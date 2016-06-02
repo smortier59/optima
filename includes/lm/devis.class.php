@@ -326,6 +326,10 @@ class devis_lm extends devis {
 
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
+		ATF::affaire_etat()->insert(array("id_affaire"=>$infos["id_affaire"],
+										  "etat"=>"commande"
+										 ));
+		unset($infos["adresse_livraison"],$infos["adresse_facturation"]);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 		$infos["ref"]=$affaire["ref"];
 
@@ -348,13 +352,31 @@ class devis_lm extends devis {
 			}
 		}		
 
-		log::logger($infos_ligne , "mfleurquin");
 
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
 			foreach($infos_ligne as $key=>$item){
 				$item["id_devis"]=$last_id;
+
+				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
+				$fournisseurs = ATF::produit_fournisseur()->select_all();
+
+				if($fournisseurs){					
+					foreach ($fournisseurs as $kf => $vf) {
+						if($vf["departement"] == NULL && !$item["id_fournisseur"]){
+							$item["id_fournisseur"] = $vf["id_fournisseur"];
+						}else{
+							$dep = explode(",", $vf["departement"]);							
+							foreach ($dep as $k => $v) {								
+								if(substr($societe["cp"],0,2) == $v){
+									$item["id_fournisseur"] = $vf["id_fournisseur"];
+								}
+							}
+						}
+					}
+				}
+
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
 					throw new error("Ligne de devis sans fournisseur",882);
