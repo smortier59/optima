@@ -3542,6 +3542,16 @@ class hotline extends classes_optima {
 	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
 
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_hotline";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
 		$colsData = array(
 			"hotline.id_hotline"=>array(),
 			"hotline.date_modification"=>array(),
@@ -3550,47 +3560,56 @@ class hotline extends classes_optima {
 			"hotline.id_user"=>array(),
 			"hotline.hotline"=>array()
 		);
-		$colsHead = array(
-			"id_hotline"=>array(),
-			"date_modification"=>array(),
-			"id_societe"=>array("visible"=>false),
-			"id_contact"=>array(),
-			"id_user"=>array(),
-			"hotline"=>array()
-		);
-		$this->q->reset()->setCount()->setLimit(50);
+
+
+		$this->q->reset();
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_hotline",$get['id'])->setLimit(1);
+		} else {
+			$this->q->setLimit($get['limit']);
+
+		}
+
+		switch ($get['tri']) {
+			case 'id_societe':
+			case 'id_user':
+			case 'id_contact':
+				$get['tri'] = "hotline.".$get['tri'];
+			break;
+		}
+
 
 		$this->q->addField($colsData);
-		// foreach ($this->colonnes['telescope'] as $k=>$i) {
-		// 	$this->q->addField($k,$i['alias']);
-		// }
 
 		$this->q->from("hotline","id_contact","contact","id_contact");
 		$this->q->from("hotline","id_societe","societe","id_societe");
 		$this->q->from("hotline","id_user","user","id_user");
 
 
-    	$cols = $colsHead;
-		$data = $this->select_all("id_hotline","desc");
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
 				if (strpos($k_,".")) {
 					$tmp = explode(".",$k_);
-					$data['data'][$k][$tmp[0]][$tmp[1]] = $val;
-					log::logger($data['data'],"qjanon");
+					$data['data'][$k][$tmp[1]] = $val;
 					unset($data['data'][$k][$k_]);
 				}				
 			}
 		}
 
+		// Envoi des headers
+		header("ts-total-row: ".$data['count']);
+		header("ts-max-page: ".ceil($data['count']/$get['limit']));
+		header("ts-active-page: ".$get['page']);
 
-		$return = array(
-			"data"=>$data,
-			"columns"=>$cols
-		);
-
-        return $return;
+        return $data['data'];
 	}
 
 };
