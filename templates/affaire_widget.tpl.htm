@@ -1,0 +1,75 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=affaire}
+<div id="{$module}Chart" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->stats(false,ATF::_g(type),true)}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}Chart',
+            type: 'spline'
+        },
+        title: {
+           text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["hoverText"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    enabled:false
+                }
+        },
+        yAxis: {            
+            title: {
+                text: null
+            }
+        },
+        plotOptions: {
+                spline: {
+                    lineWidth: 2,
+                    states: {
+                        hover: {
+                            lineWidth: 3
+                        }
+                    },
+                    marker: {
+                        enabled: false
+                    }                    
+                }
+            },
+        series: [
+           {foreach $data["dataset"] as $key =>$data2}          
+               {
+                    name: '{$key}'                    
+                   ,data: [ 
+                            {foreach $data["dataset"][$key]["set"] as $value}
+                                {$value["value"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+               }
+                {if !$data2@last},{/if}
+            {/foreach}            
+           ]        
+    });
+});
+    
+</script>
+
+
+
+<div>
+	{$a=$smarty.now|date_format:"%Y"}
+    <div>Total {$a} : {ATF::affaire()->getMargeTotaleDepuisDebutAnnee()|number_format:0:".":" "} &euro;</div>
+    <div>Total {$a-1} : {ATF::affaire()->getMargeTotaleDepuisDebutAnnee(-1)|number_format:0:".":" "} &euro; (durée équivalente)</div>
+    {$diff=ATF::affaire()->getMargeTotaleDepuisDebutAnneeDifferenceAnneePrecedente()}
+    <div>Différence : <span style="font-weight:bold;{if $diff<0}color:red{/if}">{if $diff>0}+{/if} {$diff|number_format:0:".":" "} &euro;</span></div>
+</div>
+{/strip}

@@ -1,0 +1,17 @@
+{*
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Cl enregistrement
+*}
+{* Vérification sur l'enregistrement si un ID existe en paramètre *}
+{if !$current_class->no_{$i}}
+	<div class="quickAction {$i}" style="display:inline;">
+		<a href="javascript:;" 
+			rel="{ATF::$usr->trans($i,null,_info)}" 
+			title="{ATF::$usr->trans($i)}"
+			onclick="ATF.updWait('gsa_{$current_class->table}_{$current_class->table}_{$requests[$current_class->table]["id_`$current_class->table`"]}content','Merci de patienter !',function(){ ATF.tpl2div('{$current_class->table},updateSelectAll.div','pager=gsa_{$current_class->table}_{$current_class->table}&table={$current_class->table}&function='); });">
+			<img src="{ATF::$staticserver}images/icones/{$i}.png" />
+		</a>
+	</div>
+{/if}

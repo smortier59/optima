@@ -1,0 +1,4 @@
+#!/bin/bash
+# Permet de controler un service
+# syntaxe : service-control <nom-service> etat
+service $1 $2

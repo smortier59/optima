@@ -1,0 +1,5 @@
+<a href="javascript:;" onclick="ATF.tpl2div('localisation_traduction,export_base_vers_fichier.ajax','id_localisation_langue={ATF::$usr->langue|default:1}');">{ATF::$usr->trans('generer',$current_class->table)}</a>
+<select id="id_langue"
+    onchange="ATF.tpl2div('{$current_class->name()},changeLangue.div','id_langue='+this.value,{ onComplete : function(){ ATF.tpl2div('{$current_class->name()},updateSelectAll.div','fk_name=id_localisation_langue&fk_value='+$('#id_langue').val()+'&pager={$div}'); }});">
+    {html_options options=ATF::localisation_langue()->getAll() selected=ATF::$usr->langue|default:1}
+</select>

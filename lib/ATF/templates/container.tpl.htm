@@ -1,0 +1,35 @@
+<div class="bdrContainer">
+    <div class="bdrRow">
+        <div class="absoluteContainer">
+            <div class="primaryTopLeftContent"></div>
+        </div>
+        <div class="absoluteContainer">
+            <div class="primaryTopMiddleContent"></div>
+        </div>
+        <div class="absoluteContainer">
+            <div class="primaryTopRightContent"></div>
+        </div>
+    </div>
+    <div class="{if $widget_table}slipContentContainer_{$widget_table}{elseif $onglet}slipContentContainer_{$onglet}{else}slipContentContainer{/if} bdrRow primaryMiddle">
+        <div class="absoluteContainer">
+            <div class="primaryMiddleLeftContent {if $widget_table}slipContentContainer_{$widget_table}{elseif $onglet}slipContentContainer_{$onglet}{else}slipContentContainer{/if}"></div>
+        </div>
+        <div class="absoluteContainer">
+            <div class="primaryMiddleContent {if $widget_table}slipContentContainer_{$widget_table}{elseif $onglet}slipContentContainer_{$onglet}{else}slipContentContainer{/if}"></div>
+        </div>
+        <div class="absoluteContainer">
+            <div class="primaryMiddleRightContent {if $widget_table}slipContentContainer_{$widget_table}{elseif $onglet}slipContentContainer_{$onglet}{else}slipContentContainer{/if}"></div>
+        </div>
+    </div>
+    <div class="bdrRow">
+        <div class="absoluteContainer">
+            <div class="primaryBottomLeftContent"></div>
+        </div>
+        <div class="absoluteContainer">
+            <div class="primaryBottomMiddleContent"></div>
+        </div>
+        <div class="absoluteContainer">
+            <div class="primaryBottomRightContent"></div>
+        </div>
+    </div>
+</div>

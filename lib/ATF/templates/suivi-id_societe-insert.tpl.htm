@@ -1,0 +1,6 @@
+{* On affecte la valeur de l'id_societe du contact au formulaire de suivi *}
+{if $requests.contact_id_contact}
+    {$requests.suivi.id_societe=ATF::contact()->select($requests.contact_id_contact,'id_societe')}
+{/if}
+{* On appelle normalement le generic field input *}
+{include file="generic_field.tpl.htm" key=$key item=$item}

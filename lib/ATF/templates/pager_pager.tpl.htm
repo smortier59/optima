@@ -1,0 +1,61 @@
+{** Generic-select_all - Template par dfaut d'affichage des modules
+* 
+*	string div : definit le nom du div qui contient les infos du select_all 
+*}
+{function name=changePage page=0 increase=false number=1}{strip}
+    ATF.updWait(
+        '{$div}_content'
+        ,'{ATF::$usr->trans(wait_for_page)|mt:[page=>$number]|escape:quotes}'
+        ,function(){ 
+            ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$div}&page={$page}{if $increase}&increase={$increase}{/if}&{$extra}'); 
+        }
+    );
+{/strip}{/function}
+{if $q->nb_page>1}
+    <div onmouseover="ATF.showPaging(this.up())">
+        {ATF::$usr->trans(page)|php:ucfirst} 
+    </div>
+    {if $q->page-1>0}
+        <div class="retractable" style="display:none; width:auto;">
+            {if $q->page-4>0}<a href="javascript:;" onclick="{changePage page=0}">1</a>{if $q->page-5>0} ... {/if}{/if}
+            {if $q->page-3>0}<a href="javascript:;" onclick="{changePage page={$q->page} increase="-4" number={$q->page-3}}">{$q->page-3}</a>{/if} 
+            {if $q->page-2>0}<a href="javascript:;" onclick="{changePage page={$q->page} increase="-3" number={$q->page-2}}">{$q->page-2}</a>{/if} 
+            <a href="javascript:;" onclick="{changePage page={$q->page} increase="-2" number={$q->page-1}}">{$q->page-1}</a>
+        </div>
+    {/if}
+    <div>
+        {if $q->page>0}<a href="javascript:;" onclick="{changePage page=$q->page increase="-1" number=$q->page}">{$q->page}</a>{/if} 
+        {$q->page+1} 
+        {if $q->page+1<$q->nb_page}<a href="javascript:;" onclick="{changePage page=$q->page increase="1" number={$q->page+2}}">{$q->page+2}</a>{/if} 
+    </div>
+    {if $q->page+2<$q->nb_page}
+        <div class="retractable" style="display:none; width:auto;">
+            <a href="javascript:;" onclick="{changePage page={$q->page} increase="2" number={$q->page+3}}">{$q->page+3}</a> 
+            {if $q->page+3<$q->nb_page}<a href="javascript:;" onclick="{changePage page={$q->page} increase="3" number={$q->page+4}}">{$q->page+4}</a>{/if} 
+            {if $q->page+4<$q->nb_page}<a href="javascript:;" onclick="{changePage page={$q->page} increase="4" number={$q->page+5}}">{$q->page+5}</a>{/if}
+            {if $q->page+5<$q->nb_page}{if $q->page+6<$q->nb_page} ... {/if}<a href="javascript:;" onclick="{changePage page={$q->nb_page-1} number={$q->nb_page}}">{$q->nb_page}</a>{/if} 
+        </div>
+    {/if}
+    <div>
+        | 
+    </div>
+{/if}
+<div>
+    {$q->nb_rows} 
+</div>
+<div class="retractable" style="display:none; width:auto;">
+    {if $q->nb_rows==1}{ATF::$usr->trans(item)}{else}{ATF::$usr->trans(items)}{/if}
+</div>
+<div>
+    |
+</div>
+<div>
+{if $q->limit.limit==$smarty.const.__RECORD_BY_PAGE__}
+	<a href="javascript:;" {tip text="{ATF::$usr->trans(modifier_le_nombre_d_enregistrements_par_page)} (100)"} onclick="ATF.updWait('{$div}_content','{ATF::$usr->trans(wait_for_limit_change)|mt:[nbpages=>100]|escape:quotes}'); ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$div}&limit=100&{$extra}');"><img src="{ATF::$staticserver}images/icones/listing_limit_high.png" height="16" width="16" alt="" /></a>
+{else}
+	<a href="javascript:;" {tip text="{ATF::$usr->trans(modifier_le_nombre_d_enregistrements_par_page)} ({$smarty.const.__RECORD_BY_PAGE__})"} onclick="ATF.updWait('{$div}_content','{ATF::$usr->trans(wait_for_limit_change)|mt:[nbpages=>$smarty.const.__RECORD_BY_PAGE__]|escape:quotes}'); ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$div}&limit={$smarty.const.__RECORD_BY_PAGE__}&{$extra}');"><img src="{ATF::$staticserver}images/icones/listing_limit_small.png" height="16" width="16" alt="" /></a>
+{/if}
+</div>
+<div>
+	<a href="javascript:;" {tip text="{ATF::$usr->trans(listing_truncate)}"} onclick="if ($w($('#{$div}_content').className).indexOf('seeAll')==-1) $('#{$div}_content').addClassName('seeAll'); else $('#{$div}_content').removeClassName('seeAll');"><img src="{ATF::$staticserver}images/icones/listing_truncate.png" height="16" width="16" alt="" /></a>
+</div>

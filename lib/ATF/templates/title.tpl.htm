@@ -1,0 +1,17 @@
+{**
+* Affichage du titre du document
+* @param object $current_class
+*}
+{strip}
+	{if $smarty.const.__DEV__===true}
+    	DEV|
+    {/if}
+	{if ATF::$usr->logged}
+        {if is_a($current_class,classes)}            
+            {if $smarty.get["id_{$current_class->name()}"]}{$current_class->nom($smarty.get["id_{$current_class->name()}"])|php:"strip_tags"} - {/if}
+            {t w=$current_class->table p=module} - {/if}
+        {t w=ATF::$project|cat:_title}
+    {else}
+    	{t w=ATF::$project|cat:_title_long}
+    {/if}
+{/strip}

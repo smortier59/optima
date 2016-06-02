@@ -1,0 +1,5 @@
+{strip}{* Appel ajax d'une sélection de champ *}
+{if $table && $id && $field}
+	{ATF::getClass($table)->select($id,$field)|nl2br}
+{/if}
+{/strip}

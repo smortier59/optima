@@ -1,0 +1,181 @@
+#!/usr/bin/php
+<?php
+//Désactivation des erreurs
+error_reporting(0);
+/* Autorise l'exécution infinie du script, en attente de connexion. */
+set_time_limit(0);
+/* Active le vidage implicite des buffers de sortie, pour que nous
+ * puissions voir ce que nous lisons au fur et à mesure. */
+ob_implicit_flush();
+
+/*-------------------------------------------------------*/
+/* Gestion des arguments de la commande (argc-argv)      */
+/*-------------------------------------------------------*/
+$command='';
+if($_SERVER['argc']<5){
+	echo "Envoie de commande vers le serveur ASIO\n";
+	echo "Utilisation : command <id-server> <user> <type> <nom-commande> [Arguments]\n";
+	echo "Exemple : command asterisk absystech extern alive\n";
+	exit(1);
+}else{
+	//Définition de l'identifiant serveur
+	$id_server=next($_SERVER['argv']);
+	//Définition de l'identifiant utilisateur
+	$user=next($_SERVER['argv']);
+	//Définition du type de la commande
+	$type_command=next($_SERVER['argv']);
+	//Définition de la commande
+	$command=array();
+	$compteur=0;
+	while($tmp=next($_SERVER['argv'])){
+		if($compteur==0){
+			$command['command']=$tmp;
+		}else{
+			$command['arg'.$compteur]=$tmp;
+		}
+		$compteur++;
+	}
+	//$command=implode(chr(59),$command);
+}
+
+echo "[DEMARRAGE DU CLIENT - ".date('d/m/y').' - '.date('H:i:s')."]\n";
+//sleep(1);
+/*------------------------------------------*/
+/* Lecture du fichier de configuration      */
+/*------------------------------------------*/
+$configuration=parse_ini_file('client.ini',true);
+//Erreur survenue
+if($configuration===false){
+	die("Erreur de Configuration ! Le fichier de configuration de l'application 'client.ini' est invalide !\n");
+}
+
+/*------------------------------------------*/
+/* Initilisation du client                  */
+/*------------------------------------------*/
+//Librairies utilisées
+define("__ABSOLUTE_PATH__",$configuration['global_path']['path']);
+//require_once(__ABSOLUTE_PATH__.'interface/classes/phpObject.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Network.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Fichier.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Crypt.class.php');
+
+//Création du fichier s'il n'existe pas
+$path_client=__ABSOLUTE_PATH__.$configuration['path']['log'].'client-debug.log';
+if(!file_exists($path_client)){
+	touch($path_client);
+}
+
+//Défintion de l'adresse et du port
+$adresse_client=$configuration['client']['ip'];
+$port_client=$configuration['client']['port'];
+
+//Fichier de log du client
+$path_log=__ABSOLUTE_PATH__.'log/client.log';
+$log_chambre=new Fichier($path_log);
+if(!file_exists($path_log)){
+	touch($path_log);
+}
+
+//Initialisation du cryptage
+$crypt=new Crypto($configuration['client']['cle']);
+
+//Fin de l'initialisation
+
+echo "[CLIENT CREE ".date('d/m/y').' - '.date('H:i:s')."]\n";
+//sleep(1);
+//Boucle de reconnexion
+do {	
+	//Création du client
+	$client=new Network($adresse_client,$port_client,$path_client,false,false);
+	//Création de la socket (Ressource)
+	$client->createSocket();
+	//Connexion au serveur
+	echo "--Connexion au serveur Asio-- \n";
+	//sleep(1);
+	$retour=$client->connectSocket();
+	//Test de connexion
+	if(!$retour){
+		echo "--Erreur de connexion-- \n";
+	}else{
+		echo "--Connexion reussie ".date('d/m/y').' - '.date('H:i:s')."]\n";
+		//sleep(1);//Attente avant nouvelle séquence
+		//Boucle pour une connexion
+		do {
+			if(!$client){
+				break;
+			}
+			
+			echo "----Envoi de la commande au serveur ASIO\n";
+			//sleep(1);
+			//--Ecriture du message
+			// SYNTAXE:
+			// char(124).JSON.chr(124)
+			// Envoie d'un JSON
+			// arg1 : nom du serveur
+			// arg2 : utilisateur
+			// arg3 : nom de la commande
+			// arg4 à n : arguments de la commande
+			$json=array('server'=>$id_server
+				   ,'user'=>$user
+				   ,'type'=>$type_command);
+			$json=array_merge($json,$command);
+			$command=chr(2).json_encode($json).chr(3);//Définition de la commande
+			//Cryptage du message
+			$message=$crypt->crypte($command);
+			//$message=$command;
+			$client->writeSocket($message);
+			echo "----Commande envoyée : ".$command."\n";
+
+			echo "----Réception du retour de la commande\n";
+			
+			//Lecture
+			//$buffer_read='';//Buffer de lecture
+			$buffer=$client->readSocket(false,2048,PHP_BINARY_READ);
+			//Decryptage du message
+			$message=$crypt->decrypte($buffer);
+			//sleep(1);
+			do{
+				$compteur++;
+				$buffer=$client->readSocket(false,2048,PHP_BINARY_READ);
+				//echo "buffer : ".$buffer."\n";
+				$message.=$crypt->decrypte($buffer);
+				//echo "message : ".$message."\n";
+				//Arret IMPREVU DE LA LECTURE
+				if(substr($message,0,1)!=chr(2)){//Première lecture : On doit avoir le flag de début de lecture
+					echo "[ERREUR] Flag de début de commande incorrect ! (".ord(substr($message,0,1)).")\n";
+					break;
+				}
+				if($buffer==false){//Buffer vide
+					//echo "[ERREUR] Le tampon de lecture est vide !\n";
+					break;
+				}
+				if($compteur>100){
+					echo "[ERREUR] Le message envoyé est trop important (MAX:204800 octets)\n";
+					break;
+				}
+				//fin du message
+				$end=substr($message,strlen($message)-1,1);
+			}while($end!=chr(3));
+			
+			//On supprime les marqueurs de début et de fin
+			$message=substr($message,1,strlen($message)-2);
+			//On décode le json
+			$command=json_decode($message,true);
+
+			echo "----Retour du serveur : ".$message."\n";
+			echo "----Retour de la commande : ".$command['return']."\n";
+			//sleep(1);
+			//Deconnexion
+			//if(!$buffer){break;}
+			break;
+			//sleep(30);//Attente avant nouvelle séquence
+		}while(true);//fin boucle de connexion
+		//Fermeture de la connexion
+		$client->closeSocket();
+		echo "[ARRET DU CLIENT ".date('d/m/y').' - '.date('H:i:s')."]\n";
+		exit(0);
+	}//Fin if$client
+	break;
+	sleep(10);//Attente avant nouvelle connexion
+}while(true);
+?>

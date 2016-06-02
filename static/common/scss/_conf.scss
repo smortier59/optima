@@ -1,0 +1,42 @@
+
+$url : '../interface/';
+
+/*
+************Fonts****************
+*/
+
+$base: Helvetica, Arial,  sans-serif;
+$headings: Helvetica,Arial, sans-serif;
+
+
+/*
+************Color****************
+*/
+
+
+
+
+
+
+/*
+**********helpers****************
+*/
+
+//Objectif : Recupere les dimmensions d'une image dont le nom est passé en paramètres
+// utilisation: @include dimensions('monimage.jgp');
+
+@mixin dimensions($image) {
+  width:  image-width($image);
+  height: image-height($image);
+}
+
+.clear{
+	clear:both;
+}
+
+
+
+
+/*       *****************************************   *\
+          ************ COMMENTAIRES **********
+\*       *****************************************   */

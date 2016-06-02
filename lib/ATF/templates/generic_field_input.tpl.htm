@@ -1,0 +1,166 @@
+{*
+	$key : Clé du champ de la base de données
+	$name : Nom du champ
+	$item : Structure du champ
+	$condition_field : Champs sur lequel on pourra faire un where dans l'autocomplete
+	$condition_value : Valeur sur laquelle on pourra faire un where dans l'autocomplete
+	$extra : Spécificité du champ (ex : READONLY)
+	$noname : Champ visible mais qui ne doit pas être insert/update  
+	$field_insert : Tableau de champ supplémentaire pour le speed_insert
+	$smarty.session.requests[$current_class->table][$key] : Tableau initialiser de façon spécifique par la méthode session_requests pour les cas où le formulaire d'update et rafraichi et que l'on perd le $requests
+	$update : Booléen qui a TRUE ne prend ni la valeur $smarty.session.requests[$current_class->table][$key] par défaut, ni la valeur par défaut métier ($current_class->default_value())
+	$width => taille des champs input (utilisé pour le generic_field_input
+	$value : valeur de pré-remplissage
+    $onkeyup => si on souhaite mettre un listener de type onkeyup sur le champs
+*}
+{if $update}
+    {$value=$requests[$current_class->name()][$key]|default:$smarty.request[$key]|default:$value}
+{else}
+    {$value=$requests[$current_class->name()][$key]|default:$smarty.request[$key]|default:$smarty.session.requests[$current_class->table][$key]|default:$value|default:$current_class->default_value($key)}
+{/if}
+
+{if !$name}
+	{if $alias}
+    	{$name="`$current_class->table`[`$alias`]"}
+    {else}
+		{$name="`$current_class->table`[`$key`]"}
+    {/if}
+{/if}
+{if !$class}
+	{$class="floatLeft"}
+{/if}
+
+{if $item.type=="text" || $item.type=="int" || $item.type=="decimal" || $item.type=="float"}
+	{if $key|php:"substr":"-7"=="id_pays"}
+		<select {$extra} {if !$noname} name="{$name}" {/if} id="{$name}" style=" width:150px">
+			{if $item['null']}<option value="">-</option>{/if}
+			{html_options options=ATF::pays()->options(ATF::$usr->trans("id_language")) selected=$value|default:$item.default}
+		</select>
+	{elseif ATF::getClass($current_class->fk_from($key))}
+		{$key_class=ATF::getClass($current_class->fk_from($key))}
+        {$value=$key_class->decryptId($value)|default:$value}
+		{$key_class->q->reset()->end()}
+		{if $condition_field && $condition_value}
+			{$condition_class=ATF::getClass($key_class->fk_from($condition_field))}
+			{if $condition_class}
+				{$key_class->q->addCondition("{$key_class->table}.{$condition_field}",$condition_class->decryptId($condition_value))->end()}
+			{else}
+				{$key_class->q->addCondition("{$key_class->table}.{$condition_field}",$condition_value)->end()}
+			{/if}
+		{/if}
+        
+        {* @todo Faire cela de manière générique avec un flag ds le constructeur par exemple $this->metafilter[etat]='inactif' *}
+		{if $key_class->table=="contact" || $key_class->table=="user"}
+			{$key_class->q->addCondition("{$key_class->table}.etat","inactif",false,false,"<>")->addOrder("nom")->end()}
+		{/if}
+        
+		{$count=$key_class->count()}
+		{if $count>0}
+        	{$tab_donnees=['name'=>$name
+            				,'key'=>$key
+                            ,'count'=>$count
+                            ,'extra'=>$extra
+                            ,'noname'=>$noname
+                            ,'item'=>$item
+                            ,'condition_field'=>$condition_field
+                            ,'condition_value'=>$condition_value
+                            ,'table_request'=>$smarty.request.table]}
+			<div class="{$class}">
+				<div id="gfi_{$name}">
+					{include file="generic-autocomplete_champs.tpl.htm" width=$width}
+				</div>
+			</div>
+		{else}
+			<span class="italic floatLeft">
+            	{ATF::$usr->trans("aucun(e) ")}{ATF::$usr->trans($key)}
+            </span>
+		{/if}
+		{if $key_class->colonnes.speed_insert && !$key_class->colonnes.blocked_speed_insert}
+        	<div id="speed_insert_gfi_{$name}">
+				<a href="javascript:;" onclick="ATF.tpl2div('{$key_class->name()},speed_insert_modalbox.ajax','nocr=true');" {tip text=ATF::$usr->trans("insert")}><img src="{ATF::$staticserver}images/icones/insert.png" height="16" width="16" alt="" /></a>
+			</div>
+        {/if}
+	 {*
+	 Ce code gére le coulorMoud lors de l'édtion d'un projet d'emailing par exemple.
+	 Il permet d'afficher la palette de couleur, de saisir la couleur et l'affecter à la variable couleur_fond appropirée
+	 on teste le champ couleur ci il est à true on affiche le coulorMoud.
+	 La gestion de la couleur de fond du FCKEditor est ensuite modifié dans le fckeditor.css.php grace au fckeditor.php
+	 *} 
+	{elseif $item.color}
+		{$couleur_avt=ATF::emailing_projet()->select($requests["{$current_class->table}"],"couleur_fond")}
+		<div id="overDiv" onmouseover="javascript:;" style="background-color:transparent; position:absolute; visibility:hidden; z-index:1000;"></div>                                    
+		<div id="ColourMod">
+			<div id="cmDefault " onmouseover="javascript:;">
+				<div id="cmColorContainer" class="cmColorContainer" onmouseover="javascript:;"></div>
+				<div id="cmSatValBg" class="cmSatValBg" onmouseover="javascript:;" ></div>
+				<div id="cmDefaultMiniOverlay" class="cmDefaultMiniOverlay" onmouseover="javascript:;"></div>
+				<div id="cmSatValContainer">
+					<div id="cmBlueDot" class="cmBlueDot" onmouseover="javascript:;"></div>
+				</div>
+				<div id="cmHueContainer">
+					<div id="cmBlueArrow" class="cmBlueArrow" onmouseover="javascript:;"></div>
+				</div>
+				<div id="cmClose" onmouseover="javascript:;">
+					<input type="text" {if !$noname} name="{$name}" {/if} id="cmHex" value="{$couleur_avt}" maxlength="6" size="9" style="width:60px" /> 
+					<a href="javascript:;" onclick="var e = '#'+$('#{$key|replace:"[":"\\\\["|replace:"]":"\\\\]"}').val(); $('#emailing_projet[corps]___Frame').css({ backgroundColor: e });" id="cmCloseButton">
+						<img src="js/colourmod/images/closeOver.gif" border="0" alt="Close" /> 
+					</a>
+				</div>
+				<div style="display:none">
+					<input type="text" name="cmHue" id="cmHue" value="0" maxlength="3" style="width:75px"/>
+				</div>
+			</div>
+		</div>
+			<td>
+				<table class="std">
+					<tr>
+						<td><div id="couleur_couleur_fond" style="font-size:8px;border:1px #000000 solid;background-color:#{$requests[$current_class->table].couleur_fond};width:20px;height:10px;cursor:pointer" onclick="if (this.style.cursor=='pointer'){ pickcolor('.demoBG', 'backgroundColor', true, 'couleur_fond', this,-200,-250,'couleur_couleur_fond'); }"></div></td>
+						<td colspan="2" style="padding-left:5px"><div id="couleur_fond_txt">Palette</div></td>
+						<td  style="align=left"><input type="text" name="couleur_fond" id="couleur_fond" readonly="readonly" value="{$requests[$current_class->table].couleur_fond}"  style="border:0px;background-color:transparent;width:50px;cursor:default" /></td>
+					</tr>
+				</table>
+			</td>
+		
+		
+	{elseif $item.FCKEditor}
+		{* on teste ici le champ FCKEditor et on inclu le FCKEditor.tpl si ce champ est à true *}   
+		{*include file="FCKEditor.tpl.htm" key=$key item=$item*}  
+	{else}
+		{if $item.textarea}
+			<textarea onkeyup="if (event.keyCode == 13) { this.rows = this.rows + 1; }" rows="1" {if !$noname} name="{$name}" {/if} id="{$name}" {$extra}>{$value|default:$item.default}</textarea>
+		{else} 
+			<input type="text" {if !$noname} name="{$name}" {/if} {if $width} style="width:{$width}px" {/if} id="{$name}" maxlength="{$item.maxlength}" {$extra} value="{$value|default:$item.default}" {if $onkeyup}onkeyup="{$onkeyup}"{/if} {if $onchange} onchange="{$onchange}" {/if} />
+		{/if}
+	{/if}
+{elseif $item.type=="date"}
+	<input type="text" name="{$name}" id="{$name}" maxlength="10" {if (!$item['null'] || $item['contain_date']) && $item['contain_date']!==false}{$date_now = $smarty.now|date_format:"%Y-%m-%d"}{/if} value="{$value|default:$item.default|default:$date_now}" {$extra} style="width:120px" />
+	<script type="text/javascript">/*<![CDATA[*/
+		ATF.datefield("{$name}",'d-m-Y');
+	/*]]>*/</script>
+{elseif $item.type=="datetime"}
+	<div id="{$name}_bis"></div>
+	<input type="hidden" name="{$name}" id="{$name}" maxlength="19" {if (!$item['null'] || $item['contain_date']) && $item['contain_date']!==false}{$date_now = $smarty.now|date_format:"%Y-%m-%d %H:%M:00"}{/if} value="{$value|default:$item.default|default:$date_now}"  {$extra} style="width:120px" />
+	<script type="text/javascript">/*<![CDATA[*/
+		setTimeout("ATF.dateTimeField('{$name}','{$value|default:$smarty.now|date_format:'%d-%m-%Y'}','{$value|default:$smarty.now|date_format:'%H:%M'}')",1000);
+	/*]]>*/</script>
+{elseif $item.type=="enum"}
+	<select {if !$noname} name="{$name}" {/if} onchange="{$onkeyup}" id="{$name}" {$extra}>{if $item["null"]}<option value="">-</option>{/if}{html_options output=ATF::$usr->trans($item.data,"`$current_class->table`_`$key`") values=$item.data selected=$value|default:$item.default}</select>
+{elseif $item.type=="set"}
+	{html_checkboxes output=ATF::$usr->trans($item.data,$current_class->table) values=$item.data selected=explode(",",$value|default:$item.default) name=$name}
+    |&nbsp;<input type="checkbox" name="{$name}" value="" /> Aucun
+{elseif $item.type=="textarea"}
+	{if $item.editor}
+        {*<textarea id="{$name}" class="{$item.editor}" {if !$noname} name="{$name}" {/if} style="height:250px;width:450px;">{$value|default:$item.default}</textarea>  *}
+        <div id="{$name}_div"></div>
+		<script type="text/javascript">/*<![CDATA[*/
+			new Ext.form.HtmlEditor({include file="generic-field-textfield.tpl.js" renderTo="{$name}_div" height="{$height|default:250}" width="{$width|default:450}" value=$value|default:$item.default}).render();
+        /*]]>*/</script>
+        {*<a href="javascript:;" onclick="tinyMCE.get('{$name}').hide();">hide</a>*}
+    {else}
+        <textarea {if !$noname} name="{$name}" {/if} id="{$name}" rows="6" onkeyup="{* YG: Extremement naze... comme dit dans ajax.tpl.js (adjustContainer), il faut refaire les imbrications CSS en relatif ! *}if (event.keyCode == 13) { var fontSize=(Number)(this.getStyle('fontSize').replace('px','')); this.css({ height: (this.height()+fontSize)+'px' }); ATF.adjustContainer(); if ($('#submit')) $('#submit').css({ marginTop: (fontSize+6+(Number)($('#submit').getStyle('marginTop').replace('px','')))+'px'}); }" {$extra}>{$value|default:$item.default}</textarea>   
+    {/if}
+{elseif $item.type=="time"} 
+	<input type="text" {if !$noname} name="{$current_class->table}[temps_h]" {/if} value="{{$value|substr:0:2}|default:0}" maxlength="10" style="width:25px"/>&nbsp;heure(s)  <input type="text" name="{$current_class->table}[temps_m]" value="{{$value|substr:3:2}|default:0}" maxlength="2" style="width:25px"/>&nbsp;minute(s)
+{else}
+	type de champs non géré : <strong>{$key}</strong> : {$item.type}
+{/if}

@@ -1,0 +1,42 @@
+{$listing_profil_privilege=ATF::profil_privilege()->a_privilege($id_profil)}
+{include file='profil_etiquette.tpl.htm' assign=x}
+<table border="1">
+    <thead>
+        <th class="col"><a {tip text="{$x}"}><img src="{ATF::$staticserver}images/icones/help.png" alt="" /></a></th>
+        {foreach from=ATF::privilege()->privilege key=cle_priv_titre item=info_priv_titre}
+            <th>
+                {ATF::$usr->trans($info_priv_titre.privilege,'privilege')}
+            </th>
+        {/foreach}
+    </thead>
+    <tbody>
+        {foreach from=ATF::$usr->structureModule(NULL,NULL) key=cle_mod item=info_mod}
+            {if $info_mod.module}
+                <tr>
+                    <td class="col" onclick="ATF.toggle_children({$cle_mod});">
+                        {if $info_mod.enfants}
+                            <div id="image_{$cle_mod}" class="icone">&nbsp;</div>
+                        {/if}
+                        <div>{ATF::$usr->trans($info_mod.module,'module')}</div>
+                    </td>
+                    {foreach from=ATF::privilege()->privilege key=cle_priv item=info_priv}
+                        <td>
+                            <div id="{$cle_mod}_{$info_priv.id_privilege}">{include file="profil_check.tpl.htm"}</div>
+                        </td>
+                    {/foreach}
+                    <td class="co_deco">
+                        <a href="javascript:;" onclick="ATF.tpl2div('profil_privilege,insert.ajax','id_profil={$id_profil}&id_module={$cle_mod|cryptid}');" rel="{ATF::$usr->trans('cocher_tout_module','profil')}">
+                            <img src="{ATF::$staticserver}images/icones/cb_active.gif" height="11" width="11" alt="" />
+                        </a>
+                        <a href="javascript:;" onclick="ATF.tpl2div('profil_privilege,delete.ajax','id_profil={$id_profil}&id_module={$cle_mod|cryptid}');" rel="{ATF::$usr->trans('decocher_tout_module','profil')}">
+                            <img src="{ATF::$staticserver}images/icones/cb_inactive.gif" height="11" width="11" alt="" />
+                        </a>
+                    </td>
+                </tr>
+               {include file="profil_ssmenu.tpl.htm" enfants=$info_mod.enfants id_parent=$cle_mod}
+            {/if}
+        {/foreach}
+    </tbody>
+</table>
+{include file="button.tpl.htm" name="ok" text="cocher_tout" onclick="if(confirm('Etes vous sur de vouloir tout cocher ?')){ ATF.tpl2div('profil_privilege,insert.ajax','id_profil={$id_profil}'); }"}
+{include file="button.tpl.htm" name="ok" text="decocher_tout" onclick="if(confirm('Etes vous sur de vouloir tout decocher ?')){ ATF.tpl2div('profil_privilege,delete.ajax','id_profil={$id_profil}'); }"}

@@ -1,0 +1,85 @@
+{$modif=$current_class->select($smarty.get["id_{$current_class->name()}"],'avant_modification')}
+<tr><td class="field">{$key}</td>
+<td class="value">
+{if $modif}
+	{$modif=$modif|unserialize}
+
+	{if $modif[0][0]}
+        {$nom_module=ATF::module()->nom($requests.tracabilite.id_module)}
+        {$num=1}
+        <div id="tabs1"></div>    
+        <script type="text/javascript">/*<![CDATA[*/
+    
+            var tabs = new Ext.TabPanel({
+                renderTo: 'tabs1',
+                width:450,
+                activeTab: 0,
+                frame:true,
+                defaults:{ autoHeight: true },
+				enableTabScroll:true,
+                items:[
+                    {foreach from=$modif key=cle item=liste}
+                        {foreach from=$liste key=cle2 item=donnees}
+                            {capture assign=informations}
+                                {foreach from=$donnees key=nom_champs item=valeurs}
+                                    {$serializ=$valeurs|unserialize}
+                                    {if !$serializ}
+                                        {if $current_class->fk_from($nom_champs)}
+                                            {$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+                                            <div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {ATF::getClass($module)->nom($valeurs)|default:$valeurs} </div>
+                                        {else}
+                                            <div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {$valeurs}</div>
+                                        {/if}
+                                    {/if}
+                                {/foreach}   
+                            {/capture} 
+                            { html:'{$informations|escape:javascript}', title: '{$nom_module} n° {$num++}' },
+                        {/foreach}
+                    {/foreach} 
+                ]
+            });
+    
+        /*]]>*/</script>
+    {elseif $modif[0]}
+        {$nom_module=ATF::module()->nom($requests.tracabilite.id_module)}
+        {$num=1}
+        <div id="tabs1"></div>    
+        <script type="text/javascript">/*<![CDATA[*/
+    
+            var tabs = new Ext.TabPanel({
+                renderTo: 'tabs1',
+                width:450,
+                activeTab: 0,
+                frame:true,
+                defaults:{ autoHeight: true },
+                items:[
+					{foreach from=$modif key=cle2 item=donnees}
+						{capture assign=informations}
+							{foreach from=$donnees key=nom_champs item=valeurs}
+								{$serializ=$valeurs|unserialize}
+								{if !$serializ}
+									{if $current_class->fk_from($nom_champs)}
+										{$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+										<div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {ATF::getClass($module)->nom($valeurs)|default:$valeurs} </div>
+									{else}
+										<div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {$valeurs}</div>
+									{/if}
+								{/if}
+							{/foreach}   
+						{/capture} 
+						{ html:'{$informations|escape:javascript}', title: '{$nom_module} n° {$num++}' },
+					{/foreach}
+                ]
+            });
+    
+        /*]]>*/</script>
+    {else}
+        <a style="cursor:pointer" 
+         onclick="Modalbox.show('tracabilite_avant_modification.dialog', { scrollTo:0, width: 700, title: '{ATF::$usr->trans(avant_modification,tracabilite)}', params: 'table={$current_class->table}&id_trace={$smarty.get["id_{$current_class->name()}"]}', method:'post' });">            
+        <img src="{ATF::$staticserver}images/icones/update.png" height="16" width="16" alt="" /></a>
+	{/if}
+{else}
+-
+{/if}
+</td>
+</tr>

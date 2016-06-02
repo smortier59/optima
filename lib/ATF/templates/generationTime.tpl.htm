@@ -1,0 +1,8 @@
+{**
+* Template copyright - Affiche les informations de copyright de l'application ainsi que le temps de génération de la page
+* @param string $generationTime Le temps de génération de la page (information sous forme d'une chaine de caractères)
+*}
+<br />
+<a href="http://www.absystech.fr/" onclick="window.open('http://www.absystech.fr/');return false;">AbsysTech</a> &copy;&reg; 2003-{$smarty.now|date_format:"%Y"}
+{* - Mise en page optimisée pour 1024x768 sur <a href="http://www.mozilla.com/firefox/" onclick="window.open('http://www.mozilla.com/firefox/');return false;">Mozilla Firefox</a>
+<br />{ATF::$usr->trans(generation_time)} : {if $generationTime}{ATF::$html->getSmartyAnalyzer()}{else}[ATF:GENERATION_TIME]{/if}*}

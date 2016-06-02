@@ -1,0 +1,104 @@
+<table>
+	<tr>
+    	<td>
+            <div style='padding-left:15px;'>- toutes les intéractions des 30 dernières semaines</div>
+            <div style='padding-left:15px;'>- choix de la date de fin</div>
+            <div style='padding-left:15px;'>- à la charge de qui ?</div>
+        </td>
+    </tr>
+</table>
+<br /><hr /><br />
+<div>Date de fin : 
+	{if $date_fin}
+    	{$date_now = $date_fin|date_format:"%Y-%m-%d"}
+    {else}
+		{$date_now = $smarty.now|date_format:"%Y-%m-%d"}
+    {/if}
+    <input type="text" name="date_fin" id="date_fin" maxlength="10" value="{$value|default:$date_now}" style="width:120px" />
+	<script type="text/javascript">/*<![CDATA[*/
+		ATF.datefield("date_fin",'d-m-Y');
+	/*]]>*/</script>
+	<a href="javascript:;" onclick="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&graph={$graph}&date_fin='+$('#date_fin').val());"><img src="{ATF::$staticserver}images/icones/valid.png" alt="" /></a>
+</div>
+<!-- Graphique -->
+<div id="{$table}_3"></div>
+{$data_tab=ATF::hotline_interaction()->stats30($date_now)}
+
+<script type="text/javascript">
+{$data = $data_tab}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_3',
+            type: 'line'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+            ,title: {
+                text: 'N° de semaine'
+            }
+        },
+        colors :[
+            
+            '#FFCF23',           
+            '#19FF30', 
+             '#FF0004'          
+        ],
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            }
+            ,min:0
+        },
+        series: [
+                  {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'line'
+                   ,name: '{$value["params"]["seriesname"]}'                                     
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                                                     
+                                {$v["value"]|number_format:2:'.'} 
+                                {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}           
+           ]        
+    });
+});    
+</script>
+
+
+<!-- Tableau -->
+<br /><hr /><br />
+{$data_tab.params.caption} {if $data_tab.params.subCaption}({$data_tab.params.subCaption}){/if} :<br />
+<table class="std">
+	<tr>
+    <td style="width:200px;">&nbsp;</td>
+		{foreach from=$data_tab.dataset key=key item=item}
+        	<td style="text-align:center;border:dotted;border-width:1px;">
+                {ATF::$usr->trans($key,'stats')}
+            </td>
+        {/foreach}
+    </tr>
+    
+    {foreach from=$data_tab.categories.category key=key item=item}
+    <tr style="background-color:{cycle values='#E3F3A3,#D3DAE0'};">
+    	<td style="text-align:center;width:200px;border:dotted;border-width:1px;">
+    		{$item.label}
+        </td>
+        {foreach from=$data_tab.dataset key=key_ item=item_}
+    		<td style="text-align:center;border:dotted;border-width:1px;">
+    			{str_replace('.','h',$item_.set[$key].value)}
+    		</td>
+    	{/foreach}
+    </tr>
+    {/foreach}
+</table>

@@ -1,0 +1,63 @@
+<div class="panelContainer" id="panelContainer" style="display:none">
+    <div class="bdrContainer">
+        <div class="bdrRow">
+            <div class="absoluteContainer">
+                <div class="bdrTopLeftContent"></div>
+            </div>
+            <div class="absoluteContainer">
+                <div id="panelContainerTitle" class="bdrTopMiddleContent">Titre</div>
+            </div>
+            <div class="absoluteContainer">
+                <div class="bdrTopRightContent">
+                </div>
+            </div>
+        </div>
+        <div class="bdrContentContainer bdrRow leftPanelContentContainer">
+            <div class="absoluteContainer">
+                <div class="leftPanelContentContainer bdrMiddleLeftContent"></div>
+            </div>
+            <div class="absoluteContainer">
+                <div class="leftPanelContentContainer bdrMiddleContent"></div>
+            </div>
+            <div class="absoluteContainer">
+                <div class="leftPanelContentContainer bdrMiddleRightContent"></div>
+            </div>
+        </div>
+        <div class="bdrRow">
+            <div class="absoluteContainer">
+                <div class="bdrBottomLeftContent"></div>
+            </div>
+            <div class="absoluteContainer">
+                <div class="bdrBottomTopContent"></div>
+            </div>
+            <div class="absoluteContainer">
+                <div class="bdrBottomRightContent"></div>
+            </div>
+        </div>
+    </div>
+    <div class="contentContainer" id="contentContainer" ></div>
+</div>
+{if ATF::accueil()->shortcut}
+    <div class="panelToolbar">
+        <div class="toolbar" id="toolbar" style="{if !ATF::$usr->custom['toolbar'] || ATF::$usr->custom['toolbar']=='ferme'}display:none;{/if}">
+            <div class="toolbarT"></div>
+            <div class="toolbarM">
+                {foreach from=ATF::accueil()->shortcut key=k item=i}
+                    <div {if $i.style}style="{$i.style}"{/if}>
+						<a href='{if !$i.onclick}#{/if}{$i.href|default:"`$k`.html"}' {if $i.style_link}style="{$i.style_link}"{/if} id="{$i.name}_link" rel='{$i.rel|default:"`$i.text`"}' onclick="ATF.ToggleToolBar();{if $i.onclick}{$i.onclick}{/if}">
+                        	{if $i.icone}<img src="{ATF::$staticserver}images/shortcut/{$i.icone}" id="{$i.name}_img" class="shortcut">{/if}{if $i.text}{$i.text}{/if}
+						</a>
+                    </div>
+                {/foreach}
+            </div>
+            <div class="toolbarB"></div>
+        </div>
+        <div id="toolbarAppear" class="toolbarAppear" onclick="ATF.ToggleToolBar();" {if ATF::$usr->custom['toolbar']=='ouvert'}style="cursor:w-resize;"{/if}>
+            <div class="toolbarAppearT"></div>
+            <div class="toolbarAppearM">
+				<img id="toolbar_img" src="{ATF::$staticserver}images/icones/arrow_expand_{if !ATF::$usr->custom['toolbar'] || ATF::$usr->custom['toolbar']=='ferme'}right{else}left{/if}.png" />
+			</div>
+            <div class="toolbarAppearB"></div>
+        </div>
+    </div>
+{/if}

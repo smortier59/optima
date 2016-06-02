@@ -1,0 +1,168 @@
+{* héhé *}
+{if !$projet}
+	{$id_gp=$smarty.request.id_gep_projet}
+    {$projet=ATF::gep_projet()->select($id_gp)}
+{/if}
+
+{if $infos.id_attr && $projet}
+    {$attr = ATF::attr()->select($infos.id_attr)}
+
+    {$div_childs="childs_{$infos.id_pa}_{$attr.id_attr}_{$rand|random:1:1000000000|md5}"}
+	
+	
+    {* ATTR ENFANTS *}
+    {$data = ATF::pa()->selectChilds($infos.id_pa)}
+    {if !$data}
+        {$data = ATF::attr()->selectChilds($infos.id_attr)}
+    {/if}
+    <div class="indent{$indent} pa" id="pa_{$infos.id_pa}">
+        <div class="attrTitle{if $infos.id_pa} attrTypePA{else} attrTypeA{/if}">
+            <div class="icone">
+                {if $div_childs && $data}
+                    <a href="javascript:;" onclick="{strip}
+                    if ($('#{$div_childs}').innerHTML) { 
+                        ATF.__attr.collapse('{$div_childs}','{$infos.id_attr}_{$infos.id_pa}');
+                    } else { 
+                        ATF.__attr.expand('{$div_childs}','div={$div_childs}&template=gep_projet-formulaire_attr_childs&id_attr={$attr.id_attr}&id_pa={$infos.id_pa}&id_gep_projet={$projet.id_gep_projet}');
+                        if ($('#icon_{$infos.id_attr}_{$infos.id_pa}')) {
+                            $('#icon_{$infos.id_attr}_{$infos.id_pa}').removeClassName('expand');
+                            $('#icon_{$infos.id_attr}_{$infos.id_pa}').addClassName('collapse');
+                        }
+                    }{/strip}">
+                        {if ATF::formulaire()->isOpened("`$infos.id_attr`_`$infos.id_pa`") || $allOpen}
+                            <div id="icon_{$infos.id_attr}_{$infos.id_pa}" class="collapse"></div>
+                        {else}
+                            <div id="icon_{$infos.id_attr}_{$infos.id_pa}" class="expand"></div>
+                        {/if}
+                    </a>
+                    <span style="display: none;" id="__l{$div_childs}"><img alt="Working..." src="{ATF::$staticserver}images/refreshing.gif"/></span>
+                {/if}
+            </div>
+            
+			{if $infos.id_pa}
+				<span class="reference">
+					<input type="checkbox" id="reference" style="width:20px;" {if $infos.reference} checked="checked"{/if} onchange="new ATF.ajax('pa,updateRef.ajax','id_pa={$infos.id_pa}&ref='+this.checked);" />
+				</span>
+			{/if}
+            <span class="libelle" id="pa_libelle_{$infos.id_pa}">
+                {include file="gep_projet-formulaire_attr_label.tpl.htm"}
+            </span>
+            ({if $infos.id_pa}<a href="pa-select-{$infos.id_pa|cryptid}.html">PA{$infos.id_pa}</a> / {/if}<a href="attr-select-{$infos.id_attr|cryptid}.html">A{$attr.id_attr}</a>)
+            <span class="offset">
+                {if $infos.id_pa}
+                    [<input type="text" class="updateOnTheFly offset" style="width:20px;" value="{$infos.offset}" onchange="new ATF.ajax('pa,updateOffset.ajax','id_pa={$infos.id_pa}&offset='+encodeURIComponent(this.value));" />]
+                {else}
+                    [{$infos.offset}]
+                {/if}
+            </span>
+            <span class="type">[{ATF::$usr->trans($attr.type,'attr')|strtoupper}]</span>
+            
+            <span class="multi" id="multi_{$infos.id_attr}_{$infos.id_pa}"> 
+                {include file="gep_projet-formulaire_attr_multi.tpl.htm"}
+            </span>
+            {if $attr.type=='text'}
+                <span class="ac" id="ac_{$infos.id_attr}"> 
+                    {include file="gep_projet-formulaire_attr_ac.tpl.htm"}
+                </span>
+            {/if}
+            <span class="attrStyle" id="attrStyle_{$infos.id_attr}_{$infos.id_pa}"> 
+                {include file="gep_projet-formulaire_attr_attrStyle.tpl.htm"}
+            </span>
+        </div>
+		{if ATF::attr()->canUpdate($infos.id_attr)}
+			<div id="toolBar">
+				<div class="tbLeft"></div>
+				<div class="tbMiddle">
+					{* BOUTTON AJOUT D'ATTRIBUT ENFANT *}
+					<span>
+						<a href="javascript:;" rel="{ATF::$usr->trans('edit_pa','formulaire')|escape:htmlall}" onclick="{if !$infos.id_pa}if (confirm('{ATF::$usr->trans('addAttr_etes_vous_sur','formulaire')}')) ATF.tpl2div('formulaire,addNewAttr.ajax','display_form=1&id_gep_projet={$projet.id_gep_projet}&id_parent={$infos.id_pa}&id_attr_parent={$attr.id_attr}'); {else} Effect.Grow('editPa{$div_childs}', { direction: 'left-right' }); {/if} return false;">
+							<img src="{ATF::$staticserver}images/icones/insert.png" height="16" width="16" />
+						</a>
+					</span>
+					<span style="display:none" id="editPa{$div_childs}">
+						{* Autocomplete *}
+						<input type="text" name="{$div_childs}_label" id="{$div_childs}_label" value="" />
+						<span id="ScrAcAutocompleteIndicator{$div_childs}" style="display: none"><img src="{ATF::$staticserver}images//refreshing.gif" alt="Working..." /></span>
+						<div id="ScrAcAutocomplete{$div_childs}" class="ScrAcAutocomplete"></div>
+			
+						<script item.type="text/javascript">/*<![CDATA[*/
+						new Ajax.Autocompleter (
+						  "{$div_childs}_label",
+						  "ScrAcAutocomplete{$div_childs}",
+						  "attr,autocompleteOLD.ajax",
+							{
+							method: 'post'
+							, paramName: 'recherche' 
+							, minChars: 1
+							, indicator: 'ScrAcAutocompleteIndicator{$div_childs}'
+							, afterUpdateElement : function (text, li) { 
+								if (li.id=='new') {
+									$('#{$div_childs}_label').val("");
+									ATF.tpl2div('formulaire,addNewAttr.ajax','display_form=1&id_gep_projet={$projet.id_gep_projet}&id_parent={$infos.id_pa}&id_attr_parent={$attr.id_attr}');
+								} else {
+									ATF.tpl2div('formulaire,addAttr.ajax','id_gep_projet={$projet.id_gep_projet}&id_attr='+li.id+'&id_parent={$infos.id_pa}');
+								}
+							}
+						  }
+						);
+						/*]]>*/</script>
+						<a href="javascript:;" onclick="$('#editPa{$div_childs}').hide(); return false;">
+							<img src="{ATF::$staticserver}images/icones/back.png" height="16" width="16" />
+						</a>
+					</span>
+					
+					{if $infos.id_pa}
+						{* BOUTTON CLONE D'ATTRIBUT *}
+						<a href="javascript:;" rel="{ATF::$usr->trans('cloner','formulaire')|escape:htmlall}" onclick="if (confirm('{ATF::$usr->trans(voulez_vous_dupliquer_attr)|escape:javascript}')) { ATF.tpl2div('pa,cloner.ajax', 'id_pa={$infos.id_pa}'); return false; }"> 
+							<img src="{ATF::$staticserver}images/icones/cloner.png" />
+						</a>
+						
+						{* BOUTTON CONVERSION DES ENFANTS A en PA *}
+						{if $infos.id_pa && !ATF::pa()->hasChild($infos.id_pa) && ATF::attr()->hasChild($attr.id_attr)}
+							<a href="javascript:;" rel="{ATF::$usr->trans('childs2PA','formulaire')|escape:htmlall}" onclick="if (confirm('{ATF::$usr->trans(voulez_vous_childs2PA_attr)|escape:javascript}')) { ATF.tpl2div('pa,childs2PA.ajax', 'id_pa={$infos.id_pa}&id_attr={$infos.id_attr}'); return false; }"> 
+								<img src="{ATF::$staticserver}images/icones/convert.png" />
+							</a>
+						{/if}
+						
+						{* BOUTTON SUPPRESSION D'ATTRIBUT *}
+						<a href="javascript:;" rel="{ATF::$usr->trans('del_attr','formulaire')|escape:htmlall}" onclick=" if (confirm('{ATF::$usr->trans('del_etes_vous_sur','formulaire')|escape:javascript}')) ATF.ajax('formulaire,delAttr.ajax', 'id={$infos.id_pa}', { onComplete: function (obj) { if (obj.result) { $('#pa_{$infos.id_pa}').remove(); ATF.adjustContainer(); } } });"> 
+							<img src="{ATF::$staticserver}images/icones/delete.png" />
+						</a>
+						
+						{* BOUTTON D'EDITION DES COUTS *}
+						<a href="javascript:;" rel="{ATF::$usr->trans('cout','formulaire')|escape:htmlall}" onclick="Modalbox.show('gep_projet-formulaire_attr_cout.dialog', { title:'{ATF::$usr->trans('cout_edit','formulaire')|mt:[pa=>$infos.id_pa,attr=>$attr.attr]|escape:javascript}', params:'id_pa={$infos.id_pa}', method:'post' });">
+							{if !ATF::pa()->hasCout($infos.id_pa)}
+								{$o=no_}
+							{else}
+								{$o=''}
+							{/if}
+							<img src="{ATF::$staticserver}images/icones/{$o}euro.png" />
+						</a> 
+					{/if}
+                    
+				</div>
+
+                
+				<div class="tbRight"></div>
+			</div>
+        {/if}
+		<div class="ClearBoth"></div>
+        
+        {if ($data && ATF::formulaire()->isOpened("`$infos.id_attr`_`$infos.id_pa`")) || $allOpen}
+            <div id="{$div_childs}" class="blockBordered">{include file="gep_projet-formulaire_attr_childs.tpl.htm" noKeep=true}</div>
+        {else}
+            <div id="{$div_childs}" class="blockBordered" style="display:none"></div>
+        {/if}
+        
+        <div class="ClearBoth"></div>
+    </div> 
+	<script item.type="text/javascript">/*<![CDATA[*/
+        $('#pa_{$infos.id_pa}').refreshBranch = function() {
+            new ATF.tpl2div('tpl2div.ajax', 'div='+this.up().id+'&template=gep_projet-formulaire_attr_childs&id_pa={$infos.id_parent}&id_gep_projet={$projet.id_gep_projet}');
+        }.bind($('#pa_{$infos.id_pa}'));
+    /*]]>*/</script>
+{else}
+	{var_dump($projet)}
+	{var_dump($infos)}
+	Pas d'ID attr dans l'infos	
+{/if}

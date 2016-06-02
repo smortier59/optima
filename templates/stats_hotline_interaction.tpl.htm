@@ -1,0 +1,19 @@
+<div id="menu_2">
+    <ul>
+        <li><a href="javascript:;" onclick="ATF.stats_hot_charger(1)">Graphe 1</a></li>
+        <li><a href="javascript:;" onclick="ATF.stats_hot_charger(2)">Graphe 2 (60 jours)</a></li>
+        <li><a href="javascript:;" onclick="ATF.stats_hot_charger(3)">Graphe 3 (30 semaines)</a></li>
+        <li><a href="javascript:;" onclick="ATF.stats_hot_charger(4)">Graphe 4 (charge par utilisateur)</a></li>
+        <li><a href="javascript:;" onclick="ATF.stats_hot_charger(5)">Graphe 5 (production)</a></li>
+    </ul>
+</div>
+<div id="stat_hot">
+	{if $graph}
+    	{include file="stats_hotline_interaction_`$graph`.tpl.htm" graph=$graph}
+    {/if}
+</div>
+<script type="text/javascript">/*<![CDATA[*/
+	ATF.stats_hot_charger = function (num){
+		ATF.tpl2div('tpl2div.ajax','div=stat_hot&template=stats_hotline_interaction_'+num+'&table=hotline_interaction&graph='+num);
+	}
+/*]]>*/</script>  

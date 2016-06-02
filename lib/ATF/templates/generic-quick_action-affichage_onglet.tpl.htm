@@ -1,0 +1,21 @@
+{* 
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Clé enregistrement
+*}
+
+{* Vérification sur l'enregistrement si un ID existe en paramètre *}
+{if $id && $current_class->onglets}
+    {* Peut-on faire cette action sur cet enregistrement précis ou non ? *}
+    {if $current_class->is_active($k,$id)} 
+        <div class="quickAction {$k}" style="display:inline;">
+            <a href="javascript:;" 
+            	onclick="Modalbox.show('onglet_select.dialog', { width: 400, title: 'Personalisation des affichages des onglets pour \'{ATF::$usr->trans($current_class->table,'module')}\'', params: 'table={$current_class->table}&id_table={$id}', method:'post' });" 
+            	rel="{ATF::$usr->trans($k,null,_info)}" 
+                title="{ATF::$usr->trans($k)}">
+                <img src="{ATF::$staticserver}images/icones/onglet.png" />
+            </a>
+        </div>
+    {/if}
+{/if}

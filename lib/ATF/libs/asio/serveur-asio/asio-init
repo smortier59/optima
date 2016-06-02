@@ -1,0 +1,117 @@
+#! /bin/sh
+# Copyright (c) 2002,2003 SuSE Linux AG, Nuernberg, Germany.
+# All rights reserved.
+#
+# Author: Anas Nashif
+#
+# /etc/init.d/asio
+
+### BEGIN INIT INFO
+# Provides: asio
+# Required-Start: $network $syslog
+# Required-Stop:  $network $syslog
+# Default-Start:  3 5
+# Default-Stop:   0 1 2 6
+# Description:    launch asio server
+### END INIT INFO
+
+# Shell functions sourced from /etc/rc.status:
+#      rc_check         check and set local and overall rc status
+#      rc_status        check and set local and overall rc status
+#      rc_status -v     ditto but be verbose in local rc status
+#      rc_status -v -r  ditto and clear the local rc status
+#      rc_failed        set local and overall rc status to failed
+#      rc_failed <num>  set local and overall rc status to <num><num>
+#      rc_reset         clear local rc status (overall remains)
+#      rc_exit          exit appropriate to overall rc status
+#      rc_active	checks whether a service is activated by symlinks
+. /etc/rc.status
+# First reset status of this service
+rc_reset
+
+# Return values acc. to LSB for all commands but status:
+# 0 - success
+# 1 - generic or unspecified error
+# 2 - invalid or excess argument(s)
+# 3 - unimplemented feature (e.g. "reload")
+# 4 - insufficient privilege
+# 5 - program is not installed
+# 6 - program is not configured
+# 7 - program is not running
+# 
+# Note that starting an already running service, stopping
+# or restarting a not-running service as well as the restart
+# with force-reload (in case signalling is not supported) are
+# considered a success.
+
+ASIO_BIN="/srv/www/htdocs/asteriskadmin/libs/asio/serveur-asio/serveur"
+if [ ! -x $ASIO_BIN ]; then
+	echo -n "Autonomous Server Input Output is not installed."
+	# Tell the user this has skipped
+	rc_status -s
+	exit 5
+fi
+
+# Set default in case of missing sysconfig file
+#ASIO_USE_INETD=yes
+ASIO_OPTIONS="--daemon"
+#if [ -f /etc/sysconfig/asio ]; then
+#    . /etc/sysconfig/asio
+#fi
+
+#if [ "$ASIO_USE_INETD" = "yes" ]; then
+#    exit 0;
+#fi
+
+case "$1" in
+  start)
+	echo -n "Starting Asio server : "
+	startproc $ASIO_BIN $ASIO_OPTIONS
+	rc_status -v
+	;;
+  stop)
+	echo -n "Stopping Asio server"
+	killproc -TERM $ASIO_BIN
+	rc_status -v
+
+	# Remember status and be verbose
+#	rc_status -v
+	;;
+  try-restart)
+	## Do a restart only if the service was active before.
+	## Note: try-restart is not (yet) part of LSB (as of 1.2)
+	$0 status >/dev/null && $0 restart
+
+	# Remember status and be quiet
+	rc_status
+	;;
+  restart)
+	## Stop the service and regardless of whether it was
+	## running or not, start it again.
+	$0 stop
+	$0 start
+
+	# Remember status and be quiet
+	rc_status
+	;;
+  status)
+	echo -n "Checking for service asio:"
+	## Check status with checkproc(8), if process is running
+	## checkproc will return with exit status 0.
+
+	# Return value is slightly different for the status command:
+	# 0 - service running
+	# 1 - service dead, but /var/run/  pid  file exists
+	# 2 - service dead, but /var/lock/ lock file exists
+	# 3 - service not running
+
+	# NOTE: checkproc returns LSB compliant status values.
+	checkproc $ASIO_BIN
+	rc_status -v
+	;;
+  *)
+	echo "Usage: $0 {start|stop|status|try-restart|restart}"
+	exit 1
+	;;
+esac
+rc_exit

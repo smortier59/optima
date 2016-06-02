@@ -1,0 +1,16 @@
+#!/bin/bash
+# Permet de donner l'état d'un service
+# Syntaxe : service-etat <nom-service>
+# Exemple : service-etat sshd
+if [[ $(service $1 status 2>&1|grep "no such service") ]]
+then
+	echo 'invalide'
+	exit 1
+fi
+
+if [[ $(service $1 status|grep running) ]]
+then
+	echo 'marche'
+else
+	echo 'arret'
+fi

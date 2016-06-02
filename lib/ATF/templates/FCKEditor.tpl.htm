@@ -1,0 +1,21 @@
+{if $current_class->oFCKeditor}
+    {*FONCTION POUR RECUPERER LE CORPS DU FCK EDITOR*}
+    <script type="text/javascript">/*<![CDATA[*/
+    if (!ATF.speedmail) {
+        ATF.speedmail = new Object();
+        ATF.speedmail.instances = new Object();
+    }
+    if (!ATF.speedmail.instances["{$name_field}"]) {
+        ATF.speedmail.instances["{$name_field}"] = function (element) {
+            FCKeditorAPI.GetInstance("{$name_field}").GetXHTML();
+            for ( i = 0; i < parent.frames.length; ++i ) {
+                if ( parent.frames[i].FCK ) {
+                    parent.frames[i].FCK.UpdateLinkedField();
+                }
+            }
+            return FCKeditorAPI.GetInstance("{$name_field}").GetXHTML();
+        };
+    }
+    /*]]>*/</script>
+	{$current_class->oFCKeditor->Create($name_field,$requests[$current_class->table][$key],$current_class->oFCKEditor.ToolbarSets,$current_class->oFCKEditor.EditorAreaCSS,$current_class->oFCKEditor.Width,$current_class->oFCKEditor.Height)}
+{/if}

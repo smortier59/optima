@@ -1,0 +1,13 @@
+{$modif=$current_class->select($smarty.get["id_`$current_class->name()`"],'modification')}
+{$event=$requests["`$current_class->name()`"]["`$current_class->name()`"]}
+<tr><td class="field">{$key}</td>
+<td class="value">
+{if $modif && ($event=="update" || $event=="insert")}
+	<a style="cursor:pointer" 
+    onclick="Modalbox.show('tracabilite_modification.dialog', { scrollTo:0, width: 700, title: '{ATF::$usr->trans(modification,tracabilite)}', params: 'table={$current_class->table}&id_trace={$smarty.get["id_`$current_class->name()`"]}', method:'post' });">            
+	<img src="{ATF::$staticserver}images/icones/update.png" height="16" width="16" alt="" /></a>
+{else}
+-
+{/if}
+</td>
+</tr>

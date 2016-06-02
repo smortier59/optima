@@ -1,0 +1,38 @@
+<div id="primary_pointage" class="primary pointage" style="width:100%;">
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{ATF::$usr->trans('shortcut_pointage_by_month',$current_class->table)}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div>
+    <div class="primaryContainer feuille" id="feuillePrimaryContainer">
+        {include file="container.tpl.htm" onglet="feuille"}
+        <div class="slipContainer feuille" id="feuilleContainer" >
+			{include file="pointage_by_month.tpl.htm"}
+        </div>
+    </div>
+	
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{ATF::$usr->trans('shortcut_pointage_by_day',$current_class->table)}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div> 
+    <div class="primaryContainer feuilleMois" id="feuilleMoisPrimaryContainer">
+        {include file="container.tpl.htm" onglet="feuilleMois"}
+        <div class="slipContainer feuilleMois" id="feuilleMoisContainer" >
+			{include file="pointage_by_day.tpl.htm"}
+        </div>
+    </div>
+
+    {if ATF::$html->template_exists("{$current_class->table}-select_all_suffix.tpl.htm")}
+       {include file="{$current_class->table}-select_all_suffix.tpl.htm" entete=true}
+    {/if}
+</div>
+<script type="text/javascript">
+	/* Mise à jour de la taille du fond de pointage */
+	//updateHeight();
+</script>
+

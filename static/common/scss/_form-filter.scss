@@ -1,0 +1,275 @@
+////////////////////////
+// style des formulaires
+/////////////////////////
+
+#overlay-filter{
+
+
+#new-element-builder{
+	padding: 10px 15px 10px 15px;
+	background: #82b055;
+	&>.header-builder{
+		font-size: 18px;
+		color: #eee;
+		font-weight: bold;
+		margin-bottom: 8px;
+	}
+
+	.champs-list{
+		margin-bottom: 10px;
+	}
+
+	
+}
+
+
+//reglage second niveau
+.level2{
+	.filter-form{
+
+		.dynamic-champs2{
+			input[type="text"]{
+				width: 250px;
+			}
+	
+			.sbHolder{
+				width: 245px;
+				margin-right: 0;
+			}
+		}
+	}
+}
+
+
+.filter-form{
+
+		.dynamic-champs2{
+
+			input[type="text"]{
+				width: 270px;
+			}
+	
+			.sbHolder{
+				width: 270px;
+				margin-right: 0;
+			}
+
+			.sbOptions{
+				width: 270px;
+			}
+		}
+}
+
+
+
+
+.filter-form{
+
+	.champs-list{
+		margin-bottom: 10px;
+	}
+
+	padding-bottom: 10px;
+
+		ul{
+			border-left-width:0;
+		}
+		
+		padding-top: 10px;
+		input[type="text"]{
+		background-color: #fff;
+		border: solid 1px #ddd;
+		box-shadow: 1px 1px 3px #eee inset;
+		border-radius:6px;
+		height: 35px;
+		
+		position: relative;
+		width: 270px;
+		padding:0 15px;
+		outline:none;
+		color: #777;
+		font-weight: bold;
+		font-size: 14px;
+		}
+
+		input[type="submit"]{
+			
+			color: #fff;
+			border:1px solid darken(#709b47,10%);
+			font-weight: bold;
+			text-align: center;
+			line-height: 30px;
+			padding: 0px 15px;
+			height:30px;
+			display: block;
+			float: right;
+			position: relative;	
+			background: #709b47;
+			border-radius:4px;
+			box-shadow: 0 2px 0px  darken(#709b47,10%),0 4px 2px  #aaa ;
+			cursor: pointer;
+
+			&:hover{
+				top: 2px;	
+				box-shadow: 0 0 0px  darken(#709b47,0%) inset;
+			}
+		}
+
+		#btn-update-form{
+			float: right;
+			margin-right: 10px;
+			
+		}
+
+
+		input[type="reset"]{
+			
+			color: #fff;
+			border:1px solid darken(#fc3145,20%);
+			font-weight: bold;
+			text-align: center;
+			line-height: 25px;
+			padding: 0px 15px;
+			height:30px;
+			background: #fc3145;
+			border-radius:4px;
+			position: relative;	
+			box-shadow: 0 2px 0px  darken(#fc3145,15%),0 4px 2px  #aaa ;
+			cursor: pointer;
+
+			&:hover{
+				top: 2px;	
+				box-shadow: 0 0 0px  darken(#fc3145,25%) inset;
+			}
+		}
+
+		.first-champs{
+			float: left;
+		}
+
+		.dynamic-champs, .dynamic-champs1, .dynamic-champs2{
+			float: left;
+		}
+	}
+
+	
+
+	
+	.sbHolder{
+		
+		background-color: #fff;
+		border: solid 1px #ddd;
+		box-shadow: 1px 1px 3px #eee inset;
+		border-radius:6px;
+		font-size: 14px;
+		font-weight: normal;
+		height: 35px;
+		margin-right: 15px;
+		position: relative;
+		width: 245px;
+		float: left;
+	}
+	.sbHolder:focus .sbSelector{
+		
+	}
+	.sbSelector{
+		display: block;
+		height: 30px;
+		left: 0;
+		line-height: 30px;
+		outline: none;
+		overflow: hidden;
+		position: absolute;
+		text-indent: 10px;
+		top: 0;
+		width: 245px;
+	}
+	.sbSelector:link, .sbSelector:visited, .sbSelector:hover{
+		color: #777;
+		font-weight: bold;
+		outline: none;
+		text-decoration: none;
+	}
+	.sbToggle{
+		background: url($url+'ico-select.png') no-repeat 0px center;
+		display: block;
+		height: 30px;
+		outline: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+		width: 35px;
+	}
+	.sbToggle:hover{
+		background: url($url+'ico-select.png') no-repeat  0px center;
+	}
+	.sbToggleOpen{
+		background: url($url+'ico-select.png') no-repeat  0px center;
+	}
+	.sbToggleOpen:hover{
+		background: url($url+'ico-select.png') no-repeat  0px center;
+	}
+	.sbHolderDisabled{
+		background-color: #3C3C3C;
+		border: solid 1px #515151;
+	}
+	.sbHolderDisabled .sbHolder{
+		
+	}
+	.sbHolderDisabled .sbToggle{
+		
+	}
+	.sbOptions{
+		background-color: #fff;
+		border: solid 1px #ddd;
+		list-style: none;
+		left: -1px;
+		border-radius: 0 0 5px 5px;
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		top: 31px !important ;
+		width: 245px;
+		z-index: 1;
+		overflow-y: auto;
+	}
+	.sbOptions li{
+		padding: 0px;
+	}
+	.sbOptions a{
+		border-bottom: solid 1px #eee;
+		display: block;
+		outline: none;
+		padding: 7px 0 7px 7px;
+	}
+	.sbOptions a:link, .sbOptions a:visited{
+		color: #888;
+		text-decoration: none;
+	}
+	.sbOptions a:hover,
+	.sbOptions a:focus,
+	.sbOptions a.sbFocus{
+		
+		background: #eee;
+	}
+	.sbOptions li.last a{
+		border-bottom: none;
+	}
+	.sbOptions .sbDisabled{
+		border-bottom: dotted 1px #515151;
+		color: #bbb;
+		display: block;
+		padding: 7px 0 7px 3px;
+	}
+	.sbOptions .sbGroup{
+		border-bottom: dotted 1px #515151;
+		color: #EBB52D;
+		display: block;
+		font-weight: bold;
+		padding: 7px 0 7px 3px;
+	}
+	.sbOptions .sbSub{
+		padding-left: 17px;
+	}
+
+}

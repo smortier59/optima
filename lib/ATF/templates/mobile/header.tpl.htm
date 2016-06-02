@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+<head>
+<title>{include file="title.tpl.htm"}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-language" content="fr" />
+<meta name="expires" content="never" />
+<meta name="rating" content="general" />
+<meta name="revisit-after" content="2 days" />
+<meta name="ROBOTS" content="index,follow" />
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}js/sencha-touch-1.0.1a/resources/css/sencha-touch.css" />
+<style type="text/css">	
+.demos-loading {
+  background: rgba(0,0,0,.3) url({ATF::$staticserver}js/sencha-touch-1.0.1a/resources/shared/loading.gif) center center no-repeat;
+  display: block;
+  width: 10em;
+  height: 10em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -5em;
+  margin-top: -5em;  
+  -webkit-border-radius: .5em;
+  color: #fff;
+  text-shadow: #000 0 1px 1px;
+  text-align: center;
+  padding-top: 8em;
+  font-weight: bold;
+}
+.x-tab img.devis,.x-button img.x-icon-mask.devis { -webkit-mask-image:url('{ATF::$staticserver}images/module/48/devis.png'); }
+.x-tab img.suivi,.x-button img.x-icon-mask.suivi { -webkit-mask-image:url('{ATF::$staticserver}images/module/48/suivi.png'); }
+.x-tab img.hotline,.x-button img.x-icon-mask.hotline { -webkit-mask-image:url('{ATF::$staticserver}images/module/48/hotline.png'); }
+.x-tab img.stats,.x-button img.x-icon-mask.stats { -webkit-mask-image:url('{ATF::$staticserver}images/module/48/stats.png'); }
+.x-tab img.accueil,.x-button img.x-icon-mask.accueil { -webkit-mask-image:url('{ATF::$staticserver}images/module/48/accueil.png'); }
+
+</style>
+<script type="text/javascript" src="{ATF::$staticserver}js/sencha-touch-1.0.1a/sencha-touch{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}js/md5/md5{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}js/atf/atf{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}"></script>
+</head>

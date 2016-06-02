@@ -1,0 +1,204 @@
+{* reinitialisation du tableau de session contenant la liste des champs des modules mis en supplément *}
+{ATF::$usr->unsetListeChamps($table)}
+
+{if "public_"==$filter_key|php:'substr':0:7}
+	{$filter_key=$filter_key|php:'substr':'7'}
+    {$filter=ATF::filtre_optima()->select($filter_key,"options")}
+    {$filter=$filter|unserialize}
+    {$public=true}
+{elseif $filter_key}
+    {$filter=ATF::filtre_optima()->select($filter_key,"options")}
+    {$filter=$filter|unserialize}
+{else}
+    {$evenement='insert'}
+{/if}
+<input type="hidden" id="evenement" value="{if $evenement}{$evenement}{else}update{/if}" />
+<div>
+    <div>Nom du filtre : <input type="text" name="filter_name" id="__filter_name" value="{$filter.name|default:"Filtre sans nom"}" style="width:200px" /></div>
+    <div style="padding-top:10px;">Filtres associés :</div>
+    <ul id="__chooseColums_column_list">
+        {foreach from=$filter.conditions key=key item=item}
+			<li id="__chooseColumnsAdd{$key}" style="cursor:n-resize">                 
+            	{include file="pager_filter_li.tpl.dialog" 
+                    field=$item.field
+                    operand=$item.operand
+                    value=$item.value
+                    value_sup=$item.value_sup}
+            </li>
+        {/foreach}
+    </ul>
+    <ul id="list2">
+        <li id="list2item">
+        	{include file="pager_filter_column.tpl.htm" table=$current_class->table}
+		</li>
+    </ul>
+    <ul id="__chooseMods_list" style="clear:both">
+    	{foreach from=$filter.jointures key=key item=item}
+			<li id="__chooseModsAdd{$key}">                 
+            	{include file="pager_filter_listmod_li.tpl.dialog" 
+                        module=$item.module
+                        nom_module=$item.nom_module
+                        liste_champs=$item.liste_champs}
+            </li>
+        {/foreach}
+    </ul>
+    <ul style="margin-top:10px;"><li><a href="javascript:;" onclick="$$('.advancedFiltering').each(function (e) { Effect.toggle(e, 'blind', { duration: .5, afterFinish: function () { Modalbox.resizeToContent(); } }); })">Filtrage avancé</a></li></ul>
+    <ul id="list3" class="advancedFiltering" style="display:none;">
+    	<li>
+            Rechercher : 
+            <input type="radio" name="filter_mode" id="__filter_modeAND" value="AND"{if $filter.mode==="AND" || !$filter.mode} checked="checked"{/if} /> Toutes les conditions ci-dessus
+            <input type="radio" name="filter_mode" id="__filter_modeOR" value="OR"{if $filter.mode==="OR"} checked="checked"{/if} /> Au moins l'une des conditions ci-dessus
+        </li>
+        <li id="list3item" style="margin-top:10px;"> 
+            <select name="liste_modules" onchange="ATF.tpl2div('{$table},refresh_column.ajax','div=list2item&template=pager_filter_column&table={$table}&mod='+this.value, { 
+            											onComplete:function(obj){ 
+                                                        	for(module in obj.result){ 
+                                                            	if(!isNaN(module)) { 
+                                                                	if(obj.result[module].jointure){
+                                                                        ATF.__pager_filter_listmodAdd(obj.result[module].jointure,'true');
+                                                                        ATF.__pager_filter_listmodAdd(obj.result[module].module,obj.result[module].jointure);
+                                                                    }else{
+                                                                    	ATF.__pager_filter_listmodAdd(obj.result[module],0);
+                                                                    }
+                                                                } 
+                                                             } 
+                                                         } 
+                                                    });
+                                                    this.value='';" style="width:auto">
+                <option value="">Ajouter un module :</option>
+				{html_options options=ATF::module()->listeModules()}
+            </select>
+		</li>
+    </ul>
+    <ul class="advancedFiltering" style="display:none;">
+    	<li>Type de jointure :
+        	<input type="radio" name="choix_join" value="left" {if $filter.choix_join=='left' || !$filter.choix_join}checked="checked"{/if} onchange="$('#id_choix_join').val()=this.value" />Left
+            <input type="radio" name="choix_join" value="inner" {if $filter.choix_join=='inner'}checked="checked"{/if} onchange="$('#id_choix_join').val()=this.value" />Inner
+            <input type="radio" name="choix_join" value="right" {if $filter.choix_join=='right'}checked="checked"{/if} onchange="$('#id_choix_join').val()=this.value" />Right
+            <input type="hidden" id="id_choix_join" value="{$filter.choix_join|default:left}" />
+        </li>
+    </ul>
+    <div style="text-align:right;">
+        <input  value="Valider" name="ok" type="button"
+            onclick="
+            var sel = Sortable.tree('__chooseColums_column_list').children;
+
+            var post = 'nommodule={$current_class->table}&table=filtre_optima';
+            {if $filter_key}
+				post += '&filtre_optima[id_filtre_optima]={$filter_key}';
+            {/if}
+			post += '&filtre_optima[filtre_optima]='+$('#__filter_name').val();
+            post += '&filtre_optima[options][name]='+$('#__filter_name').val();
+            post += '&filtre_optima[options][mode]='+($('#__filter_modeAND').checked ? $('#__filter_modeAND').val() : $('#__filter_modeOR').val());
+            if ($('#__filter_public').checked) {
+                post += '&filtre_optima[type]=public'; {* Rendre public le filtre *}
+            } else {
+                post += '&filtre_optima[type]=prive'; {* Rendre privé le filtre *}
+			}
+            post += '&event='+$('#evenement').val();
+            
+            for (var i=0;i<sel.length;i++) {
+                post += '&filtre_optima[options][conditions]['+sel[i].id+'][field]='+$('#__chooseColumnsAdd_field_'+sel[i].id).val();
+                post += '&filtre_optima[options][conditions]['+sel[i].id+'][operand]='+$('#__chooseColumnsAdd_operand_'+sel[i].id).val();
+                if($('#__chooseColumnsAdd_operand_'+sel[i].id).val()=='BETWEEN'){
+                	post += '&filtre_optima[options][conditions]['+sel[i].id+'][value]='+$('#__chooseColumnsAdd_value'+sel[i].id).val();
+                	post += '&filtre_optima[options][conditions]['+sel[i].id+'][value_sup]='+$('#__chooseColumnsAdd_value_datesup'+sel[i].id).val();
+            	}else{
+                	post += '&filtre_optima[options][conditions]['+sel[i].id+'][value]='+$('#__chooseColumnsAdd_value_'+sel[i].id).val();
+                }
+            }
+            var jointures = '';
+            jointures=ATF.__pager_filter_ajout_jointure();
+            jointures+='&filtre_optima[options][choix_join]='+$('#id_choix_join').val();
+			
+			ATF.ajax('filtre_optima,saveFilter.ajax',post+'&'+jointures,{ onComplete: function (obj) { if(obj.result){ Modalbox.hide(); Ext.getCmp('{$nom_tab}').removeAll(); Ext.getCmp('{$nom_tab}').fireEvent('render'); } } });
+
+           " />
+    	<input  value="Supprimer" name="delete" type="button"
+            onclick="{if $current_class->selectAllExtjs!==false && $filter_key && $filter_key!=1}
+                        ATF.ajax('filtre_optima,removeFilter.ajax', 'id_filtre_optima={$filter_key}',{ onComplete: function (obj) { Modalbox.hide(); Ext.getCmp('{$nom_tab}').removeAll(); Ext.getCmp('{$nom_tab}').fireEvent('render'); } });
+                    {else}
+            			ATF.ajax('filtre_optima,removeFilter.ajax', 'id_filtre_optima={$filter_key}',{ onComplete: function (obj) { Modalbox.hide(); ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$onglet}{if $parent_class}&parent_class={$parent_class}{/if}&table={$current_class->table}&filter_key='); } });
+    				{/if}" />
+    </div>
+    <p id="list-info"></p>
+    <script type="text/javascript">/*<![CDATA[*/
+		Sortable.SERIALIZE_RULE = /^__chooseColumnsAdd(.*)$/; /* Sert à retourner tout l'id lors du serialize(), sinon par défaut cela ne retourne que ce qu'il y a après le dernier "_" */
+		ATF.__pager_filterAdd = function (field) {
+			if (field) {
+				var newLi = document.createElement('li');
+				var key = 0;
+				if (Sortable.tree('__chooseColums_column_list').children.length) {
+					key = Sortable.tree('__chooseColums_column_list').children.length;
+					while ($('#__chooseColumnsAdd'+key)) { /* Au cas où on aurait retiré des ligne et fait des trous dans la numérotation */
+						key++;
+					}
+				}
+				newLi.setAttribute('id','__chooseColumnsAdd'+key);
+				newLi.setAttribute('style','cursor:n-resize');
+				document.getElementById('__chooseColums_column_list').appendChild(newLi);
+				new Ajax.Updater('__chooseColumnsAdd'+key,'pager_filter_li.dialog',{ method: 'post',evalScripts:'true', parameters: 'field='+field+'&key='+key+'&table={$table}', onComplete: function () { Modalbox.resizeToContent(); } });
+			}
+			Sortable.destroy("__chooseColums_column_list");
+			Sortable.create("__chooseColums_column_list", { onUpdate:function(){ } });
+		}
+		ATF.__pager_filterAdd(null);
+		
+		/* pour l'affichage des modules supplémentaires */
+		ATF.__pager_filter_listmodAdd = function (field,joint) {
+			if (field) {
+				var newLi = document.createElement('li');
+				var key = 0;
+				while ($('#__chooseModsAdd'+key)) { /* Au cas où on aurait retiré des ligne et fait des trous dans la numérotation */
+					key++;
+				}
+				newLi.setAttribute('id','__chooseModsAdd'+key);
+				document.getElementById('__chooseMods_list').appendChild(newLi);
+				new Ajax.Updater('__chooseModsAdd'+key,'pager_filter_listmod_li.dialog',{ method: 'post', parameters: 'nom_module='+field+'&key='+key+'&table={$table}&filter_key={$filter_key}&joint='+joint, onComplete: function () { Modalbox.resizeToContent(); } });
+			}
+		}
+		
+		/* pour enlever la liste des champs d'un module supprimé de la liste */
+		ATF.__pager_filter_listmod_optgroup = function(key,nom){
+			var cle=key+1;
+			while ($('#__chooseModsAdd'+cle)) {
+				var optGroups=$('#__chooseModsAdd'+cle).getElementsByTagName("OPTGROUP");
+				for ( var i =0; i < optGroups.length; i++){
+					optGroups[i].id=nom+"_"+i;
+					
+					if(optGroups[i].label==nom){
+				   		$('#liste_champs_'+cle).removeChild ($('#'+optGroups[i].id));
+				   	}
+                }
+				cle++;
+			}
+		}
+		
+		/* retourne la liste de toutes les lignes */
+		ATF.__pager_filter_ajout_jointure = function(){
+			var jointure;
+			for ( var i =0; i < 20; i++){
+				if($('#module_'+i)) {
+					if(jointure){
+						jointure+="&";
+					}else{ 
+						jointure=""; 
+					}
+					jointure += "filtre_optima[options][jointures]["+i+"][nom_module]="+$("#nom_module_"+i).val();
+					jointure += "&filtre_optima[options][jointures]["+i+"][module]="+$("#module_"+i).val();
+					jointure += "&filtre_optima[options][jointures]["+i+"][liste_champs]="+$("#liste_champs_"+i).val();
+					/*jointure += "&filters[{$current_class->table}][{$filter_key}][jointures]["+i+"][alias]="+$("#alias_"+i).val();*/
+				}
+			}
+			return jointure;
+		}
+    /*]]>*/</script>
+    <div style="text-align:right;">
+        Cocher cette case pour rendre ce filtre public :
+        {if $public}
+            <input type="checkbox" name="filter_public" id="__filter_public" value="update" checked="checked" disabled="disabled" />
+        {else}
+            <input type="checkbox" name="filter_public" id="__filter_public" value="insert" />
+        {/if}
+    </div>
+</div>

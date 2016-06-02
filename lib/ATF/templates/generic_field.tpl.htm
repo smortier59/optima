@@ -1,0 +1,117 @@
+{*
+$key => Nom du champs de la BDD
+$item => Infos sur ce champs
+$display_fields => Détermine si l'on utilise le generic_fields pour l'affichage ou pour générer le formulaire d'un champ
+$extra => infos supplémentaires pour ajouter des attributs au champ
+$width => taille des champs input (utilisé pour le generic_field_input)
+$height => hauteur des champs input (utilisé pour le generic_field_input)
+*}
+{if $display_fields}
+	{* Afin de pouvoir gérer un template particulier pour un champ uniquement pour select ! *}
+    {$view=ATF::$usr->get(custom,columns,$current_class->table)|default:$current_class->view} {* Vue du filtre, sinon vue perso *}
+    {if !$field_column && $current_class->colonnes && $key}
+        {$field_column=$current_class->colonnes.fields_column["{$current_class->table}.{$key}"]}
+    {/if}
+
+    {if $item.updateOnSelect}
+        {include file="generic-updateOnSelect.tpl.htm"}
+    {elseif ATF::$html->template_exists("{$current_class->table}-{$key}-select.tpl.htm")}
+        {include file="{$current_class->table}-{$key}-select.tpl.htm"}
+    {elseif ATF::$html->template_exists("{$current_class->table}-{$key}.tpl.htm")}
+        {include file="{$current_class->table}-{$key}.tpl.htm"}
+    {elseif ATF::$html->template_exists("generic-{$key}.tpl.htm") && $key!="fichier_joint"}
+        {include file="generic-{$key}.tpl.htm"}
+    {elseif ATF::$html->template_exists("generic-select-{$key}.tpl.htm") && $key!="fichier_joint"}
+        {include file="generic-select-{$key}.tpl.htm"}
+    {else}
+        <td class="field select">
+            {ATF::$usr->trans($key,$current_class->table)} :
+        </td>
+        {if ATF::getClass($current_class->fk_from($key)) && $requests[$current_class->table][$key]}
+            {$key_class=ATF::getClass($current_class->fk_from($key))}
+            <td class="value">
+                <a href="#{$key_class->name()}-select-{classes::cryptId($requests[$current_class->table][$key])}.html">
+                    <p id="{$key}">
+                        {$key_class->nom($requests[$current_class->table][$key])}
+                    </p>
+                </a>
+            </td>
+        {else}
+			{if $item.striptags}
+				{$requests[$current_class->table][$key] = $requests[$current_class->table][$key]|strip_tags}
+			{/if}
+
+            <td class="value">
+                <p id="{$key}">
+	            {$view.prefix[$key]|default:$field_column.prefix}
+                {if $item.type == 'date'}
+
+                        {if $requests[$current_class->table][$key]}
+                            {ATF::$usr->date_trans($requests[$current_class->table][$key],true, true)}
+                        {else}
+                            -
+                        {/if}
+                {elseif $item.type == 'datetime' || $key.type == 'timestamp'}
+                        {if $requests[$current_class->table][$key]}
+                            {ATF::$usr->date_trans($requests[$current_class->table][$key],true, true)}
+                        {else}
+                            -
+                        {/if}
+                {elseif $item.type==textarea}
+                    {if $item.editor}
+                    	<span class="standard">{$requests[$current_class->table][$key]|nl2br}</span>
+                    {else}
+                    	{$requests[$current_class->table][$key]|nl2br|default:"-"}
+                    {/if}
+                {elseif $item.type==set}
+                    {ATF::$usr->transFromSet($requests[$current_class->table][$key],$current_class->table,false,true,$key)}
+                {elseif $current_class->files[$key].type == 'png'}
+                	{$id = $requests["{$current_class->table}"]["id_{$current_class->table}"]|cryptid}
+                    {$url = $current_class->name()|cat:"-"|cat:$id|cat:"-"|cat:$key|cat:"-200.png"|cat:"?v="|cat:util::generateRandWord()}
+                	{$urlDL = $current_class->name()|cat:"-select-"|cat:$key|cat:"-"|cat:$id|cat:"-png.dl"}
+                	{$path = $current_class->filepath($requests["{$current_class->table}"]["id_{$current_class->table}"],$key)}
+
+                    {if file_exists($path)}
+                        <a href="{$urlDL}">
+                        	<img src="{$url}"/>
+                        </a>
+                    {else}
+                    	{ATF::$usr->trans('aucunes_images_disponible')}
+                    {/if}
+                {elseif $type=="file"}
+                    {include file="generic-fichier_joint.tpl.htm" item=$requests field=$key field_column=$item}
+                {else}
+                    {if $item.FCKEditor}
+                        {$color='#'|cat:$requests[$current_class->table]["couleur_fond"]}
+                         <div id="{$key}" style=" background-color:{$color};">
+                            {$requests[$current_class->table][$key]}
+                         </div>
+                    {elseif $requests[$current_class->table][$key]}
+                            {include file="href.tpl.htm"
+                                linkmode="href"
+                                link=$current_class->fk_from($key)
+                                text=$requests[$current_class->table][$key]|nl2br|default:"-"
+                                id=$requests[$current_class->table]["{$key}_fk"]|default:$requests[$current_class->table]["{$current_class->table}.id_{$current_class->table}"]|default:$requests[$current_class->table]["id_{$current_class->table}"]
+                                table=ATF::getClass($current_class->fk_from($key,false,true))->name()
+                                field=$key
+                                field_info=$item
+                                truncate=false}
+                    {else}
+                    	-
+                    {/if}
+                {/if}
+                {$view.suffix[$key]|default:$field_column.suffix}
+                </p>
+            </td>
+        {/if}
+    {/if}
+{else}
+    <td class="field">
+        {ATF::$usr->trans($alias|default:$key,$current_class->table)}
+        {if !$item["null"]}{include file="champ_obligatoire.tpl.htm"}{/if} :
+    </td>
+    {$info=ATF::$usr->trans("`$key`_info",null,null,true)|default:ATF::$usr->trans($key,$current_class->table,info,true)}
+    <td class="value inputField" {if $info && !$item.color}{tip text=$info caption=ATF::$usr->trans("Details")}{/if}>
+		{include file="generic_field_input.tpl.htm" width=$width height=$height}
+    </td>
+{/if}

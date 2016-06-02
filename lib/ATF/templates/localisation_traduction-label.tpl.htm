@@ -1,0 +1,11 @@
+{if $current_class->table!="localisation_traduction"}
+	{$current_class=ATF::localisation_traduction()}
+{/if}
+
+{include file="href.tpl.htm" 
+linkmode="href" 
+link=$current_class->fk_from($field)
+text=$value
+id=$item["{$field}_fk"]|default:$item["{$current_class->table}.id_{$current_class->table}"] 
+table=ATF::getClass($current_class->fk_from($field,false,true))->name() 
+truncate=50}

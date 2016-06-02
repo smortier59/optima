@@ -1,0 +1,6 @@
+{if $infos.id_pa}
+	<select id="id_style" {if $disabled} disabled="disabled"{/if} class="attrStyle" onchange="ATF.tpl2div('{if $infos.id_pa}pa{else}attr{/if},updateStyle.ajax','{if $infos.id_pa}id_pa={$infos.id_pa}&{/if}id_attr={$infos.id_attr}&id_style='+this.value);">
+		<option value="">- Par défaut -</option>
+		{html_options options=ATF::style()->options("style","id_style",true,"style") selected=$smarty.post.id_style|default:$infos.id_style|default:$style}
+	</select>
+{/if}

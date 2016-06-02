@@ -1,0 +1,5 @@
+<a href="javascript:;" 
+	{tip text=ATF::$usr->trans(pager_geolocalisation_text) title=ATF::$usr->trans(pager_geolocalisation_titre)}
+	onclick="ATF.ajax('{$current_class->name()},gmap.ajax','table={$current_class->name()|urlencode}&pager={$div}', { onComplete: function (obj) { eval(obj.result); } });">
+	<img src="{ATF::$staticserver}images/icones/geolocalisation.png" height="16" width="16" alt="" />
+</a>

@@ -1,0 +1,89 @@
+{$trace=$current_class->select($id_trace)}
+{$modif=$trace.avant_modification}
+{$modif=$modif|unserialize}
+
+{if $modif[0][0]}
+    {$nom_module=ATF::module()->nom($trace.id_module)}
+    {$num=1}
+    <div id="tabs1"></div>    
+    <script type="text/javascript">/*<![CDATA[*/
+
+        var tabs = new Ext.TabPanel({
+            renderTo: 'tabs1',
+            width:650,
+            activeTab: 0,
+            frame:true,
+            defaults:{ autoHeight: true },
+            enableTabScroll:true,
+            listeners:{ render:function(){ Modalbox.resizeToContent(); } },
+            items:[
+                {foreach from=$modif key=cle item=liste}
+                    {foreach from=$liste key=cle2 item=donnees}
+                        {capture assign=informations}
+                            {foreach from=$donnees key=nom_champs item=valeurs}
+                                {$serializ=$valeurs|unserialize}
+                                {if !$serializ}
+                                    {if $current_class->fk_from($nom_champs)}
+                                        {$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+                                        <div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$nom_module)} : {ATF::getClass($module)->nom($valeurs)|default:$valeurs} </div>
+                                    {else}
+                                        <div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$nom_module)} : {$valeurs}</div>
+                                    {/if}
+                                {/if}
+                            {/foreach}   
+                        {/capture} 
+                        { html:'{$informations|escape:javascript}', title: '{$nom_module} n° {$num++}' },
+                    {/foreach}
+                {/foreach} 
+            ]
+        });
+
+    /*]]>*/</script>
+{elseif $modif[0]}
+    {$nom_module=ATF::module()->nom($trace.id_module)}
+    {$num=1}
+    <div id="tabs1"></div>    
+    <script type="text/javascript">/*<![CDATA[*/
+
+        var tabs = new Ext.TabPanel({
+            renderTo: 'tabs1',
+            width:650,
+            activeTab: 0,
+            frame:true,
+            defaults:{ autoHeight: true },
+            items:[
+                {foreach from=$modif key=cle2 item=donnees}
+                    {capture assign=informations}
+                        {foreach from=$donnees key=nom_champs item=valeurs}
+                            {$serializ=$valeurs|unserialize}
+                            {if !$serializ}
+                                {if $current_class->fk_from($nom_champs)}
+                                    {$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+                                    <div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$nom_module)} : {ATF::getClass($module)->nom($valeurs)|default:$valeurs} </div>
+                                {else}
+                                    <div style="margin-left:10px;">- {ATF::$usr->trans($nom_champs,$nom_module)} : {$valeurs}</div>
+                                {/if}
+                            {/if}
+                        {/foreach}   
+                    {/capture} 
+                    { html:'{$informations|escape:javascript}', title: '{$nom_module} n° {$num++}' },
+                {/foreach}
+            ]
+        });
+
+    /*]]>*/</script>
+{else}
+    {foreach from=$modif key=nom_champs item=valeurs}
+        {* on test si il s'agit d'un champs serialize *}
+        {$serializ=$valeurs|unserialize}
+        {* si c'est le cas on affiche pas le champs *}
+        {if !$serializ}
+            {if $current_class->fk_from($nom_champs)}
+                {$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+                <div>- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {ATF::getClass($module)->nom($valeurs)|default:$valeurs} </div>
+            {else}
+                <div>- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {$valeurs}</div>
+            {/if}
+        {/if}
+    {/foreach}
+{/if}

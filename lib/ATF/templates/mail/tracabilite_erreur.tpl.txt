@@ -1,0 +1,3 @@
+{foreach from=$infos.renseignements key=key item=item}
+{$key} : {$item}
+{/foreach}

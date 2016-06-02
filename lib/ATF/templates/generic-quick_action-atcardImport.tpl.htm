@@ -1,0 +1,73 @@
+{*
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+*}
+{* Vérification sur l'enregistrement si un ID existe en paramètre *}
+
+<script type="text/javascript">/*<![CDATA[*/
+	Ext.onReady(function(){
+		atcardImport = new Ext.Window({
+			width:400
+			,id:'{$k}'
+			,height:120
+			,title:"{ATF::$usr->trans($k,$current_class->table)}"
+			,items:[
+				{
+					xtype: 'form',
+					fileUpload: true,
+					width: 500,
+					frame: true,
+					autoHeight: true,
+					id:'{$k}_form',
+					items:[
+						{
+							xtype: 'fileuploadfield',
+							name: '{$k}',
+							fieldLabel: "{ATF::$usr->trans('selectATCard',$curent_class->table)}",
+							buttonText: 'Parcourir...',
+							width: 200
+						}			
+					]
+
+				}			
+			]
+			,buttons: [
+				{
+					text:'Ok',
+					handler: function(){
+						Ext.getCmp('{$k}_form').getForm().submit({
+							method: 'post',									   	
+							url: 'societe,{$k}.ajax',
+							params: {
+								'key':'{$k}'
+								,'table':'{$table}'
+								,'identifiant':'{$identifiant}'
+							},
+							waitTitle:'Veuillez patienter',
+							waitMsg: 'Chargement ...'
+							, success:function(form, action) {
+								var i = $.parseJSON(action.response.responseText); 
+								ATF.goTo('{$current_class->name()}-select-'+i.id_societe+'.html');
+								atcardImport.hide();
+							}
+							, failure:function(form, action) {
+								ATF.extRefresh(action);
+							}
+						});
+					}
+				},{
+					text: 'Annuler',
+					handler: function(){
+						atcardImport.hide();
+					}
+				}
+			]
+		});
+	});
+/*]]>*/</script>
+<div class="quickAction {$k}" style="display:inline;">
+    <a href='javascript:;' title="{ATF::$usr->trans($k)}" onclick="atcardImport.show();">
+        <img src="{ATF::$staticserver}images/icones/{$k}.png" style="width:20px; height:20px" />
+    </a>
+</div>

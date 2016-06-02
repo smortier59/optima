@@ -1,0 +1,55 @@
+{if !$requests["{$current_class->table}"]}
+	{$requests=["{$current_class->table}"=>$current_class->select($smarty.get["id_{$current_class->name()}"])]}
+{/if}
+
+<div class="primary">
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{ATF::$usr->trans($current_class->table)}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div>
+    <div class="primaryContainer" id="primaryContainer">
+        {include file="container.tpl.htm"}
+        <div class="slipContainer" id="slipContainer" >
+            <table class="std">
+                <tbody>
+                	{$test=$current_class->colonnes("primary",'select')}
+                    {foreach from=$test key=key item=item}
+                    	{if $requests[$current_class->table][$key] || $key.custom} 
+                            <tr>
+                                {include file="generic_field.tpl.htm" key=$key item=$item display_fields=true}
+                            </tr>
+                        {/if}
+                    {/foreach}
+                    {*if ATF::$usr->privilege($current_class->name(),'delete')}
+                    	<tr><td colspan="2"><div id="rollback_tracabilite">{if $requests[$current_class->table].rollback}{ATF::$usr->trans('rollback_deja_effectue',$current_class->table)}{else}<a href="javascript:;" onclick="ATF.tpl2div('{$current_class->name()},rollback_trace.ajax','id_trace={$smarty.get.id_tracabilite}');">Rollback</a>{/if}</div></td></tr>
+                	{/if*}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="secondary" id="secondary"></div>
+    <script type="text/javascript">/*<![CDATA[*/
+		if ($('#secondary')) {
+			$('#secondary').css({ 'padding': (parseFloat($('#slipContainer').height())+parseFloat(55))+"px 0px 0px 0px" });
+		}
+		
+        $('.slipContentContainer').each(function (e) {
+            e.css({ height: 10+$('#slipContainer').height()+"px" });
+        });		
+    /*]]>*/</script>
+</div>
+<div class="ClearBothWithPadding"></div>
+<div class="onglet">
+    <div class="ongletLeft"></div>
+    <div class="ongletRight"></div>
+    <div class="ongletMiddle"></div>
+    <div class="ClearBoth"></div>
+</div>
+{include file="generic-select_all.tpl.htm" define_div=true 
+    parent_class=$current_class 
+    current_class=$current_class 
+    div="gsa_{$current_class->table}_2_{$requests[$current_class->table]["id_{$current_class->table}"]}"
+    fk=["{$current_class->table}.id_{$current_class->table}_parent"=>$requests[$current_class->table]["id_{$current_class->table}"]]}

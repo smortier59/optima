@@ -1,0 +1,12 @@
+{strip}
+	{*
+    	$infos Donnes fournies de l'enregistrement localis
+    *}
+    {if ATF::$html->template_exists("{$table}_gmap_info.tpl.htm")}
+        {include file="{$table}_gmap_info.tpl.htm"}
+    {else}
+        <a href="#{ATF::getClass($table)->name()}-select-{$id|cryptid}.html">
+            {ATF::getClass($table)->nom($id)|escape:htmlall}
+        </a>
+    {/if}
+{/strip}

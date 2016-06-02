@@ -1,0 +1,6 @@
+Bonjour {$infos.userName},
+
+Vous avez fait une demande de nouveau mot de passe, pour confirmer votre demande merci de vous rendre à ce lien suivant : https://{$smarty.server.HTTP_HOST}/usr,recovery.ajax,k={$infos.token}
+
+Cordialement,
+L'équipe Absystech

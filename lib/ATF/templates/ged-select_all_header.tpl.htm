@@ -1,0 +1,164 @@
+{*
+    Page de Gestion Electronique de Documents avec un Treeview ExtJS
+*}
+
+{if $id}
+	<script type="text/javascript">/*<![CDATA[*/
+	ATF.createTreeView = function(element,valeur,Vnode,racine,id_user,url_insert,div) {
+		var URLData = 'ged,branch.ajax,element='+element+'&valeur='+valeur+'&display=true';
+		if (Vnode) {
+			URLData += "&source="+Vnode;	
+		}
+		var gedWindow = new Ext.Window({
+			height: 350,
+			width: 400,
+			autoScroll: true,
+			title: '{ATF::$usr->trans(treeview,ged)|escape:htmlall}',
+			items: [{
+				itemId: 'arbre',
+				xtype: 'treepanel',
+				split: true,
+				useArrows: true,
+				animate: false,
+				enableDD: true,
+				border: false,
+				bodyBorder : false,
+				loader:new Ext.tree.TreeLoader({ dataUrl: URLData }),
+				root: new Ext.tree.AsyncTreeNode({
+					nodeType: 'async',
+					text: racine,
+					draggable: false,
+					expanded: true,
+					id: 'source'
+				}),
+				selModel: new Ext.tree.MultiSelectionModel(),
+				dropConfig: { appendOnly:true },
+				listeners: {
+					'dragdrop': function(node, dd, e){
+						var parent = e.dragOverData.target.attributes.id;
+						if (parent=='source') {
+							parent = '';	
+						}
+						new ATF.ajax("ged,update.ajax","noRedirection=true&id_ged="+dd.attributes.id+"&id_parent="+parent,{ 
+							onComplete: function () { 
+								gedWindow.hide(); 
+								ATF.createTreeView(element,valeur,Vnode,racine); 
+							} 
+						});
+					}
+					,'checkchange': function(node, checked){
+						/* Cocher le parent si je suis le premier fils coché */
+						if (checked && node.parentNode && !node.parentNode.checked && this.getChecked('id',node.parentNode).length===1) {
+							node.parentNode.getUI().toggleCheck(checked);
+						}
+								
+						/* Cocher/Décocher tous les enfants */
+						if (checked && this.getChecked('id',node).length===1 || !checked) {
+							node.cascade(function(node,checked) {
+								if (this!=node) {
+									this.getUI().toggleCheck(checked);
+								}
+							},null,[node,checked]);
+						}
+						
+						/* Mettre en gras */
+						if (checked) {
+							node.getUI().addClass('treeViewLayerChecked');
+							node.getUI().addClass('complete');
+						} else {
+							node.getUI().removeClass('treeViewLayerChecked');
+							node.getUI().removeClass('complete');
+						}
+					}
+				},
+				frame: true,
+				useArrows:true
+			}],
+			buttonAlign: 'left',
+			bbar: new Ext.Toolbar({
+				items: [{
+					text: '{ATF::$usr->trans(download,ged)|escape:htmlall}'
+					,handler: function(){
+						selNodes = gedWindow.getComponent('arbre').getChecked();
+						if(selNodes.length>0){
+							new ATF.ajax("ged,download.ajax","element="+element+"&valeur="+valeur+"&id_user="+id_user+"&node="+selNodes,{ 
+								onComplete: function () { 
+									window.location="ged-select-fichier.temp"; 
+								} 
+							} );
+						}else{
+							alert("{ATF::$usr->trans(cocher,ged)|escape:javascript}");
+						}
+					}
+				},'-',{
+					text: '{ATF::$usr->trans(delete,ged)|escape:htmlall}'
+					,handler: function(){
+						selNodes = gedWindow.getComponent('arbre').getChecked();
+						if(selNodes.length>0){
+							if(confirm('{ATF::$usr->trans(confirm,ged)}')){
+								new ATF.ajax("ged,sup_ged.ajax","pager="+div+"&element="+element+"&valeur="+valeur+"&id_user="+id_user+"&node="+selNodes,{ 
+									onComplete: function () { 
+										gedWindow.hide(); 
+									} 
+								});
+							}
+						}else{
+							alert("{ATF::$usr->trans(cocher,ged)|escape:javascript}");
+						}
+					}
+				},'->',{
+					text: '{ATF::$usr->trans(upload,ged)|escape:htmlall}'
+					,handler: function(){
+						if (racine && Vnode) {
+							url_insert += "&racine="+racine;
+						}
+						if (gedWindow.getComponent('arbre').getChecked()) {
+							url_insert += "&nodes="+gedWindow.getComponent('arbre').getChecked();
+						}
+						ATF.tpl2div('ged-insert.div',url_insert,{
+							onComplete: function(){ 
+								gedWindow.hide(); 
+							} 
+						});
+					}
+				},'-',{
+					text: '{ATF::$usr->trans(new_folder,ged)|escape:htmlall}'
+					,handler: function(){
+						selNodes = gedWindow.getComponent('arbre').getChecked();
+						var nom_dossier=prompt("{ATF::$usr->trans(taper_nom,ged)}");
+						if(nom_dossier){
+							new ATF.tpl2div("ged,insert_dir.ajax","element="+element+"&id_parent="+selNodes+"&valeur="+valeur+"&id_user="+id_user+"&nom_rep="+nom_dossier,{ 
+								onComplete: function () { 
+									gedWindow.hide(); 
+									ATF.createTreeView(element,valeur,Vnode,racine,id_user,url_insert,div); 
+								} 
+							});
+						}else{
+							alert("{ATF::$usr->trans(aucun_nom,ged)|escape:javascript}");
+						}
+					}
+				}]
+			})
+		});
+		gedWindow.show();
+		return gedWindow;
+	}
+	/*]]>*/</script>
+    {if $parent_name=="societe" && $id}
+        {$url_insert="id_societe={ATF::societe()->cryptid($id)}"}
+        {$racine=ATF::societe()->nom($id)}
+    {elseif $parent_name=="gep_projet" && $id}
+        {$url_insert="id_societe={ATF::societe()->cryptid(ATF::gep_projet()->select($id,'id_societe'))}&id_gep_projet={ATF::gep_projet()->cryptid($id)}"}
+        {$racine=ATF::gep_projet()->nom($id)}    
+    {elseif $parent_name=="visite" && $id}
+        {* spécifique à inventaire *}
+        {$url_insert="id_societe={ATF::societe()->cryptid(ATF::gep_projet()->select(ATF::visite()->select($id,'id_gep_projet'),'id_societe'))}&id_gep_projet={ATF::gep_projet()->cryptid(ATF::visite()->select($id,'id_gep_projet'))}&id_visite={ATF::visite()->cryptid($id)}"}
+        {$racine=ATF::visite()->nom($id)}
+    {/if}
+	
+    <a href="javascript:;" 
+        {tip text=ATF::$usr->trans(afficher_le_treeview_de_cette_ged) title=ATF::$usr->trans(ged_arborescente)}
+        onclick="ATF.createTreeView('{$parent_name}','{$id}',null,'{$racine|escape:javascript}','{ATF::$usr->get(id_user)}','{$url_insert}','{$div}');">
+        <img src="{ATF::$staticserver}images/icones/treeview.png" height="16" width="16" alt="" />
+    </a>
+{/if}

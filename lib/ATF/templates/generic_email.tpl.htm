@@ -1,0 +1,37 @@
+{if $json.result.email}
+	{$email=$json.result.email}
+{/if}
+{if $json.result.text}
+	{$text=$json.result.text}
+{/if}
+
+<hr />
+<br />
+<table>
+    <caption>
+        {ATF::$usr->trans('caption_insert_mail',$current_class->table)} 
+    </caption>
+    <tbody>
+		<tr>
+		    <td class="field">Email</td>
+			<td>
+				 <input type="checkbox" name="mail[email_]" id="mail[email_]" value="1"  onClick="document.getElementById('mail[email]').disabled=document.getElementById('mail[copie]').disabled=document.getElementById('mail[corps_email]').disabled=!this.checked;" />
+		   &nbsp;<input disabled="disabled" type="text" name="mail[email]" id="mail[email]" {if $email} value="{$email}" {/if} />
+			</td>
+		</tr>
+		<tr>
+		    <td class="field">Copie pour Absystech</td>
+			<td class="value">
+			<input id="mail[copie]" type="checkbox" disabled="disabled"  name="mail[copie]"  value="1" />		
+			</td>
+		</tr>
+		<tr>
+		    <td class="field">Texte</td>
+			<td>
+	   		<div class="text_mail">
+				<textarea style="width:550px" id="mail[corps_email]" disabled="disabled" name="mail[corps_email]">{if $text}{$text}{/if}</textarea>
+			</div>
+			</td>
+		</tr>
+	</tbody>
+</table>

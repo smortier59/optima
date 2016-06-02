@@ -1,0 +1,25 @@
+{assign var=data_tab value=ATF::getClass($table)->stats(false,$type)}
+{$data_tab.params.caption} {if $data_tab.params.subCaption}({$data_tab.params.subCaption}){/if} :<br />
+<table class="std">
+	<tr>
+    <td style="width:200px;text-align:center;border:dotted;border-width:1px;">{ATF::$usr->trans('exporter')} : <a href="{$table},export_stats.ajax,type={$type}" rel="Exporter le tableau en fichier excel"><img src="{ATF::$staticserver}images/icones/upload.png" alt="" /></a></td>
+	{foreach from=$data_tab.categories.category key=key item=item}
+    	<td style="text-align:center;border:dotted;border-width:1px;">
+    		{$item.label}
+        </td>
+    {/foreach}
+    </tr>
+    
+    {foreach from=$data_tab.dataset key=key item=item}
+    <tr style="background-color:{cycle values='#E3F3A3,#D3DAE0'};">
+    	<td style="width:200px;border:dotted;border-width:1px;">
+    		{$key}
+        </td>
+        {foreach from=$item.set key=key_ item=item_}
+    		<td style="text-align:center;border:dotted;border-width:1px;">
+    			{$item_.value}
+    		</td>
+    	{/foreach}
+    </tr>
+    {/foreach}
+</table>

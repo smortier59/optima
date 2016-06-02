@@ -1,0 +1,6 @@
+Bonjour {$infos.userName},
+
+Votre mot de passe a été réinitialisé : {$infos.mdp}
+
+Cordialement,
+L'équipe Absystech

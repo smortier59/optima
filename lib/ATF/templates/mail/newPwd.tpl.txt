@@ -1,0 +1,7 @@
+Bonjour {$infos.userName},
+Vous avez fait une demande de nouveau mot de passe, votre ancien mot de passe a donc été remplacé par le suivant : {$infos.mdp}
+
+Vous pouvez d'ores et déjà vous reconnecter a la plateforme a l'aide de votre login habituel. Merci de votre confiance.
+
+Cordialement,
+L'équipe Absystech

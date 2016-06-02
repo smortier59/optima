@@ -1,0 +1,34 @@
+{$display = true}   
+
+    {if isset($smarty.get.id_formation_devis)}
+        {$id_formation_devis = $smarty.get.id_formation_devis}
+    {elseif isset($requests[$current_class->table]["id_{$current_class->table}"])}
+        {$id_formation_devis = $requests[$current_class->table]["id_{$current_class->table}"]} 
+    {/if}
+
+{if $display == true}
+    {if !ATF::formation_devis()->getCommandeFournisseur($id_formation_devis)}
+        <tr>
+            <td colspan="2" style="height:150px">
+                <table style="width:100%;">
+                    <tr>
+                        <td colspan="2"><hr /></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center; width:80px">
+                            <a href="#formation_commande-insert.html,id_formation_devis={$id_formation_devis}">
+                                <img src="{ATF::$staticserver}images/module/48/affaire.png" style="width:40px;" alt="{ATF::$usr->trans("creer_formation_commande",$current_class->table)}" />
+                            </a>
+                        </td>
+                        <td style="text-align:justify; vertical-align:middle">
+                            <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("creer_formation_commande",$current_class->table)}</span><br />
+                        </td>                
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    {/if}
+{/if}
+    
+
+

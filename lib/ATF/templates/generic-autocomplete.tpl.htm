@@ -1,0 +1,11 @@
+{strip}
+{if $table && ATF::$html->template_exists("{$table}-autocomplete.tpl.htm")}
+	{include file="{$table}-autocomplete.tpl.htm"}
+{else}
+    <tpl for=".">
+        <div class="search-item">
+            {literal}<h3><div>{detail}</div>{nom}</h3>{/literal}
+        </div>
+    </tpl>
+{/if}
+{/strip}

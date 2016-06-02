@@ -1,0 +1,34 @@
+{* 
+	URL utiles :
+	http://fr.wikipedia.org/wiki/VCard
+	http://en.wikipedia.org/wiki/VCard
+    http://tools.ietf.org/html/rfc2426
+*}
+BEGIN:VCARD
+VERSION:3.0
+{if $d.nom}N:{$d.nom}{/if}		{* Nom, prénom, civilité (separé par ;) *}
+{if $d.fNom}FN:{$d.fNom}{/if}		{* Nom formatté *}
+{if $d.societe}ORG:{$d.societe}{/if}		{* Société *}
+{if $d.fonction}{* Intitulé du poste *}
+TITLE:{$d.fonction}
+ROLE:{$d.fonction}
+{/if}
+{if $d.logo}LOGO{$d.logo}{/if}		{* Photo *}
+{if $d.urlPhoto}PHOTO{$d.urlPhoto}{/if}		{* Photo *}
+
+{if $d.tel}TEL;TYPE=WORK,VOICE:{$d.tel}{/if}		{* Téléphone Travail *}
+{if $d.telPerso}TEL;TYPE=HOME,VOICE:{$d.telPerso}{/if}		{* Téléphone perso *}
+{if $d.cell}TEL;TYPE=CELL,WORK,VOICE:{$d.cell}{/if}		{* Téléphone portable Travail *}
+{if $d.cellPerso}TEL;TYPE=CELL,HOME,VOICE:{$d.cellPerso}{/if}		{* Téléphone portable perso *}
+
+{if $d.address}ADR;TYPE=WORK:{$d.address}{/if}		{* Adresse Bureau *}
+{if $d.fAddress}LABEL;TYPE=WORK:{$d.fAddress}{/if}		{* Adresse Bureau Formatté *}
+
+{if $d.addressHome}ADR;QUOTED-PRINTABLE:;TYPE=HOME:;;{$d.addressHome}{/if}		{* Adresse Perso *}
+{if $d.fAddressHome}LABEL;QUOTED-PRINTABLE:;TYPE=HOME:{$d.fAddressHome}{/if}		{* Adresse perso formatté *}
+
+{if $d.email}EMAIL;TYPE=PREF,INTERNET:{$d.email}{/if}		{* Email *}
+{if $d.emailPerso}EMAIL;type=HOME,INTERNET:{$d.emailPerso}{/if}		{* Email perso *}
+
+{if $d.rev}REV:{$d.rev}{/if}		{* Dernière Révision *}
+END:VCARD

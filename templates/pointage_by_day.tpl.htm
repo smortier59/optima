@@ -1,0 +1,99 @@
+{**
+* Affichage du pointage par jour
+* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+* @param int $id_user l'utilisateur concerné (false par défaut)
+* @param int $month Le numéro du mois désiré
+* @param int $year L'année désirée
+*}
+{* id_user *}
+{$id_user=$smarty.request.id_user|default:{ATF::$usr->getID()|cryptid}}
+{* Date *}
+{$date=$smarty.request.date|default:{$smarty.now|date_format:"%Y-%m-%d"}}
+{* Refresh shortcut *}
+{if $smarty.request.shortcut}
+	{$url="ATF.tpl2div('tpl2div.ajax','shortcut=1&table=pointage&div=contentContainer&template=pointage_by_day&notop=1&nognt=1&id_user='+$('#userShortcut').val()+'&date='+$('#pointageByDayShortcut').val());"}
+{else}
+	{$url="ATF.tpl2div('tpl2div.ajax','table=pointage&div=feuilleMoisContainer&template=pointage_by_day&notop=1&nognt=1&id_user='+$('#user').val()+'&date='+$('#pointageByDay').val());"}
+{/if}
+{if ATF::pointage() && ATF::$usr->privilege(pointage,'view')}
+     <div>
+		<form class="pointage_periode" name="date{if $smarty.request.shortcut}Shortcut{/if}" id="formulaire{if $smarty.request.shortcut}Shortcut{/if}" action="" method="post" >
+			<div style="text-align:left;width:600px;">
+				<div style="float:left;margin-right:5px;margin-top:5px;margin-left:50px;">
+					<span style="font-weight:bold;">{t w=select_user p=ATF::pointage()->table} : </span>
+				</div>
+				<div style="float:left;">
+					<select name="user" id="user{if $smarty.request.shortcut}Shortcut{/if}" onchange="{$url}">
+						{html_options options=ATF::user()->html_options() selected=$id_user}
+					</select>
+				</div>
+				<div style="float:left;margin-left:20px;margin-right:5px;margin-top:5px;">
+					<span style="font-weight:bold;">{t w=select_day p=ATF::pointage()->table} : </span>
+				</div>
+				<div style="float:left;width:120px">
+					<input type="text" name="pointageByDay{if $smarty.request.shortcut}Shortcut{/if}" id="pointageByDay{if $smarty.request.shortcut}Shortcut{/if}" maxlength="10" value="{$date}" disabled="disabled" style="color:black;" />
+						<script type="text/javascript">/*<![CDATA[*/
+							new Ext.form.DateField({ 
+													width:120
+													,applyTo:'pointageByDay{if $smarty.request.shortcut}Shortcut{/if}'
+													,format:'d-m-Y'
+													,listeners :{
+														select:function(infos){
+															{$url}
+														}
+													}
+													});
+								{* Bricolage de merde ! *}
+								{if !$smarty.request.shortcut}
+									$('#div.slipContentContainer_feuille').each(function (e) {
+										e.css({ height: $('#feuilleContainer').height()+"px" });
+									});
+									$('#div.slipContentContainer_feuilleMois').each(function (e) {
+										e.css({ height: $('#feuilleMoisContainer').height()+"px" });
+									});
+									var hauteur=$('#primary_pointage').height()+10;
+									$('#mMiddle').css({ height: hauteur+"px" });
+								{else}
+									$('#leftPanelContentContainer').each(function (e) { 
+										e.css({ 
+											height: $('#contentContainer').height()+"px" 
+										}); 
+									}); 
+								{/if}
+
+						/*]]>*/</script>				
+				</div>
+				<div style="clear:both;">
+				</div>
+			</div>
+		</form>    
+	</div>
+	<br /><br />
+	<div style="text-align:center;">
+		<table class="pointageByDay">
+			<thead>
+				<tr>
+					<th>{t w=id_hotline p=hotline}</th>
+					<th>{t w=societe p=societe}</th>
+					<th>{t w=hotline p=hotline}</th>
+					<th>{t w=hotline_temps p=hotline}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{foreach from=ATF::pointage()->getRequetesByDays({util::formatDate($date)},$id_user) item=item}
+					<tr>
+						 <td>{$item["pointage.id_hotline"]}</td>
+						 <td><a href="#societe-select-{$item["pointage.id_societe"]|cryptid}.html">{$item.societe}</a></td>
+						 <td><a href="#hotline-select-{$item["pointage.id_hotline"]|cryptid}.html">{$item.hotline}</a></td>
+						 <td>{$item.temps_calcule}</td>
+				   </tr>
+			   {foreachelse}
+			   		<tr>
+						<td colspan="4">Pas de pointage !</td>
+					</tr>
+			   {/foreach}
+			</tbody>
+		</table>
+	</div>
+
+{/if}	

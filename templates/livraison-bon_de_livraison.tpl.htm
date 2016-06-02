@@ -1,0 +1,5 @@
+{if $current_class->file_exists("{$item["{$current_class->table}.id_{$current_class->table}"]}",$field)}
+	<a href="{$current_class->table}-select-{$field}-{$item["{$current_class->table}.id_{$current_class->table}"]|cryptid}.dl" {tip text=ATF::$usr->trans("popup_download",$current_class->table)}><img src="{ATF::$staticserver}images/icones/upload.png" /></a>
+{else}
+	-
+{/if}

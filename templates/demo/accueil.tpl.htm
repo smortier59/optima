@@ -1,0 +1,336 @@
+{* Experimental *}
+<div id="widgets" style="padding-left:2em"></div>
+
+{$colspan=4}
+{$widgets=ATF::$usr->getWidgets()}
+<script type="text/javascript">/*<![CDATA[*/
+Ext.onReady(function(){	
+	try {
+		new Ext.Panel({ 
+			renderTo:'widgets',
+			title: 'Bonjour et bienvenue sur Optima, {ATF::user()->nom(ATF::$usr->getID())}.',
+			layout:'column',
+			items:[
+				{for $colNumber=0; $colNumber<$colspan; $colNumber++}  
+					{if $colNumber},{/if}
+					{
+						columnWidth:{1/$colspan},
+						layout: 'form',
+						bodyStyle:'padding:5px 15px 5px 15px',
+						border: false,
+						autoWidth:true,
+						items: [ 
+							{foreach from=$widgets key=key item=item}
+								{if ($item@index%$colspan)===$colNumber}
+									{if $item@index>=$colspan}
+									,
+									{/if}
+									{
+										xtype:'panel',
+										autoWidth:true,
+										bodyStyle:'margin:10px 0 5px 0',
+										items: [
+											{
+												xtype: 'panel', 
+												title: '{ATF::$usr->trans(widget,$item.module, $item.type)|escape:javascript}',
+												frame: true,
+												border: false,
+												autoWidth:true,
+												autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}', scripts:true }
+											}
+										]
+
+									}
+								{/if}
+							{/foreach}
+						 ]
+					}
+				{/for}
+			]
+		});
+		
+	} catch(e) {
+		console.log(e); 
+	}
+});
+/*]]>*/</script>
+
+{* Affichage des news *}
+{if ATF::news()->isNews()}
+	<div id="newsBoard">
+		<div id="news"></div>
+	</div>
+	
+	<script type="text/javascript">/*<![CDATA[*/
+		{include file="generic-news.tpl.js"}
+	/*]]>*/</script>
+{else}
+
+	<div id="newsBoard">
+		<div id="news"></div>
+	</div>
+
+    <div id="demoBoardContent" class="x-hide-display" style="padding:10px; font-size:12px">
+        <img src="{ATF::$staticserver}images/logos/optima.png" style="float:left" />
+        <span>
+        	Bienvenue sur <span style="font-weight:bold">la plateforme de démonstration d'optima</span>,<br /><br />
+        	Vous pouvez utiliser cette plateforme comme bon vous semble afin de vous faire une idée des possibilités offertes par l'outil.
+            Vous avez donc avec ce compte de démonstration <span style="font-weight:bold">accès a 90% des modules</span>, et pour chacun d'entre eux vous possedez les droits <span style="font-weight:bold">d'insertion, de modification et de suppression</span>.<br /><br />
+            
+            Voici quelques liens rapides pour accéder à :<br /><br />
+            
+            <ul style="margin-left:0px;padding: 0;	list-style-type: none; line-height: 20px; ">
+            	<li style="background:url('{ATF::$staticserver}images/module/48/my.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
+                	<span style="font-weight:bold; font-size:14px;">Votre Société</span><br />
+                	<span style="font-style:italic; font-size:12px;">Gérer vos demande de congés, votre feuille de pointage, vos note de frais, votre messagerie, votre agenda, etc....</span><br />
+                	<span style="font-style:italic; font-size:12px;">
+                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('my.html');">
+                        	Cliquez ICI
+                        </a>
+                    </span>
+                    <br />
+                </li>
+            	<li style="background:url('{ATF::$staticserver}images/module/48/crm.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
+                	<span style="font-weight:bold; font-size:14px;">La CRM</span><br />
+                	<span style="font-style:italic; font-size:12px;">Gérer vos sociétés, contacts et organisez votre travail avec les Suivis et les tâches.</span><br />
+                	<span style="font-style:italic; font-size:12px;">
+                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('crm.html');">
+                        	Cliquez ICI
+                        </a>
+                    </span>
+                    <br />
+                </li>
+            	<li style="background:url('{ATF::$staticserver}images/module/48/commerce.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
+                	<span style="font-weight:bold; font-size:14px;">La Gestion commerciale</span><br />
+                	<span style="font-style:italic; font-size:12px;">Créer vos affaires en passant par les modules opportunités, devis, commande client et fournisseur, facture... </span><br />
+                	<span style="font-style:italic; font-size:12px;">
+                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('commerce.html');">
+                        	Cliquez ICI
+                        </a>
+                    </span>
+                    <br />
+                </li>
+            	<li style="background:url('{ATF::$staticserver}images/module/48/drh.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
+                	<span style="font-weight:bold; font-size:14px;">La partie DRH</span><br />
+                	<span style="font-style:italic; font-size:12px;">Gérer vos offres d'emploi et vos candidatures.</span><br />
+                	<span style="font-style:italic; font-size:12px;">
+                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('drh.html');">
+                        	Cliquez ICI
+                        </a>
+                    </span>
+                    <br />
+                </li>
+            	<li style="background:url('{ATF::$staticserver}images/module/48/emailing.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
+                	<span style="font-weight:bold; font-size:14px;">SpeedMail</span><br />
+                	<span style="font-style:italic; font-size:12px;">Créer des projets d'emailing, et diffusez les comme bon vous semble a vos liste de diffusion grâce aux jobs programmés..</span><br />
+                	<span style="font-style:italic; font-size:12px;">
+                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('emailing.html');">
+                        	Cliquez ICI
+                        </a>
+                    </span>
+                    <br />
+                </li>
+            	
+            </ul><br />
+            <div style="font-style:italic; font-weight:bold; font-size:14px; text-align:center; width:100%">
+            	*** L'équipe d'AbsysTech vous souhaite une bonne navigation ***
+            </div>
+        </span>
+    </div>
+
+<script type="text/javascript">
+	/*!
+	 * Ext JS Library 3.1.0
+	 * Copyright(c) 2006-2009 Ext JS, LLC
+	 * licensing@extjs.com
+	 * http://www.extjs.com/license
+	 */
+	Ext.ux.Spotlight = function(config){
+		Ext.apply(this, config);
+	}
+	Ext.ux.Spotlight.prototype = {
+		active : false,
+		animate : true,
+		duration: .25,
+		easing:'easeNone',
+		// private
+		animated : false,
+	
+		createElements : function(){
+			var bd = Ext.getBody();
+	
+			this.right = bd.createChild({ cls:'x-spotlight' });
+			this.left = bd.createChild({ cls:'x-spotlight' });
+			this.top = bd.createChild({ cls:'x-spotlight' });
+			this.bottom = bd.createChild({ cls:'x-spotlight' });
+	
+			this.all = new Ext.CompositeElement([this.right, this.left, this.top, this.bottom]);
+		},
+	
+		show : function(el, callback, scope){
+			if(this.animated){
+				this.show.defer(50, this, [el, callback, scope]);
+				return;
+			}
+			this.el = Ext.get(el);
+			if(!this.right){
+				this.createElements();
+			}
+			if(!this.active){
+				this.all.setDisplayed('');
+				this.applyBounds(true, false);
+				this.active = true;
+				Ext.EventManager.onWindowResize(this.syncSize, this);
+				this.applyBounds(false, this.animate, false, callback, scope);
+			}else{
+				this.applyBounds(false, false, false, callback, scope); // all these booleans look hideous
+			}
+		},
+	
+		hide : function(callback, scope){
+			if(this.animated){
+				this.hide.defer(50, this, [callback, scope]);
+				return;
+			}
+			Ext.EventManager.removeResizeListener(this.syncSize, this);
+			this.applyBounds(true, this.animate, true, callback, scope);
+		},
+	
+		doHide : function(){
+			this.active = false;
+			this.all.setDisplayed(false);
+		},
+	
+		syncSize : function(){
+			this.applyBounds(false, false);
+		},
+	
+		applyBounds : function(basePts, anim, doHide, callback, scope){
+	
+			var rg = this.el.getRegion();
+	
+			var dw = Ext.lib.Dom.getViewWidth(true);
+			var dh = Ext.lib.Dom.getViewHeight(true);
+	
+			var c = 0, cb = false;
+			if(anim){
+				cb = {
+					callback: function(){
+						c++;
+						if(c == 4){
+							this.animated = false;
+							if(doHide){
+								this.doHide();
+							}
+							Ext.callback(callback, scope, [this]);
+						}
+					},
+					scope: this,
+					duration: this.duration,
+					easing: this.easing
+				};
+				this.animated = true;
+			}
+			
+			this.right.setBounds(
+					rg.right,
+					basePts ? dh : rg.top,
+					dw - rg.right-10,
+					basePts ? 0 : (dh - rg.top),
+					cb);
+	
+			this.left.setBounds(
+					0,
+					0,
+					rg.left,
+					basePts ? 0 : rg.bottom,
+					cb);
+	
+			this.top.setBounds(
+					basePts ? dw : rg.left,
+					0,
+					basePts ? 0 : dw - rg.left,
+					rg.top,
+					cb);
+	
+			this.bottom.setBounds(
+					0,
+					rg.bottom,
+					basePts ? 0 : rg.right,
+					dh - rg.bottom,
+					cb);
+	
+			if(!anim){
+				if(doHide){
+					this.doHide();
+				}
+				if(callback){
+					Ext.callback(callback, scope, [this]);
+				}
+			}
+		},
+	
+		destroy : function(){
+			this.doHide();
+			Ext.destroy(
+				this.right,
+				this.left,
+				this.top,
+				this.bottom);
+			delete this.el;
+			delete this.all;
+		}
+	};
+	//backwards compat
+	Ext.Spotlight = Ext.ux.Spotlight;
+	
+	Ext.onReady(function(){
+	
+		ATF.spot = new Ext.ux.Spotlight({
+			easing: 'easeOut',
+			duration: .5
+		});
+		
+		var updateSpot = function(id){
+			if (typeof id == 'string') {
+				ATF.spot.show(id);
+			}
+			else 
+				if (!id && ATF.spot.active) {
+					ATF.spot.hide();
+			}
+		};
+		
+		new Ext.Panel({
+			renderTo: 'news',
+			id:'newsPanel',
+			border: false,
+			items: [
+				{
+					id: 'panel1',
+					xtype:'panel',
+					title: "Bienvenue sur la plateforme de Démo d'Optima",
+					autoScroll:true,
+					width:'auto',
+					height: 565,
+					contentEl:'demoBoardContent',
+					buttons: [{
+						text: 'Fermer la fenêtre',
+						handler: function() {
+							updateSpot();
+							Ext.ComponentMgr.get('newsPanel').destroy();
+							$('#newsBoard').css({
+								visibility:'hidden',
+								display:'none'
+							});
+						}
+					}]
+				}
+			]
+		});
+		
+		ATF.spot.show('panel1');
+	});
+	</script>
+
+{/if}

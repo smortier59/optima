@@ -1,0 +1,24 @@
+{$identifiant=$smarty.request[$current_class->table]["id_{$current_class->name()}"]|default:$smarty.request["id_{$current_class->name()}"]|default:$id|default:$smarty.get["id_{$current_class->name()}"]|default:$requests[$current_class->table]["id_{$current_class->name()}"]|default:$requests["id_{$current_class->name()}"]}
+{if !$requests[$current_class->table] && $event=="update"}
+    {$requests=["{$current_class->table}"=>$current_class->select($identifiant,NULL,$smarty.get.seed)]}
+{/if}
+{if !$event}
+    {$event=$smarty.request.event}
+{/if}
+
+{**************** Primary (infos principales) *******************} 
+<div class="primaryContainer" id="primaryContainer" style="width:95%;">
+    <div id="FormDonnees" style="width:100%;"></div>
+</div>
+{* FICHIER JS DU MODULE *}
+<script type="text/javascript">/*<![CDATA[*/
+	Ext.onReady(function(){	
+		Ext.QuickTips.init(); 
+		{if ATF::$html->template_exists("`$current_class->table`-update.tpl.js")}
+			{include file="`$current_class->table`-update.tpl.js" formName=formulaire renderTo=FormDonnees}
+		{else}	
+			{include file="generic-update.tpl.js" formName=formulaire renderTo=FormDonnees}
+		{/if}
+		ATF.basicInfo = new Ext.FormPanel(formulaire);
+	});
+/*]]>*/</script> 

@@ -1,0 +1,83 @@
+{if ATF::$controller->isGranted()}
+    <div class="tContent">
+        <div id="filAriane">
+            {include file="top_fil_ariane.tpl.htm"}
+        </div>
+        <div id="globalSearch">
+            {include file="top_global_search.tpl.htm"}
+        </div>
+        {include file="top_logo.tpl.htm"}
+    </div>
+    
+    {if is_a($current_class,classes)}
+        {$id=$smarty.get["id_{$current_class->name()}"]|default:$smarty.request[$current_class->name()]["id_{$current_class->name()}"]|default:$smarty.request["id_{$current_class->name()}"]|default:$requests[$current_class->name()]["id_{$current_class->name()}"]}
+        {$event=$requests.event|default:$smarty.request.event|default:"select_all"}
+        <div id="quickActionContainer"{* style="display:none" Ca sert à quoi de mettre en hidden par défaut ? => bonne question !*}>
+            {if ATF::$html->template_exists("top_specifique.tpl.htm")}
+                {include file="top_specifique.tpl.htm"}
+            {/if}
+			{*-------------------- Quick/Speed Action ! ------------------------*}
+            {foreach from=$current_class->quick_action[$event] key=k item=i}         
+                {* Privilge du profil *}
+                {if ATF::$usr->privilege($current_class->name(),$i) || ($i.privilege && ATF::$usr->privilege($current_class->name(),$i.privilege))}                 
+                    {if is_array($i) && ATF::$html->template_exists("`$current_class->table`-quick_action-`$k`.tpl.htm")}                    
+                        {include file="`$current_class->table`-quick_action-`$k`.tpl.htm"}
+                    {elseif is_array($i) && ATF::$html->template_exists("generic-quick_action-`$k`.tpl.htm")}
+                        {include file="generic-quick_action-`$k`.tpl.htm"}
+                    {elseif ATF::$html->template_exists("`$current_class->table`-quick_action-`$i`.tpl.htm")}                    
+                        {include file="`$current_class->table`-quick_action-`$i`.tpl.htm"}
+                    {elseif ATF::$html->template_exists("generic-quick_action-`$i`.tpl.htm")}
+                        {include file="generic-quick_action-`$i`.tpl.htm"}
+                    {elseif ATF::$html->template_exists("`$current_class->table`-quick_action.tpl.htm")}
+                        {include file="`$current_class->table`-quick_action.tpl.htm"}
+                    {elseif ATF::$html->template_exists("generic-quick_action-`$k`.tpl.htm")}
+                        {include file="generic-quick_action-`$k`.tpl.htm"}
+                    {else}
+                        {include file="generic-quick_action.tpl.htm"}
+                    {/if}
+                {/if}
+            {/foreach}
+            {if $current_class->helpMeURL}
+                <div class="quickAction helpMeURL" style="display:inline;">
+                    <a href="{$current_class->helpMeURL}" rel="{ATF::$usr->trans('helpOnline')}" title="{ATF::$usr->trans('helpOnline')}" target="_blank">
+                        <img src="{ATF::$staticserver}images/icones/help2.png" alt="" />
+                    </a>
+                </div>
+            {/if}
+
+        </div>
+		{*-------------------- Ancres ------------------------*}
+        {if $current_class->onglets && $smarty.request.event=="select"}
+            <div id="anchorsTabs" {*style="display:none;"*}>
+                <div class="leftAnchor"></div>
+                <div class="returnToTop">
+                	<a href="javascript:;" onclick="document.body.scrollTop=0;">
+                    	<div class="imgReturnToTop"></div>
+                    </a>
+                </div>
+                {foreach from=$current_class->onglets key=key item=item}
+                    {if is_array($item)}
+                        {$item=$key}
+                    {/if}
+                    {if !ATF::$usr->custom[$current_class->table]['onglets_caches'][$item]}
+                        {if ATF::$usr->privilege($item,'select')}
+                            <div class="middleAnchor">
+                                <a id="anchor_{$item}" href="javascript:;" onclick="ATF.goTo(':{$item}');return false;" {*style="display:none;"*}>
+                                    <img src="{ATF::$staticserver}images/module/16/{$item}.png" width="12px" height="12px" />
+                                    {ATF::$usr->trans($item,module)}
+                                </a>
+                            </div>
+                        {/if}
+                    {/if}   
+                {/foreach}
+                <div class="rightAnchor"></div>
+            </div>
+        {/if}
+    {else}
+        {if ATF::$html->template_exists("top_specifique.tpl.htm")}
+            <div id="quickActionContainer" style="display:none">
+                {include file="top_specifique.tpl.htm"}
+            </div>
+        {/if}
+    {/if}
+{/if}

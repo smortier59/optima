@@ -1,0 +1,22 @@
+{$modif=$current_class->select($id_trace,'modification')}
+{$modif=$modif|unserialize}
+{$modif=$current_class->filtrage_null($modif)}
+<div style="max-height:500px; overflow:scroll;">
+    {foreach from=$modif key=nom_champs item=valeurs}
+        {if is_array($valeurs)}
+            {if $current_class->fk_from($nom_champs)}
+                {$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+                <div>- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : avant=>{ATF::getClass($module)->nom($valeurs.avant)|default:$valeurs.avant}, apres=>{ATF::getClass($module)->nom($valeurs.apres)|default:$valeurs.apres} </div>
+            {else}
+                <div>- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : avant=>{$valeurs.avant}, apres=>{$valeurs.apres}</div>
+            {/if}
+        {else}
+            {if $current_class->fk_from($nom_champs)}
+                {$module=ATF::getClass($current_class->fk_from($nom_champs,false,true))->name()}
+                <div>- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {ATF::getClass($module)->nom($valeurs)|default:$valeurs} </div>
+            {else}
+                <div>- {ATF::$usr->trans($nom_champs,$item['tracabilite.id_module'])} : {$valeurs}</div>
+            {/if}
+       	{/if}
+    {/foreach}
+</div>

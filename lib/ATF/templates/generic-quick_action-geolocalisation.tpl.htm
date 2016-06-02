@@ -1,0 +1,31 @@
+{* 
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Cl enregistrement
+*}
+
+{* Vrification sur l'enregistrement si un ID existe en paramtre *}
+<div class="quickAction {$i}" style="display:inline;">
+    <a href="javascript:;"
+        onclick="{strip}var w=new Ext.Window({
+            layout: 'fit',
+            title: '{ATF::$usr->trans(geolocalisation,$item.module)|escape:javascript} - {$current_class->nom($id)|escape:javascript}',
+            x: 100,
+            y: 100,
+            monitorResize:true,
+{if $id}
+            width:400,
+            height:400,
+            autoLoad:{ url: '{$current_class->name()},geolocalisation.ajax,id={$id}', scripts:true }
+{else}
+            width:700,
+            height:600,
+            autoLoad:{ url: '{$current_class->name()},geolocalisation.ajax,table={$current_class->table}&pager=gsa_{$current_class->table}_{$current_class->table}', scripts:true }
+{/if}            
+        }).show();w.on('resize', function () { google.maps.event.trigger(geolocalisation__GMap, 'resize'); }, w);return false;{/strip}" 
+        rel="{ATF::$usr->trans($i,null,_info)}" 
+        title="{ATF::$usr->trans($i,null,_info)}">
+        <img src="{ATF::$staticserver}images/icones/{$i}.png" />
+    </a>
+</div>

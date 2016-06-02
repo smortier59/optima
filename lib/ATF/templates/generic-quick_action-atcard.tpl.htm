@@ -1,0 +1,13 @@
+{*
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+*}
+{* Vérification sur l'enregistrement si un ID existe en paramètre *}
+<div class="quickAction {$k}" style="display:inline;">
+    <a href='{$current_class->table},{$k}.ajax,id_{$current_class->table}={$requests["id_`$current_class->table`"]}'
+        rel="{ATF::$usr->trans($k,null,_info)}" 
+        title="{ATF::$usr->trans($k)}">
+        <img src="{ATF::$staticserver}images/icones/{$k}.png" />
+    </a>
+</div>

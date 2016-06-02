@@ -1,0 +1,19 @@
+{* 
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Clé enregistrement
+*}
+
+<script type="text/javascript">/*<![CDATA[*/
+{include file="ged_fichier.tpl.js"}
+/*]]>*/</script> 
+
+{* Vérification sur l'enregistrement si un ID existe en paramètre *}
+{if $id}
+    <div class="quickAction {$k}" style="display:inline;">
+        <a href="javascript:;" onclick="ATF.afficheGed('{$id}','{$current_class->table}');">
+            <img src="{ATF::$staticserver}images/icones/finish.png" height="16" width="16" alt="" />
+        </a>
+    </div>
+{/if}

@@ -1,0 +1,13 @@
+@charset "utf-8";
+
+/* Frontoffice */
+.iconEconomique {
+	background:url(../images/icones/ledblue.png);
+}
+.iconPratique {
+	background-image:url(../images/icones/ledgreen.png);
+}
+
+div.button div#left {  background:url("../images/design/button_left_blue.png") no-repeat; width:32px; height:36px; float:left }
+div.button div#middle { background:url("../images/design/button_middle_blue.png") repeat-x; height:36px; float:left; padding:10px; }
+div.button div#right {  background:url("../images/design/button_right_blue.png") no-repeat; width:10px; height:36px; float:left }

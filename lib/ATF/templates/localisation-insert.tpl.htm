@@ -1,0 +1,38 @@
+<form name="localisation,insert" id="localisation,insert" action="" method="post" class="maxwidth">
+    <div class="primary">
+        <div class="slipTitle">
+            <div class="slipTitleL"></div>
+            <div class="slipTitleM">
+                <span>{ATF::$usr->trans("insert",$current_class->table)}</span>
+            </div>
+            <div class="slipTitleR"></div>
+        </div>
+        <div class="primaryContainer profilDroit" id="primaryContainer">
+            {include file="container.tpl.htm"}
+            <div class="slipContainer" id="slipContainer" >	
+                <div style="float:left;width:20px;">
+                    <a href="javascript:;" onclick="ajout_ligne()"><img src="{ATF::$staticserver}images/icones/insert.png" alt="" /></a>
+                </div>
+                {foreach from=$current_class->colonnes.formulaire key=key item=item}
+                    <div style="float:left;width:200px;">
+                        {ATF::$usr->trans($item,$current_class->table)}
+                    </div>
+                {/foreach}
+				<div style="clear:both"></div>
+                <div id="mod_listing_champs">
+                	<div id="loc_0">{include file="localisation-champs.tpl.htm"}</div>
+                </div>
+            </div>
+        </div>
+         <script type="text/javascript">/*<![CDATA[*/
+			resize();
+		/*]]>*/</script>
+    </div>
+    <div class="ClearBoth"></div>
+    <div class="submit" id="submit">
+    	<input type="hidden" name="id_localisation_langue" value="{$smarty.post.langue}"/>
+        <input type="hidden" name="coche" value="{$smarty.post.coche}"/>
+		{include file="button.tpl.htm" text="valid" onclick="ATF.insert($('#localisation,insert'));"}
+	</div>
+</form>    
+<div class="ClearBothWithPadding"></div>

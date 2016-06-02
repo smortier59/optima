@@ -1,0 +1,45 @@
+{* Ecrire une fonction qui regarde de manire recursive dans ce tableau *}
+{foreach from=ATF::$usr->get(menu) key=cle item=valeur}
+	{if $valeur.module==$table}
+    	{foreach from=$valeur.enfants key=key item=item}
+            <div class="primary primary_widget">
+                <div class="slipTitle slipTitle_widget">
+                    <div class="slipTitleL"></div>
+                    <div class="slipTitleM">
+                        <span>{ATF::$usr->trans($item.module,'module')}</span>
+                    </div>
+                    <div class="slipTitleR"></div>
+                </div>
+                <div class="primaryContainer primaryContainer_widget" id="primaryContainer">
+                    {include file="container.tpl.htm" widget_table=$item.module}
+                    <div class="slipContainer slipContainer_widget" id="slipContainer_{$item.module}">
+                        <div class="logo_widget">
+                            <a href="javascript:;" onclick="ATF.goTo('{module::moduleToName($item.module)|urlencode}.html');">
+                                <img src="{module::iconePath($item.module,48)}" height="48" width="48" alt="" />
+                            </a>
+                        </div>
+                        {ATF::$usr->trans($item.module, intro)}
+                        <div style="text-align:right; width:90%; font-weight:bold; bottom:0px; position:absolute;">
+                            <a href="javascript:;" onclick="ATF.goTo('{module::moduleToName($item.module)|urlencode}.html');">
+                                => {ATF::$usr->trans("directAccess")}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    	{/foreach}
+ 	{/if}       
+{/foreach}
+<div class="ClearBothWithPadding"></div>
+
+<script type="text/javascript">/*<![CDATA[*/
+	{foreach from=ATF::$usr->get(menu) key=cle item=valeur}
+		{if $valeur.module==$table}
+			{foreach from=$valeur.enfants key=key item=item}
+				$('.slipContentContainer_{$item.module}').each(function (e) {
+					e.css({ height: 10+$('#slipContainer_{$item.module}').height()+"px" });
+				});
+			{/foreach}
+		{/if}       
+	{/foreach}
+/*]]>*/</script>

@@ -1,0 +1,131 @@
+<style>
+#phones {
+    background-color: #fff;
+    text-shadow: #fff 0 1px 0;
+}
+
+#phones ul {
+    position: relative;
+    display: block;
+    height: auto;
+    font-size: 85%;
+}
+
+#phones ul li img {
+    margin-bottom: 1px;
+}
+
+#phones ul li {
+    float: left;
+    padding: 8px 17px;
+    margin: 5px;
+    text-align: center;
+    line-height: 1.50em;
+    color: #333;
+    height: 113px;
+    width: 112px;
+    overflow: hidden;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+}
+
+#phones ul li:hover {
+    background-color: rgba(100, 100, 100, .15);
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-top: 1px solid rgba(0, 0, 0, .15);
+}
+
+#phones li strong {
+    color: #000;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#phones li span {
+    color: #999;
+    font-size: 12px;
+}
+  
+</style>
+{* Page principale *} 
+<div class="primary" id="panelSat" style="margin-left: 30px;">    
+</div> 
+<script type="text/javascript">/*<![CDATA[*/
+Ext.onReady(function() {
+    var store = new Ext.data.ArrayStore({
+        proxy   : new Ext.data.MemoryProxy(),
+        fields  : ['name', 'module', 'graphe',"lien"],
+        sortInfo: {
+            field    : 'name',
+            direction: 'ASC'
+        }
+    });
+    
+    store.loadData([
+        {foreach name=stats from=$current_class->stats key=module item=infos}
+                 {if $infos['multigraphe']==true}
+                    {foreach from=$infos['graphes'] key=nom item=info_graph}
+                        ["{ATF::$usr->trans($module,'module')}" , "{$module}", "{ATF::$usr->trans($nom,'module')}","{$info_graph['numero']}"]
+                        {if !$nom@last} , {/if}
+                    {/foreach}
+                 {else}
+                    ["{ATF::$usr->trans($module,'module')}" , "{$module}", null, null]
+                    {if !$module@last} , {/if} 
+                 {/if}     
+        {/foreach}
+    ]);
+    
+    var dataview = new Ext.DataView({
+        store: store,
+        tpl  : new Ext.XTemplate(
+             '<ul>',
+                '<tpl for=".">',
+                    '<li class="phone">',                        
+                        '<img width="64" height="64"  src="{module::iconePath("{ldelim}module{rdelim}",48)}" height="48" width="48" alt="" />',
+                        '<strong>{ldelim}name{rdelim}</strong>',
+                        '<span>{ldelim}graphe{rdelim}</span></a>',
+                    '</li>',
+                '</tpl>',
+            '</ul>'
+        ),
+        listeners : {
+                click : {
+                    fn : function( dataView, index, node, e) {
+                        if(dataView.store.data.items[index].data.lien != ""){
+                            ATF.tpl2div("tpl2div.ajax" , "div=main&template=stats_menu&module="+dataView.store.data.items[index].data.module+"&table=stats&graph="+dataView.store.data.items[index].data.lien);
+                        }else{
+                            ATF.tpl2div("tpl2div.ajax" , "div=main&template=stats_menu&module="+dataView.store.data.items[index].data.module+"&table=stats");
+                        }                           
+                    }
+                }
+        },
+        id: 'phones',        
+        itemSelector: 'li.phone',
+        overClass   : 'phone-hover',
+        singleSelect: true,
+        multiSelect : false,
+        autoScroll  : true
+    });
+        
+    
+    new Ext.Panel({
+        title: 'Statistiques',
+        layout: 'fit',
+        items : dataview,
+        height: 615,
+        width : 800,                
+        renderTo: 'panelSat'
+    });
+    
+});
+   
+   
+   
+        $('#slipContentContainer').each(function (e) {
+            e.css({ height: 10+$('#slipContainer').height()+"px" });
+        });
+    /*]]>*/</script>       
+</div>    
+<div class="ClearBothWithPadding"></div>

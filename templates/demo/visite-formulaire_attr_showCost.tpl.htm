@@ -1,0 +1,8 @@
+{if $vi_pa.id_vi_pa && $vi_pa.reponse && (ATF::pa()->hasCout($infos.id_pa) || ATF::pa()->getRegle($infos.id_pa))}
+    <a href="javascript:;" onclick="Modalbox.show('visite-formulaire_attr_cout.dialog', { width: 750, title:'{ATF::$usr->trans('cout_view','formulaire')|mt:[pa=>$infos.id_pa,attr=>$attr.attr]|escape:javascript}', params:'id_vi_pa={$vi_pa.id_vi_pa}&id_vi_pa_multi={$id_vi_pa_multi}', method:'post' });">
+        <img src="{ATF::$staticserver}images/icones/euro.png" />
+    </a>
+    {ATF::vi_pa()->getCost($vi_pa.id_vi_pa)|number_format:0:".":" "} &euro;
+{else}
+    
+{/if}

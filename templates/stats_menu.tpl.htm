@@ -1,0 +1,120 @@
+{$module=$module|default:$smarty.get.module}
+
+{* si il s'agit d'un decoche on supprime l'année de la liste *}
+{if $valeur=="false"}
+    {ATF::stats()->modif_liste_annee('suppression',$module,$annee)}
+{elseif $annee}
+	{* sinon on ajoute l'annee en question *}
+    {ATF::stats()->modif_liste_annee('ajout',$module,$annee)}
+{/if}
+
+<style>
+    #menu_stats
+    {
+        font-size: 13px;
+    }
+    
+    #menu_2
+    {
+        font-size: 10px;
+    }
+    
+    #menu_2 ul
+    {
+       text-align: left;
+    }
+       
+     #menu_stats ul
+    {
+        padding: 0px 0 20px 0;
+        margin: 0;
+        text-align: center;
+    }
+    
+    ul li
+    {
+        display: inline;
+    }
+    
+    #menu_stats ul li a
+    {
+        color: #000;
+        padding: 6px 3px 4px 3px;
+        margin-right: 20px;
+        text-decoration: none;
+        border-bottom: 2px solid #000;
+        
+    }
+    
+    #menu_stats #menu_2 ul li a
+    {
+        border-bottom: 0px;
+    }
+    #menu_stats #menu_2 ul li a:hover
+    {
+        color: blue;
+    }
+    
+    #menu_stats ul li a:hover
+    {
+        border-bottom: 2px solid blue;
+    }    
+</style>
+
+<div class="primary" style="width:100%">
+    <div class="slipTitle">
+        <div class="slipTitleL"></div>
+        <div class="slipTitleM">
+            <span>{ATF::$usr->trans($current_class->table,'module')}</span>
+        </div>
+        <div class="slipTitleR"></div>
+    </div>
+	<div class="primaryContainer" id="primaryContainer" style="width:95%">
+    	{include file="container.tpl.htm"}
+        <div class="slipContainer" id="slipContainer">
+            <div id="menu_stats">
+                <ul>
+                {foreach name=stats from=$current_class->stats key=key item=item}
+                    {if ATF::$usr->privilege($key,'select')} 
+                        <li> 
+                            <a href="javascript:;" onclick="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&module={$key}&table=stats');">{ATF::$usr->trans($key,module)}</a>
+                        </li>
+                    {/if}
+                {/foreach}                   
+                </ul>
+                {if $module && ATF::$usr->privilege($module,'select')}
+                    
+                        {include file="stats_graph.tpl.htm" table=$module}
+                        
+                        {foreach from=ATF::getClass($module)->stats_types item=item}
+                            
+                            {if ATF::$html->template_exists("stats_`$module`_`$item`.tpl.htm")}
+                                {include file="stats_`$module`_`$item`.tpl.htm" table=$module type=$item}
+                            {else}
+                                {include file="stats_graph.tpl.htm" table=$module type=$item}
+                            {/if}
+                           
+                        {/foreach}
+                        
+                        {if ATF::$html->template_exists("stats_`$module`.tpl.htm")}
+                            {include file="stats_`$module`.tpl.htm"}
+                        {/if}
+                   {elseif ATF::$html->template_exists("stats_`$module`.tpl.htm")}
+                        {include file="stats_`$module`.tpl.htm"}
+                    {/if}               
+                {/if}                                
+                
+                {if ATF::getClass($module)->stats_tab}                    
+                    {include file="stats_tab.tpl.htm" table=$module}
+                {/if}
+            </div>
+    
+        </div>
+	</div> 
+    <script type="text/javascript">/*<![CDATA[*/
+        $('#slipContentContainer').each(function (e) {
+            e.css({ height: 10+$('#slipContainer').height()+"px" });
+        });
+    /*]]>*/</script>       
+</div>    
+<div class="ClearBothWithPadding"></div>

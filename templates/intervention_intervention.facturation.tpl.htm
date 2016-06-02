@@ -1,0 +1,7 @@
+{if $item[$field]=="unite"}
+    <img src="{ATF::$staticserver}images/icones/module_icone_53.png" height="16" width="16" {tip text=ATF::$usr->trans($item[$field],$current_class->table)}/>
+{elseif $item[$field]=="contrat_maintenance"}
+    <img src="{ATF::$staticserver}images/icones/module_icone_54.png" height="16" width="16" {tip text=ATF::$usr->trans($item[$field],$current_class->table)}/>
+{else}
+    <img src="{ATF::$staticserver}images/icones/module_icone_55.png" height="16" width="16" {tip text=ATF::$usr->trans($item[$field],$current_class->table)}/>
+{/if}

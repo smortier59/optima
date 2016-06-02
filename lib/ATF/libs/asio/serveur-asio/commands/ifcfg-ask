@@ -1,0 +1,27 @@
+#!/bin/bash
+# Renvoie les infos sur la configuration réseau
+# syntaxe : ifcfg-ask <interface> <type>
+# <type> = ip, mask, gw, type (dhcp ou none)
+
+# Constantes
+path_network=/etc/sysconfig/network/ifcfg-"$1"
+
+if [ $2 == ip ]
+then
+	ifconfig "$1"|grep 'inet ad'|cut -d ":" -f2|cut -d " " -f1
+fi
+
+if [ $2 == mask ]
+then
+	ifconfig eth0|grep 'inet ad'|cut -d ":" -f4|cut -d " " -f1
+fi
+
+if [ $2 == gw ]
+then
+	route -n|grep UG|cut -d " " -f10
+fi 
+
+if [ $2 == type ]
+then
+	cat $path_network|grep BOOTPROTO|cut -d "'" -f2
+fi

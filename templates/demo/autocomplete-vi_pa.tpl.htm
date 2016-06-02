@@ -1,0 +1,13 @@
+{*lang permet de passer une autre valeur que l'id de la current_class héhé *}
+{strip}
+<ul>
+	{foreach from=$data item=item}
+		<li id="{$item["{$current_class->table}.id_{$current_class->table}"]}" onClick="ATF.countdownTimer{$smarty.post.div}.reset(); __s{$smarty.post.div}('{$item[$current_class->table]|addslashes}');">
+        	{$item[$current_class->table]|default:$item["{$current_class->table}.id_{$current_class->table}"]}
+        </li>
+    {/foreach}
+	{*<li onClick="__s{$smarty.post.div}('{$smarty.post.recherche|addslashes}');">
+		{$smarty.post.recherche}
+	</li>*}
+</ul>
+{/strip}

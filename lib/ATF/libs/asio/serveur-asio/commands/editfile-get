@@ -1,0 +1,21 @@
+#!/bin/bash
+# Renvoie le flux d'un fichier de configuration
+# Attention à l'éxécution de cette commande !
+# Syntaxe : editfile-get <path-absolu-du-fichier>
+# Exemple : editfile-get /etc/asterisk/asterisk.conf
+
+# L'argument existe ?
+if [ "$#" -ne 1 ]
+then
+echo "Usage: editfile-get PATH"
+  exit 1
+fi
+
+# Renvoie du contenu du fichier
+if [ -f "$1" ]
+then
+	cat "$1"
+	echo
+else
+	echo 'arret'
+fi

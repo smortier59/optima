@@ -1,0 +1,3 @@
+#!/bin/bash
+# Test si le serveur est lancé
+echo 'present'

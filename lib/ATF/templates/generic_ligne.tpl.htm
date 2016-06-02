@@ -1,0 +1,106 @@
+{* héhé *}
+{if !$table}{$table=$json.result}{/if}
+{$current_class=ATF::$table()}
+
+{if $entete}
+    {* ENTETES DE LIGNE *}
+    {foreach from=$current_class->colonnes.ligne item=item key=key}
+    	{if !$item.hidden}
+            <div class="entete" id="{$key}">
+                {ATF::$usr->trans($key,$current_class->table)}
+            </div>
+        {/if}
+    {/foreach}	
+{else}
+    {* LIGNE VIERGE *}
+    <div class="blank_line">
+	    {foreach from=$current_class->colonnes.ligne item=item key=key}
+			{if !$item.hidden}
+				<div class="field" id="{$key}">
+					{if $key=="`$fk_table`"}
+						{$key="id_`$fk_table`"}
+						{$key_class=ATF::getClass($current_class->fk_from($key))}
+						{if ATF::$usr->privilege($key_class->name())}
+							{if $item.textarea}
+								<textarea style="width:95%; height:100%" onkeyup="if (event.keyCode == 13) { this.rows = this.rows + 1; }" rows="1" name="{$current_class->table}[{$fk_table}]" id="{$current_class->table}[{$fk_table}]">{if $json.result[$key]}{$key_class->nom($json.result[$key])}{elseif $json.result[$fk_table]}{$json.result[$fk_table]}{/if}</textarea>
+							{else} 
+								<input type="text" name="{$current_class->table}[{$fk_table}]" id="{$current_class->table}[{$fk_table}]" onkeyup="$('#{$current_class->table}\\[{$key}\\]').val('');" value="{if $json.result[$key]}{$key_class->nom($json.result[$key])}{elseif $json.result[$fk_table]}{$json.result[$fk_table]}{/if}" />
+							{/if}
+							<input type="hidden" name="{$current_class->table}[{$key}]" id="{$current_class->table}[{$key}]" value="{$json.result[$key]}" />
+							<script item.type="text/javascript">/*<![CDATA[*/							
+							ATF.autocomplete({
+								url:'{$key_class->table},autocomplete.ajax'
+								,mapping:{if $key_class->getAutocompleteMapping()}{$key_class->getAutocompleteMapping(true)}{else}[
+									{ name: 'nom', mapping: 0 },
+									{ name: 'detail', mapping: 1 },
+									{ name: 'id', mapping: 2 }
+								]{/if}
+								,loadingText:'Recherche...'
+								,noClearOnTrigger:{if $item.textarea}true{else}false{/if}
+								,template:'{include file="generic-autocomplete.tpl.htm" table=$key_class->table}'
+								,applyTo:'{$current_class->table}[{$fk_table}]'
+								,onSelect:function(record){
+									if (record.data.id) {
+										$('#{$current_class->table}\\[{$key}\\]').val(record.data.id);
+									}
+									if (record.data.nom) {
+										$('#{$current_class->table}\\[{$fk_table}\\]').val(Ext.util.Format.stripTags(record.data.nom));
+									}
+									this.collapse();
+									
+									{if ATF::$html->template_exists("{$current_class->table}-{$key}-oncomplete.tpl.js")}
+										{include file="{$current_class->table}-{$key}-oncomplete.tpl.js"}
+									{/if}
+								}
+							});
+							/*]]>*/</script>
+						{else}
+							{if $item.textarea}
+								<textarea style="width:95%; height:100%" onkeyup="if (event.keyCode == 13) { this.rows = this.rows + 1; }" rows="1" name="{$current_class->table}[{$fk_table}]" id="{$current_class->table}[{$fk_table}]"></textarea>
+							{else} 
+								<input type="text" name="{$current_class->table}[{$fk_table}]" id="{$current_class->table}[{$fk_table}]"  value="{$key_class->nom($json.result[$key])}" />
+							{/if}
+						{/if}	
+					{else}
+						{include file="generic_field_input.tpl.htm" value=$json.result[$key]}
+					{/if}
+				</div>
+		   {/if}
+        {/foreach}
+        <div class="icone">
+            <a href="javascript:;" onclick="ATF.tpl2div('{$current_class->name()},insert_ligne.ajax','div=ligne_conteneur{foreach from=$current_class->colonnes.ligne item=item key=key}&{$current_class->table}[{$key}]='+encodeURIComponent($('#{$current_class->table}\\[{$key}\\]').val())+'{/foreach}&template=generic_ligne&table={$table}&fk_table={$fk_table}');" {tip text=ATF::$usr->trans("update")}><img src="{ATF::$staticserver}images/icones/insert.png" height="16" width="16" alt="" /></a>
+        </div>
+    </div>
+
+	<br><br>
+
+    {* LIGNE DEJA PRESENTE DANS LA SESSION *}
+    <div class="filled_line" id="filled_line">
+        {foreach from=$smarty.session[$current_class->table] item=i key=k}
+			{foreach from=$current_class->colonnes.ligne item=item key=key}
+				{if !$item.hidden}
+					<div class="field" id="{$key}">
+						{include name="`$current_class->table`[`$key`][`$k`]" extra="onchange=ATF.tpl2div('`$current_class->table`,update_ligne.ajax','div=generic_ligne-total&key=`$key`&index=`$k`&value='+this.value+'&template=`$current_class->table`-total&table=`$table`');" file="generic_field_input.tpl.htm" key=$key item=$item value=$i[$key]}
+					</div>	
+				{/if}
+			{/foreach}
+
+            <div class="icone">
+                <a href="javascript:;" onclick="ATF.tpl2div('{$current_class->name()},delete_ligne.ajax','div=ligne_conteneur&index={$k}&template=generic_ligne&fk_table={$fk_table}&table={$table}');"><img src="{ATF::$staticserver}images/icones/delete.png" height="16" width="16" alt="" /></a>
+            </div>
+            <div class="ClearLeft"></div>
+        {foreachelse}
+       		<span class="italic">
+            	{ATF::$usr->trans('aucun_produit',$current_class->table)}
+            </span>
+        {/foreach}
+    </div>
+    {* AFFICHAGE DU TOTAL *}
+    {if $smarty.session[$current_class->table]}
+        {if ATF::$html->template_exists("{$current_class->table}-total.tpl.htm")}
+            <div id="generic_ligne-total">
+                {include file="{$current_class->table}-total.tpl.htm"}
+            </div>
+        {/if}
+    {/if}
+{/if}

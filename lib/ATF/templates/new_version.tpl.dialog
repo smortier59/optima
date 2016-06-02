@@ -1,0 +1,8 @@
+<div>
+<p>{t w="new_version"}</p>
+	<div style="text-align:center;">
+	<button type="button" onclick="window.location='logout.php'">{t w="yes"}</button>
+	</div>
+</div>
+
+

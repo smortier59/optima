@@ -1,0 +1,21 @@
+<div id="geolocalisationGMapContainer" >
+    <div id="geolocalisationGMap" class="geolocalisation GMap">&nbsp;</div>
+</div>
+
+{log::logger(ATF::_r(),qjanon)}
+{if ATF::_r('table')=="geolocalisation"}
+	{$defaultLat="47"}
+	{$defaultLong="2.35"}
+	{$defaultZoom="6"}
+{else}
+	{$defaultZoom="10"}
+{/if}
+
+<script type="text/javascript">/*<![CDATA[*/	
+{include file="gmap.tpl.js" table=societe pager=geolocalisation nolimit=1
+	defaultLat=$defaultLat
+	defaultLong=$defaultLong
+	defaultZoom=$defaultZoom
+	condition_key=$condition_key
+	condition_value=$condition_value}
+/*]]>*/</script>

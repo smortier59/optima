@@ -1,0 +1,9 @@
+{$modif=$current_class->select($item["`$current_class->table`.id_`$current_class->table`"],'modification')}
+{$event=$item["`$current_class->table`.`$current_class->table`"]}
+{if $modif && ($event=="update" || $event=="insert")}
+	<a style="cursor:pointer"
+     onclick="Modalbox.show('tracabilite_modification.dialog', { scrollTo:0, width: 700, title: '{ATF::$usr->trans(modification,tracabilite)}', params: 'table={$current_class->table}&id_trace={$item["`$current_class->table`.id_`$current_class->table`"]}', method:'post' });">            
+    <img src="{ATF::$staticserver}images/icones/update.png" height="16" width="16" alt="" /></a>
+{else}
+-
+{/if}

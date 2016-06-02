@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+<head>
+	<title>{include file="title.tpl.htm"}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-language" content="fr" />
+	<meta name="expires" content="never" />
+	<meta name="rating" content="general" />
+	<meta name="revisit-after" content="2 days" />
+	<meta name="ROBOTS" content="index,follow" />
+
+	{* jQuery *}
+	<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	{* Highcharts *}
+	<script src="{ATF::$staticserver}js/highcharts/highcharts.js"></script>
+	<script src="{ATF::$staticserver}js/highcharts/modules/exporting.js"></script>
+
+	{* Bootstrap *}	
+	<link rel="stylesheet" href="{ATF::$staticserver}bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="{ATF::$staticserver}bootstrap/css/bootstrap-theme.min.css">
+	<script src="{ATF::$staticserver}bootstrap/js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+		.iframe-responsive-wrapper        {
+	    position: relative;
+	}
+
+	.iframe-responsive-wrapper .iframe-ratio {
+	    display: block;
+	    width: 100%;
+	    height: auto;
+	}
+
+	.iframe-responsive-wrapper iframe {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+    	min-height: 900px;
+	}
+	</style>
+
+</head>
+<body>
+
+<div class="container-fluid" style="margin-top: 20px;">   
+  <center>
+  {if $smarty.get.code && $smarty.get.code == "att"}
+     <h1 style="color:#FF0FC7">Absystech Telecom</h1>
+  {else}
+    <h1>Absystech</h1>
+  {/if}
+  </center>
+
+  <div class="iframe-responsive-wrapper">    
+	    <iframe src="http://optima.absystech.net/graph_tv.php" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+	var delay = 10;
+
+	var auto_reload = setTimeout(function () {
+					        var search = window.location.search;
+							
+							if(search == ""){
+								window.location.href = window.location.protocol + "//" + window.location.hostname + "/rotator.php" + "?code=att";
+							}else if(search == "?code=att"){
+							  window.location.href = window.location.protocol + "//" + window.location.hostname + "/rotator.php" + "?code=at";
+							}else if(search == "?code=at"){
+							  //Ajouter une adresse vers laquelle pointer
+							  window.location.href = window.location.protocol + "//" + window.location.hostname + "/rotator.php" + "?code=att";
+							}
+					    }, delay * 1000);
+</script>
+</body>
+</html>

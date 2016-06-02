@@ -1,0 +1,25 @@
+{$indentation=$indentation+15}
+{foreach from=$enfants key=cle_mod item=item}
+    <tr id="{$cle_mod}" class="parent_{$id_parent} module_{$cle_mod}" style="display:none" >
+        <td class="col indent{$indentation}" {if $item.enfants}onclick="ATF.toggle_children({$cle_mod});"{/if}>
+        	{if $item.enfants}
+                <div id="image_{$cle_mod}" class="icone">&nbsp;</div>
+            {/if}
+            <div>{ATF::$usr->trans($item.module,'module')}</div>
+        </td>
+        {foreach from=ATF::privilege()->privilege key=cle_priv item=info_priv}
+        	<td>
+                <div id="{$cle_mod}_{$info_priv.id_privilege}">{include file="profil_check.tpl.htm"}</div>
+            </td>
+        {/foreach}
+        <td class="co_deco">
+            <a href="javascript:;" onclick="ATF.tpl2div('profil_privilege,insert.ajax','id_profil={$smarty.request.id_profil|cryptid}&id_module={$cle_mod|cryptid}');" rel="{ATF::$usr->trans('cocher_tout_module','profil')}">
+                <img src="{ATF::$staticserver}images/icones/cb_active.gif" height="11" width="11" alt="" />
+            </a>
+            <a href="javascript:;" onclick="ATF.tpl2div('profil_privilege,delete.ajax','id_profil={$smarty.request.id_profil|cryptid}&id_module={$cle_mod|cryptid}');" rel="{ATF::$usr->trans('decocher_tout_module','profil')}">
+                <img src="{ATF::$staticserver}images/icones/cb_inactive.gif" height="11" width="11" alt="" />
+            </a>
+        </td>
+    </tr>
+	{include file="profil_ssmenu.tpl.htm" enfants=$item.enfants id_parent=$cle_mod indentation=$indentation}
+{/foreach}

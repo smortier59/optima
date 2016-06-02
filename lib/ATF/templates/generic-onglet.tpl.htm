@@ -1,0 +1,117 @@
+{**
+	Affichage d'un onglet
+    string	 	$name		 		Nom de l'Objet courant
+    string	 	$parent_name		Nom de l'Objet parent
+    string	 	$id_current			Id du parent (fk) du coup le fk sert à rien...
+	boolean		$opened				True si l'onglet est ouvert par défaut
+	boolean		$field				Un paramètre supplémentaire !
+	//boolean		$fk				    Un paramètre fk !
+	boolean		$table				Un paramètre table !
+	string 		$function			Un paramèter function !
+	boolean		$select				Si on désire un onglet select et non select_all comme par défaut (En developpement)
+*}
+
+{*--------------Gestion de la FK-----------*}
+{if $id_current}
+    {if $field}
+        {$fk=[$field=>$id_current]}
+    {elseif $table}
+        {$fk=["`$table`.id_`$current_class->table`"=>$id_current]}
+    {elseif $current_class}
+        {$fk=["{ATF::$name()->table}.id_`$current_class->table`"=>$id_current]}
+    {elseif $current_class->table==$name}
+        {$fk=["{ATF::$name()->table}.id_parent"=>$id_current]}
+    {/if}
+{/if}
+
+{if $fk}
+	{$id_fk=$id_current}
+	{$id_fk=$id_fk|cryptid}
+	{$url_extra_fk="id_`$current_class->table`=`$id_fk`"}
+{/if}
+
+{* --------------Gestion des onglets de type select----------- *}
+{if $select===true}
+	<div>
+		<div>
+			{$name|strtoupper|truncate:65}
+			{include file="generic-quick_action.tpl.htm" i=insert}
+		</div>
+
+	{* si l'on choisit un filtre dans un onglet, il faut conserver la notion de parent, pour ne pas afficher la colonne de la clé étrangère si l'on se situe sur le select de ce dernier *}
+	{$parent_class=$current_class}
+	
+	{if !$div}
+		{* oblige de mettre une condition expres sinon fatal error to call function on a non-object *}
+		{if $parent_class}
+			{$div="gsa_{$parent_class->table}_{$name}"} {* Balise div de référence pour cette pagination *}
+		{else}
+			{$div="gsa_{$name}_{$name}"} {* Balise div de référence pour cette pagination *}
+		{/if}
+	{/if}
+	
+	{$q=$smarty.session.pager->create($div,null,true,NULL,$current_class->selectAllExtjs)}
+	{$view=ATF::$usr->get(custom,columns,$name)|default:ATF::$name()->view} {* Vue du filtre, sinon vue perso *}
+	{$q->setLimit($q->limit.limit|default:$smarty.const.__RECORD_BY_PAGE__)->reset('field')->addField(ATF::$name()->colonnes_simples($smarty.session,false,$view))->setLimit($smarty.post.limit)->end()} {* Requêteur associé *}
+	
+	{* Clés étrangères de filtrage éventuel *}
+	{if $fk}
+		{$q->reset('where')->end()}
+		{foreach from=$fk key=field item=value}
+			{* on ajoute les conditions lié aux FK défini au requeteur *}
+			{$q->addCondition($field,$value)->end()}
+		{/foreach}
+	{/if}
+	{ATF::$name()->setQuerier($q)} {* On applique ce requêteur à la classe courante *}
+	{$requests=$q->query(ATF::$name()->select_all())} {* Requête *}
+	{foreach from=$requests key=field item=value}
+		 {if $current_class->table_standard}
+			{capture name=title}{ATF::$name()->nom($value["{$name}.id_{$name}"])|strtoupper|truncate:65}{/capture}
+			{include file="table_standard.tpl.htm" header=1 event='select' forced_title=$smarty.capture.title find=0 current_class=ATF::$name() id=$value["{$name}.id_{$name}"]}
+		{/if}
+
+		{include file="generic.tpl.htm"  current_class=ATF::$name() id=$value["{$name}.id_{$name}"] force_event="select" autoHeight=true} 
+
+		{if $current_class->table_standard}
+			{include file="table_standard.tpl.htm" header=0}
+		{/if}
+	{/foreach}	
+	{*-----------------------------------------*}
+	{*           Footer( Table standard )      *}
+	{*-----------------------------------------*}              
+	{*if $parent_class->table_standard_onglet}
+		{include file="table_standard.tpl.htm" header=0}
+	{/if*}
+	</div>
+{else}
+{* --------------Gestion des onglets classiques----------- *}
+	{$parent_class=ATF::getClass($parent_name)}
+	{if $field}
+		{$fk=["{$field}"=>$id_current]}
+	{elseif $parent_class}
+		{$fk=["{ATF::$name()->table}.id_`$parent_class->table`"=>$id_current]}
+	{/if}
+    
+    {* création du nom du div, pour eviter les _ à gogo si pas d'info, ce qui rentre en conflit avec extjs, qui utilise une règle comprenant des __*}
+    {$nom="gsa"}
+    {if $parent_class->table}
+    	{$nom="`$nom`_`$parent_class->table`"}
+    {/if}    
+    {if $name}
+    	{$nom="`$nom`_`$name`"}
+    {/if}
+    {if $id_current}
+    	{$nom="`$nom`_`$id_current`"}
+    {/if}
+
+	{include file="generic-select_all.tpl.htm" 
+		define_div=true 
+		parent_class=$parent_class 
+		current_class=ATF::getClass($name) 
+		div=$nom
+		fk=$fk
+		saTitle=ATF::$usr->trans("`$current_class->table`_id_`$name`",module,null,true)
+		function=$function
+		event="select_all"
+        url_extra=$url_extra|default:"id_`$parent_class->table`=`$id_current|cryptId`"}
+{/if}

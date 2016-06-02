@@ -1,0 +1,5 @@
+{$id_current=$smarty.request["id_{$current_class->table}"]}
+<select onchange="ATF.addOnglet('{$current_class->table}','{$name}','{$id_current}',this.value);">
+    <option value="">{ATF::$usr->trans('choix_ajout','onglet')}</option>
+    {html_options options=$current_class->optionsListeOnglet()}
+</select>

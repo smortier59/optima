@@ -1,0 +1,10 @@
+{strip}
+<div class="autocomplete_table" style="font-size:9px">
+	{foreach from=$field key=key item=item}
+        <div class="autocomplete_tr_popup">
+            <div class="autocomplete_td_popup"><span class="bold">{ATF::$usr->trans($item,$current_class->table)}</span></div>
+            <div class="autocomplete_td_popup">{$infos[$item]}</div>
+        </div>
+	{/foreach}
+</div> 
+{/strip}

@@ -1,0 +1,36 @@
+<td class="field">
+	{ATF::$usr->trans($alias|default:$key,$current_class->table)} 
+</td>
+    {$req=$requests[$current_class->name()]|default:$smarty.session.requests[$current_class->table]}
+    {$id = "`$current_class->table`_`$key`"}
+    {$listeners["change"] = "function (t,n) {
+        console.log(t.container.dom.lastChild.defaultValue);
+        console.log(n);
+        ATF.ajax('`$current_class->table`,updateOnSelect.ajax'
+            ,'id={$req["id_`$current_class->table`"]}&value='+n+'&id_value='+t.container.dom.lastChild.defaultValue+'&key={$key}'
+        );
+    }"}
+
+<td>
+    <script type="application/javascript">
+	Ext.onReady(function(){
+		Ext.QuickTips.init();
+		ATF.formUpdateOnSelect{$id} = new Ext.FormPanel({
+			renderTo:'UpdateOnSelect{$id}',
+			layout:'fit',
+			bodyStyle:'padding:5px 5px 0,background-color:transparent',
+			items: 
+					{$nom_fichier="generic-field-textfield.tpl.js"}	
+					{include file=$nom_fichier
+					fieldLabel=ATF::$usr->trans($key,$current_class->table)
+					name="`$current_class->table`[`$key`]"
+					id="`$current_class->table`[`$key`]"
+					value=$requests["{$current_class->table}"][$key]|default:$requests[$key]
+					est_nul=$item["null"]
+					listeners=$listeners}
+		});		
+	});
+	{*ATF.setFormIsActive();*}
+    </script>
+    <div id="UpdateOnSelect{$id}" style="float:left;"></div> 
+</td>

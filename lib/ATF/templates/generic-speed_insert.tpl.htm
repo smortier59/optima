@@ -1,0 +1,8 @@
+<div id="divSpeedInsertForm{$table}"></div>
+<script type="text/javascript">/*<![CDATA[*/	
+{if ATF::$html->template_exists("{$table}-speed_insert.tpl.js")}
+	{include file="{$table}-speed_insert.tpl.js" table=$table current_class=ATF::$table()}
+{else}
+	{include file="generic-speed_insert.tpl.js" table=$table current_class=ATF::$table()}
+{/if}
+/*]]>*/</script>

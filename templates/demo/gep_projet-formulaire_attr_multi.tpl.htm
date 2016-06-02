@@ -1,0 +1,7 @@
+{if $infos.id_pa}
+	<a href="javascript:;" class="multi" rel="{ATF::$usr->trans('changer_multi','formulaire')}" onclick="new ATF.tpl2div('{if $infos.id_pa}pa{else}attr{/if},updateMulti.ajax','{if $infos.id_pa}id_pa={$infos.id_pa}&{/if}id_attr={$infos.id_attr}&multi={if $infos.multi}0{else}1{/if}');">
+{/if}
+    {ATF::$usr->trans("multi_`$infos.multi`",'formulaire')}
+{if $infos.id_pa}
+	</a>
+{/if}

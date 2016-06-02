@@ -1,0 +1,11 @@
+{assign var=forecast value=ATF::affaire()->forecast()}
+<table class="std">
+	<tr>
+		<td style="font-weight:bold">Forecast du chiffre d'affaire :</td>
+		<td>{$forecast.ca} &euro;</td>
+	</tr>
+	<tr>
+		<td style="font-weight:bold">Forecast de la marge :</td>
+		<td>{$forecast.marge} &euro; ({$forecast.marge*100/$forecast.ca} %)</td>
+	</tr>
+</table>

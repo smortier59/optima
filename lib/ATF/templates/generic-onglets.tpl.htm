@@ -1,0 +1,80 @@
+{**
+* Affiche des onglets select_all, listings qui peuvent être contraint par des filtrage spécifiques
+* array 	$onglets 			Tableau contenant la liste des onglets à afficher		
+* classes	$current_class 		Objet courant
+* array 	$requests 			Tableau des données (généralement postées en get ou post)
+*}
+{$id_current=$requests[$current_class->table]["id_`$current_class->table`"]|cryptid}
+{foreach from=$onglets key=key item=item}
+	{if !is_array($item)}
+		{$key=$item}
+	{/if}
+	{if ATF::$usr->privilege($key,'select')}
+		{if !ATF::$usr->custom[$current_class->table]['onglets_caches'][$key]}
+			{$name=""}
+			{if is_array($item)}
+				{$name=$key}
+				{$opened=$item.opened}
+				{$field=$item.field}
+				{$table=$key}
+				{$function=$item.function}
+				{$select=$item.select}
+			{else}
+				{$name=$item}
+				{$opened=0}
+				{$field=0}
+				{$table=$key}
+				{$function=""}
+				{$select=0}
+			{/if}
+			<div class="onglet" id="onglet_{$name}">
+				<div class="ClearBoth"></div>
+				<div class="ongletLeft"></div>
+				<div class="ongletRight">
+					<div style="margin-left:{if ATF::$name()->selectAllExtjs===false || $permapdf}-25{else}-5{/if}px;padding-top:13px;">
+						{if ATF::$name()->selectAllExtjs===false || $permapdf}
+							{capture assign=onClickRefresh}
+								<a href="javascript:;" rel="{t w=refresh p=onglet}" onclick="ATF.updWait('gsa_{$current_class->table}_{$name}_{$requests[$current_class->table]["id_`$current_class->table`"]}_content','Merci de patienter !',function(){ ATF.tpl2div('{$name},updateSelectAll.div','pager=gsa_{$current_class->table}_{$name}_{$requests[$current_class->table]["id_`$current_class->table`"]}&table={$name}&fk_name={$name}.id_{$current_class->table}&fk_value={$requests[$current_class->table]["id_`$current_class->table`"]}&function='); });">
+									<img height="14" width="14" alt="" src="{ATF::$staticserver}images/icones/refresh.png">
+								</a>
+							{/capture}
+							{$onClickRefresh}
+						{/if}
+						<a href="javascript:;" rel="{ATF::$usr->trans('delete','onglet')}" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)|escape:javascript}')) ATF.rmOnglet('{$current_class->table}','{$name}','{$id_current}');">
+							<img height="14" width="14" alt="" src="{ATF::$staticserver}images/icones/delete.png">
+						</a>
+				</div>
+				</div>
+				<div class="ongletMiddle"></div>
+				<div class="ClearBoth"></div>
+			</div>
+			<div id="onglet_{$name}_content">
+            	{if $current_class->selectAllExtjs!==false}
+                	{$id=$requests[$current_class->table]["id_`$current_class->table`"]}
+                	{include file="generic-onglet.tpl.htm"  current_class=$current_class->table
+                    										parent_name=$current_class->table 
+                    										id_current=$id
+                                                            opened=$opened
+                                                            field=$field
+                                                            table=$table
+                                                            function=$function
+                                                            select=$select
+                                                            permapdf=$permapdf}
+                {else}
+                    <div style="text-align:center;">
+                        <img src="{ATF::$staticserver}images/loading/loading3.gif" alt="loading-img" style="margin-right:5px;" />
+                        {t w=chargement_onglet}
+                        {if $onClickRefresh}
+                       		<br />{t w=retry_refresh} {$onClickRefresh}
+                        {/if}
+                        <script type="text/javascript">/*<![CDATA[*/
+                            Ext.onReady(function(){
+                                ATF.createOnglet('{$current_class->table}','{$requests[$current_class->table]["id_`$current_class->table`"]|cryptid}','{$name}','{$opened}','{$field}','{$table}','{$function}','{$select}','{$permapdf}');
+                             });
+                        /*]]>*/</script>
+                    </div>
+            	{/if}
+			</div>
+		{/if}
+	{/if}
+{/foreach}

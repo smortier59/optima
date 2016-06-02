@@ -1,0 +1,98 @@
+{if "public_"==$filter_key|php:'substr':0:7}
+    {$filter=ATF::filtre_optima()->select($filter_key|php:'substr':'7',"options")}
+    {$filter=$filter|unserialize}
+{elseif $filter_key}
+    {$filter=ATF::filtre_optima()->select($filter_key,"options")}
+    {$filter=$filter|unserialize}
+{/if}
+{if ATF::$usr->get(custom,columns,$current_class->table,vue_custom)}
+	{$cols=ATF::$usr->get(custom,columns,$current_class->table,order)} {* Colonnes customizees *}
+{elseif $filter_key && ATF::$usr->getColumnsFilter($filter_key)}
+	{$cols=ATF::$usr->getColumnsFilter($filter_key)} {* Colonnes du filtre *}
+{else}
+	{$cols=$current_class->colonnes_simples()} {* Colonnes par défaut *}
+{/if}
+{$all_cols=ATF::$usr->tri_ident($current_class->recup_colonnes())} {* Toutes les colonnes de la table *}
+<div>
+	{if ATF::$usr->get('custom','columns',$current_class->table,'order')}
+        <div>{ATF::$usr->trans('activer_perso_vue')} :
+            <input type="checkbox" id="vue_custom" {if ATF::$usr->get('custom','columns',$table,'vue_custom')}checked="checked"{/if} onchange="ATF.ajax('user,updateCustom.ajax','table={$table}&vue_custom='+this.checked,{ onComplete: function (obj) { Modalbox.hide(); ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$onglet}&table={$table}&filter_key={$filter_key}{if $parent_class}&parent_class={$parent_class}{/if}'); } });" />
+        </div>
+    	<hr />
+    {/if}
+    {if ATF::$usr->IsCustomColumns($current_class->table,$filter_key)}
+        <div style="margin-bottom:5px">{ATF::$usr->trans('reinitialiser_vue')} : <a href="javascript:;" onclick="ATF.ajax('user,updateCustom.ajax','delete=true&filter_key={$filter_key}&onglet={$onglet}&table={$current_class->table}',{ onComplete: function (obj) { Modalbox.hide();  ATF.tpl2div('{$current_class->table},updateSelectAll.div','pager={$onglet}&table={$current_class->table}&filter_key={$filter_key}&function={$smarty.request.function}'); $('#{$onglet}_pagerColumn_img').src='images/icones/columns.png';  } });">{png_image src="{ATF::$staticserver}images/icones/no.png"}</a></div>
+        <hr />
+    {/if}
+    <div style="margin-bottom:5px">{ATF::$usr->trans('trier_colonne')} :</div>
+    <ul id="__chooseColums_column_list">
+    	{$v=ATF::$usr->get(custom,columns,$current_class->table)|default:$current_class->view}
+        {foreach from=$cols key=key item=item}
+            <li id="__chooseColumnsAdd{$key}" style="cursor:n-resize">                 
+                {include file="pager_column_li.tpl.dialog" 
+                    align=$v.align[$item]
+                    prefix=$v.prefix[$item]
+                    suffix=$v.suffix[$item]}
+            </li>
+        {/foreach}
+    </ul>
+    <ul id="list2" style="margin-top:5px">
+        <li id="list2item">
+        	<div style="display:inline-block; float:right;">
+            {ATF::$usr->trans('valider_vue')} 
+            {if ATF::$usr->get(custom,columns,$current_class->table,vue_custom)}
+                {ATF::$usr->trans('vue_personnalisee')} 
+            {elseif $filter_key && ATF::$usr->getColumnsFilter($filter_key)}
+                {ATF::$usr->trans('du_filtre')} 
+            {else}
+                {ATF::$usr->trans('standard')}
+            {/if} :       
+        	<input value="Valider" name="ok" type="button"
+            	onclick="{strip}
+                var sel = Sortable.tree('__chooseColums_column_list').children;
+                var h = '';
+                for (var i=0;i<sel.length;i++) {
+                    if (i>0) h+='&';
+                	h += 'columns[{$current_class->table}][order]['+$('#__chooseColumnsAdd_field_'+sel[i].id).val()+']='+$('#__chooseColumnsAdd_field_'+sel[i].id).val();
+                	h += '&columns[{$current_class->table}][align]['+$('#__chooseColumnsAdd_field_'+sel[i].id).val()+']='+$('#__chooseColumnsAdd_align_'+sel[i].id).val();
+                	h += '&columns[{$current_class->table}][prefix]['+$('#__chooseColumnsAdd_field_'+sel[i].id).val()+']='+$('#__chooseColumnsAdd_prefix_'+sel[i].id).val();
+                	h += '&columns[{$current_class->table}][suffix]['+$('#__chooseColumnsAdd_field_'+sel[i].id).val()+']='+$('#__chooseColumnsAdd_suffix_'+sel[i].id).val();
+                }
+                ATF.ajax('user,updateCustom.ajax','filter_key={$filter_key}&'+h,{ onComplete: function (obj) { 
+                	Modalbox.hide(); 
+                    ATF.tpl2div('{$current_class->table},updateSelectAll.div','pager={$onglet}&table={$current_class->table}&filter_key={$filter_key}&function={$smarty.request.function}'); 
+                } });
+                {/strip}" />
+            </div>
+            <div>
+                <select name="cols" onchange="ATF.__chooseColumnsAdd(this.value);this.value='';" style="width:auto">
+                    <option value="">{ATF::$usr->trans('ajout_colonne')} :</option>
+                    {html_options options=$all_cols}
+                </select>
+            </div>
+		</li>
+    </ul>
+    <script type="text/javascript">/*<![CDATA[*/
+    Sortable.SERIALIZE_RULE = /^__chooseColumnsAdd(.*)$/; /* Sert à retourner tout l'id lors du serialize(), sinon par défaut cela ne retourne que ce qu'il y a après le dernier "_" */
+	ATF.__chooseColumnsAdd = function (field) {
+		if (field) {
+			var newLi = document.createElement('li');
+			var key = 0;
+			if (Sortable.tree('__chooseColums_column_list').children.length) {
+				key = Sortable.tree('__chooseColums_column_list').children.length;
+				while ($('#__chooseColumnsAdd'+key)) { /* Au cas où on aurait retiré des ligne et fait des trous dans la numérotation */
+					key++;
+				}
+			}
+			newLi.setAttribute('id','__chooseColumnsAdd'+key);
+			newLi.setAttribute('style','cursor:n-resize');
+			$('#__chooseColums_column_list').appendChild(newLi);
+			new Ajax.Updater('__chooseColumnsAdd'+key,'pager_column_li.dialog',{ method: 'post', parameters: 'item='+field+'&key='+key+'&table={$current_class->table}', onComplete: function () { Modalbox.resizeToContent(); } });
+		}
+		Sortable.destroy("__chooseColums_column_list");
+		Sortable.create("__chooseColums_column_list");
+	}
+	ATF.__chooseColumnsAdd(null);
+		
+    /*]]>*/</script>
+</div>

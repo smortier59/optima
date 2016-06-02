@@ -1,0 +1,182 @@
+{strip}
+{* Type de l'attribut parent *}
+{if $infos.id_pa}
+    {$id_pattr=ATF::pa()->select($infos.id_parent,id_attr)}
+{else}
+    {$id_pattr=$attr.id_parent}
+{/if}
+{if !$id_gp}
+	{$id_gp=$infos.id_gep_projet|default:ATF::pa()->select($infos.id_parent,'id_gep_projet')}
+{/if}
+
+{$ptype=ATF::attr()->select($id_pattr,type)}
+
+<div class="icone">
+    {if $data && ($vi_pa.reponse 
+        || $attr.type==sans_reponse 
+        || $attr.type==enum)}
+        <a href="javascript:;" onclick="{strip}
+        if ($('#{$div}_childs').innerHTML) { 
+            ATF.__attr.collapse('{$div}_childs','{$div}');
+        } else { 
+            __x{$div}();
+        }{/strip}">
+            {if ATF::formulaire()->isOpened($div)}
+                <div id="icon_{$div}" class="collapse"></div>
+            {else}
+                <div id="icon_{$div}" class="expand"></div>
+            {/if}
+        </a>                
+    {else}
+        <img src="{ATF::$staticserver}images/blank.gif" width="13" height="13" />
+    {/if}
+    {if $data}
+        <span style="display: none;" id="__l{$div}_childs"><img alt="Working..." src="{ATF::$staticserver}images/refreshing.gif"/></span>
+    {/if}
+</div>
+{if $data && ($vi_pa.reponse 
+    || $attr.type==sans_reponse 
+    || $attr.type==enum) 
+    && !ATF::formulaire()->isOpened($div)}
+	&nbsp;<a href="javascript:;" onclick="__x{$div}(null,3);">+++</a>
+{/if}
+&nbsp;
+{if $attr.type==unary}
+    <input type="{if $ptype==enum}radio{else}checkbox{/if}" id="__in{$div}" 
+		{if $ptype==enum}    
+	        name="__in{$i_id_ppa}{* Provient du visite-formulaire_attr_childs.tpl.html *}_{$id_pattr}_{$id_vi_pa_multi}" 
+        {else}
+	        name="__in{$div}" 
+        {/if}
+        value="1"
+        onclick="{*if $ptype==enum}if (!confirm('{"Opter pour cette option effacera toutes les informations éventuellement renseignées en dessous des options alternatives. Etes-vous sûr(e) ?"|escape:javascript}')) return false;{/if*} if (this.checked) __s{$div}(this.checked);{if $ptype!=enum} else { __s{$div}(''); __c{$div}(); }{/if}"
+        {if $vi_pa.reponse} checked="checked"{/if}
+        {if $ptype==enum} onchange="$$('#input[name='+this.name+']').each(function(o){ if (o.id!='__in{$div}') { eval('__c'+o.up().up().id+'();'); } }.bind(this));"{/if}
+        />
+    &nbsp;<label for="__in{$div}">{$pa.pa|default:$attr.attr}</label>&nbsp;
+    {if $ptype==enum && $vi_pa.reponse}
+        <a href="javascript:;" onclick="$('#__in{$div}').checked=false; __s{$div}(''); eval('__c'+this.up().up().id+'();');"><img src="{ATF::$staticserver}images/icones/delete.png" style="width:10px; height:10px; border: 0px" alt="" /></a>
+    {/if}
+{else}
+    &nbsp;{$pa.pa|default:$attr.attr}&nbsp;
+    {if $attr.type==date}
+		<a href="javascript:;" onclick="__s{$div}(''); eval('__x'+this.up().up().up().id.replace('_childs','')+'();');" rel="Supprimer la date">
+			<img src="{ATF::$staticserver}images/icones/delete.png" />
+		</a>
+    {/if}
+{/if}
+
+{if $id_vi_pa_multi} <span style="color:#CCC">[M{$id_vi_pa_multi}]</span>{/if}
+{if $multiRoot}<a href="javascript:;" onclick="if (confirm('{ATF::$usr->trans('del_etes_vous_sur','formulaire')|escape:javascript}')) { __s{$div}(''); eval('__x'+this.up().up().up().id.replace('_childs','')+'();'); }" rel="Supprimer élément"><img src="{ATF::$staticserver}images/icones/delete.png" height="16" width="16" /></a>{/if}
+
+{if $attr.type==unary}
+    
+{elseif $attr.type==text}
+	{if $attr.ac=="on"}
+		{$value=$vi_pa.reponse}
+		<script type="text/javascript">/*<![CDATA[*/
+			ATF.countdownTimer{$div} = new ATF.countdownTimer(1000);
+			ATF.__store{$div} = function(value) {
+				ATF.countdownTimer{$div}.start("__s{$div}('"+value.replace(/\'/g,'\\\'')+"')");
+			}
+		/*]]>*/</script>		
+		<input type="text" {$extra} name="{$div}_label" id="{$div}_label" {if $attr.maxlength} maxlength="{$attr.maxlength}"{/if}  value="{$value}" onchange="ATF.__store{$div}(this.value);" />
+		<span id="ScrAcAutocompleteIndicator{$div}" style="display: none">
+		  <img src="{ATF::$staticserver}images/refreshing.gif" alt="Working..." />
+		</span>
+		<div id="ScrAcAutocomplete{$div}" class="ScrAcAutocomplete"></div>
+	
+		<script type="text/javascript">/*<![CDATA[*/
+		new Ajax.Autocompleter (
+		  '{$div}_label',
+		  'ScrAcAutocomplete{$div}',
+		  'vi_pa,autocompleteReponse.ajax',
+		  { 
+			method: 'post'
+			, paramName: 'recherche'
+			, minChars: 1
+			, parameters: 'id_attr={$attr.id_attr}&id_gep_projet={$id_gp}&div={$div}'
+			, indicator: 'ScrAcAutocompleteIndicator{$div}'
+		  }
+		);
+		/*]]>*/</script>
+	{else}
+		: <input type="text" id="" value="{$vi_pa.reponse|escape:htmlall}"  {if $attr.maxlength} maxlength="{$attr.maxlength}"{/if} onchange="__s{$div}(this.value);" />
+	{/if}
+{elseif $attr.type==date}
+	<input type="text" id="{$div}_date" maxlength="10" value="{$vi_pa.reponse|escape:htmlall}" style="width:120px" />
+	<script type="text/javascript">/*<![CDATA[*/
+		var f = function () {
+			var v=ATF.__attr.check('date',$('#{$div}_date').val());
+			if (v===false) { 
+				$('#{$div}_date').addClassName('formError');
+			} else { 
+				$('#{$div}_date').removeClassName('formError');
+				$('#{$div}_date').val(v); 
+				__s{$div}($('#{$div}_date').val());
+			}
+		}
+		ATF.datefield("{$div}_date",'Y-m-d', f);
+	/*]]>*/</script>
+{elseif $attr.type==num}
+    : <input type="text" id="" value="{$vi_pa.reponse|escape:htmlall}" onkeyup="this.value=ATF.__attr.check('num',this.value);" onblur="__s{$div}(this.value);" maxlength="{$attr.maxlength}" />
+{elseif $attr.type==enum}
+    {* (un seul choix) *}:
+{elseif $attr.type==photo || $attr.type==plan}
+	{include file="visite-formulaire_attr_label_photo.tpl.htm"}
+{elseif $attr.type==doc}
+    {if $vi_pa.id_vi_pa && $vi_pa.reponse}
+		{$name = ATF::ged()->nom($vi_pa.reponse)}
+		{if $name}
+			<input type="button" rel="Nom du document" value="{$name}" />
+		{else}
+			<input type="button" style="color:#FF0000; font-weight:bold" rel="Nom du document" value="Document Introuvable" />
+		{/if}
+		<a href="javascript:;" onclick="__s{$div}(''); eval('__x'+this.up().up().up().id.replace('_childs','')+'();');" rel="Supprimer photo">
+			<img src="{ATF::$staticserver}images/icones/delete.png" />
+		</a> 
+    {else}
+		<div class="icone">
+			<a href="javascript:;" onclick="{strip}
+				if ($('#{$div}_childs').innerHTML) { 
+					ATF.__attr.collapse('{$div}_childs','{$div}');
+				} else { 
+					__x{$div}();
+				}{/strip}">
+				{if ATF::formulaire()->isOpened($div)}
+					<div id="icon_{$div}" class="collapse"></div>
+				{else}
+					<div id="icon_{$div}" class="expand"></div>
+				{/if}
+			</a>                
+		</div>
+		<a href="javascript:;" onclick="ATF.createTreeGridDoc('visite','{$smarty.request.id_visite}','a={$attr.id_attr}&pa={$infos.id_pa}&ppa={$id_ppa}&v={$smarty.request.id_visite}&m={$id_vi_pa_multi}&id_vi_pa={$vi_pa.id_vi_pa}','{$div}')"><img src="{ATF::$staticserver}images/icones/newDocument.png" /></a> 
+    {/if}
+{elseif $attr.type==sans_reponse}
+    :
+{elseif $attr.type==textarea}
+	<br />
+	<textarea style="width:700px; height:150px" onchange="__s{$div}(this.value);">{$vi_pa.reponse|escape:htmlall}</textarea>
+
+{else}
+    non géré {$attr.type}
+{/if}
+
+<div class="cout" id="{$div}Cost">
+	{include file="visite-formulaire_attr_showCost.tpl.htm"}
+</div>
+
+{if $id_vi_pa_multi && $attr.id_attr==3754} 
+    <div class="offset3754">
+        <input type="text" maxlength="2" onkeyup="this.value=ATF.__attr.check('num',this.value);" name="offset_{$id_vi_pa_multi}" id="offset_{$id_vi_pa_multi}" 
+            value="{ATF::vi_pa_multi()->select($id_vi_pa_multi,'offset')}" 
+            onchange="ATF.ajax('vi_pa,updateVPMOffset.ajax','id_vi_pa_multi={$id_vi_pa_multi}&offset='+this.value,{ onComplete: function (obj) { if (obj.result) eval('__x'+(this.up().up().up().up().id).replace('_childs','')+'();'); ATF.ajax_refresh(obj); }.bind(this) });;" 
+            style="width:20px; text-align:center">
+    </div>
+{/if}
+<div class="historique">
+	<a href="javascript:;" onclick="ATF.historique('a={$attr.id_attr}&pa={$infos.id_pa}&ppa={$id_ppa}&v={$smarty.request.id_visite}&m={$id_vi_pa_multi}')">
+        <img src="{ATF::$staticserver}images/icones/columns.png" />
+	</a> 
+</div>
+{/strip}

@@ -1,0 +1,57 @@
+{strip}
+{$nom_module=ATF::module()->select($nom_module,'module')|default:$nom_module}
+{if ($joint && $joint!='true') || !$joint}
+    <a href="javascript:;" onclick="{if $joint && $joint!='true'}
+    									$('#__chooseMods_list').removeChild($('#__chooseModsAdd{$key-1}'));
+    								{/if}
+                                    $('#__chooseMods_list').removeChild($('#__chooseModsAdd{$key}'));
+                                    ATF.tpl2div('{$table},refresh_column.ajax','div=list2item&template=pager_filter_column&table={$table}&mod={$nom_module}&sup=true');
+                                    ATF.__pager_filter_listmod_optgroup({$key},'{ATF::$usr->trans($nom_module,module)}');" style="margin-left:5px;margin-right:5px;">
+        {png_image src="{ATF::$staticserver}images/icones/delete.png" height="16" width="16"}
+    </a>
+{else}
+	<div style="display:inline-block; width:26px">&nbsp;</div>
+{/if}
+<div style="display:inline-block; width:129px">
+	{ATF::$usr->trans($nom_module,'module')|truncate:20:"...":true}
+</div>
+{if ATF::getClass($nom_module)}
+	{$all_cols2=ATF::$usr->tri_ident(ATF::$usr->trans(ATF::getClass($nom_module)->table_structure(),$nom_module),true)} 
+{/if}
+
+{* sous forme de conditions et non en default de default car la string peut exister mais pas le champs dans le tableau *}
+{if $all_cols2[$module]}
+	{$selected_mod=$module}
+{elseif $all_cols2["{$nom_module}.id_{$table}"]}
+    {$selected_mod="{$nom_module}.id_{$table}"}    
+{elseif $all_cols2["{$nom_module}.id_{$nom_module}"]}
+    {$selected_mod="{$nom_module}.id_{$nom_module}"}
+{/if}
+<input type="hidden" id="nom_module_{$key}" value="{$nom_module}"/>
+<select id="module_{$key}" name="module[{$key}]" style="margin-right:5px;width:150px">
+    <option value="">Champs {ATF::$usr->trans($nom_module,'module')} :</option>
+    {html_options options=$all_cols2 selected=$selected_mod}
+</select>
+=
+{if $joint==0}
+	{$all_cols=ATF::$usr->ajoutRecupListeChamps($table,$nom_module,$filter_key)}
+{else}
+    {$all_cols=ATF::$usr->recupListeChamps($table,$filter_key,$nom_module)}
+{/if}
+
+{if $joint && $all_cols[ATF::$usr->trans($joint,'module')]["{$joint}.id_{$nom_module}"]}
+	{$selected="{$joint}.id_{$nom_module}"} 
+{elseif $all_cols[ATF::$usr->trans($table,'module')]["{$table}.id_{$nom_module}"]}
+	{$selected="{$table}.id_{$nom_module}"}
+{elseif $liste_champs}
+	{$selected=$liste_champs}
+{elseif $all_cols[ATF::$usr->trans($table,'module')]["{$table}.id_{$table}"]}
+    {$selected="{$table}.id_{$table}"}
+{/if}
+
+<select id="liste_champs_{$key}" name="liste_champs[{$key}]" style="margin-left:5px;width:150px">
+    <option value="">Champs :</option>
+    {html_options options=$all_cols selected=$selected}
+</select>
+{*<input type="text" id="alias_{$key}" value="{$alias|default:Alias}" onfocus="if(this.value=='Alias')this.value='';" onblur="if(!this.value)this.value='Alias';" />*}
+{/strip}

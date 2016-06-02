@@ -1,0 +1,52 @@
+<div>
+    <div id="loginDiv">
+        <div id="loginTop">
+            <div id="loginTL"></div>
+            <div id="loginLogo"></div>
+            <div id="loginForm" style="position:absolute; top:60px; left:250px; width:600px; height:100px; z-index:60;">
+                <form method="post" action="">
+                    <input type="hidden" value="{$k|default:""}" name="url" id="url" />
+                    <div style="width:150px;">Société :</div>
+                    <div style="width:450px;">
+                        {if $schema}
+                        	{$schema|ucfirst}
+                            <input type="hidden" value="{$schema}" name="schema" id="schema" />
+                        {else}
+                            <input tabindex="1" type="text" value="{$smarty.cookies.optima.societe|default:$smarty.get.societe}"{if $__c.optima.societe || $smarty.get.societe} class="invisible" onfocus="this.className='';"{/if} name="schema" id="schema" />
+                        {/if}
+                    </div>
+                    <div style="width:150px;">Nom d'utilisateur :</div>
+                    <div style="width:200px;"><input tabindex="2" type="text" value="{$smarty.cookies.l}" name="login" id="login" /></div>
+                    <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
+                    <div style="width:250px;"><button tabindex="4" type="button" id="go">Accéder à mon compte</button></div>
+                    <div style="width:150px;">Mot de passe :</div>
+                    <div><input tabindex="3" type="password" name="password" id="password" /></div>
+
+                    {if $smarty.get.recovery==sent}
+                        <div style="font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em; color:red">Un email vous a été envoyé avec votre nouveau mot de passe.</div>
+
+                    {else}
+                        <div style="clear:both; font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em;"> <a href="javascript:;" id="recovery" onclick="$('.emailRecovery').show();">Mot de passe oublié</a></div>
+                        <div class="emailRecovery" style="display:none; clear:both; width:150px;">Email</div>
+                        <div class="emailRecovery" style="display:none"><input type="email" value="" name="email" id="email" /> <button type="button" id="goRecovery">Ok</button></div>
+                    {/if}
+                </form>
+            </div>
+            <div id="loginVirgule"></div>
+        </div>
+        <div id="loginBottom">
+            <div id="loginBL"></div>
+            <div id="loginBM">{include file="copyright.tpl.htm"}</div>
+            <div id="loginBR"></div>
+        </div>
+    </div>
+</div>
+
+{* YG: Mode arrache de noël 2009 *}
+{$server_mode=$smarty.server.HTTP_HOST|php:substr:"0":"3"}
+{if $server_mode!=www && $server_mode!="opt"}
+    <div style="text-align:center; padding-top:1em; font-weight:bold;">
+        ATTENTION IL S'AGIT DE LA PLATEFORME DE {if $server_mode==dev}DEVELOPPEMENT{elseif $server_mode==pre}PRE-PRODUCTION{else}&quot;{$server_mode}&quot;{/if}
+        <br />LA PLATEFORME DE PRODUCTION DEVRAIT ETRE CETTE ADRESSE : <a href="http://{$smarty.server.HTTP_HOST|replace:$server_mode:""|php:substr:"1"}/">http://{$smarty.server.HTTP_HOST|replace:$server_mode:""|php:substr:"1"}/</a>
+    </div>
+{/if}

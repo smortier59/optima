@@ -1,0 +1,84 @@
+{** Le Tab Pager ! Permettant d'afficher les options sur le selectall (filtre, export,...)
+* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+* @author Jérémie Gwiazdowski <jgwiazdowski@absystech.fr>
+* @author Yann GAUTHERON <ygautheron@absystech.fr>
+* @param object $current_class : Classe courante qui inclu ce listing
+* @param bool $table_standard : true si on désire utiliser le table_standard
+* @param bool $opened : True si l'onglet est ouvert 
+*	string $div : definit le nom du div qui contient les infos du select_all 
+*	string $saTitle : Titre de select_all, permet de forcer un titre particulier (utile pour écrire par exemple dans certains cas "Element enfant", plutoto qu'avoir un titre générique "Element")
+*}
+{*-----------------------------------------*}
+{*            Nom du module + icone        *}
+{*-----------------------------------------*}
+
+{* Tousaucun *}
+{if $current_class->check_all}
+	{include file="generic-checkedActions.tpl.htm" down=1}
+{/if}     
+
+{if $current_class->tabModule==true && !$table_standard}
+    <div class="tabModule">
+        {include file="pager_tab_module.tpl.htm"}
+    </div>
+{/if}     
+  
+{*-----------------------------------------*}
+{*            Pagination                   *}
+{*-----------------------------------------*}              
+{if $current_class->pagerPager==true}
+    <div id="{$div}_pager" class="pagerPager" onmouseover="ATF.showPaging(this)" onmouseout="ATF.hidePaging(this)" {if !$opened}style="display:none"{/if}> 
+        {include file="pager_pager.tpl.htm"}
+    </div>
+{/if}       
+      
+
+{*-----------------------------------------*}
+{*            Recherche                    *}
+{*-----------------------------------------*}              
+{if $current_class->pagerSearch==true && !$table_standard}
+    <div id="{$div}_pagerSearch" class="pagerSearch" {if !$opened}style="display:none"{/if}>
+        {if is_array($q->search) || $advanced_search==1}
+        	<a href="javascript:;" onclick="ATF.tpl2div('tpl2div.ajax','div={$div}&template=generic-select_all&table={$current_class->table}&advanced_search=2');">{ATF::$usr->trans('recherche_classique')}</a>
+        {else}
+            <a href="javascript:;" onclick="ATF.tpl2div('tpl2div.ajax','div={$div}&template=generic-select_all&table={$current_class->table}&advanced_search=1');" rel="{ATF::$usr->trans('recherche_avancee')}"><img src="{ATF::$staticserver}images/icones/search.png" alt="" /></a>
+        	{include file="pager_search.tpl.htm" res="pager_search{$div}"|res onkeyup=true}
+        {/if}
+    </div>
+{/if}
+
+{*-----------------------------------------*}
+{*            Filtre                       *}
+{*-----------------------------------------*}              
+{if $current_class->pagerFilter==true && ATF::$usr->privilege($current_class->name(),'filter_select')}
+    <div id="{$div}_pagerFilter" class="pagerFilter" {if !$opened}style="display:none"{/if}>
+        {include file="pager_filter.tpl.htm" res="pager_filter{$div}"|res table=$current_class->table onglet=$div}
+    </div>
+{/if}
+    
+{*-----------------------------------------*}
+{*            Geolocalisation              *}
+{*-----------------------------------------*}              
+{if $q->nb_rows>0 && $current_class->gmap==true && ATF::$usr->privilege($current_class->name(),'geolocalisation')}
+    <div id="{$div}_pagerGeoloc" class="pagerGeoloc" {if !$opened}style="display:none"{/if}>
+        {include file="pager_gmap.tpl.htm"}
+    </div>
+{/if}
+    
+{*-----------------------------------------*}
+{*  Vue  (choix des champs à afficher      *}
+{*-----------------------------------------*}              
+{if $current_class->pagerColumn==true && ATF::$usr->privilege($current_class->name(),'view')}
+    <div id="{$div}_pagerColumn" class="pagerColumn" {if !$opened}style="display:none"{/if}>
+        {include file="pager_column.tpl.htm" onglet="{$div}"}
+    </div>
+{/if}
+    
+{*-----------------------------------------*}
+{*            Export des données           *}
+{*-----------------------------------------*}              
+{if $current_class->pagerExport==true && ATF::$usr->privilege($current_class->name(),'export')}
+    <div id="{$div}_pagerExport" class="pagerExport" {if !$opened}style="display:none"{/if}>
+        {include file="pager_export.tpl.htm" onglet="{$div}"}
+    </div>
+{/if}

@@ -1,0 +1,87 @@
+<table>
+	<tr>
+    	<td>
+            <div style='padding-left:15px;'>- toutes les intéractions des 60 derniers jours</div>
+            <div style='padding-left:15px;'>- par personne</div>
+            <div style='padding-left:15px;'>- à la charge de qui ?</div>
+        </td>
+    </tr>
+</table>
+<br /><hr /><br />
+<!-- Graphique -->
+{$data_tab=ATF::hotline_interaction()->stats()}
+<div id="{$table}_2" style="height: 400px"></div>
+
+<script type="text/javascript">
+{$data = $data_tab}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_2',
+            type: 'column'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },
+        colors:['#19FF30','#FF0004'],
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: '{$value["params"]["seriesname"]}'                                     
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                                                     
+                                {$v["value"]|number_format:2:'.'} 
+                                {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});
+    
+</script>
+<br /><hr /><br />
+<!-- Tableau -->
+{$data_tab.params.caption} {if $data_tab.params.subCaption}({$data_tab.params.subCaption}){/if} :<br />
+<table class="std">
+	<tr>
+    <td style="width:200px;">&nbsp;</td>
+		{foreach from=$data_tab.dataset key=key item=item}
+        	<td style="text-align:center;border:dotted;border-width:1px;">
+                {ATF::$usr->trans($key,'stats')}
+            </td>
+        {/foreach}
+    </tr>
+    
+    {foreach from=$data_tab.categories.category key=key item=item}
+    <tr style="background-color:{cycle values='#E3F3A3,#D3DAE0'};">
+    	<td style="text-align:center;width:200px;border:dotted;border-width:1px;">
+    		{$item.label}
+        </td>
+        {foreach from=$data_tab.dataset key=key_ item=item_}
+    		<td style="text-align:center;border:dotted;border-width:1px;">
+    			{str_replace('.','h',$item_.set[$key].value)}
+    		</td>
+    	{/foreach}
+    </tr>
+    {/foreach}
+</table>

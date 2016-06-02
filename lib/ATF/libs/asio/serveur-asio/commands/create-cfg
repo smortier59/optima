@@ -1,0 +1,31 @@
+#!/bin/bash
+# create-cfg.sh Création des fichiers de provisionning
+# Syntaxe : create-cfg.sh <modèle> <adresse mac> <ipserveur> <NomCompte> <numSip> <passwdSip> <adminpasswd>
+# exemple : create-cfg 942 00:0E:08:DE:A1:BE
+
+# Définitions des variables
+path_spa_create="/srv/www/htdocs/asteriskadmin/libs/asio/serveur-asio/commands"
+path_spa_txt="/tftpboot/cfgtxt"
+path_spa_cfg="/tftpboot/cfgbin"
+path_util_spc="/tftpboot/utils"
+
+modele=$1
+adr_mac=$2
+admin_passwd=$7
+ip_serveur=$3
+name_compte=$4
+num_sip=$5
+passwd_sip=$6
+
+# Génération du fichier de configuration texte
+"$path_spa_create"/spa"$modele"-txt-create "$admin_passwd" "$ip_serveur" "$name_compte" "$num_sip" "$passwd_sip" > "$path_spa_txt"/spa"$2".txt
+
+# Compilation du fichier de configuration (cfg)
+"$path_util_spc"/spc"$modele" "$path_spa_txt"/spa"$2".txt "$path_spa_cfg"/spa"$2".cfg
+
+# Changement de droit du fichier compilé
+chmod 777 "$path_spa_cfg"/spa"$2".cfg
+
+# Changement de proprietaire du fichier compilé
+chown nobody:nogroup "$path_spa_cfg"/spa"$2".cfg
+

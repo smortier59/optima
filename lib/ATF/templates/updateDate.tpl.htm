@@ -1,0 +1,20 @@
+{if ATF::$usr->privilege($current_class->name(),'update')}
+    <div id='form_{$current_class->name()}_{$field}_{$item["`$current_class->name()`.id_`$current_class->name()`"]}'></div>
+    <script type="application/javascript">
+    Ext.onReady(function(){
+        new Ext.form.DateField({
+            renderTo: 'form_{$current_class->name()}_{$field}_{$item["`$current_class->name()`.id_`$current_class->name()`"]}',
+            bodyStyle:'background-color:transparent;',
+            frame:false,
+            border:false,
+            format: 'd-m-Y',
+            value:'{$item["`$field`"]}',
+            listeners :{
+                select:function(f,n,o){
+                    ATF.ajax('{$current_class->name()},updateDate.ajax','id_{$current_class->name()}={$item["`$current_class->name()`.id_`$current_class->name()`"]}&key={$field}&value='+(f.value ? f.value : ''));
+				}
+            }
+        });	
+    });
+    </script>
+{/if}

@@ -1,0 +1,54 @@
+{*<form name="{$current_class->name()|urlencode},insert" id="{$current_class->name()|urlencode},insert" action="" method="post" class="maxwidth">
+    <div class="primary profilDroit" style="margin-left:20px;margin-bottom:20px;">
+        <div class="slipTitle">
+            <div class="slipTitleL"></div>
+            <div class="slipTitleM">
+                <span>{ATF::$usr->trans("insert",$current_class->table)}</span>
+            </div>
+            <div class="slipTitleR"></div>
+        </div>
+        <div class="primaryContainer profilDroit" id="primaryContainer">
+            {include file="container.tpl.htm"}
+            <div class="slipContainer" id="slipContainer" >	
+                <div style="float:left;width:20px;padding-top:20px;">
+                    <a href="javascript:;" onclick="ajout_ligne()"><img src="{ATF::$staticserver}images/icones/insert.png" alt="" /></a>
+                </div>
+                {foreach from=ATF::localisation()->colonnes.formulaire key=key item=item}
+                    <div style="float:left;width:200px;padding-top:20px;">
+                        {ATF::$usr->trans($item,'localisation')}
+                    </div>
+                {/foreach}
+				<div style="clear:both"></div>
+                <div id="mod_listing_champs">
+                	<div id="loc_0">{include file="localisation-champs.tpl.htm"}</div>
+                </div>
+            </div>
+        </div>
+         <script type="text/javascript">/*<![CDATA[*/
+			resize();
+		/*]]>*/</script>
+    </div>
+    <div class="ClearBoth"></div>
+    <div class="submit" id="submit">
+        <input type="hidden" name="coche" value="{$smarty.post.coche}"/>
+		{include file="button.tpl.htm" text="valid" onclick="ATF.insert($('#localisation_traduction,insert'));"}
+	</div>
+</form>    
+<div class="ClearBothWithPadding"></div>*}
+{$identifiant=$smarty.request[$current_class->table]["id_{$current_class->name()}"]|default:$smarty.request["id_{$current_class->name()}"]|default:$id|default:$smarty.get["id_{$current_class->name()}"]|default:$requests[$current_class->table]["id_{$current_class->name()}"]|default:$requests["id_{$current_class->name()}"]}
+{if !$requests[$current_class->table] && $event=="update"}
+    {$requests=["{$current_class->table}"=>$current_class->select($identifiant,NULL,$smarty.get.seed)]}
+{/if}
+{if !$event}
+	{$event=$smarty.request.event}
+{/if}
+lol
+{**************** Primary (infos principales) *******************} 
+<div class="primaryContainer" id="primaryContainer" style="width:95%;">
+    <div id="FormDonnees"></div>
+</div>
+
+{* FICHIER JS DU MODULE *}
+<script type="text/javascript">/*<![CDATA[*/
+	{include file="localisation_traduction-update.tpl.js"}
+/*]]>*/</script>

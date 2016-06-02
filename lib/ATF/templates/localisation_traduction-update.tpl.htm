@@ -1,0 +1,16 @@
+{$identifiant=$smarty.request[$current_class->table]["id_{$current_class->name()}"]|default:$smarty.request["id_{$current_class->name()}"]|default:$id|default:$smarty.get["id_{$current_class->name()}"]|default:$requests[$current_class->table]["id_{$current_class->name()}"]|default:$requests["id_{$current_class->name()}"]}
+{if !$requests[$current_class->table] && $event=="update"}
+    {$requests=["{$current_class->table}"=>$current_class->select($identifiant,NULL,$smarty.get.seed)]}
+{/if}
+{if !$event}
+	{$event=$smarty.request.event}
+{/if}
+{**************** Primary (infos principales) *******************} 
+<div class="primaryContainer" id="primaryContainer" style="width:95%;">
+    <div id="FormDonnees"></div>
+</div>
+
+{* FICHIER JS DU MODULE *}
+<script type="text/javascript">/*<![CDATA[*/
+	{include file="localisation_traduction-update.tpl.js"}
+/*]]>*/</script>

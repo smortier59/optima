@@ -1,0 +1,21 @@
+#!/bin/bash
+# Renvoie les infos sur les serveurs dns configurés
+# syntaxe : resolv-ask <num-server>
+# <num-server> 1,2,3 ou 4
+
+# sauvegarde du séparateur de champ
+oldIFS=$IFS
+# nouveau séparateur de champ, le caractère fin de ligne     
+IFS=$'\n'
+# Boucle sur les noms de serveurs
+compteur=0
+for i in $(cat /etc/resolv.conf |grep nameserver)
+do
+	let "compteur=$compteur+1"
+	if [[ $1 == $compteur ]]
+	then
+		echo $i|cut -d " " -f2
+	fi
+done
+# rétablissement du séparateur de champ par défaut
+IFS=$old_IFS

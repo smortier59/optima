@@ -1,0 +1,15 @@
+{* on met comme valeur par défaut celle du label *}
+{$field_column.default=$item["`$field`_fk"]|default:$item[$field]}
+
+{* on change le type de certains champs pour que cela prenne une place moindre dans le select_all *}
+{if $field_column.type=="date" || $field_column.type=="datetime" || $field_column.type=="textarea"}
+    {$field_column.type="text"}
+{/if}
+
+{* on précise dans l'onkeyup que le changement de la valeur d'un des champs doit conduire à une mise à jour *}
+{$id=$item["{$current_class->table}.id_{$current_class->table}"]|cryptid}
+
+{$onkeyup="ATF.__submitSearchChampsSelectAll('{$current_class->table}','{$id}','{$nom_champs}');"}
+
+{include file="generic_field_input.tpl.htm" item=$field_column key=$nom_champs alias="`$nom_champs`_`$id`" value=$item["`$field`_fk"]|default:$item[$field] width=150}
+<span style="display: none;" id="__res_{$nom_champs}_{$id}_loading"><img alt="Working..." src="{ATF::$staticserver}images/refreshing.gif"/></span>  

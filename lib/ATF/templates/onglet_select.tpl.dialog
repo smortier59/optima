@@ -1,0 +1,24 @@
+Cocher ou décocher les onglets que vous voulez voir ou non : <br /><br />
+<form method="post" action="">
+
+{foreach from=$current_class->select_onglet() key=key item=item}
+	<input type="checkbox" name="{$key}" value="{$key}" {$item} style="width:16px;" />&nbsp;<img src="{ATF::$key()->icone()}" />&nbsp;{ATF::$usr->trans($key,"module")}<br />
+{/foreach}
+</form>
+<br />
+<button type="button" value="go" onclick="
+	{* on récupère toutes les cases cochées *}
+	var collectChecks=document.getElementsByTagName('input');
+ 	var coche = Array();
+	
+	 for (i=0;i<collectChecks.length;i++) {
+		if (collectChecks[i].type=='checkbox') {
+			if(collectChecks[i].checked==true){
+				if(collectChecks[i].name)coche[i]=collectChecks[i].name;
+			}
+		}
+	}
+	Modalbox.hide();
+	ATF.loadMask.show();
+	ATF.tpl2div('{$current_class->table},save_onglet.div','liste='+coche+'&table={$current_class->table}&id_{$current_class->table}={$id_table}',{ onComplete:function(response){ ATF.loadMask.hide(); } });
+">OK</button>

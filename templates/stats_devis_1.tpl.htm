@@ -1,0 +1,53 @@
+<!-- Graphique -->
+<table style="width:100%">
+<tr><td colspan="2">
+<div id="devis_devis1"></div>
+
+<script type="text/javascript">
+{$data = ATF::devis()->prix_moyen("true")}
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'devis_devis1',
+            type: 'spline'
+        },
+        title: {
+            text: 'Prix moyen des devis gagnés'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                                    
+                       '{$cat["label"]}'
+                    {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    rotation: -60,
+                    align: 'right',
+                    x: 0,
+                    y: 10
+                }
+        },        
+        yAxis: {
+            title: {
+                text: null
+            },min:0
+        },        
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {  
+                   name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});    
+</script>
+</td></tr>
+</table>

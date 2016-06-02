@@ -1,0 +1,83 @@
+{if !$requests["{$current_class->table}"]}
+	{$requests=["{$current_class->table}"=>$current_class->select($smarty.get["id_{$current_class->name()}"])]}
+{/if}
+{if !$event}
+	{$event=$smarty.request.event}
+{/if}
+{if !$form_name}
+	{$form_name="{$current_class->name()|urlencode}{$event}"}
+{/if}
+<div class="primary profilDroit" style="margin-left:20px;margin-bottom:20px;">
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{$requests[$current_class->table].profil|default:'Création'}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div>
+    <div class="primaryContainer profilDroit" id="primaryContainer">
+        {include file="container.tpl.htm"}
+        <div class="slipContainer profilDroit" id="slipContainer">
+        	<form name="{$form_name}" id="{$form_name}" action="" method="post" class="maxwidth">
+            	{if $requests["{$current_class->name()}"]["id_{$current_class->name()}"]}
+                    <input type="hidden" name="{$current_class->table}[id_{$current_class->table}]" value="{$requests["{$current_class->name()}"]["id_{$current_class->name()}"]}" />
+                {/if}
+                <table style="display:inline-block">
+                    <tbody>
+                        {foreach from=$current_class->colonnes("primary",$event) key=key item=item}
+                            <tr>
+                                {include file="generic_field.tpl.htm" key=$key item=$item width="150"}
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+			</form>
+            <div class="submit" id="submit" style="padding:10px;">
+            	{include file="button.tpl.htm" text="valid" onclick="ATF.{$event}($('#{$form_name}'),false,'profil,update.ajax');"}
+            </div>
+        	{if $event=="update"}
+                {$id_profil=$current_class->cryptId($requests["{$current_class->table}"]["id_{$current_class->name()}"])}
+            	<a href="javascript:;" onclick="ATF.loadMask.show();ATF.loadMask.lastXHR=ATF.tpl2div('tpl2div.ajax','table=profil&div=profilGestionDroit&template=profil_liste_droit&id_profil={$id_profil}',{ onComplete:function(){ $('.slipContentContainer').each(function (e) { $(e).css({ height: $('#slipContainer').height()+'px'}); });ATF.loadMask.hide(); } });">Modifier les droits</a>
+            	<div id="profilGestionDroit"></div>
+            {/if}
+        </div>
+    </div>
+	<script type="text/javascript">/*<![CDATA[*/
+        $('.slipContentContainer').each(function (e) {
+            $(e).css({ height: 10+$('#slipContainer').height()+"px" });
+        });
+
+		ATF.toggle_children = function(id_element){
+			//Ajoute ou enleve la class 'deplier' a l'element qui permet de changer l'icone
+			$("#image_"+id_element).toggleClass('deplier');
+			//Afficher les enfants du module via leur nom de class
+            $(".parent_"+id_element).toggle();
+			$(".parent_"+id_element).each(function (e) {
+				ATF.hide_child(e.id);
+			});
+			// Ajustement de la hauteur du DIV
+			$('.slipContentContainer').each(function (e) {
+				$(e).css({ height: 10+$('#slipContainer').height()+"px" });
+			});
+		}
+		ATF.hide_child = function(e) {
+			if ($('.parent_'+e)) {
+				/*if ($("#image_"+e) && $("#image_"+e).hasClass('deplier')) {
+					$("#image_"+e).removeClass('deplier');
+				}*/
+				if ($("#image_"+e) && $("#image_"+e).hasClass('deplier')) {
+                    $("#image_"+e).removeClass('deplier');
+                }
+                $('.parent_'+e).hide();
+				$('.parent_'+e).each(function (el) {
+					if ($('.parent_'+el.id)) {
+						ATF.hide_child(el);
+					}
+				});
+			}
+
+		}
+		
+    /*]]>*/</script>
+</div>
+<div class="ClearBothWithPadding"></div>

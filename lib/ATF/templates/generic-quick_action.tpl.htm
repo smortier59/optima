@@ -1,0 +1,21 @@
+{* Vérification qu'un no_insert,no_update, ... ne soit pas précisé dans le constructeur de la classe courante *}
+{if !$current_class->no_{$i}}
+    {* Vérification sur l'enregistrement si un ID existe en paramètre *}
+    {if $id}
+        {* Peut-on faire cette action sur cet enregistrement précis ou non ? *}
+        {if $current_class->is_active($i,$id)} 
+            <div class="quickAction {$i}" style="display:inline;">
+                <a href="#{$current_class->name()|urlencode}-{$i}-{$id|cryptid}.html" rel="{ATF::$usr->trans($i,null,_info)}" title="{ATF::$usr->trans($i)}">
+                    <img src="{ATF::$staticserver}images/icones/{$i}.png" />
+                </a>
+            </div>
+        {/if}
+    {else}
+        {* Ne nécessite pas d'ID a passer en paramètre *}
+        <div class="quickAction {$i}" style="display:inline;">
+            <a href="#{$current_class->name()|urlencode}-{$i}.html{if $url_extra_fk},{$url_extra_fk}{/if}" rel="{ATF::$usr->trans($i,null,_info)}" title="{ATF::$usr->trans($i)}">
+            	<img src="{ATF::$staticserver}images/icones/{$i}.png" />
+            </a>
+        </div>
+    {/if}
+{/if}

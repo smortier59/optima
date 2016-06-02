@@ -1,0 +1,16 @@
+{*
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Cl enregistrement
+*}
+{* Vérification sur l'enregistrement si un ID existe en paramètre *}
+{if !$current_class->no_{$i}}
+	<div class="quickAction {$i}" style="display:inline;">
+		<a href="#{$current_class->name()|urlencode}-insert{if $current_class->parent},id_{$current_class->parent|urlencode}={$id|cryptid}{/if}.html" 
+			rel="{ATF::$usr->trans($i,null,_info)}" 
+			title="{ATF::$usr->trans($i)}">
+			<img src="{ATF::$staticserver}images/icones/{$i}.png" />
+		</a>
+	</div>
+{/if}

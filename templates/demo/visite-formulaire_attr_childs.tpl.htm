@@ -1,0 +1,38 @@
+{strip}
+    {if $expandAll}
+        {$expandAll=$expandAll-1}
+    {/if}
+
+    {if !$infos}
+        {$infos=$smarty.request}
+    {/if}
+
+    {if !$noKeep}
+        {ATF::formulaire()->keepOpened("`$infos.id_ppa`_`$infos.id_attr`_{$infos.id_vi_pa_multi|default:$id_vi_pa_multi}")}
+    {/if}
+    
+    {if !$data}
+        {* ATTR ENFANTS *}
+        {$data = ATF::pa()->selectChilds($infos.id_pa)}
+        {if !$data}
+            {$data = ATF::attr()->selectChilds($infos.id_attr)}
+        {/if}
+    {/if}
+    {foreach from=$data key=k item=i}
+        {$i_id_ppa=$infos.id_pa|default:$id_ppa}
+		{if $i.multi}
+            <div class="indent15 pa">
+                <img src="{ATF::$staticserver}images/blank.gif" width="13" height="13" /> 
+				<a href="javascript:;" rel="{ATF::$usr->trans('addNewMulti','formulaire')}" onclick="ATF.ajax('vi_pa,newMulti.ajax','ppa={$i.id_pa|default:$i_id_ppa}&a={$i.id_attr}&pa={$i.id_pa}&m={$id_vi_pa_multi}&v={$smarty.request.id_visite}',{ onComplete: function (obj) { if (obj.result) eval('__x'+(this.up().up().id).replace('_childs','')+'();'); ATF.ajax_refresh(obj); }.bind(this) });">
+                	<img src="{ATF::$staticserver}images/icones/insert.png" height="16" width="16" />
+                </a>
+				&nbsp;&nbsp;{$i.pa|default:$i.attr}
+            </div>
+            {foreach from=ATF::vi_pa()->getDistinct($smarty.request.id_visite,$i.id_attr,$i.id_pa,$infos.id_vi_pa_multi|default:$id_vi_pa_multi) item=multi}
+                {include file="visite-formulaire_attr.tpl.htm" infos=$i indent=40 ppa=$i_id_ppa id_vi_pa_multi=$multi.id_vi_pa_multi multiRoot=true}
+            {/foreach}
+        {else}
+	        {include file="visite-formulaire_attr.tpl.htm" infos=$i indent=30 multiRoot=false}
+        {/if}
+    {/foreach}
+{/strip}

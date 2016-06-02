@@ -1,0 +1,43 @@
+#!/usr/bin/php
+<?php
+/** Script d'envoi de rapport issu de la reception d'un fax
+*/
+
+/*----------------------------*/
+/*Script d'initialisation     */
+/*----------------------------*/
+require_once('init.inc.php');
+
+error_reporting(E_ALL);
+/*----------------------------*/
+/*Exécution de Faxout         */
+/*----------------------------*/
+//Fichier de log de faxout
+$path_client=__ABSOLUTE_PATH__.'logs/faxin.log';
+if(!file_exists($path_client)){touch($path_client);}
+$log_fax=new Fichier(__ABSOLUTE_PATH__.'logs/faxin.log');
+
+
+//Recuperation des variables FAXOPT
+$json=$_SERVER['argv'][1];
+//reconstruction du json
+$json=str_replace('{','{"',$json);
+$json=str_replace('}','"}',$json);
+$json=str_replace(':','":"',$json);
+$json=str_replace(',','","',$json);
+$faxopts=json_decode($json,true);
+
+$log_fax->write(date('d/m/y').' - '.date('H:i:s')." FAXOPTS-json : ".$json."\n");
+
+//--Reception du fax dans l'application
+fax::getInstance()->receiveFax($faxopts);
+
+//--Envoi du pdf par mail
+fax::getInstance()->sendMailFaxIn($faxopts);
+
+//--Journalisation
+//$log_fax->write(date('d/m/y').' - '.date('H:i:s')." FAXOPTS-json : ".$json."\n");
+//$log_fax->write(date('d/m/y').' - '.date('H:i:s')." FAXOPTS : ".implode(':',$faxopts)."\n");
+
+echo "faxIn\n";
+?>

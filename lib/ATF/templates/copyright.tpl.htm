@@ -1,0 +1,12 @@
+<div id="ATFversion">
+	ATF {ATF::$version}
+    <br />{ATF::getLastUpdate()|date_format:'%d/%m/%Y %H:%M:%S'}
+</div>
+<div id="OptimaVersion">
+	{ATF::$codename|upper} {include file="version.tpl.htm"}
+    <br />{ATF::$html->mtime('version.tpl.htm')|date_format:'%d/%m/%Y %H:%M:%S'}
+</div>
+<div id="generationTime">
+	{include file="generationTime.tpl.htm"}
+</div>
+<br /><br />

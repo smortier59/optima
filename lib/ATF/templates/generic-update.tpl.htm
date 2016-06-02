@@ -1,0 +1,201 @@
+{** Generic-update - Template par défaut d'insertion, de mise à jour et de duplication des éléments
+*}
+{* on ne fait pas de select dans le cas où l'on se situe sur un insert, logique puisque l'élément n'est pas encore créé *}
+{if !$event}
+	{$event=$smarty.request.event}
+{/if}
+{if !$form_name}
+	{$form_name="{$current_class->name()|urlencode},{$event}"}
+{/if}
+{********* Header( Table standard ) **********}
+{if $current_class->table_standard || $current_class->table_standard_insert}
+	{capture name=title}{ATF::$usr->trans("$event",$current_class->table)}{if $requests[$current_class->table]["id_{$current_class->table}"]} - {$current_class->nom($requests[$current_class->table]["id_{$current_class->table}"])|strtoupper|truncate:45}{/if}{/capture}
+	{include file="table_standard.tpl.htm" header=1 forced_title=$smarty.capture.title find=0 png_image=1}
+{/if}
+{$current_class->initialise_ligne($smarty.session)}
+<form name="{$form_name}" id="{$form_name}" action="" method="post"{if $current_class->upload_file} enctype="multipart/form-data"{/if} class="maxwidth">
+    {if $smarty.get["id_{$current_class->name()}"]}
+        <input type="hidden" name="{$current_class->table}[id_{$current_class->table}]" value="{$smarty.get["id_{$current_class->name()}"]}" />
+    {elseif $requests["{$current_class->name()}"]["id_{$current_class->name()}"]}
+        <input type="hidden" name="{$current_class->table}[id_{$current_class->table}]" value="{$requests["{$current_class->name()}"]["id_{$current_class->name()}"]}" />
+    {/if}
+    
+    {* si l'on provient d'un module étranger (système d'onglet) *}
+    {foreach from=$smarty.request key=field_name item=valeur}
+    	{$key_class=ATF::getClass($current_class->fk_from($field_name))}
+    	{if $key_class && $key_class!=$current_class->table}
+			<input type="hidden" name="{$current_class->table}[{$field_name}]" value="{$valeur}" />
+            <input type="hidden" name="{$current_class->table}[__redirect]" value="{$key_class->name()}" />
+        {/if}
+    {/foreach}
+
+{**************** Panels *******************} 
+    {if $current_class->colonnes.panel}
+		<div class="panel">
+            {foreach from=$current_class->colonnes.panel key=k item=i}
+				{if $current_class->colonnes($k,$event,'true')}
+					<div class="panelTopCornerTopLeft" style="cursor:none;"></div>
+					<div class="panelTopCornerTopRight" style="cursor:none;"></div>
+					<div class="panelTopTopMiddle" style="cursor:none;"></div>
+						
+					<div class="panelTopLeft" style="cursor:none;"></div> 
+					<div class="panelTopRight" style="cursor:none;"></div>
+					<div class="panelTopMiddle" style="cursor:none;">{ATF::$usr->trans("cadre_{$k}",$current_class->table)}</div>
+					
+					<div class="panelTopCornerBottomLeft" style="cursor:none;"></div>
+					<div class="panelTopCornerBottomRight" style="cursor:none;"></div>
+					<div class="panelTopBottomMidlle" style="cursor:none;"></div>
+					
+					<div id="complement_{$k}" class="panelMiddle">
+						<table class="std">
+							<tbody>
+								{foreach from=$current_class->colonnes($k,$event,'true') key=k_ item=i_}
+									<tr class="selectRow{cycle name=$k values='0,1'}{if $i_.type} {$i_.type}{/if}">
+										{if ATF::$html->template_exists("{$current_class->table}-{$k_}-{$event}.tpl.htm")} {* Afin de pouvoir gérer un template particulier pour un champ ! *}
+											{include file="{$current_class->table}-{$k_}-{$event}.tpl.htm"}
+										{elseif $event!==update && ATF::$html->template_exists("{$current_class->table}-{$k_}-update.tpl.htm")}
+											{include file="{$current_class->table}-{$k_}-update.tpl.htm"}
+										{else}   
+											{include file="generic_field.tpl.htm" key=$k_ item=$i_ width=150}
+										{/if}
+									</tr>
+								{/foreach}
+							</tbody>
+						</table>
+					</div>
+					<div class="panelBottomLeft"></div> 
+					<div class="panelBottomRight"></div>
+					<div class="panelBottomMiddle"></div>
+					<div class="panelSpacer"></div>
+				{/if} 
+            {/foreach}
+        </div>
+	{/if}
+{**************** Primary (infos principales) *******************} 
+    <div class="primary">
+		{if !$current_class->table_standard && !$current_class->table_standard_insert}
+			<div class="slipTitle">
+				<div class="slipTitleL"></div>
+				<div class="slipTitleM">
+					<span>{ATF::$usr->trans($current_class->table,module)} | {ATF::$usr->trans("$event",$current_class->table)}{if $requests[$current_class->table]["id_{$current_class->table}"]} - {$current_class->nom($requests[$current_class->table]["id_{$current_class->table}"])|strtoupper|truncate:45}{/if}</span>
+				</div>
+				<div class="slipTitleR"></div>
+			</div>
+		{/if}
+        <div class="primaryContainer {if !$current_class->colonnes.panel}{ATF::$codename}PrimaryContainerUpdate{/if}" id="primaryContainer">
+            {include file="container.tpl.htm"}
+            <div class="slipContainer" id="slipContainer" >
+                <table class="std">
+                    <tbody>
+                        {* Autres informations *}
+                        {if ATF::$html->template_exists("`$current_class->table`-update_prefix.tpl.htm")}
+                            {include file="`$current_class->table`-update_prefix.tpl.htm"}
+                        {/if}
+                        {foreach from=$current_class->colonnes("primary",$event) key=key item=item}
+                            {if $item.FCKEditor}
+                                {*include file="FCKEditor.tpl.htm" key=$key item=$item name_field="{$current_class->table}[{$key}]"*}
+                            {else}
+                                <tr class="selectRow{cycle name='primary' values='0,1'}">
+                                    {if ATF::$html->template_exists("{$current_class->table}-{$key}-{$event}.tpl.htm")} {* Afin de pouvoir gérer un template particulier pour un champ ! *}
+                                        {include file="{$current_class->table}-{$key}-{$event}.tpl.htm" key=$key item=$item}
+                                    {elseif $event!==update && ATF::$html->template_exists("{$current_class->table}-{$key}-update.tpl.htm")}
+                                        {include file="{$current_class->table}-{$key}-update.tpl.htm"}
+                                    {else}   
+                                        {include file="generic_field.tpl.htm" key=$key item=$item}
+                                    {/if}
+                                </tr>
+                            {/if}
+                        {foreachelse}
+                            Aucun champs current_class->colonnes.primary
+                        {/foreach}
+                        {* Autres informations *}
+                        {if ATF::$html->template_exists("`$current_class->table`-update_suffix.tpl.htm")}
+                            {include file="`$current_class->table`-update_suffix.tpl.htm"}
+                        {/if}
+                    </tbody>
+                </table>
+                {foreach from=$current_class->files key=key item=item}
+                    {if !$item.no_upload}
+                    	<iframe class="upload" src="upload.tpl,table={$current_class->name()}&field={$key}{if $requests["{$current_class->table}"]["id_{$current_class->table}"]}&id_{$current_class->table}={$requests["{$current_class->table}"]["id_{$current_class->table}"]}{/if}"></iframe>
+                    {/if}
+                {/foreach}
+            </div>
+        </div>
+{**************** Secondary (infos non renseignées dans le primary) *******************} 
+		{if $col_sec=$current_class->colonnes("secondary",$event)}
+			<div class="secondary {if !$current_class->colonnes.panel}{ATF::$codename}SecondaryUpdate{/if}" id="secondary">
+				{if !$current_class->panels.$k.nodeply}
+					<div class="secondaryTopCornerTopLeft" onclick="ATF.TogglePanel('complement_secondary');"></div>
+					<div class="secondaryTopCornerTopRight" onclick="ATF.TogglePanel('complement_secondary');"></div>
+					<div class="secondaryTopTopMiddle" onclick="ATF.TogglePanel('complement_secondary');"></div>
+						
+					<div class="secondaryTopLeft" onclick="ATF.TogglePanel('complement_secondary');"></div> 
+					<div class="secondaryTopRight" onclick="ATF.TogglePanel('complement_secondary');"></div>
+					<div class="secondaryTopMiddle" onclick="ATF.TogglePanel('complement_secondary');">{ATF::$usr->trans("cadre_information_supplementaire",$current_class->table)}</div>
+						
+					<div class="secondaryTopCornerBottomLeft" onclick="ATF.TogglePanel('complement_secondary');"></div>
+					<div class="secondaryTopCornerBottomRight" onclick="ATF.TogglePanel('complement_secondary');"></div>
+					<div class="secondaryTopBottomMidlle" onclick="ATF.TogglePanel('complement_secondary');"></div>
+				{else}
+					<div class="secondaryTopCornerTopLeft"></div>
+					<div class="secondaryTopCornerTopRight"></div>
+					<div class="secondaryTopTopMiddle"></div>
+						
+					<div class="secondaryTopLeft"></div> 
+					<div class="secondaryTopRight"></div>
+					<div class="secondaryTopMiddle">{ATF::$usr->trans("cadre_information_supplementaire",$current_class->table)}</div>
+						
+					<div class="secondaryTopCornerBottomLeft"></div>
+					<div class="secondaryTopCornerBottomRight"></div>
+					<div class="secondaryTopBottomMidlle"></div>
+				{/if}
+                <div id="complement_secondary" class="secondaryMiddle" {if !$current_class->panels.secondary.visible} style="display:none;"{/if}>
+                    <table class="std">
+                        {foreach from=$col_sec key=key item=item}
+                            <tr class="selectRow{cycle name='secondary' values='0,1'}{if $item.type} {$item.type}{/if}">
+                                {if ATF::$html->template_exists("{$current_class->table}-{$key}-update.tpl.htm")} {* Afin de pouvoir gérer un template particulier pour un champ ! *}
+                                   {include file="{$current_class->table}-{$key}-update.tpl.htm" key=$key item=$item}
+                                {elseif $event!==update && ATF::$html->template_exists("{$current_class->table}-{$k_}-update.tpl.htm")}
+                                    {include file="{$current_class->table}-{$k_}-update.tpl.htm"}
+                                {else}   
+                                    {include file="generic_field.tpl.htm" key=$key item=$item}
+                                {/if}
+                            </tr>
+                        {/foreach}
+                    </table>
+                </div>
+                {if !$current_class->panels.$k.nodeply}   
+					<div class="secondaryBottomLeft" onclick="ATF.TogglePanel('complement_secondary');"></div> 
+					<div class="secondaryBottomRight" onclick="ATF.TogglePanel('complement_secondary');"></div>
+					<div class="secondaryBottomMiddle" onclick="ATF.TogglePanel('complement_secondary');">
+						<img src="{ATF::$staticserver}images/icones/arrow_expand_{if !$current_class->panels[$k].visible}down{else}up{/if}.png" alt="expand" id="complement_secondary_img"/>
+					</div>
+				{/if}
+            {/if}
+        </div>
+        <script type="text/javascript">/*<![CDATA[*/
+            $('.slipContentContainer').each(function (e) {
+                $(e).css({ height: $('#slipContainer').height()+"px" });
+            });
+		
+			if ($('#quickActionContainer')) {
+				$('#quickActionContainer').show()
+			}
+        /*]]>*/</script>
+        
+    </div>
+    <div class="ClearBoth"></div>
+    <div class="submit" id="submit">
+    	{if ATF::$html->template_exists("{$current_class->table}-button-{$event}.tpl.htm")}
+			{* si on doit mettre un bouton spécifique (avec autre redirection, check, ou autre) *}
+            {include file="{$current_class->table}-button-{$event}.tpl.htm" event="{$event}" text="valid" form_name="{$form_name}"}
+        {else}
+        	{include file="button.tpl.htm" text="valid" onclick="ATF.{$event}($('#{$form_name|replace:"[":"\\\\["|replace:"]":"\\\\]"}'));"}
+		{/if}
+    </div>
+</form>    
+<div class="ClearBothWithPadding"></div>
+{********* Footer( Table standard ) **********}
+{if $current_class->table_standard || $current_class->table_standard_insert}
+	{include file="table_standard.tpl.htm" header=0}
+{/if}

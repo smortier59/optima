@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+<head>
+<title>{include file="title.tpl.htm"}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-language" content="fr" />
+<meta name="expires" content="never" />
+<meta name="rating" content="general" />
+<meta name="revisit-after" content="2 days" />
+<meta name="ROBOTS" content="index,follow" />
+
+{if $smarty.const.__DEV__===true}
+    <link rel="shortcut icon" type="image/x-icon" href="{ATF::$staticserver}images/favicon/{ATF::$project}-debug.ico?v={util::generateRandWord()}" />
+{elseif ATF::$codename && util::url_exists("{ATF::$staticserver}images/favicon/{ATF::$codename}.png")}
+    <link rel="shortcut icon" type="image/png" href="{ATF::$staticserver}images/favicon/{ATF::$codename}.png?v={util::generateRandWord()}" />
+{else}
+    <link rel="shortcut icon" type="image/x-icon" href="{ATF::$staticserver}images/favicon/{ATF::$project}.ico?v={util::generateRandWord()}" />
+{/if}
+
+
+{* MENU V2 !
+<script src="{ATF::$staticserver}js/menu/modernizr.custom.js"></script>
+*}
+{*strip*}
+
+
+{$skin_specific=ATF::module()->skin_from_nom($smarty.get.table|default:$smarty.get.permatable)}
+{if $skin_specific}
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}images/skins/{$skin_specific}/skin{if $smarty.const.__DEV__===true}-debug{/if}.css" media="screen" />
+{else}
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}images/skins/green/skin{if $smarty.const.__DEV__===true}-debug{/if}.css" media="screen" />
+{/if}
+
+{if ATF::$usr->isLogged()}
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/{ATF::$project}_menu{if $smarty.const.__DEV__===true}-debug{/if}.css?v={ATF::$version}" media="screen" />
+{/if}
+
+{* jQuery *}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/smoothness/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+
+<!-- libs js -->
+<script>
+    !window.jQuery && document.write(unescape('%3Cscript src="{ATF::$staticserver}common/js/libs/jquery-1.8.2.js"%3E%3C/script%3E'))
+</script>
+{*
+<script type="text/javascript" src="{ATF::$staticserver}common/js/libs/handlebars.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}common/js/libs/jquery.selectbox-0.2.min.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}common/js/libs/underscore-min.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}common/js/libs/glDatePicker.min.js"></script>
+<script src="{ATF::$staticserver}common/js/dataBridge.js"></script>
+<script src="{ATF::$staticserver}common/js/filterElement.js?v={util::generateRandWord()}"></script>
+<script src="{ATF::$staticserver}common/js/filterCollection.js"></script>
+<script src="{ATF::$staticserver}common/js/filterBuilder.js"></script>
+<script src="{ATF::$staticserver}common/js/page.js"></script>
+*}
+
+<!-- perso js -->
+<script src="{ATF::$staticserver}common/js/utils.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/core{if $smarty.const.__DEV__===true}-debug{/if}.css?v={ATF::$version}" media="screen" />
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/{ATF::$project}{if $smarty.const.__DEV__===true}-debug{/if}.css?v={ATF::$version}" media="screen" />
+
+{if ATF::$usr->getLogin() !== null}
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}js/ext-3.3.1/resources/css/ext-all-notheme.css" />
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}js/ext-3.3.1/resources/css/xtheme-gray.css" />
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/superboxselect{if $smarty.const.__DEV__===true}-debug{/if}.css" />
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/superboxselect-gray-extend{if $smarty.const.__DEV__===true}-debug{/if}.css" />
+
+
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/multiselect{if $smarty.const.__DEV__===true}-debug{/if}.css" />
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/ext_specifique{if $smarty.const.__DEV__===true}-debug{/if}.css" />
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/uploadfile{if $smarty.const.__DEV__===true}-debug{/if}.css" />
+	<link rel="stylesheet" href="{ATF::$staticserver}js/modalbox/modalbox{if $smarty.const.__DEV__===true}-debug{/if}.css" type="text/css" media="screen" />
+
+
+	{* CSS EXTJS PLUGINS ET AUTRE *}
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/Spinner{if $smarty.const.__DEV__===true}-debug{/if}.css?v={ATF::$version}" media="screen" />
+	<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/extjs/multiselect{if $smarty.const.__DEV__===true}-debug{/if}.css?v={ATF::$version}" media="screen" />
+
+	{* SWFOBJECT & SWFUPLOAD *}
+	<script type="text/javascript" src="{ATF::$staticserver}js/swfobject.js?v1"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/swfupload.js?v1"></script>
+
+
+	{* Highcharts *}
+	<script src="{ATF::$staticserver}js/highcharts/highcharts.js"></script>
+	<script src="{ATF::$staticserver}js/highcharts/modules/exporting.js"></script>
+
+
+	{* filtres *}
+	<link rel="stylesheet" href="{ATF::$staticserver}common/css/glDatePicker.flatwhite.css">
+	<link rel="stylesheet" href="{ATF::$staticserver}common/css/desktop.css">
+
+
+	<script type="text/javascript" src="{ATF::$staticserver}js/ext-3.3.1/adapter/ext/ext-base{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/ext-3.3.1/ext-all{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/ext-lang-fr{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/multiselect{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/uploadfile{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/ext_specifique{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/Spinner{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/SpinnerField{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/ItemSelector{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/MultiCellSelectionModel{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/multipleUploadFileDnD{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/RowExpander{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/RadioField{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/SuperBoxSelect{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/ext.ux.menu.storemenu.js"></script>
+
+	{* Extensible Calendar, Schedule *}
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/extensible-1.0.2/Extensible-config.js"></script>
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/extensible-1.0.2/src/locale/extensible-lang-fr.js"></script>
+
+	<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/LockingGridView{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+
+	<script type="text/javascript" src="{ATF::$staticserver}js/ext-3.3.1/sch-all{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+{/if}
+
+{* smarTip
+<script type='text/javascript' src='{ATF::$staticserver}js/smartip/smartip{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}'></script> *}
+
+{* ATF *}
+<script type="text/javascript" src="{ATF::$staticserver}js/atf/atf{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}"></script>
+
+{* MODALBOX *}
+<script type="text/javascript" src="{ATF::$staticserver}js/modalbox/modalbox{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+
+{* Cryptage *}
+<script type="text/javascript" src="{ATF::$staticserver}js/md5/md5{if $smarty.const.__DEV__===true}-debug{/if}.js"></script>
+
+{* Localisation JS ATF.loc *}
+{if loc::exists(ATF::$usr->get(id_language))}
+	<script type="text/javascript" src="{ATF::$staticserver}js/atf/lang/{ATF::$usr->get(id_language)}.js?v={ATF::$version}"></script>
+    {if ATF::$codename}
+    	<script type="text/javascript" src="{ATF::$staticserver}js/atf/lang/{ATF::$usr->get(id_language)}.{ATF::$codename}.js?v={ATF::$version}"></script>
+    {/if}
+{/if}
+
+{* FICHIER JS *}
+<script type="text/javascript">/*<![CDATA[*/
+{include file="login.tpl.js"}
+{if ATF::$usr->isLogged()}
+	{include file="js.tpl.js"}
+	{if ATF::$html->template_exists("common.tpl.js")}
+		{include file="common.tpl.js"}
+	{/if}
+{/if}
+/*]]>*/</script>
+
+{if ATF::$usr->isLogged() && !ATF::$usr->invited}
+	<script type='text/javascript' src='{ATF::$staticserver}js/menu/{ATF::$project}_menu{if $smarty.const.__DEV__===true}-debug{/if}.js?v={ATF::$version}'></script>
+	<script type="text/javascript">/*<![CDATA[*/
+		Ext.onReady(function(){
+
+			ATF.menuLength={ATF::$usr->get(menu_length)|default:0};
+
+			ATF.createMenu({json_encode(ATF::$usr->get(menu))},"{$smarty.const.__SOCIETE__}","{ATF::user()->nom(ATF::$usr->getID())}","{ATF::$usr->trans(Etes_vous_sur)|escape:javascript}","{ATF::$staticserver}");
+		});
+	/*]]>*/</script>
+{/if}
+</head>
+{*/strip*}

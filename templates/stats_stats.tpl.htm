@@ -1,0 +1,122 @@
+{* graphe de stat_snap*}
+<tr><td>
+Période :
+<select onchange="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=stats&pas='+this.value);">
+	<option value="30" {if $pas==30}selected="selected"{/if}>30 jours</option>
+    <option value="60" {if $pas==60}selected="selected"{/if}>60 jours</option>
+    <option value="90" {if $pas==90}selected="selected"{/if}>90 jours</option>
+    <option value="180" {if $pas==180}selected="selected"{/if}>180 jours</option>
+    <option value="366" {if $pas==366}selected="selected"{/if}>366 jours</option>
+</select>
+<div id="stat_snap"></div>
+
+
+<script type="text/javascript">
+{$data = ATF::stat_snap()->stats($pas)}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'stat_snap',
+            type: 'spline'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+            ,title: {
+                text: 'N° de semaine'
+            }
+        },
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            }
+            ,min:0
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'spline'
+                   ,name: '{$value["params"]["seriesname"]}'                                     
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                                                     
+                                {$v["value"]} 
+                                {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+               {/foreach}            
+           ]        
+    });
+});    
+</script>
+</td>
+</tr>
+{foreach name=stats from=$current_class->stats key=key item=item}
+    {if $key != "emailing_tracking" && $key != "stats"}
+        <tr>
+            <td>                          
+                {$data = ATF::stat_snap()->stats_spline($key)}
+                
+                <div id="stat_snap_{$key}"></div>
+                
+                <script type="text/javascript">
+                Ext.onReady(function(){
+                    var chart = new Highcharts.Chart({
+                        chart: {
+                            renderTo: 'stat_snap_{$key}',
+                            type: 'spline'
+                        },
+                        title: {
+                            text: 'Nombre {ATF::$usr->trans($key,module)}'
+                        },        
+                        xAxis: {            
+                            categories: [
+                                {foreach $data["categories"]["category"] as $k => $cat}                    
+                                    '{$cat["label"]}' {if !$cat@last},{/if}
+                                {/foreach}
+                                ]
+                            ,title: {
+                                text: 'Année'
+                            }
+                        },
+                        yAxis: {                            
+                            min:0
+                        },
+                        series: [
+                               {foreach $data["dataset"] as $key=>$value}    
+                               {                   
+                                   type: 'spline'
+                                   ,name: '{$key}'                                     
+                                   ,data: [                           
+                                           {foreach $value as $k=>$v}                                                     
+                                                {$v} 
+                                                {if !$k@last},{/if}
+                                           {/foreach}
+                                          ]
+                               } {if !$key@last},{/if}
+                               {/foreach}            
+                           ]        
+                    });
+                });    
+                </script>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+            </td>
+            
+        </tr>
+    {/if}
+{/foreach}
+

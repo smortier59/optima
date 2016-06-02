@@ -1,0 +1,22 @@
+{if !$num}
+	{$num=0}
+{/if}
+<div style="float:left;width:20px;">
+	<a href="javascript:;" onclick="$('#mod_listing_champs').removeChild($('#loc_{$num}'));resize();">
+        <img src="{ATF::$staticserver}images/icones/delete.png" alt="" />
+    </a>
+</div>
+{foreach from=ATF::localisation()->colonnes.formulaire key=key item=item}
+    <div style="float:left;width:200px;">
+        {* on ne l'affiche que si on est connecté sous absystech *}
+        {if ATF::$usr->get(id_societe)=="1" && $item=="codename"}
+            <select name="codename[{$num}]">
+                <option value="">Choisissez...</option>
+                {html_options options=ATF::db()->recup_codename()}
+            </select>
+        {else}
+            <input type="text" name="{$item}[{$num}]" />
+        {/if}
+    </div>       
+{/foreach}
+<div style="clear:both"></div>

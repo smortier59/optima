@@ -1,0 +1,12 @@
+{$id=$item["{$current_class->table}.id_{$current_class->table}"]|default:$item["{$current_class->table}"]["id_{$current_class->table}"]}
+{if ATF::$html->template_exists("{$current_class->table}-{$field}-fichier_joint.tpl.htm")}	
+    {include file="{$current_class->table}-{$field}-fichier_joint.tpl.htm"}
+{else}
+    {if $current_class->file_exists($id,$field) || $current_class->files[$field].no_store===true}
+        <a href="{$current_class->name()}-select-{$field}-{$id|cryptid}.dl" {tip text=ATF::$usr->trans("popup_download",$current_class->table)}>
+        <img src="{ATF::$staticserver}images/icones/{$current_class->files[{$field}].type|default:upload}.png" class="icone" />{if $fieldLabel}{$fieldLabel}{/if}
+        </a>
+    {else}
+        <img src="{ATF::$staticserver}images/icones/warning.png" />
+    {/if}    
+{/if}

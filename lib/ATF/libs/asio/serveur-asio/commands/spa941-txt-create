@@ -1,0 +1,849 @@
+#!/bin/bash
+# *** 
+# *** SPA941 Absytech Telecom
+# *** 
+# *** $1 : Admin_Passwd
+# *** $2 : Ip serveur Asterisk
+# *** $3 : Nom du téléphone (nom de la personne)
+# *** $4 : Numéro compte SIP
+# *** $5 : Mot de passe du compte sip
+
+
+# *** Configuration du système
+
+echo "Restricted_Access_Domains                       \"\" ;"
+echo "Enable_Web_Server                               \"Yes\" ;"
+echo "Web_Server_Port                                 \"80\" ;"
+echo "Enable_Web_Admin_Access                         \"Yes\" ;"
+echo "Admin_Passwd                                    \""$1"\" ;"
+echo "User_Password                                 ! \"\" ;"
+
+# *** Internet Connection Type 
+
+echo "DHCP                                            \"Yes\" ;"
+echo "Static_IP                                       \"\" ;"
+echo "NetMask                                         \"\" ;"
+echo "Gateway                                         \"\" ;"
+
+# *** Optional Network Configuration
+
+echo "HostName                                        \"\" ;"
+echo "Domain                                          \"\" ;"
+echo "Primary_DNS                                     \"\" ;"
+echo "Secondary_DNS                                   \"\" ;"
+echo "DNS_Server_Order                                \"Manual\" ;"  # options: Manual/Manual,DHCP/DHCP,Manual
+echo "DNS_Query_Mode                                  \"Parallel\" ;"  # options: Parallel/Sequential
+echo "Syslog_Server                                   \"\" ;"
+echo "Debug_Server                                    \"\" ;"
+echo "Debug_Level                                     \"0\" ;"  # options: 0/1/2/3
+echo "Primary_NTP_Server                              \""$2"\" ;"
+echo "Secondary_NTP_Server                            \"\" ;"
+
+# *** VLAN Settings
+
+echo "Enable_VLAN                                     \"No\" ;"
+echo "VLAN_ID                                         \"1\" ;"
+
+# *** Configuration Profile
+
+echo "Provision_Enable                                \"Yes\" ;"
+echo "Resync_On_Reset                                 \"Yes\" ;"
+echo "Resync_Random_Delay                             \"2\" ;"
+echo "Resync_Periodic                                 \"3600\" ;"
+echo "Resync_Error_Retry_Delay                        \"3600\" ;"
+echo "Forced_Resync_Delay                             \"14400\" ;"
+echo "Resync_From_SIP                                 \"Yes\" ;"
+echo "Resync_After_Upgrade_Attempt                    \"Yes\" ;"
+echo "Resync_Trigger_1                                \"\" ;"
+echo "Resync_Trigger_2                                \"\" ;"
+echo "Resync_Fails_On_FNF                             \"Yes\" ;"
+echo "Profile_Rule                                    \"/spa\$PSN.cfg\" ;"
+echo "Profile_Rule_B                                  \"\" ;"
+echo "Profile_Rule_C                                  \"\" ;"
+echo "Profile_Rule_D                                  \"\" ;"
+echo "Log_Resync_Request_Msg                          \"\$PN \$MAC -- Requesting resync \$SCHEME://\$SERVIP:\$PORT\$PATH\" ;"
+echo "Log_Resync_Success_Msg                          \"\$PN \$MAC -- Successful resync \$SCHEME://\$SERVIP:\$PORT\$PATH\" ;"
+echo "Log_Resync_Failure_Msg                          \"\$PN \$MAC -- Resync failed: \$ERR\" ;"
+echo "Report_Rule                                     \"\" ;"
+
+# *** Firmware Upgrade
+
+echo "Upgrade_Enable                                  \"Yes\" ;"
+echo "Upgrade_Error_Retry_Delay                       \"3600\" ;"
+echo "Downgrade_Rev_Limit                             \"\" ;"
+echo "Upgrade_Rule                                    \"/upgrade/firm\$PSN.bin\" ;"
+echo "Log_Upgrade_Request_Msg                         \"\$PN \$MAC -- Requesting upgrade \$SCHEME://\$SERVIP:\$PORT\$PATH\" ;"
+echo "Log_Upgrade_Success_Msg                         \"\$PN \$MAC -- Successful upgrade \$SCHEME://\$SERVIP:\$PORT\$PATH -- \$ERR\" ;"
+echo "Log_Upgrade_Failure_Msg                         \"\$PN \$MAC -- Upgrade failed: \$ERR\" ;"
+echo "License_Keys                                    \"\" ;"
+
+# *** General Purpose Parameters
+
+echo "GPP_A                                           \"\" ;"
+echo "GPP_B                                           \"\" ;"
+echo "GPP_C                                           \"\" ;"
+echo "GPP_D                                           \"\" ;"
+echo "GPP_E                                           \"\" ;"
+echo "GPP_F                                           \"\" ;"
+echo "GPP_G                                           \"\" ;"
+echo "GPP_H                                           \"\" ;"
+echo "GPP_I                                           \"\" ;"
+echo "GPP_J                                           \"\" ;"
+echo "GPP_K                                           \"\" ;"
+echo "GPP_L                                           \"\" ;"
+echo "GPP_M                                           \"\" ;"
+echo "GPP_N                                           \"\" ;"
+echo "GPP_O                                           \"\" ;"
+echo "GPP_P                                           \"\" ;"
+echo "GPP_SA                                          \"\" ;"
+echo "GPP_SB                                          \"\" ;"
+echo "GPP_SC                                          \"\" ;"
+echo "GPP_SD                                          \"\" ;"
+
+# *** SIP Parameters
+
+echo "Max_Forward                                     \"70\" ;"
+echo "Max_Redirection                                 \"5\" ;"
+echo "Max_Auth                                        \"2\" ;"
+echo "SIP_User_Agent_Name                             \"\$VERSION\" ;"
+echo "SIP_Server_Name                                 \"\$VERSION\" ;"
+echo "SIP_Reg_User_Agent_Name                         \"\" ;"
+echo "SIP_Accept_Language                             \"\" ;"
+echo "DTMF_Relay_MIME_Type                            \"application/dtmf-relay\" ;"
+echo "Remove_Last_Reg                                 \"No\" ;"
+echo "Use_Compact_Header                              \"No\" ;"
+echo "Escape_Display_Name                             \"No\" ;"
+echo "SIP-B_Enable                                    \"No\" ;"
+echo "Talk_Package                                    \"No\" ;"
+echo "Hold_Package                                    \"No\" ;"
+echo "Conference_Package                              \"No\" ;"
+echo "Notify_Conference                               \"No\" ;"
+echo "RFC_2543_Call_Hold                              \"Yes\" ;"
+echo "Random_REG_CID_On_Reboot                        \"No\" ;"
+
+# *** SIP Timer Values (sec)
+
+echo "SIP_T1                                          \".5\" ;"
+echo "SIP_T2                                          \"4\" ;"
+echo "SIP_T4                                          \"5\" ;"
+echo "SIP_Timer_B                                     \"16\" ;"
+echo "SIP_Timer_F                                     \"16\" ;"
+echo "SIP_Timer_H                                     \"16\" ;"
+echo "SIP_Timer_D                                     \"16\" ;"
+echo "SIP_Timer_J                                     \"16\" ;"
+echo "INVITE_Expires                                  \"240\" ;"
+echo "ReINVITE_Expires                                \"30\" ;"
+echo "Reg_Min_Expires                                 \"1\" ;"
+echo "Reg_Max_Expires                                 \"7200\" ;"
+echo "Reg_Retry_Intvl                                 \"30\" ;"
+echo "Reg_Retry_Long_Intvl                            \"1200\" ;"
+echo "Sub_Min_Expires                                 \"10\" ;"
+echo "Sub_Max_Expires                                 \"7200\" ;"
+echo "Sub_Retry_Intvl                                 \"10\" ;"
+
+# *** Response Status Code Handling
+
+echo "SIT1_RSC                                        \"\" ;"
+echo "SIT2_RSC                                        \"\" ;"
+echo "SIT3_RSC                                        \"\" ;"
+echo "SIT4_RSC                                        \"\" ;"
+echo "Try_Backup_RSC                                  \"\" ;"
+echo "Retry_Reg_RSC                                   \"\" ;"
+
+# *** RTP Parameters
+
+echo "RTP_Port_Min                                    \"16384\" ;"
+echo "RTP_Port_Max                                    \"16482\" ;"
+echo "RTP_Packet_Size                                 \"0.030\" ;"
+echo "Max_RTP_ICMP_Err                                \"0\" ;"
+echo "RTCP_Tx_Interval                                \"0\" ;"
+echo "No_UDP_Checksum                                 \"No\" ;"
+echo "Symmetric_RTP                                   \"No\" ;"
+echo "Stats_In_BYE                                    \"No\" ;"
+
+# *** SDP Payload Types
+
+echo "AVT_Dynamic_Payload                             \"101\" ;"
+echo "INFOREQ_Dynamic_Payload                         \"\" ;"
+echo "G726r16_Dynamic_Payload                         \"98\" ;"
+echo "G726r24_Dynamic_Payload                         \"97\" ;"
+echo "G726r32_Dynamic_Payload                         \"2\" ;"
+echo "G726r40_Dynamic_Payload                         \"96\" ;"
+echo "G729b_Dynamic_Payload                           \"99\" ;"
+echo "AVT_Codec_Name                                  \"telephone-event\" ;"
+echo "G711u_Codec_Name                                \"PCMU\" ;"
+echo "G711a_Codec_Name                                \"PCMA\" ;"
+echo "G726r16_Codec_Name                              \"G726-16\" ;"
+echo "G726r24_Codec_Name                              \"G726-24\" ;"
+echo "G726r32_Codec_Name                              \"G726-32\" ;"
+echo "G726r40_Codec_Name                              \"G726-40\" ;"
+echo "G729a_Codec_Name                                \"G729a\" ;"
+echo "G729b_Codec_Name                                \"G729ab\" ;"
+echo "G723_Codec_Name                                 \"G723\" ;"
+
+# *** NAT Support Parameters
+
+echo "Handle_VIA_received                             \"No\" ;"
+echo "Handle_VIA_rport                                \"No\" ;"
+echo "Insert_VIA_received                             \"No\" ;"
+echo "Insert_VIA_rport                                \"No\" ;"
+echo "Substitute_VIA_Addr                             \"No\" ;"
+echo "Send_Resp_To_Src_Port                           \"No\" ;"
+echo "STUN_Enable                                     \"No\" ;"
+echo "STUN_Test_Enable                                \"No\" ;"
+echo "STUN_Server                                     \"\" ;"
+echo "EXT_IP                                          \"\" ;"
+echo "EXT_RTP_Port_Min                                \"\" ;"
+echo "NAT_Keep_Alive_Intvl                            \"15\" ;"
+
+# *** Linksys Key System Parameters
+
+echo "Linksys_Key_System                              \"No\" ;"
+echo "Multicast_Address                               \"224.168.168.168:6061\" ;"
+echo "Force_LAN_Codec                                 \"none\" ;"  # options: none/G711u/G711a
+
+# *** General
+
+echo "Line_Enable[1]                                  \"Yes\" ;"
+
+# *** Share Line Appearance
+
+echo "Share_Ext[1]                                    \"private\" ;"  # options: private/shared
+echo "Shared_User_ID[1]                               \"\" ;"
+echo "Subscription_Expires[1]                         \"3600\" ;"
+
+# *** NAT Settings
+
+echo "NAT_Mapping_Enable[1]                           \"No\" ;"
+echo "NAT_Keep_Alive_Enable[1]                        \"No\" ;"
+echo "NAT_Keep_Alive_Msg[1]                           \"\$NOTIFY\" ;"
+echo "NAT_Keep_Alive_Dest[1]                          \"\$PROXY\" ;"
+
+# *** Network Settings
+
+echo "SIP_TOS/DiffServ_Value[1]                       \"0x68\" ;"
+echo "SIP_CoS_Value[1]                                \"3\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "RTP_TOS/DiffServ_Value[1]                       \"0xb8\" ;"
+echo "RTP_CoS_Value[1]                                \"6\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "Network_Jitter_Level[1]                         \"high\" ;"  # options: low/medium/high/very high/extremely high
+echo "Jitter_Buffer_Adjustment[1]                     \"up and down\" ;"  # options: up and down/up only/down only/disable
+
+# *** SIP Settings
+
+echo "SIP_Port[1]                                     \"5060\" ;"
+echo "SIP_100REL_Enable[1]                            \"No\" ;"
+echo "EXT_SIP_Port[1]                                 \"\" ;"
+echo "Auth_Resync-Reboot[1]                           \"Yes\" ;"
+echo "SIP_Proxy-Require[1]                            \"\" ;"
+echo "SIP_Remote-Party-ID[1]                          \"No\" ;"
+echo "Referor_Bye_Delay[1]                            \"4\" ;"
+echo "Refer-To_Target_Contact[1]                      \"No\" ;"
+echo "Referee_Bye_Delay[1]                            \"0\" ;"
+echo "SIP_Debug_Option[1]                             \"none\" ;"  # options: none/1-line/1-line excl. OPT/1-line excl. NTFY/1-line excl. REG/1-line excl. OPT|NTFY|REG/full/full excl. OPT/full excl. NTFY/full excl. REG/full excl. OPT|NTFY|REG
+echo "Refer_Target_Bye_Delay[1]                       \"0\" ;"
+echo "Sticky_183[1]                                   \"No\" ;"
+
+# *** Call Feature Settings
+
+echo "Blind_Attn-Xfer_Enable[1]                       \"No\" ;"
+echo "MOH_Server[1]                                   \"\" ;"
+echo "Message_Waiting[1]                              \"No\" ;"
+echo "Auth_Page[1]                                    \"No\" ;"
+echo "Default_Ring[1]                                 \"1\" ;"  # options: No Ring/1/2/3/4/5/6/7/8/9/10/User 1/User 2
+echo "Auth_Page_Realm[1]                              \"\" ;"
+echo "Conference_Bridge_URL[1]                        \"\" ;"
+echo "Auth_Page_Password[1]                           \"\" ;"
+echo "Mailbox_ID[1]                                   \"\" ;"
+echo "Voice_Mail_Server[1]                            \"\" ;"
+echo "State_Agent[1]                                  \"\" ;"
+echo "CFWD_Notify_Serv[1]                             \"No\" ;"
+echo "CFWD_Notifier[1]                                \"\" ;"
+
+# *** Proxy and Registration
+
+echo "Proxy[1]                                        \""$2"\" ;"
+echo "Use_Outbound_Proxy[1]                           \"No\" ;"
+echo "Outbound_Proxy[1]                               \""$2"\" ;"
+echo "Use_OB_Proxy_In_Dialog[1]                       \"Yes\" ;"
+echo "Register[1]                                     \"Yes\" ;"
+echo "Make_Call_Without_Reg[1]                        \"No\" ;"
+echo "Register_Expires[1]                             \"3600\" ;"
+echo "Ans_Call_Without_Reg[1]                         \"No\" ;"
+echo "Use_DNS_SRV[1]                                  \"No\" ;"
+echo "DNS_SRV_Auto_Prefix[1]                          \"No\" ;"
+echo "Proxy_Fallback_Intvl[1]                         \"3600\" ;"
+echo "Proxy_Redundancy_Method[1]                      \"Normal\" ;"  # options: Normal/Based on SRV Port
+
+# *** Subscriber Information
+
+echo "Display_Name[1]                                 \""$3"\" ;"
+echo "User_ID[1]                                      \""$4"\" ;"
+echo "Password[1]                                     \""$5"\" ;"
+echo "Use_Auth_ID[1]                                  \"No\" ;"
+echo "Auth_ID[1]                                      \""$4"\" ;"
+echo "Mini_Certificate[1]                             \"\" ;"
+echo "SRTP_Private_Key[1]                             \"\" ;"
+
+# *** Audio Configuration
+
+echo "Preferred_Codec[1]                              \"G711u\" ;"  # options: G711u/G711a/G726-16/G726-24/G726-32/G726-40/G729a/G723
+echo "Use_Pref_Codec_Only[1]                          \"No\" ;"
+echo "G729a_Enable[1]                                 \"Yes\" ;"
+echo "G723_Enable[1]                                  \"Yes\" ;"
+echo "G726-16_Enable[1]                               \"Yes\" ;"
+echo "G726-24_Enable[1]                               \"Yes\" ;"
+echo "G726-32_Enable[1]                               \"Yes\" ;"
+echo "G726-40_Enable[1]                               \"Yes\" ;"
+echo "Release_Unused_Codec[1]                         \"Yes\" ;"
+echo "DTMF_Process_AVT[1]                             \"Yes\" ;"
+echo "Silence_Supp_Enable[1]                          \"No\" ;"
+echo "DTMF_Tx_Method[1]                               \"Auto\" ;"  # options: InBand/AVT/INFO/Auto/InBand+INFO/AVT+INFO
+
+# *** Dial Plan
+
+echo "Dial_Plan[1]                                    \"(*xx|[3469]11|0|00|[2-9]xxxxxx|1xxx[2-9]xxxxxxS0|xxxxxxxxxxxx.)\" ;"
+echo "Enable_IP_Dialing[1]                            \"Yes\" ;"
+
+# *** General
+
+echo "Line_Enable[2]                                  \"Yes\" ;"
+
+# *** Share Line Appearance
+
+echo "Share_Ext[2]                                    \"private\" ;"  # options: private/shared
+echo "Shared_User_ID[2]                               \"\" ;"
+echo "Subscription_Expires[2]                         \"3600\" ;"
+
+# *** NAT Settings
+
+echo "NAT_Mapping_Enable[2]                           \"No\" ;"
+echo "NAT_Keep_Alive_Enable[2]                        \"No\" ;"
+echo "NAT_Keep_Alive_Msg[2]                           \"\$NOTIFY\" ;"
+echo "NAT_Keep_Alive_Dest[2]                          \"\$PROXY\" ;"
+
+# *** Network Settings
+
+echo "SIP_TOS/DiffServ_Value[2]                       \"0x68\" ;"
+echo "SIP_CoS_Value[2]                                \"3\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "RTP_TOS/DiffServ_Value[2]                       \"0xb8\" ;"
+echo "RTP_CoS_Value[2]                                \"6\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "Network_Jitter_Level[2]                         \"high\" ;"  # options: low/medium/high/very high/extremely high
+echo "Jitter_Buffer_Adjustment[2]                     \"up and down\" ;"  # options: up and down/up only/down only/disable
+
+# *** SIP Settings
+
+echo "SIP_Port[2]                                     \"5061\" ;"
+echo "SIP_100REL_Enable[2]                            \"No\" ;"
+echo "EXT_SIP_Port[2]                                 \"\" ;"
+echo "Auth_Resync-Reboot[2]                           \"Yes\" ;"
+echo "SIP_Proxy-Require[2]                            \"\" ;"
+echo "SIP_Remote-Party-ID[2]                          \"No\" ;"
+echo "Referor_Bye_Delay[2]                            \"4\" ;"
+echo "Refer-To_Target_Contact[2]                      \"No\" ;"
+echo "Referee_Bye_Delay[2]                            \"0\" ;"
+echo "SIP_Debug_Option[2]                             \"none\" ;"  # options: none/1-line/1-line excl. OPT/1-line excl. NTFY/1-line excl. REG/1-line excl. OPT|NTFY|REG/full/full excl. OPT/full excl. NTFY/full excl. REG/full excl. OPT|NTFY|REG
+echo "Refer_Target_Bye_Delay[2]                       \"0\" ;"
+echo "Sticky_183[2]                                   \"No\" ;"
+
+# *** Call Feature Settings
+
+echo "Blind_Attn-Xfer_Enable[2]                       \"No\" ;"
+echo "MOH_Server[2]                                   \"\" ;"
+echo "Message_Waiting[2]                              \"No\" ;"
+echo "Auth_Page[2]                                    \"No\" ;"
+echo "Default_Ring[2]                                 \"1\" ;"  # options: No Ring/1/2/3/4/5/6/7/8/9/10/User 1/User 2
+echo "Auth_Page_Realm[2]                              \"\" ;"
+echo "Conference_Bridge_URL[2]                        \"\" ;"
+echo "Auth_Page_Password[2]                           \"\" ;"
+echo "Mailbox_ID[2]                                   \"\" ;"
+echo "Voice_Mail_Server[2]                            \"\" ;"
+echo "State_Agent[2]                                  \"\" ;"
+echo "CFWD_Notify_Serv[2]                             \"No\" ;"
+echo "CFWD_Notifier[2]                                \"\" ;"
+
+# *** Proxy and Registration
+
+echo "Proxy[2]                                        \"\" ;"
+echo "Use_Outbound_Proxy[2]                           \"No\" ;"
+echo "Outbound_Proxy[2]                               \"\" ;"
+echo "Use_OB_Proxy_In_Dialog[2]                       \"Yes\" ;"
+echo "Register[2]                                     \"Yes\" ;"
+echo "Make_Call_Without_Reg[2]                        \"No\" ;"
+echo "Register_Expires[2]                             \"3600\" ;"
+echo "Ans_Call_Without_Reg[2]                         \"No\" ;"
+echo "Use_DNS_SRV[2]                                  \"No\" ;"
+echo "DNS_SRV_Auto_Prefix[2]                          \"No\" ;"
+echo "Proxy_Fallback_Intvl[2]                         \"3600\" ;"
+echo "Proxy_Redundancy_Method[2]                      \"Normal\" ;"  # options: Normal/Based on SRV Port
+
+# *** Subscriber Information
+
+echo "Display_Name[2]                                 \"\" ;"
+echo "User_ID[2]                                      \"\" ;"
+echo "Password[2]                                     \"\" ;"
+echo "Use_Auth_ID[2]                                  \"No\" ;"
+echo "Auth_ID[2]                                      \"\" ;"
+echo "Mini_Certificate[2]                             \"\" ;"
+echo "SRTP_Private_Key[2]                             \"\" ;"
+
+# *** Audio Configuration
+
+echo "Preferred_Codec[2]                              \"G711u\" ;"  # options: echo "G711u/G711a/G726-16/G726-24/G726-32/G726-40/G729a/G723
+echo "Use_Pref_Codec_Only[2]                          \"No\" ;"
+echo "G729a_Enable[2]                                 \"Yes\" ;"
+echo "G723_Enable[2]                                  \"Yes\" ;"
+echo "G726-16_Enable[2]                               \"Yes\" ;"
+echo "G726-24_Enable[2]                               \"Yes\" ;"
+echo "G726-32_Enable[2]                               \"Yes\" ;"
+echo "G726-40_Enable[2]                               \"Yes\" ;"
+echo "Release_Unused_Codec[2]                         \"Yes\" ;"
+echo "DTMF_Process_AVT[2]                             \"Yes\" ;"
+echo "Silence_Supp_Enable[2]                          \"No\" ;"
+echo "DTMF_Tx_Method[2]                               \"Auto\" ;"  # options: InBand/AVT/INFO/Auto/InBand+INFO/AVT+INFO
+
+# *** Dial Plan
+
+echo "Dial_Plan[2]                                    \"(*xx|[3469]11|0|00|[2-9]xxxxxx|1xxx[2-9]xxxxxxS0|xxxxxxxxxxxx.)\" ;"
+echo "Enable_IP_Dialing[2]                            \"Yes\" ;"
+
+# *** General
+
+echo "Line_Enable[3]                                  \"Yes\" ;"
+
+# *** Share Line Appearance
+
+echo "Share_Ext[3]                                    \"private\" ;"  # options: private/shared
+echo "Shared_User_ID[3]                               \"\" ;"
+echo "Subscription_Expires[3]                         \"3600\" ;"
+
+# *** NAT Settings
+
+echo "NAT_Mapping_Enable[3]                           \"No\" ;"
+echo "NAT_Keep_Alive_Enable[3]                        \"No\" ;"
+echo "NAT_Keep_Alive_Msg[3]                           \"\$NOTIFY\" ;"
+echo "NAT_Keep_Alive_Dest[3]                          \"\$PROXY\" ;"
+
+# *** Network Settings
+
+echo "SIP_TOS/DiffServ_Value[3]                       \"0x68\" ;"
+echo "SIP_CoS_Value[3]                                \"3\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "RTP_TOS/DiffServ_Value[3]                       \"0xb8\" ;"
+echo "RTP_CoS_Value[3]                                \"6\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "Network_Jitter_Level[3]                         \"high\" ;"  # options: low/medium/high/very high/extremely high
+echo "Jitter_Buffer_Adjustment[3]                     \"up and down\" ;"  # options: up and down/up only/down only/disable
+
+# *** SIP Settings
+
+echo "SIP_Port[3]                                     \"5062\" ;"
+echo "SIP_100REL_Enable[3]                            \"No\" ;"
+echo "EXT_SIP_Port[3]                                 \"\" ;"
+echo "Auth_Resync-Reboot[3]                           \"Yes\" ;"
+echo "SIP_Proxy-Require[3]                            \"\" ;"
+echo "SIP_Remote-Party-ID[3]                          \"No\" ;"
+echo "Referor_Bye_Delay[3]                            \"4\" ;"
+echo "Refer-To_Target_Contact[3]                      \"No\" ;"
+echo "Referee_Bye_Delay[3]                            \"0\" ;"
+echo "SIP_Debug_Option[3]                             \"none\" ;"  # options: none/1-line/1-line excl. OPT/1-line excl. NTFY/1-line excl. REG/1-line excl. OPT|NTFY|REG/full/full excl. OPT/full excl. NTFY/full excl. REG/full excl. OPT|NTFY|REG
+echo "Refer_Target_Bye_Delay[3]                       \"0\" ;"
+echo "Sticky_183[3]                                   \"No\" ;"
+
+# *** Call Feature Settings
+
+echo "Blind_Attn-Xfer_Enable[3]                       \"No\" ;"
+echo "MOH_Server[3]                                   \"\" ;"
+echo "Message_Waiting[3]                              \"No\" ;"
+echo "Auth_Page[3]                                    \"No\" ;"
+echo "Default_Ring[3]                                 \"1\" ;"  # options: No Ring/1/2/3/4/5/6/7/8/9/10/User 1/User 2
+echo "Auth_Page_Realm[3]                              \"\" ;"
+echo "Conference_Bridge_URL[3]                        \"\" ;"
+echo "Auth_Page_Password[3]                           \"\" ;"
+echo "Mailbox_ID[3]                                   \"\" ;"
+echo "Voice_Mail_Server[3]                            \"\" ;"
+echo "State_Agent[3]                                  \"\" ;"
+echo "CFWD_Notify_Serv[3]                             \"No\" ;"
+echo "CFWD_Notifier[3]                                \"\" ;"
+
+# *** Proxy and Registration
+
+echo "Proxy[3]                                        \"\" ;"
+echo "Use_Outbound_Proxy[3]                           \"No\" ;"
+echo "Outbound_Proxy[3]                               \"\" ;"
+echo "Use_OB_Proxy_In_Dialog[3]                       \"Yes\" ;"
+echo "Register[3]                                     \"Yes\" ;"
+echo "Make_Call_Without_Reg[3]                        \"No\" ;"
+echo "Register_Expires[3]                             \"3600\" ;"
+echo "Ans_Call_Without_Reg[3]                         \"No\" ;"
+echo "Use_DNS_SRV[3]                                  \"No\" ;"
+echo "DNS_SRV_Auto_Prefix[3]                          \"No\" ;"
+echo "Proxy_Fallback_Intvl[3]                         \"3600\" ;"
+echo "Proxy_Redundancy_Method[3]                      \"Normal\" ;"  # options: Normal/Based on SRV Port
+
+# *** Subscriber Information
+
+echo "Display_Name[3]                                 \"\" ;"
+echo "User_ID[3]                                      \"\" ;"
+echo "Password[3]                                     \"\" ;"
+echo "Use_Auth_ID[3]                                  \"No\" ;"
+echo "Auth_ID[3]                                      \"\" ;"
+echo "Mini_Certificate[3]                             \"\" ;"
+echo "SRTP_Private_Key[3]                             \"\" ;"
+
+# *** Audio Configuration
+
+echo "Preferred_Codec[3]                              \"G711u\" ;"  # options: G711u/G711a/G726-16/G726-24/G726-32/G726-40/G729a/G723
+echo "Use_Pref_Codec_Only[3]                          \"No\" ;"
+echo "G729a_Enable[3]                                 \"Yes\" ;"
+echo "G723_Enable[3]                                  \"Yes\" ;"
+echo "G726-16_Enable[3]                               \"Yes\" ;"
+echo "G726-24_Enable[3]                               \"Yes\" ;"
+echo "G726-32_Enable[3]                               \"Yes\" ;"
+echo "G726-40_Enable[3]                               \"Yes\" ;"
+echo "Release_Unused_Codec[3]                         \"Yes\" ;"
+echo "DTMF_Process_AVT[3]                             \"Yes\" ;"
+echo "Silence_Supp_Enable[3]                          \"No\" ;"
+echo "DTMF_Tx_Method[3]                               \"Auto\" ;"  # options: InBand/AVT/INFO/Auto/InBand+INFO/AVT+INFO
+
+# *** Dial Plan
+
+echo "Dial_Plan[3]                                    \"(*xx|[3469]11|0|00|[2-9]xxxxxx|1xxx[2-9]xxxxxxS0|xxxxxxxxxxxx.)\" ;"
+echo "Enable_IP_Dialing[3]                            \"Yes\" ;"
+
+# *** General
+
+echo "Line_Enable[4]                                  \"Yes\" ;"
+
+# *** Share Line Appearance
+
+echo "Share_Ext[4]                                    \"private\" ;"  # options: private/shared
+echo "Shared_User_ID[4]                               \"\" ;"
+echo "Subscription_Expires[4]                         \"3600\" ;"
+
+# *** NAT Settings
+
+echo "NAT_Mapping_Enable[4]                           \"No\" ;"
+echo "NAT_Keep_Alive_Enable[4]                        \"No\" ;"
+echo "NAT_Keep_Alive_Msg[4]                           \"\$NOTIFY\" ;"
+echo "NAT_Keep_Alive_Dest[4]                          \"\$PROXY\" ;"
+
+# *** Network Settings
+
+echo "SIP_TOS/DiffServ_Value[4]                       \"0x68\" ;"
+echo "SIP_CoS_Value[4]                                \"3\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "RTP_TOS/DiffServ_Value[4]                       \"0xb8\" ;"
+echo "RTP_CoS_Value[4]                                \"6\" ;"  # options: 0/1/2/3/4/5/6/7
+echo "Network_Jitter_Level[4]                         \"high\" ;"  # options: low/medium/high/very high/extremely high
+echo "Jitter_Buffer_Adjustment[4]                     \"up and down\" ;"  # options: up and down/up only/down only/disable
+
+# *** SIP Settings
+
+echo "SIP_Port[4]                                     \"5063\" ;"
+echo "SIP_100REL_Enable[4]                            \"No\" ;"
+echo "EXT_SIP_Port[4]                                 \"\" ;"
+echo "Auth_Resync-Reboot[4]                           \"Yes\" ;"
+echo "SIP_Proxy-Require[4]                            \"\" ;"
+echo "SIP_Remote-Party-ID[4]                          \"No\" ;"
+echo "Referor_Bye_Delay[4]                            \"4\" ;"
+echo "Refer-To_Target_Contact[4]                      \"No\" ;"
+echo "Referee_Bye_Delay[4]                            \"0\" ;"
+echo "SIP_Debug_Option[4]                             \"none\" ;"  # options: none/1-line/1-line excl. OPT/1-line excl. NTFY/1-line excl. REG/1-line excl. OPT|NTFY|REG/full/full excl. OPT/full excl. NTFY/full excl. REG/full excl. OPT|NTFY|REG
+echo "Refer_Target_Bye_Delay[4]                       \"0\" ;"
+echo "Sticky_183[4]                                   \"No\" ;"
+
+# *** Call Feature Settings
+
+echo "Blind_Attn-Xfer_Enable[4]                       \"No\" ;"
+echo "MOH_Server[4]                                   \"\" ;"
+echo "Message_Waiting[4]                              \"No\" ;"
+echo "Auth_Page[4]                                    \"No\" ;"
+echo "Default_Ring[4]                                 \"1\" ;"  # options: No Ring/1/2/3/4/5/6/7/8/9/10/User 1/User 2
+echo "Auth_Page_Realm[4]                              \"\" ;"
+echo "Conference_Bridge_URL[4]                        \"\" ;"
+echo "Auth_Page_Password[4]                           \"\" ;"
+echo "Mailbox_ID[4]                                   \"\" ;"
+echo "Voice_Mail_Server[4]                            \"\" ;"
+echo "State_Agent[4]                                  \"\" ;"
+echo "CFWD_Notify_Serv[4]                             \"No\" ;"
+echo "CFWD_Notifier[4]                                \"\" ;"
+
+# *** Proxy and Registration
+
+echo "Proxy[4]                                        \"\" ;"
+echo "Use_Outbound_Proxy[4]                           \"No\" ;"
+echo "Outbound_Proxy[4]                               \"\" ;"
+echo "Use_OB_Proxy_In_Dialog[4]                       \"Yes\" ;"
+echo "Register[4]                                     \"Yes\" ;"
+echo "Make_Call_Without_Reg[4]                        \"No\" ;"
+echo "Register_Expires[4]                             \"3600\" ;"
+echo "Ans_Call_Without_Reg[4]                         \"No\" ;"
+echo "Use_DNS_SRV[4]                                  \"No\" ;"
+echo "DNS_SRV_Auto_Prefix[4]                          \"No\" ;"
+echo "Proxy_Fallback_Intvl[4]                         \"3600\" ;"
+echo "Proxy_Redundancy_Method[4]                      \"Normal\" ;"  # options: Normal/Based on SRV Port
+
+# *** Subscriber Information
+
+echo "Display_Name[4]                                 \"\" ;"
+echo "User_ID[4]                                      \"\" ;"
+echo "Password[4]                                     \"\" ;"
+echo "Use_Auth_ID[4]                                  \"No\" ;"
+echo "Auth_ID[4]                                      \"\" ;"
+echo "Mini_Certificate[4]                             \"\" ;"
+echo "SRTP_Private_Key[4]                             \"\" ;"
+
+# *** Audio Configuration
+
+echo "Preferred_Codec[4]                              \"G711u\" ;"  # options: G711u/G711a/G726-16/G726-24/G726-32/G726-40/G729a/G723
+echo "Use_Pref_Codec_Only[4]                          \"No\" ;"
+echo "G729a_Enable[4]                                 \"Yes\" ;"
+echo "G723_Enable[4]                                  \"Yes\" ;"
+echo "G726-16_Enable[4]                               \"Yes\" ;"
+echo "G726-24_Enable[4]                               \"Yes\" ;"
+echo "G726-32_Enable[4]                               \"Yes\" ;"
+echo "G726-40_Enable[4]                               \"Yes\" ;"
+echo "Release_Unused_Codec[4]                         \"Yes\" ;"
+echo "DTMF_Process_AVT[4]                             \"Yes\" ;"
+echo "Silence_Supp_Enable[4]                          \"No\" ;"
+echo "DTMF_Tx_Method[4]                               \"Auto\" ;"  # options: InBand/AVT/INFO/Auto/InBand+INFO/AVT+INFO
+
+# *** Dial Plan
+
+echo "Dial_Plan[4]                                    \"(*xx|[3469]11|0|00|[2-9]xxxxxx|1xxx[2-9]xxxxxxS0|xxxxxxxxxxxx.)\" ;"
+echo "Enable_IP_Dialing[4]                            \"Yes\" ;"
+
+# *** Call Forward
+
+echo "Cfwd_All_Dest                                 ! \"\" ;"
+echo "Cfwd_Busy_Dest                                ! \"\" ;"
+echo "Cfwd_No_Ans_Dest                              ! \"\" ;"
+echo "Cfwd_No_Ans_Delay                             ! \"20\" ;"
+
+# *** Speed Dial
+
+echo "Speed_Dial_2                                  ! \"\" ;"
+echo "Speed_Dial_3                                  ! \"\" ;"
+echo "Speed_Dial_4                                  ! \"\" ;"
+echo "Speed_Dial_5                                  ! \"\" ;"
+echo "Speed_Dial_6                                  ! \"\" ;"
+echo "Speed_Dial_7                                  ! \"\" ;"
+echo "Speed_Dial_8                                  ! \"\" ;"
+echo "Speed_Dial_9                                  ! \"\" ;"
+
+# *** Supplementary Services
+
+echo "CW_Setting                                    ! \"Yes\" ;"
+echo "Block_CID_Setting                             ! \"No\" ;"
+echo "Block_ANC_Setting                             ! \"No\" ;"
+echo "DND_Setting                                   ! \"No\" ;"
+echo "Secure_Call_Setting                             \"No\" ;"
+echo "Dial_Assistance                                 \"Yes\" ;"
+echo "Auto_Answer_Page                                \"Yes\" ;"
+echo "Preferred_Audio_Device                          \"Speaker\" ;"  # options: Speaker/Headset
+echo "Send_Audio_To_Speaker                           \"No\" ;"
+echo "Time_Format                                     \"24hr\" ;"  # options: 12hr/24hr
+echo "Date_Format                                     \"day/month\" ;"  # options: month/day/day/month
+echo "Miss_Call_Shortcut                              \"Yes\" ;"
+
+# *** Audio Volume
+
+echo "Ringer_Volume                                 ! \"8\" ;"
+echo "Speaker_Volume                                ! \"8\" ;"
+echo "Handset_Volume                                ! \"10\" ;"
+echo "Headset_Volume                                ! \"10\" ;"
+echo "Lcd_Contrast                                  ! \"8\" ;"
+
+# *** General
+
+echo "Station_Name                                    \""$3"\" ;"
+echo "Voice_Mail_Number                               \"123\" ;"
+echo "Text_Logo                                       \"Absystech Telecom\" ;"
+
+# *** Line Key 1
+
+echo "Extension[1]                                    \"1\" ;"  # options: 1/2/3/4/Disabled
+echo "Short_Name[1]                                   \"\$USER\" ;"
+echo "Share_Call_Appearance[1]                        \"private\" ;"  # options: private/shared
+
+# *** Line Key 2
+
+echo "Extension[2]                                    \"1\" ;"  # options: 1/2/3/4/Disabled
+echo "Short_Name[2]                                   \"\$USER\" ;"
+echo "Share_Call_Appearance[2]                        \"private\" ;"  # options: private/shared
+
+# *** Line Key 3
+
+echo "Extension[3]                                    \"1\" ;"  # options: 1/2/3/4/Disabled
+echo "Short_Name[3]                                   \"\$USER\" ;"
+echo "Share_Call_Appearance[3]                        \"private\" ;"  # options: private/shared
+
+# *** Line Key 4
+
+echo "Extension[4]                                    \"1\" ;"  # options: 1/2/3/4/Disabled
+echo "Short_Name[4]                                   \"\$USER\" ;"
+echo "Share_Call_Appearance[4]                        \"private\" ;"  # options: private/shared
+
+# *** Line Key LED Pattern
+
+echo "Idle_LED                                        \"\" ;"
+echo "Remote_Undefined_LED                            \"\" ;"
+echo "Local_Seized_LED                                \"\" ;"
+echo "Remote_Seized_LED                               \"\" ;"
+echo "Local_Progressing_LED                           \"\" ;"
+echo "Remote_Progressing_LED                          \"\" ;"
+echo "Local_Ringing_LED                               \"\" ;"
+echo "Remote_Ringing_LED                              \"\" ;"
+echo "Local_Active_LED                                \"\" ;"
+echo "Remote_Active_LED                               \"\" ;"
+echo "Local_Held_LED                                  \"\" ;"
+echo "Remote_Held_LED                                 \"\" ;"
+echo "Register_Failed_LED                             \"\" ;"
+echo "Disabled_LED                                    \"\" ;"
+echo "Registering_LED                                 \"\" ;"
+echo "Call_Back_Active_LED                            \"\" ;"
+
+# *** Supplementary Services
+
+echo "Conference_Serv                                 \"Yes\" ;"
+echo "Attn_Transfer_Serv                              \"Yes\" ;"
+echo "Blind_Transfer_Serv                             \"Yes\" ;"
+echo "DND_Serv                                        \"Yes\" ;"
+echo "Block_ANC_Serv                                  \"Yes\" ;"
+echo "Call_Back_Serv                                  \"Yes\" ;"
+echo "Block_CID_Serv                                  \"Yes\" ;"
+echo "Secure_Call_Serv                                \"Yes\" ;"
+echo "Cfwd_All_Serv                                   \"Yes\" ;"
+echo "Cfwd_Busy_Serv                                  \"Yes\" ;"
+echo "Cfwd_No_Ans_Serv                                \"Yes\" ;"
+echo "Paging_Serv                                     \"Yes\" ;"
+echo "Call_Park_Serv                                  \"Yes\" ;"
+echo "Call_Pick_Up_Serv                               \"Yes\" ;"
+echo "ACD_Login_Serv                                  \"No\" ;"
+echo "Group_Call_Pick_Up_Serv                         \"Yes\" ;"
+echo "ACD_Ext                                         \"1\" ;"  # options: 1/2/3/4
+
+# *** Ring Tone
+
+echo "Ring1                                           \"n=Classic-1;w=3;c=1\" ;"
+echo "Ring2                                           \"n=Classic-2;w=3;c=2\" ;"
+echo "Ring3                                           \"n=Classic-3;w=3;c=3\" ;"
+echo "Ring4                                           \"n=Classic-4;w=3;c=4\" ;"
+echo "Ring5                                           \"n=Simple-1;w=2;c=1\" ;"
+echo "Ring6                                           \"n=Simple-2;w=2;c=2\" ;"
+echo "Ring7                                           \"n=Simple-3;w=2;c=3\" ;"
+echo "Ring8                                           \"n=Simple-4;w=2;c=4\" ;"
+echo "Ring9                                           \"n=Simple-5;w=2;c=5\" ;"
+echo "Ring10                                          \"n=Office;w=4;c=1\" ;"
+
+# *** Audio Input Gain (dB)
+
+echo "Handset_Input_Gain                              \"0\" ;"  # options: -6/0/6
+echo "Headset_Input_Gain                              \"0\" ;"  # options: -6/0/6
+echo "Speakerphone_Input_Gain                         \"0\" ;"  # options: -6/0/6
+
+# *** Call Progress Tones
+
+echo "Dial_Tone                                       \"350@-19,440@-19;10(*/0/1+2)\" ;"
+echo "Outside_Dial_Tone                               \"420@-16;10(*/0/1)\" ;"
+echo "Prompt_Tone                                     \"520@-19,620@-19;10(*/0/1+2)\" ;"
+echo "Busy_Tone                                       \"480@-19,620@-19;10(.5/.5/1+2)\" ;"
+echo "Reorder_Tone                                    \"480@-19,620@-19;10(.25/.25/1+2)\" ;"
+echo "Off_Hook_Warning_Tone                           \"480@-10,620@0;10(.125/.125/1+2)\" ;"
+echo "Ring_Back_Tone                                  \"440@-19,480@-19;*(2/4/1+2)\" ;"
+echo "Call_Waiting_Tone                               \"440@-10;30(.3/9.7/1)\" ;"
+echo "Confirm_Tone                                    \"600@-16;1(.25/.25/1)\" ;"
+echo "SIT1_Tone                                       \"985@-16,1428@-16,1777@-16;20(.380/0/1,.380/0/2,.380/0/3,0/4/0)\" ;"
+echo "SIT2_Tone                                       \"914@-16,1371@-16,1777@-16;20(.274/0/1,.274/0/2,.380/0/3,0/4/0)\" ;"
+echo "SIT3_Tone                                       \"914@-16,1371@-16,1777@-16;20(.380/0/1,.380/0/2,.380/0/3,0/4/0)\" ;"
+echo "SIT4_Tone                                       \"985@-16,1371@-16,1777@-16;20(.380/0/1,.274/0/2,.380/0/3,0/4/0)\" ;"
+echo "MWI_Dial_Tone                                   \"350@-19,440@-19;2(.1/.1/1+2);10(*/0/1+2)\" ;"
+echo "Cfwd_Dial_Tone                                  \"350@-19,440@-19;2(.2/.2/1+2);10(*/0/1+2)\" ;"
+echo "Holding_Tone                                    \"600@-19;25(.1/.1/1,.1/.1/1,.1/9.5/1)\" ;"
+echo "Conference_Tone                                 \"350@-19;20(.1/.1/1,.1/9.7/1)\" ;"
+echo "Secure_Call_Indication_Tone                     \"397@-19,507@-19;15(0/2/0,.2/.1/1,.1/2.1/2)\" ;"
+echo "Page_Tone                                       \"600@-16;.3(.05/0.05/1)\" ;"
+
+# *** Distinctive Ring Patterns
+
+echo "Cadence_1                                       \"60(2/4)\" ;"
+echo "Cadence_2                                       \"60(.3/.2,1/.2,.3/4)\" ;"
+echo "Cadence_3                                       \"60(.8/.4,.8/4)\" ;"
+echo "Cadence_4                                       \"60(.4/.2,.3/.2,.8/4)\" ;"
+echo "Cadence_5                                       \"60(.2/.2,.2/.2,.2/.2,1/4)\" ;"
+echo "Cadence_6                                       \"60(.2/.4,.2/.4,.2/4)\" ;"
+echo "Cadence_7                                       \"60(4.5/4)\" ;"
+echo "Cadence_8                                       \"60(0.25/9.75)\" ;"
+
+# *** Control Timer Values (sec)
+
+echo "Reorder_Delay                                   \"5\" ;"
+echo "Call_Back_Expires                               \"1800\" ;"
+echo "Call_Back_Retry_Intvl                           \"30\" ;"
+echo "Call_Back_Delay                                 \".5\" ;"
+echo "Interdigit_Long_Timer                           \"10\" ;"
+echo "Interdigit_Short_Timer                          \"3\" ;"
+
+# *** Vertical Service Activation Codes
+
+echo "Call_Return_Code                                \"*69\" ;"
+echo "Blind_Transfer_Code                             \"*98\" ;"
+echo "Call_Back_Act_Code                              \"*66\" ;"
+echo "Call_Back_Deact_Code                            \"*86\" ;"
+echo "Cfwd_All_Act_Code                               \"*72\" ;"
+echo "Cfwd_All_Deact_Code                             \"*73\" ;"
+echo "Cfwd_Busy_Act_Code                              \"*90\" ;"
+echo "Cfwd_Busy_Deact_Code                            \"*91\" ;"
+echo "Cfwd_No_Ans_Act_Code                            \"*92\" ;"
+echo "Cfwd_No_Ans_Deact_Code                          \"*93\" ;"
+echo "CW_Act_Code                                     \"*56\" ;"
+echo "CW_Deact_Code                                   \"*57\" ;"
+echo "CW_Per_Call_Act_Code                            \"*71\" ;"
+echo "CW_Per_Call_Deact_Code                          \"*70\" ;"
+echo "Block_CID_Act_Code                              \"*67\" ;"
+echo "Block_CID_Deact_Code                            \"*68\" ;"
+echo "Block_CID_Per_Call_Act_Code                     \"*81\" ;"
+echo "Block_CID_Per_Call_Deact_Code                   \"*82\" ;"
+echo "Block_ANC_Act_Code                              \"*77\" ;"
+echo "Block_ANC_Deact_Code                            \"*87\" ;"
+echo "DND_Act_Code                                    \"*78\" ;"
+echo "DND_Deact_Code                                  \"*79\" ;"
+echo "Secure_All_Call_Act_Code                        \"*16\" ;"
+echo "Secure_No_Call_Act_Code                         \"*17\" ;"
+echo "Secure_One_Call_Act_Code                        \"*18\" ;"
+echo "Secure_One_Call_Deact_Code                      \"*19\" ;"
+echo "Paging_Code                                     \"*96\" ;"
+echo "Call_Park_Code                                  \"*38\" ;"
+echo "Call_Pickup_Code                                \"*36\" ;"
+echo "Call_UnPark_Code                                \"*39\" ;"
+echo "Group_Call_Pickup_Code                          \"*37\" ;"
+echo "Referral_Services_Codes                         \"\" ;"
+echo "Feature_Dial_Services_Codes                     \"\" ;"
+
+# *** Outbound Call Codec Selection Codes
+
+echo "Prefer_G711u_Code                               \"*017110\" ;"
+echo "Force_G711u_Code                                \"*027110\" ;"
+echo "Prefer_G711a_Code                               \"*017111\" ;"
+echo "Force_G711a_Code                                \"*027111\" ;"
+echo "Prefer_G723_Code                                \"*01723\" ;"
+echo "Force_G723_Code                                 \"*02723\" ;"
+echo "Prefer_G726r16_Code                             \"*0172616\" ;"
+echo "Force_G726r16_Code                              \"*0272616\" ;"
+echo "Prefer_G726r24_Code                             \"*0172624\" ;"
+echo "Force_G726r24_Code                              \"*0272624\" ;"
+echo "Prefer_G726r32_Code                             \"*0172632\" ;"
+echo "Force_G726r32_Code                              \"*0272632\" ;"
+echo "Prefer_G726r40_Code                             \"*0172640\" ;"
+echo "Force_G726r40_Code                              \"*0272640\" ;"
+echo "Prefer_G729a_Code                               \"*01729\" ;"
+echo "Force_G729a_Code                                \"*02729\" ;"
+
+# *** Miscellaneous
+
+echo "Set_Local_Date_(mm/dd)                          \"\" ;"
+echo "Set_Local_Time_(HH/mm)                          \"\" ;"
+echo "Time_Zone                                       \"GMT+02:00\" ;"  # options: GMT-12:00/GMT-11:00/GMT-10:00/GMT-09:00/GMT-08:00/GMT-07:00/GMT-06:00/GMT-05:00/GMT-04:00/GMT-03:30/GMT-03:00/GMT-02:00/GMT-01:00/GMT/GMT+01:00/GMT+02:00/GMT+03:00/GMT+03:30/GMT+04:00/GMT+05:00/GMT+05:30/GMT+05:45/GMT+06:00/GMT+06:30/GMT+07:00/GMT+08:00/GMT+09:00/GMT+09:30/GMT+10:00/GMT+11:00/GMT+12:00/GMT+13:00
+echo "Time_Offset_(HH/mm)                             \"\" ;"
+echo "Daylight_Saving_Time_Rule                       \"\" ;"
+echo "DTMF_Playback_Level                             \"-16\" ;"
+echo "DTMF_Playback_Length                            \".1\" ;"
+echo "Inband_DTMF_Boost                               \"12dB\" ;"  # options: 0dB/3dB/6dB/9dB/12dB/15dB/18dB
+echo "Protect_IVR_FactoryReset                        \"No\" ;"

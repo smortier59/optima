@@ -1,0 +1,9 @@
+<a href="javascript:;" 
+    {tip text=ATF::$usr->trans(pager_columns_text) title=ATF::$usr->trans(pager_column_titre)}
+    onclick="Modalbox.show('pager_column.dialog', { scrollTo:0, width: 700, title: '{ATF::$usr->trans(pager_column_titre)|addslashes} \'{ATF::$usr->trans($current_class->table,"module")|addslashes}\' <a style=\'float:right\' href=\'http://wiki.optima.absystech.net/index.php/Gestion_des_vues\' target=\'_blank\'>{ATF::$usr->trans(aide)|escape:javascript}</a>', params: 'onglet={$onglet}&table={$current_class->table}&filter_key={$q->filter_key}&{$extra}', method:'post' });">
+    {if ATF::$usr->IsCustomColumns($current_class->table,$q->filter_key)}
+    	<img src="{ATF::$staticserver}images/icones/columns_grise.png" height="16" width="16" alt="" />
+    {else}
+   		<img src="{ATF::$staticserver}images/icones/columns.png" height="16" width="16" alt="" />
+	{/if}
+</a>

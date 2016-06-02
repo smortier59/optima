@@ -1,0 +1,21 @@
+{include file="mobile/header.tpl.htm"}
+<body>
+	<script type="text/javascript">/*<![CDATA[*/
+		Ext.onReady(function(){
+			Ext.setup({
+				icon: 'icon.png',
+				tabletStartupScreen: 'tablet_startup.png',
+				phoneStartupScreen: 'phone_startup.png',
+				glossOnIcon: false,
+				onReady: function() {
+					{if ATF::$usr->logged}
+						{include file="mobile/accueil.tpl.js"}
+					{else}
+						{include file="mobile/login.tpl.js"}
+					{/if}
+				}
+			});
+		});
+    /*]]>*/</script>
+</body>
+{include file="mobile/footer.tpl.htm"}

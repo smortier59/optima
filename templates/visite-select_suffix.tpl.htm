@@ -1,0 +1,103 @@
+{* héhé *}
+{* Icones spéciales *}
+{$id=$smarty.request.id_visite|default:$requests.visite.id_visite|default:$smarty.request.ged.id_visite|default:$id_visite}
+{$id_visite=$id|cryptid}
+{$visite=ATF::visite()->select($id_visite)} 
+{$projet=ATF::gep_projet()->select($visite.id_gep_projet)} 
+
+<tr>
+    <td colspan="2" style="height:350px">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2">
+                    <hr />
+                    <script type="text/javascript">
+                        Ext.onReady(function(){
+                            new Ext.form.DateField({
+                                format: 'Y-m-d' // 'd mmm yyyy' is not valid, but I assume this is close?
+                                ,name:'dateChoose'
+                                ,id:'dateChoose'
+                                ,width: 140
+                                ,renderTo:'dateRapport'
+                                ,value:""
+                            });
+                            new Ext.form.TimeField({
+                                format: 'H:i:s' // 'd mmm yyyy' is not valid, but I assume this is close?
+                                ,name:'timeChoose'
+                                ,id:'timeChoose'
+                                ,width: 140
+                                ,minValue:'08:00:00'
+                                ,maxValue:'20:00:00'
+                                ,increment:30
+                                ,renderTo:'dateRapport'
+                                ,value:""
+                            });
+                        });
+                        formatDate = function (date) {
+                            date = date.replace(":","");
+                            date = date.replace(":","");
+                            date = date.replace(" ","");
+                            date = date.replace("-","");
+                            date = date.replace("-","");
+                            return date;
+                        }
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:center; font-weight:bold;" colspan="2">
+                    Choisissez une date pour la génération des rapports
+                    <div id="dateRapport" style=" width:140px; margin:auto; font-weight:bold;"></div>					
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="visite-formulaire-{$id_visite}.html">
+                        <img src="{ATF::$staticserver}images/icones/formulaire.png" style="width:40px;" alt="{ATF::$usr->trans("formulaire_edit",$current_class->table)}" />
+                    </a>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("visite_edit",$current_class->table)}</span><br />
+                    <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("visite_edit_info",$current_class->table)}</span>
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="javascript:;" onclick="window.open('visite-{$id_visite}.pdf{if ATF::$usr->get('id_profil')!=4},date='+formatDate($('#dateChoose').val()+$('#timeChoose').val()));{else}'){/if}">
+                        <img src="{ATF::$staticserver}images/icones/pdfB.png" style="width:40px;" alt="{ATF::$usr->trans("formulaire_view",$current_class->table)}" />
+                    </a>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("formulaire_view",$current_class->table)}</span><br />
+                    <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("formulaire_view_info",$current_class->table)}</span>
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="javascript:;" onclick="window.open('visiteReduit-{$id_visite}.pdf{if ATF::$usr->get('id_profil')!=4},date='+formatDate($('#dateChoose').val()+$('#timeChoose').val()));{else}'){/if}">
+                        <img src="{ATF::$staticserver}images/icones/pdfB.png" style="width:40px;" alt="{ATF::$usr->trans("formulaire_view_reduit",$current_class->table)}" />
+                    </a>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("formulaire_view_reduit",$current_class->table)}</span><br />
+                    <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("formulaire_view_reduit_info",$current_class->table)}</span>
+                </td>
+            </tr>
+        </table>
+	</td>
+</tr>

@@ -1,0 +1,49 @@
+{$current_class=ATF::getClass($table_insert)}
+{$event="insert"}
+{$form_name="{$current_class->table},{$event}"}
+<div id="error_div" style="display:none;font-weight:bold;color:red;"></div>
+<div>
+<form name="{$form_name}" id="{$form_name}" action="" method="post"{if $current_class->upload_file} enctype="multipart/form-data"{/if}>
+    <input type="hidden" name="{$current_class->table}[speed_insert]" value="1" />
+	{foreach from=$current_class->colonnes.speed_insert_hidden key=key item=item}
+		<input type="hidden" name="{$item.name}" value="{$item.value}" />
+	{/foreach}
+	<div>
+		<table>
+			{foreach from=$current_class->colonnes.speed_insert key=key item=item}
+				<tr>
+					{include file="generic_field.tpl.htm" key=$key item=$item}
+				</tr>
+			{/foreach}
+			{foreach from=$field_sup key=key item=item}
+				{if $key!="target_div" && $key!="template"}
+					<tr>
+						<td colspan="2">
+							<input type="hidden" name="{$current_class->table}[{$key}]" id="{$current_class->table}[{$key}]" value="{$item}" />
+						</td>
+					</tr>
+					{$json="`$json`&`$key`=`$item`"}
+				{/if}
+			{/foreach}
+			<tr>
+				<td colspan="2">
+					<div class="submit" id="submit">
+						{if $donnees.tpl2div}
+							{$tpl2div=$donnees.tpl2div}
+						{elseif $field_sup.notpl2div}
+							{$tpl2div="ATF.ajax_refresh(obj);"}
+						{else}
+							{capture assign=tpl2div}{strip}
+								{*if $donnees}
+									ATF.tpl2div('tpl2div.ajax','div=gfi_{$donnees.name}&template=generic-autocomplete_champs&table={$current_class->table}&{http_build_query($donnees)}&value='+obj.result);
+								{/if*}
+							{/strip}{/capture}
+						{/if}
+						{include file="button.tpl.htm" name="ok" text="valid" onclick="ATF.{$event}($('#{$form_name|replace:"[":"\\\\["|replace:"]":"\\\\]"}'), { onComplete: function(obj) { if(obj.result){ {$tpl2div} Modalbox.hide(); }else{ $('#error_div').style.display='block'; $('#error_div').innerHTML='{t w=data_manquante} '+obj.formErrorMsg; Modalbox.resizeToContent(); ATF.ajax_refresh(obj); } } },false,true);"}
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</form>
+</div>

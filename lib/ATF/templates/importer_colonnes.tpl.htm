@@ -1,0 +1,35 @@
+<table>
+    <tbody>
+        <tr>
+            <td colspan="3" style="font-size:12px">
+                <div>
+                    <input type="hidden" name="nom" value="{$infos.nom}" />
+                    <input type="hidden" name="id_module" value="{$infos.id_module}" />
+                    <input type="hidden" name="separateur" value="{$infos.separateur}" />
+                    <input type="hidden" name="importer" value="1" />
+                    <strong>{$infos.nb}</strong> {ATF::$usr->trans('enreg_trouv',$current_class->table)}
+                    <br />{ATF::$usr->trans('calib',$current_class->table)} :
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size:14px;font-weight:bold">Fichier source</td>
+            <td>&nbsp;</td>
+            <td style="font-size:14px;font-weight:bold">Base cible</td>
+        </tr>
+        {foreach from=$infos.csv key=key item=item}
+            <tr onmouseover="this.style.backgroundColor='#FFFFFF';" onmouseout="this.style.backgroundColor='transparent';">
+                <td><strong>{$item.title}</strong> - <em>{$item.samples}</em></td>
+                <td>{ATF::$usr->trans('stock',$current_class->table)} :</td>
+                <td><select name="colonnes[{$key}]"><option value="">{ATF::$usr->trans('choix_colonne',$current_class->table)} :</option><option value="">{ATF::$usr->trans('pas_assoc',$current_class->table)}</option>{html_options options=$colonnes selected=$mapping[$key]}</select></td>
+            </tr>
+        {/foreach}
+        <tr>
+            <td colspan="3">* {ATF::$usr->trans('check_donnees',$current_class->table)}</td>
+        </tr>
+        <tr>
+            <td colspan="3">** {ATF::$usr->trans('format_attendu',$current_class->table)}</td>
+        </tr>
+     </tbody>
+</table>
+<div class="submit" id="submit">{include file="button.tpl.htm" text="valid" onclick="ATF.insert($('#importer,insert'));"}</div>

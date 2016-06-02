@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+<head>
+<title>{include file="title.tpl.htm"}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-language" content="fr" />
+<meta name="expires" content="never" />
+<meta name="rating" content="general" />
+<meta name="revisit-after" content="2 days" />
+<meta name="ROBOTS" content="index,follow" />
+<link rel="shortcut icon" type="image/x-icon" href="{ATF::$staticserver}images/favicon/{ATF::$project}.ico" /> 
+
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}js/smartip/smartip.css?v1" />
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}js/ext-3.2.1/resources/css/ext-all.css" />
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/core.css?v4" media="screen" />
+<link rel="stylesheet" type="text/css" href="{ATF::$staticserver}css/{ATF::$project}.css?v4" media="screen" />
+{if $smarty.get.table}
+    <link rel="stylesheet" type="text/css" href="{ATF::$staticserver}images/skins/{ATF::module()->skin_from_nom($smarty.get.table)}/skin.css" media="screen" />
+{/if}
+
+{* Prototype.js *}
+<script type="text/javascript" src="{ATF::$staticserver}js/prototype.js?v1.6.1"></script>
+
+{* SCRIPTACULOUS *}
+<script type="text/javascript" src="{ATF::$staticserver}js/scriptaculous/scriptaculous.js?v1"></script>
+
+{* EXT 2/2 *}
+<script type="text/javascript" src="{ATF::$staticserver}js/ext-3.2.1/adapter/ext/ext-base.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}js/ext-3.2.1/ext-all.js"></script>
+{*<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/ext-lang-fr.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/multiselect.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/uploadfile.js"></script>
+<script type="text/javascript" src="{ATF::$staticserver}js/plugins_ext/ext_specifique.js"></script>*}
+
+{* smarTip *}
+<script type='text/javascript' src='{ATF::$staticserver}js/smartip/smartip.js?v1'></script>
+ 
+{* JS COMMUNS *}
+<script type="text/javascript" src="{ATF::$staticserver}js/atf/atf.js?v1"></script>
+    
+</head>

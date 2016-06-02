@@ -1,0 +1,26 @@
+<script type="text/javascript">
+        Ext.onReady(function() {
+            var panel = new Ext.Panel({
+            	renderTo:'main',
+                layout:'anchor',
+                monitorResize:true,
+                style: {
+		            marginRight: '25px',
+		            marginLeft: '25px',
+		        },
+                items:[
+					{include file="importer-select-detail.tpl.js"}
+				,{
+                	layout:'column',
+                	frame: true,
+                	frameBorder: true,
+                	anchor:'100%',
+                	items: [
+                		{include file="importer-select-mapping.tpl.js"}
+                		,
+						{include file="importer-select-report.tpl.js"}
+                	]
+            	}]
+            });
+        });
+    </script>

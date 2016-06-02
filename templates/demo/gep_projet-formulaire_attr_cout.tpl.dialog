@@ -1,0 +1,7 @@
+<div>
+	{if $infos.id_pa || $smarty.request.id_pa}
+        <div id="__edit_cout_unitaire">{include file="gep_projet-formulaire_attr_cout.tpl.htm"}</div>
+    {else}
+    	Aucun PA spécifié !
+    {/if}
+</div>

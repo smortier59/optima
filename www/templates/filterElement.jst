@@ -1,0 +1,42 @@
+<li id="{{id}}" class="filter-item">
+	<div class="item-padding"> 
+	  <div class="item-top clearfix">
+	    <div class="left">
+	      <div class="item-header"><span class="filter-field-xs">{{traduction}}</span></div>
+	      <div class="filter-desc">
+	        <span class="filter-field-xl">{{traduction}}</span> <span class="filter-type">{{operatorTrad}}</span> : 
+	        {{#if valueTrad}}
+	        	<span class="filter-selected">{{valueTrad}}</span>
+	        	<span style="visibility: hidden">{{value}}</span>
+    		{{else}}
+				<span class="filter-selected">{{value}}</span>
+    		{{/if}}
+
+
+	        {{#if value_sup}}
+	        	<span class="filter-selected">et {{value_sup}}</span>
+	        {{/if}}
+	      </div>
+	      {{#if deprecated}}
+	      	<br>
+		      <div class="filter-deprecated item-header">
+		        <span class="filter-field-xl" style="color: red">/!\ Condition obsolète /!\</span> 
+		      </div>		      
+		      <div>
+		      	<span class="filter-type">Cette condition fonctionne toujours mais elle n'est plus faisable avec la nouvelle interface. Si vous deviez la modifier, supprimez là et recréez deux nouvelles conditions (une supérieure et une inférieure)</span>
+		      </div>
+	      {{/if}}
+	    </div>
+	    <div class="right">
+    		{{#if deprecated}}
+				<a href=""  class="suppr-link">Supprimer</a>
+    		{{else}}
+				<!-- <a href="" class="update-link">Modifier</a> -->
+				<a href="" class="suppr-link">Supprimer</a>
+    		{{/if}}
+
+			<div class="item-count"><span>{{result}}</span></div>
+	    </div>
+	  </div> 
+	</div>
+</li>

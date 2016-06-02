@@ -1,0 +1,36 @@
+{strip}
+{*
+@param string $module
+*}
+{$nom_div="{$module}_graphe_{$smarty.get.type}"}
+<div id="gt_refresh">{include file="gestion_ticket_widget_refresh.tpl.htm"}</div>
+
+<div style="float:left;"></div>
+<a href="javascript:;" onclick="ATF.ajax('tpl2div.ajax','div=gt_refresh&template=gestion_ticket_widget_refresh&module={$module}&nom_div={$nom_div}&id_societe=',{ onComplete : function(){ $('#label_societe').val(''); }});"><img src="{ATF::$staticserver}images/icones/delete.png" ></a>
+</div>
+<div class="accueil_gestion_ticket" style="float:right;">
+    <input type="text" name="societe" id="label_societe" value="{ATF::$usr->trans("rechercher")}" onfocus="if ('{ATF::$usr->trans("rechercher")}'==this.value) this.value='';"  />
+    <input type="hidden" id="societe" >
+    <script type="text/javascript">/*<![CDATA[*/
+        ATF.autocomplete({
+            url:'societe,autocomplete.ajax'
+            ,mapping:[
+                { name: 'id', mapping: 0 },
+                { name: 'nom', mapping: 1 },
+                { name: 'detail', mapping: 2, type:'string' },
+                { name: 'nomBrut', mapping: 'raw_1' }
+            ]
+            ,loadingText:'Recherche...'
+            ,template:'{include file="generic-autocomplete.tpl.htm"}'
+            ,applyTo:'label_societe'
+            ,width:235
+            ,onSelect:function(record){
+                $('#societe').val(record.data.id);
+                $('#label_societe').val(Ext.util.Format.stripTags(record.data.nom));
+                ATF.ajax('tpl2div.ajax','div=gt_refresh&template=gestion_ticket_widget_refresh&module={$module}&nom_div={$nom_div}&id_societe='+record.data.id);
+                this.collapse();
+            }
+        });
+    /*]]>*/</script>
+</div>
+{/strip}

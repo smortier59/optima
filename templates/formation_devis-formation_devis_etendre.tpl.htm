@@ -1,0 +1,12 @@
+{$id_formation_formation_devis=$item['formation_devis.id_formation_devis']|default:ATF::_r('id_formation_devis')|default:$requests.formation_devis.id_formation_devis}
+{if $event=="select"}
+	<td><b>{ATF::$usr->trans($key)}</b></td>
+{/if}
+{$formation_devis=ATF::formation_devis()->select($id_formation_devis)}
+{if ATF::$usr->privilege('commande','insert')}
+    {if $formation_devis['etat']=="attente"}
+        <a href="commande-insert.html,id_formation_devis={$id_formation_devis|cryptid}" onclick="ATF.goTo('commande-insert.html,id_formation_devis={$id_formation_devis|cryptid}'); return false;"><img src="{ATF::$staticserver}images/icones/expand.png" height="16" width="16" alt="" /></a>
+    {else}
+        -
+    {/if}
+{/if}

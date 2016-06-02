@@ -1,0 +1,56 @@
+{include file="header.tpl.htm"}
+<body spellcheck="true">
+		<div id="filtreCtn"></div>
+		{if ATF::$usr->logged}
+			{if ATF::$usr->invited}
+				<div>{*<a href="logout">Se déconnecter du mode invité</a> - *}<a href="/logout">S'identifier sur Optima</a></div>
+				<div id="core">
+					<div id="mMiddle" class="mMiddle">
+						<div id="main" class="main"></div>
+					</div>
+				</div>
+			{else}
+				<div id="core">
+					<div id="TrueTop" class="TrueTop">
+						<div id="top" class="top">
+							{include file="top.tpl.htm"}
+						</div>
+						<div class="tCornerTopLeft"></div>
+						<div class="tTop" id="menu">
+						</div>
+						<div class="tCornerTopRight"></div>
+						
+						<div class="tLeft"></div> 
+						<div class="tRight"></div>
+						<div class="tMiddle"></div>
+							
+						<div class="tCornerBottomLeft"></div>
+						<div class="tBottom"></div>
+						<div class="tCornerBottomRight"></div>
+						
+						<div class="tSpacer"></div>
+						<div class="ClearBoth"></div>
+					</div>
+					<div id="mMiddle" class="mMiddle">
+						<div class="left">
+							{if ATF::$controller->isGranted()}
+								{include file="left.tpl.htm"}
+							{/if}
+						</div>
+
+						<div id="main" class="main">
+							<div style="text-align:center;height:120px;font-weight:bold;margin-top:50px;">
+								{*<a href="accueil.html">Revenir sur la page d'accueil</a>*}
+							</div>
+						</div>
+					</div>
+					<div id="bottom" class="bottom">
+						{include file="bottom.tpl.htm"}
+					</div>
+				</div>
+			{/if}
+		{else}
+			{include file="login.tpl.htm"}
+		{/if}
+</body>
+{include file="footer.tpl.htm"}

@@ -1,0 +1,28 @@
+#!/bin/bash
+# Permet de créé la configuration du réseau pour l'utilitaire ifcfg (fichier de configuration ifcfg-eth0)
+# syntaxe : ifcfg-make <interface> <method> <ipaddr> <mask> <gw>
+
+#Définitions de constantes
+path_config=/etc/sysconfig/network
+
+#Sauvegarde du fichier de conf "ifcfg"
+cd /etc/sysconfig/network
+cp "ifcfg-$1" "save-by-asio.ifcfg-$1.save-by-asio"
+
+#Sauvegarde du fichier de conf routes
+cp routes "save-by-asio.routes.save-by-asio"
+clear
+
+echo "DEVICE='$1'" > "ifcfg-$1"
+echo "ONBOOT='yes'" >> "ifcfg-$1"
+if [ $2 == dhcp ]
+then
+	echo "BOOTPROTO='dhcp'" >> "ifcfg-$1"
+else
+	echo "BOOTPROTO='static'" >> "ifcfg-$1"
+	echo "IPADDR='$3'" >> "ifcfg-$1"
+	echo "NETMASK='$4'" >> "ifcfg-$1"
+	echo "GATEWAY='$5'" >> "ifcfg-$1"
+	echo "0.0.0.0 $5 0.0.0.0 $1" > routes
+fi
+echo "STARTMODE='auto'" >> "ifcfg-$1"

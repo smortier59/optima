@@ -1,0 +1,20 @@
+{* 
+	object $current_class : Classe courante qui inclu ce listing
+	string $event : Evenement de la page courante sur laquelle on est (select, update, delete...)
+	int $i : quick_action
+	int $id : Cl enregistrement
+*}
+
+{* Vrification sur l'enregistrement si un ID existe en paramtre *}
+{if $id && !$current_class->no_{$i}}
+    {* Peut-on faire cette action sur cet enregistrement prcis ou non ? *}   
+    {if $current_class->is_active($i,$id)} 
+        <div class="quickAction {$i}" style="display:inline;">
+            <a href="#{$current_class->name()|urlencode}-update-{$id|cryptid}.html" 
+            	rel="{ATF::$usr->trans($i,null,_info)}" 
+                title="{ATF::$usr->trans($i)}">
+                <img src="{ATF::$staticserver}images/icones/{$i}.png" />
+            </a>
+        </div>
+    {/if}
+{/if}

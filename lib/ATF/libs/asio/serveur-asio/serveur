@@ -1,0 +1,181 @@
+#!/usr/bin/php
+<?php
+/*-------------------------------------------------------*/
+/*      Définition de certains "mécanismes" php          */
+/*-------------------------------------------------------*/
+//Ticks pour le gestionnaire de signaux
+declare(ticks = 1);
+//Option pour accepter les arguments
+ini_set('register_argc_argv','On');
+//Affichage des erreurs
+error_reporting(E_ALL);
+/* Autorise l'exécution infinie du script, en attente de connexion. */
+set_time_limit(0);
+/* Active le vidage implicite des buffers de sortie, pour que nous
+ * puissions voir ce que nous lisons au fur et à mesure. */
+ob_implicit_flush();
+
+/*-------------------------------------------------------*/
+/*      Lecture des aguments de la commande              */
+/*-------------------------------------------------------*/
+//Routine d'affichage d'aide
+function affiche_aide(){
+	echo "[Serveur ASIO] Daemon permettant d'éxécuter des commandes systèmes à travers des applications externes.\n";
+	echo "UTILISATION : serveur ou serveur --daemon\n";
+	echo "serveur --daemon relie le processus au processus parent (init)\n";
+	echo "AIDE : serveur --help\n";
+}
+
+$daemon_asio=false;
+if($argc==2){
+	switch($argv[1]){
+		case '--help':
+			affiche_aide();
+			exit(0);
+			break;
+		case '--daemon':
+			$daemon_asio=true;
+			break;
+		default:
+			affiche_aide();
+			exit(0);
+	}
+}
+/*echo 'argc';
+print_r($argc);
+echo 'argv';
+print_r($argv);
+die();*/
+
+/*------------------------------------------*/
+/* Lecture du fichier de configuration      */
+/*------------------------------------------*/
+$configuration=parse_ini_file('serveur.ini',true);
+//Erreur survenue
+if($configuration===false){
+	die("Erreur de Configuration ! Le fichier de configuration de l'application 'serveur.ini' est invalide !\n");
+}
+
+/*------------------------------------------*/
+/* Initilisation des librairies             */
+/*------------------------------------------*/
+//Librairies utilisées
+define("__ABSOLUTE_PATH__",$configuration['global_path']['path']);
+//require_once(__ABSOLUTE_PATH__.'interface/classes/phpObject.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Network.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Fichier.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Crypt.class.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'Asio.inc.php');
+require_once(__ABSOLUTE_PATH__.$configuration['path']['libs'].'intern.inc.php');
+
+//Fichier de log serveur-debug
+$path_serveur=__ABSOLUTE_PATH__.$configuration['path']['log'].'serveur-debug.log';
+if(!file_exists($path_serveur)){
+	touch($path_serveur);
+}
+
+//Fichier de log serveur (si daemon - sinon sortie standard)
+$log_asio=false;
+if($daemon_asio){
+	$log_asio=new fichier(__ABSOLUTE_PATH__.$configuration['path']['log'].'serveur.log');
+}
+
+/*-------------------------------------------------------*/
+/*      PARTIE SERVEUR                                   */
+/*-------------------------------------------------------*/
+exec_log("[DEMARRAGE DU SERVEUR ".date('d/m/y').' - '.date('H:i:s')."]\n",$daemon_asio,$log_asio);
+
+//Défintion de l'adresse et du port
+$adresse_serveur=$configuration['serveur']['ip'];
+$port_serveur=$configuration['serveur']['port'];
+
+//Fichier de log du client
+//$path_log=__ABSOLUTE_PATH__.'log/gestion_chambre.log';
+//$log_chambre=new Fichier($path_log);
+//if(!file_exists($path_log)){
+//	touch($path_log);
+//}
+
+//Initialisation du cryptage
+$crypt=new Crypto($configuration['serveur']['cle']);
+
+/*------------------------------------------*/
+/* Création du serveur                      */
+/*------------------------------------------*/
+//Création du Serveur
+$serveur=new Network($adresse_serveur,$port_serveur,$path_serveur,true,false);
+
+//Lancement d'un serveur multi-thread
+$serveur->serveur(true);
+
+//Fin de l'initialisation
+exec_log("[SERVEUR CREE ".date('d/m/y').' - '.date('H:i:s')."]\n",$daemon_asio,$log_asio);
+
+//daemonize
+if($daemon_asio){
+	$pid=pcntl_fork();
+	switch($pid){
+		case '0':
+			//code du fils
+			break;
+		case '-1':
+			//erreur
+			exit(1);
+		default:
+			echo "Daemonizing...";
+			exit(0);
+	}
+	$sid=posix_setsid();
+}
+
+//Installation du gestionnaire de signaux
+$serveur->setSigHandler();
+
+/*------------------------------------------*/
+/* Boucle serveur                           */
+/*------------------------------------------*/
+do {	
+	//echo "[ATTENTE D'UNE NOUVELLE CONNEXION ".date('d/m/y').' - '.date('H:i:s')."]\n";
+	//--Ressource serveur
+	global $ressource;
+	$ressource=@$serveur->acceptSocket();
+	//********************
+	//FERMETURE DU SERVEUR
+	//********************
+	if(isset($stop) && $stop){
+		exec_log("[FERMETURE DU SERVEUR ".date('d/m/y').' - '.date('H:i:s')."]\n",$daemon_asio,$log_asio);
+		//--Fermeture de la ressource
+		if($ressource){
+			socket_close($ressource);
+		}
+		$serveur->closeSocket();
+		exit(0);
+	//************
+	//RECONNEXION
+	//************
+	}elseif($ressource===false){
+		//--Bouclage après un temps définit par le fresh !
+		//--Un rafraichissement trop important occupera trop le CPU, à l'inverse
+		//--le serveur ne réagira pas assez-vite
+		//echo "ECHEC de connexion\n";
+		usleep($configuration['serveur']['fresh']);
+	//***************
+	//NOUVEAU CLIENT
+	//***************
+	}elseif ($ressource>0){
+		//--Obtention de l'adresse du client
+		$address='';
+		socket_getpeername($ressource,$address);
+		exec_log("[CLIENT CONNECTE : <".$address."> ".date('d/m/y').' - '.date('H:i:s')."]\n",$daemon_asio,$log_asio);
+		//--Exécution de la commande
+		$serveur->execClient($ressource,doClient($ressource,$crypt,$configuration['serveur']['name'],$daemon_asio,$log_asio));
+		exec_log("[FERMETURE DE LA CONNEXION : <".$address."> ".date('d/m/y').' - '.date('H:i:s')."]\n",$daemon_asio,$log_asio);
+		//exit(0);
+	//*****************
+	//ERREUR DE SOCKET
+	//*****************
+	}else{
+		exec_log("Erreur de connexion\n",$daemon_asio,$log_asio);
+	}
+}while(true);
+?>

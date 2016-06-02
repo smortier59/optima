@@ -1,0 +1,13 @@
+{strip}
+<div class="button" {if $id} id="{$id}"{/if} {if $onclick} onclick="{$onclick}"{/if}>
+    <div id="left">
+        <img src="{ATF::$staticserver}images/icones/{$icone|default:'valid'}.png" align="" style="width:16px; height:16px" />
+    </div>
+    <div id="middle" {if $style} style="{$style}"{/if}>
+    	<span>
+        	{ATF::$usr->trans($text,$current_class->table)|strtoupper} 
+        </span>
+    </div>
+    <div id="right"></div>
+</div>
+{/strip}

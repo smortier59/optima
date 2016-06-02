@@ -1,0 +1,63 @@
+{* héhé *}
+{if $smarty.request.id_gep_projet}
+    {$gp = ATF::gep_projet()->select($smarty.request.id_gep_projet)}
+{/if}
+
+	{if $requests.gep_projet.locked}
+		{$icon="lock"}
+		{$valueToUpdate=0}
+	{else}
+		{$icon="unlock"}
+		{$valueToUpdate=1}
+	{/if}
+	<td colspan="2" style="height:350px">
+            <table style="width:100%;">
+                <tr>
+                    <td colspan="2"><hr /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; width:80px">
+                        <a href="" onclick="ATF.tpl2div('gep_projet,update.ajax','id_gep_projet={$smarty.request.id_gep_projet|default:$requests[$current_class->name()]["id_{$current_class->name()}"]|cryptid}&locked={$valueToUpdate}')">
+                            <img src="{ATF::$staticserver}images/icones/{$icon}.png" style="width:40px;" alt="{ATF::$usr->trans("{$icon}",$current_class->table)}" />
+                        </a>
+                    </td>
+                    <td style="text-align:left; vertical-align:middle">
+                        <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans($icon,$current_class->table)}</span><br />			
+                        <span style="font-size:10px; font-weight:italic;">({ATF::$usr->trans("`$icon`_info",$current_class->table)})</span>				
+                    </td>
+                </tr>
+            </table>
+            <table style="width:100%;">
+                <tr>
+                    <td colspan="2"><hr /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; width:80px">
+                        <a href="gep_projet-formulaire-{$smarty.request.id_gep_projet|default:$requests[$current_class->name()]["id_{$current_class->name()}"]|cryptid}.html">
+                            <img src="{ATF::$staticserver}images/icones/formulaire.png" style="width:60px;" alt="{ATF::$usr->trans("formulaire_edit",$current_class->table)}" />
+                        </a>
+                    </td>
+                    <td style="text-align:justify; vertical-align:middle">
+                        <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("formulaire_edit",$current_class->table)}</span><br />
+                        <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("formulaire_edit_info",$current_class->table)}</span>
+                    </td>
+                </tr>
+            </table>
+        <table style="width:100%;">
+			<tr>
+				<td colspan="2"><hr /></td>
+			</tr>
+			<tr>
+				<td style="text-align:center; width:80px">
+					<a href="projet-{$smarty.request.id_gep_projet|default:$requests[$current_class->name()]["id_{$current_class->name()}"]|cryptid}.pdf" target="_blank">
+						<img src="{ATF::$staticserver}images/icones/pdfB.png" style="width:60px;" alt="{ATF::$usr->trans("formulaire_view",$current_class->table)}" />
+					</a>
+				</td>
+				<td style="text-align:justify; vertical-align:middle">
+					<span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("formulaire_view",$current_class->table)}</span><br />
+					<span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("formulaire_view_info",$current_class->table)}</span>
+				</td>
+			</tr>
+		</table>
+	</td>	
+

@@ -1,0 +1,1 @@
+ATF.tpl2div('intervention,contact_affaire_by_societe.ajax','id_societe='+record.data.id+'&field=id_societe&event=insert');

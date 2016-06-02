@@ -1,0 +1,24 @@
+<input id="__res{$res}" type="text" 
+	value="{$value|default:$q->search|default:ATF::$usr->trans('rechercher')}" 
+    onkeyup="{if $onkeyup===true}if (ATF.__searchValue{$res} !== $('#__res{$res}').val()){ ATF.__submitSearch{$res}(); }{else}if (event.keyCode == 13) ATF.__submitSearch{$res}();{/if}"
+    onfocus="if ('{ATF::$usr->trans("rechercher")}'==this.value) this.value='';" 
+    class="{if (is_array($q->search) && $q->search[$field]) || (is_string($q->search))}researchFocus{else}research{/if}"
+    onblur='setTimeout(function(){ ATF.reinitSearch("{$res}") },1001)'
+   /> 
+<a href="javascript:;" onclick="ATF.__submitSearch{$res}();"></a>
+<span style="display: none;" id="__res{$res}_loading"><img alt="Working..." src="{ATF::$staticserver}images/refreshing.gif"/></span>
+<script type="text/javascript">/*<![CDATA[*/
+ATF.countdownTimer{$res} = new ATF.countdownTimer(1000);
+ATF.__submitSearch{$res} = function() {
+	ATF.countdownTimer{$res}.start("$('#__res{$res}_loading').show(); ATF.__callSearch{$res}();");
+}
+ATF.__callSearch{$res} = function() {
+	ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$div}&recherche='+escape(encodeURI($('#__res{$res}').val()))+'&{$extra}',{ onComplete:function(obj) {  $('#__res{$res}_loading').hide(); } });
+}
+ATF.__searchValue{$res} = $('#__res{$res}').val();
+ATF.reinitSearch=function(nom){
+	if($("#__res"+nom).val()==""){
+		$("#__res"+nom).val("{ATF::$usr->trans(rechercher)}");
+	}
+}
+/*]]>*/</script>

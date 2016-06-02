@@ -1,0 +1,19 @@
+{*Recherche de la fk*}
+{if is_array($fk)}
+	{$fk_tmp=each($fk)}
+{else}
+	{$fk_tmp=['key'=>'0','value'=>'0']}
+{/if}
+<img src="{$current_class->icone(16)}" height="16" width="16" alt="" />
+{capture name=nom_module}{$saTitle|default:ATF::$usr->trans($current_class->name(),module)}{if $function} ({ATF::$usr->trans($function,$current_class->name())}){/if}{/capture}
+<a href="javascript:scroll(0,0)" rel="{ATF::$usr->trans(haut_page,module)}">
+	<img src="{ATF::$staticserver}images/icones/haut.png" height="10" width="14" alt="" />
+</a>
+<a id="{$current_class->name()}_switch" class="moduleName" href="javascript:;" rel="{$smarty.capture.nom_module}" onclick="ATF.clickOnglet('{$current_class->name()}','{if $parent_class}{$parent_class->name()}{/if}','{$div}','{$fk_tmp.key}','{$fk_tmp.value}');">
+    {$smarty.capture.nom_module|truncate:25:"..."}
+</a>
+&nbsp;
+<a id="{$current_class->name()}_switch2" class="nbElmt" href="javascript:;" onclick="ATF.clickOnglet('{$current_class->name()}','{if $parent_class}{$parent_class->name()}{/if}','{$div}','{$fk_tmp.key}','{$fk_tmp.value}');" {if $opened}style="display:none;"{/if}>
+    <img src="{ATF::$staticserver}images/icones/bottom.png" height="16" width="16" alt="" />
+	{if $q->nb_rows || $count}({$q->nb_rows|default:$count|default:0} {ATF::$usr->trans(element,module)}){/if}
+</a>

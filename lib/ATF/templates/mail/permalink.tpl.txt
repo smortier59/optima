@@ -1,0 +1,5 @@
+{ATF::$usr->trans('bonjour',mail)},
+
+{ATF::$usr->trans('lien','permalink')} : {$infos.elements.lien}
+
+{ATF::$usr->trans('politesse','permalink')}

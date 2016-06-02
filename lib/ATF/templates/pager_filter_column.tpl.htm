@@ -1,0 +1,20 @@
+{* Toutes les colonnes de la table *}
+{if $mod}
+	{$mod=ATF::module()->select($mod,'module')|default:$mod}
+{/if}
+
+{if $mod && ATF::getClass($mod)}
+    {if $sup}
+    	{ATF::$usr->unsetListeChamps($table,$mod)}
+        {$all_cols=ATF::$usr->recupListeChamps($table,$filter_key,NULL,true)}
+    {else}
+        {$all_cols=ATF::$usr->ajoutRecupListeChamps($table,$mod,$filter_key,true)}
+    {/if}
+{elseif ATF::getClass($table)}
+    {$all_cols=ATF::$usr->recupListeChamps($table,$filter_key)}
+{/if}
+
+<select name="cols" id="filter_option_addColumn" onchange="ATF.__pager_filterAdd(this.value);this.value='';"  style="width:auto">
+    <option value="">Ajouter une colonne :</option>
+    {html_options options=$all_cols}
+</select>

@@ -1,0 +1,194 @@
+{strip}
+{** 
+* Generic-select_all - Template par défaut d'affichage des modules
+*
+* PARAMETRES OBLIGATOIRES
+* @param object $current_class : Classe courante qui inclu ce listing
+*
+* PARAMETRES FACULTATIFS
+* @param object $parent_class : Classe parente qui inclu ce listing, sert pour la charte graphique à appliquer, et le masquage de la colonne correspondant à la clé primaire du parent 
+*        (Exemple: masquer la colonne société si on liste les affaires avec comme provenance parent_class->name()==societe)
+* @param boolean $display_key_columns : permet de forcer l'affichage des colonnes des clé (id_societe, id_owner...) (FALSE par défaut)
+* @param string div : definit le nom du div qui contient les infos du select_all 
+* @param array $fk : clés étrangères de filtrage
+*        array(societe.id_societe=>678)
+* @param string $onglet_custom : Permet d'appeler le template d'un onglet spécial
+* @param string $saTitle : Titre de select_all, permet de forcer un titre particulier (utile pour écrire par exemple dans certains cas "Element enfant", plutoto qu'avoir un titre générique "Element")
+* @param string $function : Fonction à utiliser à la place de select_all pour récupérer les données du listing
+* @param boolean $define_div : Définir le div "_data" ou non
+* @param boolean $table_standard : true si on désire utilisé le table standard
+* @param boolean $ignoreCustomTemplate : true si on désire ne pas utiliser de template générique
+*}
+
+{* Initialisation des variables par défaut *}
+{$q=$q|default:null}
+{if $div=="main" || !$div}
+	{$div=null}
+{/if}
+{$view=$view|default:null}
+{$url_extra=$url_extra|default:null}
+{$extra=$extra|default:null}
+{$table_standard=$table_standard|default:$current_class->table_standard}
+
+
+{if $current_class}
+    {if !$ignoreCustomTemplate && ATF::$html->template_exists("`$current_class->table`-select_all.tpl.htm")}
+        {include file="`$current_class->table`-select_all.tpl.htm"}
+        
+    {elseif $current_class->selectAllExtjs!==false && !$permapdf}
+
+    	{* Grid EXTJS *}
+        <div id='{$div}_data' class="ongletData"></div>
+		<script type="text/javascript">/*<![CDATA[*/
+		{include file="generic-tabpanel.tpl.js" 
+			current_class=$current_class
+			parent_class=$parent_class
+			q=$q
+			renderTo="{$div}_data"
+			title=ATF::$usr->trans($current_class->table,module)
+			function=false
+			search=true}
+		/*]]>*/</script>
+        
+    {else}
+		{*------------------------------------------------------------------*}
+		{*     Optimisation de l'affichage de l'onglet                      *}
+		{*------------------------------------------------------------------*}
+		{* Affichage onglet 
+		 1er cas : parmapdf : Cas du pdf
+         2ème cas : advanced_search : Cas de la recherche avancée
+		 3ème cas : !parent_class->table : Cas d'un module isolé (sans onglet)
+		 4ème cas : ATF::$usr->custom.onglets_open_close["gsa_{$parent_class->table}_{$current_class->table}"]=="ouvert" : Utilisation du custom pour l'affichage
+		 5ème cas : pas de présence du custom
+		    1er ss-cas : Le module n'est pas du type classes (exemple le module accueil)
+			2ème ss-cas : L'onglet est le même que son parent (onglet entité sur fiche entité)
+			3ème ss-cas : Présence dans le constructeur (opened)
+		*}
+		{if $permapdf
+        	|| $advanced_search 
+			|| ((is_a($parent_class,classes) && !$parent_class->table) || !$parent_class)
+			|| $parent_class->table==$current_class->table
+			|| ATF::$usr->custom.onglets_open_close["gsa_{$parent_class->table}_{$current_class->table}"]=="ouvert" 
+			|| (!ATF::$usr->custom.onglets_open_close["gsa_{$parent_class->table}_{$current_class->table}"] 
+				&&  $parent_class->onglets[$current_class->table].opened)}
+			{$opened=true}
+		{else}
+			{$opened=false}
+		{/if}
+		{*------------------------------------------------------------------*}
+		{*                      Contenu Select-ALL                          *}
+		{*------------------------------------------------------------------*}
+        {if ATF::$html->template_exists("{$current_class->table}-select_all_prefix.tpl.htm")}
+           {include file="{$current_class->table}-select_all_prefix.tpl.htm" entete=true}
+        {else}
+        	{* si l'on choisit un filtre dans un onglet, il faut conserver la notion de parent, pour ne pas afficher la colonne de la clé étrangère si l'on se situe sur le select de ce dernier *}
+            {if !$parent_class && $classe_parent}
+            	{$parent_class=ATF::$classe_parent()}
+            {/if}
+            
+            {********* Provenance Graph de stats **********}
+            {if ATF::_r(stats)}
+            	{$current_class->statsFiltrage()}
+            {/if}
+            
+            {* si on était sur une recherche par colonne et qu'on veut revenir à la recherche normale *}
+            {if $smarty.request.advanced_search}
+            	{$current_class->reinitSearch($smarty.session,$div)}
+            {/if}
+            
+			{********* Génération des éléments si pas de $data **********}
+            {$template="generic-select_all"} {* Fichier template Smarty utilisé *}
+			{if $permapdf && !$data && $opened}
+            	{$data=$current_class->genericSelectAll($div,$parent_class,$q,$view,$url_extra,$extra,$fk,$function,$smarty.session,true)}
+            {elseif !$data && $opened}
+	            {$data=$current_class->genericSelectAll($div,$parent_class,$q,$view,$url_extra,$extra,$fk,$function,$smarty.session)}
+			{elseif !$opened}
+				{$count=NULL}
+			{/if}
+            
+            {if $define_div}
+                <div id="{$div}_data" class="ongletData">
+            {/if}
+			
+			{********* Header( Table standard ) **********}
+            {if $table_standard}
+                {capture name=nom_module}{$saTitle|default:ATF::$usr->trans($current_class->table,module)}{if $function} ({ATF::$usr->trans($function,$current_class->table)}){/if}{/capture}
+                {include file="table_standard.tpl.htm" header=1 forced_title=$smarty.capture.nom_module find=1 png_image=1 no_clone=true no_update=true no_delete=true}
+            {/if}
+			
+            <a name="{$current_class->table}"></a>
+			
+			{********* Pager **********}
+            <div class="{if $table_standard}tabPagertbstd{else}tabPager{/if}"> 
+            	{include file="generic-pager.tpl.htm" table_standard=$table_standard}
+                {if ATF::$html->template_exists("{$current_class->table}-select_all_header.tpl.htm")}
+                   {include file="{$current_class->table}-select_all_header.tpl.htm"}
+                {/if}
+			</div>
+        {/if}
+        
+        {if $q->nb_rows>0 && $current_class->gmap===true && ATF::$usr->privilege($current_class->name(),'geolocalisation')}
+            <div id="{$div}GMapContainer" style="padding:0 1em; display:none;" >
+                <div id="{$div}GMap" class="{$current_class->table} GMap"></div>
+            </div>
+        {/if}
+        
+		{*------------------------------------------------------------------*}
+		{*                      Contenu Select-ALL                          *}
+		{*------------------------------------------------------------------*}
+        <div id="{$div}_content" class="tabContent" {if !$opened}style="display:none"{/if}>
+			{if $opened}
+				{include file="generic-select_all-content.tpl.htm"}
+			{else}
+				<div id="{$div}_no_content"></div>
+			{/if}
+        </div>
+		
+		{********* Footer( Table standard ) **********}  
+		{if $table_standard}
+			{include file="table_standard.tpl.htm"}
+		{/if}
+	
+        {if $define_div}
+        	</div>
+        {/if}
+    {/if}
+    
+    {*------------------------------------------------------------------*}
+	{*                      Suffixe selectAll                           *}
+	{*------------------------------------------------------------------*}
+    {if ATF::$html->template_exists("{$current_class->table}-select_all_suffix.tpl.htm")}
+       {include file="{$current_class->table}-select_all_suffix.tpl.htm" entete=true}
+    {/if}
+
+	{if !$current_class->table_standard}
+	<script type="text/javascript">/*<![CDATA[*/
+		{foreach from=[select,update,delete,insert,cloner] item=item}
+			$('#table.listing_table_{$current_class->table} a.{$item}Btn').each(function(element) {
+				var opt = { 
+					position: 'rightTop'
+					, attach: true
+					, arrow:true
+					, borderSize:2
+					, radius:2
+					, css:'ex3'
+					/*, fadeDuration:.25 */
+					, delay:.5
+				};
+				Stip.add(element,'{ATF::$usr->trans("generic_select_all_{$item}")|mt:[module=>ATF::$usr->trans($current_class->table,module)]|escape:htmlall}',opt);
+			});
+		{/foreach}
+		
+		if ($('#quickActionContainer')) {
+			$('#quickActionContainer').show()
+		}
+    /*]]>*/</script>
+	{/if}
+{else}
+    {if ATF::$html->template_exists("{$smarty.get.table}-select_all.tpl.htm")}
+       {include file="{$smarty.get.table}-select_all.tpl.htm"}
+    {else}
+    	{include file="listing_enfants.tpl.htm" table=$smarty.get.table}
+    {/if}
+{/if}
+{/strip}

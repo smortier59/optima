@@ -1,0 +1,23 @@
+<table>
+    <tbody>
+        <tr>
+            <td style="font-size:12px">{ATF::$usr->trans('finish',$current_class->table)}</td>
+        </tr>
+        <tr>
+            <td style="font-size:12px">{ATF::$usr->trans('nbre_enreg_ajout',$current_class->table)} : <strong>{$infos.count|default:0} {ATF::$usr->trans('enregistrement',$current_class->table)}</strong>.</td>
+        </tr>
+        {if $infos.error}
+            <tr>
+                <td style="font-size:12px">{ATF::$usr->trans('nbre_enreg_err',$current_class->table)} : <strong>{$infos.error|default:0} {ATF::$usr->trans('erreur',$current_class->table)}</strong>.</td>
+            </tr>
+            <tr>
+                <td style="font-size:12px">{ATF::$usr->trans('detail',$current_class->table)} :</td>
+            </tr>
+            {foreach from=$infos.errors key=key item=item}
+                <tr>
+                    <td style="font-size:11px">{counter}. {$item}</td>
+                </tr>
+            {/foreach}
+        {/if}
+     </tbody>
+</table>

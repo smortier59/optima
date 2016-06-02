@@ -1,0 +1,22 @@
+{$id_module=$infos.id_module|default:$cle_mod}
+{$id_privilege=$infos.id_privilege|default:$info_priv.id_privilege}
+{$id_profil=$id_profil|default:$infos.id_profil|default:$smarty.request.id_profil}
+{$modul=ATF::module()->select($id_module)}
+
+{if  $modul.privilege && !$modul.privilege[$id_privilege]}
+	{$a_decoche='true'}
+{elseif $listing_profil_privilege[$cle_mod][$info_priv.id_privilege] || $infos.coche=="true"}
+	{$a_decoche='false'}
+{else}
+	{$a_decoche='true'}
+{/if}
+<div {if $modul.privilege && !$modul.privilege[$id_privilege]}
+		style="background-color:#808080" 
+	{elseif ATF::$usr->privilege($modul.module,ATF::privilege()->nom($id_privilege))}
+    	onclick="ATF.tpl2div('profil_privilege,modification.ajax','coche={$a_decoche}&id_module={$id_module|cryptid}&id_privilege={$id_privilege|cryptid}&id_profil={$id_profil}')"
+        class="priv_et_modif"
+    {else}
+        class="priv_pas_modif"
+    {/if} >
+	{if $a_decoche=='true'}&nbsp;{else}<img src="{ATF::$staticserver}images/privilege/{$id_privilege|default:$info_priv.id_privilege}.png" alt="" />{/if}
+</div>

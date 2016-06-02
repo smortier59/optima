@@ -1,0 +1,14 @@
+{strip}
+{*
+@param string $module
+*}
+<div id="{$module}_graphe_{$smarty.get.type}"></div>
+<script type="text/javascript">/*<![CDATA[*/
+var so = new SWFObject("{ATF::$staticserver}flash/Charts/MSLine.swf", "{$module}_graphe_{$smarty.get.type}", "250", "150", "8", "#FFFFFF");
+so.addVariable("dataXML","{include file='stats.tpl.xml' data=ATF::getClass($module)->stats(false,$smarty.get.type,true)}");			
+so.addParam('wmode', 'transparent');
+so.addParam('allowScriptAccess', 'always');
+so.addParam('quality', 'high');
+so.write('{$module}_graphe_{$smarty.get.type}');
+/*]]>*/</script>
+{/strip}

@@ -1,0 +1,7 @@
+<div>
+	{if $smarty.request.id_vi_pa}
+        <div id="__view_cout_unitaire">{include file="visite-formulaire_attr_cout.tpl.htm" infos=ATF::vi_pa()->viewCosts($smarty.request,$smarty.session)}</div>
+    {else}
+    	Aucun VI_PA spécifié !
+    {/if}
+</div>

@@ -1,0 +1,81 @@
+{strip}
+<div  class="pagerFilterLi" style="margin-left:5px;margin-right:5px;">
+    <a href="javascript:;" onclick="$('#__chooseColums_column_list').removeChild($('#__chooseColumnsAdd{$key}'));ATF.__pager_filterAdd();">
+        {png_image src="{ATF::$staticserver}images/icones/delete.png" height="16" width="16"}
+    </a>
+</div>
+{$noms=$field|explode:"."}
+<div  class="pagerFilterLi" style="width:274px;">
+	{ATF::$usr->trans($field,$table)}{if $noms[1] && $noms[0]!=$current_class->table} ({ATF::$usr->trans($noms[0],'module')}){/if}
+</div>
+
+{if $noms[1] && $noms[0]!=$current_class->table && ATF::getClass($noms[0])}
+	{$type=ATF::getClass($noms[0])->fieldTypeHTML($field)} {* Récupération du type *}
+{elseif ATF::getClass($table)}
+	{$type=ATF::getClass($table)->fieldTypeHTML($field)} {* Récupération du type *}
+{/if}
+
+<input id="__chooseColumnsAdd_field_{$key}" name="field[{$key}]" type="hidden" value="{$field}" />
+<div class="pagerFilterLi">
+    <select id="__chooseColumnsAdd_operand_{$key}" name="operateur[{$key}]" style="width:auto"
+    		{if $type.type=='date' || $type.type=='datetime'}
+            	onchange="if(this.value=='BETWEEN'){ 
+                			$('#between{$key}').show();
+                            $('#notbetween{$key}').hide();
+                            $('#compris_entre{$key}').show(); 
+                          }else{ 
+                          	$('#between{$key}').hide();
+                            $('#notbetween{$key}').show();
+                            $('#compris_entre{$key}').hide(); 
+                            
+                            if(this.value=='DATE_JOUR' || this.value=='IS NULL' || this.value=='IS NOT NULL'){
+                            	$('#__chooseColumnsAdd_value_{$key}').hide();
+                            }else{
+                            	$('#__chooseColumnsAdd_value_{$key}').show();
+                            }
+                          } 
+                          ATF.__pager_filterAdd();"
+            {/if} >
+        {html_options values=querier::$operateur output=ATF::$usr->trans(querier::$operateur,operateur_filtre) selected=$operand}
+    	{if $type.type=='date' || $type.type=='datetime'}
+        	<option value="BETWEEN" {if $operand=='BETWEEN'}selected="selected"{/if}>{ATF::$usr->trans('compris','filtre')}</option>
+            <option value="DATE_JOUR" {if $operand=='DATE_JOUR'}selected="selected"{/if}>{ATF::$usr->trans('date_jour','filtre')}</option>
+        {/if}
+    </select>
+</div>
+
+{* création d'un div car le datefield d'ext créé un div qui de ce fait renvoi a la ligne l'input *}
+<div class="pagerFilterLi">
+    {if $type.type=='enum' || $type.type=='set'}
+        <select name="value[{$key}]" id="__chooseColumnsAdd_value_{$key}" style="width:150px">
+            {html_options values=$type.data output=ATF::$usr->trans($type.data,$table) selected=$value}
+        </select>
+    {elseif $type.type=='date' || $type.type=='datetime'}
+    	{$now=$smarty.now|date_format:'%Y-%m-%d 00:00:00'}
+			<div id="between{$key}" {if $operand!='BETWEEN'}style="display:none"{/if}>
+					<input type="text" id="__chooseColumnsAdd_value{$key}" maxlength="10" name="value[{$key}]" value="{$value|default:$now}" style="width:150px" />
+					<script type="text/javascript">/*<![CDATA[*/
+							ATF.datefield("__chooseColumnsAdd_value{$key}",'Y-m-d 00:00:00');
+					/*]]>*/</script>
+			</div>
+			<div id="notbetween{$key}" {if $operand=='BETWEEN'}style="display:none"{/if}>
+				<input type="text" maxlength="10" id="__chooseColumnsAdd_value_{$key}" name="value[{$key}]" value="{$value|default:$now}" 
+						style="width:150px;{if $operand=='DATE_JOUR' || $operand=='IS NULL' || $operand=='IS NOT NULL'}display:none;{/if}" />
+			</div>
+    	{$now=$smarty.now|date_format:'%Y-%m-%d 23:59:59'}
+			<div id="compris_entre{$key}" style="display:inline-block; clear:both; float:right;{if !$value_sup}display:none;{/if}">
+					<div style="float:left">{ATF::$usr->trans('et_le','filtre')}</div>
+					<div style="float:left">
+					<input type="text" id="__chooseColumnsAdd_value_datesup{$key}" maxlength="10" name="value_date[{$key}]" value="{$value_sup|default:$now}" style="width:150px" />
+					<script type="text/javascript">/*<![CDATA[*/
+							ATF.datefield("__chooseColumnsAdd_value_datesup{$key}",'Y-m-d 23:59:59');
+					/*]]>*/</script>
+					</div>
+			</div>
+    {else}
+        <input type="text" value="{$value}" id="__chooseColumnsAdd_value_{$key}" name="value[{$key}]" style="width:150px"{if $type.type=='float' || $type.type=='decimal'} onchange="this.value=this.value.replace(',','.');{$onchange}"{/if} />
+    {/if}
+</div>
+
+<div style="clear:both"></div>
+{/strip}

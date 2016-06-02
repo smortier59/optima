@@ -1,0 +1,278 @@
+@charset "utf-8";
+/* CSS Document */
+
+.x-list-over {
+    background-color:#e0dfdf;
+}
+
+.x-list-selected {
+    background-color:#d5d4d4;
+}
+
+.x-menu-floating, .x-combo-list {
+	z-index:58001 !important;
+}
+
+.height50 {
+	height: 50%
+}
+
+/* PLUGINS HTML EDITOR */
+/*
+	These are examples of styles for the button icons
+*/
+.x-edit-wordpaste {background: url('../../images/extjs/paste_word.png') 0 0 no-repeat !important;}
+.x-edit-table {background: url('../../images/extjs/table.png') 0 0 no-repeat !important;}
+.x-edit-hr {background: url('../../images/extjs/text_horizontalrule.png') 0 0 no-repeat !important;}
+.x-edit-indent {background: url('../../images/extjs/text_indent.png') 0 0 no-repeat !important;}
+.x-edit-char {background: url('../../images/extjs/edit-char.png') 0 0 no-repeat !important;}
+.x-edit-outdent {background: url('../../images/extjs/text_indent_remove.png') 0 0 no-repeat !important;}
+.x-edit-subscript {background: url('../../images/extjs/text_subscript.png') 0 0 no-repeat !important;}
+.x-edit-superscript {background: url('../../images/extjs/text_superscript.png') 0 0 no-repeat !important;}
+.x-edit-removeFormat {background: url('../../images/extjs/exclamation.png') 0 0 no-repeat !important;}
+.x-edit-speedMailInfo {background: url('../../images/extjs/group_link.png') 0 0 no-repeat !important;}
+.x-edit-speedMailLink {background: url('../../images/extjs/link_add.png') 0 0 no-repeat !important;}
+
+/*
+	These styles are used for the character map
+*/
+.char-item {
+	float: left; 
+	border: 1px solid #99BBE8; 
+	margin: 3px; 
+	text-align: center; 
+	vertical-align: middle; 
+	width: 20px; 
+	height: 20px; 
+	font-size: 14px;
+	color: #15428B;
+	cursor: pointer;
+}
+
+.char-item.x-view-selected {
+	background-color: #777;
+}
+
+.char-over {
+	border: 1px solid #15428B;
+	background-color:#d0def0;
+}
+
+/* Boutons utiles aux grid */
+.delete-button {background: url('../../images/icones/delete.png') 0 0 no-repeat !important;}
+.insert-button {background: url('../../images/icones/insert.png') 0 0 no-repeat !important;}
+.arrow_down-button {background: url('../../images/icones/arrow_down.png') 0 0 no-repeat !important;}
+.arrow_up-button {background: url('../../images/icones/arrow_up.png') 0 0 no-repeat !important;}
+.import-button {background: url('../../images/icones/refresh.png') 0 0 no-repeat !important;}
+
+/* Les cases des grid s'agrandissent auto */
+div.x-grid3-cell-inner {
+ height:auto !important;
+ white-space: normal;
+}
+
+/* Classe de  */
+div.gridPanelNoWrapRow table > tbody > tr > td > div.x-grid3-cell-inner {
+ white-space:nowrap !important;
+ max-height:18px;
+}
+
+/* Classe de  */
+div.gridPanelNoWrapRow  div.x-grid3-row.x-grid3-row-selected table > tbody > tr > td > div.x-grid3-cell-inner {
+ white-space:normal !important;
+ max-height:none;
+}
+
+/* FileManager HTMLEditor */
+.x-edit-FileManager {
+	background: url(../../images/extjs/images.png) 0 0 no-repeat !important;
+}
+
+.f-m-viewer .item{
+	float: left;
+	
+	height: 100px;
+	margin : 4px;
+	border: 1px solid #fff;
+}
+.f-m-viewer .item .image{
+	width: 110px;
+	height: 80px;
+	text-align: center;
+}
+.f-m-viewer .item .image img{
+	max-width : 93px;
+	max-height: 80px;
+	border: 2px solid #dddddd;
+}
+.f-m-viewer .item .label{
+	text-align: center;
+	overflow: hidden;
+	width: 90px;
+	margin-left: 5px;
+}
+.f-m-viewer .item-over {
+	border: 1px solid #ccd8e7;
+}
+.f-m-viewer .x-view-selected{
+	background:none repeat scroll 0 0 #ccd8e7;
+	border:1px solid #99bbe8;
+}
+
+.f-m-viewer .item .data, .f-m-viewer .item .object{
+	background-position: center center; 
+	background-repeat: no-repeat; 
+	height: 80px;
+	width: 110px;
+	
+}
+
+.f-m-viewer .item .data{
+	background-image: url("../../images/extjs/data.png");
+}
+.f-m-viewer .item .object{
+	background-image: url("../../images/extjs/swf.png");
+}
+
+/* info */
+.f-m-viewer .info {
+	padding: 5px;
+}
+.f-m-viewer .info .image{
+	width: 170px;
+	height: 120px;
+}
+.f-m-viewer .info .image img{
+	max-width : 160px;
+	max-height: 100px;
+}
+.f-m-viewer .info .row{
+	margin-bottom: 4px;
+}
+.f-m-viewer .info .row b{
+	display: block;
+	margin-left: 5px;
+}
+.f-m-viewer .info .image-size{
+	text-align: center;
+}
+.f-m-viewer .info .data, .f-m-viewer .info .object{
+	background-position: center center; 
+	background-repeat: no-repeat; 
+	width: 170px;
+	height: 120px;
+	
+}
+
+.f-m-viewer .info .data{
+	background-image: url("../../images/extjs/data.png");
+}
+.f-m-viewer .info .object{
+	background-image: url("../../images/extjs/swf.png");
+}
+
+
+.x-form-field-wrap .x-form-color-trigger {
+	background-image: url("../../images/extjs/color_wheel.gif");
+}
+
+.ie6 .x-form-field-wrap .x-form-color-trigger {
+	background-image: url("../../images/extjs/color_wheel.gif");
+}
+
+/*
+AWESOME UPLOADER !
+For hidden file selection and form
+*/
+.au-hidden, .au-hidden *, *.au-hidden {
+	visibility: hidden;
+	width:1px;
+	height:1px;
+	display:block;
+	z-index:-99;
+	position:absolute;
+}
+
+/*
+	For Awesome Uploader in grid with progress bar
+*/
+
+td.x-grid3-td-progress-cell {
+    padding: 0;
+}
+
+td.x-grid3-td-progress-cell div.x-grid3-cell-inner {
+    padding: 0;
+    position: relative;
+    height: 21px;
+}
+
+.ux-progress-cell-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.ux-progress-cell-background {
+    background: #E0E8F3;
+    white-space: nowrap;
+}
+.x-grid3-td-progress-cell .low {
+    background: #11aa11;
+}
+.x-grid3-td-progress-cell .medium {
+    background: #f1fa1a;
+}
+.x-grid3-td-progress-cell .high {
+    background: #ee1111;
+}
+
+.ux-progress-cell-foreground {
+    color: #000;
+    background-color: #9CBFEE;
+    white-space: nowrap;
+    overflow: hidden
+}
+
+.ux-progress-cell-inner-right {
+    text-align: right;
+}
+
+.ux-progress-cell-inner-center {
+    text-align: center;
+}
+
+.ux-progress-cell .ux-progress-cell-inner div {
+    padding: 3px 0 0 4px;
+}
+
+.ux-progress-cell-inner-right div {
+    padding: 3px 4px 0 0;
+    position: relative;
+}
+
+.ux-progress-cell-inner-center div {
+    padding: 3px 0 0 0;
+    position: relative;
+}
+
+.ux-progress-cell-inner-left div {
+    padding: 3px 0 0 4px;
+    position: relative;
+}
+
+/* allow grid text selection in Firefox and WebKit based browsers */
+.x-grid3-row td,
+.x-grid3-summary-row td,
+.x-grid3-cell-text,
+.x-grid3-hd-text,
+.x-grid3-hd,
+.x-grid3-row
+{
+    -moz-user-select: inherit;
+    -khtml-user-select: text;
+    -webkit-user-select: text;
+}

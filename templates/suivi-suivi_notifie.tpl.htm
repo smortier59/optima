@@ -1,0 +1,13 @@
+{if !$requests[$current_class->table]['suivi_notifie']}
+	{$requests=["suivi"=>ATF::suivi()->select($requests[$current_class->table].id_suivi)]}
+{/if}
+<tr>
+    <td class="field">
+        {ATF::$usr->trans('suivi_notifie',$current_class->table)} :
+    </td>
+    <td class="value">
+        {foreach name=for_suivi_notifie from=$requests[$current_class->table]['suivi_notifie'] key=key__ item=item__}
+            {ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_notifie.last}, {/if}
+        {/foreach}
+    </td>
+</tr>

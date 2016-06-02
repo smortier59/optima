@@ -1,0 +1,14 @@
+{$res="{$field}_{$key}"} 
+{$value=$value|urldecode}
+{if $field=="localisation_traduction.codename"}
+	<select style="width:250px;" onchange="ATF.tpl2div('localisation_traduction,maj.ajax','langue={$langue}&id_expression={$id_expression}&field={$field}&key={$key}&search=OK&new_codename=true&codename='+this.value+'&coche='+document.getElementById('no_trad').checked)">
+        <option value=""></option>
+        {html_options options=ATF::db()->recup_codename() selected=$value}
+     </select>
+{else}
+    <input id="__res{$res}" type="text" style="width:250px;"
+    value="{$value}" 
+    onkeyup="ATF.__submitSearch('{$field}','{$key}','{$id_expression}','{$langue}');"
+    /> 
+{/if}
+<div><span style="display: none;" id="__res{$res}_loading"><img alt="Working..." src="{ATF::$staticserver}images/refreshing.gif"/></span></div>  

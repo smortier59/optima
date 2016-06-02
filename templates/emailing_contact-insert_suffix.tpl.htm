@@ -1,0 +1,7 @@
+   <p> Liste d' emailing</p>
+   <p>
+     <select name="emailing_liste[emailing_liste.id_emailing_liste]" id="emailing_liste[emailing_liste.id_emailing_liste]" {if $style} style="{$style}"{/if}>
+        {if $item['null']}<option value="">-</option>{/if}
+        {html_options options=ATF::emailing_liste()->options() selected=$requests[emailing_liste][id_emailing_liste]|default:$item.default}
+    </select>
+   </p>

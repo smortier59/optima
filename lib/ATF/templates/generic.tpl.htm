@@ -1,0 +1,56 @@
+{strip}
+{** Coeur des templates generic - Ce template permet l'appel aux différents generic (select, selectall, insert, update,...)
+* @param string $smarty.request.event L'évènement (select, insert, update)
+* @param classes $current_class L'objet de la classe à utiliser
+* @para string $event l'évènement
+*}
+
+{* ----------------- Recherche du nom du module -------------------- *}
+{$table_name=ATF::$controller->getTable($smarty.request,$current_class)}
+{* ----------------- Recherche de l'évènement -------------------- *}
+{if $force_event}
+	{$event=$force_event}
+{else}
+    {$event=ATF::$controller->getEvent($smarty.request,$event)}
+{/if}
+
+{*  --------------------------     Gestion des clones  (@todo)  ---------------------------------     *}
+{if $smarty.get.event=="cloner" || $smarty.get.event=="update"}
+    {$requests=["{$table_name}"=>$current_class->select($smarty.request[$table_name]["id_{$table_name}"]|default:$smarty.request["id_{$table_name}"]|default:$smarty.get["id_{$table_name}"])]}
+{/if}
+
+{*  ----------------------------     Fiche HTML    --------------------------------     *}
+{if ATF::$html->template_exists("`$table_name`.tpl.htm")}
+	{include file="`$table_name`.tpl.htm"}
+	
+{*  ------------------------     Evnement spécifique (update, insert)    -----------------------------    *}
+{elseif ($event=='insert' || $event=='update' || $event=='cloner') && $current_class->formExt}	
+
+	{if $current_class->selectExtjs}
+	{*if true*}
+		<script type="text/javascript">
+			{include file="generic-select.tpl.js"}
+		</script>
+	{elseif ATF::$html->template_exists("`$current_class->table`-update_ext.tpl.htm")}
+    	{include file="`$current_class->table`-update_ext.tpl.htm"}
+	{else}
+    	{include file="generic-update_ext.tpl.htm"}
+    {/if}
+{elseif ($event=='insert' || $event=='cloner') && ATF::$html->template_exists("`$table_name`-update.tpl.htm")} {* Insert ==> Update  *}
+	{include file="`$table_name`-update.tpl.htm"}
+{elseif $event && ATF::$html->template_exists("`$table_name`-`$event`.tpl.htm")} {* Specific  *}
+	{include file="`$table_name`-`$event`.tpl.htm"}
+{elseif ($event=='insert' || $event=='cloner') && ATF::$html->template_exists("generic-update.tpl.htm")} {* Insert ==> Update  *}
+	{include file="generic-update.tpl.htm"}
+
+{*  ------------------------     Generic Select    -----------------------------    *}	
+{elseif $event && ATF::$html->template_exists("generic-`$event`.tpl.htm")} {* Specific  *}
+	{include file="generic-`$event`.tpl.htm"}
+	
+{*  -----------------------     SelectAll    --------------------------     *}
+{elseif ATF::$html->template_exists("`$table_name`-select_all.tpl.htm")} {* Specific selectAll *}
+    {include file="`$table_name`-select_all.tpl.htm" parent_class=$current_class}
+{else} {* Generic selectAll *}
+    {include file="generic-select_all.tpl.htm" define_div=true parent_class=$current_class}
+{/if}
+{/strip}

@@ -1,0 +1,286 @@
+{** Generic-select - Template par défaut de vue d'un élément
+*}
+{if $current_class->selectExtjs}
+{*if true*}
+    {if ATF::$html->template_exists("societe.tpl.js")}
+        {include file="societe.tpl.js"}
+    {/if}
+	<script type="text/javascript">/*<![CDATA[*/
+		Ext.onReady(function(){
+			Ext.QuickTips.init();
+
+            {include file="generic-select.tpl.js"}
+			//ATF.basicInfo = new Ext.FormPanel(formulaire);
+		});
+	/*]]>*/</script>
+{else}
+	{*if !$requests[$current_class->table]}
+		{$requests=["{$current_class->table}"=>$current_class->select($smarty.request[$current_class->table]["id_{$current_class->name()}"]|default:$smarty.request["id_{$current_class->name()}"]|default:$id|default:$smarty.get["id_{$current_class->name()}"],NULL,$smarty.get.seed)]}
+	{/if*}
+
+	{if $event}
+		{$requests.event=$event}
+	{/if}
+
+	{********* Header( Table standard ) **********}
+	{if $current_class->table_standard && !$current_class->table_standard_no_select}
+		{capture name=title}{$current_class->nom($requests[$current_class->table]["id_{$current_class->table}"])|strtoupper|truncate:65}{/capture}
+		{include file="table_standard.tpl.htm" header=1 forced_title=$smarty.capture.title find=0 png_image=1 event='select'}
+	{/if}
+
+	{if $current_class->colonnes.primary}
+		{$cols_primary=$current_class->colonnes.primary}
+		{$cols_sec=$current_class->colonnes('secondary',$event)}
+	{else}
+		{$cols_primary=$current_class->colonnes.restante}
+	{/if}
+
+    {if !$ignoreCustomTemplate && ATF::$html->template_exists("{$current_class->table}-select.tpl.htm")}
+        {include file="{$current_class->table}-select.tpl.htm"}
+    {else}
+        {**************** Primary (infos principales) *******************}
+        <div class="primary">
+            {if !$current_class->table_standard}
+                <div class="slipTitle">
+                    <div class="slipTitleL"></div>
+                    <div class="slipTitleM">
+                        <span>{$current_class->nom($requests[$current_class->table]["id_{$current_class->table}"])|php:"strip_tags"|html_entity_decode:$smarty.const.ENT_QUOTES:"UTF-8"|truncate:65}</span>
+                    </div>
+                    <div class="slipTitleR"></div>
+                </div>
+            {/if}
+            <div class="primaryContainer" id="primaryContainer" {if $permapdf}style="left:10px;"{/if}>
+                {include file="container.tpl.htm"}
+                <div class="slipContainer" id="slipContainer">
+                    <table class="std">
+                        <tbody>
+                            {if ATF::$html->template_exists("{$current_class->table}-select_prefix.tpl.htm")}
+                                {include file="{$current_class->table}-select_prefix.tpl.htm" entete=true}
+                            {/if}
+                            {foreach from=$current_class->colonnes("primary",'select') key=key item=item}
+                                {if $requests[$current_class->table][$key] || $item.custom} {* On evite les élements vides *}
+                                    <tr class="selectRow{cycle name='primary' values='0,1'}">
+                                        {include file="generic_field.tpl.htm" key=$key item=$item display_fields=true}
+                                    </tr>
+                                {/if}
+                            {foreachelse}
+                                <tr>
+                                    <td>
+                                        {ATF::$usr->trans("aucune_colonne_dans_primary",$current_class->table)}
+                                    </td>
+                                </tr>
+                            {/foreach}
+                            {if ATF::$html->template_exists("{$current_class->table}-select_suffix.tpl.htm")}
+                                {include file="{$current_class->table}-select_suffix.tpl.htm" entete=true}
+                            {/if}
+                            {if $current_class->quickMail}
+                                <td class="field">
+                                    Envoi rapide de Mail
+                                </td>
+                                <td id="mailDevis" class="value inputField">
+                                    {$id=$requests[$current_class->table]["id_{$current_class->table}"]}
+                                    <a href="javascript:;"
+                                            onclick="{strip}var w=new Ext.Window({
+                                            layout: 'fit',
+                                            title: '{ATF::$usr->trans($current_class->table,module)|escape:javascript} | Mail',
+                                            width:1000,
+                                            x: 100,
+                                            y: 100,
+                                            id: 'quick_mail{$id}',
+                                            monitorResize:true,
+                                            autoLoad:{ url: '{$current_class->table},quick_mail_template.ajax,id={$id}', scripts:true }
+                                        }).show();return false;{/strip}" />
+                                        <img src="{ATF::$staticserver}images/icones/email.png" height="16" width="16" alt="" />
+                                    </a>
+
+                                </td>
+                            {/if}
+                            {if $current_class->files}
+                                <tr>
+                                    <td colspan="2" style="text-align:center;font-weight:bold;">
+                                        <hr />
+                                        {ATF::$usr->trans("gestion_fichier")}
+                                    </td>
+                                </tr>
+                            {/if}
+                            {foreach from=$current_class->files key=key item=item}
+                                <tr>
+                                    {include file="generic_field.tpl.htm" key=$key item=$item display_fields=true type="file"}
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {**************** Secondary (infos non renseignées dans le primary) *******************}
+            {if $cols_sec=$current_class->colonnes("secondary",'select')}
+                {*Bricolage pour supprimer les infos supplémentaires*}
+                {foreach from=$cols_sec key=key item=item}
+                    {if !$item.custom && $requests[$current_class->table][$key]} {* On evite les élements vides *}
+                        {$infos_supp=true}
+                    {/if}
+                {/foreach}
+
+                {if $infos_supp}
+                    <div class="secondary" id="secondary" {if $permapdf}style="left:10px;"{/if}>
+                        {if !$current_class->panels.secondary.nodeply}
+                            <div class="secondaryTopCornerTopLeft" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryTopCornerTopRight" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryTopTopMiddle" onclick="ATF.pliDepliPanel('secondaire');"></div>
+
+                            <div class="secondaryTopLeft" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryTopRight" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryTopMiddle" onclick="ATF.pliDepliPanel('secondaire');">{t w=cadre_information_supplementaire p=$current_class->table}</div>
+
+                            <div class="secondaryTopCornerBottomLeft" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryTopCornerBottomRight" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryTopBottomMidlle" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                        {else}
+                            <div class="secondaryTopCornerTopLeft"></div>
+                            <div class="secondaryTopCornerTopRight"></div>
+                            <div class="secondaryTopTopMiddle"></div>
+
+                            <div class="secondaryTopLeft"></div>
+                            <div class="secondaryTopRight"></div>
+                            <div class="secondaryTopMiddle">{t w=cadre_information_supplementaire p=$current_class->table}</div>
+
+                            <div class="secondaryTopCornerBottomLeft"></div>
+                            <div class="secondaryTopCornerBottomRight"></div>
+                            <div class="secondaryTopBottomMidlle"></div>
+                        {/if}
+
+                        <div id="complement_secondary_{$current_class->table}_{$requests[$current_class->table]["id_{$current_class->table}"]}" class="secondaryMiddle" {if !$current_class->panels.secondary.visible && !$permapdf && ATF::$usr->custom["user"]["show_all"]!='oui'}style="display:none;"{/if}>
+                            <table style="width:100%">
+                                {foreach from=$cols_sec key=key item=item}
+                                    {if !$item.custom && $requests[$current_class->table][$key]} {* On evite les élements vides *}
+                                        <tr class="selectRow{cycle name='secondary' values='0,1'}">
+                                            {include file="generic_field.tpl.htm" key=$key item=$item display_fields=true}
+                                        </tr>
+                                    {/if}
+                                {/foreach}
+                            </table>
+                        </div>
+
+                        {if !$current_class->panels.secondary.nodeply && !$permapdf}
+                            <div class="secondaryBottomLeft" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryBottomRight" onclick="ATF.pliDepliPanel('secondaire');"></div>
+                            <div class="secondaryBottomMiddle" onclick="ATF.pliDepliPanel('secondaire');">
+                                <img src="{ATF::$staticserver}images/icones/arrow_expand_down.png" alt="expand" id="complement_secondary_{$current_class->table}_{$requests[$current_class->table]["id_{$current_class->table}"]}_img"/>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            {/if}
+            <script type="text/javascript">/*<![CDATA[*/
+                $('.slipContentContainer').each(function (e) {
+                    $(e).css({ height: 10+$('#slipContainer').height()+"px" });
+                });
+
+                {*if ($('#quickActionContainer')) {
+                    $('#quickActionContainer').show();
+                }*}
+
+                ATF.pliDepliPanel = function (nom){
+                    if(nom=="secondaire"){
+                        ATF.TogglePanel('complement_secondary_{$current_class->table}_{$requests[$current_class->table]["id_{$current_class->table}"]}');
+                    }else{
+                        /* Sauvegarde de l'affichage */
+                        ATF.TogglePanel('complement_'+nom);
+                        // ATF.ajax('{$current_class->name()},saveOuverturePanel.ajax','panel=complement_'+nom+'&ouvert='+$('#complement_'+nom).style.display);
+                    }
+                }
+
+            /*]]>*/</script>
+        </div>
+        {**************** Panels *******************}
+        {if $current_class->colonnes.panel}
+            <div class="panel">
+                {foreach from=$current_class->panels($requests[$current_class->table]) key=k item=i}
+                    {$champs_du_panel=$current_class->colonnes($k,'select','true')}
+                    {if $champs_du_panel}
+                        {$panel_legitime=false}
+                        {capture assign=currentPanel}
+                            {if !$current_class->panels.$k.nodeply}
+                                <div class="panelTopCornerTopLeft" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelTopCornerTopRight" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelTopTopMiddle" onclick="ATF.pliDepliPanel('{$k}');"></div>
+
+                                <div class="panelTopLeft" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelTopRight" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelTopMiddle" onclick="ATF.pliDepliPanel('{$k}');">{ATF::$usr->trans("cadre_{$k}",$current_class->table)}</div>
+
+                                <div class="panelTopCornerBottomLeft" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelTopCornerBottomRight" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelTopBottomMidlle" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                            {else}
+                                <div class="panelTopCornerTopLeft" style="cursor:none;"></div>
+                                <div class="panelTopCornerTopRight" style="cursor:none;"></div>
+                                <div class="panelTopTopMiddle" style="cursor:none;"></div>
+
+                                <div class="panelTopLeft" style="cursor:none;"></div>
+                                <div class="panelTopRight" style="cursor:none;"></div>
+                                <div class="panelTopMiddle" style="cursor:none;">{ATF::$usr->trans("cadre_{$k}",$current_class->table)}</div>
+
+                                <div class="panelTopCornerBottomLeft" style="cursor:none;"></div>
+                                <div class="panelTopCornerBottomRight" style="cursor:none;"></div>
+                                <div class="panelTopBottomMidlle" style="cursor:none;"></div>
+                            {/if}
+                            <div id="complement_{$k}" class="panelMiddle" {if ATF::$usr->custom[$current_class->table]["panel_open_close"]["complement_{$k}"]=="ferme" || (!ATF::$usr->custom[$current_class->table]["panel_open_close"]["complement_{$k}"] && !$current_class->panels[$k].visible && !$permapdf  && ATF::$usr->custom["user"]["show_all"]!='oui')}style='display:none;'{/if}>
+                                <table class="std">
+                                    <tbody>
+                                        {foreach from=$champs_du_panel key=k_ item=i_}
+                                            {if !$i_.panel_key && ($requests[$current_class->table][$k_] || $i_.custom)}
+                                                {$panel_legitime=true}
+                                                <tr class="selectRow{cycle name=$k values='0,1'}">
+                                                   {include file="generic_field.tpl.htm" key=$k_ item=$i_ display_fields=true}
+                                                </tr>
+                                            {/if}
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {if !$current_class->panels.$k.nodeply && !$permapdf}
+                                <div class="panelBottomLeft" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelBottomRight" onclick="ATF.pliDepliPanel('{$k}');"></div>
+                                <div class="panelBottomMiddle" onclick="ATF.pliDepliPanel('{$k}');">
+                                    <img src="{ATF::$staticserver}images/icones/arrow_expand_{if ATF::$usr->custom[$current_class->table]["panel_open_close"]["complement_{$k}"]=="ferme" || (!ATF::$usr->custom[$current_class->table]["panel_open_close"]["complement_{$k}"] && !$current_class->panels[$k].visible)}down{else}up{/if}.png" alt="expand" id="complement_{$k}_img" />
+                                </div>
+                            {/if}
+                            <div class="panelSpacer"></div>
+                        {/capture}
+                        {if $panel_legitime}{$currentPanel}{/if}
+                    {/if}
+                {/foreach}
+            </div>
+        {/if}
+        <div class="ClearBothWithPadding"></div>
+        {if ATF::$html->template_exists("`$current_class->table`-select_prefix_onglet.tpl.htm")}
+            <div class="onglet">
+                <div class="ClearBoth"></div>
+                <div class="ongletLeft"></div>
+                <div class="ongletRight"></div>
+                <div class="ongletMiddle"></div>
+                <div class="ClearBoth"></div>
+            </div>
+            {include file="{$current_class->table}-select_prefix_onglet.tpl.htm"}
+        {/if}
+
+        {********* Footer( Table standard ) **********}
+        {if $current_class->table_standard && !$current_class->table_standard_no_select}
+            {include file="table_standard.tpl.htm" header=0}
+        {/if}
+
+        {********* Onglets **********}
+        {include file="generic-onglets.tpl.htm" onglets=$current_class->onglets}
+
+        {********* Ajout rapide d'onglets **********}
+        {if $current_class->onglets && $current_class->optionsListeOnglet()}
+            <div class="onglet">
+                <hr />
+                <div id="ajout_onglet" style="text-align:center;">
+                    {include file="ajout_onglet.tpl.htm"}
+                </div>
+            </div>
+        {/if}
+    {/if}
+{/if}

@@ -1,0 +1,8 @@
+{* Actions effectuées sur le selectAll comme l'exportation, la suppression, la sélection,...
+* @param boolean $down 1 pour afficher l'icone de sélection vers le bas (pour un positionnement en haut)
+*}
+<div id="{$div}_checkedSelection{if $down}Down{/if}" class="checkedSelection{if $down}Down{/if}" {if $down && !$table_standard}style="display:none"{/if}>{strip}
+    <a href="javascript:;" onclick="ATF.updSel('{$current_class->table}','all')">{ATF::$usr->trans(checked_selection_all)}</a>
+    /<a href="javascript:;" onclick="ATF.updSel('{$current_class->table}','no')">{ATF::$usr->trans(checked_selection_nothing)}</a>
+    /<a href="javascript:;" onclick="ATF.updSel('{$current_class->table}')">{ATF::$usr->trans(checked_selection_invert)}</a>
+{/strip}</div>

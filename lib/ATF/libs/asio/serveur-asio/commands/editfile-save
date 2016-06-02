@@ -1,0 +1,18 @@
+#!/bin/bash
+# Sauvegarde un flux dans un fichier
+# Le flux DOIT ETRE PASSE EN ENTREE DANS LE SCRIPT (à l'aide d'un pipe par ex)
+# Attention à l'éxécution de cette commande !
+# Syntaxe : editfile-save <path-absolu-du-fichier> <nouveau-contenu>
+# Exemple : editfile-save /etc/asterisk/asterisk.conf "; [files]"..
+
+# L'argument existe ?
+if [ "$#" -ne 2 ]
+then
+echo "Usage: editfile-save PATH CONTENU"
+  exit 1
+fi
+
+# Sauvegarde de l'ancien fichier
+cp "$1" "$1".save-by-asio
+# Sauvegarde du nouveau fichier
+echo -n "$2" > $1

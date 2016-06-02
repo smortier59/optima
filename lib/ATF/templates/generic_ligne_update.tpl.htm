@@ -1,0 +1,13 @@
+{* héhé *}
+{if !$event}
+	{$event=$smarty.request.event}
+{/if}
+{if !$table}
+	{$table="{$current_class->table}_ligne"}
+{/if}
+<hr />
+<br />
+{include file="generic_ligne.tpl.htm" entete=true table=$table}
+<div id="ligne_conteneur">
+    {include file="generic_ligne.tpl.htm" entete=false table=$table}
+</div>

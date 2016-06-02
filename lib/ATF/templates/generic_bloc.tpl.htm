@@ -1,0 +1,47 @@
+{*héhé utf8*}
+{$infos =accueil::info_accueil($table,$__s)}
+{if $infos}
+	<div class="BlocAccueil">		
+		
+        <div class="tCornerTopLeft"></div>
+        <div class="tTop"><img src="{ATF::$table()->icone()}" height='16' width='16' alt="" />&nbsp;{ATF::$usr->trans($table,'accueil')}</div>
+        <div class="tCornerTopRight"></div>
+        <div class="tSpacer"></div>
+
+        <div class="BlocContent">
+            <div class="tabContent">
+                <table>
+                    <thead>
+                        <tr>
+                            {foreach from=accueil::$colonnes_accueil key=key item=item}
+                              <th>{ATF::$usr->trans($item,'accueil')}</th>
+                            {/foreach}
+                        </tr>
+                    </thead>
+                	<tbody>
+                    	<tr>
+                        	<td colspan="4"><hr class="AccueilSpacer"/></td>
+                        </tr>
+                        {foreach from=$infos key=key item=item}
+                           <tr>
+                               {foreach from=accueil::$colonnes_accueil key=key_ item=item_}
+                                    <td>
+                                        {if $item_ == 'nom'}
+                                           <a href="#{$table}-select-{classes::cryptId($item['id'])}.html">{ATF::$table()->nom($item['id'])|truncate:25}</a>
+                                        {elseif $item_ == 'user'}
+                                            <a href="#user-select-{classes::cryptId($item["id_user"])}.html">{ATF::user()->nom($item["id_user"])}</a>
+                                        {elseif $item_ == 'date'}
+                                            {ATF::$usr->date_trans($item[$item_])}
+                                        {else}
+                                           <img src="{ATF::$staticserver}images/{$item[$item_]}.png"/>
+                                        {/if}
+                                    </td>
+                                {/foreach}
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>        
+        </div>        
+	</div>        
+{/if}

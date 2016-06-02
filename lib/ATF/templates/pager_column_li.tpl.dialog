@@ -1,0 +1,15 @@
+{strip}
+{$noms=$item|explode:"."}
+<div style="display:inline-block; width:300px">{ATF::$usr->trans($item,$table)}{if $noms[1] && $noms[0]!=$current_class->table} ({ATF::$usr->trans($noms[0],'module')}){/if}</div>
+<input id="__chooseColumnsAdd_field_{$key}" name="field[{$item}]" type="hidden" value="{$item}" />
+<select id="__chooseColumnsAdd_align_{$key}" name="align[{$item}]" style="width:auto">
+    <option value="left"{if $align=="left"} selected="selected"{/if}>{ATF::$usr->trans(pager_column_align_left)}</option>
+    <option value="center"{if $align=="center"} selected="selected"{/if}>{ATF::$usr->trans(pager_column_align_center)}</option>
+    <option value="right"{if $align=="right"} selected="selected"{/if}>{ATF::$usr->trans(pager_column_align_right)}</option>
+</select>
+{ATF::$usr->trans(pager_column_prefix)} : <input type="text" value="{$prefix}" id="__chooseColumnsAdd_prefix_{$key}" name="prefix[{$item}]" style="width:30px" />
+{ATF::$usr->trans(pager_column_suffix)} : <input type="text" value="{$suffix}" id="__chooseColumnsAdd_suffix_{$key}" name="suffix[{$item}]" style="width:30px" />
+<a href="javascript:;" onclick="$('#__chooseColums_column_list').removeChild($('#__chooseColumnsAdd{$key}'));ATF.__chooseColumnsAdd(); Modalbox.resizeToContent();">
+    {png_image src="{ATF::$staticserver}images/icones/delete.png" height="16" width="16"}
+</a>
+{/strip}

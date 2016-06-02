@@ -1,0 +1,53 @@
+<div class="tabContent" id="resultat">
+    {assign var=detail_projet value=ATF::gep_projet()->detail_projet($requests["{$current_class->table}"].id_gep_projet)}
+    {assign var=detail_projet_par_mois value=ATF::gep_projet()->detail_projet_par_mois($requests["{$current_class->table}"].id_gep_projet)}
+    <table class="std">
+        <tr>
+            <td class="field">Utilisateur(s)</td>
+            {*Affichage des utilisateurs*}
+            {foreach from=ATF::gep_projet()->liste_user($requests["{$current_class->table}"].id_gep_projet) key=key item=item}
+                <td class="field" style="text-align:center;font-style:italic;">{ATF::user()->nom($item,'true')}</td>
+            {/foreach}
+        </tr>
+        {*Temps total pour le mois*}
+        {assign var=tps_total_mois value=ATF::gep_projet()->tps_projet_mois($requests["{$current_class->table}"].id_gep_projet)}
+        {*Affichage des mois*}
+        {foreach from=$detail_projet_par_mois key=key item=item}
+        <tr>
+            <td class="field" style="text-align:center;">{ATF::$usr->date_trans($key)}</td>
+            {*Affichage du temps de travail par utilisateur pour le mois en cours*}
+            {foreach from=$item key=key2 item=item2}
+                {assign var=nb_jours value="{$item2}/7"}
+                {assign var=nb_jours value=$nb_jours|string_format:"%.2f"}
+                <td style="text-align:center;">{if $item2}{$item2}{else}-{/if}</td>
+            {/foreach}
+            {assign var=nb_jours value="{$tps_total_mois[$key]}/7"}
+            {assign var=nb_jours value=$nb_jours|string_format:"%.2f"}
+            <td class="field" style="text-align:center; color:red;">{if $tps_total_mois[$key]}{$tps_total_mois[$key]}{else}-{/if}</td>
+        </tr>
+        {/foreach}
+        <tr><td><hr /></td></tr>
+        <tr>
+            <td class="field">Temps de travail cumulé</td>
+            {foreach from=$detail_projet key=key item=item}
+                <td style="text-align:center;">{$item.temps_total}</td>
+            {/foreach}
+        </tr>
+        <tr>
+            <td class="field">&nbsp;</td>
+            {foreach from=$detail_projet key=key item=item}
+                <td style="text-align:center;">{$item.temps_total/8}&nbsp;jour(s){if $item.temps_hot!=0}<br />/ {$item.temps_hot/8}&nbsp;jour(s){/if}</td>
+            {/foreach}
+        </tr>
+    </table>
+</div>
+<hr />
+<table>
+    <tr>
+        <td class="field" style="width:250px">Temps de travail total sur le projet</td>
+        {assign var=tps_total_projet value=ATF::gep_projet()->tps_total_projet($requests["{$current_class->table}"].id_gep_projet)}
+        <td class="field" style="color:red;width:350px">
+            {$tps_total_projet.temps_total}&nbsp;({$tps_total_projet.temps_total/8}&nbsp;jour(s)){if $tps_total_projet.temps_hot!="0h00"} / {$tps_total_projet.temps_hot}&nbsp;({$tps_total_projet.temps_hot/8}&nbsp;jour(s)){/if}
+        </td>
+    </tr>
+</table>

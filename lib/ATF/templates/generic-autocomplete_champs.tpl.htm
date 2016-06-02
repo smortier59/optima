@@ -1,0 +1,70 @@
+{*
+	$current_class : La classe actuelle
+	$key : La clé (champ)
+	$width : taille des champs input (utilisé pour le generic_field_input) => integer
+	$value : valeur de pré-remplissage
+*}
+{if !$key_class}
+	{$key_class=ATF::getClass($current_class->fk_from($key))}
+{/if}
+{if !$function}
+	{$function="autocomplete"}
+{/if}
+{if $extra=='readonly="readonly"'}
+	{$key_class->nom($value)|default:$value} <input type="hidden" name="{$name}" id="{$name}" value="{$value}" />
+{elseif $count < $smarty.const.__SEUIL_AUTOCOMPLETION__}
+	<select {$extra} {if !$noname} name="{$name}" {/if} id="{$name}" onchange="{strip}{if $onkeyup}
+																			        {$onkeyup}
+																		 	   {elseif ATF::$html->template_exists("{$smarty.request.table|default:$table}-{$key}-oncomplete.tpl.js")}
+																					var record = { data: { id:this.value } };
+																					{include file="{$smarty.request.table|default:$table}-{$key}-oncomplete.tpl.js"}
+																			   {/if}{/strip}">
+        {if $item['null']}<option value="">-</option>{/if}
+        {html_options options=$key_class->options(null,null,false) selected=$value|default:$item.default}
+    </select>
+{else}
+    {* Autocomplete si configuré comme tel, sinon seulement si le nombre d'enregistrement dans la table dépasse le seuil déterminé *}
+    {if $item.textarea}
+        <textarea {$extra} onkeyup="if (event.keyCode == 13) { this.rows = this.rows + 1; }" rows="1" name="label_{$key}" id="label_{$key}">{$key_class->nom($value)|default:$value}</textarea>
+    {else} 
+        <input type="text" {$extra} name="label_{$name}" id="label_{$name}" onkeyup="if (!this.value){ $('#{$name|replace:"[":"\\\\["|replace:"]":"\\\\]"}').val(''); }else{ $('#{$name|replace:"[":"\\\\["|replace:"]":"\\\\]"}').val(this.value);}" onchange="{$onkeyup}" value="{$key_class->nom($value)|default:$value}" />
+    {/if}
+   <input type="hidden"  {if !$noname} name="{$name}" {/if} id="{$name}" value="{$value}" />
+ 
+    <script type="text/javascript">/*<![CDATA[*/
+		ATF.autocomplete({
+			url:'{$current_class->fk_from($key,false)},{$function}.ajax{if $condition_field && $condition_value},condition_field={$key_class->table}.{$condition_field}&condition_value={$condition_value}{/if}'
+			,mapping:[
+				{ name: 'id', mapping: 0 },
+				{ name: 'nom', mapping: 1 },
+				{ name: 'detail', mapping: 2, type:'string' },
+				{ name: 'nomBrut', mapping: 'raw_1' }
+			]
+			,loadingText:'Recherche...'
+			,template:'{include file="generic-autocomplete.tpl.htm"}'
+			,applyTo:'label_{$name}'
+			,onSelect:function(record){
+				$('#{$name|replace:"[":"\\\\["|replace:"]":"\\\\]"}').val(record.data.id);
+				$('#label_{$name}').val(Ext.util.Format.stripTags(record.data.nom));
+				this.collapse();
+				
+				{if ATF::$html->template_exists("{$table_request|default:$smarty.request.table}-{$key}-oncomplete.tpl.js")}
+					{include file="{$table_request|default:$smarty.request.table}-{$key}-oncomplete.tpl.js"}
+				{elseif ATF::$html->template_exists("generic-{$key}-oncomplete.tpl.js")}
+					{include file="generic-{$key}-oncomplete.tpl.js"}
+				{/if}
+				
+				{$onkeyup}
+			}
+			{if $width},width: {$width}{/if}
+		},{
+			listWidth:400
+		});
+		
+		{* Traitement javascript à exécuter aussi dès affichage de la page *}
+		{if ATF::$html->template_exists("{$smarty.request.table|default:$table}-{$key}-oncomplete.tpl.js") && $value}
+			var record = { data: { id:'{$value}' } };
+			{include file="{$smarty.request.table|default:$table}-{$key}-oncomplete.tpl.js"}
+		{/if}
+    /*]]>*/</script>
+{/if}

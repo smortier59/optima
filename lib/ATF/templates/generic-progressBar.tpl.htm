@@ -1,0 +1,38 @@
+{**
+* Crée une progressBar, Avec comme options un texte, une couleur (orange, vert, gris, rouge), un avancement
+* @param string $id L'id de la progressBar
+* @param string $progress Le style de barre (progressGrey, progressGreen, progressRed, progressOrange)
+* @param string $text Le texte à afficher
+* @param float $avancement le pourcentage d'avancement p avec 0<=p<=1
+*}
+{* Définition de la progressBar *}
+{if !$progress || ($progress!='progressGrey' && $progress!='progressGreen' && $progress!='progressRed' && $progress!='progressOrange' && $progress!='progressBlue' && $progress!='progressJaune')}
+	{$progress="progressGrey"}
+{/if}
+{* Définition de l'avancement *}
+{if !$avancement || $avancement>100 || $avancement<0}
+	{$avancement=0}
+{elseif $avancement>1}
+	{$avancement=$avancement/100}
+{/if}
+{* Définition de la taille *}
+{$taille_max=120}
+{$taille=$taille_max*$avancement}
+<div id="progress-{$id}" style="display:inline;" class="ctProgress">
+	<div id="bar-progress-{$id}" class="{$progress}-wrap" style="width:{$taille_max}px;height:18px;">
+		<div class="{$progress}-inner">
+			<div class="{$progress}-bar" style="height:16px; width:{$taille}px;">
+				<div class="{$progress}-text {if $taille<9}x-hidden{/if}" style="z-index:99;width:{$taille-9}px;line-height:15px;">
+					<div style=" width:{$taille_max}px; height:18px;">
+						{$text}
+					</div>
+				</div>
+			</div>
+			<div class="{$progress}-text {$progress}-text-back">
+				<div style="width:{$taille_max}px;height:18px;">
+					{$text}
+				</div>	
+			</div>
+		</div>
+	</div>
+</div>

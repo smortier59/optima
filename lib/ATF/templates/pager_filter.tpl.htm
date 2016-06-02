@@ -1,0 +1,26 @@
+{** Filtres
+* @param classes $current_class L'objet de la classe à utiliser
+*}
+<div style="width:9px;height:20px;float:left;background:url('{ATF::$staticserver}images/toolbar/toolbarLeft.png') no-repeat;">
+	&nbsp;
+</div>
+<div style="float:left;background:url('{ATF::$staticserver}images/toolbar/toolbarMiddle.png') repeat-x;">
+    <select id="pager_filter_key_{$onglet}" name="filtre" class="filtreSA" 
+        onchange="ATF.tpl2div('{$current_class->name()},updateSelectAll.div','pager={$div}&filter_key='+this.value+'{if $parent_class->table}&parent_class={$parent_class->table}{/if}&{$extra}');">
+        <option value="">{ATF::$usr->trans(aucun,filtre)}</option>
+        {html_options options=ATF::$usr->getFilters($current_class->name()) selected=$q->filter_key}
+    </select>
+    {if $q->filter_key}
+        <a href="javascript:;" 
+            onclick="Modalbox.show('pager_filter.dialog', { width: 750, title: 'Personalisation d\'un filtre pour les listings \'{ATF::$usr->trans($current_class->table,'module')|escape:quotes}\' <a style=\'float:right\' href=\'http://wiki.optima.absystech.net/index.php/Gestion_des_filtres\' target=\'_blank\'>{ATF::$usr->trans(aide)|escape:javascript}</a>', params: 'filter_key='+$('#pager_filter_key_{$onglet}').val()+'&onglet={$onglet}{if $parent_class->table}&parent_class={$parent_class->table}{/if}&{$extra}', method:'post' });">
+            <img src="{ATF::$staticserver}images/icones/update.png" height="16" width="16" alt="" />
+        </a>
+    {/if}
+    <a href="javascript:;" 
+        onclick="Modalbox.show('pager_filter.dialog', { width: 750, title: 'Personalisation d\'un filtre pour les listings \'{ATF::$usr->trans($current_class->table,'module')|escape:quotes}\' <a style=\'float:right\' href=\'http://wiki.optima.absystech.net/index.php/Gestion_des_filtres\' target=\'_blank\'>{ATF::$usr->trans(aide)|escape:javascript}</a>', params: 'onglet={$onglet}{if $parent_class->table}&parent_class={$parent_class->table}{/if}&{$extra}', method:'post' });">
+        <img src="{ATF::$staticserver}images/icones/insert.png" height="16" width="16" alt="" />
+    </a>
+</div>
+<div style="width:8px;height:20px;float:left;background:url('{ATF::$staticserver}images/toolbar/toolbarRight.png') no-repeat;">
+	&nbsp;
+</div>

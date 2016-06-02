@@ -1,0 +1,74 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=facture}
+<div id="{$module}_graphe" class="widget"></div>
+<script type="text/javascript">
+{$data = ATF::getClass($module)->stats(false,ATF::_g(type),true)}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_graphe',
+            type: 'spline'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+            
+        },
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["hoverText"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    enabled:false
+                }                
+        },
+        yAxis: {            
+            title: {
+                text: null
+            },min:0
+        },
+        plotOptions: {
+                spline: {
+                    lineWidth: 2,
+                    states: {
+                        hover: {
+                            lineWidth: 3
+                        }
+                    },
+                    marker: {
+                        enabled: false
+                    }                    
+                }
+            },
+        series: [
+           {foreach $data["dataset"] as $key =>$data2}          
+               {
+                    name: '{$key}'                    
+                   ,data: [ 
+                            {foreach $data["dataset"][$key]["set"] as $value}
+                                {$value["value"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+               }
+                {if !$data2@last},{/if}
+            {/foreach}            
+           ]        
+    });
+});
+    
+</script>
+
+
+<div>
+    <div>Total impayé : <span style="font-weight:bold">{ATF::facture()->getTotalImpayees()|number_format:0:".":" "} &euro;</span></div>
+    {$a=$smarty.now|date_format:"%Y"}
+    <div>Total impayé {$a} : {ATF::facture()->getTotalImpayees($a)|number_format:0:".":" "} &euro;</div>
+    <div>Total impayé {$a-1} : {ATF::facture()->getTotalImpayees($a-1)|number_format:0:".":" "} &euro;</div>
+    <div>Total impayé avant {$a-1} : {ATF::facture()->getTotalImpayees($a-1,true)|number_format:0:".":" "} &euro;</div>
+</div>
+{/strip}
