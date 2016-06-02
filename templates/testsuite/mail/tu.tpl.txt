@@ -1,0 +1,2 @@
+{ATF::$usr->trans(titre,mail_tu)}
+{ATF::$usr->trans(societe,societe)}

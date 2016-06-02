@@ -1,0 +1,12 @@
+<td class="field">
+    {ATF::$usr->trans($key,$current_class->table)} :
+</td>
+<td class="value">
+    {if $requests[$current_class->table].civilite}
+        {$requests[$current_class->table].civilite}.
+    {/if}
+    {if $requests[$current_class->table].prenom}
+        {$requests[$current_class->table].prenom}
+    {/if}
+    {$requests[$current_class->table].nom}
+</td>

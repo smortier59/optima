@@ -1,0 +1,23 @@
+<div id="menu_2">
+    <ul>
+        <li>
+            <a href="javascript:;" onclick="ATF.stats_hotline_charger(1)">Graphe général</a>
+        </li>
+        <li>
+            <a href="javascript:;" onclick="ATF.stats_hotline_charger(2)">Vitesse de prise en charge</a>
+        </li>
+        <li>
+            <a href="javascript:;" onclick="ATF.stats_hotline_charger(3)">Vitesse de cloture</a>
+        </li>
+    </ul>
+</div>
+<div id="stat_hotline">
+	{if $graph}
+    	{include file="stats_hotline_`$graph`.tpl.htm" graph=$graph}
+    {/if}
+</div>
+<script type="text/javascript">/*<![CDATA[*/
+	ATF.stats_hotline_charger = function (num){
+		ATF.tpl2div('tpl2div.ajax','div=stat_hotline&template=stats_hotline_'+num+'&table=hotline&graph='+num);
+	}
+/*]]>*/</script>  

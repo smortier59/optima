@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+<head>
+<title>Désinscription des campagnes d'emailing</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<body style="text-align:center">
+	<a href="http://www.absystech.fr/software/optima-crm" border=0>
+        <img src="{ATF::$staticserver}images/logos/optima.png" border=0 />
+    </a>
+<br /><br />
+	{if $alreadyUnregister}
+    	<div style="color:red; font-weight:bold">Votre email '<strong>{$email}</strong>' est déjà désinscrit. Si vous continuez a recevoir nos campagnes d'emailing, merci de nous contacter via notre portail <a href="http://hotline.absystech.fr">hotline</a> pour relevez le problème</div>
+	{elseif $confirm}
+    	<div style="color:green; font-weight:bold">Votre email '<strong>{$email}</strong>' a bien été supprimé de notre base de contact, vous ne recevrez plus nos campagnes d'emailing.</div>
+    {else}
+        Cliquez sur <strong>NON</strong> pour désinscrire cette adresse email '<strong>{$email}</strong>' de notre liste de diffusion :<br /><br />
+    	<input type="button" onclick="window.location.href = 'http://www.absystech.fr/'" value="OUI" />
+    	<input type="button" onclick="window.location.href = 'speedmail.php?confirm=1&unregister={$unregister}&societe={$societe}'" value="NON" />
+    {/if}
+</body>
+</html>

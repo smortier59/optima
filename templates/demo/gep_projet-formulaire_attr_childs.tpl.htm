@@ -1,0 +1,21 @@
+{strip}
+    {if !$infos}
+        {$infos=$smarty.request}
+    {/if}
+    
+    {if !$noKeep}
+        {ATF::formulaire()->keepOpened("`$infos.id_attr`_`$infos.id_pa`")}
+    {/if}
+    
+    {if !$data}
+        {* ATTR ENFANTS *}
+        {$data = ATF::pa()->selectChilds($infos.id_pa)}
+        {if !$data}
+            {$data = ATF::attr()->selectChilds($infos.id_attr)}
+        {/if}
+    {/if}
+    
+    {foreach from=$data key=k item=i}
+        {include file="gep_projet-formulaire_attr.tpl.htm" infos=$i indent=15}
+    {/foreach}
+{/strip}

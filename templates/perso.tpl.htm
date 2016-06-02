@@ -1,0 +1,34 @@
+<table>
+	<tr>
+		<td style="width:25px;padding:2px"></td>
+		<td style="padding:2px;font-weight:bold">
+        	{ATF::$usr->nom(ATF::$usr->getID(),true)}
+        </td>
+	</tr>
+	{foreach from=ATF::$usr->get(custom,preference,menu_rapide) key=key item=item}
+		{if $item}
+			<tr>
+				{assign var=id_module value=ATF::module()->from_nom($item)}
+				{assign var=count value=-1}
+				{if $item == "my"}
+					{assign var=link value="generic.php?table=my"}
+				{elseif $item == "pointage"}
+					{assign var=date value=$smarty.now|date_format:"%Y-%m"}
+					{assign var=link value="generic.php?table=pointage&amp;event=select&amp;id_user={ATF::$usr->getID()}&amp;date=`$date`"}
+				{elseif $item == 'tache'}
+					{assign var=link value="rechercher.php?recherche=1&amp;module=`$item`&amp;search=1&amp;field[0]=id_user&amp;field[1]=etat&amp;operateur[0]=%3D&amp;operateur[1]=!%3D&amp;comparateur=AND&amp;value[0]={ATF::$usr->getID()}&amp;value[1]=fini"}
+				{else}
+					{assign var=link value="rechercher.php?recherche=1&amp;module=`$item`&amp;search=1&amp;field[0]=id_owner&amp;operateur[0]=%3D&amp;comparateur=AND&amp;value[0]={ATF::$usr->getID()}"}
+					{assign var=count value=ATF::$item()->select_special('id_owner',ATF::$usr->getID(),null,null,false,1)}
+				{/if}
+				
+				<td style="width:25px;padding:2px"><img src="{ATF::$staticserver}images/icones/module_icone_`$id_module`.png" height="16" width="16" alt="" /></td>
+				<td style="padding:2px"><a href="{$link}">{ATF::$usr->trans($item,"menu_rapide")}{if $count >= 0} ({$count}){/if}</a></td>
+			</tr>
+		{/if}
+	{/foreach}
+	<tr>
+		<td style="width:25px;padding:2px"><img src="{ATF::$staticserver}images/icones/exit.png" height="16" width="16" alt="" /></td>
+		<td style="padding:2px"><a href="logout">Déconnexion</a></td>
+	</tr>
+</table>

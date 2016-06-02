@@ -1,0 +1,51 @@
+{if !$key_class}
+	{$key_class=ATF::getClass($current_class->fk_from($key))}
+{/if}
+{if !$function}
+	{$function="autocomplete"}
+{/if}
+
+{if $count < $smarty.const.__SEUIL_AUTOCOMPLETION__ && $extra!='readonly="readonly"'}
+	<select {$extra} {if !$noname} name="{$name}" {/if} id="{$name}" >
+        {if $item['null']}<option value="">-</option>{/if}
+        {html_options options=$key_class->options(null,null,false) selected=$value|default:$item.default}
+    </select>
+{else}
+    {* Autocomplete si configuré comme tel, sinon seulement si le nombre d'enregistrement dans la table dépasse le seuil déterminé *}
+    {if $item.textarea}
+        <textarea {$extra} onkeyup="if (event.keyCode == 13) { this.rows = this.rows + 1; }" rows="1" name="{$key}_label" id="{$key}_label">{$key_class->nom($value)}</textarea>
+    {else} 
+        <input type="text" {$extra} name="{$key}_label" id="{$key}_label" onkeyup="if (!this.value) $('#{$name}').val('');" value="{$key_class->nom($value)}" />
+    {/if}
+    <input type="hidden"  {if !$noname} name="{$name}" {/if} id="{$name}" value="{$value}" />
+    <span id="ScrAcAutocompleteIndicator{$key}" style="display: none">
+      <img src="{ATF::$staticserver}images/refreshing.gif" alt="Working..." />
+    </span>
+    <div id="ScrAcAutocomplete{$key}" class="ScrAcAutocomplete"></div>
+
+    <script type="text/javascript">/*<![CDATA[*/
+    new Ajax.Autocompleter (
+      '{$key}_label',
+      'ScrAcAutocomplete{$key}',
+      '{$current_class->fk_from($key)},{$function}.ajax{if $condition_field && $condition_value},condition_field={$key_class->table}.{$condition_field}&condition_value={$condition_value}{/if}',
+      { 
+        method: 'post'
+        , paramName: 'recherche' 
+        , minChars: 1
+        , indicator: 'ScrAcAutocompleteIndicator{$key}'
+        , afterUpdateElement : function (text, li) { 
+            $('#{$name}').val(li.id); 
+            {if ATF::$html->template_exists("{$table_request|default:$smarty.request.table}-{$key}-oncomplete.tpl.js")}
+                {include file="{$table_request|default:$smarty.request.table}-{$key}-oncomplete.tpl.js"}
+            {/if}
+        }
+      }
+    );
+    
+    {* Traitement javascript à exécuter aussi dès affichage de la page *}
+    {if ATF::$html->template_exists("{$smarty.request.table|default:$table}-{$key}-oncomplete.tpl.js") && $value}
+        var li = { id:'{$value}' }
+        {include file="{$smarty.request.table|default:$table}-{$key}-oncomplete.tpl.js"}
+    {/if}
+    /*]]>*/</script>
+{/if}

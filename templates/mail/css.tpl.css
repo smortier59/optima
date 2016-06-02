@@ -1,0 +1,8 @@
+@charset "utf-8";
+body { font-family:Tahoma, Verdana; font-size:12px; }
+div#top { background-image:url("{ATF::$staticserver}images/design/mail/top.jpg"); width:800px; height:174px; }
+div#bottom { background-image:url("{ATF::$staticserver}images/design/mail/bottom.jpg"); width:800px; height:82px; clear:left; }
+div#middle { width:800px; }
+div#left { background-image:url("{ATF::$staticserver}images/design/mail/left.jpg"); width:210px; height:711px; float:left; }
+div#right { background-image:url("{ATF::$staticserver}images/design/mail/right.jpg"); width:46px; height:711px; float:left; }
+div#content { float:left; width:544px; }

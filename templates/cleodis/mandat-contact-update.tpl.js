@@ -1,0 +1,1 @@
+{include file="mandat-contact-insert.tpl.js"}

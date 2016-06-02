@@ -1,0 +1,20 @@
+{if !$requests}
+    {$requests=$smarty.request}
+{/if}
+
+{$suivi_contact=ATF::contact()->decryptId($requests.contact_id_contact|default:$requests.id_contact|default:$requests.suivi.suivi_contact)}
+
+{if $requests[$current_class->table].id_societe}
+	{$id_societe=$requests[$current_class->table].id_societe}
+{elseif $requests.id_societe}
+	{$id_societe=$requests.id_societe}
+{elseif $smarty.post.id_societe}
+	{$id_societe=$smarty.post.id_societe}
+{/if}
+
+{if $id_societe}
+    <select multiple='multiple' name="suivi_contact[]" size='5'>
+        {ATF::contact()->q->reset()->addCondition(id_societe,ATF::contact()->decryptId($id_societe))->addCondition(etat,actif)->end()}
+        {html_options options=ATF::contact()->options(null,null,false) selected=$suivi_contact}
+    </select>
+{/if}

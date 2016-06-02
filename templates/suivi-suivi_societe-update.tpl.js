@@ -1,0 +1,1 @@
+{include file="suivi-suivi_societe-insert.tpl.js"}

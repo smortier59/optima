@@ -1,0 +1,5 @@
+{if $item['tache.type'] == "vtodo"}
+    <span {tip text=ATF::$usr->trans("vtodo",'tache') title="Type"}><img src="{ATF::$staticserver}images/icones/date.png" height="16" width="16" alt="" /></span>
+{else}
+    <span {tip text=ATF::$usr->trans("vevent",'tache') title="Type"}><img src="{ATF::$staticserver}images/icones/clock.png" height="16" width="16" alt="" /></span>
+{/if}

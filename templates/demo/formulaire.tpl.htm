@@ -1,0 +1,95 @@
+{*
+	@param $table Module appelé (gep_projet ou visite)
+*}
+
+<script item.type="text/javascript">/*<![CDATA[*/
+	/* Méthodes de manipulation des formulaires */
+	ATF.__attr = {
+		/* Permet de refermer une branche et stocker dans la variable de session appelée en ajax que cette branche est fermée */
+		collapse:function(div,id,noAjax) {
+			Effect.BlindUp($('#'+div), { scaleY: true, duration:.3, afterFinish:function() { 
+					$('#'+div).innerHTML=''; 
+					if (!this.noAjax) {
+						new ATF.ajax('formulaire,removeOpened.ajax','id='+id, { onComplete:ATF.ajax_refresh }); 
+					}
+					ATF.adjustContainer(); 
+				}.bind({ noAjax:noAjax })
+			});
+			if ($('#icon_'+id)) {
+				$('#icon_'+id).removeClassName('collapse');
+				$('#icon_'+id).addClassName('expand');
+			}
+		}
+		/* Permet d'ouvrir une branche et stocker dans la variable de session appelée en ajax que cette branche est ouverte 
+		* @param new_multi Si non nul, alors il est demander de créer un nouveau bloc sur l'id_attr,id_pa contenu dans (new_multi)
+		*/
+		,expand:function(div,params,new_multi) {
+			if ($('#__l'+div)) {
+				$('#__l'+div).show(); 
+			}
+			new ATF.tpl2div('tpl2div.ajax', params+'&div='+div
+				, { onComplete:function (response,json) { 
+					if ($('#__l'+div)) {
+						$('#__l'+div).hide(); 
+					}
+					if ($('#'+div)) {
+						Effect.BlindDown($('#'+div), { scaleY: true, duration:.3, afterFinish: function () { ATF.adjustContainer(); } });
+					}
+				 } 
+			});
+		}
+		/* Permet de stocker une réponse au formulaire de visite */
+		,store:function(params,func) {
+			switch (params.r) {
+				case true: params.r=1; break;
+				case false: params.r=''; break;
+			}
+			new ATF.ajax('vi_pa,store.ajax',$H(params).toQueryString(), { onComplete:function (obj) { ATF.ajax_refresh(obj); if(func){ func(); } } });
+		}
+		/* Permet de vérifier que le type de réponse est correct */
+		,check:function(type,val) {
+			switch (type) { //  {literal}
+				case 'num':
+					val = val.replace(",",".");
+					var re = new RegExp(/[0-9\.]*/i);
+					var r = re.exec(val);
+					return r[0];
+					
+				case 'date':					
+					// 2010-12-31
+					var re = new RegExp(/[0-9]{4}\-[0-9]{2}\-[0-9]{2}/i);
+					var r = re.exec(val);
+					if (r && r[0]) {
+						return r[0];
+					}
+					
+					// 31/12/2010 ou 31-12-2010
+					var re = new RegExp(/([0-9]{2})[\/\-]([0-9]{2})[\/\-]([0-9]{4})/i); 
+					var r = re.exec(val);
+					if (r && r[0]) {
+						return r[3]+"-"+r[2]+"-"+r[1];
+					}
+					
+					return false;
+					
+				default:
+					return val;
+			} // {/literal}
+		}
+	}
+/*]]>*/</script>
+{if !$projet}        
+    {$projet=ATF::gep_projet()->select($id_gp)}
+{/if}
+
+{if !$data}
+    {$data = ATF::pa()->selectRootFromProjet($id_gp)}
+{/if}
+{foreach from=$data key=k item=i}
+    <div id="{if $i.id_pa}pa_{$i.id_pa}{/if}">
+        {include file="{$table|default:"gep_projet"}-formulaire_attr.tpl.htm" infos=$i projet=$projet}
+    </div>
+{/foreach}
+
+
+

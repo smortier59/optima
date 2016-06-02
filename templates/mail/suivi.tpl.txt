@@ -1,0 +1,13 @@
+{assign var=infos_suivi value=ATF::suivi()->select($infos.id_suivi)}
+{ATF::$usr->trans('bonjour',mail)},
+
+{ATF::$usr->trans('reception_suivi',mail)}
+{ATF::$usr->trans('de',mail)} {ATF::user()->nom($infos.id_user)}
+{ATF::$usr->trans('client',mail)} {ATF::societe()->nom($infos_suivi.id_societe)}
+{ATF::$usr->trans('concerne',mail)} {foreach name=for_suivi_notifie from=$infos_suivi.notifie.suivi_notifie key=key__ item=item__}{ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_notifie.last}, {/if}{/foreach}
+{ATF::$usr->trans('intervenant_client',mail)} {foreach name=for_suivi_contact from=$infos_suivi.contact.suivi_contact key=key__ item=item__}{ATF::contact()->nom($item__)}{if !$smarty.foreach.for_suivi_contact.last}, {/if}{/foreach}
+{ATF::$usr->trans('intervenant_societe',mail)} {foreach name=for_suivi_societe from=$infos_suivi.societe.suivi_societe key=key__ item=item__}{ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_societe.last}, {/if}{/foreach}
+{if $infos.id_affaire}{ATF::$usr->trans('affaire',mail)} {ATF::affaire()->nom($infos.id_affaire)}{/if}
+{ATF::$usr->trans('detail_suivi',mail)} : {$infos_suivi.texte|nl2br}
+
+{ATF::$usr->trans('remerciement_suivi',mail)}

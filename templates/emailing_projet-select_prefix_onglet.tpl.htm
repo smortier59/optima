@@ -1,0 +1,21 @@
+{$d = $requests.emailing_projet}
+{if !$d}
+	<div class="error">
+		{ATF::$usr->trans(aucunes_donnees)}
+	</div>
+{else}
+	<div class="testMail">
+		<span style="text-align:center; font-weight:bold;">
+			{ATF::$usr->trans(speedmail_test_projet,$current_class->table)} :
+		</span>
+		<input type="text" id="mail" name="mail" value="{ATF::$usr->get('email')}"  />
+		<input type="button" value="OK"  style="width:30px" onclick="ATF.ajax('{$current_class->table},send.ajax','email='+$('#mail').val()+'&id_emailing_projet={ATF::_g('id_emailing_projet')|default:$d.id_emailing_projet}');"  />
+	</div>
+	{*$current_class->apply_links($d.id_emailing_projet)
+	<div class="printProjet" style="background-color:#{$d.couleur_fond};">
+		{$d.corps}
+	</div>*}
+    <div class="printProjet">
+        <iframe src="speedmail.php?id_emailing_projet={$d.id_emailing_projet}&preview=1"></iframe>
+    </div>
+{/if}

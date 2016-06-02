@@ -1,0 +1,9 @@
+{foreach $news as $k=>$i}
+	<br />
+	<div id="news_{$i.id_news}" style="width:95%; margin:auto"></div>
+	<script type="text/javascript">
+		{include file="news-panel.tpl.js" infos=$i}
+	</script>
+{foreachelse}
+	Aucunes news...
+{/foreach}

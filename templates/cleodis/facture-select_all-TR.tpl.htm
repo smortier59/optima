@@ -1,0 +1,7 @@
+{$id_facture=ATF::_r('id_facture')|default:$item["facture.id_facture"]|default:$requests.facture.id_facture}
+{$etat=ATF::facture()->select($id_facture,"etat")}
+{strip}
+    {if $etat == "impayee"}
+        facture_impaye
+    {/if}
+{/strip}

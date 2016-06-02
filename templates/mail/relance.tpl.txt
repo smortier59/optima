@@ -1,0 +1,5 @@
+Bonjour,
+
+Veuillez trouvez ci joint la {$infos.texte} concernant la facture *{$infos.facture.ref}* du *{ATF::$usr->date_trans($infos.facture.date,true,true)}* d'un montant de *{$infos.facture.prix} €*.
+
+Merci d'en prendre connaissance au plus vite.

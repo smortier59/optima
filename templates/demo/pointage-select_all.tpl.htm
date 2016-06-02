@@ -1,0 +1,110 @@
+<div id="sheet" class="ongletData"></div>
+
+<script type="text/javascript">
+	{include file="pointage.tpl.js"}
+	
+</script>
+
+
+<style>
+
+
+
+
+
+
+.x-grid3-col-user,.x-grid3-col-matricule,.x-grid3-hd-inner { color:black }
+.cellTotal > .x-grid3-cell-inner { color:black; font-weight:bold; }
+
+.blue .x-grid3-cell-inner { color:blue; font-weight:bold; }
+.grey .x-grid3-cell-inner { color:grey }
+.black .x-grid3-cell-inner { color:black }
+
+.total-row { background-color:#99CC99 !important;; }
+
+.icon-buttonPlanification {
+    background: url({ATF::$staticserver}images/icones/planing.png) no-repeat !important;
+}
+
+.icon-typeMOE {
+    background: url({ATF::$staticserver}images/extjs/medal_bronze_1.png) no-repeat !important;
+}
+
+.icon-refresh {
+    background: url({ATF::$staticserver}images/icones/refresh.png) no-repeat !important;
+}
+
+.icon-affectationMOE {
+    background: url({ATF::$staticserver}images/extjs/medal_bronze_add.png) no-repeat !important;
+}
+      
+      
+.icon-dayNight {
+    background: url({ATF::$staticserver}images/sched/dayNight.png) no-repeat !important;
+}
+
+.x-grid3-cell.Machines .x-grid3-cell-inner
+{
+    background: url({ATF::$staticserver}images/sched/cog.png) no-repeat 3px 3px !important;
+	padding-left:25px;
+}
+
+.x-grid3-cell.Robots .x-grid3-cell-inner
+{
+    background: url({ATF::$staticserver}images/sched/ro.png) no-repeat 3px 3px !important;
+	padding-left:25px;
+}
+
+.evt-Robots
+{
+    background-color:darkorange;
+    color:#fff
+}
+
+.x-grid3-locked .x-grid3-body
+{
+    background:#fee;    
+}
+
+.unavailable
+{
+    background: url({ATF::$staticserver}images/sched/graytexture.png) repeat-x left center;
+}
+
+
+.icon-prev
+{
+    background: url({ATF::$staticserver}images/sched/arrow_left.png) no-repeat center center !important;
+}
+
+.icon-next
+{
+    background: url({ATF::$staticserver}images/sched/arrow_right.png) no-repeat center center !important;
+}
+
+.icon-add
+{
+    background: url({ATF::$staticserver}images/sched/add.png) no-repeat left center !important;
+}
+-border-radius-top-right:0 !important;
+	-webkit-border-radius-bottom-right:0 !important;
+}
+
+.sch-event-startsoutside
+{
+	-moz-border-radius-topleft:0 !important;
+	-moz-border-radius-bottomleft:0 !important;
+	-webkit-border-radius-top-left:0 !important;
+	-webkit-border-radius-bottom-left:0 !important;
+}
+
+.sch-event
+{
+    -webkit-box-shadow: 1px 1px 1px rgba(150, 150, 150, 0.3);
+    -moz-box-shadow: 1px 1px 1px rgba(150, 150, 150, 0.3); 
+    -ms-box-shadow: 1px 1px 1px rgba(150, 150, 150, 0.3); 
+    box-shadow: 1px 1px 1px rgba(150, 150, 150, 0.3); 
+}
+</style>
+
+

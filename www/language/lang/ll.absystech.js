@@ -1,0 +1,1 @@
+Object.extend(ATF.loc,{"TU LOL":"EXP LOL"});

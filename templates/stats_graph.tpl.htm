@@ -1,0 +1,224 @@
+<div id="{$table}_{$type}" ></div>
+{$module = ATF::$usr->trans($table , module)}
+<script type="text/javascript">
+
+Ext.onReady(function(){
+    Highcharts.theme = {       
+       chart: {
+          backgroundColor: {
+             linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+             stops: [
+                [0, 'rgb(255, 255, 255)'],
+                [1, 'rgb(240, 240, 255)']
+             ]
+          },
+          borderWidth: 2,
+          plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+          plotShadow: true,
+          plotBorderWidth: 1
+       },
+       credits: {
+           enabled: false
+       },
+       tooltip: {
+            shared: true
+       },
+       title: {
+          style: {
+             color: '#000',
+             font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+          }
+       },
+       subtitle: {
+          style: {
+             color: '#666666',
+             font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
+          }
+       },
+       xAxis: {
+          gridLineWidth: 1,
+          lineColor: '#000',
+          tickColor: '#000',
+          labels: {
+             style: {
+                color: '#000',
+                font: '11px Trebuchet MS, Verdana, sans-serif'
+             }
+          },
+          title: {
+             style: {
+                color: '#333',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+    
+             }
+          }
+       },
+       yAxis: {
+          minorTickInterval: 'auto',
+          lineColor: '#000',
+          lineWidth: 1,
+          tickWidth: 1,
+          tickColor: '#000',
+          labels: {
+             style: {
+                color: '#000',
+                font: '11px Trebuchet MS, Verdana, sans-serif'
+             }
+          },
+          title: {
+             style: {
+                color: '#333',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+             }
+          }
+       },
+       legend: {
+          itemStyle: {
+             font: '9pt Trebuchet MS, Verdana, sans-serif',
+             color: 'black'
+    
+          },
+          itemHoverStyle: {
+             color: '#039'
+          },
+          itemHiddenStyle: {
+             color: 'gray'
+          }
+       },
+       labels: {
+          style: {
+             color: '#99b'
+          }
+       },
+    
+       navigation: {
+          buttonOptions: {
+             theme: {
+                stroke: '#CCCCCC'
+             }
+          }
+       }
+    };
+    
+    // Apply the theme
+    var highchartsOptions = Highcharts.setOptions(Highcharts.theme); 
+
+
+{$data = ATF::getClass($table)->stats(false,$type)}
+
+    {if $type == "accueil"}		
+        
+        
+            
+    {elseif $item=="users"}         
+          
+          var chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: '{$table}_{$type}',
+                    type: 'column',
+                    marginRight: 200,
+                    marginBottom: 40
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -10,
+                    y: 100,
+                    borderWidth: 0
+                },
+                title: {
+                    text: '{$module} : {$data["params"]["subCaption"]}'
+                },
+                xAxis: {            
+                    categories: [
+                        {foreach $data["categories"]["category"] as $k => $cat}                    
+                            '{$cat["label"]}' {if !$cat@last},{/if}
+                        {/foreach}
+                        ]
+                },
+                plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    },
+                yAxis: {
+                    title: {
+                        text: '{$data["params"]["yaxisname"]}'
+                    }
+                },
+                series: [
+                       {foreach $data["dataset"] as $key=>$value}    
+                       {                   
+                           type: 'column'
+                           ,name: '{$value["params"]["seriesname"]}'                                     
+                           ,data: [                           
+                                   {foreach $value["set"] as $k=>$v}                                                     
+                                        {$v["value"]|number_format:2:'.'} 
+                                        {if !$k@last},{/if}
+                                   {/foreach}
+                                  ]
+                       } {if !$key@last},{/if}
+                     {/foreach}              
+                   ]        
+            });        			
+    {else}
+         var chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: '{$table}_{$type}',
+                    type: 'spline',
+                    marginRight: 100,
+                    marginBottom: 40
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'top',
+                    x: -10,
+                    y: 100,
+                    borderWidth: 0
+                },
+                title: {
+                    text: '{$module} : {$data["params"]["subCaption"]}'
+                },
+                xAxis: {            
+                    categories: [
+                        {foreach $data["categories"]["category"] as $k => $cat}                    
+                            '{$cat["label"]}' {if !$cat@last},{/if}
+                        {/foreach}
+                        ]
+                },
+                plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    },
+                yAxis: {
+                    title: {
+                        text: '{$data["params"]["yaxisname"]}'
+                    }
+                },
+                series: [
+                       {foreach $data["dataset"] as $key=>$value}    
+                       {                   
+                           type: 'spline'
+                           ,name: '{$value["params"]["seriesname"]}'                                     
+                           ,data: [                           
+                                   {foreach $value["set"] as $k=>$v}                                               
+                                        {$v["value"]} 
+                                        {if !$k@last},{/if}
+                                   {/foreach}
+                                  ]
+                       } {if !$key@last},{/if}
+                     {/foreach}              
+                   ]        
+            });		
+    {/if}
+   
+}); 
+
+</script>

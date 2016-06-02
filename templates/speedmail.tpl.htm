@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" >
+<title>{$projet.subject}</title>
+<style type="text/css">
+	{if $projet.couleur_link}
+		a { color: #{$projet.couleur_link}; }
+	{/if}
+	{if $projet.couleur_footer}
+		div#footer { color: #{$projet.couleur_footer}; }
+		div#top { color: #{$projet.couleur_footer}; }
+	{/if}
+	{if $projet.couleur_fond}
+		body { background-color:#{$projet.couleur_fond}; }
+	{/if}
+</style>
+</head>
+<body>
+	{if $projet.viewer}
+        <div style="text-align:center; font-size:14px" id="top">
+           Si vous ne parvenez pas à lire cet email, vous pouvez accéder à la  <a style="font-size:14px; font-weight:bold; text-decoration:underline" href="{$projet.viewer}">version en ligne</a>.
+            <br />
+        </div>
+    {/if}
+    {$projet.corps}
+    <br /><br /><br />
+    <div style="text-align:center; font-size:10px;" id="footer">
+		{if $projet.afficher_infos_societe == "oui"}
+        	{$societe = ATF::societe()->maSociete}
+            {$societe.societe|strtoupper}
+            {if $societe.structure && $societe.capital}
+             - {$societe.structure} au capital de {$societe.capital} EUR{/if}
+            {if $societe.siret} - SIRET : {$societe.siret}{/if}
+            <br />
+            {if $societe.adresse && $societe.cp && $societe.ville}
+            	Siège social : {$societe.adresse} - {$societe.cp} {$societe.ville}
+            {/if}
+            {if $societe.id_pays} - {ATF::pays()->nom($societe.id_pays)}{/if}
+            {if $societe.email} - {$societe.email}{/if}
+            {if $societe.tel} - Tél : {$societe.tel}{/if}
+            {if $societe.fax} - Fax : {$societe.fax}{/if}
+            <br />
+	          
+	    {/if}    
+        Cet E-mail a été envoyé avec SpeedMail, un outil développé par <a href="http://www.absystech.fr">AbsysTech</a>
+        <br />
+	    {if $projet.unregister}
+            Si vous ne souhaitez plus recevoir de mail, <a style="font-size:10px; font-weight:bold; text-decoration:underline;" href="{$projet.unregister}">cliquez ici</a> pour vous désinscrire.
+	    {/if}
+    </div>
+	{if $projet.embed}
+        {$projet.embed}
+    {/if}
+</body>
+</html>

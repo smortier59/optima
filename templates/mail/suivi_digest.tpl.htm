@@ -1,0 +1,23 @@
+<p>{ATF::$usr->trans('bonjour',mail)}</p>
+
+<p>{ATF::$usr->trans('reception_suivi',mail)}</p>
+
+{foreach from=$infos.infoSuivi item=info}
+{assign var=infos_suivi value=ATF::suivi()->select($info.id_suivi)}
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('de',mail)}</span> {ATF::user()->nom($info.id_user)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->nom($info.id_societe)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('concerne',mail)}</span> {foreach name=for_suivi_notifie from=$infos_suivi.suivi_notifie key=key__ item=item__}{ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_notifie.last}, {/if}{/foreach}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('intervenant_client',mail)}</span> {foreach name=for_suivi_contact from=$infos_suivi.suivi_contact key=key__ item=item__}{ATF::contact()->nom($item__)}{if !$smarty.foreach.for_suivi_contact.last}, {/if}{/foreach}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('intervenant_societe',mail)}</span> {foreach name=for_suivi_societe from=$infos_suivi.suivi_societe key=key__ item=item__}{ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_societe.last}, {/if}{/foreach}</p>
+{if $info.id_affaire}<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->nom($info.id_affaire)}</p>{/if}
+<p><span style="font-weight:bold;">{ATF::$usr->trans('detail_suivi',mail)}</span> : <br />{$infos_suivi.texte|nl2br}</p>
+<div align="center">
+  <p>&nbsp;</p>
+  <p><strong>*************</strong></p>
+  <p>&nbsp;</p>
+</div>
+<p>{/foreach}</p>
+<p>{ATF::$usr->trans('remerciement_suivi',mail)}</p>
+
+<p>Vous pouvez désactiver l'envoi automatique de cet email dans vos préférences</p>

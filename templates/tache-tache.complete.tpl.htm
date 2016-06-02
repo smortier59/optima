@@ -1,0 +1,10 @@
+{if $item['tache.etat']=='fini'}
+    100%
+{elseif $item['tache.type']=='vtodo'}
+    {html_options 
+        name="complete" 
+        options=$current_class->complete 
+        selected=$item['tache.complete'] 
+        style="width:50px" 
+        onchange="ATF.ajax('tache,update_complete.ajax','id_tache={$item['tache.id_tache']}&complete='+this.value);"}
+{/if}

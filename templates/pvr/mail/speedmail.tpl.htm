@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+<body>
+	<table width="600" bgcolor="#252525" cellspacing="0" cellpadding="0" border="0" style="margin: auto">
+		<!-- row browser link-->
+		{if $infos.projet.viewer}
+			<tr>
+				<td align="center" height="25" valign="middle" bgcolor="#666">
+					<p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+						Si vous ne parvenez pas à lire ce mail, <a style="color: #fff;" href="{$infos.projet.viewer}">cliquez ici</a>
+					</p>
+				</td>
+			</tr>
+		    {/if}	<!-- HEADER -->
+		<!-- row image entete-->
+		<tr>
+			<td align="center">
+				<img style="display: block; border: none;" src="http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/entete.png" alt="Alertes Vidéos Rhône Alpes TV"/>
+			</td>
+		</tr>
+		<!-- row texte entete -->
+		<tr>
+			<td>
+				<table width="600" bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+					<tr>
+						<td width="45">
+						</td>
+						<td width="510" valign="top">
+							<p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+
+							</p>
+						</td>
+						<td width="45">
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<!-- row pusher-->
+		<tr height="40">
+			<td>
+			</td>
+		</tr>
+
+        {$ct = 0}
+        
+        {foreach $infos.videos as $k=>$i name=foo} 
+            {if !$i.total || $k=="total"}{continue}{/if}
+            {if $ct>4}{continue}{/if}
+            {$ct = $ct+1}
+			<tr>
+				<td>
+					<table bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+						<tr>
+							<td width="189" valign="middle">
+								<img src="http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/label-video.png" alt="Vidéos" style="display: block; border: none;"/>
+							</td>
+							<td width="366" valign="middle">
+								<p style="color: #e5690b; font-size: 36px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+									{$k}
+								</p>
+							</td>
+							<td width="45">
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<!-- row pusher-->
+			<tr height="30">
+				<td>
+				</td>
+			</tr>
+
+            {foreach $i.videos as $video}
+                {if $video.id_video}
+
+            		{include file="pvr/mail/speedmail-video-item.tpl.htm"}
+            	{/if}
+            {/foreach}
+            {if $i.total>3}
+				<!-- row pusher-->
+				<tr height="15">
+					<td>
+					</td>
+				</tr>
+				<!-- footer liste de video -->
+				<tr>
+					<td>
+						<table width="600" bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+							<tr>
+								<td width="45">
+								</td>
+								<td valign="middle" style="background-color: #333; background-image: url('http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/bg-alerte.png');" bgcolor="#333">
+									<p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0 0 0 10px;">
+										<strong>Toutes les videos {$k} ({$i.total})</strong>
+									</p>
+								</td>
+								<td width="129" valign="middle">
+									<a href="{$i.lienAll}" target="_blank"><img src="http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/acces.png" alt="Accès direct" style="display: block; border: none;"/></a>
+								</td>
+								<td width="45">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>                    
+            {/if}
+            <!-- row pusher-->
+            <tr height="15">
+                <td>
+                </td>
+            </tr>
+            <!-- fin item alerte -->
+            <!-- row pusher-->
+            <tr height="40">
+                <td>
+                </td>
+            </tr>
+        {/foreach}
+
+        {if count($videos)>6}
+			<!-- row entete alerte -->
+			<tr>
+				<td>
+					<img src="http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/label-alerte.png" alt="Vos alertes" style="display: block; border: none;"/>
+				</td>
+			</tr>
+			<!-- row pusher-->
+			<tr height="30">
+				<td>
+				</td>
+			</tr>
+			<!-- liste des alertes -->
+			<!-- item alerte -->
+	        {$ct = 0}
+	        {foreach $infos.videos as $k=>$i name=foo2} 
+	            {if !$i.total || $k=="total"}{continue}{/if}
+	            {$ct = $ct+1}
+	            {if $ct<6}{continue}{/if}
+
+	            <tr>
+	                <td>
+	                    <table width="600" bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+	                        <tr>
+	                            <td width="45">
+	                            </td>
+	                            <td valign="middle" style="background-color: #333; background-image: url('http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/bg-alerte.png');" bgcolor="#333">
+	                                <p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0 0 0 10px;">
+	                                    <strong>{$k} :</strong> {$i.total} nouvelles vidéo(s)
+	                                </p>
+	                            </td>
+	                            <td width="129" valign="middle">
+	                                <a href="{$i.lienAll}" target="_blank"><img src="http://dev.wall.ra.novastream.fr/common/media/interface/mail-alerte/acces.png" alt="Accès direct" style="display: block; border: none;"/></a>
+	                            </td>
+	                            <td width="45">
+	                            </td>
+	                        </tr>
+	                    </table>
+	                </td>
+	            </tr>
+	            <!-- row pusher-->
+	            <tr height="15">
+	                <td>
+	                </td>
+	            </tr>
+
+	        {/foreach}
+	        <!-- fin item alerte -->
+	        <!-- fin liste des alertes -->
+	        <tr height="15">
+	            <td>
+	            </td>
+	        </tr>
+	        <!-- row desabo-->
+		{/if}
+
+		<!-- fin item alerte -->
+		<!-- fin liste des alertes -->
+		<tr height="10">
+			<td>
+			</td>
+		</tr>
+		<!-- row desabo-->
+		{if $infos.projet.unregister}
+			<tr>
+				<td align="center" height="25" valign="middle" bgcolor="#666">
+					<p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+						Pour vous désabonner des alertes vidéos, <a style="color: #fff;" href="{$infos.projet.unregister}">cliquez ici</a>
+					</p>
+				</td>
+			</tr>
+	    {/if}
+		<!-- row pusher-->
+		<tr height="10">
+			<td>
+			</td>
+		</tr>
+		<!-- row footer texte -->
+		<tr>
+			<td>
+				<table width="600" bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+					<tr>
+						<td width="45">
+						</td>
+						<td width="510" valign="top">
+							<p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+							</p>
+						</td>
+						<td width="45">
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<!-- row pusher-->
+		<tr height="10">
+			<td>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

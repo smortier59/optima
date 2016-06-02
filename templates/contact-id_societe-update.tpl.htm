@@ -1,0 +1,5 @@
+{if $smarty.post.id_societe}
+	{include file="generic_field.tpl.htm" key=$key item=$item extra='readonly="readonly"'}
+{else}
+	{include file="generic_field.tpl.htm" key=$key item=$item}
+{/if}

@@ -1,0 +1,50 @@
+{* héhé *}
+{if $vi_pa.id_vi_pa && $vi_pa.reponse}
+	<img src="{ATF::$staticserver}images/icones/select.png"  onmouseover="Stip.addNow(this,'<img src=\'vi_pa-{$vi_pa.id_vi_pa|cryptid}-photo-200.jpg\' />',{ {strip}
+		arrow:true
+		,delay:.25
+		,fadeDuration:.25
+		,attach:true
+		,position:'topLeft'
+		,css:'ex3 uploadPhoto'
+		,width:220
+		,borderSize:4
+		,radius:4
+	{/strip} });"
+	/>
+	 <a href="javascript:;" onclick="__s{$div}(''); eval('__x'+this.up().up().up().id.replace('_childs','')+'();');" rel="Supprimer photo"><img src="{ATF::$staticserver}images/icones/delete.png" /></a> 
+{else}
+	<img id="{$div}_photo" src="{ATF::$staticserver}images/blank.gif" width="20" height="13" />
+{/if}
+
+{* autocomplete de la GED *}
+{$donnees="a=`$attr.id_attr`&pa=`$infos.id_pa`&ppa=`$id_ppa`&v=`$smarty.request.id_visite`&m=`$id_vi_pa_multi`&id_vi_pa=`$vi_pa.id_vi_pa`"}
+<a href="javascript:;" onclick="ATF.createPhotoView(this,'{$donnees}');">
+	<img src="{ATF::$staticserver}images/icones/new_photo.png" height="16" width="16" alt="" />
+</a>
+{if $vi_pa.reponse}
+	[{$vi_pa.reponse}]
+{/if}
+{* Code en vue de la visionneuse 
+{if $vi_pa.id_vi_pa && $vi_pa.reponse}
+	{$point = $vi_pa.reponse|strpos:"."}
+	{$extension = $vi_pa.reponse|substr:$point+1}
+	<img id="{$div}_photo" class="photo" src="vi_pa-{$vi_pa.id_vi_pa|cryptid}-photo-20.{$extension}" onmouseover="Stip.addNow(this,'<img src=\'vi_pa-{$vi_pa.id_vi_pa|cryptid}-photo-200.{$extension}\' />',{ {strip}
+		arrow:true
+		,delay:.25
+		,fadeDuration:.25
+		,attach:true
+		,position:'topLeft'
+		,css:'ex3 uploadPhoto'
+		,width:220
+		,borderSize:4
+		,radius:4
+	{/strip} });" />
+	 <a href="javascript:;" onclick="__s{$div}(''); eval('__x'+this.up().up().up().id.replace('_childs','')+'();');" rel="Supprimer photo">
+		<img src="{ATF::$staticserver}images/icones/delete.png" />
+	</a> 
+{else}
+	<a href="javascript:;" onclick="ATF.createTreeGridImg('visite','{$smarty.request.id_visite}','a={$attr.id_attr}&pa={$infos.id_pa}&ppa={$id_ppa}&v={$smarty.request.id_visite}&m={$id_vi_pa_multi}&id_vi_pa={$vi_pa.id_vi_pa}','{$div}')">
+        <img src="{ATF::$staticserver}images/icones/new_photo.png" />
+	</a> 
+{/if}*}

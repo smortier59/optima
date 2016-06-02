@@ -1,0 +1,12 @@
+<div style="width:180px;">
+	<div style="display:inline;">
+		{t w=$item['ordre_de_mission.etat'] p='ordre_de_mission_etat'}
+	</div>
+	{if $item['ordre_de_mission.etat']=="en_cours"}
+		<div style="display:inline;">
+			<a href="#hotline_interaction-insert.html,id_hotline={$fk['ordre_de_mission.id_hotline']|cryptid}&id_ordre_de_mission={$item['ordre_de_mission.id_ordre_de_mission']|cryptid}" rel="{t w=valid_intervention p=ordre_de_mission}">
+				<img width="16" height="16" alt="" src="{ATF::$staticserver}images/icones/expand.png">
+			</a>
+		</div>
+	{/if}
+</div>

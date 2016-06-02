@@ -1,0 +1,75 @@
+{* @todo Refactoriser les styles CSS lorsque la conception est finie *}
+{$id_pa=ATF::vi_pa()->select(ATF::_r(id_vi_pa),id_pa)}
+{$cout_catalogue=ATF::cout_catalogue()->select(ATF::vi_pa()->select(ATF::_r(id_vi_pa),id_cout_catalogue))}
+{$couts_pa=ATF::cout_catalogue()->optionsFromPA($id_pa)}
+{if !$couts_pa}
+    <div style="width:150px; float:left;">Catégorie de coût :</div>	
+    <div style="width:580px; float:left;" id="cout_categorie">
+        <select style="width:580px" name="cout_catalogue[id_cout_categorie]" id="cout_catalogue[id_cout_categorie]" onchange="ATF.updateHtmlOptions('cout_catalogue,getOptions.ajax','id_cout_catalogue={$cout_catalogue.id_cout_catalogue}&id_cout_categorie='+this.value,'cout_unitaire[id_cout_catalogue]','- Choisir... -');">
+            <option value="">- Autre coût -</option>
+            {html_options options=ATF::cout_categorie()->options() selected=$cout_catalogue.id_cout_categorie}
+        </select>
+    </div>
+{/if}
+
+<div style="width:150px; float:left;">Choisir un coût associé :</div>
+<div style="width:580px; float:left;" id="cout_catalogue">
+    <select style="width:580px" name="cout_unitaire[id_cout_catalogue]" id="cout_unitaire[id_cout_catalogue]" onchange="ATF.tpl2div('vi_pa_cout,addCost.ajax','id_vi_pa={ATF::_r(id_vi_pa)}&id_cout_catalogue='+this.value, { onComplete: function () { Modalbox.resizeToContent({ height:$('#__view_cout_unitaire').height() }); } });">
+        <option value="0">- Choisir... -</option>
+        {if $couts_pa}
+	        {html_options options=$couts_pa}
+        {else}
+            {ATF::cout_catalogue()->optionsFromCat($cout_catalogue.id_cout_categorie)}
+            {html_options options=ATF::cout_catalogue()->options(null,null,false) selected=$cout_catalogue.id_cout_catalogue}
+        {/if}
+    </select>
+</div>
+
+<div style="width:400px; float:left; clear:both;">Coût catalogue</div>
+{*<div style="width:100px; float:left;">Coût spécif. (PA{ATF::vi_pa()->select($infos.id_vi_pa,id_pa)})</div>*}
+<div style="width:100px; float:left;">Prix expertisé</div>
+<div style="width:200px; float:left;">Calcul brut</div>
+
+<hr style="float:none; clear:both;"  />
+{foreach from=ATF::vi_pa_cout()->getCosts(ATF::_r(id_vi_pa)) item=vi_pa_cout}
+	{capture assign=detail}{strip}
+        <div style='padding-top:1em;'>Détail&nbsp;interprété&nbsp;:</div>
+        {foreach from=ATF::vi_pa()->analyze($vi_pa_cout.cout_unitaire.regle) key=ref item=nom}
+            {$ref}, {$nom} : {ATF::vi_pa()->findAnswerFromReference($infos.id_vi_pa,$ref)|default:ATF::$usr->trans(cout_non_trouve)}<br />
+        {/foreach}
+	{/strip}{/capture}
+
+    <div style="width:400px; float:left; font-family:'Courier New', Courier, monospace;" 
+    	{*onmouseover="Stip.addNow(this,'{strip}
+	        {if $vi_pa_cout.regle}
+                <div>Règle :</div>
+                <div style='font-family:\'Courier New\', Courier, monospace;'>{$infos.regle|escape:javascript}</div>
+            {/if}
+            {$detail|escape:javascript}
+        {/strip}');"
+        *}>
+        {$vi_pa_cout.cout_catalogue.cout_catalogue} ({$vi_pa_cout.cout_catalogue.unite|default:"<u>Pas d'unité</u>"})
+    </div>
+    
+    <div style="width:100px; float:left;">
+        <input type="text" name="vi_pa[cout_unitaire]" id="vi_pa_cout[{$vi_pa_cout.id_vi_pa_cout}][cout_unitaire]" style="width:40px; font-family:'Courier New', Courier, monospace;" 
+        value="{$vi_pa_cout.cout_unitaire|escape:htmlall}" 
+        onkeyup="this.value=ATF.__attr.check('num',this.value);"  />
+        <input type="button" value="Ok" onclick="ATF.tpl2div('vi_pa_cout,updCost.ajax','id_vi_pa_cout={$vi_pa_cout.id_vi_pa_cout}&id_vi_pa={$vi_pa_cout.id_vi_pa}&cout_unitaire='+$('#vi_pa_cout[{$vi_pa_cout.id_vi_pa_cout}][cout_unitaire]').val(), { onComplete: function () { Modalbox.resizeToContent({ height:$('#__view_cout_unitaire').height() }); } });" />
+    </div>
+    
+    <div style="width:200px; float:left; font-family:'Courier New', Courier, monospace; font-weight:bold;" id="calcul">
+    	{$vi_pa_cout.cout_unitaire_reel|number_format:0:".":" "} &euro; * {ATF::vi_pa()->costAnswers($vi_pa_cout.id_vi_pa,$vi_pa_cout.regle)|number_format:0:".":" "}{$vi_pa_cout.cout_catalogue.unite} = {$vi_pa_cout.cout_unitaire_calcule|number_format:0:".":" "} &euro;
+    	{if $vi_pa_cout.estUnCoutProjet}
+        	<br /><span style="background-color:white">Coût projet (orig. = {$vi_pa_cout.coutStandard}&euro;)</span>
+        {/if}
+    </div>
+    
+    <div style="float:left;">
+    	<a href="javascript:;" onclick="ATF.tpl2div('vi_pa_cout,delCost.ajax','id_vi_pa_cout={$vi_pa_cout.id_vi_pa_cout}&id_vi_pa={$vi_pa_cout.id_vi_pa}', { onComplete: function () { Modalbox.resizeToContent({ height:$('#__view_cout_unitaire').height() }); } });" />
+            <img src="{ATF::$staticserver}images/icones/delete.png" height="16" width="16" />
+    	</a>
+    </div>
+    <hr style="float:none; clear:both;"  />
+{/foreach}
+<div style='clear:both; padding-top:1em;'>TOTAL = {ATF::vi_pa()->getCost(ATF::_r(id_vi_pa))|number_format:0:",":" "} &euro;</div>

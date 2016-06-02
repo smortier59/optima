@@ -1,0 +1,91 @@
+{if !$annee}
+	{$annee=$smarty.now|date_format:"%Y"}
+{/if}
+
+{if !$table}
+	{$table=$module}
+{/if}
+
+<br /><br />
+
+{$data_tab=ATF::hotline_interaction()->statsProduction($annee)}
+<div id="{$table}_5" style="height: 400px"></div>
+<script type="text/javascript">
+{$data = $data_tab}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_5',
+            type: 'column'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}  {$annee}'
+        },        
+        colors:['#19FF30','#FF0004','#f28f43','#000000'],
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'                    
+                }                
+            },
+       tooltip: {
+            formatter: function() {
+                return '<b>'+ this.series.name +'</b> : <b>'+ this.y +' %</b>';
+            }
+        },
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            },max :100
+        },       
+        series: [
+             {foreach $data["dataset"] as $key=>$value} 
+                  {if $value["params"]["seriesname"] != "Non produit"}   
+                       {                   
+                           type: 'column'
+                           ,name: '{$value["params"]["seriesname"]}'                                     
+                           ,data: [                           
+                                   {foreach $value["set"] as $k=>$v}                                                     
+                                        {$v["value"]|number_format:2:'.'} 
+                                        {if !$k@last},{/if}
+                                   {/foreach}
+                                  ]
+                      } {if !$key@last},{/if}
+                  {/if}
+             {/foreach}           
+           ]        
+    });
+});    
+</script>
+
+<br /><hr /><br />
+<!-- Tableau -->
+{*$data_tab.params.caption} {if $data_tab.params.subCaption}({$data_tab.params.subCaption}){/if} :<br />
+<table class="std">
+	<tr>
+    <td style="width:200px;">&nbsp;</td>
+    	{foreach from=$data_tab.categories.category key=key item=item}
+        	<td style="text-align:center;border:dotted;border-width:1px;">
+                {$item.label}
+            </td>
+        {/foreach}
+    </tr>
+    {foreach from=$data_tab.dataset key=key item=item}
+    <tr style="background-color:{cycle values='#E3F3A3,#D3DAE0'};">
+    	<td style="text-align:center;width:200px;border:dotted;border-width:1px;">
+    		{$item.params.seriesname}
+        </td>
+        {foreach from=$data_tab.categories.category key=key_ item=item_}
+    		<td style="text-align:center;border:dotted;border-width:1px;">
+    			{str_replace('.','h',$item.set[$key_].value)}
+    		</td>
+    	{/foreach}
+    </tr>
+    {/foreach}
+</table>*}

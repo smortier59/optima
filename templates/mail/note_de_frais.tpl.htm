@@ -1,0 +1,8 @@
+<p style="font-style:italic">
+    Rendez-vous sur Optima pour valider/invalider les notes de frais suivantes<br />
+</p>
+{foreach $infos['data'] as $k=>$i}
+	<p>
+		<strong>{ATF::user()->nom($i.id_user)}</strong> : {ATF::note_de_frais()->getTotal($i.id_note_de_frais)} €
+	</p>
+{/foreach}

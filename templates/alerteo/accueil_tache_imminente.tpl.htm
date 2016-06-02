@@ -1,0 +1,19 @@
+{assign var="date" value=($date|default:$smarty.now)|date_format:"%Y-%m-%d"}
+<table style="width:100%">
+{foreach from=ATF::tache()->tache_imminente($date) key=dat item=infos}
+    <tr>
+        <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->date_trans($dat)}</td>
+        <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule" colspan="2">{ATF::$usr->trans(de,'tache')}</td>
+    </tr>
+    {foreach from=$infos key=cle item=donnees}
+        <tr>
+            <td style="width:30%"><a href="societe-select-{classes::cryptId($donnees.id_societe)}.html">{$donnees.societe}</a></td>
+            <td style="width:20%">{$donnees.createur}</td>
+            <td>{$donnees.tache}</td>
+        </tr>
+    {/foreach}
+    <tr><td>&nbsp;</td></tr>
+{foreachelse}
+	<tr><td>{ATF::$usr->trans('aucune_tache','tache')}</td></tr>
+{/foreach}
+</table>

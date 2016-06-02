@@ -1,0 +1,174 @@
+{if !$annee}
+	{$annee=$smarty.now|date_format:"%Y"}
+{/if}
+
+{if $stats_filtre}
+    {ATF::hotline_interaction()->modifEtat($stats_filtre,$name,$etat)}
+{/if}
+
+{if !$table}
+	{$table=$module}
+{/if}
+
+{if $id_societe}
+    {$onchange2="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&user={$user}&graph={$graph}&groupe={$groupe}&id_societe=`$id_societe`&annee='+this.value);"}
+{else}
+	{$onchange2="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&user={$user}&graph={$graph}&groupe={$groupe}&annee='+this.value);"}
+{/if}
+<table>
+	<tr>
+    	<td>
+            <div style='padding-left:15px;'>- toutes les intéractions de toutes les hotlines</div>
+            <div style='padding-left:15px;'>- par personne</div>
+            <div style='padding-left:15px;'>- par société</div>
+            <div style='padding-left:15px;'>- par pôle</div>
+            <div style='padding-left:15px;'>- par année</div>
+        </td>
+    </tr>
+</table>
+<br /><hr />
+<!-- Choix -->
+<table class="std">
+	<tr>
+    	<td>&nbsp;</td>
+    </tr>
+	<tr>
+    	<td>
+            {ATF::$usr->trans("choix_societe",'hotline_interaction')} : 
+            <select onchange="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&graph={$graph}&annee={$annee}&user={$user}&id_societe='+this.value);">
+            <option label="Voir toutes les sociétés" value=""> {ATF::$usr->trans("tout_voir_societe",'hotline_interaction')} </option>
+        	{html_options options=ATF::hotline_interaction()->societe_options($annee) selected=$id_societe}
+        	</select>
+        </td>
+	
+    	<td>
+        	{ATF::$usr->trans("choix_annee",'hotline_interaction')} : 
+            {html_options name=annee options=ATF::hotline_interaction()->get_years($id_societe) selected=$annee onchange="`$onchange2`"}
+       </td>
+    </tr> 
+    <tr>
+    	<td>
+        	{ATF::$usr->trans("choix_user","stats")} : 
+            <select onchange="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&graph={$graph}&id_societe={$id_societe}&annee={$annee}&user='+this.value);">
+            <option label="Voir tout le monde" value=""> {ATF::$usr->trans("tout_voir_user","stats")} </option>
+        	{html_options options=ATF::hotline_interaction()->get_user() selected=$user}
+        	</select>
+        </td>
+    </tr>
+    {if !$id_societe && !$user}
+    	<tr>
+        	<td>
+            	{ATF::$usr->trans("choix_groupe")} :
+            	<select onchange="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&graph={$graph}&annee={$annee}&groupe='+this.value);">
+                	<option value="soc">{ATF::$usr->trans("par_soc",'hotline_interaction')}</option>
+                    <option value="util" {if $groupe=="util"}selected="selected"{/if}>{ATF::$usr->trans("par_util",'hotline_interaction')}</option>
+                </select>
+            </td>
+        </tr>
+    {/if}
+    <tr>
+    	<td>
+    		<form> 
+            	<table>
+                    <tr>
+                    	{foreach from=ATF::hotline_interaction()->stats_filtre item=name}
+                            <td style="width:auto;padding-right:20px;">
+                                {ATF::$usr->trans($name,'hotline')} :
+                             </td>
+                        {/foreach}     
+                    </tr>
+                    <tr>
+                    	{foreach from=ATF::hotline_interaction()->stats_filtre item=nom_filtre}
+                        	<td style="width:auto;padding-right:20px;">
+                                {foreach from=ATF::hotline_interaction()->get($nom_filtre) key=nom item=a_check}
+                                    <div>
+                                        <input type="checkbox" style="width:auto" {if $a_check==1} CHECKED {/if}
+                                        onclick="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&groupe={$groupe}&graph={$graph}&annee={$annee}&user={$user}&id_societe={$id_societe}&stats_filtre={$nom_filtre}&name={$nom}&etat='+this.checked);" />
+                                        {ATF::$usr->trans($nom)}
+                                    </div>
+                                {/foreach}
+                            </td>
+                        {/foreach}
+                	</tr>        
+    			</table>
+			</form>
+		</td>
+	</tr>
+</table>
+<br/>
+<!-- Graphique -->
+<div id="{$table}_1" style="height: 400px"></div>
+{$data_tab=ATF::hotline_interaction()->stats_special($annee,$id_societe,$user,$groupe)}
+
+<script type="text/javascript">
+{$data = $data_tab}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_1',
+            type: 'column'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: '{$value["params"]["seriesname"]}'                                     
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                                                     
+                                {$v["value"]|number_format:2:'.'} 
+                                {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});
+    
+</script>
+
+<br /><hr /><br />
+<!-- Tableau -->
+{$data_tab.params.caption} {if $data_tab.params.subCaption}({$data_tab.params.subCaption}){/if} :<br />
+<table class="std">
+	<tr>
+    <td style="width:200px;">&nbsp;</td>
+    	{foreach from=$data_tab.categories.category key=key item=item}
+        	<td style="text-align:center;border:dotted;border-width:1px;">
+                {$item.label}
+            </td>
+        {/foreach}
+    </tr>
+    {foreach from=$data_tab.dataset key=key item=item}
+    <tr style="background-color:{cycle values='#E3F3A3,#D3DAE0'};">
+    	<td style="text-align:center;width:200px;border:dotted;border-width:1px;">
+    		{$item.params.seriesname}
+        </td>
+        {foreach from=$data_tab.categories.category key=key_ item=item_}
+    		<td style="text-align:center;border:dotted;border-width:1px;">
+    			{str_replace('.','h',$item.set[$key_].value)}
+    		</td>
+    	{/foreach}
+    </tr>
+    {/foreach}
+</table>

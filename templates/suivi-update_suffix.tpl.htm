@@ -1,0 +1,31 @@
+<tr>
+	<td class="field">
+        {ATF::$usr->trans('intervenant_client',$current_class->table)} :
+    </td>
+    <td class="value">
+    	<div id="suivi_intervenant_client">
+        	{*include file="suivi_intervenant_client.tpl.htm"*}
+        </div>
+    </td>
+</tr>
+<tr>
+	<td class="field">
+        {ATF::$usr->trans('intervenant_societe',$current_class->table)} :
+    </td>
+    <td class="value">
+        <select multiple='multiple' name="suivi_societe[]" size='5'>
+            {ATF::user()->q->reset()->addOrder("user.nom")->addCondition(etat,normal)->end()}
+            {html_options options=ATF::user()->options(null,null,false) selected=$requests[$current_class->table].suivi_societe|default:ATF::$usr->getID()}
+        </select>
+    </td>
+</tr>
+<tr>
+	<td class="field">
+        {ATF::$usr->trans('notifie',$current_class->table)} :
+    </td>
+    <td class="value">
+        <select multiple='multiple' name="suivi_notifie[]" size='5'>
+            {html_options options=ATF::user()->options(null,null,false) selected=$requests[$current_class->table].suivi_notifie|default:ATF::$usr->getID()}
+        </select>
+    </td>
+</tr>

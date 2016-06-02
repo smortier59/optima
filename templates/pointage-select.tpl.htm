@@ -1,0 +1,309 @@
+{* Pointage *}
+{$pointage=$smarty.get.id_pointage|default:$id_pointage}
+
+{if $smarty.post.year && $smarty.post.month}
+	{$date_incomplete="`$smarty.post.year`-`$smarty.post.month`"}
+	{$month=$smarty.post.month}
+	{$year=$smarty.post.year}
+{else}
+	{$date_incomplete=$smarty.now|date_format:"%Y-%m"}
+	{$month=$smarty.now|date_format:"%m"}
+	{$year=$smarty.now|date_format:"%Y"}
+{/if}
+
+{* VIA l'ID pointage qu'on récupère en GET *}
+{if $smarty.request["id_user"]}
+	{$id_user=$smarty.request["id_user"]|default:$id_user}
+{elseif $pointage}
+	{$id_user=$current_class->select($pointage,'id_user')}
+{else}
+{/if}
+
+<div class="primary pointage">
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{ATF::$usr->trans('choisir_periode',$current_class->table)}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div>
+    <div class="primaryContainer periode" id="primaryContainer">
+        {include file="container.tpl.htm"}
+        <div class="slipContainer periode" id="slipContainer" >
+            <form class="pointage_periode" name="date" id="formulaire" action="" method="post" >
+                <select name="month" id="month">
+                    {html_options options=util::month() selected=$month}
+                </select>
+                <select name="year" id="year">
+                    {html_options options=util::year() selected=$year}
+                </select>
+                {include file="button.tpl.htm" name="changer_date" text="ok" onclick="ATF.tpl2div('{$current_class->table}-select-{classes::cryptId($id_user)}.div','month='+$('#month').val()+'&year='+$('#year').val()+'&id_user={$id_user}');"}
+            </form>
+        </div>
+    </div>
+    <div class="ClearBothWithPadding"></div>
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{ATF::$usr->trans('choisir_projet',$current_class->table)}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div>
+    <div class="primaryContainer projet" id="projetPrimaryContainer">
+        {include file="container.tpl.htm" onglet="projet"}
+        <div class="slipContainer projet" id="projetContainer" >
+            <form name="pointage,insert" id="pointage,insert" action="" method="post" >
+                <table>
+                    <colgroup>
+                        <col class="first" />
+                        <col class="second"  />
+                        <col class="third"  />
+                        <col class="fourth"  />
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <td>{ATF::$usr->trans('choix',$current_class->table)}</td>
+                            <td> <input type="radio" name="choix" id="choix" value="gep" onclick="ATF.pointage.selection_projet('gep');" /> {ATF::$usr->trans('projet_defini',$current_class->table)}</td>
+                            <td> <input type="radio" name="choix" id="choix" value="cours" onclick="ATF.pointage.selection_projet('cours');"/> {ATF::$usr->trans('cours',$current_class->table)}</td>
+                            <td> <input type="radio" name="choix" id="choix" value="personnalise" onclick="ATF.pointage.selection_projet('personnalise');"/> {ATF::$usr->trans('projet_personnalise',$current_class->table)}</td>
+                        </tr>
+                        <tr>
+                            <td>{ATF::$usr->trans('libelle',$current_class->table)}</td>
+                            <td>
+                                <select name="gep" id="gep" disabled="disabled">
+                                    {html_options options=ATF::gep_projet()->options(null,null,true,'gep_projet','asc') selected=$smarty.post.id_gep_projet}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" id="cours" name="cours" disabled="disabled" value="">
+                            </td>
+                            <td>
+                                <input type="text" id="personnalise" name="personnalise" disabled="disabled" value="" /> 
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {ATF::$usr->trans(type,pointage)}
+                            </td>
+                            <td>
+                                <span id="type_gep">{ATF::$usr->trans(choisir_projet,pointage)}</span>
+                            </td>
+                            <td>
+                                {ATF::$usr->trans(cours,pointage)}	
+                            </td>
+                            <td>
+                                <select id="type" name="type" disabled="disabled">
+                                    {html_options options=$current_class->type}
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <input type="hidden" name="id_user" value="{$id_user}"/>
+                                <input type="hidden" name="date" value="{$date_incomplete}"/>
+                                {include file="button.tpl.htm" name="ajout_mission" text="ajout" onclick="if (ATF.verifChoix('choix')) ATF.insert($('#pointage,insert')); else alert('{ATF::$usr->trans(faite_votre_choix,pointage)}');"}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div class="ClearBothWithPadding"></div>
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>{ATF::$usr->trans('remplir_feuille',$current_class->table)} {ATF::$usr->trans($month)}/{$year}</span>
+        </div>
+    	<div class="slipTitleR"></div>
+    </div>
+    <div class="primaryContainer feuille" id="feuillePrimaryContainer">
+        {include file="container.tpl.htm" onglet="feuille"}
+        <div class="slipContainer feuille" id="feuilleContainer" >
+            {$jours=$current_class->nbJour($date_incomplete)}
+            <form name="pointage,insert" action="" method="post">
+                <fieldset class="recap">
+                    <legend>
+                        <span>
+                            {ATF::$usr->trans("recapitulatif",$current_class->table)|strtoupper}
+                            <a href="javascript:;" onclick="if ($('#recapContainer')) Effect.toggle('recapContainer', 'blind', { duration: .5, afterUpdate: updateHeight });">
+                                <img src="{ATF::$staticserver}images/icones/bottom.png" height="16" width="16" alt="" />
+                            </a>
+                        </span>
+                    </legend>
+                    <div id="recapContainer" style="display:none">
+                        <table>
+                            <colgroup>
+                                {foreach from=$jours key=key_ item=item_}
+                                    <col class="{ATF::$usr->abbreviate_day("`$date_incomplete`-`$key_`")}" />
+                                {/foreach}			
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    {foreach from=$jours key=key_ item=item_}
+                                        <th class="recap">
+                                            {ATF::$usr->abbreviate_day("`$date_incomplete`-`$key_`")} {$key_}
+                                        </th>
+                                    {/foreach}			
+                                     <th class="recap">
+                                        {ATF::$usr->trans("total")}                        
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {foreach from=$jours key=key_ item=item_}
+                                        {$date="`$date_incomplete`-`$key_`"}
+                                        {$t = $current_class->totalHeure($date,$id_user)}
+                                        <td class="recap {if $t!=0.0} filled{/if}">
+                                            {$t}
+                                        </td>
+                                    {/foreach}			
+                                     <td class="recap">
+                                        {$current_class->totalHeure($date_incomplete,$id_user)}                             
+                                    </td>
+                               </tr>
+                            </tbody>
+                        </table>
+                        <br />
+                        <table class="total">
+                            <thead>
+                                <tr>
+                                    <th colspan="6">
+                                        {ATF::$usr->trans("total",$current_class->table)}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{ATF::$usr->trans("production",$current_class->table)}</td>
+                                    <td class="value">{$current_class->totalHeure($date_incomplete,$id_user,'production')}</td>
+                                    <td>{ATF::$usr->trans("rd",$current_class->table)}</td>
+                                    <td class="value">{$current_class->totalHeure($date_incomplete,$id_user,"rd")}</td>
+                                    <td>{ATF::$usr->trans("hotline",$current_class->table)}</td>
+                                    <td class="value">{$current_class->totalHeure($date_incomplete,$id_user,'hotline')}</td>
+                                </tr>
+                                <tr>
+                                    <td>{ATF::$usr->trans("cours",$current_class->table)}</td>
+                                    <td class="value">{$current_class->totalHeure($date_incomplete,$id_user,'cours')}</td>
+                                    <td>{ATF::$usr->trans("conge",$current_class->table)}</td>
+                                    <td class="value">{$current_class->totalHeure($date_incomplete,$id_user,'conge')}</td>
+                                    <td>{ATF::$usr->trans("reunion",$current_class->table)}</td>
+                                    <td class="value">{$current_class->totalHeure($date_incomplete,$id_user,'reunion')}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+                {foreach from=$current_class->selectSujet($date_incomplete,$id_user) key=key item=item}
+                    <fieldset class="{$item.type}" {if $item.type=='hotline'} style="display:none" id="pointage_hotline_{$key}"{/if}>
+                        <legend>
+                            {if $item.type=="hotline"}
+                            	{$item.sujet|addslashes} 
+                                {if $item.id_gep_projet}
+                                    <a href="javascript:;" onclick="ATF.tpl2div('gep_projet-select-{classes::cryptId($item.id_gep_projet)}.div')" >
+                                        [{ATF::gep_projet()->nom($item.id_gep_projet)}]
+                                    </a>
+                                {/if}
+                            {elseif $item.id_gep_projet}
+                                <a href="javascript:;" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)}')) ATF.tpl2div('{$current_class->name()|urlencode},delete.ajax','id_user={$id_user}&id_pointage={$item["{$current_class->table}.id_pointage"]|cryptid}&div=main&template=pointage-select');">
+                                    <img src="{ATF::$staticserver}images/icones/delete.png" height="15" width="15" alt="" />
+                                </a>
+                                <a href="javascript:;" onclick="ATF.tpl2div('gep_projet-select-{classes::cryptId($item.id_gep_projet)}.div')" >{ATF::gep_projet()->nom($item.id_gep_projet)}</a>
+                            {elseif $item.sujet=="conge"}
+                                <a href="javascript:;" onclick="ATF.tpl2div('conge-select-{classes::cryptId($item.id_conge)}.div')" >{$item.sujet|addslashes}</a>
+                            {else}
+                                <a href="javascript:;" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)}')) ATF.deletor('{$current_class->table}','{$item["{$current_class->table}.id_pointage"]|cryptid}','id_user={$id_user}');">
+                                    <img src="{ATF::$staticserver}images/icones/delete.png" height="15" width="15" alt="" />
+                                </a>
+                                {$item.sujet|urldecode}
+                            {/if}                        
+                            <span>
+                                ({$current_class->totalHeure($date_incomplete,$id_user,false,$item.sujet)})
+                            </span>
+                        </legend>
+                        <table>
+                            <colgroup>
+                                {foreach from=$jours key=key_ item=item_}
+                                    <col class="{ATF::$usr->abbreviate_day("`$date_incomplete`-`$key_`")}" />
+                                {/foreach}			
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    {foreach from=$jours key=key_ item=item_}
+                                        <th class="{$item.type}">
+                                            {ATF::$usr->abbreviate_day("`$date_incomplete`-`$key_`")} {$key_}
+                                        </th>
+                                    {/foreach}	
+                                    <th class="{$item.type}">
+                                    	{ATF::$usr->trans("total")}
+                                    </th>		
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {foreach from=$jours key=key_ item=item_}
+                                        {$date="`$date_incomplete`-`$key_`"}
+                                        {$infos_pointage=$current_class->selectHoraire($date,$item.sujet,$id_user)}
+                                        <td class="{$item.type}" id="case_temps[{$infos_pointage.id_pointage}]">
+                                            {if $infos_pointage.id_pointage}
+                                            	{* Affecte la class CSS pour les éléments rempli *}
+                                                {$class=""}
+                                                {$disabled=""}
+                                                {if $infos_pointage.temps!="00:00"}
+                                                	{$class="filled"}
+                                                {/if} 
+                                            	{* Si on a un 0 au début il ne sert a rien on le vire *}
+                                            	{if $infos_pointage.temps|substr:"0":"1"==0}
+                                                	{$infos_pointage.temps = $infos_pointage.temps|substr:"1"}
+                                                {/if}
+                                            	{* Affecte la class CSS pour les éléments rempli *}
+                                                {if $item.sujet=="conge" || $item.type=="hotline"} 
+                                                	{$disabled = "disabled='disabled'"}
+                                                {/if}
+                                                <input {$disabled} class="{$class}" type="text" id="temps[{$infos_pointage.id_pointage}]" name="temps[{$item.sujet}][{$key_}]" value="{$infos_pointage.temps}" 
+                                                 onchange="if(ATF.verif_horaire('temps[{$infos_pointage.id_pointage}]','{$item.type}','{util::testJour($date)}')){ ATF.ajax('pointage,maj.ajax','id_pointage={$infos_pointage.id_pointage}&date={$date}&id_user={$id_user}&temps='+this.value); }" />                                
+                                                {if $item.sujet!="conge" && $item.type!="hotline"}
+                                                    <span  id="cell1_temps[{$item.sujet}][{$key_}]">
+                                                        <a href="javascript:;" id="cremente" onclick="if(ATF.pointage.decr_horaire('temps[{$infos_pointage.id_pointage}]','{$item.type|addslashes}','{util::testJour($date)}')){ ATF.__submitMaj({$infos_pointage.id_pointage},{$id_user}) }">
+                                                            -
+                                                        </a>
+                                                        <a href="javascript:;" id="cremente" onclick="if(ATF.pointage.incr_horaire('temps[{$infos_pointage.id_pointage}]','{$item.type}','{util::testJour($date)}')){ ATF.__submitMaj({$infos_pointage.id_pointage},{$id_user}) }">
+                                                            +
+                                                        </a>
+                                                        <a href="javascript:;" id="cremente" id="button_temps[{$infos_pointage.id_pointage}]" onclick="if( ATF.pointage.ajout_journee('temps[{$infos_pointage.id_pointage}]','{$item.type}') ){ ATF.ajax('pointage,maj.ajax','id_pointage={$infos_pointage.id_pointage}&date={$date}&id_user={$id_user}&temps='+$('#temps[{$infos_pointage.id_pointage}]').val()); }">
+                                                            &bull;
+                                                        </a>
+                                                    </span>
+                                                    <br />
+                                                {/if}
+                                            {else}
+                                                -
+                                            {/if}
+                                        </td>
+                                    {/foreach}		
+                                    <td class="{$item.type}">
+                                        {$current_class->totalHeure($date_incomplete,$id_user,$item.type,$item.sujet)}                              
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </fieldset>
+                {foreachelse}
+                	{ATF::$usr->trans('aucun_projet_selectionne',$current_class->table)}
+                {/foreach}	
+                {*<input type="button" value="{ATF::$usr->trans('afficher_hot',$current_class->table)}" onclick="affiche_hot()" />*}
+            </form>
+        </div>
+    </div>
+
+    {if ATF::$html->template_exists("{$current_class->table}-select_all_suffix.tpl.htm")}
+       {include file="{$current_class->table}-select_all_suffix.tpl.htm" entete=true}
+    {/if}
+</div>
+<script type="text/javascript">
+	/* Mise à jour de la taille du fond de pointage */
+	updateHeight();
+</script>

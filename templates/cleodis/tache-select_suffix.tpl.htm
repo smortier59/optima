@@ -1,0 +1,116 @@
+<tr>
+	<td class="field">
+        {ATF::$usr->trans('tache_user',$current_class->table)} :
+    </td>
+    <td class="value">
+        {foreach name=for_tache from=$requests.tache.dest key=key__ item=id_user}
+            {ATF::user()->nom($id_user)}{if !$smarty.foreach.for_tache.last}, {/if}
+        {/foreach}
+    </td>
+</tr>
+
+{if ATF::tache()->select($requests.tache.id_tache , "type_tache") != "demande_comite"}
+    {if !$requests.tache.date_validation}
+        <tr>
+            <td class="field">
+                {ATF::$usr->trans('valid',$current_class->table)} :
+            </td>
+            <td class="value">                    
+                <input type="button" value="{ATF::$usr->trans('valid',$current_class->table)}"
+                onclick="if(confirm('{ATF::$usr->trans(creer_suivi,tache)}')){
+                                ATF.ajax(
+                                    'tache,valid.ajax'
+                                    ,'id_tache={$requests.tache.id_tache}'
+                                    ,{ onComplete: function (obj) { 
+                                        ATF.goTo('suivi-insert.html');
+                                    } }
+                                );
+                            }else{	
+                                ATF.ajax('tache,valid.ajax','id_tache={$requests.tache.id_tache}');
+                            }" />                    
+            </td>
+        </tr>
+    {/if}
+{else}
+    <tr>
+        <td class="field">
+            {ATF::$usr->trans('valid',$current_class->table)} :
+        </td>
+        <td class="value">
+            {if ATF::tache()->select($requests.tache.id_tache , "id_user_valid_1") == ATF::$usr->getID()}
+                {if ATF::tache()->select($requests.tache.id_tache , "validation_1")}
+                    <b>Vous avez déja validé cette tache</b>
+                {else}
+                    <select id="comboDisplay" name="comboDisplay">
+                        <option value="refus_comite">Refus comité</option>
+                        <option value="accord_portage">Accord de portage</option>
+                        <option value="accord_reserve_cession">Accord reserve de cession</option>
+                        <option value="accord_cession_portage">Accord cession portage</option>
+                        <option value="attente_retour">Attente de retour</option>
+                    </select>            
+                    <input type="button" value="{ATF::$usr->trans('valid',$current_class->table)}"
+                    onclick="if(confirm('{ATF::$usr->trans(creer_suivi,tache)}')){
+                                var select = document.getElementById( 'comboDisplay' ); 
+                                var selectOption = select.options[select.selectedIndex].value;
+                                ATF.ajax(
+                                    'tache,valid.ajax'
+                                    ,'id_tache={$requests.tache.id_tache}&comboDisplay='+selectOption
+                                    ,{ onComplete: function (obj) { 
+                                        ATF.goTo('suivi-insert.html');
+                                    } }
+                                );
+                            }else{                                
+                                ATF.ajax('tache,valid.ajax','id_tache={$requests.tache.id_tache}&comboDisplay='+selectOption);
+                            }" />
+                {/if}
+            {else}
+                {if ATF::tache()->select($requests.tache.id_tache , "validation_1")}
+                    <b>Tache validée par {ATF::user()->nom(ATF::tache()->select($requests.tache.id_tache , "id_user_valid_1"))} ( {ATF::tache()->select($requests.tache.id_tache , "decision_1")} )</b>
+                {else}
+                    <b>En attente de validation par {ATF::user()->nom(ATF::tache()->select($requests.tache.id_tache , "id_user_valid_1"))}</b>
+                {/if}
+            {/if}
+
+            <br />
+
+            {if ATF::tache()->select($requests.tache.id_tache , "id_user_valid_2")}
+                {if ATF::tache()->select($requests.tache.id_tache , "id_user_valid_2") == ATF::$usr->getID()}
+                    
+                    {if ATF::tache()->select($requests.tache.id_tache , "validation_2")}
+                        <b>Vous avez déja validé cette tache</b>
+                    {else}
+                        <select id="comboDisplay" name="comboDisplay">
+                            <option value="refus_comite">Refus comité</option>
+                            <option value="accord_portage">Accord de portage</option>
+                            <option value="accord_reserve_cession">Accord reserve de cession</option>
+                            <option value="accord_cession_portage">Accord cession portage</option>
+                            <option value="attente_retour">Attente de retour</option>
+                        </select>
+                        <input type="button" value="{ATF::$usr->trans('valid',$current_class->table)}"
+                        onclick="if(confirm('{ATF::$usr->trans(creer_suivi,tache)}')){
+                                var select = document.getElementById( 'comboDisplay' ); 
+                                var selectOption = select.options[select.selectedIndex].value;
+                                ATF.ajax(
+                                    'tache,valid.ajax'
+                                    ,'id_tache={$requests.tache.id_tache}&comboDisplay='+selectOption
+                                    ,{ onComplete: function (obj) { 
+                                        ATF.goTo('suivi-insert.html');
+                                    } }
+                                );
+                            }else{                                
+                                ATF.ajax('tache,valid.ajax','id_tache={$requests.tache.id_tache}&comboDisplay='+selectOption);
+                            }" />
+                    {/if}
+
+
+                {else}
+                    {if ATF::tache()->select($requests.tache.id_tache , "validation_2")}
+                        <b>Tache validée par {ATF::user()->nom(ATF::tache()->select($requests.tache.id_tache , "id_user_valid_2"))} ( {ATF::tache()->select($requests.tache.id_tache , "decision_2")} )</b>
+                    {else}
+                        <b>En attente de validation par {ATF::user()->nom(ATF::tache()->select($requests.tache.id_tache , "id_user_valid_2"))}</b>
+                    {/if}
+                {/if}
+            {/if}  
+        </td>
+    </tr>
+{/if}

@@ -1,0 +1,3 @@
+{if $infos.id_pa}
+	<input type="text" class="updateOnTheFly codePA" style="width:40px;" value="{$infos.code}" onchange="new ATF.ajax('pa,update.ajax','id_pa={$infos.id_pa}&code='+encodeURIComponent(this.value));" />
+{/if}

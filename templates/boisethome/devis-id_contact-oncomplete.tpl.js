@@ -1,0 +1,1 @@
+Ext.ComponentMgr.get('devis[email]').setValue(Ext.util.Format.stripTags(record.data.email));

@@ -1,0 +1,57 @@
+{if isset($smarty.get.id_comite)}
+    {$id_comite = $smarty.get.id_comite}
+
+    {$note = ATF::comite()->select($id_comite, "note")}
+
+    {if $note<= 100 && $note>70}
+    	{$color = "#358c2b"}
+    	{$commentaire = "Risque tres faible"}
+    	{$lettre = "a"}
+    {else if $note<= 70 && $note>51}
+    	{$color = "#29bc0e"}
+    	{$commentaire = "Risque faible"}
+    	{$lettre = "b"}
+    {else if $note<= 50 && $note>30}
+    	{$color = "#f4af12"}
+    	{$commentaire = "Risque modéré"}
+    	{$lettre = "c"}
+    {else if $note<= 29 && $note>21}
+    	{$color = "#e6520c"}
+    	{$commentaire = "Risque Elevé"}
+    	{$lettre = "d"}
+    {else if $note<= 20 && $note>1}
+    	{$color = "#e6520c"}
+    	{$commentaire = "Risque tres Elevé"}
+    	{$lettre = "d"}
+    {else if $note== 0}
+    	{$color = "#c4291d"}
+    	{$commentaire = "Entreprise en situation de défaillance et ayant un tres fort risque de radiation"}
+    	{$lettre = "e"}
+    {else if $note== "NC"}
+    	{$color = "#c4291d"}
+    	{$commentaire = "Pas Noté"}
+    	{$lettre = "e"}
+    {/if}
+
+	<tr>    
+        <td style="height:102px; width:120px; background-image: url('images_pdf/cleodis/{$lettre}.png'); background-repeat: no-repeat;  background-position: right top; color:#fff">
+        	<center>
+        		<strong style="font-size: 15px;">Note :</strong><br /><br />
+        		<strong style="font-size: 38px;">{$note}</strong><br />
+        	</center>
+        		<strong style="font-size: 26px; float: right;margin-right: 18px;">{$lettre|upper}</strong>        	
+        </td>
+        <td style="color:{$color}; font-size: 20px;"><br /><br />{$commentaire}</td>
+	</tr>
+
+
+    {$res = ATF::societe()->getInfosInvestissement(ATF::comite()->select($id_comite, "id_societe"))}
+    <tr>
+        <td colspan="2"><strong style="font-size: 20px;">Investissement contrats en cours : {$res["investissement"]} €</strong></td>        
+    </tr>
+    <tr>
+        <td colspan="2"><strong style="font-size: 20px;">Encours factures non sorties : {$res["restant"]} €</strong></td>
+    </tr>
+    
+
+{/if}

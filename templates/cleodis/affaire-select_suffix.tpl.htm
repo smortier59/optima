@@ -1,0 +1,27 @@
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe"}
+	{if isset($smarty.get.id_affaire)}
+	    {$id_affaire = $smarty.get.id_affaire}
+
+	    {$pourcentage = ATF::affaire()->getPourcentagesMateriel($id_affaire)}
+
+		<tr>
+		    <td colspan="2" style="height:150px">
+		        <table style="width:100%; text-align:center;"> 
+		            <tr>
+		                <td><h2>Materiel </h2>(fixe, portable)</td>
+		                <td><h2>Immateriel  </h2>(Sans objet et non identifiabe)</td>
+		            </tr>
+		            <tr>
+		                <td><h3>{$pourcentage.pourcentagesMat} % </h3>{$pourcentage.mat} €</td>
+		                <td><h3>{$pourcentage.pourcentagesImmat} % </h3>{$pourcentage.immat} €</td>
+		            </tr>
+		            <tr>
+		            	<td colspan="2"><h2>Prix d'achat total : {$pourcentage.mat + $pourcentage.immat} €<h2></td>
+		            </tr>
+		            
+		        </table>
+		    </td>
+		</tr>
+
+	{/if}
+{/if}

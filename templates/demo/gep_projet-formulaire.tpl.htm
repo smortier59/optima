@@ -1,0 +1,138 @@
+{* héhé *} 
+{* Récupération de l'id projet dans le post ou le get *}
+{if !$id_gp}
+	{$id_gp = $smarty.post.id_gep_projet|default:$smarty.request.id_gep_projet}
+{/if}
+
+<div class="primary formulaire">
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>
+            	{if !$id_gp}
+                    {ATF::$usr->trans("erreur")}
+                {else}
+                    {ATF::$usr->trans("edition",'formulaire')} - {ATF::gep_projet()->nom($id_gp)}
+                {/if}
+            </span>
+        </div>
+    	<div class="slipTitleR" on></div>
+    </div>
+    <div class="primaryContainer formulaire" id="primaryContainer">
+        {include file="container.tpl.htm"}
+        <div class="slipContainer formulaire" id="slipContainer" >
+            {if !$id_gp}
+                <strong>{ATF::$usr->trans("manque_id_projet","formulaire")}</strong>
+            {else}
+            	{$projet=ATF::gep_projet()->select($id_gp)}
+            	<br />
+                <div style="width:930px; text-align:left;" class="action">
+                	<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" /> Accès fiche projet <a href="gep_projet-select-{$id_gp|cryptid}.html">{ATF::gep_projet()->nom($id_gp)}</a>
+                </div>
+                <div style="width:930px; text-align:left;" class="action">
+                	<span>
+                    	<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" />
+                    </span>
+                	<span>
+                    	{ATF::$usr->trans("voir_pdf","formulaire")}
+                    </span>
+                	<span>
+                        <a href="projet-{$id_gp}.pdf" target="_blank">
+                            <img src="{ATF::$staticserver}images/icones/pdf.png" height="16" width="16" />
+                        </a>
+                    </span>
+                </div>
+                <div style="width:930px; text-align:left;" class="action">
+                    <span>
+                        <img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" />
+                    </span>
+                    <span>
+                        {ATF::$usr->trans("ajout_attr_racine","formulaire")}
+                        {* Autocomplete *}
+                        {$key="attr_racine"}
+                        <input type="text" name="{$key}_label" id="{$key}_label" value="" onclick="this.value=''" />
+                        <span id="ScrAcAutocompleteIndicator{$key}" style="display: none">
+                          <img src="{ATF::$staticserver}images/refreshing.gif" alt="Working..." />
+                        </span>
+                        <div id="ScrAcAutocomplete{$key}" class="ScrAcAutocomplete"></div>
+            
+                        <script item.type="text/javascript">/*<![CDATA[*/
+                        new Ajax.Autocompleter (
+                          "{$key}_label",
+                          "ScrAcAutocomplete{$key}",
+                          "attr,autocompleteOLD.ajax",
+                            {
+                            method: 'post'
+                            , paramName: 'recherche' 
+                            , parameters: ''
+                            , minChars: 1
+                            , indicator: 'ScrAcAutocompleteIndicator{$key}'
+                            , afterUpdateElement : function (text, li) { 
+                                if (li.id=='new') {
+                                    $('#{$key}_label').val("");
+                                    ATF.tpl2div('formulaire,addNewAttr.ajax','display_form=1&id_gep_projet={$projet.id_gep_projet}&racine=1');
+                                } else {
+                                    ATF.tpl2div('formulaire,addAttr.ajax','id_attr='+li.id+'&id_gep_projet={$projet.id_gep_projet}&racine=1');
+                                }
+                            }
+                          }
+                        );
+                        
+                        /*]]>*/</script>
+                    </span>
+                </div>
+                <div style="width:930px; text-align:left;" class="action">
+                	<span>
+                    	<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" />
+                    </span>
+                	{*<span>
+                        {ATF::$usr->trans("derouler_tout","formulaire")}
+                    </span>
+                	<span>
+                        <a href="#">
+                            <img src="{ATF::$staticserver}images/icones/treeview_expand.png" height="13" width="13" />
+                        </a>
+                    </span>
+                	<span>
+                        {ATF::$usr->trans("or")}
+                    </span>*}
+                	<span>
+                        {ATF::$usr->trans("enrouler_tout","formulaire")}
+                    </span>
+                	<span>
+                        <a href="#" onclick="new ATF.tpl2div('formulaire,flushOpened.ajax', 'div=formulaire&id_gp='+{$projet.id_gep_projet}, { onSuccess:ATF.adjustContainer() });">
+                            <img src="{ATF::$staticserver}images/icones/treeview_collapse.png" height="13" width="13" />
+                        </a>
+                    </span>
+                </div>
+                <hr />
+                <div class="formulaire" id="formulaire">
+                	{include file="gep_projet-formulaire_data.tpl.htm" id_gp=$projet.id_gep_projet}
+                </div>
+                <hr />
+                <div class="legend">
+                    <div class="title">Légende :</div>
+                    <div class="attrTypeA">Couleur des attributs du catalogue général (appelés les A)</div>
+                    <div class="attrTypePA">Couleur des liaisons vers des attributs pour ce projet uniquement (appelés les PA)</div>
+                    <div class="offset">Ordre du A et/ou du PA dans le formulaire</div>
+                    <div class="type">Type de l'attribut</div>
+                    <div class="multi">Active / Désactive la multiplicité de l'attribut</div>
+                    <div class="ac">Active / Désactive l'autocomplétion sur cette attribut dans la saisie des visites, uniquement sur les ATTR de type TEXTE</div>
+                    <div class="attrStyle">{include file="gep_projet-formulaire_attr_attrStyle.tpl.htm" disabled=true style=1} : Style du A dans le rapport PDF</div>
+                    <br />
+					<div>
+                        <img src="{ATF::$staticserver}images/icones/insert.png" height="13" width="13" /> Ajouter un A enfant, existant ou nouveau
+                        <br /><img src="{ATF::$staticserver}images/icones/convert.png" height="13" width="13" /> Convertir tous les enfants de l'A en PA pour pouvoir les modifier
+                        <br /><img src="{ATF::$staticserver}images/icones/delete.png" height="13" width="13" /> Supprime le PA selectionné, mais ne supprime pas le A correspondant qui lui reste dans le catalogue.
+                        <br /><img src="{ATF::$staticserver}images/icones/no_euro.png" height="13" width="13" /> Editer la règle de cotation pour ce PA <br />{png_image src="{ATF::$staticserver}images/icones/euro.png" height="13" width="13"} Une règle au moins déjà existante pour ce PA
+                        <br />
+                    </div>
+                </div>
+            {/if}
+        </div>
+    </div>
+	<script type="text/javascript">/*<![CDATA[*/
+		ATF.adjustContainer();
+    /*]]>*/</script>
+</div>
+<div class="ClearBothWithPadding"></div>

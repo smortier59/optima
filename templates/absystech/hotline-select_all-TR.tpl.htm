@@ -1,0 +1,20 @@
+{strip}
+{*if $item["hotline.urgence"] && $item["hotline.etat"]}
+    {$item=[urgence=>$item["hotline.urgence"],etat=>$item["hotline.etat"]]}
+{else}
+    {$item=$current_class->select($item["hotline.id_hotline"],"urgence,etat")}
+{/if}
+{if $item.etat!=done && $item.etat!=payee && $item.etat!=wait && $item.etat!=annulee}
+    {if $item.urgence==bloquant}
+        hotlineBloquant
+    {elseif $item.urgence==genant}    
+        hotlineGenant
+    {/if}
+{/if*}
+
+{if $item["hotline.wait_mep"]==oui}
+	hotlineMEP
+{elseif $item["hotline.etat"]==wait}
+	hotlineWait
+{/if}
+{/strip}

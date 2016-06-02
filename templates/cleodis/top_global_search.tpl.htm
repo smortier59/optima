@@ -1,0 +1,23 @@
+{if ATF::$codename!=midas}
+<input type="text" name="globalSearch_label" id="globalSearch_label" value="{ATF::$usr->trans("rechercher")}" onfocus="if ('{ATF::$usr->trans("rechercher")}'==this.value) this.value='';"  />
+<script type="text/javascript">/*<![CDATA[*/
+	ATF.autocomplete({
+		url:'accueil,global_search.ajax'
+		,mapping:[
+			{ name: 'moduleBrut', mapping: 0 },
+			{ name: 'module', mapping: 1 },
+			{ name: 'id', mapping: 2 },
+			{ name: 'nom', mapping: 3 },
+			{ name: 'detail', mapping: 4, type:'string' }
+		]
+		,loadingText:'Recherche...'
+		,template:'{include file="top_global_search_autocomplete.tpl.htm"}'
+		,applyTo:'globalSearch_label'
+		,onSelect:function(record){
+			this.collapse();
+			//window.location = record.data.moduleBrut+"-select-"+record.data.id+".html";
+			ATF.goTo(record.data.moduleBrut+"-select-"+record.data.id+".html");
+		}
+	});
+/*]]>*/</script>
+{/if}

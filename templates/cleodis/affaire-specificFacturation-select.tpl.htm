@@ -1,0 +1,33 @@
+{$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire}
+<td colspan="2">
+    <div id="specificFacturation"></div>
+    <script type="application/javascript">
+    Ext.onReady(function(){
+        new Ext.FormPanel({
+            renderTo: 'specificFacturation',
+            bodyStyle:'background-color:transparent;',
+            frame:false,
+            border:false,
+            defaults: {
+                xtype: 'textfield',
+                width:185,
+				height:20
+            },
+            items: [
+                {foreach from=[RIB,BIC,IBAN,nom_banque,ville_banque,date_previsionnelle,RUM] item=d}
+                    {if !$d@first},{/if}
+                    {
+                        fieldLabel: '{ATF::$usr->trans($d,affaire)}',
+                        value:'{ATF::affaire()->select($id_affaire,$d)|escape:javascript}',
+                        listeners :{
+							change:function(f,n,o){
+						    ATF.ajax("affaire,updateFacturation.ajax","id_affaire={$id_affaire}&field={$d}&value="+(n?n:''));
+                            }
+                        }
+                    }
+                {/foreach}
+            ]
+        });	
+    });
+    </script>
+</td>

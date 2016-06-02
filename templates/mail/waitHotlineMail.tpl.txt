@@ -1,0 +1,4 @@
+Bonjour {$infos["contact"]} ,
+
+
+votre requete est en attente d'une réponse de votre part !!

@@ -1,0 +1,1 @@
+Ext.ComponentMgr.get('bon_de_commande[email]').setValue(record.data.email);

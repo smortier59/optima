@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{ATF::$usr->trans("id_language")}">
+<head>
+<style type="text/css"><!--{include file="mail/css.tpl.css"}--></style>
+</head>
+<body style="margin:0px">
+<table class="top">
+	<tr>
+		<td valign="top" align="center">
+			<table class="top" style="height:176px;">
+				<tr>
+					<td valign="top" align="center">MAIL TOP !</td>
+				</tr>
+			</table>
+			<table class="std" style="width:1000px">
+				<tr>
+					<td valign="top" style="width:150px;padding-right:4px"><img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/light_left.jpg")}" alt="LEFT" /></td>
+					<td valign="top" align="center">
+						{include file="mail/{$infos.template}.tpl.htm"}
+					</td>
+					<td valign="top" style="width:150px;padding-right:4px">RIGHT</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

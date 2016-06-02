@@ -1,0 +1,115 @@
+{**
+* Affichage du pointage par mois
+* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+* @author Quentin JANON <qjanon@absystech.fr>
+* @param int $id_user l'utilisateur concerné (false par défaut)
+* @param int $month Le numéro du mois désiré
+* @param int $year L'année désirée
+*}
+
+{* Date *}
+{if $month && $year}
+	{$date_incomplete="`$year`-`$month`"}
+{else}
+	{$date_incomplete=$smarty.now|date_format:"%Y-%m"}
+	{$month=$smarty.now|date_format:"%m"}
+	{$year=$smarty.now|date_format:"%Y"}
+{/if}
+{if $smarty.request.shortcut}
+	{$url="ATF.tpl2div('tpl2div.ajax','shortcut=1&table=pointage&div=contentContainer&template=pointage_by_month&notop=1&nognt=1&id_user='+$('#MuserShortcut').val()+'&month='+$('#MmonthShortcut').val()+'&year='+$('#MyearShortcut').val());"}
+{else}
+	{$url="ATF.tpl2div('tpl2div.ajax','table=pointage&div=feuilleContainer&template=pointage_by_month&notop=1&nognt=1&id_user='+$('#Muser').val()+'&month='+$('#Mmonth').val()+'&year='+$('#Myear').val());"}
+{/if}
+{* id_user *}
+{$id_user=$smarty.request.id_user|default:{ATF::$usr->getID()|cryptid}}
+<form class="pointage_periode" name="date{if $smarty.request.shortcut}Shortcut{/if}" id="formulaire{if $smarty.request.shortcut}Shortcut{/if}" action="" method="post" >
+	<div style="text-align:left;">
+		<div style="display:inline;margin-right:5px;margin-left:50px;">
+			<span style="font-weight:bold;">{t w=select_user p=ATF::pointage()->table} : </span>
+		</div>
+		<div style="display:inline;">
+			<select name="user" id="Muser{if $smarty.request.shortcut}Shortcut{/if}" onchange="{$url}">
+				{html_options options=ATF::user()->html_options() selected=$id_user}
+			</select>
+		</div>
+		<div style="display:inline;margin-right:5px;">
+		<span style="font-weight:bold;">{t w=select_month p=ATF::pointage()->table} : </span>
+		</div>
+		<div style="display:inline;">
+			<select name="month" id="Mmonth{if $smarty.request.shortcut}Shortcut{/if}" onchange="{$url}">
+				{html_options options=util::month() selected=$month}
+			</select>
+		</div>
+		<div style="display:inline;">
+			<select name="year" id="Myear{if $smarty.request.shortcut}Shortcut{/if}" onchange="{$url}">
+				{html_options options=util::year() selected=$year}
+			</select>
+		</div>
+	</div>
+</form>
+<br /><br />
+{$jours=ATF::pointage()->nbJour($date_incomplete)}
+<div id="recapContainer">
+	<table class="pointageByMonth">
+		<colgroup>
+			{foreach from=$jours key=key_ item=item_}
+				<col class="{ATF::$usr->abbreviate_day("`$date_incomplete`-`$key_`")}" />
+			{/foreach}			
+		</colgroup>
+		<thead>
+			<tr>
+				{foreach from=$jours key=key_ item=item_}
+					<th class="recap">
+						{ATF::$usr->abbreviate_day("`$date_incomplete`-`$key_`")} {$key_}
+					</th>
+				{/foreach}			
+				 <th class="recap">
+					{ATF::$usr->trans("total")}                        
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				{foreach from=$jours key=key_ item=item_}
+					{$date="`$date_incomplete`-`$key_`"}
+					{$t = ATF::pointage()->totalHeure($date,$id_user)}
+					<td class="recap {if $t!=0.0} filled{/if}">
+						{$t|default:00h00}
+					</td>
+				{/foreach}			
+				 <td class="recap">
+					{ATF::pointage()->totalHeure($date_incomplete,$id_user)}                             
+				</td>
+		   </tr>
+		</tbody>
+	</table>
+	<br />
+	<table class="total pointageByMonth">
+		<thead>
+			<tr>
+				<th colspan="6">
+					{ATF::$usr->trans("total",ATF::pointage()->table)}
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>{ATF::$usr->trans("production",ATF::pointage()->table)}</td>
+				<td class="value">{ATF::pointage()->totalHeure($date_incomplete,$id_user,'production')|default:00h00}</td>
+				<td>{ATF::$usr->trans("rd",ATF::pointage()->table)}</td>
+				<td class="value">{ATF::pointage()->totalHeure($date_incomplete,$id_user,"rd")|default:00h00}</td>
+				<td>{ATF::$usr->trans("hotline",ATF::pointage()->table)}</td>
+				<td class="value">{ATF::pointage()->totalHeure($date_incomplete,$id_user,'hotline')|default:00h00}</td>
+			</tr>
+			<tr>
+				<td>{ATF::$usr->trans("cours",ATF::pointage()->table)}</td>
+				<td class="value">{ATF::pointage()->totalHeure($date_incomplete,$id_user,'cours')|default:00h00}</td>
+				<td>{ATF::$usr->trans("conge",ATF::pointage()->table)}</td>
+				<td class="value">{ATF::pointage()->totalHeure($date_incomplete,$id_user,'conge')|default:00h00}</td>
+				<td>{ATF::$usr->trans("reunion",ATF::pointage()->table)}</td>
+				<td class="value">{ATF::pointage()->totalHeure($date_incomplete,$id_user,'reunion')|default:00h00}</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+</form>

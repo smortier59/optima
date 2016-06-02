@@ -1,0 +1,38 @@
+{strip}
+<div class="accueilContainer">
+    <span class="txt1">
+        {ATF::$usr->trans(activiteRecenteDepuisDerniereConnexion,accueil)}
+    </span>
+    <br /><br />
+    <span class="txt2">
+        &bull;&nbsp;&nbsp;{ATF::$usr->trans('nbTacheDepuisDerniereConnexion','accueil')} {ATF::tache()->getSinceLastConnection(true)}
+    </span>
+    <br /><br />
+    <span class="txt2">
+        &bull;&nbsp;&nbsp;{ATF::$usr->trans('nbHotlineDepuisDerniereConnexion','accueil')} {ATF::hotline()->getSinceLastConnection(true)}
+    </span>
+    <br /><br />
+    <span class="txt2">
+        &bull;&nbsp;&nbsp;{ATF::$usr->trans('nbAffaireDepuisDerniereConnexion','accueil')} {ATF::affaire()->getSinceLastConnection(true)}
+    </span>
+    <br /><br />
+    {*<fieldset style="width:45%; border:1px solid grey; float:left; margin:10px">
+        <legend>
+            {ATF::$usr->trans('derniereTache','accueil')}
+        </legend>
+    </fieldset><fieldset style="width:45%; border:1px solid grey; margin:10px">
+        <legend>
+            {ATF::$usr->trans('derniereTache','accueil')}
+        </legend>
+    </fieldset>
+    <fieldset style="width:45%; border:1px solid grey; float:left; margin:10px">
+        <legend>
+            {ATF::$usr->trans('derniereTache','accueil')}
+        </legend>
+    </fieldset><fieldset style="width:45%; border:1px solid grey; margin:10px">
+        <legend>
+            {ATF::$usr->trans('derniereTache','accueil')}
+        </legend>
+    </fieldset>*}
+</div>
+{/strip}

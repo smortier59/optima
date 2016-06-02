@@ -1,0 +1,18 @@
+{$id_devis=$item['devis.id_devis']|default:ATF::_r('id_devis')|default:$requests.devis.id_devis}
+{if $event=="select"}
+	<td><b>{ATF::$usr->trans($key)}</b></td>
+{/if}
+{$devis=ATF::devis()->select($id_devis)}
+{if ATF::$usr->privilege('commande','insert')}
+    {if $devis['etat']=="attente"}
+        <a href="commande-insert.html,id_devis={$id_devis|cryptid}" onclick="ATF.goTo('commande-insert.html,id_devis={$id_devis|cryptid}'); return false;"><img src="{ATF::$staticserver}images/icones/expand.png" height="16" width="16" alt="" /></a>
+    {elseif $devis['etat']=="bloque"}
+        {if ATF::$usr->get("id_profil")==1}
+            <a href="javascript:;" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)}')) ATF.tpl2div('{$current_class->table},valider.ajax','id_devis={$id_devis|cryptid}');" {$item[$x]}&amp;event=valider" onclick="return confirm('Etes-vous sur(e) ?');"><img src="{ATF::$staticserver}images/icones/valid.png" height="16" width="16" alt="" /></a>
+        {else}
+            -
+        {/if}
+    {else}
+        -
+    {/if}
+{/if}

@@ -1,0 +1,71 @@
+{* héhé *}
+{if !$projet}
+	{$id_gp=$smarty.request.id_gep_projet}
+    {$projet=ATF::gep_projet()->select($id_gp)}
+{/if}
+
+{$id_ppa=$infos.id_pa|default:$infos.id_ppa|default:$id_ppa}
+{$id_vi_pa_multi=$infos.id_vi_pa_multi|default:$id_vi_pa_multi}
+
+{* On a une réponse ? *}
+{$vi_pa=ATF::vi_pa()->isAnswered($smarty.request.id_visite,$infos.id_attr,$id_ppa,$infos.id_pa,$id_vi_pa_multi)}
+
+{if $infos.id_attr}
+	{if $infos.id_pa}
+	    {$pa = ATF::pa()->select($infos.id_pa)}
+    {else}
+	    {$pa = null}
+    {/if}
+    {$attr = ATF::attr()->select($infos.id_attr)}
+
+	{* identifiant de cette réponse *}
+    {$div="`$id_ppa`_`$attr.id_attr`_`$id_vi_pa_multi`"}
+    
+    {if !ATF::formulaire()->isOpened($div) && $expandAll}
+        {ATF::formulaire()->keepOpened($div)}
+    {/if}
+    
+    {* ATTR ENFANTS *}
+    {$data = ATF::pa()->selectChilds($infos.id_pa)}
+    {if !$data}
+        {$data = ATF::attr()->selectChilds($infos.id_attr)}
+    {/if}
+    <div class="indent{$indent} pa" id="{$div}">
+		<script item.type="text/javascript">/*<![CDATA[*/
+			__x{$div}  = function (i,xAll) { 
+				ATF.__attr.expand('{$div}_childs','template=visite-formulaire_attr_childs&id_attr={$attr.id_attr}&id_pa={$infos.id_pa}&id_ppa={$id_ppa}&id_visite={$smarty.request.id_visite}&id_vi_pa_multi={$id_vi_pa_multi}'+(xAll?'&expandAll='+xAll:''),i); 
+				if ($('#icon_{$div}')) {
+					$('#icon_{$div}').removeClassName('expand');
+					$('#icon_{$div}').addClassName('collapse');
+				}
+			};
+			__c{$div}  = function () { ATF.__attr.collapse('{$div}_childs','{$div}',1); };
+			__s{$div}  = function (v) { ATF.__attr.store({ldelim}r:v,a:{$infos.id_attr},v:'{$smarty.request.id_visite}',pa:'{$infos.id_pa}',ppa:'{$id_ppa}',m:'{$id_vi_pa_multi}',d:'{$div}'{rdelim},v?__x{$div}:null); };
+        /*]]>*/</script>
+            <div class="attrTitle{if $infos.id_pa} attrTypePA{else} attrTypeA{/if}" id="{$div}Label">
+                {include file="visite-formulaire_attr_label.tpl.htm"}
+            </div>
+        <div class="ClearBoth"></div>
+        
+        {*if (ATF::formulaire()->isOpened($div) || $ptype===sans_reponse && $attr.type===sans_reponse) *}
+        {if ATF::formulaire()->isOpened($div)
+        && $data 
+        && ($vi_pa.reponse || $attr.type===sans_reponse || $attr.type===enum)}
+            <div id="{$div}_childs" class="blockBordered">
+                {include file="visite-formulaire_attr_childs.tpl.htm" noKeep=true id_ppa=$infos.id_pa|default:$id_ppa}
+            </div>
+        {else}
+            <div id="{$div}_childs" class="blockBordered" style="display:none;"></div>
+        {/if}
+        
+        <div class="ClearBoth"></div>
+    </div> 
+	<script item.type="text/javascript">/*<![CDATA[*/
+        $('#{$div}').refreshBranch = function() {
+            new ATF.tpl2div('tpl2div.ajax', 'div='+this.up().id+'&template=visite-formulaire_attr_childs&id_pa={$infos.id_parent}&id_ppa={$id_ppa}&id_gep_projet={$projet.id_gep_projet}&id_visite={$smarty.request.id_visite}&id_vi_pa_multi={$id_vi_pa_multi}');
+        }.bind($('#{$div}'));
+    /*]]>*/</script>
+{else}
+	{var_dump($infos)}
+	Pas d'ID attr dans l'infos	
+{/if}

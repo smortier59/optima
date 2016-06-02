@@ -1,0 +1,254 @@
+<script type="application/javascript">
+	/* Données de l'affaire */
+	var lignesDataVisibles = {$lignesDataVisibles};
+	var lignesDataNonVisibles = {$lignesDataNonVisibles};
+	var lignesDataReprises = {$lignesDataReprises};
+	var facturesDataFournisseurs = {$facturesDataFournisseurs};
+	var facturesDataNonParvenues = {$facturesDataNonParvenues};
+	var loyerData = {$loyerData};
+	var facturesCleodisData = {$facturesCleodisData};
+	
+	/* Retourne le grid générique représentant des lignes visibles, non visibles ou reprises */
+	var lignesGrid = function (title,data) { 
+		var lignesColonnes = ['ref', 'id_fournisseur', 'quantite', 'prix_achat'];
+		var lignesColumnModel = new Ext.grid.ColumnModel({
+			columns: [
+				{ header: 'Réf.',  dataIndex:'ref' },
+				{ header: 'Fournisseur',  dataIndex:'id_fournisseur', width:150 },
+				{ header: 'Qté',  dataIndex:'quantite', width:30 },
+				{ header: 'Montant',  dataIndex:'prix_achat' }
+			],
+			defaults: {
+				sortable: true,
+				forceFit:true,
+				menuDisabled: true
+			}
+		});
+		
+		return new Ext.grid.GridPanel({
+			titleCollapse:true,
+			collapsible:true,
+			collapsed:true,
+			autoHeight:true,
+			autoWidth:true,
+			store:new Ext.data.JsonStore({
+				fields:lignesColonnes,
+				data:data
+			}),
+			colModel: lignesColumnModel,
+			title: title
+		});
+	};
+	
+	/* Retourne le grid générique représentant des factures fournisseur ou non parvenues */
+	var facturesGrid = function (title,data) { 
+		var facturesColonnes = ['ref', 'date', 'prix', 'id_fournisseur'];
+		var facturesColumnModel = new Ext.grid.ColumnModel({
+			columns: [
+				{ header: 'Date',  dataIndex:'date' },
+				{ header: 'Réf.',  dataIndex:'ref' },
+				{ header: 'Montant',  dataIndex:'prix' },
+				{ header: 'Fournisseur',  dataIndex:'id_fournisseur' }
+			],
+			defaults: {
+				sortable: true,
+				forceFit:true,
+				menuDisabled: true
+			}
+		});
+		
+		return new Ext.grid.GridPanel({
+			titleCollapse:true,
+			collapsible:true,
+			collapsed:true,
+			autoHeight:true,
+			autoWidth:true,
+			store:new Ext.data.JsonStore({
+				fields:facturesColonnes,
+				data:data
+			}),
+			colModel: facturesColumnModel,
+			title: title
+		});
+	};
+	
+	/* Retourne le grid des loyers actualisés */
+	var loyerGrid = function (title,data) { 
+		var loyerColonnes = ['duree', 'frequence_loyer', 'loyer', 'frais_de_gestion', 'assurance', 'pv'];
+		var loyerColumnModel = new Ext.grid.ColumnModel({
+			columns: [
+				{ header: 'Durée',  dataIndex:'duree', width:50 },
+				{ header: 'Fréq.',  dataIndex:'frequence_loyer', width:50 },
+				{ header: 'Montant',  dataIndex:'loyer', width:75 },
+				{ header: 'Frais',  dataIndex:'frais_de_gestion', width:50 },
+				{ header: 'Assur.',  dataIndex:'assurance', width:50 },
+				{ header: 'Loyer Act.',  dataIndex:'pv', width:75 }
+			],
+			defaults: {
+				sortable: true,
+				forceFit:true,
+				menuDisabled: true
+			}
+		});
+		
+		return new Ext.grid.GridPanel({
+			autoHeight:true,
+			autoWidth:true,
+			store:new Ext.data.JsonStore({
+				fields:loyerColonnes,
+				data:data
+			}),
+			colModel: loyerColumnModel,
+			title: title
+		});
+	};
+	
+	/* Retourne le grid générique représentant des factures fournisseur ou non parvenues */
+	var facturesCleodisGrid = function (title,data) { 
+		var facturesCleodisColonnes = ['type_facture', 'ref', 'date', 'prix'];
+		var facturesCleodisColumnModel = new Ext.grid.ColumnModel({
+			columns: [
+				{ header: 'Type',  dataIndex:'type_facture' },
+				{ header: 'Réf.',  dataIndex:'ref' },
+				{ header: 'Date',  dataIndex:'date' },
+				{ header: 'Montant',  dataIndex:'prix' }
+			],
+			defaults: {
+				sortable: true,
+				forceFit:true,
+				menuDisabled: true
+			}
+		});
+		
+		return new Ext.grid.GridPanel({
+			titleCollapse:true,
+			collapsible:true,
+			collapsed:true,
+			autoHeight:true,
+			autoWidth:true,
+			store:new Ext.data.JsonStore({
+				fields:facturesCleodisColonnes,
+				data:data
+			}),
+			colModel: facturesCleodisColumnModel,
+			title: title
+		});
+	};
+	
+	/* Dépenses */
+	var depenses = {
+		xtype:'fieldset',
+		title:'Dépenses',
+		autoHeight:true,
+		items:[/*{
+			id:'typeCompteT',
+			xtype: 'hidden',
+			value:'{$type}'
+		},*/{
+			width:100,
+			id:'tauxCompteT',
+			value:'{$taux}',
+{if $type==manager}
+			xtype: 'displayfield',
+			fieldLabel:'Taux de refi. réel (%)'
+{else}
+			xtype: 'textfield',
+			fieldLabel:'Taux de refi. (%)'
+{/if}
+/*		},{
+			xtype: 'compositefield',
+			fieldLabel:'Assurance (fixe)',
+			items:[{
+				xtype: 'textfield',
+				width:100,
+				emptyText: '%',
+				value:'{$affaire->get("assurance_fixe")|number_format:2:".":" "}'
+			},{
+				xtype: 'displayfield',
+				width:100,
+				value:'{$affaire->get("assurance_portable")|number_format:2:".":" "} €'
+			}]
+		},{
+			xtype: 'compositefield',
+			fieldLabel:'Assurance (fixe)',
+			items:[{
+				xtype: 'textfield',
+				width:100,
+				emptyText: '%',
+				value:'{$affaire->get("assurance_fixe")|number_format:2:".":" "}'
+			},{
+				xtype: 'displayfield',
+				width:100,
+				value:'{$affaire->get("assurance_portable")|number_format:2:".":" "} €'
+			}]
+*/		},
+		lignesDataVisibles ? lignesGrid('Lignes visibles ({$lignesDataVisiblesTotal|number_format:2:".":" "} €)',lignesDataVisibles) : { },
+		lignesDataNonVisibles ? lignesGrid('Lignes non visibles ({$lignesDataNonVisiblesTotal|number_format:2:".":" "} €)',lignesDataNonVisibles) : { },
+		lignesDataReprises ? lignesGrid('Lignes reprises ({$lignesDataReprisesTotal|number_format:2:".":" "} €)',lignesDataReprises) : { },
+{if $type==manager}
+		{
+			xtype: 'displayfield',
+			width:100,
+			fieldLabel:'Annulation invest.',
+			value:'- {$lignesTotal|number_format:2:".":" "} €'
+		},
+		facturesDataFournisseurs ? facturesGrid('Factures des fournisseurs ({$facturesDataFournisseursTotal|number_format:2:".":" "} €)',facturesDataFournisseurs) : { },
+		facturesDataNonParvenues ? facturesGrid('Factures des non parvenues ({$facturesDataNonParvenuesTotal|number_format:2:".":" "} €)',facturesDataNonParvenues) : { },
+{/if}
+		{
+			xtype: 'displayfield',
+			fieldLabel:'Total dépenses',
+			value:'{$depensesTotal|number_format:2:".":" "} €'
+		}
+		]
+	};
+	
+	/* Recettes */
+	var recettes = {
+		xtype:'fieldset',
+		title:'Recettes',
+		autoHeight:true,
+		items:[{
+			xtype: 'displayfield',
+			fieldLabel:'Valeur résiduelle',
+			value:'{$vr|number_format:2:".":" "} €'
+		},
+		loyerData ? loyerGrid('Loyer actualisé ({$loyerDataVA|number_format:2:".":" "} € @ {$taux}%))',loyerData) : { },
+{if $type==manager}
+		facturesCleodisData ? facturesCleodisGrid('Factures ({$facturesCleodisDataTotal|number_format:2:".":" "} €',facturesCleodisData) : { },
+		{
+			xtype: 'displayfield',
+			fieldLabel:'Reste à facturer',
+			value:'{$resteAFacturer|number_format:2:".":" "} €'
+		},
+{/if}
+		{
+			xtype: 'displayfield',
+			fieldLabel:'Marge',
+			value:'{$margePourcent} % = {$marge|number_format:2:".":" "} €'
+		}]
+	};
+	
+	/* Regrouper les dépenses et recettes en deux colonnes moitié/moitié */
+	Ext.getCmp('winCompteT').removeAll();
+	Ext.getCmp('winCompteT').add(new Ext.FormPanel({
+		items:[{
+			type:'panel',
+			layout:'column',
+			defaults: { labelWidth:150 },
+			padding:5,
+			items:[{
+				xtype: 'container',
+				columnWidth: .5,
+				layout:'fit',
+				items:[depenses]
+			},{
+				xtype: 'container',
+				columnWidth: .5, 
+				layout:'fit',
+				items:[recettes]
+			}]
+		}]	
+	}));
+	Ext.getCmp('winCompteT').doLayout();
+</script>

@@ -1,0 +1,63 @@
+<!-- Graphique -->
+<table style="width:100%">
+<tr><td colspan="2">
+<div id="{$smarty.get.module}_"></div>
+
+<script type="text/javascript">
+{$data = ATF::hotline()->stats()} 
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$smarty.get.module}_',
+            type: 'column'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },
+        colors :[
+            '#FF0004',
+            '#FFCF23',
+            '#19FF30'            
+        ],
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}  
+                    {if $cat["label"]}                  
+                        '{$cat["label"]}' 
+                    {else}
+                        'Non traités'
+                    {/if}
+                    {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: null
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});
+    
+</script>
+</td></tr>
+</table>

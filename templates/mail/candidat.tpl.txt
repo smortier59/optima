@@ -1,0 +1,11 @@
+Bonjour,
+
+un nouveau candidat vient de postuler, dont voici les informations :
+
+{foreach from=$infos.donnees key=champs item=donnees}
+{if $donnees}
+{$champs} = {$donnees}
+{/if}
+{/foreach}
+
+Veuillez vous rendre sur Optima pour en prendre connaissance.

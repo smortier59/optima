@@ -1,0 +1,82 @@
+{$adherent = ATF::_r()}
+
+{$id_adherent = ATF::adherent()->decryptId($adherent["id_adherent"]|default:$adherent["adherent_charge"]["id_adherent"]|default:$adherent["adherent_ressource"]["id_adherent"])}
+
+{if !$id_adherent}
+    {$id_adherent = ATF::adherent()->last()}
+{/if}
+
+
+{$charge = ATF::adherent_charge()->selectCalcule($id_adherent)}
+{$ressource = ATF::adherent_ressource()->selectCalcule($id_adherent)}
+{$ratio = ATF::adherent()->getRatio($id_adherent) }
+
+<tr>
+    <td colspan="2" style="height:150px">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="#adherent_ressource-update.html,id_adherent_ressource={ATF::adherent_ressource()->cryptId(ATF::adherent_ressource()->getAdherent_ressource($id_adherent))}">
+                        <img src="{ATF::$staticserver}images/module/48/adherent_ressource.png" style="width:40px;" alt="{ATF::$usr->trans("adherent_ressource",$current_class->table)}" />
+                   </a>                                        
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("adherent_ressource",$current_class->table)}</span><br />
+               </td>               
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="#adherent_charge-update.html,id_adherent_charge={ATF::adherent_charge()->cryptId(ATF::adherent_charge()->getAdherent_charge($id_adherent))}">
+                        <img src="{ATF::$staticserver}images/module/48/adherent_charge.png" style="width:40px;" alt="{ATF::$usr->trans("adherent_charge",$current_class->table)}" />
+                   </a>
+                 </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("adherent_charge",$current_class->table)}</span><br />
+                </td>
+            </tr>            
+        </table>
+    </td>
+</tr>
+
+
+<tr>
+    <td colspan="2" style="height:150px">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("adherent_ressource",$current_class->table)}</span><br />
+               </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("adherent_charge",$current_class->table)} (Ratio : <span style="color:red;">{$ratio|number_format:2:".":" "}</span>)</span><br />
+               </td>         
+            </tr>
+            <tr>
+                <td style="text-align:justify; vertical-align:middle">                    
+                   
+                    <div>
+                        {ATF::$usr->trans('total_mensuel',$current_class->table)} : <span style="font-weight:bold;">{$ressource[0]["total_mensuel"]|number_format:2:".":" "} €</span> <br />
+                        {ATF::$usr->trans('total_mensuel_conjoint',$current_class->table)} : <span style="font-weight:bold;">{$ressource[0]["total_mensuel_conjoint"]|number_format:2:".":" "} €</span> <br /><br />
+                        {ATF::$usr->trans('total_annuel',$current_class->table)} : <span style="font-weight:bold;">{$ressource[0]["total_annuel"]|number_format:2:".":" "} €</span> <br />
+                        {ATF::$usr->trans('total_conjoint',$current_class->table)} : <span style="font-weight:bold;">{$ressource[0]["total_conjoint"]|number_format:2:".":" "} €</span>  <br />
+                    </div>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">                  
+                    
+                    <div>
+                        {ATF::$usr->trans('total_mensuel',$current_class->table)} : <span style="color:red;font-weight:bold;">{$charge[0]["total_mensuel"]|number_format:2:".":" "} €</span> <br />
+                        {ATF::$usr->trans('total_mensuel_conjoint',$current_class->table)} : <span style="color:red;font-weight:bold;">{$charge[0]["total_mensuel_conjoint"]|number_format:2:".":" "} €</span> <br /><br />
+                        {ATF::$usr->trans('total_impaye',$current_class->table)} : <span style="color:red;font-weight:bold;">{$charge[0]["total_impaye"]|number_format:2:".":" "} €</span> <br /><br />
+                        {ATF::$usr->trans('total_annuel',$current_class->table)} : <span style="color:red;font-weight:bold;">{$charge[0]["total_annuel"]|number_format:2:".":" "} €</span> <br />
+                        {ATF::$usr->trans('total_conjoint',$current_class->table)} : <span style="color:red;font-weight:bold;">{$charge[0]["total_conjoint"]|number_format:2:".":" "} €</span>  <br />
+                    </div>
+                </td>
+            </tr>            
+        </table>
+    </td>
+</tr>

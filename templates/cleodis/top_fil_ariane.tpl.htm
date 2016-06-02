@@ -1,0 +1,79 @@
+{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap" || ATF::$codename=="exactitude"}
+	<div id="switchCodenameButton">
+		<script type="text/javascript">
+				function switchCodename(el) {
+					ATF.ajax(
+						'usr,switchCodename.ajax',
+						'codename='+el.value, 
+						{ 
+							onComplete: function () {
+								document.location.href="/";
+							} 
+						}
+					);
+				}
+				new Ext.Button({
+					renderTo: "switchCodenameButton"
+					,icon:"{ATF::$staticserver}images/icones/switch.png"
+					,menu: {
+						items: [
+						{if ATF::$codename!=="cleodis"}
+						{
+							text:"Cléodis"
+							,icon: "{ATF::$staticserver}images/logos/cleodis.png"
+							,value:"cleodis"
+							,handler: switchCodename
+						},
+						{/if}	
+						{if ATF::$codename!=="cleodisbe"}
+						{
+							text:"Cléodis BE"
+							,icon: "{ATF::$staticserver}images/logos/cleodisbe.png"
+							,value:"cleodisbe"
+							,handler: switchCodename
+						},
+						{/if}
+						{if ATF::$codename!=="cap"}
+						{
+							text:"Cap Recouvrement"
+							,icon: "{ATF::$staticserver}images/logos/cap2.png"
+							,value:"cap"
+							,handler: switchCodename
+						},
+						{/if}
+						{if ATF::$codename!=="exactitude"}
+						{
+							text:"Exactitude"
+							,icon: "{ATF::$staticserver}images/logos/exactitude.png"
+							,value:"exactitude"
+							,handler: switchCodename
+						},
+						{/if}					
+						]
+					}
+				});
+		</script>
+		
+	</div>
+{/if}
+
+
+<div><img src="{ATF::$staticserver}images/ariane/ariane_g.png" alt="" /></div>
+<div class="fil_texte">
+	<a href="#{module::moduleToName(accueil)|urlencode}.html">{ATF::$usr->trans(accueil,module)}</a>
+</div>
+{if $smarty.request.table=="preference"}{$table=$smarty.request.table}{else}{$table=$current_class->table|default:$smarty.request.table}{/if}
+{if $table!="accueil"}
+    {foreach from=ATF::module()->ancetres(ATF::module()->from_nom($table)) key=cle item=ss_mod}
+       	<div class="fil_image">{*png_image src="{ATF::$staticserver}images/icones/right.png"*}</div>
+        <div class="fil_texte" id="men{$cle+1}">
+        	<a href="#{module::moduleToName($ss_mod.module)|urlencode}.html">{ATF::$usr->trans($ss_mod.module,module)}</a>
+        </div>
+        {$dernier=$dernier+1}
+    {/foreach}
+    <div class="fil_image">{*png_image src="{ATF::$staticserver}images/icones/right.png"*}</div>
+    <div id="men{$dernier+1}" class="fil_texte">
+    	<a href="#{module::moduleToName($table)|urlencode}.html">{ATF::$usr->trans($table,module)}</a>
+    </div>
+{/if}
+<div><img src="{ATF::$staticserver}images/ariane/ariane_d.png" alt="" /></div>

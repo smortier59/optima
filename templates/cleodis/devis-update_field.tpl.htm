@@ -1,0 +1,60 @@
+{if $json.result}
+	{$id_societe=$json.result}
+{/if}
+ 
+<hr />
+<table>
+    <caption>
+        {ATF::$usr->trans('caption_insert_step_2',$current_class->table)} 
+    </caption>
+    <tbody>
+        {$current_class=ATF::devis()}
+       	{* Permet lors d'un clonage de rafraichir les contacts et opportunité lors du changement de societe *}
+		{if $smarty.request.id!=$smarty.session.requests[$current_class->table]["id_societe"]}
+			{$var=true}
+		{/if}
+	    {foreach from=$current_class->colonnes.primary key=key item=item}
+            {if $key!='id_societe'}
+                {if !$item.update_only}   
+                    {if $item.FCKEditor}
+                        {*include file="FCKEditor.tpl.htm" key=$key item=$item name_field="{$current_class->table}[{$key}]"*}
+                    {else}
+                        <tr> 
+                            {if $key=='id_contact' || $key=='id_opportunite'}
+								{$extra="ATF.tpl2div('contact,getMail.ajax','id_contact='+this.value+'&div=email_devis&template=generic_email')"}
+									{include extra="onchange=`$extra`" file="generic_field.tpl.htm" update=$var field_insert="id_societe={$id_societe}&target_div=devis_form&template=devis-update_field" key=$key item=$item condition_field="id_societe" condition_value=$id_societe}
+                            {elseif $event=='cloner' && ($key=='validite' || $key=='date')}
+								<td class="field">
+									{ATF::$usr->trans($alias|default:$key,$current_class->table)} 
+									{if !$item["null"]}{include file="champ_obligatoire.tpl.htm"}{/if} :
+								</td>
+								{$info=ATF::$usr->trans("`$key`_info",null,null,true)|default:ATF::$usr->trans($key,$current_class->table,info,true)}
+								<td class="value inputField" {if $info && !$item.color}{tip text=$info caption=ATF::$usr->trans("Details")}{/if}>
+									{$date_now=''}
+									{$name="`$current_class->table`[`$key`]"}
+									{if $item.type=="date"}
+										<input type="text" name="{$name}" id="{$name}" maxlength="10" {if (!$item['null'] || $item['contain_date']) && $item['contain_date']!==false}{$date_now = $smarty.now|date_format:"%Y-%m-%d"}{/if} value="{$value|default:$item.default|default:$date_now}"  style="width:120px" />
+										<script type="text/javascript">/*<![CDATA[*/
+                                            ATF.datefield("{$name}",'d-m-Y');
+                                        /*]]>*/</script>
+                                    {elseif $item.type=="datetime"}
+										<div id="{$name}_bis"></div>
+                                        <input type="hidden" name="{$name}" id="{$name}" maxlength="19" {if (!$item['null'] || $item['contain_date']) && $item['contain_date']!==false}{$date_now = $smarty.now|date_format:"%Y-%m-%d %H:%M:00"}{/if} value="{$value|default:$item.default|default:$date_now}"  style="width:120px" />
+                                        <script type="text/javascript">/*<![CDATA[*/
+                                            ATF.dateTimeField("{$name}","{$value|default:$smarty.now|date_format:'%d-%m-%Y'}","{$value|default:$smarty.now|date_format:'%H:%M'}");
+										/*]]>*/</script>
+                                    {/if}
+									{$name=""}
+								</td>
+                            {else}
+                                {include file="generic_field.tpl.htm" key=$key item=$item}
+                            {/if}
+                        </tr>
+                    {/if}
+                {/if}
+            {/if}
+        {foreachelse}
+            Aucun champs current_class->colonnes.primary
+        {/foreach}
+    </tbody>
+</table>

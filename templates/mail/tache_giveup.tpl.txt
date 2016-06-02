@@ -1,0 +1,10 @@
+{ATF::$usr->trans('bonjour',mail)},
+
+Le user '{$infos.giveup_user}' a décliner l'intéressement a la tâche suivante :
+
+{ATF::$usr->trans('tache',tache)} : {$infos.tache.tache}
+{ATF::$usr->trans('createur',tache)} : {ATF::user()->nom($infos.tache.id_user)}
+{ATF::$usr->trans('id_societe',tache)} : {ATF::societe()->nom($infos.tache.id_societe)}
+{ATF::$usr->trans('horaire_fin',tache)} : {ATF::$usr->date_trans($infos.tache.horaire_fin)}
+
+{ATF::$usr->trans('remerciement_tache',mail)}.

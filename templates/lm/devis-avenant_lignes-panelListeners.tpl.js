@@ -1,0 +1,10 @@
+{
+	expand:function(){
+		Ext.getCmp('panel_AR').collapse();
+		Ext.getCmp('panel_vente').collapse();
+		Ext.getCmp('combodevis[loyer_unique]').enable();
+	},
+	collapse:function(){
+		Ext.getCmp('combodevis[loyer_unique]').disable();
+	}
+}

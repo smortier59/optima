@@ -1,0 +1,1 @@
+Object.extend(ATF.loc,{"solde":"Solde","acompte":"Acompte","prelevement":"Prelevement","paypal":"Paypal","lettre_de_change":"Lettre de change"});

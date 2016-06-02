@@ -1,0 +1,48 @@
+{* héhé *}
+{* Icones spéciales *}
+{$id=$smarty.request.id_mission|default:$requests.mission.id_mission|default:$smarty.request.ged.id_mission|default:$id_mission}
+{$id_mission=$id|cryptid}
+{$mission=ATF::mission()->select($id_mission)} 
+{if $mission.etat=="en_attente"}
+    <tr>
+        <td colspan="2">
+            <table style="width:100%;">
+                <tr>
+                    <td colspan="2"><hr /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; width:80px">
+                        <a href="javascript:;" onclick="ATF.loadMask.hide();ATF.ajax('{$current_class->table},validate.ajax,id={$id}','',{ onComplete: function() { ATF.loadMask.hide(); } });">
+                            <img src="{ATF::$staticserver}images/icones/validB.png" style="width:40px;" alt="{ATF::$usr->trans("validOnSelect",$current_class->table)}" />
+                        </a>
+                    </td>
+                    <td style="text-align:justify; vertical-align:middle">
+                        <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("validOnSelect",$current_class->table)}</span><br />
+                        <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("validOnSelect_info",$current_class->table)}</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+{else if $mission.etat=="validee"}
+    <tr>
+        <td colspan="2">
+            <table style="width:100%;">
+                <tr>
+                    <td colspan="2"><hr /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; width:80px">
+                        <a href="javascript:;" onclick="ATF.goTo('facture-insert.html,id_mission={$id}'); ">
+                            <img src="{ATF::$staticserver}images/icones/billing.png" style="width:40px;" alt="{ATF::$usr->trans("createFacture",$current_class->table)}" />
+                        </a>
+                    </td>
+                    <td style="text-align:justify; vertical-align:middle">
+                        <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("createFacture",$current_class->table)}</span><br />
+                        <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("createFacture_info",$current_class->table)}</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+{/if}

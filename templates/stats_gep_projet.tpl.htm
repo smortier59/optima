@@ -1,0 +1,142 @@
+<table style="width:100%">
+	<tr>
+    	<td style="width:80%;">
+        	<!-- Graphique -->
+            <div id="{$table}_"></div>
+        </td>
+        <td style="width:20%;">
+            <table class="listing_table_stats">
+				{if ATF::gep_projet()->projet}      
+                    {* mise a jour du temps selon le pas *}
+                    {ATF::gep_projet()->majTpsProjet()}
+                 	{$projets=ATF::gep_projet()->projet} 
+               {else}
+                    {* si pas de projet on prends les 5 plus cons�quents *}
+                	{$liste_proj=ATF::gep_projet()->setProjet()}
+                    {foreach from=$liste_proj key=id item=valeur}
+                    	{$projets[$valeur.id_projet]=$valeur.tot} 
+                    {/foreach}
+                {/if}
+
+                {foreach from=$projets key=id item=valeur}
+                    <tr>
+                        <td style="height:16px;">
+                            {if $liste_proj}-{else}<a href="javascript:;" onclick="ATF.tpl2div('gep_projet,modifStatProjet.ajax','table=stats&module=gep_projet&projet={$id}');"><img src="{ATF::$staticserver}images/icones/delete.png" ></a>{/if}&nbsp;{ATF::gep_projet()->nom($id)} ({$valeur} jour(s))    
+                        </td>
+                    </tr>
+                {/foreach}
+                <tr>
+                    <td style="font-weight:bold;padding-top:20px;">
+                        Choix du projet : 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="{$gep_projet}">
+                            <input type="text" name="gep_projet" id="label_gep_projet" value="{ATF::$usr->trans("rechercher")}" onfocus="if ('{ATF::$usr->trans("rechercher")}'==this.value) this.value='';"  />
+                            <input type="hidden" id="gep_projet" >
+                            <script type="text/javascript">/*<![CDATA[*/
+                                ATF.autocomplete({
+                                    url:'gep_projet,autocomplete.ajax'
+                                    ,mapping:[
+                                        { name: 'id', mapping: 0 },
+                                        { name: 'nom', mapping: 1 },
+                                        { name: 'detail', mapping: 2, type:'string' },
+                                        { name: 'nomBrut', mapping: 'raw_1' }
+                                    ]
+                                    ,loadingText:'Recherche...'
+                                    ,template:'{include file="generic-autocomplete.tpl.htm"}'
+                                    ,applyTo:'label_gep_projet'
+                                    ,onSelect:function(record){
+                                        $('#gep_projet').val(record.data.id);
+                                        $('#label_gep_projet').val(Ext.util.Format.stripTags(record.data.nom));
+                                        this.collapse();
+                                    }
+                                });
+                            /*]]>*/</script>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight:bold">
+                        Choix du pas : 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    	<select id="pas">
+                        	<option value="semaine" {if ATF::gep_projet()->pas=="semaine"}selected=selected{/if}>Semaine</option>
+                            <option value="mois" {if ATF::gep_projet()->pas!="semaine"}selected=selected{/if}>Mois</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="submit" id="submit">
+                            {include file="button.tpl.htm" text="modifier" onclick="ATF.tpl2div('gep_projet,modifStatProjet.ajax','table=stats&module=gep_projet&ajout=true&projet='+$('#gep_projet').val()+'&pas='+$('#pas').val());"}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+	</tr>
+</table>
+{$data_tab=ATF::gep_projet()->stats($liste_proj)}
+<script type="text/javascript">
+{$data = $data_tab} 
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_',
+            type: 'spline'
+        },
+        title: {
+            text: '{$data["params"]["caption"]|escape:javascript}'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                                    
+                       '{$cat["label"]}'
+                    {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    rotation: -60,
+                    align: 'right',
+                    x: 0,
+                    y: 10
+                },
+                title :{
+                    text : '{$data["params"]["yaxisname"]}'
+                }
+                
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: "Nombre de jours"
+            }
+            ,min:0
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'spline'
+                   ,name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});    
+</script>
+
+

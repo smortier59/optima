@@ -1,0 +1,8 @@
+{ATF::$usr->trans('bonjour',mail)},
+
+{ATF::$usr->trans('relance_tache','mail')} :
+
+{ATF::$usr->trans('tache','tache')} : {$infos.donnees.tache}
+{ATF::$usr->trans('horaire_fin','tache')} : {ATF::$usr->date_trans($infos.donnees.horaire_fin)}
+
+{ATF::$usr->trans('remerciement_tache',mail)}.

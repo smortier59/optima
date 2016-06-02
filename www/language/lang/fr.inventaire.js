@@ -1,0 +1,1 @@
+Object.extend(ATF.loc,{"impossible_supprimer_sur_ce_projet":"Impossible de supprimer les éléments sur ce projet."});

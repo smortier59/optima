@@ -1,0 +1,6 @@
+{if $infos.id_pa}
+	<a href="javascript:;" class="ac" rel="{ATF::$usr->trans('ac_`$infos.ac`','formulaire')}" 
+		onclick="new ATF.tpl2div('attr,updateAC.ajax','id_attr={$infos.id_attr}&ac={if $infos.ac=='on'}off{else}on{/if}');">
+		{ATF::$usr->trans("ac_`$infos.ac`",'formulaire')}
+	</a>
+{/if}

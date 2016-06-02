@@ -1,0 +1,24 @@
+<div class="primary" style="padding-left:2em">
+    <div class="alerteoPrimaryContainer">
+		<script type="text/javascript">/*<![CDATA[*/
+            Ext.onReady(function(){		
+                var dr = new Ext.DatePicker({
+                    startDay : 1
+                    ,listeners: {
+                        'select': function(node, dd){ ATF.tpl2div('tpl2div.ajax','div=accueilTacheEnCours&template=accueil_tache_imminente&table=accueil&date='+dd.dateFormat("Y-m-d")); }
+                    } 
+                });
+            
+                dr.render('dr');
+            });
+    
+        /*]]>*/</script>
+        
+        <div id="accueilTacheEnCours" style="float:left;width:80%;">{include file="accueil_tache_imminente.tpl.htm" date=$date}</div>
+        <div id="dr" style="float:right;"></div>
+	</div>
+</div>
+<div class="Bloc">
+    {include file="generic-onglets.tpl.htm" onglets=ATF::accueil()->onglets current_class=null}
+</div>
+<div class="ClearBothWithPadding"></div>

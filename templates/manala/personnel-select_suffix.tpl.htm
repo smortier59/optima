@@ -1,0 +1,25 @@
+{* héhé *}
+{* Icones spéciales *}
+{$id=$smarty.request.id_personnel|default:$requests.personnel.id_personnel|default:$smarty.request.ged.id_personnel|default:$id_personnel}
+{$id_personnel=$id|cryptid}
+{$p=ATF::personnel()->select($id_personnel)} 
+<tr>
+    <td colspan="2">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="javascript:;" onclick="ATF.sendmail('personnel','{$p.email}','Demande de recrutement','Bonjour, \n\nVous trouverez ci-joint une proposition de recrutement pour la mission : \n\n\nCordialement,\nL\'équipe MANALA.');">
+                        <img src="{ATF::$staticserver}images/icones/mail.png" style="width:40px;" alt="{ATF::$usr->trans("sendMail",$current_class->table)}" />
+                    </a>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("sendMail",$current_class->table)}</span><br />
+                    <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("sendMail_info",$current_class->table)}</span>
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>

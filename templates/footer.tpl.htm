@@ -1,0 +1,32 @@
+{if ATF::$usr->logged && ATF::db()->table_or_view_exists(im)}
+    <script type="text/javascript">
+        ATF.parseData = function (o) { 
+            if (o && o.result) {
+                return true;
+            }
+        };
+        ATF.observeOneMoreTime = function (o) { 
+            if (!o || ATF.parseData(o)) {
+                ATF.ajax("im,observe.ajax",o ? '' : 'connect=1&location='+window.location.hash.substr(1), { onComplete: ATF.observeOneMoreTime });
+            }
+        };
+        /*
+		ATF.observeOneMoreTime();     
+		*/
+           
+    </script>
+{/if}
+
+{* Google analytics : Pas moyen de le mettre autrement :-/ *}
+{if $smarty.const.__DEV__===false}
+	<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-2281579-11");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+{/if}
+</html>

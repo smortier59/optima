@@ -1,0 +1,25 @@
+<div>
+    <div style="margin-bottom:5px">{ATF::$usr->trans(indiquer_mdp,conge)}</div>
+	<div><input type="password" id="pass" /></div>
+    <div>
+    <input value="Valider" name="ok" type="button"
+        onclick="{strip}
+        var mdp=$('#pass').val();
+        ATF.ajax('conge,validation.ajax','etat=ok&id_conge={$id_conge}',{ onComplete:function(obj){
+            ATF.tpl2div('conge,storeIcal.ajax','id_conge={$id_conge}&mdp='+binl2b64(str2binl(mdp)));
+            Modalbox.hide(); 
+        } });
+        {/strip}" />
+    </div>
+    <div style="margin:10px 0 10px 0;">Ou</div>
+    <div><input type="text" id="refus" value="Raison du refus" onclick="this.value='';" /></div>    
+    <div>
+    <input value="Refuser" name="ok" type="button"
+        onclick="{strip}
+        var mdp=$('#pass').val();
+        ATF.tpl2div('conge,validation.ajax','etat=nok&id_conge={$id_conge}&raison='+$('#refus').val(),{ onComplete:function(obj){
+            Modalbox.hide(); 
+        } });
+        {/strip}" />
+    </div>
+</div>

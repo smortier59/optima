@@ -1,0 +1,104 @@
+{* Tableau de bord 
+<div id="dashBoard" style="padding-left:2em"></div>
+
+<script type="text/javascript">/*<![CDATA[*/
+	{include file="generic-tabs.tpl.js"}
+/*]]>*/</script>*}
+
+{if ATF::$codename=="cleodis"}
+	<div id="widgets" style="padding-left:2em"></div>
+
+	{$colspan=4}
+	{$widgets=ATF::accueil()->getWidgets()}
+	
+
+	<script type="text/javascript">/*<![CDATA[*/
+		Ext.onReady(function(){	
+			try {
+				new Ext.Panel({
+					renderTo:'widgets',
+					title: 'Bonjour et bienvenue sur Optima, {ATF::user()->nom(ATF::$usr->getID())}.',
+					layout:'column',
+					items:[
+						{for $colNumber=0; $colNumber<$colspan; $colNumber++}  
+							{if $colNumber},{/if}
+							{
+								columnWidth:{1/$colspan},
+								layout: 'form',
+								bodyStyle:'padding:5px 15px 5px 15px',
+								border: false,
+								autoWidth:true,
+								items: [ 
+									{foreach from=$widgets key=key item=item}
+										{if ($item@index%$colspan)===$colNumber}											
+											{if $item@index>=$colspan}
+											,
+											{/if}											
+											{
+												xtype:'panel',
+												autoWidth:true,
+												bodyStyle:'margin:10px 0 5px 0',
+												items: [
+													{
+														xtype: 'panel', 
+														title: '{ATF::$usr->trans(widget,$item.module, $item.type)|escape:javascript}',
+														frame: true,
+														border: false,
+														autoWidth:true,
+														autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}{if $item.id_agence},id_agence={$item.id_agence}{/if}', scripts:true }
+													}
+												]
+
+											}
+										{/if}
+									{/foreach}
+								 ]
+							}
+						{/for}
+					]
+				});
+				
+			} catch(e) {
+				console.log(e); 
+			}
+		});
+	/*]]>*/</script>
+{/if}
+
+
+{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="exactitude"}
+    <div class="primary" style="width:80%;padding:2em">
+        <div class="gingerPrimaryContainer">
+            <script type="text/javascript">/*<![CDATA[*/
+                Ext.onReady(function(){		
+                    var dr = new Ext.DatePicker({
+                        startDay : 1
+                        ,listeners: {
+                            'select': function(node, dd){ ATF.tpl2div('tpl2div.ajax','div=accueilTacheEnCours&template=accueil_tache_imminente&table=accueil&date='+dd.dateFormat("Y-m-d")); }
+                        } 
+                    });
+                
+                    dr.render('dr');
+                });
+        
+            /*]]>*/</script>
+            
+            <div id="accueilTacheEnCours" style="float:left;width:80%;">{include file="accueil_tache_imminente.tpl.htm" date=$date}</div>
+            <div id="dr" style="float:right;"></div>
+        </div>
+    </div>
+{/if}
+<div class="Bloc">
+    {include file="generic-onglets.tpl.htm" onglets=ATF::accueil()->onglets current_class=null}
+</div>
+
+{* Affichage des news *}
+{if ATF::news()->isNews()}
+	<div id="newsBoard">
+		<div id="news"></div>
+	</div>
+	
+	<script type="text/javascript">/*<![CDATA[*/
+		{include file="generic-news.tpl.js"}
+	/*]]>*/</script>
+{/if}

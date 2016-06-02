@@ -1,0 +1,32 @@
+{*lang permet de passer une autre valeur que l'id de la current_class héhé *}
+{strip}
+<ul>
+	{foreach from=$data item=item}
+		<li {if $item.lang} lang="{$item.lang}" {/if} id="{$item["{$current_class->table}.id_{$current_class->table}"]}"
+        {if $current_class->autocomplete.popup} 
+            {include file="autocomplete_popup.tpl.htm" infos=$item field=$current_class->autocomplete.popup assign=detail}
+            {tip text=$detail caption=ATF::$usr->trans("Details") width=300}
+        {/if}
+       	>
+        {foreach name=autocomp from=$current_class->autocomplete.show item=show}
+			{if !$show@first}
+				&nbsp;
+			{/if}
+            {if $item[$show]}
+            	{$item[$show]|ireplace:$current_class->q->search:'<span class="searchSelectionFound">\0</span>'}
+            {else}
+            	{$show|escape:"htmlall"|replace:$show:""}
+            {/if}
+        {foreachelse}
+        	{$item[$current_class->table]|default:$item["{$current_class->table}.id_{$current_class->table}"]}
+        {/foreach}
+        </li>
+    {/foreach}
+    {if $new}
+        <li id="new">
+            <img src="{ATF::$staticserver}images/icones/insert.png" height="16" width="16" />
+            {ATF::$usr->trans('creer_nouveau',$current_class->table)}
+        </li>
+    {/if}
+</ul>
+{/strip}

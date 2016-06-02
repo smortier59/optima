@@ -1,0 +1,8 @@
+Le ticket hotline {$infos.text} est déjà cloturé.
+
+Si vous rencontrez un problème, il est indispensable d'ouvrir une requête sur notre portail hotline à cette adresse:
+
+https://hotline.absystech.net
+
+
+Cet email est envoyé par un robot, toute réponse ne sera jamais lue.

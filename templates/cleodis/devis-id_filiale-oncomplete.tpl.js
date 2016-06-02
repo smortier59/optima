@@ -1,0 +1,1 @@
+Ext.ComponentMgr.get('devis[tva]').setValue(record.data.tva);

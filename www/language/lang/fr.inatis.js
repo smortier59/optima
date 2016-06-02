@@ -1,0 +1,1 @@
+Object.extend(ATF.loc,{"module_mission":"Mission","module_facture_odm":"Facture ODM"});

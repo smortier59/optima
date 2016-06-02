@@ -1,0 +1,56 @@
+<div id="{$table}_{$type}"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($table)->stats(false,$type)}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_{$type}',
+            type: 'spline'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["hoverText"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]                
+        },
+        yAxis: {            
+            title: {
+                text: null
+            }
+        },
+        plotOptions: {
+            spline: {
+                lineWidth: 2,
+                states: {
+                    hover: {
+                        lineWidth: 4
+                    }
+                },
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        series: [
+           {foreach $data["dataset"] as $key =>$data2}          
+               {
+                    name: '{$key}'                    
+                   ,data: [ 
+                            {foreach $data["dataset"][$key]["set"] as $value}
+                                {$value["value"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+               }
+               {if !$data2@last},{/if}
+            {/foreach}            
+           ]        
+    });
+});    
+</script>
+

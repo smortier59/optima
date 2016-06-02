@@ -1,0 +1,11 @@
+<p>{ATF::$usr->trans('bonjour',mail)},</p>
+
+<p>{ATF::$usr->trans('validation_tache',mail)}</p>
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('par',mail)}</span> : {ATF::user()->nom($infos.tache.id_aboutisseur)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('date_creation',mail)}</span> : {$infos.tache.horaire_debut}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('echeance',mail)}</span> : {$infos.tache.horaire_fin}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('id_societe',tache)}</span> : {ATF::societe()->nom($infos.tache.id_societe)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('detail_tache',mail)}</span> : {$infos.tache.tache}</p>
+
+<p>{ATF::$usr->trans('remerciement_tache',mail)}</p>

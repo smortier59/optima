@@ -1,0 +1,146 @@
+<!-- Graphique -->
+<table style="width:100%">
+<tr><td colspan="2">
+<div id="{$smarty.get.module}_"></div>
+
+<script type="text/javascript">
+{$data = ATF::hotline()->statsTps()} 
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$smarty.get.module}_',
+            type: 'spline'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                                    
+                       '{$cat["label"]}'
+                    {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    rotation: -60,
+                    align: 'right',
+                    x: 0,
+                    y: 10
+                }
+                
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: null
+            }
+            ,min:0
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'spline'
+                   ,name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});    
+</script>
+
+</td></tr>
+<tr><td style="width:80%;">
+<div id="{$smarty.get.module}_2"></div>
+<script type="text/javascript">
+{$data = ATF::hotline()->statsTps(false , true)} 
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$smarty.get.module}_2',
+            type: 'spline'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                                    
+                       '{$cat["label"]}'
+                    {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    rotation: -60,
+                    align: 'right',
+                    x: 0,
+                    y: 10
+                }
+        },        
+        yAxis: {
+            title: {
+                text: null
+            },min:0
+        },        
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {  
+                   name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});    
+</script>
+</td>
+<td style="width:20%;">
+    <!-- Choix du user -->
+    <form method="post" id="formStatGraphe2">
+        <table class="listing_table_stats">
+            <tr>
+                <td>
+                    {ATF::$usr->trans("choix_user","stats")} : 
+                </td>
+            </tr>
+            {foreach from=ATF::hotline()->liste_user key=ident item=a_check}
+                <tr>
+                    <td>
+                        <input class="check_select_row2" type="checkbox" name="tabuser[]" value="{$ident}" {if $a_check==1} CHECKED {/if} /> {ATF::user()->nom($ident)}
+                    </td>
+                </tr>
+            {/foreach}
+            <tr>
+                <td>
+                    <a href="javascript:;" onclick="ATF.updSel('stats','all','check_select_row2')">Cocher tout</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a href="javascript:;" onclick="ATF.updSel('stats','no','check_select_row2')">Décocher tout</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="submit" id="submit">
+                        {include file="button.tpl.htm" text="valid" onclick="ATF.tpl2div('hotline,changeUser.ajax','table=stats&module=hotline&graph={$graph}&'+$('#formStatGraphe2').serialize());"}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+</td>
+</td></tr>
+</table>

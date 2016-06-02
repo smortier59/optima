@@ -1,0 +1,6 @@
+<td class="field select">
+	{ATF::$usr->trans($key,$current_class->table)} :
+</td>
+<td class="value">
+	<a href="javascript:;" onclick="window.open('http://www.societe.com/societe/{$requests[$current_class->table]["societe"]|replace:' ':'-'}-{$requests[$current_class->table]['siren']}.html');">{$requests[$current_class->table]['siren']}</a>
+</td>

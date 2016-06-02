@@ -1,0 +1,23 @@
+<p style="font-style:italic">
+    <a href="{$infos.optima_url}">Rendez-vous sur Optima pour prendre en charge la requête</a><br />
+</p>
+{$temps_estime=ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}
+<p>
+	<strong>Priorite : {$infos.hotline_detail.priorite}/20</strong>
+</p>
+
+<p>
+	<strong>{$infos.contact}</strong> de la société <strong>{$infos.societe}</strong> a effectué la requête suivante :
+</p>
+
+<p><b>Titre : </b>{$infos.hotline}</p>
+<div style="font-size:13px; font-style:italic; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</div>
+<p>
+Le temps estimé est de <strong>{util::hoursToString($temps_estime)}</strong>
+</p>
+
+{if $infos.fichier}
+	<p style="font-style:italic; color:red;">
+		Un fichier est joint à la requête hotline, si vous ne le voyez pas rendez-vous sur Optima pour le télécharger
+    </p>
+{/if}

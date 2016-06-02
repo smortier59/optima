@@ -1,0 +1,26 @@
+{* héhé *}
+{if isset($smarty.get.id_user)}
+    {$id_user = $smarty.get.id_user}
+{else}
+    <script type="text/javascript">location.reload();</script>
+{/if}
+
+<tr>
+    <td colspan="2" style="height:150px">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="{$current_class->name()},export_user_infos.ajax,id_user={$id_user}">
+                        <img src="{ATF::$staticserver}images/module/48/exporter.png" style="width:40px;" alt="{ATF::$usr->trans("creer_affaire",$current_class->table)}" />
+                    </a>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">                    
+                    <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("export_fichier_user",$current_class->table)}</span>
+                </td>                
+            </tr>
+        </table>
+    </td>
+</tr>

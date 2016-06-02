@@ -1,0 +1,12 @@
+{$id_audit=$item['audit.id_audit']|default:ATF::_r('id_audit')|default:$requests.audit.id_audit}
+{if $event=="select"}
+	<td><b>{ATF::$usr->trans($key)}</b></td>
+{/if}
+{$audit=ATF::audit()->select($id_audit)}
+{if ATF::$usr->privilege('mandat','insert')}
+    {if $audit['etat']=="attente"}
+        <a href="mandat-insert.html,id_audit={$id_audit|cryptid}" onclick="ATF.goTo('mandat-insert.html,id_audit={$id_audit|cryptid}'); return false;"><img src="{ATF::$staticserver}images/icones/expand.png" height="16" width="16" alt="" /></a>    
+    {else}
+        -
+    {/if}
+{/if}

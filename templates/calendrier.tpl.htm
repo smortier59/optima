@@ -1,0 +1,228 @@
+<div style="padding-left:15px;">
+    <div id="calendar"></div>
+</div>
+<script type="text/javascript">
+{literal}
+
+Ext.onReady(function(){
+
+    var today = new Date().clearTime();
+    
+    Ext.Msg.minWidth = 200;
+
+
+    // Let's load the calendar store remotely also. All you have to do to get
+    // color-coding is include this store with the CalendarPanel.
+    var calendarStore = new Ext.data.JsonStore({
+        storeId: 'calendarStore',
+        url: 'ical,getCalendars.ajax',
+        root: 'result',
+        idProperty: Ext.ensible.cal.CalendarMappings.CalendarId.mapping || 'id',
+        fields: Ext.ensible.cal.CalendarRecord.prototype.fields.getRange(),
+        remoteSort: true,
+        sortInfo: {
+            field: Ext.ensible.cal.CalendarMappings.Title.name,
+            direction: 'ASC'
+        }
+    });
+    // Make sure this loads first so that the calendar records are available
+    // when the event store loads and triggers the view to render
+    calendarStore.load();
+
+    var proxy = new Ext.data.HttpProxy({
+        disableCaching: false, // no need for cache busting when loading via Ajax
+        api: {
+            read:     'ical,view.ajax',
+            //create:   'ical,create.ajax',
+            //update:   'ical,update.ajax',
+            //destroy:  'ical,destroy.ajax'
+        },
+        listeners: {
+            beforeload: function beforeLoadListener (proxy, params) {
+                ATF.loadMask.show();
+            },
+            load: function loadListener (proxy, params) {
+                ATF.loadMask.hide();
+            },
+            exception: function(proxy, type, action, o, res, arg){
+                var res = Ext.decode(res.responseText);
+                var err = res.error;
+                var warning = res.warning;
+                var notice = res.notice;
+
+                var msg = "";
+                if (res.error.length) {
+                    for (var i=0; i<res.error.length; i++) {
+                        if (i) msg += "\n";
+                        msg += "Erreur "+res.error[i].type+". "+res.error[i].msg.text;
+                    }
+                }
+                if (res.warning.length) {
+                    for (var i=0; i<res.warning.length; i++) {
+                        if (i) msg += "\n";
+                        msg += res.warning[i].type+". "+res.warning[i].msg.text;
+                    }
+                }
+                if (res.notice.length) {
+                    for (var i=0; i<res.notice.length; i++) {
+                        if (i) msg += "\n";
+                        msg += res.notice[i].type+". "+res.notice[i].msg.text;
+                    }
+                }
+
+                // ideally an app would provide a less intrusive message display
+                if (msg) Ext.Msg.alert('Server Error', msg);
+            }
+        }
+    });
+    
+    var reader = new Ext.data.JsonReader({
+        totalProperty: 'total',
+        successProperty: 'success',
+        idProperty:  'id',
+        root: 'data',
+        messageProperty: 'message',
+        fields: Ext.ensible.cal.EventRecord.prototype.fields.getRange()
+    });
+    
+    
+    var writer = new Ext.data.JsonWriter({
+        encode: true,
+        writeAllFields: false
+    });
+   
+    
+    var store = new Ext.ensible.cal.EventStore({
+        id: 'event-store',
+        restful: false,
+        proxy: proxy,
+        reader: reader,
+        writer: writer,
+        autoLoad: true
+    });
+
+    var calendarList = {
+        xtype: 'extensible.calendarlist',
+        store: calendarStore,
+        border: false,
+        width: '100%'
+    };
+  		
+    var cp = new Ext.ensible.cal.CalendarPanel({
+        id: 'container-calendar',
+		eventStore: store,
+        calendarStore: calendarStore,
+		readOnly:true,
+        border: false,
+        region: 'center',
+        anchor: "100%",
+        layout:'fit',
+        height: 700,        
+        listeners: {
+            "eventclick" : {                
+                    fn: function (calendar, rec, el) {  
+                        //alert(rec.data[Ext.ensible.cal.EventMappings.Title.name]);                                         
+                    }
+                    ,scope:this                    
+            },
+            'eventover': function(vw, rec, el) {                            
+                /*console.log("Event : "+rec.data[Ext.ensible.cal.EventMappings.Title.name]);
+                console.log("Note : "+rec.data[Ext.ensible.cal.EventMappings.Notes.name]);
+                console.log("Début : "+rec.data[Ext.ensible.cal.EventMappings.StartDate.name]); 
+                console.log("Fin : "+rec.data[Ext.ensible.cal.EventMappings.EndDate.name]);
+                console.log("Lieu : "+rec.data[Ext.ensible.cal.EventMappings.Location.name]);    */      
+            },
+            'eventadd': {
+                fn: function(cp, rec) {
+                    this.showMsg("L'ajout d'evenement n'est pas disponible !!");
+                },
+                scope: this
+            },
+            'eventupdate': {
+                fn: function(cp, rec) {
+                    this.showMsg("L'update d'evenement n'est pas disponible !!");
+                },
+                scope: this
+            },
+            'eventdelete': {
+                fn: function(cp, rec) {
+                    //this.eventStore.remove(rec);
+                    this.showMsg("La suppression d'evenement n'est pas disponible !!");
+                },
+                scope: this
+            },
+            'afterrender': function afeterRenderCalendar(el) {
+                ATF.log(el);
+            }
+        },
+        activeItem: 1, // default to week view
+        weekViewCfg: {
+
+            // These settings create a fixed weekday view. 
+            // This view will only show Mon-Fri.
+            dayCount: 5,
+            // Always start the view on Monday
+            startDay: 1,
+            startDayIsStatic: true,
+            
+            // NOTE: the configs below apply to any DayView or WeekView. If you wanted all day
+            // and week views to share these same settings, you could simply pass these configs
+            // in the general viewCfg. Any views that do not use them will ignore them. They are
+            // only on this view in this sample to demonstrate how they can be easily customized per view.
+            
+            // Hide the half-hour marker line
+            // Start the view at 6:00
+            viewStartHour: 6,
+            // End the view at 8:00pm / 20:00
+            viewEndHour: 20,
+            // Default the scroll position on load to 8:00 if the body is overflowed
+            scrollStartHour: 8,
+            // Customize the hour (and event) heights. See the docs for details on setting this.
+            // This example will be double-height (the default is 42)
+            hourHeight: 42,
+            // Allow drag-drop, drag-create and resize of events in 10-minute increments
+            ddIncrement: 10,
+            // Since the hour blocks are double-height, we can shorten the minimum event display 
+            // height to match the ddIncrement
+            minEventDisplayMinutes: 10
+        }
+        		
+    });
+
+    new Ext.Container({
+        layout: 'border',
+        renderTo: 'calendar',
+        flex: true,
+        height: 700,
+        items: [{
+            id: 'app-center',
+            region: 'center',
+            layout: 'border',
+            items: [{
+                id:'app-west',
+                region: 'west',
+                width: 176,
+                border: false,
+                items: [{
+                    xtype: 'datepicker',
+                    id: 'app-nav-picker',
+                    cls: 'ext-cal-nav-picker',
+                    listeners: {
+                        'select': {
+                            fn: function(dp, dt){
+                                Ext.getCmp('container-calendar').setStartDate(dt);
+                            },
+                            scope: this
+                        }
+                    }
+                },calendarList]
+            },cp]
+        }]
+    });
+
+    
+});
+
+{/literal}
+
+</script>

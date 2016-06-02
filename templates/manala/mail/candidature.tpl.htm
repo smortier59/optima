@@ -1,0 +1,5 @@
+<div style="width: 600px; margin: auto; border: 1px solid black; text-align: center; padding: 10px">
+	{foreach $infos.data as $k=>$i}
+		<strong>{ATF::$usr->trans($k,'personnel')}</strong> {if $i}: {$i}{/if}<br>
+	{/foreach}
+</div>

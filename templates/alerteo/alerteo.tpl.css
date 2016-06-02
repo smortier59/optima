@@ -1,0 +1,4 @@
+@charset "utf-8";
+/* CSS Document */
+
+div.alerteoPrimaryContainer { position:relative; z-index:500; left:45px; width: 900px; padding:12px 0px; }

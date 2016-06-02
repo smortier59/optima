@@ -1,0 +1,37 @@
+<div class="primary" style="width:80%;padding:2em">
+    <div class="gingerPrimaryContainer">
+        <script type="text/javascript">/*<![CDATA[*/
+            Ext.onReady(function(){     
+                var dr = new Ext.DatePicker({
+                    startDay : 1
+                    ,listeners: {
+                        'select': function(node, dd){ ATF.tpl2div('tpl2div.ajax','div=accueilTacheEnCours&template=accueil_rdv&table=accueil&date='+dd.dateFormat("Y-m-d")); }
+                    } 
+                });
+            
+                dr.render('dr');
+            });
+    
+        /*]]>*/</script>
+        
+        <div id="accueilTacheEnCours" style="float:left;width:80%;">{include file="accueil_rdv.tpl.htm" date=$date}</div>
+        <div id="dr" style="float:right;"></div>
+    </div>
+</div>
+
+<div class="Bloc">
+    {include file="generic-onglets.tpl.htm" onglets=ATF::accueil()->onglets current_class=null}
+</div>
+
+
+{* Affichage des news *}
+{if ATF::news()->isNews()}
+    <div id="newsBoard">
+        <div id="news"></div>
+    </div> 
+    
+    <script type="text/javascript">/*<![CDATA[*/
+        {include file="generic-news.tpl.js"}
+    /*]]>*/</script>
+{/if}
+

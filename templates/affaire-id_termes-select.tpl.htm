@@ -1,0 +1,10 @@
+<td class="field">
+	{ATF::$usr->trans($alias|default:$key,$current_class->table)} 
+	{if !$item["null"]}{include file="champ_obligatoire.tpl.htm"}{/if} :
+</td>
+{$info=ATF::$usr->trans("`$key`_info",null,null,true)|default:ATF::$usr->trans($key,$current_class->table,info,true)}
+<td class="value inputField" {if $info && !$item.color}{tip text=$info caption=ATF::$usr->trans("Details")}{/if}>
+	{$id=$requests[$current_class->name()].id_affaire|default:$smarty.request.id_affaire|default:$value}
+	{$onkeyup="ATF.tpl2div('{$current_class->table},update_termes.ajax','id_affaire={$id}&id_termes='+this.value);"}
+	{include file="generic_field_input.tpl.htm" width=$width onkeyup=$onkeyup}
+</td>

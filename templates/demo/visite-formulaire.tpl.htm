@@ -1,0 +1,67 @@
+{* Récupération de l'id_visite dans le post ou le get *}
+{if !$visite}
+	{$visite=ATF::visite()->select($smarty.request.id_visite)}
+	{$projet=ATF::gep_projet()->select($visite.id_gep_projet)}
+{/if}
+
+<div class="primary formulaire">
+	<div class="slipTitle">
+    	<div class="slipTitleL"></div>
+    	<div class="slipTitleM">
+        	<span>
+            	{if !$projet.id_gep_projet}
+                    {ATF::$usr->trans("erreur")}
+                {else}
+                    {ATF::$usr->trans('visite')} - {ATF::visite()->nom($visite.id_visite)}
+                {/if}
+            </span>
+        </div>
+    	<div class="slipTitleR" on></div>
+    </div>
+    <div class="primaryContainer formulaire" id="primaryContainer">
+        {include file="container.tpl.htm"}
+        <div class="slipContainer formulaire" id="slipContainer" >
+            <div class="formulaire" id="formulaire" style="padding-top:1em;">
+                <div style="width:930px; text-align:left;" class="action">
+                	<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" /> Accès fiche projet <a href="gep_projet-select-{$projet.id_gep_projet|cryptid}.html">{ATF::gep_projet()->nom($projet.id_gep_projet)}</a>
+                </div>
+                <div style="width:930px; text-align:left;" class="action">
+                	<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" /> Accès fiche visite <a href="visite-select-{$visite.id_visite|cryptid}.html">{ATF::visite()->nom($visite.id_visite)}</a>
+                </div>
+				<div style="width:930px; text-align:left;" class="action">
+					<span>
+						<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" />
+					</span>
+					<span>
+						{ATF::$usr->trans("voir_pdf_reduit","formulaire")}
+					</span>
+					<span>
+						<a href="visiteReduit-{$visite.id_visite|cryptid}.pdf" target="_blank">
+                        	<img src="{ATF::$staticserver}images/icones/pdf.png" height="16" width="16" />
+						</a>
+					</span>
+				</div>
+                <div style="width:930px; text-align:left;" class="action">
+                	<span>
+                    	<img src="{ATF::$staticserver}images/icones/puce.png" height="16" width="16" />
+                    </span>
+                	<span>
+                    	{ATF::$usr->trans(historique,formulaire)}
+                    </span>
+                	<span>
+                        <a href="javascript:;" onclick="$('#formulaire').toggleClassName('historique');">
+                        	<img src="{ATF::$staticserver}images/icones/columns.png" height="16" width="16" />
+                        </a>
+                    </span>
+                </div>
+                <hr />
+                {include file="visite-formulaire_data.tpl.htm" id_gp=$projet.id_gep_projet}
+            </div>
+        </div>
+    </div>
+	<script type="text/javascript">/*<![CDATA[*/
+		ATF.adjustContainer();
+		{*include file="visite-formulaire.tpl.js"*}
+    /*]]>*/</script>
+</div>
+<div class="ClearBothWithPadding"></div>

@@ -1,0 +1,47 @@
+
+<div style="text-align:center">
+	{$candidat=ATF::candidat()->select($smarty.post.params.id_candidat)}
+	
+	<div style="margin-bottom:5px">Message à envoyer pour la candidature de {$candidat.civilite}. {strtoupper($candidat.nom)} {ucfirst($candidat.prenom)} :</div>
+	<div>
+	{if $smarty.post.params.etat === "oui"}
+		<textarea id="raison" style="width:500px;height:300px;">
+		
+Bonjour,
+
+Merci pour votre candidature, nous enregistrons votre profil dans notre base.
+
+Êtes-vous disponible pour un rendez-vous afin de nous entretenir de vive voix et évaluer vos capacités et connaissances actuelles ?
+
+Appelez-nous au numéro inscrit sur la page http://www.absystech.fr/contact afin de convenir l'heure qui vous irait.
+
+Cordialement,
+
+{ATF::user()->nom(ATF::$usr->getID())}	
+
+AbsysTech
+		</textarea>
+	
+	{else}
+		<textarea id="raison" style="width:500px;height:300px;">
+
+Bonjour,
+
+Merci pour votre candidature, nous enregistrons votre profil dans notre base et reviendrons vers vous si nous avons un projet imminent.
+
+Cordialement,
+
+{ATF::user()->nom(ATF::$usr->getID())}	
+
+AbsysTech
+
+		</textarea>
+	{/if}
+	</div>	
+    <div>
+        <input value="Valider" name="ok" type="button"
+            onclick="{strip}
+            ATF.tpl2div('candidat,validation.ajax','etat={$smarty.post.params.etat}&id_candidat={$smarty.post.params.id_candidat}&raison='+$('#raison').val(),{ onComplete:function(obj){ Modalbox.hide(); } });
+            {/strip}" />
+	</div>
+</div>

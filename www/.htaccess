@@ -1,0 +1,85 @@
+RewriteEngine on
+
+# SVN
+RewriteRule ^\.svn(.*)$ http://fr.wikipedia.org/wiki/Hacker [L]
+
+# Permalink
+RewriteRule ^([0-9a-f]{40})$ index.php?k=$1 [L]
+
+# Crossdomain
+RewriteRule crossdomain.xml crossdomain.xml [L]
+
+# Logout
+RewriteRule ^logout$ logout.php [L]
+
+# Facture (utile depuis hotline)
+RewriteRule ^facture/(.[a-zA-Z0-9\-\=]*)$ index.php?method=facture&schema=$1 [L]
+
+# Asterisk
+RewriteRule ^asterisk/(.[a-zA-Z0-9\-\=]*)$ index.php?method=asterisk&schema=$1 [L]
+
+# CSS simul dans son repertoire de skin
+RewriteRule ^images/skins/(.[a-zA-Z0-9_^\/]*)/skin.css$ skin.css [L]
+RewriteRule ^images/skins/(.[a-zA-Z0-9_^\/]*)/skin-debug.css$ skin-debug.css [L]
+
+# Tlchargement de fichiers
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-([a-f0-9]{32})-(.[a-zA-Z]*).(dl|temp)$ index.php?table=$1&event=$2&field=$3&id_$1=$4&type=$5&method=$6 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-([a-f0-9]{32}).(dl|temp)$ index.php?table=$1&event=$2&field=$3&id_$1=$4&method=$5 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*).(temp)$ index.php?table=$1&event=$2&field=$3&method=$4 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*).(pdf|html2pdf)$ index.php?function=$1&id=$2&method=$3&$4 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*).(pdf|html2pdf),(.*)$ index.php?function=$1&id=$2&method=$3&$4 [L]
+
+# Appels de templates avec argument TABLE-EVENT-ID.METHOD
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-([a-f0-9]{32}|[A-Z]{2}).(json|xml|js|css|html|div|rss)$ index.php?table=$1&event=$2&id_$1=$3&method=$4 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-([a-f0-9]{32}).(json|xml|js|css|html|div|rss)$ index.php?table=$1&id_$1=$2&method=$3 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^.]*).(json|xml|js|css|html|div|rss)$ index.php?table=$1&event=$2&method=$3 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*).(json|xml|js|css|html|div|rss)$ index.php?table=$1&method=$2 [L]
+
+# Appels de templates avec arguments aprs une virgule TABLE-EVENT-ID.METHOD,EXTRA1=X&EXTRA2=Y...
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^-]*)-([a-f0-9]{32}).(json|xml|js|css|html|div|dl),(.*)$ index.php?table=$1&event=$2&id_$1=$3&method=$4&$5 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-([a-f0-9]{32}).(json|xml|js|css|html|div),(.*)$ index.php?table=$1&id_$1=$2&method=$3&$4 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*)-(.[a-zA-Z0-9_^.]*).(json|xml|js|css|html|div),(.*)$ index.php?table=$1&event=$2&method=$3&$4 [L]
+RewriteRule ^(.[\\a-zA-Z0-9_^-]*).(json|xml|js|css|html|div),(.*)$ index.php?table=$1&method=$2&$3 [L]
+
+# Dtecte si le fichier existe, si oui il redirige directement vers le fichier image et non le .php qui sert a gnerer cette image
+RewriteCond %{DOCUMENT_ROOT}/images/photos/$1/$2_$3_$4.png -f
+RewriteRule ^(.*)-(.*)-(.*)-(.*).png$ /images/photos/$1/$2_$3_$4.png [L]
+
+# Images Pour emailing_projet
+RewriteRule ^emailing_projet-([a-f0-9]{32})-(.[^-]*)-(.[^\.]*)-(.[^\.]*).(png|jpg|gif|bmp)$ index.php?table=emailing_projet&id=$1&field=$2&width=$3&codename=$4&method=$5 [L]
+
+# Images auto-gnres
+RewriteRule ^([0-9]*)-(.*)-(.*)-(.*).png$ ttf.php?s=$1&f=$2&c=$3&t=$4&method=png [L]
+# RewriteRule ^(.*)-(.*)-(.*)-(.*).png$ photo.php?table=$1&id=$2&field=$3&width=$4&method=png [L]
+RewriteRule ^(.[^-]*)-([a-f0-9]{32})-(.[^-]*)-(.[^\.]*)-(.[^\.]*).(png|jpg|gif|bmp)$ index.php?table=$1&id=$2&field=$3&width=$4&height=$5&method=$6 [L]
+RewriteRule ^(.[^-]*)-([a-f0-9]{32})-(.[^-]*)-(.[^\.]*).(png|jpg|gif|bmp)$ index.php?table=$1&id=$2&field=$3&width=$4&method=$5 [L]
+RewriteRule ^(.[^-]*)-([a-f0-9]{32})-(.[^-]*)-(.[^\.]*)-(.[^\.]*).(png|jpg|gif|bmp)$ index.php?table=$1&id=$2&field=$3&width=$4&height=$5&method=$6 [L]
+
+# 
+RewriteRule ^(.[^\/^\.]*).(ajax|json|xml)$ index.php?event=$1&method=$2 [L]
+RewriteRule ^(.[^\/^\.]*).(ajax|json|xml),(.*)$ index.php?event=$1&method=$2&$3 [L]
+RewriteRule ^(.[^\/^\.]*).(js|css|div|dialog)$ index.php?table=$1&method=$2 [L]
+
+# API ExtJS
+RewriteRule ^(.[^\/^\.]*).ajax/(.*)$ index.php?event=$1&method=ajax&id=$2 [L]
+
+# Appel direct d'un template
+RewriteRule ^(upload).(tpl),(.*)$ index.php?tpl=$1&method=$2&$3 [L]
+
+# Gestion de l'historique de navigation
+RewriteRule ^back.history$ index.php?method=history [L]
+
+# POPC Remontée de fiche
+#RewriteRule ^popc=(.*)$ popc.php?tel=$1 [L]
+
+
+
+# API REST
+
+# If the request is not for a valid directory
+RewriteCond %{REQUEST_FILENAME} !-d
+# If the request is not for a valid file
+RewriteCond %{REQUEST_FILENAME} !-f
+# If the request is not for a valid link
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.*)$ /index.php?path=$1 [L,QSA]

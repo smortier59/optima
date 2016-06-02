@@ -1,0 +1,18 @@
+{strip}
+{if ATF::$codename != "exactitude"}
+
+<tpl for=".">
+    <div class="search-item">
+        {literal}<h3>{nom}</h3>{ref} {type} {fournisseur} <br />{fabriquant} {produit_type} {processeur} {produit_puissance} {produit_ram} {produit_dd} {produit_lecteur} {produit_lan} {produit_OS} {produit_garantie_uc}<br />{produit_typeecran} {produit_viewable} {produit_garantie_ecran}<br />{produit_technique} {produit_format} {produit_garantie_imprimante}{/literal}
+    </div>
+</tpl>
+
+{else}
+
+<tpl for=".">
+    <div class="search-item">
+        {literal}<h3>{produit}</h3>{ref} - {prix}€<br />{/literal}
+    </div>
+</tpl>
+{/if}
+{/strip}

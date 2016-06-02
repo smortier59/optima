@@ -1,0 +1,1 @@
+<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("impossible_supprimer_sur_ce_projet"=>"Impossible de supprimer les éléments sur ce projet."));?>

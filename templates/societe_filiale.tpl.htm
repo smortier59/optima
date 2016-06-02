@@ -1,0 +1,38 @@
+<script type="text/javascript">/*<![CDATA[*/
+	
+	var createTreeViewFiliale = function(id_societe) {
+	
+		var gedWindow = new Ext.form.FieldSet({
+			renderTo:'societe_ged_'+id_societe,
+			collapsible: false,
+			collapsed: false,
+			autoWidth: true,
+			autoScroll: true,
+			title: '{ATF::$usr->trans(treeview)|escape:javascript}',
+			items: [{
+				itemId: 'arbre',
+				xtype: 'treepanel',
+				split: true,
+				useArrows: true,
+				animate: false,
+				border: false,
+				bodyBorder : false,
+				frame: true,
+				loader:new Ext.tree.TreeLoader({ dataUrl: 'societe,branch.ajax,valeur='+id_societe+'&display=true' }),
+				root: new Ext.tree.AsyncTreeNode({
+					nodeType: 'async',
+					text: '{ATF::$usr->trans(genealogie)|escape:javascript}',
+					draggable: false,
+					expanded: true,
+					id: 'source'
+				})
+			}],	
+			buttonAlign: 'left' // anything but 'center' or 'right' and you can use '-', and '->'
+		}).show();
+		
+	}
+	
+	createTreeViewFiliale('{$infos.id_societe}');
+/*]]>*/</script>
+
+<div id="societe_ged_{$infos.id_societe}"></div>

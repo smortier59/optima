@@ -1,0 +1,32 @@
+{assign var="date" value=($date|default:$smarty.now)|date_format:"%Y-%m-%d"}
+
+<table style="width:100%">     
+    <tr>
+        <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->date_trans($date)}</td>
+        <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->trans('rdv')}</td>
+        <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->trans('id_adherent')}</td>
+        <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->trans('id_user')}</td>
+    </tr>
+{foreach from=ATF::rdv()->rdv_imminent($date) key=dat item=infos}    
+    {if $infos.date_rdv|date_format:"%Y-%m-%d" !== $date|date_format:"%Y-%m-%d"} 
+        {$date = $infos.date_rdv|date_format:"%Y-%m-%d"}
+        <tr>
+            <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->date_trans($date)}</td>
+            <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->trans('rdv')}</td>
+            <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->trans('id_adherent')}</td>
+            <td style="font-weight:bold;border-bottom:dotted #888888 1px;" class="intitule">{ATF::$usr->trans('id_user')}</td>
+        </tr>
+        
+    {/if}
+    <tr>
+            <td style="width:20%">{$infos.date_rdv|date_format:"%d/%m/%Y %k:%M"}</td>
+            <td>{$infos.type_rdv}</td>
+            <td style="width:30%"><a href="adherent-select-{classes::cryptId($infos.id_adherent)}.html">{$infos.adherent}</a></td>
+            <td style="width:30%"><a href="user-select-{classes::cryptId($infos.id_user)}.html">{$infos.user}</a></td>
+        </tr>  
+    <tr><td>&nbsp;</td></tr>
+
+{foreachelse}
+    <tr><td>{ATF::$usr->trans('aucun_rdv','rdv')}</td></tr>
+{/foreach}
+</table>

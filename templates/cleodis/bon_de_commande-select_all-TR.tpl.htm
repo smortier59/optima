@@ -1,0 +1,7 @@
+{$id_bon_de_commande=ATF::_r('id_bon_de_commande')|default:$item["bon_de_commande.id_bon_de_commande"]|default:$requests.bon_de_commande.id_bon_de_commande}
+{$etat=ATF::bon_de_commande()->select($id_bon_de_commande,"etat")}
+{strip}
+    {if $etat != "payee"}
+        facture_impaye
+    {/if}
+{/strip}

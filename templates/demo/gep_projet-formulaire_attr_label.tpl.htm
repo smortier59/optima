@@ -1,0 +1,6 @@
+{if $infos.id_pa}
+	{$L=$infos.pa|default:$attr.attr|strlen}
+	<input type="text" class="updateOnTheFly PA" style="width:{$L*6}px;" value="{$infos.pa|default:$attr.attr}" onchange="new ATF.tpl2div('pa,updateLibelle.ajax','id_pa={$infos.id_pa}&libelle='+encodeURIComponent(this.value));" />
+{else}
+	{$infos.pa|default:$attr.attr}
+{/if}

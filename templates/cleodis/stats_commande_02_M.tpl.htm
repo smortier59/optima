@@ -1,0 +1,106 @@
+<!-- Graphique -->
+<table style="width:100%">
+<tr><td colspan="2">
+
+<tr><td {*style="width:80%;" *}>
+<div id="{$smarty.get.module}_"></div>
+
+{$data = ATF::commande()->commande_mep_stats(false,'o2m',true,date("Y"))}
+
+
+<script type="text/javascript">
+
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$smarty.get.module}_',
+            type: 'spline'
+        },
+        title: {
+            text: 'CONTRAT MEP RESEAUX'
+        },
+        xAxis: {
+            categories: [
+                            {foreach $data["categories"]["category"] as $cat}                    
+                                '{$cat["label"]}' {if !$cat@last},{/if}
+                            {/foreach}
+                        ]
+        },
+        series: [                       
+                    {
+                        type: 'column',
+                        name: 'Réel',
+                        data: [
+                                {foreach $data["dataset"]["reel"] as $reel}   
+                                    {$reel["value"]} {if !$reel@last},{/if}
+                                {/foreach} 
+
+                              ]
+                    },
+                    {
+                        type: 'spline',
+                        name: 'Moyenne',
+                        data: [
+                                {foreach $data["dataset"]["moyenne"] as $obj}   
+                                     {$obj["value"]} {if !$obj@last},{/if}
+                                {/foreach}   
+                            ]                  
+                    } ,
+                    {
+                        type: 'spline',
+                        name: 'Objectif',
+                        data: [
+                                {foreach $data["dataset"]["objectif"] as $obj}   
+                                     {$obj["value"]} {if !$obj@last},{/if}
+                                {/foreach}   
+                            ]                  
+                    }                      
+                ]        
+    });
+});
+   
+</script>
+
+</td>
+{*
+<td style="width:20%;">  
+    <form method="post" id="formStatGraphe3">
+        <table class="listing_table_stats">
+            <tr>
+                <td>
+                   {ATF::$usr->trans("objectif","stats")} :
+                </td>
+            </tr>           
+            <tr>
+                <td>
+                    <input type="number" name="objectif" />
+                </td>
+            </tr>
+                    
+            <tr>
+                <td>
+                    <div class="submit" id="submit">
+                        {include file="button.tpl.htm" text="valid" onclick="ATF.tpl2div('commande,commande_mep_stats.ajax','table=stats&module=commande&graph={$graph}&'+$('#formStatGraphe3').serialize());"}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>                                     
+
+
+
+    
+</td>
+*}
+</td></tr>
+<tr>
+	<td>
+	    <h3>Contrat MEP :</h3>
+	    {foreach $data["year"] as $annee}        
+	        <div style="width:25%; float:left;"><b>{$annee["annee"]}</b> : {$annee["count"]}</div>
+	    {/foreach}
+
+	</td>
+</tr>
+</table>

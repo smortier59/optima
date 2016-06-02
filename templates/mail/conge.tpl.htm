@@ -1,0 +1,15 @@
+<p>{ATF::$usr->trans('bonjour',mail)} {ATF::user()->nom($infos.conge.id_superieur)},</p>
+
+<p>{ATF::$usr->trans('reception','conge')}</p>
+
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('demandeur',mail)}</span> : {$infos.conge.nom}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('type',mail)}</span> : {ATF::$usr->trans($infos.conge.type,'conge')}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('date_debut','conge')}</span> : {ATF::$usr->date_trans($infos.conge.date_debut)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('periode','conge')}</span> : {ATF::$usr->trans($infos.conge.periode,'conge')}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('date_fin','conge')}</span> : {ATF::$usr->date_trans($infos.conge.date_fin)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('commentaire','conge')}</span> : {$infos.conge.commentaire}</p>
+
+<p><a href="{$infos.optima_url}">{ATF::$usr->trans('permalink')}</a></p>
+
+<p>{ATF::$usr->trans('remerciement','conge')}</p>

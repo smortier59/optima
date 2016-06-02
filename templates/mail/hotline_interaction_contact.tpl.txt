@@ -1,0 +1,38 @@
+{**
+* Mail de nouvelle interaction au contact
+* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+* @param array $infos les infos !
+*}
+Titre Requête {$infos.ref} : {$infos.hotline}
+
+Bonjour {$infos.contact},
+
+{$infos.interaction.detail}
+
+{ATF::user()->nom($infos.interaction.id_user)} est intervenu sur votre requête pendant {util::hoursToString(ATF::hotline_interaction()->getBillingTimeV2($infos.interaction.id_hotline_interaction))} pour un total de {ATF::hotline_interaction()->getCreditV2($infos.interaction.id_hotline_interaction)} crédit(s).
+
+{if $infos.hotline_detail.etat =='wait'}
+Cette interaction nécessite une reponse de votre part pour continuer le travail.
+{/if}
+
+{if $infos.mep}
+Ce ticket est maintenant en attente de mise en production, vous serez informé lorsque celle ci sera effective.
+{/if}
+
+Pour information, la requête a nécessité au total {util::hoursToString(ATF::hotline()->getBillingTime($infos.hotline_detail.id_hotline))} de travail.
+
+{if $infos.hotline_detail.facturation_ticket=="oui"}
+Le temps passé sur cette requête est à votre charge.
+{else}
+Le temps passé sur cette requête est à notre charge.
+{/if}
+
+Vous pouvez consulter l'avancement de votre requête : {$infos.portail_hotline_url}
+
+Cordialement,
+
+L'équipe Absystech
+
+{if $infos.fichier}
+Un fichier est joint au mail, si vous ne le voyez pas rendez-vous votre portail pour le télécharger !
+{/if}

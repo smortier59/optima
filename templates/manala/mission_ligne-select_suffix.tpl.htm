@@ -1,0 +1,31 @@
+{* héhé *}
+{* Icones spéciales *}
+{$id=$smarty.request.id_mission_ligne|default:$requests.mission.id_mission_ligne|default:$smarty.request.ged.id_mission_ligne|default:$id_mission_ligne}
+{$id_mission_ligne=$id|cryptid}
+{$mission_ligne=ATF::mission_ligne()->select($id_mission_ligne)} 
+{$mission=ATF::mission()->select($mission_ligne.id_mission)} 
+
+{$docs = explode(",",$mission.specific_doc)}
+
+{foreach $docs as $k=>$i} 
+    <tr>
+        <td colspan="2">
+            <table style="width:100%;">
+                <tr>
+                    <td colspan="2"><hr /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; width:80px">
+                        <a href="{$i}-{$id_mission_ligne|cryptId}.pdf" target="_blank">
+                            <img src="{ATF::$staticserver}images/icones/pdfB.png" style="width:60px;" alt="{ATF::$usr->trans("`$i`_view",$current_class->table)}" />
+                        </a>
+                    </td>
+                    <td style="text-align:justify; vertical-align:middle">
+                        <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("`$i`",$current_class->table)}</span><br />
+                        <span style="font-size:12px; font-style:italic;">{ATF::$usr->trans("`$i`_info",$current_class->table)}</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+{/foreach}

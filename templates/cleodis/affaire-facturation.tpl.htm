@@ -1,0 +1,17 @@
+{$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire}
+<td>
+	<b>
+		{ATF::$usr->trans($key)} :
+	</b>
+</td>
+<td>
+   {if $id_affaire}
+        {$affaire = $current_class->select($id_affaire)}
+        {$facturation = ATF::facturation()->select_special("id_affaire",$affaire.id_affaire)}
+        {if $affaire && $facturation}
+            <a href="affaire-{$affaire.id_affaire|cryptID}.pdf" target="_blank">
+                <img src="{ATF::$staticserver}images/icones/pdf.png" />
+            </a>
+       {/if}
+    {/if}
+</td>

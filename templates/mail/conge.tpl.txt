@@ -1,0 +1,13 @@
+{ATF::$usr->trans('bonjour',mail)} {ATF::user()->nom($infos.conge.id_superieur)},
+
+{ATF::$usr->trans('reception','conge')}
+
+
+{ATF::$usr->trans('demandeur',mail)} : {$infos.conge.nom}
+{ATF::$usr->trans('type',mail)} : {ATF::$usr->trans($infos.conge.type,'conge')}
+{ATF::$usr->trans('date_debut','conge')} : {ATF::$usr->date_trans($infos.conge.date_debut)}
+{ATF::$usr->trans('periode','conge')} : {ATF::$usr->trans($infos.conge.periode,'conge')}
+{ATF::$usr->trans('date_fin','conge')} : {ATF::$usr->date_trans($infos.conge.date_fin)}
+{ATF::$usr->trans('commentaire','conge')} : {$infos.conge.commentaire}
+
+{ATF::$usr->trans('remerciement','conge')}

@@ -1,0 +1,47 @@
+<td class="field select">{ATF::$usr->trans($key,affaire)} :</td>
+<td class="value">
+	{$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire}
+	<a href="javascript:;" onclick="ATF.compte_t('{$id_affaire}');"><img src="{ATF::$staticserver}images/module/16/stats.png" /></a>
+	<script type="application/javascript">
+    ATF.compte_t = function(id_affaire){
+		if (ATF.compte_t_window) ATF.compte_t_window.close();
+        ATF.compte_t_window = new Ext.Window({
+			autoScroll:true,
+            height: 400,
+            width: 900,
+            id:'winCompteT',
+            title: '{ATF::$usr->trans(compte_t)|escape:javascript} : Commercial',
+            resizable:true,
+			autoLoad:{ url: 'affaire,getCompteT.ajax,id_affaire='+id_affaire, scripts:true },
+			listeners: {
+				beforeclose: function (p) {
+					p.removeAll();
+				}
+			},
+			bbar: new Ext.Toolbar({
+				items: [{
+					text: 'Commercial',
+					handler: function(){
+						Ext.getCmp('winCompteT').setTitle('{ATF::$usr->trans(compte_t)|escape:javascript} : Commercial');
+						Ext.getCmp('winCompteT').load({ url: 'affaire,getCompteT.ajax,id_affaire='+id_affaire, scripts:true });
+						Ext.getCmp('validerTauxCompteT').enable();
+					}
+				},'-',{
+					text: 'Manager',
+					handler: function(){
+						Ext.getCmp('winCompteT').setTitle('{ATF::$usr->trans(compte_t)|escape:javascript} : Manager');
+						Ext.getCmp('winCompteT').load({ url: 'affaire,getCompteT.ajax,type=manager&id_affaire='+id_affaire, scripts:true });
+						Ext.getCmp('validerTauxCompteT').disable();
+					}
+				},'->',{
+					text: 'Valider taux',
+					id: 'validerTauxCompteT',
+					handler: function(){
+						Ext.getCmp('winCompteT').load({ url: 'affaire,getCompteT.ajax,id_affaire='+id_affaire+'&taux='+Ext.getCmp('tauxCompteT').getValue()/*+'&type='+Ext.getCmp('typeCompteT').getValue()*/, scripts:true });
+					}
+				}]
+			})		
+        }).show();
+    };
+    </script>
+</td>

@@ -1,0 +1,83 @@
+<!-- row thumbs + text -->
+<tr>
+	<td>
+		<table bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+			<tr>
+				<td width="45">
+				</td>
+				<td width="153" valign="top">
+					{if $video.speedmailLink}<a href="{$video.speedmailLink}" target="_blank" style="color: #fff; text-decoration:none;">{/if}
+					<img width="153" height="85" src="http://www.rhonealpes.tv/video-{$video.id_video}-153-85.jpg" alt="Lancer la vidéo" style="display: block; border: none;"/>
+					{if $video.speedmailLink}</a>{/if}
+				</td>
+				<td width="10">
+				</td>
+				<td valign="top">
+					<h1 style="color: #fff; font-size: 16px; line-height: 20px; text-transform: uppercase; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px 0px 1px; padding: 0;">
+						{if $video.speedmailLink}<a href="{$video.speedmailLink}" target="_blank" style="color: #fff; text-decoration:none;">{/if}
+						{$video.name}
+						{if $video.speedmailLink}</a>{/if}
+					</h1>
+
+					{if $video.auteur}<small>(Auteur : {$video.auteur})</small>{/if}
+					
+					<p style="color: #ddd; line-height: 17px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+						{if $video.speedmailLink}<a href="{$video.speedmailLink}" target="_blank" style="color: #fff; text-decoration:none;">{/if}
+						{$video.shortDescription}
+						{if $video.speedmailLink}</a>{/if}
+					</p>
+				</td>
+				<td width="45">
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+<!-- row pusher-->
+<tr height="10">
+	<td>
+	</td>
+</tr>
+<!-- row chaine+date -->
+<tr>
+	<td>
+		<table bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+			<tr>
+				<td width="45">
+				</td>
+				<td width="160" valign="middle" align="left">
+					<img src="{$video.chaineLogo}" alt="{$video.chaine}" style="display: block; border: none;"/>
+				</td>
+				<td width="357" valign="middle" align="right">
+					<p style="color: #e5690b; line-height: 16px; font-size: 12px; font-family: 'Open Sans',Arial,Helvetica,sans-serif; margin: 0px; padding: 0;">
+						{ATF::$usr->date_trans($video.date_creation)}
+					</p>
+				</td>
+				<td width="45">
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+<!-- row pusher-->
+<tr height="5">
+	<td>
+	</td>
+</tr>
+<!-- row separateur -->
+<tr>
+	<td>
+		<table width="600" bgcolor="#252525" cellspacing="0" cellpadding="0" border="0">
+			<tr height="10">
+				<td width="45"></td>
+				<td width="510" valign="top" style="border-top-width: 1px; border-top-color: #e5690b; border-top-style: solid;"></td>
+				<td width="45"></td>
+			</tr>
+		</table>
+	</td>
+</tr>
+
+
+<tr height="30">
+	<td>&nbsp;</td>
+</tr>

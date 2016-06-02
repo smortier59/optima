@@ -1,0 +1,71 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=devis}
+<div id="{$module}_graphe" class="widget"></div>
+<script type="text/javascript">
+{$data = ATF::getClass($module)->stats(false,ATF::_g(type),true)}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_graphe',
+            type: 'spline'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["hoverText"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ],
+                labels: {
+                    enabled:false
+                }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        plotOptions: {
+                spline: {
+                    lineWidth: 2,
+                    states: {
+                        hover: {
+                            lineWidth: 3
+                        }
+                    },
+                    marker: {
+                        enabled: false
+                    }                    
+                }
+            },
+        series: [
+           {foreach $data["dataset"] as $key =>$data2}          
+               {
+                    name: '{$key}'                    
+                   ,data: [ 
+                            {foreach $data["dataset"][$key]["set"] as $value}
+                                {$value["value"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+               }
+                {if !$data2@last},{/if}
+            {/foreach}            
+           ]        
+    });
+});
+    
+</script>
+
+
+<div>
+    <div>Total dans le pipe : {ATF::devis()->getTotalPipe()|number_format:0:".":" "} &euro; (au mieux)</div>
+    <div>Total dans le pipe pondéré : <span style="font-weight:bold">{ATF::devis()->getTotalPipePondere()|number_format:0:".":" "} &euro;</span></div>
+</div>
+{/strip}

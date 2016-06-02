@@ -1,0 +1,251 @@
+<div id="menu_2">
+    <ul>
+        <li>
+            <a href="javascript:;" onclick="ATF.stats_commande_charger('02_M')">Contrats MEP RESEAUX</a>
+        </li>
+        <li>
+            <a href="javascript:;" onclick="ATF.stats_commande_charger('autre')">Contrats MEP AUTRES CLIENTS</a>
+        </li>
+    </ul>
+</div>
+<div id="stat_commande">
+  {if $graph && $graph != "null"}
+      {include file="stats_commande_`$graph`.tpl.htm" graph=$graph}
+  {else}
+        {$liste_annees=ATF::getClass($module)->get_years()}
+        {if $liste_annees}               
+            <form style="text-align: center;">
+                {ATF::$usr->trans("choix_annee","stats")} :                                
+                    {foreach from=$liste_annees key=cle_annee item=item_annee}                                        
+                            <input type="checkbox" name="{$item_annee.year}" 
+                                {if ATF::stats()->liste_annees[$module][$item_annee.year]}checked="checked"{/if} 
+                                onchange="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module={$module}&annee='+this.name+'&valeur='+this.checked);" />
+                            {$item_annee.year}                                        
+                    {/foreach}                                
+            </form>                            
+        {/if}
+        
+        <div id="commande_user"></div>
+        <div id="commande_users"></div>
+
+            {$module = ATF::$usr->trans(commande , module)}
+            <script type="text/javascript">
+                Ext.onReady(function(){
+                    Highcharts.theme = {       
+                       chart: {
+                          backgroundColor: {
+                             linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+                             stops: [
+                                [0, 'rgb(255, 255, 255)'],
+                                [1, 'rgb(240, 240, 255)']
+                             ]
+                          },
+                          borderWidth: 2,
+                          plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+                          plotShadow: true,
+                          plotBorderWidth: 1
+                       },
+                       credits: {
+                           enabled: false
+                       },
+                       tooltip: {
+                            shared: true
+                       },
+                       title: {
+                          style: {
+                             color: '#000',
+                             font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+                          }
+                       },
+                       subtitle: {
+                          style: {
+                             color: '#666666',
+                             font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
+                          }
+                       },
+                       xAxis: {
+                          gridLineWidth: 1,
+                          lineColor: '#000',
+                          tickColor: '#000',
+                          labels: {
+                             style: {
+                                color: '#000',
+                                font: '11px Trebuchet MS, Verdana, sans-serif'
+                             }
+                          },
+                          title: {
+                             style: {
+                                color: '#333',
+                                fontWeight: 'bold',
+                                fontSize: '12px',
+                                fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+                    
+                             }
+                          }
+                       },
+                       yAxis: {
+                          minorTickInterval: 'auto',
+                          lineColor: '#000',
+                          lineWidth: 1,
+                          tickWidth: 1,
+                          tickColor: '#000',
+                          labels: {
+                             style: {
+                                color: '#000',
+                                font: '11px Trebuchet MS, Verdana, sans-serif'
+                             }
+                          },
+                          title: {
+                             style: {
+                                color: '#333',
+                                fontWeight: 'bold',
+                                fontSize: '12px',
+                                fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+                             }
+                          }
+                       },
+                       legend: {
+                          itemStyle: {
+                             font: '9pt Trebuchet MS, Verdana, sans-serif',
+                             color: 'black'
+                    
+                          },
+                          itemHoverStyle: {
+                             color: '#039'
+                          },
+                          itemHiddenStyle: {
+                             color: 'gray'
+                          }
+                       },
+                       labels: {
+                          style: {
+                             color: '#99b'
+                          }
+                       },
+                    
+                       navigation: {
+                          buttonOptions: {
+                             theme: {
+                                stroke: '#CCCCCC'
+                             }
+                          }
+                       }
+                    };
+            
+                    // Apply the theme
+                    var highchartsOptions = Highcharts.setOptions(Highcharts.theme); 
+
+
+                    {$data = ATF::commande()->stats(false,"user")}
+                    var chart = new Highcharts.Chart({
+                        chart: {
+                            renderTo: 'commande_user',
+                            type: 'spline',
+                            marginRight: 100,
+                            marginBottom: 40
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 100,
+                            borderWidth: 0
+                        },
+                        title: {
+                            text: '{$module} : {$data["params"]["subCaption"]}'
+                        },
+                        xAxis: {            
+                            categories: [
+                                {foreach $data["categories"]["category"] as $k => $cat}                    
+                                    '{$cat["label"]}' {if !$cat@last},{/if}
+                                {/foreach}
+                                ]
+                        },
+                        plotOptions: {
+                                column: {
+                                    stacking: 'normal'
+                                }
+                            },
+                        yAxis: {
+                            title: {
+                                text: '{$data["params"]["yaxisname"]}'
+                            }
+                        },
+                        series: [
+                               {foreach $data["dataset"] as $key=>$value}    
+                               {                   
+                                   type: 'spline'
+                                   ,name: '{$value["params"]["seriesname"]}'                                     
+                                   ,data: [                           
+                                           {foreach $value["set"] as $k=>$v}                                               
+                                                {$v["value"]} 
+                                                {if !$k@last},{/if}
+                                           {/foreach}
+                                          ]
+                               } {if !$key@last},{/if}
+                             {/foreach}              
+                           ]        
+                    });
+
+                    {$data = ATF::commande()->stats(false,"users")}
+                    var chart = new Highcharts.Chart({
+                        chart: {
+                            renderTo: 'commande_users',
+                            type: 'spline',
+                            marginRight: 100,
+                            marginBottom: 40
+                        },
+                        legend: {
+                            layout: 'vertical',
+                            align: 'right',
+                            verticalAlign: 'top',
+                            x: -10,
+                            y: 100,
+                            borderWidth: 0
+                        },
+                        title: {
+                            text: '{$module} : {$data["params"]["subCaption"]}'
+                        },
+                        xAxis: {            
+                            categories: [
+                                {foreach $data["categories"]["category"] as $k => $cat}                    
+                                    '{$cat["label"]}' {if !$cat@last},{/if}
+                                {/foreach}
+                                ]
+                        },
+                        plotOptions: {
+                                column: {
+                                    stacking: 'normal'
+                                }
+                            },
+                        yAxis: {
+                            title: {
+                                text: '{$data["params"]["yaxisname"]}'
+                            }
+                        },
+                        series: [
+                               {foreach $data["dataset"] as $key=>$value}    
+                               {                   
+                                   type: 'spline'
+                                   ,name: '{$value["params"]["seriesname"]}'                                     
+                                   ,data: [                           
+                                           {foreach $value["set"] as $k=>$v}                                               
+                                                {$v["value"]} 
+                                                {if !$k@last},{/if}
+                                           {/foreach}
+                                          ]
+                               } {if !$key@last},{/if}
+                             {/foreach}              
+                           ]        
+                    });
+                }); 
+
+            </script>
+  {/if}
+</div>
+<script type="text/javascript">/*<![CDATA[*/
+  ATF.stats_commande_charger = function (num){
+    ATF.tpl2div('tpl2div.ajax','div=stat_commande&template=stats_commande_'+num+'&table=commande&graph='+num);
+  }
+/*]]>*/</script>  

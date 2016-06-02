@@ -1,0 +1,3 @@
+Lien pour télécharger le logiciel de prise en mail à distance
+
+<a href="http://download.teamviewer.com/download/TeamViewerQS_fr.exe">Télécharger le logiciel</a>

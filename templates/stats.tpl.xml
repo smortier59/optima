@@ -1,0 +1,23 @@
+{strip}
+<chart {foreach from=$data.params key=k item=i} {$k}='{$i}'{/foreach} {$extra}>
+	{foreach from=$data.categories key=key item=item}
+		{if $key!='params'}
+			<categories{foreach from=$data.categories.params key=k item=i} {$k}='{$i}'{/foreach}>
+				{foreach from=$item key=key_ item=item_}
+					<{$key}{foreach from=$item_ key=k item=i} {$k}='{$i}'{/foreach} />
+				{/foreach}
+			</categories>
+		{/if}
+	{/foreach}
+	
+	{foreach from=$data.dataset key=key item=item}
+		{if $item.params.seriesname}
+			<dataset{foreach from=$item.params key=k item=i} {$k}='{$i}'{/foreach}>
+				{foreach from=$item.set key=key_ item=item_}
+					<set{foreach from=$item_ key=k item=i} {$k}='{$i}'{/foreach} tooltext='{$item_.titre}' />
+				{/foreach}
+			</dataset>
+		{/if}
+	{/foreach}	
+</chart>
+{/strip}

@@ -1,0 +1,13 @@
+<hr />
+<div style="font-size:16px; font-weight:bold;">
+	{if $batiment}
+        Bâtiment : {$batiment.reponse}
+    {else}
+    	Equipements communs au site
+    {/if}
+</div><br />
+{foreach $conclusions as $k=>$i}
+    {include file="visite-formulaire_attr.tpl.htm" infos=$i projet=$projet}
+{/foreach}
+
+

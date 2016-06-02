@@ -1,0 +1,8 @@
+{if $requests.conge.etat!="annule" && ATF::usr()->getId()==ATF::user()->select($requests.conge.id_user,'id_superieur')}
+	<tr><td colspan="2"><table>
+    <tr>
+        <td>
+        	{include file="button.tpl.htm" icone="cancel" text="annuler le congé" onclick="ATF.ajax('conge,annulation.ajax,etat=annule&id_conge=`$requests.conge.id_conge`');"}
+        </td>
+    </tr></table></td></tr>
+{/if}    

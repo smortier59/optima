@@ -1,0 +1,1 @@
+{include file="devis_ligne-id_fournisseur-oncomplete.tpl.js"}	

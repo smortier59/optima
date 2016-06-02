@@ -1,0 +1,1 @@
+{include file="generic-field-textfield.tpl.js" condition_field=fournisseur condition_value='oui'}

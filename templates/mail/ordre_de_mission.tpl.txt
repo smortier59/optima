@@ -1,0 +1,9 @@
+{t w=bonjour p=mail},
+
+{t w=information p=mail}
+
+{t w=objet p=mail} {$infos.ordre_de_mission.ordre_de_mission}
+{t w=date p=mail} {ATF::$usr->date_trans($infos.ordre_de_mission.date,"force")}
+{t w=intervenant p=mail} {ATF::user()->nom($infos.ordre_de_mission.id_user)}
+{t w=societe p=mail} {ATF::societe()->nom($infos.ordre_de_mission.id_societe)}
+{t w=adresse p=mail} {$infos.ordre_de_mission.adresse}{if $infos.ordre_de_mission.adresse_2} , {$infos.ordre_de_mission.adresse_2}{/if}{if $infos.ordre_de_mission.adresse_3} , {$infos.ordre_de_mission.adresse_3}{/if} - {$infos.ordre_de_mission.cp} - {$infos.ordre_de_mission.ville}

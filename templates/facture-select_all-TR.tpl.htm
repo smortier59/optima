@@ -1,0 +1,10 @@
+{strip}
+{if $item["facture.etat"] && isset($item["facture.date_previsionnelle"])}
+    {$payee=["etat"=>$item["facture.etat"],"date_previsionnelle"=>$item["facture.date_previsionnelle"]]}
+{else}
+    {$payee=$current_class->select($item["facture.id_facture"],"etat,date_previsionnelle")}
+{/if}
+{if $payee["etat"] == "impayee"  && $current_class->is_past($payee["date_previsionnelle"])}
+	facture_impaye
+{/if}
+{/strip}

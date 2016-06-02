@@ -1,0 +1,1 @@
+<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("ca_pondere"=>"CA pondéré","opportunite_nb_traks"=>"Nb Traks","opportunite_date_offre"=>"Date de l\'offre","opportunite_id_societe_partenaire"=>"Partenaire","opportunite_cadre_planning"=>"Planning","opportunite_cadre_detail"=>"Détails","opportunite_cadre_detail"=>"Chiffres"));?>

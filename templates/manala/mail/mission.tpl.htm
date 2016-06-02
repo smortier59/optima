@@ -1,0 +1,29 @@
+Bonjour {$infos.nom},<br><br>
+
+Vous trouverez ci-joint pour votre animation du {ATF::$usr->date_trans($infos.mission.date_debut)} au {ATF::$usr->date_trans($infos.mission.date_fin)} :<br><br>
+
+{foreach $infos.files as $k=>$i}
+	- <strong>{$k}</strong> {if $i}: {$i}{/if}<br>
+
+{/foreach}
+<br>
+<strong>Lieu</strong> : {$infos.mission.lieu}<br><br>
+{$tel = ATF::contact()->select($infos.mission.id_contact,"tel")}
+<strong>Contact</strong> : {ATF::contact()->nom($infos.mission.id_contact)}{if $tel} : <em>{$tel}</em>{/if}<br><br>
+ 
+{if $infos.mission.detail_horaire}
+	<strong>Horaires</strong> : <br><br>
+	{$infos.mission.detail_horaire|nl2br}
+	<br><br>
+{/if}
+
+{if $infos.mission.indication_personnel}
+	<strong>Indications</strong> : <br><br>
+	{$infos.mission.indication_personnel|nl2br}
+	<br><br>
+{/if}
+
+Je compte sur vous,<br>
+BONNE ANIMATION !<br><br>
+
+Merci 

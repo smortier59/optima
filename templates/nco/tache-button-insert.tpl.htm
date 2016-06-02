@@ -1,0 +1,24 @@
+<script type="text/javascript">
+	function processResult(btn){
+		Ext.example.msg('Button Click', 'You clicked the {0} button', btn);
+	};
+</script>
+
+<div class="button" onclick="if(confirm('{ATF::$usr->trans(creer_tache,suivi)}')){
+        	{* ATF.ajax('{$form_name}.ajax','$({$form_name}).serialize()',{ onComplete: function (obj) { console.log(obj.result); ATF.tpl2div('tpl2div.ajax','div=main&template=generic&event=insert&table=tache'); } }); *}
+           	ATF.hideAllEditors();
+            ATF.ajax('{$form_name}.ajax',$('#{$form_name}').serialize(),{ onComplete: function (obj) { ATF.tpl2div('tpl2div.ajax','div=main&template=generic&event=insert&table=tache&id_suivi='+obj.result); } });
+        }else{
+        	ATF.{$event}($('#{$form_name}'));
+        }
+    ">
+    <div id="left">
+        <img src="images/icones/valid.png" align="" style="width:16px; height:16px" />
+    </div>
+    <div id="middle">
+    	<span>
+        	{ATF::$usr->trans(valid,$current_class->table)|strtoupper} 
+        </span>
+    </div>
+    <div id="right"></div>
+</div>

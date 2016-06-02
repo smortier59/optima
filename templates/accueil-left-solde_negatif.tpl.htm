@@ -1,0 +1,23 @@
+{if ATF::gestion_ticket() && ATF::$usr->privilege(gestion_ticket,'view')}
+     <div>
+        <table class="std">
+            {$total = 0}
+            {foreach from=ATF::societe()->societes_debitrices() key=key item=item}
+                {$total = $item.credits+$total}
+                {$classCSS = ATF::societe()->getCSSSocieteDebitrice($item)}
+                <tr>
+                    <td style="font-weight:bold">
+                    	<a href="javascript:;" class="{$classCSS}" onclick="ATF.tpl2div('societe-select-{classes::cryptId($item.id_societe)}.div');">
+                        {$item.societe}
+                        </a>{if $classCSS==societeDebitriceToCall} (+6 mois sans nouvelles !){/if}
+                    </td>
+                    <td class="credits" class="{$classCSS}">{$item.credits}</td>
+                </tr>
+            {/foreach}
+            <tr>
+                <td class="field">{ATF::$usr->trans('total')}</td>
+                <td class="credits">{$total}</td>
+            </tr>
+        </table>
+    </div>
+{/if}	

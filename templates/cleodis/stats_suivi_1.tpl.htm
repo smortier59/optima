@@ -1,0 +1,133 @@
+
+{if !$annee}
+	{$annee=$smarty.now|date_format:"%Y"}
+{/if}
+
+{if $stats_filtre}
+    {ATF::suivi()->modifEtat($stats_filtre,$name,$etat)}
+{/if}
+
+{if !$table}
+	{$table=$module}
+{/if}
+
+{$onchange2="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=suivi&user={$user}&graph={$graph}&groupe={$groupe}&annee='+this.value);"}
+
+<table>
+	<tr>
+    	<td>
+            <div style='padding-left:15px;'>- tout les suivis</div>
+            <div style='padding-left:15px;'>- par personne</div>
+            <div style='padding-left:15px;'>- par type de suivis</div>
+            <div style='padding-left:15px;'>- par année</div>
+        </td>
+    </tr>
+</table>
+<br /><hr />
+<!-- Choix -->
+<table class="std">
+	<tr>
+    	<td>&nbsp;</td>
+    </tr>	
+    <tr>
+        <td>
+            {ATF::$usr->trans("choix_annee",'suivi')} : 
+            {html_options name=annee options=ATF::suivi()->get_annee() selected=$annee onchange="`$onchange2`"}
+       </td>
+    </tr>
+
+    <tr>
+    	<td>
+        	{ATF::$usr->trans("choix_user","stats")} : 
+            <select onchange="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=suivi&graph={$graph}&annee={$annee}&user='+this.value);">
+            <option label="Voir tout le monde" value=""> {ATF::$usr->trans("tout_voir_user","stats")} </option>
+        	{html_options options=ATF::suivi()->getUserActif() selected=$user}
+        	</select>
+        </td>
+    </tr>
+    
+    <tr>
+    	<td>
+    		<form> 
+            	<table>
+                    <tr>
+                        {foreach from=ATF::suivi()->stats_filtre item=name}
+                            <td style="width:auto;padding-right:20px;">
+                                {ATF::$usr->trans($name,'suivi')} :
+                             </td>
+                        {/foreach}     
+                    </tr>
+                    <tr>
+                        {foreach from=ATF::suivi()->stats_filtre item=nom_filtre}                            
+                            <td style="width:auto;padding-right:20px;">
+                                {foreach from=ATF::suivi()->get($nom_filtre) key=nom item=a_check}
+                                    <div>
+                                        <input type="checkbox" style="width:auto" {if $a_check==1} CHECKED {/if}
+                                        onclick="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=suivi&graph={$graph}&annee={$annee}&user={$user}&stats_filtre={$nom_filtre}&name={$nom}&etat='+this.checked);" />
+                                        {ATF::$usr->trans($nom)}
+                                    </div>
+                                {/foreach}
+                            </td>
+                        {/foreach}
+                    </tr>         
+    			</table>
+			</form>
+		</td>
+	</tr>
+</table>
+<br/>
+
+
+
+
+<!-- Graphique -->
+<div id="{$table}_1" style="height: 400px"></div>
+{$data_tab=ATF::suivi()->stats_special($annee,$user,$groupe)}
+
+<script type="text/javascript">
+{$data = $data_tab}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_1',
+            type: 'column'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: '{$value["params"]["seriesname"]}'                                     
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                                                     
+                                {$v["value"]|number_format:2:'.'} 
+                                {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});
+    
+</script>
+

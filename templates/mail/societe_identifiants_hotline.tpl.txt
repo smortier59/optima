@@ -1,0 +1,11 @@
+Bonjour {ATF::contact()->nom($infos.contact.id_contact)},
+
+Voici vos identifiants pour vous connecter au portail hotline ({$smarty.const.__HOTLINE_URL__})
+
+Référence Societe : {$infos.societe.ref}
+Mot de passe  : {$infos.societe.divers_5}
+
+Vous pouvez également utiliser le  lien direct : {$infos.direct_link}
+
+Cordialement,
+L'équipe Absystech

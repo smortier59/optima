@@ -1,0 +1,76 @@
+{strip}
+	{$id = $item["{$current_class->table}.id_note_de_frais_ligne"]}
+    {$idNF = $item["{$current_class->table}.id_note_de_frais_fk"]}
+    
+    <script type="text/javascript">
+		ATF.activeRefus{$id} = function() {		
+			var commentaireRefus{$id} = new Ext.Window({
+				title: 'Raison du refus de validation',
+				width: 500,
+				height:300,
+				minWidth: 300,
+				minHeight: 200,
+				layout: 'fit',
+				plain:true,
+				bodyStyle:'padding:5px;',
+				buttonAlign:'center',
+				items: [{
+					xtype: 'textarea',
+					hideLabel: true,
+					name: 'raison',
+					id: 'raison'
+				}],
+		
+				buttons: [{
+					text: 'Ok',
+					handler: function(){
+						ATF.tpl2div(
+							'{$current_class->table},refus.ajax'
+							,'id_note_de_frais_ligne={$id|cryptid}&raison='+Ext.getCmp('raison').getValue()
+							,{ onComplete:function(){ 
+								ATF.updWait('gsa_note_de_frais_note_de_frais_ligne_{$idNF}_content','Merci de patienter !',function(){ ATF.tpl2div('note_de_frais_ligne,updateSelectAll.div','pager=gsa_note_de_frais_note_de_frais_ligne_{$idNF}&table=note_de_frais_ligne&function='); });
+							 	commentaireRefus{$id}.hide();
+							 } }
+						);
+						
+					}
+				},{
+					text: 'Annuler',
+					handler: function(){
+						commentaireRefus{$id}.hide();
+					}
+				}]
+			});
+		
+			commentaireRefus{$id}.show();
+		}
+    </script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    {if ATF::note_de_frais()->canValid(ATF::$usr->getID()) && $item["{$current_class->table}.etat"]=='en_cours'}
+        <a href="javascript:;" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)}')) 
+        	ATF.tpl2div(
+            	'{$current_class->table},valid.ajax'
+                ,'id_note_de_frais_ligne={$id|cryptid}'
+            	,{ onComplete:function(){ 
+                	ATF.updWait('gsa_note_de_frais_note_de_frais_ligne_{$idNF}_content','Merci de patienter !',function(){ ATF.tpl2div('note_de_frais_ligne,updateSelectAll.div','pager=gsa_note_de_frais_note_de_frais_ligne_{$idNF}&table=note_de_frais_ligne&function='); });
+                 } }
+            );">
+            <img src="{ATF::$staticserver}images/icones/valid.png" height="16" width="16" alt="" />
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="javascript:;" onclick="ATF.activeRefus{$id}();">
+            <img src="{ATF::$staticserver}images/icones/no.png" height="16" width="16" alt="" />
+        </a>
+    {/if}
+    
+    
+    
+{/strip}

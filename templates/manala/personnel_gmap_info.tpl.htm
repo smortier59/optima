@@ -1,0 +1,24 @@
+{strip}
+	{*
+    	$infos Donn�es fournies de l'enregistrement localis�
+    *}
+<b><a href="{ATF::getClass($table)->name()}-select-{$id|cryptid}.html">{ATF::getClass($table)->nom($id)|escape:'javascript'|stripslashes}</a></b><br>
+{$infos.adresse|escape:'javascript'|stripslashes}
+{if $infos.adresse_2}
+    <br />
+    {$infos.adresse_2|escape:'javascript'|stripslashes}
+{/if}
+{if $infos.adresse_3}
+    <br>
+    {$infos.adresse_3|escape:'javascript'|stripslashes}
+{/if}<br>
+{$infos.id_pays}-{$infos.cp} {$infos.ville|escape:'javascript'|stripslashes}<br>
+<strong>Tél :</strong> {$infos.tel}<br>
+<strong>Nombre de mission déjà effectuée :</strong> {ATF::mission_ligne()->GetNbByPersonnel($id)}<br>
+
+<br>
+
+<img src="{ATF::getClass($table)->name()}-{$id|cryptId}-photo_identite-100.png?v={rand(0,1000000)}">
+
+<br><br><br>
+{/strip}

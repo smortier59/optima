@@ -1,0 +1,49 @@
+{* héhé *}
+{if isset($smarty.get.id_societe)}
+    {$id_societe = $smarty.get.id_societe}
+{elseif isset($requests[$current_class->table]["id_{$current_class->table}"])}
+    {$id_societe = $requests[$current_class->table]["id_{$current_class->table}"]} 
+{/if}
+
+
+{$id_crypt = $current_class->cryptId( $id_societe )}
+
+{* Icones spéciales *}
+{if ATF::$usr->privilege('affaire','insert')}
+<tr>
+    <td colspan="2" style="height:150px">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>            
+            <tr>
+                <td style="text-align:center; width:80px">
+                    <a href="#affaire-insert.html,id_societe={$id_societe}">
+                        <img src="{ATF::$staticserver}images/module/48/affaire.png" style="width:40px;" alt="{ATF::$usr->trans("creer_affaire",$current_class->table)}" />
+                    </a>
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("creer_affaire",$current_class->table)}</span><br />
+                    <span style="font-size:12px; font-style:italic;">{*ATF::$usr->trans("envoyer_fichier_info",$current_class->table)*}</span>
+                </td>
+                {if $smarty.get.id_societe == "3407a75d752b23089d922095ce4fdd8a" }
+                    <td>                       
+                        <span style="font-size:12px; font-weight:bold;">ICS : {$smarty.const.__ICS__}</span>
+                    </td>
+                {/if}
+            </tr>           
+            <tr>
+                <td colspan="2"><hr /></td>
+            </tr>
+            <tr>
+                <td style="text-align:center; width:80px">                    
+                        <img src="{ATF::$staticserver}images/icones/joignable.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />                   
+                </td>
+                <td style="text-align:justify; vertical-align:middle">
+                    <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("joignable",$current_class->table)} : {ATF::$usr->trans(ATF::societe()->select($id_societe , "joignable"),"societe_joignable")}</span>
+                </td>
+            </tr> 
+        </table>
+    </td>
+</tr>
+{/if}

@@ -1,0 +1,11 @@
+<p>{ATF::$usr->trans('bonjour',mail)},</p>
+
+<p>{ATF::$usr->trans('creation_tache','mail')} :</p>
+
+{if $infos.donnees.id_societe}<p><span style="font-weight:bold;">{ATF::$usr->trans('societe','tache')}</span> : {ATF::societe()->nom($infos.donnees.id_societe)}</p>{/if}
+<p><span style="font-weight:bold;">{ATF::$usr->trans('tache','tache')}</span> : {$infos.donnees.tache}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('horaire_fin','tache')}</span> : {ATF::$usr->date_trans($infos.donnees.horaire_fin)}</p>
+
+<p><a href="{$infos.optima_url}">{ATF::$usr->trans('permalink')}</a></p>
+
+<p>{ATF::$usr->trans('remerciement_tache',mail)}.</p>

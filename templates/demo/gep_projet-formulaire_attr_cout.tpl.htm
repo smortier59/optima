@@ -1,0 +1,75 @@
+{* @todo Refactoriser les styles CSS lorsque la conception est finie *}
+{if $infos.id_cout_unitaire}
+	{$event=update}
+{else}
+	{$event=insert}
+{/if}
+{$id_pa=$infos.id_pa|default:$smarty.request.id_pa}
+{if $infos.id_cout_catalogue}
+	{$cout_catalogue=ATF::cout_catalogue()->select($infos.id_cout_catalogue)}
+{/if}
+<form name="cout_unitaire,{$event}" id="cout_unitaire,{$event}" action="" method="post">
+    <input type="hidden" name="cout_unitaire[id_pa]" id="cout_unitaire[id_pa]" value="{$id_pa}" />
+    {if $infos.id_cout_unitaire}
+        <input type="hidden" name="cout_unitaire[id_cout_unitaire]" id="cout_unitaire[id_cout_unitaire]" value="{$infos.id_cout_unitaire}" />
+    {/if}
+    
+    <input type="hidden" name="cout_catalogue[id_cout_catalogue]" id="cout_catalogue[id_cout_catalogue]" value="{$cout_catalogue.id_cout_catalogue}" />
+    <div style="width:150px; float:left;">Catégorie de coût :</div>	
+    <div style="float:left;" id="cout_categorie">
+        <select style="width:300px" name="cout_catalogue[id_cout_categorie]" id="cout_catalogue[id_cout_categorie]" onchange="ATF.updateHtmlOptions('cout_catalogue,getOptions.ajax','id_cout_catalogue={$cout_catalogue.id_cout_catalogue}&id_cout_categorie='+this.value,'cout_unitaire[id_cout_catalogue]','- Créer un nouveau coût dans le catalogue... -');">
+            <option value="">- Autre coût -</option>
+            {html_options options=ATF::cout_categorie()->options() selected=$cout_catalogue.id_cout_categorie}
+        </select>
+    </div>
+    
+    <div style="width:150px; float:left;">Coût associé :</div>	
+    <div style="float:left;" id="cout_catalogue">
+        <select style="width:300px" name="cout_unitaire[id_cout_catalogue]" id="cout_unitaire[id_cout_catalogue]" onchange="ATF.tpl2div('pa,cout.ajax','id_pa={$id_pa}&id_cout_catalogue='+this.value, { onComplete: function () { Modalbox.resizeToContent({ height:$('#__edit_cout_unitaire').height() }); } });">
+            <option value="">- Créer un nouveau coût dans le catalogue... -</option>
+            {ATF::cout_catalogue()->optionsFromCat($cout_catalogue.id_cout_categorie)}
+            {html_options options=ATF::cout_catalogue()->options(null,null,false) selected=$infos.id_cout_catalogue}
+        </select>
+    </div>
+    
+    <div style="width:150px; float:left; clear:both;">Libellé du coût :</div>
+    <div style="float:left;"><input type="text" name="cout_catalogue[cout_catalogue]" id="cout_catalogue[cout_catalogue]" style="width:300px;" value="{$cout_catalogue.cout_catalogue|escape:htmlall}" /></div>
+    <div style="width:300px; float:left; clear:both;">Coût unitaire (catalogue) :</div>
+    <div style="float:left;"><input type="text" name="cout_catalogue[cout_unitaire]" id="cout_catalogue[cout_unitaire]" style="width:150px; font-family:'Courier New', Courier, monospace;" value="{$cout_catalogue.cout_unitaire|escape:htmlall}" onkeyup="this.value=ATF.__attr.check('num',this.value)" /></div>
+
+    <div style="width:300px; float:left; clear:both;">Coût unitaire spécifique (sur PA{$id_pa}) :</div>
+    <div style="float:left;"><input type="text" name="cout_unitaire[cout_unitaire]" id="cout_unitaire[cout_unitaire]" style="width:150px; font-family:'Courier New', Courier, monospace;" value="{$infos.cout_unitaire|escape:htmlall}" onkeyup="this.value=ATF.__attr.check('num',this.value)" /></div>
+    <div style="width:150px; float:left; clear:both;">Règle de calcul (<a href="javascript:;" onclick="Effect.toggle($('#aide'), 'blind', { duration: .5, afterFinish: function () { Modalbox.resizeToContent(); } });">Aide</a>) :</div>
+    <div style="float:left;"><input type="text" name="cout_unitaire[regle]" id="cout_unitaire[regle]" style="width:300px; font-family:'Courier New', Courier, monospace;" value="{$infos.regle|escape:htmlall}" onkeyup="" /></div>
+    <div style="clear:both; padding-top:1em; text-align:center;">
+        {include file="button.tpl.htm" name=ok text=ATF::$usr->trans($event) onclick="ATF.{$event}($('#cout_unitaire,{$event}'), { onComplete: function(obj) { Modalbox.hide(); ATF.showNotice(obj.notice); } });"}
+        {if $event==update}
+            {include file="button.tpl.htm" name=delete icone=delete text=ATF::$usr->trans(delete) onclick="if (confirm('sûr ?')) ATF.tpl2div('pa,cout.ajax','delete=1&id={$infos.id_cout_unitaire}&id_pa={$id_pa}&id_cout_catalogue={$infos.id_cout_catalogue|default:$smarty.request.id_cout_catalogue}', { onComplete: function (obj) { Modalbox.resizeToContent({ height:$('#__edit_cout_unitaire').height() }); ATF.showNotice(obj.notice); } });"}
+        {/if}
+    </div>
+    
+    <div style="color:#666; display:none;" id="aide">
+        <div>Aide :</div>
+        <div>Coût total = [CU] * [Règle de calcul]</div>
+		<div>Syntaxes possibles pour les règles de calcul :</div>
+        <div style="width:384px; padding:3px; border:1px solid #DEDEDE">
+            Arithmétique simple : <span style="font-family:'Courier New', Courier, monospace">2*PA467-A45*(A46/A48)+A47/10</span>
+            <br />Puissance (Ex: <span style="font-family:'Courier New', Courier, monospace">PA467<span style="vertical-align:super">3</span></span>) : <span style="font-family:'Courier New', Courier, monospace">pow(PA467,3)</span>
+        </div>
+    </div> 
+    
+    <hr style="clear:both;" />
+    <div style="font-weight:bold; color:#D00">Coûts déjà définis pour PA{$id_pa} '{ATF::pa()->nom($id_pa)}' :</div>
+    {foreach from=ATF::cout_unitaire()->selectAllFromPA($id_pa) item=item}
+    	{if $item@first}
+       		<div style="float:left; clear:both; width:20px">&nbsp;</div>
+            <div style="width:50%; float:left; text-decoration:underline;">Coût catalogue</div>	
+            <div style="float:left; text-decoration:underline;">Cout Unitaire * Règle</div>
+        {/if}
+        <div style="float:left; clear:both; width:20px; cursor:pointer;" onclick="ATF.tpl2div('pa,cout.ajax','id_pa={$id_pa}&id_cout_catalogue={$item.id_cout_catalogue}', { onComplete: function () { Modalbox.resizeToContent({ height:$('#__edit_cout_unitaire').height() }); } });"><img src="{ATF::$staticserver}images/icones/update.png" height="16" width="16" /></div>
+        <div style="width:50%; float:left;">{ATF::cout_catalogue()->nom($item.id_cout_catalogue)}</div>	
+        <div style="float:left;">{$item.cout_unitaire|default:ATF::cout_catalogue()->select($item.id_cout_catalogue,cout_unitaire)} &euro; * {$item.regle|default:1} </div>
+    {foreachelse}
+        <div style="width:100%; clear:both; text-align:center;">- Aucun -</div>	
+    {/foreach}
+</form>

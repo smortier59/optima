@@ -1,0 +1,209 @@
+<table>
+	<tr>
+    	<td>
+            <div style='padding-left:15px;'>- toutes les intéractions des 12 dernières semaines</div>
+            <div style='padding-left:15px;'>- choix de la date de fin</div>
+            <div style='padding-left:15px;'>- charge par utilisateur</div>
+        </td>
+    </tr>
+</table>
+<br /><hr /><br />
+<div>Date de fin : 
+	{if $date_fin}
+    	{$date_now = $date_fin|date_format:"%Y-%m-%d"}
+    {else}
+		{$date_now = $smarty.now|date_format:"%Y-%m-%d"}
+    {/if}
+    <input type="text" name="date_fin" id="date_fin" maxlength="10" value="{$value|default:$date_now}" style="width:120px" />
+	<script type="text/javascript">/*<![CDATA[*/
+		ATF.datefield("date_fin",'d-m-Y');
+	/*]]>*/</script>
+	<a href="javascript:;" onclick="ATF.tpl2div('tpl2div.ajax','div=main&template=stats_menu&table=stats&module=hotline_interaction&graph={$graph}&date_fin='+$('#date_fin').val());"><img src="{ATF::$staticserver}images/icones/valid.png" alt="" /></a>
+
+</div>
+<!-- Graphique -->
+<div id="{$table}_4"></div>
+{$data_tab=ATF::hotline_interaction()->statsChargeParUser($date_now)}
+<div id="{$table}_5" style="height: 400px"></div>
+<script type="text/javascript">
+
+
+
+
+{$data = $data_tab}
+Ext.onReady(function(){
+    Highcharts.theme = {
+   colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
+   chart: {
+      backgroundColor: {
+         linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+         stops: [
+            [0, 'rgb(255, 255, 255)'],
+            [1, 'rgb(240, 240, 255)']
+         ]
+      },
+      borderWidth: 2,
+      plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+      plotShadow: true,
+      plotBorderWidth: 1
+   },
+   title: {
+      style: {
+         color: '#000',
+         font: 'bold 16px "Trebuchet MS", Verdana, sans-serif'
+      }
+   },
+   subtitle: {
+      style: {
+         color: '#666666',
+         font: 'bold 12px "Trebuchet MS", Verdana, sans-serif'
+      }
+   },
+   xAxis: {
+      gridLineWidth: 1,
+      lineColor: '#000',
+      tickColor: '#000',
+      labels: {
+         style: {
+            color: '#000',
+            font: '11px Trebuchet MS, Verdana, sans-serif'
+         }
+      },
+      title: {
+         style: {
+            color: '#333',
+            fontWeight: 'bold',
+            fontSize: '12px',
+            fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+
+         }
+      }
+   },
+   tooltip: {
+          shared: true
+     },   
+   yAxis: {
+      minorTickInterval: 'auto',
+      lineColor: '#000',
+      lineWidth: 1,
+      tickWidth: 1,
+      tickColor: '#000',
+      labels: {
+         style: {
+            color: '#000',
+            font: '11px Trebuchet MS, Verdana, sans-serif'
+         }
+      },
+      title: {
+         style: {
+            color: '#333',
+            fontWeight: 'bold',
+            fontSize: '12px',
+            fontFamily: 'Trebuchet MS, Verdana, sans-serif'
+         }
+      }
+   },
+   legend: {
+      itemStyle: {
+         font: '9pt Trebuchet MS, Verdana, sans-serif',
+         color: 'black'
+
+      },
+      itemHoverStyle: {
+         color: '#039'
+      },
+      itemHiddenStyle: {
+         color: 'gray'
+      }
+   },
+   labels: {
+      style: {
+         color: '#99b'
+      }
+   },
+
+   navigation: {
+      buttonOptions: {
+         theme: {
+            stroke: '#CCCCCC'
+         }
+      }
+   }
+};
+
+// Apply the theme
+var highchartsOptions = Highcharts.setOptions(Highcharts.theme);
+    
+    
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$table}_4',
+            type: 'line'
+        },
+        title: {
+            text: '{$data["params"]["caption"]}'
+        },        
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $k => $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: '{$data["params"]["yaxisname"]}'
+            },min :0
+        },
+        series: [
+                  {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'line'
+                   ,name: '{$value["params"]["seriesname"]}'                                     
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                                                     
+                                {$v["value"]|number_format:2:'.'} 
+                                {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+              } {if !$key@last},{/if}
+             {/foreach}           
+           ]        
+    });
+});    
+</script>
+<!-- Tableau -->
+<br /><hr /><br />
+{$data_tab.params.caption} {if $data_tab.params.subCaption}({$data_tab.params.subCaption}){/if} :<br />
+<table class="std">
+	<tr>
+    <td style="width:200px;">&nbsp;</td>
+		{foreach from=$data_tab.dataset key=key item=item}
+        	<td style="text-align:center;border:dotted;border-width:1px;">
+                {ATF::user()->nom($key)}
+            </td>
+        {/foreach}
+    </tr>
+    
+    {foreach from=$data_tab.categories.category key=key item=item}
+    <tr style="background-color:{cycle values='#E3F3A3,#D3DAE0'};">
+    	<td style="text-align:center;width:200px;border:dotted;border-width:1px;">
+    		{$item.label}
+        </td>
+        {foreach from=$data_tab.dataset key=key_ item=item_}
+    		<td style="text-align:center;border:dotted;border-width:1px;">
+    			{if $item_.set[$key].value}
+                	{str_replace('.','h',$item_.set[$key].value)}
+                {else}
+                	-
+                {/if}
+    		</td>
+    	{/foreach}
+    </tr>
+    {/foreach}
+</table>

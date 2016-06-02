@@ -1,0 +1,59 @@
+<div>
+    <div id="loginDiv">
+        <div id="loginTop">
+            <div id="loginTL"></div>
+            {if $smarty.server.HTTP_HOST=="midas.cleodis.fr" || $smarty.server.HTTP_HOST=="dev.midas.optima.absystech.net"}
+            	 <div id="loginLogoMidas"></div>
+            {else}
+            	 <div id="loginLogo"></div>
+            {/if}
+            <div id="loginForm" style="position:absolute; top:60px; left:250px; width:600px; height:100px; z-index:60;">
+                <form method="post" action="">
+                    <input type="hidden" value="{$k|default:""}" name="url" id="url" />
+                    <div style="width:150px;">Société :</div>
+                    <div style="width:450px;">
+                    	{if $smarty.server.HTTP_HOST=="midas.cleodis.fr" || $smarty.server.HTTP_HOST=="dev.midas.optima.absystech.net"}
+                        	Midas
+                            <input type="hidden" value="midas" name="schema" id="schema" />
+                        {elseif $smarty.server.HTTP_HOST=="optima.absystech-telecom.fr"}
+                            AbsysTech Telecom
+                            <input type="hidden" value="att" name="schema" id="schema" />
+                    	{elseif $smarty.server.HTTP_HOST=="optima.boisethome.fr"}
+                        	Bois &amp; Home
+                            <input type="hidden" value="boisethome" name="schema" id="schema" />
+                        {elseif $schema}
+                        	{$schema|ucfirst}
+                            <input type="hidden" value="{$schema}" name="schema" id="schema" />
+                        {else}
+                            <input tabindex="1" type="text" value="{$smarty.cookies.optima.societe|default:$smarty.get.societe}"{if $__c.optima.societe || $smarty.get.societe} class="invisible" onfocus="this.className='';"{/if} name="schema" id="schema" />
+                        {/if}
+                    </div>
+                    <div style="width:150px;">Nom d'utilisateur :</div>
+                    <div style="width:200px;"><input tabindex="2" type="text" value="{$smarty.cookies.l}" name="login" id="login" /></div>
+                    <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
+                    <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="go">Accéder à mon compte</button></div>
+                    <div style="width:150px;">Mot de passe :</div>
+                    <div><input tabindex="3" type="password" value="{$smarty.cookies.p}" name="password" id="password" onkeyup="$('#passwordseeded').val('');" /></div>
+                    <input type="hidden" value="{$smarty.cookies.p}" id="passwordseeded"  />
+                    <input type="hidden" value="{$smarty.cookies.s}" id="seed"  />
+                    <div style="font-size:10px; font-family:Arial, Helvetica, sans-serif"><input{if $smarty.cookies.p} checked="checked"{/if} tabindex="4" type="checkbox" value="1" name="store" id="store" style="width:auto;" /> Se rappeler des identifiants (Je suis le seul utilisateur de ma machine)</div>
+                </form>
+            </div>
+            <div id="loginVirgule"></div>
+        </div>
+        <div id="loginBottom">
+            <div id="loginBL"></div>
+            <div id="loginBM">{include file="copyright.tpl.htm"}</div>
+            <div id="loginBR"></div>
+        </div>
+    </div>
+</div>
+
+{* YG: Mode arrache de noël 2009 *}
+{$server_mode=$smarty.server.HTTP_HOST|php:substr:"0":"3"}
+{if $server_mode!=www && $server_mode!="opt" && $smarty.server.HTTP_HOST!="midas.cleodis.fr"}
+    <div style="text-align:center; padding-top:1em; font-weight:bold;">
+        ATTENTION IL S'AGIT DE LA PLATEFORME DE {if $server_mode==dev}DEVELOPPEMENT{elseif $server_mode==pre}PRE-PRODUCTION{else}&quot;{$server_mode}&quot;{/if}
+        <br />LA PLATEFORME DE PRODUCTION DEVRAIT ETRE CETTE ADRESSE : <a href="http://{$smarty.server.HTTP_HOST|replace:$server_mode:""|php:substr:"1"}/">http://{$smarty.server.HTTP_HOST|replace:$server_mode:""|php:substr:"1"}/</a>
+    </div>
+{/if}

@@ -1,0 +1,11 @@
+<p>{ATF::$usr->trans('bonjour',mail)},</p>
+
+<p>Le user '<span style="font-weight:bold;">{$infos.giveup_user}</span>' a décliner l'intéressement a la tâche suivante :</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('tache',tache)}</span> : {$infos.tache.tache}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('createur',tache)}</span> {ATF::user()->nom($infos.tache.id_user)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('id_societe',tache)}</span> : {ATF::societe()->nom($infos.tache.id_societe)}</p>
+<p><span style="font-weight:bold;">{ATF::$usr->trans('horaire_fin',tache)}</span> : {ATF::$usr->date_trans($infos.tache.horaire_fin)}</p>
+
+<p><a href="{$infos.optima_url}">Accès direct</a></p>
+
+<p>{ATF::$usr->trans('remerciement_tache',mail)}</p>
