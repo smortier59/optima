@@ -1,0 +1,3 @@
+# Ajout du module produit_fournisseur
+INSERT INTO `module` (`id_module`, `id_parent`, `module`, `abstrait`, `priorite`, `visible`, `import`, `couleur_fond`, `couleur_texte`, `couleur`, `description`, `construct`) VALUES (NULL, '75', 'produit_fournisseur', '0', '0', '1', '0', 'FFFFFF', '000000', 'blue', NULL, NULL);
+# NE PAS OUBLIER DE METTRE LES DROITS SUR LE MODULE pour qu'il apparaisse en onglet de produit.
