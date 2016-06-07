@@ -1952,7 +1952,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(280);
 		$this->setleftmargin(15);
 		$this->setfont('arial','BI',8);
-		$this->multicell(0,3,"CGL CLEDOIS V09-14",0,"R");
+		$this->multicell(0,3,"CGL CLEODIS V09-14",0,"R");
 		$this->setAutoPageBreak(true);
 	}
 

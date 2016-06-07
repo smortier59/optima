@@ -9,7 +9,7 @@ class facturation extends classes_optima {
 		$this->table="facturation";
 		parent::__construct(); 
 		$this->colonnes['fields_column'] = array( 
-			 'facturation.id_societe'
+			  'facturation.id_societe'
 			 ,'facturation.id_affaire'
 			 ,'facturation.id_facture'
 			 ,'facturation.date_periode_debut'
@@ -1451,8 +1451,4 @@ class facturation extends classes_optima {
 	}
 
 };
-
-class facturation_cleodisbe extends facturation { };
-class facturation_cap extends facturation { };
-class facturation_exactitude extends facturation { };
 ?>

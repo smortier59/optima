@@ -132,6 +132,13 @@ class affaire_lm extends affaire {
 		$affaire["ville_banque"]=$infos["ville_banque"];
 		$affaire["date"]=$infos["date"];
 		$affaire["ref"]=$infos["ref"];
+		$affaire["adresse_livraison"]=$infos["adresse_livraison"];
+		$affaire["ville_adresse_livraison"]=$infos["ville_adresse_livraison"];
+		$affaire["cp_adresse_livraison"]=$infos["cp_adresse_livraison"];
+		$affaire["adresse_facturation"]=$infos["adresse_facturation"];
+		$affaire["ville_adresse_facturation"]=$infos["ville_adresse_facturation"];
+		$affaire["cp_adresse_facturation"]=$infos["cp_adresse_facturation"];
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {

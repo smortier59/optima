@@ -257,7 +257,7 @@ class commande_lm extends commande {
 			throw new error("Cette Ref de commande existe déjà !",878);
 		}
 		$infos["ref"]=ATF::affaire()->select($infos["id_affaire"],"ref");
-		$infos["etat"]="non_loyer";
+		$infos["etat"]="pending";
 		$infos["id_user"] = ATF::$usr->getID();
 
 		$this->check_field($infos);
@@ -1205,7 +1205,7 @@ class commande_lm extends commande {
 				$return['data'][$k]['demandeRefiExist'] = false;
 			}
 			//Check affichage de création de facture
-			if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
+			if (($i["commande.date_debut"] || $affaire['nature']=="vente") /*&& $return['data'][$k]['bdcExist']*/) {
 				$return['data'][$k]['factureAllow'] = true;
 			} else {
 				$return['data'][$k]['factureAllow'] = false;
@@ -1370,7 +1370,6 @@ class commande_lm extends commande {
 			$affaireFillesAR=ATF::affaire()->getFillesAR($commande->get("id_affaire"));
 		
 			$etat=$commande->get("etat");
-			log::logger($commande->get("id_affaire") , "mfleurquin");
 
 			$this->checkEtat($commande,false,$affaireFillesAR);
 			$etat_modifie=$commande->get("etat");
@@ -2089,9 +2088,7 @@ class commande_lm extends commande {
 					}
 					
 
-					if($type == "o2m"){
-							log::logger($reel , "mfleurquin");
-						}
+					
 
 					$graph['dataset']["objectif"] = $obj;
 					$graph['dataset']["moyenne"] = $avg;
