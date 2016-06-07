@@ -1,3 +1,3 @@
 [submodule "libs/ATF"]
 	path = libs/ATF
-	url = http://git.absystech.net/absystech/ATF.git
+	url = https://git.absystech.net/absystech/ATF.git

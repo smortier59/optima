@@ -2011,10 +2011,10 @@ class commande_cleodis extends commande {
 						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE");
 					}*/
 					if($type == "reseau"){
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NOT NULL");
+						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+								->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
 					}else{
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE")
+						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
 								->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
 					}
 
@@ -2031,7 +2031,8 @@ class commande_cleodis extends commande {
 							
 							->addCondition("affaire.affaire","%transfert%" ,"AND", "conditiondevis", "NOT LIKE")
 
-							
+							->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+							->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
 
 							->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
 							

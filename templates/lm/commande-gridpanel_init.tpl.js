@@ -559,27 +559,4 @@ ATF.renderer.pdfCourriers=function(table,field) {
 {/if}
 
 
-{if ATF::$codename=="midas"}
-	ATF.renderer.uploadFileMidas=function(table,field) {
-		return function(filetype, meta, record, rowIndex, colIndex, store) {
-			if(record.json){		
-				var id = record.data[table+'__dot__id_'+table];
-				
-				html = '<div class="floatLeft" style="width:50%; text-align:center">';
-		
-				if (filetype) {
-					html += '<a href="'+table+'-select-'+field+'-'+id+'.dl" alt="'+ATF.usr.trans("popup_download",table)+'">'+
-						'<img class="smallIcon '+filetype+'" src="'+ATF.blank_png+'" class="icone" />'+
-						'</a>';
-				} else {
-					html += '<img class="smallIcon warning" src="'+ATF.blank_png+'" />';
-				}
-				html += '</div>';
-				
-				return html;
-			}
-		}
-	};
-{/if}
-
 {/strip}
