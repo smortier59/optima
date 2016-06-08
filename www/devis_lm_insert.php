@@ -198,10 +198,12 @@ if($infos["id_societe"]){
             $id_commande = ATF::commande()->decryptId($id_commande);            
 
             echo $id_commande;            
+        } else {
+            throw new Exception("aucun id_devis !");
         }
 
-    }catch(error $e){  
-        print_r($e);
-              
-    }       
+    }catch(error $e){
+        log::logger($e->getMessage(),'lm');
+        echo "Erreur, merci de contacter le service client.";
+    }
 }
