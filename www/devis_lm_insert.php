@@ -39,6 +39,8 @@ if($infos["id_societe"]){
 
             }else{
                 $adresse_facturation = $adresse_livraison;
+                $cp_facturation = $cp_livraison;
+                $ville_facturation =  $ville_livraison;
             }
         }else{
             $adresse_livraison = $societe["adresse"];
@@ -48,9 +50,7 @@ if($infos["id_societe"]){
             $cp_livraison = $societe["cp"];
             $ville_livraison = $societe["ville"];
 
-
             $adresse_facturation = $adresse_livraison;
-
             $cp_facturation = $cp_livraison;
             $ville_facturation =  $ville_livraison;
         }
