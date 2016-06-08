@@ -39,6 +39,7 @@ class pack_produit extends classes_optima {
 		$this->files["photo2"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 	
+		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);		
 		$this->formExt=true;		
 		//$this->no_delete = true;
 		$this->selectAllExtjs=true; 
