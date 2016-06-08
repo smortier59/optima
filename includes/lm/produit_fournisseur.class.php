@@ -17,7 +17,7 @@ class produit_fournisseur extends classes_optima {
 		);
 
 		$this->colonnes['primary'] = array(
-			 "id_fournisseur"
+			 "id_fournisseur"=>array("custom"=>true,"autocomplete"=>array("function"=>"autocompleteFournisseurs"))
 			,"id_produit"
 			,"prix_prestation"
 			,"recurrence"
