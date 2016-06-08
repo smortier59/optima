@@ -1,4 +1,5 @@
 <?
+
 $_SERVER["argv"][1] = 'lm';
 include(dirname(__FILE__)."/../global.inc.php");
 
@@ -8,6 +9,7 @@ ATF::$usr = new usr(18);
 ATF::_s("user",ATF::$usr);
 
 $infos = $_POST;
+
 
 if ($infos["id_contrat"]) {
 

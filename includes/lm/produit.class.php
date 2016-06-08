@@ -73,6 +73,8 @@ class produit_lm extends produit {
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['loyer_fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
 
+		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
+
 		$this->fieldstructure();
 
 		$this->onglets = array('produit_loyer','produit_fournisseur');
