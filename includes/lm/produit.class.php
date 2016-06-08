@@ -69,7 +69,8 @@ class produit_lm extends produit {
 			,"popup"=>array("produit" , "id")
 		);
 		$this->colonnes['bloquees']['select'] =  array('loyer')	;
-				
+		
+		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);		
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['loyer_fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
 
