@@ -19,12 +19,15 @@ class pack_produit extends classes_optima {
 
 
 		$this->colonnes['primary']=array('libelle',
+										 'libelle_ecran_magasin'
 										'popup',
 										'etat'=>array("targetCols"=>1),							
 										'type_pack'=>array("targetCols"=>1),
 										'id_produit'=>array("targetCols"=>1),
 										'ref_lm_principale'=>array("targetCols"=>1),
-										'fin_formulaire'
+										'fin_formulaire',
+										'description',
+										'service_inclus'
 										);					
 
 		
