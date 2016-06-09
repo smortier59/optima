@@ -19,7 +19,7 @@ class pack_produit extends classes_optima {
 
 
 		$this->colonnes['primary']=array('libelle',
-										 'libelle_ecran_magasin'
+										 'libelle_ecran_magasin',
 										'popup',
 										'etat'=>array("targetCols"=>1),							
 										'type_pack'=>array("targetCols"=>1),
