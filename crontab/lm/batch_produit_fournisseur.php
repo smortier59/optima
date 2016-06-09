@@ -37,12 +37,7 @@ foreach ($packs as $key => $value) {
 								 "etat"=>$value["etat"],
 								 "fin_formulaire"=>$value["fin_formulaire"],
 								 "service_inclus"=>$value["service_inclus"]
-						   ));
-	$packs = array("id_pack"=>$id_pack,
-				   "id_produit"=>$value["id_produit"]
-				  );
-
-	
+						   ));	
 }
 
 $q = "SELECT *  FROM import_produit";
