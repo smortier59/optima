@@ -10,11 +10,20 @@ ATF::_s("user",ATF::$usr);
 
 $infos = $_POST;
 
+log::logger("DEVIS LM INSERT", "mfleurquin");
+log::logger($infos, "mfleurquin");
+
 
 if ($infos["id_contrat"]) {
-
     ATF::pdf()->generic('contratA4',$infos["id_contrat"]);
     die;
+}
+
+
+if($infos["save_contrat"]){
+    log::logger("Insert PDF", "mfleurquin");    
+    util::file_put_contents(ATF::commande()->filepath($infos["id_commande"],"retour"), base64_decode($infos["pdf"]));
+    die;    
 }
 
 if($infos["id_societe"]){
