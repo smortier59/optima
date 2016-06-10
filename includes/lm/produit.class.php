@@ -38,7 +38,7 @@ class produit_lm extends produit {
 										'id_pack_produit'=>array("targetCols"=>1),
 										'ref_lm'=>array("targetCols"=>1),
 										'libelle_a_revoyer_lm'=>array("targetCols"=>1),
-										"description"=>array("targetCols"=>2),
+										"description",
 										"ordre"=>array("targetCols"=>1),
 										"afficher"=>array("targetCols"=>1),
 										'id_fabriquant'
