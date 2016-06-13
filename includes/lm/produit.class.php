@@ -187,7 +187,7 @@ class produit_lm extends produit {
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));
 
-			$dep = array();
+			/*$dep = array();
 			$dep = explode(",", $value["produit_fournisseur__dot__departement"]);
 			foreach ($dep as $kd => $vd) {
 				ATF::departement()->q->reset()->where("code","%".$vd."%","AND",false,"LIKE");
@@ -197,7 +197,7 @@ class produit_lm extends produit {
 				ATF::produit_fournisseur_departement()->i(array("id_produit_fournisseur"=>$id_pf,
 												    "id_departement"=>$dep["id_departement"]
 				 							));
-			}
+			}*/
 
 		}
 
@@ -236,13 +236,7 @@ class produit_lm extends produit {
 		$produit_fournisseurs = ATF::produit_fournisseur()->select_all();
 		
 		foreach ($produit_fournisseurs as $key => $value) {
-			ATF::produit_fournisseur()->d($value["id_produit_fournisseur"]);
-
-			ATF::produit_fournisseur_departement()->q->reset()->where("id_produit_fournisseur",$value["id_produit_fournisseur"]);
-			$produit_fournisseur_departements = ATF::produit_fournisseur_departement()->select_all();
-			foreach ($produit_fournisseur_departements as $k => $v) {
-				ATF::produit_fournisseur_departement()->d($v["id_produit_fournisseur_departement"]);
-			}
+			ATF::produit_fournisseur()->d($value["id_produit_fournisseur"]);			
 		}
 
 		foreach ($infos_fournisseur as $key => $value) {			
@@ -253,7 +247,7 @@ class produit_lm extends produit {
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));
 
-			$dep = array();
+			/*$dep = array();
 			$dep = explode(",", $value["produit_fournisseur__dot__departement"]);
 			foreach ($dep as $kd => $vd) {
 				ATF::departement()->q->reset()->where("code","%".$vd."%","AND",false,"LIKE");
@@ -263,7 +257,7 @@ class produit_lm extends produit {
 				ATF::produit_fournisseur_departement()->i(array("id_produit_fournisseur"=>$id_pf,
 												    "id_departement"=>$dep["id_departement"]
 				 							));
-			}
+			}*/
 		}
 
 
