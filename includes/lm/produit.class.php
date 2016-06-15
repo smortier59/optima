@@ -227,6 +227,7 @@ class produit_lm extends produit {
 										   "loyer"=> $value["produit_loyer__dot__loyer"],
 										   "duree"=> $value["produit_loyer__dot__duree"],
 										   "nature"=> $value["produit_loyer__dot__nature"],
+										   "periodicite"=> $value["produit_loyer__dot__periodicite"],
 										   "ordre"=> $key+1
 									));
 		}	
