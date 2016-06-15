@@ -113,7 +113,7 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 						
 		try {
 			$insert=$this->obj->insert($produit);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(987,$error,'Erreur ref déjà utilisé');
@@ -269,7 +269,7 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$r = $this->obj->getDataFromIcecat("Saxxxmsundfgg","XE303C12-Asdfgdfs01US");
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 
@@ -288,7 +288,7 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$r = $this->obj->getInfosFromICECAT();
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 
@@ -735,7 +735,7 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$r = $this->obj->getDataFromIcecat("Saxxxmsundfgg","XE303C12-Asdfgdfs01US");
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 
@@ -752,7 +752,7 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$r = $this->obj->getInfosFromICECAT();
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 

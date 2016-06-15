@@ -71,7 +71,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$id_prolongation=$this->obj->decryptId($this->obj->insert($prolongation));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(875,$error,'La prolongation n aurait pas du s insérer car il n y a pas de date de fin');
@@ -80,7 +80,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$id_prolongation=$this->obj->decryptId($this->obj->insert($prolongation));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(877,$error,'La prolongation n aurait pas du s insérer car il n y a pas de loyer');
@@ -89,7 +89,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$id_prolongation=$this->obj->decryptId($this->obj->insert($prolongation));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(876,$error,'La prolongation n aurait pas du s insérer car il n y a pas de frequence');
@@ -100,7 +100,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 		$prolongation["values_prolongation"]=array("loyer_prolongation"=>'[{"loyer_prolongation__dot__loyer":"100","loyer_prolongation__dot__duree":"6","loyer_prolongation__dot__assurance":"10","loyer_prolongation__dot__frais_de_gestion":"10","loyer_prolongation__dot__frequence_loyer":"mois","loyer_prolongation__dot__loyer_total":600},{"loyer_prolongation__dot__loyer":"25","loyer_prolongation__dot__duree":"2","loyer_prolongation__dot__assurance":"","loyer_prolongation__dot__frais_de_gestion":"","loyer_prolongation__dot__frequence_loyer":"trimestre","loyer_prolongation__dot__loyer_total":100},{"loyer_prolongation__dot__loyer":"25","loyer_prolongation__dot__duree":"1","loyer_prolongation__dot__assurance":"","loyer_prolongation__dot__frais_de_gestion":"","loyer_prolongation__dot__frequence_loyer":"an","loyer_prolongation__dot__loyer_total":25},{"loyer_prolongation__dot__loyer":"25","loyer_prolongation__dot__duree":"2","loyer_prolongation__dot__assurance":"","loyer_prolongation__dot__frais_de_gestion":"","loyer_prolongation__dot__frequence_loyer":"semestre","loyer_prolongation__dot__loyer_total":25}]');
 		try {
 			$id_prolongation=$this->obj->decryptId($this->obj->insert($prolongation));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(880,$error,'La prolongation n aurait pas du s insérer date inférieur');
@@ -237,7 +237,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			$updateDate=$this->obj->updateDate($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(879,$error,'La date insérée est inférieure à la date de prolongation');
@@ -245,7 +245,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos["value"]="31-12-2011";
 		try {
 			$updateDate=$this->obj->updateDate($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,'On ne peut pas supprimer une facture');

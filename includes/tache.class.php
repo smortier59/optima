@@ -146,7 +146,7 @@ class tache extends classes_optima {
 		if($tab_dest){
 			try{
 				ATF::tache_user()->multi_insert($tab_dest);
-			} catch(error $e) {
+			} catch(errorATF $e) {
 				ATF::db($this->db)->rollback_transaction();
 				$e->setError();
 				throw new errorATF('Erreur Insert');
@@ -224,7 +224,7 @@ class tache extends classes_optima {
 				}
 				try{
 					ATF::tache_user()->multi_insert($ajout);
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					ATF::db($this->db)->rollback_transaction();
 					$e->setError();
 					throw new errorATF('Erreur Insert');

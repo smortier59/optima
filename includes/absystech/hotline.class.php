@@ -544,7 +544,7 @@ class hotline extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice mail envoyé
 				$this->createMailNotice("hotline_mail_prise_en_charge_contact");
-			}catch(error $e){
+			}catch(errorATF $e){
 				//$this->createMailNotice("hotline_no_mail_prise_en_charge_contact");
 			}
 		}
@@ -769,7 +769,7 @@ class hotline extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice mail envoyé
 				$this->createMailNotice("hotline_mail_resolu_client");
-			}catch(error $e){
+			}catch(errorATF $e){
 			}
 		}
 		
@@ -1126,7 +1126,7 @@ class hotline extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice mail envoyé
 				$this->createMailNotice("hotline_mail_cancel_client");
-			}catch(error $e){
+			}catch(errorATF $e){
 			}
 		}
 		
@@ -1619,7 +1619,7 @@ class hotline extends classes_optima {
 //			ATF::db($this->db)->commit_transaction();
 //			echo "Nombre de pointages créés : ".$cpt."\n";
 //			echo "--Fin Traitement des requêtes hotline--\n";
-//		}catch(error $e){
+//		}catch(errorATF $e){
 //			echo "Erreur ! : ".$e."\n";
 //		}
 //	}
@@ -1752,7 +1752,7 @@ class hotline extends classes_optima {
 			$this->update(array("id_hotline"=>$element["id_hotline"],"priorite"=>$nouvelle_priorite,"disabledInternalInteraction"=>true));
 			echo "Maj requête n° ".$element["id_hotline"]." Ancienne priorite=".$element["priorite"]." Nouvelle priorite=".$nouvelle_priorite."\n";
 		}
-		}catch(error $e){
+		}catch(errorATF $e){
 			ATF::db()->rollback_transaction();
 			echo "Erreur : ".$e->getMessage()."\n";
 			return false;
@@ -3523,7 +3523,7 @@ class hotline extends classes_optima {
         	// Récupération des notices créés
         	$return['notices'] = ATF::$msg->getNotices();
 	        return $return;
-        } catch (error $e) {
+        } catch (errorATF $e) {
         	throw $e;
         } catch (Exception $e) {
         	throw $e;

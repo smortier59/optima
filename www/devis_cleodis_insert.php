@@ -117,7 +117,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
         }  */      
 
         return true;
-    }catch(error $e){  
+    }catch(errorATF $e){  
         print_r($e);
         die();      
         return $e->getMessage();

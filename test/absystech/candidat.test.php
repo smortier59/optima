@@ -33,7 +33,7 @@ class candidat_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->validation(array("id_candidat"=>$id_candidat,"etat"=>"non","raison"=>"test"));
 			$this->assertTrue(false,'Une erreur aurait du etre généré car pas de mail spécifié');
-		}catch(error $e){
+		}catch(errorATF $e){
 			//c good, check de l'update effectué
 			$this->assertEquals("non",$this->obj->select($id_candidat,'etat'),"L'état aurait du changer en non");
 		}

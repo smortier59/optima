@@ -1381,7 +1381,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
         $error=false;
         try{
             $this->obj->resolveRequest(array("id_hotline"=>$this->id_hotline));
-        }catch(error $e){
+        }catch(errorATF $e){
             $error=true;
         }
         $this->assertTrue($error,"assert 1");
@@ -1410,7 +1410,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
                      ,"send_mail"=>true
                      ,"filestoattach"=>array("fichier_joint"=>true)
                      ,"visible"=>"oui"));           
-        }catch(error $e){
+        }catch(errorATF $e){
             $erreur = $e->getMessage();
         }
         
@@ -1977,7 +1977,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
                      ,"mono_interaction"=>true
                      ,"estimation"=>"00:00"
                      ,"send_mail"=>true));
-        }catch(error $e){
+        }catch(errorATF $e){
             $error=true;
             ATF::db()->rollback_transaction();
         }
@@ -2188,7 +2188,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
         $error=false;
         try{
             $prio=$this->obj->setPriorite(array("id_hotline"=>$this->id_hotline,"priorite"=>50));
-        }catch(error $e){
+        }catch(errorATF $e){
             $error=$e->getMessage();
         }
         $this->assertEquals($error,"invalid_range");    
@@ -2273,7 +2273,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
         $error=false;
         try{
             $this->obj->setAvancement($this->id_hotline,400);
-        }catch(error $e){
+        }catch(errorATF $e){
             $error=$e->getMessage();
         }
         $this->assertEquals($error,"invalid_range");    
@@ -2985,7 +2985,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::setSingleton("imap", new mockObjectCurlClassesHotline());
         try{
             $this->obj->checkMailBox("toto", $host, $port, $password);
-        }catch (error $e) {
+        }catch (errorATF $e) {
             $eMsg = $e->getMessage();
         }
         $this->assertEquals($eMsg, "error", "L'erreur catch n'est pas bonne !!");       

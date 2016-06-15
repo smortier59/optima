@@ -932,7 +932,7 @@ class facturation extends classes_optima {
 
 			try {
 				$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
-			} catch (error $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
+			} catch (errorATF $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
 				
 			if($id_facturation){				
 				$facturation=$this->select($id_facturation);
@@ -1192,7 +1192,7 @@ class facturation extends classes_optima {
 		
 					try {
 						$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
-					} catch (error $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
+					} catch (errorATF $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
 						
 					if($id_facturation){				
 						$facturation=$this->select($id_facturation);

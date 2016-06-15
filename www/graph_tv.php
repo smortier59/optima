@@ -4,7 +4,7 @@ try{
 
 	ATF::$html->displayWithAnalyzer("graph_tv.tpl.htm"); 
 
-}catch(error $e){
+}catch(errorATF $e){
 	$e->setError();
 }
 ?>

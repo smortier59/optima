@@ -458,7 +458,7 @@ class commande_lm extends commande {
 							ATF::suivi()->d($item["id_suivi"]);
 						}
 					}
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					//On rollback le tout
 					ATF::db($this->db)->rollback_transaction();
 					throw $e;

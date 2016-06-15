@@ -239,7 +239,7 @@ class bon_de_commande_lm extends bon_de_commande {
 								   );							
 							$this->u($d);						
 					}
-				} catch(error $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
+				} catch(errorATF $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
 				//On commit le tout
 				ATF::db($this->db)->commit_transaction();
 

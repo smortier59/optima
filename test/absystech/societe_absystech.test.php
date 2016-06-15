@@ -529,7 +529,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 1
 		try {
 			$send_identifiants_hotline=$this->obj->send_identifiants_hotline(array("id_societe"=>$this->id_societe));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getMessage();
 		}
 		$this->assertEquals("Le contact n'est pas spécifié ! Vous devez choisir un contact afin d'envoyer le mail.",$erreur_trouvee1,"send_identifiants_hotline : Erreur non attrapé : il manque un contact");
@@ -537,7 +537,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 2
 		try {
 			$send_identifiants_hotline=$this->obj->send_identifiants_hotline(array("id_contact"=>$this->id_contact));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee2 = $e->getMessage();
 		}
 		$this->assertEquals("La société n'est pas spécifié !",$erreur_trouvee2,"send_identifiants_hotline : Erreur non attrapé : il manque une société");
@@ -547,7 +547,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>""));
 		try {
 			$send_identifiants_hotline=$this->obj->send_identifiants_hotline(array("id_contact"=>$this->id_contact,"id_societe"=>$this->id_societe));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee3 = $e->getMessage();
 		}
 		$this->assertEquals("Le contact que vous avez sélectionné n'a pas d'adresse mail ! Impossible d'envoyer les identifiants.",$erreur_trouvee3,"send_identifiants_hotline : Erreur non attrapé : il n'y a pas de mail pour le contact");
@@ -592,7 +592,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			$this->obj->atcardImport($infos,$s,$files,$cr);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee = $e->getMessage();
 		}
 		$this->assertNotNull($erreur_trouvee,"Erreur non attrapé : pas de taille de fichier");
@@ -601,7 +601,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$files['atcardImport']['size'] = "666";
 			$r = $this->obj->atcardImport($infos,$s,$files,$cr);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee = $e->getMessage();
 		}
 
@@ -610,7 +610,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			$this->obj->atcardImport($infos,$s,$files,$cr);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee = $e->getMessage();
 		}
 		$this->assertNotNull($erreur_trouvee,"Erreur non attrapé : problemeLorsDeLimport");

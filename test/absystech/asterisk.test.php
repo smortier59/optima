@@ -111,7 +111,7 @@ class asterisk_test extends ATF_PHPUnit_Framework_TestCase {
 		/*ATF::db()->select_db("extranet_v3_att");
 		try{
 			$this->assertEquals("0.00", ATF::asterisk()->getCreditFromRef("09120011"));
-		}catch(error $e){
+		}catch(errorATF $e){
 			echo $e->getTraceAsString();
 		}		
 		ATF::db()->select_db("extranet_v3_absystech");
@@ -129,7 +129,7 @@ class asterisk_test extends ATF_PHPUnit_Framework_TestCase {
 		/*ATF::db()->select_db("extranet_v3_att");
 		try{
 			$this->assertNull(ATF::asterisk()->callCancelled("09120011"));
-		}catch(error $e){
+		}catch(errorATF $e){
 			echo $e->getTraceAsString();
 		}		
 		ATF::db()->select_db("extranet_v3_absystech");

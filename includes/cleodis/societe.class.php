@@ -706,7 +706,7 @@ class societe_cleodis extends societe {
 					$contactInserted++;
 				}
 
-			} catch (error $e) {
+			} catch (errorATF $e) {
 
 				$msg = $e->getMessage();
                 

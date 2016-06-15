@@ -18,7 +18,7 @@ try {
     }
      
     ATF::emailing_job()->majEtatSent();
-} catch (error $e) {
+} catch (errorATF $e) {
     if ($e->getErrno()==1142) {
         echo "\n/!\Le user n'a pas les droits pour faire les modifications/!\ \n";
     } else {

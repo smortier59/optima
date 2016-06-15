@@ -61,7 +61,7 @@
 
           $_REQUEST['success'] = true;
           unset($_POST);
-        } catch(error $e) {
+        } catch(errorATF $e) {
           $_REQUEST['success'] = false;
           $data = "";
           foreach ($_POST as $k=>$val) {
@@ -73,7 +73,7 @@
         }
         ATF::db()->commit_transaction();
       }    
-    } catch (error $e) { 
+    } catch (errorATF $e) { 
       ATF::db()->rollback_transaction();
       if ($e->getErrNo()==1062) { 
         $_REQUEST['erreur'] = "Vous êtes déjà enregistré dans notre base de donnée. Merci de votre attention.";

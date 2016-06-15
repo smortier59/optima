@@ -145,7 +145,7 @@ class contact_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_delete(){
 		try {
 			 $this->obj->can_delete($id_commande);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer un contact');

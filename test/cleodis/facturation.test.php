@@ -64,7 +64,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		));	
 		try {
 			$this->obj->update_facturations($affaire_parent,$affaire);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$errno = $e->getCode();	
 		}
 		$this->assertEquals(878,$errno,"Erreur non retrouvée");
@@ -100,7 +100,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::facture()->d($id_facture_avoir);		
 		try {
 			$this->obj->update_facturations($affaire_parent,$affaire);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$errno = $e->getCode();	
 		}
 		$this->assertEquals(879,$errno,"Erreur non retrouvée");	
@@ -232,7 +232,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_facturation=$this->obj->i(array("id_affaire"=>$id_affaire,"id_societe"=>$this->id_societe,"id_facture"=>$id_facture,"montant"=>100,"date_periode_debut"=>"2010-01-01","date_periode_fin"=>"2010-02-01","envoye"=>"oui"));
 		try {
 			$this->obj->delete_special($id_affaire,"contrat");	
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,'Impossible de supprimer une facturation envoyée');
@@ -240,7 +240,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->u(array("id_facturation"=>$id_facturation,"envoye"=>"non"));
 		try {
 			$this->obj->delete_special($id_affaire,"contrat");	
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(879,$error,'Impossible de supprimer une facturation qui a une facture');

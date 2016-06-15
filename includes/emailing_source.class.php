@@ -96,7 +96,7 @@ class emailing_source extends emailing {
 					try {
 						$r = ATF::emailing_contact()->u($enr);
 						$numUpdateOK+=$r;
-					} catch (error $e) {
+					} catch (errorATF $e) {
 						$msg = $e->getMessage();
 						if (ereg("generic message : ",$msg)) {
 							$tmp = json_decode(str_replace("generic message : ","",$msg),true);
@@ -111,7 +111,7 @@ class emailing_source extends emailing {
 					try {
 						$r = ATF::emailing_contact()->i($enr);
 						$numInsert++;
-					} catch (error $e) {
+					} catch (errorATF $e) {
 						$msg = $e->getMessage();
                         
 						if (ereg("generic message : ",$msg)) {

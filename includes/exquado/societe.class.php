@@ -707,7 +707,7 @@ class societe_exquado extends societe {
 					$contactInserted++;
 				}
 
-			} catch (error $e) {
+			} catch (errorATF $e) {
 
 				$msg = $e->getMessage();
                 

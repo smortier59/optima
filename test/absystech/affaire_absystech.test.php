@@ -260,7 +260,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	
 		try {
 			$can_delete=$this->obj->can_delete($this->id_affaire);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"can_delete ne doit pas pouvoir suprimer une affaire s'il y a une facture une commande ou un devis");
@@ -269,7 +269,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::facture()->d($this->id_facture);
 		try {
 			$can_delete=$this->obj->can_delete($this->id_affaire);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"can_delete ne doit pas pouvoir suprimer une affaire s'il y a une commande ou un devis");
@@ -277,7 +277,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::commande()->d($this->id_commande);
 		try {
 			$can_delete=$this->obj->can_delete($this->id_affaire);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"can_delete ne doit pas pouvoir suprimer une affaire s'il y a un devis");
@@ -310,7 +310,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			ATF::affaire()->can_update();
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 
@@ -343,7 +343,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->setForecast($u);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non remontée");
@@ -360,7 +360,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->getRef(NULL,"facture");	
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non catché !");
@@ -401,7 +401,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$o->getRef(NULL,"facture");	
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non catché !");
@@ -469,7 +469,7 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$id_suivi = $this->obj->updateOnSelect($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		

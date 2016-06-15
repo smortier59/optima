@@ -99,7 +99,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
         $erreur = true;
         try{
             $this->obj->createMailInsert();  
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
         $this->assertTrue($erreur,"Erreur non declenche");
@@ -116,7 +116,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
         $erreur = true;
         try{
             $this->obj->createMailInsert();  
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
         $this->assertTrue($erreur,"Erreur non declenche");

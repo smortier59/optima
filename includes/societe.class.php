@@ -343,7 +343,7 @@ class societe extends classes_optima {
 		
 		try{
 			$retour=parent::insert($infos,$s,$files,$cadre_refreshed);
-		}catch(error $e){			
+		}catch(errorATF $e){			
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}
