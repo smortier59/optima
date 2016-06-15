@@ -41,7 +41,7 @@ class scanner extends classes_optima {
 	public function checkMailBox($mail, $host, $port, $password, $class="scanner"){		
 		ATF::imap()->init($host, $port, $mail, $password);		
 		if (ATF::imap()->error) {			
-			throw new error(ATF::imap()->error);
+			throw new errorATF(ATF::imap()->error);
 		}
 		$mails = ATF::imap()->imap_fetch_overview('1:*');
 						
@@ -91,7 +91,7 @@ class scanner extends classes_optima {
 			$this->update(array("id_scanner" => $infos["id_scanner"] , "transfert" => $infos["transfert"]." (ref : ".$infos["reference"].")"));
 		}else{
 			$module = explode("-", $infos["transfert"]);
-			throw new Error("Il n'y a pas de ".$module[0]." ayant la référence ".$infos["reference"]);
+			throw new errorATF("Il n'y a pas de ".$module[0]." ayant la référence ".$infos["reference"]);
 		}		
 	}	
 	
@@ -107,7 +107,7 @@ class scanner extends classes_optima {
 			$this->deplace($infos["id_scanner"] , $infos["module"], $infos["champs"], $id_to);
 			$this->update(array("id_scanner" => $infos["id_scanner"] , "transfert" => ATF::getClass($infos["module"])->getRefForScanner($infos["id_to"], $infos["champs"] )));
 		}else{
-			throw new Error("Il faut séléctionner un fichier du scanner !");
+			throw new errorATF("Il faut séléctionner un fichier du scanner !");
 		}
 	}
 	

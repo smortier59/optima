@@ -646,10 +646,10 @@ class visite extends classes_optima {
 	public function can_delete($id,$infos=false){
 		$visite = $this->select($id);
 		if ($visite['id_gep_projet']==70 && ATF::$usr->get('id_profil')!=6) {
-			throw new error(ATF::$usr->trans("impossible_supprimer_sur_ce_projet",$this->table),8802);
+			throw new errorATF(ATF::$usr->trans("impossible_supprimer_sur_ce_projet",$this->table),8802);
 		}
 		if ($visite['id_gep_projet']==71 && ATF::$usr->get('id_profil')!=6) {
-			throw new error(ATF::$usr->trans("impossible_supprimer_sur_ce_projet",$this->table),8804);
+			throw new errorATF(ATF::$usr->trans("impossible_supprimer_sur_ce_projet",$this->table),8804);
 		}
 		return true;
 	}	

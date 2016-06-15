@@ -189,7 +189,7 @@ class emailing_projet_test extends emailing_test {
 			imap_close($mbox);
 			$this->assertNotEquals(0,$counter,"Erreur : Il n'a  trouvé aucun mail ");
 		} catch (error $e) {
-			throw new error("Erreur imap_open : ".imap_last_error(),801);
+			throw new errorATF("Erreur imap_open : ".imap_last_error(),801);
 		}
 
 	}

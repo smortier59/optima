@@ -91,11 +91,11 @@ class relance extends classes_optima {
 			if($id_contact_facturation){
 				if(!$info_mail["recipient"]=ATF::contact()->select($id_contact_facturation,"email")){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Il n'y a pas d'email pour ce contact",166);
+					throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Il n'y a pas de contact pour cette societe".$facture["id_societe"],167);
+				throw new errorATF("Il n'y a pas de contact pour cette societe".$facture["id_societe"],167);
 			}
 			
 			//Ajout du fichier de relance
@@ -118,7 +118,7 @@ class relance extends classes_optima {
 			$mail_copie->send();
 			ATF::db($this->db)->commit_transaction();
 		} else {
-			throw new error(ATF::$usr->trans("cycle_relance_terminé",$this->table),168);
+			throw new errorATF(ATF::$usr->trans("cycle_relance_terminé",$this->table),168);
 		}
 		return $relance["id_relance"];
 	}

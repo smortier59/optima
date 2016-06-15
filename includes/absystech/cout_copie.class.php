@@ -12,7 +12,7 @@ class cout_copie {
 		ATF::imap()->init($host, $port, $mail, $password);	
 		//ATF::imap()->init($host, $port, $mail, $password, "INBOX/tmp");
 		if (ATF::imap()->error) {
-			throw new error(ATF::imap()->error);
+			throw new errorATF(ATF::imap()->error);
 		}
 
 		$mails = ATF::imap()->imap_fetch_overview('1:*');

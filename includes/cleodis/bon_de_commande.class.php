@@ -324,7 +324,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			break;
 
 			default:
-				throw new error("date_invalide",987);
+				throw new errorATF("date_invalide",987);
 		}
 
 		if($infos["table"]!="commande"){
@@ -359,7 +359,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		ATF::facture_fournisseur()->q->reset()->addCondition("id_bon_de_commande",$id)->setCount();
 		$count=ATF::facture_fournisseur()->sa();
 		if($count["count"]>0){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture_fournisseur")." liée.",884);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture_fournisseur")." liée.",884);
 		}else{
 			return true;
 		}
@@ -452,7 +452,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$code_four=ATF::societe()->select($id_fournisseur,"code_fournisseur");
 
 		if(!$code_four){
-			throw new error("Il doit y avoir un code fournisseur pour ".ATF::societe()->nom($id_fournisseur),880);
+			throw new errorATF("Il doit y avoir un code fournisseur pour ".ATF::societe()->nom($id_fournisseur),880);
 			return false;
 		}
 
@@ -516,10 +516,10 @@ class bon_de_commande_cleodis extends bon_de_commande {
 //		
 //		//Si aucune affaire sélectionné
 //		if(!$affaire){
-//			throw new error(ATF::$usr->trans("parc_sans_".$type),879);
+//			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
 //		//Si c'est un avenant il ne peut y avoir qu'une affaire parente
 //		}elseif(count($return["affaire"])>1 && $type=="avenant"){
-//			throw new error(ATF::$usr->trans("une_affaire_par_avenant"),878);
+//			throw new errorATF(ATF::$usr->trans("une_affaire_par_avenant"),878);
 //		}else{
 //			return $return;
 //		}
@@ -549,7 +549,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			//On supprime l'élément correspondant à l'id_commande (car on ne garde que les id_bon_de_commande)
 			unset($infos_bon_de_commande_ligne[0]);
 		}else{
-			throw new error("Il faut sélectionner des lignes de bon de commande.",875);
+			throw new errorATF("Il faut sélectionner des lignes de bon de commande.",875);
 		}
 
 		$envoyerEmail = $infos["panel_courriel-checkbox"];

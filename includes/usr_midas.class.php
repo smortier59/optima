@@ -15,7 +15,7 @@ class usr_midas extends usr {
 	*/
 	public function login($infos) {
 		if($infos["schema"]!="midas"){
-			throw new error("Vous devez vous connecter avec la Société midas",883);
+			throw new errorATF("Vous devez vous connecter avec la Société midas",883);
 		}
 		return parent::login($infos);
 	}

@@ -115,7 +115,7 @@ class societe_boisethome extends societe {
 			}
 		} catch (error $e) {
 			ATF::db($this->db)->rollback_transaction();	
-			throw new error(ATF::$usr->trans("probleme_insertion",$this->table)." => ".$e->getMessage(),$e->getCode());
+			throw new errorATF(ATF::$usr->trans("probleme_insertion",$this->table)." => ".$e->getMessage(),$e->getCode());
 		}
 
 		ATF::db($this->db)->commit_transaction();
