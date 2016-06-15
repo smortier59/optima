@@ -1275,7 +1275,7 @@ class devis_absystech extends devis {
 				case "perdu":
 				case "annule":
 					$params = array('id_devis'=>$infos['id']);
-					$result = $this->$infos['action']($params);
+					$result = $this->{$infos['action']}($params);
 					if ($infos["raison"]) {
 						// Enregistre la raison
 						$params["cause_perdu"] = $infos["raison"];
