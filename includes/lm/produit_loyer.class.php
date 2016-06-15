@@ -11,21 +11,27 @@ class produit_loyer extends classes_optima {
 			$this->colonnes['fields_column'] = array( 
 			 'produit_loyer.duree'=>array("align"=>"right","suffix"=>"x")
 			,'produit_loyer.loyer'=>array("aggregate"=>array("min","max"),"renderer"=>"money")
-			,'produit_loyer.type'
+			,'produit_loyer.nature'
+			,'produit_loyer.ordre'
+			,'produit_loyer.periodicite'
 		);
 
 		$this->colonnes['primary'] = array(
 			"duree"
 			,"loyer"
-			,"type"
+			,"nature"
 			,"id_produit"
+			,'ordre'
+			,'periodicite'
 		);
 		
 		$this->colonnes['bloquees']['insert'] =  array('id_produit');
 		$this->colonnes['ligne'] =  array( 	
 			"produit_loyer.loyer"
 			,"produit_loyer.duree"
-			,"produit_loyer.type"
+			,"produit_loyer.nature"
+			,"produit_loyer.ordre"
+			,"produit_loyer.periodicite"
 		);
 				
 		$this->fieldstructure();	
