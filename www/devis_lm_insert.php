@@ -97,9 +97,9 @@ if($infos["id_societe"]){
 
             foreach ($l as $kl => $vl) {
                 if($qte = $infos["panier"]["product"][$value["id_produit"]]["quantite"]){
-                    $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = ($vl["loyer"]*$value["tva_loyer"]);
+                    $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2);
                     $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
-                    $loyers["loyer"][$vl["ordre"]]["loyer"] += (($vl["loyer"]*$value["tva_loyer"])*$qte);
+                    $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2)*$qte);
                     $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
                    
                 }

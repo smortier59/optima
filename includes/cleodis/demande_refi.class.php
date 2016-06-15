@@ -301,7 +301,7 @@ class demande_refi extends classes_optima {
 
 				$mail = new mail(array(
 							"optima_url"=>ATF::permalink()->getURL(ATF::affaire()->createPermalink($infos['id_affaire'])),
-							"recipient"=>"frederique.randoux@cleodis.fr,terence.delattre@cleodis.fr,".$resp_societe,
+							"recipient"=>"frederique.randoux@cleodis.com,terence.delattre@cleodis.com,".$resp_societe,
 							"objet"=>"Suivi Refinancement de la part de ".ATF::user()->nom(ATF::$usr->getID()),
 							"template"=>"suivi",
 							"id_user"=>ATF::$usr->getID(),
