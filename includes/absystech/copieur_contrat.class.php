@@ -89,7 +89,7 @@ class copieur_contrat extends classes_optima {
 		$this->check_field($infos);
 
 		if(!$infos_ligne){
-			throw new error(ATF::$usr->trans("copieur_contrat_ligne_inexistant"),50);
+			throw new errorATF(ATF::$usr->trans("copieur_contrat_ligne_inexistant"),50);
 		}
 
 		ATF::db($this->db)->begin_transaction();
@@ -152,7 +152,7 @@ class copieur_contrat extends classes_optima {
 		$this->infoCollapse($infos);
 
 		if(!$infos_ligne){
-			throw new error(ATF::$usr->trans("copieur_contrat_ligne_inexistant"),50);
+			throw new errorATF(ATF::$usr->trans("copieur_contrat_ligne_inexistant"),50);
 		}
 
 		ATF::db($this->db)->begin_transaction();
@@ -281,13 +281,13 @@ class copieur_contrat extends classes_optima {
 	public function can_update($id,$infos=false){
 		if($el=$this->select($id)){			
 			if(ATF::societe()->estFermee($el["id_societe"])){			
-				throw new error(ATF::$usr->trans("Impossible de modifier un contrat car la société est inactive"));
+				throw new errorATF(ATF::$usr->trans("Impossible de modifier un contrat car la société est inactive"));
 			}
 			log::logger($el,"qjanon");
 			//Si l'état est gagné on ne peut le modifier uniquement s'il n'y a plus d'affaire et qu'elle n'est pas annulée
 			log::logger($el["etat"],"qjanon");
 			if(!$el["etat"] || $el["etat"]!="en_attente"){
-				throw new error("Vous ne pouvez modifier un contrat que si celui ci est en cours",892);
+				throw new errorATF("Vous ne pouvez modifier un contrat que si celui ci est en cours",892);
 			}else{
 				return true;
 			}

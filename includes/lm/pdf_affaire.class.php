@@ -164,7 +164,7 @@ class pdf_affaire extends classes_optima {
 			//$this->update(array("id_scanner" => $infos["id_scanner"] , "transfert" => $infos["transfert"]." (ref : ".$infos["reference"].")"));
 		}else{
 			$module = explode("-", $infos["transfert"]);
-			throw new Error("Il n'y a pas de ".$module[0]." ayant la référence ".$infos["reference"]);
+			throw new errorATF("Il n'y a pas de ".$module[0]." ayant la référence ".$infos["reference"]);
 		}		
 	}
 };

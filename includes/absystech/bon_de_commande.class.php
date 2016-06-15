@@ -119,7 +119,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 		
 		
 		if($infos["bon_de_commande"]["id_fournisseurFinal"] == NULL){
-			throw new error("Il faut un fournisseur pour le bon de commande");
+			throw new errorATF("Il faut un fournisseur pour le bon de commande");
 		}
 		$infos["bon_de_commande"]["id_fournisseur"] = $infos["bon_de_commande"]["id_fournisseurFinal"];
 		$infos["label_bon_de_commande"]["id_fournisseur"] = $infos["label_bon_de_commande"]["id_fournisseurFinal"];
@@ -200,14 +200,14 @@ class bon_de_commande_absystech extends bon_de_commande{
 					//Pas encore de commande pour celui la
 					if($item["quantite"] > $quantiteDepart["quantite"]){
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Quantité saisie ".$item["quantite"]. " alors que la quantité max pour le produit ref : ".$item["ref"]. " est de ".$quantiteDepart["quantite"]);
+						throw new errorATF("Quantité saisie ".$item["quantite"]. " alors que la quantité max pour le produit ref : ".$item["ref"]. " est de ".$quantiteDepart["quantite"]);
 					}								
 				}else{
 					//Deja des commandes concernant ce produit pour cette affaire
 					$total = $quantiteRecu + $item["quantite"]; 
 					if($total > $quantiteDepart["quantite"]){
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Quantité saisie ".$item["quantite"]." + quantite déja commandée ".$quantiteRecu." = ".$total." alors que la quantité max pour le produit ref : ".$item["ref"]. " est de ".$quantiteDepart["quantite"]);
+						throw new errorATF("Quantité saisie ".$item["quantite"]." + quantite déja commandée ".$quantiteRecu." = ".$total." alors que la quantité max pour le produit ref : ".$item["ref"]. " est de ".$quantiteDepart["quantite"]);
 					}				
 				}
 			}			
@@ -337,7 +337,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 		ATF::db()->begin_transaction();
 		if(!$id_bdc || !is_numeric($id_bdc)) {
 			ATF::db()->rollback_transaction();
-			throw new error(ATF::$usr->trans("error_setCompleted"));
+			throw new errorATF(ATF::$usr->trans("error_setCompleted"));
 		}
 		
 		//Traitement des lignes de bon de commande

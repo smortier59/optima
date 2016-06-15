@@ -195,10 +195,10 @@ class pa extends attributs {
       
 	function duplicate($infos,&$s,$files=NULL,&$cadre_refreshed) {
 		if (!$infos['id_attr']) {
-			throw new error(ATF::$usr->trans($this->table,'module')." - ".ATF::$usr->trans("Pas_d_id_attr_transmis",$this->table));
+			throw new errorATF(ATF::$usr->trans($this->table,'module')." - ".ATF::$usr->trans("Pas_d_id_attr_transmis",$this->table));
 		}
 		if (!$infos['id_pa']) {
-			throw new error("Fonction ".ATF::$usr->trans($this->table,'module')."::Duplicate() - ".ATF::$usr->trans("Pas_d_id_pa_transmis",$this->table));
+			throw new errorATF("Fonction ".ATF::$usr->trans($this->table,'module')."::Duplicate() - ".ATF::$usr->trans("Pas_d_id_pa_transmis",$this->table));
 		}
 		ATF::db($this->db)->autocommit(false);
 		$attr_old = ATF::attr()->select($infos['id_attr']);
@@ -241,7 +241,7 @@ class pa extends attributs {
 
 		if(!$affectedRows) {
 			ATF::db($this->db)->rollback();
-			throw new error("Fonction ".ATF::$usr->trans($this->table,'module')."::Duplicate() - ".ATF::$usr->trans("liaison_nouvel_attr_NOK",$this->table));
+			throw new errorATF("Fonction ".ATF::$usr->trans($this->table,'module')."::Duplicate() - ".ATF::$usr->trans("liaison_nouvel_attr_NOK",$this->table));
 		}
 		
 		ATF::db($this->db)->autocommit(true);
@@ -266,10 +266,10 @@ class pa extends attributs {
     */   
 	public function childs2PA($infos,&$s,$files=NULL,&$cadre_refreshed) {
 		if (!$infos['id_attr']) {
-			throw new error(ATF::$usr->trans($this->table,'module')." - ".ATF::$usr->trans("Pas_d_id_attr_transmis",$this->table));
+			throw new errorATF(ATF::$usr->trans($this->table,'module')." - ".ATF::$usr->trans("Pas_d_id_attr_transmis",$this->table));
 		}
 		if (!$infos['id_pa']) {
-			throw new error("Fonction ".ATF::$usr->trans($this->table,'module')."::Duplicate() - ".ATF::$usr->trans("Pas_d_id_pa_transmis",$this->table));
+			throw new errorATF("Fonction ".ATF::$usr->trans($this->table,'module')."::Duplicate() - ".ATF::$usr->trans("Pas_d_id_pa_transmis",$this->table));
 		}
 		ATF::db($this->db)->autocommit(false);
 		$attr_old = ATF::attr()->select($infos['id_attr']);

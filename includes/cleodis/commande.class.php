@@ -274,7 +274,7 @@ class commande_cleodis extends commande {
 		$this->q->reset()->addCondition("ref",ATF::affaire()->select($infos["id_affaire"],"ref"))->setCount();
 		$countRef=$this->sa();
 		if($countRef["count"]>0){
-			throw new error("Cette Ref de commande existe déjà !",878);
+			throw new errorATF("Cette Ref de commande existe déjà !",878);
 		}
 		$infos["ref"]=ATF::affaire()->select($infos["id_affaire"],"ref");
 		$infos["etat"]="non_loyer";
@@ -347,7 +347,7 @@ class commande_cleodis extends commande {
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Commande sans produits",877);
+			throw new errorATF("Commande sans produits",877);
 		}
 		
 		////////////////Devis
@@ -410,7 +410,7 @@ class commande_cleodis extends commande {
 				//Il ne faut pas que la date début soit un 29 30 ou 31 car sinon cela pause problème lors de la création de l'échéancier
 				if($infos['key']=="date_debut"){					
 					if(date("d",strtotime($infos['value']))=="29" || date("d",strtotime($infos['value']))=="30" || date("d",strtotime($infos['value']))=="31"){
-						throw new error("Un contrat ne peut pas avoir pour ".ATF::$usr->trans($infos['key'],$this->table)." une 29, 30, 31 (ici ".date("d",strtotime($infos['value'])).")",880);
+						throw new errorATF("Un contrat ne peut pas avoir pour ".ATF::$usr->trans($infos['key'],$this->table)." une 29, 30, 31 (ici ".date("d",strtotime($infos['value'])).")",880);
 					}
 					ATF::devis()->u(array("id_devis"=> $this->select($infos['id_commande'] , "id_devis"), "date_accord"=>date("Y-m-d")));
 
@@ -500,7 +500,7 @@ class commande_cleodis extends commande {
 				break;
 
 			default:
-				throw new error("date_invalide",987);
+				throw new errorATF("date_invalide",987);
 		}
 
 		if($infos["table"]!="commande"){
@@ -520,7 +520,7 @@ class commande_cleodis extends commande {
 //		$commande = $this->select($infos['id_commande']);
 //		//Il faut une date de de résiliation pour insérer une date de restitution
 //		if($infos['value'] == 'undefined' && ($commande["date_restitution"] || $commande["date_restitution_effective"])){
-//			throw new error("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
+//			throw new errorATF("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
 //		}else{
 //			return parent::updateDate($infos);
 //		}
@@ -535,9 +535,9 @@ class commande_cleodis extends commande {
 //		$commande = $this->select($infos['id_commande']);
 //		//Il faut une date de de résiliation pour insérer une date de restitution
 //		if($infos['value'] != 'undefined' && !$commande["date_resiliation"]){
-//			throw new error("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
+//			throw new errorATF("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
 //		}elseif($infos['value'] == 'undefined' && $commande["date_restitution_effective"]){
-//			throw new error("Impossible de supprimer la date de résiliation si la restitution est effective",883);
+//			throw new errorATF("Impossible de supprimer la date de résiliation si la restitution est effective",883);
 //		}else{
 //			return parent::updateDate($infos);
 //		}
@@ -565,7 +565,7 @@ class commande_cleodis extends commande {
 			$this->q->reset()->Where("id_affaire",$affaire->get("id_fille"))->setDimension("row");
 			$commandeAR=$this->sa();
 			if($commandeAR["date_debut"] || $commandeAR["date_evolution"]){
-				throw new error("On ne peut pas modifier/supprimer car l'affaire est Annulée et Remplacée, il faut d'abord supprimer les dates de l'AR (".ATF::affaire()->select($affaire->get("id_fille"),"ref").")",877);
+				throw new errorATF("On ne peut pas modifier/supprimer car l'affaire est Annulée et Remplacée, il faut d'abord supprimer les dates de l'AR (".ATF::affaire()->select($affaire->get("id_fille"),"ref").")",877);
 			}
 		}
 	}
@@ -576,13 +576,13 @@ class commande_cleodis extends commande {
     */   	
 	public function checkUpdateAVT($affaireEnfant){
 		if($affaireEnfant["nature"]=="vente"){
-			throw new error("On ne peut pas modifier/supprimer car des produits de cette affaire sont vendus dans l'affaire (".$affaireEnfant["ref"].")",875);
+			throw new errorATF("On ne peut pas modifier/supprimer car des produits de cette affaire sont vendus dans l'affaire (".$affaireEnfant["ref"].")",875);
 		}elseif($affaireEnfant["nature"]=="avenant"){
 			$this->q->reset()->Where("id_affaire",$affaireEnfant["id_affaire"])->setDimension("row");
 			$commandeAvenant=$this->sa();
 			//On ne peut pas modifier les dates d'une affaire parente tant que l'affaire avenant a une date_debut ou une date_fin (l'utilisateur doit d'abord supprimer les dates de l'avenant)
 			if($commandeAvenant["date_debut"] || $commandeAvenant["date_evolution"]){
-				throw new error("On ne peut pas modifier/supprimer car l'affaire a un avenant, il faut d'abord supprimer les dates de l'avenant (".$affaireEnfant["ref"].")",876);
+				throw new errorATF("On ne peut pas modifier/supprimer car l'affaire a un avenant, il faut d'abord supprimer les dates de l'avenant (".$affaireEnfant["ref"].")",876);
 			}
 		}
 	}
@@ -801,7 +801,7 @@ class commande_cleodis extends commande {
 						ATF::suivi()->insert($suivi);
 					}
 				}else{					
-					throw new Error("Il est impossible d'inserer une date de restitution effective nulle");
+					throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
 				}	
 				//}
 			break;
@@ -984,11 +984,11 @@ class commande_cleodis extends commande {
 								  ->addCondition("type_facture","ap","AND",false,"!=");
 		
 		if(ATF::facture()->sa()){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
 		}
 		
 		if($this->select($id,"etat")!="non_loyer"){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
 		}
 		
 		// On ne peut pas supprimer un contrat qui a des matériels "actifs"
@@ -997,7 +997,7 @@ class commande_cleodis extends commande {
 			->where("existence","actif")
 			->setCountOnly();
 		if (ATF::parc()->sa()>0) {
-			throw new error("On ne peut pas supprimer un contrat qui a des matériels 'actifs'",84513);
+			throw new errorATF("On ne peut pas supprimer un contrat qui a des matériels 'actifs'",84513);
 		}			
 		
 		return true;

@@ -58,7 +58,7 @@ class audit_cap extends audit {
 		if($this->select($id,"etat")=="attente"){
 			return true;
 		}else{
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false; 
 		}
 	}
@@ -183,7 +183,7 @@ class audit_cap extends audit {
 			$this->redirection("select_all",NULL,"audit.html");
 			return true; 
 		}else{	
-			throw new error("Impossible de passer un audit gagnée en 'perdu'",899);
+			throw new errorATF("Impossible de passer un audit gagnée en 'perdu'",899);
 		}
 	}
 

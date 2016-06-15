@@ -221,7 +221,7 @@ class emailing_liste extends emailing {
 		
 		//Si on la liste est fermée
 		if ($sel['etat']=='close') {
-			throw new error(ATF::$usr->trans("impossible_modifer_liste_close",$this->table),8822);
+			throw new errorATF(ATF::$usr->trans("impossible_modifer_liste_close",$this->table),8822);
 		}
 		return true;
 	}

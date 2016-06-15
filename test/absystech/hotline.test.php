@@ -3500,7 +3500,7 @@ class hotlineTU extends hotline {
 class hotlineTUbis extends hotline {	
 	public function update($infos){
 		echo "Exception";
-		throw new error();
+		throw new errorATF();
 	}
 }
 

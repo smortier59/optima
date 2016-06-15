@@ -134,13 +134,13 @@ class pack_produit extends classes_optima {
 				$item["id_pack_produit"]=$last_id;
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Ligne de pack_produit sans fournisseur",882);
+					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
 				}				
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("pack_produit sans produits",877);
+			throw new errorATF("pack_produit sans produits",877);
 		}		
 		ATF::db($this->db)->commit_transaction();
 
@@ -215,13 +215,13 @@ class pack_produit extends classes_optima {
 				$item["id_pack_produit"]=$last_id;
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Ligne de pack_produit sans fournisseur",882);
+					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
 				}				
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("pack_produit sans produits",877);
+			throw new errorATF("pack_produit sans produits",877);
 		}		
 		ATF::db($this->db)->commit_transaction();
 

@@ -517,7 +517,7 @@ class devis_absystech extends devis {
 	public function can_update($id,$infos=false){
 		if($devis=$this->select($id)){			
 			if(ATF::societe()->estFermee($devis["id_societe"])){			
-				throw new error(ATF::$usr->trans("Impossible de modifier un devis car la société est inactive"));
+				throw new errorATF(ATF::$usr->trans("Impossible de modifier un devis car la société est inactive"));
 			}
 			
 			ATF::commande()->q->reset()
@@ -528,7 +528,7 @@ class devis_absystech extends devis {
 
 			//Si l'état est gagné on ne peut le modifier uniquement s'il n'y a plus d'affaire et qu'elle n'est pas annulée
 			if(!$devis["etat"] || ($devis["etat"]=="gagne" && $commande && $commande["etat"]!="annulee")){
-				throw new error("Il est impossible de modifier un devis gagné ou un devis qui a une commande",892);
+				throw new errorATF("Il est impossible de modifier un devis gagné ou un devis qui a une commande",892);
 			}else{
 				return true;
 			}
@@ -612,7 +612,7 @@ class devis_absystech extends devis {
 		
 		unset($infos["devis"]["financement_mois"] , $infos["devis"]["marge_financement"]);	
 		if(ATF::societe()->estFermee($infos["devis"]["id_societe"])){			
-			throw new error(ATF::$usr->trans("Impossible d'ajouter un devis car la société est inactive"));
+			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter un devis car la société est inactive"));
 		}		
 		
 		if($infos["label_devis"]["id_politesse_post"] && !$infos["devis"]["id_politesse_post"]){
@@ -694,11 +694,11 @@ class devis_absystech extends devis {
 		$this->check_field($infos);
 
 		if(!$infos_ligne && $infos["type_devis"] != "consommable"){
-			throw new error(ATF::$usr->trans("devis_ligne_inexistant"));
+			throw new errorATF(ATF::$usr->trans("devis_ligne_inexistant"));
 		}
 
 		if(!$consommables && $infos["type_devis"] == "consommable"){
-			throw new error(ATF::$usr->trans("devis_ligne_consommable_inexistant"));
+			throw new errorATF(ATF::$usr->trans("devis_ligne_consommable_inexistant"));
 		}
 
 		//Limite sur les montants selon les profils
@@ -804,11 +804,11 @@ class devis_absystech extends devis {
 
 				if(!isset($item["index_nb"])){ 
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("index_nb_inexistant"));
+					throw new errorATF(ATF::$usr->trans("index_nb_inexistant"));
 				}
 				if(!isset($item["index_couleur"])){ 
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("index_couleur_inexistant"));
+					throw new errorATF(ATF::$usr->trans("index_couleur_inexistant"));
 				}
 				
 				ATF::devis_ligne()->insert($item,$s);
@@ -971,7 +971,7 @@ class devis_absystech extends devis {
 
 		if(!ATF::user()->select($devis["id_user"],"email")){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas d'email pour ce contact");
+			throw new errorATF("Il n'y a pas d'email pour ce contact");
 		}else{
 			$recipient = ATF::user()->select($devis["id_user"],"email");
 		}
@@ -1152,7 +1152,7 @@ class devis_absystech extends devis {
 	//	*/
 	//	public function getCurrentMail(){
 	//		//Current mail
-	//		if(!$this->current_mail) throw new error(ATF::$usr->trans("null_current_mail",$this->table));
+	//		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 	//		return $this->current_mail;
 	//	}
 	//
@@ -1331,7 +1331,7 @@ class devis_absystech extends devis {
 		
 		if (!$recipient) {
 			if (ATF::db($this->db)->isTransaction()) ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas d'email pour ce contact",1054);
+			throw new errorATF("Il n'y a pas d'email pour ce contact",1054);
 		}
 
 		$mail = array(
@@ -1355,7 +1355,7 @@ class devis_absystech extends devis {
 			$res = $zip->open($pathAnnexe);
 			if ($res !== TRUE) {
 				if (ATF::db($this->db)->isTransaction()) ATF::db($this->db)->rollback_transaction();
-				throw new error("Ouverture du ZIP (".$pathAnnexe.") Impossible, res = ".$res,501);	
+				throw new errorATF("Ouverture du ZIP (".$pathAnnexe.") Impossible, res = ".$res,501);	
 			}
 			
 			$dossierTempToExtract = "/tmp/".ATF::$codename."_".$this->table."_tempZip".$id_devis."/";

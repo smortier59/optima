@@ -149,7 +149,7 @@ class tache extends classes_optima {
 			} catch(error $e) {
 				ATF::db($this->db)->rollback_transaction();
 				$e->setError();
-				throw new error('Erreur Insert');
+				throw new errorATF('Erreur Insert');
 			}
 		}
 		
@@ -227,7 +227,7 @@ class tache extends classes_optima {
 				} catch(error $e) {
 					ATF::db($this->db)->rollback_transaction();
 					$e->setError();
-					throw new error('Erreur Insert');
+					throw new errorATF('Erreur Insert');
 				}
 			}
 			//suppression de ceux qui ont été déselectionnés
@@ -470,7 +470,7 @@ class tache extends classes_optima {
 		if (!$infos['id_tache']) return false;
 		$dest = self::infos_dest($infos['id_tache']);
 		if (count($dest)===1) {
-			throw new error("Vous êtes le seul sur cette tâche, impossible de vous retirer, veuillez l'annulé",402);
+			throw new errorATF("Vous êtes le seul sur cette tâche, impossible de vous retirer, veuillez l'annulé",402);
 		}
 		
 		ATF::tache_user()->q->reset()->addField('id_tache_user')->where("id_tache",$infos['id_tache'])->where('id_user',ATF::$usr->getId());

@@ -249,7 +249,7 @@ class societe_lm extends societe {
 			//On check si le siret existe déja
 			$this->q->reset()->where("siret",$infos["societe"]["siret"]);
 			if($this->select_all()){
-				throw new error("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
+				throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
 			}
 		}
 

@@ -313,7 +313,7 @@ class devis_boisethome extends devis {
 		//Si c'est une insertion et non pas un update
 		if(!$infos["ref"]){
 			if ($infos["nature"]=="avenant") {
-				throw new error("Un avenant ne peut être la première révision d'un devis !");
+				throw new errorATF("Un avenant ne peut être la première révision d'un devis !");
 			}
 			$infos["ref"] = ATF::affaire()->getRef($infos["date"],"devis");
 		}
@@ -327,7 +327,7 @@ class devis_boisethome extends devis {
 		$this->check_field($infos);
 
 		if(!$articles){
-			throw new error(ATF::$usr->trans("Pas d'articles ?"));
+			throw new errorATF(ATF::$usr->trans("Pas d'articles ?"));
 		}
 
 		ATF::db($this->db)->begin_transaction();
@@ -422,11 +422,11 @@ class devis_boisethome extends devis {
 				}
 			}
 		} catch (Exception $e) {
-			throw new error($e->getMessage() . " (".print_r($lot,true)." / ".print_r($produit,true)." / ".print_r($article,true).")");
+			throw new errorATF($e->getMessage() . " (".print_r($lot,true)." / ".print_r($produit,true)." / ".print_r($article,true).")");
 		}
 
 		if ($total_echeancier!=100) {
-			throw new error("La somme des pourcentage à payer en fin des lots doit faire au total 100% !");
+			throw new errorATF("La somme des pourcentage à payer en fin des lots doit faire au total 100% !");
 		}
 
 		$this->u(array(

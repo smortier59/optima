@@ -239,7 +239,7 @@ class emailing_projet extends emailing {
 			ATF::$cr->block('top');
 			ATF::$cr->block('generationTime');
 		}catch(error $e){
-			throw new error(ATF::$usr->trans("envoi_mail_NOK",$this->table));
+			throw new errorATF(ATF::$usr->trans("envoi_mail_NOK",$this->table));
 		}
 	}
 	

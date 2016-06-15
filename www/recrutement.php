@@ -17,11 +17,11 @@
       // Check des fichiers joints
       if (!is_array($_FILES["photo_identite"]) || $_FILES["photo_identite"]['error'] || !$_FILES["photo_identite"]['size']) {
         $pi_valid = false;
-        throw new error("Photo d'identité incompatible.",8002);
+        throw new errorATF("Photo d'identité incompatible.",8002);
       }    
       if (!is_array($_FILES["photo_pleine"]) || $_FILES["photo_pleine"]['error'] || !$_FILES["photo_pleine"]['size']) {
         $pp_valid = false;
-        throw new error("Photo plein pied incompatible.",8001);
+        throw new errorATF("Photo plein pied incompatible.",8001);
       }
 
       if ($pi_valid && $pp_valid) {

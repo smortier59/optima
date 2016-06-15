@@ -278,7 +278,7 @@ class affaire_lm extends affaire {
 					case "date_installation_reel":
 						$devis = $affaire->getDevis();
 						if (!$devis) {
-							throw new error("aucun_devis_trouve",856);
+							throw new errorATF("aucun_devis_trouve",856);
 						}
 						if($affaire->get("nature")!="avenant" && !$affaire->get("date_garantie")){
 							$affaire->set("date_garantie",$devis->getDateFinPrevue($infos['value']));
@@ -293,7 +293,7 @@ class affaire_lm extends affaire {
 					case "date_ouverture": break;
 						
 					default:
-						throw new error("date_invalide",988);
+						throw new errorATF("date_invalide",988);
 				}				
 				$affaire->set($infos["field"], $infos["value"]?date("Y-m-d",strtotime($infos["value"])):NULL);
 				$affaire->majForecastProcess();
@@ -363,7 +363,7 @@ class affaire_lm extends affaire {
 					$affaire->set($infos["field"],$infos['value']);					
 					break;
 				default:
-					throw new error("Problème modification",987);
+					throw new errorATF("Problème modification",987);
 			}
 			
 		} catch(error $e) {
@@ -983,13 +983,13 @@ class affaire_lm extends affaire {
 		}elseif($enregistrement["id_contact"]){
 			if(!ATF::contact()->select($enregistrement["id_contact"],"email")){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
+				throw new errorATF("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
 			}else{
 				$recipient = ATF::contact()->select($enregistrement["id_contact"],"email");
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas d'email",350);
+			throw new errorATF("Il n'y a pas d'email",350);
 		}
 
 		if(ATF::$usr->getID()){
