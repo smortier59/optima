@@ -26,7 +26,7 @@ class scanner_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try{
 			$this->obj->transfert($infos);
-		}catch(error $e){
+		}catch(errorATF $e){
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Il n'y a pas de Devis  ayant la référence test", $error, "1 - Error Ref inconnue");		

@@ -238,7 +238,7 @@ class emailing_projet extends emailing {
 			ATF::$msg->addNotice(ATF::$usr->trans("mail_envoye",$this->table),ATF::$usr->trans("success"),3);
 			ATF::$cr->block('top');
 			ATF::$cr->block('generationTime');
-		}catch(error $e){
+		}catch(errorATF $e){
 			throw new errorATF(ATF::$usr->trans("envoi_mail_NOK",$this->table));
 		}
 	}

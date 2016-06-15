@@ -161,7 +161,7 @@ class stock_etat_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 				,"id_stock_etat" => $etat['id_stock_etat']
 				,"date" => "2000-01-01 00:00:00"
 			));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$errno = $e->getCode();
 		}
 		$this->assertEquals(20974,$errno,"erreur modif non trouvee");
@@ -173,7 +173,7 @@ class stock_etat_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 				,"id_stock" => $etat['id_stock']
 				,"date" => "2000-01-01 00:00:00"
 			));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$errno = $e->getCode();
 		}
 		$this->assertEquals(20973,$errno,"erreur modif non trouvee");

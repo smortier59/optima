@@ -19,7 +19,7 @@ if (ATF::$codename == "absystech") {
 echo "\n...vérification des imports pour ".$_SERVER["argv"][1]."...";
 try {
 	$retour=ATF::importer()->importMassif();
-} catch (error $e) {
+} catch (errorATF $e) {
 	echo $e->getMessage();
 
 	$retour = "Une erreur s'est déclenchée";

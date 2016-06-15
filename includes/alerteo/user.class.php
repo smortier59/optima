@@ -14,7 +14,7 @@ class user_alerteo extends user {
 		
 		try {
 			$this->fieldstructure();	/*		log::logger($this->colonnes['fields_column'],'qjanon');	*///		$this->tables_de_jointure = array("domaine");
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			// Si pas de table user, impossible de se logger, mais on va créer un "user::$logged=false"
 		}
 	}

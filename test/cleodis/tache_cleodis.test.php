@@ -30,7 +30,7 @@ class tache_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos=array('tache'=>array("id_suivi"=>$id_suivi,"tache"=>"tac lol","horaire_debut"=>date("Y-m-d"),"horaire_fin"=>date("Y-m-d") ,"type_tache"=> "demande_comite"), "dest" =>"blabla");
 		try{
 			$id_tache=$this->obj->insert($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		

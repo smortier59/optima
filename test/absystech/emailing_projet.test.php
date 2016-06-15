@@ -154,7 +154,7 @@ class emailing_projet_test extends emailing_test {
 		);
 		try {
 			$this->obj->send($params);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$this->assertNotNull($e->getMessage(),"Le throw ne s'est pas déclenché, couille dans le paté !");
 		}
 		
@@ -188,7 +188,7 @@ class emailing_projet_test extends emailing_test {
 			imap_expunge($mbox);
 			imap_close($mbox);
 			$this->assertNotEquals(0,$counter,"Erreur : Il n'a  trouvé aucun mail ");
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			throw new errorATF("Erreur imap_open : ".imap_last_error(),801);
 		}
 

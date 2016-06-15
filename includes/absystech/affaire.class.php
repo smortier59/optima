@@ -569,7 +569,7 @@ class affaire_absystech extends affaire {
 				);
 				$id_suivi = ATF::suivi()->insert($suivi);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;	
 		}

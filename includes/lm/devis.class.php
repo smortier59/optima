@@ -406,7 +406,7 @@ class devis_lm extends devis {
 			if($infos["type_contrat"]=="vente"){
 				$this->vente($infos_ligne_repris,$infos_vente["affaire"],$infos['id_affaire']);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}

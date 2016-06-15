@@ -54,7 +54,7 @@ try {
 	
 	ATF::db()->commit_transaction(true);
 	echo "N'OUBLIEZ PAS DE SUPPRIMER LA ".strtoupper($_SERVER["argv"][2])." manuellement.\n";
-} catch (error $e) {
+} catch (errorATF $e) {
 	ATF::db()->rollback_transaction(true);
 	throw $e;
 }

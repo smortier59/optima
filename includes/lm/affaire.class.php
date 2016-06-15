@@ -306,7 +306,7 @@ class affaire_lm extends affaire {
 		
 				return true;
 				
-			} catch(error $e) {
+			} catch(errorATF $e) {
 				//On commit le tout
 				ATF::db($this->db)->rollback_transaction();
 				throw $e;
@@ -366,7 +366,7 @@ class affaire_lm extends affaire {
 					throw new errorATF("Problème modification",987);
 			}
 			
-		} catch(error $e) {
+		} catch(errorATF $e) {
 			//On commit le tout
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;

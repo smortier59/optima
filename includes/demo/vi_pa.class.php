@@ -349,7 +349,7 @@ class vi_pa extends classes_optima {
 						}
 					}
 				}
-			} catch (error $e) {
+			} catch (errorATF $e) {
 				$e->setError($e);
 				throw new errorATF(__CLASS__."::".__FUNCTION__." pb attribut dans PA :".log::arrayToString($reponse));
 			}
@@ -1541,7 +1541,7 @@ class vi_pa extends classes_optima {
 			try{
 				//echo "====V".$id_visite."====A".$i['id_attr']."====PPA".($i['id_pa']?$i['id_pa']:$infos['id_pa'])."====PA".$i['id_pa']."====M".$infos['id_vi_pa_multi']."====D".$dateMax."====\n";
 				$vi_pa=ATF::vi_pa()->isAnswered($id_visite,$i['id_attr'],$i['id_pa']?$i['id_pa']:$infos['id_pa'],$i['id_pa'],$infos['id_vi_pa_multi'],$dateMax);
-			} catch(error $e) { }
+			} catch(errorATF $e) { }
 			if ((!$reponse || ($vi_pa && strtotime($reponse['date'])<strtotime($vi_pa['date']))) && $vi_pa['reponse']) {
 				$reponse = $vi_pa;
 			}

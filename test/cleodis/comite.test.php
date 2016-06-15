@@ -77,7 +77,7 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_update(38);
-		} catch (Error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Impossible de modifier/supprimer ce Comité car il n'est plus en 'En attente'", $error, "Can_update 2 error");

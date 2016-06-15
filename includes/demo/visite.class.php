@@ -286,7 +286,7 @@ class visite extends classes_optima {
 						$current = ATF::pa()->select($o['id_pa']);
 						//try{
 							$currentVIPA = ATF::vi_pa()->isAnswered($id_visite,$current['id_attr'],$current['id_pa'],$current['id_pa'],$o['id_vi_pa_multi']);
-						//} catch(error $e) { }
+						//} catch(errorATF $e) { }
 						
 						//Récupération du coût associé s'il existe
 						if (ATF::pa()->hasCout($current['id_pa']) || ATF::pa()->getRegle($current['id_pa']) && $currentVIPA['id_vi_pa']) {
@@ -709,7 +709,7 @@ class visite extends classes_optima {
 			fpassthru($fh);
 			unlink($fname);
 		
-		}catch(error $e){
+		}catch(errorATF $e){
 			print_r($e->getMessage()."<br /><br />".utf8_decode("Signalez cette erreur à votre administrateur de projet (bien préciser la visite concernée)"));
 			die();
 		}

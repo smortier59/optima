@@ -462,7 +462,7 @@ class hotline_interaction extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice
 				ATF::hotline()->createMailNotice("hotline_interaction_mail_to_contact");
-			}catch(error $e){
+			}catch(errorATF $e){
 				//Notice
 				//ATF::hotline()->createNotice("hotline_interaction_no_mail_to_contact");
 			}

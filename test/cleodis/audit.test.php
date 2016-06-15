@@ -79,7 +79,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$c->can_update($id);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->RollBackTransaction("cleodis");
@@ -147,7 +147,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$c->perdu(array("id_audit"=>$id));
-		}catch(error $e){
+		}catch(errorATF $e){
 			$erreur = $e->getMessage();
 		}
 

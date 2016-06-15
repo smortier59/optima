@@ -26,7 +26,7 @@ include(dirname(__FILE__)."/../../global.inc.php");
 //try {
 ////	log::logger(ATF::stock()->q,"amaitre");
 //	ATF::db()->update(ATF::stock());
-//} catch (error $e) {
+//} catch (errorATF $e) {
 //	throw $e;
 //}
 
@@ -113,7 +113,7 @@ foreach ($db as $k=>$i) {	//Parcours de la table
 					$result_img = $xml->xpath('body/table[@class="mainTable"]/tr/td/table/tr/td/form/table/tr/td/table/tr/td[@class="image"]/table/tr/td/a/img');
 					// Récupération des données mais cette fois ci, grâce a l'xpath de l'url de l'image
 					}
-				catch (error $e) {
+				catch (errorATF $e) {
 						throw $e;	
 				}
 				if ($result_img[0]["src"] != false) {

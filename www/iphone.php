@@ -71,7 +71,7 @@ try{
 	}
 	
 	die(json_encode(array("nosession"=>true)));
-}catch(error $e){
+}catch(errorATF $e){
 	log::logger("ERROR : ".$e->getMessage(),'qjanon');
 //      $e->setError();
 }
