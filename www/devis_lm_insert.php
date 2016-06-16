@@ -203,7 +203,8 @@ if($infos["id_societe"]){
                 "prix" => $prix,//somme des loyers * duree
                 //"marge_absolue" => 0, //prix - prix_achat
                 //"marge" => 0, //?
-                "etat"=>"pending"
+                "etat"=>"pending",
+                "from_web"=>true
             );
             $data = array("commande"=>$commande, "values_commande"=>$values_commande);
 

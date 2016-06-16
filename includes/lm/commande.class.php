@@ -233,10 +233,16 @@ class commande_lm extends commande {
 
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
+
 		unset($infos["values_".$this->table]["produits"]);
 		
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
+
+		if($infos["from_web"]){
+			$from_web = true;
+			unset($infos["from_web"]);
+		}
 
 		//Gestion mail
 		if($envoyerEmail){
@@ -290,8 +296,7 @@ class commande_lm extends commande {
 		
 
 		// Mise à jour du forecast
-		if(ATF::$codename == "lmbe") $affaire = new affaire_lmbe($infos['id_affaire']);
-		else $affaire = new affaire_lm($infos['id_affaire']);
+		$affaire = new affaire_lm($infos['id_affaire']);
 		
 		$affaire->majForecastProcess();
 
@@ -303,25 +308,54 @@ class commande_lm extends commande {
 			}
 		}
 	
-
-		//Lignes visibles
-		if($infos_ligne){
-			$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"commande_ligne");
-			foreach($infos_ligne as $key=>$item){
-				if($item["id_commande_ligne"]){
-					$devis_ligne=ATF::devis_ligne()->select($item["id_commande_ligne"]);
-					$item["id_affaire_provenance"]=$devis_ligne["id_affaire_provenance"];
-					$item["serial"]=$devis_ligne["serial"];
-					$item["neuf"]=$devis_ligne["neuf"];
-					unset($item["id_commande_ligne"]);
+		if($from_web){
+			$infos_ligne = array();
+			ATF::devis_ligne()->q->reset()->where("id_devis",$infos["id_devis"]);
+			$infos_ligne = ATF::devis_ligne()->sa();
+			if($infos_ligne){	
+				foreach($infos_ligne as $key=>$item){										
+					unset($item["id_devis_ligne"],
+						  $item["id_devis"],
+						  $item["ref_simag"],
+						  $item["type"],
+						  $item["visibilite_prix"]
+						 );
+					
+					$item["id_commande"]=$last_id;
+					ATF::commande_ligne()->i($item);
 				}
-				$item["id_commande"]=$last_id;
-				ATF::commande_ligne()->i($item);
+			}else{
+				ATF::db($this->db)->rollback_transaction();
+				throw new error("Commande sans produits",877);
+			}			
+
+		}else{
+			//Lignes visibles
+			if($infos_ligne){
+				$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"commande_ligne");
+			
+				foreach($infos_ligne as $key=>$item){
+					if($item["id_commande_ligne"]){
+						$devis_ligne=ATF::devis_ligne()->select($item["id_commande_ligne"]);
+						$item["id_affaire_provenance"]=$devis_ligne["id_affaire_provenance"];
+						$item["serial"]=$devis_ligne["serial"];
+						$item["neuf"]=$devis_ligne["neuf"];
+						$item["id_fournisseur"]=$devis_ligne["id_fournisseur"];
+						unset($item["id_commande_ligne"]);
+					}
+					$item["id_commande"]=$last_id;
+					ATF::commande_ligne()->i($item);
+				}
+			}else{
+				ATF::db($this->db)->rollback_transaction();
+				throw new error("Commande sans produits",877);
 			}
+
 		}else{
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Commande sans produits",877);
 		}
+		
 		
 		////////////////Devis
 		$devis["etat"]="gagne";	
@@ -572,8 +606,7 @@ class commande_lm extends commande {
 	* @return bool
     */   	
 	public function checkAndUpdateDates($infos){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($infos['id_commande']);
-		else $commande = new commande_lm($infos['id_commande']);
+		$commande = new commande_lm($infos['id_commande']);
 		
 		$affaire = $commande->getAffaire();		
 		//On ne doit pas pouvoir modifier une commande Annulée et remplacée
@@ -1250,8 +1283,16 @@ class commande_lm extends commande {
 	* 	$infos[id_fournisseur]
     */ 
 	function getCommande_ligne(&$infos){
+		//log::logger($infos , "mfleurquin");
+
 		$id_commande=$this->decryptId($infos["id_commande"]);
 		$id_fournisseur=ATF::societe()->decryptId($infos["id_fournisseur"]);
+
+
+		//log::logger($id_commande , "mfleurquin");
+		//log::logger($id_fournisseur , "mfleurquin");
+
+
 		if ($id_commande && $id_fournisseur) {
 			$this->q->reset()->addCondition("id_commande",$id_commande);		
 			if($commandes=$this->sa()){
