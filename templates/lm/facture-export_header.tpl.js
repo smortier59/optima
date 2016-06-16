@@ -1,5 +1,4 @@
 {strip}
-
 { 
 	text: '{ATF::$usr->trans(export_tableau_autoportes,$current_class->name())}'
 	, handler: function(b,e){
@@ -22,6 +21,16 @@
 	text: '{ATF::$usr->trans(export_comptable_facture_rejet,$current_class->name())}'
 	, handler: function(b,e){
 		window.location='{$current_class->name()},export_special2.ajax,onglet={$pager}';
+	}
+} ,
+{ 
+	text: '<hr />'
+} ,
+
+{ 
+	text: '{ATF::$usr->trans(export_GL_LM,$current_class->name())}'
+	, handler: function(b,e){
+		window.location='{$current_class->name()},export_GL_LM.ajax,onglet={$pager}';
 	}
 } 
 {/strip}
