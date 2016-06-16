@@ -78,7 +78,7 @@ class produit_lm extends produit {
 
 		$this->fieldstructure();
 
-		$this->onglets = array('produit_loyer','produit_fournisseur');
+		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
 		//$this->field_nom = "%produit% (%id_pack_produit%)";
 				
 		$this->addPrivilege("setInfos","update");		

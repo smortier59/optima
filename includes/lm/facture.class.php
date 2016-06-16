@@ -110,6 +110,7 @@ class facture_lm extends facture {
 		$this->addPrivilege("getAllForRelance");
 		$this->addPrivilege("libreToNormale");
 		$this->addPrivilege("export_cegid");
+		$this->addPrivilege("export_GL_LM");
 
 		
 		
@@ -289,7 +290,7 @@ class facture_lm extends facture {
 			$facture=$this->select($id);
 	
 			ATF::db($this->db)->begin_transaction();
-//*****************************Transaction********************************
+		//*****************************Transaction********************************
 			
 			ATF::facturation()->q->reset()->addCondition("id_facture",$facture["id_facture"])
 										  ->setDimension("row");
@@ -316,7 +317,7 @@ class facture_lm extends facture {
 			
 
 			ATF::db($this->db)->commit_transaction();
-//*****************************************************************************
+		//*****************************************************************************
 			ATF::affaire()->redirection("select",$facture["id_affaire"]);
 			
 			return true; 
@@ -490,7 +491,7 @@ class facture_lm extends facture {
 
 		ATF::db($this->db)->begin_transaction();
 
-//*****************************Transaction********************************
+		//*****************************Transaction********************************
 
 		////////////////Affaire
 		ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"],"etat"=>"facture"));
@@ -550,7 +551,7 @@ class facture_lm extends facture {
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente);
 		}
 		
-//*****************************************************************************
+		//*****************************************************************************
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -757,7 +758,7 @@ class facture_lm extends facture {
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
      * @param array $infos : contient tous les enregistrements          
      */     
-     public function export_xls_special(&$infos){
+    public function export_xls_special(&$infos){
      		     
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
@@ -855,7 +856,7 @@ class facture_lm extends facture {
      * @param array $sheets : contient les 5 onglets     
      * @param array $infos : contient tous les enregistrements          
      */     
-     public function ajoutDonnees(&$sheets,$infos){
+    public function ajoutDonnees(&$sheets,$infos){
 		$row_auto=1;      
 		$increment=0;     
 		foreach ($infos as $key => $item) {             
@@ -1197,7 +1198,7 @@ class facture_lm extends facture {
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
      * @param array $infos : contient tous les enregistrements          
      */     
-     public function export_xls_autoportes(&$infos,$refi=FALSE){
+    public function export_xls_autoportes(&$infos,$refi=FALSE){
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
@@ -1240,7 +1241,7 @@ class facture_lm extends facture {
 	/** Mise en place des titres         
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
      */     
-     public function ajoutTitreAutoporte(&$sheets){
+    public function ajoutTitreAutoporte(&$sheets){
         $row_data = array(
         	 "A"=>array('RESEAU',20)
         	,"B"=>array('X',5)
@@ -1303,7 +1304,7 @@ class facture_lm extends facture {
 	 * @param boolean $refinance TRUE pour sortir toutes les affaires        
      */     
      public function ajoutDonneesAutoportes(&$sheets,$infos, $refinance=FALSE){
-//log::logger('ajoutDonneesAutoportes',ygautheron);
+		//log::logger('ajoutDonneesAutoportes',ygautheron);
         $row_auto=1;      
 		$increment=0;
 		$InOneMonth = date('Y-m-01',strtotime("+1 month"));
@@ -1338,14 +1339,14 @@ class facture_lm extends facture {
 				
 				
 				
-//log::logger($afficher,ygautheron);			
+		//log::logger($afficher,ygautheron);			
 				if($afficher){
 					$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);        
 					$societe = ATF::societe()->select($item['facture.id_societe_fk']);
 					ATF::loyer()->q->reset()->where("loyer.id_affaire",$item["facture.id_affaire_fk"]);
 					$loyers = ATF::loyer()->select_all();
-//log::logger("===================".$item["facture.id_affaire_fk"]."==========\n",ygautheron);				
-//log::logger($loyer,ygautheron);
+		//log::logger("===================".$item["facture.id_affaire_fk"]."==========\n",ygautheron);				
+		//log::logger($loyer,ygautheron);
 					foreach($loyers as $k=>$loyer){
 							
 						//Ne pas afficher les contrats ou il n'y a qu'un seul loyer
@@ -1774,5 +1775,139 @@ class facture_lm extends facture {
 		fpassthru($fh);   
 		unlink($fname);   
 		PHPExcel_Calculation::getInstance()->__destruct(); 		   
-	} 
+	}
+
+
+	public function export_GL_LM(&$infos){
+		$infos["display"] = true;
+		
+		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();   
+        $data = $this->sa();
+
+        $string = "";
+        $total_debit = 0;
+        $total_credit = 0;
+        $lignes = 0;
+
+        $donnees = array();
+
+        foreach ($data as $key => $value) {
+        	for($i=1;$i<4;$i++){	
+	        	if($i==1){
+	        		//TTC
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = $value["facture.prix"]*$value["facture.tva"]; //Montant Debit
+					$donnees[$key][$i][21] = "0"; //Montant Credit        	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+
+					$total_debit += ($value["facture.prix"]*$value["facture.tva"]);
+
+	        	}elseif($i==2){
+	        		//HT
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = "0"; //Montant Debit
+					$donnees[$key][$i][21] = $value["facture.prix"]; //Montant Credit      	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+
+					$total_credit += $value["facture.prix"];
+
+	        	}elseif($i==3){
+	        		//TVA
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = "0"; //Montant Debit
+					$donnees[$key][$i][21] = $value["facture.prix"]*($value["facture.tva"]-1); //Montant Credit      	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+
+					$total_credit += ($value["facture.prix"]*($value["facture.tva"]-1));
+	        	}  
+        	}        	
+        }
+
+        header('Content-Type: application/fic');		
+		header('Content-Disposition: attachment; filename="GL_CLEODIS_LMA_'.date("Y-m").'"');
+		
+		
+		foreach ($donnees as $key => $value) {	
+			foreach ($value as $k => $v) {
+				for($i=1;$i<=36;$i++){
+					if(isset($v[$i])){
+						$string .= $v[$i].";";
+					}else{
+						$string .= ";";
+					}					
+				}
+				$string .= "\n";
+				$lignes ++;
+			}
+		}
+        $string .= "99;".$total_debit.";".$total_credit.";"."EUR;\n";
+
+        $lignes++;
+        $string .=  "0;".$lignes.";".date("Ymd").";";
+        echo $string;
+	}
+
+
 }; 

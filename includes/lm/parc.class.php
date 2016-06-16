@@ -220,13 +220,13 @@ class parc extends classes_optima {
 			throw new errorATF("Il n'y a pas de date de garantie pour cette affaire",880);
 		}
 	
-		/*Le serial ne doit pas déjà exister*/
+		/*Le serial ne doit pas déjà exister
 		$this->q->reset()->addCondition("serial",$item["serial"])->setCount();
 		$countParc=$this->sa();
 		if($countParc["count"]>0){
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Le serial ".$item["serial"]." n'est pas valide car il est déjà utilisé par le parc '".$countParc["data"][0]["libelle"]."' de l'affaire '".ATF::affaire()->nom($countParc["data"][0]["id_affaire"])."'",881);
-		}
+		}*/
 
 		$serial["id_societe"]=$affaire["id_societe"];
 		$serial["id_affaire"]=$affaire["id_affaire"];
