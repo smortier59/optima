@@ -165,6 +165,7 @@ class societe_lm extends societe {
 		$this->addPrivilege("getTreePanel");
 		$this->addPrivilege("getChildren");
 		$this->addPrivilege("autocompleteFournisseurs");
+		$this->addPrivilege("autocompleteFournisseursDeCommande");
 		
 		$this->autocomplete = array(
 			"field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
@@ -174,18 +175,42 @@ class societe_lm extends societe {
 		);
 
 	}
+
+	/**
+	* Autocomplete retournant seulement les fournisseurs ayant des produits dans les ligne de la commande passée en paramètre,
+	* des lignes qui ne sont pas reprise (sans id_affaire_provenance)
+	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
+	* @param array $infos ($_POST habituellement attendu)
+	*	string $infos[recherche]
+	* @param boolean $reset VRAI si on reset lme querier, FAUX si on a initialisé qqch de précis avant...
+	* @return string HTML de retour
+	*/
+	public function autocompleteFournisseursDeCommande($infos,$reset=true) {
+
+		log::logger($infos , "mfleurquin");
+
+		if ($reset) {
+			$this->q->reset();
+		}
+		$this->q
+			->from("societe","id_societe","commande_ligne","id_fournisseur")
+			->addGroup("societe.id_societe")
+			->addField("societe.id_contact_signataire")
+			->addField(array("CONCAT(societe.id_contact_signataire)"=>array("alias"=>"id_contact_signataire_fk","nosearch"=>true)))
+			->where("societe.fournisseur","oui");
+		return parent::autocomplete($infos,false);
+	}
 	
 	public function autocompleteFournisseurs($infos,$reset=true) {
 		if ($reset) {
                $this->q->reset();
-       }
+       }      
        $this->q->where("societe.fournisseur","oui");
 
        return parent::autocomplete($infos,false);
 	}
 
-
-		/** 
+	/** 
 	* Mise à jour des infos
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]

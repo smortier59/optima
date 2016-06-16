@@ -471,6 +471,8 @@ class devis_lm extends devis {
 				$item[str_replace($escape.".","",$k_unescape)]=$i;
 				unset($item[$k]);
 			}
+
+
 			$item["id_fournisseur"]=ATF::societe()->decryptId($item["id_fournisseur_fk"]);
 			$item["id_produit"]=ATF::produit()->decryptId($item["id_produit_fk"]);
 			unset($item["id_fournisseur_fk"],$item["id_produit_fk"]);
