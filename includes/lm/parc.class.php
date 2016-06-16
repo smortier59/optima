@@ -3,7 +3,7 @@
 * @package Optima
 * @subpackage Cleodis
 */
-class parc_lm extends classes_optima {
+class parc extends classes_optima {
 	function __construct() {
 		parent::__construct();
 		$this->table = "parc";
@@ -205,7 +205,7 @@ class parc_lm extends classes_optima {
 	* @param array $commande_ligne
 	*/
 	public function insertParcSerial($item,$commande_ligne){
-		$type=ATF::produit()->select($item["id_produit"],"type");
+		//$type=ATF::produit()->select($item["id_produit"],"type");
 							
 		if(!$item["serial"]){
 			ATF::db($this->db)->rollback_transaction();
@@ -324,7 +324,7 @@ class parc_lm extends classes_optima {
 	* @param int $id_bon_de_commande
 	* @return boolean 
 	*/
-	function parcByBdc($id_bon_de_commande){
+	function parcByBdc($id_bon_de_commande){		
 		ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_bon_de_commande",$id_bon_de_commande);
 		$parc=ATF::bon_de_commande_ligne()->toParcInsert();
 
