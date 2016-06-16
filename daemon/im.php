@@ -6,7 +6,7 @@ try{
 	include(dirname(__FILE__)."/../global.inc.php");
 	
 	new socketer();
-}catch(error $e){
+}catch(errorATF $e){
 	$e->setError();
 }
 ?>

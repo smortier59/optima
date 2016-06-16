@@ -43,7 +43,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 			$erreur = false;
 			$param = array('id_facture'=>$this->facture["id_facture"]);
 			$r = $this->obj->generate($param);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non catché :/ ");
@@ -71,7 +71,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 			$erreur = false;
 			$param = array('id_facture'=>$this->facture["id_facture"]);
 			$r = $this->obj->generate($param);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non catché :/ ");
@@ -235,7 +235,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$erreur = false;
 			$r = $this->obj->generate($param);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non catchée");

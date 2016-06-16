@@ -84,7 +84,7 @@ class conge_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->insert(array("conge"=>array("date_debut"=>"2012-02-02","date_fin"=>"2012-02-01",'periode'=>"autre")));
 			$this->assertTrue(false,"Une erreur aurait du se produire");
-		}catch(error $e){
+		}catch(errorATF $e){
 			$this->assertEquals(ATF::$usr->trans("fin_inf_deb","conge"),$e->getMessage(),"Le message d'erreur est incorrecte");
 		}
 		

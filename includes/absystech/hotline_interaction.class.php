@@ -193,7 +193,7 @@ class hotline_interaction extends classes_optima {
 		/*---------------Vérification des informations passées----------------------*/
 		if(!$infos){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error(ATF::$usr->trans("aucunes_infos",$this->table));
+			throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 		}
 
 		if(!$infos["heure_depart_dep"])  $infos["heure_depart_dep"] = $infos["heure_debut_presta"];
@@ -211,26 +211,26 @@ class hotline_interaction extends classes_optima {
 
 		if($debut_dep > $debut_presta){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error(ATF::$usr->trans("L'heure de début de mission est superieure à l'heure de début de prestation !",$this->table));
+			throw new errorATF(ATF::$usr->trans("L'heure de début de mission est superieure à l'heure de début de prestation !",$this->table));
 		}
 
 		if($fin_presta > $fin_dep){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error(ATF::$usr->trans("L'heure de fin de mission est inferieure à l'heure de fin de prestation !",$this->table));
+			throw new errorATF(ATF::$usr->trans("L'heure de fin de mission est inferieure à l'heure de fin de prestation !",$this->table));
 		}
 
 
 		//Test de présence d'un texte
 		if (!$infos["detail"]){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error(ATF::$usr->trans("joindre_un_texte_explicatif_a_l_interaction",$this->table));
+			throw new errorATF(ATF::$usr->trans("joindre_un_texte_explicatif_a_l_interaction",$this->table));
 		} 
 		
 		$hotline = ATF::hotline()->select($infos["id_hotline"]);
 		/*---------------Gestion du temps----------------------*/
 		if((!$infos["duree_presta"] || $infos["duree_presta"] =="00:00" || $infos["duree_presta"] =="0:00") && !isset($infos["no_test_credit"])){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error(ATF::$usr->trans("duree_presta_non_renseigne",$this->table));
+			throw new errorATF(ATF::$usr->trans("duree_presta_non_renseigne",$this->table));
 		} 	
 		
 
@@ -243,7 +243,7 @@ class hotline_interaction extends classes_optima {
 			$duree_presta = $fin_presta - $debut_presta;
 			if($duree_presta < $duree_pause){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error(ATF::$usr->trans("La durée de pause est superieure à la durée de prestation !",$this->table));
+				throw new errorATF(ATF::$usr->trans("La durée de pause est superieure à la durée de prestation !",$this->table));
 			}
 
 		}
@@ -258,7 +258,7 @@ class hotline_interaction extends classes_optima {
 		
 		if($duree_presta < 0){			
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("L'heure du début de la prestation est supérieure à l'heure de fin !");
+			throw new errorATF("L'heure du début de la prestation est supérieure à l'heure de fin !");
 		} 
 
 		
@@ -274,7 +274,7 @@ class hotline_interaction extends classes_optima {
 
 			/*if($fin_dep - $debut_dep < 0){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("[DEPLACEMENT] L'heure du départ déplacement est supérieure à l'heure d'arrivée !");
+				throw new errorATF("[DEPLACEMENT] L'heure du départ déplacement est supérieure à l'heure d'arrivée !");
 			}*/
 
 			$duree_dep =  explode(":", $infos["duree_dep"]);
@@ -294,7 +294,7 @@ class hotline_interaction extends classes_optima {
 				if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
 					if(!$infos["champ_alerte"]){
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Merci de saisir votre justification !");
+						throw new errorATF("Merci de saisir votre justification !");
 					} 
 					
 					ATF::alerte()->i(array("alerte"=>$infos["champ_alerte"]
@@ -462,7 +462,7 @@ class hotline_interaction extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice
 				ATF::hotline()->createMailNotice("hotline_interaction_mail_to_contact");
-			}catch(error $e){
+			}catch(errorATF $e){
 				//Notice
 				//ATF::hotline()->createNotice("hotline_interaction_no_mail_to_contact");
 			}

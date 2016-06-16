@@ -113,7 +113,7 @@ class tache_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->insert($infos);
 			$this->assertTrue(false,"Une erreur aurait du être générée");
-		}catch(error $e){
+		}catch(errorATF $e){
 			//c'est bon
 		}
 	}
@@ -171,7 +171,7 @@ class tache_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->update($infos);
 			$this->assertTrue(false,"Une erreur aurait du être générée");
-		}catch(error $e){
+		}catch(errorATF $e){
 			//c'est bon
 		}
 	}
@@ -519,7 +519,7 @@ class tache_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->giveUp($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 			$c = $e->getCode();
 		}

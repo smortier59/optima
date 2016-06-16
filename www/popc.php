@@ -23,7 +23,7 @@ try{
 			die;
 		}
 	}
-}catch(error $e){
+}catch(errorATF $e){
 	$e->setError();
 }
 ?>

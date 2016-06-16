@@ -170,7 +170,7 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             classes::decryptId(ATF::bon_de_commande()->insert($bon_de_commande));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(875,$error,'Erreur bon de commande sans commandes');
@@ -363,7 +363,7 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             $this->obj->getRef($this->devis_select["id_affaire"],253);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(880,$error,'Erreur Fournisseur sans code fournisseur');
@@ -659,7 +659,7 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::bon_de_commande()->can_delete($id_bon_de_commande);
 		try{
 			$this->assertTrue(ATF::bon_de_commande()->can_delete($id_bon_de_commande),'1 Probleme sur le can_delete');
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$error = $e->getCode();
 		}		
 		$this->assertTrue(ATF::bon_de_commande()->can_update($id_bon_de_commande),'1 Probleme sur le can_update');
@@ -668,14 +668,14 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			ATF::bon_de_commande()->can_delete($id_bon_de_commande);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(884,$error,'2 Probleme sur le can_delete car facture_fournisseur');
 
 		try {
 			ATF::bon_de_commande()->can_update($id_bon_de_commande);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(884,$error,'2 Probleme sur le can_update car facture_fournisseur');
@@ -696,7 +696,7 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		}
 		try{
 			$this->assertTrue(ATF::bon_de_commande()->can_delete($id_bon_de_commande));
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 	}
@@ -829,7 +829,7 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			$this->obj->delete(array("id"=>array(0=>$id_bon_de_commande)));
 
        		 $this->assertNull($this->obj->select($id_bon_de_commande),'le bon_de_commande ne se delete pas');
-		}catch(error $e){
+		}catch(errorATF $e){
 			$e->setError();
 		}			
 

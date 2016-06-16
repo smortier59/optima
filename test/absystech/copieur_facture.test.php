@@ -92,7 +92,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur l'id_societe n'est pas remonté");
@@ -105,7 +105,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur l'id_societe FERME ! n'est pas remonté");
@@ -117,7 +117,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la présence des relevé n'est pas remontée.");
@@ -128,7 +128,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la présence de l'id affaire cout page n'est pas remontée.");
@@ -139,7 +139,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la présence de l'id terme n'est pas remontée.");
@@ -176,7 +176,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la différence entre les relevé COULEUR n'est pas remontée.");
@@ -192,7 +192,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la différence entre les relevé N&B n'est pas remontée.");
@@ -218,7 +218,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur l'email des params n'est pas remontée.");
@@ -248,7 +248,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur l'email de contact de facturation n'est pas remontée.");
@@ -295,7 +295,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la différence entre les relevé N&B n'est pas remontée.");
@@ -305,7 +305,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			ATF::copieur_facture()->insert($cf,$this->s);		
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"L'erreur sur la différence entre les relevé COULEUR n'est pas remontée.");
@@ -410,7 +410,7 @@ class copieur_facture_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->updateDate($params);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non attrapée !");

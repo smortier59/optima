@@ -176,7 +176,7 @@ class bon_de_commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCas
 		try{
 			$this->obj->insert($bon_de_commande_ligne,$this->s);
 			$this->requete_valide("bon_de_commande_ligne");
-		}catch(error $e){
+		}catch(errorATF $e){
 			$erreur = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -185,7 +185,7 @@ class bon_de_commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCas
 		try{
 			$this->obj->insert($bon_de_commande_ligne,$this->s);
 			$this->requete_valide("bon_de_commande_ligne");
-		}catch(error $e){
+		}catch(errorATF $e){
 			$erreur = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 2");
@@ -193,7 +193,7 @@ class bon_de_commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCas
 		try{
 			$this->obj->insert($bon_de_commande_ligne,$this->s);
 			$this->requete_valide("bon_de_commande_ligne");
-		}catch(error $e){
+		}catch(errorATF $e){
 			$erreur = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 3");

@@ -391,12 +391,12 @@ class facture_lm extends facture {
 		$infos["date_relance"]=date("Y-m-d",strtotime("+1 month"));
 		
 		if(($infos["type_facture"] === "libre") && (!$infos["type_libre"])){
-			throw new error("Il faut un type de facture libre",351);
+			throw new errorATF("Il faut un type de facture libre",351);
 		}
 		
 		if($infos["type_facture"]=="refi"){
 			if(!$infos["id_demande_refi"]){
-				throw new error("Il n'y a pas de demande de refinancement valide pour cette affaire !",347);
+				throw new errorATF("Il n'y a pas de demande de refinancement valide pour cette affaire !",347);
 			}
 			$demande_refi=ATF::demande_refi()->select($infos["id_demande_refi"]);
 			$infos["prix"]=$demande_refi["loyer_actualise"];
@@ -425,7 +425,7 @@ class facture_lm extends facture {
 					
 					if(($infos["date_periode_debut"] >= $facturation["date_periode_debut"]) && ($infos["date_periode_fin"] <= $facturation["date_periode_fin"])){
 						//On est dans une periode de l'echeancier
-						if($facturation["id_facture"]) throw new error("Il existe déjà une facturation pour cette période.",349);						
+						if($facturation["id_facture"]) throw new errorATF("Il existe déjà une facturation pour cette période.",349);						
 					}else{ $facturation = ATF::facturation()->periode_facturation($commande['id_affaire'],true); }					
 				}else{
 					$infos["date_periode_debut"] = $facturation["date_periode_debut"];					
@@ -434,7 +434,7 @@ class facture_lm extends facture {
 					$infos["date_periode_debut"] = $facturation["date_periode_debut"];
 					$infos["date_periode_fin"] = $facturation["date_periode_fin"];
 					if($facturation["id_facture"]){
-					  throw new error("Il existe déjà une facturation pour cette période.",349);					
+					  throw new errorATF("Il existe déjà une facturation pour cette période.",349);					
 					}
 				}
 			}
@@ -466,7 +466,7 @@ class facture_lm extends facture {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 
 		if(!$infos["prix"]){
-			throw new error("Il faut un prix pour la facture",351);
+			throw new errorATF("Il faut un prix pour la facture",351);
 		}
 		
 		if(!$batch){
@@ -589,7 +589,7 @@ class facture_lm extends facture {
 			$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
 			if($infos["key"] == "date_rejet"){
 				if(ATF::facture()->select($infos["id_facture"], "date_rejet") != NULL){					
-					throw new error("Impossible de modifier une date de rejet car elle est déja renseignée",877);
+					throw new errorATF("Impossible de modifier une date de rejet car elle est déja renseignée",877);
 					return true;
 				}
 			}		
@@ -676,7 +676,7 @@ class facture_lm extends facture {
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));		
 			return true;
 		}else{
-			throw new error("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
+			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
 	}
 	
@@ -714,7 +714,7 @@ class facture_lm extends facture {
 		if($this->select($id,"etat")=="impayee"){
 			return true; 
 		}else{
-			throw new error("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
+			throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
 		}
 	}
 
@@ -725,7 +725,7 @@ class facture_lm extends facture {
 	* @return boolean 
 	*/
 	public function can_update($id,$infos=false){
-		throw new error("Impossible de modifier une ".ATF::$usr->trans($this->table),878);
+		throw new errorATF("Impossible de modifier une ".ATF::$usr->trans($this->table),878);
 	}
 	
 	 public function export_special2($infos){
@@ -1176,7 +1176,7 @@ class facture_lm extends facture {
          $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
          if($infos['onglet'] === "gsa_facture_facture"){
-         	throw new error("Il faut générer les fichier Excell à partir d'un filtre personnalisé");
+         	throw new errorATF("Il faut générer les fichier Excell à partir d'un filtre personnalisé");
          }else{
          	$this->q->addAllFields($this->table)
          		 //->where("facture.id_commande","commande.id_commande")
@@ -1565,7 +1565,7 @@ class facture_lm extends facture {
 					ATF::db($this->db)->commit_transaction();
 					ATF::$msg->addNotice("Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie");					
 				}else{					
-					throw new error("Il y a déja une facture pour la période du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));
+					throw new errorATF("Il y a déja une facture pour la période du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));
 				}
 			}else{
 				ATF::db($this->db)->begin_transaction();
@@ -1596,10 +1596,10 @@ class facture_lm extends facture {
 					ATF::suivi()->insert($suivis);
 				ATF::db($this->db)->commit_transaction();
 				ATF::$msg->addNotice("Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie");
-				/*throw new error("Impossible car il n'y a pas de ligne d'echeancier pour la periode du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));*/
+				/*throw new errorATF("Impossible car il n'y a pas de ligne d'echeancier pour la periode du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));*/
 			}
 		}else{
-			throw new error("Il n'est pas possible de passer une facture libre ".$this->select($infos["id_facture"] , "type_libre")." en facture normale");
+			throw new errorATF("Il n'est pas possible de passer une facture libre ".$this->select($infos["id_facture"] , "type_libre")." en facture normale");
 		}
 		return true;
 	}

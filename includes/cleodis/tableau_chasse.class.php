@@ -65,7 +65,7 @@ class tableau_chasse extends classes_optima {
 	*/
 	public function setInfos($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){	
 		
-		if(!$infos['id_tableau_chasse']) throw new Error(ATF::$usr->trans("erreur_identifiant"),900);
+		if(!$infos['id_tableau_chasse']) throw new errorATF(ATF::$usr->trans("erreur_identifiant"),900);
 		 
 		$data["id_tableau_chasse"] = $infos["id_tableau_chasse"];
 		$data[$infos["field"]] = $infos[$infos["field"]];

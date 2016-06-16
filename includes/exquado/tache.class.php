@@ -76,10 +76,10 @@ class tache_exquado extends tache {
 			if($tab_dest){
 				try{
 					ATF::tache_user()->multi_insert($tab_dest);
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					ATF::db($this->db)->rollback_transaction();
 					$e->setError();
-					throw new error('Erreur Insert');
+					throw new errorATF('Erreur Insert');
 				}
 				$tache["id_tache"] = $infos['id_'.$this->table];
 				for($i=0;$i<2;$i++){

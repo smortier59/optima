@@ -35,7 +35,7 @@ class pack_produit_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$this->obj->insert(array("pack_produit"=>$pack_produit, "values_pack_produit"=>$pack_produit_ligne));
-		}catch(error $e){
+		}catch(errorATF $e){
 			$err = $e->getMessage();
 		}
 		$this->assertEquals("pack_produit sans produits",$err, "Erreur incorrecte");
@@ -44,7 +44,7 @@ class pack_produit_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$this->obj->insert(array("pack_produit"=>$pack_produit, "values_pack_produit"=>$pack_produit_ligne));
-		}catch(error $e){
+		}catch(errorATF $e){
 			$err = $e->getMessage();
 		}
 		$this->assertEquals("Ligne de pack_produit sans fournisseur",$err, "Erreur incorrecte");
@@ -78,7 +78,7 @@ class pack_produit_test extends ATF_PHPUnit_Framework_TestCase {
 		$pack_produit_ligne["produits_non_visible"] = '[{"pack_produit_ligne__dot__produit":"SonicWALL Global VPN Client","pack_produit_ligne__dot__quantite":"2","pack_produit_ligne__dot__type":"sans_objet","pack_produit_ligne__dot__ref":"01-SSC-5316","pack_produit_ligne__dot__prix_achat":"0.00","pack_produit_ligne__dot__id_produit":"","pack_produit_ligne__dot__id_fournisseur":"ABSYSTECH","pack_produit_ligne__dot__visibilite_prix":"visible","pack_produit_ligne__dot__date_achat":"","pack_produit_ligne__dot__commentaire":"","pack_produit_ligne__dot__neuf":"oui","pack_produit_ligne__dot__id_produit_fk":"9546"}]'; 
 		try{
 			$this->obj->update(array("pack_produit"=>$pack_produit, "values_pack_produit"=>$pack_produit_ligne));
-		}catch(error $e){
+		}catch(errorATF $e){
 			$err = $e->getMessage();
 		}
 		$this->assertEquals("Ligne de pack_produit sans fournisseur",$err, "Erreur incorrecte");
@@ -86,7 +86,7 @@ class pack_produit_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$this->obj->update(array("pack_produit"=>$pack_produit, "values_pack_produit"=>array()));
-		}catch(error $e){
+		}catch(errorATF $e){
 			$err = $e->getMessage();
 		}
 		$this->assertEquals("pack_produit sans produits",$err, "Erreur incorrecte 2");

@@ -135,25 +135,25 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
 		$hotline_interaction['actifNotify'] = "1,12";			
 		
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>array()),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("Aucunes informations transmises, veuillez recommencez le traitement.",$errorMessage,"assert 1");
 		
 
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("Vous devez préciser les actions effectuées sur la requête.",$errorMessage,"assert 2");
 
 		$hotline_interaction['detail']='Test detail';
 		$hotline_interaction['duree_presta']='00:00';		
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("duree_presta_non_renseigne",$errorMessage,"assert 3");
 		
 		$hotline_interaction['duree_presta']='00:45';
 		$hotline_interaction['heure_fin_presta']='14:45';
 		$hotline_interaction['heure_debut_presta']='15:30';		
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("L'heure du début de la prestation est supérieure à l'heure de fin !",$errorMessage,"assert 4");
 
 
@@ -165,7 +165,7 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
 		unset($hotline_interaction["hotline_interaction"]);	
 
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("L'heure de début de mission est superieure à l'heure de début de prestation !",$errorMessage,"assert 5");
 
 
@@ -177,7 +177,7 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
 		unset($hotline_interaction["hotline_interaction"]);	
 
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("L'heure de fin de mission est inferieure à l'heure de fin de prestation !",$errorMessage,"assert 6");
 
 
@@ -190,7 +190,7 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
 		unset($hotline_interaction["hotline_interaction"]);	
 
 		try{ $id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		$this->assertEquals("La durée de pause est superieure à la durée de prestation !",$errorMessage,"assert 7");
 
 
@@ -285,7 +285,7 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try{
 			$id_inter=$this->obj->insert(array("hotline_interaction"=>$hotline_interaction),$this->s);
-		}catch(error $e){ $errorMessage = $e->getMessage(); }
+		}catch(errorATF $e){ $errorMessage = $e->getMessage(); }
 		
 		$this->assertEquals("Merci de saisir votre justification !",$errorMessage,"assert 8");
 

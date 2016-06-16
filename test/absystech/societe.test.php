@@ -26,7 +26,7 @@ class societe_test extends ATF_PHPUnit_Framework_TestCase {
 		//Une erreur doit se déclencher
 		try {
 			$id=$this->obj->insert(array(),$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur_trouvee1,"L'erreur de la societe non créée n'a pas été catchée !");
@@ -126,7 +126,7 @@ class societe_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 1
 		try {
 			$result=$this->obj->create_ref($this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(80853,$erreur_trouvee1,"4 La rfrence n'est pas correcte !");
@@ -135,7 +135,7 @@ class societe_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 2
 		try {
 			$result=$this->obj->create_ref($this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee2 = $e->getCode();
 		}
 		$this->assertEquals(80846,$erreur_trouvee2,"5 La rfrence n'est pas correcte !");

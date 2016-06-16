@@ -103,7 +103,7 @@ class cout_unitaire extends classes_optima {
 					));
 				}
 			} else {
-				throw new error("Remplir tous les champs !");
+				throw new errorATF("Remplir tous les champs !");
 			}
 		}
 		$this->infoCollapse($infos); // $infos avec une seule dimension
@@ -136,7 +136,7 @@ class cout_unitaire extends classes_optima {
 					,"id_user"=>ATF::$usr->getID()
 				));
 			} else {
-				throw new error("Remplir tous les champs !");
+				throw new errorATF("Remplir tous les champs !");
 			}
 		}
 		$this->infoCollapse($infos); // $infos avec une seule dimension

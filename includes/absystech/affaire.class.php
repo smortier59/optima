@@ -424,7 +424,7 @@ class affaire_absystech extends affaire {
 		$affaire=parent::select_all();
 
 		if($affaire["id_facture"] || $affaire["id_commande"] || $affaire["id_devis"]){
-			throw new error("Il est impossible de supprimer cette affaire car il y a soit un devis soit une commande soit une facture",892);
+			throw new errorATF("Il est impossible de supprimer cette affaire car il y a soit un devis soit une commande soit une facture",892);
 		}else{
 			return true;
 		}
@@ -439,7 +439,7 @@ class affaire_absystech extends affaire {
 		if(($infos["id_societe"] || $infos["id_termes"] || $infos["code_commande_client"] || $infos["date_fin_maintenance"]) || $infos["contrat_maintenance"] && count($infos)==2){
 			return true;
 		}else{
-			throw new error("Il est impossible de modifier une affaire",892);
+			throw new errorATF("Il est impossible de modifier une affaire",892);
 		}
 	}
 
@@ -459,7 +459,7 @@ class affaire_absystech extends affaire {
 	*/
 	public function setForecast($infos){
 		if($infos["forecast"]>100||$infos["forecast"]<0){
-			throw new error(ATF::$usr->trans("invalid_range"),6512);
+			throw new errorATF(ATF::$usr->trans("invalid_range"),6512);
 		}
 		
 		$this->u(array("id_affaire"=>$infos["id_affaire"],"forecast"=>$infos["forecast"]));
@@ -476,7 +476,7 @@ class affaire_absystech extends affaire {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new error(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
 		}	
 		if($class=="devis"){
 			$prefix="D";
@@ -569,7 +569,7 @@ class affaire_absystech extends affaire {
 				);
 				$id_suivi = ATF::suivi()->insert($suivi);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;	
 		}
@@ -634,7 +634,7 @@ class affaire_att extends affaire_absystech {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new error(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
 		}	
 		if($class=="devis"){
 			$prefix="AD";

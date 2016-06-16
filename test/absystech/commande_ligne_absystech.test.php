@@ -257,7 +257,7 @@ class commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	function test_can_update(){
 		try{
 			$this->obj->can_update();
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$error = $e->getMessage();
 		}			
 		$this->assertEquals($error , "Pour modifier une ligne de commande, il faut modifier dans la commande !!!" , "Pas de message d'erreur?? On ne peux pas update une ligne facture sans passer dans la facture normalement !!");
@@ -269,7 +269,7 @@ class commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	function test_can_insert(){
 		try{
 			$this->obj->can_insert();
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$error = $e->getMessage();
 		}			
 		$this->assertEquals($error , "Pour inserer une ligne de commande, il faut modifier dans la commande !!!" , "Pas de message d'erreur?? On ne peux pas update une ligne facture sans passer dans la facture normalement !!");
@@ -281,7 +281,7 @@ class commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	/*function test_can_delete(){
 		try{
 			$this->obj->can_delete();
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$error = $e->getMessage();
 		}			
 		$this->assertEquals($error , "Pour supprimer une ligne de commande, il faut modifier dans la commande !!!" , "Pas de message d'erreur?? On ne peux pas update une ligne facture sans passer dans la facture normalement !!");

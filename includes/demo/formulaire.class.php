@@ -80,7 +80,7 @@ class formulaire extends classes_optima {
     */   
 	public function addAttr($infos,&$s,$files=NULL,&$cadre_refreshed) {
 		if (!$infos || !is_array($infos)) {
-			throw new error("Fonction ".ATF::$usr->trans($this->table,'module')."::addAttr() - ".ATF::$usr->trans("aucunes_donnees_transmise"));
+			throw new errorATF("Fonction ".ATF::$usr->trans($this->table,'module')."::addAttr() - ".ATF::$usr->trans("aucunes_donnees_transmise"));
 		}
 		
 		ATF::db($this->db)->autocommit(false);
@@ -152,7 +152,7 @@ class formulaire extends classes_optima {
 			return array("modalbox"=>util::mbox("attr-quick_insert",ATF::$usr->trans("quick_insert",'formulaire'),array("params"=>$params, "method"=>"post")));
 		} else {
 			if (!$infos['id_gep_projet'] || !$infos['id_attr']) {
-				throw new error("Fonction ".ATF::$usr->trans($this->table,'module')."::addNewAttr() - ".ATF::$usr->trans("aucunes_donnees_transmise"));
+				throw new errorATF("Fonction ".ATF::$usr->trans($this->table,'module')."::addNewAttr() - ".ATF::$usr->trans("aucunes_donnees_transmise"));
 			}
 			ATF::db($this->db)->autocommit(false);
 			// Verifions que l'attribut a modifier ne comporte pas de PA, si c'est le cas on le duplique afin de pouvoir le modifier sans effet papillon sur les autres formulaires.
@@ -215,7 +215,7 @@ class formulaire extends classes_optima {
 	public function delAttr($infos,&$s,$files=NULL,&$cadre_refreshed) {
 		// Suppression du pe et de tous ses enfants
 		if (!$infos) {
-			throw new error("Fonction ".ATF::$usr->trans($this->table,'module')."::delAttr() - ".ATF::$usr->trans("aucunes_donnees_transmise"));
+			throw new errorATF("Fonction ".ATF::$usr->trans($this->table,'module')."::delAttr() - ".ATF::$usr->trans("aucunes_donnees_transmise"));
 		}
 		// Suppression de la liaison
 		ATF::pa()->delete($infos);

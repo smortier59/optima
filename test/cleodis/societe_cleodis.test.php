@@ -43,7 +43,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$societe["siret"] = "45307981600048";
 		try {
 			$this->obj->insert(array('societe'=>$societe));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,"Une société existe déja avec le SIRET ");
