@@ -63,7 +63,7 @@ class emailing_source extends emailing {
 		
 		foreach ($cols as $k=>$i) {
 		    if (!$i) continue;
-			if (ereg("id_",$i) || ereg("_fk",$i)) continue;
+			if (preg_match("/id_/",$i) || preg_match("/_fk/",$i)) continue;
 			if (!in_array($i,$tableCols)) {
 				if ($champsInconnu!="") $champsInconnu .= ", ";
                 $i = str_replace("–","-",$i);
@@ -98,7 +98,7 @@ class emailing_source extends emailing {
 						$numUpdateOK+=$r;
 					} catch (errorATF $e) {
 						$msg = $e->getMessage();
-						if (ereg("generic message : ",$msg)) {
+						if (preg_match("generic message",$msg)) {
 							$tmp = json_decode(str_replace("generic message : ","",$msg),true);
 							$msg = $tmp['text'];
 						}
@@ -114,7 +114,7 @@ class emailing_source extends emailing {
 					} catch (errorATF $e) {
 						$msg = $e->getMessage();
                         
-						if (ereg("generic message : ",$msg)) {
+						if (preg_match("generic message",$msg)) {
 							$tmp = json_decode(str_replace("generic message : ","",$msg),true);
 							$msg = $tmp['text'];
 						}
