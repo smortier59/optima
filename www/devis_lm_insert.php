@@ -149,7 +149,7 @@ if($infos["id_societe"]){
                     "devis_ligne__dot__produit"=>$v["produit"],
                     "devis_ligne__dot__quantite"=>$qte,
                     "devis_ligne__dot__type"=>$v["type"],
-                    "devis_ligne__dot__ref"=>$v["ref"],
+                    "devis_ligne__dot__ref"=>$v["ref_lm"],
                     "devis_ligne__dot__prix_achat"=>$v["prix_achat_ht"],
                     "devis_ligne__dot__id_produit"=>$v["id_produit"],
                     "devis_ligne__dot__id_fournisseur"=>"LM",
@@ -163,7 +163,7 @@ if($infos["id_societe"]){
                 $produits_commande[] = array(
                     "commande_ligne__dot__produit"=>$v["produit"],
                     "commande_ligne__dot__quantite"=>$qte,
-                    "commande_ligne__dot__ref"=>$v["ref"],
+                    "commande_ligne__dot__ref"=>$v["ref_lm"],
                     "commande_ligne__dot__prix_achat"=>$v["prix_achat_ht"],
                     "commande_ligne__dot__id_produit"=>$v["id_produit"],
                     "commande_ligne__dot__id_fournisseur"=>"LM",
