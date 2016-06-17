@@ -291,32 +291,16 @@ class bon_de_commande_lm extends bon_de_commande {
 			
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		foreach ($return['data'] as $k=>$i) {
-			if ($i["solde_ht"]>0 || !$i["solde_ht"]) {
+			//if ($i["solde_ht"]>0 || !$i["solde_ht"]) {
 				$return['data'][$k]['factureFournisseurAllow'] = true;	
-			}
-			log::logger(ATF::parc()->parcByBdc($i['bon_de_commande.id_bon_de_commande']) , "mfleurquin");
-
+			//}
+			
 			if (ATF::parc()->parcByBdc($i['bon_de_commande.id_bon_de_commande'])) {
 				$return['data'][$k]['parcInsertionAllow'] = true;	
 			}
 		}
 		return $return;
 	}
-
-
-
-			default:
-				throw new errorATF("date_invalide",987);
-		}
-
-		if($infos["table"]!="commande"){
-//			ATF::commande()->redirection("select_all",NULL,"commande.html");
-//		}else{
-			ATF::affaire()->redirection("select",$cmd["id_affaire"]);
-		}
-		return true;
-	}*/
-
 
 	/** 
 	* Impossible de supprimer un bon de commande qui a une facture fournisseur

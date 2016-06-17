@@ -350,12 +350,7 @@ class commande_lm extends commande {
 				ATF::db($this->db)->rollback_transaction();
 				throw new error("Commande sans produits",877);
 			}
-
-		}else{
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF("Commande sans produits",877);
-		}
-		
+		}		
 		
 		////////////////Devis
 		$devis["etat"]="gagne";	
