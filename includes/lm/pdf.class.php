@@ -635,4 +635,29 @@ class pdf_lm extends pdf_cleodis {
 
 	}
 
+
+	public function conditionsGeneralesDeLocationA4($type){
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->SetLeftMargin(10);
+		$this->setAutoPageBreak(false);
+
+		$articles = ATF::cgl_article()->sa();
+		
+		foreach ($articles as $key => $value) {
+			$this->setfont('arial','BI',10);	
+			$this->cell(0,5,"Article ".$value["numero"]." - ".$value["titre"],0,1);
+
+			$this->setfont('arial','',8);
+			$texte = array();
+			ATF::cgl_texte()->q->reset()->where("id_cgl_article",$value["id_cgl_article"])
+										->addOrder("cgl_texte.numero");
+			$texte = ATF::cgl_texte()->select_all();
+			foreach ($texte as $k => $v) {
+				$this->multicell(0,4,$value["numero"].".".$v["numero"].". ".$v["texte"]);
+			}
+		}
+
+
+	}
 }
