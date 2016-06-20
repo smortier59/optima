@@ -52,7 +52,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 1
 		try {
 			$id_commande = $this->obj->insert($commande,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();			
 		}
 		$this->assertEquals(105,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (id_societe non insere)");
@@ -64,7 +64,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 2
 		try {
 			$id_commande = $this->obj->insert($commande,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee2 = $e->getCode();
 			ATF::db($this->db)->rollback_transaction();
 		}
@@ -97,7 +97,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 4
 		try {
 			$id_commande = $this->obj->insert($commande,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee3 = $e->getCode();
 			ATF::db($this->db)->rollback_transaction();
 		}
@@ -107,7 +107,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$commande["values_commande"]=array("produits"=>'[{"commande_ligne__dot__ref":"TU","commande_ligne__dot__produit":"Tu_commande","commande_ligne.prix":"10","commande_ligne__dot__prix_achat":"10","commande_ligne__dot__id_fournisseur":"1","commande_ligne__dot__id_compte_absystech":"1","commande_ligne__dot__marge":97.14,"commande_ligne__dot__id_fournisseur_fk":"1"}]');
 		try {
 			$id_commande = $this->obj->insert($commande,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee3 = $e->getMessage();
 			
 		}
@@ -137,7 +137,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$usr->set("id_profil",4);
 		try {
 			$this->obj->can_update($this->id_commande);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"2 Can_update ne fonctionne pas");
@@ -155,7 +155,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_delete($this->id_commande);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(893,$error,"2 can_delete ne fonctionne pas");
@@ -185,7 +185,7 @@ class commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$commande[$this->obj->table]["id_commande"]="A";
 		try {
 			$this->obj->delete($commande[$this->obj->table]["id_commande"]);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee = $e->getCode();
 			ATF::db($this->db)->rollback_transaction();
 		}

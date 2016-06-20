@@ -110,6 +110,7 @@ class facture_lm extends facture {
 		$this->addPrivilege("getAllForRelance");
 		$this->addPrivilege("libreToNormale");
 		$this->addPrivilege("export_cegid");
+		$this->addPrivilege("export_GL_LM");
 
 		
 		
@@ -289,7 +290,7 @@ class facture_lm extends facture {
 			$facture=$this->select($id);
 	
 			ATF::db($this->db)->begin_transaction();
-//*****************************Transaction********************************
+		//*****************************Transaction********************************
 			
 			ATF::facturation()->q->reset()->addCondition("id_facture",$facture["id_facture"])
 										  ->setDimension("row");
@@ -316,7 +317,7 @@ class facture_lm extends facture {
 			
 
 			ATF::db($this->db)->commit_transaction();
-//*****************************************************************************
+		//*****************************************************************************
 			ATF::affaire()->redirection("select",$facture["id_affaire"]);
 			
 			return true; 
@@ -391,12 +392,12 @@ class facture_lm extends facture {
 		$infos["date_relance"]=date("Y-m-d",strtotime("+1 month"));
 		
 		if(($infos["type_facture"] === "libre") && (!$infos["type_libre"])){
-			throw new error("Il faut un type de facture libre",351);
+			throw new errorATF("Il faut un type de facture libre",351);
 		}
 		
 		if($infos["type_facture"]=="refi"){
 			if(!$infos["id_demande_refi"]){
-				throw new error("Il n'y a pas de demande de refinancement valide pour cette affaire !",347);
+				throw new errorATF("Il n'y a pas de demande de refinancement valide pour cette affaire !",347);
 			}
 			$demande_refi=ATF::demande_refi()->select($infos["id_demande_refi"]);
 			$infos["prix"]=$demande_refi["loyer_actualise"];
@@ -425,7 +426,7 @@ class facture_lm extends facture {
 					
 					if(($infos["date_periode_debut"] >= $facturation["date_periode_debut"]) && ($infos["date_periode_fin"] <= $facturation["date_periode_fin"])){
 						//On est dans une periode de l'echeancier
-						if($facturation["id_facture"]) throw new error("Il existe déjà une facturation pour cette période.",349);						
+						if($facturation["id_facture"]) throw new errorATF("Il existe déjà une facturation pour cette période.",349);						
 					}else{ $facturation = ATF::facturation()->periode_facturation($commande['id_affaire'],true); }					
 				}else{
 					$infos["date_periode_debut"] = $facturation["date_periode_debut"];					
@@ -434,7 +435,7 @@ class facture_lm extends facture {
 					$infos["date_periode_debut"] = $facturation["date_periode_debut"];
 					$infos["date_periode_fin"] = $facturation["date_periode_fin"];
 					if($facturation["id_facture"]){
-					  throw new error("Il existe déjà une facturation pour cette période.",349);					
+					  throw new errorATF("Il existe déjà une facturation pour cette période.",349);					
 					}
 				}
 			}
@@ -466,7 +467,7 @@ class facture_lm extends facture {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 
 		if(!$infos["prix"]){
-			throw new error("Il faut un prix pour la facture",351);
+			throw new errorATF("Il faut un prix pour la facture",351);
 		}
 		
 		if(!$batch){
@@ -490,7 +491,7 @@ class facture_lm extends facture {
 
 		ATF::db($this->db)->begin_transaction();
 
-//*****************************Transaction********************************
+		//*****************************Transaction********************************
 
 		////////////////Affaire
 		ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"],"etat"=>"facture"));
@@ -550,7 +551,7 @@ class facture_lm extends facture {
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente);
 		}
 		
-//*****************************************************************************
+		//*****************************************************************************
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -589,7 +590,7 @@ class facture_lm extends facture {
 			$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
 			if($infos["key"] == "date_rejet"){
 				if(ATF::facture()->select($infos["id_facture"], "date_rejet") != NULL){					
-					throw new error("Impossible de modifier une date de rejet car elle est déja renseignée",877);
+					throw new errorATF("Impossible de modifier une date de rejet car elle est déja renseignée",877);
 					return true;
 				}
 			}		
@@ -676,7 +677,7 @@ class facture_lm extends facture {
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));		
 			return true;
 		}else{
-			throw new error("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
+			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
 	}
 	
@@ -714,7 +715,7 @@ class facture_lm extends facture {
 		if($this->select($id,"etat")=="impayee"){
 			return true; 
 		}else{
-			throw new error("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
+			throw new errorATF("Impossible de supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",879);
 		}
 	}
 
@@ -725,7 +726,7 @@ class facture_lm extends facture {
 	* @return boolean 
 	*/
 	public function can_update($id,$infos=false){
-		throw new error("Impossible de modifier une ".ATF::$usr->trans($this->table),878);
+		throw new errorATF("Impossible de modifier une ".ATF::$usr->trans($this->table),878);
 	}
 	
 	 public function export_special2($infos){
@@ -757,7 +758,7 @@ class facture_lm extends facture {
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
      * @param array $infos : contient tous les enregistrements          
      */     
-     public function export_xls_special(&$infos){
+    public function export_xls_special(&$infos){
      		     
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
@@ -855,7 +856,7 @@ class facture_lm extends facture {
      * @param array $sheets : contient les 5 onglets     
      * @param array $infos : contient tous les enregistrements          
      */     
-     public function ajoutDonnees(&$sheets,$infos){
+    public function ajoutDonnees(&$sheets,$infos){
 		$row_auto=1;      
 		$increment=0;     
 		foreach ($infos as $key => $item) {             
@@ -1176,7 +1177,7 @@ class facture_lm extends facture {
          $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
          if($infos['onglet'] === "gsa_facture_facture"){
-         	throw new error("Il faut générer les fichier Excell à partir d'un filtre personnalisé");
+         	throw new errorATF("Il faut générer les fichier Excell à partir d'un filtre personnalisé");
          }else{
          	$this->q->addAllFields($this->table)
          		 //->where("facture.id_commande","commande.id_commande")
@@ -1197,7 +1198,7 @@ class facture_lm extends facture {
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
      * @param array $infos : contient tous les enregistrements          
      */     
-     public function export_xls_autoportes(&$infos,$refi=FALSE){
+    public function export_xls_autoportes(&$infos,$refi=FALSE){
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
@@ -1240,7 +1241,7 @@ class facture_lm extends facture {
 	/** Mise en place des titres         
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
      */     
-     public function ajoutTitreAutoporte(&$sheets){
+    public function ajoutTitreAutoporte(&$sheets){
         $row_data = array(
         	 "A"=>array('RESEAU',20)
         	,"B"=>array('X',5)
@@ -1303,7 +1304,7 @@ class facture_lm extends facture {
 	 * @param boolean $refinance TRUE pour sortir toutes les affaires        
      */     
      public function ajoutDonneesAutoportes(&$sheets,$infos, $refinance=FALSE){
-//log::logger('ajoutDonneesAutoportes',ygautheron);
+		//log::logger('ajoutDonneesAutoportes',ygautheron);
         $row_auto=1;      
 		$increment=0;
 		$InOneMonth = date('Y-m-01',strtotime("+1 month"));
@@ -1338,14 +1339,14 @@ class facture_lm extends facture {
 				
 				
 				
-//log::logger($afficher,ygautheron);			
+		//log::logger($afficher,ygautheron);			
 				if($afficher){
 					$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);        
 					$societe = ATF::societe()->select($item['facture.id_societe_fk']);
 					ATF::loyer()->q->reset()->where("loyer.id_affaire",$item["facture.id_affaire_fk"]);
 					$loyers = ATF::loyer()->select_all();
-//log::logger("===================".$item["facture.id_affaire_fk"]."==========\n",ygautheron);				
-//log::logger($loyer,ygautheron);
+		//log::logger("===================".$item["facture.id_affaire_fk"]."==========\n",ygautheron);				
+		//log::logger($loyer,ygautheron);
 					foreach($loyers as $k=>$loyer){
 							
 						//Ne pas afficher les contrats ou il n'y a qu'un seul loyer
@@ -1565,7 +1566,7 @@ class facture_lm extends facture {
 					ATF::db($this->db)->commit_transaction();
 					ATF::$msg->addNotice("Passage de la facture libre en normale et ajout de la facture à l'echeancier reussie");					
 				}else{					
-					throw new error("Il y a déja une facture pour la période du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));
+					throw new errorATF("Il y a déja une facture pour la période du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));
 				}
 			}else{
 				ATF::db($this->db)->begin_transaction();
@@ -1596,10 +1597,10 @@ class facture_lm extends facture {
 					ATF::suivi()->insert($suivis);
 				ATF::db($this->db)->commit_transaction();
 				ATF::$msg->addNotice("Passage de la facture libre en normale création de la ligne d'echeancier et ajout de la facture à l'echeancier reussie");
-				/*throw new error("Impossible car il n'y a pas de ligne d'echeancier pour la periode du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));*/
+				/*throw new errorATF("Impossible car il n'y a pas de ligne d'echeancier pour la periode du ".$this->select($infos["id_facture"] , "date_periode_debut")." au ".$this->select($infos["id_facture"] , "date_periode_fin"));*/
 			}
 		}else{
-			throw new error("Il n'est pas possible de passer une facture libre ".$this->select($infos["id_facture"] , "type_libre")." en facture normale");
+			throw new errorATF("Il n'est pas possible de passer une facture libre ".$this->select($infos["id_facture"] , "type_libre")." en facture normale");
 		}
 		return true;
 	}
@@ -1774,5 +1775,139 @@ class facture_lm extends facture {
 		fpassthru($fh);   
 		unlink($fname);   
 		PHPExcel_Calculation::getInstance()->__destruct(); 		   
-	} 
+	}
+
+
+	public function export_GL_LM(&$infos){
+		$infos["display"] = true;
+		
+		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();   
+        $data = $this->sa();
+
+        $string = "";
+        $total_debit = 0;
+        $total_credit = 0;
+        $lignes = 0;
+
+        $donnees = array();
+
+        foreach ($data as $key => $value) {
+        	for($i=1;$i<4;$i++){	
+	        	if($i==1){
+	        		//TTC
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = $value["facture.prix"]*$value["facture.tva"]; //Montant Debit
+					$donnees[$key][$i][21] = "0"; //Montant Credit        	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+
+					$total_debit += ($value["facture.prix"]*$value["facture.tva"]);
+
+	        	}elseif($i==2){
+	        		//HT
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = "0"; //Montant Debit
+					$donnees[$key][$i][21] = $value["facture.prix"]; //Montant Credit      	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+
+					$total_credit += $value["facture.prix"];
+
+	        	}elseif($i==3){
+	        		//TVA
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = "0"; //Montant Debit
+					$donnees[$key][$i][21] = $value["facture.prix"]*($value["facture.tva"]-1); //Montant Credit      	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+
+					$total_credit += ($value["facture.prix"]*($value["facture.tva"]-1));
+	        	}  
+        	}        	
+        }
+
+        header('Content-Type: application/fic');		
+		header('Content-Disposition: attachment; filename="GL_CLEODIS_LMA_'.date("Y-m").'"');
+		
+		
+		foreach ($donnees as $key => $value) {	
+			foreach ($value as $k => $v) {
+				for($i=1;$i<=36;$i++){
+					if(isset($v[$i])){
+						$string .= $v[$i].";";
+					}else{
+						$string .= ";";
+					}					
+				}
+				$string .= "\n";
+				$lignes ++;
+			}
+		}
+        $string .= "99;".$total_debit.";".$total_credit.";"."EUR;\n";
+
+        $lignes++;
+        $string .=  "0;".$lignes.";".date("Ymd").";";
+        echo $string;
+	}
+
+
 }; 

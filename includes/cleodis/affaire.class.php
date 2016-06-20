@@ -237,7 +237,7 @@ class affaire_cleodis extends affaire {
 //		){
 //			return true;
 //		}else{
-//			throw new error("L'affaire doit être inséré depuis une société.",880);
+//			throw new errorATF("L'affaire doit être inséré depuis une société.",880);
 //		}
 //	}
 	
@@ -289,7 +289,7 @@ class affaire_cleodis extends affaire {
 					case "date_installation_reel":
 						$devis = $affaire->getDevis();
 						if (!$devis) {
-							throw new error("aucun_devis_trouve",856);
+							throw new errorATF("aucun_devis_trouve",856);
 						}
 						if($affaire->get("nature")!="avenant" && !$affaire->get("date_garantie")){
 							$affaire->set("date_garantie",$devis->getDateFinPrevue($infos['value']));
@@ -304,7 +304,7 @@ class affaire_cleodis extends affaire {
 					case "date_ouverture": break;
 						
 					default:
-						throw new error("date_invalide",988);
+						throw new errorATF("date_invalide",988);
 				}				
 				$affaire->set($infos["field"], $infos["value"]?date("Y-m-d",strtotime($infos["value"])):NULL);
 				$affaire->majForecastProcess();
@@ -317,7 +317,7 @@ class affaire_cleodis extends affaire {
 		
 				return true;
 				
-			} catch(error $e) {
+			} catch(errorATF $e) {
 				//On commit le tout
 				ATF::db($this->db)->rollback_transaction();
 				throw $e;
@@ -374,10 +374,10 @@ class affaire_cleodis extends affaire {
 					$affaire->set($infos["field"],$infos['value']);					
 					break;
 				default:
-					throw new error("Problème modification",987);
+					throw new errorATF("Problème modification",987);
 			}
 			
-		} catch(error $e) {
+		} catch(errorATF $e) {
 			//On commit le tout
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
@@ -986,7 +986,7 @@ class affaire_cleodis extends affaire {
 		if ($demandeRefi = $this->getDemandeRefiValidee()) {
 			$vr = $demandeRefi->get("valeur_residuelle");
 		}
-//log::logger("valeur_residuelle_demande_refi => ".$vr,ygautheron);
+//log::logger("valeur_residuelle_demande_refi => ".$vr,mfleurquin);
 		
 		$f = new Financial;
 		$freq = array("mois"=>12,"trimestre"=>4,"semestre"=>2,"an"=>1);
@@ -995,11 +995,11 @@ class affaire_cleodis extends affaire {
 			if ($pv) {
 				$vr2 = $pv; 
 			}
-//log::logger("f->PV(".$taux."/".$freq[$loyer["frequence_loyer"]]."/100, ".$loyer["duree"].", ".$loyer["loyer"].", ".$vr." , 1);",ygautheron);
+//log::logger("f->PV(".$taux."/".$freq[$loyer["frequence_loyer"]]."/100, ".$loyer["duree"].", ".$loyer["loyer"].", ".$vr." , 1);",mfleurquin);
 			$pv = -$f->PV($taux/$freq[$loyer["frequence_loyer"]]/100, $loyer["duree"], ($loyer["loyer"]+$loyer["frais_de_gestion"]+$loyer["assurance"]), $vr2 , 1);
 			$loyers[$i]["pv"] = round($pv,2);
 		}
-		$loyers = array_reverse($loyers);	
+		$loyers = array_reverse($loyers);
 		return $loyers;
 	}
 	
@@ -1019,18 +1019,25 @@ class affaire_cleodis extends affaire {
 			$date_debut = $c->get("date_debut");
 		}
 		if ($date_debut && $infos["date_cession"]) {
-//log::logger("date_cession=".$infos["date_cession"],ygautheron);				
+//log::logger("date_cession=".$infos["date_cession"],mfleurquin);				
 			$date1 = new DateTime(substr($infos["date_cession"],0,8).'01');
 			$date1->modify('+1 month'); // On prend le premier jour du mois suivant ( nécessaire en cas de date de cession en dernier jour de période pleine,et à cause du pb des bisextile, et en plus a ce bug de merde : https://bugs.php.net/bug.php?id=52480 )
-//log::logger("date_cession=".$date1->format('Y-m-d'),ygautheron);				
-//log::logger("date_debut=".$date_debut,ygautheron);			
-			$date2 = new DateTime($date_debut);
-//log::logger($date1->diff($date2),ygautheron);			
-//log::logger("diff=".$date1->diff($date2)->format('%m'),ygautheron);			
-			$duree_ecoulee_restante = $duree_ecoulee = $date1->diff($date2)->format('%y')*12 + $date1->diff($date2)->format('%m');
-//log::logger("duree_ecoulee=".$duree_ecoulee,ygautheron);		
+//log::logger("date_cession=".$date1->format('Y-m-d'),mfleurquin);				
+//log::logger("date_debut=".$date_debut,mfleurquin);			
+			$date_2 = new DateTime($date_debut);
+//log::logger("DateTime date_debut=".$date_2->format('Y-m-d'),mfleurquin);
+//log::logger($date1->diff($date_2),mfleurquin);			
+//log::logger("diff=".$date1->diff($date_2)->format('%m'),ygautheron);			
+			$duree_ecoulee_restante = $duree_ecoulee = $date1->diff($date_2)->format('%y')*12 + $date1->diff($date_2)->format('%m');
+			if($date1->diff($date_2)->format('%d')>0) $duree_ecoulee_restante = $duree_ecoulee = $duree_ecoulee+1;
+//log::logger("duree_ecoulee=".$duree_ecoulee,mfleurquin);		
 //log::logger(DateTime::getLastErrors(),ygautheron);		
-			
+			//log::logger($date1->diff($date_2)->format('%d') , "mfleurquin");
+			//log::logger($date_2 , "mfleurquin");
+
+			//log::logger($date1->diff($date_2) , "mfleurquin");
+			//log::logger($date_2->diff($date1) , "mfleurquin");
+
 			// On "rogne" les mois deja écoulé jusqu'àla date de cession	
 			$frequence_loyer=array("mois"=>1,"trimestre"=>3,"semestre"=>6,"an"=>12);
 			$loyers = $this->getLoyers($infos["id_affaire"]);
@@ -1053,7 +1060,7 @@ class affaire_cleodis extends affaire {
 //log::logger($loyers,ygautheron);		
 	
 		$loyers = $a->getCompteTLoyersActualises($infos["taux"],$infos["vr"],$loyers);
-//log::logger($loyers,ygautheron);	
+	
 		//date_default_timezone_set($fuseau);	// Fin du truc chelou	: https://bugs.php.net/bug.php?id=52480
 		return $loyers[0]["pv"];
 	}
@@ -1099,13 +1106,13 @@ class affaire_cleodis extends affaire {
 		}elseif($enregistrement["id_contact"]){
 			if(!ATF::contact()->select($enregistrement["id_contact"],"email")){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
+				throw new errorATF("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
 			}else{
 				$recipient = ATF::contact()->select($enregistrement["id_contact"],"email");
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas d'email",350);
+			throw new errorATF("Il n'y a pas d'email",350);
 		}
 
 		if(ATF::$usr->getID()){

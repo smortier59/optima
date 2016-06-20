@@ -365,7 +365,7 @@ class parc_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			classes::decryptId($this->obj->insert($infos));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(877,$error,'Erreur insertion de parc sans parc !');
@@ -392,7 +392,7 @@ class parc_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			classes::decryptId($this->obj->insert($infos));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(880,$error,'Erreur affaire sans garantie !');
@@ -406,7 +406,7 @@ class parc_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			classes::decryptId($this->obj->insert($infos));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(883,$error,'Erreur parc sans serial !');
@@ -438,7 +438,7 @@ class parc_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			classes::decryptId($this->obj->insert($infos));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(881,$error,'Erreur serial déjà utilisé !');

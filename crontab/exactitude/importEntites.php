@@ -56,7 +56,7 @@ while ($l = fgetcsv($fic)) {
     }
     echo "DONE !\n";
 
-  } catch (error $e) {
+  } catch (errorATF $e) {
     if ($e->getErrno()==1062) continue;
     print_r($toInsert);
     die("ERREUR  => ".$e->getErrno()." - ".$e->getMessage()."\n\n");

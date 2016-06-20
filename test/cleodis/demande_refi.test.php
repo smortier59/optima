@@ -90,7 +90,7 @@ class demande_refi_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->updateDate($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(875,$error,"Impossible d'insérer date de cession car il n'y a pas de date de fin de contrat");
@@ -99,7 +99,7 @@ class demande_refi_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->updateDate($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(876,$error,'La date de cession date est inférieur à la date de début de contrat');
@@ -314,13 +314,13 @@ class demande_refi_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_facture=ATF::facture()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"prix"=>1000,"date"=>date("Y-m-d"),"tva"=>"19.6","id_affaire"=>$id_affaire,"id_demande_refi"=>$id_demande_refi));
 		try {
 			$this->obj->can_delete($id_demande_refi);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,'On ne doit pas pouvoir supprimer une demande_refi qui a une facture');
 		try {
 			$this->obj->can_update($id_demande_refi);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,'On ne doit pas pouvoir modifier une demande_refi qui a une facture');
@@ -330,13 +330,13 @@ class demande_refi_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->u(array("id_demande_refi"=>$id_demande_refi,"etat"=>"valide"));
 		try {
 			$this->obj->can_delete($id_demande_refi);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(877,$error,'On ne doit pas pouvoir supprimer une demande_refi qui est valide');
 		try {
 			$this->obj->can_update($id_demande_refi);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(877,$error,'On ne doit pas pouvoir moodifier une demande_refi qui est valide');

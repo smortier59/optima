@@ -3,7 +3,7 @@
 * @package Optima
 * @subpackage Cleodis
 */
-class parc_lm extends classes_optima {
+class parc extends classes_optima {
 	function __construct() {
 		parent::__construct();
 		$this->table = "parc";
@@ -205,11 +205,11 @@ class parc_lm extends classes_optima {
 	* @param array $commande_ligne
 	*/
 	public function insertParcSerial($item,$commande_ligne){
-		$type=ATF::produit()->select($item["id_produit"],"type");
+		//$type=ATF::produit()->select($item["id_produit"],"type");
 							
 		if(!$item["serial"]){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Il faut un serial pour le produit ".$item["produit"],883);
+			throw new errorATF("Il faut un serial pour le produit ".$item["produit"],883);
 		}
 		
 		//Parcs, insertion des parcs uniquement s'ils ne proviennent pas d'une affaire (car déjà présent)
@@ -217,16 +217,16 @@ class parc_lm extends classes_optima {
 		
 		if(!$affaire["date_garantie"]){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas de date de garantie pour cette affaire",880);
+			throw new errorATF("Il n'y a pas de date de garantie pour cette affaire",880);
 		}
 	
-		/*Le serial ne doit pas déjà exister*/
+		/*Le serial ne doit pas déjà exister
 		$this->q->reset()->addCondition("serial",$item["serial"])->setCount();
 		$countParc=$this->sa();
 		if($countParc["count"]>0){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Le serial ".$item["serial"]." n'est pas valide car il est déjà utilisé par le parc '".$countParc["data"][0]["libelle"]."' de l'affaire '".ATF::affaire()->nom($countParc["data"][0]["id_affaire"])."'",881);
-		}
+			throw new errorATF("Le serial ".$item["serial"]." n'est pas valide car il est déjà utilisé par le parc '".$countParc["data"][0]["libelle"]."' de l'affaire '".ATF::affaire()->nom($countParc["data"][0]["id_affaire"])."'",881);
+		}*/
 
 		$serial["id_societe"]=$affaire["id_societe"];
 		$serial["id_affaire"]=$affaire["id_affaire"];
@@ -247,7 +247,7 @@ class parc_lm extends classes_optima {
 		
 		/*
 		if($this->parcSerialIsActif($serial["serial"])){
-			throw new error("Impossible d'insérer ce parc car un parc ACTIF existe déjà avec ce même serial. (serial=".$serial["serial"].")",347);
+			throw new errorATF("Impossible d'insérer ce parc car un parc ACTIF existe déjà avec ce même serial. (serial=".$serial["serial"].")",347);
 		}
 		 * Ne sert pas, car on teste deja plus haut qu'aucun autre parc existe deja avec ce serial ! */
 		
@@ -312,7 +312,7 @@ class parc_lm extends classes_optima {
 			}
 			ATF::db($this->db)->commit_transaction();
 		}else{
-			throw new error("Il n'y a pas de produit !",877);
+			throw new errorATF("Il n'y a pas de produit !",877);
 		}
 		ATF::affaire()->redirection("select",$id_affaire);
 		return true;
@@ -324,7 +324,7 @@ class parc_lm extends classes_optima {
 	* @param int $id_bon_de_commande
 	* @return boolean 
 	*/
-	function parcByBdc($id_bon_de_commande){
+	function parcByBdc($id_bon_de_commande){		
 		ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_bon_de_commande",$id_bon_de_commande);
 		$parc=ATF::bon_de_commande_ligne()->toParcInsert();
 

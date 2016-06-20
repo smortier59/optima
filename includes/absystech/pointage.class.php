@@ -340,7 +340,7 @@ class pointage_absystech extends pointage {
 			->addField("id_user")
 			->addCondition("id_pointage",$id);
 		$res=$this->sa();
-		if(!$res[0]) throw new error("pointage_not_found");
+		if(!$res[0]) throw new errorATF("pointage_not_found");
 		
 		$res=$res[0];
 		$id_user = $res["id_user"];

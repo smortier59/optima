@@ -77,7 +77,7 @@ class emailing_source_test extends emailing_test {
 		$erreur = false;
 		try {
 			$this->obj->majListContact();
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 			$code = $e->getCode();
 		}

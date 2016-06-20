@@ -234,7 +234,7 @@ class produit_exquado extends produit {
 		$infos["url"] = util::mod_rewrite($infos["produit"]);
 
 		if($count["count"]>0){
-			throw new error("Cette Ref existe déjà !",987);
+			throw new errorATF("Cette Ref existe déjà !",987);
 		}
 		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);	
 	}
@@ -261,7 +261,7 @@ class produit_exquado extends produit {
 	*/
 	public function getInfosFromICECAT($infos){
 		if (!$infos['ref'] || !$infos['id_fabriquant']) {
-			throw new error("Impossible d'interroger ICECAT sans la référence et le fabriquant.");
+			throw new errorATF("Impossible d'interroger ICECAT sans la référence et le fabriquant.");
 		}
 
 		// Vérifier que la référence n'existe pas déjà dans le catalogue produit, si c'est le cas on renvoi un message d'erreur.
@@ -387,7 +387,7 @@ class produit_exquado extends produit {
         $html = str_replace("`","'",$html);
         // La fiche technique est inaccessible : Produit obsolète ou alors la REF n'est pas bonn, ou bien la marque :/
 		if (preg_match('#Sorry, for this product no additional product information is found#', $html) || !$html) {
-            throw new error(ATF::$usr->trans("Produit introuvable sur ICECAT !"),910);
+            throw new errorATF(ATF::$usr->trans("Produit introuvable sur ICECAT !"),910);
         }
                 
 		$html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");

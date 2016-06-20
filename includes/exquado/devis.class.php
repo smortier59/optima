@@ -210,10 +210,10 @@ class devis_exquado extends devis {
 	
 		//Si aucune affaire sélectionné (seul une vente peut être fait sans faire référence à une affaire)
 		if(!$affaire && $type!="vente"){
-			throw new error(ATF::$usr->trans("parc_sans_".$type),879);
+			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
 		//Si c'est un avenant il ne peut y avoir qu'une affaire parente (sauf pour les AR)
 		}elseif(count($return["affaire"])>1 && ($type=="avenant" || $type=="vente")){
-			throw new error("Il ne peut y avoir qu'une affaire reprise par ".$type,878);
+			throw new errorATF("Il ne peut y avoir qu'une affaire reprise par ".$type,878);
 		}else{
 			return $return;
 		}
@@ -278,7 +278,7 @@ class devis_exquado extends devis {
 
 		if($infos["loyer_unique"]=="oui"){
 			if(!$infos_avenant){
-				throw new error("Un loyer unique doit être un avenant.",881);
+				throw new errorATF("Un loyer unique doit être un avenant.",881);
 			}else{
 				$loyer_unique["loyer"]=$infos_loyer[0]["loyer__dot__loyer"];
 				$loyer_unique["frais_de_gestion"]=$infos_loyer[0]["loyer__dot__frais_de_gestion"];
@@ -294,10 +294,10 @@ class devis_exquado extends devis {
 				$loyer_vente["frequence_loyer"]="mois";
 				unset($infos["prix_vente"],$infos_loyer);
 			}else{
-				throw new error("Il faut un prix pour ce contrat de vente.",880);
+				throw new errorATF("Il faut un prix pour ce contrat de vente.",880);
 			}
 		}elseif(!$infos_loyer){
-			throw new error("Il n'y a pas de loyer pour ce devis.",875);
+			throw new errorATF("Il n'y a pas de loyer pour ce devis.",875);
 		}
 
 		////////////////Affaire
@@ -402,14 +402,14 @@ class devis_exquado extends devis {
 				$item["id_devis"]=$last_id;
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Ligne de devis sans fournisseur",882);
+					throw new errorATF("Ligne de devis sans fournisseur",882);
 				}
 				unset($item["id_parc"]);
 				ATF::devis_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Devis sans produits",877);
+			throw new errorATF("Devis sans produits",877);
 		}
 
 		////////////////Parcs
@@ -430,7 +430,7 @@ class devis_exquado extends devis {
 			if($infos["type_contrat"]=="vente"){
 				$this->vente($infos_ligne_repris,$infos_vente["affaire"],$infos['id_affaire']);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}
@@ -453,7 +453,7 @@ class devis_exquado extends devis {
 					ATF::loyer()->i($item);
 				}else{
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Il n'y a pas de fréquence pour un loyer",876);
+					throw new errorATF("Il n'y a pas de fréquence pour un loyer",876);
 				}
 			}
 		}elseif($infos["type_contrat"]=="vente"){
@@ -696,7 +696,7 @@ class devis_exquado extends devis {
 				unset($parc["date"]);
 				ATF::parc()->i($parc);
 			}else{
-				throw new error("parc_checked_sans_affaire",891);
+				throw new errorATF("parc_checked_sans_affaire",891);
 			}
 		}
 		
@@ -731,7 +731,7 @@ class devis_exquado extends devis {
 				ATF::parc()->i($parc_reloue);
 			
 			}else{
-				throw new error("parc_checked_sans_affaire",891);
+				throw new errorATF("parc_checked_sans_affaire",891);
 			}
 		}
 		
@@ -790,7 +790,7 @@ class devis_exquado extends devis {
 			
 				$affaire[]=$parc_vendu["provenance"];
 			}else{
-				throw new error("parc_checked_sans_affaire",891);
+				throw new errorATF("parc_checked_sans_affaire",891);
 			}
 		}
 		return true;		
@@ -847,7 +847,7 @@ class devis_exquado extends devis {
 		if($this->select($id,"etat")=="attente"){
 			return true;
 		}else{
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false; 
 		}
 	}
@@ -1052,7 +1052,7 @@ class devis_exquado extends devis {
 			$this->redirection("select_all",NULL,"devis.html");
 			return true; 
 		}else{	
-			throw new error("Impossible de passer une affaire gagnée en 'perdu'",899);
+			throw new errorATF("Impossible de passer une affaire gagnée en 'perdu'",899);
 		}
 	}
 	

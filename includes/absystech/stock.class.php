@@ -1114,7 +1114,7 @@ class stock_absystech extends stock {
 	}	
 
 };
-class errorStock extends error {};
+class errorStock extends errorATF {};
 
 class stock_att extends stock_absystech { };
 class stock_wapp6 extends stock_absystech { };

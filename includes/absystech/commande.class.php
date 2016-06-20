@@ -110,7 +110,7 @@ class commande_absystech extends commande {
 	 */
 	public function can_update($id,$infos=false){
 		if($this->select($id,"etat")!="en_cours" && ATF::$usr->get("id_profil")!=1) {
-			throw new error("Il est impossible de modifier une commande qui n'est pas en cours, seul un profil Associé peut faire cela.",892);
+			throw new errorATF("Il est impossible de modifier une commande qui n'est pas en cours, seul un profil Associé peut faire cela.",892);
 		}else{
 			return true;
 		}
@@ -123,7 +123,7 @@ class commande_absystech extends commande {
 	 */
 	public function can_delete($id){
 		if($this->select($id,"etat")!="en_cours" && $this->select($id,"etat")!="annulee"){
-			throw new error("Il est impossible de supprimer une commande qui n'est pas en cours ou annulée",893);
+			throw new errorATF("Il est impossible de supprimer une commande qui n'est pas en cours ou annulée",893);
 		}else{
 			return true;
 		}

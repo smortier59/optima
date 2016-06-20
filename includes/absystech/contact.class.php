@@ -39,7 +39,7 @@ class contact_absystech extends contact {
 			$this->teamviewerMail = new mail($info_mail);
 			$this->teamviewerMail->send();
 			ATF::$msg->addNotice(loc::mt("Mail envoyé pour le téléchargement de Teamviewer"));
-		}else{	throw new error("Le contact n'a pas d'adresse mail renseignée",880); }	
+		}else{	throw new errorATF("Le contact n'a pas d'adresse mail renseignée",880); }	
 	}
 	
 

@@ -32,10 +32,10 @@ class asterisk extends classes_optima {
 		}
 				
 		//Sip non paramétré	
-		if (!ATF::$usr->get("id_phone")) throw new error(ATF::$usr->trans("sip_failed",$this->table));
+		if (!ATF::$usr->get("id_phone")) throw new errorATF(ATF::$usr->trans("sip_failed",$this->table));
 		
 		//Tel non trouvé
-		if (!$tel) throw new error(ATF::$usr->trans("tel_empty",$this->table));
+		if (!$tel) throw new errorATF(ATF::$usr->trans("tel_empty",$this->table));
 		
 		//Gestion de l'indicatif international
 		$tel=str_replace("+","00",$tel);

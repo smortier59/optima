@@ -45,7 +45,7 @@ class emailing_source extends emailing {
 		// Verification de la présence du fichier temporaire
 		$path=ATF::importer()->filepath(ATF::$usr->getID(),"fichier",true);
 		if (!file_exists($path)) {
-			throw new error(ATF::$usr->trans("fichier_temp_manquant",$this->table),1000);
+			throw new errorATF(ATF::$usr->trans("fichier_temp_manquant",$this->table),1000);
 		} else {
 			$r = `xls2csv -d utf-8 $path 2>/dev/null`;
 			$path = str_replace(".xls",".csv",$path);
@@ -96,7 +96,7 @@ class emailing_source extends emailing {
 					try {
 						$r = ATF::emailing_contact()->u($enr);
 						$numUpdateOK+=$r;
-					} catch (error $e) {
+					} catch (errorATF $e) {
 						$msg = $e->getMessage();
 						if (ereg("generic message : ",$msg)) {
 							$tmp = json_decode(str_replace("generic message : ","",$msg),true);
@@ -111,7 +111,7 @@ class emailing_source extends emailing {
 					try {
 						$r = ATF::emailing_contact()->i($enr);
 						$numInsert++;
-					} catch (error $e) {
+					} catch (errorATF $e) {
 						$msg = $e->getMessage();
                         
 						if (ereg("generic message : ",$msg)) {

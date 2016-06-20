@@ -71,7 +71,7 @@ class emailing_contact_test extends emailing_test {
             $erreur = false;
             $infos['onglet'] = "gsa_emailing_source_".$id;
             $this->obj->export_brut($infos);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
         $this->assertTrue($erreur,"Pas d'erreur ?");

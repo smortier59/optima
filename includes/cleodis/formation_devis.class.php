@@ -154,7 +154,7 @@ class formation_devis_cleodis extends formation_devis {
 		if($this->select($id,"etat")=="attente"){
 			return true;
 		}else{
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false; 
 		}
 	}
@@ -219,10 +219,10 @@ class formation_devis_cleodis extends formation_devis {
 		unset($infos["contact"],$infos["opca"]);				
 				
 		if($infos["type"] != "light"){
-			if(!$participants){	throw new error("Il faut au moins 1 participant à la formation",875);	}
+			if(!$participants){	throw new errorATF("Il faut au moins 1 participant à la formation",875);	}
 
-			if(!$formation_devis_ligne){  throw new error("Il faut au moins 1 date pour la formation",875); }
-			if(!$formation_devis_fournisseur){  throw new error("Il faut au moins 1 fournisseur pour la formation",875); }
+			if(!$formation_devis_ligne){  throw new errorATF("Il faut au moins 1 date pour la formation",875); }
+			if(!$formation_devis_fournisseur){  throw new errorATF("Il faut au moins 1 fournisseur pour la formation",875); }
 		}
 		
 
@@ -319,14 +319,14 @@ class formation_devis_cleodis extends formation_devis {
 		unset($infos["contact"], $infos["opca"]);
 		
 		if($this->select($infos["id_formation_devis"], "etat") != "attente"){
-			throw new error("Impossible de modifier un devis qui n'est plus en attente !",875);
+			throw new errorATF("Impossible de modifier un devis qui n'est plus en attente !",875);
 		}		
 		
 		if(!$participants){
-			throw new error("Il faut au moins 1 participant à la formation",875);
+			throw new errorATF("Il faut au moins 1 participant à la formation",875);
 		}
-		if(!$formation_devis_ligne){  throw new error("Il faut au moins 1 date pour la formation",875); }
-		if(!$formation_devis_fournisseur){  throw new error("Il faut au moins 1 fournisseur pour la formation",875); }
+		if(!$formation_devis_ligne){  throw new errorATF("Il faut au moins 1 date pour la formation",875); }
+		if(!$formation_devis_fournisseur){  throw new errorATF("Il faut au moins 1 fournisseur pour la formation",875); }
 
 
 		ATF::db($this->db)->begin_transaction();
@@ -464,7 +464,7 @@ class formation_devis_cleodis extends formation_devis {
 			$this->redirection("select_all",NULL,"formation_devis.html");
 			return true; 
 		}else{	
-			throw new error("Impossible de passer un devis gagné en 'perdu'",899);
+			throw new errorATF("Impossible de passer un devis gagné en 'perdu'",899);
 		}
 	}
 

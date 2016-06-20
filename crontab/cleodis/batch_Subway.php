@@ -54,7 +54,7 @@ foreach ($liste as $key => $value) {
 	try{
 		ATF::societe()->u($data);	
 		echo ".";						
-	}catch(error $e){
+	}catch(errorATF $e){
 		echo "\n".$e->getMessage()."\n";
 	}
 
