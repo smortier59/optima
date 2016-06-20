@@ -710,7 +710,7 @@ class societe_cleodis extends societe {
 
 				$msg = $e->getMessage();
                 
-				if (ereg("generic message : ",$msg)) {
+				if (preg_match("/generic message : /",$msg)) {
 					$tmp = json_decode(str_replace("generic message : ","",$msg),true);
 					$msg = $tmp['text'];
 				}
