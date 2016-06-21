@@ -640,7 +640,6 @@ class pdf_lm extends pdf_cleodis {
 		$this->unsetHeader();
 		$this->AddPage();
 		$this->SetLeftMargin(10);
-		$this->setAutoPageBreak(false);
 
 		$articles = ATF::cgl_article()->sa();
 		
@@ -649,13 +648,22 @@ class pdf_lm extends pdf_cleodis {
 			$this->cell(0,5,"Article ".$value["numero"]." - ".$value["titre"],0,1);
 
 			$this->setfont('arial','',8);
-			$texte = array();
+			$texte = NULL;
 			ATF::cgl_texte()->q->reset()->where("id_cgl_article",$value["id_cgl_article"])
 										->addOrder("cgl_texte.numero");
 			$texte = ATF::cgl_texte()->select_all();
-			foreach ($texte as $k => $v) {
-				$this->multicell(0,4,$value["numero"].".".$v["numero"].". ".$v["texte"]);
+			if($texte){
+				if(count($texte)>1){
+					foreach ($texte as $k => $v) {
+						if($v["numero"]) $this->multicell(0,4,$value["numero"].".".$v["numero"].". ".$v["texte"]);
+						else $this->multicell(0,4,$v["texte"]);
+					}
+				}else{
+					$this->multicell(0,4,$texte[0]["texte"]);
+				}
 			}
+			$this->ln(3);
+			
 		}
 
 
