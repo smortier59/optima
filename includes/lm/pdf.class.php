@@ -276,7 +276,7 @@ class pdf_lm extends pdf_cleodis {
 						round($i_['quantite'])
 						,$ssCat
 						,$fab
-						,$i_['produit'].$etat
+						,str_replace("&nbsp;","",str_replace("&nbsp;>", "", $i_['produit'])).$etat
 						,"details"=>$details
 					);
 						
@@ -585,7 +585,7 @@ class pdf_lm extends pdf_cleodis {
 				}
 				
 				$style[$k][1] = $this->leftStyle;
-				$data[$k][2] = $i['produit'];	
+				$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $i['produit']));
 				$style[$k][2] = $this->leftStyle;			
 				$data[$k][3] = $i['quantite'];
 			}
@@ -655,17 +655,27 @@ class pdf_lm extends pdf_cleodis {
 			if($texte){
 				if(count($texte)>1){
 					foreach ($texte as $k => $v) {
+						$v["texte"] = $this->formateTextPDF($v["texte"]);
+
 						if($v["numero"]) $this->multicell(0,4,$value["numero"].".".$v["numero"].". ".$v["texte"]);
 						else $this->multicell(0,4,$v["texte"]);
 					}
 				}else{
+					$texte[0]["texte"] = $this->formateTextPDF($texte[0]["texte"]);					
 					$this->multicell(0,4,$texte[0]["texte"]);
 				}
 			}
 			$this->ln(3);
 			
 		}
+	}
 
+	public function formateTextPDF($texte){
+		$texte = str_replace("\n", "", $texte);
+		$texte = str_replace("<br>", "\n", $texte);
+		$texte = str_replace("&nbsp;", " ", $texte);
+		$texte = strip_tags($texte);
 
+		return $texte;
 	}
 }
