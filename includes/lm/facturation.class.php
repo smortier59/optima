@@ -283,7 +283,8 @@ class facturation extends classes_optima {
 												"frais_de_gestion"=>$item['frais_de_gestion'],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat")
+												"type"=>"contrat",
+												"nature"=>$item["nature"])
 											);							
 						}else{
 							//Pour chaque échéance d'une période
@@ -298,7 +299,8 @@ class facturation extends classes_optima {
 												"frais_de_gestion"=>$item['frais_de_gestion'],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat")
+												"type"=>"contrat",
+												"nature"=>$item["nature"])
 											);
 								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
 							}

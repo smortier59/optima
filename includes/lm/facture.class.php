@@ -196,6 +196,13 @@ class facture_lm extends facture {
 					return $periode["date_periode_debut"];
 				}
 				break;
+			case "nature":
+				if ($facture) {
+					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					return $periode["nature"];
+				}
+				break;
+
 			case "date_periode_fin":
 				if ($facture) {
 					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
@@ -410,10 +417,6 @@ class facture_lm extends facture {
 			if($infos["type_libre"] !== "normale" ){
 				$infos["tva"]=1;
 			}					
-		}elseif($infos["type_facture"]=="midas"){		
-			unset($infos_ligne_repris , $infos_ligne_non_visible , $infos_ligne);
-			$infos["prix"]=$infos["prix_midas"];
-			$infos["commentaire"] = $infos["periode_midas"];			
 		}elseif($infos["type_facture"]=="facture"){
 			if($facturation= ATF::facturation()->periode_facturation($commande['id_affaire'])){				
 				if(($infos["date_periode_debut"]) && ($infos["date_periode_fin"])){
