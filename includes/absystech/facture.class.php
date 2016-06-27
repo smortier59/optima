@@ -75,7 +75,7 @@ class facture_absystech extends facture {
 			,"periodicite"=>array("disabled"=>false,"listeners"=>array("change"=>"ATF.changePeriode"))
 			,'id_termes'=>array("updateOnSelect"=>true,"custom"=>true)
 			,"date_fin_periode"
-			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield")
+			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield","listeners"=>array("change"=>"ATF.changeAcompte"))
 			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")			
 			
 		);
@@ -322,27 +322,27 @@ class facture_absystech extends facture {
 		} 
 
 		if(!count($infos_ligne)){
-			throw new error("Une facture doit comporter au moins une ligne.",161);
+			throw new errorATF("Une facture doit comporter au moins une ligne.",161);
 		}
 
 		if(!$infos["id_societe"]){
-			throw new error("Vous devez spécifier la société (Entité)",167);
+			throw new errorATF("Vous devez spécifier la société (Entité)",167);
 		}else{
 			if(ATF::societe()->estFermee($infos["id_societe"])){
-				throw new error("Impossible d'ajouter une facture sur une entité fermée");
+				throw new errorATF("Impossible d'ajouter une facture sur une entité fermée");
 			}
 		}
 
 		if ($infos["affaire_sans_devis"]) {
 			if (!$infos["affaire_sans_devis_libelle"]) {
-				throw new error("Pour une affaire sans devis, il faut saisir un libellé de votre choix.",162);
+				throw new errorATF("Pour une affaire sans devis, il faut saisir un libellé de votre choix.",162);
 			}
 			unset($infos["affaire_sans_devis"]);
 			// Alors on crée une affaire pour l'occasion
 			$affaire_sans_devis = true;
 		}
 		elseif(!$infos["id_affaire"]){
-			throw new error("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",160);
+			throw new errorATF("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",160);
 		}
 
 		// Dematerialisation
@@ -418,7 +418,7 @@ class facture_absystech extends facture {
 			$infos["prix"]=0-$infos["prix"];
 			$infos["type_facture"]="avoir";
 			if(!$infos["id_facture_parente"]){
-				throw new error("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
+				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 
 
@@ -440,7 +440,7 @@ class facture_absystech extends facture {
 		}elseif($type_check=="factor"){
 			$infos["type_facture"]="factor";
 			if(!$societe["rib_affacturage"] || !$societe["iban_affacturage"] || !$societe["bic_affacturage"]){
-				throw new error("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
+				throw new errorATF("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
 			}
 		}
 
@@ -471,7 +471,7 @@ class facture_absystech extends facture {
 
 			if($infos["type_facture"]=="facture" && $infos["id_termes"] === NULL){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Vous devez spécifier les termes",167);
+				throw new errorATF("Vous devez spécifier les termes",167);
 			}
 
 			//Facture
@@ -503,7 +503,7 @@ class facture_absystech extends facture {
 
 				if(!$infos["date_debut_periode"] || !$infos["date"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
+					throw new errorATF(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
 				}
 				
 				$total = 0;	
@@ -707,11 +707,11 @@ class facture_absystech extends facture {
 					if($id_contact_facturation){
 						if(!$recipient=ATF::contact()->select($id_contact_facturation,"email")){
 							ATF::db($this->db)->rollback_transaction();
-							throw new error("Il n'y a pas d'email pour ce contact",166);
+							throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 						}
 					}else{
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Il n'y a pas d'email pour ce contact",166);
+						throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 					}
 				}else{
 					$recipient = $email["email"];
@@ -797,7 +797,7 @@ class facture_absystech extends facture {
 		if($infos["type_facture"]!="acompte" && $infos["type_facture"]!="solde"){
 			return true;
 		} else {
-			throw new error("Il est impossible de modifier une facture d'accompte ou de solde.",893);
+			throw new errorATF("Il est impossible de modifier une facture d'accompte ou de solde.",893);
 		}
 	}	
 
@@ -854,12 +854,12 @@ class facture_absystech extends facture {
 			}			
 			$infos["type_facture"]="avoir";
 			if(!$infos["id_facture_parente"]){				
-				throw new error("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
+				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 		}elseif($type_check=="factor"){
 			$infos["type_facture"]="factor";
 			if(!$societe["rib_affacturage"] || !$societe["iban_affacturage"] || !$societe["bic_affacturage"]){
-				throw new error("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
+				throw new errorATF("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
 			}
 		}
 
@@ -874,7 +874,7 @@ class facture_absystech extends facture {
 					
 				if(!$infos["date_debut_periode"] || !$infos["date"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
+					throw new errorATF(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
 				}	
 
 				$total = 0;	
@@ -1048,7 +1048,7 @@ class facture_absystech extends facture {
 			
 			if($infos["type_facture"]=="facture" && $infos["id_termes"] === NULL){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Vous devez spécifier les termes",167);
+				throw new errorATF("Vous devez spécifier les termes",167);
 			}
 			
 			parent::update($infos,$s);
@@ -1102,7 +1102,7 @@ class facture_absystech extends facture {
 					$id_contact_facturation=ATF::societe()->select($infos["id_societe"],"id_contact_facturation");
 					if(!$recipient=ATF::contact()->select($id_contact_facturation,"email")){
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Il n'y a pas d'email pour ce contact",166);
+						throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 					}
 				}else{
 					$recipient = $email["email"];
@@ -1339,14 +1339,14 @@ class facture_absystech extends facture {
 	public function can_delete($id){
 		if($this->select($id,"etat")=="impayee"){			 
 			if(!$this->isLastOfMonth($id)){
-				throw new error("Il est impossible de supprimer cette facture car elle n'est pas la derniere du mois",893);
+				throw new errorATF("Il est impossible de supprimer cette facture car elle n'est pas la derniere du mois",893);
 			}
 			else{
 				return true;
 			}			
 		}
 		else{
-			throw new error("Il est impossible de supprimer cette facture car elle est payée",892);
+			throw new errorATF("Il est impossible de supprimer cette facture car elle est payée",892);
 		}
 	}
 	
@@ -1589,7 +1589,7 @@ class facture_absystech extends facture {
 //	*/
 //	public function getCurrentMail(){
 //		//Current mail
-//		if(!$this->current_mail) throw new error(ATF::$usr->trans("null_current_mail",$this->table));
+//		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 //		return $this->current_mail;
 //	}
 //	
@@ -1856,10 +1856,10 @@ class facture_absystech extends facture {
 				$id_societe = $this->select($factures[0] , "id_societe");
 								
 				if(!ATF::societe()->select($id_societe , "rib")){
-					throw new error("Il faut inserer un RIB pour la societe",167);
+					throw new errorATF("Il faut inserer un RIB pour la societe",167);
 				}
 				if(!ATF::societe()->select($id_societe , "banque")){
-					throw new error("Il faut inserer une banque pour la societe",167);				
+					throw new errorATF("Il faut inserer une banque pour la societe",167);				
 				}
 				
 				
@@ -1879,7 +1879,7 @@ class facture_absystech extends facture {
 					$mail->send();
 					return true;			
 				}			
-			}else{ throw new error("Toutes les factures sont déja payées",167);	}			
+			}else{ throw new errorATF("Toutes les factures sont déja payées",167);	}			
 		}return false;
 	}		
 	

@@ -93,7 +93,7 @@ class relance_cleodis extends relance {
             return "mise_en_demeure";
         } else {
             return false;
-            throw new error(ATF::$usr->trans("il_y_a_deja_une_mise_en_demeure_sur_cette_facture")." : ".ATF::facture()->select($infos['id_facture'],"ref"),1022);  
+            throw new errorATF(ATF::$usr->trans("il_y_a_deja_une_mise_en_demeure_sur_cette_facture")." : ".ATF::facture()->select($infos['id_facture'],"ref"),1022);  
         }
         
     }

@@ -50,15 +50,15 @@ class gestion_ticket extends classes_optima {
 	public function add_ticket($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Test du paramètre crédits
 		if(!is_numeric($infos["credits"])){
-			throw new error(ATF::$usr->trans("gestion_ticket_not_numeric",$this->table));
+			throw new errorATF(ATF::$usr->trans("gestion_ticket_not_numeric",$this->table));
 		}
 		if($infos["credits"]<=0){
-			throw new error(ATF::$usr->trans("gestion_ticket_not_positif",$this->table));
+			throw new errorATF(ATF::$usr->trans("gestion_ticket_not_positif",$this->table));
 		}
 		
 		// Test de la présence de la facture ou du libellé
 		if(!$infos["id_facture"] && !$infos["libelle"]){
-			throw new error(ATF::$usr->trans("libelle_or_id_facture",$this->table));
+			throw new errorATF(ATF::$usr->trans("libelle_or_id_facture",$this->table));
 		}
 		
 		//Recherche du crédit précédent

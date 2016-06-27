@@ -79,7 +79,7 @@ class emailing_job_test extends emailing_test {
 		ATF::define("testsUnitaires",false);
 		try {
 			$r = $this->obj->insert($jobToday);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::define("testsUnitaires",true);
 			throw $e;
 		}
@@ -95,7 +95,7 @@ class emailing_job_test extends emailing_test {
 
 		try {
 			$this->obj->insert($jobBeforeToday);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$this->assertNotNull($e->getMessage(),"Le throw ne s'est pas déclenché, couille dans le paté !");
 		}
 	}

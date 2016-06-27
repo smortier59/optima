@@ -153,11 +153,11 @@ class facture_boisethome extends classes_optima {
 		$this->infoCollapse($infos);
 
 		if(!$infos["id_societe"]){
-			throw new error("Vous devez spécifier la société (Entité)",167);
+			throw new errorATF("Vous devez spécifier la société (Entité)",167);
 		}
 
 		if(!$infos["id_affaire"]){
-			throw new error("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",160);
+			throw new errorATF("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",160);
 		}
 
 		if($infos["emailTexte"]){
@@ -222,11 +222,11 @@ class facture_boisethome extends classes_optima {
 					if($id_contact_facturation){
 						if(!$recipient=ATF::contact()->select($id_contact_facturation,"email")){
 							ATF::db($this->db)->rollback_transaction();
-							throw new error("Il n'y a pas d'email pour ce contact",166);
+							throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 						}
 					}else{
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Il n'y a pas d'email pour ce contact",166);
+						throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 					}
 				}else{
 					$recipient = $email["email"];

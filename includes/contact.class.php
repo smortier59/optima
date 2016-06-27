@@ -314,7 +314,7 @@ class contact extends classes_optima {
 	* @return boolean 
 	*/
 	public function can_delete($id){
-		throw new error("Impossible de supprimer un contact, il faut le passer en inactif",879);
+		throw new errorATF("Impossible de supprimer un contact, il faut le passer en inactif",879);
 		return false;
 	}
 	
@@ -400,7 +400,7 @@ class contact extends classes_optima {
 		$societe = ATF::societe()->select($contact['id_societe']);
 
 		$target = $this->filepath($id,"vcard",$temp);
-		if (!util::mkdir(dirname($target))) throw new error("Le dossier <i>".$target."</i> ne s'est pas créer ");
+		if (!util::mkdir(dirname($target))) throw new errorATF("Le dossier <i>".$target."</i> ne s'est pas créer ");
 
 		if(file_exists($target)){
 			unlink($target);

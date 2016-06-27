@@ -176,9 +176,9 @@ class societe_absystech extends societe {
 				
 				$this->redirection("select",$id_societe);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();	
-			throw new error(ATF::$usr->trans("probleme_insertion",$this->table)." => ".$e->getMessage(),$e->getCode());
+			throw new errorATF(ATF::$usr->trans("probleme_insertion",$this->table)." => ".$e->getMessage(),$e->getCode());
 		}
 		
 		ATF::db($this->db)->commit_transaction();
@@ -349,15 +349,15 @@ class societe_absystech extends societe {
 	*/
 	public function send_identifiants_hotline($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		//Test du contact
-		if(!$infos['id_contact']) throw new error(ATF::$usr->trans('si_hotline_no_contact',$this->table));
+		if(!$infos['id_contact']) throw new errorATF(ATF::$usr->trans('si_hotline_no_contact',$this->table));
 		//Test de la societe
-		if(!$infos['id_societe']) throw new error(ATF::$usr->trans('si_hotline_no_societe',$this->table));
+		if(!$infos['id_societe']) throw new errorATF(ATF::$usr->trans('si_hotline_no_societe',$this->table));
 		
 		//Recherche du contact
 		$contact=ATF::contact()->select($infos['id_contact']);
 		
 		//Mail vide
-		if(!$contact['email']) throw new error(ATF::$usr->trans('si_hotline_contact_no_mail',$this->table));
+		if(!$contact['email']) throw new errorATF(ATF::$usr->trans('si_hotline_contact_no_mail',$this->table));
 		
 		//Recherche de la societe
 		$societe=$this->select($infos['id_societe']);
@@ -899,7 +899,7 @@ class societe_absystech extends societe {
 		$infos['display']=true;
 		$f = $files["atcardImport"];
 		if (!$f['size']) {
-			throw new error(ATF::$usr->trans("fichier_corrompu",$this->table));	
+			throw new errorATF(ATF::$usr->trans("fichier_corrompu",$this->table));	
 		}
 
 		if($fichier=fopen($f['tmp_name'],"r")){
@@ -938,9 +938,9 @@ class societe_absystech extends societe {
 						unset($insert);
 					}
 				}
-			} catch (error $e) {
+			} catch (errorATF $e) {
 				ATF::db($this->db)->rollback_transaction();	
-				throw new error(ATF::$usr->trans("problemeLorsDeLimport",$this->table)." => ".$e->getMessage());
+				throw new errorATF(ATF::$usr->trans("problemeLorsDeLimport",$this->table)." => ".$e->getMessage());
 			}
 			ATF::db($this->db)->commit_transaction();
 		}

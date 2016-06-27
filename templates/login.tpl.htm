@@ -18,6 +18,9 @@
                         {elseif $smarty.server.HTTP_HOST=="optima.absystech-telecom.fr"}
                             AbsysTech Telecom
                             <input type="hidden" value="att" name="schema" id="schema" />
+                        {elseif strpos($smarty.server.HTTP_HOST,"lma")!==false}
+                            Leroy Merlin Abonnement
+                            <input type="hidden" value="lm" name="schema" id="schema" />
                     	{elseif $smarty.server.HTTP_HOST=="optima.boisethome.fr"}
                         	Bois &amp; Home
                             <input type="hidden" value="boisethome" name="schema" id="schema" />

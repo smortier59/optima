@@ -70,7 +70,7 @@ class mission_ligne extends classes_optima {
 		$mission = ATF::mission()->select($this->select($infos['id'],"id_mission"));
 
 		if ($mission['etat']!='en_attente') {
-			throw new error("Impossible de changer l'état du personnel sur une mission qui n'est pas en attente.");
+			throw new errorATF("Impossible de changer l'état du personnel sur une mission qui n'est pas en attente.");
 		}
 
 		$toUpdate = array("id_mission_ligne"=>$this->decryptId($infos['id']),"etat"=>"valide");

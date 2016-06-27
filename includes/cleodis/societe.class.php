@@ -552,7 +552,7 @@ class societe_cleodis extends societe {
 			//On check si le siret existe déja
 			$this->q->reset()->where("siret",$infos["societe"]["siret"]);
 			if($this->select_all()){
-				throw new error("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
+				throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
 			}
 		}		
 		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
@@ -706,11 +706,11 @@ class societe_cleodis extends societe {
 					$contactInserted++;
 				}
 
-			} catch (error $e) {
+			} catch (errorATF $e) {
 
 				$msg = $e->getMessage();
                 
-				if (ereg("generic message : ",$msg)) {
+				if (preg_match("/generic message : /",$msg)) {
 					$tmp = json_decode(str_replace("generic message : ","",$msg),true);
 					$msg = $tmp['text'];
 				}

@@ -21,7 +21,7 @@ foreach ($societes as $key => $value) {
 		
 		try {
 			ATF::societe()->u($value);
-		} catch (Error $e) {
+		} catch (errorATF $e) {
 			echo $value["societe"]." : ".$e->getMessage()."\n";	
 		}
 	}else{

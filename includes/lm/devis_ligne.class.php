@@ -81,7 +81,6 @@ class devis_ligne_lm extends devis_ligne {
 			}
 			$res["data"] = $return;
 		}
-		log::logger($res["data"] , "mfleurquin");
 		return $res;
 	}
 

@@ -84,7 +84,7 @@ class vi_pa extends classes_optima {
     */ 
 	public function store($infos,&$s,&$files,&$cadre_refreshed=NULL) {
 		if (!$infos["v"]) {
-			throw new error("vi_pa::store() Il manque un id_visite",44);	
+			throw new errorATF("vi_pa::store() Il manque un id_visite",44);	
 		}
 		if (ATF::db()->begin_transaction()) {
 			// On flush le tableau antidoublons
@@ -143,7 +143,7 @@ class vi_pa extends classes_optima {
 			} catch (errorSQL $e) {
 				ATF::db()->rollback();
 				if ($e->getErrno()==1062) {
-					throw new error("vi_pa::store() l'insertion a échouée, date identique",1);
+					throw new errorATF("vi_pa::store() l'insertion a échouée, date identique",1);
 				}
 			}
 			
@@ -198,7 +198,7 @@ class vi_pa extends classes_optima {
 			return $new_answer_id;
 		} else {
 			ATF::db()->rollback();
-			throw new error("vi_pa::store() réponse déjà la même...",2);
+			throw new errorATF("vi_pa::store() réponse déjà la même...",2);
 		}
 		
 	}
@@ -222,7 +222,7 @@ class vi_pa extends classes_optima {
 //log::logger("storeEmptySisters nb_childs_attr=".count($childs)." du parent=".$id_parent,"ygautheron");				
 			
 		} else {
-			throw new error("vi_pa::storeEmptySisters needs a parent !");
+			throw new errorATF("vi_pa::storeEmptySisters needs a parent !");
 		}
 		
 		// Les enfants sont trouvés, alors on execute le remplacement par des réponses vides recursivement, sauf sur la réponse protégée.
@@ -349,9 +349,9 @@ class vi_pa extends classes_optima {
 						}
 					}
 				}
-			} catch (error $e) {
+			} catch (errorATF $e) {
 				$e->setError($e);
-				throw new error(__CLASS__."::".__FUNCTION__." pb attribut dans PA :".log::arrayToString($reponse));
+				throw new errorATF(__CLASS__."::".__FUNCTION__." pb attribut dans PA :".log::arrayToString($reponse));
 			}
 			
 //log::logger("storeEmptyChilds essai Insertion reponse sur id_attr=".$insert["id_attr"]." id_pa=".$insert["id_pa"]." id_ppa=".$insert["id_ppa"]." reponse=".$insert["reponse"]."IF[".(!$childsOnly)." && ".(!$this->alreadyStored[$insert["id_ppa"]][$insert["id_attr"]])."]","qjanon");				
@@ -407,7 +407,7 @@ class vi_pa extends classes_optima {
 			
 			return $this->select_all();
 		} else {
-			throw new error(__CLASS__."::".__FUNCTION__."($id_visite,$id_attr,$id_ppa,$id_pa,$id_vi_pa_multi)");	
+			throw new errorATF(__CLASS__."::".__FUNCTION__."($id_visite,$id_attr,$id_ppa,$id_pa,$id_vi_pa_multi)");	
 		}
 	}
 	
@@ -445,7 +445,7 @@ class vi_pa extends classes_optima {
 			}
 			return $this->select_all();
 		} else {
-			throw new error(__CLASS__."::".__FUNCTION__."($id_visite,$id_ppa,$id_vi_pa_multi)");	
+			throw new errorATF(__CLASS__."::".__FUNCTION__."($id_visite,$id_ppa,$id_vi_pa_multi)");	
 		}
 	}
 	
@@ -486,7 +486,7 @@ class vi_pa extends classes_optima {
 //			log::logger(ATF::db($this->db)->sql2array($query),'qjanon');
 			return ATF::db($this->db)->sql2array($query);
 		} else {
-			throw new error(__CLASS__."::".__FUNCTION__."($id_visite,$id_attr,$id_pa)");	
+			throw new errorATF(__CLASS__."::".__FUNCTION__."($id_visite,$id_attr,$id_pa)");	
 		}
 	}
 	
@@ -747,14 +747,14 @@ class vi_pa extends classes_optima {
 							$infos["cout_unitaire_reel"] =  $infos["cout_catalogue"]["cout_unitaire"];
 						}
 //					} else {
-//						throw new error($this->table."::".__FUNCTION__." > error 3 : aucun coût associé");
+//						throw new errorATF($this->table."::".__FUNCTION__." > error 3 : aucun coût associé");
 //					}
 				} else {
-					throw new error($this->table."::".__FUNCTION__." > error 2 : aucun PA associé au vi_pa");
+					throw new errorATF($this->table."::".__FUNCTION__." > error 2 : aucun PA associé au vi_pa");
 				}
 			}
 		} else {
-			throw new error($this->table."::".__FUNCTION__." > error 1 : aucun vi_pa");
+			throw new errorATF($this->table."::".__FUNCTION__." > error 1 : aucun vi_pa");
 		}
 		if (is_array($cadre_refreshed)) {
 			return $this->refreshCostModalbox($infos,$s,$files,$cadre_refreshed);
@@ -1541,7 +1541,7 @@ class vi_pa extends classes_optima {
 			try{
 				//echo "====V".$id_visite."====A".$i['id_attr']."====PPA".($i['id_pa']?$i['id_pa']:$infos['id_pa'])."====PA".$i['id_pa']."====M".$infos['id_vi_pa_multi']."====D".$dateMax."====\n";
 				$vi_pa=ATF::vi_pa()->isAnswered($id_visite,$i['id_attr'],$i['id_pa']?$i['id_pa']:$infos['id_pa'],$i['id_pa'],$infos['id_vi_pa_multi'],$dateMax);
-			} catch(error $e) { }
+			} catch(errorATF $e) { }
 			if ((!$reponse || ($vi_pa && strtotime($reponse['date'])<strtotime($vi_pa['date']))) && $vi_pa['reponse']) {
 				$reponse = $vi_pa;
 			}

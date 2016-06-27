@@ -307,12 +307,12 @@ class societe extends classes_optima {
 			}elseif($max<10000){
 				$ref.=$max;
 			}else{
-				throw new error(ATF::$usr->trans('ref_too_high'),80853);
+				throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
 			}
 			
 			return $ref;
 		}else{
-			throw new error(ATF::$usr->trans('societe_agence_user_false'),80846);
+			throw new errorATF(ATF::$usr->trans('societe_agence_user_false'),80846);
 		}
 	}
 	
@@ -343,7 +343,7 @@ class societe extends classes_optima {
 		
 		try{
 			$retour=parent::insert($infos,$s,$files,$cadre_refreshed);
-		}catch(error $e){			
+		}catch(errorATF $e){			
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}

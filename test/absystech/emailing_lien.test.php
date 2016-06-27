@@ -36,7 +36,7 @@ class emailing_lien_test extends emailing_test {
 	public function test_iFromPlugin() {
 		try {		
 			$this->assertFalse($this->obj->iFromPlugin(),"Insertion sans aucunes infos ? Strange.");
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$this->assertNotNull($e->getMessage(),"Le throw ne s'est pas déclenché, couille dans le paté !");
 		}
 		$this->assertFalse($this->obj->iFromPlugin(array("emailing_lien"=>array())),"Insertion sans aucunes infos ? Strange.");

@@ -152,7 +152,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Sans mail
 		try {
 			$this->obj->update($facture,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 
@@ -195,7 +195,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture["facture"]["periodicite"] = "mensuelle";
 		try {
 			$this->obj->update($facture,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(175,$erreur_trouvee1,"ERREUR 2 NON ATTRAPPEE (il n'y a pas de date de debut de periode)");
@@ -207,7 +207,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$erreur_trouvee1 = null;
 			$this->obj->update($facture,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(167,$erreur_trouvee1,"ERREUR 2 NON ATTRAPPEE (il n'y a pas de terme)");
@@ -299,7 +299,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$err = false;
 		try {
 			$this->obj->update($facture,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$err = true;
 		}
 
@@ -350,7 +350,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			$societe = array("id_societe"=>$this->id_societe,"rib_affacturage"=>"","iban_affacturage"=>"","bic_affacturage"=>"");
 			ATF::societe()->u($societe);
 			$this->obj->update($facture,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$err = true;
 		}
 
@@ -383,7 +383,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$err1=false;
 		try {
 			$this->obj->can_update($r['facture.id_facture']);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$err1 = true;
 		}
 		$this->assertTrue($err1,"Peut etre modifié si c'est un type acompte");
@@ -393,7 +393,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$err2=false;
 		try {
 			$this->assertFalse($this->obj->can_update($r['facture.id_facture']),"Peut etre modifié si c'est un type solde");
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$err2 = true;
 		}
 		$this->assertTrue($err2,"Peut etre modifié si c'est un type solde");
@@ -465,7 +465,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			unset($facture4["values_facture"]);
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouveelignes = $e->getCode();
 		}
 		$this->assertEquals(161,$erreur_trouveelignes,"ERREUR lignes NON ATTRAPPEE (il n'y a pas de lignes)");
@@ -475,7 +475,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$facture4["facture"]["id_societe"]=NULL;
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(167,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas de société)");
@@ -484,7 +484,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Pas d'affaire
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(160,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas d'affaire)");
@@ -493,7 +493,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture4["facture"]["affaire_sans_devis"]=true;
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouveeSansDevis = $e->getCode();
 		}
 		$this->assertEquals(162,$erreur_trouveeSansDevis,"ERREUR pas de libelle affaire dans devis NON ATTRAPPEE");
@@ -503,7 +503,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Avoir sans facture parente
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(170,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas de facture parente pour l'avoir)");
@@ -591,7 +591,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Avoir sans facture parente
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(170,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas de facture parente pour l'avoir)");
@@ -600,7 +600,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Sans mail
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 		$this->assertEquals(166,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas d'email pour ce contact)");
@@ -611,7 +611,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Sans mail 2
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee11 = $e->getCode();
 		}
 		$this->assertEquals(166,$erreur_trouvee11,"ERREUR 11 NON ATTRAPPEE (il n'y a pas d'email pour ce contact)");
@@ -622,7 +622,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::societe()->u(array("id_societe" => $this->id_societe, "etat"=> "inactif"));
 		try {
 			$this->obj->insert($facture4,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getMessage();
 		}
 		$this->assertEquals("Impossible d'ajouter une facture sur une entité fermée",$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (societe inactive)");
@@ -648,7 +648,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			ATF::societe()->update(array("id_societe"=>ATF::societe()->decryptId($this->id_societe),"rib_affacturage"=>"","iban_affacturage"=>"","bic_affacturage"=>""));
 			$this->obj->insert($facture5,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee2 = $e->getCode();
 		}
 		$this->assertEquals(167,$erreur_trouvee2,"ERREUR 2 NON ATTRAPPEE (Il manque l'une de ces informations pour la société : RIB, IBAN, BIC)");
@@ -728,7 +728,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$erreur_trouvee = NULL;
 			$id_facture7=$this->obj->insert($facture7,$this->s);
-		} catch (error $e) {		
+		} catch (errorATF $e) {		
 			$erreur_trouvee = $e->getCode();
 		}		
 		$this->assertNull($id_facture7);	
@@ -742,7 +742,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$erreur_trouvee = NULL;
 			$id_facture8=$this->obj->insert($facture8,$this->s);
-		} catch (error $e) {		
+		} catch (errorATF $e) {		
 			$erreur_trouvee = $e->getCode();
 		}	
 		$this->assertEquals(167,$erreur_trouvee,"ERREUR  NON ATTRAPPEE (Il manque les termes");
@@ -750,14 +750,14 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$erreur_trouvee = NULL;
 			$id_facture8=$this->obj->insert($facture8,$this->s);
-		} catch (error $e) {		
+		} catch (errorATF $e) {		
 			$erreur_trouvee = $e->getCode();
 		}
 		$facture8["facture"]["date_debut_periode"]="2015-08-15";
 		try {
 			$erreur_trouvee = NULL;
 			$id_facture8=$this->obj->insert($facture8,$this->s);
-		} catch (error $e) {		
+		} catch (errorATF $e) {		
 			$erreur_trouvee = $e->getCode();
 		}
 		$facture8["facture"]["date_fin_periode"]="2015-02-15";
@@ -999,7 +999,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	function testCan_delete(){
 		try{
 			$this->obj->can_delete($this->id_facture);
-		}catch(error $e) {
+		}catch(errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(893,$error,"2 can_delete permet de supprimer une facture qui n'est pas la derniere");
@@ -1008,7 +1008,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_delete($this->id_facture);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"2 can_delete permet de supprimer une facture payee");
@@ -1423,7 +1423,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos = array("facture" => $this->id_facture.",2");
 		try {
 			$this->obj->lettre_change($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getMessage();
 		}
 		$this->assertEquals($erreur_trouvee1,"Il faut inserer un RIB pour la societe", "Erreur 1 non trouvée");
@@ -1431,7 +1431,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			$this->obj->lettre_change($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getMessage();
 		}
 		$this->assertEquals($erreur_trouvee1,"Il faut inserer une banque pour la societe", "Erreur 2 non trouvée");
@@ -1445,7 +1445,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			$this->obj->lettre_change(array("facture" => "2"));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getMessage();
 		}
 		$this->assertEquals($erreur_trouvee1,"Toutes les factures sont déja payées", "Erreur 5 non trouvée");

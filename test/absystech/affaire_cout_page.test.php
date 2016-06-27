@@ -78,7 +78,7 @@ class affaire_cout_page_test extends ATF_PHPUnit_Framework_TestCase {
 	
 		try {
 			$can_delete=$this->obj->can_delete($this->id_affaire_cout_page);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"can_delete ne doit pas pouvoir suprimer une affaire_cout_page s'il y a une facture ET un contrat");
@@ -87,7 +87,7 @@ class affaire_cout_page_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::copieur_facture()->d($this->id_copieur_facture);
 		try {
 			$can_delete=$this->obj->can_delete($this->id_affaire_cout_page);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"can_delete ne doit pas pouvoir suprimer une affaire s'il y a un contrat");
@@ -103,7 +103,7 @@ class affaire_cout_page_test extends ATF_PHPUnit_Framework_TestCase {
 		$u = array("id_affaire_cout_page"=>$this->id_affaire_cout_page,"etat"=>"commande");
 		try {
 			$can_update=$this->obj->can_update($this->id_affaire_cout_page,$u);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"ne doit pas pouvoir modifier une affaire_cout_page");
@@ -121,7 +121,7 @@ class affaire_cout_page_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->setForecast($u);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		$this->assertTrue($erreur,"Erreur non remontée");

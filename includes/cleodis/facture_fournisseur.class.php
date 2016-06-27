@@ -210,7 +210,7 @@ class facture_fournisseur extends classes_optima {
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Facture fournisseur sans produits",877);
+				throw new errorATF("Facture fournisseur sans produits",877);
 			}
 
 		ATF::db($this->db)->commit_transaction();
@@ -260,7 +260,7 @@ class facture_fournisseur extends classes_optima {
 		if($this->select($id,"etat")=="impayee"){
 			return true; 
 		}else{
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",883);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",883);
 			return false; 
 		}
 	}

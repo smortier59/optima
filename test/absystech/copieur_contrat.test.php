@@ -22,7 +22,7 @@ class copieur_contrat_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->id = $this->obj->insert($copieur_contrat,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$err = $e->getCode();
 		}
 
@@ -117,7 +117,7 @@ class copieur_contrat_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->update($copieur_contrat);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$err = $e->getCode();
 		}
 

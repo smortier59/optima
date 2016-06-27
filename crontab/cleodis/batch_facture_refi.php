@@ -264,7 +264,7 @@ foreach ($factures as $key => $value) {
 			
 			echo "Mise à jour Facture ref : ".$facture["ref"]."\n";	
 
-		}catch(error $e){
+		}catch(errorATF $e){
 			ATF::db()->rollback_transaction();
 		}
 		ATF::db()->commit_transaction();

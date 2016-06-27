@@ -13,7 +13,7 @@ class facture_ligne_absystech extends facture_ligne {
 	
 	/** @author Morgan FLEURQUIN	<mfleurquin@absystech.fr> */
 	public function can_update(){
-		throw new error("Pour modifier une ligne de facture, il faut modifier dans la facture !!!");					
+		throw new errorATF("Pour modifier une ligne de facture, il faut modifier dans la facture !!!");					
 		return false;
 	}
 	
@@ -21,7 +21,7 @@ class facture_ligne_absystech extends facture_ligne {
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
 	public function can_insert(){
-		throw new error("Pour inserer une ligne de facture, il faut modifier dans la facture !!!");
+		throw new errorATF("Pour inserer une ligne de facture, il faut modifier dans la facture !!!");
 		return false;	
 	}
 	
@@ -29,7 +29,7 @@ class facture_ligne_absystech extends facture_ligne {
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
 	/*public function can_delete(){
-		throw new error("Pour supprimer une ligne de facture, il faut modifier dans la facture !!!");
+		throw new errorATF("Pour supprimer une ligne de facture, il faut modifier dans la facture !!!");
 		return false;	
 	}*/
 	

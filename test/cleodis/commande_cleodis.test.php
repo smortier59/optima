@@ -100,7 +100,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::commande()->u(array("id_commande"=>$id_commande,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d")));
         try {
             $this->obj->checkUpdateAR($objAffaire);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(877,$error,'On ne peut pas modifier/supprimer une commande qui est AnnulÃ©e et RemplacÃ©e par une autre affaire');
@@ -119,7 +119,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $selectVente =ATF::affaire()->select($id_vente);
         try {
             $this->obj->checkUpdateAVT($selectVente);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error1 = $e->getCode();
         }
         $this->assertEquals(875,$error1,'On ne peut pas modifier/supprimer cette commande car ses produits sont vendus dans l affaire');
@@ -133,7 +133,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::commande()->i($commande);
         try {
             $this->obj->checkUpdateAVT($selectAvenant);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error2 = $e->getCode();
         }
         $this->assertEquals(876,$error2,'On ne peut pas modifier/supprimer une commande qui a un avenant, il faut d abord supprimer les dates de l avenant');
@@ -162,7 +162,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $id_parc = ATF::parc()->i(array("id_societe"=> $this->id_societe , "id_produit"=>5, "id_affaire"=>$commande["commande"]["id_affaire"] , "ref"=>"Une ref", "libelle"=>"libelle", "serial"=>"toto", "etat"=>"loue" , "existence"=>"actif"));
         try {
              $this->obj->can_delete($id_commande);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(84513,$error,'can_delete ne doit pas supprimer une commande avec un parc actif');
@@ -171,7 +171,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->u(array("id_commande"=>$id_commande,"etat"=>"mis_loyer"));
         try {
              $this->obj->can_delete($id_commande);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer une commande "mis_loyer" 1');
@@ -180,7 +180,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
          
         try {
              $this->obj->can_delete($id_commande);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer une commande "mis_loyer" 2');
@@ -188,7 +188,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::facture()->i(array("ref"=>"test_tu","id_societe"=>$this->id_societe,"prix"=>100,"date"=>date("Y-m-d"),"tva"=>"1.96","id_commande"=>$id_commande,"id_affaire"=>$commande["commande"]["id_affaire"]));
         try {
              $this->obj->can_delete($id_commande);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer une commande avec une facture');
@@ -571,7 +571,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
         try {
             $this->obj->checkAndUpdateDates($infos);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error2 = $e->getMessage();
         }
         $this->assertEquals("Il est impossible d'inserer une date de restitution effective nulle",$error2,'On ne peux pas inserer date_restitution_effective NULL');
@@ -674,7 +674,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
         try {
             $this->obj->delete(48);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             ATF::db($this->db)->rollback_transaction(); 
             $error = $e->getCode();
         }
@@ -944,7 +944,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         //Sans produits
         try {
              $id_commande = $this->obj->insert($commande);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
 
         }
@@ -954,7 +954,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         //Sans produits
         try {
              $id_commande = $this->obj->insert($commande);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(878,$error,'Erreur commmande avec ref dupliquée non declenchee');
@@ -969,7 +969,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         try {
             $error = NULL;
             classes::decryptId(ATF::commande()->insert($commande,$this->s));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode(); 
         }
         $this->assertEquals(350,$error,"Erreur d'email non declenchée");
@@ -1208,7 +1208,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             $this->obj->updateDate($date_debut);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(875,$error,'Erreur on ne doit pas pouvoir modifier les dates d une affaire qui a un avenant non démarré');
@@ -1240,7 +1240,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 ,"key" => "date_debut"
                 ,"id_commande" => "aaaaaaaaaaa"
             ));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = true;
         }
         $this->assertTrue($error,'Erreur de type update impossible non declenchee');
@@ -1254,7 +1254,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 ,"key" => "date_existe_pas"
                 ,"id_commande" => $id_commande
             ));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals($error,987,'Erreur de type date inexistante non declenchee');
@@ -1582,7 +1582,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             $this->obj->updateDate($date_debut);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(876,$error,'Erreur on ne doit pas pouvoir modifier les dates d une affaire qui a un avenant non démarré');
@@ -1854,7 +1854,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             $this->obj->updateDate($date_debut);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(876,$error,'Erreur on ne doit pas pouvoir modifier les dates d une affaire qui a un avenant non démarré');
@@ -2392,7 +2392,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             $this->obj->updateDate($date_debut);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(880,$error,'Mauvaise date 29');
@@ -2405,7 +2405,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
             $this->obj->updateDate($date_debut);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(880,$error,'Mauvaise date 30');
@@ -2417,7 +2417,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
         try {
             $this->obj->updateDate($date_debut);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(880,$error,'Mauvaise date 31');
@@ -2997,7 +2997,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //
 //      try {
 //          $this->obj->updateDate($date_debut);
-//      } catch (error $e) {
+//      } catch (errorATF $e) {
 //          $error = $e->getCode();
 //
 //      }
@@ -3837,7 +3837,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      
 //      try {
 //          $this->obj->updateDateResiliation($infos);
-//      } catch (error $e) {
+//      } catch (errorATF $e) {
 //          $error = $e->getCode();
 //      }
 //      $this->assertEquals(881,$error,"Impossible de supprimer la date de résiliation si la date de restitution est renseignée");
@@ -3854,7 +3854,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      
 //      try {
 //          $this->obj->updateDateRestitution($infos);
-//      } catch (error $e) {
+//      } catch (errorATF $e) {
 //          $error = $e->getCode();
 //      }
 //      $this->assertEquals(882,$error,"Il faut une date de resiliation pour pouvoir renseigner la date de restitution");
@@ -3872,7 +3872,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      
 //      try {
 //          $this->obj->updateDateRestitution($infos);
-//      } catch (error $e) {
+//      } catch (errorATF $e) {
 //          $error = $e->getCode();
 //      }
 //      $this->assertEquals(883,$error,"Impossible de supprimer la date de résiliation si la restitution est effective");

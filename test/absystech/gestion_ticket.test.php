@@ -84,7 +84,7 @@ class gestion_ticket_test extends ATF_PHPUnit_Framework_TestCase {
 		$error=false;
 		try{
 			$this->obj->add_ticket($infos);
-		}catch(error $e){
+		}catch(errorATF $e){
 			$error=true;
 		}
 		
@@ -103,7 +103,7 @@ class gestion_ticket_test extends ATF_PHPUnit_Framework_TestCase {
 		$error=false;
 		try{
 			$this->obj->add_ticket($infos);
-		}catch(error $e){
+		}catch(errorATF $e){
 			$error=true;
 		}
 		
@@ -121,7 +121,7 @@ class gestion_ticket_test extends ATF_PHPUnit_Framework_TestCase {
 		$error=false;
 		try{
 			$this->obj->add_ticket($infos);
-		}catch(error $e){
+		}catch(errorATF $e){
 			$error=true;
 		}
 		

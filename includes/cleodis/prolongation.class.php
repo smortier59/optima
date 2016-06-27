@@ -123,7 +123,7 @@ class prolongation extends classes_optima {
 			$infosMaj["date_arret"]=date("Y-m-d",strtotime($infosMaj["date_arret"]));
 			if($infosMaj["date_arret"]<$prolongation["date_debut"]){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("La date insérée est inférieure à la date de prolongation",879);
+				throw new errorATF("La date insérée est inférieure à la date de prolongation",879);
 			}
 
 			ATF::facturation()->q->reset()->addCondition("id_affaire",$prolongation["id_affaire"],"AND")
@@ -136,7 +136,7 @@ class prolongation extends classes_optima {
 				//Sauf si elles ont déjà été facturées
 				if($item["id_facture"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Il existe une facture (".ATF::facture()->nom($item["id_facture"]).") sur la période ".$item["date_periode_debut"]." - ".$facturation["date_periode_fin"]."",878);
+					throw new errorATF("Il existe une facture (".ATF::facture()->nom($item["id_facture"]).") sur la période ".$item["date_periode_debut"]." - ".$facturation["date_periode_fin"]."",878);
 				}else{
 					ATF::facturation()->d($item["id_facturation"]);
 				}
@@ -240,7 +240,7 @@ class prolongation extends classes_optima {
 			$infos["date_debut"]=date("Y-m-d",strtotime($commande["date_evolution"]."+1 day"));
 			$date_debut=$infos["date_debut"];
 		}else{
-			throw new error("Un contrat ne peut pas avoir de prolongation s'il n'a pas de date de fin !",875);
+			throw new errorATF("Un contrat ne peut pas avoir de prolongation s'il n'a pas de date de fin !",875);
 		}
 		unset($infos["prix"],$infos["id_commande"]);		
 		
@@ -288,14 +288,14 @@ class prolongation extends classes_optima {
 					ATF::loyer_prolongation()->i($item,$s);
 				}else{
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Il n'y a pas de fréquence pour un loyer",876);
+					throw new errorATF("Il n'y a pas de fréquence pour un loyer",876);
 				}
 			}
 			
 
 			if($infos["date_arret"] && $infos["date_fin"]>=date("Y-m-d",strtotime($infos["date_arret"]))){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Erreur : la date d'arrêt (".date("Y-m-d",strtotime($infos["date_arret"])).") est inférieur à la date de fin (".$infos["date_fin"].") ",880);
+				throw new errorATF("Erreur : la date d'arrêt (".date("Y-m-d",strtotime($infos["date_arret"])).") est inférieur à la date de fin (".$infos["date_fin"].") ",880);
 			}
 			
 			$this->u($infos);
@@ -309,7 +309,7 @@ class prolongation extends classes_optima {
 			}
 			return $infos["id_prolongation"];
 		}else{
-			throw new error("Prolongation sans loyer",877);
+			throw new errorATF("Prolongation sans loyer",877);
 		}
 		
 	}

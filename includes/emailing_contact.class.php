@@ -168,7 +168,7 @@ class emailing_contact extends emailing {
 			$this->q->reset()->where('id_emailing_source',$id)->setCountOnly();
 
 			if (!$this->sa()) {
-				throw new error(ATF::$usr->trans("aucun_enregistrement_pour_cette_source",$this->table));	
+				throw new errorATF(ATF::$usr->trans("aucun_enregistrement_pour_cette_source",$this->table));	
 			}
 		}
 		parent::export_brut($infos,$s);

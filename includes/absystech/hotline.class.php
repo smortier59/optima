@@ -544,7 +544,7 @@ class hotline extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice mail envoyé
 				$this->createMailNotice("hotline_mail_prise_en_charge_contact");
-			}catch(error $e){
+			}catch(errorATF $e){
 				//$this->createMailNotice("hotline_no_mail_prise_en_charge_contact");
 			}
 		}
@@ -575,7 +575,7 @@ class hotline extends classes_optima {
 		$this->infoCollapse($infos);
 		
 		//Récupération des infos hotline
-		if(!$infos["id_hotline"]) throw new error("null_id_hotline");
+		if(!$infos["id_hotline"]) throw new errorATF("null_id_hotline");
 		$hotline=$this->select($infos["id_hotline"]);
 		
 		//Détermination du type de la requête
@@ -607,7 +607,7 @@ class hotline extends classes_optima {
 	*/
 	public function boostBilling($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$this->infoCollapse($infos);
-		if(!$infos["id_hotline"]) throw new error("null_id_hotline");
+		if(!$infos["id_hotline"]) throw new errorATF("null_id_hotline");
 		$infos=$this->select($infos["id_hotline"]);
 		$infos["relance"]=true;
 		$infos["send_mail"]=true;
@@ -666,7 +666,7 @@ class hotline extends classes_optima {
 				$chargeText="Charge Client";
 				break;
 			case "affaire":
-				if(!$infos["id_affaire"]) throw new error('null_id_affaire');
+				if(!$infos["id_affaire"]) throw new errorATF('null_id_affaire');
 				$hotline["facturation_ticket"]="non";
 				if($id_user) $hotline["etat"]="fixing";
 				$hotline["ok_facturation"]=NULL;
@@ -727,17 +727,17 @@ class hotline extends classes_optima {
 		$this->infoCollapse($infos);
 			
 		//Vérification de l'état
-		if($this->select($infos["id_hotline"],"wait_mep")=="oui") throw new error(ATF::$usr->trans("wait_mep_not_valid",$this->table));
+		if($this->select($infos["id_hotline"],"wait_mep")=="oui") throw new errorATF(ATF::$usr->trans("wait_mep_not_valid",$this->table));
 		
 		//Vérification du travail
-		if(!$this->getTotalTime($infos["id_hotline"])) throw new error(ATF::$usr->trans("travail_null",$this->table));
+		if(!$this->getTotalTime($infos["id_hotline"])) throw new errorATF(ATF::$usr->trans("travail_null",$this->table));
 		
 		//Vérification des ordres de missions
 		ATF::ordre_de_mission()->q->reset()->addField("etat")->addCondition("id_hotline",$this->decryptId($infos['id_hotline']));
 		$odms=ATF::ordre_de_mission()->sa();		
 		foreach($odms as $odm){
 			if($odm["etat"]=="en_cours"){
-				throw new error(ATF::$usr->trans("odm_en_cours",$this->table));
+				throw new errorATF(ATF::$usr->trans("odm_en_cours",$this->table));
 			}
 		}
 				
@@ -769,7 +769,7 @@ class hotline extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice mail envoyé
 				$this->createMailNotice("hotline_mail_resolu_client");
-			}catch(error $e){
+			}catch(errorATF $e){
 			}
 		}
 		
@@ -794,15 +794,15 @@ class hotline extends classes_optima {
 
 		
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){			
-			throw new error(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
+			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
 		}
 
 		
 		//Vérification des informations
-		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new error(ATF::$usr->trans("id_contact_null",$this->table));
+		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 
 
-		if(!$infos["pole_concerne"]) throw new error("Il faut selectionner un pole associé pour cette requete");
+		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
 
 		//Construction de la hotline
 		$detail=$infos["detail"];
@@ -935,13 +935,13 @@ class hotline extends classes_optima {
 		$this->infoCollapse($infos);
 		
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){			
-			throw new error(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
+			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
 		}
 		
 		//Vérification des informations
-		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new error(ATF::$usr->trans("id_contact_null",$this->table));
+		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 
-		if(!$infos["pole_concerne"]) throw new error("Il faut selectionner un pole associé pour cette requete");
+		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
 		//Construction de la hotline
 		$detail=$infos["detail"];
 		$infos["detail"]="Requête mise en ligne par ".ATF::user()->nom(ATF::$usr->getID())."\n\n".$infos["detail"];
@@ -995,7 +995,7 @@ class hotline extends classes_optima {
 		$this->createNotice("hotline_insert");
 
 		//Gestion de l'envoi de mail
-		if(!$id_hotline) throw new error(ATF::$usr->trans("null_id_hotline"));
+		if(!$id_hotline) throw new errorATF(ATF::$usr->trans("null_id_hotline"));
 		
 		// Envoi du mail de création de hotline
 		$contactn = ATF::contact()->nom($infos['id_contact']);
@@ -1079,7 +1079,7 @@ class hotline extends classes_optima {
 		$this->infoCollapse($infos);
 		
 		//Vérification des informations
-		//if(!$infos["id_contact"]) throw new error(ATF::$usr->trans("id_contact_null",$this->table));
+		//if(!$infos["id_contact"]) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 		
 		if(isset($infos["send_mail"])){
 			unset($infos["send_mail"]);
@@ -1126,7 +1126,7 @@ class hotline extends classes_optima {
 				ATF::hotline_mail()->sendMail();
 				//Notice mail envoyé
 				$this->createMailNotice("hotline_mail_cancel_client");
-			}catch(error $e){
+			}catch(errorATF $e){
 			}
 		}
 		
@@ -1249,7 +1249,7 @@ class hotline extends classes_optima {
 	*/	
 	public function setWaitMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Vérification des infos
- 		if(!$infos || !$infos["id_hotline"]) throw new error(ATF::$usr->trans("aucunes_infos",$this->table));
+ 		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 		
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
@@ -1294,7 +1294,7 @@ class hotline extends classes_optima {
 	*/	
 	public function setMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Vérification des infos
- 		if(!$infos || !$infos["id_hotline"]) throw new error(ATF::$usr->trans("aucunes_infos",$this->table));
+ 		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 		
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
@@ -1339,7 +1339,7 @@ class hotline extends classes_optima {
 	*/	
 	public function cancelMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Vérification des infos
- 		if(!$infos || !$infos["id_hotline"]) throw new error(ATF::$usr->trans("aucunes_infos",$this->table));
+ 		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 		
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
@@ -1448,7 +1448,7 @@ class hotline extends classes_optima {
 	*/
 	public function setPriorite($infos){
 		if($infos["priorite"]>20||$infos["priorite"]<0){
-			throw new error(ATF::$usr->trans("invalid_range"));
+			throw new errorATF(ATF::$usr->trans("invalid_range"));
 		}
 		
 		$this->update(array("id_hotline"=>$infos["id_hotline"],"priorite"=>$infos["priorite"],"disabledInternalInteraction"=>true));
@@ -1527,7 +1527,7 @@ class hotline extends classes_optima {
 
 	public function setAvancement($id_hotline,$avancement){
 		if($avancement>100||$avancement<0){
-			throw new error(ATF::$usr->trans("invalid_range"));
+			throw new errorATF(ATF::$usr->trans("invalid_range"));
 		}
 		return $this->update(array("id_hotline"=>$id_hotline,"avancement"=>$avancement,"disabledInternalInteraction"=>true));
 	}
@@ -1619,7 +1619,7 @@ class hotline extends classes_optima {
 //			ATF::db($this->db)->commit_transaction();
 //			echo "Nombre de pointages créés : ".$cpt."\n";
 //			echo "--Fin Traitement des requêtes hotline--\n";
-//		}catch(error $e){
+//		}catch(errorATF $e){
 //			echo "Erreur ! : ".$e."\n";
 //		}
 //	}
@@ -1752,7 +1752,7 @@ class hotline extends classes_optima {
 			$this->update(array("id_hotline"=>$element["id_hotline"],"priorite"=>$nouvelle_priorite,"disabledInternalInteraction"=>true));
 			echo "Maj requête n° ".$element["id_hotline"]." Ancienne priorite=".$element["priorite"]." Nouvelle priorite=".$nouvelle_priorite."\n";
 		}
-		}catch(error $e){
+		}catch(errorATF $e){
 			ATF::db()->rollback_transaction();
 			echo "Erreur : ".$e->getMessage()."\n";
 			return false;
@@ -2985,7 +2985,7 @@ class hotline extends classes_optima {
 		ATF::imap()->init($host, $port, $mail, $password);		
 		//ATF::imap()->init($host, $port, $mail, $password, "INBOX/tmp");
 		if (ATF::imap()->error) {
-			throw new error(ATF::imap()->error);
+			throw new errorATF(ATF::imap()->error);
 		}
 		$mails = ATF::imap()->imap_fetch_overview('1:*');
 		
@@ -3143,7 +3143,7 @@ class hotline extends classes_optima {
 				$chargeText="Charge Client";
 				break;
 			case "affaire":
-				if(!$infos["id_affaire"]) throw new error('null_id_affaire');
+				if(!$infos["id_affaire"]) throw new errorATF('null_id_affaire');
 				$hotline["facturation_ticket"]="non";
 				if($id_user) $hotline["etat"]="fixing";
 				$hotline["ok_facturation"]=NULL;
@@ -3523,7 +3523,7 @@ class hotline extends classes_optima {
         	// Récupération des notices créés
         	$return['notices'] = ATF::$msg->getNotices();
 	        return $return;
-        } catch (error $e) {
+        } catch (errorATF $e) {
         	throw $e;
         } catch (Exception $e) {
         	throw $e;

@@ -86,7 +86,7 @@ class personnel extends classes_optima {
        	ATF::pdf()->generic("ficheCasting",$infos,$fp);     
 
        	if (!file_exists($fp)) {
-       		throw new error("Fichier impossible a générer"); 
+       		throw new errorATF("Fichier impossible a générer"); 
        	}
        	$url = __ABSOLUTE_WEB_PATH__."personnel-select-ficheCasting-".ATF::user()->cryptId(ATF::$usr->getId())."-pdf.temp";
 

@@ -124,7 +124,7 @@ class vi_pa_cout extends classes_optima {
 		}
 		try {
 			ATF::vi_pa_cout()->insert($cout);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			// Duplicate entry ne doit pas virer le texte de la modalbox
 		}
 		

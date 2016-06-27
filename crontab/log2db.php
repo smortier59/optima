@@ -19,7 +19,7 @@ try{
 	echo "[ATF - Gestion des erreurs] Fichier Log update ajoute en Base\n";
 	ATF::log()->insert_delete_log();
 	echo "[ATF - Gestion des erreurs] Fichier Log delete ajoute en Base\n";
-}catch(error $e){
+}catch(errorATF $e){
 	$e->setError();
 	echo "[ATF - Gestion des erreurs] ERREUR DU SCRIPT D'AJOUT DE LOG EN BASE\n";
 	//Affichage des erreurs

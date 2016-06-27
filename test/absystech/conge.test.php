@@ -32,7 +32,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->insert($infos_erreur);
 			$this->assertTrue(false,'Aurait dû générer une erreur');
-		}catch(error $e){
+		}catch(errorATF $e){
 			$this->assertEquals(ATF::$usr->trans("fin_inf_deb","conge"),$e->getMessage(),"L'erreur retournée n'est pas celle attendue");
 		}
 	}
@@ -46,7 +46,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->update(array("conge"=>array("id_conge"=>$this->id_conge,'date_debut'=>date("Y-m-d"),'date_fin'=>date("Y-m-d",strtotime("-1day")),'periode'=>"autre")));
 			$this->assertTrue(false,'Aurait dû générer une erreur');
-		}catch(error $e){
+		}catch(errorATF $e){
 			$this->assertEquals(ATF::$usr->trans("fin_inf_deb","conge"),$e->getMessage(),"L'erreur retournée n'est pas celle attendue");
 		}
 	}
@@ -203,7 +203,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->can_delete($id_conge);
 			$this->assertFalse(true,"Ce congé ne devrait pas pouvoir être supprimé");
-		}catch(error $e){
+		}catch(errorATF $e){
 			//c'est good
 		}
 	}
