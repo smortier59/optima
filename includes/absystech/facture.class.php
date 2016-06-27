@@ -75,7 +75,7 @@ class facture_absystech extends facture {
 			,"periodicite"=>array("disabled"=>false,"listeners"=>array("change"=>"ATF.changePeriode"))
 			,'id_termes'=>array("updateOnSelect"=>true,"custom"=>true)
 			,"date_fin_periode"
-			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield")
+			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield","listeners"=>array("change"=>"ATF.changeAcompte"))
 			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")			
 			
 		);
