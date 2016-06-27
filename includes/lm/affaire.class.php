@@ -101,6 +101,10 @@ class affaire_lm extends affaire {
 		);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
+
+		$this->files["bon_inter"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["facture"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
 		$this->field_nom="ref";
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
@@ -109,6 +113,7 @@ class affaire_lm extends affaire {
 		$this->addPrivilege("updateFacturation","update");
 		$this->addPrivilege("getCompteT");
 		$this->addPrivilege("getCompteTLoyerActualise");
+		$this->addPrivilege("relancer");
 		$this->no_delete = true;
 		$this->no_update = true;
 		$this->no_insert = true;
@@ -1029,6 +1034,16 @@ class affaire_lm extends affaire {
 			$copy_mail->send();
 		}
 		return true;
+	}
+
+
+	public function relancer($infos){
+		$id_affaire = $this->decryptId($infos["id_affaire"]);
+
+		$email = ATF::societe()->select(ATF::affaire()->select($id_affaire , "id_societe"), "email");
+
+		log::logger($email , "mfleurquin");
+
 	}
 };
 ?>
