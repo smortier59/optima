@@ -35,7 +35,8 @@ class pdf_lm extends pdf_cleodis {
 		$this->ATFSetStyle($style);
 		$this->SetXY(10,-20);
 		$this->multicell(0,3,"Conformément à l'article 27 de la loi Informatique et Libertés, vous disposez d'un droit d'accès et de rectification des données vous concernant et dont nous sommes les seuls utilisateurs",0,"C");
-		$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
+		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10 000 EUR - 820 472 009 RCS LILLE - N° C.E.E. XXXXXXXXX XX
+SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 80",0,'C');
 		
 		
 		$this->SetX(10);
@@ -276,7 +277,7 @@ class pdf_lm extends pdf_cleodis {
 						round($i_['quantite'])
 						,$ssCat
 						,$fab
-						,$i_['produit'].$etat
+						,str_replace("&nbsp;","",str_replace("&nbsp;>", "", $i_['produit'])).$etat
 						,"details"=>$details
 					);
 						
@@ -517,29 +518,33 @@ class pdf_lm extends pdf_cleodis {
 	public function facture($id){
 		$this->noPageNo = true;
 		$this->setFooter();
-		$this->unsetHeader();
+		
 		$this->A3 = false;
 		$this->A4 = true;	
 
 		$this->Open();
 		$this->Addpage();
 
-		$this->headerLMFacture();
-
 		$id = ATF::facture()->decryptId($id);
 
 		$facture = ATF::facture()->select($id);
 		ATF::facture_ligne()->q->reset()->where("id_facture",$id);
 		$facture_lignes = ATF::facture_ligne()->select_all();
+		$affaire = ATF::affaire()->select($facture["id_affaire"]);
+
 		$client = ATF::societe()->select($facture["id_societe"]);
 		$societe = ATF::societe()->select(ATF::user()->select($facture["id_user"], "id_societe"));
 		$this->societe = $societe;
 
 		$this->setY(13);
-
-		$this->cell(36,5,"",0,0,"C");
+		$this->setleftmargin(40);
+		
 		$this->setfont('arial','',16);
-		$this->cell(134,5,"FACTURE N° ".$facture["ref"],0,0,"C");
+		$this->cell(134,5,"FACTURE N° ".$facture["ref"],0,1,"C");
+
+		$this->setfont('arial','',8);
+		$this->cell(134,5,"Date de facture ".date("d/m/Y", strtotime($facture["date"]))." Exemplaire client ",0,1,"C");
+		$this->cell(134,5,"Date d'émission ".date("d/m/Y", strtotime($facture["date"])),0,1,"C");
 
 
 		$this->setleftmargin(7);
@@ -552,44 +557,78 @@ class pdf_lm extends pdf_cleodis {
 		if($societe["adresse_2"]) $adresse .= "\n".$societe["adresse_2"];
 		if($societe["adresse_3"]) $adresse .= "\n".$societe["adresse_3"];
 		$adresse .= "\n".$societe["cp"]." ".$societe["ville"];
-
-		if($societe["tel"]) $adresse .= "\n"."Téléphone : ".$societe["tel"];
-		if($societe["fax"]) $adresse .= "\n"."Télécopie : ".$societe["fax"];
+		$adresse .= "\n"."FRANCE";
+		$adresse .= "\n"."Téléphone : Se référer à votre contrat";
+		$adresse .= "\n"."Site internet : https://abonnement.leroymerlin.fr";
 
 		$y = $this->getY();		
 
 		$this->multicell(80,4,$societe["societe"]."\n".$adresse,0,"L",1);
 
-		
+		$this->ln(5);
+
+		$this->setfont('arial','',7);
+		$this->multicell(80,4,"N° de client :".$client["ref"],0,"L",0);
+		$this->multicell(80,4,"N° de contrat :".$affaire["ref"],0,"L",0);
+		$this->multicell(110,3,"Conditions de règlement : prix comptant sans escompte , paiement à réception de la facture",0,"L");
+
+		$this->setfont('arial','U',7);
+		$this->multicell(110,3,"Pénalité retard : En cas de non-paiement à l’échéance, des pénalités de retard égales à trois fois le taux d’intérêt légal pourront être appliquées, outre l’indemnité forfaitaire d’un montant de 40 euros prévue par la loi sauf frais de recouvrement plus important");
+
+		$this->setfont('arial','',8);
+			
 		$cadre2[] = "          ".strtoupper($client["civilite"]." ".$client["prenom"]." ".$client["nom"]);
 		$cadre2[] = "          ".$client["adresse"];
 		if($client["adresse_2"]) $cadre2[] = "          ".$client["adresse_2"];
 		if($client["adresse_3"]) $cadre2[] = "          ".$client["adresse_3"];
 		$cadre2[] = "          ".$client["cp"]." ".$client["ville"];
 		
-		$this->cadre(110,$y,90,35,$cadre2,false,0);
+		$this->cadre(110,$y,90,30,$cadre2,false,0);
 
+		$this->setY(95);
 
 		$this->setLeftMargin(7);
 
-		$head = array("N","Réf article","Désignation article","Quantité");
-		$width = array(10,33,130,20);
+		$head = array("N","Référence","Désignation","Prix unit. HT","Taux de TVA","Quantité","Total TTC");
+		$width = array(8,24,80,20,20,20,20);
 			
 		if ($facture_lignes){
 			foreach ($facture_lignes as $k => $i) {
-				$data[$k][0] = $k+1;
-				if($i["ref"]){ 
-					$data[$k][1] = $i['ref'];
-				}else{
-					$data[$k][1] = ATF::produit()->select($i['id_produit'], "ref_lm");
-				}
+				$prod = ATF::produit()->select($i['id_produit']);
+								
 				
+				if($facture["nature"]){
+					ATF::produit_loyer()->q->reset()->where("id_produit",$i["id_produit"])
+													->where("nature", $facture["nature"]);
+					$loyer = ATF::produit_loyer()->select_row();
+
+				}
+
+				$data[$k][0] = $k+1;
+				$data[$k][1] = $prod["ref_lm"];	
 				$style[$k][1] = $this->leftStyle;
-				$data[$k][2] = $i['produit'];	
+				$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
 				$style[$k][2] = $this->leftStyle;			
-				$data[$k][3] = $i['quantite'];
+				if($loyer){
+					$data[$k][3] = number_format($loyer["loyer"],2);
+					$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
+					$data[$k][5] = $i['quantite'];
+					$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2);
+						
+					$ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
+					$ttva = $ttc - $loyer["loyer"];
+
+					$tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($ttva),2);
+					$tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($ttc-$ttva),2);
+				}else{
+					$data[$k][3] = "-";
+					$data[$k][4] = "-";
+					$data[$k][5] = $i['quantite'];
+					$data[$k][6] = "-";
+				}					
 			}
 		}
+
 		$this->tableauBigHead($head,$data,$width,7,$style,260);
 
 		$this->ln(5);
@@ -599,15 +638,22 @@ class pdf_lm extends pdf_cleodis {
 		$data = array();
 		$style = array();
 
-		$data[0][0] = "TVA ".number_format(($facture["tva"]-1)*100,2,"."," ")."%";
-		$style[0][0] = $this->leftStyle;
-		$data[0][1] = number_format($facture["prix"],2,"."," ")."€";
-		$data[0][2] = number_format($facture["prix"]*($facture["tva"]-1),2,"."," ")."€";
+		foreach ($tva as $key => $value) {
+			$data[0][0] = "TVA ".$key."%";
+			$style[0][0] = $this->leftStyle;
+			$data[0][1] = $value["total"]."€";
+			$data[0][2] = $value["TVA"]."€";
+
+			$montantTVA += $value["TVA"];
+			$montantHT += $value["total"];
+		}
+
+		
 
 		$data[1][0] = "Total TVA";
 		$style[1][0] = $this->leftStyle;
-		$data[1][1] = number_format($facture["prix"],2,"."," ")."€";
-		$data[1][2] = number_format($facture["prix"]*($facture["tva"]-1),2,"."," ")."€";
+		$data[1][1] = $montantHT."€";
+		$data[1][2] = $montantTVA."€";
 
 		
 		$this->tableau($head,$data,$width,7,$style,260);
@@ -619,8 +665,8 @@ class pdf_lm extends pdf_cleodis {
 		$data = array();
 		$style = array();
 		$data[0][0] =  date("d/m/Y", strtotime($facture["date"]));
-		$data[0][1] = "";
-		$data[0][2] = number_format($facture["prix"]*$facture["tva"],2,"."," ")."€";
+		$data[0][1] = "PRELEVEMENT AUTOMATIQUE";
+		$data[0][2] = $facture["prix"]."€";
 		
 		$this->tableau($head,$data,$width,7,$style,260);
 
@@ -630,9 +676,52 @@ class pdf_lm extends pdf_cleodis {
 
 		$this->setfont('arial','B',10);
 		$this->cell(50,10,"Total TTC",1,0);
-		$this->cell(20,10,number_format($facture["prix"]*$facture["tva"],2,"."," ")."€",1,1,"C");
+		$this->cell(20,10,$facture["prix"]."€",1,1,"C");
 		
 
 	}
 
+
+	public function conditionsGeneralesDeLocationA4($type){
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->SetLeftMargin(10);
+
+		$articles = ATF::cgl_article()->sa();
+		
+		foreach ($articles as $key => $value) {
+			$this->setfont('arial','BI',10);	
+			$this->cell(0,5,"Article ".$value["numero"]." - ".$value["titre"],0,1);
+
+			$this->setfont('arial','',8);
+			$texte = NULL;
+			ATF::cgl_texte()->q->reset()->where("id_cgl_article",$value["id_cgl_article"])
+										->addOrder("cgl_texte.numero");
+			$texte = ATF::cgl_texte()->select_all();
+			if($texte){
+				if(count($texte)>1){
+					foreach ($texte as $k => $v) {
+						$v["texte"] = $this->formateTextPDF($v["texte"]);
+
+						if($v["numero"]) $this->multicell(0,4,$value["numero"].".".$v["numero"].". ".$v["texte"]);
+						else $this->multicell(0,4,$v["texte"]);
+					}
+				}else{
+					$texte[0]["texte"] = $this->formateTextPDF($texte[0]["texte"]);					
+					$this->multicell(0,4,$texte[0]["texte"]);
+				}
+			}
+			$this->ln(3);
+			
+		}
+	}
+
+	public function formateTextPDF($texte){
+		$texte = str_replace("\n", "", $texte);
+		$texte = str_replace("<br>", "\n", $texte);
+		$texte = str_replace("&nbsp;", " ", $texte);
+		$texte = strip_tags($texte);
+
+		return $texte;
+	}
 }
