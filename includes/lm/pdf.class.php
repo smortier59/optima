@@ -393,8 +393,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 								$data[] = array(
 								$i['duree']
 								,strtoupper($i['frequence_loyer'])
+								,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])/$this->commande["tva"]),2,"."," ")." €"
 								,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
-								,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])*$this->commande["tva"]),2,"."," ")." €"
+								
 							);
 						}
 					}
@@ -572,7 +573,6 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->multicell(80,4,"N° de contrat :".$affaire["ref"],0,"L",0);
 		$this->multicell(110,3,"Conditions de règlement : prix comptant sans escompte , paiement à réception de la facture",0,"L");
 
-		$this->setfont('arial','U',7);
 		$this->multicell(110,3,"Pénalité retard : En cas de non-paiement à l’échéance, des pénalités de retard égales à trois fois le taux d’intérêt légal pourront être appliquées, outre l’indemnité forfaitaire d’un montant de 40 euros prévue par la loi sauf frais de recouvrement plus important");
 
 		$this->setfont('arial','',8);
@@ -610,10 +610,10 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
 				$style[$k][2] = $this->leftStyle;			
 				if($loyer){
-					$data[$k][3] = number_format($loyer["loyer"],2);
+					$data[$k][3] = number_format($loyer["loyer"],2)." €";
 					$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
 					$data[$k][5] = $i['quantite'];
-					$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2);
+					$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
 						
 					$ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
 					$ttva = $ttc - $loyer["loyer"];
@@ -641,8 +641,8 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		foreach ($tva as $key => $value) {
 			$data[0][0] = "TVA ".$key."%";
 			$style[0][0] = $this->leftStyle;
-			$data[0][1] = $value["total"]."€";
-			$data[0][2] = $value["TVA"]."€";
+			$data[0][1] = $value["total"]." €";
+			$data[0][2] = $value["TVA"]." €";
 
 			$montantTVA += $value["TVA"];
 			$montantHT += $value["total"];
@@ -652,8 +652,8 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		$data[1][0] = "Total TVA";
 		$style[1][0] = $this->leftStyle;
-		$data[1][1] = $montantHT."€";
-		$data[1][2] = $montantTVA."€";
+		$data[1][1] = $montantHT." €";
+		$data[1][2] = $montantTVA." €";
 
 		
 		$this->tableau($head,$data,$width,7,$style,260);
@@ -666,7 +666,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$style = array();
 		$data[0][0] =  date("d/m/Y", strtotime($facture["date"]));
 		$data[0][1] = "PRELEVEMENT AUTOMATIQUE";
-		$data[0][2] = $facture["prix"]."€";
+		$data[0][2] = $facture["prix"]." €";
 		
 		$this->tableau($head,$data,$width,7,$style,260);
 
@@ -676,7 +676,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		$this->setfont('arial','B',10);
 		$this->cell(50,10,"Total TTC",1,0);
-		$this->cell(20,10,$facture["prix"]."€",1,1,"C");
+		$this->cell(20,10,$facture["prix"]." €",1,1,"C");
 		
 
 	}
