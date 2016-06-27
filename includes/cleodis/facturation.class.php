@@ -803,9 +803,12 @@ class facturation extends classes_optima {
 						if($item["type"]=="prolongation"){
 							$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
 						}else{
-							$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
+							//Enlever les factures envoyées par mail
+							if(!$contact["email"]){
+								$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
+							}
 						}
-						if($contact && $item["type"] !=="prolongation"){							
+						if($contact && $item["type"] !=="prolongation"){
 							if($contact["email"]){
 								
 								$path=array("facture"=>"fichier_joint");
@@ -852,31 +855,6 @@ class facturation extends classes_optima {
 			}
 		}
 
-		/************************************PROLONGATIONS QUI NE SONT PAS DANS LA TABLE PROLONGATION***********************************************************/
-
-//		$this->q->reset()->addField('id_affaire')
-//					     ->setStrict()
-//						 ->addCondition("`facturation`.`date_periode_debut`",$date_debut,"AND",false,"<=")
-//						 ->addCondition("`facturation`.`date_periode_fin`",date("Y-m-d",strtotime($date_fin."-1 day")),"AND",false,">=")
-//						 ->addCondition("`facturation`.`id_affaire`","`commande`.`id_affaire`","AND")
-//						 ->setToString();
-//		$subQuery = $this->sa();
-
-//		ATF::commande()->q->reset()
-//						  ->addField("commande.*")
-//						  ->setStrict()
-//						  ->addJointure("affaire","id_affaire","affaire","id_affaire",false,false,false,false,"INNER")
-//						  ->addCondition("`commande`.`date_evolution`",$date_fin,"AND",false,"<")
-//						  ->addCondition("`affaire`.`etat`","perdue","AND",false,"<>")
-//						  ->addCondition("`commande`.`etat`","arreter","AND",false,"<>")
-//						  ->addCondition("`commande`.`etat`","AR","AND",false,"<>")
-//						  ->addCondition("`commande`.`etat`","vente","AND",false,"<>")
-//						  ->setSubQuery($subQuery)
-//						  ->addOrder("`commande`.`id_affaire`")
-//						  ->setToString();
-//
-//
-//		$prolongation=ATF::commande()->sa();
 
 		$query="SELECT `commande`.* , LTRIM(`societe`.`societe`) as ltrimsociete, LTRIM(`societe`.`code_client`) as ltrimcode_client
 				FROM `commande`
@@ -904,7 +882,6 @@ class facturation extends classes_optima {
 				AND `societe`.`code_client`='TU'
 			";
 		}
-//$query.=" AND `societe`.`id_societe`=1499 ";
 		
 		$query.="
 			    AND `affaire`.`id_affaire` NOT
