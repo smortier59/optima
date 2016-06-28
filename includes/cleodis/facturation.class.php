@@ -32,6 +32,11 @@ class facturation extends classes_optima {
 		$this->files["global_factureCode"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_factureDate"] = array("type"=>"pdf","no_upload"=>true);
 
+		$this->files["global_facture_contrat_envoye"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_facture_contrat_envoyeSociete"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_facture_contrat_envoyeCode"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_facture_contrat_envoyeDate"] = array("type"=>"pdf","no_upload"=>true);
+		
 		$this->files["global_prolongation"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_prolongationSociete"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_prolongationCode"] = array("type"=>"pdf","no_upload"=>true);
@@ -737,6 +742,7 @@ class facturation extends classes_optima {
 
 		$facture_contrat = array();
 		$facture_prolongation = array();
+		$facture_contrat_envoye = array();
 		$facturer = array();
 		$non_envoye = array();
 		
@@ -806,6 +812,8 @@ class facturation extends classes_optima {
 							//Enlever les factures envoyées par mail
 							if(!$contact["email"]){
 								$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
+							}else{
+								$facture_contrat_envoye=$this->formateTabfacturer($facture_contrat_envoye,$item,"facture_contrat_envoye",$id_facture);
 							}
 						}
 						if($contact && $item["type"] !=="prolongation"){
@@ -829,6 +837,7 @@ class facturation extends classes_optima {
 								$item["email"]=$contact["email"];
 								$item["envoye"]='non';
 								$facturer=$this->formateTabfacturer($facturer,$item,"client",false,$item["type"]);
+								
 								$tab=$this->incrementeFacture($tab,$item["type"],true);
 								$this->u(array("id_facturation"=>$item["id_facturation"],"envoye"=>"non"));
 								
@@ -987,7 +996,7 @@ class facturation extends classes_optima {
 		if($non_envoye){
 			log::logger("Envoi du mail à Cléodis des facturations non envoyées...",__CLASS__);	
 			$this->sendGrille($non_envoye,$tab["nfc"],$tab["nfp"],$date_debut,$date_fin,"grille_","grille_","Grille de facturation des factures non envoyées",$s);
-		}	
+		}		
 
 		//Envoi d'un pdf contenant toutes les factures contrat
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat...",__CLASS__);
@@ -996,10 +1005,16 @@ class facturation extends classes_optima {
 		//Envoi d'un pdf contenant toutes les factures prolongation
 		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_prolongation,"global_","Factures prolongation",$s);
+				
+		//Envoi d'un pdf contenant toutes les factures contrat
+		log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
+		$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye,"global_","Factures contrat envoyées",$s);
 		
+
 		$return["facturer"]=$facturer;
 		$return["non_envoye"]=$non_envoye;
 		$return["facture_contrat"]=$facture_contrat;
+		$return["facture_contrat_envoye"]=$facture_contrat_envoye;		
 		$return["facture_prolongation"]=$facture_prolongation;
 		$return["date_debut"]=$date_debut;
 		$return["date_fin"]=$date_fin;

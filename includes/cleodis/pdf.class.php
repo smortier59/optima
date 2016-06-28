@@ -4028,6 +4028,21 @@ class pdf_cleodis extends pdf {
 		$this->global_facture($facture,$s);
 	}
 
+	function global_facture_contrat_envoye($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoyeSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoyeCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoyeDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
 
 	function global_factureSociete ($facture,$s){
 		$this->global_facture($facture,$s);
