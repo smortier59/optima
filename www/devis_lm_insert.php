@@ -30,6 +30,15 @@ if($infos["save_contrat"]){
     die;    
 }
 
+if($infos["save_mandat"]){
+    log::logger("Insert Mandat PDF", "mfleurquin");    
+    log::logger($infos , "mfleurquin");
+    util::file_put_contents(ATF::affaire()->filepath($infos["id_affaire"],"mandat_slimpay"), base64_decode($infos["pdf"]));
+    $id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$infos["id_affaire"], "provenance"=>"Mandat SLIMPAY"));
+    copy(ATF::affaire()->filepath($infos["id_affaire"],"mandat_slimpay"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));   
+    die;    
+}
+
 if($infos["id_societe"]){
     try{
         $societe = ATF::societe()->select($infos["id_societe"]);
