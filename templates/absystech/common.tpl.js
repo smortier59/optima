@@ -20,6 +20,10 @@ ATF.changeModeFacture = function(el,val,lastVal) {
 	}
 }
 
+ATF.changeAcompte = function(el,val,lastVal){
+	Ext.ComponentMgr.get('facture[finale]').hide();
+}
+
 ATF.changePeriode = function(el,val,lastVal) {
 	Ext.getCmp('facture[date_debut_periode]').show();
 	if(Ext.getCmp('combofacture[periodicite]').value !== ""){

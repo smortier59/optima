@@ -4,7 +4,7 @@
 * @package Optima
 * @subpackage AbsysTech
 */
-class hotline extends classes_optima {		
+class hotline extends classes_optima {	 	
 	/**
 	* Constructeur hotline - Créé le singleton d'accès au module hotline
 	*/
@@ -3532,6 +3532,46 @@ class hotline extends classes_optima {
 	}
 
 	/**
+	* Permet de modifier un ticket hotline depuis telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array COntient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/ 
+	public function _PUT($get,$post) {
+        $input = file_get_contents('php://input');
+        if (!empty($input)) parse_str($input,$post);
+    	$return = array();
+
+        try {
+        	
+	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+	        // Check des champs obligatoire
+	        if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
+	        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
+	        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
+	        if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
+
+	        // Mapping pour BDD Optima
+	        $post['pole_concerne'] = $post['pole']; unset($post['pole']);
+	        $post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
+	        $post['visible'] = $post['visible']=='on'?"oui":"non";
+
+	        // Insertion
+        	$return['id'] = self::insert($post);
+        	// Récupération des notices créés
+        	$return['notices'] = ATF::$msg->getNotices();
+	        return $return;
+        } catch (error $e) {
+        	throw $e;
+        } catch (Exception $e) {
+        	throw $e;
+        }
+        return false;
+	}
+
+	/**
 	* Permet de récupérer la liste des tickets hotline pour telescope
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr> 
@@ -3554,11 +3594,16 @@ class hotline extends classes_optima {
 
 		$colsData = array(
 			"hotline.id_hotline"=>array(),
-			"hotline.date_modification"=>array(),
+			"hotline.date"=>array(),
 			"hotline.id_societe"=>array("visible"=>false),
 			"hotline.id_contact"=>array(),
+			"hotline.id_gep_projet"=>array(),
 			"hotline.id_user"=>array(),
-			"hotline.hotline"=>array()
+			"hotline.hotline"=>array(),
+			"hotline.pole_concerne"=>array(),
+			"hotline.visible"=>array(),
+			"hotline.urgence"=>array(),
+			"hotline.detail"=>array()
 		);
 
 
@@ -3604,12 +3649,26 @@ class hotline extends classes_optima {
 			}
 		}
 
-		// Envoi des headers
-		header("ts-total-row: ".$data['count']);
-		header("ts-max-page: ".ceil($data['count']/$get['limit']));
-		header("ts-active-page: ".$get['page']);
+		if ($get['id']) {
+	        $return = $data['data'][0];			
+		} else {
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
 
-        return $data['data'];
+	        $return = $data['data'];			
+		}
+
+		return $return;
+	}
+
+	public function _DELETE($get,$post) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		$return['result'] = $this->delete($get);
+    	// Récupération des notices créés
+    	$return['notices'] = ATF::$msg->getNotices();
+        return $return;
 	}
 
 };
