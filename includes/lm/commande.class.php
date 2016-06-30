@@ -1260,9 +1260,14 @@ class commande_lm extends commande {
                 $return['data'][$k]["CourrierRestitutionExists"] = true;
             }
 
-            
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiCourrierClassique"))) {
                 $return['data'][$k]["envoiCourrierClassiqueExists"] = true;
+            }
+
+            log::logger($i["commande.id_commande"] , "mfleurquin");
+
+            if (file_exists($this->filepath($i['commande.id_commande'],"retour"))) {
+                $return['data'][$k]["ctSigneSlimpayExists"] = true;
             }
 		}
 		
