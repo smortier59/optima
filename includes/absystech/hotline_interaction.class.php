@@ -146,6 +146,8 @@ class hotline_interaction extends classes_optima {
 		}
 		
 		parent::delete($infos,$s,$files,$cadre_refreshed,$mail,$pointage);
+
+		api::sendUDP(array("data"=>array("type"=>"interaction")));
 	}
 	
 	/**
@@ -509,19 +511,8 @@ class hotline_interaction extends classes_optima {
 		ATF::hotline()->createNotice("hotline_interaction_done");
 		
 		if(ATF::db($this->db)->commit_transaction()){
-			/*
-			$type = ATF::hotline()->getModeFacturation(array("id_hotline_interaction"=>$id_hotline_interaction)) == true ? "fact" : "not_fact";
-			api::sendUDP(array(
-				'event'=> "interaction_added",
-				'data'=> array(
-					"time" => $this->getBillingTimeV2($id_hotline_interaction),
-					"id_user" => (($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID()),
-					"type" => $type
-				)
-			));
-			*/
 
-			api::sendUDP(array("data"=>array("type"=>"interaction_added")));
+			api::sendUDP(array("data"=>array("type"=>"interaction")));
 		}
 
 

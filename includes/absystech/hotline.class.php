@@ -920,7 +920,7 @@ class hotline extends classes_optima {
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
 
 		
-		
+		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
 	}
 
@@ -1067,7 +1067,7 @@ class hotline extends classes_optima {
 		//Fin de transaction
 		ATF::db($this->db)->commit_transaction();
 
-				
+		api::sendUDP(array("data"=>array("type"=>"interaction")));	
 		return $id_hotline;
 	}
 	
@@ -1096,6 +1096,8 @@ class hotline extends classes_optima {
 		if(!$disabledInternalInteraction){		
 			$this->createInternalInteraction($infos["id_hotline"],"Requête mise à jour par ".ATF::user()->nom(ATF::$usr->getId()));
 		}
+		
+		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		
 		return $retour;
 	}
@@ -1762,6 +1764,17 @@ class hotline extends classes_optima {
 		ATF::db()->commit_transaction();
 	}
 	
+	public function _stats($get, $post){
+		$at = $this->stats(true);
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->stats(true);
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+
+		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
+	}
+
 	//************************STATS*****************************/	
 	/**
 	* Statistiques sur nombre de ticket en cours non fini par personne
@@ -2027,14 +2040,14 @@ class hotline extends classes_optima {
 						} else {
 							$nom = "?";
 						}
-						$graph['categories']["category"][] = array("label" => $nom);
+						$graph['categories']["category"][$i["id_user"]] = array("label" => $nom);
 					}
 					
 					$graph['params']['showLegend'] = "0";
 					$graph['params']['bgAlpha'] = "0";
 				} else {
 					foreach ($result as $i) {
-						$graph['categories']["category"][] = array("label"=>ATF::user()->nom($i["id_user"]));
+						$graph['categories']["category"][$i["id_user"]] = array("label"=>ATF::user()->nom($i["id_user"]));
 					}
 					
 					$graph['params']['caption'] = "Etat des Tickets Hotline de chaque personne";
@@ -2059,7 +2072,7 @@ class hotline extends classes_optima {
 								$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("urgence_".$etat,'hotline')." : 0");
 							}
 						}
-						$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("urgence_".$etat,'hotline')." : ".$val_['nb_'.$etat]);
+						$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("total"=>$val_['total'], "value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("urgence_".$etat,'hotline')." : ".$val_['nb_'.$etat]);
 					
 						/* ajout de l'url */
 						$graph['dataset'][$etat]['set'][$val_["id_user"]]["link"]=urlencode("hotline.html,stats=1&label=".$val_["id_user"]);
@@ -2256,7 +2269,16 @@ class hotline extends classes_optima {
 	}
 
 	public function _requetebyUserParMois($get,$post){
-		return $this->requetebyUserParMois(-1);
+		$moment = $get['moment'] == "now" ? date("Y-m") : -1;
+		$at = $this->requetebyUserParMois($moment);
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->requetebyUserParMois($moment);
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+
+		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"requetebyUserParMois"));
+
 	}
 
 	public function requetebyUserParMois($mois,$tu=false){
