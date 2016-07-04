@@ -3512,6 +3512,7 @@ class hotline extends classes_optima {
 	        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
 	        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
 	        if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
+	        if (!$post['pole']) throw new Exception("POLE_MISSING",1024);
 
 	        // Mapping pour BDD Optima
 	        $post['pole_concerne'] = $post['pole']; unset($post['pole']);
