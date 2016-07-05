@@ -79,6 +79,7 @@ class affaire_lm extends affaire {
 		$this->onglets = array(
 			 'loyer'
 			,'devis'=>array('opened'=>true)
+			,'comite'
 			,'commande'=>array('opened'=>true)
 			,'prolongation'
 			,'loyer_prolongation'

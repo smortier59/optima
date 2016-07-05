@@ -50,7 +50,18 @@ class devis_lm extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
+			
 		);
+
+		$this->colonnes['panel']['adresse'] = array(
+			"adresse_livraison"=>array("custom"=>true)
+			,"adresse_facturation"=>array("custom"=>true,"null"=>true)
+
+			,"cp_adresse_livraison"=>array("custom"=>true)
+			,"cp_adresse_facturation"=>array("custom"=>true,"null"=>true)
+
+			,"ville_adresse_livraison"=>array("custom"=>true)
+			,"ville_adresse_facturation"=>array("custom"=>true,"null"=>true));
 
 		$this->colonnes['panel']['facturation'] = array(
 			"RIB"=>array("custom"=>true,"null"=>true)
@@ -343,6 +354,16 @@ class devis_lm extends devis {
 		$affaire = new affaire_lm($infos['id_affaire']);
 		$affaire->majForecastProcess();
 
+
+		ATF::comite()->insert(array("date"=>date("Y-m-d"),
+									"id_affaire"=>$infos["id_affaire"],
+									"id_societe"=>$infos["id_societe"],
+									//"prix"=> ,
+									"etat"=>"en_attente",
+									"date_creation"=>date("Y-m-d"),
+									"suivi_notifie"=>array(18)
+								));
+
 		////////////////Devis Ligne
 		//Lignes reprise
 		if($infos_ligne_repris){
@@ -357,6 +378,8 @@ class devis_lm extends devis {
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
 			foreach($infos_ligne as $key=>$item){
 				$item["id_devis"]=$last_id;
+
+				log::logger($item , "mfleurquin");
 
 				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
