@@ -28,19 +28,15 @@ class comite extends classes_optima {
 		$this->colonnes['panel']['dates'] = array(
 			"date"
 			,"reponse"
-			,"validite_accord"
 		);
 
-		$this->colonnes['panel']['notes'] = array(
-			"description"
-			,"observations"
-		);
+		
 
 		$this->colonnes['panel']['notifie'] = array(
 			"suivi_notifie"=>array("custom"=>true)
 		);
 		
-		$this->field_nom = "description";
+		$this->field_nom = "%id_affaire% (%date_creation%)";
 
 		$this->colonnes['bloquees']['select'] =   array_merge(array('note'));
 
