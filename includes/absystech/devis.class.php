@@ -232,7 +232,7 @@ class devis_absystech extends devis {
 						,"color"=>$couleur
 					));
 					
-					foreach ($result as $val_2) { 
+					foreach ($result as $val_2) {
 						$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : 0");
 					}
 				}
@@ -243,10 +243,20 @@ class devis_absystech extends devis {
 		return $graph;
 	}
 
+	public function _devis_prix($get, $post){
+		$at = $this->devis_prix(true);
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->devis_prix(true);
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+
+		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"marge"));
+	}
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
-	public function devis_prix($marge = false){		
+	public function devis_prix($marge = false){	
 		$this->q->reset()
 				->setStrict()				
 				->addField('devis.etat','etat');
@@ -277,7 +287,7 @@ class devis_absystech extends devis {
 		
 		foreach ($result as $i) {
 			$nom=ATF::user()->select($i["id_user"]);
-			$graph['categories']["category"][$i['user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
+			$graph['categories']["category"][$i['id_user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
 		}
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";
@@ -582,6 +592,9 @@ class devis_absystech extends devis {
 			ATF::db($this->db)->commit_transaction();
 			ATF::affaire()->redirection("select",$devis["id_affaire"]);
 		}
+
+		api::sendUDP(array("data"=>array("type"=>"devis")));
+
 		return $last_id;
 	}
 
@@ -870,6 +883,9 @@ class devis_absystech extends devis {
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
+
+		api::sendUDP(array("data"=>array("type"=>"devis")));
+
 		return $this->cryptId($last_id);			
 
 			
@@ -942,7 +958,9 @@ class devis_absystech extends devis {
 			}else{
 				$this->redirection("select_all",NULL,"devis.html");
 			}
-				
+			
+			api::sendUDP(array("data"=>array("type"=>"devis")));
+			
 			return true;
 
 		} elseif (is_array($infos) && $infos) {
