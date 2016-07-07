@@ -1,4 +1,4 @@
-{strip}
+{strip} 
 {
 	text: '{ATF::$usr->trans(creditsafeButton,"societe")|escape:javascript}',
 	id:'creditsafe _{$current_class->table}',

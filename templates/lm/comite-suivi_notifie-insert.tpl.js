@@ -4,7 +4,7 @@
 	name: '{$alternateName|default:$name}[]',
 	id: '{$alternateId|default:$id}',
 	width: 400,
-	height: 200,
+	height: 200, 
 	store: [		
 			['16', 'Jérome Loison'],
 			['17', 'Christophe Loison'],

@@ -1,4 +1,4 @@
-{$id_user = ATF::$usr->getID()}
+{$id_user = ATF::$usr->getID()} 
 
 ATF.renderer.comiteDecision=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {

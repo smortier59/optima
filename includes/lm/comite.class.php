@@ -3,7 +3,7 @@
 * @package Optima
 * @subpackage Cléodis
 */
-class comite extends classes_optima {
+class comite extends classes_optima { 
 	function __construct($table_or_id) {
 		$this->table ="comite";
 		parent::__construct($table_or_id);
