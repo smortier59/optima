@@ -35,12 +35,11 @@ class pdf_lm extends pdf_cleodis {
 		$this->ATFSetStyle($style);
 		$this->SetXY(10,-20);
 		$this->multicell(0,3,"Conformément à l'article 27 de la loi Informatique et Libertés, vous disposez d'un droit d'accès et de rectification des données vous concernant et dont nous sommes les seuls utilisateurs",0,"C");
-		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10 000 EUR - 820 472 009 RCS LILLE - N° C.E.E. XXXXXXXXX XX
+		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10 000 EUR - 820 472 009 RCS LILLE - N° C.E.E. FR 08820472009
 SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 80",0,'C');
 		
 		
-		$this->SetX(10);
-		$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+		$this->SetX(10);		
 		if (!$this->noPageNo) {
 			$this->ln(-3);
 			$this->Cell(0,3,$this->noPageNo.'Page '.$this->PageNo(),0,0,'R');
@@ -589,47 +588,15 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		$this->setLeftMargin(7);
 
-		$head = array("N","Référence","Désignation","Prix unit. HT","Taux de TVA","Quantité","Total TTC");
-		$width = array(8,24,80,20,20,20,20);
 			
-		if ($facture_lignes){
-			foreach ($facture_lignes as $k => $i) {
-				$prod = ATF::produit()->select($i['id_produit']);
-								
-				
-				if($facture["nature"]){
-					ATF::produit_loyer()->q->reset()->where("id_produit",$i["id_produit"])
-													->where("nature", $facture["nature"]);
-					$loyer = ATF::produit_loyer()->select_row();
+		if($facture["nature"]){
+			$this->lignes_facture($facture_lignes,$facture,"loyer");
+		}else{
+			$this->lignes_facture($facture_lignes,$facture,"prestation");
+		}	
+		
 
-				}
-
-				$data[$k][0] = $k+1;
-				$data[$k][1] = $prod["ref_lm"];	
-				$style[$k][1] = $this->leftStyle;
-				$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
-				$style[$k][2] = $this->leftStyle;			
-				if($loyer){
-					$data[$k][3] = number_format($loyer["loyer"],2)." €";
-					$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
-					$data[$k][5] = $i['quantite'];
-					$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
-						
-					$ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
-					$ttva = $ttc - $loyer["loyer"];
-
-					$tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($ttva),2);
-					$tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($ttc-$ttva),2);
-				}else{
-					$data[$k][3] = "-";
-					$data[$k][4] = "-";
-					$data[$k][5] = $i['quantite'];
-					$data[$k][6] = "-";
-				}					
-			}
-		}
-
-		$this->tableauBigHead($head,$data,$width,7,$style,260);
+		
 
 		$this->ln(5);
 		$y = $this->getY();
@@ -638,7 +605,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$data = array();
 		$style = array();
 
-		foreach ($tva as $key => $value) {
+		foreach ($this->tva as $key => $value) {
 			$data[0][0] = "TVA ".$key."%";
 			$style[0][0] = $this->leftStyle;
 			$data[0][1] = $value["total"]." €";
@@ -679,6 +646,100 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->cell(20,10,$facture["prix"]." €",1,1,"C");
 		
 
+	}
+
+	public function lignes_facture($facture_lignes,$facture, $nature){
+		
+
+		if($nature == "loyer"){
+			$head = array("Désignation ( Référence )","Prix unit. HT","Taux de TVA","Total TTC");
+			$width = array(132,20,20,20);
+
+			if ($facture_lignes){
+				foreach ($facture_lignes as $k => $i) {
+					$prod = ATF::produit()->select($i['id_produit']);
+									
+					
+					if($facture["nature"]){
+						ATF::produit_loyer()->q->reset()->where("id_produit",$i["id_produit"])
+														->where("nature", $facture["nature"]);
+						$loyer = ATF::produit_loyer()->select_row();
+					}
+					
+					if($ligne_produits[($prod["tva_loyer"]*100)-100]["produits"]) $ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= "\n";
+					$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= $i['quantite']." x ".str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
+
+					if($prod["ref_lm"]){
+						$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= " ( Ref: ".$prod["ref_lm"]." )";
+					}
+				
+					
+					if($loyer){	
+						$this->ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
+						$this->ttva = $this->ttc - $loyer["loyer"];
+
+						$this->tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($this->ttva),2);
+						$this->tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($this->ttc-$this->ttva),2);
+						
+						$ligne_produits[($prod["tva_loyer"]*100)-100]["HT"] += ($loyer["loyer"]*$i['quantite']);
+						$ligne_produits[($prod["tva_loyer"]*100)-100]["TTC"] += (($loyer["loyer"]*$i['quantite'])*$prod["tva_loyer"]);
+
+					}				
+				}
+
+				foreach ($ligne_produits as $key => $value) {
+					$data[$key][0] = $value["produits"];
+					$style[$key][0] = $this->leftStyle;
+					$data[$key][1] = number_format($value["HT"],2)." €" ;
+					$data[$key][2] = $key."%";
+					$data[$key][3] = number_format($value["TTC"],2)." €" ;
+				}
+				
+
+			}
+			$this->tableauBigHead($head,$data,$width,7,$style,260);
+		}
+
+		if($nature == "prestation"){
+			$head = array("N","Référence","Désignation","Prix unit. HT","Taux de TVA","Quantité","Total TTC");
+			$width = array(8,24,80,20,20,20,20);
+			if ($facture_lignes){
+				foreach ($facture_lignes as $k => $i) {
+					$prod = ATF::produit()->select($i['id_produit']);
+									
+					
+					if($facture["nature"]){
+						ATF::produit_loyer()->q->reset()->where("id_produit",$i["id_produit"])
+														->where("nature", $facture["nature"]);
+						$loyer = ATF::produit_loyer()->select_row();
+					}
+
+					$data[$k][0] = $k+1;
+					$data[$k][1] = $prod["ref_lm"];	
+					$style[$k][1] = $this->leftStyle;
+					$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
+					$style[$k][2] = $this->leftStyle;			
+					if($loyer){
+						$data[$k][3] = number_format($loyer["loyer"],2)." €";
+						$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
+						$data[$k][5] = $i['quantite'];
+						$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
+							
+						$this->ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
+						$this->ttva = $this->ttc - $loyer["loyer"];
+
+						$this->tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($this->ttva),2);
+						$this->tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($this->ttc-$this->ttva),2);
+					}else{
+						$data[$k][3] = "-";
+						$data[$k][4] = "-";
+						$data[$k][5] = $i['quantite'];
+						$data[$k][6] = "-";
+					}					
+				}
+			}
+			$this->tableauBigHead($head,$data,$width,7,$style,260);
+		}
 	}
 
 

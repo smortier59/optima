@@ -146,6 +146,8 @@ class hotline_interaction extends classes_optima {
 		}
 		
 		parent::delete($infos,$s,$files,$cadre_refreshed,$mail,$pointage);
+
+		api::sendUDP(array("data"=>array("type"=>"interaction")));
 	}
 	
 	/**
@@ -509,19 +511,8 @@ class hotline_interaction extends classes_optima {
 		ATF::hotline()->createNotice("hotline_interaction_done");
 		
 		if(ATF::db($this->db)->commit_transaction()){
-			/*
-			$type = ATF::hotline()->getModeFacturation(array("id_hotline_interaction"=>$id_hotline_interaction)) == true ? "fact" : "not_fact";
-			api::sendUDP(array(
-				'event'=> "interaction_added",
-				'data'=> array(
-					"time" => $this->getBillingTimeV2($id_hotline_interaction),
-					"id_user" => (($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID()),
-					"type" => $type
-				)
-			));
-			*/
 
-			api::sendUDP(array("data"=>array("type"=>"interaction_added")));
+			api::sendUDP(array("data"=>array("type"=>"interaction")));
 		}
 
 
@@ -1781,5 +1772,105 @@ class hotline_interaction extends classes_optima {
 	    }
 	   
     }
+
+
+
+	/**
+	* Permet de récupérer la liste des interaction hotline pour telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/ 
+	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
+	public function _GET($get,$post) {
+
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_hotline_interaction";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$colsData = array(
+			"hotline_interaction.id_hotline_interaction"=>array(),
+			"hotline_interaction.id_hotline"=>array(),
+			"hotline_interaction.date"=>array(),
+			"hotline_interaction.temps"=>array("visible"=>false),
+			"hotline_interaction.temps_passe"=>array(), 
+			"hotline_interaction.detail"=>array(),
+			"hotline_interaction.id_user"=>array(),
+			"hotline_interaction.id_contact"=>array(),
+			"hotline_interaction.visible"=>array(),
+			"hotline_interaction.nature"=>array()
+		);
+
+
+		$this->q->reset();
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_hotline_interaction",$get['id'])->setLimit(1);
+		} elseif ($get['id_hotline']) {
+			$this->q->where("hotline_interaction.id_hotline",$get['id_hotline'])->setLimit($get['limit']);
+		} else {
+			$this->q->setLimit($get['limit']);
+		}
+
+		switch ($get['tri']) {
+			case 'id_hotline':
+			case 'id_user':
+			case 'id_contact':
+				$get['tri'] = "hotline_interaction.".$get['tri'];
+			break;
+		}
+
+
+		$this->q->addField($colsData);
+
+		$this->q->from("hotline_interaction","id_contact","contact","id_contact");
+		$this->q->from("hotline_interaction","id_hotline","hotline","id_hotline");
+		$this->q->from("hotline_interaction","id_user","user","id_user");
+
+
+		$this->q->setToString();
+		$sql = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+		$this->q->unsetToString();
+		
+		header("TS-sql-debug: ".$sql);
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
+
+		if ($get['id']) {
+	        $return = $data['data'][0];			
+		} else {
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+
+	        $return = $data['data'];			
+		}
+
+		return $return;
+	}
+
 
 }

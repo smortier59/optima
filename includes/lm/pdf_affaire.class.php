@@ -12,8 +12,8 @@ class pdf_affaire extends classes_optima {
 		parent::__construct($table_or_id);
 		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array(
-			 'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"scanner","width"=>200)
-			,'fichier_joint2'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
+			// 'fichier_joint2'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"scanner","width"=>200)
+			'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			,'pdf_affaire.id_affaire'
 			,'pdf_affaire.provenance'	
 			,"action"=>array("custom"=>true,"nosort"=>true,"renderer"=>"transfertPDFAffaire","width"=>80)
@@ -38,6 +38,7 @@ class pdf_affaire extends classes_optima {
 
 		$this->foreign_key["id_affaire"] = "affaire";
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		//$this->files["fichier_joint2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
 		$this->addPrivilege('getUrlImagePDF');		
 		$this->addPrivilege('getAll');	
@@ -66,6 +67,8 @@ class pdf_affaire extends classes_optima {
 
     	$previewFn = $pathPDF.'/'.$id_pdf_affaire.".previewPDF";
 
+
+    	log::logger( $fn, "mfleurquin");
    		
    		//On recupere le nombre de page
    		$page = array();
@@ -73,15 +76,18 @@ class pdf_affaire extends classes_optima {
 		$contents = fread($handle, filesize($path));
 		fclose($handle);	
 
-   		preg_match_all("#/Count ([0-9]*)#" , $contents, $page);
+   		/*preg_match_all("#/Count ([0-9]*)#" , $contents, $page);
    		if(!empty($page[1])){ $page = $page[1][count($page[1])-1];	}
-   		else{	$page = 1;	}
+   		else{*/	$page = 1;	/*}*/
    		
+   		
+
    		for($i=0; $i<$page; $i++){
    			 //execute imageMagick's 'convert', setting the color space to RGB	    
 		    $cmd = "convert \"{$fn}[".$i."]\" -colorspace RGB -geometry 900 -quality 100 -flatten ".$previewFn."_".$i.".png";	   
 		    exec($cmd);
-		   
+		   	log::logger( "--- Exec ", "mfleurquin");
+		   	log::logger( exec($cmd), "mfleurquin");
 		    // Renommer l'image créée par le convert pour lui soustraire son extension
     		util::rename($previewFn."_".$i.".png",$previewFn."_".$i);
    		}	   
@@ -94,6 +100,9 @@ class pdf_affaire extends classes_optima {
 
         // Ici on renomme les fichiers extrait avec leur vrai nom par le nom qu'on leur attribut
         //rename($path2extract.$name,$path2extract.$id_pdf_affaire.".".$filename.$i);     
+
+
+
         return $array;
    	}	
 
@@ -121,12 +130,15 @@ class pdf_affaire extends classes_optima {
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		
+
 		if(!$return["data"]) $return["data"] = $return;
+
+		log::logger($return["data"], "mfleurquin");
 
 		foreach ($return['data'] as $k=>$i) {			
 			if($i["pdf_affaire.id_pdf_affaire"]) $id = $this->cryptId($i["pdf_affaire.id_pdf_affaire"]);
 			else $id = $this->cryptId($i["id_pdf_affaire"]);
-			
+						
 			$url = NULL;
 			if($this->getFichierJoint($id)){
 				if($this->imageExist($id)){	$url = $this->getUrlImagePDF($id); }

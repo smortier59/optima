@@ -31,6 +31,7 @@
 {util::push($fieldsKeys,"ctSigneExists")}
 {util::push($fieldsKeys,"CourrierRestitutionExists")}
 {util::push($fieldsKeys,"envoiCourrierClassiqueExists")}
+{util::push($fieldsKeys,"ctSigneSlimpayExists")}
 
 
 ATF.renderer.dateCleCommande=function(table,field) {
@@ -170,6 +171,12 @@ ATF.renderer.pdfCommande=function(table,field) {
 		html += '<a href="mandatSepa-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande');
 		html += '</a><br /><hr>';
+
+		if (record.data.ctSigneSlimpayExists==true){
+			html += '<a href="commande-select-retour-'+id+'.dl" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat Signé Slimpay','commande');
+			html += '</a><br /><hr>';
+		}
 
 		return '<div id="'+idDiv+'">'+html+'</div>';
 	}
