@@ -1229,6 +1229,15 @@ class societe_absystech extends societe {
 		$indicator["retard"] = number_format($indicator["retard"] ,2,","," ");
 		$indicator["delai_paiement"] = number_format($indicator["delai_paiement"]/$nb_delai_paiement,0);
 
+		$indicator["meteo"] = $this->meteo_icone($this->select($infos["id_societe"], "meteo"));
+
+		$indicator["solde_total"]    = 	$this->solde_total($infos["id_societe"]);
+		$indicator["chiffre_par_an"] =  $this->chiffre_par_an($infos["id_societe"]); 
+		$indicator["affaire_perdu"]  = 	$this->affaire_perdu($infos["id_societe"]);
+		$indicator["datediff"] 		 =	$this->datediff($infos["id_societe"]);
+
+
+
 		return $indicator;
 	}
 
