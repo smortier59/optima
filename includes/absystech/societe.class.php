@@ -1184,6 +1184,54 @@ class societe_absystech extends societe {
 		return $retour;
 	}
 
+
+	public function _getIndicateur($infos){
+
+		$indicator["credit_restant"] = $this->getSolde($infos["id_societe"]);
+
+		ATF::facture()->q->reset()->where("facture.id_societe",$infos["id_societe"]);
+		$factures = ATF::facture()->select_all();
+		log::logger($factures , "mfleurquin");
+
+		$indicator["CA"] =
+		$indicator["delai_paiement"] = 
+		$indicator["en_cours"] = 
+		$indicator["retard"] = 0;
+
+		foreach ($factures as $key => $value) {
+			$date_edition = "";
+			$date_paiement = "";
+
+			if($value["facture.date"] > date("Y-01-01") && $value["facture.date"] < date("Y-12-31")){
+				$indicator["CA"] += $value["facture.prix"];
+			}
+
+			if($value["facture.etat"] == "payee"){
+				$date_edition = strtotime($value["facture.date"]. "00:00:00");
+				$date_paiement = strtotime($value["facture.date_effective"]. "00:00:00");
+				$diff  = abs($date_edition - $date_paiement);
+				$indicator["delai_paiement"] += floor($diff /86400);
+				$nb_delai_paiement ++;	
+			}
+
+			if($value["facture.etat"] !== "payee"){
+				$indicator["en_cours"] += $value["facture.prix"];
+				if($value["facture.retard"]>0){
+					$indicator["retard"] += $value["facture.prix"];
+				}
+				
+			}
+
+		}
+
+		$indicator["CA"] = number_format($indicator["CA"] ,2,","," ");
+		$indicator["en_cours"] = number_format($indicator["en_cours"] ,2,","," ");
+		$indicator["retard"] = number_format($indicator["retard"] ,2,","," ");
+		$indicator["delai_paiement"] = number_format($indicator["delai_paiement"]/$nb_delai_paiement,0);
+
+		return $indicator;
+	}
+
 };
 
 class societe_att extends societe_absystech {
