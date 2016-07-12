@@ -24,5 +24,9 @@ class site_article extends classes_optima {
 		$this->fieldstructure();	
 		$this->foreign_key["id_parent"] = "site_article";
 
+		$this->onglets = array("site_article_contenu");
+
 	}
+
+
 }
