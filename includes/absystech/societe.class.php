@@ -28,6 +28,9 @@ class societe_absystech extends societe {
 			,'societe.id_apporteur_affaire'
 		);
 		
+		$this->colonnes["primary"]["date_fin_contrat_maintenance"] = "";
+		$this->colonnes["primary"]["date_fin_option"] = "";
+
 		/*-----------Colonnes bloquées select -----------------------*/
 		$this->colonnes['bloquees']['select'] = array(
 			'societe.meteo'
@@ -35,6 +38,14 @@ class societe_absystech extends societe {
 
 		// Adresse de facturation
 		array_unshift($this->colonnes['panel']['adresse_facturation_complete_fs'],"facturer_le_siege");
+
+		$this->colonnes['panel']['contrat_maintenance'] = array(
+			"est_sous_contrat_maintenance"
+			,"commentaire_contrat_maintenance"
+			,"option_contrat_maintenance"			
+			,"id_commercial"
+		);
+		$this->panels['contrat_maintenance'] = array('nbCols'=>1, "visible"=>true);
 
 		
 		$this->colonnes['bloquees']['insert'][] = "credits";
@@ -71,14 +82,7 @@ class societe_absystech extends societe {
 			'societe'
 		);
 		
-		$this->colonnes['panel']['contrat_maintenance'] = array(
-			"est_sous_contrat_maintenance"
-			,"commentaire_contrat_maintenance"
-			,"option_contrat_maintenance"
-			,"date_fin_contrat_maintenance"
-			,"date_fin_option"
-			,"id_commercial"
-		);
+
 
 		$this->foreign_key['id_apporteur_affaire'] = "societe";
 		$this->foreign_key["id_commercial"] = "user";
@@ -1303,7 +1307,7 @@ class societe_absystech extends societe {
 				$date = date("Ymd", $date->getTimestamp());
 
 				if($date <= $now){
-					$this->u(array("id_societe"=>$value["id_societe"], "est_sous_contrat_maintenance"=>"sans_contrat","commentaire_contrat_maintenance"=>"Ancien commentaire : ".$value["commentaire_contrat_maintenance"],"date_fin_contrat_maintenance"=>NULL));
+					$this->u(array("id_societe"=>$value["id_societe"], "est_sous_contrat_maintenance"=>"sans_contrat","commentaire_contrat_maintenance"=>"Ancien commentaire : ".$value[""],"date_fin_contrat_maintenance"=>NULL));
 					ATF::suivi()->insert(array( "id_user"=>$value["id_commercial"],
 												"id_societe"=>$value["id_societe"],
 												"type"=>"note",
