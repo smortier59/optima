@@ -28,14 +28,24 @@ class societe_absystech extends societe {
 			,'societe.id_apporteur_affaire'
 		);
 		
+		$this->colonnes["primary"]["date_fin_contrat_maintenance"] = "";
+		$this->colonnes["primary"]["date_fin_option"] = "";
+
 		/*-----------Colonnes bloquées select -----------------------*/
 		$this->colonnes['bloquees']['select'] = array(
-
 			'societe.meteo'
 		);
 
 		// Adresse de facturation
 		array_unshift($this->colonnes['panel']['adresse_facturation_complete_fs'],"facturer_le_siege");
+
+		$this->colonnes['panel']['contrat_maintenance'] = array(
+			"est_sous_contrat_maintenance"
+			,"commentaire_contrat_maintenance"
+			,"option_contrat_maintenance"			
+			,"id_commercial"
+		);
+		$this->panels['contrat_maintenance'] = array('nbCols'=>1, "visible"=>true);
 
 		
 		$this->colonnes['bloquees']['insert'][] = "credits";
@@ -72,7 +82,10 @@ class societe_absystech extends societe {
 			'societe'
 		);
 		
+
+
 		$this->foreign_key['id_apporteur_affaire'] = "societe";
+		$this->foreign_key["id_commercial"] = "user";
 
 		$this->fieldstructure();
 
@@ -1239,6 +1252,71 @@ class societe_absystech extends societe {
 
 
 		return $indicator;
+	}
+
+
+	/**
+	 * Retourne la valeur par défaut spécifique aux données passées en paramètres
+	 * @author Yann GAUTHERON <ygautheron@absystech.fr>
+	 * @param string $field
+	 * @param array &$s La session
+	 * @param array &$request Paramètres disponibles (clés étrangères)
+	 * @return string
+	 */
+	public function default_value($field,$quickMail=false){
+		if(ATF::_r('id_societe')){
+			$societe = $this->select(ATF::_r('id_societe'));
+		}			
+		switch ($field) {
+			case "id_commercial":
+				if($societe) return $societe["id_user"];
+				else return ATF::$usr->getID();
+			default:
+				return parent::default_value($field);
+		}
+	}
+
+	/*
+	* Permet de checker les sociétés sous contrat de maintenance et d'avertir le commercial en charge si le contrat arrive a échéance
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function check_contrat_maintenance(){
+		ATF::societe()->q->reset()->where("est_sous_contrat_maintenance","sans_contrat","AND",false,"!=");
+		$societes = ATF::societe()->select_all();
+
+		$now = date('Ymd');
+
+		foreach ($societes as $key => $value) {
+			if($value["date_fin_option"]){
+				$date = new DateTime( $value["date_fin_option"] );
+				$date = date("Ymd", $date->getTimestamp());
+
+				if($date <= $now){
+					$this->u(array("id_societe"=>$value["id_societe"], "est_sous_contrat_maintenance"=>"sans_contrat","option_contrat_maintenance"=>"aucune","date_fin_option"=>NULL));
+					ATF::suivi()->insert(array( "id_user"=>$value["id_commercial"],
+												"id_societe"=>$value["id_societe"],
+												"type"=>"note",
+												"texte"=>"L'option du contrat de maintenance du client ".$value["societe"]." viens d'arriver à échéance",
+												"suivi_notifie"=>$value["id_commercial"]
+										));
+				}
+			}
+
+			if($value["date_fin_contrat_maintenance"]){
+				$date = new DateTime( $value["date_fin_contrat_maintenance"] );
+				$date = date("Ymd", $date->getTimestamp());
+
+				if($date <= $now){
+					$this->u(array("id_societe"=>$value["id_societe"], "est_sous_contrat_maintenance"=>"sans_contrat","commentaire_contrat_maintenance"=>"Ancien commentaire : ".$value[""],"date_fin_contrat_maintenance"=>NULL));
+					ATF::suivi()->insert(array( "id_user"=>$value["id_commercial"],
+												"id_societe"=>$value["id_societe"],
+												"type"=>"note",
+												"texte"=>"Le contrat de maintenance du client ".$value["societe"]." viens d'arriver à expiration",
+												"suivi_notifie"=>$value["id_commercial"]
+										));
+				}
+			}
+		}
 	}
 
 };

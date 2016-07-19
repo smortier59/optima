@@ -1,6 +1,8 @@
 {$id_crypted = ATF::hotline()->cryptId($infos.id_hotline)}
 {$path = $current_class->filepath($infos.id_hotline,"fichier_joint")}
 
+{$societe = ATF::societe()->select($infos.id_societe)}
+
 {
 	html:'<div style="border: 2px solid #a60000; color: #a60000; font-weight: bold; line-height: 13px; padding-left: 5px; padding-right: 5px; border-radius: 5px;">Presta "facturable" : {ATF::hotline()->getTotalTime($infos.id_hotline, "prestaTicket")} | Dép. : {ATF::hotline()->getTotalTime($infos.id_hotline, "dep")}<br>Crédits facturés : {ATF::hotline()->getCreditUtilises($infos.id_hotline)}</div>',
 	cls: "labelCtn"
@@ -554,4 +556,53 @@
 	}
 {/if}
 /* END : Annulation de la requête */
-	
+
+{if $societe["est_sous_contrat_maintenance"]}
+	{if $societe["est_sous_contrat_maintenance"] == "sous_contrat"}
+		{$alerte = "btn-success"}
+		{$texte = "Client sous contrat de maintenance"}
+	{else if $societe["est_sous_contrat_maintenance"] == "sous_contrat_partiel"}
+		{$alerte = "btn-warning"}
+		{$texte = "Contrat de maintenance Partiel"}
+	{else}
+		{$alerte = "btn-danger"}
+		{$texte = "Le client ne possède pas de contrat de maintenance"}
+	{/if}
+
+	{$commentaire = ""}
+	{if $societe["commentaire_contrat_maintenance"]}
+		{$commentaire = $societe["commentaire_contrat_maintenance"]}
+	{/if}
+
+	{$image =''}
+	{if $societe["option_contrat_maintenance"] != "aucune"}
+		{if $societe["option_contrat_maintenance"] == "a_caliner"}
+			,{
+				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/heart.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire}</span>{/if}</button>'
+				,border: false
+				,style: {
+					marginLeft: "10px",
+					float: 'left'
+				}
+			}		
+		{else}
+			,{
+				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/new_install.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire}</span>{/if}</button>'
+				,border: false
+				,style: {
+					marginLeft: "10px",
+					float: 'left'
+				}
+			}		
+		{/if}
+	{else}
+		,{
+			html: '<button type="button" class="btn btn-lg {$alerte}">{$image}{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire}</span>{/if}</button>'
+			,border: false
+			,style: {
+				marginLeft: "10px",
+				float: 'left'
+			}
+		}
+	{/if}
+{/if}
