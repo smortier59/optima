@@ -617,7 +617,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		
 
-		$data[1][0] = "Total TVA";
+		$data[1][0] = "Total";
 		$style[1][0] = $this->leftStyle;
 		$data[1][1] = $montantHT." €";
 		$data[1][2] = $montantTVA." €";
@@ -636,6 +636,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$data[0][2] = $facture["prix"]." €";
 		
 		$this->tableau($head,$data,$width,7,$style,260);
+
+		$this->ln(10);
+		$this->multicell(0,5,"TERMES DE PAIEMENTS \nLe ".date("d/m/Y", strtotime($facture["date_previsionnelle"])).", vous serez débité sur le compte : FRXX XXXX XXXX XXXX XXXX XXXX XXX – XXXXXXXX\nRUM XXXXXXXXXX\nICS XXXXXX");
 
 		
 		$this->setY($y);

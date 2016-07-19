@@ -5,6 +5,7 @@
 */
 require_once dirname(__FILE__)."/../produit.class.php";
 class produit_lm extends produit {	
+
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
@@ -79,6 +80,8 @@ class produit_lm extends produit {
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->fieldstructure();
+
+		$this->field_nom = "%produit% (Pack %id_pack_produit% )";
 
 		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
 		//$this->field_nom = "%produit% (%id_pack_produit%)";
