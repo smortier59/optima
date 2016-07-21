@@ -1211,9 +1211,40 @@ class societe_absystech extends societe {
 
 		$indicator["credit_restant"] = $this->getSolde($infos["id_societe"]);
 
-		ATF::facture()->q->reset()->where("facture.id_societe",$infos["id_societe"]);
+		ATF::facture()->q->reset()->addAllFields("facture")->where("facture.id_societe",$infos["id_societe"]);
+		ATF::facture()->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
+								,0
+								,IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,(facture.prix*facture.tva)
+								)),2)","solde")
+						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+						    ->addField("IF(facture.etat!='perte'
+										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+											,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+											    *ROUND(IF(
+													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+													,facture.prix*facture.tva
+												),2))
+										,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+											    *ROUND(IF(
+													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+													,facture.prix*facture.tva
+												),2))>0
+											, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+										    *ROUND(IF(
+												(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+												,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+												,facture.prix*facture.tva
+											),2))
+											, 0 )
+										) 					   					
+									,0)","interet")			
+						    ->addGroup("facture.id_facture");
 		$factures = ATF::facture()->select_all();
-		log::logger($factures , "mfleurquin");
 
 		$indicator["CA"] =
 		$indicator["delai_paiement"] = 
@@ -1225,7 +1256,7 @@ class societe_absystech extends societe {
 			$date_paiement = "";
 
 			if($value["facture.date"] > date("Y-01-01") && $value["facture.date"] < date("Y-12-31")){
-				$indicator["CA"] += $value["facture.prix"];
+				$indicator["CA"] += ($value["facture.prix"]*$value["facture.tva"]);
 			}
 
 			if($value["facture.etat"] == "payee"){
@@ -1237,9 +1268,9 @@ class societe_absystech extends societe {
 			}
 
 			if($value["facture.etat"] !== "payee"){
-				$indicator["en_cours"] += $value["facture.prix"];
-				if($value["facture.retard"]>0){
-					$indicator["retard"] += $value["facture.prix"];
+				$indicator["en_cours"] += ($value["facture.prix"]*$value["facture.tva"]);
+				if($value["retard"]>0){
+					$indicator["retard"] += ($value["facture.prix"]*$value["facture.tva"]);
 				}
 				
 			}

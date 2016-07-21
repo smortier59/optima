@@ -3652,6 +3652,13 @@ class hotline extends classes_optima {
 			break;
 		}
 
+		if($get["filter"]){
+			foreach ($get["filter"] as $key => $value) {	
+				if (strpos($key, 'hotline') !== false) {	
+					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+				}
+			}
+		}
 
 		$this->q->addField($colsData);
 
