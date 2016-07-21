@@ -934,7 +934,13 @@ class societe_absystech extends societe {
 					unset($data[0]);
 					// Insertion de la société
 					array_shift($societe);
+					// On vire les champs auto calculé qui ne sont pas utiles
 					unset($societe['solde'],$societe['ref'],$societe['date'],$societe['id_filiale'],$societe['divers_5'],$societe['meteo'],$societe['meteo_calcul'],$societe['mdp_client'],$societe['mdp_absystech']);
+					// On vire aussi les champs a contraintes sur les contacts
+					if ($societe['id_contact_facturation']) {
+						unset($societe['id_contact_facturation']);
+					}
+
 					$societe['id_owner'] = ATF::$usr->getID();
 					$insert['societe'] = $societe;
 					$id_societe = $this->insert($insert);
@@ -949,7 +955,10 @@ class societe_absystech extends societe {
 						$insert['contact']['id_societe'] = $id_societe;
 						ATF::contact()->i($insert);
 						unset($insert);
+
 					}
+
+
 				}
 			} catch (errorATF $e) {
 				ATF::db($this->db)->rollback_transaction();	
