@@ -78,6 +78,7 @@ class contact_absystech extends contact {
 	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
 
+
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "id_contact";
 		if (!$get['trid']) $get['trid'] = "desc";
@@ -94,7 +95,9 @@ class contact_absystech extends contact {
 			"contact.civilite"=>array(),
 			"contact.nom"=>array(),
 			"contact.prenom"=>array(),
-			"contact.etat"=>array()
+			"contact.tel"=>array(),
+			"contact.gsm"=>array(),
+			"contact.email"=>array()
 		);
 		
 
@@ -113,12 +116,22 @@ class contact_absystech extends contact {
 
 		}
 
+
+
 		switch ($get['tri']) {
 			case 'id_societe':	
 				$get['tri'] = "contact.".$get['tri'];
 			break;
 		}
 
+		if($get["filter"]){
+			foreach ($get["filter"] as $key => $value) {
+				if (strpos($key, 'contact') !== false) {
+					log::logger($key , "mfleurquin");
+					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+				}
+			}
+		}
 
 		$this->q->addField($colsData);
 
