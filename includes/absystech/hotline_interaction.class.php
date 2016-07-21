@@ -1873,4 +1873,53 @@ class hotline_interaction extends classes_optima {
 	}
 
 
+	/**
+	* Permet d'insérer une interaction hotline depuis telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array COntient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/ 
+	public function _POST($get,$post) {
+
+    	$return = array();
+
+        try {
+        	
+	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+	        // Check des champs obligatoire
+	        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1100);
+	        if (!$post['detail'] || $post['detail']=="<p><br></p>") throw new Exception("CONTENT_MISSING",1101);
+	        if (!$post['temps_passe'] || $post['temps_passe']=="00:00:00") throw new Exception("TEMPS_PASSE_MISSING",1102);
+	        if (!$post['date']) $post['date'] = date("Y-m-d H:i:s");
+
+	        // Mapping pour BDD Optima
+	        $tps = substr($post['temps_passe'],0,5);
+	        if ($tps == "00:00") {
+	        	$tps = "00:05";
+	        }
+	        $post['temps_passe'] = $post['duree_presta'] = $tps;
+
+	        // Insertion
+	        $id = self::insert($post);
+        	$return['result'] = self::select($id);
+
+        	// Traitement de l'id_user
+        	if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
+        		$return["result"]["id_user_fk"] = $return["result"]["id_user"];
+        		$return["result"]["id_user"] = ATF::user()->nom($return["result"]["id_user"]);
+        	}
+        	// Récupération des notices créés
+        	$return['notices'] = ATF::$msg->getNotices();
+	        return $return;
+        } catch (errorATF $e) {
+        	throw $e;
+        } catch (Exception $e) {
+        	throw $e;
+        }
+        return false;
+	}	
+
+
 }

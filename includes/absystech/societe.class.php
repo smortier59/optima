@@ -28,14 +28,24 @@ class societe_absystech extends societe {
 			,'societe.id_apporteur_affaire'
 		);
 		
+		$this->colonnes["primary"]["date_fin_contrat_maintenance"] = "";
+		$this->colonnes["primary"]["date_fin_option"] = "";
+
 		/*-----------Colonnes bloquées select -----------------------*/
 		$this->colonnes['bloquees']['select'] = array(
-
 			'societe.meteo'
 		);
 
 		// Adresse de facturation
 		array_unshift($this->colonnes['panel']['adresse_facturation_complete_fs'],"facturer_le_siege");
+
+		$this->colonnes['panel']['contrat_maintenance'] = array(
+			"est_sous_contrat_maintenance"
+			,"commentaire_contrat_maintenance"
+			,"option_contrat_maintenance"			
+			,"id_commercial"
+		);
+		$this->panels['contrat_maintenance'] = array('nbCols'=>1, "visible"=>true);
 
 		
 		$this->colonnes['bloquees']['insert'][] = "credits";
@@ -72,7 +82,10 @@ class societe_absystech extends societe {
 			'societe'
 		);
 		
+
+
 		$this->foreign_key['id_apporteur_affaire'] = "societe";
+		$this->foreign_key["id_commercial"] = "user";
 
 		$this->fieldstructure();
 
@@ -921,7 +934,13 @@ class societe_absystech extends societe {
 					unset($data[0]);
 					// Insertion de la société
 					array_shift($societe);
+					// On vire les champs auto calculé qui ne sont pas utiles
 					unset($societe['solde'],$societe['ref'],$societe['date'],$societe['id_filiale'],$societe['divers_5'],$societe['meteo'],$societe['meteo_calcul'],$societe['mdp_client'],$societe['mdp_absystech']);
+					// On vire aussi les champs a contraintes sur les contacts
+					if ($societe['id_contact_facturation']) {
+						unset($societe['id_contact_facturation']);
+					}
+
 					$societe['id_owner'] = ATF::$usr->getID();
 					$insert['societe'] = $societe;
 					$id_societe = $this->insert($insert);
@@ -936,7 +955,10 @@ class societe_absystech extends societe {
 						$insert['contact']['id_societe'] = $id_societe;
 						ATF::contact()->i($insert);
 						unset($insert);
+
 					}
+
+
 				}
 			} catch (errorATF $e) {
 				ATF::db($this->db)->rollback_transaction();	
@@ -1182,6 +1204,159 @@ class societe_absystech extends societe {
 			$this->u(array("id_societe" => $infos["id_societe"] , "divers_5" => $new));		
 		}		
 		return $retour;
+	}
+
+
+	public function _getIndicateur($infos){
+
+		$indicator["credit_restant"] = $this->getSolde($infos["id_societe"]);
+
+		ATF::facture()->q->reset()->addAllFields("facture")->where("facture.id_societe",$infos["id_societe"]);
+		ATF::facture()->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
+								,0
+								,IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,(facture.prix*facture.tva)
+								)),2)","solde")
+						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+						    ->addField("IF(facture.etat!='perte'
+										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+											,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+											    *ROUND(IF(
+													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+													,facture.prix*facture.tva
+												),2))
+										,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+											    *ROUND(IF(
+													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+													,facture.prix*facture.tva
+												),2))>0
+											, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+										    *ROUND(IF(
+												(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+												,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+												,facture.prix*facture.tva
+											),2))
+											, 0 )
+										) 					   					
+									,0)","interet")			
+						    ->addGroup("facture.id_facture");
+		$factures = ATF::facture()->select_all();
+
+		$indicator["CA"] =
+		$indicator["delai_paiement"] = 
+		$indicator["en_cours"] = 
+		$indicator["retard"] = 0;
+
+		foreach ($factures as $key => $value) {
+			$date_edition = "";
+			$date_paiement = "";
+
+			if($value["facture.date"] > date("Y-01-01") && $value["facture.date"] < date("Y-12-31")){
+				$indicator["CA"] += ($value["facture.prix"]*$value["facture.tva"]);
+			}
+
+			if($value["facture.etat"] == "payee"){
+				$date_edition = strtotime($value["facture.date"]. "00:00:00");
+				$date_paiement = strtotime($value["facture.date_effective"]. "00:00:00");
+				$diff  = abs($date_edition - $date_paiement);
+				$indicator["delai_paiement"] += floor($diff /86400);
+				$nb_delai_paiement ++;	
+			}
+
+			if($value["facture.etat"] !== "payee"){
+				$indicator["en_cours"] += ($value["facture.prix"]*$value["facture.tva"]);
+				if($value["retard"]>0){
+					$indicator["retard"] += ($value["facture.prix"]*$value["facture.tva"]);
+				}
+				
+			}
+
+		}
+
+		$indicator["CA"] = number_format($indicator["CA"] ,2,","," ");
+		$indicator["en_cours"] = number_format($indicator["en_cours"] ,2,","," ");
+		$indicator["retard"] = number_format($indicator["retard"] ,2,","," ");
+		$indicator["delai_paiement"] = number_format($indicator["delai_paiement"]/$nb_delai_paiement,0);
+
+		$indicator["meteo"] = $this->meteo_icone($this->select($infos["id_societe"], "meteo"));
+
+		$indicator["solde_total"]    = 	$this->solde_total($infos["id_societe"]);
+		$indicator["chiffre_par_an"] =  $this->chiffre_par_an($infos["id_societe"]); 
+		$indicator["affaire_perdu"]  = 	$this->affaire_perdu($infos["id_societe"]);
+		$indicator["datediff"] 		 =	$this->datediff($infos["id_societe"]);
+
+
+
+		return $indicator;
+	}
+
+
+	/**
+	 * Retourne la valeur par défaut spécifique aux données passées en paramètres
+	 * @author Yann GAUTHERON <ygautheron@absystech.fr>
+	 * @param string $field
+	 * @param array &$s La session
+	 * @param array &$request Paramètres disponibles (clés étrangères)
+	 * @return string
+	 */
+	public function default_value($field,$quickMail=false){
+		if(ATF::_r('id_societe')){
+			$societe = $this->select(ATF::_r('id_societe'));
+		}			
+		switch ($field) {
+			case "id_commercial":
+				if($societe) return $societe["id_user"];
+				else return ATF::$usr->getID();
+			default:
+				return parent::default_value($field);
+		}
+	}
+
+	/*
+	* Permet de checker les sociétés sous contrat de maintenance et d'avertir le commercial en charge si le contrat arrive a échéance
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function check_contrat_maintenance(){
+		ATF::societe()->q->reset()->where("est_sous_contrat_maintenance","sans_contrat","AND",false,"!=");
+		$societes = ATF::societe()->select_all();
+
+		$now = date('Ymd');
+
+		foreach ($societes as $key => $value) {
+			if($value["date_fin_option"]){
+				$date = new DateTime( $value["date_fin_option"] );
+				$date = date("Ymd", $date->getTimestamp());
+
+				if($date <= $now){
+					$this->u(array("id_societe"=>$value["id_societe"], "est_sous_contrat_maintenance"=>"sans_contrat","option_contrat_maintenance"=>"aucune","date_fin_option"=>NULL));
+					ATF::suivi()->insert(array( "id_user"=>$value["id_commercial"],
+												"id_societe"=>$value["id_societe"],
+												"type"=>"note",
+												"texte"=>"L'option du contrat de maintenance du client ".$value["societe"]." viens d'arriver à échéance",
+												"suivi_notifie"=>$value["id_commercial"]
+										));
+				}
+			}
+
+			if($value["date_fin_contrat_maintenance"]){
+				$date = new DateTime( $value["date_fin_contrat_maintenance"] );
+				$date = date("Ymd", $date->getTimestamp());
+
+				if($date <= $now){
+					$this->u(array("id_societe"=>$value["id_societe"], "est_sous_contrat_maintenance"=>"sans_contrat","commentaire_contrat_maintenance"=>"Ancien commentaire : ".$value[""],"date_fin_contrat_maintenance"=>NULL));
+					ATF::suivi()->insert(array( "id_user"=>$value["id_commercial"],
+												"id_societe"=>$value["id_societe"],
+												"type"=>"note",
+												"texte"=>"Le contrat de maintenance du client ".$value["societe"]." viens d'arriver à expiration",
+												"suivi_notifie"=>$value["id_commercial"]
+										));
+				}
+			}
+		}
 	}
 
 };
