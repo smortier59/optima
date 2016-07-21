@@ -100,8 +100,8 @@ class facture_lm extends facture {
 		$this->fieldstructure();
 
 		$this->onglets = array('facture_ligne');
-		$this->no_insert = true;
-		$this->no_update = true;
+		//$this->no_insert = true;
+		//$this->no_update = true;
 		$this->addPrivilege("majMail","update");
 		$this->addPrivilege("export_special");
 		$this->addPrivilege("export_special2");
@@ -380,6 +380,9 @@ class facture_lm extends facture {
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
+
+		log::logger($infos_ligne , "mfleurquin");
+
 		unset($infos["values_".$this->table]["produits"]);
 
 
