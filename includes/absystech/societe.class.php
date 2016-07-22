@@ -1247,13 +1247,22 @@ class societe_absystech extends societe {
 		$factures = ATF::facture()->select_all();
 
 		$indicator["CA"] =
+		$indicator["CA_Prev"] =
 		$indicator["delai_paiement"] = 
 		$indicator["en_cours"] = 
 		$indicator["retard"] = 0;
 
+		$last_year = date("Y")-1;
+
+
+
 		foreach ($factures as $key => $value) {
 			$date_edition = "";
 			$date_paiement = "";
+
+			if($value["facture.date"] > date($last_year."-01-01") && $value["facture.date"] < date($last_year."-m-d")){
+				$indicator["CA_Prev"] += ($value["facture.prix"]*$value["facture.tva"]);
+			}
 
 			if($value["facture.date"] > date("Y-01-01") && $value["facture.date"] < date("Y-12-31")){
 				$indicator["CA"] += ($value["facture.prix"]*$value["facture.tva"]);
@@ -1277,6 +1286,9 @@ class societe_absystech extends societe {
 
 		}
 
+		$evoCA = ((number_format($indicator["CA"],2,"",",")-number_format($indicator["CA_Prev"],2,"",","))/number_format($indicator["CA_Prev"],2,"",","))*100;
+	
+		$indicator["evoCA"] = number_format($evoCA ,0," ",",");
 		$indicator["CA"] = number_format($indicator["CA"] ,2,","," ");
 		$indicator["en_cours"] = number_format($indicator["en_cours"] ,2,","," ");
 		$indicator["retard"] = number_format($indicator["retard"] ,2,","," ");
@@ -1292,6 +1304,37 @@ class societe_absystech extends societe {
 
 
 		return $indicator;
+	}
+
+	public function _indicateur_graph($infos){
+		$data = $this->chiffre_par_an($infos["id_societe"]);
+
+		foreach ($data as $i=>$j) {	
+			$graph['categories']["category"][$j["annee"]] = array("label"=>$j["annee"]);
+			$data[$i]["ca"] = $j["ca"]-$j["marge"];
+		}
+		$graph['params']['showLegend'] = "0";
+		$graph['params']['bgAlpha'] = "0";
+		$graph['categories']['params']["fontSize"] = "12";
+		$graph['params']["titre"] = "";		
+			
+		$this->paramGraphe($dataset_params,$graph);
+
+		$liste_etat=array('marge'=>"FF0033",'ca'=>"0000FF");
+				
+		foreach ($data as $key=>$val_){			
+			foreach($liste_etat as $etat=>$couleur){
+				if (!$graph['dataset'][$etat]) {
+					$graph['dataset'][$etat]["params"] = array_merge($dataset_params,array(
+						"seriesname"=>ATF::$usr->trans($etat, $this->table)
+						,"color"=>$couleur
+					));						
+				}		
+				$graph['dataset'][$etat]['set'][$val_["annee"]] = array("value"=>number_format($val_[$etat],2,",",""),"titre"=>ATF::$usr->trans($etat, $this->table)." : ".number_format($val_[$etat],2,",","")." €");					
+								
+			}
+		}		
+		return $graph;	
 	}
 
 
