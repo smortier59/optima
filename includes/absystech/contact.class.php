@@ -127,7 +127,6 @@ class contact_absystech extends contact {
 		if($get["filter"]){
 			foreach ($get["filter"] as $key => $value) {
 				if (strpos($key, 'contact') !== false) {
-					log::logger($key , "mfleurquin");
 					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
 				}
 			}
