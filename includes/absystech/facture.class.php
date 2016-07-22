@@ -1914,10 +1914,7 @@ class facture_absystech extends facture {
 	*/ 
 	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
-
-		log::logger($get , "mfleurquin");
-
-
+		
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "date";
 		if (!$get['trid']) $get['trid'] = "desc";
