@@ -1902,6 +1902,155 @@ class facture_absystech extends facture {
 
 		return parent::autocomplete($infos,false);
 	}
+
+
+	/**
+	* Permet de récupérer la liste des contacts pour telescope
+	* @package Telescope
+	* @author Morgan FLEURQUIB <mfleurquin@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/ 
+	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
+	public function _GET($get,$post) {
+		
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "date";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$colsData = array(
+			"facture.id_facture"=>array("visible"=>false),
+			"facture.id_societe"=>array("visible"=>false),
+			"facture.ref"=>array(),
+			"facture.date"=>array(),
+			"facture.etat"=>array("visible"=>false),
+			"facture.prix"=>array(),
+			"facture.tva"=>array(),
+			"facture.date_previsionnelle"=>array(),
+			"facture.date_effective"=>array(),
+			"facture.date_relance"=>array()
+		);
+		
+
+
+		$this->q->reset();
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_facture",$get['id'])->setLimit(1);
+		} else {
+			$this->q->setLimit($get['limit']);
+		}
+
+		$this->q->addOrder("facture.date","asc");
+		
+		switch ($get['tri']) {
+			case 'id_societe':	
+				$get['tri'] = "facture.".$get['tri'];
+			break;
+		}
+
+		if($get["filter"]){
+			foreach ($get["filter"] as $key => $value) {
+				if (strpos($key, 'facture') !== false) {
+					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+				}
+			}
+		}
+
+		$this->q->addField($colsData);
+
+		$this->q->from("facture","id_societe","societe","id_societe");
+
+		$this->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
+								,0
+								,IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,(facture.prix*facture.tva)
+								)),2)","solde")
+			    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+			    ->addField("IF(facture.etat!='perte'
+							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+								,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+								    *ROUND(IF(
+										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+										,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+										,facture.prix*facture.tva
+									),2))
+							,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+								    *ROUND(IF(
+										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+										,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+										,facture.prix*facture.tva
+									),2))>0
+								, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+							    *ROUND(IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,facture.prix*facture.tva
+								),2))
+								, 0 )
+							) 					   					
+						,0)","interet")			
+			    ->addGroup("facture.id_facture");
+
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
+
+		if ($get['id']) {
+	        $return = $data['data'][0];			
+		} else {
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+
+	        $return = $data['data'];			
+		}
+
+		return $return;
+	}	
+
+
+	public function _getImpaye($get,$post){
+		if($get["filter"]["facture.id_societe"]) $id_societe =  $get["filter"]["facture.id_societe"];
+		$get["filter"]= array();
+		if($id_societe) $get["filter"]["facture.id_societe"] = $id_societe;
+		$get["filter"]["facture.etat"] = "impayee";
+		return $this->_GET($get,$post);
+	}
+
+	public function _getPaye($get,$post){
+		if($get["filter"]["facture.id_societe"]) $id_societe = $get["filter"]["facture.id_societe"];
+		$get["filter"]= array();
+		if($id_societe) $get["filter"]["facture.id_societe"] = $id_societe;
+		$get["filter"]["facture.etat"] = "payee";
+		$get['limit'] = 15;
+		$get['tri'] = "facture.date";
+		$get['trid'] = "desc";
+		return $this->_GET($get,$post);
+	}
 				
 };
 
