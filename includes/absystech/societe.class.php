@@ -1311,7 +1311,7 @@ class societe_absystech extends societe {
 
 		foreach ($data as $i=>$j) {	
 			$graph['categories']["category"][$j["annee"]] = array("label"=>$j["annee"]);
-			$data[$i]["marge"] = $j["ca"]-$j["marge"];
+			$data[$i]["ca"] = $j["ca"]-$j["marge"];
 		}
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";

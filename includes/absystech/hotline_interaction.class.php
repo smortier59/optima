@@ -1897,7 +1897,7 @@ class hotline_interaction extends classes_optima {
 	        // Mapping pour BDD Optima
 	        $tps = substr($post['temps_passe'],0,5);
 	        if ($tps == "00:00") {
-	        	$tps = "00:05";
+	        	$tps = "00:01";
 	        }
 	        $post['temps_passe'] = $post['duree_presta'] = $tps;
 

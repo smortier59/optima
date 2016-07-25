@@ -1467,7 +1467,7 @@ class hotline extends classes_optima {
 				"current_class"=>$this
 			);
 			ATF::$cr->add("main","generic-select_all.tpl.htm",$var);		*/			//Notice
-			$this->createNotice("update_priorite");
+			$this->createNotice("Mise a jour de la priorité réussie");
 		}
 	}
 	
@@ -3568,21 +3568,35 @@ class hotline extends classes_optima {
     	$return = array();
 
         try {
-        	
 	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-	        // Check des champs obligatoire
-	        if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
-	        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
-	        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
-	        if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
+	        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 
-	        // Mapping pour BDD Optima
-	        $post['pole_concerne'] = $post['pole']; unset($post['pole']);
-	        $post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
-	        $post['visible'] = $post['visible']=='on'?"oui":"non";
+        	// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
+        	if ($post['specialAction']) {
+        		switch ($post['specialAction']) {
+        			case "setPriorite":
+        				self::$post['specialAction']($post);
+        				$return['result'] = true;
+        			break;
+        		}
+        	// Si on fait un update pur et simple du ticket
+        	} else {
+		        // Check des champs obligatoire
+		        if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
+		        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
+		        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
+		        if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
 
-	        // Insertion
-        	$return['id'] = self::insert($post);
+		        // Mapping pour BDD Optima
+		        $post['pole_concerne'] = $post['pole']; unset($post['pole']);
+		        $post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
+		        $post['visible'] = $post['visible']=='on'?"oui":"non";
+
+		        // Insertion
+	        	$return['aff'] = self::update($post);        		
+	        	$return['result'] = true;
+        	}
+
         	// Récupération des notices créés
         	$return['notices'] = ATF::$msg->getNotices();
 	        return $return;
@@ -3618,6 +3632,7 @@ class hotline extends classes_optima {
 		$colsData = array(
 			"hotline.id_hotline"=>array(),
 			"hotline.date"=>array(),
+			"hotline.date_modification"=>array(),
 			"hotline.id_societe"=>array("visible"=>false),
 			"hotline.id_contact"=>array(),
 			"hotline.id_gep_projet"=>array(),
@@ -3626,7 +3641,10 @@ class hotline extends classes_optima {
 			"hotline.pole_concerne"=>array(),
 			"hotline.visible"=>array(),
 			"hotline.urgence"=>array(),
-			"hotline.detail"=>array()
+			"hotline.detail"=>array(),
+			"hotline.etat"=>array(),
+			"hotline.ok_facturation"=>array(),
+			"hotline.facturation_ticket"=>array()
 		);
 
 
@@ -3644,6 +3662,7 @@ class hotline extends classes_optima {
 
 		}
 
+		// TRI
 		switch ($get['tri']) {
 			case 'id_societe':
 			case 'id_user':
@@ -3652,13 +3671,31 @@ class hotline extends classes_optima {
 			break;
 		}
 
-		if($get["filter"]){
-			foreach ($get["filter"] as $key => $value) {	
-				if (strpos($key, 'hotline') !== false) {	
-					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
-				}
+		// Filtre EXCLUSIF ET NON EXCLUSIF
+		// Filtre non traité
+		if ($get['filters']['free'] == "on") {
+			$this->q->where("hotline.etat","free");
+		} else {
+			// Filtre ticket actif
+			if ($get['filters']['active'] == "on") {
+				$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
 			}
+			// Filtre MES tickets
+			if ($get['filters']['mine'] == "on" && $get['id_user']) {
+				$this->q->where("hotline.id_user",$get['id_user']);
+			}	
 		}
+
+		// AUtre filtre - fitlres indépendant
+		if ($get['filters']['dev'] == "on") {
+			$this->q->where("hotline.pole_concerne","dev","OR","pole");
+		}		
+		if ($get['filters']['system'] == "on") {
+			$this->q->where("hotline.pole_concerne","system","OR","pole");
+		}		
+		if ($get['filters']['telecom'] == "on") {
+			$this->q->where("hotline.pole_concerne","telecom","OR","pole");
+		}		
 
 		$this->q->addField($colsData);
 
