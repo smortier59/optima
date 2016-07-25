@@ -467,8 +467,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
 		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES AU VERSO",0,'C');
-		if($this->devis["type_contrat"] == "presta"){	}
-		else{ $this->conditionsGeneralesDeLocationA4($this->affaire['nature']); }
+		
 		
 		if ($annexes) {
 			$this->annexes($annexes);
@@ -742,41 +741,6 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				}
 			}
 			$this->tableauBigHead($head,$data,$width,7,$style,260);
-		}
-	}
-
-
-	public function conditionsGeneralesDeLocationA4($type){
-		$this->unsetHeader();
-		$this->AddPage();
-		$this->SetLeftMargin(10);
-
-		$articles = ATF::cgl_article()->sa();
-		
-		foreach ($articles as $key => $value) {
-			$this->setfont('arial','BI',10);	
-			$this->cell(0,5,"Article ".$value["numero"]." - ".$value["titre"],0,1);
-
-			$this->setfont('arial','',8);
-			$texte = NULL;
-			ATF::cgl_texte()->q->reset()->where("id_cgl_article",$value["id_cgl_article"])
-										->addOrder("cgl_texte.numero");
-			$texte = ATF::cgl_texte()->select_all();
-			if($texte){
-				if(count($texte)>1){
-					foreach ($texte as $k => $v) {
-						$v["texte"] = $this->formateTextPDF($v["texte"]);
-
-						if($v["numero"]) $this->multicell(0,4,$value["numero"].".".$v["numero"].". ".$v["texte"]);
-						else $this->multicell(0,4,$v["texte"]);
-					}
-				}else{
-					$texte[0]["texte"] = $this->formateTextPDF($texte[0]["texte"]);					
-					$this->multicell(0,4,$texte[0]["texte"]);
-				}
-			}
-			$this->ln(3);
-			
 		}
 	}
 
