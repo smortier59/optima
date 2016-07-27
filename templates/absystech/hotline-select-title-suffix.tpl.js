@@ -578,7 +578,7 @@
 	{if $societe["option_contrat_maintenance"] != "aucune"}
 		{if $societe["option_contrat_maintenance"] == "a_caliner"}
 			,{
-				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/heart.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire}</span>{/if}</button>'
+				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/heart.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
 				,border: false
 				,style: {
 					marginLeft: "10px",
@@ -587,7 +587,7 @@
 			}		
 		{else}
 			,{
-				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/new_install.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire}</span>{/if}</button>'
+				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/new_install.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
 				,border: false
 				,style: {
 					marginLeft: "10px",
@@ -597,7 +597,7 @@
 		{/if}
 	{else}
 		,{
-			html: '<button type="button" class="btn btn-lg {$alerte}">{$image}{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire}</span>{/if}</button>'
+			html: '<button type="button" class="btn btn-lg {$alerte}">{$image}{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
 			,border: false
 			,style: {
 				marginLeft: "10px",
