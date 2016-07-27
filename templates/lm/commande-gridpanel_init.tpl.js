@@ -164,13 +164,13 @@ ATF.renderer.pdfCommande=function(table,field) {
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
 		html += '</a><br /><hr>';*/
 		
-		html += '<a href="contratA4-'+id+'.pdf" target="_blank">';
+		html += '<a href="commande-select-contratA4-'+id+'.dl" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande');
 		html += '</a><br /><hr>';
 
-		html += '<a href="mandatSepa-'+id+'.pdf" target="_blank">';
+		/*html += '<a href="mandatSepa-'+id+'.dl" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande');
-		html += '</a><br /><hr>';
+		html += '</a><br /><hr>';*/
 
 		if (record.data.ctSigneSlimpayExists==true){
 			html += '<a href="commande-select-retour-'+id+'.dl" target="_blank">';

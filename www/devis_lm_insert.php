@@ -15,7 +15,13 @@ log::logger($infos, "mfleurquin");
 
 
 if ($infos["id_contrat"]) {
-    ATF::pdf()->generic('contratA4',$infos["id_contrat"]);    
+    //ATF::pdf()->generic('contratA4',$infos["id_contrat"]);   
+   
+    $filename = ATF::commande()->filepath($infos["id_contrat"],"contratA4");
+    $handle = fopen($filename, "r");
+    $contents = fread($handle, filesize($filename));
+    fclose($handle);    
+    echo $contents;
     die;
 }
 
