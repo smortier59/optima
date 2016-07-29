@@ -3194,7 +3194,8 @@ class hotline extends classes_optima {
 		//Insère une interaction d'information
 		if(!$infos["relance"] && !$infos["disabledInternalInteraction"]){
 			//Trace dans les interactions		
-			$this->createInternalInteraction($infos["id_hotline"],"Choix de la facturation \"".$chargeText."\" par ".ATF::user()->nom(ATF::$usr->getId()));
+			$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+			$this->createInternalInteraction($infos["id_hotline"],"Choix de la facturation \"".$chargeText."\" par ".ATF::user()->nom($u));
 		}
 		
 		//Notice
@@ -3578,6 +3579,10 @@ class hotline extends classes_optima {
         				self::$post['specialAction']($post);
         				$return['result'] = true;
         			break;
+        			case "setBillingMode":
+        				self::setBillingModeNew($post);
+        				$return['result'] = $this->getBillingMode($post['id_hotline'],true);
+        			break;
         		}
         	// Si on fait un update pur et simple du ticket
         	} else {
@@ -3616,7 +3621,6 @@ class hotline extends classes_optima {
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
 	*/ 
-	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
 
 		// Gestion du tri
@@ -3643,7 +3647,9 @@ class hotline extends classes_optima {
 			"hotline.urgence"=>array(),
 			"hotline.detail"=>array(),
 			"hotline.etat"=>array(),
+			"hotline.id_affaire"=>array(),
 			"hotline.ok_facturation"=>array(),
+			"hotline.charge"=>array(),
 			"hotline.facturation_ticket"=>array()
 		);
 
@@ -3658,51 +3664,76 @@ class hotline extends classes_optima {
 		if ($get['id']) {
 			$this->q->where("id_hotline",$get['id'])->setLimit(1);
 		} else {
+
+			// Filtre EXCLUSIF ET NON EXCLUSIF
+			// Filtre non traité
+			if ($get['filters']['free'] == "on") {
+				$this->q->where("hotline.etat","free");
+			} else {
+				// Filtre ticket actif
+				if ($get['filters']['active'] == "on") {
+					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
+				}
+				// Filtre MES tickets
+				if ($get['filters']['mine'] == "on" && $get['id_user']) {
+					$this->q->where("hotline.id_user",$get['id_user']);
+				}	
+
+				// Filtre Facturé
+				if ($get['filters']['facture'] == "on") {
+					$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
+				}	
+				// Filtre NON Facturé
+				if ($get['filters']['nfacture'] == "on") {
+					$this->q->where("hotline.facturation_ticket","non","OR","facturation");
+				}	
+				$this->q->whereIsNull("hotline.facturation_ticket","OR","facturation");
+
+				// Filtre Sur affaire
+				if ($get['filters']['afffacture'] == "on") {
+					$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
+				} else {
+					$this->q->whereIsNull("hotline.id_affaire");
+				}
+			}
+			// AUtre filtre - fitlres indépendant
+			if ($get['filters']['dev'] == "on") {
+				$this->q->where("hotline.pole_concerne","dev","OR","pole");
+			}		
+			if ($get['filters']['system'] == "on") {
+				$this->q->where("hotline.pole_concerne","system","OR","pole");
+			}		
+			if ($get['filters']['telecom'] == "on") {
+				$this->q->where("hotline.pole_concerne","telecom","OR","pole");
+			}		
+
+			// TRI
+			switch ($get['tri']) {
+				case 'id_societe':
+				case 'id_user':
+				case 'id_contact':
+					$get['tri'] = "hotline.".$get['tri'];
+				break;
+			}
+
 			$this->q->setLimit($get['limit']);
 
 		}
 
-		// TRI
-		switch ($get['tri']) {
-			case 'id_societe':
-			case 'id_user':
-			case 'id_contact':
-				$get['tri'] = "hotline.".$get['tri'];
-			break;
-		}
 
-		// Filtre EXCLUSIF ET NON EXCLUSIF
-		// Filtre non traité
-		if ($get['filters']['free'] == "on") {
-			$this->q->where("hotline.etat","free");
-		} else {
-			// Filtre ticket actif
-			if ($get['filters']['active'] == "on") {
-				$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
-			}
-			// Filtre MES tickets
-			if ($get['filters']['mine'] == "on" && $get['id_user']) {
-				$this->q->where("hotline.id_user",$get['id_user']);
-			}	
-		}
 
-		// AUtre filtre - fitlres indépendant
-		if ($get['filters']['dev'] == "on") {
-			$this->q->where("hotline.pole_concerne","dev","OR","pole");
-		}		
-		if ($get['filters']['system'] == "on") {
-			$this->q->where("hotline.pole_concerne","system","OR","pole");
-		}		
-		if ($get['filters']['telecom'] == "on") {
-			$this->q->where("hotline.pole_concerne","telecom","OR","pole");
-		}		
 
 		$this->q->addField($colsData);
 
 		$this->q->from("hotline","id_contact","contact","id_contact");
 		$this->q->from("hotline","id_societe","societe","id_societe");
 		$this->q->from("hotline","id_user","user","id_user");
+		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
+		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
+		$this->q->setToString();
+		header("ts-SQL-debug: ".$this->select_all($get['tri'],$get['trid'],$get['page'],true));
+		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
@@ -3717,6 +3748,7 @@ class hotline extends classes_optima {
 		}
 
 		if ($get['id']) {
+			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
 	        $return = $data['data'][0];			
 		} else {
 			// Envoi des headers
@@ -3730,12 +3762,62 @@ class hotline extends classes_optima {
 		return $return;
 	}
 
+	/**
+	* Permet de supprimer un ticket hotline
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient l'id a l'index 'id'
+	* @param $post array vide
+	* @return array result en booleen et notice sous forme d'un tableau
+	*/ 
 	public function _DELETE($get,$post) {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 		$return['result'] = $this->delete($get);
     	// Récupération des notices créés
     	$return['notices'] = ATF::$msg->getNotices();
         return $return;
+	}
+
+	/**
+	* Récupère la liste des numéros de téléphones utiles
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient l'id du ticket a l'index 'id'
+	* @return array les numéro de téléphone sous deux index : societe et contact
+	*/ 
+	public function _tel($get) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+
+		$h = $this->select($get['id']);
+		// Récupération des numéros du contacts du ticket
+		$c = ATF::contact()->select($h['id_contact']);
+		if ($c['tel'] || $c['gsm']) $return['contact']["name"] = $c["prenom"]." ".$c["nom"];
+		if ($c['tel']) $return['contact']["tel"] = $c['tel'];
+		if ($c['gsm']) $return['contact']["gsm"] = $c['gsm'];
+
+		// Récupération des numéros de la société
+		$s = ATF::societe()->select($h['id_societe']);
+		if ($s['tel'] || $s['gsm']) $return['societe']["name"] = $s["societe"];
+		if ($s['tel']) $return['societe']["tel"] = $s['tel'];
+		if ($s['gsm']) $return['societe']["gsm"] = $s['gsm'];
+
+		return $return;
+	}
+
+	/**
+	* Récupère la liste des affaires utiles
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient l'id du ticket a l'index 'id'
+	* @return array les affaires éligibles
+	*/ 
+	public function _affaire($get) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+
+		$h = $this->select($get['id']);
+		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])->where("etat","terminee","AND","cle1","!=")->where("etat","perdue","AND","cle1","!=");
+
+		return ATF::affaire()->sa();
 	}
 
 };
