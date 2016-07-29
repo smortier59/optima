@@ -2029,8 +2029,6 @@ class commande_cleodis extends commande {
 							->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 							->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 							
-							->addCondition("affaire.affaire","%transfert%" ,"AND", "conditiondevis", "NOT LIKE")
-
 							->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
 							->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
 

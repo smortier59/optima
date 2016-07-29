@@ -502,7 +502,7 @@ class societe_cleodis extends societe {
 
 		// Si avis_credit change, on crée un suivi !
 		$avis_credit = $this->select($infos["id_societe"],"avis_credit");
-		$notifie = "43,21"; // 43 Lejeune Nicolas et 21 Severine Mazars
+		$notifie = "106,21"; // 106 Lesueur Jennifer et 21 Severine Mazars
 		if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
 			$notifie .= ",".$this->select($infos["id_societe"],"id_owner");
 		}
