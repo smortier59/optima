@@ -404,6 +404,7 @@ class facture_absystech extends facture {
 			);
 			$infos["tva"] = $tva;
 		}
+
 		if ($type_check=="facture") {
 			if($acompte_pourcent!=100 && $acompte_pourcent){
 				$infos["prix"]*=($acompte_pourcent/100);
