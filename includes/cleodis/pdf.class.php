@@ -20,6 +20,11 @@ class pdf_cleodis extends pdf {
 	public $logo = 'cleodis/logo.jpg';
 	public $logo_site = 'cleodis/formation.png';
 
+	public $texteHT = "HT";
+	public $texteTTC = "TTC";
+
+
+
 	/* Génère le pied de page des PDF Cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
@@ -33,40 +38,39 @@ class pdf_cleodis extends pdf {
 		
 		$savelMargin=$this->lMargin;
 		if ($this->A3) {
+			//Numéro de page centré
+			$this->ATFSetStyle($style);
+			$this->SetXY(10,-15);
 			if(ATF::$codename == "cleodisbe"){
-				//Numéro de page centré
-				$this->ATFSetStyle($style);
-				$this->SetXY(10,-10);
-				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - N° de TVA BE.0811.464.584 - ".$this->societe['web'],0,'C');
-				$this->SetXY(210,-10);
-				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - N° de TVA BE.0811.464.584 - ".$this->societe['web'],0,'C');
+				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure'],0,'C');
+				$this->multicell(200,3,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
+				$this->multicell(200,3,"N° de TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
+				$this->multicell(200,3,"BELFIUS - IBAN BE43 0689 0471 6401 - BIC GKCCBEBB",0,'C');
+					
 			}else{
-				//Numéro de page centré
-				$this->ATFSetStyle($style);
-				$this->SetXY(10,-10);
 				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
-				$this->SetXY(210,-10);
-				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
-			}
-			$this->SetX(10);
-			$this->multicell(200,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
-			$this->SetXY(210,-7);
-			$this->multicell(200,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+				
+				$this->multicell(200,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+			}	
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
 		} else {
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
-			$this->SetXY(10,-10);
+			$this->SetXY(10,-15);
 			if(ATF::$codename == "cleodisbe"){
-				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - N° de TVA BE.0811.464.584 - ".$this->societe['web'],0,'C');
-			
+				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure'],0,'C');
+				$this->multicell(0,3,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
+				$this->multicell(0,3,"N° de TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
+				$this->multicell(0,3,"BELFIUS - IBAN BE43 0689 0471 6401 - BIC GKCCBEBB",0,'C');
+					
 			}else{
+
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
-			}
-			
-			$this->SetX(10);
-			$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+				
+				$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+			}			
+			$this->SetX(10);			
 			if (!$this->noPageNo) {
 				$this->ln(-3);
 				$this->Cell(0,3,$this->noPageNo.'Page '.$this->PageNo(),0,0,'R');
@@ -97,13 +101,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	*/
-	public function Header() {	
-		$this->texteHT = "HT";
-		$this->texteTTC = "TTC";
-		if(ATF::$codename == "cleodisbe"){ 
-			$this->texteHT = "HTVA";
-			$this->texteTTC = "TVAC"; 
-		}
+	public function Header() {			
 
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
@@ -293,7 +291,7 @@ class pdf_cleodis extends pdf {
 					$title = "EQUIPEMENT(S) VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
 				}
 
-				$head = array("Référence","Désignation","Qté","Prix unitaire HT","Total HT");
+				$head = array("Référence","Désignation","Qté","Prix unitaire ".$this->texteHT,"Total ".$this->texteHT);
 				$w = array(40,93,12,20,20);
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
@@ -682,7 +680,7 @@ class pdf_cleodis extends pdf {
 					}
 				}
 
-				$head = array("Qté","Fournisseur","Désignation","Prix HT");
+				$head = array("Qté","Fournisseur","Désignation","Prix ".$this->texteHT);
 				$w = array(12,40,111,22);
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
@@ -918,7 +916,7 @@ class pdf_cleodis extends pdf {
 					$title = "EQUIPEMENT(S) RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
 				}
 
-				$head = array("Qté","Fournisseur","Désignation","Prix HT");
+				$head = array("Qté","Fournisseur","Désignation","Prix ".$this->texteHT);
 				$w = array(12,40,111,22);
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
@@ -1683,7 +1681,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(95,2,"6.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers proportionnellement au prix d’achat figurant sur le devis du Fournisseur au jour de la signature du contrat. Si la prise d’effet telle que définie à l’article 5 intervient après le premier jour du mois ou du trimestre civils, le Locataire payera au Loueur, pour lesdits mois ou trimestre en cours, une redevance de mise à disposition calculée prorata temporis au trentième ou au quatre-vingt dixième, sur la base du montant du loyer");
 		$this->multicell(95,2,"6.4 Le premier loyer est exigible à la date prévue à l’article 5.1 ; il ne doit pas être confondu avec les redevances de mise à disposition."); 		
 		$this->multicell(95,2,"6.5 Les prix mentionnés aux Conditions Particulières sont hors taxes. Tous droits, impôts et taxes liés aux Equipements sont à la charge du Locataire et lui sont facturés. Toute modification légale de ces droits, impôts et taxes s’applique de plein droit et sans avis.");
-		$this->multicell(95,2,"6.6 Les loyers (TTC) et les redevances de mise à disposition (TTC) non payés à leur échéance porteront intérêt au profit du Loueur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux refi de la Banque Centrale Européenne majoré de 10 points, conformément à l’article L 441-6 du Code de commerce.");
+		$this->multicell(95,2,"6.6 Les loyers (".$this->texteTTC.") et les redevances de mise à disposition (".$this->texteTTC.") non payés à leur échéance porteront intérêt au profit du Loueur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux refi de la Banque Centrale Européenne majoré de 10 points, conformément à l’article L 441-6 du Code de commerce.");
 		$this->multicell(95,2,"6.7 Le Locataire autorise expressément le Loueur à recouvrer le montant des loyers et les redevances de mise à disposition, par l’intermédiaire de l’établissement bancaire de son choix, par prélèvements SEPA sur le compte bancaire indiqué par le Locataire. A cette fin, le Locataire remettra à CLEODIS un mandat de prélèvement SEPA au profit de CLEODIS et du Cessionnaire dans les conditions prévues à l’article 9.");
 		$this->multicell(95,2,"6.8 Déchéance du terme : toute facture non payée à l’échéance entraîne immédiatement et de plein droit l’exigibilité des sommes facturées non échues"); 		
 		$this->multicell(95,2,"6.9 A titre de clause pénale, toute somme impayée à l’échéance entraînera l’exigibilité d’une pénalité fixée à 15 % du montant des factures impayées, avec un minimum de 80 euros.");
@@ -1865,7 +1863,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(50,2,"6.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers proportionnellement au prix d’achat figurant sur le devis du Fournisseur au jour de la signature du contrat. Si la prise d’effet telle que définie à l’article 5 intervient après le premier jour du mois ou du trimestre civils, le Locataire payera au Loueur, pour lesdits mois ou trimestre en cours, une redevance de mise à disposition calculée prorata temporis au trentième ou au quatre-vingt dixième, sur la base du montant du loyer.",0,'L');
 		$this->multicell(50,2,"6.4 Le premier loyer est exigible à la date prévue à l’article 5.1 ; il ne doit pas être confondu avec les redevances de mise à disposition.",0,'L'); 		
 		$this->multicell(50,2,"6.5 Les prix mentionnés aux Conditions Particulières sont hors taxes. Tous droits, impôts et taxes liés aux Equipements sont à la charge du Locataire et lui sont facturés. Toute modification légale de ces droits, impôts et taxes s’applique de plein droit et sans avis.",0,'L'); 		
-		$this->multicell(50,2,"6.6 Les loyers (TTC) et les redevances de mise à disposition (TTC) non payés à leur échéance porteront intérêt au profit du Loueur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux refi de la Banque Centrale Européenne majoré de 10 points, conformément à l’article L 441-6 du Code de commerce.",0,'L'); 		
+		$this->multicell(50,2,"6.6 Les loyers (".$this->texteTTC.") et les redevances de mise à disposition (".$this->texteTTC.") non payés à leur échéance porteront intérêt au profit du Loueur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux refi de la Banque Centrale Européenne majoré de 10 points, conformément à l’article L 441-6 du Code de commerce.",0,'L'); 		
 		$this->multicell(50,2,"6.7 Le Locataire autorise expressément le Loueur à recouvrer le montant des loyers et les redevances de mise à disposition, par l’intermédiaire de l’établissement bancaire de son choix, par prélèvements SEPA sur le compte bancaire indiqué par le Locataire. A cette fin, le Locataire remettra à CLEODIS un mandat de prélèvement SEPA au profit de CLEODIS et du Cessionnaire dans les conditions prévues à l’article 9.",0,'L');
 		$this->multicell(50,2,"6.8 Déchéance du terme : toute facture non payée à l’échéance entraîne immédiatement et de plein droit l’exigibilité des sommes facturées non échues.",0,'L'); 		
 		$this->multicell(50,2,"6.9 A titre de clause pénale, toute somme impayée à l’échéance entraînera l’exigibilité d’une pénalité fixée à 15 % du montant des factures impayées, avec un minimum de 80 euros.",0,'L'); 		
@@ -2359,16 +2357,16 @@ class pdf_cleodis extends pdf {
 		$this->cell(30,12,"LE LOUEUR",1,0,'C');
 		$this->multicell(
 			0,4,
-			$this->societe['societe']." - ".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville']." - Tél : ".$this->societe['tel']." – Fax : ".$this->societe['fax']."\n".
-			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"\n").
-			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."NUMERO DE TVA ".$this->societe['siret']."\n")
+			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
+			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
+			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
 			,1
 		);
 		$this->cell(30,12,"LE LOCATAIRE",1,0,'C');
 		if(ATF::$codename == "cleodisbe"){
 			$this->multicell(
 				0,4,
-				$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["fax"]?"Fax : ".$this->client["fax"]:"")."\n".
+				$this->client['societe'].($this->client["tel"]?" - Tél : ".$this->client["tel"]:"").($this->client["fax"]?" – Fax : ".$this->client["fax"]:"")."\n".
 				$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]."\n".
 				($this->client['id_pays']=='FR'?"SIREN : ".$this->client['siren'].($this->client['structure']?" - ".$this->client['structure']:"").($this->client['capital']?" au capital de ".number_format($this->client["capital"],2,'.',' ')." €":"")."\n":"NUMERO DE TVA : ".$this->client['reference_tva'].($this->client['structure']?" - ".$this->client['structure']:"").($this->client['capital']?" au capital de ".number_format($this->client["capital"],2,'.',' ')." €":"")."\n")
 				,1
@@ -2488,7 +2486,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"LIVRAISON :");
 		$this->setfont('arial','',8);
 		$this->multicell(0,4,"La livraison est à ce jour complète et définitivement acceptée par Le Locataire sans restriction ni réserve. Le Locataire reconnaît que : ");
-		$this->multicell(0,4,"=> le matériel est bien installé, mis en ordre de marche, qu'il est réglementaire, conforme notamment aux lois, règlements, prescriptions administratives, normes françaises et qu'il est muni de tous les justificatifs nécessaires notamment l'Attestation de Conformité sur la sécurité et l'hygiène des travailleurs.");
+		$this->multicell(0,4,"=> le matériel est bien installé, mis en ordre de marche, qu'il est réglementaire, conforme notamment aux lois, règlements, prescriptions administratives, normes et qu'il est muni de tous les justificatifs nécessaires notamment l'Attestation de Conformité sur la sécurité et l'hygiène des travailleurs.");
 		$this->multicell(0,4,"=> les logiciels décrits dans les annexes du contrat lui ont été entièrement livrés et apparaissent parfaitement conformes aux spécifications des fournisseurs, que l'ensemble de la documentation relative à ces logiciels lui a été remise, que la formation de son personnel relative à ces logiciels a été correctement effectuée ou planifiée, que les licences et/ou les modules de déploiement ont été recettés selon des modalités directement convenues avec les éditeurs des licences et le cas échéant les prestataires assurant leurs déploiements et qu'ainsi leur réception définitive a été prononcée à la date de signature de la présente, que rien ne s'oppose à la cession des droits d'exploitations liés aux logiciels et, le cas échéant, liés à leur développement qui est facturé par le(s) fournisseurs au Loueur.");
 		$this->multicell(0,4,"=> Qu'en conséquence la location est devenue effective en totale conformité avec le Contrat de location.");
 
@@ -2512,7 +2510,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(70,5,"Signature et cachet du Loueur",0,'C');
 		
 		$this->setautopagebreak(false,'1');
-		$this->sety(280);
+		$this->sety(277);
 		$this->setfont('arial','B',8);
 		$this->cell(40,4,"",0,0);
 		$this->cell(100,4,"POUR ACCEPTATION DES CONDITIONS DE CESSION AU VERSO",1,0,'C');
@@ -2914,9 +2912,9 @@ class pdf_cleodis extends pdf {
 			}
 			$totalTable = array(
 				"data"=>array(
-								array("TOTAL HT",number_format($this->bdc["prix"],2,"."," ")." €")
+								array("TOTAL ".$this->texteHT,number_format($this->bdc["prix"],2,"."," ")." €")
 								,array("TVA (".(($this->bdc['tva']-1)*100)."%)",number_format(($this->bdc["prix"]*($this->bdc['tva']-1)),2,"."," ")." €")
-								,array("TOTAL TTC",number_format(($this->bdc["prix"]*$this->bdc['tva']),2,"."," ")." €")
+								,array("TOTAL ".$this->texteTTC,number_format(($this->bdc["prix"]*$this->bdc['tva']),2,"."," ")." €")
 							)
 				,"styles"=>array(
 									array($this->styleLibTotaux,$this->styleTotaux)
@@ -3350,7 +3348,7 @@ class pdf_cleodis extends pdf {
 			$this->multicell(0,5,"TOTAL : ".number_format($this->demandeRefi['loyer_actualise'],2,'.',' ')." €");
 		} else {
 			$this->multicell(0,5,"TOTAL : ".number_format($this->demandeRefi['loyer_actualise'],2,'.',' ')." €");
-			$this->multicell(0,5,"Valeur Résiduelle :".number_format($this->demandeRefi['valeur_residuelle'],2,'.',' ')." € HT");
+			$this->multicell(0,5,"Valeur Résiduelle :".number_format($this->demandeRefi['valeur_residuelle'],2,'.',' ')." € ".$this->texteHT);
 			$this->ln(5);
 			$this->multicell(0,5,"Règlement des loyer :".ATF::$usr->trans($this->contrat["type"],'commande'));
 			$this->cell(40,5,"Pourcentage : ",0,0);
@@ -3577,7 +3575,7 @@ class pdf_cleodis extends pdf {
 			$totalTTC = $total*$this->facture['tva'];
 
 			
-			$head = array("Montant Total HT","Taux","Montant TVA (".abs(($this->facture['tva']-1)*100)."%)","Total T.T.C.");
+			$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".abs(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 			$data = array(
 				array(
 					number_format(round($total,2),2,"."," ")." €"
@@ -3644,7 +3642,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 
 		
-		$head = array("Quantité","Libellé","Montant total € HT");
+		$head = array("Quantité","Libellé","Montant total € ".$this->texteHT);
 		$w = array(20,120,40);
 		$data = $styles = array();
 		
@@ -3677,7 +3675,7 @@ class pdf_cleodis extends pdf {
 		$total = $this->facture['prix'];
 		$totalTTC = $total*$this->facture['tva'];
 		
-		$head = array("Montant Total HT","Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total T.T.C.");
+		$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 		$w = array(46,47,47,40);
 		$data = array(
 			array(
@@ -3888,7 +3886,7 @@ class pdf_cleodis extends pdf {
 			$totalTTC = $total*$this->facture['tva'];
 			if($this->facture['type_facture'] === "libre"){
 				if($this->facture['type_libre'] === "normale"){
-					$head = array("Montant Total HT","Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total T.T.C.");
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 					$data = array(
 						array(
 							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
@@ -3898,7 +3896,7 @@ class pdf_cleodis extends pdf {
 						)
 					);
 				}else{
-					$head = array("Montant Total HT","Taux","Montant TVA","Total T.T.C.");
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
 					$data = array(
 						array(
 							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
@@ -3909,7 +3907,7 @@ class pdf_cleodis extends pdf {
 					);
 				}
 			}else{
-				$head = array("Montant Total HT","Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total T.T.C.");
+				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 					$data = array(
 						array(
 							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
@@ -3945,9 +3943,11 @@ class pdf_cleodis extends pdf {
 			}			
 		}else{
 			$this->cell(0,5,"Par remboursement ou compensation",0,1);
-		}		
-		$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-		$this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		}
+		if(ATF::$codename !== "cleodisbe"){		
+			$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+			$this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		}
 
 		if($this->facture["mode_paiement"] == "virement"){
 			$cadre = array();
@@ -4182,7 +4182,7 @@ class pdf_cleodis extends pdf {
 		$totaux=ATF::facturation()->montant_total($this->affaire['id_affaire'],$this->type);
 		if ($this->lignes) {
 			$this->setTopMargin(30);
-			$head = array("Date échéance","Loyer HT","Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total TTC");
+			$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
 			foreach ($this->lignes as $k=>$i) {
 				//Si le montant est différent c'est qu'on a changé de loyer, on le signale par une ligne
 				if($montant!=$i["montant"]){
@@ -4326,7 +4326,7 @@ class pdf_cleodis extends pdf {
 		$this->setdrawcolor(0,0,0);
 		$this->SetLineWidth(0.2);
 		
-		$head = array("SOCIETE","AFFAIRE","DATE DEBUT","DATE FIN","MONTANT HT","TYPE");
+		$head = array("SOCIETE","AFFAIRE","DATE DEBUT","DATE FIN","MONTANT ".$this->texteHT,"TYPE");
 		if($nf){
 			$head[]="RAISON";
 		}else{
@@ -4426,7 +4426,7 @@ class pdf_cleodis extends pdf {
 		$x = $this->getx();
 		$this->cell(15,5,"MONTANT",'TRL',0,'C');
 		$this->setxy($x,$this->gety()+5);		
-		$this->cell(15,5,"HT",'BRL',0,'C');
+		$this->cell(15,5,"".$this->texteHT,'BRL',0,'C');
 		$this->setxy($this->getx(),$this->gety()-5);		
 
 		$this->cell(15,10,"TYPE",1,0,'C');
@@ -4558,7 +4558,7 @@ class pdf_cleodis extends pdf {
         }
         $this->ln(5);
         
-		$this->multicell(0,5,"Nous vous rapellons que selon l'article 6.6, du contrat de location que vous avez signé avec CLEODIS : Les loyers (TTC) et les redevances de mise à disposition (TTC) non payés à leur échéance porteront interêt au profit du Loueur, de plein droit et sans qu'il soit besoin de quelconque mise en demeure, au taux conventionnel de 1.5% par mois à compter de leur date d'exigibilité.");		
+		$this->multicell(0,5,"Nous vous rapellons que selon l'article 6.6, du contrat de location que vous avez signé avec CLEODIS : Les loyers (".$this->texteTTC.") et les redevances de mise à disposition (".$this->texteTTC.") non payés à leur échéance porteront interêt au profit du Loueur, de plein droit et sans qu'il soit besoin de quelconque mise en demeure, au taux conventionnel de 1.5% par mois à compter de leur date d'exigibilité.");		
         $this->ln(5);
 	}
 		
@@ -4646,7 +4646,7 @@ class pdf_cleodis extends pdf {
  		$this->multicell(0,5,$p,0);
         $this->ln(5);
 		
-		$this->multicell(0,5,"Aussi, par la présente, nous vous mettons en demeure de nous verser, à titre principal, la somme de ".$total." € HT, soit ".$totalTTC." € TTC. Conformément à l'article 6.6 des conditions générales du contrat de location, cette somme sera majorée des intérêts au taux conventionnel de 1.5%.");
+		$this->multicell(0,5,"Aussi, par la présente, nous vous mettons en demeure de nous verser, à titre principal, la somme de ".$total." € HT, soit ".$totalTTC." € ".$this->texteTTC.". Conformément à l'article 6.6 des conditions générales du contrat de location, cette somme sera majorée des intérêts au taux conventionnel de 1.5%.");
         $this->ln(5);
 		
 		$this->multicell(0,5,"Nous vous informons que ces pénalités courent dès réception de la présente.",0);
@@ -4686,7 +4686,11 @@ class pdf_cleodis extends pdf {
 		
 		$this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
 		$this->setFont("arial","I",10);
-		$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",12);
 				
 		$this->ln(5);
@@ -4716,17 +4720,19 @@ class pdf_cleodis extends pdf {
 		
 		$this->setx(15);		
 		$phrase = "- l'ensemble des documents signés et paraphés avec le cachet de la société \n";
-		$phrase .= "- RIB mentionnant le nom de la banque\n"; 
+		if(ATF::$codename == "cleodis") {
+			$phrase .= "- RIB mentionnant le nom de la banque\n"; 
+		}
 		$phrase .= "- la copie recto/verso d'une pièce d'identité\n";
 		$phrase .= "- le dernier bilan disponible";   
 		$this->multicell(0,5,$phrase);
 		$this->setx(25);
 		$this->setFontDecoration("I");
-		$phrase = "=> Si vous le souhaitez, nous pouvons contacter votre comptable pour vous. Dans ce cas, merci de renseigner les éléments suivants :";
+		$phrase = "=> Si vous le souhaitez, nous pouvons contacter votre expert comptable pour vous. Dans ce cas, merci de renseigner les éléments suivants :";
 		$this->multicell(0,5,$phrase);		
         $this->ln(3);
 		$this->setx(40);
-		$phrase  = "Cabinet : ................................................................ \n";
+		$phrase  = "Expert comptable : ...................................................... \n";
 		$phrase .= "Nom : ....................................................................\n";
 		$phrase .= "Téléphone : ..............................................................";
 		$this->multicell(0,5,$phrase);		
@@ -4767,7 +4773,11 @@ class pdf_cleodis extends pdf {
 		
         $this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
         $this->setFont("arial","I",10);
-        $this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+        if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",12);
                 
         $this->ln(5);
@@ -4797,7 +4807,10 @@ class pdf_cleodis extends pdf {
         $this->ln(5);
 		$this->setx(15);			
 		$phrase  = "- l'ensemble des documents signés et paraphés avec le cachet de la société\n"; 		   
-		$phrase .= "- RIB mentionnant le nom de la banque \n";
+		if(ATF::$codename == "cleodis") {
+			$phrase .= "- RIB mentionnant le nom de la banque\n"; 
+		}
+
 		$phrase .= "- la copie recto/verso d'une pièce d'identité";   
 		$this->multicell(0,5,$phrase);
 		
@@ -4839,7 +4852,11 @@ class pdf_cleodis extends pdf {
 		
         $this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
         $this->setFont("arial","I",10);
-        $this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+        if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",12);
                 
         $this->ln(5);
@@ -4893,7 +4910,11 @@ class pdf_cleodis extends pdf {
 		
         $this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
         $this->setFont("arial","I",10);
-        $this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+        if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",12);
                 
         $this->ln(5);
@@ -4918,7 +4939,10 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',11);
 		$this->setleftMargin(15);
 		$this->multicell(0,5,"- l'ensemble des documents signés et paraphés avec le cachet de la société");
-	    $this->multicell(0,5,"- RIB mentionnant le nom de la banque");
+	    if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5, "- RIB mentionnant le nom de la banque"); 
+		}
+
 		$this->multicell(0,5,"- la copie recto/verso d'une pièce d'identité");
         if ($s['docSupAretourner']) {
             $this->multicell(0,5,"- ".$s['docSupAretourner']);
@@ -4963,7 +4987,11 @@ class pdf_cleodis extends pdf {
 		
         $this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
         $this->setFont("arial","I",10);
-        $this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+        if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",12);
                 
         $this->ln(5);
@@ -5010,7 +5038,11 @@ class pdf_cleodis extends pdf {
         $this->setFont("arial","B",12);
         $this->cell(0,5,"RAR : ".$s["rar"],0,1);
         $this->setFont("arial","I",10);
-        $this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+        if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",10);
                 
         $this->ln(5);
@@ -5144,8 +5176,8 @@ class pdf_cleodis extends pdf {
 		$this->ln(2);
 		$this->cell(0,5,"Echéancier des loyers H.T. :",0,1);
 		foreach ($this->loyer as $key => $value) {
-			$ht = $value["loyer"]+$value["assurance"]+$value["frais_de_gestion"];
-			$this->cell(0,4,$value["duree"]." Loyers H.T : ".$ht." euros H.T.",0,1);
+			$this->texteHT = $value["loyer"]+$value["assurance"]+$value["frais_de_gestion"];
+			$this->cell(0,4,$value["duree"]." Loyers H.T : ".$this->texteHT." euros H.T.",0,1);
 		}
 		$this->cell(0,4,"à majorer de la TVA au taux en vigueur.",0,1);
 		$this->ln(2);
@@ -5456,14 +5488,19 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->multicell(100,5, "VILLE *       ".$this->client["ville"] ,0, "L");
 		$this->multicell(0,5, "PAYS*       ".strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0, "L");
 		$this->multicell(0,5, "E-mail       ".$this->client["email"] ,0, "L");
+		if(ATF::$codename == "cleodisbe"){
+			$this->multicell(0,5, "N° d'entreprise  ".$point ,0, "L");
+		}else{
+			$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
+		}
+		
 
 		$this->Ln(5);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
 		$this->Ln(2);
 		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
 		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
-		$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
-
+		
 
 		$this->Ln(5);
 		$this->multicell(0,5, "3 - Information Créancier" ,1, "C");
@@ -5540,7 +5577,11 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		
         $this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
         $this->setFont("arial","I",10);
-        $this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+        if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
         $this->setFont("arial","",12);
                 
         $this->ln(5);
@@ -5570,7 +5611,10 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
         $this->ln(5);
 		$this->setx(15);			
 		$phrase  = "- l'ensemble des documents signés et paraphés avec le cachet de la société\n"; 		   
-		$phrase .= "- RIB mentionnant le nom de la banque \n";
+		if(ATF::$codename == "cleodis") {
+			$phrase .= "- RIB mentionnant le nom de la banque \n";
+		}
+
 		$phrase .= "- la copie recto/verso d'une pièce d'identité";   
 		$this->multicell(0,5,$phrase);
 		
@@ -5806,8 +5850,8 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		}	
 		$this->cell(40,8,"Loyer ".$frequence." *",1,0,'L');
 		foreach ($this->loyer as $key => $value) {		
-			if($key == count($this->loyer)-1){ $this->cell(40,8, $value["loyer"]." € HT",1,1,'C');	}
-			else{  $this->cell(40,8, $value["loyer"]." € HT",1,0,'C'); }
+			if($key == count($this->loyer)-1){ $this->cell(40,8, $value["loyer"]." € ".$this->texteHT,1,1,'C');	}
+			else{  $this->cell(40,8, $value["loyer"]." € ".$this->texteHT,1,0,'C'); }
 		}
 		
 
@@ -5909,7 +5953,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 		$this->ln(5);
 		$this->cell(0,5,"Pour un montant de :",0,1);
-		$this->cell(0,5,"                  - ".$devis["montantHT"]." euros HT soit ".round($devis["montantHT"]*__TVA__,2)." euros TTC" ,0,1,'L');
+		$this->cell(0,5,"                  - ".$devis["montantHT"]." euros ".$this->texteHT." soit ".round($devis["montantHT"]*__TVA__,2)." euros ".$this->texteTTC ,0,1,'L');
 
 		$this->ln(5);
 		if($devis["remuneration_of"]){	
@@ -5918,7 +5962,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 		$this->ln(5);
 		if($devis["acompte"]){	
-			$acompte = $devis["acompte"]. " euros HT soit ".round($devis["acompte"]*__TVA__,2)." euros TTC "; 
+			$acompte = $devis["acompte"]. " euros ".$this->texteHT." soit ".round($devis["acompte"]*__TVA__,2)." euros ".$this->texteTTC; 
 			$this->multicell(0,5,"Un acompte de ".$acompte." vous sera demandé lors de la signature de la convention de formation.",0);
 		}
 		$this->ln(5);
@@ -5929,125 +5973,6 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 	}
 
-	/*public function formation_devis_normal($devis, $formation_devis_ligne){
-		$this->setY(15);
-
-		$this->setfont('arial','B',16);
-		$this->setLeftMargin(100);
-		$this->cell(90,5,"Formation et accompagnement",0,1,'C');
-		
-
-		$this->setY(60);
-		$this->setfont('arial','B',10);
-		$this->cell(0,5,"DEVIS N° ".$devis["numero_dossier"],0,1,'L');
-		$this->cell(0,5,"Date ".date("d/m/Y", strtotime($devis["date"])),0,1,'L');
-		$this->setLeftMargin(10);
-
-		$this->setfont('arial','',10);
-
-		$this->setY(90);
-
-		$adresse = $this->client["adresse"];
-		if ($this->client["adresse2"]) $cadre[] = $adresse .= " ".$this->client["adresse2"]; 
-        if ($this->client["adresse3"]) $cadre[] = $adresse .= " ".$this->client["adresse3"];
-
-		$cadre = array(
-                     array("txt"=>"Nom de l’entreprise : ".$this->client['societe'],"size"=>10)
-                    ,array("txt"=>"Nom de l’interlocuteur : ".ATF::contact()->nom($this->client['id_owner']) ,"size"=>10)
-                    ,array("txt"=>"Fonction : ".ATF::contact()->select($this->client['id_owner'], "fonction"),"size"=>10)
-                    ,array("txt"=>"Adresse de l’entreprise : ".$adresse,"size"=>10)
-                    ,array("txt"=>"Code postal : ".$this->client["cp"],"size"=>10)
-                    ,array("txt"=>"Ville : ".$this->client["ville"],"size"=>10)
-                    ,array("txt"=>"Code Naf : ".$this->client["naf"],"size"=>10)
-                    ,array("txt"=>"Téléphone : ".$this->client["tel"],"size"=>10)          
-                );		
-        $this->cadre(10,$this->getY(),180,55,$cadre);
-
-        $this->setfont('arial','B',12);
-        $this->cell(0,5,"Identification des besoins de formations de l’entreprise",0,1,'L');
-        $this->setfont('arial','',10);     
-        $this->ln(10);
-
-        $size = 30;
-
-        $cadre = array(array("txt"=>"Thématiques des formations souhaitées, par ordre de priorité et par bénéficiaire : ","size"=>10, "bold"=>true));
-
-        $str = explode(";", $devis["thematique"]);
-
-        foreach ($str as $key => $value) {
-        	$cadre[] = array("txt"=>"                  - ".$value,"size"=>10);
-        	$size = $size+5;
-        }
-
-        $cadre[] = array("txt"=>"OPCAS de l’entreprise : ","size"=>10);
-        foreach (explode("|", $devis["opca"]) as $k => $v) {
-        	$cadre[] = array("txt"=>"                  - ".ATF::societe()->select($v,"societe"),"size"=>10);
-        	$size = $size+5;
-        }
-
-        $nb_participants = $devis["nb_participants"];
-        if(!$nb_participants){
-        	ATF::formation_participant()->q->reset()->where("id_formation_devis",$devis["id_formation_devis"]);
-			$participants = ATF::formation_participant()->select_all();
-			$nb_participants = count($participants);
-        } 
-
-
-        $cadre[] = array("txt"=>"Nombre de participants : ".$nb_participants,"size"=>10);
-        
-        $lieu_formation = ATF::societe()->select($devis["id_lieu_formation"]);
-		$lieu_formation["adresse"] = $lieu_formation["adresse"];
-		if($lieu_formation["adresse_2"]) $lieu_formation["adresse"] .= " ".$lieu_formation["adresse_2"];
-		if($lieu_formation["adresse_3"]) $lieu_formation["adresse"] .= " ".$lieu_formation["adresse_3"];
-		$lieu_formation["adresse"] .= ", ".$lieu_formation["cp"]." ".$lieu_formation["ville"];
-        $cadre[] = array("txt"=>"Lieu de la formation : ".$lieu_formation["societe"]." - ".$lieu_formation["adresse"],"size"=>10);
-
-        $this->cadre(10,$this->getY(),180,$size,$cadre);
-
-
-        $this->addpage();
-
-        $cadre = array(  array("txt"=>"Notre offre d’accompagnement :","size"=>10, "bold"=>true)
-        				,array("txt"=>" ","size"=>5)
-        				,array("txt"=>$this->societe["societe"]." vous propose un accompagnement sur mesure dans l’ensemble de votre démarche de formation en :","size"=>10)
-        				,array("txt"=>"     -  Identifiant  des besoins en formation, aide aux montages financiers et recherche des financements correspondants","size"=>10)
-        				,array("txt"=>"     -  Animation de formations ","size"=>10)
-        				,array("txt"=>"     -  Suivi qualitatif de la formation : une évaluation à chaud de la formation par les participants, une  évaluation à froid de l’atteinte des objectifs visés par la formation et des propositions d’actions correctives.","size"=>10)
-        			);
-
-        $this->cadre(10,20,180,60,$cadre);
-
-        $this->ln(15);
-
-
-        $cadre = array(  array("txt"=>"Coût de la formation et de l’accompagnement :","size"=>10, "bold"=>true)
-        				,array("txt"=>" ","size"=>5)
-        				,array("txt"=>"Le coût payé par l’entreprise sera fonction de la prestation fournie par ".$this->societe["societe"].".","size"=>10)
-        				,array("txt"=>" ","size"=>2)
-        				,array("txt"=>"Dans l’hypothèse où  ".$this->societe["societe"]." fournit l’accompagnement et les formateurs :","size"=>10, "bold"=>true)
-        				,array("txt"=>" ","size"=>5)
-        				,array("txt"=>"L’entreprise devra verser un acompte de  ".$devis["acompte"]."%  du budget obtenu. La somme correspondant à ce montant lui sera reversée dans le cas où l’organisme financeur règle directement la prestation d’Exactitude par subrogation.","size"=>10)
-        				,array("txt"=>" ","size"=>5)
-        				,array("txt"=>"Dans l’hypothèse où l’entreprise souhaite faire appel à ses propres formateurs : ","size"=>10, "bold"=>true)
-        				,array("txt"=>" ","size"=>5)
-        				,array("txt"=>"L’entreprise devra verser un montant égal à ".$devis["remuneration_of"]."% du budget obtenu, au titre de l’appui-conseil et de l’accompagnement.","size"=>10)
-        			);
-
-        $this->cadre(10,$this->getY(),180,80,$cadre);
-
-        $this->ln(10);
-
-        $this->setfont('arial','',10);
-		$this->multicell(0,5,"Ce devis est valable 30 jours. Pour toute confirmation, merci de nous retourner ce devis signé, avec la mention Bon pour accord et le cachet de l’entreprise.",0);
-
-		$this->ln(5);
-
-		$this->multicell(0,5,"Cachet commercial + signature\n\n\n\n\n\n\n\n\n" ,1);
-
-
-
-
-	}*/
 
 	public function cleanHtml($text){
 		$tag = "span";
@@ -6151,9 +6076,9 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 			$pattern = '~<li[^>]*>\K.*(?=</li>)~Uis';
 			preg_match_all($pattern, $objectif, $out);			
 			foreach ($out[0] as $key => $value) {	
-				$html = "<li>".$value."</li>";			
+				$this->texteHTml = "<li>".$value."</li>";			
 				$str = "               - ".$value ."\n";
-				$objectif = str_replace($html, $str, $objectif);
+				$objectif = str_replace($this->texteHTml, $str, $objectif);
 			}
 
 		}
@@ -6227,14 +6152,14 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->multicell(0,5,"Le coût de la formation, objet de la présente, s'élève",0,'L');
 		$this->ln(2);
 
-		$this->cell(0,5,"à ".round($devis["montantHT"])." € HT" ,0,1);
-		$this->cell(0,5,"Soit ".round($devis["montantHT"]*__TVA__)." € TTC",0,1);
+		$this->cell(0,5,"à ".round($devis["montantHT"])." € ".$this->texteHT ,0,1);
+		$this->cell(0,5,"Soit ".round($devis["montantHT"]*__TVA__)." € ".$this->texteTTC,0,1);
 		
 		$this->cell(0,5,"Payable à 30 jours à partir de la réception de la facture.",0,1);
 
 		$this->ln(2);
 		$phrase = "Cette somme couvre l'intégralité des frais engagés de l'organisme de formation pour cette session. ";
-		if($devis["acompte"]){	$phrase .= "Un acompte de ".$devis["acompte"]." € HT soit ".round($devis["acompte"]*__TVA__,2)." € TTC sera dû lors de la signature de cette convention et le solde à la réception de facture."; }
+		if($devis["acompte"]){	$phrase .= "Un acompte de ".$devis["acompte"]." € ".$this->texteHT." soit ".round($devis["acompte"]*__TVA__,2)." € ".$this->texteTTC." sera dû lors de la signature de cette convention et le solde à la réception de facture."; }
 		$this->multicell(0,5,$phrase,0,'J');
 							
 		$this->ln(5);
@@ -6560,7 +6485,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->cell("50",5,"Article 6 : Modalités financières",0,1,'L');
 		$this->setfont('arial','',10);
 		$this->ln(2);
-		$this->multicell(0,5,"Le sous-traitant percevra une rémunération de ... euros HT par journée / par session / par stagiaire.\nLe paiement sera effectué à réception de la facture." ,0);
+		$this->multicell(0,5,"Le sous-traitant percevra une rémunération de ... euros ".$this->texteHT." par journée / par session / par stagiaire.\nLe paiement sera effectué à réception de la facture." ,0);
 
 
 		$this->ln(3);
@@ -6704,7 +6629,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$total = $this->facture['prix'];
 		$totalTTC = $total*1.20;
 		
-		$head = array("Montant Total HT","Taux","Montant TVA (20%)","Total T.T.C.");
+		$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (20%)","Total ".$this->texteTTC);
 		$data = array(
 			array(
 				number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
@@ -6872,9 +6797,9 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 			
 			$totalTable = array(
 				"data"=>array(
-								array("TOTAL HT",number_format($this->bdc["montant"],2,"."," ")." €")
+								array("TOTAL ".$this->texteHT,number_format($this->bdc["montant"],2,"."," ")." €")
 								,array("TVA (".(($this->fournisseur['tva']-1)*100)."%)",number_format($this->bdc["montant"]*($this->fournisseur['tva']-1),2,"."," ")." €")
-								,array("TOTAL TTC",number_format(($this->bdc["montant"]*$this->fournisseur['tva']),2,"."," ")." €")
+								,array("TOTAL ".$this->texteTTC,number_format(($this->bdc["montant"]*$this->fournisseur['tva']),2,"."," ")." €")
 							)
 				,"styles"=>array(
 									array($this->styleLibTotaux,$this->styleTotaux)
@@ -6931,7 +6856,8 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 class pdf_cleodisbe extends pdf_cleodis {
 	public $logo = 'cleodisbe/logo.jpg';
-
+	public $texteHT = "HTVA";
+	public $texteTTC = "TVAC";
 
 
 
@@ -8695,8 +8621,8 @@ class pdf_exactitude extends pdf_cleodis {
 			
 			$totalTable = array(
 				"data"=>array(
-								array("","Total HT",number_format($total,2,'.',' ')." €")
-								,array("","Total TTC",number_format($totalTTC,2,'.',' ')." €")
+								array("","Total ".$this->texteHT,number_format($total,2,'.',' ')." €")
+								,array("","Total ".$this->texteTTC,number_format($totalTTC,2,'.',' ')." €")
 							)
 				,"styles"=>array(
 									array(array("border"=>" "),"","")
@@ -8735,7 +8661,7 @@ class pdf_exactitude extends pdf_cleodis {
 		}		
 		$this->RoundedRect(15,$this->gety(),180,10,3);		
 		$this->setfont('arial','B',10);
-		$this->multicell(0,5,number_format($totalTTC,2,'.',' ')." € TTC\n".$prix_en_lettre,0,"C");
+		$this->multicell(0,5,number_format($totalTTC,2,'.',' ')." € ".$this->texteTTC."\n".$prix_en_lettre,0,"C");
 		$this->setfont('arial','',10);
 
 		$this->ln(3);
@@ -9164,7 +9090,7 @@ class pdf_exactitude extends pdf_cleodis {
 		$this->ln(2);
 		$this->multicell(0,5,"Les honoraires payables par le Client à la société EXACTITUDE pour l’embauche d’un candidat sélectionné peuvent être déterminés selon deux modalités :");
 		$this->ln(2);
-		$this->multicell(0,5,"(i) soit à partir d’un pourcentage de la rémunération annuelle brute globale du poste à pourvoir. La rémunération annuelle s’entend comme étant tout élément de rémunération fixe et variable, ainsi que tout avantage en nature figurant au contrat. Les véhicules mis à disposition sont évalués sur une base forfaitaire de 4.600 euros TTC (quatre mille six cent euros toutes taxes comprises). Ce pourcentage est défini aux conditions particulières du contrat.");
+		$this->multicell(0,5,"(i) soit à partir d’un pourcentage de la rémunération annuelle brute globale du poste à pourvoir. La rémunération annuelle s’entend comme étant tout élément de rémunération fixe et variable, ainsi que tout avantage en nature figurant au contrat. Les véhicules mis à disposition sont évalués sur une base forfaitaire de 4.600 euros ".$this->texteTTC." (quatre mille six cent euros toutes taxes comprises). Ce pourcentage est défini aux conditions particulières du contrat.");
 		$this->ln(2);		
 		$this->multicell(0,5,"(ii) soit une somme globale forfaitaire définie aux conditions particulières du contrat.");
 		$this->ln(2);	
@@ -9428,7 +9354,7 @@ class pdf_exactitude extends pdf_cleodis {
 		$styles[] = array($this->colsProduitAlignRight, $this->colsProduitAlignRight);
 		$data[] = array("TVA applicable au taux de ".number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%", number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €");
 		$styles[] = array($this->colsProduitAlignRight, $this->colsProduitAlignRight);
-		$data[] = array("TOTAL TTC",number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €");
+		$data[] = array("TOTAL ".$this->texteTTC,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €");
 		$styles[] = array($this->colsProduitAlignRight, $this->colsProduitAlignRight);
 		$this->tableauBigHeadFacture($head,$data,$w,5,$styles);
 
@@ -9625,7 +9551,7 @@ class pdf_exactitude extends pdf_cleodis {
 		$styles[] = array($this->colsProduitAlignRight, $this->colsProduitAlignRight);
 		$data[] = array("TVA applicable au taux de ".number_format(abs(20),2,'.',' ')."%", number_format(abs(round(($this->facture["prix"]*(1.20-1)),2)),2,'.',' ')." €");
 		$styles[] = array($this->colsProduitAlignRight, $this->colsProduitAlignRight);
-		$data[] = array("TOTAL TTC",number_format(abs(round($this->facture["prix"]*1.20,2)),2,'.',' ')." €");
+		$data[] = array("TOTAL ".$this->texteTTC,number_format(abs(round($this->facture["prix"]*1.20,2)),2,'.',' ')." €");
 		$styles[] = array($this->colsProduitAlignRight, $this->colsProduitAlignRight);
 		$this->tableauBigHeadFacture($head,$data,$w,5,$styles);				
 		$this->ln(5);

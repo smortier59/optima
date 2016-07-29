@@ -43,7 +43,7 @@ Ext.onReady(function(){
         series: [                       
                     {
                         type: 'column',
-                        name: 'Réel',
+                        name: 'Réel ({$data["year"][date("Y")]["count"]})',
                         data: [
                                 {foreach $data["dataset"]["reel"] as $reel}   
                                     {$reel["value"]} {if !$reel@last},{/if}

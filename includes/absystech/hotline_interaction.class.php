@@ -1800,8 +1800,10 @@ class hotline_interaction extends classes_optima {
 			"hotline_interaction.id_hotline_interaction"=>array(),
 			"hotline_interaction.id_hotline"=>array(),
 			"hotline_interaction.date"=>array(),
-			"hotline_interaction.temps"=>array("visible"=>false),
-			"hotline_interaction.temps_passe"=>array(), 
+			"hotline_interaction.heure_debut_presta"=>array("visible"=>false),
+			"hotline_interaction.heure_fin_presta",
+			"hotline_interaction.credit_presta",
+			"hotline_interaction.credit_dep",
 			"hotline_interaction.detail"=>array(),
 			"hotline_interaction.id_user"=>array(),
 			"hotline_interaction.id_contact"=>array(),
@@ -1856,6 +1858,23 @@ class hotline_interaction extends classes_optima {
 					unset($data['data'][$k][$k_]);
 				}				
 			}
+			$lines = $data['data'][$k];
+
+			if (!$data['data'][$k]['id_user_fk']) {
+				unset($data['data'][$k]['id_user'],$data['data'][$k]['id_user_fk']);
+			}
+
+			$data['data'][$k]['detail'] = $this->remove_empty_tags_recursive($data['data'][$k]['detail']);
+
+			if ($lines["id_user_fk"]) {
+				$v = $this->getTime($lines['id_hotline_interaction_fk'],"duree_presta");
+
+				if ($v != "0.00") $data['data'][$k]['duree_presta'] = $v;
+				$v = $this->getTime($lines['id_hotline_interaction_fk'],"duree_pause");
+				if ($v != "0.00") $data['data'][$k]['duree_pause'] = $v;
+				$v = $this->getTime($lines['id_hotline_interaction_fk'],"duree_dep");
+				if ($v != "0.00") $data['data'][$k]['duree_dep'] = $v;
+			}
 		}
 
 		if ($get['id']) {
@@ -1872,6 +1891,23 @@ class hotline_interaction extends classes_optima {
 		return $return;
 	}
 
+	public function remove_empty_tags_recursive ($str, $repto = NULL){
+	    //** Return if string not given or empty.
+	    if (!is_string ($str) || trim ($str) == '') return $str;
+	    //** Recursive empty HTML tags.
+	    $str = preg_replace(
+	        //** Pattern written by Junaid Atari.
+	        '/<([^<\/>]*)>([\s]*?|(?R))<\/\1>/imsU',
+	        //** Replace with nothing if string empty.
+	        !is_string ($repto) ? '' : $repto,
+	        //** Source string
+	        $str
+	    );
+
+	    // ENleve les multiple BR
+	    $str = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $str);
+	    return $str;
+	}
 
 	/**
 	* Permet d'insérer une interaction hotline depuis telescope
