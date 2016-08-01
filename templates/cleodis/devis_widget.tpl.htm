@@ -5,15 +5,21 @@
 
 {$infos = ATF::accueil()->type_agence(ATF::_g(type))}
 
+{$id_agence = $infos.id_agence}
+
+
 {if $infos.type=="o2m" || $infos.type=="reseau"}
     {$titre = 'DEVIS RESEAUX'}
+    {$objectif = ATF::agence()->select($id_agence, "objectif_devis_reseaux")}
 {else if $infos.type=="autre"}
     {$titre = 'DEVIS AUTRES'}
+    {$objectif = ATF::agence()->select($id_agence, "objectif_devis_autre")}    
 {else}
     {$titre = 'DEVIS S'}
 {/if}
 
-{$id_agence = $infos.id_agence}
+
+
 
 
     
@@ -64,7 +70,7 @@ Ext.onReady(function(){
                     } ,
                     {
                         type: 'spline',
-                        name: 'Objectif',
+                        name: 'Objectif ({$objectif})',
                         data: [
                                 {foreach $data["dataset"]["objectif"] as $obj}   
                                      {$obj["value"]} {if !$obj@last},{/if}
