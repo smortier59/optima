@@ -7420,7 +7420,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(90,10,"N° SIRET: ".($siret?$siret:$this->getPoints(50)),0,0);
 		$this->cell(90,10,"Code NAF: ".($infos_client['naf']?$infos_client['naf']:$this->getPoints(56)),0,1);
 
-		$this->cell(0,10,"Représentant Légal: ".$this->getPoints(120),0,1);
+		$this->cell(0,10,"Représentant Légal: ".ATF::contact()->select($audit["id_representant"], "civilite")." ".ATF::contact()->select($audit["id_representant"], "nom")." ".ATF::contact()->select($audit["id_representant"], "prenom"),0,1);
 
 		$this->multicell(0,10,"Adresse: ".($adresse?$adresse:$this->getPoints(110)),0,"L");
 		
@@ -7679,6 +7679,8 @@ class pdf_cap extends pdf_cleodis {
 		ATF::mandat_contact()->q->reset()->where("id_mandat",$id);
 		$mandat_contact = ATF::mandat_contact()->select_all();
 
+		ATF::mandat_ligne()->q->reset()->where("id_mandat",$id)->addOrder("id_mandat_ligne","asc");
+		$mandat_ligne = ATF::mandat_ligne()->select_all();
 
 		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
 		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
@@ -7702,294 +7704,18 @@ class pdf_cap extends pdf_cleodis {
 		}
 
 		$representant_client = "";
-		if($infos_client["id_contact_facturation"]){ $representant_client = ATF::contact()->nom($infos_client["id_contact_facturation"])." ";	}
+		if($mandat["id_representant"]){ $representant_client = ATF::contact()->nom($mandat["id_representant"])." ";	}
 		
 
+		if($mandat["type_creance"] === "btob"){
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btob",$representant_client,$adresse_client,$siret,$siren);
+		}elseif($mandat["type_creance"] === "btoc"){
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btoc",$representant_client,$adresse_client,$siret,$siren);
+		}else{
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btob",$representant_client,$adresse_client,$siret,$siren);
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btoc",$representant_client,$adresse_client,$siret,$siren);
+		}
 		
-		$this->Open();
-		$this->Addpage();
-		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
-		$this->bgMandat();
-
-
-		$this->setleftmargin(10);
-		$this->setrightmargin(10);
-
-
-		$this->setfont('arial','B',8);
-		$this->multicell(0,3,"\n\n\nAnnexe à la convention de recouvrement - Secteur BtoC (Créances civiles)\nRémunération de CAP RECOUVREMENT - Tarif H.T. au 1er Septembre 2014",0,"R");
-
-		$this->setY(40);
-
-		$this->setFillColor(239,239,239);
-		$this->cell(0,25,"",0,1,"L",1);
-		$this->setY(40);
-
-		$this->setfont('arial','',10);
-		$this->cell(0,5,"",0,1);
-		$this->cell(0,5,"Le client : ".$infos_client["societe"],0,1);
-		$this->cell(0,5,"Adresse : ".$adresse_client,0,1);
-		$this->cell(60,5,"N° siret : ".$siret,0,0);
-		$this->cell(120,5,"représenté par : ".$representant_client,0,1);
-
-		$this->ln(5);
-		
-
-		$this->setfont('arial','',6);
-		$this->settextcolor(0,0,0);		
-		$this->cell(160,5,"Détail des prestations facturées par la sarl Cap Recouvrement en rémunération des services proposés selon les barèmes suivants :",0,1);
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Droits d’ouverture de dossier",0,0);
-		$this->setfont('arial','B',9);
-		$this->settextcolor(0,0,0);	
-		$this->cell(25,8,"Tarif unitaire",0,1,"R");	
-		$this->setfont('arial','',8);
-		$this->cell(0,5,"La création inclue la mise au norme RNVP – le traitement Charade – l’enrichissement téléphonique .......................................... 3% du montant confié",0,1);	
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Taux de commissions sur les sommes récupérées en principal",0,0);
-		$this->setfont('arial','B',8);
-		$this->settextcolor(0,0,0);	
-		$this->multicell(27,3,"\nTaux de base\ndes commissions",0,"R");	
-		
-		$y = $this->getY();
-		$this->cell(60,5,"Créances sur la France",0,1);	
-		$this->setfont('arial','',8);
-		$this->multicell(60,3,"Tarif dégressif par tranche\nde récupération",0);
-		
-		$this->setY($y);
-		$this->setX(51);
-		$this->multicell(0,4,"De 0 à 100,00 € .................................................................................................................................................... 30%\nDe 100,01 à 200,00 €............................................................................................................................................ 25%\nDe 200,01 à 500,00 € ........................................................................................................................................... 20%\nDe 500,01 à 2500,00 € ......................................................................................................................................... 15%\nAu delà de 2500,00 € ........................................................................................................................................... 10%",0,"L");
-
-		$this->setfont('arial','B',8);
-		$this->cell(41,5,"Créances à l’étranger",0,0);	
-		$this->setfont('arial','',8);
-		$this->cell(0,5,"Majoration du taux de commissions sur chaque tranche .................................................................................... +10%",0,1);	
-		$this->setfont('arial','',6);			
-		$this->cell(160,5,"*Ecart constaté entre la date d’échéance de la facture la plus ancienne du débiteur et la date de création du dossier",0,1);
-
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Enquêtes & solvabilité",0,0);
-		$this->setfont('arial','B',8);
-		$this->settextcolor(0,0,0);	
-		$this->multicell(27,3,"\nCréances\nsur la France**",0,"R");	
-		$this->setfont('arial','',8);		
-		
-		$this->cell(0,4,"Une recherche : adresse ou banque ou employeur (facturation au résultat) .........................................................................................................80,00 €",0,1);
-		$this->cell(0,4,"Deux recherches (facturation au résultat) ............................................................................................................................................................150,00 €",0,1);
-		$this->cell(0,4,"Trois recherches (facturation au résultat) ............................................................................................................................................................200,00 €",0,1);
-		$this->cell(0,4,"Enquête de patrimoine (facturation quel que soit le résultat)............................................................................................................................... 600,00 €",0,1);
-		
-
-
-
-		$this->setfont('arial','',6);			
-		$this->cell(160,5,"** Les créances à l’Etranger feront l’objet d’une facturation sur devis préalable",0,1);
-
-
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Prestations annexes",0,0);
-		$this->settextcolor(0,0,0);	
-		$this->setfont('arial','B',8);
-		$this->cell(27,8,"Tarif unitaire",0,1,"R");	
-		$this->setfont('arial','',8);
-
-		$this->cell(0,4,"Assignation en référé au Tribunal d’Instance ou Grande Instance (Hors cour d’appel ou cassation) ............................................................... 1 500,00 €",0,1);
-		$this->cell(0,4,"Assignation au fond au Tribunal d’Instance ou Grande Instance (Hors cour d’appel ou cassation) ................................................................. 1 800,00 €",0,1);
-		$this->cell(0,4,"Rédaction et pilotage de requête en injonction de payer au Tribunal d’Instance ou Grande Instance................................................................. 150,00 €",0,1);
-		$this->cell(0,4,"Déclaration de créances (Procédure collective et surendettement) ....................................................................................................................... 45,00 €",0,1);
-		$this->cell(0,4,"Certificat d’Irrécouvrabilité..........................................................................................................................................................................................1,50 €",0,1);
-		$this->cell(0,4,"Taux de commission sur les sommes accessoires encaissées....................................................................................................................................".$mandat["taux_btob"]." %",0,1);
-
-
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Frais engagés",0,0);
-		$this->settextcolor(0,0,0);	
-		$this->cell(27,8,"",0,1,"R");	
-		$this->setfont('arial','',8);
-		$this->multicell(0,3,"A la charge du CLIENT pour ceux qui ne peuvent être récupérés auprès du débiteur (Frais de greffe de Tribunaux, frais de signification et d’exécution, frais d’expertise, frais et honoraires d’avoué, frais d’enquêtes, bancaires, etc ...)",0);
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Conditions particulières / instructions commerciales",0,1);
-		$this->settextcolor(0,0,0);
-		$this->setfont('arial','B',8);
-		$this->setFillColor(239,239,239);
-		if($mandat["precision_btob"]){ 
-			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
-			$this->setfont('arial','',8);
-			$this->multicell(0,3,$mandat["precision_btob"],0,"L",1);
-			$this->ln(5);
-		}else{ 
-			$this->multicell(0,5,"Précisions complémentaires sur la tarification : \n\n\n",0,"L",1); 
-			$this->ln(10);
-		}	
-		
-		$y = $this->getY();
-		$this->setfont('arial','',8);
-		$this->cell(30,3,"(Taux de TVA en vigueur : 20,00%)",0,1,"L");	
-		$this->setfont('arial','B',8);
-		$this->cell(30,3,"Date :",0,1,"L");
-		$this->cell(30,3,"Signature :",0,1,"L");
-		$this->setY($y);
-		$this->setfont('arial','',8);
-		$this->cell(90,3,"",0,0);
-		$this->setFillColor(239,239,239);
-		$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n",0,"C",1);
-		$this->getFooterMandat();
-
-
-		/* ----------------------------------------
-		  					PAGE 2
-		   ---------------------------------------- */		
-		$this->Addpage();
-		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
-		$this->bgMandat();
-		$this->setleftmargin(10);
-		$this->setrightmargin(10);
-
-
-		$this->setfont('arial','B',8);
-		$this->multicell(0,3,"\n\n\nAnnexe à la convention de recouvrement - Secteur BtoB (Créances commerciales)\nRémunération de CAP RECOUVREMENT - Tarif H.T. au 1er Septembre 2014",0,"R");
-
-		$this->setY(40);
-
-		$this->setFillColor(239,239,239);
-		$this->cell(0,25,"",0,1,"L",1);
-		$this->setY(40);
-
-		$this->setfont('arial','',10);
-		$this->cell(0,5,"",0,1);
-		$this->cell(0,5,"Le client : ".$infos_client["societe"],0,1);
-		$this->cell(0,5,"Adresse : ".$adresse_client,0,1);
-		$this->cell(60,5,"N° siret : ".$siret,0,0);
-		$this->cell(120,5,"représenté par : ".$representant_client,0,1);
-
-		$this->ln(5);
-		
-
-		$this->setfont('arial','',6);
-		$this->settextcolor(0,0,0);		
-		$this->cell(160,5,"Détail des prestations facturées par la sarl Cap Recouvrement en rémunération des services proposés selon les barèmes suivants :",0,1);
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Droits d’ouverture de dossier",0,0);
-		$this->setfont('arial','B',9);
-		$this->settextcolor(0,0,0);	
-		$this->cell(25,8,"Tarif unitaire",0,1,"R");	
-		$this->setfont('arial','',8);
-		$this->cell(0,5,"La création inclue la mise au norme RNVP – le traitement Charade – l’enrichissement téléphonique .......................................... 3% du montant confié",0,1);	
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Taux de commissions sur les sommes récupérées en principal",0,0);
-		$this->setfont('arial','B',8);
-		$this->settextcolor(0,0,0);	
-		$this->multicell(27,3,"\nTaux de base\ndes commissions",0,"R");	
-		
-		$y = $this->getY();
-		$this->cell(60,5,"Créances sur la France",0,1);	
-		$this->setfont('arial','',8);
-		$this->multicell(60,3,"Tarif dégressif par tranche\nde récupération",0);
-		
-		$this->setY($y);
-		$this->setX(51);
-		$this->multicell(0,4,"De 0 à 2500,00 € ................................................................................................................................................. 18 %
-De 2.500,01 à 5.000,00 € .................................................................................................................................... 15 %
-De 5.000,01 à 10..000,00 € ................................................................................................................................. 12 %
-De 10.000,01 à 25.000,00 € ................................................................................................................................ 10 %
-Au delà de 25.000,01 € ......................................................................................................................................... 8 %",0,"L");
-
-		$this->setfont('arial','B',8);
-		$this->cell(41,5,"Créances à l’étranger",0,0);	
-		$this->setfont('arial','',8);
-		$this->cell(0,5,"Majoration du taux de commissions sur chaque tranche .................................................................................... +10%",0,1);
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Enquêtes & solvabilité",0,0);
-		$this->setfont('arial','B',8);
-		$this->settextcolor(0,0,0);	
-		$this->multicell(27,3,"\nCréances\nsur la France**",0,"R");	
-		$this->setfont('arial','',8);		
-		
-		$this->cell(0,4,"Renseignement commercial simple (K-Bis + Liasse fiscale + état des privilèges et nantissements)................................................................... 75,00 €",0,1);
-		$this->cell(0,4,"Renseignement commercial complet (Etat de solvabilité argumenté, recherche de créanciers, etc ...) ........................................................... sur devis",0,1);
-		
-		$this->setfont('arial','',6);			
-		$this->cell(160,5,"** Les créances à l’Etranger feront l’objet d’une facturation sur devis préalable",0,1);
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Prestations annexes",0,0);
-		$this->settextcolor(0,0,0);	
-		$this->setfont('arial','B',8);
-		$this->cell(27,8,"Tarif unitaire",0,1,"R");	
-		$this->setfont('arial','',8);
-
-		$this->cell(0,4,"Assignation en référé au Tribunal d’Instance ou Grande Instance (Hors cour d’appel ou cassation) ............................................................... 1 200,00 €",0,1);
-		$this->cell(0,4,"Assignation au fond au Tribunal d’Instance ou Grande Instance (Hors cour d’appel ou cassation) ................................................................. 1 500,00 €",0,1);
-		$this->cell(0,4,"Rédaction et pilotage de requête en injonction de payer au Tribunal d’Instance ou Grande Instance................................................................. 150,00 €",0,1);
-		$this->cell(0,4,"Déclaration de créances (Procédure collective et surendettement) ......................................................................................................................120,00 €",0,1);
-		$this->cell(0,4,"Certificat d’Irrécouvrabilité..........................................................................................................................................................................................  20 €",0,1);
-		$this->cell(0,4,"Taux de commission sur les sommes accessoires encaissées....................................................................................................................................".$mandat["taux_btoc"]." %",0,1);
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Frais engagés",0,0);
-		$this->settextcolor(0,0,0);	
-		$this->cell(27,8,"",0,1,"R");	
-		$this->setfont('arial','',8);
-		$this->multicell(0,3,"A la charge du CLIENT pour ceux qui ne peuvent être récupérés auprès du débiteur (Frais de greffe de Tribunaux, frais de signification et d’exécution, frais d’expertise, frais et honoraires d’avoué, frais d’enquêtes, bancaires, etc ...)",0);
-
-
-		$this->setfont('arial','B',12);
-		$this->settextcolor(186,19,26);		
-		$this->cell(160,10,"Conditions particulières / instructions commerciales",0,1);
-		$this->settextcolor(0,0,0);
-		$this->setfont('arial','B',8);
-		$this->setFillColor(239,239,239);
-		if($mandat["precision_btoc"]){ 
-			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
-			$this->setfont('arial','',8);
-			$this->multicell(0,3,$mandat["precision_btoc"],0,"L",1);	
-			$this->ln(5);
-		}else{ 
-			$this->multicell(0,5,"Précisions complémentaires sur la tarification : \n\n\n",0,"L",1); 
-			$this->ln(10);
-		}	
-
-		$y = $this->getY();
-		$this->setfont('arial','',8);
-		$this->cell(30,3,"(Taux de TVA en vigueur : 20,00%)",0,1,"L");	
-		$this->setfont('arial','B',8);
-		$this->cell(30,3,"Date :",0,1,"L");
-		$this->cell(30,3,"Signature :",0,1,"L");
-		$this->setY($y);
-		$this->setfont('arial','',8);
-		$this->cell(90,3,"",0,0);
-		$this->setFillColor(239,239,239);
-		$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n",0,"C",1);
-		$this->getFooterMandat();
 
 
 		/* ----------------------------------------
@@ -8001,9 +7727,8 @@ Au delà de 25.000,01 € ......................................................
 		$this->setleftmargin(10);
 		$this->setrightmargin(10);
 
-
 		$this->setfont('arial','B',14);
-		$this->multicell(0,5,"\n\nConditions particulières du mandat\nde recouvrement de créances",0,"R");
+		$this->multicell(0,5,"\n\nConditions particulières du mandat\nde recouvrement de créances\nN° ".ATF::affaire()->select($mandat["id_affaire"],"ref"),0,"R");
 
 		$this->setY(40);
 
@@ -8019,7 +7744,7 @@ Au delà de 25.000,01 € ......................................................
 		$this->setfont('arial','',9);
 		$this->cell(0,4,"Adresse ".$adresse_client,0,1);
 		$this->cell(0,4,"SIREN ".$siren,0,1);
-		$this->cell(0,4,"Nom et fonction du représentant ",0,1);
+		$this->cell(0,4,"Nom et fonction du représentant ".$representant_client,0,1);
 
 		$this->ln(5);
 		$this->cell(0,5,"Et",0,1);
@@ -8097,65 +7822,112 @@ Au delà de 25.000,01 € ......................................................
 		$this->cell(40,4,"Conditions tarifaires :",0,0);
 		$this->setfont('arial','',9);
 		$this->cell(0,4,"Les conditions tarifaires générales sont définies en Annexe 1.",0,1);
-		$this->ln(4);
 
 		$this->setfont('arial','B',9);
 		$this->cell(40,4,"Conditions spécifiques :",0,1);
+		
+		$y=$this->getY();
+		$this->cell(40,4,"Flux entrant :",0,1);
 		$this->setfont('arial','',8);
+
 		if($mandat["type_creance"] === "btob"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",49,$this->getY(),4);
 		}else{ $this->image(__PDF_PATH__."cap/case.jpg",49,$this->getY(),4); }		
 		if($mandat["type_creance"] === "btoc"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",60,$this->getY(),4);
 		}else{ $this->image(__PDF_PATH__."cap/case.jpg",60,$this->getY(),4);	}		
 		if($mandat["type_creance"] === "btob_btoc"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",81,$this->getY(),4);
 		}else{ 	$this->image(__PDF_PATH__."cap/case.jpg",81,$this->getY(),4);	}
-		$this->cell(90,4,"Traitement des créances BtoB      BtoC      BtoC et BtoB ",0,0);		
-		
-		
-		if($mandat["enregistrement_creance"] === "edi"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",159,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",159,$this->getY(),4);	}
-		if($mandat["enregistrement_creance"] === "manuelle"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",187,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",187,$this->getY(),4);	}	
+		$this->cell(90,4,"Traitement des créances BtoB      BtoC      BtoC et BtoB ",0,1);
+
+		if($mandat["enregistrement_creance"] === "edi"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",69,$this->getY(),4);
+		}else{ $this->image(__PDF_PATH__."cap/case.jpg",69,$this->getY(),4);	}
+		if($mandat["enregistrement_creance"] === "manuelle"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",97,$this->getY(),4);
+		}else{ $this->image(__PDF_PATH__."cap/case.jpg",97,$this->getY(),4);	}	
 		$this->cell(90,4,"Enregistrement des créances par : Fichier EDI      Création manuelle",0,1);
+		$y2=$this->getY();
+
+		$this->setleftMargin(115);
+		$this->setY($y);
+		$this->setfont('arial','B',9);
+		$this->cell(40,4,"Production :",0,1);
+		$this->setfont('arial','',8);
+
+		if($mandat["phase_judiciaire_auto"] === "oui"){ 
+				$this->image(__PDF_PATH__."cap/caseCheck.jpg",175,$this->getY(),4);
+				$this->image(__PDF_PATH__."cap/case.jpg",186,$this->getY(),4);
+		}else{ 
+			$this->image(__PDF_PATH__."cap/case.jpg",175,$this->getY(),4);	
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",186,$this->getY(),4);
+		}		
+		$this->cell(90,4,"Passage automatique en phase judiciaire  OUI       NON",0,1);
+		
+		if($mandat["autorisation_huissier"] === "oui"){ 
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",133,$this->getY()+4,4);
+			$this->image(__PDF_PATH__."cap/case.jpg",145,$this->getY()+4,4);
+		}else{
+			$this->image(__PDF_PATH__."cap/case.jpg",133,$this->getY()+4,4);
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",145,$this->getY()+4,4);
+
+		}		
+		$this->multicell(90,4,"Autorisation de mandater l’huissier partenaire en fin de phase amiable  OUI       NON");
+		
+		if($mandat["visite_domiciliaire"] === "oui"){ 
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",145,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/case.jpg",157,$this->getY(),4);
+		}else{ 
+			$this->image(__PDF_PATH__."cap/case.jpg",145,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",157,$this->getY(),4);
+		}	
+		$this->cell(90,4,"Visite domiciliaire : OUI       NON",0,1);
 
 
-		if($mandat["phase_judiciaire_auto"] === "oui"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",63,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",63,$this->getY(),4);	}		
-		$this->cell(90,4,"Passage automatique en phase judiciaire",0,0);
+		if($mandat["relance_interne"] === "oui"){ 
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",191,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/case.jpg",203,$this->getY(),4);
+		}else{ 
+			$this->image(__PDF_PATH__."cap/case.jpg",191,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",203,$this->getY(),4);
+		}	
+		$this->cell(90,4,"Les créances ont-elles fait l’objet de relances internes : OUI       NON",0,1);
 
-		if($mandat["autorisation_huissier"] === "oui"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",189,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",189,$this->getY(),4);	}		
-		$this->cell(90,4,"Autorisation de mandater l’huissier partenaire en fin de phase amiable",0,1);
 
-		if($mandat["reversement_cheque"] === "oui"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",63,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",63,$this->getY(),4);	}		
-		$this->cell(90,4,"Reversement des sommes par chèque",0,0);
 
-		if($mandat["certif_irrecouvrabilite_auto"] === "oui"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",164,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",164,$this->getY(),4);	}		
-		$this->cell(90,4,"Edition automatique du certificat d’irrécouvrabilité",0,1);
 
-		if($mandat["enquete_adresse"] === "oui"){ $this->image(__PDF_PATH__."cap/caseCheck.jpg",85,$this->getY(),4);
-		}else{ $this->image(__PDF_PATH__."cap/case.jpg",85,$this->getY(),4);	}		
-		$this->cell(90,4,"Enquête recherche d’adresse automatique en cas de NPAI",0,0);
+
+		$this->setfont('arial','B',9);
+
+		$this->setleftMargin(10);
+		$this->setY($y2+2);
+		$this->cell(40,4,"Reporting :",0,1);
+		$this->setfont('arial','',8);
+		
+		if($mandat["acces_web"] === "oui"){ 
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",48,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/case.jpg",59,$this->getY(),4);
+		}else{ 
+			$this->image(__PDF_PATH__."cap/case.jpg",48,$this->getY(),4);	
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",59,$this->getY(),4);
+		}		
+		$this->cell(90,4,"Abonnement client Web  OUI      NON",0,1);
+
+		if($mandat["certif_irrecouvrabilite_auto"] === "oui"){ 
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",79,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/case.jpg",90,$this->getY(),4);
+		}else{ 
+			$this->image(__PDF_PATH__."cap/case.jpg",79,$this->getY(),4);	
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",90,$this->getY(),4);
+		}		
+		$this->cell(90,4,"Edition automatique du certificat d’irrécouvrabilité  OUI      NON",0,1);
 
 		if($mandat["cahier_charge"] === "oui"){ 
-			$this->image(__PDF_PATH__."cap/caseCheck.jpg",172,$this->getY(),4);
-			$this->image(__PDF_PATH__."cap/case.jpg",183,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",82,$this->getY(),4);
+			$this->image(__PDF_PATH__."cap/case.jpg",93,$this->getY(),4);
 		}else{ 
-			$this->image(__PDF_PATH__."cap/case.jpg",172,$this->getY(),4);
-			$this->image(__PDF_PATH__."cap/caseCheck.jpg",183,$this->getY(),4);	
-
+			$this->image(__PDF_PATH__."cap/case.jpg",82,$this->getY(),4);	
+			$this->image(__PDF_PATH__."cap/caseCheck.jpg",93,$this->getY(),4);
 		}		
 		$this->cell(90,4,"Présence d’un cahier des charges complémentaire : OUI      NON",0,1);
 
-		if($mandat["relance_interne"] === "oui"){ 
-			$this->image(__PDF_PATH__."cap/caseCheck.jpg",86,$this->getY(),4);
-			$this->image(__PDF_PATH__."cap/case.jpg",98,$this->getY(),4);
-		}else{ 
-			$this->image(__PDF_PATH__."cap/case.jpg",86,$this->getY(),4);
-			$this->image(__PDF_PATH__."cap/caseCheck.jpg",98,$this->getY(),4);
-		}	
-		$this->cell(90,4,"Les créances ont-elles fait l’objet de relances internes : OUI       NON",0,1);
+
 		$this->ln(4);
 
 		$this->multicell(0,4,"Conformément à l’application de l’article 2 des conditions générales de recouvrement, le client nous informe que le préjudice indépendant du retard du paiement qu’il entend réclamer, dû à la mauvaise foi de son débiteur, est fixé à la somme de : ".$mandat["indemnite_retard"]." EUR au titre de l’article 1153 alinéa 4 du Code civil.",0,"J");
@@ -8190,6 +7962,113 @@ Au delà de 25.000,01 € ......................................................
 
 
 		$this->getAnnexeMandat();
+
+	}
+
+	public function listing_mandat($mandat,$infos_client,$mandat_ligne,$type,$representant_client,$adresse_client,$siret,$siren){
+		$this->Open();
+		$this->Addpage();
+		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
+		$this->bgMandat();
+
+		$this->setleftmargin(10);
+		$this->setrightmargin(10);
+		$this->setfont('arial','B',8);
+		if($type == "btoc"){
+			$this->multicell(0,3,"\n\n\nAnnexe à la convention de recouvrement - Secteur BtoC (Créances civiles)\nRémunération de CAP RECOUVREMENT - Tarif H.T. au 1er Septembre 2014",0,"R");
+		}else{
+			$this->multicell(0,3,"\n\n\nAnnexe à la convention de recouvrement - Secteur BtoB (Créances commerciales)\nRémunération de CAP RECOUVREMENT - Tarif H.T. au 1er Septembre 2014",0,"R");
+		}
+		$this->setY(40);
+
+
+
+		$this->setFillColor(239,239,239);
+		$this->cell(0,25,"",0,1,"L",1);
+		$this->setY(40);
+
+		$this->setfont('arial','',10);
+		$this->cell(0,5,"",0,1);
+		$this->cell(0,5,"Le client : ".$infos_client["societe"],0,1);
+		$this->cell(0,5,"Adresse : ".$adresse_client,0,1);
+		$this->cell(60,5,"N° siret : ".$siret,0,0);
+		$this->cell(120,5,"représenté par : ".$representant_client,0,1);
+
+		$this->ln(5);
+		
+
+
+		$this->setfont('arial','',6);
+		$this->settextcolor(0,0,0);		
+		$this->cell(160,5,"Détail des prestations facturées par la sarl Cap Recouvrement en rémunération des services proposés selon les barèmes suivants :",0,1);
+
+		$lignes = array();
+
+		foreach ($mandat_ligne as $key => $value) {
+			if($value["mandat_type"] == $type){
+				$lignes[$value["ligne_titre"]][] = $value;
+			}
+		}
+
+
+		foreach ($lignes as $key => $value) {
+			
+			$this->setfont('arial','B',12);
+			$this->settextcolor(186,19,26);		
+			$this->cell(160,10,ATF::$usr->trans($key),0,0);			
+			$this->setfont('arial','B',9);
+			$this->settextcolor(0,0,0);
+			if($key == "20_Taux_de_commissions_sur_les_sommes_recuperees_en_principal"){
+				$this->multicell(30,3,"\nTaux de base\ndes commissions",0,"R");	
+			}elseif($key == "30_Enquetes_et_solvabilite"){
+				$this->multicell(30,3,"\nCréances\nsur la France**",0,"R");	
+			}else{
+				$this->cell(30,8,"Tarif unitaire HT",0,1,"R");	
+			}			
+			$this->setfont('arial','',8);
+			foreach ($value as $k => $v) {
+				$this->cell(160,4,$v["texte"],0,0);
+				$this->cell(30,4,$v["valeur"]." ".$v["type"],0,1,"R");
+			}
+		}
+
+		$this->setfont('arial','B',12);
+		$this->settextcolor(186,19,26);		
+		$this->cell(160,10,"Frais engagés",0,0);
+		$this->settextcolor(0,0,0);	
+		$this->cell(27,8,"",0,1,"R");	
+		$this->setfont('arial','',8);
+		$this->multicell(0,3,"A la charge du CLIENT pour ceux qui ne peuvent être récupérés auprès du débiteur (Frais de greffe de Tribunaux, frais de signification et d’exécution, frais d’expertise, frais et honoraires d’avoué, frais d’enquêtes, bancaires, etc ...)",0);
+
+
+		$this->setfont('arial','B',12);
+		$this->settextcolor(186,19,26);		
+		$this->cell(160,10,"Conditions particulières / instructions commerciales",0,1);
+		$this->settextcolor(0,0,0);
+		$this->setfont('arial','B',8);
+		$this->setFillColor(239,239,239);
+		if($mandat["precision_btob"]){ 
+			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,3,$mandat["precision_btob"],0,"L",1);
+			$this->ln(5);
+		}else{ 
+			$this->multicell(0,5,"Précisions complémentaires sur la tarification : \n\n\n",0,"L",1); 
+			$this->ln(10);
+		}	
+		
+		$y = $this->getY();
+		$this->setfont('arial','',8);
+		$this->cell(30,3,"(Taux de TVA en vigueur : 20,00%)",0,1,"L");	
+		$this->setfont('arial','B',8);
+		$this->cell(30,3,"Date :",0,1,"L");
+		$this->cell(30,3,"Signature :",0,1,"L");
+		$this->setY($y);
+		$this->setfont('arial','',8);
+		$this->cell(90,3,"",0,0);
+		$this->setFillColor(239,239,239);
+		$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n",0,"C",1);
+		$this->getFooterMandat();
 
 	}
 
