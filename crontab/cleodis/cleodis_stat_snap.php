@@ -18,25 +18,35 @@ foreach ($agence as $key => $value) {
 	$dateMoisPrec = date("Y-m-01" , strtotime($date." -1 month"));
 
 	ATF::devis()->q->reset()							
-			->addField("COUNT(*)","nb")					
-			->setStrict()
-			->addJointure("devis","id_societe","societe","id_societe")	
-			->addJointure("societe","id_owner","user","id_user")
-			->addCondition("devis.etat",'gagne',"AND")
-			->addCondition("user.id_agence",$value["id_agence"])
-			
-			->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-			->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NOT NULL")
-
-			->addCondition("devis.devis","%lcd%" ,"AND", "conditiondevis", "NOT LIKE")
-			->addCondition("devis.devis","%avenant%","AND", "conditiondevis", "NOT LIKE")
-			->addCondition("devis.devis","%vente%","AND", "conditiondevis", "NOT LIKE")
-			->addCondition("devis.devis","%AVT%","AND", "conditiondevis", "NOT LIKE")
-			->addCondition("devis.devis","%MIPOS%","AND", "conditiondevis", "NOT LIKE")
-			->addCondition("devis.type_contrat","%vente%","AND", "conditiondevis", "!=")
-			->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")			
-			->addCondition("`devis`.`first_date_accord`",$dateMoisPrec,"AND",false,">=")
-			->addCondition("`devis`.`first_date_accord`",$date,"AND",false,"<");	
+							->addField("COUNT(*)","nb")					
+							->setStrict()
+							->addJointure("devis","id_societe","societe","id_societe")
+							->addJointure("devis","id_affaire","affaire","id_affaire")
+							->addJointure("societe","id_owner","user","id_user")							
+							->where("user.id_agence",$id_agence)
+							->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+							->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL")
+							->addCondition("devis.devis","%lcd%" ,"AND", "conditiondevis", "NOT LIKE")
+							->addCondition("devis.devis","%avenant%","AND", "conditiondevis", "NOT LIKE")
+							->addCondition("devis.devis","%vente%","AND", "conditiondevis", "NOT LIKE")
+							->addCondition("devis.devis","%AVT%","AND", "conditiondevis", "NOT LIKE")
+							->addCondition("devis.devis","%MIPOS%","AND", "conditiondevis", "NOT LIKE")
+							
+							->addCondition("devis.type_contrat","vente","AND", "conditiondevis", "!=")
+							->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+							
+							->addCondition("devis.etat",'gagne',"AND","conditiondevis","=")
+							->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+							->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+							
+							->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%Y')","year")
+							->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%m')","month")
+													
+							->addGroup("year")->addGroup("month")
+							->addOrder("year")->addOrder("month")
+						
+							->addCondition("`devis`.`first_date_accord`",$dateMoisPrec,"AND",false,">=")
+							->addCondition("`devis`.`first_date_accord`",$date,"AND",false,"<");	
 
 	$result= ATF::devis()->select_row();
 
@@ -46,21 +56,31 @@ foreach ($agence as $key => $value) {
 	ATF::devis()->q->reset()							
 			->addField("COUNT(*)","nb")					
 			->setStrict()
-			->addJointure("devis","id_societe","societe","id_societe")		
-			->addCondition("devis.etat",'gagne',"AND")
-			->addJointure("societe","id_owner","user","id_user")
-			->addCondition("user.id_agence",$value["id_agence"])
-
-			->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE")
+			->addJointure("devis","id_societe","societe","id_societe")
+			->addJointure("devis","id_affaire","affaire","id_affaire")
+			->addJointure("societe","id_owner","user","id_user")							
+			->where("user.id_agence",$id_agence)
+			->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
 			->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL")
-			
 			->addCondition("devis.devis","%lcd%" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("devis.devis","%avenant%","AND", "conditiondevis", "NOT LIKE")
 			->addCondition("devis.devis","%vente%","AND", "conditiondevis", "NOT LIKE")
 			->addCondition("devis.devis","%AVT%","AND", "conditiondevis", "NOT LIKE")
 			->addCondition("devis.devis","%MIPOS%","AND", "conditiondevis", "NOT LIKE")
-			->addCondition("devis.type_contrat","%vente%","AND", "conditiondevis", "!=")
-			->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")			
+			
+			->addCondition("devis.type_contrat","vente","AND", "conditiondevis", "!=")
+			->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+			
+			->addCondition("devis.etat",'gagne',"AND","conditiondevis","=")
+			->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+			->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+			
+			->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%Y')","year")
+			->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%m')","month")
+									
+			->addGroup("year")->addGroup("month")
+			->addOrder("year")->addOrder("month")
+		
 			->addCondition("`devis`.`first_date_accord`",$dateMoisPrec,"AND",false,">=")
 			->addCondition("`devis`.`first_date_accord`",$date,"AND",false,"<");	
 
@@ -69,16 +89,16 @@ foreach ($agence as $key => $value) {
 	ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"devis-autre", "id_agence"=>$value["id_agence"]));
 
 
-	ATF::commande()->q->reset()							
+	ATF::commande()->q->reset()	
 			->addField("COUNT(*)","nb")					
 			->setStrict()
 			->addJointure("commande","id_societe","societe","id_societe")
 			->addJointure("commande","id_affaire","affaire","id_affaire")
 			->addJointure("societe","id_owner","user","id_user")
-			->addCondition("user.id_agence",$value["id_agence"])
+			->where("user.id_agence",$id_agence)
 
-			->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-			->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NOT NULL")	
+			->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+			->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL")	
 
 			->addCondition("commande.etat","prolongation" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("commande.etat","AR" ,"AND", "conditiondevis", "NOT LIKE")
@@ -87,13 +107,21 @@ foreach ($agence as $key => $value) {
 			->addCondition("commande.etat","restitution" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("commande.etat","mis_loyer_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
-			->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")		
-			->addCondition("affaire.affaire","%transfert%" ,"AND", "conditiondevis", "NOT LIKE")
-			->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")									
+			->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 			
+			->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+			->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
 
-			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=")
-			->addCondition("`commande`.`mise_en_place`",$date,"AND",false,"<");
+			->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+			
+			->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%Y')","year")
+			->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%m')","month")
+									
+			->addGroup("year")->addGroup("month")
+			->addOrder("year")->addOrder("month")
+
+			->addCondition("`commande`.`mise_en_place`",$date."-01-01","AND",false,">")
+			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=");
 				
 
 	$result= ATF::commande()->select_row();
@@ -108,10 +136,10 @@ foreach ($agence as $key => $value) {
 			->addJointure("commande","id_societe","societe","id_societe")
 			->addJointure("commande","id_affaire","affaire","id_affaire")
 			->addJointure("societe","id_owner","user","id_user")
-			->addCondition("user.id_agence",$value["id_agence"])
+			->where("user.id_agence",$id_agence)
 
-			->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE")
-			->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL")
+			->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
+			->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL")	
 
 			->addCondition("commande.etat","prolongation" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("commande.etat","AR" ,"AND", "conditiondevis", "NOT LIKE")
@@ -120,13 +148,21 @@ foreach ($agence as $key => $value) {
 			->addCondition("commande.etat","restitution" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("commande.etat","mis_loyer_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 			->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
-			->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")		
-			->addCondition("affaire.affaire","%transfert%" ,"AND", "conditiondevis", "NOT LIKE")
-			->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")									
-		
+			->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+			
+			->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+			->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
 
-			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=")
-			->addCondition("`commande`.`mise_en_place`",$date,"AND",false,"<");
+			->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+			
+			->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%Y')","year")
+			->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%m')","month")
+									
+			->addGroup("year")->addGroup("month")
+			->addOrder("year")->addOrder("month")
+						
+			->addCondition("`commande`.`mise_en_place`",$date."-01-01","AND",false,">")
+			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=");
 
 	$result= ATF::commande()->select_row();
 	ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"mep-autre", "id_agence"=>$value["id_agence"]));
