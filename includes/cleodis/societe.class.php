@@ -455,28 +455,6 @@ class societe_cleodis extends societe {
 	*/
 	public function autocompleteAvecFiliale($infos,$reset=true) {
 
-//		$this->q->reset()
-//				->addField("societe.*")
-//				->setStrict()
-//		     ->addCondition("societe","%cleodis%",NULL,false,"LIKE")
-//			 ->setToString();
-//			 
-//		$q1=$this->sa();
-//			 
-//		$this->q->reset()
-//				->addField("societe.*")
-//				->setStrict()
-//			 ->addJointure("societe","id_societe","societe","id_filiale","parent")
-//		     ->addCondition("parent.societe","%cleodis%",NULL,false,"LIKE")
-//			 ->setToString();
-//			 
-//		$q2=$this->sa();
-//		
-//		$this->q->reset()
-//					->addUnion($q1)
-//					->addUnion($q2);
-//		$union=$this->q->getUnion();	
-//		$this->q->reset()->setSubQuery($union,'uni');
 
 		if ($reset) {
 			$this->q->reset();
@@ -827,6 +805,8 @@ class societe_cap extends societe_cleodis {
 		parent::__construct();
 		$this->table = "societe";
 
+		$this->colonnes['primary']["code_regroupement"] ="";
+		
 		unset($this->colonnes['panel']['delai_rav'], 
 			  $this->colonnes['panel']['delai_fournisseur'], 
 			  $this->colonnes['panel']['deploiement'],
