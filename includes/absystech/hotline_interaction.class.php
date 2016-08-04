@@ -177,7 +177,7 @@ class hotline_interaction extends classes_optima {
 		/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
 			$data = array(
-				 "duree_presta"=>"00:00"
+				 "duree_presta"=>$infos["duree_presta"]?$infos["duree_presta"]:"00:00"
 				,"heure_debut_presta"=>date("h:i")
 				,"heure_fin_presta"=>date("h:i")
 				,"detail"=>$infos["detail"]

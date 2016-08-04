@@ -1167,7 +1167,8 @@ class hotline extends classes_optima {
 		parent::update($hotline,$s);
 		
 		//Trace dans les interactions		
-		$this->createInternalInteraction($infos["id_hotline"],"Passage en état 'en cours' par ".ATF::user()->nom(ATF::$usr->getId()));
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Passage en état 'en cours' par ".ATF::user()->nom($u));
 		
 		//commit
 		ATF::db()->commit_transaction();
@@ -1201,7 +1202,8 @@ class hotline extends classes_optima {
 		parent::update($hotline,$s);
 		
 		//Trace dans les interactions		
-		$this->createInternalInteraction($infos["id_hotline"],"Passage en état 'en attente' par ".ATF::user()->nom(ATF::$usr->getId()));
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Passage en état 'en attente' par ".ATF::user()->nom($u));
 		
 		//commit
 		ATF::db()->commit_transaction();
@@ -3555,6 +3557,85 @@ class hotline extends classes_optima {
         return false;
 	}
 
+	private function forward($infos) {
+
+		ATF::db($this->db)->begin_transaction();
+
+		try {
+			if ($infos['type'] == 'pole') {
+				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
+					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".ATF::$usr->trans($infos['val'],"hotline_pole_concerne"),
+					"internal"=>true,
+					"visible"=>"oui",
+					"duree_presta"=>"00:05",
+					"id_user"=>$infos["id_user"],
+					"id_hotline"=>$infos['id_hotline']
+				));
+				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
+
+
+				ATF::hotline()->update(array(
+					"id_hotline"=>$infos["id_hotline"],
+					"pole_concerne"=>$infos["val"],
+					"disabledInternalInteraction"=>true
+				));
+
+				//Récupération de l'email du nouveau utilisateur en charge
+				$email="hotline.".$infos["val"]."@absystech.fr";
+			
+				ATF::hotline_mail()->createMailPoleTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
+				ATF::hotline_mail()->sendMail();
+				
+				//Notice
+				$this->createMailNotice("hotline_transfert_pole");
+
+			} else if ($infos['type'] == 'user') {
+				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
+					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." à ".ATF::user()->nom($infos['val']),
+					"internal"=>true,
+					"visible"=>"oui",
+					"duree_presta"=>"00:05",
+					"id_user"=>$infos["id_user"],
+					"id_hotline"=>$infos['id_hotline']
+				));
+				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
+				$return['new_user'] = ATF::user()->nom($infos['val']);
+
+				//Récupération du pôle de l'utilisateur
+				$pole=explode(",",ATF::user()->select($infos["val"],"pole"));
+				$return['new_pole'] = ((is_array($pole) && isset($pole[0]) && !empty($pole[0]))?$pole[0]:"dev");
+
+
+				ATF::hotline()->update(
+					array(
+						"id_hotline"=>$infos["id_hotline"]
+						,"id_user"=>$infos["val"]
+						,"pole_concerne"=>$return['new_pole']
+						,"disabledInternalInteraction"=>true)
+				);
+
+				//Mise à jour de l'état
+				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
+				//Récupération de l'email du nouvel utilisateur en charge
+				$email=ATF::user()->select($infos["val"],"email");
+				
+				ATF::hotline_mail()->createMailUserTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
+				ATF::hotline_mail()->sendMail();
+				
+				//Notice
+				ATF::hotline()->createMailNotice("hotline_transfert_user");
+			}
+		} catch (errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
+
+    	$return['notices'] = ATF::$msg->getNotices();
+		$return['result'] = true;
+		ATF::db($this->db)->commit_transaction();
+		return $return;
+	}
+
 	/**
 	* Permet de modifier un ticket hotline depuis telescope
 	* @package Telescope
@@ -3575,13 +3656,28 @@ class hotline extends classes_optima {
         	// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
         	if ($post['specialAction']) {
         		switch ($post['specialAction']) {
+        			case "forward":
+        				$return = self::$post['specialAction']($post);
+        			break;
         			case "setPriorite":
         				self::$post['specialAction']($post);
         				$return['result'] = true;
         			break;
+        			case "setWait":
+        				if ($post['etat']=="wait") {
+	        				self::$post['specialAction']($post);
+        				} else {
+        					$this->fixingRequest($post);
+        				}
+        				$return['result'] = true;
+        				ATF::hotline_interaction()->q->reset()->where("hotline_interaction.id_hotline",$post['id_hotline'])->addOrder("hotline_interaction.id_hotline_interaction","desc")->setLimit(1);
+        				$return['interaction'] = ATF::hotline_interaction()->select_row();
+        			break;
         			case "setBillingMode":
         				self::setBillingModeNew($post);
         				$return['result'] = $this->getBillingMode($post['id_hotline'],true);
+        				ATF::hotline_interaction()->q->reset()->where("hotline_interaction.id_hotline",$post['id_hotline'])->addOrder("hotline_interaction.id_hotline_interaction","desc")->setLimit(1);
+        				$return['interaction'] = ATF::hotline_interaction()->select_row();
         			break;
         		}
         	// Si on fait un update pur et simple du ticket
@@ -3650,7 +3746,9 @@ class hotline extends classes_optima {
 			"hotline.id_affaire"=>array(),
 			"hotline.ok_facturation"=>array(),
 			"hotline.charge"=>array(),
-			"hotline.facturation_ticket"=>array()
+			"hotline.facturation_ticket"=>array(),
+			"societe.latitude"=>array(),
+			"societe.longitude"=>array()
 		);
 
 
