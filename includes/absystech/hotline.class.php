@@ -2214,7 +2214,8 @@ class hotline extends classes_optima {
 			}else{
 				$facture = 0;
 			}
-			$temps_passe = $this->getSecond($value["duree_presta"]) + $this->getSecond($value["duree_dep"]);
+			$temps_passe = $this->getSecond($value["duree_presta"])+$this->getSecond($value["duree_dep"])-$this->getSecond($value["duree_pause"]);
+
 			
 			$data[date("Y-m-d", strtotime($value["date"]))]["temps_passe"] += $temps_passe;
 			$data[date("Y-m-d", strtotime($value["date"]))]["temps"] += $facture;
@@ -2324,7 +2325,7 @@ class hotline extends classes_optima {
 
 		$data = array();
 		foreach ($result as $key => $value) {
-			$temps_passe = $this->getSecond($value["duree_presta"])+$this->getSecond($value["duree_dep"]);
+			$temps_passe = $this->getSecond($value["duree_presta"])+$this->getSecond($value["duree_dep"])-$this->getSecond($value["duree_pause"]);
 
 			if($temps_passe != 0){
 				$facturation_ticket = ATF::hotline()->select($value["id_hotline"], "facturation_ticket");

@@ -1563,6 +1563,10 @@ class hotline_interaction extends classes_optima {
 		    		else{ $return[$key]["date_fin"] = ""; }
     			}
 
+    			if ($id_affaire && !$affaires[$id_affaire]) {
+	    			$affaires[$id_affaire] = ATF::affaire()->select($id_affaire);
+    			}
+
     			$temps_passe = (ATF::hotline()->getSecond($vhi["duree_presta"])
     						   +ATF::hotline()->getSecond($vhi["duree_dep"]))
     			   			   -ATF::hotline()->getSecond($vhi["duree_pause"]);
@@ -1583,13 +1587,24 @@ class hotline_interaction extends classes_optima {
     												
 					}else{						
 						if($id_affaire){	
-							if(! isset($THAffaire[$id_affaire])){							
-								$THAffaire[$id_affaire] = ATF::hotline()->getTauxHorraire($id_affaire);
+							if (in_array($affaires[$id_affaire]["etat"],array("commande","facture","terminee"))) {
+								// Affaires signées
+								if(! isset($THAffaire[$id_affaire])){							
+									$THAffaire[$id_affaire] = ATF::hotline()->getTauxHorraire($id_affaire);
+								}
+								$return[$key]["marge_brute"] += round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
+								$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
+	    						$return[$key]["taux_horaire"] = round($THAffaire[$id_affaire],2);
+
+							} else {
+								// Affaires non signées
+								if(! isset($THAffaire[$id_affaire])){							
+									$THAffaire[$id_affaire] = ATF::hotline()->getTauxHorraire($id_affaire);
+								}
+								$return[$key]["marge_brute"] = round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
+								$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
+	    						$return[$key]["taux_horaire"] = 0;
 							}
-							$return[$key]["temps_facture"] += "";
-							$return[$key]["marge_brute"] += round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
-							$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
-    						$return[$key]["taux_horaire"] = round($THAffaire[$id_affaire],2);
 						}else{
 							$return[$key]["temps_facture"] = 0;
 							$return[$key]["marge_brute"] = 0;
