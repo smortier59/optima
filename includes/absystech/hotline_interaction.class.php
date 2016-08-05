@@ -1973,4 +1973,31 @@ class hotline_interaction extends classes_optima {
 	}	
 
 
+	public function _indicateurs($get, $post){
+	
+		$workedHour = (ATF::hotline()->getJoursOuvres(date("Y-m-01"), date("Y-m-d")))*(7*ATF::user()->select(ATF::$usr->getID(), "temps_partiel"));
+		
+		
+		//Compte le nombre d'heures passees sur un mois
+		$mois = ATF::pointage()->totalHeure(date("Y-m"),ATF::$usr->getID());
+		$today = ATF::pointage()->totalHeure(date("Y-m-d"),ATF::$usr->getID());
+		
+
+
+		if($today == NULL){ $today = 0; 
+		}else{  }
+		
+		if($mois == NULL){ $mois = 0;
+		}else{		
+
+			$m = explode("h", $mois);
+			$mois = number_format(intval($m[0])+(60/intval($m[1]))-1,0); 
+			log::logger($mois , "mfleurquin");
+		}
+
+
+		return array("today"=>$today , "mois"=>$mois, "totalMois"=>$workedHour);
+
+	}
+
 }

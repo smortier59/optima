@@ -1854,7 +1854,7 @@ class hotline extends classes_optima {
 				return $graph;		
 			
 			case "partTicket" :				
-				$this->q->reset()->addField("SUM(hotline.id_hotline)", "total")
+				$this->q->reset()->addField("COUNT(hotline.id_hotline)", "total")
 								 ->addField("hotline.pole_concerne")
 								 ->where("hotline.pole_concerne","telecom")
 								 ->where("hotline.pole_concerne","dev")
@@ -3940,6 +3940,32 @@ class hotline extends classes_optima {
 		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])->where("etat","terminee","AND","cle1","!=")->where("etat","perdue","AND","cle1","!=");
 
 		return ATF::affaire()->sa();
+	}
+
+
+
+	public function _partTicket($get,$post){
+		log::logger($get , "mfleurquin");
+		log::logger($post , "mfleurquin");
+
+		$at = $this->stats(true,"partTicket");
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->stats(true,"partTicket");
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+		
+		$res = array();
+		$res["dev"]["total"] =     $at["dataset"]["dev"]["total"] + $att["dataset"]["dev"]["total"];
+		$res["telecom"]["total"] = $at["dataset"]["telecom"]["total"] + $att["dataset"]["telecom"]["total"];
+		$res["system"]["total"] =  $at["dataset"]["system"]["total"] + $att["dataset"]["system"]["total"];
+
+		$total = $res["dev"]["total"] + $res["telecom"]["total"] + $res["system"]["total"];
+
+		foreach ($res as $key => $value) {
+			$res[$key]["pourcentage"] = round(($value["total"] / $total)*100,1);
+		}
+		return $res;		
 	}
 
 };
