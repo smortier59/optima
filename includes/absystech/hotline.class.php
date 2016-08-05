@@ -10,7 +10,7 @@ class hotline extends classes_optima {
 	*/
 	public function __construct() {
 		parent::__construct();
-		$this->table = __CLASS__;
+		$this->table = __CLASS__; 
 		
 		//Colonnes SELECT ALL
 		$this->colonnes['fields_column'] = array(
@@ -1274,7 +1274,8 @@ class hotline extends classes_optima {
 		$this->createMailNotice("hotline_mail_wait_mise_prod");
 
 		//Trace dans les interactions		
-		$this->createInternalInteraction($infos["id_hotline"],"Demande de Mise en prod par ".ATF::user()->nom(ATF::$usr->getId()));
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Demande de Mise en prod par ".ATF::user()->nom($u));
 		
 		//Commit
 		ATF::db($this->db)->commit_transaction();
@@ -1319,7 +1320,8 @@ class hotline extends classes_optima {
 		$this->createMailNotice("hotline_mail_mise_prod");
 
 		//Trace dans les interactions		
-		$this->createInternalInteraction($infos["id_hotline"],"Mis en prod par ".ATF::user()->nom(ATF::$usr->getId()));
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Mis en prod par ".ATF::user()->nom($u));
 		
 		//Commit
 		ATF::db($this->db)->commit_transaction();
@@ -1348,7 +1350,7 @@ class hotline extends classes_optima {
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
 		
-		/*	Mise à jour de la requête en cours*/
+		/*	Mise à jour de la requête en cours*/  
 		$hotline = array(
 			"id_hotline"=>$infos["id_hotline"]
 			,"wait_mep"=>"non"
@@ -1357,7 +1359,8 @@ class hotline extends classes_optima {
 		parent::update($hotline,$s);
 		
 		//Trace dans les interactions		
-		$this->createInternalInteraction($infos["id_hotline"],"Demande de MEP annulé par ".ATF::user()->nom(ATF::$usr->getId()));
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Demande de MEP annulé par ".ATF::user()->nom($u));
 		
 		//Commit
 		ATF::db($this->db)->commit_transaction();
@@ -3652,38 +3655,51 @@ class hotline extends classes_optima {
 
         try {
 	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-	        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 
         	// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
         	if ($post['specialAction']) {
         		switch ($post['specialAction']) {
         			case "forward":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				$return = self::$post['specialAction']($post);
-        			break;
+         				$lastInteractionRequired = true;
+	       			break;
         			case "setPriorite":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				self::$post['specialAction']($post);
         				$return['result'] = true;
         			break;
         			case "setWait":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				if ($post['etat']=="wait") {
 	        				self::$post['specialAction']($post);
         				} else {
         					$this->fixingRequest($post);
         				}
         				$return['result'] = true;
-        				ATF::hotline_interaction()->q->reset()->where("hotline_interaction.id_hotline",$post['id_hotline'])->addOrder("hotline_interaction.id_hotline_interaction","desc")->setLimit(1);
-        				$return['interaction'] = ATF::hotline_interaction()->select_row();
+        				$lastInteractionRequired = true;
         			break;
         			case "setBillingMode":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				self::setBillingModeNew($post);
         				$return['result'] = $this->getBillingMode($post['id_hotline'],true);
-        				ATF::hotline_interaction()->q->reset()->where("hotline_interaction.id_hotline",$post['id_hotline'])->addOrder("hotline_interaction.id_hotline_interaction","desc")->setLimit(1);
-        				$return['interaction'] = ATF::hotline_interaction()->select_row();
+        				$lastInteractionRequired = true;
+        			break;
+        			case "sendMailTeamviewer":
+				        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1024);
+        				ATF::contact()->sendMailTeamViewer($post);
+        			break;
+        			case "sendMEP":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+				        if (!$post['action']) throw new Exception("ACTION_MISSING",1030);
+        				$this->$post['action']($post);
+        				$lastInteractionRequired = true;
         			break;
         		}
         	// Si on fait un update pur et simple du ticket
         	} else {
 		        // Check des champs obligatoire
+		        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 		        if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
 		        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
 		        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
@@ -3697,6 +3713,12 @@ class hotline extends classes_optima {
 		        // Insertion
 	        	$return['aff'] = self::update($post);        		
 	        	$return['result'] = true;
+        	}
+
+        	// last itneraction
+        	if ($lastInteractionRequired) {
+        		$p = array("limit"=>1,"tri"=>"id_hotline_interaction","trid"=>"desc","id_hotline"=>$post['id_hotline']);
+				$return['interaction'] = ATF::hotline_interaction()->_GET($p);
         	}
 
         	// Récupération des notices créés
@@ -3748,6 +3770,7 @@ class hotline extends classes_optima {
 			"hotline.ok_facturation"=>array(),
 			"hotline.charge"=>array(),
 			"hotline.facturation_ticket"=>array(),
+			"hotline.wait_mep"=>array(),
 			"societe.latitude"=>array(),
 			"societe.longitude"=>array()
 		);
