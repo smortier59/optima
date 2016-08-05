@@ -3718,7 +3718,7 @@ class hotline extends classes_optima {
         	// last itneraction
         	if ($lastInteractionRequired) {
         		$p = array("limit"=>1,"tri"=>"id_hotline_interaction","trid"=>"desc","id_hotline"=>$post['id_hotline']);
-				$return['interaction'] = ATF::hotline_interaction()->_GET($p);
+				$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
         	}
 
         	// Récupération des notices créés
@@ -3854,7 +3854,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
 		$this->q->setToString();
-		header("ts-SQL-debug: ".$this->select_all($get['tri'],$get['trid'],$get['page'],true));
+
 		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
