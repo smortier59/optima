@@ -5216,8 +5216,10 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
-		$this->cell(0,4,"Date de la revente : ".date("d / m / Y", strtotime($this->commande["date_evolution"])),0,1);
-		$this->cell(0,4,"Prix de Revente ".$this->demande_refi["valeur_residuelle"]." euros H.T. à majorer de la TVA en vigueur.",0,1);
+		$date_revente = date("01 / m / Y", strtotime("+1 month", strtotime($this->commande["date_evolution"])));
+
+		$this->cell(0,4,"Date de la revente : ".$date_revente,0,1);
+		$this->cell(0,4,"Prix de Revente 15 euros H.T. à majorer de la TVA en vigueur.",0,1);
 		$this->ln(5);
 		$this->cell(0,4,"Fait en deux (2) exemplaires, à Rueil-Malmaison, le ".date("d / m / Y", strtotime($this->demande_refi["date"])),0,1);
 		$this->ln(5);
@@ -5292,14 +5294,14 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,4,"Fait en deux exemplaires à Bruxelles, le ".$date ,0,1);
 
 		$this->ln(10);
-		$this->cell(90,3,"CLEODIS  s.a.",0,0,"C");
+		$this->cell(90,3,"CLEODIS.BE SPRL",0,0,"C");
 		$this->cell(90,3,"BELFIUS LEASE SERVICES s.a.",0,1,"C");
 
 		$this->lettreBelfius2();
 		$this->cell(0,4,"Fait en deux exemplaires à Bruxelles, le ".$date ,0,1);
 
 		$this->ln(10);
-		$this->cell(90,3,"CLEODIS  s.a.",0,0,"C");
+		$this->cell(90,3,"CLEODIS.BE SPRL",0,0,"C");
 		$this->cell(90,3,"BELFIUS LEASE SERVICES s.a.",0,1,"C");
 	}
 
@@ -5312,7 +5314,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"I. EXPOSE",0,1);
 		$this->ln(2);
 		$this->setfont('times',"",9);
-		$this->multicell(0,4,"Le ".$this->date.", la s.a. CLEODIS, ayant son siège social ".$this->cleodissiege.", ci-après dénommé 'CLEODIS', a conclu le contrat de location précité portant sur le matériel informatique plus amplement décrit dans l’article des conditions particulières dudit contrat, avec la société ".$this->client["societe"].", ci-après 'le locataire'.\nLe matériel objet de ce contrat est la propriété de CLEODIS." ,0);
+		$this->multicell(0,4,"Le ".$this->date.", la SPRL CLEODIS.BE, ayant son siège social ".$this->cleodissiege.", ci-après dénommé 'CLEODIS', a conclu le contrat de location précité portant sur le matériel informatique plus amplement décrit dans l’article des conditions particulières dudit contrat, avec la société ".$this->client["societe"].", ci-après 'le locataire'.\nLe matériel objet de ce contrat est la propriété de CLEODIS." ,0);
 		$this->multicell(0,4,"L’intention de CLEODIS est de vendre à BELFIUS LEASE SERVICES s.a., ayant sons siège social Place Rogier 11 à 1210 Bruxelles, ci-après dénommé 'BELFIUS LEASE SERVICES', le matériel objet de ce contrat moyennant la cession à cette dernière des droits résultant du contrat de location n°".$this->affaire["ref"]." et des loyers y relatifs conformément à l’article 10.2 des conditions générales de ce contrat au moyen d’une convention de cession de contrat séparée." ,0);
 		$this->multicell(0,4, "Cet achat et cession ont lieu conformément à la convention cadre portant sur la vente de matériel et cession de loyers signée par les parties dénommées ci-dessus en date du 08 juin 2015 et sous réserve des conditions particulières suivantes : ",0);
 		$this->ln(5);
@@ -5378,9 +5380,9 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"I. EXPOSE DES FAITS",0,1);
 		$this->ln(2);
 		$this->setfont('times',"",9);
-		$this->multicell(0,4,"La s.a. CLEODIS, ayant son siège social ".$cleodis["adresse_siege_social"].", a conclu le ".date("d/m/Y", strtotime($this->commande["date"]))." avec la société ".$this->client["societe"].", le contrat de location n° ".$this->affaire["ref"]." portant sur des équipements informatiques, plus amplements décrits dans les conditions particulières  dudit contrat et dont une copie est jointe en annexe pour faire partie intégrante de cette cession.",0);
+		$this->multicell(0,4,"La SPRL CLEODIS.BE, ayant son siège social ".$cleodis["adresse_siege_social"].", a conclu le ".date("d/m/Y", strtotime($this->commande["date"]))." avec la société ".$this->client["societe"].", le contrat de location n° ".$this->affaire["ref"]." portant sur des équipements informatiques, plus amplements décrits dans les conditions particulières  dudit contrat et dont une copie est jointe en annexe pour faire partie intégrante de cette cession.",0);
 		$this->ln(5);
-		$this->multicell(0,4,"La s.a. CLEODIS vend à la s.a. BELFIUS LEASE SERVICES, ayant son siège social Place Rogier 11 1210 Bruxelles, ces équipements et désire céder à cette dernière le contrat de location y relatif, conformément aux stipulations de l’article 10.2 des conditions générales de ce contrat.",0);
+		$this->multicell(0,4,"La SPRL CLEODIS.BE vend à la s.a. BELFIUS LEASE SERVICES, ayant son siège social Place Rogier 11 1210 Bruxelles, ces équipements et désire céder à cette dernière le contrat de location y relatif, conformément aux stipulations de l’article 10.2 des conditions générales de ce contrat.",0);
 		$this->ln(5);
 		$this->multicell(0,4,"La s.a. BELFIUS LEASE SERVICES accepte cette cession.",0);
 
@@ -5391,18 +5393,18 @@ class pdf_cleodis extends pdf {
 
 
 		$this->ln(5);
-		$this->multicell(0,4,"1.  La s.a. CLEODIS cède à la s.a. BELFIUS LEASE SERVICES, qui accepte, tous les droits découlant du contrat de location n° ".$this->affaire["ref"]." conclu avec ".$this->client["societe"].", qui reprend exhaustivement l’ensemble des accords intervenus entre CLEODIS et le locataire et portant sur le matériel décrit aux conditions particulières.",0);
+		$this->multicell(0,4,"1.  La SPRL CLEODIS.BE cède à la s.a. BELFIUS LEASE SERVICES, qui accepte, tous les droits découlant du contrat de location n° ".$this->affaire["ref"]." conclu avec ".$this->client["societe"].", qui reprend exhaustivement l’ensemble des accords intervenus entre CLEODIS et le locataire et portant sur le matériel décrit aux conditions particulières.",0);
 	
 		$this->ln(2);
 		$this->multicell(0,4,"La cession prendra effet le ".date("d/m/Y", strtotime($this->demande_refi["date_cession"]))." et emporte cession des loyers relatifs à la période du ".date("d/m/Y", strtotime($this->facturations[0]["date_periode_debut"]))." au ".date("d/m/Y", strtotime($this->facturations[count($this->facturations)-1]["date_periode_fin"])),0);
 		$this->ln(5);
 		$this->multicell(0,4,"Cette cession a lieu conformément à la convention cadre portant sur la vente de matériel et cession de loyers conclue entre nos sociétés et date du 08 juin 2015.",0);
 		$this->ln(5);
-		$this->multicell(0,4,"2. La s.a. CLEODIS certifie que le matériel a bien été livré au lieu indiqué dans le contrat de location et a été déclaré conforme par le locataire. Faute de quoi, BELFIUS LEASE SERVICES conserve un recours auprès de CLEODIS pour la récupération du montant des loyers non perçus.  ",0);
+		$this->multicell(0,4,"2. La SPRL CLEODIS.BE certifie que le matériel a bien été livré au lieu indiqué dans le contrat de location et a été déclaré conforme par le locataire. Faute de quoi, BELFIUS LEASE SERVICES conserve un recours auprès de CLEODIS pour la récupération du montant des loyers non perçus.  ",0);
 		$this->ln(5);
-		$this->multicell(0,4,"3. Compte tenu des termes du contrat de location, et plus particulièrement de l’article   , il est entendu que la s.a. CLEODIS reste tenue envers le locataire à l’égard de toute obligation pouvant découler de la construction, de la livraison et de l’installation de l’équipement, ainsi que de l’exécution de la clause d’évolution (article 12 des conditions générales). CLEODIS est tenue d’informer BELFIUS LEASE SERVICES endéans la semaine de toutes les correspondances qui lui parviendront suite à l’application de l’article 6.3  des conditions générales des contrats de location cédés. ",0);
+		$this->multicell(0,4,"3. Compte tenu des termes du contrat de location, et plus particulièrement de l’article   , il est entendu que la SPRL CLEODIS.BE reste tenue envers le locataire à l’égard de toute obligation pouvant découler de la construction, de la livraison et de l’installation de l’équipement, ainsi que de l’exécution de la clause d’évolution (article 12 des conditions générales). CLEODIS est tenue d’informer BELFIUS LEASE SERVICES endéans la semaine de toutes les correspondances qui lui parviendront suite à l’application de l’article 6.3  des conditions générales des contrats de location cédés. ",0);
 		$this->ln(5);
-		$this->multicell(0,4,"4. La s.a. CLEODIS marque dès lors son entier accord quant au versement -par exclusivité et par privilège- de toutes sommes pouvant lui revenir du chef de ce contrat de location sur le compte n° 552-2961101-30 de BELFIUS LEASE SERVICES.",0);
+		$this->multicell(0,4,"4. La SPRL CLEODIS.BE marque dès lors son entier accord quant au versement -par exclusivité et par privilège- de toutes sommes pouvant lui revenir du chef de ce contrat de location sur le compte n° 552-2961101-30 de BELFIUS LEASE SERVICES.",0);
 
 		$this->multicell(0,4,"Pour lui assurer l’encaissement du montant des créances, objet de la présente cession, CLEODIS autorise BELFIUS LEASE SERVICES -pour autant que de besoin- à effectuer toutes démarches de vérification et, le cas échéant, à entamer toute procédure qui pourrait être utile à cette fin. CLEODIS apportera son support total et autorise le débiteur cédé à donner à BELFIUS LEASE SERVICES toutes informations sur les créances qu’elle possède contre ledit débiteur et, en général, tous renseignements quelconques que jugerait utile de connaître BELFIUS LEASE SERVICES. ",0);
 		$this->ln(5);
