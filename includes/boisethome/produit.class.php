@@ -72,7 +72,7 @@ class produit_boisethome extends classes_optima {
 		$this->check_field($infos);
 
 		if(!$infos_ligne){
-			throw new error(ATF::$usr->trans("produit_article_inexistant"));
+			throw new errorATF(ATF::$usr->trans("produit_article_inexistant"));
 		}
 
 		ATF::db($this->db)->begin_transaction();
@@ -124,7 +124,7 @@ class produit_boisethome extends classes_optima {
 		$this->check_field($infos);
 
 		if(!$infos_ligne){
-			throw new error(ATF::$usr->trans("produit_article_inexistant"));
+			throw new errorATF(ATF::$usr->trans("produit_article_inexistant"));
 		}
 
 		ATF::db($this->db)->begin_transaction();

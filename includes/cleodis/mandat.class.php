@@ -15,10 +15,13 @@ class mandat_cap extends mandat {
         $this->colonnes['fields_column'] = array( 
              'mandat.ref'
             ,'mandat.id_societe'
+            ,'mandat.etat'
             ,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70)
             ,'retourBPA'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"uploadFile","width"=>70)
             ,"mandat.date_envoi"=>array("renderer"=>"updateDate","width"=>170)
             ,"mandat.date_retour"=>array("renderer"=>"updateDate","width"=>170)
+            ,"mandat.date_debut"=>array("renderer"=>"updateDate","width"=>170)
+            ,"mandat.date_fin"=>array("renderer"=>"updateDate","width"=>170)
         );
 
         $this->colonnes['primary'] = array(
@@ -27,50 +30,69 @@ class mandat_cap extends mandat {
             ,"id_societe"
             ,"date"  
             ,"date_envoi"   
-            ,"date_retour"          
+            ,"date_retour" 
+            ,"id_representant"         
         );
 
         $this->colonnes['panel']['participants'] = array(
             "contact"=>array("custom"=>true)  
         );
 
-        $this->colonnes['panel']['condition'] = array(
-             "type_creance"
-            ,"enregistrement_creance"
-            ,"phase_judiciaire_auto"
+        $this->colonnes['panel']['flux_entrant'] = array(
+               "type_creance"
+              ,"enregistrement_creance"
+        );        
+
+        $this->colonnes['panel']['production'] = array(            
+             "phase_judiciaire_auto"
             ,"autorisation_huissier"
-            ,"reversement_cheque"
+            ,"visite_domiciliaire"
+            ,"relance_interne"       
+        );       
+
+        $this->colonnes['panel']['reporting'] = array(
+             "acces_web"
             ,"certif_irrecouvrabilite_auto"
-            ,"enquete_adresse"
-            ,"cahier_charge"
-            ,"relance_interne"           
+        );
+
+        $this->panels['flux_entrant'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+        $this->panels['production'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+        $this->panels['reporting'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+
+        $this->colonnes['panel']['condition'] = array(
+             "flux_entrant"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'flux_entrant')
+            ,"production"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'production')  
+            ,"reporting"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'reporting')               
+            ,"cahier_charge"                
             ,"commentaire"
             ,"indemnite_retard"
         );
 
-        $this->colonnes['panel']['btob'] = array(
-             "taux_btob"
+               
+        $this->colonnes['panel']['ligne_btob'] = array(
+            "btob"=>array("custom"=>true)            
             ,"precision_btob"
         );
-    
-        $this->colonnes['panel']['btoc'] = array(
-             "taux_btoc"
+       
+
+        $this->colonnes['panel']['ligne_btoc'] = array(
+            "btoc"=>array("custom"=>true)            
             ,"precision_btoc"
         );
 
-       
-
-        $this->panels['btob'] = array('nbCols'=>1,'visible'=>false);
-        $this->panels['btoc'] = array('nbCols'=>1,'visible'=>false);
-        $this->panels['condition'] = array('nbCols'=>2,'visible'=>true);
+        $this->panels['ligne_btob'] = array('nbCols'=>1,'visible'=>false);
+        $this->panels['ligne_btoc'] = array('nbCols'=>1,'visible'=>false);
+        $this->panels['condition'] = array('nbCols'=>1,'visible'=>true);
 
         $this->colonnes['bloquees']['insert'] =  
         $this->colonnes['bloquees']['clone'] =  
-        $this->colonnes['bloquees']['update'] =  array_merge(array("date_retour","date_envoi"));
+        $this->colonnes['bloquees']['update'] =  array_merge(array("date_retour","date_envoi","reversement_cheque","enquete_adresse","date_debut","date_fin","etat"));
 
         $this->fieldstructure();    
 
+        $this->onglets = array('mandat_ligne');
         $this->field_nom = "ref";
+        $this->foreign_key["id_representant"] = "contact";
         $this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true);
         $this->files["retourBPA"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
     }
@@ -90,7 +112,10 @@ class mandat_cap extends mandat {
             $preview=$infos["preview"];
         }else{
             $preview=false;
-        }      
+        }     
+
+        $btoc = json_decode($infos["values_".$this->table]["btoc"],true);
+        $btob = json_decode($infos["values_".$this->table]["btob"],true);
 
         if(isset($infos["tu"])){ $tu = true; }else{ $tu = false; }
         
@@ -103,7 +128,7 @@ class mandat_cap extends mandat {
 
         unset($infos["contact"], $infos["id_audit"]);
 
-        ATF::audit_cap()->u(array("id_audit"=>$audit, "etat"=>"signe"));
+        ATF::audit()->u(array("id_audit"=>$audit, "etat"=>"signe"));
 
         $last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
@@ -111,6 +136,59 @@ class mandat_cap extends mandat {
         foreach ($mandat_contact as $key => $value) {
             ATF::mandat_contact()->insert(array("id_mandat"=>$last_id, "id_contact"=>ATF::contact()->decryptId($value)));
         }
+
+
+        if($infos["type_creance"]){
+            if($infos["type_creance"] == "btob"){
+                if($btob){
+                    foreach ($btob as $key => $value) {
+                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                           "type"=> $value["mandat_ligne__dot__type"],
+                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                           "mandat_type"=> "btob"
+                                                    ));
+                    }
+                }
+            }elseif($infos["type_creance"] == "btoc"){
+                if($btoc){
+                    foreach ($btoc as $key => $value) {
+                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                           "type"=> $value["mandat_ligne__dot__type"],
+                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                           "mandat_type"=> "btoc"
+                                                    ));
+                    }
+                }
+            }else{
+                if($btob){
+                    foreach ($btob as $key => $value) {
+                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                           "type"=> $value["mandat_ligne__dot__type"],
+                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                           "mandat_type"=> "btob"
+                                                    ));
+                    }
+                }
+                if($btoc){
+                    foreach ($btoc as $key => $value) {
+                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                           "type"=> $value["mandat_ligne__dot__type"],
+                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                           "mandat_type"=> "btoc"
+                                                    ));
+                    }
+                }
+            }
+        }
+
 
         if($preview){
             if(!$tu) $this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
@@ -135,11 +213,16 @@ class mandat_cap extends mandat {
             ATF::mandat_contact()->delete($value["id_mandat_contact"]);
         }
 
+        ATF::mandat_ligne()->q->reset()->where("id_mandat",$id_mandat);
+        foreach (ATF::mandat_ligne()->select_all() as $key => $value) {
+            ATF::mandat_ligne()->delete($value["id_mandat_ligne"]);
+        }
+
+        $infos["mandat"]["id_audit"] = $this->select($infos["mandat"]["id_mandat"] , "id_affaire");
+
         $this->delete($infos["mandat"]["id_mandat"]);
 
         unset($infos["mandat"]["id_mandat"]);
-
-
 
         $last_id = $this->insert($infos,$s,$files);
 
@@ -159,7 +242,7 @@ class mandat_cap extends mandat {
 
    public function default_value($field){
         if(ATF::_r('id_audit')){
-            $audit=ATF::audit_cap()->select(ATF::_r('id_audit'));
+            $audit=ATF::audit()->select(ATF::_r('id_audit'));
         }
 
         if($audit){
@@ -167,6 +250,7 @@ class mandat_cap extends mandat {
                 case "ref": return $audit["ref"];
                 case "id_societe": return $audit["id_societe"];
                 case "id_affaire": return $audit["id_affaire"];
+                case "id_representant": return $audit["id_representant"];
                 case "date": return date("Y-m-d");
             }
         }        
@@ -193,6 +277,22 @@ class mandat_cap extends mandat {
            ATF::societe()->u(array("id_societe"=>$this->select($infos["id_".$this->table], "id_societe"), "relation"=>"client"));
         }
         
+
+        if(($infos["key"] == "date_debut" || $infos["key"] == "date_fin") && $infos["value"]){
+            if($infos["key"] == "date_debut" && $infos["value"] <= date("Y-m-d")){
+                if($this->select($this->decryptId($infos["id_".$this->table]), "date_fin") && $this->select($this->decryptId($infos["id_".$this->table]), "date_fin")>=date("Y-m-d")){
+                    $infosMaj["etat"] = "actif";                    
+                }
+            }
+
+            if($infos["key"] == "date_fin" && $infos["value"] >= date("Y-m-d")){
+                $infosMaj["etat"] = "actif";                    
+            }else{
+                $infosMaj["etat"] = "inactif";
+            }
+            
+        }
+
         if($this->u($infosMaj)){
             ATF::$msg->addNotice(
                 loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))

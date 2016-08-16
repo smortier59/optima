@@ -224,22 +224,6 @@ class affaire_cleodis extends affaire {
 		return $prefix.$suffix;
 	}
 	
-//	/** 
-//	* On ne peut créer une affaire uniquement à partir d'une fiche société
-//	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @return boolean 
-//	*/
-//	public function can_insert($id,$field,$requests){
-//log::logger($requests,ygautheron);		
-//		if($requests["id_societe"] || $requests[$this->table]["id_societe"]
-//			 || $requests["parent_name"]==="societe" && $requests["id"] // Appel ajax de l'onglet
-//			 || strpos($requests["pager"],"gsa_societe_affaire_")===0 // Appel ajax de l'onglet rafraichi
-//		){
-//			return true;
-//		}else{
-//			throw new error("L'affaire doit être inséré depuis une société.",880);
-//		}
-//	}
 	
 	/**
     * Permet de mettre a jour une date en ajax
@@ -534,32 +518,6 @@ class affaire_cleodis extends affaire {
 		}
 	}
 
-//	/** 
-//	* Retourne la facture de refinancement si elle existe
-//    * @author Yann GAUTHERON <ygautheron@absystech.fr>
-//	* @param int $id_fille Affaire fille qui demande ses parents
-//	* @return facture_cleodis
-//	*/
-//	function getFactureRefi($id_affaire=NULL){
-//		if (!$id_affaire && $this->infos["id_affaire"]) {
-//			$id_affaire = $this->infos["id_affaire"];
-//		}
-//		if($id_affaire){
-//			ATF::facture()->q->reset()
-//				->setStrict()
-//				->addField('facture.id_facture')
-//				->where("facture.id_affaire",$id_affaire)
-//				->where("facture.type_facture",'refi')
-//				->setDimension("cell");
-//			if($id = ATF::facture()->sa()) {
-//				return new facture_cleodis($id);
-//			}else{
-//				return false;
-//			}
-//		}else{
-//			return false;
-//		}
-//	}
 
 	/** 
 	* Retourne l'objet devis associé à la commande passée en paramètre
@@ -676,25 +634,7 @@ class affaire_cleodis extends affaire {
 		));
 	}
 	
-//	/**
-//	* Met à jour une valeur les dates de garanties
-//	* @author Anonyme
-//	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
-//	* @param string $date_garantie
-//	*/	
-//	function majGarantieParc($date_garantie){
-//		$this->notSingleton();
-//		if ($parc = ATF::parc()->ss('id_affaire',$this->get('id_affaire'))){
-//			foreach ($parc as $key => $item){
-//				if (!$item['provenance']) {
-//					ATF::parc()->u(array(
-//						'id_parc'=>$item["id_parc"]
-//						,'date_garantie' =>$date_garantie
-//					));
-//				}
-//			}
-//		} 
-//	}
+
 
 	/** 
 	* Met à jour le forecast d'une affaire en fonction de son état, méthode d'objet et non de singleton
@@ -744,29 +684,6 @@ class affaire_cleodis extends affaire {
 		}
 	}
 
-//	/**
-//	* Mise à jour des forecast
-//	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
-//	* @param array &$s La session
-//	* @param array $files $_FILES
-//	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
-//	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
-//	* @return boolean 
-//	*/
-//	public function update_forecast($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
-//		$this->infoCollapse();
-//		if($this->majForecastProcess()){
-//			ATF::$msg->addNotice(
-//				loc::mt(ATF::$usr->trans("notice_update_success"),array("record"=>$this->nom($infos["id_affaire"])))
-//				,ATF::$usr->trans("notice_success_title")
-//			);
-//			$this->redirection("select_all",NULL,"affaire.html");
-//			return true;
-//		}else{
-//			return false;
-//		}
-//	}
 	
 	function num_avenant($ref){
 		$tab_ref=explode("AVT",$ref);
@@ -903,9 +820,7 @@ class affaire_cleodis extends affaire {
 			}
 			ATF::$html->assign("taux",$taux);
 			
-//			// Assurance
-//			ATF::$html->assign("assurance_fixe",$taux);
-//			ATF::$html->assign("assurance_portable",$taux);
+
 
 			// Calcul du loyer actualisé			
 			$vr = 0;
@@ -1329,6 +1244,13 @@ class affaire_cap extends affaire {
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire"; 
 		parent::__construct($table_or_id);
+
+		$this->colonnes['fields_column'] = array(
+			'affaire.ref'
+			,'affaire.date'
+			,'affaire.id_societe'			
+		);
+
 		$this->actions_by = array("insert"=>"audit","update"=>"audit");
 		$this->fieldstructure();
 		
@@ -1340,6 +1262,8 @@ class affaire_cap extends affaire {
 		
 		
 		$this->field_nom="ref";
+
+		$this->foreign_key['id_societe'] =  "societe";
 		
 		$this->no_delete = true;
 		$this->no_update = true;

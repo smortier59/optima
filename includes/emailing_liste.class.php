@@ -93,7 +93,7 @@ class emailing_liste extends emailing {
                                 "id_emailing_liste"=>$id_el
                                 ,"id_emailing_contact"=>$i_["id_emailing_contact"]
                             ));
-                        } catch (error $e) {
+                        } catch (errorATF $e) {
                             if ($e->getErrno()==1062) {
                                 $ctDoublon++;
                             }
@@ -111,7 +111,7 @@ class emailing_liste extends emailing {
                                 "id_emailing_liste"=>$id_el
                                 ,"id_emailing_contact"=>$i_["id_emailing_contact"]
                             ));
-                        } catch (error $e) {
+                        } catch (errorATF $e) {
                             if ($e->getErrno()==1062) {
                                 $ctDoublon++;
                             }
@@ -119,7 +119,7 @@ class emailing_liste extends emailing {
                     }
                 }
             }
-        } catch (error $e) {
+        } catch (errorATF $e) {
             ATF::db($this->db)->rollback_transaction(true);
             throw $e;
         }
@@ -172,7 +172,7 @@ class emailing_liste extends emailing {
                                 "id_emailing_liste"=>$id_el
                                 ,"id_emailing_contact"=>$i_["id_emailing_contact"]
                             ));
-                        } catch (error $e) {
+                        } catch (errorATF $e) {
                             if ($e->getErrno()==1062) {
                                 $ctDoublon++;
                             }
@@ -190,7 +190,7 @@ class emailing_liste extends emailing {
                                 "id_emailing_liste"=>$id_el
                                 ,"id_emailing_contact"=>$i_["id_emailing_contact"]
                             ));
-                        } catch (error $e) {
+                        } catch (errorATF $e) {
                             if ($e->getErrno()==1062) {
                                 $ctDoublon++;
                             }
@@ -198,7 +198,7 @@ class emailing_liste extends emailing {
                     }
                 }
             }
-        } catch (error $e) {
+        } catch (errorATF $e) {
             ATF::db($this->db)->rollback_transaction(true);
             throw $e;
         }
@@ -221,7 +221,7 @@ class emailing_liste extends emailing {
 		
 		//Si on la liste est fermée
 		if ($sel['etat']=='close') {
-			throw new error(ATF::$usr->trans("impossible_modifer_liste_close",$this->table),8822);
+			throw new errorATF(ATF::$usr->trans("impossible_modifer_liste_close",$this->table),8822);
 		}
 		return true;
 	}

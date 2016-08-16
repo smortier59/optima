@@ -18,7 +18,7 @@ if($_SERVER["REMOTE_ADDR"] == "109.190.125.45" || preg_match('/192\.168\.0\.[0-9
 		
 		ATF::$html->displayWithAnalyzer("rotator.tpl.htm"); 
 
-	}catch(error $e){
+	}catch(errorATF $e){
 		$e->setError();
 	}
 }

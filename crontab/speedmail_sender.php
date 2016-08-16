@@ -12,13 +12,13 @@ try {
     ATF::emailing_job()->majEtatSending();
     
     if ($_SERVER["argv"][2]=="toSent") {
-    	echo ATF::emailing_job()->$_SERVER["argv"][2](true);
+    	echo ATF::emailing_job()->{$_SERVER["argv"][2]}(true);
     } else {
     	ATF::emailing_job()->send($_SERVER["argv"][2]);
     }
      
     ATF::emailing_job()->majEtatSent();
-} catch (error $e) {
+} catch (errorATF $e) {
     if ($e->getErrno()==1142) {
         echo "\n/!\Le user n'a pas les droits pour faire les modifications/!\ \n";
     } else {

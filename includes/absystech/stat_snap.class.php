@@ -39,9 +39,9 @@ class stat_snap extends classes_optima {
 				$this->insert($infos);
 				return;
 			}
-			throw new error("La méthode '".$method."' n'existe pas dans le singleton '".$singleton."'");
+			throw new errorATF("La méthode '".$method."' n'existe pas dans le singleton '".$singleton."'");
 		}
-		throw new error("Le singleton '".$singleton."' n'existe pas");
+		throw new errorATF("Le singleton '".$singleton."' n'existe pas");
 	}
 	
 	/** Retourne la liste de tous les snapshots à faire

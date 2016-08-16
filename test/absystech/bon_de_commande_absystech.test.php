@@ -226,7 +226,7 @@ class bon_de_commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			
 			try{
 				$this->obj->insert($bon_de_commande,$this->s);
-			}catch(error $e){			
+			}catch(errorATF $e){			
 				$erreur = $e->getMessage();
 			}
 			$this->assertEquals("Quantité saisie 30 alors que la quantité max pour le produit ref : REF_Produit est de 15.00",$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -255,7 +255,7 @@ class bon_de_commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 															 );
 			try{
 				$this->obj->insert($bon_de_commande,$this->s);
-			}catch(error $e){			
+			}catch(errorATF $e){			
 				$erreur = $e->getMessage();
 			}
 			$this->assertEquals("Quantité saisie 20 + quantite déja commandée 10 = 30 alors que la quantité max pour le produit ref : REF_Produit est de 15.00",$erreur,"ERREUR NON ATTRAPPEE 2");
@@ -281,7 +281,7 @@ class bon_de_commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->insert($bon_de_commande,$this->s);
 			$this->requete_valide("bon_de_commande");
-		}catch(error $e){			
+		}catch(errorATF $e){			
 			$erreur = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -290,7 +290,7 @@ class bon_de_commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$this->obj->insert($bon_de_commande,$this->s);
 			$this->requete_valide("bon_de_commande");
-		}catch(error $e){			
+		}catch(errorATF $e){			
 			$erreur = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 2");
@@ -454,7 +454,7 @@ class bon_de_commande_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//id_bon_de_commande erroné
 		try {
 			$result = $this->obj->setCompleted(NULL,$this->s,NULL,$cadre_refreshed);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			//ATF::db()->rollback_transaction();
 			$erreur_capter = $e->getCode();
 		}

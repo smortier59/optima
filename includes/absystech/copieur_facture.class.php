@@ -160,21 +160,21 @@ class copieur_facture extends classes_optima {
 		$this->infoCollapse($infos);
 		
 		if(!$infos["id_societe"]){
-			throw new error("Vous devez spécifier la société (Entité)",167);
+			throw new errorATF("Vous devez spécifier la société (Entité)",167);
 		}else{
 			if(ATF::societe()->estFermee($infos["id_societe"])){
-				throw new error("Impossible d'ajouter une facture sur une entité fermée");
+				throw new errorATF("Impossible d'ajouter une facture sur une entité fermée");
 			}
 		}
 		
 		if(!isset($infos["releve_compteurC"]) || !isset($infos["releve_compteurNB"])){
-			throw new error("Vous devez saisir les relevés de compteur couleur ET noir & blanc.",167);
+			throw new errorATF("Vous devez saisir les relevés de compteur couleur ET noir & blanc.",167);
 		}
 		if(!$infos["id_affaire_cout_page"]){
 			$infos["id_affaire_cout_page"]=ATF::copieur_contrat()->select($id_copieur_contrat,"id_affaire_cout_page");
 		}
 		if(!$infos["id_affaire_cout_page"]){
-			throw new error("Vous devez spécifier une affaire coût/pages",167);
+			throw new errorATF("Vous devez spécifier une affaire coût/pages",167);
 		}
 		
 		/*Formatage des numériques*/
@@ -210,18 +210,18 @@ class copieur_facture extends classes_optima {
 			
 		if($infos["id_termes"] === NULL){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Vous devez spécifier les termes",167);
+			throw new errorATF("Vous devez spécifier les termes",167);
 		}
 		
 		
 		if ($precedentFacture = $this->getLastFacture($infos['id_affaire_cout_page'])) {
 			if ($precedentFacture['releve_compteurNB']>$infos['releve_compteurNB']) {
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Le relevé de compteur N&B de cette facture ne peut être inférieur au précedent (qui est ".$precedentFacture['releve_compteurNB']." - Facture ".$precedentFacture['ref'].")");
+				throw new errorATF("Le relevé de compteur N&B de cette facture ne peut être inférieur au précedent (qui est ".$precedentFacture['releve_compteurNB']." - Facture ".$precedentFacture['ref'].")");
 			}
 			if ($precedentFacture['releve_compteurC']>$infos['releve_compteurC']) {
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Le relevé de compteur couleur de cette facture ne peut être inférieur au précedent (qui est ".$precedentFacture['releve_compteurC']." - Facture ".$precedentFacture['ref'].")");
+				throw new errorATF("Le relevé de compteur couleur de cette facture ne peut être inférieur au précedent (qui est ".$precedentFacture['releve_compteurC']." - Facture ".$precedentFacture['ref'].")");
 			}
 
 
@@ -235,7 +235,7 @@ class copieur_facture extends classes_optima {
 			if ($riC = ATF::affaire_cout_page()->select($infos['id_affaire_cout_page'],"releve_initial_C")) {
 				if ($riC>$real_releve_compteurC) {
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Le relevé de compteur N&B de cette facture ne peut être inférieur au relevé initial de l'affaire (qui est ".$riC.")");
+					throw new errorATF("Le relevé de compteur N&B de cette facture ne peut être inférieur au relevé initial de l'affaire (qui est ".$riC.")");
 				}
 
 				$real_releve_compteurC -= $riC;
@@ -244,7 +244,7 @@ class copieur_facture extends classes_optima {
 			if ($riNB = ATF::affaire_cout_page()->select($infos['id_affaire_cout_page'],"releve_initial_NB")) {
 				if ($riNB>$real_releve_compteurNB) {
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Le relevé de compteur N&B de cette facture ne peut être inférieur au relevé initial de l'affaire (qui est ".$riNB.")");
+					throw new errorATF("Le relevé de compteur N&B de cette facture ne peut être inférieur au relevé initial de l'affaire (qui est ".$riNB.")");
 				}
 				$real_releve_compteurNB -= $riNB;
 			}
@@ -303,11 +303,11 @@ class copieur_facture extends classes_optima {
 					if($id_contact_facturation){
 						if(!$recipient=ATF::contact()->select($id_contact_facturation,"email")){
 							ATF::db($this->db)->rollback_transaction();
-							throw new error("Il n'y a pas d'email pour ce contact",166);
+							throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 						}
 					}else{
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Il n'y a pas d'email pour ce contact",166);
+						throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 					}
 				}else{
 					$recipient = $email["email"];
@@ -361,7 +361,7 @@ class copieur_facture extends classes_optima {
 			case "date_effective":	
 				
 				if(strtotime($cf['date']) > strtotime($infos['value'])){
-					throw new error("Une facture ne peut pas avoir une ".ATF::$usr->trans($infos['key'],$this->table)." antérieure à la date d'edition (ici ".date("d-m-Y",strtotime($cf['date'])).")",880);
+					throw new errorATF("Une facture ne peut pas avoir une ".ATF::$usr->trans($infos['key'],$this->table)." antérieure à la date d'edition (ici ".date("d-m-Y",strtotime($cf['date'])).")",880);
 				}
 
 				$toU = array("id_copieur_facture"=>$infos['id_copieur_facture'],"etat"=>"payee",$infos['key']=>$infos['value']);

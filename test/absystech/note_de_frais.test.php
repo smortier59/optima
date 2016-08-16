@@ -56,7 +56,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$r = $this->obj->insert($array);
 			$erreur=false;
-		}catch(error $e){
+		}catch(errorATF $e){
 			$erreur=true;
 		}
 		$this->assertTrue($erreur,"Ca devrait faire une erreur, il n'y a pas de lignes");
@@ -183,7 +183,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$r = $this->obj->update($u);
 			$erreur=false;
-		}catch(error $e){
+		}catch(errorATF $e){
 			$erreur=true;
 		}
 		$this->assertTrue($erreur,"Ca devrait faire une erreur, il n'y a pas de lignes");
@@ -235,7 +235,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$r = $this->obj->update($u);
 			$erreur=false;
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur=true;
 		}
 		$this->assertTrue($erreur,"Ca devrait faire une erreur, le zip n'a pas le bon chmod");
@@ -255,7 +255,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$r = $this->obj->update($u);
 			$erreur=false;
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur=true;
 		}
 		$this->assertTrue($erreur,"Ca devrait faire une erreur, le fichier n'a pas le bon chmod");
@@ -326,7 +326,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$error = NULL;
 			$ndfExtended->can_update(666);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();	
 		}
 		$this->assertEquals(8766,$error,"Erreur de depassement de date non attrapee");
@@ -341,7 +341,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$error = NULL;
 			$this->obj->can_update($id);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();	
 		}
 		$this->assertEquals(8764,$error,"Erreur de mauvais user non attrapee");
@@ -369,7 +369,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 		$error = false;
 		try {
 			$ndfExtended2->can_update($id);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = true;
 			$errorno = $e->getCode();	
 		}

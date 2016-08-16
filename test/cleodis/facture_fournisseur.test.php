@@ -167,7 +167,7 @@ class facture_fournisseur_test extends ATF_PHPUnit_Framework_TestCase {
 														
 		try {
 			$id_facture_fournisseur=classes::decryptId($this->obj->insert($facture_fournisseur,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error1 = $e->getCode();
 		}
 		$this->assertEquals(877,$error1,'Erreur facture fournisseur sans ligne non declenchee');
@@ -262,7 +262,7 @@ class facture_fournisseur_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->u(array("id_facture_fournisseur"=>$this->id_facture_fournisseur,"etat"=>"payee"));
 		try {
 			$this->obj->can_delete($this->id_facture_fournisseur);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error1 = $e->getCode();
 		}
 		$this->assertEquals(883,$error1,'Can_delete ne doit pas permettre la suppression d une facture payee');
@@ -278,7 +278,7 @@ class facture_fournisseur_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_update($this->id_facture_fournisseur);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error1 = $e->getCode();
 		}
 		$this->assertEquals(883,$error1,'Can_delete ne doit pas permettre la suppression d une facture payee');

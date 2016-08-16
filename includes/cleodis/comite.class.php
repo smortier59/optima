@@ -305,7 +305,7 @@ class comite extends classes_optima {
 		if($this->select($id,"etat")=="en_attente"){
 			return true;
 		}else{
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false; 
 		}
 	}

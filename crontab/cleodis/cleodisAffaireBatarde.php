@@ -28,7 +28,7 @@ foreach ($commande as $key=>$item) {
 	$infos['id_commande']=$item["id_commande"]; 
 	try{
 		ATF::commande()->updateDate($infos);
-	} catch(error $e) {
+	} catch(errorATF $e) {
 		ATF::commande()->u(array("id_commande"=>$item["id_commande"],"date_evolution"=>date("Y-m-d H:i:s",strtotime($item["date_evolution"]."- 1 day"))));
 	}
 	$com=ATF::commande()->select($item["id_commande"]);

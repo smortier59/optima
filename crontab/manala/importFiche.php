@@ -193,7 +193,7 @@ foreach (scandir($path) as $k=>$i) {
       echo "DONE !\n";
       $archive = dirname(__FILE__)."/fiches/ok/";
       util::rename($path."/".$i,$archive."/".$i);
-    } catch (error $e) {
+    } catch (errorATF $e) {
       echo "ERREUR !\n";
       $error = dirname(__FILE__)."/fiches/nok/";
       util::rename($path."/".$i,$error."/".$i);

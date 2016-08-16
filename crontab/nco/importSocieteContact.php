@@ -84,7 +84,7 @@ while ($ligne = fgetcsv($fic)) {
 	try {
 		$id_societe = ATF::societe()->i($toInsert);
 		echo "Societe : ".$toInsert['societe']." CREATE\n";
-	} catch (error $e) {
+	} catch (errorATF $e) {
 		echo "Societe : ".$toInsert['societe']." ERREUR\n";
 		$ct++;
     	//ATF::db()->rollback_transaction();
@@ -141,7 +141,7 @@ while ($ligne = fgetcsv($fic)) {
 	try {
 		ATF::contact()->i($toInsert);
 		echo "contact : ".$toInsert['contact']." CREATE\n";
-	} catch (error $e) {
+	} catch (errorATF $e) {
 		echo "contact : ".$toInsert['contact']." ERREUR\n";
 		$ct++;
 		$errorsC[] = "LIGNE dans le CSV n°".$ct." - Code erreur : ".$e->getErrno()." => ".$e->getMessage();

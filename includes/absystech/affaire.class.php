@@ -36,6 +36,7 @@ class affaire_absystech extends affaire {
 			,'affaire.date'
 			,'affaire.forecast'=>array("renderer"=>"progress","rowEditor"=>"forecastUpdate","width"=>100)
 			,'marge'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
+			,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
 			,'marge_commandee'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"money","type"=>"decimal","width"=>100)
 			,'pourcent'=>array("renderer"=>"percent","custom"=>true,"aggregate"=>array("avg","min","max"),"width"=>80)
 		);
@@ -97,13 +98,25 @@ class affaire_absystech extends affaire {
 	/**
 	 * Sert à trier la colonne marge et pourcentage
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
+		
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
+			->addJointure("affaire","id_affaire","hotline","id_affaire")
+			->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
+
 			->addGroup("affaire.id_affaire")
-			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
+			->addField("(SUM(facture.prix)
+							 -IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
+			->addField("(SUM(facture.prix)
+			 			-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
+						-IF(COUNT(`hotline`.`id_hotline`)=0, 
+							0,
+						    (SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
+						 	)","margenette")
 			->addField("IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, commande.prix-`commande`.`prix_achat`)","marge_commandee")
 			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee' , 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
 			->setView(array("align"=>array("marge"=>"right","pourcent"=>"center")));
@@ -424,7 +437,7 @@ class affaire_absystech extends affaire {
 		$affaire=parent::select_all();
 
 		if($affaire["id_facture"] || $affaire["id_commande"] || $affaire["id_devis"]){
-			throw new error("Il est impossible de supprimer cette affaire car il y a soit un devis soit une commande soit une facture",892);
+			throw new errorATF("Il est impossible de supprimer cette affaire car il y a soit un devis soit une commande soit une facture",892);
 		}else{
 			return true;
 		}
@@ -439,7 +452,7 @@ class affaire_absystech extends affaire {
 		if(($infos["id_societe"] || $infos["id_termes"] || $infos["code_commande_client"] || $infos["date_fin_maintenance"]) || $infos["contrat_maintenance"] && count($infos)==2){
 			return true;
 		}else{
-			throw new error("Il est impossible de modifier une affaire",892);
+			throw new errorATF("Il est impossible de modifier une affaire",892);
 		}
 	}
 
@@ -459,7 +472,7 @@ class affaire_absystech extends affaire {
 	*/
 	public function setForecast($infos){
 		if($infos["forecast"]>100||$infos["forecast"]<0){
-			throw new error(ATF::$usr->trans("invalid_range"),6512);
+			throw new errorATF(ATF::$usr->trans("invalid_range"),6512);
 		}
 		
 		$this->u(array("id_affaire"=>$infos["id_affaire"],"forecast"=>$infos["forecast"]));
@@ -476,7 +489,7 @@ class affaire_absystech extends affaire {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new error(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
 		}	
 		if($class=="devis"){
 			$prefix="D";
@@ -569,13 +582,60 @@ class affaire_absystech extends affaire {
 				);
 				$id_suivi = ATF::suivi()->insert($suivi);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;	
 		}
 		ATF::db($this->db)->commit_transaction();
 		return $id_suivi;
 	}
+
+
+	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	*/
+	public function widget_marge_nette(){		
+		$this->q->reset()
+				->setStrict()	
+				->addField("affaire.id_commercial")
+				->addField("affaire.id_affaire")			
+				->addCondition("affaire.date","'".date("Y-m-d 00:00:00", strtotime(date("Y-m-d")." -1 month"))."'",NULL,false,">=",false,false,true)
+				->addCondition("affaire.etat","facture");
+		$result= $this->select_all();
+
+		
+		foreach ($result as $i) {
+			$nom=ATF::user()->select($i["id_user"]);
+			$graph['categories']["category"][$i['user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
+		}
+		$graph['params']['showLegend'] = "0";
+		$graph['params']['bgAlpha'] = "0";
+		$graph['categories']['params']["fontSize"] = "12";
+		
+		
+		/*parametres graphe*/		
+		$this->paramGraphe($dataset_params,$graph);	
+
+		
+				
+		foreach ($result as $val_){			
+			if (!$graph['dataset'][$etat]) {
+				$graph['dataset'][$etat]["params"] = array_merge($dataset_params,array(
+					"seriesname"=>ATF::$usr->trans("etat_".$etat,'devis')
+					,"color"=>$couleur
+				));
+				
+				foreach ($result as $val_2) { 
+					$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : 0");
+				}
+			}
+			$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : ".$val_['nb_'.$etat]);				
+		}
+		return $graph;
+	}
+
+
+
 };
 
 class affaire_att extends affaire_absystech {
@@ -634,7 +694,7 @@ class affaire_att extends affaire_absystech {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new error(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
 		}	
 		if($class=="devis"){
 			$prefix="AD";

@@ -226,7 +226,7 @@ class mission extends classes_optima {
 		$personnel = ATF::mission_ligne()->sa();
 		if (!$personnel['count']) {
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Impossible de valider une mission sans personnel validé.");
+			throw new errorATF("Impossible de valider une mission sans personnel validé.");
 		}
 		// Envoi des mails au personnels valide
 		foreach ($personnel['data'] as $k=>$i) {	
@@ -324,7 +324,7 @@ class mission extends classes_optima {
 	public function can_update($id,$infos=false){
 		if($el=$this->select($id)){			
 			if($el["etat"]!="en_attente"){
-				throw new error("Il est impossible de modifier une mission qui n'est pas en attente ",892);
+				throw new errorATF("Il est impossible de modifier une mission qui n'est pas en attente ",892);
 			}else{
 				return true;
 			}

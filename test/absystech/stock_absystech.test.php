@@ -220,7 +220,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $erreur = false;
         try {
             $this->obj->getDataFromIcecat("iydufcjthf","toto",1);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
     }
@@ -271,7 +271,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         try {
             $d = array();
             $this->obj->ParserIcecat($d);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
         
@@ -385,7 +385,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $erreur = false;
         try {
             $this->obj->updateForMagento($params);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
 
@@ -472,14 +472,14 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         try {
             unset($this->_stock[0]["id_stock"]);
             $result = $this->obj->setReceived(array("id_stock"=>$this->_stock[0]["id_stock"]));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur_capter = $e->getCode();
         }
         $this->assertEquals(900,$erreur_capter,"ERREUR NON ATTRAPPEE (id_stock erroné)");
         // error: absence du serial
         try {
             $result = $this->obj->setReceived(array("id_stock"=>$this->_stock[1]["id_stock"]));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur_capter = $e->getCode();
         }
         $this->assertEquals(900,$erreur_capter,"ERREUR NON ATTRAPPEE (serial non insere)");
@@ -591,7 +591,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
          //erreur 1: la date_achat n'a pas le bon type 
          try {
             $result = $this->obj->insert($new_stock,$this->s,NULL);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             //debugage avec le message d'erreur
             $erreur_capter = $e->getMessage();
             ATF::db()->commit_transaction(true);
@@ -603,7 +603,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 2: etat du stock enixistant
          try {
             $result = $this->obj->insert($new_stock,$this->s,NULL);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             ATF::db()->commit_transaction(true);
             $erreur = $e->getcode();
         }
@@ -613,7 +613,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 3: date fin immo incorrecte
          try {
             $result = $this->obj->insert($new_stock,$this->s,NULL);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             ATF::db()->commit_transaction(true);
             $erreur = $e->getcode();
         }
@@ -623,7 +623,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //insertion final
          try {
             $result = $this->obj->insert($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             ATF::db()->commit_transaction(true);
             $erreur = $e->getcode();
         }
@@ -671,7 +671,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
          //erreur 1: quantité absente
          try {
             $result = $this->obj->insert($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(906,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -679,7 +679,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 2: serial vide
         try {
             $result = $this->obj->insert($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(906,$erreur,"ERREUR NON ATTRAPPEE 2");
@@ -687,14 +687,14 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 3: grouper
         try {
             $result = $this->obj->insert($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(906,$erreur,"ERREUR NON ATTRAPPEE 3");
         $new_stock["grouper"] = "oui";
         try {
             $result = $this->obj->insert($new_stock,$this->s,NULL,$cadre_refreshed);
-        }catch (error $e) {
+        }catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(908,$erreur,"ERREUR NON ATTRAPPEE 4");  
@@ -718,7 +718,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
          //erreur 1: quantité negatif 
          try {
             $result = $this->obj->insert_stock($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(907,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -726,7 +726,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         
         try {
             $result = $this->obj->insert_stock($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->requete_valide("stock");
@@ -749,7 +749,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
          //erreur 1: quantité absente
          try {
             $result = $this->obj->insert_stock($new_stock,$this->s);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(907,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -759,7 +759,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 2: serial renseigner
         try {
             $result = $this->obj->insert_stock($new_stock,$this->s);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(908,$erreur,"ERREUR NON ATTRAPPEE 2");
@@ -767,14 +767,14 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erruer 3: grouper
         try {
             $result = $this->obj->insert_stock($new_stock,$this->s);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(908,$erreur,"ERREUR NON ATTRAPPEE 3");
         $new_stock["grouper"] = "non";
         try {
             $result = $this->obj->insert_stock($new_stock,$this->s);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(906,$erreur,"ERREUR NON ATTRAPPEE 4"); 
@@ -798,7 +798,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
          //erreur 1: quantité absente
          try {
             $result = $this->obj->insert_stock($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(907,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -807,7 +807,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         
         try {
             $result = $this->obj->insert_stock($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(907,$erreur,"ERREUR NON ATTRAPPEE 2");
@@ -816,7 +816,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 1: serial
          try {
             $result = $this->obj->insert_stock($new_stock,$this->s,NULL,$cadre_refreshed);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(906,$erreur,"ERREUR NON ATTRAPPEE 3");
@@ -881,7 +881,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $inf = array("formulaire"=>true,"serial"=>"EZFGTRB1245T","id_stock"=>$stock_1["stock.id_stock"]);
         try{
             $stock_1_up = $this->obj->update($inf,$this->s,NULL,$cadre_refreshed);
-        }catch(error $e) {
+        }catch(errorATF $e) {
             ATF::db()->rollback_transaction();
             $erreur = $e->getCode();
         }
@@ -905,7 +905,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 //          $inf = array("serial"=>"EZFGTRB1245T","id_stock"=>$stock_1["stock.id_stock"]);
 //          $stock_1_up = $this->obj->update_from($inf,$this->s,NULL,$cadre_refreshed);
 //          $this->requete_valide("stock");
-//      } catch (error $e) {
+//      } catch (errorATF $e) {
 //          $erreur = $e->getCode();
 //      }
 //      $this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -1010,7 +1010,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         //erreur 1: quantite
         try {
             $result = $this->obj->insert_stock($new_stock,$this->s);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = $e->getCode();
         }
         $this->assertEquals(907,$erreur,"ERREUR NON ATTRAPPEE 1");
@@ -1129,7 +1129,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $erreur = false;
         try {
             $this->obj->updateForMagento($params);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
         $this->assertTrue($erreur,"Pas de remonté d'erreur 902");
@@ -1150,7 +1150,7 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $erreur = false;
         try {
             $this->obj->updateForMagento($params);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
         $this->assertTrue($erreur,"Pas de remonté d'erreur 904");

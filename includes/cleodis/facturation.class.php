@@ -32,6 +32,11 @@ class facturation extends classes_optima {
 		$this->files["global_factureCode"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_factureDate"] = array("type"=>"pdf","no_upload"=>true);
 
+		$this->files["global_facture_contrat_envoye"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_facture_contrat_envoyeSociete"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_facture_contrat_envoyeCode"] = array("type"=>"pdf","no_upload"=>true);
+		$this->files["global_facture_contrat_envoyeDate"] = array("type"=>"pdf","no_upload"=>true);
+		
 		$this->files["global_prolongation"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_prolongationSociete"] = array("type"=>"pdf","no_upload"=>true);
 		$this->files["global_prolongationCode"] = array("type"=>"pdf","no_upload"=>true);
@@ -215,7 +220,7 @@ class facturation extends classes_optima {
 	* @param string $date_periode_fin 
 	*/
 	function raiseErrorAvoirNonTrouve($id_affaire,$debut_contrat,$id_parente,$periode_debut,$periode_fin,$errno=878) {
-		throw new error("Impossible de commencer l'affaire ".ATF::affaire()->nom($id_affaire)." au ".$debut_contrat
+		throw new errorATF("Impossible de commencer l'affaire ".ATF::affaire()->nom($id_affaire)." au ".$debut_contrat
 			." car l'affaire parente ".ATF::affaire()->nom($id_parente)
 			." est facturée pour la période du ".$periode_debut." au ".$periode_fin
 			.". Il faut créer un avoir pour cette période.",$errno);
@@ -643,7 +648,7 @@ class facturation extends classes_optima {
 		}
 
 		if($this->sa()){
-			throw new error("Impossible de modifier les dates de cette commande car des factures ont déjà été envoyées sur la base de cet échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),878);
+			throw new errorATF("Impossible de modifier les dates de cette commande car des factures ont déjà été envoyées sur la base de cet échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),878);
 		}
 
 		//Aucune facturation ne doit avoir été facturée
@@ -652,7 +657,7 @@ class facturation extends classes_optima {
 			$this->q->Where("type",$type);
 		}
 		if($this->sa()){
-			throw new error("Impossible de modifier les dates de cette commande car des factures ont déjà été édités sur la base de l'échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),879);
+			throw new errorATF("Impossible de modifier les dates de cette commande car des factures ont déjà été édités sur la base de l'échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),879);
 		}
 
 		$this->q->reset()->Where("id_affaire",$id_affaire);
@@ -737,6 +742,7 @@ class facturation extends classes_optima {
 
 		$facture_contrat = array();
 		$facture_prolongation = array();
+		$facture_contrat_envoye = array();
 		$facturer = array();
 		$non_envoye = array();
 		
@@ -803,9 +809,14 @@ class facturation extends classes_optima {
 						if($item["type"]=="prolongation"){
 							$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
 						}else{
-							$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
+							//Enlever les factures envoyées par mail
+							if(!$contact["email"]){
+								$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
+							}else{
+								$facture_contrat_envoye=$this->formateTabfacturer($facture_contrat_envoye,$item,"facture_contrat_envoye",$id_facture);
+							}
 						}
-						if($contact && $item["type"] !=="prolongation"){							
+						if($contact && $item["type"] !=="prolongation"){
 							if($contact["email"]){
 								
 								$path=array("facture"=>"fichier_joint");
@@ -826,6 +837,7 @@ class facturation extends classes_optima {
 								$item["email"]=$contact["email"];
 								$item["envoye"]='non';
 								$facturer=$this->formateTabfacturer($facturer,$item,"client",false,$item["type"]);
+								
 								$tab=$this->incrementeFacture($tab,$item["type"],true);
 								$this->u(array("id_facturation"=>$item["id_facturation"],"envoye"=>"non"));
 								
@@ -852,31 +864,6 @@ class facturation extends classes_optima {
 			}
 		}
 
-		/************************************PROLONGATIONS QUI NE SONT PAS DANS LA TABLE PROLONGATION***********************************************************/
-
-//		$this->q->reset()->addField('id_affaire')
-//					     ->setStrict()
-//						 ->addCondition("`facturation`.`date_periode_debut`",$date_debut,"AND",false,"<=")
-//						 ->addCondition("`facturation`.`date_periode_fin`",date("Y-m-d",strtotime($date_fin."-1 day")),"AND",false,">=")
-//						 ->addCondition("`facturation`.`id_affaire`","`commande`.`id_affaire`","AND")
-//						 ->setToString();
-//		$subQuery = $this->sa();
-
-//		ATF::commande()->q->reset()
-//						  ->addField("commande.*")
-//						  ->setStrict()
-//						  ->addJointure("affaire","id_affaire","affaire","id_affaire",false,false,false,false,"INNER")
-//						  ->addCondition("`commande`.`date_evolution`",$date_fin,"AND",false,"<")
-//						  ->addCondition("`affaire`.`etat`","perdue","AND",false,"<>")
-//						  ->addCondition("`commande`.`etat`","arreter","AND",false,"<>")
-//						  ->addCondition("`commande`.`etat`","AR","AND",false,"<>")
-//						  ->addCondition("`commande`.`etat`","vente","AND",false,"<>")
-//						  ->setSubQuery($subQuery)
-//						  ->addOrder("`commande`.`id_affaire`")
-//						  ->setToString();
-//
-//
-//		$prolongation=ATF::commande()->sa();
 
 		$query="SELECT `commande`.* , LTRIM(`societe`.`societe`) as ltrimsociete, LTRIM(`societe`.`code_client`) as ltrimcode_client
 				FROM `commande`
@@ -904,7 +891,6 @@ class facturation extends classes_optima {
 				AND `societe`.`code_client`='TU'
 			";
 		}
-//$query.=" AND `societe`.`id_societe`=1499 ";
 		
 		$query.="
 			    AND `affaire`.`id_affaire` NOT
@@ -932,7 +918,7 @@ class facturation extends classes_optima {
 
 			try {
 				$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
-			} catch (error $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
+			} catch (errorATF $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
 				
 			if($id_facturation){				
 				$facturation=$this->select($id_facturation);
@@ -1010,7 +996,7 @@ class facturation extends classes_optima {
 		if($non_envoye){
 			log::logger("Envoi du mail à Cléodis des facturations non envoyées...",__CLASS__);	
 			$this->sendGrille($non_envoye,$tab["nfc"],$tab["nfp"],$date_debut,$date_fin,"grille_","grille_","Grille de facturation des factures non envoyées",$s);
-		}	
+		}		
 
 		//Envoi d'un pdf contenant toutes les factures contrat
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat...",__CLASS__);
@@ -1019,10 +1005,16 @@ class facturation extends classes_optima {
 		//Envoi d'un pdf contenant toutes les factures prolongation
 		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_prolongation,"global_","Factures prolongation",$s);
+				
+		//Envoi d'un pdf contenant toutes les factures contrat
+		log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
+		$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye,"global_","Factures contrat envoyées",$s);
 		
+
 		$return["facturer"]=$facturer;
 		$return["non_envoye"]=$non_envoye;
 		$return["facture_contrat"]=$facture_contrat;
+		$return["facture_contrat_envoye"]=$facture_contrat_envoye;		
 		$return["facture_prolongation"]=$facture_prolongation;
 		$return["date_debut"]=$date_debut;
 		$return["date_fin"]=$date_fin;
@@ -1192,7 +1184,7 @@ class facturation extends classes_optima {
 		
 					try {
 						$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
-					} catch (error $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
+					} catch (errorATF $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
 						
 					if($id_facturation){				
 						$facturation=$this->select($id_facturation);

@@ -107,8 +107,8 @@ class formation_facture_cleodis extends formation_facture {
 		$this->infoCollapse($infos);
 		
 		if($infos["type"] == "normale"){
-			if(!$infos["ref"]){ throw new error("Le champs réference est obligatoire pour une facture normale");}
-			if(!$infos["num_dossier"]){ throw new error("Le champs N° de dossier est obligatoire pour une facture normale");}
+			if(!$infos["ref"]){ throw new errorATF("Le champs réference est obligatoire pour une facture normale");}
+			if(!$infos["num_dossier"]){ throw new errorATF("Le champs N° de dossier est obligatoire pour une facture normale");}
 		}
 
 		unset($infos["id_formation_commande"]);

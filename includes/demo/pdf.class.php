@@ -398,7 +398,7 @@ class pdf_demo extends pdf_absystech {
 				} else {
 					try {
 						$testVIPA=ATF::vi_pa()->isAnswered($this->visite['id_visite'],$infos['id_attr'],$this->id_ppa,$infos['id_pa'],$infos['id_vi_pa_multi'],$this->dateReference);
-					} catch(error $e) {	}
+					} catch(errorATF $e) {	}
 					if (!$testVIPA) continue;
 					$var = $this->initPhotoVarByStyle($infos['style']['id_style']);
 					if ($var && $this->attrPhoto($infos,$var['x'],$var['y'],$var['w'],$var['h'],"jpg")) {
@@ -574,7 +574,7 @@ class pdf_demo extends pdf_absystech {
 				try{
 					$vi_pa=ATF::vi_pa()->isAnswered($this->visite['id_visite'],$infos['id_attr'],$this->id_ppa,$infos['id_pa'],$infos['id_vi_pa_multi'],$this->dateReference);
 					$this->verifyPageBreak($vi_pa['reponse'] ? $vi_pa['reponse'] : $vide,$this->widthReponse);
-				} catch(error $e) { }
+				} catch(errorATF $e) { }
 				$this->defineStyle(ATF::style()->select($this->StyleStandard),true);
 				$this->multicell(0,$this->height,$vi_pa['reponse'],$this->border,$this->align,$this->fill);
 			break;
@@ -735,7 +735,7 @@ class pdf_demo extends pdf_absystech {
 											$data[$k_][$k][] =$vi_pa['reponse'];
 											$style[$k_][$k][] = ATF::pa()->getStyle($vi_pa);
 										}
-									} catch(error $e) { 
+									} catch(errorATF $e) { 
 										$data[$k_][$k][] = "";
 										$style[$k_][$k][] = "";
 									}
@@ -748,7 +748,7 @@ class pdf_demo extends pdf_absystech {
 								foreach ($multi as $c=>$o) {
 									try{
 										$currentVIPA = ATF::vi_pa()->isAnswered($this->visite['id_visite'],$current['id_attr'],$current['id_pa'],$current['id_pa'],$o['id_vi_pa_multi'],$this->dateReference);
-									} catch(error $e) { }
+									} catch(errorATF $e) { }
 									// Première Case : Plus l'id Multi
 									//On récupère les réponses du multi qu'on exploitera plus bas
 									foreach ($enfants as $k=>$i) {
@@ -762,7 +762,7 @@ class pdf_demo extends pdf_absystech {
 												foreach ($enfantsENUM as $cle=>$obj) {
 													try {
 														$answerd = ATF::vi_pa()->isAnswered($this->visite['id_visite'],$obj['id_attr'],$obj['id_pa']?$obj['id_pa']:$i['id_pa'],$obj['id_pa'],$o['id_vi_pa_multi'],$this->dateReference);
-													} catch (error $e) { }
+													} catch (errorATF $e) { }
 													if ($answerd) {
 														if ($answerd['id_attr']==$obj['id_attr'] && $answerd['reponse']) {
 															$reponses = $answerd;
@@ -774,9 +774,9 @@ class pdf_demo extends pdf_absystech {
 											} else {
 												try {
 													$reponses = ATF::vi_pa()->isAnswered($this->visite['id_visite'],$i['id_attr'],$i['id_pa']?$i['id_pa']:$this->id_ppa,$i['id_pa'],$o['id_vi_pa_multi'],$this->dateReference);
-												} catch (error $e) { }
+												} catch (errorATF $e) { }
 											}
-										} catch(error $e) { 
+										} catch(errorATF $e) { 
 										}
 										//Init des entêtes
 										if (!$c) {
@@ -859,7 +859,7 @@ class pdf_demo extends pdf_absystech {
 											foreach ($enfantsENUM as $cle=>$obj) {
 												try {
 													$answerd = ATF::vi_pa()->isAnswered($this->visite['id_visite'],$obj['id_attr'],$obj['id_pa']?$obj['id_pa']:$this->id_ppa,$obj['id_pa'],$id_vi_pa_multi,$this->dateReference);
-												} catch (error $e) { }
+												} catch (errorATF $e) { }
 												if ($answerd) {
 													if ($answerd['id_attr']==$obj['id_attr'] && $answerd['reponse']) {
 														$vi_pa = $answerd;
@@ -871,10 +871,10 @@ class pdf_demo extends pdf_absystech {
 										} else {
 											try {
 												$vi_pa=ATF::vi_pa()->isAnswered($this->visite['id_visite'],$i['id_attr'],$currentIDPA,$i['id_pa'],$id_vi_pa_multi,$this->dateReference);
-											} catch (error $e) { }
+											} catch (errorATF $e) { }
 										}
 //										$style[$k_][$key][] = ATF::pa()->getStyle($vi_pa);
-									} catch(error $e) { 
+									} catch(errorATF $e) { 
 									}
 									if ($i['type'] == 'photo') {
 										$style[$k_][$key][] = "";
@@ -1028,12 +1028,12 @@ class pdf_demo extends pdf_absystech {
 				foreach ($childs as $k=>$i) {
 					try{
 						$vi_pa = ATF::vi_pa()->isAnswered($this->visite['id_visite'],$i['id_attr'],$i['id_pa']?$i['id_pa']:$this->id_ppa,$i['id_pa'],$infos['id_vi_pa_multi'],$this->dateReference);
-					} catch (error $e) { }
+					} catch (errorATF $e) { }
 					if ($vi_pa['reponse']) {
 						$Show = true;
 					}
 				}
-			} catch (error $e) { }
+			} catch (errorATF $e) { }
 			if (!$Show && !$this->forceShow) {
 				return false;
 			}
@@ -1091,7 +1091,7 @@ class pdf_demo extends pdf_absystech {
 				if (ATF::pa()->hasCout($infos['id_pa'])) {
 					$cout = " [".ATF::vi_pa()->getCost($vi_pa['id_vi_pa'],false,$this->dateReference)."EUR]";
 				}
-			} catch(error $e) { }
+			} catch(errorATF $e) { }
 		}
 		
 		if ($this->onlyAnswerd && !$this->forceShow && !$vi_pa['reponse']) {
@@ -1221,7 +1221,7 @@ class pdf_demo extends pdf_absystech {
 						$this->searchChild=true;
 					}
 				}
-			} catch(error $e) { }
+			} catch(errorATF $e) { }
 			$this->Checkbox($style,$this->height);
 		}
 		$this->ATFsetStyle($infos['style']);
@@ -1263,7 +1263,7 @@ class pdf_demo extends pdf_absystech {
 					$this->multicell($w,4,$infos['libelleATTR'],$this->border,"C");
 					$this->sety($ySaved+4);
 				}
-			} catch(error $e) { }
+			} catch(errorATF $e) { }
 		//Pour le projet
 		} elseif ($infos['attr'] || $infos['pa']) {
 			$this->cell($this->getStringWidth($infos['attr']),4,$infos['libelleATTR'],$this->border,1,"L");
@@ -1367,7 +1367,7 @@ class pdf_demo extends pdf_absystech {
 					$this->setxy($xSave,$ySave);
 					$this->multicell(30,5,$vi_pa['reponse'],0,'C');
 					$this->setxy($xSave+30,$ySave);
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					$this->cell(30,20,"-",1,0,'C');
 				}
 			} else {
@@ -1379,7 +1379,7 @@ class pdf_demo extends pdf_absystech {
 					$this->setxy($xSave,$ySave);
 					$this->multicell(30,5,$vi_pa['reponse'],0,'C');
 					$this->setxy($xSave+30,$ySave);
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					$this->cell(30,20,"-",1,0,'C');
 				}
 			}
@@ -1392,7 +1392,7 @@ class pdf_demo extends pdf_absystech {
 				$this->setxy($xSave,$ySave);
 				$this->multicell(0,5,$vi_pa['reponse'],0,'C');
 				$this->sety($yEnd);
-			} catch(error $e) {
+			} catch(errorATF $e) {
 				$this->cell(0,20,"-",1,1,'C');
 			}
 		}
@@ -1558,7 +1558,7 @@ class pdf_demo extends pdf_absystech {
 //								echo $visite['id_visite'].",".$i['id_attr'].",".$o['id_pa'].",".$i['id_pa'].",".$o['id_vi_pa_multi'].",".$this->dateReference."\n";
 								try {
 									$vi_pa=ATF::vi_pa()->isAnswered($visite['id_visite'],$i['id_attr'],$o['id_pa'],$i['id_pa'],$o['id_vi_pa_multi'],$this->dateReference);
-								} catch (error $e) { }
+								} catch (errorATF $e) { }
 								if ($vi_pa) {
 									$this->cell($w[$k],$c_height,"",1,$ln);
 									$y = $this->gety();
@@ -1650,7 +1650,7 @@ class pdf_demo extends pdf_absystech {
 										$tC = array_pop($tempCost);
 										$vi_pa['reponse'] .= " ".$tC['cout_catalogue']['unite'];
 									}
-								} catch (error $e) { }
+								} catch (errorATF $e) { }
 								
 								$xSaved = $this->getx();
 								$ySaved = $this->gety();
@@ -1673,7 +1673,7 @@ class pdf_demo extends pdf_absystech {
 							case 3911:
 								try {
 									$vi_pa=ATF::vi_pa()->isAnswered($visite['id_visite'],$i['id_attr'],$o['id_pa'],$i['id_pa'],$o['id_vi_pa_multi'],$this->dateReference);
-								} catch (error $e) { }
+								} catch (errorATF $e) { }
 								
 								$xSaved = $this->getx();
 								$ySaved = $this->gety();
@@ -1767,7 +1767,7 @@ class pdf_demo extends pdf_absystech {
 				}
 				try{
 					$currentVIPA = ATF::vi_pa()->isAnswered($id_visite,$current['id_attr'],$current['id_pa'],$current['id_pa'],$o['id_vi_pa_multi'],$this->dateReference);
-				} catch(error $e) { }
+				} catch(errorATF $e) { }
 				foreach ($enfants as $k=>$i) {
 					unset($vi_pa);
 					//Init des entêtes
@@ -1825,7 +1825,7 @@ class pdf_demo extends pdf_absystech {
 							}
 							
 						}
-					} catch(error $e) { 
+					} catch(errorATF $e) { 
 					}
 					if ($i['type'] == 'photo' && $vi_pa['reponse']) {
 						$Answerd[$c] = true;
@@ -2053,14 +2053,14 @@ class pdf_demo extends pdf_absystech {
 			if ($i['type']=="enum") {
 				try {
 					$vi_pa = ATF::vi_pa()->getEnumReponse($i,$this->visite['id_visite'],$this->dateReference);
-				} catch (error $e) { }
+				} catch (errorATF $e) { }
 //				if ($infos['id_pa']==20798) {
 //					echo "==>ENUM DANS LA PLACE<==\n<br>";
 //				}
 			} else {
 				try {
 					$vi_pa=ATF::vi_pa()->isAnswered($this->visite['id_visite'],$i['id_attr'],$i['id_pa']?$i['id_pa']:$infos['id_pa'],$i['id_pa'],$infos['id_vi_pa_multi'],$this->dateReference);
-				} catch (error $e) { }
+				} catch (errorATF $e) { }
 //				if ($infos['id_pa']==20798) {
 //					echo "==>".$this->visite['id_visite'].",".$i['id_attr'].",".($i['id_pa']?$i['id_pa']:$infos['id_pa']).",".$i['id_pa'].",".$infos['id_vi_pa_multi'].",".$this->dateReference."<==\n<br>";
 //				}

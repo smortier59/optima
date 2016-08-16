@@ -21,7 +21,7 @@ try{
 		}
 //log::logger("END","jgwiazdowski");
 	}
-}catch(error $e){
+}catch(errorATF $e){
 	$e->setError();
 }
 ?>

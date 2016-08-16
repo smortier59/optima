@@ -1,0 +1,40 @@
+{$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire}
+{if ATF::$codename=="midas"}
+	<td class="field select">{ATF::$usr->trans(date_installation_reel,affaire)} :</td>
+    <td class="value">{ATF::affaire()->select($id_affaire,"date_installation_reel")}</td>    
+{else}
+    <td colspan="2">
+        <div id="specificDateAffaire"></div>
+        <script type="application/javascript">
+        Ext.onReady(function(){
+            new Ext.FormPanel({
+                renderTo: 'specificDateAffaire',
+                bodyStyle:'background-color:transparent;',
+                frame:false,
+                border:false,
+                defaults: {
+                    xtype: 'datefield',
+                    format: 'd-m-Y',
+                    width:120
+                },
+                items: [
+                    {$dates =[date_diag,date_installation_prevu,date_installation_reel,date_garantie,date_livraison_prevu]}  
+                    
+                    {foreach from=$dates item=d}
+                        {if !$d@first},{/if}
+                        {
+                            fieldLabel: '{ATF::$usr->trans($d,affaire)}',
+                            value:'{ATF::affaire()->select($id_affaire,$d)|escape:javascript}',
+                            listeners :{
+                                select:function(f){
+                                    ATF.ajax("affaire,updateDate.ajax","id_affaire={$id_affaire}&field={$d}&value="+(f.value?f.value:''));
+                                }
+                            }
+                        }
+                    {/foreach}  
+                ]
+            });	
+        });
+        </script>
+    </td>    	
+{/if}

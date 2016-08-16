@@ -204,7 +204,7 @@ class commande_ligne_absystech extends commande_ligne {
 	
 	/** @author Morgan FLEURQUIN	<mfleurquin@absystech.fr> */
 	public function can_update(){
-		throw new error("Pour modifier une ligne de commande, il faut modifier dans la commande !!!");					
+		throw new errorATF("Pour modifier une ligne de commande, il faut modifier dans la commande !!!");					
 		return false;
 	}
 	
@@ -212,7 +212,7 @@ class commande_ligne_absystech extends commande_ligne {
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
 	public function can_insert(){
-		throw new error("Pour inserer une ligne de commande, il faut modifier dans la commande !!!");
+		throw new errorATF("Pour inserer une ligne de commande, il faut modifier dans la commande !!!");
 		return false;	
 	}
 	
@@ -220,7 +220,7 @@ class commande_ligne_absystech extends commande_ligne {
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
 	/*public function can_delete(){
-		throw new error("Pour supprimer une ligne de commande, il faut modifier dans la commande !!!");
+		throw new errorATF("Pour supprimer une ligne de commande, il faut modifier dans la commande !!!");
 		return false;	
 	}*/
 	

@@ -61,7 +61,7 @@
 		$mail->addFile($target,"cv.zip",true);						
 		$mail->send();					
 		header('Location: http://www.absystech.fr/candidature-valide');
-	}catch(error $e){
+	}catch(errorATF $e){
 		$mail = new mail(array( "recipient"=>"jobs@absystech.fr", 
 							"objet"=>"Un probleme sur une candidature : ".$e->getMessage(),
 							"template"=>"candidat",

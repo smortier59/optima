@@ -90,7 +90,7 @@ class note_de_frais extends classes_optima {
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		$lignes = json_decode($infos["values_".$this->table]["depenses"],true);
 		if(!$lignes){
-			throw new error(ATF::$usr->trans("aucunes_lignes_saisies"));
+			throw new errorATF(ATF::$usr->trans("aucunes_lignes_saisies"));
 		}
 		$this->infoCollapse($infos);
 		
@@ -133,7 +133,7 @@ class note_de_frais extends classes_optima {
 		$lignes = json_decode($infos["values_".$this->table]["depenses"],true);
 
 		if(!$lignes){
-			throw new error(ATF::$usr->trans("aucunes_lignes_saisies"));
+			throw new errorATF(ATF::$usr->trans("aucunes_lignes_saisies"));
 		}
 		$this->infoCollapse($infos);
 
@@ -165,7 +165,7 @@ class note_de_frais extends classes_optima {
 	
 				if ($zip->open($zipFileName) !== TRUE) {
 					ATF::db()->rollback_transaction();
-					throw new error("Problème avec l'ouverture du zip : ".$res,501);
+					throw new errorATF("Problème avec l'ouverture du zip : ".$res,501);
 				}
 	
 				foreach ($fileToZip as $k_=>$i_) {
@@ -174,7 +174,7 @@ class note_de_frais extends classes_optima {
 	
 				if (!$zip->close()) {
 					ATF::db()->rollback_transaction();
-					throw new error("Problème avec la fermeture du zip.",502);
+					throw new errorATF("Problème avec la fermeture du zip.",502);
 				}
 				foreach ($fileToZip as $k_=>$i_) {
 					util::rm($i_);
@@ -295,15 +295,15 @@ class note_de_frais extends classes_optima {
 			
 		//Si on a depassé le 20 du mois, impossible de modifier
 		if ($nf['etat']!="en_cours") {
-			throw new error(ATF::$usr->trans("impossible_modifer_note_de_frais_qui_nest_pas_en_cours",$this->table),8766);
+			throw new errorATF(ATF::$usr->trans("impossible_modifer_note_de_frais_qui_nest_pas_en_cours",$this->table),8766);
 		} elseif ($this->checkDateLimite(time(),$nf)) {
-			throw new error(ATF::$usr->trans("impossible_modifer_note_de_frais_apres_le_20_du_mois",$this->table),8764);
+			throw new errorATF(ATF::$usr->trans("impossible_modifer_note_de_frais_apres_le_20_du_mois",$this->table),8764);
 		//Si on est le supérieur hiérarchique, on peut
 		} elseif (ATF::user()->select($nf['id_user'],'id_superieur')==ATF::$usr->getID()) {
 			return true;
 		//Si on est pas le propriétaire de la note de frais, on peut pas
 		} elseif ($nf['id_user']!=ATF::$usr->getID()) {
-			throw new error(ATF::$usr->trans("impossible_modifer_note_de_frais_dun_autre_user",$this->table),8765);
+			throw new errorATF(ATF::$usr->trans("impossible_modifer_note_de_frais_dun_autre_user",$this->table),8765);
 		}
 		return true;
 	}
@@ -368,7 +368,7 @@ class note_de_frais extends classes_optima {
 			if ($i['etat']=="en_cours") {
 				$i['etat'] = "ok";
 				ATF::note_de_frais_ligne()->update($i);
-//				throw new error("Toutes les lignes ne sont pas validées.");	
+//				throw new errorATF("Toutes les lignes ne sont pas validées.");	
 			}
 		}
 		
@@ -394,7 +394,7 @@ class note_de_frais extends classes_optima {
 			if ($i['etat']=="en_cours") {
 				$i['etat'] = "nok";
 				ATF::note_de_frais_ligne()->update($i);
-//				throw new error("Toutes les lignes ne sont pas validées.");	
+//				throw new errorATF("Toutes les lignes ne sont pas validées.");	
 			}
 		}
 		

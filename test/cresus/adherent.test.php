@@ -91,7 +91,7 @@ class adherent_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try{
 			$this->obj->insert($adherent);		
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Le champs Prénom n'est pas renseigné !",$error,"Insert adherent sans prenom ne doit pas se faire !!");
@@ -172,7 +172,7 @@ class adherent_test extends ATF_PHPUnit_Framework_TestCase {
 				
 		try {
 			$this->obj->insert($adherent);	
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Les enfants doivent avoir un prénom et une date de naissance !",$error,"Insert avec enfant sans nom ne doit pas se faire !!");

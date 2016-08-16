@@ -82,7 +82,7 @@ class formation_devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->insert(array("preview" => true, "formation_devis" => $infos, "values_formation_devis" => $dates));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Il faut au moins 1 participant à la formation" , $error , "Message d'erreur incorrect !");
@@ -139,7 +139,7 @@ class formation_devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->u(array("id_formation_devis" => $id_devis_formation, "etat" => "gagne"));
 		try {
 			$this->obj->perdu(array("id_formation_devis"=> $id_devis_formation));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Impossible de passer un devis gagné en 'perdu'" , $error , "Message d'erreur incorrect !");
@@ -229,7 +229,7 @@ class formation_devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos["contact"] = NULL;
 		try {
 			$this->obj->update(array("preview" => true, "formation_devis" => $infos));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Il faut au moins 1 participant à la formation" , $error , "Message d'erreur incorrect !");
@@ -239,7 +239,7 @@ class formation_devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->u(array("id_formation_devis"=> $id_devis_formation, "etat"=>"perdu"));
 		try {
 			$this->obj->update(array("preview" => true, "formation_devis" => $infos , "values_formation_devis" => $dates));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Impossible de modifier un devis qui n'est plus en attente !" , $error , "Message d'erreur 2 incorrect !");
@@ -293,7 +293,7 @@ class formation_devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_update($id_devis_formation);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Impossible de modifier/supprimer ce Devis formation car il n'est plus en 'En attente'" , $error , "Message d'erreur 2 incorrect !");

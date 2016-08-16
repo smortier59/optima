@@ -70,7 +70,7 @@ class stock_etat_absystech extends stock_etat {
 			 ->setLimit(1);
 		$dateLastEtat = $this->select_cell();
 		if ($infos["date"] && $dateLastEtat && strtotime($infos["date"]) < strtotime($dateLastEtat)) {
-			throw new error("Impossible d'ajouter un état de stock antérieur au dernier état connu !",20973);
+			throw new errorATF("Impossible d'ajouter un état de stock antérieur au dernier état connu !",20973);
 		}
 		if ($infos["desassocier"]=="oui") {
 			$desassocier = true;
@@ -109,7 +109,7 @@ class stock_etat_absystech extends stock_etat {
 			 ->setLimit(1);
 		$dateLastEtat = $this->select_cell();
 		if ($infos["date"] && $dateLastEtat && strtotime($infos["date"]) < strtotime($dateLastEtat)) {
-			throw new error("Impossible de modifier un état de stock antérieur au dernier état connu !",20974);
+			throw new errorATF("Impossible de modifier un état de stock antérieur au dernier état connu !",20974);
 		}
 		return parent::update($infos,$s,$files,$cadre_refreshed);	
 	}

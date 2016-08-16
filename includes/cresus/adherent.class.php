@@ -195,7 +195,7 @@ class adherent extends classes_optima {
 			unset($infos["age"]);
 			foreach ($infosObli as $key => $value) {
 				if(!$infos[$value]){
-					throw new error("Le champs ".ATF::$usr->trans($value)." n'est pas renseigné !");
+					throw new errorATF("Le champs ".ATF::$usr->trans($value)." n'est pas renseigné !");
 				}
 			}
 			// ************************* FIN TESTS ****************************************			
@@ -260,7 +260,7 @@ class adherent extends classes_optima {
 					ATF::adherent_enfant()->insert($item , $s);	
 				}elseif(!$item["prenom"] || !$item["date_naissance"] ){
 					ATF::db($this->db)->rollback_transaction();	
-					throw new error("Les enfants doivent avoir un prénom et une date de naissance !");
+					throw new errorATF("Les enfants doivent avoir un prénom et une date de naissance !");
 				}				
 			}
 			//************************  FIN  *********************************************			

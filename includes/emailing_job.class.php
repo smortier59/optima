@@ -143,7 +143,7 @@ class emailing_job extends emailing {
 		$now=strtotime(date("Y-m-d H:i:s",time()));
 
 		if(($date+3600)<$now) {
-			throw new error(ATF::$usr->trans('dateInvalide',$this->table));
+			throw new errorATF(ATF::$usr->trans('dateInvalide',$this->table));
 			return false;
 		}
 
@@ -324,7 +324,7 @@ class emailing_job extends emailing {
 					//Envoi du mail
 					try {
 						$r = $m->send(NULL,false,$forceEmail);
-					} catch (error $e) {
+					} catch (errorATF $e) {
 						ATF::emailing_job_email()->update(array(
 							"id_emailing_job_email"=>$id_ej
 							,"retour"=>"oui"

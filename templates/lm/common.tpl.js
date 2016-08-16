@@ -1,28 +1,190 @@
-ATF.selectType_client = function(el,val,lastVal) {
-	var val = val.json[0];
-
-	if(val == "client"){
-		Ext.getCmp("panel_infos_soc").collapse();
-		Ext.getCmp("panel_infos_soc").hide();
-
-		Ext.getCmp("panel_client").show();
-		Ext.getCmp("panel_client").expand();	
+ATF.changeType_suivi = function(el,val,lastVal) {
+	if(Ext.getCmp('combosuivi[type_suivi]').value == "Formation"){
+		Ext.ComponentMgr.get('panel_formation').show();
 	}else{
-		Ext.getCmp("panel_client").collapse();
-		Ext.getCmp("panel_client").hide();
-
-		Ext.getCmp("panel_infos_soc").show();
-		Ext.getCmp("panel_infos_soc").expand();	
-	}	
+		Ext.ComponentMgr.get('panel_formation').hide();
+	}
 }
 
 
-ATF.loadClient = function(){
-	/*
-    Ext.getCmp("panel_infos_soc").collapse();
-	Ext.getCmp("panel_infos_soc").hide();
-	Ext.getCmp("panel_client").show();
-	Ext.getCmp("panel_client").expand();
-	*/
-
-}
+ATF.renderer.scanner = function(table , field){
+	return function(filetype, meta, record, rowIndex, colIndex, store) {
+		if(record.data[table+'__dot__id_'+table]){
+			var id = record.data[table+'__dot__id_'+table];
+		}else if(record.data['id_'+table]){
+			var id = record.data['id_'+table];
+		}else{
+			var id = null;
+		}
+		if(id){			
+			if(table == "pdf_affaire"){
+					 /*"'+table+'-select-'+field+'-'+id+'.dl"*/
+					 if(record.json.url != null){
+					 	return '<a href="'+record.json.urlBig+'_0-2480-3500.png" target="_blank" >'+
+								'<img  src="'+record.json.url+'_0-200-500.png" />'+
+							'</a>';
+						}else{
+							return "";
+						}
+					 
+			}else{
+				if (filetype) {
+						return '<a href="'+table+'-select-'+field+'-'+id+'.dl" alt="'+ATF.usr.trans("popup_download",table)+'">'+
+									'<img class="smallIcon '+filetype+'" src="'+ATF.blank_png+'" class="icone" />'+
+								'</a>';	
+				} else {					
+					var idDiv = Ext.id();
+									
+					var btnTransfert = {
+						xtype:'button',
+						id:"transfert-"+field+"-"+id,
+						buttonText: '',
+						buttonOnly: true,
+						iconCls: 'btnScanner',
+						cls:'center',
+						tooltip: '{ATF::$usr->trans("Fichier de scanner")}',
+						tooltipType:'title',
+						listeners: {
+							'click': function(fb, v){											
+									ATF.ajax('scanner,getNoTransfered.ajax'
+											,null
+											,{ onComplete: function (result) { 
+												var retour = result.result;										
+												var donnee = [];
+																						
+												for (var i = 0; i < retour.length; i++) {											
+													text = retour[i].provenance+" ("+retour[i].nbpages+ "pages) "+retour[i].date;
+													donnee[i] = [
+														 retour[i].id_scanner,
+														 table,
+														 id,
+														 text
+													];										
+												} 
+																						
+												var transfert = new Ext.data.ArrayStore({
+													fields: ["id_scanner","tableto" , "id_to", "text"],
+													data: donnee					
+												});
+												
+												
+												var id_scanner = new Ext.form.Hidden({
+												    name: 'id_scanner'
+												});
+												
+												var module = new Ext.form.Hidden({
+												    name: 'module'
+												});
+												
+												var champs = new Ext.form.Hidden({
+												    name: 'champs'
+												});
+												
+												var form = new Ext.FormPanel({
+													frame:true,
+													autoHeight:true,
+													id:'myForm'+id,
+													name:'myFormName'+id,
+													title: '',
+													bodyStyle:'padding:5px 5px 0',
+													items: [
+														 {
+														 	 xtype: "combo"
+														 	,fieldLabel: "Type de document"
+														 	,name:"transfert"
+														 	,store: transfert
+														 	,displayField: "text"
+														 	,mode: "local"
+														 	,listeners: {
+														        select: function(combo, record) {									        	
+														            id_scanner.setValue(record.data['id_scanner']);
+														            module.setValue(record.data['tableto']);
+														            champs.setValue(field);													            
+														        }
+														    }
+														 }
+														,{
+															 xtype: 'textfield'
+															,name: 'id_to' 
+															,id: 'id_to'
+															,value: id
+															,hidden:true
+														},	
+															id_scanner,
+															module,
+															champs								
+													],
+													buttons: [{
+														 text: 'Ok'
+														,handler: function(a,b,c,d){
+															Ext.getCmp('myForm'+id).getForm().submit({
+																submitEmptyText:false,
+																method  : 'post',
+																waitMsg : '{ATF::$usr->trans(loading_new_page)|escape:javascript}',
+																waitTitle :'{ATF::$usr->trans(loading)|escape:javascript}',
+																url     : 'extjs.ajax',
+																params: {
+																	 'extAction':'scanner'
+																	,'extMethod':'transfertTo'												
+																}
+																,success:function(form, action) {
+																	ATF.ajax_refresh(action.result,true);
+																	Ext.getCmp('myForm'+id).destroy();
+																	Ext.getCmp('mywindow'+id).destroy();
+																	store.reload();
+																}
+																,timeout:3600
+															});								
+														}
+													},
+													{
+														text: 'Annuler',
+														handler: function(){
+															Ext.getCmp('myForm'+id).destroy();
+															Ext.getCmp('mywindow'+id).destroy();
+														}
+													}]
+												});
+												
+												if (!Ext.getCmp('mywindow'+id)) {
+													var height = 500;
+													var width = 500;
+													new Ext.Window({
+														title: '{ATF::$usr->trans("Faire un transfert vers : ")}',
+														id:'mywindow'+id,
+														plain:true,
+														bodyStyle:'padding:5px;',
+														buttonAlign:'center'
+													});								
+													if (form) {
+														Ext.getCmp('mywindow'+id).add(form);
+														height += 400;
+														width = 800;
+													}													
+												}
+												Ext.getCmp('mywindow'+id).setHeight(height);		
+												Ext.getCmp('mywindow'+id).setWidth(width);		
+												Ext.getCmp('mywindow'+id).show();	
+																						
+											}}
+									);
+							 }
+						}
+					};
+					
+					(function(){
+						var params = {
+							renderTo: idDiv,
+							items:[btnTransfert]
+							
+						};
+						var p = new Ext.Container(params);
+					}).defer(25);
+			
+					
+					return '<div id="'+idDiv+'"></div>';
+				}
+			}
+		}
+	}
+};

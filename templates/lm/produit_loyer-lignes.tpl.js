@@ -152,6 +152,11 @@ ATF.buildGridEditor({
 				width:20,
 				dataIndex: '{$current_class->table}__dot__nature',
 				editor: {include file="generic-gridpanel-combo.tpl.js" key=nature function=null}
+			},{
+				header: 'Periodicite',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__periodicite',
+				editor: {include file="generic-gridpanel-combo.tpl.js" key=periodicite function=null}
 			}
 		]
 	}),

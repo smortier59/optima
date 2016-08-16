@@ -95,11 +95,11 @@ class facture_manala extends facture {
 		$this->infoCollapse($infos);
 		unset($infos['id_mission']);
 		if(!$infos["id_societe"]){
-			throw new error("Vous devez spécifier la société (Entité)",167);
+			throw new errorATF("Vous devez spécifier la société (Entité)",167);
 		}
 		
 		if(!$missions || empty($missions)){
-			throw new error("Vous devez spécifier au moins une mission",168);
+			throw new errorATF("Vous devez spécifier au moins une mission",168);
 		}
 
 		$infos["prix_unitaire"]=util::stringToNumber($infos["prix_unitaire"]);
@@ -292,7 +292,7 @@ class facture_manala extends facture {
 			return true;
 		}
 		else{
-			throw new error("Il est impossible de supprimer cette facture car elle est payée",892);
+			throw new errorATF("Il est impossible de supprimer cette facture car elle est payée",892);
 		}
 	}
 	
@@ -347,7 +347,7 @@ class facture_manala extends facture {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new error(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
 		}	
 
 		$prefix=strtoupper(date("y",strtotime($date)));

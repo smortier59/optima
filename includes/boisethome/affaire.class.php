@@ -24,7 +24,7 @@ class affaire_boisethome extends affaire {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new error(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
 		}
 		if($class=="devis"){
 			$prefix="D";
