@@ -177,7 +177,7 @@ class hotline_interaction extends classes_optima {
 		/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
 			$data = array(
-				 "duree_presta"=>"00:00"
+				 "duree_presta"=>$infos["duree_presta"]?$infos["duree_presta"]:"00:00"
 				,"heure_debut_presta"=>date("h:i")
 				,"heure_fin_presta"=>date("h:i")
 				,"detail"=>$infos["detail"]
@@ -1972,5 +1972,33 @@ class hotline_interaction extends classes_optima {
         return false;
 	}	
 
+
+	public function _indicateurs($get, $post){
+	
+		$workedDay = (ATF::hotline()->getJoursOuvres(date("Y-m-01"), date("Y-m-d")))*ATF::user()->select(ATF::$usr->getID(), "temps_partiel");
+		
+		
+		//Compte le nombre d'heures passees sur un mois
+		$mois = ATF::pointage()->totalHeure(date("Y-m"),ATF::$usr->getID());
+		$today = ATF::pointage()->totalHeure(date("Y-m-d"),ATF::$usr->getID());
+		
+		$todayText = $today;
+		$moisTxt = $mois;
+
+		if($today == NULL){ $today = 0; $todayText="0h";
+		}else{ 
+			$d = explode("h", $mois);
+			$today = number_format(intval($d[0])+(60/intval($d[1]))-1,0);  
+		}
+		
+		if($mois == NULL){ $mois = 0; $moisTxt="0h";
+		}else{
+			$m = explode("h", $mois);
+			$mois = number_format(intval($m[0])+(60/intval($m[1]))-1,0); 			
+		}
+
+		return array("today"=>$today , "mois"=>$mois, "todayText"=>$todayText, "moisTxt"=>$moisTxt,"totalMois"=>$workedDay);
+
+	}
 
 }
