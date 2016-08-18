@@ -2741,6 +2741,8 @@ class pdf_cleodis extends pdf {
 		$this->addpage();
 		$this->setfont('arial','B',18);
 		$this->multicell(0,5,"ANNEXES DE DESCRIPTION DES EQUIPEMENTS",0,'C');
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
 		$this->ln(5);
 		foreach ($tableau as $k=>$i) {
 			$this->setFillColor(239,239,239);
