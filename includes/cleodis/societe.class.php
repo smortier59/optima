@@ -137,8 +137,10 @@ class societe_cleodis extends societe {
 
 		}
 
-
 		$this->fieldstructure();
+
+		$this->files["societe_document"] =array("multiUpload"=>true);
+
 		
 		unset($this->colonnes['panel']['facturation_fs']["solde_et_relance"]);
 		$this->checkAndRemoveBadFields('caracteristiques');

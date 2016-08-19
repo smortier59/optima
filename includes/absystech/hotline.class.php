@@ -3669,6 +3669,16 @@ class hotline extends classes_optima {
         				self::$post['specialAction']($post);
         				$return['result'] = true;
         			break;
+        			case "takeRequest":
+        			case "cancelRequest":
+        			case "resolveRequest":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+        				self::$post['specialAction']($post);
+        				$return['result'] = true;
+        				$lastInteractionRequired = true;
+        				if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
+
+        			break;
         			case "setWait":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				if ($post['etat']=="wait") {
@@ -3718,7 +3728,7 @@ class hotline extends classes_optima {
         	// last itneraction
         	if ($lastInteractionRequired) {
         		$p = array("limit"=>1,"tri"=>"id_hotline_interaction","trid"=>"desc","id_hotline"=>$post['id_hotline']);
-				$return['interaction'] = ATF::hotline_interaction()->_GET($p);
+				$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
         	}
 
         	// Récupération des notices créés
@@ -3793,7 +3803,7 @@ class hotline extends classes_optima {
 				$this->q->where("hotline.etat","free");
 			} else {
 				// Filtre ticket actif
-				if ($get['filters']['active'] == "on") {
+				if ($get['filters']['fixing'] == "on") {
 					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
 				}
 				// Filtre MES tickets
@@ -3854,7 +3864,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
 		$this->q->setToString();
-		header("ts-SQL-debug: ".$this->select_all($get['tri'],$get['trid'],$get['page'],true));
+
 		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
