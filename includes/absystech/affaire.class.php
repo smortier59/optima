@@ -704,7 +704,11 @@ class affaire_absystech extends affaire {
 		}
 
 		foreach ($affaires['data'] as $k=>$line) {
-			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year']);
+			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture.".$field.",'%Y')",$get['year']);
+			// ATF::facture()->q->setToString();
+			// log::logger(ATF::facture()->sa(),"qjanon");
+			// log::logger("DATE_FORMAT(facture.".$field.",'%Y') == ".$get['year'],"qjanon");
+			// ATF::facture()->q->unsetToString();
 			foreach (ATF::facture()->sa() as $key=>$i) {
 				$affaires['data'][$k][strftime("%b",strtotime($i[$field]))] += $i['prix'];
 			}
