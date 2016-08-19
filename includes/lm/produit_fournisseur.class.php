@@ -34,6 +34,7 @@ class produit_fournisseur extends classes_optima {
 		);
 
 
+		$this->field_nom = "%id_produit% %id_fournisseur%";
 		$this->foreign_key["id_fournisseur"] = "societe";
 		
 		
