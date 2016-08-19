@@ -634,7 +634,82 @@ class affaire_absystech extends affaire {
 		return $graph;
 	}
 
+	/**
+	* Renvoi les informations pour afficher le rapport de facturation périodique dans telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array 
+	* @param $post array 
+	* @return array result 
+	*/ 
+	public function _rapportFacturePeriodique($get,$post) {
 
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_hotline";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+
+		ATF::affaire()->q->reset()
+			->addField("affaire.id_societe")
+			->addField("affaire.id_affaire")
+			->addField("devis_ligne.periode","periode")
+			->from("affaire","id_affaire","devis","id_affaire")
+			->from("affaire","id_societe","societe","id_societe")
+			->from("devis","id_devis","devis_ligne","id_devis")
+			->from("affaire","id_affaire","facture","id_affaire")
+			->where("devis.etat","gagne")
+			->where("DATE_FORMAT(facture.date,'%Y')",$get['year'],"OR",false,"<=")
+			->whereIsNotNull("devis_ligne.periode")
+			->addGroup("affaire.id_affaire")
+			->addGroup("affaire.id_societe")
+		;
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			ATF::affaire()->q->setSearch($get["search"]);
+		}
+
+		// TRI
+		switch ($get['tri']) {
+			case 'id_societe':
+			case 'id_affaire':
+				$get['tri'] = "affaire.".$get['tri'];
+			break;
+		}
+
+		$this->q->setLimit($get['limit']);
+
+		$affaires = ATF::affaire()->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($affaires['data'] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$affaires['data'][$k][$tmp[1]] = $val;
+					unset($affaires['data'][$k][$k_]);
+				}				
+			}
+		}
+
+		foreach ($affaires['data'] as $k=>$line) {
+			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture.date,'%Y')",$get['year']);
+			foreach (ATF::facture()->sa() as $key=>$i) {
+				$affaires['data'][$k][strftime("%b",strtotime($i['date']))] += $i['prix'];
+			}
+		}
+		// Envoi des headers
+		header("ts-total-row: ".$affaires['count']);
+		header("ts-max-page: ".ceil($affaires['count']/$get['limit']));
+		header("ts-active-page: ".$get['page']);
+
+		return $affaires;
+	}
 
 };
 
@@ -728,6 +803,11 @@ class affaire_att extends affaire_absystech {
 		}
 		return $prefix.$suffix;
 	}
+
+
+
+
+
 };
 class affaire_wapp6 extends affaire_absystech { }
 class affaire_demo extends affaire_absystech { }
