@@ -654,6 +654,12 @@ class affaire_absystech extends affaire {
 		// Gestion de la page
 		if (!$get['page']) $get['page'] = 0;
 
+		if ($get['filters']['field-date_debut_periode']) {
+			$field = "date_debut_periode";
+		} else {
+			$field = "date";
+		}
+
 
 		ATF::affaire()->q->reset()
 			->addField("affaire.id_societe")
@@ -664,7 +670,7 @@ class affaire_absystech extends affaire {
 			->from("devis","id_devis","devis_ligne","id_devis")
 			->from("affaire","id_affaire","facture","id_affaire")
 			->where("devis.etat","gagne")
-			->where("DATE_FORMAT(facture.date,'%Y')",$get['year'],"OR",false,"<=")
+			->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year'],"OR",false,"<=")
 			->whereIsNotNull("devis_ligne.periode")
 			->addGroup("affaire.id_affaire")
 			->addGroup("affaire.id_societe")
@@ -698,9 +704,9 @@ class affaire_absystech extends affaire {
 		}
 
 		foreach ($affaires['data'] as $k=>$line) {
-			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture.date,'%Y')",$get['year']);
+			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year']);
 			foreach (ATF::facture()->sa() as $key=>$i) {
-				$affaires['data'][$k][strftime("%b",strtotime($i['date']))] += $i['prix'];
+				$affaires['data'][$k][strftime("%b",strtotime($i[$field]))] += $i['prix'];
 			}
 		}
 		// Envoi des headers
