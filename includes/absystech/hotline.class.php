@@ -3669,6 +3669,16 @@ class hotline extends classes_optima {
         				self::$post['specialAction']($post);
         				$return['result'] = true;
         			break;
+        			case "takeRequest":
+        			case "cancelRequest":
+        			case "resolveRequest":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+        				self::$post['specialAction']($post);
+        				$return['result'] = true;
+        				$lastInteractionRequired = true;
+        				if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
+
+        			break;
         			case "setWait":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				if ($post['etat']=="wait") {
@@ -3793,7 +3803,7 @@ class hotline extends classes_optima {
 				$this->q->where("hotline.etat","free");
 			} else {
 				// Filtre ticket actif
-				if ($get['filters']['active'] == "on") {
+				if ($get['filters']['fixing'] == "on") {
 					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
 				}
 				// Filtre MES tickets
