@@ -257,6 +257,9 @@ class commande_lm extends commande {
 		$devis=ATF::devis()->select($infos["id_devis"]);
 		$infos["id_affaire"]=$devis["id_affaire"];
 		$infos["tva"]=$devis["tva"];
+
+		$infos["type_contrat"] = ATF::affaire()->select($infos["id_affaire"], "type_affaire");
+
 		$this->q->reset()->addCondition("ref",ATF::affaire()->select($infos["id_affaire"],"ref"))->setCount();
 		$countRef=$this->sa();
 		if($countRef["count"]>0){
@@ -391,7 +394,7 @@ class commande_lm extends commande {
 				if(file_exists($contratA4) && file_exists($CG)){					
 					$cmd = "gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$contratA4.".pdf ".$contratA4." ".$CG;
 					$result = `$cmd`;
-					rename($contratA4.".pdf", $contratA4);									
+					rename($contratA4.".pdf", $contratA4);
 				}			
 			}
 		}
