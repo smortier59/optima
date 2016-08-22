@@ -664,12 +664,15 @@ class affaire_absystech extends affaire {
 		ATF::affaire()->q->reset()
 			->addField("affaire.id_societe")
 			->addField("affaire.id_affaire")
+			->addField("commande.date","date_cmd")
 			->addField("devis_ligne.periode","periode")
 			->from("affaire","id_affaire","devis","id_affaire")
+			->from("affaire","id_affaire","commande","id_affaire")
 			->from("affaire","id_societe","societe","id_societe")
 			->from("devis","id_devis","devis_ligne","id_devis")
 			->from("affaire","id_affaire","facture","id_affaire")
 			->where("devis.etat","gagne")
+			->where("commande.etat","annulee","OR",false,"!=")
 			->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year'],"OR",false,"<=")
 			->whereIsNotNull("devis_ligne.periode")
 			->addGroup("affaire.id_affaire")
@@ -689,7 +692,8 @@ class affaire_absystech extends affaire {
 			break;
 		}
 
-		$this->q->setLimit($get['limit']);
+		if (!$get['noLimit']) $this->q->setLimit($get['limit']);
+
 
 		$affaires = ATF::affaire()->select_all($get['tri'],$get['trid'],$get['page'],true);
 
@@ -705,10 +709,7 @@ class affaire_absystech extends affaire {
 
 		foreach ($affaires['data'] as $k=>$line) {
 			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture.".$field.",'%Y')",$get['year']);
-			// ATF::facture()->q->setToString();
-			// log::logger(ATF::facture()->sa(),"qjanon");
-			// log::logger("DATE_FORMAT(facture.".$field.",'%Y') == ".$get['year'],"qjanon");
-			// ATF::facture()->q->unsetToString();
+
 			foreach (ATF::facture()->sa() as $key=>$i) {
 				$affaires['data'][$k][strftime("%b",strtotime($i[$field]))] += $i['prix'];
 			}
@@ -720,6 +721,77 @@ class affaire_absystech extends affaire {
 
 		return $affaires;
 	}
+
+	public function _export_rapport_facturation_periodique(&$get,$post) {
+
+        include_once __ATF_PATH__."libs/PHPExcel/Classes/PHPExcel.php";
+        $o = new PHPExcel();
+        $o->getProperties()
+           ->setCreator('Quentin JANON <qjanon@absystech.fr>')
+           ->setTitle('Export listing de la facturation périodique')
+           ->setDescription("Document reprenant le listing de la facturation périodique")
+           ->setCategory('export')
+           ;
+
+        $s = $o->getSheet(0);
+        $s->setTitle("Facturation périodique");
+
+        $get['noLimit'] = true;
+		$data = self::_rapportFacturePeriodique($get,$post);
+		$data = $data['data'];
+        // HEader
+        $h = array("Société","Affaire","Date de commande","Jan","Fév","Mar","Avr","Mai","Juin","Jui","Aou","Sept","Oct","Nov","Déc.");
+
+        $row = 1;
+        $s->fromArray($h," ","A".$row);
+
+        $header = 'a1:z1';
+        // $ews->getStyle($header)->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB('00ffff00');
+        $style = array(
+            'font' => array('bold' => true),
+            'alignment' => array('horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,),
+        );
+        $s->getStyle($header)->applyFromArray($style);
+
+        $row = 3;
+        foreach ($data as $k=>$i) {
+
+            $d = array(
+                $i['id_societe'],
+                $i['id_affaire']." (".$i['periode'].")",
+                $i['date_cmd'],
+                number_format($i['Jan'],2),
+                number_format($i['Feb'],2),
+                number_format($i['Mar'],2),
+                number_format($i['Apr'],2),
+                number_format($i['May'],2),
+                number_format($i['Jun'],2),
+                number_format($i['Jul'],2),
+                number_format($i['Aug'],2),
+                number_format($i['Sept'],2),
+                number_format($i['Oct'],2),
+                number_format($i['Nov'],2),
+                number_format($i['Dec'],2),
+            );
+
+            $s->fromArray($d," ","A".$row);
+            $row++;
+        }
+
+        for ($col = ord('a'); $col <= ord('z'); $col++) {
+            $s->getColumnDimension(chr($col))->setAutoSize(true);
+        }
+
+        $writer = \PHPExcel_IOFactory::createWriter($o, 'Excel5');
+                    
+        $fn = $this->filepath(ATF::$usr->getId(),"rapport_facturation_periodique",true);
+        util::file_put_contents($fn,"");
+        $writer->save($fn);
+        $return['URL'] = __ABSOLUTE_WEB_PATH__."/affaire-".ATF::user()->cryptId(ATF::$usr->getId())."-rapport_facturation_periodique.temp";
+
+        return $return;
+	}
+
 
 };
 
