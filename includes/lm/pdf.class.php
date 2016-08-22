@@ -222,13 +222,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		$this->setfont('arial','',8);	
 		$texteDuree = "";
-		if($this->affaire["type_affaire"] == "SP"){
-			$texteDuree = "Durée : mois à compter de la souscription du Contrat d'abonnemet, soit le ";
-		}else{
-			$texteDuree ="Durée : mois à compter de la reception du Produit, soit le ";
-		}
 
-		$this->multicell(0,4,"\n".$texteDuree."\n\nEchéancier :\n\n",1,"L");
+		$dureeEngagement = 0;
+		$FrequenceEngagement = $this->loyer[0]["frequence_loyer"];
 
 		$head = array("Nombre de loyers","Prériodicité","Loyer HT","Loyer TTC");
 		$width = array(49,49,49,49);		
@@ -237,6 +233,8 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		foreach ($this->loyer as $key => $value) {
 			if($value["nature"] != "prolongation"){
+				$dureeEngagement += $value["duree"];
+
 				$data[$key][0] = $value["duree"];		
 				switch ($value["frequence_loyer"]) {
 					case 'jour' : $data[$key][1] = "Hebdomadaire"; break;
@@ -251,16 +249,32 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			}
 							
 		}
+
+
+
+		if($this->affaire["type_affaire"] == "SP"){
+			$texteDuree = "Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la souscription du Contrat d'abonnemet, soit le ";
+		}else{
+			$texteDuree ="Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la reception du Produit, soit le ";
+		}
+
+		$this->multicell(0,4,"\n".$texteDuree."\n\nEchéancier :\n\n",1,"L");
+
+		
 		$this->tableau($head,$data,$width,7,$style,260);
 
-		$this->multicell(0,4,"\nProlongation possible de  mois si vous le souhaitez :\n\nEchéancier de prolongation (indicatif) :\n\n",1,"L");
+
+		$dureeProl = 0;
+		$FrequenceProl = "";
 		$head = array("Nombre de loyers","Prériodicité","Loyer HT","Loyer TTC");
 		$width = array(49,49,49,49);		
 		$data = array();
 		$style = array();
-
+		
 		foreach ($this->loyer as $key => $value) {
 			if($value["nature"] == "prolongation"){
+				$dureeProl += $value["duree"];
+				$FrequenceProl = $value["frequence_loyer"];
 				$data[$key][0] = $value["duree"];		
 				switch ($value["frequence_loyer"]) {
 					case 'jour' : $data[$key][1] = "Hebdomadaire"; break;
@@ -275,6 +289,12 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			}
 							
 		}
+
+
+		$this->multicell(0,4,"\nProlongation possible de ".$dureeProl." ".$FrequenceProl." si vous le souhaitez :\n\nEchéancier de prolongation (indicatif) :\n\n",1,"L");
+		
+
+		
 		$this->tableau($head,$data,$width,7,$style,260);
 		
 
