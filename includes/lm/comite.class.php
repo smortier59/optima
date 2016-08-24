@@ -327,7 +327,7 @@ class comite extends classes_optima {
 		ATF::commande()->q->reset()->where("commande.id_affaire",$this->select($id, "id_affaire"));
 		$commande = ATF::commande()->select_row();
 
-		if($commande){
+		if($commande && $etat == "accepte"){
 			ATF::commande()->u(array("id_commande"=>$commande["commande.id_commande"], "etat"=>"non_loyer"));
 			self::envoiNotificationPrestataires($commande["commande.id_commande"]);
 		}	
