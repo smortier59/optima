@@ -330,6 +330,11 @@ class comite extends classes_optima {
 		if($commande && $etat == "accepte"){
 			ATF::commande()->u(array("id_commande"=>$commande["commande.id_commande"], "etat"=>"non_loyer"));
 			self::envoiNotificationPrestataires($commande["commande.id_commande"]);
+		}
+
+		if($commande && $etat == "refuse"){
+			ATF::commande()->d($commande["commande.id_commande"]);
+			ATF::affaire()->u(array("id_affaire"=>$commande["commande.id_affaire"], "etat"=>"perdue"));
 		}	
 	}
 
