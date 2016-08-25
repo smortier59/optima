@@ -987,8 +987,7 @@ class commande_lm extends commande {
 	* @return boolean 
 	*/
 	public function can_delete($id,$infos=false){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($id);
-		else $commande = new commande_lm($id);
+		$commande = new commande_lm($id);
 
 		$affaire = $commande->getAffaire();
 
@@ -1068,8 +1067,7 @@ class commande_lm extends commande {
 				ATF::devis()->u($devis_update);
 	
 				// Mise à jour du forecast
-				if(ATF::$codename == "lmbe") $affaire = new affaire_lmbe($commande['id_affaire']);
-				else $affaire = new affaire_lm($commande['id_affaire']);
+				$affaire = new affaire_lm($commande['id_affaire']);
 				$affaire->majForecastProcess();
 	
 				//Suppression des facturations
