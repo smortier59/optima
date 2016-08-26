@@ -354,7 +354,9 @@ class comite extends classes_optima {
                 ->select('commande_ligne.id_fournisseur')
                 ->from("commande","id_commande","commande_ligne","id_commande")
                 ->from("commande_ligne","id_fournisseur","societe","id_societe")
-                ->where("commande.id_commande", $id_commande)
+                ->from("commande_ligne","id_produit","produit","id_produit") 
+                ->where("produit.element_declencheur","acceptation_comite","AND")                
+                ->where("commande.id_commande", $id_commande,"AND")
                 ->setStrict()
                 ->addGroup('commande_ligne.id_fournisseur');
             if ($fournisseurs = ATF::commande()->select_all()) {            	
