@@ -634,7 +634,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	}
 
 	public function lignes_facture($facture_lignes,$facture, $nature){
-		
+			
 
 		if($nature == "loyer"){
 			$head = array("Désignation ( Référence )","Prix unit. HT","Taux de TVA","Total TTC");
