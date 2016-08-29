@@ -392,7 +392,7 @@ class devis_lm extends devis {
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
 
 				if(!$fournisseurs){
-					ATF::produit_fournisseur_loyer()->q->reset()->where("produit_fournisseur_loyer.id_produit",$item["id_produit"])->where("produit_fournisseur_loyer.ordre",1,"AND");
+					ATF::produit_fournisseur_loyer()->q->reset()->where("produit_fournisseur_loyer.id_produit",$item["id_produit"]);
 					$fournisseurs = ATF::produit_fournisseur_loyer()->select_all();
 				}
 
@@ -415,7 +415,7 @@ class devis_lm extends devis {
 
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new errorATF("Ligne de devis sans fournisseur",882);
+					throw new errorATF("Ligne de devis sans fournisseur (Produit : ".$item['id_produit'].")",882);
 				}
 				unset($item["id_parc"]);
 				ATF::devis_ligne()->i($item);
