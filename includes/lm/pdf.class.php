@@ -232,7 +232,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$style = array();
 
 		foreach ($this->loyer as $key => $value) {
-			if($value["nature"] != "prolongation"){
+			if($value["nature"] != "prolongation" && $value["nature"] != "prolongation_probable"){
 				$dureeEngagement += $value["duree"];
 
 				$data[$key][0] = $value["duree"];		
@@ -272,7 +272,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$style = array();
 		
 		foreach ($this->loyer as $key => $value) {
-			if($value["nature"] == "prolongation"){
+			if($value["nature"] == "prolongation" || $value["nature"] != "prolongation_probable"){
 				$dureeProl += $value["duree"];
 				$FrequenceProl = $value["frequence_loyer"];
 				$data[$key][0] = $value["duree"];		
@@ -673,11 +673,14 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				}
 
 				foreach ($ligne_produits as $key => $value) {
-					$data[$key][0] = $value["produits"];
-					$style[$key][0] = $this->leftStyle;
-					$data[$key][1] = number_format($value["HT"],2)." €" ;
-					$data[$key][2] = $key."%";
-					$data[$key][3] = number_format($value["TTC"],2)." €" ;
+					if(strpos($value["produit"], "&nbsp;>") === false){						
+						$data[$key][0] = $value["produits"];
+						$style[$key][0] = $this->leftStyle;
+						$data[$key][1] = number_format($value["HT"],2)." €" ;
+						$data[$key][2] = $key."%";
+						$data[$key][3] = number_format($value["TTC"],2)." €" ;
+					}
+					
 				}
 				
 
