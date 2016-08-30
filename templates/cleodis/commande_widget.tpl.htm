@@ -5,21 +5,15 @@
 
 {$infos = ATF::accueil()->type_agence(ATF::_g(type))}
 
-{$id_agence = $infos.id_agence}
-
-
 {if $infos.type=="o2m" || $infos.type=="reseau"}
     {$titre = 'Ct MEP RESEAUX'}
-    {$objectif = ATF::agence()->select($id_agence, "objectif_mep_reseaux")}
 {else if $infos.type=="autre"}
     {$titre = 'Ct MEP AUTRES'}
-    {$objectif = ATF::agence()->select($id_agence, "objectif_mep_autre")}
 {else}
     {$titre = 'Ct MEP S'}
 {/if}
 
-
-
+{$id_agence = $infos.id_agence}
 
 
 <div id="{$module}_graphe_{$infos.type}_{$id_agence}" class="widget"></div>
@@ -48,7 +42,7 @@ Ext.onReady(function(){
         series: [                       
                     {
                         type: 'column',
-                        name: 'Réel ({$data["year"][date("Y")]["count"]})',
+                        name: 'Réel',
                         data: [
                                 {foreach $data["dataset"]["reel"] as $reel}   
                                     {$reel["value"]} {if !$reel@last},{/if}
@@ -69,7 +63,7 @@ Ext.onReady(function(){
                     } ,
                     {
                         type: 'spline',
-                        name: 'Objectif ({$objectif})',
+                        name: 'Objectif',
                         data: [
                                 {foreach $data["dataset"]["objectif"] as $obj}   
                                      {$obj["value"]} {if !$obj@last},{/if}

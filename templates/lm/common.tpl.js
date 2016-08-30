@@ -1,3 +1,50 @@
+ATF.formation_facture_type = function(el,val,lastVal) {
+
+	var id_devis =  Ext.ComponentMgr.get('formation_facture[id_formation_devis]').value;
+	
+	ATF.ajax('formation_devis,getMontantForFacture.ajax','id_formation_devis='+id_devis+'&type='+val,{ 
+		onComplete:function(obj){		
+			Ext.ComponentMgr.get('formation_facture[prix]').setValue(obj.result);			
+		} 
+	});
+}
+
+
+ATF.formation_devis_type = function(el,val,lastVal) {
+	
+	if(Ext.getCmp('comboformation_devis[type]').value == "light"){
+		Ext.ComponentMgr.get('panel_fournisseurs').hide();
+		Ext.ComponentMgr.get('panel_participants').hide();
+		Ext.ComponentMgr.get('panel_light').show();
+		
+	}else{
+		Ext.ComponentMgr.get('panel_fournisseurs').show();
+		Ext.ComponentMgr.get('panel_participants').show();
+		Ext.ComponentMgr.get('panel_light').hide();
+	}
+}
+
+
+
+
+ATF.changeServiceType = function(el,val,lastVal) {	
+	if(Ext.getCmp('comboexa_directeur[restriction_services_type]').value == "sans"){
+		Ext.ComponentMgr.get('panel_restriction_services_lignes').hide();
+	}else{
+		Ext.ComponentMgr.get('panel_restriction_services_lignes').show();
+	}
+}
+
+
+ATF.changeGeoTyoe = function(el,val,lastVal) {
+	if(Ext.getCmp('comboexa_directeur[restriction_geo_type]').value == "sans"){
+		Ext.ComponentMgr.get('panel_restriction_geo_lignes').hide();
+	}else{
+		Ext.ComponentMgr.get('panel_restriction_geo_lignes').show();
+	}
+}
+
+
 ATF.changeType_suivi = function(el,val,lastVal) {
 	if(Ext.getCmp('combosuivi[type_suivi]').value == "Formation"){
 		Ext.ComponentMgr.get('panel_formation').show();

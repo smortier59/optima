@@ -18,8 +18,11 @@
                     width:120
                 },
                 items: [
-                    {$dates =[date_diag,date_installation_prevu,date_installation_reel,date_garantie,date_livraison_prevu]}  
-                    
+                    {if ATF::$codename=="cleodis"}
+                        {$dates =[date_installation_prevu,date_installation_reel,date_garantie,date_livraison_prevu ,date_ouverture, date_recettage_cablage]}                    
+                    {else}
+                        {$dates =[date_installation_prevu,date_installation_reel,date_garantie,date_livraison_prevu]}  
+                    {/if}
                     {foreach from=$dates item=d}
                         {if !$d@first},{/if}
                         {

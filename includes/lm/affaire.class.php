@@ -15,7 +15,6 @@ class affaire_lm extends affaire {
 			,'affaire.date'
 			,'affaire.affaire'
 			,'affaire.id_societe'
-			,'affaire.type_affaire'
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
@@ -40,9 +39,7 @@ class affaire_lm extends affaire {
 			,'nom_banque'
 			,'ville_banque'
 			,'date_previsionnelle'
-			,'type_affaire'
 			,"compte_t"=>array("custom"=>true)
-			,'id_magasin'
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -80,9 +77,8 @@ class affaire_lm extends affaire {
 		$this->colonnes['bloquees']['select'] = array('id_parent','data','RIB','BIC','IBAN','RUM','nom_banque','ville_banque','date_previsionnelle');
 		
 		$this->onglets = array(
-			 'loyer' 
+			 'loyer'
 			,'devis'=>array('opened'=>true)
-			,'comite'
 			,'commande'=>array('opened'=>true)
 			,'prolongation'
 			,'loyer_prolongation'
@@ -105,23 +101,14 @@ class affaire_lm extends affaire {
 		);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
-
-		$this->files["bon_inter"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		$this->files["facture"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		$this->files["mandat_slimpay"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-
-
 		$this->field_nom="ref";
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
-		$this->foreign_key['id_magasin'] =  "magasin";
-		
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
 		$this->addPrivilege("getCompteT");
 		$this->addPrivilege("getCompteTLoyerActualise");
-		$this->addPrivilege("relancer");
 		$this->no_delete = true;
 		$this->no_update = true;
 		$this->no_insert = true;
@@ -151,12 +138,6 @@ class affaire_lm extends affaire {
 		$affaire["adresse_facturation"]=$infos["adresse_facturation"];
 		$affaire["ville_adresse_facturation"]=$infos["ville_adresse_facturation"];
 		$affaire["cp_adresse_facturation"]=$infos["cp_adresse_facturation"];
-		$affaire["id_magasin"]=$infos["id_magasin"];
-		$affaire["num_bdc_lm"]=$infos["num_bdc_lm"];
-		$affaire["poseur"]=$infos["poseur"];
-		$affaire["poseur_aggree"]=$infos["poseur_aggree"];
-		$affaire["type_souscription"]=$infos["type_souscription"];
-		$affaire["type_affaire"] = $infos["type_affaire"];
 
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
@@ -996,9 +977,6 @@ class affaire_lm extends affaire {
 	* @return boolean
     */
 	public function mailContact($email,$last_id,$table,$paths){
-		log::logger($last_id , "mfleurquin");
-		log::logger($table , "mfleurquin");
-		log::logger($paths , "mfleurquin");
 		$enregistrement = ATF::$table()->select($last_id);	
 		if($email["email"]){
 			$recipient = $email["email"];
@@ -1051,20 +1029,6 @@ class affaire_lm extends affaire {
 			$copy_mail->send();
 		}
 		return true;
-	}
-
-
-	public function relancer($infos){
-		$id_affaire = $this->decryptId($infos["id_affaire"]);
-		$email = ATF::societe()->select(ATF::affaire()->select($id_affaire , "id_societe"), "email");
-
-		
-		/*
-		*	Générer un lien vers une page du front avec ID Crypté
-		*	Sur cette page on récupere tout les infos de l'affaire necessaire à SLIMPAY 
-		*	et on redirige direct vers SLIMPAY
-		*/
-
 	}
 };
 ?>

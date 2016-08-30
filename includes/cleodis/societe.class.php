@@ -137,10 +137,8 @@ class societe_cleodis extends societe {
 
 		}
 
+
 		$this->fieldstructure();
-
-		$this->files["societe_document"] =array("multiUpload"=>true);
-
 		
 		unset($this->colonnes['panel']['facturation_fs']["solde_et_relance"]);
 		$this->checkAndRemoveBadFields('caracteristiques');
@@ -457,6 +455,28 @@ class societe_cleodis extends societe {
 	*/
 	public function autocompleteAvecFiliale($infos,$reset=true) {
 
+//		$this->q->reset()
+//				->addField("societe.*")
+//				->setStrict()
+//		     ->addCondition("societe","%cleodis%",NULL,false,"LIKE")
+//			 ->setToString();
+//			 
+//		$q1=$this->sa();
+//			 
+//		$this->q->reset()
+//				->addField("societe.*")
+//				->setStrict()
+//			 ->addJointure("societe","id_societe","societe","id_filiale","parent")
+//		     ->addCondition("parent.societe","%cleodis%",NULL,false,"LIKE")
+//			 ->setToString();
+//			 
+//		$q2=$this->sa();
+//		
+//		$this->q->reset()
+//					->addUnion($q1)
+//					->addUnion($q2);
+//		$union=$this->q->getUnion();	
+//		$this->q->reset()->setSubQuery($union,'uni');
 
 		if ($reset) {
 			$this->q->reset();
@@ -482,7 +502,7 @@ class societe_cleodis extends societe {
 
 		// Si avis_credit change, on crée un suivi !
 		$avis_credit = $this->select($infos["id_societe"],"avis_credit");
-		$notifie = "106,21"; // 106 Lesueur Jennifer et 21 Severine Mazars
+		$notifie = "43,21"; // 43 Lejeune Nicolas et 21 Severine Mazars
 		if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
 			$notifie .= ",".$this->select($infos["id_societe"],"id_owner");
 		}
@@ -690,7 +710,7 @@ class societe_cleodis extends societe {
 
 				$msg = $e->getMessage();
                 
-				if (preg_match("/generic message : /",$msg)) {
+				if (ereg("generic message : ",$msg)) {
 					$tmp = json_decode(str_replace("generic message : ","",$msg),true);
 					$msg = $tmp['text'];
 				}
@@ -807,8 +827,6 @@ class societe_cap extends societe_cleodis {
 		parent::__construct();
 		$this->table = "societe";
 
-		$this->colonnes['primary']["code_regroupement"] ="";
-		
 		unset($this->colonnes['panel']['delai_rav'], 
 			  $this->colonnes['panel']['delai_fournisseur'], 
 			  $this->colonnes['panel']['deploiement'],

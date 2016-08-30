@@ -9,8 +9,6 @@ class fabriquant extends classes_optima{
 		$this->colonnes['fields_column']=array('fabriquant.fabriquant');
 		$this->colonnes['primary']=array('fabriquant');
 		
-
-		$this->field_nom = "%fabriquant%";
 		$this->fieldstructure();
 		
 	}

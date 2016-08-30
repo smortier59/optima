@@ -1,1 +1,0 @@
-{include file="mandat-lignes.tpl.js"}
