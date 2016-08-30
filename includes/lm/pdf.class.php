@@ -266,13 +266,13 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		$dureeProl = 0;
 		$FrequenceProl = "";
-		$head = array("Nombre de loyers","Prériodicité","Loyer HT","Loyer TTC");
+		$head = array("Nombre de loyers","Périodicité","Loyer HT","Loyer TTC");
 		$width = array(49,49,49,49);		
 		$data = array();
 		$style = array();
 		
 		foreach ($this->loyer as $key => $value) {
-			if($value["nature"] == "prolongation" || $value["nature"] != "prolongation_probable"){
+			if($value["nature"] == "prolongation" || $value["nature"] == "prolongation_probable"){
 				$dureeProl += $value["duree"];
 				$FrequenceProl = $value["frequence_loyer"];
 				$data[$key][0] = $value["duree"];		
