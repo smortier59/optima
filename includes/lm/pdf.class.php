@@ -650,13 +650,18 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 														->where("nature", $facture["nature"]);
 						$loyer = ATF::produit_loyer()->select_row();
 					}
+					if(strpos($prod["produit"], "&nbsp;>") === false){
+						if($ligne_produits[($prod["tva_loyer"]*100)-100]["produits"]) $ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= "\n";
 					
-					if($ligne_produits[($prod["tva_loyer"]*100)-100]["produits"]) $ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= "\n";
-					$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= $i['quantite']." x ".str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
 
-					if($prod["ref_lm"]){
-						$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= " ( Ref: ".$prod["ref_lm"]." )";
+						$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= $i['quantite']." x ".$prod['produit'];
+
+						if($prod["ref_lm"]){
+							$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= " ( Ref: ".$prod["ref_lm"]." )";
+						}
+
 					}
+					
 				
 					
 					if($loyer){	
@@ -702,28 +707,34 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 						$loyer = ATF::produit_loyer()->select_row();
 					}
 
-					$data[$k][0] = $k+1;
-					$data[$k][1] = $prod["ref_lm"];	
-					$style[$k][1] = $this->leftStyle;
-					$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
-					$style[$k][2] = $this->leftStyle;			
-					if($loyer){
-						$data[$k][3] = number_format($loyer["loyer"],2)." €";
-						$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
-						$data[$k][5] = $i['quantite'];
-						$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
-							
-						$this->ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
-						$this->ttva = $this->ttc - $loyer["loyer"];
+					if(strpos($value["produit"], "&nbsp;>") === false){	
+						$data[$k][0] = $k+1;
+						$data[$k][1] = $prod["ref_lm"];	
+						$style[$k][1] = $this->leftStyle;
+						$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
+						$style[$k][2] = $this->leftStyle;			
+					}	
+						if($loyer){
+							if(strpos($value["produit"], "&nbsp;>") === false){	
+								$data[$k][3] = number_format($loyer["loyer"],2)." €";
+								$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
+								$data[$k][5] = $i['quantite'];
+								$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
+							}
 
-						$this->tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($this->ttva),2);
-						$this->tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($this->ttc-$this->ttva),2);
-					}else{
-						$data[$k][3] = "-";
-						$data[$k][4] = "-";
-						$data[$k][5] = $i['quantite'];
-						$data[$k][6] = "-";
-					}					
+							$this->ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
+							$this->ttva = $this->ttc - $loyer["loyer"];
+
+							$this->tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($this->ttva),2);
+							$this->tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($this->ttc-$this->ttva),2);
+						}else{
+							if(strpos($value["produit"], "&nbsp;>") === false){	
+								$data[$k][3] = "-";
+								$data[$k][4] = "-";
+								$data[$k][5] = $i['quantite'];
+								$data[$k][6] = "-";
+							}
+						}					
 				}
 			}
 			$this->tableauBigHead($head,$data,$width,7,$style,260);
