@@ -1009,7 +1009,7 @@ class commande_lm extends commande {
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
 		}
 		
-		if($this->select($id,"etat")!="non_loyer"){
+		if($this->select($id,"etat")!="non_loyer" && $this->select($id,"etat")!="pending"){
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
 		}
 		
