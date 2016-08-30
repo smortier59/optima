@@ -327,9 +327,14 @@ class comite extends classes_optima {
 		ATF::commande()->q->reset()->where("commande.id_affaire",$this->select($id, "id_affaire"));
 		$commande = ATF::commande()->select_row();
 
-		if($commande){
+		if($commande && $etat == "accepte"){
 			ATF::commande()->u(array("id_commande"=>$commande["commande.id_commande"], "etat"=>"non_loyer"));
 			self::envoiNotificationPrestataires($commande["commande.id_commande"]);
+		}
+
+		if($commande && $etat == "refuse"){
+			ATF::commande()->d($commande["commande.id_commande"]);
+			ATF::affaire()->u(array("id_affaire"=>$commande["commande.id_affaire"], "etat"=>"perdue"));
 		}	
 	}
 
@@ -349,7 +354,9 @@ class comite extends classes_optima {
                 ->select('commande_ligne.id_fournisseur')
                 ->from("commande","id_commande","commande_ligne","id_commande")
                 ->from("commande_ligne","id_fournisseur","societe","id_societe")
-                ->where("commande.id_commande", $id_commande)
+                ->from("commande_ligne","id_produit","produit","id_produit") 
+                ->where("produit.element_declencheur","acceptation_comite","AND")                
+                ->where("commande.id_commande", $id_commande,"AND")
                 ->setStrict()
                 ->addGroup('commande_ligne.id_fournisseur');
             if ($fournisseurs = ATF::commande()->select_all()) {            	
@@ -384,6 +391,9 @@ class comite extends classes_optima {
     * @return array
     */
     public static function getInfosCommande($id_commande, $id_fournisseur){ // fonction get accessible uniquement par le prestataire
+       
+    	$element_declencheur = "acceptation_comite";
+		$produit_declencheur = array();
         $q = "SELECT 
                 commande.id_commande, 
                 commande.ref, 
@@ -407,12 +417,18 @@ class comite extends classes_optima {
         $q = "SELECT * FROM commande_ligne WHERE id_fournisseur='".ATF::db()->real_escape_string($id_fournisseur)."' AND id_commande='".ATF::db()->real_escape_string($id_commande)."'";
         if ($all_lines = ATF::db()->arr($q)) { // on recupère toutes ses lignes
             foreach ($all_lines as $key_lines => $lc) { // pour chaque lignes de la commande
-                $q = "SELECT produit, id_produit, ref_lm FROM produit WHERE id_produit='".ATF::db()->real_escape_string($lc['id_produit'])."'";
+                $q = "SELECT produit, id_produit, ref_lm, element_declencheur FROM produit WHERE id_produit='".ATF::db()->real_escape_string($lc['id_produit'])."'";
                 $p = ATF::db()->fasso($q);
                 $p["quantite"] = $lc["quantite"];
+                if($p["element_declencheur"] == $element_declencheur) $produit_declencheur[] = $p['produit']." (id_produit : ".$p["id_produit"].")";
+                unset($p["element_declencheur"]);
+
                 $cmd['produit'][] = $p; // on ajout dans la commande sur laquelle on itère le produit en question dans un tableau 'produit'
+            	
+            	
             }
         }
+        $cmd["produit_declencheur"] = $produit_declencheur;
         return $cmd;
     } 
 };
