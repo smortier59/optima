@@ -1256,8 +1256,15 @@ class commande_cleodis extends commande {
             }
             if (file_exists($this->filepath($i['commande.id_commande'],"CourrierRestitution"))) {
                 $return['data'][$k]["CourrierRestitutionExists"] = true;
+            }           
+
+            if (file_exists($this->filepath($i['commande.id_commande'],"lettreSGEF"))) {
+                $return['data'][$k]["ctSGEFExists"] = true;
             }
 
+             if (file_exists($this->filepath($i['commande.id_commande'],"lettreBelfius"))) {
+                $return['data'][$k]["ctlettreBelfiusExists"] = true;
+            }
             
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiCourrierClassique"))) {
                 $return['data'][$k]["envoiCourrierClassiqueExists"] = true;
@@ -2029,8 +2036,6 @@ class commande_cleodis extends commande {
 							->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 							->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 							
-							->addCondition("affaire.affaire","%transfert%" ,"AND", "conditiondevis", "NOT LIKE")
-
 							->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
 							->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
 

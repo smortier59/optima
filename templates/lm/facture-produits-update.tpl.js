@@ -1,5 +1,5 @@
 {$table="facture"}
-{$no_update='true'}
+{$no_update='false'}
 {$pager="ProduitsUpdateVisible"}
 {$parent_class=$current_class}
 {$current_class=ATF::getClass("{$current_class->table}_ligne")}

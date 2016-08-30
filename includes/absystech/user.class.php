@@ -59,6 +59,17 @@ class user_absystech extends user {
 			 ->addCondition("profil.profil","Technicien");
 		return $this->autocomplete($infos,false);
 	}
+
+	public function _updateMailUser($get, $post){
+		if(!$post['password_mail']) throw new Exception("Il manque le mot de passe", 500);
+		if(!$post['id_user']) throw new Exception("Il manque l'id user'", 500);
+
+		log::logger($post, 'alahlah');
+		$this->q->reset();
+
+		return !!$this->update($post);
+
+	}
 	
 };
 class user_att extends user_absystech {

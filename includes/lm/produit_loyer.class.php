@@ -33,7 +33,9 @@ class produit_loyer extends classes_optima {
 			,"produit_loyer.ordre"
 			,"produit_loyer.periodicite"
 		);
-				
+		
+		$this->field_nom = "%id_produit% %nature%";	
+
 		$this->fieldstructure();	
 		$this->selectAllExtjs=true; 
 	}

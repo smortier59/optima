@@ -5,6 +5,7 @@
 */
 require_once dirname(__FILE__)."/../produit.class.php";
 class produit_lm extends produit {	
+
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
@@ -51,12 +52,14 @@ class produit_lm extends produit {
 															'id_fournisseur',
 															"mode_paiement"
 															);*/
-		$this->colonnes["panel"]["loyer_fournisseur_lignes"] = array(
+		$this->colonnes["panel"]["fournisseur_lignes"] = array(
 			"loyer_fournisseur"=>array("custom"=>true),
+			"produit_fournisseur"=>array("custom"=>true),
 			'controle_fournisseur',
 			'declencheur_mep',
 			'tva_prix_achat'
 		);
+
 
 		$this->colonnes["panel"]["loyer_lignes"] = array(
 			"loyer"=>array("custom"=>true),
@@ -72,11 +75,13 @@ class produit_lm extends produit {
 		
 		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);		
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
-		$this->panels['loyer_fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
+		$this->panels['fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
 
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->fieldstructure();
+
+		$this->field_nom = "%produit% (Pack %id_pack_produit% )";
 
 		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
 		//$this->field_nom = "%produit% (%id_pack_produit%)";
@@ -163,7 +168,8 @@ class produit_lm extends produit {
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
-		$infos_fournisseur = json_decode($infos["values_".$this->table]["loyer_fournisseur"] , true);
+		$infos_fournisseur = json_decode($infos["values_".$this->table]["produit_fournisseur"] , true);
+		$infos_loyer_fournisseur = json_decode($infos["values_".$this->table]["loyer_fournisseur"] , true);
 
 		$this->infoCollapse($infos);
 
@@ -175,6 +181,7 @@ class produit_lm extends produit {
 										   "loyer"=> $value["produit_loyer__dot__loyer"],
 										   "duree"=> $value["produit_loyer__dot__duree"],
 										   "nature"=> $value["produit_loyer__dot__nature"],
+										   "periodicite"=> $value["produit_loyer__dot__periodicite"],
 										   "ordre"=> $key+1
 									));
 		}
@@ -187,17 +194,18 @@ class produit_lm extends produit {
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));
 
-			/*$dep = array();
-			$dep = explode(",", $value["produit_fournisseur__dot__departement"]);
-			foreach ($dep as $kd => $vd) {
-				ATF::departement()->q->reset()->where("code","%".$vd."%","AND",false,"LIKE");
-				$dep = ATF::departement()->select_row();
-				
+		}
 
-				ATF::produit_fournisseur_departement()->i(array("id_produit_fournisseur"=>$id_pf,
-												    "id_departement"=>$dep["id_departement"]
-				 							));
-			}*/
+		foreach ($infos_loyer_fournisseur as $key => $value) {			
+			$id_pf = ATF::produit_fournisseur_loyer()->i(array( "id_produit"=> $this->decryptId($last_id),
+														        "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
+														        "loyer"=> $value["produit_fournisseur__dot__loyer"],
+														        "ordre"=> $value["produit_fournisseur__dot__ordre"],
+														        "periodicite"=> $value["produit_fournisseur__dot__periodicite"],
+														        "nature"=> $value["produit_fournisseur__dot__rnature"],
+														        "nb_loyer"=> $value["produit_fournisseur__dot__nb_loyer"],
+														        "departement"=> $value["produit_fournisseur__dot__departement"]
+													   ));
 
 		}
 
@@ -210,8 +218,9 @@ class produit_lm extends produit {
 		
 
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
-		$infos_fournisseur = json_decode($infos["values_".$this->table]["loyer_fournisseur"] , true);
-		unset($infos["values_".$this->table]["loyer"]);
+		$infos_fournisseur = json_decode($infos["values_".$this->table]["produit_fournisseur"] , true);
+		$infos_loyer_fournisseur = json_decode($infos["values_".$this->table]["loyer_fournisseur"] , true);
+		unset($infos["values_".$this->table]);
 		
 		//On supprime les loyers pour les reinserer avant l'update
 		ATF::produit_loyer()->q->reset()->where("id_produit",$this->decryptId($infos["produit"]["id_produit"]));
@@ -247,20 +256,28 @@ class produit_lm extends produit {
 													      "recurrence"=> $value["produit_fournisseur__dot__recurrence"],
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));
-
-			/*$dep = array();
-			$dep = explode(",", $value["produit_fournisseur__dot__departement"]);
-			foreach ($dep as $kd => $vd) {
-				ATF::departement()->q->reset()->where("code","%".$vd."%","AND",false,"LIKE");
-				$dep = ATF::departement()->select_row();
-				
-
-				ATF::produit_fournisseur_departement()->i(array("id_produit_fournisseur"=>$id_pf,
-												    "id_departement"=>$dep["id_departement"]
-				 							));
-			}*/
 		}
 
+		//On supprime les produits fournisseurs loyer pour les reinserer avant l'update
+		ATF::produit_fournisseur_loyer()->q->reset()->where("id_produit",$this->decryptId($infos["produit"]["id_produit"]));
+		$produit_fournisseurs_loyer = ATF::produit_fournisseur_loyer()->select_all();
+		
+		foreach ($produit_fournisseurs_loyer as $key => $value) {
+			ATF::produit_fournisseur_loyer()->d($value["id_produit_fournisseur_loyer"]);			
+		}
+
+		foreach ($infos_loyer_fournisseur as $key => $value) {			
+			$id_pf = ATF::produit_fournisseur_loyer()->i(array( "id_produit"=> $this->decryptId($infos["produit"]["id_produit"]),
+														        "id_fournisseur"=> $value["produit_fournisseur_loyer__dot__id_fournisseur_fk"],
+														        "loyer"=> $value["produit_fournisseur_loyer__dot__loyer"],
+														        "ordre"=> $value["produit_fournisseur_loyer__dot__ordre"],
+														        "periodicite"=> $value["produit_fournisseur_loyer__dot__periodicite"],
+														        "nature"=> $value["produit_fournisseur_loyer__dot__nature"],
+														        "nb_loyer"=> $value["produit_fournisseur_loyer__dot__nb_loyer"],
+														        "departement"=> $value["produit_fournisseur_loyer__dot__departement"]
+													   ));
+
+		}
 
 
 		parent::update($infos,$s,$files);
