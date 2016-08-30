@@ -7,7 +7,6 @@
 {/if}
 
 
-
 record.data.nom = Ext.util.Format.stripTags(record.data.nom);
 $('#{$id|replace:"[":"\\\\["|replace:"]":"\\\\]"}').val(record.data.nom);
 

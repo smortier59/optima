@@ -305,9 +305,7 @@ ATF.buildGridEditor({
 				dataIndex: '{$current_class->table}__dot__produit',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store){			
 					if (value) {
-						console.log(value);
-						var a = value.split(ATF.extJSGridComboboxSeparator);	
-						console.log(a);
+						var a = value.split(ATF.extJSGridComboboxSeparator);						
 						if (a[1]) {
 							record.set('{$current_class->table}__dot__id_produit_fk',a[1]);
 						}

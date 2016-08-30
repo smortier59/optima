@@ -67,22 +67,6 @@ class pack_produit extends classes_optima {
 		$this->addPrivilege("EtatUpdate");
 	}
 
-	/**
-    * Surcharge de la méthode autocomplete pour faire apparaître sous_catégorie et catégorie
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @param array $infos 
-    * @return int  id si enregistrement ok 
-    */   	
-	function autocomplete($infos) {
-			
-			// Récupérer les produits
-			$this->q->reset()				
-				->addField("id_pack_produit")
-				->addField("nom")
-				->addField("site_associe");
-		return parent::autocomplete($infos,false);
-	}
-
 
 	/**
 	 * Permet de modifier un champs en AJAX

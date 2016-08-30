@@ -1272,7 +1272,7 @@ class societe extends classes_optima {
 	* Retourne les dernières activités
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
-	/*public static function _GET($get,$post) {	
+	public static function _GET($get,$post) {	
 		$columns = $get["columns"];
 
 		ATF::societe()->q->reset()->setLimit($get["length"],$get["start"])->setPage($get["start"]/$get["length"]);
@@ -1310,97 +1310,7 @@ class societe extends classes_optima {
 		$return["recordsFiltered"] = $total;
 //throw new Exception("test",500);
 		return $return;
-	}	*/
-
-
-	/**
-	* Permet de récupérer la liste des tickets hotline pour telescope
-	* @package Telescope
-	* @author Quentin JANON <qjanon@absystech.fr> 
-	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
-	* @param $post array Argument obligatoire mais inutilisé ici.
-	* @return array un tableau avec les données
-	*/ 
-	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
-	public function _GET($get,$post) {
-
-		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "id_societe";
-		if (!$get['trid']) $get['trid'] = "desc";
-
-		// Gestion du limit
-		if (!$get['limit']) $get['limit'] = 30;
-
-		// Gestion de la page
-		if (!$get['page']) $get['page'] = 0;
-
-		/*$colsData = array(
-			"societe.id_societe"=>array(),
-			"societe.ref"=>array(),
-			"societe.societe"=>array(),			
-			"societe.etat"=>array()
-		);*/
-
-
-		$this->q->reset();
-
-		if($get["search"]){
-			header("ts-search-term: ".$get['search']);
-			$this->q->setSearch($get["search"]);
-		}
-
-		if ($get['id']) {
-			$this->q->where("societe",$get['id'])->setLimit(1);
-		} else {
-			$this->q->setLimit($get['limit']);
-
-		}
-
-		switch ($get['tri']) {
-			case 'id_societe':
-			case 'etat':			
-				$get['tri'] = "societe.".$get['tri'];
-			break;
-		}
-
-
-		$this->q->addAllFields("societe");	
-
-
-		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-
-		foreach ($data["data"] as $k=>$lines) {
-			foreach ($lines as $k_=>$val) {
-				if (strpos($k_,".")) {
-					$tmp = explode(".",$k_);
-					$data['data'][$k][$tmp[1]] = $val;
-					unset($data['data'][$k][$k_]);
-				}				
-			}
-		}
-
-		if ($get['id']) {
-	        $return = $data['data'][0];			
-		} else {
-			// Envoi des headers
-			header("ts-total-row: ".$data['count']);
-			header("ts-max-page: ".ceil($data['count']/$get['limit']));
-			header("ts-active-page: ".$get['page']);
-
-	        $return = $data['data'];			
-		}
-
-		return $return;
-	}
-
-	public function _DELETE($get,$post) {
-		if (!$get['id']) throw new Exception("MISSING_ID",1000);
-		$return['result'] = $this->delete($get);
-    	// Récupération des notices créés
-    	$return['notices'] = ATF::$msg->getNotices();
-        return $return;
-	}
-
+	}	
 
 	public function _getSociete($get,$post) {		
 		return array("societe"=>$this->select($get["id_societe"]) , "module"=>$this);

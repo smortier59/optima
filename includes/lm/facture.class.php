@@ -100,8 +100,8 @@ class facture_lm extends facture {
 		$this->fieldstructure();
 
 		$this->onglets = array('facture_ligne');
-		//$this->no_insert = true;
-		//$this->no_update = true;
+		$this->no_insert = true;
+		$this->no_update = true;
 		$this->addPrivilege("majMail","update");
 		$this->addPrivilege("export_special");
 		$this->addPrivilege("export_special2");
@@ -196,13 +196,6 @@ class facture_lm extends facture {
 					return $periode["date_periode_debut"];
 				}
 				break;
-			case "nature":
-				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
-					return $periode["nature"];
-				}
-				break;
-
 			case "date_periode_fin":
 				if ($facture) {
 					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
@@ -380,9 +373,6 @@ class facture_lm extends facture {
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
-
-		log::logger($infos_ligne , "mfleurquin");
-
 		unset($infos["values_".$this->table]["produits"]);
 
 
@@ -420,6 +410,10 @@ class facture_lm extends facture {
 			if($infos["type_libre"] !== "normale" ){
 				$infos["tva"]=1;
 			}					
+		}elseif($infos["type_facture"]=="midas"){		
+			unset($infos_ligne_repris , $infos_ligne_non_visible , $infos_ligne);
+			$infos["prix"]=$infos["prix_midas"];
+			$infos["commentaire"] = $infos["periode_midas"];			
 		}elseif($infos["type_facture"]=="facture"){
 			if($facturation= ATF::facturation()->periode_facturation($commande['id_affaire'])){				
 				if(($infos["date_periode_debut"]) && ($infos["date_periode_fin"])){
@@ -1800,49 +1794,14 @@ class facture_lm extends facture {
         $donnees = array();
 
         foreach ($data as $key => $value) {
-        	$entite = "M0380";
-
-        	if(ATF::affaire()->select($value["facture.id_affaire"] , "id_magasin")){
-        		$entite = ATF::magasin(ATF::affaire()->select($value["facture.id_affaire"] , "id_magasin"), "entite_lm");
-        	}
-
         	for($i=1;$i<4;$i++){	
 	        	if($i==1){
 	        		//TTC
 	        		$donnees[$key][$i][1] = "1"; 
-		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
 		        	$donnees[$key][$i][3] = "1";
-		        	$donnees[$key][$i][4] = $entite;
-		        	$donnees[$key][$i][5] = "1"; //Code BU a donner par LM
-		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
-		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
-		        	$donnees[$key][$i][9] = "1";
-		        	$donnees[$key][$i][10] = "EUR";
-		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
-		        	$donnees[$key][$i][12] = "3"; //Centre de cout/profit a donner LM
-		        	$donnees[$key][$i][13] = "1";	
-	        		$donnees[$key][$i][14] = "411"; //Compte Comptable
-	        		$donnees[$key][$i][15] = ""; //Code projet
-		        	$donnees[$key][$i][16] = "0";
-		        	$donnees[$key][$i][17] = "0";
-		        	$donnees[$key][$i][18] = "0";
-		        	$donnees[$key][$i][19] = "0";	  
-					$donnees[$key][$i][20] = $value["facture.prix"]*$value["facture.tva"]; //Montant Debit
-					$donnees[$key][$i][21] = "0"; //Montant Credit        	
-		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] = ATF::affaire()->select($value["facture.id_affaire"], "ref")."/".$value["facture.ref"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
-					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
-
-					$total_debit += ($value["facture.prix"]*$value["facture.tva"]);
-
-	        	}elseif($i==2){
-	        		//HT
-	        		$donnees[$key][$i][1] = "1"; 
-		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "1";
-		        	$donnees[$key][$i][4] = $entite;
-		        	$donnees[$key][$i][5] = "1"; //Code BU a donner par LM
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
 		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
@@ -1851,10 +1810,36 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
 		        	$donnees[$key][$i][13] = "1";	
-	        		$donnees[$key][$i][14] = ""; //Compte Comptable 706100	Chiffre d'affaires location produit
-												 //					706200	Chiffre d'affaires lié à l'installation
-												 //					706300	Chiffre d'affaires abonnement services
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
+	        		$donnees[$key][$i][15] = ""; //Code projet
+		        	$donnees[$key][$i][16] = "0";
+		        	$donnees[$key][$i][17] = "0";
+		        	$donnees[$key][$i][18] = "0";
+		        	$donnees[$key][$i][19] = "0";	  
+					$donnees[$key][$i][20] = $value["facture.prix"]*$value["facture.tva"]; //Montant Debit
+					$donnees[$key][$i][21] = "0"; //Montant Credit        	
+		        	$donnees[$key][$i][22] = "0";	
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
+					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
+					$total_debit += ($value["facture.prix"]*$value["facture.tva"]);
+
+	        	}elseif($i==2){
+	        		//HT
+	        		$donnees[$key][$i][1] = "1"; 
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
+		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
+		        	$donnees[$key][$i][6] = "CLEODIS";
+		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
+		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][9] = "1";
+		        	$donnees[$key][$i][10] = "EUR";
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][13] = "1";	
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
 	        		$donnees[$key][$i][15] = ""; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
@@ -1863,7 +1848,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = "0"; //Montant Debit
 					$donnees[$key][$i][21] = $value["facture.prix"]; //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] =  ATF::affaire()->select($value["facture.id_affaire"], "ref")."/".$value["facture.ref"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
 					$total_credit += $value["facture.prix"];
@@ -1871,21 +1856,19 @@ class facture_lm extends facture {
 	        	}elseif($i==3){
 	        		//TVA
 	        		$donnees[$key][$i][1] = "1"; 
-		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
+		        	$donnees[$key][$i][2] = ""; //Code pays a donner par LM
 		        	$donnees[$key][$i][3] = "1";
-		        	$donnees[$key][$i][4] = $entite;
-		        	$donnees[$key][$i][5] = "1"; //Code BU a donner par LM
+		        	$donnees[$key][$i][4] = "1";
+		        	$donnees[$key][$i][5] = ""; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
 		        	$donnees[$key][$i][7] = ""; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
 		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
-		        	$donnees[$key][$i][12] = "R54"; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][12] = ""; //Centre de cout/profit a donner LM
 		        	$donnees[$key][$i][13] = "1";	
-	        		$donnees[$key][$i][14] = ""; //Compte Comptable 706100	Chiffre d'affaires location produit
-												 //					706200	Chiffre d'affaires lié à l'installation
-												 //					706300	Chiffre d'affaires abonnement services
+	        		$donnees[$key][$i][14] = ""; //Compte Comptable
 	        		$donnees[$key][$i][15] = ""; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
@@ -1894,7 +1877,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = "0"; //Montant Debit
 					$donnees[$key][$i][21] = $value["facture.prix"]*($value["facture.tva"]-1); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] =  ATF::affaire()->select($value["facture.id_affaire"], "ref")."/".$value["facture.ref"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
+					$donnees[$key][$i][23] = $value["facture.ref"]; //Description ligne
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
 					$total_credit += ($value["facture.prix"]*($value["facture.tva"]-1));

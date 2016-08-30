@@ -171,6 +171,8 @@ foreach ($liste as $key => $value) {
 		$produit["etat"] = strtolower($value["COL 2"]);
 		$produit["commentaire"] = $value["COL 4"];
 
+		log::logger($produit , "mfleurquin");
+
 		ATF::produit()->i($produit);
 
 

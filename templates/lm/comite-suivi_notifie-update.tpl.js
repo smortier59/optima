@@ -1,1 +1,0 @@
-{include file="comite-suivi_notifie-insert.tpl.js"} 
