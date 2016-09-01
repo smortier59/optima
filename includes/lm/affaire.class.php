@@ -77,7 +77,8 @@ class affaire_lm extends affaire {
 		$this->colonnes['bloquees']['select'] = array('id_parent','data','RIB','BIC','IBAN','RUM','nom_banque','ville_banque','date_previsionnelle');
 		
 		$this->onglets = array(
-			 'loyer'
+			 'affaire_etat'
+			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)
 			,'prolongation'
