@@ -1256,8 +1256,15 @@ class commande_cleodis extends commande {
             }
             if (file_exists($this->filepath($i['commande.id_commande'],"CourrierRestitution"))) {
                 $return['data'][$k]["CourrierRestitutionExists"] = true;
+            }           
+
+            if (file_exists($this->filepath($i['commande.id_commande'],"lettreSGEF"))) {
+                $return['data'][$k]["ctSGEFExists"] = true;
             }
 
+             if (file_exists($this->filepath($i['commande.id_commande'],"lettreBelfius"))) {
+                $return['data'][$k]["ctlettreBelfiusExists"] = true;
+            }
             
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiCourrierClassique"))) {
                 $return['data'][$k]["envoiCourrierClassiqueExists"] = true;

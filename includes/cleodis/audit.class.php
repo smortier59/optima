@@ -3,11 +3,7 @@
 * @package Optima
 * @subpackage Cléodis
 */
-class audit extends classes_optima {	
-};
-
-class audit_cap extends audit {
-
+class audit extends classes_optima {
 	function __construct($table_or_id) {
 		$this->table ="audit";
 		parent::__construct($table_or_id);
@@ -33,20 +29,27 @@ class audit_cap extends audit {
 			,'type'
 			,'etat'
 			,"date"
+			,"id_representant"
 		);
+
+		$this->colonnes['panel']['participants'] = array(
+            "contact"=>array("custom"=>true)
+        );
+
+
 
 		$this->colonnes['bloquees']['insert'] =  
 		$this->colonnes['bloquees']['clone'] =  
-		$this->colonnes['bloquees']['update'] =  array_merge(array('ref','etat','id_user',"id_affaire"));
+		$this->colonnes['bloquees']['update'] =  array_merge(array('ref','etat','id_user'));
 
-		$this->fieldstructure();		
+		$this->fieldstructure();
+
+		$this->foreign_key["id_representant"] = "contact";		
 		$this->files["auditA4"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["retourBPA"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 		$this->addPrivilege("perdu","update");
 	}
-
-
 
 	/** 
 	* Impossible de modifier un audit qui n'est pas en attente
@@ -55,22 +58,15 @@ class audit_cap extends audit {
 	* @return boolean 
 	*/
 	public function can_update($id,$infos=false){
+		
 		if($this->select($id,"etat")=="attente"){
 			return true;
 		}else{
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
-			return false; 
+			//return false; 
 		}
 	}
-	/** 
-	* Impossible de supprimer un audit
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @param int $id
-	* @return boolean 
-	*/
-	public function can_delete($id,$infos=false){
-		return false; 
-	}
+	
 
 	
 	/** 
@@ -88,9 +84,13 @@ class audit_cap extends audit {
 		}else{	$preview=false;	}
 
 		if(isset($infos["tu"])){ $tu = true; }else{ $tu = false; }
-
-		
+			
 		$this->infoCollapse($infos);
+
+		log::logger($infos , "mfleurquin");
+
+		$audit_contact = $infos["contact"];
+		unset($infos["contact"]);
 
 		ATF::db($this->db)->begin_transaction();
 		
@@ -99,15 +99,23 @@ class audit_cap extends audit {
 
 		if( !$infos["id_user"] ) $infos["id_user"] = ATF::$usr->get('id_user');
 
-		$affaire = array("ref"=>$infos["ref"],
+		if( !$infos["id_affaire"] ){
+			$affaire = array("ref"=>$infos["ref"],
 						"date"=>$infos["date"],
 						"id_societe"=>$infos["id_societe"]
 						);
 
-		$infos["id_affaire"]=ATF::affaire_cap()->i($affaire,$s);
+			$infos["id_affaire"]=ATF::affaire_cap()->i($affaire,$s);
+		}
+		
 
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);		
 		
+		//iNSERTION DES CONTACTS AUDIT
+        foreach ($audit_contact as $key => $value) {
+            ATF::audit_contact()->insert(array("id_audit"=>$last_id, "id_contact"=>ATF::contact()->decryptId($value)));
+        }
+
 		if($preview){
 			if(!$tu) $this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -120,6 +128,32 @@ class audit_cap extends audit {
 		if(is_array($cadre_refreshed)){	ATF::affaire()->redirection("select",$infos["id_affaire"]);	}
 		return $last_id;
 	}
+
+	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+        $id_audit = $this->decryptId($infos["audit"]["id_audit"]);
+
+        ATF::db($this->db)->begin_transaction();
+
+        ATF::audit_contact()->q->reset()->where("id_audit",$id_audit);
+        foreach (ATF::audit_contact()->select_all() as $key => $value) {
+            ATF::audit_contact()->delete(ATF::audit_contact()->decryptId($value["id_audit_contact"]));
+        }
+
+        $this->d($id_audit);
+
+        unset($infos["audit"]["id_audit"]);
+
+        $last_id = $this->insert($infos,$s,$files);
+
+        if($infos["preview"]){
+            ATF::db($this->db)->rollback_transaction();
+            return $this->cryptId($last_id);
+        }else{
+            ATF::db($this->db)->commit_transaction();
+            if(is_array($cadre_refreshed)){  ATF::affaire()->redirection("select",$this->select($last_id, "id_affaire"));   }
+            return $last_id;
+        }
+    }
 
 
 	/**

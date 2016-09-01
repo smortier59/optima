@@ -58,6 +58,8 @@ class facture_fournisseur extends classes_optima {
 
 		$this->addPrivilege("export_data");
 		$this->addPrivilege("export_cegid");
+		$this->addPrivilege("export_ap");
+		
 		$this->field_nom = "ref";
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->onglets = array('facture_fournisseur_ligne','facture_non_parvenue');
@@ -787,27 +789,29 @@ class facture_fournisseur extends classes_optima {
 
         $donnees = array();
 
+        
+
         foreach ($data as $key => $value) {
         	for($i=1;$i<4;$i++){	
 	        	if($i==1){
 	        		//TTC
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "e"; //Type d'evenement e/a
-		        	$donnees[$key][$i][3] = ""; //Code BU
+		        	$donnees[$key][$i][3] = "1"; //Code BU
 		        	$donnees[$key][$i][4] = "1";
-		        	$donnees[$key][$i][5] = "75"; //Code BU a donner par LM
+		        	$donnees[$key][$i][5] = "65"; //Code pays (centrale)
 		        	$donnees[$key][$i][6] = "1";
-		        	$donnees[$key][$i][7] = ""; //Type de facture F/A
-		        	$donnees[$key][$i][8] =  "";
-		        	$donnees[$key][$i][9] = date("Ymd", strtotime($value["facture.date"]));
+		        	$donnees[$key][$i][7] = ($value["facture_fournisseur.prix"] >= 0)?"F":"A"; //Type de facture F/A
+		        	$donnees[$key][$i][8] =  $value["facture_fournisseur.ref"];
+		        	$donnees[$key][$i][9] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
 		        	$donnees[$key][$i][10] = "";
-		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"])); 
-		        	$donnees[$key][$i][12] = ""; //Montant TTC separateur numeric .
+		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
+		        	$donnees[$key][$i][12] = ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]); //Montant TTC separateur numeric .
 		        	$donnees[$key][$i][13] = "EUR";	
 	        		$donnees[$key][$i][14] = ""; 
 	        		$donnees[$key][$i][15] = ""; 
-		        	$donnees[$key][$i][16] = "0"; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
-		        	$donnees[$key][$i][17] = "0"; //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
+		        	$donnees[$key][$i][16] = $value["facture_fournisseur.bap"]; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
+		        	$donnees[$key][$i][17] = $value["facture_fournisseur.date_bap"]; //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
 		        	$donnees[$key][$i][18] = "0"; //Num du fournisseur d'imputation comptable Num Tiers du Spec fournisseurs (champ2) 
 		        	$donnees[$key][$i][19] = "";	  
 					$donnees[$key][$i][20] = "";
@@ -817,20 +821,20 @@ class facture_fournisseur extends classes_optima {
 					$donnees[$key][$i][24] = "";
 					$donnees[$key][$i][25] = ""; 
 					$donnees[$key][$i][26] = "";  
-					$donnees[$key][$i][27] = ""; //N° Commande ? 
+					$donnees[$key][$i][27] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref"); //N° Commande ? 
 					$donnees[$key][$i][28] = ""; //Numéro du contrat / référence affaire 
 					$donnees[$key][$i][29] = ""; 
 					$donnees[$key][$i][30] = ""; 
 					$donnees[$key][$i][31] = ""; 
 
-					$total_debit += ($value["facture.prix"]*$value["facture.tva"]);
+					$total_debit += ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]);
 
 	        	}elseif($i==2){
 	        		//HT
 	        		$donnees[$key][$i][1] = "2"; 
 		        	$donnees[$key][$i][2] = "1"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = "0";
-		        	$donnees[$key][$i][4] = ""; // Montant
+		        	$donnees[$key][$i][4] = $value["facture_fournisseur.prix"]; // Montant
 		        	$donnees[$key][$i][5] = ""; //Code TVA
 		        	$donnees[$key][$i][6] = "";
 		        	$donnees[$key][$i][7] = ""; 
@@ -839,7 +843,7 @@ class facture_fournisseur extends classes_optima {
 		        	$donnees[$key][$i][10] = ""; 
 		        	
 
-					$total_credit += $value["facture.prix"];
+					$total_credit += $value["facture_fournisseur.prix"];
 
 	        	}elseif($i==3){
 	        		//TVA
@@ -848,13 +852,13 @@ class facture_fournisseur extends classes_optima {
 		        	$donnees[$key][$i][3] = "0";
 		        	$donnees[$key][$i][4] = ""; // Montant
 		        	$donnees[$key][$i][5] = ""; //Code TVA
-		        	$donnees[$key][$i][6] = "";
+		        	$donnees[$key][$i][6] = $value["facture_fournisseur.tva"];
 		        	$donnees[$key][$i][7] = ""; 
-		        	$donnees[$key][$i][8] = ""; // Montant HT si on est sur une ligne TVA 
+		        	$donnees[$key][$i][8] = $value["facture_fournisseur.prix"]; // Montant HT si on est sur une ligne TVA 
 		        	$donnees[$key][$i][9] = ""; //Type de facture
 		        	$donnees[$key][$i][10] = "";  
 
-					$total_credit += ($value["facture.prix"]*($value["facture.tva"]-1));
+					$total_credit += ($value["facture_fournisseur.prix"]*($value["facture_fournisseur.tva"]-1));
 	        	}  
         	}        	
         }
@@ -879,9 +883,9 @@ class facture_fournisseur extends classes_optima {
         
         $string .=  "98;".$lignes.";".date("Ymd").";\n";
         
-        $string .= "99;".$total_debit.";".$total_credit.";"."EUR;\n";
+        $string .= "99;".$total_debit.";".$total_credit.";EUR;\n";
        
-        $string .= "0;".$lignes.";".$date("Ymd").";";
+        $string .= "0;".$lignes.";".date("Ymd").";";
 
         echo $string;
     }

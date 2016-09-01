@@ -404,6 +404,7 @@ class facture_absystech extends facture {
 			);
 			$infos["tva"] = $tva;
 		}
+
 		if ($type_check=="facture") {
 			if($acompte_pourcent!=100 && $acompte_pourcent){
 				$infos["prix"]*=($acompte_pourcent/100);
@@ -2031,6 +2032,65 @@ class facture_absystech extends facture {
 
 		return $return;
 	}	
+
+	public function _graph_impaye($get,$post){
+
+		$date = date("Y-m");
+		$date_start = date("Y-m", strtotime("-1 year"));
+
+		ATF::facture()->q->reset()->where("facture.etat","impayee")								  
+								  ->addField("facture.date","date")
+								  ->addOrder("facture.date");
+		$fact = ATF::facture()->select_all();		
+		
+		//Initialisation du tableau des mois
+		for ($i=date("Y")-1; $i<=date("Y") ; $i++) { 
+			for($j=1;$j<=12;$j++){				
+				if($i == date("Y")){
+					if($j<=date("n")) $evo[$i][$j] = 0;
+				}else{
+					$evo[$i][$j] = 0;
+				}
+			}
+		}
+
+		// On renseigne le tabeau
+		$prix = 0;
+		foreach ($fact as $key => $value) {
+			$prix += number_format($value["prix_ttc"],0,",","");
+			if(date("Y-m", strtotime($value["date"])) <= $date_start){
+				$old[date("Y", strtotime($value["date"]))] += number_format($value["prix_ttc"],0,",","");
+				$evo[date("Y")-1][1] = number_format($value["prix_ttc"],0,",","");				
+			}else{
+				$evo[date("Y", strtotime($value["date"]))][date("n", strtotime($value["date"]))] = $prix;				
+			}
+		}		
+
+		$start = 0;
+		foreach ($old as $key => $value) {			
+			$old[$key] += $start;
+			$start += $value;
+		}
+
+		$data = $old;
+
+		foreach ($evo as $year => $mois) {
+			foreach ($mois as $num_mois => $value) {
+				if($value == 0) {
+					if($num_mois == 1){ 
+						$evo[$year][$num_mois] = $evo[$year-1][12];
+					}else{
+						$evo[$year][$num_mois] = $evo[$year][$num_mois-1];
+					}
+				}
+
+				$data[$year][$num_mois] = $evo[$year][$num_mois];
+			}
+		}
+
+
+		return $data;
+	}
 
 
 	public function _getImpaye($get,$post){

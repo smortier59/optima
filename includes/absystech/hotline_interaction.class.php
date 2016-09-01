@@ -177,7 +177,7 @@ class hotline_interaction extends classes_optima {
 		/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
 			$data = array(
-				 "duree_presta"=>"00:00"
+				 "duree_presta"=>$infos["duree_presta"]?$infos["duree_presta"]:"00:00"
 				,"heure_debut_presta"=>date("h:i")
 				,"heure_fin_presta"=>date("h:i")
 				,"detail"=>$infos["detail"]
@@ -263,9 +263,6 @@ class hotline_interaction extends classes_optima {
 			throw new errorATF("L'heure du début de la prestation est supérieure à l'heure de fin !");
 		} 
 
-		
-
-		$ticket_presta = explode(":", $infos["duree_presta"]);		
 		$ticket_presta = number_format(($duree_presta)/60 , 2);
 
 		$id_societe = ATF::hotline()->select($infos["id_hotline"], "id_societe");
@@ -1563,6 +1560,10 @@ class hotline_interaction extends classes_optima {
 		    		else{ $return[$key]["date_fin"] = ""; }
     			}
 
+    			if ($id_affaire && !$affaires[$id_affaire]) {
+	    			$affaires[$id_affaire] = ATF::affaire()->select($id_affaire);
+    			}
+
     			$temps_passe = (ATF::hotline()->getSecond($vhi["duree_presta"])
     						   +ATF::hotline()->getSecond($vhi["duree_dep"]))
     			   			   -ATF::hotline()->getSecond($vhi["duree_pause"]);
@@ -1583,13 +1584,24 @@ class hotline_interaction extends classes_optima {
     												
 					}else{						
 						if($id_affaire){	
-							if(! isset($THAffaire[$id_affaire])){							
-								$THAffaire[$id_affaire] = ATF::hotline()->getTauxHorraire($id_affaire);
+							if (in_array($affaires[$id_affaire]["etat"],array("commande","facture","terminee"))) {
+								// Affaires signées
+								if(! isset($THAffaire[$id_affaire])){							
+									$THAffaire[$id_affaire] = ATF::hotline()->getTauxHorraire($id_affaire);
+								}
+								$return[$key]["marge_brute"] += round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
+								$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
+	    						$return[$key]["taux_horaire"] = round($THAffaire[$id_affaire],2);
+
+							} else {
+								// Affaires non signées
+								if(! isset($THAffaire[$id_affaire])){							
+									$THAffaire[$id_affaire] = ATF::hotline()->getTauxHorraire($id_affaire);
+								}
+								$return[$key]["marge_brute"] = round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
+								$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
+	    						$return[$key]["taux_horaire"] = 0;
 							}
-							$return[$key]["temps_facture"] += "";
-							$return[$key]["marge_brute"] += round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
-							$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
-    						$return[$key]["taux_horaire"] = round($THAffaire[$id_affaire],2);
 						}else{
 							$return[$key]["temps_facture"] = 0;
 							$return[$key]["marge_brute"] = 0;
@@ -1800,8 +1812,10 @@ class hotline_interaction extends classes_optima {
 			"hotline_interaction.id_hotline_interaction"=>array(),
 			"hotline_interaction.id_hotline"=>array(),
 			"hotline_interaction.date"=>array(),
-			"hotline_interaction.temps"=>array("visible"=>false),
-			"hotline_interaction.temps_passe"=>array(), 
+			"hotline_interaction.heure_debut_presta"=>array("visible"=>false),
+			"hotline_interaction.heure_fin_presta",
+			"hotline_interaction.credit_presta",
+			"hotline_interaction.credit_dep",
 			"hotline_interaction.detail"=>array(),
 			"hotline_interaction.id_user"=>array(),
 			"hotline_interaction.id_contact"=>array(),
@@ -1856,6 +1870,23 @@ class hotline_interaction extends classes_optima {
 					unset($data['data'][$k][$k_]);
 				}				
 			}
+			$lines = $data['data'][$k];
+
+			if (!$data['data'][$k]['id_user_fk']) {
+				unset($data['data'][$k]['id_user'],$data['data'][$k]['id_user_fk']);
+			}
+
+			$data['data'][$k]['detail'] = $this->remove_empty_tags_recursive($data['data'][$k]['detail']);
+
+			if ($lines["id_user_fk"]) {
+				$v = $this->getTime($lines['id_hotline_interaction_fk'],"duree_presta");
+
+				if ($v != "0.00") $data['data'][$k]['duree_presta'] = $v;
+				$v = $this->getTime($lines['id_hotline_interaction_fk'],"duree_pause");
+				if ($v != "0.00") $data['data'][$k]['duree_pause'] = $v;
+				$v = $this->getTime($lines['id_hotline_interaction_fk'],"duree_dep");
+				if ($v != "0.00") $data['data'][$k]['duree_dep'] = $v;
+			}
 		}
 
 		if ($get['id']) {
@@ -1872,6 +1903,30 @@ class hotline_interaction extends classes_optima {
 		return $return;
 	}
 
+	/**
+	* Permet de virer tous les tags vide d'une chaine de caractère, et virer les multiple BR qui s'enchaine.
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $str string Chaine a traitée
+	* @param $repto string replacementstring chaine modifié.
+	*/ 
+	public function remove_empty_tags_recursive ($str, $repto = NULL){
+	    //** Return if string not given or empty.
+	    if (!is_string ($str) || trim ($str) == '') return $str;
+	    //** Recursive empty HTML tags.
+	    $str = preg_replace(
+	        //** Pattern written by Junaid Atari.
+	        '/<([^<\/>]*)>([\s]*?|(?R))<\/\1>/imsU',
+	        //** Replace with nothing if string empty.
+	        !is_string ($repto) ? '' : $repto,
+	        //** Source string
+	        $str
+	    );
+
+	    // ENleve les multiple BR
+	    $str = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $str);
+	    return $str;
+	}
 
 	/**
 	* Permet d'insérer une interaction hotline depuis telescope
@@ -1901,9 +1956,37 @@ class hotline_interaction extends classes_optima {
 	        }
 	        $post['temps_passe'] = $post['duree_presta'] = $tps;
 
+	        if (!$post['heure_debut_presta'] || !$post['heure_fin_presta']) {
+	        	// On créer un date time
+	        	$date = new DateTime();
+	        	// On stock la date car c'est la date de fin
+	        	$dayEnd = $date->format('d');
+	        	$post['heure_fin_presta'] = $date->format('H:i:s');
+	        	// On initialise l'interval a soustraire grace au temps passé
+	        	$tosub = new DateInterval("PT".str_replace(":", "H", $tps)."M");
+	        	$date->sub($tosub);
+	        	$post['heure_debut_presta'] = $date->format('H:i:s');
+	        	$dayBegin = $date->format('d');
+
+	        	if ($dayEnd != $dayBegin) {
+	        		throw new errorATF("Impossible d'enregistrer l'interaction car elle chevauche deux jours. Veuillez résuire le temps passé.");
+	        	}
+	        }
+
+	        // Calcul du nombre de crédit
+	        if (!$post['credit_presta']) {
+	        	$tmp = explode(":", $post['temps_passe']);
+
+	        	$creditMin = $tmp[1]/60;
+
+	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
+	        }
+
+
 	        // Insertion
 	        $id = self::insert($post);
-        	$return['result'] = self::select($id);
+	        $p = array("id"=>$id);
+        	$return['result'] = self::_GET($p);
 
         	// Traitement de l'id_user
         	if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
@@ -1921,5 +2004,67 @@ class hotline_interaction extends classes_optima {
         return false;
 	}	
 
+	/**
+	* Renvoi le nombre de crédit par rapport aun temps passé
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient le temps passé formatté comme suit : HH:ii:ss ou HH:ii
+	* @param $post array vide
+	* @return float le nombre de crédit formaté sur 3 chiffres après la virgule
+	*/ 
+	public function _credit($get,$post) {
+		if (!$get['tps']) return 0;
+    	$tmp = explode(":", $get['tps']);
+
+    	$creditMin = $tmp[1]/60;
+
+    	return round($creditMin + $tmp[0],2);
+	}
+
+	/**
+	* Renvoi le nombre de crédit pour le déplacement par rapport aux horaires saisis
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient les temps passé formattés comme suit : HH:ii:ss ou HH:ii
+	* @param $post array vide
+	* @return float le nombre de crédit formaté sur 3 chiffres après la virgule
+	*/ 
+	public function _credit_dep($get,$post) {
+		if ($val = ATF::hotline()->estAuForfait($get)) {
+			return $val;
+		} else {
+			return $this->_credit($get);
+		}
+	}
+
+
+
+	public function _indicateurs($get, $post){
+	
+		$workedDay = (ATF::hotline()->getJoursOuvres(date("Y-m-01"), date("Y-m-d")))*ATF::user()->select(ATF::$usr->getID(), "temps_partiel");
+		
+		
+		//Compte le nombre d'heures passees sur un mois
+		$mois = ATF::pointage()->totalHeure(date("Y-m"),ATF::$usr->getID());
+		$today = ATF::pointage()->totalHeure(date("Y-m-d"),ATF::$usr->getID());
+		
+		$todayText = $today;
+		$moisTxt = $mois;
+
+		if($today == NULL){ $today = 0; $todayText="0h";
+		}else{ 
+			$d = explode("h", $mois);
+			$today = number_format(intval($d[0])+(60/intval($d[1]))-1,0);  
+		}
+		
+		if($mois == NULL){ $mois = 0; $moisTxt="0h";
+		}else{
+			$m = explode("h", $mois);
+			$mois = number_format(intval($m[0])+(60/intval($m[1]))-1,0); 			
+		}
+
+		return array("today"=>$today , "mois"=>$mois, "todayText"=>$todayText, "moisTxt"=>$moisTxt,"totalMois"=>$workedDay);
+
+	}
 
 }

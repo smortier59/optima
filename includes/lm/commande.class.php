@@ -257,6 +257,9 @@ class commande_lm extends commande {
 		$devis=ATF::devis()->select($infos["id_devis"]);
 		$infos["id_affaire"]=$devis["id_affaire"];
 		$infos["tva"]=$devis["tva"];
+
+		$infos["type_contrat"] = ATF::affaire()->select($infos["id_affaire"], "type_affaire");
+
 		$this->q->reset()->addCondition("ref",ATF::affaire()->select($infos["id_affaire"],"ref"))->setCount();
 		$countRef=$this->sa();
 		if($countRef["count"]>0){
@@ -391,7 +394,7 @@ class commande_lm extends commande {
 				if(file_exists($contratA4) && file_exists($CG)){					
 					$cmd = "gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$contratA4.".pdf ".$contratA4." ".$CG;
 					$result = `$cmd`;
-					rename($contratA4.".pdf", $contratA4);									
+					rename($contratA4.".pdf", $contratA4);
 				}			
 			}
 		}
@@ -984,8 +987,7 @@ class commande_lm extends commande {
 	* @return boolean 
 	*/
 	public function can_delete($id,$infos=false){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($id);
-		else $commande = new commande_lm($id);
+		$commande = new commande_lm($id);
 
 		$affaire = $commande->getAffaire();
 
@@ -1007,7 +1009,7 @@ class commande_lm extends commande {
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
 		}
 		
-		if($this->select($id,"etat")!="non_loyer"){
+		if($this->select($id,"etat")!="non_loyer" && $this->select($id,"etat")!="pending"){
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
 		}
 		
@@ -1065,8 +1067,7 @@ class commande_lm extends commande {
 				ATF::devis()->u($devis_update);
 	
 				// Mise à jour du forecast
-				if(ATF::$codename == "lmbe") $affaire = new affaire_lmbe($commande['id_affaire']);
-				else $affaire = new affaire_lm($commande['id_affaire']);
+				$affaire = new affaire_lm($commande['id_affaire']);
 				$affaire->majForecastProcess();
 	
 				//Suppression des facturations

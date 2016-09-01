@@ -224,22 +224,6 @@ class affaire_cleodis extends affaire {
 		return $prefix.$suffix;
 	}
 	
-//	/** 
-//	* On ne peut créer une affaire uniquement à partir d'une fiche société
-//	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @return boolean 
-//	*/
-//	public function can_insert($id,$field,$requests){
-//log::logger($requests,ygautheron);		
-//		if($requests["id_societe"] || $requests[$this->table]["id_societe"]
-//			 || $requests["parent_name"]==="societe" && $requests["id"] // Appel ajax de l'onglet
-//			 || strpos($requests["pager"],"gsa_societe_affaire_")===0 // Appel ajax de l'onglet rafraichi
-//		){
-//			return true;
-//		}else{
-//			throw new errorATF("L'affaire doit être inséré depuis une société.",880);
-//		}
-//	}
 	
 	/**
     * Permet de mettre a jour une date en ajax
@@ -289,7 +273,7 @@ class affaire_cleodis extends affaire {
 					case "date_installation_reel":
 						$devis = $affaire->getDevis();
 						if (!$devis) {
-							throw new errorATF("aucun_devis_trouve",856);
+							throw new error("aucun_devis_trouve",856);
 						}
 						if($affaire->get("nature")!="avenant" && !$affaire->get("date_garantie")){
 							$affaire->set("date_garantie",$devis->getDateFinPrevue($infos['value']));
@@ -304,7 +288,7 @@ class affaire_cleodis extends affaire {
 					case "date_ouverture": break;
 						
 					default:
-						throw new errorATF("date_invalide",988);
+						throw new error("date_invalide",988);
 				}				
 				$affaire->set($infos["field"], $infos["value"]?date("Y-m-d",strtotime($infos["value"])):NULL);
 				$affaire->majForecastProcess();
@@ -317,7 +301,7 @@ class affaire_cleodis extends affaire {
 		
 				return true;
 				
-			} catch(errorATF $e) {
+			} catch(error $e) {
 				//On commit le tout
 				ATF::db($this->db)->rollback_transaction();
 				throw $e;
@@ -374,10 +358,10 @@ class affaire_cleodis extends affaire {
 					$affaire->set($infos["field"],$infos['value']);					
 					break;
 				default:
-					throw new errorATF("Problème modification",987);
+					throw new error("Problème modification",987);
 			}
 			
-		} catch(errorATF $e) {
+		} catch(error $e) {
 			//On commit le tout
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
@@ -534,32 +518,6 @@ class affaire_cleodis extends affaire {
 		}
 	}
 
-//	/** 
-//	* Retourne la facture de refinancement si elle existe
-//    * @author Yann GAUTHERON <ygautheron@absystech.fr>
-//	* @param int $id_fille Affaire fille qui demande ses parents
-//	* @return facture_cleodis
-//	*/
-//	function getFactureRefi($id_affaire=NULL){
-//		if (!$id_affaire && $this->infos["id_affaire"]) {
-//			$id_affaire = $this->infos["id_affaire"];
-//		}
-//		if($id_affaire){
-//			ATF::facture()->q->reset()
-//				->setStrict()
-//				->addField('facture.id_facture')
-//				->where("facture.id_affaire",$id_affaire)
-//				->where("facture.type_facture",'refi')
-//				->setDimension("cell");
-//			if($id = ATF::facture()->sa()) {
-//				return new facture_cleodis($id);
-//			}else{
-//				return false;
-//			}
-//		}else{
-//			return false;
-//		}
-//	}
 
 	/** 
 	* Retourne l'objet devis associé à la commande passée en paramètre
@@ -676,25 +634,7 @@ class affaire_cleodis extends affaire {
 		));
 	}
 	
-//	/**
-//	* Met à jour une valeur les dates de garanties
-//	* @author Anonyme
-//	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
-//	* @param string $date_garantie
-//	*/	
-//	function majGarantieParc($date_garantie){
-//		$this->notSingleton();
-//		if ($parc = ATF::parc()->ss('id_affaire',$this->get('id_affaire'))){
-//			foreach ($parc as $key => $item){
-//				if (!$item['provenance']) {
-//					ATF::parc()->u(array(
-//						'id_parc'=>$item["id_parc"]
-//						,'date_garantie' =>$date_garantie
-//					));
-//				}
-//			}
-//		} 
-//	}
+
 
 	/** 
 	* Met à jour le forecast d'une affaire en fonction de son état, méthode d'objet et non de singleton
@@ -744,29 +684,6 @@ class affaire_cleodis extends affaire {
 		}
 	}
 
-//	/**
-//	* Mise à jour des forecast
-//	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
-//	* @param array &$s La session
-//	* @param array $files $_FILES
-//	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
-//	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
-//	* @return boolean 
-//	*/
-//	public function update_forecast($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
-//		$this->infoCollapse();
-//		if($this->majForecastProcess()){
-//			ATF::$msg->addNotice(
-//				loc::mt(ATF::$usr->trans("notice_update_success"),array("record"=>$this->nom($infos["id_affaire"])))
-//				,ATF::$usr->trans("notice_success_title")
-//			);
-//			$this->redirection("select_all",NULL,"affaire.html");
-//			return true;
-//		}else{
-//			return false;
-//		}
-//	}
 	
 	function num_avenant($ref){
 		$tab_ref=explode("AVT",$ref);
@@ -903,9 +820,7 @@ class affaire_cleodis extends affaire {
 			}
 			ATF::$html->assign("taux",$taux);
 			
-//			// Assurance
-//			ATF::$html->assign("assurance_fixe",$taux);
-//			ATF::$html->assign("assurance_portable",$taux);
+
 
 			// Calcul du loyer actualisé			
 			$vr = 0;
@@ -986,7 +901,7 @@ class affaire_cleodis extends affaire {
 		if ($demandeRefi = $this->getDemandeRefiValidee()) {
 			$vr = $demandeRefi->get("valeur_residuelle");
 		}
-//log::logger("valeur_residuelle_demande_refi => ".$vr,mfleurquin);
+//log::logger("valeur_residuelle_demande_refi => ".$vr,ygautheron);
 		
 		$f = new Financial;
 		$freq = array("mois"=>12,"trimestre"=>4,"semestre"=>2,"an"=>1);
@@ -995,11 +910,11 @@ class affaire_cleodis extends affaire {
 			if ($pv) {
 				$vr2 = $pv; 
 			}
-//log::logger("f->PV(".$taux."/".$freq[$loyer["frequence_loyer"]]."/100, ".$loyer["duree"].", ".$loyer["loyer"].", ".$vr." , 1);",mfleurquin);
+//log::logger("f->PV(".$taux."/".$freq[$loyer["frequence_loyer"]]."/100, ".$loyer["duree"].", ".$loyer["loyer"].", ".$vr." , 1);",ygautheron);
 			$pv = -$f->PV($taux/$freq[$loyer["frequence_loyer"]]/100, $loyer["duree"], ($loyer["loyer"]+$loyer["frais_de_gestion"]+$loyer["assurance"]), $vr2 , 1);
 			$loyers[$i]["pv"] = round($pv,2);
 		}
-		$loyers = array_reverse($loyers);
+		$loyers = array_reverse($loyers);	
 		return $loyers;
 	}
 	
@@ -1019,25 +934,18 @@ class affaire_cleodis extends affaire {
 			$date_debut = $c->get("date_debut");
 		}
 		if ($date_debut && $infos["date_cession"]) {
-//log::logger("date_cession=".$infos["date_cession"],mfleurquin);				
+//log::logger("date_cession=".$infos["date_cession"],ygautheron);				
 			$date1 = new DateTime(substr($infos["date_cession"],0,8).'01');
 			$date1->modify('+1 month'); // On prend le premier jour du mois suivant ( nécessaire en cas de date de cession en dernier jour de période pleine,et à cause du pb des bisextile, et en plus a ce bug de merde : https://bugs.php.net/bug.php?id=52480 )
-//log::logger("date_cession=".$date1->format('Y-m-d'),mfleurquin);				
-//log::logger("date_debut=".$date_debut,mfleurquin);			
-			$date_2 = new DateTime($date_debut);
-//log::logger("DateTime date_debut=".$date_2->format('Y-m-d'),mfleurquin);
-//log::logger($date1->diff($date_2),mfleurquin);			
-//log::logger("diff=".$date1->diff($date_2)->format('%m'),ygautheron);			
-			$duree_ecoulee_restante = $duree_ecoulee = $date1->diff($date_2)->format('%y')*12 + $date1->diff($date_2)->format('%m');
-			if($date1->diff($date_2)->format('%d')>0) $duree_ecoulee_restante = $duree_ecoulee = $duree_ecoulee+1;
-//log::logger("duree_ecoulee=".$duree_ecoulee,mfleurquin);		
+//log::logger("date_cession=".$date1->format('Y-m-d'),ygautheron);				
+//log::logger("date_debut=".$date_debut,ygautheron);			
+			$date2 = new DateTime($date_debut);
+//log::logger($date1->diff($date2),ygautheron);			
+//log::logger("diff=".$date1->diff($date2)->format('%m'),ygautheron);			
+			$duree_ecoulee_restante = $duree_ecoulee = $date1->diff($date2)->format('%y')*12 + $date1->diff($date2)->format('%m');
+//log::logger("duree_ecoulee=".$duree_ecoulee,ygautheron);		
 //log::logger(DateTime::getLastErrors(),ygautheron);		
-			//log::logger($date1->diff($date_2)->format('%d') , "mfleurquin");
-			//log::logger($date_2 , "mfleurquin");
-
-			//log::logger($date1->diff($date_2) , "mfleurquin");
-			//log::logger($date_2->diff($date1) , "mfleurquin");
-
+			
 			// On "rogne" les mois deja écoulé jusqu'àla date de cession	
 			$frequence_loyer=array("mois"=>1,"trimestre"=>3,"semestre"=>6,"an"=>12);
 			$loyers = $this->getLoyers($infos["id_affaire"]);
@@ -1060,7 +968,7 @@ class affaire_cleodis extends affaire {
 //log::logger($loyers,ygautheron);		
 	
 		$loyers = $a->getCompteTLoyersActualises($infos["taux"],$infos["vr"],$loyers);
-	
+//log::logger($loyers,ygautheron);	
 		//date_default_timezone_set($fuseau);	// Fin du truc chelou	: https://bugs.php.net/bug.php?id=52480
 		return $loyers[0]["pv"];
 	}
@@ -1106,13 +1014,13 @@ class affaire_cleodis extends affaire {
 		}elseif($enregistrement["id_contact"]){
 			if(!ATF::contact()->select($enregistrement["id_contact"],"email")){
 				ATF::db($this->db)->rollback_transaction();
-				throw new errorATF("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
+				throw new error("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
 			}else{
 				$recipient = ATF::contact()->select($enregistrement["id_contact"],"email");
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF("Il n'y a pas d'email",350);
+			throw new error("Il n'y a pas d'email",350);
 		}
 
 		if(ATF::$usr->getID()){
@@ -1336,6 +1244,13 @@ class affaire_cap extends affaire {
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire"; 
 		parent::__construct($table_or_id);
+
+		$this->colonnes['fields_column'] = array(
+			'affaire.ref'
+			,'affaire.date'
+			,'affaire.id_societe'			
+		);
+
 		$this->actions_by = array("insert"=>"audit","update"=>"audit");
 		$this->fieldstructure();
 		
@@ -1347,6 +1262,8 @@ class affaire_cap extends affaire {
 		
 		
 		$this->field_nom="ref";
+
+		$this->foreign_key['id_societe'] =  "societe";
 		
 		$this->no_delete = true;
 		$this->no_update = true;

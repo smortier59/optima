@@ -51,6 +51,7 @@ class devis_lm extends devis {
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			
+			
 		);
 
 		$this->colonnes['panel']['adresse'] = array(
@@ -148,6 +149,7 @@ class devis_lm extends devis {
 		$this->foreign_key["id_fournisseur"] = "societe";
 		$this->foreign_key["AR_societe"] = "societe";
 		$this->foreign_key["vente_societe"] = "societe";
+		
 
 		$this->onglets = array('devis_ligne');
 		$this->sans_partage = true; /* Evite de se voir jeté à cause d'un droit de partage pour ce module */
@@ -238,6 +240,12 @@ class devis_lm extends devis {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 		
+		if(!$infos["type_affaire"]){
+		  $pack = ATF::produit()->select($infos_ligne[0]["devis_ligne__dot__id_produit"], "id_pack_produit");
+		  $infos["type_affaire"] = ATF::pack_produit()->select($pack, "type_contrat");
+		} 
+
+
 		//Vérification du devis
 		if ($infos["ref"]) { // Dans le cas d'une modification, il faut conerver la ref d'affaire !
 			$this->check_field($infos);
@@ -339,7 +347,8 @@ class devis_lm extends devis {
 		ATF::affaire_etat()->insert(array("id_affaire"=>$infos["id_affaire"],
 										  "etat"=>"commande"
 										 ));
-		unset($infos["adresse_livraison"],$infos["adresse_facturation"],$infos["cp_adresse_livraison"],$infos["cp_adresse_facturation"],$infos["ville_adresse_livraison"],$infos["ville_adresse_facturation"]);
+		unset($infos["adresse_livraison"],$infos["adresse_facturation"],$infos["cp_adresse_livraison"],$infos["cp_adresse_facturation"],$infos["ville_adresse_livraison"],$infos["ville_adresse_facturation"],$infos["id_magasin"],$infos["num_bdc_lm"],$infos["poseur"],$infos["poseur_aggree"],$infos["type_souscription"],$infos["type_affaire"]);
+		
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 		$infos["ref"]=$affaire["ref"];
 
@@ -352,7 +361,7 @@ class devis_lm extends devis {
 		
 		// Mise à jour du forecast
 		$affaire = new affaire_lm($infos['id_affaire']);
-		$affaire->majForecastProcess();
+		//$affaire->majForecastProcess();
  
 
 		ATF::comite()->insert(array("date"=>date("Y-m-d"),
@@ -379,10 +388,14 @@ class devis_lm extends devis {
 			foreach($infos_ligne as $key=>$item){
 				$item["id_devis"]=$last_id;
 
-				log::logger($item , "mfleurquin");
-
 				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
+
+				if(!$fournisseurs){
+					ATF::produit_fournisseur_loyer()->q->reset()->where("produit_fournisseur_loyer.id_produit",$item["id_produit"]);
+					$fournisseurs = ATF::produit_fournisseur_loyer()->select_all();
+				}
+
 
 				if($fournisseurs){					
 					foreach ($fournisseurs as $kf => $vf) {
@@ -399,9 +412,10 @@ class devis_lm extends devis {
 					}
 				}
 
+
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new errorATF("Ligne de devis sans fournisseur",882);
+					throw new errorATF("Ligne de devis sans fournisseur (Produit : ".$item['id_produit'].")",882);
 				}
 				unset($item["id_parc"]);
 				ATF::devis_ligne()->i($item);
