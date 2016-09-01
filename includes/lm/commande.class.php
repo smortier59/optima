@@ -257,6 +257,9 @@ class commande_lm extends commande {
 		$devis=ATF::devis()->select($infos["id_devis"]);
 		$infos["id_affaire"]=$devis["id_affaire"];
 		$infos["tva"]=$devis["tva"];
+
+		$infos["type_contrat"] = ATF::affaire()->select($infos["id_affaire"], "type_affaire");
+
 		$this->q->reset()->addCondition("ref",ATF::affaire()->select($infos["id_affaire"],"ref"))->setCount();
 		$countRef=$this->sa();
 		if($countRef["count"]>0){
@@ -312,6 +315,9 @@ class commande_lm extends commande {
 			$infos_ligne = array();
 			ATF::devis_ligne()->q->reset()->where("id_devis",$infos["id_devis"]);
 			$infos_ligne = ATF::devis_ligne()->sa();
+
+			$pack = ATF::pack_produit()->select(ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit"));
+
 			if($infos_ligne){	
 				foreach($infos_ligne as $key=>$item){										
 					unset($item["id_devis_ligne"],
@@ -333,7 +339,9 @@ class commande_lm extends commande {
 			//Lignes visibles
 			if($infos_ligne){
 				$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"commande_ligne");
-			
+				
+				$pack = ATF::pack_produit()->select(ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit"));
+
 				foreach($infos_ligne as $key=>$item){
 					if($item["id_commande_ligne"]){
 						$devis_ligne=ATF::devis_ligne()->select($item["id_commande_ligne"]);
@@ -375,7 +383,20 @@ class commande_lm extends commande {
 				$path=array("A3"=>"contratA3","A4"=>"contratA4");
 				ATF::affaire()->mailContact($email,$last_id,"commande",$path);
 			}
+
 			ATF::db($this->db)->commit_transaction();
+			
+			//On concatene le PDF du contrat avec les CG
+			if($pack && $pack["id_document_contrat"]){
+				$contratA4 = $this->filepath($last_id,"contratA4");
+				$CG = ATF::document_contrat()->filepath($pack["id_document_contrat"],"fichier_joint");
+
+				if(file_exists($contratA4) && file_exists($CG)){					
+					$cmd = "gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$contratA4.".pdf ".$contratA4." ".$CG;
+					$result = `$cmd`;
+					rename($contratA4.".pdf", $contratA4);
+				}			
+			}
 		}
 		
 		if(is_array($cadre_refreshed)){
@@ -966,8 +987,7 @@ class commande_lm extends commande {
 	* @return boolean 
 	*/
 	public function can_delete($id,$infos=false){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($id);
-		else $commande = new commande_lm($id);
+		$commande = new commande_lm($id);
 
 		$affaire = $commande->getAffaire();
 
@@ -989,7 +1009,7 @@ class commande_lm extends commande {
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
 		}
 		
-		if($this->select($id,"etat")!="non_loyer"){
+		if($this->select($id,"etat")!="non_loyer" && $this->select($id,"etat")!="pending"){
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
 		}
 		
@@ -1047,8 +1067,7 @@ class commande_lm extends commande {
 				ATF::devis()->u($devis_update);
 	
 				// Mise à jour du forecast
-				if(ATF::$codename == "lmbe") $affaire = new affaire_lmbe($commande['id_affaire']);
-				else $affaire = new affaire_lm($commande['id_affaire']);
+				$affaire = new affaire_lm($commande['id_affaire']);
 				$affaire->majForecastProcess();
 	
 				//Suppression des facturations
@@ -1260,9 +1279,14 @@ class commande_lm extends commande {
                 $return['data'][$k]["CourrierRestitutionExists"] = true;
             }
 
-            
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiCourrierClassique"))) {
                 $return['data'][$k]["envoiCourrierClassiqueExists"] = true;
+            }
+
+            log::logger($i["commande.id_commande"] , "mfleurquin");
+
+            if (file_exists($this->filepath($i['commande.id_commande'],"retour"))) {
+                $return['data'][$k]["ctSigneSlimpayExists"] = true;
             }
 		}
 		
