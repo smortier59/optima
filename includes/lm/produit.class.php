@@ -12,8 +12,8 @@ class produit_lm extends produit {
 		$this->colonnes['fields_column'] = array(
 			'produit.produit',											
 			//'produit.id_fournisseur',												 
-			//'produit.prix_achat_ht'=>array("width"=>80,"rowEditor"=>"setInfos","align"=>"right","renderer"=>"money"),
-			'somme_loyers_engages'=>array("custom"=>true,"align"=>"right","renderer"=>"money"),
+			'prix_achat_ht'=>array("custom"=>true,"width"=>80,"rowEditor"=>"setInfos","align"=>"right","renderer"=>"money"),
+			'somme_loyers_engages'=>array("custom"=>true,"nosort"=>true,"align"=>"right","renderer"=>"money"),
 			'detail_loyers'=>array("custom"=>true),
 			'produit.etat'=>array("rowEditor"=>"actifUpdate","renderer"=>"etat","width"=>80),
 			'produit.id_pack_produit',
@@ -302,8 +302,35 @@ class produit_lm extends produit {
 			->addField("SUM(IF(produit_loyer.nature='prolongation',0,produit_loyer.duree * produit_loyer.loyer))","somme_loyers_engages")
 			->addField("GROUP_CONCAT(CONCAT(produit_loyer.duree, 'x', produit_loyer.loyer) ORDER BY produit_loyer.ordre ASC SEPARATOR ' + ')","detail_loyers")
 			->from("produit","id_produit","produit_loyer","id_produit")
+
+			//->addField("SUM(IF(produit_fournisseur.recurrence='achat',produit_fournisseur.prix_prestation,0))","prix_achat_ht")
+			//->from("produit","id_produit","produit_fournisseur","id_produit")
+
 			->addGroup("produit.id_produit")
 		;
-		return parent::select_all($order_by,$asc,$page,$count);
+
+		$return = parent::select_all($order_by,$asc,$page,$count);
+		$p = new produit_lm(); // Ne pas écraser le querier courant
+		foreach ($return['data'] as $k=>$i) {
+			$return['data'][$k]['prix_achat_ht'] = $p->prix_achat_prestation($i['produit.id_produit']);
+		}
+		return $return;
+	}
+
+	/**
+	* Retourne le prix d'achat total, donc la somme des prix_prestation de ses produit_fournsiseur
+	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
+	* @param int $id_produit
+	* @return float $prix_total
+	*/
+	public function prix_achat_prestation($id_produit){
+		ATF::produit_fournisseur()->q->reset()
+			->addField("SUM(IF(produit_fournisseur.recurrence='achat',produit_fournisseur.prix_prestation,0))","prix_achat_ht")
+			->where("produit_fournisseur.recurrence","achat")
+			->where("produit_fournisseur.id_produit",$id_produit)
+			->addGroup("produit_fournisseur.id_produit")
+			->setDimension('cell')
+		;
+		return ATF::produit_fournisseur()->sa();
 	}
 }
