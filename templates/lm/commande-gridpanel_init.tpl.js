@@ -310,7 +310,6 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</p>';
 			}
 
-
 			if (!Ext.getCmp('myForm'+id)) {
 				 var formPanel = new Ext.FormPanel({
 					frame:true,
@@ -426,7 +425,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 							,value: id
 							,hidden:true
 						},{
-							 xtype: 'textfield',
+							xtype: 'textfield',
 		                    fieldLabel: 'Document supplémentaire a retourner',
 		                    name:'docSupAretourner',
 		                    id : 'docSupAretourner'+id,
@@ -510,19 +509,21 @@ ATF.renderer.pdfCourriers=function(table,field) {
 					},{
 						text: 'Annuler',
 						handler: function(){
-							Ext.getCmp('myForm'+id).destroy();
 							Ext.getCmp('mywindow'+id).hide();
 						}
 					}]
 				});
 			}	
+
 			if (!Ext.getCmp('mywindow'+id)) {
+
 				new Ext.Window({
 					title: '{ATF::$usr->trans("creerCourrierType","commande")}',
 					id:'mywindow'+id,
 					plain:true,
 					bodyStyle:'padding:5px;',
 					width:600,
+					closable: false,
 					buttonAlign:'center',
 					items: [formPanel]
 				});
