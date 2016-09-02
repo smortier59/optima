@@ -28,7 +28,7 @@ if($infos["OffreMagasin"]){
                 "nom"    => $societe["nom"],
                 "prenom" => $societe["prenom"],
                 "email"  => $societe["email"],
-                "tel"=>     $societe["tel"]              
+                "tel"=>     $societe["tel"]
             );
             $id_contact = ATF::contact()->insert($contact);
        }       
