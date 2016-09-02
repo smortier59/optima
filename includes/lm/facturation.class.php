@@ -291,18 +291,25 @@ class facturation extends classes_optima {
 							for($j=1;$j<=$item['duree'];$j++){
 								$date_fin=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
 								$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
-								$this->i(array(
-												"id_societe"=>$affaire->get("id_societe"),
-												"id_affaire"=>$affaire->get("id_affaire"),
-												"montant"=>$item['loyer'],
-												"assurance"=>$item['assurance'],
-												"frais_de_gestion"=>$item['frais_de_gestion'],
-												"date_periode_fin"=>$date_fin,
-												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat",
-												"nature"=>$item["nature"])
-											);
+								$echeance = array(
+									"id_societe"=>$affaire->get("id_societe"),
+									"id_affaire"=>$affaire->get("id_affaire"),
+									"montant"=>$item['loyer'],
+									"assurance"=>$item['assurance'],
+									"frais_de_gestion"=>$item['frais_de_gestion'],
+									"date_periode_fin"=>$date_fin,
+									"date_periode_debut"=>$date_debut,
+									"type"=>"contrat",
+									"nature"=>$item["nature"]
+								);
+								$this->i($echeance);
+
+								// Excheancier de facturation fournisseur
+								ATF::facturation_fournisseur()->createEcheance($affaire, $echeance);
+
 								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
+
+
 							}
 						}
 						
@@ -929,7 +936,7 @@ class facturation extends classes_optima {
 				
 		$prolongation=ATF::db()->sql2array($query);	
 		foreach ($prolongation as $key=>$item) {
-			$objAffaire = new affaire_cleodis($item['id_affaire']);
+			$objAffaire = new affaire_lm($item['id_affaire']);
 			$objCommande = $objAffaire->getCommande();
 
 			try {
@@ -1189,7 +1196,7 @@ class facturation extends classes_optima {
 				//Si il n'y a pas de facture 
 				if(!$facturePresente){					
 					//En restitution et fin de contrat dépassée
-					$objAffaire = new affaire_cleodis($item['id_affaire']);
+					$objAffaire = new affaire_lm($item['id_affaire']);
 					$objCommande = $objAffaire->getCommande();
 		
 					try {
