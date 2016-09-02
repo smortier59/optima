@@ -197,7 +197,6 @@ class devis_lm extends devis {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
@@ -329,7 +328,7 @@ class devis_lm extends devis {
 		ATF::affaire_etat()->insert(array("id_affaire"=>$infos["id_affaire"],
 										  "etat"=>"commande"
 										 ));
-		unset($infos["adresse_livraison"],$infos["adresse_facturation"]);
+		unset($infos["adresse_livraison"],$infos["adresse_facturation"],$infos["cp_adresse_livraison"],$infos["cp_adresse_facturation"],$infos["ville_adresse_livraison"],$infos["ville_adresse_facturation"]);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 		$infos["ref"]=$affaire["ref"];
 

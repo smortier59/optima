@@ -27,10 +27,7 @@ class produit_loyer extends classes_optima {
 			,"produit_loyer.duree"
 			,"produit_loyer.type"
 		);
-		
-		$this->no_insert=true;
-		$this->no_update=true;
-		$this->no_delete=true;
+				
 		$this->fieldstructure();	
 		$this->selectAllExtjs=true; 
 	}

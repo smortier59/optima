@@ -38,7 +38,7 @@ class produit_lm extends produit {
 										'id_pack_produit'=>array("targetCols"=>1),
 										'ref_lm'=>array("targetCols"=>1),
 										'libelle_a_revoyer_lm'=>array("targetCols"=>1),
-										"description"=>array("targetCols"=>2),
+										"description",
 										"ordre"=>array("targetCols"=>1),
 										"afficher"=>array("targetCols"=>1),
 										'id_fabriquant'
@@ -69,9 +69,12 @@ class produit_lm extends produit {
 			,"popup"=>array("produit" , "id")
 		);
 		$this->colonnes['bloquees']['select'] =  array('loyer')	;
-				
+		
+		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);		
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['loyer_fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
+
+		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->fieldstructure();
 

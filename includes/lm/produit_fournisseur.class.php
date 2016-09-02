@@ -17,7 +17,7 @@ class produit_fournisseur extends classes_optima {
 		);
 
 		$this->colonnes['primary'] = array(
-			 "id_fournisseur"
+			 "id_fournisseur"=>array("custom"=>true,"autocomplete"=>array("function"=>"autocompleteFournisseurs"))
 			,"id_produit"
 			,"prix_prestation"
 			,"recurrence"
@@ -36,9 +36,7 @@ class produit_fournisseur extends classes_optima {
 
 		$this->foreign_key["id_fournisseur"] = "societe";
 		
-		$this->no_insert=true;
-		$this->no_update=true;
-		$this->no_delete=true;
+		
 		$this->fieldstructure();	
 		$this->selectAllExtjs=true; 
 	}

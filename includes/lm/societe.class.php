@@ -26,7 +26,7 @@ class societe_lm extends societe {
 			,"id_owner"
 			,"etat"			
 			,"joignable"
-			,"type_societe"=>array("listeners"=>array("select"=>"ATF.selectType_client","afterRender"=>"ATF.loadClient"))
+			,"type_societe"/*=>array("listeners"=>array("select"=>"ATF.selectType_client","afterRender"=>"ATF.loadClient"))*/
 		);
 
 		$PanelCoordonne = $this->colonnes["panel"]["coordonnees"];

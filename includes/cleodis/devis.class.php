@@ -1392,8 +1392,8 @@ class devis_cleodis extends devis {
 							->addField("COUNT(*)","nb")					
 							->setStrict()
 							->addJointure("devis","id_societe","societe","id_societe")
-							->addJointure("societe","id_owner","user","id_user")
-							->addCondition("devis.etat",'gagne',"AND")
+							->addJointure("devis","id_affaire","affaire","id_affaire")
+							->addJointure("societe","id_owner","user","id_user")							
 							->where("user.id_agence",$id_agence);
 
 					/*if($type == "o2m"){
@@ -1417,10 +1417,10 @@ class devis_cleodis extends devis {
 					}*/
 
 					if($type == "reseau"){
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NOT NULL");
+						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+								->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
 					}else{
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE")
+						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
 								->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
 					}
 
@@ -1429,10 +1429,13 @@ class devis_cleodis extends devis {
 							->addCondition("devis.devis","%vente%","AND", "conditiondevis", "NOT LIKE")
 							->addCondition("devis.devis","%AVT%","AND", "conditiondevis", "NOT LIKE")
 							->addCondition("devis.devis","%MIPOS%","AND", "conditiondevis", "NOT LIKE")
-
-							->addCondition("devis.type_contrat","%vente%","AND", "conditiondevis", "!=")
+							
+							->addCondition("devis.type_contrat","vente","AND", "conditiondevis", "!=")
 							->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
-
+							
+							->addCondition("devis.etat",'gagne',"AND","conditiondevis","=")
+							->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+							->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
 							
 							->addField("DATE_FORMAT(`".$this->table."`.`first_date_accord`,'%Y')","year")
 							->addField("DATE_FORMAT(`".$this->table."`.`first_date_accord`,'%m')","month")
@@ -1440,7 +1443,7 @@ class devis_cleodis extends devis {
 							->addGroup("year")->addGroup("month")
 							->addOrder("year")->addOrder("month");
 						
-							$this->q->addCondition("`".$this->table."`.`date`",$date."-01-01","AND",false,">");	
+							$this->q->addCondition("`".$this->table."`.`first_date_accord`",$date."-01-01","AND",false,">=");	
 
 					$result= parent::select_all();
 					
