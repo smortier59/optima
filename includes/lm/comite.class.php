@@ -13,7 +13,6 @@ class comite extends classes_optima {
 			,'comite.id_affaire'
 			,'comite.id_societe'
 			,'comite.etat'=>array("width"=>30,"renderer"=>"etat")
-			//,'comite.validite_accord'=>array("renderer"=>"updateDate","width"=>170)					
 			,'decision'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteDecision","width"=>50)
 			,"decisionComite"
 		);
