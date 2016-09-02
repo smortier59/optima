@@ -343,6 +343,9 @@ class pdf_absystech extends pdf {
 			
 			$this->cell(25,4,"Total HT",1,0,'R');
 
+
+
+
 			switch ($type_facture) {
 				case "solde":
 					$this->cell(25,4,number_format($infos_facture["prix"]+$sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
@@ -374,7 +377,24 @@ class pdf_absystech extends pdf {
 					$this->cell(131,4,"En votre aimable règlement,",0,0,'L');	
 				break;
 				case "avoir":
-					if (ATF::facture()->select($infos_facture['id_facture_parente'] , "type_facture") == "solde")  {
+					// SI on traite un avoir, celui ci doit avoir le même comportement que sa facture parente
+					$parente = ATF::facture()->select($infos_facture['id_facture_parente']);
+
+					if ($parente['type_facture']=="acompte") {
+						ATF::commande_facture()->q->reset()->addCondition('id_facture',$parente['id_facture'])->end();
+						if($id_commande=ATF::commande_facture()->select_all()){
+							$commande=ATF::commande()->select($id_commande[0]["id_commande"]);
+
+							$this->cell(25,4,number_format($commande["prix"],2,',',' ')." €",1,1,'R');
+
+						    $accompte = $parente["prix"]/$commande["prix"];
+							$this->cell(131,4,"Facture d'acompte de ".round(($accompte)*100)."%",0,0,'L');
+							$this->cell(25,4,"Acompte HT ".round(($accompte)*100)."%",1,0,'R');
+							$this->cell(25,4,number_format($parente["prix"],2,',',' ')." €",1,1,'R');		
+
+							$this->cell(131,4,"En votre aimable règlement,",0,0,'L');		
+						}					
+					} else if ($parente['type_facture']=="solde") {
 
 						ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos_facture['id_facture_parente'])->end();
 						if($id_commande=ATF::commande_facture()->select_all()){
@@ -389,19 +409,34 @@ class pdf_absystech extends pdf {
 						}
 
 
-						$this->cell(25,4,number_format($infos_facture["prix"],2,',',' ')." €",1,1,'R');
+						$this->cell(25,4,number_format($parente["prix"],2,',',' ')." €",1,1,'R');
 						$this->cell(131,4,"",0,0,'C');
 						$this->cell(25,4,"Déjà Payé HT",1,0,'R');
 						$this->cell(25,4,number_format($sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');	
 
 						$this->cell(131,4,"",0,0,'C');
 						$this->cell(25,4,"Solde HT",1,0,'R');						
-					}
-					
-					$infos_facture["prix"] = ($infos_facture["prix"] + $sum_anc_facture["prix"])*-1;
+						
+						$infos_facture["prix"] = ($parente["prix"] + $sum_anc_facture["prix"])*-1;
 
-					$this->cell(25,4,number_format($infos_facture["prix"],2,',',' ')." €",1,1,'R');
-					$this->cell(131,4,"",0,0,'C');
+
+
+						$this->cell(25,4,number_format($parente["prix"],2,',',' ')." €",1,1,'R');
+						$this->cell(131,4,"",0,0,'C');
+
+					} else {
+						$infos_facture["prix"] = ($infos_facture["prix"] + $sum_anc_facture["prix"])*-1;
+
+
+
+						$this->cell(25,4,number_format($infos_facture["prix"],2,',',' ')." €",1,1,'R');
+						$this->cell(131,4,"",0,0,'C');
+						
+					}
+
+					$infos_facture['prix'] = abs($infos_facture['prix']);
+
+
 
 					//ATF::facture()->u(array("id_facture"=>$id , "prix"=>$infos_facture["prix"]));
 
