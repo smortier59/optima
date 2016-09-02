@@ -541,7 +541,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 					bodyStyle:'padding:5px;',
 					width:600,
 					buttonAlign:'center',
-					items: [Ext.getCmp('myForm'+id)]
+					items: [formPanel]
 				});
 			}
 			
@@ -552,8 +552,17 @@ ATF.renderer.pdfCourriers=function(table,field) {
 			html += ATF.usr.trans('creerCourrierType','commande');
 			html += '</a>';
 			html += '</p>';
+
+			(function(){
+				var params = {
+					renderTo: idDiv,
+					html: html
+					
+				};
+				var p = new Ext.Container(params);
+			}).defer(25);
 						
-			return '<div id="'+idDiv+'">'+html+'</div>';
+			return '<div id="'+idDiv+'"></div>';
 		}
 	};
 {/if}
