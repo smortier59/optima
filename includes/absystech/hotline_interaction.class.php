@@ -1973,6 +1973,13 @@ class hotline_interaction extends classes_optima {
 	        	}
 	        }
 
+
+	        if ($post['visible']=="on") $post['visible'] = "oui";
+	        else $post['visible'] = "non";
+
+	        if ($post['send_mail']=="on") $post['send_mail'] = "oui";
+	        else $post['send_mail'] = "non";
+
 	        // Calcul du nombre de crédit
 	        if (!$post['credit_presta']) {
 	        	$tmp = explode(":", $post['temps_passe']);
