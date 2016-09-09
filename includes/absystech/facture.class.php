@@ -417,25 +417,28 @@ class facture_absystech extends facture {
 			}
 		}elseif($type_check=="avoir"){
 			$infos["prix"]=0-$infos["prix"];
-			$infos["type_facture"]="avoir";
 			if(!$infos["id_facture_parente"]){
 				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 
+			$parent = $this->select($infos["id_facture_parente"]);
+			unset($parent['ref']);
+			//$infos = $parent;
+			$infos["type_facture"]="avoir";
+			$infos['prix'] = 0-$parent["prix"];
 
+			// ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
+			// if($id_commande_factures=ATF::commande_facture()->select_all()){
+			// 	$commande=ATF::commande()->select($id_commande_factures[0]["id_commande"]);
 
-			ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
-			if($id_commande_factures=ATF::commande_facture()->select_all()){
-				$commande=ATF::commande()->select($id_commande_factures[0]["id_commande"]);
-
-				if($commande["prix"]!=$infos["prix"]){
-					$infos["frais_de_port"]=$infos["frais_de_port"];
-					//Si c'est un solde ou un acompte				
-					$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);					
-				}
-			}
+			// 	if($commande["prix"]!=$infos["prix"]){
+			// 		$infos["frais_de_port"]=$infos["frais_de_port"];
+			// 		//Si c'est un solde ou un acompte				
+			// 		$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);					
+			// 	}
+			// }
 			
-			$infos["prix"] = $infos["prix"] - $sum_anc_facture["prix"];
+			// $infos["prix"] = $infos["prix"] - $sum_anc_facture["prix"];
 
 
 		}elseif($type_check=="factor"){

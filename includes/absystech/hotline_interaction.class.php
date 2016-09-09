@@ -1973,6 +1973,12 @@ class hotline_interaction extends classes_optima {
 	        	}
 	        }
 
+	        if ($post['visible']=="on") $post['visible'] = "oui";
+	        else $post['visible'] = "non";
+
+	        if ($post['send_mail']=="on") $post['send_mail'] = "oui";
+	        else $post['send_mail'] = "non";
+
 	        // Calcul du nombre de crédit
 	        if (!$post['credit_presta']) {
 	        	$tmp = explode(":", $post['temps_passe']);
@@ -1982,6 +1988,9 @@ class hotline_interaction extends classes_optima {
 	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
 	        }
 
+	        if (!$post['id_user']) {
+	        	$post['id_user'] = ATF::$usr->getId();
+	        }
 
 	        // Insertion
 	        $id = self::insert($post);
@@ -2005,7 +2014,7 @@ class hotline_interaction extends classes_optima {
 	}	
 
 	/**
-	* Renvoi le nombre de crédit par rapport aun temps passé
+	* Renvoi le nombre de crédit (presta ou deplacement par rapport au temps passé
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr> 
 	* @param $get array contient le temps passé formatté comme suit : HH:ii:ss ou HH:ii
@@ -2013,29 +2022,21 @@ class hotline_interaction extends classes_optima {
 	* @return float le nombre de crédit formaté sur 3 chiffres après la virgule
 	*/ 
 	public function _credit($get,$post) {
-		if (!$get['tps']) return 0;
+		if (!$get['tps'] || $get['tps']=="00:00:00") return 0;
+
+		if ($get['field']=="credit_dep") {
+			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
+		}
+
     	$tmp = explode(":", $get['tps']);
 
     	$creditMin = $tmp[1]/60;
 
-    	return round($creditMin + $tmp[0],2);
+    	return round($creditMin + $tmp[0],2);			
+
+
 	}
 
-	/**
-	* Renvoi le nombre de crédit pour le déplacement par rapport aux horaires saisis
-	* @package Telescope
-	* @author Quentin JANON <qjanon@absystech.fr> 
-	* @param $get array contient les temps passé formattés comme suit : HH:ii:ss ou HH:ii
-	* @param $post array vide
-	* @return float le nombre de crédit formaté sur 3 chiffres après la virgule
-	*/ 
-	public function _credit_dep($get,$post) {
-		if ($val = ATF::hotline()->estAuForfait($get)) {
-			return $val;
-		} else {
-			return $this->_credit($get);
-		}
-	}
 
 
 
