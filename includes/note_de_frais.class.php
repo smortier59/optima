@@ -7,6 +7,7 @@ class note_de_frais extends classes_optima {
 	private $jourLimit = 26;
 	private $idSmortier = 3;
 	private $idMmortier = 5;
+	private $idMmortierATT = 31;
 	public $mailFrais = "frais@absystech.net";
 	
 	private $god = array();
@@ -56,6 +57,7 @@ class note_de_frais extends classes_optima {
 		
 		$this->god[] = $this->idSmortier;
 		$this->god[] = $this->idMmortier;
+		$this->god[] = $this->idMmortierATT;
 	}
 	
 	/**
