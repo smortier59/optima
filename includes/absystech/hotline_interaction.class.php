@@ -1200,7 +1200,7 @@ class hotline_interaction extends classes_optima {
 			"filtre_optima"=>$donnees['name']
 			,"id_module"=>ATF::module()->from_nom($this->table)
 			,"id_user"=>ATF::$usr->getID()
-			,"options"=>mysql_escape_string(serialize($donnees))
+			,"options"=>serialize($donnees)
 			,"type"=>"prive");
 
 		//si le filtre existe déjà on le supprime
