@@ -232,7 +232,7 @@ class devis_absystech extends devis {
 						,"color"=>$couleur
 					));
 					
-					foreach ($result as $val_2) { 
+					foreach ($result as $val_2) {
 						$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : 0");
 					}
 				}
@@ -243,10 +243,20 @@ class devis_absystech extends devis {
 		return $graph;
 	}
 
+	public function _devis_prix($get, $post){
+		$at = $this->devis_prix(true);
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->devis_prix(true);
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+
+		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"marge"));
+	}
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
-	public function devis_prix($marge = false){		
+	public function devis_prix($marge = false){	
 		$this->q->reset()
 				->setStrict()				
 				->addField('devis.etat','etat');
@@ -277,7 +287,7 @@ class devis_absystech extends devis {
 		
 		foreach ($result as $i) {
 			$nom=ATF::user()->select($i["id_user"]);
-			$graph['categories']["category"][$i['user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
+			$graph['categories']["category"][$i['id_user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
 		}
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";
@@ -517,7 +527,7 @@ class devis_absystech extends devis {
 	public function can_update($id,$infos=false){
 		if($devis=$this->select($id)){			
 			if(ATF::societe()->estFermee($devis["id_societe"])){			
-				throw new error(ATF::$usr->trans("Impossible de modifier un devis car la société est inactive"));
+				throw new errorATF(ATF::$usr->trans("Impossible de modifier un devis car la société est inactive"));
 			}
 			
 			ATF::commande()->q->reset()
@@ -528,7 +538,7 @@ class devis_absystech extends devis {
 
 			//Si l'état est gagné on ne peut le modifier uniquement s'il n'y a plus d'affaire et qu'elle n'est pas annulée
 			if(!$devis["etat"] || ($devis["etat"]=="gagne" && $commande && $commande["etat"]!="annulee")){
-				throw new error("Il est impossible de modifier un devis gagné ou un devis qui a une commande",892);
+				throw new errorATF("Il est impossible de modifier un devis gagné ou un devis qui a une commande",892);
 			}else{
 				return true;
 			}
@@ -582,6 +592,9 @@ class devis_absystech extends devis {
 			ATF::db($this->db)->commit_transaction();
 			ATF::affaire()->redirection("select",$devis["id_affaire"]);
 		}
+
+		api::sendUDP(array("data"=>array("type"=>"devis")));
+
 		return $last_id;
 	}
 
@@ -612,7 +625,7 @@ class devis_absystech extends devis {
 		
 		unset($infos["devis"]["financement_mois"] , $infos["devis"]["marge_financement"]);	
 		if(ATF::societe()->estFermee($infos["devis"]["id_societe"])){			
-			throw new error(ATF::$usr->trans("Impossible d'ajouter un devis car la société est inactive"));
+			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter un devis car la société est inactive"));
 		}		
 		
 		if($infos["label_devis"]["id_politesse_post"] && !$infos["devis"]["id_politesse_post"]){
@@ -694,11 +707,11 @@ class devis_absystech extends devis {
 		$this->check_field($infos);
 
 		if(!$infos_ligne && $infos["type_devis"] != "consommable"){
-			throw new error(ATF::$usr->trans("devis_ligne_inexistant"));
+			throw new errorATF(ATF::$usr->trans("devis_ligne_inexistant"));
 		}
 
 		if(!$consommables && $infos["type_devis"] == "consommable"){
-			throw new error(ATF::$usr->trans("devis_ligne_consommable_inexistant"));
+			throw new errorATF(ATF::$usr->trans("devis_ligne_consommable_inexistant"));
 		}
 
 		//Limite sur les montants selon les profils
@@ -804,11 +817,11 @@ class devis_absystech extends devis {
 
 				if(!isset($item["index_nb"])){ 
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("index_nb_inexistant"));
+					throw new errorATF(ATF::$usr->trans("index_nb_inexistant"));
 				}
 				if(!isset($item["index_couleur"])){ 
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("index_couleur_inexistant"));
+					throw new errorATF(ATF::$usr->trans("index_couleur_inexistant"));
 				}
 				
 				ATF::devis_ligne()->insert($item,$s);
@@ -870,6 +883,9 @@ class devis_absystech extends devis {
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
+
+		api::sendUDP(array("data"=>array("type"=>"devis")));
+
 		return $this->cryptId($last_id);			
 
 			
@@ -942,7 +958,9 @@ class devis_absystech extends devis {
 			}else{
 				$this->redirection("select_all",NULL,"devis.html");
 			}
-				
+			
+			api::sendUDP(array("data"=>array("type"=>"devis")));
+			
 			return true;
 
 		} elseif (is_array($infos) && $infos) {
@@ -971,7 +989,7 @@ class devis_absystech extends devis {
 
 		if(!ATF::user()->select($devis["id_user"],"email")){
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas d'email pour ce contact");
+			throw new errorATF("Il n'y a pas d'email pour ce contact");
 		}else{
 			$recipient = ATF::user()->select($devis["id_user"],"email");
 		}
@@ -1152,7 +1170,7 @@ class devis_absystech extends devis {
 	//	*/
 	//	public function getCurrentMail(){
 	//		//Current mail
-	//		if(!$this->current_mail) throw new error(ATF::$usr->trans("null_current_mail",$this->table));
+	//		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 	//		return $this->current_mail;
 	//	}
 	//
@@ -1275,7 +1293,7 @@ class devis_absystech extends devis {
 				case "perdu":
 				case "annule":
 					$params = array('id_devis'=>$infos['id']);
-					$result = $this->$infos['action']($params);
+					$result = $this->{$infos['action']}($params);
 					if ($infos["raison"]) {
 						// Enregistre la raison
 						$params["cause_perdu"] = $infos["raison"];
@@ -1331,7 +1349,7 @@ class devis_absystech extends devis {
 		
 		if (!$recipient) {
 			if (ATF::db($this->db)->isTransaction()) ATF::db($this->db)->rollback_transaction();
-			throw new error("Il n'y a pas d'email pour ce contact",1054);
+			throw new errorATF("Il n'y a pas d'email pour ce contact",1054);
 		}
 
 		$mail = array(
@@ -1355,7 +1373,7 @@ class devis_absystech extends devis {
 			$res = $zip->open($pathAnnexe);
 			if ($res !== TRUE) {
 				if (ATF::db($this->db)->isTransaction()) ATF::db($this->db)->rollback_transaction();
-				throw new error("Ouverture du ZIP (".$pathAnnexe.") Impossible, res = ".$res,501);	
+				throw new errorATF("Ouverture du ZIP (".$pathAnnexe.") Impossible, res = ".$res,501);	
 			}
 			
 			$dossierTempToExtract = "/tmp/".ATF::$codename."_".$this->table."_tempZip".$id_devis."/";

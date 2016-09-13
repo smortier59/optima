@@ -302,7 +302,7 @@ if(isset($_POST["generercontrat"])){
 
 
             echo $id_devis;
-        }catch(error $e){
+        }catch(errorATF $e){
             echo $e->getMessage();
         }
     }else{  

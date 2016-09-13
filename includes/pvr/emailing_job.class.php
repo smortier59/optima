@@ -123,7 +123,7 @@ class emailing_job_pvr extends emailing_job {
 							$r = $m->send(NULL,false,$forceEmail);
 							log::logger("SEND SUCCEED","speedmailDEBUGPVR");
 							//log::logger($r,"speedmailDEBUGPVR");
-						} catch (error $e) {
+						} catch (errorATF $e) {
 							ATF::emailing_job_email()->update(array(
 								"id_emailing_job_email"=>$id_ej
 								,"retour"=>"oui"
@@ -153,7 +153,7 @@ class emailing_job_pvr extends emailing_job {
 					// Mis a jour de l'état
 					//log::logger("UPDATE ETAT JOB !","speedmailDEBUGPVR");
 					$this->majEtatSent();
-				} catch (error $e) {
+				} catch (errorATF $e) {
 					log::logger("/!\ ERREUR /!\ ","speedmailPVR");
 					log::logger($e->getCode(),"speedmailPVR");
 					log::logger($e->getMessage(),"speedmailPVR");				

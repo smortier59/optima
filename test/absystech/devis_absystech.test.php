@@ -56,7 +56,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 1
 		try {
 			$id_devis = $this->obj->insert($devis,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 
@@ -68,7 +68,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 2
 		try {
 			$id_devis = $this->obj->insert($devis,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee3 = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur_trouvee3,"ERREUR 2 NON ATTRAPPEE (entite non insere)");
@@ -78,7 +78,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		// Erreur 3
 		try {
 			$id_devis = $this->obj->insert($devis,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee2 = $e->getCode();
 		}
 		$this->assertEquals(12,$erreur_trouvee2,"ERREUR 3 NON ATTRAPPEE (ligne non insere)");
@@ -91,7 +91,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur_trouvee4 = false;
 		try {
 			$id_devis = $this->obj->insert($devis,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			echo "\nERROR => ".$e->getMessage()."\n";
 			$erreur_trouvee4 = true;
 		}
@@ -105,7 +105,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::societe()->u(array("id_societe" => 1, "etat"=> "inactif"));
 		try {
 			$id_devis = $this->obj->insert($devis,$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getMessage();
 		}
 		$this->assertEquals("Impossible d'ajouter un devis car la société est inactive",$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (societe inactive)");
@@ -273,7 +273,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_delete($this->id_devis);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"2 La méthode can_delete ne fonctionne pas");
@@ -300,7 +300,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->can_update($this->id_devis);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(892,$error,"2 La méthode can_update ne fonctionne pas");
@@ -310,7 +310,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::societe()->u(array("id_societe" => 1, "etat"=> "inactif"));
 		try {
 			$this->obj->can_update($this->id_devis);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Impossible de modifier un devis car la société est inactive",$error,"3 Ne renvoi pas l'erreur sur la societe fermée !");
@@ -369,7 +369,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try {
 			$this->obj->unlock(array("id_devis"=>$this->id_devis),$this->s);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur_trouvee1 = $e->getCode();
 		}
 
@@ -752,7 +752,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->sendMailDevis($this->id_devis);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		
@@ -776,7 +776,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$erreur = false;
 		try {
 			$this->obj->sendMailDevis($this->id_devis);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$erreur = true;
 		}
 		

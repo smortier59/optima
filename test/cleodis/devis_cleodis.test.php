@@ -96,7 +96,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		//Sans loyer
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(875,$error,'Erreur devis sans loyer non declenchee');
@@ -105,7 +105,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["values_devis"]["loyer"]='[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"","loyer__dot__loyer_total":8024}]';
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error1 = $e->getCode();
 		}
 		$this->assertEquals(876,$error1,'Erreur devis sans frequence non declenchee');
@@ -116,7 +116,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		unset($devis["values_devis"]["produits"]);
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(877,$error,'Erreur devis sans produit non declenchee');
@@ -125,7 +125,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["values_devis"]["produits_non_visible"]='[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":""}]';
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(882,$error,'Erreur produit sans fournisseur non declenchee');
@@ -185,7 +185,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["values_devis"]["produits_repris"] = '[{"devis_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","devis_ligne__dot__prix_achat":"100","devis_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","devis_ligne__dot__id_fournisseur":"DELL","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"5X7ZB2J","devis_ligne__dot__id_produit_fk":"5893","devis_ligne__dot__id_parc":"17","devis_ligne__dot__id_affaire_provenance":"26","devis_ligne__dot__id_fournisseur_fk":"1351"},{"devis_ligne__dot__produit":"LATITUDE D520","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"DELLLAT-1","devis_ligne__dot__prix_achat":"50","devis_ligne__dot__id_produit":"LATITUDE D520","devis_ligne__dot__id_fournisseur":"CBASE","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"BBPZB2J","devis_ligne__dot__id_produit_fk":"6066","devis_ligne__dot__id_parc":"6995","devis_ligne__dot__id_affaire_provenance":"43","devis_ligne__dot__id_fournisseur_fk":"1349"}]';
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(879,$error,'Erreur parc_sans_AR non declenchee AR');
@@ -233,7 +233,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$devis["AR"] = "affaire_4358,parc_23242,affaire_4358,parc_7421,parc_7423";
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(891,$error,'Erreur parc_checked_sans_affaire non declenchee AR');
@@ -248,7 +248,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 				$devis["values_devis"]["produits_repris"] = '[{"devis_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","devis_ligne__dot__prix_achat":"100","devis_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","devis_ligne__dot__id_fournisseur":"DELL","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"5X7ZB2J","devis_ligne__dot__id_produit_fk":"5893","devis_ligne__dot__id_parc":"17","devis_ligne__dot__id_affaire_provenance":"26","devis_ligne__dot__id_fournisseur_fk":"1351"}]';
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error1 = $e->getCode();
 		}
 		$this->assertEquals(879,$error1,'Erreur parc_sans_avenant non declenchee avenant');
@@ -256,7 +256,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["avenant"] = "affaire_26,affaire_43";
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error2 = $e->getCode();
 		}
 		$this->assertEquals(878,$error2,'Erreur parc_sans_avenant non declenchee avenant');
@@ -265,7 +265,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error2 = $e->getCode();
 		}
 		$this->assertEquals(891,$error2,'Erreur "parc n appertenant pas a l affaire" non declenchee avenant');
@@ -300,7 +300,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		unset($devis["panel_avenant_lignes-checkbox"]);
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error3 = $e->getCode();
 		}
 		$this->assertEquals(881,$error3,'Erreur "Un loyer unique est forcément un avenant" non declenchee avenant');
@@ -341,7 +341,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error2 = $e->getCode();
 		}
 		$this->assertEquals(880,$error2,'Erreur "vente sans prix" non declenchee vente');
@@ -350,7 +350,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error3 = $e->getCode();
 		}
 		$this->assertEquals(891,$error3,'Erreur "parc_checked_sans_affaire" non declenchee vente');
@@ -422,7 +422,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			ATF::devis()->can_update($id_devis);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 
@@ -533,7 +533,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->u(array("id_devis"=>$id_devis,"etat"=>"gagne"));
 		try {
 			$this->obj->perdu(array("id_devis"=>$id_devis));
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(899,$error,'un devis gagne ne peut etre perdu');
@@ -771,7 +771,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$id_devis = ATF::devis_exactitude()->insert($infos); 
-		}catch(error $e){
+		}catch(errorATF $e){
 			$msg = $e->getMessage();
 		}
 
@@ -832,7 +832,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try{
 			$id_devis = ATF::devis_exactitude()->insert($infos); 
-		}catch(error $e){
+		}catch(errorATF $e){
 			$msg = $e->getMessage();
 		}
 		

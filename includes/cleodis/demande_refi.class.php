@@ -301,7 +301,7 @@ class demande_refi extends classes_optima {
 
 				$mail = new mail(array(
 							"optima_url"=>ATF::permalink()->getURL(ATF::affaire()->createPermalink($infos['id_affaire'])),
-							"recipient"=>"frederique.randoux@cleodis.fr,terence.delattre@cleodis.fr,".$resp_societe,
+							"recipient"=>"frederique.randoux@cleodis.com,terence.delattre@cleodis.com,".$resp_societe,
 							"objet"=>"Suivi Refinancement de la part de ".ATF::user()->nom(ATF::$usr->getID()),
 							"template"=>"suivi",
 							"id_user"=>ATF::$usr->getID(),
@@ -393,7 +393,7 @@ class demande_refi extends classes_optima {
 			ATF::commande()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row");
 			$commande=ATF::commande()->sa();
 			if(!$commande["date_evolution"]){
-				throw new error("Impossible d'insérer date de cession car il n'y a pas de date de fin de contrat",875);
+				throw new errorATF("Impossible d'insérer date de cession car il n'y a pas de date de fin de contrat",875);
 			}
 			
 			$datetime1 = new DateTime($infosMaj[$infos["key"]]);
@@ -401,7 +401,7 @@ class demande_refi extends classes_optima {
 			$interval = date_diff($datetime1, $datetime2);
 			
 			if($interval->invert>0){
-				throw new error("La date de cession date est inférieur à la date de début de contrat",876);
+				throw new errorATF("La date de cession date est inférieur à la date de début de contrat",876);
 			}
 
 			$m=0;
@@ -536,9 +536,9 @@ class demande_refi extends classes_optima {
 		ATF::facture()->q->reset()->addCondition("id_demande_refi",$id)->setCount();
 		$count=ATF::facture()->sa();		
 		if($count["count"]>0){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture")." liée.",878);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture")." liée.",878);
 		}elseif($this->select($id,"etat")=="valide"){
-			throw new error("Impossible de modifier/modifier cette ".ATF::$usr->trans($this->table)." car elle est ".ATF::$usr->trans($this->select($id,"etat")).".",877);
+			throw new errorATF("Impossible de modifier/modifier cette ".ATF::$usr->trans($this->table)." car elle est ".ATF::$usr->trans($this->select($id,"etat")).".",877);
 		}else{
 			return true;
 		}

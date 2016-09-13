@@ -240,7 +240,7 @@ class conge_cleodis extends conge {
 		$infos = $infos[$this->table];
 		if($infos['periode']!=="autre")$infos['date_fin']=$infos['date_debut'];
 		if(strtotime($infos['date_fin'])<strtotime($infos['date_debut'])){
-			throw new error(ATF::$usr->trans("fin_inf_deb",$this->table));
+			throw new errorATF(ATF::$usr->trans("fin_inf_deb",$this->table));
 		}
 		if(!$infos["id_user"])$infos["id_user"]=ATF::$usr->getID();		
 

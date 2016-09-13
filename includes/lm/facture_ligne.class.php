@@ -29,9 +29,9 @@ class facture_ligne_lm extends facture_ligne {
 		$this->fieldstructure();
 		
 		$this->foreign_key['id_fournisseur'] =  "societe";
-		$this->no_insert=true;
-		$this->no_update=true;
-		$this->no_delete=true;
+		$this->no_insert=false;
+		$this->no_update=false;
+		$this->no_delete=false;
 	}
 };
 ?>

@@ -93,7 +93,7 @@ class ordre_de_mission extends classes_optima {
 		//Destinataires
 		$destinataire = ATF::user()->select($id_user,'email');
 		
-		if(!$destinataire) throw new error("null_recipient_mail");
+		if(!$destinataire) throw new errorATF("null_recipient_mail");
 		
 		if ($d = ATF::contact()->select($id_contact,'email')) {
 			$destinataire .=",".$d;
@@ -121,7 +121,7 @@ class ordre_de_mission extends classes_optima {
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	*/
 	public function sendMail(){
-		if(!$this->mail_mission) throw new error("null_mission_mail");
+		if(!$this->mail_mission) throw new errorATF("null_mission_mail");
 		return $this->mail_mission->send();
 	}
 	
@@ -132,7 +132,7 @@ class ordre_de_mission extends classes_optima {
 	*/
 	public function getMail(){
 		//Current mail
-		if(!$this->mail_mission) throw new error("null_mission_mail");
+		if(!$this->mail_mission) throw new errorATF("null_mission_mail");
 		return $this->mail_mission;
 	}
 	

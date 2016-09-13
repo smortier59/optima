@@ -31,6 +31,7 @@
 {util::push($fieldsKeys,"ctSigneExists")}
 {util::push($fieldsKeys,"CourrierRestitutionExists")}
 {util::push($fieldsKeys,"envoiCourrierClassiqueExists")}
+{util::push($fieldsKeys,"ctSigneSlimpayExists")}
 
 
 ATF.renderer.dateCleCommande=function(table,field) {
@@ -159,41 +160,23 @@ ATF.renderer.pdfCommande=function(table,field) {
 		var id = record.data[table+'__dot__id_'+table];
 		var html = "";
 	
-		html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
+		/*html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
-		html += '</a><br /><hr>';
+		html += '</a><br /><hr>';*/
 		
-		html += '<a href="contratA4-'+id+'.pdf" target="_blank">';
+		html += '<a href="commande-select-contratA4-'+id+'.dl" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande');
 		html += '</a><br /><hr>';
 
-		html += '<a href="mandatSepa-'+id+'.pdf" target="_blank">';
+		/*html += '<a href="mandatSepa-'+id+'.dl" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande');
-		html += '</a><br /><hr>';		
-		
-		
-		{if ATF::$codename!="midas"}
-			html += '<a href="contratAP-'+id+'.pdf" target="_blank">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratAP','commande');
-			html += '</a><br /><hr>';
-			
-			html += '<a href="contratPV-'+id+'.pdf" target="_blank">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratPV','commande');
-			html += '</a><br /><hr>';
-		{/if}
+		html += '</a><br /><hr>';*/
 
-		{if ATF::$codename == "cleodis"}
-			html += '<a href="lettreSGEF-'+id+'.pdf" target="_blank">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />Contrat vente SGEF';
+		if (record.data.ctSigneSlimpayExists==true){
+			html += '<a href="commande-select-retour-'+id+'.dl" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat Signé Slimpay','commande');
 			html += '</a><br /><hr>';
-		{/if}
-
-		{if ATF::$codename == "cleodisbe"}
-			html += '<a href="lettreBelfius-'+id+'.pdf" target="_blank">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />Convention Belfius';
-			html += '</a><br /><hr>';
-		{/if}
-
+		}
 
 		return '<div id="'+idDiv+'">'+html+'</div>';
 	}
@@ -327,7 +310,6 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</p>';
 			}
 
-
 			if (!Ext.getCmp('myForm'+id)) {
 				 var formPanel = new Ext.FormPanel({
 					frame:true,
@@ -443,7 +425,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 							,value: id
 							,hidden:true
 						},{
-							 xtype: 'textfield',
+							xtype: 'textfield',
 		                    fieldLabel: 'Document supplémentaire a retourner',
 		                    name:'docSupAretourner',
 		                    id : 'docSupAretourner'+id,
@@ -527,19 +509,21 @@ ATF.renderer.pdfCourriers=function(table,field) {
 					},{
 						text: 'Annuler',
 						handler: function(){
-							Ext.getCmp('myForm'+id).destroy();
 							Ext.getCmp('mywindow'+id).hide();
 						}
 					}]
 				});
 			}	
+
 			if (!Ext.getCmp('mywindow'+id)) {
+
 				new Ext.Window({
 					title: '{ATF::$usr->trans("creerCourrierType","commande")}',
 					id:'mywindow'+id,
 					plain:true,
 					bodyStyle:'padding:5px;',
 					width:600,
+					closable: false,
 					buttonAlign:'center',
 					items: [formPanel]
 				});

@@ -50,7 +50,19 @@ class devis_lm extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
+			
+			
 		);
+
+		$this->colonnes['panel']['adresse'] = array(
+			"adresse_livraison"=>array("custom"=>true)
+			,"adresse_facturation"=>array("custom"=>true,"null"=>true)
+
+			,"cp_adresse_livraison"=>array("custom"=>true)
+			,"cp_adresse_facturation"=>array("custom"=>true,"null"=>true)
+
+			,"ville_adresse_livraison"=>array("custom"=>true)
+			,"ville_adresse_facturation"=>array("custom"=>true,"null"=>true));
 
 		$this->colonnes['panel']['facturation'] = array(
 			"RIB"=>array("custom"=>true,"null"=>true)
@@ -137,6 +149,7 @@ class devis_lm extends devis {
 		$this->foreign_key["id_fournisseur"] = "societe";
 		$this->foreign_key["AR_societe"] = "societe";
 		$this->foreign_key["vente_societe"] = "societe";
+		
 
 		$this->onglets = array('devis_ligne');
 		$this->sans_partage = true; /* Evite de se voir jeté à cause d'un droit de partage pour ce module */
@@ -177,10 +190,10 @@ class devis_lm extends devis {
 	
 		//Si aucune affaire sélectionné (seul une vente peut être fait sans faire référence à une affaire)
 		if(!$affaire && $type!="vente"){
-			throw new error(ATF::$usr->trans("parc_sans_".$type),879);
+			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
 		//Si c'est un avenant il ne peut y avoir qu'une affaire parente (sauf pour les AR)
 		}elseif(count($return["affaire"])>1 && ($type=="avenant" || $type=="vente")){
-			throw new error("Il ne peut y avoir qu'une affaire reprise par ".$type,878);
+			throw new errorATF("Il ne peut y avoir qu'une affaire reprise par ".$type,878);
 		}else{
 			return $return;
 		}
@@ -227,6 +240,12 @@ class devis_lm extends devis {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 		
+		if(!$infos["type_affaire"]){
+		  $pack = ATF::produit()->select($infos_ligne[0]["devis_ligne__dot__id_produit"], "id_pack_produit");
+		  $infos["type_affaire"] = ATF::pack_produit()->select($pack, "type_contrat");
+		} 
+
+
 		//Vérification du devis
 		if ($infos["ref"]) { // Dans le cas d'une modification, il faut conerver la ref d'affaire !
 			$this->check_field($infos);
@@ -238,7 +257,7 @@ class devis_lm extends devis {
 
 		if($infos["loyer_unique"]=="oui"){
 			if(!$infos_avenant){
-				throw new error("Un loyer unique doit être un avenant.",881);
+				throw new errorATF("Un loyer unique doit être un avenant.",881);
 			}else{
 				$loyer_unique["loyer"]=$infos_loyer[0]["loyer__dot__loyer"];
 				$loyer_unique["frais_de_gestion"]=$infos_loyer[0]["loyer__dot__frais_de_gestion"];
@@ -254,10 +273,10 @@ class devis_lm extends devis {
 				$loyer_vente["frequence_loyer"]="mois";
 				unset($infos["prix_vente"],$infos_loyer);
 			}else{
-				throw new error("Il faut un prix pour ce contrat de vente.",880);
+				throw new errorATF("Il faut un prix pour ce contrat de vente.",880);
 			}
 		}elseif(!$infos_loyer){
-			throw new error("Il n'y a pas de loyer pour ce devis.",875);
+			throw new errorATF("Il n'y a pas de loyer pour ce devis.",875);
 		}
 
 		////////////////Affaire
@@ -328,7 +347,8 @@ class devis_lm extends devis {
 		ATF::affaire_etat()->insert(array("id_affaire"=>$infos["id_affaire"],
 										  "etat"=>"commande"
 										 ));
-		unset($infos["adresse_livraison"],$infos["adresse_facturation"],$infos["cp_adresse_livraison"],$infos["cp_adresse_facturation"],$infos["ville_adresse_livraison"],$infos["ville_adresse_facturation"]);
+		unset($infos["adresse_livraison"],$infos["adresse_facturation"],$infos["cp_adresse_livraison"],$infos["cp_adresse_facturation"],$infos["ville_adresse_livraison"],$infos["ville_adresse_facturation"],$infos["id_magasin"],$infos["num_bdc_lm"],$infos["poseur"],$infos["poseur_aggree"],$infos["type_souscription"],$infos["type_affaire"]);
+		
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 		$infos["ref"]=$affaire["ref"];
 
@@ -341,7 +361,17 @@ class devis_lm extends devis {
 		
 		// Mise à jour du forecast
 		$affaire = new affaire_lm($infos['id_affaire']);
-		$affaire->majForecastProcess();
+		//$affaire->majForecastProcess();
+ 
+
+		ATF::comite()->insert(array("date"=>date("Y-m-d"),
+									"id_affaire"=>$infos["id_affaire"],
+									"id_societe"=>$infos["id_societe"],
+									//"prix"=> ,
+									"etat"=>"en_attente",
+									"date_creation"=>date("Y-m-d"),
+									"suivi_notifie"=>array(18)
+								));
 
 		////////////////Devis Ligne
 		//Lignes reprise
@@ -361,6 +391,12 @@ class devis_lm extends devis {
 				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
 
+				if(!$fournisseurs){
+					ATF::produit_fournisseur_loyer()->q->reset()->where("produit_fournisseur_loyer.id_produit",$item["id_produit"]);
+					$fournisseurs = ATF::produit_fournisseur_loyer()->select_all();
+				}
+
+
 				if($fournisseurs){					
 					foreach ($fournisseurs as $kf => $vf) {
 						if($vf["departement"] == NULL && !$item["id_fournisseur"]){
@@ -376,16 +412,17 @@ class devis_lm extends devis {
 					}
 				}
 
+
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Ligne de devis sans fournisseur",882);
+					throw new errorATF("Ligne de devis sans fournisseur (Produit : ".$item['id_produit'].")",882);
 				}
 				unset($item["id_parc"]);
 				ATF::devis_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("Devis sans produits",877);
+			throw new errorATF("Devis sans produits",877);
 		}
 
 		////////////////Parcs
@@ -406,7 +443,7 @@ class devis_lm extends devis {
 			if($infos["type_contrat"]=="vente"){
 				$this->vente($infos_ligne_repris,$infos_vente["affaire"],$infos['id_affaire']);
 			}
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}
@@ -429,7 +466,7 @@ class devis_lm extends devis {
 					ATF::loyer()->i($item);
 				}else{
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Il n'y a pas de fréquence pour un loyer",876);
+					throw new errorATF("Il n'y a pas de fréquence pour un loyer",876);
 				}
 			}
 		}elseif($infos["type_contrat"]=="vente"){
@@ -471,6 +508,8 @@ class devis_lm extends devis {
 				$item[str_replace($escape.".","",$k_unescape)]=$i;
 				unset($item[$k]);
 			}
+
+
 			$item["id_fournisseur"]=ATF::societe()->decryptId($item["id_fournisseur_fk"]);
 			$item["id_produit"]=ATF::produit()->decryptId($item["id_produit_fk"]);
 			unset($item["id_fournisseur_fk"],$item["id_produit_fk"]);
@@ -657,7 +696,7 @@ class devis_lm extends devis {
 				unset($parc["date"]);
 				ATF::parc()->i($parc);
 			}else{
-				throw new error("parc_checked_sans_affaire",891);
+				throw new errorATF("parc_checked_sans_affaire",891);
 			}
 		}
 		
@@ -692,7 +731,7 @@ class devis_lm extends devis {
 				ATF::parc()->i($parc_reloue);
 			
 			}else{
-				throw new error("parc_checked_sans_affaire",891);
+				throw new errorATF("parc_checked_sans_affaire",891);
 			}
 		}
 		
@@ -751,7 +790,7 @@ class devis_lm extends devis {
 			
 				$affaire[]=$parc_vendu["provenance"];
 			}else{
-				throw new error("parc_checked_sans_affaire",891);
+				throw new errorATF("parc_checked_sans_affaire",891);
 			}
 		}
 		return true;		
@@ -836,7 +875,7 @@ class devis_lm extends devis {
 		if($this->select($id,"etat")=="attente"){
 			return true;
 		}else{
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false; 
 		}
 	}
@@ -1031,7 +1070,7 @@ class devis_lm extends devis {
 			$this->redirection("select_all",NULL,"devis.html");
 			return true; 
 		}else{	
-			throw new error("Impossible de passer une affaire gagnée en 'perdu'",899);
+			throw new errorATF("Impossible de passer une affaire gagnée en 'perdu'",899);
 		}
 	}
 	

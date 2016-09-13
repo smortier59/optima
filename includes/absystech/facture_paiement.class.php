@@ -63,7 +63,7 @@ class facture_paiement extends classes_optima {
 		$this->infoCollapse($infos);
 		$facture=ATF::facture()->select($infos["id_facture"]);
 		if ($infos['mode_paiement']=="avoir") {
-			if (!$infos['id_facture_avoir']) throw new error("Impossible d'insérer un avoir comme mode de paiement si celui ci n'est pas précisé.");
+			if (!$infos['id_facture_avoir']) throw new errorATF("Impossible d'insérer un avoir comme mode de paiement si celui ci n'est pas précisé.");
 
 			$infos['id_facture_avoir'] = $this->decryptId($infos['id_facture_avoir']);
 
@@ -71,7 +71,7 @@ class facture_paiement extends classes_optima {
 			$prix_avoir = abs($avoir["prix"]*$avoir["tva"]);
 			$prix_facture = $facture['prix']*$facture['tva'];
 
-			if ($prix_facture!=$prix_avoir) throw new error("Impossible d'effectuer ce mode de paiement, car le montant (".$prix_facture.") est différend de celui de l'avoir (".$prix_avoir.")");
+			if ($prix_facture!=$prix_avoir) throw new errorATF("Impossible d'effectuer ce mode de paiement, car le montant (".$prix_facture.") est différend de celui de l'avoir (".$prix_avoir.")");
 
 			$infos['montant'] = $prix_avoir;
 

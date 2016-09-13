@@ -11,7 +11,7 @@ try{
 		ATF::getEnv()->commitSession();
 	}
 	header("Location: /");
-}catch(error $e){
+}catch(errorATF $e){
 	$e->setError();
 }
 ?>

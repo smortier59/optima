@@ -215,7 +215,7 @@ class facturation extends classes_optima {
 	* @param string $date_periode_fin 
 	*/
 	function raiseErrorAvoirNonTrouve($id_affaire,$debut_contrat,$id_parente,$periode_debut,$periode_fin,$errno=878) {
-		throw new error("Impossible de commencer l'affaire ".ATF::affaire()->nom($id_affaire)." au ".$debut_contrat
+		throw new errorATF("Impossible de commencer l'affaire ".ATF::affaire()->nom($id_affaire)." au ".$debut_contrat
 			." car l'affaire parente ".ATF::affaire()->nom($id_parente)
 			." est facturée pour la période du ".$periode_debut." au ".$periode_fin
 			.". Il faut créer un avoir pour cette période.",$errno);
@@ -283,24 +283,33 @@ class facturation extends classes_optima {
 												"frais_de_gestion"=>$item['frais_de_gestion'],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat")
+												"type"=>"contrat",
+												"nature"=>$item["nature"])
 											);							
 						}else{
 							//Pour chaque échéance d'une période
 							for($j=1;$j<=$item['duree'];$j++){
 								$date_fin=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
 								$date_fin=date("Y-m-d",strtotime($date_fin."-1 day"));
-								$this->i(array(
-												"id_societe"=>$affaire->get("id_societe"),
-												"id_affaire"=>$affaire->get("id_affaire"),
-												"montant"=>$item['loyer'],
-												"assurance"=>$item['assurance'],
-												"frais_de_gestion"=>$item['frais_de_gestion'],
-												"date_periode_fin"=>$date_fin,
-												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat")
-											);
+								$echeance = array(
+									"id_societe"=>$affaire->get("id_societe"),
+									"id_affaire"=>$affaire->get("id_affaire"),
+									"montant"=>$item['loyer'],
+									"assurance"=>$item['assurance'],
+									"frais_de_gestion"=>$item['frais_de_gestion'],
+									"date_periode_fin"=>$date_fin,
+									"date_periode_debut"=>$date_debut,
+									"type"=>"contrat",
+									"nature"=>$item["nature"]
+								);
+								$this->i($echeance);
+
+								// Excheancier de facturation fournisseur
+								ATF::facturation_fournisseur()->createEcheance($affaire, $echeance);
+
 								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
+
+
 							}
 						}
 						
@@ -643,7 +652,7 @@ class facturation extends classes_optima {
 		}
 
 		if($this->sa()){
-			throw new error("Impossible de modifier les dates de cette commande car des factures ont déjà été envoyées sur la base de cet échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),878);
+			throw new errorATF("Impossible de modifier les dates de cette commande car des factures ont déjà été envoyées sur la base de cet échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),878);
 		}
 
 		//Aucune facturation ne doit avoir été facturée
@@ -652,7 +661,7 @@ class facturation extends classes_optima {
 			$this->q->Where("type",$type);
 		}
 		if($this->sa()){
-			throw new error("Impossible de modifier les dates de cette commande car des factures ont déjà été édités sur la base de l'échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),879);
+			throw new errorATF("Impossible de modifier les dates de cette commande car des factures ont déjà été édités sur la base de l'échéancier de l'affaire ".ATF::affaire()->nom($id_affaire),879);
 		}
 
 		$this->q->reset()->Where("id_affaire",$id_affaire);
@@ -927,12 +936,12 @@ class facturation extends classes_optima {
 				
 		$prolongation=ATF::db()->sql2array($query);	
 		foreach ($prolongation as $key=>$item) {
-			$objAffaire = new affaire_cleodis($item['id_affaire']);
+			$objAffaire = new affaire_lm($item['id_affaire']);
 			$objCommande = $objAffaire->getCommande();
 
 			try {
 				$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
-			} catch (error $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
+			} catch (errorATF $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
 				
 			if($id_facturation){				
 				$facturation=$this->select($id_facturation);
@@ -1187,12 +1196,12 @@ class facturation extends classes_optima {
 				//Si il n'y a pas de facture 
 				if(!$facturePresente){					
 					//En restitution et fin de contrat dépassée
-					$objAffaire = new affaire_cleodis($item['id_affaire']);
+					$objAffaire = new affaire_lm($item['id_affaire']);
 					$objCommande = $objAffaire->getCommande();
 		
 					try {
 						$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
-					} catch (error $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
+					} catch (errorATF $e) { log::logger("!!!!!!!! Erreur d'insertion de facturation : ".$e->getMessage(),__CLASS__); }
 						
 					if($id_facturation){				
 						$facturation=$this->select($id_facturation);

@@ -358,7 +358,7 @@ ATF.buildGridEditor({
 					            'id',
 					            'value'
 					        ],
-					        data: [["", "Aucun"], ["mois", 'Mois'],["trimestre", 'Trimestre'],["an", 'Année']]
+					        data: [["", "Aucun"], ["mois", 'Mois'],["trimestre", 'Trimestre'],["semestre", 'Semestre'],["an", 'Année']]
 					    }),
 					    valueField: 'id',
 					    displayField: 'value'

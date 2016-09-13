@@ -121,7 +121,7 @@ class affaire_cout_page extends classes_optima {
 		$affaire=parent::select_all();
 
 		if($affaire["id_copieur_facture"] || $affaire["id_copieur_contrat"]){
-			throw new error("Il est impossible de supprimer cette affaire car il y a soit un contrat soit une facture",892);
+			throw new errorATF("Il est impossible de supprimer cette affaire car il y a soit un contrat soit une facture",892);
 		}else{
 			return true;
 		}
@@ -136,7 +136,7 @@ class affaire_cout_page extends classes_optima {
 		if(($infos["id_societe"] || $infos["id_termes"]) && count($infos)==2){
 			return true;
 		}else{
-			throw new error("Il est impossible de modifier une affaire",892);
+			throw new errorATF("Il est impossible de modifier une affaire",892);
 		}
 	}
 
@@ -147,7 +147,7 @@ class affaire_cout_page extends classes_optima {
 	*/
 	public function setForecast($infos){
 		if($infos["forecast"]>100||$infos["forecast"]<0){
-			throw new error(ATF::$usr->trans("invalid_range"),6512);
+			throw new errorATF(ATF::$usr->trans("invalid_range"),6512);
 		}
 		
 		$this->u(array("id_affaire_cout_page"=>$infos["id_affaire_cout_page"],"forecast"=>$infos["forecast"]));

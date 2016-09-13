@@ -62,7 +62,7 @@ class tache extends classes_optima {
     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @return liste des tâches filtrées
     */ 
-	public function select_all() {
+	public function select_all($tri=false,$trid=false,$page=false,$count=false) {
 		$this->q	->addField("DATEDIFF(tache.horaire_fin,DATE(NOW()))","horaire_fin")
 					->addField("tache.etat")
 					->addField("tache.type")
@@ -75,7 +75,7 @@ class tache extends classes_optima {
 					->addJointure("tache","id_societe","societe","id_societe","societe__id_societe") // [JOINTURE SUPPLEMENTAIRE DE TABLE SOCIETE]
 					->addJointure("tache","id_user","user","id_user","user") // [JOINTURE SUPPLEMENTAIRE DE TABLE USER]
 					->addGroup("tache.id_tache");
-		$return = parent::select_all();
+		$return = parent::select_all($tri,$trid,$page,$count);
 		
 		foreach ($return['data'] as $k=>$i) {
 			if ($i['tache.etat'] != "fini") {
@@ -109,6 +109,7 @@ class tache extends classes_optima {
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$no_mail=false){
 		if(isset($infos['dest'])) {
 		    $liste_destinataire= is_array($infos['dest'])?$infos['dest']:explode(",",$infos['dest']);
+		    unset($infos['dest']);
         }
 		$this->infoCollapse($infos);
 
@@ -146,10 +147,10 @@ class tache extends classes_optima {
 		if($tab_dest){
 			try{
 				ATF::tache_user()->multi_insert($tab_dest);
-			} catch(error $e) {
+			} catch(errorATF $e) {
 				ATF::db($this->db)->rollback_transaction();
 				$e->setError();
-				throw new error('Erreur Insert');
+				throw new errorATF('Erreur Insert');
 			}
 		}
 		
@@ -224,10 +225,10 @@ class tache extends classes_optima {
 				}
 				try{
 					ATF::tache_user()->multi_insert($ajout);
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					ATF::db($this->db)->rollback_transaction();
 					$e->setError();
-					throw new error('Erreur Insert');
+					throw new errorATF('Erreur Insert');
 				}
 			}
 			//suppression de ceux qui ont été déselectionnés
@@ -470,7 +471,7 @@ class tache extends classes_optima {
 		if (!$infos['id_tache']) return false;
 		$dest = self::infos_dest($infos['id_tache']);
 		if (count($dest)===1) {
-			throw new error("Vous êtes le seul sur cette tâche, impossible de vous retirer, veuillez l'annulé",402);
+			throw new errorATF("Vous êtes le seul sur cette tâche, impossible de vous retirer, veuillez l'annulé",402);
 		}
 		
 		ATF::tache_user()->q->reset()->addField('id_tache_user')->where("id_tache",$infos['id_tache'])->where('id_user',ATF::$usr->getId());
@@ -704,6 +705,164 @@ class tache extends classes_optima {
 
 
 		
+	/**
+	* Permet de récupérer la liste des tâches pour telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/ 
+	public function _GET($get,$post) {
+
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_tache";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$colsData = array(
+			"tache.id_tache"=>array(),
+			"tache.id_societe"=>array(),
+			"tache.id_user"=>array(),
+			"tache.id_suivi"=>array("visible"=>false),
+			"tache.tache"=>array(),
+			"tache.date"=>array(),
+			"tache.horaire_debut"=>array(),
+			"tache.horaire_fin"=>array(),
+			"tache.date_validation"=>array(),
+			"tache.etat"=>array(),
+			"tache.id_aboutisseur"=>array(),
+			"tache.type"=>array(),
+			"tache.lieu"=>array(),
+			"tache.description"=>array(),
+			"tache.priorite"=>array(),
+			"tache.complete"=>array(),
+			"tache.periodique"=>array()
+		);
+
+		$this->q->reset();
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_tache",$get['id'])->setLimit(1);
+		} else {
+
+
+			// if ($get['filters']['mine'] == "on" || $get['mine']) {
+			// 	$this->q->where("tache_user.id_user",ATF::$usr->getId());
+			// }
+
+			if (!$get['filters']['done']) {
+				$this->q->where("tache.etat","fini","OR","fini","!=");
+			}
+
+			// TRI
+			switch ($get['tri']) {
+				case 'id_tache':
+				case 'id_societe':
+				case 'id_user':
+				case 'id_contact':
+					$get['tri'] = "tache.".$get['tri'];
+				break;
+			}
+
+			$this->q->setLimit($get['limit']);
+
+		}
+
+		$this->q->addField($colsData);
+
+		$this->q->from("tache","id_suivi","suivi","id_suivi");
+
+		$this->q->setToString();
+		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
+		$this->q->unsetToString();
+
+		if ($get['id']) {
+			$data = $this->select_row();
+	        $return = $data;			
+		} else {
+			$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+			foreach ($data["data"] as $k=>$lines) {
+				foreach ($lines as $k_=>$val) {
+					if (strpos($k_,".")) {
+						$tmp = explode(".",$k_);
+						$data['data'][$k][$tmp[1]] = $val;
+						unset($data['data'][$k][$k_]);
+					}				
+				}
+			}			
+
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+
+	        $return = $data['data'];			
+		}
+
+		return $return;
+	}
+
+		
+	/**
+	* Sauvegarde une tâche depuis telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array COntient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/ 
+	public function _POST($get,$post) {
+
+    	$return = array();
+
+        try {
+        	
+	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+	        // Check des champs obligatoire
+	        if (!$post['tache']) throw new Exception("CONTENT_MISSING",1101);
+	        if (!$post['horaire_fin']) throw new Exception("DATE_FIN_MISSING",1102);
+	        
+			// Valeur par défaut
+	        if (!$post['date']) $post['date'] = date("Y-m-d H:i:s");
+	        if (!$post['id_user']) $post['id_user'] = ATF::$usr->getId();
+
+	        // Mapping/traitement de donnée pour BDD Optima
+	        $post['horaire_fin'] = date("Y-m-d H:i:s",strtotime($post['horaire_fin']));
+	        if ($post['concernes']) {
+		        $post['dest'] = $post['concernes'];
+		        unset($post['concernes']);
+	        }
+
+	        // Nettoyage du post
+	        unset($post['page-task']);
+
+	        // Insertion
+	        $id = self::insert($post);
+        	$return['result'] = $id;
+
+        	// Récupération des notices créés
+        	$return['notices'] = ATF::$msg->getNotices();
+	        return $return;
+        } catch (errorATF $e) {
+        	throw $e;
+        } catch (Exception $e) {
+        	throw $e;
+        }
+        return false;
+	}	
+
+
 	
 };
 ?>

@@ -67,6 +67,22 @@ class pack_produit extends classes_optima {
 		$this->addPrivilege("EtatUpdate");
 	}
 
+	/**
+    * Surcharge de la méthode autocomplete pour faire apparaître sous_catégorie et catégorie
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos 
+    * @return int  id si enregistrement ok 
+    */   	
+	function autocomplete($infos) {
+			
+			// Récupérer les produits
+			$this->q->reset()				
+				->addField("id_pack_produit")
+				->addField("nom")
+				->addField("site_associe");
+		return parent::autocomplete($infos,false);
+	}
+
 
 	/**
 	 * Permet de modifier un champs en AJAX
@@ -134,13 +150,13 @@ class pack_produit extends classes_optima {
 				$item["id_pack_produit"]=$last_id;
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Ligne de pack_produit sans fournisseur",882);
+					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
 				}				
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("pack_produit sans produits",877);
+			throw new errorATF("pack_produit sans produits",877);
 		}		
 		ATF::db($this->db)->commit_transaction();
 
@@ -215,13 +231,13 @@ class pack_produit extends classes_optima {
 				$item["id_pack_produit"]=$last_id;
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error("Ligne de pack_produit sans fournisseur",882);
+					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
 				}				
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
-			throw new error("pack_produit sans produits",877);
+			throw new errorATF("pack_produit sans produits",877);
 		}		
 		ATF::db($this->db)->commit_transaction();
 

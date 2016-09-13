@@ -70,7 +70,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		);
 	
 		$this->colonnes['panel']['total'] = array(
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			"prix"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 		
 		$this->colonnes['panel']['total_cleodis'] = array(
@@ -239,7 +239,7 @@ class bon_de_commande_lm extends bon_de_commande {
 								   );							
 							$this->u($d);						
 					}
-				} catch(error $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
+				} catch(errorATF $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
 				//On commit le tout
 				ATF::db($this->db)->commit_transaction();
 
@@ -291,50 +291,16 @@ class bon_de_commande_lm extends bon_de_commande {
 			
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		foreach ($return['data'] as $k=>$i) {
-			if ($i["solde_ht"]>0 || !$i["solde_ht"]) {
+			//if ($i["solde_ht"]>0 || !$i["solde_ht"]) {
 				$return['data'][$k]['factureFournisseurAllow'] = true;	
-			}
+			//}
+			
 			if (ATF::parc()->parcByBdc($i['bon_de_commande.id_bon_de_commande'])) {
 				$return['data'][$k]['parcInsertionAllow'] = true;	
 			}
 		}
 		return $return;
 	}
-	
-	/**
-    * Permet de mettre a jour une date en ajax
-    * @author Quentin JANON <qjanon@absystech.fr>
-    * @author Yann GAUTHERON <ygautheron@absystech.fr>
-	* @param array $infos
-	* @param array &$s La session
-	* @param array &$request Paramètres disponibles (clés étrangères)
-	* @return bool
-    */   	
-	/*public function updateDate($infos,&$s,&$request){
-		if (!$infos['id_bon_de_commande']) return false;
-
-		if ($infos['value'] == "undefined") $infos["value"] = "";		
-		switch ($infos['key']) {			
-			case "date_debut":		
-				
-					ATF::$msg->addNotice(loc::mt(
-						ATF::$usr->trans("dates_modifiee",$this->table)
-						,array("date"=>ATF::$usr->trans($infos['key'],$this->table))
-					));
-			break;
-
-			default:
-				throw new error("date_invalide",987);
-		}
-
-		if($infos["table"]!="commande"){
-//			ATF::commande()->redirection("select_all",NULL,"commande.html");
-//		}else{
-			ATF::affaire()->redirection("select",$cmd["id_affaire"]);
-		}
-		return true;
-	}*/
-
 
 	/** 
 	* Impossible de supprimer un bon de commande qui a une facture fournisseur
@@ -344,7 +310,7 @@ class bon_de_commande_lm extends bon_de_commande {
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
-		$affaire = new affaire_cleodis($bdc['id_affaire']);
+		$affaire = new affaire_lm($bdc['id_affaire']);
 		
 		//On ne doit pas pouvoir modifier une affaire Annulée et remplacée
 		ATF::commande()->checkUpdateAR($affaire);
@@ -359,7 +325,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		ATF::facture_fournisseur()->q->reset()->addCondition("id_bon_de_commande",$id)->setCount();
 		$count=ATF::facture_fournisseur()->sa();
 		if($count["count"]>0){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture_fournisseur")." liée.",884);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture_fournisseur")." liée.",884);
 		}else{
 			return true;
 		}
@@ -452,7 +418,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		$code_four=ATF::societe()->select($id_fournisseur,"code_fournisseur");
 
 		if(!$code_four){
-			throw new error("Il doit y avoir un code fournisseur pour ".ATF::societe()->nom($id_fournisseur),880);
+			throw new errorATF("Il doit y avoir un code fournisseur pour ".ATF::societe()->nom($id_fournisseur),880);
 			return false;
 		}
 
@@ -495,12 +461,13 @@ class bon_de_commande_lm extends bon_de_commande {
 				if ($infos["id_commande"]) {
 					// On propose seulement les sociétés qui sont dans la commande
 					$conditions["condition_field"][] = "commande_ligne.id_commande";
-					$conditions["condition_value"][] = $infos["id_commande"];
+					$conditions["condition_value"][] = ATF::commande()->decryptId($infos["id_commande"]);
 				}
 				break;
 		}
 		return array_merge_recursive((array)($conditions),parent::autocompleteConditions($class,$infos,$condition_field,$condition_value));
 	}
+
 
 //	private function getArrayCommandeLigne($infos){
 //		$infos_explode = explode(",",$infos);
@@ -516,10 +483,10 @@ class bon_de_commande_lm extends bon_de_commande {
 //		
 //		//Si aucune affaire sélectionné
 //		if(!$affaire){
-//			throw new error(ATF::$usr->trans("parc_sans_".$type),879);
+//			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
 //		//Si c'est un avenant il ne peut y avoir qu'une affaire parente
 //		}elseif(count($return["affaire"])>1 && $type=="avenant"){
-//			throw new error(ATF::$usr->trans("une_affaire_par_avenant"),878);
+//			throw new errorATF(ATF::$usr->trans("une_affaire_par_avenant"),878);
 //		}else{
 //			return $return;
 //		}
@@ -549,7 +516,7 @@ class bon_de_commande_lm extends bon_de_commande {
 			//On supprime l'élément correspondant à l'id_commande (car on ne garde que les id_bon_de_commande)
 			unset($infos_bon_de_commande_ligne[0]);
 		}else{
-			throw new error("Il faut sélectionner des lignes de bon de commande.",875);
+			throw new errorATF("Il faut sélectionner des lignes de bon de commande.",875);
 		}
 
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
@@ -577,16 +544,9 @@ class bon_de_commande_lm extends bon_de_commande {
 		$infos["ref"] = $this->getRef($infos["id_affaire"],$infos["id_fournisseur"]);
 		//$infos["date"] = date("Y-m-d");
 
-//		ATF::facture()->q->reset()
-//						 ->addCondition($infos["id_affaire"],"id_affaire")
-//						 ->setCountOnly();
-//		
-//		//s'il y a une facture pour cette affaire alors etat=>fnp sinon etat=>envoyee
-//		if(ATF::facture()->sa()>0){
-//			$infos['etat'] = 'fnp';	
-//		}else{
+
 		$infos['etat'] = 'envoyee';	
-//		}
+
 		
 		//Vérification du bon de commande
 		$this->check_field($infos);
@@ -598,10 +558,6 @@ class bon_de_commande_lm extends bon_de_commande {
 			$nbj_livraison = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_nbj_livraison");
 			$infos["date_livraison_estime"] = date("Y-m-d", strtotime("+".$nbj_livraison." days", strtotime($infos["date"])));
 
-			/*if($infos["date_livraison_estime"]){
-				$nbj_installation = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_nbj_installation");
-				$infos["date_installation_prevue"] = date("Y-m-d", strtotime("+".$nbj_installation." days", strtotime($infos["date_livraison_estime"])));
-			}*/
 
 			$fournisseur_delai_rav = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_delai_rav");
 			$infos["date_limite_rav"] = date("Y-m-d", strtotime($fournisseur_delai_rav." days", strtotime(ATF::affaire()->select($infos["id_affaire"], "date_ouverture"))));

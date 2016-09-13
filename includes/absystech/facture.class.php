@@ -75,7 +75,7 @@ class facture_absystech extends facture {
 			,"periodicite"=>array("disabled"=>false,"listeners"=>array("change"=>"ATF.changePeriode"))
 			,'id_termes'=>array("updateOnSelect"=>true,"custom"=>true)
 			,"date_fin_periode"
-			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield")
+			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield","listeners"=>array("change"=>"ATF.changeAcompte"))
 			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")			
 			
 		);
@@ -322,27 +322,27 @@ class facture_absystech extends facture {
 		} 
 
 		if(!count($infos_ligne)){
-			throw new error("Une facture doit comporter au moins une ligne.",161);
+			throw new errorATF("Une facture doit comporter au moins une ligne.",161);
 		}
 
 		if(!$infos["id_societe"]){
-			throw new error("Vous devez spécifier la société (Entité)",167);
+			throw new errorATF("Vous devez spécifier la société (Entité)",167);
 		}else{
 			if(ATF::societe()->estFermee($infos["id_societe"])){
-				throw new error("Impossible d'ajouter une facture sur une entité fermée");
+				throw new errorATF("Impossible d'ajouter une facture sur une entité fermée");
 			}
 		}
 
 		if ($infos["affaire_sans_devis"]) {
 			if (!$infos["affaire_sans_devis_libelle"]) {
-				throw new error("Pour une affaire sans devis, il faut saisir un libellé de votre choix.",162);
+				throw new errorATF("Pour une affaire sans devis, il faut saisir un libellé de votre choix.",162);
 			}
 			unset($infos["affaire_sans_devis"]);
 			// Alors on crée une affaire pour l'occasion
 			$affaire_sans_devis = true;
 		}
 		elseif(!$infos["id_affaire"]){
-			throw new error("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",160);
+			throw new errorATF("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",160);
 		}
 
 		// Dematerialisation
@@ -404,6 +404,7 @@ class facture_absystech extends facture {
 			);
 			$infos["tva"] = $tva;
 		}
+
 		if ($type_check=="facture") {
 			if($acompte_pourcent!=100 && $acompte_pourcent){
 				$infos["prix"]*=($acompte_pourcent/100);
@@ -416,31 +417,34 @@ class facture_absystech extends facture {
 			}
 		}elseif($type_check=="avoir"){
 			$infos["prix"]=0-$infos["prix"];
-			$infos["type_facture"]="avoir";
 			if(!$infos["id_facture_parente"]){
-				throw new error("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
+				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 
+			$parent = $this->select($infos["id_facture_parente"]);
+			unset($parent['ref']);
+			//$infos = $parent;
+			$infos["type_facture"]="avoir";
+			$infos['prix'] = 0-$parent["prix"];
 
+			// ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
+			// if($id_commande_factures=ATF::commande_facture()->select_all()){
+			// 	$commande=ATF::commande()->select($id_commande_factures[0]["id_commande"]);
 
-			ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
-			if($id_commande_factures=ATF::commande_facture()->select_all()){
-				$commande=ATF::commande()->select($id_commande_factures[0]["id_commande"]);
-
-				if($commande["prix"]!=$infos["prix"]){
-					$infos["frais_de_port"]=$infos["frais_de_port"];
-					//Si c'est un solde ou un acompte				
-					$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);					
-				}
-			}
+			// 	if($commande["prix"]!=$infos["prix"]){
+			// 		$infos["frais_de_port"]=$infos["frais_de_port"];
+			// 		//Si c'est un solde ou un acompte				
+			// 		$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);					
+			// 	}
+			// }
 			
-			$infos["prix"] = $infos["prix"] - $sum_anc_facture["prix"];
+			// $infos["prix"] = $infos["prix"] - $sum_anc_facture["prix"];
 
 
 		}elseif($type_check=="factor"){
 			$infos["type_facture"]="factor";
 			if(!$societe["rib_affacturage"] || !$societe["iban_affacturage"] || !$societe["bic_affacturage"]){
-				throw new error("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
+				throw new errorATF("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
 			}
 		}
 
@@ -471,7 +475,7 @@ class facture_absystech extends facture {
 
 			if($infos["type_facture"]=="facture" && $infos["id_termes"] === NULL){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Vous devez spécifier les termes",167);
+				throw new errorATF("Vous devez spécifier les termes",167);
 			}
 
 			//Facture
@@ -503,7 +507,7 @@ class facture_absystech extends facture {
 
 				if(!$infos["date_debut_periode"] || !$infos["date"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
+					throw new errorATF(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
 				}
 				
 				$total = 0;	
@@ -707,11 +711,11 @@ class facture_absystech extends facture {
 					if($id_contact_facturation){
 						if(!$recipient=ATF::contact()->select($id_contact_facturation,"email")){
 							ATF::db($this->db)->rollback_transaction();
-							throw new error("Il n'y a pas d'email pour ce contact",166);
+							throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 						}
 					}else{
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Il n'y a pas d'email pour ce contact",166);
+						throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 					}
 				}else{
 					$recipient = $email["email"];
@@ -797,7 +801,7 @@ class facture_absystech extends facture {
 		if($infos["type_facture"]!="acompte" && $infos["type_facture"]!="solde"){
 			return true;
 		} else {
-			throw new error("Il est impossible de modifier une facture d'accompte ou de solde.",893);
+			throw new errorATF("Il est impossible de modifier une facture d'accompte ou de solde.",893);
 		}
 	}	
 
@@ -854,12 +858,12 @@ class facture_absystech extends facture {
 			}			
 			$infos["type_facture"]="avoir";
 			if(!$infos["id_facture_parente"]){				
-				throw new error("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
+				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 		}elseif($type_check=="factor"){
 			$infos["type_facture"]="factor";
 			if(!$societe["rib_affacturage"] || !$societe["iban_affacturage"] || !$societe["bic_affacturage"]){
-				throw new error("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
+				throw new errorATF("Il manque l'une de ces informations pour la société ".$societe["societe"]." : RIB, IBAN, BIC",167);
 			}
 		}
 
@@ -874,7 +878,7 @@ class facture_absystech extends facture {
 					
 				if(!$infos["date_debut_periode"] || !$infos["date"]){
 					ATF::db($this->db)->rollback_transaction();
-					throw new error(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
+					throw new errorATF(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
 				}	
 
 				$total = 0;	
@@ -1048,7 +1052,7 @@ class facture_absystech extends facture {
 			
 			if($infos["type_facture"]=="facture" && $infos["id_termes"] === NULL){
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Vous devez spécifier les termes",167);
+				throw new errorATF("Vous devez spécifier les termes",167);
 			}
 			
 			parent::update($infos,$s);
@@ -1102,7 +1106,7 @@ class facture_absystech extends facture {
 					$id_contact_facturation=ATF::societe()->select($infos["id_societe"],"id_contact_facturation");
 					if(!$recipient=ATF::contact()->select($id_contact_facturation,"email")){
 						ATF::db($this->db)->rollback_transaction();
-						throw new error("Il n'y a pas d'email pour ce contact",166);
+						throw new errorATF("Il n'y a pas d'email pour ce contact",166);
 					}
 				}else{
 					$recipient = $email["email"];
@@ -1339,14 +1343,14 @@ class facture_absystech extends facture {
 	public function can_delete($id){
 		if($this->select($id,"etat")=="impayee"){			 
 			if(!$this->isLastOfMonth($id)){
-				throw new error("Il est impossible de supprimer cette facture car elle n'est pas la derniere du mois",893);
+				throw new errorATF("Il est impossible de supprimer cette facture car elle n'est pas la derniere du mois",893);
 			}
 			else{
 				return true;
 			}			
 		}
 		else{
-			throw new error("Il est impossible de supprimer cette facture car elle est payée",892);
+			throw new errorATF("Il est impossible de supprimer cette facture car elle est payée",892);
 		}
 	}
 	
@@ -1589,7 +1593,7 @@ class facture_absystech extends facture {
 //	*/
 //	public function getCurrentMail(){
 //		//Current mail
-//		if(!$this->current_mail) throw new error(ATF::$usr->trans("null_current_mail",$this->table));
+//		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 //		return $this->current_mail;
 //	}
 //	
@@ -1856,10 +1860,10 @@ class facture_absystech extends facture {
 				$id_societe = $this->select($factures[0] , "id_societe");
 								
 				if(!ATF::societe()->select($id_societe , "rib")){
-					throw new error("Il faut inserer un RIB pour la societe",167);
+					throw new errorATF("Il faut inserer un RIB pour la societe",167);
 				}
 				if(!ATF::societe()->select($id_societe , "banque")){
-					throw new error("Il faut inserer une banque pour la societe",167);				
+					throw new errorATF("Il faut inserer une banque pour la societe",167);				
 				}
 				
 				
@@ -1879,7 +1883,7 @@ class facture_absystech extends facture {
 					$mail->send();
 					return true;			
 				}			
-			}else{ throw new error("Toutes les factures sont déja payées",167);	}			
+			}else{ throw new errorATF("Toutes les factures sont déja payées",167);	}			
 		}return false;
 	}		
 	
@@ -1901,6 +1905,214 @@ class facture_absystech extends facture {
 		}
 
 		return parent::autocomplete($infos,false);
+	}
+
+
+	/**
+	* Permet de récupérer la liste des contacts pour telescope
+	* @package Telescope
+	* @author Morgan FLEURQUIB <mfleurquin@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/ 
+	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
+	public function _GET($get,$post) {
+		
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "date";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$colsData = array(
+			"facture.id_facture"=>array("visible"=>false),
+			"facture.id_societe"=>array("visible"=>false),
+			"facture.ref"=>array(),
+			"facture.date"=>array(),
+			"facture.etat"=>array("visible"=>false),
+			"facture.prix"=>array(),
+			"facture.tva"=>array(),
+			"facture.date_previsionnelle"=>array(),
+			"facture.date_effective"=>array(),
+			"facture.date_relance"=>array()
+		);
+		
+
+
+		$this->q->reset();
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_facture",$get['id'])->setLimit(1);
+		} else {
+			$this->q->setLimit($get['limit']);
+		}
+
+		$this->q->addOrder("facture.date","asc");
+		
+		switch ($get['tri']) {
+			case 'id_societe':	
+				$get['tri'] = "facture.".$get['tri'];
+			break;
+		}
+
+		if($get["filter"]){
+			foreach ($get["filter"] as $key => $value) {
+				if (strpos($key, 'facture') !== false) {
+					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+				}
+			}
+		}
+
+		$this->q->addField($colsData);
+
+		$this->q->from("facture","id_societe","societe","id_societe");
+
+		$this->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
+								,0
+								,IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,(facture.prix*facture.tva)
+								)),2)","solde")
+			    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+			    ->addField("IF(facture.etat!='perte'
+							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+								,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+								    *ROUND(IF(
+										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+										,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+										,facture.prix*facture.tva
+									),2))
+							,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+								    *ROUND(IF(
+										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+										,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+										,facture.prix*facture.tva
+									),2))>0
+								, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+							    *ROUND(IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,facture.prix*facture.tva
+								),2))
+								, 0 )
+							) 					   					
+						,0)","interet")			
+			    ->addGroup("facture.id_facture");
+
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
+
+		if ($get['id']) {
+	        $return = $data['data'][0];			
+		} else {
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+
+	        $return = $data['data'];			
+		}
+
+		return $return;
+	}	
+
+	public function _graph_impaye($get,$post){
+
+		$date = date("Y-m");
+		$date_start = date("Y-m", strtotime("-1 year"));
+
+		ATF::facture()->q->reset()->where("facture.etat","impayee")								  
+								  ->addField("facture.date","date")
+								  ->addOrder("facture.date");
+		$fact = ATF::facture()->select_all();		
+		
+		//Initialisation du tableau des mois
+		for ($i=date("Y")-1; $i<=date("Y") ; $i++) { 
+			for($j=1;$j<=12;$j++){				
+				if($i == date("Y")){
+					if($j<=date("n")) $evo[$i][$j] = 0;
+				}else{
+					$evo[$i][$j] = 0;
+				}
+			}
+		}
+
+		// On renseigne le tabeau
+		$prix = 0;
+		foreach ($fact as $key => $value) {
+			$prix += number_format($value["prix_ttc"],0,",","");
+			if(date("Y-m", strtotime($value["date"])) <= $date_start){
+				$old[date("Y", strtotime($value["date"]))] += number_format($value["prix_ttc"],0,",","");
+				$evo[date("Y")-1][1] = number_format($value["prix_ttc"],0,",","");				
+			}else{
+				$evo[date("Y", strtotime($value["date"]))][date("n", strtotime($value["date"]))] = $prix;				
+			}
+		}		
+
+		$start = 0;
+		foreach ($old as $key => $value) {			
+			$old[$key] += $start;
+			$start += $value;
+		}
+
+		$data = $old;
+
+		foreach ($evo as $year => $mois) {
+			foreach ($mois as $num_mois => $value) {
+				if($value == 0) {
+					if($num_mois == 1){ 
+						$evo[$year][$num_mois] = $evo[$year-1][12];
+					}else{
+						$evo[$year][$num_mois] = $evo[$year][$num_mois-1];
+					}
+				}
+
+				$data[$year][$num_mois] = $evo[$year][$num_mois];
+			}
+		}
+
+
+		return $data;
+	}
+
+
+	public function _getImpaye($get,$post){
+		if($get["filter"]["facture.id_societe"]) $id_societe =  $get["filter"]["facture.id_societe"];
+		$get["filter"]= array();
+		if($id_societe) $get["filter"]["facture.id_societe"] = $id_societe;
+		$get["filter"]["facture.etat"] = "impayee";
+		return $this->_GET($get,$post);
+	}
+
+	public function _getPaye($get,$post){
+		if($get["filter"]["facture.id_societe"]) $id_societe = $get["filter"]["facture.id_societe"];
+		$get["filter"]= array();
+		if($id_societe) $get["filter"]["facture.id_societe"] = $id_societe;
+		$get["filter"]["facture.etat"] = "payee";
+		$get['limit'] = 15;
+		$get['tri'] = "facture.date";
+		$get['trid'] = "desc";
+		return $this->_GET($get,$post);
 	}
 				
 };

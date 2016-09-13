@@ -26,7 +26,7 @@ class scanner_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		try{
 			$this->obj->transfert($infos);
-		}catch(error $e){
+		}catch(errorATF $e){
 			$error = $e->getMessage();
 		}
 		$this->assertEquals("Il n'y a pas de Devis  ayant la référence test", $error, "1 - Error Ref inconnue");		
@@ -40,7 +40,7 @@ class scanner_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::setSingleton("imap", new mockObjectCurlClassesScanner());
         try{
             $this->obj->checkMailBox("toto", $host, $port, $password);
-        }catch (error $e) {
+        }catch (errorATF $e) {
             $eMsg = $e->getMessage();
         }
         $this->assertEquals($eMsg, "error", "L'erreur catch n'est pas bonne !!");

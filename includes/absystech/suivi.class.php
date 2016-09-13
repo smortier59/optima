@@ -26,7 +26,7 @@ class suivi_absystech extends suivi {
 			$password = "az78qs45";
 			
 			ATF::imap()->init($host, $port, $mail, $password);		
-			if (ATF::imap()->error) { throw new error(ATF::imap()->error);	}
+			if (ATF::imap()->error) { throw new errorATF(ATF::imap()->error);	}
 			$mails = ATF::imap()->imap_fetch_overview('1:*');
 							
 
@@ -78,7 +78,7 @@ class suivi_absystech extends suivi {
 			$password = "az78qs45";
 			
 			ATF::imap()->init($host, $port, $mail, $password);		
-			if (ATF::imap()->error) { throw new error(ATF::imap()->error);	}
+			if (ATF::imap()->error) { throw new errorATF(ATF::imap()->error);	}
 			$mails = ATF::imap()->imap_fetch_overview('1:*');
 							
 

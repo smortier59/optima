@@ -103,7 +103,7 @@ class emailing_liste_test extends emailing_test {
         try {
             $id6 = $this->obj->insert(array("description"=>"Liste TU n°6"));
             $error = false;
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = true;
         }
         $this->assertTrue($error,"Devrait généré une erreur");
@@ -228,7 +228,7 @@ class emailing_liste_test extends emailing_test {
         $erreur = false;
         try {
             $this->obj->update(array("id_emailing_liste"=>"fgfdftrgbdfbsbgsdfbgstheytvrthztesghczethervyhrtsgshtrhbdfgb","emailing_liste"=>"Liste TU n°5","toto"=>"titi"));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $erreur = true;
         }
             

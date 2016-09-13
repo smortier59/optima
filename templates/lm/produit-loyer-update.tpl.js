@@ -7,6 +7,7 @@
 	  "{$current_class->table}.loyer"
 	, "{$current_class->table}.duree"
 	, "{$current_class->table}.nature"
+	, "{$current_class->table}.periodicite"
 ]}
 
 

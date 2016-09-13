@@ -349,6 +349,7 @@ class comite extends classes_optima {
         try {
             ATF::commande()->q->reset()
                 ->select('societe.email_notification')
+                ->select('produit.id_pack_produit')
                 //->select('societe.societe')
                 ->select('commande_ligne.id_fournisseur')
                 ->from("commande","id_commande","commande_ligne","id_commande")
@@ -361,6 +362,7 @@ class comite extends classes_optima {
             if ($fournisseurs = ATF::commande()->select_all()) {            	
                 foreach ($fournisseurs as $f) {
                 	$f = ATF::societe()->select($f["commande_ligne.id_fournisseur"]);                	
+                	$p = ATF::pack_produit()->select($f["produit.id_pack_produit"]);                	
                     if ($f["email_notification"]) {
                         $commande = self::getInfosCommande($id_commande,$f["id_societe"]);
                         

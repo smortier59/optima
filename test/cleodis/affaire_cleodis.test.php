@@ -283,7 +283,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$this->begin_transaction(true);
 			$this->obj->mailContact($email,$id_bon_de_commande,"bon_de_commande",$path);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(349,$error,'problème sur mailContact contact sans mail');
@@ -292,7 +292,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		try {
 			$this->begin_transaction(true);
 			$this->obj->mailContact($email,$id_bon_de_commande,"bon_de_commande",$path);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(350,$error,'problème sur mailContact contact sans mail et sans contact');
@@ -479,7 +479,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$infosBidon3["id_affaire"]=$id_affaire;
 		try {
 			$this->obj->updateDate($infosBidon3);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(988,$error,'problème sur updateDate lorsqu il n y a pas de field');
@@ -526,7 +526,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		try {
 			$this->obj->updateDate($infosDate_installation_reel);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(856,$error,'problème sur updateDate lorsqu il n y a pas de devis');
@@ -634,7 +634,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos["id_affaire"]=$id_affaire;
 		try {
 			$this->obj->updateFacturation($infos);
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(987,$error,'problème sur updateDate lorsqu il n y a pas de field');

@@ -268,7 +268,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::facturation()->u(array("id_facturation"=>$this->id_facturation,"id_facture"=>$this->id_facture));
         try {
              $id_facture = $this->obj->insert($facture);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(349,$error,'Il existe déjà  une facturation pour cette période');
@@ -278,7 +278,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         unset($facture["facture"]["prix"]);
         try {
              $id_facture = $this->obj->insert($facture);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(351,$error,'Il faut un prix pour la facture');
@@ -298,7 +298,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $facture["facture"]["date_periode_fin"]=$date_fin[2]."-".$date_fin[1]."-".$date_fin[0];
 		try {
              $id_facture = $this->obj->insert($facture);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(349,$error,'Il existe déjà  une facturation pour cette période');
@@ -435,7 +435,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         try {
              $id_facture = $this->obj->insert($facture);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(347,$error,'Il n y a pas de demande de refinancement valide pour cette affaire');
@@ -484,7 +484,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
         try {
              $id_facture = $this->obj->insert($facture,$this->s,NULL,$refresh);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(351,$error,'Il n y a pas de type libre pour cette facture libre');
@@ -564,7 +564,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::facture()->u(array("id_facture"=>$this->id_facture,"etat"=>"payee"));
         try {
              $this->obj->can_delete($this->id_facture);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(879,$error,"On ne doit pas pouvoir supprimer une facture payée");
@@ -576,7 +576,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
         try {
              $this->obj->can_update($this->id_facture);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(878,$error,"On ne doit pas pouvoir modifier une facture payée");
@@ -644,7 +644,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
         try{
              $this->obj->updateDate($mod);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getMessage();
         }
         $this->assertEquals("Impossible de modifier une date de rejet car elle est déja renseignée",$error,"On ne doit pas pouvoir mettre a jour une date rejet deja renseignée");     
@@ -675,7 +675,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($mod);
         try {
         $this->obj->updateEnumRejet($mod);
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(877,$error,"On ne doit pas pouvoir updateEnumRejet une facture payée");
@@ -1761,7 +1761,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ob_start();
 		try{
 			$c_fact->export_autoportes(array('onglet'=>"gsa_facture_facture"));
-		}catch (error $e) {
+		}catch (errorATF $e) {
 			$erreur = $e->getMessage();
 		}		
 		ob_end_clean(); 		   
@@ -1890,7 +1890,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		 try {
              $this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getMessage();
         }
         $this->assertEquals("Il n'est pas possible de passer une facture libre contentieux en facture normale",$error,"LibreToNormale 1");
@@ -1908,7 +1908,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::facture()->u(array("id_facture" => $factureLibre , "date_periode_debut" => "2012-01-01" , "date_periode_fin" => "2012-02-01"));
 		try {
              $this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
-        } catch (error $e) {
+        } catch (errorATF $e) {
             $error = $e->getMessage();
         }
 		$this->assertEquals("Il y a déja une facture pour la période du 2012-01-01 au 2012-02-01",$error,"LibreToNormale 3");

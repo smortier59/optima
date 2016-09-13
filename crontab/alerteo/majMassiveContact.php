@@ -68,7 +68,7 @@ while ($ligne = fgetcsv($fic)) {
 		try {
 			ATF::contact()->u($u);
 			echo "Contact : ".$u['id_contact']." MAJ\n";
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			echo "Contact : ".$u['id_contact']." ERREUR\n";
 			$ct++;
 			$errors[] = $e;

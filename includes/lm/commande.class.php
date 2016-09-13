@@ -233,10 +233,16 @@ class commande_lm extends commande {
 
 		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
+
 		unset($infos["values_".$this->table]["produits"]);
 		
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
+
+		if($infos["from_web"]){
+			$from_web = true;
+			unset($infos["from_web"]);
+		}
 
 		//Gestion mail
 		if($envoyerEmail){
@@ -251,10 +257,13 @@ class commande_lm extends commande {
 		$devis=ATF::devis()->select($infos["id_devis"]);
 		$infos["id_affaire"]=$devis["id_affaire"];
 		$infos["tva"]=$devis["tva"];
+
+		$infos["type_contrat"] = ATF::affaire()->select($infos["id_affaire"], "type_affaire");
+
 		$this->q->reset()->addCondition("ref",ATF::affaire()->select($infos["id_affaire"],"ref"))->setCount();
 		$countRef=$this->sa();
 		if($countRef["count"]>0){
-			throw new error("Cette Ref de commande existe déjà !",878);
+			throw new errorATF("Cette Ref de commande existe déjà !",878);
 		}
 		$infos["ref"]=ATF::affaire()->select($infos["id_affaire"],"ref");
 		$infos["etat"]="pending";
@@ -290,8 +299,7 @@ class commande_lm extends commande {
 		
 
 		// Mise à jour du forecast
-		if(ATF::$codename == "lmbe") $affaire = new affaire_lmbe($infos['id_affaire']);
-		else $affaire = new affaire_lm($infos['id_affaire']);
+		$affaire = new affaire_lm($infos['id_affaire']);
 		
 		$affaire->majForecastProcess();
 
@@ -303,25 +311,54 @@ class commande_lm extends commande {
 			}
 		}
 	
+		if($from_web){
+			$infos_ligne = array();
+			ATF::devis_ligne()->q->reset()->where("id_devis",$infos["id_devis"]);
+			$infos_ligne = ATF::devis_ligne()->sa();
 
-		//Lignes visibles
-		if($infos_ligne){
-			$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"commande_ligne");
-			foreach($infos_ligne as $key=>$item){
-				if($item["id_commande_ligne"]){
-					$devis_ligne=ATF::devis_ligne()->select($item["id_commande_ligne"]);
-					$item["id_affaire_provenance"]=$devis_ligne["id_affaire_provenance"];
-					$item["serial"]=$devis_ligne["serial"];
-					$item["neuf"]=$devis_ligne["neuf"];
-					unset($item["id_commande_ligne"]);
+			$pack = ATF::pack_produit()->select(ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit"));
+
+			if($infos_ligne){	
+				foreach($infos_ligne as $key=>$item){										
+					unset($item["id_devis_ligne"],
+						  $item["id_devis"],
+						  $item["ref_simag"],
+						  $item["type"],
+						  $item["visibilite_prix"]
+						 );
+					
+					$item["id_commande"]=$last_id;
+					ATF::commande_ligne()->i($item);
 				}
-				$item["id_commande"]=$last_id;
-				ATF::commande_ligne()->i($item);
-			}
+			}else{
+				ATF::db($this->db)->rollback_transaction();
+				throw new error("Commande sans produits",877);
+			}			
+
 		}else{
-			ATF::db($this->db)->rollback_transaction();
-			throw new error("Commande sans produits",877);
-		}
+			//Lignes visibles
+			if($infos_ligne){
+				$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"commande_ligne");
+				
+				$pack = ATF::pack_produit()->select(ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit"));
+
+				foreach($infos_ligne as $key=>$item){
+					if($item["id_commande_ligne"]){
+						$devis_ligne=ATF::devis_ligne()->select($item["id_commande_ligne"]);
+						$item["id_affaire_provenance"]=$devis_ligne["id_affaire_provenance"];
+						$item["serial"]=$devis_ligne["serial"];
+						$item["neuf"]=$devis_ligne["neuf"];
+						$item["id_fournisseur"]=$devis_ligne["id_fournisseur"];
+						unset($item["id_commande_ligne"]);
+					}
+					$item["id_commande"]=$last_id;
+					ATF::commande_ligne()->i($item);
+				}
+			}else{
+				ATF::db($this->db)->rollback_transaction();
+				throw new error("Commande sans produits",877);
+			}
+		}		
 		
 		////////////////Devis
 		$devis["etat"]="gagne";	
@@ -346,7 +383,20 @@ class commande_lm extends commande {
 				$path=array("A3"=>"contratA3","A4"=>"contratA4");
 				ATF::affaire()->mailContact($email,$last_id,"commande",$path);
 			}
+
 			ATF::db($this->db)->commit_transaction();
+			
+			//On concatene le PDF du contrat avec les CG
+			if($pack && $pack["id_document_contrat"]){
+				$contratA4 = $this->filepath($last_id,"contratA4");
+				$CG = ATF::document_contrat()->filepath($pack["id_document_contrat"],"fichier_joint");
+
+				if(file_exists($contratA4) && file_exists($CG)){					
+					$cmd = "gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$contratA4.".pdf ".$contratA4." ".$CG;
+					$result = `$cmd`;
+					rename($contratA4.".pdf", $contratA4);
+				}			
+			}
 		}
 		
 		if(is_array($cadre_refreshed)){
@@ -383,7 +433,7 @@ class commande_lm extends commande {
 				//Il ne faut pas que la date début soit un 29 30 ou 31 car sinon cela pause problème lors de la création de l'échéancier
 				if($infos['key']=="date_debut"){					
 					if(date("d",strtotime($infos['value']))=="29" || date("d",strtotime($infos['value']))=="30" || date("d",strtotime($infos['value']))=="31"){
-						throw new error("Un contrat ne peut pas avoir pour ".ATF::$usr->trans($infos['key'],$this->table)." une 29, 30, 31 (ici ".date("d",strtotime($infos['value'])).")",880);
+						throw new errorATF("Un contrat ne peut pas avoir pour ".ATF::$usr->trans($infos['key'],$this->table)." une 29, 30, 31 (ici ".date("d",strtotime($infos['value'])).")",880);
 					}
 					ATF::devis()->u(array("id_devis"=> $this->select($infos['id_commande'] , "id_devis"), "date_accord"=>date("Y-m-d")));
 
@@ -458,7 +508,7 @@ class commande_lm extends commande {
 							ATF::suivi()->d($item["id_suivi"]);
 						}
 					}
-				} catch(error $e) {
+				} catch(errorATF $e) {
 					//On rollback le tout
 					ATF::db($this->db)->rollback_transaction();
 					throw $e;
@@ -474,7 +524,7 @@ class commande_lm extends commande {
 				break;
 
 			default:
-				throw new error("date_invalide",987);
+				throw new errorATF("date_invalide",987);
 		}
 
 		if($infos["table"]!="commande"){
@@ -494,7 +544,7 @@ class commande_lm extends commande {
 //		$commande = $this->select($infos['id_commande']);
 //		//Il faut une date de de résiliation pour insérer une date de restitution
 //		if($infos['value'] == 'undefined' && ($commande["date_restitution"] || $commande["date_restitution_effective"])){
-//			throw new error("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
+//			throw new errorATF("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
 //		}else{
 //			return parent::updateDate($infos);
 //		}
@@ -509,9 +559,9 @@ class commande_lm extends commande {
 //		$commande = $this->select($infos['id_commande']);
 //		//Il faut une date de de résiliation pour insérer une date de restitution
 //		if($infos['value'] != 'undefined' && !$commande["date_resiliation"]){
-//			throw new error("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
+//			throw new errorATF("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
 //		}elseif($infos['value'] == 'undefined' && $commande["date_restitution_effective"]){
-//			throw new error("Impossible de supprimer la date de résiliation si la restitution est effective",883);
+//			throw new errorATF("Impossible de supprimer la date de résiliation si la restitution est effective",883);
 //		}else{
 //			return parent::updateDate($infos);
 //		}
@@ -539,7 +589,7 @@ class commande_lm extends commande {
 			$this->q->reset()->Where("id_affaire",$affaire->get("id_fille"))->setDimension("row");
 			$commandeAR=$this->sa();
 			if($commandeAR["date_debut"] || $commandeAR["date_evolution"]){
-				throw new error("On ne peut pas modifier/supprimer car l'affaire est Annulée et Remplacée, il faut d'abord supprimer les dates de l'AR (".ATF::affaire()->select($affaire->get("id_fille"),"ref").")",877);
+				throw new errorATF("On ne peut pas modifier/supprimer car l'affaire est Annulée et Remplacée, il faut d'abord supprimer les dates de l'AR (".ATF::affaire()->select($affaire->get("id_fille"),"ref").")",877);
 			}
 		}
 	}
@@ -550,13 +600,13 @@ class commande_lm extends commande {
     */   	
 	public function checkUpdateAVT($affaireEnfant){
 		if($affaireEnfant["nature"]=="vente"){
-			throw new error("On ne peut pas modifier/supprimer car des produits de cette affaire sont vendus dans l'affaire (".$affaireEnfant["ref"].")",875);
+			throw new errorATF("On ne peut pas modifier/supprimer car des produits de cette affaire sont vendus dans l'affaire (".$affaireEnfant["ref"].")",875);
 		}elseif($affaireEnfant["nature"]=="avenant"){
 			$this->q->reset()->Where("id_affaire",$affaireEnfant["id_affaire"])->setDimension("row");
 			$commandeAvenant=$this->sa();
 			//On ne peut pas modifier les dates d'une affaire parente tant que l'affaire avenant a une date_debut ou une date_fin (l'utilisateur doit d'abord supprimer les dates de l'avenant)
 			if($commandeAvenant["date_debut"] || $commandeAvenant["date_evolution"]){
-				throw new error("On ne peut pas modifier/supprimer car l'affaire a un avenant, il faut d'abord supprimer les dates de l'avenant (".$affaireEnfant["ref"].")",876);
+				throw new errorATF("On ne peut pas modifier/supprimer car l'affaire a un avenant, il faut d'abord supprimer les dates de l'avenant (".$affaireEnfant["ref"].")",876);
 			}
 		}
 	}
@@ -572,8 +622,7 @@ class commande_lm extends commande {
 	* @return bool
     */   	
 	public function checkAndUpdateDates($infos){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($infos['id_commande']);
-		else $commande = new commande_lm($infos['id_commande']);
+		$commande = new commande_lm($infos['id_commande']);
 		
 		$affaire = $commande->getAffaire();		
 		//On ne doit pas pouvoir modifier une commande Annulée et remplacée
@@ -775,7 +824,7 @@ class commande_lm extends commande {
 						ATF::suivi()->insert($suivi);
 					}
 				}else{					
-					throw new Error("Il est impossible d'inserer une date de restitution effective nulle");
+					throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
 				}	
 				//}
 			break;
@@ -938,8 +987,7 @@ class commande_lm extends commande {
 	* @return boolean 
 	*/
 	public function can_delete($id,$infos=false){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($id);
-		else $commande = new commande_lm($id);
+		$commande = new commande_lm($id);
 
 		$affaire = $commande->getAffaire();
 
@@ -958,11 +1006,11 @@ class commande_lm extends commande {
 								  ->addCondition("type_facture","ap","AND",false,"!=");
 		
 		if(ATF::facture()->sa()){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
 		}
 		
-		if($this->select($id,"etat")!="non_loyer"){
-			throw new error("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
+		if($this->select($id,"etat")!="non_loyer" && $this->select($id,"etat")!="pending"){
+			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
 		}
 		
 		// On ne peut pas supprimer un contrat qui a des matériels "actifs"
@@ -971,7 +1019,7 @@ class commande_lm extends commande {
 			->where("existence","actif")
 			->setCountOnly();
 		if (ATF::parc()->sa()>0) {
-			throw new error("On ne peut pas supprimer un contrat qui a des matériels 'actifs'",84513);
+			throw new errorATF("On ne peut pas supprimer un contrat qui a des matériels 'actifs'",84513);
 		}			
 		
 		return true;
@@ -1019,8 +1067,7 @@ class commande_lm extends commande {
 				ATF::devis()->u($devis_update);
 	
 				// Mise à jour du forecast
-				if(ATF::$codename == "lmbe") $affaire = new affaire_lmbe($commande['id_affaire']);
-				else $affaire = new affaire_lm($commande['id_affaire']);
+				$affaire = new affaire_lm($commande['id_affaire']);
 				$affaire->majForecastProcess();
 	
 				//Suppression des facturations
@@ -1232,9 +1279,14 @@ class commande_lm extends commande {
                 $return['data'][$k]["CourrierRestitutionExists"] = true;
             }
 
-            
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiCourrierClassique"))) {
                 $return['data'][$k]["envoiCourrierClassiqueExists"] = true;
+            }
+
+            log::logger($i["commande.id_commande"] , "mfleurquin");
+
+            if (file_exists($this->filepath($i['commande.id_commande'],"retour"))) {
+                $return['data'][$k]["ctSigneSlimpayExists"] = true;
             }
 		}
 		
@@ -1250,8 +1302,16 @@ class commande_lm extends commande {
 	* 	$infos[id_fournisseur]
     */ 
 	function getCommande_ligne(&$infos){
+		//log::logger($infos , "mfleurquin");
+
 		$id_commande=$this->decryptId($infos["id_commande"]);
 		$id_fournisseur=ATF::societe()->decryptId($infos["id_fournisseur"]);
+
+
+		//log::logger($id_commande , "mfleurquin");
+		//log::logger($id_fournisseur , "mfleurquin");
+
+
 		if ($id_commande && $id_fournisseur) {
 			$this->q->reset()->addCondition("id_commande",$id_commande);		
 			if($commandes=$this->sa()){

@@ -79,7 +79,7 @@ while ($ligne = fgetcsv($fic)) {
 	try {
 		$id_soc = ATF::societe()->i($soc);
 		echo "Societe : ".$soc['societe']." CREATE\n";
-	} catch (error $e) {
+	} catch (errorATF $e) {
 		echo "Societe : ".$soc['societe']." ERREUR\n";
 		$ct++;
     	//ATF::db()->rollback_transaction();
@@ -102,7 +102,7 @@ while ($ligne = fgetcsv($fic)) {
 		try {
 			$id_con = ATF::contact()->i($contact);
 			echo "Contact : ".$contact['nom']." CREATE\n";
-		} catch (error $e) {
+		} catch (errorATF $e) {
 			echo "Contact : ".$contact['nom']." ERREUR\n";
 			$ct++;
 	    	//ATF::db()->rollback_transaction();
