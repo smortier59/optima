@@ -2309,7 +2309,7 @@ La dénonciation devra être notifiée par lettre recommandée avec accusé de r
 				if ($this->lastEl) {	
 					ATF::facture_ligne()->q->reset()->from("facture_ligne","id_facture","facture","id_facture")
 													->where("facture.id_facture", $this->lastEl["id_facture"])
-													->where("produit",mysql_escape_string($i["produit"]),"AND",false,"LIKE");
+													->where("produit",$i["produit"],"AND",false,"LIKE");
 
 					$facture_ligne = ATF::facture_ligne()->select_row();
 
@@ -2317,7 +2317,7 @@ La dénonciation devra être notifiée par lettre recommandée avec accusé de r
 				}else{			
 					ATF::devis_ligne()->q->reset()->from("devis_ligne","id_devis","devis","id_devis")
 												  ->where("devis.id_affaire", $this->el["id_affaire"])
-												  ->where("produit",mysql_escape_string($i["produit"]),"AND",false,"LIKE");
+												  ->where("produit",$i["produit"],"AND",false,"LIKE");
 
 					$devis_ligne = ATF::devis_ligne()->select_row();
 				}

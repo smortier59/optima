@@ -24,6 +24,7 @@ class hotline extends classes_optima {
 			//,'temps_total'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'temps_facture_calcule'=>array("custom"=>true,"align"=>"right","width"=>80)
 			//,'temps'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'duree_work'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'duree_presta'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'duree_dep'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'dead_line'=>array("custom"=>true,"width"=>90,"fixedWidth"=>true)
@@ -189,6 +190,7 @@ class hotline extends classes_optima {
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.temps))/3600*4)/4,2)","temps")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600*4)/4,2)","duree_dep")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600*4)/4,2)","duree_presta")
+			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta)-TIME_TO_SEC(IF(hotline_interaction.duree_pause IS NULL,0,hotline_interaction.duree_pause)))/3600*4)/4,2)","duree_work")
 			->addField("hotline.id_affaire","hotline.id_affaire_fk")
 			->addField("hotline.urgence")
 			->addField("hotline.etat")
@@ -2629,7 +2631,7 @@ class hotline extends classes_optima {
 		$insertion=array("filtre_optima"=>$donnees['name']
 						,"id_module"=>ATF::module()->from_nom($this->table)
 						,"id_user"=>ATF::$usr->getID()
-						,"options"=>mysql_escape_string(serialize($donnees))
+						,"options"=>serialize($donnees)
 						,"type"=>"prive");
 
 		//si le filtre existe déjà on le supprime
