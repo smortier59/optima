@@ -102,7 +102,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	* @date 25-01-2011
 	* @param int $id Identifiant commande
 	*/
-	private function commandeInit($id) {
+	public function commandeInit($id) {
 		$this->commande = ATF::commande()->select($id);
 			
 		$this->colsProduit = array("border"=>"TB","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduit");
@@ -478,7 +478,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	
 	
 
-	private function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
+	public function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
 		$save = $this->headStyle;
 		$newStyleHead = array(
 			"size" => 9
