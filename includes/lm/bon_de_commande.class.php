@@ -63,6 +63,7 @@ class bon_de_commande_lm extends bon_de_commande {
 				)
 			)
 			,'factureFournisseur'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
+			,"num_bdc"
 			,"commentaire"=>array("xtype"=>"textarea")
 		);
 		$this->colonnes['panel']['commande_lignes'] = array(
