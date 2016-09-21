@@ -8,9 +8,9 @@ require_once dirname(__FILE__)."/../cleodis/pdf.class.php";
 */
 class pdf_lm extends pdf_cleodis {	
 	public $logo = 'lm/lm.png';
-	private $heightLimitTableContratA4 = 100; 
+	public $heightLimitTableContratA4 = 100; 
 
-	private $leftStyle = array(
+	public $leftStyle = array(
 		"size" => 8
 		,"color" => 000000
 		,"font" => "arial"
@@ -102,7 +102,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	* @date 25-01-2011
 	* @param int $id Identifiant commande
 	*/
-	private function commandeInit($id) {
+	public function commandeInit($id) {
 		$this->commande = ATF::commande()->select($id);
 			
 		$this->colsProduit = array("border"=>"TB","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduit");
@@ -163,9 +163,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);
 		if($this->affaire["type_affaire"] == "LP"){
-			$this->multicell(0,5,"1.1. LE CLIENT :",1,"L",1);
+			$this->multicell(0,5,"1.1. Le Client :",1,"L",1);
 		}else{
-			$this->multicell(0,5,"1.1. L'ABONNE :",1,"L",1);
+			$this->multicell(0,5,"1.1. L'Abonné :",1,"L",1);
 		}
 
 		$this->setfont('arial','',8);
@@ -189,12 +189,12 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);		
 		if($this->affaire["type_affaire"] == "LP"){
-			$this->multicell(0,5,"1.2. LE LOUEUR/LEROY MERLIN Abonnements",1,"L",1);
+			$this->multicell(0,5,"1.2. Le Loueur/Leroy Merlin Abonnements",1,"L",1);
 		}else{
-			$this->multicell(0,5,"1.2. LEROY MERLIN Abonnements",1,"L",1);
+			$this->multicell(0,5,"1.2. Leroy Merlin Abonnements",1,"L",1);
 		}
 		$this->setfont('arial','',8);
-		$this->multicell(0,4,"\nLa société Leroy Merlin Abonnements, SAS au capital de 10.000€ dont le siège social est situé Rue de Chanzy Lezennes 59712 Lille Cedex 9, immatriculé au RCS Lille Métropole sous le numéro 820 472 009\n\n",1,"L");
+		$this->multicell(0,4,"\nLa société Leroy Merlin Abonnements, SAS au capital de 10.000€ dont le siège social est situé Rue de Chanzy Lezennes 59712 Lille Cedex 9, immatriculée au RCS Lille Métropole sous le numéro 820 472 009\n\n",1,"L");
 		
 		$this->ln(5);
 
@@ -226,7 +226,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$dureeEngagement = 0;
 		$FrequenceEngagement = $this->loyer[0]["frequence_loyer"];
 
-		$head = array("Nombre de loyers","Prériodicité","Loyer HT","Loyer TTC");
+		$head = array("Nombre de loyers","Périodicité","Loyer HT","Loyer TTC");
 		$width = array(49,49,49,49);		
 		$data = array();
 		$style = array();
@@ -243,7 +243,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 					case 'semestre' : $data[$key][1] = "Semestriel"; break;
 					case 'an' : $data[$key][1] = "Annuel"; break;
 				}			
-				$data[$key][2] = round(($value["loyer"]/__TVA__),2)." €";
+				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
 				$data[$key][3] = $value["loyer"]." €";
 				//$style[$key][1] = $this->leftStyle;
 			}
@@ -253,9 +253,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 
 		if($this->affaire["type_affaire"] == "SP"){
-			$texteDuree = "Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la souscription du Contrat d'abonnemet, soit le ";
+			$texteDuree = "Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la souscription du Contrat d'Abonnement";
 		}else{
-			$texteDuree ="Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la reception du Produit, soit le ";
+			$texteDuree ="Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la réception du Produit";
 		}
 
 		$this->multicell(0,4,"\n".$texteDuree."\n\nEchéancier :\n\n",1,"L");
@@ -283,7 +283,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 					case 'semestre' : $data[$key][1] = "Semestriel"; break;
 					case 'an' : $data[$key][1] = "Annuel"; break;
 				}			
-				$data[$key][2] = round(($value["loyer"]/__TVA__),2)." €";
+				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
 				$data[$key][3] = $value["loyer"]." €";
 				//$style[$key][1] = $this->leftStyle;
 			}
@@ -291,7 +291,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		}
 
 
-		$this->multicell(0,4,"\nProlongation possible de ".$dureeProl." ".$FrequenceProl." si vous le souhaitez :\n\nEchéancier de prolongation (indicatif) :\n\n",1,"L");
+		$this->multicell(0,4,"\nProlongation possible de ".$dureeProl." ".$FrequenceProl." par tacite reconduction sans engagement :\n\nEchéancier de prolongation (indicatif) :\n\n",1,"L");
 		
 
 		
@@ -373,7 +373,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			,"Signature : "
 		);
 		
-		$t = "Pour Leroy Merlin Abonneemnts";
+		$t = "Pour Leroy Merlin Abonnements";
 		
 		$this->cadre(110,$y,80,48,$cadre,$t);
 			
@@ -387,7 +387,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);	
-		$this->multicell(0,5,"1.3. LE(S) PRODUITS LOUES",1,"L",1);
+		$this->multicell(0,5,"1.3. Le(s) Produits loué(s)",1,"L",1);
 		$this->listingProduitsService("produit");
 
 		$this->ln(5);
@@ -404,14 +404,14 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	public function listingSP(){
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);	
-		$this->multicell(0,5,"1.3. LE(S) SERVICES",1,"L",1);
+		$this->multicell(0,5,"1.3. Le(s) Service(s)",1,"L",1);
 		$this->listingProduitsService("service");
 	}
 
 	public function listingLS(){
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);	
-		$this->multicell(0,5,"1.3. LE(S) PRODUITS LOUES",1,"L",1);
+		$this->multicell(0,5,"1.3. Le(s) Produits loué(s)",1,"L",1);
 		$this->listingProduitsService("produit");
 
 		$this->ln(5);
@@ -426,7 +426,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->ln(5);
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);	
-		$this->multicell(0,5,"1.4. LE(S) SERVICES",1,"L",1);
+		$this->multicell(0,5,"1.4. Le(s) Service(s)",1,"L",1);
 		$this->listingProduitsService("service");
 
 
@@ -445,7 +445,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		}
 		if($lignes){
 			if($type == "produit"){
-				$head = array("Quantité","Description du produit");
+				$head = array("Quantité","Description des produits");
 				$width = array(30,166);		
 				$data = array();
 				$style = array();
@@ -478,7 +478,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	
 	
 
-	private function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
+	public function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
 		$save = $this->headStyle;
 		$newStyleHead = array(
 			"size" => 9
