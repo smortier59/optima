@@ -189,12 +189,12 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);		
 		if($this->affaire["type_affaire"] == "LP"){
-			$this->multicell(0,5,"1.2. Le louer/Leroy Merlin Abonnements",1,"L",1);
+			$this->multicell(0,5,"1.2. Le loueur/Leroy Merlin Abonnements",1,"L",1);
 		}else{
 			$this->multicell(0,5,"1.2. Leroy Merlin Abonnement",1,"L",1);
 		}
 		$this->setfont('arial','',8);
-		$this->multicell(0,4,"\nLa société Leroy Merlin Abonnements, SAS au capital de 10.000€ dont le siège social est situé Rue de Chanzy Lezennes 59712 Lille Cedex 9, immatriculé au RCS Lille Métropole sous le numéro 820 472 009\n\n",1,"L");
+		$this->multicell(0,4,"\nLa société Leroy Merlin Abonnements, SAS au capital de 10.000€ dont le siège social est situé Rue de Chanzy Lezennes 59712 Lille Cedex 9, immatriculée au RCS Lille Métropole sous le numéro 820 472 009\n\n",1,"L");
 		
 		$this->ln(5);
 
@@ -310,7 +310,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			$this->ln(5);$this->setfont('arial','B',8);
 			$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
 			$this->setfont('arial','',8);
-			$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d'Abonnement, et consentir à l'utilisation et à la communication des données personnelles qu'il aura fournies ou qui auront été collectées, après avoir été informé qu'elles pourront être transférées en dehors de l'Union Européenne et qu'il pourra exercer son droit d'accès et de rectification à l'adresse indiquée dans les conditions générales.\n\n",1,"L");
+			$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d'Abonnements, et consentir à l'utilisation et à la communication des données personnelles qu'il aura fournies ou qui auront été collectées, après avoir été informé qu'elles pourront être transférées en dehors de l'Union Européenne et qu'il pourra exercer son droit d'accès et de rectification à l'adresse indiquée dans les conditions générales.\n\n",1,"L");
 
 		}elseif($this->affaire["type_affaire"] == "LP"){	
 			$chapSuivant++;
