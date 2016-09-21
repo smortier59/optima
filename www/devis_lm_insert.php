@@ -13,6 +13,36 @@ log::logger("DEVIS LM INSERT", "mfleurquin");
 log::logger($infos, "mfleurquin");
 
 
+//Creation de la tache pour alerter benjamin de la création d'une affaire terminée par SLIMPAY
+if($infos["create_tache"]){
+    try{
+        $tache = array("tache"=>array("id_societe"=> $infos["id_societe"],
+                                       "id_user"=>18,
+                                       "origine"=>"societe_commande",
+                                       "tache"=>"Une nouvelle commande viens d'être passée et validée par SLIMPAY",
+                                       "id_affaire"=>$infos["id_affaire"],
+                                       "type_tache"=>"creation_contrat",
+                                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+                                       "no_redirect"=>"true"
+                                      ),
+                        "dest"=>18
+                    );        
+        $id_tache = ATF::tache()->insert($tache);
+
+        ATF::comite()->insert(array("date"=>date("Y-m-d"),
+                                        "id_affaire"=>$infos["id_affaire"],
+                                        "id_societe"=>$infos["id_societe"],                                   
+                                        "etat"=>"en_attente",
+                                        "date_creation"=>date("Y-m-d"),
+                                        "suivi_notifie"=>array(18)
+                                    ));
+        die;
+    }catch(errorATF $e){
+        log::logger($e->getMessage(),'lm');
+        echo "Une erreur s'est produit, merci de contacter le service client.";
+    }
+}
+
 //Creation d'une offre Magasin 
 if($infos["OffreMagasin"]){
     try{
@@ -113,6 +143,29 @@ if ($infos["id_facture"]) {
 
     log::logger(ATF::facture()->decryptId($id_facture), "mfleurquin");
     $filename = ATF::facture()->filepath($id_facture,"fichier_joint");
+
+    if(file_exists($filename)){
+        $handle = fopen($filename, "r");
+        $contents = fread($handle, filesize($filename));
+        fclose($handle);    
+        echo $contents;
+        die;
+    }else{
+        echo "Probleme de récupération du PDF";
+        die;
+    }      
+}
+
+//Récuperation du PDF de la facture
+if ($infos["getPdfSigne"]) {   
+    
+    log::logger($infos , "mfleurquin");
+
+    $id_commande = ATF::commande()->decryptId($infos["id_commande"]);
+    
+    log::logger($id_commande , "mfleurquin");
+
+    $filename = ATF::commande()->filepath($id_commande,"contratA4");
 
     if(file_exists($filename)){
         $handle = fopen($filename, "r");
