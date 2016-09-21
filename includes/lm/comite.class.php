@@ -78,8 +78,6 @@ class comite extends classes_optima {
 			$preview=false;
 		}		
 
-		log::logger($infos , "mfleurquin");
-
 		$this->infoCollapse($infos);
 
 		$notifie_suivi = $infos["suivi_notifie"];
