@@ -361,18 +361,7 @@ class devis_lm extends devis {
 		
 		// Mise à jour du forecast
 		$affaire = new affaire_lm($infos['id_affaire']);
-		//$affaire->majForecastProcess();
- 
-
-		ATF::comite()->insert(array("date"=>date("Y-m-d"),
-									"id_affaire"=>$infos["id_affaire"],
-									"id_societe"=>$infos["id_societe"],
-									//"prix"=> ,
-									"etat"=>"en_attente",
-									"date_creation"=>date("Y-m-d"),
-									"suivi_notifie"=>array(18)
-								));
-
+		$affaire->majForecastProcess();
 		////////////////Devis Ligne
 		//Lignes reprise
 		if($infos_ligne_repris){
