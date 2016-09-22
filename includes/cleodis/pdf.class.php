@@ -550,7 +550,7 @@ class pdf_cleodis extends pdf {
 		/*	PAGE 4	*/
 		$this->AddPage();
 		
-		$this->sety(25);
+		$this->sety(30);
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,"=> La location évolutive, un moyen efficace");
 		$this->unsetFontDecoration();
@@ -564,7 +564,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"Un budget mensuel maintenu à périmètre équivalent.");
 		$this->unsetFontDecoration();
 		
-		$this->ln(5);
+		$this->ln(3);
 		$this->setfont('arial','U',10);
 		$this->multicell(0,5,"La location selon CLEODIS, une valeur ajoutée clairement exprimée");
 		$this->ln(5);
@@ -610,12 +610,12 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"=>Gestion de parc");
 		$this->unsetFontDecoration();
 		$this->multicell(0,5,"Pour vous faciliter la gestion quotidienne de votre parc, CLEODIS vous donne accès via son site Web à la base de donnée reprenant tous les équipements intégrés au contrat de location. Vous y trouverez toutes les informations concernant vos contrats, les données techniques des matériels et logiciels.");
-		$this->ln(5);
+		$this->ln(3);
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Assurance remplacement");
 		$this->unsetFontDecoration();
 		$this->multicell(0,5,"CLEODIS vous propose d'intégrer au contrat une assurance remplacement (et non remboursement à la valeur vénale) du matériel en cas de sinistre partiel ou total lors d'un vol avec effraction, un incendie ou un dégât des eaux.");
-		$this->ln(5);
+		$this->ln(3);
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Brokerage – Matériel de seconde main");
 		$this->unsetFontDecoration();
@@ -794,13 +794,17 @@ class pdf_cleodis extends pdf {
 		
 		$this->sety(10);
 		$this->setfont('arial','B',14);
-		$this->RoundedRect(15,10,140,25,5);
-		$this->multicell(140,6,"Proposition locative CLEODIS",0,'C');
-		$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
-		$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
-		$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
-		
+		if(ATF::$codename == "cleodis"){
+			$this->RoundedRect(15,10,140,25,5);
+			$this->multicell(140,6,"Proposition locative CLEODIS",0,'C');
+			$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
+			$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
+			$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+			
+			
+		}
 		$this->sety(35);
+		
 		$this->setfont('arial','',8);
 
 		$this->cell(0,5,"N° d'affaire : ".$this->affaire["ref"],0,1);
