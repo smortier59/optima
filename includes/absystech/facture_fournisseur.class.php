@@ -116,6 +116,7 @@ class facture_fournisseur extends classes_optima {
 
 	//Retourne les id des facture_fournisseur n'ayant pas encore le champs OCR rempli 
 	public function getNextToOCR(){
+		log::disableLog();
 		ATF::facture_fournisseur()->q->reset()->whereIsNull("ocr");
 		$result = ATF::facture_fournisseur()->select_all();	
 		if($result){

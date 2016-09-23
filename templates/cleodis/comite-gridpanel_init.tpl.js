@@ -1,12 +1,23 @@
 {$id_user = ATF::$usr->getID()}
+{util::push($fieldsKeys,"reseau")}
 
-{if $id_user == 16 || $id_user == 17 || $id_user == 18 || $id_user == 93 || $id_user == 35}
+
+
+{if $id_user == 16 || $id_user == 17 || $id_user == 18 || $id_user == 93 || $id_user == 35 || $id_user == 21}
 	ATF.renderer.comiteDecision=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {
 			var idDiv = Ext.id();
 			var id = record.data[table+'__dot__id_comite'];
+			var ok = true;
+
+			{if $id_user == 21}
+				console.log(record.data.reseau);
+				if(record.data.reseau == false){
+					ok = false;
+				}
+			{/if}
 			
-			if (record.data.comite__dot__etat=="en_attente") {					
+			if (record.data.comite__dot__etat=="en_attente" && ok==true) {					
 				var btndecision = {
 					xtype:'button',
 					id:"decision"+id,
