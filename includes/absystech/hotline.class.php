@@ -839,6 +839,10 @@ class hotline extends classes_optima {
 		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
 		if ($id_societe==1) {
 			$infos['type_requete'] = "charge_absystech";
+		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
+			$infos["id_affaire"] = $id_affaire_projet;
 		}
 
 		//Insertion de la requête
