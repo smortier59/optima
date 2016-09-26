@@ -3238,9 +3238,17 @@ class hotline extends classes_optima {
 				$r[] = ATF::affaire()->nom($hotline['id_affaire']);
 			break;
 			case "intervention": 
-				if (!$hotline['facturation_ticket']) $r = array("Nature de la charge à définir");
-				else if ($hotline['id_affaire']) $r[] = " sur l'affaire : ".ATF::affaire()->nom($hotline['id_affaire']);
-				else $r[] = ATF::$usr->trans($hotline['facturation_ticket']."_facture","hotline");
+				if (!$hotline['facturation_ticket']) {
+					$r = array("Nature de la charge à définir");
+				} else if ($hotline['id_affaire']) {
+					$r[] = " sur l'affaire : ".ATF::affaire()->nom($hotline['id_affaire']);
+					$id_societe_affaire = ATF::affaire()->select($hotline['id_affaire'],"id_societe");
+					if ($hotline['id_societe'] != $id_societe_affaire) {
+						$r[] = " (".ATF::societe()->nom($id_societe_affaire).")";
+					}
+				} else {
+					$r[] = ATF::$usr->trans($hotline['facturation_ticket']."_facture","hotline");
+				}
 			break;
 
 		}
@@ -3846,6 +3854,7 @@ class hotline extends classes_optima {
 				case 'id_societe':
 				case 'id_user':
 				case 'id_contact':
+				case 'date':
 					$get['tri'] = "hotline.".$get['tri'];
 				break;
 			}

@@ -792,6 +792,37 @@ class affaire_absystech extends affaire {
         return $return;
 	}
 
+/* PARTIE DES FONCTIONS POUR TELESCOPE*/
+
+
+	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+		$length = 25;
+		$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("affaire.id_affaire","id_affaire")->addField("affaire.affaire","affaire")->addField("affaire.etat","etat");
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		if ($get['id_societe']) {
+			$this->q->where("affaire.id_societe",$get["id_societe"]);
+		}
+
+		$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
+
+
+
+
 
 };
 
