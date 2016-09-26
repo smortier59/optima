@@ -1989,6 +1989,9 @@ class hotline_interaction extends classes_optima {
 	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
 	        }
 
+ 			if (!$post['id_user']) {
+ 	        	$post['id_user'] = ATF::$usr->getId();
+ 	        }
 
 	        // Insertion
 	        $id = self::insert($post);
@@ -2012,7 +2015,7 @@ class hotline_interaction extends classes_optima {
 	}	
 
 	/**
-	* Renvoi le nombre de crédit par rapport aun temps passé
+	* Renvoi le nombre de crédit (presta ou deplacement par rapport au temps passé
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr> 
 	* @param $get array contient le temps passé formatté comme suit : HH:ii:ss ou HH:ii
@@ -2020,7 +2023,12 @@ class hotline_interaction extends classes_optima {
 	* @return float le nombre de crédit formaté sur 3 chiffres après la virgule
 	*/ 
 	public function _credit($get,$post) {
-		if (!$get['tps']) return 0;
+		if (!$get['tps'] || $get['tps']=="00:00:00") return 0;
+ 
+ 		if ($get['field']=="credit_dep") {
+	
+ 			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
+ 		}
     	$tmp = explode(":", $get['tps']);
 
     	$creditMin = $tmp[1]/60;
