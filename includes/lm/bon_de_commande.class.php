@@ -63,6 +63,7 @@ class bon_de_commande_lm extends bon_de_commande {
 				)
 			)
 			,'factureFournisseur'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
+			,"num_bdc"
 			,"commentaire"=>array("xtype"=>"textarea")
 		);
 		$this->colonnes['panel']['commande_lignes'] = array(
@@ -310,7 +311,7 @@ class bon_de_commande_lm extends bon_de_commande {
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
-		$affaire = new affaire_cleodis($bdc['id_affaire']);
+		$affaire = new affaire_lm($bdc['id_affaire']);
 		
 		//On ne doit pas pouvoir modifier une affaire Annulée et remplacée
 		ATF::commande()->checkUpdateAR($affaire);

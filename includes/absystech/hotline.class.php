@@ -24,6 +24,7 @@ class hotline extends classes_optima {
 			//,'temps_total'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'temps_facture_calcule'=>array("custom"=>true,"align"=>"right","width"=>80)
 			//,'temps'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'duree_work'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'duree_presta'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'duree_dep'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'dead_line'=>array("custom"=>true,"width"=>90,"fixedWidth"=>true)
@@ -189,6 +190,7 @@ class hotline extends classes_optima {
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.temps))/3600*4)/4,2)","temps")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600*4)/4,2)","duree_dep")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600*4)/4,2)","duree_presta")
+			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta)-TIME_TO_SEC(IF(hotline_interaction.duree_pause IS NULL,0,hotline_interaction.duree_pause)))/3600*4)/4,2)","duree_work")
 			->addField("hotline.id_affaire","hotline.id_affaire_fk")
 			->addField("hotline.urgence")
 			->addField("hotline.etat")
@@ -837,6 +839,10 @@ class hotline extends classes_optima {
 		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
 		if ($id_societe==1) {
 			$infos['type_requete'] = "charge_absystech";
+		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
+			$infos["id_affaire"] = $id_affaire_projet;
 		}
 
 		//Insertion de la requête
@@ -2629,7 +2635,7 @@ class hotline extends classes_optima {
 		$insertion=array("filtre_optima"=>$donnees['name']
 						,"id_module"=>ATF::module()->from_nom($this->table)
 						,"id_user"=>ATF::$usr->getID()
-						,"options"=>mysql_escape_string(serialize($donnees))
+						,"options"=>serialize($donnees)
 						,"type"=>"prive");
 
 		//si le filtre existe déjà on le supprime
@@ -3236,9 +3242,17 @@ class hotline extends classes_optima {
 				$r[] = ATF::affaire()->nom($hotline['id_affaire']);
 			break;
 			case "intervention": 
-				if (!$hotline['facturation_ticket']) $r = array("Nature de la charge à définir");
-				else if ($hotline['id_affaire']) $r[] = " sur l'affaire : ".ATF::affaire()->nom($hotline['id_affaire']);
-				else $r[] = ATF::$usr->trans($hotline['facturation_ticket']."_facture","hotline");
+				if (!$hotline['facturation_ticket']) {
+					$r = array("Nature de la charge à définir");
+				} else if ($hotline['id_affaire']) {
+					$r[] = " sur l'affaire : ".ATF::affaire()->nom($hotline['id_affaire']);
+					$id_societe_affaire = ATF::affaire()->select($hotline['id_affaire'],"id_societe");
+					if ($hotline['id_societe'] != $id_societe_affaire) {
+						$r[] = " (".ATF::societe()->nom($id_societe_affaire).")";
+					}
+				} else {
+					$r[] = ATF::$usr->trans($hotline['facturation_ticket']."_facture","hotline");
+				}
 			break;
 
 		}
@@ -3669,6 +3683,16 @@ class hotline extends classes_optima {
         				self::$post['specialAction']($post);
         				$return['result'] = true;
         			break;
+        			case "takeRequest":
+        			case "cancelRequest":
+        			case "resolveRequest":
+				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+        				self::$post['specialAction']($post);
+        				$return['result'] = true;
+        				$lastInteractionRequired = true;
+        				if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
+
+        			break;
         			case "setWait":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				if ($post['etat']=="wait") {
@@ -3718,7 +3742,7 @@ class hotline extends classes_optima {
         	// last itneraction
         	if ($lastInteractionRequired) {
         		$p = array("limit"=>1,"tri"=>"id_hotline_interaction","trid"=>"desc","id_hotline"=>$post['id_hotline']);
-				$return['interaction'] = ATF::hotline_interaction()->_GET($p);
+				$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
         	}
 
         	// Récupération des notices créés
@@ -3793,12 +3817,12 @@ class hotline extends classes_optima {
 				$this->q->where("hotline.etat","free");
 			} else {
 				// Filtre ticket actif
-				if ($get['filters']['active'] == "on") {
+				if ($get['filters']['fixing'] == "on") {
 					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
 				}
 				// Filtre MES tickets
-				if ($get['filters']['mine'] == "on" && $get['id_user']) {
-					$this->q->where("hotline.id_user",$get['id_user']);
+				if ($get['filters']['mine'] == "on") {
+					$this->q->where("hotline.id_user",ATF::$usr->getId());
 				}	
 
 				// Filtre Facturé
@@ -3834,6 +3858,7 @@ class hotline extends classes_optima {
 				case 'id_societe':
 				case 'id_user':
 				case 'id_contact':
+				case 'date':
 					$get['tri'] = "hotline.".$get['tri'];
 				break;
 			}
@@ -3854,7 +3879,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
 		$this->q->setToString();
-		header("ts-SQL-debug: ".$this->select_all($get['tri'],$get['trid'],$get['page'],true));
+
 		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);

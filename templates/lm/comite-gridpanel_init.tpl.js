@@ -91,21 +91,21 @@ ATF.renderer.comiteDecision=function(table,field) {
 							});
 							
 							
+							var height = 500;
+							var width = 500;
+							new Ext.Window({
+								title: '{ATF::$usr->trans("Décision du comite : ")}',
+								id:'mywindow'+id,
+								plain:true,
+								bodyStyle:'padding:5px;',
+								buttonAlign:'center'
+							});								
+							if (form) {
+								Ext.getCmp('mywindow'+id).add(form);
+								height += 400;
+								width = 800;
+							}													
 							if (!Ext.getCmp('mywindow'+id)) {
-								var height = 500;
-								var width = 500;
-								new Ext.Window({
-									title: '{ATF::$usr->trans("Décision du comite : ")}',
-									id:'mywindow'+id,
-									plain:true,
-									bodyStyle:'padding:5px;',
-									buttonAlign:'center'
-								});								
-								if (form) {
-									Ext.getCmp('mywindow'+id).add(form);
-									height += 400;
-									width = 800;
-								}													
 							}
 							Ext.getCmp('mywindow'+id).setHeight(height);		
 							Ext.getCmp('mywindow'+id).setWidth(width);		

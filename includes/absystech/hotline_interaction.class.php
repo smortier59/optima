@@ -263,9 +263,6 @@ class hotline_interaction extends classes_optima {
 			throw new errorATF("L'heure du début de la prestation est supérieure à l'heure de fin !");
 		} 
 
-		
-
-		$ticket_presta = explode(":", $infos["duree_presta"]);		
 		$ticket_presta = number_format(($duree_presta)/60 , 2);
 
 		$id_societe = ATF::hotline()->select($infos["id_hotline"], "id_societe");
@@ -1203,7 +1200,7 @@ class hotline_interaction extends classes_optima {
 			"filtre_optima"=>$donnees['name']
 			,"id_module"=>ATF::module()->from_nom($this->table)
 			,"id_user"=>ATF::$usr->getID()
-			,"options"=>mysql_escape_string(serialize($donnees))
+			,"options"=>serialize($donnees)
 			,"type"=>"prive");
 
 		//si le filtre existe déjà on le supprime
@@ -1906,6 +1903,13 @@ class hotline_interaction extends classes_optima {
 		return $return;
 	}
 
+	/**
+	* Permet de virer tous les tags vide d'une chaine de caractère, et virer les multiple BR qui s'enchaine.
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $str string Chaine a traitée
+	* @param $repto string replacementstring chaine modifié.
+	*/ 
 	public function remove_empty_tags_recursive ($str, $repto = NULL){
 	    //** Return if string not given or empty.
 	    if (!is_string ($str) || trim ($str) == '') return $str;
@@ -1952,9 +1956,46 @@ class hotline_interaction extends classes_optima {
 	        }
 	        $post['temps_passe'] = $post['duree_presta'] = $tps;
 
+	        if (!$post['heure_debut_presta'] || !$post['heure_fin_presta']) {
+	        	// On créer un date time
+	        	$date = new DateTime();
+	        	// On stock la date car c'est la date de fin
+	        	$dayEnd = $date->format('d');
+	        	$post['heure_fin_presta'] = $date->format('H:i:s');
+	        	// On initialise l'interval a soustraire grace au temps passé
+	        	$tosub = new DateInterval("PT".str_replace(":", "H", $tps)."M");
+	        	$date->sub($tosub);
+	        	$post['heure_debut_presta'] = $date->format('H:i:s');
+	        	$dayBegin = $date->format('d');
+
+	        	if ($dayEnd != $dayBegin) {
+	        		throw new errorATF("Impossible d'enregistrer l'interaction car elle chevauche deux jours. Veuillez résuire le temps passé.");
+	        	}
+	        }
+
+	        if ($post['visible']=="on") $post['visible'] = "oui";
+	        else $post['visible'] = "non";
+
+	        if ($post['send_mail']=="on") $post['send_mail'] = "oui";
+	        else $post['send_mail'] = "non";
+
+	        // Calcul du nombre de crédit
+	        if (!$post['credit_presta']) {
+	        	$tmp = explode(":", $post['temps_passe']);
+
+	        	$creditMin = $tmp[1]/60;
+
+	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
+	        }
+
+	        if (!$post['id_user']) {
+	        	$post['id_user'] = ATF::$usr->getId();
+	        }
+
 	        // Insertion
 	        $id = self::insert($post);
-        	$return['result'] = self::select($id);
+	        $p = array("id"=>$id);
+        	$return['result'] = self::_GET($p);
 
         	// Traitement de l'id_user
         	if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
@@ -1971,6 +2012,32 @@ class hotline_interaction extends classes_optima {
         }
         return false;
 	}	
+
+	/**
+	* Renvoi le nombre de crédit (presta ou deplacement par rapport au temps passé
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient le temps passé formatté comme suit : HH:ii:ss ou HH:ii
+	* @param $post array vide
+	* @return float le nombre de crédit formaté sur 3 chiffres après la virgule
+	*/ 
+	public function _credit($get,$post) {
+		if (!$get['tps'] || $get['tps']=="00:00:00") return 0;
+
+		if ($get['field']=="credit_dep") {
+			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
+		}
+
+    	$tmp = explode(":", $get['tps']);
+
+    	$creditMin = $tmp[1]/60;
+
+    	return round($creditMin + $tmp[0],2);			
+
+
+	}
+
+
 
 
 	public function _indicateurs($get, $post){

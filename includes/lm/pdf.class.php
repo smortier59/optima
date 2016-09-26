@@ -8,9 +8,9 @@ require_once dirname(__FILE__)."/../cleodis/pdf.class.php";
 */
 class pdf_lm extends pdf_cleodis {	
 	public $logo = 'lm/lm.png';
-	private $heightLimitTableContratA4 = 100; 
+	public $heightLimitTableContratA4 = 100; 
 
-	private $leftStyle = array(
+	public $leftStyle = array(
 		"size" => 8
 		,"color" => 000000
 		,"font" => "arial"
@@ -35,7 +35,7 @@ class pdf_lm extends pdf_cleodis {
 		$this->ATFSetStyle($style);
 		$this->SetXY(10,-20);
 		$this->multicell(0,3,"Conformément à l'article 27 de la loi Informatique et Libertés, vous disposez d'un droit d'accès et de rectification des données vous concernant et dont nous sommes les seuls utilisateurs",0,"C");
-		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10 000 EUR - 820 472 009 RCS LILLE - N° C.E.E. FR 08820472009
+		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10.000 € - 820 472 009 RCS LILLE - N° C.E.E. FR 08820472009
 SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 80",0,'C');
 		
 		
@@ -102,7 +102,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	* @date 25-01-2011
 	* @param int $id Identifiant commande
 	*/
-	private function commandeInit($id) {
+	public function commandeInit($id) {
 		$this->commande = ATF::commande()->select($id);
 			
 		$this->colsProduit = array("border"=>"TB","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduit");
@@ -149,286 +149,202 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->sety(10);
 		$this->setLeftMargin(37);
 
-		if($this->affaire["nature"]=="avenant"){
-			if($this->devis["type_contrat"] == "presta"){ $this->multicell(134,5,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU CONTRAT DE PRESTATION N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); 
-			}else{ 	$this->multicell(134,5,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU CONTRAT DE ".($this->affaire['nature']=="vente"?"VENTE":"LOCATION")." N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
-			$this->ln(5);
+
+		if($this->affaire["type_affaire"] == "LP"){
+			$this->multicell(134,5,"CONDITIONS PARTICULIERES DE LOCATION \nContrat N° : ".$this->commande['ref'],0,"C");
 		}else{
-			if($this->devis["type_contrat"] == "presta"){
-				$this->multicell(134,5,"CONDITIONS PARTICULIERES du Contrat de PRESTATION n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-			}else{
-				$this->multicell(134,5,"CONDITIONS PARTICULIERES du Contrat de ".($this->affaire['nature']=="vente"?"vente":"location")." n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-			
-			}
-			if($this->lignes && $this->affaire["nature"]=="AR"){
-				foreach($this->AR as $k=>$i){
-					$affaire=ATF::affaire()->select($i['id_affaire']);
-					$ref_ar .=" ".$affaire["ref"]." (".$affaire["affaire"]."), ";
-				}
-				$this->ln(2);
-				$this->setfont('arial','BI',7.5);				
-				$this->multicell(134,5,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
-			} else {
-				$this->ln(5);
-			}
-		}
-		
+			$this->multicell(134,5,"CONDITIONS PARTICULIERES D'ABONNEMENT \nContrat N° : ".$this->commande['ref'],0,"C");
+		}		
 		$this->setleftmargin(7);
 		$this->setrightmargin(7);
 		$this->setY(30);
 
-		$this->setfont('arial','',8);		
+
+		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);
-		$adresse = $this->societe["adresse"];
-		if($this->societe["adresse_2"]) $adresse .= "\n".$this->societe["adresse_2"];
-		if($this->societe["adresse_3"]) $adresse .= "\n".$this->societe["adresse_3"];
-		$adresse .= "\n".$this->societe["cp"]." ".$this->societe["ville"];
-
-		if($this->societe["tel"]) $adresse .= "\n"."Téléphone : ".$this->societe["tel"];
-		if($this->societe["fax"]) $adresse .= "\n"."Télécopie : ".$this->societe["fax"];
-
-		$y = $this->getY();		
-
-		$this->multicell(80,4,$this->societe["societe"]."\n".$adresse,0,"L",1);
-
-		
-		$cadre2[] = "          ".strtoupper($this->client["civilite"]." ".$this->client["prenom"]." ".$this->client["nom"]);
-		$cadre2[] = "          ".$this->client["adresse"];
-		if($this->client["adresse_2"]) $cadre2[] = "          ".$this->client["adresse_2"];
-		if($this->client["adresse_3"]) $cadre2[] = "          ".$this->client["adresse_3"];
-		$cadre2[] = "          ".$this->client["cp"]." ".$this->client["ville"];
-		
-		$this->cadre(110,$y,90,35,$cadre2,false,0);
-	
-		$this->setxy(15,70);
-		$this->SetDrawColor(0,0,0);
-		$this->SetLineWidth(0.2);
-
-		if($this->affaire["nature"]=="avenant"){
-			$titre = "ARTICLE 1 : OBJET DE L'AVENANT";
-			$texte = "L'objet de cet avenant concerne l'ajout et le retrait d'équipements au contrat de base cité en référence.";
+		if($this->affaire["type_affaire"] == "LP"){
+			$this->multicell(0,5,"1.1. Le Client :",1,"L",1);
 		}else{
-			$titre = "ARTICLE 1 : OBJET DU CONTRAT";			
-			
-			if($this->devis["type_contrat"] == "presta"){				
-				$texte = "L'objet du contrat concerne les prestations dont le détail figure ci-après. ";
-			}else{
-				$texte = "L'objet du contrat est la ".($this->affaire['nature']=="vente"?"vente":"mise en location")." d'équipements dont le détail figure ci-après. ";
-			}
-
-
-			if ($this->affaire['nature']=="AR" && $this->AR) {
-				$texte .= "Ce contrat annule et remplace le(s) contrat(s) suivant(s) : ";
-				foreach ($this->AR as $k=>$i) {
-					$texte .= ATF::affaire()->nom($i['id_affaire']).", ";
-				}
-			}
+			$this->multicell(0,5,"1.1. L'Abonné :",1,"L",1);
 		}
-		$this->setfont('arial','B',8);
-		$this->cell(0,5,$titre,0,1);
+
 		$this->setfont('arial','',8);
-		$this->multicell(0,4,$texte,0,1);
-			
-		$w = array(20,35,35,106);
+		$adresseFacturation = $this->affaire["adresse_facturation"]; 				
+		$adresseFacturation .= "\n".$this->affaire["cp_adresse_facturation"]." ".$this->affaire["ville_adresse_facturation"]; 
+
+		$y = $this->getY();
+		$this->multicell(100,4,"\nNom : ".$this->client["nom"]."\nPrénom : ".$this->client["prenom"]."\nAdresse : ".$adresseFacturation."\n",1,"L");	
 		
-		$eq = "EQUIPEMENT(S)";	
-
-		if($this->devis["type_contrat"] == "presta") $eq = "PRESTATION(S)";	
-
-
-		if ($this->lignes) {
-			$this->setFillColor(239,239,239);
-			// Groupe les lignes par affaire
-			$lignes=$this->groupByAffaire($this->lignes);
-			// Flag pour savoir si le tableau part en annexe ou pas
-			foreach ($lignes as $k => $i) {
-				$this->setfont('arial','B',10);
-				if (!$k) {
-					if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
-					else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
-					
-				} else {
-					$affaire_provenance=ATF::affaire()->select($k);
-					if($this->affaire["nature"]=="avenant"){
-						$title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-					}elseif($this->affaire["nature"]=="AR"){
-						$title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-					}elseif($this->affaire["nature"]=="vente"){
-						$title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-					}
-				}
-				unset($data,$st);
-				foreach ($i as $k_ => $i_) {
-					$produit = ATF::produit()->select($i_['id_produit']);
-					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
-					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
-					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-					
-					$etat = "";
-										
-					
-					//Si c'est une prestation, on affiche pas l'etat
-					if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) {	$etat = "";		}	
-					
-					if ($details == "") unset($details);
-					$data[] = array(
-						round($i_['quantite'])
-						,$ssCat
-						,$fab
-						,str_replace("&nbsp;","",str_replace("&nbsp;>", "", $i_['produit'])).$etat
-						,"details"=>$details
-					);
-						
-					$st[] = array(
-						($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
-						,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-						,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-						
-						,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
-						,"details"=>$this->styleDetailsProduit
-					);
-						
-				}
-				$tableau[$k] = array(
-					"head"=>$head
-					,"data"=>$data
-					,"w"=>$w
-					,"styles"=>$st
-					,"title"=>$title
-				);
-			}
-			unset($data,$st);
-			$h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
-			foreach ($tableau as $k=>$i) {
-				if ($i['head']) $h += 5;
-				$h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
-			}
-
-			foreach ($tableau as $k=>$i) {
-				$this->setFillColor(239,239,239);
-				$this->setfont('arial','B',10);
-				$this->multicell(0,5,$i['title'],1,'C',1);
-				$this->setfont('arial','',8);
-				if ($h>$this->heightLimitTableContratA4 || $this->commande["clause_logicielle"]=="oui") {
-					$this->multicellAnnexe();
-					$annexes[$k] = $i;
-				} else {
-
-					$this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
-				}
-			}
-		}
-		$this->ln(3);
-
-				
-		if ($this->affaire['nature']=="vente") {
-			$this->setfont('arial','B',8);
-			$this->multicell(0,5,"ARTICLE 2 : PRIX DE VENTE");
-			$this->setfont('arial','',8);
-			$prix = $this->loyer[0]["loyer"]+$this->loyer[0]["assurance"]+$this->loyer[0]["frais_de_gestion"];
-			$this->multicell(0,5,"Le prix de vente est fixé à ".number_format($prix,2,"."," ")." € ".$this->texteHT." soit ".number_format((($prix)*$this->commande["tva"]),2,"."," ")." € ".$this->texteTTC);
-			$numArticle = 3;
-			
-			$this->setfont('arial','B',8);
-			$this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
-			$numArticle++;
-			$this->setfont('arial','',8);
-			$this->multicell(0,5,"La facture est payable par chèque à 30 jours date de facture.");
-			
-			
-		} else {
-			//$this->sety(167);
-			$this->setfont('arial','B',8);
-			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,5,"ARTICLE 2 : DUREE"); }
-			else{ $this->multicell(0,5,"ARTICLE 2 : DUREE DE LA LOCATION"); }
-			
-			$this->setfont('arial','B',10);
-			$duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
-			$this->setfont('arial','',8);
-			if($this->devis['loyer_unique']=='oui'){
-				if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est identique à celle du contrat principal."); }
-				else{ $this->multicell(0,3,"La durée d'engagement est identique à celle du contrat principal."); }
-				
-			}elseif($this->affaire["nature"]=="avenant"){
-				if($this->devis["type_contrat"] == "presta"){	$texte = "La durée est fixée à ".$duree." mois"." à compter du "; }
-				else{ $texte = "La durée d'engagement est fixée à ".$duree." mois"." à compter du "; }
-				if($this->commande['date_debut']){
-					$texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
-				}
-				$this->multicell(0,3,$texte);
-			}else{
-				if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
-				else{ $this->multicell(0,3,"La durée d'engagement est fixée à ".$duree." mois."); }
-				
-			}
-			$this->ln(2);
-			
-			if($this->devis['loyer_unique']=='oui'){
-				$this->setfont('arial','B',8);
-				$this->multicell(0,5,"ARTICLE 3 : LOYER UNIQUE");
-				$this->setfont('arial','',8);
-				$this->multicell(0,3,"Il est payable terme à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et est fixe et non révisable pendant toute la durée de la location.");
-				if(($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"])>0){
-					$this->multicell(0,3,"Le montant du loyer unique est fixé à ".number_format($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"],2,"."," ")." € HT.");
-				}else{
-					$this->multicell(0,3,"Les loyers restent inchangés.");
-				}
-			}else{
-				$this->setfont('arial','B',8);
-				$this->multicell(0,5,"ARTICLE 3 : LOYERS");
-				$this->setfont('arial','',7);
-				$this->setfont('arial','',8);
-				if ($this->affaire['nature']=="avenant"){
-					$this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
-				}else{
-					$this->multicell(0,3,"Ils sont payables termes à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et sont fixes et non révisables pendant toute la durée de la location.");
-				}
-				if($duree){
-					$donnee = array();
-					$head = array("Nombre de Loyers","Périodicité : Mois (M) Trimestre (T) Semestre (S) ou Année (A)","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
-					foreach ($this->loyer as $k=>$i) {
-						if($i["nature"] !== "prolongation"){
-								$data[] = array(
-								$i['duree']
-								,strtoupper($i['frequence_loyer'])
-								,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])/$this->commande["tva"]),2,"."," ")." €"
-								,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
-								
-							);
-						}
-					}
-					$this->SetLineWidth(0.20);
-					$this->ln(3);
-					$this->tableau($head,$data,180,3);
-				}
-			}
-			$numArticle = 4;
-		}
+		$this->setXY(107,$y);
 		
-		$this->setfont('arial','B',8);
-		$this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
-		$numArticle++;
+	
+		$this->multicell(96,4,"\nTéléphone : ".$this->client["tel"]."\nE-mail: ".$this->client["email"],"LR","L");
+		$this->setXY(107,$this->getY());		
+		$this->SetTextColor(255,255,255);
+		$this->multicell(96,4,$adresseFacturation."\n","LRB","L");
+		$this->SetTextColor(0,0,0);
+				
+		$this->ln(5);
+
+		$this->setfont('arial','B',8);		
+		$this->setFillColor(200,200,200);		
+		if($this->affaire["type_affaire"] == "LP"){
+			$this->multicell(0,5,"1.2. Le Loueur/Leroy Merlin Abonnements",1,"L",1);
+		}else{
+			$this->multicell(0,5,"1.2. Leroy Merlin Abonnements",1,"L",1);
+		}
 		$this->setfont('arial','',8);
-		$this->cell(0,6,"La présente proposition ne deviendra une offre ferme qu'après acceptation du Comité des Agréments de CLEODIS.",0,1);
+		$this->multicell(0,4,"\nLa société Leroy Merlin Abonnements, SAS au capital de 10.000€ dont le siège social est situé Rue de Chanzy Lezennes 59712 Lille Cedex 9, immatriculée au RCS Lille Métropole sous le numéro 820 472 009\n\n",1,"L");
 		
-		if ($this->commande["clause_logicielle"]=="oui") {
-			$this->setfont('arial','B',8);
-			$this->multicell(0,5,"ARTICLE ".$numArticle." : MISE A DISPOSITION DES LOGICIELS");
-			$this->ln(1);
-			$this->setfont('arial','',8);
-			$this->multicell(0,3,"ETANT PREALABLEMENT EXPOSE :");
-			$this->multicell(0,3,"Pour les besoins de son activité, le Locataire a souhaité la mise à disposition d'une configuration informatique composée de matériels et de logiciels [ci-après désignés les «Logiciels »] objet du contrat ci-dessus référencé.");
-			$this->multicell(0,3,"Le Locataire a obtenu du Fournisseur de pouvoir utiliser les Logiciels dans le cadre d'une licence dont il a approuvé les termes.");
-			$this->multicell(0,3,"Le mode de souscription de ce droit d'utilisation s'effectue dans le cadre d'une mise à disposition temporaire convenue dans le cadre du Contrat en référence.");
-			$this->multicell(0,3,"LE LOCATAIRE DECLARE :");
-			$this->multicell(0,3,"=>reconnaître que le Contrat lui permet de bénéficier d'une mise à disposition des Logiciels et donc de l'utilisation de ceux-ci conformément à ses besoins;");
-			$this->multicell(0,3,"=>qu'en cas de contradiction, les clauses du contrat ci-dessus référencé prévalent, dans ses relations avec le Loueur, sur celles qui régissent ou constituent la licence;");
-			$this->multicell(0,3,"=>que les configurations informatiques seront livrées et installées, les prestations réalisées conformément à la commande qu'il a passé aux fournisseurs et selon les modalités convenues directement avec l'éditeur des Logiciels ou les prestataires et/ou les fournisseurs des matériels;");
-			$this->multicell(0,3,"=>prendre livraison des configurations informatiques à ses frais et risques, et reconnaît avoir choisi seul sans que le Loueur et/ou l'Etablissement Cessionnaire du contrat n'interviennent en quoi que ce soit dans ce choix;");
-			$this->multicell(0,3,"En conséquence, ce choix relevant de la responsabilité exclusive du Locataire, ce dernier s'engage à régler ponctuellement l'ensemble des sommes dues au titre du Contrat et ce, même en cas de défaillance des éditeurs ou de leurs logiciels ainsi que des Prestataires.");
+		$this->ln(5);
+
+
+		if($this->affaire["type_affaire"] == "LP"){
+			$this->listingLP();
+			$chapSuivant = 4;
+
+		}elseif($this->affaire["type_affaire"] == "SP"){
+			$this->listingSP();
+			$chapSuivant = 4;
+		}else{
+			$this->listingLS();
+			$chapSuivant = 5;
 		}
 		
+		$this->AddPage();
+		$this->setleftmargin(7);
+		$this->setrightmargin(7);
+		$this->setY(30);
+
+		$this->setfont('arial','B',8);		
+		$this->setFillColor(200,200,200);	
+		$this->multicell(0,5,"1.".$chapSuivant.". Durée de l'abonnement",1,"L",1);
+
+		$this->setfont('arial','',8);	
+		$texteDuree = "";
+
+		$dureeEngagement = 0;
+		$FrequenceEngagement = $this->loyer[0]["frequence_loyer"];
+
+		$head = array("Nombre de loyers","Périodicité","Loyer HT","Loyer TTC");
+		$width = array(49,49,49,49);		
+		$data = array();
+		$style = array();
+
+		foreach ($this->loyer as $key => $value) {
+			if($value["nature"] != "prolongation" && $value["nature"] != "prolongation_probable"){
+				$dureeEngagement += $value["duree"];
+
+				$data[$key][0] = $value["duree"];		
+				switch ($value["frequence_loyer"]) {
+					case 'jour' : $data[$key][1] = "Hebdomadaire"; break;
+					case 'mois' : $data[$key][1] = "Mensuel"; break;
+					case 'trimestre' : $data[$key][1] = "Trimestriel"; break;
+					case 'semestre' : $data[$key][1] = "Semestriel"; break;
+					case 'an' : $data[$key][1] = "Annuel"; break;
+				}			
+				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
+				$data[$key][3] = $value["loyer"]." €";
+				//$style[$key][1] = $this->leftStyle;
+			}
+							
+		}
+
+
+
+		if($this->affaire["type_affaire"] == "SP"){
+			$texteDuree = "Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la souscription du Contrat d'Abonnement";
+		}else{
+			$texteDuree ="Durée : ".$dureeEngagement." ".$FrequenceEngagement." à compter de la réception du Produit";
+		}
+
+		$this->multicell(0,4,"\n".$texteDuree."\n\nEchéancier :\n\n",1,"L");
+
+		
+		$this->tableau($head,$data,$width,7,$style,260);
+
+
+		$dureeProl = 0;
+		$FrequenceProl = "";
+		$head = array("Nombre de loyers","Périodicité","Loyer HT","Loyer TTC");
+		$width = array(49,49,49,49);		
+		$data = array();
+		$style = array();
+		
+		foreach ($this->loyer as $key => $value) {
+			if($value["nature"] == "prolongation" || $value["nature"] == "prolongation_probable"){
+				$dureeProl += $value["duree"];
+				$FrequenceProl = $value["frequence_loyer"];
+				$data[$key][0] = $value["duree"];		
+				switch ($value["frequence_loyer"]) {
+					case 'jour' : $data[$key][1] = "Hebdomadaire"; break;
+					case 'mois' : $data[$key][1] = "Mensuel"; break;
+					case 'trimestre' : $data[$key][1] = "Trimestriel"; break;
+					case 'semestre' : $data[$key][1] = "Semestriel"; break;
+					case 'an' : $data[$key][1] = "Annuel"; break;
+				}			
+				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
+				$data[$key][3] = $value["loyer"]." €";
+				//$style[$key][1] = $this->leftStyle;
+			}
+							
+		}
+
+
+		$this->multicell(0,4,"\nProlongation possible de ".$dureeProl." ".$FrequenceProl." par tacite reconduction sans engagement :\n\nEchéancier de prolongation (indicatif) :\n\n",1,"L");
+		
+
+		
+		$this->tableau($head,$data,$width,7,$style,260);
+		
+
+		$this->ln(5);		
+		$this->setFillColor(200,200,200);
+		if($this->affaire["type_affaire"] == "SP"){
+			$chapSuivant++;
+			$this->setfont('arial','B',8);
+			$this->multicell(0,5,"1.".$chapSuivant.". Déclaration de l'Abonné",1,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,4,"\nLe présent Contrat d'Abonnement prendra effet à compter de l'acceptation, par Leroy Merlin Abonnements, de la demande d'abonnement. L'Abonné reconnait être engagé par toutes les stipulations du Contrat d'Abonnement, y compris les Conditions Générales d'Abonnement, dont l'Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nL'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l'exécution du Contrat, qu'il est valablement constitué, qu'il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+			$chapSuivant++;
+			$this->ln(5);$this->setfont('arial','B',8);
+			$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d'Abonnement, et consentir à l'utilisation et à la communication des données personnelles qu'il aura fournies ou qui auront été collectées, après avoir été informé qu'elles pourront être transférées en dehors de l'Union Européenne et qu'il pourra exercer son droit d'accès et de rectification à l'adresse indiquée dans les conditions générales.\n\n",1,"L");
+
+		}elseif($this->affaire["type_affaire"] == "LP"){	
+			$chapSuivant++;
+			$this->setfont('arial','B',8);
+			$this->multicell(0,5,"1.".$chapSuivant.". Déclaration du Client",1,"L",1);
+			$this->setfont('arial','',8);			
+			$this->multicell(0,4,"\nLe présent Contrat de location prendra effet à compter de la réception par le Client du ou des Produit(s). Le Client reconnait être engagé par toutes les stipulations du Contrat de location, y compris les Conditions Générales de Location, dont le Client reconnait les avoir reçues, lues, comprises et acceptées. Le Client confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nLe Client déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution du Contrat, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+			$chapSuivant++;
+			$this->ln(5);
+			$this->setfont('arial','B',8);
+			$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,4,"\nLe Client reconnait en signant les présentes Conditions Particulières avoir accepté les termes des conditions générales de location, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, après avoir été informé qu’elles pourront être transférées en dehors de l’Union Européenne et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans les conditions générales.\n\n",1,"L");
+		}else{
+				$chapSuivant++;
+				$this->setfont('arial','B',8);
+				$this->multicell(0,5,"1.".$chapSuivant.". Déclaration de l'Abonné",1,"L",1);
+				$this->setfont('arial','',8);
+				$this->multicell(0,4,"\nLe présent Contrat d'Abonnement prendra effet à compter de la réception par l'Abonné du ou des Produit(s). L'Abonné reconnait être engagé par toutes les stipulations du Contrat d’Abonnement, y compris les Conditions Générales d’Abonnement, dont l’Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nL'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution du Contrat, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+				$chapSuivant++;
+				$this->ln(5);
+				$this->setfont('arial','B',8);
+				$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
+				$this->setfont('arial','',8);
+				$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d’Abonnement, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, après avoir été informé qu’elles pourront être transférées en dehors de l’Union Européenne et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans les conditions générales.\n\n",1,"L");
+		}	
+		
+
+			
+
+
+
+
+
 		$this->setY(219);
 		$this->line(0,$this->gety(),238,$this->gety());
 		$this->SetTextColor(64,192,0);
@@ -443,10 +359,10 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		
 		$y = $this->gety()+2;
-		if ($this->affaire['nature']=="vente") {
-			$t = "L'acheteur";
+		if($this->affaire["type_affaire"] == "LP"){
+			$t = "Pour le client";
 		} else {
-			$t = "Le Locataire";
+			$t = "Pour l'abonné";
 		}
 		$this->cadre(20,$y,80,48,array(),$t);
 		$cadre = array(
@@ -456,46 +372,113 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			,"Qualité : "
 			,"Signature : "
 		);
-		if ($this->affaire['nature']=="vente") {
-			$t = "Le Vendeur";
-		} else {
-			$t = "Le Loueur";
-		}
+		
+		$t = "Pour Leroy Merlin Abonnements";
+		
 		$this->cadre(110,$y,80,48,$cadre,$t);
 			
 		
 		$this->setfont('arial','B',9);
-		$this->setY(275.9);
-		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES AU VERSO",0,'C');
-		
-		
-		if ($annexes) {
-			$this->annexes($annexes);
-		}
+		$this->setY(275.9);		
 	}
 
 
+	public function listingLP(){
 
-	/** Groupe les produits par affaire de provenance
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @date 25-01-2011
-	* @param array tableau contenant toutes les lignes de produit
-	*/
-	private function groupByAffaire($lignes){
-		$prov_encours="";
-		//On fait en sorte d'avoir autant de tableau que de provenance
-		foreach ($lignes as $k => $i) {
-			if($i["id_affaire_provenance"]==$prov_encours){
-				$tab_lignes_provenance[$prov_encours][]=$i;
-			}else{
-				$tab_lignes_provenance[$i["id_affaire_provenance"]][]=$i;
-				$prov_encours=$i["id_affaire_provenance"];
+		$this->setfont('arial','B',8);		
+		$this->setFillColor(200,200,200);	
+		$this->multicell(0,5,"1.3. Le(s) Produits loué(s)",1,"L",1);
+		$this->listingProduitsService("produit");
+
+		$this->ln(5);
+		if($this->affaire["adresse_livraison"] == $this->affaire["adresse_facturation"]){
+			$texteAdresse = "......................................................................................................................................................................................................................................................";
+		}else{
+			$texteAdresse = $this->affaire["adresse_livraison"]." ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"];
+		}
+		$this->multicell(0,4,"Adresse de livraison du Produit (si différente de celle indiquée au 1.1 ci-dessus) : \n".$texteAdresse,1,"L");
+
+
+	}
+
+	public function listingSP(){
+		$this->setfont('arial','B',8);		
+		$this->setFillColor(200,200,200);	
+		$this->multicell(0,5,"1.3. Le(s) Service(s)",1,"L",1);
+		$this->listingProduitsService("service");
+	}
+
+	public function listingLS(){
+		$this->setfont('arial','B',8);		
+		$this->setFillColor(200,200,200);	
+		$this->multicell(0,5,"1.3. Le(s) Produits loué(s)",1,"L",1);
+		$this->listingProduitsService("produit");
+
+		$this->ln(5);
+		if($this->affaire["adresse_livraison"] == $this->affaire["adresse_facturation"]){
+			$texteAdresse = "......................................................................................................................................................................................................................................................";
+		}else{
+			$texteAdresse = $this->affaire["adresse_livraison"]." ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"];
+		}
+		$this->multicell(0,4,"Adresse de livraison du Produit (si différente de celle indiquée au 1.1 ci-dessus) : \n".$texteAdresse,1,"L");
+
+
+		$this->ln(5);
+		$this->setfont('arial','B',8);		
+		$this->setFillColor(200,200,200);	
+		$this->multicell(0,5,"1.4. Le(s) Service(s)",1,"L",1);
+		$this->listingProduitsService("service");
+
+
+	}
+
+	public function listingProduitsService($type){
+		$lignes = array();
+		if ($this->lignes) {			
+			foreach ($this->lignes as $key => $value) {
+				if(ATF::produit()->select($value["id_produit"], "nature") == $type){					
+					if(strpos($value["produit"], "&nbsp;>") === false){						
+						$lignes[] = $value;
+					}
+				}
+			}		
+		}
+		if($lignes){
+			if($type == "produit"){
+				$head = array("Quantité","Description des produits");
+				$width = array(30,166);		
+				$data = array();
+				$style = array();
+
+				foreach ($lignes as $key => $value) {
+					$data[$key][0] = $value["quantite"];					
+					$data[$key][1] = $value["produit"];
+					$style[$key][1] = $this->leftStyle;					
+				}
+				$this->tableau($head,$data,$width,7,$style,260);
 			}
-		}
-		return $tab_lignes_provenance;	
-	}
 
-	private function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
+			if($type == "service"){
+				$head = array("","Description des services");
+				$width = array(30,166);		
+				$data = array();
+				$style = array();
+
+				foreach ($lignes as $key => $value) {
+					$data[$key][0] = "";					
+					$data[$key][1] = $value["produit"];
+					$style[$key][1] = $this->leftStyle;					
+				}
+				$this->tableau($head,$data,$width,7,$style,260);
+			}			
+
+		}
+		
+	}
+	
+	
+
+	public function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
 		$save = $this->headStyle;
 		$newStyleHead = array(
 			"size" => 9
@@ -637,7 +620,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->tableau($head,$data,$width,7,$style,260);
 
 		$this->ln(10);
-		$this->multicell(0,5,"TERMES DE PAIEMENTS \nLe ".date("d/m/Y", strtotime($facture["date_previsionnelle"])).", vous serez débité sur le compte : FRXX XXXX XXXX XXXX XXXX XXXX XXX – XXXXXXXX\nRUM XXXXXXXXXX\nICS XXXXXX");
+		$this->multicell(0,5,"TERMES DE PAIEMENTS \nLe ".date("d/m/Y", strtotime($facture["date_previsionnelle"])).", vous serez débité sur le compte bancaire");
 
 		
 		$this->setY($y);
@@ -651,7 +634,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	}
 
 	public function lignes_facture($facture_lignes,$facture, $nature){
-		
+			
 
 		if($nature == "loyer"){
 			$head = array("Désignation ( Référence )","Prix unit. HT","Taux de TVA","Total TTC");
@@ -667,13 +650,18 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 														->where("nature", $facture["nature"]);
 						$loyer = ATF::produit_loyer()->select_row();
 					}
+					if(strpos($prod["produit"], "&nbsp;>") === false){
+						if($ligne_produits[($prod["tva_loyer"]*100)-100]["produits"]) $ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= "\n";
 					
-					if($ligne_produits[($prod["tva_loyer"]*100)-100]["produits"]) $ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= "\n";
-					$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= $i['quantite']." x ".str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
 
-					if($prod["ref_lm"]){
-						$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= " ( Ref: ".$prod["ref_lm"]." )";
+						$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= $i['quantite']." x ".$prod['produit'];
+
+						if($prod["ref_lm"]){
+							$ligne_produits[($prod["tva_loyer"]*100)-100]["produits"] .= " ( Ref: ".$prod["ref_lm"]." )";
+						}
+
 					}
+					
 				
 					
 					if($loyer){	
@@ -690,11 +678,14 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				}
 
 				foreach ($ligne_produits as $key => $value) {
-					$data[$key][0] = $value["produits"];
-					$style[$key][0] = $this->leftStyle;
-					$data[$key][1] = number_format($value["HT"],2)." €" ;
-					$data[$key][2] = $key."%";
-					$data[$key][3] = number_format($value["TTC"],2)." €" ;
+					if(strpos($value["produit"], "&nbsp;>") === false){						
+						$data[$key][0] = $value["produits"];
+						$style[$key][0] = $this->leftStyle;
+						$data[$key][1] = number_format($value["HT"],2)." €" ;
+						$data[$key][2] = $key."%";
+						$data[$key][3] = number_format($value["TTC"],2)." €" ;
+					}
+					
 				}
 				
 
@@ -716,28 +707,34 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 						$loyer = ATF::produit_loyer()->select_row();
 					}
 
-					$data[$k][0] = $k+1;
-					$data[$k][1] = $prod["ref_lm"];	
-					$style[$k][1] = $this->leftStyle;
-					$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
-					$style[$k][2] = $this->leftStyle;			
-					if($loyer){
-						$data[$k][3] = number_format($loyer["loyer"],2)." €";
-						$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
-						$data[$k][5] = $i['quantite'];
-						$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
-							
-						$this->ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
-						$this->ttva = $this->ttc - $loyer["loyer"];
+					if(strpos($value["produit"], "&nbsp;>") === false){	
+						$data[$k][0] = $k+1;
+						$data[$k][1] = $prod["ref_lm"];	
+						$style[$k][1] = $this->leftStyle;
+						$data[$k][2] = str_replace("&nbsp;","",str_replace("&nbsp;>", "", $prod['produit']));
+						$style[$k][2] = $this->leftStyle;			
+					}	
+						if($loyer){
+							if(strpos($value["produit"], "&nbsp;>") === false){	
+								$data[$k][3] = number_format($loyer["loyer"],2)." €";
+								$data[$k][4] = (($prod["tva_loyer"]-1)*100)." %";
+								$data[$k][5] = $i['quantite'];
+								$data[$k][6] = number_format(($loyer["loyer"]*$prod["tva_loyer"])*$i["quantite"],2)." €";
+							}
 
-						$this->tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($this->ttva),2);
-						$this->tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($this->ttc-$this->ttva),2);
-					}else{
-						$data[$k][3] = "-";
-						$data[$k][4] = "-";
-						$data[$k][5] = $i['quantite'];
-						$data[$k][6] = "-";
-					}					
+							$this->ttc = ($loyer["loyer"]*$prod["tva_loyer"]);
+							$this->ttva = $this->ttc - $loyer["loyer"];
+
+							$this->tva[($prod["tva_loyer"]*100)-100]["TVA"] += number_format($i['quantite']* ($this->ttva),2);
+							$this->tva[($prod["tva_loyer"]*100)-100]["total"] += number_format($i['quantite']* ($this->ttc-$this->ttva),2);
+						}else{
+							if(strpos($value["produit"], "&nbsp;>") === false){	
+								$data[$k][3] = "-";
+								$data[$k][4] = "-";
+								$data[$k][5] = $i['quantite'];
+								$data[$k][6] = "-";
+							}
+						}					
 				}
 			}
 			$this->tableauBigHead($head,$data,$width,7,$style,260);

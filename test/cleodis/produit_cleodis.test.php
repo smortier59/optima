@@ -4,7 +4,8 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	/** Méthode pré-test, exécute avant chaque test unitaire
 	* besoin d'un user pour les traduction
 	*/
-	public function setUp() {
+	public function setUp() {		
+		ATF::db()->select_db("extranet_v3_cleodis");
 		$this->begin_transaction(true);
 	}
 	
@@ -272,8 +273,6 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		} catch (errorATF $e) {
 			$erreur = true;
 		}
-
-		log::logger($r , "mfleurquin");
 
 		$this->assertTrue($erreur,"L'erreur ne remonte pas ?");
 		$this->assertEquals(910,$e->getCode(),"L'erreur ne remonte pas ?");

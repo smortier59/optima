@@ -1,0 +1,1 @@
+jQuery.extend(ATF.loc,{"accueil_shortcut_solde_negatif":"","accueil_shortcut_pointage_by_month":"","accueil_shortcut_pointage_by_day":""});
