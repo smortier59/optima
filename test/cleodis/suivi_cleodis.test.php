@@ -122,11 +122,6 @@ class suivi_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $annees=$this->obj->get_annee();
         $this->assertTrue(count($annees)>0,"La méthode ne renvoie pas les données");
 
-
-        log::logger($annees , "mfleurquin");
-
-
-
         $this->assertEquals(2015,$annees[2015],"La méthode ne renvoie pas les bonnes données");
         $this->assertEquals(2014,$annees[2014],"La méthode ne renvoie pas les bonnes données 2");
     }

@@ -316,7 +316,7 @@ class commande_lm extends commande {
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Commande sans produits",877);
+				throw new errorATF("Commande sans produits",877);
 			}			
 
 		}else{
@@ -340,7 +340,7 @@ class commande_lm extends commande {
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Commande sans produits",877);
+				throw new errorATF("Commande sans produits",877);
 			}
 		}		
 		
