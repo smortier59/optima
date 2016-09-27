@@ -35,6 +35,7 @@
 											,["accord_portage", "Accord de portage"]
 											,["accord_reserve_cession", "Accord réserve de cession"]
 											,["attente_retour", "Attente de retour"]
+											,["favorable_cession", "Favorable à la cession"]
 										  ]							
 								});
 								var hiddenField = new Ext.form.Hidden({

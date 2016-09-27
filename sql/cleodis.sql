@@ -1,3 +1,12 @@
+#DEVIS CLEODIS V2
+ALTER TABLE `devis_ligne` ADD `options` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire`;
+ALTER TABLE `devis` ADD `commentaire_offre_partenaire` TEXT NULL DEFAULT NULL AFTER `raison_refus`;
+ALTER TABLE `devis` ADD `offre_partenaire` varchar(80) NULL DEFAULT NULL AFTER `raison_refus`;
+
+#14505 - Ajout nouvel etat comité
+ALTER TABLE `comite` CHANGE `etat` `etat` ENUM('en_attente','accepte','refuse','accord_non utilise','favorable_cession') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'en_attente';
+
+#Portail FLUNCH
 CREATE TABLE `brouillon_fl` (
   `id_brouillon_fl` mediumint(8) UNSIGNED NOT NULL,
   `nom` varchar(100) NOT NULL,

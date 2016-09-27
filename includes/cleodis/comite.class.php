@@ -451,6 +451,8 @@ class comite extends classes_optima {
 			$etat = "refuse";
 		}elseif($infos["comboDisplay"] == "attente_retour"){
 			$etat = "en_attente";
+		}elseif($infos["comboDisplay"] == "favorable_cession"){
+			$etat = "favorable_cession";
 		}else{
 			$etat = "accepte";
 			
