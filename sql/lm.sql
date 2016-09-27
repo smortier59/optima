@@ -6,3 +6,14 @@ ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('commande','commande_pris_e
 ALTER TABLE `suivi` CHANGE `type_suivi` `type_suivi` ENUM('Devis','Contrat','Refinancement','Comptabilité','Broke','Contentieux','Mis en place','Restitution','Autre','Prolongation','Resiliation','Sinistre','Transfert','Fournisseur','Requête','BDC','Flottes','Installation','Passage_comite','demande_comite','Audit en cours','Assurance','Formation','Commentaire') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 
 ALTER TABLE `commande` ADD `etat_service1` ENUM('client_order_received','user_created','site_created','service_enabled','mail_sent','client_order_confirmed','client_order_installed') NULL DEFAULT NULL AFTER `etat`;
+
+
+
+
+CREATE TABLE `dev_optima_lm`.`token` ( `id_token` INT UNSIGNED NOT NULL AUTO_INCREMENT , `token` VARCHAR(25) NOT NULL , `id_societe` MEDIUMINT(8) UNSIGNED NOT NULL , PRIMARY KEY (`id_token`)) ENGINE = InnoDB;
+
+ALTER TABLE `token` ADD INDEX(` id_societe `);
+
+ALTER TABLE `token` ADD FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `token` ADD `expire_time` TIMESTAMP NOT NULL AFTER `token`;

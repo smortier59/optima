@@ -166,6 +166,7 @@ class societe_lm extends societe {
 		$this->addPrivilege("getChildren");
 		$this->addPrivilege("autocompleteFournisseurs");
 		$this->addPrivilege("autocompleteFournisseursDeCommande");
+		$this->addPrivilege("setToken");
 		
 		$this->autocomplete = array(
 			"field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
@@ -486,6 +487,28 @@ class societe_lm extends societe {
 		$infos['display'] = true;
 
 		return json_encode($ligne_affaires);
+	}
+
+	//Méthode qui permet de générer un token et l'insère en base de donnée
+	public function setToken($infos){
+		try {
+			$token = substr(sha1(__ABSOLUTE_PATH__.microtime().mt_rand(0,100000)), 0, 25);
+			$expire_time = strtotime("+5 minutes", strtotime(date("Y-m-d H:i:s")));
+
+			$token_insert = array(
+				"token"=>$token
+				,"expire_time"=>date("Y-m-d H:i:s", $expire_time)
+				,"id_societe"=>$infos['id_societe']
+			);
+			$id = ATF::token()->insert($token_insert);
+			if ($id) $infos_token = ATF::token()->select($id);
+			if ($infos_token)
+				return $infos_token['token'];
+
+
+		} catch (Exception $e) {
+			log::logger($e->getMessage(), 'alahlah');
+		}
 	}
 
 
