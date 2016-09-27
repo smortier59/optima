@@ -122,11 +122,17 @@ class pdf_cleodis extends pdf {
                 $this->cadre(110,45,85,35,$cadre);
             }            
             $this->setfont('arial','',12);            	    
-        } else {
-
-        	if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,35); }
+        } else {        	
+        	if($this->pdf_devis){
+        		$this->image(__PDF_PATH__.$this->logo,10,10,35);
+        		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
+				$this->sety(20);
+        	}else{
+        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,35); }
 			
-			$this->sety(20);
+				$this->sety(20);
+        	}
+        	
 		}
 	}
 
@@ -148,7 +154,7 @@ class pdf_cleodis extends pdf {
 	* @date 13-01-2011
 	* @param int $id Id du devis
 	*/
-	public function devis($id,$s) {
+	public function devis_old($id,$s) {
 
 		$this->devis = ATF::devis()->select($id);
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
@@ -197,6 +203,89 @@ class pdf_cleodis extends pdf {
 			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);
 			$this->ln(5);
 			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
+			$this->setleftmargin(15);
+
+			if($this->devis['type_contrat'] =='vente'){
+				$this->devisVente();
+			}elseif($this->affaire['nature'] =='avenant'){
+				$this->devisAvenant();
+			}else{
+				$this->devisClassique();
+			}
+		}
+		return true;
+
+	}
+
+
+	public function devis($id,$s) {
+
+		$this->devis = ATF::devis()->select($id);
+		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
+		
+		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+		$this->lignes = ATF::devis_ligne()->sa();
+		
+		$this->user = ATF::user()->select($this->devis['id_user']);
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
+		$this->client = ATF::societe()->select($this->devis['id_societe']);
+		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
+		$this->agence = ATF::agence()->select($this->user['id_agence']);
+
+		if($this->devis["type_devis"] === "optic_2000"){
+			$this->devisoptic_2000($id);			
+		}else{
+			$this->pdf_devis = true;
+			/* PAGE 1 */
+			//$this->unsetHeader();
+			$this->Addpage();
+			$this->setHeader();			
+			$this->SetLeftMargin(15);
+			
+			$this->sety(30);
+			$this->setfont('arial','B',18);
+			$this->multicell(0,7,"PAYEZ A L’USAGE VOS SOLUTIONS\nINFORMATIQUES ET DIGITALES",0,'C');
+
+			$this->image(__PDF_PATH__."cleodis/page1_devis.jpg",20,60,160);
+			
+			$this->setY(200);
+
+			$this->setfont('arial','',12);
+
+			$this->cell(36,5,"Livraison",1,0,'C');
+			$this->cell(36,5,"Connexion",1,0,'C');
+			$this->cell(36,5,"Maintenance",1,0,'C');
+			$this->cell(36,5,"Evolution",1,0,'C');
+			$this->cell(36,5,"Récupération",1,1,'C');
+			$this->ln(8);
+			$this->setfont('arial','B',18);
+
+			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+
+			$this->setfont('arial','',8);
+			$this->ln(5);
+			$y = $this->getY();
+
+
+			$this->multicell(85,5,"Votre Interlocuteur CLEODIS ");
+			$this->setfont('arial','IB',11);
+			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
+			$this->setfont('arial','',8);
+			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));			
+			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));			
+			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
+
+			$this->setY($y);
+			$this->setleftmargin(110);
+			$this->setfont('arial','IB',11);
+			$this->multicell(85,10,$this->client['societe']);
+			$this->setfont('arial','',8);
+			$this->multicell(85,5,$this->client['adresse']);
+			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);	
+			$this->setfont('arial','B',11);
+			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
+			$this->setfont('arial','',8);
 			$this->setleftmargin(15);
 
 			if($this->devis['type_contrat'] =='vente'){
@@ -439,12 +528,314 @@ class pdf_cleodis extends pdf {
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
 	}
+
+	/* Génère le PDF d'un devis Classique V2
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @date 23-09-2016
+	*/
+	private function devisClassique() {
+		if (!$this->devis) return false;
+		
+		/* PAGE 2 */
+		$this->setHeader();
+		$this->setTopMargin(30);
+		$this->addpage();
+		
+		$this->setfont('arial','B',16);
+		$this->setTextColor("48","154","40");
+		$this->multicell(0,7,"1 – Cléodis, partenaire des entreprises & réseaux de franchises");
+		$this->setTextColor("black");
+		$this->ln(10);
+		
+		$this->setfont('arial','',12);
+		$this->multicell(0,7,"Groupe indépendant, présent dans près de 4 000 entreprises, partenaires de 25 enseignes de franchises sur l’ensemble du territoire français, nous intervenons en partenariat avec notre réseau de prestataires :");
+		$this->ln(10);
+		$this->setLeftMargin(50);
+		$y = $this->getY();
+		$this->cell(50,7,"- constructeurs",0,1);
+		$this->cell(50,7,"- éditeurs",0,1);
+		$this->cell(50,7,"- intégrateurs",0,1);
+
+		$this->setY($y);
+		$this->setLeftMargin(120);
+		$this->cell(50,7,"- SSII",0,1);
+		$this->cell(50,7,"- distributeurs",0,1);
+		$this->cell(50,7,"- mainteneurs",0,1);
+		$this->ln(10);
+		$this->setLeftMargin(15);
+		$this->multicell(0,7,"afin de vous apporter des solutions complètes et proches de chez vous.");
+		$this->ln(10);
+		
+
+		$this->setfont('arial','B',16);
+		$this->setTextColor("48","154","40");
+		$this->multicell(0,7,"2 – Cléodis, spécialiste des réseaux & franchises : ");
+		$this->setTextColor("black");
+		$this->ln(10);
+		
+		$this->setfont('arial','',12);
+		$this->multicell(0,7,"Cléodis a développé une approche spécifique pour les réseaux d'entreprises : franchises, coopératives, etc.");
+		$this->ln(10);
+		$this->setLeftMargin(35);
+		$this->cell(0,7," >  approche individualisée par entreprise",0,1);
+		$this->cell(0,7," >  accompagnement au cas par cas lors des créations ",0,1);
+		$this->cell(0,7," >  gestion des évolutions informatiques et logicielles sur l'ensemble du réseau",0,1);
+		$this->cell(0,7," >  gestion centralisée et surpervision globale",0,1);
+		$this->cell(0,7," >  suivi et maintenance du parc avec reporting centralisé",0,1);
+
+		$this->ln(10);
+		$this->setLeftMargin(15);
+		
+		$this->setfont('arial','B',16);
+		$this->setTextColor("48","154","40");
+		$this->multicell(0,7,"Notre vocation : vous faire profiter de la technologie en vous apportant SIMPLICITE, TRANQUILLITE et LIBERTE.");
+		$this->setTextColor("black");
+		$this->ln(10);
+
+
+		
+		/* PAGE 3 */
+		$this->AddPage();
+
+		$this->setfont('arial','B',16);
+		$this->setTextColor("48","154","40");
+		$this->multicell(0,7,"3 – Nos domaines d’intervention");
+		$this->setTextColor("black");
+		$this->ln(5);
+		$this->setfont('arial','B',11);
+		$this->multicell(0,7,"Cléodis intervient sur les composants du système d’information de l’entreprise :");
+		
+
+		$head = NULL;
+		$width = array(60,120);		
+		$data = array();
+		$style = array(
+			"col1"=>array("size"=>12,"decoration"=>"B","align"=>"C")
+		);
+
+		$data[] = array("\n\nPostes informatiques & bureautiques","\n\n\n\n\n\n\n");
+		$s[][0] = $style["col1"];
+		$data[] = array("Systèmes d'encaissement","\n\n\n\n\n\n\n");
+		$s[][0] = $style["col1"];
+		$data[] = array("Solutions d'impression","\n\n\n\n\n\n\n");
+		$s[][0] = $style["col1"];
+		$data[] = array("\n\nRéseau : LAN/WAN, wifi\nsupervision","\n\n\n\n\n\n\n");
+		$s[][0] = $style["col1"];
+		$data[] = array("Digital & Multimédia","\n\n\n\n\n\n\n");
+		$s[][0] = $style["col1"];
+		$data[] = array("Téléphonie","\n\n\n\n\n\n\n");
+		$s[][0] = $style["col1"];		
+		$this->tableau($head,$data,$width,7,$s,260);
+
+
+		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne1.jpg",85,60,90);
+		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne2.jpg",85,90,90);
+		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne3.jpg",85,125,105);
+		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne4.jpg",85,160,105);
+		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne5.jpg",85,195,105);
+		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne6.jpg",85,230,105);
+
+		
+		/*	PAGE 4	*/
+		$this->AddPage();
+		
+		$this->sety(30);
+		$this->setfont('arial','B',16);
+		$this->setTextColor("48","154","40");
+		$this->multicell(0,7,"4 – L’infogérance  de votre système d’information par Cléodis");
+		$this->setTextColor("black");
+		$this->ln(10);
+
+		$this->setfont('arial','B',12);
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Conseil","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Analyse","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Gestion de","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Projet","align"=>"C","size"=>14);
+		$this->cadre(15,50,50,50,$cadre);
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Analyse","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"des","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Utilisateurs","align"=>"C","size"=>14);
+		$this->cadre(70,50,50,50,$cadre);
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Management","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"des","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Evolutions","align"=>"C","size"=>14);
+		$this->cadre(125,50,50,50,$cadre);
+
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Commandes","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Installation","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Coordination","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"technique","align"=>"C","size"=>14);
+		$this->cadre(15,110,50,50,$cadre);
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Assistance","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Technique","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Maintenance","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"&","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"hotline","align"=>"C","size"=>14);
+		$this->cadre(70,110,50,50,$cadre);
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Simulations","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Financières","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"&","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Techniques","align"=>"C","size"=>14);
+		$this->cadre(125,110,50,50,$cadre);
+
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Gestion Locative","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Facturation","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Multisite","align"=>"C","size"=>14);		
+		$this->cadre(15,170,50,50,$cadre);
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Assurance","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Remplacement","align"=>"C","size"=>14);
+		$this->cadre(70,170,50,50,$cadre);
+
+		$cadre = array();
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Reprise","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
+		$cadre[] = array("txt"=>"Recyclage","align"=>"C","size"=>14);
+		$this->cadre(125,170,50,50,$cadre);
+
+		$this->setY(230);
+		$this->multicell(0,5,"Choisissez votre niveau d'externalisation",0,"C");
+
+
+
+		/* PAGE 5 */
+		$this->AddPage();
+
+		if($this->devis["commentaire_offre_partenaire"]){
+			$this->setfont('arial','',10);
+			$this->multicell(0,5,$this->devis["commentaire_offre_partenaire"],1);
+			$this->ln(5);
+		}
+
+		$this->setfont('arial','BU',14);
+		$this->multicell(0,7,"Synthèse de l'offre ".($this->devis["offre_partenaire"]?strtoupper($this->devis["offre_partenaire"]):"")." :");
+		$this->ln(5);
+
+		$head = NULL;
+		$width = array(100,40);		
+		$data = array();
+		
+		$inclus = $options = $s = array();
+		if ($this->lignes) {
+			foreach ($this->lignes as $key => $value) {
+				if($value["options"] == "oui"){
+					$options[] = $value;
+				}else{
+					$inclus[] = $value;
+				}
+			}			
+
+			foreach ($inclus as $key => $value) {
+				$data[] = array($value["produit"] , " €");
+				$s[] = array(array("size"=>10,"decoration"=>"","align"=>"L") , array("size"=>10,"decoration"=>"","align"=>"R"));				
+				$totalInclus = 0;				
+			}
+			$data[] = array("Total hors Options" , $totalInclus." €");
+			$s[] = array(array("size"=>10,"decoration"=>"B","align"=>"L", "bgcolor"=>"309A28", "fill"=>1) , 
+						 array("size"=>10,"decoration"=>"B","align"=>"R", "bgcolor"=>"309A28", "fill"=>1));
+
+			if($options){
+				$data[] = array("OPTIONS" , "");
+				$s[] = array(array("size"=>10,"align"=>"L", "bgcolor"=>"BEBEBE", "fill"=>1),array("bgcolor"=>"BEBEBE", "fill"=>1));
+
+				foreach ($options as $key => $value) {
+					$data[] = array($value["produit"] , " €");
+					$s[] = array(array("size"=>10,"align"=>"L") , array("size"=>10,"align"=>"R"));
+					$totalInclus = $totalInclus+0;
+				}
+				$data[] = array("Total avec Options" , $totalInclus." €");		
+				$s[] = array(array("size"=>10,"decoration"=>"B","align"=>"L", "bgcolor"=>"309A28", "fill"=>1) , 
+							 array("size"=>10,"decoration"=>"B","align"=>"R", "bgcolor"=>"309A28", "fill"=>1));
+			}
+		}		
+		$this->tableau($head,$data,$width,7,$s,260);
+
+
+		/*	PAGE 6	*/
+		$this->AddPage();
+
+
+		if(ATF::$codename == "cleodis"){
+			$this->setTextColor("48","154","40");
+			$this->setfont('arial','B',14);
+
+			$this->multicell(0,6,"Proposition locative CLEODIS pour ".$this->client['societe'],0,'C');
+			if($this->affaire['nature']=="avenant"){
+				$this->multicell(0,6,"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'),0,'C');
+			}			
+			$this->multicell(0,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');	
+			$this->setTextColor("0","0","0");				
+		}
+
+
+		
+		
+		
+
+
+		
+		$this->setfont('arial','',8);
+		$this->cell(0,5,"",0,1,'C');
+		
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"Cléodis s'engage à vous fournir : ");		
+		$this->setfont('arial','',9);
+		$this->cell(15,5,"",0,0);
+		$this->cell(0,5,"=>Un conseil indépendant en renouvellement de matériels",0,1);
+		$this->cell(15,5,"",0,0);
+		$this->cell(0,5,"=>La possibilité d'évoluer à tout moment, et d'incorporer des budgets non prévus tout en lissant la charge budgétaire",0,1);
+		$this->cell(15,5,"",0,0);
+		$this->cell(0,5,"=>Un service de reprise des équipements au terme ou en cours de contrat",0,1);
+		$this->cell(15,5,"",0,0);
+		$this->cell(0,5,"=>La gestion de parc des matériels loués",0,1);
+		
+		$this->ln(10);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,"Cette offre, valable jusqu'au ".ATF::$usr->trans($this->devis['validite']).", reste soumise à notre comité des engagements.",0);
+		
+	}
+
 	
 	/* Génère le PDF d'un devis Classique
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisClassique() {
+	private function devisClassique_old() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -2982,10 +3373,11 @@ class pdf_cleodis extends pdf {
 		$this->client = ATF::societe()->select($this->affaire['id_societe']);
 
 
-		$this->unsetHeader();
+		
 		
 		$this->open();
 		$this->addpage();
+		$this->unsetHeader();
 		$this->setleftmargin(10);
 		$this->sety(10);
 
@@ -3003,57 +3395,57 @@ class pdf_cleodis extends pdf {
 		$this->setleftmargin(30);
 		$y = $this->getY();
 		$date = split("/", $this->comite["date_creation"]);
-
+		
 		if( (date("Y") - $date[1] ) >= 2 ){
-			$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+			$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Ancienneté > à 2 ans ( ".$date[1]." )",0,1,"L");
-
+	
 		$this->ln(5);
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["capital_social"])) > 10000 ) { $this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( floatval(str_replace(" ", "", $this->comite["capital_social"])) > 10000 ) { $this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Capital social > 10 000 € ( ".number_format(floatval($this->comite["capital_social"]),2,',',' ')." )",0,1,"L");
 		
 		$this->ln(5);
 		if(!$this->comite["dettes_financieres"]) $this->comite["dettes_financieres"] = 0;
 
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > floatval(str_replace(" ", "", $this->comite["dettes_financieres"])) ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > floatval(str_replace(" ", "", $this->comite["dettes_financieres"])) ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Capitaux propres > Dettes financières ( ".number_format(floatval($this->comite["capitaux_propres"]),2,',',' ').">".number_format(floatval($this->comite["dettes_financieres"]),2,',',' ')." )",0,1,"L");
 
 
 		$this->ln(5);
 		$y = $this->getY();
 		$investissement = 2*$this->devis["prix_achat"];
-		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > $investissement ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > $investissement ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Capitaux propres > 2 x investissement ( ".number_format(floatval($this->comite["capitaux_propres"]),2,',',' ')." > ".$investissement." )",0,1,"L");
 
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["ca"])) > 150000 ) { $this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);	}
+		if( floatval(str_replace(" ", "", $this->comite["ca"])) > 150000 ) { $this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
 		$this->cell(0,5,"CA > 150 000 € ( ".number_format(floatval($this->comite["ca"]),2,',',' ')." )",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["resultat_exploitation"])) > 0 ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);	}
+		if( floatval(str_replace(" ", "", $this->comite["resultat_exploitation"])) > 0 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
 		$this->cell(0,5,"Résultat d'exploitation > 0 ( ".number_format(floatval($this->comite["resultat_exploitation"]),2,',',' ')." )",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( $this->comite["pourcentage_materiel"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( $this->comite["pourcentage_materiel"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"% Matériel > 50 % ",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( $this->comite["note"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( $this->comite["note"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Note CréditSafe > 50 ( ".$this->comite["note"]." )",0,1,"L");
 
 
@@ -3064,18 +3456,13 @@ class pdf_cleodis extends pdf {
 									   ->addCondition("date",date("Y-m-d",strtotime(date("Y-m-d")." - 6 month")),"AND",false,">");
 									   
 
-		if(! ATF::demande_refi()->select_all() ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);			
-		}else{		$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);	}
+		if(! ATF::demande_refi()->select_all() ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);			
+		}else{		$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
 		$this->cell(0,5,"Pas de refus refi récent ",0,1,"L");
 
 		$this->ln(5);		
 		$y = $this->getY();	
-
-		/*if( ) {
-			$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);			
-		}else{
-			$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);			
-		}*/
+		
 		$this->cell(0,5,"Maison mère",0,1,"L");
 
 
