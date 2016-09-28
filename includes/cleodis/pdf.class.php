@@ -154,7 +154,7 @@ class pdf_cleodis extends pdf {
 	* @date 13-01-2011
 	* @param int $id Id du devis
 	*/
-	public function devis_old($id,$s) {
+	public function devis($id,$s) {
 
 		$this->devis = ATF::devis()->select($id);
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
@@ -218,87 +218,7 @@ class pdf_cleodis extends pdf {
 	}
 
 
-	public function devis($id,$s) {
-
-		$this->devis = ATF::devis()->select($id);
-		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
-		
-		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
-		$this->lignes = ATF::devis_ligne()->sa();
-		
-		$this->user = ATF::user()->select($this->devis['id_user']);
-		$this->societe = ATF::societe()->select($this->user['id_societe']);
-		$this->client = ATF::societe()->select($this->devis['id_societe']);
-		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
-		$this->agence = ATF::agence()->select($this->user['id_agence']);
-
-		if($this->devis["type_devis"] === "optic_2000"){
-			$this->devisoptic_2000($id);			
-		}else{
-			$this->pdf_devis = true;
-			/* PAGE 1 */
-			//$this->unsetHeader();
-			$this->Addpage();
-			$this->setHeader();			
-			$this->SetLeftMargin(15);
-			
-			$this->sety(30);
-			$this->setfont('arial','B',18);
-			$this->multicell(0,7,"PAYEZ A L’USAGE VOS SOLUTIONS\nINFORMATIQUES ET DIGITALES",0,'C');
-
-			$this->image(__PDF_PATH__."cleodis/page1_devis.jpg",20,60,160);
-			
-			$this->setY(200);
-
-			$this->setfont('arial','',12);
-
-			$this->cell(36,5,"Livraison",1,0,'C');
-			$this->cell(36,5,"Connexion",1,0,'C');
-			$this->cell(36,5,"Maintenance",1,0,'C');
-			$this->cell(36,5,"Evolution",1,0,'C');
-			$this->cell(36,5,"Récupération",1,1,'C');
-			$this->ln(8);
-			$this->setfont('arial','B',18);
-
-			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
-
-			$this->setfont('arial','',8);
-			$this->ln(5);
-			$y = $this->getY();
-
-
-			$this->multicell(85,5,"Votre Interlocuteur CLEODIS ");
-			$this->setfont('arial','IB',11);
-			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
-			$this->setfont('arial','',8);
-			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));			
-			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));			
-			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
-
-			$this->setY($y);
-			$this->setleftmargin(110);
-			$this->setfont('arial','IB',11);
-			$this->multicell(85,10,$this->client['societe']);
-			$this->setfont('arial','',8);
-			$this->multicell(85,5,$this->client['adresse']);
-			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);	
-			$this->setfont('arial','B',11);
-			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
-			$this->setfont('arial','',8);
-			$this->setleftmargin(15);
-
-			if($this->devis['type_contrat'] =='vente'){
-				$this->devisVente();
-			}elseif($this->affaire['nature'] =='avenant'){
-				$this->devisAvenant();
-			}else{
-				$this->devisClassique();
-			}
-		}
-		return true;
-
-	}
+	
 	
 	/* Génère le PDF d'un devis de vente
 	* @author Quentin JANON <qjanon@absystech.fr>
