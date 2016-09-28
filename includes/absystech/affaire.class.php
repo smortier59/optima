@@ -698,7 +698,7 @@ class affaire_absystech extends affaire {
 		}
 
 		foreach ($affaires['data'] as $k=>$line) {
-			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture.".$field.",'%Y')",$get['year']);
+
 			foreach (ATF::facture()->sa() as $key=>$i) {
 				$affaires['data'][$k][strftime("%b",strtotime($i['date']))] += $i['prix'];
 			}
