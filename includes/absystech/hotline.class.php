@@ -3821,8 +3821,8 @@ class hotline extends classes_optima {
 					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
 				}
 				// Filtre MES tickets
-				if ($get['filters']['mine'] == "on") {
-					$this->q->where("hotline.id_user",ATF::$usr->getId());
+				if ($get['filters']['mine'] == "on" && $get['id_user']) {
+					$this->q->where("hotline.id_user",$get['id_user']);
 				}	
 
 				// Filtre Facturé
