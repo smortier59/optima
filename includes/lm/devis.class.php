@@ -390,11 +390,14 @@ class devis_lm extends devis {
 					foreach ($fournisseurs as $kf => $vf) {
 						if($vf["departement"] == NULL && !$item["id_fournisseur"]){
 							$item["id_fournisseur"] = $vf["id_fournisseur"];
+							if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
 						}else{
 							$dep = explode(",", $vf["departement"]);							
 							foreach ($dep as $k => $v) {								
 								if(substr($societe["cp"],0,2) == $v){
 									$item["id_fournisseur"] = $vf["id_fournisseur"];
+									unset($item["prix_achat"]);
+									if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
 								}
 							}
 						}
