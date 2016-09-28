@@ -12,7 +12,7 @@ class produit_lm extends produit {
 		$this->colonnes['fields_column'] = array(
 			'produit.produit',											
 			//'produit.id_fournisseur',												 
-			'prix_achat_ht'=>array("custom"=>true,"width"=>80,"rowEditor"=>"setInfos","align"=>"right","renderer"=>"money"),
+			//'prix_achat_ht'=>array("custom"=>true,"width"=>80,"rowEditor"=>"setInfos","align"=>"right","renderer"=>"money"),
 			'somme_loyers_engages'=>array("custom"=>true,"nosort"=>true,"align"=>"right","renderer"=>"money"),
 			'detail_loyers'=>array("custom"=>true),
 			'produit.etat'=>array("rowEditor"=>"actifUpdate","renderer"=>"etat","width"=>80),
@@ -310,10 +310,10 @@ class produit_lm extends produit {
 		;
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
-		$p = new produit_lm(); // Ne pas écraser le querier courant
+		/*$p = new produit_lm(); // Ne pas écraser le querier courant
 		foreach ($return['data'] as $k=>$i) {
 			$return['data'][$k]['prix_achat_ht'] = $p->prix_achat_prestation($i['produit.id_produit']);
-		}
+		}*/
 		return $return;
 	}
 
@@ -322,7 +322,7 @@ class produit_lm extends produit {
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id_produit
 	* @return float $prix_total
-	*/
+	
 	public function prix_achat_prestation($id_produit){
 		ATF::produit_fournisseur()->q->reset()
 			->addField("SUM(IF(produit_fournisseur.recurrence='achat',produit_fournisseur.prix_prestation,0))","prix_achat_ht")
@@ -332,5 +332,5 @@ class produit_lm extends produit {
 			->setDimension('cell')
 		;
 		return ATF::produit_fournisseur()->sa();
-	}
+	}*/
 }
