@@ -7,7 +7,7 @@ require_once dirname(__FILE__)."/../cleodis/pdf.class.php";
 * @date 05-01-2011
 */
 class pdf_lm extends pdf_cleodis {	
-	public $logo = 'lm/lm.png';
+	public $logo = 'lm/lm.jpg';
 	public $heightLimitTableContratA4 = 100; 
 
 	public $leftStyle = array(
