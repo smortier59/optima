@@ -3879,7 +3879,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
 		$this->q->setToString();
-
+		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
 		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -3896,7 +3896,13 @@ class hotline extends classes_optima {
 
 		if ($get['id']) {
 			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
-	        $return = $data['data'][0];			
+
+	        $return = $data['data'][0];		
+
+			// Check PJ
+			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
+			$return["idc"] = $this->cryptId($get['id']);
+
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);

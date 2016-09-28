@@ -1989,9 +1989,9 @@ class hotline_interaction extends classes_optima {
 	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
 	        }
 
- 			if (!$post['id_user']) {
+			if (!$post['id_user']) {
  	        	$post['id_user'] = ATF::$usr->getId();
- 	        }
+ 	        }	        
 
 	        // Insertion
 	        $id = self::insert($post);
@@ -2015,7 +2015,7 @@ class hotline_interaction extends classes_optima {
 	}	
 
 	/**
-	* Renvoi le nombre de crédit (presta ou deplacement par rapport au temps passé
+	* Renvoi le nombre de crédit par rapport aun temps passé
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr> 
 	* @param $get array contient le temps passé formatté comme suit : HH:ii:ss ou HH:ii

@@ -667,7 +667,7 @@ class affaire_absystech extends affaire {
 			->addField("commande.date","date_cmd")
 			->addField("devis_ligne.periode","periode")
 			->from("affaire","id_affaire","devis","id_affaire")
-			->from("affaire","id_affaire","commande","id_affaire")
+			->from("affaire","id_affaire","commande","id_affaire"
 			->from("affaire","id_societe","societe","id_societe")
 			->from("devis","id_devis","devis_ligne","id_devis")
 			->from("affaire","id_affaire","facture","id_affaire")
@@ -692,7 +692,7 @@ class affaire_absystech extends affaire {
 			break;
 		}
 
-		if (!$get['noLimit']) $this->q->setLimit($get['limit']);
+		if(!$get['noLimit']) $this->q->setLimit($get['limit']);
 
 		$affaires = ATF::affaire()->select_all($get['tri'],$get['trid'],$get['page'],true);
 
