@@ -333,7 +333,8 @@ if($infos["id_societe"]){
                     "devis_ligne__dot__commentaire"=>$v["commentaire"],
                     "devis_ligne__dot__neuf"=>"oui",
                     "devis_ligne__dot__id_produit_fk"=>$v["id_produit"],
-                    "devis_ligne__dot__id_fournisseur_fk"=>$v["id_fournisseur"]
+                    "devis_ligne__dot__id_fournisseur_fk"=>$v["id_fournisseur"],
+                    "devis_ligne__dot__visible"=>$v["afficher"]
                 );
                 $produits_commande[] = array(
                     "commande_ligne__dot__produit"=>$v["produit"],
@@ -346,7 +347,8 @@ if($infos["id_societe"]){
                     "commande_ligne__dot__commentaire"=>$v["commentaire"],
                     "commande_ligne__dot__neuf"=>"oui",
                     "commande_ligne__dot__id_produit_fk"=>$v["id_produit"],
-                    "commande_ligne__dot__id_fournisseur_fk"=>$v["id_fournisseur"]
+                    "commande_ligne__dot__id_fournisseur_fk"=>$v["id_fournisseur"],
+                    "commande_ligne__dot__visible"=>$v["afficher"]
                 );
                 $prix_achat +=  $prod["prix_achat_ht"];
             }
