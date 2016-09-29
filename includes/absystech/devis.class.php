@@ -1059,7 +1059,8 @@ class devis_absystech extends devis {
 //				));
 
 				$this->q->reset()
-				->addCondition("id_devis",$devis["id_devis"],false,false,'!=')
+				->addCondition("devis.id_devis",$devis["id_devis"],false,false,'!=')
+				->from("devis","id_affaire","commande","id_affaire")
 				->addCondition("commande.id_affaire",$devis["id_affaire"]);				
 				
 				$anc_devis=$this->sa();
@@ -1074,7 +1075,7 @@ class devis_absystech extends devis {
 			}
 				
 			$this->u(array(
-							"id_devis"=>$devis["id_devis"],
+							"id_devis"=>$infos["id_devis"],
 							"etat"=>"annule",
 							"date_modification"=>date("Y-m-d H:i:s")
 							)
@@ -1287,6 +1288,7 @@ class devis_absystech extends devis {
 	 * @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	 */
 	public function annulation($infos,&$s,$files=NULL,&$cadre_refreshed){
+
 		if (!$infos['action'] || !$infos['id']) return false;
 		ATF::db($this->db)->begin_transaction();
 			switch ($infos['action']) {

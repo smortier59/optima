@@ -655,12 +655,12 @@ class affaire_absystech extends affaire {
 		if (!$get['page']) $get['page'] = 0;
 
 		if ($get['filters']['field-date_debut_periode']) {
-			$field = "date_debut_periode";
-		} else {
-			$field = "date";
-		}
-
-
+ 			$field = "date_debut_periode";
+ 		} else {
+ 			$field = "date";
+	
+ 		}
+ 
 		ATF::affaire()->q->reset()
 			->addField("affaire.id_societe")
 			->addField("affaire.id_affaire")
@@ -673,7 +673,7 @@ class affaire_absystech extends affaire {
 			->from("affaire","id_affaire","facture","id_affaire")
 			->where("devis.etat","gagne")
 			->where("commande.etat","annulee","OR",false,"!=")
-			->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year'],"OR",false,"<=")
+ 			->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year'],"OR",false,"<=")
 			->whereIsNotNull("devis_ligne.periode")
 			->addGroup("affaire.id_affaire")
 			->addGroup("affaire.id_societe")
@@ -692,8 +692,7 @@ class affaire_absystech extends affaire {
 			break;
 		}
 
-		if (!$get['noLimit']) $this->q->setLimit($get['limit']);
-
+		if(!$get['noLimit']) $this->q->setLimit($get['limit']);
 
 		$affaires = ATF::affaire()->select_all($get['tri'],$get['trid'],$get['page'],true);
 
@@ -709,7 +708,6 @@ class affaire_absystech extends affaire {
 
 		foreach ($affaires['data'] as $k=>$line) {
 			ATF::facture()->q->reset()->where('id_affaire',$line['id_affaire_fk'])->where("DATE_FORMAT(facture.".$field.",'%Y')",$get['year']);
-
 			foreach (ATF::facture()->sa() as $key=>$i) {
 				$affaires['data'][$k][strftime("%b",strtotime($i[$field]))] += $i['prix'];
 			}
@@ -791,6 +789,37 @@ class affaire_absystech extends affaire {
 
         return $return;
 	}
+
+/* PARTIE DES FONCTIONS POUR TELESCOPE*/
+
+
+	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+		$length = 25;
+		$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("affaire.id_affaire","id_affaire")->addField("affaire.affaire","affaire")->addField("affaire.etat","etat");
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		if ($get['id_societe']) {
+			$this->q->where("affaire.id_societe",$get["id_societe"]);
+		}
+
+		$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
+
+
+
 
 
 };

@@ -839,6 +839,10 @@ class hotline extends classes_optima {
 		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
 		if ($id_societe==1) {
 			$infos['type_requete'] = "charge_absystech";
+		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
+			$infos["id_affaire"] = $id_affaire_projet;
 		}
 
 		//Insertion de la requête
@@ -3238,9 +3242,17 @@ class hotline extends classes_optima {
 				$r[] = ATF::affaire()->nom($hotline['id_affaire']);
 			break;
 			case "intervention": 
-				if (!$hotline['facturation_ticket']) $r = array("Nature de la charge à définir");
-				else if ($hotline['id_affaire']) $r[] = " sur l'affaire : ".ATF::affaire()->nom($hotline['id_affaire']);
-				else $r[] = ATF::$usr->trans($hotline['facturation_ticket']."_facture","hotline");
+				if (!$hotline['facturation_ticket']) {
+					$r = array("Nature de la charge à définir");
+				} else if ($hotline['id_affaire']) {
+					$r[] = " sur l'affaire : ".ATF::affaire()->nom($hotline['id_affaire']);
+					$id_societe_affaire = ATF::affaire()->select($hotline['id_affaire'],"id_societe");
+					if ($hotline['id_societe'] != $id_societe_affaire) {
+						$r[] = " (".ATF::societe()->nom($id_societe_affaire).")";
+					}
+				} else {
+					$r[] = ATF::$usr->trans($hotline['facturation_ticket']."_facture","hotline");
+				}
 			break;
 
 		}
@@ -3846,6 +3858,7 @@ class hotline extends classes_optima {
 				case 'id_societe':
 				case 'id_user':
 				case 'id_contact':
+				case 'date':
 					$get['tri'] = "hotline.".$get['tri'];
 				break;
 			}
@@ -3866,7 +3879,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
 		$this->q->setToString();
-
+		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
 		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -3883,7 +3896,13 @@ class hotline extends classes_optima {
 
 		if ($get['id']) {
 			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
-	        $return = $data['data'][0];			
+
+	        $return = $data['data'][0];		
+
+			// Check PJ
+			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
+			$return["idc"] = $this->cryptId($get['id']);
+
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);

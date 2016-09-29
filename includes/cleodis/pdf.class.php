@@ -122,11 +122,17 @@ class pdf_cleodis extends pdf {
                 $this->cadre(110,45,85,35,$cadre);
             }            
             $this->setfont('arial','',12);            	    
-        } else {
-
-        	if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,35); }
+        } else {        	
+        	if($this->pdf_devis){
+        		$this->image(__PDF_PATH__.$this->logo,10,10,35);
+        		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
+				$this->sety(20);
+        	}else{
+        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,35); }
 			
-			$this->sety(20);
+				$this->sety(20);
+        	}
+        	
 		}
 	}
 
@@ -210,6 +216,9 @@ class pdf_cleodis extends pdf {
 		return true;
 
 	}
+
+
+	
 	
 	/* Génère le PDF d'un devis de vente
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -439,6 +448,9 @@ class pdf_cleodis extends pdf {
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
 	}
+
+	
+
 	
 	/* Génère le PDF d'un devis Classique
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -2982,10 +2994,11 @@ class pdf_cleodis extends pdf {
 		$this->client = ATF::societe()->select($this->affaire['id_societe']);
 
 
-		$this->unsetHeader();
+		
 		
 		$this->open();
 		$this->addpage();
+		$this->unsetHeader();
 		$this->setleftmargin(10);
 		$this->sety(10);
 
@@ -3003,57 +3016,57 @@ class pdf_cleodis extends pdf {
 		$this->setleftmargin(30);
 		$y = $this->getY();
 		$date = split("/", $this->comite["date_creation"]);
-
+		
 		if( (date("Y") - $date[1] ) >= 2 ){
-			$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+			$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Ancienneté > à 2 ans ( ".$date[1]." )",0,1,"L");
-
+	
 		$this->ln(5);
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["capital_social"])) > 10000 ) { $this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( floatval(str_replace(" ", "", $this->comite["capital_social"])) > 10000 ) { $this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Capital social > 10 000 € ( ".number_format(floatval($this->comite["capital_social"]),2,',',' ')." )",0,1,"L");
 		
 		$this->ln(5);
 		if(!$this->comite["dettes_financieres"]) $this->comite["dettes_financieres"] = 0;
 
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > floatval(str_replace(" ", "", $this->comite["dettes_financieres"])) ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > floatval(str_replace(" ", "", $this->comite["dettes_financieres"])) ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Capitaux propres > Dettes financières ( ".number_format(floatval($this->comite["capitaux_propres"]),2,',',' ').">".number_format(floatval($this->comite["dettes_financieres"]),2,',',' ')." )",0,1,"L");
 
 
 		$this->ln(5);
 		$y = $this->getY();
 		$investissement = 2*$this->devis["prix_achat"];
-		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > $investissement ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( floatval(str_replace(" ", "", $this->comite["capitaux_propres"])) > $investissement ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Capitaux propres > 2 x investissement ( ".number_format(floatval($this->comite["capitaux_propres"]),2,',',' ')." > ".$investissement." )",0,1,"L");
 
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["ca"])) > 150000 ) { $this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);	}
+		if( floatval(str_replace(" ", "", $this->comite["ca"])) > 150000 ) { $this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
 		$this->cell(0,5,"CA > 150 000 € ( ".number_format(floatval($this->comite["ca"]),2,',',' ')." )",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( floatval(str_replace(" ", "", $this->comite["resultat_exploitation"])) > 0 ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);	}
+		if( floatval(str_replace(" ", "", $this->comite["resultat_exploitation"])) > 0 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
 		$this->cell(0,5,"Résultat d'exploitation > 0 ( ".number_format(floatval($this->comite["resultat_exploitation"]),2,',',' ')." )",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( $this->comite["pourcentage_materiel"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( $this->comite["pourcentage_materiel"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"% Matériel > 50 % ",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
-		if( $this->comite["note"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);
-		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5); }
+		if( $this->comite["note"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
+		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Note CréditSafe > 50 ( ".$this->comite["note"]." )",0,1,"L");
 
 
@@ -3064,18 +3077,13 @@ class pdf_cleodis extends pdf {
 									   ->addCondition("date",date("Y-m-d",strtotime(date("Y-m-d")." - 6 month")),"AND",false,">");
 									   
 
-		if(! ATF::demande_refi()->select_all() ) {	$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);			
-		}else{		$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);	}
+		if(! ATF::demande_refi()->select_all() ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);			
+		}else{		$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
 		$this->cell(0,5,"Pas de refus refi récent ",0,1,"L");
 
 		$this->ln(5);		
 		$y = $this->getY();	
-
-		/*if( ) {
-			$this->image(__PDF_PATH__.'cleodis/check.png',20,$y,5);			
-		}else{
-			$this->image(__PDF_PATH__.'cleodis/uncheck.png',20,$y,5);			
-		}*/
+		
 		$this->cell(0,5,"Maison mère",0,1,"L");
 
 
