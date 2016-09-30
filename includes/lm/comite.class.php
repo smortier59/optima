@@ -363,11 +363,9 @@ class comite extends classes_optima {
                 	$p = ATF::pack_produit()->select($f["produit.id_pack_produit"]);                	
                     if ($f["email_notification"]) {
                         $commande = self::getInfosCommande($id_commande,$f["id_societe"]);
-                        
                         $info_mail["from"] = __EMAIL_FROM_NAME__." <".__EMAIL_FROM__.">";;
-												
 						$info_mail["recipient"] = $f["email_notification"];
-						$info_mail["objet"] = "[LMA] Nouvelle souscription de ".$commande["prenom"]." ".$commande["nom"]." du pack ";												
+						$info_mail["objet"] = "[LMA pour ".ATF::societe()->select($f["id_societe"],"societe")."] Nouvelle souscription de ".$commande["prenom"]." ".$commande["nom"]." du pack ";
 						$info_mail["body"] = json_encode($commande, JSON_PRETTY_PRINT);
 					
 						$mail = new mail($info_mail);
