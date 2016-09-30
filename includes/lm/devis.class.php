@@ -376,6 +376,7 @@ class devis_lm extends devis {
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
 			foreach($infos_ligne as $key=>$item){
 				$item["id_devis"]=$last_id;
+				$item["visible"] = ATF::produit()->select($item["id_produit"] , "afficher");
 
 				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
