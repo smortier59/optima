@@ -366,7 +366,7 @@ class comite extends classes_optima {
                         $info_mail["from"] = __EMAIL_FROM_NAME__." <".__EMAIL_FROM__.">";;
 						$info_mail["recipient"] = $f["email_notification"];
 						$info_mail["objet"] = "[LMA pour ".ATF::societe()->select($f["id_societe"],"societe")."] Nouvelle souscription de ".$commande["prenom"]." ".$commande["nom"]." du pack ";
-						$info_mail["body"] = json_encode($commande, JSON_PRETTY_PRINT);
+						$info_mail["body"] = json_encode($commande, JSON_PRETTY_PRINT)."\n\n".print_r($commande, true);
 					
 						$mail = new mail($info_mail);
 					
