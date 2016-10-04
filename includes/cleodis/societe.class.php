@@ -57,6 +57,7 @@ class societe_cleodis extends societe {
 			,'tache'
 			,'parc'
 			,'ged'
+			,'pdf_societe'
 			,'user'
 			,'societe'=>array('field'=>'societe.id_filiale')/*,'societe_domaine'*/
 		);		
@@ -138,8 +139,6 @@ class societe_cleodis extends societe {
 		}
 
 		$this->fieldstructure();
-
-		$this->files["societe_document"] =array("multiUpload"=>true);
 
 		
 		unset($this->colonnes['panel']['facturation_fs']["solde_et_relance"]);
