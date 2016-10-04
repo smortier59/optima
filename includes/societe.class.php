@@ -1406,6 +1406,37 @@ class societe extends classes_optima {
 		return array("societe"=>$this->select($get["id_societe"]) , "module"=>$this);
 	}
 
+
+	/**
+	* Permet de récupérer la liste des societes pour la geolocalisation
+	* @package Telescope
+	* @author Charlier Cyril <ccharlier@absystech.fr> 
+	* @param $get array Argument obligatoire mais inutilisé ici
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/ 
+
+	public function _getGeoloc($get,$post) {
+		$colsData = array(
+			"id_societe"=>array(),
+			"societe"=>array(),
+			"longitude"=>array(),
+			"latitude"=>array(),
+			"ville"=>array(),
+			"cp"=>array(),
+			"adresse"=>array()
+		);		
+		$this->q->reset();
+		$this->q->addField($colsData)				
+				->setCount()
+				->whereIsNotNull("longitude")
+				->addConditionNotNull("latitude");
+				
+		$return = $this->select_all();
+		header("ts-total-row: ".$return['count']);
+		return $return;
+	}
+
 	/** Fonction qui génère les résultat pour les champs d'auto complétion société
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
