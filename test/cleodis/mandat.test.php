@@ -30,7 +30,7 @@ class mandat_test extends ATF_PHPUnit_Framework_TestCase {
 
 	public function test_default_value(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 		$m = new mandat_cap();
 
 		$data = array("ref"=> "123456",
@@ -66,7 +66,7 @@ class mandat_test extends ATF_PHPUnit_Framework_TestCase {
 	
 	public function test_insert(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 		$m = new mandat_cap();
 
 		$data = array("ref"=> "123456",
@@ -101,7 +101,7 @@ class mandat_test extends ATF_PHPUnit_Framework_TestCase {
 
 	public function test_update(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 		$m = new mandat_cap();
 	
 
@@ -146,7 +146,7 @@ class mandat_test extends ATF_PHPUnit_Framework_TestCase {
 
 	public function test_updateDate(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 		$m = new mandat_cap();
 
 		$data = array("ref"=> "123456",

@@ -19,7 +19,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	public function test_construct(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();		
+		$c = new audit();		
 		
 		$this->RollBackTransaction("cleodis");
 
@@ -30,7 +30,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	public function test_insert_preview(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 
 		$data = array("ref"=> "123456",
 					  "id_user"=> 1,
@@ -51,7 +51,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_can_delete(){
 		$this->beginTransaction("cap");
 		
-		$c = new audit_cap();	
+		$c = new audit();	
 
 		$this->assertEquals(false, $c->can_delete(1),"Can delete incorrect");
 
@@ -61,7 +61,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	public function test_can_update(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 
 		$data = array("ref"=> "123456",
 					  "id_user"=> 1,
@@ -93,7 +93,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	public function test_getRef(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 
 		$data = array("ref"=> "12345",
 					  "id_user"=> 1,
@@ -128,7 +128,7 @@ class audit_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	public function test_perdu(){
 		$this->beginTransaction("cap");
-		$c = new audit_cap();	
+		$c = new audit();	
 
 		$data = array("ref"=> "12345",
 					  "id_user"=> 1,

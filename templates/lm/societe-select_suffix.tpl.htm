@@ -2,11 +2,15 @@
 {if isset($smarty.get.id_societe)}
     {$id_societe = $smarty.get.id_societe}
 {elseif isset($requests[$current_class->table]["id_{$current_class->table}"])}
-    {$id_societe = $requests[$current_class->table]["id_{$current_class->table}"]} 
+    {$id_societe = $requests[$current_class->table]["id_{$current_class->table}"]}
 {/if}
 
+{$isFournisseur = $requests[$current_class->table]['fournisseur']}
 
-{$id_crypt = $current_class->cryptId( $id_societe )}
+{*$id_crypt = $current_class->cryptId( $id_societe )*}
+
+
+{*$id_c = urlencode(base64_encode(mcrypt_encrypt(MCRYPT_BLOWFISH, 'absystech', $id_societe, MCRYPT_MODE_CBC, '12345678')))*}
 
 {* Icones spéciales *}
 {if ATF::$usr->privilege('affaire','insert')}
@@ -42,8 +46,29 @@
                 <td style="text-align:justify; vertical-align:middle">
                     <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("joignable",$current_class->table)} : {ATF::$usr->trans(ATF::societe()->select($id_societe , "joignable"),"societe_joignable")}</span>
                 </td>
-            </tr> 
+            </tr>
+            {if $isFournisseur == "oui"}
+                <tr>
+                    <td colspan="2"><hr /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:center; width:80px">
+                        <!--
+                        <a href='https://dev-presta-lma.absystech.net/#!commande?id_societe={$requests[$current_class->table]["id_{$current_class->table}"]}' target="_blank">
+                            <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />                   
+                        </a>
+                        -->
+                        <a href="javascript:;" onclick="ATF.ajax('societe,setToken.ajax','id_societe={$requests[$current_class->table]["id_{$current_class->table}"]}', { onSuccess:function(obj){ if (obj.result) window.location='{$smarty.const.__MANUAL_WEB_PATH__|replace:'lma-optima':'presta-lma'}/#!commande?token='+obj.result; } });">
+                            <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />                   
+                        </a>         
+                    </td>
+                    <td style="text-align:justify; vertical-align:middle">
+                        <span style="font-size:12px; font-weight:bold;">S'authentifier sur le portail prestataire</span>
+                    </td>
+                </tr>
+            {/if}
         </table>
     </td>
 </tr>
 {/if}
+

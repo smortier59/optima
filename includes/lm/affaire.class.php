@@ -15,7 +15,7 @@ class affaire_lm extends affaire {
 			,'affaire.date'
 			,'affaire.affaire'
 			,'affaire.id_societe'
-			,'affaire.type_affaire'
+			,'affaire.type_affaire'=>array('EnumTranslate'=>true)
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
@@ -109,7 +109,7 @@ class affaire_lm extends affaire {
 
 		$this->files["bon_inter"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["facture"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		$this->files["mandat_slimpay"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		//$this->files["mandat_slimpay"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 
 		$this->field_nom="ref";

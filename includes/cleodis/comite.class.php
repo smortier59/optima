@@ -450,7 +450,7 @@ class comite extends classes_optima {
 		if($infos["comboDisplay"] == "refus_comite"){
 			$etat = "refuse";
 		}elseif($infos["comboDisplay"] == "attente_retour"){
-			$etat = "en_attente";
+			$etat = "en_attente";		
 		}else{
 			$etat = "accepte";
 			
@@ -509,6 +509,29 @@ class comite extends classes_optima {
 				);													
 		$id_suivi = ATF::suivi()->insert($suivi);
 
+
+	}
+
+
+	/**
+    * Avoir des infos sur la société
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    */ 
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
+		$return = parent::select_all($order_by,$asc,$page,$count);
+
+		foreach ($return['data'] as $k=>$i) {
+			$id_societe = $i["comite.id_societe_fk"];			
+			if(ATF::societe()->select($id_societe , "code_client") && strpos(ATF::societe()->select($id_societe , "code_client"), "S") === false){
+				//Reseau				
+				$return['data'][$k]["reseau"] = true;
+			}else{
+				//Autre
+				$return['data'][$k]["reseau"] = false;
+			}
+		}
+
+		return $return;
 
 	}
 };

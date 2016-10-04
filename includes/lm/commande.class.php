@@ -275,26 +275,10 @@ class commande_lm extends commande {
 
 		//*****************************Transaction********************************
 
-		$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
-									   "id_user"=>$infos["id_user"],
-									   "origine"=>"societe_commande",
-									   "tache"=>"Relancer le contrat ",
-									   "id_affaire"=>$infos["id_affaire"],
-									   "type_tache"=>"creation_contrat",
-									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
-									   "no_redirect"=>"true"
-									  ),
-						"dest"=>$dest
-					  );		
-		$id_tache = ATF::tache()->insert($tache);
-
 		unset($infos["marge"],$infos["marge_absolue"]);
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 		
-		$dest = NULL;
-		if($infos["id_user"] == 18) $dest = 21;
-		elseif($infos["id_user"] == 93) $dest = 103;
-		else $dest = ATF::$usr->getID();
+		
 
 		
 
@@ -332,7 +316,7 @@ class commande_lm extends commande {
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Commande sans produits",877);
+				throw new errorATF("Commande sans produits",877);
 			}			
 
 		}else{
@@ -356,7 +340,7 @@ class commande_lm extends commande {
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
-				throw new error("Commande sans produits",877);
+				throw new errorATF("Commande sans produits",877);
 			}
 		}		
 		

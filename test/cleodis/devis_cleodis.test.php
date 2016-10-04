@@ -475,7 +475,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("8021",ATF::devis()->default_value("marge_absolue"),'valeur marge_absolue');
 		$this->assertEquals("99.96%",ATF::devis()->default_value("marge"),'valeur marge');
 		$this->assertEquals("pmoons@finorpa.fr",ATF::devis()->default_value("email"),'pmoons@finorpa.fr');
-		$this->assertEquals("jerome.loison@cleodis.fr",ATF::devis()->default_value("emailCopie"),'valeur emailCopie');
+		$this->assertEquals("jerome.loison@cleodis.com",ATF::devis()->default_value("emailCopie"),'valeur emailCopie');
 		$this->assertEquals("8024",ATF::devis()->default_value("prix"),'valeur prix');
 		$this->assertEquals("3.00",ATF::devis()->default_value("prix_achat"),'valeur prix_achat');
 		$this->assertEquals("",ATF::devis()->default_value("RIB"),'valeur RIB');
@@ -687,7 +687,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$res = $this->obj->devis_gagne_stats(true,"o2m",true,2014,1);
 
-		$this->assertEquals(17 ,$res["dataset"]["reel"]["01"]["value"] , "Count 2013 incorrect?");
+		$this->assertEquals(13 ,$res["dataset"]["reel"]["01"]["value"] , "Count 2013 incorrect?");
 		$this->assertEquals(10 ,$res["dataset"]["reel"]["12"]["value"] , "Count 2014 incorrect?");
 
 		ATF::stats()->liste_annees["devis"] = array("2014"=>1);
