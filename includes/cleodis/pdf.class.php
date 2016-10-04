@@ -218,6 +218,87 @@ class pdf_cleodis extends pdf {
 	}
 
 
+	public function devis_new($id,$s) {  
+  		$this->devis = ATF::devis()->select($id);
+  		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
+  		
+  		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+  		$this->lignes = ATF::devis_ligne()->sa();
+  		
+  		$this->user = ATF::user()->select($this->devis['id_user']);
+  		$this->societe = ATF::societe()->select($this->user['id_societe']);
+  		$this->client = ATF::societe()->select($this->devis['id_societe']);
+  		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+  		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
+  		$this->agence = ATF::agence()->select($this->user['id_agence']);
+  
+  		if($this->devis["type_devis"] === "optic_2000"){
+  			$this->devisoptic_2000($id);			
+  		}else{
+  			$this->pdf_devis = true;
+  			/* PAGE 1 */
+  			//$this->unsetHeader();
+  			$this->Addpage();
+  			$this->setHeader();			
+  			$this->SetLeftMargin(15);
+  			
+  			$this->sety(30);
+  			$this->setfont('arial','B',18);
+  			$this->multicell(0,7,"PAYEZ A L’USAGE VOS SOLUTIONS\nINFORMATIQUES ET DIGITALES",0,'C');
+  
+  			$this->image(__PDF_PATH__."cleodis/page1_devis.jpg",20,60,160);
+  			
+  			$this->setY(200);
+  
+  			$this->setfont('arial','',12);
+  
+  			$this->cell(36,5,"Livraison",1,0,'C');
+  			$this->cell(36,5,"Connexion",1,0,'C');
+  			$this->cell(36,5,"Maintenance",1,0,'C');
+  			$this->cell(36,5,"Evolution",1,0,'C');
+  			$this->cell(36,5,"Récupération",1,1,'C');
+  			$this->ln(8);
+  			$this->setfont('arial','B',18);
+  
+  			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+  
+  			$this->setfont('arial','',8);
+  			$this->ln(5);
+  			$y = $this->getY();
+  
+  
+  			$this->multicell(85,5,"Votre Interlocuteur CLEODIS ");
+  			$this->setfont('arial','IB',11);
+  			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
+  			$this->setfont('arial','',8);
+  			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));			
+  			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));			
+  			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
+  
+  			$this->setY($y);
+  			$this->setleftmargin(110);
+  			$this->setfont('arial','IB',11);
+  			$this->multicell(85,10,$this->client['societe']);
+  			$this->setfont('arial','',8);
+  			$this->multicell(85,5,$this->client['adresse']);
+  			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);	
+  			$this->setfont('arial','B',11);
+  			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
+  			$this->setfont('arial','',8);
+  			$this->setleftmargin(15);
+  
+  			if($this->devis['type_contrat'] =='vente'){
+  				$this->devisVente();
+  			}elseif($this->affaire['nature'] =='avenant'){
+  				$this->devisAvenant();
+  			}else{
+  				$this->devisClassique();
+  			}
+  		}
+  		return true;
+  
+  	}
+
 	
 	
 	/* Génère le PDF d'un devis de vente
@@ -453,7 +534,7 @@ class pdf_cleodis extends pdf {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @date 23-09-2016
 	*/
-	private function devisClassique() {
+	private function devisClassique_new() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -658,7 +739,7 @@ class pdf_cleodis extends pdf {
 
 		if($this->devis["commentaire_offre_partenaire"]){
 			$this->setfont('arial','',10);
-			$this->multicell(0,5,$this->devis["commentaire_offre_partenaire"],1);
+			$this->multicell(0,5,str_replace("&nbsp;", " ", strip_tags($this->devis["commentaire_offre_partenaire"],'')) ,1);
 			$this->ln(5);
 		}
 
@@ -709,7 +790,6 @@ class pdf_cleodis extends pdf {
 		/*	PAGE 6	*/
 		$this->AddPage();
 
-
 		if(ATF::$codename == "cleodis"){
 			$this->setTextColor("48","154","40");
 			$this->setfont('arial','B',14);
@@ -719,17 +799,161 @@ class pdf_cleodis extends pdf {
 				$this->multicell(0,6,"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'),0,'C');
 			}			
 			$this->multicell(0,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');	
-			$this->setTextColor("0","0","0");				
+			$this->setTextColor("0","0","0");
+			$this->ln(10);				
 		}
 
 
-		
-		
+		$options = array("frais_de_gestion"=> 0,
+						 "assurance"=> 0,						 
+						 "serenite"=> 0,
+						 "maintenance"=> 0,
+						 "hotline"=> 0,
+						 "supervision"=> 0,
+						 "support"=> 0
+					);
+		$option_presente = false;
 		
 
+		$style = array(
+			"col1"=>array("size"=>11,"decoration"=>"B","align"=>"L"),
+			"prix"=>array("size"=>11,"decoration"=>"","align"=>"R"),
+			"col_detail"=>array("size"=>8,"decoration"=>"","color"=>"000000","align"=>"L"),
+			"col1_blue"=>array("size"=>11,"decoration"=>"B","color"=>"0000FF","align"=>"L"),
+			"prix_blue"=>array("size"=>11,"decoration"=>"B","color"=>"0000FF","align"=>"R"),
+		);
 
+
+		$head = array("Proposition Locative LRP");
+		$width = array(100);	
+		
+		$data = $s = array();
+
+		foreach ($this->loyer as $key => $value) {
+			$texteHead = $value["duree"]." ".$value["frequence_loyer"];
+			if($value["avec_option"] == "oui"){	$texteHead .= "\n avec option(s)";
+			}else{	$texteHead .= "\n sans option";	}
+			$head[] = $texteHead;
+			$width[] = round(80/count($this->loyer),0);
+
+			foreach ($options as $kopt => $vopt) {
+				if($value[$kopt]) $options[$kopt] = 1;
+			}
+		}
+
+
+
+		$data[0][] = "Mise à disposition mensuelle HT";
+		$s[0][] = $style["col1"];
+		foreach ($this->loyer as $key => $value) {
+		  	$data[0][] = $value["loyer"]." €";
+		  	$s[0][] = $style["prix"];	
+		}
+
+
+		$ligne = 1;
+		foreach ($options as $kopt => $vopt) {
+			if($vopt){	
+
+				switch ($kopt) {
+					case 'frais_de_gestion':
+						$data[$ligne][] = "Gestion du contrat mensuelle HT";
+					break;
+					case 'assurance':
+						$data[$ligne][] = "Service de Remplacement en cas de sinistre";
+					break;
+					case 'serenite':
+						$data[$ligne][] = "Service Sérénité – en cas de panne bloquante supérieure à 48h : prêt de machine ";
+					break;
+					case 'maintenance':
+						$option_presente = true;
+						$data[$ligne][] = "Service Maintenance";
+					break;
+					case 'hotline':
+						$option_presente = true;
+						$data[$ligne][] = "Service Hotline";
+					break;
+					case 'supervision':
+						$option_presente = true;
+						$data[$ligne][] = "Service Supervision";
+					break;
+					case 'support':
+						$option_presente = true;
+						$data[$ligne][] = "Support";
+					break;
+				}
+
+				
+				$s[$ligne][] = $style["col1"];
+				
+				foreach ($this->loyer as $key => $value) {
+				  	$data[$ligne][] = $value[$kopt]." €";
+				  	$s[$ligne][] = $style["prix"];	
+				}
+				$ligne ++;
+
+
+				switch ($kopt) {
+					case 'frais_de_gestion':
+						$data[$ligne][] = "-	Suivi de la facturation, Gestion de parc,\n-	Evolution, récupération des équipements,\n-	Valorisation ou recyclage des matériels,\n-	Formatage niveau 1 des disques durs,\n-	Simulation d’évolution en cours de contrat";
+						
+						$s[$ligne][] = $style["col_detail"];
+						foreach ($this->loyer as $key => $value) {
+						  	$data[$ligne][] = "";
+						  	$s[$ligne][] = $style["prix_detail"];	
+						} 
+						$ligne ++;
+
+						$data[$ligne][] = "Redevance Mensuelle HT";
+						$s[$ligne][] = $style["col1_blue"];
+						foreach ($this->loyer as $key => $value) {
+						  	$data[$ligne][] = number_format(($value["loyer"]+$value["frais_de_gestion"]),2," ",",")." €";;
+						  	$s[$ligne][] = $style["prix_blue"];	
+						} 
+						$ligne ++;				
+					break;
+
+					case 'assurance':
+						$data[$ligne][] = "En cas de vol avec effraction, incendie, dégât des eaux :\nRemplacement des équipements à l’équivalent ou annulation du contrat et renouvellement global dans le cadre d’un nouveau contrat";
+						$s[$ligne][] = $style["col_detail"];
+						foreach ($this->loyer as $key => $value) {
+						  	$data[$ligne][] = "";
+						  	$s[$ligne][] = $style["prix_detail"];	
+						} 
+						$ligne ++;
+					break;
+				}
+
+			}
+
+			
+			
+		}
+
+		if($option_presente){
+			$data[$ligne][] = "Redevance Mensuelle option(s) comprise";
+			$s[$ligne][] = $style["col1_blue"];
+			foreach ($this->loyer as $key => $value) {
+			  	$total = $value["loyer"];
+			  	foreach ($options as $kopt => $vopt) {
+			  		$total += $value[$kopt];
+			  	}
+
+			  	$data[$ligne][] = number_format($total,2," ",",")." €";
+			  	$s[$ligne][] = $style["prix_blue"];	
+			} 
+			$ligne ++;
+		}
+
+
+		$this->tableau($head,$data,$width,7,$s,260);
+
+	
+		
+		
 		
 		$this->setfont('arial','',8);
+		$this->SetTextColor(0,0,0);
 		$this->cell(0,5,"",0,1,'C');
 		
 		$this->setfont('arial','B',10);
@@ -755,7 +979,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisClassique_old() {
+	private function devisClassique() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -8999,7 +9223,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(2,210,"",0,1,"L",1);
 
 
-		$this->image(__PDF_PATH__."cap/logo_cap.png",182,2,25,25);
+		$this->image(__PDF_PATH__."cap/logo_cap.jpg",182,2,25,25);
 
 		$this->setY(10);
 		$this->setleftmargin(10);
@@ -9031,7 +9255,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->Open();
 		$this->Addpage();	
 
-		$this->image(__PDF_PATH__."cap/groupe-cap.png",20,10,160,100);
+		$this->image(__PDF_PATH__."cap/groupe-cap.jpg",20,10,160,100);
 		$this->setleftmargin(10);
 		$this->setrightmargin(10);		
 		$this->setY(150);
@@ -9075,9 +9299,9 @@ class pdf_cap extends pdf_cleodis {
 
 		foreach ($liste as $key => $value) {
 			if($audit["type"] == $key){
-				$this->image(__PDF_PATH__.'cap/puce_check.png',38,$this->getY()+2,2);
+				$this->image(__PDF_PATH__.'cap/puce_check.jpg',38,$this->getY()+2,2);
 			}else{				
-				$this->image(__PDF_PATH__.'cap/puce.png',38,$this->getY()+2,2);
+				$this->image(__PDF_PATH__.'cap/puce.jpg',38,$this->getY()+2,2);
 			}
 			$this->cell(0,6,$value,0,1);
 		}
@@ -9158,21 +9382,21 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',12);
 		$this->cell(50,6,"Nature des impayés: ",0,1);
 		$this->setfont('arial','',10);
-		$this->image(__PDF_PATH__.'cap/puce.png',10,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',10,$this->getY()+2,2);
 		$this->cell(60,6,"   Factures (".$this->getPoints(10)."%)",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',68,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',68,$this->getY()+2,2);
 		$this->cell(60,6,"Autres (".$this->getPoints(10)."%)",0,1);
 
 		$this->cell(50,6,"Qui sont vos débiteurs? ",0,1);
-		$this->image(__PDF_PATH__.'cap/puce.png',10,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',10,$this->getY()+2,2);
 		$this->cell(40,6,"   Particuliers (".$this->getPoints(6)."%)",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',48,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',48,$this->getY()+2,2);
 		$this->cell(40,6,"Professionnels (".$this->getPoints(6)."%)",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',88,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',88,$this->getY()+2,2);
 		$this->cell(38,6,"Associations (".$this->getPoints(6)."%)",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',125,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',125,$this->getY()+2,2);
 		$this->cell(42,6,"Administrations (".$this->getPoints(6)."%)",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',168,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',168,$this->getY()+2,2);
 		$this->cell(40,6,"Autres (".$this->getPoints(6)."%)",0,0);
 
 
@@ -9180,39 +9404,39 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(0,6,"Dans les contrats ou CGV est-il prévu des indemnités? ",0,1);
 		$this->setfont('arial','',10);
 		$this->setleftmargin(40);
-		$this->image(__PDF_PATH__.'cap/puce.png',40,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',40,$this->getY()+2,2);
 		$this->cell(0,6,"   Clause pénale: oui / non (".$this->getPoints(10)."%)",0,1);
 		$this->cell(0,6,"Montant ou %: ".$this->getPoints(100),0,1);
 		
-		$this->image(__PDF_PATH__.'cap/puce.png',40,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',40,$this->getY()+2,2);
 		$this->cell(0,6,"   Intérêt: oui / non (".$this->getPoints(10)."%)",0,1);
 		$this->cell(0,6,"Mode de calcul: ".$this->getPoints(100),0,1);
-		$this->image(__PDF_PATH__.'cap/puce.png',40,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',40,$this->getY()+2,2);
 		$this->cell(0,6,"   Clause pénale: oui / non (".$this->getPoints(10)."%)",0,1);
 		$this->setleftmargin(10);
 
 		$this->setfont('arial','B',12);
 		$this->cell(50,6,"Méthode de commercialisation: ",0,1);
 		$this->setfont('arial','',10);
-		$this->image(__PDF_PATH__.'cap/puce.png',10,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',10,$this->getY()+2,2);
 		$this->cell(60,6,"   Directe (".$this->getPoints(10)."%)",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',68,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',68,$this->getY()+2,2);
 		$this->cell(60,6,"Autres (préciser): ".$this->getPoints(100),0,1);
 
 		$this->cell(0,6,"Support(s) utilisé(s) (bon de commande, cgv, ...): ",0,1);
-		$this->image(__PDF_PATH__.'cap/puce.png',10,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',10,$this->getY()+2,2);
 		$this->cell(17,6,"   CGV",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',25,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',25,$this->getY()+2,2);
 		$this->cell(17,6,"CGL",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',42,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',42,$this->getY()+2,2);
 		$this->cell(17,6,"BL",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',59,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',59,$this->getY()+2,2);
 		$this->cell(40,6,"Contrat spécifique",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',99,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',99,$this->getY()+2,2);
 		$this->cell(17,6,"BDC",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',116,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',116,$this->getY()+2,2);
 		$this->cell(17,6,"Devis",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',133,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',133,$this->getY()+2,2);
 		$this->cell(50,6,"Autre (".$this->getPoints(30).")",0,1);
 		$this->cell(0,6,"Joindre un exemplaire de chaque document coché et un modèle de facture ",0,1);
 
@@ -9229,12 +9453,12 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(0,6,"Processus de relance internes: ",0,1);
 		$this->setfont('arial','',10);
 		$this->setleftmargin(30);
-		$this->image(__PDF_PATH__.'cap/puce.png',30,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',30,$this->getY()+2,2);
 		$this->cell(50,6,"   Courriers (".$this->getPoints(10).")",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',80,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',80,$this->getY()+2,2);
 		$this->cell(50,6,"   Appels (".$this->getPoints(10).")",0,0);
 
-		$this->image(__PDF_PATH__.'cap/puce.png',130,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',130,$this->getY()+2,2);
 		$this->cell(50,6,"   Autre (".$this->getPoints(10).")",0,1);		
 		$this->setleftmargin(10);
 		$this->cell(0,6,"Fréquence des relances : ".$this->getPoints(35)."        Temps estimé pour la gestion des impayés: ".$this->getPoints(35),0,1);
@@ -9254,9 +9478,9 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',12);
 		$this->cell(50,6,"Processus externe: ",0,0);
 		$this->setfont('arial','',10);
-		$this->image(__PDF_PATH__.'cap/puce.png',58,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',58,$this->getY()+2,2);
 		$this->cell(20,6,"Oui",0,0);
-		$this->image(__PDF_PATH__.'cap/puce.png',78,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',78,$this->getY()+2,2);
 		$this->cell(20,6,"Non",0,1);
 
 		$this->cell(0,6,"1- Si oui avec qui travaillez-vous?         Avocat: ".$this->getPoints(20)."         Huissier: ".$this->getPoints(20)."         SR: ".$this->getPoints(28),0,1);
@@ -9265,20 +9489,20 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(0,6,"4- Sous quel délai transmettez-vous vos impayés: ".$this->getPoints(105),0,1);
 		$this->cell(0,6,"5- Quel support sera utilisé pour la transmission des impayés: ",0,1);
 		$this->setleftmargin(30);
-		$this->image(__PDF_PATH__.'cap/puce.png',28,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',28,$this->getY()+2,2);
 		$this->cell(0,6,"Fichier excel ou CSV fourni par le client",0,1);
-		$this->image(__PDF_PATH__.'cap/puce.png',28,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',28,$this->getY()+2,2);
 		$this->cell(0,6,"Copie ou double facture",0,1);
-		$this->image(__PDF_PATH__.'cap/puce.png',28,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',28,$this->getY()+2,2);
 		$this->cell(0,6,"Autre, préciser : ".$this->getPoints(70),0,1);
 		$this->setleftmargin(10);
 
 		$this->cell(0,6,"6- Quelles difficultés avez-vous rencontré avec votre prestataire actuel? ".$this->getPoints(70),0,1);
 		$this->cell(0,6,"7- En cas d'échec de la procédure amiable, envisagez-vous des poursuites judiciaires sur vos dossiers? ",0,1);
 		$this->setleftmargin(30);
-		$this->image(__PDF_PATH__.'cap/puce.png',28,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',28,$this->getY()+2,2);
 		$this->cell(0,6,"oui, si le montant est supérieur à : ".$this->getPoints(70),0,1);
-		$this->image(__PDF_PATH__.'cap/puce.png',28,$this->getY()+2,2);
+		$this->image(__PDF_PATH__.'cap/puce.jpg',28,$this->getY()+2,2);
 		$this->cell(0,6,"Non",0,1);
 		$this->setleftmargin(10);
 		//Page 4
@@ -9750,7 +9974,7 @@ class pdf_cap extends pdf_cleodis {
 
 	public function getFooterMandat(){
 		$this->image(__PDF_PATH__."cap/abjuris.jpg",10,250,30);
-		$this->image(__PDF_PATH__."cap/groupe-cap.png",40,257,26);
+		$this->image(__PDF_PATH__."cap/groupe-cap.jpg",40,257,26);
 		$this->image(__PDF_PATH__."cap/toulemonde.jpg",70,252,30);
 
 		$this->setY(260);

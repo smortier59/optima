@@ -373,9 +373,12 @@ class devis_lm extends devis {
 
 		//Lignes
 		if($infos_ligne){
+			$cp_adresse_livraison = ATF::affaire()->select($infos["id_affaire"], "cp_adresse_livraison");
+
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
 			foreach($infos_ligne as $key=>$item){
 				$item["id_devis"]=$last_id;
+				$item["visible"] = ATF::produit()->select($item["id_produit"] , "afficher");
 
 				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
@@ -394,7 +397,7 @@ class devis_lm extends devis {
 						}else{
 							$dep = explode(",", $vf["departement"]);							
 							foreach ($dep as $k => $v) {								
-								if(substr($societe["cp"],0,2) == $v){
+								if(substr($cp_adresse_livraison,0,2) == $v){
 									$item["id_fournisseur"] = $vf["id_fournisseur"];
 									unset($item["prix_achat"]);
 									if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
