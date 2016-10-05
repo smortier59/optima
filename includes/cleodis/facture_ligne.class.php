@@ -37,5 +37,4 @@ class facture_ligne_cleodis extends facture_ligne {
 
 class facture_ligne_cleodisbe extends facture_ligne_cleodis { };
 class facture_ligne_cap extends facture_ligne_cleodis { };
-class facture_ligne_exactitude extends facture_ligne_cleodis { };
 ?>

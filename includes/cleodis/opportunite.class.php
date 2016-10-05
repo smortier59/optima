@@ -40,5 +40,4 @@ class opportunite extends classes_optima {
 
 class opportunite_cleodisbe extends opportunite { };
 class opportunite_cap extends opportunite { };
-class opportunite_exactitude extends opportunite { };
 ?>

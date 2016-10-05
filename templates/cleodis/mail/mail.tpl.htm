@@ -44,11 +44,8 @@
                <tr>
                     <!--LOGO DE LA SOCIETE-->
                     <td align="left">
-                        <br />
-                        {if ATF::$codename == "exactitude"}
-                            {$societe=ATF::societe()->select(1)}
-                            <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/exactitude/exactitude.png")}"/>
-                        {elseif ATF::$codename == "cap"}
+                        <br />                        
+                        {if ATF::$codename == "cap"}
                             {$societe=ATF::societe()->select(1)}
                             <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}"/>
                         {else}

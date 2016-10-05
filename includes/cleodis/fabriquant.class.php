@@ -31,5 +31,4 @@ class fabriquant extends classes_optima {
 
 class fabriquant_cleodisbe extends fabriquant { };
 class fabriquant_cap extends fabriquant { };
-class fabriquant_exactitude extends fabriquant { };
 ?>

@@ -15,7 +15,7 @@
 	} 
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "exactitude"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe"}
 { 
 	text: '{ATF::$usr->trans(export_comptable,$current_class->name())}'
 	, handler: function(b,e){
@@ -23,7 +23,7 @@
 	}
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "exactitude"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe"}
 { 
 	text: '{ATF::$usr->trans(export_comptable_facture_rejet,$current_class->name())}'
 	, handler: function(b,e){

@@ -40,5 +40,4 @@ class produit_lecteur extends classes_optima {
 
 class produit_lecteur_cleodisbe extends produit_lecteur { };
 class produit_lecteur_cap extends produit_lecteur { };
-class produit_lecteur_exactitude extends produit_lecteur { };
 ?>

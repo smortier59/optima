@@ -63,5 +63,4 @@ class produit_OS extends classes_optima {
 
 class produit_OS_cleodisbe extends produit_OS { };
 class produit_OS_cap extends produit_OS { };
-class produit_OS_exactitude extends produit_OS { };
 ?>

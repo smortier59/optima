@@ -377,18 +377,6 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
-	/* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
-	public function test_construct(){
-		ATF::db()->select_db("extranet_v3_exactitude");
-		$c = new produit_exactitude();	
-		
-		$this->assertTrue($c instanceOf produit_exactitude, "L'objet produit_exactitude n'est pas de bon type");
-		
-		ATF::db()->select_db("extranet_v3_cleodis");	
-	}
-
-
-
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	private function beginTransaction($codename){		
 		ATF::db()->select_db("extranet_v3_".$codename);
@@ -469,108 +457,6 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 					 "raw_4"=> ""	);
 
 		$this->assertEquals($res, $prod[0], "Error autocomplete");
-	}
-
-	public function test_autocompleteexactitude(){
-		$this->beginTransaction("exactitude");
-
-		$infos = array("ref"=>"Test produit exactitude",
-					   "produit"=>"Produit exactitude",
-					   "prix_achat"=>500,
-					   "prix"=>800
-					  );
-
-		$c = new produit_exactitude();	
-		$id= $c->insert($infos);
-
-		$prod = $c->autocomplete(array(
-			"limit"=>10
-			,"start"=>0
-			,"condition_field"=>"produit.produit"
-			,"condition_value"=>"Produit exactitude"
-		));		
-
-		$this->RollBackTransaction("cleodis");
-
-		$res = array(0=> "Produit exactitude",
-					 1=> "Test produit exactitude",
-					 2=> "500.00",
-					 3=> "800.00",
-					 4=> $id,
-					 5=>"",
-					 "raw_0"=> "Produit exactitude",
-					 "raw_1"=> "Test produit exactitude",
-					 "raw_2"=> "500.00",
-					 "raw_3"=> "800.00",
-					 "raw_4"=> $id,
-					 "raw_5"=>""	);
-
-		$this->assertEquals($res, $prod[0], "Error autocomplete");
-	}
-
-
-
-
-
-
-	/** @test Test du constructeur produit.  */
-	public function test_InsertExactitude(){
-		$this->beginTransaction("exactitude");
-
-		$infos = array("ref"=>"Test produit exactitude",
-					   "produit"=>"Produit exactitude",
-					   "prix_achat"=>500,
-					   "prix"=>800
-					  );
-
-		$c = new produit_exactitude();	
-		$id = $c->insert($infos);
-
-		$prod = $c->select($id);
-
-		$this->RollBackTransaction("cleodis");
-
-		$this->assertEquals("produit-exactitude", $prod["url"], "Insert Error");
-	}
-
-
-
-	public function test_speed_insert_exactitude(){
-		$this->beginTransaction("exactitude");
-
-		$c = new produit_exactitude();	
-
-		$produit=array("ref"=>"refTu",
-					   "produit"=>"produitTu",
-					   "prix_achat"=>"100.00",
-					   "prix"=>800						
-					  );
-						
-		$speed_insert=$c->speed_insert($produit);
-
-		$this->RollBackTransaction("cleodis");
-
-		$this->assertEquals(
-							array(
-								"nom"=>"produitTu"
-								,"id"=>$speed_insert["id"]
-								,"data"=>array(
-											"id_produit"=>$speed_insert["id"],
-											"ref"=>"refTu",
-											"produit"=>"produitTu",
-											"prix_achat"=>"100.00",
-											"prix"=>"800.00",											
-											"commentaire"=>NULL,
-											"type_offre"=>NULL,
-											"description"=>NULL,																					
-											"visible_sur_site"=>'non',											
-											"avis_expert"=>NULL,											
-											"url"=>"produittu"
-										)
-							),
-							$speed_insert,
-							'speed_insert ne renvoi pas les bonnes infos'
-							);
 	}
 
 	public function test_speed_insert_cap(){

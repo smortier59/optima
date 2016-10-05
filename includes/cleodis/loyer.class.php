@@ -92,5 +92,4 @@ class loyer extends classes_optima {
 
 class loyer_cleodisbe extends loyer { };
 class loyer_cap extends loyer { };
-class loyer_exactitude extends loyer { };
 ?>

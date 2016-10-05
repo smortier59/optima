@@ -134,17 +134,4 @@ class formation_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $r["data"][0]["factureAllow"], "Select all 2  error");
 	}
 
-
-
-	/*
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*/
-	public function test_default_value_exactitude(){
-		$c = new formation_commande_fournisseur_exactitude();
-
-		$this->assertEquals(17, $c->default_value("id_owner"), "default_value ne renvoie pas la bonne valeur !");
-		$this->assertEquals("",$c->default_value("formateur"), "default_value 2 ne renvoie pas la bonne valeur !");
-	}
-
-
 }

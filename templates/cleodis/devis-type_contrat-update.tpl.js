@@ -44,20 +44,7 @@
 		,name: '{$alternateName|default:$name}'
 		,id: '{$alternateId|default:$id}'
 		,listeners :{
-			'select':function(f,n,o){
-				{if ATF::$codename == "exactitude"}
-					if(n.data.myId == "recrutement"){
-						Ext.ComponentMgr.get('panel_poste').show();
-						Ext.ComponentMgr.get('panel_methodologie').show();
-						Ext.ComponentMgr.get('panel_paiement').show();
-					}
-
-					if(n.data.myId == "audit"){
-						Ext.ComponentMgr.get('panel_poste').hide();
-						Ext.ComponentMgr.get('panel_methodologie').hide();
-						Ext.ComponentMgr.get('panel_paiement').hide();
-					}
-				{else}
+			'select':function(f,n,o){				
 					if(n.data.myId=='vente'){
 						Ext.getCmp('panel_loyer_lignes').hide();
 						Ext.getCmp('panel_loyer_uniques').hide();
@@ -72,7 +59,7 @@
 						Ext.getCmp('panel_avenant_lignes').show();
 						Ext.getCmp('panel_AR').show();
 					}
-				{/if}
+				
 			},
 		}
 		{if $emptyText},emptyText:'{$emptyText|escape:javascript}'{/if}

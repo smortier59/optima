@@ -63,5 +63,4 @@ class produit_tel_type extends classes_optima {
 
 class produit_tel_type_cleodisbe extends produit_tel_type { };
 class produit_tel_type_cap extends produit_tel_type { };
-class produit_tel_type_exactitude extends produit_tel_type { };
 ?>

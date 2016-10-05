@@ -73,5 +73,4 @@ class loyer_prolongation extends classes_optima {
 
 class loyer_prolongation_cleodisbe extends loyer_prolongation { };
 class loyer_prolongation_cap extends loyer_prolongation { };
-class loyer_prolongation_exactitude extends loyer_prolongation { };
 ?>
