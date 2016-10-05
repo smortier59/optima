@@ -411,7 +411,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	public function listingLS(){
 		$this->setfont('arial','B',8);		
 		$this->setFillColor(200,200,200);	
-		$this->multicell(0,5,"1.3. Le(s) Produits loué(s)",1,"L",1);
+		$this->multicell(0,5,"1.3. Le(s) Produit(s) loué(s)",1,"L",1);
 		$this->listingProduitsService("produit");
 
 		$this->ln(5);
