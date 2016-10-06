@@ -493,7 +493,6 @@ class parc_midas extends parc_cleodis {
 
 class parc_cleodisbe extends parc_cleodis { };
 class parc_cap extends parc_cleodis { };
-class parc_exactitude extends parc_cleodis { };
 
 
 ?>

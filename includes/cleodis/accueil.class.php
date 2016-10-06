@@ -63,5 +63,3 @@ class accueil_cap extends accueil_cleodis {
 		"societe"=>array("opened"=>true)
 	);
 };
-class accueil_exactitude extends accueil_cleodis { };
-?>

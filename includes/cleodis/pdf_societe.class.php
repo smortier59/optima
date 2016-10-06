@@ -13,8 +13,8 @@ class pdf_societe extends classes_optima {
 		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array(
 			 'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"scanner","width"=>200)
+			,'nom_document'
 			,'pdf_societe.id_societe'
-
 		);
 
 		$this->colonnes['primary'] = array(

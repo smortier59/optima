@@ -92,15 +92,11 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 		$r = $this->obj->getInfosFromCREDITSAFE($infos);	
 		
 		$this->assertEquals("04/2004",$r['date_creation'],"La date de création de société n'est pas bonne. Elle a changée sur Credit Safe ?");
-		$this->assertEquals("31/12/2013",$r['date_compte'],"La date de création n'est pas bonne. Elle a changée sur Credit Safe ?");		
+		$this->assertEquals("31/12/2015",$r['date_compte'],"La date de création n'est pas bonne. Elle a changée sur Credit Safe ?");		
 		$this->assertEquals("55",$r['note'],"Le note de société n'est pas bon. Il a changé sur Credit Safe ?");
 		$this->assertEquals("50000",$r['limite'],"Le limite de société n'est pas bon. Il a changé sur Credit Safe ?");
 		$this->assertEquals("Location et location-bail d'autres machines, équipements et biens matériels n.c.a. ",$r['activite'],"Le activite de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("2448354",$r['ca'],"Le ca de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("125707",$r['resultat_exploitation'],"Le resultat_exploitation de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("625240",$r['capital_social'],"Le capital_social de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("782743",$r['capitaux_propres'],"Le capitaux_propres de société n'est pas bon. Il a changé sur Credit Safe ?");
-		$this->assertEquals("1347479",$r['dettes_financieres'],"Le dettes_financieres de société n'est pas bon. Il a changé sur Credit Safe ?");
+		$this->assertEquals("4239770",$r['ca'],"Le ca de société n'est pas bon. Il a changé sur Credit Safe ?");
 	}
 
 	//@author Morgan FLEURQUIN <mfleurquin@absystech.fr>

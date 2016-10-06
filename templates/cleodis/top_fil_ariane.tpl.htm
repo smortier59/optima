@@ -1,4 +1,4 @@
-{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap" || ATF::$codename=="exactitude"}
+{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap"}
 	<div id="switchCodenameButton">
 		<script type="text/javascript">
 				function switchCodename(el) {
@@ -41,14 +41,7 @@
 							,handler: switchCodename
 						},
 						{/if}
-						{if ATF::$codename!=="exactitude"}
-						{
-							text:"Exactitude"
-							,icon: "{ATF::$staticserver}images/logos/exactitude.png"
-							,value:"exactitude"
-							,handler: switchCodename
-						},
-						{/if}					
+										
 						]
 					}
 				});

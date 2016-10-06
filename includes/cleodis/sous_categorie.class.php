@@ -50,5 +50,4 @@ class sous_categorie extends classes_optima {
 
 class sous_categorie_cleodisbe extends sous_categorie { };
 class sous_categorie_cap extends sous_categorie { };
-class sous_categorie_exactitude extends sous_categorie { };
 ?>

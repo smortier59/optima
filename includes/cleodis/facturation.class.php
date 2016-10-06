@@ -1446,5 +1446,4 @@ class facturation extends classes_optima {
 
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
-class facturation_exactitude extends facturation { };
 ?>
