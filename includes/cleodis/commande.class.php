@@ -2189,5 +2189,4 @@ class commande_midas extends commande_cleodis {
 };
 
 class commande_cap extends commande_cleodis { };
-class commande_exactitude extends commande_cleodis { };
 ?>

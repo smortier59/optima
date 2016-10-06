@@ -33,11 +33,6 @@ class user_cleodis_test  extends ATF_PHPUnit_Framework_TestCase {
         $c = new user_cap();
         $this->assertEquals(array("Export Optima","RDV","Appels") , $c->getFeuilles(), "Retour incorrect");
     }
-
-    public function test_getFeuillesExactitude(){
-        $c = new user_exactitude();
-        $this->assertEquals(array("Export Optima","RDV","Appels") , $c->getFeuilles(), "Retour incorrect");
-    }
 };
 
 class objet_excel_user { 

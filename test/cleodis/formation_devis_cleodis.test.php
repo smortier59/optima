@@ -37,10 +37,7 @@ class formation_devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("", $this->obj->default_value("thematique"), "default_value 2 ne renvoie pas la bonne valeur !");
 
 		$this->assertEquals(date("Y-m-d", strtotime("+15 day")) , $this->obj->default_value("date_validite"), "default_value 3 ne renvoie pas la bonne valeur !");
-	
-		$fde = new formation_devis_exactitude();
-		$this->assertEquals("", $fde->default_value("thematique"), "default_value exactitude 2 ne renvoie pas la bonne valeur !");
-	}
+		}
 
 	/*
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>

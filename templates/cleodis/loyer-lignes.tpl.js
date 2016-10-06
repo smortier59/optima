@@ -14,14 +14,22 @@ ATF.buildGridEditor({
 		var prix = 0;
 		var total = 0;
 
-		for (var i = 0; i < this.store.getRange().length; i++) {
+		for (var i = 0; i < this.store.getRange().length; i++) {			
 			prix=(
 				records[i].data.{$current_class->table}__dot__loyer*1+
 				records[i].data.{$current_class->table}__dot__assurance*1+
-				records[i].data.{$current_class->table}__dot__frais_de_gestion*1
+				records[i].data.{$current_class->table}__dot__frais_de_gestion*1+
+				records[i].data.{$current_class->table}__dot__serenite*1+
+				records[i].data.{$current_class->table}__dot__maintenance*1+
+				records[i].data.{$current_class->table}__dot__hotline*1+
+				records[i].data.{$current_class->table}__dot__supervision*1+
+				records[i].data.{$current_class->table}__dot__support*1
 			)*records[i].data.{$current_class->table}__dot__duree; 
 			records[i].set('{$current_class->table}__dot__loyer_total',prix);
-			total+=prix;
+			if(records[i].data.{$current_class->table}__dot__avec_option == "non"){
+				total+=prix;
+			}
+			
 		}
 		if(Ext.ComponentMgr.get('{$table}[prix]')){
 			Ext.ComponentMgr.get('{$table}[prix]').setValue(ATF.formatNumeric(total));
@@ -118,6 +126,7 @@ ATF.buildGridEditor({
 				grid.startEditing(idx, 0);
 				var records = Ext.ComponentMgr.get('{$id}').store.getRange();
 				records[idx].set('{$current_class->table}__dot__frequence_loyer','mois');
+				records[idx].set('{$current_class->table}__dot__avec_option','non');
 			}
 		}, '-', {
 			text: '{ATF::$usr->trans(delete)|escape:javascript}',
@@ -196,6 +205,63 @@ ATF.buildGridEditor({
 				dataIndex: '{$current_class->table}__dot__frequence_loyer'
 				{if !$no_update}
 					,editor: {include file="generic-gridpanel-combo.tpl.js" key=frequence_loyer function=null}
+				{/if}
+			},{
+				header: 'serenite',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__serenite',
+				renderer: 'money'
+				{if !$no_update}
+					,editor: new Ext.form.TextField({
+						value:0
+					})
+				{/if}
+			},{
+				header: 'maintenance',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__maintenance',
+				renderer: 'money'
+				{if !$no_update}
+					,editor: new Ext.form.TextField({
+						value:0
+					})
+				{/if}
+			},{
+				header: 'hotline',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__hotline',
+				renderer: 'money'
+				{if !$no_update}
+					,editor: new Ext.form.TextField({
+						value:0
+					})
+				{/if}
+			},{
+				header: 'supervision',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__supervision',
+				renderer: 'money'
+				{if !$no_update}
+					,editor: new Ext.form.TextField({
+						value:0
+					})
+				{/if}
+			},{
+				header: 'support',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__support',
+				renderer: 'money'
+				{if !$no_update}
+					,editor: new Ext.form.TextField({
+						value:0
+					})
+				{/if}
+			},{
+				header: 'avec_option',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__avec_option'
+				{if !$no_update}
+					,editor: {include file="generic-gridpanel-combo.tpl.js" key=avec_option function=null}
 				{/if}
 			},{
 				header: 'Loyer Total',

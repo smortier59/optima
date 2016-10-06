@@ -63,5 +63,4 @@ class produit_env extends classes_optima {
 
 class produit_env_cleodisbe extends produit_env { };
 class produit_env_cap extends produit_env { };
-class produit_env_exactitude extends produit_env { };
 ?>

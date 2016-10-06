@@ -3,12 +3,35 @@ class accueil_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	/* @author Yann GAUTHERON <ygautheron@absystech.fr> */
 	public function test_widgets(){
 
-		ATF::$usr->set("id_user",94);
+		ATF::$usr->set("id_user",16);
 
 		$this->assertEquals(
-			'a:4:{i:0;a:3:{s:6:"module";s:5:"devis";s:4:"type";s:3:"o2m";s:9:"id_agence";s:1:"1";}i:1;a:3:{s:6:"module";s:8:"commande";s:4:"type";s:3:"o2m";s:9:"id_agence";s:1:"1";}i:2;a:3:{s:6:"module";s:8:"commande";s:4:"type";s:5:"autre";s:9:"id_agence";s:1:"1";}i:3;a:3:{s:6:"module";s:5:"devis";s:4:"type";s:5:"autre";s:9:"id_agence";s:1:"1";}}'
+			'a:0:{}'
 			,serialize(ATF::accueil()->getWidgets())
 			,"Les widgets ont change"
+		);
+
+
+
+	}
+
+	/* @author Yann GAUTHERON <ygautheron@absystech.fr> */
+	public function test_get_agence(){
+
+		ATF::$usr->set("id_user",16);
+
+		$this->assertEquals(
+			array(1 , 3)
+			,ATF::accueil()->getAgence()
+			,"Erreur get_agence"
+		);
+
+		ATF::$usr->set("id_user",21);
+
+		$this->assertEquals(
+			array(1)
+			,ATF::accueil()->getAgence()
+			,"Erreur get_agence"
 		);
 	}
 

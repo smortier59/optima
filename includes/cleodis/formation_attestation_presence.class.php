@@ -58,5 +58,4 @@ class formation_attestation_presence_cleodis extends formation_attestation_prese
 };
 class formation_attestation_presence_cleodisbe extends formation_attestation_presence_cleodis { };
 class formation_attestation_presence_cap extends formation_attestation_presence_cleodis { };
-class formation_attestation_presence_exactitude extends formation_attestation_presence_cleodis { };
 
