@@ -54,7 +54,6 @@ class comite extends classes_optima {
 		$this->panels['notes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['statut'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['creditSafeInfos'] = array("visible"=>true, 'nbCols'=>4);
-		$this->no_insert = true;
 		$this->selectAllExtjs=true; 
 
 		$this->addPrivilege("getInfosFromCREDITSAFE");
