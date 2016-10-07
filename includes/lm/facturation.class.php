@@ -305,7 +305,7 @@ class facturation extends classes_optima {
 								$this->i($echeance);
 
 								// Excheancier de facturation fournisseur
-								ATF::facturation_fournisseur()->createEcheance($affaire, $echeance);
+								//ATF::facturation_fournisseur()->createEcheance($affaire, $echeance);
 
 								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
 
