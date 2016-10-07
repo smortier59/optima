@@ -15,6 +15,10 @@ ATF.buildGridEditor({
 		var total = 0;
 
 		for (var i = 0; i < this.store.getRange().length; i++) {			
+			
+			console.log(records[i].data);
+
+
 			prix=(
 				records[i].data.{$current_class->table}__dot__loyer*1+
 				records[i].data.{$current_class->table}__dot__assurance*1+
@@ -26,9 +30,15 @@ ATF.buildGridEditor({
 				records[i].data.{$current_class->table}__dot__support*1
 			)*records[i].data.{$current_class->table}__dot__duree; 
 			records[i].set('{$current_class->table}__dot__loyer_total',prix);
-			if(records[i].data.{$current_class->table}__dot__avec_option == "non"){
+			
+			{if $current_class->table == "loyer_prolongation"}
 				total+=prix;
-			}
+			{else}				
+				if(records[i].data.{$current_class->table}__dot__avec_option == "non"){
+					total+=prix;
+				}
+			{/if}			
+			
 			
 		}
 		if(Ext.ComponentMgr.get('{$table}[prix]')){
@@ -126,7 +136,10 @@ ATF.buildGridEditor({
 				grid.startEditing(idx, 0);
 				var records = Ext.ComponentMgr.get('{$id}').store.getRange();
 				records[idx].set('{$current_class->table}__dot__frequence_loyer','mois');
-				records[idx].set('{$current_class->table}__dot__avec_option','non');
+				{if $current_class->table != "loyer_prolongation"}
+					records[idx].set('{$current_class->table}__dot__avec_option','non');				
+				{/if}
+				
 			}
 		}, '-', {
 			text: '{ATF::$usr->trans(delete)|escape:javascript}',
@@ -256,14 +269,18 @@ ATF.buildGridEditor({
 						value:0
 					})
 				{/if}
-			},{
+			},
+			{if $current_class->table == "loyer"}
+			{
 				header: 'avec_option',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__avec_option'
 				{if !$no_update}
 					,editor: {include file="generic-gridpanel-combo.tpl.js" key=avec_option function=null}
 				{/if}
-			},{
+			},
+			{/if}
+			{
 				header: 'Loyer Total',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__loyer_total',
