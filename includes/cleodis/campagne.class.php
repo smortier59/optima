@@ -17,5 +17,4 @@ class campagne extends classes_optima {
 };
 
 class campagne_cleodisbe extends campagne {};
-class campagne_exactitude extends campagne {};
 class campagne_cap extends campagne {};

@@ -31,4 +31,3 @@ class formation_devis_ligne extends classes_optima {
 
 class formation_devis_ligne_cleodisbe extends formation_devis_ligne { };
 class formation_devis_ligne_cap extends formation_devis_ligne { };
-class formation_devis_ligne_exactitude extends formation_devis_ligne { };

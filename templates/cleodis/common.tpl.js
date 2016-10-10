@@ -64,7 +64,7 @@ ATF.renderer.scanner = function(table , field){
 			var id = null;
 		}
 		if(id){			
-			if(table == "pdf_affaire"){
+			if(table == "pdf_affaire" || table == "pdf_societe"){
 					 /*"'+table+'-select-'+field+'-'+id+'.dl"*/
 					 if(record.json.url != null){
 					 	return '<a href="'+record.json.urlBig+'_0-2480-3500.png" target="_blank" >'+

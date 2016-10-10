@@ -55,6 +55,5 @@ class pack_produit_ligne extends classes_optima {
 
 class pack_produit_ligne_cleodisbe extends pack_produit_ligne { };
 class pack_produit_ligne_cap extends pack_produit_ligne { };
-class pack_produit_ligne_exactitude extends pack_produit_ligne { };
 
 ?>

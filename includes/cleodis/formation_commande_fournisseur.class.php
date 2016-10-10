@@ -103,11 +103,3 @@ class formation_commande_fournisseur extends classes_optima {
 
 class formation_commande_fournisseur_cleodisbe extends formation_commande_fournisseur { };
 class formation_commande_fournisseur_cap extends formation_commande_fournisseur { };
-class formation_commande_fournisseur_exactitude extends formation_commande_fournisseur { 
-public function default_value($field){		
-		switch ($field) {
-			case "id_owner": return 17;			
-		}
-		return parent::default_value($field);
-	}
-};

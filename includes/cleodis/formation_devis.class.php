@@ -553,5 +553,4 @@ class formation_devis_cleodis extends formation_devis {
 
 class formation_devis_cleodisbe extends formation_devis_cleodis { };
 class formation_devis_cap extends formation_devis_cleodis { };
-class formation_devis_exactitude extends formation_devis_cleodis { };
 ?>

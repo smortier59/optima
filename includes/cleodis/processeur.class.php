@@ -31,5 +31,4 @@ class processeur extends classes_optima {
 
 class processeur_cleodisbe extends processeur { };
 class processeur_cap extends processeur { };
-class processeur_exactitude extends processeur { };
 ?>

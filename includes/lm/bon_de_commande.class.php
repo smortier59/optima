@@ -224,32 +224,6 @@ class bon_de_commande_lm extends bon_de_commande {
 
 		if ($infos['value'] == "undefined") $infos["value"] = "";		
 		switch ($infos['key']) {
-			// Sécurité, n'exécuter une action que pour ces champs	
-			case "date_livraison_prevue":	
-			case "date_livraison_reelle":												
-				ATF::db($this->db)->begin_transaction();
-				try {					
-										
-					$cmd = $this->select($infos['id_bon_de_commande']);
-					if($infos['value']){		
-							$nbj_installation = ATF::societe()->select($cmd["id_fournisseur"], "fournisseur_nbj_installation");
-
-							$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
-								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)
-								   ,"date_installation_prevue" => date("Y-m-d", strtotime("+".$nbj_installation." days", strtotime($infos["value"])))
-								   );							
-							$this->u($d);						
-					}
-				} catch(errorATF $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
-				//On commit le tout
-				ATF::db($this->db)->commit_transaction();
-
-				ATF::$msg->addNotice(loc::mt(
-					ATF::$usr->trans("dates_modifiee",$this->table)
-					,array("date"=>ATF::$usr->trans($infos['key'],$this->table))
-				));
-			break;
-
 			default:
 				$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
 					   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)					   
@@ -555,15 +529,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		ATF::db($this->db)->begin_transaction();
 
 //*****************************Transaction********************************
-		if(!$infos["date_livraison_prevue"] && ATF::$codename == "cleodis"){
-			$nbj_livraison = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_nbj_livraison");
-			$infos["date_livraison_estime"] = date("Y-m-d", strtotime("+".$nbj_livraison." days", strtotime($infos["date"])));
-
-
-			$fournisseur_delai_rav = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_delai_rav");
-			$infos["date_limite_rav"] = date("Y-m-d", strtotime($fournisseur_delai_rav." days", strtotime(ATF::affaire()->select($infos["id_affaire"], "date_ouverture"))));
-		}
-		
+				
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);	
 
 		$prix_total = 0;
