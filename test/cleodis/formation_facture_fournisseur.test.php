@@ -111,14 +111,5 @@ class formation_facture_fournisseur_test extends ATF_PHPUnit_Framework_TestCase 
 		$this->assertEquals(1606, $this->obj->default_value("id_societe"), "default_value 2.3 ne renvoie pas la bonne valeur !");
 
 	}
-
-	/*
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*/
-	public function default_valueExactitude(){
-		$fmfe=new formation_commande_fournisseur_exactitude();
-
-		$this->assertEquals(17, $fmfe->default_value("id_user"), "default_value exactitude ne renvoie pas la bonne valeur !");
-	}
 }
 ?>

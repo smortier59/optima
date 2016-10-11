@@ -232,7 +232,7 @@ class facturation extends classes_optima {
 	* @return boolean
 	*/
 	function insert_facturations($commande,$affaire,$affaires_parentes=false,$devis,$type) {
-		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"));
+		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"))->where("loyer.nature","prolongation","AND",false,"!=")->where("loyer.nature","prolongation_probable","AND",false,"!=");
 		$loyer = ATF::loyer()->sa();
 		if($commande->get("etat")!="arreter" && $commande->get("etat")!="vente" && $commande->get("etat")!="restitution" && $commande->get("etat")!="restitution_contentieux" && !$commande->isAR() && $loyer){
 			
@@ -305,7 +305,7 @@ class facturation extends classes_optima {
 								$this->i($echeance);
 
 								// Excheancier de facturation fournisseur
-								ATF::facturation_fournisseur()->createEcheance($affaire, $echeance);
+								//ATF::facturation_fournisseur()->createEcheance($affaire, $echeance);
 
 								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
 

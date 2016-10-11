@@ -41,5 +41,4 @@ class module_midas extends module {
 
 class module_cleodisbe extends module_cleodis { };
 class module_cap extends module_cleodis { };
-class module_exactitude extends module_cleodis { };
 ?>

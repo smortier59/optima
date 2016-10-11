@@ -337,4 +337,3 @@ class formation_facture_cleodis extends formation_facture {
 
 class formation_facture_cleodisbe extends formation_facture_cleodis { };
 class formation_facture_cap extends formation_facture_cleodis { };
-class formation_facture_exactitude extends formation_facture_cleodis { };

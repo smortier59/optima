@@ -873,12 +873,6 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
        $this->assertTrue($c instanceOf bon_de_commande_cap, "L'objet bon_de_commande_cap n'est pas de bon type");
     }
 
-    /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr> */
-    public function test_construcexactitude(){
-        $c=new bon_de_commande_exactitude();        
-       $this->assertTrue($c instanceOf bon_de_commande_exactitude, "L'objet bon_de_commande_exactitude n'est pas de bon type");
-    }
-
 
     /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr> 
     * @date 08/12/2015

@@ -28,5 +28,4 @@ class formation_participant extends classes_optima {
 
 class formation_participant_cleodisbe extends formation_participant { };
 class formation_participant_cap extends formation_participant { };
-class formation_participant_exactitude extends formation_participant { };
 ?>

@@ -54,7 +54,6 @@ class comite extends classes_optima {
 		$this->panels['notes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['statut'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['creditSafeInfos'] = array("visible"=>true, 'nbCols'=>4);
-		$this->no_insert = true;
 		$this->selectAllExtjs=true; 
 
 		$this->addPrivilege("getInfosFromCREDITSAFE");
@@ -94,13 +93,10 @@ class comite extends classes_optima {
 
 					
 		if($notifie_suivi != array(0=>"")){
-			$recipient = "";
+			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com";
 			$info_mail["suivi_notifie"] = "";
 
-			log::logger($notifie_suivi , "mfleurquin");
-
 			foreach ($notifie_suivi as $key => $value) {
-				log::logger($value , "mfleurquin");
 				$info_mail["suivi_notifie"] .= ATF::user()->nom($value).",";
 				$recipient .= ATF::user()->select($value,"email").",";
 			}
@@ -326,12 +322,13 @@ class comite extends classes_optima {
 
 		if($commande && $etat == "accepte"){
 			ATF::commande()->u(array("id_commande"=>$commande["commande.id_commande"], "etat"=>"non_loyer"));
+			ATF::affaire()->u(array("id_affaire"=>$this->select($id, "id_affaire") , "etat"=>"commande"));
 			self::envoiNotificationPrestataires($commande["commande.id_commande"]);
 		}
 
-		if($commande && $etat == "refuse"){
-			ATF::commande()->d($commande["commande.id_commande"]);
-			ATF::affaire()->u(array("id_affaire"=>$commande["commande.id_affaire"], "etat"=>"perdue"));
+		if($etat == "refuse"){
+			ATF::affaire()->u(array("id_affaire"=>$this->select($id, "id_affaire"), "etat"=>"refuse"));
+			if($commande )	ATF::commande()->d($commande["commande.id_commande"]);
 		}	
 	}
 

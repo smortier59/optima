@@ -40,5 +40,4 @@ class produit_type extends classes_optima {
 
 class produit_type_cleodisbe extends produit_type { };
 class produit_type_cap extends produit_type { };
-class produit_type_exactitude extends produit_type { };
 ?>

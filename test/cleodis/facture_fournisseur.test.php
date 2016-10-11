@@ -12,6 +12,7 @@ class facture_fournisseur_test extends ATF_PHPUnit_Framework_TestCase {
 	
 	/** Méthode post-test, exécute après chaque test unitaire*/
 	public function tearDown(){
+		$notices = ATF::$msg->getNotices();
 		ATF::db()->rollback_transaction(true);
 	}
 
@@ -235,6 +236,7 @@ class facture_fournisseur_test extends ATF_PHPUnit_Framework_TestCase {
 					);
 
 		$this->assertEquals($fnp,$facture_non_parvenue[0],'La facture non parvenue ne s insère pas bien');
+
 	}
 	
 	public function test_delete(){

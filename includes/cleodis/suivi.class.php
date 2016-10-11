@@ -263,5 +263,4 @@ class suivi_cleodis extends suivi {
 
 class suivi_cleodisbe extends suivi_cleodis { };
 class suivi_cap extends suivi_cleodis { };
-class suivi_exactitude extends suivi_cleodis { };
 ?>

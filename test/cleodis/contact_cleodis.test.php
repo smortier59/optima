@@ -69,18 +69,6 @@ class contact_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 				
 	}
 
-
-	public function test_saExactitude(){
-		ATF::db()->select_db("extranet_v3_exactitude");
-		$c = new contact_exactitude ();	
-
-		$c->q->reset()->where("societe.id_societe",1);
-		$res = $c->select_all();
-
-		$this->assertEquals( 4,count($res), "1 Error select all exactitude");
-
-		ATF::db()->select_db("extranet_v3_cleodis");
-	}	
 	
 };
 

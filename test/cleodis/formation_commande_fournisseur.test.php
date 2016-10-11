@@ -79,13 +79,4 @@ class formation_commande_fournisseur_test extends ATF_PHPUnit_Framework_TestCase
 		$this->assertEquals(date("Y-m-d") , $this->obj->default_value("date_envoi") , "date_envoi incorrect");
 		$this->assertEquals("" , $this->obj->default_value("objectif") , "objectif incorrect");
 	}
-
-	/*
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*/
-	public function default_valueExactitude(){
-		$fmfe=new formation_commande_fournisseur_exactitude();
-
-		$this->assertEquals(17, $fmfe->default_value("id_user"), "default_value exactitude ne renvoie pas la bonne valeur !");
-	}
 }

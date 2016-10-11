@@ -40,5 +40,4 @@ class produit_garantie extends classes_optima {
 
 class produit_garantie_cleodisbe extends produit_garantie { };
 class produit_garantie_cap extends produit_garantie { };
-class produit_garantie_exactitude extends produit_garantie { };
 ?>

@@ -40,5 +40,4 @@ class produit_typeecran extends classes_optima {
 
 class produit_typeecran_cleodisbe extends produit_typeecran { };
 class produit_typeecran_cap extends produit_typeecran { };
-class produit_typeecran_exactitude extends produit_typeecran { };
 ?>

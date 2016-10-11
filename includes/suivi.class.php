@@ -26,6 +26,7 @@ class suivi extends classes_optima {
 			,"type"
 			,"texte"=>array("xtype"=>"textarea","height"=>300)
 			,"date"
+			,"id_affaire"
 		);
 		
 		$this->colonnes['panel']['intervenants'] = array(

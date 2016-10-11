@@ -40,5 +40,4 @@ class produit_ram extends classes_optima {
 
 class produit_ram_cleodisbe extends produit_ram { };
 class produit_ram_cap extends produit_ram { };
-class produit_ram_exactitude extends produit_ram { };
 ?>

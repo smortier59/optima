@@ -472,16 +472,14 @@ class commande_lm extends commande {
 								,'public'=>'oui'
 								,'suivi_contact'=>array(ATF::devis()->select($cmd['id_devis'],'id_contact'))
 								,'suivi_societe'=>array(ATF::$usr->getID())
-								,'suivi_notifie'=>array(ATF::societe()->select($cmd['id_societe'],'id_owner'))
+								,'suivi_notifie'=>NULL
 								,'champsComplementaire'=>$infos['key']
 							);
-							if(($infos['key'] == "date_prevision_restitution") || ($infos['key'] == "date_prevision_restitution")){	$suivi["type_suivi"] = "Restitution";	}				
-							if(ATF::societe()->select($cmd['id_societe'],'id_owner') != 35){
-								$suivi['suivi_notifie'][1] = 35;
-							}							
+							if(($infos['key'] == "date_prevision_restitution") || ($infos['key'] == "date_prevision_restitution")){	$suivi["type_suivi"] = "Restitution";	}	
+							
 							
 							ATF::suivi()->insert($suivi);
-							ATF::$msg->addNotice(ATF::$usr->trans("suivi_plus_email_envoye_to_owner",$this->table));
+							//ATF::$msg->addNotice(ATF::$usr->trans("suivi_plus_email_envoye_to_owner",$this->table));
 						}
 					}else{
 						ATF::suivi()->q->reset()
