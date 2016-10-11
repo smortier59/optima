@@ -218,7 +218,7 @@ class pdf_cleodis extends pdf {
 	}
 
 
-	public function devis_new($id,$s) {  
+	public function devis_new($id,$s) {
   		$this->devis = ATF::devis()->select($id);
   		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
   		
@@ -2488,6 +2488,7 @@ class pdf_cleodis extends pdf {
 		$this->AddPage();
 		$this->A3 = false;
 		$this->A4 = true;
+
 
 		$this->setfont('arial','B',10);
 		$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
@@ -5147,7 +5148,7 @@ class pdf_cleodis extends pdf {
 	*/
 	public function envoiContratEtBilan($id,$s){
 				
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
 
 		$this->envoiContrat = true;
@@ -5235,7 +5236,7 @@ class pdf_cleodis extends pdf {
 	* @date 03-03-2013
 	*/	
 	public function envoiContratSsBilan($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
 
 		$this->envoiContrat = true;
@@ -5315,7 +5316,7 @@ class pdf_cleodis extends pdf {
 	*/
 	public function envoiAvenant($id,$s){
 
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
 
 		$this->envoiContrat = true;	
@@ -5373,7 +5374,7 @@ class pdf_cleodis extends pdf {
 	* @date 03-03-2013
 	*/
 	public function contratTransfert($id,$s){
-		if(ATF::$codename == "cleodis"){ $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis"){ $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
 
 		$this->envoiContrat = true;
@@ -5452,7 +5453,7 @@ class pdf_cleodis extends pdf {
 	* @date 03-03-2013
 	*/
 	public function ctSigne($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
 
 		$this->envoiContrat = true;
@@ -5502,7 +5503,7 @@ class pdf_cleodis extends pdf {
 	* @date 20-08-2015
 	*/
 	public function CourrierRestitution($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
 		$this->envoiContrat = true;
         $this->noPageNo = true;
@@ -6049,7 +6050,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 	*/
 	public function envoiCourrierClassique($id,$s){
 				
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
 
 		$this->envoiContrat = true;
@@ -7375,7 +7376,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',7);
 		$this->multicell(65,3,$this->societe['adresse'],0,"C");
 		$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
-		if ($this->societe['tel']) $this->multicell(65,3,"Tel :".$this->societe['tel'],0,"C");
+		if ($this->societe['tel']) $this->multicell(65,3,"Tel : +32 (0)2 588 52 90",0,"C");
 		if ($this->societe['id_pays'] =='FR') {
 			$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
 		} else {
@@ -7400,9 +7401,26 @@ class pdf_cleodisbe extends pdf_cleodis {
 		
 		$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
 		$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
-
-		$this->setLeftMargin(15);
 		$this->setTopMargin(40);
+
+		if($this->pdfEnveloppe){
+			$cadre = array(
+                    array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
+                    ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
+                    ,array("txt"=>$this->client["adresse"],"size"=>10)
+                );  
+                if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10); 
+                if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
+                $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
+                $this->cadre(110,35,85,35,$cadre);
+		}
+		
+		$this->setLeftMargin(15);
+		
+
+
+		
+        		
 	}
 
 	/* Génère le pied de page des PDF Cléodis
@@ -7426,7 +7444,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(200,2,$this->societe['societe']." ".$this->societe['structure'],0,'C');
 			$this->unsetFontDecoration("B");
 			$this->multicell(200,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
+			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
 			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
 			
 			$this->SetLeftMargin(220);
@@ -7435,7 +7453,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(200,2,$this->societe['societe']." ".$this->societe['structure'],0,'C');
 			$this->unsetFontDecoration("B");
 			$this->multicell(200,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
+			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
 			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
 
 			$this->ln(-3);
@@ -7449,7 +7467,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(0,2,$this->societe['societe']." ".$this->societe['structure'],0,'C');
 			$this->unsetFontDecoration("B");
 			$this->multicell(0,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-			$this->multicell(0,2,"N° TVA ".$this->societe["reference_tva"]." - Tel : ".$this->societe['tel'] ,0,'C');
+			$this->multicell(0,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
 			$this->multicell(0,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
 			
 
@@ -7475,34 +7493,25 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function title($title,$subtitle=false) {
 
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
-		if ($this->A3) {
-			$this->line(210,$this->gety(),420,$this->gety());
-		} else {
-			$this->line(0,$this->gety(),220,$this->gety());
-		}
-
+				
+		$this->ln(7);
 		$this->sety($this->gety()+2);
 		$this->setfont('arial','B',15);				
-		$this->multicell(0,5,$title,0,"C");
+		$this->multicell(90,5,$title,0,"C");
 		$this->sety($this->gety()+3);
 
 		if ($subtitle) {
 			$this->setfont('arial','BI',10);				
-			$this->multicell(0,2,$subtitle,0,'C');
+			$this->multicell(90,2,$subtitle,0,'C');
 			$this->sety($this->gety()+2);
 		}
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->ln(3);
 		if ($this->A3) {
 			$this->line(210,$this->gety(),420,$this->gety());
 		} else {
 			$this->line(0,$this->gety(),220,$this->gety());
 		}
-		$this->SetDrawColor(0,0,0);
-		$this->SetLineWidth(0.2);
+		
 		$this->ln(5);
 
 	}
@@ -7745,12 +7754,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratA4($id) {
 
+		$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
 		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
 		$this->A4 = true;
+
 
 		if($this->affaire["nature"]=="avenant"){
 			$t = "AVENANT N° ".ATF::affaire()->num_avenant($this->affaire["ref"]);
@@ -8427,6 +8438,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->colsProduitAlignLeft = array("border"=>1,"size"=>9,"align"=>"L");
 		$this->styleDetailsProduit = array("border"=>1,"bgcolor"=>"efefef","decoration"=>"I","size"=>8,"align"=>"L");
 
+
 		if ($this->facture['type_facture']=="refi") {
 			$this->demandeRefi = ATF::demande_refi()->select($this->facture['id_demande_refi']);
 			$this->refinanceur = ATF::refinanceur()->select($this->facture['id_refinanceur']);
@@ -8600,6 +8612,19 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->open(); 
 		}
 		$this->addpage();
+
+		$this->setfont('arial','',12);
+		$cadre = array(
+            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)                
+            ,array("txt"=>$this->client["adresse"],"size"=>10)
+        );  
+        if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10); 
+        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
+        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
+        $this->cadre(110,45,85,35,$cadre);
+               
+        $this->setfont('arial','',12);
+
 		$this->setMargins(15,30);
 
 		$this->setfont('arial','B',22);
