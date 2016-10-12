@@ -29,7 +29,7 @@ if($infos["create_tache"]){
                     );        
         $id_tache = ATF::tache()->insert($tache);
 
-        ATF::comite()->insert(array("date"=>date("Y-m-d"),
+        ATF::comite()->insert(    array("date"=>date("Y-m-d"),
                                         "id_affaire"=>$infos["id_affaire"],
                                         "id_societe"=>$infos["id_societe"],                                   
                                         "etat"=>"en_attente",

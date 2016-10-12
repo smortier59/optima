@@ -421,9 +421,12 @@ class commande_lm extends commande {
 					}
 					ATF::devis()->u(array("id_devis"=> $this->select($infos['id_commande'] , "id_devis"), "date_accord"=>date("Y-m-d")));
 
-					ATF::facture_fournisseur()->q->reset()->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
-														  ->where("type", "achat");					
-					foreach (ATF::facture_fournisseur()->select_all() as $k => $v) { ATF::facture_fournisseur()->u(array("id_facture_fournisseur"=>$v["id_facture_fournisseur"], "numero_cegid"=> ATF::facture_fournisseur()->getNumeroCegid()));	}
+					ATF::facture_fournisseur()->q->reset()
+						->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
+						->where("type", "achat");					
+					foreach (ATF::facture_fournisseur()->select_all() as $k => $v) {
+						ATF::facture_fournisseur()->u(array("id_facture_fournisseur"=>$v["id_facture_fournisseur"], "numero_cegid"=> ATF::facture_fournisseur()->getNumeroCegid()));
+					}
 
 					$id_societe = $this->select($infos["id_commande"] , "id_societe");
 					if(ATF::societe()->select($id_societe, "relation") !== "client"){ ATF::societe()->u(array("id_societe"=> $id_societe, "relation"=>"client")); }
@@ -676,7 +679,7 @@ class commande_lm extends commande {
 					
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
-					
+					ATF::facturation_fournisseur()->createEcheancier($affaire);					
 					
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
 					if($commande->get("etat")=="prolongation"){
@@ -736,6 +739,9 @@ class commande_lm extends commande {
 					
 					//Mise à jour des facturations
 					ATF::facturation()->delete_special($commande->get("id_affaire"));
+					
+					//Mise à jour des facturations
+					ATF::facturation_fournisseur()->delete_special("id_affaire",$commande->get("id_affaire"));
 					
 					//Mise à jour des prolongations (supprimer les dates)
 					ATF::prolongation()->unsetDate($commande->get("id_affaire"));
@@ -954,8 +960,17 @@ class commande_lm extends commande {
 	*/
 	function getAffaire(){
 		$this->notSingleton();
-		if(ATF::$codename == "lmbe") return new affaire_lmbe($this->infos['id_affaire']);
 		return new affaire_lm($this->infos['id_affaire']);
+	}
+
+	/** 
+	* Retourne la date de début de la commande
+    * @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return string Date de début
+	*/
+	function getDateDebut(){
+		$this->notSingleton();
+		return $this->infos['date_debut'];
 	}
 
 	public function getDateResti($infos){
@@ -1353,7 +1368,10 @@ class commande_lm extends commande {
 	function getLignes($type){
 		$this->notSingleton();
 		ATF::commande_ligne()->q->reset()
-			->addField("commande_ligne.ref")->addField("commande_ligne.id_fournisseur")->addField("commande_ligne.quantite")->addField("commande_ligne.prix_achat")
+			->select("commande_ligne.ref")
+			->select("commande_ligne.id_fournisseur")
+			->select("commande_ligne.quantite")
+			->select("commande_ligne.prix_achat")
 			->where("id_commande",$this->get("id_commande"));
 		switch ($type) {
 			case "visible":

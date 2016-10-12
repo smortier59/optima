@@ -2024,9 +2024,8 @@ class hotline_interaction extends classes_optima {
 	*/ 
 	public function _credit($get,$post) {
 		if (!$get['tps'] || $get['tps']=="00:00:00") return 0;
- 
+
  		if ($get['field']=="credit_dep") {
-	
  			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
  		}
     	$tmp = explode(":", $get['tps']);
