@@ -7415,11 +7415,7 @@ class pdf_cleodisbe extends pdf_cleodis {
                 $this->cadre(110,35,85,35,$cadre);
 		}
 		
-		$this->setLeftMargin(15);
-		
-
-
-		
+		$this->setLeftMargin(15);		
         		
 	}
 
@@ -7492,17 +7488,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function title($title,$subtitle=false) {
-
 				
 		$this->ln(7);
 		$this->sety($this->gety()+2);
 		$this->setfont('arial','B',15);				
-		$this->multicell(90,5,$title,0,"C");
+		$this->multicell(0,5,$title,0,"C");
 		$this->sety($this->gety()+3);
 
 		if ($subtitle) {
 			$this->setfont('arial','BI',10);				
-			$this->multicell(90,2,$subtitle,0,'C');
+			$this->multicell(0,2,$subtitle,0,'C');
 			$this->sety($this->gety()+2);
 		}
 		$this->ln(3);
@@ -7754,7 +7749,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratA4($id) {
 
-		$this->pdfEnveloppe = true;
+		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
 		$this->Open();
@@ -9573,25 +9568,7 @@ class pdf_cap extends pdf_cleodis {
 
 		//Couleur de ligne --> setDrawColor();
 
-	}
-
-	public function bgMandat(){
-		$this->setleftmargin(2);
-		$this->setY(5);
-
-		$this->setFillColor(150,150,150);
-		$this->cell(3,86,"",0,1,"L",1);
-		$this->ln(4);
-
-		$this->setFillColor(221,16,39);
-		$this->cell(3,86,"",0,1,"L",1);
-		$this->ln(4);
-
-		$this->setFillColor(0,0,0);
-		$this->cell(3,86,"",0,1,"L",1);
-
-		$this->setY(5);
-	}
+	}	
 
 	public function mandat($id,&$s) {
 		$id = ATF::mandat()->decryptId($id);
@@ -9606,7 +9583,243 @@ class pdf_cap extends pdf_cleodis {
 
 		ATF::mandat_ligne()->q->reset()->where("id_mandat",$id)->addOrder("id_mandat_ligne","asc");
 		$mandat_ligne = ATF::mandat_ligne()->select_all();
+		if($mandat["nature"] == "cedre"){
+			$this->mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne);
+		}else{
+			$this->mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne);
+		}
+		
+	}
 
+
+	public function mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne){
+		
+		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
+		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
+
+		$siren = "";
+		if($infos_client['siren']){
+			$siren = str_replace(" ", "", $infos_client['siren']);
+			$siren = substr($infos_client['siren'], 0, 3)." ".substr($infos_client['siren'], 3, 3)." ".substr($infos_client['siren'], 6, 3);
+		}elseif($infos_client['siret']){
+			$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
+			$siren = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3);
+		}
+
+		
+		$adresse_client = "";
+		if($infos_client["adresse"]){
+			$adresse_client = $infos_client["adresse"];
+			if($infos_client["adresse_2"]) $adresse_client .= " ".$infos_client["adresse_2"];
+			if($infos_client["adresse_3"]) $adresse_client .= " ".$infos_client["adresse_3"];
+			$adresse_client .= " ".$infos_client["cp"]." ".$infos_client["ville"];
+		}
+
+		$representant_client = "";
+		if($mandat["id_representant"]){ $representant_client = ATF::contact()->select($mandat["id_representant"]);	}
+
+		//Page 1
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"Préambule  :");
+
+		$this->setFont('arial','',7);
+		$this->multicell(0,3,"Cette offre de services est exclusivement réservée aux entreprises adhérentes du groupement Sarl Le Cèdre, Sarl au capital de 33 294,00 EUR, ayant son siège social 1 allée des Chapelains 71600 PARAY LE MONIAL inscrite au registre du commerce et des sociétés de MACON sous le n° 418 841 227.\n\nLe présent contrat s’applique pour les enseignes : ",0,"L");
+
+		$this->setFont('arial','B',7);
+		$this->multicell(0,3,"Le Cèdre structures chrétiennes  /  Le Cèdre Associations  /  Le Cèdre Campings  /  Le Cèdre Entreprises",0,"L");
+
+		$this->ln(5);
+
+		$this->setFont('arial','',7);
+		$this->multicell(0,3,"Le présent contrat est soumis aux dispositions du protocole d’accord cadre régularisé entre la Sarl Le Cèdre RCS 418 841 227 et la Sarl CAP RECOUVREMENT le 7 Septembre 2016.  Lesdites dispositions ne pourront être maintenues en cas de résiliation du protocole d’accord cadre.",0,"L");
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"1. Identification du mandataire");
+
+		$this->setFont('arial','',9);
+		$this->multicell(0,4,"Le mandataire (ci-après désigné « prestataire »)\nSarl CAP RECOUVREMENT, inscrite au RCS LILLE METROPOLE sous le n° 392 468 443\nSiège : 30 Boulevard du Général Leclerc – 59100 ROUBAIX\nReprésentée par Olivier DUBENSKI en qualité de gérant\nN° de TVA INTRACOMMUNAUTAIRE : FR38392468443",0,"L");
+
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"2. Informations client");
+
+		$this->ln(5);
+
+		$this->setFont('arial','',10);
+		$this->setFillColor(0,153,0);
+		$this->cell(45,6,"N° Adhérent Le Cèdre",1,0,"L",1);
+		
+		$this->setFillColor(255,255,255);		
+		$this->cell(135,6,$infos_client["code_client"],1,1,"L",1);
+
+		$this->cell(45,6,"Raison Sociale",1,0,"L",1);
+		$this->cell(135,6,$infos_client["societe"],1,1,"L",1);
+
+		$this->cell(45,6,"Forme Juridique",1,0,"L",1);
+		$this->cell(30,6,$infos_client["structure"],"TBL",0,"L",1);
+		$this->cell(15,6,"SIRET","TBR",0,"L",1);
+		$this->cell(50,6,$infos_client["siret"],"TBL",0,"L",1);
+		$this->cell(20,6,"Code NAF","TBR",0,"L",1);
+		$this->cell(20,6,$infos_client["naf"],1,1,"L",1);
+
+
+		$this->cell(45,6,"Adresse de gestion",1,0,"L",1);
+		$this->cell(135,6,$infos_client["adresse"],1,1,"L",1);
+
+		$this->cell(45,6,"Code Postal",1,0,"L",1);
+		$this->cell(30,6,$infos_client["cp"],"TBL",0,"L",1);
+		$this->cell(15,6,"Ville","TBR",0,"L",1);
+		$this->cell(90,6,$infos_client["ville"],1,1,"L",1);
+
+		$this->cell(45,6,"Téléphone",1,0,"L",1);
+		$this->cell(30,6,$infos_client["tel"],"TBL",0,"L",1);
+		$this->cell(10,6,"Fax","TBR",0,"L",1);
+		$this->cell(30,6,$infos_client["fax"],"TBL",0,"L",1);
+		$this->cell(15,6,"N° TVA","TBR",0,"L",1);
+		$this->cell(50,6,$infos_client["tel"],1,1,"L",1);
+
+
+		$this->ln(5);
+
+		
+		$this->setFillColor(0,153,0);
+		$this->cell(45,6,"Représentant légal",1,0,"L",1);
+		
+		$this->setFillColor(255,255,255);		
+		$this->cell(60,6,ATF::contact()->nom($representant_client["id_contact"]),"TBL",0,"L",1);
+		$this->cell(20,6,"Fonction","TBR",0,"L",1);
+		$this->cell(55,6,$representant_client["fonction"],1,1,"L",1);
+
+		$this->cell(45,6,"Email",1,0,"L",1);
+		$this->cell(70,6,$representant_client["email"],"TBL",0,"L",1);
+		$this->cell(20,6,"Tél. direct","TBR",0,"L",1);
+		$this->cell(45,6,$representant_client["tel"],1,1,"L",1);
+
+		$this->ln(5);
+
+		
+		$this->setFillColor(0,153,0);
+		$this->cell(45,6,"Interlocuteur",1,0,"L",1);
+		
+		$this->setFillColor(255,255,255);		
+		$this->cell(60,6,"","TBL",0,"L",1);
+		$this->cell(20,6,"Fonction","TBR",0,"L",1);
+		$this->cell(55,6,"",1,1,"L",1);
+
+		$this->cell(45,6,"Email",1,0,"L",1);
+		$this->cell(70,6,"","TBL",0,"L",1);
+		$this->cell(20,6,"Tél. direct","TBR",0,"L",1);
+		$this->cell(45,6,"",1,1,"L",1);
+
+		$this->ln(5);
+
+		$this->setFillColor(0,153,0);
+		$this->cell(180,6,"VOS COORDONNEES BANCAIRES POUR LE REVERSEMENT DES FONDS PAR VIREMENT",1,1,"L",1);
+		$this->setFillColor(255,255,255);
+
+		$this->cell(60,6,"Vos coordonnées IBAN ",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+		$this->cell(60,6,"Vos coordonnées BIC / SWIFT",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+		$this->cell(60,6,"Nom de la Banque",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+		$this->cell(60,6,"Adresse de la Banque",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+
+		$this->ln(5);
+
+		$this->setFillColor(0,153,0);
+		$this->cell(180,6,"VOS CONDITONS CONTRACTUELLES  / CONDITIONS GENERALES DE VENTE (à joindre)",1,1,"L",1);
+		$this->setFillColor(255,255,255);
+
+		$this->cell(60,6,"Libellé",1,0,"L",1);
+		$this->cell(60,6,"Montant (Euros)",1,0,"C",1);
+		$this->cell(60,6,"Taux %",1,1,"C",1);
+
+		$this->cell(60,6,"Clause Pénale",1,0,"L",1);
+		$this->cell(60,6,"",1,0,"L",1);
+		$this->cell(60,6,"%",1,1,"R",1);
+
+		$this->cell(60,6,"Intérêts de retard",1,0,"L",1);
+		$this->cell(60,6,"-",1,0,"C",1);
+		$this->cell(60,6,"%",1,1,"R",1);
+
+		$this->cell(60,6,"Indemnités (article 1153-4 du Code civil)",1,0,"L",1);
+		$this->cell(60,6,"",1,0,"L",1);
+		$this->cell(60,6,"-",1,1,"C",1);
+
+
+		//Page 2
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"3. Description de l’offre de services");
+
+		$this->setFont('arial','',10);
+		$this->multicell(0,4,"Le Client confie au prestataire, qui l’accepte, un mandat de recouvrement de créances conformément aux dispositions contenues dans les conditions générales de recouvrement annexées et les accepte sans réserve.",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','BU',10);
+		$this->multicell(0,4,"Phase 1 « balayage et qualification du compte clients »",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->multicell(0,4,"Cette mission est une phase obligatoire et un préalable indispensable à la création d’une relation pérenne, efficace et génératrice de valeur pour les adhérents du CEDRE.\n\nLe support utilisé pour le traitement doit obligatoirement être transmis en échange de données informatisées de type tableur, un modèle lors de l’intégration sera fourni par le prestataire.\n\nLe client nous transmet ses créances certaines, liquides et devenues exigibles. \n\nCette phase de traitement permet de réaliser une démarche de relance curative et commerciale sur l’intégralité des créances échues, avant l’éventualité d’une mise en recouvrement",0,"L");
+
+		$this->ln(5);
+		$this->setFont('arial','I',10);
+		$this->multicell(0,4,"Les objectifs attendus :",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->setLeftMargin(25);
+		$this->multicell(0,4," -   Identifier rapidement les potentiels de règlement à moindre coût et améliorer la trésorerie du client\n -   Garantir le maintien de la relation commerciale par une démarche préventive\n -   Identifier les litiges réels relevant de l’intervention du client\n -   Statuer sur les rapports d’analyses commentés pour les catégories 1 à 4\n -   Eviter les mises en recouvrement « non justifiées »\n -   Simplifier la démarche et sa rapidité d’exécution",0,"L");
+		$this->ln(5);
+		$this->setLeftMargin(15);
+		$this->multicell(0,4,"45 jours suivants la prise en charge de la demande, le rapport d’analyse transmis et commenté à chaque fin de mission permet de qualifier le traitement des créances réalisé en 5 catégories :",0,"L");
+		$this->ln(5);
+		$this->setLeftMargin(25);
+		$this->multicell(0,4," -   Catégorie 1 : Créances soldées, règlement partiel ou total, protocole validé\n -   Catégorie 2 : Clients-débiteurs en situation NPAI / PSA (coordonnées incorrectes ou introuvables)\n -   Catégorie 3 : Clients-débiteurs en procédure collective ou surendettement\n -   Catégorie 4 : Existence d’un litige nécessitant l’intervention du client\n -   Catégorie 5 : Créances dont la situation doit conduire à une mise en recouvrement ",0,"L");
+		$this->setLeftMargin(15);
+		$this->ln(5);
+		$this->setFont('arial','BU',10);
+		$this->multicell(0,4,"Phase 2 « Recouvrement amiable créances civiles ou commerciales »",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->multicell(0,4,"Cette mission s’intègre dans la continuité du traitement réalisé sur la phase 1. Par exception, elle peut être déclenchée directement selon les situations prévues avec l’adhérent CEDRE.",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','I',10);
+		$this->multicell(0,4,"Le client bénéficiera dès l‘ouverture de compte d’un accès privilégié au site www.groupe-cap.com et recevra ses identifiants pour accéder au site du prestataire. Par le biais du site, le client pourra :",0,"L");
+
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->setLeftMargin(25);
+		$this->multicell(0,4," -   Transmettre ses dossiers en recouvrement\n -   Suivre l’état d’avancement des créances confiées\n -   Envoyer des messages au gestionnaire en charge du recouvrement de ses créances\n -   Extraire des états statistiques",0,"L");
+	}	
+
+
+	public function enteteCedre(){
+		$this->setY(15);
+		$this->setfont('arial','',12);
+		$this->setLeftMargin(90);
+		$this->multicell(110,5,"MARCHE CEDRE\nCONTRAT DE SERVICE POUR LE RECOUVREMENT DE FACTURES - CREANCES SUR PARTICULIERS ET ENTREPRISES",0,"L");
+		$this->image(__PDF_PATH__."cap/le_cedre.jpg",15,10,30,30);
+
+		$this->setfont('arial','I',10);
+		$this->setLeftMargin(160);
+		$this->multicell(110,5," « By »",0,"L");
+		$this->image(__PDF_PATH__."cap/groupe-cap.jpg",175,35,15,10);
+		
+		$this->setY(50);
+		$this->setLeftMargin(15);
+	}
+
+	public function mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne){
 		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
 		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
 
@@ -9995,6 +10208,24 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n",0,"C",1);
 		$this->getFooterMandat();
 
+	}
+
+	public function bgMandat(){
+		$this->setleftmargin(2);
+		$this->setY(5);
+
+		$this->setFillColor(150,150,150);
+		$this->cell(3,86,"",0,1,"L",1);
+		$this->ln(4);
+
+		$this->setFillColor(221,16,39);
+		$this->cell(3,86,"",0,1,"L",1);
+		$this->ln(4);
+
+		$this->setFillColor(0,0,0);
+		$this->cell(3,86,"",0,1,"L",1);
+
+		$this->setY(5);
 	}
 
 	public function getFooterMandat(){
