@@ -13,6 +13,10 @@ class facturation_fournisseur extends classes_optima {
 			 ,'facturation_fournisseur.envoye'
 		);
 		$this->fieldstructure();
+
+		$this->onglets = array(
+			 'facturation_fournisseur_detail'			
+		);
 	}
 
 	/** 
