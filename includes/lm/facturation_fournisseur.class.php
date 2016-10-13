@@ -17,6 +17,8 @@ class facturation_fournisseur extends classes_optima {
 		$this->onglets = array(
 			 'facturation_fournisseur_detail'			
 		);
+
+		$this->foreign_key["id_fournisseur"] = "societe";
 	}
 
 	/** 
