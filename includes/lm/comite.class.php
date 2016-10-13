@@ -98,10 +98,10 @@ class comite extends classes_optima {
 
 			foreach ($notifie_suivi as $key => $value) {
 				$info_mail["suivi_notifie"] .= ATF::user()->nom($value).",";
-				$recipient .= ATF::user()->select($value,"email").",";
+				$recipient .= ",".ATF::user()->select($value,"email");
 			}
 
-			$recipient = substr($recipient, 0, -1);
+			//$recipient = substr($recipient, 0, -1);
 			$info_mail["suivi_notifie"] = substr($info_mail["suivi_notifie"], 0, -1);
 
 			$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";;
@@ -118,7 +118,6 @@ class comite extends classes_optima {
 			$info_mail["optima_url"] = ATF::permalink()->getURL($this->createPermalink($this->cryptId($last_id)));
 			
 			
-
 			$mail = new mail($info_mail);
 		
 			if(!$tu) $mail->send();						
