@@ -8,15 +8,15 @@ class accueil_lm extends accueil {
 	public $onglets = array(
 		"affaire"=>array("opened"=>true)
 	);
-	protected $targetGlobalSearch = array("societe","contact","affaire");// La recherche globale se fait sur ces modules
 
 	/** 
 	* Retourne les widgets de l'utilisateur
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
 	public function getWidgets(){
-		$w = array();
-		
+		$w = array(
+			array('module'=>'log_btn')
+		);
 		return $w;
 	}
 
