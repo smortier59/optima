@@ -2378,14 +2378,15 @@ La dénonciation devra être notifiée par lettre recommandée avec accusé de r
 		if((float)($this->el["tva"])>1){
 			$this->cell(25,4,"TVA ".round($this->el["tva"]*100-100,2)."%",1,0,'R');			
 			
-			$TTC=$prixHT*$this->el["tva"];
+			$TTC=round($prixHT,2)*$this->el["tva"];
+			
 			
 
 			$this->cell(25,4,number_format(abs($TTC-$prixHT),2,',',' ')." €",1,1,'R');		
 			$this->cell(131,4,"",0,0,'C');
 			$this->setfont('arial','B',8);
 			$this->cell(25,4," Montant TTC",1,0,'R'); 
-			$this->cell(25,4,number_format(abs($TTC),2,',',' ')." €",1,1,'R');
+			$this->cell(25,4,number_format(round($TTC,2),2,',',' ')." €",1,1,'R');
 		}	
 		
 		if ($this->gety()>225) $this->AddPage();
