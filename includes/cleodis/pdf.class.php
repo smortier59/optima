@@ -7368,43 +7368,44 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		}
 
+		if(!$this->facturePDF){
+			$this->sety(12);
+			$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
+			$this->setfont('arial','B',7);
+			$this->multicell(65,3,$this->societe['societe'],0,"C");
+			$this->setfont('arial','',7);
+			$this->multicell(65,3,$this->societe['adresse'],0,"C");
+			$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
+			if ($this->societe['tel']) $this->multicell(65,3,"Tel : +32 (0)2 588 52 90",0,"C");
+			if ($this->societe['id_pays'] =='FR') {
+				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
+			} else {
+				$this->multicell(65,3,"Numéro de TVA  ".$this->societe['siret'],0,"C");
+			}
+
+			if ($this->A3) {
+				$this->setLeftMargin(340);	
+			} else {
+				$this->setLeftMargin(135);	
+
+			}
+			$this->sety(12);
 		
-		$this->sety(12);
-		$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
-		$this->setfont('arial','B',7);
-		$this->multicell(65,3,$this->societe['societe'],0,"C");
-		$this->setfont('arial','',7);
-		$this->multicell(65,3,$this->societe['adresse'],0,"C");
-		$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
-		if ($this->societe['tel']) $this->multicell(65,3,"Tel : +32 (0)2 588 52 90",0,"C");
-		if ($this->societe['id_pays'] =='FR') {
-			$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
-		} else {
-			$this->multicell(65,3,"Numéro de TVA  ".$this->societe['siret'],0,"C");
-		}
+			$this->setfont('arial','B',10);
+			$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE","L","C");
+			$this->setfont('arial','B',7);
+			$this->multicell(0,3,$this->client['societe'],"L","C");
+			$this->setfont('arial','',7);
+			$this->multicell(0,3,$this->client['adresse'],"L","C");
+			$this->multicell(0,3,$this->client['cp']." ".$this->client['ville'],"L","C");
+			
+			$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
+			$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
+					
+			$this->setTopMargin(40);		
 
-		if ($this->A3) {
-			$this->setLeftMargin(340);	
-		} else {
-			$this->setLeftMargin(135);	
-
-		}
-		$this->sety(12);
-
-		$this->setfont('arial','B',10);
-		$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE","L","C");
-		$this->setfont('arial','B',7);
-		$this->multicell(0,3,$this->client['societe'],"L","C");
-		$this->setfont('arial','',7);
-		$this->multicell(0,3,$this->client['adresse'],"L","C");
-		$this->multicell(0,3,$this->client['cp']." ".$this->client['ville'],"L","C");
-		
-		$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
-		$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
-		$this->setTopMargin(40);
-
-		if($this->pdfEnveloppe){
-			$cadre = array(
+			if($this->pdfEnveloppe){
+				$cadre = array(
                     array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
                     ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
                     ,array("txt"=>$this->client["adresse"],"size"=>10)
@@ -7413,9 +7414,26 @@ class pdf_cleodisbe extends pdf_cleodis {
                 if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
                 $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
                 $this->cadre(110,35,85,35,$cadre);
+			}
+			$this->setLeftMargin(15);		
+		}else{
+			$this->setfont('arial','',12);
+			$cadre = array(
+	            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)                
+	            ,array("txt"=>$this->client["adresse"],"size"=>10)
+	        );  
+	        if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10); 
+	        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
+	        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
+	        $this->cadre(110,20,85,35,$cadre);
+	               
+	        $this->setfont('arial','',12);
+
+			$this->setMargins(15,50);
 		}
+
+
 		
-		$this->setLeftMargin(15);		
         		
 	}
 
@@ -8433,6 +8451,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->colsProduitAlignLeft = array("border"=>1,"size"=>9,"align"=>"L");
 		$this->styleDetailsProduit = array("border"=>1,"bgcolor"=>"efefef","decoration"=>"I","size"=>8,"align"=>"L");
 
+		$this->facturePDF = true;
 
 		if ($this->facture['type_facture']=="refi") {
 			$this->demandeRefi = ATF::demande_refi()->select($this->facture['id_demande_refi']);
@@ -8608,20 +8627,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 		$this->addpage();
 
-		$this->setfont('arial','',12);
-		$cadre = array(
-            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)                
-            ,array("txt"=>$this->client["adresse"],"size"=>10)
-        );  
-        if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10); 
-        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
-        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
-        $this->cadre(110,45,85,35,$cadre);
-               
-        $this->setfont('arial','',12);
-
-		$this->setMargins(15,30);
-
+		
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
 			$t = 'FACTURE';

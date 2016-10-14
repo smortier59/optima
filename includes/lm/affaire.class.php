@@ -93,6 +93,7 @@ class affaire_lm extends affaire {
 			,'facture_fournisseur'
 			,'facture_non_parvenue'
 			,'facturation'
+			,'facturation_fournisseur'
 			,'intervention'
 			,'parc'
 			,'livraison'
