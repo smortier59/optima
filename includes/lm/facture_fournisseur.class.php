@@ -156,7 +156,7 @@ class facture_fournisseur extends classes_optima {
 		ATF::db($this->db)->begin_transaction();
 
 			$infos["tva"]=ATF::bon_de_commande()->select($infos["id_bon_de_commande"],"tva");
-			$last_id=parent::insert($infos,$s);
+			$last_id=parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 			
 			ATF::facture_non_parvenue()->q->reset()->where("id_affaire",$infos["id_affaire"])
 												   ->where("id_bon_de_commande",$infos["id_bon_de_commande"]);
