@@ -1,0 +1,66 @@
+
+
+<div id="indicateur"></div>
+
+<script type="text/javascript">
+{$data = ATF::log_btn()->getForWidget()}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            type: 'area',
+            renderTo : 'indicateur'
+        },
+        title: {
+            text: 'Surveillance lien entrant'
+        },
+        tooltip : {
+            shared : true
+        },
+        xAxis: {
+            allowDecimals: false,
+            title: {
+                text: 'Jours'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Nombre de check'
+            }
+        },
+        plotOptions: {
+            area: {
+                marker: {
+                    enabled: false,
+                    symbol: 'circle',
+                    radius: 2,
+                    states: {
+                        hover: {
+                            enabled: true
+                        }
+                    }
+                }
+            }
+        },
+        series: [        
+               {
+                    name: 'Visible'                    
+                   ,data: [ 
+                            {foreach $data as $value}
+                                {$value["ok"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+               },
+               {
+                    name: 'Non visible'                    
+                   ,data: [ 
+                            {foreach $data as $value}
+                                {$value["ko"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+               }         
+           ]
+    });
+});    
+</script>
