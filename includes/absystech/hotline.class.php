@@ -112,8 +112,18 @@ class hotline extends classes_optima {
 		$this->defaultRedirect["insert"]="select";
 		
 		$this->autocomplete["view"] = array(
-			"ROUND(hotline.id_hotline)"=>array("alias"=>"ref")
+			"ROUND(hotline.id_hotline)"=>array("alias"=>"id")
+			// "hotline.hotline"=>array("alias"=>"nom"),
+			// "societe.id_societe"=>array("alias"=>"d1"),
+			// "contact.id_contact"=>array("alias"=>"d2"),
+			// "hotline.etat"=>array("alias"=>"d3")
 		);
+		// $this->autocomplete = array(
+		// 	"view"=>array("hotline.id_hotline","hotline.hotline","hotline.priorite","hotline.avancement")
+		// 	// ,"field"=>array("hotline.id_hotline","hotline.hotline","societe.societe")
+		// 	// ,"show"=>array("contact.civilite","contact.prenom","contact.nom")
+		// 	// ,"popup"=>array("contact.nom","contact.prenom","contact.societe")
+		// );
 		
 		$this->liste_user=$this->getUserActif();
 		$this->addPrivilege("changeUser");
