@@ -159,5 +159,80 @@ class accueil {
 		
 		return $return;
 	}	
+
+
+
+
+	public function _global_search($get,$post) {
+		if ($get["limit"]>25) return; // Protection nombre d'enregistrements par page
+		
+		if (strlen($get["query"])>0) {
+			$data = array();
+			$searchKeywords = stripslashes(urldecode($get["query"]));
+			
+			// Calcul du nombre de colonne maximal (important pour le UNION SQL)
+			foreach ($this->targetGlobalSearch as $module) {
+				if (!ATF::$usr->privilege($module)) continue;
+				$class = ATF::getClass($module);
+				$nb_cols = max($nb_cols,count($class->autocomplete["view"]));
+			}
+			
+			// Pour chaque module dans lequel il est défini de chercher
+			foreach ($this->targetGlobalSearch as $priorite => $module) {
+				if (!ATF::$usr->privilege($module)) continue;
+				$class = ATF::getClass($module);
+				$class->q->reset()
+					->setSearch($searchKeywords)
+					->setStrict(1)
+					->setToString();
+				
+				// On défini les champs sur lesquels effectuer la recherche
+				$class->q->addField(array("'".$class->name()."'"=>array("alias"=>"moduleBrut","nosearch"=>true))) // Pour savoir de quel podule provient cet enregistrement
+				->addField(array("'".ATF::$usr->trans($class->table,"module")."'"=>array("alias"=>"module","nosearch"=>true))) // Pour savoir de quel podule provient cet enregistrement
+				->addField(array("CONCAT(".$class->table.".id_".$class->table.")"=>array("alias"=>"id","nosearch"=>true)));
+				if ($class->autocomplete["view"]) {
+					$class->q->addField($class->autocomplete["view"]);
+					$nb_cols_this = count($class->autocomplete["view"]);
+				} else {
+					$class->q->addField($class->table.".id_".$class->table);
+					$nb_cols_this = 1;
+				}
+				for ($i=$nb_cols_this;$i<=$nb_cols;$i++) {
+					$class->q->addField('SUBSTRING(" '.$i.'",0,1)',"detail".$i); // Entourloupe pour avoir le même nombre de champs pour le UNION ^^
+				}
+				
+				// Calcul de pertinence : pour afficher en premier les plus pertinents
+				$class->q->addField(array('('.($priorite*100000000).'+1/'.$class->table.'.id_'.$class->table.')'=>array("alias"=>"pertinence","nosearch"=>true)));
+				
+				$class->q->addOrder("pertinence","ASC");
+
+				// Récupérer le SQL seulement
+				$queries[] = $class->sa();
+			}
+			
+			$q = new querier();
+			$q->setLimit($get["limit"])->addOrder('pertinence','asc')->setPage($get["start"]/$get["limit"]);
+
+			$result = ATF::db($this->db)->union($queries,$q);
+			
+			// On force les index du tableau, car les index numérique sont inexploitable côté HBS
+			foreach ($result["data"] as $k=>$i) {
+					$return[$k] = array(
+						"mod"=>$i[0],
+						"modb"=>$i[1],
+						"id"=>$i[2],
+						"nom"=>$i[3],
+						"d1"=>$i[4],
+						"d2"=>$i[5],
+						"d3"=>$i[6],
+						"d4"=>$i[7]
+					);
+			}
+
+		}
+		
+		return $return;
+
+	}
 };
 ?>
