@@ -295,8 +295,7 @@ class pdf_cleodis extends pdf {
   				$this->devisClassique();
   			}
   		}
-  		return true;
-  
+  		return true;  
   	}
 
 	
@@ -5150,7 +5149,7 @@ class pdf_cleodis extends pdf {
 				
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
 		$this->noPageNo = true;
 		
@@ -5238,7 +5237,7 @@ class pdf_cleodis extends pdf {
 	public function envoiContratSsBilan($id,$s){
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 		
@@ -5318,7 +5317,7 @@ class pdf_cleodis extends pdf {
 
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;	
         $this->noPageNo = true;
 				
@@ -5376,7 +5375,7 @@ class pdf_cleodis extends pdf {
 	public function contratTransfert($id,$s){
 		if(ATF::$codename == "cleodis"){ $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 		
@@ -5455,7 +5454,7 @@ class pdf_cleodis extends pdf {
 	public function ctSigne($id,$s){
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 				
@@ -5505,6 +5504,7 @@ class pdf_cleodis extends pdf {
 	public function CourrierRestitution($id,$s){
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 				
@@ -6054,6 +6054,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 
 		$this->envoiContrat = true;
+		$this->facturePDF = true;
         $this->noPageNo = true;
 		
 		$this->commande = ATF::commande()->select($id);	
@@ -8813,10 +8814,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 			$this->cell(0,5,"Par remboursement ou compensation",0,1);
 		}
-		if(ATF::$codename !== "cleodisbe"){		
-			$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-			$this->cell(0,5,"ICS ".__ICS__ ,0,1);
-		}
+			
+		$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		$this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		
 
 		if($this->facture["mode_paiement"] == "virement"){
 			$cadre = array();

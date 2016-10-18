@@ -293,7 +293,7 @@ class hotline_interaction extends classes_optima {
 				if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
 					if(!$infos["champ_alerte"]){
 						ATF::db($this->db)->rollback_transaction();
-						throw new errorATF("Merci de saisir votre justification !");
+						throw new errorATF("Merci de saisir votre justification !",1020);
 					} 
 					
 					ATF::alerte()->i(array("alerte"=>$infos["champ_alerte"]
