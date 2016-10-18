@@ -1811,7 +1811,7 @@ class facture_lm extends facture {
 	        		//TTC
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][3] = "FR054";
 		        	$donnees[$key][$i][4] = $entite;
 		        	$donnees[$key][$i][5] = "1"; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
@@ -1840,7 +1840,7 @@ class facture_lm extends facture {
 	        		//HT
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][3] = "FR054";
 		        	$donnees[$key][$i][4] = $entite;
 		        	$donnees[$key][$i][5] = "1"; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
@@ -1872,7 +1872,7 @@ class facture_lm extends facture {
 	        		//TVA
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "1";
+		        	$donnees[$key][$i][3] = "FR054";
 		        	$donnees[$key][$i][4] = $entite;
 		        	$donnees[$key][$i][5] = "1"; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";

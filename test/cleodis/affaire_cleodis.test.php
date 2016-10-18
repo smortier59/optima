@@ -24,14 +24,6 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	/** Test du constructeur
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/	
-	public function test__construct(){
-		$c = new affaire_exactitude();	
-		$this->assertTrue($c instanceOf affaire_exactitude, "L'objet affaire_exactitude n'est pas de bon type");
-	}
-
-	/** Test du constructeur
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*/	
 	public function test__constructCap(){
 		$c = new affaire_cap();	
 		$this->assertTrue($c instanceOf affaire_cap, "L'objet affaire_cap n'est pas de bon type");

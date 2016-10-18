@@ -826,39 +826,7 @@ class societe_cap extends societe_cleodis {
 		return true;
 	}
 };
-class societe_exactitude extends societe_cleodis {
-	/*--------------------------------------------------------------*/
-	/*                   Constructeurs                              */
-	/*--------------------------------------------------------------*/
-	public function __construct() {
-		parent::__construct();
-		$this->table = "societe";
 
-		unset($this->colonnes['panel']['delai_rav'], 
-			  $this->colonnes['panel']['delai_fournisseur'], 
-			  $this->colonnes['panel']['deploiement'],
-			  $this->colonnes['primary']["id_assistante"]);
-
-
-
-		$this->onglets = array(
-			 'contact'=>array('opened'=>true)
-			,'affaire'=>array('opened'=>true)
-			,'formation_devis'
-			,'suivi'=>array('opened'=>true)
-			,'devis'
-			,'commande'
-			,'tache'			
-		);
-
-
-		$this->fieldstructure();
-
-		$this->files["logo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
-
-	}
-
-};
 
 class societe_midas extends societe_cleodis {
 	public function __construct() {		

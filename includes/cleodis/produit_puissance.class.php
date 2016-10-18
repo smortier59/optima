@@ -40,5 +40,4 @@ class produit_puissance extends classes_optima {
 
 class produit_puissance_cleodisbe extends produit_puissance { };
 class produit_puissance_cap extends produit_puissance { };
-class produit_puissance_exactitude extends produit_puissance { };
 ?>

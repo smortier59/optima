@@ -353,14 +353,5 @@ class user_cap extends user_cleodis {
 	}
 
 }
-class user_exactitude extends user_cleodis {
 
-	public function getFeuilles(){
-		return array("Export Optima",
-					  "RDV",
-					  "Appels"
-					 );
-	}
-
-}
 ?>

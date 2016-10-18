@@ -40,5 +40,4 @@ class produit_viewable extends classes_optima {
 
 class produit_viewable_cleodisbe extends produit_viewable { };
 class produit_viewable_cap extends produit_viewable { };
-class produit_viewable_exactitude extends produit_viewable { };
 ?>

@@ -62,5 +62,4 @@ class produit_technique extends classes_optima {
 
 class produit_technique_cleodisbe extends produit_technique { };
 class produit_technique_cap extends produit_technique { };
-class produit_technique_exactitude extends produit_technique { };
 ?>

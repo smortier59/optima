@@ -1600,6 +1600,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->assertEquals(array(
                                 array(
+                                    "msg" => "Suppression de '1' enregistrement(s) effectués avec succès dans le module 'Prolong.'.",
+                                    "title" => "Succès !",
+                                    "timer" => ""
+                                    ),
+                                array(
                                     "msg" => "L'état de la commande '0610001AVT1' a changé de 'En cours' à 'En attente'",
                                     "title" => "",
                                     "timer" => ""

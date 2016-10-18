@@ -20,5 +20,4 @@ class stats_cleodis extends stats {
 
 class stats_cleodisbe extends stats_cleodis { };
 class stats_cap extends stats_cleodis { };
-class stats_exactitude extends stats_cleodis { };
 ?>

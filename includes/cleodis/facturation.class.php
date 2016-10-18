@@ -17,6 +17,11 @@ class facturation extends classes_optima {
 			 ,'facturation.montant'
 			 ,'facturation.frais_de_gestion'
 			 ,'facturation.assurance'
+			 ,'facturation.serenite'
+			 ,'facturation.maintenance'
+			 ,'facturation.hotline'
+			 ,'facturation.supervision'
+			 ,'facturation.support'
 			 ,'facturation.type'
 			 ,'facturation.envoye'
 		);
@@ -97,6 +102,11 @@ class facturation extends classes_optima {
 								"id_affaire"=>$affaire_parente->get("id_affaire"),
 								"montant"=>$loyer_parent[0]['loyer'],
 								"assurance"=>$loyer_parent[0]['assurance'],
+								"serenite"=>$loyer_parent[0]['serenite'],
+								"maintenance"=>$loyer_parent[0]['maintenance'],
+								"hotline"=>$loyer_parent[0]['hotline'],
+								"supervision"=>$loyer_parent[0]['supervision'],
+								"support"=>$loyer_parent[0]['support'],
 								"frais_de_gestion"=>$loyer_parent[0]['frais_de_gestion'],
 								"date_periode_fin"=>$date_fin,
 								"date_periode_debut"=>$date_debut,
@@ -188,6 +198,11 @@ class facturation extends classes_optima {
 									"montant"=>$item['loyer'],
 									"assurance"=>$item['assurance'],
 									"frais_de_gestion"=>$item['frais_de_gestion'],
+									"serenite"=>$item["serenite"],
+									"maintenance"=>$item["maintenance"],
+									"hotline"=>$item["hotline"],
+									"supervision"=>$item["supervision"],
+									"support"=>$item["support"],
 									"date_periode_fin"=>$date_fin,
 									"date_periode_debut"=>$date_debut,
 									"type"=>"contrat")
@@ -264,6 +279,11 @@ class facturation extends classes_optima {
 									"montant"=>$loyer[0]['loyer'],
 									"assurance"=>$loyer[0]['assurance'],
 									"frais_de_gestion"=>$loyer[0]['frais_de_gestion'],
+									"serenite"=>$loyer[0]["serenite"],
+									"maintenance"=>$loyer[0]["maintenance"],
+									"hotline"=>$loyer[0]["hotline"],
+									"supervision"=>$loyer[0]["supervision"],
+									"support"=>$loyer[0]["support"],
 									"date_periode_fin"=>$date_fin,
 									"date_periode_debut"=>$date_debut,
 									"type"=>"contrat"));
@@ -286,6 +306,11 @@ class facturation extends classes_optima {
 												"montant"=>$item['loyer'],
 												"assurance"=>$item['assurance'],
 												"frais_de_gestion"=>$item['frais_de_gestion'],
+												"serenite"=>$item["serenite"],
+												"maintenance"=>$item["maintenance"],
+												"hotline"=>$item["hotline"],
+												"supervision"=>$item["supervision"],
+												"support"=>$item["support"],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
 												"type"=>"contrat")
@@ -301,6 +326,11 @@ class facturation extends classes_optima {
 												"montant"=>$item['loyer'],
 												"assurance"=>$item['assurance'],
 												"frais_de_gestion"=>$item['frais_de_gestion'],
+												"serenite"=>$item["serenite"],
+												"maintenance"=>$item["maintenance"],
+												"hotline"=>$item["hotline"],
+												"supervision"=>$item["supervision"],
+												"support"=>$item["support"],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
 												"type"=>"contrat")
@@ -385,6 +415,11 @@ class facturation extends classes_optima {
 				$montant=$dernierLoyer['loyer'];
 				$assurance=$dernierLoyer['assurance'];
 				$frais_de_gestion=$dernierLoyer['frais_de_gestion'];
+				$serenite= $dernierLoyer["serenite"];
+				$maintenance= $dernierLoyer["maintenance"];
+				$hotline= $dernierLoyer["hotline"];
+				$supervision= $dernierLoyer["supervision"];
+				$support= $dernierLoyer["support"];
 				$date_debut=date(date("Y-m",strtotime($date_debut_periode))."-".date("d",strtotime($commande->get("date_debut"))));
 				$date_fin=date("Y-m-d",strtotime($date_debut."+".$frequence." month -1 day"));
 				$id=$this->i(array(
@@ -393,6 +428,11 @@ class facturation extends classes_optima {
 									"montant"=>$montant,
 									"assurance"=>$assurance,
 									"frais_de_gestion"=>$frais_de_gestion,
+									"serenite"=>$serenite,
+									"maintenance"=>$maintenance,
+									"hotline"=>$hotline,
+									"supervision"=>$supervision,
+									"support"=>$support,
 									"date_periode_debut"=>$date_debut,
 									"date_periode_fin"=>$date_fin,
 									"type"=>"prolongation")
@@ -461,6 +501,12 @@ class facturation extends classes_optima {
 					$montant=$dernierLoyer['loyer'];
 					$assurance=$dernierLoyer['assurance'];
 					$frais_de_gestion=$dernierLoyer['frais_de_gestion'];
+					$serenite= $dernierLoyer["serenite"];
+					$maintenance= $dernierLoyer["maintenance"];
+					$hotline= $dernierLoyer["hotline"];
+					$supervision= $dernierLoyer["supervision"];
+					$support= $dernierLoyer["support"];
+									
 					$date_debut=date(date("Y-m",strtotime($date_debut_periode))."-".date("d",strtotime($commande->get("date_debut"))));
 					$date_fin=date("Y-m-d",strtotime($date_debut." +".$frequence." month -1 day"));
 					$id=$this->i(array(
@@ -469,6 +515,11 @@ class facturation extends classes_optima {
 										"montant"=>$montant,
 										"assurance"=>$assurance,
 										"frais_de_gestion"=>$frais_de_gestion,
+										"serenite"=>$serenite,
+										"maintenance"=>$maintenance,
+										"hotline"=>$hotline,
+										"supervision"=>$supervision,
+										"support"=>$support,
 										"date_periode_debut"=>$date_debut,
 										"date_periode_fin"=>$date_fin,
 										"type"=>"prolongation")
@@ -537,6 +588,11 @@ class facturation extends classes_optima {
 								$facturation["montant"]=$item["loyer"];
 								$facturation["assurance"]=$item["assurance"];
 								$facturation["frais_de_gestion"]=$item["frais_de_gestion"];
+								$facturation["serenite"]=$item["serenite"];
+								$facturation["maintenance"]=$item["maintenance"];
+								$facturation["hotline"]=$item["hotline"];
+								$facturation["supervision"]=$item["supervision"];
+								$facturation["support"]=$item["support"];
 								$facturation["date_periode_debut"]=$date_debut;
 								$facturation["date_periode_fin"]=$date_fin;
 								$facturation["type"]="prolongation";
@@ -1362,7 +1418,7 @@ class facturation extends classes_optima {
 			$commande = ATF::commande()->sa();
 						
 			if($commande){
-				if($facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]!="0"){
+				if($facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"]!="0"){
 					$ref=ATF::facture()->getRef($affaire["id_affaire"],"facture");
 					if($date_previsionnelle=ATF::affaire()->select($affaire['id_affaire'],"date_previsionnelle")){
 						$day=$date_previsionnelle;
@@ -1383,7 +1439,7 @@ class facturation extends classes_optima {
 					$facture=array(
 						"id_societe"=>$commande["id_societe"],
 						"ref"=>$ref,
-						"prix"=>$facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"],
+						"prix"=>$facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"],
 						"etat"=>"impayee",
 						"date"=>$date_debut,
 						"date_periode_debut"=>$facturation["date_periode_debut"],
@@ -1446,5 +1502,4 @@ class facturation extends classes_optima {
 
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
-class facturation_exactitude extends facturation { };
 ?>
