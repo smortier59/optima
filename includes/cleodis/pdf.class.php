@@ -295,8 +295,7 @@ class pdf_cleodis extends pdf {
   				$this->devisClassique();
   			}
   		}
-  		return true;
-  
+  		return true;  
   	}
 
 	
@@ -5150,7 +5149,7 @@ class pdf_cleodis extends pdf {
 				
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
 		$this->noPageNo = true;
 		
@@ -5238,7 +5237,7 @@ class pdf_cleodis extends pdf {
 	public function envoiContratSsBilan($id,$s){
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 		
@@ -5318,7 +5317,7 @@ class pdf_cleodis extends pdf {
 
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;	
         $this->noPageNo = true;
 				
@@ -5376,7 +5375,7 @@ class pdf_cleodis extends pdf {
 	public function contratTransfert($id,$s){
 		if(ATF::$codename == "cleodis"){ $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 		
@@ -5455,7 +5454,7 @@ class pdf_cleodis extends pdf {
 	public function ctSigne($id,$s){
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 				
@@ -5505,6 +5504,7 @@ class pdf_cleodis extends pdf {
 	public function CourrierRestitution($id,$s){
 		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 				
@@ -6054,6 +6054,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 
 		$this->envoiContrat = true;
+		$this->facturePDF = true;
         $this->noPageNo = true;
 		
 		$this->commande = ATF::commande()->select($id);	
@@ -8813,10 +8814,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 			$this->cell(0,5,"Par remboursement ou compensation",0,1);
 		}
-		if(ATF::$codename !== "cleodisbe"){		
-			$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-			$this->cell(0,5,"ICS ".__ICS__ ,0,1);
-		}
+			
+		$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		$this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		
 
 		if($this->facture["mode_paiement"] == "virement"){
 			$cadre = array();
@@ -9700,9 +9701,9 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(55,6,$representant_client["fonction"],1,1,"L",1);
 
 		$this->cell(45,6,"Email",1,0,"L",1);
-		$this->cell(70,6,$representant_client["email"],"TBL",0,"L",1);
+		$this->cell(80,6,$representant_client["email"],"TBL",0,"L",1);
 		$this->cell(20,6,"Tél. direct","TBR",0,"L",1);
-		$this->cell(45,6,$representant_client["tel"],1,1,"L",1);
+		$this->cell(35,6,$representant_client["tel"],1,1,"L",1);
 
 		$this->ln(5);
 
@@ -9716,9 +9717,9 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(55,6,"",1,1,"L",1);
 
 		$this->cell(45,6,"Email",1,0,"L",1);
-		$this->cell(70,6,"","TBL",0,"L",1);
+		$this->cell(80,6,"","TBL",0,"L",1);
 		$this->cell(20,6,"Tél. direct","TBR",0,"L",1);
-		$this->cell(45,6,"",1,1,"L",1);
+		$this->cell(35,6,"",1,1,"L",1);
 
 		$this->ln(5);
 
@@ -9745,21 +9746,21 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(180,6,"VOS CONDITONS CONTRACTUELLES  / CONDITIONS GENERALES DE VENTE (à joindre)",1,1,"L",1);
 		$this->setFillColor(255,255,255);
 
-		$this->cell(60,6,"Libellé",1,0,"L",1);
-		$this->cell(60,6,"Montant (Euros)",1,0,"C",1);
-		$this->cell(60,6,"Taux %",1,1,"C",1);
+		$this->cell(80,6,"Libellé",1,0,"L",1);
+		$this->cell(50,6,"Montant (Euros)",1,0,"C",1);
+		$this->cell(50,6,"Taux %",1,1,"C",1);
 
-		$this->cell(60,6,"Clause Pénale",1,0,"L",1);
-		$this->cell(60,6,"",1,0,"L",1);
-		$this->cell(60,6,"%",1,1,"R",1);
+		$this->cell(80,6,"Clause Pénale",1,0,"L",1);
+		$this->cell(50,6,"Minimum : ".$mandant["clause_penale"]." €",1,0,"C",1);
+		$this->cell(50,6,$mandant["clause_penale_percentage"]."%",1,1,"R",1);
 
-		$this->cell(60,6,"Intérêts de retard",1,0,"L",1);
-		$this->cell(60,6,"-",1,0,"C",1);
-		$this->cell(60,6,"%",1,1,"R",1);
+		$this->cell(80,6,"Intérêts de retard",1,0,"L",1);
+		$this->cell(50,6,"-",1,0,"C",1);
+		$this->cell(50,6,"%",1,1,"R",1);
 
-		$this->cell(60,6,"Indemnités (article 1153-4 du Code civil)",1,0,"L",1);
-		$this->cell(60,6,"",1,0,"L",1);
-		$this->cell(60,6,"-",1,1,"C",1);
+		$this->cell(80,6,"Indemnités (article 1153-4 du Code civil)",1,0,"L",1);
+		$this->cell(50,6,$mandat["indemnite_retard"]." €",1,0,"C",1);
+		$this->cell(50,6,"-",1,1,"C",1);
 
 
 		//Page 2
@@ -9806,6 +9807,107 @@ class pdf_cap extends pdf_cleodis {
 		$this->setFont('arial','',10);
 		$this->setLeftMargin(25);
 		$this->multicell(0,4," -   Transmettre ses dossiers en recouvrement\n -   Suivre l’état d’avancement des créances confiées\n -   Envoyer des messages au gestionnaire en charge du recouvrement de ses créances\n -   Extraire des états statistiques",0,"L");
+
+		//Page 3
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"4. Conditions de rémunération");
+
+		$this->setFont('arial','',10);
+		$lignes = array();
+
+		foreach ($mandat_ligne as $key => $value) {			
+			$lignes[$value["ligne_titre"]][] = $value;		
+		}
+
+		foreach ($lignes as $key => $value) {
+			
+			switch ($key) {
+				case '41_services_integration':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.1 Facturation des services d'intégration et supports",0,1);
+					$this->ln(2);
+				break;				
+				case '42_services_balayage':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.2 Facturation des services balayage et qualification de la balance clients",0,1);
+					$this->ln(2);
+				break;
+				case '431_ouvertures_de_dossier':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.3 Facturation des services recouvrement de créances",0,1);
+					$this->ln(2);
+					$this->cell(0,5,"Facturation des ouvertures de dossier",0,1);
+					$this->ln(2);					
+				break;
+				case '432_somme_recouvree':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"Honoraires sur les sommes recouvrées*",0,1);
+					$this->ln(2);
+					
+				break;
+				case '441_phase_judiciaire':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.4 Facturation des actions judiciaires et enquêtes",0,1);
+					$this->ln(2);
+					
+				break;
+				case '442_phase_enquete':	
+					$this->ln(-2);									
+				break;
+			}
+			
+			if($key != "432_somme_recouvree" && $key != "441_phase_judiciaire" && $key != "442_phase_enquete"){
+				$this->setFont('arial','',10);
+				$this->setFillColor(0,153,0);
+				$this->cell(135,5,"LIBELLE",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
+			}elseif($key == "432_somme_recouvree"){
+				$this->setFont('arial','',10);
+				$this->setFillColor(0,153,0);
+				$this->cell(135,5,"TRANCHE DE RECUPERATION PAR DOSSIER CONFIE",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
+			}elseif($key == "441_phase_judiciaire"){
+				$this->setFont('arial','',10);
+				$this->setFillColor(0,153,0);
+				$this->cell(135,5,"PHASE JUDICIAIRE",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
+			}elseif ($key === "442_phase_enquete") {
+
+				$this->setFont('arial','',10);
+				$this->setFillColor(0,153,0);
+				$this->cell(135,5,"PHASE D'ENQUETE*",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"--",1,1,"C",1);
+			}
+			
+
+			
+			
+			$this->setfont('arial','',8);
+			foreach ($value as $k => $v) {
+				$this->cell(135,5,$v["texte"],1,0,"L",1);	
+				$this->cell(45,5,$v["valeur"]." ".$v["type"],1,1,"C",1);
+			}
+			if($key == "42_services_balayage"){
+				$this->setfont('arial','I',6);
+				$this->cell(0,3,"* Avec un minimum de facturation de 90,00 EUR H.T. annuel, soit 20 créances minimum",0,1,"L");
+			}elseif($key == "432_somme_recouvree"){
+				$this->setfont('arial','I',6);
+				$this->cell(0,3,"* Applicable selon conditions générales de recouvrement  - barème par tranche de récupération",0,1,"L");
+			}elseif($key == "442_phase_enquete"){
+				$this->setfont('arial','I',6);
+				$this->multicell(0,3,"* Si nécessaire et après votre accord écrit, pour le traitement des recherches de localisation de débiteurs disparus, d’éléments de solvabilité,  les forfaits mentionnés ne sont exposés qu’en cas d’éléments recherchés ayant un résultat positif de la part de nos partenaires (Hors taxes CNAPS).",0,1,"L");
+			}
+
+			$this->ln(2);
+		}
+		
 	}	
 
 

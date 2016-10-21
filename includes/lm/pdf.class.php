@@ -23,6 +23,10 @@ class pdf_lm extends pdf_cleodis {
 	* @date 25-01-2011
 	*/
 	public function Footer() {
+
+
+
+
 		if ($this->getFooter()) return false;
 		if (!$this->societe) return false;
 		//Police Arial italique 8
@@ -52,7 +56,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			$this->sety(10);
 			$this->multicell(0,5,"PREVISUALISATION",0,'C');
 		}
-
+					
 	}
 
 
@@ -91,7 +95,24 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->settextcolor(0,0,0);
 		$this->setfont('arial','B',9);
 		$this->cell(40,5,"www.leroymerlin.fr",0,1,"L");
+		
+		if(__PRE__ === true || __DEV__ === true){
+			$this->setX(40);
+			$this->setY(20);
+
+			$this->Rotate(-55);
+			$this->setLineWidth(0.5);
+			$this->setfont('arial',"B",160);
+			$this->setTextColor(211,211,211);
+			if(__PRE__ === true){$this->multicell(300,10,"RECETTE",0,"C");}
+			if(__DEV__ === true){$this->multicell(300,10,"ESP DEV",0,"C");}
 			
+			$this->setTextColor("black");
+			$this->setfont('arial',"",8);
+			$this->Rotate(0);
+		}
+		
+
 		$this->sety(20);
 		
 	}
@@ -144,6 +165,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->A3 = false;
 		$this->A4 = true;
 
+		
 		$this->setfont('arial','B',10);
 				
 		$this->sety(10);
@@ -571,17 +593,18 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->setLeftMargin(7);
 
 			
-		if($facture["nature"]){
+		/*if($facture["nature"]){
 			$this->lignes_facture($facture_lignes,$facture,"loyer");
 		}else{
 			$this->lignes_facture($facture_lignes,$facture,"prestation");
-		}	
-		
+		}	*/
+		$this->lignes_facture($facture_lignes,$facture,NULL);
 
-		
+			
 
 		$this->ln(5);
 		$y = $this->getY();
+		/*
 		$head = array("","Total HT","Montant TVA");
 		$width = array(20,30,30);		
 		$data = array();
@@ -606,7 +629,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 
 		
 		$this->tableau($head,$data,$width,7,$style,260);
-
+		*/
 
 		$this->ln(5);
 		$head = array("Date","Réglement","Montant");
@@ -634,9 +657,22 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	}
 
 	public function lignes_facture($facture_lignes,$facture, $nature){
-			
+		
+		$head = array("Désignation ( Référence )","Prix unit. HT","Taux de TVA","Total TTC");
+		$width = array(132,20,20,20);
 
-		if($nature == "loyer"){
+		$pack = ATF::produit()->select($facture_lignes[0]['id_produit'] , "id_pack_produit");
+
+
+		$data[0][0] = "Abonnement à l'offre ".ATF::pack_produit()->select($pack , "libelle");
+		$style[0][0] = $this->leftStyle;
+		$data[0][1] = number_format(($facture["prix"] - ($facture["prix"]*0.2)) ,2)." €" ;
+		$data[0][2] = "20%";
+		$data[0][3] = number_format($facture["prix"],2)." €" ;
+
+		$this->tableauBigHead($head,$data,$width,7,$style,260);
+
+		/*if($nature == "loyer"){
 			$head = array("Désignation ( Référence )","Prix unit. HT","Taux de TVA","Total TTC");
 			$width = array(132,20,20,20);
 
@@ -738,7 +774,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				}
 			}
 			$this->tableauBigHead($head,$data,$width,7,$style,260);
-		}
+		}*/
 	}
 
 	public function formateTextPDF($texte){
