@@ -20,7 +20,13 @@ Ext.onReady(function(){
             allowDecimals: false,
             title: {
                 text: 'Jours'
-            }
+            },
+            categories: [
+                            {foreach $data as $value}
+                                '{date("l",strtotime($value["date"]))}'                         
+                                {if !$value@last},{/if}
+                            {/foreach}   
+                        ]
         },
         yAxis: {
             title: {

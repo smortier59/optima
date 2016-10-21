@@ -9656,7 +9656,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->ln(5);
 
 		$this->setFont('arial','',10);
-		$this->setFillColor(0,153,0);
+		$this->setFillColor(163,197,15);
 		$this->cell(45,6,"N° Adhérent Le Cèdre",1,0,"L",1);
 		
 		$this->setFillColor(255,255,255);		
@@ -9692,7 +9692,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->ln(5);
 
 		
-		$this->setFillColor(0,153,0);
+		$this->setFillColor(163,197,15);
 		$this->cell(45,6,"Représentant légal",1,0,"L",1);
 		
 		$this->setFillColor(255,255,255);		
@@ -9708,7 +9708,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->ln(5);
 
 		
-		$this->setFillColor(0,153,0);
+		$this->setFillColor(163,197,15);
 		$this->cell(45,6,"Interlocuteur",1,0,"L",1);
 		
 		$this->setFillColor(255,255,255);		
@@ -9723,7 +9723,7 @@ class pdf_cap extends pdf_cleodis {
 
 		$this->ln(5);
 
-		$this->setFillColor(0,153,0);
+		$this->setFillColor(163,197,15);
 		$this->cell(180,6,"VOS COORDONNEES BANCAIRES POUR LE REVERSEMENT DES FONDS PAR VIREMENT",1,1,"L",1);
 		$this->setFillColor(255,255,255);
 
@@ -9742,7 +9742,7 @@ class pdf_cap extends pdf_cleodis {
 
 		$this->ln(5);
 
-		$this->setFillColor(0,153,0);
+		$this->setFillColor(163,197,15);
 		$this->cell(180,6,"VOS CONDITONS CONTRACTUELLES  / CONDITIONS GENERALES DE VENTE (à joindre)",1,1,"L",1);
 		$this->setFillColor(255,255,255);
 
@@ -9861,26 +9861,26 @@ class pdf_cap extends pdf_cleodis {
 			
 			if($key != "432_somme_recouvree" && $key != "441_phase_judiciaire" && $key != "442_phase_enquete"){
 				$this->setFont('arial','',10);
-				$this->setFillColor(0,153,0);
+				$this->setFillColor(163,197,15);
 				$this->cell(135,5,"LIBELLE",1,0,"L",1);			
 				$this->setFillColor(255,255,255);		
 				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
 			}elseif($key == "432_somme_recouvree"){
 				$this->setFont('arial','',10);
-				$this->setFillColor(0,153,0);
+				$this->setFillColor(163,197,15);
 				$this->cell(135,5,"TRANCHE DE RECUPERATION PAR DOSSIER CONFIE",1,0,"L",1);			
 				$this->setFillColor(255,255,255);		
 				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
 			}elseif($key == "441_phase_judiciaire"){
 				$this->setFont('arial','',10);
-				$this->setFillColor(0,153,0);
+				$this->setFillColor(163,197,15);
 				$this->cell(135,5,"PHASE JUDICIAIRE",1,0,"L",1);			
 				$this->setFillColor(255,255,255);		
 				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
 			}elseif ($key === "442_phase_enquete") {
 
 				$this->setFont('arial','',10);
-				$this->setFillColor(0,153,0);
+				$this->setFillColor(163,197,15);
 				$this->cell(135,5,"PHASE D'ENQUETE*",1,0,"L",1);			
 				$this->setFillColor(255,255,255);		
 				$this->cell(45,5,"--",1,1,"C",1);
@@ -9908,7 +9908,132 @@ class pdf_cap extends pdf_cleodis {
 			$this->ln(2);
 		}
 		
+
+		$this->cg_cedre();
 	}	
+
+	public function cg_cedre(){
+
+		//Page 4
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setfont('arial','B',10);
+		$this->cell(0,5,"MANDAT DE RECOUVREMENT DE CREANCES POUR LE COMPTE D’AUTRUI",0,1,"L");
+		$this->setfont('arial','',6);
+		$this->cell(0,5,"Décret n°2012-783 du 30 mai 2012 ",0,1,"L");
+
+		$this->ln(5);
+
+		$this->setfont('arial','B',8);
+		$this->cell(0,5,"Conditions générales de recouvrement",0,1,"L");
+		$this->ln(5);
+
+
+		$cg = array(
+				"CHAMP D’APPLICATION"
+					=>array("Les présentes Conditions générales s’appliquent au mandat de recouvrement con􏰁é par le Client au Prestataire (ci-après défini), en vertu des Conditions particulières du mandat de recouvrement de créances pour le compte d’autrui, de ses annexes tarifaires et l’annexe « Cahier des charges » quand elle existe. Ces documents forment un ensemble indivisible et constituent l’intégralité des conditions réglementant le recouvrement par le Prestataire des créances confiées par le Client. Lorsqu’un Cahier des charges est constitué, celui-ci contient des précisions sur les modalités opérationnelles, telles que le format de communication entre les parties, des process particuliers, des demandes de reportings spécifiques ou encore la restitution des sommes recouvrées, sans que cette liste ne soit limitative. le Client reconnaît avoir pris connaissance préalablement à la signature de la présente convention, des documents précités et les accepter sans réserve."),
+				"MANDAT DE RECOUVREMENT"
+					=>array("Le Client donne mandat au Prestataire à l’effet de recouvrer ses créances échues, en son nom et pour son compte, en principal, intérêts et autres accessoires, sur ses propres clients débiteurs, selon le type de traitement correspondant à la prestation choisie. le Client transmet un panel de créances au Prestataire. Ses créances sont certaines, liquides et exigibles, et le Client en atteste la sincérité et l’exactitude. Le Client atteste le bienfondé de sa réclamation par l’absence de règlement, le retard abusif de règlement ou la passivité de ses débiteurs malgré la réalisation de relances internes, et donne mandat exprès au Prestataire de recevoir pour son compte les fonds à recouvrer auprès de ses débiteurs. En ce sens, le Client est fondé à faire réclamer par le Prestataire, en complément des factures initiales, les pénalités conventionnelles et les dommages & intérêts, visant à indemniser le préjudice, tant moratoires que compensatoires. A ce titre, le Client atteste que les démarches entreprises aux fins de recouvrer ses créances impactent financièrement son compte d’exploitation. Le Client atteste également que les débiteurs relancés ont été régulièrement informés de l’existence d’une facture, de sorte qu’ils ne peuvent en ignorer l’existence. le Client précise dans les Conditions Particulières le montant du préjudice indépendant du retard, qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, distinct des intérêts moratoires, ce afin que le Prestataire puisse les exposer au débiteur.","A cet effet, le Prestataire certifie notamment : ",
+						"- Avoir souscrit un contrat d’assurance la garantissant contre les conséquences pécuniaires de sa responsabilité professionnelle auprès de la compagnie AXA, sous le n° 160131330. ","- Etre titulaire d’un compte décret visés à l’article 18-1 de la loi du 24 janvier 1984 susvisée, ou l’une des institutions ou l’un des établissements visés à l’article 8 de la même loi pour l’encaissement des fonds débiteurs. Il est rappelé que ce compte est dédié au strict encaissement des fonds débiteur, et ne peut faire l’objet d’aucune saisie conservatoire ou autre procédure visant la saisie attribution. ","- Justifier des conditions requises précitées assurée par déclaration écrite des intéressés, remise ou adressée, avant tout exercice, au Procureur de la république près le Tribunal de Grande Instance dans le ressort duquel la société a le siège de son activité."),
+				"MODALITES DE GESTION"
+					=>array("Le Prestataire s’engage à mettre en œuvre avec diligence les moyens dont elle dispose, et s’efforce d’obtenir des débiteurs dont les dossiers lui sont confiés, l’apurement de leurs dettes.","Le Client autorise expressément le Prestataire à faire intervenir dans le cadre des procédures engagées ses filiales habilitées à exécuter l’objet des présentes, et dispense le Prestataire de l’en informer. De la même manière, le Prestataire pourra sous-traiter tout ou partie des prestations confiées par le Client.","Pour chaque dossier transmis, le Prestataire adressera au Client un accusé de réception, présenté sous forme de listing lorsque plusieurs dossiers sont contenus dans le même fichier d’intégration. le Prestataire emploiera les moyens qui lui apparaissent comme étant les plus adaptés en fonction des éléments recueillis sur le(s) débiteur(s), et, de manière générale sur la stratégie de recouvrement à employer, qu’ils soient dans la réalisation de relances par courriers, en envois simples ou recommandés, courriels ou autres supports de communication, par des actions de télé recouvrement ou de visites domiciliaires.","Dans ce contexte, le Prestataire s’engage à :  ","- Réaliser les prestations conformément aux présentes, aux Conditions particulières et ses annexes, à l’éventuel Cahier des charges sur lequel les Parties se sont entendues, dans le respect des règles de l’art applicables et ce, avec le soin et la diligence requis ;"," - Réaliser les prestations en conformité avec les droits au respect de la vie privée des débiteurs et notamment des dispositions de l’article 9 du code civil ;"," - Collaborer avec le Client selon les termes de l’article 6 ; ","- Mettre en œuvre tous les moyens nécessaires pour assurer la confidentialité des dossiers de créances et l’intégrité des échanges entre le Client et le Prestataire ; ","- Informer chaque débiteur de l’existence de son mandat par courrier ;","- Se présenter en son propre nom lors des conversations téléphoniques avec les débiteurs ; en cas de demande spécifique de la part du Client, le Prestataire pourra intervenir en marque blanche ; ","- Respecter l’image du Client, les règles de déontologie et éthique de la profession.","Sauf demande expresse de la part du Client, les dossiers transmis par le Client dans le cadre de la présente convention feront l’objet d’un traite- ment précontentieux, préalable à toute action judiciaire éventuelle dont l’objectif prioritaire sera la recherche d’une solution amiable dans les meilleurs délais. Sauf stipulation particulière, toute procédure judiciaire à engager fera l’objet d’une validation préalable par le Client. Le recouvrement judiciaire donnera lieu à la signature d’un « pouvoir spécial », selon les articles 827 et 828 du NCPC.","Au jour de la signature du contrat, chacune des parties désigne, au sein de son personnel, les correspondants qualifiés chargés du suivi des prestations, notamment pour coordonner les modalités de transmission des dossiers et le suivi des processus de recouvrement, les délais de traite- ment, les supports d’information entre les Parties. L’annexe « Cahier des charges », lorsqu’elle est constituée, peut permettre de définir précisé- ment les modalités d’échange et de communication entre les parties."),
+				"RESTITUTION DES SOMMES RECOUVREES"
+					=>array("Le Prestataire s’engage à régler au Client, mensuellement à 25 jours fin de mois, après l’encaissement effectif par ses services, les sommes recouvrées en principal pour le compte de ce dernier, déduction faite de ses commissions et éventuellement des coûts engagés pour le compte du Client (frais, honoraires ...) sur l’ensemble des dossiers. La restitution des sommes recouvrées pourra être prévue dans l’annexe « Cahier des charges ».","Les dépens auxquels le débiteur est condamné sont affectés en priorité par le Prestataire au règlement des coûts engagés pour le compte du Client.","Au cas où il y aurait des règlements impayés de la part du débiteur sur des fonds déjà reversés au Client, ce dernier s’engage à les rembourser sans délai, suivant le relevé mensuel adressé par le Prestataire. Si des règlements intervenus faisaient l’objet d’une annulation en vertu d’une négociation commerciale, conventionnelle, d’un avoir, d’un jugement ou arrêt, ou pour tout autre raison, les commissions préalablement facturées ne pourront pas être remis en cause."),
+				"REMUNERATION DE CAP RECOUVREMENT"
+					=>array("Le Prestataire recevra du Client une rémunération hors taxes selon les modalités définies en annexe tarifaire jointe, sur les sommes recouvrées en principal et en accessoire. Est considérée comme accessoire toute somme distinct du principal de la créance.","Dans tous les cas, les commissions s’appliquent systématiquement à compter du jour de la réception du dossier par le Prestataire"," - sur les sommes perçues par le Prestataire  - sur les sommes versées directement par le débiteur au Client","- sur le montant de la reprise de matériel, de marchandises, d’avoir consenti par le Client, lettrage de paiement antérieur, compensation légale, conventionnelle ou judiciaire, validée par le Client. Le Client reconnaît que les commissions du Prestataire sont facturables en cas d’avoir émis postérieurement à la demande de recouvrement (notamment en cas de retour de marchandises, de modification de facturation, en cas d’identification de règlement(s) intervenu(s) chez le client), et plus généralement lorsque le client considère l’impayé transmis comme étant régularisé chez lui.","- Sur demande expresse du client de clôturer une ou plusieurs affaires confiées, et ce qu’elle qu’en soit les motivations. Dans ce cas, le Prestataire facturera au Client l’intégralité des frais et honoraires auxquels il aurait pu prétendre si le dossier avait été mené à bonne fin.","De convention expresse, le Client autorise le Prestataire à compenser les sommes qu’il aura recouvrées avec les rémunérations ou remboursements de frais qui pourraient lui être dus au titre des différents dossiers confiés dans le cadre du présent mandat. Le Prestataire reversera au Client l’intégralité des sommes perçues pour son compte. Le créancier demande au Prestataire de réclamer au débiteur, outre les intérêts moratoires et accessoires légaux, toutes indemnités ou dommages et intérêts qui seraient dus en raison de la loi, de dispositions contractuelles ou de la mauvaise foi du débiteur, sans que cette liste ne soit limitative. le montant desdites indemnités étant précisé par le Client dans les Conditions particulières et dans ses propres documents contractuels. les Conditions Particulières précisent quels honoraires sont perçus sur les sommes accessoires. Lesdites sommes seront considérées comme un élément constitutif de la rémunération du Prestataire et impactent directement la proposition tarifaire proposée au Client. le Prestataire dispose de la faculté d’affecter à son gré les sommes recouvrées au Principal confié ou aux sommes complémentaires et accessoires réclamés, quelle qu’en soit la nature. Le créancier pourra être amené à devoir justifier, sous sa responsabilité, le montant du préjudice indépendant du retard de paiement qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, et qu’il demande au Prestataire de recouvrer.","En matière d’action judiciaire, outre les commissions contractuellement prévues, seront facturés au Client les forfaits tels qu’ils lui ont été proposés, ainsi que les frais engagés pour son compte dans le cadre de l’action judiciaire ; par frais engagés on entend frais de procédure et d’exécution, honoraires d’huissier, frais d’expertise, frais d’enquêtes, frais bancaires et, d’une manière générale, toutes les dépenses payées pour le compte du client aux fins de gérer son dossier.. Dans le cas d’une telle action, les commissions liées au recouvrement feront l’objet d’une augmentation de deux points. Le Prestataire peut être amené à demander au client une provision préalable à la poursuite de l’action. Ces forfaits et le remboursement des frais engagés sont dus quelle que soit l’issue du dossier.","En cas de désaccord, sur tout ou partie d’une facture, le Client s’engage à indiquer par écrit au Prestataire, le motif de la contestation et ce, dans les 15 jours ouvrés de la réception de ladite facture, étant entendu que toute facture non contestée dans ledit délai est réputée définitivement acceptée."),
+				"FACTURATION"
+					=>array("Nos factures sont payables au comptant à réception. le défaut de paiement des factures émises à leur échéance entraînera automatiquement, sans mise en demeure préalable, l’exigibilité immédiate de toutes les sommes dues au Prestataire, échues ou à échoir, quel que soit le mode de règlement convenu. En outre, les sommes restant dues seront automatiquement, et sans formalités, majorées, à compter de leur date d’exigibilité, d’un intérêt appliqué par la Banque Centrale Européenne à son opération de refinancement la plus récente majoré de 10 points de pourcentage, d’une indemnité égale à 20% des sommes dues à titre de clause pénale, ainsi qu’une indemnité forfaitaire pour frais de recouvrement d’un montant de 40,00 EUR par facture impayée. Si les frais de recouvrement sont supérieurs à l’indemnité forfaitaire, le client s’engage à s’acquitter de l’intégralité de ces frais, sur justification et à première demande du Prestataire, et ce conformément à l’article l441-6 du Code de commerce."),
+				"OBLIGATIONS DES PARTIES"
+					=>array("Chacune des Parties reconnaît que les prestations nécessitent une collaboration active et régulière entre le Prestataire et le Client.  le Client s’engage à fournir à ses frais au Prestataire, les créances échues selon les dispositions prévues dans le préalablement à la signature de la convention.","Le Client garantit au Prestataire qu’aucun autre intervenant n’est préalablement intervenu dans les dossiers transmis, ou n’est en cours d’action sur les dossiers confiés au Prestataire. Dans le cas contraire, les sommes recouvrées par l’autre intervenant figureront dans l’assiette de facturation du prestataire. En outre, et dans ces conditions, le Prestataire se réserve la possibilité de mettre fin à la présente convention et de considérer que l’ensemble des dossiers en cours de gestion seront soumis à clôture anticipée aux torts exclusifs du Client, ce qui engendrera une facturation conformément aux conditions spécifiées à l’article 5 des pré- sentes.","Le Client s’engage à identifier les paiements directs effectués à son attention par les débiteurs, et plus généralement tous paiements qui lui parviendraient sans être passé par le Prestataire. Il s’engage à en tenir informé le Prestataire dans un délai de trois jours ouvrés à compter de la réception entre ses mains, par courriel, ou par fax, afin qu’il en soit tenu compte dans les procédures engagées et dans l’élaboration de la facture du Prestataire. Il en va de même concernant tout avoir ou remise consentis, ainsi que toute contestation, proposition, intervention formulées directement par le débiteur à son encontre ou réciproquement.  Si une difficulté apparaît au cours de la réalisation de la prestation, chacune des Parties s’engage à alerter l’autre le plus rapidement possible afin de se concerter pour mettre en place la solution la mieux adaptée et ce, dans les meilleurs délais.","Le Client s’engage aussi à communiquer au Prestataire toutes les informations dont il a connaissance, notamment un jugement d’ouverture d’une procédure collective, vente/cession de fonds de commerce du débiteur, changement d’adresse du débiteur, sans que cette liste ne soit limitative. Le client dispense le Prestataire de l’informer des propositions du débiteur tendant à s’acquitter de son obligation par un autre moyen que le paiement immédiat de la somme réclamée.","Il est convenu que le Prestataire n’est pas tenu à une obligation de surveillance permanente du BODACC ou des annonces légales en matière de redressement judiciaire, ou vente de fonds de commerce. Aucune réclamation concernant un dossier classé après règlement ou notification au client de l’abandon des poursuites ne sera admise au-delà d’un délai de trois mois après le règlement ou l’avis de classement de CAP RECCOUVREMENT. Si le client n’a pas demandé la restitution de son dossier, CAP RECOUVREMENT est définitivement déchargée de toute responsabilité relative à la conservation des pièces et documents confiés dans ces mêmes délais ou dans l’éventualité de perte ou destruction d’archives par cas de force majeure. "),
+				"RESPONSABILITES"
+					=>array("Le client est seul responsable de la légitimité des créances confiées au Prestataire et de l’identité du débiteur. Le Prestataire dégage toute responsabilité en cas de demande abusive et injustifiée. Le Prestataire appellera en garantie son Client en cas de poursuites engagées contre elle sur ce chef de demande. La mise en demeure adressée au débiteur est effectuée sous l’entière responsabilité du Client. En conséquence, le Prestataire attire l’attention de son client sur le fait que : la créance à recouvrer doit être certaine, liquide et exigible ; les éventuels compléments doivent représenter des frais réellement engagés et/ou des indemnités pouvant être légalement ou conventionnellement justifiées. Le Client s’interdit toute ingérence dans la conduite du dossier confié au Prestataire, tant vis-à-vis de son débiteur que des correspondants du Prestataire. le Client déclare avoir régulièrement recueilli les pièces transmises au Prestataire. En cas de condamnation du client au paiement de dommages et intérêts et/ou d’indemnités en application de l’article 700 du Code de Procédure Civil, il devra en assurer personnellement le paiement. le Prestataire se réserve le droit de ne pas poursuivre judiciairement les débiteurs qu’il jugera insolvables ou dont la demande sera jugée mal fondée. En cas de contestation sérieuse du débiteur, le Prestataire se réserve le droit de ne pas poursuivre le dossier.  Le Prestataire rappelle autant que de besoin qu’il est soumis à une obligation de moyens, et non de résultat. En cas d’insuccès d’une ou plusieurs phases de recouvrement, qu’elles soient amiables ou judiciaires, la responsabilité du Prestataire ne pourra jamais être recherchée au seul motif que la créance n’est pas recouvrée. La responsabilité du Prestataire ne pourra jamais être recherchée en cas de force majeure. Seront notamment considérés comme un cas de force majeure, la guerre, l’émeute, la révolution, la grève chez l’une des parties ou chez tout tiers, une catastrophe naturelle, un acte de piraterie, un incident sur les lignes téléphoniques et un dysfonctionnement des réseaux. En outre, la responsabilité du Prestataire ne pourra jamais être recherchée en cas de dysfonctionnement généré par un matériel informatique défectueux appartenant au client ou mis à disposition par un tiers. Toute responsabilité qui serait alléguée à l’encontre du Prestataire ne pourra en aucun cas être d’un montant supérieur à ce qui a été facturé par le Prestataire sur le dossier concerné. "),
+				"DONNEES PERSONNELLES - REFERENCEMENT"
+					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
+				"NON SOLLICITATION DE PERSONNEL"
+					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
+				"DUREE DE LA CONVENTION"
+					=>array("La présente convention de recouvrement est conclue pour une durée d’un (1) an renouvelable par tacite reconduction, à compter de la signature de la présente convention, sauf dénonciation par l’une ou l’autre des parties, en respectant toutefois un préavis de deux (2) mois, et ce par lettre recommandée avec accusé de réception ; le point de départ du préavis est fixé à la date de l’accusé de réception.  Dans ce cas, les dossiers restant en cours à l’expiration de la convention continueront à être gérés par le Prestataire jusqu’à leur clôture définitive. Le Prestataire s’engage à apporter tous ses soins à cette gestion et le Client s’engage à en accepter les conséquences, ceci en conformité avec les conditions de traitement initialement prévues et dans le cadre des conditions générales de recouvrement.  Dans l’hypothèse où le Client exigerait la restitution de dossiers en cours en raison de la dénonciation de la convention, celle-ci serait subordonnée au paiement préalable au Prestataire de toutes les commissions et de tous les remboursements de frais pouvant lui rester dus."),
+				"CLAUSE ATTRIBUTIVE DE JURIDICTION"
+					=>array("Le Tribunal de commerce de Lille Métropole est seul compétent nonobstant toute clause contraire même en cas de pluralité de défendeurs ou d’appel en garantie. Nos prestations sont soumises au droit français."),
+				"ELECTION DE DOMICILE"
+					=>array("Pour l’exécution des présentes, les parties font élection de domicile en leur adresse portée en tête des présentes."),
+			);
+
+		
+		$this->multicell(0,4,"Le Client a pris connaissance de l’offre du Prestataire à l’occasion de leurs relations précontractuelles et reconnaît avoir reçu l’ensemble des informations et conseils lui permettant d’apprécier la proposition du Presta- taire. le Client souhaite recourir aux services du Prestataire et reconnaît que leur mise en œuvre nécessite une collaboration étroite et active. Le Client reconnaît que le présent contrat est soumis aux dispositions du décret n°2012-783 du 30 Mai 2012 et les dispositions ultérieures régissant le recouvrement de créances pour le compte d’autrui.",0,1,"L");
+
+		
+		$this->setfont('arial','',8);
+		$this->multicell(0,4,"",0,1,"L");
+		$i=1;
+		foreach ($cg as $key => $value) {
+			if($key == "MODALITES DE GESTION" 
+			|| $key == "REMUNERATION DE CAP RECOUVREMENT"
+			|| $key == "OBLIGATIONS DES PARTIES"
+			|| $key == "DONNEES PERSONNELLES - REFERENCEMENT"){
+				$this->Addpage();
+				$this->enteteCedre();
+			}
+
+			$this->setfont('arial','B',8);
+			$this->cell(0,5,"ARTICLE ".$i." ".$key,0,1,"L");
+			$this->ln(3);
+			$this->setfont('arial','',8);
+
+			foreach ($value as $k=> $v) {
+				$this->multicell(0,4,$v,0,1,"L");
+				$this->ln(2);
+			}
+			$i++;
+		}
+
+		$this->setfont('arial','B',8);
+		$this->cell(0,5,"Cette convention est validée en double exemplaire de 8 pages remises à chaque partie signataire",0,1,"L");
+
+		$y = $this->getY();
+
+		$this->setFont('arial','',10);		
+		$this->setFillColor(255,255,255);	
+		$this->cell(60,70," ",1,0,"L",1);		
+		$this->setFillColor(163,197,15);		
+		$this->cell(120,70," ",1,1,"L",1);
+
+
+		$this->setY($y);
+		$this->setFillColor(255,255,255);
+		$this->ln(2);
+		$this->cell(60,5,"Pour CAP RECOUVREMENT",0,1,"L");
+		$this->ln(15);
+		$this->cell(60,5,"Nom : Olivier DUBENSKI",0,1,"L");
+		$this->cell(60,5,"Signature :",0,1,"L");
+		$this->ln(30);
+		$this->cell(60,5,"Acceptation CAP RECOUVREMENT",0,1,"L");
+
+
+		$this->setY($y);
+		$this->setLeftMargin(75);
+		$this->multicell(120,5,"Le Client déclare avoir pris connaissance et accepter sans réserve les conditions générales de prestation",0,1,"L");
+		$this->ln(10);
+		$this->cell(120,5,"Nom du signataire :",0,1,"L");
+		$this->cell(120,5,"Lu et approuvé Cachet commercial et signature",0,1,"L");
+		$this->ln(25);
+		$this->cell(120,5,"Date : ",0,1,"L");
+		$this->cell(120,5,"Acceptation du Client",0,1,"L");
+
+		$this->setLeftMargin(15);
+		$this->ln(8);
+		$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
+		$this->setFont('arial','B',8);		
+		$this->cell(0,4,"CAP RECOUVREMENT - 30 Boulevard du Général Leclerc - BP 70333 - 59056 ROUBAIX CEDEX 1",0,1,"C");
+		
+
+
+
+
+
+
+	}
 
 
 	public function enteteCedre(){

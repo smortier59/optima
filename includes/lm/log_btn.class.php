@@ -26,6 +26,7 @@ class log_btn extends classes_optima {
 		
 		
 		$r=ATF::db()->sql2array($q);
+		log::logger($r, 'alahlah');
         return $r;
 
     } 
