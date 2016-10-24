@@ -998,9 +998,7 @@ class affaire_lm extends affaire {
 	* @return boolean
     */
 	public function mailContact($email,$last_id,$table,$paths){
-		log::logger($last_id , "mfleurquin");
-		log::logger($table , "mfleurquin");
-		log::logger($paths , "mfleurquin");
+		
 		$enregistrement = ATF::$table()->select($last_id);	
 		if($email["email"]){
 			$recipient = $email["email"];

@@ -424,9 +424,9 @@ class commande_lm extends commande {
 					ATF::facture_fournisseur()->q->reset()
 						->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
 						->where("type", "achat");					
-					foreach (ATF::facture_fournisseur()->select_all() as $k => $v) {
+					/*foreach (ATF::facture_fournisseur()->select_all() as $k => $v) {
 						ATF::facture_fournisseur()->u(array("id_facture_fournisseur"=>$v["id_facture_fournisseur"], "numero_cegid"=> ATF::facture_fournisseur()->getNumeroCegid()));
-					}
+					}*/
 
 					$id_societe = $this->select($infos["id_commande"] , "id_societe");
 					if(ATF::societe()->select($id_societe, "relation") !== "client"){ ATF::societe()->u(array("id_societe"=> $id_societe, "relation"=>"client")); }
