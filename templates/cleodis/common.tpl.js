@@ -9,6 +9,19 @@ ATF.formation_facture_type = function(el,val,lastVal) {
 	});
 }
 
+ATF.natureMandatChange = function(el,val,lastVal) {
+	if(val == "cedre"){
+		Ext.ComponentMgr.get('combomandat[type_creance]').setValue("btob_btoc");
+		Ext.ComponentMgr.get('combomandat[autorisation_huissier]').setValue("oui");
+		Ext.ComponentMgr.get('combomandat[relance_interne]').setValue("oui");
+		Ext.ComponentMgr.get('combomandat[acces_web]').setValue("oui");
+		Ext.ComponentMgr.get('combomandat[cahier_charge]').setValue("oui");
+		Ext.ComponentMgr.get('mandat[indemnite_retard]').setValue("75");
+	}
+	
+}
+
+
 
 ATF.formation_devis_type = function(el,val,lastVal) {
 	
