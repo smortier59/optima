@@ -32,7 +32,7 @@ class mandat_cap extends mandat {
             ,"date_envoi"   
             ,"date_retour" 
             ,"id_representant" 
-            ,"nature"        
+            ,"nature"=>array("listeners"=>array("change"=>"ATF.natureMandatChange"))     
         );
 
         $this->colonnes['panel']['participants'] = array(
@@ -67,6 +67,8 @@ class mandat_cap extends mandat {
             ,"cahier_charge"                
             ,"commentaire"
             ,"indemnite_retard"
+            ,"clause_penale"
+            ,"clause_penale_percentage"
         );
 
                
