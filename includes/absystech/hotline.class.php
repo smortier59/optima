@@ -1785,6 +1785,21 @@ class hotline extends classes_optima {
 		ATF::db()->commit_transaction();
 	}
 	
+
+	public function _graph_tickets_hotline($get, $post){
+		/*
+		$at = $this->stats(true);
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->stats(true);
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+
+		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
+		*/
+		return 'un test';
+	}
+
 	public function _stats($get, $post){
 		$at = $this->stats(true);
 		ATF::define_db("db","extranet_v3_att");
@@ -3532,8 +3547,29 @@ class hotline extends classes_optima {
 		        }
 			}
 			
-
 		}
+	}
+
+	/**
+	* Permet de récupérer la liste des tickets hotline en cours pour snap stat
+	* @package Telescope
+	* @author Anthony LAHLAH <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function getTotalHotlineEnCours($get,$post) {
+		$date = date('Y-m-d',strtotime('- 1 day'));
+		$data  = array("total"=>array());
+
+		$q = "SELECT COUNT(*) as en_cours FROM hotline WHERE etat = 'fixing' OR etat = 'wait' OR etat = 'free'";
+		
+		$data['total'] = ATF::db()->ffc($q);
+
+		$qC = "SELECT COUNT(*) as cloture FROM hotline WHERE DATE_FORMAT(date_fin, '%Y-%m-%d') ='".$date."'";
+		$data['cloture'] = ATF::db()->ffc($qC);
+
+        return json_encode($data);
 	}
 
 
@@ -3543,6 +3579,7 @@ class hotline extends classes_optima {
 
 
 
+	
 
 	/**
 	* Permet de récupérer la liste des tickets hotline pour telescope
@@ -3551,7 +3588,7 @@ class hotline extends classes_optima {
 	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
-	*/ 
+	*/
 	public function _GET($get,$post) {
 
 		// Gestion du tri
@@ -4025,6 +4062,16 @@ class hotline extends classes_optima {
 		}
 		return $res;		
 	}
+
+
+	public function _getTotalHotlineEnCours($get,$post) {
+		$date = date('Y-m-d',strtotime('- 1 day'));
+		$q = "SELECT * FROM stat_snap WHERE code = 'getTotalHotlineEnCours' AND DATE_FORMAT(date, '%Y-%m-%d') >='".$date."'";
+
+		if ($data = ATF::db()->sql2array($q)) return $data;
+		else return array();
+	}
+	
 
 };
 ?>
