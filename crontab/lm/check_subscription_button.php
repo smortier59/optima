@@ -3,6 +3,16 @@ define("__BYPASS__",true);
 $_SERVER["argv"][1] = "lm";
 include(dirname(__FILE__)."/../../global.inc.php");
 
+
+// Vérification si le script est déjà en train de tourner, dans ce cas là, on attends.
+$cmd = 'ps -efa | egrep -e "[0-9] php '.__FILE__.'"';
+$result = explode("\n",trim(`$cmd`));
+if (count($result)>1) {
+	echo "Crontab deja en cours d'éxecution\n";
+	exit(-1);
+}
+
+
 ATF::define("tracabilite",false);
 log::logger("START","qjanon");
 

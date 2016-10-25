@@ -31,7 +31,8 @@ class mandat_cap extends mandat {
             ,"date"  
             ,"date_envoi"   
             ,"date_retour" 
-            ,"id_representant"         
+            ,"id_representant" 
+            ,"nature"=>array("listeners"=>array("change"=>"ATF.natureMandatChange"))     
         );
 
         $this->colonnes['panel']['participants'] = array(
@@ -66,6 +67,8 @@ class mandat_cap extends mandat {
             ,"cahier_charge"                
             ,"commentaire"
             ,"indemnite_retard"
+            ,"clause_penale"
+            ,"clause_penale_percentage"
         );
 
                
@@ -80,8 +83,13 @@ class mandat_cap extends mandat {
             ,"precision_btoc"
         );
 
+        $this->colonnes['panel']['ligne_cedre'] = array(
+            "cedre"=>array("custom"=>true)
+        );
+
         $this->panels['ligne_btob'] = array('nbCols'=>1,'visible'=>false);
         $this->panels['ligne_btoc'] = array('nbCols'=>1,'visible'=>false);
+        $this->panels['ligne_cedre'] = array('nbCols'=>1,'visible'=>false);
         $this->panels['condition'] = array('nbCols'=>1,'visible'=>true);
 
         $this->colonnes['bloquees']['insert'] =  
@@ -116,6 +124,7 @@ class mandat_cap extends mandat {
 
         $btoc = json_decode($infos["values_".$this->table]["btoc"],true);
         $btob = json_decode($infos["values_".$this->table]["btob"],true);
+        $cedre = json_decode($infos["values_".$this->table]["cedre"],true);
 
         if(isset($infos["tu"])){ $tu = true; }else{ $tu = false; }
         
@@ -137,57 +146,71 @@ class mandat_cap extends mandat {
             ATF::mandat_contact()->insert(array("id_mandat"=>$last_id, "id_contact"=>ATF::contact()->decryptId($value)));
         }
 
-
-        if($infos["type_creance"]){
-            if($infos["type_creance"] == "btob"){
-                if($btob){
-                    foreach ($btob as $key => $value) {
-                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
-                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
-                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
-                                                           "type"=> $value["mandat_ligne__dot__type"],
-                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
-                                                           "mandat_type"=> "btob"
-                                                    ));
+        if($infos["nature"] == "normal"){
+            if($infos["type_creance"]){
+                if($infos["type_creance"] == "btob"){
+                    if($btob){
+                        foreach ($btob as $key => $value) {
+                            ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                               "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                               "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                               "type"=> $value["mandat_ligne__dot__type"],
+                                                               "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                               "mandat_type"=> "btob"
+                                                        ));
+                        }
                     }
-                }
-            }elseif($infos["type_creance"] == "btoc"){
-                if($btoc){
-                    foreach ($btoc as $key => $value) {
-                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
-                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
-                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
-                                                           "type"=> $value["mandat_ligne__dot__type"],
-                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
-                                                           "mandat_type"=> "btoc"
-                                                    ));
+                }elseif($infos["type_creance"] == "btoc"){
+                    if($btoc){
+                        foreach ($btoc as $key => $value) {
+                            ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                               "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                               "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                               "type"=> $value["mandat_ligne__dot__type"],
+                                                               "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                               "mandat_type"=> "btoc"
+                                                        ));
+                        }
                     }
-                }
-            }else{
-                if($btob){
-                    foreach ($btob as $key => $value) {
-                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
-                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
-                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
-                                                           "type"=> $value["mandat_ligne__dot__type"],
-                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
-                                                           "mandat_type"=> "btob"
-                                                    ));
+                }else{
+                    if($btob){
+                        foreach ($btob as $key => $value) {
+                            ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                               "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                               "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                               "type"=> $value["mandat_ligne__dot__type"],
+                                                               "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                               "mandat_type"=> "btob"
+                                                        ));
+                        }
                     }
-                }
-                if($btoc){
-                    foreach ($btoc as $key => $value) {
-                        ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
-                                                           "texte" => $value["mandat_ligne__dot__texte"] ,
-                                                           "valeur"=> $value["mandat_ligne__dot__valeur"],
-                                                           "type"=> $value["mandat_ligne__dot__type"],
-                                                           "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
-                                                           "mandat_type"=> "btoc"
-                                                    ));
+                    if($btoc){
+                        foreach ($btoc as $key => $value) {
+                            ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                               "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                               "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                               "type"=> $value["mandat_ligne__dot__type"],
+                                                               "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                               "mandat_type"=> "btoc"
+                                                        ));
+                        }
                     }
                 }
             }
+        }elseif($infos["nature"] == "cedre"){
+            if($cedre){
+                foreach ($cedre as $key => $value) {
+                    ATF::mandat_ligne()->insert(array( "id_mandat"=>$last_id,
+                                                       "texte" => $value["mandat_ligne__dot__texte"] ,
+                                                       "valeur"=> $value["mandat_ligne__dot__valeur"],
+                                                       "type"=> $value["mandat_ligne__dot__type"],
+                                                       "ligne_titre"=> $value["mandat_ligne__dot__ligne_titre"],
+                                                       "mandat_type"=> "cedre"
+                                                ));
+                }
+            }
         }
+        
 
 
         if($preview){
