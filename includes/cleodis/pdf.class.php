@@ -304,7 +304,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisVente(){
+	public function devisVente(){
 		if (!$this->devis) return false;
 		/* PAGE 2 */
 		$this->setHeader();
@@ -533,7 +533,7 @@ class pdf_cleodis extends pdf {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @date 23-09-2016
 	*/
-	private function devisClassique_new() {
+	public function devisClassique_new() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -978,7 +978,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisClassique() {
+	public function devisClassique() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -1427,7 +1427,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisAvenant() {
+	public function devisAvenant() {
 		if (!$this->devis) return false;
 
 		/* PAGE 2 */
@@ -1831,7 +1831,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	*/
-	private function contratA3Left() {
+	public function contratA3Left() {
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -1959,7 +1959,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	*/
-	private function contratA3Right() {
+	public function contratA3Right() {
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";		
@@ -3270,7 +3270,7 @@ class pdf_cleodis extends pdf {
 	* @date 21-02-2011
 	* @param int $id Identifiant bon de commande
 	*/
-	private function initBDC($id,$s) {
+	public function initBDC($id,$s) {
 		$this->bdc = ATF::bon_de_commande()->select($id);
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$this->lignes = ATF::bon_de_commande_ligne()->sa();
@@ -3489,7 +3489,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	* @param int $id Identifiant demande de refi
 	*/
-	private function initDemandeRefi($id,$s) {
+	public function initDemandeRefi($id,$s) {
 		$this->demandeRefi = ATF::demande_refi()->select($id);
 		$this->affaire = ATF::affaire()->select($this->demandeRefi['id_affaire']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
@@ -3939,7 +3939,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 21-02-2011
 	*/
-	private function factureRefi($global=false) {
+	public function factureRefi($global=false) {
 		if(!$global){
 			$this->open(); 
 		}
@@ -4088,7 +4088,7 @@ class pdf_cleodis extends pdf {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @date 17-11-2014
 	*/
-	private function factureMidas($global=false){
+	public function factureMidas($global=false){
 
 		if(!$global){
 			$this->open(); 
@@ -4185,7 +4185,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-02-2011
 	*/
-	private function factureClassique($global=false){
+	public function factureClassique($global=false){
 		if(!$global){
 			$this->open(); 
 		}
@@ -4481,7 +4481,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 30-05-2011
 	*/
-	private function initEcheancier($id) {
+	public function initEcheancier($id) {
 		$this->affaire = ATF::affaire()->select($id);
 		$this->commande = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 		$this->devis = ATF::devis()->select($this->commande['id_devis']);
@@ -4547,7 +4547,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 28-02-2011
 	*/
-	private function echeancierFacturation($id) {
+	public function echeancierFacturation($id) {
 		$this->open();
 		$this->unsetHeader();
 		$this->addpage();
@@ -5001,7 +5001,7 @@ class pdf_cleodis extends pdf {
 	* @param $id id de la facture	
 	* @date 06-02-2013
 	*/
-	private function premiereRelance(){
+	public function premiereRelance(){
 		$this->multicell(0,10,"Objet : Relance facture impayée ");
         $this->ln(5);
 		
@@ -5047,7 +5047,7 @@ class pdf_cleodis extends pdf {
 	* @param $id id de la facture	
 	* @date 06-02-2013
 	*/
-	private function deuxiemeRelance(){
+	public function deuxiemeRelance(){
 		$this->multicell(0,5,"Objet : 2ème Relance facture impayée ");
         $this->ln(5);
         
@@ -5097,7 +5097,7 @@ class pdf_cleodis extends pdf {
 	* @param $id id de la facture	
 	* @date 06-02-2013
 	*/
-	private function miseDemeure(){		
+	public function miseDemeure(){		
         $this->ln(5);
         $this->multicell(0,5,"Objet : Mise en demeure - Lettre recommandée avec accusé de reception");
         $this->ln(5);
@@ -7168,7 +7168,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 	* @date 12-03-2015
 	* @param int $id Identifiant bon de commande
 	*/
-	private function initFormationBDC($id,$s) {
+	public function initFormationBDC($id,$s) {
 		$this->bdc = ATF::formation_bon_de_commande_fournisseur()->select($id);;
 		$this->devis = ATF::formation_devis()->select($this->bdc["id_formation_devis"]);
 
@@ -8127,7 +8127,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
 	*/
-	private function contratA3Left() {
+	public function contratA3Left() {
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -8293,7 +8293,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
 	*/
-	private function contratA3Right() {
+	public function contratA3Right() {
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";		
@@ -8472,7 +8472,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	/** PDF d'une facture refinanceur
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 21-02-2011
-	private function factureRefi($global=false) {
+	public function factureRefi($global=false) {
 		if(!$global){
 			$this->open(); 
 		}
@@ -8622,7 +8622,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-02-2011
 	*/
-	private function factureClassique($global=false){
+	public function factureClassique($global=false){
 		if(!$global){
 			$this->open(); 
 		}
