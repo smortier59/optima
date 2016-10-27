@@ -74,9 +74,10 @@ class societe_cleodis extends societe {
 		));
 		$this->colonnes['panel']['facturation_fs']["banque_ref"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"IBAN"
-			,"BIC"
+			,"BIC"			
 		));
 		$this->colonnes['panel']['facturation_fs'][]="RIB";
+		$this->colonnes['panel']['facturation_fs'][]="RUM";
 		$this->colonnes['panel']['facturation_fs'][]="divers_2";
 		$this->colonnes['panel']['facturation_fs'][]="nom_banque";
 		$this->colonnes['panel']['facturation_fs'][]="ville_banque";
