@@ -21,6 +21,7 @@ class affaire_lm extends affaire {
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
 			,'commande.etat'=>array("width"=>30,"renderer"=>"etat")
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
+			,"ref_commande_lm"=>array("rowEditor"=>"setInfos")
 		);
 
 		$this->colonnes['primary'] = array(
@@ -124,10 +125,29 @@ class affaire_lm extends affaire {
 		$this->addPrivilege("getCompteT");
 		$this->addPrivilege("getCompteTLoyerActualise");
 		$this->addPrivilege("relancer");
+		$this->addPrivilege("setInfos","update");
 		$this->no_delete = true;
 		$this->no_update = true;
 		$this->no_insert = true;
 		$this->can_insert_from = array("societe");
+	}
+
+
+	/**
+	 * Permet de modifier un champs en AJAX
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @return bool
+	 */
+	public function setInfos($infos){
+		$res = $this->u(array("id_affaire"=> $this->decryptId($infos["id_affaire"]),
+						  $infos["field"] => $infos[$infos["field"]])
+					);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}		
 	}
 	
 	/**
@@ -1066,5 +1086,110 @@ class affaire_lm extends affaire {
 		*/
 
 	}
+
+
+
+	/**
+    * Parsing des mails d'expedition de commande
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param $mail boite mail à parser
+	* @param $host Host de la boite mail
+	* @param $port Port de la boite mail
+	* @param $password Password de connection boite mail
+    */
+	public function checkMailBoxExpeditionCommande($mail, $host, $port, $password){
+		
+		ATF::imap()->init($host, $port, $mail, $password, "INBOX", false, "/imap/ssl");
+		if (ATF::imap()->error) {
+			throw new errorATF(ATF::imap()->error);
+		}
+		$mails = ATF::imap()->imap_fetch_overview('1:*');
+
+		
+		if(is_array($mails)){
+			foreach ($mails as $kmail => $vmail) {
+								
+				if (strpos(str_replace(" ","",$vmail->subject),"=?UTF-8?Q?Exp=C3=A9dition_de_votre_commande_n=C2=B0")!==false){
+					$num_commande_lm = str_replace("=?UTF-8?Q?Exp=C3=A9dition_de_votre_commande_n=C2=B0","",$vmail->subject);
+					$num_commande_lm = str_replace("?=","",$num_commande_lm);
+
+					$date_expedition = date("Y-m-d", strtotime($vmail->date));	
+					$body =  ATF::imap()->returnBody($vmail->uid);
+
+					$this->q->reset()->where("ref_commande_lm",$num_commande_lm);
+					$affaire = $this->select_row();
+
+					if($affaire){
+						$affaire = $this->select($affaire["affaire.id_affaire"]);
+						$client = ATF::societe()->select($affaire["id_societe"]);
+						
+						$body = str_replace("\n", "", $body);
+						$body = str_replace("\r", "", $body);
+						
+
+						$pattern_num_expedition = "/Leroy Merlin : Exp=C3=A9dition n=C2==B0 ([0-9]*) de votre commande/";
+						preg_match_all($pattern_num_expedition , $body, $ids);						
+						$num_expedition = $ids[1][0];
+
+						$pattern_ref_colissimo = "/<strong>Colis n=C2=B0= ([a-zA-Z0-9]*)<\/strong>/";
+						preg_match_all($pattern_ref_colissimo , $body, $ids_colissimo);									
+						$ref_colissimo = $ids_colissimo[1][0];																
+						$lien_colissimo = "http://www.colissimo.fr/portail_colissimo/suivre.do?colispart=".$ref_colissimo;
+						log::logger($ref_colissimo , "mfleurquin");
+
+
+						$pattern_produits = "/<em>Ref : ([0-9]*)<\/em><\/font>/";
+						preg_match_all($pattern_produits , $body, $ids_produits);
+						$ref_produits = $ids_produits[1];
+
+
+						ATF::devis()->q->reset()->where("id_affaire" , $affaire["id_affaire"]);
+						$devis = ATF::devis()->select_row();
+						ATF::devis_ligne()->q->reset()->where("id_devis" , $devis["id_devis"]);
+						$lignes = ATF::devis_ligne()->select_all();
+						
+
+						$produits = array();
+						$i = 0;
+						foreach ($ref_produits as $k_produit => $v_produit) {
+							foreach ($lignes as $kl => $vl) {
+								if($vl["ref"] == $v_produit){
+									$produits[$i]["ref"] = $vl["ref"];
+									$produits[$i]["produit"] = $vl["produit"];
+									$produits[$i]["qte"] = $vl["quantite"];
+									$i++;
+								}
+							}							
+						}					
+
+						$mail = new mail(array(
+							"recipient"=>$client["email"]
+							,"objet"=>"Expédition de votre commande n°".$num_commande_lm
+							,"template"=>"expedition_commande"	
+							,"html"=>true
+							,"affaire"=>$affaire
+							,"client"=>$client
+							,"produits"=>$produits
+							,"num_expedition"=>$num_expedition
+							,"commande_lm"=>$num_commande_lm
+							,"date_envoi"=>$date_expedition
+							,"colissimo_ref"=>$ref_colissimo
+							,"lien_colissimo"=>$lien_colissimo
+							,"from"=>"no-reply@leroymerlin.fr"));
+						$mail->send();
+
+						ATF::imap()->imap_mail_move( $vmail->uid, "Mail_Expedition_traitee");
+					}
+					
+				}	
+			}
+		}
+		ATF::imap()->imap_expunge();		
+		return true;
+
+
+	}
+
+
 };
 ?>

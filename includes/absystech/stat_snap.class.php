@@ -33,7 +33,12 @@ class stat_snap extends classes_optima {
 		$class = ATF::getClass($singleton);
 		if (is_object($class)) {
 			if (method_exists($class,$method)) {
-				$infos["valeur"] = $class->$method();
+				$val = $class->$method();
+				if (is_numeric($val)) {
+					$infos["valeur"] = $val;
+				} else {
+					$infos["data"] = $val;
+				}
 				$infos["id_module"] = ATF::module()->from_nom($singleton);
 				$infos["code"] = $method;
 				$this->insert($infos);
@@ -57,6 +62,7 @@ class stat_snap extends classes_optima {
 			,array("affaire","getMargeTotaleDepuisDebutAnnee")
 			,array("affaire","getMargeTotaleDepuisDebutAnneeDifferenceAnneePrecedente")
 			,array("hotline","getTempsTotalNonResolu")
+			,array("hotline","getTotalHotlineEnCours")
 		);
 	}
 	
@@ -124,7 +130,7 @@ class stat_snap extends classes_optima {
 	}
 
 	
-	public function stats_spline($module){		
+	public function stats_spline($module){	
 		ATF::getClass($module)->q->reset()->addField("COUNT(*)", "nb")	
 										  ->addField("MONTH($module.date)", "mois")
 										  ->addField("YEAR($module.date)", "annee")	

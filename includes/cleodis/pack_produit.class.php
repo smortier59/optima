@@ -21,9 +21,7 @@ class pack_produit extends classes_optima {
 			,'pack_produit.site_associe'
 			,'loyer'=>array("width"=>80,"rowEditor"=>"setInfos")
 			,'duree'=>array("width"=>80,"rowEditor"=>"setInfos")
-			,'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)
-			
-							
+			,'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)				
 		);
 		
 		$this->colonnes['primary'] = array(		 
@@ -127,8 +125,7 @@ class pack_produit extends classes_optima {
 
 		$this->infoCollapse($infos);
 		
-
-		$infos["url"] = util::mod_rewrite($infos["pack_produit"]);
+		$infos["url"] = util::mod_rewrite($infos["nom"],1,true);
 		
 
 		ATF::db($this->db)->begin_transaction();
@@ -203,6 +200,14 @@ class pack_produit extends classes_optima {
 
 		$this->infoCollapse($infos);
 		
+		
+
+		if(!$infos["url"]){
+			$infos["url"] = util::mod_rewrite($infos["nom"],1,true);
+		}
+
+		log::logger($infos, "mfleurquin");
+
 		$last_id = $this->decryptId($infos["id_pack_produit"]);
 
 		ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $last_id);
