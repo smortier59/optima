@@ -155,15 +155,21 @@ class pdf_cleodis extends pdf {
 
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+
+
+
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+		$this->contrat = ATF::commande()->select_row();		
 
 		$this->adresseClient = $this->client["adresse"];
 		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
 		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
 		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
 
-		/* Passage en A3 */
+		/* Passage en A3 
 		$format=array(336,672);
 		$this->fwPt=$format[0];
 		$this->fhPt=$format[1];
@@ -176,11 +182,11 @@ class pdf_cleodis extends pdf {
 		
 		$this->CurOrientation=$this->DefOrientation;
 		$this->w=$this->wPt/$this->k;
-		$this->h=$this->hPt/$this->k;
+		$this->h=$this->hPt/$this->k;*/
 		
 		$this->unsetHeader();
 		$this->Open();		
-		$this->AddPage("L");
+		$this->AddPage();
 
 
 		$this->setfillcolor(208,255,208);
@@ -263,6 +269,16 @@ class pdf_cleodis extends pdf {
 		$this->ln(4);
 		$this->setfont('arial','',7);
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+
+		$this->unsetHeader();		
+		$this->AddPage();
+
+		copy(ATF::commande()->filepath($this->contrat["commande.id_commande"],"contratA4"), ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true));
+
+		$pageCount = $this->setSourceFile(ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true) );
+		
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
 	}
 
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
@@ -2947,7 +2963,7 @@ class pdf_cleodis extends pdf {
 			,"Le : "
 			,"Nom : "
 			,"Qualité : "
-			,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
+			,array("txt"=>"[SignatureContractant/] : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 		);
 		$y = $this->gety()+2;
 		if ($this->affaire['nature']=="vente") {
