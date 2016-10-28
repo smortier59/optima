@@ -108,7 +108,11 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,295,5,35);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-            $this->image(__PDF_PATH__.$this->logo,75,10,60);
+			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
+				$this->image(__PDF_PATH__.$this->logo,75,10,40);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,75,10,60);
+			}            
             $this->setfont('arial','',11);
             if ($this->client) {
                 $cadre = array(
@@ -149,6 +153,118 @@ class pdf_cleodis extends pdf {
 		if ($police != 8)	$this->setfont('arial','',8);
 	}
 
+	public function mandatSellAndSign($id_affaire, $concat=false){
+
+		$this->affaire = ATF::affaire()->select($id_affaire);
+		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+
+		$this->adresseClient = $this->client["adresse"];
+		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
+		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
+		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+
+		/* Passage en A3 */
+		$format=array(336,672);
+		$this->fwPt=$format[0];
+		$this->fhPt=$format[1];
+		
+			
+		$this->DefOrientation='L';
+		$this->wPt=$this->fhPt;
+		$this->hPt=$this->fwPt;
+		
+		
+		$this->CurOrientation=$this->DefOrientation;
+		$this->w=$this->wPt/$this->k;
+		$this->h=$this->hPt/$this->k;
+		
+		$this->unsetHeader();
+		$this->Open();		
+		$this->AddPage("L");
+
+
+		$this->setfillcolor(208,255,208);
+
+
+		//HEADER
+		$this->image(__PDF_PATH__.$this->logo,5,5,40);
+
+		$this->setMargins(5);
+		$this->setfont('arial','',9);
+		$this->setLeftMargin(60);
+		$this->cell(20,4,"Créancier :");
+		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->setLeftMargin(5);
+		$this->line(5,$this->gety()+2,232,$this->gety()+2);
+
+		//Page Centrale
+		//Gauche
+		$this->setY(27);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, "Mandat",0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "de prélèvement SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Coordonnées",0,1);
+		$this->cell(55, 4, "bancaires",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Nom :",0,1);
+		$this->cell(55, 4, "Adresse :",0,1);
+		$this->ln(4);
+		$this->cell(55, 4, "Numéro de mobile :",0,1);
+		
+		//Milieu
+		$this->setY(27);
+		$this->setLeftMargin(60);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, __ICS__,0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Identifiant créancier SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["BIC"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "BIC",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["societe"],0,1);
+		$this->multicell(120, 4, $this->adresseClient,0,1);
+		$this->cell(55, 4, $this->client["tel"],0,1);
+
+		//Droite
+		$this->setY(27);
+		$this->setLeftMargin(125);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Référence unique du mandat",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["IBAN"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "IBAN",0,1);
+
+		$this->setY(70);
+		$this->setLeftMargin(5);
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->ln(4);
+		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y"),0,1);
+
+		$this->ln(4);
+		$this->setfont('arial','',7);
+		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+	}
+
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
@@ -168,6 +284,9 @@ class pdf_cleodis extends pdf {
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
+
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 
 		if($this->devis["type_devis"] === "optic_2000"){
 			$this->devisoptic_2000($id);			
@@ -231,7 +350,9 @@ class pdf_cleodis extends pdf {
   		$this->contact = ATF::contact()->select($this->devis['id_contact']);
   		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
   		$this->agence = ATF::agence()->select($this->user['id_agence']);
-  
+  		
+  		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
   		if($this->devis["type_devis"] === "optic_2000"){
   			$this->devisoptic_2000($id);			
   		}else{
@@ -1728,6 +1849,8 @@ class pdf_cleodis extends pdf {
 		if ($this->affaire['nature']=="AR") {
 			$this->AR = ATF::affaire()->getParentAR($this->affaire['id_affaire']);
 		}
+
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 	}
 
 	/** Renvoi le detail d'un produit par rapport a ses informations
@@ -2306,7 +2429,13 @@ class pdf_cleodis extends pdf {
 		$this->setY(200);
 		$this->setfont('arial','I',8);
 		$this->multicell(95,3,"CGL CLEODIS V09-14",0,"R");
-		$this->image(__PDF_PATH__.$this->logo,330,200,35);
+
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",330,200,35);			
+		} else{
+			$this->image(__PDF_PATH__.$this->logo,330,200,35);
+		}
+		
 		
 		
 		
@@ -2490,7 +2619,13 @@ class pdf_cleodis extends pdf {
 
 
 		$this->setfont('arial','B',10);
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);			
+		} else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+		}
+		
 
 		
 		$this->sety(10);
@@ -2858,7 +2993,12 @@ class pdf_cleodis extends pdf {
 		$this->Open();		
 		$this->AddPage();
 
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",4,5,35);			
+		} else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+		}
+		
 
 		$this->setfont('arial','I',8);
 		//Cadre du haut avec Loueur et Locataire
@@ -3305,8 +3445,12 @@ class pdf_cleodis extends pdf {
 		$this->open();
 		$this->addpage();
 		
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
+		} else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
+		}
 		
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
 		
 		$this->setfont('arial','',10);
 		
@@ -4972,10 +5116,15 @@ class pdf_cleodis extends pdf {
 		$this->relance = ATF::relance()->select($id);
         $this->client = ATF::societe()->select($this->relance['id_societe']);
         $this->contact = ATF::contact()->select($this->relance['id_contact']);
-        
+        $this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
+
+
         ATF::relance_facture()->q->reset()->where('id_relance',$this->relance['id_relance'])->setCount();
         $this->factures = ATF::relance_facture()->sa();
         
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80); 
@@ -5159,6 +5308,8 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5246,7 +5397,9 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-		
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5326,7 +5479,9 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-		
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5385,7 +5540,9 @@ class pdf_cleodis extends pdf {
         $this->devis = ATF::devis()->select($this->commande["id_devis"]);
         $this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
         $this->contact = ATF::contact()->select($this->devis['id_contact']);
-		
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5464,6 +5621,8 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5514,6 +5673,8 @@ class pdf_cleodis extends pdf {
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		if (ATF::$codename == "cleodisbe") $this->sety(50);
@@ -5590,6 +5751,8 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		ATF::loyer()->q->reset()->where("id_affaire", $this->devis['id_affaire']);
 		$this->loyer = ATF::loyer()->select_all();
@@ -5929,6 +6092,8 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->addpage();
 		$this->setfont('arial',"",8);
 		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
@@ -6063,6 +6228,8 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   

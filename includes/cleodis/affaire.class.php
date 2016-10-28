@@ -15,6 +15,7 @@ class affaire_cleodis extends affaire {
 			,'affaire.date'
 			,'affaire.affaire'
 			,'affaire.id_societe'
+			,'affaire.type_affaire'
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
@@ -41,6 +42,7 @@ class affaire_cleodis extends affaire {
 			,'ville_banque'
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
+			,"type_affaire"
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(

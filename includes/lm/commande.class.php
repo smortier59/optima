@@ -421,10 +421,10 @@ class commande_lm extends commande {
 					}
 					ATF::devis()->u(array("id_devis"=> $this->select($infos['id_commande'] , "id_devis"), "date_accord"=>date("Y-m-d")));
 
-					ATF::facture_fournisseur()->q->reset()
+					/*ATF::facture_fournisseur()->q->reset()
 						->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
 						->where("type", "achat");					
-					/*foreach (ATF::facture_fournisseur()->select_all() as $k => $v) {
+					foreach (ATF::facture_fournisseur()->select_all() as $k => $v) {
 						ATF::facture_fournisseur()->u(array("id_facture_fournisseur"=>$v["id_facture_fournisseur"], "numero_cegid"=> ATF::facture_fournisseur()->getNumeroCegid()));
 					}*/
 
