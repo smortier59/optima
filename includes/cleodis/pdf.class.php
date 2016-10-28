@@ -153,7 +153,7 @@ class pdf_cleodis extends pdf {
 		if ($police != 8)	$this->setfont('arial','',8);
 	}
 
-	public function mandatSellAndSign($id_affaire){
+	public function mandatSellAndSign($id_affaire, $concat=false){
 
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
@@ -168,28 +168,26 @@ class pdf_cleodis extends pdf {
 		$this->fwPt=$format[0];
 		$this->fhPt=$format[1];
 		
-		/* Passage en LandScape */		
+			
 		$this->DefOrientation='L';
 		$this->wPt=$this->fhPt;
 		$this->hPt=$this->fwPt;
 		
-		/* Formattage de la taille */
+		
 		$this->CurOrientation=$this->DefOrientation;
 		$this->w=$this->wPt/$this->k;
 		$this->h=$this->hPt/$this->k;
 		
 		$this->unsetHeader();
 		$this->Open();		
-		$this->AddPage();
+		$this->AddPage("L");
 
 
 		$this->setfillcolor(208,255,208);
 
 
-
 		//HEADER
 		$this->image(__PDF_PATH__.$this->logo,5,5,40);
-
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -199,9 +197,7 @@ class pdf_cleodis extends pdf {
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
-
 		//Page Centrale
-
 		//Gauche
 		$this->setY(27);
 		$this->setfont('arial','B',9);
@@ -220,7 +216,6 @@ class pdf_cleodis extends pdf {
 		$this->cell(55, 4, "Adresse :",0,1);
 		$this->ln(4);
 		$this->cell(55, 4, "Numéro de mobile :",0,1);
-
 		
 		//Milieu
 		$this->setY(27);
@@ -245,7 +240,6 @@ class pdf_cleodis extends pdf {
 		$this->cell(55, 4, $this->client["tel"],0,1);
 
 		//Droite
-
 		$this->setY(27);
 		$this->setLeftMargin(125);
 		$this->setfont('arial','B',9);
@@ -269,7 +263,6 @@ class pdf_cleodis extends pdf {
 		$this->ln(4);
 		$this->setfont('arial','',7);
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
-
 	}
 
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
