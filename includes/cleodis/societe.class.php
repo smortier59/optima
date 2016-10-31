@@ -817,46 +817,67 @@ class societe_cleodis extends societe {
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer
 	*/ 
-	public function _sign($post){
-
+	public function _signAndGetPDF($post,$get){
+//log::logger($post,'ygautheron');
+//log::logger($get,'ygautheron');
 		$tel  = $post["tel"]; 
 		$bic  = $post["bic"]; 
 		$iban = $post["iban"]; 
-		$id_affaire = $post["id_affaire"]; 
+		$id_affaire = $post["id"];
 
-		$affaire = ATF::affaire()->select($id_affaire);
-		ATF::societe()->u(array("id_societe"=>$affaire["id_societe"], "tel"=>$tel , "BIC"=>$bic , "IBAN"=>$iban));
+		$id_societe = ATF::affaire()->select($id_affaire,"id_societe");
+		if (!$id_societe) {
+			throw new Exception('Aucune information pour cet identifiant.', 500);
+		}
+		ATF::societe()->u(array("id_societe"=>$id_societe, "tel"=>$tel , "BIC"=>$bic , "IBAN"=>$iban));
 
-		$societe = ATF::societe()->select($affaire["id_societe"]);
+		$societe = ATF::societe()->select($id_societe);
 		$contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
-		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
-		$contrat = ATF::commande()->select_row();
-
 		$this->checkIBAN($iban);
-	
+
 		$pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-				
+
 		$return = array(
-							"civility"=>$contact["civilite"],
-							"firstname"=>$contact["nom"],
-							"lastname"=>$contact["prenom"],
-							"address_1"=>$societe["adresse"],
-							"address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
-							"postal_code"=>$societe["cp"],
-							"city"=>$societe["ville"],
-							"email"=>$contact["email"],
-							"company_name"=>$societe["societe"],
-							"country"=>$societe["id_pays"],
-							"cell_phone"=>$tel,
-							"pdf_mandat"=> base64_encode($pdf_mandat) // base64
-						);
-		return json_encode($return);
+			"civility"=>$contact["civilite"],
+			"firstname"=>$contact["prenom"],
+			"lastname"=>$contact["nom"],
+			"address_1"=>$societe["adresse"],
+			"address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
+			"postal_code"=>$societe["cp"],
+			"city"=>$societe["ville"],
+			"email"=>$contact["email"],
+			"company_name"=>$societe["societe"],
+			"country"=>$societe["id_pays"],
+			"cell_phone"=>$tel,
+			"pdf_mandat"=> base64_encode($pdf_mandat) // base64
+		);
+		return $return;
 	}
 
-
-
-
+	/** 
+	* Appel Sell & Sign, retourne les infos du client à partir de l'id_affaire
+    * @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @param array $post["id_affaire"]
+	*/ 
+	public function _signGetInfosOnly($post){
+		$id_societe = ATF::affaire()->select($post["id"],"id_societe");
+		if (!$id_societe) {
+			throw new Exception('Aucune information pour cet identifiant.', 500);
+		}
+		$societe = ATF::societe()->select($id_societe);
+		$contact = ATF::contact()->select($societe["id_contact_signataire"]);
+		$return = array(
+			"civility"=>$contact["civilite"],
+			"firstname"=>$contact["prenom"],
+			"lastname"=>$contact["nom"],
+			"email"=>$contact["email"],
+			"company_name"=>$societe["societe"],
+			"IBAN"=>$societe["IBAN"],
+			"BIC"=>$societe["BIC"]
+		);
+		return $return;
+	}
 };
 
 class societe_cleodisbe extends societe_cleodis {
