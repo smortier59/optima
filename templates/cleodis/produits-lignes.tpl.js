@@ -348,6 +348,16 @@ ATF.buildGridEditor({
 					dataIndex: '{$current_class->table}__dot__type',
 				}
 			{/if}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Ordre',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__ordre',								
+					editor: new Ext.form.TextField({
+						value:0
+					})
+				}
+			{/if}
 			, {
 				header: 'Référence',
 				dataIndex: '{$current_class->table}__dot__ref',
