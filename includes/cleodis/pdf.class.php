@@ -4103,7 +4103,20 @@ class pdf_cleodis extends pdf {
 		if(!$global){
 			$this->open(); 
 		}
+
+		if(ATF::$codename == "cleodisbe"){
+			$this->unsetHeader();			
+		}
 		$this->addpage();
+
+		if(ATF::$codename == "cleodisbe"){
+			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+			}
+		}
+
 		$this->setMargins(15,30);
 		$this->sety(10);
 		
