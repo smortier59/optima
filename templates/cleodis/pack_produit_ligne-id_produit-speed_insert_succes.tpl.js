@@ -18,6 +18,7 @@
 			var records = Ext.ComponentMgr.get('{$id}').store.getRange();
 			records[idx].set('pack_produit__dot__id_produit_fk',action.result.result.data.id_produit);
 			records[idx].set('pack_produit__dot__produit',action.result.result.nom);
+			records[idx].set('pack_produit__dot__produit',action.result.result.ordre);
 			records[idx].set('pack_produit__dot__type',action.result.result.data.type);
 			records[idx].set('pack_produit__dot__ref',action.result.result.data.ref);
 			records[idx].set('pack_produit__dot__prix_achat',action.result.result.data.prix_achat);

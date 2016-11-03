@@ -519,14 +519,17 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->headStyle = $save;
 	}
 
-	public function facture($id){
+	public function facture($id,$s,$global=false){
+		
 		$this->noPageNo = true;
 		$this->setFooter();
 		
 		$this->A3 = false;
 		$this->A4 = true;	
 
-		$this->Open();
+		if(!$global){
+			$this->open(); 
+		}
 		$this->Addpage();
 
 		$id = ATF::facture()->decryptId($id);
@@ -784,5 +787,220 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$texte = strip_tags($texte);
 
 		return $texte;
+	}
+
+
+
+	/** PDF de l'échéancier d'une affaire
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 30-05-2011
+	*/
+	public function initEcheancier($id) {
+		$this->affaire = ATF::affaire()->select($id);
+		$this->commande = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
+		$this->devis = ATF::devis()->select($this->commande['id_devis']);
+		$this->client = ATF::societe()->select($this->devis['id_societe']);
+		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
+		ATF::facturation()->q->reset()->addCondition("id_affaire",$this->affaire['id_affaire'])
+									  ->addOrder("date_periode_debut","ASC");
+		$this->lignes = ATF::facturation()->sa();
+	}
+	
+	function global_prolongation ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongationSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongationCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongationDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoye($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoyeSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoyeCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture_contrat_envoyeDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_facture ($facture,$s){
+		$this->open();
+		foreach ($facture as $key => $item) {
+			$this->facture($item,$s,true) ;
+		}
+	}
+
+
+	function grille_prolongationclient_non_envoyeSociete($non_facturerSociete,$s) {
+		$this->grille_client($non_facturerSociete,$s,true,true);
+	}
+
+	function grille_prolongationclient_non_envoyeCode($non_facturerCode,$s) {
+		$this->grille_client($non_facturerCode,$s,true,true);
+	}
+
+	function grille_prolongationclient_non_envoyeDate($non_facturerDate,$s) {
+		$this->grille_client($non_facturerDate,$s,true,true);
+	}
+
+	function grille_contratclient_non_envoyeSociete($non_facturerSociete,$s) {
+		$this->grille_client($non_facturerSociete,$s,true);
+	}
+
+	function grille_contratclient_non_envoyeCode($non_facturerCode,$s) {
+		$this->grille_client($non_facturerCode,$s,true);
+	}
+
+	function grille_contratclient_non_envoyeDate($non_facturerDate,$s) {
+		$this->grille_client($non_facturerDate,$s,true);
+	}
+
+	function grille_prolongationclientSociete($facturerSociete,$s) {
+		$this->grille_client($facturerSociete,$s,false,true);
+	}
+
+	function grille_prolongationclientCode($facturerCode,$s) {
+		$this->grille_client($facturerCode,$s,false,true);
+	}
+
+	function grille_prolongationclientDate($facturerDate,$s) {
+		$this->grille_client($facturerDate,$s,false,true);
+	}
+
+	function grille_contratclientSociete($facturerSociete,$s) {
+		$this->grille_client($facturerSociete,$s,false);
+	}
+
+	function grille_contratclientCode($facturerCode,$s) {
+		$this->grille_client($facturerCode,$s,false);
+	}
+
+	function grille_contratclientDate($facturerDate,$s) {
+		$this->grille_client($facturerDate,$s,false);
+	}
+
+
+	function grille_client($facturer,$s,$nf=false,$prol=false) {
+		$this->open();
+		$this->addpage();
+		$this->setfont('arial','B',15);
+
+		$this->sety(10);
+		
+		$titre="GRILLE DE FACTURATION";
+
+		if($prol){
+			$titre.=" DE PROLONGATION";
+		}
+
+		if($nf){
+			$titre.=" NON ENVOYÉES";
+		}
+		
+		$this->multicell(0,10,$titre,0,'C');
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor(64,192,0);
+		$this->line(0,35,220,35);
+		$this->setLeftMargin(10);
+		$this->sety(37);
+		$this->setfont('arial','B',10);
+		
+		$date_debut=$facturer["reserve"]['date_debut'];
+		$date_fin=$facturer["reserve"]['date_fin'];
+		
+		$this->multicell(0,3,"Grille de facturation pour la période du ".date("d/m/Y",strtotime($date_debut))." au ".date("d/m/Y",strtotime($date_fin)));
+		$this->setfont('arial','',8);
+		
+		if($prol){
+			$nbFac=$facturer["reserve"]["fp"];
+		}else{
+			$nbFac=$facturer["reserve"]["fc"];
+		}
+		
+		if($nf){
+			$liste="Liste des factures n'ayant pas été envoyées (".$nbFac.").";
+		}else{
+			$liste="Liste des factures ayant été envoyées (".$nbFac.").";
+		}
+
+		unset($facturer["reserve"]);
+
+		$this->multicell(0,3,$liste);
+
+		$this->setdrawcolor(0,0,0);
+		$this->SetLineWidth(0.2);
+		
+		$head = array("SOCIETE","AFFAIRE","DATE DEBUT","DATE FIN","MONTANT ".$this->texteHT,"TYPE");
+		if($nf){
+			$head[]="RAISON";
+		}else{
+			$head[]="CONTACT FACTURATION";
+		}
+		$w = array(35,39,21,20,20,20,35);
+		
+		$this->setfont('arial','',6);
+		
+		$montant=0;	
+		foreach ($facturer as $key => $item) {
+			$txt = "";
+			if($nf){
+				if($item["cause"]=="an"){
+					$societe=ATF::societe()->select($item["id_societe"]);
+					$txt = "Pas de mail pour le contact ".ATF::contact()->nom($societe["id_contact_facturation"]);
+				}elseif($item["cause"]=="pc"){
+					$txt = "Pas de contact de facturation pour cette société";
+				}elseif($item["cause"]=="pi"){
+					$txt = "Problème lors de l'insertion de la facture";
+				}
+			}else{
+				$txt = $item["email"];
+			}
+			$data[] = array(
+				"(".ATF::societe()->select($item["id_societe"],"ref").") ".ATF::societe()->nom($item["id_societe"])
+				,ATF::affaire()->select($item["id_affaire"],"ref")
+				,date("d/m/Y",strtotime($item["date_periode_debut"]))
+				,date("d/m/Y",strtotime($item["date_periode_fin"]))
+				,number_format(($item["montant"]+$item["frais_de_gestion"]+$item["assurance"]),2,'.',' ')." €"
+				,$item["type"]
+				,$txt
+			);
+			$total+=($item["montant"]+$item["frais_de_gestion"]+$item["assurance"]);
+		}
+		$this->ln(5);
+		
+		$this->tableau($head,$data,$w);
+		
+		$this->ln(5);
+
+		$this->setfont('arial','',8);
+		$this->cell(0,3,"Montant total des factures envoyées : ".number_format($total,2, ',', ' ')." €",0,1);
 	}
 }

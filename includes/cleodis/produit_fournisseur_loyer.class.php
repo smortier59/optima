@@ -12,13 +12,15 @@ class produit_fournisseur_loyer extends classes_optima {
 			 'produit_fournisseur_loyer.id_fournisseur'
 			,'produit_fournisseur_loyer.id_produit'
 			,'produit_fournisseur_loyer.loyer'
+			,'produit_fournisseur_loyer.frequence_loyer'
 			
 		);
 
 		$this->colonnes['primary'] = array(
 			 "id_fournisseur"=>array("custom"=>true,"autocomplete"=>array("function"=>"autocompleteFournisseurs"))
 			,'id_produit'
-			,'loyer'		
+			,'loyer'	
+			,'frequence_loyer'	
 			
 		);
 		
@@ -26,7 +28,8 @@ class produit_fournisseur_loyer extends classes_optima {
 		$this->colonnes['ligne'] =  array( 	
 			 'produit_fournisseur_loyer.id_fournisseur'
 			,'produit_fournisseur_loyer.id_produit'
-			,'produit_fournisseur_loyer.loyer'			
+			,'produit_fournisseur_loyer.loyer'
+			,'produit_fournisseur_loyer.frequence_loyer'			
 		);
 
 		$this->field_nom = "%id_produit% %id_fournisseur%";
