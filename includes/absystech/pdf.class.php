@@ -1477,12 +1477,15 @@ class pdf_absystech extends pdf {
 		$head = array("Référence","Désignation","Qté","Prix unitaire","Montant");
 		$width = array(25,95,11,25,25);
 		
+		$indemnite = "40.00";
 		$txt = "Intérêts relatifs au retard de paiement de la facture ".$infos_facture['ref']." du ".ATF::$usr->date_trans($infos_facture['date'],true,true)." pour un montant de ".$infos_facture['prix']." € HT.";
 		$txt .= "\nPaiement de ".$infos_facture_paiement['montant']." € TTC effectué le ".ATF::$usr->date_trans($infos_facture_paiement['date'],true,true);
 		$data = array(
-			array("INT",$txt,"1",$infos_facture_paiement['montant_interet']." €",$infos_facture_paiement['montant_interet']." €")
+			array("INTERETS",$txt,"1",$infos_facture_paiement['montant_interet']." €",$infos_facture_paiement['montant_interet']." €"),
+			array("INDEMNITE","Indemnité de recouvrement (articles L441-3 et L441-6 du code de commerce)","1",$indemnite." €",$indemnite." €")
 		);
 		$style = array(
+			array("",$this->leftStyle,"",$this->rightStyle,$this->rightStyle),
 			array("",$this->leftStyle,"",$this->rightStyle,$this->rightStyle)
 		);
 
@@ -1491,7 +1494,7 @@ class pdf_absystech extends pdf {
 		$this->setx(15);
 		$this->cell(131,4,"",0,0,'C');
 		$this->cell(25,4,"Total",1,0,'R');
-		$this->cell(25,4,$infos_facture_paiement['montant_interet']." €",1,1,'R');
+		$this->cell(25,4,($indemnite+$infos_facture_paiement['montant_interet'])." €",1,1,'R');
 			
 		$this->setleftmargin(15);
 		$this->setrightmargin(15);
