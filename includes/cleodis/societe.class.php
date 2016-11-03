@@ -822,7 +822,10 @@ class societe_cleodis extends societe {
 //log::logger($get,'ygautheron');
 		$tel  = $post["tel"]; 
 		$bic  = $post["bic"]; 
-		$iban = $post["iban"]; 
+		$iban = $post["iban"];
+		if (strlen($post["id"])!=32) {
+			throw new Exception('Identifiant non valide.', 500);
+		}
 		$id_affaire = $post["id"];
 
 		$id_societe = ATF::affaire()->select($id_affaire,"id_societe");
@@ -861,6 +864,9 @@ class societe_cleodis extends societe {
 	* @param array $post["id_affaire"]
 	*/ 
 	public function _signGetInfosOnly($post){
+		if (strlen($post["id"])!=32) {
+			throw new Exception('Identifiant non valide.', 500);
+		}
 		$id_societe = ATF::affaire()->select($post["id"],"id_societe");
 		if (!$id_societe) {
 			throw new Exception('Aucune information pour cet identifiant.', 500);
