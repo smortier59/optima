@@ -763,6 +763,121 @@ class societe_cleodis extends societe {
 		return array("investissement"=>number_format($totalInvestissement,2,"," ," "), "restant"=>number_format($totalRestant+$encours,2,"," ," "));
 	}
 
+
+	/** 
+	* Permet de checker si un IBAN est correct
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos Simple dimension des champs à insérer
+	*/
+	public function checkIBAN($iban){
+		$table_conversion = array("A"=>10,"B"=>11,"C"=>12,"D"=>13,"E"=>14,"F"=>15,"G"=>16,"H"=>17,"I"=>18,"J"=>19,"K"=>20,"L"=>21,"M"=>22,"N"=>23,"O"=>24,"P"=>25,"Q"=>26,"R"=>27,"S"=>28,"T"=>29,"U"=>30,"V"=>31,"W"=>32,"X"=>33,"Y"=>34,"Z"=>35);
+
+			
+		/*
+		* Enlever les caractères indésirables (espaces, tirets)
+		* Supprimer les 4 premiers caractères et les replacer à la fin du compte
+		* Remplacer les lettres par des chiffres au moyen d'une table de conversion (A=10, B=11, C=12 etc.)
+		* Diviser le nombre ainsi obtenu par 97.
+		* Si le reste n'est pas égal à 1 l'IBAN est incorrect : Modulo de 97 égal à 1
+		*/
+		if($iban){
+			//Enlever les caractères indésirables (espaces, tirets)
+			$iban = str_replace("-", "", $iban);
+			$iban = str_replace(" ", "", $iban);
+			
+
+			//Supprimer les 4 premiers caractères et les replacer à la fin du compte
+			$first = substr($iban, 0, 4);			
+			$iban = substr($iban, 4);
+
+			$iban = $iban.$first;
+
+			$char = "";
+
+			//Remplacer les lettres par des chiffres au moyen d'une table de conversion (A=10, B=11, C=12 etc.)
+			for($i=0;$i<strlen($iban); $i++){				
+				if(!is_numeric($iban[$i])){
+					$char .= $table_conversion[$iban[$i]];					
+				}else{
+					$char .= $iban[$i]; 
+				}
+			}	
+			
+			//Diviser le nombre ainsi obtenu par 97
+			if(bcmod($char , 97) != 1) throw new errorATF("IBAN incorrect", 500);		
+			
+		}else{
+			throw new errorATF("IBAN vide", 500);	
+		}
+	}
+
+
+	/** 
+	* Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos Simple dimension des champs à insérer
+	*/ 
+	public function _signAndGetPDF($post,$get){
+//log::logger($post,'ygautheron');
+//log::logger($get,'ygautheron');
+		$tel  = $post["tel"]; 
+		$bic  = $post["bic"]; 
+		$iban = $post["iban"]; 
+		$id_affaire = $post["id"];
+
+		$id_societe = ATF::affaire()->select($id_affaire,"id_societe");
+		if (!$id_societe) {
+			throw new Exception('Aucune information pour cet identifiant.', 500);
+		}
+		ATF::societe()->u(array("id_societe"=>$id_societe, "tel"=>$tel , "BIC"=>$bic , "IBAN"=>$iban));
+
+		$societe = ATF::societe()->select($id_societe);
+		$contact = ATF::contact()->select($societe["id_contact_signataire"]);
+
+		$this->checkIBAN($iban);
+
+		$pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+
+		$return = array(
+			"civility"=>$contact["civilite"],
+			"firstname"=>$contact["prenom"],
+			"lastname"=>$contact["nom"],
+			"address_1"=>$societe["adresse"],
+			"address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
+			"postal_code"=>$societe["cp"],
+			"city"=>$societe["ville"],
+			"email"=>$contact["email"],
+			"company_name"=>$societe["societe"],
+			"country"=>$societe["id_pays"],
+			"cell_phone"=>$tel,
+			"pdf_mandat"=> base64_encode($pdf_mandat) // base64
+		);
+		return $return;
+	}
+
+	/** 
+	* Appel Sell & Sign, retourne les infos du client à partir de l'id_affaire
+    * @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @param array $post["id_affaire"]
+	*/ 
+	public function _signGetInfosOnly($post){
+		$id_societe = ATF::affaire()->select($post["id"],"id_societe");
+		if (!$id_societe) {
+			throw new Exception('Aucune information pour cet identifiant.', 500);
+		}
+		$societe = ATF::societe()->select($id_societe);
+		$contact = ATF::contact()->select($societe["id_contact_signataire"]);
+		$return = array(
+			"civility"=>$contact["civilite"],
+			"firstname"=>$contact["prenom"],
+			"lastname"=>$contact["nom"],
+			"email"=>$contact["email"],
+			"company_name"=>$societe["societe"],
+			"IBAN"=>$societe["IBAN"],
+			"BIC"=>$societe["BIC"]
+		);
+		return $return;
+	}
 };
 
 class societe_cleodisbe extends societe_cleodis {

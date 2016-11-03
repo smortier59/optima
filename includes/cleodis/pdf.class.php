@@ -155,32 +155,24 @@ class pdf_cleodis extends pdf {
 
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+
+
+
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+		$this->contrat = ATF::commande()->select_row();		
 
 		$this->adresseClient = $this->client["adresse"];
 		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
 		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
 		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
 
-		/* Passage en A3 */
-		$format=array(336,672);
-		$this->fwPt=$format[0];
-		$this->fhPt=$format[1];
-		
-			
-		$this->DefOrientation='L';
-		$this->wPt=$this->fhPt;
-		$this->hPt=$this->fwPt;
-		
-		
-		$this->CurOrientation=$this->DefOrientation;
-		$this->w=$this->wPt/$this->k;
-		$this->h=$this->hPt/$this->k;
 		
 		$this->unsetHeader();
 		$this->Open();		
-		$this->AddPage("L");
+		$this->AddPage();
 
 
 		$this->setfillcolor(208,255,208);
@@ -263,6 +255,20 @@ class pdf_cleodis extends pdf {
 		$this->ln(4);
 		$this->setfont('arial','',7);
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+
+		/*$this->unsetHeader();		
+		$this->AddPage();
+
+		copy(ATF::commande()->filepath($this->contrat["commande.id_commande"],"contratA4Signature"), ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true));
+
+		$pageCount = $this->setSourceFile(ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true) );
+		
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);*/
+
+		
+		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
+
 	}
 
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
@@ -2603,12 +2609,17 @@ class pdf_cleodis extends pdf {
 		$this->setAutoPageBreak(true);
 	}
 
+
+	public function contratA4Signature($id){
+		$this->contratA4($id,true);
+	}
+
 	/** PDF d'un contrat en A4
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	* @param int $id Identifiant commande
 	*/
-	public function contratA4($id) {
+	public function contratA4($id, $signature=false) {
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		$this->commandeInit($id);
@@ -2942,12 +2953,14 @@ class pdf_cleodis extends pdf {
 
 		$this->setFillColor(255,255,0);
 
+
+
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
 			,"Nom : "
 			,"Qualité : "
-			,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
+			,array("txt"=>$signature?"[SignatureContractant/]":"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 		);
 		$y = $this->gety()+2;
 		if ($this->affaire['nature']=="vente") {
@@ -4087,7 +4100,20 @@ class pdf_cleodis extends pdf {
 		if(!$global){
 			$this->open(); 
 		}
+
+		if(ATF::$codename == "cleodisbe"){
+			$this->unsetHeader();			
+		}
 		$this->addpage();
+
+		if(ATF::$codename == "cleodisbe"){
+			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+			}
+		}
+
 		$this->setMargins(15,30);
 		$this->sety(10);
 		

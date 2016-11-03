@@ -3560,7 +3560,7 @@ class hotline extends classes_optima {
 	*/
 	public function getTotalHotlineEnCours($get,$post) {
 		$date = date('Y-m-d',strtotime('- 1 day'));
-		$data  = array("total"=>array());
+		$data  = array();
 
 		$q = "SELECT COUNT(*) as en_cours FROM hotline WHERE etat = 'fixing' OR etat = 'wait' OR etat = 'free'";
 		
@@ -3573,6 +3573,42 @@ class hotline extends classes_optima {
 	}
 
 
+	/**
+	* Permet de récupérer la liste des tickets hotline pour chaque user en cours pour snap stat
+	* @package Telescope
+	* @author Anthony LAHLAH <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function getTotalHotlineEnCoursPerso($get,$post) {
+		$date = date('Y-m-d',strtotime('- 1 day'));
+		$data  = array("total"=>array());
+
+		$q = "SELECT COUNT(*) as en_cours FROM hotline WHERE etat = 'fixing' OR etat = 'wait' OR etat = 'free'";
+		
+		$data['total'] = ATF::db()->ffc($q);
+
+		$q_all_id = "SELECT id_user FROM user WHERE etat = 'normal'";
+		$all_id = ATF::db()->sql2array($q_all_id);
+
+		foreach ($all_id as $key => $val) {
+			$q_id = "SELECT COUNT(*) as en_cours FROM hotline WHERE (etat = 'fixing' OR etat = 'wait' OR etat = 'free') AND id_user = '".$val['id_user']."'";
+			$data[$val['id_user']] = ATF::db()->ffc($q_id);
+		}
+		
+
+      	return json_encode($data);
+	}
+
+	public function getSatisfaction($get,$post) {
+		$date = date('Y-m',strtotime('- 30 day'));
+
+		$q = "SELECT AVG(indice_satisfaction) as satisfaction FROM hotline WHERE DATE_FORMAT(date, '%Y-%m') >='".$date."' AND indice_satisfaction IS NOT NULL GROUP BY YEAR(date), MONTH(date)";
+
+		return ATF::db()->ffc($q);
+
+	}
 
 
 
@@ -4063,15 +4099,24 @@ class hotline extends classes_optima {
 		return $res;		
 	}
 
+	public function _getStatSnapData($get,$post){
+		$to_return = array();
 
-	public function _getTotalHotlineEnCours($get,$post) {
-		$date = date('Y-m-d',strtotime('- 1 day'));
-		$q = "SELECT * FROM stat_snap WHERE code = 'getTotalHotlineEnCours' AND DATE_FORMAT(date, '%Y-%m-%d') >='".$date."'";
+		$code = $get['code'];
+		$date = date('Y-m-d',strtotime('- 30 day'));
+		$q = "SELECT * FROM stat_snap WHERE code = '".$code."' AND DATE_FORMAT(date, '%Y-%m-%d') >='".$date."' ORDER BY date DESC";
 
-		if ($data = ATF::db()->sql2array($q)) return $data;
-		else return array();
+		$to_return['data_snap'] = ATF::db()->sql2array($q);
+
+		if ($code == 'getTotalHotlineEnCours'){
+			$to_return['ca'] = ATF::commande_absystech()->_getCaThisMonth();
+			$to_return['satisfaction'] =  $this->getSatisfaction();
+			$to_return['conseil'] = ATF::news()->getConseils();
+		}
+
+		return $to_return;
 	}
-	
+
 
 };
 ?>

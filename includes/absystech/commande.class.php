@@ -622,6 +622,15 @@ class commande_absystech extends commande {
 
 	}
 
+	public function _getCaThisMonth(){
+		$date = date('Y-m');
+		$q = "SELECT SUM(prix) FROM commande WHERE DATE_FORMAT(date, '%Y-%m') = '".$date."' GROUP BY YEAR(date), MONTH(date)";
+
+		$ca = ATF::db()->ffc($q);
+
+		return $ca;
+	}
+
 };
 
 class commande_att extends commande_absystech { };

@@ -63,6 +63,7 @@ class stat_snap extends classes_optima {
 			,array("affaire","getMargeTotaleDepuisDebutAnneeDifferenceAnneePrecedente")
 			,array("hotline","getTempsTotalNonResolu")
 			,array("hotline","getTotalHotlineEnCours")
+			,array("hotline","getTotalHotlineEnCoursPerso")
 		);
 	}
 	
