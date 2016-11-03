@@ -21,7 +21,27 @@
 		            
 		        </table>
 		    </td>
-		</tr>
+		</tr>	
 
 	{/if}
+{/if}
+
+{if isset($smarty.get.id_affaire)}
+{$id_affaire = ATF::affaire()->decryptId($smarty.get.id_affaire)}
+{$societe = ATF::societe()->select(ATF::affaire()->select($id_affaire, "id_societe"))}
+
+{if $societe["id_contact_signataire"] && ATF::contact()->select($societe["id_contact_signataire"] , "email") != NULL }
+	<tr>
+		<td colspan="2" style="text-align:center; width:80px color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; padding-right: 35px; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; text-align:justify; vertical-align:middle">            	
+		    <a href="https://{if __DEV__}pre-{/if}sign.absystech.net/#!{ATF::$codename}?k={$smarty.get.id_affaire}" target="_blank">
+		        <img src="{ATF::$staticserver}images/document_to_sign.png" style="width:40px;" alt="Signer le contrat" />   Signer le contrat electroniquement</a> 
+		</td>		                
+	</tr>
+{else}
+	<tr>		
+		<td colspan="2" style="color: #a94442; background-color: #f2dede; border-color: #ebccd1; padding-right: 35px; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; text-align:justify; vertical-align:middle">                
+		    <img src="{ATF::$staticserver}images/document_to_sign.png" style="width:40px;" alt="Signer le contrat" />  Pour signer le contrat electroniquement, il faut un contact signataire avec un email valide
+		</td>                
+	</tr>
+{/if}
 {/if}
