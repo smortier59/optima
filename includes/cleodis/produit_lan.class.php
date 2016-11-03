@@ -40,5 +40,4 @@ class produit_lan extends classes_optima {
 
 class produit_lan_cleodisbe extends produit_lan { };
 class produit_lan_cap extends produit_lan { };
-class produit_lan_exactitude extends produit_lan { };
 ?>

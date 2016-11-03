@@ -306,5 +306,4 @@ class conge_cleodis extends conge {
 
 class conge_cleodisbe extends conge_cleodis { };
 class conge_cap extends conge_cleodis { };
-class conge_exactitude extends conge_cleodis { };
 ?>

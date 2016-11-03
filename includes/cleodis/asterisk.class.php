@@ -35,5 +35,4 @@ class asterisk_cleodis extends asterisk {
 
 class asterisk_cleodisbe extends asterisk_cleodis { };
 class asterisk_cap extends asterisk_cleodis { };
-class asterisk_exactitude extends asterisk_cleodis { };
 ?>

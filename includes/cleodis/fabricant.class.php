@@ -31,5 +31,4 @@ class fabricant extends classes_optima {
 
 class fabricant_cleodisbe extends fabricant { };
 class fabricant_cap extends fabricant { };
-class fabricant_exactitude extends fabricant { };
 ?>

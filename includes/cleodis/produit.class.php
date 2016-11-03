@@ -109,6 +109,8 @@ class produit_cleodis extends produit {
 		$this->addPrivilege("getInfosFromICECAT");
 		$this->addPrivilege("setInfos","update");		
 		$this->addPrivilege("EtatUpdate");
+
+		$this->onglets = array("produit_fournisseur_loyer");
 	}
 
 

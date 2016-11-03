@@ -15,6 +15,7 @@ class pack_produit_ligne extends classes_optima {
 			,'pack_produit_ligne.ref'
 			,'pack_produit_ligne.id_fournisseur'
 			,'pack_produit_ligne.neuf'
+			,'pack_produit_ligne.ordre'
 			,'pack_produit_ligne.prix_achat'=>array("renderer"=>"money")
 		);
 
@@ -31,12 +32,14 @@ class pack_produit_ligne extends classes_optima {
 			 "pack_produit_ligne.id_produit"=>array("hidden"=>true)
 			,"pack_produit_ligne.produit"
 			,"pack_produit_ligne.quantite"
+			,'pack_produit_ligne.ordre'
 			,"pack_produit_ligne.type"
 			,"pack_produit_ligne.ref"
 			,"pack_produit_ligne.id_fournisseur"
 			,"pack_produit_ligne.prix_achat"
 			,'pack_produit_ligne.neuf'
 			,'pack_produit_ligne.commentaire'
+
 		);
 
 		$this->no_insert=true;
@@ -55,6 +58,5 @@ class pack_produit_ligne extends classes_optima {
 
 class pack_produit_ligne_cleodisbe extends pack_produit_ligne { };
 class pack_produit_ligne_cap extends pack_produit_ligne { };
-class pack_produit_ligne_exactitude extends pack_produit_ligne { };
 
 ?>

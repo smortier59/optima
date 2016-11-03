@@ -11,6 +11,7 @@ class bon_de_commande_lm extends bon_de_commande {
 
 		$this->colonnes['fields_column'] = array(
 			"bon_de_commande.ref"
+			,"bon_de_commande.num_bdc"=>array("rowEditor"=>"setInfos")
 			,"bon_de_commande.id_fournisseur"
 			,"bon_de_commande.bon_de_commande"
 			,"bon_de_commande.etat"=>array("renderer"=>"etat","width"=>30)
@@ -166,7 +167,8 @@ class bon_de_commande_lm extends bon_de_commande {
 		$this->fieldstructure();
 
 		$this->addPrivilege("updateDate");
-		
+		$this->addPrivilege("setInfos","update");
+
 		$this->noTruncateSA = true;
 		$this->no_insert = true;
 		$this->no_update = true;
@@ -178,8 +180,28 @@ class bon_de_commande_lm extends bon_de_commande {
 		$this->files["pdf"] = array("type"=>"pdf","no_upload"=>true,"no_generate"=>true);
 		$this->can_insert_from = array("commande");
 		$this->selectAllExtjs=true; 
+
+		
 	}
 	
+
+	/**
+	 * Permet de modifier un champs en AJAX
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @return bool
+	 */
+	public function setInfos($infos){
+		$res = $this->u(array("id_bon_de_commande"=> $this->decryptId($infos["id_bon_de_commande"]),
+						  $infos["field"] => $infos[$infos["field"]])
+					);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}		
+	}
+
 	public function uploadFileFromSA(&$infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$infos['display'] = true;
 		$class = ATF::getClass($infos['extAction']);
@@ -224,32 +246,6 @@ class bon_de_commande_lm extends bon_de_commande {
 
 		if ($infos['value'] == "undefined") $infos["value"] = "";		
 		switch ($infos['key']) {
-			// Sécurité, n'exécuter une action que pour ces champs	
-			case "date_livraison_prevue":	
-			case "date_livraison_reelle":												
-				ATF::db($this->db)->begin_transaction();
-				try {					
-										
-					$cmd = $this->select($infos['id_bon_de_commande']);
-					if($infos['value']){		
-							$nbj_installation = ATF::societe()->select($cmd["id_fournisseur"], "fournisseur_nbj_installation");
-
-							$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
-								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)
-								   ,"date_installation_prevue" => date("Y-m-d", strtotime("+".$nbj_installation." days", strtotime($infos["value"])))
-								   );							
-							$this->u($d);						
-					}
-				} catch(errorATF $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
-				//On commit le tout
-				ATF::db($this->db)->commit_transaction();
-
-				ATF::$msg->addNotice(loc::mt(
-					ATF::$usr->trans("dates_modifiee",$this->table)
-					,array("date"=>ATF::$usr->trans($infos['key'],$this->table))
-				));
-			break;
-
 			default:
 				$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
 					   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)					   
@@ -555,15 +551,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		ATF::db($this->db)->begin_transaction();
 
 //*****************************Transaction********************************
-		if(!$infos["date_livraison_prevue"] && ATF::$codename == "cleodis"){
-			$nbj_livraison = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_nbj_livraison");
-			$infos["date_livraison_estime"] = date("Y-m-d", strtotime("+".$nbj_livraison." days", strtotime($infos["date"])));
-
-
-			$fournisseur_delai_rav = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_delai_rav");
-			$infos["date_limite_rav"] = date("Y-m-d", strtotime($fournisseur_delai_rav." days", strtotime(ATF::affaire()->select($infos["id_affaire"], "date_ouverture"))));
-		}
-		
+				
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);	
 
 		$prix_total = 0;

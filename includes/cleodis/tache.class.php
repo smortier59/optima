@@ -333,4 +333,3 @@ class tache_cleodis extends tache {
 
 class tache_cleodisbe extends tache_cleodis { };
 class tache_cap extends tache_cleodis { };
-class tache_exactitude extends tache_cleodis { };

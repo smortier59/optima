@@ -15,6 +15,7 @@ class affaire_cleodis extends affaire {
 			,'affaire.date'
 			,'affaire.affaire'
 			,'affaire.id_societe'
+			,'affaire.type_affaire'
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
@@ -41,6 +42,7 @@ class affaire_cleodis extends affaire {
 			,'ville_banque'
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
+			,"type_affaire"
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -1273,28 +1275,5 @@ class affaire_cap extends affaire {
 
 
 };
-class affaire_exactitude extends affaire_cleodis {
-	function __construct($table_or_id=NULL) {
-		$this->table = "affaire"; 
-		parent::__construct($table_or_id);	
-		
-		$this->colonnes['fields_column']['tableau_chasse']=array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70,"renderer"=>"uploadFile");
-		
 
-		$this->fieldstructure();
-
-		$this->onglets = array(	
-			 'affaire_candidat'=>array('opened'=>true)
-			,'tableau_chasse'=>array('opened'=>true)		
-			,'devis'=>array('opened'=>true)			
-			//,'commande'=>array('opened'=>true)			
-			,'facture'=>array('opened'=>true)		
-			,'suivi'
-			,'tache'
-		);
-
-		$this->files["tableau_chasse"] = array("type"=>"xls","no_generate"=>true);
-		
-	}
- };
 ?>

@@ -20,5 +20,4 @@ class facture_fournisseur_ligne extends classes_optima {
 
 class facture_fournisseur_ligne_cleodisbe extends facture_fournisseur_ligne { };
 class facture_fournisseur_ligne_cap extends facture_fournisseur_ligne { };
-class facture_fournisseur_ligne_exactitude extends facture_fournisseur_ligne { };
 ?>

@@ -14,7 +14,7 @@ class prolongation extends classes_optima {
 			 ,'prolongation.date_fin'
 			 ,'prolongation.id_refinanceur'
    			 ,'prolongation.date_fin'
-			 ,'facturation'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
+			 //,'facturation'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			 ,'retour_avenant'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>60)
    			 ,'prolongation.date_arret'=>array("renderer"=>"updateDate","width"=>170)
 		);
@@ -45,7 +45,7 @@ class prolongation extends classes_optima {
 		$this->colonnes['bloquees']['cloner'] = 
 		$this->colonnes['bloquees']['update'] = array("date_fin","date_arret");	
 		$this->fieldstructure();
-		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
+		//$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->files["retour_avenant"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		
 		$this->no_insert = true;
@@ -299,7 +299,7 @@ class prolongation extends classes_optima {
 			}
 			
 			$this->u($infos);
-			$objCommande = new commande_cleodis($commande['id_commande']);
+			$objCommande = new commande_lm($commande['id_commande']);
 			ATF::facturation()->insert_facturation_prolongation($objCommande,$prolongation["date_debut"]);
 //*****************************************************************************
 			ATF::db($this->db)->commit_transaction();

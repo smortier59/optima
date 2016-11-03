@@ -50,5 +50,4 @@ class refinanceur extends classes_optima {
 
 class refinanceur_cleodisbe extends refinanceur { };
 class refinanceur_cap extends refinanceur { };
-class refinanceur_exactitude extends refinanceur { };
 ?>

@@ -112,8 +112,18 @@ class hotline extends classes_optima {
 		$this->defaultRedirect["insert"]="select";
 		
 		$this->autocomplete["view"] = array(
-			"ROUND(hotline.id_hotline)"=>array("alias"=>"ref")
+			"ROUND(hotline.id_hotline)"=>array("alias"=>"id")
+			// "hotline.hotline"=>array("alias"=>"nom"),
+			// "societe.id_societe"=>array("alias"=>"d1"),
+			// "contact.id_contact"=>array("alias"=>"d2"),
+			// "hotline.etat"=>array("alias"=>"d3")
 		);
+		// $this->autocomplete = array(
+		// 	"view"=>array("hotline.id_hotline","hotline.hotline","hotline.priorite","hotline.avancement")
+		// 	// ,"field"=>array("hotline.id_hotline","hotline.hotline","societe.societe")
+		// 	// ,"show"=>array("contact.civilite","contact.prenom","contact.nom")
+		// 	// ,"popup"=>array("contact.nom","contact.prenom","contact.societe")
+		// );
 		
 		$this->liste_user=$this->getUserActif();
 		$this->addPrivilege("changeUser");
@@ -1775,6 +1785,21 @@ class hotline extends classes_optima {
 		ATF::db()->commit_transaction();
 	}
 	
+
+	public function _graph_tickets_hotline($get, $post){
+		/*
+		$at = $this->stats(true);
+		ATF::define_db("db","extranet_v3_att");
+		ATF::$codename = "att";
+		$att = $this->stats(true);
+		ATF::define_db("db","extranet_v3_absystech");
+		ATF::$codename = "absystech";
+
+		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
+		*/
+		return 'un test';
+	}
+
 	public function _stats($get, $post){
 		$at = $this->stats(true);
 		ATF::define_db("db","extranet_v3_att");
@@ -3522,8 +3547,67 @@ class hotline extends classes_optima {
 		        }
 			}
 			
-
 		}
+	}
+
+	/**
+	* Permet de récupérer la liste des tickets hotline en cours pour snap stat
+	* @package Telescope
+	* @author Anthony LAHLAH <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function getTotalHotlineEnCours($get,$post) {
+		$date = date('Y-m-d',strtotime('- 1 day'));
+		$data  = array();
+
+		$q = "SELECT COUNT(*) as en_cours FROM hotline WHERE etat = 'fixing' OR etat = 'wait' OR etat = 'free'";
+		
+		$data['total'] = ATF::db()->ffc($q);
+
+		$qC = "SELECT COUNT(*) as cloture FROM hotline WHERE DATE_FORMAT(date_fin, '%Y-%m-%d') ='".$date."'";
+		$data['cloture'] = ATF::db()->ffc($qC);
+
+        return json_encode($data);
+	}
+
+
+	/**
+	* Permet de récupérer la liste des tickets hotline pour chaque user en cours pour snap stat
+	* @package Telescope
+	* @author Anthony LAHLAH <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function getTotalHotlineEnCoursPerso($get,$post) {
+		$date = date('Y-m-d',strtotime('- 1 day'));
+		$data  = array("total"=>array());
+
+		$q = "SELECT COUNT(*) as en_cours FROM hotline WHERE etat = 'fixing' OR etat = 'wait' OR etat = 'free'";
+		
+		$data['total'] = ATF::db()->ffc($q);
+
+		$q_all_id = "SELECT id_user FROM user WHERE etat = 'normal'";
+		$all_id = ATF::db()->sql2array($q_all_id);
+
+		foreach ($all_id as $key => $val) {
+			$q_id = "SELECT COUNT(*) as en_cours FROM hotline WHERE (etat = 'fixing' OR etat = 'wait' OR etat = 'free') AND id_user = '".$val['id_user']."'";
+			$data[$val['id_user']] = ATF::db()->ffc($q_id);
+		}
+		
+
+      	return json_encode($data);
+	}
+
+	public function getSatisfaction($get,$post) {
+		$date = date('Y-m',strtotime('- 30 day'));
+
+		$q = "SELECT AVG(indice_satisfaction) as satisfaction FROM hotline WHERE DATE_FORMAT(date, '%Y-%m') >='".$date."' AND indice_satisfaction IS NOT NULL GROUP BY YEAR(date), MONTH(date)";
+
+		return ATF::db()->ffc($q);
+
 	}
 
 
@@ -3531,9 +3615,164 @@ class hotline extends classes_optima {
 
 
 
+	
+
+	/**
+	* Permet de récupérer la liste des tickets hotline pour telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function _GET($get,$post) {
+
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_hotline";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$colsData = array(
+			"hotline.id_hotline"=>array(),
+			"hotline.date"=>array(),
+			"hotline.date_modification"=>array(),
+			"hotline.id_societe"=>array("visible"=>false),
+			"hotline.id_contact"=>array(),
+			"hotline.id_gep_projet"=>array(),
+			"hotline.id_user"=>array(),
+			"hotline.hotline"=>array(),
+			"hotline.pole_concerne"=>array(),
+			"hotline.visible"=>array(),
+			"hotline.urgence"=>array(),
+			"hotline.detail"=>array(),
+			"hotline.etat"=>array(),
+			"hotline.id_affaire"=>array(),
+			"hotline.ok_facturation"=>array(),
+			"hotline.charge"=>array(),
+			"hotline.facturation_ticket"=>array(),
+			"hotline.wait_mep"=>array(),
+			"societe.latitude"=>array(),
+			"societe.longitude"=>array(),
+			"societe.solde"=>array()
+		);
 
 
+		$this->q->reset();
 
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_hotline",$get['id'])->setLimit(1);
+		} else {
+
+			// Filtre EXCLUSIF ET NON EXCLUSIF
+			// Filtre non traité
+			if ($get['filters']['free'] == "on") {
+				$this->q->where("hotline.etat","free");
+			} else {
+				// Filtre ticket actif
+				if ($get['filters']['fixing'] == "on") {
+					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
+				}
+				// Filtre MES tickets
+				if ($get['filters']['mine'] == "on") {
+					$this->q->where("hotline.id_user",ATF::$usr->getId());
+				}	
+
+				// Filtre Facturé
+				if ($get['filters']['facture'] == "on") {
+					$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
+				}	
+				// Filtre NON Facturé
+				if ($get['filters']['nfacture'] == "on") {
+					$this->q->where("hotline.facturation_ticket","non","OR","facturation");
+				}	
+				$this->q->whereIsNull("hotline.facturation_ticket","OR","facturation");
+
+				// Filtre Sur affaire
+				if ($get['filters']['afffacture'] == "on") {
+					$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
+				} else {
+					$this->q->whereIsNull("hotline.id_affaire");
+				}
+			}
+			// AUtre filtre - fitlres indépendant
+			if ($get['filters']['dev'] == "on") {
+				$this->q->where("hotline.pole_concerne","dev","OR","pole");
+			}		
+			if ($get['filters']['system'] == "on") {
+				$this->q->where("hotline.pole_concerne","system","OR","pole");
+			}		
+			if ($get['filters']['telecom'] == "on") {
+				$this->q->where("hotline.pole_concerne","telecom","OR","pole");
+			}		
+
+			// TRI
+			switch ($get['tri']) {
+				case 'id_societe':
+				case 'id_user':
+				case 'id_contact':
+				case 'date':
+					$get['tri'] = "hotline.".$get['tri'];
+				break;
+			}
+
+			$this->q->setLimit($get['limit']);
+
+		}
+
+		$this->q->addField($colsData);
+
+		$this->q->from("hotline","id_contact","contact","id_contact");
+		$this->q->from("hotline","id_societe","societe","id_societe");
+		$this->q->from("hotline","id_user","user","id_user");
+		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
+		$this->q->from("hotline","id_affaire","affaire","id_affaire");
+
+		$this->q->setToString();
+		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
+		$this->q->unsetToString();
+
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
+
+		if ($get['id']) {
+			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
+
+	        $return = $data['data'][0];		
+
+			// Check PJ
+			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
+			$return["idc"] = $this->cryptId($get['id']);
+
+		} else {
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+
+	        $return = $data['data'];			
+		}
+
+		return $return;
+	}
 
 	/**
 	* Permet d'insérer un ticket hotline depuis telescope
@@ -3757,165 +3996,6 @@ class hotline extends classes_optima {
 	}
 
 	/**
-	* Permet de récupérer la liste des tickets hotline pour telescope
-	* @package Telescope
-	* @author Quentin JANON <qjanon@absystech.fr> 
-	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
-	* @param $post array Argument obligatoire mais inutilisé ici.
-	* @return array un tableau avec les données
-	*/ 
-	public function _GET($get,$post) {
-
-		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "id_hotline";
-		if (!$get['trid']) $get['trid'] = "desc";
-
-		// Gestion du limit
-		if (!$get['limit']) $get['limit'] = 30;
-
-		// Gestion de la page
-		if (!$get['page']) $get['page'] = 0;
-
-		$colsData = array(
-			"hotline.id_hotline"=>array(),
-			"hotline.date"=>array(),
-			"hotline.date_modification"=>array(),
-			"hotline.id_societe"=>array("visible"=>false),
-			"hotline.id_contact"=>array(),
-			"hotline.id_gep_projet"=>array(),
-			"hotline.id_user"=>array(),
-			"hotline.hotline"=>array(),
-			"hotline.pole_concerne"=>array(),
-			"hotline.visible"=>array(),
-			"hotline.urgence"=>array(),
-			"hotline.detail"=>array(),
-			"hotline.etat"=>array(),
-			"hotline.id_affaire"=>array(),
-			"hotline.ok_facturation"=>array(),
-			"hotline.charge"=>array(),
-			"hotline.facturation_ticket"=>array(),
-			"hotline.wait_mep"=>array(),
-			"societe.latitude"=>array(),
-			"societe.longitude"=>array()
-		);
-
-
-		$this->q->reset();
-
-		if($get["search"]){
-			header("ts-search-term: ".$get['search']);
-			$this->q->setSearch($get["search"]);
-		}
-
-		if ($get['id']) {
-			$this->q->where("id_hotline",$get['id'])->setLimit(1);
-		} else {
-
-			// Filtre EXCLUSIF ET NON EXCLUSIF
-			// Filtre non traité
-			if ($get['filters']['free'] == "on") {
-				$this->q->where("hotline.etat","free");
-			} else {
-				// Filtre ticket actif
-				if ($get['filters']['fixing'] == "on") {
-					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
-				}
-				// Filtre MES tickets
-				if ($get['filters']['mine'] == "on") {
-					$this->q->where("hotline.id_user",ATF::$usr->getId());
-				}	
-
-				// Filtre Facturé
-				if ($get['filters']['facture'] == "on") {
-					$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
-				}	
-				// Filtre NON Facturé
-				if ($get['filters']['nfacture'] == "on") {
-					$this->q->where("hotline.facturation_ticket","non","OR","facturation");
-				}	
-				$this->q->whereIsNull("hotline.facturation_ticket","OR","facturation");
-
-				// Filtre Sur affaire
-				if ($get['filters']['afffacture'] == "on") {
-					$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
-				} else {
-					$this->q->whereIsNull("hotline.id_affaire");
-				}
-			}
-			// AUtre filtre - fitlres indépendant
-			if ($get['filters']['dev'] == "on") {
-				$this->q->where("hotline.pole_concerne","dev","OR","pole");
-			}		
-			if ($get['filters']['system'] == "on") {
-				$this->q->where("hotline.pole_concerne","system","OR","pole");
-			}		
-			if ($get['filters']['telecom'] == "on") {
-				$this->q->where("hotline.pole_concerne","telecom","OR","pole");
-			}		
-
-			// TRI
-			switch ($get['tri']) {
-				case 'id_societe':
-				case 'id_user':
-				case 'id_contact':
-				case 'date':
-					$get['tri'] = "hotline.".$get['tri'];
-				break;
-			}
-
-			$this->q->setLimit($get['limit']);
-
-		}
-
-
-
-
-		$this->q->addField($colsData);
-
-		$this->q->from("hotline","id_contact","contact","id_contact");
-		$this->q->from("hotline","id_societe","societe","id_societe");
-		$this->q->from("hotline","id_user","user","id_user");
-		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
-		$this->q->from("hotline","id_affaire","affaire","id_affaire");
-
-		$this->q->setToString();
-		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
-		$this->q->unsetToString();
-
-		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-
-		foreach ($data["data"] as $k=>$lines) {
-			foreach ($lines as $k_=>$val) {
-				if (strpos($k_,".")) {
-					$tmp = explode(".",$k_);
-					$data['data'][$k][$tmp[1]] = $val;
-					unset($data['data'][$k][$k_]);
-				}				
-			}
-		}
-
-		if ($get['id']) {
-			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
-
-	        $return = $data['data'][0];		
-
-			// Check PJ
-			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
-			$return["idc"] = $this->cryptId($get['id']);
-
-		} else {
-			// Envoi des headers
-			header("ts-total-row: ".$data['count']);
-			header("ts-max-page: ".ceil($data['count']/$get['limit']));
-			header("ts-active-page: ".$get['page']);
-
-	        $return = $data['data'];			
-		}
-
-		return $return;
-	}
-
-	/**
 	* Permet de supprimer un ticket hotline
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr> 
@@ -3973,6 +4053,26 @@ class hotline extends classes_optima {
 		return ATF::affaire()->sa();
 	}
 
+	/**
+	* Renvoi toutes les infos utiles pour le ticket hotline : temps facturé / passé, temps de deplacement, etc...
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient l'id du ticket a l'index 'id'
+	* @return array les différends indicateurs utiles : prestaTicket, credit, deplacement, solde, etc...
+	*/ 
+	public function _getInfos($get,$post) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+
+		$id_societe = $this->select($get['id'],"id_societe");
+
+		$r['prestaTicket'] = $this->getTotalTime($get['id'],"prestaTicket");
+		$r['credit'] = $this->getCreditUtilises($get['id']);
+		$r['deplacement'] = $this->getTotalTime($get['id'],"dep");
+		$r['solde'] = ATF::societe()->getSolde($id_societe);
+
+		return $r;
+	}
+
 
 
 	public function _partTicket($get,$post){
@@ -3998,6 +4098,25 @@ class hotline extends classes_optima {
 		}
 		return $res;		
 	}
+
+	public function _getStatSnapData($get,$post){
+		$to_return = array();
+
+		$code = $get['code'];
+		$date = date('Y-m-d',strtotime('- 30 day'));
+		$q = "SELECT * FROM stat_snap WHERE code = '".$code."' AND DATE_FORMAT(date, '%Y-%m-%d') >='".$date."' ORDER BY date DESC";
+
+		$to_return['data_snap'] = ATF::db()->sql2array($q);
+
+		if ($code == 'getTotalHotlineEnCours'){
+			$to_return['ca'] = ATF::commande_absystech()->_getCaThisMonth();
+			$to_return['satisfaction'] =  $this->getSatisfaction();
+			$to_return['conseil'] = ATF::news()->getConseils();
+		}
+
+		return $to_return;
+	}
+
 
 };
 ?>

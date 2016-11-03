@@ -30,6 +30,5 @@ class scanner_cleodis extends scanner {
 
 class scanner_cleodisbe extends scanner_cleodis { };
 class scanner_cap extends scanner_cleodis { };
-class scanner_exactitude extends scanner_cleodis { };
 
 ?>

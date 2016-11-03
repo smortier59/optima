@@ -19,9 +19,6 @@ ATF.buildGridEditor({
 		if (records) {			
 			for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
 				prix_achat+=records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite; 
-				{if ATF::$codename == "exactitude"}
-					prix+=records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite; 
-				{/if}
 			}
 		}
 		
@@ -44,12 +41,7 @@ ATF.buildGridEditor({
 		if(Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]')){
 			Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));
 		}
-
-		{if ATF::$codename == "exactitude"}
-			if(Ext.ComponentMgr.get('{$parent_class->table}[prix]')){
-				Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
-			}
-		{/if}
+	
 
 		if(Ext.ComponentMgr.get('{$parent_class->table}[marge]')){
 			Ext.ComponentMgr.get('{$parent_class->table}[marge]').setValue(ATF.formatNumeric(parseFloat((Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1-prix_achat)/Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1)*100));
@@ -354,6 +346,16 @@ ATF.buildGridEditor({
 					header: 'Type',
 					width:20,
 					dataIndex: '{$current_class->table}__dot__type',
+				}
+			{/if}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Ordre',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__ordre',								
+					editor: new Ext.form.TextField({
+						value:0
+					})
 				}
 			{/if}
 			, {
