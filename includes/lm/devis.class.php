@@ -19,7 +19,8 @@ class devis_lm extends devis {
             ,'devis.date'
             ,'devis.first_date_accord'       
  			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"devisExpand","width"=>50)
-			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"devisPerdu","width"=>50)								
+			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"devisPerdu","width"=>50)	
+			,'comite'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteExpand","width"=>50)							
 		);
 		
 		$this->colonnes['primary'] = array(

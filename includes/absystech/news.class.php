@@ -26,6 +26,15 @@ class news_absystech extends news {
 
 		$this->fieldstructure();
 	}
+
+
+	public function getConseils(){
+		$q = "SELECT details FROM news WHERE type = 'tips' ORDER BY RAND() LIMIT 1";
+		ATF::define_db("db","optima");
+		$tips =  ATF::db()->ffc($q);
+		ATF::define_db("db","extranet_v3_absystech");
+		return $tips;
+	}
 	
 	
 };

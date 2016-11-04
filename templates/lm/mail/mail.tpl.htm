@@ -1,0 +1,30 @@
+{if $infos.template == "expedition_commande"}
+	{include file="mail/{$infos.template}.tpl.htm"}
+{else}
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	      "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title></title>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	</head>
+	<body>
+	<table id="main" cellspacing="0" cellpadding="0">
+		<tr>
+			<td id="left" style="padding:0px; margin:0px; height:664px; width:151px;" rowspan="2" valign="top">
+				<img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/light_left.jpg")}" alt="" />
+			</td>
+			<td id="top" style="padding:0px; margin:0px; height:134px; width:800px;">
+				<img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/light_top.jpg")}" alt="" />
+			</td>
+		</tr>
+		<tr>
+			<td id="right" style="font-size:14px; max-width:800px; padding-top:10px; padding-left:5px;" valign="top">
+				{include file="mail/{$infos.template}.tpl.htm"}
+			</td>
+		</tr>
+	</table>
+	</body>
+	</html>
+{/if}

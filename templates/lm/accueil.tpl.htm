@@ -5,15 +5,16 @@
 	{include file="generic-tabs.tpl.js"}
 /*]]>*/</script>*}
 
-{if ATF::$codename=="cleodis"}
+
 	<div id="widgets" style="padding-left:2em"></div>
 
-	{$colspan=4}
+	{$colspan=2}
 	{$widgets=ATF::accueil()->getWidgets()}
 	
-
+	
+	
 	<script type="text/javascript">/*<![CDATA[*/
-		Ext.onReady(function(){	
+		Ext.onReady(function(){
 			try {
 				new Ext.Panel({
 					renderTo:'widgets',
@@ -27,8 +28,8 @@
 								layout: 'form',
 								bodyStyle:'padding:5px 15px 5px 15px',
 								border: false,
-								autoWidth:true,
-								items: [ 
+								autoWidth:false,
+								items: [
 									{foreach from=$widgets key=key item=item}
 										{if ($item@index%$colspan)===$colNumber}											
 											{if $item@index>=$colspan}
@@ -41,18 +42,18 @@
 												items: [
 													{
 														xtype: 'panel', 
-														title: '{ATF::$usr->trans(widget,$item.module, $item.type)|escape:javascript}',
+														title: 'Indicateur',
 														frame: true,
 														border: false,
 														autoWidth:true,
-														autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}{if $item.id_agence},id_agence={$item.id_agence}{/if}', scripts:true }
+														autoLoad:{ url: '{$item.module},widget.ajax', scripts:true }
 													}
 												]
 
 											}
 										{/if}
 									{/foreach}
-								 ]
+								]
 							}
 						{/for}
 					]
@@ -63,31 +64,10 @@
 			}
 		});
 	/*]]>*/</script>
-{/if}
 
 
-{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="exactitude"}
-    <div class="primary" style="width:80%;padding:2em">
-        <div class="gingerPrimaryContainer">
-            <script type="text/javascript">/*<![CDATA[*/
-                Ext.onReady(function(){		
-                    var dr = new Ext.DatePicker({
-                        startDay : 1
-                        ,listeners: {
-                            'select': function(node, dd){ ATF.tpl2div('tpl2div.ajax','div=accueilTacheEnCours&template=accueil_tache_imminente&table=accueil&date='+dd.dateFormat("Y-m-d")); }
-                        } 
-                    });
-                
-                    dr.render('dr');
-                });
-        
-            /*]]>*/</script>
-            
-            <div id="accueilTacheEnCours" style="float:left;width:80%;">{include file="accueil_tache_imminente.tpl.htm" date=$date}</div>
-            <div id="dr" style="float:right;"></div>
-        </div>
-    </div>
-{/if}
+
+
 <div class="Bloc">
     {include file="generic-onglets.tpl.htm" onglets=ATF::accueil()->onglets current_class=null}
 </div>

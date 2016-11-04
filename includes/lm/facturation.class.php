@@ -232,7 +232,7 @@ class facturation extends classes_optima {
 	* @return boolean
 	*/
 	function insert_facturations($commande,$affaire,$affaires_parentes=false,$devis,$type) {
-		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"));
+		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"))->where("loyer.nature","prolongation","AND",false,"!=")->where("loyer.nature","prolongation_probable","AND",false,"!=");
 		$loyer = ATF::loyer()->sa();
 		if($commande->get("etat")!="arreter" && $commande->get("etat")!="vente" && $commande->get("etat")!="restitution" && $commande->get("etat")!="restitution_contentieux" && !$commande->isAR() && $loyer){
 			
@@ -749,13 +749,14 @@ class facturation extends classes_optima {
 		$facturer = array();
 		$non_envoye = array();
 		
-		$cleodis=ATF::societe()->select(246);
+		//$cleodis=ATF::societe()->select(246);
 
 		$this->q->reset()
 				->addField("facturation.*")
-				->addField("LTRIM(`societe`.`societe`)","ltrimsociete")
-				->addField("LTRIM(`societe`.`code_client`)","ltrimcode_client")
+				->addField("LTRIM(CONCAT(`societe`.`nom`,' ',`societe`.`prenom`))","ltrimsociete")
+				->addField("LTRIM(`societe`.`ref`)","ltrimcode_client")
 				->setStrict()
+
 				->addJointure("facturation","id_affaire","affaire","id_affaire",false,false,false,false,"INNER")
 				->addJointure("facturation","id_affaire","commande","id_affaire",false,false,false,false,"INNER")
 				->addJointure("facturation","id_societe","societe","id_societe",false,false,false,false,"INNER")
@@ -887,7 +888,7 @@ class facturation extends classes_optima {
 //
 //		$prolongation=ATF::commande()->sa();
 
-		$query="SELECT `commande`.* , LTRIM(`societe`.`societe`) as ltrimsociete, LTRIM(`societe`.`code_client`) as ltrimcode_client
+		$query="SELECT `commande`.* , LTRIM(CONCAT(societe.nom,' ',societe.prenom)) as ltrimsociete, LTRIM(societe.ref) as ltrimcode_client
 				FROM `commande`
 				INNER JOIN `affaire` ON `affaire`.`id_affaire` = `commande`.`id_affaire`
 				INNER JOIN `societe` ON `societe`.`id_societe` = `commande`.`id_societe`
@@ -1018,7 +1019,7 @@ class facturation extends classes_optima {
 		//Envoi du mail à Cléodis des facturations non envoyées
 		if($non_envoye){
 			log::logger("Envoi du mail à Cléodis des facturations non envoyées...",__CLASS__);	
-			$this->sendGrille($non_envoye,$tab["nfc"],$tab["nfp"],$date_debut,$date_fin,"grille_","grille_","Grille de facturation des factures non envoyées",$s);
+			$this->sendGrille($non_envoye,$tab["nfc"],$tab["nfp"],$date_debut,$date_fin,"grille_","Grille de facturation des factures non envoyées",$s);
 		}	
 
 		//Envoi d'un pdf contenant toutes les factures contrat
@@ -1066,7 +1067,7 @@ class facturation extends classes_optima {
 		 */
 		 $date_deb=date("Y-m-d",strtotime(date("Y-m-01")."-1 month"));
 		 //INNER JOIN facturation ON facturation.id_affaire = commande.id_affaire
-		 $query="SELECT `commande`.* , LTRIM(`societe`.`societe`) as ltrimsociete, LTRIM(`societe`.`code_client`) as ltrimcode_client
+		 $query="SELECT `commande`.* , LTRIM(CONCAT(societe.nom,' ',societe.prenom)) as ltrimsociete, LTRIM(societe.ref) as ltrimcode_client
 				FROM `commande`
 				INNER JOIN `affaire` ON `affaire`.`id_affaire` = `commande`.`id_affaire`
 				INNER JOIN `societe` ON `societe`.`id_societe` = `commande`.`id_societe`
@@ -1097,8 +1098,8 @@ class facturation extends classes_optima {
 				
 				$this->q->reset()
 						->addField("facturation.*")
-						->addField("LTRIM(`societe`.`societe`)","ltrimsociete")
-						->addField("LTRIM(`societe`.`code_client`)","ltrimcode_client")
+						->addField("LTRIM(CONCAT(`societe`.`nom`," ",`societe`.`prenom`))","ltrimsociete")
+				        ->addField("LTRIM(`societe`.`ref`)","ltrimcode_client")
 						->setStrict()
 						->addCondition("`facturation`.`date_periode_debut`",$date_debut,"AND",false,">=")
 						->addCondition("`facturation`.`date_periode_debut`",$date_fin,"AND",false,"<=")
@@ -1304,7 +1305,6 @@ class facturation extends classes_optima {
 		if($type){
 			$prefix=$type.$prefix;
 		}
-		
 		//PDF avec les memes facture mais pour des tris differents ensuite dans sendGrille		
 		$tab[$prefix."Societe"][$item["ltrimsociete"].$item["id_facturation"]]=$i;
 		$tab[$prefix."Code"][$item["ltrimcode_client"].$item["id_facturation"]]=$i;
@@ -1315,7 +1315,7 @@ class facturation extends classes_optima {
 
 	public function sendFactures($date_debut,$date_fin,$facture_contrat,$type,$texte,$s){
 		//$emailGlobalFacture["email"]=ATF::societe()->select(246,"email");
-		$emailGlobalFacture["email"] = ATF::user()->select(35, "email").",".ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
+		$emailGlobalFacture["email"] = "jerome.loison@cleodis.fr";
 		$emailGlobalFacture["texte"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
 		$emailGlobalFacture["objet"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
 		foreach($facture_contrat as $key => $item){
@@ -1330,7 +1330,7 @@ class facturation extends classes_optima {
 	
 	public function sendGrille($facturer,$fc,$fp,$date_debut,$date_fin,$type,$texte,$s){
 		//$emailGrille["email"]=ATF::societe()->select(246,"email");
-		$emailGrille["email"] = ATF::user()->select(35, "email").",".ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
+		$emailGrille["email"] = "jerome.loison@cleodis.fr";
 		$emailGrille["texte"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
 		$emailGrille["objet"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
 

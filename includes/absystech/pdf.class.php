@@ -74,67 +74,13 @@ class pdf_absystech extends pdf {
 	}
 
 	public function cgv() {
-		ATF::cgv()->q->reset()->addCondition('id_societe',ATF::$usr->get('id_societe'))->end();
-        $this->setAutoPageBreak(true,1);
-		if ($cgv=ATF::cgv()->select_all()) {
-			$this->Addpage();
-			$this->setleftmargin(10);
-			$this->setrightmargin(15);
-			$this->setfont('arial','',9);
-			
-			if (is_array($cgv)){
-				foreach ($cgv as $key => $item){
-					$this->multicell(0,3,$item["cgv"],0,'C');
-					$this->setfont('arial','',7);
-					$this->ln(2);
-					$this->multicell(0,3,$item["resume"],0,'C');
-				
-					$this->sety(40);
-	
-					ATF::cgv_article()->q->reset()->addCondition('id_cgv',$item['id_cgv'])->addOrder('id_cgv_article')->end();
-					$cgv_article = ATF::cgv_article()->select_all();
-					if(is_array($cgv_article)){
-						foreach($cgv_article as $key_ => $item_){
-							if ($this->getY() >= 250 && !$col2){
-								$this->setxy(105,40);
-								$col2 =true;
-							}elseif($this->getY() >= 250 && $col2){
-								$this->Addpage();
-								$this->setleftmargin(10);
-								$this->setrightmargin(15);
-								$col2 =false;
-								$this->setxy(15,20);
-							}
-							
-							$col2?$this->setx(105):$this->setx(10);						
-							$this->setfont('arial','',8);
-							$this->cell(7,3,($key_+1),0,0);
-							$this->cell(80,3,$item_["cgv_article"],0,'1');
-							$this->setfont('arial','',7);
-							
-							if($item_["resume"]){
-								$this->ln(1);
-								$col2?$this->setx(112):$this->setx(17);						
-								$this->multicell(85,3,$item_["resume"],0,'J');
-							}
-		
-							ATF::cgv_article_second()->q->reset()->addCondition('id_cgv_article',$item_['id_cgv_article'])->addOrder('cgv_article_second')->end();
-							$cgv_article_second = ATF::cgv_article_second()->select_all();
-							if(is_array($cgv_article_second)){
-								foreach($cgv_article_second as $k => $i){
-									$this->ln(1);
-									$col2?$this->setx(105):$this->setx(10);						
-									$this->cell(7,3,$i["cgv_article_second"],0,0);
-									$this->multicell(85,3,$i["resume"],0,'J');
-								}
-							}
-							$this->ln(3);
-						}
-					}
-				}
-			}
-			$this->multicell(95,3,'CGV AbsysTech. janvier 2013',0,'C');
-		}
+
+		$this->unsetHeader();		
+		$this->AddPage();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."absystech/cgv.pdf");
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, -5, -10, 220, 0, true);	
 	}
 
 	public function facture($id,&$s) {
@@ -1531,12 +1477,15 @@ class pdf_absystech extends pdf {
 		$head = array("Référence","Désignation","Qté","Prix unitaire","Montant");
 		$width = array(25,95,11,25,25);
 		
+		$indemnite = "40.00";
 		$txt = "Intérêts relatifs au retard de paiement de la facture ".$infos_facture['ref']." du ".ATF::$usr->date_trans($infos_facture['date'],true,true)." pour un montant de ".$infos_facture['prix']." € HT.";
 		$txt .= "\nPaiement de ".$infos_facture_paiement['montant']." € TTC effectué le ".ATF::$usr->date_trans($infos_facture_paiement['date'],true,true);
 		$data = array(
-			array("INT",$txt,"1",$infos_facture_paiement['montant_interet']." €",$infos_facture_paiement['montant_interet']." €")
+			array("INTERETS",$txt,"1",$infos_facture_paiement['montant_interet']." €",$infos_facture_paiement['montant_interet']." €"),
+			array("INDEMNITE","Indemnité de recouvrement (articles L441-3 et L441-6 du code de commerce)","1",$indemnite." €",$indemnite." €")
 		);
 		$style = array(
+			array("",$this->leftStyle,"",$this->rightStyle,$this->rightStyle),
 			array("",$this->leftStyle,"",$this->rightStyle,$this->rightStyle)
 		);
 
@@ -1545,7 +1494,7 @@ class pdf_absystech extends pdf {
 		$this->setx(15);
 		$this->cell(131,4,"",0,0,'C');
 		$this->cell(25,4,"Total",1,0,'R');
-		$this->cell(25,4,$infos_facture_paiement['montant_interet']." €",1,1,'R');
+		$this->cell(25,4,($indemnite+$infos_facture_paiement['montant_interet'])." €",1,1,'R');
 			
 		$this->setleftmargin(15);
 		$this->setrightmargin(15);
@@ -2378,14 +2327,15 @@ La dénonciation devra être notifiée par lettre recommandée avec accusé de r
 		if((float)($this->el["tva"])>1){
 			$this->cell(25,4,"TVA ".round($this->el["tva"]*100-100,2)."%",1,0,'R');			
 			
-			$TTC=$prixHT*$this->el["tva"];
+			$TTC=round($prixHT,2)*$this->el["tva"];
+			
 			
 
 			$this->cell(25,4,number_format(abs($TTC-$prixHT),2,',',' ')." €",1,1,'R');		
 			$this->cell(131,4,"",0,0,'C');
 			$this->setfont('arial','B',8);
 			$this->cell(25,4," Montant TTC",1,0,'R'); 
-			$this->cell(25,4,number_format(abs($TTC),2,',',' ')." €",1,1,'R');
+			$this->cell(25,4,number_format(round($TTC,2),2,',',' ')." €",1,1,'R');
 		}	
 		
 		if ($this->gety()>225) $this->AddPage();

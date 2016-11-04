@@ -784,7 +784,7 @@ class tache extends classes_optima {
 		$this->q->from("tache","id_suivi","suivi","id_suivi");
 
 		$this->q->setToString();
-		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
+
 		$this->q->unsetToString();
 
 		if ($get['id']) {

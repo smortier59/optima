@@ -108,7 +108,11 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,295,5,35);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-            $this->image(__PDF_PATH__.$this->logo,75,10,60);
+			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
+				$this->image(__PDF_PATH__.$this->logo,75,10,40);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,75,10,60);
+			}            
             $this->setfont('arial','',11);
             if ($this->client) {
                 $cadre = array(
@@ -149,6 +153,124 @@ class pdf_cleodis extends pdf {
 		if ($police != 8)	$this->setfont('arial','',8);
 	}
 
+	public function mandatSellAndSign($id_affaire, $concat=false){
+
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
+		$this->affaire = ATF::affaire()->select($id_affaire);
+		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+
+
+
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+		$this->contrat = ATF::commande()->select_row();		
+
+		$this->adresseClient = $this->client["adresse"];
+		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
+		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
+		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+
+		
+		$this->unsetHeader();
+		$this->Open();		
+		$this->AddPage();
+
+
+		$this->setfillcolor(208,255,208);
+
+
+		//HEADER
+		$this->image(__PDF_PATH__.$this->logo,5,5,40);
+
+		$this->setMargins(5);
+		$this->setfont('arial','',9);
+		$this->setLeftMargin(60);
+		$this->cell(20,4,"Créancier :");
+		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->setLeftMargin(5);
+		$this->line(5,$this->gety()+2,232,$this->gety()+2);
+
+		//Page Centrale
+		//Gauche
+		$this->setY(27);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, "Mandat",0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "de prélèvement SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Coordonnées",0,1);
+		$this->cell(55, 4, "bancaires",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Nom :",0,1);
+		$this->cell(55, 4, "Adresse :",0,1);
+		$this->ln(4);
+		$this->cell(55, 4, "Numéro de mobile :",0,1);
+		
+		//Milieu
+		$this->setY(27);
+		$this->setLeftMargin(60);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, __ICS__,0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Identifiant créancier SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["BIC"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "BIC",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["societe"],0,1);
+		$this->multicell(120, 4, $this->adresseClient,0,1);
+		$this->cell(55, 4, $this->client["tel"],0,1);
+
+		//Droite
+		$this->setY(27);
+		$this->setLeftMargin(125);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Référence unique du mandat",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["IBAN"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "IBAN",0,1);
+
+		$this->setY(70);
+		$this->setLeftMargin(5);
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->ln(4);
+		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y"),0,1);
+
+		$this->ln(4);
+		$this->setfont('arial','',7);
+		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+
+		/*$this->unsetHeader();		
+		$this->AddPage();
+
+		copy(ATF::commande()->filepath($this->contrat["commande.id_commande"],"contratA4Signature"), ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true));
+
+		$pageCount = $this->setSourceFile(ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true) );
+		
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);*/
+
+		
+		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
+
+	}
+
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
@@ -168,6 +290,9 @@ class pdf_cleodis extends pdf {
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
+
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 
 		if($this->devis["type_devis"] === "optic_2000"){
 			$this->devisoptic_2000($id);			
@@ -218,7 +343,7 @@ class pdf_cleodis extends pdf {
 	}
 
 
-	public function devis_new($id,$s) {  
+	public function devis_new($id,$s) {
   		$this->devis = ATF::devis()->select($id);
   		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
   		
@@ -231,7 +356,9 @@ class pdf_cleodis extends pdf {
   		$this->contact = ATF::contact()->select($this->devis['id_contact']);
   		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
   		$this->agence = ATF::agence()->select($this->user['id_agence']);
-  
+  		
+  		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
   		if($this->devis["type_devis"] === "optic_2000"){
   			$this->devisoptic_2000($id);			
   		}else{
@@ -295,8 +422,7 @@ class pdf_cleodis extends pdf {
   				$this->devisClassique();
   			}
   		}
-  		return true;
-  
+  		return true;  
   	}
 
 	
@@ -305,7 +431,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisVente(){
+	public function devisVente(){
 		if (!$this->devis) return false;
 		/* PAGE 2 */
 		$this->setHeader();
@@ -534,7 +660,7 @@ class pdf_cleodis extends pdf {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @date 23-09-2016
 	*/
-	private function devisClassique_new() {
+	public function devisClassique_new() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -979,7 +1105,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisClassique() {
+	public function devisClassique() {
 		if (!$this->devis) return false;
 		
 		/* PAGE 2 */
@@ -1428,7 +1554,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
 	*/
-	private function devisAvenant() {
+	public function devisAvenant() {
 		if (!$this->devis) return false;
 
 		/* PAGE 2 */
@@ -1729,6 +1855,8 @@ class pdf_cleodis extends pdf {
 		if ($this->affaire['nature']=="AR") {
 			$this->AR = ATF::affaire()->getParentAR($this->affaire['id_affaire']);
 		}
+
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 	}
 
 	/** Renvoi le detail d'un produit par rapport a ses informations
@@ -1832,7 +1960,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	*/
-	private function contratA3Left() {
+	public function contratA3Left() {
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -1960,7 +2088,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	*/
-	private function contratA3Right() {
+	public function contratA3Right() {
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";		
@@ -2307,7 +2435,13 @@ class pdf_cleodis extends pdf {
 		$this->setY(200);
 		$this->setfont('arial','I',8);
 		$this->multicell(95,3,"CGL CLEODIS V09-14",0,"R");
-		$this->image(__PDF_PATH__.$this->logo,330,200,35);
+
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",330,200,35);			
+		} else{
+			$this->image(__PDF_PATH__.$this->logo,330,200,35);
+		}
+		
 		
 		
 		
@@ -2475,12 +2609,17 @@ class pdf_cleodis extends pdf {
 		$this->setAutoPageBreak(true);
 	}
 
+
+	public function contratA4Signature($id){
+		$this->contratA4($id,true);
+	}
+
 	/** PDF d'un contrat en A4
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
 	* @param int $id Identifiant commande
 	*/
-	public function contratA4($id) {
+	public function contratA4($id, $signature=false) {
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		$this->commandeInit($id);
@@ -2489,8 +2628,15 @@ class pdf_cleodis extends pdf {
 		$this->A3 = false;
 		$this->A4 = true;
 
+
 		$this->setfont('arial','B',10);
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);			
+		} else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+		}
+		
 
 		
 		$this->sety(10);
@@ -2807,12 +2953,14 @@ class pdf_cleodis extends pdf {
 
 		$this->setFillColor(255,255,0);
 
+
+
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
 			,"Nom : "
 			,"Qualité : "
-			,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
+			,array("txt"=>$signature?"[SignatureContractant/]":"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 		);
 		$y = $this->gety()+2;
 		if ($this->affaire['nature']=="vente") {
@@ -2858,7 +3006,12 @@ class pdf_cleodis extends pdf {
 		$this->Open();		
 		$this->AddPage();
 
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",4,5,35);			
+		} else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+		}
+		
 
 		$this->setfont('arial','I',8);
 		//Cadre du haut avec Loueur et Locataire
@@ -3270,7 +3423,7 @@ class pdf_cleodis extends pdf {
 	* @date 21-02-2011
 	* @param int $id Identifiant bon de commande
 	*/
-	private function initBDC($id,$s) {
+	public function initBDC($id,$s) {
 		$this->bdc = ATF::bon_de_commande()->select($id);
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$this->lignes = ATF::bon_de_commande_ligne()->sa();
@@ -3305,8 +3458,12 @@ class pdf_cleodis extends pdf {
 		$this->open();
 		$this->addpage();
 		
+		if($this->affaire["type_affaire"] == "2SI"){
+			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
+		} else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
+		}
 		
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
 		
 		$this->setfont('arial','',10);
 		
@@ -3489,7 +3646,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	* @param int $id Identifiant demande de refi
 	*/
-	private function initDemandeRefi($id,$s) {
+	public function initDemandeRefi($id,$s) {
 		$this->demandeRefi = ATF::demande_refi()->select($id);
 		$this->affaire = ATF::affaire()->select($this->demandeRefi['id_affaire']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
@@ -3939,11 +4096,24 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 21-02-2011
 	*/
-	private function factureRefi($global=false) {
+	public function factureRefi($global=false) {
 		if(!$global){
 			$this->open(); 
 		}
+
+		if(ATF::$codename == "cleodisbe"){
+			$this->unsetHeader();			
+		}
 		$this->addpage();
+
+		if(ATF::$codename == "cleodisbe"){
+			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+			}
+		}
+
 		$this->setMargins(15,30);
 		$this->sety(10);
 		
@@ -4088,7 +4258,7 @@ class pdf_cleodis extends pdf {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @date 17-11-2014
 	*/
-	private function factureMidas($global=false){
+	public function factureMidas($global=false){
 
 		if(!$global){
 			$this->open(); 
@@ -4185,7 +4355,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-02-2011
 	*/
-	private function factureClassique($global=false){
+	public function factureClassique($global=false){
 		if(!$global){
 			$this->open(); 
 		}
@@ -4481,7 +4651,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 30-05-2011
 	*/
-	private function initEcheancier($id) {
+	public function initEcheancier($id) {
 		$this->affaire = ATF::affaire()->select($id);
 		$this->commande = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 		$this->devis = ATF::devis()->select($this->commande['id_devis']);
@@ -4547,7 +4717,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 28-02-2011
 	*/
-	private function echeancierFacturation($id) {
+	public function echeancierFacturation($id) {
 		$this->open();
 		$this->unsetHeader();
 		$this->addpage();
@@ -4972,10 +5142,15 @@ class pdf_cleodis extends pdf {
 		$this->relance = ATF::relance()->select($id);
         $this->client = ATF::societe()->select($this->relance['id_societe']);
         $this->contact = ATF::contact()->select($this->relance['id_contact']);
-        
+        $this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
+
+
         ATF::relance_facture()->q->reset()->where('id_relance',$this->relance['id_relance'])->setCount();
         $this->factures = ATF::relance_facture()->sa();
         
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80); 
@@ -5001,7 +5176,7 @@ class pdf_cleodis extends pdf {
 	* @param $id id de la facture	
 	* @date 06-02-2013
 	*/
-	private function premiereRelance(){
+	public function premiereRelance(){
 		$this->multicell(0,10,"Objet : Relance facture impayée ");
         $this->ln(5);
 		
@@ -5047,7 +5222,7 @@ class pdf_cleodis extends pdf {
 	* @param $id id de la facture	
 	* @date 06-02-2013
 	*/
-	private function deuxiemeRelance(){
+	public function deuxiemeRelance(){
 		$this->multicell(0,5,"Objet : 2ème Relance facture impayée ");
         $this->ln(5);
         
@@ -5097,7 +5272,7 @@ class pdf_cleodis extends pdf {
 	* @param $id id de la facture	
 	* @date 06-02-2013
 	*/
-	private function miseDemeure(){		
+	public function miseDemeure(){		
         $this->ln(5);
         $this->multicell(0,5,"Objet : Mise en demeure - Lettre recommandée avec accusé de reception");
         $this->ln(5);
@@ -5147,9 +5322,9 @@ class pdf_cleodis extends pdf {
 	*/
 	public function envoiContratEtBilan($id,$s){
 				
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
 		$this->noPageNo = true;
 		
@@ -5159,6 +5334,8 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5235,9 +5412,9 @@ class pdf_cleodis extends pdf {
 	* @date 03-03-2013
 	*/	
 	public function envoiContratSsBilan($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 		
@@ -5246,7 +5423,9 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-		
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5315,9 +5494,9 @@ class pdf_cleodis extends pdf {
 	*/
 	public function envoiAvenant($id,$s){
 
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;	
         $this->noPageNo = true;
 				
@@ -5326,7 +5505,9 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-		
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5373,9 +5554,9 @@ class pdf_cleodis extends pdf {
 	* @date 03-03-2013
 	*/
 	public function contratTransfert($id,$s){
-		if(ATF::$codename == "cleodis"){ $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis"){ $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 		
@@ -5385,7 +5566,9 @@ class pdf_cleodis extends pdf {
         $this->devis = ATF::devis()->select($this->commande["id_devis"]);
         $this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
         $this->contact = ATF::contact()->select($this->devis['id_contact']);
-		
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5452,9 +5635,9 @@ class pdf_cleodis extends pdf {
 	* @date 03-03-2013
 	*/
 	public function ctSigne($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
-
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 				
@@ -5464,6 +5647,8 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -5502,8 +5687,9 @@ class pdf_cleodis extends pdf {
 	* @date 20-08-2015
 	*/
 	public function CourrierRestitution($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
+		$this->facturePDF = true;
 		$this->envoiContrat = true;
         $this->noPageNo = true;
 				
@@ -5513,6 +5699,8 @@ class pdf_cleodis extends pdf {
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		if (ATF::$codename == "cleodisbe") $this->sety(50);
@@ -5589,6 +5777,8 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		ATF::loyer()->q->reset()->where("id_affaire", $this->devis['id_affaire']);
 		$this->loyer = ATF::loyer()->select_all();
@@ -5928,6 +6118,8 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->addpage();
 		$this->setfont('arial',"",8);
 		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
@@ -6049,10 +6241,11 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 	*/
 	public function envoiCourrierClassique($id,$s){
 				
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
 
 
 		$this->envoiContrat = true;
+		$this->facturePDF = true;
         $this->noPageNo = true;
 		
 		$this->commande = ATF::commande()->select($id);	
@@ -6061,6 +6254,8 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		$this->open();
 		$this->addpage();
 		$this->sety(80);   
@@ -7166,7 +7361,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 	* @date 12-03-2015
 	* @param int $id Identifiant bon de commande
 	*/
-	private function initFormationBDC($id,$s) {
+	public function initFormationBDC($id,$s) {
 		$this->bdc = ATF::formation_bon_de_commande_fournisseur()->select($id);;
 		$this->devis = ATF::formation_devis()->select($this->bdc["id_formation_devis"]);
 
@@ -7367,42 +7562,73 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		}
 
+		if(!$this->facturePDF){
+			$this->sety(12);
+			$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
+			$this->setfont('arial','B',7);
+			$this->multicell(65,3,$this->societe['societe'],0,"C");
+			$this->setfont('arial','',7);
+			$this->multicell(65,3,$this->societe['adresse'],0,"C");
+			$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
+			if ($this->societe['tel']) $this->multicell(65,3,"Tel : +32 (0)2 588 52 90",0,"C");
+			if ($this->societe['id_pays'] =='FR') {
+				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
+			} else {
+				$this->multicell(65,3,"Numéro de TVA  ".$this->societe['siret'],0,"C");
+			}
+
+			if ($this->A3) {
+				$this->setLeftMargin(340);	
+			} else {
+				$this->setLeftMargin(135);	
+
+			}
+			$this->sety(12);
 		
-		$this->sety(12);
-		$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
-		$this->setfont('arial','B',7);
-		$this->multicell(65,3,$this->societe['societe'],0,"C");
-		$this->setfont('arial','',7);
-		$this->multicell(65,3,$this->societe['adresse'],0,"C");
-		$this->multicell(65,3,$this->societe['cp']." ".$this->societe['ville'],0,"C");
-		if ($this->societe['tel']) $this->multicell(65,3,"Tel :".$this->societe['tel'],0,"C");
-		if ($this->societe['id_pays'] =='FR') {
-			$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
-		} else {
-			$this->multicell(65,3,"Numéro de TVA  ".$this->societe['siret'],0,"C");
+			$this->setfont('arial','B',10);
+			$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE","L","C");
+			$this->setfont('arial','B',7);
+			$this->multicell(0,3,$this->client['societe'],"L","C");
+			$this->setfont('arial','',7);
+			$this->multicell(0,3,$this->client['adresse'],"L","C");
+			$this->multicell(0,3,$this->client['cp']." ".$this->client['ville'],"L","C");
+			
+			$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
+			$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
+					
+			$this->setTopMargin(40);		
+
+			if($this->pdfEnveloppe){
+				$cadre = array(
+                    array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
+                    ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
+                    ,array("txt"=>$this->client["adresse"],"size"=>10)
+                );  
+                if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10); 
+                if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
+                $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
+                $this->cadre(110,35,85,35,$cadre);
+			}
+			$this->setLeftMargin(15);		
+		}else{
+			$this->setfont('arial','',12);
+			$cadre = array(
+	            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)                
+	            ,array("txt"=>$this->client["adresse"],"size"=>10)
+	        );  
+	        if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10); 
+	        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10); 
+	        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10); 
+	        $this->cadre(110,20,85,35,$cadre);
+	               
+	        $this->setfont('arial','',12);
+
+			$this->setMargins(15,50);
 		}
 
-		if ($this->A3) {
-			$this->setLeftMargin(340);	
-		} else {
-			$this->setLeftMargin(135);	
 
-		}
-		$this->sety(12);
-
-		$this->setfont('arial','B',10);
-		$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE","L","C");
-		$this->setfont('arial','B',7);
-		$this->multicell(0,3,$this->client['societe'],"L","C");
-		$this->setfont('arial','',7);
-		$this->multicell(0,3,$this->client['adresse'],"L","C");
-		$this->multicell(0,3,$this->client['cp']." ".$this->client['ville'],"L","C");
 		
-		$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
-		$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
-
-		$this->setLeftMargin(15);
-		$this->setTopMargin(40);
+        		
 	}
 
 	/* Génère le pied de page des PDF Cléodis
@@ -7426,7 +7652,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(200,2,$this->societe['societe']." ".$this->societe['structure'],0,'C');
 			$this->unsetFontDecoration("B");
 			$this->multicell(200,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
+			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
 			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
 			
 			$this->SetLeftMargin(220);
@@ -7435,7 +7661,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(200,2,$this->societe['societe']." ".$this->societe['structure'],0,'C');
 			$this->unsetFontDecoration("B");
 			$this->multicell(200,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
+			$this->multicell(200,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
 			$this->multicell(200,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
 
 			$this->ln(-3);
@@ -7449,7 +7675,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(0,2,$this->societe['societe']." ".$this->societe['structure'],0,'C');
 			$this->unsetFontDecoration("B");
 			$this->multicell(0,2,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-			$this->multicell(0,2,"N° TVA ".$this->societe["reference_tva"]." - Tel : ".$this->societe['tel'] ,0,'C');
+			$this->multicell(0,2,"N° TVA ".$this->societe["reference_tva"]." - Tél : +32 (0)2 588 52 90" ,0,'C');
 			$this->multicell(0,2,"BELFIUS - IBAN ".$this->societe["IBAN"]." - BIC ".$this->societe["BIC"]."",0,'C');
 			
 
@@ -7474,15 +7700,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function title($title,$subtitle=false) {
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
-		if ($this->A3) {
-			$this->line(210,$this->gety(),420,$this->gety());
-		} else {
-			$this->line(0,$this->gety(),220,$this->gety());
-		}
-
+				
+		$this->ln(7);
 		$this->sety($this->gety()+2);
 		$this->setfont('arial','B',15);				
 		$this->multicell(0,5,$title,0,"C");
@@ -7493,16 +7712,13 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(0,2,$subtitle,0,'C');
 			$this->sety($this->gety()+2);
 		}
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->ln(3);
 		if ($this->A3) {
 			$this->line(210,$this->gety(),420,$this->gety());
 		} else {
 			$this->line(0,$this->gety(),220,$this->gety());
 		}
-		$this->SetDrawColor(0,0,0);
-		$this->SetLineWidth(0.2);
+		
 		$this->ln(5);
 
 	}
@@ -7745,12 +7961,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratA4($id) {
 
+		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
 		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
 		$this->A4 = true;
+
 
 		if($this->affaire["nature"]=="avenant"){
 			$t = "AVENANT N° ".ATF::affaire()->num_avenant($this->affaire["ref"]);
@@ -8102,7 +8320,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
 	*/
-	private function contratA3Left() {
+	public function contratA3Left() {
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -8268,7 +8486,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
 	*/
-	private function contratA3Right() {
+	public function contratA3Right() {
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";		
@@ -8427,6 +8645,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->colsProduitAlignLeft = array("border"=>1,"size"=>9,"align"=>"L");
 		$this->styleDetailsProduit = array("border"=>1,"bgcolor"=>"efefef","decoration"=>"I","size"=>8,"align"=>"L");
 
+		$this->facturePDF = true;
+
 		if ($this->facture['type_facture']=="refi") {
 			$this->demandeRefi = ATF::demande_refi()->select($this->facture['id_demande_refi']);
 			$this->refinanceur = ATF::refinanceur()->select($this->facture['id_refinanceur']);
@@ -8445,7 +8665,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	/** PDF d'une facture refinanceur
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 21-02-2011
-	private function factureRefi($global=false) {
+	public function factureRefi($global=false) {
 		if(!$global){
 			$this->open(); 
 		}
@@ -8595,13 +8815,13 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-02-2011
 	*/
-	private function factureClassique($global=false){
+	public function factureClassique($global=false){
 		if(!$global){
 			$this->open(); 
 		}
 		$this->addpage();
-		$this->setMargins(15,30);
 
+		
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
 			$t = 'FACTURE';
@@ -8787,10 +9007,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 			$this->cell(0,5,"Par remboursement ou compensation",0,1);
 		}
-		if(ATF::$codename !== "cleodisbe"){		
-			$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-			$this->cell(0,5,"ICS ".__ICS__ ,0,1);
-		}
+			
+		$this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		$this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		
 
 		if($this->facture["mode_paiement"] == "virement"){
 			$cadre = array();
@@ -9548,25 +9768,7 @@ class pdf_cap extends pdf_cleodis {
 
 		//Couleur de ligne --> setDrawColor();
 
-	}
-
-	public function bgMandat(){
-		$this->setleftmargin(2);
-		$this->setY(5);
-
-		$this->setFillColor(150,150,150);
-		$this->cell(3,86,"",0,1,"L",1);
-		$this->ln(4);
-
-		$this->setFillColor(221,16,39);
-		$this->cell(3,86,"",0,1,"L",1);
-		$this->ln(4);
-
-		$this->setFillColor(0,0,0);
-		$this->cell(3,86,"",0,1,"L",1);
-
-		$this->setY(5);
-	}
+	}	
 
 	public function mandat($id,&$s) {
 		$id = ATF::mandat()->decryptId($id);
@@ -9581,7 +9783,469 @@ class pdf_cap extends pdf_cleodis {
 
 		ATF::mandat_ligne()->q->reset()->where("id_mandat",$id)->addOrder("id_mandat_ligne","asc");
 		$mandat_ligne = ATF::mandat_ligne()->select_all();
+		if($mandat["nature"] == "cedre"){
+			$this->mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne);
+		}else{
+			$this->mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne);
+		}
+		
+	}
 
+
+	public function mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne){
+		
+		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
+		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
+
+		$siren = "";
+		if($infos_client['siren']){
+			$siren = str_replace(" ", "", $infos_client['siren']);
+			$siren = substr($infos_client['siren'], 0, 3)." ".substr($infos_client['siren'], 3, 3)." ".substr($infos_client['siren'], 6, 3);
+		}elseif($infos_client['siret']){
+			$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
+			$siren = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3);
+		}
+
+		
+		$adresse_client = "";
+		if($infos_client["adresse"]){
+			$adresse_client = $infos_client["adresse"];
+			if($infos_client["adresse_2"]) $adresse_client .= " ".$infos_client["adresse_2"];
+			if($infos_client["adresse_3"]) $adresse_client .= " ".$infos_client["adresse_3"];
+			$adresse_client .= " ".$infos_client["cp"]." ".$infos_client["ville"];
+		}
+
+		$representant_client = "";
+		if($mandat["id_representant"]){ $representant_client = ATF::contact()->select($mandat["id_representant"]);	}
+
+		//Page 1
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"Préambule  :");
+
+		$this->setFont('arial','',7);
+		$this->multicell(0,3,"Cette offre de services est exclusivement réservée aux entreprises adhérentes du groupement Sarl Le Cèdre, Sarl au capital de 33 294,00 EUR, ayant son siège social 1 allée des Chapelains 71600 PARAY LE MONIAL inscrite au registre du commerce et des sociétés de MACON sous le n° 418 841 227.\n\nLe présent contrat s’applique pour les enseignes : ",0,"L");
+
+		$this->setFont('arial','B',7);
+		$this->multicell(0,3,"Le Cèdre structures chrétiennes  /  Le Cèdre Associations  /  Le Cèdre Campings  /  Le Cèdre Entreprises",0,"L");
+
+		$this->ln(5);
+
+		$this->setFont('arial','',7);
+		$this->multicell(0,3,"Le présent contrat est soumis aux dispositions du protocole d’accord cadre régularisé entre la Sarl Le Cèdre RCS 418 841 227 et la Sarl CAP RECOUVREMENT le 7 Septembre 2016.  Lesdites dispositions ne pourront être maintenues en cas de résiliation du protocole d’accord cadre.",0,"L");
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"1. Identification du mandataire");
+
+		$this->setFont('arial','',9);
+		$this->multicell(0,4,"Le mandataire (ci-après désigné « prestataire »)\nSarl CAP RECOUVREMENT, inscrite au RCS LILLE METROPOLE sous le n° 392 468 443\nSiège : 30 Boulevard du Général Leclerc – 59100 ROUBAIX\nReprésentée par Olivier DUBENSKI en qualité de gérant\nN° de TVA INTRACOMMUNAUTAIRE : FR38392468443",0,"L");
+
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"2. Informations client");
+
+		$this->ln(5);
+
+		$this->setFont('arial','',10);
+		$this->setFillColor(163,197,15);
+		$this->cell(45,6,"N° Adhérent Le Cèdre",1,0,"L",1);
+		
+		$this->setFillColor(255,255,255);		
+		$this->cell(135,6,$infos_client["code_client"],1,1,"L",1);
+
+		$this->cell(45,6,"Raison Sociale",1,0,"L",1);
+		$this->cell(135,6,$infos_client["societe"],1,1,"L",1);
+
+		$this->cell(45,6,"Forme Juridique",1,0,"L",1);
+		$this->cell(30,6,$infos_client["structure"],"TBL",0,"L",1);
+		$this->cell(15,6,"SIRET","TBR",0,"L",1);
+		$this->cell(50,6,$infos_client["siret"],"TBL",0,"L",1);
+		$this->cell(20,6,"Code NAF","TBR",0,"L",1);
+		$this->cell(20,6,$infos_client["naf"],1,1,"L",1);
+
+
+		$this->cell(45,6,"Adresse de gestion",1,0,"L",1);
+		$this->cell(135,6,$infos_client["adresse"],1,1,"L",1);
+
+		$this->cell(45,6,"Code Postal",1,0,"L",1);
+		$this->cell(30,6,$infos_client["cp"],"TBL",0,"L",1);
+		$this->cell(15,6,"Ville","TBR",0,"L",1);
+		$this->cell(90,6,$infos_client["ville"],1,1,"L",1);
+
+		$this->cell(45,6,"Téléphone",1,0,"L",1);
+		$this->cell(30,6,$infos_client["tel"],"TBL",0,"L",1);
+		$this->cell(10,6,"Fax","TBR",0,"L",1);
+		$this->cell(30,6,$infos_client["fax"],"TBL",0,"L",1);
+		$this->cell(15,6,"N° TVA","TBR",0,"L",1);
+		$this->cell(50,6,$infos_client["tel"],1,1,"L",1);
+
+
+		$this->ln(5);
+
+		
+		$this->setFillColor(163,197,15);
+		$this->cell(45,6,"Représentant légal",1,0,"L",1);
+		
+		$this->setFillColor(255,255,255);		
+		$this->cell(60,6,ATF::contact()->nom($representant_client["id_contact"]),"TBL",0,"L",1);
+		$this->cell(20,6,"Fonction","TBR",0,"L",1);
+		$this->cell(55,6,$representant_client["fonction"],1,1,"L",1);
+
+		$this->cell(45,6,"Email",1,0,"L",1);
+		$this->cell(80,6,$representant_client["email"],"TBL",0,"L",1);
+		$this->cell(20,6,"Tél. direct","TBR",0,"L",1);
+		$this->cell(35,6,$representant_client["tel"],1,1,"L",1);
+
+		$this->ln(5);
+
+		
+		$this->setFillColor(163,197,15);
+		$this->cell(45,6,"Interlocuteur",1,0,"L",1);
+		
+		$this->setFillColor(255,255,255);		
+		$this->cell(60,6,"","TBL",0,"L",1);
+		$this->cell(20,6,"Fonction","TBR",0,"L",1);
+		$this->cell(55,6,"",1,1,"L",1);
+
+		$this->cell(45,6,"Email",1,0,"L",1);
+		$this->cell(80,6,"","TBL",0,"L",1);
+		$this->cell(20,6,"Tél. direct","TBR",0,"L",1);
+		$this->cell(35,6,"",1,1,"L",1);
+
+		$this->ln(5);
+
+		$this->setFillColor(163,197,15);
+		$this->cell(180,6,"VOS COORDONNEES BANCAIRES POUR LE REVERSEMENT DES FONDS PAR VIREMENT",1,1,"L",1);
+		$this->setFillColor(255,255,255);
+
+		$this->cell(60,6,"Vos coordonnées IBAN ",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+		$this->cell(60,6,"Vos coordonnées BIC / SWIFT",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+		$this->cell(60,6,"Nom de la Banque",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+		$this->cell(60,6,"Adresse de la Banque",1,0,"L",1);
+		$this->cell(120,6,"",1,1,"L",1);
+
+
+		$this->ln(5);
+
+		$this->setFillColor(163,197,15);
+		$this->cell(180,6,"VOS CONDITONS CONTRACTUELLES  / CONDITIONS GENERALES DE VENTE (à joindre)",1,1,"L",1);
+		$this->setFillColor(255,255,255);
+
+		$this->cell(80,6,"Libellé",1,0,"L",1);
+		$this->cell(50,6,"Montant (Euros)",1,0,"C",1);
+		$this->cell(50,6,"Taux %",1,1,"C",1);
+
+		$this->cell(80,6,"Clause Pénale",1,0,"L",1);
+		$this->cell(50,6,"Minimum : ".$mandant["clause_penale"]." €",1,0,"C",1);
+		$this->cell(50,6,$mandant["clause_penale_percentage"]."%",1,1,"R",1);
+
+		$this->cell(80,6,"Intérêts de retard",1,0,"L",1);
+		$this->cell(50,6,"-",1,0,"C",1);
+		$this->cell(50,6,"%",1,1,"R",1);
+
+		$this->cell(80,6,"Indemnités (article 1153-4 du Code civil)",1,0,"L",1);
+		$this->cell(50,6,$mandat["indemnite_retard"]." €",1,0,"C",1);
+		$this->cell(50,6,"-",1,1,"C",1);
+
+
+		//Page 2
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"3. Description de l’offre de services");
+
+		$this->setFont('arial','',10);
+		$this->multicell(0,4,"Le Client confie au prestataire, qui l’accepte, un mandat de recouvrement de créances conformément aux dispositions contenues dans les conditions générales de recouvrement annexées et les accepte sans réserve.",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','BU',10);
+		$this->multicell(0,4,"Phase 1 « balayage et qualification du compte clients »",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->multicell(0,4,"Cette mission est une phase obligatoire et un préalable indispensable à la création d’une relation pérenne, efficace et génératrice de valeur pour les adhérents du CEDRE.\n\nLe support utilisé pour le traitement doit obligatoirement être transmis en échange de données informatisées de type tableur, un modèle lors de l’intégration sera fourni par le prestataire.\n\nLe client nous transmet ses créances certaines, liquides et devenues exigibles. \n\nCette phase de traitement permet de réaliser une démarche de relance curative et commerciale sur l’intégralité des créances échues, avant l’éventualité d’une mise en recouvrement",0,"L");
+
+		$this->ln(5);
+		$this->setFont('arial','I',10);
+		$this->multicell(0,4,"Les objectifs attendus :",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->setLeftMargin(25);
+		$this->multicell(0,4," -   Identifier rapidement les potentiels de règlement à moindre coût et améliorer la trésorerie du client\n -   Garantir le maintien de la relation commerciale par une démarche préventive\n -   Identifier les litiges réels relevant de l’intervention du client\n -   Statuer sur les rapports d’analyses commentés pour les catégories 1 à 4\n -   Eviter les mises en recouvrement « non justifiées »\n -   Simplifier la démarche et sa rapidité d’exécution",0,"L");
+		$this->ln(5);
+		$this->setLeftMargin(15);
+		$this->multicell(0,4,"45 jours suivants la prise en charge de la demande, le rapport d’analyse transmis et commenté à chaque fin de mission permet de qualifier le traitement des créances réalisé en 5 catégories :",0,"L");
+		$this->ln(5);
+		$this->setLeftMargin(25);
+		$this->multicell(0,4," -   Catégorie 1 : Créances soldées, règlement partiel ou total, protocole validé\n -   Catégorie 2 : Clients-débiteurs en situation NPAI / PSA (coordonnées incorrectes ou introuvables)\n -   Catégorie 3 : Clients-débiteurs en procédure collective ou surendettement\n -   Catégorie 4 : Existence d’un litige nécessitant l’intervention du client\n -   Catégorie 5 : Créances dont la situation doit conduire à une mise en recouvrement ",0,"L");
+		$this->setLeftMargin(15);
+		$this->ln(5);
+		$this->setFont('arial','BU',10);
+		$this->multicell(0,4,"Phase 2 « Recouvrement amiable créances civiles ou commerciales »",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->multicell(0,4,"Cette mission s’intègre dans la continuité du traitement réalisé sur la phase 1. Par exception, elle peut être déclenchée directement selon les situations prévues avec l’adhérent CEDRE.",0,"L");
+		$this->ln(5);
+		$this->setFont('arial','I',10);
+		$this->multicell(0,4,"Le client bénéficiera dès l‘ouverture de compte d’un accès privilégié au site www.groupe-cap.com et recevra ses identifiants pour accéder au site du prestataire. Par le biais du site, le client pourra :",0,"L");
+
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->setLeftMargin(25);
+		$this->multicell(0,4," -   Transmettre ses dossiers en recouvrement\n -   Suivre l’état d’avancement des créances confiées\n -   Envoyer des messages au gestionnaire en charge du recouvrement de ses créances\n -   Extraire des états statistiques",0,"L");
+
+		//Page 3
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setFont('arial','U',10);
+		$this->multicell(0,8,"4. Conditions de rémunération");
+
+		$this->setFont('arial','',10);
+		$lignes = array();
+
+		foreach ($mandat_ligne as $key => $value) {			
+			$lignes[$value["ligne_titre"]][] = $value;		
+		}
+
+		foreach ($lignes as $key => $value) {
+			
+			switch ($key) {
+				case '41_services_integration':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.1 Facturation des services d'intégration et supports",0,1);
+					$this->ln(2);
+				break;				
+				case '42_services_balayage':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.2 Facturation des services balayage et qualification de la balance clients",0,1);
+					$this->ln(2);
+				break;
+				case '431_ouvertures_de_dossier':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.3 Facturation des services recouvrement de créances",0,1);
+					$this->ln(2);
+					$this->cell(0,5,"Facturation des ouvertures de dossier",0,1);
+					$this->ln(2);					
+				break;
+				case '432_somme_recouvree':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"Honoraires sur les sommes recouvrées*",0,1);
+					$this->ln(2);
+					
+				break;
+				case '441_phase_judiciaire':
+					$this->setFont('arial','',10);
+					$this->cell(0,5,"4.4 Facturation des actions judiciaires et enquêtes",0,1);
+					$this->ln(2);
+					
+				break;
+				case '442_phase_enquete':	
+					$this->ln(-2);									
+				break;
+			}
+			
+			if($key != "432_somme_recouvree" && $key != "441_phase_judiciaire" && $key != "442_phase_enquete"){
+				$this->setFont('arial','',10);
+				$this->setFillColor(163,197,15);
+				$this->cell(135,5,"LIBELLE",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
+			}elseif($key == "432_somme_recouvree"){
+				$this->setFont('arial','',10);
+				$this->setFillColor(163,197,15);
+				$this->cell(135,5,"TRANCHE DE RECUPERATION PAR DOSSIER CONFIE",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
+			}elseif($key == "441_phase_judiciaire"){
+				$this->setFont('arial','',10);
+				$this->setFillColor(163,197,15);
+				$this->cell(135,5,"PHASE JUDICIAIRE",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"Montant H.T.",1,1,"C",1);
+			}elseif ($key === "442_phase_enquete") {
+
+				$this->setFont('arial','',10);
+				$this->setFillColor(163,197,15);
+				$this->cell(135,5,"PHASE D'ENQUETE*",1,0,"L",1);			
+				$this->setFillColor(255,255,255);		
+				$this->cell(45,5,"--",1,1,"C",1);
+			}
+			
+
+			
+			
+			$this->setfont('arial','',8);
+			foreach ($value as $k => $v) {
+				$this->cell(135,5,$v["texte"],1,0,"L",1);	
+				$this->cell(45,5,$v["valeur"]." ".$v["type"],1,1,"C",1);
+			}
+			if($key == "42_services_balayage"){
+				$this->setfont('arial','I',6);
+				$this->cell(0,3,"* Avec un minimum de facturation de 90,00 EUR H.T. annuel, soit 20 créances minimum",0,1,"L");
+			}elseif($key == "432_somme_recouvree"){
+				$this->setfont('arial','I',6);
+				$this->cell(0,3,"* Applicable selon conditions générales de recouvrement  - barème par tranche de récupération",0,1,"L");
+			}elseif($key == "442_phase_enquete"){
+				$this->setfont('arial','I',6);
+				$this->multicell(0,3,"* Si nécessaire et après votre accord écrit, pour le traitement des recherches de localisation de débiteurs disparus, d’éléments de solvabilité,  les forfaits mentionnés ne sont exposés qu’en cas d’éléments recherchés ayant un résultat positif de la part de nos partenaires (Hors taxes CNAPS).",0,1,"L");
+			}
+
+			$this->ln(2);
+		}
+		
+
+		$this->cg_cedre();
+	}	
+
+	public function cg_cedre(){
+
+		//Page 4
+		$this->Addpage();
+		$this->enteteCedre();
+
+		$this->setfont('arial','B',10);
+		$this->cell(0,5,"MANDAT DE RECOUVREMENT DE CREANCES POUR LE COMPTE D’AUTRUI",0,1,"L");
+		$this->setfont('arial','',6);
+		$this->cell(0,5,"Décret n°2012-783 du 30 mai 2012 ",0,1,"L");
+
+		$this->ln(5);
+
+		$this->setfont('arial','B',8);
+		$this->cell(0,5,"Conditions générales de recouvrement",0,1,"L");
+		$this->ln(5);
+
+
+		$cg = array(
+				"CHAMP D’APPLICATION"
+					=>array("Les présentes Conditions générales s’appliquent au mandat de recouvrement con􏰁é par le Client au Prestataire (ci-après défini), en vertu des Conditions particulières du mandat de recouvrement de créances pour le compte d’autrui, de ses annexes tarifaires et l’annexe « Cahier des charges » quand elle existe. Ces documents forment un ensemble indivisible et constituent l’intégralité des conditions réglementant le recouvrement par le Prestataire des créances confiées par le Client. Lorsqu’un Cahier des charges est constitué, celui-ci contient des précisions sur les modalités opérationnelles, telles que le format de communication entre les parties, des process particuliers, des demandes de reportings spécifiques ou encore la restitution des sommes recouvrées, sans que cette liste ne soit limitative. le Client reconnaît avoir pris connaissance préalablement à la signature de la présente convention, des documents précités et les accepter sans réserve."),
+				"MANDAT DE RECOUVREMENT"
+					=>array("Le Client donne mandat au Prestataire à l’effet de recouvrer ses créances échues, en son nom et pour son compte, en principal, intérêts et autres accessoires, sur ses propres clients débiteurs, selon le type de traitement correspondant à la prestation choisie. le Client transmet un panel de créances au Prestataire. Ses créances sont certaines, liquides et exigibles, et le Client en atteste la sincérité et l’exactitude. Le Client atteste le bienfondé de sa réclamation par l’absence de règlement, le retard abusif de règlement ou la passivité de ses débiteurs malgré la réalisation de relances internes, et donne mandat exprès au Prestataire de recevoir pour son compte les fonds à recouvrer auprès de ses débiteurs. En ce sens, le Client est fondé à faire réclamer par le Prestataire, en complément des factures initiales, les pénalités conventionnelles et les dommages & intérêts, visant à indemniser le préjudice, tant moratoires que compensatoires. A ce titre, le Client atteste que les démarches entreprises aux fins de recouvrer ses créances impactent financièrement son compte d’exploitation. Le Client atteste également que les débiteurs relancés ont été régulièrement informés de l’existence d’une facture, de sorte qu’ils ne peuvent en ignorer l’existence. le Client précise dans les Conditions Particulières le montant du préjudice indépendant du retard, qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, distinct des intérêts moratoires, ce afin que le Prestataire puisse les exposer au débiteur.","A cet effet, le Prestataire certifie notamment : ",
+						"- Avoir souscrit un contrat d’assurance la garantissant contre les conséquences pécuniaires de sa responsabilité professionnelle auprès de la compagnie AXA, sous le n° 160131330. ","- Etre titulaire d’un compte décret visés à l’article 18-1 de la loi du 24 janvier 1984 susvisée, ou l’une des institutions ou l’un des établissements visés à l’article 8 de la même loi pour l’encaissement des fonds débiteurs. Il est rappelé que ce compte est dédié au strict encaissement des fonds débiteur, et ne peut faire l’objet d’aucune saisie conservatoire ou autre procédure visant la saisie attribution. ","- Justifier des conditions requises précitées assurée par déclaration écrite des intéressés, remise ou adressée, avant tout exercice, au Procureur de la république près le Tribunal de Grande Instance dans le ressort duquel la société a le siège de son activité."),
+				"MODALITES DE GESTION"
+					=>array("Le Prestataire s’engage à mettre en œuvre avec diligence les moyens dont elle dispose, et s’efforce d’obtenir des débiteurs dont les dossiers lui sont confiés, l’apurement de leurs dettes.","Le Client autorise expressément le Prestataire à faire intervenir dans le cadre des procédures engagées ses filiales habilitées à exécuter l’objet des présentes, et dispense le Prestataire de l’en informer. De la même manière, le Prestataire pourra sous-traiter tout ou partie des prestations confiées par le Client.","Pour chaque dossier transmis, le Prestataire adressera au Client un accusé de réception, présenté sous forme de listing lorsque plusieurs dossiers sont contenus dans le même fichier d’intégration. le Prestataire emploiera les moyens qui lui apparaissent comme étant les plus adaptés en fonction des éléments recueillis sur le(s) débiteur(s), et, de manière générale sur la stratégie de recouvrement à employer, qu’ils soient dans la réalisation de relances par courriers, en envois simples ou recommandés, courriels ou autres supports de communication, par des actions de télé recouvrement ou de visites domiciliaires.","Dans ce contexte, le Prestataire s’engage à :  ","- Réaliser les prestations conformément aux présentes, aux Conditions particulières et ses annexes, à l’éventuel Cahier des charges sur lequel les Parties se sont entendues, dans le respect des règles de l’art applicables et ce, avec le soin et la diligence requis ;"," - Réaliser les prestations en conformité avec les droits au respect de la vie privée des débiteurs et notamment des dispositions de l’article 9 du code civil ;"," - Collaborer avec le Client selon les termes de l’article 6 ; ","- Mettre en œuvre tous les moyens nécessaires pour assurer la confidentialité des dossiers de créances et l’intégrité des échanges entre le Client et le Prestataire ; ","- Informer chaque débiteur de l’existence de son mandat par courrier ;","- Se présenter en son propre nom lors des conversations téléphoniques avec les débiteurs ; en cas de demande spécifique de la part du Client, le Prestataire pourra intervenir en marque blanche ; ","- Respecter l’image du Client, les règles de déontologie et éthique de la profession.","Sauf demande expresse de la part du Client, les dossiers transmis par le Client dans le cadre de la présente convention feront l’objet d’un traite- ment précontentieux, préalable à toute action judiciaire éventuelle dont l’objectif prioritaire sera la recherche d’une solution amiable dans les meilleurs délais. Sauf stipulation particulière, toute procédure judiciaire à engager fera l’objet d’une validation préalable par le Client. Le recouvrement judiciaire donnera lieu à la signature d’un « pouvoir spécial », selon les articles 827 et 828 du NCPC.","Au jour de la signature du contrat, chacune des parties désigne, au sein de son personnel, les correspondants qualifiés chargés du suivi des prestations, notamment pour coordonner les modalités de transmission des dossiers et le suivi des processus de recouvrement, les délais de traite- ment, les supports d’information entre les Parties. L’annexe « Cahier des charges », lorsqu’elle est constituée, peut permettre de définir précisé- ment les modalités d’échange et de communication entre les parties."),
+				"RESTITUTION DES SOMMES RECOUVREES"
+					=>array("Le Prestataire s’engage à régler au Client, mensuellement à 25 jours fin de mois, après l’encaissement effectif par ses services, les sommes recouvrées en principal pour le compte de ce dernier, déduction faite de ses commissions et éventuellement des coûts engagés pour le compte du Client (frais, honoraires ...) sur l’ensemble des dossiers. La restitution des sommes recouvrées pourra être prévue dans l’annexe « Cahier des charges ».","Les dépens auxquels le débiteur est condamné sont affectés en priorité par le Prestataire au règlement des coûts engagés pour le compte du Client.","Au cas où il y aurait des règlements impayés de la part du débiteur sur des fonds déjà reversés au Client, ce dernier s’engage à les rembourser sans délai, suivant le relevé mensuel adressé par le Prestataire. Si des règlements intervenus faisaient l’objet d’une annulation en vertu d’une négociation commerciale, conventionnelle, d’un avoir, d’un jugement ou arrêt, ou pour tout autre raison, les commissions préalablement facturées ne pourront pas être remis en cause."),
+				"REMUNERATION DE CAP RECOUVREMENT"
+					=>array("Le Prestataire recevra du Client une rémunération hors taxes selon les modalités définies en annexe tarifaire jointe, sur les sommes recouvrées en principal et en accessoire. Est considérée comme accessoire toute somme distinct du principal de la créance.","Dans tous les cas, les commissions s’appliquent systématiquement à compter du jour de la réception du dossier par le Prestataire"," - sur les sommes perçues par le Prestataire  - sur les sommes versées directement par le débiteur au Client","- sur le montant de la reprise de matériel, de marchandises, d’avoir consenti par le Client, lettrage de paiement antérieur, compensation légale, conventionnelle ou judiciaire, validée par le Client. Le Client reconnaît que les commissions du Prestataire sont facturables en cas d’avoir émis postérieurement à la demande de recouvrement (notamment en cas de retour de marchandises, de modification de facturation, en cas d’identification de règlement(s) intervenu(s) chez le client), et plus généralement lorsque le client considère l’impayé transmis comme étant régularisé chez lui.","- Sur demande expresse du client de clôturer une ou plusieurs affaires confiées, et ce qu’elle qu’en soit les motivations. Dans ce cas, le Prestataire facturera au Client l’intégralité des frais et honoraires auxquels il aurait pu prétendre si le dossier avait été mené à bonne fin.","De convention expresse, le Client autorise le Prestataire à compenser les sommes qu’il aura recouvrées avec les rémunérations ou remboursements de frais qui pourraient lui être dus au titre des différents dossiers confiés dans le cadre du présent mandat. Le Prestataire reversera au Client l’intégralité des sommes perçues pour son compte. Le créancier demande au Prestataire de réclamer au débiteur, outre les intérêts moratoires et accessoires légaux, toutes indemnités ou dommages et intérêts qui seraient dus en raison de la loi, de dispositions contractuelles ou de la mauvaise foi du débiteur, sans que cette liste ne soit limitative. le montant desdites indemnités étant précisé par le Client dans les Conditions particulières et dans ses propres documents contractuels. les Conditions Particulières précisent quels honoraires sont perçus sur les sommes accessoires. Lesdites sommes seront considérées comme un élément constitutif de la rémunération du Prestataire et impactent directement la proposition tarifaire proposée au Client. le Prestataire dispose de la faculté d’affecter à son gré les sommes recouvrées au Principal confié ou aux sommes complémentaires et accessoires réclamés, quelle qu’en soit la nature. Le créancier pourra être amené à devoir justifier, sous sa responsabilité, le montant du préjudice indépendant du retard de paiement qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, et qu’il demande au Prestataire de recouvrer.","En matière d’action judiciaire, outre les commissions contractuellement prévues, seront facturés au Client les forfaits tels qu’ils lui ont été proposés, ainsi que les frais engagés pour son compte dans le cadre de l’action judiciaire ; par frais engagés on entend frais de procédure et d’exécution, honoraires d’huissier, frais d’expertise, frais d’enquêtes, frais bancaires et, d’une manière générale, toutes les dépenses payées pour le compte du client aux fins de gérer son dossier.. Dans le cas d’une telle action, les commissions liées au recouvrement feront l’objet d’une augmentation de deux points. Le Prestataire peut être amené à demander au client une provision préalable à la poursuite de l’action. Ces forfaits et le remboursement des frais engagés sont dus quelle que soit l’issue du dossier.","En cas de désaccord, sur tout ou partie d’une facture, le Client s’engage à indiquer par écrit au Prestataire, le motif de la contestation et ce, dans les 15 jours ouvrés de la réception de ladite facture, étant entendu que toute facture non contestée dans ledit délai est réputée définitivement acceptée."),
+				"FACTURATION"
+					=>array("Nos factures sont payables au comptant à réception. le défaut de paiement des factures émises à leur échéance entraînera automatiquement, sans mise en demeure préalable, l’exigibilité immédiate de toutes les sommes dues au Prestataire, échues ou à échoir, quel que soit le mode de règlement convenu. En outre, les sommes restant dues seront automatiquement, et sans formalités, majorées, à compter de leur date d’exigibilité, d’un intérêt appliqué par la Banque Centrale Européenne à son opération de refinancement la plus récente majoré de 10 points de pourcentage, d’une indemnité égale à 20% des sommes dues à titre de clause pénale, ainsi qu’une indemnité forfaitaire pour frais de recouvrement d’un montant de 40,00 EUR par facture impayée. Si les frais de recouvrement sont supérieurs à l’indemnité forfaitaire, le client s’engage à s’acquitter de l’intégralité de ces frais, sur justification et à première demande du Prestataire, et ce conformément à l’article l441-6 du Code de commerce."),
+				"OBLIGATIONS DES PARTIES"
+					=>array("Chacune des Parties reconnaît que les prestations nécessitent une collaboration active et régulière entre le Prestataire et le Client.  le Client s’engage à fournir à ses frais au Prestataire, les créances échues selon les dispositions prévues dans le préalablement à la signature de la convention.","Le Client garantit au Prestataire qu’aucun autre intervenant n’est préalablement intervenu dans les dossiers transmis, ou n’est en cours d’action sur les dossiers confiés au Prestataire. Dans le cas contraire, les sommes recouvrées par l’autre intervenant figureront dans l’assiette de facturation du prestataire. En outre, et dans ces conditions, le Prestataire se réserve la possibilité de mettre fin à la présente convention et de considérer que l’ensemble des dossiers en cours de gestion seront soumis à clôture anticipée aux torts exclusifs du Client, ce qui engendrera une facturation conformément aux conditions spécifiées à l’article 5 des pré- sentes.","Le Client s’engage à identifier les paiements directs effectués à son attention par les débiteurs, et plus généralement tous paiements qui lui parviendraient sans être passé par le Prestataire. Il s’engage à en tenir informé le Prestataire dans un délai de trois jours ouvrés à compter de la réception entre ses mains, par courriel, ou par fax, afin qu’il en soit tenu compte dans les procédures engagées et dans l’élaboration de la facture du Prestataire. Il en va de même concernant tout avoir ou remise consentis, ainsi que toute contestation, proposition, intervention formulées directement par le débiteur à son encontre ou réciproquement.  Si une difficulté apparaît au cours de la réalisation de la prestation, chacune des Parties s’engage à alerter l’autre le plus rapidement possible afin de se concerter pour mettre en place la solution la mieux adaptée et ce, dans les meilleurs délais.","Le Client s’engage aussi à communiquer au Prestataire toutes les informations dont il a connaissance, notamment un jugement d’ouverture d’une procédure collective, vente/cession de fonds de commerce du débiteur, changement d’adresse du débiteur, sans que cette liste ne soit limitative. Le client dispense le Prestataire de l’informer des propositions du débiteur tendant à s’acquitter de son obligation par un autre moyen que le paiement immédiat de la somme réclamée.","Il est convenu que le Prestataire n’est pas tenu à une obligation de surveillance permanente du BODACC ou des annonces légales en matière de redressement judiciaire, ou vente de fonds de commerce. Aucune réclamation concernant un dossier classé après règlement ou notification au client de l’abandon des poursuites ne sera admise au-delà d’un délai de trois mois après le règlement ou l’avis de classement de CAP RECCOUVREMENT. Si le client n’a pas demandé la restitution de son dossier, CAP RECOUVREMENT est définitivement déchargée de toute responsabilité relative à la conservation des pièces et documents confiés dans ces mêmes délais ou dans l’éventualité de perte ou destruction d’archives par cas de force majeure. "),
+				"RESPONSABILITES"
+					=>array("Le client est seul responsable de la légitimité des créances confiées au Prestataire et de l’identité du débiteur. Le Prestataire dégage toute responsabilité en cas de demande abusive et injustifiée. Le Prestataire appellera en garantie son Client en cas de poursuites engagées contre elle sur ce chef de demande. La mise en demeure adressée au débiteur est effectuée sous l’entière responsabilité du Client. En conséquence, le Prestataire attire l’attention de son client sur le fait que : la créance à recouvrer doit être certaine, liquide et exigible ; les éventuels compléments doivent représenter des frais réellement engagés et/ou des indemnités pouvant être légalement ou conventionnellement justifiées. Le Client s’interdit toute ingérence dans la conduite du dossier confié au Prestataire, tant vis-à-vis de son débiteur que des correspondants du Prestataire. le Client déclare avoir régulièrement recueilli les pièces transmises au Prestataire. En cas de condamnation du client au paiement de dommages et intérêts et/ou d’indemnités en application de l’article 700 du Code de Procédure Civil, il devra en assurer personnellement le paiement. le Prestataire se réserve le droit de ne pas poursuivre judiciairement les débiteurs qu’il jugera insolvables ou dont la demande sera jugée mal fondée. En cas de contestation sérieuse du débiteur, le Prestataire se réserve le droit de ne pas poursuivre le dossier.  Le Prestataire rappelle autant que de besoin qu’il est soumis à une obligation de moyens, et non de résultat. En cas d’insuccès d’une ou plusieurs phases de recouvrement, qu’elles soient amiables ou judiciaires, la responsabilité du Prestataire ne pourra jamais être recherchée au seul motif que la créance n’est pas recouvrée. La responsabilité du Prestataire ne pourra jamais être recherchée en cas de force majeure. Seront notamment considérés comme un cas de force majeure, la guerre, l’émeute, la révolution, la grève chez l’une des parties ou chez tout tiers, une catastrophe naturelle, un acte de piraterie, un incident sur les lignes téléphoniques et un dysfonctionnement des réseaux. En outre, la responsabilité du Prestataire ne pourra jamais être recherchée en cas de dysfonctionnement généré par un matériel informatique défectueux appartenant au client ou mis à disposition par un tiers. Toute responsabilité qui serait alléguée à l’encontre du Prestataire ne pourra en aucun cas être d’un montant supérieur à ce qui a été facturé par le Prestataire sur le dossier concerné. "),
+				"DONNEES PERSONNELLES - REFERENCEMENT"
+					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
+				"NON SOLLICITATION DE PERSONNEL"
+					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
+				"DUREE DE LA CONVENTION"
+					=>array("La présente convention de recouvrement est conclue pour une durée d’un (1) an renouvelable par tacite reconduction, à compter de la signature de la présente convention, sauf dénonciation par l’une ou l’autre des parties, en respectant toutefois un préavis de deux (2) mois, et ce par lettre recommandée avec accusé de réception ; le point de départ du préavis est fixé à la date de l’accusé de réception.  Dans ce cas, les dossiers restant en cours à l’expiration de la convention continueront à être gérés par le Prestataire jusqu’à leur clôture définitive. Le Prestataire s’engage à apporter tous ses soins à cette gestion et le Client s’engage à en accepter les conséquences, ceci en conformité avec les conditions de traitement initialement prévues et dans le cadre des conditions générales de recouvrement.  Dans l’hypothèse où le Client exigerait la restitution de dossiers en cours en raison de la dénonciation de la convention, celle-ci serait subordonnée au paiement préalable au Prestataire de toutes les commissions et de tous les remboursements de frais pouvant lui rester dus."),
+				"CLAUSE ATTRIBUTIVE DE JURIDICTION"
+					=>array("Le Tribunal de commerce de Lille Métropole est seul compétent nonobstant toute clause contraire même en cas de pluralité de défendeurs ou d’appel en garantie. Nos prestations sont soumises au droit français."),
+				"ELECTION DE DOMICILE"
+					=>array("Pour l’exécution des présentes, les parties font élection de domicile en leur adresse portée en tête des présentes."),
+			);
+
+		
+		$this->multicell(0,4,"Le Client a pris connaissance de l’offre du Prestataire à l’occasion de leurs relations précontractuelles et reconnaît avoir reçu l’ensemble des informations et conseils lui permettant d’apprécier la proposition du Presta- taire. le Client souhaite recourir aux services du Prestataire et reconnaît que leur mise en œuvre nécessite une collaboration étroite et active. Le Client reconnaît que le présent contrat est soumis aux dispositions du décret n°2012-783 du 30 Mai 2012 et les dispositions ultérieures régissant le recouvrement de créances pour le compte d’autrui.",0,1,"L");
+
+		
+		$this->setfont('arial','',8);
+		$this->multicell(0,4,"",0,1,"L");
+		$i=1;
+		foreach ($cg as $key => $value) {
+			if($key == "MODALITES DE GESTION" 
+			|| $key == "REMUNERATION DE CAP RECOUVREMENT"
+			|| $key == "OBLIGATIONS DES PARTIES"
+			|| $key == "DONNEES PERSONNELLES - REFERENCEMENT"){
+				$this->Addpage();
+				$this->enteteCedre();
+			}
+
+			$this->setfont('arial','B',8);
+			$this->cell(0,5,"ARTICLE ".$i." ".$key,0,1,"L");
+			$this->ln(3);
+			$this->setfont('arial','',8);
+
+			foreach ($value as $k=> $v) {
+				$this->multicell(0,4,$v,0,1,"L");
+				$this->ln(2);
+			}
+			$i++;
+		}
+
+		$this->setfont('arial','B',8);
+		$this->cell(0,5,"Cette convention est validée en double exemplaire de 8 pages remises à chaque partie signataire",0,1,"L");
+
+		$y = $this->getY();
+
+		$this->setFont('arial','',10);		
+		$this->setFillColor(255,255,255);	
+		$this->cell(60,70," ",1,0,"L",1);		
+		$this->setFillColor(163,197,15);		
+		$this->cell(120,70," ",1,1,"L",1);
+
+
+		$this->setY($y);
+		$this->setFillColor(255,255,255);
+		$this->ln(2);
+		$this->cell(60,5,"Pour CAP RECOUVREMENT",0,1,"L");
+		$this->ln(15);
+		$this->cell(60,5,"Nom : Olivier DUBENSKI",0,1,"L");
+		$this->cell(60,5,"Signature :",0,1,"L");
+		$this->ln(30);
+		$this->cell(60,5,"Acceptation CAP RECOUVREMENT",0,1,"L");
+
+
+		$this->setY($y);
+		$this->setLeftMargin(75);
+		$this->multicell(120,5,"Le Client déclare avoir pris connaissance et accepter sans réserve les conditions générales de prestation",0,1,"L");
+		$this->ln(10);
+		$this->cell(120,5,"Nom du signataire :",0,1,"L");
+		$this->cell(120,5,"Lu et approuvé Cachet commercial et signature",0,1,"L");
+		$this->ln(25);
+		$this->cell(120,5,"Date : ",0,1,"L");
+		$this->cell(120,5,"Acceptation du Client",0,1,"L");
+
+		$this->setLeftMargin(15);
+		$this->ln(8);
+		$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
+		$this->setFont('arial','B',8);		
+		$this->cell(0,4,"CAP RECOUVREMENT - 30 Boulevard du Général Leclerc - BP 70333 - 59056 ROUBAIX CEDEX 1",0,1,"C");
+		
+
+
+
+
+
+
+	}
+
+
+	public function enteteCedre(){
+		$this->setY(15);
+		$this->setfont('arial','',12);
+		$this->setLeftMargin(90);
+		$this->multicell(110,5,"MARCHE CEDRE\nCONTRAT DE SERVICE POUR LE RECOUVREMENT DE FACTURES - CREANCES SUR PARTICULIERS ET ENTREPRISES",0,"L");
+		$this->image(__PDF_PATH__."cap/le_cedre.jpg",15,10,30,30);
+
+		$this->setfont('arial','I',10);
+		$this->setLeftMargin(160);
+		$this->multicell(110,5," « By »",0,"L");
+		$this->image(__PDF_PATH__."cap/groupe-cap.jpg",175,35,15,10);
+		
+		$this->setY(50);
+		$this->setLeftMargin(15);
+	}
+
+	public function mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne){
 		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
 		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
 
@@ -9970,6 +10634,24 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n",0,"C",1);
 		$this->getFooterMandat();
 
+	}
+
+	public function bgMandat(){
+		$this->setleftmargin(2);
+		$this->setY(5);
+
+		$this->setFillColor(150,150,150);
+		$this->cell(3,86,"",0,1,"L",1);
+		$this->ln(4);
+
+		$this->setFillColor(221,16,39);
+		$this->cell(3,86,"",0,1,"L",1);
+		$this->ln(4);
+
+		$this->setFillColor(0,0,0);
+		$this->cell(3,86,"",0,1,"L",1);
+
+		$this->setY(5);
 	}
 
 	public function getFooterMandat(){
