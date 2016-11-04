@@ -777,28 +777,57 @@ class societe_cleodisbe extends societe_cleodis {
 		$this->fieldstructure();
 	}
 
-
+ 
 
 	/** Interroge Cradit Safe pour récupérer les informations des sociétés.
 	* @author Quentin JANON <qjanon@absystech.fr>
+	* @author Cyril Charlier <ccharlier@absystech.fr>
 	*/
-/*
+
 	public function getInfosFromCREDITSAFE($infos) {
-
-	   	//$client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=> "cleodisLive",'password'=> "cleodis1497"));
-
-
-	    /*log::logger($response , "mfleurquin");
-
-		//file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
-
-		if($infos["returnxml"]){
+ 		log::logger($infos , "ccharlier");
+	   	$client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=> "Cleodistest",'password'=> "Cleodis026598"));
+	   	$params = (object)array
+		(	'countries' => array ('BE'),
+			'searchCriteria' => (object) array
+			(
+				//'VatNumber' => (object) array ( '_' => 'BE0806304778', 'MatchType' => 'MatchBeginning' ),
+				'RegistrationNumber' => $infos['num_ident'],
+				//'VatNumber' =>'BE0806304778'
+			),
+			'customData' => null,
+			'chargeReference' => 'example searchCriteria with name'
+		);
+	   	$response = $client->__soapCall('FindCompanies',array($params));
+		log::logger($response, "ccharlier");
+		file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
+		log::logger($response->FindCompaniesResult->messages,"ccharlier");
+/*		if($infos["returnxml"]){
 			$data = $response;			
 		}else{
 			$data = $this->cleanCSResponse($response);		
 		}		
 		return NULL;
-	}*/
+*/
+		$xml = $response;
+		log::logger($xml,"ccharlier");
+		// response/Messages / Message type = error 
+		$error = False;
+		foreach($xml->FindCompaniesResult->messages->children() as $messages) {
+			if($messages["Type"]== "Error"){
+				ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messages["Code"] ,ATF::$usr->trans("notice_title"));	
+				return $error = true;	
+			}
+		}
+		 
+		if($error == False){ 
+			$data = $response;			
+		}else{
+			//$data = $this->cleanCSResponse($response);		
+		}		
+		return $data;
+		
+	}
 };
 
 class societe_cap extends societe_cleodis {
