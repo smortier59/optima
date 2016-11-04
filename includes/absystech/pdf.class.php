@@ -492,7 +492,7 @@ class pdf_absystech extends pdf {
 			$this->setfont('arial','B',8);
 			$this->multicell(0,5,"Tout paiement anticipé fera l'objet d'un escompte calculé au prorata au taux de 4,8% l'an",0,'C');
 			$this->setfont('arial','',5);
-			$this->multicell(0,2,"Tout paiement postérieur à la date d'échéance entraîne l'exigibilité d'intérêts de retard au taux de 12% par an avec un montant minimum de 65 €. A compter du 1er janvier 2013, une indemnité de recouvrement de 40€, non soumise à la TVA, est applicable sur chaque facture impayée à date et s'ajoute aux intérêts de retard précédemment cités, en application des articles L441-3 et L441-6 du code de commerce.",0,'C');
+			$this->multicell(0,2,"Tout paiement postérieur à la date d'échéance entraîne l'exigibilité d'intérêts de retard au taux de 12% par an. A compter du 1er janvier 2013, une indemnité de recouvrement de 40€, non soumise à la TVA, est applicable sur chaque facture impayée à date et s'ajoute aux intérêts de retard précédemment cités, en application des articles L441-3 et L441-6 du code de commerce.",0,'C');
 
 
 			if (ATF::_r('dematerialisation')) {
@@ -1481,7 +1481,7 @@ class pdf_absystech extends pdf {
 		$txt = "Intérêts relatifs au retard de paiement de la facture ".$infos_facture['ref']." du ".ATF::$usr->date_trans($infos_facture['date'],true,true)." pour un montant de ".$infos_facture['prix']." € HT.";
 		$txt .= "\nPaiement de ".$infos_facture_paiement['montant']." € TTC effectué le ".ATF::$usr->date_trans($infos_facture_paiement['date'],true,true);
 		$data = array(
-			array("INTERETS",$txt,"1",$infos_facture_paiement['montant_interet']." €",$infos_facture_paiement['montant_interet']." €"),
+			array("INTERETS",$txt,"1",($infos_facture_paiement['montant_interet']-$indemnite)." €",($infos_facture_paiement['montant_interet']-$indemnite)." €"),
 			array("INDEMNITE","Indemnité de recouvrement (articles L441-3 et L441-6 du code de commerce)","1",$indemnite." €",$indemnite." €")
 		);
 		$style = array(
@@ -1494,7 +1494,7 @@ class pdf_absystech extends pdf {
 		$this->setx(15);
 		$this->cell(131,4,"",0,0,'C');
 		$this->cell(25,4,"Total",1,0,'R');
-		$this->cell(25,4,($indemnite+$infos_facture_paiement['montant_interet'])." €",1,1,'R');
+		$this->cell(25,4,($infos_facture_paiement['montant_interet'])." €",1,1,'R');
 			
 		$this->setleftmargin(15);
 		$this->setrightmargin(15);
@@ -2396,7 +2396,7 @@ La dénonciation devra être notifiée par lettre recommandée avec accusé de r
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"Tout paiement anticipé fera l'objet d'un escompte calculé au prorata au taux de 4,8% l'an",0,'C');
 		$this->setfont('arial','',5);
-		$this->multicell(0,2,"Tout paiement postérieur à la date d'échéance entraîne l'exigibilité d'intérêts de retard au taux de 12% par an avec un montant minimum de 65 €. A compter du 1er janvier 2013, une indemnité de recouvrement de 40€, non soumise à la TVA, est applicable sur chaque facture impayée à date et s'ajoute aux intérêts de retard précédemment cités, en application des articles L441-3 et L441-6 du code de commerce.",0,'C');
+		$this->multicell(0,2,"Tout paiement postérieur à la date d'échéance entraîne l'exigibilité d'intérêts de retard au taux de 12% par an. A compter du 1er janvier 2013, une indemnité de recouvrement de 40€, non soumise à la TVA, est applicable sur chaque facture impayée à date et s'ajoute aux intérêts de retard précédemment cités, en application des articles L441-3 et L441-6 du code de commerce.",0,'C');
 
 	}
 
