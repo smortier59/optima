@@ -4071,6 +4071,8 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		//Styles utilisés
 
 		$this->colsProduit = array("border"=>1,"size"=>9);
@@ -4392,7 +4394,7 @@ class pdf_cleodis extends pdf {
 				,"N° TVA intra : FR 91 ".$this->societe["siren"]
 				,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 			);
-			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
+			$this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
 		}
 		
 		//CADRE Client
@@ -4416,7 +4418,7 @@ class pdf_cleodis extends pdf {
 
 		if(ATF::$codename == "cleodisbe"){ $cadre[] = "TVA : BE 0 ".$this->client["siren"]; }
 		
-		$this->cadre(110,30,80,35,$cadre,$this->client['societe']);
+		$this->cadre(110,35,80,35,$cadre,$this->client['societe']);
 		
 		$this->multicell(0,5,"A l'attention du service comptabilité,");
 		$this->ln(5);
