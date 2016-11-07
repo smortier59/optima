@@ -4073,6 +4073,27 @@ class hotline extends classes_optima {
 		return $r;
 	}
 
+	/**
+	* Renvoi un flag pour identifier si le ticket est facturable au client ou non
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @param $get array contient l'id du ticket ou l'id d'une interaction
+	* @return boolean TRUE si facturable, sinon FALSE
+	*/ 
+	public function _isFacturable($get,$post){	
+		if(!$get["id_hotline"] && $get["id_hotline_interaction"]) {
+			$get["id_hotline"] = ATF::hotline_interaction()->select($get["id_hotline_interaction"], "id_hotline");
+		}
+
+		if ($get["id_hotline"]) {
+			$hotline = $this->select($get["id_hotline"]);
+			if($hotline["charge"] == "intervention" && $hotline["facturation_ticket"] == "oui"){
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 
 	public function _partTicket($get,$post){

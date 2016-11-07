@@ -367,8 +367,10 @@ class hotline_mail {
 		$to=ATF::contact()->select(ATF::hotline()->select($id_hotline,"id_contact"),"email");
 		if ($toPlus) {
 			$plusMail = is_array($toPlus)?$toPlus:explode(",",$toPlus);
+
 			foreach ($plusMail as $m) {
-				$to .= ", ".ATF::contact()->select($m,'email');
+
+				if ($m) $to .= ", ".ATF::contact()->select($m,'email');
 			}
 		}
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_user"));

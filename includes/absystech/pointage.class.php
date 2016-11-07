@@ -258,19 +258,22 @@ class pointage_absystech extends pointage {
 		//Pointage actuel ?
 		$pointage=$this->select_special("id_hotline_interaction",$id_hotline_interaction);
 		if(is_array($pointage) && isset($pointage[0]["id_pointage"])){
-			$update=array("id_pointage"=>$pointage[0]["id_pointage"]
-						  ,"id_user"=>$id_user
-						  ,"date"=>$dateYmd
-						  ,"temps"=>$temps
-						);
+			$update = array(
+				"id_pointage"=>$pointage[0]["id_pointage"]
+				,"id_user"=>$id_user
+				,"date"=>$dateYmd
+				,"temps"=>$temps
+			);
 			parent::update($update);
 		}else{
-			$this->insert("hotline"
-						,$id_hotline
-						,$id_hotline_interaction
-						,$id_user
-						,$dateYmd
-						,$temps);
+			$this->insert(
+				"hotline"
+				,$id_hotline
+				,$id_hotline_interaction
+				,$id_user
+				,$dateYmd
+				,$temps
+			);
 		}
 	}
 	
