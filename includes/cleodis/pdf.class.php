@@ -4427,15 +4427,21 @@ class pdf_cleodis extends pdf {
 
 		//CADRE Date
 		$cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
-		$this->cadre(10,$y,60,10,$cadre);
+		$this->cadre(10,$y,60,13,$cadre);
 
 		//CADRE Client
-		$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL),"align"=>"C"));
-		$this->cadre(75,$y,60,10,$cadre);
+
+		if($this->client['nom_commercial']){
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
+		}else{
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL),"align"=>"C"));
+		}
+		
+		$this->cadre(75,$y,60,13,$cadre);
 
 		//CADRE Facture
 		$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),"align"=>"C"));
-		$this->cadre(140,$y,60,10,$cadre);
+		$this->cadre(140,$y,60,13,$cadre);
 
 		if ($this->lignes) {
 			$head = array("Quantité","Désignation","Montant");
