@@ -159,8 +159,6 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
 
-
-
 		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
 		$this->contrat = ATF::commande()->select_row();		
 
@@ -171,7 +169,6 @@ class pdf_cleodis extends pdf {
 
 		
 		$this->unsetHeader();
-		$this->Open();		
 		$this->AddPage();
 
 
@@ -255,17 +252,6 @@ class pdf_cleodis extends pdf {
 		$this->ln(4);
 		$this->setfont('arial','',7);
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
-
-		/*$this->unsetHeader();		
-		$this->AddPage();
-
-		copy(ATF::commande()->filepath($this->contrat["commande.id_commande"],"contratA4Signature"), ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true));
-
-		$pageCount = $this->setSourceFile(ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true) );
-		
-		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);*/
-
 		
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
@@ -2623,7 +2609,6 @@ class pdf_cleodis extends pdf {
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		$this->commandeInit($id);
-		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
 		$this->A4 = true;
