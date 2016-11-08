@@ -1042,8 +1042,7 @@ class devis_lm extends devis {
 				,ATF::$usr->trans("notice_success_title")
 			);
 
-			if(ATF::$usr->getID() == 35){ $suivi_societe = array(0=>ATF::$usr->getID()); }
-			else{ $suivi_societe = array(0=>ATF::$usr->getID(),1=>35); }
+			$suivi_societe = array(0=>ATF::$usr->getID());
 
 			$suivi = array(
 				 "id_user"=>ATF::$usr->get('id_user')

@@ -1135,8 +1135,7 @@ class affaire_lm extends affaire {
 						preg_match_all($pattern_ref_colissimo , $body, $ids_colissimo);									
 						$ref_colissimo = $ids_colissimo[1][0];																
 						$lien_colissimo = "http://www.colissimo.fr/portail_colissimo/suivre.do?colispart=".$ref_colissimo;
-						log::logger($ref_colissimo , "mfleurquin");
-
+						
 
 						$pattern_produits = "/<em>Ref : ([0-9]*)<\/em><\/font>/";
 						preg_match_all($pattern_produits , $body, $ids_produits);
