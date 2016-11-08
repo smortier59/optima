@@ -106,7 +106,7 @@ class contact extends classes_optima {
 		
 		$this->fieldstructure();
 		
-		$this->field_nom = "%civilite% %prenom% %nom%";
+		$this->field_nom = "%prenom% %nom%";
 		$this->onglets = array('suivi'=>array('table'=>'suivi_contact','opened'=>true,'field'=>'suivi_contact.id_contact'),'devis');
 		$this->addPrivilege("getMail");
 		$this->addPrivilege("export_vcard","export");
