@@ -1160,9 +1160,11 @@ class affaire_lm extends affaire {
 								}
 							}							
 						}					
+						
 
 						$mail = new mail(array(
-							"recipient"=>$client["email"]
+							 "mailcopy"=>"contact@abonnement.leroymerlin.fr"
+							,"recipient"=>$client["email"]
 							,"objet"=>"Expédition de votre commande n°".$num_commande_lm
 							,"template"=>"expedition_commande"	
 							,"html"=>true
