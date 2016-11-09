@@ -241,7 +241,13 @@ class mandat_cap extends mandat {
             ATF::mandat_ligne()->delete($value["id_mandat_ligne"]);
         }
 
-        $infos["mandat"]["id_audit"] = $this->select($infos["mandat"]["id_mandat"] , "id_affaire");
+        $infos["mandat"]["id_affaire"] = $this->select($infos["mandat"]["id_mandat"] , "id_affaire");
+
+        ATF::audit()->q->reset()->where("id_affaire", $infos["mandat"]["id_affaire"]);
+        $audit = ATF::audit()->select_row();
+
+
+        $infos["mandat"]["id_audit"] = $audit["id_audit"];
 
         $this->delete($infos["mandat"]["id_mandat"]);
 
@@ -257,7 +263,7 @@ class mandat_cap extends mandat {
         }else{
             
             ATF::db($this->db)->commit_transaction();
-            if(is_array($cadre_refreshed)){  ATF::affaire()->redirection("select",$id_affaire);   }
+            if(is_array($cadre_refreshed)){  ATF::affaire()->redirection("select",$infos["mandat"]["id_affaire"]);   }
             return $last_id;
         }
     }
@@ -326,6 +332,50 @@ class mandat_cap extends mandat {
         }else{ return false; }
 
         return true;
+    }
+
+
+    /** 
+    * Surcharge de delete afin de supprimer les lignes de mandat et modifier l'état de l'affaire et du devis
+    * @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+    * @param int $infos le ou les identificateurs de l'élément que l'on désire inséré
+    * @param array &$s La session
+    * @param array $files $_FILES
+    * @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
+    */
+    public function delete($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL) {
+        if (is_numeric($infos) || is_string($infos)) {
+            $id=$this->decryptId($infos);
+            $mandat=$this->select($id);
+
+    
+            //mandat
+            if($mandat){
+
+                ATF::db($this->db)->begin_transaction();
+                parent::delete($id,$s);
+                
+                ATF::audit()->q->reset()->where("id_affaire", $mandat["id_affaire"]);
+                $audit = ATF::audit()->select_row();
+
+               
+                //Audit
+                $audit_u = array("id_audit"=>$audit["id_audit"],"etat"=>"attente");
+                ATF::audit()->u($audit_u);
+                
+                                   
+                ATF::db($this->db)->commit_transaction();
+                
+                ATF::affaire()->redirection("select",$mandat["id_affaire"]);
+                
+                return true; 
+            }
+        } elseif (is_array($infos) && $infos) {
+
+            foreach($infos["id"] as $key=>$item){
+                $this->delete($item,$s,$files,$cadre_refreshed);
+            }
+        }
     }
 }
 
