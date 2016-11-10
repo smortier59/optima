@@ -878,6 +878,7 @@ class societe_cleodis extends societe {
 			"firstname"=>$contact["prenom"],
 			"lastname"=>$contact["nom"],
 			"email"=>$contact["email"],
+			"tel"=>$contact["gsm"],
 			"company_name"=>$societe["societe"],
 			"IBAN"=>$societe["IBAN"],
 			"BIC"=>$societe["BIC"]
