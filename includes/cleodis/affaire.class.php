@@ -356,6 +356,16 @@ class affaire_cleodis extends affaire {
 						$res = ATF::affaire()->select_all();						
 
 						if($res){ 	$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") ); $esp = true;}
+					}
+					if($infos["field"] == "IBAN" && !ATF::affaire()->select($infos["id_affaire"] , "RUM") ){
+						$RUM = "";
+						$IBAN = str_replace(" ", "", $infos['value']);
+						$id_societe = ATF::affaire()->select($infos["id_affaire"] , "id_societe");						
+
+						ATF::affaire()->q->reset()->where("affaire.id_societe", $id_societe)->where('replace(affaire.IBAN, " ", "")' , $IBAN)->whereIsNotNull("affaire.RUM");
+						$res = ATF::affaire()->select_all();						
+
+						if($res){ 	$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") ); $esp = true;}
 					}					
 					$affaire->set($infos["field"],$infos['value']);					
 					break;

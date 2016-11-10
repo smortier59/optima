@@ -1160,8 +1160,9 @@ class affaire_lm extends affaire {
 								}
 							}							
 						}					
+						
 
-						$mail = new mail(array(
+						$mail = new mail(array(							 
 							"recipient"=>$client["email"]
 							,"objet"=>"Expédition de votre commande n°".$num_commande_lm
 							,"template"=>"expedition_commande"	
@@ -1175,6 +1176,8 @@ class affaire_lm extends affaire {
 							,"colissimo_ref"=>$ref_colissimo
 							,"lien_colissimo"=>$lien_colissimo
 							,"from"=>"no-reply@leroymerlin.fr"));
+						$mail->setCustomHeaders(array("Bcc"=>"contact@abonnement.leroymerlin.fr"));
+						
 						$mail->send();
 
 						ATF::imap()->imap_mail_move( $vmail->uid, "Mail_Expedition_traitee");
