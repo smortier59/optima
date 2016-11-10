@@ -2623,7 +2623,7 @@ class pdf_cleodis extends pdf {
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		$this->commandeInit($id);
-		$this->Open();
+		if(!$signature)		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
 		$this->A4 = true;
@@ -2955,13 +2955,23 @@ class pdf_cleodis extends pdf {
 
 
 
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,array("txt"=>$signature?"[SignatureContractant/]":"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
-		);
+		if(!$signature){
+			$cadre = array(
+				"Fait à : "
+				,"Le : "
+				,"Nom : "
+				,"Qualité : "
+				,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
+			);
+		}else{
+				$cadre = array(
+				"Fait à : "
+				,"Le : "
+				,"[SignatureContractant/]"
+			);
+		}
+
+		
 		$y = $this->gety()+2;
 		if ($this->affaire['nature']=="vente") {
 			$t = "L'acheteur";
