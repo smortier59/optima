@@ -2611,9 +2611,7 @@ class hotline_interaction extends classes_optima {
 		$q = "SELECT
 			SUM(TIME_TO_SEC(duree_presta)-TIME_TO_SEC(duree_pause))
 			/
-			(SELECT count(DISTINCT DATE_FORMAT(date, '%Y-%m-%d'))
-				FROM hotline_interaction
-				WHERE DATE_FORMAT(date, '%Y-%m') = '".$date."')
+			count(DISTINCT DATE_FORMAT(date, '%Y-%m-%d'))
 			FROM `hotline_interaction`
 			WHERE DATE_FORMAT(date, '%Y-%m') = '".$date."'";
 		if ($get['id']) $q .= " AND id_user=".ATF::$usr->getID();
