@@ -839,6 +839,8 @@ class societe_cleodis extends societe {
 
 		$this->checkIBAN($iban);
 
+		ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
+
 		$pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
 		$return = array(
