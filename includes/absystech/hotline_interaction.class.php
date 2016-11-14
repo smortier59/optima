@@ -384,7 +384,7 @@ class hotline_interaction extends classes_optima {
 		}
 
 		// GESTION DES ALERTES
-		if(!$no_test_credit){
+		/*if(!$no_test_credit){
 			if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
 				if(!$infos["champ_alerte"]){
 					ATF::db($this->db)->rollback_transaction();
@@ -404,7 +404,7 @@ class hotline_interaction extends classes_optima {
 				}
 
 			}
-		}
+		}*/
 
 
 		//L'interaction fait mention de materiel a facturer
@@ -2266,7 +2266,7 @@ class hotline_interaction extends classes_optima {
 			}
 
 			// GESTION DES ALERTES 
-			log::logger($ticket_presta." > ".$infos["credit_presta"],"hotline");
+			/*log::logger($ticket_presta." > ".$infos["credit_presta"],"hotline");
 			log::logger($ticket_dep." > ".$infos["credit_dep"],"hotline");
 			if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
 				log::logger("ALERTE POUR SOUS FACTURATION","hotline");
@@ -2292,7 +2292,7 @@ class hotline_interaction extends classes_optima {
 					ATF::alerte()->i($alerte);					
 				}
 
-			}
+			}*/
 
 
 			//L'interaction fait mention de materiel a facturer
