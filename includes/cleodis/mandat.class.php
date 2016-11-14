@@ -69,6 +69,7 @@ class mandat_cap extends mandat {
             ,"indemnite_retard"
             ,"clause_penale"
             ,"clause_penale_percentage"
+            ,"interet_retard"
         );
 
                
