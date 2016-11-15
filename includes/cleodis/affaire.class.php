@@ -347,26 +347,28 @@ class affaire_cleodis extends affaire {
 							$infos['value'] = str_replace(" ", "", $infos['value']);
 						}
 					}
-					if($infos["field"] == "RIB" && !ATF::affaire()->select($infos["id_affaire"] , "RUM") ){
+					if(($infos["field"] == "RIB" || $infos["field"] == "BIC" || $infos["field"] == "IBAN" || $infos["field"] == "RUM") && !ATF::affaire()->select($infos["id_affaire"] , "RUM") ){
 						$RUM = "";
-						$RIB = str_replace(" ", "", $infos['value']);
+						$field_value = str_replace(" ", "", $infos['value']);
 						$id_societe = ATF::affaire()->select($infos["id_affaire"] , "id_societe");						
 
-						ATF::affaire()->q->reset()->where("affaire.id_societe", $id_societe)->where('replace(affaire.RIB, " ", "")' , $RIB)->whereIsNotNull("affaire.RUM");
+						ATF::affaire()->q->reset()->where("affaire.id_societe", $id_societe)
+												  ->where('replace(affaire.'.$infos["field"].', " ", "")' , $field_value)
+												  ->whereIsNotNull("affaire.RUM");
 						$res = ATF::affaire()->select_all();						
 
-						if($res){ 	$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") ); $esp = true;}
+						if($res){
+							$affaire->set("RIB", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RIB") );
+							$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") );
+							$affaire->set("BIC", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "BIC") );
+							$affaire->set("IBAN", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "IBAN") ); 
+							$affaire->set("nom_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "nom_banque") );
+							$affaire->set("ville_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "ville_banque") );	
+
+							$esp = true;
+						}
 					}
-					if($infos["field"] == "IBAN" && !ATF::affaire()->select($infos["id_affaire"] , "RUM") ){
-						$RUM = "";
-						$IBAN = str_replace(" ", "", $infos['value']);
-						$id_societe = ATF::affaire()->select($infos["id_affaire"] , "id_societe");						
-
-						ATF::affaire()->q->reset()->where("affaire.id_societe", $id_societe)->where('replace(affaire.IBAN, " ", "")' , $IBAN)->whereIsNotNull("affaire.RUM");
-						$res = ATF::affaire()->select_all();						
-
-						if($res){ 	$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") ); $esp = true;}
-					}					
+										
 					$affaire->set($infos["field"],$infos['value']);					
 					break;
 				default:
