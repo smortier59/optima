@@ -2606,7 +2606,7 @@ class hotline_interaction extends classes_optima {
 
 
 	public function _getMoyennePointage($get, $post){
-		$date = date('Y-m', strtotime('-1 month'));
+		$date = date('Y-m');
 
 		if ($get['id']) {
 			$diviseur = ATF::db()->ffc(
@@ -2627,13 +2627,13 @@ class hotline_interaction extends classes_optima {
 			WHERE DATE_FORMAT(date, '%Y-%m') = '".$date."'";
 		if ($get['id']) $q .= " AND id_user=".ATF::$usr->getID();
 
-		$date2 = date('Y-m-d', strtotime('-3 days'));
+		$date2 = date('Y-m-d');
 		$q2 = "SELECT
 			SUM(TIME_TO_SEC(duree_presta)-TIME_TO_SEC(duree_pause))
 			FROM `hotline_interaction`
 			WHERE DATE_FORMAT(date, '%Y-%m-%d') = '".$date2."'";
 		if ($get['id']) $q2 .= " AND id_user=".ATF::$usr->getID();
-
+		log::logger($q2, 'alahlah');
 		$r['global'] = ATF::db()->ffc($q);
 		$r['today'] = ATF::db()->ffc($q2);
 
