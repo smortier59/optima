@@ -236,7 +236,7 @@ class hotline_interaction extends classes_optima {
 		
 		$hotline = ATF::hotline()->select($infos["id_hotline"]);
 		/*---------------Gestion du temps----------------------*/
-		if((!$infos["duree_presta"] || $infos["duree_presta"] =="00:00" || $infos["duree_presta"] =="0:00") && !isset($infos["no_test_credit"])){
+		if((!$infos["duree_presta"] || $infos["duree_presta"] =="00:00" || $infos["duree_presta"] =="0:00") && !$no_test_credit){
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF(ATF::$usr->trans("duree_presta_non_renseigne",$this->table));
 		} 	
