@@ -41,35 +41,22 @@ class pdf_cleodis extends pdf {
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
-			if(ATF::$codename == "cleodisbe"){
-				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure'],0,'C');
-				$this->multicell(200,3,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-				$this->multicell(200,3,"N° de TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
-				$this->multicell(200,3,"BELFIUS - IBAN BE43 0689 0471 6401 - BIC GKCCBEBB",0,'C');
-					
-			}else{
+			
 				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 				
 				$this->multicell(200,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
-			}	
+				
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
 		} else {
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
-			$this->SetXY(10,-15);
-			if(ATF::$codename == "cleodisbe"){
-				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure'],0,'C');
-				$this->multicell(0,3,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-				$this->multicell(0,3,"N° de TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
-				$this->multicell(0,3,"BELFIUS - IBAN BE43 0689 0471 6401 - BIC GKCCBEBB",0,'C');
-					
-			}else{
-
+			$this->SetXY(10,-15);			
+			
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 				
 				$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
-			}			
+						
 			$this->SetX(10);			
 			if (!$this->noPageNo) {
 				$this->ln(-3);

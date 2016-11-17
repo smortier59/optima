@@ -1512,7 +1512,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_periode_debut" => $c->get("date_debut"),
                                         "type" => "contrat",
                                         "envoye" => "non",
-                                        "date_periode_fin" =>$c->get("date_evolution")
+                                        "date_periode_fin" =>$c->get("date_evolution"),                                        
+                                        'serenite' => '0.00',
+                                        'maintenance' => '0.00',
+                                        'hotline' => '0.00',
+                                        'supervision' => '0.00',
+                                        'support' => '0.00'
                                         )
                                     ),
                                     $facturation,
@@ -1789,7 +1794,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_periode_debut" => $c->get("date_debut"),
                                         "type" => "contrat",
                                         "envoye" => "non",
-                                        "date_periode_fin" =>$c->get("date_evolution")
+                                        "date_periode_fin" =>$c->get("date_evolution"),
+                                        'serenite' => '0.00',
+                                        'maintenance' => '0.00',
+                                        'hotline' => '0.00',
+                                        'supervision' => '0.00',
+                                        'support' => '0.00'
                                         )
                                     ),
                                     $facturation,
