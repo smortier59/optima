@@ -69,19 +69,6 @@ class contact_cleodis extends contact {
 
 class contact_cleodisbe extends contact_cleodis { };
 class contact_cap extends contact_cleodis { };
-class contact_exactitude extends contact_cleodis {
-
-	/**
-    * Retourne les contacts avec les infos de société
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-    */
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
-		$this->q->addField("societe.*")->from("contact","id_societe","societe","id_societe");
-		$return = parent::select_all($order_by,$asc,$page,$count);		
-		return $return;
-	}
-
-};
 
 class contact_midas extends contact_cleodis {
 	public function __construct() {		

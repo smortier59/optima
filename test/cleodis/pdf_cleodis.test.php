@@ -661,6 +661,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     public function test_factureRefiCleodisBE() {
     	$this->beginTransaction("cleodisbe", true, false);
 
+    	$c = new pdf_cleodisbe();
+
     	$this->insertSociete();
 		$this->societe = ATF::societe()->select($this->id_societe);
 		$this->insertContact();
@@ -675,13 +677,13 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->create("demande_refi");  
         $this->create("factureRefi");   
         
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
 
-        $this->assertNotNull($this->obj->demandeRefi ,"Erreur : le demandeRefi n'est pas initialisé");
-        $this->assertNotNull($this->obj->refinanceur ,"Erreur : le refinanceur n'est pas initialisé");
+        $this->assertNotNull($c->demandeRefi ,"Erreur : le demandeRefi n'est pas initialisé");
+        $this->assertNotNull($c->refinanceur ,"Erreur : le refinanceur n'est pas initialisé");
 
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureRefiCleodisBE-".$this->dateSave.".pdf");
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-factureRefiCleodisBE-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
@@ -691,7 +693,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("f40bde546a53e864d3635e053279bdab",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("032f29428bce02ea090ecdf113c39b91",$md5,"Erreur de génération de la facture");
 
        
     }
@@ -703,7 +705,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     public function test_factureSimpleCleodisBE() {
     	$this->beginTransaction("cleodisbe", true, false);
 
-        
+        $c = new pdf_cleodisbe();
+
     	$this->insertSociete();
 		$this->societe = ATF::societe()->select($this->id_societe);
 		$this->insertContact();
@@ -717,11 +720,11 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->create("demande_refi");  
         $this->create("factureNormale");    
         
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
 
 
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureSimpleCleodisBE-".$this->dateSave.".pdf");
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-factureSimpleCleodisBE-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
@@ -731,12 +734,9 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("5e04d18bbf6bcc2d9b6c8a57ec94be95",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("cfc30812078a1ab42cf07075c152a2f7",$md5,"Erreur de génération de la facture");
     }
        
-
-
-
 
 	 /* 
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -761,9 +761,31 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("26b2f3a66070720b35f4c06c29addcf6",$md5,"Erreur de génération du Footer A4 Cléodis, auraient-ils été modifié ?");
+        $this->assertEquals("910c4303cac05264856a4ada027ae223",$md5,"Erreur de génération du Footer A4 Cléodis, auraient-ils été modifié ?");
     }
     
+    public function test_FooterA4_cleodisBE(){
+    	$this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+        $c->societe = $this->societe;
+        $c->addpage();
+        $c->setFont('arial','',10);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."FooterA4-CLEODISBE-".$this->dateSave.".pdf");
+        $c->Output($this->tmpFile);
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+ 		$this->beginTransaction("cleodisbe", false, true);
+
+        $this->assertEquals("58aea7ae306dbe0df7095cd8d2447581",$md5,"Erreur de génération du Footer A4 Cléodis BE, auraient-ils été modifié ?");
+    }
+
     /* 
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
@@ -793,8 +815,45 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e6c7a1f3c33fd754f8cf9d8691fc8539",$md5,"Erreur de génération du Footer A3 Cléodis, auraient-ils été modifié ?");
+        $this->assertEquals("de1b3591d911952a02454442705ef28b",$md5,"Erreur de génération du Footer A3 Cléodis, auraient-ils été modifié ?");        
         
+    }
+
+    /*
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @date 17-11-2016
+    */
+    public function test_footerA3_cleodisBE(){
+    	$this->beginTransaction("cleodisbe", true, false);
+    	$format=array(841.89,1190.55);
+        $c = new pdf_cleodisbe();
+        $c->fwPt=$format[0];
+        $c->fhPt=$format[1];
+        $c->DefOrientation='L';
+        $c->wPt=$c->fhPt;
+        $c->hPt=$c->fwPt;
+        $c->CurOrientation=$c->DefOrientation;
+        $c->w=$c->wPt/$c->k;
+        $c->h=$c->hPt/$c->k;
+        $c->societe = $this->societe;
+        $c->A3 = true;
+        $c->unsetHeader();
+        $c->setFooter();
+        $c->addpage();
+        $c->setFont('arial','',10);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."FooterA3-CLEODISBE-".$this->dateSave.".pdf");
+        $c->Output($this->tmpFile);
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+ 		$this->beginTransaction("cleodisbe", false, true);
+
+        $this->assertEquals("138aa00134a341462c4a1cac5d34e9e9",$md5,"Erreur de génération du Footer A3 Cléodis BE, auraient-ils été modifié ?");
     }
     
     /*
@@ -819,6 +878,33 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = substr($md5,0,32);
         ob_get_clean();
         $this->assertEquals("b5a8643e8335366a51d2ab6c25f4f772",$md5,"Erreur de génération du Header A4 Cléodis, auraient-ils été modifié ?");
+
+     
+       $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+        $c->unsetFooter();
+        $c->unsetHeader();
+        $this->assertFalse($c->Header(),"Erreur, le Header est unsetté donc ca doit retourner FALSE");
+        $c->setHeader();
+
+        $c->addpage();
+        $c->setFont('arial','',10);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."HeaderA4-CLEODISBE-".$this->dateSave.".pdf");
+        $c->Output($this->tmpFile);
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+ 		$this->beginTransaction("cleodisbe", false, true);
+
+        $this->assertEquals("bebe5930d930e6179fe28b5fd0ef0c8a",$md5,"Erreur de génération du Header A4 Cléodis BE, auraient-ils été modifié ?");
+
+
     }
     
     /* 
@@ -853,6 +939,25 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
     }
     
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
