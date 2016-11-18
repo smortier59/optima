@@ -7714,6 +7714,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 	}
 
+
+	
+
 	/** Génère les annexes des PDF
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
@@ -7941,6 +7944,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->AddPage();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf");
+		log::logger(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf" , "mfleurquin");
 		$tplIdx = $this->importPage(1);
 		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
 	}
@@ -9017,7 +9021,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 	public function datamandatSepa($id,$s){
 		
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		$this->societe = ATF::societe()->select(4225);
 
 
 
@@ -9027,33 +9031,32 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		// $this->setHeader();
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
 
-		$this->title("MANDAT DE PRELEVEMENT SEPA");
+		$this->setFont("arial","B","14");
+		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
+		$this->ln(15);
 
+		$this->setfont('arial',"B",8);
+		$this->setLeftMargin(50);
+		$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
+		$this->setLeftMargin(10);
+		$this->ln(10);
 
-		$this->setfont('arial',"B",11);
-		$this->setx(40);
-		$this->multicell(130,10, "  REFERENCE UNIQUE DU MANDAT : ",1);
+		$this->setfont('arial',"I",7);
+		$text = "En signant ce mandat, vous autorisez : \n\n - le créancier à envoyer des encaissements à votre banque afin de débiter votre compte.\n - votre banque à débuter un compte selon les instructions reçues du créancier.\n\nCe mandat est destiné uniquement aux transactions business-to-business. Vous ne bénéficiez pas d'un droit à remboursement par votre banque après le débit de votre compte, mais jusqu'à la date d'échéance vous avez le droit de demander à votre banque de ne pas débiter votre compte.\n\nVotre banque vous fournira volontiers plus d'informations concernant vos droits et obligations.\n\n";	
 
-		$this->ln(5);
-		$this->setfont('arial',"I",9);
-		$this->multicell(0,6,"En signant ce mandat, vous autorisez : ");
-		$this->multicell(0,6,"- le créancier à envoyer des encaissements à votre banque afin de débiter votre compte.");
-		$this->multicell(0,6,"- votre banque à débuter un compte selon les instructions reçues du créancier.");
+		
+		$this->multicell(0,3, $text ,0, "J");
 
-		$this->ln(5);
+		$this->setFontDecoration('B');
+		$this->cell(0,5,"Les champs marqués sont obligatoires (*) - Ne compléter que les champs incorrects ou manquants." ,0, 1);
+		$this->unsetFontDecoration('B');
+		
 
-		$this->multicell(0,6,"Ce mandat est destiné uniquement aux transactions business-to-business. Vous ne bénéficiez pas d'un droit à remboursement par votre banque après le débit de votre compte, mais jusqu'à la date d'échéance vous avez le droit de demander à votre banque de ne pas débiter votre compte.");
-
-		$this->multicell(0,6,"Votre banque vous fournira volontiers plus d'informations concernant vos droits et obligations.");
-
-		$this->setfont('arial',"BI",9);
-		$this->multicell(0,6,"Les champs marqués sont obligatoires (*) - Ne compléter que les champs incorrects ou manquants.");
-
-
+		
 
 		$point = ".....................................................................................................";
 
@@ -9061,56 +9064,40 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->Ln(5);
 		$this->multicell(0,5, "1- Données débiteur" ,1, "C");
 		$this->Ln(2);
-		$this->cell(85,5, "NOM PRENOM / RAISON SOCIALE *");
+		$this->cell(60,5, "NOM PRENOM / RAISON SOCIALE*");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $this->client["structure"]."  ".$this->client["societe"],0,1);
+		$this->cell(0,5, ($this->client["structure"]?$this->client["structure"]."  ":"").$this->client["societe"],0,1);
 		$this->unsetFontDecoration('B');
-		$this->cell(85,5, "ADRESSE *");
+		$this->cell(60,5, "ADRESSE*");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $this->client["adresse"]."  ".$this->client["adresse1"]."  ".$this->client["adresse2"],0,1);
+		$this->cell(0,5, $this->client["adresse"]."  ".$this->client["adresse1"]."  ".$this->client["adresse2"] ,0, 1);
 		$this->unsetFontDecoration('B');
-		$this->cell(85,5, "CP - VILLE *");
+		$this->cell(60,5, "CP - VILLE* ");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $this->client["cp"]."  ".$this->client["ville"],0,1);
+		$this->cell(0,5, $this->client["cp"]." - ".$this->client["ville"] ,0, 1);		
 		$this->unsetFontDecoration('B');
-
-		$this->cell(85,5, "PAYS *");
+		$this->cell(60,5, "PAYS*");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")),0,1);
+		$this->cell(0,5,strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0,1);
 		$this->unsetFontDecoration('B');
-
-		if ($this->client["email"]) {
-			$this->cell(85,5, "E-mail");
-			$this->setFontDecoration('B');
-			$this->cell(0,5, $this->client["email"],0,1);
-			$this->unsetFontDecoration('B');
-		}
-
-		$this->cell(85,5, "N° d'entreprise");
+		$this->cell(60,5, "E-mail");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $point,0,1);
+		$this->cell(0,5,$this->client["email"] ,0, 1);
+		$this->unsetFontDecoration('B');
+		$this->cell(60,5, "N° d'entreprise");
+		$this->setFontDecoration('B');
+		$this->cell(0,5,$point ,0, 1);
 		$this->unsetFontDecoration('B');
 		
 
 		$this->Ln(5);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
 		$this->Ln(2);
-
-		$this->cell(85,5, "COORDONNEES DE VOTRE COMPTE- IBAN *");
-		$this->setFontDecoration('B');
-		$this->cell(0,5, $point,0,1);
-		$this->unsetFontDecoration('B');
-
-		$this->multicell(80,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE *");
-		$this->ln(-10);
-		$this->setFontDecoration('B');
-		$this->setx(95);
-		$this->cell(0,5, $point,0,1);
-		$this->unsetFontDecoration('B');
-
+		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
+		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
 		
 
-		$this->Ln(10);
+		$this->Ln(5);
 		$this->multicell(0,5, "3 - Information Créancier" ,1, "C");
 		$this->Ln(5);
 	
@@ -9119,8 +9106,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial',"B",8);
 
 		$this->Ln(-25);
-		$this->setX(95);
-		$this->multicell(90,5 , "Ou pour tout établissement financier ou loueur secondaire : ".$point."\n".$point."\n".$point."\n".$point);
+		$this->setX(90);
+		$this->multicell(90,5 , "Ou pour tout établissement financier ou loueur secondaire : 
+			".$point."
+			".$point."
+			".$point."
+			".$point);
 
 		$this->setfont('arial',"",8);
 		$this->Ln(5);
@@ -9147,9 +9138,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->Cell(10,5, "Signature (s)*" ,0);
 		$this->setX(110);
 		$this->Cell(60,30, "" ,1,1);
-
-		$this->Ln(10);
-		$this->setfont('arial',"",12); 
+		
 		
 	}
 
