@@ -7944,7 +7944,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->AddPage();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf");
-		log::logger(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf" , "mfleurquin");
 		$tplIdx = $this->importPage(1);
 		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
 	}
