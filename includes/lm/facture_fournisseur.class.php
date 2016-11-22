@@ -4,9 +4,9 @@
 * @subpackage LMA
 */
 class facture_fournisseur extends classes_optima {
-	function __construct() {
-		parent::__construct();
+	function __construct($table_or_id=NULL) {
 		$this->table = "facture_fournisseur"; 
+		parent::__construct($table_or_id);
 
 		$this->colonnes['fields_column'] = array(
 			"facture_fournisseur.ref"
@@ -63,7 +63,7 @@ class facture_fournisseur extends classes_optima {
 		$this->field_nom = "ref";
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->onglets = array('facture_fournisseur_ligne','facture_non_parvenue');
-		$this->files["fichier_joint"] = array();
+		$this->files["fichier_joint"]  = array("obligatoire"=>true);
 		$this->can_insert_from = array("bon_de_commande");
 		$this->no_insert = true;
 		$this->selectAllExtjs=true; 
@@ -146,9 +146,12 @@ class facture_fournisseur extends classes_optima {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$this->infoCollapse($infos);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
+
+
 
 		
 
@@ -238,15 +241,17 @@ class facture_fournisseur extends classes_optima {
 	*/
 	public function delete($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL) {
 		
+		log::logger($infos , "mfleurquin");
+
 		if (!is_array($infos)) {
 			$id_affaire = $this->select($infos,"id_affaire");
 		} elseif(!is_array($infos["id"])) {
-			$id_affaire = $this->nom($infos["id"],"id_affaire");
+			$id_affaire = $this->select($infos["id"],"id_affaire");
 		}
 		
-		if($return = parent::delete($infos,$s,$files,$cadre_refreshed)){
-			ATF::affaire()->redirection("select",$id_affaire);
-		}
+		$return = parent::delete($infos,$s,$files,$cadre_refreshed);
+		ATF::affaire()->redirection("select",$id_affaire);
+		
 		return $return;
 	}
 
@@ -787,86 +792,149 @@ class facture_fournisseur extends classes_optima {
         $total_credit = 0;
         $lignes = 0;
 
-        $donnees = array();
-
-        
+        $donnees = array();        
 
         foreach ($data as $key => $value) {
-        	for($i=1;$i<4;$i++){	
-	        	if($i==1){
-	        		//TTC
-	        		$donnees[$key][$i][1] = "1"; 
-		        	$donnees[$key][$i][2] = "e"; //Type d'evenement e/a
-		        	$donnees[$key][$i][3] = "1"; //Code BU
-		        	$donnees[$key][$i][4] = "1";
-		        	$donnees[$key][$i][5] = "65"; //Code pays (centrale)
-		        	$donnees[$key][$i][6] = "1";
-		        	$donnees[$key][$i][7] = ($value["facture_fournisseur.prix"] >= 0)?"F":"A"; //Type de facture F/A
-		        	$donnees[$key][$i][8] =  $value["facture_fournisseur.ref"];
-		        	$donnees[$key][$i][9] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
-		        	$donnees[$key][$i][10] = "";
-		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
-		        	$donnees[$key][$i][12] = ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]); //Montant TTC separateur numeric .
-		        	$donnees[$key][$i][13] = "EUR";	
-	        		$donnees[$key][$i][14] = ""; 
-	        		$donnees[$key][$i][15] = ""; 
-		        	$donnees[$key][$i][16] = $value["facture_fournisseur.bap"]; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
-		        	$donnees[$key][$i][17] = $value["facture_fournisseur.date_bap"]; //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
-		        	$donnees[$key][$i][18] = "0"; //Num du fournisseur d'imputation comptable Num Tiers du Spec fournisseurs (champ2) 
-		        	$donnees[$key][$i][19] = "";	  
-					$donnees[$key][$i][20] = "";
-					$donnees[$key][$i][21] = ""; 	
-		        	$donnees[$key][$i][22] = "";
-					$donnees[$key][$i][23] = "";
-					$donnees[$key][$i][24] = "";
-					$donnees[$key][$i][25] = ""; 
-					$donnees[$key][$i][26] = "";  
-					$donnees[$key][$i][27] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref"); //N° Commande ? 
-					$donnees[$key][$i][28] = ""; //Numéro du contrat / référence affaire 
-					$donnees[$key][$i][29] = ""; 
-					$donnees[$key][$i][30] = ""; 
-					$donnees[$key][$i][31] = ""; 
+        	$code_magasin = "M0380"; //Par defaut web
+        	
+        	$compteTVA = $compteTTC = $compteHT  = $magasin;
 
-					$total_debit += ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]);
+        	$ref_cmd_lm = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref_commande_lm");
 
-	        	}elseif($i==2){
-	        		//HT
+        	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
+        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");
+        	}
+
+        	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
+        	$devis = ATF::devis()->select_row();
+
+        	//On recupere le 1er produit de la facture pour connaitre le pack et donc le rayon
+        	ATF::devis_ligne()->q->reset()->where("id_devis",$devis["id_devis"])
+        									->setLimit(1);
+        	$ligne = ATF::devis_ligne()->select_row();
+        	   
+        	$pack = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit"));
+        	
+        	/*switch ($value["facture_fournisseur.type"]) {
+        		case 'achat':
+        			$compteHT = "215600";
+    				$compteTVA = "445620";
+    				$compteTTC = "401000";
+        		break; 
+        		case 'maintenance':
+        			$compteHT = "615610";
+    				$compteTVA = "445824P";
+    				$compteTTC = "401103";
+        		break; 
+        		case 'diagnostique':
+        			$compteHT = "604112";
+    				$compteTVA = "445824P";
+    				$compteTTC = "401103";
+        		break; 
+        		case 'installation':
+        			$compteHT = "604100";
+    				$compteTVA = "445824P";
+    				$compteTTC = "401103";
+        		break;       			        			
+        			
+        	}*/
+        	if($value["facture_fournisseur.type"] == "achat"){
+        		$compteComptable = "215600";
+        	}elseif($value["facture_fournisseur.type"] == "maintenance"){
+				$compteComptable = "615610";
+        	}elseif($value["facture_fournisseur.type"] == "diagnostique"){
+				$compteComptable = "604112";
+        	}elseif($value["facture_fournisseur.type"] == "installation"){
+				$compteComptable = "604100";
+        	}
+        	
+
+        	$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
+
+        	//TTC
+    		$donnees[$key][1][1] = "1"; 
+        	$donnees[$key][1][2] = "e"; //Type d'evenement e/a
+        	$donnees[$key][1][3] = "120"; //Code BU
+        	$donnees[$key][1][4] = "54";
+        	$donnees[$key][1][5] = "1"; //Code pays (centrale)
+        	$donnees[$key][1][6] = $code_magasin;
+        	$donnees[$key][1][7] = ($value["facture_fournisseur.prix"] >= 0)?"F":"A"; //Type de facture F/A
+        	$donnees[$key][1][8] =  $value["facture_fournisseur.ref"];
+        	$donnees[$key][1][9] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
+        	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));;
+        	$donnees[$key][1][11] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
+        	$donnees[$key][1][12] = ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]); //Montant TTC separateur numeric .
+        	$donnees[$key][1][13] = "EUR";	
+    		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
+    		$donnees[$key][1][15] = ""; 
+        	$donnees[$key][1][16] = $value["facture_fournisseur.bap"]; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
+        	$donnees[$key][1][17] = date("Ymd", strtotime($value["facture_fournisseur.date"])); //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
+        	$donnees[$key][1][18] = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"] ,"numero_site"); //Numéro du site fournisseur (FGX .. Ou IMO…) 
+        	$donnees[$key][1][19] = "A voir avec David et Clotilde (dans le cas de facture magasin)";	  
+			$donnees[$key][1][20] = "A voir avec David et Clotilde (dans le cas de facture magasin)";
+			$donnees[$key][1][21] = "A voir avec David et Clotilde (dans le cas de facture magasin)"; 	
+        	$donnees[$key][1][22] = "A voir avec David et Clotilde (dans le cas de facture magasin)";
+			$donnees[$key][1][23] = "";
+			$donnees[$key][1][24] = "";
+			$donnees[$key][1][25] = $compteComptable; 
+			$donnees[$key][1][26] = "";  
+			$donnees[$key][1][27] = $ref_cmd_lm;  //N° Commande site LM 
+			$donnees[$key][1][28] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref"); //Numéro du contrat / référence affaire 
+			$donnees[$key][1][29] = ""; 
+			$donnees[$key][1][30] = ""; 
+			$donnees[$key][1][31] = ""; 
+
+			$total_debit += ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]);
+
+
+			ATF::facture_fournisseur_ligne()->q->reset()->where("id_facture_fournisseur",$value["facture_fournisseur.id_facture_fournisseur_fk"]);
+			$lignes_ff = ATF::facture_fournisseur_ligne()->select_all();
+
+			$i = 2;
+			foreach ($lignes_ff as $kl => $vl) {
+				if($vl["prix"]){
+					//HT
 	        		$donnees[$key][$i][1] = "2"; 
 		        	$donnees[$key][$i][2] = "1"; //TVA =0 / HT=1
-		        	$donnees[$key][$i][3] = "0";
-		        	$donnees[$key][$i][4] = $value["facture_fournisseur.prix"]; // Montant
-		        	$donnees[$key][$i][5] = ""; //Code TVA
-		        	$donnees[$key][$i][6] = "";
+		        	$donnees[$key][$i][3] = $rayon;
+		        	$donnees[$key][$i][4] = $vl["prix"]; // Montant
+		        	$donnees[$key][$i][5] = "D20"; //Code TVA
+		        	$donnees[$key][$i][6] = "0";
 		        	$donnees[$key][$i][7] = ""; 
-		        	$donnees[$key][$i][8] = ""; // Montant HT si on est sur une ligne TVA 
+		        	$donnees[$key][$i][8] = ""; 
 		        	$donnees[$key][$i][9] = ""; //Type de facture
 		        	$donnees[$key][$i][10] = ""; 
-		        	
 
-					$total_credit += $value["facture_fournisseur.prix"];
+					$total_credit += $vl["prix"];
 
-	        	}elseif($i==3){
-	        		//TVA
+					$i++;
+
+					//TVA
 	        		$donnees[$key][$i][1] = "2"; 
 		        	$donnees[$key][$i][2] = "0"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = "0";
-		        	$donnees[$key][$i][4] = ""; // Montant
-		        	$donnees[$key][$i][5] = ""; //Code TVA
+		        	$donnees[$key][$i][4] = round(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2); // Montant
+		        	$donnees[$key][$i][5] = "D20"; //Code TVA
 		        	$donnees[$key][$i][6] = $value["facture_fournisseur.tva"];
 		        	$donnees[$key][$i][7] = ""; 
-		        	$donnees[$key][$i][8] = $value["facture_fournisseur.prix"]; // Montant HT si on est sur une ligne TVA 
+		        	$donnees[$key][$i][8] = "" ; 
 		        	$donnees[$key][$i][9] = ""; //Type de facture
 		        	$donnees[$key][$i][10] = "";  
 
-					$total_credit += ($value["facture_fournisseur.prix"]*($value["facture_fournisseur.tva"]-1));
-	        	}  
-        	}        	
+					$total_credit += round(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2);
+
+					$i++;
+				}				
+			}
+        	    	
         }
 
         header('Content-Type: application/fic');		
 		header('Content-Disposition: attachment; filename="AP_CLEODIS_LMA_'.date("Y-m").'"');
 		
 		
+		log::logger($donnees , "mfleurquin");
+
 		foreach ($donnees as $key => $value) {	
 			foreach ($value as $k => $v) {
 				for($i=1;$i<=36;$i++){
