@@ -381,40 +381,50 @@ class devis_lm extends devis {
 				$item["id_devis"]=$last_id;
 				$item["visible"] = ATF::produit()->select($item["id_produit"] , "afficher");
 
-				ATF::produit_fournisseur()->q->reset()->where("produit_fournisseur.id_produit",$item["id_produit"]);
+				unset($item["id_parc"]);
+
+				ATF::produit_fournisseur()->q->reset()
+					->where("produit_fournisseur.id_produit",$item["id_produit"])
+					->andWhere('produit_fournisseur.departement','(^|,)'.substr($cp_adresse_livraison,0,2).'($|,)','dep','REGEXP')
+					->whereIsNull('produit_fournisseur.departement','OR','dep');
 				$fournisseurs = ATF::produit_fournisseur()->select_all();
 
-				if(!$fournisseurs){
-					ATF::produit_fournisseur_loyer()->q->reset()->where("produit_fournisseur_loyer.id_produit",$item["id_produit"]);
-					$fournisseurs = ATF::produit_fournisseur_loyer()->select_all();
-				}
 
+				if($fournisseurs){
+					foreach ($fournisseurs as $kf => $vf) {						
+						$item["id_fournisseur"] = $vf["id_fournisseur"];
+						if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
 
-				if($fournisseurs){					
-					foreach ($fournisseurs as $kf => $vf) {
-						if($vf["departement"] == NULL && !$item["id_fournisseur"]){
-							$item["id_fournisseur"] = $vf["id_fournisseur"];
-							if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
-						}else{
-							$dep = explode(",", $vf["departement"]);							
-							foreach ($dep as $k => $v) {								
-								if(substr($cp_adresse_livraison,0,2) == $v){
-									$item["id_fournisseur"] = $vf["id_fournisseur"];
-									unset($item["prix_achat"]);
-									if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
-								}
-							}
+						if(!$item["id_fournisseur"]){
+						ATF::db($this->db)->rollback_transaction();
+							throw new errorATF("Ligne de devis sans fournisseur achat (Produit : ".$item['id_produit'].")",882);
 						}
-					}
-				}
+						ATF::devis_ligne()->i($item);
+					}					
+				}else{
+					ATF::produit_fournisseur_loyer()->q->reset()
+						->where("produit_fournisseur_loyer.id_produit",$item["id_produit"])						
+						->andWhere('produit_fournisseur_loyer.departement','(^|,)'.substr($cp_adresse_livraison,0,2).'($|,)','dep','REGEXP')
+						->whereIsNull('produit_fournisseur_loyer.departement','OR','dep');							;
+					$fournisseurs = ATF::produit_fournisseur_loyer()->select_all();
 
+					if($fournisseurs){
+						foreach ($fournisseurs as $kf => $vf) {
+							$item["id_fournisseur"] = $vf["id_fournisseur"];
+							unset($item["prix_achat"]);
+							if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }	
 
-				if(!$item["id_fournisseur"]){
-					ATF::db($this->db)->rollback_transaction();
-					throw new errorATF("Ligne de devis sans fournisseur (Produit : ".$item['id_produit'].")",882);
+							if(!$item["id_fournisseur"]){
+								ATF::db($this->db)->rollback_transaction();
+								throw new errorATF("Ligne de devis sans fournisseur loyer (Produit : ".$item['id_produit'].")",882);
+							}							
+							ATF::devis_ligne()->i($item);
+						}
+					}else{
+						ATF::db($this->db)->rollback_transaction();
+						throw new errorATF("Ligne de devis sans fournisseur (achat ou loyer) (Produit : ".$item['id_produit'].")",882);	
+					}					
 				}
-				unset($item["id_parc"]);
-				ATF::devis_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
