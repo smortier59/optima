@@ -2941,9 +2941,7 @@ class pdf_cleodis extends pdf {
 			);
 		}else{
 				$cadre = array(
-				"Fait à : "
-				,"Le : "
-				,"[SignatureContractant/]"
+					"[SignatureContractant/]"
 			);
 		}
 
@@ -2955,13 +2953,22 @@ class pdf_cleodis extends pdf {
 			$t = "Le Locataire";
 		}
 		$this->cadre(20,$y,80,48,$cadre,$t);
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,"Signature et cachet commercial : "
-		);
+		if(!$signature){
+			$cadre = array(
+				"Fait à : "
+				,"Le : "
+				,"Nom : "
+				,"Qualité : "
+				,"Signature et cachet commercial : "
+			);
+		}else{
+			$cadre = array(
+				"[SignatureFournisseur/]"
+			);
+			
+		}
+
+		
 		if ($this->affaire['nature']=="vente") {
 			$t = "Le Vendeur";
 		} else {
