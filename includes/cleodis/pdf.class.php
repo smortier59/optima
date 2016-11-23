@@ -2941,7 +2941,7 @@ class pdf_cleodis extends pdf {
 			);
 		}else{
 				$cadre = array(
-					"[SignatureContractant/]"
+					"[SignatureContractant]\n\n\n\n[/SignatureContractant]"
 			);
 		}
 
@@ -2963,7 +2963,7 @@ class pdf_cleodis extends pdf {
 			);
 		}else{
 			$cadre = array(
-				"[SignatureFournisseur/]"
+				"[SignatureFournisseur]\n\n\n\n[/SignatureFournisseur]"
 			);
 			
 		}
