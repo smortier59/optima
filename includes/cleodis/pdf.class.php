@@ -2940,8 +2940,13 @@ class pdf_cleodis extends pdf {
 				,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 			);
 		}else{
-				$cadre = array(
-					"[SignatureContractant]\n\n\n\n[/SignatureContractant]"
+			$cadre = array(
+				" ",
+				"[SignatureContractant]",
+				" ",
+				" ",
+				" ",
+				"[/SignatureContractant]"
 			);
 		}
 
@@ -2963,7 +2968,12 @@ class pdf_cleodis extends pdf {
 			);
 		}else{
 			$cadre = array(
-				"[SignatureFournisseur]\n\n\n\n[/SignatureFournisseur]"
+				" ",
+				"[SignatureFournisseur]",
+				" ",
+				" ",
+				" ",
+				"[/SignatureFournisseur]"
 			);
 			
 		}
