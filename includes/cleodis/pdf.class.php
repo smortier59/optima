@@ -2940,10 +2940,13 @@ class pdf_cleodis extends pdf {
 				,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 			);
 		}else{
-				$cadre = array(
-				"Fait à : "
-				,"Le : "
-				,"[SignatureContractant/]"
+			$cadre = array(
+				" ",
+				"[SignatureContractant]",
+				" ",
+				" ",
+				" ",
+				"[/SignatureContractant]"
 			);
 		}
 
@@ -2955,13 +2958,27 @@ class pdf_cleodis extends pdf {
 			$t = "Le Locataire";
 		}
 		$this->cadre(20,$y,80,48,$cadre,$t);
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,"Signature et cachet commercial : "
-		);
+		if(!$signature){
+			$cadre = array(
+				"Fait à : "
+				,"Le : "
+				,"Nom : "
+				,"Qualité : "
+				,"Signature et cachet commercial : "
+			);
+		}else{
+			$cadre = array(
+				" ",
+				"[SignatureFournisseur]",
+				" ",
+				" ",
+				" ",
+				"[/SignatureFournisseur]"
+			);
+			
+		}
+
+		
 		if ($this->affaire['nature']=="vente") {
 			$t = "Le Vendeur";
 		} else {
