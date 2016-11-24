@@ -30,19 +30,23 @@
 {$id_affaire = ATF::affaire()->decryptId($smarty.get.id_affaire)}
 {$societe = ATF::societe()->select(ATF::affaire()->select($id_affaire, "id_societe"))}
 
-{if $societe["id_contact_signataire"] && ATF::contact()->select($societe["id_contact_signataire"] , "email") != NULL }
+{if $societe["id_contact_signataire"] && ATF::contact()->select($societe["id_contact_signataire"] , "email") != NULL && $societe["code_client"] != NULL} 
 	<tr>
-		<td colspan="2" style="text-align:center; width:80px color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; padding-right: 35px; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; text-align:justify; vertical-align:middle"> 
-		{$link = ''}
+		<td colspan="2" style="padding-left: 10px; padding-right: 10px;"> 
+			<div style="text-align:center; width:80px color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6; padding-right: 35px; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px;  vertical-align:middle"> 
+				{$link = ATF::societe()->getUrlSign($smarty.get.id_affaire)}
 
-			<a href="mailto:{ATF::contact()->select($societe['id_contact_signataire'] , email)}?subject=Votre lien de signature de contrat&body=https://{if __DEV__}pre-{/if}sign.absystech.net/#!{ATF::$codename}?k={$smarty.get.id_affaire}"><img src="{ATF::$staticserver}images/document_to_sign.png" style="width:40px;" alt="Signer le contrat" />   Signer le contrat electroniquement</a>           	
-		     
-		</td>		                
+				<a href="mailto:{ATF::contact()->select($societe['id_contact_signataire'] , email)}?subject=Votre lien de signature de contrat&body={$link}" style="text-decoration: none;"><img src="{ATF::$staticserver}images/document_to_sign.png" style="width:40px;" alt="Signer le contrat" />  Signer le contrat electroniquement</a>
+
+
+
+		    </div>
+		</td>				                
 	</tr>
 {else}
 	<tr>		
 		<td colspan="2" style="color: #a94442; background-color: #f2dede; border-color: #ebccd1; padding-right: 35px; padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; text-align:justify; vertical-align:middle">                
-		    <img src="{ATF::$staticserver}images/document_to_sign.png" style="width:40px;" alt="Signer le contrat" />  Pour signer le contrat electroniquement, il faut un contact signataire avec un email valide
+		    <img src="{ATF::$staticserver}images/document_to_sign.png" style="width:40px;" alt="Signer le contrat" />  Pour signer le contrat electroniquement, il faut un contact signataire avec un email valide et un code client sur la société
 		</td>                
 	</tr>
 {/if}
