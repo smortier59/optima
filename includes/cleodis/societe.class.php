@@ -812,6 +812,13 @@ class societe_cleodis extends societe {
 	}
 
 
+	public function getUrlSign($id_affaire){
+		$url = "https://";
+		if(__DEV__) $url .= "pre-";
+		$url .= "sign.absystech.net/#!".ATF::$codename."?k=".$id_affaire;
+		return $url/*."&sref=".urlencode($url)*/;
+	}
+
 	/** 
 	* Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -853,6 +860,7 @@ class societe_cleodis extends societe {
 			"city"=>$societe["ville"],
 			"email"=>$contact["email"],
 			"company_name"=>$societe["societe"],
+			"ref_client"=>$societe["ref"],
 			"country"=>$societe["id_pays"],
 			"cell_phone"=>$tel,
 			"pdf_mandat"=> base64_encode($pdf_mandat) // base64
@@ -882,6 +890,7 @@ class societe_cleodis extends societe {
 			"email"=>$contact["email"],
 			"tel"=>$contact["gsm"],
 			"company_name"=>$societe["societe"],
+			"ref_client"=>$societe["ref"],
 			"IBAN"=>$societe["IBAN"],
 			"BIC"=>$societe["BIC"]
 		);
