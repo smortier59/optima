@@ -316,8 +316,8 @@ class pdf_absystech extends pdf {
 						$this->cell(25,4,number_format(0 - $sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
 					}
 				    $accompte = $infos_facture["prix"]/$commande["prix"];
-					$this->cell(131,4,"Facture d'acompte de ".number_format(($accompte)*100,2,',',' ')."%",0,0,'L');
-					$this->cell(25,4,"Acompte HT ".number_format(($accompte)*100,2,',',' ')."%",1,0,'R');
+					$this->cell(131,4,"Facture d'acompte de ".number_format(($accompte)*100,1,',',' ')."%",0,0,'L');
+					$this->cell(25,4,"Acompte HT ".number_format(($accompte)*100,1,',',' ')."%",1,0,'R');
 					$this->cell(25,4,number_format($infos_facture["prix"],2,',',' ')." €",1,1,'R');		
 
 					$this->cell(131,4,"En votre aimable règlement,",0,0,'L');	
