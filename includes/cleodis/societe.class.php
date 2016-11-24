@@ -860,7 +860,7 @@ class societe_cleodis extends societe {
 			"city"=>$societe["ville"],
 			"email"=>$contact["email"],
 			"company_name"=>$societe["societe"],
-			"ref"=>$id_societe,
+			"ref"=>ATF::$codename.$id_societe,
 			"country"=>$societe["id_pays"],
 			"cell_phone"=>$tel,
 			"pdf_mandat"=> base64_encode($pdf_mandat) // base64
@@ -890,7 +890,7 @@ class societe_cleodis extends societe {
 			"email"=>$contact["email"],
 			"tel"=>$contact["gsm"],
 			"company_name"=>$societe["societe"],
-			"ref"=>$id_societe,
+			"ref"=>ATF::$codename.$id_societe,
 			"IBAN"=>$societe["IBAN"],
 			"BIC"=>$societe["BIC"]
 		);
