@@ -8653,7 +8653,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 		$this->addpage();
 
-		
+		$this->setfont('arial','',8);
+		$this->ln(8);
+		$this->setLeftMargin(110);
+		$this->cell(0,5,"N° TVA : ".$this->client["reference_tva"]);
+		$this->setLeftMargin(15);
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
 			$t = 'FACTURE';
