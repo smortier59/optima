@@ -117,9 +117,6 @@ class mandat_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$audit = $c->select($id_audit);
 
-
-
-
 		$mandat = array("ref"=>"123456",
 						"id_societe"=>9969,
 						"id_affaire"=>$audit["id_affaire"],
