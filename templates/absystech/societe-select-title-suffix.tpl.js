@@ -350,3 +350,56 @@
 			window.open("societe,atcard.ajax,id_societe={$id}");
 		}
 	}
+
+
+{$societe = ATF::societe()->select($infos.id_societe)}
+
+{if $societe["est_sous_contrat_maintenance"]}
+	{if $societe["est_sous_contrat_maintenance"] == "sous_contrat"}
+		{$alerte = "btn-success"}
+		{$texte = "Client sous contrat de maintenance"}
+	{else if $societe["est_sous_contrat_maintenance"] == "sous_contrat_partiel"}
+		{$alerte = "btn-warning"}
+		{$texte = "Contrat de maintenance Partiel"}
+	{else}
+		{$alerte = "btn-danger"}
+		{$texte = "Le client ne possède pas de contrat de maintenance"}
+	{/if}
+
+	{$commentaire = ""}
+	{if $societe["commentaire_contrat_maintenance"]}
+		{$commentaire = $societe["commentaire_contrat_maintenance"]}
+	{/if}
+
+	{$image =''}
+	{if $societe["option_contrat_maintenance"] != "aucune"}
+		{if $societe["option_contrat_maintenance"] == "a_caliner"}
+			,{
+				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/heart.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
+				,border: false
+				,style: {
+					marginLeft: "10px",
+					float: 'left'
+				}
+			}		
+		{else}
+			,{
+				html: '<button type="button" class="btn btn-lg {$alerte}"><div style="float:left; margin-right:10px;"><img src="{ATF::$staticserver}images/new_install.png" style="height:40px;"></div>{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
+				,border: false
+				,style: {
+					marginLeft: "10px",
+					float: 'left'
+				}
+			}		
+		{/if}
+	{else}
+		,{
+			html: '<button type="button" class="btn btn-lg {$alerte}">{$image}{$texte}{if $commentaire}<br><span class="infos_sup">{$commentaire|escape:javascript}</span>{/if}</button>'
+			,border: false
+			,style: {
+				marginLeft: "10px",
+				float: 'left'
+			}
+		}
+	{/if}
+{/if}
