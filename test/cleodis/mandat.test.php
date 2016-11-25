@@ -10,6 +10,7 @@ class mandat_test extends ATF_PHPUnit_Framework_TestCase {
 
 	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	private function RollBackTransaction($codename){	
+		ATF::$msg->getNotices();
 		ATF::db()->rollback_transaction(true);
         ATF::$codename = "cleodis";
         ATF::db()->select_db("extranet_v3_cleodis");

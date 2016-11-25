@@ -41,6 +41,7 @@ class formation_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	
 	/* Méthode post-test, exécute après chaque test unitaire */
 	public function tearDown(){
+		ATF::$msg->getNotices();
 		ATF::db()->rollback_transaction(true);
 	}
 
