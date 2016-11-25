@@ -214,6 +214,7 @@ if($infos["id_societe"]){
             
             $cp_livraison = $infos["societe_form"]["cp"];
             $ville_livraison = $infos["societe_form"]["ville"];
+            $pays_livraison = $infos["societe_form"]["id_pays"];
 
             $adresse_facturation = "";
             if($infos["societe_form"]["facturation_same_livraisonCheckbox"] == "non"){
@@ -221,12 +222,15 @@ if($infos["id_societe"]){
                 if($infos["societe_form"]["facturation_adresse_2"] )  $adresse_facturation .= "\n".$infos["societe_form"]["facturation_adresse_2"];
                 if($infos["societe_form"]["facturation_adresse_3"] )  $adresse_facturation .= "\n".$infos["societe_form"]["facturation_adresse_3"];
                 $cp_facturation = $infos["societe_form"]["facturation_cp"];
-                $ville_facturation =  $infos["societe_form"]["ville"];
+                $ville_facturation =  $infos["societe_form"]["facturation_ville"];
+                $pays_facturation = $infos["societe_form"]["facturation_id_pays"];
+
 
             }else{
                 $adresse_facturation = $adresse_livraison;
                 $cp_facturation = $cp_livraison;
                 $ville_facturation =  $ville_livraison;
+                $pays_facturation = $pays_livraison;
             }
         }else{
             $adresse_livraison = $societe["adresse"];
@@ -235,10 +239,12 @@ if($infos["id_societe"]){
             
             $cp_livraison = $societe["cp"];
             $ville_livraison = $societe["ville"];
+            $pays_livraison = $societe["id_pays"];
 
             $adresse_facturation = $adresse_livraison;
             $cp_facturation = $cp_livraison;
             $ville_facturation =  $ville_livraison;
+            $pays_facturation = $pays_livraison;
         }
         
 
