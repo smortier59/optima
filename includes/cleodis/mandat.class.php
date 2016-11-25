@@ -242,7 +242,7 @@ class mandat_cap extends mandat {
             ATF::mandat_ligne()->delete($value["id_mandat_ligne"]);
         }
 
-        $infos["mandat"]["id_affaire"] = $this->select($infos["mandat"]["id_mandat"] , "id_affaire");
+        if(!isset($infos["mandat"]["id_affaire"])) $infos["mandat"]["id_affaire"] = $this->select($infos["mandat"]["id_mandat"] , "id_affaire");
 
         ATF::audit()->q->reset()->where("id_affaire", $infos["mandat"]["id_affaire"]);
         $audit = ATF::audit()->select_row();
