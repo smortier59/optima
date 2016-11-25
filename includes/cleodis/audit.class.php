@@ -87,8 +87,6 @@ class audit extends classes_optima {
 			
 		$this->infoCollapse($infos);
 
-		log::logger($infos , "mfleurquin");
-
 		$audit_contact = $infos["contact"];
 		unset($infos["contact"]);
 

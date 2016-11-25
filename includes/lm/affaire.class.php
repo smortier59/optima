@@ -118,6 +118,8 @@ class affaire_lm extends affaire {
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_magasin'] =  "magasin";
+		$this->foreign_key['pays_livraison'] =  "pays";
+		$this->foreign_key['pays_facturation'] =  "pays";
 		
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
