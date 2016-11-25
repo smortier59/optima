@@ -5843,7 +5843,7 @@ class pdf_cleodis extends pdf {
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
 		$this->cell(0,5,"Numéro du Contrat de Financement ".$s["num_contrat"],0,1);
-		$this->multicell(0,4,"Désignation du Client : ".$this->client["societe"].", ".$this->client["structure"]." au capital de ".$this->client["capital"]." Euros – ".$this->client["siren"]." R.C.S. LILLE.",0);
+		$this->multicell(0,4,"Désignation du Client : ".$this->client["societe"].", ".$this->client["structure"]." au capital de ".$this->client["capital"]." Euros – ".$this->client["siren"]." R.C.S. ".$this->client["ville_rcs"],0);
 		
 
 		$siege = $this->client["adresse_siege_social"];

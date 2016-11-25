@@ -71,6 +71,7 @@ class societe_cleodis extends societe {
 		$this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"reference_tva"
 			,"tva"
+			,"ville_rcs"
 		));
 		$this->colonnes['panel']['facturation_fs']["banque_ref"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"IBAN"
