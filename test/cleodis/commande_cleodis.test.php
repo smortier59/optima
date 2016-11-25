@@ -2060,7 +2060,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_periode_debut" => $c->get("date_debut"),
                                         "type" => "contrat",
                                         "envoye" => "non",
-                                        "date_periode_fin" =>$c->get("date_evolution")
+                                        "date_periode_fin" =>$c->get("date_evolution"),
+                                        'serenite' => '0.00',
+                                        'maintenance' => '0.00',
+                                        'hotline' => '0.00',
+                                        'supervision' => '0.00',
+                                        'support' => '0.00'
                                         )
                                     ),
                                     $facturation,
@@ -3134,6 +3139,43 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         
         unlink($f);
     }
+
+     //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+    public function test_select_all_checkctlettreBelfiusExists() {
+        $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
+        $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
+        
+        $f = $this->obj->filepath($id_commande,"lettreBelfius");
+
+        file_put_contents($f,"toto");
+        
+        $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
+        $r = $this->obj->select_all();
+        $r = $r['data'];
+
+        $this->assertTrue($r[0]['ctlettreBelfiusExists'],"Erreur, le fichier ctlettreBelfiusExists n'est pas reconnu comme présent");
+        
+        unlink($f);
+    }
+
+     //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+    public function test_select_all_checkEnvoictSGEFExists() {
+        $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
+        $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
+        
+        $f = $this->obj->filepath($id_commande,"lettreSGEF");
+
+        file_put_contents($f,"toto");
+        
+        $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
+        $r = $this->obj->select_all();
+        $r = $r['data'];
+
+        $this->assertTrue($r[0]['ctSGEFExists'],"Erreur, le fichier ctSGEFExists n'est pas reconnu comme présent");
+        
+        unlink($f);
+    }
+
     
     //  @author Quentin JANON <qjanon@absystech.fr>  
     public function test_select_all_checkenvoiContratSsBilanExists() {
@@ -4041,24 +4083,24 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     public function test_commande_mep_stats(){
         ATF::stats()->liste_annees["commande"] = array("2015"=>1);
 
-        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>20,"stat_concerne"=>"mep-02m","id_agence"=>1));
-        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>30,"stat_concerne"=>"devis-02m","id_agence"=>1));
-        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>10,"stat_concerne"=>"mep-autre","id_agence"=>1));
-        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>15,"stat_concerne"=>"devis-autre","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>20,"stat_concerne"=>"mep-reseau","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>30,"stat_concerne"=>"devis-reseau","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>10,"stat_concerne"=>"mep-les_S","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2012-01-01", "nb"=>15,"stat_concerne"=>"devis-les_S","id_agence"=>1));
 
-        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>20,"stat_concerne"=>"mep-02m","id_agence"=>1));
-        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>30,"stat_concerne"=>"devis-02m","id_agence"=>1));
-        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>10,"stat_concerne"=>"mep-autre","id_agence"=>1));
-        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>15,"stat_concerne"=>"devis-autre","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>20,"stat_concerne"=>"mep-reseau","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>30,"stat_concerne"=>"devis-reseau","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>10,"stat_concerne"=>"mep-les_S","id_agence"=>1));
+        ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>15,"stat_concerne"=>"devis-les_S","id_agence"=>1));
       
 
-        $return = $this->obj->commande_mep_stats(NULL, "o2m", "true" , 2015,1);   
-        $return = $this->obj->commande_mep_stats(NULL, "autre", "false" , 2015,1);
-        $this->assertEquals(28.0, $return["dataset"]["objectif"]["01"]["value"] , "Retour incorrect 3");
-        $this->assertEquals(12.0, $return["dataset"]["moyenne"]["01"]["value"] , "Retour incorrect 4");
+        $return = $this->obj->commande_mep_stats(NULL, "reseau", "true" , 2015,1);   
+        $return = $this->obj->commande_mep_stats(NULL, "les_S", "false" , 2015,1);
+        $this->assertEquals(185.0, $return["dataset"]["objectif"]["01"]["value"] , "Retour incorrect 3");
+        $this->assertEquals(7.0, $return["dataset"]["moyenne"]["01"]["value"] , "Retour incorrect 4");
 
 
-        $return = $this->obj->commande_mep_stats(NULL, "autre", NULL , 2015,1);       
+        $return = $this->obj->commande_mep_stats(NULL, "les_S", NULL , 2015,1);       
         $this->assertEquals("Janv", $return["categories"]["category"][0]["label"] , "Retour incorrect 5");
 
         $return = $this->obj->commande_mep_stats(NULL, "test", NULL , 2015,1);
@@ -4066,14 +4108,14 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
         ATF::stats()->liste_annees["commande"] = array("2006"=>1);
-        $return = $this->obj->commande_mep_stats(NULL, "o2m", "true" , 2006,1);
+        $return = $this->obj->commande_mep_stats(NULL, "reseau", "true" , 2006,1);
 
 
-        $return = $this->obj->commande_mep_stats(NULL, "o2m", "true" , date('Y'),1);
+        $return = $this->obj->commande_mep_stats(NULL, "reseau", "true" , date('Y'),1);
     }
 
 
-     /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr> 
+     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
     * @date 08/12/2015
     */
     public function test_uploadFileFromSA() {
