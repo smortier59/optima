@@ -5902,7 +5902,10 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
-		$date_revente = date("01 / m / Y", strtotime("+1 month", strtotime($this->commande["date_evolution"])));
+
+
+		$date_revente = date("Y-m-01", strtotime($this->commande["date_evolution"]));		
+		$date_revente = date("01 / m / Y", strtotime("+1 month", strtotime($date_revente)));		
 
 		$this->cell(0,4,"Date de la revente : ".$date_revente,0,1);
 		$this->cell(0,4,"Prix de Revente 15 euros H.T. à majorer de la TVA en vigueur.",0,1);
