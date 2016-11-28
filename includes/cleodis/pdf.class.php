@@ -5915,7 +5915,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial',"",8);
 		$this->cell(90,6,"Nom, Prénom du signataire :",0,0);
 		$this->cell(90,6,"Nom, Prénom du signataire :",0,1);
-
+ 
 		$this->cell(90,6,"____________________________________________",0,0);
 		$this->cell(90,6,"Christophe Loison",0,1);
 
