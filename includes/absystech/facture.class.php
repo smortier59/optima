@@ -76,8 +76,7 @@ class facture_absystech extends facture {
 			,'id_termes'=>array("updateOnSelect"=>true,"custom"=>true)
 			,"date_fin_periode"
 			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield","listeners"=>array("change"=>"ATF.changeAcompte"))
-			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")			
-			
+			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")
 		);
 
 		$this->colonnes['panel']['lignes'] = array(
@@ -304,6 +303,7 @@ class facture_absystech extends facture {
 	* Surcharge de l'insert afin d'insérer les lignes de factures et modifier l'état de l'affaire sur l'insert d'une facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @author Cyril Charlier <ccharlier@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
 	* @param array &$s La session
 	* @param array $files $_FILES
@@ -1338,7 +1338,7 @@ class facture_absystech extends facture {
 			}				
 			return $prix;	
 		}else{
-			return 0.00;
+			return 0.00; 
 		}
 
 	}
@@ -1622,7 +1622,6 @@ class facture_absystech extends facture {
     */ 
 	public function select($id,$field=NULL) {		
 		$facture=parent::select($id,$field);
-			
 		if((ATF::_r("event")=="cloner") && is_array($facture)){					
 			$facture["date"]="";
 			$facture["date_previsionnelle"]="";
