@@ -98,9 +98,7 @@ class pdf_absystech extends pdf {
 			$infos_facture = ATF::facture()->select($id);
 			$type_facture=$infos_facture["type_facture"];	
 			ATF::facture_ligne()->q->reset()->addCondition('id_facture',$id,"AND")->addCondition('visible',"oui")->end();
-			$infos_facture_produit = ATF::facture_ligne()->select_all();
-
-			//Si c'est une facture liée à une commande
+			$infos_facture_produit = ATF::facture_ligne()->select_all();			//Si c'est une facture liée à une commande
 			ATF::commande_facture()->q->reset()->addCondition('id_facture',$id)->end();
 			if($id_commande=ATF::commande_facture()->select_all()){
 				$commande=ATF::commande()->select($id_commande[0]["id_commande"]);
@@ -296,8 +294,13 @@ class pdf_absystech extends pdf {
 				case "solde":
 					$this->cell(25,4,number_format($infos_facture["prix"]+$sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
 					$this->cell(131,4,"",0,0,'C');
-					$this->cell(25,4,"Déjà Payé HT",1,0,'R');
-					$this->cell(25,4,number_format($sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');	
+					$y = $this->getY();
+					$this->cell(25,4,"Acompte(s)" ,"LR",1,'R');
+					$this->cell(131,4,"",0,0,'C');
+					$this->cell(25,4, "facturé(s) HT","LRB",0,'R');
+					$this->setY($y);
+					$this->cell(156,4,"",0,0,'C');
+					$this->cell(25,8,number_format($sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');	
 
 					$this->cell(131,4,"",0,0,'C');
 					$this->cell(25,4,"Solde HT",1,0,'R');
@@ -309,17 +312,12 @@ class pdf_absystech extends pdf {
 				break;
 				case "acompte":
 					$this->cell(25,4,number_format($commande["prix"],2,',',' ')." €",1,1,'R');
-
-					if(($sum_anc_facture["prix"] - $infos_facture["prix"]>0)){
-						$this->cell(131,4,"",0,0,'C');
-						$this->cell(25,4,"Déjà Payé HT",1,0,'R');
-						$this->cell(25,4,number_format(0 - $sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
-					}
-				    $accompte = $infos_facture["prix"]/$commande["prix"];
-					$this->cell(131,4,"Facture d'acompte de ".number_format(($accompte)*100,1,',',' ')."%",0,0,'L');
-					$this->cell(25,4,"Acompte HT ".number_format(($accompte)*100,1,',',' ')."%",1,0,'R');
+					// accompte sur le solde sinon total HT
+					$accompte = $infos_facture["prix"]/$commande["prix"];
+					$this->cell(131,4,"Facture d'acompte de ".round($accompte*100)."% du total hors taxe ",0,0,'L');
+					$infos_facture["prix"] = $commande["prix"] * $accompte;
+					$this->cell(25,4,"Acompte HT ".round(($accompte)*100)."%",1,0,'R');
 					$this->cell(25,4,number_format($infos_facture["prix"],2,',',' ')." €",1,1,'R');		
-
 					$this->cell(131,4,"En votre aimable règlement,",0,0,'L');	
 				break;
 				case "avoir":
@@ -391,7 +389,7 @@ class pdf_absystech extends pdf {
 					if(($sum_anc_facture["prix"] - $infos_facture["prix"]>0)){
 						$this->cell(131,4,"",0,0,'C');
 						$this->cell(25,4,"Déjà Payé HT",1,0,'R');
-						$this->cell(25,4,number_format(0 - $sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
+						$this->cell(25,4,number_format($sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
 						$infos_facture["prix"] = $infos_facture["prix"] - $sum_anc_facture["prix"];
 					}
 

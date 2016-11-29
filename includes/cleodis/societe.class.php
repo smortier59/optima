@@ -912,28 +912,49 @@ class societe_cleodisbe extends societe_cleodis {
 		$this->fieldstructure();
 	}
 
-
+ 
 
 	/** Interroge Cradit Safe pour récupérer les informations des sociétés.
 	* @author Quentin JANON <qjanon@absystech.fr>
+	* @author Cyril Charlier <ccharlier@absystech.fr>
 	*/
-/*
+	/*
 	public function getInfosFromCREDITSAFE($infos) {
+ 		log::logger($infos , "ccharlier");
+	   	$client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=> "Cleodistest",'password'=> "Cleodis026598"));
+	   	$params = (object)array
+		(	'countries' => array ('BE'),
+			'searchCriteria' => (object) array
+			(
+				'RegistrationNumber' => $infos['num_ident'],
+			),
+			'customData' => null,
+			'chargeReference' => 'example searchCriteria with name',
+		);
+	   	$response = $client->__soapCall('FindCompanies',array($params));
+	   	//$r2 = $client->__soapCall('GetData',array($params));
+		//log::logger($r2, "ccharlier");
+		file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
 
-	   	//$client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=> "cleodisLive",'password'=> "cleodis1497"));
-
-
-	    /*log::logger($response , "mfleurquin");
-
-		//file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
-
-		if($infos["returnxml"]){
-			$data = $response;			
+		$xml = $response;
+		log::logger($xml,"ccharlier");
+		// response/Messages / Message type = error 
+		$error = False;
+		$message =$xml->FindCompaniesResult->Messages->Message;
+		if($message->Type == "Error"){
+			log::logger($message->Code,"ccharlier");
+			ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$message->Code ,ATF::$usr->trans("notice_title"));	
+			return $error = True;	
+		}
+		if($error == False){ 
+			$data = $this->cleanGGSResponse($response);		
 		}else{
-			$data = $this->cleanCSResponse($response);		
+			$data = Null;		
 		}		
-		return NULL;
-	}*/
+		return $data;
+		
+	}
+	*/
 };
 
 class societe_cap extends societe_cleodis {

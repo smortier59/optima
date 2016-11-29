@@ -905,8 +905,125 @@ class societe extends classes_optima {
 	}
 
 
+/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
+	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
+	*/
+/*
+	public function cleanGGSResponse($r) {
+
+		$xml = $r;
+
+		$item = $xml->FindCompaniesResult->Companies->Company;
+
+		// Nom de société
+		$return['societe'] = (string)$item->Name;
+		
+		// Pays de société
+		$pays = ATF::pays()->ss("pays",(string)$item->Country);
+		$return['id_pays'] = $pays[0]['id_pays'];
+		
+		// Adresse de société
+		$return['adresse'] = (string)$item->Address->Street.' '.(string)$item->Address->HouseNumber;
+		
+		// CP de société
+		$return['cp'] = (string)$item->Address->PostalCode;
+		
+		// VILLE de société
+		$return['ville'] = (string)$item->Address->City;
+		
+		// telephone de société
+		$return['tel'] = str_replace("/","",(string)$item->PhoneNumber);
+		
+		// NAF de société
+		//$return['naf'] = (string)$bi->activitycode;
+
+		// Activite de société
+		//$return['activite'] = (string)$bi->activitydescription;
+
+		// Activite de société
+		//$return['structure'] = (string)$bi->legalform;
+
+		// Activite de société
+		//$return['capital'] = (int)$bi->sharecapital;
+
+		// Activite de société
+		//$d = "01-".str_replace("/","-",(string)$bi->formationdate);
+		//$return['date_creation'] = date("Y-m-d",strtotime($d));
+
+		// Activite de société
+		$return['reference_tva'] = (string)$item->VatNumber;
+
+		// NB employé de société
+		//$return['nb_employe'] = (string)$bi->companyworkforce;
+
+		// NOTE
+		//$return['cs_score'] = (string)$s->rating2013;
+		
+		// LIMITE
+		//$return['cs_avis_credit'] = (string)$s->creditlimit2013;
+
+		//Date information creditSafe
+		$return['lastaccountdate'] = (string)$item->DateOfLatestAccounts;
+
+		// Créances
+		//$return['receivables'] = number_format(intval((string)$balancesheet->activeaccount->receivables), 0, ",", " ");
+
+		// Placements + disponibilités
+		//$return['securitieandcash'] = number_format(intval((string)$balancesheet->activeaccount->securitiesandcash) , 0, ",", " ");
+
+		// Produits d'exploitation
+		//$return['operatingincome'] =  number_format(intval((string)$balancesheet->profitloss->operatingincome) , 0, ",", " ");
+
+		// Chiffre d'affaires net
+		//$return['netturnover'] =  number_format(intval((string)$balancesheet->profitloss->netturnover) , 0, ",", " ");
+
+		// Résultat d'exploitation
+		//$return['operationgprofitless'] = number_format(intval((string)$balancesheet->profitloss->operatingprofitloss) , 0, ",", " ");
+
+		// Produits financiers
+		//$return['financialincome'] = number_format(intval((string)$balancesheet->profitloss->financialincome) , 0, ",", " ");
+
+		// Charges financières
+		//$return['financialcharges'] = number_format(intval((string)$balancesheet->profitloss->financialcharges) , 0, ",", " ");
+
+		// ETAT
+		switch ((string)$item->Status) {
+			case '':
+				$return['etat'] = "supprime";
+			break;
+			/case 'Non diffusable':
+				$return['etat'] = "non_diffusable";
+			break;/
+			case 'Inactive':
+				$return['etat'] = "inactif";
+			break;
+			case 'Active':
+				$return['etat'] = "actif";
+			break;
+			/case 'Fermé':
+				$return['etat'] = "ferme";
+			break;
+			case 'Transféré':
+				$return['etat'] = "transfere";
+			break;
+			case 'Cessé économiquement (INSEE)':
+				$return['etat'] = "cesse";
+			break;
+			case 'Liquidé':
+				$return['etat'] = "liquide";
+			break;
+			case 'dormante':
+				$return['etat'] = "veille";
+			break		}/
+		
+		// CA
+		//$return['ca'] = (string)$s->financialsummary->tradingtodate[0]->turnover;
 
 
+
+		return $return;
+	}
+*/
 	/** Prépare les ésultats de creditsafe pour intégration dans Optima
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
