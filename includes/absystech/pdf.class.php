@@ -294,7 +294,12 @@ class pdf_absystech extends pdf {
 				case "solde":
 					$this->cell(25,4,number_format($infos_facture["prix"]+$sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');
 					$this->cell(131,4,"",0,0,'C');
-					$this->MultiCell(25,4,"Acompte(s) facturé(s) HT",1,'R',0,0);
+					$y = $this->getY();
+					$this->cell(25,4,"Acompte(s)" ,"LR",1,'R');
+					$this->cell(131,4,"",0,0,'C');
+					$this->cell(25,4, "facturé(s) HT","LRB",0,'R');
+					$this->setY($y);
+					$this->cell(156,4,"",0,0,'C');
 					$this->cell(25,8,number_format($sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');	
 
 					$this->cell(131,4,"",0,0,'C');
