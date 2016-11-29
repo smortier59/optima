@@ -908,6 +908,7 @@ class societe extends classes_optima {
 /** Prépare les résultats de GGS creditsafe pour intégration dans Optima
 	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
 	*/
+/*
 	public function cleanGGSResponse($r) {
 
 		$xml = $r;
@@ -990,16 +991,16 @@ class societe extends classes_optima {
 			case '':
 				$return['etat'] = "supprime";
 			break;
-/*			case 'Non diffusable':
+			/case 'Non diffusable':
 				$return['etat'] = "non_diffusable";
-			break;*/
+			break;/
 			case 'Inactive':
 				$return['etat'] = "inactif";
 			break;
 			case 'Active':
 				$return['etat'] = "actif";
 			break;
-			/*case 'Fermé':
+			/case 'Fermé':
 				$return['etat'] = "ferme";
 			break;
 			case 'Transféré':
@@ -1013,8 +1014,7 @@ class societe extends classes_optima {
 			break;
 			case 'dormante':
 				$return['etat'] = "veille";
-			break;*/
-		}
+			break		}/
 		
 		// CA
 		//$return['ca'] = (string)$s->financialsummary->tradingtodate[0]->turnover;
@@ -1023,7 +1023,7 @@ class societe extends classes_optima {
 
 		return $return;
 	}
-
+*/
 	/** Prépare les ésultats de creditsafe pour intégration dans Optima
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/

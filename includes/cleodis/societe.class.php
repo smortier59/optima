@@ -918,7 +918,7 @@ class societe_cleodisbe extends societe_cleodis {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @author Cyril Charlier <ccharlier@absystech.fr>
 	*/
-
+	/*
 	public function getInfosFromCREDITSAFE($infos) {
  		log::logger($infos , "ccharlier");
 	   	$client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=> "Cleodistest",'password'=> "Cleodis026598"));
@@ -954,6 +954,7 @@ class societe_cleodisbe extends societe_cleodis {
 		return $data;
 		
 	}
+	*/
 };
 
 class societe_cap extends societe_cleodis {
