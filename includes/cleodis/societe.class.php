@@ -71,6 +71,7 @@ class societe_cleodis extends societe {
 		$this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"reference_tva"
 			,"tva"
+			,"ville_rcs"
 		));
 		$this->colonnes['panel']['facturation_fs']["banque_ref"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"IBAN"
@@ -812,6 +813,13 @@ class societe_cleodis extends societe {
 	}
 
 
+	public function getUrlSign($id_affaire){
+		$url = "https://";
+		if(__DEV__) $url .= "pre-";
+		$url .= "sign.absystech.net/#!".ATF::$codename."?k=".$id_affaire;
+		return $url/*."&sref=".urlencode($url)*/;
+	}
+
 	/** 
 	* Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -839,6 +847,8 @@ class societe_cleodis extends societe {
 
 		$this->checkIBAN($iban);
 
+		ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
+
 		$pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
 		$return = array(
@@ -851,6 +861,7 @@ class societe_cleodis extends societe {
 			"city"=>$societe["ville"],
 			"email"=>$contact["email"],
 			"company_name"=>$societe["societe"],
+			"ref"=>ATF::$codename.$societe["code_client"],
 			"country"=>$societe["id_pays"],
 			"cell_phone"=>$tel,
 			"pdf_mandat"=> base64_encode($pdf_mandat) // base64
@@ -878,7 +889,9 @@ class societe_cleodis extends societe {
 			"firstname"=>$contact["prenom"],
 			"lastname"=>$contact["nom"],
 			"email"=>$contact["email"],
+			"tel"=>$contact["gsm"],
 			"company_name"=>$societe["societe"],
+			"ref"=>ATF::$codename.$societe["code_client"],
 			"IBAN"=>$societe["IBAN"],
 			"BIC"=>$societe["BIC"]
 		);
@@ -913,39 +926,30 @@ class societe_cleodisbe extends societe_cleodis {
 		(	'countries' => array ('BE'),
 			'searchCriteria' => (object) array
 			(
-				//'VatNumber' => (object) array ( '_' => 'BE0806304778', 'MatchType' => 'MatchBeginning' ),
 				'RegistrationNumber' => $infos['num_ident'],
-				//'VatNumber' =>'BE0806304778'
 			),
 			'customData' => null,
-			'chargeReference' => 'example searchCriteria with name'
+			'chargeReference' => 'example searchCriteria with name',
 		);
 	   	$response = $client->__soapCall('FindCompanies',array($params));
-		log::logger($response, "ccharlier");
+	   	//$r2 = $client->__soapCall('GetData',array($params));
+		//log::logger($r2, "ccharlier");
 		file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
-		log::logger($response->FindCompaniesResult->messages,"ccharlier");
-/*		if($infos["returnxml"]){
-			$data = $response;			
-		}else{
-			$data = $this->cleanCSResponse($response);		
-		}		
-		return NULL;
-*/
+
 		$xml = $response;
 		log::logger($xml,"ccharlier");
 		// response/Messages / Message type = error 
 		$error = False;
-		foreach($xml->FindCompaniesResult->messages->children() as $messages) {
-			if($messages["Type"]== "Error"){
-				ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messages["Code"] ,ATF::$usr->trans("notice_title"));	
-				return $error = true;	
-			}
+		$message =$xml->FindCompaniesResult->Messages->Message;
+		if($message->Type == "Error"){
+			log::logger($message->Code,"ccharlier");
+			ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$message->Code ,ATF::$usr->trans("notice_title"));	
+			return $error = True;	
 		}
-		 
 		if($error == False){ 
-			$data = $response;			
+			$data = $this->cleanGGSResponse($response);		
 		}else{
-			//$data = $this->cleanCSResponse($response);		
+			$data = Null;		
 		}		
 		return $data;
 		

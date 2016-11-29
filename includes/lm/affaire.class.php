@@ -118,6 +118,8 @@ class affaire_lm extends affaire {
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_magasin'] =  "magasin";
+		$this->foreign_key['pays_livraison'] =  "pays";
+		$this->foreign_key['pays_facturation'] =  "pays";
 		
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
@@ -1135,8 +1137,7 @@ class affaire_lm extends affaire {
 						preg_match_all($pattern_ref_colissimo , $body, $ids_colissimo);									
 						$ref_colissimo = $ids_colissimo[1][0];																
 						$lien_colissimo = "http://www.colissimo.fr/portail_colissimo/suivre.do?colispart=".$ref_colissimo;
-						log::logger($ref_colissimo , "mfleurquin");
-
+						
 
 						$pattern_produits = "/<em>Ref : ([0-9]*)<\/em><\/font>/";
 						preg_match_all($pattern_produits , $body, $ids_produits);
@@ -1161,8 +1162,9 @@ class affaire_lm extends affaire {
 								}
 							}							
 						}					
+						
 
-						$mail = new mail(array(
+						$mail = new mail(array(							 
 							"recipient"=>$client["email"]
 							,"objet"=>"Expédition de votre commande n°".$num_commande_lm
 							,"template"=>"expedition_commande"	
@@ -1176,6 +1178,8 @@ class affaire_lm extends affaire {
 							,"colissimo_ref"=>$ref_colissimo
 							,"lien_colissimo"=>$lien_colissimo
 							,"from"=>"no-reply@leroymerlin.fr"));
+						$mail->setCustomHeaders(array("Bcc"=>"contact@abonnement.leroymerlin.fr"));
+						
 						$mail->send();
 
 						ATF::imap()->imap_mail_move( $vmail->uid, "Mail_Expedition_traitee");

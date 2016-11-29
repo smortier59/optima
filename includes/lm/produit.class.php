@@ -17,6 +17,7 @@ class produit_lm extends produit {
 			'detail_loyers'=>array("custom"=>true),
 			'produit.etat'=>array("rowEditor"=>"actifUpdate","renderer"=>"etat","width"=>80),
 			'produit.id_pack_produit',
+			'produit.id_produit_principal',
 			'produit.ordre'=>array("width"=>80,"rowEditor"=>"setInfos"),
 			'produit.min'=>array("width"=>80,"rowEditor"=>"setInfos"),
 			'produit.max'=>array("width"=>80,"rowEditor"=>"setInfos"),
@@ -37,6 +38,7 @@ class produit_lm extends produit {
 																,"defaut"
 															)),
 										'id_pack_produit'=>array("targetCols"=>1),
+										'id_produit_principal',
 										'ref_lm'=>array("targetCols"=>1),
 										'libelle_a_revoyer_lm'=>array("targetCols"=>1),
 										"description",
@@ -82,9 +84,9 @@ class produit_lm extends produit {
 		$this->fieldstructure();
 
 		$this->field_nom = "%produit% (Pack %id_pack_produit% )";
+		$this->foreign_key["id_produit_principal"] = "produit"; 
 
 		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
-		//$this->field_nom = "%produit% (%id_pack_produit%)";
 				
 		$this->addPrivilege("setInfos","update");		
 		$this->addPrivilege("actifUpdate");
@@ -310,6 +312,16 @@ class produit_lm extends produit {
 		;
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
+
+		
+		foreach ($return["data"] as $key => $value) {
+			if($value["produit.id_produit_principal_fk"] == ""){
+				$return["data"][$key]["produit.id_produit_principal"] = NULL;
+			}else{
+				$return["data"][$key]["produit.id_produit_principal"] = ATF::produit()->select($value["produit.id_produit_principal_fk"] , "produit");
+			}
+
+		}
 		/*$p = new produit_lm(); // Ne pas écraser le querier courant
 		foreach ($return['data'] as $k=>$i) {
 			$return['data'][$k]['prix_achat_ht'] = $p->prix_achat_prestation($i['produit.id_produit']);

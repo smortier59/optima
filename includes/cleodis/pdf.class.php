@@ -41,35 +41,22 @@ class pdf_cleodis extends pdf {
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
-			if(ATF::$codename == "cleodisbe"){
-				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure'],0,'C');
-				$this->multicell(200,3,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-				$this->multicell(200,3,"N° de TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
-				$this->multicell(200,3,"BELFIUS - IBAN BE43 0689 0471 6401 - BIC GKCCBEBB",0,'C');
-					
-			}else{
+			
 				$this->multicell(200,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 				
 				$this->multicell(200,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
-			}	
+				
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
 		} else {
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
-			$this->SetXY(10,-15);
-			if(ATF::$codename == "cleodisbe"){
-				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure'],0,'C');
-				$this->multicell(0,3,$this->societe['adresse']." - B-".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays'])),0,'C');
-				$this->multicell(0,3,"N° de TVA ".$this->societe["reference_tva"]." - Tél : ".$this->societe['tel'] ,0,'C');
-				$this->multicell(0,3,"BELFIUS - IBAN BE43 0689 0471 6401 - BIC GKCCBEBB",0,'C');
-					
-			}else{
-
+			$this->SetXY(10,-15);			
+			
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 				
 				$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
-			}			
+						
 			$this->SetX(10);			
 			if (!$this->noPageNo) {
 				$this->ln(-3);
@@ -159,8 +146,6 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
 
-
-
 		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
 		$this->contrat = ATF::commande()->select_row();		
 
@@ -171,7 +156,6 @@ class pdf_cleodis extends pdf {
 
 		
 		$this->unsetHeader();
-		$this->Open();		
 		$this->AddPage();
 
 
@@ -255,18 +239,10 @@ class pdf_cleodis extends pdf {
 		$this->ln(4);
 		$this->setfont('arial','',7);
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
-
-		/*$this->unsetHeader();		
-		$this->AddPage();
-
-		copy(ATF::commande()->filepath($this->contrat["commande.id_commande"],"contratA4Signature"), ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true));
-
-		$pageCount = $this->setSourceFile(ATF::commande()->filepath($this->contrat["commande.id_commande"],"pdf", true) );
 		
-		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);*/
-
-		
+		$this->setleftMargin(130);
+		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->setleftMargin(15);
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
 	}
@@ -2623,7 +2599,7 @@ class pdf_cleodis extends pdf {
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		$this->commandeInit($id);
-		$this->Open();
+		if(!$signature)		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
 		$this->A4 = true;
@@ -2955,13 +2931,26 @@ class pdf_cleodis extends pdf {
 
 
 
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,array("txt"=>$signature?"[SignatureContractant/]":"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
-		);
+		if(!$signature){
+			$cadre = array(
+				"Fait à : "
+				,"Le : "
+				,"Nom : "
+				,"Qualité : "
+				,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
+			);
+		}else{
+			$cadre = array(
+				" ",
+				"[SignatureContractant]",
+				" ",
+				" ",
+				" ",
+				"[/SignatureContractant]"
+			);
+		}
+
+		
 		$y = $this->gety()+2;
 		if ($this->affaire['nature']=="vente") {
 			$t = "L'acheteur";
@@ -2969,13 +2958,27 @@ class pdf_cleodis extends pdf {
 			$t = "Le Locataire";
 		}
 		$this->cadre(20,$y,80,48,$cadre,$t);
-		$cadre = array(
-			"Fait à : "
-			,"Le : "
-			,"Nom : "
-			,"Qualité : "
-			,"Signature et cachet commercial : "
-		);
+		if(!$signature){
+			$cadre = array(
+				"Fait à : "
+				,"Le : "
+				,"Nom : "
+				,"Qualité : "
+				,"Signature et cachet commercial : "
+			);
+		}else{
+			$cadre = array(
+				" ",
+				"[SignatureFournisseur]",
+				" ",
+				" ",
+				" ",
+				"[/SignatureFournisseur]"
+			);
+			
+		}
+
+		
 		if ($this->affaire['nature']=="vente") {
 			$t = "Le Vendeur";
 		} else {
@@ -4071,6 +4074,8 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
 		//Styles utilisés
 
 		$this->colsProduit = array("border"=>1,"size"=>9);
@@ -4392,7 +4397,7 @@ class pdf_cleodis extends pdf {
 				,"N° TVA intra : FR 91 ".$this->societe["siren"]
 				,"RCS ".$this->societe['ville']." ".$this->societe['siren']
 			);
-			$this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
+			$this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
 		}
 		
 		//CADRE Client
@@ -4416,7 +4421,7 @@ class pdf_cleodis extends pdf {
 
 		if(ATF::$codename == "cleodisbe"){ $cadre[] = "TVA : BE 0 ".$this->client["siren"]; }
 		
-		$this->cadre(110,30,80,35,$cadre,$this->client['societe']);
+		$this->cadre(110,35,80,35,$cadre,$this->client['societe']);
 		
 		$this->multicell(0,5,"A l'attention du service comptabilité,");
 		$this->ln(5);
@@ -4425,15 +4430,21 @@ class pdf_cleodis extends pdf {
 
 		//CADRE Date
 		$cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
-		$this->cadre(10,$y,60,10,$cadre);
+		$this->cadre(10,$y,60,13,$cadre);
 
 		//CADRE Client
-		$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL),"align"=>"C"));
-		$this->cadre(75,$y,60,10,$cadre);
+
+		if($this->client['nom_commercial']){
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
+		}else{
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL),"align"=>"C"));
+		}
+		
+		$this->cadre(75,$y,60,13,$cadre);
 
 		//CADRE Facture
 		$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),"align"=>"C"));
-		$this->cadre(140,$y,60,10,$cadre);
+		$this->cadre(140,$y,60,13,$cadre);
 
 		if ($this->lignes) {
 			$head = array("Quantité","Désignation","Montant");
@@ -5832,7 +5843,7 @@ class pdf_cleodis extends pdf {
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
 		$this->cell(0,5,"Numéro du Contrat de Financement ".$s["num_contrat"],0,1);
-		$this->multicell(0,4,"Désignation du Client : ".$this->client["societe"].", ".$this->client["structure"]." au capital de ".$this->client["capital"]." Euros – ".$this->client["siren"]." R.C.S. LILLE.",0);
+		$this->multicell(0,4,"Désignation du Client : ".$this->client["societe"].", ".$this->client["structure"]." au capital de ".$this->client["capital"]." Euros – ".$this->client["siren"]." R.C.S. ".$this->client["ville_rcs"],0);
 		
 
 		$siege = $this->client["adresse_siege_social"];
@@ -5891,7 +5902,10 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
-		$date_revente = date("01 / m / Y", strtotime("+1 month", strtotime($this->commande["date_evolution"])));
+
+
+		$date_revente = date("Y-m-01", strtotime($this->commande["date_evolution"]));		
+		$date_revente = date("01 / m / Y", strtotime("+1 month", strtotime($date_revente)));		
 
 		$this->cell(0,4,"Date de la revente : ".$date_revente,0,1);
 		$this->cell(0,4,"Prix de Revente 15 euros H.T. à majorer de la TVA en vigueur.",0,1);
@@ -7723,6 +7737,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 	}
 
+
+	
+
 	/** Génère les annexes des PDF
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
@@ -7746,198 +7763,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 	}
 
 	/** CGL d'un PDF d'un contrat en A3
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @date 12-09-2016
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @date 18-11-2016
 	*/
-	public function conditionsGeneralesDeLocationA3()  {
-		
-		$this->unsetHeader();
+	public function conditionsGeneralesDeLocationA3()  {		
+		$this->unsetHeader();		
 		$this->AddPage();
-		$this->SetLeftMargin(10);
-		
-		//page gauche
-		$this->setfont('arial','BI',8);		
-		$this->sety(5);
-		$this->multicell(190,5,"CONDITIONS GENERALES DE LOCATION",1,'C');
-		
-		$this->SetLeftMargin(10);
-		$this->article(15,15,'1','OBJET & DEFINITIONS',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);		
-		$this->multicell(55,2,"Les présentes conditions générales visent à régler les relations contractuelles entre Cleodis, ci-après dénommé le Bailleur, et le client, ci-après dénommé le Locataire.",0,'L');
-		$this->multicell(60,2,"Les termes suivants, au sens qui leur est donnés, sont par ailleurs, utilisés dans ces conditions générales: "); 		
-		$this->multicell(60,2," Fournisseur: entité juridique autre que CLEODIS désigné par le Locataire pour fournir les Equipements et/ou réaliser certains services associés à la location desdits équipements"); 		
-		$this->multicell(60,2,"Cessionnaire: établissement financier ou de crédit agréé en qualité de société financière ou société de location."); 		
-		$this->multicell(60,2,"Equipements: équipements informatiques, bureautiques et de télécommunications y compris l’ensemble des droits d’utilisations des logiciels d’exploitation et d’application qui y sont associés"); 		
-		$this->multicell(60,2,"Redevance de mise à disposition: redevance due pour la location du matériel en cas de livraison avant la date à laquelle la période initiale de location prend effet ou en cas de livraisons partielles, et jusqu’à la date d’effet de la période initiale de location.");   		
-		$this->multicell(60,2,"Date d’effet de la période initiale de location: le premier jour du mois ou trimestre civil suivant la livraison de la totalité des Equipements"); 		
-		$this->multicell(60,2,"Fournisseur : fournisseurs, constructeurs et éditeurs qui participent à la fabrication, l’assemblage, la livraison et l’installation des Equipements et de leurs composants"); 		
-		$this->multicell(60,2,"Loyer: contrepartie pécuniaire de la mise à disposition des Equipements par le Bailleur, dus à partir du premier jour du mois ou trimestre civil suivant la location.");
-		
 
-
-		$this->article(15,82,'2','OBJET DU CONTRAT & VALIDITE',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"2.1 L’objet du présent contrat consiste en la location d’Equipements à laquelle des Services sont associés, l’ensemble étant détaillé dans les Conditions Particulières."); 		
-		$this->multicell(60,2,"2.2 La signature du Contrat constitue un engagement ferme et définitif de la part du Locataire et annule et remplace tous accords antérieurs, écrits et verbaux, se rapportant aux dits Equipements."); 		
-		$this->multicell(60,2,"2.3 Les parties reconnaissent que les Equipements loués ayant un rapport direct avec l’activité professionnelle du Locataire, le code de la consommation ne s’applique pas."); 		
-		$this->multicell(60,2,"2.4 Le Loueur dispose d’un mois à compter de la réception par lui du présent contrat pour signifier son accord au Locataire. Passé ce délai, le Locataire pourra se rétracter sans aucune indemnité due de part et d’autre"); 		
-		$this->multicell(60,2,"2.5 Au cas où le Loueur prendrait connaissance, après la conclusion du contrat mais avant la livraison des Equipements, de faits concernant la solvabilité du Locataire pouvant laisser craindre de sa part une incapacité à exécuter tout ou partie de ses obligations contractuelles, le Contrat serait alors résolu de plein droit à l’initiative du Loueur sans qu’aucune indemnité ne soit due de part et d’autre."); 		
-		$this->multicell(60,2,"2.6 Toute modification des clauses et conditions du présent contrat sera réputée nulle et non avenue sauf à résulter d’un avenant écrit et signé par CLEODIS et validé par le Cessionnaire");
-		
-		$this->article(15,144,'3','CHOIX DES EQUIPEMENTS',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"3.1 Le Locataire reconnaît avoir choisi librement, en toute indépendance et sous sa seule responsabilité, les Equipements ainsi que les Fournisseurs. Il reconnaît avoir pris connaissance des spécifications techniques et des modalités d’exploitation préalablement à la location. "); 		
-		$this->multicell(60,2,"3.2Le Locataire reconnaît avoir été mis en garde par le Bailleur du fait que certains Equipements peuvent présenter des disfonctionnements. Il incombe au Locataire de vérifier auprès de ses Fournisseurs la qualité de ses Equipements, ycompris lorsque ceuxci sont incorporés dans un système informatique préexistant."); 		
-		$this->multicell(60,2,"3.3 Les logiciels sont livrés selon les modalités directement convenues par le Locataire avec l'éditeur de logiciel(s). Le Locataire reconnaît avoir régularisé avec l'éditeur, en tant que mandataire du Bailleur, la licence d'utilisation des logiciels et faire son affaire directement avec l’éditeur du respect des clauses y figurant. La présente location est conclue «intuitu personae» avec le Locataire. Par conséquent, Les licences ne pourront à aucun moment être cédées, ou faire l'objet d'une sous-licence au profit d'un tiers, sans accord préalable du Bailleur. ");
-		
-		$this->article(15,194,'4','LIVRAISON DES EQUIPEMENTS',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"4.1Le Locataire prendra livraison des Equipements sous son unique responsabilité à ses frais et risques, sans que la présence du Bailleur ne soit requise. Immédiatement après la réception des Equipements, le Locataire remet au Bailleur un procès-verbal de livraison selon le modèle fourni par le Bailleur signé constatant leur conformité et leur bon fonctionnement. Il s’interdit de refuser les Equipements pour tout motif autre qu’une non-conformité ou un mauvais fonctionnement, auxquels cas, il se porte garant de toutes les condamnations qui pourraient être prononcées contre le Bailleur à raison de tout recours du Fournisseur. S’il y a lieu, il devra notifier au transporteur toutes les réserves utiles, les confirmer dans les délais légaux et en informer immédiatement le Bailleur par lettre recommandée avec accusé de réception."); 		 		 		
-		 		
-		$this->multicell(60,2,"4.2 Le procès verbal de livraison vaut autorisation de paiement du Bailleur au Fournisseur. Si le Locataire transmet ce procès verbal sans avoir reçu les Equipements ou sans vérifier leur conformité et l’absence de vices ou défauts, il engage sa responsabilité et devra au Bailleur réparation du préjudice subi par ce dernier"); 		
-			
-		
-
-		$this->multicell(60,2,"4.3 Le Locataire dispose d’un délai de six mois à partir de la signature du Contrat pour faire procéder à la livraison des Equipements. Passé ce délai, le Contrat sera résilié aux torts du Locataire et ce dernier sera redevable d’une indemnité égale à la totalité des sommes réglées par le Bailleur au titre du Contrat augmentée d’une pénalité équivalente à douze loyers");
-			
-		$this->setxy(75,15); 		
-		$this->setleftmargin(75);
-
-		$this->article(77,15,'5','RESPONSABILITE',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"5.1 Le Bailleur n’est ni tenu à une obligation de résultat, ni responsable d’une quelconque inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des Equipements entre eux. Il en est également ainsi si des mises au point sont rendues nécessaires pour leur fonctionnement ou si des évolutions techniques modifient leur compatibilité."); 		
-		$this->multicell(60,2,"5.2 Le Bailleur n’est, en aucun cas, responsable pour des dommages (matériels ou financiers) causés par ou aux Equipements qui résulteraient d’un vice de fabrication ou d’un dysfonctionnement de ceux-ci, ni à un élément tiers aux équipements en raison de la mise à disposition de ceux-ci. Le Locataire reconnaît que la responsabilité du Bailleur ne peut être engagée à quelque titre que ce soit et pour tout dommage causé par ou aux Equipements et résultant d’un vice de construction ou pour tout disfonctionnement des Equipements ainsi qu’à raison de surcoûts ou dommages consécutifs à ces disfonctionnements");
-		$this->multicell(60,2,"5.3 Le Locataire renonce à tout recours contre le Bailleur en cas de défaillance ou de vices cachés affectant les Equipements ou survenant au cours de l’exécution des prestations. et garanties."); 		
-		$this->multicell(60,2,"5.4 Le Bailleur transmet au Locataire l’ensemble des recours possibles contre le Fournisseur, y compris l’action en résolution de la vente pour vices rédhibitoires. Si la résolution judiciaire du contrat de vente des Equipements entre le Fournisseur et le Bailleur est prononcée, le Contrat existant entre le Bailleur et le Locataire est résilié à la date du prononcé du jugement. Dans ce cas, le Locataire s’engage alors à restitue restituer les Equipements à ses frais au Fournisseur et se porte garant solidaire de ce dernier pour le remboursement des sommes versées par le Bailleur");
-		
-
-		$this->article(77,90,'6',"DATE D’EFFET & DUREE DE \nLOCATION",7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"6.1 La période initiale de location prévue aux Conditions Particulières prend effet au plus tard le premier jour du mois ou du trimestre civil qui suit celui au cours duquel s’effectue la livraison de la totalité des Equipements auprès du Locataire. Cette disposition ne fait pas obstacle à l’application de l’Article 7.4 alinéa 2.dans les locaux désignés par le Locataire constatée par le procès verbal de livraison. Cette disposition ne fait pas obstacle à l’application de l’article7.4 alinéa 2. "); 		
-		$this->multicell(60,2,"6.2 La durée de la location est fixée par les Conditions Particulières, en nombre entier de mois ou de trimestres., ceci sans préjudices de l’application des dispositions de l’art.7"); 		
-		$this->multicell(60,2,"6.3 Au delà de la durée initiale prévue aux Conditions Particulières, le contrat est prolongé par tacite reconduction par périodes d’un an aux mêmes conditions et sur la base du dernier loyer, sauf pour l’une des parties à notifier à l’autre par lettre recommandée avec accusé de réception, en respectant un préavis de six mois, son intention de ne pas reconduire le contrat.");
-
-			
-		$this->article(77,140,'7','REDEVANCES',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"7.1 Le montant des loyers est fixé dans les Conditions Particulières. Si le prix des Equipements à payer au Fournisseur ou le taux de référence venait à augmenterentre la date de signature et la date de livraison, le montant du Loyer serait ajusté proportionnellement. Le taux de référence est la moyenne des derniers taux connus et publiés au jour du contrat de l'EURIBOR 12 mois et du TEC 5. (EURIBOR 12 mois : taux interbancaire offert en euro publié chaque jour par la Fédération Bancaire de l'Union Européenne et TEC 5 : Taux des échéances constantes à 5 ans, publié chaque jour par la Caisse des Dépôts et Consignations)"); 		
-		$this->multicell(60,2,"7.2 Les modalités de règlement des Loyers et Redevances de mise à disposition sont précisées aux Conditions Particulières"); 		
-		$this->multicell(60,2,"7.3 Les Loyers et Redevances de mise à disposition sont portables et non quérables."); 		
-		$this->multicell(60,2,"7.4 En cas de livraison partielle, une Redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur base de la valeur des loyers et proportionnellement au prix d’achat figurant sur le devis du Fournisseur au jour de la signature du contrat. Si la prise d’effet telle que définie à l’article 6 intervient après le premier jour du mois ou du trimestre civils, le Locataire payera au Bailleur, pour lesdits mois ou trimestres en cours, une Redevance de mise à disposition calculée prorata temporisa de la durée de mise à disposition mensuelle ou trimestrielle (au trentième ou au nonantième, selon les cas) sur la base du montant du loyer"); 		
-		$this->multicell(60,2,"7.5 Le premier loyer est exigible à la date prévue à l’article 6.1; il ne doit pas être confondu avec les redevances de mise à disposition."); 		
-		$this->multicell(60,2,"7.6 Les prix mentionnés aux Conditions Particulières sont hors taxes. Tous droits et taxes sont à la charge du Locataire et lui sont facturés en sus. Toute modification légale de ces droits et taxes s’applique de plein droit et sans avis préalable."); 		
-		$this->multicell(60,2,"7.7 Les loyers (TVAC) et les Redevances de mise à disposition (TVAC) non payés à leur échéance porteront intérêt au profit du Bailleur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux conventionnelde 1,5% par mois à compter de leur date d’exigibilité."); 		
-		$this->multicell(60,2,"7.8 Le loyer sera payé par domiciliation bancaire. A cette fin, le Locataire remet au Bailleur, au plus tard lors de la remise du procèsverbal de livraison, un ordre de domiciliation. A défaut de remise d’un tel ordre, le bailleur a la faculté de résilier le contrat, sans mise en demeure préalable, aux torts du locataire conformément aux dispositions de l’article 13.6. ");
-		
-		
-		$this->article(77,246,'8',"AUTRES PRESTATIONS –\n MANDATS DONNES  AU BAILLEUR",7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"SSi le Locataire a conclu avec un Fournisseur un contrat de prestations,c le Bailleur peut intervenir pour le compte du Fournisseur prestataire dec services après avoir reçu mandat d’encaisser les redevances duc contrat de prestations en même temps que les loyers. Le Bailleurc procède à la facturation pour le compte du Fournisseur Prestataire etc reverse les redevances audit Prestataire. Le Bailleur n’assumec aucune responsabilité quant à l’exécution des dites prestations. Ilc exécute uniquement un rôle d’intermédiaire et ne garantit donc pasc les obligations des contractants à cet égard entre");
-
-		$this->setxy(140,15);
-		$this->setleftmargin(140);
-
-		$this->multicell(60,2,"eux. Le Locatairec s’interdit de refuser le paiement des loyers du contrat pour quelquec motif que ce soit. La révocation du mandat peut être opérée à toutc moment par le Prestataire Fournisseur oupar lec Bailleur, à sa convenance et notamment en cas de contestationc quelconque ou d’incident de paiement. Toute prestation non prévue dans le contrat de prestations pour lequel le Bailleur a obtenu mandatc d’encaisser les redevances et facturée directement par le Prestatairec n’est pas incluse dans le mandat précité; il en est de même pour toutc droit à remboursement du Locataire en raison de prestations nonc effectuées par le Fournisseur ou de prestations jugées nonc insatisfaisantes. Le Locataire reconnaîtque le contrat de location qu'ilc a signé est indépendant du contrat de prestations ou de service qu'il ac signé en parallèle avec le Prestataire Fournisseur.");
-
-		$this->multicell(60,2,"quelconque ou d’incident de paiement. Toute prestation non prévue dans le contrat de prestations pour lequel le Bailleur a obtenu mandat d’encaisser les redevances et facturée directement par le Prestataire n’est pas incluse dans le mandat précité ; il en est de même pour tout droit à remboursement du Locataire au titre de prestations non effectuées par le Fournisseur ou non satisfaisantes. Le Locataire reconnaît que le contrat de location qu'il a signé est indépendant du contrat de prestations ou de service qu'il a signé avec le Prestataire");
-		
-		$this->article(144,70,'9',"ENTRETIEN – REPARATION –\n EXPLOITATION",7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);		
-		$this->multicell(60,2,"9.1Le Locataire est responsable des Equipements. Il s’engage à les utiliser suivant les spécifications du constructeur, dans un local permettant leur bon fonctionnement. Il s’engage à les entretenir selon les directives du constructeur et leur entretien, ce afin de les maintenir en parfait état pendant toute la durée de la location. Le locataire s’engage à respecter les dispositions légales auxquelles sont soumis l’utilisation et la possession des Equipements. Par dérogation aux articles 1719 et suivants du Code Civil, le Locataire prend à sa charge l’ensemble des frais relatifs à l’utilisation, l’entretien et la réparation des Equipements. Par dérogation aux articles 1722 et 1724 du Code Civil, le Locataire ne pourra prétendre à aucune indemnité, aucun différé ni diminution de loyer s’il devait être privé de la jouissance des Equipements"); 		
-		$this->multicell(60,2,"9.2 Le Locataire s’interdit toute modification des Equipements loués ne peut effectuer aucune modification aux Equipements loués sans accord préalable et par écrit du Bailleur. Lapropriété de toute pièce remplacée, detout accessoire incorporé ou de tout ajoute adjonction dans les Equipements pendant la location sera acquis aussitôt et sans récompense du Bailleur"); 		
-		$this->multicell(60,2,"9.3 Le Bailleur ne pourra être tenu pour responsable en cas de détérioration, de mauvais fonctionnement oude dommages causés par les Equipements. "); 		
-		$this->multicell(60,2,"9.4Le déplacement des Equipements s’effectue exclusivement sous l’entière responsabilité du Locataire, notamment pour les matériels portables. En cas de déménagement, les loyers restent dus quelle qu’en soit la durée");
-		
-		$this->article(144,142,'10',"SOUS LOCATION – CESSION\n – DELEGATION – NANTISSEMENT",7);
-		$this->setfont('arial','I',6);
-		$this->ln(-2);	
-		$this->multicell(60,2,"10.1 Le Locataire ne peut ni sous-louer, ni prêter, ni mettre à disposition de quiconque à quelque titre et sous quelque forme que ce soit, tout ou partie des Equipements sans l’accord préalable et par écrit du Bailleur."); 		
-		$this->multicell(60,2,"10.2 Le Locataire reconnaît que le Bailleur l’a tenu informé de l’éventualité d’une cession, d’un nantissement ou d’une délégation, des Equipements ou des créances, au profit du Cessionnaire de son choix, pour une durée n’excédant pas la période initiale de location. Le Cessionnaire sera alors lié par les termes et conditions du contrat ce que le Locataire accepte dès à présent et sans réserve. En cas d’acceptation par le Cessionnaire, celui-ci se substitue alors à Bailleur sachant que l’obligation du Cessionnaire se limite à laisser au Locataire la libre disposition des Equipements, les autres obligations restant à la charge du Bailleur. Le Locataire a alors l’obligation de payer au Cessionnaire les loyers ainsi que toute somme éventuellement due au titre du contrat, sans pouvoir opposer au Cessionnaire aucune compensation ou exception qu’il pourrait faire valoir vis à vis du Bailleur."); 		
-		$this->multicell(60,2,"10.3 Le Locataire sera informé de la cession par tout moyen et notamment par le libellé de l'avis de prélèvement, de la facture de loyer ou de l’échéancier qui seront émis. Le locataire dispense le Cessionnaire de la signification prévue par l'article 1690 du Code Civil"); 		
-		$this->multicell(60,2,"10.4En cas de cession, le Locataire s’interdit de céder et/ou de se dessaisir de tout ou partie des Equipements, à quelque titre que ce soit et pour quelque motif que ce soit, même au profit du Bailleur, sans l’accord écrit du Cessionnaire. La cession des Equipements et des créances de loyers n’emporte pas novation dunouveau Contrat. Le Bailleur se substituera au Cessionnaire au terme de la période initiale de location. Tout autre accord contractuel intervenu entre le Bailleur et le Locataire n’est pas opposable au Cessionnaire.");
-
-		$this->article(144,226,'11','ASSURANCE – SINISTRES',7);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"Le Locataire est gardien responsable du matériel qu'il détient des Equipements mis à disposition, dès le début de celle-ci et jusqu’à restitution effective au Baill. Dès sa mise à disposition et jusqu'à la restitution effective de celui-ci, le Locataire assume tous les risques de détérioration et de perte, même en casfortuit ou pour raison de force majeure. Il est responsable de tout dommage causé par le matériel en toutes circonstances. Il s'oblige en conséquence de souscrire une assurance couvrant sa responsabilité civile ainsi que celle du Bailleur, et couvrant tous les risques de dommages ou de vol subis par les matériels loués Equipements avec une clause de délégation d'indemnités au profit du Bailleur et une clause de renonciation aux recours contre ce dernier. Le Locataire doit informer sans délai le Bailleur de tout sinistre en précisant les circonstances et ses conséquences. En cas de sinistre total ou de vol, couvert ou non par l'assurance, le contrat est résilié immédiatement et de plein droit. Le Locataire est tenu à indemniser le Bailleurune indemnisation pour la perte du matériel ainsi que pour la rupture anticipée 'interruption prématurée du contrat. Cette indemnité de rupture anticipée est calculée et exigible ");
-
-
-		//page droite
-		$this->setautopagebreak('disabled',10);
-		$this->SetLeftMargin(215);		
-		
-		$this->setfont('arial','BI',8);		
-		$this->sety(5);
-		$this->multicell(190,5,"CONDITIONS GENERALES DE LOCATION",1,'C');		
-		$this->SetLeftMargin(215);
-
-		$this->ln(4);	
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"à la date de résiliation de plein droit. Le montant global de cette indemnisation est égal aux loyers restant à échoir jusqu'à l'issue de la période de location, augmentés de la valeur estimée du matériel détruit ou volé au terme de cette période ou, si l’expertise est nécessaire, de sa valeur déterminée par l’expert au jour du sinistre. Les indemnités octroyées par l’assurance du Locataire sont imputées en premier lieu sur l’indemnisation pour la perte de matériel. Le solde est imputé sur l’indemnité pour raison de rupture anticipée de la location/mise à disposition. En cas de sinistre non couvert en totalité par l’assurance, le Locataire est tenu: -pour un sinistre total, d’assurer le paiement du solde du montant à payer au Bailleur (perte de matériel + indemnité de rupture anticipée) -pour un sinistre partiel, d’assurer la remise en état complète des Equipements à ses frais. d'assurances, éventuellement perçues par le Bailleur s'imputent en premier lieu sur l'indemnisation de la perte du matériel et ensuite sur l'indemnisation de l'interruption prématurée. Pour un sinistre partiel, en cas d'insuffisance de l'indemnité reçue de la compagnie d'assurance, le Locataire est tenu de parfaire la remise en état complète des Equipements à ses frais.");
-	
-		$this->article(215,60,'12','EVOLUTION DES EQUIPEMENTS',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"Le Locataire pourra demander au Bailleur, au cours de la période de validité du présent contrat, la modification des Equipements loués. Les modifications sont fixées par écrit entre parties.; les modifications éventuelles du contrat seront déterminées par l’accord écrit des parties");
-
-		$this->article(215,80,'13','ANNULATION & RESILIATION',7);
-		$this->ln(-2);
-		$this->setfont('arial','I',6);	
-		$this->multicell(60,2,"13.1 En cas d’annulation de son engagement avant l’expiration du délai d’un mois donné au Bailleur pour faire connaître son accord, décrit à l’article 2.4, le Locataire sera redevable envers le Bailleur d’une indemnité d’annulation égale aux six premiers mois de loyer prévus au contrat. L’annulation ne sera reconnue effective qu’à la date de règlement de l’indemnité définie ci-dessus."); 		
-		$this->multicell(60,2,"13.2 Le contrat est résilié de plein droit dès restitution du matériel loué ou en cas de résolution judiciaire du contrat de vente des Equipements entre le Fournisseur et le Bailleur., dans le cas prévu à l’article 5.4."); 		
-		$this->multicell(60,2,"13.3 Le contrat peut également être résilié par le Bailleur, par simple notification par écrit au Locataire, dans les situations suivantes : -non respect, par le Locataire, de l'un des de ses engagements pris au présent contratconformément aux présentes Conditions Générales et notamment le défaut de paiement d'une échéance ou de toute somme due en vertu du contrat et/ou des présentes Conditions Générales, dans les 8 jours qui suivent une mise en demeure transmise par courrier recommandé restée infructueuse;  "); 		
-		$this->multicell(60,2,"-2/ modification de la situation du Locataire et notamment, sans être exhaustif, son décès, la liquidation amiable ou judiciaire, la cessation d'activité, la cession du fonds de commerce, la cession de parts ou d'actions du Locataire, le changement de forme sociale, la faillite ou la réorganisation judiciaire ;"); 		
-		$this->multicell(60,2,"- toute modification de l’Equipement loué et notamment, sans être exhaustif, la détérioration, destruction ou aliénation de celui-ci., notamment par apport en société, fusion, absorption ou scission, ou perte ou diminution des garanties fournies. "); 		
-		$this->multicell(60,2,"13.4 En cas de résiliation du contrat en application de l’article 13.3pour un des motifs précités, le Locataire ou ses ayants droits sont tenus de remettre immédiatement le matériel à disposition du Loueur dans les conditions prévues à l'article 15 des présentes Conditions Générales. traitant de la restitution du matériel."); 		
-		$this->multicell(60,2,"13.5 Dans les cas prévus à l’article 13.3,la résiliation entraîne de plein une indemnité au Bailleur en raison du préjudice subi par la rupture anticipée du contrat. Cette indemnité correspond au montant des loyers restant à échoir jusqu’au terme théorique prévu pour la location des équipements. , au profit du Bailleur, le paiement par le Locataire ou ses ayants droit, en réparation du préjudice subi en sus des loyers impayés et de leurs accessoires, d'une indemnité égale aux loyers restant à échoir au jour de la résiliation.Cette indemnité sera, en outre, majorée d'une somme forfaitaire égale à 10 % de ladite indemnitéde son montant à titre de clause pénale. "); 		
-		$this->multicell(60,2,"13.6. Le contrat peut également être également résilié par le Bailleur dans les hypothèses suivantes:\n -absence deprise de livraison des Equipements dans les six mois de la conclusion du contrat tel que prévu à l’Article 4.4;, tel que prévu par l’article 4.4;\n - absence d’envoi de preuve de notification de la propriété des Equipements au propriétaire des lieux dans lesquels les Equipements sont placés conformément à l’Article 14.5\n 3/ absence de remise de formulaire de domiciliation bancaire (Mandat SEPA) tel que prescrit à l’Article 7.8\n 4/ sinistre total ou vol tel que décrit à l’Article 11\n Dans les cas prévus auxpoints 1à 3, la résiliation entraîne le paiement par le Locataire d’une somme égale à douze mois de loyer");
-		
-		$this->multicell(60,2,"13.7 Si le contrat est résilié pour l'un des motifs visés au présent article 13,En cas de résiliation anticipée pour un des motifs précités, tous les autres contrats qui auraient pu être conclus entre le Locataire, le Bailleur ou l'une des sociétés de son groupe peuvent être résiliés par le Bailleur par simple"); 		 		
-		$this->multicell(60,2,"13.8 Si, après la résiliation, le Locataire conserve pendant un certain temps la jouissance des Equipements, le Locataire doit au Bailleur une Redevance de mise à disposition égale au montant des loyers conventionnelsdont le montant est calculé conformément à l’article 7., sans que le paiement de ces Redevances ne diminue, en aucun cas, l’indemnité prévue pour rupture anticipée du contrat."); 		 		
-		$this->multicell(60,2,"13.9 La faculté de résiliation prévue par le présent article ne prive pas le Bailleur de sa faculté d’exiger l’exécution pure et simple du contrat jusqu’à son terme, conformément à l’article 1184 du Code Civil.");
-		
-		
-		
-		$this->article(215,252,'14','PROPRIETE',7);
-		$this->ln(-2);		
-		$this->setfont('arial','I',6);
-		$this->multicell(60,2,"14.1 Sauf en cas de cession visée à l’article 10.2., Le Bailleur conserve la propriété des Equipements loués sauf en cas d’application de l’article 10.2. Dans tous les cas, le Bailleur conserve les relations commerciales avec leLocataire."); 		
-		$this->multicell(60,2,"14.2 Le Locataire s’engage à apposer sur les Equipements, pour toute la durée de la location, une étiquette de propriété. "); 		
-				 		
-		$this->setxy(290,15); 		
-		$this->setleftmargin(290); 	
-
-		$this->multicell(60,2,"14.3 Le Locataire est tenu d’aviser immédiatement le Bailleur par lettre recommandée avec accusé de réception de toute encas de tentative de saisie ou de toute autre intervention sur les Equipements. Le Locataire doit contrer et devra élever toute protestation concernant les Equipements et prendre toute mesure pour garantir la reconnaissance des droits du Bailleur. Si la saisie a lieu, le Locataire devra faire diligence, à ses frais, pour en obtenir la mainlevée"); 
-
-		$this->multicell(60,2,"14.4 Le Locataire ne bénéficie en vertu du contrat d’aucun droit d’acquisition des Equipements tant pendant qu’ou au terme de la location.");
-		
-		$this->multicell(60,2,"14.5 Lorsque le Locataire n’est pas propriétaire des lieux dans lesquels les Equipements sont placés, il est tenu d’aviser d’informer le propriétaire des lieux avant la livraison du fait des Equipements que ceux-ci s sont la propriété du Bailleur. Le Locataire s’engage à envoyer la preuve de l’information du propriétaire des lieux au Bailleur avant la prise de livraison, et au plus tard dans les deux semaines de la conclusion du Contrat. En absence de la réception de cette preuve, le Bailleur a la faculté de résilier le contrat, conformément aux dispositions de l’article 13. ");
-		
-		$this->article(290,62,'15','RESTITUTION DES EQUIPEMENTS',7);
-		$this->ln(-2);	
-		$this->setfont('arial','I',6);
-		
-		$this->multicell(60,2,"15.1 Le Locataire doit, en fin de période de location, restituer au Bailleur au lieu désigné par celui-ci, les Equipements en parfait état d’entretien et de fonctionnement, les frais de transport et de déconnexion incombant au Locataire. Tous frais éventuels de remise en état sont à la charge du locataire et les Equipements manquants lui sont facturés selon la valeur du marché à la date de la reprise."); 		
-		$this->multicell(60,2,"15.2 Si le Locataire ne restitue pas immédiatement et de son propre chef les Equipements au Bailleur à l’expiration du contrat, il est redevable d’une indemnité égale aux loyers jusqu’à leur restitution effective."); 		 		
-		$this->article(290,92,'16',"ATTRIBUTION DE JURIDICTION ET\nDROIT APPLICABLE",7); 		
-		$this->ln(-2);	 		
-		$this->setfont('arial','I',6); 		
-		$this->multicell(60,2,"16.1 A défaut d’information contradictoire communiquée par écrit, le Bailleur et le Locataire contractent en qualité de commerçants. A ce titre, en cas de litige, seul le attribuent compétence, même en cas de pluralité de défendeurs ou d'appel en garantie, au Tribunal de Commerce du siège social du Bailleur ou, en cas de cession, du Cessionnaire, est compétent");
-		$this->multicell(55,2,"16.2 La loi belge est applicable à tout litige né du présent contrat ou de ses suites.");
-
-		$this->sety(270);
-		$this->setleftmargin(15);
-		$this->setfont('arial','BI',8);
-		$this->multicell(0,3,"CGL CLEODIS.BE V 2016-01",0,"R");
-		$this->setAutoPageBreak(true);
+		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA3.pdf");
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, 5, 5, 400, 0, true);
 
 	}
 
@@ -8821,7 +8656,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 		$this->addpage();
 
-		
+		$this->setfont('arial','',8);
+		$this->ln(8);
+		$this->setLeftMargin(110);
+		$this->cell(0,5,"N° TVA : ".$this->client["reference_tva"]);
+		$this->setLeftMargin(15);
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
 			$t = 'FACTURE';
@@ -9026,7 +8865,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 	public function datamandatSepa($id,$s){
 		
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); } 
+		$this->societe = ATF::societe()->select(4225);
 
 
 
@@ -9036,33 +8875,32 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		// $this->setHeader();
+        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
 
-		$this->title("MANDAT DE PRELEVEMENT SEPA");
+		$this->setFont("arial","B","14");
+		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
+		$this->ln(15);
 
+		$this->setfont('arial',"B",8);
+		$this->setLeftMargin(50);
+		$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
+		$this->setLeftMargin(10);
+		$this->ln(10);
 
-		$this->setfont('arial',"B",11);
-		$this->setx(40);
-		$this->multicell(130,10, "  REFERENCE UNIQUE DU MANDAT : ",1);
+		$this->setfont('arial',"I",7);
+		$text = "En signant ce mandat, vous autorisez : \n\n - le créancier à envoyer des encaissements à votre banque afin de débiter votre compte.\n - votre banque à débuter un compte selon les instructions reçues du créancier.\n\nCe mandat est destiné uniquement aux transactions business-to-business. Vous ne bénéficiez pas d'un droit à remboursement par votre banque après le débit de votre compte, mais jusqu'à la date d'échéance vous avez le droit de demander à votre banque de ne pas débiter votre compte.\n\nVotre banque vous fournira volontiers plus d'informations concernant vos droits et obligations.\n\n";	
 
-		$this->ln(5);
-		$this->setfont('arial',"I",9);
-		$this->multicell(0,6,"En signant ce mandat, vous autorisez : ");
-		$this->multicell(0,6,"- le créancier à envoyer des encaissements à votre banque afin de débiter votre compte.");
-		$this->multicell(0,6,"- votre banque à débuter un compte selon les instructions reçues du créancier.");
+		
+		$this->multicell(0,3, $text ,0, "J");
 
-		$this->ln(5);
+		$this->setFontDecoration('B');
+		$this->cell(0,5,"Les champs marqués sont obligatoires (*) - Ne compléter que les champs incorrects ou manquants." ,0, 1);
+		$this->unsetFontDecoration('B');
+		
 
-		$this->multicell(0,6,"Ce mandat est destiné uniquement aux transactions business-to-business. Vous ne bénéficiez pas d'un droit à remboursement par votre banque après le débit de votre compte, mais jusqu'à la date d'échéance vous avez le droit de demander à votre banque de ne pas débiter votre compte.");
-
-		$this->multicell(0,6,"Votre banque vous fournira volontiers plus d'informations concernant vos droits et obligations.");
-
-		$this->setfont('arial',"BI",9);
-		$this->multicell(0,6,"Les champs marqués sont obligatoires (*) - Ne compléter que les champs incorrects ou manquants.");
-
-
+		
 
 		$point = ".....................................................................................................";
 
@@ -9070,56 +8908,40 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->Ln(5);
 		$this->multicell(0,5, "1- Données débiteur" ,1, "C");
 		$this->Ln(2);
-		$this->cell(85,5, "NOM PRENOM / RAISON SOCIALE *");
+		$this->cell(60,5, "NOM PRENOM / RAISON SOCIALE*");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $this->client["structure"]."  ".$this->client["societe"],0,1);
+		$this->cell(0,5, ($this->client["structure"]?$this->client["structure"]."  ":"").$this->client["societe"],0,1);
 		$this->unsetFontDecoration('B');
-		$this->cell(85,5, "ADRESSE *");
+		$this->cell(60,5, "ADRESSE*");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $this->client["adresse"]."  ".$this->client["adresse1"]."  ".$this->client["adresse2"],0,1);
+		$this->cell(0,5, $this->client["adresse"]."  ".$this->client["adresse1"]."  ".$this->client["adresse2"] ,0, 1);
 		$this->unsetFontDecoration('B');
-		$this->cell(85,5, "CP - VILLE *");
+		$this->cell(60,5, "CP - VILLE* ");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $this->client["cp"]."  ".$this->client["ville"],0,1);
+		$this->cell(0,5, $this->client["cp"]." - ".$this->client["ville"] ,0, 1);		
 		$this->unsetFontDecoration('B');
-
-		$this->cell(85,5, "PAYS *");
+		$this->cell(60,5, "PAYS*");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")),0,1);
+		$this->cell(0,5,strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0,1);
 		$this->unsetFontDecoration('B');
-
-		if ($this->client["email"]) {
-			$this->cell(85,5, "E-mail");
-			$this->setFontDecoration('B');
-			$this->cell(0,5, $this->client["email"],0,1);
-			$this->unsetFontDecoration('B');
-		}
-
-		$this->cell(85,5, "N° d'entreprise");
+		$this->cell(60,5, "E-mail");
 		$this->setFontDecoration('B');
-		$this->cell(0,5, $point,0,1);
+		$this->cell(0,5,$this->client["email"] ,0, 1);
+		$this->unsetFontDecoration('B');
+		$this->cell(60,5, "N° d'entreprise");
+		$this->setFontDecoration('B');
+		$this->cell(0,5,$point ,0, 1);
 		$this->unsetFontDecoration('B');
 		
 
 		$this->Ln(5);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
 		$this->Ln(2);
-
-		$this->cell(85,5, "COORDONNEES DE VOTRE COMPTE- IBAN *");
-		$this->setFontDecoration('B');
-		$this->cell(0,5, $point,0,1);
-		$this->unsetFontDecoration('B');
-
-		$this->multicell(80,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE *");
-		$this->ln(-10);
-		$this->setFontDecoration('B');
-		$this->setx(95);
-		$this->cell(0,5, $point,0,1);
-		$this->unsetFontDecoration('B');
-
+		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
+		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
 		
 
-		$this->Ln(10);
+		$this->Ln(5);
 		$this->multicell(0,5, "3 - Information Créancier" ,1, "C");
 		$this->Ln(5);
 	
@@ -9128,8 +8950,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial',"B",8);
 
 		$this->Ln(-25);
-		$this->setX(95);
-		$this->multicell(90,5 , "Ou pour tout établissement financier ou loueur secondaire : ".$point."\n".$point."\n".$point."\n".$point);
+		$this->setX(90);
+		$this->multicell(90,5 , "Ou pour tout établissement financier ou loueur secondaire : 
+			".$point."
+			".$point."
+			".$point."
+			".$point);
 
 		$this->setfont('arial',"",8);
 		$this->Ln(5);
@@ -9156,9 +8982,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->Cell(10,5, "Signature (s)*" ,0);
 		$this->setX(110);
 		$this->Cell(60,30, "" ,1,1);
-
-		$this->Ln(10);
-		$this->setfont('arial',"",12); 
+		
 		
 	}
 
@@ -9772,7 +9596,7 @@ class pdf_cap extends pdf_cleodis {
 
 	public function mandat($id,&$s) {
 		$id = ATF::mandat()->decryptId($id);
-		$this->setFooter();
+		
 		$this->unsetHeader();
 		$this->A3 = false;
 		$this->A4 = true;
@@ -9792,7 +9616,7 @@ class pdf_cap extends pdf_cleodis {
 	}
 
 
-	public function mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne){
+	public function mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne, $signature= false){
 		
 		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
 		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
@@ -9819,7 +9643,7 @@ class pdf_cap extends pdf_cleodis {
 		if($mandat["id_representant"]){ $representant_client = ATF::contact()->select($mandat["id_representant"]);	}
 
 		//Page 1
-		$this->Addpage();
+		$this->Addpage();		
 		$this->enteteCedre();
 
 		$this->setFont('arial','U',10);
@@ -9921,16 +9745,16 @@ class pdf_cap extends pdf_cleodis {
 		$this->setFillColor(255,255,255);
 
 		$this->cell(60,6,"Vos coordonnées IBAN ",1,0,"L",1);
-		$this->cell(120,6,"",1,1,"L",1);
+		$this->cell(120,6,$infos_client["IBAN"],1,1,"L",1);
 
 		$this->cell(60,6,"Vos coordonnées BIC / SWIFT",1,0,"L",1);
-		$this->cell(120,6,"",1,1,"L",1);
+		$this->cell(120,6,$infos_client["BIC"],1,1,"L",1);
 
 		$this->cell(60,6,"Nom de la Banque",1,0,"L",1);
-		$this->cell(120,6,"",1,1,"L",1);
+		$this->cell(120,6,$infos_client["nom_banque"],1,1,"L",1);
 
 		$this->cell(60,6,"Adresse de la Banque",1,0,"L",1);
-		$this->cell(120,6,"",1,1,"L",1);
+		$this->cell(120,6,$infos_client["ville_banque"],1,1,"L",1);
 
 
 		$this->ln(5);
@@ -9944,17 +9768,23 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(50,6,"Taux %",1,1,"C",1);
 
 		$this->cell(80,6,"Clause Pénale",1,0,"L",1);
-		$this->cell(50,6,"Minimum : ".$mandant["clause_penale"]." €",1,0,"C",1);
-		$this->cell(50,6,$mandant["clause_penale_percentage"]."%",1,1,"R",1);
+		$this->cell(50,6,"Minimum : ".$mandat["clause_penale"]." €",1,0,"C",1);
+		$this->cell(50,6,$mandat["clause_penale_percentage"]."%",1,1,"R",1);
 
 		$this->cell(80,6,"Intérêts de retard",1,0,"L",1);
-		$this->cell(50,6,"-",1,0,"C",1);
-		$this->cell(50,6,"%",1,1,"R",1);
+		$this->setFillColor(160,160,160);
+		$this->cell(50,6,"",1,0,"C",1);
+		$this->setFillColor(255,255,255);
+		$this->cell(50,6,$mandat["interet_retard"]."%",1,1,"R",1);
 
-		$this->cell(80,6,"Indemnités (article 1153-4 du Code civil)",1,0,"L",1);
+		$this->cell(80,6,"Indemnités (article 1153-4 du Code civil)",1,0,"L",1);		
 		$this->cell(50,6,$mandat["indemnite_retard"]." €",1,0,"C",1);
-		$this->cell(50,6,"-",1,1,"C",1);
+		$this->setFillColor(160,160,160);
+		$this->cell(50,6,"",1,1,"C",1);
+		$this->setFillColor(255,255,255);
 
+		$this->SetXY(10,274);
+		$this->Cell(0,2,$this->PageNo(),0,0,'R');
 
 		//Page 2
 		$this->Addpage();
@@ -9994,12 +9824,15 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(0,4,"Cette mission s’intègre dans la continuité du traitement réalisé sur la phase 1. Par exception, elle peut être déclenchée directement selon les situations prévues avec l’adhérent CEDRE.",0,"L");
 		$this->ln(5);
 		$this->setFont('arial','I',10);
-		$this->multicell(0,4,"Le client bénéficiera dès l‘ouverture de compte d’un accès privilégié au site www.groupe-cap.com et recevra ses identifiants pour accéder au site du prestataire. Par le biais du site, le client pourra :",0,"L");
+		$this->multicell(0,4,"Le client bénéficiera dès l'ouverture de compte d’un accès privilégié au site www.groupe-cap.com et recevra ses identifiants pour accéder au site du prestataire. Par le biais du site, le client pourra :",0,"L");
 
 		$this->ln(5);
 		$this->setFont('arial','',10);
 		$this->setLeftMargin(25);
 		$this->multicell(0,4," -   Transmettre ses dossiers en recouvrement\n -   Suivre l’état d’avancement des créances confiées\n -   Envoyer des messages au gestionnaire en charge du recouvrement de ses créances\n -   Extraire des états statistiques",0,"L");
+
+		$this->SetXY(10,274);
+		$this->Cell(0,2,$this->PageNo(),0,0,'R');
 
 		//Page 3
 		$this->Addpage();
@@ -10100,12 +9933,14 @@ class pdf_cap extends pdf_cleodis {
 
 			$this->ln(2);
 		}
+		$this->SetXY(10,274);
+		$this->Cell(0,2,$this->PageNo(),0,0,'R');
 		
 
-		$this->cg_cedre();
+		$this->cg_cedre($signature);
 	}	
 
-	public function cg_cedre(){
+	public function cg_cedre($signature){
 
 		//Page 4
 		$this->Addpage();
@@ -10125,26 +9960,25 @@ class pdf_cap extends pdf_cleodis {
 
 		$cg = array(
 				"CHAMP D’APPLICATION"
-					=>array("Les présentes Conditions générales s’appliquent au mandat de recouvrement con􏰁é par le Client au Prestataire (ci-après défini), en vertu des Conditions particulières du mandat de recouvrement de créances pour le compte d’autrui, de ses annexes tarifaires et l’annexe « Cahier des charges » quand elle existe. Ces documents forment un ensemble indivisible et constituent l’intégralité des conditions réglementant le recouvrement par le Prestataire des créances confiées par le Client. Lorsqu’un Cahier des charges est constitué, celui-ci contient des précisions sur les modalités opérationnelles, telles que le format de communication entre les parties, des process particuliers, des demandes de reportings spécifiques ou encore la restitution des sommes recouvrées, sans que cette liste ne soit limitative. le Client reconnaît avoir pris connaissance préalablement à la signature de la présente convention, des documents précités et les accepter sans réserve."),
+					=>array("Les présentes Conditions générales s’appliquent au mandat de recouvrement confié par le Client au Prestataire (ci-après défini), en vertu des Conditions particulières du mandat de recouvrement de créances pour le compte d’autrui, de ses annexes tarifaires et l’annexe « Cahier des charges » quand elle existe. Ces documents forment un ensemble indivisible et constituent l’intégralité des conditions réglementant le recouvrement par le Prestataire des créances confiées par le Client. Lorsqu’un Cahier des charges est constitué, celui-ci contient des précisions sur les modalités opérationnelles, telles que le format de communication entre les parties, des process particuliers, des demandes de reportings spécifiques ou encore la restitution des sommes recouvrées, sans que cette liste ne soit limitative. le Client reconnaît avoir pris connaissance préalablement à la signature de la présente convention, des documents précités et les accepter sans réserve."),
 				"MANDAT DE RECOUVREMENT"
-					=>array("Le Client donne mandat au Prestataire à l’effet de recouvrer ses créances échues, en son nom et pour son compte, en principal, intérêts et autres accessoires, sur ses propres clients débiteurs, selon le type de traitement correspondant à la prestation choisie. le Client transmet un panel de créances au Prestataire. Ses créances sont certaines, liquides et exigibles, et le Client en atteste la sincérité et l’exactitude. Le Client atteste le bienfondé de sa réclamation par l’absence de règlement, le retard abusif de règlement ou la passivité de ses débiteurs malgré la réalisation de relances internes, et donne mandat exprès au Prestataire de recevoir pour son compte les fonds à recouvrer auprès de ses débiteurs. En ce sens, le Client est fondé à faire réclamer par le Prestataire, en complément des factures initiales, les pénalités conventionnelles et les dommages & intérêts, visant à indemniser le préjudice, tant moratoires que compensatoires. A ce titre, le Client atteste que les démarches entreprises aux fins de recouvrer ses créances impactent financièrement son compte d’exploitation. Le Client atteste également que les débiteurs relancés ont été régulièrement informés de l’existence d’une facture, de sorte qu’ils ne peuvent en ignorer l’existence. le Client précise dans les Conditions Particulières le montant du préjudice indépendant du retard, qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, distinct des intérêts moratoires, ce afin que le Prestataire puisse les exposer au débiteur.","A cet effet, le Prestataire certifie notamment : ",
-						"- Avoir souscrit un contrat d’assurance la garantissant contre les conséquences pécuniaires de sa responsabilité professionnelle auprès de la compagnie AXA, sous le n° 160131330. ","- Etre titulaire d’un compte décret visés à l’article 18-1 de la loi du 24 janvier 1984 susvisée, ou l’une des institutions ou l’un des établissements visés à l’article 8 de la même loi pour l’encaissement des fonds débiteurs. Il est rappelé que ce compte est dédié au strict encaissement des fonds débiteur, et ne peut faire l’objet d’aucune saisie conservatoire ou autre procédure visant la saisie attribution. ","- Justifier des conditions requises précitées assurée par déclaration écrite des intéressés, remise ou adressée, avant tout exercice, au Procureur de la république près le Tribunal de Grande Instance dans le ressort duquel la société a le siège de son activité."),
+					=>array("Le Client donne mandat au Prestataire à l’effet de recouvrer ses créances échues, en son nom et pour son compte, en principal, intérêts et autres accessoires, sur ses propres clients débiteurs, selon le type de traitement correspondant à la prestation choisie. le Client transmet un panel de créances au Prestataire. Ses créances sont certaines, liquides et exigibles, et le Client en atteste la sincérité et l’exactitude. Le Client atteste le bienfondé de sa réclamation par l’absence de règlement, le retard abusif de règlement ou la passivité de ses débiteurs malgré la réalisation de relances internes, et donne mandat exprès au Prestataire de recevoir pour son compte les fonds à recouvrer auprès de ses débiteurs. En ce sens, le Client est fondé à faire réclamer par le Prestataire, en complément des factures initiales, les pénalités conventionnelles et les dommages & intérêts, visant à indemniser le préjudice, tant moratoires que compensatoires. A ce titre, le Client atteste que les démarches entreprises aux fins de recouvrer ses créances impactent financièrement son compte d’exploitation. Le Client atteste également que les débiteurs relancés ont été régulièrement informés de l’existence d’une facture, de sorte qu’ils ne peuvent en ignorer l’existence. le Client précise dans les Conditions Particulières le montant du préjudice indépendant du retard, qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, distinct des intérêts moratoires, ce afin que le Prestataire puisse les exposer au débiteur.","A cet effet, le Prestataire certifie notamment : "," - voir souscrit un contrat d’assurance la garantissant contre les conséquences pécuniaires de sa responsabilité professionnelle auprès de la compagnie AXA, sous le n° 160131330.","- Etre titulaire d’un compte décret visés à l’article 18-1 de la loi du 24 janvier 1984 susvisée, ou l’une des institutions ou l’un des établissements visés à l’article 8 de la même loi pour l’encaissement des fonds débiteurs. Il est rappelé que ce compte est dédié au strict encaissement des fonds débiteur, et ne peut faire l’objet d’aucune saisie conservatoire ou autre procédure visant la saisie attribution.","- Justifier des conditions requises précitées assurée par déclaration écrite des intéressés, remise ou adressée, avant tout exercice, au Procureur de la république près le Tribunal de Grande Instance dans le ressort duquel la société a le siège de son activité."),
 				"MODALITES DE GESTION"
-					=>array("Le Prestataire s’engage à mettre en œuvre avec diligence les moyens dont elle dispose, et s’efforce d’obtenir des débiteurs dont les dossiers lui sont confiés, l’apurement de leurs dettes.","Le Client autorise expressément le Prestataire à faire intervenir dans le cadre des procédures engagées ses filiales habilitées à exécuter l’objet des présentes, et dispense le Prestataire de l’en informer. De la même manière, le Prestataire pourra sous-traiter tout ou partie des prestations confiées par le Client.","Pour chaque dossier transmis, le Prestataire adressera au Client un accusé de réception, présenté sous forme de listing lorsque plusieurs dossiers sont contenus dans le même fichier d’intégration. le Prestataire emploiera les moyens qui lui apparaissent comme étant les plus adaptés en fonction des éléments recueillis sur le(s) débiteur(s), et, de manière générale sur la stratégie de recouvrement à employer, qu’ils soient dans la réalisation de relances par courriers, en envois simples ou recommandés, courriels ou autres supports de communication, par des actions de télé recouvrement ou de visites domiciliaires.","Dans ce contexte, le Prestataire s’engage à :  ","- Réaliser les prestations conformément aux présentes, aux Conditions particulières et ses annexes, à l’éventuel Cahier des charges sur lequel les Parties se sont entendues, dans le respect des règles de l’art applicables et ce, avec le soin et la diligence requis ;"," - Réaliser les prestations en conformité avec les droits au respect de la vie privée des débiteurs et notamment des dispositions de l’article 9 du code civil ;"," - Collaborer avec le Client selon les termes de l’article 6 ; ","- Mettre en œuvre tous les moyens nécessaires pour assurer la confidentialité des dossiers de créances et l’intégrité des échanges entre le Client et le Prestataire ; ","- Informer chaque débiteur de l’existence de son mandat par courrier ;","- Se présenter en son propre nom lors des conversations téléphoniques avec les débiteurs ; en cas de demande spécifique de la part du Client, le Prestataire pourra intervenir en marque blanche ; ","- Respecter l’image du Client, les règles de déontologie et éthique de la profession.","Sauf demande expresse de la part du Client, les dossiers transmis par le Client dans le cadre de la présente convention feront l’objet d’un traite- ment précontentieux, préalable à toute action judiciaire éventuelle dont l’objectif prioritaire sera la recherche d’une solution amiable dans les meilleurs délais. Sauf stipulation particulière, toute procédure judiciaire à engager fera l’objet d’une validation préalable par le Client. Le recouvrement judiciaire donnera lieu à la signature d’un « pouvoir spécial », selon les articles 827 et 828 du NCPC.","Au jour de la signature du contrat, chacune des parties désigne, au sein de son personnel, les correspondants qualifiés chargés du suivi des prestations, notamment pour coordonner les modalités de transmission des dossiers et le suivi des processus de recouvrement, les délais de traite- ment, les supports d’information entre les Parties. L’annexe « Cahier des charges », lorsqu’elle est constituée, peut permettre de définir précisé- ment les modalités d’échange et de communication entre les parties."),
+					=>array("Le Prestataire s’engage à mettre en oeuvre avec diligence les moyens dont elle dispose, et s’efforce d’obtenir des débiteurs dont les dossiers lui sont confiés, l’apurement de leurs dettes.","Le Client autorise expressément le Prestataire à faire intervenir dans le cadre des procédures engagées ses filiales habilitées à exécuter l’objet des présentes, et dispense le Prestataire de l’en informer. De la même manière, le Prestataire pourra sous-traiter tout ou partie des prestations confiées par le Client.","Pour chaque dossier transmis, le Prestataire adressera au Client un accusé de réception, présenté sous forme de listing lorsque plusieurs dossiers sont contenus dans le même fichier d’intégration. Le Prestataire emploiera les moyens qui lui apparaissent comme étant les plus adaptés en fonction des éléments recueillis sur le(s) débiteur(s), et, de manière générale sur la stratégie de recouvrement à employer, qu’ils soient dans la réalisation de relances par courriers, en envois simples ou recommandés, courriels ou autres supports de communication, par des actions de télé recouvrement ou de visites domiciliaires.","Dans ce contexte, le Prestataire s’engage à : ","- Réaliser les prestations conformément aux présentes, aux Conditions particulières et ses annexes, à l’éventuel Cahier des charges sur lequel les Parties se sont entendues, dans le respect des règles de l’art applicables et ce, avec le soin et la diligence requis ;"," - Réaliser les prestations en conformité avec les droits au respect de la vie privée des débiteurs et notamment des dispositions de l’article 9 du code civil ;"," - Collaborer avec le Client selon les termes de l’article 6 ;"," - Mettre en oeuvre tous les moyens nécessaires pour assurer la confidentialité des dossiers de créances et l’intégrité des échanges entre le Client et le Prestataire ;"," - Informer chaque débiteur de l’existence de son mandat par courrier ;","- Se présenter en son propre nom lors des conversations téléphoniques avec les débiteurs ; en cas de demande spécifique de la part du Client, le Prestataire pourra intervenir en marque blanche ;","- Respecter l’image du Client, les règles de déontologie et éthique de la profession.","Sauf demande expresse de la part du Client, les dossiers transmis par le Client dans le cadre de la présente convention feront l’objet d’un traite- ment précontentieux, préalable à toute action judiciaire éventuelle dont l’objectif prioritaire sera la recherche d’une solution amiable dans les meilleurs délais. Sauf stipulation particulière, toute procédure judiciaire à engager fera l’objet d’une validation préalable par le Client. Le recouvrement judiciaire donnera lieu à la signature d’un « pouvoir spécial », selon les articles 827 et 828 du NCPC.","Au jour de la signature du contrat, chacune des parties désigne, au sein de son personnel, les correspondants qualifiés chargés du suivi des prestations, notamment pour coordonner les modalités de transmission des dossiers et le suivi des processus de recouvrement, les délais de traite- ment, les supports d’information entre les Parties. L’annexe « Cahier des charges », lorsqu’elle est constituée, peut permettre de définir précisé- ment les modalités d’échange et de communication entre les parties."),
 				"RESTITUTION DES SOMMES RECOUVREES"
 					=>array("Le Prestataire s’engage à régler au Client, mensuellement à 25 jours fin de mois, après l’encaissement effectif par ses services, les sommes recouvrées en principal pour le compte de ce dernier, déduction faite de ses commissions et éventuellement des coûts engagés pour le compte du Client (frais, honoraires ...) sur l’ensemble des dossiers. La restitution des sommes recouvrées pourra être prévue dans l’annexe « Cahier des charges ».","Les dépens auxquels le débiteur est condamné sont affectés en priorité par le Prestataire au règlement des coûts engagés pour le compte du Client.","Au cas où il y aurait des règlements impayés de la part du débiteur sur des fonds déjà reversés au Client, ce dernier s’engage à les rembourser sans délai, suivant le relevé mensuel adressé par le Prestataire. Si des règlements intervenus faisaient l’objet d’une annulation en vertu d’une négociation commerciale, conventionnelle, d’un avoir, d’un jugement ou arrêt, ou pour tout autre raison, les commissions préalablement facturées ne pourront pas être remis en cause."),
 				"REMUNERATION DE CAP RECOUVREMENT"
-					=>array("Le Prestataire recevra du Client une rémunération hors taxes selon les modalités définies en annexe tarifaire jointe, sur les sommes recouvrées en principal et en accessoire. Est considérée comme accessoire toute somme distinct du principal de la créance.","Dans tous les cas, les commissions s’appliquent systématiquement à compter du jour de la réception du dossier par le Prestataire"," - sur les sommes perçues par le Prestataire  - sur les sommes versées directement par le débiteur au Client","- sur le montant de la reprise de matériel, de marchandises, d’avoir consenti par le Client, lettrage de paiement antérieur, compensation légale, conventionnelle ou judiciaire, validée par le Client. Le Client reconnaît que les commissions du Prestataire sont facturables en cas d’avoir émis postérieurement à la demande de recouvrement (notamment en cas de retour de marchandises, de modification de facturation, en cas d’identification de règlement(s) intervenu(s) chez le client), et plus généralement lorsque le client considère l’impayé transmis comme étant régularisé chez lui.","- Sur demande expresse du client de clôturer une ou plusieurs affaires confiées, et ce qu’elle qu’en soit les motivations. Dans ce cas, le Prestataire facturera au Client l’intégralité des frais et honoraires auxquels il aurait pu prétendre si le dossier avait été mené à bonne fin.","De convention expresse, le Client autorise le Prestataire à compenser les sommes qu’il aura recouvrées avec les rémunérations ou remboursements de frais qui pourraient lui être dus au titre des différents dossiers confiés dans le cadre du présent mandat. Le Prestataire reversera au Client l’intégralité des sommes perçues pour son compte. Le créancier demande au Prestataire de réclamer au débiteur, outre les intérêts moratoires et accessoires légaux, toutes indemnités ou dommages et intérêts qui seraient dus en raison de la loi, de dispositions contractuelles ou de la mauvaise foi du débiteur, sans que cette liste ne soit limitative. le montant desdites indemnités étant précisé par le Client dans les Conditions particulières et dans ses propres documents contractuels. les Conditions Particulières précisent quels honoraires sont perçus sur les sommes accessoires. Lesdites sommes seront considérées comme un élément constitutif de la rémunération du Prestataire et impactent directement la proposition tarifaire proposée au Client. le Prestataire dispose de la faculté d’affecter à son gré les sommes recouvrées au Principal confié ou aux sommes complémentaires et accessoires réclamés, quelle qu’en soit la nature. Le créancier pourra être amené à devoir justifier, sous sa responsabilité, le montant du préjudice indépendant du retard de paiement qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, et qu’il demande au Prestataire de recouvrer.","En matière d’action judiciaire, outre les commissions contractuellement prévues, seront facturés au Client les forfaits tels qu’ils lui ont été proposés, ainsi que les frais engagés pour son compte dans le cadre de l’action judiciaire ; par frais engagés on entend frais de procédure et d’exécution, honoraires d’huissier, frais d’expertise, frais d’enquêtes, frais bancaires et, d’une manière générale, toutes les dépenses payées pour le compte du client aux fins de gérer son dossier.. Dans le cas d’une telle action, les commissions liées au recouvrement feront l’objet d’une augmentation de deux points. Le Prestataire peut être amené à demander au client une provision préalable à la poursuite de l’action. Ces forfaits et le remboursement des frais engagés sont dus quelle que soit l’issue du dossier.","En cas de désaccord, sur tout ou partie d’une facture, le Client s’engage à indiquer par écrit au Prestataire, le motif de la contestation et ce, dans les 15 jours ouvrés de la réception de ladite facture, étant entendu que toute facture non contestée dans ledit délai est réputée définitivement acceptée."),
+					=>array("Le Prestataire recevra du Client une rémunération hors taxes selon les modalités définies en annexe tarifaire jointe, sur les sommes recouvrées en principal et en accessoire. Est considérée comme accessoire toute somme distinct du principal de la créance.","Dans tous les cas, les commissions s’appliquent systématiquement à compter du jour de la réception du dossier par le Prestataire"," - sur les sommes perçues par le Prestataire - sur les sommes versées directement par le débiteur au Client","- sur le montant de la reprise de matériel, de marchandises, d’avoir consenti par le Client, lettrage de paiement antérieur, compensation légale, conventionnelle ou judiciaire, validée par le Client. Le Client reconnaît que les commissions du Prestataire sont facturables en cas d’avoir émis postérieurement à la demande de recouvrement (notamment en cas de retour de marchandises, de modification de facturation, en cas d’identification de règlement(s) intervenu(s) chez le client), et plus généralement lorsque le client considère l’impayé transmis comme étant régularisé chez lui.","- Sur demande expresse du client de clôturer une ou plusieurs affaires confiées, et ce qu’elle qu’en soit les motivations. Dans ce cas, le Prestataire facturera au Client l’intégralité des frais et honoraires auxquels il aurait pu prétendre si le dossier avait été mené à bonne fin.","De convention expresse, le Client autorise le Prestataire à compenser les sommes qu’il aura recouvrées avec les rémunérations ou remboursements de frais qui pourraient lui être dus au titre des différents dossiers confiés dans le cadre du présent mandat. Le Prestataire reversera au Client l’intégralité des sommes perçues pour son compte. Le créancier demande au Prestataire de réclamer au débiteur, outre les intérêts moratoires et accessoires légaux, toutes indemnités ou dommages et intérêts qui seraient dus en raison de la loi, de dispositions contractuelles ou de la mauvaise foi du débiteur, sans que cette liste ne soit limitative. le montant desdites indemnités étant précisé par le Client dans les Conditions particulières et dans ses propres documents contractuels. les Conditions Particulières précisent quels honoraires sont perçus sur les sommes accessoires. Lesdites sommes seront considérées comme un élément constitutif de la rémunération du Prestataire et impactent directement la proposition tarifaire proposée au Client. le Prestataire dispose de la faculté d’affecter à son gré les sommes recouvrées au Principal confié ou aux sommes complémentaires et accessoires réclamés, quelle qu’en soit la nature. Le créancier pourra être amené à devoir justifier, sous sa responsabilité, le montant du préjudice indépendant du retard de paiement qu’il estime avoir subi du fait de la mauvaise foi de son débiteur, et qu’il demande au Prestataire de recouvrer.","En matière d’action judiciaire, outre les commissions contractuellement prévues, seront facturés au Client les forfaits tels qu’ils lui ont été proposés, ainsi que les frais engagés pour son compte dans le cadre de l’action judiciaire ; par frais engagés on entend frais de procédure et d’exécution, honoraires d’huissier, frais d’expertise, frais d’enquêtes, frais bancaires et, d’une manière générale, toutes les dépenses payées pour le compte du client aux fins de gérer son dossier.. Dans le cas d’une telle action, les commissions liées au recouvrement feront l’objet d’une augmentation de deux points. Le Prestataire peut être amené à demander au client une provision préalable à la poursuite de l’action. Ces forfaits et le remboursement des frais engagés sont dus quelle que soit l’issue du dossier.","En cas de désaccord, sur tout ou partie d’une facture, le Client s’engage à indiquer par écrit au Prestataire, le motif de la contestation et ce, dans les 15 jours ouvrés de la réception de ladite facture, étant entendu que toute facture non contestée dans ledit délai est réputée définitivement acceptée."),
 				"FACTURATION"
 					=>array("Nos factures sont payables au comptant à réception. le défaut de paiement des factures émises à leur échéance entraînera automatiquement, sans mise en demeure préalable, l’exigibilité immédiate de toutes les sommes dues au Prestataire, échues ou à échoir, quel que soit le mode de règlement convenu. En outre, les sommes restant dues seront automatiquement, et sans formalités, majorées, à compter de leur date d’exigibilité, d’un intérêt appliqué par la Banque Centrale Européenne à son opération de refinancement la plus récente majoré de 10 points de pourcentage, d’une indemnité égale à 20% des sommes dues à titre de clause pénale, ainsi qu’une indemnité forfaitaire pour frais de recouvrement d’un montant de 40,00 EUR par facture impayée. Si les frais de recouvrement sont supérieurs à l’indemnité forfaitaire, le client s’engage à s’acquitter de l’intégralité de ces frais, sur justification et à première demande du Prestataire, et ce conformément à l’article l441-6 du Code de commerce."),
 				"OBLIGATIONS DES PARTIES"
-					=>array("Chacune des Parties reconnaît que les prestations nécessitent une collaboration active et régulière entre le Prestataire et le Client.  le Client s’engage à fournir à ses frais au Prestataire, les créances échues selon les dispositions prévues dans le préalablement à la signature de la convention.","Le Client garantit au Prestataire qu’aucun autre intervenant n’est préalablement intervenu dans les dossiers transmis, ou n’est en cours d’action sur les dossiers confiés au Prestataire. Dans le cas contraire, les sommes recouvrées par l’autre intervenant figureront dans l’assiette de facturation du prestataire. En outre, et dans ces conditions, le Prestataire se réserve la possibilité de mettre fin à la présente convention et de considérer que l’ensemble des dossiers en cours de gestion seront soumis à clôture anticipée aux torts exclusifs du Client, ce qui engendrera une facturation conformément aux conditions spécifiées à l’article 5 des pré- sentes.","Le Client s’engage à identifier les paiements directs effectués à son attention par les débiteurs, et plus généralement tous paiements qui lui parviendraient sans être passé par le Prestataire. Il s’engage à en tenir informé le Prestataire dans un délai de trois jours ouvrés à compter de la réception entre ses mains, par courriel, ou par fax, afin qu’il en soit tenu compte dans les procédures engagées et dans l’élaboration de la facture du Prestataire. Il en va de même concernant tout avoir ou remise consentis, ainsi que toute contestation, proposition, intervention formulées directement par le débiteur à son encontre ou réciproquement.  Si une difficulté apparaît au cours de la réalisation de la prestation, chacune des Parties s’engage à alerter l’autre le plus rapidement possible afin de se concerter pour mettre en place la solution la mieux adaptée et ce, dans les meilleurs délais.","Le Client s’engage aussi à communiquer au Prestataire toutes les informations dont il a connaissance, notamment un jugement d’ouverture d’une procédure collective, vente/cession de fonds de commerce du débiteur, changement d’adresse du débiteur, sans que cette liste ne soit limitative. Le client dispense le Prestataire de l’informer des propositions du débiteur tendant à s’acquitter de son obligation par un autre moyen que le paiement immédiat de la somme réclamée.","Il est convenu que le Prestataire n’est pas tenu à une obligation de surveillance permanente du BODACC ou des annonces légales en matière de redressement judiciaire, ou vente de fonds de commerce. Aucune réclamation concernant un dossier classé après règlement ou notification au client de l’abandon des poursuites ne sera admise au-delà d’un délai de trois mois après le règlement ou l’avis de classement de CAP RECCOUVREMENT. Si le client n’a pas demandé la restitution de son dossier, CAP RECOUVREMENT est définitivement déchargée de toute responsabilité relative à la conservation des pièces et documents confiés dans ces mêmes délais ou dans l’éventualité de perte ou destruction d’archives par cas de force majeure. "),
+					=>array("Chacune des Parties reconnaît que les prestations nécessitent une collaboration active et régulière entre le Prestataire et le Client. Le Client s’engage à fournir à ses frais au Prestataire, les créances échues selon les dispositions prévues dans le préalablement à la signature de la convention.","Le Client garantit au Prestataire qu’aucun autre intervenant n’est préalablement intervenu dans les dossiers transmis, ou n’est en cours d’action sur les dossiers confiés au Prestataire. Dans le cas contraire, les sommes recouvrées par l’autre intervenant figureront dans l’assiette de facturation du prestataire. En outre, et dans ces conditions, le Prestataire se réserve la possibilité de mettre fin à la présente convention et de considérer que l’ensemble des dossiers en cours de gestion seront soumis à clôture anticipée aux torts exclusifs du Client, ce qui engendrera une facturation conformément aux conditions spécifiées à l’article 5 des présentes.","Le Client s’engage à identifier les paiements directs effectués à son attention par les débiteurs, et plus généralement tous paiements qui lui parviendraient sans être passé par le Prestataire. Il s’engage à en tenir informé le Prestataire dans un délai de trois jours ouvrés à compter de la réception entre ses mains, par courriel, ou par fax, afin qu’il en soit tenu compte dans les procédures engagées et dans l’élaboration de la facture du Prestataire. Il en va de même concernant tout avoir ou remise consentis, ainsi que toute contestation, proposition, intervention formulées directement par le débiteur à son encontre ou réciproquement.  Si une difficulté apparaît au cours de la réalisation de la prestation, chacune des Parties s’engage à alerter l’autre le plus rapidement possible afin de se concerter pour mettre en place la solution la mieux adaptée et ce, dans les meilleurs délais.","Le Client s’engage aussi à communiquer au Prestataire toutes les informations dont il a connaissance, notamment un jugement d’ouverture d’une procédure collective, vente/cession de fonds de commerce du débiteur, changement d’adresse du débiteur, sans que cette liste ne soit limitative. Le client dispense le Prestataire de l’informer des propositions du débiteur tendant à s’acquitter de son obligation par un autre moyen que le paiement immédiat de la somme réclamée.","Il est convenu que le Prestataire n’est pas tenu à une obligation de surveillance permanente du BODACC ou des annonces légales en matière de redressement judiciaire, ou vente de fonds de commerce. Aucune réclamation concernant un dossier classé après règlement ou notification au client de l’abandon des poursuites ne sera admise au-delà d’un délai de trois mois après le règlement ou l’avis de classement de CAP RECCOUVREMENT. Si le client n’a pas demandé la restitution de son dossier, CAP RECOUVREMENT est définitivement déchargée de toute responsabilité relative à la conservation des pièces et documents confiés dans ces mêmes délais ou dans l’éventualité de perte ou destruction d’archives par cas de force majeure. "),
 				"RESPONSABILITES"
-					=>array("Le client est seul responsable de la légitimité des créances confiées au Prestataire et de l’identité du débiteur. Le Prestataire dégage toute responsabilité en cas de demande abusive et injustifiée. Le Prestataire appellera en garantie son Client en cas de poursuites engagées contre elle sur ce chef de demande. La mise en demeure adressée au débiteur est effectuée sous l’entière responsabilité du Client. En conséquence, le Prestataire attire l’attention de son client sur le fait que : la créance à recouvrer doit être certaine, liquide et exigible ; les éventuels compléments doivent représenter des frais réellement engagés et/ou des indemnités pouvant être légalement ou conventionnellement justifiées. Le Client s’interdit toute ingérence dans la conduite du dossier confié au Prestataire, tant vis-à-vis de son débiteur que des correspondants du Prestataire. le Client déclare avoir régulièrement recueilli les pièces transmises au Prestataire. En cas de condamnation du client au paiement de dommages et intérêts et/ou d’indemnités en application de l’article 700 du Code de Procédure Civil, il devra en assurer personnellement le paiement. le Prestataire se réserve le droit de ne pas poursuivre judiciairement les débiteurs qu’il jugera insolvables ou dont la demande sera jugée mal fondée. En cas de contestation sérieuse du débiteur, le Prestataire se réserve le droit de ne pas poursuivre le dossier.  Le Prestataire rappelle autant que de besoin qu’il est soumis à une obligation de moyens, et non de résultat. En cas d’insuccès d’une ou plusieurs phases de recouvrement, qu’elles soient amiables ou judiciaires, la responsabilité du Prestataire ne pourra jamais être recherchée au seul motif que la créance n’est pas recouvrée. La responsabilité du Prestataire ne pourra jamais être recherchée en cas de force majeure. Seront notamment considérés comme un cas de force majeure, la guerre, l’émeute, la révolution, la grève chez l’une des parties ou chez tout tiers, une catastrophe naturelle, un acte de piraterie, un incident sur les lignes téléphoniques et un dysfonctionnement des réseaux. En outre, la responsabilité du Prestataire ne pourra jamais être recherchée en cas de dysfonctionnement généré par un matériel informatique défectueux appartenant au client ou mis à disposition par un tiers. Toute responsabilité qui serait alléguée à l’encontre du Prestataire ne pourra en aucun cas être d’un montant supérieur à ce qui a été facturé par le Prestataire sur le dossier concerné. "),
+					=>array("Le client est seul responsable de la légitimité des créances confiées au Prestataire et de l’identité du débiteur. Le Prestataire dégage toute responsabilité en cas de demande abusive et injustifiée. Le Prestataire appellera en garantie son Client en cas de poursuites engagées contre elle sur ce chef de demande. La mise en demeure adressée au débiteur est effectuée sous l’entière responsabilité du Client. En conséquence, le Prestataire attire l’attention de son client sur le fait que : la créance à recouvrer doit être certaine, liquide et exigible ; les éventuels compléments doivent représenter des frais réellement engagés et/ou des indemnités pouvant être légalement ou conventionnellement justifiées. Le Client s’interdit toute ingérence dans la conduite du dossier confié au Prestataire, tant vis-à-vis de son débiteur que des correspondants du Prestataire Le Client déclare avoir régulièrement recueilli les pièces transmises au Prestataire. En cas de condamnation du client au paiement de dommages et intérêts et/ou d’indemnités en application de l’article 700 du Code de Procédure Civil, il devra en assurer personnellement le paiement. Le Prestataire se réserve le droit de ne pas poursuivre judiciairement les débiteurs qu’il jugera insolvables ou dont la demande sera jugée mal fondée. En cas de contestation sérieuse du débiteur, le Prestataire se réserve le droit de ne pas poursuivre le dossier.  Le Prestataire rappelle autant que de besoin qu’il est soumis à une obligation de moyens, et non de résultat. En cas d’insuccès d’une ou plusieurs phases de recouvrement, qu’elles soient amiables ou judiciaires, la responsabilité du Prestataire ne pourra jamais être recherchée au seul motif que la créance n’est pas recouvrée. La responsabilité du Prestataire ne pourra jamais être recherchée en cas de force majeure. Seront notamment considérés comme un cas de force majeure, la guerre, l’émeute, la révolution, la grève chez l’une des parties ou chez tout tiers, une catastrophe naturelle, un acte de piraterie, un incident sur les lignes téléphoniques et un dysfonctionnement des réseaux. En outre, la responsabilité du Prestataire ne pourra jamais être recherchée en cas de dysfonctionnement généré par un matériel informatique défectueux appartenant au client ou mis à disposition par un tiers. Toute responsabilité qui serait alléguée à l’encontre du Prestataire ne pourra en aucun cas être d’un montant supérieur à ce qui a été facturé par le Prestataire sur le dossier concerné. "),
 				"DONNEES PERSONNELLES - REFERENCEMENT"
-					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
+					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
 				"NON SOLLICITATION DE PERSONNEL"
-					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
+					=>array("Les informations nominatives collectées dans le cadre de l’exécution de la prestation convenue, sont exclusivement réservée à l’usage du Presta- taire qui s’engage à ne pas les communiquer à des tiers. Conformément à la loi Informatique et liberté, (article 27 de la loi 78-17 du 6 Janvier 1978). Le client dispose d’un droit d’accès et de rectification aux informations qui le concernent, en effectuant la demande par écrit. Le Client autorise le Prestataire à citer son entreprise et à faire figurer son logo en tant que référence client."),
 				"DUREE DE LA CONVENTION"
 					=>array("La présente convention de recouvrement est conclue pour une durée d’un (1) an renouvelable par tacite reconduction, à compter de la signature de la présente convention, sauf dénonciation par l’une ou l’autre des parties, en respectant toutefois un préavis de deux (2) mois, et ce par lettre recommandée avec accusé de réception ; le point de départ du préavis est fixé à la date de l’accusé de réception.  Dans ce cas, les dossiers restant en cours à l’expiration de la convention continueront à être gérés par le Prestataire jusqu’à leur clôture définitive. Le Prestataire s’engage à apporter tous ses soins à cette gestion et le Client s’engage à en accepter les conséquences, ceci en conformité avec les conditions de traitement initialement prévues et dans le cadre des conditions générales de recouvrement.  Dans l’hypothèse où le Client exigerait la restitution de dossiers en cours en raison de la dénonciation de la convention, celle-ci serait subordonnée au paiement préalable au Prestataire de toutes les commissions et de tous les remboursements de frais pouvant lui rester dus."),
 				"CLAUSE ATTRIBUTIVE DE JURIDICTION"
@@ -10154,7 +9988,7 @@ class pdf_cap extends pdf_cleodis {
 			);
 
 		
-		$this->multicell(0,4,"Le Client a pris connaissance de l’offre du Prestataire à l’occasion de leurs relations précontractuelles et reconnaît avoir reçu l’ensemble des informations et conseils lui permettant d’apprécier la proposition du Presta- taire. le Client souhaite recourir aux services du Prestataire et reconnaît que leur mise en œuvre nécessite une collaboration étroite et active. Le Client reconnaît que le présent contrat est soumis aux dispositions du décret n°2012-783 du 30 Mai 2012 et les dispositions ultérieures régissant le recouvrement de créances pour le compte d’autrui.",0,1,"L");
+		$this->multicell(0,4,"Le Client a pris connaissance de l’offre du Prestataire à l’occasion de leurs relations précontractuelles et reconnaît avoir reçu l’ensemble des informations et conseils lui permettant d’apprécier la proposition du Prestataire. le Client souhaite recourir aux services du Prestataire et reconnaît que leur mise en oeuvre nécessite une collaboration étroite et active. Le Client reconnaît que le présent contrat est soumis aux dispositions du décret n°2012-783 du 30 Mai 2012 et les dispositions ultérieures régissant le recouvrement de créances pour le compte d’autrui.",0,1,"L");
 
 		
 		$this->setfont('arial','',8);
@@ -10165,6 +9999,9 @@ class pdf_cap extends pdf_cleodis {
 			|| $key == "REMUNERATION DE CAP RECOUVREMENT"
 			|| $key == "OBLIGATIONS DES PARTIES"
 			|| $key == "DONNEES PERSONNELLES - REFERENCEMENT"){
+				$this->SetXY(10,274);
+				$this->Cell(0,2,$this->PageNo(),0,0,'R');
+
 				$this->Addpage();
 				$this->enteteCedre();
 			}
@@ -10216,16 +10053,16 @@ class pdf_cap extends pdf_cleodis {
 
 		$this->setLeftMargin(15);
 		$this->ln(8);
-		$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
-		$this->setFont('arial','B',8);		
-		$this->cell(0,4,"CAP RECOUVREMENT - 30 Boulevard du Général Leclerc - BP 70333 - 59056 ROUBAIX CEDEX 1",0,1,"C");
+		if(!$signature){
+			$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
+			$this->setFont('arial','B',8);		
+			$this->cell(0,4,"CAP RECOUVREMENT - 30 Boulevard du Général Leclerc - BP 70333 - 59056 ROUBAIX CEDEX 1",0,1,"C");
+		}
+		
 		
 
-
-
-
-
-
+		$this->SetXY(10,274);
+		$this->Cell(0,2,$this->PageNo(),0,0,'R');
 	}
 
 

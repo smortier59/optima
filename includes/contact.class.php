@@ -106,7 +106,7 @@ class contact extends classes_optima {
 		
 		$this->fieldstructure();
 		
-		$this->field_nom = "%civilite% %prenom% %nom%";
+		$this->field_nom = "%prenom% %nom%";
 		$this->onglets = array('suivi'=>array('table'=>'suivi_contact','opened'=>true,'field'=>'suivi_contact.id_contact'),'devis');
 		$this->addPrivilege("getMail");
 		$this->addPrivilege("export_vcard","export");
@@ -477,5 +477,78 @@ class contact extends classes_optima {
 		return $this->select_all();
 	}
 
+	/** Fonction qui supprime un contact
+	* @author Charlier cyril <ccharlier@absystech.fr>
+	*/
+	/*
+	public function _DELETE($get,$post) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		$return['result'] = $this->delete($get);
+    	// Récupération des notices créés
+    	$return['notices'] = ATF::$msg->getNotices();
+        return $return;
+	}
+ */
+
+	/**
+	* Permet de modifier un contact depuis telescope
+	* @author cyril CHARLIER <ccharlier@absystech.fr>
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array Contient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/ 
+	/*
+	public function _PUT($get,$post){
+		$input = file_get_contents('php://input');
+	    if (!empty($input)) parse_str($input,$post);
+		$return = array();
+        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    	// Si on fait un update du contact
+    	else {
+	        // Check des champs obligatoire
+			if (!$post['id_contact']) throw new errorATF(ATF::$usr->trans('id_contact_missing','user'));
+	    if (!$post['nom']) throw new errorATF(ATF::$usr->trans('nom_missing','user'));
+	    if (!$post['prenom']) throw new errorATF(ATF::$usr->trans('prenom_missing','user'));
+			if (!$post['civilite']) throw new errorATF(ATF::$usr->trans('civilite_missing','user'));
+			if (!$post['etat']) throw new errorATF(ATF::$usr->trans('etat_missing','user'));
+	        // Insertion
+        	$this->update($post);    		
+        	$return['result'] = true;
+        	$return['id_contact'] = $post['id_contact'];
+    	}
+           	// Récupération des notices créés
+        $return['notices'] = ATF::$msg->getNotices();
+
+        return $return;
+	}
+	*/
+	/**
+	* Permet d'ajouter un contact
+	* @author cyril CHARLIER <ccharlier@absystech.fr>
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array Contient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/
+	/*  	
+	public function _POST($get,$post){
+		$input = file_get_contents('php://input');
+	    if (!empty($input)) parse_str($input,$post);
+		$return = array();
+        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    	else {
+	        // Check des champs obligatoire
+	    if (!$post['nom']) throw new errorATF(ATF::$usr->trans('nom_missing','contact'));
+	    if (!$post['prenom']) throw new errorATF(ATF::$usr->trans('prenom_missing','contact'));
+			if (!$post['civilite']) throw new errorATF(ATF::$usr->trans('civilite_missing','contact'));
+			if (!$post['etat']) throw new errorATF(ATF::$usr->trans('etat_missing','contact'));
+	        // Insertion
+        	$result = $this->insert($post);    		
+        	$return['result'] = true;
+        	$return['id_user'] = $result;
+    	}
+        return $return;
+	}
+	*/
 };
+
 ?>

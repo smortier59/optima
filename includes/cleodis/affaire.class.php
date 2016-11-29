@@ -347,16 +347,28 @@ class affaire_cleodis extends affaire {
 							$infos['value'] = str_replace(" ", "", $infos['value']);
 						}
 					}
-					if($infos["field"] == "RIB" && !ATF::affaire()->select($infos["id_affaire"] , "RUM") ){
+					if(($infos["field"] == "RIB" || $infos["field"] == "BIC" || $infos["field"] == "IBAN" || $infos["field"] == "RUM") && !ATF::affaire()->select($infos["id_affaire"] , "RUM") ){
 						$RUM = "";
-						$RIB = str_replace(" ", "", $infos['value']);
+						$field_value = str_replace(" ", "", $infos['value']);
 						$id_societe = ATF::affaire()->select($infos["id_affaire"] , "id_societe");						
 
-						ATF::affaire()->q->reset()->where("affaire.id_societe", $id_societe)->where('replace(affaire.RIB, " ", "")' , $RIB)->whereIsNotNull("affaire.RUM");
+						ATF::affaire()->q->reset()->where("affaire.id_societe", $id_societe)
+												  ->where('replace(affaire.'.$infos["field"].', " ", "")' , $field_value)
+												  ->whereIsNotNull("affaire.RUM");
 						$res = ATF::affaire()->select_all();						
 
-						if($res){ 	$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") ); $esp = true;}
-					}					
+						if($res){
+							$affaire->set("RIB", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RIB") );
+							$affaire->set("RUM", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "RUM") );
+							$affaire->set("BIC", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "BIC") );
+							$affaire->set("IBAN", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "IBAN") ); 
+							$affaire->set("nom_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "nom_banque") );
+							$affaire->set("ville_banque", ATF::affaire()->select($res[0]["affaire.id_affaire"] , "ville_banque") );	
+
+							$esp = true;
+						}
+					}
+										
 					$affaire->set($infos["field"],$infos['value']);					
 					break;
 				default:
@@ -935,17 +947,31 @@ class affaire_cleodis extends affaire {
 		if ($c = $a->getCommande()) {
 			$date_debut = $c->get("date_debut");
 		}
+
 		if ($date_debut && $infos["date_cession"]) {
 //log::logger("date_cession=".$infos["date_cession"],ygautheron);				
-			$date1 = new DateTime(substr($infos["date_cession"],0,8).'01');
-			$date1->modify('+1 month'); // On prend le premier jour du mois suivant ( nécessaire en cas de date de cession en dernier jour de période pleine,et à cause du pb des bisextile, et en plus a ce bug de merde : https://bugs.php.net/bug.php?id=52480 )
-//log::logger("date_cession=".$date1->format('Y-m-d'),ygautheron);				
-//log::logger("date_debut=".$date_debut,ygautheron);			
+			$date1 = new DateTime(substr($infos["date_cession"],0,8).'01');		
+			
+			if(date("m",strtotime($infos["date_cession"])) != "12"){
+				$date1->modify('+1 month'); // On prend le premier jour du mois suivant ( nécessaire en cas de date de cession en dernier jour de période pleine,et à cause du pb des bisextile, et en plus a ce bug de merde : https://bugs.php.net/bug.php?id=52480 )
+			}
+
+			
+
+
+//log::logger("date_cession=".$date1->format('Y-m-d'),mfleurquin);				
+//log::logger("date_debut=".$date_debut,mfleurquin);
 			$date2 = new DateTime($date_debut);
-//log::logger($date1->diff($date2),ygautheron);			
-//log::logger("diff=".$date1->diff($date2)->format('%m'),ygautheron);			
+//log::logger($date1->diff($date2),mfleurquin);			
+//log::logger("diff=".$date1->diff($date2)->format('%m'),mfleurquin);			
 			$duree_ecoulee_restante = $duree_ecoulee = $date1->diff($date2)->format('%y')*12 + $date1->diff($date2)->format('%m');
-//log::logger("duree_ecoulee=".$duree_ecoulee,ygautheron);		
+
+			if($date1->diff($date2)->format('%d')){
+				$duree_ecoulee_restante = $duree_ecoulee = $duree_ecoulee+1;
+			}
+
+
+//log::logger("duree_ecoulee=".$duree_ecoulee,mfleurquin);		
 //log::logger(DateTime::getLasterrorATFs(),ygautheron);		
 			
 			// On "rogne" les mois deja écoulé jusqu'àla date de cession	
@@ -961,13 +987,14 @@ class affaire_cleodis extends affaire {
 //log::logger("duree_max_pouvant_etre_retiree_de_ce_loyer=".$duree_max_pouvant_etre_retiree_de_ce_loyer,ygautheron);		
 					$loyer["duree"] -= $duree_max_pouvant_etre_retiree_de_ce_loyer / $frequence_loyer[$loyer["frequence_loyer"]];
 					$duree_ecoulee_restante -= $duree_max_pouvant_etre_retiree_de_ce_loyer;
-//log::logger("duree_ecoulee_restante=".$duree_ecoulee_restante,ygautheron);		
+//log::logger("duree_ecoulee_restante=".$duree_ecoulee_restante,mfleurquin);		
 					$loyers[$k] = $loyer;
 				}
 			}
+
 			$loyers = array_reverse($loyers);
 		}
-//log::logger($loyers,ygautheron);		
+//log::logger($loyers,mfleurquin);		
 	
 		$loyers = $a->getCompteTLoyersActualises($infos["taux"],$infos["vr"],$loyers);
 //log::logger($loyers,ygautheron);	

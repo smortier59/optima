@@ -398,9 +398,13 @@ class facture_absystech extends facture {
 		
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		
-		//Seuls les associés peuvent modifier la tva
-		$tva=$this->getTVA($societe["id_societe"]);
-		if($tva!=$infos["tva"] && ATF::$usr->get("id_profil")!=1){
+		//Seuls les associés et Emma peuvent modifier la tva
+		$tva=$this->getTVA($societe["id_societe"]);		
+		$assistantDirection = 9;
+		if(ATF::$codename == "att") $assistantDirection = 5;
+		
+
+		if($tva!=$infos["tva"] && (ATF::$usr->get("id_profil")!=1 && ATF::$usr->get("id_profil")!=$assistantDirection )){
 			$profil=ATF::profil()->select(1);
 			ATF::$msg->addNotice(
 				loc::mt(ATF::$usr->trans("error_403_facture_tva"),array("profil"=>$profil["profil"], "tva"=>$tva))
