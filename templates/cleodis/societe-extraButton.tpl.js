@@ -4,13 +4,11 @@
 	id:'creditsafe _{$current_class->table}',
 	disabled : false,
 	handler: function(){
- 		var siret = Ext.getCmp('societe[siret]').getValue();
+		var siret = Ext.getCmp('societe[siret]').getValue();
  		if (!siret) {
-/* 		var num_ident = Ext.getCmp('societe[num_ident]').getValue();
-		if (!num_ident) {*/
 			Ext.Msg.show({
 			   title:'Champ manquant',
-			   msg: 'Vous devez renseigner un SIRET pour interroger CreditSafe',//numéro d\'identification
+			   msg: 'Vous devez renseigner un SIRET pour interroger CreditSafe',
 			   buttons: Ext.Msg.OK,
 			   animEl: 'elId',
 			   icon: Ext.MessageBox.WARNING
@@ -20,8 +18,7 @@
 		ATF.loadMask.show();
 		ATF.ajax(
 			"societe,getInfosFromCREDITSAFE,ajax"
-			,"siret="+siret
-			/*,"num_ident="+num_ident	*/		, {
+			,"siret="+siret		, {
 				onComplete: function (r) {
 					console.log(r);
 					Ext.iterate(r.result, function(key, value) {
