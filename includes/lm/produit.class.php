@@ -175,6 +175,7 @@ class produit_lm extends produit {
 
 		$this->infoCollapse($infos);
 
+		ATF::db($this->db)->begin_transaction();
 
 		$last_id = parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 
@@ -210,6 +211,7 @@ class produit_lm extends produit {
 													   ));
 
 		}
+		ATF::db($this->db)->commit_transaction();
 
 		if(is_array($cadre_refreshed)){	ATF::produit()->redirection("select",$last_id);	}
 		return $last_id;
