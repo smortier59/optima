@@ -169,12 +169,32 @@ class societe_lm extends societe {
 		$this->addPrivilege("setToken");
 		
 		$this->autocomplete = array(
-			"field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
-			,"show"=>array("societe.societe","societe.nom_commercial","societe.code_client")
-			,"popup"=>array("societe.societe","societe.nom_commercial","societe.code_client")
-			,"view"=>array("societe.societe","societe.nom_commercial","societe.code_client")
+			 "field"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
+			,"show"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
+			,"popup"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
+			,"view"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
 		);
 
+	}
+
+
+	/**
+	 * Surcharge de l'autocomplete pour afficher le client si ce n'est pas une société
+	 * @param  [type]  $infos [description]
+	 * @param  boolean $reset [description]
+	 * @return [type]         [description]
+	 * @author  Morgan Fleurquin <mfleurquin@absystech.fr>
+	 */
+	public function autocomplete($infos,$reset=true) {
+		$res = parent::autocomplete($infos,$reset);
+		foreach ($res as $key => $value) {
+			if(!$value[1]){
+				$client = ATF::societe()->select($value["raw_0"] , "nom")." ".ATF::societe()->select($value["raw_0"] , "prenom")." (".ATF::societe()->select($value["raw_0"] , "ref").")";
+				$res[$key][1] = $res[$key]["raw_1"] = $client;
+			}
+		}		
+
+		return $res;
 	}
 
 	/**

@@ -549,10 +549,15 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->setleftmargin(40);
 		
 		$this->setfont('arial','',16);
-		$this->cell(134,5,"FACTURE N° ".$facture["ref"],0,1,"C");
+		if($facture["prix"]>0){
+			$this->cell(134,5,"FACTURE N° ".$facture["ref"],0,1,"C");
+		}else{
+			$this->cell(134,5,"AVOIR N° ".$facture["ref"],0,1,"C");
+		}
+		
 
 		$this->setfont('arial','',8);
-		$this->cell(134,5,"Date de facture ".date("d/m/Y", strtotime($facture["date"]))." Exemplaire client ",0,1,"C");
+		$this->cell(134,5,"Date ".($facture["prix"]>0?"de facture":"de l'avoir")." ".date("d/m/Y", strtotime($facture["date"]))." Exemplaire client ",0,1,"C");
 		$this->cell(134,5,"Date d'émission ".date("d/m/Y", strtotime($facture["date"])),0,1,"C");
 
 
@@ -636,20 +641,21 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->tableau($head,$data,$width,7,$style,260);
 		*/
 
-		$this->ln(5);
-		$head = array("Date","Réglement","Montant");
-		$width = array(20,30,30);		
-		$data = array();
-		$style = array();
-		$data[0][0] =  date("d/m/Y", strtotime($facture["date"]));
-		$data[0][1] = "PRELEVEMENT AUTOMATIQUE";
-		$data[0][2] = $facture["prix"]." €";
+		if($facture["prix"]>0){
+			$this->ln(5);
+			$head = array("Date","Réglement","Montant");
+			$width = array(20,30,30);		
+			$data = array();
+			$style = array();
+			$data[0][0] =  date("d/m/Y", strtotime($facture["date"]));
+			$data[0][1] = "PRELEVEMENT AUTOMATIQUE";
+			$data[0][2] = $facture["prix"]." €";
+			
+			$this->tableau($head,$data,$width,7,$style,260);
 		
-		$this->tableau($head,$data,$width,7,$style,260);
-
-		$this->ln(10);
-		$this->multicell(0,5,"TERMES DE PAIEMENTS \nLe ".date("d/m/Y", strtotime($facture["date_previsionnelle"])).", vous serez débité sur le compte bancaire");
-
+			$this->ln(10);
+			$this->multicell(0,5,"TERMES DE PAIEMENTS \nLe ".date("d/m/Y", strtotime($facture["date_previsionnelle"])).", vous serez débité sur le compte bancaire");
+		}
 		
 		$this->setY($y);
 		$this->setX(130);
