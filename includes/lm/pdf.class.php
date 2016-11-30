@@ -648,7 +648,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			$data = array();
 			$style = array();
 			$data[0][0] =  date("d/m/Y", strtotime($facture["date"]));
-			$data[0][1] = "PRELEVEMENT AUTOMATIQUE";
+			
+			$data[0][1] = ATF::$usr->trans($facture["mode_paiement"]);
+			
 			$data[0][2] = $facture["prix"]." €";
 			
 			$this->tableau($head,$data,$width,7,$style,260);
