@@ -175,6 +175,11 @@ class produit_lm extends produit {
 
 		$this->infoCollapse($infos);
 
+		ATF::db($this->db)->begin_transaction();
+
+		log::logger($infos_loyer , "mfleurquin");
+		log::logger($infos_fournisseur , "mfleurquin");
+		log::logger($infos_loyer_fournisseur , "mfleurquin");
 
 		$last_id = parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 
@@ -200,16 +205,17 @@ class produit_lm extends produit {
 
 		foreach ($infos_loyer_fournisseur as $key => $value) {			
 			$id_pf = ATF::produit_fournisseur_loyer()->i(array( "id_produit"=> $this->decryptId($last_id),
-														        "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
-														        "loyer"=> $value["produit_fournisseur__dot__loyer"],
-														        "ordre"=> $value["produit_fournisseur__dot__ordre"],
-														        "periodicite"=> $value["produit_fournisseur__dot__periodicite"],
-														        "nature"=> $value["produit_fournisseur__dot__rnature"],
-														        "nb_loyer"=> $value["produit_fournisseur__dot__nb_loyer"],
-														        "departement"=> $value["produit_fournisseur__dot__departement"]
+														        "id_fournisseur"=> $value["produit_fournisseur_loyer__dot__id_fournisseur_fk"],
+														        "loyer"=> $value["produit_fournisseur_loyer__dot__loyer"],
+														        "ordre"=> $value["produit_fournisseur_loyer__dot__ordre"],
+														        "periodicite"=> $value["produit_fournisseur_loyer__dot__periodicite"],
+														        "nature"=> $value["produit_fournisseur_loyer__dot__nature"],
+														        "nb_loyer"=> $value["produit_fournisseur_loyer__dot__nb_loyer"],
+														        "departement"=> $value["produit_fournisseur_loyer__dot__departement"]
 													   ));
 
 		}
+		ATF::db($this->db)->commit_transaction();
 
 		if(is_array($cadre_refreshed)){	ATF::produit()->redirection("select",$last_id);	}
 		return $last_id;
