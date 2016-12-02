@@ -679,7 +679,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$pack = ATF::produit()->select($facture_lignes[0]['id_produit'] , "id_pack_produit");
 
 
-		$data[0][0] = "Abonnement à l'offre ".ATF::pack_produit()->select($pack , "libelle");
+		$data[0][0] = "Abonnement à l'offre ".ATF::pack_produit()->select($pack , "libelle").($facture["date_periode_debut"]?" - période de ".ATF::$usr->date_trans(date("Y-m",strtotime($facture["date_periode_debut"])),true):"");
 		$style[0][0] = $this->leftStyle;
 		$data[0][1] = number_format(($facture["prix"] - ($facture["prix"]*0.2)) ,2)." €" ;
 		$data[0][2] = "20%";
