@@ -167,6 +167,7 @@ class societe_cleodis extends societe {
 		$this->addPrivilege("getParcVente");
 		$this->addPrivilege("getTreePanel");
 		$this->addPrivilege("getChildren");
+		$this->addPrivilege("export_atol");
 
 		$this->addPrivilege("autocompleteFournisseursDeCommande");
 		$this->addPrivilege("autocompleteAvecAdresse");
@@ -212,6 +213,98 @@ class societe_cleodis extends societe {
 		}	
 		parent::export($infos,$s);
 	}
+
+
+	/** Permet d'exporter les sociétés ATOL ayant au moins 1 bon de commande
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>              
+    * @param array $infos : contient le nom de l'onglet 
+    */     
+   	public function export_atol($infos,$testUnitaire="false", $reset="true"){       
+	 	
+	 	if($testUnitaire == "true"){
+	 		$donnees = $infos;
+		}else{		
+			$query_select = "SELECT societe.* FROM societe, bon_de_commande 
+							 WHERE societe.id_societe = bon_de_commande.id_societe
+							 AND societe.divers_3 = 'Atol'
+							 AND societe.id_societe IN (SELECT id_societe FROM bon_de_commande)
+							 GROUP BY societe.id_societe";
+			
+			$donnees = ATF::db()->sql2array($query_select);			
+		}       
+		
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
+		$workbook = new PHPExcel;        
+         
+		//premier onglet  
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('ATOL'); 
+		$sheets=array("auto"=>$worksheet_auto); 
+
+		$row_data = array(        	
+			        	 "A" => 'Code magasin Atol'
+			        	,"B" => "Raison Sociale"
+			        	,"C" => "Civilité"
+			        	,"D" => "Nom"
+			        	,"E" => "Prénom"
+			        	,"F" => "Adresse"
+			        	,"G" => "Code Postal"
+			        	,"H" => "Ville"
+			        	,"I" => "Email"
+			        	,"J" => "Téléphone"			        	
+				    );
+		$i=0;
+    	              
+        foreach($row_data as $col=>$titre){         
+			  $sheets['auto']->write($col."1", $titre);  
+			  $sheets["auto"]->sheet->getColumnDimension($col)->setAutoSize(true);    
+        }             
+        
+        $row_data = array();
+		$k=0;		
+       foreach ($donnees as $key => $value) {
+        	$row_data[$k] = array(        	
+	        	 "A" => $value["code_client"]." " 
+	        	,"B" => $value["societe"] 
+	        	,"C" => ATF::contact()->select($value["id_contact_signataire"], "civilite") 
+	        	,"D" => ATF::contact()->select($value["id_contact_signataire"], "nom") 
+	        	,"E" => ATF::contact()->select($value["id_contact_signataire"], "prenom") 
+	        	,"F" => $value["adresse"]." ".$value["adresse_2"]." ".$value["adresse_3"] 
+	        	,"G" => $value["cp"]." "
+	        	,"H" => $value["ville"] 
+	        	,"I" => $value["email"] 
+	        	,"J" => $value["tel"]." "
+			); 
+			$k++;
+        }
+
+        if($row_data){
+        	$row_auto=2;
+        	foreach ($row_data as $k => $v) {        		
+        		foreach($v as $col=>$valeur){				
+					$sheets['auto']->write($col.$row_auto, $valeur);					            
+				}
+				$row_auto++;
+			}
+        }
+    	
+
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);		
+		
+		$writer->save($fname);           
+		header('Content-type: application/vnd.ms-excel');              
+		header('Content-Disposition:inline;filename=export_ATOL.xls');            
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");         
+		fpassthru($fh);   
+		unlink($fname);   
+		PHPExcel_Calculation::getInstance()->__destruct();
+
+	}
+
 
 	/**
 	* Méthode qui retourne les parcs dispo pour les Avenants et les AR
