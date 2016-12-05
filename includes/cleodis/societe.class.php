@@ -250,10 +250,12 @@ class societe_cleodis extends societe {
 			        	,"D" => "Nom"
 			        	,"E" => "Prénom"
 			        	,"F" => "Adresse"
-			        	,"G" => "Code Postal"
-			        	,"H" => "Ville"
-			        	,"I" => "Email"
-			        	,"J" => "Téléphone"			        	
+			        	,"F" => "Adresse 2"
+			        	,"G" => "Adresse 3"
+			        	,"H" => "Code Postal"
+			        	,"I" => "Ville"
+			        	,"J" => "Email"
+			        	,"K" => "Téléphone"			        	
 				    );
 		$i=0;
     	              
@@ -271,11 +273,13 @@ class societe_cleodis extends societe {
 	        	,"C" => ATF::contact()->select($value["id_contact_signataire"], "civilite") 
 	        	,"D" => ATF::contact()->select($value["id_contact_signataire"], "nom") 
 	        	,"E" => ATF::contact()->select($value["id_contact_signataire"], "prenom") 
-	        	,"F" => $value["adresse"]." ".$value["adresse_2"]." ".$value["adresse_3"] 
-	        	,"G" => $value["cp"]." "
-	        	,"H" => $value["ville"] 
-	        	,"I" => $value["email"] 
-	        	,"J" => $value["tel"]." "
+	        	,"F" => $value["adresse"]
+	        	,"G" => $value["adresse_2"]
+	        	,"H" => $value["adresse_3"]
+	        	,"I" => $value["cp"]." "
+	        	,"K" => $value["ville"] 
+	        	,"J" => ATF::contact()->select($value["id_contact_signataire"], "email")
+	        	,"K" => $value["tel"]." "
 			); 
 			$k++;
         }
