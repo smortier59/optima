@@ -250,12 +250,12 @@ class societe_cleodis extends societe {
 			        	,"D" => "Nom"
 			        	,"E" => "Prénom"
 			        	,"F" => "Adresse"
-			        	,"F" => "Adresse 2"
-			        	,"G" => "Adresse 3"
-			        	,"H" => "Code Postal"
-			        	,"I" => "Ville"
-			        	,"J" => "Email"
-			        	,"K" => "Téléphone"			        	
+			        	,"G" => "Adresse 2"
+			        	,"H" => "Adresse 3"
+			        	,"I" => "Code Postal"
+			        	,"J" => "Ville"
+			        	,"K" => "Email"
+			        	,"L" => "Téléphone"			        	
 				    );
 		$i=0;
     	              
@@ -279,7 +279,7 @@ class societe_cleodis extends societe {
 	        	,"I" => $value["cp"]." "
 	        	,"K" => $value["ville"] 
 	        	,"J" => ATF::contact()->select($value["id_contact_signataire"], "email")
-	        	,"K" => $value["tel"]." "
+	        	,"L" => $value["tel"]." "
 			); 
 			$k++;
         }
