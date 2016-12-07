@@ -156,16 +156,12 @@ if ($infos["id_facture"]) {
     }      
 }
 
-//Récuperation du PDF de la facture
+//Récuperation du PDF signé du contrat
 if ($infos["getPdfSigne"]) {   
     
-    log::logger($infos , "mfleurquin");
-
-    $id_commande = ATF::commande()->decryptId($infos["id_commande"]);
+    $id_commande = ATF::commande()->decryptId($infos["id_commande"]);   
     
-    log::logger($id_commande , "mfleurquin");
-
-    $filename = ATF::commande()->filepath($id_commande,"contratA4");
+    $filename = ATF::commande()->filepath($id_commande,"retour");
 
     if(file_exists($filename)){
         $handle = fopen($filename, "r");
@@ -174,8 +170,18 @@ if ($infos["getPdfSigne"]) {
         echo $contents;
         die;
     }else{
-        echo "Probleme de récupération du PDF";
-        die;
+        $filename = ATF::commande()->filepath($id_commande,"contratA4");
+
+        if(file_exists($filename)){
+            $handle = fopen($filename, "r");
+            $contents = fread($handle, filesize($filename));
+            fclose($handle);    
+            echo $contents;
+            die;
+        }else{
+            echo "Probleme de récupération du PDF";
+            die;
+        }
     }      
 }
 

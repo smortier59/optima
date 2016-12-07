@@ -85,6 +85,7 @@ class produit_lm extends produit {
 
 		$this->field_nom = "%produit% (Pack %id_pack_produit% )";
 		$this->foreign_key["id_produit_principal"] = "produit"; 
+		$this->foreign_key["id_pack_produit"] = "pack_produit";
 
 		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
 				
