@@ -19,7 +19,7 @@ class loyer_lm extends loyer {
     */ 
 	public function dureeTotal($id_affaire) {
 		foreach($this->ss("id_affaire",$id_affaire) as $key=>$item){
-			if($item["nature"] !== "prolongation"){
+			if($item["nature"] !== "prolongation" && $item["nature"] !== "prolongation_probable"){
 				if($item["frequence_loyer"]=="an"){
 					$duree+=$item["duree"]*12;
 				}elseif($item["frequence_loyer"]=="semestre"){
