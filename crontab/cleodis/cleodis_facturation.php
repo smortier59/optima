@@ -7,4 +7,5 @@ if(exec('whoami')!="apache"){
 
 ATF::facturation()->facturationMensuelle();
 ATF::facturation()->facturationMensuelleRestitution();
+
 ?>
