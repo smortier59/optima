@@ -1327,9 +1327,10 @@ class commande_lm extends commande {
 								ATF::produit_fournisseur_loyer()->q->reset()->where("id_produit", $i["id_produit"])
 																			->where("nature","engagement");
 								$loyer = ATF::produit_fournisseur_loyer()->select_all();
-
+								$quantite_prod = $i["quantite"];
 								foreach ($loyer as $kl => $vl) {
-									$i["prix_achat"] += $vl["loyer"]*$vl["nb_loyer"];
+									$i["prix_achat"] += $vl["loyer"]*$quantite_prod;
+									$i["quantite"] = $vl["nb_loyer"];
 								}
 							}
 							
