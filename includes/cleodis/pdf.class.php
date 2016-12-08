@@ -89,7 +89,6 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function Header() {			
-
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
 			$this->image(__PDF_PATH__.$this->logo,295,5,35);
@@ -4075,6 +4074,7 @@ class pdf_cleodis extends pdf {
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
 		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		else $this->logo = 'cleodis/logo.jpg';
 
 		//Styles utilisés
 
@@ -4720,6 +4720,7 @@ class pdf_cleodis extends pdf {
 	function global_facture ($facture,$s){
 		$this->open();
 		foreach ($facture as $key => $item) {
+			
 			$this->facture($item,$s,true) ;
 		}
 	}
@@ -4936,6 +4937,7 @@ class pdf_cleodis extends pdf {
 
 
 	function grille_client($facturer,$s,$nf=false,$prol=false) {
+		$this->logo = 'cleodis/logo.jpg';
 		$this->open();
 		$this->addpage();
 		$this->setfont('arial','B',15);
