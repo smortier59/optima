@@ -250,14 +250,12 @@ class affaire_lm extends affaire {
 				->addCondition("ref",$prefix."%","AND",false,"LIKE")
 				->addCondition("LENGTH(`ref`)",3,"AND",false,">")
 			    ->addCondition("ref","%AVT%","AND",false,"NOT LIKE")
-				->addField('SUBSTRING(`ref`,5)+1',"max_ref")
-				->addOrder('ref',"DESC")
+				->addField('SUBSTRING(`ref`,4)+1',"max_ref")
+				//->addOrder('ref',"DESC")
 				->setDimension("row")
 				->setLimit(1);
 	
 		$nb=$this->sa();
-
-		log::logger($nb , "mfleurquin");
 
 		if($nb["max_ref"]){
 			if($nb["max_ref"]<10){
