@@ -257,6 +257,8 @@ class affaire_lm extends affaire {
 	
 		$nb=$this->sa();
 
+		log::logger($nb , "mfleurquin");
+
 		if($nb["max_ref"]){
 			if($nb["max_ref"]<10){
 				$suffix="000".$nb["max_ref"];
