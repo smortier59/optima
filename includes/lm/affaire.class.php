@@ -260,9 +260,9 @@ class affaire_lm extends affaire {
 		if(date("y") < 17){
 			if($nb["max_ref"]){
 				if($nb["max_ref"]<10){
-					$suffix="000".$nb["max_ref"];
-				}elseif($nb["max_ref"]<100){
 					$suffix="00".$nb["max_ref"];
+				}elseif($nb["max_ref"]<100){
+					$suffix="0".$nb["max_ref"];
 				}else{
 					$suffix=$nb["max_ref"];
 				}
