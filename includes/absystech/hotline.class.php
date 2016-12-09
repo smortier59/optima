@@ -3723,7 +3723,7 @@ class hotline extends classes_optima {
 				break;
 			}
 
-			$this->q->setLimit($get['limit']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 
 		}
 
@@ -3754,7 +3754,7 @@ class hotline extends classes_optima {
 		if ($get['id']) {
 			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
 
-	        $return = $data['data'][0];
+      $return = $data['data'][0];
 
 			// Check PJ
 			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
@@ -3763,10 +3763,12 @@ class hotline extends classes_optima {
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
-			header("ts-max-page: ".ceil($data['count']/$get['limit']));
-			header("ts-active-page: ".$get['page']);
+			if (!$get['no-limit']) {
+				header("ts-max-page: ".ceil($data['count']/$get['limit']));
+				header("ts-active-page: ".$get['page']);
+			}
 
-	        $return = $data['data'];
+      $return = $data['data'];
 		}
 
 		return $return;
@@ -3978,7 +3980,7 @@ class hotline extends classes_optima {
 
         	// last itneraction
         	if ($lastInteractionRequired) {
-        		$p = array("limit"=>1,"tri"=>"hotline_interaction.id_hotline_interaction","trid"=>"desc","id_hotline"=>$post['id_hotline']);
+        		$p = array("limit"=>1,"tri"=>"hotline_interaction.id_hotline_interaction_fk","trid"=>"desc","id_hotline"=>$post['id_hotline']);
 						$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
         	}
 

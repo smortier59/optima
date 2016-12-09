@@ -22,13 +22,13 @@ class facture_absystech extends facture {
 	* @var mixed
 	*/
 	private $current_mail=NULL;
-	
+
 	/**	* Constructeur par défaut
-	*/ 
-	public function __construct() { 
+	*/
+	public function __construct() {
 		parent::__construct();
 		$this->table = "facture";
-		$this->colonnes['fields_column'] = array(	
+		$this->colonnes['fields_column'] = array(
 			'facture.ref'=>array("width"=>100,"align"=>"center")
 			,'facture.id_societe'
 			,'facture.date'=>array("width"=>100,"align"=>"center")
@@ -43,9 +43,9 @@ class facture_absystech extends facture {
 			,'interet'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money","width"=>80)
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			,'actions'=>array("custom"=>true,"nosort"=>true,"align"=>"center","width"=>100,"renderer"=>"actionsFacture")
-		);	
+		);
 
-		$this->colonnes['primary'] = array(	 
+		$this->colonnes['primary'] = array(
 			"id_societe"=>array("autocomplete"=>array(
 				"function"=>"autocompleteAvecTVA"
 				,"mapping"=>array(
@@ -56,7 +56,7 @@ class facture_absystech extends facture {
 					,array('name'=> 'nomBrut', 'mapping'=> 'raw_2')
 				)
 			))
-			,"date"			
+			,"date"
 			,'date_previsionnelle'=>array("obligatoire"=>true)
 			,'date_relance'
 			,'date_modification'
@@ -66,18 +66,18 @@ class facture_absystech extends facture {
 			,'affaire_sans_devis_libelle'=>array("xtype"=>"textfield","null"=>true)
 			,'infosSup'
 			,'dematerialisation'=>array("xtype"=>"checkbox","null"=>true)
-		);		
+		);
 
 		$this->colonnes['panel']['mode_facturation'] = array(
 			"mode"=>array("custom"=>true,"data"=>array("facture","avoir","factor","acompte"),"xtype"=>"combo","listeners"=>array("change"=>"ATF.changeModeFacture"))
 			,"id_facture_parente"=>array("disabled"=>true)
-			,"date_debut_periode"					
+			,"date_debut_periode"
 			,"periodicite"=>array("disabled"=>false,"listeners"=>array("change"=>"ATF.changePeriode"))
 			,'id_termes'=>array("updateOnSelect"=>true,"custom"=>true)
 			,"date_fin_periode"
 			,"acompte_pourcent"=>array("custom"=>true,"xtype"=>"numberfield","listeners"=>array("change"=>"ATF.changeAcompte"))
-			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")			
-			
+			,"finale"=>array("custom"=>true,"xtype"=>"checkbox")
+
 		);
 
 		$this->colonnes['panel']['lignes'] = array(
@@ -99,7 +99,7 @@ class facture_absystech extends facture {
 			,"emailCopie"=>array("custom"=>true,'null'=>true)
 			,"emailTexte"=>array("custom"=>true,'null'=>true,"xtype"=>"htmleditor")
 		);
-		
+
 		// Propriété des panels
 		$this->panels['mode_facturation'] = array("visible"=>true,'nbCols'=>3,"collapsible"=>false);
 		$this->panels['primary'] = array("visible"=>true,'nbCols'=>4);
@@ -108,16 +108,16 @@ class facture_absystech extends facture {
 		$this->panels['courriel'] = array('nbCols'=>2);
 
 		// Champs masqués
-		$this->colonnes['bloquees']['insert'] =  
-		$this->colonnes['bloquees']['cloner'] =  
-		$this->colonnes['bloquees']['update'] =  array('type_facture','divers_1','ref','id_user','etat','id_commande','regenerate','date_effective');	
-		
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] =  array('type_facture','divers_1','ref','id_user','etat','id_commande','regenerate','date_effective');
+
 		$this->colonnes['bloquees']['update'][] = "affaire_sans_devis";
 		$this->colonnes['bloquees']['update'][] = "affaire_sans_devis_libelle";
 
 		//IMPORTANT, complte le tableau de colonnes avec les infos MYSQL des colonnes
-		$this->fieldstructure();	
-			
+		$this->fieldstructure();
+
 		$this->foreign_key["id_facture_parente"] = "facture";
 
 		$this->addPrivilege('rapprochementFacture');
@@ -134,8 +134,8 @@ class facture_absystech extends facture {
 		//$this->files["lettre_de_change"] = array("type"=>"pdf","no_upload"=>true);
 		$this->field_nom = "ref";
 		$this->formExt=true;
-		
-		
+
+
 		$this->autocomplete = array(
 			"field"=>array("facture.ref","facture.prix")
 			,"show"=>array("facture.ref","facture.prix")
@@ -143,7 +143,7 @@ class facture_absystech extends facture {
 			,"view"=>array("facture.ref","facture.prix")
 		);
 	}
-	
+
 	/**
 	* Surcharge du select-All
 	*/
@@ -166,9 +166,9 @@ class facture_absystech extends facture {
 									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
 									,(facture.prix*facture.tva)
 								)),2)","solde")
-			->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+			->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
 			->addField("IF(facture.etat!='perte'
-							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
 								,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
 								    *ROUND(IF(
 										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
@@ -188,11 +188,11 @@ class facture_absystech extends facture {
 									,facture.prix*facture.tva
 								),2))
 								, 0 )
-							) 					   					
-						,0)","interet")			
+							)
+						,0)","interet")
 			->addGroup("facture.id_facture");
 		$return = parent::select_all($order_by,$asc,$page,$count);
-		
+
 		foreach ($return['data'] as $k=>$i) {
 			//{if $fact["etat"] == "impayee"  && $current_class->is_past($fact["date_previsionnelle"]) && ATF::relance()->getNumeroDeRelance($idCrypt)}
 			if ($i['facture.id_facture']) { // Seulement si on a une clé, car dans lec as d'un autocomplete on demande pas ce field...
@@ -207,7 +207,7 @@ class facture_absystech extends facture {
 				if ($rNo=='fourth') {
 					$return['data'][$k]['allowPDFRelance'] = false;
 				}
-	
+
 				if ($i['solde']>0) {
 					$return['data'][$k]['allowSolde'] = true;
 				} else {
@@ -223,12 +223,12 @@ class facture_absystech extends facture {
 		}
 		return $return;
 	}
-	
+
 	/**
 	* Prédicat sur l'antériorité par rapport à la date d'aujourd'hui
 	* @param string $jour
 	* @return bool true si le jour est antérieur à aujourd'hui
-	
+
 	public function getInterets($id) {
 		$facture = $this->select($id);
 		if ($facture['etat']!="perte") {
@@ -247,14 +247,14 @@ class facture_absystech extends facture {
 				$round = round($facture['prix']*$facture['tva'],2);
 			}
 			$calcul = $calcul * $round;
-			
+
 			if ($calcul>=65) {
-				return round($calcul,2);	
+				return round($calcul,2);
 			}
 
 		}
 		return false;
-	} 
+	}
 	*/
 	/**
 	* Prédicat sur l'antériorité par rapport à la date d'aujourd'hui
@@ -264,13 +264,13 @@ class facture_absystech extends facture {
 	public function is_past($jour) {
 		$now = time();
 		$date = strtotime($jour);
-	
+
 		if ($date < $now){
 			return true;
 		}else{
 			return false;
 		}
-	} 
+	}
 
 	public function getLastFacture($id_affaire,$idRef=false,$copieur=false) {
 		$facture = ATF::facture()->select($idRef);
@@ -288,7 +288,7 @@ class facture_absystech extends facture {
 				        ->where('date',$facture["date"],"AND","","<")
 				        ->addOrder('date','desc');
 			}else{ $this->q->where('id_facture',$idRef,"AND","","<")->addOrder('id_facture','desc'); }
-					
+
 		} else {
 			$this->q->addOrder('date','desc');
 		}
@@ -300,7 +300,7 @@ class facture_absystech extends facture {
 	}
 
 
-	/** 
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes de factures et modifier l'état de l'affaire sur l'insert d'une facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -323,7 +323,7 @@ class facture_absystech extends facture {
 		if($infos["type_facture"] == "acompte"){
 			$finale = false;
 			$infos["type_facture"] = "facture";
-		} 
+		}
 
 		if(!count($infos_ligne)){
 			throw new errorATF("Une facture doit comporter au moins une ligne.",161);
@@ -395,14 +395,14 @@ class facture_absystech extends facture {
 		if(!$infos["date_previsionnelle"]){
 			$infos["date_previsionnelle"] = date('Y-m-d',strtotime(date("Y-m-d")." + 30 day"));
 		}
-		
+
 		$societe=ATF::societe()->select($infos["id_societe"]);
-		
+
 		//Seuls les associés et Emma peuvent modifier la tva
-		$tva=$this->getTVA($societe["id_societe"]);		
+		$tva=$this->getTVA($societe["id_societe"]);
 		$assistantDirection = 9;
 		if(ATF::$codename == "att") $assistantDirection = 5;
-		
+
 
 		if($tva!=$infos["tva"] && (ATF::$usr->get("id_profil")!=1 && ATF::$usr->get("id_profil")!=$assistantDirection )){
 			$profil=ATF::profil()->select(1);
@@ -419,7 +419,7 @@ class facture_absystech extends facture {
 				$infos["type_facture"]="acompte";
 			}elseif($id_commande && ($anc_facture = $this->facture_by_commande($id_commande,true))){
 				$infos["prix"]-=$anc_facture["prix"];
-				$infos["type_facture"]="solde"; 
+				$infos["type_facture"]="solde";
 			}else{
 				$infos["type_facture"]="facture";
 			}
@@ -441,11 +441,11 @@ class facture_absystech extends facture {
 
 			// 	if($commande["prix"]!=$infos["prix"]){
 			// 		$infos["frais_de_port"]=$infos["frais_de_port"];
-			// 		//Si c'est un solde ou un acompte				
-			// 		$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);					
+			// 		//Si c'est un solde ou un acompte
+			// 		$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);
 			// 	}
 			// }
-			
+
 			// $infos["prix"] = $infos["prix"] - $sum_anc_facture["prix"];
 
 
@@ -488,7 +488,7 @@ class facture_absystech extends facture {
 
 			//Facture
 			$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-			
+
 			//Facture Ligne
 			foreach($infos_ligne as $key=>$item){
 				foreach($item as $k=>$i){
@@ -517,26 +517,26 @@ class facture_absystech extends facture {
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
 				}
-				
-				$total = 0;	
+
+				$total = 0;
 				$dateFacture = date("Y-m-d", mktime(0, 0, 0, $date[1], $date[0], $date[2]));
-				
+
 				switch ($infos["periodicite"]) {
 	 				case 'mensuelle':
 						$mois = mktime( 0, 0, 0, $date[1], 1, $date[2] );
 						$dateFin = date("Y-m-d", mktime(0, 0, 0, $date[1], date('t',$mois), $date[2]));
-						$dateDeb = date("Y-m-d" , $mois);					
-						
+						$dateDeb = date("Y-m-d" , $mois);
+
 						$nbJoursMois = $this->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = $this->date_diff($dateFacture, $infos["date_fin_periode"]);
 						}else{
 							$nbJoursAVenir = $this->date_diff($dateFacture, $dateFin);
 						}
-						
-	
+
+
 						if($nbJoursMois !== $nbJoursAVenir){
-							$remise = $nbJoursAVenir-1;	
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur un mois : ".($nbJoursMois-$remise)." jours sur ".$nbJoursMois." jours";
@@ -546,24 +546,24 @@ class facture_absystech extends facture {
 						    $item["id_facture"] = $last_id;
 							$id = ATF::facture_ligne()->i($item,$s);
 
-							$prix += $item["prix"]; 							
-						}		
+							$prix += $item["prix"];
+						}
 					break;
-					
-					case 'trimestrielle':	
+
+					case 'trimestrielle':
 						//01 Janvier - 31 Mars
 						if(intval($date[1]) <= 3){
 							$mois = mktime( 0, 0, 0, 3, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  1, 1, $date[2])); // 01-01-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 3, date('t',$mois), $date[2]));
-								
+
 						}
 						elseif(intval($date[1]) <= 6) {
 							//01 Avril - 30 Juin
 							$mois = mktime( 0, 0, 0, 6, 1, $date[2] );
-							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  4, 1, $date[2])); // 01-04-anneeFacture	
+							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  4, 1, $date[2])); // 01-04-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 6, date('t',$mois), $date[2]));
-							
+
 						}
 						elseif(intval($date[1]) <= 9) {
 							//01 Juillet - 30 Septembre
@@ -576,9 +576,9 @@ class facture_absystech extends facture {
 							$mois = mktime( 0, 0, 0, 12, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  10, 1, $date[2])); // 01-10-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 12, date('t',$mois), $date[2]));
-							
-						}					
-						
+
+						}
+
 						$nbJoursTrimestre = ATF::facture_absystech()->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $infos["date_fin_periode"]);
@@ -586,36 +586,36 @@ class facture_absystech extends facture {
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $dateFin);
 						}
 
-						if($nbJoursTrimestre !== $nbJoursAVenir){					
-							$remise = $nbJoursAVenir-1;	
+						if($nbJoursTrimestre !== $nbJoursAVenir){
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur un trimestre : ".($nbJoursTrimestre-$remise)." jours sur ".$nbJoursTrimestre." jours";
 						    $item["quantite"] = 1;
 						    $item["prix"] = $infos["prix"]*($nbJoursTrimestre-$remise)/$nbJoursTrimestre*-1;
 						    $item["id_compte_absystech"] = "";
-						    $item["id_facture"] = $last_id;						
-							ATF::facture_ligne()->i($item,$s);	
+						    $item["id_facture"] = $last_id;
+							ATF::facture_ligne()->i($item,$s);
 
-							$prix += $item["prix"]; 
+							$prix += $item["prix"];
 						}
 					break;
-					
-					case 'semestrielle' :						
-						
+
+					case 'semestrielle' :
+
 						//01 Janvier au 30 Juin
 						if(intval($date[1]) <= 6){
 							$mois = mktime( 0, 0, 0, 6, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  1, 1, $date[2])); // 01-01-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 6, date('t',$mois), $date[2]));
-						
+
 						}//01 Juillet au 31 Decembre
 						else{
 							$mois = mktime( 0, 0, 0, 12, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  7, 1, $date[2])); // 01-01-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 12, date('t',$mois), $date[2]));
-						}							
-						
+						}
+
 						$nbJoursSemestre = ATF::facture_absystech()->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $infos["date_fin_periode"]);
@@ -623,78 +623,78 @@ class facture_absystech extends facture {
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $dateFin);
 						}
 
-						
-						if($nbJoursSemestre !== $nbJoursAVenir){					
-							$remise = $nbJoursAVenir-1;	
+
+						if($nbJoursSemestre !== $nbJoursAVenir){
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur un semestre : ".($nbJoursSemestre-$remise)." jours sur ".$nbJoursSemestre." jours";
 						    $item["quantite"] = 1;
 						    $item["prix"] = $infos["prix"]*($nbJoursSemestre-$remise)/$nbJoursSemestre*-1;
 						    $item["id_compte_absystech"] = "";
-						    $item["id_facture"] = $last_id;						
-							ATF::facture_ligne()->i($item,$s);	
+						    $item["id_facture"] = $last_id;
+							ATF::facture_ligne()->i($item,$s);
 
-							$prix += $item["prix"]; 
+							$prix += $item["prix"];
 						}
-						
-					break;				
-									
+
+					break;
+
 					case 'annuelle':
-						$mois = mktime( 0, 0, 0, 12, 1, $date[2] );				
+						$mois = mktime( 0, 0, 0, 12, 1, $date[2] );
 						$dateDeb = date("Y-m-d", mktime(0, 0, 0, 1, 1, $date[2]));
 						$dateFin = date("Y-m-d", mktime(0, 0, 0, 12,  date('t',$mois), $date[2]));
-								
+
 						$nbJoursAnnee = ATF::facture_absystech()->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $infos["date_fin_periode"]);
 						}else{
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $dateFin);
 						}
-						
-						if($nbJoursAnnee !== $nbJoursAVenir){					
-							$remise = $nbJoursAVenir-1;	
+
+						if($nbJoursAnnee !== $nbJoursAVenir){
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur une année : ".($nbJoursAnnee-$remise)." jours sur ".$nbJoursAnnee." jours";
 						    $item["quantite"] = 1;
 						    $item["prix"] = $infos["prix"]*($nbJoursAnnee-$remise)/$nbJoursAnnee*-1;
 						    $item["id_compte_absystech"] = "";
-						    $item["id_facture"] = $last_id;						
-							ATF::facture_ligne()->i($item,$s);	
-							
-							$prix += $item["prix"]; 
-						}							
+						    $item["id_facture"] = $last_id;
+							ATF::facture_ligne()->i($item,$s);
+
+							$prix += $item["prix"];
+						}
 					break;
 				}
 
 				if($infos["date_fin_periode"]){
 					$dateFin = $infos["date_fin_periode"];
-				}				
+				}
 				$this->u(array("id_facture"=>$last_id  ,"prix" => $prix, "date_fin_periode" => $dateFin));
 
 				//Ajouter test pour savoir si la dateFin > date_fin maintenance avant de modifier
 				ATF::affaire()->q->reset()->where("affaire.id_affaire", $infos["id_affaire"])->addField("affaire.date_fin_maintenance")->setLimit(1);
 				$affaire = ATF::affaire()->select_row();
-								
-				if($affaire["affaire.date_fin_maintenance"]){								
-					$nbJoursDiff = $this->date_diff($affaire["affaire.date_fin_maintenance"] , $dateFin);									
+
+				if($affaire["affaire.date_fin_maintenance"]){
+					$nbJoursDiff = $this->date_diff($affaire["affaire.date_fin_maintenance"] , $dateFin);
 					if($nbJoursDiff > 0){
 						ATF::affaire()->u(array("id_affaire" => $infos["id_affaire"], "date_fin_maintenance" => $dateFin));
-					}	
+					}
 				}else{
 					ATF::affaire()->u(array("id_affaire" => $infos["id_affaire"], "date_fin_maintenance" => $dateFin));
 				}
 			}
-			
-	
+
+
 			//Commande Ligne
 			if($id_commande){
 				$commande_facture["id_facture"]=$last_id;
 				$commande_facture["id_commande"]=$id_commande;
-				ATF::commande_facture()->insert($commande_facture,$s);					
+				ATF::commande_facture()->insert($commande_facture,$s);
 			}
-			
+
 			//Commande
 			if($id_commande && $finale){
 				$commande["id_commande"]=$id_commande;
@@ -704,14 +704,14 @@ class facture_absystech extends facture {
 
 
 		//***************************************************************************************
-		
-		if($preview){			
+
+		if($preview){
 
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
 			return $this->cryptId($last_id);
 		}else{
-			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base	
+			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 			/* MAIL */
 			if($email){
 				if(!$email["email"]){
@@ -738,16 +738,16 @@ class facture_absystech extends facture {
 				$info_mail["texte"] = $email["texte"];
 				$info_mail["recipient"] = $recipient;
 				//Ajout du fichier
-				$path = $this->filepath($last_id,"fichier_joint");		
-				
+				$path = $this->filepath($last_id,"fichier_joint");
+
 				$this->facture_mail = new mail($info_mail);
-				$this->facture_mail->addFile($path,$facture["ref"].".pdf",true);						
+				$this->facture_mail->addFile($path,$facture["ref"].".pdf",true);
 				$this->facture_mail->send();
-				
+
 				if($email["emailCopie"]){
 					$info_mail["recipient"] = $email["emailCopie"];
 					$this->facture_copy_mail = new mail($info_mail);
-					$this->facture_copy_mail->addFile($path,$facture["ref"].".pdf",true);						
+					$this->facture_copy_mail->addFile($path,$facture["ref"].".pdf",true);
 					$this->facture_copy_mail->send();
 				}
 			}
@@ -763,7 +763,7 @@ class facture_absystech extends facture {
 
 				ATF::facture()->q->reset()->where("id_affaire",$infos["id_affaire"])
 										  ->setCountOnly();
-				$nb = 	ATF::facture()->select_row();				  
+				$nb = 	ATF::facture()->select_row();
 				if($nb_facture == $nb){
 					//C'est l'avant derniere facture, il faut envoyer une alerte car le contrat arrive a echeance !
 					ATF::tache()->insert(array("id_societe"=>$infos["id_societe"],
@@ -783,7 +783,7 @@ class facture_absystech extends facture {
 		}
 
 		ATF::affaire()->redirection("select",$infos["id_affaire"]);
-		
+
 		return $this->cryptId($last_id);
 	}
 
@@ -792,11 +792,11 @@ class facture_absystech extends facture {
 	 * @param $date2 date de fin
 	 * @return int nombre de jours entre 2 dates
 	 */
-	 public function date_diff($date1, $date2)  
-	{ 
-		 $s = strtotime($date2)-strtotime($date1); 
-		 $d = intval($s/86400)+1;   
-		 return "$d"; 
+	 public function date_diff($date1, $date2)
+	{
+		 $s = strtotime($date2)-strtotime($date1);
+		 $d = intval($s/86400)+1;
+		 return "$d";
 	}
 
 	/**
@@ -811,9 +811,9 @@ class facture_absystech extends facture {
 		} else {
 			throw new errorATF("Il est impossible de modifier une facture d'accompte ou de solde.",893);
 		}
-	}	
+	}
 
-	/** 
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes de factures et modifier l'état de l'affaire sur l'insert d'une facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -856,16 +856,16 @@ class facture_absystech extends facture {
 		}else{
 			$email=false;
 		}
- 
+
 		unset($infos["email"],$infos["emailCopie"],$infos["emailTexte"],$infos["marge"],$infos["prix_achat"],$infos["sous_total"],$infos["mode"],$infos["acompte_pourcent"],$infos["id_commande"],$infos["finale"],$infos["preview"],$infos["marge_absolue"]);
 		$societe=ATF::societe()->select($infos["id_societe"]);
 
 		if($type_check=="avoir"){
 			if($infos["prix"] > 0){
 				$infos["prix"]=0-$infos["prix"];
-			}			
+			}
 			$infos["type_facture"]="avoir";
-			if(!$infos["id_facture_parente"]){				
+			if(!$infos["id_facture_parente"]){
 				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 		}elseif($type_check=="factor"){
@@ -877,37 +877,37 @@ class facture_absystech extends facture {
 
 		ATF::db($this->db)->begin_transaction();
 		//*****************************Transaction********************************
-	
+
 			//Facture
-			
-			if($infos["periodicite"]){				
+
+			if($infos["periodicite"]){
 				$date = $infos["date_debut_periode"];
 				$date = explode("-", $date);
-					
+
 				if(!$infos["date_debut_periode"] || !$infos["date"]){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF(ATF::$usr->trans("Il faut remplir la date (date d'édition) et la date de début de période pour une facture périodique"),175);
-				}	
+				}
 
-				$total = 0;	
+				$total = 0;
 				$dateFacture = date("Y-m-d", mktime(0, 0, 0, $date[1], $date[0], $date[2]));
-								
+
 				switch ($infos["periodicite"]) {
 	 				case 'mensuelle':
 						$mois = mktime( 0, 0, 0, $date[1], 1, $date[2] );
-						$dateFin = date("Y-m-d", mktime(0, 0, 0, $date[1], date('t',$mois), $date[2]));	
+						$dateFin = date("Y-m-d", mktime(0, 0, 0, $date[1], date('t',$mois), $date[2]));
 
-						$dateDeb = date("Y-m-d" , $mois);					
-						
+						$dateDeb = date("Y-m-d" , $mois);
+
 						$nbJoursMois = $this->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = $this->date_diff($dateFacture, $infos["date_fin_periode"]);
 						}else{
 							$nbJoursAVenir = $this->date_diff($dateFacture, $dateFin);
 						}
-						
+
 						if($nbJoursMois !== $nbJoursAVenir){
-							$remise = $nbJoursAVenir-1;	
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur un mois : ".($nbJoursMois-$remise)." jours sur ".$nbJoursMois." jours";
@@ -918,24 +918,24 @@ class facture_absystech extends facture {
 
 							$additionnalLines[] = $item;
 
-							$infos["prix"] += $item["prix"]; 							
-						}		
+							$infos["prix"] += $item["prix"];
+						}
 
 					break;
-					
-					case 'trimestrielle':	
+
+					case 'trimestrielle':
 						if(intval($date[1]) <= 3){
 							$mois = mktime( 0, 0, 0, 3, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  1, 1, $date[2])); // 01-01-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 3, date('t',$mois), $date[2]));
-								
+
 						}
 						elseif(intval($date[1]) <= 6) {
 							//01 Avril - 30 Juin
 							$mois = mktime( 0, 0, 0, 6, 1, $date[2] );
-							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  4, 1, $date[2])); // 01-04-anneeFacture	
+							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  4, 1, $date[2])); // 01-04-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 6, date('t',$mois), $date[2]));
-							
+
 						}
 						elseif(intval($date[1]) <= 9) {
 							//01 Juillet - 30 Septembre
@@ -948,8 +948,8 @@ class facture_absystech extends facture {
 							$mois = mktime( 0, 0, 0, 12, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  10, 1, $date[2])); // 01-10-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 12, date('t',$mois), $date[2]));
-							
-						}					
+
+						}
 						$nbJoursTrimestre = $this->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = $this->date_diff($dateFacture, $infos["date_fin_periode"]);
@@ -957,38 +957,38 @@ class facture_absystech extends facture {
 							$nbJoursAVenir = $this->date_diff($dateFacture, $dateFin);
 						}
 
-						if($nbJoursTrimestre !== $nbJoursAVenir){					
-							$remise = $nbJoursAVenir-1;	
+						if($nbJoursTrimestre !== $nbJoursAVenir){
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur un trimestre : ".($nbJoursTrimestre-$remise)." jours sur ".$nbJoursTrimestre." jours";
 						    $item["quantite"] = 1;
 						    $item["prix"] = $infos["prix"]*($nbJoursTrimestre-$remise)/$nbJoursTrimestre*-1;
 						    $item["id_compte_absystech"] = "";
-						    $item["id_facture"] = $this->decryptId($infos['id_facture']);						
+						    $item["id_facture"] = $this->decryptId($infos['id_facture']);
 							$additionnalLines[] = $item;
 
-							$infos["prix"] += $item["prix"]; 							
+							$infos["prix"] += $item["prix"];
 						}
 
 
 					break;
 
-					case 'semestrielle' :						
-						
+					case 'semestrielle' :
+
 						//01 Janvier au 30 Juin
 						if(intval($date[1]) <= 6){
 							$mois = mktime( 0, 0, 0, 6, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  1, 1, $date[2])); // 01-01-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 6, date('t',$mois), $date[2]));
-						
+
 						}//01 Juillet au 31 Decembre
 						else{
 							$mois = mktime( 0, 0, 0, 12, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  7, 1, $date[2])); // 01-01-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 12, date('t',$mois), $date[2]));
-						}							
-						
+						}
+
 						$nbJoursSemestre = $this->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = $this->date_diff($dateFacture, $infos["date_fin_periode"]);
@@ -996,73 +996,73 @@ class facture_absystech extends facture {
 							$nbJoursAVenir = $this->date_diff($dateFacture, $dateFin);
 						}
 
-						
-						if($nbJoursSemestre !== $nbJoursAVenir){					
-							$remise = $nbJoursAVenir-1;	
+
+						if($nbJoursSemestre !== $nbJoursAVenir){
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur un semestre : ".($nbJoursSemestre-$remise)." jours sur ".$nbJoursSemestre." jours";
 						    $item["quantite"] = 1;
 						    $item["prix"] = $infos["prix"]*($nbJoursSemestre-$remise)/$nbJoursSemestre*-1;
 						    $item["id_compte_absystech"] = "";
-						    $item["id_facture"] = $this->decryptId($infos['id_facture']);						
+						    $item["id_facture"] = $this->decryptId($infos['id_facture']);
 							$additionnalLines[] = $item;
 
-							$infos["prix"] += $item["prix"]; 							
+							$infos["prix"] += $item["prix"];
 						}
-						
-					break;				
-									
+
+					break;
+
 					case 'annuelle':
-						$mois = mktime( 0, 0, 0, 12, 1, $date[2] );				
+						$mois = mktime( 0, 0, 0, 12, 1, $date[2] );
 						$dateDeb = date("Y-m-d", mktime(0, 0, 0, 1, 1, $date[2]));
 						$dateFin = date("Y-m-d", mktime(0, 0, 0, 12,  date('t',$mois), $date[2]));
-								
+
 						$nbJoursAnnee = $this->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = $this->date_diff($dateFacture, $infos["date_fin_periode"]);
 						}else{
 							$nbJoursAVenir = $this->date_diff($dateFacture, $dateFin);
 						}
-						
-						if($nbJoursAnnee !== $nbJoursAVenir){					
-							$remise = $nbJoursAVenir-1;	
+
+						if($nbJoursAnnee !== $nbJoursAVenir){
+							$remise = $nbJoursAVenir-1;
 							$item = array();
 							$item["ref"] = "PRORATA";
 						    $item["produit"] = "Remise prorata temporis sur une année : ".($nbJoursAnnee-$remise)." jours sur ".$nbJoursAnnee." jours";
 						    $item["quantite"] = 1;
 						    $item["prix"] = $infos["prix"]*($nbJoursAnnee-$remise)/$nbJoursAnnee*-1;
 						    $item["id_compte_absystech"] = "";
-						    $item["id_facture"] = $this->decryptId($infos['id_facture']);						
+						    $item["id_facture"] = $this->decryptId($infos['id_facture']);
 							$additionnalLines[] = $item;
 
-							$infos["prix"] += $item["prix"]; 		
-						}							
+							$infos["prix"] += $item["prix"];
+						}
 					break;
 
 				}
-				
+
 				$infos["date_fin_periode"] = $dateFin;
-								
+
 				//Avant de modifier la date de fin de maintenance d'une affaire, il faut verifier si la date à modifier est < à la date de fin de la facture que l'on viens de modifier
 				ATF::affaire()->q->reset()->addField("affaire.date_fin_maintenance")->where("affaire.id_affaire",$infos["id_affaire"]);
-				$affaire = ATF::affaire()->select_row();	
-				
-				if($affaire["affaire.date_fin_maintenance"]){								
-					$nbJoursDiff = $this->date_diff($affaire["affaire.date_fin_maintenance"] , $dateFin);									
+				$affaire = ATF::affaire()->select_row();
+
+				if($affaire["affaire.date_fin_maintenance"]){
+					$nbJoursDiff = $this->date_diff($affaire["affaire.date_fin_maintenance"] , $dateFin);
 					if($nbJoursDiff > 0){
 						ATF::affaire()->u(array("id_affaire" => $infos["id_affaire"], "date_fin_maintenance" => $dateFin));
-					}	
+					}
 				}else{
 					ATF::affaire()->u(array("id_affaire" => $infos["id_affaire"], "date_fin_maintenance" => $dateFin));
-				}		
+				}
 			}
-			
+
 			if($infos["type_facture"]=="facture" && $infos["id_termes"] === NULL){
 				ATF::db($this->db)->rollback_transaction();
 				throw new errorATF("Vous devez spécifier les termes",167);
 			}
-			
+
 			parent::update($infos,$s);
 
 			ATF::facture_ligne()->q->reset()
@@ -1073,7 +1073,7 @@ class facture_absystech extends facture {
 			foreach($facture_ligne as $key=>$item){
 				ATF::facture_ligne()->delete(array("id"=>$item["id_facture_ligne"]));
 			}
-			
+
 			$facture_ligne_after = $infos_ligne;
 			//Facture Ligne
 			foreach($infos_ligne as $key=>$item){
@@ -1082,7 +1082,7 @@ class facture_absystech extends facture {
 					$item[str_replace("facture_ligne.","",$k_unescape)]=$i;
 					unset($item[$k]);
 				}
-	
+
 				$item["id_fournisseur"]=$item["id_fournisseur_fk"];
 				$item["id_compte_absystech"]=$item["id_compte_absystech_fk"];
 				unset($item["id_fournisseur_fk"],$item["id_compte_absystech_fk"],$item["marge"],$item["marge_absolue"]);
@@ -1097,10 +1097,10 @@ class facture_absystech extends facture {
 				ATF::facture_ligne()->i($i,$s);
 			}
 
-			
-			
+
+
 		//***************************************************************************************
-				
+
 		if($preview){
 			$this->move_files($infos["id_facture"],$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -1130,16 +1130,16 @@ class facture_absystech extends facture {
 				$info_mail["texte"] = $email["texte"];
 				$info_mail["recipient"] = $recipient;
 				//Ajout du fichier
-				$path = $this->filepath($infos["id_facture"],"fichier_joint");		
-				
+				$path = $this->filepath($infos["id_facture"],"fichier_joint");
+
 				$this->facture_mail = new mail($info_mail);
-				$this->facture_mail->addFile($path,$infos["ref"].".pdf",true);						
+				$this->facture_mail->addFile($path,$infos["ref"].".pdf",true);
 				$this->facture_mail->send();
-				
+
 				if($email["emailCopie"]){
 					$info_mail["recipient"] = $email["emailCopie"];
 					$this->facture_copy_mail = new mail($info_mail);
-					$this->facture_copy_mail->addFile($path,$infos["ref"].".pdf",true);						
+					$this->facture_copy_mail->addFile($path,$infos["ref"].".pdf",true);
 					$this->facture_copy_mail->send();
 				}
 			}
@@ -1148,12 +1148,12 @@ class facture_absystech extends facture {
 		}
 		$id_affaire=$this->select($infos["id_facture"],"id_affaire");
 		ATF::affaire()->redirection("select",$id_affaire);
-		
+
 		return true;
 	}
 
-	
-	/** 
+
+	/**
 	* Surcharge de delete afin de supprimer les lignes de commande et modifier l'état de l'affaire et du devis
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -1164,13 +1164,13 @@ class facture_absystech extends facture {
 	*/
 	public function delete($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL) {
 		if (is_numeric($infos) || is_string($infos)) {
-						
+
 			$id=$this->decryptId($infos);
 			$facture=$this->select($id);
-			
+
 			ATF::db($this->db)->begin_transaction();
 			//*****************************Transaction********************************
-				
+
 				//Commande
 				ATF::commande_facture()->q->reset()->addCondition("id_facture",$id)->end();
 				if($tab_commande=ATF::commande_facture()->select_all()){
@@ -1184,34 +1184,34 @@ class facture_absystech extends facture {
 
 				//Facture
 				parent::delete($id,$s);
-				
+
 				//On recupere les factures précédente pour récuperer la date de fin la plus proche
 				$this->q->reset()->where("facture.id_affaire", $facture["id_affaire"])->addField("facture.date_fin_periode");
 				$factures = $this->select_all();
-				
+
 				//Si pas d'autre facture la date de fin de période devient NULL
-				
+
 				if(is_array($factures)){
 					$dateFin = "";
 					foreach($factures as $k=>$v){
 						if($v["facture.date_fin_periode"]){
-							$nbJours = ATF::facture_absystech()->date_diff($dateFin, $v["facture.date_fin_periode"]);	
+							$nbJours = ATF::facture_absystech()->date_diff($dateFin, $v["facture.date_fin_periode"]);
 							 if(($dateFin === "") || ($dateFin === NULL)){
 								$dateFin = $v["facture.date_fin_periode"];
 							}
-							else{		
+							else{
 								if($nbJours > 1){
 									$dateFin = $v["facture.date_fin_periode"];
-								}																							
+								}
 							}
 						}
-					}							
-					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => $dateFin));	
+					}
+					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => $dateFin));
 				}else{
-					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => NULL));					
+					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => NULL));
 				}
-				
-		
+
+
 				//Affaire
 				$this->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
 				$autre_affaire=parent::sa();
@@ -1228,18 +1228,18 @@ class facture_absystech extends facture {
 					if($commande["count"]>0){
 						$affaire["etat"]="commande";
 						ATF::affaire()->u($affaire,$s);
-					//S'il y a au moins un devis 
+					//S'il y a au moins un devis
 					}elseif($devis["count"]>0){
-						$affaire["etat"]="devis";	
+						$affaire["etat"]="devis";
 						$affaire["forecast"]="20";
 						ATF::affaire()->u($affaire,$s);
 					//Sinon on peut tout supprimer
 					}else{
 						ATF::affaire()->delete($affaire["id_affaire"],$s);
 						unset($facture["id_affaire"]);
-					}					
-				}	
-				
+					}
+				}
+
 				ATF::db($this->db)->commit_transaction();
 				//*****************************************************************************
 
@@ -1253,11 +1253,11 @@ class facture_absystech extends facture {
                 $this->delete($item,$s,$files,$cadre_refreshed);
             }
         }
-		
+
 		return true;
 	}
-	
-	/** 
+
+	/**
 	* Retourne un tableau pour le graphe d'affaire, dans statistique
 	* @author DEV <dev@absystech.fr>
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
@@ -1277,91 +1277,91 @@ class facture_absystech extends facture {
 			}
 		}*/
 		ATF::stats()->conditionYear($liste_annees,$this->q,"`facture`.`date`");
-		
+
 		$this->q->addGroup("year")->addGroup("month");
 		return parent::select_all();
 	}
-	
+
 	/**
 	* Permet de connaître toutes les factures d'une commande, en acompte ou pas
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_commande
-	* @return array 
+	* @return array
 	*/
 	public function facture_by_commande($id_commande,$acompte=false){
 		$this->q->reset()
 			 ->addJointure("facture","id_facture","commande_facture","id_facture")
 			 //->addField("SUM(facture.prix)","prix")
 			 ->addCondition("id_commande",$id_commande);
-			 //->setDimension("row")->end();		
+			 //->setDimension("row")->end();
 		if($acompte){
 			$this->q->addCondition("type_facture","acompte");
-		}		
-		$facture_by_commande=parent::select_all();	
+		}
+		$facture_by_commande=parent::select_all();
 		if(is_array($facture_by_commande)){
-			$prix = 0;	
+			$prix = 0;
 			foreach($facture_by_commande as $k=>$v){
 				$this->q->reset()->where("id_facture_parente",$v["id_facture"]);
 				$res = $this->select_all();
 				if(!is_array($res)){
 					$prix += $v["prix"];
 				}
-			}				
-			return array("prix" => $prix);	
+			}
+			return array("prix" => $prix);
 		}else{
 			return false;
 		}
-		 
+
 		/*if($facture_by_commande["prix"]){
 			return $facture_by_commande;
 		}*/
 	}
-	
+
 	/**
 	* Renvoi le montant total de la ou des factures associé a une commande.
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param int $id_commande
-	* @return float  
+	* @return float
 	*/
 	public function total_by_commande($id_commande){
 		$this->q->reset()
 			 ->addJointure("facture","id_facture","commande_facture","id_facture")
 			 //->addField("SUM(facture.prix)","prix")
 			 ->addCondition("id_commande",$id_commande);
-			 //->setDimension("row")->end();		
+			 //->setDimension("row")->end();
 
-		$facture_by_commande=parent::select_all();	
+		$facture_by_commande=parent::select_all();
 		if(is_array($facture_by_commande)){
-			$prix = 0;	
+			$prix = 0;
 			foreach($facture_by_commande as $k=>$v){
 				$prix += $v["prix"];
-			}				
-			return $prix;	
+			}
+			return $prix;
 		}else{
 			return 0.00;
 		}
 
 	}
-	
-	/** 
+
+	/**
 	* Retourne false car suppression de facture impossible sauf si etat impayee ou pas derniere du mois
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_delete($id){
-		if($this->select($id,"etat")=="impayee"){			 
+		if($this->select($id,"etat")=="impayee"){
 			if(!$this->isLastOfMonth($id)){
 				throw new errorATF("Il est impossible de supprimer cette facture car elle n'est pas la derniere du mois",893);
 			}
 			else{
 				return true;
-			}			
+			}
 		}
 		else{
 			throw new errorATF("Il est impossible de supprimer cette facture car elle est payée",892);
 		}
 	}
-	
+
 	/**
 	* Statistiques : nombre de factures restantes à payer
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -1372,15 +1372,15 @@ class facture_absystech extends facture {
 		switch ($type) {
 			case "resteAPayer":
 				$this->q->reset()->addField("DISTINCT(DATE_FORMAT(facture.date,  '%Y'))", "annee")->where("facture.etat", "impayee")->addGroup("annee");
-				$annees = $this->sa();				
+				$annees = $this->sa();
 				$years = array();
 				foreach ($annees as $key => $value) {
 					$years[$value["annee"]] = 1;
 				}
 				$this->q->reset();
 				//on récupère la liste des années que l'on ne souhaite pas voir afficher sur les graphes
-				//on les incorpore ensuite sur les requêtes adéquates				
-				
+				//on les incorpore ensuite sur les requêtes adéquates
+
 
 				foreach($years  as $key_list=>$item_list){
 					if($item_list)$this->q->addCondition("YEAR(`date`)",$key_list);
@@ -1397,7 +1397,7 @@ class facture_absystech extends facture {
 
 				$this->q->reset("field,group");
 				$this->q->addField("DISTINCT YEAR(`date`)","year");
-				$stats['YEARS'] =parent::select_all();			
+				$stats['YEARS'] =parent::select_all();
 
 //				foreach (util::month() as $k => $i) {
 //					if (((int)($k)-1)%3==0) {
@@ -1406,7 +1406,7 @@ class facture_absystech extends facture {
 //					}
 //				}
 				return parent::stats($stats,$type,$widget);
-				
+
 			case "top10negatif":
 				$result=ATF::societe()->solde_total_global();
 				foreach ($result as $i) {
@@ -1417,17 +1417,17 @@ class facture_absystech extends facture {
 				}
 				$graph['params']['showLegend'] = "0";
 				$graph['params']['bgAlpha'] = "0";
-				$this->paramGraphe($dataset_params,$graph);	
-				
+				$this->paramGraphe($dataset_params,$graph);
+
 				$graph['dataset']["solde"]["params"] = array_merge($dataset_params,array(
 					"seriesname"=>'solde'
 				));
 				foreach ($result as $i) {
-					//$i["societe"] = str_replace("'", " ", $i["societe"]);					
+					//$i["societe"] = str_replace("'", " ", $i["societe"]);
 					$graph['dataset']["solde"]['set'][$i["id_societe"]] = array(
 						"value"=>$i['soldeTotal']
 						,"alpha"=>100
-						,"titre"=> $i["societe"] 
+						,"titre"=> $i["societe"]
 						,"color"=>$i["credits"]<-100?"FF0033":($i["soldeTotal"]<-10?"FF6600":"FFFF00")
 						,"link"=>urlencode("societe-select-".classes::cryptId($i["id_societe"]).".html")
 					);
@@ -1435,7 +1435,7 @@ class facture_absystech extends facture {
 //						break; // Pas plus de 10 sur le widget
 //					}
 				}
-				return $graph;		
+				return $graph;
 
 			default:
 				return parent::stats($stats,$type,$widget);
@@ -1445,9 +1445,9 @@ class facture_absystech extends facture {
 	/** Permet d'envoyer un mail au regénérateur pour qu'il garde une trace de la facture supprimée
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @return void
-	*/ 
+	*/
 	function generatePDF($infos,&$s,$preview=false){
-		
+
 		$facture=$this->select($infos["id"]);
 		$path = $this->filepath($infos["id"],"fichier_joint",$preview);
 		if (file_exists($path)) {
@@ -1458,17 +1458,17 @@ class facture_absystech extends facture {
 			$info_mail["template"] = 'devis';
 			$info_mail["texte"] = "Facture de sauvegardre avant régénération : ".$facture["ref"]." (".$infos["id"].")";
 			$info_mail["recipient"] = ATF::$usr->get('email');
-		
+
 			//Ajout du fichier
 			$mail = new mail($info_mail);
-			$mail->addFile($path,$infos["ref"].".pdf",true);						
+			$mail->addFile($path,$infos["ref"].".pdf",true);
 			$mail->send();
-		
+
 			ATF::$msg->addNotice(ATF::$usr->trans("email_sauvegarde_old_facture_send",$this->table));
 		} else {
 			ATF::$msg->addWarning(ATF::$usr->trans("email_sauvegarde_old_facture_doesnt_exist",$this->table));
 		}
-		
+
 		$this->move_files($infos["id"],$s,false);
 
 		ATF::$msg->addNotice(ATF::$usr->trans("facture_regenere_avec_succes",$this->table));
@@ -1481,7 +1481,7 @@ class facture_absystech extends facture {
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return int
-    */   	
+    */
 	public function getTVA($id_societe=false){
 		$societe=ATF::societe()->select($id_societe);
 		$adrr_FR = (($societe["facturation_id_pays"]=="FR" && $societe["facturation_adresse"]) || (!$societe["facturation_adresse"] && $societe["id_pays"]=="FR"));
@@ -1498,7 +1498,7 @@ class facture_absystech extends facture {
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param string $field
 	* @return string
-    */   	
+    */
 	public function default_value($field){
 		if(/*$field!="mode" &&*/ $field!="acompte_pourcent" && $field!="emailCopie"){
 			if(ATF::_r('id_facture')){
@@ -1509,7 +1509,7 @@ class facture_absystech extends facture {
 										->addField("SUM(`prix_achat` * `quantite`)","prix_achat")
 										->setStrict()
 										->setDimension('cell');
-		
+
 					$prix_achat=ATF::facture_ligne()->select_all();
 				}
 			}elseif(ATF::_r('id_commande')){
@@ -1518,14 +1518,14 @@ class facture_absystech extends facture {
 					$prix_achat=$infos["prix_achat"];
 				}
 			}
-			
+
 			if($field=="id_societe" || $field=="email" || $field=="tva"){
 				if($infos["id_societe"]){
 					$id_societe=$infos["id_societe"];
 				}elseif(ATF::_r('id_affaire')){
 					$affaire=ATF::affaire()->select(ATF::_r('id_affaire'));
 					$id_societe=$affaire["id_societe"];
-					
+
 				}elseif(ATF::_r('id_societe')){
 					$id_societe=ATF::_r('id_societe');
 				}
@@ -1542,7 +1542,7 @@ class facture_absystech extends facture {
 					return $id_societe;
 				}
 			case "id_affaire":
-				return $infos["id_affaire"];			
+				return $infos["id_affaire"];
 			case "tva":
 				return $this->getTVA($id_societe);
 			case "mode":
@@ -1575,26 +1575,26 @@ class facture_absystech extends facture {
 				}else{
 					return false;
 				}
-			case "id_termes":		
+			case "id_termes":
 				if(ATF::_r('id_affaire')){
 					$affaire=ATF::affaire()->select(ATF::_r('id_affaire'));
-					$id_termes=$affaire["id_termes"];					
+					$id_termes=$affaire["id_termes"];
 				}elseif(ATF::_r('id_societe')){
 					$societe = ATF::societe()->select(ATF::_r('id_societe'));
-					$id_termes = $societe["id_termes"];					
+					$id_termes = $societe["id_termes"];
 				}elseif(ATF::_r('id_commande')){
 					$affaire=ATF::affaire()->select( ATF::commande()->select(ATF::commande()->decryptId(ATF::_r('id_commande')) , "id_affaire"));
-					$id_termes=$affaire["id_termes"];				
+					$id_termes=$affaire["id_termes"];
 				}else{
 					$id_termes = NULL;
-				}	
-				
+				}
+
 				return $id_termes;
 			default:
 				return parent::default_value($field);
 		}
 	}
-	
+
 //	/**
 //	* Donne le mail actuel
 //	* @return mixed
@@ -1604,26 +1604,26 @@ class facture_absystech extends facture {
 //		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 //		return $this->current_mail;
 //	}
-//	
+//
 //	/**
 //	* Initialise le mail courant
 //	* @param string $mail le nom du mail courant
 //	*/
 //	public function setCurrentMail($mail){
 //		$this->current_mail=&$this->$mail;
-//	}	 
-	
+//	}
+
 	/**
     * Select classique qui ne prend pas en compte certaines données lors du cloner
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param int id 
-	* @param string field 
-	* @return array 
-    */ 
-	public function select($id,$field=NULL) {		
+	* @param int id
+	* @param string field
+	* @return array
+    */
+	public function select($id,$field=NULL) {
 		$facture=parent::select($id,$field);
-			
-		if((ATF::_r("event")=="cloner") && is_array($facture)){					
+
+		if((ATF::_r("event")=="cloner") && is_array($facture)){
 			$facture["date"]="";
 			$facture["date_previsionnelle"]="";
 			$facture["date_effective"]="";
@@ -1631,7 +1631,7 @@ class facture_absystech extends facture {
 		}
 		return $facture;
 	}
-	
+
 	/**
 	* Pour les autocomplete, retourne une conditions au format URL   arg1=2&arg2=3...
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -1652,11 +1652,11 @@ class facture_absystech extends facture {
 					$conditions["condition_value"][] = $infos["id_societe"];
 				}
 			break;
-		}		
+		}
 		return array_merge_recursive((array)($conditions),parent::autocompleteConditions($class,$infos,$condition_field,$condition_value));
 	}
-	
-		
+
+
 	/**
 	 * Filtrage d'information selon le profil
 	 * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
@@ -1670,21 +1670,21 @@ class facture_absystech extends facture {
 		}
 	}
 
-	
+
 	/*
 	* Méthode qui prépare le pager
 	* @author Mathieu mtribouillard <mtribouillard@absystech.fr>
-	* @param int $id_societe 
-	* @param decimal $montant 
+	* @param int $id_societe
+	* @param decimal $montant
 	* @return object $q
 	*/
-	
+
 	public function rapprochementFacture($id_societe,$montant=false){
 
 		//Les champs que l'on souhaite afficher dans le grid
 		$fields=array(
 						0=>"ref",
-						1=>"prix"	
+						1=>"prix"
 					);
 
 		$q = ATF::_s("pager")->getAndPrepare("Factures");
@@ -1693,7 +1693,7 @@ class facture_absystech extends facture {
 		  ->addCondition("id_societe",$id_societe)
 		//On ajoute id_societe pour pouvoir le retouver lors de rapprochementFactureSA()
 		  ->addValue("id_societe",$id_societe);
-		
+
 		$group=ATF::societe()->getGroup($id_societe);
 		foreach($group as $item){
 			$q->addCondition("id_societe",$item["id_societe"]);
@@ -1704,30 +1704,30 @@ class facture_absystech extends facture {
 			$q->addConditionBetween("prix",($montant-2)." AND ".($montant+2),"OR",false,'BETWEEN')
 			  ->addValue("montant",$montant);
 		}
-		
+
 		$q->end();
 
 		return $q;
 	}
-	
+
 	/*
 	* Exeécution du querier du pager
 	* @author Mathieu mtribouillard <mtribouillard@absystech.fr>
 	* @return array $data
 	*/
-	
+
 	public function rapprochementFactureSA(){
-		
+
 		//Pas de limite
 		$this->q->setLimit(-1)->end();
-		
+
 		//Facture correspondante
 		$data=parent::sa();
-		
+
 		//Si montant on doit faire un test pour les combinaisons de prix de facture
 		if($values=$this->q->getValues()){
 			$montant=$values["montant"];
-			
+
 			//On récupère les factures ayant un prix < montant (évidemment il ne peut pas y avoir un élément d'une somme qui est > au montant recherché)
 			$this->q
 				 ->reset()
@@ -1735,7 +1735,7 @@ class facture_absystech extends facture {
 				 ->addCondition("prix",($montant+2),false,false,"<=")
 //				 ->addCondition("etat","impayee")
 				 ->addOrder("prix");
-				 
+
 			$dataToutes=parent::sa();
 			foreach($dataToutes as $key=>$item){
 				$tabId_facture=array();
@@ -1750,13 +1750,13 @@ class facture_absystech extends facture {
 
 		return $dataRapprochementFactureSA;
 	}
-	
+
 	/*
 	* Permet de tester toutes les comnaisons existantes pour un montant
 	* @author Mathieu mtribouillard <mtribouillard@absystech.fr>
 	* @param array $dataToutes toutes les factures de cette société qui ont un prix inférieur au montant recherché
 	* @param decimal $prix prix de la facture mère (1er élément de la combinaison)
-	* @param array $tabId_facture tableau des factures qui forme la combinaison 
+	* @param array $tabId_facture tableau des factures qui forme la combinaison
 	* @param decimal $montant montant recherché
 	* @array data $tableau de facture retourné
 	*/
@@ -1785,7 +1785,7 @@ class facture_absystech extends facture {
 						$dataRetour["facture.id_facture"].=$Id_facture;
 					}
 					$dataRetour["prix"].=" = ".$prixTotal;
-					
+
 					//Si data existe il faut tester que cette combianaison n'existe pas déjà
 					if($data["data"]){
 						$exist=false;
@@ -1830,71 +1830,71 @@ class facture_absystech extends facture {
 		//Recupere la date de notre facture
 		$this->q->reset()->AddField("facture.ref")->where("facture.id_facture",$id_facture);
 		$ref = $this->select_cell();
-		
+
 		//Recupere toute les factures du mois
 		$this->q->reset()->AddField("facture.ref")->setLimit(1);
 		$res = $this->select_row();
 
 		$ref = substr($ref,3);
-		$res = substr($res["facture.ref"],3);							 
-		$ref = intval($ref); 
-		$res = intval($res); 		
+		$res = substr($res["facture.ref"],3);
+		$ref = intval($ref);
+		$res = intval($res);
 
-				
+
 		if($res === $ref){
-			return true;	
+			return true;
 		}
 		else {
 			return false;
 		}
 	}
-		
+
 	/**
 	* Module de generation de lettre de change
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function lettre_change($infos){
-		$factures = explode(",",$infos["facture"]);		
-		if($factures[0]){			
-			// On retire les factures déja payées 
+		$factures = explode(",",$infos["facture"]);
+		if($factures[0]){
+			// On retire les factures déja payées
 			foreach ($factures as $key => $value) {
 				if($this->select($value , "etat") == "payee"){
 					unset($factures[$key]);
-				}			
-			}	
+				}
+			}
 			ksort($factures);
-									
+
 			if($factures[0]){
 				$id_societe = $this->select($factures[0] , "id_societe");
-								
+
 				if(!ATF::societe()->select($id_societe , "rib")){
 					throw new errorATF("Il faut inserer un RIB pour la societe",167);
 				}
 				if(!ATF::societe()->select($id_societe , "banque")){
-					throw new errorATF("Il faut inserer une banque pour la societe",167);				
+					throw new errorATF("Il faut inserer une banque pour la societe",167);
 				}
-				
-				
+
+
 				$file = "lettre_de_change";
 				$infos["filestoattach"][$file] = "";
 				$info = array("id_societe" => $id_societe, "factures" => $factures, "echeance" => $infos["date"]);
-				$return = ATF::pdf()->generic("lettre_de_change",$info,true,$s,false);			
-								
+				$return = ATF::pdf()->generic("lettre_de_change",$info,true,$s,false);
+
 				$tmpfname = tempnam("/tmp", "lettre");
 				if(file_put_contents($tmpfname, $return)){
-					$info_mail["objet"] = "lettre de change";					
+					$info_mail["objet"] = "lettre de change";
 					$info_mail["texte"] = "test";
 					$info_mail["template"] = 'lettre_change';
-					$info_mail["recipient"] = ATF::user()->select(ATF::$usr->getID() , "email");					
+					$info_mail["recipient"] = ATF::user()->select(ATF::$usr->getID() , "email");
 					$mail = new mail($info_mail);
 					$mail->addFile($tmpfname,"lettre_de_change.pdf",false);
 					$mail->send();
-					return true;			
-				}			
-			}else{ throw new errorATF("Toutes les factures sont déja payées",167);	}			
+					return true;
+				}
+			}else{ throw new errorATF("Toutes les factures sont déja payées",167);	}
 		}return false;
-	}		
-	
+	}
+
 	/**
 	* Renvoi les avoir disponible pour une société en se basant sur une facture
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -1919,16 +1919,16 @@ class facture_absystech extends facture {
 	/**
 	* Permet de récupérer la liste des contacts pour telescope
 	* @package Telescope
-	* @author Morgan FLEURQUIB <mfleurquin@absystech.fr> 
+	* @author Morgan FLEURQUIB <mfleurquin@absystech.fr>
 	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
-	*/ 
+	*/
 	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
-		
+
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "date";
+		if (!$get['tri']) $get['tri'] = "facture.date";
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
@@ -1949,7 +1949,7 @@ class facture_absystech extends facture {
 			"facture.date_effective"=>array(),
 			"facture.date_relance"=>array()
 		);
-		
+
 
 
 		$this->q->reset();
@@ -1962,13 +1962,16 @@ class facture_absystech extends facture {
 		if ($get['id']) {
 			$this->q->where("id_facture",$get['id'])->setLimit(1);
 		} else {
+			if ($get['id_societe']) {
+				$this->q->where("facture.id_societe",$get['id_societe']);
+			}
 			$this->q->setLimit($get['limit']);
 		}
 
 		$this->q->addOrder("facture.date","asc");
-		
+
 		switch ($get['tri']) {
-			case 'id_societe':	
+			case 'id_societe':
 				$get['tri'] = "facture.".$get['tri'];
 			break;
 		}
@@ -1992,9 +1995,9 @@ class facture_absystech extends facture {
 									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
 									,(facture.prix*facture.tva)
 								)),2)","solde")
-			    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+			    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
 			    ->addField("IF(facture.etat!='perte'
-							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
 								,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
 								    *ROUND(IF(
 										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
@@ -2014,8 +2017,8 @@ class facture_absystech extends facture {
 									,facture.prix*facture.tva
 								),2))
 								, 0 )
-							) 					   					
-						,0)","interet")			
+							)
+						,0)","interet")
 			    ->addGroup("facture.id_facture");
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -2026,37 +2029,37 @@ class facture_absystech extends facture {
 					$tmp = explode(".",$k_);
 					$data['data'][$k][$tmp[1]] = $val;
 					unset($data['data'][$k][$k_]);
-				}				
+				}
 			}
 		}
 
 		if ($get['id']) {
-	        $return = $data['data'][0];			
+	        $return = $data['data'][0];
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
 
-	        $return = $data['data'];			
+	        $return = $data['data'];
 		}
 
 		return $return;
-	}	
+	}
 
 	public function _graph_impaye($get,$post){
 
 		$date = date("Y-m");
 		$date_start = date("Y-m", strtotime("-1 year"));
 
-		ATF::facture()->q->reset()->where("facture.etat","impayee")								  
+		ATF::facture()->q->reset()->where("facture.etat","impayee")
 								  ->addField("facture.date","date")
 								  ->addOrder("facture.date");
-		$fact = ATF::facture()->select_all();		
-		
+		$fact = ATF::facture()->select_all();
+
 		//Initialisation du tableau des mois
-		for ($i=date("Y")-1; $i<=date("Y") ; $i++) { 
-			for($j=1;$j<=12;$j++){				
+		for ($i=date("Y")-1; $i<=date("Y") ; $i++) {
+			for($j=1;$j<=12;$j++){
 				if($i == date("Y")){
 					if($j<=date("n")) $evo[$i][$j] = 0;
 				}else{
@@ -2071,14 +2074,14 @@ class facture_absystech extends facture {
 			$prix += number_format($value["prix_ttc"],0,",","");
 			if(date("Y-m", strtotime($value["date"])) <= $date_start){
 				$old[date("Y", strtotime($value["date"]))] += number_format($value["prix_ttc"],0,",","");
-				$evo[date("Y")-1][1] = number_format($value["prix_ttc"],0,",","");				
+				$evo[date("Y")-1][1] = number_format($value["prix_ttc"],0,",","");
 			}else{
-				$evo[date("Y", strtotime($value["date"]))][date("n", strtotime($value["date"]))] = $prix;				
+				$evo[date("Y", strtotime($value["date"]))][date("n", strtotime($value["date"]))] = $prix;
 			}
-		}		
+		}
 
 		$start = 0;
-		foreach ($old as $key => $value) {			
+		foreach ($old as $key => $value) {
 			$old[$key] += $start;
 			$start += $value;
 		}
@@ -2088,7 +2091,7 @@ class facture_absystech extends facture {
 		foreach ($evo as $year => $mois) {
 			foreach ($mois as $num_mois => $value) {
 				if($value == 0) {
-					if($num_mois == 1){ 
+					if($num_mois == 1){
 						$evo[$year][$num_mois] = $evo[$year-1][12];
 					}else{
 						$evo[$year][$num_mois] = $evo[$year][$num_mois-1];
@@ -2122,11 +2125,11 @@ class facture_absystech extends facture {
 		$get['trid'] = "desc";
 		return $this->_GET($get,$post);
 	}
-				
+
 };
 
-class facture_att extends facture_absystech { 
-	/** 
+class facture_att extends facture_absystech {
+	/**
 	* Retourne le total des factures en attente de paiement
     * @author Yann GAUTHERON <ygautheron@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param int $annee
@@ -2146,10 +2149,10 @@ class facture_att extends facture_absystech {
 			}
 		}
 		return parent::sa();
-	}	
-	
+	}
 
-	
+
+
 };
 class facture_wapp6 extends facture_absystech { };
 class facture_demo extends facture_absystech { };
