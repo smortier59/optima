@@ -365,7 +365,22 @@ class devis_lm extends devis {
 		ATF::affaire_etat()->insert(array("id_affaire"=>$infos["id_affaire"],
 										  "etat"=>"commande"
 										 ));
-		unset($infos["adresse_livraison"],$infos["adresse_facturation"],$infos["cp_adresse_livraison"],$infos["cp_adresse_facturation"],$infos["ville_adresse_livraison"],$infos["ville_adresse_facturation"],$infos["id_magasin"],$infos["num_bdc_lm"],$infos["poseur"],$infos["poseur_aggree"],$infos["type_souscription"],$infos["type_affaire"]);
+		unset(  $infos["adresse_livraison"],
+				$infos["adresse_facturation"],
+				$infos["adresse_facturation_2"],
+				$infos["adresse_livraison_2"],
+				$infos["adresse_livraison_3"],
+				$infos["adresse_facturation_3"],
+				$infos["cp_adresse_livraison"],
+				$infos["cp_adresse_facturation"],
+				$infos["ville_adresse_livraison"],
+				$infos["ville_adresse_facturation"],
+				$infos["id_magasin"],
+				$infos["num_bdc_lm"],
+				$infos["poseur"],
+				$infos["poseur_aggree"],
+				$infos["type_souscription"],
+				$infos["type_affaire"]);
 		
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 		$infos["ref"]=$affaire["ref"];

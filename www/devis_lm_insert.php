@@ -156,16 +156,12 @@ if ($infos["id_facture"]) {
     }      
 }
 
-//Récuperation du PDF de la facture
+//Récuperation du PDF signé du contrat
 if ($infos["getPdfSigne"]) {   
     
-    log::logger($infos , "mfleurquin");
-
-    $id_commande = ATF::commande()->decryptId($infos["id_commande"]);
+    $id_commande = ATF::commande()->decryptId($infos["id_commande"]);   
     
-    log::logger($id_commande , "mfleurquin");
-
-    $filename = ATF::commande()->filepath($id_commande,"contratA4");
+    $filename = ATF::commande()->filepath($id_commande,"retour");
 
     if(file_exists($filename)){
         $handle = fopen($filename, "r");
@@ -174,8 +170,18 @@ if ($infos["getPdfSigne"]) {
         echo $contents;
         die;
     }else{
-        echo "Probleme de récupération du PDF";
-        die;
+        $filename = ATF::commande()->filepath($id_commande,"contratA4");
+
+        if(file_exists($filename)){
+            $handle = fopen($filename, "r");
+            $contents = fread($handle, filesize($filename));
+            fclose($handle);    
+            echo $contents;
+            die;
+        }else{
+            echo "Probleme de récupération du PDF";
+            die;
+        }
     }      
 }
 
@@ -209,18 +215,20 @@ if($infos["id_societe"]){
 
         if($infos["societe_form"]["adresse"]){
             $adresse_livraison = $infos["societe_form"]["adresse"];
-            if($infos["societe_form"]["adresse_2"] )  $adresse_livraison .= "\n".$infos["societe_form"]["adresse_2"];
-            if($infos["societe_form"]["adresse_3"] )  $adresse_livraison .= "\n".$infos["societe_form"]["adresse_3"];
+            $adresse_livraison_2 = $adresse_livraison_3 = NULL;
+
+            if($infos["societe_form"]["adresse_2"] )  $adresse_livraison_2 = $infos["societe_form"]["adresse_2"];
+            if($infos["societe_form"]["adresse_3"] )  $adresse_livraison_3 = $infos["societe_form"]["adresse_3"];
             
             $cp_livraison = $infos["societe_form"]["cp"];
             $ville_livraison = $infos["societe_form"]["ville"];
             $pays_livraison = $infos["societe_form"]["id_pays"];
 
-            $adresse_facturation = "";
+            $adresse_facturation = $adresse_facturation_2 = $adresse_facturation_3 = NULL;
             if($infos["societe_form"]["facturation_same_livraisonCheckbox"] == "non"){
                 $adresse_facturation = $infos["societe_form"]["facturation_adresse"];
-                if($infos["societe_form"]["facturation_adresse_2"] )  $adresse_facturation .= "\n".$infos["societe_form"]["facturation_adresse_2"];
-                if($infos["societe_form"]["facturation_adresse_3"] )  $adresse_facturation .= "\n".$infos["societe_form"]["facturation_adresse_3"];
+                if($infos["societe_form"]["facturation_adresse_2"] )  $adresse_facturation_2  = $infos["societe_form"]["facturation_adresse_2"];
+                if($infos["societe_form"]["facturation_adresse_3"] )  $adresse_facturation_3  = $infos["societe_form"]["facturation_adresse_3"];
                 $cp_facturation = $infos["societe_form"]["facturation_cp"];
                 $ville_facturation =  $infos["societe_form"]["facturation_ville"];
                 $pays_facturation = $infos["societe_form"]["facturation_id_pays"];
@@ -228,20 +236,24 @@ if($infos["id_societe"]){
 
             }else{
                 $adresse_facturation = $adresse_livraison;
+                $adresse_facturation_2 = $adresse_livraison_2;
+                $adresse_facturation_3 = $adresse_livraison_3;
                 $cp_facturation = $cp_livraison;
                 $ville_facturation =  $ville_livraison;
                 $pays_facturation = $pays_livraison;
             }
         }else{
             $adresse_livraison = $societe["adresse"];
-            if($societe["adresse_2"] )  $adresse_livraison .= "\n".$societe["adresse_2"];
-            if($societe["adresse_3"] )  $adresse_livraison .= "\n".$societe["adresse_3"];
+            if($societe["adresse_2"] )  $adresse_livraison_2  = $societe["adresse_2"];
+            if($societe["adresse_3"] )  $adresse_livraison_3  = $societe["adresse_3"];
             
             $cp_livraison = $societe["cp"];
             $ville_livraison = $societe["ville"];
             $pays_livraison = $societe["id_pays"];
 
             $adresse_facturation = $adresse_livraison;
+            $adresse_facturation_2 = $adresse_livraison_2;
+            $adresse_facturation_3 = $adresse_livraison_3;
             $cp_facturation = $cp_livraison;
             $ville_facturation =  $ville_livraison;
             $pays_facturation = $pays_livraison;
@@ -314,9 +326,13 @@ if($infos["id_societe"]){
             "prix_achat" => $prix_achat,//somme des prix_achat des produits
             "prix" => $prix,//somme des loyers * duree
             "adresse_facturation"=>$adresse_facturation ,
+            "adresse_facturation_2"=>$adresse_facturation_2 ,
+            "adresse_facturation_3"=>$adresse_facturation_3 ,
             "cp_adresse_facturation"=>$cp_facturation ,
             "ville_adresse_facturation"=>$ville_facturation ,
             "adresse_livraison"=>$adresse_livraison ,
+            "adresse_livraison_2"=>$adresse_livraison_2 ,
+            "adresse_livraison_3"=>$adresse_livraison_3 ,
             "cp_adresse_livraison"=>$cp_livraison,
             "ville_adresse_livraison"=>$ville_livraison          
         );       

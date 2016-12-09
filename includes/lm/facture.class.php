@@ -1806,18 +1806,18 @@ class facture_lm extends facture {
         	switch ($pack["type_pack_magasin"]) {
         		case 'alarme':
         			if($value["facture.type_facture"] == "facture") $legaccHT = "706200";
-        			if($value["facture.type_facture"] == "installation") $legaccHT = "706200";
-        			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706200";       			
+        			//if($value["facture.type_facture"] == "installation") $legaccHT = "706200";
+        			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706203";       			
         		break;        		
         		case 'chaudiere':
-        			if($value["facture.type_facture"] == "facture") $legaccHT = "706201";
-        			if($value["facture.type_facture"] == "installation") $legaccHT = "706201";
-        			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706201";
+        			if($value["facture.type_facture"] == "facture") $legaccHT = "706200";
+        			//if($value["facture.type_facture"] == "installation") $legaccHT = "706201";
+        			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706203";
         			
         		break;
         		case 'adoucisseur':
-        			if($value["facture.type_facture"] == "facture") $legaccHT = "706203";
-        			if($value["facture.type_facture"] == "installation") $legaccHT = "706203";
+        			if($value["facture.type_facture"] == "facture") $legaccHT = "706200";
+        			//if($value["facture.type_facture"] == "installation") $legaccHT = "706203";
         			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706203";  			
         		break;
         	}
@@ -1829,16 +1829,16 @@ class facture_lm extends facture {
 	        		//TTC
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "054";
+		        	$donnees[$key][$i][3] = "54";
 		        	$donnees[$key][$i][4] = $code_magasin;
-		        	$donnees[$key][$i][5] = "a_fournir_par_LM"; //Code BU a donner par LM
+		        	$donnees[$key][$i][5] = 120; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = "a_fournir_par_LM"; //Type information a donner par LM
+		        	$donnees[$key][$i][7] = "VT"; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
 		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
-		        	$donnees[$key][$i][12] = $rayon; //Rayon du pack
+		        	$donnees[$key][$i][12] = "00000"; //Rayon du pack
 		        	$donnees[$key][$i][13] = "1";	
 	        		$donnees[$key][$i][14] = "411000"; //Compte Comptable
 	        		$donnees[$key][$i][15] = "0"; //Code projet
@@ -1858,11 +1858,11 @@ class facture_lm extends facture {
 	        		//HT
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "054";
+		        	$donnees[$key][$i][3] = "54";
 		        	$donnees[$key][$i][4] = $code_magasin;
-		        	$donnees[$key][$i][5] = "a_fournir_par_LM";; //Code BU a donner par LM
+		        	$donnees[$key][$i][5] = 120; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = "a_fournir_par_LM";; //Type information a donner par LM
+		        	$donnees[$key][$i][7] = "VT";; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
@@ -1876,7 +1876,7 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][18] = "0";
 		        	$donnees[$key][$i][19] = "0";	  
 					$donnees[$key][$i][20] = "0"; //Montant Debit
-					$donnees[$key][$i][21] = $value["facture.prix"]*($value["facture.tva"]-1); //Montant Credit      	
+					$donnees[$key][$i][21] = number_format($value["facture.prix"]/$value["facture.tva"] ,2); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
 					$donnees[$key][$i][23] =  $value["facture.id_affaire"]."/".$value["facture.id_facture"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
@@ -1887,25 +1887,25 @@ class facture_lm extends facture {
 	        		//TVA
 	        		$donnees[$key][$i][1] = "1"; 
 		        	$donnees[$key][$i][2] = "1"; //Code pays a donner par LM
-		        	$donnees[$key][$i][3] = "054";
+		        	$donnees[$key][$i][3] = "54";
 		        	$donnees[$key][$i][4] = $code_magasin;
-		        	$donnees[$key][$i][5] = "a_fournir_par_LM";; //Code BU a donner par LM
+		        	$donnees[$key][$i][5] = 120; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = "a_fournir_par_LM";; //Type information a donner par LM
+		        	$donnees[$key][$i][7] = "VT";; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
 		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
-		        	$donnees[$key][$i][12] = "00000"; //Centre de cout/profit a donner LM
+		        	$donnees[$key][$i][12] = "00000"; //Centre de cout/profit 
 		        	$donnees[$key][$i][13] = "1";	
-	        		$donnees[$key][$i][14] = "706200"; 
+	        		$donnees[$key][$i][14] = "445733"; 
 	        		$donnees[$key][$i][15] = "0"; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
 		        	$donnees[$key][$i][18] = "0";
 		        	$donnees[$key][$i][19] = "0";	  
 					$donnees[$key][$i][20] = "0"; //Montant Debit
-					$donnees[$key][$i][21] = $value["facture.prix"] - ($value["facture.prix"]*($value["facture.tva"]-1)); //Montant Credit      	
+					$donnees[$key][$i][21] = number_format($value["facture.prix"] - ($value["facture.prix"]/$value["facture.tva"]) ,2); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
 					$donnees[$key][$i][23] =  $value["facture.id_affaire"]."/".$value["facture.id_facture"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 

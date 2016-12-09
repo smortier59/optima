@@ -1305,10 +1305,6 @@ class commande_lm extends commande {
 		$id_fournisseur=ATF::societe()->decryptId($infos["id_fournisseur"]);
 
 
-		//log::logger($id_commande , "mfleurquin");
-		//log::logger($id_fournisseur , "mfleurquin");
-
-
 		if ($id_commande && $id_fournisseur) {
 			$this->q->reset()->addCondition("id_commande",$id_commande);		
 			if($commandes=$this->sa()){
@@ -1323,9 +1319,23 @@ class commande_lm extends commande {
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande_fk"]);
 						unset($ligne_commande);
-						foreach($commande_ligne as $k=>$i){
+						foreach($commande_ligne as $k=>$i){					
+							
+							if(!$i["prix_achat"] || $i["prix_achat"] == "0.00"){																
+								//Si ce n'est pas de l'achat c'est qu'il y a echeancier fournisseur
+								// X facture de produit_echeancier prix
+								ATF::produit_fournisseur_loyer()->q->reset()->where("id_produit", $i["id_produit"])
+																			->where("nature","engagement");
+								$loyer = ATF::produit_fournisseur_loyer()->select_all();
+								$quantite_prod = $i["quantite"];
+								foreach ($loyer as $kl => $vl) {
+									$i["prix_achat"] += $vl["loyer"]*$quantite_prod;
+									$i["quantite"] = $vl["nb_loyer"];
+								}
+							}
+							
 							$ligne_commande[]=array(
-												"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
 												,"id"=>$i["id_commande_ligne"]
 												,"leaf"=>true
 												,"prix"=>$i["prix_achat"]
