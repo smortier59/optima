@@ -250,26 +250,42 @@ class affaire_lm extends affaire {
 				->addCondition("ref",$prefix."%","AND",false,"LIKE")
 				->addCondition("LENGTH(`ref`)",3,"AND",false,">")
 			    ->addCondition("ref","%AVT%","AND",false,"NOT LIKE")
-				->addField('SUBSTRING(`ref`,4)+1',"max_ref")
-				//->addOrder('ref',"DESC")
+				->addField('SUBSTRING(`ref`,5)+1',"max_ref")
+				->addOrder('ref',"DESC")
 				->setDimension("row")
 				->setLimit(1);
 	
 		$nb=$this->sa();
 
-		if($nb["max_ref"]){
-			if($nb["max_ref"]<10){
-				$suffix="000".$nb["max_ref"];
-			}elseif($nb["max_ref"]<100){
-				$suffix="00".$nb["max_ref"];
-			}elseif($nb["max_ref"]<1000){
-				$suffix="0".$nb["max_ref"];
+		if(date("y") < 17){
+			if($nb["max_ref"]){
+				if($nb["max_ref"]<10){
+					$suffix="000".$nb["max_ref"];
+				}elseif($nb["max_ref"]<100){
+					$suffix="00".$nb["max_ref"];
+				}else{
+					$suffix=$nb["max_ref"];
+				}
 			}else{
-				$suffix=$nb["max_ref"];
+				$suffix="001";
 			}
 		}else{
-			$suffix="0001";
+			if($nb["max_ref"]){
+				if($nb["max_ref"]<10){
+					$suffix="000".$nb["max_ref"];
+				}elseif($nb["max_ref"]<100){
+					$suffix="00".$nb["max_ref"];
+				}elseif($nb["max_ref"]<1000){
+					$suffix="0".$nb["max_ref"];
+				}else{
+					$suffix=$nb["max_ref"];
+				}
+			}else{
+				$suffix="0001";
+			}
 		}
+
+		
 		return $prefix.$suffix;
 	}
 	
