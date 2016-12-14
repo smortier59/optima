@@ -1302,14 +1302,14 @@ class facture_lm extends facture {
 							$periode .= $vl["frequence_loyer"]; 
 							$jour_edition .= "01";
 							$duree .= $vl["duree"]; 
-							$loyerHT .= number_format($vl["loyer"]*0.2,2); 
+							$loyerHT .= number_format($vl["loyer"] - ($vl["loyer"]*0.2),2); 
 							$loyerTTC .= $vl["loyer"];
 						}else{
-							$periode .= "\n".$vl["frequence_loyer"]; ; 
+							$periode .= "\n".$vl["frequence_loyer"];
 							$jour_edition .= "\n"."01"; 
 							$duree .= "\n".$vl["duree"]; 
-							$loyerHT .= "\n".number_format($vl["loyer"]*0.2,2); ; 
-							$loyerTTC .= "\n".$vl["loyer"];;
+							$loyerHT .= "\n".number_format($vl["loyer"] - ($vl["loyer"]*0.2),2); 
+							$loyerTTC .= "\n".$vl["loyer"];
 						}						
 					}
 

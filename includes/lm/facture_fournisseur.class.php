@@ -792,9 +792,7 @@ class facture_fournisseur extends classes_optima {
         $total_credit = 0;
         $lignes = 0;
 
-        $donnees = array();        
-
-
+        $donnees = array();
 
         foreach ($data as $key => $value) {
         	$code_magasin = "380"; //Par defaut web
@@ -805,6 +803,7 @@ class facture_fournisseur extends classes_optima {
 
         	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
         		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");
+        		$code_magasin = substr($code_magasin, 1);
         	}
 
         	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
