@@ -315,8 +315,6 @@ if($infos["id_societe"]){
             }   
         }
 
-        log::logger($loyers , "mfleurquin");
-
         $loyer = $devis = $produits = array();
         foreach ($loyers["loyer"] as $key => $value) {             
             $loyer[] = array(
