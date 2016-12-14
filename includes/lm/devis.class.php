@@ -510,6 +510,7 @@ class devis_lm extends devis {
 			throw $e;
 		}
 
+		
 		////////////////Loyers
 		if($infos["loyer_unique"]=="oui"){
 			$this->loyer_unique($infos['id_affaire'],$infos_avenant["affaire"][0],$loyer_unique);
