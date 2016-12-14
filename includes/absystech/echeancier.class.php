@@ -45,7 +45,7 @@ class echeancier extends classes_optima {
   * @return array un tableau avec les données
   */
   public function _GET($get,$post) {
-   // Gestion du tri
+    // Gestion du tri
     if (!$get['tri']) $get['tri'] = "designation";
     if (!$get['trid']) $get['trid'] = "asc";
 
@@ -55,46 +55,30 @@ class echeancier extends classes_optima {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array(
-      "id_echeancier"=>array(),
-      "designation"=>array(),
-      "montant_ht"=>array(),
-      "commentaire"=>array(),
-      "affaire"=> array(),
-      "societe.id_societe"=> array(),
-      "debut"=>array(),
-      "fin"=>array(),
-      "variable"=>array(),
-      "periodicite"=>array(),
-      "actif"=>array(),
-      "societe"=>array(),
-      "mise_en_service"=>array(),
-      "prochaine_echeance"=>array(),
-      "jour_facture"=>array(),
-      "methode_reglement"=>array(),
-      "echeance.id_affaire"=>array()
-    );
+    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","mise_en_service","prochaine_echeance","jour_facture","methode_reglement","echeance.id_affaire");
     $this->q->reset();
+    $this->q->addField($colsData)
+        ->from("echeancier","id_societe","societe","id_societe")
+        ->addJointure("echeancier",'id_affaire',"affaire","id_affaire")
+    ;
 
     if($get["search"]){
       header("ts-search-term: ".$get['search']);
       $this->q->setSearch($get['search']);
     }
-    if ($get['id_echeancier']) {
-      $this->q->where("id_echeancier",$get['id_echeancier'])->setLimit(1);
 
+    if ($get['id_echeancier']) {
+      $this->q->where("id_echeancier",$get['id_echeancier'])->setCount(false)->setDimension('row');
+      $data = $this->select_all();
     } else {
       // gestion des filtres
       if ($get['filters']['actif'] == "on") {
         $this->q->andWhere("actif","oui");
       }
-      $this->q->setLimit($get['limit']);
+      $this->q->setLimit($get['limit'])->setCount();
+      $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
     }
-    $this->q->addField($colsData)
-        ->from("echeancier","id_societe","societe","id_societe")
-        ->addJointure("echeancier",'id_affaire',"affaire","id_affaire")
-        ->setCount();
-    $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
     foreach ($data["data"] as $k=>$lines) {
       foreach ($lines as $k_=>$val) {
         if (strpos($k_,".")) {
@@ -104,16 +88,19 @@ class echeancier extends classes_optima {
         }       
       }
     }
-    // si l'on recupère une seule echeance, on renvoie directement la premiere ligne du tableau
+
     if($get['id_echeancier']){
-      $return = $data['data'][0]; 
-    }else{  
+      // GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
+      $data['periodique'] = ATF::echeancier_ligne_periodique()->select_special('id_echeancier', $get['id_echeancier']);
+      $data['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_special('id_echeancier', $get['id_echeancier']);
+      $return = $data;
+    }else{
       header("ts-total-row: ".$data['count']);
       header("ts-max-page: ".ceil($data['count']/$get['limit']));
       header("ts-active-page: ".$get['page']);
       $return = $data['data'];
     }
-    return $return; 
+    return $return;
   } 
   /**
   * Fonctions _POST echeancier pour telescope
