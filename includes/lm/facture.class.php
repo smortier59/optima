@@ -1165,130 +1165,102 @@ class facture_lm extends facture {
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>              
      * @param array $infos : contient le nom de l'onglet 
      */     
-	 public function export_autoportes($infos){ 
-         $this->q->reset();
+	 public function export_autoportes(&$infos){ 
+	 	$infos["display"] = true;
 
-         $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
-
-         if($infos['onglet'] === "gsa_facture_facture"){
-         	throw new errorATF("Il faut générer les fichier Excell à partir d'un filtre personnalisé");
-         }else{
-         	$this->q->addAllFields($this->table)
-         		 //->where("facture.id_commande","commande.id_commande")
-         		 //->addOrder("commande.date_debut","asc")
-         		 ->addGroup("facture.id_affaire")
-         		 ->setLimit(-1)
-	         		 ->unsetCount();   
-	         $donnees = $this->sa();	
-			 if($infos["refi"]){		 	
-			 	$this->export_xls_autoportes($donnees,true);
-			 }else{
-			 	$this->export_xls_autoportes($donnees);
-			 }
-         }                      
-     }
-
-	/** Surcharge pour avoir un export identique Ã  celui de Nebula    
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
-     * @param array $infos : contient tous les enregistrements          
-     */     
-    public function export_xls_autoportes(&$infos,$refi=FALSE){
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-            
-		//premier onglet  
-		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle('Autoporté'); 
-		$sheets=array("auto"=>$worksheet_auto);         
-		$this->initStyle();
-		//mise en place des titres       
-		$this->ajoutTitreAutoporte($sheets);    			
-		//ajout des donnÃ©es             
-		if($infos){
-			if($refi){
-				$this->ajoutDonneesAutoportes($sheets,$infos,true);
+		
+
+
+        ATF::affaire()->q->reset()->where("affaire.etat","commande","OR","sous_req_affaire","=")
+        				 		  ->where("affaire.etat","facture","OR","sous_req_affaire","=")
+        				 		  ->from("affaire","id_affaire","commande","id_affaire")
+        				 		  ->whereIsNotNull("commande.date_debut");
+        $donnees = ATF::affaire()->sa();             
+
+		// Create new PHPExcel object
+		$objPHPExcel = new PHPExcel();
+
+		$feuilles[]["titre"] = "Engagement";
+		$feuilles[]["titre"] = "Prolongation";
+		foreach ($feuilles as $key => $value) {	
+			if($key > 0) $objPHPExcel->createSheet();	
+			$objPHPExcel->setActiveSheetIndex($key);
+			$objPHPExcel->getActiveSheet()->setTitle($value["titre"]);
+			$this->ajoutTitreAutoporte($objPHPExcel);
+			if($value["titre"] == "Engagement"){
+				$this->ajoutDonneesAutoportes($objPHPExcel,$donnees,false);
 			}else{
-				$this->ajoutDonneesAutoportes($sheets,$infos);
-			} 
-				        
-		}     
-		
-		$writer = new PHPExcel_Writer_Excel5($workbook);
-		
-		$writer->save($fname);           
-		header('Content-type: application/vnd.ms-excel');
-		if($refi){
-			header('Content-Disposition:inline;filename=export_autoportes_avec_tout.xls');
-		}else{
-			header('Content-Disposition:inline;filename=export_autoportes.xls');
-		}              
-		            
+				$this->ajoutDonneesAutoportes($objPHPExcel,$donnees,true);
+			}
+			
+		}
+	
+		// Redirect output to a client’s web browser (Excel5)
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="export_autoportes.xls"');
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct(); 		   
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$objWriter->save('php://output');	
+
+
 	} 
 
 	/** Mise en place des titres         
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
      */     
-    public function ajoutTitreAutoporte(&$sheets){
+    public function ajoutTitreAutoporte(&$objPHPExcel){
         $row_data = array(
-        	 "A"=>array('RESEAU',20)
-        	,"B"=>array('X',5)
-			,"C"=>array('ENTITE',30)
-			,"D"=>array('AFFAIRE',20)
-			,"E"=>array('REFINANCEUR',30)
-			,"F"=>array('DATE DEBUT',10)
-			,"G"=>array('PERIODE',10)
-			,"H"=>array('JOUR',7)			
-			,"I"=>array('DUREE',8)
-			,"J"=>array('LOYER HT',20)			
-			,"K"=>array('TOTAL TTC CONTRAT',20)
-			,"L"=>array('ACHAT HT',20)
-			,"M"=>array('ACHAT TTC',20)
+        	array('X',5)
+			,array('CLIENT',30)
+			,array('AFFAIRE',80)        	 
+			,array('DATE DEBUT',15)
+			,array('PERIODE',15)
+			,array('JOUR',15)			
+			,array('DUREE',15)
+			,array('LOYER HT',15)			
+			,array('TOTAL TTC CONTRAT',15)
+			,array("PRESTATAIRE/FOURNISSEUR",20)
+			,array('ACHAT HT',15)
+			,array('ACHAT TTC',15)
 		);           
          
-		//A =65 Z=90
-		 $lettre2 = 77;
-		 $lettre1 = 64;
-		 for($an=2006; $an<=2024; $an++){
+		
+		for($an=2016; $an<=2030; $an++){
 		 	for($mois=1;$mois<=12; $mois++){
 		 		if($mois <10){ $mois = "0".$mois;}
 		 		$date = $an."-".$mois."-"."01";
 				$stamp = strtotime($date);
-				$date = date("M-y", $stamp);
-				
-				//DEPART
-				if(($lettre1 == 64) && ($lettre2 <90)){
-					$lettre2++;
-					$char = chr($lettre2);
-				}
-				else{
-					if($lettre2 == 90){
-						$lettre1++;
-						$lettre2 = 65;
-						$char = chr($lettre1).chr($lettre2);
-					}
-					else{
-						$lettre2++;
-						$char = chr($lettre1).chr($lettre2);
-					}					
-				}
-			    $row_data[$char] = array($date,10);			
+				$date = date("M-y", $stamp);				
+			    $row_data[] = array($date,10);			
 		 	}
-		 }   
-		    
-         foreach($sheets as $nom=>$onglet){              
-             foreach($row_data as $col=>$titre){         
-				  $sheets[$nom]->write($col.'1',$titre[0],$this->getStyle("titre1"));  
-				  $sheets[$nom]->sheet->getColumnDimension($col)->setWidth($titre[1]);
-             }             
-         }
-		 
+		}	
+		//A =65 Z=90
+		$lettre2 = 64;
+		$lettre1 = 64;	
+		//DEPART	       			
+        foreach($row_data as $col=>$titre){  
+        	if(($lettre1 == 64) && ($lettre2 <90)){
+				$lettre2++;
+				$char = chr($lettre2);
+			}else{
+				if($lettre2 == 90){
+					$lettre1++;
+					$lettre2 = 65;
+					$char = chr($lettre1).chr($lettre2);
+				}else{
+					$lettre2++;
+					$char = chr($lettre1).chr($lettre2);
+				}					
+			}	
+			
+
+        	$objPHPExcel->getActiveSheet()->setCellValue($char.'1', $titre[0]); 
+        	$objPHPExcel->getActiveSheet()->getColumnDimension($char)->setWidth($titre[1]); 
+
+        }   		 
      }     
 
 	 /** Mise en place du contenu         
@@ -1297,118 +1269,236 @@ class facture_lm extends facture {
      * @param array $infos : contient tous les enregistrements  
 	 * @param boolean $refinance TRUE pour sortir toutes les affaires        
      */     
-     public function ajoutDonneesAutoportes(&$sheets,$infos, $refinance=FALSE){
-		//log::logger('ajoutDonneesAutoportes',ygautheron);
-        $row_auto=1;      
-		$increment=0;
+     public function ajoutDonneesAutoportes(&$objPHPExcel,$infos,$prolongation=false){
+        $row_auto=1;   
 		$InOneMonth = date('Y-m-01',strtotime("+1 month"));
 		$InOneMonth = explode("-", $InOneMonth);
 		$InOneMonth =  $InOneMonth["0"].$InOneMonth["1"].$InOneMonth["2"]; 
 		foreach ($infos as $key => $item) {
-			$afficher = FALSE;			          
+			$row_data = array();			          
 			$increment++; 			
-			if($item){
-								
-				ATF::demande_refi()->q->reset()->where("demande_refi.id_affaire",$item["facture.id_affaire_fk"])
-											  ->where("demande_refi.etat", "valide")
-											  ->setLimit(1)
-											  ->addOrder("demande_refi.date","desc");
-				$refi = ATF::demande_refi()->select_row();
-				//On affiche toutes les affaires meme celles refinancé par un autre que lm
-				if($refinance){					
-					$afficher = TRUE; 
-				}else{
-					//Refinancements par lm OU CLEOFI ou sans refi
-					if(($refi["id_refinanceur"] ==4) || ($refi["id_refinanceur"] ==14) || (!$refi)){
-						$afficher = TRUE;
-					}
-					$com = ATF::commande()->select($item["commande.etat_fk"]);				
-					$finContratDansMois = explode("-", $com["date_evolution"]);
-									
-					$finContratDansMois =  $finContratDansMois["0"].$finContratDansMois["1"].$finContratDansMois["2"]; 
-									
-					//Si le contrat prend fin dans le mois, il ne faut pas l'afficher
-					if($finContratDansMois && $finContratDansMois < $InOneMonth){	$afficher = FALSE; }					
+			if($item){	
+				$commande = ATF::commande()->select($item["id_commande"]);
+				$afficher = false;
+				
+				if($prolongation == true && ($commande["etat"] == "prolongation" || $commande["etat"] == "prolongation_contentieux")){
+					$afficher = true;
+				}elseif($prolongation == false && ($commande["etat"] !== "prolongation" && $commande["etat"] !== "prolongation_contentieux")){
+					$afficher = true;
 				}
-				
-				
-				
-		//log::logger($afficher,ygautheron);			
+
 				if($afficher){
-					$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);        
-					$societe = ATF::societe()->select($item['facture.id_societe_fk']);
-					ATF::loyer()->q->reset()->where("loyer.id_affaire",$item["facture.id_affaire_fk"]);
-					$loyers = ATF::loyer()->select_all();
-		//log::logger("===================".$item["facture.id_affaire_fk"]."==========\n",ygautheron);				
-		//log::logger($loyer,ygautheron);
-					foreach($loyers as $k=>$loyer){
-							
-						//Ne pas afficher les contrats ou il n'y a qu'un seul loyer
-						ATF::facturation()->q->reset()->where("facturation.id_affaire", $item["facture.id_affaire_fk"])
-													  ->where("facturation.type", "contrat")
-													  ->addOrder("date_periode_debut", "asc");
-						$echTest = ATF::facturation()->select_all();
-						
-						
-						if($loyer["duree"] && count($echTest)>1){
-							$duree = $loyer["duree"];
-							ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $item['facture.id_affaire_fk']);
-							$sommeBDC = ATF::bon_de_commande()->sa();
-																						
-							$Achat["HT"] = 0;
-							$Achat["TTC"] = 0;
-							foreach($sommeBDC as $k=>$v){
-								$Achat["HT"] = $Achat["HT"] + $v["prix"];
-								$Achat["TTC"] = $Achat["TTC"] + ($v["prix"] * $v["tva"]) ;
-							}
-
-							ATF::commande()->q->reset()->where("commande.id_affaire", $item["facture.id_affaire_fk"]);
-							$commande = ATF::commande()->select_row();										
-							ATF::facturation()->q->reset()->where("facturation.id_affaire", $item["facture.id_affaire_fk"])
-														  ->where("facturation.date_periode_debut", $commande["commande.date_debut"], "AND", false, ">=")
-														  ->addOrder("date_periode_debut", "asc");
-							$echeancier = ATF::facturation()->select_all();
-
-							$fact = 0;					
-							$row_data=array();       
-							
-							$row_data["A"]=array($item["societe.code_client"],"border_cel_left");
-							$row_data["B"]=array("","border_cel_left");
-							$row_data["C"]=array($item["facture.id_societe"],"border_cel_left");
-							$row_data["D"]=array($item["facture.id_affaire"],"border_cel_right");
-							
-							$res = $this->select($item["facture.id_facture_fk"] );
-							
-							
-							if(is_array($refi)){
-								$row_data["E"] = array(ATF::refinanceur()->select($refi["id_refinanceur"], "refinanceur") , "border_cel");
-							}else{ $row_data["E"] = array("","border_cel");	}
-												
-							$row_data["F"]=array($echeancier[$fact]["date_periode_debut"], "border_cel");
-							$frequence = "";
-							if($loyer["frequence_loyer"]){	
-								switch ($loyer["frequence_loyer"]) {
-									case 'mois':$frequence = "M";  break;						
-									case 'trimestre':$frequence = "T";	break;
-									case 'semestre':$frequence = "S";	break;
-									case 'an':$frequence = "A";	break;
-								}
-							}	
-							$row_data["G"]=array($frequence,"border_cel");
-							
-							//$jour = explode("-",$item['facture.date_periode_debut']);
-							$jour = explode("-", $echeancier[$fact]["date_periode_debut"]);
-							$row_data["H"]=array($jour[2],"border_cel_right");							
-							$row_data["I"]=array($loyer["duree"],"border_cel_right");
-							$row_data["J"]=array(($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"]),"border_cel_right");					
-							$row_data["K"]=array($loyer["duree"]*($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"])*1.2,"border_cel_right");
-							$row_data["L"]=array(abs($Achat["HT"]),"border_cel_right");
-							$row_data["M"]=array(round(abs($Achat["TTC"]),2),"border_cel_right");					
+					$row_auto++;							
 													
+					$loyers = array();
+					ATF::loyer()->q->reset()->where("id_affaire",$item["id_affaire"]);
+					$loyers = ATF::loyer()->select_all();
+					
+					$periode = $jour_edition = $duree = $loyerHT = $loyerTTC = "";
+
+					// Récupération des loyers de l'affaire
+					foreach ($loyers as $kl => $vl) {
+						if($kl == 0){
+							$periode .= $vl["frequence_loyer"]; 
+							$jour_edition .= "01";
+							$duree .= $vl["duree"]; 
+							$loyerHT .= number_format($vl["loyer"] - ($vl["loyer"]*0.2),2); 
+							$loyerTTC .= $vl["loyer"];
+						}else{
+							$periode .= "\n".$vl["frequence_loyer"];
+							$jour_edition .= "\n"."01"; 
+							$duree .= "\n".$vl["duree"]; 
+							$loyerHT .= "\n".number_format($vl["loyer"] - ($vl["loyer"]*0.2),2); 
+							$loyerTTC .= "\n".$vl["loyer"];
+						}						
+					}
+
+					//Récuperation des prix d'achat de l'affaire
+					$departement = ATF::db()->escape_string(substr(ATF::affaire()->select($item["id_affaire"],"cp_adresse_livraison"),0,2));
+					ATF::commande_ligne()->q->reset()->where("id_commande", $item["id_commande"]);
+					$lignes = ATF::commande_ligne()->sa();
+
+
+
+					$prix_achat = 0;
+
+					foreach ($lignes as $kl => $vl) {					
+
+						ATF::produit_fournisseur()->q->reset()->andWhere("id_fournisseur",$vl["id_fournisseur"])
+															  ->andWhere("recurrence","achat")
+															  ->andWhere("id_produit",$vl["id_produit"])
+															  ->andWhere('departement','(^|,)'.$departement.'($|,)','dep','REGEXP')
+															  ->whereIsNull('departement','OR','dep');
+						$achat = ATF::produit_fournisseur()->select_row();
+						
+
+						if($achat){
+							$prix_achat += $vl["quantite"] * $achat["prix_prestation"];							
+						}
+					}
+
+				
+
+			        $row_data[]  = '';
+					$row_data[]  = ATF::societe()->nom($item["id_societe"]);
+					$row_data[]  = $item["ref"]." - ".$item["affaire"];
+					$row_data[]  = date("d/m/Y", strtotime($item["date_debut"]));
+					$row_data[]  = $periode;
+					$row_data[]  = $jour_edition;			
+					$row_data[]  = $duree;
+					$row_data[]  = $loyerHT;			
+					$row_data[]  = $loyerTTC;
+					$row_data[]  = '';
+					$row_data[]  = $prix_achat;
+					$row_data[]  = $prix_achat*1.20;
+								
+
+					//A =65 Z=90
+					$lettre2 = 64;
+					$lettre1 = 64;	
+					//DEPART	       			
+			        foreach($row_data as $k=>$v){  
+			        	if(($lettre1 == 64) && ($lettre2 <90)){
+							$lettre2++;
+							$char = chr($lettre2);
+						}else{
+							if($lettre2 == 90){
+								$lettre1++;
+								$lettre2 = 65;
+								$char = chr($lettre1).chr($lettre2);
+							}else{
+								$lettre2++;
+								$char = chr($lettre1).chr($lettre2);
+							}					
+						}			
+
+						$objPHPExcel->getActiveSheet()->setCellValue($char.$row_auto, $v);
+						$objPHPExcel->getActiveSheet()->getStyle($char.$row_auto)->getAlignment()->setWrapText(true);	        	        	
+	        		}
+
+	        		ATF::facturation()->q->reset()->where("facturation.id_affaire", $item["id_affaire"])
+												  ->where("facturation.date_periode_debut", $item["date_debut"], "AND", false, ">=")
+												  ->addOrder("date_periode_debut", "asc");
+					$echeancier = ATF::facturation()->select_all();
+
+					
+
+
+					$fact = 0;
+					$jour = explode("-", $echeancier[$fact]["date_periode_debut"]);
+
+					for($an=2016; $an<=2030; $an++){
+					 	for($mois=1;$mois<=12; $mois++){
+					 		if($mois <10){ $mois = "0".$mois;}
+					 		$date = $an."-".$mois."-"."01";		
+
+							//DEPART
+							if(($lettre1 == 64) && ($lettre2 <90)){
+								$lettre2++;
+								$char = chr($lettre2);
+							}else{
+								if($lettre2 == 90){
+									$lettre1++;
+									$lettre2 = 65;
+									$char = chr($lettre1).chr($lettre2);
+								}else{
+									$lettre2++;
+									$char = chr($lettre1).chr($lettre2);
+								}					
+							}
+							$date = date("Y-m", strtotime($date));
+							$date = $date."-".$jour[2];	
+							$dateCol = new DateTime($date);	
+							$dateDeb = new DateTime($echeancier[$fact]["date_periode_debut"]);									
+							$dateFin = new DateTime($echeancier[$fact]["date_periode_fin"]);
+
+							if(($dateCol->getTimestamp()  == $dateDeb->getTimestamp())){
+
+								if($echeancier[$fact]["montant"] || ($echeancier[$fact]["montant"] == $loyer["loyer"])){
+									$objPHPExcel->getActiveSheet()->setCellValue($char.$row_auto, $echeancier[$fact]["montant"]);
+
+									//Engagement -> vert
+									//Prolongation probable -> orange
+									//Prolongation -> rouge
+									$color = '32cd32';
+									if($echeancier[$fact]["nature"] == "prolongation_probable"){
+										$color = 'ffa500';
+									}elseif ($echeancier[$fact]["nature"] == "prolongation") {
+										$color = 'FF0000';
+									}
+
+									$objPHPExcel->getActiveSheet()->getStyle($char.$row_auto)->applyFromArray(
+									    array(
+									        'fill' => array(
+									            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+									            'color' => array('rgb' => $color)
+									        )
+									    )
+									);
+								}																	    	
+					    		$fact++;									
+							}	
+													
+					 	}
+					}	
+
+					$fournisseurs = array();
+
+					ATF::facturation_fournisseur()->q->reset()->where("id_affaire", $item["id_affaire"]);
+					$facturations = ATF::facturation_fournisseur()->sa();
+					
+					if($facturations){
+						foreach ($facturations as $kff => $vff) {
+							$fournisseurs[$vff["id_fournisseur"]][]= $vff;							
+						}
+					}					
+					
+					if($fournisseurs){
+						foreach ($fournisseurs as $kfournisseur => $vfournisseur) {
+							$row_data = array();
+							$row_auto++;	
+
+							$row_data[]  = '';
+							$row_data[]  = '';
+							$row_data[]  = "";
+							$row_data[]  = "";
+							$row_data[]  = "";
+							$row_data[]  = "";
+							$row_data[]  = "";			
+							$row_data[]  = "";
+							$row_data[]  = "";		
+							$row_data[]  = ATF::societe()->select($kfournisseur , "societe");
+							$row_data[]  = "";
+							$row_data[]  = "";
+							$row_data[]  = "";
+
 							//A =65 Z=90
-							$lettre2 = 77;
-							$lettre1 = 64;						
-							for($an=2006; $an<=2024; $an++){
+							$lettre2 = 64;
+							$lettre1 = 64;	
+							//DEPART	       			
+					        foreach($row_data as $k=>$v){  
+					        	if(($lettre1 == 64) && ($lettre2 <90)){
+									$lettre2++;
+									$char = chr($lettre2);
+								}else{
+									if($lettre2 == 90){
+										$lettre1++;
+										$lettre2 = 65;
+										$char = chr($lettre1).chr($lettre2);
+									}else{
+										$lettre2++;
+										$char = chr($lettre1).chr($lettre2);
+									}					
+								}			
+
+								$objPHPExcel->getActiveSheet()->setCellValue($char.$row_auto, $v);
+								$objPHPExcel->getActiveSheet()->getStyle($char.$row_auto)->getAlignment()->setWrapText(true);	        	        	
+			        		}
+
+			        		$fact = 0;
+							$jour = explode("-", $vfournisseur[$fact]["date_periode_debut"]);
+
+							for($an=2016; $an<=2030; $an++){
 							 	for($mois=1;$mois<=12; $mois++){
 							 		if($mois <10){ $mois = "0".$mois;}
 							 		$date = $an."-".$mois."-"."01";		
@@ -1430,30 +1520,40 @@ class facture_lm extends facture {
 									$date = date("Y-m", strtotime($date));
 									$date = $date."-".$jour[2];	
 									$dateCol = new DateTime($date);	
-									$dateDeb = new DateTime($echeancier[$fact]["date_periode_debut"]);									
-									$dateFin = new DateTime($echeancier[$fact]["date_periode_fin"]);
+									$dateDeb = new DateTime($vfournisseur[$fact]["date_periode_debut"]);							
 
+									if(($dateCol->getTimestamp()  == $dateDeb->getTimestamp())){
 
-									if(($dateCol->getTimestamp()  == $dateDeb->getTimestamp()))
-								    {	
-										if((($echeancier[$fact]["montant"]+$echeancier[$fact]["assurance"]+$echeancier[$fact]["frais_de_gestion"]) == ($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"])) || (($echeancier[$fact]["montant"]) == ($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"]))){
-											$row_data[$char] =  array(($echeancier[$fact]["montant"]+$echeancier[$fact]["assurance"]+$echeancier[$fact]["frais_de_gestion"]),"cel_right");
+										if($vfournisseur[$fact]["montant"] || ($vfournisseur[$fact]["montant"] == $loyer["loyer"])){
+											$objPHPExcel->getActiveSheet()->setCellValue($char.$row_auto, $vfournisseur[$fact]["montant"]);
 										}																	    	
 							    		$fact++;									
-									}							
+									}	
+															
 							 	}
 							}	
-							//log::logger($row_data , "mfleurquin");			
-							if($row_data){           
-								$row_auto++;         
-								foreach($row_data as $col=>$valeur){
-									$sheets['auto']->write($col.$row_auto, $valeur[0], $this->getStyle($valeur[1]));              
-								}     
-							}
-						}											
-					}											
-				}         
+
+						}
+					}
+				}		
 			}  
+		}
+
+		$ArrayCol = array(array("Engagement","32cd32"), array("Prolongation probable","ffa500"), array("Prolongation","FF0000"));
+		$row_auto = $row_auto+2;
+		foreach ($ArrayCol as $kcol => $vcol) {
+			
+			$row_auto ++;		
+
+			$objPHPExcel->getActiveSheet()->getStyle("A".$row_auto)->applyFromArray(
+								    array(
+								        'fill' => array(
+								            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+								            'color' => array('rgb' => $vcol["1"])
+								        )
+								    )
+								);
+			$objPHPExcel->getActiveSheet()->setCellValue("B".$row_auto, $vcol[0]);
 		}
 	}      
 	 
@@ -1833,14 +1933,14 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][4] = $code_magasin;
 		        	$donnees[$key][$i][5] = 120; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = "VT"; //Type information a donner par LM
+		        	$donnees[$key][$i][7] = "10"; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
 		        	$donnees[$key][$i][11] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][12] = "00000"; //Rayon du pack
 		        	$donnees[$key][$i][13] = "1";	
-	        		$donnees[$key][$i][14] = "411000"; //Compte Comptable
+	        		$donnees[$key][$i][14] = "411101"; //Compte Comptable
 	        		$donnees[$key][$i][15] = "0"; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
@@ -1862,7 +1962,7 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][4] = $code_magasin;
 		        	$donnees[$key][$i][5] = 120; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = "VT";; //Type information a donner par LM
+		        	$donnees[$key][$i][7] = "10";; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
@@ -1891,7 +1991,7 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][4] = $code_magasin;
 		        	$donnees[$key][$i][5] = 120; //Code BU a donner par LM
 		        	$donnees[$key][$i][6] = "CLEODIS";
-		        	$donnees[$key][$i][7] = "VT";; //Type information a donner par LM
+		        	$donnees[$key][$i][7] = "10";; //Type information a donner par LM
 		        	$donnees[$key][$i][8] = date("Ymd", strtotime($value["facture.date"]));
 		        	$donnees[$key][$i][9] = "1";
 		        	$donnees[$key][$i][10] = "EUR";
