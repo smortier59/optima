@@ -83,6 +83,16 @@ class pdf_absystech extends pdf {
 		$r = $this->useTemplate($tplIdx, -5, -10, 220, 0, true);	
 	}
 
+	public function echeancier($id){
+		$this->Open();
+		$this->Addpage();
+		$this->setleftmargin(15);
+		$this->setrightmargin(15);
+		$this->setdrawcolor(0,184,255);
+		
+		$this->image(__PDF_PATH__.ATF::$codename."/facturePage1.jpg",5,0,200);
+	}
+
 	public function facture($id,&$s) {
 		$id = ATF::facture()->decryptId($id);
 
