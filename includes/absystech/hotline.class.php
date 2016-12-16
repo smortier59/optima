@@ -3911,31 +3911,32 @@ class hotline extends classes_optima {
 
         	// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
         	if ($post['specialAction']) {
+		        $func = $post['specialAction'];
         		switch ($post['specialAction']) {
         			case "forward":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				$return = self::$post['specialAction']($post);
+        				$return = self::$func($post);
          				$lastInteractionRequired = true;
 	       			break;
         			case "setPriorite":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				self::$post['specialAction']($post);
+        				self::$func($post);
         				$return['result'] = true;
         			break;
         			case "takeRequest":
         			case "cancelRequest":
         			case "resolveRequest":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				self::$post['specialAction']($post);
+        				self::$func($post);
         				$return['result'] = true;
         				$lastInteractionRequired = true;
-        				if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
+        				if ($func=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
 
         			break;
         			case "setWait":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				if ($post['etat']=="wait") {
-	        				self::$post['specialAction']($post);
+      						self::$func($post);
         				} else {
         					$this->fixingRequest($post);
         				}
