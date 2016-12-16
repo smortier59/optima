@@ -288,11 +288,29 @@ if($infos["id_societe"]){
 
             foreach ($l as $kl => $vl) {
                 if($qte = $infos["panier"]["product"][$value["id_produit"]]["quantite"]){
-                    $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2);
-                    $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
-                    $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2)*$qte);
-                    $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
-                   
+
+                    //Si pas un sous produit
+                    if(!$value["id_produit_principal"]){
+                        $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
+                        $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
+                        $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                        $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];  
+                    }else{
+                        $qte_produit_princ = $infos["panier"]["product"][$value["id_produit_principal"]]["quantite"];
+                        if($qte_produit_princ && $qte_produit_princ > 0){
+                            if($value["qte_lie_principal"] == "non"){
+                                $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
+                                $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
+                                $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                                $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
+                            }else{
+                                $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
+                                $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
+                                $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*($qte*$qte_produit_princ));
+                                $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
+                            }
+                        }
+                    }                   
                 }
             }   
         }

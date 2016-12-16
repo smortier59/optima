@@ -466,9 +466,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		if ($this->lignes) {			
 			foreach ($this->lignes as $key => $value) {
 				if(ATF::produit()->select($value["id_produit"], "nature") == $type){					
-					if(strpos($value["produit"], "&nbsp;>") === false){						
-						$lignes[] = $value;
-					}
+					$lignes[] = $value;					
 				}
 			}		
 		}
@@ -480,11 +478,18 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				$style = array();
 
 				foreach ($lignes as $key => $value) {
-					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")){
-						$data[$key][0] = $value["quantite"];					
+					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal") 
+					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
+						$data[$key][0] = $value["quantite"];
 						$data[$key][1] = $value["produit"];
 						$style[$key][1] = $this->leftStyle;		
-					}			
+					 }else{
+					 	if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){					 		
+					 		$data[$key][0] = $value["quantite"];
+							$data[$key][1] = $value["produit"]." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
+							$style[$key][1] = $this->leftStyle;	
+					 	}
+					 }			
 				}
 				$this->tableau($head,$data,$width,7,$style,260);
 			}
@@ -496,12 +501,13 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 				$style = array();
 
 				foreach ($lignes as $key => $value) {
-					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")){
+					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal") 
+					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
 						$data[$key][0] = "";
 						$data[$key][1] = $value["produit"];
 						$style[$key][1] = $this->leftStyle;		
 					 }else{
-					 	if(ATF::produit()->select($value["id_produit"], "afficher") == "oui"){					 		
+					 	if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){					 		
 					 		$data[$key][0] = $value["quantite"];
 							$data[$key][1] = $value["produit"]." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
 							$style[$key][1] = $this->leftStyle;	

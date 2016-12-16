@@ -792,10 +792,10 @@ class facture_fournisseur extends classes_optima {
         $total_credit = 0;
         $lignes = 0;
 
-        $donnees = array();        
+        $donnees = array();
 
         foreach ($data as $key => $value) {
-        	$code_magasin = "M0380"; //Par defaut web
+        	$code_magasin = "380"; //Par defaut web
         	
         	$compteTVA = $compteTTC = $compteHT  = $magasin;
 
@@ -803,6 +803,7 @@ class facture_fournisseur extends classes_optima {
 
         	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
         		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");
+        		$code_magasin = substr($code_magasin, 1);
         	}
 
         	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
@@ -815,29 +816,7 @@ class facture_fournisseur extends classes_optima {
         	   
         	$pack = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit"));
         	
-        	/*switch ($value["facture_fournisseur.type"]) {
-        		case 'achat':
-        			$compteHT = "215600";
-    				$compteTVA = "445620";
-    				$compteTTC = "401000";
-        		break; 
-        		case 'maintenance':
-        			$compteHT = "615610";
-    				$compteTVA = "445824P";
-    				$compteTTC = "401103";
-        		break; 
-        		case 'diagnostique':
-        			$compteHT = "604112";
-    				$compteTVA = "445824P";
-    				$compteTTC = "401103";
-        		break; 
-        		case 'installation':
-        			$compteHT = "604100";
-    				$compteTVA = "445824P";
-    				$compteTTC = "401103";
-        		break;       			        			
-        			
-        	}*/
+        	
         	if($value["facture_fournisseur.type"] == "achat"){
         		$compteComptable = "215600";
         	}elseif($value["facture_fournisseur.type"] == "maintenance"){
@@ -859,10 +838,10 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][5] = "1"; //Code pays (centrale)
         	$donnees[$key][1][6] = $code_magasin;
         	$donnees[$key][1][7] = ($value["facture_fournisseur.prix"] >= 0)?"F":"A"; //Type de facture F/A
-        	$donnees[$key][1][8] =  $value["facture_fournisseur.ref"];
+        	$donnees[$key][1][8] =  $value["facture_fournisseur.id_facture_fournisseur"];
         	$donnees[$key][1][9] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
         	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));;
-        	$donnees[$key][1][11] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
+        	$donnees[$key][1][11] = date("Ymd"); 
         	$donnees[$key][1][12] = ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]); //Montant TTC separateur numeric .
         	$donnees[$key][1][13] = "EUR";	
     		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
@@ -870,10 +849,10 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][16] = $value["facture_fournisseur.bap"]; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
         	$donnees[$key][1][17] = date("Ymd", strtotime($value["facture_fournisseur.date"])); //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
         	$donnees[$key][1][18] = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"] ,"numero_site"); //Numéro du site fournisseur (FGX .. Ou IMO…) 
-        	$donnees[$key][1][19] = "A voir avec David et Clotilde (dans le cas de facture magasin)";	  
-			$donnees[$key][1][20] = "A voir avec David et Clotilde (dans le cas de facture magasin)";
-			$donnees[$key][1][21] = "A voir avec David et Clotilde (dans le cas de facture magasin)"; 	
-        	$donnees[$key][1][22] = "A voir avec David et Clotilde (dans le cas de facture magasin)";
+        	$donnees[$key][1][19] = $code_magasin;	  
+			$donnees[$key][1][20] = "1";
+			$donnees[$key][1][21] = "001"; 	
+        	$donnees[$key][1][22] = "1";
 			$donnees[$key][1][23] = "";
 			$donnees[$key][1][24] = "";
 			$donnees[$key][1][25] = $compteComptable; 
@@ -898,7 +877,11 @@ class facture_fournisseur extends classes_optima {
 		        	$donnees[$key][$i][2] = "1"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = $rayon;
 		        	$donnees[$key][$i][4] = $vl["prix"]; // Montant
-		        	$donnees[$key][$i][5] = "D20"; //Code TVA
+		        	if($value["facture_fournisseur.type"] == "achat"){
+		        		$donnees[$key][$i][5] = "D20 Immo"; //Code TVA
+		       	 	}else{ 
+		       	 		$donnees[$key][$i][5] = ""; //Code TVA 
+		       	 	}
 		        	$donnees[$key][$i][6] = "0";
 		        	$donnees[$key][$i][7] = ""; 
 		        	$donnees[$key][$i][8] = ""; 
@@ -914,8 +897,12 @@ class facture_fournisseur extends classes_optima {
 		        	$donnees[$key][$i][2] = "0"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = "0";
 		        	$donnees[$key][$i][4] = round(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2); // Montant
-		        	$donnees[$key][$i][5] = "D20"; //Code TVA
-		        	$donnees[$key][$i][6] = $value["facture_fournisseur.tva"];
+		        	if($value["facture_fournisseur.type"] == "achat"){
+		        		$donnees[$key][$i][5] = "D20 Immo"; //Code TVA
+		       	 	}else{ 
+		       	 		$donnees[$key][$i][5] = ""; //Code TVA 
+		       	 	}
+		        	$donnees[$key][$i][6] = ($value["facture_fournisseur.tva"]-1)*100;
 		        	$donnees[$key][$i][7] = ""; 
 		        	$donnees[$key][$i][8] = "" ; 
 		        	$donnees[$key][$i][9] = ""; //Type de facture
@@ -925,34 +912,33 @@ class facture_fournisseur extends classes_optima {
 
 					$i++;
 				}				
-			}
-        	    	
+			}        	    	
         }
 
         header('Content-Type: application/fic');		
-		header('Content-Disposition: attachment; filename="AP_CLEODIS_LMA_'.date("Y-m").'"');
+		header('Content-Disposition: attachment; filename="CLEODIS_AP'.date("Ym").'".fic');
 		
-		
-		log::logger($donnees , "mfleurquin");
 
 		foreach ($donnees as $key => $value) {	
 			foreach ($value as $k => $v) {
 				for($i=1;$i<=36;$i++){
 					if(isset($v[$i])){
-						$string .= $v[$i].";";
+						$string .= $v[$i];
+						if($i!=36) $string .= ";";
 					}else{
-						$string .= ";";
+						$string .= "";
+						if($i!=36) $string .= ";";
 					}					
 				}
-				$string .= "\n";
-				$lignes ++;
-			}
+				$string .= "\n";	
+				$lignes ++;			
+			}			
 		}
         
-        $string .=  "98;".$lignes.";".date("Ymd").";\n";
-        
-        $string .= "99;".$total_debit.";".$total_credit.";EUR;\n";
-       
+        $string .=  "98;".count($donnees).";CLEODIS\n";
+        $lignes ++;	
+        $string .= "99;".$total_debit.";EUR;\n";
+       	$lignes ++;	
         $string .= "0;".$lignes.";".date("Ymd").";";
 
         echo $string;
