@@ -1905,18 +1905,18 @@ class facture_lm extends facture {
 
         	switch ($pack["type_pack_magasin"]) {
         		case 'alarme':
-        			if($value["facture.type_facture"] == "facture") $legaccHT = "706200";
+        			if($value["facture.type_facture"] == "facture" || $value["facture.type_facture"] == "libre") $legaccHT = "706200";
         			//if($value["facture.type_facture"] == "installation") $legaccHT = "706200";
         			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706203";       			
         		break;        		
         		case 'chaudiere':
-        			if($value["facture.type_facture"] == "facture") $legaccHT = "706200";
+        			if($value["facture.type_facture"] == "facture" || $value["facture.type_facture"] == "libre") $legaccHT = "706200";
         			//if($value["facture.type_facture"] == "installation") $legaccHT = "706201";
         			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706203";
         			
         		break;
         		case 'adoucisseur':
-        			if($value["facture.type_facture"] == "facture") $legaccHT = "706200";
+        			if($value["facture.type_facture"] == "facture" || $value["facture.type_facture"] == "libre") $legaccHT = "706200";
         			//if($value["facture.type_facture"] == "installation") $legaccHT = "706203";
         			if($value["facture.type_facture"] == "service_complementaire") $legaccHT = "706203";  			
         		break;
@@ -2016,26 +2016,27 @@ class facture_lm extends facture {
         }
 
         header('Content-Type: application/fic');		
-		header('Content-Disposition: attachment; filename="GL_CLEODIS_LMA_'.date("Y-m").'"');
+		header('Content-Disposition: attachment; filename="CLEODIS_VT'.date("Ym").'".fic');
 		
 		
 		foreach ($donnees as $key => $value) {	
 			foreach ($value as $k => $v) {
 				for($i=1;$i<=36;$i++){
 					if(isset($v[$i])){
-						$string .= $v[$i].";";
+						$string .= $v[$i];
+						if($i!=36) $string .= ";";						 
 					}else{
-						$string .= ";";
-					}					
+						if($i!=36) $string .= ";";
+					}
 				}
 				$string .= "\n";
 				$lignes ++;
 			}
 		}
-        $string .= "99;".$total_debit.";".$total_credit.";"."EUR;\n";
+        $string .= "99;".$total_debit.";".$total_credit.";"."EUR\n";
 
         $lignes++;
-        $string .=  "0;".$lignes.";".date("Ymd").";";
+        $string .=  "0;".$lignes.";".date("Ymd");
         echo $string;
 	}
 
