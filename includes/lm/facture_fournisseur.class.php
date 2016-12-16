@@ -849,10 +849,10 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][16] = $value["facture_fournisseur.bap"]; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
         	$donnees[$key][1][17] = date("Ymd", strtotime($value["facture_fournisseur.date"])); //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
         	$donnees[$key][1][18] = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"] ,"numero_site"); //Numéro du site fournisseur (FGX .. Ou IMO…) 
-        	$donnees[$key][1][19] = "A voir avec David et Clotilde (dans le cas de facture magasin)";	  
-			$donnees[$key][1][20] = "A voir avec David et Clotilde (dans le cas de facture magasin)";
-			$donnees[$key][1][21] = "A voir avec David et Clotilde (dans le cas de facture magasin)"; 	
-        	$donnees[$key][1][22] = "A voir avec David et Clotilde (dans le cas de facture magasin)";
+        	$donnees[$key][1][19] = $code_magasin;	  
+			$donnees[$key][1][20] = "1";
+			$donnees[$key][1][21] = "001"; 	
+        	$donnees[$key][1][22] = "1";
 			$donnees[$key][1][23] = "";
 			$donnees[$key][1][24] = "";
 			$donnees[$key][1][25] = $compteComptable; 
@@ -902,7 +902,7 @@ class facture_fournisseur extends classes_optima {
 		       	 	}else{ 
 		       	 		$donnees[$key][$i][5] = ""; //Code TVA 
 		       	 	}
-		        	$donnees[$key][$i][6] = $value["facture_fournisseur.tva"];
+		        	$donnees[$key][$i][6] = ($value["facture_fournisseur.tva"]-1)*100;
 		        	$donnees[$key][$i][7] = ""; 
 		        	$donnees[$key][$i][8] = "" ; 
 		        	$donnees[$key][$i][9] = ""; //Type de facture
@@ -912,32 +912,33 @@ class facture_fournisseur extends classes_optima {
 
 					$i++;
 				}				
-			}
-        	    	
+			}        	    	
         }
 
         header('Content-Type: application/fic');		
-		header('Content-Disposition: attachment; filename="AP_CLEODIS_LMA_'.date("Y-m").'"');
+		header('Content-Disposition: attachment; filename="CLEODIS_AP'.date("Ym").'".fic');
 		
 
 		foreach ($donnees as $key => $value) {	
 			foreach ($value as $k => $v) {
 				for($i=1;$i<=36;$i++){
 					if(isset($v[$i])){
-						$string .= $v[$i].";";
+						$string .= $v[$i];
+						if($i!=36) $string .= ";";
 					}else{
-						$string .= ";";
+						$string .= "";
+						if($i!=36) $string .= ";";
 					}					
 				}
-				$string .= "\n";
-				$lignes ++;
-			}
+				$string .= "\n";	
+				$lignes ++;			
+			}			
 		}
         
-        $string .=  "98;".$lignes.";".date("Ymd").";\n";
-        
-        $string .= "99;".$total_debit.";".$total_credit.";EUR;\n";
-       
+        $string .=  "98;".count($donnees).";CLEODIS\n";
+        $lignes ++;	
+        $string .= "99;".$total_debit.";EUR;\n";
+       	$lignes ++;	
         $string .= "0;".$lignes.";".date("Ymd").";";
 
         echo $string;

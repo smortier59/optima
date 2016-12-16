@@ -248,4 +248,14 @@ class echeancier extends classes_optima {
     }
     return $return;
   }
+
+
+  public function _getPdf($get, $post){
+
+    log::logger($get , "mfleurquin");
+
+    $pdf_mandat = ATF::pdf()->generic('echeancier',$id_affaire,true);
+
+    return base64_encode($pdf_mandat);
+  }
 }
