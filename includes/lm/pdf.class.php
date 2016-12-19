@@ -133,7 +133,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->colsProduitAvecDetailFirst = array("border"=>"TL","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduitAvecDetailFirst");
 		$this->colsProduitAvecDetailLast = array("border"=>"TR","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduitAvecDetailLast");
 		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
-		ATF::commande_ligne()->q->reset()->where("visible","oui")
+		ATF::commande_ligne()->q->reset()//->where("visible","oui")
 									     ->where("id_commande",$this->commande['id_commande'])
 									     ->addGroup("id_produit");
 		$this->lignes = ATF::commande_ligne()->sa();
