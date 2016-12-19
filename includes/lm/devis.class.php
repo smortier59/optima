@@ -415,7 +415,7 @@ class devis_lm extends devis {
 				if((ATF::produit()->select($item["id_produit"] , "id_produit_principal") == NULL) ||
 				   (ATF::produit()->select($item["id_produit"] , "id_produit_principal") !== NULL && $this->principalEstPresent(ATF::produit()->select($item["id_produit"] , "id_produit_principal"), $infos_ligne))){
 				   	$item["id_devis"]=$last_id;
-					$item["visible"] = ATF::produit()->select($item["id_produit"] , "afficher");
+					$item["visible"] = ATF::produit()->select($item["id_produit"] , "visible_pdf");
 
 
 					//Si la quantité du sous produit est lié à la quantité du produit principal
