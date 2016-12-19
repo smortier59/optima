@@ -17,11 +17,10 @@ class echeancier_ligne_periodique extends classes_optima {
       ,'echeancier_ligne_periodique.designation'
       ,'echeancier_ligne_periodique.quantite'
       ,'echeancier_ligne_periodique.puht'
-      ,'echeancier_ligne_periodique.total'
       ,'echeancier_ligne_periodique.valeur_variable'
-      ,'echeancier_ligne_periodique.facture_prorataisee'
+      ,'echeancier_ligne_periodique.facture_prorata'
       ,'echeancier_ligne_periodique.mise_en_service'
-      ,'echeancier_ligne_periodique.ventilation_analytique'
+      ,'echeancier_ligne_periodique.id_compte_absystech'
       ,'echeancier_ligne_periodique.id_echeancier'
      
     );
@@ -31,15 +30,28 @@ class echeancier_ligne_periodique extends classes_optima {
       ,'designation'
       ,'quantite'
       ,'puht'
-      ,'total'
       ,'valeur_variable'
-      ,'facture_prorataisee'
+      ,'facture_prorata'
       ,'mise_en_service'
-      ,'ventilation_analytique'
+      ,'id_compte_absystech'
       ,'id_echeancier'
     );
   }
-
+  /**
+  * Permet de supprimer une ligne d'echeancier périodique
+  * @package Telescope
+  * @author Cyril CHARLIER <ccharlier@absystech.fr> 
+  * @param $get array contient l'id a l'index 'id'
+  * @param $post array vide
+  * @return array result en booleen et notice sous forme d'un tableau
+  */ 
+  public function _DELETE($get,$post) {
+    if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    $return['result'] = $this->delete($get);
+    // Récupération des notices créés
+    $return['notices'] = ATF::$msg->getNotices();
+    return $return;
+  }
   /**
   * Fonction _POST pour telescope
   * @package Telescope
@@ -51,7 +63,7 @@ class echeancier_ligne_periodique extends classes_optima {
   public function _POST($get,$post) {
     // parser la date sous le bon format pour mysql
     $post["mise_en_service"]=date("Y-m-d",strtotime($post["mise_en_service"]));
-
+    unset($post["total"]);
     try {
       $result = $this->insert($post);
     } catch (errorSQL $e) {

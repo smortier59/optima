@@ -186,7 +186,6 @@ class echeancier extends classes_optima {
     // Si on fait un ajout de l'echeance
     else {
       // Check des champs obligatoire
-      log::logger($post,"ccharlier");
       if (!$post["id_echeancier"]) throw new errorATF(ATF::$usr->trans('id_echeancier_missing','echeancier'));
       if (!$post['id_societe']) throw new errorATF(ATF::$usr->trans('id_societe_missing','echeancier'));
       if (!$post['id_affaire']) throw new errorATF(ATF::$usr->trans('id_affaire_missing','echeancier'));
@@ -248,7 +247,22 @@ class echeancier extends classes_optima {
     }
     return $return;
   }
-
+  /**
+  * Permet de supprimer un contrat
+  * @package Telescope
+  * @author Cyril CHARLIER <ccharlier@absystech.fr> 
+  * @param $get array contient l'id a l'index 'id'
+  * @param $post array vide
+  * @return array result en booleen et notice sous forme d'un tableau
+  */ 
+  public function _DELETE($get,$post) {
+    if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    $get["actif"]="non";
+    $get["id_echeancier"]=$get['id'];
+    unset($get["id"],$get["path"],$get["method"]);
+    $return['result'] = $this->update($get);
+    return $return;
+  }
 
   public function _getPdf($get, $post){
 
