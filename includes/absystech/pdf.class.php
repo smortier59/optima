@@ -174,7 +174,7 @@ class pdf_absystech extends pdf {
 			
 			$date = $infos_facture["date_debut_periode"];
 			$date = explode("-", $date);
-			
+			if($type_facture = "facture_periodique") $type_facture= "Facture";
 			$this->sety(35);
 			switch ($type_facture) {
 				case "avoir":
