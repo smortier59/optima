@@ -15,6 +15,7 @@ Ext.onReady(function(){
         },
         tooltip : {
             shared : true
+            
         },
         xAxis: {
             allowDecimals: false,
@@ -28,11 +29,18 @@ Ext.onReady(function(){
                             {/foreach}   
                         ]
         },
-        yAxis: {
-            title: {
-                text: 'Nombre de check'
+        yAxis: [
+            {
+                title: {
+                    text: "Taux d'erreur"
+                }
+            },
+            {
+                title: {
+                    text: "Nombre de requetes"
+                }
             }
-        },
+        ],
         plotOptions: {
             area: {
                 marker: {
@@ -49,23 +57,40 @@ Ext.onReady(function(){
         },
         series: [        
                {
-                    name: 'Visible'                    
+                    name: "Taux d'erreur" 
+                    ,yAxis: 0                   
                    ,data: [ 
                             {foreach $data as $value}
-                                {$value["ok"]}                                
+                                {round(($value["ko"]/$value["ok"])*100, 2)}                                
                                 {if !$value@last},{/if}
                             {/foreach}    
                           ]
+                    ,tooltip : {
+                        valueSuffix: ' %'
+                    }
                },
                {
-                    name: 'Non visible'                    
+                    name: "Erreur"
+                    ,yAxis: 1                 
                    ,data: [ 
                             {foreach $data as $value}
                                 {$value["ko"]}                                
                                 {if !$value@last},{/if}
                             {/foreach}    
                           ]
-               }         
+                    ,visible: false
+               },
+               {
+                    name: "Ok"
+                    ,yAxis: 1                   
+                   ,data: [ 
+                            {foreach $data as $value}
+                                {$value["ok"]}                                
+                                {if !$value@last},{/if}
+                            {/foreach}    
+                          ]
+                    ,visible: false
+               }
            ]
     });
 });    
