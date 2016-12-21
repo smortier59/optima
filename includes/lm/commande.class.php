@@ -1420,8 +1420,7 @@ class commande_lm extends commande {
 			unset($affaires_parentes);
 			
 //			log::logger($i." \ ".$commandeSa["count"],'lm_statut.log');
-			if(ATF::$codename == "lmbe") $commande = new commande_lmbe($item['id_commande']);
-			else $commande = new commande_lm($item['id_commande']);
+			$commande = new commande_lm($item['id_commande']);
 			
 			$affaire = $commande->getAffaire();
 			
@@ -1429,9 +1428,7 @@ class commande_lm extends commande {
 			if ($ap = $affaire->getParentAR()) {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
-					if(ATF::$codename == "lmbe") $affaires_parentes[] = new affaire_lmbe($a["id_affaire"]);
-					else $affaires_parentes[] = new affaire_lm($a["id_affaire"]);
-					
+					$affaires_parentes[] = new affaire_lm($a["id_affaire"]);					
 				}
 			} elseif ($affaire->get('id_parent')) {
 				$affaire_parente = $affaire->getParentAvenant();

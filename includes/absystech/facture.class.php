@@ -311,6 +311,7 @@ class facture_absystech extends facture {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+		if($infos["echeancier"]) $echeancier = true;  
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
  		$preview=$infos["preview"];
 		$type_check=$infos[$this->table]["mode"];
@@ -552,6 +553,8 @@ class facture_absystech extends facture {
 					
 					case 'trimestrielle':	
 						//01 Janvier - 31 Mars
+						
+						
 						if(intval($date[1]) <= 3){
 							$mois = mktime( 0, 0, 0, 3, 1, $date[2] );
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  1, 1, $date[2])); // 01-01-anneeFacture
@@ -577,8 +580,7 @@ class facture_absystech extends facture {
 							$dateDeb = date("Y-m-d" , mktime(0, 0, 0,  10, 1, $date[2])); // 01-10-anneeFacture
 							$dateFin = date("Y-m-d", mktime(0, 0, 0, 12, date('t',$mois), $date[2]));
 							
-						}					
-						
+						}	
 						$nbJoursTrimestre = ATF::facture_absystech()->date_diff($dateDeb, $dateFin);
 						if($infos["date_fin_periode"]){
 							$nbJoursAVenir = ATF::facture_absystech()->date_diff($dateFacture, $infos["date_fin_periode"]);
@@ -706,11 +708,17 @@ class facture_absystech extends facture {
 		//***************************************************************************************
 		
 		if($preview){			
-
+			if($echeancier){
+				$pdf_binaire = ATF::pdf()->generic("facture",$last_id,true,$s,true);
+				ATF::db($this->db)->rollback_transaction();
+				return $pdf_binaire;
+			}
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
 			return $this->cryptId($last_id);
 		}else{
+
+
 			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base	
 			/* MAIL */
 			if($email){
@@ -776,10 +784,12 @@ class facture_absystech extends facture {
 										);
 				}
 			}
-
-
-
 			ATF::db($this->db)->commit_transaction();
+
+			if($echeancier){
+				$pdf_binaire = ATF::pdf()->generic("facture",$last_id,true,$s,false);
+				return $pdf_binaire;
+			}
 		}
 
 		ATF::affaire()->redirection("select",$infos["id_affaire"]);

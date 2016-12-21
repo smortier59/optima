@@ -1892,8 +1892,8 @@ class facture_lm extends facture {
 
         	$rayon =  $legaccHT = NULL;
 
-        	if(ATF::affaire()->select($value["facture.id_affaire"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture.id_affaire"] , "id_magasin")){
-        		$code_magasin = ATF::magasin(ATF::affaire()->select($value["facture.id_affaire"] , "id_magasin"), "entite_lm");
+        	if(ATF::affaire()->select($value["facture.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin")){
+        		$code_magasin = ATF::magasin(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
         	}
 
         	//On recupere le 1er produit de la facture pour connaitre le pack et donc le rayon
@@ -1923,7 +1923,10 @@ class facture_lm extends facture {
         	}
 
         	$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
-        	        	
+        	
+        	$ref_mandate = ATF::affaire()->select($value["facture.id_affaire_fk"] , "ref_mandate");
+        	$lettrage_date_facture = $this->getMoisFrancais(date("m", strtotime($value["facture.date"])))." - ".date("Y", strtotime($value["facture.date"]));
+
         	for($i=1;$i<4;$i++){	
 	        	if($i==1){
 	        		//TTC
@@ -1941,7 +1944,7 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][12] = "00000"; //Rayon du pack
 		        	$donnees[$key][$i][13] = "1";	
 	        		$donnees[$key][$i][14] = "411101"; //Compte Comptable
-	        		$donnees[$key][$i][15] = "0"; //Code projet
+	        		$donnees[$key][$i][15] = ""; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
 		        	$donnees[$key][$i][18] = "0";
@@ -1949,8 +1952,20 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = $value["facture.prix"]; //Montant Debit
 					$donnees[$key][$i][21] = "0"; //Montant Credit        	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] = $value["facture.id_affaire"]."/".$value["facture.id_facture"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
+					$donnees[$key][$i][23] = "FACTURE ".$value["facture.id_facture"]." / ".$ref_mandate." / ".$lettrage_date_facture; //reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
+					$donnees[$key][$i][25] = ""; 
+					$donnees[$key][$i][26] = ""; 
+					$donnees[$key][$i][27] = "";
+					$donnees[$key][$i][28] = "";
+					$donnees[$key][$i][29] = "";
+					$donnees[$key][$i][30] = "";
+					$donnees[$key][$i][31] = "";
+					$donnees[$key][$i][32] = "";
+					$donnees[$key][$i][33] = $ref_mandate;
+					$donnees[$key][$i][34] = "";
+					$donnees[$key][$i][35] = "";
+					$donnees[$key][$i][36] = "";
 
 					$total_debit += $value["facture.prix"];
 
@@ -1970,7 +1985,7 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][12] = $rayon; //Centre de cout/profit a donner LM
 		        	$donnees[$key][$i][13] = "1";	
 	        		$donnees[$key][$i][14] = $legaccHT; 
-	        		$donnees[$key][$i][15] = "0"; //Code projet
+	        		$donnees[$key][$i][15] = ""; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
 		        	$donnees[$key][$i][18] = "0";
@@ -1978,7 +1993,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = "0"; //Montant Debit
 					$donnees[$key][$i][21] = number_format($value["facture.prix"]/$value["facture.tva"] ,2); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] =  $value["facture.id_affaire"]."/".$value["facture.id_facture"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
+					$donnees[$key][$i][23] = "FACTURE ".$value["facture.id_facture"]." / ".$ref_mandate." / ".$lettrage_date_facture;//reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
 					$total_credit += $value["facture.prix"]*($value["facture.tva"]-1);
@@ -1999,7 +2014,7 @@ class facture_lm extends facture {
 		        	$donnees[$key][$i][12] = "00000"; //Centre de cout/profit 
 		        	$donnees[$key][$i][13] = "1";	
 	        		$donnees[$key][$i][14] = "445733"; 
-	        		$donnees[$key][$i][15] = "0"; //Code projet
+	        		$donnees[$key][$i][15] = ""; //Code projet
 		        	$donnees[$key][$i][16] = "0";
 		        	$donnees[$key][$i][17] = "0";
 		        	$donnees[$key][$i][18] = "0";
@@ -2007,7 +2022,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = "0"; //Montant Debit
 					$donnees[$key][$i][21] = number_format($value["facture.prix"] - ($value["facture.prix"]/$value["facture.tva"]) ,2); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] =  $value["facture.id_affaire"]."/".$value["facture.id_facture"]."/".$value["facture.date_periode_debut"]."/".$value["facture.date_periode_fin"]; //reference affaire/facture/periode
+					$donnees[$key][$i][23] =  "FACTURE ".$value["facture.id_facture"]." / ".$ref_mandate." / ".$lettrage_date_facture; //reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
 					$total_credit += ($value["facture.prix"] - ($value["facture.prix"]*($value["facture.tva"]-1)));
@@ -2015,8 +2030,10 @@ class facture_lm extends facture {
         	}        	
         }
 
+        $filename = 'CLEODIS_VT'.date("Ymd").'.fic';
+
         header('Content-Type: application/fic');		
-		header('Content-Disposition: attachment; filename="CLEODIS_VT'.date("Ym").'".fic');
+		header('Content-Disposition: attachment; filename="'.$filename.'"');
 		
 		
 		foreach ($donnees as $key => $value) {	
@@ -2040,5 +2057,28 @@ class facture_lm extends facture {
         echo $string;
 	}
 
+
+	/**
+	 * Retourne le mois passé en parametre en Francais
+	 * @param  string $mois 
+	 * @return string mois en lettre en Francais
+	 */
+	public function getMoisFrancais($mois){
+		$month = array(
+					    "01" => 'Janvier',
+					    "02" => 'Février',
+					    "03" => 'Mars',
+					    "04" => 'Avril',
+					    "05" => 'Mai',
+					    "06" => 'Juin',
+					    "07" => 'Juillet',
+					    "08" => 'Août',
+					    "09" => 'Septembre',
+					    "10" => 'Octobre',
+					    "11" => 'Novembre',
+					    "12" => 'Decembre'
+					);
+		return strtoupper($month[$mois]);
+	}
 
 }; 

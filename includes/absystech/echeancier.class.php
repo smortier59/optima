@@ -186,7 +186,6 @@ class echeancier extends classes_optima {
     // Si on fait un ajout de l'echeance
     else {
       // Check des champs obligatoire
-      log::logger($post,"ccharlier");
       if (!$post["id_echeancier"]) throw new errorATF(ATF::$usr->trans('id_echeancier_missing','echeancier'));
       if (!$post['id_societe']) throw new errorATF(ATF::$usr->trans('id_societe_missing','echeancier'));
       if (!$post['id_affaire']) throw new errorATF(ATF::$usr->trans('id_affaire_missing','echeancier'));
@@ -248,14 +247,155 @@ class echeancier extends classes_optima {
     }
     return $return;
   }
-
+  /**
+  * Permet de supprimer un contrat
+  * @package Telescope
+  * @author Cyril CHARLIER <ccharlier@absystech.fr> 
+  * @param $get array contient l'id a l'index 'id'
+  * @param $post array vide
+  * @return array result en booleen et notice sous forme d'un tableau
+  */ 
+  public function _DELETE($get,$post) {
+    if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    $get["actif"]="non";
+    $get["id_echeancier"]=$get['id'];
+    unset($get["id"],$get["path"],$get["method"]);
+    $return['result'] = $this->update($get);
+    return $return;
+  }
 
   public function _getPdf($get, $post){
 
     log::logger($get , "mfleurquin");
+    $id_echeancier = $get["id_echeancier"];
+    $lignes = $get["lignes"];
 
-    $pdf_mandat = ATF::pdf()->generic('echeancier',$id_affaire,true);
 
-    return base64_encode($pdf_mandat);
+    $date_debut_periode = str_replace("/", "-",$get["prochaine_echeance"]);
+    $date_fin_periode   = str_replace("/", "-",$get["fin_echeance"]);
+
+    $echeancier = $this->select($id_echeancier);
+
+    ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier", $id_echeancier);
+    $echeancier_ligne_ponctuelle = ATF::echeancier_ligne_ponctuelle()->select_all();
+
+
+    ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier);
+    $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
+
+    $produits = array();
+
+    foreach ($echeancier_ligne_periodique as $key => $value) {
+        $p=array();
+
+        $p["facture_ligne__dot__ref"] = $value["ref"];
+        $p["facture_ligne__dot__produit"] = $value["designation"];        
+
+        if($value["valeur_variable"] == "oui"){         
+          $p["facture_ligne__dot__quantite"] = $lignes["periodique"][$value["id_echeancier_ligne_periodique"]]["quantite"];
+          $p["facture_ligne__dot__prix"] = $lignes["periodique"][$value["id_echeancier_ligne_periodique"]]["puht"];
+        }else{
+          $p["facture_ligne__dot__quantite"] = $value["quantite"];
+          $p["facture_ligne__dot__prix"] = $value["puht"];
+        }      
+        
+        $p["facture_ligne__dot__prix_achat"] = NULL;
+        $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;            
+        $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
+        $p["facture_ligne__dot__serial"] = null;
+        $p["facture_ligne__dot__prix_nb"] = null;
+        $p["facture_ligne__dot__prix_couleur"] = null;
+        $p["facture_ligne__dot__prix_achat_nb"] = null;
+        $p["facture_ligne__dot__prix_achat_couleur"] = null;
+        $p["facture_ligne__dot__index_nb"] = null;
+        $p["facture_ligne__dot__index_couleur"] = null;
+        $p["facture_ligne__dot__visible"] = "oui";
+        $p["facture_ligne__dot__marge"] = NULL;
+        $p["facture_ligne__dot__marge_absolue"] = NULL;
+
+        $produits[] = $p;
+    }
+
+    foreach ($echeancier_ligne_ponctuelle as $key => $value) {
+        $p=array();
+
+        $p["facture_ligne__dot__ref"] = $value["ref"];
+        $p["facture_ligne__dot__produit"] = $value["designation"];
+
+        if($value["valeur_variable"] == "oui"){
+          $p["facture_ligne__dot__quantite"] = $lignes["ponctuelle"][$value["id_echeancier_ligne_ponctuelle"]]["quantite"];
+          $p["facture_ligne__dot__prix"] = $lignes["ponctuelle"][$value["id_echeancier_ligne_ponctuelle"]]["puht"];
+        }else{
+          $p["facture_ligne__dot__quantite"] = $value["quantite"];
+          $p["facture_ligne__dot__prix"] = $value["puht"];
+        }
+
+        $p["facture_ligne__dot__prix_achat"] = NULL;
+        $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;            
+        $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
+        $p["facture_ligne__dot__serial"] = null;
+        $p["facture_ligne__dot__prix_nb"] = null;
+        $p["facture_ligne__dot__prix_couleur"] = null;
+        $p["facture_ligne__dot__prix_achat_nb"] = null;
+        $p["facture_ligne__dot__prix_achat_couleur"] = null;
+        $p["facture_ligne__dot__index_nb"] = null;
+        $p["facture_ligne__dot__index_couleur"] = null;
+        $p["facture_ligne__dot__visible"] = "oui";
+        $p["facture_ligne__dot__marge"] = NULL;
+        $p["facture_ligne__dot__marge_absolue"] = NULL;
+
+        $produits[] = $p;
+    }
+
+    $facture = array();
+
+    $facture["facture"] = array("id_societe"=> $echeancier["id_societe"],
+                                "type_facture" => "facture_periodique",
+                                "date"=> $date_debut_periode,
+                                "infosSup" => NULL,                                
+                                "id_affaire" => $echeancier["id_affaire"],
+                                "date_previsionnelle" => NULL,
+                                "date_relance" => NULL,
+                                "affaire_sans_devis_libelle" => NULL,
+                                "mode" => NULL, 
+                                "periodicite" => $echeancier["periodicite"],
+                                "id_facture_parente" => NULL,
+                                "id_termes" => NULL, 
+                                "date_debut_periode" => $date_debut_periode,
+                                "date_fin_periode" => $date_fin_periode,
+                                "sous_total" => NULL, 
+                                "marge" => NULL, 
+                                "frais_de_port" => NULL, 
+                                "marge_absolue" => NULL,
+                                "prix" =>  NULL,
+                                "tva" => "1.200",
+                                "prix_achat" => NULL,
+                                "email" => NULL,
+                                "emailTexte" => NULL,
+                                "emailCopie" => NULL
+                               );
+    $facture["values_facture"]["produits"] = json_encode($produits);
+    
+    $facture["preview"] = true;
+    if($get["preview"]) $facture["echeancier"] = true;
+
+    try{
+      $return = ATF::facture()->insert($facture);
+            
+      header('Content-Type: application/pdf');
+      return base64_encode($return);
+      
+    }catch(errorATF $e){
+      throw new errorATF($e->getMessage(),500);
+    }
+    
+    
+
+    
   }
+
+
+
+
+
 }
