@@ -44,6 +44,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   public function _POST($get,$post) {
     // parser la date sous le bon format pour mysql
     $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
+    ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
     unset($post["total"]);
     try {
       $result = $this->insert($post);
@@ -62,6 +63,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   */ 
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    ATF::echeancier()->increase($post['id_echeancier'],'montant_ht','-'.$post["total"]);
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
