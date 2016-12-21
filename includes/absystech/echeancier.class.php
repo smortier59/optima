@@ -13,14 +13,14 @@ class echeancier extends classes_optima {
 
     $this->table = "echeancier";
     $this->colonnes['fields_column'] = array(
-       'echeancier.id_societe'
-      ,'echeancier.id_affaire'
-      ,'echeancier.designation'
-      ,'echeancier.montant_ht'
-      ,'echeancier.debut'
-      ,'echeancier.fin'
-      ,'echeancier.variable'
-      ,'echeancier.periodicite'
+       'id_societe'
+      ,'id_affaire'
+      ,'designation'
+      ,'montant_ht'
+      ,'debut'
+      ,'fin'
+      ,'variable'
+      ,'periodicite'
      
     );
 
@@ -55,7 +55,7 @@ class echeancier extends classes_optima {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","mise_en_service","prochaine_echeance","jour_facture","methode_reglement","echeance.id_affaire");
+    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","mise_en_service","prochaine_echeance","jour_facture","methode_reglement","echeancier.id_affaire");
     $this->q->reset();
     $this->q->addField($colsData)
         ->from("echeancier","id_societe","societe","id_societe")
@@ -78,17 +78,6 @@ class echeancier extends classes_optima {
       $this->q->setLimit($get['limit'])->setCount();
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
     }
-
-    foreach ($data["data"] as $k=>$lines) {
-      foreach ($lines as $k_=>$val) {
-        if (strpos($k_,".")) {
-          $tmp = explode(".",$k_);
-          $data['data'][$k][$tmp[1]] = $val;
-          unset($data['data'][$k][$k_]);
-        }       
-      }
-    }
-
     if($get['id_echeancier']){
       // GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
       $data['periodique'] = ATF::echeancier_ligne_periodique()->select_special('id_echeancier', $get['id_echeancier']);
@@ -111,7 +100,6 @@ class echeancier extends classes_optima {
   * @return Integer & boolean
   */
   public function _POST($get,$post){
-    log::logger("echeancier post ","ccharlier");
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
     $return = array();
@@ -137,17 +125,17 @@ class echeancier extends classes_optima {
       
       // switch permettant de calculer la prochaine date d'echeance en fonction de la periodicité
       switch($post["periodicite"]){
-        case "annuel":
+        case "annuelle":
           $post["prochaine_echeance"]= $explodeDebut[0]."-01-01";
         break;
-        case "semestriel":
+        case "semestrielle":
           if($explodeDebut[1]/6 <=1)
             $sem = $explodeDebut[0].'-01-01';
           else
             $sem = $explodeDebut[0].'-07-01';
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
         break;
-        case "trimestriel":
+        case "trimestrielle":
           if($explodeDebut[1]/3 <=1 )
               $sem = $explodeDebut[0].'-01-01';
           elseif($explodeDebut[1]/3 <=2)
@@ -158,7 +146,7 @@ class echeancier extends classes_optima {
             $sem = $explodeDebut[0].'-10-01';
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
         break;
-        case "mensuel":
+        case "mensuelle":
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($post["debut"]."first day of this month"));
         break;
       }
@@ -178,7 +166,6 @@ class echeancier extends classes_optima {
   }
 
   public function _PUT($get,$post){
-    log::logger("echeancier put ","ccharlier");
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
     $return = array();
@@ -208,17 +195,17 @@ class echeancier extends classes_optima {
       
       // switch permettant de calculer la prochaine date d'echeance en fonction de la periodicité
       switch($post["periodicite"]){
-        case "annuel":
+        case "annuelle":
           $post["prochaine_echeance"]= $explodeDebut[0]."-01-01";
         break;
-        case "semestriel":
+        case "semestrielle":
           if($explodeDebut[1]/6 <=1)
             $sem = $explodeDebut[0].'-01-01';
           else
             $sem = $explodeDebut[0].'-07-01';
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
         break;
-        case "trimestriel":
+        case "trimestrielle":
           if($explodeDebut[1]/3 <=1 )
               $sem = $explodeDebut[0].'-01-01';
           elseif($explodeDebut[1]/3 <=2)
@@ -229,7 +216,7 @@ class echeancier extends classes_optima {
             $sem = $explodeDebut[0].'-10-01';
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
         break;
-        case "mensuel":
+        case "mensuelle":
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($post["debut"]."first day of this month"));
         break;
       }
@@ -379,9 +366,10 @@ class echeancier extends classes_optima {
     
     
     if($get["preview"]){
-      ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier, "actif"=>"non"));
       $facture["preview"] = true;
-    } 
+    }else{
+      ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier, "actif"=>"non"));
+    }
     $facture["echeancier"] = true;
 
     //if($get["preview"]) $facture["preview"] = true;
