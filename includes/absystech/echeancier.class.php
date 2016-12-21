@@ -266,13 +266,14 @@ class echeancier extends classes_optima {
 
   public function _getPdf($get, $post){
 
-    log::logger($get , "mfleurquin");
     $id_echeancier = $get["id_echeancier"];
     $lignes = $get["lignes"];
 
+    $date_debut_periode = $get["prochaine_echeance"];
+    $date_fin_periode   = $get["fin_echeance"];
 
-    $date_debut_periode = str_replace("/", "-",$get["prochaine_echeance"]);
-    $date_fin_periode   = str_replace("/", "-",$get["fin_echeance"]);
+    //$date_debut_periode = "01-01-2017";
+    //$date_fin_periode = "31-03-2017";
 
     $echeancier = $this->select($id_echeancier);
 
@@ -376,15 +377,20 @@ class echeancier extends classes_optima {
                                );
     $facture["values_facture"]["produits"] = json_encode($produits);
     
-    $facture["preview"] = true;
-    if($get["preview"]) $facture["echeancier"] = true;
+    
+    if($get["preview"]){
+      ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier, "actif"=>"non"));
+      $facture["preview"] = true;
+    } 
+    $facture["echeancier"] = true;
 
+    //if($get["preview"]) $facture["preview"] = true;
     try{
       $return = ATF::facture()->insert($facture);
             
       header('Content-Type: application/pdf');
       return base64_encode($return);
-      
+    
     }catch(errorATF $e){
       throw new errorATF($e->getMessage(),500);
     }

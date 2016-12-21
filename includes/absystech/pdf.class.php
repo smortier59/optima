@@ -82,16 +82,7 @@ class pdf_absystech extends pdf {
 		$tplIdx = $this->importPage(1);
 		$r = $this->useTemplate($tplIdx, -5, -10, 220, 0, true);	
 	}
-
-	public function echeancier($id){
-		$this->Open();
-		$this->Addpage();
-		$this->setleftmargin(15);
-		$this->setrightmargin(15);
-		$this->setdrawcolor(0,184,255);
-		
-		$this->image(__PDF_PATH__.ATF::$codename."/facturePage1.jpg",5,0,200);
-	}
+	
 
 	public function facture($id,&$s) {
 		$id = ATF::facture()->decryptId($id);
@@ -152,7 +143,10 @@ class pdf_absystech extends pdf {
 			
 
 			$cadre[] = array("size"=>12,"bold"=>true,"txt"=>$infos_client['societe'],"h"=>7);
-			$cadre[] = array("size"=>10,"bold"=>false,"txt"=>ATF::$usr->trans($infos_contact['civilite'])." ".$infos_contact['nom']." ".$infos_contact['prenom']);
+			if($infos_contact){
+				$cadre[] = array("size"=>10,"bold"=>false,"txt"=>ATF::$usr->trans($infos_contact['civilite'])." ".$infos_contact['nom']." ".$infos_contact['prenom']);
+			}
+			
 	 
 			if ($infos_client['facturation_adresse']) {
 				$cadre[] = array("size"=>10,"txt"=>$infos_client['facturation_adresse']);
@@ -166,10 +160,10 @@ class pdf_absystech extends pdf {
 				$cadre[] =  array("size"=>10,"txt"=>$infos_client['cp']." ".$infos_client['ville']." (".ATF::pays()->nom($infos_client['id_pays']).")");
 			}
 			
-			if ($infos_client['reference_tva']) $cadre[] = array("size"=>12,"txt"=>"N° TVA : ".$infos_client['reference_tva']);
+			if ($infos_client['reference_tva']) $cadre[] = array("size"=>10,"txt"=>"N° TVA : ".$infos_client['reference_tva']);
 			
 			
-			$this->cadre(100,30,90,40,$cadre);
+			$this->cadre(100,30,90,45,$cadre);
 
 			
 			$date = $infos_facture["date_debut_periode"];
