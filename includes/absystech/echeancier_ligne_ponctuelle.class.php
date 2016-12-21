@@ -17,12 +17,9 @@ class echeancier_ligne_ponctuelle extends classes_optima {
       ,'echeancier_ligne_ponctuelle.designation'
       ,'echeancier_ligne_ponctuelle.id_echeancier'
       ,'echeancier_ligne_ponctuelle.quantite'
-      ,'echeancier_ligne_ponctuelle.total'
       ,'echeancier_ligne_ponctuelle.puht'
       ,'echeancier_ligne_ponctuelle.date_valeur'
-      ,'echeancier_ligne_ponctuelle.ventilation_analytique'
-
-     
+      ,'echeancier_ligne_ponctuelle.id_compte_absystech' 
     );
 
     $this->colonnes['primary'] = array(
@@ -30,10 +27,9 @@ class echeancier_ligne_ponctuelle extends classes_optima {
       ,'designation'
       ,'id_echeancier'
       ,'quantite'
-      ,'total'
       ,'puht'
       ,'date_valeur'
-      ,'ventilation_analytique'
+      ,'id_compte_absystech'
     );
   }
 
@@ -48,14 +44,27 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   public function _POST($get,$post) {
     // parser la date sous le bon format pour mysql
     $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
-
+    unset($post["total"]);
     try {
       $result = $this->insert($post);
     } catch (errorSQL $e) {
       throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
-
     return true;
   } 
-
+  /**
+  * Permet de supprimer une ligne d'echeancier ponctuelle
+  * @package Telescope
+  * @author Cyril CHARLIER <ccharlier@absystech.fr> 
+  * @param $get array contient l'id a l'index 'id'
+  * @param $post array vide
+  * @return array result en booleen et notice sous forme d'un tableau
+  */ 
+  public function _DELETE($get,$post) {
+    if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    $return['result'] = $this->delete($get);
+    // Récupération des notices créés
+    $return['notices'] = ATF::$msg->getNotices();
+    return $return;
+  }
 }

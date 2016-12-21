@@ -79,3 +79,9 @@ ALTER TABLE `echeancier_ligne_periodique`
 ALTER TABLE `echeancier_ligne_periodique`
   ADD CONSTRAINT `echeancier_ligne_periodique_ibfk_1` FOREIGN KEY (`id_echeancier`) REFERENCES `echeancier` (`id_echeancier`) ON UPDATE CASCADE,
   ADD CONSTRAINT `echeancier_ligne_periodique_ibfk_2` FOREIGN KEY (`ventilation_analytique`) REFERENCES `compte_absystech` (`id_compte_absystech`) ON UPDATE CASCADE;
+
+ALTER TABLE `echeancier_ligne_periodique` ADD `ref` VARCHAR(32) NOT NULL AFTER `id_compte_absystech`;
+
+ALTER TABLE `echeancier_ligne_ponctuelle` ADD `ref` VARCHAR(32) NOT NULL AFTER `date_valeur`;
+ALTER TABLE `echeancier_ligne_periodique` DROP `total`;
+ALTER TABLE `echeancier_ligne_periodique` DROP `total`;
