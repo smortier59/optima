@@ -6073,7 +6073,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"I. EXPOSE DES FAITS",0,1);
 		$this->ln(2);
 		$this->setfont('times',"",9);
-		$this->multicell(0,4,"La SPRL CLEODIS.BE, ayant son siège social ".$cleodis["adresse_siege_social"].", a conclu le ".date("d/m/Y", strtotime($this->commande["date"]))." avec la société ".$this->client["societe"].", le contrat de location n° ".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:"")." portant sur des équipements informatiques, plus amplements décrits dans les conditions particulières  dudit contrat et dont une copie est jointe en annexe pour faire partie intégrante de cette cession.",0);
+		$this->multicell(0,4,"La SPRL CLEODIS.BE, ayant son siège social ".$cleodis["adresse_siege_social"].", a conclu le ".$s['date_signature']." avec la société ".$this->client["societe"].", le contrat de location n° ".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:"")." portant sur des équipements informatiques, plus amplements décrits dans les conditions particulières  dudit contrat et dont une copie est jointe en annexe pour faire partie intégrante de cette cession.",0);
 		$this->ln(5);
 		$this->multicell(0,4,"La SPRL CLEODIS.BE vend à la s.a. BELFIUS LEASE SERVICES, ayant son siège social Place Rogier 11 1210 Bruxelles, ces équipements et désire céder à cette dernière le contrat de location y relatif, conformément aux stipulations de l’article 10.2 des conditions générales de ce contrat.",0);
 		$this->ln(5);
@@ -6089,7 +6089,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,4,"1.  La SPRL CLEODIS.BE cède à la s.a. BELFIUS LEASE SERVICES, qui accepte, tous les droits découlant du contrat de location n° ".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:"")." conclu avec ".$this->client["societe"].", qui reprend exhaustivement l’ensemble des accords intervenus entre CLEODIS.BE et le locataire et portant sur le matériel décrit aux conditions particulières.",0);
 	
 		$this->ln(2);
-		$this->multicell(0,4,"La cession prendra effet le ".date("d/m/Y", strtotime($this->demande_refi["date_cession"]))." et emporte cession des loyers relatifs à la période du ".date("d/m/Y", strtotime($this->facturations[0]["date_periode_debut"]))." au ".date("d/m/Y", strtotime($this->facturations[count($this->facturations)-1]["date_periode_fin"])),0);
+		$this->multicell(0,4,"La cession prendra effet le ".date("d/m/Y", strtotime($this->commande["date_debut"]))." et emporte cession des loyers relatifs à la période du ".date("d/m/Y", strtotime($this->facturations[0]["date_periode_debut"]))." au ".date("d/m/Y", strtotime($this->facturations[count($this->facturations)-1]["date_periode_fin"])),0);
 		$this->ln(5);
 		$this->multicell(0,4,"Cette cession a lieu conformément à la convention cadre portant sur la vente de matériel et cession de loyers conclue entre nos sociétés et date du 08 juin 2015.",0);
 		$this->ln(5);
