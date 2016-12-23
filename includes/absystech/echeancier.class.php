@@ -369,11 +369,11 @@ class echeancier extends classes_optima {
 
 
   public function _getLignePeriode($get , $post){
-    return $this->getLignesPeriode($get["id_echeancier"], $get["periode_debut"], $get["periode_fin"]);
+    return $this->getLignesPeriode($get["id_echeancier"], $get["periode_debut"], $get["periode_fin"], true);
   }
 
 
-  public function getLignesPeriode($id_echeancier , $periode_debut, $periode_fin){
+  public function getLignesPeriode($id_echeancier , $periode_debut, $periode_fin, $from_web = false){
     $d1 = explode("-",$periode_debut);
     $periode_debut = $d1[2].$d1[1].$d1[0];
     $d2 = explode("-",$periode_fin);
@@ -386,7 +386,8 @@ class echeancier extends classes_optima {
     $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
 
     foreach ($echeancier_ligne_ponctuelle as $key => $value) {      
-      $d3 = str_replace("-", "", $value["date_valeur"]);
+      $d3 = str_replace("-", "", $value["date_valeur"]);   
+
       if($periode_debut <= $d3 && $d3 <= $periode_fin){
           $value["type"] = "ponctuelle";
           $lignes[] = $value;
@@ -398,6 +399,14 @@ class echeancier extends classes_optima {
       $lignes[] = $value;
     }
 
+    //Si from_web a true c'est qu'on viens de télescope et il faut des informations pour afficher les infos sur la page
+    if($from_web){
+      $return["lignes"] = $lignes;
+      $return["echeancier"] = ATF::echeancier()->select($id_echeancier);
+      $return["echeancier"]["societe"] = ATF::societe()->select($return["echeancier"]["id_societe"], "societe");
+      $return["echeancier"]["affaire"] = ATF::affaire()->select($return["echeancier"]["id_affaire"], "affaire");
+      return $return;
+    }
     return $lignes;   
   }
 
