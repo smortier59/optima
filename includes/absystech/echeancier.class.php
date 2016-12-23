@@ -157,7 +157,7 @@ class echeancier extends classes_optima {
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
       }
       unset($post["id_echeancier"],$post['custom']);
-      $post['fin']==" "? $post['fin']= NULL :$post['fin']=$post['fin'];
+      $post['fin']==" "? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
       $result = $this->insert($post);       
       $return['result'] = true;
       $return['id_echeancier'] = $result;
@@ -226,7 +226,7 @@ class echeancier extends classes_optima {
         $temp =explode("-", $post["prochaine_echeance"]);
         $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
       }
-      $post['fin']==" "? $post['fin']= NULL :$post['fin']=$post['fin'];
+      $post['fin']==" "? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
       unset($post['custom']);
       $result = $this->update($post);       
       $return['result'] = true;
@@ -363,12 +363,33 @@ class echeancier extends classes_optima {
                                 "emailCopie" => NULL
                                );
     $facture["values_facture"]["produits"] = json_encode($produits);
-    
-    
     if($get["preview"]){
       $facture["preview"] = true;
     }else{
-      ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier, "actif"=>"non"));
+      if(!$get["fin_contrat"]){
+        // on change la date de début de prochaine echeance s'il n'y a pas de fin de contrat
+        ATF::echeancier()->u(
+          array(
+            "id_echeancier"=>$id_echeancier, 
+            "prochaine_echeance"=>
+              date("Y-m-d",strtotime("+1 day",strtotime($date_fin_periode)))
+          )
+        );
+      }else{
+        // si la date de fin de contrat est avant la fin de période actuelle
+        if(date('Y-m-d',strtotime($get["fin_contrat"])) < date('Y-m-d', strtotime($date_fin_periode)) ){
+          // le contrat est fini, on peut cacher la ligne de la liste des facturations
+          ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"actif"=>"non"));         
+        }else{
+           ATF::echeancier()->u(
+            array(
+              "id_echeancier"=>$id_echeancier, 
+              "prochaine_echeance"=>
+              date("Y-m-d",strtotime("+1 day",strtotime($date_fin_periode)))
+            )
+          );
+        }   
+      }
     }
     $facture["echeancier"] = true;
 
