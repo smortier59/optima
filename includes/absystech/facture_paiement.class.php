@@ -1,4 +1,4 @@
-<? 
+<?
 /** Classe facture_paiement
 * @package Optima
 * @subpackage Absystech
@@ -7,7 +7,7 @@ class facture_paiement extends classes_optima {
 	function __construct() { // PHP5
 		parent::__construct();
 		$this->table = __CLASS__;
-		$this->colonnes['fields_column'] = array(	
+		$this->colonnes['fields_column'] = array(
 			'facture_paiement.id_facture'
 			,'facture_paiement.montant'
 			,'facture_paiement.mode_paiement'
@@ -16,41 +16,41 @@ class facture_paiement extends classes_optima {
 			,'facture_paiement.montant_interet'
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50, "renderer"=>"scanner")
 			,'factureInteret'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
-		);		
+		);
 
-		$this->colonnes['primary'] = array(	
+		$this->colonnes['primary'] = array(
  			'id_facture'
 			,'montant'
 			,'mode_paiement'=>array("listeners"=>array("select"=>"ATF.selectModePaiement"))
 			,'date'
 			,'remarques'
-		);		
-		
+		);
+
 		$this->colonnes['panel']['reference_paiement'] = array(
 			"num_cheque"
 			,"num_compte"
 			,"num_bordereau"
 			,"id_facture_avoir"=>array("readonly"=>true,"autocomplete"=>array("function"=>"autocompleteFactureAvoirDispo"))
-		); 
-	
+		);
+
 		//IMPORTANT, complte le tableau de colonnes avec les infos MYSQL des colonnes
-		$this->fieldstructure();	
+		$this->fieldstructure();
 		$this->panels['reference_paiement'] = array("visible"=>true);
 		$this->files["fichier_joint"] = array("type"=>"pdf");
 		$this->files["factureInteret"] = array("type"=>"pdf","no_upload"=>true);
-		
+
 		$this->foreign_key['id_facture_avoir'] = "facture";
 
 
 
 		// Champs masqués
-		$this->colonnes['bloquees']['insert'] =  
-		$this->colonnes['bloquees']['cloner'] =  
-		$this->colonnes['bloquees']['update'] =  array('montant_interet');	
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] =  array('montant_interet');
 		$this->formExt=true;
 	}
-	
-	/** Surcharge de l'insert afin de remplir le champ date_effective de la table facture 
+
+	/** Surcharge de l'insert afin de remplir le champ date_effective de la table facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
 	* @param array &$s La session
@@ -76,7 +76,7 @@ class facture_paiement extends classes_optima {
 			$infos['montant'] = $prix_avoir;
 
 			$last_id=$this->insertAvoir($infos);
-			
+
 		} else {
 			$last_id=parent::insert($infos,$s,$files);
 		}
@@ -97,11 +97,11 @@ class facture_paiement extends classes_optima {
 		$this->updateInteret($last_id);
 		ATF::db($this->db)->commit_transaction();
 		ATF::facture()->redirection("select",$infos["id_facture"]);
-		
+
 		return $this->cryptId($last_id);
 	}
 
-	/** Surcharge de l'insert afin de remplir le champ date_effective de la table facture 
+	/** Surcharge de l'insert afin de remplir le champ date_effective de la table facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
 	* @param array &$s La session
@@ -116,15 +116,15 @@ class facture_paiement extends classes_optima {
 		// Passer l'avoir en etat payé après avoir créer un paiement LETTRAGE pour celle ci
 		$paiement = array("id_facture"=>$infos['id_facture_avoir'],"montant"=>$infos['montant'],"mode_paiement"=>"lettrage","date"=>$infos["date"]);
 		$id_p_avoir=parent::insert($paiement,$s,$files);
-		
+
 		$avoirToUpdate = array("id_facture"=>$infos['id_facture_avoir'],"etat"=>"payee");
-		ATF::facture()->update($avoirToUpdate);
-	
+		ATF::facture()->u($avoirToUpdate);
+
 		return $last_id;
 	}
 
 
-	/** 
+	/**
 	* Permet de mettre à jour les montants d'intérêt
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id id de la facture_paiement
@@ -134,19 +134,19 @@ class facture_paiement extends classes_optima {
 		$facture_paiement=$this->select($id);
 		$facture=ATF::facture()->select($facture_paiement["id_facture"]);
 		if($facture["date_previsionnelle"]){
-			$nbjours = round((strtotime($facture_paiement["date"]) - strtotime($facture["date_previsionnelle"]))/(60*60*24)-1);			
-			
+			$nbjours = round((strtotime($facture_paiement["date"]) - strtotime($facture["date_previsionnelle"]))/(60*60*24)-1);
+
 			//Calcul du restant à payer
 			ATF::facture_paiement()->q->reset()->where("facture_paiement.id_facture", $facture_paiement["id_facture"]);
 			$PartiePaye = ATF::facture_paiement()->select_all();
-			
+
 			$Restant  = round($facture["prix"]*$facture["tva"] , 2);
-			foreach ($PartiePaye as $key => $value){				
+			foreach ($PartiePaye as $key => $value){
 				if($value["facture_paiement.id_facture_paiement"] != $id){
 					$Restant = $Restant - $value["facture_paiement.montant"];
-				}				
-			}			
-			// (Nbre jours de retard x 4,8%) / 365= taux exact à appliquer			
+				}
+			}
+			// (Nbre jours de retard x 4,8%) / 365= taux exact à appliquer
 			//$montant_interet=$facture_paiement["montant"]*$nbjours*0.01/30;
 			$taux=(($nbjours*0.048)/365);
 			//$Restant = $Restant/100;
@@ -160,12 +160,12 @@ class facture_paiement extends classes_optima {
 				$this->delete_file($id,"factureInteret");
 			}
 		}
-		
+
 		return true;
 	}
-	
-	/** 
-	* Surcharge du delete afin de remplir le champ date_effective de la table facture 
+
+	/**
+	* Surcharge du delete afin de remplir le champ date_effective de la table facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
 	* @param array &$s La session
@@ -202,7 +202,7 @@ class facture_paiement extends classes_optima {
 			return false;
 		}
 	}
-	
+
 	/** Surcharge de l'update pour que la modif d'un paiement mette à jour la facture
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -250,7 +250,7 @@ class facture_paiement extends classes_optima {
 		return true;
 	}
 
-	
+
 	public function factureTerminee($id_facture,$date){
 		//Si la totalité de la facture est payée alors son état passe en 'payé'
 		ATF::facture()->u(array("id_facture"=>$id_facture,"date_effective"=>$date,"etat"=>"payee","date_modification"=>date("Y-m-d H:i:s")));
@@ -262,7 +262,7 @@ class facture_paiement extends classes_optima {
 		ATF::commande_facture()->q->reset()->addCondition('id_facture',ATF::facture()
 										   ->decryptId($id_facture))
 										   ->setDimension("row");
-										   
+
 		if($commande_facture=ATF::commande_facture()->select_all()){
 			$commande=ATF::commande()->select($commande_facture["id_commande"]);
 			$sum_facture=ATF::facture()->facture_by_commande($commande["id_commande"]);
@@ -284,7 +284,7 @@ class facture_paiement extends classes_optima {
 		ATF::affaire()->u(array("id_affaire"=>$facture["id_affaire"],"etat"=>"facture"));
 		return true;
 	}
-	
+
 	/**
 	* Surcharge du select-All
 	*/
@@ -297,7 +297,7 @@ class facture_paiement extends classes_optima {
 			}
 		}
 		$return = parent::select_all($order_by,$asc,$page,$count);
-		
+
 		foreach ($return['data'] as $k=>$i) {
 			if ($i['facture_paiement.montant_interet']) {
 				$return['data'][$k]['allowFactureInteret'] = true;
@@ -316,10 +316,10 @@ class facture_paiement extends classes_optima {
 	* @return int $id_user
 	*/
 	public function getRefForScanner($id,$champs) {
-		$paiement = $this->select($id);		
+		$paiement = $this->select($id);
 		return "Transfert vers paiement d'un montant de ".$paiement["montant"]." de la facture ".ATF::facture()->select($paiement["id_facture"], "ref");
 	}
-		
+
 
 };
 
