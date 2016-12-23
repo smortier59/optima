@@ -345,6 +345,9 @@ ATF.buildGridEditor({
 						width:20,
 						dataIndex: '{$current_class->table}__dot__prix',
 						renderer: 'money',
+						editor: new Ext.form.TextField({
+							value:0
+						})
 						}, {
 						header: 'Serial',
 						width:20,
