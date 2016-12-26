@@ -81,6 +81,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	* @date 21-01-11
 	*/
 	public function tearDown(){
+		ATF::$msg->getNotices();
 		ATF::db()->rollback_transaction(true);
 		ob_start();
 		system("rm ".str_replace(".pdf","",$this->tmpFile).".* 2>&1");
@@ -656,6 +657,25 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	/* 
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @date 29/11/2016
+    */
+	public function test_mandatSellAndSign(){
+		$this->create("commande");
+
+		$this->obj->generic("mandatSellAndSign",$this->affaire['id_affaire'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-mandatSellAndSign-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("7fd505021a1fcdcc409b7c13de6ad1a4",$md5,"Erreur de génération du mandatSellAndSign");
+    }
+
+	/* 
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     * @date 28-02-2011
     */
     public function test_factureRefiCleodisBE() {
@@ -734,7 +754,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("cfc30812078a1ab42cf07075c152a2f7",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("26bd2149332f4dcf02e6c81bbab62686",$md5,"Erreur de génération de la facture");
     }
        
 
@@ -941,23 +961,6 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     
  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
@@ -976,7 +979,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("fec4fb286826bc697404732d134e8282",$md5,"Erreur de génération du Footer PREVISU Cléodis");
+        $this->assertEquals("2a0349bed0f33a7d289d0c226694cb59",$md5,"Erreur de génération du Footer PREVISU Cléodis");
         
     }
     
@@ -1047,7 +1050,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f53a28d8a4097c3ebe908d65b0afc26e",$md5,"Erreur de génération du devis");
+        $this->assertEquals("5afdd8100608b57e33bb64f1bf309f25",$md5,"Erreur de génération du devis");
     }
 
     /* 
@@ -1065,7 +1068,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("94c3b6e95437d92b11b21bd9131dd98e",$md5,"Erreur de génération du devis optic 2000 Avenant");        
+        $this->assertEquals("dd4ce822bdd70aa54db5e7619f62f4ae",$md5,"Erreur de génération du devis optic 2000 Avenant");        
     }
 
      /* 
@@ -1083,7 +1086,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1d9e3e0a2c493d46a20331f68aff6b1b",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("d1a942b8076b63c483a57686c1f85b7d",$md5,"Erreur de génération du devis optic 2000 AR");
     }
     public function test_devis_optic2000_AR_mensuel() {  
     	$this->create("devis_optic2000_AR");   
@@ -1098,7 +1101,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d972c7c4a9ed1003db18c2628adf5642",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("c0e69656caafedf16562221a264cbe28",$md5,"Erreur de génération du devis optic 2000 AR");
        }
  	public function test_devis_optic2000_AR_trimestriel() {
  		$this->create("devis_optic2000_AR"); 
@@ -1113,7 +1116,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("47a418ccc41fa3281a09a9028adb4d23",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("8ff7bfc8d32d95fb4b318ebe89038e8b",$md5,"Erreur de génération du devis optic 2000 AR");
     }
 
     public function test_devis_optic2000_AR_semestriel() {
@@ -1129,7 +1132,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("2e6a12c2d1b7d92a3d20006adaccecd4",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("5a1b6e07f6e1cc50476cd68e4e36fe8a",$md5,"Erreur de génération du devis optic 2000 AR");
     }    
 
     
@@ -1151,7 +1154,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("01747ccdf7b2f10685700a81dc016a57",$md5,"Erreur de génération du devis");
+        $this->assertEquals("7582b8e6e2e700d3f416aea53b0e629a",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1185,7 +1188,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1dc90b55fd124ff00e104ceddfd82f9b",$md5,"Erreur de génération du devis");
+        $this->assertEquals("eff3abd3c2544440bb10111fd6abc78b",$md5,"Erreur de génération du devis");
     }
 
     /* 
@@ -1229,7 +1232,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f58551b9fdac11111b15a10a1915c09c",$md5,"Erreur de génération du devis");
+        $this->assertEquals("f96eb7e0bc4b928b6df6be62b8faf5b5",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1264,7 +1267,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("045cf3bebdd6433cb900d1aa5a09070a",$md5,"Erreur de génération du devis");
+        $this->assertEquals("cb155dc0708b27c6a30ef6f17856380b",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1302,7 +1305,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0f311b989d8962981ce45de816fcfb1a",$md5,"Erreur de génération du devis");
+        $this->assertEquals("850e572a2811e2e9d9d93b6b9628455c",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1340,7 +1343,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("90eb531cb6adebbe4a6d342c3d9fe1e6",$md5,"Erreur de génération du devis");
+        $this->assertEquals("859f2b18c5be7878fc7cc3affe552a6f",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1378,7 +1381,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("da93d40a549e533790855413ac76d34c",$md5,"Erreur de génération du devis");
+        $this->assertEquals("b9016540171faa6e9f69d5ec949b9b72",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1424,7 +1427,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a79cea71c723ea7db5d07acac5b6bfaa",$md5,"Erreur de génération du devis");
+        $this->assertEquals("f476c28e0feba11c2fdac8632d9faf72",$md5,"Erreur de génération du devis");
     }
 
     /* 
@@ -1458,7 +1461,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("4d7fd69e315fbe5b6f4fcbde8dffff0c",$md5,"Erreur de génération du devis");
+        $this->assertEquals("f5905d346c389711940d708798d26066",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1493,7 +1496,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("873fa1fb594eceac77ff3c3b79911145",$md5,"Erreur de génération du devis");
+        $this->assertEquals("a7f66fd7e6a1c5dbdcb66e1ea777e622",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1527,7 +1530,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7866bd45ab8c293689cbad06c5569a66",$md5,"Erreur de génération du devis");
+        $this->assertEquals("2ed2a1129699eef86d2b31753b33da9e",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1562,7 +1565,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8353eb86c836bccc68e2130a7d2a15f4",$md5,"Erreur de génération du devis");
+        $this->assertEquals("4a1d6cec8d1a2f71d0779a6d6ad229de",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1582,7 +1585,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3c23862e42453b7a6eaa8f9b8bc9b78f",$md5,"Erreur de génération du devis");
+        $this->assertEquals("eb7381a1b9ebc4d2fdded31b30cf35e8",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1602,7 +1605,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b271a9c6821dd2bee44dd812840e4134",$md5,"Erreur de génération du devis");
+        $this->assertEquals("ff6a0afa0bf9e58c82f5d8fcff03b7d4",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1622,7 +1625,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6aa75771134dc274ebf9961b62f53d8a",$md5,"Erreur de génération du devis");
+        $this->assertEquals("dc3b11a524d30d4c2f214f8b9103942d",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1656,7 +1659,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("fb6534f25bea343a98b81e765e77273e",$md5,"Erreur de génération du devis");
+        $this->assertEquals("03fa9afc5ef7e22effd1dd0538e62d4c",$md5,"Erreur de génération du devis");
     }
 
     /* 
@@ -1684,7 +1687,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("ad2f41293da4ce4771e1fa881468add9",$md5,"Erreur de génération du devis");
+        $this->assertEquals("22ff70d089eafc8404a8f1ce3d6f2ff1",$md5,"Erreur de génération du devis");
     }   
     
     /* 
@@ -1723,7 +1726,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f984f1bbaf6a1475227cc76ae612b7b8",$md5,"Erreur de génération du devis");
+        $this->assertEquals("497d126e7338e831a2752c825c25a174",$md5,"Erreur de génération du devis");
     }
     
     /* 
@@ -1797,7 +1800,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("2f585be2c48644aa87755e2db8d71f74",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("2c2caf02e47bc1791b015d87a47f87a0",$md5,"Erreur de génération de la commande");
     }
 
      /* 
@@ -1823,7 +1826,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("224a9aa23a0923307ea73360f8c8564c",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("5cf38a8ee61b64e4bcfcf9059a5649c0",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -1859,7 +1862,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7d0b23d1cbaa9f4d57ed0ec38e95013f",$md5,"Erreur de génération de la contratA3AvecAnnexes");
+        $this->assertEquals("c37aa05a865d0a7e4872498a23123ea2",$md5,"Erreur de génération de la contratA3AvecAnnexes");
     }
     
     /* 
@@ -1892,7 +1895,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("39148cbe7aa01000d1c366809cfe4448",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("1ae12c8ae2e1b02714a7efb789c0eca1",$md5,"Erreur de génération de la commande");
     }
 
     /* 
@@ -1931,7 +1934,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7b44466f204506df79166d52e1a11c0b",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("df0569b2f5b8c1c51a75fc107b998049",$md5,"Erreur de génération de la commande");
 
         $this->devis['loyer_unique'] = "oui";
         ATF::devis()->u($this->devis);
@@ -1945,7 +1948,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8db3e744a817cf67b41f0378b759a684",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("384bddea5cea51e1fe19ca5934953d11",$md5,"Erreur de génération de la commande");
 
     }
     
@@ -1989,7 +1992,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("110c278f3ead6957dc7b86ec92deec69",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("19bd30f1b899cf150321b6149faf306d",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2032,7 +2035,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("bd4b90de3157072618a079c67697d675",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("0043bd3a1cee680dda47d55a5f76bb4b",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2054,7 +2057,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("dfb541f7d95c9a4d9d18b19af638ac4c",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("5c95b3f9fdbbb6aba6861c0a30b0ab3d",$md5,"Erreur de génération de la commande");
     }
     
      /* 
@@ -2080,7 +2083,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("972dbbb8e9750c2a37a2769de1ce480c",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("e818656ad4cbf582aac934374ada04fb",$md5,"Erreur de génération de la commande");
     }
 
     /* 
@@ -2105,7 +2108,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e039306428ec7b7882d0a3de6714daa6",$md5,"Erreur de génération de la contratA4ClauseVente");
+        $this->assertEquals("0064c6b2b53eb17f8aa998e31ce5136f",$md5,"Erreur de génération de la contratA4ClauseVente");
     }
     
     
@@ -2152,7 +2155,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("727217280e73e80a958ae0ae09e84242",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("1a994ceb27ffb8a3b59008afe9eb87f7",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2191,7 +2194,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b96b3e3488389081c21e1ee6d8a1a8d5",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("cc304b73fb2c957a0a5178f08076b1c5",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2230,7 +2233,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("26646d1e68a738dbea02db4f1150323e",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("86633efcfa911b7871cb64b247f03142",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2259,7 +2262,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("546b7e25960051c893742b5768f48183",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("fa2975579ddab221f4080700e6f8513c",$md5,"Erreur de génération de la commande");
 
         foreach ($this->loyer as $k=>$i) {
             if (!$k){
@@ -2278,7 +2281,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0bbc319e390db43ca76862434ba21307",$md5,"Erreur de génération de la commande 2" );
+        $this->assertEquals("110f9b541a5c02a6fd0e58c84f821aff",$md5,"Erreur de génération de la commande 2" );
 
     }
     
@@ -2307,7 +2310,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a44d61949b24eed78df24226ee26fb61",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("42a33992434f016028b642d6b7c8ead8",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2350,7 +2353,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("de698636350f2638a638c56b7376a269",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("517864a8b8722b1b2945b683bf31f7be",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2400,7 +2403,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("32e6e2152f3a0d0a9d82786ccf6fd346",$md5,"Erreur de génération de la contratPVARANNEXES");
+        $this->assertEquals("32e84b4c732f80d29e7706faecadf3ad",$md5,"Erreur de génération de la contratPVARANNEXES");
     }
     
     /* 
@@ -2439,7 +2442,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6179b118e00660de95bab789f0ae1f6a",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("46a10b0866d25005d794bf454b915eb6",$md5,"Erreur de génération de la commande");
     }
     
     /* 
@@ -2460,7 +2463,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("19928d170e6ccf427e138236780d330d",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("0efed40aeeebb1c0c980340b27c0b615",$md5,"Erreur de génération de la commande");
     }
 
 
@@ -2475,7 +2478,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = substr($md5,0,32);
         ob_get_clean();     
     	
-    	$this->assertEquals("dc547388f8506dbe868233c4f4cb32a9",$md5,"Erreur de génération de la commande");
+    	$this->assertEquals("b93b66e87bd732dc19073091458f8d04",$md5,"Erreur de génération de la commande");
     }
 
     public function test_lettreBelfius(){
@@ -2506,8 +2509,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ob_get_clean();
        
     	$this->beginTransaction("cleodis",false,true);
-    	$this->assertEquals("0364ba38d33fcf0edbef3e2eac4c22e9",$md5,"Erreur de génération de la lettre belfius");
-    	$this->assertEquals("0364ba38d33fcf0edbef3e2eac4c22e9",$md52,"Erreur de génération de la lettre belfius sans siege");
+    	$this->assertEquals("31fb156e09755c5a3191a69d90d048f7",$md5,"Erreur de génération de la lettre belfius");
+    	$this->assertEquals("31fb156e09755c5a3191a69d90d048f7",$md52,"Erreur de génération de la lettre belfius sans siege");
     }
 
     
@@ -2561,7 +2564,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("62f74396223f6b3301710aee15391f35",$md5,"Erreur de génération de la BDC");
+        $this->assertEquals("0164ef09cf5cb271c7d0912e5986f597",$md5,"Erreur de génération de la BDC");
     }
     
     /* 
@@ -2588,7 +2591,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("04cc2f7764103705d6dcab86f6c96e76",$md5,"Erreur de génération de la BDCAvecAnnexe");
+        $this->assertEquals("d25aa0ba72cbb47494907df3d9325ac8",$md5,"Erreur de génération de la BDCAvecAnnexe");
     }
     
     /* 
@@ -2635,7 +2638,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("c6dc53739911eb2d15340fa5f2762a2a",$md5,"Erreur de génération de la demande_refiKBC");
+        $this->assertEquals("5299d2c0951ea30f8acfcc75dbb8b348",$md5,"Erreur de génération de la demande_refiKBC");
     }
     
     /* 
@@ -2662,7 +2665,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8cc4d18957d0145fc99a5b435a20d541",$md5,"Erreur de génération de la demande_refiBNP");
+        $this->assertEquals("2c5e5877d730845438667e72ff02c483",$md5,"Erreur de génération de la demande_refiBNP");
     }
 
     // @author Quentin JANON <qjanon@absystech.fr>
@@ -2697,7 +2700,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("432c1ca1aea5f84c9b30aed53ee18f7c",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("8957b74ba563a801762493d89da2a600",$md5,"Erreur de génération de la facture");
 
 
         $this->facture['prix'] = 0;
@@ -2712,7 +2715,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8a193d8379bc9513573d2b083fd9a588",$md5,"Erreur de génération de la facture AVOIR");
+        $this->assertEquals("fba0572740abc3c66660983f1acb8b77",$md5,"Erreur de génération de la facture AVOIR");
 
         $this->affaire['nature'] = "vente";
         ATF::affaire()->u($this->affaire);
@@ -2726,7 +2729,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("76d4a715c2a129c3ab8937056bb308c6",$md5,"Erreur de génération de la facture VENTE");
+        $this->assertEquals("5ca60806ed29c37ba6c21aac7901a25a",$md5,"Erreur de génération de la facture VENTE");
 
         $this->facture['mode_paiement'] = "cheque";
         $this->facture['prix'] = 100;
@@ -2741,7 +2744,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("5605c1f3d2910c48809bc6093a5bb1c5",$md5,"Erreur de génération de la facture AVOIR cheque");
+        $this->assertEquals("dde969e57c2e0c27896d1ee69edc3b05",$md5,"Erreur de génération de la facture AVOIR cheque");
 
         $this->facture['mode_paiement'] = "virement";
         $this->facture['prix'] = 100;
@@ -2756,7 +2759,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("79db64bacc82285ee5eaed4449447fe3",$md5,"Erreur de génération de la facture AVOIR Virement");
+        $this->assertEquals("94a12a84f6501d9773c7643bd9333cd5",$md5,"Erreur de génération de la facture AVOIR Virement");
     }
     
     /* 
@@ -2781,7 +2784,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e6246b626f91a1558b7ab1c58e17df5c",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("81441a787a872a9e3bd0a163960a62f7",$md5,"Erreur de génération de la facture");
     }
 
 
@@ -2830,7 +2833,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("34aef696b276923ee7f940d0cfb496cc",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("ebfadbb54fc42502cfbf5526774f1ab5",$md5,"Erreur de génération de la facture");
     }
     
     /* 
@@ -2872,7 +2875,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f0d71becbbe34e75e82743fafa2b6497",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("e1cf4a36e4095b84247839ea2dacf29f",$md5,"Erreur de génération de la facture");
     }
     
     /* 
@@ -2914,7 +2917,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("cd6fa65604481b534ec62db4c20bbe81",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("439c57d575907008ed0515c0b8f30b6d",$md5,"Erreur de génération de la facture");
     }
     
     /* 
@@ -2955,7 +2958,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("17c810a9c89ffc709de41b2ba82847e6",$md5,"Erreur de génération de la facture Refi d'Avoir");
+        $this->assertEquals("314787e8cfc4122cd50539b7441a0092",$md5,"Erreur de génération de la facture Refi d'Avoir");
     }
     
 //  /* 
@@ -3060,7 +3063,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("84911537e69ba31e5b3cf7cab8331125",$md5,"Erreur de génération de la echeancierFacturationProlongation");
+        $this->assertEquals("c8d64a87ac477fac757316d2f67a1005",$md5,"Erreur de génération de la echeancierFacturationProlongation");
         
     }
     
@@ -3090,7 +3093,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f7c33ce6472c120fe65c736b6c08a069",$md5,"Erreur de génération de la echeancierFacturationContrat");
+        $this->assertEquals("93022bbf08912f61a0cd0ec6c93b7c96",$md5,"Erreur de génération de la echeancierFacturationContrat");
         
     }
     
@@ -3139,7 +3142,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("28d1491984bb2ff72528dbf94decdbe2",$md5,"Erreur de génération de la global_prolongation_et_facture");
+        $this->assertEquals("34d9e93d071413d49980a467ab2b05a6",$md5,"Erreur de génération de la global_prolongation_et_facture");
 
         //***********Societe**************/
         $this->obj->generic("global_prolongationSociete",$ids,$this->tmpFile,$s);
@@ -3438,7 +3441,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("87be039f7e034fe64f7299e6d67113d4",$md5,"Erreur de génération de la facture libre Retard");
+        $this->assertEquals("bc4102c9ddbda905341cff0eb1bdbff4",$md5,"Erreur de génération de la facture libre Retard");
         
                 
         //--------------------------------------------------------------------------------------------------
@@ -3458,7 +3461,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("87be039f7e034fe64f7299e6d67113d4",$md5,"Erreur de génération de la facture libre Contentieux");
+        $this->assertEquals("bc4102c9ddbda905341cff0eb1bdbff4",$md5,"Erreur de génération de la facture libre Contentieux");
         
         //--------------------------------------------------------------------------------------------------
         //          Facture Libre Normale
@@ -3479,7 +3482,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("ac237afe6ebd5a5be2ba8c78a4214f3a",$md5,"Erreur de génération de la facture libre Normale Affaire");
+        $this->assertEquals("b1dff7ec7a582cd18b7344783b448355",$md5,"Erreur de génération de la facture libre Normale Affaire");
         
         //Affaire Vente
         $this->affaire['nature'] = "vente";
@@ -3494,7 +3497,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8d0f3ee5d0d16ea3221b90fb0ac9a52d",$md5,"Erreur de génération de la facture libre Normale Vente");
+        $this->assertEquals("5c9b67b1638a0f6db814c682d3c02ddf",$md5,"Erreur de génération de la facture libre Normale Vente");
         
     }
 
@@ -3516,7 +3519,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3d9fd0647823a60fcb6718fd80806849",$md5,"Erreur de génération de la facture Midas");
+        $this->assertEquals("7c6895ae65d6321cfeab1d8f1fc8151b",$md5,"Erreur de génération de la facture Midas");
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -3536,7 +3539,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8270d9682da59b925f9708f02797a06f",$md5,"Erreur de génération de la relance 1");
+        $this->assertEquals("2d84ba6f07493f9a1665df62351a32b8",$md5,"Erreur de génération de la relance 1");
                 
         $this->create("factureNormale");
         ATF::relance_facture()->insert(array("id_facture" => $this->facture['id_facture'] , "id_relance"=> $relance1));
@@ -3549,7 +3552,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("26cceeda53ae612b9270d16650b44e6e",$md5,"Erreur de génération de la relance 1 BIS");
+        $this->assertEquals("3b0cdc4698fdccb615cc1803a3963a6a",$md5,"Erreur de génération de la relance 1 BIS");
         
         
     }
@@ -3571,7 +3574,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("20765610edea5d93d8fd3d5eac0c1558",$md5,"Erreur de génération de la relance 2");
+        $this->assertEquals("aaa78e095bb82396c128b409ef0b4af1",$md5,"Erreur de génération de la relance 2");
         
         
         $this->create("factureNormale");
@@ -3585,7 +3588,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1735f88b895312f537c6fde5a146d085",$md5,"Erreur de génération de la relance 2 BIS");
+        $this->assertEquals("deef12ebcde221cf4f29762b08cd1d08",$md5,"Erreur de génération de la relance 2 BIS");
     }
     
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -3605,7 +3608,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b563eca484e86155907db4ca699987ac",$md5,"Erreur de génération de la relance 3");
+        $this->assertEquals("58951addcfa3d7068aacb28f276e18b9",$md5,"Erreur de génération de la relance 3");
     
     
         $this->create("factureNormale");
@@ -3619,7 +3622,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("71e1cc8e0aa1ad56538024ba2d180e88",$md5,"Erreur de génération de la relance 3 BIS");
+        $this->assertEquals("15a2d3f4e7f3e8e4f7032213df971172",$md5,"Erreur de génération de la relance 3 BIS");
     
     }
 	
@@ -3644,7 +3647,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("c83dbcab92404455ecc177dd311955be",$md5,"Erreur de génération de la envoiContratEtBilan");
+        $this->assertEquals("976d3a12622aa8f18179af8f10c0d975",$md5,"Erreur de génération de la envoiContratEtBilan");
     
     }
     
@@ -3669,7 +3672,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e82f8ec3528a993532352583787a4d8d",$md5,"Erreur de génération de la envoiContratEtBilanAR");
+        $this->assertEquals("e63d50e84d41e8b963952749ae73696f",$md5,"Erreur de génération de la envoiContratEtBilanAR");
     
     }
     
@@ -3692,7 +3695,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7096894a5add07fcd1f57f4a29f7783d",$md5,"Erreur de génération de la envoiContratSsBilan");
+        $this->assertEquals("bdf43d8b2b64089ff33a64eec57b5288",$md5,"Erreur de génération de la envoiContratSsBilan");
     
     }
     
@@ -3717,7 +3720,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("9dc19cc52675cc2fbcf9d4c0ea27ed64",$md5,"Erreur de génération de la envoiContratSsBilanAR");
+        $this->assertEquals("792d40f6f29b68b393508f6df34ff6ad",$md5,"Erreur de génération de la envoiContratSsBilanAR");
     
     }
     
@@ -3741,7 +3744,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0ff83e23570e2a8f9e83bad4b176612f",$md5,"Erreur de génération de la envoiAvenant");
+        $this->assertEquals("ca1a849569477a9de37523c0fa11cc76",$md5,"Erreur de génération de la envoiAvenant");
     
     }
     
@@ -3766,7 +3769,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("457ef57e5351906e39509708a5120d86",$md5,"Erreur de génération de la contratTransfert");
+        $this->assertEquals("6af77a3045907358b0043aa10c70e24d",$md5,"Erreur de génération de la contratTransfert");
     
     }
     
@@ -3789,7 +3792,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("45ce6d03768a8e49ccd793f113b85089",$md5,"Erreur de génération de la ctSigne ");
+        $this->assertEquals("a65ce5151594de06e38aadcced7b6ff7",$md5,"Erreur de génération de la ctSigne ");
     
     }
 
@@ -3815,7 +3818,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("12c35ebbf89f7190a05f9cda97ab0234",$md5,"Erreur de génération de la CourrierRestitution ");
+        $this->assertEquals("4eb86ea01ccf6f4169d71cc6fde94715",$md5,"Erreur de génération de la CourrierRestitution ");
     
     }
 
@@ -3840,7 +3843,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8606cffded4c00fd4fdb2aec437a8d20",$md5,"Erreur de génération de la envoiCourrierClassique");
+        $this->assertEquals("6d46b9c7fd9a7f2c58b0f3f18b6669e8",$md5,"Erreur de génération de la envoiCourrierClassique");
     
     }
 
@@ -3865,7 +3868,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d1997570e5e307894a686509a99ce6db",$md5,"Erreur de génération de la envoiCourrierClassiqueAR");
+        $this->assertEquals("957b2e2b335016d5192c9960e4285e91",$md5,"Erreur de génération de la envoiCourrierClassiqueAR");
     
     }
 
@@ -3883,7 +3886,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("4ba50736a2570468c8616ed990865363",$md5,"Erreur de génération du Mandat Sepa");   
+        $this->assertEquals("f07590e8e54aa886e41a684beef6218c",$md5,"Erreur de génération du Mandat Sepa");   
     }
 
 
@@ -3934,7 +3937,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3eddaa09569125396ce412c6fc01b54b",$md5,"Erreur de génération du test_formation_devis");   
+        $this->assertEquals("3a69179a2fe52e7736ece13f130a9694",$md5,"Erreur de génération du test_formation_devis");   
 
 
     }
@@ -3984,7 +3987,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("835cebecd1f2f0e8c2711dccb0e48207",$md5,"Erreur de génération du test_formation_devis_light");   
+        $this->assertEquals("aa5df55fa0d479daf0dd3dc50edb353e",$md5,"Erreur de génération du test_formation_devis_light");   
 
 
     }
@@ -4036,7 +4039,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e0d2f8f8a024b9f14891726d82c44d0a",$md5,"Erreur de génération du test_formation_commande"); 
+        $this->assertEquals("ebed85c6178cd7f0d3af04298800fa45",$md5,"Erreur de génération du test_formation_commande"); 
 
 
         /*
@@ -4054,7 +4057,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("43954e8fb1e20c9539ba2104fd1ad53a",$md5,"Erreur de génération du test_formation_commande avec acompte"); 
+        $this->assertEquals("b65a6894e59c2ef8fe1304ed9dee8fb1",$md5,"Erreur de génération du test_formation_commande avec acompte"); 
 
     }
 
@@ -4103,7 +4106,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1cf81c0b2fd668f6b9fb525a4fa07f4d",$md5,"Erreur de génération du test_formation_commande_fournisseur"); 
+        $this->assertEquals("52fb2acfb395004f15b8d60ca3ef7994",$md5,"Erreur de génération du test_formation_commande_fournisseur"); 
     }
 
     
@@ -4154,7 +4157,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("47b352ce2bcf7a8421b09c9a173ddf3f",$md5,"Erreur de génération du test_formation_attestation_presence"); 
+        $this->assertEquals("1375b8ea2761be9109c2684aa659ea20",$md5,"Erreur de génération du test_formation_attestation_presence"); 
     }
 
 
@@ -4216,7 +4219,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d0d0856cacebf8da4fcd5559c54cfa3a",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur");
+        $this->assertEquals("a3a5d7035a9d484657431d9953d61b53",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur");
 
 
 
@@ -4237,7 +4240,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("21ea0bac525acf0a2fd322660aac1fa8",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur avec acompte");
+        $this->assertEquals("4b2e1e336de1f9ecf923acd67f594695",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur avec acompte");
 
     }
    
@@ -4294,7 +4297,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0cf749103644ff2f0c9c6f39eba15826",$md5,"Erreur de génération du formation_facture"); 
+        $this->assertEquals("1746d05022b4a4fa305e9186a83e8a9f",$md5,"Erreur de génération du formation_facture"); 
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -4349,7 +4352,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("5f5eb0e99dcd149f31578351fed11f62",$md5,"Erreur de génération de formation_facture_acompte"); 
+        $this->assertEquals("383a4cf44f5bce763a40dad39c3fe90d",$md5,"Erreur de génération de formation_facture_acompte"); 
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -4385,7 +4388,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("598f269afcc41c1c75f1178270bd5dc8",$md5,"Erreur de génération de la commande BE");       
+        $this->assertEquals("ef47dfa1102164d1c82fdacc3317365f",$md5,"Erreur de génération de la commande BE");       
 
        
     }
@@ -4423,7 +4426,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("5685657caa97093a7c30557e35d18dea",$md5,"Erreur de génération de la commande BE");       
+        $this->assertEquals("bf17351aec75618a6122d8be48ce9dcb",$md5,"Erreur de génération de la commande BE");       
 
         
     }
@@ -4459,7 +4462,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cap", false, true);
 
-        $this->assertEquals("d75fef36551c7aa0a14e6667be53eb9a",$md5,"Erreur de génération de l'audit CAP");       
+        $this->assertEquals("c6734fcdff53426d0202f3543c28ebdd",$md5,"Erreur de génération de l'audit CAP");       
 	}
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -4484,7 +4487,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f3ea5ba91155a17b51ea8eff8682a332",$md5,"Erreur de génération du mandat CAP");       
+        $this->assertEquals("3e322a5eeb69a30b47d01ec488fccfe4",$md5,"Erreur de génération du mandat CAP");       
 
 
 

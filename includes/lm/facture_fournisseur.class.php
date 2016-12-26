@@ -59,6 +59,8 @@ class facture_fournisseur extends classes_optima {
 		$this->addPrivilege("export_data");
 		$this->addPrivilege("export_cegid");
 		$this->addPrivilege("export_ap");
+		$this->addPrivilege("export_immo_adeo");
+		
 		
 		$this->field_nom = "ref";
 		$this->foreign_key['id_fournisseur'] =  "societe";
@@ -831,7 +833,7 @@ class facture_fournisseur extends classes_optima {
         	$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
 
         	//TTC
-    		$donnees[$key][1][1] = "1"; 
+    		$donnees[$key][21][1] = "1"; 
         	$donnees[$key][1][2] = "e"; //Type d'evenement e/a
         	$donnees[$key][1][3] = "120"; //Code BU
         	$donnees[$key][1][4] = "54";
@@ -839,12 +841,12 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][6] = $code_magasin;
         	$donnees[$key][1][7] = ($value["facture_fournisseur.prix"] >= 0)?"F":"A"; //Type de facture F/A
         	$donnees[$key][1][8] =  $value["facture_fournisseur.id_facture_fournisseur"];
-        	$donnees[$key][1][9] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
-        	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));;
+        	$donnees[$key][1][9] =  date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
+        	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
         	$donnees[$key][1][11] = date("Ymd"); 
-        	$donnees[$key][1][12] = ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]); //Montant TTC separateur numeric .
+        	$donnees[$key][1][12] = number_format(($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]),2,".",""); //Montant TTC separateur numeric .
         	$donnees[$key][1][13] = "EUR";	
-    		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date"])); 
+    		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date_echeance"])); 
     		$donnees[$key][1][15] = ""; 
         	$donnees[$key][1][16] = $value["facture_fournisseur.bap"]; //Numéro de BAP Dans le fichier FACTURES : NULL Dans le fichier BAP : un numéro de BAP
         	$donnees[$key][1][17] = date("Ymd", strtotime($value["facture_fournisseur.date"])); //Date de BAP de la pièce Dans le fichier FACTURES : NULL Dans le fichier BAP : La date de passage BAP
@@ -863,15 +865,14 @@ class facture_fournisseur extends classes_optima {
 			$donnees[$key][1][30] = ""; 
 			$donnees[$key][1][31] = ""; 
 
-			$total_debit += ($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]);
-
-
+			$total_debit += number_format(($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]),2,".","");
+		
 			ATF::facture_fournisseur_ligne()->q->reset()->where("id_facture_fournisseur",$value["facture_fournisseur.id_facture_fournisseur_fk"]);
 			$lignes_ff = ATF::facture_fournisseur_ligne()->select_all();
 
 			$i = 2;
 			foreach ($lignes_ff as $kl => $vl) {
-				if($vl["prix"]){
+				if($vl["prix"] > 0){
 					//HT
 	        		$donnees[$key][$i][1] = "2"; 
 		        	$donnees[$key][$i][2] = "1"; //TVA =0 / HT=1
@@ -896,7 +897,7 @@ class facture_fournisseur extends classes_optima {
 	        		$donnees[$key][$i][1] = "2"; 
 		        	$donnees[$key][$i][2] = "0"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = "0";
-		        	$donnees[$key][$i][4] = round(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2); // Montant
+		        	$donnees[$key][$i][4] = number_format(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2,".",""); // Montant
 		        	if($value["facture_fournisseur.type"] == "achat"){
 		        		$donnees[$key][$i][5] = "D20 Immo"; //Code TVA
 		       	 	}else{ 
@@ -915,21 +916,37 @@ class facture_fournisseur extends classes_optima {
 			}        	    	
         }
 
+        $filename = 'CLEODIS_AP'.date("Ymd").'.fic';
+
         header('Content-Type: application/fic');		
-		header('Content-Disposition: attachment; filename="CLEODIS_AP'.date("Ym").'".fic');
+		header('Content-Disposition: attachment; filename="'.$filename.'"');      
 		
 
 		foreach ($donnees as $key => $value) {	
 			foreach ($value as $k => $v) {
-				for($i=1;$i<=36;$i++){
-					if(isset($v[$i])){
-						$string .= $v[$i];
-						if($i!=36) $string .= ";";
-					}else{
-						$string .= "";
-						if($i!=36) $string .= ";";
-					}					
+				if($v[1] == "1"){
+					for($i=1;$i<=31;$i++){
+						if(isset($v[$i])){
+							$string .= $v[$i];
+							if($i!=31) $string .= ";";
+						}else{
+							$string .= "";
+							if($i!=31) $string .= ";";
+						}					
+					}
+				}elseif($v[1] == "2"){
+					for($i=1;$i<=10;$i++){
+						if(isset($v[$i])){
+							$string .= $v[$i];
+							if($i!=10) $string .= ";";
+						}else{
+							$string .= "";
+							if($i!=10) $string .= ";";
+						}					
+					}
 				}
+
+				
 				$string .= "\n";	
 				$lignes ++;			
 			}			
@@ -937,11 +954,184 @@ class facture_fournisseur extends classes_optima {
         
         $string .=  "98;".count($donnees).";CLEODIS\n";
         $lignes ++;	
-        $string .= "99;".$total_debit.";EUR;\n";
+        $string .= "99;".$total_debit.";EUR\n";
        	$lignes ++;	
-        $string .= "0;".$lignes.";".date("Ymd").";";
+        $string .= "0;".$lignes.";".date("Ymd");
 
         echo $string;
     }
+
+
+     /** Export des immobilisation pour ADEO Services
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
+     * @date 22/12/2016  
+     * @param array $infos : contient tous les enregistrements          
+     */ 
+    public function export_immo_adeo(&$infos,$force){
+    	$infos["display"] = true;
+		
+		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();   
+        $data = $this->sa();
+
+        $donnees = array();
+
+        foreach ($data as $key => $value) {
+
+        	if($value["facture_fournisseur.type"] == "achat"){
+        		$code_magasin = "M380"; //Par defaut web
+        		        	
+	        	
+	        	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
+	        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");	        		
+	        	}
+
+	        	ATF::loyer()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])
+	        							->where("nature","prolongation","AND",false,"!=")
+	        							->where("nature","prolongation_probable","AND",false,"!=");
+	        	$loyers_engagement = ATF::loyer()->sa();
+
+	        	$engagement = 0;
+	        	foreach ($loyers_engagement as $kv => $vv) {
+	        		$engagement += $vv["duree"];
+	        	}
+
+
+
+	        	$montant = number_format($value["facture_fournisseur.prix"]/$engagement ,2 ,".","");
+	        	
+	        		        	
+	        	$donnees[$key][1][1] = "1"; 
+	        	$donnees[$key][1][2] = "1"; 
+	        	$donnees[$key][1][3] = "54"; 
+	        	$donnees[$key][1][4] = $code_magasin;
+	        	$donnees[$key][1][5] = "120"; 
+	        	$donnees[$key][1][6] = "CLEODIS";
+	        	$donnees[$key][1][7] = "20"; 
+	        	$donnees[$key][1][8] =  ""; //date comptable = Denier jour de la periode
+	        	$donnees[$key][1][9] =  "1";
+	        	$donnees[$key][1][10] = "EUR";
+	        	$donnees[$key][1][11] = ""; //date application du taux
+	        	$donnees[$key][1][12] = ""; //Centre cout/profit R03(Alarme)- R04(Chaudiere) - 00000(Immo)
+	        	$donnees[$key][1][13] = "1";	
+	    		$donnees[$key][1][14] = "681120";
+	    		$donnees[$key][1][15] = "0"; 
+	        	$donnees[$key][1][16] = "0"; 
+	        	$donnees[$key][1][17] = "0"; 
+	        	$donnees[$key][1][18] = "0";
+	        	$donnees[$key][1][19] = "0";	  
+				$donnees[$key][1][20] = "0";
+				$donnees[$key][1][21] = ""; //Montant debit	
+	        	$donnees[$key][1][22] = "0"; //Montant credit
+				$donnees[$key][1][23] = "0";
+				$donnees[$key][1][24] = "Dotation aux amortissements au DD/MM/YY  REFERENCE ABONNEMENT";
+				$donnees[$key][1][25] = ""; //date comptable
+				$donnees[$key][1][26] = "";  
+				$donnees[$key][1][27] = "";  
+				$donnees[$key][1][28] = "";
+				$donnees[$key][1][29] = ""; 
+				$donnees[$key][1][30] = "";
+				$donnees[$key][1][31] = "";
+				$donnees[$key][1][32] = "";
+				$donnees[$key][1][33] = "";
+				$donnees[$key][1][34] = "";
+				$donnees[$key][1][35] = "";
+				$donnees[$key][1][36] = ""; 
+
+				$donnees[$key][2][1] = "1"; 
+	        	$donnees[$key][2][2] = "1"; 
+	        	$donnees[$key][2][3] = "54"; 
+	        	$donnees[$key][2][4] = $code_magasin;
+	        	$donnees[$key][2][5] = "120"; 
+	        	$donnees[$key][2][6] = "CLEODIS";
+	        	$donnees[$key][2][7] = "20"; 
+	        	$donnees[$key][2][8] =  ""; //date comptable = Denier jour de la periode
+	        	$donnees[$key][2][9] =  "1";
+	        	$donnees[$key][2][10] = "EUR";
+	        	$donnees[$key][2][11] = ""; //date application du taux
+	        	$donnees[$key][2][12] = "00000";
+	        	$donnees[$key][2][13] = "1";	
+	    		$donnees[$key][2][14] = "281560";
+	    		$donnees[$key][2][15] = "0"; 
+	        	$donnees[$key][2][16] = "0"; 
+	        	$donnees[$key][2][17] = "0"; 
+	        	$donnees[$key][2][18] = "0";
+	        	$donnees[$key][2][19] = "0";	  
+				$donnees[$key][2][20] = "0";
+				$donnees[$key][2][21] = "0"; //Montant debit	
+	        	$donnees[$key][2][22] = ""; //Montant credit
+				$donnees[$key][2][23] = "0";
+				$donnees[$key][2][24] = "Dotation aux amortissements au DD/MM/YY  REFERENCE ABONNEMENT";
+				$donnees[$key][2][25] = ""; //date comptable
+				$donnees[$key][2][26] = "";  
+				$donnees[$key][2][27] = "";  
+				$donnees[$key][2][28] = "";
+				$donnees[$key][2][29] = ""; 
+				$donnees[$key][2][30] = "";
+				$donnees[$key][2][31] = "";
+				$donnees[$key][2][32] = "";
+				$donnees[$key][2][33] = "";
+				$donnees[$key][2][34] = "";
+				$donnees[$key][2][35] = "";
+				$donnees[$key][2][36] = "";
+
+			
+
+
+
+
+
+        	}
+        	
+        }
+
+        $filename = 'CLEODIS_IMMO'.date("Ymd").'.fic';
+
+        header('Content-Type: application/fic');		
+		header('Content-Disposition: attachment; filename="'.$filename.'"');      
+		
+
+		foreach ($donnees as $key => $value) {	
+			foreach ($value as $k => $v) {
+				if($v[1] == "1"){
+					for($i=1;$i<=31;$i++){
+						if(isset($v[$i])){
+							$string .= $v[$i];
+							if($i!=31) $string .= ";";
+						}else{
+							$string .= "";
+							if($i!=31) $string .= ";";
+						}					
+					}
+				}elseif($v[1] == "2"){
+					for($i=1;$i<=10;$i++){
+						if(isset($v[$i])){
+							$string .= $v[$i];
+							if($i!=10) $string .= ";";
+						}else{
+							$string .= "";
+							if($i!=10) $string .= ";";
+						}					
+					}
+				}
+
+				
+				$string .= "\n";	
+				$lignes ++;			
+			}			
+		}
+        
+        $string .=  "98;".count($donnees).";CLEODIS\n";
+        $lignes ++;	
+        $string .= "99;".$total_debit.";EUR\n";
+       	$lignes ++;	
+        $string .= "0;".$lignes.";".date("Ymd");
+
+        echo $string;
+
+
+    }
+
 };
 ?>
