@@ -687,7 +687,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$res = $this->obj->devis_gagne_stats(true,"reseau",true,2014,1);
 
-		$this->assertEquals(15 ,$res["dataset"]["reel"]["01"]["value"] , "Count 2013 incorrect?");
+		$this->assertEquals(16 ,$res["dataset"]["reel"]["01"]["value"] , "Count 2013 incorrect?");
 		$this->assertEquals(9 ,$res["dataset"]["reel"]["12"]["value"] , "Count 2014 incorrect?");
 
 		ATF::stats()->liste_annees["devis"] = array("2014"=>1);

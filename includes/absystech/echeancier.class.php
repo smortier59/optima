@@ -258,81 +258,43 @@ class echeancier extends classes_optima {
 
     $date_debut_periode = $get["prochaine_echeance"];
     $date_fin_periode   = $get["fin_echeance"];
-
-    //$date_debut_periode = "01-01-2017";
-    //$date_fin_periode = "31-03-2017";
+    
 
     $echeancier = $this->select($id_echeancier);
 
-    ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier", $id_echeancier);
-    $echeancier_ligne_ponctuelle = ATF::echeancier_ligne_ponctuelle()->select_all();
-
-
-    ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier);
-    $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
-
     $produits = array();
 
-    foreach ($echeancier_ligne_periodique as $key => $value) {
-        $p=array();
+    $lignes_echeancier = $this->getLignesPeriode($id_echeancier , $date_debut_periode, $date_fin_periode);
 
-        $p["facture_ligne__dot__ref"] = $value["ref"];
-        $p["facture_ligne__dot__produit"] = $value["designation"];        
+    foreach ($lignes_echeancier as $key => $value) {
+      $p=array();
+     
+      $p["facture_ligne__dot__ref"] = $value["ref"];
+      $p["facture_ligne__dot__produit"] = $value["designation"];        
 
-        if($value["valeur_variable"] == "oui"){         
-          $p["facture_ligne__dot__quantite"] = $lignes["periodique"][$value["id_echeancier_ligne_periodique"]]["quantite"];
-          $p["facture_ligne__dot__prix"] = $lignes["periodique"][$value["id_echeancier_ligne_periodique"]]["puht"];
-        }else{
-          $p["facture_ligne__dot__quantite"] = $value["quantite"];
-          $p["facture_ligne__dot__prix"] = $value["puht"];
-        }      
-        
-        $p["facture_ligne__dot__prix_achat"] = NULL;
-        $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;            
-        $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
-        $p["facture_ligne__dot__serial"] = null;
-        $p["facture_ligne__dot__prix_nb"] = null;
-        $p["facture_ligne__dot__prix_couleur"] = null;
-        $p["facture_ligne__dot__prix_achat_nb"] = null;
-        $p["facture_ligne__dot__prix_achat_couleur"] = null;
-        $p["facture_ligne__dot__index_nb"] = null;
-        $p["facture_ligne__dot__index_couleur"] = null;
-        $p["facture_ligne__dot__visible"] = "oui";
-        $p["facture_ligne__dot__marge"] = NULL;
-        $p["facture_ligne__dot__marge_absolue"] = NULL;
+      if($value["valeur_variable"] == "oui"){
+        $p["facture_ligne__dot__quantite"] = $lignes[$value["type"]][$value["id_echeancier_ligne_".$value["type"]]]["quantite"];
+        $p["facture_ligne__dot__prix"] = $lignes[$value["type"]][$value["id_echeancier_ligne_".$value["type"]]]["puht"];
+      }else{
+        $p["facture_ligne__dot__quantite"] = $value["quantite"];
+        $p["facture_ligne__dot__prix"] = $value["puht"];
+      }
+      
+      $p["facture_ligne__dot__prix_achat"] = NULL;
+      $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;            
+      $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
+      $p["facture_ligne__dot__serial"] = null;
+      $p["facture_ligne__dot__prix_nb"] = null;
+      $p["facture_ligne__dot__prix_couleur"] = null;
+      $p["facture_ligne__dot__prix_achat_nb"] = null;
+      $p["facture_ligne__dot__prix_achat_couleur"] = null;
+      $p["facture_ligne__dot__index_nb"] = null;
+      $p["facture_ligne__dot__index_couleur"] = null;
+      $p["facture_ligne__dot__visible"] = "oui";
+      $p["facture_ligne__dot__marge"] = NULL;
+      $p["facture_ligne__dot__marge_absolue"] = NULL;
 
-        $produits[] = $p;
-    }
-
-    foreach ($echeancier_ligne_ponctuelle as $key => $value) {
-        $p=array();
-
-        $p["facture_ligne__dot__ref"] = $value["ref"];
-        $p["facture_ligne__dot__produit"] = $value["designation"];
-
-        if($value["valeur_variable"] == "oui"){
-          $p["facture_ligne__dot__quantite"] = $lignes["ponctuelle"][$value["id_echeancier_ligne_ponctuelle"]]["quantite"];
-          $p["facture_ligne__dot__prix"] = $lignes["ponctuelle"][$value["id_echeancier_ligne_ponctuelle"]]["puht"];
-        }else{
-          $p["facture_ligne__dot__quantite"] = $value["quantite"];
-          $p["facture_ligne__dot__prix"] = $value["puht"];
-        }
-
-        $p["facture_ligne__dot__prix_achat"] = NULL;
-        $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;            
-        $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
-        $p["facture_ligne__dot__serial"] = null;
-        $p["facture_ligne__dot__prix_nb"] = null;
-        $p["facture_ligne__dot__prix_couleur"] = null;
-        $p["facture_ligne__dot__prix_achat_nb"] = null;
-        $p["facture_ligne__dot__prix_achat_couleur"] = null;
-        $p["facture_ligne__dot__index_nb"] = null;
-        $p["facture_ligne__dot__index_couleur"] = null;
-        $p["facture_ligne__dot__visible"] = "oui";
-        $p["facture_ligne__dot__marge"] = NULL;
-        $p["facture_ligne__dot__marge_absolue"] = NULL;
-
-        $produits[] = $p;
+      $produits[] = $p;
     }
 
     $facture = array();
@@ -393,7 +355,7 @@ class echeancier extends classes_optima {
     }
     $facture["echeancier"] = true;
 
-    //if($get["preview"]) $facture["preview"] = true;
+
     try{
       $return = ATF::facture()->insert($facture);
             
@@ -402,13 +364,51 @@ class echeancier extends classes_optima {
     
     }catch(errorATF $e){
       throw new errorATF($e->getMessage(),500);
-    }
-    
-    
-
-    
+    }    
   }
 
+
+  public function _getLignePeriode($get , $post){
+    return $this->getLignesPeriode($get["id_echeancier"], $get["periode_debut"], $get["periode_fin"], true);
+  }
+
+
+  public function getLignesPeriode($id_echeancier , $periode_debut, $periode_fin, $from_web = false){
+    $d1 = explode("-",$periode_debut);
+    $periode_debut = $d1[2].$d1[1].$d1[0];
+    $d2 = explode("-",$periode_fin);
+    $periode_fin = $d2[2].$d2[1].$d2[0];
+
+    ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier", $id_echeancier);
+    $echeancier_ligne_ponctuelle = ATF::echeancier_ligne_ponctuelle()->select_all();
+
+    ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier);
+    $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
+
+    foreach ($echeancier_ligne_ponctuelle as $key => $value) {      
+      $d3 = str_replace("-", "", $value["date_valeur"]);   
+
+      if($periode_debut <= $d3 && $d3 <= $periode_fin){
+          $value["type"] = "ponctuelle";
+          $lignes[] = $value;
+      }      
+    }
+
+    foreach ($echeancier_ligne_periodique as $key => $value) {     
+      $value["type"] = "periodique";
+      $lignes[] = $value;
+    }
+
+    //Si from_web a true c'est qu'on viens de télescope et il faut des informations pour afficher les infos sur la page
+    if($from_web){
+      $return["lignes"] = $lignes;
+      $return["echeancier"] = ATF::echeancier()->select($id_echeancier);
+      $return["echeancier"]["societe"] = ATF::societe()->select($return["echeancier"]["id_societe"], "societe");
+      $return["echeancier"]["affaire"] = ATF::affaire()->select($return["echeancier"]["id_affaire"], "affaire");
+      return $return;
+    }
+    return $lignes;   
+  }
 
 
 

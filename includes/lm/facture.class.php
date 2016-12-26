@@ -1923,9 +1923,10 @@ class facture_lm extends facture {
         	}
 
         	$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
-        	
-        	$ref_mandate = ATF::affaire()->select($value["facture.id_affaire_fk"] , "ref_mandate");
-        	$lettrage_date_facture = $this->getMoisFrancais(date("m", strtotime($value["facture.date"])))." - ".date("Y", strtotime($value["facture.date"]));
+        	        	
+        	$ref_societe = ATF::societe()->select($value["facture.id_societe_fk"] , "ref");
+
+        	$lettrage_date_facture = $this->getMoisFrancais(date("m", strtotime($value["facture.date_periode_debut"])))." - ".date("Y", strtotime($value["facture.date_periode_debut"]));
 
         	for($i=1;$i<4;$i++){	
 	        	if($i==1){
@@ -1952,7 +1953,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = $value["facture.prix"]; //Montant Debit
 					$donnees[$key][$i][21] = "0"; //Montant Credit        	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] = "FACTURE ".$value["facture.id_facture"]." / ".$ref_mandate." / ".$lettrage_date_facture; //reference affaire/facture/periode
+					$donnees[$key][$i][23] = "FACTURE ".$value["facture.id_facture"]." / ".$ref_societe." / ".$lettrage_date_facture; //reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 					$donnees[$key][$i][25] = ""; 
 					$donnees[$key][$i][26] = ""; 
@@ -1962,7 +1963,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][30] = "";
 					$donnees[$key][$i][31] = "";
 					$donnees[$key][$i][32] = "";
-					$donnees[$key][$i][33] = $ref_mandate;
+					$donnees[$key][$i][33] = $ref_societe;
 					$donnees[$key][$i][34] = "";
 					$donnees[$key][$i][35] = "";
 					$donnees[$key][$i][36] = "";
@@ -1993,7 +1994,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = "0"; //Montant Debit
 					$donnees[$key][$i][21] = number_format($value["facture.prix"]/$value["facture.tva"] ,2); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] = "FACTURE ".$value["facture.id_facture"]." / ".$ref_mandate." / ".$lettrage_date_facture;//reference affaire/facture/periode
+					$donnees[$key][$i][23] = "FACTURE ".$value["facture.id_facture"]." / ".$ref_societe." / ".$lettrage_date_facture;//reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
 					$total_credit += $value["facture.prix"]*($value["facture.tva"]-1);
@@ -2022,7 +2023,7 @@ class facture_lm extends facture {
 					$donnees[$key][$i][20] = "0"; //Montant Debit
 					$donnees[$key][$i][21] = number_format($value["facture.prix"] - ($value["facture.prix"]/$value["facture.tva"]) ,2); //Montant Credit      	
 		        	$donnees[$key][$i][22] = "0";	
-					$donnees[$key][$i][23] =  "FACTURE ".$value["facture.id_facture"]." / ".$ref_mandate." / ".$lettrage_date_facture; //reference affaire/facture/periode
+					$donnees[$key][$i][23] =  "FACTURE ".$value["facture.id_facture"]." / ".$ref_societe." / ".$lettrage_date_facture; //reference affaire/facture/periode
 					$donnees[$key][$i][24] = date("Ymd", strtotime($value["facture.date"])); 
 
 					$total_credit += ($value["facture.prix"] - ($value["facture.prix"]*($value["facture.tva"]-1)));

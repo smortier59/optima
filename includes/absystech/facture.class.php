@@ -509,7 +509,7 @@ class facture_absystech extends facture {
 				ATF::facture_ligne()->i($item,$s);
 			}
 
-			if($infos["periodicite"]){
+			if($infos["periodicite"] && !$echeancier){
 
 				$date = $infos["date_debut_periode"];
 				$date = explode("-", $date);

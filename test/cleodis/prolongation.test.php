@@ -151,7 +151,12 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>"10.00",
 									"frequence_loyer"=>"mois",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 6 month")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 year"))
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 year")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 									)
 							,$loyer_prolongation[0],'Le loyer_prolongation n est pas bon 0');
 
@@ -165,7 +170,12 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"trimestre",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 1 year")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 1 year"))
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 1 year")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 									)
 							,$loyer_prolongation[1],'Le loyer_prolongation n est pas bon 1');
 		
@@ -180,7 +190,12 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"an",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 6 month + 1 year")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 2 year"))
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 2 year")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 									)
 							,$loyer_prolongation[2],'Le loyer_prolongation n est pas bon 2');
 
@@ -194,7 +209,12 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"semestre",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 6 month + 2 year")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 3 year"))
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 3 year")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 									)
 							,$loyer_prolongation[3],'Le loyer_prolongation n est pas bon 3');
 
