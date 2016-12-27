@@ -8,7 +8,7 @@ ALTER TABLE `echeancier` CHANGE `jour_paiement` `jour_facture` ENUM('1','2','3',
 
 ALTER TABLE `echeancier` ADD `mise_en_service` DATE NOT NULL AFTER `commentaire`, ADD `methode_reglement` ENUM('prelevement','reception','jours') NOT NULL AFTER `mise_en_service`;
 ALTER TABLE `echeancier` ADD `prochaine_echeance` DATE NOT NULL AFTER `methode_reglement`;
-
+ALTER TABLE `echeancier` DROP `mise_en_service`;
 --
 -- Tables echeancier_ligne_ponctuelle & echeancier_ligne_periodique
 -- Charlier cyril <ccharlier@absystech.fr>

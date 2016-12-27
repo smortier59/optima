@@ -18,7 +18,7 @@ class echeancier extends classes_optima {
       ,'designation'
       ,'montant_ht'
       ,'debut'
-      ,'fin'
+      ,'fin' 
       ,'variable'
       ,'periodicite'
      
@@ -72,9 +72,12 @@ class echeancier extends classes_optima {
       $data = $this->select_all();
     } else {
       // gestion des filtres
-      if ($get['filters']['actif'] == "on") {
-        $this->q->andWhere("actif","oui");
-      }
+     /* if ($get['filters']['encours'] == "on") {
+
+        $date = getdate();
+        $datePars
+        $this->q->andWhere("encours",$date[,"<");
+      }*/
       $this->q->setLimit($get['limit'])->setCount();
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
     }
