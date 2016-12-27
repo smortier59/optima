@@ -85,3 +85,8 @@ ALTER TABLE `echeancier_ligne_periodique` ADD `ref` VARCHAR(32) NOT NULL AFTER `
 ALTER TABLE `echeancier_ligne_ponctuelle` ADD `ref` VARCHAR(32) NOT NULL AFTER `date_valeur`;
 ALTER TABLE `echeancier_ligne_periodique` DROP `total`;
 ALTER TABLE `echeancier_ligne_periodique` DROP `total`;
+
+ALTER TABLE `echeancier_ligne_periodique` CHANGE `quantite` `quantite` FLOAT NOT NULL;
+ALTER TABLE `echeancier_ligne_ponctuelle` CHANGE `quantite` `quantite` FLOAT NOT NULL;
+ALTER TABLE `echeancier_ligne_periodique` ADD INDEX(`ref`);
+ALTER TABLE `echeancier_ligne_ponctuelle` ADD INDEX(`ref`);

@@ -48,7 +48,14 @@ class echeancier_ligne_periodique extends classes_optima {
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
     // gerer le cas du montant sur le delete 
-    ATF::echeancier()->increase($post['id_echeancier'],'montant_ht','-'.$post["total"]);
+    $this->q->reset();
+    $this->q->addField("quantite")->addField("puht")->addField("id_echeancier")
+            ->where("id_echeancier_ligne_periodique",$get['id'])
+            ->setDimension('row');
+
+    $data =$this->select_all();
+    $total = number_format($data["quantite"]* $data['puht'],2);
+    ATF::echeancier()->increase($data['id_echeancier'],'montant_ht','-'.$total);
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
@@ -65,7 +72,10 @@ class echeancier_ligne_periodique extends classes_optima {
   public function _POST($get,$post) {
     // parser la date sous le bon format pour mysql
     $post["mise_en_service"]=date("Y-m-d",strtotime($post["mise_en_service"]));
+    $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
+
     ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
+    log::logger(ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]), 'ccharlier');
     unset($post["total"]);
     try {
       $result = $this->insert($post);

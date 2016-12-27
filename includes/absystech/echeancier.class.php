@@ -157,7 +157,7 @@ class echeancier extends classes_optima {
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
       }
       unset($post["id_echeancier"],$post['custom']);
-      $post['fin']==" "? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
+      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));      
       $result = $this->insert($post);       
       $return['result'] = true;
       $return['id_echeancier'] = $result;
@@ -226,7 +226,7 @@ class echeancier extends classes_optima {
         $temp =explode("-", $post["prochaine_echeance"]);
         $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
       }
-      $post['fin']==" "? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
+      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));      
       unset($post['custom']);
       $result = $this->update($post);       
       $return['result'] = true;
@@ -258,7 +258,7 @@ class echeancier extends classes_optima {
 
     $date_debut_periode = $get["prochaine_echeance"];
     $date_fin_periode   = $get["fin_echeance"];
-    
+    $date_facture = $get["date_facture"];
 
     $echeancier = $this->select($id_echeancier);
 
@@ -301,7 +301,7 @@ class echeancier extends classes_optima {
 
     $facture["facture"] = array("id_societe"=> $echeancier["id_societe"],
                                 "type_facture" => "facture_periodique",
-                                "date"=> $date_debut_periode,
+                                "date"=> $date_facture,
                                 "infosSup" => NULL,                                
                                 "id_affaire" => $echeancier["id_affaire"],
                                 "date_previsionnelle" => NULL,

@@ -63,7 +63,15 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   */ 
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
-    ATF::echeancier()->increase($post['id_echeancier'],'montant_ht','-'.$post["total"]);
+    // gerer le cas du montant sur le delete 
+    $this->q->reset();
+    $this->q->addField("quantite")->addField("puht")->addField("id_echeancier")
+            ->where("id_echeancier_ligne_ponctuelle",$get['id'])
+            ->setDimension('row');
+
+    $data =$this->select_all();
+    $total = number_format($data["quantite"]* $data['puht'],2);
+    ATF::echeancier()->increase($data['id_echeancier'],'montant_ht','-'.$total);
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
