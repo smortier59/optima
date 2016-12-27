@@ -48,15 +48,30 @@ class echeancier_ligne_periodique extends classes_optima {
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
     // gerer le cas du montant sur le delete 
+    // requete qui recupère la qté et le puht pour le retirer au montant total de l'echeancier
     $this->q->reset();
-    $this->q->addField("quantite")->addField("puht")->addField("id_echeancier")
+    $this->q->addField("quantite")->addField("puht")->addField("valeur_variable")->addField("id_echeancier")
             ->where("id_echeancier_ligne_periodique",$get['id'])
             ->setDimension('row');
 
     $data =$this->select_all();
-    $total = number_format($data["quantite"]* $data['puht'],2);
+    // on exec le delete 
+    $delete =$this->delete($get);
+    // puis on regarde s'il reste des lignes avec une valeur variable 
+    $this->q->reset();
+    $this->q->addField("id_echeancier_ligne_periodique")
+            ->where("id_echeancier",$data["id_echeancier"])
+            ->addCondition("valeur_variable", 'oui')
+            ->setCount();
+    $count = $this->select_all();
+    // s'il y en a pas, on met variable à non dans l'echeancier
+    if($count['count'] ==0){
+      $row = array('id_echeancier'=>$data["id_echeancier"],'variable'=>'non');
+      ATF::echeancier()->update($row);
+    }
+    $total = number_format($data["quantite"]* $data['puht'],2,'.','');
     ATF::echeancier()->increase($data['id_echeancier'],'montant_ht','-'.$total);
-    $return['result'] = $this->delete($get);
+    $return['result'] = $delete;
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
     return $return;
@@ -73,9 +88,11 @@ class echeancier_ligne_periodique extends classes_optima {
     // parser la date sous le bon format pour mysql
     $post["mise_en_service"]=date("Y-m-d",strtotime($post["mise_en_service"]));
     $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
-
+    if ($post['valeur_variable'] == "oui"){
+      $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
+      ATF::echeancier()->update($update);
+    }
     ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
-    log::logger(ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]), 'ccharlier');
     unset($post["total"]);
     try {
       $result = $this->insert($post);
