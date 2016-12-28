@@ -1,5 +1,3 @@
-
-
 <?
 /**
  * Classe echeancier
@@ -344,17 +342,16 @@ class echeancier extends classes_optima {
     try{
       $return = ATF::facture()->insert($facture);
             
-      /*header('Content-Type: application/pdf');
-      header("Content-Transfer-Encoding: binary");
-      header('x-optima-binary: pdf');
+      header('Content-Type: application/pdf');
+      header('Content-Disposition: inline; filename=facture.pdf');
+      //log::logger(substr(base64_encode($return),0,1000), ygautheron);
+      echo base64_encode($return);
 
-      echo $return;
+      // The famous comment : "En attendant..."
       die;
-log::logger($return,ygautheron)      ;
-      $get["display"] = true;
-      return $return;
 
-      //*/return base64_encode($return);
+      $get["display"] = true;
+      return base64_encode($return);
     
     }catch(errorATF $e){
       throw new errorATF($e->getMessage(),500);
