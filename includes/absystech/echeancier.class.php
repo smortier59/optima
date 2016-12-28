@@ -1,3 +1,5 @@
+
+
 <?
 /**
  * Classe echeancier
@@ -55,7 +57,7 @@ class echeancier extends classes_optima {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","mise_en_service","prochaine_echeance","jour_facture","methode_reglement","echeancier.id_affaire");
+    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","prochaine_echeance","jour_facture","methode_reglement","echeancier.id_affaire");
     $this->q->reset();
     $this->q->addField($colsData)
         ->from("echeancier","id_societe","societe","id_societe")
@@ -72,12 +74,12 @@ class echeancier extends classes_optima {
       $data = $this->select_all();
     } else {
       // gestion des filtres
-     /* if ($get['filters']['encours'] == "on") {
-
-        $date = getdate();
-        $datePars
-        $this->q->andWhere("encours",$date[,"<");
-      }*/
+      if ($get['filters']['encours'] == "on") {
+        $this->q->andWhere("prochaine_echeance",'CURRENT_DATE','echeance',"<",false,true);
+      }
+      if ($get['filters']['actif'] == "on") {
+        $this->q->andWhere("actif","oui");
+      }
       $this->q->setLimit($get['limit'])->setCount();
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
     }
@@ -109,20 +111,8 @@ class echeancier extends classes_optima {
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
     // Si on fait un ajout de l'echeance
     else {
-      // Check des champs obligatoire
-      if (!$post['id_societe']) throw new errorATF(ATF::$usr->trans('id_societe_missing','echeancier'));
-      if (!$post['id_affaire']) throw new errorATF(ATF::$usr->trans('id_affaire_missing','echeancier'));
-      if (!$post['designation']) throw new errorATF(ATF::$usr->trans('designation','echeancier'));
-      if (!$post['periodicite']) throw new errorATF(ATF::$usr->trans('periodicite_missing','echeancier'));
-      if (!$post['debut']) throw new errorATF(ATF::$usr->trans('debut_missing','echeancier'));
-      if (!$post['methode_reglement']) throw new errorATF(ATF::$usr->trans('methode_reglement_missing','echeancier'));
-      if (!$post['mise_en_service']) throw new errorATF(ATF::$usr->trans('mise_en_service_missing','echeancier'));
-      if (!$post['methode_reglement']) throw new errorATF(ATF::$usr->trans('methode_reglement_missing','echeancier'));
-      if(!$post['jour_facture']) throw new errorATF(ATF::$usr->trans('jour_facture_missing','echeancier'));
-
       // Insertion
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      $post["mise_en_service"]= date("Y-m-d",strtotime($post["mise_en_service"]));
       if($post['jour_facture'] =="custom") $post["jour_facture"]= $post["custom"];
       $explodeDebut =explode("-", $post["debut"]);
       
@@ -161,7 +151,12 @@ class echeancier extends classes_optima {
       }
       unset($post["id_echeancier"],$post['custom']);
       empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));      
-      $result = $this->insert($post);       
+      try {
+        // Try / catch pour avoir une erreur 500 forcée
+        $result = $this->insert($post);       
+      }catch(errorATF $e){
+        throw new errorATF($e->getMessage(),500);
+      }    
       $return['result'] = true;
       $return['id_echeancier'] = $result;
     }
@@ -175,24 +170,11 @@ class echeancier extends classes_optima {
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
     // Si on fait un ajout de l'echeance
     else {
-      // Check des champs obligatoire
-      if (!$post["id_echeancier"]) throw new errorATF(ATF::$usr->trans('id_echeancier_missing','echeancier'));
-      if (!$post['id_societe']) throw new errorATF(ATF::$usr->trans('id_societe_missing','echeancier'));
-      if (!$post['id_affaire']) throw new errorATF(ATF::$usr->trans('id_affaire_missing','echeancier'));
-      if (!$post['designation']) throw new errorATF(ATF::$usr->trans('designation','echeancier'));
-      if (!$post['periodicite']) throw new errorATF(ATF::$usr->trans('periodicite_missing','echeancier'));
-      if (!$post['debut']) throw new errorATF(ATF::$usr->trans('debut_missing','echeancier'));
-      if (!$post['methode_reglement']) throw new errorATF(ATF::$usr->trans('methode_reglement_missing','echeancier'));
-      if (!$post['mise_en_service']) throw new errorATF(ATF::$usr->trans('mise_en_service_missing','echeancier'));
-      if (!$post['methode_reglement']) throw new errorATF(ATF::$usr->trans('methode_reglement_missing','echeancier'));
-      if(!$post['jour_facture']) throw new errorATF(ATF::$usr->trans('jour_facture_missing','echeancier'));
       // Insertion
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      $post["mise_en_service"]= date("Y-m-d",strtotime($post["mise_en_service"]));
 
       // Insertion
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      $post["mise_en_service"]= date("Y-m-d",strtotime($post["mise_en_service"]));
       if($post['jour_facture'] =="custom") $post["jour_facture"]= $post["custom"];
       $explodeDebut =explode("-", $post["debut"]);
       
@@ -254,7 +236,7 @@ class echeancier extends classes_optima {
     return $return;
   }
 
-  public function _getPdf($get, $post){
+  public function _getPdf(&$get, $post){
 
     $id_echeancier = $get["id_echeancier"];
     $lignes = $get["lignes"];
@@ -362,8 +344,17 @@ class echeancier extends classes_optima {
     try{
       $return = ATF::facture()->insert($facture);
             
-      header('Content-Type: application/pdf');
-      return base64_encode($return);
+      /*header('Content-Type: application/pdf');
+      header("Content-Transfer-Encoding: binary");
+      header('x-optima-binary: pdf');
+
+      echo $return;
+      die;
+log::logger($return,ygautheron)      ;
+      $get["display"] = true;
+      return $return;
+
+      //*/return base64_encode($return);
     
     }catch(errorATF $e){
       throw new errorATF($e->getMessage(),500);
@@ -412,8 +403,4 @@ class echeancier extends classes_optima {
     }
     return $lignes;   
   }
-
-
-
-
 }

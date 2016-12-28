@@ -90,7 +90,7 @@ class echeancier_ligne_periodique extends classes_optima {
     $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
     if ($post['valeur_variable'] == "oui"){
       $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
-      ATF::echeancier()->update($update);
+      ATF::echeancier()->u($update);
     }
     ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
     unset($post["total"]);
