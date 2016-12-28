@@ -86,7 +86,7 @@ class echeancier_ligne_periodique extends classes_optima {
   */
   public function _POST($get,$post) {
     // parser la date sous le bon format pour mysql
-    $post["mise_en_service"]=date("Y-m-d",strtotime($post["mise_en_service"]));
+    $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
     $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
     if ($post['valeur_variable'] == "oui"){
       $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
