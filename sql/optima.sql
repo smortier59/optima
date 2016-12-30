@@ -88,5 +88,9 @@ ALTER TABLE `echeancier_ligne_periodique` DROP `total`;
 
 ALTER TABLE `echeancier_ligne_periodique` CHANGE `quantite` `quantite` FLOAT NOT NULL;
 ALTER TABLE `echeancier_ligne_ponctuelle` CHANGE `quantite` `quantite` FLOAT NOT NULL;
-ALTER TABLE `echeancier_ligne_periodique` ADD INDEX(`ref`);
-ALTER TABLE `echeancier_ligne_ponctuelle` ADD INDEX(`ref`);
+ALTER TABLE `echeancier_ligne_periodique` ADD UNIQUE(`ref`);
+ALTER TABLE `echeancier_ligne_ponctuelle` ADD UNIQUE(`ref`);
+
+
+
+ALTER TABLE `echeancier` CHANGE `methode_reglement` `methode_reglement` ENUM('prelevement-trimestriel','reception','jours','prelevement-mensuel') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
