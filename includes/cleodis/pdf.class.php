@@ -8485,6 +8485,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->styleDetailsProduit = array("border"=>1,"bgcolor"=>"efefef","decoration"=>"I","size"=>8,"align"=>"L");
 
 		$this->facturePDF = true;
+		$this->setHeader(false);
 
 		if ($this->facture['type_facture']=="refi") {
 			$this->demandeRefi = ATF::demande_refi()->select($this->facture['id_demande_refi']);
