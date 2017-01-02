@@ -1,17 +1,17 @@
-<?	
+<?
 /** Classe devis
 * @package Optima
 * @subpackage Cleodis
 */
 require_once dirname(__FILE__)."/../produit.class.php";
-class produit_lm extends produit {	
+class produit_lm extends produit {
 
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
 		$this->colonnes['fields_column'] = array(
-			'produit.produit',											
-			//'produit.id_fournisseur',												 
+			'produit.produit',
+			//'produit.id_fournisseur',
 			//'prix_achat_ht'=>array("custom"=>true,"width"=>80,"rowEditor"=>"setInfos","align"=>"right","renderer"=>"money"),
 			'somme_loyers_engages'=>array("custom"=>true,"nosort"=>true,"align"=>"right","renderer"=>"money"),
 			'detail_loyers'=>array("custom"=>true),
@@ -23,12 +23,12 @@ class produit_lm extends produit {
 			'produit.max'=>array("width"=>80,"rowEditor"=>"setInfos"),
 			'produit.defaut'=>array("width"=>80,"rowEditor"=>"setInfos"),
 		);
-		
+
 		$this->colonnes['primary']=array('produit',
 										'url_produit',
 										'etat'=>array("targetCols"=>1),
 										'nature'=>array("targetCols"=>1),
-										"quantite"=>array("custom"=>true, 
+										"quantite"=>array("custom"=>true,
 														  "targetCols"=>1,
 														  'null'=>true,
 														  'xtype'=>'compositefield',
@@ -46,9 +46,9 @@ class produit_lm extends produit {
 										"afficher"=>array("targetCols"=>1),
 										'id_fabriquant'
 										);
-		
+
 		/*$this->colonnes['panel']['caracteristiques']=array('prix_achat_ht',
-															'tva_prix_achat',															
+															'tva_prix_achat',
 												   			'tva_loyer',
 															'id_fabriquant',
 															'id_fournisseur',
@@ -66,16 +66,16 @@ class produit_lm extends produit {
 		$this->colonnes["panel"]["loyer_lignes"] = array(
 			"loyer"=>array("custom"=>true),
 			'tva_loyer'
-		);		
-		  
+		);
+
 		$this->autocomplete = array(
 			"field"=>array("produit" , "id")
 			,"show"=>array("produit" , "id")
 			,"popup"=>array("produit" , "id")
 		);
 		$this->colonnes['bloquees']['select'] =  array('loyer')	;
-		
-		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);		
+
+		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
 
@@ -84,15 +84,16 @@ class produit_lm extends produit {
 		$this->fieldstructure();
 
 		$this->field_nom = "%produit% (Pack %id_pack_produit% )";
-		$this->foreign_key["id_produit_principal"] = "produit"; 
+		$this->foreign_key["id_produit_principal"] = "produit";
 		$this->foreign_key["id_pack_produit"] = "pack_produit";
+		$this->foreign_key["id_compte_produit"] = "compte_produit";
 
 		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
-				
-		$this->addPrivilege("setInfos","update");		
+
+		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("actifUpdate");
 	}
-	
+
 	/**
 	 * Permet de modifier un champs en AJAX
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -107,22 +108,22 @@ class produit_lm extends produit {
 				loc::mt(ATF::$usr->trans("notice_update_success"))
 				,ATF::$usr->trans("notice_success_title")
 			);
-		}		
+		}
 	}
 
 	public function actifUpdate($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
-        
+
 		$data["id_produit"] = $this->decryptId($infos["id_produit"]);
         $data["etat"] = $infos["etat"];
-               
+
         if ($r=$this->u($data)) {
             ATF::$msg->addNotice(loc::mt(ATF::$usr->trans("notice_update_success")));
         }
         return $r;
     }
 
-	
-	
+
+
 	/**
 	* Surcharge du speed_insert pour pouvoir renvoyer les champs voulus
 	* Utilisation d'un querier d'insertion
@@ -134,8 +135,8 @@ class produit_lm extends produit {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	* @version 3
 	* @return boolean TRUE si cela s'est correctement passé
-	*/	
-	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {	
+	*/
+	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {
 		$last_id = $this->insert($infos,$s,$files,$cadre_refreshed,$nolog);
 		$result["nom"]=$this->nom($last_id);
 		$result["id"]=$last_id;
@@ -164,12 +165,12 @@ class produit_lm extends produit {
 				ATF::_r($key,$item);
 			}
 		}
-		
+
 		return parent::speed_insert_template($infos);
 	}
-	
+
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		
+
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
 		$infos_fournisseur = json_decode($infos["values_".$this->table]["produit_fournisseur"] , true);
 		$infos_loyer_fournisseur = json_decode($infos["values_".$this->table]["loyer_fournisseur"] , true);
@@ -194,7 +195,7 @@ class produit_lm extends produit {
 									));
 		}
 
-		foreach ($infos_fournisseur as $key => $value) {			
+		foreach ($infos_fournisseur as $key => $value) {
 			$id_pf = ATF::produit_fournisseur()->i(array( "id_produit"=> $this->decryptId($last_id),
 													      "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
 													      "prix_prestation"=> $value["produit_fournisseur__dot__prix_prestation"],
@@ -204,7 +205,7 @@ class produit_lm extends produit {
 
 		}
 
-		foreach ($infos_loyer_fournisseur as $key => $value) {			
+		foreach ($infos_loyer_fournisseur as $key => $value) {
 			$id_pf = ATF::produit_fournisseur_loyer()->i(array( "id_produit"=> $this->decryptId($last_id),
 														        "id_fournisseur"=> $value["produit_fournisseur_loyer__dot__id_fournisseur_fk"],
 														        "loyer"=> $value["produit_fournisseur_loyer__dot__loyer"],
@@ -223,18 +224,18 @@ class produit_lm extends produit {
 
 	}
 
-	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){		
-		
+	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
 
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
 		$infos_fournisseur = json_decode($infos["values_".$this->table]["produit_fournisseur"] , true);
 		$infos_loyer_fournisseur = json_decode($infos["values_".$this->table]["loyer_fournisseur"] , true);
 		unset($infos["values_".$this->table]);
-		
+
 		//On supprime les loyers pour les reinserer avant l'update
 		ATF::produit_loyer()->q->reset()->where("id_produit",$this->decryptId($infos["produit"]["id_produit"]));
 		$loyers = ATF::produit_loyer()->select_all();
-		
+
 		foreach ($loyers as $key => $value) {
 			ATF::produit_loyer()->d($value["id_produit_loyer"]);
 		}
@@ -248,17 +249,17 @@ class produit_lm extends produit {
 										   "periodicite"=> $value["produit_loyer__dot__periodicite"],
 										   "ordre"=> $key+1
 									));
-		}	
+		}
 
 		//On supprime les produits fournisseurs pour les reinserer avant l'update
 		ATF::produit_fournisseur()->q->reset()->where("id_produit",$this->decryptId($infos["produit"]["id_produit"]));
 		$produit_fournisseurs = ATF::produit_fournisseur()->select_all();
-		
+
 		foreach ($produit_fournisseurs as $key => $value) {
-			ATF::produit_fournisseur()->d($value["id_produit_fournisseur"]);			
+			ATF::produit_fournisseur()->d($value["id_produit_fournisseur"]);
 		}
 
-		foreach ($infos_fournisseur as $key => $value) {			
+		foreach ($infos_fournisseur as $key => $value) {
 			$id_pf = ATF::produit_fournisseur()->i(array( "id_produit"=> $this->decryptId($infos["produit"]["id_produit"]),
 													      "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
 													      "prix_prestation"=> $value["produit_fournisseur__dot__prix_prestation"],
@@ -270,12 +271,12 @@ class produit_lm extends produit {
 		//On supprime les produits fournisseurs loyer pour les reinserer avant l'update
 		ATF::produit_fournisseur_loyer()->q->reset()->where("id_produit",$this->decryptId($infos["produit"]["id_produit"]));
 		$produit_fournisseurs_loyer = ATF::produit_fournisseur_loyer()->select_all();
-		
+
 		foreach ($produit_fournisseurs_loyer as $key => $value) {
-			ATF::produit_fournisseur_loyer()->d($value["id_produit_fournisseur_loyer"]);			
+			ATF::produit_fournisseur_loyer()->d($value["id_produit_fournisseur_loyer"]);
 		}
 
-		foreach ($infos_loyer_fournisseur as $key => $value) {			
+		foreach ($infos_loyer_fournisseur as $key => $value) {
 			$id_pf = ATF::produit_fournisseur_loyer()->i(array( "id_produit"=> $this->decryptId($infos["produit"]["id_produit"]),
 														        "id_fournisseur"=> $value["produit_fournisseur_loyer__dot__id_fournisseur_fk"],
 														        "loyer"=> $value["produit_fournisseur_loyer__dot__loyer"],
@@ -294,7 +295,7 @@ class produit_lm extends produit {
 		if(is_array($cadre_refreshed)){	ATF::produit()->redirection("select",$infos["produit"]["id_produit"]);	}
 		return $infos["produit"]["id_produit"];
 	}
-	
+
 
 	/**
 	* Surcharge du select-All
@@ -320,7 +321,7 @@ class produit_lm extends produit {
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
 
-		
+
 		foreach ($return["data"] as $key => $value) {
 			if($value["produit.id_produit_principal_fk"] == ""){
 				$return["data"][$key]["produit.id_produit_principal"] = NULL;
@@ -341,7 +342,7 @@ class produit_lm extends produit {
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id_produit
 	* @return float $prix_total
-	
+
 	public function prix_achat_prestation($id_produit){
 		ATF::produit_fournisseur()->q->reset()
 			->addField("SUM(IF(produit_fournisseur.recurrence='achat',produit_fournisseur.prix_prestation,0))","prix_achat_ht")
