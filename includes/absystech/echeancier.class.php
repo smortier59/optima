@@ -38,6 +38,7 @@ class echeancier extends classes_optima {
     $this->field_nom = 'designation';
   }
   /**
+   *
   * Fonctions _GET pour telescope
   * @package Telescope
   * @author Charlier Cyril <ccharlier@absystech.fr>
@@ -56,7 +57,8 @@ class echeancier extends classes_optima {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array("echeancier.id_echeancier","echeancier.designation","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","prochaine_echeance","jour_facture","echeancier.id_termes","echeancier.id_affaire");
+   $colsData = array("echeancier.id_echeancier","echeancier.designation","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","prochaine_echeance","jour_facture","echeancier.id_termes","echeancier.id_affaire");
+
     $this->q->reset();
     $this->q->addField($colsData)
         ->addField("SUM(echeancier_ligne_periodique.quantite*echeancier_ligne_periodique.puht)","montant_ht")
@@ -72,7 +74,7 @@ class echeancier extends classes_optima {
     }
 
     if ($get['id_echeancier']) {
-      $this->q->where("id_echeancier",$get['id_echeancier'])->setCount(false)->setDimension('row');
+      $this->q->where("echeancier.id_echeancier",$get['id_echeancier'])->setCount(false)->setDimension('row');
       $data = $this->select_all();
     } else {
       // gestion des filtres
@@ -349,14 +351,14 @@ class echeancier extends classes_optima {
 
       $return = ATF::facture()->insert($facture);
 
-      header('Content-Type: application/pdf');
+      /*header('Content-Type: application/pdf');
       header('Content-Disposition: inline; filename=facture.pdf');
       echo base64_encode($return);
 
       // The famous comment : "En attendant..."
       die;
 
-      $get["display"] = true;
+      $get["display"] = true;*/
       return base64_encode($return);
 
     }catch(errorATF $e){
@@ -365,6 +367,9 @@ class echeancier extends classes_optima {
     }
   }
 
+  public function _getDataLigne($get,$post){
+    return ATF::getClass("echeancier_ligne_".$post["type"])->select($post["id"]);
+  }
 
   public function _getLignePeriode($get , $post){
     return $this->getLignesPeriode($get["id_echeancier"], $get["periode_debut"], $get["periode_fin"], true);
