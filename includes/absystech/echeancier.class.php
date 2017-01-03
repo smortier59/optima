@@ -72,7 +72,7 @@ class echeancier extends classes_optima {
     }
 
     if ($get['id_echeancier']) {
-      $this->q->where("id_echeancier",$get['id_echeancier'])->setCount(false)->setDimension('row');
+      $this->q->where("echeancier.id_echeancier",$get['id_echeancier'])->setCount(false)->setDimension('row');
       $data = $this->select_all();
     } else {
       // gestion des filtres
