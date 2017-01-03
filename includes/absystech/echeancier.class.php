@@ -4,7 +4,7 @@
  * @package Optima
  */
 class echeancier extends classes_optima {
- 
+
   /**
    * Constructeur
    */
@@ -18,10 +18,10 @@ class echeancier extends classes_optima {
       ,'designation'
       ,'montant_ht'
       ,'debut'
-      ,'fin' 
+      ,'fin'
       ,'variable'
       ,'periodicite'
-     
+
     );
 
     $this->colonnes['primary'] = array(
@@ -39,7 +39,7 @@ class echeancier extends classes_optima {
   /**
   * Fonctions _GET pour telescope
   * @package Telescope
-  * @author Charlier Cyril <ccharlier@absystech.fr> 
+  * @author Charlier Cyril <ccharlier@absystech.fr>
   * @param $get array contient le tri, page limit et potentiellement un id.
   * @param $post array Argument obligatoire mais inutilisé ici.
   * @return array un tableau avec les données
@@ -48,14 +48,14 @@ class echeancier extends classes_optima {
     // Gestion du tri
     if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "societe";
     if (!$get['trid']) $get['trid'] = "asc";
- 
+
     // Gestion du limit
     if (!$get['limit']) $get['limit'] = 30;
 
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","prochaine_echeance","jour_facture","methode_reglement","echeancier.id_affaire");
+    $colsData = array("id_echeancier","designation","montant_ht","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","prochaine_echeance","jour_facture","echeancier.id_termes","echeancier.id_affaire");
     $this->q->reset();
     $this->q->addField($colsData)
         ->from("echeancier","id_societe","societe","id_societe")
@@ -93,12 +93,12 @@ class echeancier extends classes_optima {
       $return = $data['data'];
     }
     return $return;
-  } 
+  }
   /**
   * Fonctions _POST echeancier pour telescope
-  * @package Telescope 
-  * @author Charlier Cyril <ccharlier@absystech.fr> 
-  * @param   $[get] array 
+  * @package Telescope
+  * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @param   $[get] array
   * @param $post array contient toutes les donnees envoyées par le formulaire
   * @return Integer & boolean
   */
@@ -113,7 +113,7 @@ class echeancier extends classes_optima {
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
       if($post['jour_facture'] =="custom") $post["jour_facture"]= $post["custom"];
       $explodeDebut =explode("-", $post["debut"]);
-      
+
       // switch permettant de calculer la prochaine date d'echeance en fonction de la periodicité
       switch($post["periodicite"]){
         case "annuelle":
@@ -148,13 +148,13 @@ class echeancier extends classes_optima {
           $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
       }
       unset($post["id_echeancier"],$post['custom']);
-      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));      
+      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
       try {
         // Try / catch pour avoir une erreur 500 forcée
-        $result = $this->insert($post);       
+        $result = $this->insert($post);
       }catch(errorATF $e){
         throw new errorATF($e->getMessage(),500);
-      }    
+      }
       $return['result'] = true;
       $return['id_echeancier'] = $result;
     }
@@ -175,7 +175,7 @@ class echeancier extends classes_optima {
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
       if($post['jour_facture'] =="custom") $post["jour_facture"]= $post["custom"];
       $explodeDebut =explode("-", $post["debut"]);
-      
+
       // switch permettant de calculer la prochaine date d'echeance en fonction de la periodicité
       switch($post["periodicite"]){
         case "annuelle":
@@ -209,9 +209,9 @@ class echeancier extends classes_optima {
         $temp =explode("-", $post["prochaine_echeance"]);
         $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
       }
-      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));      
+      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
       unset($post['custom']);
-      $result = $this->update($post);       
+      $result = $this->update($post);
       $return['result'] = true;
       $return['id_echeancier'] = $post["id_echeancier"];
     }
@@ -220,11 +220,11 @@ class echeancier extends classes_optima {
   /**
   * Permet de supprimer un contrat
   * @package Telescope
-  * @author Cyril CHARLIER <ccharlier@absystech.fr> 
+  * @author Cyril CHARLIER <ccharlier@absystech.fr>
   * @param $get array contient l'id a l'index 'id'
   * @param $post array vide
   * @return array result en booleen et notice sous forme d'un tableau
-  */ 
+  */
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
     $get["actif"]="non";
@@ -251,9 +251,9 @@ class echeancier extends classes_optima {
 
     foreach ($lignes_echeancier as $key => $value) {
       $p=array();
-     
+
       $p["facture_ligne__dot__ref"] = $value["ref"];
-      $p["facture_ligne__dot__produit"] = $value["designation"];        
+      $p["facture_ligne__dot__produit"] = $value["designation"];
 
       if($value["valeur_variable"] == "oui"){
         $p["facture_ligne__dot__quantite"] = $lignes[$value["type"]][$value["id_echeancier_ligne_".$value["type"]]]["quantite"];
@@ -262,9 +262,9 @@ class echeancier extends classes_optima {
         $p["facture_ligne__dot__quantite"] = $value["quantite"];
         $p["facture_ligne__dot__prix"] = $value["puht"];
       }
-      
+
       $p["facture_ligne__dot__prix_achat"] = NULL;
-      $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;            
+      $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;
       $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
       $p["facture_ligne__dot__serial"] = null;
       $p["facture_ligne__dot__prix_nb"] = null;
@@ -285,20 +285,20 @@ class echeancier extends classes_optima {
     $facture["facture"] = array("id_societe"=> $echeancier["id_societe"],
                                 "type_facture" => "facture_periodique",
                                 "date"=> $date_facture,
-                                "infosSup" => NULL,                                
+                                "infosSup" => NULL,
                                 "id_affaire" => $echeancier["id_affaire"],
                                 "date_previsionnelle" => NULL,
                                 "date_relance" => NULL,
                                 "affaire_sans_devis_libelle" => NULL,
-                                "mode" => NULL, 
+                                "mode" => NULL,
                                 "periodicite" => $echeancier["periodicite"],
                                 "id_facture_parente" => NULL,
-                                "id_termes" => NULL, 
+                                "id_termes" => $echeancier["id_termes"],
                                 "date_debut_periode" => $date_debut_periode,
                                 "date_fin_periode" => $date_fin_periode,
-                                "sous_total" => NULL, 
-                                "marge" => NULL, 
-                                "frais_de_port" => NULL, 
+                                "sous_total" => NULL,
+                                "marge" => NULL,
+                                "frais_de_port" => NULL,
                                 "marge_absolue" => NULL,
                                 "prix" =>  NULL,
                                 "tva" => "1.200",
@@ -315,7 +315,7 @@ class echeancier extends classes_optima {
         // on change la date de début de prochaine echeance s'il n'y a pas de fin de contrat
         ATF::echeancier()->u(
           array(
-            "id_echeancier"=>$id_echeancier, 
+            "id_echeancier"=>$id_echeancier,
             "prochaine_echeance"=>
               date("Y-m-d",strtotime("+1 day",strtotime($date_fin_periode)))
           )
@@ -324,27 +324,29 @@ class echeancier extends classes_optima {
         // si la date de fin de contrat est avant la fin de période actuelle
         if(date('Y-m-d',strtotime($get["fin_contrat"])) < date('Y-m-d', strtotime($date_fin_periode)) ){
           // le contrat est fini, on peut cacher la ligne de la liste des facturations
-          ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"actif"=>"non"));         
+          ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"actif"=>"non"));
         }else{
            ATF::echeancier()->u(
             array(
-              "id_echeancier"=>$id_echeancier, 
+              "id_echeancier"=>$id_echeancier,
               "prochaine_echeance"=>
               date("Y-m-d",strtotime("+1 day",strtotime($date_fin_periode)))
             )
           );
-        }   
+        }
       }
     }
+
+
     $facture["echeancier"] = true;
 
 
     try{
+
       $return = ATF::facture()->insert($facture);
-            
+
       header('Content-Type: application/pdf');
       header('Content-Disposition: inline; filename=facture.pdf');
-      //log::logger(substr(base64_encode($return),0,1000), ygautheron);
       echo base64_encode($return);
 
       // The famous comment : "En attendant..."
@@ -352,10 +354,11 @@ class echeancier extends classes_optima {
 
       $get["display"] = true;
       return base64_encode($return);
-    
+
     }catch(errorATF $e){
+      log::logger($e->getMessage() , "mfleurquin");
       throw new errorATF($e->getMessage(),500);
-    }    
+    }
   }
 
 
@@ -376,16 +379,16 @@ class echeancier extends classes_optima {
     ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier);
     $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
 
-    foreach ($echeancier_ligne_ponctuelle as $key => $value) {      
-      $d3 = str_replace("-", "", $value["date_valeur"]);   
+    foreach ($echeancier_ligne_ponctuelle as $key => $value) {
+      $d3 = str_replace("-", "", $value["date_valeur"]);
 
       if($periode_debut <= $d3 && $d3 <= $periode_fin){
           $value["type"] = "ponctuelle";
           $lignes[] = $value;
-      }      
+      }
     }
 
-    foreach ($echeancier_ligne_periodique as $key => $value) {     
+    foreach ($echeancier_ligne_periodique as $key => $value) {
       $value["type"] = "periodique";
       $lignes[] = $value;
     }
@@ -398,6 +401,6 @@ class echeancier extends classes_optima {
       $return["echeancier"]["affaire"] = ATF::affaire()->select($return["echeancier"]["id_affaire"], "affaire");
       return $return;
     }
-    return $lignes;   
+    return $lignes;
   }
 }
