@@ -480,7 +480,7 @@ class contact extends classes_optima {
 	/** Fonction qui supprime un contact
 	* @author Charlier cyril <ccharlier@absystech.fr>
 	*/
-	/*
+	
 	public function _DELETE($get,$post) {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 		$return['result'] = $this->delete($get);
@@ -488,7 +488,6 @@ class contact extends classes_optima {
     	$return['notices'] = ATF::$msg->getNotices();
         return $return;
 	}
- */
 
 	/**
 	* Permet de modifier un contact depuis telescope
@@ -497,58 +496,153 @@ class contact extends classes_optima {
 	* @param $post array Contient les données envoyé en POST par le formulaire.
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/ 
-	/*
+
 	public function _PUT($get,$post){
 		$input = file_get_contents('php://input');
-	    if (!empty($input)) parse_str($input,$post);
+	   if (!empty($input)) parse_str($input,$post);
 		$return = array();
-        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-    	// Si on fait un update du contact
-    	else {
-	        // Check des champs obligatoire
+    if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    // Si on fait un update du contact
+    else {
+	    // Check des champs obligatoire
 			if (!$post['id_contact']) throw new errorATF(ATF::$usr->trans('id_contact_missing','user'));
 	    if (!$post['nom']) throw new errorATF(ATF::$usr->trans('nom_missing','user'));
 	    if (!$post['prenom']) throw new errorATF(ATF::$usr->trans('prenom_missing','user'));
 			if (!$post['civilite']) throw new errorATF(ATF::$usr->trans('civilite_missing','user'));
 			if (!$post['etat']) throw new errorATF(ATF::$usr->trans('etat_missing','user'));
-	        // Insertion
-        	$this->update($post);    		
-        	$return['result'] = true;
-        	$return['id_contact'] = $post['id_contact'];
-    	}
-           	// Récupération des notices créés
-        $return['notices'] = ATF::$msg->getNotices();
-
-        return $return;
+	    // Insertion
+	    $post['private']= "non";
+			$result = $this->update($post); 
+      $return['result'] = true;
+      $return['id_contact'] = $post['id_contact'];
+    }
+    // Récupération des notices créés
+    $return['notices'] = ATF::$msg->getNotices();
+		return $return;
 	}
-	*/
 	/**
 	* Permet d'ajouter un contact
 	* @author cyril CHARLIER <ccharlier@absystech.fr>
 	* @param $get array Argument obligatoire mais inutilisé ici.
 	* @param $post array Contient les données envoyé en POST par le formulaire.
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
-	*/
-	/*  	
+	*/ 	
 	public function _POST($get,$post){
 		$input = file_get_contents('php://input');
-	    if (!empty($input)) parse_str($input,$post);
+	  if (!empty($input)) parse_str($input,$post);
 		$return = array();
-        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-    	else {
-	        // Check des champs obligatoire
+    if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    else {
+	    // Check des champs obligatoire
 	    if (!$post['nom']) throw new errorATF(ATF::$usr->trans('nom_missing','contact'));
-	    if (!$post['prenom']) throw new errorATF(ATF::$usr->trans('prenom_missing','contact'));
 			if (!$post['civilite']) throw new errorATF(ATF::$usr->trans('civilite_missing','contact'));
 			if (!$post['etat']) throw new errorATF(ATF::$usr->trans('etat_missing','contact'));
-	        // Insertion
-        	$result = $this->insert($post);    		
-        	$return['result'] = true;
-        	$return['id_user'] = $result;
+			if (!$post['id_societe']) throw new errorATF(ATF::$usr->trans('id_societe_missing','contact'));
+	    try{
+				$result = $this->insert($post); 
+			}catch(errorATF $e){
+				throw new errorATF($e->getMessage(),500);
     	}
-        return $return;
+      $return['result'] = true;
+      $return['id_user'] = $result;
+    }
+    return $return;
 	}
-	*/
+	/**
+	* Permet de récupérer la liste des contacts pour telescope
+	* @package Telescope
+	* @author Morgan FLEURQUIB <mfleurquin@absystech.fr> 
+	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/ 
+	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
+	public function _GET($get,$post) {
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "nom";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+
+		$colsData = array(
+			"contact.id_contact"=>array(),
+			"contact.id_societe"=>array("visible"=>false),
+			"contact.civilite"=>array(),
+			"contact.nom"=>array(),
+			"contact.prenom"=>array(),
+			"contact.tel"=>array(),
+			"contact.gsm"=>array(),
+			"contact.email"=>array(),
+			"contact.etat"=>array(),
+			"contact.id_pays"=>array(),
+			"contact.fonction"=>array(),
+			"contact.adresse"=>array(),
+			"contact.cp"=>array(),
+			"contact.ville"=>array()
+		);
+		
+
+
+		$this->q->reset();
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get["search"]);
+		}
+
+		if ($get['id']) {
+			$this->q->where("id_contact",$get['id'])->setLimit(1);
+		} else {
+			$this->q->setLimit($get['limit']);
+
+		}
+		switch ($get['tri']) {
+			case 'id_societe':	
+				$get['tri'] = "contact.".$get['tri'];
+			break;
+		}
+
+		if($get["filter"]){
+			foreach ($get["filter"] as $key => $value) {
+				if (strpos($key, 'contact') !== false) {
+					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+				}
+			}
+		}
+
+		$this->q->addField($colsData);
+
+		$this->q->from("contact","id_societe","societe","id_societe");
+
+
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
+
+		if ($get['id']) {
+	        $return = $data['data'][0];			
+		} else {
+			// Envoi des headers
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+	    $return = $data['data'];			
+		}
+
+		return $return;
+	}
 };
 
 ?>
