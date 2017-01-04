@@ -48,6 +48,7 @@ class echeancier_ligne_periodique extends classes_optima {
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
     // gerer le cas du montant sur le delete
+    // requete qui recupère la qté et le puht pour le retirer au montant total de l'echeancier
     $this->q->reset();
     $this->q->addField("quantite")->addField("puht")->addField("valeur_variable")->addField("id_echeancier")
             ->where("id_echeancier_ligne_periodique",$get['id'])
@@ -68,6 +69,8 @@ class echeancier_ligne_periodique extends classes_optima {
       $row = array('id_echeancier'=>$data["id_echeancier"],'variable'=>'non');
       ATF::echeancier()->update($row);
     }
+    $total = number_format($data["quantite"]* $data['puht'],2,'.','');
+    ATF::echeancier()->increase($data['id_echeancier'],'montant_ht','-'.$total);
     $return['result'] = $delete;
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
@@ -82,20 +85,29 @@ class echeancier_ligne_periodique extends classes_optima {
   * @return boolean | integer
   */
   public function _POST($get,$post) {
-    // parser la date sous le bon format pour mysql
-    $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
-    $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
-    if ($post['valeur_variable'] == "oui"){
-      $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
-      ATF::echeancier()->u($update);
+    if($post["id_echeancier_ligne_periodique"]){
+      unset($post["id_echeancier"],$post["total"]);
+      try {
+        $result = $this->update($post);
+      } catch (errorSQL $e) {
+        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      }
+    }else{
+      // parser la date sous le bon format pour mysql
+      $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
+      $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
+      if ($post['valeur_variable'] == "oui"){
+        $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
+        ATF::echeancier()->u($update);
+      }
+      ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
+      unset($post["total"]);
+      try {
+        $result = $this->insert($post);
+      } catch (errorSQL $e) {
+        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      }
     }
-    unset($post["total"]);
-    try {
-      $result = $this->insert($post);
-    } catch (errorSQL $e) {
-      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
-    }
-
-    return $result;
+    return true;
   }
 }

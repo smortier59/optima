@@ -42,13 +42,22 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   * @return boolean | integer
   */
   public function _POST($get,$post) {
-    // parser la date sous le bon format pour mysql
-    $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
-    unset($post["total"]);
-    try {
-      $result = $this->insert($post);
-    } catch (errorSQL $e) {
-      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+    if($post["id_echeancier_ligne_ponctuelle"]){
+      unset($post["id_echeancier"],$post["total"]);
+      try {
+        $result = $this->update($post);
+      } catch (errorSQL $e) {
+        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      }
+    }else{
+      // parser la date sous le bon format pour mysql
+      $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
+      unset($post["total"]);
+      try {
+        $result = $this->insert($post);
+      } catch (errorSQL $e) {
+        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      }
     }
     return true;
   }
