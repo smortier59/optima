@@ -1,0 +1,1 @@
+ALTER TABLE `echeancier` DROP `montant_ht`

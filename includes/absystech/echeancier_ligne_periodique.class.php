@@ -4,7 +4,7 @@
  * @package Optima
  */
 class echeancier_ligne_periodique extends classes_optima {
- 
+
   /**
    * Constructeur
    */
@@ -22,7 +22,7 @@ class echeancier_ligne_periodique extends classes_optima {
       ,'echeancier_ligne_periodique.mise_en_service'
       ,'echeancier_ligne_periodique.id_compte_absystech'
       ,'echeancier_ligne_periodique.id_echeancier'
-     
+
     );
 
     $this->colonnes['primary'] = array(
@@ -40,14 +40,14 @@ class echeancier_ligne_periodique extends classes_optima {
   /**
   * Permet de supprimer une ligne d'echeancier périodique
   * @package Telescope
-  * @author Cyril CHARLIER <ccharlier@absystech.fr> 
+  * @author Cyril CHARLIER <ccharlier@absystech.fr>
   * @param $get array contient l'id a l'index 'id'
   * @param $post array vide
   * @return array result en booleen et notice sous forme d'un tableau
-  */ 
+  */
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
-    // gerer le cas du montant sur le delete 
+    // gerer le cas du montant sur le delete
     // requete qui recupère la qté et le puht pour le retirer au montant total de l'echeancier
     $this->q->reset();
     $this->q->addField("quantite")->addField("puht")->addField("valeur_variable")->addField("id_echeancier")
@@ -55,9 +55,9 @@ class echeancier_ligne_periodique extends classes_optima {
             ->setDimension('row');
 
     $data =$this->select_all();
-    // on exec le delete 
+    // on exec le delete
     $delete =$this->delete($get);
-    // puis on regarde s'il reste des lignes avec une valeur variable 
+    // puis on regarde s'il reste des lignes avec une valeur variable
     $this->q->reset();
     $this->q->addField("id_echeancier_ligne_periodique")
             ->where("id_echeancier",$data["id_echeancier"])
@@ -79,27 +79,35 @@ class echeancier_ligne_periodique extends classes_optima {
   /**
   * Fonction _POST pour telescope
   * @package Telescope
-  * @author Charlier Cyril <ccharlier@absystech.fr> 
+  * @author Charlier Cyril <ccharlier@absystech.fr>
   * @param $get array.
   * @param $post array Argument obligatoire.
-  * @return boolean | integer 
+  * @return boolean | integer
   */
   public function _POST($get,$post) {
-    // parser la date sous le bon format pour mysql
-    $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
-    $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
-    if ($post['valeur_variable'] == "oui"){
-      $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
-      ATF::echeancier()->u($update);
+    if($post["id_echeancier_ligne_periodique"]){
+      unset($post["id_echeancier"],$post["total"]);
+      try {
+        $result = $this->update($post);
+      } catch (errorSQL $e) {
+        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      }
+    }else{
+      // parser la date sous le bon format pour mysql
+      $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
+      $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
+      if ($post['valeur_variable'] == "oui"){
+        $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
+        ATF::echeancier()->u($update);
+      }
+      ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
+      unset($post["total"]);
+      try {
+        $result = $this->insert($post);
+      } catch (errorSQL $e) {
+        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      }
     }
-    ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
-    unset($post["total"]);
-    try {
-      $result = $this->insert($post);
-    } catch (errorSQL $e) {
-      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
-    }
-
     return true;
-  } 
+  }
 }
