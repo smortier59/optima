@@ -48,7 +48,7 @@ class echeancier extends classes_optima {
   */
   public function _GET($get,$post) {
     // Gestion du tri
-    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "societe";
+    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "echeancier.id_echeancier";
     if (!$get['trid']) $get['trid'] = "asc";
 
     // Gestion du limit
