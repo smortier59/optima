@@ -70,7 +70,7 @@ class echeancier_ligne_periodique extends classes_optima {
       ATF::echeancier()->update($row);
     }
     $total = number_format($data["quantite"]* $data['puht'],2,'.','');
-    ATF::echeancier()->increase($data['id_echeancier'],'montant_ht','-'.$total);
+    //ATF::echeancier()->increase($data['id_echeancier'],'montant_ht','-'.$total);
     $return['result'] = $delete;
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
@@ -100,7 +100,7 @@ class echeancier_ligne_periodique extends classes_optima {
         $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
         ATF::echeancier()->u($update);
       }
-      ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
+      //ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
       unset($post["total"]);
       try {
         $result = $this->insert($post);
