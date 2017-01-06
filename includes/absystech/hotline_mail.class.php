@@ -1,5 +1,5 @@
 <?
-/**  
+/**
 * Classe Hotline_mail
 * Gère la construction et l'envoi des mails de la hotline.
 * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
@@ -25,7 +25,7 @@ class hotline_mail {
 	* @var mixed
 	*/
 	private $mail_prise_en_charge_contact=NULL;
-	
+
 	/**
 	* Mail notification de prise en charge envoyé à la hotline
 	* @var mixed
@@ -61,7 +61,7 @@ class hotline_mail {
 	* @var mixed
 	*/
 	private $mail_interaction=NULL;
-	
+
 	/**
 	* Mail notification de transfert à un utilisateur
 	* @var mixed
@@ -73,13 +73,13 @@ class hotline_mail {
 	* @var mixed
 	*/
 	private $mail_pole_transfert=NULL;
-	
+
 	/**
 	* Mail actuel
 	* @var mixed
 	*/
 	private $current_mail=NULL;
-			
+
 	/**
 	* Crée un nouveau mail Hotline
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -97,15 +97,15 @@ class hotline_mail {
 		if(!$hotline=ATF::hotline()->select($id_hotline)) throw new errorATF(ATF::$usr->trans("null_hotline","hotline"));
 		//Current mail
 		//if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
-		
+
 		//Test template
 		if(!$template) throw new errorATF(ATF::$usr->trans("templateNULL","hotline"));
-		
+
 		//Recherche du contact et de la société
 		$contact = ATF::contact()->nom(ATF::hotline()->decryptId($hotline['id_contact']));
 		$societe = ATF::societe()->nom(ATF::hotline()->decryptId($hotline['id_societe']));
 		$societe_detail = ATF::societe()->select($hotline["id_societe"]);
-				
+
 		//Données envoyées au template
 		$infos["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$infos["portail_hotline_url"]=ATF::hotline()->createPortailHotlineURL($societe_detail["ref"],$societe_detail["divers_5"],$hotline["id_hotline"],$hotline["id_contact"],"validation");
@@ -132,15 +132,19 @@ class hotline_mail {
 		$this->current_mail = new mail($infos);
 		//return $this->mail->send();
 	}
-	
+
 	/**
 	* Envoi le mail courant (current_mail)
 	*/
 	public function sendMail(){
-		if(!$this->current_mail) throw new errorATF("null_current_mail");
-		return $this->current_mail->send();
+		if(!$this->current_mail) {
+			ATF::$msg->addWarning(ATF::$usr->trans("le_mail_n_a_pas_ete_envoye"));
+			// throw new errorATF("null_current_mail");
+		} else {
+			return $this->current_mail->send();
+		}
 	}
-	
+
 	/**
 	* Donne le mail actuel
 	* @return mixed
@@ -150,7 +154,7 @@ class hotline_mail {
 		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 		return $this->current_mail;
 	}
-	
+
 	/**
 	* Initialise le mail courant
 	* @param string $mail le nom du mail courant
@@ -158,7 +162,7 @@ class hotline_mail {
 	public function setCurrentMail($mail){
 		$this->current_mail=&$this->$mail;
 	}
-	
+
 //	/**
 //	* Indique l'objet du mail
 //	* @param int $id_requete Le numéro de la requête
@@ -169,7 +173,7 @@ class hotline_mail {
 //	public function setObj($id_requete,$societe,$etat,$sujet){
 //		return "[".$id_requete."-".$societe."-".$etat."] ".$sujet;
 //	}
-	
+
 	/**
 	* Création de mail pour AbsysTech
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -187,7 +191,7 @@ class hotline_mail {
 		$from="Hotline AbsysTech <optima-hotline-".ATF::$codename."-".ATF::hotline()->cryptId($id_hotline)."-".ATF::user()->cryptId($id_contact["id_contact"])."@absystech-speedmail.com>";
 		$this->createMail($id_hotline,$obj,$from,$to,$template,$id_hotline_interaction,$pj);
 	}
-	
+
 	/**
 	* Création de mail pour les clients
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -204,18 +208,20 @@ class hotline_mail {
 		if($to==ATF::user()->select(ATF::hotline()->select($id_hotline,"id_user"),"email")){
 			//throw new errorATF(ATF::$usr->trans("same_mail"));
 			ATF::$msg->addWarning(ATF::$usr->trans("same_mail"));
+			return false;
 		}else{
 			ATF::hotline()->q->reset()->where("id_hotline", $id_hotline);
 			$id_contact = ATF::hotline()->select_row();
 			$from="Hotline AbsysTech <optima-hotline-".ATF::$codename."-".ATF::hotline()->cryptId($id_hotline)."-".ATF::user()->cryptId($id_contact["id_contact"])."@absystech-speedmail.com>";
 
 			$this->createMail($id_hotline,$obj,$from,$to,$template,$id_hotline_interaction,$pj,$mep);
+			return true;
 		}
 	}
-	
+
 	/**
 	* CLIENT
-	* Crée un mail de facturation. 
+	* Crée un mail de facturation.
 	* Cela concerne une demande de validation ou notifie que le travail est à la charge d'AbsysTech ou pris en charge tout simplement (affaire)
 	* @param int $id_hotline
 	*/
@@ -228,9 +234,9 @@ class hotline_mail {
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_contact"));
 		$template="hotline_facturation";
 		$this->setCurrentMail("mail_billing");
-		$this->createMailForCustomers($id_hotline,$obj,$to,$template);
+		return $this->createMailForCustomers($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail en interne lors de la création d'une requête
@@ -248,7 +254,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_insert");
 		$this->createMailForAT($id_hotline,$obj,$to,$template,NULL,$pj);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail de prise en charge au contact
@@ -265,7 +271,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_prise_en_charge_hotline");
 		$this->createMailForAT($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* CLIENT
 	* Crée un mail de prise en charge au client
@@ -282,7 +288,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_prise_en_charge_contact");
 		$this->createMailForCustomers($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* CLIENT
 	* Crée un mail de fin de requête
@@ -299,7 +305,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_resolve");
 		$this->createMailForCustomers($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* CLIENT
 	* Crée un mail d'annulation de requête
@@ -316,7 +322,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_cancel");
 		$this->createMailForCustomers($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail d'attente de mise en prod
@@ -333,7 +339,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_wait_mep");
 		$this->createMailForAT($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail de validation de mise en prod
@@ -350,7 +356,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_mep");
 		$this->createMailForAT($id_hotline,$obj,$to,$template);
 	}
-	
+
 	/**
 	* CLIENT
 	* Crée un mail d'interaction
@@ -378,7 +384,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_interaction");
 		$this->createMailForCustomers($id_hotline,$obj,$to,$template,$id_hotline_interaction,$pj,$mep);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail d'interaction interne envoyé à tous les intervenants
@@ -397,14 +403,14 @@ class hotline_mail {
 			ATF::hotline_interaction()->q->reset()->where("id_hotline_interaction", $id_hotline_interaction);
 			$interaction = ATF::hotline_interaction()->select_row();
 			$obj=ATF::$usr->trans("mail_hotline_objet8")." ".ATF::contact()->nom($interaction["id_contact"]);
-		}		
-		
+		}
+
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_user"));
 		$template="hotline_interaction_hotline";
 		$this->setCurrentMail("mail_interaction");
 		$this->createMailForAT($id_hotline,$obj,$to,$template,$id_hotline_interaction,$pj);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail de transfert à un utilisateur
@@ -421,7 +427,7 @@ class hotline_mail {
 		$this->setCurrentMail("mail_user_transfert");
 		$this->createMailForAT($id_hotline,$obj,$to,$template,$id_hotline_interaction);
 	}
-	
+
 	/**
 	* INTERNE
 	* Crée un mail de transfert à un pole
