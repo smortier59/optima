@@ -1041,7 +1041,7 @@ class societe_cleodisbe extends societe_cleodis {
     $messageSociete =$xml->FindCompaniesResult->Messages->Message;
     foreach ( $messageSociete as $msg ) {
       if($msg->Type == "Error"){
-        ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code ,ATF::$usr->trans("notice_title"));
+        ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
         return $error = True;
       }
     }
@@ -1061,7 +1061,7 @@ class societe_cleodisbe extends societe_cleodis {
 
       foreach ( $messageReport as $msg ) {
         if($msg->Type == "Error"){
-          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code ,ATF::$usr->trans("notice_title"));
+          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
           return $error = True;
         }
         // si aucune notice d'erreur n'est retournée, alors on peut clean la réponse GGS
