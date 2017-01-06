@@ -962,25 +962,25 @@ class societe extends classes_optima {
 		$dateparsee = explode("-",explode('T',$item->CreditScore->DateOfLatestRatingChange)[0]);
 		$return['lastaccountdate'] = (string) $dateparsee[2]."/".$dateparsee[1]."/".$dateparsee[0];
 		// Créances
-		$return['receivables'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->BalanceSheet->TotalReceivables->_), 0, ",", " ");
+		$return['receivables'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->BalanceSheet->TotalReceivables->_), 0, ",", "");
 
 		// Placements + disponibilités
-		$return['securitieandcash'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->BalanceSheet->Cash->_) , 0, ",", " ");
+		$return['securitieandcash'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->BalanceSheet->Cash->_) , 0, ",", "");
 
 		// Produits d'exploitation
-		$return['operatingincome'] =  number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->ProfitAndLoss->FinancialIncome->_) , 0, ",", " ");
+		$return['operatingincome'] =  number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
 
 		// Chiffre d'affaires net
-		$return['netturnover'] =  number_format(intval((string)$item->FinancialStatements->FinancialStatement[0]->ProfitAndLoss->ProfitAfterTax->_) , 0, ",", " ");
+		$return['netturnover'] =  number_format(intval((string)$item->FinancialStatements->FinancialStatement[0]->ProfitAndLoss->ProfitAfterTax->_) , 0, ",", "");
 
 		// Résultat d'exploitation
-		$return['operationgprofitless'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement[0]->ProfitAndLoss->OperatingProfit->_) , 0, ",", " ");
+		$return['operationgprofitless'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement[0]->ProfitAndLoss->OperatingProfit->_) , 0, ",", "");
 
 		// Produits financiers
-		$return['financialincome'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialIncome->_) , 0, ",", " ");
+		$return['financialincome'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
 
 		// Charges financières
-		$return['financialcharges'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", " ");
+		$return['financialcharges'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", "");
 
 		// ETAT
 		switch ((string)$company->BasicInformation->CompanyStatus->Code) {
