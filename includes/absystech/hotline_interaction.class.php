@@ -2074,7 +2074,6 @@ class hotline_interaction extends classes_optima {
 		foreach($lesautres as $autres){
 			if (!empty($autres)) {
 				$others = ATF::contact()->select($autres,"email, nom, prenom");
-				log::logger($others,"ccharlier");
 				array_push($recipient,$others['nom'].' '.$others['prenom'].' <'.$others['email'].'>');
 			}
 		}
