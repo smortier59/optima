@@ -1835,6 +1835,7 @@ class hotline_interaction extends classes_optima {
 			"SUBSTR(hotline_interaction.duree_presta,1,5)"=>array("alias"=>"tps_passe"),
 			"SUBSTR(hotline_interaction.duree_pause,1,5)"=>array("alias"=>"tps_pause"),
 			"hotline_interaction.credit_dep",
+			"hotline_interaction.recipient",
 			"hotline_interaction.detail"=>array(),
 			"hotline_interaction.id_user"=>array(),
 			"hotline_interaction.id_contact"=>array(),
@@ -2023,13 +2024,11 @@ class hotline_interaction extends classes_optima {
 			if (!$post['id_user']) {
  	        	$post['id_user'] = ATF::$usr->getId();
  	        }
-
 	        // Insertion
 	        $id = self::insertTS($post);
 
 	        $p = array("id"=>$id);
         	$return['result'] = self::_GET($p);
-
         	// Traitement de l'id_user
         	if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
         		$return["result"]["id_user_fk"] = $return["result"]["id_user"];
@@ -2050,16 +2049,39 @@ class hotline_interaction extends classes_optima {
 	/**
 	* INSERTION d'une interaction de hotline depuis telescope
 	* @author Quentin JANON <qjanon@absystech.fr>
+	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	* @param array $infos Les informations de l'interaction
 	* @param array $s La session
 	* @param array $files Les fichiers uploadés
 	* @param boolean $mail True si on désire
 	* @param boolean $pointage True si on désire créer le pointage
-    * @return boolean true
-    */
+  * @return boolean true
+  */
 	public function insertTS($infos,$mail = true) {
 
-		/*---------------Fonctionnalité de trace hotline----------------------*/
+		$recipient = array();
+		//Ajout des actifs selectionné
+		$lesactifs = is_array($infos["actifNotify"])?$infos["actifNotify"]:explode(",",$infos["actifNotify"]);
+		foreach($lesactifs as $actif){
+			if (!empty($actif)) {
+				$user = ATF::user()->select($actif,"email, nom, prenom");
+				log::logger($user,"ccharlier");
+				array_push($recipient,$user['nom'].' '.$user['prenom'].' <'.$user['email'].'>');
+			}
+		}
+		$lesautres = is_array($infos["anotherNotify"])?$infos["anotherNotify"]:explode(",",$infos["anotherNotify"]);
+		//Ajout des autres contacts clients selectionné
+		foreach($lesautres as $autres){
+			if (!empty($autres)) {
+				$others = ATF::contact()->select($autres,"email, nom, prenom");
+				log::logger($others,"ccharlier");
+				array_push($recipient,$others['nom'].' '.$others['prenom'].' <'.$others['email'].'>');
+			}
+		}
+		if(count($recipient)>0)
+			$recipient = array_flip(array_flip($recipient));
+		$res= implode(', ', $recipient);
+			/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
 			log::logger("INTERNAL INTERACTION","hotline");
 			$data = array(
@@ -2070,6 +2092,7 @@ class hotline_interaction extends classes_optima {
 				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 				,"id_hotline"=>$infos["id_hotline"]
 				,"visible"=>$infos["visible"]
+				,"recipient"=> $res
 				,"nature"=>"internal"
 			);
 			log::logger($data,"hotline");
@@ -2238,6 +2261,7 @@ class hotline_interaction extends classes_optima {
 	            ,"visible"=>$infos["visible"]
 	            ,"nature"=>$infos["nature"]
 				,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
+				,'recipient'=>$res
 			);
 
 
