@@ -924,8 +924,6 @@ class societe_cleodis extends societe {
   * @param array $infos Simple dimension des champs à insérer
   */
   public function _signAndGetPDF($post,$get){
-//log::logger($post,'ygautheron');
-//log::logger($get,'ygautheron');
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
@@ -1096,12 +1094,11 @@ class societe_cap extends societe_cleodis {
   }
 
   public function envoiCourrier($infos) {
-
-
     ATF::_s("ids",explode("|",$infos['ids']));
     ATF::_s("societe_source",$infos['societe_source']);
     return true;
   }
+
 };
 
 
