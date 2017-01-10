@@ -85,29 +85,45 @@ class echeancier_ligne_periodique extends classes_optima {
   * @return boolean | integer
   */
   public function _POST($get,$post) {
-    if($post["id_echeancier_ligne_periodique"]){
-      unset($post["id_echeancier"],$post["total"]);
-      try {
-        $result = $this->update($post);
-      } catch (errorSQL $e) {
-        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
-      }
-    }else{
-      // parser la date sous le bon format pour mysql
-      $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
-      $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
-      if ($post['valeur_variable'] == "oui"){
-        $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
-        ATF::echeancier()->u($update);
-      }
-      //ATF::echeancier()->increase($post['id_echeancier'],'montant_ht',$post["total"]);
-      unset($post["total"]);
-      try {
-        $result = $this->insert($post);
-      } catch (errorSQL $e) {
-        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
-      }
+
+    // parser la date sous le bon format pour mysql
+    $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
+    $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
+    if ($post['valeur_variable'] == "oui"){
+      $update = array('id_echeancier'=> $post['id_echeancier'], 'variable'=> $post['valeur_variable']);
+      ATF::echeancier()->u($update);
+    }
+    try {
+      $result = $this->insert($post);
+    } catch (errorSQL $e) {
+      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
     return true;
+  }
+
+  /**
+  * Fonction _PUT pour telescope
+  * @package Telescope
+  * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @param $get array.
+  * @param $post array Argument obligatoire.
+  * @return boolean | integer
+  */
+  public function _PUT($get,$post){
+    $input = file_get_contents('php://input');
+    if (!empty($input)) parse_str($input,$post);
+      $return = array();
+    if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    log::logger($post, "ccharlier");
+    unset($post["id_echeancier"],$post["total"]);
+    // parser la date sous le bon format pour mysql
+    $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
+    $post["valeur_variable"] = ($post["valeur_variable"] == "on")? 'oui':'non';
+    try {
+      $return = $this->update($post);
+    } catch (errorSQL $e) {
+      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+    }
+    return $return;
   }
 }

@@ -42,22 +42,14 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   * @return boolean | integer
   */
   public function _POST($get,$post) {
-    if($post["id_echeancier_ligne_ponctuelle"]){
-      unset($post["id_echeancier"],$post["total"]);
-      try {
-        $result = $this->update($post);
-      } catch (errorSQL $e) {
-        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
-      }
-    }else{
-      // parser la date sous le bon format pour mysql
-      $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
-      unset($post["total"]);
-      try {
-        $result = $this->insert($post);
-      } catch (errorSQL $e) {
-        throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
-      }
+
+    // parser la date sous le bon format pour mysql
+    $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
+    unset($post["total"]);
+    try {
+      $result = $this->insert($post);
+    } catch (errorSQL $e) {
+      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
     return true;
   }
@@ -76,6 +68,31 @@ class echeancier_ligne_ponctuelle extends classes_optima {
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
+    return $return;
+  }
+
+  /**
+  * Fonction _PUT pour telescope
+  * @package Telescope
+  * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @param $get array.
+  * @param $post array Argument obligatoire.
+  * @return boolean | integer
+  */
+
+  public function _PUT($get,$post){
+    $input = file_get_contents('php://input');
+    if (!empty($input)) parse_str($input,$post);
+      $return = array();
+    if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    unset($post["id_echeancier"],$post["total"]);
+    // parser la date sous le bon format pour mysql
+    $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
+    try {
+      $return = $this->update($post);
+    } catch (errorSQL $e) {
+      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+    }
     return $return;
   }
 }
