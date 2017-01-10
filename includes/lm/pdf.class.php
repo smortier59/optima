@@ -447,7 +447,10 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		if($this->affaire["adresse_livraison"] == $this->affaire["adresse_facturation"]){
 			$texteAdresse = "......................................................................................................................................................................................................................................................";
 		}else{
-			$texteAdresse = $this->affaire["adresse_livraison"]." ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"];
+			$texteAdresse = $this->affaire["adresse_livraison"];
+			if($this->affaire["adresse_livraison_2"]) $texteAdresse .= " ".$this->affaire["adresse_livraison_2"];
+			if($this->affaire["adresse_livraison_3"]) $texteAdresse .= " ".$this->affaire["adresse_livraison_3"];
+			$texteAdresse .= " ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"];
 		}
 		$this->multicell(0,4,"Adresse de livraison du Produit (si différente de celle indiquée au 1.1 ci-dessus) : \n".$texteAdresse,1,"L");
 
