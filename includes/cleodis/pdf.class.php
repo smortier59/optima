@@ -9599,7 +9599,123 @@ class pdf_cap extends pdf_cleodis {
 
 	}
 
-	public function mandat($id,&$s) {
+	public function mandatSellAndSign($id_affaire){
+
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
+		$this->affaire = ATF::affaire()->select($id_affaire);
+		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+
+		ATF::mandat()->q->reset()->where("mandat.id_affaire", $id_affaire);
+		$this->mandat = ATF::mandat()->select_row();
+
+		$this->adresseClient = $this->client["adresse"];
+		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
+		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
+		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+
+
+		$this->unsetHeader();
+		$this->AddPage();
+
+
+		$this->setfillcolor(208,255,208);
+
+
+		//HEADER
+		$this->image(__PDF_PATH__.$this->logo,5,-6,40);
+
+		$this->setMargins(5);
+		$this->setfont('arial','',9);
+		$this->setLeftMargin(60);
+		$this->cell(20,4,"Créancier :");
+		$this->multicell(70,4,"Cap Recouvrement\n30 Boulevard du Général Leclerc\n59100 Roubaix - France");
+		$this->setLeftMargin(5);
+		$this->line(5,$this->gety()+2,232,$this->gety()+2);
+
+		//Page Centrale
+		//Gauche
+		$this->setY(27);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, "Mandat",0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "de prélèvement SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Coordonnées",0,1);
+		$this->cell(55, 4, "bancaires",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Nom :",0,1);
+		$this->cell(55, 4, "Adresse :",0,1);
+		$this->ln(4);
+		$this->cell(55, 4, "Numéro de mobile :",0,1);
+
+		//Milieu
+		$this->setY(27);
+		$this->setLeftMargin(60);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, __ICS__,0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Identifiant créancier SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["BIC"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "BIC",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["societe"],0,1);
+		$this->multicell(120, 4, $this->adresseClient,0,1);
+		$this->cell(55, 4, $this->client["tel"],0,1);
+
+		//Droite
+		$this->setY(27);
+		$this->setLeftMargin(125);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Référence unique du mandat",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["IBAN"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "IBAN",0,1);
+
+		$this->setY(70);
+		$this->setLeftMargin(5);
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->ln(4);
+		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y"),0,1);
+
+		$this->ln(4);
+		$this->setfont('arial','',7);
+		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+
+		$this->setleftMargin(130);
+		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->setleftMargin(15);
+
+		$this->mandatSignature($this->mandat["id_mandat"]);
+
+	}
+
+	public function mandatSignature($id){
+		$this->mandat($id, $s, true);
+	}
+
+
+	public function mandat($id, &$s, $signature=false) {
+
+		if(!$signature)	$this->Open();
+
 		$id = ATF::mandat()->decryptId($id);
 
 		$this->unsetHeader();
@@ -9613,9 +9729,9 @@ class pdf_cap extends pdf_cleodis {
 		ATF::mandat_ligne()->q->reset()->where("id_mandat",$id)->addOrder("id_mandat_ligne","asc");
 		$mandat_ligne = ATF::mandat_ligne()->select_all();
 		if($mandat["nature"] == "cedre"){
-			$this->mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne);
+			$this->mandat_cedre($mandat, $infos_client, $mandat_contact, $mandat_ligne, $signature);
 		}else{
-			$this->mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne);
+			$this->mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne, $signature);
 		}
 
 	}
@@ -9648,6 +9764,7 @@ class pdf_cap extends pdf_cleodis {
 		if($mandat["id_representant"]){ $representant_client = ATF::contact()->select($mandat["id_representant"]);	}
 
 		//Page 1
+		if(!$signature)	$this->Open();
 		$this->Addpage();
 		$this->enteteCedre();
 
@@ -9942,10 +10059,10 @@ class pdf_cap extends pdf_cleodis {
 		$this->Cell(0,2,$this->PageNo(),0,0,'R');
 
 
-		$this->cg_cedre($signature);
+		$this->cg_cedre(false, $signature);
 	}
 
-	public function cg_cedre($signature){
+	public function cg_cedre($signature , $signSellSign= false){
 
 		//Page 4
 		$this->Addpage();
@@ -10041,8 +10158,13 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(60,5,"Pour CAP RECOUVREMENT",0,1,"L");
 		$this->ln(15);
 		$this->cell(60,5,"Nom : Olivier DUBENSKI",0,1,"L");
-		$this->cell(60,5,"Signature :",0,1,"L");
-		$this->ln(30);
+		if($signSellSign){
+			$this->multicell(60,5,"Signature : \n\n[SignatureFournisseur]\n\n\n\n[/SignatureFournisseur]",0,1,"L");
+		}else{
+			$this->cell(60,5,"Signature :",0,1,"L");
+			$this->ln(30);
+		}
+
 		$this->cell(60,5,"Acceptation CAP RECOUVREMENT",0,1,"L");
 
 
@@ -10051,8 +10173,13 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(120,5,"Le Client déclare avoir pris connaissance et accepter sans réserve les conditions générales de prestation",0,1,"L");
 		$this->ln(10);
 		$this->cell(120,5,"Nom du signataire :",0,1,"L");
-		$this->cell(120,5,"Lu et approuvé Cachet commercial et signature",0,1,"L");
-		$this->ln(25);
+		if($signSellSign){
+			$this->multicell(120,5,"Lu et approuvé \n\n[SignatureContractant]\n\n\n\n[/SignatureContractant]",0,1,"L");
+		}else{
+			$this->cell(120,5,"Lu et approuvé Cachet commercial et signature",0,1,"L");
+			$this->ln(25);
+		}
+
 		$this->cell(120,5,"Date : ",0,1,"L");
 		$this->cell(120,5,"Acceptation du Client",0,1,"L");
 
@@ -10087,7 +10214,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setLeftMargin(15);
 	}
 
-	public function mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne){
+	public function mandat_normal($mandat, $infos_client, $mandat_contact, $mandat_ligne, $signature = false){
 		$infos_client['siret'] = str_replace(" ", "", $infos_client['siret']);
 		$siret = substr($infos_client['siret'], 0, 3)." ".substr($infos_client['siret'], 3, 3)." ".substr($infos_client['siret'], 6, 3)." ".substr($infos_client['siret'], -5);
 
@@ -10114,12 +10241,12 @@ class pdf_cap extends pdf_cleodis {
 
 
 		if($mandat["type_creance"] === "btob"){
-			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btob",$representant_client,$adresse_client,$siret,$siren);
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btob",$representant_client,$adresse_client,$siret,$siren,$signature);
 		}elseif($mandat["type_creance"] === "btoc"){
-			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btoc",$representant_client,$adresse_client,$siret,$siren);
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btoc",$representant_client,$adresse_client,$siret,$siren,$signature);
 		}else{
-			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btob",$representant_client,$adresse_client,$siret,$siren);
-			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btoc",$representant_client,$adresse_client,$siret,$siren);
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btob",$representant_client,$adresse_client,$siret,$siren,$signature);
+			$this->listing_mandat($mandat,$infos_client,$mandat_ligne,"btoc",$representant_client,$adresse_client,$siret,$siren,$signature);
 		}
 
 
@@ -10349,7 +10476,13 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','BI',7);
 		$this->multicell(0,4,"La signature des présentes conditions particulières entraîne l’acceptation pleine, entière et sans réserve des conditions générales de recouvrement et des conditions tarifaires annexées aux présentes.",0,"C",0);
 		$this->setfont('arial','',7);
-		$this->cell(0,4,"Fait à : ........................................ Le : ......................................",0,1);
+
+		if($signature){
+			$this->cell(0,4,"Fait à : ........................................ Le : ".date("d/m/Y"),0,1);
+		}else{
+			$this->cell(0,4,"Fait à : ........................................ Le : ......................................",0,1);
+		}
+
 
 		$this->ln(2);
 		$y = $this->getY();
@@ -10359,19 +10492,24 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(90,3,"Nom et fonction du signataire\nPrécédés de la mention « Bon pour mandat »\nApposition du cachet",0,"L");
 		$this->setFillColor(239,239,239);
 		$y = $this->getY();
-		$this->multicell(90,3,"\n\n\n\n\n",0,"C",1);
+
+		if($signature){
+			$this->multicell(90,3,"[ImageContractant1]\n\n\n\n[/ImageContractant1]",0,"C",1);
+		}else{
+			$this->multicell(90,3,"\n\n\n\n\n",0,"C",1);
+		}
+
 		$this->setY($y);
 		$this->setX(110);
 		$this->multicell(90,3,"\n\n\n\n\n",0,"C",1);
 
 		$this->getFooterMandat();
 
-
-		$this->getAnnexeMandat();
+		$this->getAnnexeMandat($signature);
 
 	}
 
-	public function listing_mandat($mandat,$infos_client,$mandat_ligne,$type,$representant_client,$adresse_client,$siret,$siren){
+	public function listing_mandat($mandat,$infos_client,$mandat_ligne,$type,$representant_client,$adresse_client,$siret,$siren,$signature=false){
 		$this->Open();
 		$this->Addpage();
 		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
@@ -10473,7 +10611,12 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','',8);
 		$this->cell(90,3,"",0,0);
 		$this->setFillColor(239,239,239);
-		$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n",0,"C",1);
+		if($signature){
+			$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n[ImageContractant1]\n\n\n\n[/ImageContractant1]",0,"C",1);
+		}else{
+			$this->multicell(0,3,"Cachet commerciale du CLIENT \n\n\n\n\n\n",0,"C",1);
+		}
+
 		$this->getFooterMandat();
 
 	}
@@ -10522,7 +10665,7 @@ class pdf_cap extends pdf_cleodis {
 	}
 
 
-	public function getAnnexeMandat(){
+	public function getAnnexeMandat($signature=false){
 
 		$this->Addpage();
 		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
@@ -10697,7 +10840,11 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(95,3,"Le : ............................",0,"L");
 		$this->ln(5);
 		$this->setFillColor(239,239,239);
-		$this->multicell(95,3,"\n\n\n\n\n\n\n",0,"C",1);
+		if($signature){
+			$this->multicell(95,3,"[SignatureContractant]\n\n\n\n\n[/SignatureContractant]",0,"C",1);
+		}else{
+			$this->multicell(95,3,"\n\n\n\n\n\n\n",0,"C",1);
+		}
 
 		$this->setY(40);
 		$this->setleftmargin(107);
@@ -10739,7 +10886,12 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(95,3,"Le : ............................",0,"L");
 		$this->ln(5);
 		$this->setFillColor(239,239,239);
-		$this->multicell(95,3,"\n\n\n\n\n\n\n",0,"C",1);
+		if($signature){
+			$this->multicell(95,3,"[SignatureFournisseur]\n\n\n\n\n[/SignatureFournisseur]",0,"C",1);
+		}else{
+			$this->multicell(95,3,"\n\n\n\n\n\n\n",0,"C",1);
+		}
+
 		$this->getFooterMandat();
 	}
 
