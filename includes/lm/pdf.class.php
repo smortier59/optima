@@ -484,12 +484,12 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")
 					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
 						$data[$key][0] = $value["quantite"];
-						$data[$key][1] = $value["produit"];
+						$data[$key][1] = str_replace("&nbsp;", "", $value["produit"]);
 						$style[$key][1] = $this->leftStyle;
 					 }else{
 					 	if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
 					 		$data[$key][0] = $value["quantite"];
-							$data[$key][1] = $value["produit"]." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
+							$data[$key][1] = str_replace("&nbsp;", "", $value["produit"]." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
 							$style[$key][1] = $this->leftStyle;
 					 	}
 					 }
@@ -507,12 +507,12 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")
 					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
 						$data[$key][0] = $value["quantite"];
-						$data[$key][1] = $value["produit"];
+						$data[$key][1] = str_replace("&nbsp;", "", $value["produit"];
 						$style[$key][1] = $this->leftStyle;
 					 }else{
 					 	if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
 					 		$data[$key][0] = $value["quantite"];
-							$data[$key][1] = $value["produit"]." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
+							$data[$key][1] = str_replace("&nbsp;", "", $value["produit"]." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
 							$style[$key][1] = $this->leftStyle;
 					 	}
 					 }
