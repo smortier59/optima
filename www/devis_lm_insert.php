@@ -348,11 +348,13 @@ if($infos["id_societe"]){
             "adresse_facturation_3"=>$adresse_facturation_3 ,
             "cp_adresse_facturation"=>$cp_facturation ,
             "ville_adresse_facturation"=>$ville_facturation ,
+            "pays_facturation"=>$pays_facturation,
             "adresse_livraison"=>$adresse_livraison ,
             "adresse_livraison_2"=>$adresse_livraison_2 ,
             "adresse_livraison_3"=>$adresse_livraison_3 ,
             "cp_adresse_livraison"=>$cp_livraison,
-            "ville_adresse_livraison"=>$ville_livraison
+            "ville_adresse_livraison"=>$ville_livraison,
+            "pays_livraison"=>$pays_livraison
         );
 
         if($infos["id_magasin"]) $devis["id_magasin"] = $infos["id_magasin"];
