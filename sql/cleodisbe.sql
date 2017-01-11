@@ -40,12 +40,24 @@ INSERT INTO `facture_ligne`(id_facture,id_produit,ref,produit,quantite,id_fourni
   WHERE facture_ligne.id_facture = 98463 AND facture.id_facture =
     (SELECT id_facture FROM facture WHERE facture.ref = '1502041-11')
 
-
+INSERT INTO `facture_ligne`(id_facture,id_produit,ref,produit,quantite,id_fournisseur,prix_achat,serial,code,id_affaire_provenance,visible,afficher)
+  SELECT facture.id_facture ,id_produit,facture_ligne.ref,produit,quantite,id_fournisseur,prix_achat,serial,code,
+  id_affaire_provenance,visible,afficher
+  FROM `facture_ligne`,`facture`
+  WHERE facture_ligne.id_facture = 98445 AND facture.id_facture =
+    (SELECT id_facture FROM facture WHERE facture.ref = '1505002-10')
 
 INSERT INTO `facture_ligne`(id_facture,id_produit,ref,produit,quantite,id_fournisseur,prix_achat,serial,code,id_affaire_provenance,visible,afficher)
   SELECT facture.id_facture ,id_produit,facture_ligne.ref,produit,quantite,id_fournisseur,prix_achat,serial,code,
   id_affaire_provenance,visible,afficher
   FROM `facture_ligne`,`facture`
-  WHERE facture_ligne.id_facture = 98463 AND facture.id_facture =
-    (SELECT id_facture FROM facture WHERE facture.ref = ' 1505002-10')
+  WHERE facture_ligne.id_facture = 98441 AND facture.id_facture =
+    (SELECT id_facture FROM facture WHERE facture.ref = '1506001-13')
+
+INSERT INTO `facture_ligne`(id_facture,id_produit,ref,produit,quantite,id_fournisseur,prix_achat,serial,code,id_affaire_provenance,visible,afficher)
+  SELECT facture.id_facture ,id_produit,facture_ligne.ref,produit,quantite,id_fournisseur,prix_achat,serial,code,
+  id_affaire_provenance,visible,afficher
+  FROM `facture_ligne`,`facture`
+  WHERE facture_ligne.id_facture = 98505 AND facture.id_facture =
+    (SELECT id_facture FROM facture WHERE facture.ref = '1602004-1')
 
