@@ -196,7 +196,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$adresseFacturation = $this->affaire["adresse_facturation"];
 		if($this->affaire["adresse_facturation_2"]) $adresseFacturation .= " ".$this->affaire["adresse_facturation_2"];
 		if($this->affaire["adresse_facturation_3"]) $adresseFacturation .= " ".$this->affaire["adresse_facturation_3"];
-		$adresseFacturation .= "\n".$this->affaire["cp_adresse_facturation"]." ".$this->affaire["ville_adresse_facturation"];
+		$adresseFacturation .= "\n".$this->affaire["cp_adresse_facturation"]." ".$this->affaire["ville_adresse_facturation"]." - ".ATF::pays()->select($this->affaire["pays_facturation"], "pays");
 
 		$y = $this->getY();
 		$this->multicell(100,4,"\nNom : ".$this->client["nom"]."\nPrénom : ".$this->client["prenom"]."\nAdresse : ".$adresseFacturation."\n",1,"L");
@@ -423,7 +423,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			$texteAdresse = $this->affaire["adresse_livraison"];
 			if($this->affaire["adresse_livraison_2"]) $texteAdresse .= " ".$this->affaire["adresse_livraison_2"];
 			if($this->affaire["adresse_livraison_3"]) $texteAdresse .= " ".$this->affaire["adresse_livraison_3"];
-			$texteAdresse .= " ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"];
+			$texteAdresse .= " ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"]." - ".ATF::pays()->select($this->affaire["pays_livraison"], "pays");
 		}
 		$this->multicell(0,4,"Adresse de livraison du Produit (si différente de celle indiquée au 1.1 ci-dessus) : \n".$texteAdresse,1,"L");
 
@@ -450,7 +450,7 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			$texteAdresse = $this->affaire["adresse_livraison"];
 			if($this->affaire["adresse_livraison_2"]) $texteAdresse .= " ".$this->affaire["adresse_livraison_2"];
 			if($this->affaire["adresse_livraison_3"]) $texteAdresse .= " ".$this->affaire["adresse_livraison_3"];
-			$texteAdresse .= " ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"];
+			$texteAdresse .= " ".$this->affaire["cp_adresse_livraison"]." ".$this->affaire["ville_adresse_livraison"]." - ".ATF::pays()->select($this->affaire["pays_livraison"], "pays");
 		}
 		$this->multicell(0,4,"Adresse de livraison du Produit (si différente de celle indiquée au 1.1 ci-dessus) : \n".$texteAdresse,1,"L");
 

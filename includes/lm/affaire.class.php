@@ -173,9 +173,11 @@ class affaire_lm extends affaire {
 		$affaire["adresse_livraison"]=$infos["adresse_livraison"];
 		$affaire["ville_adresse_livraison"]=$infos["ville_adresse_livraison"];
 		$affaire["cp_adresse_livraison"]=$infos["cp_adresse_livraison"];
+		$affaire["pays_livraison"]=$infos["pays_livraison"];
 		$affaire["adresse_facturation"]=$infos["adresse_facturation"];
 		$affaire["ville_adresse_facturation"]=$infos["ville_adresse_facturation"];
 		$affaire["cp_adresse_facturation"]=$infos["cp_adresse_facturation"];
+		$affaire["pays_facturation"]=$infos["pays_facturation"];
 		$affaire["id_magasin"]=$infos["id_magasin"];
 		$affaire["num_bdc_lm"]=$infos["num_bdc_lm"];
 		$affaire["poseur"]=$infos["poseur"];

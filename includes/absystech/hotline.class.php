@@ -3916,19 +3916,22 @@ class hotline extends classes_optima {
         		switch ($post['specialAction']) {
         			case "forward":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+				        $action = $post['specialAction'];
         				$return = self::$post['specialAction']($post);
          				$lastInteractionRequired = true;
 	       			break;
         			case "setPriorite":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				self::$post['specialAction']($post);
+				        $action = $post['specialAction'];
+        				self::$action($post);
         				$return['result'] = true;
         			break;
         			case "takeRequest":
         			case "cancelRequest":
         			case "resolveRequest":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				self::$post['specialAction']($post);
+        				$action = $post['specialAction'];
+        				self::$action($post);
         				$return['result'] = true;
         				$lastInteractionRequired = true;
         				if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
@@ -3937,7 +3940,8 @@ class hotline extends classes_optima {
         			case "setWait":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
         				if ($post['etat']=="wait") {
-	        				self::$post['specialAction']($post);
+        					$action = $post['specialAction'];
+	        				self::$action($post);
         				} else {
         					$this->fixingRequest($post);
         				}
@@ -3957,7 +3961,8 @@ class hotline extends classes_optima {
         			case "sendMEP":
 				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 				        if (!$post['action']) throw new Exception("ACTION_MISSING",1030);
-        				$this->$post['action']($post);
+				        $action = $post["action"];
+        				$this->$action($post);
         				$lastInteractionRequired = true;
         			break;
         		}
