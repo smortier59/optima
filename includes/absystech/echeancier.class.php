@@ -285,7 +285,7 @@ class echeancier extends classes_optima {
 
       $produits[] = $p;
     }
-
+    $affaire_sans_devis_libelle = ($get["affaire_sans_devis_libelle"])? $get["affaire_sans_devis_libelle"]: NULL;
     $facture = array();
 
     $facture["facture"] = array("id_societe"=> $echeancier["id_societe"],
@@ -295,7 +295,7 @@ class echeancier extends classes_optima {
                                 "id_affaire" => $echeancier["id_affaire"],
                                 "date_previsionnelle" => NULL,
                                 "date_relance" => NULL,
-                                "affaire_sans_devis_libelle" => NULL,
+                                "affaire_sans_devis_libelle" => $affaire_sans_devis_libelle,
                                 "mode" => NULL,
                                 "periodicite" => $echeancier["periodicite"],
                                 "id_facture_parente" => NULL,
@@ -311,8 +311,11 @@ class echeancier extends classes_optima {
                                 "prix_achat" => NULL,
                                 "email" => NULL,
                                 "emailTexte" => NULL,
-                                "emailCopie" => NULL
+                                "emailCopie" => NULL,
                                );
+    if($get["affaire_sans_devis"]){
+      $facture["facture"]["affaire_sans_devis"]= $get["affaire_sans_devis"];
+    }
     $facture["values_facture"]["produits"] = json_encode($produits);
     if($get["preview"]){
       $facture["preview"] = true;
@@ -362,7 +365,6 @@ class echeancier extends classes_optima {
       return base64_encode($return);
 
     }catch(errorATF $e){
-      log::logger($e->getMessage() , "mfleurquin");
       throw new errorATF($e->getMessage(),500);
     }
   }
