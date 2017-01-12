@@ -2065,7 +2065,6 @@ class hotline_interaction extends classes_optima {
 		foreach($lesactifs as $actif){
 			if (!empty($actif)) {
 				$user = ATF::user()->select($actif,"email, nom, prenom");
-				log::logger($user,"ccharlier");
 				array_push($recipient,$user['nom'].' '.$user['prenom'].' <'.$user['email'].'>');
 			}
 		}

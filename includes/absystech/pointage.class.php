@@ -10,20 +10,20 @@ class pointage_absystech extends pointage {
 	*/
 	public function __construct() {
 		parent::__construct();
-		
+
 		$this->type = array('production'=>'Production', 'rd'=>'Recherche & Developpement');
 		$this->no_update = true;
 		$this->no_insert = true;
 		ATF::tracabilite()->no_trace[$this->table]=1;
-		
+
 		$this->addPrivilege("pointages");
 		$this->addPrivilege("getCategorieScheduler");
-	}	
+	}
 
 	/** EXPERIMENTAL : Retourne des infos pour le scheduler
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param string $infos : Arguments postés en ajax
-	*/	
+	*/
 	public function pointages(&$infos){
 //		$infos['display'] = true;
 		// On récupère tous le pointage de l'utilisateur
@@ -34,7 +34,7 @@ class pointage_absystech extends pointage {
 			$startDate = $i['date']." "+$i['temps'];
 			$endDate = $i['date']." 18:00";
 			$time = $this->selectHoraire($i['date'],$i['sujet'],ATF::$usr->getId());
-			
+
 			$return[] = array(
 				"Group"=>"default"
 				,"Id"=>"e".$k
@@ -48,11 +48,11 @@ class pointage_absystech extends pointage {
 		ATF::$json->add('totalCount',count($return));
 		return $return;
 	}
-	
+
 	/** EXPERIMENTAL : Retourne des infos pour le scheduler
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param string $infos : Arguments postés en ajax
-	*/	
+	*/
 	public function getCategorieScheduler($infos){
 		$this->q->reset()
 					->addField("id_gep_projet")
@@ -64,8 +64,8 @@ class pointage_absystech extends pointage {
 			if (!$i['id_gep_projet']) continue;
 			$projet = ATF::gep_projet()->nom($i['id_gep_projet']);
 			$projetInfos = ATF::gep_projet()->select($i['id_gep_projet']);
-			
-			/* rangement par projet 
+
+			/* rangement par projet
 			if (strstr($projet,"Optima")) {
 				$cat = "Optima";
 			} elseif (strstr($projet,"Nebula")) {
@@ -75,32 +75,32 @@ class pointage_absystech extends pointage {
 			} else {
 				$cat = $projet;
 			}*/
-			
+
 			/* Rangement par société */
 			$cat = ATF::societe()->nom($projetInfos['id_societe']);
-			
-			/* Rangement par type 
+
+			/* Rangement par type
 			$cat = $i['type'];*/
-			
-			
+
+
 			$return[] = array(
 				"Id"=>$i['id_gep_projet']
 				,"Name"=>$projet
 				,"Type"=>$i['type']
 				,"Category"=>$cat
 			);
-			
+
 		}
 		ATF::$json->add('totalCount',count($return));
 
-		return $return;		
+		return $return;
 	}
 	/**
 	* Compte le nombre d'heures passees sur un mois et sur un projet
 	* @param : date date
 	* @param : int id_user
 	* @return float le nombre d'heures
-	*/ 
+	*/
 	public function totalHeure($date,$id_user,$type=NULL,$sujet=NULL){
 		$this->q->reset()
 			->addField(array(
@@ -116,19 +116,19 @@ class pointage_absystech extends pointage {
 			))
 			->addCondition("`date`",$date."%","AND",false,"LIKE")
 			->addCondition("id_user",$this->decryptId($id_user),"AND");
-			
+
 		if ($type) {
 			$this->q->addCondition("type",$type,"AND");
 		}
 		if ($sujet) {
-			$this->q->addCondition("sujet",$sujet,"AND");			
+			$this->q->addCondition("sujet",$sujet,"AND");
 		}
-		
+
 		$this->q->setDimension("cell");
-		
+
 		return $this->sa();
 	}
-	
+
 	/**
 	* Donne les requêtes de la journée par utilisateur AVEC LES RESULTATS HORAIRES DU POINTAGE (et non de la hotline)
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
@@ -160,20 +160,20 @@ class pointage_absystech extends pointage {
 			->addGroup("pointage.id_hotline")
 			->setStrict()
 			->setToString();
-			
+
 		$subQuery=$this->sa();
 		$this->q->reset()
             ->setSubQuery($subQuery,"a")
 			->addCondition("a.temps_calcule","00h00","AND","false","!=");
-			
+
 		return ATF::db($this->db)->select_all($this);
 	}
-	
-	
-	/** 
+
+
+	/**
 	* Selection des projets pour un user et une date donnée
 	* @author : Maïté Glinkowski
-	* @param : string date 
+	* @param : string date
 	* @param : int id_user
 	* @param : string type
 	* @return array
@@ -185,31 +185,31 @@ class pointage_absystech extends pointage {
 			->addCondition("pointage.date",$date."%","AND",false,"LIKE")
 			->addGroup("sujet")
 			->addOrder("type,id_gep_projet,sujet");
-			
+
 		if ($type) {
 			$this->q
 				->addCondition("type",$type,"AND")
 				->setDistinct();
-			
+
 		} else {
 			$this->q
-			
+
 				// Désativer les hotline (temporaire)
 				->addCondition("type","hotline","AND",false,"!=")
-				
+
 			->addCondition("type","conge_sans_solde","AND",false,"!=")
 			->addCondition("type","arret","AND",false,"!=")
 			->addCondition("type","conge_annuel","AND",false,"!=")
 			->addCondition("type","conge_legaux","AND",false,"!=");
-			
+
 		}
-		
+
 		return $this->sa();
 	}
-	
+
 	/**
 	* Sélection du temps et de l'id du pointage pour un sujet, une date et un id_user donnés
-	* @param : string date 
+	* @param : string date
 	* @param : string sujet
 	* @param : int id_user
 	* @return array
@@ -236,14 +236,14 @@ class pointage_absystech extends pointage {
 	* @return boolean
 	*/
 	public function deleteHoraire($sujet,$date,$id_user) {
-		$query = "DELETE FROM `pointage` 
-					WHERE `date` LIKE '".$date."%' 
-					AND `sujet`='".addslashes($sujet)."' 
-					AND `id_user`=".$this->decryptId($id_user)." 
+		$query = "DELETE FROM `pointage`
+					WHERE `date` LIKE '".$date."%'
+					AND `sujet`='".addslashes($sujet)."'
+					AND `id_user`=".$this->decryptId($id_user)."
 					AND type!='conge'";
 		return ATF::db()->query($query);
 	}
-		
+
 	/**
 	* Ajoute un nouveau pointage
 	* @param int $id_hotline L'identifiant de la hotline
@@ -276,8 +276,8 @@ class pointage_absystech extends pointage {
 			);
 		}
 	}
-	
-	/**	
+
+	/**
 	* Formatage des données pour le insert de classes
 	* @author : Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param string $choix gep, cours, personnalisé ou hotline
@@ -297,7 +297,7 @@ class pointage_absystech extends pointage {
 				if(is_numeric($id_hotline)){
 					$hotline = ATF::hotline()->select($id_hotline);
 				}
-				$insert = array(	
+				$insert = array(
 					"sujet"=>"Requete ".$hotline['id_hotline']
 					,"id_societe"=>$hotline['id_societe']
 					,"type"=>'hotline'
@@ -324,8 +324,8 @@ class pointage_absystech extends pointage {
 
 		return parent::insert($insert);
 	}
-	
-	/** 
+
+	/**
 	* Supprime toutes les entrées d'un projet dans la table de pointage pour un user et une date donnés
 	* @atuhor : Maïté Glinkowski
 	* @param : array infos
@@ -333,10 +333,10 @@ class pointage_absystech extends pointage {
 	*/
 	public function delete($infos,&$s,$files=NULL,&$cadre_refreshed){
 		if(!$this->isMySheet($infos["id_user"])) return false;
-		
+
 		ATF::db($this->db)->begin_transaction();
 		$id = $this->decryptId($infos["id_pointage"]);
-		
+
 		$this->q->reset()
 			->addField("date")
 			->addField("sujet")
@@ -344,7 +344,7 @@ class pointage_absystech extends pointage {
 			->addCondition("id_pointage",$id);
 		$res=$this->sa();
 		if(!$res[0]) throw new errorATF("pointage_not_found");
-		
+
 		$res=$res[0];
 		$id_user = $res["id_user"];
 		$date = explode('-',$res["date"]);
@@ -352,29 +352,29 @@ class pointage_absystech extends pointage {
 		$annee = $date[0];
 		$date = $annee.'-'.$mois;
 		$sujet = $res["sujet"];
-			
+
 		$this->deleteHoraire($sujet,$date,$id_user);
 		ATF::db()->commit_transaction();
 		ATF::$cr->add("main","pointage-select.tpl.htm",array('id_user'=>$id_user,'id_pointage'=>$id));
 		return true;
 
 	}
-	
-	/** 
+
+	/**
 	* Mise à jour le temps passé pour une journée sur un pointage
 	* @author : Maïté Glinkowski
 	* @param : array $post : informations passées en post
 	* @return boolean
 	*/
-	public function maj($post,&$s,$files=NULL,&$cadre_refreshed){		
+	public function maj($post,&$s,$files=NULL,&$cadre_refreshed){
 		ATF::$cr->rm("top");//Optimisation
 		if(!$this->isMySheet($post["id_user"])) return false;
-		
+
 		$update['pointage'] = $post;
 		return $this->update($update,$s,$files);
-		
+
 	}
-	
+
 };
 
 class pointage_att extends pointage_absystech {
