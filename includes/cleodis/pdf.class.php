@@ -9691,7 +9691,7 @@ class pdf_cap extends pdf_cleodis {
 
 		$this->setY(70);
 		$this->setLeftMargin(5);
-		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) Cap Recouvrement à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de Cap Recouvrement.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
 		$this->ln(4);
 		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y"),0,1);
 
