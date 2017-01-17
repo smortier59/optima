@@ -8,7 +8,8 @@ $req = " SELECT id_facture, date FROM facture WHERE `date` BETWEEN '2016-07-01' 
 $factures = ATF::db()->sql2array($req);
 foreach ($factures as $key => $value) {
   $fact['id'] = $value['id_facture'];
-  ATF::facture()->genererPdf($fact);
+  ATF::facture()->generatePDF($fact);
+  echo '.';
   //log::logger('id facture -- '.$value['id_facture'],"ccharlier");
 }
 ?>
