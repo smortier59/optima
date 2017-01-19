@@ -572,7 +572,7 @@ class suivi extends classes_optima {
 
 	public function _GET($get,$post){
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "id_suivi";
+		if (!$get['tri']) $get['tri'] = "societe.id_suivi";
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
@@ -583,12 +583,17 @@ class suivi extends classes_optima {
 
 		$colsData = array(
 			"societe.societe"=>array(),
+			"societe.id_societe"=>array(),
+			"user.id_user"=>array(),
 			"user.civilite"=>array(),
 			"user.nom"=>array(),
 			"user.prenom"=>array(),
 			"suivi.date"=>array(),
+			"suivi.type"=>array(),
+			"affaire.affaire"=>array(),
 			"texte"=>array(),
 			"suivi.id_suivi"=>array(),
+			"suivi.id_opportunite"=>array(),
 		);
 
 		$this->q->reset();
@@ -602,8 +607,15 @@ class suivi extends classes_optima {
 
 		$this->q->from("suivi","id_user","user","id_user");
 		$this->q->from("suivi","id_societe","societe","id_societe")
+						->from("suivi",'id_affaire','affaire','id_affaire')
 					->addJointure("suivi_notifie","id_user","user","id_user","user_not")
-					->addField("GROUP_CONCAT(DISTINCT(CONCAT_WS('',SUBSTRING(`user_not`.`prenom`,1,1),' ',`user_not`.`nom`)) SEPARATOR ',')","suivi.notifie");
+					->addJointure("suivi_contact","id_contact","contact","id_contact","suivi_client")
+					->addJointure("suivi_societe","id_user","contact","id_user","suivi_societe")
+					->addField("GROUP_CONCAT(DISTINCT(CONCAT_WS('',`user_not`.`prenom` ,' ',`user_not`.`nom`)) SEPARATOR ',')","suivi.notifie")
+					->addField("GROUP_CONCAT(DISTINCT(`user_not`.`id_user`) SEPARATOR ',')","suivi.notifie_id")
+					->addField("GROUP_CONCAT(DISTINCT(`suivi_client`.`id_contact`) SEPARATOR ',')","suivi.suivi_client")
+					->addField("GROUP_CONCAT(DISTINCT(`suivi_societe`.`id_user`) SEPARATOR ',')","suivi.suivi_societe");
+
     $this->q->setLimit($get['limit'])->setCount();
 
 		if ($get['id']) {
@@ -639,5 +651,70 @@ class suivi extends classes_optima {
 
 		return $return;
 	}
+
+
+    /**
+  * Fonction _POST pour telescope
+  * @package Telescope
+  * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @param $get array.
+  * @param $post array Argument obligatoire.
+  * @return integer
+  */
+	public function _POST($get,$post){
+    $input = file_get_contents('php://input');
+    if (!empty($input)) parse_str($input,$post);
+    $suivi=array(
+    	'suivi'=>array(
+    		'id_societe'=> $post['id_societe'],
+    		'type'=>$post['type'],
+    		'texte'=>$post['texte'],
+    		'date'=>$post['date'],
+    		'id_affaire'=> $post['id_affaire'],
+    		"suivi_contact"=>$post['suivi_contact'],
+    		"suivi_societe"=>$post['suivi_societe'],
+    		"suivi_notifie"=>$post['suivi_notifie'],
+    		"id_opportunite"=>$post['id_opportunite'],
+    		'ponderation'=>$post['ponderation'],
+    		'temps_passe'=>$post['temps_passe']
+    	)
+    );
+
+    $return['id_suivi'] =$this->insert($suivi);
+    return $return;
+  }
+
+    /**
+  * Fonction _PUT pour telescope
+  * @package Telescope
+  * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @param $get array.
+  * @param $post array Argument obligatoire.
+  * @return boolean | integer
+  */
+ /*
+  public function _PUT($get,$post){
+    $input = file_get_contents('php://input');
+    if (!empty($input)) parse_str($input,$post);
+    $suivi=array(
+    	'suivi'=>array(
+    		'id_societe'=> $post['id_societe'],
+    		'type'=>$post['type'],
+    		'texte'=>$post['texte'],
+    		'date'=>$post['date'],
+    		'id_affaire'=> $post['id_affaire'],
+    		"suivi_contact"=>$post['suivi_contact'],
+    		"suivi_societe"=>$post['suivi_societe'],
+    		"suivi_notifie"=>$post['suivi_notifie'],
+    		"id_opportunite"=>$post['id_opportunite'],
+    		'ponderation'=>$post['ponderation'],
+    		'temps_passe'=>$post['temps_passe']
+    	)
+    );
+
+    $return['id_suivi'] =$this->update($suivi);
+    return $return;
+  }
+  */
 };
 ?>
