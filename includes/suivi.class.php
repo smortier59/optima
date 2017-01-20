@@ -333,7 +333,7 @@ class suivi extends classes_optima {
     * Jointure avec la table de liaison pour avoir les contacts
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
     */
-	public function select_all() {
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false,$parent=false) {
 		$this->q
 			->addJointure("suivi","id_suivi","suivi_contact","id_suivi")
 			->addJointure("suivi_contact","id_contact","contact","id_contact","contact_cont")
@@ -349,7 +349,7 @@ class suivi extends classes_optima {
 
 			->addGroup("suivi.id_suivi");
 
-		return parent::select_all();
+		return parent::select_all($order_by,$asc,$page,$count);
 	}
 
 	/**
@@ -594,6 +594,10 @@ class suivi extends classes_optima {
 			"texte"=>array(),
 			"suivi.id_suivi"=>array(),
 			"suivi.id_opportunite"=>array(),
+			"suivi.intervenant_client"=> array('custom'=>true),
+			"suivi.intervenant_societe"=> array('custom'=>true),
+			"suivi.temps_passe"=> array(),
+			"suivi.ponderation"=> array(),
 		);
 
 		$this->q->reset();
@@ -692,12 +696,12 @@ class suivi extends classes_optima {
   * @param $post array Argument obligatoire.
   * @return boolean | integer
   */
- /*
   public function _PUT($get,$post){
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
     $suivi=array(
     	'suivi'=>array(
+    		'id_suivi'=> $post['id_suivi'],
     		'id_societe'=> $post['id_societe'],
     		'type'=>$post['type'],
     		'texte'=>$post['texte'],
@@ -712,9 +716,10 @@ class suivi extends classes_optima {
     	)
     );
 
-    $return['id_suivi'] =$this->update($suivi);
+    $this->update($suivi);
+    $return['id_suivi'] = $post['id_suivi'];
     return $return;
   }
-  */
+
 };
 ?>
