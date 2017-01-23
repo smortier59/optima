@@ -227,7 +227,7 @@ class facture_fournisseur extends classes_optima {
 
 		$id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$infos["id_affaire"], "provenance"=>ATF::$usr->trans($class->name(), "module")." ref : ".$infos['ref']));
 
-		copy($this->filepath($last_id,"fichier_joint"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint2"));
+		copy($this->filepath($last_id,"fichier_joint"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
 
 		ATF::affaire()->redirection("select",$infos["id_affaire"]);
 
