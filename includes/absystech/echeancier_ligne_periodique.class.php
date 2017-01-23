@@ -115,7 +115,6 @@ class echeancier_ligne_periodique extends classes_optima {
     if (!empty($input)) parse_str($input,$post);
       $return = array();
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-    log::logger($post, "ccharlier");
     unset($post["id_echeancier"],$post["total"]);
     // parser la date sous le bon format pour mysql
     $post["mise_en_service"] = date("Y-m-d",$post["mise_en_service"] ? strtotime($post["mise_en_service"]) : time());
