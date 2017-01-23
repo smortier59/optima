@@ -52,6 +52,31 @@ class opportunite_absystech extends opportunite {
 
 		return $id_affaire;
 	}
+
+	/** Fonction qui génère les résultat pour les champs d'auto complétion opportunite
+	* @author Cyril CHARLIER <ccharlier@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+		$length = 25;
+		$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("opportunite.id_opportunite","id_opportunite")->addField("opportunite.opportunite","opportunite");
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		if ($get['id_societe']) {
+			$this->q->where("opportunite.id_societe",$get["id_societe"]);
+		}
+
+		$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
 }
 
 
