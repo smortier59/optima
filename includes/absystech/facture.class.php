@@ -2062,22 +2062,12 @@ class facture_absystech extends facture {
 			$societe = false;
 		}
 
-		ATF::facture()->q->reset()->where('id_facture', intval($get["id_facture"]), 'AND', false, '<')->addOrder('id_facture', 'DESC')->setLimit(1);
-		$previous = ATF::facture()->sa();
-		$previousId = $previous[0]["id_facture"];
-
-		ATF::facture()->q->reset()->where('id_facture', intval($get["id_facture"]), 'AND', false, '>')->setLimit(1);
-		$next = ATF::facture()->sa();
-		$nextId = $next[0]["id_facture"];
-
 		return array(
 			"facture"=> $detail_facture,
 			"facture_ligne"=>$facture_ligne,
 			"affaire" => $affaire,
 			"societe" => $societe,
-			"data" =>$this->getBase64Facture($get["id_facture"]),
-			"previous" => $previousId,
-			"next" => $nextId
+			"data" =>$this->getBase64Facture($get["id_facture"])
 		);
 	}
 
