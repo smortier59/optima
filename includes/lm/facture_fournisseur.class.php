@@ -1029,6 +1029,10 @@ class facture_fournisseur extends classes_optima {
 				$pack = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit"));
 				$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
 
+				$d1 = date("Y-m-01", strtotime(date("Y-m-d")." +1 month"));
+				$d1 = date("Ymd", strtotime($d1. " -1 day"));
+
+				$date_comptable = $date_app_taux = $d1;
 
 	        	$donnees[$key][1][1] = "1";
 	        	$donnees[$key][1][2] = "1";
@@ -1037,10 +1041,10 @@ class facture_fournisseur extends classes_optima {
 	        	$donnees[$key][1][5] = "120";
 	        	$donnees[$key][1][6] = "CLEODIS";
 	        	$donnees[$key][1][7] = "20";
-	        	$donnees[$key][1][8] =  ""; //date comptable = Denier jour de la periode
+	        	$donnees[$key][1][8] =  $date_comptable; //date comptable = Denier jour de la periode
 	        	$donnees[$key][1][9] =  "1";
 	        	$donnees[$key][1][10] = "EUR";
-	        	$donnees[$key][1][11] = date("Ymd"); //date application du taux
+	        	$donnees[$key][1][11] = $date_app_taux; //date application du taux
 	        	$donnees[$key][1][12] = $rayon; //Centre cout/profit R03(Alarme)- R04(Chaudiere) - 00000(Immo)
 	        	$donnees[$key][1][13] = "1";
 	    		$donnees[$key][1][14] = "681120";
@@ -1054,7 +1058,7 @@ class facture_fournisseur extends classes_optima {
 	        	$donnees[$key][1][22] = "0"; //Montant credit
 				$donnees[$key][1][23] = "0";
 				$donnees[$key][1][24] = "Dotation aux amortissements au ".date("d/m/Y")." ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
-				$donnees[$key][1][25] = ""; //date comptable
+				$donnees[$key][1][25] = $date_comptable; //date comptable
 				$donnees[$key][1][26] = "";
 				$donnees[$key][1][27] = "";
 				$donnees[$key][1][28] = "";
@@ -1074,10 +1078,10 @@ class facture_fournisseur extends classes_optima {
 	        	$donnees[$key][2][5] = "120";
 	        	$donnees[$key][2][6] = "CLEODIS";
 	        	$donnees[$key][2][7] = "20";
-	        	$donnees[$key][2][8] =  ""; //date comptable = Denier jour de la periode
+	        	$donnees[$key][2][8] =  $date_comptable; //date comptable = Denier jour de la periode
 	        	$donnees[$key][2][9] =  "1";
 	        	$donnees[$key][2][10] = "EUR";
-	        	$donnees[$key][2][11] = date("Ymd"); //date application du taux
+	        	$donnees[$key][2][11] = $date_app_taux; //date application du taux
 	        	$donnees[$key][2][12] = "00000";
 	        	$donnees[$key][2][13] = "1";
 	    		$donnees[$key][2][14] = "281560";
@@ -1091,7 +1095,7 @@ class facture_fournisseur extends classes_optima {
 	        	$donnees[$key][2][22] = $montant; //Montant credit
 				$donnees[$key][2][23] = "0";
 				$donnees[$key][2][24] = "Dotation aux amortissements au ".date("d/m/Y")." ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
-				$donnees[$key][2][25] = ""; //date comptable
+				$donnees[$key][2][25] = $date_comptable; //date comptable
 				$donnees[$key][2][26] = "";
 				$donnees[$key][2][27] = "";
 				$donnees[$key][2][28] = "";
