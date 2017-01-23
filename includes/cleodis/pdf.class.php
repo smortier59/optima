@@ -5966,6 +5966,10 @@ class pdf_cleodis extends pdf {
 
 		ATF::facture()->q->reset()->where("facture.id_affaire", $this->devis["id_affaire"])->where("type_facture","refi");
 		$this->facture_refi = ATF::facture()->select_row();
+		if($this->facture_refi){
+			$this->facture_refi = ATF::facture()->select($this->facture_refi["facture.id_facture"]);
+		}
+
 
 
 		$this->cleodis = ATF::societe()->select(4225);
@@ -5990,7 +5994,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(90,3,"CLEODIS.BE SPRL",0,0,"C");
 		$this->cell(90,3,"BELFIUS LEASE SERVICES s.a.",0,1,"C");
 
-		$this->lettreBelfius2();
+		$this->lettreBelfius2($s);
 		$this->cell(0,4,"Fait en deux exemplaires à Bruxelles, le ".$date ,0,1);
 
 		$this->ln(10);
@@ -5999,6 +6003,7 @@ class pdf_cleodis extends pdf {
 	}
 
 	public function lettreBelfius1($s){
+
 		$this->addpage();
 		$this->setfont('times',"BU",12);
 		$this->multicell(0,5,"CONVENTION D’ACHAT DE MATERIEL INFORMATIQUE FAISANT L’OBJET DU CONTRAT DE LOCATION CLEODIS N°".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:""),0);
@@ -6015,8 +6020,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"II CONVENTION D’ACHAT",0,1);
 		$this->ln(2);
 		$this->setfont('times',"",9);
-		$date_facture = ($this->demande_refi["date_cession"]?date("d/m/Y", strtotime($this->demande_refi["date_cession"])):"");
-		if($this->facture_refi["date_previsionnelle"]) $date_facture = date("d/m/Y", strtotime($this->facture_refi["date_previsionnelle"]));
+		$date_facture = ($this->facture_refi["date"]?date("d/m/Y", strtotime($this->facture_refi["date"])):($this->demande_refi["date_cession"]?date("d/m/Y", strtotime($this->demande_refi["date_cession"])):""));
 		$this->multicell(0,4,"1. Par la présente, CLEODIS.BE vend à BELFIUS LEASE SERVICES le matériel décrit dans l’article des conditions particulières du contrat de location CLEODIS.BE précité, pour le prix de ".number_format($this->demande_refi["loyer_actualise"],2,","," ")." EUR hors TVA, payable le ".$date_facture,0);
 		$this->cell(0,4,"Ce prix a été calculé sur base des éléments suivants :",0,1);
 		$this->ln(5);
@@ -6032,7 +6036,8 @@ class pdf_cleodis extends pdf {
 		$this->image(__PDF_PATH__.'cleodisbe/puce.png',12,$this->getY()+1,3);
 		$this->cell(0,4,"une valeur résiduelle de 15 EUR hors TVA",0,1);
 		$this->setLeftMargin(10);
-		$this->cell(0,4,"La cession prend effet au ".($this->demande_refi["date_cession"]?date("d/m/Y", strtotime($this->demande_refi["date_cession"])):""),0,1);
+
+		$this->cell(0,4,"La cession prend effet au ".date("d/m/Y", strtotime($this->commande["date_debut"])),0,1);
 		$this->setLeftMargin(10);
 
 		$this->ln(3);
@@ -6044,7 +6049,7 @@ class pdf_cleodis extends pdf {
 		$liste = array("convention de cession du contrat de location et des ".$this->loyer[0]["duree"]." loyers ".$freq." de ".$prix." EUR, dûment signée par CLEODIS.BE;",
 						"un exemplaire original du contrat de location n° ".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:"")." conclu entre CLEODIS.BE et son client, ainsi que de toutes ses parties et annexes;",
 						"copie de la présente convention d’achat dûment signée par les personnes habilitées;",
-						"la facture de vente de l’équipement, établie par CLEODIS.BE au nom de BELFIUS LEASE SERVICES pour un montant de ".number_format($this->demande_refi["prix"],2,","," ")." EUR hors TVA; ",
+						"la facture de vente de l’équipement, établie par CLEODIS.BE au nom de BELFIUS LEASE SERVICES pour un montant de ".number_format($this->demande_refi["loyer_actualise"],2,","," ")." EUR hors TVA; ",
 						"copie de la notification de la cession au locataire;",
 						"l’avis de domiciliation, dûment signé par le locataire.",
 						"copie de la notification au propriétaire de l’immeuble"
@@ -6064,7 +6069,7 @@ class pdf_cleodis extends pdf {
 
 	}
 
-	public function lettreBelfius2(){
+	public function lettreBelfius2($s){
 		$this->addpage();
 		$this->setfont('times',"BU",12);
 		$this->multicell(0,5,"CONVENTION DE CESSION D’UN CONTRAT DE LOCATION ",0,"C");
@@ -6073,7 +6078,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(0,5,"I. EXPOSE DES FAITS",0,1);
 		$this->ln(2);
 		$this->setfont('times',"",9);
-		$this->multicell(0,4,"La SPRL CLEODIS.BE, ayant son siège social ".$cleodis["adresse_siege_social"].", a conclu le ".$s['date_signature']." avec la société ".$this->client["societe"].", le contrat de location n° ".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:"")." portant sur des équipements informatiques, plus amplements décrits dans les conditions particulières  dudit contrat et dont une copie est jointe en annexe pour faire partie intégrante de cette cession.",0);
+		$this->multicell(0,4,"La SPRL CLEODIS.BE, ayant son siège social ".$this->cleodissiege.", a conclu le ".$s['date_signature']." avec la société ".$this->client["societe"].", le contrat de location n° ".$this->affaire["ref"].($this->client['code_client']?"-".$this->client['code_client']:"")." portant sur des équipements informatiques, plus amplements décrits dans les conditions particulières  dudit contrat et dont une copie est jointe en annexe pour faire partie intégrante de cette cession.",0);
 		$this->ln(5);
 		$this->multicell(0,4,"La SPRL CLEODIS.BE vend à la s.a. BELFIUS LEASE SERVICES, ayant son siège social Place Rogier 11 1210 Bruxelles, ces équipements et désire céder à cette dernière le contrat de location y relatif, conformément aux stipulations de l’article 10.2 des conditions générales de ce contrat.",0);
 		$this->ln(5);
