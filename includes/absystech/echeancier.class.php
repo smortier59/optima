@@ -84,6 +84,25 @@ class echeancier extends classes_optima {
       if ($get['filters']['actif'] == "on") {
         $this->q->andWhere("actif","oui");
       }
+
+      // Filtre mensuel
+      if ($get['filters']['mensuel'] == "on") {
+        $this->q->where("echeancier.periodicite","mensuelle","OR","periodicite");
+      }
+      // Filtre trimestre
+      if ($get['filters']['trimestre'] == "on") {
+        $this->q->where("echeancier.periodicite","trimestrielle","OR","periodicite");
+      }
+      // Filtre trimestre
+      if ($get['filters']['annuel'] == "on") {
+        $this->q->where("echeancier.periodicite","annuelle","OR","periodicite");
+      }
+      // Filtre semestre
+      if ($get['filters']['semestriel'] == "on") {
+        $this->q->where("echeancier.periodicite","semestrielle","OR","periodicite");
+      }
+
+
       $this->q->setLimit($get['limit'])->setCount();
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
     }
@@ -291,7 +310,7 @@ class echeancier extends classes_optima {
     $facture["facture"] = array("id_societe"=> $echeancier["id_societe"],
                                 "type_facture" => "facture_periodique",
                                 "date"=> $date_facture,
-                                "infosSup" => NULL,
+                                "infosSup" => $get["infosSup"],
                                 "id_affaire" => $echeancier["id_affaire"],
                                 "date_previsionnelle" => NULL,
                                 "date_relance" => NULL,
@@ -320,30 +339,23 @@ class echeancier extends classes_optima {
     if($get["preview"]){
       $facture["preview"] = true;
     }else{
-      if(!$get["fin_contrat"]){
-        // on change la date de début de prochaine echeance s'il n'y a pas de fin de contrat
-        ATF::echeancier()->u(
-          array(
-            "id_echeancier"=>$id_echeancier,
-            "prochaine_echeance"=>
-              date("Y-m-d",strtotime("+1 day",strtotime($date_fin_periode)))
-          )
-        );
-      }else{
+      if($get["fin_contrat"]) {
+        $fin_contrat = strtotime($get["fin_contrat"]);
+        $fin_period = strtotime($date_fin_periode);
+
         // si la date de fin de contrat est avant la fin de période actuelle
-        if(date('Y-m-d',strtotime($get["fin_contrat"])) < date('Y-m-d', strtotime($date_fin_periode)) ){
+        if($fin_contrat < $fin_period){
           // le contrat est fini, on peut cacher la ligne de la liste des facturations
           ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"actif"=>"non"));
         }else{
-           ATF::echeancier()->u(
-            array(
-              "id_echeancier"=>$id_echeancier,
-              "prochaine_echeance"=>
-              date("Y-m-d",strtotime("+1 day",strtotime($date_fin_periode)))
-            )
-          );
+          $next_echeance = strtotime($date_fin_periode."+1 days");
+          ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"prochaine_echeance"=>date("Y-m-d",$next_echeance)));
         }
+      } else {
+        $next_echeance = strtotime($date_fin_periode."+1 days");
+        ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"prochaine_echeance"=>date("Y-m-d",$next_echeance)));
       }
+
     }
 
 
@@ -384,19 +396,15 @@ class echeancier extends classes_optima {
     $d2 = explode("-",$periode_fin);
     $periode_fin = $d2[2].$d2[1].$d2[0];
 
-    ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier", $id_echeancier);
+    ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier", $id_echeancier)->where("date_valeur",$periode_fin,"OR",false,"<");
     $echeancier_ligne_ponctuelle = ATF::echeancier_ligne_ponctuelle()->select_all();
 
-    ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier);
+    ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier)->where("mise_en_service",$periode_fin,"OR",false,"<");
     $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
 
     foreach ($echeancier_ligne_ponctuelle as $key => $value) {
-      $d3 = str_replace("-", "", $value["date_valeur"]);
-
-      if($periode_debut <= $d3 && $d3 <= $periode_fin){
-          $value["type"] = "ponctuelle";
-          $lignes[] = $value;
-      }
+      $value["type"] = "ponctuelle";
+      $lignes[] = $value;
     }
 
     foreach ($echeancier_ligne_periodique as $key => $value) {
