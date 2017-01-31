@@ -90,7 +90,7 @@ class echeancier extends classes_optima {
         $this->q->where("echeancier.periodicite","mensuelle","OR","periodicite");
       }
       // Filtre trimestre
-      if ($get['filters']['trimestre'] == "on") {
+      if ($get['filters']['trimestriel'] == "on") {
         $this->q->where("echeancier.periodicite","trimestrielle","OR","periodicite");
       }
       // Filtre trimestre
@@ -106,6 +106,7 @@ class echeancier extends classes_optima {
       $this->q->setLimit($get['limit'])->setCount();
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
     }
+
     if($get['id_echeancier']){
       // GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
       $data['periodique'] = ATF::echeancier_ligne_periodique()->select_special('id_echeancier', $get['id_echeancier']);
