@@ -2461,7 +2461,7 @@ class hotline extends classes_optima {
 
 			}
 		}
-		log::logger($graph, "alahlah");
+
 		return $graph;
 	}
 

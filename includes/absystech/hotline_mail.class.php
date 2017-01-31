@@ -128,7 +128,6 @@ class hotline_mail {
 			$infos["interaction"]=ATF::hotline_interaction()->select($id_hotline_interaction);
 		}
 
-
 		$this->current_mail = new mail($infos);
 		//return $this->mail->send();
 	}
@@ -150,6 +149,7 @@ class hotline_mail {
 	* @return mixed
 	*/
 	public function getCurrentMail(){
+
 		//Current mail
 		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 		return $this->current_mail;
@@ -231,6 +231,7 @@ class hotline_mail {
 		$id_hotline=ATF::hotline()->decryptId($id_hotline);
 		$obj=ATF::$usr->trans("mail_hotline_objet3").$id_hotline;
 		$to=ATF::contact()->select(ATF::hotline()->select($id_hotline,"id_contact"),"email");
+
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_contact"));
 		$template="hotline_facturation";
 		$this->setCurrentMail("mail_billing");
@@ -244,6 +245,7 @@ class hotline_mail {
 	* @param int $id_hotline
 	*/
 	public function createMailInsert($id_hotline,$pj=false,$id_user=NULL){
+
 		if(!$id_hotline) throw new errorATF(ATF::$usr->trans("null_id_hotline"));
 		//Paramètres du mail
 		$id_hotline=ATF::hotline()->decryptId($id_hotline);
