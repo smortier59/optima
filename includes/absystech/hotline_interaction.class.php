@@ -2055,8 +2055,8 @@ class hotline_interaction extends classes_optima {
 	* @param array $files Les fichiers uploadés
 	* @param boolean $mail True si on désire
 	* @param boolean $pointage True si on désire créer le pointage
-  * @return boolean true
-  */
+    * @return boolean true
+    */
 	public function insertTS($infos,$mail = true) {
 
 		$recipient = array();
