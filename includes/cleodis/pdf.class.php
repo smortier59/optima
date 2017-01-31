@@ -7567,6 +7567,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public $logo = 'cleodisbe/logo.jpg';
 	public $texteHT = "HTVA";
 	public $texteTTC = "TVAC";
+	public $heightLimitTableContratPV = 70;
 
 	/* Header spécifique aux documents cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -9184,15 +9185,15 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial',"",8);
 		$this->Rotate(0);
 
-		$this->cadre(25,215,70,50,$cadre,"Loueur");
-		$this->cadre(115,215,70,50,$cadre,"Cessionnaire");
+		$this->cadre(25,224,70,48,$cadre,"Loueur");
+		$this->cadre(115,224,70,48,$cadre,"Cessionnaire");
 		$this->setxy(25,259);
 		$this->cell(10,5,"");
 		$this->cell(50,5,"Signature et cachet",0,0,'C');
 		$this->cell(10,5,"",0,1);
 		$this->setxy(125,259);
 		$this->multicell(50,5,"Signature et cachet",0,'C');
-		$this->ln(2);
+		$this->ln(8);
 		$this->setfillColor(211,211,211);
 		$this->multicell(0,4,"PARTIE RESERVEE A CLEODIS","TB","C",1);
 
