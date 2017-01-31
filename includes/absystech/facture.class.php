@@ -1936,7 +1936,7 @@ class facture_absystech extends facture {
 	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "date";
+		if (!$get['tri']) $get['tri'] = "facture.date";
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
@@ -1970,7 +1970,18 @@ class facture_absystech extends facture {
 		if ($get['id']) {
 			$this->q->where("id_facture",$get['id'])->setLimit(1);
 		} else {
+			if ($get['id_societe']) {
+				$this->q->where("facture.id_societe",$get['id_societe']);
+			}
 			$this->q->setLimit($get['limit']);
+		}
+
+		$this->q->addOrder("facture.date","asc");
+
+		switch ($get['tri']) {
+			case 'id_societe':
+				$get['tri'] = "facture.".$get['tri'];
+			break;
 		}
 
 		if($get["filter"]){
