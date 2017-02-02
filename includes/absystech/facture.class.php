@@ -1928,7 +1928,7 @@ class facture_absystech extends facture {
 	/**
 	* Permet de récupérer la liste des factures pour telescope
 	* @package Telescope
-	* @author Morgan FLEURQUIB <mfleurquin@absystech.fr>
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
@@ -1976,7 +1976,7 @@ class facture_absystech extends facture {
 			$this->q->setLimit($get['limit']);
 		}
 
-		$this->q->addOrder("facture.date","asc");
+		//$this->q->addOrder("facture.date","asc");
 
 		switch ($get['tri']) {
 			case 'id_societe':
@@ -2080,6 +2080,11 @@ class facture_absystech extends facture {
 			"societe" => $societe,
 			"data" =>$this->getBase64Facture($get["id_facture"])
 		);
+	}
+
+	public function _getFactureSociete($get,$post){
+		$this->q->reset()->where("facture.id_societe",$post["id_societe"]);
+		return $this->sa();
 	}
 
 	public function getBase64Facture($id) {
