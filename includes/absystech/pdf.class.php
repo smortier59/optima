@@ -35,6 +35,14 @@ class pdf_absystech extends pdf {
 		,"align" => "R"
 	);
 
+	private $rightStyleRed = array(
+		 "size" => 8
+		,"color" => "ef3933"
+		,"font" => "arial"
+		,"border" => ""
+		,"align" => "R"
+	);
+
 	var $repeatEntete = true;
 
 	private $noPageNo = false;
@@ -2403,21 +2411,57 @@ La dénonciation devra être notifiée par lettre recommandée avec accusé de r
 	}
 
 
+	public function recapHotline($infos){
+		$this->Open();
+		$this->Addpage();
+
+		$this->setFont('arial','B',12);
+
+		$this->multicell(0,20,"RECAPITULATIF HOTLINE ".ATF::societe()->select($infos["societe"],"societe")." du ".$infos["debut"]." au ".$infos["fin"],0,"C");
+
+		$this->setFont('arial','',10);
+
+		$solde = $nb_tickets = 0;
+
+		$head = array(	"N°",
+						"Résumé",
+						"Date",
+						"Votre Contact",
+						"Contact AbsysTech",
+						"Crédits",
+						"Solde");
+
+		$width = array(15,50,20,30,30,20,25);
+
+		foreach ($infos["data"] as $key => $value) {
+
+			$data[] = array($value["id_hotline"],
+							($value["id_hotline"]) ? $value["hotline"] : "Crédit ".ATF::facture()->select($value["id_facture"],'ref'),
+							date("d-m-Y", strtotime($value["date"])),
+							($value["id_contact"] ? ATF::contact()->select($value["id_contact"],"nom") : ""),
+							($value["id_user"] ? ATF::user()->select($value["id_user"],"nom") : ""),
+							$value["nbre_tickets"],
+							$value["solde"]
+							);
+			$s[] = array(NULL,$this->leftStyle,NULL,NULL,NULL,$this->rightStyle,$this->rightStyle);
+			$solde = $value["solde"];
+			$nb_tickets = $nb_tickets + $value["nbre_tickets"];
+		}
+
+		$data[] = array("",
+						"",
+						"",
+						"",
+						"",
+						$nb_tickets,
+						$solde);
+
+		$s[] = array(NULL,$this->leftStyle,NULL,NULL,NULL,$this->rightStyleRed,$this->rightStyleRed);
+
+		$this->tableau($head,$data,$width,7,$s,260);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
 
 }
 
