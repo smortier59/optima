@@ -362,15 +362,15 @@ class societe_absystech extends societe {
 	*/
 	public function send_identifiants_hotline($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		//Test du contact
-		if(!$infos['id_contact']) throw new errorATF(ATF::$usr->trans('si_hotline_no_contact',$this->table));
+		if(!$infos['id_contact']) throw new errorATF(ATF::$usr->trans('si_hotline_no_contact',$this->table),500);
 		//Test de la societe
-		if(!$infos['id_societe']) throw new errorATF(ATF::$usr->trans('si_hotline_no_societe',$this->table));
+		if(!$infos['id_societe']) throw new errorATF(ATF::$usr->trans('si_hotline_no_societe',$this->table),500);
 
 		//Recherche du contact
 		$contact=ATF::contact()->select($infos['id_contact']);
 
 		//Mail vide
-		if(!$contact['email']) throw new errorATF(ATF::$usr->trans('si_hotline_contact_no_mail',$this->table));
+		if(!$contact['email']) throw new errorATF(ATF::$usr->trans('si_hotline_contact_no_mail',$this->table),500);
 
 		//Recherche de la societe
 		$societe=$this->select($infos['id_societe']);
@@ -1213,38 +1213,37 @@ class societe_absystech extends societe {
 
 		ATF::facture()->q->reset()->addAllFields("facture")->where("facture.id_societe",$infos["id_societe"]);
 		ATF::facture()->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
-			,0
-			,IF(
-				(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-				,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-				,(facture.prix*facture.tva)
-			)),2)","solde")
-		    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
-		    ->addField("IF(facture.etat!='perte'
-				,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
-					,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-					    *ROUND(IF(
-							(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-							,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-							,facture.prix*facture.tva
-						),2))
-				,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-					    *ROUND(IF(
-							(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-							,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-							,facture.prix*facture.tva
-						),2))>0
-					, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-				    *ROUND(IF(
-						(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-						,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-						,facture.prix*facture.tva
-					),2))
-					, 0 )
-				)
-			,0)","interet")
-	    ->addGroup("facture.id_facture");
-
+								,0
+								,IF(
+									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+									,(facture.prix*facture.tva)
+								)),2)","solde")
+						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
+						    ->addField("IF(facture.etat!='perte'
+										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
+											,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+											    *ROUND(IF(
+													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+													,facture.prix*facture.tva
+												),2))
+										,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+											    *ROUND(IF(
+													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+													,facture.prix*facture.tva
+												),2))>0
+											, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+										    *ROUND(IF(
+												(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+												,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+												,facture.prix*facture.tva
+											),2))
+											, 0 )
+										)
+									,0)","interet")
+						    ->addGroup("facture.id_facture");
 		$factures = ATF::facture()->select_all();
 
 		if (!$factures) return null;
@@ -1403,6 +1402,35 @@ class societe_absystech extends societe {
 				}
 			}
 		}
+	}
+
+	public function _hotline_echeancier($get, $post){
+
+		$date_debut = $post["date_debut_rapport"];
+		$date_fin = $post["date_fin_rapport"];
+
+		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","id_hotline")
+								  ->addField("gestion_ticket.solde","solde")
+								  ->addField("gestion_ticket.id_facture","id_facture")
+								  ->addField("gestion_ticket.libelle","libelle")
+								  ->addField("gestion_ticket.nbre_tickets","nbre_tickets")
+								  ->addField("gestion_ticket.date","date")
+								  ->addField("gestion_ticket.id_facture","id_facture")
+								  ->addField("hotline.id_contact","id_contact")
+								  ->addField("hotline.id_user","id_user")
+								  ->addField("hotline.hotline","hotline")
+								  ->addField("hotline.facturation_ticket","facturation_ticket")
+								  ->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($post["id_societe"]))
+								  //->whereIsNotNull("id_hotline")
+								  ->addCondition("gestion_ticket.date",util::formatDate($date_fin),"AND",false,"<=")
+								  ->addCondition("gestion_ticket.date",util::formatDate($date_debut),"AND",false,">=")
+								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
+								  ->addOrder("gestion_ticket.date");
+		$result = ATF::gestion_ticket()->sa();
+
+		$res = ATF::pdf()->generic("recapHotline",array("data"=>$result, "debut"=>$date_debut, "fin"=>$date_fin, "societe"=>$post["id_societe"]) ,true);
+
+		return base64_encode($res);
 	}
 
 };

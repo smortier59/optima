@@ -632,6 +632,11 @@ class contact extends classes_optima {
 
 		return $return;
 	}
+
+	public function _getContactSociete($get,$post){
+		$this->q->reset()->where("id_societe",$post['id_societe']);
+		return $this->select_all();
+	}
 };
 
 ?>
