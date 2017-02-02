@@ -25,7 +25,7 @@ class devis_absystech extends devis {
 
 	/**
 	 * Constructeur
-	 */ 
+	 */
 	public function __construct() {
 		parent::__construct();
 		$this->table = "devis";
@@ -84,22 +84,22 @@ class devis_absystech extends devis {
 			,"id_opportunite"
 			,"type_devis"=>array("listeners"=>array("change"=>"ATF.changeTypeDevis","select"=>"ATF.selectTypeDevis"))
 			,"resume"
-			
+
 		);
-			
+
 		$this->colonnes['panel']['location'] = array(
 			"duree_location",
 			"prix_location"
 		);
 
-		
+
 		$this->colonnes['panel']['financement'] = array(
 			"duree_financement"=> array("null"=> true,"listeners"=>array("change"=>"ATF.changefinancement")),
 			"cout_total_financement"=> array("null"=> true,"listeners"=>array("change"=>"ATF.changefinancement")),
 			"maintenance_financement"=> array("null"=> true,"listeners"=>array("change"=>"ATF.changefinancement")),
 			"financement_cleodis"
 		);
-		
+
 		$this->colonnes['panel']['redaction'] = array(
 			"id_politesse_pref"
 			,"id_politesse_post"
@@ -125,7 +125,7 @@ class devis_absystech extends devis {
 		);
 
 		$this->colonnes['panel']['lignes_consommable'] = array(
-			"duree_contrat_cout_copie"			
+			"duree_contrat_cout_copie"
 			,"consommables"=>array("custom"=>true)
 		);
 
@@ -187,7 +187,7 @@ class devis_absystech extends devis {
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
-	public function devis_signe(){		
+	public function devis_signe(){
 		$this->q->reset()
 				->setStrict()
 				->addField('count(*)','dif')
@@ -195,21 +195,21 @@ class devis_absystech extends devis {
 				->addField("sum(case devis.etat when 'gagne' then 1  else 0 end)",'nb_gagne')
 				->addField("sum(case devis.etat when 'attente' then 1 when 'bloque' then 1 else 0 end)",'nb_attente')
 				->addField("sum(case devis.etat when 'perdu' then 1  when 'remplace' then 1 when 'annule' then 1 else 0 end)",'nb_perdu')
-								
+
 
 
 				->addField("CONCAT(`user`.`prenom`,' ',`user`.`nom`)","user")
 				->addField("user.id_user","id_user")
 
-				->addJointure("devis","id_user","user","id_user")	
-				
+				->addJointure("devis","id_user","user","id_user")
+
 				->addCondition("devis.date","'".date("Y-m-d 00:00:00", strtotime(date("Y-m-d")." -1 month"))."'",NULL,false,">=",false,false,true)
 
 				->addGroup("devis.id_user")
 				->addOrder("dif",'desc');
 		$result=parent::sa();
 
-		
+
 		foreach ($result as $i) {
 			$nom=ATF::user()->select($i["id_user"]);
 			$graph['categories']["category"][$i['user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
@@ -217,27 +217,27 @@ class devis_absystech extends devis {
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";
 		$graph['categories']['params']["fontSize"] = "12";
-		
-		
-		/*parametres graphe*/		
-		$this->paramGraphe($dataset_params,$graph);	
+
+
+		/*parametres graphe*/
+		$this->paramGraphe($dataset_params,$graph);
 
 		$liste_etat=array('perdu'=>"FF0033", 'attente'=>"2f7ed8",'gagne'=>"0000FF");
-				
-		foreach ($result as $val_){			
+
+		foreach ($result as $val_){
 			foreach($liste_etat as $etat=>$couleur){
 				if (!$graph['dataset'][$etat]) {
 					$graph['dataset'][$etat]["params"] = array_merge($dataset_params,array(
 						"seriesname"=>ATF::$usr->trans("etat_".$etat,'devis')
 						,"color"=>$couleur
 					));
-					
+
 					foreach ($result as $val_2) {
 						$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : 0");
 					}
 				}
 				$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : ".$val_['nb_'.$etat]);
-				
+
 			}
 		}
 		return $graph;
@@ -256,9 +256,9 @@ class devis_absystech extends devis {
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
-	public function devis_prix($marge = false){	
+	public function devis_prix($marge = false){
 		$this->q->reset()
-				->setStrict()				
+				->setStrict()
 				->addField('devis.etat','etat');
 
 		if($marge){
@@ -268,15 +268,15 @@ class devis_absystech extends devis {
 		}else{
 			$this->q->addField("sum(case devis.etat when 'gagne' then devis.prix  else 0 end)",'nb_gagne')
 					->addField("sum(case devis.etat when 'attente' then devis.prix when 'bloque' then devis.prix else 0 end)",'nb_attente')
-					->addField("sum(case devis.etat when 'perdu' then devis.prix  when 'remplace' then devis.prix when 'annule' then devis.prix else 0 end)",'nb_perdu');								
-		}	
+					->addField("sum(case devis.etat when 'perdu' then devis.prix  when 'remplace' then devis.prix when 'annule' then devis.prix else 0 end)",'nb_perdu');
+		}
 
 		$this->q->addField("CONCAT(`user`.`prenom`,' ',`user`.`nom`)","user")
 				->addField("user.id_user","id_user")
 
-				->addJointure("devis","id_user","user","id_user")	
+				->addJointure("devis","id_user","user","id_user")
 				->addJointure("devis","id_devis","commande","id_devis")
-				
+
 				->addCondition("devis.date","'".date("Y-m-d 00:00:00", strtotime(date("Y-m-d")." -1 month"))."'","OR","date",">=",false,false,true)
 				->addCondition("commande.date","'".date("Y-m-d", strtotime(date("Y-m-d")." -1 month"))."'","OR","date",">=",false,false,true)
 
@@ -284,7 +284,7 @@ class devis_absystech extends devis {
 				->addOrder("nb_gagne",'desc');
 		$result=parent::sa();
 
-		
+
 		foreach ($result as $i) {
 			$nom=ATF::user()->select($i["id_user"]);
 			$graph['categories']["category"][$i['id_user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
@@ -292,30 +292,30 @@ class devis_absystech extends devis {
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";
 		$graph['categories']['params']["fontSize"] = "12";
-		
-		
-		/*parametres graphe*/		
-		$this->paramGraphe($dataset_params,$graph);	
+
+
+		/*parametres graphe*/
+		$this->paramGraphe($dataset_params,$graph);
 
 		$liste_etat=array('perdu'=>"FF0033", 'attente'=>"2f7ed8",'gagne'=>"0000FF");
-				
-		foreach ($result as $val_) {			
+
+		foreach ($result as $val_) {
 			foreach($liste_etat as $etat=>$couleur){
 				if (!$graph['dataset'][$etat]) {
 					$graph['dataset'][$etat]["params"] = array_merge($dataset_params,array(
 						"seriesname"=>ATF::$usr->trans("etat_".$etat,'devis')
 						,"color"=>$couleur
 					));
-					
-					foreach ($result as $val_2) { 
+
+					foreach ($result as $val_2) {
 						$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : 0");
 					}
 				}
 				$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : ".$val_['nb_'.$etat]);
-				
+
 			}
 		}
-		return $graph;	
+		return $graph;
 	}
 
 
@@ -323,33 +323,33 @@ class devis_absystech extends devis {
 	public function prix_moyen($avg=NULL){
 		$this->q->reset()
 				->setStrict()
-				->addField("COUNT(*)", "nb")				
+				->addField("COUNT(*)", "nb")
 				->addJointure("devis","id_user","user","id_user")
-				->addCondition("user.etat","normal")				
+				->addCondition("user.etat","normal")
 			    ->addCondition("DATE_FORMAT(devis.date,'%Y')","2010","OR",false,">=")
 				->addGroup("DATE_FORMAT(devis.date,'%Y %M')")
 				->addOrder("devis.date",'asc')
-				->addField("DATE_FORMAT(devis.date,'%Y %M')","hotdate")	
+				->addField("DATE_FORMAT(devis.date,'%Y %M')","hotdate")
 				->addField("CONCAT(`user`.`prenom`,' ',`user`.`nom`)","user")
 				->addField("user.id_user","id_user")
-				->addGroup("devis.id_user");	
+				->addGroup("devis.id_user");
 		if($avg){
 			$this->q->addCondition("devis.etat","gagne")
 					->addField("SUM(devis.prix)", "sum");
 		}
-		
-		$result=parent::sa();	
-		
-		
-		
+
+		$result=parent::sa();
+
+
+
 		foreach ($result as $i) {
 			$graph['categories']["category"][$i['hotdate']] = array("label"=>$i['hotdate']);
 		}
-		
-		/*parametres graphe*/		
+
+		/*parametres graphe*/
 		$this->paramGraphe($dataset_params,$graph);
-		
-		
+
+
 		foreach ($result as $val_) {
 			if($avg){
 				if($val_["nb"]>0){
@@ -360,15 +360,15 @@ class devis_absystech extends devis {
 			}else{
 
 			}
-			
+
 
 			if (!$graph['dataset'][$val_['user']]) {
 				$graph['dataset'][$val_['user']]["params"] = array_merge($dataset_params,array(
 					"seriesname"=>$val_['user']
 					,"color"=>dechex(rand(0,16777216))
 				));
-				
-				foreach ($result as $val_2) { 
+
+				foreach ($result as $val_2) {
 					$graph['dataset'][$val_['user']]['set'][$val_2['hotdate']] = array("value"=>0,"alpha"=>100,"titre"=>$val_['user']." : 0");
 				}
 			}
@@ -376,8 +376,8 @@ class devis_absystech extends devis {
 		}
 
 		//log::logger($graph , "mfleurquin");
-		
-		return $graph;		
+
+		return $graph;
 	}
 
 
@@ -470,7 +470,7 @@ class devis_absystech extends devis {
 				->setStrict()
 				->setToString();
 				$subQuery = $d->select_all();
-					
+
 				$this->q
 				->addCondition("devis.id_devis",$subQuery,'AND',false,"=",false,true)
 				->addOrder('devis.date_modification','desc');
@@ -525,11 +525,11 @@ class devis_absystech extends devis {
 	 * @return boolean
 	 */
 	public function can_update($id,$infos=false){
-		if($devis=$this->select($id)){			
-			if(ATF::societe()->estFermee($devis["id_societe"])){			
+		if($devis=$this->select($id)){
+			if(ATF::societe()->estFermee($devis["id_societe"])){
 				throw new errorATF(ATF::$usr->trans("Impossible de modifier un devis car la société est inactive"));
 			}
-			
+
 			ATF::commande()->q->reset()
 			->addCondition("commande.id_affaire",$devis["id_affaire"])
 			->setDimension("row")
@@ -622,12 +622,12 @@ class devis_absystech extends devis {
 	 * @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	 */
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		
-		unset($infos["devis"]["financement_mois"] , $infos["devis"]["marge_financement"]);	
-		if(ATF::societe()->estFermee($infos["devis"]["id_societe"])){			
+
+		unset($infos["devis"]["financement_mois"] , $infos["devis"]["marge_financement"]);
+		if(ATF::societe()->estFermee($infos["devis"]["id_societe"])){
 			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter un devis car la société est inactive"));
-		}		
-		
+		}
+
 		if($infos["label_devis"]["id_politesse_post"] && !$infos["devis"]["id_politesse_post"]){
 			if($infos["label_devis"]["id_politesse_post"] == "Veuillez agréer, Mademoiselle, l'expression de nos sentiments les meilleurs."){
 				$politesse = ATF::politesse()->cryptId(12);
@@ -636,15 +636,15 @@ class devis_absystech extends devis {
 			}else{
 				$politesse = ATF::politesse()->cryptId(6);
 			}
-			$infos["devis"]["id_politesse_post"] = $politesse;	
+			$infos["devis"]["id_politesse_post"] = $politesse;
 		}
-		
+
 		if($infos["label_devis"]["id_termes"] && !$infos["devis"]["id_termes"]){
 				ATF::termes()->q->reset()->where("termes", $infos["label_devis"]["id_termes"]);
-				$termes = ATF::termes()->select_row();				
+				$termes = ATF::termes()->select_row();
 				$infos["devis"]["id_termes"] = $termes["id_termes"];
 		}
-		
+
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{
@@ -652,7 +652,7 @@ class devis_absystech extends devis {
 		}
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$consommables = json_decode($infos["values_".$this->table]["consommables"],true);
-	
+
 
 		$this->infoCollapse($infos);
 
@@ -682,14 +682,14 @@ class devis_absystech extends devis {
 					$infos["filestoattach"][$key]="";
 				}
 			}
-			
+
 			if($infos["emailTexte"]){
 				// Enregistrement des infos du mail
 				$infos["mail"]=$infos["email"];
 				ATF::mail()->check_mail($infos["email"]);
 				$infos["mail_copy"]=$infos["emailCopie"];
 				$infos["mail_text"]=$infos["emailTexte"];
-			}					
+			}
 		}
 		unset($infos["email"],$infos["emailCopie"],$infos["emailTexte"]);
 
@@ -702,7 +702,7 @@ class devis_absystech extends devis {
 		$infos["id_societe"] = $societe["id_societe"];
 		if($societe["id_pays"]!="FR") $infos["tva"] =  1;
 		else $infos["tva"] =  __TVA__;
-		
+
 		//Vérification du devis
 		$this->check_field($infos);
 
@@ -728,51 +728,51 @@ class devis_absystech extends devis {
 		//*****************************Transaction********************************
 
 		//Affaire
-		
+
 		$affaire["etat"]='devis';
 		$affaire["id_societe"]=$infos["id_societe"];
 		$affaire["affaire"]=$infos["resume"];
 		$affaire["date"]=$infos["date"];
 		$affaire["id_termes"]=$infos["id_termes"];
 		$affaire["forecast"]=20;
-		$affaire["id_commercial"]=$infos["id_user"];		
+		$affaire["id_commercial"]=$infos["id_user"];
 		if ($infos["type_devis"] == "consommable") $affaire["nature"]="consommable";
 
 		if(!$infos["id_affaire"]){
 			$infos["id_affaire"]=ATF::affaire()->insert($affaire,$s);
 		}else{
-			if ($infos["type_devis"] == "consommable"){ 
+			if ($infos["type_devis"] == "consommable"){
 				ATF::affaire()->u(array(
 					"id_affaire"=>$infos["id_affaire"],
 					"id_termes"=>$infos["id_termes"],
 					"etat"=>"devis",
 					"nature"=>"consommable",
 					"forecast"=>20)
-				,$s); 
-			}else{ 
+				,$s);
+			}else{
 				ATF::affaire()->u(array(
 					"id_affaire"=>$infos["id_affaire"],
 					"id_termes"=>$infos["id_termes"],
 					"etat"=>"devis",
 					"forecast"=>20),
-				$s); 
+				$s);
 			}
-			
-		}	
 
-				
+		}
+
+
 		if($infos_ligne){
-			$totalCom = 0;		
+			$totalCom = 0;
 			foreach($infos_ligne as $key=>$item){
 				if(!$item["devis_ligne__dot__quantite"]){
 					$item["devis_ligne__dot__quantite"]=0;
-				}			
-				$totalCom += ($item["devis_ligne__dot__quantite"]* $item["devis_ligne__dot__prix"]);			
+				}
+				$totalCom += ($item["devis_ligne__dot__quantite"]* $item["devis_ligne__dot__prix"]);
 			}
-			$totalCom += $infos["frais_de_port"];		
+			$totalCom += $infos["frais_de_port"];
 			$prix = str_replace(" ","", $infos["prix"]);
 		}
-		
+
 
 
 		//Devis
@@ -800,7 +800,7 @@ class devis_absystech extends devis {
 			}
 		}
 
-		if($consommables && $infos["type_devis"] == "consommable"){			
+		if($consommables && $infos["type_devis"] == "consommable"){
 			foreach($consommables as $key=>$item){
 				foreach($item as $k=>$i){
 					$k_unescape=util::extJSUnescapeDot($k);
@@ -815,21 +815,21 @@ class devis_absystech extends devis {
 				$item["index"]=util::extJSEscapeDot($key);
 				$item["quantite"]=1;
 
-				if(!isset($item["index_nb"])){ 
+				if(!isset($item["index_nb"])){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF(ATF::$usr->trans("index_nb_inexistant"));
 				}
-				if(!isset($item["index_couleur"])){ 
+				if(!isset($item["index_couleur"])){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF(ATF::$usr->trans("index_couleur_inexistant"));
 				}
-				
+
 				ATF::devis_ligne()->insert($item,$s);
-			}			
+			}
 		}
-		
+
 		//*****************************************************************************
-		
+
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -871,14 +871,14 @@ class devis_absystech extends devis {
 					$info_mail["recipient"] = $recipient;
 					//Ajout du fichier
 					$path = $this->filepath($last_id,"fichier_joint");
-						
+
 					$this->devis_mail = new mail($info_mail);
 					$this->devis_mail->addFile($path,$devis["ref"]."-".$devis["revision"].".pdf",true);
 					$this->devis_mail->send();
 				}
 			}
 			ATF::db($this->db)->commit_transaction();
-		}	
+		}
 
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
@@ -886,9 +886,9 @@ class devis_absystech extends devis {
 
 		api::sendUDP(array("data"=>array("type"=>"devis")));
 
-		return $this->cryptId($last_id);			
+		return $this->cryptId($last_id);
 
-			
+
 	}
 
 	/**
@@ -920,15 +920,15 @@ class devis_absystech extends devis {
 			foreach($devis_ref as $key=>$item){
 				parent::delete($item["id_devis"],$s);
 			}
-				
+
 			//Affaire
 			ATF::commande()->q->reset()->addCondition("commande.id_affaire",$devis["id_affaire"])->end();
 			$tab_commande = ATF::commande()->select_all();
-			$this->q->reset()->addCondition("commande.id_affaire",$devis["id_affaire"])->end();
+			$this->q->reset()->addCondition("devis.id_affaire",$devis["id_affaire"])->end();
 			$tab_devis = $this->select_all();
-			ATF::facture()->q->reset()->addCondition("commande.id_affaire",$devis["id_affaire"])->end();
+			ATF::facture()->q->reset()->addCondition("facture.id_affaire",$devis["id_affaire"])->end();
 			$tab_facture = ATF::facture()->sa();
-				
+
 			if(!$tab_facture && !$tab_devis && !$tab_commande) {
 				ATF::affaire()->delete($devis["id_affaire"],$s);
 				unset($devis["id_affaire"]);
@@ -958,9 +958,9 @@ class devis_absystech extends devis {
 			}else{
 				$this->redirection("select_all",NULL,"devis.html");
 			}
-			
+
 			api::sendUDP(array("data"=>array("type"=>"devis")));
-			
+
 			return true;
 
 		} elseif (is_array($infos) && $infos) {
@@ -1013,12 +1013,12 @@ class devis_absystech extends devis {
 		$this->devis_mail = new mail($info_mail);
 		$this->devis_mail->addFile($path,$devis["ref"]."-".$devis["revision"].".pdf",true);
 		$this->devis_mail->send();
-		
+
 		if ($devis['mail'] && $devis['mail_text']) {
 			$this->sendMailDevis($infos["id_devis"]);
 		}
-		
-		
+
+
 		ATF::db($this->db)->commit_transaction();
 
 		ATF::$msg->addNotice(
@@ -1061,8 +1061,8 @@ class devis_absystech extends devis {
 				$this->q->reset()
 				->addCondition("devis.id_devis",$devis["id_devis"],false,false,'!=')
 				->from("devis","id_affaire","commande","id_affaire")
-				->addCondition("commande.id_affaire",$devis["id_affaire"]);				
-				
+				->addCondition("commande.id_affaire",$devis["id_affaire"]);
+
 				$anc_devis=$this->sa();
 				foreach($anc_devis as $item){
 					$this->u(array(
@@ -1073,7 +1073,7 @@ class devis_absystech extends devis {
 					);
 				}
 			}
-				
+
 			$this->u(array(
 							"id_devis"=>$infos["id_devis"],
 							"etat"=>"annule",
@@ -1103,7 +1103,7 @@ class devis_absystech extends devis {
 	 * @return string
 	 */
 	public function default_value($field,$quickMail=false){
-		
+
 
 		if($field!="id_user_technique" && $field!="id_user_admin" && $field!="emailCopie"){
 			if(ATF::_r('id')){
@@ -1258,7 +1258,7 @@ class devis_absystech extends devis {
 		if($devis["etat"]!="gagne"){
 			ATF::db($this->db)->begin_transaction();
 			//***************************Transaction************************************************
-				
+
 			$this->u(array("id_devis"=>$devis["id_devis"],"etat"=>"perdu","date_modification"=>date("Y-m-d H:i:s")),$s);
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"etat"=>"perdue","forecast"=>"0"),$s);
 
@@ -1282,7 +1282,7 @@ class devis_absystech extends devis {
 	 * Méthode quif ait le portail pour l'annulation d'un devis, redirige vers perdu, annule ou remplacement.
 	 * @author Quentin JANON <qjanon@absystech.fr>
 	 * @author Yann GAUTHERON <ygautheron@absystech.fr>
-	 * @param array $infos 
+	 * @param array $infos
 	 * @param array &$s La session
 	 * @param array $files $_FILES
 	 * @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
@@ -1299,10 +1299,10 @@ class devis_absystech extends devis {
 					if ($infos["raison"]) {
 						// Enregistre la raison
 						$params["cause_perdu"] = $infos["raison"];
-						$this->u($params);	
+						$this->u($params);
 					}
 					break;
-					
+
 				case "replace":
 					$params = array(
 						'id_devis'=>$this->decryptId($infos['id'])
@@ -1320,35 +1320,35 @@ class devis_absystech extends devis {
 		ATF::db($this->db)->commit_transaction();
 		return $result;
 	}
-	
+
 	/**
 	 * Méthode qui gère l'envoi immédiat du mail du devis
 	 * @author Quentin JANON <qjanon@absystech.fr>
-	 * @param array $id_devis 
-	 * @param array $devis 
+	 * @param array $id_devis
+	 * @param array $devis
 	 */
 	public function getRefMail($id_devis,$devis=false){
 		if (!$devis) {
-			$devis = $this->select($id_devis);	
+			$devis = $this->select($id_devis);
 		}
 		return $devis["ref"]."-".$devis["revision"];
 	}
 
-	
+
 	/**
 	 * Méthode qui gère l'envoi immédiat du mail du devis
 	 * @author Quentin JANON <qjanon@absystech.fr>
-	 * @param array $devis 
+	 * @param array $devis
 	 */
 	public function sendMailDevis($id_devis){
 		$id_devis = $this->decryptId($id_devis);
 		$devis = ATF::devis()->select($id_devis);
 
 		if (!$devis['mail_text']) return false;
-		
+
 		$from = ATF::user()->select($devis['id_user'],"email");
 		$recipient = $devis['mail']?$devis['mail']:ATF::contact()->select($devis["id_contact"],"email");
-		
+
 		if (!$recipient) {
 			if (ATF::db($this->db)->isTransaction()) ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Il n'y a pas d'email pour ce contact",1054);
@@ -1367,7 +1367,7 @@ class devis_absystech extends devis {
 		//Ajout du fichier joint
 		$path = $this->filepath($id_devis,"fichier_joint");
 		$this->devis_mail->addFile($path,$this->getRefMail($id_devis,$devis).".pdf",true);
-		
+
 		// Ouverture du ZIP contenant les annexes pour les mettre toutes en pièce jointe
 		$pathAnnexe = $this->filepath($id_devis,"documentAnnexes");
 		if (file_exists($pathAnnexe)) {
@@ -1375,9 +1375,9 @@ class devis_absystech extends devis {
 			$res = $zip->open($pathAnnexe);
 			if ($res !== TRUE) {
 				if (ATF::db($this->db)->isTransaction()) ATF::db($this->db)->rollback_transaction();
-				throw new errorATF("Ouverture du ZIP (".$pathAnnexe.") Impossible, res = ".$res,501);	
+				throw new errorATF("Ouverture du ZIP (".$pathAnnexe.") Impossible, res = ".$res,501);
 			}
-			
+
 			$dossierTempToExtract = "/tmp/".ATF::$codename."_".$this->table."_tempZip".$id_devis."/";
 			util::mkdir($dossierTempToExtract);
 			$zip->extractTo($dossierTempToExtract);
@@ -1386,7 +1386,7 @@ class devis_absystech extends devis {
 				$this->devis_mail->addFile($dossierTempToExtract.$fileTmp,$fileTmp,true);
 			}
 		}
-		
+
 		if ($this->devis_mail->send()) {
 			ATF::$msg->addNotice(ATF::$usr->trans("a_cette_adresse")." : ".$recipient,ATF::$usr->trans("notice_mail_devis_envoye"));
 		}
@@ -1406,13 +1406,13 @@ class devis_absystech extends devis {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Renvoi les devis
 	 * Pour un appel en AJAX
 	 * @author Quentin JANON <qjanon@absystech.fr>
 	 */
-	public function getAllForMenu(&$infos,$s,$f) { 
+	public function getAllForMenu(&$infos,$s,$f) {
 		$this->q->reset();
 		if ($infos["id_societe"]) {
 			$this->q->where("id_societe",$infos['id_societe']);
@@ -1430,6 +1430,129 @@ class devis_absystech extends devis {
 		$infos['display'] = true;
 		return json_encode($r);
 	}
+
+
+
+	/**
+  *
+  * Fonctions _GET pour telescope
+  * @package Telescope
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param $get array contient le tri, page limit et potentiellement un id.
+  * @param $post array Argument obligatoire mais inutilisé ici.
+  * @return array un tableau avec les données
+  */
+  public function _GET($get,$post) {
+
+
+    // Gestion du tri
+    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "devis.id_devis";
+    if (!$get['trid']) $get['trid'] = "asc";
+
+    // Gestion du limit
+    if (!$get['limit']) $get['limit'] = 30;
+
+    // Gestion de la page
+    if (!$get['page']) $get['page'] = 0;
+
+    $colsData = array("devis.id_devis","devis.ref","resume","affaire","societe.id_societe","revision","devis.id_affaire","devis.etat");
+
+    $this->q->reset();
+
+    if ($get['id_devis']) $colsData = array("devis.*");
+
+    $this->q->addField($colsData);
+
+    if($get["search"]){
+      header("ts-search-term: ".$get['search']);
+      $this->q->setSearch($get['search']);
+    }
+
+    if ($get['id_devis']) {
+
+		$this->q->where("devis.id_devis",$get['id_devis'])->setCount(false)->setDimension('row');
+		$data = $this->sa();
+
+		foreach ($data as $key => $value) {
+			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
+			if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
+			if($key == "id_user") $data["user"] = ATF::user()->select($value);
+			if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
+			if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
+
+			$data["fichier_joint"] = $data["documentAnnexes"] = false;
+
+			if (file_exists($this->filepath($get['id_devis'],"fichier_joint"))) $data["fichier_joint"] = true;
+			if (file_exists($this->filepath($get['id_devis'],"documentAnnexes"))) $data["documentAnnexes"] = true;
+
+			unset($data["id_societe"], $data["id_contact"], $data["id_user"], $data["id_user_technique"], $data["id_user_admin"]);
+		}
+
+		$this->q->reset()->where("devis.id_affaire", $data["id_affaire"]);
+		$data["devisAffaire"] = $this->sa();
+
+		$data["idcrypted"] = $this->cryptId($get["id_devis"]);
+
+    } else {
+      $this->q->setLimit($get['limit'])->setCount();
+      $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+    }
+
+
+
+    if($get['id_devis']){
+      // GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
+      $data['ligne'] = ATF::devis_ligne()->select_special('id_devis', $get['id_devis']);
+      $return = $data;
+    }else{
+      header("ts-total-row: ".$data['count']);
+      header("ts-max-page: ".ceil($data['count']/$get['limit']));
+      header("ts-active-page: ".$get['page']);
+      $return = $data['data'];
+    }
+    return $return;
+  }
+
+
+
+  public function _getPDF($get,$post){
+  	$data = file_get_contents($this->filepath($post["id_devis"], $post["file"]));
+  	return base64_encode($data);
+  }
+
+  public function _getHotline_devis($get,$post){
+  	$limit = 10;
+
+	ATF::hotline()->q->reset()->where("hotline.id_affaire", $this->select($get["id_devis"], "id_affaire"))
+							  ->setLimit(100)->setCount()
+							  ->addOrder("hotline.id_hotline","desc");
+	$hotlines = ATF::hotline()->select_all();
+
+	$i = 0;
+
+	foreach ($hotlines["data"] as $kh => $vh) {
+		$temps_passe = ATF::hotline()->getTotalTime($vh['id_hotline'],"prestaTicket");
+
+		if($i < $get["page"]*$limit && $i > ($get["page"]-1)*$limit){
+			$data["hotlines"][$vh["id_hotline"]]["tps"] = $temps_passe;
+			$data["hotlines"][$vh["id_hotline"]]["resume"] = $vh["hotline"];
+		}
+
+		$t = explode("H", $temps_passe);
+
+		$total += ($t[0]*60)+$t[1];
+
+		$i++;
+	}
+	$data["total_hotline"] = intval($total/60)."H".intval((($total/60)-intval($total/60))*60);
+
+	$data["pages"] = ceil($hotlines['count']/$limit);
+	$data["page"] = $get["page"];
+
+	return $data;
+
+
+  }
 
 };
 
