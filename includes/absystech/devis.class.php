@@ -1524,8 +1524,12 @@ class devis_absystech extends devis {
   	$limit = 10;
 
 	ATF::hotline()->q->reset()->where("hotline.id_affaire", $this->select($get["id_devis"], "id_affaire"))
+<<<<<<< HEAD
 							  ->setLimit(100)->setCount()
 							  ->addOrder("hotline.id_hotline","desc");
+=======
+							  ->setLimit(100)->setCount();
+>>>>>>> b419b19e3d25a6fdd7cf37e4dd33ebe750449ac2
 	$hotlines = ATF::hotline()->select_all();
 
 	$i = 0;
