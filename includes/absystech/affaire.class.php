@@ -792,6 +792,103 @@ class affaire_absystech extends affaire {
 
 /* PARTIE DES FONCTIONS POUR TELESCOPE*/
 
+	/**
+  *
+  * Fonctions _GET pour telescope
+  * @package Telescope
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param $get array contient le tri, page limit et potentiellement un id.
+  * @param $post array Argument obligatoire mais inutilisé ici.
+  * @return array un tableau avec les données
+  */
+  public function _GET($get,$post) {
+
+    // Gestion du tri
+    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
+    if (!$get['trid']) $get['trid'] = "desc";
+
+    // Gestion du limit
+    if (!$get['limit']) $get['limit'] = 30;
+
+    // Gestion de la page
+    if (!$get['page']) $get['page'] = 0;
+
+    $colsData = array("affaire.*","societe.societe");
+
+    $this->q->reset();
+
+    if ($get['id_affaire']) $colsData = array("affaire.*");
+
+    $this->q->addField($colsData);
+    $this->q->from("affaire","id_societe","societe","id_societe");
+
+    if($get["search"]){
+      header("ts-search-term: ".$get['search']);
+      $this->q->setSearch($get['search']);
+    }
+
+	// Filtre sur l'etat de l'affaire
+	if ($get['filters']['devis'] == "on") {
+		$this->q->where("affaire.etat","devis","OR","etatAffaire");
+	}
+	if ($get['filters']['commande'] == "on") {
+		$this->q->where("affaire.etat","commande","OR","etatAffaire");
+	}
+	if ($get['filters']['facture'] == "on") {
+		$this->q->where("affaire.etat","facture","OR","etatAffaire");
+	}
+	if ($get['filters']['terminee'] == "on") {
+		$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+	}
+	if ($get['filters']['perdue'] == "on") {
+		$this->q->where("affaire.etat","perdue","OR","etatAffaire");
+	}
+
+
+
+    if ($get['id_affaire']) {
+
+		$this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
+		$data = $this->sa();
+
+		foreach ($data as $key => $value) {
+			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
+			//if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
+			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
+			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
+			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
+
+			//$data["fichier_joint"] = $data["documentAnnexes"] = false;
+
+			//if (file_exists($this->filepath($get['id_affaire'],"fichier_joint"))) $data["fichier_joint"] = true;
+			//if (file_exists($this->filepath($get['id_affaire'],"documentAnnexes"))) $data["documentAnnexes"] = true;
+
+			unset($data["id_societe"],  $data["id_commercial"]);
+		}
+
+		/*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
+		$data["affaireAffaire"] = $this->sa();
+		*/
+		$data["idcrypted"] = $this->cryptId($get["id_affaire"]);
+
+    } else {
+      $this->q->setLimit($get['limit'])->setCount();
+      $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+    }
+
+
+
+    if($get['id_affaire']){
+      $return = $data;
+    }else{
+      header("ts-total-row: ".$data['count']);
+      header("ts-max-page: ".ceil($data['count']/$get['limit']));
+      header("ts-active-page: ".$get['page']);
+      $return = $data['data'];
+    }
+    return $return;
+  }
+
 
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -803,7 +900,9 @@ class affaire_absystech extends affaire {
 		$this->q->reset();
 
 		// On ajoute les champs utiles pour l'autocomplete
-		$this->q->addField("affaire.id_affaire","id_affaire")->addField("affaire.affaire","affaire")->addField("affaire.etat","etat");
+		$this->q->addField("affaire.id_affaire","id_affaire")
+				->addField("affaire.affaire","affaire")
+				->addField("affaire.etat","etat");
 
 		if ($get['q']) {
 			$this->q->setSearch($get["q"]);
