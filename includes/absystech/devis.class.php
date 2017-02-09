@@ -939,7 +939,7 @@ class devis_absystech extends devis {
 				$revision=chr(ord($devis["revision"])-1);
 				$this->q->reset()
 				->addCondition("revision",$revision)
-				->addCondition("commande.id_affaire",$devis["id_affaire"])
+				->addCondition("devis.id_affaire",$devis["id_affaire"])
 				->setDimension("row");
 
 				$anc_devis=$this->sa();
