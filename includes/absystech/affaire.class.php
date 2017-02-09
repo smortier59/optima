@@ -851,6 +851,12 @@ class affaire_absystech extends affaire {
 		$this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
 		$data = $this->sa();
 
+		ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
+								->addField("devis.*")
+								->from("devis","id_user","user","id_user")
+								->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
+		$data["devis"] = ATF::devis()->sa();
+
 		foreach ($data as $key => $value) {
 			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
 			//if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
@@ -862,6 +868,7 @@ class affaire_absystech extends affaire {
 
 			//if (file_exists($this->filepath($get['id_affaire'],"fichier_joint"))) $data["fichier_joint"] = true;
 			//if (file_exists($this->filepath($get['id_affaire'],"documentAnnexes"))) $data["documentAnnexes"] = true;
+
 
 			unset($data["id_societe"],  $data["id_commercial"]);
 		}

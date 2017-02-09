@@ -4031,12 +4031,14 @@ class hotline extends classes_optima {
 		$h = $this->select($get['id']);
 		// Récupération des numéros du contacts du ticket
 		$c = ATF::contact()->select($h['id_contact']);
+		$return['contact']['id'] = $h['id_contact'];
 		if ($c['tel'] || $c['gsm']) $return['contact']["name"] = $c["prenom"]." ".$c["nom"];
 		if ($c['tel']) $return['contact']["tel"] = $c['tel'];
 		if ($c['gsm']) $return['contact']["gsm"] = $c['gsm'];
 
 		// Récupération des numéros de la société
 		$s = ATF::societe()->select($h['id_societe']);
+		$return['societe']['id'] = $h['id_societe'];
 		if ($s['tel'] || $s['gsm']) $return['societe']["name"] = $s["societe"];
 		if ($s['tel']) $return['societe']["tel"] = $s['tel'];
 		if ($s['gsm']) $return['societe']["gsm"] = $s['gsm'];
