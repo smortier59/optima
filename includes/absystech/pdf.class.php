@@ -204,7 +204,7 @@ class pdf_absystech extends pdf {
 			}
 
 
-			if(isset($infos_facture["periodicite"])){
+			if(isset($infos_facture["periodicite"]) && !$infos_facture['date_fin_periode']){
 					$this->setfont('arial','B',9);
 					switch ($infos_facture["periodicite"]) {
 						case 'mensuelle':
@@ -249,6 +249,13 @@ class pdf_absystech extends pdf {
 								$this->multicell(70,5,ATF::$usr->trans("Période du ").$date[2]."/".$date[1]."/".$date[0].ATF::$usr->trans(" au ").date('t',$mois)."/12/".$date[0],0,'L');
 						break;
 					}
+			} else {
+				$this->setfont('arial','B',9);
+				$msg = ATF::$usr->trans("Période du ");
+				$msg .= date('d/m/Y',strtotime($infos_facture['date_debut_periode']));
+				$msg .= ATF::$usr->trans(" au ");
+				$msg .= date('d/m/Y',strtotime($infos_facture['date_fin_periode']));
+				$this->multicell(70,5,$msg,0,'L');
 			}
 
 
