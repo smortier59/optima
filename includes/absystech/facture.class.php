@@ -786,10 +786,10 @@ class facture_absystech extends facture {
 			}
 			ATF::db($this->db)->commit_transaction();
 
-			if($echeancier){
-				$pdf_binaire = ATF::pdf()->generic("facture",$last_id,true,$s,false);
-				return $pdf_binaire;
-			}
+			// if($echeancier){
+			// 	$pdf_binaire = ATF::pdf()->generic("facture",$last_id,true,$s,false);
+			// 	return $pdf_binaire;
+			// }
 		}
 
 		ATF::affaire()->redirection("select",$infos["id_affaire"]);
