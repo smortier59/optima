@@ -5,6 +5,7 @@
  */
 class echeancier extends classes_optima {
 
+  public $maxDelayFacturation = 5;
   /**
    * Constructeur
    */
@@ -48,7 +49,7 @@ class echeancier extends classes_optima {
   */
   public function _GET($get,$post) {
     // Gestion du tri
-    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "echeancier.id_echeancier";
+    if (!$get['tri'] ) $get['tri'] = "id_echeancier";
     if (!$get['trid']) $get['trid'] = "asc";
 
     // Gestion du limit
@@ -57,32 +58,64 @@ class echeancier extends classes_optima {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-   $colsData = array("echeancier.id_echeancier","echeancier.designation","commentaire","affaire","societe.id_societe","debut","fin","variable","periodicite","actif","societe","prochaine_echeance","jour_facture","echeancier.id_termes","echeancier.id_affaire");
-
     $this->q->reset();
-    $this->q->addField($colsData)
-        ->addField("SUM(echeancier_ligne_periodique.quantite*echeancier_ligne_periodique.puht)","montant_ht")
-        ->from("echeancier","id_societe","societe","id_societe")
-        ->addJointure("echeancier",'id_affaire',"affaire","id_affaire")
-        ->addJointure("echeancier",'id_echeancier',"echeancier_ligne_periodique","id_echeancier")
-        ->addGroup("echeancier.id_echeancier")
-    ;
+
+    $colsData = array(
+      "echeancier.id_echeancier",
+      "echeancier.designation",
+      "echeancier.commentaire",
+      "affaire.id_affaire",
+      "echeancier.debut",
+      "echeancier.fin",
+      "echeancier.variable",
+      "echeancier.periodicite",
+      "echeancier.actif",
+      "societe.id_societe",
+      "echeancier.jour_facture",
+      "CASE echeancier.periodicite
+        WHEN 'trimestrielle' THEN DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 3 MONTH), INTERVAL ".$this->maxDelayFacturation." DAY)
+        WHEN 'semestrielle' THEN DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 6 MONTH), INTERVAL ".$this->maxDelayFacturation." DAY)
+        WHEN 'annuelle' THEN DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 1 YEAR), INTERVAL ".$this->maxDelayFacturation." DAY)
+        ELSE DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 1 MONTH), INTERVAL ".$this->maxDelayFacturation." DAY)
+      END
+      "=>array('alias'=>"date_limite_paiement"),
+      "echeancier.prochaine_echeance"=>array('alias'=>'debut_periode'),
+      "CASE echeancier.periodicite
+        WHEN 'trimestrielle' THEN LAST_DAY(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 2 MONTH))
+        WHEN 'semestrielle' THEN LAST_DAY(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 5 MONTH))
+        WHEN 'annuelle' THEN LAST_DAY(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 11 MONTH))
+        ELSE LAST_DAY(echeancier.prochaine_echeance)
+      END
+      "=>array('alias'=>'fin_periode'),
+      "echeancier.jour_facture",
+      "echeancier.id_termes",
+      "echeancier.id_affaire",
+      "SUM(echeancier_ligne_periodique.quantite*echeancier_ligne_periodique.puht)"=>array("alias"=>"montant_ht")
+    );
+
+    $this->q->addField($colsData);
+
+    $this->q->from("echeancier","id_societe","societe","id_societe");
+    $this->q->from("echeancier","id_affaire","affaire","id_affaire");
+    $this->q->from("echeancier","id_echeancier","echeancier_ligne_periodique","id_echeancier");
+    $this->q->from("echeancier","id_termes","termes","id_termes");
+
+    $this->q->addGroup("echeancier.id_echeancier");
 
     if($get["search"]){
       header("ts-search-term: ".$get['search']);
       $this->q->setSearch($get['search']);
     }
 
-    if ($get['id_echeancier']) {
-      $this->q->where("echeancier.id_echeancier",$get['id_echeancier'])->setCount(false)->setDimension('row');
-      $data = $this->select_all();
+    if ($get['id']) {
+      $this->q->where("echeancier.id_echeancier",$get['id'])->setLimit(1);
     } else {
       // gestion des filtres
       if ($get['filters']['encours'] == "on") {
-        $this->q->andWhere("prochaine_echeance",'CURRENT_DATE','echeance',"<",false,true);
+        $this->q->where("echeancier.prochaine_echeance",'CURRENT_DATE','OR','echeance',"<",false,true);
       }
       if ($get['filters']['actif'] == "on") {
-        $this->q->andWhere("actif","oui");
+        $this->q->where("actif","oui");
       }
 
       // Filtre mensuel
@@ -104,22 +137,148 @@ class echeancier extends classes_optima {
 
 
       $this->q->setLimit($get['limit'])->setCount();
-      $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+      // $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
     }
 
-    if($get['id_echeancier']){
-      // GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
-      $data['periodique'] = ATF::echeancier_ligne_periodique()->select_special('id_echeancier', $get['id_echeancier']);
-      $data['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_special('id_echeancier', $get['id_echeancier']);
-      $return = $data;
+    // TRI
+    switch ($get['tri']) {
+      case 'id_echeancier':
+        $get['tri'] = "echeancier.".$get['tri']."_fk";
+      break;
+      case 'debut_periode':
+        $get['tri'] .= ",fin_periode";
+      break;
+    }
+
+    $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+    foreach ($data["data"] as $k=>$lines) {
+      foreach ($lines as $k_=>$val) {
+        if (strpos($k_,".")) {
+          $tmp = explode(".",$k_);
+          $data['data'][$k][$tmp[1]] = $val;
+          unset($data['data'][$k][$k_]);
+        }
+      }
+    }
+
+
+    if($get['id']){
+      $return = $data['data'][0];
+
+      ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id']);
+      if ($get['periode_debut']) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$get['periode_debut'],"OR","periode",">");
+      }
+      if ($get['periode_fin']) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$get['periode_fin'],"OR","periode","<");
+      }
+      $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all();
+
+      ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
+      if ($get['periode_debut']) {
+        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$get['periode_debut'],"OR","periode",">");
+      }
+      if ($get['periode_fin']) {
+        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$get['periode_fin'],"OR","periode","<");
+      }
+      $return['periodique'] = ATF::echeancier_ligne_periodique()->select_all();
+
+      $return['fin_periode'] = self::getFinPeriodEstimated($return['debut_periode'], $return['periodicite']);
+
+
     }else{
+
+
       header("ts-total-row: ".$data['count']);
       header("ts-max-page: ".ceil($data['count']/$get['limit']));
       header("ts-active-page: ".$get['page']);
       $return = $data['data'];
+
+      foreach ($return as $k=>$i) {
+        if (date('Y-m-d')>$i['date_limite_paiement']) {
+          $return[$k]['retard'] = true;
+          $return[$k]['fin_periode'] = self::getFinPeriodEstimated($i['debut_periode'], $i['periodicite']);
+        }
+      }
     }
+
     return $return;
   }
+
+  /**
+   * Estime la date de fin de période pour un contrat en fonction du début de période et de la périodicité
+   * @author Quentin JANON <qjanon@absystech.fr>
+   * @param  Date $debPeriod  Date de début de période
+   * @param  string $perodicite Periodicité : mensuelle, trimestrielle, semestrielle ou annuelle
+   * @return date             Date estimée de fin de contrat.
+   */
+  private function getFinPeriodEstimated ($debPeriod, $perodicite) {
+    log::logger($debPeriod.' - '.$perodicite,"qjanon");
+    $start = new DateTime($debPeriod);
+    switch ($perodicite) {
+      case 'trimestrielle':
+        $end = new DateTime(date('Y-m-d',strtotime($debPeriod." + 3 month")));
+        $return = date("Y-m-t",strtotime($debPeriod." + 2 MONTH"));
+        break;
+      case 'semestrielle':
+        $end = new DateTime(date('Y-m-d',strtotime($debPeriod." + 6 month")));
+        $return = date("Y-m-t",strtotime($debPeriod." + 5 MONTH"));
+        break;
+      case 'annuelle':
+        $end = new DateTime(date('Y-m-d',strtotime($debPeriod." + 12 month")));
+        $return = date("Y-m-t",strtotime($debPeriod." + 11 MONTH"));
+        break;
+      default:
+        $end = new DateTime(date('Y-m-d',strtotime($debPeriod)));
+        $return = date("Y-m-t",strtotime($debPeriod));
+        break;
+    }
+    // $now = new DateTime();
+
+    // // Si on facture dans le passé
+    // if ($end < $now) {
+    //   log::logger("FACTURE PASSEE","qjanon");
+    //   $monthInterval = $start->diff($now)->format('%m');
+    //   log::logger($start->format('Ymd').' - '.$end->format('Ymd').' - '.$now->format('Ymd').' - '.$monthInterval,"qjanon");
+    //   switch ($perodicite) {
+    //     case 'trimestrielle':
+    //       $return = date("Y-m-t",strtotime($debPeriod." + ".(2+$monthInterval*3)." MONTH"));
+    //     break;
+    //     case 'semestrielle':
+    //       $return = date("Y-m-t",strtotime($debPeriod." + ".(5+$monthInterval*6)." MONTH"));
+    //     break;
+    //     case 'annuelle':
+    //       $return = date("Y-m-t",strtotime($debPeriod." + ".(11+$monthInterval*12)." MONTH"));
+    //     break;
+    //     default:
+    //       $return = date("Y-m-t",strtotime($debPeriod." + ".$monthInterval." MONTH"));
+    //     break;
+    //   }
+    // } else {
+    //   log::logger("FACTURE FUTURE","qjanon");
+    //   // SI on facture dans le futur, alors ona  pas besoin de calculer l'interval de mois entre les deux dates.
+    //   log::logger($start->format('Ymd').' - '.$end->format('Ymd').' - '.$now->format('Ymd'),"qjanon");
+    //   switch ($perodicite) {
+    //     case 'trimestrielle':
+    //       $return = date("Y-m-t",strtotime($debPeriod." + 2 MONTH"));
+    //     break;
+    //     case 'semestrielle':
+    //       $return = date("Y-m-t",strtotime($debPeriod." + 5 MONTH"));
+    //     break;
+    //     case 'annuelle':
+    //       $return = date("Y-m-t",strtotime($debPeriod." + 11 MONTH"));
+    //     break;
+    //     default:
+    //       $return = date("Y-m-t",strtotime($debPeriod));
+    //     break;
+    //   }
+
+    // }
+    return $return;
+  }
+
   /**
   * Fonctions _POST echeancier pour telescope
   * @package Telescope
@@ -132,47 +291,15 @@ class echeancier extends classes_optima {
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
     $return = array();
+
+
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
     // Si on fait un ajout de l'echeance
     else {
       // Insertion
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      if($post['jour_facture'] =="custom") $post["jour_facture"]= $post["custom"];
-      $explodeDebut =explode("-", $post["debut"]);
+      $post["prochaine_echeance"]=date("Y-m-d",strtotime($post["prochaine_echeance"]));
 
-      // switch permettant de calculer la prochaine date d'echeance en fonction de la periodicité
-      switch($post["periodicite"]){
-        case "annuelle":
-          $post["prochaine_echeance"]= $explodeDebut[0]."-01-01";
-        break;
-        case "semestrielle":
-          if($explodeDebut[1]/6 <=1)
-            $sem = $explodeDebut[0].'-01-01';
-          else
-            $sem = $explodeDebut[0].'-07-01';
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
-        break;
-        case "trimestrielle":
-          if($explodeDebut[1]/3 <=1 )
-              $sem = $explodeDebut[0].'-01-01';
-          elseif($explodeDebut[1]/3 <=2)
-              $sem = $explodeDebut[0].'-04-01';
-          elseif($explodeDebut[1]/3 <=3)
-            $sem = $explodeDebut[0].'-07-01';
-          elseif($explodeDebut[1]/3 <=4)
-            $sem = $explodeDebut[0].'-10-01';
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
-        break;
-        case "mensuelle":
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($post["debut"]."first day of this month"));
-        break;
-      }
-      if($post['jour_facture'] =='fin_mois')
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($post["prochaine_echeance"]."first day of this month"));
-      else{
-          $temp =explode("-", $post["prochaine_echeance"]);
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
-      }
       unset($post["id_echeancier"],$post['custom']);
       empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
       try {
@@ -187,6 +314,13 @@ class echeancier extends classes_optima {
     return $return;
   }
 
+  /**
+   * Modification d'un contrat
+   * @author Quentin JANON <qjanon@absystech.fr>
+   * @param  array $get  $_GET
+   * @param  array $post $_POST
+   * @return array       resultat de lupdate, ID de l'echeancier, notifications, et result (flag booleen)
+   */
   public function _PUT($get,$post){
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
@@ -194,48 +328,20 @@ class echeancier extends classes_optima {
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
     // Si on fait un ajout de l'echeance
     else {
+      if (!$post["prochaine_echeance"]) {
+        throw new Exception("La date de prochaine échéance est obligatoire",2655);
+      }
       // Insertion
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
+      $post["prochaine_echeance"]=date("Y-m-d",strtotime($post["prochaine_echeance"]));
 
-      // Insertion
-      $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      if($post['jour_facture'] =="custom") $post["jour_facture"]= $post["custom"];
-      $explodeDebut =explode("-", $post["debut"]);
+      if ($post["debut"] > $post["prochaine_echeance"]) {
+        throw new Exception("La date de prochaine échéance ne peut pas être antérieure à la date de début",2654);
+      }
 
-      // switch permettant de calculer la prochaine date d'echeance en fonction de la periodicité
-      switch($post["periodicite"]){
-        case "annuelle":
-          $post["prochaine_echeance"]= $explodeDebut[0]."-01-01";
-        break;
-        case "semestrielle":
-          if($explodeDebut[1]/6 <=1)
-            $sem = $explodeDebut[0].'-01-01';
-          else
-            $sem = $explodeDebut[0].'-07-01';
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
-        break;
-        case "trimestrielle":
-          if($explodeDebut[1]/3 <=1 )
-              $sem = $explodeDebut[0].'-01-01';
-          elseif($explodeDebut[1]/3 <=2)
-              $sem = $explodeDebut[0].'-04-01';
-          elseif($explodeDebut[1]/3 <=3)
-            $sem = $explodeDebut[0].'-07-01';
-          elseif($explodeDebut[1]/3 <=4)
-            $sem = $explodeDebut[0].'-10-01';
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($sem));
-        break;
-        case "mensuelle":
-          $post["prochaine_echeance"]= date("Y-m-d",strtotime($post["debut"]."first day of this month"));
-        break;
-      }
-      if($post['jour_facture'] =='fin_mois')
-        $post["prochaine_echeance"]= date("Y-m-d",strtotime($post["prochaine_echeance"]."first day of this month"));
-      else{
-        $temp =explode("-", $post["prochaine_echeance"]);
-        $post["prochaine_echeance"]= date("Y-m-d",strtotime($temp[0]."-".$temp[1])."-".$post["jour_facture"]);
-      }
-      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
+      if($post['jour_facture'] == "custom") $post["jour_facture"]= $post["custom"];
+
+      empty(rtrim($post['fin'])) ? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
       unset($post['custom']);
       $result = $this->update($post);
       $return['result'] = true;
@@ -260,38 +366,50 @@ class echeancier extends classes_optima {
     return $return;
   }
 
-  public function _getPdf(&$get, $post){
+  /**
+   * Créer une facture soit en preview soit en réel
+   * @author Quentin JANON <qjanon@absystech.fr>
+   * @param  array &$get COntient les infos pour générer la facture et le flag de preview
+   * @param  array $post Same ci dessus
+   * @return mixed       base64 du contneu du PDF généré pour la preview OU ID de la facture insérée
+   */
+  public function _createFacture(&$get, $post){
+    $input = file_get_contents('php://input');
+    if (!empty($input)) parse_str($input,$post);
+    if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 
-    $id_echeancier = $get["id_echeancier"];
-    $lignes = $get["lignes"];
+    if (!$post['lignes']) throw new errorATF("LINES_MISSING",1523);
+    $lignes = $post['lignes'];
 
-    $date_debut_periode = $get["prochaine_echeance"];
-    $date_fin_periode   = $get["fin_echeance"];
-    $date_facture = $get["date_facture"];
+    if (!$post['id']) throw new errorATF("MISSING_ID",1524);
+    $id_echeancier = $post["id"];
 
-    $echeancier = $this->select($id_echeancier);
+    if (!$post['date_facture']) throw new errorATF("MISSING_DATE",1525);
+    $date_facture = date('Y-m-d',strtotime($post["date_facture"]));
+
+    if (!$post['debut_periode']) throw new errorATF("MISSING_DEBUT_PERIOD",1525);
+    $date_debut_periode = date('Y-m-d',strtotime($post["debut_periode"]));
+
+    if (!$post['fin_periode']) throw new errorATF("MISSING_FIN_PERIOD",1525);
+    $date_fin_periode = date('Y-m-d',strtotime($post["fin_periode"]));
+
+    $this->q->reset()->addField('fin')->where('id_echeancier',$id_echeancier);
+    $fin_de_contrat = $this->select_cell();
+
 
     $produits = array();
-
-    $lignes_echeancier = $this->getLignesPeriode($id_echeancier , $date_debut_periode, $date_fin_periode);
-
-    foreach ($lignes_echeancier as $key => $value) {
+    foreach ($lignes['designation'] as $idx=>$des) {
       $p=array();
 
-      $p["facture_ligne__dot__ref"] = $value["ref"];
-      $p["facture_ligne__dot__produit"] = $value["designation"];
+      $p["facture_ligne__dot__ref"] = $lignes["ref"][$idx];
+      $p["facture_ligne__dot__produit"] = $des;
 
-      if($value["valeur_variable"] == "oui"){
-        $p["facture_ligne__dot__quantite"] = $lignes[$value["type"]][$value["id_echeancier_ligne_".$value["type"]]]["quantite"];
-        $p["facture_ligne__dot__prix"] = $lignes[$value["type"]][$value["id_echeancier_ligne_".$value["type"]]]["puht"];
-      }else{
-        $p["facture_ligne__dot__quantite"] = $value["quantite"];
-        $p["facture_ligne__dot__prix"] = $value["puht"];
-      }
+      $p["facture_ligne__dot__quantite"] = $lignes["quantite"][$idx];
+      $p["facture_ligne__dot__prix"] = $lignes["puht"][$idx];
 
       $p["facture_ligne__dot__prix_achat"] = NULL;
       $p["facture_ligne__dot__id_fournisseur_fk"] = NULL;
-      $p["facture_ligne__dot__id_compte_absystech_fk"] = $value["id_compte_absystech"];
+      $p["facture_ligne__dot__id_compte_absystech_fk"] = $lignes["id_compte_absystech"][$idx];
       $p["facture_ligne__dot__serial"] = null;
       $p["facture_ligne__dot__prix_nb"] = null;
       $p["facture_ligne__dot__prix_couleur"] = null;
@@ -305,122 +423,86 @@ class echeancier extends classes_optima {
 
       $produits[] = $p;
     }
-    $affaire_sans_devis_libelle = ($get["affaire_sans_devis_libelle"])? $get["affaire_sans_devis_libelle"]: NULL;
-    $facture = array();
 
-    $facture["facture"] = array("id_societe"=> $echeancier["id_societe"],
-                                "type_facture" => "facture_periodique",
-                                "date"=> $date_facture,
-                                "infosSup" => $get["infosSup"],
-                                "id_affaire" => $echeancier["id_affaire"],
-                                "date_previsionnelle" => NULL,
-                                "date_relance" => NULL,
-                                "affaire_sans_devis_libelle" => $affaire_sans_devis_libelle,
-                                "mode" => NULL,
-                                "periodicite" => $echeancier["periodicite"],
-                                "id_facture_parente" => NULL,
-                                "id_termes" => $echeancier["id_termes"],
-                                "date_debut_periode" => $date_debut_periode,
-                                "date_fin_periode" => $date_fin_periode,
-                                "sous_total" => NULL,
-                                "marge" => NULL,
-                                "frais_de_port" => NULL,
-                                "marge_absolue" => NULL,
-                                "prix" =>  NULL,
-                                "tva" => "1.200",
-                                "prix_achat" => NULL,
-                                "email" => NULL,
-                                "emailTexte" => NULL,
-                                "emailCopie" => NULL,
-                               );
-    if($get["affaire_sans_devis"]){
-      $facture["facture"]["affaire_sans_devis"]= $get["affaire_sans_devis"];
+    $affaire_sans_devis_libelle = ($post["affaire_sans_devis_libelle"])? $post["affaire_sans_devis_libelle"]: NULL;
+    $facture = array();
+    $facture["echeancier"] = true; // FLAG pour la classe facture
+
+    $facture["facture"] = array(
+      "id_societe"=> $post["id_societe"],
+      "type_facture" => "facture_periodique",
+      "date"=> $date_facture,
+      "infosSup" => $post["infosSup"],
+      "id_affaire" => $post["id_affaire"],
+      "date_previsionnelle" => NULL,
+      "date_relance" => NULL,
+      "affaire_sans_devis_libelle" => $affaire_sans_devis_libelle,
+      "mode" => NULL,
+      "periodicite" => $post["periodicite"],
+      "id_facture_parente" => NULL,
+      "id_termes" => $post["id_termes"],
+      "date_debut_periode" => $date_debut_periode,
+      "date_fin_periode" => $date_fin_periode,
+      "sous_total" => NULL,
+      "marge" => NULL,
+      "frais_de_port" => NULL,
+      "marge_absolue" => NULL,
+      "prix" =>  NULL,
+      "tva" => "1.200",
+      "prix_achat" => NULL,
+      "email" => NULL,
+      "emailTexte" => NULL,
+      "emailCopie" => NULL,
+    );
+
+    if($post["affaire_sans_devis"]){
+      $facture["facture"]["affaire_sans_devis"]= $post["affaire_sans_devis"];
     }
     $facture["values_facture"]["produits"] = json_encode($produits);
-    if($get["preview"]){
-      $facture["preview"] = true;
-    }else{
-      if($get["fin_contrat"]) {
-        $fin_contrat = strtotime($get["fin_contrat"]);
-        $fin_period = strtotime($date_fin_periode);
 
-        // si la date de fin de contrat est avant la fin de période actuelle
-        if($fin_contrat < $fin_period){
-          // le contrat est fini, on peut cacher la ligne de la liste des facturations
-          ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"actif"=>"non"));
-        }else{
+    ATF::db($this->db)->begin_transaction();
+    try{
+      if($post["preview"]){
+        $facture["preview"] = $post['preview'];
+      } else {
+
+        if($fin_contrat) {
+          $fin_contrat = strtotime($fin_contrat);
+          $fin_period = strtotime($date_fin_periode);
+
+          // si la date de fin de contrat est avant la fin de période actuelle
+          if($fin_contrat < $fin_period){
+            // le contrat est fini, on peut cacher la ligne de la liste des facturations
+            ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"actif"=>"non"));
+            ATF::$msg->addWarning(ATF::$usr->trans("contrat_desactive",$this->table));
+
+          }else{
+            $next_echeance = strtotime($date_fin_periode."+1 days");
+            ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"prochaine_echeance"=>date("Y-m-d",$next_echeance)));
+            ATF::$msg->addNotice(ATF::$usr->trans("maj_prochaine_echeance",$this->table)." : ".date("Y-m-d",$next_echeance));
+          }
+        } else {
           $next_echeance = strtotime($date_fin_periode."+1 days");
           ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"prochaine_echeance"=>date("Y-m-d",$next_echeance)));
+          ATF::$msg->addNotice(ATF::$usr->trans("maj_prochaine_echeance",$this->table)." : ".date("Y-m-d",$next_echeance));
         }
-      } else {
-        $next_echeance = strtotime($date_fin_periode."+1 days");
-        ATF::echeancier()->u(array("id_echeancier"=>$id_echeancier,"prochaine_echeance"=>date("Y-m-d",$next_echeance)));
+
       }
 
-    }
-
-
-    $facture["echeancier"] = true;
-
-
-    try{
-
-      $return = ATF::facture()->insert($facture);
-
-      /*header('Content-Type: application/pdf');
-      header('Content-Disposition: inline; filename=facture.pdf');
-      echo base64_encode($return);
-
-      // The famous comment : "En attendant..."
-      die;
-
-      $get["display"] = true;*/
-      return base64_encode($return);
+      if ($post["preview"]) {
+        $return = base64_encode(ATF::facture()->insert($facture));
+      } else {
+        $return['result'] = ATF::facture()->insert($facture);
+        $return['notices'] = ATF::$msg->getNotices();
+        $return['warning'] = ATF::$msg->getWarnings();
+      }
 
     }catch(errorATF $e){
-      throw new errorATF($e->getMessage(),500);
+      ATF::db($this->db)->rollback_transaction();
+      throw $e;
     }
+    ATF::db($this->db)->commit_transaction();
+    return $return;
   }
 
-  public function _getDataLigne($get,$post){
-    return ATF::getClass("echeancier_ligne_".$post["type"])->select($post["id"]);
-  }
-
-  public function _getLignePeriode($get , $post){
-    return $this->getLignesPeriode($get["id_echeancier"], $get["periode_debut"], $get["periode_fin"], true);
-  }
-
-
-  public function getLignesPeriode($id_echeancier , $periode_debut, $periode_fin, $from_web = false){
-    $d1 = explode("-",$periode_debut);
-    $periode_debut = $d1[2].$d1[1].$d1[0];
-    $d2 = explode("-",$periode_fin);
-    $periode_fin = $d2[2].$d2[1].$d2[0];
-
-    ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier", $id_echeancier)->where("date_valeur",$periode_fin,"OR",false,"<");
-    $echeancier_ligne_ponctuelle = ATF::echeancier_ligne_ponctuelle()->select_all();
-
-    ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier", $id_echeancier)->where("mise_en_service",$periode_fin,"OR",false,"<");
-    $echeancier_ligne_periodique = ATF::echeancier_ligne_periodique()->select_all();
-
-    foreach ($echeancier_ligne_ponctuelle as $key => $value) {
-      $value["type"] = "ponctuelle";
-      $lignes[] = $value;
-    }
-
-    foreach ($echeancier_ligne_periodique as $key => $value) {
-      $value["type"] = "periodique";
-      $lignes[] = $value;
-    }
-
-    //Si from_web a true c'est qu'on viens de télescope et il faut des informations pour afficher les infos sur la page
-    if($from_web){
-      $return["lignes"] = $lignes;
-      $return["echeancier"] = ATF::echeancier()->select($id_echeancier);
-      $return["echeancier"]["societe"] = ATF::societe()->select($return["echeancier"]["id_societe"], "societe");
-      $return["echeancier"]["affaire"] = ATF::affaire()->select($return["echeancier"]["id_affaire"], "affaire");
-      return $return;
-    }
-    return $lignes;
-  }
 }
