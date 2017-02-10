@@ -3758,7 +3758,7 @@ class hotline extends classes_optima {
 		if ($get['id']) {
 			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
 
-	        $return = $data['data'][0];
+			$return = $data['data'][0];
 
 			// Check PJ
 			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
