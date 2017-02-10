@@ -95,4 +95,94 @@ class echeancier_ligne_ponctuelle extends classes_optima {
     }
     return $return;
   }
+
+  /**
+   * Renvoi les lignes de facturation ponctuelle
+   * @author Quentin JANON <qjanon@absystech.fr>
+   * @param  array $get  $_GET
+   * @param  array $post $_POST
+   * @return array       une ou plusieurs lignes selon les paramètres
+   */
+  public function _GET($get, $post) {
+    // Gestion du tri
+    if (!$get['tri'] ) $get['tri'] = "id_echeancier_ligne_ponctuelle";
+    if (!$get['trid']) $get['trid'] = "asc";
+
+    // Gestion du limit
+    if (!$get['limit']) $get['limit'] = 30;
+
+    // Gestion de la page
+    if (!$get['page']) $get['page'] = 0;
+
+    $this->q->reset();
+
+    $colsData = array(
+      "echeancier_ligne_ponctuelle.designation",
+      "echeancier_ligne_ponctuelle.quantite",
+      "echeancier_ligne_ponctuelle.puht",
+      "echeancier_ligne_ponctuelle.date_valeur",
+      "echeancier_ligne_ponctuelle.id_echeancier",
+      "echeancier_ligne_ponctuelle.id_compte_absystech",
+      "echeancier_ligne_ponctuelle.ref"
+    );
+
+    $this->q->addField($colsData);
+
+    // $this->q->from("echeancier","id_societe","societe","id_societe");
+    // $this->q->from("echeancier","id_affaire","affaire","id_affaire");
+    $this->q->from("echeancier","id_echeancier","echeancier_ligne_ponctuelle","id_echeancier");
+    // $this->q->from("echeancier","id_termes","termes","id_termes");
+
+    $this->q->addGroup("echeancier_ligne_ponctuelle.id_echeancier_ligne_ponctuelle");
+
+    if($get["search"]){
+      header("ts-search-term: ".$get['search']);
+      $this->q->setSearch($get['search']);
+    }
+
+    if ($get['id']) {
+      $this->q->where("id_echeancier_ligne_ponctuelle",$get['id'])->setLimit(1);
+    } else {
+
+      $this->q->setLimit($get['limit'])->setCount();
+      // $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+    }
+
+    // TRI
+    // switch ($get['tri']) {
+
+    // }
+    // $this->q->setToString();
+    // log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),'qjanon');
+    // $this->q->unsetToString();
+    $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+    foreach ($data["data"] as $k=>$lines) {
+      foreach ($lines as $k_=>$val) {
+        if (strpos($k_,".")) {
+          $tmp = explode(".",$k_);
+          $data['data'][$k][$tmp[1]] = $val;
+          unset($data['data'][$k][$k_]);
+        }
+      }
+    }
+
+
+    if($get['id']){
+      $return = $data['data'][0];
+    }else{
+
+      header("ts-total-row: ".$data['count']);
+      header("ts-max-page: ".ceil($data['count']/$get['limit']));
+      header("ts-active-page: ".$get['page']);
+      $return = $data['data'];
+
+    }
+
+    return $return;
+  }
+
+
+
 }
