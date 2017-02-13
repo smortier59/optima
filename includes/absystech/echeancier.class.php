@@ -174,6 +174,7 @@ class echeancier extends classes_optima {
       if ($get['periode_fin']) {
         ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$get['periode_fin'],"OR","periode","<");
       }
+
       $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all();
 
       ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
