@@ -311,7 +311,6 @@ class facture_absystech extends facture {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		if($infos["echeancier"]) $echeancier = true;
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
  		$preview=$infos["preview"];
 		$type_check=$infos[$this->table]["mode"];
@@ -708,7 +707,7 @@ class facture_absystech extends facture {
 		//***************************************************************************************
 
 		if($preview){
-			if($echeancier){
+			if($infos['id_echeancier']){
 				$pdf_binaire = ATF::pdf()->generic("facture",$last_id,true,$s,true);
 				ATF::db($this->db)->rollback_transaction();
 				return $pdf_binaire;
