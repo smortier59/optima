@@ -249,7 +249,7 @@ class pdf_absystech extends pdf {
 								$this->multicell(70,5,ATF::$usr->trans("Période du ").$date[2]."/".$date[1]."/".$date[0].ATF::$usr->trans(" au ").date('t',$mois)."/12/".$date[0],0,'L');
 						break;
 					}
-			} else {
+			} else if (isset($infos_facture["periodicite"])) {
 				$this->setfont('arial','B',9);
 				$msg = ATF::$usr->trans("Période du ");
 				$msg .= date('d/m/Y',strtotime($infos_facture['date_debut_periode']));
