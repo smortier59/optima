@@ -174,6 +174,7 @@ class echeancier extends classes_optima {
       if ($get['periode_fin']) {
         ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$get['periode_fin'],"OR","periode","<");
       }
+
       $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all();
 
       ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
@@ -426,7 +427,6 @@ class echeancier extends classes_optima {
 
     $affaire_sans_devis_libelle = ($post["affaire_sans_devis_libelle"])? $post["affaire_sans_devis_libelle"]: NULL;
     $facture = array();
-    $facture["echeancier"] = true; // FLAG pour la classe facture
 
     $facture["facture"] = array(
       "id_societe"=> $post["id_societe"],
@@ -441,6 +441,7 @@ class echeancier extends classes_optima {
       "periodicite" => $post["periodicite"],
       "id_facture_parente" => NULL,
       "id_termes" => $post["id_termes"],
+      "id_echeancier" => $id_echeancier,
       "date_debut_periode" => $date_debut_periode,
       "date_fin_periode" => $date_fin_periode,
       "sous_total" => NULL,
@@ -459,7 +460,6 @@ class echeancier extends classes_optima {
       $facture["facture"]["affaire_sans_devis"]= $post["affaire_sans_devis"];
     }
     $facture["values_facture"]["produits"] = json_encode($produits);
-
     ATF::db($this->db)->begin_transaction();
     try{
       if($post["preview"]){
