@@ -5,7 +5,7 @@ $proxyUrl
 {if ATF::_r(id_devis)}
 	{if $current_class->table == "commande_ligne"}
 
-	{/if}	
+	{/if}
 {/if}
 
 
@@ -81,13 +81,13 @@ ATF.buildGridEditor({
 				{/foreach}
 			});
 			grid.stopEditing();
-			
+
 			var idx = 0; // Numéro de ligne par défaut
 			var index = grid.getSelectionModel().getSelectedCell();
 			if (index) {
 				idx = index[0]+1; // Numéro de ligne sélectionné
 			}
-			
+
 			store.insert(idx, p);
 			grid.startEditing(idx, 0);
 		}
@@ -103,7 +103,7 @@ ATF.buildGridEditor({
 			var rec = grid.store.getAt(index[0]);
 			grid.store.remove(rec);
 			grid.refreshHiddenValues();
-			
+
 			var records = Ext.ComponentMgr.get('{$id}').store.getRange();
 			var sous_total = 0;
 			var poids = 0;
@@ -112,10 +112,10 @@ ATF.buildGridEditor({
 			var prix = 0;
 			var marge = 0;
 			var marge_absolue = 0;
-			var maintenance = 0;		
+			var maintenance = 0;
 
-			
-			
+
+
 		}
 	}],
 	columns: {util::getExtJSGridMappingColumns($q->getView(),$current_class)}.push({ 'dataIndex':'{$current_class->table}__dot__id_fournisseur_fk' },{ 'dataIndex':'{$current_class->table}__dot__id_compte_absystech_fk' },{ 'dataIndex':'{$current_class->table}__dot__marge' },{ 'dataIndex':'{$current_class->table}__dot__marge_absolue' }),
@@ -133,14 +133,14 @@ ATF.buildGridEditor({
 			var prix = 0;
 			var marge = 0;
 			var marge_absolue = 0;
-			var maintenance = 0;		
-		
+			var maintenance = 0;
+
 		},
 		'render': function(component) {
 			{if $current_class->table == "devis_ligne"}
 				val = Ext.getCmp("combodevis[type_devis]").value;
 
-				Ext.getCmp("panel_financement").show();			
+				Ext.getCmp("panel_financement").show();
 				Ext.getCmp("panel_total").show();
 				Ext.getCmp("panel_courriel").show();
 				Ext.getCmp("panel_redaction").show();
@@ -157,13 +157,13 @@ ATF.buildGridEditor({
 					Ext.getCmp("panel_location").hide();
 					Ext.getCmp("panel_lignes").hide();
 
-					Ext.getCmp("panel_financement").hide();				
+					Ext.getCmp("panel_financement").hide();
 					Ext.getCmp("panel_total").hide();
 					Ext.getCmp("panel_courriel").hide();
 					Ext.getCmp("panel_redaction").hide();
 					Ext.getCmp("panel_lignes_consommable").show();
 					Ext.getCmp("panel_lignes_consommable").expand();
-				}	
+				}
 			{else if $current_class->table == "commande_ligne"}
 				{if ATF::_r("id_devis")}
 					{if ATF::devis()->select(ATF::_r("id_devis"), "type_devis") == "consommable"}
@@ -173,7 +173,7 @@ ATF.buildGridEditor({
 					{/if}
 				{/if}
 
-				{if ATF::_r("id_commande")}		
+				{if ATF::_r("id_commande")}
 					{if ATF::affaire()->select( ATF::commande()->select(ATF::_r("id_commande"), "id_affaire")  , "nature") == "consommable"}
 						Ext.getCmp("panel_total").hide();
 						Ext.getCmp("fichier_joint").expand();
@@ -181,7 +181,7 @@ ATF.buildGridEditor({
 				{/if}
 			{else if $current_class->table == "facture_ligne"}
 				{if ATF::_r("id_commande")}
-						Ext.getCmp("facture[date_previsionnelle]").hide();							
+						Ext.getCmp("facture[date_previsionnelle]").hide();
 						Ext.getCmp("facture[affaire_sans_devis]").hide();
 						Ext.getCmp("facture[date_relance]").hide();
 						Ext.getCmp("facture[affaire_sans_devis_libelle]").hide();
@@ -195,7 +195,7 @@ ATF.buildGridEditor({
 				{/if}
 
 				{if ATF::_r("id_facture")}
-					Ext.getCmp("facture[date_previsionnelle]").hide();		
+					Ext.getCmp("facture[date_previsionnelle]").hide();
 						Ext.getCmp("facture[date_relance]").hide();
 						Ext.getCmp("facture[infosSup]").hide();
 						Ext.getCmp("facture[dematerialisation]").hide();
@@ -204,12 +204,12 @@ ATF.buildGridEditor({
 						Ext.getCmp("combofacture[periodicite]").hide();
 						Ext.getCmp("panel_total").hide();
 				{/if}
-				
+
 
 			{/if}
 		}
 	},
-	
+
 	cm:new Ext.grid.ColumnModel({
 		/*defaults: {
 			sortable: true
@@ -234,43 +234,43 @@ ATF.buildGridEditor({
 				dataIndex: '{$current_class->table}__dot__prix_nb',
 				editor: new Ext.form.TextField({
 					value:0
-				})				
+				})
 			},{
 				header: 'Prix Couleur',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__prix_couleur',
 				editor: new Ext.form.TextField({
 					value:0
-				})				
+				})
 			},{
 				header: 'Prix achat N&B',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__prix_achat_nb',
 				editor: new Ext.form.TextField({
 					value:0
-				})				
+				})
 			},{
 				header: 'Prix achat Couleur',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__prix_achat_couleur',
 				editor: new Ext.form.TextField({
 					value:0
-				})				
-			}			
+				})
+			}
 			, {
 				header: 'Index N&B',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__index_nb',
 				editor: new Ext.form.TextField({
 					value:0
-				})			
+				})
 			},{
 				header: 'Index Couleur',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__index_couleur',
 				editor: new Ext.form.TextField({
 					value:0
-				})			
+				})
 			}
 			{if $current_class->table == "commande_ligne"}
 			,{
@@ -279,7 +279,7 @@ ATF.buildGridEditor({
 				dataIndex: '{$current_class->table}__dot__serial',
 				editor: new Ext.form.TextField({
 					value:0
-				})			
+				})
 			}
 			{/if}
 
@@ -330,9 +330,9 @@ ATF.buildGridEditor({
 		root: 'result',
 		totalProperty: 'totalCount',
 		idProperty: 'id',
-		remoteSort: true,	
+		remoteSort: true,
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView(),["{$current_class->table}.id_fournisseur_fk","{$current_class->table}.id_compte_absystech_fk"])}),
-		baseParams:{ 
+		baseParams:{
 			'pager':'{$pager}'
 			{foreach from=$baseParams key=kParam item=iParam}
 				,'{$kParam}':'{$iParam}'

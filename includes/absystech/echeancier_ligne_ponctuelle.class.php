@@ -37,26 +37,44 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   * Fonction _POST pour telescope
   * @package Telescope
   * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @author Quentin JANON <qjanon@absystech.fr>
   * @param $get array.
   * @param $post array Argument obligatoire.
   * @return boolean | integer
   */
   public function _POST($get,$post) {
 
+    if (!$post['id_echeancier']) throw new errorATF("ID_ECHENCIER_MISSING",5042);
+    if (!$post['ref']) throw new errorATF("REF_MISSING",5042);
+    if (!$post['designation']) throw new errorATF("DESIGNATION_MISSING",5042);
+    if (!$post['quantite']) throw new errorATF("QTE_MISSING",5042);
+    if (!$post['date_valeur']) throw new errorATF("DATE_VALEUR_MISSING",5042);
+    if (!$post['id_compte_absystech']) throw new errorATF("VENTILATION_MISSING",5042);
+
+
+    $post['ref'] = strtoupper($post['ref']);
     // parser la date sous le bon format pour mysql
     $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
-    unset($post["total"]);
+
+    ATF::db($this->db)->begin_transaction();
     try {
-      $result = $this->insert($post);
-    } catch (errorSQL $e) {
-      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      $id = $this->insert($post);
+      // $post['id_echeancier_ligne_periodique'] = $id;
+      $post['id'] = $id;
+      $return['row'] = $post;
+    } catch (errorATF $e) {
+      ATF::db($this->db)->rollback_transaction();
+      throw $e; // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
-    return true;
+    ATF::db($this->db)->commit_transaction();
+    return $return;
   }
+
   /**
   * Permet de supprimer une ligne d'echeancier ponctuelle
   * @package Telescope
   * @author Cyril CHARLIER <ccharlier@absystech.fr>
+  * @author Quentin JANON <qjanon@absystech.fr>
   * @param $get array contient l'id a l'index 'id'
   * @param $post array vide
   * @return array result en booleen et notice sous forme d'un tableau
@@ -64,7 +82,6 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   public function _DELETE($get,$post) {
     if (!$get['id']) throw new Exception("MISSING_ID",1000);
     // gerer le cas du montant sur le delete
-    $this->q->reset();
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
     $return['notices'] = ATF::$msg->getNotices();
@@ -75,6 +92,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   * Fonction _PUT pour telescope
   * @package Telescope
   * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @author Quentin JANON <qjanon@absystech.fr>
   * @param $get array.
   * @param $post array Argument obligatoire.
   * @return boolean | integer
@@ -83,15 +101,17 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   public function _PUT($get,$post){
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
-      $return = array();
+
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-    unset($post["id_echeancier"],$post["total"]);
     // parser la date sous le bon format pour mysql
     $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
     try {
-      $return = $this->update($post);
-    } catch (errorSQL $e) {
-      throw new Exception($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      $this->update($post);
+      $post['id'] = $post['id_echeancier_ligne_ponctuelle'];
+      $return['row'] = $post;
+      $return['notices'] = ATF::$msg->getNotices();
+    } catch (errorATF $e) {
+      throw $e; // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
     return $return;
   }
