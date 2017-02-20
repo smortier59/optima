@@ -320,6 +320,9 @@ class facture_absystech extends facture {
 
 		$this->infoCollapse($infos);
 
+		// FLAG qui identifie une facture provenant d'un echeancier
+		$echeancier = $infos['id_echeancier'] ? true : false;
+
 		if($infos["type_facture"] == "acompte"){
 			$finale = false;
 			$infos["type_facture"] = "facture";
