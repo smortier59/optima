@@ -167,24 +167,15 @@ class echeancier extends classes_optima {
     if($get['id']){
       $return = $data['data'][0];
 
-      ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id']);
-      if ($get['periode_debut']) {
-        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$get['periode_debut'],"OR","periode",">");
-      }
-      if ($get['periode_fin']) {
-        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$get['periode_fin'],"OR","periode","<");
-      }
-      $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all();
+      if (!$get['noLine']) {
 
-      ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
-      if ($get['periode_debut']) {
-        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$get['periode_debut'],"OR","periode",">");
-      }
-      if ($get['periode_fin']) {
-        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$get['periode_fin'],"OR","periode","<");
-      }
-      $return['periodique'] = ATF::echeancier_ligne_periodique()->select_all();
+        $ponctuelle = self::_getLines(array("id"=>$get['id'],"type"=>"ponctuelle"));
+        $return['ponctuelle'] = $ponctuelle['ponctuelle'];
 
+        $periodique = self::_getLines(array("id"=>$get['id'],"type"=>"periodique"));
+        $return['periodique'] = $periodique['periodique'];
+
+      }
       $return['fin_periode'] = self::getFinPeriodEstimated($return['debut_periode'], $return['periodicite']);
 
 
@@ -204,6 +195,41 @@ class echeancier extends classes_optima {
       }
     }
 
+    return $return;
+  }
+
+  public function _getLines($get,$post) {
+    if (!$get['id']) throw new errorATF("ID_ECHEANCIER_MISSING",5000);
+    $return = array();
+
+    if ($get['periode_debut']) {
+      $debut = date('Y-m-d',strtotime(str_replace("/","-",$get['periode_debut'])));
+    }
+    if ($get['periode_fin']) {
+      $fin = date('Y-m-d',strtotime(str_replace("/","-",$get['periode_fin'])));
+    }
+
+    if ($get['type'] == 'ponctuelle' || !$get['type']) {
+      ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id']);
+      if ($get['periode_debut']) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$debut,"AND","periode",">=");
+      }
+      if ($get['periode_fin']) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$fin,"AND","periode","<=");
+      }
+      $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all("id_echeancier_ligne_ponctuelle","asc");
+    }
+
+    if ($get['type'] == 'periodique' || !$get['type']) {
+      ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
+      if ($get['periode_debut']) {
+        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$debut,"AND","periode",">=");
+      }
+      if ($get['periode_fin']) {
+        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$fin,"AND","periode","<=");
+      }
+      $return['periodique'] = ATF::echeancier_ligne_periodique()->select_all("id_echeancier_ligne_periodique","asc");
+    }
     return $return;
   }
 
@@ -298,7 +324,7 @@ class echeancier extends classes_optima {
     else {
       // Insertion
       $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      $post["prochaine_echeance"]=date("Y-m-d",strtotime($post["prochaine_echeance"]));
+      $post["prochaine_echeance"] = $post["prochaine_echeance"] ? date("Y-m-d",strtotime($post["prochaine_echeance"])) : $post["debut"];
 
       unset($post["id_echeancier"],$post['custom']);
       empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
@@ -381,8 +407,8 @@ class echeancier extends classes_optima {
     if (!$post['lignes']) throw new errorATF("LINES_MISSING",1523);
     $lignes = $post['lignes'];
 
-    if (!$post['id']) throw new errorATF("MISSING_ID",1524);
-    $id_echeancier = $post["id"];
+    if (!$post['id_echeancier']) throw new errorATF("MISSING_ID",1524);
+    $id_echeancier = $post["id_echeancier"];
 
     if (!$post['date_facture']) throw new errorATF("MISSING_DATE",1525);
     $date_facture = date('Y-m-d',strtotime($post["date_facture"]));
@@ -426,7 +452,6 @@ class echeancier extends classes_optima {
 
     $affaire_sans_devis_libelle = ($post["affaire_sans_devis_libelle"])? $post["affaire_sans_devis_libelle"]: NULL;
     $facture = array();
-    $facture["echeancier"] = true; // FLAG pour la classe facture
 
     $facture["facture"] = array(
       "id_societe"=> $post["id_societe"],
@@ -441,6 +466,7 @@ class echeancier extends classes_optima {
       "periodicite" => $post["periodicite"],
       "id_facture_parente" => NULL,
       "id_termes" => $post["id_termes"],
+      "id_echeancier" => $id_echeancier,
       "date_debut_periode" => $date_debut_periode,
       "date_fin_periode" => $date_fin_periode,
       "sous_total" => NULL,
@@ -459,7 +485,6 @@ class echeancier extends classes_optima {
       $facture["facture"]["affaire_sans_devis"]= $post["affaire_sans_devis"];
     }
     $facture["values_facture"]["produits"] = json_encode($produits);
-
     ATF::db($this->db)->begin_transaction();
     try{
       if($post["preview"]){
