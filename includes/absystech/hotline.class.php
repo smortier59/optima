@@ -2603,14 +2603,14 @@ class hotline extends classes_optima {
 			foreach ($res as $key => $value) {
 				$marge_brute += $value["facture.prix"];
 			}
-			$marge_brute = $marge_brute - $pbdc;
+			$marge_brute = round(($marge_brute - $pbdc),2);
 		}else{
 			//Si j'ai pas de factures
 			ATF::devis()->q->reset()->where("id_affaire", $id_affaire)
 									->addOrder("revision","desc");
 			$devis = ATF::devis()->select_row();
 
-			$marge_brute = $devis["prix"] - $devis["prix_achat"];
+			$marge_brute = round(($devis["prix"] - $devis["prix_achat"]),2);
 		}
 
 		ATF::hotline_interaction()->q->reset()

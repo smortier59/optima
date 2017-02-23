@@ -96,7 +96,6 @@ class societe_absystech extends societe {
 			'contact'=>array('opened'=>true)
 			,'suivi'=>array('opened'=>true)
 			,'affaire'=>array('opened'=>true)
-			,'affaire_cout_page'=>array('opened'=>true)
 			,'devis'
 			,'commande'
 			,'facture'
