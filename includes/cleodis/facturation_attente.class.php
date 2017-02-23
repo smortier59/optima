@@ -37,16 +37,12 @@ class facturation_attente extends classes_optima {
 			$table = $value["nom_table"];
 			$path = get_object_vars(json_decode($value["path"]));
 			$id_facturation = $value["id_facturation"];
-			if(file_exists($path)){
-				try {
-					ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
-				} catch (errorATF $e) {
-					$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "envoye"=> "erreur", "erreur"=>$e->getMessage()));
-				}
+			try {
+				ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
 				$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "envoye"=> "oui"));
 				ATF::facturation()->u(array("id_facturation"=> $id_facturation, "envoye"=> "oui"));
-			}else{
-				$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "envoye"=> "erreur", "erreur"=>"Pas de fichier"));
+			} catch (errorATF $e) {
+				$this->u(array("id_facturation_attente"=> $value["id_facturation_attente"], "envoye"=> "erreur", "erreur"=>$e->getMessage()));
 			}
 		}
 	}
