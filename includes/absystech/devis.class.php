@@ -796,7 +796,7 @@ class devis_absystech extends devis {
 				if(!$item["quantite"]){
 					$item["quantite"]=0;
 				}
-				$item["visible"] = ($item["visible"] == "on")? 'oui':'non';
+				//$item["visible"] = ($item["visible"] == "on")? 'oui':'non';
 				ATF::devis_ligne()->insert($item,$s);
 			}
 		}
