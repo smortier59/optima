@@ -8,7 +8,7 @@ require_once dirname(__FILE__)."/../commande.class.php";
 class commande_absystech extends commande {
 
 	public $user_for_rappel = array(
-		54, // Emma 
+		54, // Emma
 		57, // Gauthier
 		3, // Séb
 	);
@@ -17,7 +17,10 @@ class commande_absystech extends commande {
 	 * Constructeur
 	 */
 	public function __construct() {
+
+		$this->table = "commande";
 		parent::__construct();
+
 		$this->colonnes['fields_column'] = array(
 			 'commande.ref'=>array("width"=>100,"align"=>"center")
 			 ,'commande.id_societe'
@@ -29,7 +32,7 @@ class commande_absystech extends commande {
 			 ,'marchandises'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money","width"=>80)
 			 ,'prestations'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money","width"=>80)
 			 ,'autres'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money","width"=>80)
-			 ,'commande.id_devis'=>array("width"=>100,"align"=>"center") 
+			 ,'commande.id_devis'=>array("width"=>100,"align"=>"center")
 			 ,'commande.etat'=>array("renderer"=>"etat","width"=>30)
 			 ,'totalFacture'=>array("custom"=>true,"renderer"=>"money","width"=>80)
 			 ,'fichier_joint'=>array("custom"=>true,"align"=>"center","nosort"=>true,"type"=>"file","width"=>50, "renderer"=>"scanner")
@@ -43,7 +46,7 @@ class commande_absystech extends commande {
 			,"date"=>array("obligatoire"=>true)
 			,"code_commande_client"=>array("custom"=>true)
 		);
-		
+
 		$this->colonnes['panel']['redaction'] = array(
 			"resume"
 		);
@@ -93,7 +96,7 @@ class commande_absystech extends commande {
 		,"popup"=>array("commande.resume","commande.ref")
 		,"view"=>array("commande.resume","commande.ref")
 		);
-		
+
 
 		$this->files["fichier_joint"] = array("type"=>"pdf","obligatoire"=>true);
 		$this->files["fichier_joint2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
@@ -143,16 +146,16 @@ class commande_absystech extends commande {
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$this->infoCollapse($infos);
 		unset($infos["sous_total"],$infos["marge"],$infos["marge_absolue"]);
-				
+
 
 		ATF::db($this->db)->begin_transaction();
 		//*****************************Transaction********************************
 
 		ATF::commande_ligne()->q->reset()->where("id_commande",$this->decryptId($infos["id_commande"]));
 		$commande_ligne=ATF::commande_ligne()->select_all();
-		
-		foreach($commande_ligne as $key=>$item){				
-			ATF::commande_ligne()->delete(array("id"=>$item["id_commande_ligne"]));				
+
+		foreach($commande_ligne as $key=>$item){
+			ATF::commande_ligne()->delete(array("id"=>$item["id_commande_ligne"]));
 		}
 
 		foreach($infos_ligne as $key=>$item){
@@ -173,11 +176,11 @@ class commande_absystech extends commande {
 			$prixFinal += $item["prix"]*$item["quantite"];
 		}
 		$prixFinal += $infos["frais_de_port"];
-			
+
 		// Mise a jour du prix final du devis.
 		$cu = array("id_commande"=>$item["id_commande"],"prix"=>$prixFinal);
 		$this->u($cu);
-	
+
 		if($infos["code_commande_client"]){
 			$affaire["code_commande_client"]=$infos["code_commande_client"];
 			$affaire["id_affaire"]=$infos["id_affaire"];
@@ -220,8 +223,8 @@ class commande_absystech extends commande {
 	 * @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	 */
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);		
-		$this->infoCollapse($infos);		
+		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
+		$this->infoCollapse($infos);
 
 
 		foreach($infos_ligne as $key=>$item){
@@ -229,7 +232,7 @@ class commande_absystech extends commande {
 				$k_unescape=util::extJSUnescapeDot($k);
 				$item[str_replace("commande_ligne.","",$k_unescape)]=$i;
 				unset($item[$k]);
-			}			
+			}
 			if(!$item["quantite"]) $item["quantite"]=0;
 			$prixFinal += $item["prix"]*$item["quantite"];
 		}
@@ -238,18 +241,18 @@ class commande_absystech extends commande {
 		/*Formatage des numériques*/
 		$infos["prix"]=util::stringToNumber($prixFinal);
 		$infos["frais_de_port"]=util::stringToNumber($infos["frais_de_port"]);
-	
 
-	
+
+
 		unset($infos["id_produit"]);
 
 		if(!$infos["date"]){
 			$infos["date"] = date("Y-m-d");
 		}
-		
+
 		$infos["ref"] = ATF::affaire()->getRef($infos["date"],"commande");
 		$infos["id_user"] = ATF::$usr->getID();
-		
+
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		if($societe["id_pays"]!="FR") $infos["tva"] =  1;
 		else $infos["tva"] =  __TVA__;
@@ -296,12 +299,14 @@ class commande_absystech extends commande {
 			$affaire["date"]=$infos["date"];
 			$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		}
+
+
 		//Commande
 		unset($infos["sous_total"],$infos["marge"],$infos["marge_absolue"]);
 		$last_id=parent::insert($infos,$s);
-		
+
 		$totalCom = 0;
-			
+
 
 		foreach($infos_ligne as $key=>$item){
 			foreach($item as $k=>$i){
@@ -320,7 +325,7 @@ class commande_absystech extends commande {
 
 			ATF::commande_ligne()->i($item,$s);
 		}
-			
+
 		if ($rappel_annee) {
 			$now = time();
 			$horaire = date('Y-m-d H:i:s', strtotime("+".$rappel_annee." year", $now));
@@ -332,12 +337,12 @@ class commande_absystech extends commande {
 					"id_societe"=>$infos["id_societe"],
 					"horaire_fin"=>$horaire,
 					"horaire_debut"=>$horaire,
-					"type"=>"vtodo",				
-					"description"=>"Rappeler le client pour faire un point sur le contrat de maintenance relatif a l'affaire ".$affaire["affaire"].".",				
+					"type"=>"vtodo",
+					"description"=>"Rappeler le client pour faire un point sur le contrat de maintenance relatif a l'affaire ".$affaire["affaire"].".",
 					"priorite"=>"petite",
 					"no_redirect"=>true
 				),
-				"dest"=>$this->user_for_rappel	
+				"dest"=>$this->user_for_rappel
 			);
 
 			ATF::tache()->insert($tache);
@@ -351,7 +356,7 @@ class commande_absystech extends commande {
 			$devis = array("id_devis"=>$infos["id_devis"],"etat"=>"gagne","date_modification"=>date("Y-m-d H:i:s"));
 			ATF::devis()->u($devis,$s);
 		}
-			
+
 		//Societe
 		ATF::societe()->u(array("id_societe"=>$infos["id_societe"],"relation"=>"client"));
 
@@ -377,43 +382,46 @@ class commande_absystech extends commande {
 		if (is_numeric($infos) || is_string($infos)) {
 			$id=$this->decryptId($infos);
 			$commande=$this->select($id);
+			if($commande){
+				ATF::db($this->db)->begin_transaction();
+				//*****************************Transaction********************************
+				//Commande
+				parent::delete($id,$s);
 
-			ATF::db($this->db)->begin_transaction();
-			//*****************************Transaction********************************
-			//Commande
-			parent::delete($id,$s);
+				//Devis
+				if($commande["id_devis"]){
+					$devis = array("id_devis"=>$commande["id_devis"],"etat"=>"attente","date_modification"=>date("Y-m-d H:i:s"));
+					ATF::devis()->u($devis,$s);
+				}
 
-			//Devis
-			if($commande["id_devis"]){
-				$devis = array("id_devis"=>$commande["id_devis"],"etat"=>"attente","date_modification"=>date("Y-m-d H:i:s"));
-				ATF::devis()->u($devis,$s);
-			}
+				//Affaire
+				$this->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
+				$tab_commande = $this->sa();
+				ATF::devis()->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
+				$tab_devis = ATF::devis()->sa();
+				ATF::facture()->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
+				$tab_facture = ATF::facture()->sa();
+				if($commande["id_devis"]){
+					$affaire = array("id_affaire"=>$commande["id_affaire"],"etat"=>"devis","forecast"=>"20");
+					ATF::affaire()->u($affaire,$s);
+				}elseif(!$tab_commande && !$tab_devis && !$tab_facture){
+					ATF::affaire()->delete($commande["id_affaire"],$s);
+					unset($commande["id_affaire"]);
+				}
 
-			//Affaire
-			$this->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
-			$tab_commande = $this->sa();
-			ATF::devis()->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
-			$tab_devis = ATF::devis()->sa();
-			ATF::facture()->q->reset()->where("id_affaire",$commande["id_affaire"])->end();
-			$tab_facture = ATF::facture()->sa();
-			if($commande["id_devis"]){
-				$affaire = array("id_affaire"=>$commande["id_affaire"],"etat"=>"devis","forecast"=>"20");
-				ATF::affaire()->u($affaire,$s);
-			}elseif(!$tab_commande && !$tab_devis && !$tab_facture){
-				ATF::affaire()->delete($commande["id_affaire"],$s);
-				unset($commande["id_affaire"]);
-			}
+				ATF::db($this->db)->commit_transaction();
+				//*****************************************************************************
+				if($commande["id_affaire"]){
+					ATF::affaire()->redirection("select",$commande["id_affaire"]);
+				}else{
+					$this->redirection("select_all",NULL,"commande.html");
+				}
 
-			ATF::db($this->db)->commit_transaction();
-			//*****************************************************************************
-			if($commande["id_affaire"]){
-				ATF::affaire()->redirection("select",$commande["id_affaire"]);
+				return true;
 			}else{
-				$this->redirection("select_all",NULL,"commande.html");
+				throw new errorATF("commande introuvable", 893);
 			}
-				
-			return true;
-				
+
 		} elseif (is_array($infos) && $infos) {
 
 			foreach($infos["id"] as $key=>$item){
@@ -440,24 +448,24 @@ class commande_absystech extends commande {
 			//*****************************Transaction********************************
 			//Commande
 			parent::update(array("id_commande"=>$commande["id_commande"],"etat"=>"annulee"),$s);
-				
+
 			//Affaire
 			ATF::affaire()->u(array("id_affaire"=>$commande["id_affaire"],"etat"=>"devis","forecast"=>"20"),$s);
-				
+
 			//Devis
 			if($commande["id_devis"]){
 				$devis = array("id_devis"=>$commande["id_devis"],"etat"=>"attente","date_modification"=>date("Y-m-d H:i:s"));
-				ATF::devis()->u($devis,$s); 
+				ATF::devis()->u($devis,$s);
 			}
 
 			ATF::db($this->db)->commit_transaction();
 			//*****************************************************************************
-				
+
 			ATF::$msg->addNotice(
 			loc::mt(ATF::$usr->trans("notice_commande_annulee"),array("record"=>$this->nom($commande["id_commande"])))
 			,ATF::$usr->trans("notice_success_title")
 			);
-				
+
 //			ATF::affaire()->redirection("select",$commande["id_affaire"]);
 
 			return true;
@@ -553,21 +561,21 @@ class commande_absystech extends commande {
 			->setStrict()
 			->setToString();
 			$subQuery = $d->select_all();
-	
+
 			$this->q->addField("(".$subQuery.")","redacteurs");
 		}
 		$this->q
 			//->from("commande","id_affaire","devis","id_affaire")
 			//->from("devis","id_user","user","id_user","devis_user")
-			//->addField("GROUP_CONCAT(DISTINCT CONCAT(devis.revision,':',devis_user.nom) ORDER BY devis.revision ASC)","redacteurs")		
-			//->addField("GROUP_CONCAT(CONCAT(commande_ligne.id_compte_absystech,':',commande_ligne.prix))","comptes")		
-			->addField("commande.prix-commande.prix_achat","margebrute")		
+			//->addField("GROUP_CONCAT(DISTINCT CONCAT(devis.revision,':',devis_user.nom) ORDER BY devis.revision ASC)","redacteurs")
+			//->addField("GROUP_CONCAT(CONCAT(commande_ligne.id_compte_absystech,':',commande_ligne.prix))","comptes")
+			->addField("commande.prix-commande.prix_achat","margebrute")
 
 			// Somme par compte comptable
 			->from("commande","id_commande","commande_ligne","id_commande")
-			->addField("SUM(IF(commande_ligne.id_compte_absystech IN (1),commande_ligne.quantite*(commande_ligne.prix-IF(commande_ligne.prix_achat IS NULL,0,commande_ligne.prix_achat)),0))","marchandises")		
-			->addField("SUM(IF(commande_ligne.id_compte_absystech IN (4,5),commande_ligne.quantite*(commande_ligne.prix-IF(commande_ligne.prix_achat IS NULL,0,commande_ligne.prix_achat)),0))","prestations")		
-			->addField("SUM(IF(commande_ligne.id_compte_absystech IS NULL OR commande_ligne.id_compte_absystech NOT IN (1,4,5),commande_ligne.quantite*(commande_ligne.prix-IF(commande_ligne.prix_achat IS NULL,0,commande_ligne.prix_achat)),0))","autres")		
+			->addField("SUM(IF(commande_ligne.id_compte_absystech IN (1),commande_ligne.quantite*(commande_ligne.prix-IF(commande_ligne.prix_achat IS NULL,0,commande_ligne.prix_achat)),0))","marchandises")
+			->addField("SUM(IF(commande_ligne.id_compte_absystech IN (4,5),commande_ligne.quantite*(commande_ligne.prix-IF(commande_ligne.prix_achat IS NULL,0,commande_ligne.prix_achat)),0))","prestations")
+			->addField("SUM(IF(commande_ligne.id_compte_absystech IS NULL OR commande_ligne.id_compte_absystech NOT IN (1,4,5),commande_ligne.quantite*(commande_ligne.prix-IF(commande_ligne.prix_achat IS NULL,0,commande_ligne.prix_achat)),0))","autres")
 
 			->addGroup("commande.id_commande");
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -584,7 +592,7 @@ class commande_absystech extends commande {
 			}
 
 			$return['data'][$k]['totalFacture'] = ATF::facture()->total_by_commande($id_commande);
-			
+
 			// Etendre à la facture
 			if ($etat=="en_cours" && ATF::$usr->privilege('facture','insert')) {
 				$return['data'][$k]['allowFacture'] = true;
@@ -597,14 +605,14 @@ class commande_absystech extends commande {
 			} else {
 				$return['data'][$k]['allowCheckFacture'] = false;
 			}
-			
+
 			// Annulation
 			if ($etat=="en_cours" && ATF::$usr->privilege('commande','update')) {
 				$return['data'][$k]['allowCancel'] = true;
 			} else {
 				$return['data'][$k]['allowCancel'] = false;
 			}
-			
+
 			$return['data'][$k]['id_affaire'] = $this->cryptID($c->select($id_commande,"id_affaire"));
 		}
 		return $return;
