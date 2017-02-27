@@ -201,33 +201,34 @@ class echeancier extends classes_optima {
   public function _getLines($get,$post) {
     if (!$get['id']) throw new errorATF("ID_ECHEANCIER_MISSING",5000);
     $return = array();
-
-    if ($get['periode_debut']) {
-      $debut = date('Y-m-d',strtotime(str_replace("/","-",$get['periode_debut'])));
-    }
-    if ($get['periode_fin']) {
-      $fin = date('Y-m-d',strtotime(str_replace("/","-",$get['periode_fin'])));
+    if ($get['periode_debut'] || $get['periode_fin']) {
+      $jf = $this->select($get['id'],'jour_facture');
+      if ($jf == 1 && $get['periode_debut']) { // SI a facturer en debut de mois, alors la date de référence se base sur le début de période
+        $date_ref = date('Y-m-d',strtotime(str_replace("/","-",$get['periode_debut'])));
+      } else if ($jf == 'fin_mois' && $get['periode_fin']) { // SI a facturer en fin de mois, alors la date de référence sera la fin de période
+        $date_ref = date('Y-m-d',strtotime(str_replace("/","-",$get['periode_fin'])));
+      } else { // Sinon on précise le jour exacte pour remonter les lignes.
+        if ($jf < 10) $jf = "0".$jf;
+        $date_ref = date('Y-m',strtotime(str_replace("/","-",$get['periode_debut'])))."-".$jf;
+      }
     }
 
     if ($get['type'] == 'ponctuelle' || !$get['type']) {
       ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id']);
-      if ($get['periode_debut']) {
-        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$debut,"AND","periode",">=");
-      }
-      if ($get['periode_fin']) {
-        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$fin,"AND","periode","<=");
+      if ($date_ref) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$date_ref,"AND","periode","<=");
       }
       $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all("id_echeancier_ligne_ponctuelle","asc");
     }
 
     if ($get['type'] == 'periodique' || !$get['type']) {
       ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
-      if ($get['periode_debut']) {
-        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$debut,"AND","periode",">=");
+      if ($date_ref) {
+        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$date_ref,"AND","periode","<=");
       }
-      if ($get['periode_fin']) {
-        ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$fin,"AND","periode","<=");
-      }
+      // ATF::echeancier_ligne_periodique()->q->setToString();
+      // log::logger(ATF::echeancier_ligne_periodique()->select_all("id_echeancier_ligne_periodique","asc"),"qjanon");
+      // ATF::echeancier_ligne_periodique()->q->unsetToString();
       $return['periodique'] = ATF::echeancier_ligne_periodique()->select_all("id_echeancier_ligne_periodique","asc");
     }
     return $return;
