@@ -215,8 +215,11 @@ class echeancier extends classes_optima {
 
     if ($get['type'] == 'ponctuelle' || !$get['type']) {
       ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id']);
-      if ($date_ref) {
-        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",$date_ref,"AND","periode","<=");
+      if ($get['periode_debut']) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",date('Y-m-d',strtotime($get['periode_debut'])),"AND","periode",">=");
+      }
+      if ($get['periode_fin']) {
+        ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",date('Y-m-d',strtotime($get['periode_fin'])),"AND","periode","<=");
       }
       $return['ponctuelle'] = ATF::echeancier_ligne_ponctuelle()->select_all("id_echeancier_ligne_ponctuelle","asc");
     }
