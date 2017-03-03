@@ -73,17 +73,17 @@ class echeancier extends classes_optima {
       "societe.id_societe",
       "echeancier.jour_facture",
       "CASE echeancier.periodicite
-        WHEN 'trimestrielle' THEN DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 3 MONTH), INTERVAL ".$this->maxDelayFacturation." DAY)
+        WHEN 'trimestrielle' THEN MAKEDATE(YEAR(echeancier.prochaine_echeance), 1) + INTERVAL QUARTER(echeancier.prochaine_echeance) QUARTER - INTERVAL 1 DAY + INTERVAL ".$this->maxDelayFacturation." DAY
         WHEN 'semestrielle' THEN DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 6 MONTH), INTERVAL ".$this->maxDelayFacturation." DAY)
-        WHEN 'annuelle' THEN DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 1 YEAR), INTERVAL ".$this->maxDelayFacturation." DAY)
+        WHEN 'annuelle' THEN CONCAT(DATE_FORMAT(echeancier.prochaine_echeance,'%Y'),'-12-31') + INTERVAL ".$this->maxDelayFacturation." DAY
         ELSE DATE_ADD(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 1 MONTH), INTERVAL ".$this->maxDelayFacturation." DAY)
       END
       "=>array('alias'=>"date_limite_paiement"),
       "echeancier.prochaine_echeance"=>array('alias'=>'debut_periode'),
       "CASE echeancier.periodicite
-        WHEN 'trimestrielle' THEN LAST_DAY(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 2 MONTH))
+        WHEN 'trimestrielle' THEN MAKEDATE(YEAR(echeancier.prochaine_echeance), 1) + INTERVAL QUARTER(echeancier.prochaine_echeance) QUARTER - INTERVAL 1 DAY
         WHEN 'semestrielle' THEN LAST_DAY(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 5 MONTH))
-        WHEN 'annuelle' THEN LAST_DAY(DATE_ADD(echeancier.prochaine_echeance, INTERVAL 11 MONTH))
+        WHEN 'annuelle' THEN CONCAT(DATE_FORMAT(echeancier.prochaine_echeance,'%Y'),'-12-31')
         ELSE LAST_DAY(echeancier.prochaine_echeance)
       END
       "=>array('alias'=>'fin_periode'),
@@ -115,6 +115,8 @@ class echeancier extends classes_optima {
         $this->q->where("echeancier.prochaine_echeance",'CURRENT_DATE','OR','echeance',"<",false,true);
       }
       if ($get['filters']['actif'] == "on") {
+        $this->q->whereIsNull("echeancier.fin",'OR','fin');
+        $this->q->where("echeancier.fin",'CURRENT_DATE','OR','fin',">",false,true);
         $this->q->where("actif","oui");
       }
 
@@ -135,6 +137,27 @@ class echeancier extends classes_optima {
         $this->q->where("echeancier.periodicite","semestrielle","OR","periodicite");
       }
 
+      // Filtre cours de mois
+      if ($get['filters']['cours_mois'] == "on") {
+        if ($get['filters']['fin_mois'] == "on" && !$get['filters']['debut_mois']) {
+          $this->q->where("echeancier.jour_facture","1","OR","a_facture_le","<>");
+        } else if ($get['filters']['debut_mois'] == "on" && !$get['filters']['fin_mois']) {
+          $this->q->where("echeancier.jour_facture","fin_mois","OR","a_facture_le","<>");
+        } else if (!$get['filters']['debut_mois'] && !$get['filters']['fin_mois']) {
+          $this->q->where("echeancier.jour_facture","fin_mois","AND","a_facture_le","<>");
+          $this->q->where("echeancier.jour_facture","1","AND","a_facture_le","<>");
+        }
+      } else {
+        // Filtre fin de mois
+        if ($get['filters']['fin_mois'] == "on") {
+          $this->q->where("echeancier.jour_facture","fin_mois","OR","a_facture_le");
+        }
+
+        // Filtre début de mois
+        if ($get['filters']['debut_mois'] == "on") {
+          $this->q->where("echeancier.jour_facture","1","OR","a_facture_le");
+        }
+      }
 
       $this->q->setLimit($get['limit'])->setCount();
       // $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -150,7 +173,6 @@ class echeancier extends classes_optima {
         $get['tri'] .= ",fin_periode";
       break;
     }
-
     $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
     foreach ($data["data"] as $k=>$lines) {
@@ -229,9 +251,6 @@ class echeancier extends classes_optima {
       if ($date_ref) {
         ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$date_ref,"AND","periode","<=");
       }
-      // ATF::echeancier_ligne_periodique()->q->setToString();
-      // log::logger(ATF::echeancier_ligne_periodique()->select_all("id_echeancier_ligne_periodique","asc"),"qjanon");
-      // ATF::echeancier_ligne_periodique()->q->unsetToString();
       $return['periodique'] = ATF::echeancier_ligne_periodique()->select_all("id_echeancier_ligne_periodique","asc");
     }
     return $return;
@@ -245,7 +264,6 @@ class echeancier extends classes_optima {
    * @return date             Date estimée de fin de contrat.
    */
   private function getFinPeriodEstimated ($debPeriod, $perodicite) {
-    log::logger($debPeriod.' - '.$perodicite,"qjanon");
     $start = new DateTime($debPeriod);
     switch ($perodicite) {
       case 'trimestrielle':
@@ -258,54 +276,13 @@ class echeancier extends classes_optima {
         break;
       case 'annuelle':
         $end = new DateTime(date('Y-m-d',strtotime($debPeriod." + 12 month")));
-        $return = date("Y-m-t",strtotime($debPeriod." + 11 MONTH"));
+        $return = date("Y-12-t");
         break;
       default:
         $end = new DateTime(date('Y-m-d',strtotime($debPeriod)));
         $return = date("Y-m-t",strtotime($debPeriod));
         break;
     }
-    // $now = new DateTime();
-
-    // // Si on facture dans le passé
-    // if ($end < $now) {
-    //   log::logger("FACTURE PASSEE","qjanon");
-    //   $monthInterval = $start->diff($now)->format('%m');
-    //   log::logger($start->format('Ymd').' - '.$end->format('Ymd').' - '.$now->format('Ymd').' - '.$monthInterval,"qjanon");
-    //   switch ($perodicite) {
-    //     case 'trimestrielle':
-    //       $return = date("Y-m-t",strtotime($debPeriod." + ".(2+$monthInterval*3)." MONTH"));
-    //     break;
-    //     case 'semestrielle':
-    //       $return = date("Y-m-t",strtotime($debPeriod." + ".(5+$monthInterval*6)." MONTH"));
-    //     break;
-    //     case 'annuelle':
-    //       $return = date("Y-m-t",strtotime($debPeriod." + ".(11+$monthInterval*12)." MONTH"));
-    //     break;
-    //     default:
-    //       $return = date("Y-m-t",strtotime($debPeriod." + ".$monthInterval." MONTH"));
-    //     break;
-    //   }
-    // } else {
-    //   log::logger("FACTURE FUTURE","qjanon");
-    //   // SI on facture dans le futur, alors ona  pas besoin de calculer l'interval de mois entre les deux dates.
-    //   log::logger($start->format('Ymd').' - '.$end->format('Ymd').' - '.$now->format('Ymd'),"qjanon");
-    //   switch ($perodicite) {
-    //     case 'trimestrielle':
-    //       $return = date("Y-m-t",strtotime($debPeriod." + 2 MONTH"));
-    //     break;
-    //     case 'semestrielle':
-    //       $return = date("Y-m-t",strtotime($debPeriod." + 5 MONTH"));
-    //     break;
-    //     case 'annuelle':
-    //       $return = date("Y-m-t",strtotime($debPeriod." + 11 MONTH"));
-    //     break;
-    //     default:
-    //       $return = date("Y-m-t",strtotime($debPeriod));
-    //     break;
-    //   }
-
-    // }
     return $return;
   }
 
