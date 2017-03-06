@@ -7586,6 +7586,22 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		}
 
+		$adresse = $adresse2 = $adresse3 = $cp = $ville = NULL;
+
+		if($this->client['facturation_adresse']){
+			$adresse = $this->client['facturation_adresse'];
+			$adresse2 = $this->client['facturation_adresse_2'];
+			$adresse3 = $this->client['facturation_adresse_3'];
+			$cp = $this->client['facturation_cp'];
+			$ville = $this->client['facturation_ville'];
+		}else{
+			$adresse = $this->client['adresse'];
+			$adresse2 = $this->client['adresse_2'];
+			$adresse3 = $this->client['adresse_3'];
+			$cp = $this->client['cp'];
+			$ville = $this->client['ville'];
+		}
+
 		if(!$this->facturePDF){
 			$this->sety(12);
 			$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
@@ -7614,8 +7630,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->setfont('arial','B',7);
 			$this->multicell(0,3,$this->client['societe'],"L","C");
 			$this->setfont('arial','',7);
-			$this->multicell(0,3,$this->client['adresse'],"L","C");
-			$this->multicell(0,3,$this->client['cp']." ".$this->client['ville'],"L","C");
+			$this->multicell(0,3,$adresse,"L","C");
+			$this->multicell(0,3,$cp." ".$ville,"L","C");
 
 			$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
 			$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
@@ -7626,11 +7642,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$cadre = array(
                     array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
                     ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
-                    ,array("txt"=>$this->client["adresse"],"size"=>10)
+                    ,array("txt"=>$adresse,"size"=>10)
                 );
-                if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
-                if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
-                $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
+                if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
+                if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
+                $cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
                 $this->cadre(110,35,85,35,$cadre);
 			}
 			$this->setLeftMargin(15);
@@ -7638,11 +7654,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->setfont('arial','',12);
 			$cadre = array(
 	            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
-	            ,array("txt"=>$this->client["adresse"],"size"=>10)
+	            ,array("txt"=>$adresse,"size"=>10)
 	        );
-	        if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
-	        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
-	        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
+	        if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
+	        if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
+	        $cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
 	        $this->cadre(110,20,85,35,$cadre);
 
 	        $this->setfont('arial','',12);
