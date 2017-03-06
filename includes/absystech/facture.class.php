@@ -31,6 +31,8 @@ class facture_absystech extends facture {
 		$this->colonnes['fields_column'] = array(
 			'facture.ref'=>array("width"=>100,"align"=>"center")
 			,'facture.id_societe'
+			,'facture.id_affaire'
+			,'facture.id_termes'
 			,'facture.date'=>array("width"=>100,"align"=>"center")
 			,'facture.date_previsionnelle'=>array("width"=>100,"align"=>"center")
 			,'facture.etat'=>array("width"=>30,"renderer"=>"etat")
@@ -1937,12 +1939,11 @@ class facture_absystech extends facture {
 	/**
 	* Permet de récupérer la liste des factures pour telescope
 	* @package Telescope
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
 	*/
-	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "facture.date";
@@ -1954,21 +1955,6 @@ class facture_absystech extends facture {
 		// Gestion de la page
 		if (!$get['page']) $get['page'] = 0;
 
-		$colsData = array(
-			"facture.id_facture"=>array("visible"=>false),
-			"facture.id_societe"=>array("visible"=>false),
-			"facture.ref"=>array(),
-			"facture.date"=>array(),
-			"facture.etat"=>array("visible"=>false),
-			"facture.prix"=>array(),
-			"facture.tva"=>array(),
-			"facture.date_previsionnelle"=>array(),
-			"facture.date_effective"=>array(),
-			"facture.date_relance"=>array()
-		);
-
-
-
 		$this->q->reset();
 
 		if($get["search"]){
@@ -1977,67 +1963,39 @@ class facture_absystech extends facture {
 		}
 
 		if ($get['id']) {
-			$this->q->where("id_facture",$get['id'])->setLimit(1);
+			$this->q->where("facture.id_facture",$get['id'])->setLimit(1);
 		} else {
 			if ($get['id_societe']) {
 				$this->q->where("facture.id_societe",$get['id_societe']);
 			}
+			if ($get['filters']['payee']) {
+				$this->q->where("facture.etat","payee","OR","etat");
+			}
+			if ($get['filters']['impayee']) {
+				$this->q->where("facture.etat","impayee","OR","etat");
+			}
+			if ($get['filters']['perte']) {
+				$this->q->where("facture.etat","perte","OR","etat");
+			}
+			if ($get['filters']['start']) {
+				$this->q->where("facture.date",date('Y-m-d',strtotime($get['filters']['start'])),"AND","date",">=");
+			}
+			if ($get['filters']['end']) {
+				$this->q->where("facture.date",date('Y-m-d',strtotime($get['filters']['end'])),"AND","date","<=");
+			}
 			$this->q->setLimit($get['limit']);
 		}
 
-		//$this->q->addOrder("facture.date","asc");
-
 		switch ($get['tri']) {
 			case 'id_societe':
+			case 'id_termes':
+			case 'id_facture':
+			case 'ref':
+			case 'date':
+			case 'etat':
 				$get['tri'] = "facture.".$get['tri'];
 			break;
 		}
-
-		if($get["filter"]){
-			foreach ($get["filter"] as $key => $value) {
-				if (strpos($key, 'facture') !== false) {
-					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
-				}
-			}
-		}
-
-		if ($get['tri'] != "prix_ttc") $get['tri'] = "facture.".$get['tri'];
-		$this->q->addField($colsData);
-
-		$this->q->from("facture","id_societe","societe","id_societe");
-
-		$this->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
-								,0
-								,IF(
-									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-									,(facture.prix*facture.tva)
-								)),2)","solde")
-			    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
-			    ->addField("IF(facture.etat!='perte'
-							,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
-								,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-								    *ROUND(IF(
-										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-										,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-										,facture.prix*facture.tva
-									),2))
-							,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-								    *ROUND(IF(
-										(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-										,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-										,facture.prix*facture.tva
-									),2))>0
-								, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-							    *ROUND(IF(
-									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-									,facture.prix*facture.tva
-								),2))
-								, 0 )
-							)
-						,0)","interet")
-			    ->addGroup("facture.id_facture");
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 		foreach ($data["data"] as $k=>$lines) {
@@ -2051,45 +2009,33 @@ class facture_absystech extends facture {
 		}
 
 		if ($get['id']) {
-	        $return = $data['data'][0];
+      $return = $data['data'][0];
+      // $return['societe'] = ATF::societe()->select($return['id_societe_fk']);
+      $return['data'] = $this->getBase64Facture($get["id"]);
+      $return['lignes'] = $this->getLignes($get["id"]);
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
 
-	        $return = $data['data'];
+  		$return = $data['data'];
 		}
 
 		return $return;
 	}
 
-	public function _getFacture($get,$post, &$s) {
-		ATF::facture_ligne()->q->reset()->addCondition("id_facture", $get["id_facture"]);
-		$facture_ligne=ATF::facture_ligne()->select_all();
-		$detail_facture = $this->select($get["id_facture"]);
-		if ($detail_facture['id_affaire']) {
-			ATF::affaire()->q->reset()->addCondition("affaire.id_affaire", $detail_facture['id_affaire']);
-			$affaire= array_shift(ATF::affaire()->sa());
-		} else {
-			$affaire = false;
-		}
+	/**
+	 * Renvoi les lignes d'une factures
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  INT $id  ID de la facture
+	 * @return array collection des lignes de la facture
+	 */
+  public function getLignes($id) {
+    if (!$id) return false;
+    return ATF::facture_ligne()->ss('id_facture',$id);
+  }
 
-		if ($detail_facture['id_societe']) {
-			ATF::societe()->q->reset()->addCondition("id_societe", $detail_facture['id_societe']);
-			$societe= array_shift(ATF::societe()->sa());
-		} else {
-			$societe = false;
-		}
-
-		return array(
-			"facture"=> $detail_facture,
-			"facture_ligne"=>$facture_ligne,
-			"affaire" => $affaire,
-			"societe" => $societe,
-			"data" =>$this->getBase64Facture($get["id_facture"])
-		);
-	}
 
 	public function _getFactureSociete($get,$post){
 		$this->q->reset()->where("facture.id_societe",$post["id_societe"]);
