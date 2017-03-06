@@ -3,7 +3,7 @@
 * @package Optima
 * @subpackage Cleodis
 */
-
+require_once dirname(__FILE__).("/../../libs/ATF/includes/constante.class.php");
 class constante_lm extends constante {
 
 	function __construct($table_or_id=NULL) {

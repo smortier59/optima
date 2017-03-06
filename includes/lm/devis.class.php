@@ -1606,5 +1606,53 @@ class devis_lm extends devis {
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
+
+
+
+	public function _GET ($get, $post){
+		$affaire = ATF::affaire()->select(ATF::affaire()->decryptId($get["id"]));
+
+		$this->q->reset()->where("id_affaire",$affaire["id_affaire"]);
+		$devis = $this->select_row();
+
+		ATF::devis_ligne()->q->reset()->where('id_devis', $devis['id_devis']);
+		$contratLigne = ATF::devis_ligne()->select_all();
+
+		$id_pack = ATF::produit()->select($contratLigne[0]['id_produit'] , 'id_pack_produit');
+		ATF::produit()->q->reset()->where("id_pack_produit", $id_pack);
+		$packLigne = ATF::produit()->sa();
+
+		$loyer = array();
+		foreach ($packLigne as $key => $value) {
+			ATF::produit_loyer()->q->reset()->where('id_produit', $value["id_produit"])
+											->addOrder('ordre', "asc");
+			$loyer[$value['id_produit']]["id_produit"] = $value['id_produit'];
+			$loyer[$value['id_produit']]["loyer"] = ATF::produit_loyer()->select_all();
+
+			if($this->estpresent($contratLigne , $value['id_produit'])){
+				unset($packLigne[$key]);
+			}
+
+		}
+
+		$client = ATF::societe()->select($affaire["id_societe"]);
+
+
+		$return['affaire'] = $affaire;
+		$return['client'] = $client;
+		$return['contratLigne'] = $contratLigne;
+		$return['packLigne'] = $packLigne;
+		$return["loyer"] = $loyer;
+
+		return $return;
+	}
+
+	public function estPresent($lignes, $id_produit){
+		foreach ($lignes as $key => $value) {
+			if($value["id_produit"] == $id_produit) return true;
+		}
+		return false;
+	}
+
 };
 ?>
