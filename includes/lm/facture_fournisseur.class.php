@@ -951,7 +951,7 @@ class facture_fournisseur extends classes_optima {
 			}
         }
 
-       	$sequence = ATF::constante()->getSequence("__SEQUENCE_BAP__");
+       	$sequence = ATF::constante()->getSequence("__SEQUENCE_AP__");
 
         $filename = 'CLEODIS_AP'.$sequence.'.fic';
 
