@@ -19,9 +19,9 @@
         <table style="width:100%;">
             <tr>
                 <td colspan="2"><hr /></td>
-            </tr>            
+            </tr>
             <tr>
-                <td style="text-align:center; width:80px">
+                <!--<td style="text-align:center; width:80px">
                     <a href="#affaire-insert.html,id_societe={$id_societe}">
                         <img src="{ATF::$staticserver}images/module/48/affaire.png" style="width:40px;" alt="{ATF::$usr->trans("creer_affaire",$current_class->table)}" />
                     </a>
@@ -31,17 +31,18 @@
                     <span style="font-size:12px; font-style:italic;">{*ATF::$usr->trans("envoyer_fichier_info",$current_class->table)*}</span>
                 </td>
                 {if $smarty.get.id_societe == "3407a75d752b23089d922095ce4fdd8a" }
-                    <td>                       
+                    <td>
                         <span style="font-size:12px; font-weight:bold;">ICS : {$smarty.const.__ICS__}</span>
                     </td>
                 {/if}
-            </tr>           
+                -->
+            </tr>
             <tr>
                 <td colspan="2"><hr /></td>
             </tr>
             <tr>
-                <td style="text-align:center; width:80px">                    
-                        <img src="{ATF::$staticserver}images/icones/joignable.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />                   
+                <td style="text-align:center; width:80px">
+                        <img src="{ATF::$staticserver}images/icones/joignable.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />
                 </td>
                 <td style="text-align:justify; vertical-align:middle">
                     <span style="font-size:12px; font-weight:bold;">{ATF::$usr->trans("joignable",$current_class->table)} : {ATF::$usr->trans(ATF::societe()->select($id_societe , "joignable"),"societe_joignable")}</span>
@@ -55,12 +56,12 @@
                     <td style="text-align:center; width:80px">
                         <!--
                         <a href='https://dev-presta-lma.absystech.net/#!commande?id_societe={$requests[$current_class->table]["id_{$current_class->table}"]}' target="_blank">
-                            <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />                   
+                            <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />
                         </a>
                         -->
                         <a href="javascript:;" onclick="ATF.ajax('societe,setToken.ajax','id_societe={$requests[$current_class->table]["id_{$current_class->table}"]}', { onSuccess:function(obj){ if (obj.result) window.location='{$smarty.const.__MANUAL_WEB_PATH__|replace:'lma-optima':'presta-lma'}#!commande?token='+obj.result; } });">
-                            <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />                   
-                        </a>         
+                            <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />
+                        </a>
                     </td>
                     <td style="text-align:justify; vertical-align:middle">
                         <span style="font-size:12px; font-weight:bold;">S'authentifier sur le portail prestataire</span>

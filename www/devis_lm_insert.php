@@ -210,6 +210,8 @@ if($infos["save_mandat"]){
 
 //Création d'une souscription faite par le site WEB
 if($infos["id_societe"]){
+
+
     try{
         $societe = ATF::societe()->select($infos["id_societe"]);
 
@@ -217,8 +219,8 @@ if($infos["id_societe"]){
             $adresse_livraison = $infos["societe_form"]["adresse"];
             $adresse_livraison_2 = $adresse_livraison_3 = NULL;
 
-            if($infos["societe_form"]["adresse_2"] )  $adresse_livraison_2 = $infos["societe_form"]["adresse_2"];
-            if($infos["societe_form"]["adresse_3"] )  $adresse_livraison_3 = $infos["societe_form"]["adresse_3"];
+            if($infos["societe_form"]["adresse_2"] !== "")  $adresse_livraison_2 = $infos["societe_form"]["adresse_2"];
+            if($infos["societe_form"]["adresse_3"] !== "")  $adresse_livraison_3 = $infos["societe_form"]["adresse_3"];
 
             $cp_livraison = $infos["societe_form"]["cp"];
             $ville_livraison = $infos["societe_form"]["ville"];
@@ -244,8 +246,8 @@ if($infos["id_societe"]){
             }
         }else{
             $adresse_livraison = $societe["adresse"];
-            if($societe["adresse_2"] )  $adresse_livraison_2  = $societe["adresse_2"];
-            if($societe["adresse_3"] )  $adresse_livraison_3  = $societe["adresse_3"];
+            if($societe["adresse_2"] !== "" )  $adresse_livraison_2  = $societe["adresse_2"];
+            if($societe["adresse_3"] !== "" )  $adresse_livraison_3  = $societe["adresse_3"];
 
             $cp_livraison = $societe["cp"];
             $ville_livraison = $societe["ville"];
@@ -258,7 +260,6 @@ if($infos["id_societe"]){
             $ville_facturation =  $ville_livraison;
             $pays_facturation = $pays_livraison;
         }
-
 
 
         ATF::contact()->q->reset()->where("id_societe",$infos["id_societe"]);

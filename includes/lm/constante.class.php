@@ -20,6 +20,8 @@ class constante_lm extends constante {
 
 		$const = intval($const) + 1;
 
+		$this->u(array("constante"=>$constante, "valeur"=>$const));
+
 		if($const < 10){
 			$const = "0000".$const;
 		}elseif ($const < 100) {
