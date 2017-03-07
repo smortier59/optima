@@ -169,6 +169,9 @@ class echeancier extends classes_optima {
       case 'id_echeancier':
         $get['tri'] = "echeancier.".$get['tri']."_fk";
       break;
+      case 'designation':
+        $get['tri'] = "echeancier.".$get['tri'];
+      break;
       case 'debut_periode':
         $get['tri'] .= ",fin_periode";
       break;
