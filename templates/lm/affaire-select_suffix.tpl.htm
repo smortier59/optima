@@ -1,16 +1,34 @@
 {if isset($smarty.get.id_affaire)}
     {$id_affaire = $smarty.get.id_affaire}
 {elseif isset($requests[$current_class->table]["id_{$current_class->table}"])}
-    {$id_affaire = $requests[$current_class->table]["id_{$current_class->table}"]} 
+    {$id_affaire = $requests[$current_class->table]["id_{$current_class->table}"]}
 {/if}
 
 {if isset($id_affaire)}
    	{$ref_mandate = ATF::affaire()->select($id_affaire, "ref_mandate")}
    	{if !$ref_mandate}
-		<tr>
-			<td colspan="2" style="text-align:center; width:100%;">	            
+		<!--<tr>
+			<td colspan="2" style="text-align:center; width:100%;">
 	            <a href="javascript:;" class="btn btn-success" onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur)}')) ATF.tpl2div('{$current_class->table},relancer.ajax','id_affaire={$id_affaire|cryptid}');" {$item[$x]}&amp;event=relancer" onclick="return confirm('Etes-vous sur(e) ?');">Relancer le client pour la reprise de souscription</a>
-	        </td>        
-		</tr>
+	        </td>
+		</tr>-->
 	{/if}
+
+	<tr>
+		<td style="text-align:center; width:30%;">
+			{if __MANUAL_WEB_PATH__ === "https://dev-lma-optima.absystech.net/"}
+            	<a href="https://dev-lma-cleoscope.absystech.net/#!lm?k={$id_affaire|cryptid}&u={ATF::$usr->getID()}">
+            {elseif __MANUAL_WEB_PATH__ === "https://dev-lma-optima.absystech.net/"}
+            	<a href="https://pre-lma-cleoscope.absystech.net/#!lm?k={$id_affaire|cryptid}&u={ATF::$usr->getID()}">
+            {else}
+            	<a href="https://lma-cleoscope.absystech.net/#!lm?k={$id_affaire|cryptid}&u={ATF::$usr->getID()}">
+            {/if}
+                <img src="{ATF::$staticserver}images/module/48/affaire.png" style="width:40px; margin-top: 10px;" alt="Créer l'avenant pour ce contrat" />
+
+            </a>
+        </td>
+        <td style="text-align:justify; vertical-align:middle">
+            <span style="font-size:12px; font-weight:bold;">Créer l'avenant pour ce contrat</span><br />
+        </td>
+	</tr>
 {/if}
