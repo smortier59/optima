@@ -305,6 +305,7 @@ class devis_lm extends devis {
 		}else{
 			$infos["nature"]="affaire";
 		}
+
 		$affaire=ATF::affaire()->formateInsertUpdate($infos);
 
 
@@ -1619,6 +1620,7 @@ class devis_lm extends devis {
 		}
 
 
+
 		$this->infoCollapse($infos);
 
 
@@ -1710,8 +1712,14 @@ class devis_lm extends devis {
 				}
 			}
 
+			$prod = $service = false;
+
 			foreach($infos_ligne as $key=>$item){
 				$produit = ATF::produit()->select($item["id_produit"]);
+
+				if($produit["nature"] === "produit") $prod = true;
+				if($produit["nature"] === "service") $prod = true;
+
 			   	$item["id_devis"]=$last_id;
 				$item["visible"] = $produit["visible_pdf"];
 
@@ -1764,11 +1772,16 @@ class devis_lm extends devis {
 						throw new errorATF("Ligne de devis sans fournisseur (achat ou loyer) (Produit : ".$item['id_produit'].")",500);
 					}
 				}
-
-
-
-
 			}
+
+			if($prod == true &&  $service == true){
+				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "LS"));
+			} elseif($prod == true){
+				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "LP"));
+			} else {
+				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "SP"));
+			}
+
 			if($preview){
 				$return = base64_encode(ATF::pdf()->generic("devis",$last_id,true,$s,true)); // Génération du PDF de preview
 				ATF::db($this->db)->rollback_transaction();
