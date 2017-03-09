@@ -1034,6 +1034,7 @@ class facture_fournisseur extends classes_optima {
 	        		$engagement += $vv["duree"];
 	        	}
 	        	$montant = number_format($value["facture_fournisseur.prix"]/$engagement ,2 ,".","");
+	        	$total += $montant;
 
 	        	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
         		$devis = ATF::devis()->select_row();
@@ -1100,7 +1101,7 @@ class facture_fournisseur extends classes_optima {
 	        	$donnees[$key][2][12] = "00000";
 	        	$donnees[$key][2][13] = "1";
 	    		$donnees[$key][2][14] = "281560";
-	    		$donnees[$key][2][15] = "0";
+	    		$donnees[$key][2][15] = "000000000";
 	        	$donnees[$key][2][16] = "0";
 	        	$donnees[$key][2][17] = "0";
 	        	$donnees[$key][2][18] = "0";
@@ -1164,7 +1165,7 @@ class facture_fournisseur extends classes_optima {
 
         //$string .=  "98;".count($donnees).";CLEODIS\n";
         //$lignes ++;
-        $string .= "99;".$total_debit.";".$total_credit.";EUR\n";
+        $string .= "99;".number_format($total ,2 ,".","").";".number_format($total ,2 ,".","").";EUR\n";
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
