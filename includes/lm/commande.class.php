@@ -1310,7 +1310,7 @@ class commande_lm extends commande {
 		if ($id_commande && $id_fournisseur) {
 			$this->q->reset()->addCondition("id_commande",$id_commande);
 			if($commandes=$this->sa()){
-			foreach($commandes as $key=>$item){
+				foreach($commandes as $key=>$item){
 					//Ligne de la commande pour le fournisseur il ne faut pas que ces lignes soient présentes dans un autre bon de commande
 					ATF::commande_ligne()->q->reset()->addOrder("commande_ligne.id_commande_ligne","asc")
 													 ->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
@@ -1319,7 +1319,7 @@ class commande_lm extends commande {
 													 ->where("id_fournisseur",$id_fournisseur);
 					$commande_ligne=ATF::commande_ligne()->sa();
 					if($commande_ligne){
-						$id_commande=$this->cryptId($item["id_commande_fk"]);
+						$id_commande=$this->cryptId($item["id_commande"]);
 						unset($ligne_commande);
 						foreach($commande_ligne as $k=>$i){
 
@@ -1335,6 +1335,7 @@ class commande_lm extends commande {
 									$i["quantite"] = $vl["nb_loyer"];
 								}
 							}
+
 							if($i["quantite"] > 1){
 								$n = 1;
 								for($n=1; $n<=$i["quantite"];$n++){
@@ -1366,7 +1367,7 @@ class commande_lm extends commande {
 						if ($ligne_commande) {
 							$commande[]=array(
 								"text"=>$item["ref"]." ".$item["commande"]
-								,"id"=>$item["id_commande_fk"]
+								,"id"=>$item["id_commande"]
 								,"leaf"=>false
 								,"href"=>"javascript:window.open('commande-select-".$id_commande.".html');"
 								,"cls"=>"folder"
