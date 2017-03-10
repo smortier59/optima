@@ -1313,7 +1313,7 @@ class commande_lm extends commande {
 				foreach($commandes as $key=>$item){
 					//Ligne de la commande pour le fournisseur il ne faut pas que ces lignes soient présentes dans un autre bon de commande
 					ATF::commande_ligne()->q->reset()->addOrder("commande_ligne.id_commande_ligne","asc")
-													 ->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
+													 //->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
 													 ->where("id_commande",$item["id_commande"])
 													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
 													 ->where("id_fournisseur",$id_fournisseur);
