@@ -397,15 +397,15 @@ ATF.renderer.pdfCourriers=function(table,field) {
                         				Ext.getCmp("date_signature"+id).setVisible(true);
                         				Ext.getCmp("equipement"+id).setVisible(true); 
                         			}else if(field.value =="lettreBelfius"){
-                        				Ext.getCmp("bdc"+id).setVisible(false);
-										Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				
+                        				Ext.getCmp("bdc"+id).setVisible(false);  
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);                     				
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
-                        				Ext.getCmp("num_contrat"+id).setVisible(false);
-                        				Ext.getCmp("date_signature"+id).setVisible(false);
-                        				Ext.getCmp("equipement"+id).setVisible(false);
+                        				Ext.getCmp("num_contrat"+id).setVisible(true);
+                        				Ext.getCmp("date_signature"+id).setVisible(true);
+                        				Ext.getCmp("equipement"+id).setVisible(true); 
 						    		} else if(field.value == "envoiAvenant"){
                         				Ext.getCmp("bdc"+id).setVisible(true);  
                         				Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				

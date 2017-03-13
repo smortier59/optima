@@ -138,5 +138,16 @@ class pack_produit_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(1,count($notice), "Nbre de notice incorrect");
 	}
+
+	public function test_autocomplete(){
+		$pack=array(
+						"start"=>0,
+					   "limit"=>0,
+					   "query"=>"PACK ATOL PRO"
+						);	
+						
+		$autocomplete=$this->obj->autocomplete($pack);
+		$this->assertEquals(52,$autocomplete[0]["raw_0"],"autocomplete ne renvoi pas le bon pack produit");
+	}
 }
 ?>

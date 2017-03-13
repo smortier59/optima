@@ -6,6 +6,8 @@
 {$type = requetebyUserParMois}
 <div id="{$module}_grapherequetebyUserParMois2" class="widget"></div>
 
+{$nbjOuvres = ATF::hotline()->getJoursOuvres(date("Y-m-01" , strtotime("-1 month", strtotime(date("Y-m-01")))), date("Y-m-d", strtotime("-1 day", strtotime(date("Y-m-01")))))} 
+
 <script type="text/javascript">
 {$data = ATF::getClass($module)->requetebyUserParMois(-1)} 
 Ext.onReady(function(){
@@ -86,7 +88,7 @@ Ext.onReady(function(){
                         name: 'Objectif',
                         data: [
                                 {foreach $data["categories"]["category"] as $key => $cat}   
-                                      {if $key == 60} 120*0.8 {else} 120 {/if}
+                                      {if $key == 60} {$nbjOuvres}*6*0.8 {else} {$nbjOuvres}*6 {/if}
                                       {if !$key@last},{/if}
                                 {/foreach}    
                             ]

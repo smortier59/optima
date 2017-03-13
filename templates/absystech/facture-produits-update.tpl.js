@@ -34,7 +34,7 @@
 	{/if}
 {else if ATF::_r(id_facture)}
 	{$q->reset()->where("id_facture",classes::decryptId(ATF::_r(id_facture)))->setView([order=>$fields])->end()}
-	
+
 	{if ATF::affaire()->select(ATF::facture()->select(ATF::_r(id_facture), "id_affaire") , "nature") == "consommable"}
 		{include file="devis-consommables-lignes_consommable.tpl.js"}
 	{else}
@@ -43,4 +43,4 @@
 {else}
 	{$q->reset()->where("id_facture",0)->setView([order=>$fields])->end()}
 	{include file="devis-produits-lignes.tpl.js"}
-{/if}	
+{/if}

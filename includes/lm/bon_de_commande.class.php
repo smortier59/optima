@@ -7,7 +7,7 @@ require_once dirname(__FILE__)."/../bon_de_commande.class.php";
 class bon_de_commande_lm extends bon_de_commande {
 	function __construct() {
 		parent::__construct();
-		$this->table = "bon_de_commande"; 
+		$this->table = "bon_de_commande";
 
 		$this->colonnes['fields_column'] = array(
 			"bon_de_commande.ref"
@@ -31,7 +31,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		$this->colonnes["bloquees"]["insert"] =
 		$this->colonnes["bloquees"]["update"] = array("ref","id_user","date_livraison_prevision","date_installation_prevision","date_reception_prevision","livraison_partielle","date_reception_fournisseur","date_livraison","date_installation","date_pv_install","factureFournisseur",'date_livraison_estime','date_livraison_prevue','date_livraison_reelle','date_installation_prevue','date_installation_reele','date_limite_rav');
 		$this->colonnes["bloquees"]["update"][] = "date";
-		
+
 		$this->colonnes['primary'] = array(
 			"ref"
 			,"id_societe"=>array("disabled"=>true)
@@ -65,20 +65,21 @@ class bon_de_commande_lm extends bon_de_commande {
 			)
 			,'factureFournisseur'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,"num_bdc"
+			,"id_magasin"
 			,"commentaire"=>array("xtype"=>"textarea")
 		);
 		$this->colonnes['panel']['commande_lignes'] = array(
 			"commandes"=>array("custom"=>true)
 		);
-	
+
 		$this->colonnes['panel']['total'] = array(
 			"prix"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
-		
+
 		$this->colonnes['panel']['total_cleodis'] = array(
 			"prix_cleodis"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
-						
+
 		// Blocs montant/état/dates
 		$this->colonnes['panel']['statut'] = array(
 			"montant"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'montant_fs')
@@ -162,8 +163,8 @@ class bon_de_commande_lm extends bon_de_commande {
 		$this->colonnes['bloquees']['select'] =  array_merge(
 			array_keys($this->colonnes['panel']['commande_lignes']),
 			array_keys($this->colonnes['panel']['courriel'])
-		);	
-					
+		);
+
 		$this->fieldstructure();
 
 		$this->addPrivilege("updateDate");
@@ -179,11 +180,11 @@ class bon_de_commande_lm extends bon_de_commande {
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true);
 		$this->files["pdf"] = array("type"=>"pdf","no_upload"=>true,"no_generate"=>true);
 		$this->can_insert_from = array("commande");
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 
-		
+
 	}
-	
+
 
 	/**
 	 * Permet de modifier un champs en AJAX
@@ -199,7 +200,7 @@ class bon_de_commande_lm extends bon_de_commande {
 				loc::mt(ATF::$usr->trans("notice_update_success"))
 				,ATF::$usr->trans("notice_success_title")
 			);
-		}		
+		}
 	}
 
 	public function uploadFileFromSA(&$infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
@@ -208,9 +209,9 @@ class bon_de_commande_lm extends bon_de_commande {
 		if (!$class) return false;
 		if (!$infos['id']) return false;
 		if (!$files) return false;
-		
+
 		$id = $class->decryptID($infos['id']);
-		
+
 		$id_affaire = $class->select($id, "id_affaire");
 
 		foreach ($files as $k=>$i) {
@@ -218,13 +219,13 @@ class bon_de_commande_lm extends bon_de_commande {
 			$id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$id_affaire, "provenance"=>ATF::$usr->trans($class->name(), "module")." ".$k." ref : ".$infos['extAction']." ".$class->select($id, "ref")));
 			$this->store($s,$id,$k,$i);
 
-			copy($class->filepath($id,$k), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));			
+			copy($class->filepath($id,$k), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
 		}
 		ATF::$cr->block('generationTime');
 		ATF::$cr->block('top');
-		
-		
-		
+
+
+
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
@@ -237,25 +238,25 @@ class bon_de_commande_lm extends bon_de_commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return bool
-    */   	
+    */
 	public function updateDate($infos,&$s,&$request){
 
 		if (!$infos['id_bon_de_commande']) return false;
 
 		$infos["id_bon_de_commande"] = $this->decryptId($infos["id_bon_de_commande"]);
 
-		if ($infos['value'] == "undefined") $infos["value"] = "";		
+		if ($infos['value'] == "undefined") $infos["value"] = "";
 		switch ($infos['key']) {
 			default:
 				$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
-					   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)					   
-					);				
+					   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)
+					);
 				$this->u($d);
 			break;
 		}
-		
-		
-		
+
+
+
 		return true;
 	}
 
@@ -285,30 +286,30 @@ class bon_de_commande_lm extends bon_de_commande {
 													)"
 													,"solde_ht")
 			->addGroup("bon_de_commande.id_bon_de_commande");
-			
+
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		foreach ($return['data'] as $k=>$i) {
 			//if ($i["solde_ht"]>0 || !$i["solde_ht"]) {
-				$return['data'][$k]['factureFournisseurAllow'] = true;	
+				$return['data'][$k]['factureFournisseurAllow'] = true;
 			//}
-			
+
 			if (ATF::parc()->parcByBdc($i['bon_de_commande.id_bon_de_commande'])) {
-				$return['data'][$k]['parcInsertionAllow'] = true;	
+				$return['data'][$k]['parcInsertionAllow'] = true;
 			}
 		}
 		return $return;
 	}
 
-	/** 
+	/**
 	* Impossible de supprimer un bon de commande qui a une facture fournisseur
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
 		$affaire = new affaire_lm($bdc['id_affaire']);
-		
+
 		//On ne doit pas pouvoir modifier une affaire Annulée et remplacée
 		ATF::commande()->checkUpdateAR($affaire);
 
@@ -318,7 +319,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		if($affaireEnfant){
 			ATF::commande()->checkUpdateAVT($affaireEnfant);
 		}
-		
+
 		ATF::facture_fournisseur()->q->reset()->addCondition("id_bon_de_commande",$id)->setCount();
 		$count=ATF::facture_fournisseur()->sa();
 		if($count["count"]>0){
@@ -327,11 +328,11 @@ class bon_de_commande_lm extends bon_de_commande {
 			return true;
 		}
 	}
-	
+
 	public function can_update($id,$infos=false){
 		return $this->can_delete($id);
 	}
-	
+
 	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -339,12 +340,12 @@ class bon_de_commande_lm extends bon_de_commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
 		if ($id_commande = ATF::_r('id_commande')) {
 			$commande=ATF::commande()->select($id_commande);
 		}
-		
+
 		switch ($field) {
 			case "id_societe":
 				return $commande[$field];
@@ -389,16 +390,16 @@ class bon_de_commande_lm extends bon_de_commande {
 				return ATF::societe()->select($commande['id_societe'],$field);
 				break;
 			}
-	
+
 		return parent::default_value($field,$s,$request);
-	}	
+	}
 
 	/**
     * Retourne la valeur du texte d'email, appelé en Ajax
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
-    */   	
+    */
 	public function majMail($id_societe){
 		return nl2br("Bonjour,\n\nCi-joint le bon de commande pour la société ".ATF::societe()->nom($id_societe).".\nBon de commande effectué le ".date("d/m/Y").".\n");
 	}
@@ -420,16 +421,16 @@ class bon_de_commande_lm extends bon_de_commande {
 		}
 
 		$prefix=$code_four."-".ATF::affaire()->select($id_affaire,"ref")."-";
-		
+
 		$this->q->reset()
 			->addField("ROUND(SUBSTRING(`ref`,".(strlen($prefix)+1)."))","ref_reel")
 			->addCondition("ref",$prefix."%","AND",false,"LIKE")
 			->addOrder('ref_reel',"DESC")
 			->setDimension("row")
 			->setLimit(1);
-		
+
 		$nb=$this->sa();
-	
+
 		if($nb["ref_reel"]){
 			$suffix=$nb["ref_reel"]+1;
 		}else{
@@ -440,7 +441,7 @@ class bon_de_commande_lm extends bon_de_commande {
 	}
 
 	/**
-	* Ajoute 
+	* Ajoute
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	* @param string classes_optima $class Classe des enregistrements affichés dans l'autocomplète
 	* @param array $infos ($requests habituellement attendu)
@@ -477,7 +478,7 @@ class bon_de_commande_lm extends bon_de_commande {
 //				$return["affaire"][]=$affaire;
 //			}
 //		}
-//		
+//
 //		//Si aucune affaire sélectionné
 //		if(!$affaire){
 //			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
@@ -489,8 +490,8 @@ class bon_de_commande_lm extends bon_de_commande {
 //		}
 //	}
 //
-	
-	/** 
+
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes du bon de commande et d'nvoyer un mail
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -518,7 +519,12 @@ class bon_de_commande_lm extends bon_de_commande {
 
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
-		
+
+		//Si le fournisseur est LM, il faut un magasin
+		if($infos["id_fournisseur"] == 2 && !$infos["id_magasin"]){
+			throw new errorATF("Il faut le magasin sur lequel la commande Leroy Merlin a été passée",500);
+		}
+
 		//Gestion mail
 		if($envoyerEmail){
 			$email["email"]=$infos["email"];
@@ -533,26 +539,26 @@ class bon_de_commande_lm extends bon_de_commande {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 		$infos["id_fournisseur"] = ATF::societe()->decryptId($infos["id_fournisseur"]);
-		
+
 		//Cleodis & Cleofi ont la possibilité de choisir le prix
 		$societe=ATF::societe()->nom($infos["id_fournisseur"]);
-		if($societe=="CLEODIS" || $societe=="CLEOFI") $infos["prix"]=$infos["prix_cleodis"]; 
+		if($societe=="CLEODIS" || $societe=="CLEOFI") $infos["prix"]=$infos["prix_cleodis"];
 		unset($infos["prix_cleodis"]);
 		$infos["ref"] = $this->getRef($infos["id_affaire"],$infos["id_fournisseur"]);
 		//$infos["date"] = date("Y-m-d");
 
 
-		$infos['etat'] = 'envoyee';	
+		$infos['etat'] = 'envoyee';
 
-		
+
 		//Vérification du bon de commande
 		$this->check_field($infos);
-	
+
 		ATF::db($this->db)->begin_transaction();
 
 //*****************************Transaction********************************
-				
-		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);	
+
+		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		$prix_total = 0;
 		foreach($infos_bon_de_commande_ligne as $key=>$item){
@@ -561,15 +567,15 @@ class bon_de_commande_lm extends bon_de_commande {
 			$bon_de_commande_ligne["id_bon_de_commande"]=$last_id;
 			$bon_de_commande_ligne["ref"]=$commande_ligne["ref"];
 			$bon_de_commande_ligne["produit"]=$commande_ligne["produit"];
-			$bon_de_commande_ligne["quantite"]=$commande_ligne["quantite"];
+			$bon_de_commande_ligne["quantite"]=1;
 			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"];
-			$prix_total += $bon_de_commande_ligne["prix"]*$bon_de_commande_ligne["quantite"];
+			$prix_total += $bon_de_commande_ligne["prix"];
 			ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne);
 		}
-		
+
 		if($societe=="CLEODIS" || $societe=="CLEOFI"){
 			if($prix_total != $infos["prix"]){
-				$prix_total=$infos["prix"];	
+				$prix_total=$infos["prix"];
 			}
 		}
 
@@ -598,17 +604,17 @@ class bon_de_commande_lm extends bon_de_commande {
 			}
 			ATF::db($this->db)->commit_transaction();
 		}
-		
+
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
 		return $last_id;
 
 	}
-	
-		
-	/** 
-	* Surcharge de delete 
+
+
+	/**
+	* Surcharge de delete
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $infos le ou les identificateurs de l'élément que l'on désire inséré
 	* @param array &$s La session
@@ -624,17 +630,17 @@ class bon_de_commande_lm extends bon_de_commande {
 			if($bon_de_commande){
 //*****************************Transaction********************************
 				ATF::db($this->db)->begin_transaction();
-	
+
 				ATF::facture_non_parvenue()->q->reset()->addCondition("id_bon_de_commande",$bon_de_commande["id_bon_de_commande"]);
 				$facture_non_parvenue=ATF::facture_non_parvenue()->sa();
-				
+
 				foreach($facture_non_parvenue as $key=>$item){
 					ATF::facture_non_parvenue()->d($item["id_facture_non_parvenue"]);
 				}
 
 				ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_bon_de_commande",$bon_de_commande["id_bon_de_commande"]);
 				$bon_de_commande_ligne=ATF::bon_de_commande_ligne()->sa();
-			
+
 				foreach($bon_de_commande_ligne as $key=>$item){
 					$commande_ligne=ATF::commande_ligne()->select($item["id_commande_ligne"]);
 					if($commande_ligne["serial"] && !$commande_ligne["id_affaire_provenance"]){
@@ -649,16 +655,16 @@ class bon_de_commande_lm extends bon_de_commande {
 						}
 					}
 				}
-				
+
 				parent::delete($id,$s);
-	
-					
+
+
 				ATF::db($this->db)->commit_transaction();
 	//*****************************************************************************
-				
+
 				ATF::affaire()->redirection("select",$bon_de_commande["id_affaire"]);
-				
-				return true; 
+
+				return true;
 			}
 		} elseif (is_array($infos) && $infos) {
 
@@ -668,12 +674,12 @@ class bon_de_commande_lm extends bon_de_commande {
 		}
 	}
 
-	
-	/** 
+
+	/**
 	* Permet de savoir si toutes les lignes d'une commande sont passées en bon de commande
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function bdcByAffaire($id_commande){
 		ATF::commande_ligne()->q->reset()->addCondition("id_commande",$id_commande);
@@ -685,7 +691,7 @@ class bon_de_commande_lm extends bon_de_commande {
 				$nb_commande_ligne++;
 			}
 		}
-		
+
 		if($nb_commande_ligne==count($commande_ligne)){
 			return true;
 		}else{

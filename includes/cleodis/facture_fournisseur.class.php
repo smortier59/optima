@@ -4,9 +4,11 @@
 * @subpackage Cléodis
 */
 class facture_fournisseur extends classes_optima {
-	function __construct() {
-		parent::__construct();
+	function __construct($table_or_id=NULL) {
 		$this->table = "facture_fournisseur"; 
+
+		parent::__construct($table_or_id);
+		
 
 		$this->colonnes['fields_column'] = array(
 			"facture_fournisseur.ref"

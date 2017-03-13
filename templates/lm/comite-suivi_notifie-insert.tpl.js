@@ -7,10 +7,7 @@
 	height: 200, 
 	store: [		
 			['16', 'Jérome Loison'],
-			['17', 'Christophe Loison'],
-			['18', 'Pierre Caminel'],
-			['93', 'Térence Delattre'],
-			['35', 'Frédérique Randoux']		
+			['18', 'Benjamin Tronquit']
 	]	
 	,listeners: {
 		render : function(){

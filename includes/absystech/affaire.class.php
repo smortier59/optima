@@ -50,16 +50,16 @@ class affaire_absystech extends affaire {
 			,"id_termes"=>array("updateOnSelect"=>true,"custom"=>true)
 			,"code_commande_client"=>array("updateOnSelect"=>true,"custom"=>true)
 			,"contrat_maintenance"=>array("updateOnSelect"=>true,"xtype"=>"textarea","width"=>400,"custom"=>true)
-			
-			
+
+
 		);
-		
+
 		$this->colonnes['panel']['maintenance'] = array(
-			"date_fin_maintenance",				
-			"rappel_annee",				
-			"jours_inclus"					
+			"date_fin_maintenance",
+			"rappel_annee",
+			"jours_inclus"
 		);
-		
+
 		$this->fieldstructure();
 
 		$this->onglets = array(
@@ -88,11 +88,11 @@ class affaire_absystech extends affaire {
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("autocompleteHotlineForm");
 		$this->addPrivilege("setForecast","update");
-		// GED		
+		// GED
 		$this->quick_action['select']["affiche_ged"]=array('privilege'=>'select');
 
-		//$this->selectExtjs=true; 
-		$this->foreign_key['id_commercial'] = "user"; 
+		//$this->selectExtjs=true;
+		$this->foreign_key['id_commercial'] = "user";
 	}
 
 	/**
@@ -101,7 +101,7 @@ class affaire_absystech extends affaire {
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
-		
+
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
@@ -113,7 +113,7 @@ class affaire_absystech extends affaire {
 							 -IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
 			->addField("(SUM(facture.prix)
 			 			-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
-						-IF(COUNT(`hotline`.`id_hotline`)=0, 
+						-IF(COUNT(`hotline`.`id_hotline`)=0,
 							0,
 						    (SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
 						 	)","margenette")
@@ -221,7 +221,7 @@ class affaire_absystech extends affaire {
 						->addUnion(ATF::commande()->sa("no_order"))
 						->addUnion(ATF::facture()->sa("no_order"));
 				$subQuery=$this->q->getUnion();
-					
+
 				//requête récupérant la marge (en utilisant la subquery)
 				$this->q->reset()
 						->addField("YEAR(uni.date)","year")
@@ -231,7 +231,7 @@ class affaire_absystech extends affaire {
 						->setSubQuery($subQuery,'uni')
 						->addGroup("year")
 						->addGroup("month");
-					
+
 				// Nombre d'année suivant sélection ou widget
 				if ($widget) {
 					//$this->q->addCondition("YEAR(uni.date)",(date("Y",time())-1),"OR",false,">=");
@@ -294,7 +294,7 @@ class affaire_absystech extends affaire {
 					);
 					if($nom=="marge")$specificite["parentYAxis"]='S';
 					$graph['dataset'][$nom]["params"] = array_merge($dataset_params,$specificite);
-						
+
 					/*foreach ($donnees[$nom] as $val_2) {
 						$graph['dataset'][$nom]['set'][$val_2['month']] = array("value"=>0,"alpha"=>100,"titre"=>"0");
 					}*/
@@ -410,7 +410,7 @@ class affaire_absystech extends affaire {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Retourne false si la société est en etat douteux
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -474,13 +474,13 @@ class affaire_absystech extends affaire {
 		if($infos["forecast"]>100||$infos["forecast"]<0){
 			throw new errorATF(ATF::$usr->trans("invalid_range"),6512);
 		}
-		
+
 		$this->u(array("id_affaire"=>$infos["id_affaire"],"forecast"=>$infos["forecast"]));
-		
+
 		$notice=ATF::$usr->trans("update_forecast",$this->table);
 		ATF::$msg->addNotice($notice);
 	}
-	
+
 	/**
     * Retourne la ref d'une affaire autre qu'avenant
     * @author Mathieu Tribouillard <mtribouillard@absystech.fr>
@@ -489,8 +489,8 @@ class affaire_absystech extends affaire {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
-		}	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);
+		}
 		if($class=="devis"){
 			$prefix="D";
 		}elseif($class=="commande"){
@@ -505,7 +505,7 @@ class affaire_absystech extends affaire {
 					   ->addOrder('ref',"DESC")
 					   ->setDimension("row")
 					   ->setLimit(1);
-	
+
 		$nb=ATF::$class()->sa();
 
 		// On regarde aussi les références des contrat de maintenance des copieur car ils ont le même numéro séquentiel
@@ -545,7 +545,7 @@ class affaire_absystech extends affaire {
 		return $prefix.$suffix;
 	}
 
-	
+
 	/* surcharge de la fonction pour gérer le cas d'un changement de société
 	*	@author Quentin JANON <qjanon@absytech.fr>
 	*
@@ -568,8 +568,8 @@ class affaire_absystech extends affaire {
 						foreach ($el as $enr) {
 							$enr['id_societe'] = $idNewSociete;
 							$c->u($enr);
-						}						
-					}					
+						}
+					}
 				}
 				// Création de suivi automatique
 				$suivi = array(
@@ -584,7 +584,7 @@ class affaire_absystech extends affaire {
 			}
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
-			throw $e;	
+			throw $e;
 		}
 		ATF::db($this->db)->commit_transaction();
 		return $id_suivi;
@@ -594,16 +594,16 @@ class affaire_absystech extends affaire {
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	*/
-	public function widget_marge_nette(){		
+	public function widget_marge_nette(){
 		$this->q->reset()
-				->setStrict()	
+				->setStrict()
 				->addField("affaire.id_commercial")
-				->addField("affaire.id_affaire")			
+				->addField("affaire.id_affaire")
 				->addCondition("affaire.date","'".date("Y-m-d 00:00:00", strtotime(date("Y-m-d")." -1 month"))."'",NULL,false,">=",false,false,true)
 				->addCondition("affaire.etat","facture");
 		$result= $this->select_all();
 
-		
+
 		foreach ($result as $i) {
 			$nom=ATF::user()->select($i["id_user"]);
 			$graph['categories']["category"][$i['user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
@@ -611,25 +611,25 @@ class affaire_absystech extends affaire {
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";
 		$graph['categories']['params']["fontSize"] = "12";
-		
-		
-		/*parametres graphe*/		
-		$this->paramGraphe($dataset_params,$graph);	
 
-		
-				
-		foreach ($result as $val_){			
+
+		/*parametres graphe*/
+		$this->paramGraphe($dataset_params,$graph);
+
+
+
+		foreach ($result as $val_){
 			if (!$graph['dataset'][$etat]) {
 				$graph['dataset'][$etat]["params"] = array_merge($dataset_params,array(
 					"seriesname"=>ATF::$usr->trans("etat_".$etat,'devis')
 					,"color"=>$couleur
 				));
-				
-				foreach ($result as $val_2) { 
+
+				foreach ($result as $val_2) {
 					$graph['dataset'][$etat]['set'][$val_2["id_user"]] = array("value"=>0,"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : 0");
 				}
 			}
-			$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : ".$val_['nb_'.$etat]);				
+			$graph['dataset'][$etat]['set'][$val_["id_user"]] = array("value"=>$val_['nb_'.$etat],"alpha"=>100,"titre"=>ATF::$usr->trans("etat_".$etat,'devis')." : ".$val_['nb_'.$etat]);
 		}
 		return $graph;
 	}
@@ -637,11 +637,11 @@ class affaire_absystech extends affaire {
 	/**
 	* Renvoi les informations pour afficher le rapport de facturation périodique dans telescope
 	* @package Telescope
-	* @author Quentin JANON <qjanon@absystech.fr> 
-	* @param $get array 
-	* @param $post array 
-	* @return array result 
-	*/ 
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param $get array
+	* @param $post array
+	* @return array result
+	*/
 	public function _rapportFacturePeriodique($get,$post) {
 
 		// Gestion du tri
@@ -658,9 +658,9 @@ class affaire_absystech extends affaire {
  			$field = "date_debut_periode";
  		} else {
  			$field = "date";
-	
+
  		}
- 
+
 		ATF::affaire()->q->reset()
 			->addField("affaire.id_societe")
 			->addField("affaire.id_affaire")
@@ -702,7 +702,7 @@ class affaire_absystech extends affaire {
 					$tmp = explode(".",$k_);
 					$affaires['data'][$k][$tmp[1]] = $val;
 					unset($affaires['data'][$k][$k_]);
-				}				
+				}
 			}
 		}
 
@@ -781,7 +781,7 @@ class affaire_absystech extends affaire {
         }
 
         $writer = \PHPExcel_IOFactory::createWriter($o, 'Excel5');
-                    
+
         $fn = $this->filepath(ATF::$usr->getId(),"rapport_facturation_periodique",true);
         util::file_put_contents($fn,"");
         $writer->save($fn);
@@ -792,13 +792,144 @@ class affaire_absystech extends affaire {
 
 /* PARTIE DES FONCTIONS POUR TELESCOPE*/
 
+	/**
+  *
+  * Fonctions _GET pour telescope
+  * @package Telescope
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param $get array contient le tri, page limit et potentiellement un id.
+  * @param $post array Argument obligatoire mais inutilisé ici.
+  * @return array un tableau avec les données
+  */
+  public function _GET($get,$post) {
+
+    // Gestion du tri
+    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
+    if (!$get['trid']) $get['trid'] = "desc";
+
+    // Gestion du limit
+    if (!$get['limit']) $get['limit'] = 30;
+
+    // Gestion de la page
+    if (!$get['page']) $get['page'] = 0;
+
+    $colsData = array("affaire.*","societe.societe");
+
+    $this->q->reset();
+
+    if ($get['id_affaire']) $colsData = array("affaire.*");
+
+    $this->q->addField($colsData);
+    $this->q->from("affaire","id_societe","societe","id_societe");
+
+    if($get["search"]){
+      header("ts-search-term: ".$get['search']);
+      $this->q->setSearch($get['search']);
+    }
+
+	// Filtre sur l'etat de l'affaire
+	if ($get['filters']['devis'] == "on") {
+		$this->q->where("affaire.etat","devis","OR","etatAffaire");
+	}
+	if ($get['filters']['commande'] == "on") {
+		$this->q->where("affaire.etat","commande","OR","etatAffaire");
+	}
+	if ($get['filters']['facture'] == "on") {
+		$this->q->where("affaire.etat","facture","OR","etatAffaire");
+	}
+	if ($get['filters']['terminee'] == "on") {
+		$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+	}
+	if ($get['filters']['perdue'] == "on") {
+		$this->q->where("affaire.etat","perdue","OR","etatAffaire");
+	}
+
+
+
+    if ($get['id_affaire']) {
+
+		$this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
+		$data = $this->sa();
+
+		ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
+								->addField("devis.*")
+								->from("devis","id_user","user","id_user")
+								->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
+		$data["devis"] = ATF::devis()->sa();
+
+		foreach ($data as $key => $value) {
+			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
+			//if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
+			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
+			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
+			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
+
+			//$data["fichier_joint"] = $data["documentAnnexes"] = false;
+
+			//if (file_exists($this->filepath($get['id_affaire'],"fichier_joint"))) $data["fichier_joint"] = true;
+			//if (file_exists($this->filepath($get['id_affaire'],"documentAnnexes"))) $data["documentAnnexes"] = true;
+
+
+			unset($data["id_societe"],  $data["id_commercial"]);
+		}
+
+		/*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
+		$data["affaireAffaire"] = $this->sa();
+		*/
+		$data["idcrypted"] = $this->cryptId($get["id_affaire"]);
+
+    } else {
+      $this->q->setLimit($get['limit'])->setCount();
+      $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+    }
+
+
+
+    if($get['id_affaire']){
+      $return = $data;
+    }else{
+      header("ts-total-row: ".$data['count']);
+      header("ts-max-page: ".ceil($data['count']/$get['limit']));
+      header("ts-active-page: ".$get['page']);
+      $return = $data['data'];
+    }
+    return $return;
+  }
+
 
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function _ac($get,$post) {
-		$length = 25;
-		$start = 0;
+		//$length = 25;
+		//$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("affaire.id_affaire","id_affaire")
+				->addField("affaire.affaire","affaire")
+				->addField("affaire.etat","etat");
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		if ($get['id_societe']) {
+			$this->q->where("affaire.id_societe",$get["id_societe"]);
+		}
+
+		//$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
+
+	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire seulement différent de perdu pour l'echeancier
+	* @author Cyril Charlier <ccharlier@absystech.fr>
+	*/
+	public function _acSpecial($get,$post) {
+		//$length = 25;
+		//$start = 0;
 
 		$this->q->reset();
 
@@ -812,8 +943,8 @@ class affaire_absystech extends affaire {
 		if ($get['id_societe']) {
 			$this->q->where("affaire.id_societe",$get["id_societe"]);
 		}
-
-		$this->q->setLimit($length,$start)->setPage($start/$length);
+		$this->q->AndWhere('affaire.etat','perdue',false,'<>');
+		//$this->q->setLimit($length,$start)->setPage($start/$length);
 
 		return $this->select_all();
 	}
@@ -821,11 +952,10 @@ class affaire_absystech extends affaire {
 
 
 
-
 };
 
 class affaire_att extends affaire_absystech {
-	/** 
+	/**
 	* Retourne la marge effectuée entre le début de l'année passée en paramètre et NOW()
     * @author Yann GAUTHERON <ygautheron@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param int $offset Décalage de l'année demandé
@@ -833,8 +963,8 @@ class affaire_att extends affaire_absystech {
 	*/
 	public function getMargeTotaleDepuisDebutAnnee($offset=0,$mois=NULL){
 		if(!$mois)$mois=date("m");
-		$annee = date("Y",time()) + $offset;		
-		
+		$annee = date("Y",time()) + $offset;
+
 		ATF::commande()->q->reset()
 							->addField("commande.date","date")
 							->addField("-prix_achat","prix")
@@ -849,8 +979,8 @@ class affaire_att extends affaire_absystech {
 				->addUnion(ATF::commande()->sa("no_order"))
 				->addUnion(ATF::facture()->sa("no_order"));
 		$subQuery=$this->q->getUnion();
-			
-			
+
+
 		//requête récupérant la marge (en utilisant la subquery)
 		$this->q->reset()
 				->addField("SUM(uni.prix)")
@@ -870,7 +1000,7 @@ class affaire_att extends affaire_absystech {
 
 		return $this->sa(false,false,false,false,true);
 	}
-	
+
 	/**
     * Retourne la ref d'une affaire autre qu'avenant
     * @author Mathieu Tribouillard <mtribouillard@absystech.fr>
@@ -880,8 +1010,8 @@ class affaire_att extends affaire_absystech {
     */
 	function getRef($date,$class){
 		if (!$date) {
-			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);	
-		}	
+			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);
+		}
 		if($class=="devis"){
 			$prefix="AD";
 		}elseif($class=="commande"){
@@ -896,7 +1026,7 @@ class affaire_att extends affaire_absystech {
 					   ->addOrder('ref',"DESC")
 					   ->setDimension("row")
 					   ->setLimit(1);
-	
+
 		$nb=ATF::$class()->sa();
 
 		if($nb["max_ref"]){

@@ -49,13 +49,7 @@
 		,id: '{$alternateId|default:$id}'
 		,listeners :{
 			'select':function(f,n,o){
-				if(n.data.myId=='refi'){
-					Ext.getCmp('panel_refi').show();
-					Ext.getCmp('panel_dates_facture').hide();
-					Ext.getCmp('panel_dates_facture_libre').hide();
-					Ext.getCmp('combofacture[type_libre]').disable();
-					Ext.getCmp('combofacture[redevance]').disable();					
-				}else if(n.data.myId=='facture'){										
+				if(n.data.myId=='facture'){										
 					Ext.getCmp('panel_refi').hide();
 					Ext.getCmp('panel_dates_facture').show();
 					Ext.getCmp('panel_dates_facture_libre').hide();
@@ -70,9 +64,6 @@
 					Ext.getCmp('facture[prix_libre]').show();
 					Ext.getCmp('combofacture[type_libre]').enable();
 					Ext.getCmp('combofacture[redevance]').enable();
-				}else if(n.data.myId=='ap'){
-					Ext.getCmp('combofacture[type_libre]').disable();					
-					Ext.getCmp('combofacture[redevance]').disable();
 				}
 			}
 		}

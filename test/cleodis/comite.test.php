@@ -214,6 +214,21 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
+	//	@author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+	public function test_select_all(){		
+		$this->obj->q->reset()->addCondition("comite.id_affaire",15331)->setCount();
+        $sa=$this->obj->select_all();		
+		$this->assertEquals($sa["data"][0]["reseau"], false, "Erreur select_all 1");
+	
+
+		$this->obj->q->reset()->addCondition("comite.id_affaire",18469)->setCount();
+        $sa=$this->obj->select_all();		
+		$this->assertEquals($sa["data"][0]["reseau"], true, "Erreur select_all 2");
+		
+		ATF::$msg->getNotices();
+	}
+
+
 };
 
 

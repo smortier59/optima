@@ -1,6 +1,6 @@
 <?
 require_once dirname(__FILE__)."/../societe.class.php";
-/**  
+/**
 * @package Optima
 * @subpackage nco
 */
@@ -11,20 +11,20 @@ class societe_lm extends societe {
 	public function __construct() {
 		parent::__construct();
 		$this->table = "societe";
-				
+
 		unset($this->colonnes['panel']['facturation_fs']);
-		
+
 		/*-----------Quick Insert-----------------------*/
 		$this->quick_insert = array('societe'=>'societe');
 		$this->colonnes['fields_column'][] = "societe.nom_commercial";
 		$this->colonnes['fields_column'][] = "societe.code_client";
-		
+
 		// Panel prinicpal
 		$this->colonnes['primary'] = array(
 			"code_client"
-			,"ref"			 
+			,"ref"
 			,"id_owner"
-			,"etat"			
+			,"etat"
 			,"joignable"
 			,"type_societe"/*=>array("listeners"=>array("select"=>"ATF.selectType_client","afterRender"=>"ATF.loadClient"))*/
 		);
@@ -42,7 +42,7 @@ class societe_lm extends societe {
 			))
 			,"id_lm"
 			,"id_carte_maison"
-			,"id_magasin"			
+			,"id_magasin"
 		);
 
 
@@ -69,31 +69,31 @@ class societe_lm extends societe {
 
 		$this->panels['soc'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
 		$this->panels['caracteristiques'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
-		
-		$this->colonnes['panel']['autres'] = array("id_apporteur","id_fournisseur","id_prospection","id_campagne");	
+
+		$this->colonnes['panel']['autres'] = array("id_apporteur","id_fournisseur","id_prospection","id_campagne");
 		$this->panels['autres'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-		
+
 
 
 		$this->colonnes['panel']['infos_soc']=array(
 			"socs"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'soc')
-			,"carac"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'caracteristiques')  
-			,"autre"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'autres')  
+			,"carac"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'caracteristiques')
+			,"autre"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'autres')
 		);
 		$this->panels['infos_soc'] = array('nbCols'=>1,'collapsible'=>true,'visible'=>false);
-				
-		
+
+
 		$this->colonnes["panel"]["coordonnees"] = $PanelCoordonne;
 
 
 
-			
+
 		// Infos codifiées
 		$this->colonnes['panel']['codes_fs']["les_codes"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"code_groupe"
 			,"code_fournisseur"
 		));
-		
+
 		// Facturation
 		$this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
 			"reference_tva"
@@ -107,12 +107,12 @@ class societe_lm extends societe {
 		$this->colonnes['panel']['facturation_fs'][]="divers_2";
 		$this->colonnes['panel']['facturation_fs'][]="nom_banque";
 		$this->colonnes['panel']['facturation_fs'][]="ville_banque";
-		$this->colonnes['panel']['facturation_fs'][]='rum'; 
-		
+		$this->colonnes['panel']['facturation_fs'][]='rum';
+
 		// Adresses en +
 		$this->colonnes['panel']["coordonnees_supplementaires_fs"]["adresse_siege_social"]=array("xtype"=>"textarea");
 
-		$this->colonnes['panel']['adresse_complete_fs']["id_contact_signataire"]=array("xtype"=>"int","numberfield"=>8);	
+		$this->colonnes['panel']['adresse_complete_fs']["id_contact_signataire"]=array("xtype"=>"int","numberfield"=>8);
 
 		// Portail
 		$this->colonnes['panel']['portail_fs'] = array(
@@ -120,7 +120,7 @@ class societe_lm extends societe {
 			,"id_accompagnateur"
 		);
 		$this->panels['portail_fs'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true);
-		
+
 
 		$this->colonnes['bloquees']['select'] = array('joignable');
 
@@ -128,7 +128,7 @@ class societe_lm extends societe {
 		/* Définition statique des clés étrangère de la table */
 		$this->onglets = array(
 			 'contact'=>array('opened'=>true)
-			,'affaire'=>array('opened'=>true)			
+			,'affaire'=>array('opened'=>true)
 			,'suivi'=>array('opened'=>true)
 			,'devis'
 			,'commande'
@@ -136,14 +136,14 @@ class societe_lm extends societe {
 			,'parc'
 			,'ged'
 			,'user'
-		);	
+		);
 
 		$this->fieldstructure();
-		
+
 		unset($this->colonnes['panel']['facturation_fs']["solde_et_relance"]);
 		$this->checkAndRemoveBadFields('caracteristiques');
 		$this->checkAndRemoveBadFields('facturation_fs');
-		
+
 		$this->foreign_key["id_apporteur"] = "societe";
 		$this->foreign_key["id_fournisseur"] = "societe";
 		$this->foreign_key["id_contact_signataire"] = "contact";
@@ -151,14 +151,14 @@ class societe_lm extends societe {
 		$this->foreign_key["id_assistante"] = "user";
 
 
-		$this->field_nom = "%societe% %nom% %prenom%";
-		
+		$this->field_nom = "%societe%%nom% %prenom%";
+
 		// Pouvoir modifier massivement
-		$this->no_update_all = false; 
-		
+		$this->no_update_all = false;
+
 		// on montre que pour joindre la table domaine, on passe par une table de jointure qui est societe_domaine, si on créé un filtre dans le module société
 		$this->listeJointure['domaine']="societe_domaine";
-		
+
 		// Droits sur méthodes Ajax
 		$this->addPrivilege("getParc");
 		$this->addPrivilege("getParcVente");
@@ -167,14 +167,34 @@ class societe_lm extends societe {
 		$this->addPrivilege("autocompleteFournisseurs");
 		$this->addPrivilege("autocompleteFournisseursDeCommande");
 		$this->addPrivilege("setToken");
-		
+
 		$this->autocomplete = array(
-			"field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
-			,"show"=>array("societe.societe","societe.nom_commercial","societe.code_client")
-			,"popup"=>array("societe.societe","societe.nom_commercial","societe.code_client")
-			,"view"=>array("societe.societe","societe.nom_commercial","societe.code_client")
+			 "field"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
+			,"show"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
+			,"popup"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
+			,"view"=>array("societe.societe","societe.nom_commercial","societe.code_client","societe.nom","societe.prenom")
 		);
 
+	}
+
+
+	/**
+	 * Surcharge de l'autocomplete pour afficher le client si ce n'est pas une société
+	 * @param  [type]  $infos [description]
+	 * @param  boolean $reset [description]
+	 * @return [type]         [description]
+	 * @author  Morgan Fleurquin <mfleurquin@absystech.fr>
+	 */
+	public function autocomplete($infos,$reset=true) {
+		$res = parent::autocomplete($infos,$reset);
+		foreach ($res as $key => $value) {
+			if(!$value[1]){
+				$client = ATF::societe()->select($value["raw_0"] , "nom")." ".ATF::societe()->select($value["raw_0"] , "prenom")." (".ATF::societe()->select($value["raw_0"] , "ref").")";
+				$res[$key][1] = $res[$key]["raw_1"] = $client;
+			}
+		}
+
+		return $res;
 	}
 
 	/**
@@ -201,17 +221,17 @@ class societe_lm extends societe {
 			->where("societe.fournisseur","oui");
 		return parent::autocomplete($infos,false);
 	}
-	
+
 	public function autocompleteFournisseurs($infos,$reset=true) {
 		if ($reset) {
                $this->q->reset();
-       }      
+       }
        $this->q->where("societe.fournisseur","oui");
 
        return parent::autocomplete($infos,false);
 	}
 
-	/** 
+	/**
 	* Mise à jour des infos
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -229,8 +249,8 @@ class societe_lm extends societe {
 		if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
 			$notifie .= ",".$this->select($infos["id_societe"],"id_owner");
 		}
-		
-		if ($infos["avis_credit"] && ($avis_credit !== $infos["avis_credit"])) {		
+
+		if ($infos["avis_credit"] && ($avis_credit !== $infos["avis_credit"])) {
 			$suivi = array(
 				"id_user"=>ATF::$usr->get('id_user')
 				,"id_societe"=>$infos['id_societe']
@@ -244,10 +264,10 @@ class societe_lm extends societe {
 		}
 
 		// Si score change, on crée un suivi !
-		$score = $this->select($infos["id_societe"],"score");		
-		if ($infos["score"] && $score!=$infos["score"]) {			
+		$score = $this->select($infos["id_societe"],"score");
+		if ($infos["score"] && $score!=$infos["score"]) {
 			$suivi = array(
-				"id_user"=>ATF::$usr->get('id_user') 
+				"id_user"=>ATF::$usr->get('id_user')
 				,"id_societe"=>$infos['id_societe']
 				,"type_suivi"=>'Contentieux'
 				,"texte"=>"La société passe du score '".$score."' à '".$infos["score"]."'"
@@ -257,12 +277,12 @@ class societe_lm extends societe {
 			);
 			ATF::suivi()->insert($suivi);
 		}
-				
+
 		return parent::update($infos,$s,$files,$cadre_refreshed,$nolog);
 	}
 
 
-	/** 
+	/**
 	* Insert
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -304,7 +324,7 @@ class societe_lm extends societe {
 	/**
 	* Méthode qui retourne les parcs dispo pour les Avenants et les AR
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $ligne_affaires 
+	* @param array $ligne_affaires
 	*/
 	public function getParc(&$infos){
 		$id_societe=$this->decryptId($infos["id_societe"]);
@@ -326,7 +346,7 @@ class societe_lm extends societe {
 		if($infos["type"]=="avenant"){
 			$this->q->addCondition("affaire.nature","avenant","AND",NULL,"!=");
 		}
-				
+
 		if($affaire=parent::sa("affaire.id_affaire")){
 			foreach($affaire as $key=>$item){
 				//Parc de l'affaire
@@ -337,21 +357,21 @@ class societe_lm extends societe {
 									   ->addOrder("parc.id_parc","asc");
 
 				$parc=ATF::parc()->sa();
-				
+
 				if($ligne_affaire=$this->formateGetParc($parc,$item,$infos["id_affaire"])){
 					$ligne_affaires[]=$ligne_affaire;
 				}
 			}
 		}
-		$infos['display'] = true;		
+		$infos['display'] = true;
 
 		return json_encode($ligne_affaires);
 	}
-	
+
 	/**
 	* Méthode qui formate les données pour qu'elles soient comprises par le treepanel
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $ligne_affaire 
+	* @param array $ligne_affaire
 	*/
 	public function formateGetParc($parc,$item,$id_affaire_courante=false){
 
@@ -364,17 +384,17 @@ class societe_lm extends societe {
 							  ->addCondition("id_affaire",$i["id_affaire"],"AND",false,">")
 							  ->addCondition("serial",$i["serial"],"AND")
 							  ->addOrder("id_parc","asc");
-				
+
 				if($i["provenance"]){
 					ATF::parc()->q->addCondition("id_affaire",$i["provenance"],"AND",false,"!=");
 				}
-				
+
 				if($id_affaire_courante){
-					ATF::parc()->q->addCondition("id_affaire",$id_affaire_courante,"AND",false,"!=");	
+					ATF::parc()->q->addCondition("id_affaire",$id_affaire_courante,"AND",false,"!=");
 				}
-	
+
 				$otherParc=ATF::parc()->sa();
-	
+
 				$parc_libre=true;
 				if(count($otherParc)>0){
 					foreach($otherParc as $k_=>$i_){
@@ -383,7 +403,7 @@ class societe_lm extends societe {
 						}
 					}
 				}
-				
+
 				if($parc_libre){
 					if($i["provenance"]){
 						$suffix=" - Parc provenant de l'affaire ".$item["affaire.affaire"]." (".$item["affaire.ref"].")";
@@ -396,20 +416,20 @@ class societe_lm extends societe {
 						,"id"=>"parc_".$i["id_parc"]
 						,"leaf"=>true
 						,"icon"=>ATF::$staticserver."images/blank.gif"
-						,"checked"=>false		
-						,"id_produit_fk"=>$i["id_produit"]		
+						,"checked"=>false
+						,"id_produit_fk"=>$i["id_produit"]
 						,"produit"=>$i["libelle"]
-						,"ref"=>$produit["ref"]		
-						,"type"=>$produit["type"]		
-						,"serial"=>$i["serial"]		
-						,"quantite"=>1		
-						,"visibilite_prix"=>"visible"		
-						,"id_affaire_provenance"=>$item["affaire.id_affaire_fk"]	
-						,"id_parc"=>$i["id_parc"]		
+						,"ref"=>$produit["ref"]
+						,"type"=>$produit["type"]
+						,"serial"=>$i["serial"]
+						,"quantite"=>1
+						,"visibilite_prix"=>"visible"
+						,"id_affaire_provenance"=>$item["affaire.id_affaire_fk"]
+						,"id_parc"=>$i["id_parc"]
 					);
 				}
 			}
-			
+
 			if ($ligne_parc) {
 				$ligne_affaire=array(
 					"text"=>$item["affaire.ref"]." ".$item["affaire.affaire"]
@@ -428,11 +448,11 @@ class societe_lm extends societe {
 			return false;
 		}
 	}
-		
+
 	/**
 	* Méthode qui retourne les parcs dispo pour les ventes
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $ligne_affaires 
+	* @param array $ligne_affaires
 	*/
 	public function getParcVente(&$infos){
 		$id_societe=$this->decryptId($infos["id_societe"]);
@@ -445,7 +465,7 @@ class societe_lm extends societe {
 						 ->addJointure("affaire","id_affaire","commande","id_affaire",NULL,NULL,NULL,NULL,"INNER")
 						 ->addCondition("affaire.id_societe",$id_societe,NULL,1)
 						 ->addCondition("commande.etat","arreter",false,false,"!=");
-				
+
 		if($affaire=parent::sa()){
 			foreach($affaire as $key=>$item){
 				//Parc de l'affaire
@@ -453,13 +473,13 @@ class societe_lm extends societe {
 									   ->addCondition("parc.existence","actif","AND")
 									   ->addCondition("parc.etat","broke","AND");
 				$parc1=ATF::parc()->sa();
-				
+
 				if($ligne_affaire=$this->formateGetParc($parc1,$item,$infos["id_affaire"])){
 					$ligne_affaires[]=$ligne_affaire;
 				}
 			}
 		}
-	
+
 		$this->q->reset()->addOrder("affaire.id_affaire","asc")
 						 ->addField("affaire.id_affaire")
 						 ->addField("affaire.ref")
@@ -477,13 +497,13 @@ class societe_lm extends societe {
 							  ->addCondition("parc.existence","actif");
 
 				$parc2=ATF::parc()->sa();
-				
+
 				if($ligne_affaire=$this->formateGetParc($parc2,$item,$infos["id_affaire"])){
 					$ligne_affaires[]=$ligne_affaire;
 				}
 			}
 		}
-		
+
 		$infos['display'] = true;
 
 		return json_encode($ligne_affaires);

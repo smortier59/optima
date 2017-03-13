@@ -12,12 +12,12 @@ class societe extends classes_optima {
 		parent::__construct();
 		//$this->controlled_by = "societe";
 		$this->table = __CLASS__;
-		
+
 		/*-----------Quick Insert-----------------------
 		$this->quick_insert = array('societe'=>'societe');*/
-		 
+
 		/*-----------Colonnes Select all par défaut------------------------------------------------*/
-		$this->colonnes['fields_column'] = array(	
+		$this->colonnes['fields_column'] = array(
 			'societe.societe'
 			,'societe.tel' => array("tel"=>true)
 			,'societe.fax' => array("tel"=>true)
@@ -25,7 +25,7 @@ class societe extends classes_optima {
 			,'societe.ville'
 			,'dernierSuivi'=>array("custom"=>true,"nosort"=>true)
 		);
-		
+
 		// Panel prinicpal
 		$this->colonnes['primary'] = array(
 			"ref"
@@ -45,7 +45,7 @@ class societe extends classes_optima {
 			,"relation"
 			,"fournisseur"
 		);
-		
+
 		// Adresse
 		$this->colonnes['panel']['adresse_complete_fs'] = array(
 			"id_contact_commercial"
@@ -59,7 +59,7 @@ class societe extends classes_optima {
 			,"id_pays"
 		);
 		$this->panels['adresse_complete_fs'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true);
-		
+
 		// Adresse de facturation
 		$this->colonnes['panel']['adresse_facturation_complete_fs'] = array(
 			"id_contact_facturation"
@@ -73,7 +73,7 @@ class societe extends classes_optima {
 			,"facturation_id_pays"
 		);
 		$this->panels['adresse_facturation_complete_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-		
+
 		// Coordonnées supplémentaires
 		$this->colonnes['panel']['coordonnees_supplementaires_fs'] = array(
 			"tel_complet"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
@@ -88,7 +88,7 @@ class societe extends classes_optima {
 			))
 		);
 		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-		
+
 		// Informations supplémentaires de facturation
 		$this->colonnes['panel']['facturation_fs'] = array(
 			"banque"
@@ -96,7 +96,7 @@ class societe extends classes_optima {
 				"reference_tva"
 				,"iban"
 				,"rib"
-			))			
+			))
 			,"bic"
 			,"swift"
 			,"id_devise"
@@ -107,7 +107,7 @@ class societe extends classes_optima {
 			))
 		);
 		$this->panels['facturation_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-		
+
 		// Coordonnées supplémentaires (codes)
 		$this->colonnes['panel']['codes_fs'] = array(
 			"les_codes"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
@@ -117,7 +117,7 @@ class societe extends classes_optima {
 			,"liens"
 		);
 		$this->panels['codes_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-			
+
 		// Panel prinicpal des coordonnées
 		$this->colonnes['panel']['coordonnees'] = array(
 			"adresse_complete"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'adresse_complete_fs')
@@ -127,7 +127,7 @@ class societe extends classes_optima {
 			,"codes"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'codes_fs')
 		);
 		$this->panels['coordonnees'] = array("visible"=>true);
-		
+
 		// Structure et secteur
 		$this->colonnes['panel']['structure_secteur_fs'] = array(
 			"structure_societe"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
@@ -147,14 +147,14 @@ class societe extends classes_optima {
 			,"id_secteur_geographique"
 		);
 		$this->panels['structure_secteur_fs'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true);
-		
+
 		// Panel prinicpal des catactéristiques
-		$this->colonnes['panel']['caracteristiques'] = array(	
+		$this->colonnes['panel']['caracteristiques'] = array(
 			"notes"
 			,"structure_secteur"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'structure_secteur_fs')
-			,"partenaire"			
+			,"partenaire"
 		);
-		
+
 		/*-----------Colonnes bloquées select -----------------------*/
 		$this->colonnes['bloquees']['select'] = array(
 			"id_contact_commercial"
@@ -170,9 +170,9 @@ class societe extends classes_optima {
 			,"facturation_cp"
 			,"facturation_id_pays"*/
 		);
-		
+
 		/*-----------Colonnes bloquées insert -----------------------*/
-		$this->colonnes['bloquees']['insert'] = array(	
+		$this->colonnes['bloquees']['insert'] = array(
 			"link_hotline"
 			,"ref"
 			,"date"
@@ -180,7 +180,7 @@ class societe extends classes_optima {
 			,"id_contact_commercial"
 			,"link_hotline"=> array("custom"=>true)
 		);
-		
+
 		/*-----------Colonnes bloquées update -----------------------*/
 		$this->colonnes['bloquees']['update'] = array(
 			"link_hotline"
@@ -189,11 +189,11 @@ class societe extends classes_optima {
 			,"date"
 			,"link_hotline"=> array("custom"=>true)
 		);
-		
+
 		$this->colonnes['bloquees']['recherche'] = array("id_".$this->table);
-		
+
 		$this->fieldstructure();
-		
+
 		$this->onglets = array(
 			'contact'=>array('opened'=>true)
 			,'suivi'=>array('opened'=>true)
@@ -205,36 +205,36 @@ class societe extends classes_optima {
 			,'ged'
 			,'societe'=>array('field'=>'societe.id_filiale')/*,'societe_domaine'*/
 		);
-		
+
 		$this->autocomplete = array(
 			"field"=>array("societe.societe","societe.nom_commercial")
 			,"show"=>array("societe.societe")
 			,"popup"=>array("societe.societe","societe.nom_commercial")
-			
+
 //			,"where"=>array("societe.societe"=>"nom","societe.nom_commercial"=>"detail")
 			,"view"=>array("societe.societe","societe.nom_commercial","societe.tel")
 		);
-		
+
 		/* Définition statique des clés étrangère de la table */
 		$this->foreign_key["id_contact_facturation"] = "contact";
 		$this->foreign_key["id_contact_commercial"] = "contact";
 		$this->foreign_key["facturation_id_pays"] = "pays";
 		$this->foreign_key["id_filiale"] = "societe";
 		$this->foreign_key["id_owner"] = "user";
-		
-		//$this->shortcut = array('shortcut','help','release'); 
-		
+
+		//$this->shortcut = array('shortcut','help','release');
+
 		$this->gmap = true;
 		$this->quick_action['select_all'][] = "geolocalisation";
 		$this->quick_action['select'][] = "geolocalisation";
-		
+
 		$this->no_update_all = false; // Pouvoir modifier massivement
-		
+
 		// @todo Trouver un autre moyen, genre avec la société de l'utilisateur courant par exemple
 		$this->maSociete = $this->select(1);
 
 		$this->files["facturation_rib"] =true;
-		
+
 		$this->addPrivilege("send_identifiants_hotline");
 		$this->addPrivilege("autocompleteFournisseurs");
 		$this->addPrivilege("branch");
@@ -249,29 +249,29 @@ class societe extends classes_optima {
 
 		// on montre que pour joindre la table domaine, on passe par une table de jointure qui est societe_domaine, si on créé un filtre dans le module société
 		$this->listeJointure['domaine']="societe_domaine";
-	}	
-		
-	/** 
+	}
+
+	/**
 	* Retourne la ref maximum du mois en cours
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	* @param string $prefixe Le préfixe de la référence (exemple SLI0911)
 	* @return int la référence max
 	*/
-	public function get_max_ref($prefixe){		
+	public function get_max_ref($prefixe){
 		//Recherche du max en base
 		$this->q->reset()
 			->addField('MAX(SUBSTRING(ref FROM -4))','max')
 			->addCondition('ref',$prefixe.'%','OR',false,'LIKE');
 		$result=$this->sa();
-		
+
 		if(isset($result[0]['max'])){
 			return intval($result[0]['max'])+1;
 		}else{
 			return 1;
 		}
 	}
-	
-	/** 
+
+	/**
 	* Retourne le préfixe utilisé, peut être surchargé
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @return string $prefix
@@ -279,8 +279,8 @@ class societe extends classes_optima {
 	public function create_ref_prefix(){
 		return "S";
 	}
-	
-	/** 
+
+	/**
 	* Construit la référence de l'entité (spécifique à chaque Optima)
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -295,7 +295,7 @@ class societe extends classes_optima {
 				substr(
 					ATF::agence()->select(ATF::$usr->get('id_agence'),'agence'),0,2)
 				).date('ym');
-				
+
 			//Recherche du maximum
 			$max=$this->get_max_ref($ref);
 			if($max<10){
@@ -309,14 +309,14 @@ class societe extends classes_optima {
 			}else{
 				throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
 			}
-			
+
 			return $ref;
 		}else{
 			throw new errorATF(ATF::$usr->trans('societe_agence_user_false'),80846);
 		}
 	}
-	
-	/** 
+
+	/**
 	* Surcharge de l'insertion pour les sociétés
 	* Il y a la prise en charge de la création de référence ainsi que l'attachement au id_owner
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -327,33 +327,33 @@ class societe extends classes_optima {
 	*/
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
 		$this->infoCollapse($infos);
-		
+
 		if ($this->desc && isset($this->desc["ref"])) {
 			$infos['ref']=$this->create_ref($s);
 		}
 
 		//--Set de l'id Owner (créateur de l'entité)--
 		if(!$infos['id_owner']) $infos['id_owner']=ATF::$usr->getID();
-		
+
 		//--Insertion en base de données--
 		$retour=false;
 
 		//Transactionel
 		ATF::db($this->db)->begin_transaction();
-		
+
 		try{
 			$retour=parent::insert($infos,$s,$files,$cadre_refreshed);
-		}catch(errorATF $e){			
+		}catch(errorATF $e){
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}
-		
+
 		//--Commit + retour--
 		ATF::db($this->db)->commit_transaction();
 		return $retour;
-	}	
-	
-	/** 
+	}
+
+	/**
 	* Grise les contacts qui sont inactifs
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array donnees : les donnees de la ligne du select_all (donc qui se base sur les colonnes)
@@ -366,9 +366,9 @@ class societe extends classes_optima {
 			$etat=$this->select($donnees['societe.id_societe'],'etat');
 			if($etat=="inactif")return 'grise';
 		}
-		return NULL;		
+		return NULL;
 	}
-	
+
 	/**
 	* Surcharge de la méthode update dans le cas où l'on rends la société inactive, on rends les contacts s'y rattachant inactifs également
 	* ou dans le cas d'un changement des informations sur l'adresse, on réinitialise les coordonnées gps
@@ -384,9 +384,9 @@ class societe extends classes_optima {
 			$infos['latitude']=NULL;
 			$infos['longitude']=NULL;
 		}
-	
+
 		$retour=parent::update($infos,$s,$files,$cadre_refreshed);
-		
+
 		//--On met les contacts en inactifs dans le cas où il s'agit de cette modification
 		if($infos_soc['etat']!=$infos['etat'] && $infos['etat']=='inactif'){
 			ATF::contact()->q->reset()->addField("id_contact")->addCondition('id_societe',$infos['id_societe'])->addCondition('etat','actif');
@@ -397,7 +397,7 @@ class societe extends classes_optima {
 
 		return $retour;
 	}
-	
+
 	/**
 	* Autocomplete retournant les fournisseurs
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -414,13 +414,13 @@ class societe extends classes_optima {
 			->where("fournisseur","oui");
 		return parent::autocomplete($infos,false);
 	}
-	
-	/****************************** Treeview des filiales ************************************/	
-	
+
+	/****************************** Treeview des filiales ************************************/
+
 	/** Permet de créer le tableau qui va afficher le treeview de la société
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @return string json du tableau structuré
-	*/	
+	*/
 	public function branch($infos,&$s,$files=NULL,&$cadre_refreshed){
 		if ($infos["node"]=="source") {
 			//on récupère la société originelle et on flag toutes les sociétés par lesquelles on est passé pour les expand
@@ -442,12 +442,12 @@ class societe extends classes_optima {
 
 		return json_encode($return);
 	}
-	
+
 	/** Permet de récupérer l'ensemble des sociétés d'un goupe (société parente, filles, soeurs...)
 	* @author Mathieu mtribouillard <mtribouillard@absystech.fr>
-	* @param int $id_societe 
+	* @param int $id_societe
 	* @return array $societes tableau de societe
-	*/	
+	*/
 	public function getGroup($id_societe){
 		//Pour prendre les factures des sociétés parentes
 		if($societeOriginelle=$this->societeOriginelle($id_societe,$id_societe)){
@@ -458,13 +458,13 @@ class societe extends classes_optima {
 			return false;
 		}
 	}
-	
+
 	/** Permet de récupérer l'ensemble des sociétés d'un goupe (société parente, filles, soeurs...)
 	* @author Mathieu mtribouillard <mtribouillard@absystech.fr>
-	* @param int $id_societe 
+	* @param int $id_societe
 	* @param array $societes tableau de societe
 	* @return array $societes tableau de societe
-	*/	
+	*/
 	public function getFilliale($id_societe,$societes){
 		ATF::societe()->q->reset()->addCondition("id_filiale",$id_societe);
 		if($societeFiliale=ATF::societe()->sa()){
@@ -475,7 +475,7 @@ class societe extends classes_optima {
 		}
 		return $societes;
 	}
-	
+
 	/** Permet de récupérer la société d'origine de la société de la fiche
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param integer id_societe : société de la fiche / société qui a pour filiale celle passée en paramètre
@@ -486,7 +486,7 @@ class societe extends classes_optima {
 		//pour éviter le bouclage si les filiales n'ont toujours pas été corrigées
 		if($soc_courante['id_filiale']!=$id_societe){
 			if($soc_courante['id_filiale']){
-				$soc_famille=$this->societeOriginelle($soc_courante['id_filiale'],$id_societe_courante);	
+				$soc_famille=$this->societeOriginelle($soc_courante['id_filiale'],$id_societe_courante);
 			}else{
 				if($id_societe!=$id_societe_courante)$soc_courante['expanded']=true;
 				ATF::contact()->q->reset()->setCountOnly()->addCondition("id_societe",$soc_courante['id_societe']);
@@ -496,7 +496,7 @@ class societe extends classes_optima {
 		}
 		return $soc_famille;
 	}
-	
+
 	/** Permet de déterminer si la société passé en paramètre est une société parente à la société de la fiche
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param integer id_societe : société à tester
@@ -510,20 +510,20 @@ class societe extends classes_optima {
 			//retourne vrai, si la société enfant est la société de la fiche sur laquelle on est
 			if($item['id_societe']==$id_societe_enfant){
 				return true;
-			//retourne vrai, si la societe enfant est une societe parente de la societe de la fiche sur laquelle on est	
+			//retourne vrai, si la societe enfant est une societe parente de la societe de la fiche sur laquelle on est
 			}elseif($this->estEnfant($item['id_societe'],$id_societe_enfant)){
 				return true;
 			}
-		}	
+		}
 		return $return;
 	}
-	
+
 	/** Permet de structurer les informations nécessaires à l'affichage du treeview
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @parem array infos : informations concernant la société
 	* @return array : le tableau nécessaire à l'affichage du treeview
 	*/
-	public function feuille($infos){	
+	public function feuille($infos){
 		//on regarde si la société a des enfants, si oui, on fait en sorte que l'icône qui lui appartient soit un dossier
 		//sinon on affiche un fichier
 		$this->q->reset()->setCountOnly()->addCondition("id_filiale",$infos["id_societe"]);
@@ -538,8 +538,8 @@ class societe extends classes_optima {
 			,"expanded"=>$infos['expanded']
 		);
 	}
-	/****************************** Fin Treeview des filiales ************************************/	
-	
+	/****************************** Fin Treeview des filiales ************************************/
+
 	/**
 	* Méthode ajax pour appeler les société depuis un mobile
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -558,7 +558,7 @@ class societe extends classes_optima {
 		}
 		return util::cleanForMobile($data);
 	}
-	
+
 	/**
 	* Retourne les coordonnées d'une société et de ses contacts
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -566,7 +566,7 @@ class societe extends classes_optima {
 	*/
 	public function rpcGetContactsForMobile($infos){
 		ATF::$cr->block("top");
-		
+
 		// Adresse de la société
 		$s = $this->select($infos["id"]);
 		$return[] = array(
@@ -576,7 +576,7 @@ class societe extends classes_optima {
 			,"groupTitle" => $s["societe"]
 			,"type" => "address"
 		);
-		
+
 		// Numéro de téléphone et de fax de la société
 		foreach (array("tel","fax") as $f) {
 			if ($s[$f]) {
@@ -590,7 +590,7 @@ class societe extends classes_optima {
 				);
 			}
 		}
-		
+
 		// Numéro de téléphone des contacts
 		ATF::contact()->q->reset()
 			->addField("id_contact")
@@ -632,7 +632,7 @@ class societe extends classes_optima {
 				}
 			}
 		}
-		
+
 		// Ajout des 3 derniers suivis
 		ATF::suivi()->q->reset()
 			->addField("suivi.date")
@@ -641,7 +641,7 @@ class societe extends classes_optima {
 			->where("suivi.id_societe",$infos["id"])
 			->addOrder("suivi.date","desc")
 			->setLimit(3);
-		if ($data=ATF::suivi()->select_all()) { 
+		if ($data=ATF::suivi()->select_all()) {
 			foreach ($data as $k => $i) {
 				$return[] = array(
 					"group" => "0suivis"
@@ -661,7 +661,7 @@ class societe extends classes_optima {
 		}
 		return util::cleanForMobile($return);
 	}
-	
+
 	/**
 	* Retourne les sociétés aléatoirement
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -670,14 +670,14 @@ class societe extends classes_optima {
 	public function rpcGetRecentToRecallForMobile($infos,$noreset=false){
 		ATF::$cr->block("top");
 		if ($noreset!==true) {
-			$this->q->reset();	
+			$this->q->reset();
 		}
 		$this->q
 			->addField('id_societe')->addField('societe')
 			->addOrder("recallCounter","asc")->addOrder("RAND()")
 			->where("fournisseur","non")->where("partenaire","non")->where("etat","actif")
 			->setLimit(2);
-		
+
 		// Prospects
 		$this->q->where("relation","prospect","OR","rel");
 		$data = $this->select_all();
@@ -689,7 +689,7 @@ class societe extends classes_optima {
 				,"groupTitle" => ATF::$usr->trans("prospect","societe_relation")
 			);
 		}
-		
+
 		// Client
 		$this->q->where("relation","client","OR","rel","=",true);
 		$data = $this->select_all();
@@ -703,7 +703,7 @@ class societe extends classes_optima {
 		}
 		return util::cleanForMobile($return);
 	}
-	
+
 	/**
 	* Détermine qu'on a rappelé ce client avec le mobile
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -711,13 +711,13 @@ class societe extends classes_optima {
 	*/
 	public function rpcSetRecalledForMobile($infos){
 		ATF::$cr->block("top");
-		
+
 		if (!is_numeric($infos["id_societe"])) {
 			$infos["id_societe"] = ATF::contact()->select($infos["id_contact"],"id_societe");
 		}
-		
+
 		$this->increase($infos["id_societe"],"recallCounter");
-		
+
 		// Ajout du suivi
 		$suivi = array(
 			"id_user"=>ATF::$usr->getID()
@@ -731,10 +731,10 @@ class societe extends classes_optima {
 			$suivi["suivi_contact"]=array($infos["id_contact"]);
 		}
 		ATF::suivi()->insert($suivi);
-		
+
 		return true;
 	}
-	
+
 	/**
 	* Retourne les société à proximité du point central des coordonnées de la fenêtre vue sur la map passés en paramètre
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -749,7 +749,7 @@ class societe extends classes_optima {
 		$data = $this->getProximiteFromXY($x,$y);
 		return (array)(util::cleanForMobile($data));
 	}
-	
+
 	/**
 	* Méthode spéciale par défaut "saCustom"
 	* Appel la méthode de classe particulière à utiliser,  si $method =flase on utilise select_all
@@ -780,39 +780,39 @@ class societe extends classes_optima {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function sendMails($infos){
-					
-		$soc = explode("_",$infos["societe"]);				
+
+		$soc = explode("_",$infos["societe"]);
 		if($infos["previsualiser"] === "true"){
-				
+
 			$mail=new mail(array(
 							'recipient'=> ATF::user()->select(ATF::$usr->getID() , "email"),
 							'objet'=>'[Prévisualisation] '.$infos["sujet"],
 							"template"=>"societe_emails",
 							"donnee"=>$infos["message"]
-						 ));									
+						 ));
 			$mail->send();
-			
-		}else{			
-			foreach ($soc as $key => $value) {			
+
+		}else{
+			foreach ($soc as $key => $value) {
 				ATF::contact()->q->reset()->where("contact.id_societe", $this->decryptId($value));
 				$contact = ATF::contact()->select_all();
 				$contacte = "";
 				foreach ($contact as $k => $v) {
 					if($v["email"]){
-						if($contacte == ""){							
+						if($contacte == ""){
 							$contacte = ATF::contact()->cryptId($v["id_contact"]);
 						}else{
 							$contacte = $contacte.",".ATF::contact()->cryptId($v["id_contact"]);
-						}						
-						
+						}
+
 						$mail=new mail(array(
 							'recipient'=> $v["email"],
 							'objet'=> $infos["sujet"],
 							"template"=>"societe_emails",
 							'donnee' => $infos["message"]
-						 ));					
-						$mail->send();												
-					}				
+						 ));
+						$mail->send();
+					}
 				}
 				//Création du Suivi
 				$suivi = array("suivi" => array("id_societe" => $this->decryptId($value),
@@ -823,24 +823,24 @@ class societe extends classes_optima {
 												 "suivi_societe" => ATF::user()->decryptId(ATF::$usr->getID()),
 												 "suivi_notifie" => NULL,
 												 "filestoattach" => array( "fichier_joint" => NULL)
-												  
+
 								));
 				ATF::suivi()->insert($suivi);
 
 			}
-			
+
 			$mail=new mail(array(
 							'recipient'=> "interne@absystech.fr",
 							'objet'=> $infos["sujet"],
 							"template"=>"societe_emails",
 							'donnee' => $infos["message"]
-						 ));					
+						 ));
 			$mail->send();
-							
+
 		}
-		
-		
-	}	
+
+
+	}
 
 	/** Renvoi l'adresse formatté pour une société
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -856,7 +856,7 @@ class societe extends classes_optima {
 			$r .= " \n ".$s['adresse_3'];
 		}
 		$r .= " \n ".$s['cp']." ".$s['ville'];
-		
+
 		if ($inline) $r = str_replace("\n","-",$r);
 
 		return $r;
@@ -896,17 +896,109 @@ class societe extends classes_optima {
 			ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$xml->xmlresponse->body->errors->errordetail->code ,ATF::$usr->trans("notice_title"));
 		}else{
 			if($infos["returnxml"]){
-				$data = $response;			
+				$data = $response;
 			}else{
-				$data = $this->cleanCSResponse($response);		
+				$data = $this->cleanCSResponse($response);
 			}
-		}				
+		}
 		return $data;
 	}
 
 
+/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
+	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
+	*/
+	public function cleanGGSResponse($r) {
 
+		$xml = $r;
 
+		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
+		$company = $item->CompanyIdentification;
+		// Nom de société
+		$return['societe'] = (string)$company->BasicInformation->BusinessName;
+		// Pays de société
+		$return['id_pays'] = $company->BasicInformation->Country;
+
+		// Adresse de société
+		$return['adresse'] = (string)$company->BasicInformation->ContactAddress->Street.' '.(string)$company->BasicInformation->ContactAddress->HouseNumber;
+
+		// CP de société
+		$return['cp'] = (string)$company->BasicInformation->ContactAddress->PostalCode;
+
+		// VILLE de société
+		$return['ville'] = (string)$company->BasicInformation->ContactAddress->City;
+
+		// telephone de société
+		$return['tel'] = str_replace("/","",(string)$company->BasicInformation->ContactTelephoneNumber);
+
+		// NAF de société
+		$return['naf'] = (string)$company->BasicInformation->PrincipalActivity->ActivityCode;
+
+		// Activite de société
+		$return['activite'] = (string)$company->BasicInformation->PrincipalActivity->ActivityDescription;
+
+		// Activite de société
+		$return['structure'] = (string)$company->BasicInformation->LegalForm->_;
+
+		// Activite de société
+		$return['capital'] = (int)$item->ShareCapitalStructure->IssuedShareCapital;
+
+		// Activite de société
+		$dateparsee = explode('T',$company->BasicInformation->DateofCompanyRegistration);
+		$return['date_creation'] = date("Y-m-d",strtotime($dateparsee[0]));
+
+		// TVA
+		$return['reference_tva'] = (string)$company->BasicInformation->VatRegistrationNumber;
+
+		// NB employé de société
+		//$return['nb_employe'] = (string)$bi->companyworkforce;
+		// NOTE
+		$return['cs_score'] = (string)$item->CreditScore->CurrentCreditRating->ProviderValue->_;
+
+		// LIMITE
+		$return['cs_avis_credit'] = (string)$item->CreditScore->CurrentCreditRating->CreditLimit->_;
+
+		//Date information creditSafe
+		$dateparsee = explode("-",explode('T',$item->CreditScore->DateOfLatestRatingChange)[0]);
+		$return['lastaccountdate'] = (string) $dateparsee[2]."/".$dateparsee[1]."/".$dateparsee[0];
+		// Créances
+		$return['receivables'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->BalanceSheet->TotalReceivables->_), 0, ",", "");
+
+		// Placements + disponibilités
+		$return['securitieandcash'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->BalanceSheet->Cash->_) , 0, ",", "");
+
+		// Produits d'exploitation
+		$return['operatingincome'] =  number_format(intval((string)$item->FinancialStatements->FinancialStatement['0']->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
+
+		// Chiffre d'affaires net
+		$return['netturnover'] =  number_format(intval((string)$item->FinancialStatements->FinancialStatement[0]->ProfitAndLoss->ProfitAfterTax->_) , 0, ",", "");
+
+		// Résultat d'exploitation
+		$return['operationgprofitless'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement[0]->ProfitAndLoss->OperatingProfit->_) , 0, ",", "");
+
+		// Produits financiers
+		$return['financialincome'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
+
+		// Charges financières
+		$return['financialcharges'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", "");
+
+		// ETAT
+		switch ((string)$company->BasicInformation->CompanyStatus->Code) {
+			case '':
+				$return['etat'] = "supprime";
+			break;
+			case 'Inactive':
+				$return['etat'] = "inactif";
+			break;
+			case 'Active':
+				$return['etat'] = "actif";
+			break;
+		}
+
+		// CA
+		$return['ca'] = (string)$item->CompanySummary->LatestTurnoverFigure->_;
+		return $return;
+	}
 	/** Prépare les ésultats de creditsafe pour intégration dans Optima
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
@@ -931,35 +1023,35 @@ class societe extends classes_optima {
 
 		// Nom de société
 		$return['societe'] = (string)$bi->companyname;
-		
+
 		// SIRET de société
 		$return['siret'] = (string)$bi->companynumber;
-		
+
 		// SIREN de société
 		$return['siren'] = substr($return['siret'],0,9);
-		
+
 		// Pays de société
 		$pays = ATF::pays()->ss("pays",(string)$bi->nationality);
 		$return['id_pays'] = $pays[0]['id_pays'];
-		
+
 		// Adresse de société
 		$return['adresse'] = (string)$s->postaladdress->address;
-		
+
 		// Adresse 2 de société
 		$return['adresse_2'] = (string)$s->postaladress->additiontoaddress;
-				
+
 		// CP de société
 		$return['cp'] = (string)$s->postcode;
-		
+
 		// VILLE de société
 		$return['ville'] = (string)$s->municipality;
-		
+
 		// telephone de société
 		$return['tel'] = (string)$bi->telephone;
-		
+
 		// FAX de société
 		$return['fax'] = (string)$bi->fax;
-		
+
 		// NAF de société
 		$return['naf'] = (string)$bi->activitycode;
 
@@ -984,7 +1076,7 @@ class societe extends classes_optima {
 
 		// NOTE
 		$return['cs_score'] = (string)$s->rating2013;
-		
+
 		// LIMITE
 		$return['cs_avis_credit'] = (string)$s->creditlimit2013;
 
@@ -1042,7 +1134,7 @@ class societe extends classes_optima {
 				$return['etat'] = "veille";
 			break;
 		}
-		
+
 		// CA
 		$return['ca'] = (string)$s->financialsummary->tradingtodate[0]->turnover;
 
@@ -1054,13 +1146,13 @@ class societe extends classes_optima {
 	/** Exécute la requête CURL a credit safe
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
-    private function processCSRequest($url, $params) { 
-        if(!is_array($params)) return false; 
+    private function processCSRequest($url, $params) {
+        if(!is_array($params)) return false;
         $post_params = "";
-        foreach($params as $key => $val) { 
+        foreach($params as $key => $val) {
             $post_params .= $post_params?"&":"";
             $post_params .= $key."=".$val;
-        } 
+        }
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -1077,21 +1169,21 @@ class societe extends classes_optima {
 
         curl_close($ch);
         return html_entity_decode($data);
-    } 
+    }
 
 
 
-    /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique 
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>              
-     * @param array $infos : contient le nom de l'onglet 
-     */     
-	 public function export_societe_contact($infos,$testUnitaire="false", $reset="true"){       
-	 	
+    /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	 public function export_societe_contact($infos,$testUnitaire="false", $reset="true"){
+
 	 	if($testUnitaire == "true"){
 	 		$donnees = $infos;
-		}else{				
-			if($reset == "true") $this->q->reset();	
-			$this->setQuerier(ATF::_s("pager")->create($infos['onglet']));	
+		}else{
+			if($reset == "true") $this->q->reset();
+			$this->setQuerier(ATF::_s("pager")->create($infos['onglet']));
 			$this->q->setLimit(-1)->unsetCount();
 			$donnees = $this->select_all();
 		}
@@ -1099,47 +1191,47 @@ class societe extends classes_optima {
         $onglet = str_replace("gsa_commande_", "", $infos["onglet"]);
 		$onglet = str_replace("commande_", "", $onglet);
 		if(is_numeric($onglet)){ $onglet = ATF::filtre_optima()->select($onglet , "filtre_optima"); }
-		
 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-            
-		//premier onglet  
+
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle($onglet); 
-		$sheets=array("auto"=>$worksheet_auto);         
+		$worksheet_auto->sheet->setTitle($onglet);
+		$sheets=array("auto"=>$worksheet_auto);
 		//$this->initStyle();
-		if($donnees){		
+		if($donnees){
 			$this->ajoutTitreExport($sheets,$donnees);
-			$this->ajoutDonneesExport($sheets,$donnees);			       
+			$this->ajoutDonneesExport($sheets,$donnees);
 		}
-		
+
 		$writer = new PHPExcel_Writer_Excel5($workbook);
-		
-		$writer->save($fname);           
+
+		$writer->save($fname);
 		header('Content-type: application/vnd.ms-excel');
-		header('Content-Disposition:inline;filename=export_societe_contact.xls');			
+		header('Content-Disposition:inline;filename=export_societe_contact.xls');
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct();		
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
     }
 
 
-    /** Mise en place des titres         
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
-     */     
+    /** Mise en place des titres
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     */
     public function ajoutTitreExport(&$sheets, $donnees){
         $row_data = array();
      	//A =65 Z=90
      	$lettre1 = 65;
-		$lettre2 = 0;	
+		$lettre2 = 0;
 
 		$donnees[0]["contact.id_contact"] =  NULL;
-		$donnees[0]["contact.civilite"] =   NULL;  
+		$donnees[0]["contact.civilite"] =   NULL;
 		$donnees[0]["contact.nom"] =  NULL;
 		$donnees[0]["contact.prenom"] =  NULL;
 		$donnees[0]["contact.etat"] =  NULL;
@@ -1152,16 +1244,16 @@ class societe extends classes_optima {
 
      	foreach ($donnees[0] as $key => $value) {
      		$data = array();
-     		$data = explode(".", $key);     		
+     		$data = explode(".", $key);
      		if( !strpos($data[1],"_fk") ){
 
      			if($lettre1 <= 90 && $lettre2 == 0){
      				$char = chr($lettre1);
      				$lettre1++;
      			}else{
-     				if($lettre2 == 0){ 
+     				if($lettre2 == 0){
      					$lettre1 =  $lettre2 = 65;
-     					$char = chr($lettre1).chr($lettre2); 
+     					$char = chr($lettre1).chr($lettre2);
      				}elseif($lettre2 == 90){
 						$lettre1++;
 						$lettre2 = 65;
@@ -1169,29 +1261,29 @@ class societe extends classes_optima {
 					}else{
 						$lettre2++;
 						$char = chr($lettre1).chr($lettre2);
-					}     				
-     			}				
-			    $row_data[$char] = array(ATF::$usr->trans($data[1],$data[0]),20);	     			
-     		} 
+					}
+     			}
+			    $row_data[$char] = array(ATF::$usr->trans($data[1],$data[0]),20);
+     		}
      	}
 
-        foreach($sheets as $nom=>$onglet){              
-             foreach($row_data as $col=>$titre){         
-				  $sheets[$nom]->write($col.'1',$titre[0]);  
+        foreach($sheets as $nom=>$onglet){
+             foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre[0]);
 				  $sheets[$nom]->sheet->getColumnDimension($col)->setWidth($titre[1]);
-            }             
-        }		     
-    }     
-	
+            }
+        }
+    }
 
 
-	/** Mise en place du contenu         
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
-    * @param array $sheets : contient les 30 onglets     
-    * @param array $infos : contient tous les enregistrements         
-    */     
+
+	/** Mise en place du contenu
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @param array $sheets : contient les 30 onglets
+    * @param array $infos : contient tous les enregistrements
+    */
     public function ajoutDonneesExport(&$sheets,$infos){
-        $row_auto=1; 
+        $row_auto=1;
 
         foreach ($infos as $key => $value) {
         	$contacts = array();
@@ -1202,7 +1294,7 @@ class societe extends classes_optima {
         	foreach ($contacts as $k => $v) {
         		if($i > 0){
         			$infos[$key]["contact.id_contact"] .=  "\n".$v["contact.id_contact"];
-					$infos[$key]["contact.civilite"]   .=  "\n".$v["contact.civilite"];  
+					$infos[$key]["contact.civilite"]   .=  "\n".$v["contact.civilite"];
 					$infos[$key]["contact.nom"] 	   .=  "\n".$v["ontact.nom"];
 					$infos[$key]["contact.prenom"] 	   .=  "\n".$v["contact.prenom"];
 					$infos[$key]["contact.etat"] 	   .=  "\n".$v["contact.etat"];
@@ -1210,10 +1302,10 @@ class societe extends classes_optima {
 					$infos[$key]["contact.gsm"]        .=  "\n".$v["contact.gsm"];
 					$infos[$key]["contact.fax"] 	   .=  "\n".$v["contact.fax"];
 					$infos[$key]["contact.email"] 	   .=  "\n".$v["contact.email"];
-					$infos[$key]["contact.fonction"]   .=  "\n".$v["contact.fonction"];        			
+					$infos[$key]["contact.fonction"]   .=  "\n".$v["contact.fonction"];
         		}else{
         			$infos[$key]["contact.id_contact"] =  $v["contact.id_contact"];
-					$infos[$key]["contact.civilite"] =   $v["contact.civilite"];  
+					$infos[$key]["contact.civilite"] =   $v["contact.civilite"];
 					$infos[$key]["contact.nom"] =  $v["contact.nom"];
 					$infos[$key]["contact.prenom"] =  $v["contact.prenom"];
 					$infos[$key]["contact.etat"] =  $v["contact.etat"];
@@ -1221,31 +1313,31 @@ class societe extends classes_optima {
 					$infos[$key]["contact.gsm"] =  $v["contact.gsm"];
 					$infos[$key]["contact.fax"] =  $v["contact.fax"];
 					$infos[$key]["contact.email"] =  $v["contact.email"];
-					$infos[$key]["contact.fonction"] =  $v["contact.fonction"];       			
+					$infos[$key]["contact.fonction"] =  $v["contact.fonction"];
         		}
         		$i = $i+1;
         	}
-        	
+
         }
 
 
-		foreach ($infos as $key => $value) {	
+		foreach ($infos as $key => $value) {
 			$row_data = array();
 	     	//A =65 Z=90
 	     	$lettre1 = 65;
-			$lettre2 = 0;			 
-			
-			foreach ($value as $k => $v) {	     	
+			$lettre2 = 0;
+
+			foreach ($value as $k => $v) {
 	     		$data = array();
-	     		$data = explode(".", $k);     		
+	     		$data = explode(".", $k);
 	     		if( !strpos($data[1],"_fk") ){
 	     			if($lettre1 <= 90 && $lettre2 == 0){
 	     				$char = chr($lettre1);
 	     				$lettre1++;
 	     			}else{
-	     				if($lettre2 == 0){ 
+	     				if($lettre2 == 0){
 	     					$lettre1 =  $lettre2 = 65;
-	     					$char = chr($lettre1).chr($lettre2); 
+	     					$char = chr($lettre1).chr($lettre2);
 	     				}elseif($lettre2 == 90){
 							$lettre1++;
 							$lettre2 = 65;
@@ -1253,31 +1345,31 @@ class societe extends classes_optima {
 						}else{
 							$lettre2++;
 							$char = chr($lettre1).chr($lettre2);
-						}     				
-	     			}				
+						}
+	     			}
 				    $row_data[$char] = array($v);
 	     		}
 	     	}
 
-	     	if($row_data){           
-				$row_auto++;         
+	     	if($row_data){
+				$row_auto++;
 				foreach($row_data as $col=>$valeur){
-					$sheets['auto']->write($col.$row_auto, " ".$valeur[0]);              
-				}     
-			}		
-		}		
+					$sheets['auto']->write($col.$row_auto, " ".$valeur[0]);
+				}
+			}
+		}
 	}
 
 	/** Méthode GET REST pour API
 	* Retourne les dernières activités
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
-	/*public static function _GET($get,$post) {	
+	/*public static function _GET($get,$post) {
 		$columns = $get["columns"];
 
 		ATF::societe()->q->reset()->setLimit($get["length"],$get["start"])->setPage($get["start"]/$get["length"]);
 
-		
+
 		foreach ($columns as $key => $value) {
 			ATF::societe()->q->addField($value["name"]);
 		}
@@ -1288,7 +1380,7 @@ class societe extends classes_optima {
 
 		ATF::societe()->q->addOrder($columns[$get["order"][0]["column"]]["name"],$get["order"][0]["dir"]);
 
-		$data_sql = ATF::societe()->select_all(); 
+		$data_sql = ATF::societe()->select_all();
 
 		$data = array();
 
@@ -1296,12 +1388,12 @@ class societe extends classes_optima {
 		$total = ATF::societe()->select_row();
 
 		foreach ($data_sql as $key => $value) {
-			
-			$d = array(); 
+
+			$d = array();
 			foreach ($columns as $k => $v) {
 				$d[] = $value[$v["name"]];
-			}			
-			$data[] = $d;								
+			}
+			$data[] = $d;
 		}
 
 		$return["data"] = $data;
@@ -1316,11 +1408,11 @@ class societe extends classes_optima {
 	/**
 	* Permet de récupérer la liste des tickets hotline pour telescope
 	* @package Telescope
-	* @author Quentin JANON <qjanon@absystech.fr> 
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
-	*/ 
+	*/
 	//$order_by=false,$asc='desc',$page=false,$count=false,$noapplyfilter=false
 	public function _GET($get,$post) {
 
@@ -1337,7 +1429,7 @@ class societe extends classes_optima {
 		/*$colsData = array(
 			"societe.id_societe"=>array(),
 			"societe.ref"=>array(),
-			"societe.societe"=>array(),			
+			"societe.societe"=>array(),
 			"societe.etat"=>array()
 		);*/
 
@@ -1358,13 +1450,13 @@ class societe extends classes_optima {
 
 		switch ($get['tri']) {
 			case 'id_societe':
-			case 'etat':			
+			case 'etat':
 				$get['tri'] = "societe.".$get['tri'];
 			break;
 		}
 
 
-		$this->q->addAllFields("societe");	
+		$this->q->addAllFields("societe");
 
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -1375,19 +1467,19 @@ class societe extends classes_optima {
 					$tmp = explode(".",$k_);
 					$data['data'][$k][$tmp[1]] = $val;
 					unset($data['data'][$k][$k_]);
-				}				
+				}
 			}
 		}
 
 		if ($get['id']) {
-	        $return = $data['data'][0];			
+	        $return = $data['data'][0];
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
 
-	        $return = $data['data'];			
+	        $return = $data['data'];
 		}
 
 		return $return;
@@ -1402,7 +1494,7 @@ class societe extends classes_optima {
 	}
 
 
-	public function _getSociete($get,$post) {		
+	public function _getSociete($get,$post) {
 		return array("societe"=>$this->select($get["id_societe"]) , "module"=>$this);
 	}
 
@@ -1410,11 +1502,11 @@ class societe extends classes_optima {
 	/**
 	* Permet de récupérer la liste des societes pour la geolocalisation
 	* @package Telescope
-	* @author Charlier Cyril <ccharlier@absystech.fr> 
+	* @author Charlier Cyril <ccharlier@absystech.fr>
 	* @param $get array Argument obligatoire mais inutilisé ici
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
-	*/ 
+	*/
 
 	public function _getGeoloc($get,$post) {
 		$colsData = array(
@@ -1425,13 +1517,13 @@ class societe extends classes_optima {
 			"ville"=>array(),
 			"cp"=>array(),
 			"adresse"=>array()
-		);		
+		);
 		$this->q->reset();
-		$this->q->addField($colsData)				
+		$this->q->addField($colsData)
 				->setCount()
 				->whereIsNotNull("longitude")
 				->addConditionNotNull("latitude");
-				
+
 		$return = $this->select_all();
 		header("ts-total-row: ".$return['count']);
 		return $return;

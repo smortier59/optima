@@ -157,7 +157,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-01-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-01-31"
+										"date_periode_fin"=>"2009-01-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								1=>array(
 										"id_facturation"=>$facturations_parente[1]["id_facturation"],
@@ -170,7 +175,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-02-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-02-28"
+										"date_periode_fin"=>"2009-02-28",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								2=>array(
 										"id_facturation"=>$facturations_parente[2]["id_facturation"],
@@ -183,7 +193,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-03-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-03-31"
+										"date_periode_fin"=>"2009-03-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								3=>array(
 										"id_facturation"=>$facturations_parente[3]["id_facturation"],
@@ -196,7 +211,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-04-01",
 										"type"=>"contrat",
 										"envoye"=>"oui",
-										"date_periode_fin"=>"2009-06-30"
+										"date_periode_fin"=>"2009-06-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$facturations_parente,'insert_facturation ne créé pas les bonnes facturations parent ');
@@ -394,7 +414,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"mois",
 									"date_debut"=>"2011-01-01",
-									"date_fin"=>"2011-03-31"
+									"date_fin"=>"2011-03-31",
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 							)
 							,ATF::loyer_prolongation()->select($id_loyer_prolongation1),'insert_facturation_prolongation ne met pas à jour les dates de loyer_prolongation1');
 
@@ -409,7 +434,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"trimestre",
 									"date_debut"=>"2011-04-01",
-									"date_fin"=>"2011-09-30"
+									"date_fin"=>"2011-09-30",
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 							)
 							,ATF::loyer_prolongation()->select($id_loyer_prolongation2),'insert_facturation_prolongation ne met pas à jour les dates de loyer_prolongation2');
 
@@ -424,7 +454,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"an",
 									"date_debut"=>"2011-10-01",
-									"date_fin"=>"2012-09-30"
+									"date_fin"=>"2012-09-30",
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 							)
 							,ATF::loyer_prolongation()->select($id_loyer_prolongation3),'insert_facturation_prolongation ne met pas à jour les dates de loyer_prolongation3');
 
@@ -443,7 +478,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-01-01",
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-01-31"
+										"date_periode_fin"=>"2011-01-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								1=>array(
 										"id_facturation"=>$facturations[1]["id_facturation"],
@@ -456,7 +496,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-02-01",
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-02-28"
+										"date_periode_fin"=>"2011-02-28",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								2=>array(
 										"id_facturation"=>$facturations[2]["id_facturation"],
@@ -469,7 +514,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-03-01",
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-03-31"
+										"date_periode_fin"=>"2011-03-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								3=>array(
 										"id_facturation"=>$facturations[3]["id_facturation"],
@@ -482,7 +532,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-04-01",
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-06-30"
+										"date_periode_fin"=>"2011-06-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								4=>array(
 										"id_facturation"=>$facturations[4]["id_facturation"],
@@ -495,7 +550,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-07-01",
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-09-30"
+										"date_periode_fin"=>"2011-09-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								5=>array(
 										"id_facturation"=>$facturations[5]["id_facturation"],
@@ -508,7 +568,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-10-01",
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2012-09-30"
+										"date_periode_fin"=>"2012-09-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$this->obj->sa(),'insert_facturation_prolongation ne créé pas les bonnes facturations');
@@ -550,7 +615,14 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2010-01-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2010-01-31"
+										"date_periode_fin"=>"2010-01-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
+
+
 								),
 								1=>array(
 										"id_facturation"=>$facturations[1]["id_facturation"],
@@ -563,7 +635,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2010-02-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2010-02-28"
+										"date_periode_fin"=>"2010-02-28",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
+
 								),
 								2=>array(
 										"id_facturation"=>$facturations[2]["id_facturation"],
@@ -576,7 +654,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2010-03-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2010-03-31"
+										"date_periode_fin"=>"2010-03-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
+
 								),
 								3=>array(
 										"id_facturation"=>$facturations[3]["id_facturation"],
@@ -589,7 +673,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2010-04-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2010-06-30"
+										"date_periode_fin"=>"2010-06-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
+
 								),
 								4=>array(
 										"id_facturation"=>$facturations[4]["id_facturation"],
@@ -602,7 +692,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2010-07-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-06-30"
+										"date_periode_fin"=>"2011-06-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
+
 								),
 								5=>array(
 										"id_facturation"=>$facturations[5]["id_facturation"],
@@ -615,7 +711,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2011-07-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2011-07-02"
+										"date_periode_fin"=>"2011-07-02",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
+
 								)
 							)
 							,$facturations,'insert_facturation ne créé pas les bonnes facturations');
@@ -660,7 +762,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-01-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-01-31"
+										"date_periode_fin"=>"2009-01-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								1=>array(
 										"id_facturation"=>$facturations_parente[1]["id_facturation"],
@@ -673,7 +780,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-02-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-02-28"
+										"date_periode_fin"=>"2009-02-28",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								2=>array(
 										"id_facturation"=>$facturations_parente[2]["id_facturation"],
@@ -686,7 +798,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-03-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-03-31"
+										"date_periode_fin"=>"2009-03-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								3=>array(
 										"id_facturation"=>$facturations_parente[3]["id_facturation"],
@@ -699,7 +816,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-04-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-06-30"
+										"date_periode_fin"=>"2009-06-30",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$facturations_parente,'insert_facturation ne créé pas les bonnes facturations parent 2');
@@ -739,7 +861,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>"2009-01-01",
 										"type"=>"contrat",
 										"envoye"=>"non",
-										"date_periode_fin"=>"2009-12-31"
+										"date_periode_fin"=>"2009-12-31",
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$facturations_avenant,'insert_facturation ne créé pas les bonnes facturations avenant');
@@ -787,7 +914,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>$date_debut_periode,
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day"))
+										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day")),
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id)
 								,"L'insertion de la facturation ne fonctionne pas fréquence an");
@@ -806,7 +938,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>$date_debut_periode,
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 month - 1 day"))
+										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 month - 1 day")),
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id)
 								,"L'insertion de la facturation ne fonctionne pas fréquence mois");
@@ -825,7 +962,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>$date_debut_periode,
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 3 month - 1 day"))
+										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 3 month - 1 day")),
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");
@@ -852,7 +994,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>$date_debut_periode,
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day"))
+										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day")),
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");
@@ -896,7 +1043,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"date_periode_debut"=>date("Y-m-d",strtotime($date_debut_periode." - 2 month")),
 									"type"=>"prolongation",
 									"envoye"=>"non",
-									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day - 2 month"))
+									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day - 2 month")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence annuelle, restitution");
@@ -916,7 +1068,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"date_periode_debut"=>date("Y-m-d",strtotime($date_debut_periode." -2 month ")),
 									"type"=>"prolongation",
 									"envoye"=>"non",
-									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 month - 1 day"))
+									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 month - 1 day")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre, restitution");
@@ -937,7 +1094,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"date_periode_debut"=>date("Y-m-d",strtotime($date_debut_periode." -2 month ")),
 									"type"=>"prolongation",
 									"envoye"=>"non",
-									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." -1 month -1 day"))
+									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." -1 month -1 day")),
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence mois, restitution");	
@@ -959,7 +1121,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"date_periode_debut"=>date("Y-m-d",strtotime($date_debut_periode."-2 month")),
 										"type"=>"prolongation",
 										"envoye"=>"non",
-										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." - 1 day -1 month"))
+										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." - 1 day -1 month")),
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");			

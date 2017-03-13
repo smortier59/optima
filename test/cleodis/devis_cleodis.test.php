@@ -147,7 +147,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"total_depense"=>NULL,"total_recette"=>NULL,"valeur_residuelle"=>NULL,"data"=>NULL,"forecast"=>"20",
 									"id_parent"=>NULL,"id_fille"=>NULL,"date_installation_prevu"=>"2008-10-01","date_installation_reel"=>NULL,
 									"date_livraison_prevu"=>"2008-09-06","date_garantie"=>NULL,"nature"=>"affaire",
-									"RIB"=>"30027 17536 00013420801 37","BIC"=>NULL,"IBAN"=>NULL,"nom_banque"=>NULL,"ville_banque"=>NULL,"date_previsionnelle"=>"0", "RUM" => NULL, 'date_ouverture' => NULL , "date_recettage_cablage"=> NULL
+									"RIB"=>"30027 17536 00013420801 37","BIC"=>NULL,"IBAN"=>NULL,"nom_banque"=>NULL,"ville_banque"=>NULL,"date_previsionnelle"=>"0", "RUM" => NULL, 'date_ouverture' => NULL , "date_recettage_cablage"=> NULL,'type_affaire' => 'normal'
 								 )
 			,$affaire
 			,"L'affaire ne renvoie pas les bonnes infos"
@@ -155,18 +155,18 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		ATF::devis_ligne()->q->reset()->addCondition("id_devis",$id_devis);
 		$devis_ligne = ATF::devis_ligne()->sa();
-		$this->assertEquals(array("id_devis_ligne"=>$devis_ligne[0]["id_devis_ligne"],"type"=>"fixe","id_devis"=>$id_devis,"id_produit"=>1175,"ref"=>"ZYX-FW","produit"=>"Zywall 5 - dispositif de sécurité","quantite"=>3,"id_fournisseur"=>1583,"prix_achat"=>"1.00","code"=>NULL,"id_affaire_provenance"=>NULL,"serial"=>NULL,"visible"=>"oui","visibilite_prix"=>"visible","neuf"=>"oui",'date_achat' => null, 'ref_simag' => null,'commentaire' => null)
+		$this->assertEquals(array("id_devis_ligne"=>$devis_ligne[0]["id_devis_ligne"],"type"=>"fixe","id_devis"=>$id_devis,"id_produit"=>1175,"ref"=>"ZYX-FW","produit"=>"Zywall 5 - dispositif de sécurité","quantite"=>3,"id_fournisseur"=>1583,"prix_achat"=>"1.00","code"=>NULL,"id_affaire_provenance"=>NULL,"serial"=>NULL,"visible"=>"oui","visibilite_prix"=>"visible","neuf"=>"oui",'date_achat' => null, 'ref_simag' => null,'commentaire' => null,'options' => 'non')
 			,$devis_ligne[0]
 			,"L'affaire ne renvoie pas les bonnes lignes de devis"
 		);	
-		$this->assertEquals(array("id_devis_ligne"=>$devis_ligne[1]["id_devis_ligne"],"type"=>"fixe","id_devis"=>$id_devis,"id_produit"=>1175,"ref"=>"ZYX-FW","produit"=>"Zywall 5 - dispositif de sécurité","quantite"=>"0","id_fournisseur"=>1583,"prix_achat"=>"1.00","code"=>NULL,"id_affaire_provenance"=>NULL,"serial"=>NULL,"visible"=>"non","visibilite_prix"=>"visible","neuf"=>"oui",'date_achat' => null, 'ref_simag' => null,'commentaire' => null)
+		$this->assertEquals(array("id_devis_ligne"=>$devis_ligne[1]["id_devis_ligne"],"type"=>"fixe","id_devis"=>$id_devis,"id_produit"=>1175,"ref"=>"ZYX-FW","produit"=>"Zywall 5 - dispositif de sécurité","quantite"=>"0","id_fournisseur"=>1583,"prix_achat"=>"1.00","code"=>NULL,"id_affaire_provenance"=>NULL,"serial"=>NULL,"visible"=>"non","visibilite_prix"=>"visible","neuf"=>"oui",'date_achat' => null, 'ref_simag' => null,'commentaire' => null,'options' => 'non')
 			,$devis_ligne[1]
 			,"L'affaire ne renvoie pas les bonnes lignes de devis"
 		);	
 
 		ATF::loyer()->q->reset()->addCondition("id_affaire",$id_affaire);
 		$loyer = ATF::loyer()->sa();
-		$this->assertEquals(array("id_loyer"=>$loyer[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"233.00","duree"=>34,"assurance"=>"2.00","frais_de_gestion"=>"1.00","frequence_loyer"=>"mois")
+		$this->assertEquals(array("id_loyer"=>$loyer[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"233.00","duree"=>34,"assurance"=>"2.00","frais_de_gestion"=>"1.00","frequence_loyer"=>"mois",'serenite' => '0.00','maintenance' => '0.00','hotline' => '0.00','supervision' => '0.00','support' => '0.00','avec_option' => 'non')
 			,$loyer[0]
 			,"L'affaire ne renvoie pas les bons loyers"
 		);	
@@ -315,7 +315,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			,count($loyers)
 			,"Pour un loyer unique il ne peut y avoir qu'un loyer"
 		);	
-		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"1000.00","duree"=>1,"assurance"=>"10.00","frais_de_gestion"=>"10.00","frequence_loyer"=>"mois")
+		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"1000.00","duree"=>1,"assurance"=>"10.00","frais_de_gestion"=>"10.00","frequence_loyer"=>"mois",'serenite' => '0.00','maintenance' => '0.00','hotline' => '0.00','supervision' => '0.00','support' => '0.00','avec_option' => 'non')
 			,$loyers[0]
 			,"Le loyer ne renvoi pas les bonnes infos"
 		);	
@@ -379,7 +379,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			,count($loyers)
 			,"Pour une vente il ne peut y avoir qu'un loyer"
 		);	
-		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"3000.00","duree"=>1,"assurance"=>NULL,"frais_de_gestion"=>NULL,"frequence_loyer"=>"mois")
+		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"3000.00","duree"=>1,"assurance"=>NULL,"frais_de_gestion"=>NULL,"frequence_loyer"=>"mois",'serenite' => '0.00','maintenance' => '0.00','hotline' => '0.00','supervision' => '0.00','support' => '0.00','avec_option' => 'non')
 			,$loyers[0]
 			,"Le loyer ne renvoi pas les bonnes infos"
 		);	
@@ -444,7 +444,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(date("Y-m-d"),ATF::devis()->default_value("date"),'valeur date');
 		$this->assertEquals("lld",ATF::devis()->default_value("type_contrat"),'valeur type_contrat avant remplissage du request');
 		$this->assertEquals("1.20",ATF::devis()->default_value("tva"),'valeur tva avant remplissage du request');
-		$this->assertEquals("jerome.loison@cleodis.fr",ATF::devis()->default_value("emailCopie"),'valeur emailCopie avant remplissage du request');
+		$this->assertEquals("jerome.loison@cleodis.com",ATF::devis()->default_value("emailCopie"),'valeur emailCopie avant remplissage du request');
 		$this->assertEquals("246",ATF::devis()->default_value("id_filiale"),'valeur id_filiale avant remplissage du request');
 		$this->assertEquals("",ATF::devis()->default_value("email"),'valeur email avant remplissage du request');
 		$this->assertEquals(0,ATF::devis()->default_value("prix"),'valeur prix');
@@ -685,10 +685,10 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_devis_gagne_stats(){
 		ATF::stats()->liste_annees["devis"] = array("2015"=>1);
 
-		$res = $this->obj->devis_gagne_stats(true,"o2m",true,2014,1);
+		$res = $this->obj->devis_gagne_stats(true,"reseau",true,2014,1);
 
-		$this->assertEquals(13 ,$res["dataset"]["reel"]["01"]["value"] , "Count 2013 incorrect?");
-		$this->assertEquals(10 ,$res["dataset"]["reel"]["12"]["value"] , "Count 2014 incorrect?");
+		$this->assertEquals(16 ,$res["dataset"]["reel"]["01"]["value"] , "Count 2013 incorrect?");
+		$this->assertEquals(9 ,$res["dataset"]["reel"]["12"]["value"] , "Count 2014 incorrect?");
 
 		ATF::stats()->liste_annees["devis"] = array("2014"=>1);
 		$res = $this->obj->devis_gagne_stats(true,"autre",false,2014,3);

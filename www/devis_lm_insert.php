@@ -26,12 +26,12 @@ if($infos["create_tache"]){
                                        "no_redirect"=>"true"
                                       ),
                         "dest"=>18
-                    );        
+                    );
         $id_tache = ATF::tache()->insert($tache);
 
         ATF::comite()->insert(    array("date"=>date("Y-m-d"),
                                         "id_affaire"=>$infos["id_affaire"],
-                                        "id_societe"=>$infos["id_societe"],                                   
+                                        "id_societe"=>$infos["id_societe"],
                                         "etat"=>"en_attente",
                                         "date_creation"=>date("Y-m-d"),
                                         "suivi_notifie"=>array(18)
@@ -43,13 +43,13 @@ if($infos["create_tache"]){
     }
 }
 
-//Creation d'une offre Magasin 
+//Creation d'une offre Magasin
 if($infos["OffreMagasin"]){
     try{
         ATF::contact()->q->reset()->where("id_societe",$infos["devis"]["devis"]["id_societe"]);
         $contact = ATF::contact()->select_row();
         if($contact){
-           $id_contact = $contact["id_contact"]; 
+           $id_contact = $contact["id_contact"];
        }else{
             $societe = ATF::societe()->select($infos["devis"]["devis"]["id_societe"]);
             $contact = array(
@@ -61,9 +61,9 @@ if($infos["OffreMagasin"]){
                 "tel"=>     $societe["tel"]
             );
             $id_contact = ATF::contact()->insert($contact);
-       }       
+       }
        $infos["devis"]["devis"]["id_contact"] = $id_contact;
-       
+
        $id_devis = ATF::devis()->insert($infos["devis"]);
        echo ATF::devis()->select($id_devis , "id_affaire");
        die;
@@ -79,7 +79,7 @@ if($infos["create_commande"]){
         ATF::devis()->q->reset()->where("id_affaire",$infos["id_affaire"]);
         $devis = ATF::devis()->select_row();
         ATF::devis_ligne()->q->reset()->where("id_devis",$devis["id_devis"]);
-        $lignes = ATF::devis_ligne()->select_all(); 
+        $lignes = ATF::devis_ligne()->select_all();
 
         $commande = $commande_ligne = array();
         $commande["ref"] = $devis["ref"];
@@ -90,30 +90,30 @@ if($infos["create_commande"]){
         $commande["etat"] = $devis["non_loyer"];
         $commande["id_user"] = $devis["id_user"];
         $commande["id_affaire"] = $devis["id_affaire"];
-        $commande["clause_logicielle"] =  "non"; 
+        $commande["clause_logicielle"] =  "non";
         $commande["etat"] = "pending";
         $commande["from_web"] = true;
 
-        foreach ($lignes as $key => $value) {       
-           $commande_ligne[$key]["id_produit"]            = $value["id_produit"]; 
-           $commande_ligne[$key]["ref"]                   = $value["ref"]; 
-           $commande_ligne[$key]["produit"]               = $value["produit"]; 
-           $commande_ligne[$key]["quantite"]              = $value["quantite"]; 
-           $commande_ligne[$key]["id_fournisseur"]        = $value["id_fournisseur"]; 
-           $commande_ligne[$key]["prix_achat"]            = $value["prix_achat"]; 
-           $commande_ligne[$key]["code"]                  = $value["code"]; 
-           $commande_ligne[$key]["id_affaire_provenance"] = $value["id_affaire_provenance"]; 
-           $commande_ligne[$key]["serial"]                = $value["serial"]; 
-           $commande_ligne[$key]["visible"]               = $value["visible"]; 
-           $commande_ligne[$key]["neuf"]                  = $value["neuf"]; 
-           $commande_ligne[$key]["date_achat"]            = $value["date_achat"]; 
-           $commande_ligne[$key]["commentaire"]           = $value["commentaire"]; 
+        foreach ($lignes as $key => $value) {
+           $commande_ligne[$key]["id_produit"]            = $value["id_produit"];
+           $commande_ligne[$key]["ref"]                   = $value["ref"];
+           $commande_ligne[$key]["produit"]               = $value["produit"];
+           $commande_ligne[$key]["quantite"]              = $value["quantite"];
+           $commande_ligne[$key]["id_fournisseur"]        = $value["id_fournisseur"];
+           $commande_ligne[$key]["prix_achat"]            = $value["prix_achat"];
+           $commande_ligne[$key]["code"]                  = $value["code"];
+           $commande_ligne[$key]["id_affaire_provenance"] = $value["id_affaire_provenance"];
+           $commande_ligne[$key]["serial"]                = $value["serial"];
+           $commande_ligne[$key]["visible"]               = $value["visible"];
+           $commande_ligne[$key]["neuf"]                  = $value["neuf"];
+           $commande_ligne[$key]["date_achat"]            = $value["date_achat"];
+           $commande_ligne[$key]["commentaire"]           = $value["commentaire"];
         }
-                    
+
         $data = array("commande"=>$commande, "values_commande"=>array("produit"=>json_encode($commande_ligne)));
 
         $id_commande = ATF::commande()->insert($data);
-        $id_commande = ATF::commande()->decryptId($id_commande);            
+        $id_commande = ATF::commande()->decryptId($id_commande);
 
         log::logger($id_commande , "mfleurquin");
         echo $id_commande;
@@ -126,19 +126,19 @@ if($infos["create_commande"]){
 
 //Récuperation du PDF du contrat
 if ($infos["id_contrat"]) {
-    //ATF::pdf()->generic('contratA4',$infos["id_contrat"]);   
-   
+    ATF::commande()->move_files($infos["id_contrat"],$_SESSION,false,NULL,"contratA4");
+
     $filename = ATF::commande()->filepath($infos["id_contrat"],"contratA4");
     $handle = fopen($filename, "r");
     $contents = fread($handle, filesize($filename));
-    fclose($handle);    
+    fclose($handle);
     echo $contents;
     die;
 }
 
 //Récuperation du PDF de la facture
-if ($infos["id_facture"]) {   
-   
+if ($infos["id_facture"]) {
+
     $id_facture = ATF::facture()->decryptId($infos["id_facture"]);
 
     log::logger(ATF::facture()->decryptId($id_facture), "mfleurquin");
@@ -147,100 +147,119 @@ if ($infos["id_facture"]) {
     if(file_exists($filename)){
         $handle = fopen($filename, "r");
         $contents = fread($handle, filesize($filename));
-        fclose($handle);    
+        fclose($handle);
         echo $contents;
         die;
     }else{
         echo "Probleme de récupération du PDF";
         die;
-    }      
+    }
 }
 
-//Récuperation du PDF de la facture
-if ($infos["getPdfSigne"]) {   
-    
-    log::logger($infos , "mfleurquin");
+//Récuperation du PDF signé du contrat
+if ($infos["getPdfSigne"]) {
 
     $id_commande = ATF::commande()->decryptId($infos["id_commande"]);
-    
-    log::logger($id_commande , "mfleurquin");
 
-    $filename = ATF::commande()->filepath($id_commande,"contratA4");
+    $filename = ATF::commande()->filepath($id_commande,"retour");
 
     if(file_exists($filename)){
         $handle = fopen($filename, "r");
         $contents = fread($handle, filesize($filename));
-        fclose($handle);    
+        fclose($handle);
         echo $contents;
         die;
     }else{
-        echo "Probleme de récupération du PDF";
-        die;
-    }      
+        $filename = ATF::commande()->filepath($id_commande,"contratA4");
+
+        if(file_exists($filename)){
+            $handle = fopen($filename, "r");
+            $contents = fread($handle, filesize($filename));
+            fclose($handle);
+            echo $contents;
+            die;
+        }else{
+            echo "Probleme de récupération du PDF";
+            die;
+        }
+    }
 }
 
 
 //Enregistrement du contrat signé par SLIMPAY
 if($infos["save_contrat"]){
-    log::logger("Insert PDF", "mfleurquin");    
+    log::logger("Insert PDF", "mfleurquin");
     util::file_put_contents(ATF::commande()->filepath($infos["id_commande"],"retour"), base64_decode($infos["pdf"]));
     $id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$infos["id_affaire"], "provenance"=>"Contrat signé par SLIMPAY"));
     copy(ATF::commande()->filepath($infos["id_commande"],"retour"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
     log::logger("AJOUT Date retour contrat & AP", "mfleurquin");
     ATF::commande()->u(array("id_commande"=>$infos["id_commande"], "retour_contrat"=>date("Y-m-d") , "retour_prel"=>date("Y-m-d")));
-    die;    
+    die;
 }
 
 //Enregistrement du mandat SLIMPAY
 if($infos["save_mandat"]){
-    log::logger("Insert Mandat PDF", "mfleurquin");    
+    log::logger("Insert Mandat PDF", "mfleurquin");
     log::logger($infos , "mfleurquin");
     util::file_put_contents(ATF::affaire()->filepath($infos["id_affaire"],"mandat_slimpay"), base64_decode($infos["pdf"]));
     $id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$infos["id_affaire"], "provenance"=>"Mandat SLIMPAY"));
-    copy(ATF::affaire()->filepath($infos["id_affaire"],"mandat_slimpay"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));   
-    die;    
+    copy(ATF::affaire()->filepath($infos["id_affaire"],"mandat_slimpay"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
+    die;
 }
 
 
 //Création d'une souscription faite par le site WEB
 if($infos["id_societe"]){
+
+
     try{
         $societe = ATF::societe()->select($infos["id_societe"]);
 
         if($infos["societe_form"]["adresse"]){
             $adresse_livraison = $infos["societe_form"]["adresse"];
-            if($infos["societe_form"]["adresse_2"] )  $adresse_livraison .= "\n".$infos["societe_form"]["adresse_2"];
-            if($infos["societe_form"]["adresse_3"] )  $adresse_livraison .= "\n".$infos["societe_form"]["adresse_3"];
-            
+            $adresse_livraison_2 = $adresse_livraison_3 = NULL;
+
+            if($infos["societe_form"]["adresse_2"] !== "")  $adresse_livraison_2 = $infos["societe_form"]["adresse_2"];
+            if($infos["societe_form"]["adresse_3"] !== "")  $adresse_livraison_3 = $infos["societe_form"]["adresse_3"];
+
             $cp_livraison = $infos["societe_form"]["cp"];
             $ville_livraison = $infos["societe_form"]["ville"];
+            $pays_livraison = $infos["societe_form"]["id_pays"];
 
-            $adresse_facturation = "";
+            $adresse_facturation = $adresse_facturation_2 = $adresse_facturation_3 = NULL;
             if($infos["societe_form"]["facturation_same_livraisonCheckbox"] == "non"){
                 $adresse_facturation = $infos["societe_form"]["facturation_adresse"];
-                if($infos["societe_form"]["facturation_adresse_2"] )  $adresse_facturation .= "\n".$infos["societe_form"]["facturation_adresse_2"];
-                if($infos["societe_form"]["facturation_adresse_3"] )  $adresse_facturation .= "\n".$infos["societe_form"]["facturation_adresse_3"];
+                if($infos["societe_form"]["facturation_adresse_2"] )  $adresse_facturation_2  = $infos["societe_form"]["facturation_adresse_2"];
+                if($infos["societe_form"]["facturation_adresse_3"] )  $adresse_facturation_3  = $infos["societe_form"]["facturation_adresse_3"];
                 $cp_facturation = $infos["societe_form"]["facturation_cp"];
-                $ville_facturation =  $infos["societe_form"]["ville"];
+                $ville_facturation =  $infos["societe_form"]["facturation_ville"];
+                $pays_facturation = $infos["societe_form"]["facturation_id_pays"];
+
 
             }else{
                 $adresse_facturation = $adresse_livraison;
+                $adresse_facturation_2 = $adresse_livraison_2;
+                $adresse_facturation_3 = $adresse_livraison_3;
                 $cp_facturation = $cp_livraison;
                 $ville_facturation =  $ville_livraison;
+                $pays_facturation = $pays_livraison;
             }
         }else{
             $adresse_livraison = $societe["adresse"];
-            if($societe["adresse_2"] )  $adresse_livraison .= "\n".$societe["adresse_2"];
-            if($societe["adresse_3"] )  $adresse_livraison .= "\n".$societe["adresse_3"];
-            
+            if($societe["adresse_2"] !== "" )  $adresse_livraison_2  = $societe["adresse_2"];
+            if($societe["adresse_3"] !== "" )  $adresse_livraison_3  = $societe["adresse_3"];
+
             $cp_livraison = $societe["cp"];
             $ville_livraison = $societe["ville"];
+            $pays_livraison = $societe["id_pays"];
 
             $adresse_facturation = $adresse_livraison;
+            $adresse_facturation_2 = $adresse_livraison_2;
+            $adresse_facturation_3 = $adresse_livraison_3;
             $cp_facturation = $cp_livraison;
             $ville_facturation =  $ville_livraison;
+            $pays_facturation = $pays_livraison;
         }
-        
 
 
         ATF::contact()->q->reset()->where("id_societe",$infos["id_societe"]);
@@ -270,17 +289,35 @@ if($infos["id_societe"]){
 
             foreach ($l as $kl => $vl) {
                 if($qte = $infos["panier"]["product"][$value["id_produit"]]["quantite"]){
-                    $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2);
-                    $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
-                    $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2)*$qte);
-                    $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
-                   
+
+                    //Si pas un sous produit
+                    if(!$value["id_produit_principal"]){
+                        $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
+                        $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
+                        $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                        $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
+                    }else{
+                        $qte_produit_princ = $infos["panier"]["product"][$value["id_produit_principal"]]["quantite"];
+                        if($qte_produit_princ && $qte_produit_princ > 0){
+                            if($value["qte_lie_principal"] == "non"){
+                                $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
+                                $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
+                                $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                                $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
+                            }else{
+                                $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
+                                $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
+                                $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*($qte*$qte_produit_princ));
+                                $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
+                            }
+                        }
+                    }
                 }
-            }   
+            }
         }
 
         $loyer = $devis = $produits = array();
-        foreach ($loyers["loyer"] as $key => $value) {             
+        foreach ($loyers["loyer"] as $key => $value) {
             $loyer[] = array(
                 "loyer__dot__loyer" => $value["loyer"],
                 "loyer__dot__duree" => $value["duree"],
@@ -308,12 +345,18 @@ if($infos["id_societe"]){
             "prix_achat" => $prix_achat,//somme des prix_achat des produits
             "prix" => $prix,//somme des loyers * duree
             "adresse_facturation"=>$adresse_facturation ,
+            "adresse_facturation_2"=>$adresse_facturation_2 ,
+            "adresse_facturation_3"=>$adresse_facturation_3 ,
             "cp_adresse_facturation"=>$cp_facturation ,
             "ville_adresse_facturation"=>$ville_facturation ,
+            "pays_facturation"=>$pays_facturation,
             "adresse_livraison"=>$adresse_livraison ,
+            "adresse_livraison_2"=>$adresse_livraison_2 ,
+            "adresse_livraison_3"=>$adresse_livraison_3 ,
             "cp_adresse_livraison"=>$cp_livraison,
-            "ville_adresse_livraison"=>$ville_livraison          
-        );       
+            "ville_adresse_livraison"=>$ville_livraison,
+            "pays_livraison"=>$pays_livraison
+        );
 
         if($infos["id_magasin"]) $devis["id_magasin"] = $infos["id_magasin"];
 
@@ -355,7 +398,7 @@ if($infos["id_societe"]){
         }
 
         $devis["prix_achat"] = $prix_achat;
-        $devis["prix"] = $prix;  
+        $devis["prix"] = $prix;
 
         $values_devis = array("loyer"=>json_encode($loyer),"produits"=>json_encode($produits));
         $data = array("devis"=>$devis, "values_devis"=>$values_devis);
@@ -386,9 +429,9 @@ if($infos["id_societe"]){
             $data = array("commande"=>$commande, "values_commande"=>$values_commande);
 
             $id_commande = ATF::commande()->insert($data);
-            $id_commande = ATF::commande()->decryptId($id_commande);            
+            $id_commande = ATF::commande()->decryptId($id_commande);
 
-            echo $id_commande;            
+            echo $id_commande;
         } else {
             throw new Exception("aucun id_devis !");
         }
