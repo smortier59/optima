@@ -905,7 +905,7 @@ class facture_fournisseur extends classes_optima {
 
 				if($vl["prix"] > 0){
 					$TTC_ligne = $vl["prix"] * $vl["quantite"];
-					$HT_ligne = round($TTC_ligne / $value["facture_fournisseur.tva"] ,2);
+					$HT_ligne = round($TTC_ligne ,2);
 					$total_credit = $TTC_ligne;
 
 					//HT
