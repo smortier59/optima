@@ -17,14 +17,14 @@ ATF.buildGridEditor({
 			text: '',
 			iconCls: 'arrow_up-button',
 			handler : function(field){
-	
+
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i-1]){
@@ -46,10 +46,10 @@ ATF.buildGridEditor({
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i+1]){
@@ -77,20 +77,20 @@ ATF.buildGridEditor({
 					{/foreach}
 				});
 				grid.stopEditing();
-				
+
 				var idx = 0; // Numéro de ligne par défaut.
 
-				if(store.getCount() != 0){					
-					idx = store.getCount();					
+				if(store.getCount() != 0){
+					idx = store.getCount();
 				}
 
-				if(idx == 0){				
+				if(idx == 0){
 					var index = grid.getSelectionModel().getSelectedCell();
 					if (index) {
 						idx = index[0]+1; // Numéro de ligne sélectionné
 					}
-				}				
-				
+				}
+
 				store.insert(idx, p);
 				grid.startEditing(idx, 0);
 				var records = Ext.ComponentMgr.get('{$id}').store.getRange();
@@ -107,7 +107,7 @@ ATF.buildGridEditor({
 				var rec = grid.store.getAt(index[0]);
 				grid.store.remove(rec);
 				grid.refreshHiddenValues();
-				
+
 				Ext.ComponentMgr.get('{$id}').maj();
 			}
 		}],
@@ -122,7 +122,7 @@ ATF.buildGridEditor({
 			Ext.ComponentMgr.get('{$id}').maj();
 		}
 	},
-	cm:new Ext.grid.ColumnModel({		
+	cm:new Ext.grid.ColumnModel({
 		columns: [
 		     {
 				header: 'Fournisseur',
@@ -141,7 +141,7 @@ ATF.buildGridEditor({
 						{/if}
 						return a[0];
 					}
-				},				
+				},
 				editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_fournisseur function=autocompleteFournisseurs  forceId="id_fournisseur{$id}" extJSGridComboboxSeparator=true},{
 					listWidth:200
 				})
@@ -149,13 +149,20 @@ ATF.buildGridEditor({
 				hidden:true,
 				dataIndex: '{$current_class->table}__dot__id_fournisseur_fk'
 			},{
-				header: 'Prix',
+				header: 'Prix TTC',
 				width:20,
-				dataIndex: '{$current_class->table}__dot__prix_prestation',
 				renderer: 'money',
+				dataIndex: '{$current_class->table}__dot__prix_ttc',
 				editor: new Ext.form.TextField({
 					value:0
-				})				
+				})
+			},{
+				header: 'Prix HT',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__prix_prestation',
+				editor: new Ext.form.TextField({
+					value:0
+				})
 			},{
 				header: 'Recurrence',
 				width:20,
@@ -168,19 +175,19 @@ ATF.buildGridEditor({
 				editor:  new Ext.form.TextField({ })
 			}
 
-			
+
 		]
 	}),
 	store:new Ext.data.JsonStore({
 		root: 'result',
 		totalProperty: 'totalCount',
 		idProperty: 'id',
-		remoteSort: true,	
+		remoteSort: true,
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView())}),
 		{if $function}baseParams:{ 'function':'{$function}' },{/if}
 		proxy: new Ext.data.HttpProxy({
 			url: '{if $proxyUrl}{$proxyUrl}{else}{$current_class->table},extJSgsa.ajax,pager={$pager}{/if}'
 			,method:'POST'
-		})	
+		})
 	})
 })
