@@ -399,7 +399,10 @@ class devis_lm extends devis {
 					if($fournisseurs){
 						foreach ($fournisseurs as $kf => $vf) {
 							$item["id_fournisseur"] = $vf["id_fournisseur"];
-							if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
+							if($vf["prix_prestation"]){
+								 $item["prix_achat"] = $vf["prix_prestation"];
+								 $item["prix_achat_ttc"] = $vf["prix_ttc"];
+							}
 
 							if(!$item["id_fournisseur"]){
 							ATF::db($this->db)->rollback_transaction();
@@ -418,8 +421,7 @@ class devis_lm extends devis {
 						if($fournisseurs){
 							foreach ($fournisseurs as $kf => $vf) {
 								$item["id_fournisseur"] = $vf["id_fournisseur"];
-								unset($item["prix_achat"]);
-								if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
+								unset($item["prix_achat"],$item["prix_achat_ttc"]);
 
 								if(!$item["id_fournisseur"]){
 									ATF::db($this->db)->rollback_transaction();

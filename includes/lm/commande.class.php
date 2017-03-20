@@ -1343,7 +1343,8 @@ class commande_lm extends commande {
 												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
 												,"id"=>$i["id_commande_ligne"]
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]
+												,"prix_ht"=>$i["prix_achat"]
 												,"quantite"=>1
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
@@ -1354,7 +1355,7 @@ class commande_lm extends commande {
 												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
 												,"id"=>$i["id_commande_ligne"]
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]
 												,"quantite"=>$i["quantite"]
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
