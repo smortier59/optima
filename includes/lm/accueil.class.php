@@ -9,13 +9,13 @@ class accueil_lm extends accueil {
 		"affaire"=>array("opened"=>true)
 	);
 
-	/** 
+	/**
 	* Retourne les widgets de l'utilisateur
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
 	public function getWidgets(){
 		$w = array(
-			array('module'=>'log_btn')
+			//array('module'=>'log_btn')
 		);
 		return $w;
 	}

@@ -79,10 +79,13 @@ class produit_lm extends produit {
 		);
 		$this->colonnes['bloquees']['select'] =  array('loyer')	;
 
-		$this->panels['primary'] = array('nbCols'=>2,'visible'=>true);
+		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
-
+		$this->panels['sous_produit'] = array('nbCols'=>1);
+		$this->panels['affichage_site_souscription'] = array('nbCols'=>1);
+		$this->panels['fournisseur_lignes'] = array('nbCols'=>1);
+		$this->panels['loyer_lignes'] = array('nbCols'=>1);
 
 
 		$this->fieldstructure();
@@ -203,6 +206,7 @@ class produit_lm extends produit {
 			$id_pf = ATF::produit_fournisseur()->i(array( "id_produit"=> $this->decryptId($last_id),
 													      "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
 													      "prix_prestation"=> $value["produit_fournisseur__dot__prix_prestation"],
+													      "prix_ttc"=> $value["produit_fournisseur__dot__prix_ttc"],
 													      "recurrence"=> $value["produit_fournisseur__dot__recurrence"],
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));
@@ -267,6 +271,7 @@ class produit_lm extends produit {
 			$id_pf = ATF::produit_fournisseur()->i(array( "id_produit"=> $this->decryptId($infos["produit"]["id_produit"]),
 													      "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
 													      "prix_prestation"=> $value["produit_fournisseur__dot__prix_prestation"],
+													      "prix_ttc"=> $value["produit_fournisseur__dot__prix_ttc"],
 													      "recurrence"=> $value["produit_fournisseur__dot__recurrence"],
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));

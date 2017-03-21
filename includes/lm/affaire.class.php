@@ -230,7 +230,7 @@ class affaire_lm extends affaire {
     */
 	function getRefAvenant($id_parent){
 		//Récup du dernier avenant de cette affaire
-		$ref=substr($this->select($id_parent,"ref"),0,7);
+		$ref=substr($this->select($id_parent,"ref"),0,8);
 		$this->q->reset()
 		   ->addField('MAX(`ref`)','max')
 		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
