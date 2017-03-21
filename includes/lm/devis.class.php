@@ -228,18 +228,10 @@ class devis_lm extends devis {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		$infos_ligne_repris = json_decode($infos["values_".$this->table]["produits_repris"],true);
+
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
 
-		//Gestion AR/Avenant : soit l'un soit l'autre
-		if($infos["panel_AR-checkbox"]){
-			$infos_AR=$this->getArrayAvenantARVente($infos["AR"],"AR");
-		}elseif($infos["panel_avenant_lignes-checkbox"]){
-			$infos_avenant=$this->getArrayAvenantARVente($infos["avenant"],"avenant");
-		}elseif($infos["panel_vente-checkbox"]){
-			$infos_vente=$this->getArrayAvenantARVente($infos["vente"],"vente");
-		}
 
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
@@ -298,9 +290,9 @@ class devis_lm extends devis {
 		}
 
 		////////////////Affaire
-		if($infos_avenant){
+		if($infos_avenant || $infos["nature"] == "avenant"){
 			//Si avenant alors id_parent, comme on ne peut faire un avenant que sur une affaire on peut récupérer $infos_avenant["affaire"][0]
-			$infos["id_parent"]=$infos_avenant["affaire"][0];
+			$infos["id_parent"]=ATF::affaire()->decryptId($infos["id_parent"]);
 			//Dans le cadre d'un avenant on récupère la date garantie de l'affaire parente
 			$infos["nature"]="avenant";
 		}elseif($infos_AR){
@@ -313,52 +305,13 @@ class devis_lm extends devis {
 		}else{
 			$infos["nature"]="affaire";
 		}
+
 		$affaire=ATF::affaire()->formateInsertUpdate($infos);
 
 
 		ATF::db($this->db)->begin_transaction();
 //*****************************Transaction********************************
 
-		$RUM = "";
-		if($affaire["RIB"]){
-			if($infos_AR){
-
-				foreach ($infos_AR["affaire"] as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value, "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $RIB );
-
-						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value, "RUM");
-					}
-				}
-			}elseif ($infos_avenant){
-				foreach ($infos_avenant["affaire"] as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value, "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $RIB );
-
-						if($RIB == $affaire["RIB"])	$RUM =  ATF::affaire()->select($value, "RUM");
-					}
-
-				}
-			}else{
-				ATF::affaire()->q->reset()->where("affaire.id_societe" , $infos['id_societe']);
-				$lesAffaires = ATF::affaire()->select_all();
-
-				foreach ($lesAffaires as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value["affaire.id_affaire"], "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $infos["RIB"] );
-
-						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
-					}
-				}
-			}
-		}
-		$affaire["RUM"] = $RUM;
 
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
@@ -446,7 +399,10 @@ class devis_lm extends devis {
 					if($fournisseurs){
 						foreach ($fournisseurs as $kf => $vf) {
 							$item["id_fournisseur"] = $vf["id_fournisseur"];
-							if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
+							if($vf["prix_prestation"]){
+								 $item["prix_achat"] = $vf["prix_prestation"];
+								 $item["prix_achat_ttc"] = $vf["prix_ttc"];
+							}
 
 							if(!$item["id_fournisseur"]){
 							ATF::db($this->db)->rollback_transaction();
@@ -465,8 +421,7 @@ class devis_lm extends devis {
 						if($fournisseurs){
 							foreach ($fournisseurs as $kf => $vf) {
 								$item["id_fournisseur"] = $vf["id_fournisseur"];
-								unset($item["prix_achat"]);
-								if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
+								unset($item["prix_achat"],$item["prix_achat_ttc"]);
 
 								if(!$item["id_fournisseur"]){
 									ATF::db($this->db)->rollback_transaction();
@@ -1606,5 +1561,256 @@ class devis_lm extends devis {
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
+
+
+
+	public function _GET ($get, $post){
+		$affaire = ATF::affaire()->select(ATF::affaire()->decryptId($get["id"]));
+
+		$this->q->reset()->where("id_affaire",$affaire["id_affaire"]);
+		$devis = $this->select_row();
+
+		ATF::devis_ligne()->q->reset()->where('id_devis', $devis['id_devis']);
+		$contratLigne = ATF::devis_ligne()->select_all();
+
+		$id_pack = ATF::produit()->select($contratLigne[0]['id_produit'] , 'id_pack_produit');
+		ATF::produit()->q->reset()->where("id_pack_produit", $id_pack);
+		$packLigne = ATF::produit()->sa();
+
+		$loyer = array();
+		foreach ($packLigne as $key => $value) {
+			ATF::produit_loyer()->q->reset()->where('id_produit', $value["id_produit"])
+											->addOrder('ordre', "asc");
+			$loyer[$value['id_produit']]["id_produit"] = $value['id_produit'];
+			$loyer[$value['id_produit']]["loyer"] = ATF::produit_loyer()->select_all();
+
+			if($this->estpresent($contratLigne , $value['id_produit'])){
+				unset($packLigne[$key]);
+			}
+
+		}
+
+		$client = ATF::societe()->select($affaire["id_societe"]);
+
+
+		$return['affaire'] = $affaire;
+		$return['client'] = $client;
+		$return['contratLigne'] = $contratLigne;
+		$return['packLigne'] = $packLigne;
+		$return["loyer"] = $loyer;
+		$return["pack"] = ATF::pack_produit()->select($id_pack);
+
+		return $return;
+	}
+
+	public function _POST($get,$post){
+		return $this->createAvenant($post);
+	}
+
+	public function createAvenant($infos){
+
+		if($infos["preview"]) $preview = true;
+
+		$infos_ligne = $infos["devis_ligne"];
+		$infos_loyer = $infos["loyer"];
+
+		if(!$infos_loyer){
+			throw new errorATF("Il n'y a pas de loyer pour ce devis.",500);
+		}
+		if(!$infos_ligne){
+			throw new errorATF("Il n'y a pas de ligne pour ce devis.",500);
+		}
+
+
+
+		$this->infoCollapse($infos);
+
+
+
+		if(!$infos["id_user"]){ $infos["id_user"] = ATF::$usr->getID(); }
+
+		$affaire_parent = ATF::affaire()->select($infos["id_parent"]);
+		$infos["id_societe"] = $affaire_parent["id_societe"];
+
+		$infos["devis"] = "Avenant au contrat ".$affaire_parent["ref"];
+		$infos["type_contrat"] = "lld";
+		$infos["tva"] = __TVA__;
+		$infos["date"] = date("Y-m-d");
+		$infos["validite"] = date("Y-m-d",strtotime("+15 day"));
+
+		ATF::contact()->q->reset()->where("id_societe", $infos["id_societe"])->where("etat", "actif");
+		$contact = ATF::contact()->select_row();
+		$infos["id_contact"] = $contact["id_contact"];
+
+
+		if(!$infos["adresse_livraison"]) $infos["adresse_livraison"] = $affaire_parent["adresse_livraison"];
+	    if(!$infos["ville_adresse_livraison"]) $infos["ville_adresse_livraison"] = $affaire_parent["ville_adresse_livraison"];
+	    if(!$infos["cp_adresse_livraison"]) $infos["cp_adresse_livraison"] = $affaire_parent["cp_adresse_livraison"];
+	    if(!$infos["pays_livraison"]) $infos["pays_livraison"] = $affaire_parent["pays_livraison"];
+	    if(!$infos["adresse_facturation"]) $infos["adresse_facturation"] = $affaire_parent["adresse_facturation"];
+	    if(!$infos["ville_adresse_facturation"]) $infos["ville_adresse_facturation"] = $affaire_parent["ville_adresse_facturation"];
+	    if(!$infos["cp_adresse_facturation"]) $infos["cp_adresse_facturation"] = $affaire_parent["cp_adresse_facturation"];
+	    if(!$infos["pays_facturation"]) $infos["pays_facturation"] = $affaire_parent["pays_facturation"];
+
+		if(!$infos["type_affaire"]){
+		  $pack = ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit");
+		  $infos["type_affaire"] = ATF::pack_produit()->select($pack, "type_contrat");
+		}
+
+		$infos["id_parent"]=ATF::affaire()->decryptId($infos["id_parent"]);
+
+		$infos["nature"]="avenant";
+
+		$affaire=ATF::affaire()->formateInsertUpdate($infos);
+
+
+
+		ATF::db($this->db)->begin_transaction();
+
+		try{
+			$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
+			ATF::affaire_etat()->insert(array("id_affaire"=>$infos["id_affaire"],
+											  "etat"=>"commande"
+											 ));
+
+			$cp_adresse_livraison = $infos["cp_adresse_livraison"];
+
+			unset(  $infos["adresse_livraison"],
+					$infos["adresse_facturation"],
+					$infos["adresse_facturation_2"],
+					$infos["adresse_livraison_2"],
+					$infos["adresse_livraison_3"],
+					$infos["adresse_facturation_3"],
+					$infos["cp_adresse_livraison"],
+					$infos["cp_adresse_facturation"],
+					$infos["ville_adresse_livraison"],
+					$infos["ville_adresse_facturation"],
+					$infos["pays_facturation"],
+					$infos["pays_livraison"],
+					$infos["id_magasin"],
+					$infos["num_bdc_lm"],
+					$infos["poseur"],
+					$infos["poseur_aggree"],
+					$infos["type_souscription"],
+					$infos["id_parent"],
+					$infos["nature"],
+					$infos["type_affaire"]);
+
+			$affaire=ATF::affaire()->select($infos["id_affaire"]);
+			$infos["ref"]=$affaire["ref"];
+			$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
+			$affaire = new affaire_lm($infos['id_affaire']);
+			$affaire->majForecastProcess();
+
+			foreach($infos_loyer as $key=>$item){
+
+				$item["id_affaire"]=$infos["id_affaire"];
+				$item["index"]=$key;
+				if($item["frequence_loyer"]){
+					ATF::loyer()->i($item);
+				}else{
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Il n'y a pas de fréquence pour un loyer",500);
+				}
+			}
+
+			$prod = $service = false;
+
+			foreach($infos_ligne as $key=>$item){
+				$produit = ATF::produit()->select($item["id_produit"]);
+
+				if($produit["nature"] === "produit") $prod = true;
+				if($produit["nature"] === "service") $prod = true;
+
+			   	$item["id_devis"]=$last_id;
+				$item["visible"] = $produit["visible_pdf"];
+
+				$item["produit"] = $produit["produit"];
+
+				if($item["quantite"] < 0) $item["id_affaire_provenance"] = $affaire_parent["id_affaire"];
+
+
+				ATF::produit_fournisseur()->q->reset()
+					->where("produit_fournisseur.id_produit",$item["id_produit"])
+					->andWhere('produit_fournisseur.departement','(^|,)'.substr($cp_adresse_livraison,0,2).'($|,)','dep','REGEXP')
+					->whereIsNull('produit_fournisseur.departement','OR','dep')
+					->addGroup("produit_fournisseur.id_fournisseur");
+				$fournisseurs = ATF::produit_fournisseur()->select_all();
+
+
+				if($fournisseurs){
+					foreach ($fournisseurs as $kf => $vf) {
+						$item["id_fournisseur"] = $vf["id_fournisseur"];
+						if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
+
+						if(!$item["id_fournisseur"]){
+						ATF::db($this->db)->rollback_transaction();
+							throw new errorATF("Ligne de devis sans fournisseur achat (Produit : ".$item['id_produit'].")",500);
+						}
+						ATF::devis_ligne()->i($item);
+					}
+				}else{
+					ATF::produit_fournisseur_loyer()->q->reset()
+						->where("produit_fournisseur_loyer.id_produit",$item["id_produit"])
+						->andWhere('produit_fournisseur_loyer.departement','(^|,)'.substr($cp_adresse_livraison,0,2).'($|,)','dep','REGEXP')
+						->whereIsNull('produit_fournisseur_loyer.departement','OR','dep')
+						->addGroup("produit_fournisseur_loyer.id_fournisseur");
+					$fournisseurs = ATF::produit_fournisseur_loyer()->select_all();
+
+					if($fournisseurs){
+						foreach ($fournisseurs as $kf => $vf) {
+							$item["id_fournisseur"] = $vf["id_fournisseur"];
+							unset($item["prix_achat"]);
+							if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
+
+							if(!$item["id_fournisseur"]){
+								ATF::db($this->db)->rollback_transaction();
+								throw new errorATF("Ligne de devis sans fournisseur loyer (Produit : ".$item['id_produit'].")",500);
+							}
+							ATF::devis_ligne()->i($item);
+						}
+					}else{
+						ATF::db($this->db)->rollback_transaction();
+						throw new errorATF("Ligne de devis sans fournisseur (achat ou loyer) (Produit : ".$item['id_produit'].")",500);
+					}
+				}
+			}
+
+			if($prod == true &&  $service == true){
+				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "LS"));
+			} elseif($prod == true){
+				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "LP"));
+			} else {
+				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "SP"));
+			}
+
+			if($preview){
+				$return = base64_encode(ATF::pdf()->generic("devis",$last_id,true,$s,true)); // Génération du PDF de preview
+				ATF::db($this->db)->rollback_transaction();
+				return $return;
+			}else{
+				$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
+				ATF::db($this->db)->commit_transaction();
+				return ATF::affaire()->cryptId($infos['id_affaire']);
+			}
+
+
+		}catch(errorATF $e){
+			log::logger($e->getMessage() , "mfleurquin");
+			ATF::db($this->db)->rollback_transaction();
+		}
+
+
+
+
+	}
+
+	public function estPresent($lignes, $id_produit){
+		foreach ($lignes as $key => $value) {
+			if($value["id_produit"] == $id_produit) return true;
+		}
+		return false;
+	}
+
 };
 ?>

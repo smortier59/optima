@@ -273,6 +273,11 @@ class facture_absystech extends facture {
 		}
 	}
 
+	/*public function cloner($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {
+		unset($infos["facture"]["id_facture"]);
+		return parent::cloner($infos,$s,$files,$cadre_refreshed,$nolog);
+	}*/
+
 	public function getLastFacture($id_affaire,$idRef=false,$copieur=false) {
 		$facture = ATF::facture()->select($idRef);
 
@@ -288,7 +293,9 @@ class facture_absystech extends facture {
 				$this->q->where('id_facture',$idRef,"AND","","!=")
 				        ->where('date',$facture["date"],"AND","","<")
 				        ->addOrder('date','desc');
-			}else{ $this->q->where('id_facture',$idRef,"AND","","<")->addOrder('id_facture','desc'); }
+			}else{
+				$this->q->where('id_facture',$idRef,"AND","","<")->addOrder('id_facture','desc');
+			}
 
 		} else {
 			$this->q->addOrder('date','desc');

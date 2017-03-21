@@ -10,6 +10,7 @@
 	, "{$current_class->table}.quantite"
 	, "{$current_class->table}.ref"
 	, "{$current_class->table}.prix"
+	, "{$current_class->table}.prix_ttc"
 	, "{$current_class->table}.serial"
 ]}
 

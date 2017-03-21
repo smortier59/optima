@@ -39,8 +39,7 @@ class pdf_lm extends pdf_cleodis {
 		$this->ATFSetStyle($style);
 		$this->SetXY(10,-20);
 		$this->multicell(0,3,"Conformément à l'article 27 de la loi Informatique et Libertés, vous disposez d'un droit d'accès et de rectification des données vous concernant et dont nous sommes les seuls utilisateurs",0,"C");
-		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10.000 € - 820 472 009 RCS LILLE - N° C.E.E. FR 08820472009
-SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 80",0,'C');
+		$this->multicell(0,3,"S.A.S LEROY MERLIN ABONNEMENTS - Capital de 10.000 € - 820 472 009 RCS LILLE - N° C.E.E. FR 08820472009 SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 80",0,'C');
 
 
 		$this->SetX(10);
@@ -153,7 +152,6 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 	}
 
 
-
 	/** PDF d'un contrat en A4
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @date 02-06-2016
@@ -173,6 +171,9 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 		$this->sety(10);
 		$this->setLeftMargin(37);
 
+		if(strpos($this->commande['ref'], "AVT") !== false){
+			$this->multicell(134,5,"AVENANT ".$this->commande['ref']." AUX CONTRAT D’ABONNEMENT",0,"C");
+		}
 
 		if($this->affaire["type_affaire"] == "LP"){
 			$this->multicell(134,5,"CONDITIONS PARTICULIERES DE LOCATION \nContrat N° : ".$this->commande['ref'],0,"C");
@@ -331,37 +332,67 @@ SIEGE SOCIAL - rue Chanzy - LEZENNES - 59712 LILLE Cedex 9 - Tel : 03 28 80 80 8
 			$this->setfont('arial','B',8);
 			$this->multicell(0,5,"1.".$chapSuivant.". Déclaration de l'Abonné",1,"L",1);
 			$this->setfont('arial','',8);
-			$this->multicell(0,4,"\nLe présent Contrat d'Abonnement prendra effet à compter de l'acceptation, par Leroy Merlin Abonnements, de la demande d'abonnement. L'Abonné reconnait être engagé par toutes les stipulations du Contrat d'Abonnement, y compris les Conditions Générales d'Abonnement, dont l'Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nL'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l'exécution du Contrat, qu'il est valablement constitué, qu'il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+
+			if(strpos($this->commande['ref'], "AVT") !== false){
+				$this->multicell(0,4,"\nLe présent Avenant prendra effet à compter de l’acceptation, par Leroy Merlin Abonnements, de la demande d’abonnement. L'Abonné reconnait être engagé par toutes les stipulations du Contrat d’Abonnement, y compris les Conditions Générales d’Abonnement, dont l’Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme égalementque toutes les informations contenues dans le présent Avenant sont correctes.\n L'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution de l’Avenant, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et d’exécuter la présente convention.\n Toutes stipulations du Contrat d’Abonnement non modifiées par le présent Avenant demeurent purement applicables. En cas de contradiction entre les stipulations du Contrat d’Abonnement et celles de l’Avenant ayant le même objet, ces dernières prévaudront.\n\n",1,"L");
+			}else{
+				$this->multicell(0,4,"\nLe présent Contrat d'Abonnement prendra effet à compter de l'acceptation, par Leroy Merlin Abonnements, de la demande d'abonnement. L'Abonné reconnait être engagé par toutes les stipulations du Contrat d'Abonnement, y compris les Conditions Générales d'Abonnement, dont l'Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nL'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l'exécution du Contrat, qu'il est valablement constitué, qu'il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+			}
+
+
 			$chapSuivant++;
 			$this->ln(5);$this->setfont('arial','B',8);
 			$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
 			$this->setfont('arial','',8);
-			$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d'Abonnement, et consentir à l'utilisation et à la communication des données personnelles qu'il aura fournies ou qui auront été collectées, après avoir été informé qu'elles pourront être transférées en dehors de l'Union Européenne et qu'il pourra exercer son droit d'accès et de rectification à l'adresse indiquée dans les conditions générales.\n\n",1,"L");
+			if(strpos($this->commande['ref'], "AVT") !== false){
+				$this->multicell(0,4,"\nL'Abonné reconnait en signant le présent Avenant avoir accepté les termes des Conditions Générales d’Abonnement, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans le Contrat d’Abonnement.\n\n",1,"L");
+			}else{
+				$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d'Abonnement, et consentir à l'utilisation et à la communication des données personnelles qu'il aura fournies ou qui auront été collectées, après avoir été informé qu'elles pourront être transférées en dehors de l'Union Européenne et qu'il pourra exercer son droit d'accès et de rectification à l'adresse indiquée dans les conditions générales.\n\n",1,"L");
+			}
 
 		}elseif($this->affaire["type_affaire"] == "LP"){
 			$chapSuivant++;
 			$this->setfont('arial','B',8);
 			$this->multicell(0,5,"1.".$chapSuivant.". Déclaration du Client",1,"L",1);
 			$this->setfont('arial','',8);
-			$this->multicell(0,4,"\nLe présent Contrat de location prendra effet à compter de la réception par le Client du ou des Produit(s). Le Client reconnait être engagé par toutes les stipulations du Contrat de location, y compris les Conditions Générales de Location, dont le Client reconnait les avoir reçues, lues, comprises et acceptées. Le Client confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nLe Client déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution du Contrat, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+			if(strpos($this->commande['ref'], "AVT") !== false){
+			} else {
+				$this->multicell(0,4,"\nLe présent Contrat de location prendra effet à compter de la réception par le Client du ou des Produit(s). Le Client reconnait être engagé par toutes les stipulations du Contrat de location, y compris les Conditions Générales de Location, dont le Client reconnait les avoir reçues, lues, comprises et acceptées. Le Client confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nLe Client déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution du Contrat, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+			}
 			$chapSuivant++;
 			$this->ln(5);
 			$this->setfont('arial','B',8);
 			$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
 			$this->setfont('arial','',8);
-			$this->multicell(0,4,"\nLe Client reconnait en signant les présentes Conditions Particulières avoir accepté les termes des conditions générales de location, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, après avoir été informé qu’elles pourront être transférées en dehors de l’Union Européenne et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans les conditions générales.\n\n",1,"L");
+			if(strpos($this->commande['ref'], "AVT") !== false){
+
+			} else {
+				$this->multicell(0,4,"\nLe Client reconnait en signant les présentes Conditions Particulières avoir accepté les termes des conditions générales de location, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, après avoir été informé qu’elles pourront être transférées en dehors de l’Union Européenne et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans les conditions générales.\n\n",1,"L");
+			}
 		}else{
 				$chapSuivant++;
 				$this->setfont('arial','B',8);
 				$this->multicell(0,5,"1.".$chapSuivant.". Déclaration de l'Abonné",1,"L",1);
 				$this->setfont('arial','',8);
-				$this->multicell(0,4,"\nLe présent Contrat d'Abonnement prendra effet à compter de la réception par l'Abonné du ou des Produit(s). L'Abonné reconnait être engagé par toutes les stipulations du Contrat d’Abonnement, y compris les Conditions Générales d’Abonnement, dont l’Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nL'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution du Contrat, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+				if(strpos($this->commande['ref'], "AVT") !== false){
+					$this->multicell(0,4,"\nLe présent Avenant au Contrat d'Abonnement prendra effet à compter de la réception par l'Abonné du ou des Produit(s). L'Abonné reconnait être engagé par toutes les stipulations du Contrat d’Abonnement, y compris les Conditions Générales et Particulières d’Abonnement, dont l’Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Avenant sont correctes.\n L'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution de l’Avenant, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n Toutes stipulations du Contrat d’Abonnement non modifiées par le présent Avenant demeurent purement applicables. En cas de contradiction entre les stipulations du Contrat d’Abonnement et celles de l’Avenant ayant le même objet, ces dernières prévaudront.\n\n",1,"L");
+				} else {
+					$this->multicell(0,4,"\nLe présent Contrat d'Abonnement prendra effet à compter de la réception par l'Abonné du ou des Produit(s). L'Abonné reconnait être engagé par toutes les stipulations du Contrat d’Abonnement, y compris les Conditions Générales d’Abonnement, dont l’Abonné reconnait les avoir reçues, lues, comprises et acceptées. L'Abonné confirme également que toutes les informations contenues dans le présent Contrat sont correctes.\nL'Abonné déclare et garantit à Leroy Merlin Abonnements, à la date de signature et à tout moment pendant l’exécution du Contrat, qu’il est valablement constitué, qu’il a le pouvoir et la faculté de conclure et exécuter la présente convention.\n\n",1,"L");
+				}
+
+
 				$chapSuivant++;
 				$this->ln(5);
 				$this->setfont('arial','B',8);
 				$this->multicell(0,5,"1.".$chapSuivant.". Utilisation des données personnelles ",1,"L",1);
 				$this->setfont('arial','',8);
-				$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d’Abonnement, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, après avoir été informé qu’elles pourront être transférées en dehors de l’Union Européenne et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans les conditions générales.\n\n",1,"L");
+				if(strpos($this->commande['ref'], "AVT") !== false){
+					$this->multicell(0,4,"\nL'Abonné reconnait en signant le présent Avenant au Contrat d’Abonnement avoir accepté les termes des Conditions Générales d’Abonnement, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans le Contrat d’Abonnement.\n\n",1,"L");
+				} else {
+					$this->multicell(0,4,"\nL'Abonné reconnait en signant les présentes Conditions Particulières avoir accepté les termes des Conditions Générales d’Abonnement, et consentir à l’utilisation et à la communication des données personnelles qu’il aura fournies ou qui auront été collectées, après avoir été informé qu’elles pourront être transférées en dehors de l’Union Européenne et qu’il pourra exercer son droit d’accès et de rectification à l’adresse indiquée dans les conditions générales.\n\n",1,"L");
+				}
+
+
 		}
 
 

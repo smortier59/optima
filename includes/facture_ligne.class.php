@@ -50,8 +50,13 @@ class facture_ligne extends classes_optima {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all["count"]>0){
 			foreach($select_all["data"] as $key=>$item){
-				$select_all["data"][$key]["facture_ligne.marge"]=(($select_all["data"][$key]["facture_ligne.prix"]-$select_all["data"][$key]["facture_ligne.prix_achat"])/$select_all["data"][$key]["facture_ligne.prix"])*100;
-				$select_all["data"][$key]["facture_ligne.marge_absolue"]=($select_all["data"][$key]["facture_ligne.prix"]*$select_all["data"][$key]["facture_ligne.quantite"])-($select_all["data"][$key]["facture_ligne.prix_achat"]*$select_all["data"][$key]["facture_ligne.quantite"]);
+				if($item["prix"] && $item["prix_achat"]){
+					$select_all["data"][$key]["facture_ligne.marge"]=(($select_all["data"][$key]["facture_ligne.prix"]-$select_all["data"][$key]["facture_ligne.prix_achat"])/$select_all["data"][$key]["facture_ligne.prix"])*100;
+					$select_all["data"][$key]["facture_ligne.marge_absolue"]=($select_all["data"][$key]["facture_ligne.prix"]*$select_all["data"][$key]["facture_ligne.quantite"])-($select_all["data"][$key]["facture_ligne.prix_achat"]*$select_all["data"][$key]["facture_ligne.quantite"]);
+				}else{
+					$select_all["data"][$key]["facture_ligne.marge"] = $select_all["data"][$key]["facture_ligne.marge_absolue"] = 0;
+				}
+
 			}
 		}
 		return $select_all;

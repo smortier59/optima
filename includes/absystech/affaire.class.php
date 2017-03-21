@@ -901,8 +901,8 @@ class affaire_absystech extends affaire {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function _ac($get,$post) {
-		$length = 25;
-		$start = 0;
+		//$length = 25;
+		//$start = 0;
 
 		$this->q->reset();
 
@@ -919,7 +919,7 @@ class affaire_absystech extends affaire {
 			$this->q->where("affaire.id_societe",$get["id_societe"]);
 		}
 
-		$this->q->setLimit($length,$start)->setPage($start/$length);
+		//$this->q->setLimit($length,$start)->setPage($start/$length);
 
 		return $this->select_all();
 	}
@@ -928,8 +928,8 @@ class affaire_absystech extends affaire {
 	* @author Cyril Charlier <ccharlier@absystech.fr>
 	*/
 	public function _acSpecial($get,$post) {
-		$length = 25;
-		$start = 0;
+		//$length = 25;
+		//$start = 0;
 
 		$this->q->reset();
 
@@ -944,7 +944,7 @@ class affaire_absystech extends affaire {
 			$this->q->where("affaire.id_societe",$get["id_societe"]);
 		}
 		$this->q->AndWhere('affaire.etat','perdue',false,'<>');
-		$this->q->setLimit($length,$start)->setPage($start/$length);
+		//$this->q->setLimit($length,$start)->setPage($start/$length);
 
 		return $this->select_all();
 	}

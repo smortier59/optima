@@ -622,7 +622,6 @@ class devis_absystech extends devis {
 	 * @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	 */
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-
 		unset($infos["devis"]["financement_mois"] , $infos["devis"]["marge_financement"]);
 		if(ATF::societe()->estFermee($infos["devis"]["id_societe"])){
 			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter un devis car la société est inactive"));
@@ -644,7 +643,7 @@ class devis_absystech extends devis {
 				$termes = ATF::termes()->select_row();
 				$infos["devis"]["id_termes"] = $termes["id_termes"];
 		}
-
+		if(isset($infos["telescope"])) $telescope = true;
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{
@@ -674,6 +673,7 @@ class devis_absystech extends devis {
 			/*Formatage des numériques*/
 			$infos["prix"]=util::stringToNumber($prixFinal);
 			$infos["frais_de_port"]=util::stringToNumber($infos["frais_de_port"]);
+
 
 
 			// Pour regénérer le fichier à chaque fois ?
@@ -707,11 +707,11 @@ class devis_absystech extends devis {
 		$this->check_field($infos);
 
 		if(!$infos_ligne && $infos["type_devis"] != "consommable"){
-			throw new errorATF(ATF::$usr->trans("devis_ligne_inexistant"));
+			throw new errorATF(ATF::$usr->trans("devis_ligne_inexistant"),600);
 		}
 
 		if(!$consommables && $infos["type_devis"] == "consommable"){
-			throw new errorATF(ATF::$usr->trans("devis_ligne_consommable_inexistant"));
+			throw new errorATF(ATF::$usr->trans("devis_ligne_consommable_inexistant"),600);
 		}
 
 		//Limite sur les montants selon les profils
@@ -796,6 +796,7 @@ class devis_absystech extends devis {
 				if(!$item["quantite"]){
 					$item["quantite"]=0;
 				}
+				//$item["visible"] = ($item["visible"] == "on")? 'oui':'non';
 				ATF::devis_ligne()->insert($item,$s);
 			}
 		}
@@ -831,10 +832,17 @@ class devis_absystech extends devis {
 		//*****************************************************************************
 
 		if($preview){
+			if($telescope){
+				return base64_encode(ATF::pdf()->generic("devis",$last_id,true,$s,true));
+			}
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
 			return $this->cryptId($last_id);
 		}else{
+			if($telescope){
+				return base64_encode(ATF::pdf()->generic("devis",$last_id,true,$s,false));
+			}
+
 			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 
 			/* MAIL */
@@ -1433,6 +1441,46 @@ class devis_absystech extends devis {
 
 
 
+	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("devis.id_devis","id_devis")
+				->addField("devis.resume","devis")
+				->addField("devis.ref","ref");
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		if ($get['id_societe']) {
+			$this->q->where("devis.id_societe",$get["id_societe"]);
+		}
+
+		return $this->select_all();
+	}
+
+
+	/**
+	 * Fonction telescope qui permet d'annuler, mettre en perdu ou remplace un devis
+	 * @package Telescope
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  	 * @param $get array contient le tri, page limit et potentiellement un id.
+  	 * @param $post array Argument obligatoire mais inutilisé ici.
+	 * @return id_devis si tout c'est bien passé false sinon
+	 */
+	public function _annulation ($get, $post) {
+		$return = $this->annulation($post);
+		if($return){
+			$return = array("id"=>$post["id"], "etat"=>$post['action']);
+		}
+		return $return;
+	}
+
 	/**
   *
   * Fonctions _GET pour telescope
@@ -1479,14 +1527,27 @@ class devis_absystech extends devis {
 			if($key == "id_user") $data["user"] = ATF::user()->select($value);
 			if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
 			if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
+			if($key == "id_opportunite") $data["id_opportunite_fk"] = ATF::opportunite()->select($value, "opportunite");
+
+			if($key == "id_termes") $data["id_termes_fk"] = ATF::termes()->select($value, "termes");
+			if($key == "id_politesse_post") $data["id_politesse_post_fk"] = ATF::politesse()->select($value, "politesse");
+			if($key == "id_politesse_pref") $data["id_politesse_pref_fk"] = ATF::politesse()->select($value, "politesse");
+			if($key == "id_delai_de_realisation") $data["id_delai_de_realisation_fk"] = ATF::delai_de_realisation()->select($value, "delai_de_realisation");
 
 			$data["fichier_joint"] = $data["documentAnnexes"] = false;
 
 			if (file_exists($this->filepath($get['id_devis'],"fichier_joint"))) $data["fichier_joint"] = true;
 			if (file_exists($this->filepath($get['id_devis'],"documentAnnexes"))) $data["documentAnnexes"] = true;
 
-			unset($data["id_societe"], $data["id_contact"], $data["id_user"], $data["id_user_technique"], $data["id_user_admin"]);
+			$data["id_societe_fk"] = $data["societe"]["societe"];
+			$data["id_contact_fk"] = $data["contact"]["nom"]." ".$data["contact"]["prenom"];
+			$data["id_user_fk"] = $data["user"]["nom"]." ".$data["user"]["prenom"];
+			$data["id_user_technique_fk"] = $data["user_technique"]["nom"]." ".$data["user_technique"]["prenom"];
+			$data["id_user_admin_fk"] = $data["user_admin"]["nom"]." ".$data["user_admin"]["prenom"];
+
 		}
+
+
 
 		$this->q->reset()->where("devis.id_affaire", $data["id_affaire"]);
 		$data["devisAffaire"] = $this->sa();
@@ -1501,9 +1562,16 @@ class devis_absystech extends devis {
 
 
     if($get['id_devis']){
-      // GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
-      $data['ligne'] = ATF::devis_ligne()->select_special('id_devis', $get['id_devis']);
-      $return = $data;
+    	// GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
+    	$data['ligne'] = ATF::devis_ligne()->select_special('id_devis', $get['id_devis']);
+
+		foreach($data["ligne"] as $k => $v){
+			$data["ligne"][$k]["id_fournisseur_fk"] = $data["ligne"][$k]["id_compte_absystech_fk"] = " - ";
+			if($v["id_fournisseur"])$data["ligne"][$k]["id_fournisseur_fk"] = ATF::societe()->select($v["id_fournisseur"], "societe");
+			if($v["id_compte_absystech"])$data["ligne"][$k]["id_compte_absystech_fk"] = ATF::compte_absystech()->select($v["id_compte_absystech"], "compte_absystech");
+		}
+
+    	$return = $data;
     }else{
       header("ts-total-row: ".$data['count']);
       header("ts-max-page: ".ceil($data['count']/$get['limit']));
@@ -1511,6 +1579,74 @@ class devis_absystech extends devis {
       $return = $data['data'];
     }
     return $return;
+  }
+
+  /**
+  *
+  * Fonctions _POST pour telescope
+  * @package Telescope
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param $get inutile ici.
+  * @param $post array Argument obligatoire contient les data à inserer/mettre à jour.
+  * @return array un tableau avec les données
+  */
+  public function _POST($get,$post) {
+
+  	$infos = array();
+
+  	$post["financement_cleodis"] = ($post["financement_cleodis"] == "on")? 'oui':'non';
+  	$infos["values_devis"]["produits"] = json_encode($post["values_devis"]["produits"]);
+  	$infos["values_devis"]["consommables"] = json_encode($post["values_devis"]["consommables"]);
+  	if($post["preview"]){
+  		$infos["preview"] = true;
+  		unset($post["preview"]);
+  	}
+
+  	unset($post["values_devis"]);
+  	$infos["devis"] = $post;
+
+
+  	$return= $this->insert($infos);
+
+  	if (is_numeric($return) || is_string($return)) {
+		$return = $this->decryptId($return);
+	}
+
+  	$res['notices'] = ATF::$msg->getNotices();
+	$res['result'] = $return;
+
+	return $res;
+
+  }
+
+  public function _PUT($get,$post) {
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
+
+  	$infos = array();
+
+  	$post["financement_cleodis"] = ($post["financement_cleodis"] == "on")? 'oui':'non';
+  	$infos["values_devis"]["produits"] = json_encode($post["values_devis"]["produits"]);
+  	$infos["values_devis"]["consommables"] = json_encode($post["values_devis"]["consommables"]);
+  	if($post["preview"]){
+  		$infos["preview"] = true;
+  		$infos["telescope"] = true;
+  		unset($post["preview"]);
+  	}
+
+  	unset($post["values_devis"]);
+  	$infos["devis"] = $post;
+
+
+	$return= $this->update($infos);
+
+	if (is_numeric($return) || is_string($return)) {
+		$return = $this->decryptId($return);
+	}
+
+  	$res['notices'] = ATF::$msg->getNotices();
+	$res['result'] = $return;
+	return $res;
   }
 
 
