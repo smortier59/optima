@@ -1,0 +1,5 @@
+{$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire|default:$item['affaire.id_affaire']}
+{foreach from=ATF::affaire()->getFilles($id_affaire) key=k item=i}
+    <a href="#affaire-select-{$i.id_affaire|cryptId}.html">{$i.ref}</a>
+    {if !$i@last}, {/if}
+{/foreach}
