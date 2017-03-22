@@ -1,5 +1,5 @@
 <?
-/** 
+/**
 * Classe commande
 * @package Optima
 */
@@ -12,7 +12,8 @@ class commande extends classes_optima {
 		$this->table = __CLASS__;
 	}
 
-	/** 
+
+	/**
 	* méthode permettant de faire les graphes des diffrents modules, dans statistique
 	* @author DEV <dev@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -24,7 +25,7 @@ class commande extends classes_optima {
 			if($item_list)$this->q->addCondition("YEAR(`date`)",$key_list);
 		}*/
 		ATF::stats()->conditionYear(ATF::stats()->liste_annees[$this->table],$this->q,"date");
-		
+
 		switch ($type) {
 			case "CA":
 				$this->q->addField("YEAR(`date`)","year")
@@ -33,13 +34,13 @@ class commande extends classes_optima {
 						->addGroup("year")
 						->addGroup("month");
 				$stats['DATA'] = parent::select_all();
-				
+
 				$this->q->reset();
 				$this->q->addField("DISTINCT YEAR(`date`)","years");
 				$stats['YEARS'] =parent::select_all();
-				
+
 				return parent::stats($stats,$type);
-				
+
 			case "marge":
 				$this->q->addField("YEAR(`date`)","year")
 						->addField("MONTH(`date`)","month")
@@ -47,13 +48,13 @@ class commande extends classes_optima {
 						->addGroup("year")
 						->addGroup("month");
 				$stats['DATA'] = parent::select_all();
-				
+
 				$this->q->reset();
 				$this->q->addField("DISTINCT YEAR(`date`)","years");
 				$stats['YEARS'] =parent::select_all();
-				
+
 				return parent::stats($stats,$type);
-				
+
 			case "pourcentage":
 				$this->q->addField("YEAR(`date`)","year")
 						->addField("MONTH(`date`)","month")
@@ -61,13 +62,13 @@ class commande extends classes_optima {
 						->addGroup("year")
 						->addGroup("month");
 				$stats['DATA'] = parent::select_all();
-				
+
 				$this->q->reset();
 				$this->q->addField("DISTINCT YEAR(`date`)","years");
 				$stats['YEARS'] =parent::select_all();
-				
+
 				return parent::stats($stats,$type);
-				
+
 			default:
 				return parent::stats($stats,$type);
 		}
