@@ -948,6 +948,7 @@ class societe_cleodis extends societe {
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
     $return = array(
+      "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],

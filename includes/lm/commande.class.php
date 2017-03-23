@@ -104,6 +104,8 @@ class commande_lm extends commande {
 		$this->addPrivilege("uploadScanDocument","update");
 		$this->addPrivilege("getCommande_ligne");
 		$this->addPrivilege("stopCommande","update");
+		$this->addPrivilege("abandonCommande","update");
+
 		$this->addPrivilege("reactiveCommande","update");
 		$this->addPrivilege("generateCourrierType");
 		$this->addPrivilege("export_loyer_assurance");
@@ -1256,6 +1258,13 @@ class commande_lm extends commande {
 			} else {
 				$return['data'][$k]['factureAllow'] = false;
 			}
+
+			//Check affichage de création de facture
+			if (($i["commande.etat"] == "pending" || $i["commande.etat"] == "non_loyer")) {
+				$return['data'][$k]['abandonAllow'] = true;
+			} else {
+				$return['data'][$k]['abandonAllow'] = false;
+			}
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
 
             // check des fichiers courriers types
@@ -1470,14 +1479,44 @@ class commande_lm extends commande {
 	}
 
 	/**
+    * Passe une commande en abandonnée
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function abandonCommande($infos){
+		$commande = new commande_lm($infos['id_commande']);
+
+		if ($commande) {
+			$commande->set('etat','abandon');
+			$comm = ATF::commande()->select($infos['id_commande']);
+			$affaire = $commande->getAffaire();
+
+			$notifie[] = ATF::$usr->getID();
+
+
+			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
+							,"id_societe"=>$comm['id_societe']
+							,"type_suivi"=>'Contrat'
+							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en abandonnée "
+							,'public'=>'oui'
+							,'suivi_societe'=>ATF::$usr->getID()
+							,'suivi_notifie'=>$notifie
+						);
+			ATF::suivi()->insert($suivi);
+
+			ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
+		}
+	}
+
+	/**
     * Met à jour létat de la comande en 'arreter'
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
     */
 	public function stopCommande($infos){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($infos['id_commande']);
-		else $commande = new commande_lm($infos['id_commande']);
+		$commande = new commande_lm($infos['id_commande']);
 
 		if ($commande) {
 
@@ -1486,10 +1525,9 @@ class commande_lm extends commande {
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
-			$notifie = array(21, 35 , 94);
-			if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94){
-				$notifie[] = ATF::$usr->getID();
-			}
+
+			$notifie[] = ATF::$usr->getID();
+
 
 
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
@@ -1508,8 +1546,7 @@ class commande_lm extends commande {
 			if ($ap = $affaire->getParentAR()) {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
-					if(ATF::$codename == "lmbe") $affaires_parentes[] = new affaire_lmbe($a["id_affaire"]);
-					else $affaires_parentes[] = new affaire_lm($a["id_affaire"]);
+					$affaires_parentes[] = new affaire_lm($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
 				$affaire_parente = $affaire->getParentAvenant();

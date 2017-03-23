@@ -19,8 +19,8 @@ class affaire_lm extends affaire {
 			,'affaire.type_affaire'=>array('EnumTranslate'=>true)
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
-			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
-			,'commande.etat'=>array("width"=>30,"renderer"=>"etat")
+			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>80)
+			,'commande.etat'=>array("width"=>30,"renderer"=>"etat","width"=>80)
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,"ref_commande_lm"=>array("rowEditor"=>"setInfos")
 		);
