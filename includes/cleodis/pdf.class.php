@@ -8704,6 +8704,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 		$this->addpage();
 
+		$this->setY(80);
 		$this->setfont('arial','',8);
 		$this->ln(8);
 		$this->setLeftMargin(110);
