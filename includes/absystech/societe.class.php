@@ -350,6 +350,11 @@ class societe_absystech extends societe {
 		return __HOTLINE_URL__."login.php?login=".base64_encode($reference)."&password=".base64_encode($password_hotline)."&contact=".base64_encode("choix_contact")."&url=".base64_encode(__HOTLINE_URL__."choix_contact.php")."&schema=".base64_encode(ATF::$codename);
 	}
 
+	public function _redirect_hotline($get, $post){
+		return $this->redirect_hotline($post["ref"],$post["divers_5"]);
+
+	}
+
 	/**
 	* Envoi les identifiants hotline par mail via le contact concerné
 	* @author Jérémie Gwiazdowski
