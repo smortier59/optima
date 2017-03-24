@@ -1553,4 +1553,29 @@ class societe extends classes_optima {
 		return $this->select_all();
 	}
 
+	/** Fonction qui génère les résultat pour les champs d'auto complétion société
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function _acFournisseur($get,$post) {
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("id_societe")->addField("societe")->addField("ref")->addField("nom_commercial");
+
+
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+
+		// Clause globale
+		$this->q->where("etat","actif")
+				->where("fournisseur","oui")
+				->addOrder("societe","asc");
+
+
+		return $this->select_all();
+	}
+
 }

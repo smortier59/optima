@@ -405,7 +405,7 @@ class pdf_absystech extends pdf {
 
 				break;
 				default:
-					if(($sum_anc_facture["prix"] - $infos_facture["prix"]>0)){
+					if(($sum_anc_facture["prix"] - $infos_facture["prix"]>0) && $infos_facture["prix"]>0){
 						$this->cell(131,4,"",0,0,'C');
 						$this->cell(25,4,"Déjà Payé HT",1,0,'R');
 						$this->cell(25,4,number_format($sum_anc_facture["prix"],2,',',' ')." €",1,1,'R');

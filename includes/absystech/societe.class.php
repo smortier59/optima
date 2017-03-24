@@ -1145,6 +1145,7 @@ class societe_absystech extends societe {
 	}
 
 
+
 	/**
 	* Retourne les sociétés aléatoirement, sans les particuliers
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
