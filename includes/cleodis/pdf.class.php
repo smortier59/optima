@@ -5716,7 +5716,7 @@ class pdf_cleodis extends pdf {
 
 		$this->open();
 		$this->addpage();
-		if (ATF::$codename == "cleodisbe") $this->sety(50);
+		if (ATF::$codename == "cleodisbe") $this->sety(70);
 		else $this->sety(80);
 
 		$this->setFont("arial","BIU",12);
@@ -6177,9 +6177,10 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 		$point = ".....................................................................................................";
 
-		$this->setfont('arial',"",8);
+		$this->setfont('arial',"B",10);
 		$this->Ln(5);
 		$this->multicell(0,5, "1- Données débiteur" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(2);
 		$this->cell(60,5, "NOM PRENOM / RAISON SOCIALE*");
 		$this->setFontDecoration('B');
@@ -6194,21 +6195,25 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->multicell(0,5, "PAYS*       ".strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0, "L");
 		$this->multicell(0,5, "E-mail       ".$this->client["email"] ,0, "L");
 		if(ATF::$codename == "cleodisbe"){
-			$this->multicell(0,5, "N° d'entreprise  ".$point ,0, "L");
+			$this->multicell(0,5, "N° d'entreprise  ".$this->client["num_ident"] ,0, "L");
 		}else{
 			$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
 		}
 
 
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(2);
 		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
 		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
 
 
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "3 - Information Créancier" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(5);
 
 		$this->setfont('arial',"BI",10);
@@ -6223,9 +6228,11 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 			".$point."
 			".$point);
 
-		$this->setfont('arial',"",8);
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "4 - Information type de paiement" ,1, "C");
+
+		$this->setfont('arial',"",8);
 		$this->Ln(5);
 		$y = $this->getY();
 		$this->Cell(50,5, "Type de paiement" ,0);
@@ -6238,8 +6245,9 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->image(__PDF_PATH__.'cleodis/case.jpg',155,$y,5);
 
 		$this->Ln(10);
-
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "5 - Signature(s)" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(2);
 		$this->multicell(80,5, "Signé à" ,0, "L");
 		$this->multicell(80,5, "Date *" ,0, "L");
@@ -7577,13 +7585,31 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if ($this->getHeader()) return false;
 		$this->setfont('arial','B',10);
 
-		if ($this->A3) {
-			$this->image(__PDF_PATH__.$this->logo,220,10,55);
-			$this->setLeftMargin(275);
-		} else {
-			$this->image(__PDF_PATH__.$this->logo,15,10,55);
-			$this->setLeftMargin(70);
+		if(!$this->facturePDF){
+			if ($this->A3) {
+				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->setLeftMargin(275);
+			} else {
+				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->setLeftMargin(70);
 
+			}
+		}
+
+		$adresse = $adresse2 = $adresse3 = $cp = $ville = NULL;
+
+		if($this->client['facturation_adresse']){
+			$adresse = $this->client['facturation_adresse'];
+			$adresse2 = $this->client['facturation_adresse_2'];
+			$adresse3 = $this->client['facturation_adresse_3'];
+			$cp = $this->client['facturation_cp'];
+			$ville = $this->client['facturation_ville'];
+		}else{
+			$adresse = $this->client['adresse'];
+			$adresse2 = $this->client['adresse_2'];
+			$adresse3 = $this->client['adresse_3'];
+			$cp = $this->client['cp'];
+			$ville = $this->client['ville'];
 		}
 
 		if(!$this->facturePDF){
@@ -7598,7 +7624,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			if ($this->societe['id_pays'] =='FR') {
 				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
 			} else {
-				$this->multicell(65,3,"Numéro de TVA  ".$this->societe['siret'],0,"C");
+				$this->multicell(65,3,"N° TVA  ".$this->societe['siret'],0,"C");
 			}
 
 			if ($this->A3) {
@@ -7614,11 +7640,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->setfont('arial','B',7);
 			$this->multicell(0,3,$this->client['societe'],"L","C");
 			$this->setfont('arial','',7);
-			$this->multicell(0,3,$this->client['adresse'],"L","C");
-			$this->multicell(0,3,$this->client['cp']." ".$this->client['ville'],"L","C");
+			$this->multicell(0,3,$adresse,"L","C");
+			$this->multicell(0,3,$cp." ".$ville,"L","C");
 
 			$this->multicell(0,3,"Tel : ".$this->client['tel'],"L","C");
-			$this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva'],"L","C");
+			$this->multicell(0,3,"N° TVA : ".$this->client['reference_tva'],"L","C");
 
 			$this->setTopMargin(40);
 
@@ -7626,24 +7652,34 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$cadre = array(
                     array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
                     ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
-                    ,array("txt"=>$this->client["adresse"],"size"=>10)
+                    ,array("txt"=>$adresse,"size"=>10)
                 );
-                if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
-                if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
-                $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
-                $this->cadre(110,35,85,35,$cadre);
+                if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
+                if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
+                $cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
+                $this->cadre(110,45,85,40,$cadre);
 			}
 			$this->setLeftMargin(15);
 		}else{
+
+			if ($this->A3) {
+				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->setLeftMargin(275);
+			} else {
+				$this->image(__PDF_PATH__.$this->logo,20,30,55);
+				$this->setLeftMargin(60);
+
+			}
+
 			$this->setfont('arial','',12);
 			$cadre = array(
 	            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
-	            ,array("txt"=>$this->client["adresse"],"size"=>10)
+	            ,array("txt"=>$adresse,"size"=>10)
 	        );
-	        if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
-	        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
-	        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
-	        $this->cadre(110,20,85,35,$cadre);
+	        if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
+	        if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
+	        $cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
+	        $this->cadre(100,45,95,40,$cadre);
 
 	        $this->setfont('arial','',12);
 
@@ -7794,9 +7830,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->unsetHeader();
 		$this->AddPage();
 
+
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf");
 		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
+		$r = $this->useTemplate($tplIdx, -8, -8, 226, 0, true);
 	}
 
 
@@ -8878,8 +8915,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->societe = ATF::societe()->select(4225);
 
-
-
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
@@ -8890,12 +8925,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->addpage();
 
+		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
 		$this->ln(15);
 
 		$this->setfont('arial',"B",8);
-		$this->setLeftMargin(50);
+		$this->setLeftMargin(70);
 		$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
 		$this->setLeftMargin(10);
 		$this->ln(10);
@@ -8917,7 +8954,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->setfont('arial',"",8);
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "1- Données débiteur" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(2);
 		$this->cell(60,5, "NOM PRENOM / RAISON SOCIALE*");
 		$this->setFontDecoration('B');
@@ -8941,19 +8980,23 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->unsetFontDecoration('B');
 		$this->cell(60,5, "N° d'entreprise");
 		$this->setFontDecoration('B');
-		$this->cell(0,5,$point ,0, 1);
+		$this->cell(0,5,$this->client["num_ident"] ,0, 1);
 		$this->unsetFontDecoration('B');
 
 
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "2 - Informations coordonnées bancaires" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(2);
-		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*       ".$point ,0, "L");
+		$this->multicell(0,5, "COORDONNEES DE VOTRE COMPTE- IBAN*                                                              ".$point ,0, "L");
 		$this->multicell(0,5, "BIC - SWIFT - CODE INTERNATIONAL D'IDENTIFICATIONS DE VOTRE BANQUE*  ".$point ,0, "L");
 
 
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "3 - Information Créancier" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(5);
 
 		$this->setfont('arial',"BI",10);
@@ -8970,7 +9013,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->setfont('arial',"",8);
 		$this->Ln(5);
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "4 - Information type de paiement" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(5);
 		$y = $this->getY();
 		$this->Cell(50,5, "Type de paiement" ,0);
@@ -8984,7 +9029,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->Ln(10);
 
+		$this->setfont('arial',"B",10);
 		$this->multicell(0,5, "5 - Signature(s)" ,1, "C");
+		$this->setfont('arial',"",8);
 		$this->Ln(2);
 		$this->multicell(80,5, "Signé à" ,0, "L");
 		$this->multicell(80,5, "Date *" ,0, "L");

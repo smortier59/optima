@@ -25,47 +25,51 @@ class produit_lm extends produit {
 		);
 
 		$this->colonnes['primary']=array('produit',
-										'url_produit',
-										'etat'=>array("targetCols"=>1),
-										'nature'=>array("targetCols"=>1),
-										"quantite"=>array("custom"=>true,
-														  "targetCols"=>1,
-														  'null'=>true,
-														  'xtype'=>'compositefield',
-														  'fields'=>array(
-																"min"
-																,"max"
-																,"defaut"
-															)),
-										'id_pack_produit'=>array("targetCols"=>1),
-										'id_produit_principal',
-										'ref_lm'=>array("targetCols"=>1),
-										'libelle_a_revoyer_lm'=>array("targetCols"=>1),
-										"description",
-										"ordre"=>array("targetCols"=>1),
-										"afficher"=>array("targetCols"=>1),
-										'id_fabriquant'
-										);
+										 'ref_lm',
+										 'libelle_a_revoyer_lm',
+										 'url_produit',
+										 'id_pack_produit',
+										 'etat',
+										 'nature',
+										 'id_fabriquant',
+										 'id_compte_produit');
 
-		/*$this->colonnes['panel']['caracteristiques']=array('prix_achat_ht',
-															'tva_prix_achat',
-												   			'tva_loyer',
-															'id_fabriquant',
-															'id_fournisseur',
-															"mode_paiement"
-															);*/
+		$this->colonnes["panel"]["sous_produit"] = array('id_produit_principal',
+														 'qte_lie_principal',
+														 'sous_produit_unique');
+
+		$this->colonnes["panel"]["affichage_site_souscription"] = array("afficher",
+																		"description",
+																		"ordre",
+																		"quantite"=>array("custom"=>true,
+																		  "targetCols"=>1,
+																		  'null'=>true,
+																		  'xtype'=>'compositefield',
+																		  'fields'=>array(
+																				"min"
+																				,"max"
+																				,"defaut"
+																			)),
+																		'pas'
+																		);
+		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
+
 		$this->colonnes["panel"]["fournisseur_lignes"] = array(
 			"loyer_fournisseur"=>array("custom"=>true),
 			"produit_fournisseur"=>array("custom"=>true),
+			'tva_prix_achat',
 			'controle_fournisseur',
-			'declencheur_mep',
-			'tva_prix_achat'
+			'declencheur_mep'
+
 		);
 
 
 		$this->colonnes["panel"]["loyer_lignes"] = array(
 			"loyer"=>array("custom"=>true),
-			'tva_loyer'
+			'tva_loyer',
+			'visible_pdf',
+			'element_declencheur',
+			'mode_paiement'
 		);
 
 		$this->autocomplete = array(
@@ -78,8 +82,11 @@ class produit_lm extends produit {
 		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
+		$this->panels['sous_produit'] = array('nbCols'=>1);
+		$this->panels['affichage_site_souscription'] = array('nbCols'=>1);
+		$this->panels['fournisseur_lignes'] = array('nbCols'=>1);
+		$this->panels['loyer_lignes'] = array('nbCols'=>1);
 
-		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->fieldstructure();
 
@@ -199,6 +206,7 @@ class produit_lm extends produit {
 			$id_pf = ATF::produit_fournisseur()->i(array( "id_produit"=> $this->decryptId($last_id),
 													      "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
 													      "prix_prestation"=> $value["produit_fournisseur__dot__prix_prestation"],
+													      "prix_ttc"=> $value["produit_fournisseur__dot__prix_ttc"],
 													      "recurrence"=> $value["produit_fournisseur__dot__recurrence"],
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));
@@ -263,6 +271,7 @@ class produit_lm extends produit {
 			$id_pf = ATF::produit_fournisseur()->i(array( "id_produit"=> $this->decryptId($infos["produit"]["id_produit"]),
 													      "id_fournisseur"=> $value["produit_fournisseur__dot__id_fournisseur_fk"],
 													      "prix_prestation"=> $value["produit_fournisseur__dot__prix_prestation"],
+													      "prix_ttc"=> $value["produit_fournisseur__dot__prix_ttc"],
 													      "recurrence"=> $value["produit_fournisseur__dot__recurrence"],
 													      "departement"=> $value["produit_fournisseur__dot__departement"]
 												   ));

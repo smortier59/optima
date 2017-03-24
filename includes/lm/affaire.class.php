@@ -19,8 +19,8 @@ class affaire_lm extends affaire {
 			,'affaire.type_affaire'=>array('EnumTranslate'=>true)
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
-			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
-			,'commande.etat'=>array("width"=>30,"renderer"=>"etat")
+			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>80)
+			,'commande.etat'=>array("width"=>30,"renderer"=>"etat","width"=>80)
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,"ref_commande_lm"=>array("rowEditor"=>"setInfos")
 		);
@@ -160,6 +160,7 @@ class affaire_lm extends affaire {
 	* @return array
     */
 	public function formateInsertUpdate($infos){
+
 		$affaire["id_societe"]=$infos["id_societe"];
 		$affaire["nature"]=$infos["nature"];
 		$affaire["affaire"]=$infos["devis"];
@@ -171,10 +172,15 @@ class affaire_lm extends affaire {
 		$affaire["date"]=$infos["date"];
 		$affaire["ref"]=$infos["ref"];
 		$affaire["adresse_livraison"]=$infos["adresse_livraison"];
+		$affaire["adresse_livraison_2"]=$infos["adresse_livraison_2"];
+		$affaire["adresse_livraison_3"]=$infos["adresse_livraison_3"];
+
 		$affaire["ville_adresse_livraison"]=$infos["ville_adresse_livraison"];
 		$affaire["cp_adresse_livraison"]=$infos["cp_adresse_livraison"];
 		$affaire["pays_livraison"]=$infos["pays_livraison"];
 		$affaire["adresse_facturation"]=$infos["adresse_facturation"];
+		$affaire["adresse_facturation_2"]=$infos["adresse_facturation_2"];
+		$affaire["adresse_facturation_3"]=$infos["adresse_facturation_3"];
 		$affaire["ville_adresse_facturation"]=$infos["ville_adresse_facturation"];
 		$affaire["cp_adresse_facturation"]=$infos["cp_adresse_facturation"];
 		$affaire["pays_facturation"]=$infos["pays_facturation"];
@@ -224,7 +230,7 @@ class affaire_lm extends affaire {
     */
 	function getRefAvenant($id_parent){
 		//Récup du dernier avenant de cette affaire
-		$ref=substr($this->select($id_parent,"ref"),0,7);
+		$ref=substr($this->select($id_parent,"ref"),0,8);
 		$this->q->reset()
 		   ->addField('MAX(`ref`)','max')
 		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")

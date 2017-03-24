@@ -3,7 +3,7 @@
 * @package Optima
 * @subpackage Cleodis
 */
-
+require_once dirname(__FILE__).("/../../libs/ATF/includes/constante.class.php");
 class constante_lm extends constante {
 
 	function __construct($table_or_id=NULL) {
@@ -16,9 +16,13 @@ class constante_lm extends constante {
 	public function getSequence($constante){
 
 		$this->q->reset()->where("constante",$constante);
-		$const = $this->select_row();
+		$constData = $this->select_row();
 
-		$const = intval($const) + 1;
+		$const = intval($constData["valeur"]) + 1;
+
+		$this->u(array("id_constante"=>$constData["id_constante"], "valeur"=>$const));
+
+
 
 		if($const < 10){
 			$const = "0000".$const;

@@ -43,6 +43,9 @@ class societe_lm extends societe {
 			,"id_lm"
 			,"id_carte_maison"
 			,"id_magasin"
+			,"offre_lmA"
+			,"offre_lm"
+			,"mdp"
 		);
 
 
@@ -65,6 +68,10 @@ class societe_lm extends societe {
 			,"id_assistante"
 			,"date_creation"
 			,"relation"
+			,"client_id"
+			,"client_secret"
+			,"email_notification"
+
 		);
 
 		$this->panels['soc'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);

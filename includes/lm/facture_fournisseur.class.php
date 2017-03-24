@@ -866,7 +866,7 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][9] =  date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
         	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
         	$donnees[$key][1][11] = date("Ymd");
-        	$donnees[$key][1][12] = number_format(($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]),2,".",""); //Montant TTC separateur numeric .
+        	$donnees[$key][1][12] = number_format(($value["facture_fournisseur.prix"]),2,".",""); //Montant TTC separateur numeric .
         	$donnees[$key][1][13] = "EUR";
     		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
     		$donnees[$key][1][15] = "";
@@ -883,23 +883,36 @@ class facture_fournisseur extends classes_optima {
 			$donnees[$key][1][26] = "";
 			$donnees[$key][1][27] = $ref_cmd_lm;  //N° Commande site LM
 			$donnees[$key][1][28] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire"); //Numéro du contrat / affaire
-			$donnees[$key][1][29] = "";
+			$donnees[$key][1][29] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire");
 			$donnees[$key][1][30] = "";
 			$donnees[$key][1][31] = "";
 
-			$total_debit += number_format(($value["facture_fournisseur.prix"]*$value["facture_fournisseur.tva"]),2,".","");
+			$total_debit += number_format(($value["facture_fournisseur.prix"]),2,".","");
 
 			ATF::facture_fournisseur_ligne()->q->reset()->where("id_facture_fournisseur",$value["facture_fournisseur.id_facture_fournisseur_fk"]);
 			$lignes_ff = ATF::facture_fournisseur_ligne()->select_all();
 
+			$recap_produit = array();
+
+			foreach ($lignes_ff as $k => $v) {
+				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
+				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+			}
+
 			$i = 2;
-			foreach ($lignes_ff as $kl => $vl) {
+			foreach ($recap_produit as $kl => $vl) {
+
+
 				if($vl["prix"] > 0){
+					$TTC_ligne = $vl["prix_ttc"];
+					$HT_ligne = round($vl["prix"] ,2);
+					$total_credit = $TTC_ligne;
+
 					//HT
 	        		$donnees[$key][$i][1] = "2";
 		        	$donnees[$key][$i][2] = "1"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = $rayon;
-		        	$donnees[$key][$i][4] = $vl["prix"]; // Montant
+		        	$donnees[$key][$i][4] =  $HT_ligne; // Montant
 		        	if($value["facture_fournisseur.type"] == "achat"){
 		        		$donnees[$key][$i][5] = "D20 Immo"; //Code TVA
 		       	 	}else{
@@ -911,7 +924,7 @@ class facture_fournisseur extends classes_optima {
 		        	$donnees[$key][$i][9] = ""; //Type de facture
 		        	$donnees[$key][$i][10] = "";
 
-					$total_credit += $vl["prix"];
+					//$total_credit += $vl["prix"];
 
 					$i++;
 
@@ -919,7 +932,7 @@ class facture_fournisseur extends classes_optima {
 	        		$donnees[$key][$i][1] = "2";
 		        	$donnees[$key][$i][2] = "0"; //TVA =0 / HT=1
 		        	$donnees[$key][$i][3] = "0";
-		        	$donnees[$key][$i][4] = number_format(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2,".",""); // Montant
+		        	$donnees[$key][$i][4] = number_format(($TTC_ligne - $HT_ligne) ,2,".",""); // Montant
 		        	if($value["facture_fournisseur.type"] == "achat"){
 		        		$donnees[$key][$i][5] = "D20 Immo"; //Code TVA
 		       	 	}else{
@@ -931,14 +944,14 @@ class facture_fournisseur extends classes_optima {
 		        	$donnees[$key][$i][9] = ""; //Type de facture
 		        	$donnees[$key][$i][10] = "";
 
-					$total_credit += round(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2);
+					//$total_credit += round(($vl["prix"]*$value["facture_fournisseur.tva"])-$vl["prix"] ,2);
 
 					$i++;
 				}
 			}
         }
 
-       	$sequence = ATF::constante()->getSequence("__SEQUENCE_BAP__");
+       	$sequence = ATF::constante()->getSequence("__SEQUENCE_AP__");
 
         $filename = 'CLEODIS_AP'.$sequence.'.fic';
 
@@ -978,7 +991,7 @@ class facture_fournisseur extends classes_optima {
 
         $string .=  "98;".count($donnees).";CLEODIS\n";
         $lignes ++;
-        $string .= "99;".$total_debit.";EUR\n";
+        $string .= "99;".number_format($total_debit,2).";EUR\n";
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
@@ -1021,6 +1034,7 @@ class facture_fournisseur extends classes_optima {
 	        		$engagement += $vv["duree"];
 	        	}
 	        	$montant = number_format($value["facture_fournisseur.prix"]/$engagement ,2 ,".","");
+	        	$total += $montant;
 
 	        	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
         		$devis = ATF::devis()->select_row();
@@ -1058,7 +1072,7 @@ class facture_fournisseur extends classes_optima {
 				$donnees[$key][1][20] = $montant; //Montant debit
 				$donnees[$key][1][21] = "0"; //Montant credit
 	        	$donnees[$key][1][22] = "0";
-				$donnees[$key][1][23] = "Dotation aux amortissements au ".date("d/m/Y")." ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
+				$donnees[$key][1][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
 				$donnees[$key][1][24] = $date_comptable; //date comptable
 				$donnees[$key][1][25] = "";
 				$donnees[$key][1][26] = "";
@@ -1087,7 +1101,7 @@ class facture_fournisseur extends classes_optima {
 	        	$donnees[$key][2][12] = "00000";
 	        	$donnees[$key][2][13] = "1";
 	    		$donnees[$key][2][14] = "281560";
-	    		$donnees[$key][2][15] = "0";
+	    		$donnees[$key][2][15] = "000000000";
 	        	$donnees[$key][2][16] = "0";
 	        	$donnees[$key][2][17] = "0";
 	        	$donnees[$key][2][18] = "0";
@@ -1095,7 +1109,7 @@ class facture_fournisseur extends classes_optima {
 				$donnees[$key][2][20] = "0"; //Montant debit
 				$donnees[$key][2][21] = $montant; //Montant credit
 	        	$donnees[$key][2][22] = "0";
-				$donnees[$key][2][23] = "Dotation aux amortissements au ".date("d/m/Y")." ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
+				$donnees[$key][2][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
 				$donnees[$key][2][24] = $date_comptable; //date comptable
 				$donnees[$key][2][25] = "";
 				$donnees[$key][2][26] = "";
@@ -1151,7 +1165,7 @@ class facture_fournisseur extends classes_optima {
 
         //$string .=  "98;".count($donnees).";CLEODIS\n";
         //$lignes ++;
-        $string .= "99;".$total_debit.";".$total_credit.";EUR\n";
+        $string .= "99;".number_format($total ,2 ,".","").";".number_format($total ,2 ,".","").";EUR\n";
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 

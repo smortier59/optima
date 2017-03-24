@@ -104,6 +104,8 @@ class commande_lm extends commande {
 		$this->addPrivilege("uploadScanDocument","update");
 		$this->addPrivilege("getCommande_ligne");
 		$this->addPrivilege("stopCommande","update");
+		$this->addPrivilege("abandonCommande","update");
+
 		$this->addPrivilege("reactiveCommande","update");
 		$this->addPrivilege("generateCourrierType");
 		$this->addPrivilege("export_loyer_assurance");
@@ -1256,6 +1258,13 @@ class commande_lm extends commande {
 			} else {
 				$return['data'][$k]['factureAllow'] = false;
 			}
+
+			//Check affichage de création de facture
+			if (($i["commande.etat"] == "pending" || $i["commande.etat"] == "non_loyer")) {
+				$return['data'][$k]['abandonAllow'] = true;
+			} else {
+				$return['data'][$k]['abandonAllow'] = false;
+			}
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
 
             // check des fichiers courriers types
@@ -1310,16 +1319,16 @@ class commande_lm extends commande {
 		if ($id_commande && $id_fournisseur) {
 			$this->q->reset()->addCondition("id_commande",$id_commande);
 			if($commandes=$this->sa()){
-			foreach($commandes as $key=>$item){
+				foreach($commandes as $key=>$item){
 					//Ligne de la commande pour le fournisseur il ne faut pas que ces lignes soient présentes dans un autre bon de commande
 					ATF::commande_ligne()->q->reset()->addOrder("commande_ligne.id_commande_ligne","asc")
-													 ->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
+													 //->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
 													 ->where("id_commande",$item["id_commande"])
 													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
 													 ->where("id_fournisseur",$id_fournisseur);
 					$commande_ligne=ATF::commande_ligne()->sa();
 					if($commande_ligne){
-						$id_commande=$this->cryptId($item["id_commande_fk"]);
+						$id_commande=$this->cryptId($item["id_commande"]);
 						unset($ligne_commande);
 						foreach($commande_ligne as $k=>$i){
 
@@ -1335,6 +1344,7 @@ class commande_lm extends commande {
 									$i["quantite"] = $vl["nb_loyer"];
 								}
 							}
+
 							if($i["quantite"] > 1){
 								$n = 1;
 								for($n=1; $n<=$i["quantite"];$n++){
@@ -1342,7 +1352,8 @@ class commande_lm extends commande {
 												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
 												,"id"=>$i["id_commande_ligne"]
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]
+												,"prix_ht"=>$i["prix_achat"]
 												,"quantite"=>1
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
@@ -1353,7 +1364,7 @@ class commande_lm extends commande {
 												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
 												,"id"=>$i["id_commande_ligne"]
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]
 												,"quantite"=>$i["quantite"]
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
@@ -1366,7 +1377,7 @@ class commande_lm extends commande {
 						if ($ligne_commande) {
 							$commande[]=array(
 								"text"=>$item["ref"]." ".$item["commande"]
-								,"id"=>$item["id_commande_fk"]
+								,"id"=>$item["id_commande"]
 								,"leaf"=>false
 								,"href"=>"javascript:window.open('commande-select-".$id_commande.".html');"
 								,"cls"=>"folder"
@@ -1468,14 +1479,44 @@ class commande_lm extends commande {
 	}
 
 	/**
+    * Passe une commande en abandonnée
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function abandonCommande($infos){
+		$commande = new commande_lm($infos['id_commande']);
+
+		if ($commande) {
+			$commande->set('etat','abandon');
+			$comm = ATF::commande()->select($infos['id_commande']);
+			$affaire = $commande->getAffaire();
+
+			$notifie[] = ATF::$usr->getID();
+
+
+			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
+							,"id_societe"=>$comm['id_societe']
+							,"type_suivi"=>'Contrat'
+							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en abandonnée "
+							,'public'=>'oui'
+							,'suivi_societe'=>ATF::$usr->getID()
+							,'suivi_notifie'=>$notifie
+						);
+			ATF::suivi()->insert($suivi);
+
+			ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
+		}
+	}
+
+	/**
     * Met à jour létat de la comande en 'arreter'
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
     */
 	public function stopCommande($infos){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($infos['id_commande']);
-		else $commande = new commande_lm($infos['id_commande']);
+		$commande = new commande_lm($infos['id_commande']);
 
 		if ($commande) {
 
@@ -1484,10 +1525,9 @@ class commande_lm extends commande {
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
-			$notifie = array(21, 35 , 94);
-			if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94){
-				$notifie[] = ATF::$usr->getID();
-			}
+
+			$notifie[] = ATF::$usr->getID();
+
 
 
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
@@ -1506,8 +1546,7 @@ class commande_lm extends commande {
 			if ($ap = $affaire->getParentAR()) {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
-					if(ATF::$codename == "lmbe") $affaires_parentes[] = new affaire_lmbe($a["id_affaire"]);
-					else $affaires_parentes[] = new affaire_lm($a["id_affaire"]);
+					$affaires_parentes[] = new affaire_lm($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
 				$affaire_parente = $affaire->getParentAvenant();

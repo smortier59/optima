@@ -1,0 +1,13 @@
+{$id_affaire=ATF::_r('id_affaire')|default:$item.affaire.id_affaire|default:$requests.affaire.id_affaire|default:$item['affaire.id_affaire']}
+{$nature=ATF::affaire()->select($id_affaire,nature)}
+{if $nature==AR}
+    {foreach from=ATF::affaire()->getParentAR($id_affaire) key=k item=i}
+        <a href="#affaire-select-{$i.id_affaire|cryptId}.html">{$i.ref}</a>
+        {if !$i@last}, {/if}
+    {/foreach}
+{elseif $nature==avenant || $nature==vente}
+    {$affaire=ATF::affaire()->getParentAvenant($id_affaire)}
+	{if $affaire}
+        <a href="#affaire-select-{$affaire->get('id_affaire')|cryptId}.html">{$affaire->get('ref')}</a>
+	{/if}
+{/if}
