@@ -1498,10 +1498,7 @@ class commande_lm extends commande {
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
 							,"type_suivi"=>'Contrat'
-							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en abandonnée "
-							,'public'=>'oui'
-							,'suivi_societe'=>ATF::$usr->getID()
-							,'suivi_notifie'=>$notifie
+							,"texte"=>"Le contrat ".$affaire->get("ref")." est passé en abandonné"
 						);
 			ATF::suivi()->insert($suivi);
 
