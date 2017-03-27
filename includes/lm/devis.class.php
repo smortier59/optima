@@ -1584,6 +1584,10 @@ class devis_lm extends devis {
 			$loyer[$value['id_produit']]["id_produit"] = $value['id_produit'];
 			$loyer[$value['id_produit']]["loyer"] = ATF::produit_loyer()->select_all();
 
+			foreach ($loyer[$value['id_produit']]["loyer"] as $kl => $vl) {
+				$loyer[$value['id_produit']]["loyer"][$kl]['loyer'] = $vl["loyer"] * __TVA__;
+			}
+
 			if($this->estpresent($contratLigne , $value['id_produit'])){
 				unset($packLigne[$key]);
 			}
