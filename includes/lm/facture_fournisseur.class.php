@@ -12,6 +12,7 @@ class facture_fournisseur extends classes_optima {
 			"facture_fournisseur.ref"
 			,"facture_fournisseur.id_fournisseur"
 			,"facture_fournisseur.prix"=>array("aggregate"=>array("min","avg","max","sum"),"renderer"=>"money")
+			,"facture_fournisseur.prix_ht"=>array("aggregate"=>array("min","avg","max","sum"),"renderer"=>"money")
 			,"facture_fournisseur.id_affaire"
 			,"facture_fournisseur.id_bon_de_commande"
 			,"facture_fournisseur.etat"=>array("renderer"=>"etat","width"=>30)
@@ -37,8 +38,9 @@ class facture_fournisseur extends classes_optima {
 		);
 
 		$this->colonnes['panel']['statut'] = array(
-			"prix"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			"prix_ht"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"etat"
+			,"prix"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"tva"=>array("readonly"=>true)
 		);
 
@@ -51,7 +53,7 @@ class facture_fournisseur extends classes_optima {
 		// Propriété des panels
 		$this->panels['lignes'] = array('nbCols'=>1,'visible'=>true);
 		$this->panels['dates'] = array('nbCols'=>2,'visible'=>true);
-		$this->panels['statut'] = array('nbCols'=>3,'visible'=>true);
+		$this->panels['statut'] = array('nbCols'=>2,'visible'=>true);
 
 		// Champs masqués
 		$this->colonnes['bloquees']['insert'] =
@@ -172,6 +174,7 @@ class facture_fournisseur extends classes_optima {
 				'ref'=>$infos['ref']."-FNP"
 				,'id_facture_fournisseur'=>$last_id
 				,'prix'=>-(str_replace(" ","",$infos['prix'])) // Valeur négative
+				,'prix_ht'=>-(str_replace(" ","",$infos['prix_ht']))
 				,'id_affaire'=>$infos["id_affaire"]
 				,'tva'=>$infos["tva"]
 				,'date'=>$infos["date"]
@@ -179,11 +182,13 @@ class facture_fournisseur extends classes_optima {
 			);
 
 			if($fnps){
-				$prix = 0;
+				$prix = $prix_ht = 0;
 				foreach ($fnps as $key => $value) {
 					$prix += $value["prix"];
+					$prix_ht += $value["prix_ht"];
 				}
 				$prix = $prix - str_replace(" ","",$infos['prix']);
+				$prix_ht = $prix_ht - str_replace(" ","",$infos['prix_ht']);
 
 				if($prix == 0){
 					foreach ($fnps as $key => $value) {
