@@ -1467,12 +1467,16 @@ class commande_lm extends commande {
 
 			$etat=$commande->get("etat");
 
-			$this->checkEtat($commande,false,$affaireFillesAR);
-			$etat_modifie=$commande->get("etat");
-			if($etat!=$etat_modifie){
-				log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');
+			if($etat !== "abandon" || $etat !== "pending"){
+				$this->checkEtat($commande,false,$affaireFillesAR);
+				$etat_modifie=$commande->get("etat");
+				if($etat!=$etat_modifie){
+					log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');
+				}
+				ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			}
-			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
+
+
 			$i++;
 		}
 		ATF::db($this->db)->commit_transaction();
