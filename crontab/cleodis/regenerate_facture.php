@@ -22,7 +22,7 @@ $dataPath = __DATA_PATH__."cleodisbe/";
 
 	foreach ($factures as $key => $value) {
 		$facture = array();
-		$values_facture["produits"] = array();	
+		$values_facture["produits"] = array();
 
 		$facture = ATF::facture()->select($value["facture.id_facture"]);
 
@@ -42,15 +42,15 @@ $dataPath = __DATA_PATH__."cleodisbe/";
 				$facture["date_periode_debut_libre"] = $facture["date_periode_debut"];
 				$facture["date_periode_fin_libre"] = $facture["date_periode_fin"];
 			}
-			foreach ($facture_ligne as $k => $v) {				
+			foreach ($facture_ligne as $k => $v) {
 				unset($v["id_facture_ligne"],$v["id_facture"]);
 				$d = array();
-				foreach ($v as $cle => $valeur) {				
+				foreach ($v as $cle => $valeur) {
 					if(strpos($cle,'id') !== false){
 						if($cle !==  'id_affaire_provenance'){
-							$cle = $cle."_fk";		
-						}								
-					}				
+							$cle = $cle."_fk";
+						}
+					}
 					$cle = "facture_ligne__dot__".$cle;
 					$d[$cle] = $valeur;
 				}
@@ -58,10 +58,10 @@ $dataPath = __DATA_PATH__."cleodisbe/";
 			}
 			$facture["batchtva"] = 1.21;
 			$facture["batch"] = true;
-			$values_facture["produits"] = json_encode($values_facture["produits"]);		
+			$values_facture["produits"] = json_encode($values_facture["produits"]);
 
 			$id = ATF::facture()->insert(array("facture"=>$facture , "values_facture"=> $values_facture));
-			echo "Mise à jour Facture ref : ".$facture["ref"]."\n";	
+			echo "Mise à jour Facture ref : ".$facture["ref"]."\n";
 
 
 
@@ -69,12 +69,12 @@ $dataPath = __DATA_PATH__."cleodisbe/";
 */
 
 
-ATF::facture()->q->reset()->where("facture.date","2016-10-01","AND",false,">=");
+ATF::facture()->q->reset()->where("facture.date","2016-01-01","AND",false,">=");
 $factures = ATF::facture()->select_all();
 
 //echo count($factures);
 foreach ($factures as $key => $value) {
-	
+
 	ATF::facture()->move_files($value["facture.id_facture"]);
 }
 ?>

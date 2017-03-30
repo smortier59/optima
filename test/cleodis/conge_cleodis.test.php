@@ -104,7 +104,7 @@ class conge_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_sup_recup=ATF::user()->sel['email'];
 		
 		$this->assertTrue(is_numeric($id_conge),"Le congé aurait du être créé");	
-		$this->assertEquals(43,$id_sup_recup,"Le supérieur pris en compte est faux");
+		$this->assertEquals(17,$id_sup_recup,"Le supérieur pris en compte est faux");
 		
 		// On simule l'inactivité de tous sauf severine
 		$query = "UPDATE user SET etat=IF(id_user=21,'normal','inactif')";

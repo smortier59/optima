@@ -1,5 +1,5 @@
 <?
-/** 
+/**
 * Classe asterisk - Permet l'utilisation de services téléphoniques Asterisk (click2call, fax,...)
 * Remarque : le système de fax n'est pas encore implémenté
 * @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -9,6 +9,13 @@ class asterisk extends classes_optima {
 	public function __construct($obj="webService"){
 		parent::__construct();
 		$this->addPrivilege("createCall");
+	}
+
+	public function _createCall($get,$post){
+		return $this->createCall(array("id"=>$post["id"],
+									   "table"=>$post["table"],
+									   "field"=>$post["field"]));
+
 	}
 
 	/**
@@ -22,7 +29,7 @@ class asterisk extends classes_optima {
 		//Bloquage du Top et du generationTime
 		ATF::$cr->block("top");
 		ATF::$cr->block("generationTime");
-		
+
 		//Recherche de la source et de la destination
 		$module = $infos["table"];
 		$infos["field"] = str_replace(".","",substr($infos["field"],strpos($infos["field"],".")));
@@ -30,19 +37,19 @@ class asterisk extends classes_optima {
 		if(!$tel && $module=='contact'){ // Prendre le contact de société sinon...
 			$tel = ATF::societe()->select(ATF::getClass($module)->select($infos["id"],"id_societe"),"tel");
 		}
-				
-		//Sip non paramétré	
+
+		//Sip non paramétré
 		if (!ATF::$usr->get("id_phone")) throw new errorATF(ATF::$usr->trans("sip_failed",$this->table));
-		
+
 		//Tel non trouvé
 		if (!$tel) throw new errorATF(ATF::$usr->trans("tel_empty",$this->table));
-		
+
 		//Gestion de l'indicatif international
 		$tel=str_replace("+","00",$tel);
-		
+
 		//Lancement de l'appel
 		$this->originate(ATF::$usr->get("id_phone"),$tel);
-		
+
 		//Notice
 		ATF::$msg->addNotice(ATF::$usr->trans("call_to",$this->table)." ".$tel." ".ATF::$usr->trans("call_from",$this->table)." ".ATF::phone()->select(ATF::$usr->get("id_phone"),"sip"));
 		return true;
@@ -78,7 +85,7 @@ class asterisk extends classes_optima {
 		curl_close($ch);
 		return !!json_decode($data,true);
 	}
-	
+
 	/**
 	* Retourne le nom du CallerId s'il est trouvé
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -103,7 +110,7 @@ class asterisk extends classes_optima {
 		}
 		return $result;
 	}
-	
+
 	/**
 	* Retourne le nom du CallerId s'il est trouvé
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -122,7 +129,7 @@ class asterisk extends classes_optima {
 		}
 		return $result;
 	}
-	
+
 	/**
 	* Retourne le nom du CallerId s'il est trouvé
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -137,11 +144,11 @@ class asterisk extends classes_optima {
 			}
 		} elseif ($societe = $this->getSocieteFromCallerId($callerId)) {
 			$result = $societe["societe"];
-		}		
+		}
 		$result = mb_convert_encoding($result, "UTF-8");
 		return $result;
 	}
-	
+
 	/**
 	* Retourne le nombre de crédits de la société
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -151,14 +158,14 @@ class asterisk extends classes_optima {
 	*/
 	public function getCreditFromRef($refSociete){
 		$solde="nok";
-		if (($id = $this->getSocieteId($refSociete))!=="nok") {						
-			$solde = ATF::societe()->getSolde($id);					
-			$ref = ATF::societe()->select($id , "ref");						 		
-			if(strpos($ref , "A") === 0){											
+		if (($id = $this->getSocieteId($refSociete))!=="nok") {
+			$solde = ATF::societe()->getSolde($id);
+			$ref = ATF::societe()->select($id , "ref");
+			if(strpos($ref , "A") === 0){
 				$notifier = "24,23,33";
-			}else{													
+			}else{
 				$notifier = "1,3,12,30,42,52,55";
-			}		
+			}
 			$infos = array(
 				"id_societe"=>$id
 				,"id_user"=>13
@@ -167,26 +174,26 @@ class asterisk extends classes_optima {
 				,"date"=>date("Y-m-d H:i:s")
 				,"suivi_contact"=>NULL
 				,"suivi_societe"=>$notifier
-				,"suivi_notifie"=>$notifier							
-			);			  
+				,"suivi_notifie"=>$notifier
+			);
 			ATF::suivi()->insert($infos);
-		}		
+		}
 		return $solde;
 	}
-	
+
 	/**
 	* Stocke un suivi d'appel interrompu
 	* @param string $refSociete Référence de la société
 	* @return string
 	*/
 	public function callCancelled($refSociete){
-		if (($id = $this->getSocieteId($refSociete))!=="nok") {		
-			$ref = ATF::societe()->select($id , "ref");						 		
-			if(strpos($ref , "A") === 0){											
+		if (($id = $this->getSocieteId($refSociete))!=="nok") {
+			$ref = ATF::societe()->select($id , "ref");
+			if(strpos($ref , "A") === 0){
 				$notifier = "24,23,33";
-			}else{													
+			}else{
 				$notifier = "1,3,12,30,42,52,55";
-			}		
+			}
 			$infos = array(
 				"id_societe"=>$id
 				,"id_user"=>13
@@ -195,12 +202,12 @@ class asterisk extends classes_optima {
 				,"date"=>date("d-m-Y H:i")
 				,"suivi_contact"=>NULL
 				,"suivi_societe"=>$notifier
-				,"suivi_notifie"=>$notifier							
-			);			  
+				,"suivi_notifie"=>$notifier
+			);
 			ATF::suivi()->insert($infos);
-		}		
+		}
 	}
-	
+
 	/**
 	* Retourne l'id_societe
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -212,7 +219,7 @@ class asterisk extends classes_optima {
 		$id = ATF::societe()->select_cell();
 		return $id ? $id : "nok";
 	}
-	
+
 	/**
 	* Retourne le nom de la hotline à partir de son ID
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -229,7 +236,7 @@ class asterisk extends classes_optima {
 		}
 		return $hotline["hotline"];
 	}
-	
+
 	/**
 	* Retourne le codename de la hotline
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -241,12 +248,12 @@ class asterisk extends classes_optima {
 		if ($absystech!="ferme" && $absystech!="nok") {
 			return 'absystech';
 		} else {
-			
+
 			// Ajouter check reel ATT
 			return 'att';
 		}
 	}
-	
+
 	/**
 	* Retourne le SIP de l'utilisateur en charge de cette hotline
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -262,7 +269,7 @@ class asterisk extends classes_optima {
 						return $sip;
 					} else {
 						return "nosip";
-					}	
+					}
 				} else {
 					return "nophone";
 				}
@@ -292,20 +299,20 @@ class asterisk extends classes_optima {
 			,"id_contact"=>false // On force pas de contact
 			,"pole_concerne"=>$pole
 		);
-        
+
 		try {
 			$id_hotline = ATF::hotline()->insert($hotline,$session,$files);
 		} catch (Exception $e) { log::logger($e->getMessage(),"asterisk.log"); log::logger($e->getTraceAsString(),"asterisk.log"); }
-		
-		// Insertion du fichier		
-		$fichier = array_shift($files);	
+
+		// Insertion du fichier
+		$fichier = array_shift($files);
 		$newpath = ATF::hotline()->filepath($id_hotline,"fichier_joint");
 		mkdir(dirname($newpath),0777,true);
 		log::logger(ATF::$codename.",".$method." : deplacement et zip du fichier ".$fichier["tmp_name"]." (".number_format(filesize($fichier["tmp_name"]),0,"."," ")." octets) vers ".$newpath,"asterisk.log");
 		$zip = new ZipArchive();
 		util::file_put_contents($newpath,"");
 		$zip->open($newpath);
-		$zip->addFile($fichier["tmp_name"],"audio.wav");	
+		$zip->addFile($fichier["tmp_name"],"audio.wav");
 		$zip->close();
 		return $id_hotline;
 	}
@@ -336,21 +343,21 @@ class asterisk extends classes_optima {
 		try {
 			$id_hotline_interaction = ATF::hotline_interaction()->insert($hotline_interaction,$session,$files);
 		} catch (Exception $e) { log::logger($e->getMessage(),"asterisk.log"); log::logger($e->getTraceAsString(),"asterisk.log"); }
-		
-		// Insertion du fichier		
-		$fichier = array_shift($files);	
+
+		// Insertion du fichier
+		$fichier = array_shift($files);
 		$newpath = ATF::hotline_interaction()->filepath($id_hotline_interaction,"fichier_joint");
 		mkdir(dirname($newpath),0777,true);
 		log::logger(ATF::$codename.",".$method." : deplacement et zip du fichier ".$fichier["tmp_name"]." (".number_format(filesize($fichier["tmp_name"]),0,"."," ")." octets) vers ".$newpath,"asterisk.log");
 		$zip = new ZipArchive();
 		util::file_put_contents($newpath,"");
 		$zip->open($newpath);
-		$zip->addFile($fichier["tmp_name"],"audio.wav");	
+		$zip->addFile($fichier["tmp_name"],"audio.wav");
 		$zip->close();
-		
+
 		return "ok";
 	}
-	
+
 	/**
 	* Manager des webservices
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -376,15 +383,15 @@ log::logger($post,"asterisk.log");
 						log::logger(ATF::$codename.",".$method." : la methode existe","asterisk.log");
 						$retour = $this->$method($secondArg,$files,$thirdArg);
 						log::logger(ATF::$codename.",".$method."(".$secondArg.",".$files.",".$thirdArg.") => ".$retour,"asterisk.log");
-						$s .= 'SET VARIABLE '.$method.' "'.$retour.'"'."\n";			
+						$s .= 'SET VARIABLE '.$method.' "'.$retour.'"'."\n";
 
 					} else log::logger(ATF::$codename.",".$method." : la methode n'existe pas","asterisk.log");
 				} else log::logger(ATF::$codename.",".$method.' : aucun $_FILES !',"asterisk.log");
-				
+
 			} else {
 				foreach ($post["server"] as $method) {
 					log::logger($method."(".$firstArg.")","asterisk.log");
-					if (method_exists($this,$method)) {						
+					if (method_exists($this,$method)) {
 						log::logger(ATF::$codename.",".$method." : la methode existe","asterisk.log");
 						$retour = $this->$method($firstArg);
 						log::logger(ATF::$codename.",".$method."(".$firstArg.") => ".$retour,"asterisk.log");
@@ -394,7 +401,7 @@ log::logger($post,"asterisk.log");
 			}
 		}
 		log::logger(ATF::$codename.",".$_SERVER["REMOTE_ADDR"].",".$script.",".$firstArg." => ".str_replace("\n","|",$s),"asterisk.log");
-	
+
 		return $s;
 	}
 };

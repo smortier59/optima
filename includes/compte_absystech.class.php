@@ -14,5 +14,25 @@ class compte_absystech extends classes_optima{
 		
 		$this->fieldstructure();
 	}
+
+		/**
+		 * fonction _GET afin 
+		 * @param  $get obligatoire mais inutilisé
+		 * @param  $post obligatoire mais inutilisé
+		 * @author  Cyril Charlier <ccharlier@absystech.fr>
+		 * @return array retourne tous les elements 
+		 */
+	function _GET($get,$post){
+ 		$colsData = array(
+      "id_compte_absystech"=>array(),
+      "compte_absystech"=>array()
+    );
+    $this->q->reset();
+    $this->q->addField($colsData);
+    $data = $this->select_all();
+
+		return $data;
+
+	}
 };
 ?>

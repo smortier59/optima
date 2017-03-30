@@ -1,6 +1,6 @@
 <?
 require_once dirname(__FILE__)."/../societe.class.php";
-/**  
+/**
 * @package Optima
 * @subpackage AbsysTech
 */
@@ -11,9 +11,9 @@ class societe_absystech extends societe {
 	public function __construct() {
 		parent::__construct();
 		$this->table = "societe";
-		
+
 		/*-----------Colonnes Select all par défaut------------------------------------------------*/
-		$this->colonnes['fields_column'] = array(	
+		$this->colonnes['fields_column'] = array(
 			 'societe.societe'
 			,'societe.tel' => array("renderer"=>"tel","width"=>120)
 			,'societe.email'=>array("renderer"=>"email","width"=>180)
@@ -27,7 +27,7 @@ class societe_absystech extends societe {
 			,'renderAjoutTache'=>array("renderer"=>"tacheActions","width"=>60,"custom"=>true)
 			,'societe.id_apporteur_affaire'
 		);
-		
+
 		$this->colonnes["primary"]["date_fin_contrat_maintenance"] = "";
 		$this->colonnes["primary"]["date_fin_option"] = "";
 
@@ -42,21 +42,21 @@ class societe_absystech extends societe {
 		$this->colonnes['panel']['contrat_maintenance'] = array(
 			"est_sous_contrat_maintenance"
 			,"commentaire_contrat_maintenance"
-			,"option_contrat_maintenance"			
+			,"option_contrat_maintenance"
 			,"id_commercial"
 		);
 		$this->panels['contrat_maintenance'] = array('nbCols'=>1, "visible"=>true);
 
-		
+
 		$this->colonnes['bloquees']['insert'][] = "credits";
 		$this->colonnes['bloquees']['insert'][] = "meteo";
 		$this->colonnes['bloquees']['insert'][] = "meteo_calcul";
 		$this->colonnes['bloquees']['update'][] = "credits";
 		$this->colonnes['bloquees']['update'][] = "meteo";
 		$this->colonnes['bloquees']['update'][] = "meteo_calcul";
-		
+
 		$this->colonnes['primary']["credits"] = array("custom"=>true);
-		
+
 		$this->colonnes["rapprocher"] = array(
 			 'id_societe'=>array("disabled"=>true),
 			 'montant'=>array("formatNumeric"=>true,"xtype"=>"textfield"),
@@ -70,18 +70,18 @@ class societe_absystech extends societe {
 		);
 		$this->panels['affacturage_fs'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
 		$this->colonnes['panel']['coordonnees']["affacturage"] = array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'affacturage_fs');
-		
+
 		$this->colonnes['panel']['mdp'] = array(
 			"divers_5"
 			,"mdp_client"
 			,"mdp_absystech"
 		);
 		$this->panels["mdp"] = array('nbCols'=>3);
-		
+
 		$this->colonnes["speed_insert"] = array(
 			'societe'
 		);
-		
+
 
 
 		$this->foreign_key['id_apporteur_affaire'] = "societe";
@@ -89,14 +89,13 @@ class societe_absystech extends societe {
 
 		$this->fieldstructure();
 
-		
+
 
 		// champ parc remplacer par stock
 		$this->onglets = array(
 			'contact'=>array('opened'=>true)
 			,'suivi'=>array('opened'=>true)
 			,'affaire'=>array('opened'=>true)
-			,'affaire_cout_page'=>array('opened'=>true) 
 			,'devis'
 			,'commande'
 			,'facture'
@@ -113,21 +112,21 @@ class societe_absystech extends societe {
 		);
 
 		$this->colonnes['bloquees']['select'] =   array("divers_5");
-		
+
 		$this->quick_action['select']['atcard'] = array('privilege'=>'export');
 		$this->quick_action['select_all']['atcardImport'] = array('privilege'=>'import');
-		
+
 		$this->addPrivilege('rapprocher');
 		$this->addPrivilege('updateRapprocher');
-		$this->addPrivilege("atcard","export"); 
-		$this->addPrivilege("atcardImport","import"); 
+		$this->addPrivilege("atcard","export");
+		$this->addPrivilege("atcardImport","import");
 		$this->addPrivilege("autocompleteAvecTermes");
 		$this->addPrivilege("autocompleteAvecTVA");
 		$this->addPrivilege("autocompleteFournisseursDeCommande");
 		$this->addPrivilege("autocompleteOnlyActive");
 		$this->addPrivilege("add_ticket","insert");
-		
-		
+
+
 		$this->selectExtjs=true;
 	}
 /*
@@ -137,15 +136,15 @@ class societe_absystech extends societe {
         $r['societe'] = str_replace("'","OO",$r['societe']);
         return $r;
     }
-    
+
     public function nom($id) {
         $r = parent::nom($id);
         $r = addslashes($r);
-        return $r;        
+        return $r;
     }
-*/     
-	
-	/** 
+*/
+
+	/**
 	* Surcharge de l'insertion pour les socits
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param array $infos Les informations  insrer
@@ -160,12 +159,12 @@ class societe_absystech extends societe {
 		$infos["mdp_absystech"]=util::generateRandWord(9);
 
 		ATF::db($this->db)->begin_transaction();
-		
+
 		try {
 			//Unset du crédit pour les duplicates
 			unset($infos["credits"]);
 			$id_societe = parent::insert($infos,$s,$files,$cadre_refreshed);
-		
+
 			if(ATF::famille()->nom($infos["id_famille"])=="Particulier"){
 				$contact=array(
 									"civilite"=>NULL,
@@ -184,26 +183,26 @@ class societe_absystech extends societe {
 									"email"=>$infos["email"],
 									"cle_externe"=>$infos["cle_externe"]
 								);
-								
+
 				ATF::contact()->insert($contact,$s);
-				
+
 				$this->redirection("select",$id_societe);
 			}
 		} catch (errorATF $e) {
-			ATF::db($this->db)->rollback_transaction();	
+			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF(ATF::$usr->trans("probleme_insertion",$this->table)." => ".$e->getMessage(),$e->getCode());
 		}
-		
+
 		ATF::db($this->db)->commit_transaction();
 
 		return $id_societe;
 	}
-	
+
 	/**
     * Retourne toutes les sociétés débitrices
     * @author Jérémie Gwiazdowski <jgw@absystech.fr>
     * @return array $societe
-    */   	
+    */
 	public function societes_debitrices($limite=NULL){
 		$this->q->reset()->addField('societe.id_societe','id_societe')->addField('societe.societe','societe')->setToString();
 		$subQuery = $this->saCustom();
@@ -221,7 +220,7 @@ class societe_absystech extends societe {
 		if ($limite) {
 			$this->q->setLimit($limite);
 		}
-		
+
 		return $this->select_all();
 	}
 
@@ -242,21 +241,21 @@ class societe_absystech extends societe {
 			"+IF(LENGTH(societe.adresse)>0,1,0)".
 			"+IF(LENGTH(societe.cp)>0,1,0)".
 			"+IF(LENGTH(societe.ville)>0,1,0))*100/11","completer");
-		
+
 //		// Derrnier crédit restant basé sur gestion_ticket
 //		$g = new gestion_ticket();
 //		$g->q->addField("solde")->addField("id_societe")->addOrder("id_gestion_ticket","desc")->setToString();
 //		$this->q
 //			->addField("g.solde","credits")
 //			->from("societe","id_societe","(".$g->sa().")","id_societe","g");
-//		
+//
 //		// Date de dernier suivi effectué
 //		$s = new suivi();
 //		$s->q->addField("date")->addField("id_societe")->addOrder("id_suivi","desc")->setToString();
 //		$this->q
 //			->addField("s.date","dernierSuivi")
 //			->from("societe","id_societe","(".$s->sa().")","id_societe","s");
-//			
+//
 //		// Nécessaire pour que les jointures ne retournent que le dernier suivi, et derneir crédit
 //		$this->q->addGroup('societe.id_societe');
 
@@ -284,12 +283,12 @@ class societe_absystech extends societe {
 
 		return parent::saCustom();
 	}
-			
+
 	/**
     * Retourne le solde négatif de toutes les sociétés
     * @author Jérémie Gwiazdowski <jgw@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
     * @return array
-    */   	
+    */
 	public function getSoldeSNegatives(){
 		$this->q->reset()->setToString()
 						->addCondition("societe.etat","actif");
@@ -299,12 +298,12 @@ class societe_absystech extends societe {
 		$this->q->reset()
 			->setSubQuery($subQuery,"g2")
 			->addField("SUM(g2.credits)")
-			->addCondition("g2.credits","0","AND",false,"<") 
+			->addCondition("g2.credits","0","AND",false,"<")
 			->setStrict()
 			->setDimension("cell");
 		return $this->select_all();
 	}
-	
+
 	/**
 	* Retourne le cumul des solde de toutes les sociétés (permet de voir s'il y a du crédit de tickets au client)
     * @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -313,7 +312,7 @@ class societe_absystech extends societe {
 	public function getSoldeS(){
 		$this->q->reset()->setToString();
 		$subQuery = $this->saCustom();
-		
+
 		//Somme des soldes des sociétés
 		$this->q->reset()
 			->setSubQuery($subQuery,"g2")
@@ -323,35 +322,40 @@ class societe_absystech extends societe {
 
 		return $this->select_all();
 	}
-	
+
 	/**
     * Dans le cas où on ajoute des tickets en passant par le select des sociétés
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
     * @author Fanny DECLERCK <fdeclerck@absystech.fr>
 	* @param array $infos $infos['id_societe'] et $infos['credits']
-	* @param array $s 
+	* @param array $s
 	* @param file $files
 	* @param array $cadre_refreshed
-    * @return boolean true 
-    */   	
+    * @return boolean true
+    */
 	public function add_ticket($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		return ATF::gestion_ticket()->add_ticket($infos,$s,$files,$cadre_refreshed);
 	}
-	
+
 	/**
-    * Redirection vers le portail hotline 
+    * Redirection vers le portail hotline
     * @author Fanny DECLERCK <fdeclerck@absystech.fr>
-    * @author Jérémie Gwiazdowski <jgw@absystech.fr>	
+    * @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	* @param string $reference la Référence de la société (SLI09110001)
 	* @param string $password_hotline Le mot de passe hotline (divers_5) de la société
     * @return string $url Le lien direct vers la hotline
-    */   	
+    */
 	public function redirect_hotline($reference,$password_hotline){
 		/*lien pour autologin et redirect*/
 		return __HOTLINE_URL__."login.php?login=".base64_encode($reference)."&password=".base64_encode($password_hotline)."&contact=".base64_encode("choix_contact")."&url=".base64_encode(__HOTLINE_URL__."choix_contact.php")."&schema=".base64_encode(ATF::$codename);
 	}
-	
-	/** 
+
+	public function _redirect_hotline($get, $post){
+		return $this->redirect_hotline($post["ref"],$post["divers_5"]);
+
+	}
+
+	/**
 	* Envoi les identifiants hotline par mail via le contact concerné
 	* @author Jérémie Gwiazdowski
 	* @param array $infos le tableau contenant  : id_contact et id_societe
@@ -362,19 +366,19 @@ class societe_absystech extends societe {
 	*/
 	public function send_identifiants_hotline($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		//Test du contact
-		if(!$infos['id_contact']) throw new errorATF(ATF::$usr->trans('si_hotline_no_contact',$this->table));
+		if(!$infos['id_contact']) throw new errorATF(ATF::$usr->trans('si_hotline_no_contact',$this->table),500);
 		//Test de la societe
-		if(!$infos['id_societe']) throw new errorATF(ATF::$usr->trans('si_hotline_no_societe',$this->table));
-		
+		if(!$infos['id_societe']) throw new errorATF(ATF::$usr->trans('si_hotline_no_societe',$this->table),500);
+
 		//Recherche du contact
 		$contact=ATF::contact()->select($infos['id_contact']);
-		
+
 		//Mail vide
-		if(!$contact['email']) throw new errorATF(ATF::$usr->trans('si_hotline_contact_no_mail',$this->table));
-		
+		if(!$contact['email']) throw new errorATF(ATF::$usr->trans('si_hotline_contact_no_mail',$this->table),500);
+
 		//Recherche de la societe
 		$societe=$this->select($infos['id_societe']);
-		
+
 		//Construction du mail
 		$infos_mail['societe']=$societe;
 		$infos_mail['contact']=$contact;
@@ -383,17 +387,17 @@ class societe_absystech extends societe {
 		$infos_mail["objet"] = ATF::$usr->trans("mail_identifiants_hotline");
 		$infos_mail["recipient"] = $contact['email'];
 		$infos_mail["template"] = "societe_identifiants_hotline";
-		
+
 		//Envoi du mail
 		$mail = new mail($infos_mail);
 		$mail->send();
-		
+
 		//Notice
 		ATF::$msg->addNotice(ATF::$usr->trans("mail_send_identifiants_hotline",$this->table));
-		
+
 		return true;
 	}
-	
+
 	/**
 	* Donne le solde en fonction des gestion_ticket
 	* @param int $id_societe L'identifiant de la societé désirée
@@ -415,17 +419,17 @@ class societe_absystech extends societe {
 			return 0;
 		}
 	}
-	
+
 	/**
 	* Fonction faisant partie de la météo "météo"
 	* Renvoi le solde_total c'est à diore la différence entre la somme des factures moins la somme des paiements
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
 	* @return float $solde_total
-	*/	
+	*/
 	public function solde_total($id_societe){
 		// Création de la subQuery
-		$this->q->reset() 
+		$this->q->reset()
 			->addField("facture.prix*facture.tva","facture")
 			->addField("ROUND(IF(facture.date_effective IS NOT NULL
 				,0
@@ -441,24 +445,24 @@ class societe_absystech extends societe {
 			->setStrict()
 			->setToString();
 		$subQuery = parent::select_all();
-		
+
 		// Utilisation de la subQuery
 		$this->q->reset()
 			->addField('SUM(a.solde)','soldeTotal')
-			->setSubQuery($subQuery,'a')			
+			->setSubQuery($subQuery,'a')
 			->setDimension('cell');
 		return parent::select_all();
 	}
-	
+
 	/**
 	* Solde total pour toutes les sociétés
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id
 	* @return float $solde_total
-	*/	
+	*/
 	public function solde_total_global($id_societe){
 		// Création de la subQuery
-		$this->q->reset() 
+		$this->q->reset()
 			->addField("facture.id_societe","id_societe")
 			->addField("societe.societe","societe")
 			->addField("facture.prix*facture.tva","facture")
@@ -476,7 +480,7 @@ class societe_absystech extends societe {
 			->setStrict()
 			->setToString();
 		$subQuery = parent::select_all();
-		
+
 		// Utilisation de la subQuery
 		$this->q->reset()
 			->addField('SUM(a.solde)','soldeTotal')
@@ -484,10 +488,10 @@ class societe_absystech extends societe {
 			->addField("a.societe","societe")
 			->addGroup("id_societe")
 			->setSubQuery($subQuery,'a')
-			->setStrict();			
+			->setStrict();
 		$this->q->setToString();
 		$finalSubQuery = parent::sa();
-		
+
 		$this->q->reset()
 			->addField('soldeTotal')
 			->addField('id_societe')
@@ -495,8 +499,8 @@ class societe_absystech extends societe {
 			->setSubQuery($finalSubQuery,'final')
 			->setStrict()
 			->addOrder("soldeTotal","asc")
-			->setLimit(15);			
-		
+			->setLimit(15);
+
 		return parent::sa();
 	}
 
@@ -506,7 +510,7 @@ class societe_absystech extends societe {
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
 	* @return array $chiffre_par_an
-	*/	
+	*/
 	public function chiffre_par_an($id_societe){
 
 		$chiffre_par_an =array();
@@ -533,7 +537,7 @@ class societe_absystech extends societe {
 
 		foreach($commande as $key=>$item){
 			$prix=0;
-			
+
 			//Pour chaque année où il y a eu une commande on récupère les factures (s'il y en a)
 			foreach($facture as $k=>$i){
 				if($i["annee"]==$item["annee"]){
@@ -541,7 +545,7 @@ class societe_absystech extends societe {
 					unset($facture[$k]);
 				}
 			}
-			
+
 			//Pour chaque année calcul de la marge du ca et du ratio facture/commande
 			$chiffre_par_an[]=array(
 				"annee"=>$item["annee"],
@@ -550,7 +554,7 @@ class societe_absystech extends societe {
 				"ca"=>$prix
 			);
 		}
-		
+
 		//Pour les années où il y a des factures mais pas de commande
 		if($facture){
 			foreach($facture as $key=>$item){
@@ -573,7 +577,7 @@ class societe_absystech extends societe {
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id
 	* @return float $solde_total
-	*/	
+	*/
 	public function affaire_perdu($id_societe){
 
 		// Affaires
@@ -585,7 +589,7 @@ class societe_absystech extends societe {
 			 ->setDimension('row');
 		$affaire = parent::select_all();
 		$affaire["affaire_perdu_pourcent"]=($affaire["affaire_perdu"]/$affaire["affaire"]*100);
-		
+
 		$this->q->reset()
 			 ->addField("COUNT(devis.id_devis)","devis")
 			 ->addJointure("societe","id_societe","affaire","id_societe",NULL,NULL,NULL,NULL,"INNER")
@@ -593,7 +597,7 @@ class societe_absystech extends societe {
 			 ->addCondition("societe.id_societe",$id_societe)
 			 ->setDimension('row');
 		$affaire = array_merge($affaire,parent::select_all());
-		
+
 		ATF::devis()->q->reset()
 			 ->addField("id_affaire")
 			 ->addCondition("id_societe",$id_societe)
@@ -601,7 +605,7 @@ class societe_absystech extends societe {
 			 ->setStrict()
 			 ->settoString();
 		$subquery = ATF::devis()->select_all();
-				
+
 		ATF::devis()->q->reset()
 			 ->addField("COUNT(id_devis)","devis_perdu")
 			 ->addCondition("id_affaire",$subquery,NULL,NULL,"IN",false,true)
@@ -614,7 +618,7 @@ class societe_absystech extends societe {
 		$affaire = array_merge($affaire,ATF::devis()->select_all());
 
 		$affaire["devis_perdu_pourcent"]=($affaire["devis_perdu"]/$affaire["devis"]*100);
-	
+
 		return $affaire;
 	}
 
@@ -625,7 +629,7 @@ class societe_absystech extends societe {
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id
 	* @return array $chiffre_par_an
-	*/	
+	*/
 	public function datediff($id_societe){
 		$this->q->reset()
 			->addField("ROUND(SUM(DATEDIFF(date_effective,facture.date))/COUNT(facture.id_facture),0)","datediff")
@@ -636,14 +640,14 @@ class societe_absystech extends societe {
 			->setDimension('cell');
 		return parent::select_all();
 	}
-	
+
 	/**
 	* Fonction "météo" qui pour une société renvoie un indice qui permet de classer la société
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id
 	* @return array $meteo
-	*/	
+	*/
 	public function meteo($id_societe){
 
 		//Somme des factures (prix)
@@ -661,13 +665,13 @@ class societe_absystech extends societe {
             ->addCondition("commande.date",date('Y-m-d',strtotime("-3 year")),"AND",false,">=")
 			->addCondition("societe.id_societe",$id_societe);
 		$commande = parent::select_all();
-		
+
 		$meteo["marge"]=$facture[0]["prix"]-$commande[0]["prix_achat"];
 		$meteo['solde_total']=$this->solde_total($id_societe);
 		$meteo['datediff']=$this->datediff($id_societe);
 		$meteo['affaire_perdu']=$this->affaire_perdu($id_societe);
 		$meteo['chiffre_par_an']=$this->chiffre_par_an($id_societe);
-		
+
 		if($meteo['solde_total']==NULL && $meteo['affaire_perdu']['devis_perdu']==0 && $meteo['datediff']==0 && $marge==0){
 			$meteo["icone"]="Fog";
 			$meteo["echelle"]="Pas de données";
@@ -706,30 +710,30 @@ class societe_absystech extends societe {
 
 			//Un pourcentage supérieur à 30 engendre du malus
 			$devis_perdu_pourcent=__METEO_COEFF_DEVIS_PERDU__*((($devis_perdu_pourcent/__METEO_LIMITE_DEVIS_PERDU__)-1)+1);
-			
-			
+
+
 			//Calcul de la météo
 			$meteo["meteo"]=$datediff-$credit+$solde_total-$marge+$devis_perdu_pourcent;
-			$meteo["meteo_calcul"]=round($meteo["meteo"],4)." = ".$meteo["meteo_calcul"];			
+			$meteo["meteo_calcul"]=round($meteo["meteo"],4)." = ".$meteo["meteo_calcul"];
 		}
 		return $meteo;
 	}
-	
+
 	/**
 	* Fonction appeler depuis une crontab qui met à jour l'indice météo de chaque société
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id
 	* @return array $chiffre_par_an
-	*/	
+	*/
 	public function meteo_societe($id_societe=false){
 		$this->q->reset();
-		
+
 		//Si l'on souhaite mettre à jour seulement une société
 		if($id_societe){
 			$this->q->addCondition("id_societe",$id_societe);
 		}
-		
+
 		$societe=parent::select_all();
 		$big["chiffre"]=0;
 		$small["chiffre"]=1000000;
@@ -756,7 +760,7 @@ class societe_absystech extends societe {
 				$this->update(array("id_societe"=>$item["id_societe"],"meteo"=>$meteo[$key]["meteo"],"meteo_calcul"=>$meteo[$key]["meteo_calcul"]));
 				$nb_tot++;
 				$meteo_tot+=$meteo[$key]["meteo"];
-//print_r($meteo[$key]);	
+//print_r($meteo[$key]);
 				if($meteo[$key]["meteo"]>=$big["chiffre"]){
 					$big["chiffre"]=$meteo[$key]["meteo"];
 					$big["societe"]=$item["societe"];
@@ -801,7 +805,7 @@ class societe_absystech extends societe {
 			}else{
 				$this->update(array("id_societe"=>$item["id_societe"],"meteo"=>NULL,"meteo_calcul"=>NULL));
 				unset($meteo["key"]);
-			}			
+			}
 		}
 		//Trie du tableau en DESC de valeur météo (les + mauvais en premier...)
 		foreach ($meteo as $key => $item) {
@@ -815,7 +819,7 @@ class societe_absystech extends societe {
 
 		//Calcul de la moyenne 'relative'
 		$meteo_moyenne=$meteo[round($nb_tot/2)]["meteo"];
-		
+
 		//Mis à jour des constantes
 		$id_constante=ATF::constante()->getConstante("__METEO_MOYENNE__");
 		ATF::constante()->update(array("id_constante"=>$id_constante,"valeur"=>round($meteo_moyenne,4)));
@@ -831,20 +835,20 @@ class societe_absystech extends societe {
 // print_r("\nmeteo_moyenne : ".$meteo_moyenne);
 // print_r("\n+ Gros chiffre = ".$big["societe"]." : ".$big["chiffre"]);
 // print_r("\n+ Petit chiffre = ".$small["societe"]." : ".$small["chiffre"]);
-// 
+//
 // print_r("\n+ Gros chiffre datediff ".$big["datediff_societe"]." : ".$big["datediff"]);
 // print_r("\n+ Petit chiffre datediff ".$small["datediff_societe"]." : ".$small["datediff"]);
-// 
+//
 // print_r("\n+ Gros chiffre marge ".$big["marge_societe"]." : ".$big["marge"]);
 // print_r("\n+ Petit chiffre marge ".$small["marge_societe"]."  : ".$small["marge"]);
-// 
+//
 // print_r("\n+ Gros chiffre solde_total ".$big["solde_total_societe"]."  : ".$big["solde_total"]);
 // print_r("\n+ Petit chiffre solde_total ".$small["solde_total_societe"]." : ".$small["solde_total"]);
-// 
+//
 // print_r("\n+ Gros chiffre devis_perdu_pourcent ".$big["affaire_perdu"]['devis_perdu_pourcent_societe']."  : ".$big["affaire_perdu"]['devis_perdu_pourcent']);
 // print_r("\n+ Petit chiffre devis_perdu_pourcent ".$small["affaire_perdu"]['devis_perdu_pourcent_societe']."  : ".$small["affaire_perdu"]['devis_perdu_pourcent']);
-// 
-// 
+//
+//
 // print_r("\nRatio societe/meteo = ".$nb_tot." / ".$nb_societe);
 	}
 
@@ -854,9 +858,9 @@ class societe_absystech extends societe {
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id
 	* @return array $return
-	*/	
+	*/
 	public function meteo_icone($meteo){
-	
+
 		if($meteo!="0.0000"){
 			//Définition des icones
 			$echelle[1]["icone"]="Sunny";
@@ -869,22 +873,22 @@ class societe_absystech extends societe {
 			$echelle[8]["icone"]="Flurries";
 			$echelle[9]["icone"]="Snow";
 			$echelle[10]["icone"]="Thunderstorms";
-			
+
 			$meteo_moyenne=__METEO_MOYENNE__;
 			$small=__METEO_SMALL__;
 			$big=__METEO_BIG__;
-	
+
 			$j=0;
 			for($i=2;$i<=10;$i+=2){
 				$j++;
 				$echelle[$j]["echelle"]=(($meteo_moyenne)-$small)*($i/10)+$small;
 			}
-	
+
 			for($i=2;$i<=10;$i+=2){
 				$j++;
 				$echelle[$j]["echelle"]=($big-($meteo_moyenne))*($i/10)+($meteo_moyenne);
 			}
-			
+
 			//Pour chaque societe meteo on définit son classement
 			for($i=1;$i<=10;$i++){
 				if($meteo<=$echelle[$i]["echelle"]){
@@ -898,37 +902,37 @@ class societe_absystech extends societe {
 			$return["icone"]="Fog";
 			$return["echelle"]="Pas de données pour la météo";
 		}
-		
+
 		return $return;
 	}
-		
-	/** 
+
+	/**
 	* Import d'une ATCard
 	* @author Quentin JANON <qjanon@absystech.fr>
-	* @return void 
+	* @return void
 	*/
 	public function atcardImport(&$infos,&$s,$files=NULL,&$cadre_refreshed) {
 		if (!$files) return false;
 		$infos['display']=true;
 		$f = $files["atcardImport"];
 		if (!$f['size']) {
-			throw new errorATF(ATF::$usr->trans("fichier_corrompu",$this->table));	
+			throw new errorATF(ATF::$usr->trans("fichier_corrompu",$this->table));
 		}
 
 		if($fichier=fopen($f['tmp_name'],"r")){
 			$read = fread($fichier, filesize($f['tmp_name']));
-			
-			//Récupération de la société 
+
+			//Récupération de la société
 			$data = explode("===BEGIN:CONTACT===",$read);
-			
-			
+
+
 			ATF::db($this->db)->begin_transaction();
 			try {
 				if ($data[0]) {
 					$data[0] = str_replace("\n","",$data[0]);
 					$data[0] = str_replace("\r","",$data[0]);
 					$data[0] = substr($data[0],42);
-					
+
 
 					$societe = unserialize($data[0]);
 					unset($data[0]);
@@ -961,12 +965,12 @@ class societe_absystech extends societe {
 
 				}
 			} catch (errorATF $e) {
-				ATF::db($this->db)->rollback_transaction();	
+				ATF::db($this->db)->rollback_transaction();
 				throw new errorATF(ATF::$usr->trans("problemeLorsDeLimport",$this->table)." => ".$e->getMessage());
 			}
 			ATF::db($this->db)->commit_transaction();
 		}
-		
+
 		ATF::$json->add("success",true);
 		ATF::$json->add("id_societe",$this->cryptID($id_societe));
 
@@ -974,10 +978,10 @@ class societe_absystech extends societe {
 
 	}
 
-	/** 
+	/**
 	* Génère la ATcard puis l'envoi en DL au navigateur
 	* @author Quentin JANON <qjanon@absystech.fr>
-	* @return void 
+	* @return void
 	*/
 	public function atcard(&$infos,&$s,$files=NULL,&$cadre_refreshed) {
 		$infos['display'] = true;
@@ -987,7 +991,7 @@ class societe_absystech extends societe {
 		$this->dl(array("id_societe"=>$id,"field"=>"ATCARD-".$this->nom($infos['id_societe']),"type"=>"atcf"));
 	}
 
-	/** 
+	/**
 	* Généère la ATcard des sociétés + contact.
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @return void
@@ -998,7 +1002,7 @@ class societe_absystech extends societe {
 			unlink($target);
 		}
 		touch($target);
-		
+
 		if($fichier=fopen($target,"w")){
 			$begin="BEGIN:ATCARD\nVERSION:1.0\n";
 			fwrite($fichier,$begin);
@@ -1008,14 +1012,14 @@ class societe_absystech extends societe {
 			$atcf['societe'] = "===BEGIN:SOCIETE===";
 			$atcf['societe'] .= "\n";
 			$atcf['societe'] .= serialize($societe);
-			
+
 			//Infos des contacts de cette société
 			ATF::contact()->q->reset()->where("id_societe",$societe['id_societe']);
 			foreach (ATF::contact()->sa() as $contact) {
 				$tmp = "===BEGIN:CONTACT===";
 				$tmp .= "\n";
 				$tmp .= serialize($contact);
-				
+
 				$atcf['contact'] .= $tmp."\n";
 			}
 			fwrite($fichier,$atcf['societe']."\n".$atcf['contact']);
@@ -1024,9 +1028,9 @@ class societe_absystech extends societe {
 			fclose($fichier);
 		}
 	}
-	
 
-	/** 
+
+	/**
 	* Généère la ATcard des sociétés + contact.
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @return void
@@ -1042,16 +1046,16 @@ class societe_absystech extends societe {
 
 		$SixMonthLess = mktime(0,0,0,date("m")-6,date("d"),date("Y"));
 		$recordTS = strtotime($record['date']);
-		
+
 		if ($recordTS<$SixMonthLess) {
-			return "societeDebitriceToCall";	
+			return "societeDebitriceToCall";
 		} else {
-			return "societeDebitrice";	
+			return "societeDebitrice";
 		}
-			
-	
+
+
 	}
-	
+
 	/**
 	* Autocomplete avec les termes associés à chaque société
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -1069,8 +1073,8 @@ class societe_absystech extends societe {
 			->addField(array("CONCAT(societe.id_termes)"=>array("alias"=>"id_termes_fk","nosearch"=>true)));		// Entourloupe habituelle à l'autojoin
 		return parent::autocomplete($infos,false);
 	}
-	
-	
+
+
 	public function autocompleteOnlyActive($infos,$reset=true) {
 		if ($reset) {
 			$this->q->reset();
@@ -1079,8 +1083,8 @@ class societe_absystech extends societe {
 		// Entourloupe habituelle à l'autojoin
 		return parent::autocomplete($infos,false);
 	}
-	
-	
+
+
 	/**
 	* Autocomplete avec la TVA associés à chaque société
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -1095,19 +1099,19 @@ class societe_absystech extends societe {
 		}
 		$data=parent::autocomplete($infos,false);
 		foreach($data as $key => $item){
-			$data_return[$key][0]=$item[2];	
-			$data_return[$key][1]=$item["raw_0"];	
-			$data_return[$key][2]=$item[1];	
-			$data_return[$key]["raw_0"]=ATF::facture()->getTVA($item["raw_0"]);	
+			$data_return[$key][0]=$item[2];
+			$data_return[$key][1]=$item["raw_0"];
+			$data_return[$key][2]=$item[1];
+			$data_return[$key]["raw_0"]=ATF::facture()->getTVA($item["raw_0"]);
 			$data_return[$key]["raw_1"]=$item["raw_0"];
 			$data_return[$key]["raw_2"]=$item["raw_1"];
 			$data_return[$key]["email_facturation"]=ATF::contact()->select(ATF::societe()->select($item["raw_0"],"id_contact_facturation"),"email");
 		}
-		
+
 		return $data_return;
 	}
 
-		
+
 	/**
 	* Autocomplete retournant les fournisseurs d'une commande
 	* @author MOUAD EL HIZABRI
@@ -1127,7 +1131,7 @@ class societe_absystech extends societe {
 
        return parent::autocomplete($infos,false);
 	}
-	
+
 	/**
 	* Autocomplete retournant les fournisseurs
 	* @author MOUAD EL HIZABRI
@@ -1144,8 +1148,9 @@ class societe_absystech extends societe {
 
        return parent::autocomplete($infos,false);
 	}
-	
-	
+
+
+
 	/**
 	* Retourne les sociétés aléatoirement, sans les particuliers
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -1156,7 +1161,7 @@ class societe_absystech extends societe {
 			->where("id_famille",2,"OR","famille","!=");
 		return parent::rpcGetRecentToRecallForMobile($infos,true);
 	}
-	
+
 	/*
 	* Permet de faire une insertion rapide en extjs
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -1170,19 +1175,19 @@ class societe_absystech extends societe {
 		$infos["display"]=true;
 		return ATF::$html->fetch("rapprocher-societe.tpl.js");
 	}
-	
+
 	/*
 	* Permet de remplacer une carte via une fenêtre extjs
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
 	* @return une nouvelle fenêtre
 	*/
-	
+
 	public function updateRapprocher(){
 		return true;
 	}
 
-	public function estFermee($id_soc){		
+	public function estFermee($id_soc){
 		if($this->select($id_soc , "etat") == "inactif"){
 			return true;
 		}else{
@@ -1195,14 +1200,14 @@ class societe_absystech extends societe {
 	* @author morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function update($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
-		$this->infoCollapse($infos);	
-        $infos['id_societe'] = $this->decryptId($infos['id_societe']);	
-		$retour=parent::update($infos,$s,$files,$cadre_refreshed);	
-		
-		if($infos_soc['etat']!=$infos['etat'] && $infos['etat']=='inactif'){				
+		$this->infoCollapse($infos);
+        $infos['id_societe'] = $this->decryptId($infos['id_societe']);
+		$retour=parent::update($infos,$s,$files,$cadre_refreshed);
+
+		if($infos_soc['etat']!=$infos['etat'] && $infos['etat']=='inactif'){
 			$new = substr(md5(time()),0,4);
-			$this->u(array("id_societe" => $infos["id_societe"] , "divers_5" => $new));		
-		}		
+			$this->u(array("id_societe" => $infos["id_societe"] , "divers_5" => $new));
+		}
 		return $retour;
 	}
 
@@ -1219,9 +1224,9 @@ class societe_absystech extends societe {
 									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
 									,(facture.prix*facture.tva)
 								)),2)","solde")
-						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")			
+						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
 						    ->addField("IF(facture.etat!='perte'
-										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1 
+										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
 											,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
 											    *ROUND(IF(
 													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
@@ -1241,15 +1246,17 @@ class societe_absystech extends societe {
 												,facture.prix*facture.tva
 											),2))
 											, 0 )
-										) 					   					
-									,0)","interet")			
+										)
+									,0)","interet")
 						    ->addGroup("facture.id_facture");
 		$factures = ATF::facture()->select_all();
 
+		if (!$factures) return null;
+
 		$indicator["CA"] =
 		$indicator["CA_Prev"] =
-		$indicator["delai_paiement"] = 
-		$indicator["en_cours"] = 
+		$indicator["delai_paiement"] =
+		$indicator["en_cours"] =
 		$indicator["retard"] = 0;
 
 		$last_year = date("Y")-1;
@@ -1273,7 +1280,7 @@ class societe_absystech extends societe {
 				$date_paiement = strtotime($value["facture.date_effective"]. "00:00:00");
 				$diff  = abs($date_edition - $date_paiement);
 				$indicator["delai_paiement"] += floor($diff /86400);
-				$nb_delai_paiement ++;	
+				$nb_delai_paiement ++;
 			}
 
 			if($value["facture.etat"] !== "payee"){
@@ -1281,13 +1288,13 @@ class societe_absystech extends societe {
 				if($value["retard"]>0){
 					$indicator["retard"] += ($value["facture.prix"]*$value["facture.tva"]);
 				}
-				
+
 			}
 
 		}
 
 		$evoCA = ((number_format($indicator["CA"],2,"",",")-number_format($indicator["CA_Prev"],2,"",","))/number_format($indicator["CA_Prev"],2,"",","))*100;
-	
+
 		$indicator["evoCA"] = number_format($evoCA ,0," ",",");
 		$indicator["CA"] = number_format($indicator["CA"] ,2,","," ");
 		$indicator["en_cours"] = number_format($indicator["en_cours"] ,2,","," ");
@@ -1297,7 +1304,7 @@ class societe_absystech extends societe {
 		$indicator["meteo"] = $this->meteo_icone($this->select($infos["id_societe"], "meteo"));
 
 		$indicator["solde_total"]    = 	$this->solde_total($infos["id_societe"]);
-		$indicator["chiffre_par_an"] =  $this->chiffre_par_an($infos["id_societe"]); 
+		$indicator["chiffre_par_an"] =  $this->chiffre_par_an($infos["id_societe"]);
 		$indicator["affaire_perdu"]  = 	$this->affaire_perdu($infos["id_societe"]);
 		$indicator["datediff"] 		 =	$this->datediff($infos["id_societe"]);
 
@@ -1309,32 +1316,32 @@ class societe_absystech extends societe {
 	public function _indicateur_graph($infos){
 		$data = $this->chiffre_par_an($infos["id_societe"]);
 
-		foreach ($data as $i=>$j) {	
+		foreach ($data as $i=>$j) {
 			$graph['categories']["category"][$j["annee"]] = array("label"=>$j["annee"]);
 			$data[$i]["ca"] = $j["ca"]-$j["marge"];
 		}
 		$graph['params']['showLegend'] = "0";
 		$graph['params']['bgAlpha'] = "0";
 		$graph['categories']['params']["fontSize"] = "12";
-		$graph['params']["titre"] = "";		
-			
+		$graph['params']["titre"] = "";
+
 		$this->paramGraphe($dataset_params,$graph);
 
 		$liste_etat=array('marge'=>"FF0033",'ca'=>"0000FF");
-				
-		foreach ($data as $key=>$val_){			
+
+		foreach ($data as $key=>$val_){
 			foreach($liste_etat as $etat=>$couleur){
 				if (!$graph['dataset'][$etat]) {
 					$graph['dataset'][$etat]["params"] = array_merge($dataset_params,array(
 						"seriesname"=>ATF::$usr->trans($etat, $this->table)
 						,"color"=>$couleur
-					));						
-				}		
-				$graph['dataset'][$etat]['set'][$val_["annee"]] = array("value"=>number_format($val_[$etat],2,",",""),"titre"=>ATF::$usr->trans($etat, $this->table)." : ".number_format($val_[$etat],2,",","")." €");					
-								
+					));
+				}
+				$graph['dataset'][$etat]['set'][$val_["annee"]] = array("value"=>number_format($val_[$etat],2,",",""),"titre"=>ATF::$usr->trans($etat, $this->table)." : ".number_format($val_[$etat],2,",","")." €");
+
 			}
-		}		
-		return $graph;	
+		}
+		return $graph;
 	}
 
 
@@ -1349,7 +1356,7 @@ class societe_absystech extends societe {
 	public function default_value($field,$quickMail=false){
 		if(ATF::_r('id_societe')){
 			$societe = $this->select(ATF::_r('id_societe'));
-		}			
+		}
 		switch ($field) {
 			case "id_commercial":
 				if($societe) return $societe["id_user"];
@@ -1402,10 +1409,39 @@ class societe_absystech extends societe {
 		}
 	}
 
+	public function _hotline_echeancier($get, $post){
+
+		$date_debut = $post["date_debut_rapport"];
+		$date_fin = $post["date_fin_rapport"];
+
+		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","id_hotline")
+								  ->addField("gestion_ticket.solde","solde")
+								  ->addField("gestion_ticket.id_facture","id_facture")
+								  ->addField("gestion_ticket.libelle","libelle")
+								  ->addField("gestion_ticket.nbre_tickets","nbre_tickets")
+								  ->addField("gestion_ticket.date","date")
+								  ->addField("gestion_ticket.id_facture","id_facture")
+								  ->addField("hotline.id_contact","id_contact")
+								  ->addField("hotline.id_user","id_user")
+								  ->addField("hotline.hotline","hotline")
+								  ->addField("hotline.facturation_ticket","facturation_ticket")
+								  ->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($post["id_societe"]))
+								  //->whereIsNotNull("id_hotline")
+								  ->addCondition("gestion_ticket.date",util::formatDate($date_fin),"AND",false,"<=")
+								  ->addCondition("gestion_ticket.date",util::formatDate($date_debut),"AND",false,">=")
+								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
+								  ->addOrder("gestion_ticket.date");
+		$result = ATF::gestion_ticket()->sa();
+
+		$res = ATF::pdf()->generic("recapHotline",array("data"=>$result, "debut"=>$date_debut, "fin"=>$date_fin, "societe"=>$post["id_societe"]) ,true);
+
+		return base64_encode($res);
+	}
+
 };
 
 class societe_att extends societe_absystech {
-	/** 
+	/**
 	* Retourne le prfixe utilis, peut tre surcharg
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @return string $prefix

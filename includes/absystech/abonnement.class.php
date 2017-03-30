@@ -1,5 +1,5 @@
 <?
-/** 
+/**
 * Classe abonnement
 * @package Optima
 * @subpackage AbsysTech
@@ -11,7 +11,7 @@ class abonnement extends classes_optima {
 	public function __construct() {
 		parent::__construct();
 
-		$this->table = __CLASS__; 
+		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array(
 			'abonnement.codename',
 			'abonnement.nbre_user_actif',
@@ -40,12 +40,12 @@ class abonnement extends classes_optima {
 		return $return;
 	}
 
-	/* Remplissage de la table 
+	/* Remplissage de la table
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
 	public function insertMassif(){
 		$dbold = ATF::db($this->db)->getDatabase();
-		
+
 		//récupère les users actifs depuis moins de 3 mois
 		ATF::db($this->db)->select_db("optima");
 		ATF::activity()->q->reset()->addField("website_codename")
@@ -54,7 +54,7 @@ class abonnement extends classes_optima {
 									->setStrict();
 		$r = ATF::activity()->select_all();
 		if($r){
-			foreach($r as $cle=>$donnees){	
+			foreach($r as $cle=>$donnees){
 				if ($donnees['login'] == "absystech") continue;
 				$dbToConnect = $donnees['website_codename'];
 				if ($donnees['website_codename'] == "midas") {
@@ -96,10 +96,10 @@ class abonnement extends classes_optima {
 					"liste_user"=>$nbre_usr['liste_user'],
 					"espace_utilise"=>($size?$size:NULL)
 				);
-				
+
 			}
 		}
-		
+
 		//insertion des données dans la bonne base
 		ATF::db($this->db)->select_db($dbold);
 		//vu le peu de donnée je supprime le contenu et remplace par le nouveau

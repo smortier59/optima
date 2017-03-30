@@ -2,13 +2,7 @@
 { 
 	text: '{ATF::$usr->trans(export_tableau_autoportes,$current_class->name())}'
 	, handler: function(b,e){
-		window.location='{$current_class->name()},export_autoportes.ajax,onglet={$pager}';
-	} 
-},
-{ 
-	text: '{ATF::$usr->trans(export_tableau_autoportes_avec_refi,$current_class->name())}'
-	, handler: function(b,e){
-		window.location='{$current_class->name()},export_autoportes.ajax,onglet={$pager}&refi=true';
+		window.location='{$current_class->name()},export_autoportes.ajax';
 	} 
 },
 { 

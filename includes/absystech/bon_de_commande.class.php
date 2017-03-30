@@ -12,7 +12,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 	*/
 	public function __construct() {
 		parent::__construct();
-		$this->table = "bon_de_commande";	
+		$this->table = "bon_de_commande";
 		$this->colonnes['fields_column']  = array(
 			 'bon_de_commande.ref'
 			,'bon_de_commande.resume'
@@ -24,17 +24,17 @@ class bon_de_commande_absystech extends bon_de_commande{
 			,'termine'=>array("custom"=>true,"align"=>"center","nosort"=>true,"renderer"=>"setCompleted","width"=>50)
 			,'url'=>array("renderer"=>"viewCommand","custom"=>true,"align"=>"center","nosort"=>true)
 		);
-		//panel principale "premier plan"									
+		//panel principale "premier plan"
 		$this->colonnes['primary'] = array(
-			 "id_commande"	
+			 "id_commande"
 			 ,"resume"
 			 ,"ref"
 			 ,"etat"
 			 ,"id_societe"
 			 ,"date"
 			 ,"date_fin"
-			 ,"id_fournisseur"=>array("autocomplete"=>array("function"=>"autocompleteFournisseursDeCommande"))	
-			 //,"fournisseur_import"=>array("custom"=>true)		
+			 ,"id_fournisseur"=>array("autocomplete"=>array("function"=>"autocompleteFournisseursDeCommande"))
+			 //,"fournisseur_import"=>array("custom"=>true)
 			 ,"id_fournisseurFinal"=>array("custom"=>true,"autocomplete"=>array("function"=>"autocompleteFournisseurs"))
 			 ,"id_affaire"
 			 ,"id_user"
@@ -50,12 +50,12 @@ class bon_de_commande_absystech extends bon_de_commande{
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
 			,"tva"
 		);
-		
-		$this->fieldstructure();	
-		$this->foreign_key['id_fournisseur'] =  "societe";	
+
+		$this->fieldstructure();
+		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->foreign_key['id_fournisseurFinal'] =  "societe";
 		$this->field_nom = "resume";
-		
+
 		// Onglets
 		$this->onglets = array('bon_de_commande_ligne', 'facture_fournisseur'=>array('opened'=>true));
 
@@ -63,22 +63,22 @@ class bon_de_commande_absystech extends bon_de_commande{
 		$this->panels['primary'] = array("visible"=>true,'nbCols'=>3);
 		$this->panels['lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['total'] = array("visible"=>true,'nbCols'=>4);
-		
+
 		// Champs masqués
-		$this->colonnes['bloquees']['insert'] =  
-		$this->colonnes['bloquees']['cloner'] =  
-		$this->colonnes['bloquees']['update'] =  array('id_user','id_affaire','tva','id_commande','date','etat','id_societe');	
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] =  array('id_user','id_affaire','tva','id_commande','date','etat','id_societe');
 
 		//privileges
 		$this->addPrivilege("insert","update");
 		$this->addPrivilege("select_all","update");
-		
+
 		//$this->addPrivilege("autocompleteConditions");
 		$this->addPrivilege("setCompleted","update");
-		
+
 		$this->no_update = true;
 	}
-	
+
 	/**
 	* Surcharge du select-All
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -93,11 +93,11 @@ class bon_de_commande_absystech extends bon_de_commande{
 	}
 
 	/**
-	* MultiExplode recursif ! 
+	* MultiExplode recursif !
 	* @author Mouad EL HIZABRI
 	* @param String $separateur array des separateur
 	* @param String $chaine chaine a explodé
-	* @return array tableau des sous-chaîne du paramètre chaine 
+	* @return array tableau des sous-chaîne du paramètre chaine
 	*/
 	private function multi_explode($separateur,$chaine) {
     	$ary = explode($separateur[0],$chaine);
@@ -112,19 +112,17 @@ class bon_de_commande_absystech extends bon_de_commande{
 	/**
 	* Surcharge de l'insertion
 	* @author Mouad EL HIZABRI Jérémie GWIAZDOWSKI <jgw@absystech.fr>
-	* @return Integer id insertion de la commande 
+	* @return Integer id insertion de la commande
 	* dans le bon_de_commande et dans le stock
 	**/
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
-		
-		
 		if($infos["bon_de_commande"]["id_fournisseurFinal"] == NULL){
 			throw new errorATF("Il faut un fournisseur pour le bon de commande");
 		}
 		$infos["bon_de_commande"]["id_fournisseur"] = $infos["bon_de_commande"]["id_fournisseurFinal"];
 		$infos["label_bon_de_commande"]["id_fournisseur"] = $infos["label_bon_de_commande"]["id_fournisseurFinal"];
 		unset($infos["bon_de_commande"]["id_fournisseurFinal"], $infos["label_bon_de_commande"]["id_fournisseurFinal"]);
-		
+
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$chaine = $infos['values_bon_de_commande']['produits'];
 		$separateur = array(',',':','"');
@@ -141,13 +139,19 @@ class bon_de_commande_absystech extends bon_de_commande{
 		if($infos["id_commande"]){
 			$infos["id_affaire"]=ATF::commande()->select($infos['id_commande'],"id_affaire");
 		}
-		
+
 		//Nouvelle transaction
 		ATF::db($this->db)->begin_transaction();
-			
+
 		/*------------ Insertion COMMANDE FOURNISSEUR   ----------------*/
 		unset($infos["sous_total"],$infos["marge"],$infos["marge_absolue"],$infos["id_stock"]);
-		$last_id=parent::insert($infos,$s); 
+		try {
+			$last_id=parent::insert($infos,$s);
+		} catch (errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw new errorATF($e);
+		}
+
 		foreach($infos_ligne as $key=>$item){
 			foreach($item as $k=>$i){
 				$k_unescape=util::extJSUnescapeDot($k);
@@ -159,7 +163,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 			//$item["id_affaire"]=$infos["id_affaire"];
 			//$ligne_bdc["frais_de_port"]=$infos["frais_de_port"];
 			$ligne_bdc["tva"]=$infos["tva"];
-			
+
 			// Données ligne
 			$ligne_bdc["ref"]=$item["ref"];
 			$ligne_bdc["produit"]=$item["produit"];
@@ -168,19 +172,19 @@ class bon_de_commande_absystech extends bon_de_commande{
 			$ligne_bdc["prix_achat"]=$item["prix_achat"];
 			$ligne_bdc["date"]=$item["date"];
 			$ligne_bdc["etat"]=$item["etat"];
-			
+
 			//TEST pour savoir si la quantité inserée n'est pas > à la quantité commandé dans la commande
 			ATF::commande_ligne()->q->reset()->where("ref" , $item["ref"])
 											 ->where("id_commande", $infos['id_commande']);
-			$quantiteDepart = ATF::commande_ligne()->select_row();		
-			
+			$quantiteDepart = ATF::commande_ligne()->select_row();
+
 			ATF::bon_de_commande_ligne()->q->reset()->where("bon_de_commande_ligne.ref" , $item["ref"])
 													->from("bon_de_commande_ligne" , "id_bon_de_commande" , "bon_de_commande" , "id_bon_de_commande")
 													->from("bon_de_commande_ligne" , "id_bon_de_commande_ligne" , "stock" , "id_bon_de_commande_ligne")
 													->where("bon_de_commande.id_commande", $infos['id_commande']);
 			$Recu = ATF::bon_de_commande_ligne()->select_all();
 
-			
+
 
 			$quantiteRecu  = 0;
 
@@ -192,25 +196,25 @@ class bon_de_commande_absystech extends bon_de_commande{
 					$stock = ATF::stock_etat()->select_row();
 					if($stock["etat"] != "sinistr") $quantiteRecu  += 1;
 				}
-			}			
+			}
 
-			
+
 			if(isset($quantiteDepart)){
 				if(!$quantiteRecu){
 					//Pas encore de commande pour celui la
 					if($item["quantite"] > $quantiteDepart["quantite"]){
 						ATF::db($this->db)->rollback_transaction();
 						throw new errorATF("Quantité saisie ".$item["quantite"]. " alors que la quantité max pour le produit ref : ".$item["ref"]. " est de ".$quantiteDepart["quantite"]);
-					}								
+					}
 				}else{
 					//Deja des commandes concernant ce produit pour cette affaire
-					$total = $quantiteRecu + $item["quantite"]; 
+					$total = $quantiteRecu + $item["quantite"];
 					if($total > $quantiteDepart["quantite"]){
 						ATF::db($this->db)->rollback_transaction();
 						throw new errorATF("Quantité saisie ".$item["quantite"]." + quantite déja commandée ".$quantiteRecu." = ".$total." alors que la quantité max pour le produit ref : ".$item["ref"]. " est de ".$quantiteDepart["quantite"]);
-					}				
+					}
 				}
-			}			
+			}
 			$id_bon_de_commande_ligne = ATF::bon_de_commande_ligne()->insert($ligne_bdc,$s);
 
 			// Données stock
@@ -241,15 +245,15 @@ class bon_de_commande_absystech extends bon_de_commande{
 				$stock["etat"]="reception";
 				$stock["redirection_custom"]=true;
 				$stock["date_achat"]=$infos["date_fin"];
-				
+
 				//unset($item["id_produit"],$item["id_produit_fk"],$item["id_fournisseur"],$item["id_fournisseur_fk"],$item["id_compte_absystech_fk"],$item["marge"],$item["id_compte_absystech"],$item["marge_absolue"],$item["prix_achat"],$item["serial"]);
-				
+
 				/*---------------------- Insertion STOCK   ----------------------*/
 				if(!$item["quantite"]){
 					$item["quantite"]=0;
 				}else{
 					for($m=1;$m<=$item["quantite"];$m++){
-						ATF::stock()->insert($stock,$s);	
+						ATF::stock()->insert($stock,$s);
 					}
 				}
 			}
@@ -257,30 +261,30 @@ class bon_de_commande_absystech extends bon_de_commande{
 		//Redirection vers l'affaire
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
-		}		
+		}
 		//Fin transaction
-        //ATF::db($this->db)->rollback_transaction();       
-        ATF::db($this->db)->commit_transaction();       
+        //ATF::db($this->db)->rollback_transaction();
+        ATF::db($this->db)->commit_transaction();
 		//Insertion bon de commande
 		return $last_id;
 	}
-	
+
 	/**
 	* Surcharge de l'update
 	* @author Mouad EL HIZABRI
 	*/
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed){
 		$this->infoCollapse($infos);
-		unset($infos["sous_total"],$infos["marge"],$infos["marge_absolue"],$infos["prix_achat"]);	
-		return parent::update($infos,$s,$files,$cadre_refreshed);		
+		unset($infos["sous_total"],$infos["marge"],$infos["marge_absolue"],$infos["prix_achat"]);
+		return parent::update($infos,$s,$files,$cadre_refreshed);
 	}
-	
+
 	/**
     * Retourne la valeur par défaut spécifique aux données passées en paramètres
     * @author Mouad EL HIZABRI
 	* @param string $field
 	* @return string
-    */  
+    */
 	public function default_value($field){
 		if(ATF::_r('id_devis')){
 			$infos=ATF::devis()->select(ATF::_r('id_devis'));
@@ -308,7 +312,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 				return parent::default_value($field);
 		}
 	}
-	
+
 	/**
 	* Donne l'url du fournisseur
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
@@ -326,7 +330,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 				return false;
 		}
 	}
-	
+
 	/**
 	* Place la commande en état terminé
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr> MOUAD EL HIZABRI
@@ -339,13 +343,13 @@ class bon_de_commande_absystech extends bon_de_commande{
 			ATF::db()->rollback_transaction();
 			throw new errorATF(ATF::$usr->trans("error_setCompleted"));
 		}
-		
+
 		//Traitement des lignes de bon de commande
 		$bdc_lignes = ATF::bon_de_commande_ligne()->ss("id_bon_de_commande",$id_bdc);
 		//Traitement des lignes de bon_de_commande
-		foreach($bdc_lignes as $ligne){			
+		foreach($bdc_lignes as $ligne){
 			ATF::bon_de_commande_ligne()->update(array("id_bon_de_commande_ligne"=>$ligne["id_bon_de_commande_ligne"],"etat"=>"recu"));
-			
+
 			$stocks = ATF::stock()->ss("id_bon_de_commande_ligne",$ligne["id_bon_de_commande_ligne"]);
 			//Traitement des stocks
 			foreach($stocks as $stock){
@@ -355,9 +359,9 @@ class bon_de_commande_absystech extends bon_de_commande{
 				}
 			}
 		}
-		
+
 		$this->update(array("id_bon_de_commande"=>$id_bdc,"etat"=>"recu","date_fin"=>$infos["date_reception"]));
-		
+
 		//Redirection
 		if(is_array($cadre_refreshed)){
 			$id_affaire=$this->select($id_bdc,"id_affaire");
@@ -367,11 +371,11 @@ class bon_de_commande_absystech extends bon_de_commande{
 		ATF::db()->commit_transaction();
 		return true;
 	}
-	
+
     /**
-	* Surcharge du delete 
+	* Surcharge du delete
 	* @author MOUAD EL HIZABRI
-    */	
+    */
 	public function delete($infos,&$s,$files=NULL,&$cadre_refreshed){
 		$last_id= array();
 		//Nouvelle transaction
@@ -379,7 +383,7 @@ class bon_de_commande_absystech extends bon_de_commande{
 		// Multi suppression
 		foreach($infos["id"] as $cle=>$valeur){
 			$info_id =$valeur;
-			if (is_numeric($info_id) || is_string($info_id)) {			
+			if (is_numeric($info_id) || is_string($info_id)) {
 				$id=$this->decryptId($info_id);
 				//Recherche des lignes
 				$bdc_lignes = ATF::bon_de_commande_ligne()->ss("id_bon_de_commande",$id);
@@ -407,8 +411,8 @@ class bon_de_commande_absystech extends bon_de_commande{
 			ATF::stock()->redirection('select_all_optimized',"gsa_affaire_stock_".$id_affaire);
 		}
 		return true;
-	} 
-	
+	}
+
 	/**
 	* Condition du filtrage
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr> MOUAD EL HIZABRI
@@ -436,28 +440,28 @@ class bon_de_commande_absystech extends bon_de_commande{
 	}
 
 	/* a voir */
-	
-	/** 
+
+	/**
 	* possiblilité de mise à jour
 	* @author Mouad ELHIZABRI
 	* @return true si la modification est possible
 	*/
 	/*public function can_update($id,$field){
 		if($this->select($id,"etat")=="en_cours"){
-			return false; 
+			return false;
 		}else{
 			return true;
 		}
 	}
 
-	/** 
+	/**
 	* possiblilité de suppression
 	* @author Mouad ELHIZABRI
 	* @return true si la suppression est possible
 	*/
 	/*public function can_delete($id){
 		return $this->can_update($id);
-	}*/	
+	}*/
 };
 
 class bon_de_commande_att extends bon_de_commande_absystech { };

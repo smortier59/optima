@@ -20,6 +20,8 @@
 {util::push($fieldsKeys,"demandeRefiExist")}
 /* Pour les Factures */
 {util::push($fieldsKeys,"factureAllow")}
+{util::push($fieldsKeys,"abandonAllow")}
+
 {util::push($fieldsKeys,"id_affaireCrypt")}
 /* Pour les Ventes */
 {util::push($fieldsKeys,"vente")}
@@ -37,7 +39,7 @@
 ATF.renderer.dateCleCommande=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
 		var idDiv = Ext.id();
-		var id = record.data[table+'__dot__id_'+table]; 
+		var id = record.data[table+'__dot__id_'+table];
 		if (!record.data.vente) {
 			(function(){
 				var params = {
@@ -145,10 +147,10 @@ ATF.renderer.dateCleCommande=function(table,field) {
 				var p = new Ext.FormPanel(params);
 			}).defer(25);
 		}
-		
-		
+
+
 		html = '<div id="'+idDiv+'"></div>';
-		
+
 		return html;
 	}
 };
@@ -159,11 +161,11 @@ ATF.renderer.pdfCommande=function(table,field) {
 		var idDiv = Ext.id();
 		var id = record.data[table+'__dot__id_'+table];
 		var html = "";
-	
+
 		/*html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
 		html += '</a><br /><hr>';*/
-		
+
 		html += '<a href="commande-select-contratA4-'+id+'.dl" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande');
 		html += '</a><br /><hr>';
@@ -187,15 +189,15 @@ ATF.renderer.pdfCourriers=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
 		var idDiv = Ext.id();
 		var id = record.data[table+'__dot__id_'+table];
-		
+
 		var html = "";
-		
+
 		if (record.data.envoiCourrierClassiqueExists==true) {
 			html += '<a href="commande-select-envoiCourrierClassique-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Courrier classique','commande');
 			html += '</a><br /><hr>';
 		}
-				
+
 		if (record.data.envoiContratEtBilanExists==true) {
 			html += '<a href="commande-select-envoiContratEtBilan-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat avec demande de bilan','commande');
@@ -206,19 +208,19 @@ ATF.renderer.pdfCourriers=function(table,field) {
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat sans demande de bilan','commande');
 			html += '</a><br /><hr>';
 		}
-		
+
 		if (record.data.envoiAvenantExists==true) {
 			html += '<a href="commande-select-envoiAvenant-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Avenant','commande');
 			html += '</a><br /><hr>';
 		}
-		
+
 		if (record.data.contratTransfertExists==true) {
 			html += '<a href="commande-select-contratTransfert-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat de transfert','commande');
 			html += '</a><br /><hr>';
 		}
-		
+
 		if (record.data.ctSigneExists==true) {
 			html += '<a href="commande-select-ctSigne-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat signé','commande');
@@ -231,10 +233,10 @@ ATF.renderer.pdfCourriers=function(table,field) {
 			html += '</a><br /><hr>';
 		}
 
-		
 
-		
-				
+
+
+
 		return '<div id="'+idDiv+'">'+html+'</div>';
 	}
 };
@@ -269,7 +271,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
 			}
-			
+
 			/* Demande refi Expand */
 			if (!record.data.demandeRefiExist) {
 				html += '<p>';
@@ -279,7 +281,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
 			}
-			
+
 			/* Facture Expand */
 			if (record.data.factureAllow) {
 				html += '<p>';
@@ -289,7 +291,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
 			}
-			
+
 			if (etat=='mis_loyer' || etat=='prolongation' || etat=='restitution' || etat=='mis_loyer_contentieux' || etat=='prolongation_contentieux' || etat=='restitution_contentieux') {
 				/* Stop CMD */
 				html += '<p>';
@@ -310,6 +312,24 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</p>';
 			}
 
+
+			html += '<p>';
+			html += '<a href="javascript:;"  onclick="Ext.getCmp(\'mywindow'+id+'\').show();">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />';
+			html += ATF.usr.trans('creerCourrierType','commande');
+			html += '</a>';
+			html += '</p>';
+
+			/* Abandon Expand */
+			if (record.data.abandonAllow) {
+				html += '<p><br />';
+				html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'commande,abandonCommande.ajax\',\'id_commande='+id+'\');">';
+				html += '<img src="{ATF::$staticserver}images/icones/delete.png" />';
+				html += 'Abandonner le contrat';
+				html += '</a>&nbsp;&nbsp;&nbsp;';
+				html += '</p>';
+			}
+
 			if (!Ext.getCmp('myForm'+id)) {
 				 var formPanel = new Ext.FormPanel({
 					frame:true,
@@ -322,24 +342,24 @@ ATF.renderer.pdfCourriers=function(table,field) {
 							html: '<span class="bold">{ATF::$usr->trans("choixCourrier","commande")|escape:javascript}</span><hr>',
 							xtype:'container'
 						}
-						,					
+						,
 						{
 							xtype: 'combo'
-							,name: 'combo_pdf' 
+							,name: 'combo_pdf'
 							,hiddenName:'pdf'
 							,id: 'choixCourrierPdf'
-							,fieldLabel:'{ATF::$usr->trans("documentCR","commande")|escape:javascript}'							
+							,fieldLabel:'{ATF::$usr->trans("documentCR","commande")|escape:javascript}'
 						    ,store: new Ext.data.ArrayStore({
 						        fields: ['myId','displayText'],
 						        data: [
 						        	['envoiCourrierClassique', 'Courrier classique'],
-						        	['envoiContratEtBilan', 'Contrat avec demande de bilan'], 
-						        	['envoiContratSsBilan', 'Contrat sans demande de bilan'], 
-						        	['envoiAvenant', 'Avenant'], 
-						        	['contratTransfert', 'Contrat de transfert'], 
+						        	['envoiContratEtBilan', 'Contrat avec demande de bilan'],
+						        	['envoiContratSsBilan', 'Contrat sans demande de bilan'],
+						        	['envoiAvenant', 'Avenant'],
+						        	['contratTransfert', 'Contrat de transfert'],
 						        	['ctSigne', 'Contrat signé'],
 						        	['CourrierRestitution', 'Courrier de restitution']
-						        	
+
 						        ]
 						    }),
 						    valueField: 'myId',
@@ -350,68 +370,68 @@ ATF.renderer.pdfCourriers=function(table,field) {
 						    mode: 'local',
 						    editable:false,
 						    listeners: {
-						    	select: function(field) {                        			
+						    	select: function(field) {
                         			if(field.value == "envoiAvenant"){
-                        				Ext.getCmp("bdc"+id).setVisible(true);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				
-                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);                     				
+                        				Ext.getCmp("bdc"+id).setVisible(true);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
+                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
                         			} else if (field.value == "contratTransfert") {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(true);   
-                        				Ext.getCmp("docSupAretourner"+id).setVisible(true);                     				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(true);
+                        				Ext.getCmp("docSupAretourner"+id).setVisible(true);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
                         			} else if (field.value == "envoiContratEtBilan" || field.value == "envoiContratSsBilan" || field.value == "envoiCourrierClassique") {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                           				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(true);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
                         			} else if (field.value == "CourrierRestitution") {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                           				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(true);
                         				Ext.getCmp("rar"+id).setVisible(true);
                         				ATF.ajax("commande,getDateResti.ajax"
                         						,"id_commande="+id
-                        						,{ onComplete: function (result) {                        								
+                        						,{ onComplete: function (result) {
                         								if(result.result){
                         									Ext.getCmp("date_echeance"+id).setValue(result.result);
-                        								}                        							
+                        								}
                         							}
                         						}
-                        				);                     				
-                        				
+                        				);
+
                         			}else {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                           				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
-                        				Ext.getCmp("date_echeance"+id).setVisible(false);  
-                        				Ext.getCmp("rar"+id).setVisible(false);                      				
+                        				Ext.getCmp("date_echeance"+id).setVisible(false);
+                        				Ext.getCmp("rar"+id).setVisible(false);
                         			}
-                        			
+
                         		}
-						    }						    
+						    }
 						},{
 		                    xtype: 'textfield',
 		                    fieldLabel: 'Type du devis',
 		                    name : 'type_devis',
 		                    id : 'type_devis'+id,
-		                    hidden: true,						
+		                    hidden: true,
 						},{
 		                    xtype: 'textfield',
 		                    fieldLabel: 'Bon de commande',
 		                    name : 'bdc',
 		                    id : 'bdc'+id,
-		                    hidden: true,						
+		                    hidden: true,
 						},{
 							xtype: 'textfield',
 		                    fieldLabel: 'Reprise Magasin',
@@ -420,7 +440,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 		                    hidden: true,
 						},{
 							xtype: 'textfield'
-							,name: 'id_commande' 
+							,name: 'id_commande'
 							,id: 'id_commande'
 							,value: id
 							,hidden:true
@@ -444,7 +464,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 		                    hidden: true,
 						}
 					],
-				
+
 					buttons: [{
 						text: 'Ok',
 						handler: function(a,b,c,d){
@@ -465,7 +485,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 									Ext.getCmp(store.baseParams.pager).store.reload();
 								}
 								,timeout:3600
-							});								
+							});
 						}
 					},{
 						text: '{ATF::$usr->trans(preview)|escape:javascript}',
@@ -504,7 +524,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 									}
 								}
 								,timeout:3600
-							});									
+							});
 						}
 					},{
 						text: 'Annuler',
@@ -513,7 +533,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 						}
 					}]
 				});
-			}	
+			}
 
 			if (!Ext.getCmp('mywindow'+id)) {
 
@@ -528,24 +548,16 @@ ATF.renderer.pdfCourriers=function(table,field) {
 					items: [formPanel]
 				});
 			}
-			
-
-			html += '<p>';
-			html += '<a href="javascript:;"  onclick="Ext.getCmp(\'mywindow'+id+'\').show();">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />';
-			html += ATF.usr.trans('creerCourrierType','commande');
-			html += '</a>';
-			html += '</p>';
 
 			(function(){
 				var params = {
 					renderTo: idDiv,
 					html: html
-					
+
 				};
 				var p = new Ext.Container(params);
 			}).defer(25);
-						
+
 			return '<div id="'+idDiv+'"></div>';
 		}
 	};

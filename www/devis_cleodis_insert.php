@@ -28,7 +28,8 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
             $id_societe = $soc["id_societe"];
         }
 
-        ATF::contact()->q->reset()->where("nom",$infos['nom'],"AND")->where("prenom",$infos['prenom']);
+        ATF::contact()->q->reset()->where("nom",ATF::db()->real_escape_string($infos['nom']),"AND")
+                                  ->where("prenom",ATF::db()->real_escape_string($infos['prenom']));
 
         $contact = ATF::contact()->select_row();
         if($contact){

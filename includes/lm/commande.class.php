@@ -1,5 +1,5 @@
 <?
-/** 
+/**
 * Classe commande
 * @package Optima
 * @subpackage Cléodis
@@ -45,7 +45,7 @@ class commande_lm extends commande {
 			,'autreFacture'=>array("custom"=>true,"nosort"=>true)
 			,'stop'=>array("custom"=>true,"nosort"=>true)
 		);
-		
+
 		$this->colonnes['panel']['loyer_lignes'] = array(
 			"loyer"=>array("custom"=>true)
 		);
@@ -56,7 +56,7 @@ class commande_lm extends commande {
 
 		$this->colonnes['panel']['lignes'] = array(
 			"produits"=>array("custom"=>true)
-		);		
+		);
 
 		$this->colonnes['panel']['total'] = array(
 			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
@@ -79,24 +79,24 @@ class commande_lm extends commande {
 		$this->panels['loyer_lignes'] = array("visible"=>true,'nbCols'=>1);
 		$this->panels['total'] = array("visible"=>true,'nbCols'=>4);
 		$this->panels['courriel'] = array('nbCols'=>2,"checkboxToggle"=>true);
-		
+
 		// Champs masqués
-		$this->colonnes['bloquees']['insert'] = 
-		$this->colonnes['bloquees']['cloner'] = 
-		$this->colonnes['bloquees']['update'] = array('stop','autreFacture','bdc','prolongation','date_debut','id_devis','etat','date_evolution','id_user','tva',"retour_prel","mise_en_place","retour_pv","retour_contrat","date_debut","date_evolution","date_arret");	
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] = array('stop','autreFacture','bdc','prolongation','date_debut','id_devis','etat','date_evolution','id_user','tva',"retour_prel","mise_en_place","retour_pv","retour_contrat","date_debut","date_evolution","date_arret");
 		$this->colonnes['bloquees']['select'] = array('produits','loyer','total');
-				
+
 		$this->fieldstructure();
 		$this->noTruncateSA = true;
 		$this->no_insert = true;
 		$this->no_update = true;
-		$this->onglets = array('commande_ligne','bon_de_commande');		
-		$this->files["contratA4"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);		
+		$this->onglets = array('commande_ligne','bon_de_commande');
+		$this->files["contratA4"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["retour"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["retourPV"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		
-        
-        
+
+
+
         $this->files["demandeResi"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 		$this->addPrivilege("majMail","update");
@@ -104,6 +104,8 @@ class commande_lm extends commande {
 		$this->addPrivilege("uploadScanDocument","update");
 		$this->addPrivilege("getCommande_ligne");
 		$this->addPrivilege("stopCommande","update");
+		$this->addPrivilege("abandonCommande","update");
+
 		$this->addPrivilege("reactiveCommande","update");
 		$this->addPrivilege("generateCourrierType");
 		$this->addPrivilege("export_loyer_assurance");
@@ -112,18 +114,18 @@ class commande_lm extends commande {
 
 		/* Important pour patcher le problème de FK FROM relevé dans le ticket : 7775 */
 		$this->foreign_key["id_fournisseur"] = "societe";
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 	}
-	
+
 	public function uploadFileFromSA(&$infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$infos['display'] = true;
 		$class = ATF::getClass($infos['extAction']);
 		if (!$class) return false;
 		if (!$infos['id']) return false;
 		if (!$files) return false;
-		
+
 		$id = $class->decryptID($infos['id']);
-		
+
 		$id_affaire = $class->select($id, "id_affaire");
 
 		foreach ($files as $k=>$i) {
@@ -134,13 +136,13 @@ class commande_lm extends commande {
 			$this->store($s,$id,$k,$i);
 
 			copy($class->filepath($id,$k), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
-			
+
 		}
 		ATF::$cr->block('generationTime');
 		ATF::$cr->block('top');
-		
-		
-		
+
+
+
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
@@ -152,15 +154,15 @@ class commande_lm extends commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
-		
+
 		if($id_commande = ATF::_r('id_commande')){
 			$commande=$this->select($id_commande);
 		}elseif ($id_devis = ATF::_r('id_devis')) {
 			$commande=ATF::devis()->select($id_devis);
 		}
-		
+
 		if($commande){
 			switch ($field) {
 				case "ref":
@@ -209,11 +211,11 @@ class commande_lm extends commande {
 					return $commande['id_devis'];
 			}
 		}
-	
+
 		return parent::default_value($field,$s,$request);
-	}	
-	
-	/** 
+	}
+
+	/**
 	* Surcharge de l'insert
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -223,9 +225,9 @@ class commande_lm extends commande {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		
+
 		if(isset($infos["preview"])){
-			if ($infos['file']) $fileToPreview = $infos['file'];	
+			if ($infos['file']) $fileToPreview = $infos['file'];
 			$preview=$infos["preview"];
 		}else{
 			$preview=false;
@@ -235,7 +237,7 @@ class commande_lm extends commande {
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 
 		unset($infos["values_".$this->table]["produits"]);
-		
+
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
 
@@ -277,14 +279,14 @@ class commande_lm extends commande {
 
 		unset($infos["marge"],$infos["marge_absolue"]);
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-		
-		
 
-		
+
+
+
 
 		// Mise à jour du forecast
 		$affaire = new affaire_lm($infos['id_affaire']);
-		
+
 		$affaire->majForecastProcess();
 
 		////////////////Commande Ligne
@@ -294,7 +296,7 @@ class commande_lm extends commande {
 				$infos_ligne[]=$infos_ligne_repris[$key];
 			}
 		}
-	
+
 		if($from_web){
 			$infos_ligne = array();
 			ATF::devis_ligne()->q->reset()->where("id_devis",$infos["id_devis"]);
@@ -302,28 +304,28 @@ class commande_lm extends commande {
 
 			$pack = ATF::pack_produit()->select(ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit"));
 
-			if($infos_ligne){	
-				foreach($infos_ligne as $key=>$item){										
+			if($infos_ligne){
+				foreach($infos_ligne as $key=>$item){
 					unset($item["id_devis_ligne"],
 						  $item["id_devis"],
 						  $item["ref_simag"],
 						  $item["type"],
 						  $item["visibilite_prix"]
 						 );
-					
+
 					$item["id_commande"]=$last_id;
 					ATF::commande_ligne()->i($item);
 				}
 			}else{
 				ATF::db($this->db)->rollback_transaction();
 				throw new errorATF("Commande sans produits",877);
-			}			
+			}
 
 		}else{
 			//Lignes visibles
 			if($infos_ligne){
 				$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"commande_ligne");
-				
+
 				$pack = ATF::pack_produit()->select(ATF::produit()->select($infos_ligne[0]["id_produit"], "id_pack_produit"));
 
 				foreach($infos_ligne as $key=>$item){
@@ -342,18 +344,18 @@ class commande_lm extends commande {
 				ATF::db($this->db)->rollback_transaction();
 				throw new errorATF("Commande sans produits",877);
 			}
-		}		
-		
+		}
+
 		////////////////Devis
-		$devis["etat"]="gagne";	
-		 
+		$devis["etat"]="gagne";
+
         if (!$devis['first_date_accord']){ 	$devis['first_date_accord'] = date('Y-m-d'); }
-        else{ $devis["date_accord"] = date('Y-m-d'); }       
+        else{ $devis["date_accord"] = date('Y-m-d'); }
 		ATF::devis()->u($devis);
-		
+
 		////////////////Affaire
 		ATF::affaire()->u(array("id_affaire"=>$devis['id_affaire'],"etat"=>"commande"));
-	
+
 //*****************************************************************************
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
@@ -369,27 +371,27 @@ class commande_lm extends commande {
 			}
 
 			ATF::db($this->db)->commit_transaction();
-			
+
 			//On concatene le PDF du contrat avec les CG
 			if($pack && $pack["id_document_contrat"]){
 				$contratA4 = $this->filepath($last_id,"contratA4");
 				$CG = ATF::document_contrat()->filepath($pack["id_document_contrat"],"fichier_joint");
 
-				if(file_exists($contratA4) && file_exists($CG)){					
+				if(file_exists($contratA4) && file_exists($CG)){
 					$cmd = "gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$contratA4.".pdf ".$contratA4." ".$CG;
 					$result = `$cmd`;
 					rename($contratA4.".pdf", $contratA4);
-				}			
+				}
 			}
 		}
-		
+
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
 		return $this->cryptId($last_id);
 
 	}
-	
+
 	/**
     * Permet de mettre a jour une date en ajax
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -398,24 +400,24 @@ class commande_lm extends commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return bool
-    */   	
+    */
 	public function updateDate($infos,&$s,&$request){
 		if (!$infos['id_commande']) return false;
 
-		if ($infos['value'] == "undefined") $infos["value"] = "";		
+		if ($infos['value'] == "undefined") $infos["value"] = "";
 		switch ($infos['key']) {
 			// Sécurité, n'exécuter une action que pour ces champs
-			case "date_debut":	
-			case "date_evolution":	
-			case "retour_contrat":	
-			case "retour_prel":	
+			case "date_debut":
+			case "date_evolution":
+			case "retour_contrat":
+			case "retour_prel":
 			case "retour_pv":
 			case "date_demande_resiliation":
 			case "date_prevision_restitution":
 			case "date_restitution_effective":
-				
+
 				//Il ne faut pas que la date début soit un 29 30 ou 31 car sinon cela pause problème lors de la création de l'échéancier
-				if($infos['key']=="date_debut"){					
+				if($infos['key']=="date_debut"){
 					if(date("d",strtotime($infos['value']))=="29" || date("d",strtotime($infos['value']))=="30" || date("d",strtotime($infos['value']))=="31"){
 						throw new errorATF("Un contrat ne peut pas avoir pour ".ATF::$usr->trans($infos['key'],$this->table)." une 29, 30, 31 (ici ".date("d",strtotime($infos['value'])).")",880);
 					}
@@ -423,7 +425,7 @@ class commande_lm extends commande {
 
 					/*ATF::facture_fournisseur()->q->reset()
 						->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
-						->where("type", "achat");					
+						->where("type", "achat");
 					foreach (ATF::facture_fournisseur()->select_all() as $k => $v) {
 						ATF::facture_fournisseur()->u(array("id_facture_fournisseur"=>$v["id_facture_fournisseur"], "numero_cegid"=> ATF::facture_fournisseur()->getNumeroCegid()));
 					}*/
@@ -436,36 +438,36 @@ class commande_lm extends commande {
 				ATF::db($this->db)->begin_transaction();
 				try {
 					$cmdBefore = $this->select($infos['id_commande']);
-					
-					
+
+
 					//Si on modifie la fin de contrat, on modifie en meme temps la date de restitution prévue
 					if($infos['key'] === "date_evolution"){
 						$d = array("id_commande"=>$infos['id_commande']
 								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)
 								   );
-						
+
 					}else{
 						$d = array("id_commande"=>$infos['id_commande']
 								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL));
-					}	
-					
+					}
+
 					$this->u($d);
-					$commande = $this->select($infos['id_commande']);					
-					
+					$commande = $this->select($infos['id_commande']);
+
 					$this->checkAndUpdateDates(array(
 						"id_commande"=>$infos['id_commande']
 						,"field"=>$infos['key']
 						,"date"=>$d[$infos['key']]
-					));						
-					
-					
-					
+					));
+
+
+
 					$cmd = $this->select($infos['id_commande']);
 					if($infos['value']){
 						if(ATF::$usr->get('id_user')){
 							$client = ATF::societe()->select($cmd['id_societe']);
 							$num_contrat = $cmd['ref'].($client["code_client"]?"-".$client["code_client"]:"");
-							
+
 							$suivi = array(
 								"id_user"=>ATF::$usr->get('id_user')
 								,"id_societe"=>$cmd['id_societe']
@@ -478,9 +480,9 @@ class commande_lm extends commande {
 								,'suivi_notifie'=>NULL
 								,'champsComplementaire'=>$infos['key']
 							);
-							if(($infos['key'] == "date_prevision_restitution") || ($infos['key'] == "date_prevision_restitution")){	$suivi["type_suivi"] = "Restitution";	}	
-							
-							
+							if(($infos['key'] == "date_prevision_restitution") || ($infos['key'] == "date_prevision_restitution")){	$suivi["type_suivi"] = "Restitution";	}
+
+
 							ATF::suivi()->insert($suivi);
 							//ATF::$msg->addNotice(ATF::$usr->trans("suivi_plus_email_envoye_to_owner",$this->table));
 						}
@@ -498,7 +500,7 @@ class commande_lm extends commande {
 					ATF::db($this->db)->rollback_transaction();
 					throw $e;
 				}
-				
+
 				//On commit le tout
 				ATF::db($this->db)->commit_transaction();
 
@@ -518,13 +520,13 @@ class commande_lm extends commande {
 			ATF::affaire()->redirection("select",$cmd["id_affaire"]);
 		}
 		return true;
-	}	
+	}
 
 //	/**
 //    * Permet de mettre a jour la date Resiliation en ajax
 //    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 //	  * @param array $infos
-//    */   	
+//    */
 //	public function updateDateResiliation($infos){
 //		$commande = $this->select($infos['id_commande']);
 //		//Il faut une date de de résiliation pour insérer une date de restitution
@@ -534,12 +536,12 @@ class commande_lm extends commande {
 //			return parent::updateDate($infos);
 //		}
 //	}
-//	
+//
 //	/**
 //    * Permet de mettre a jour la date Resiliation en ajax
 //    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 //	* @param array $infos
-//    */   	
+//    */
 //	public function updateDateRestitution($infos){
 //		$commande = $this->select($infos['id_commande']);
 //		//Il faut une date de de résiliation pour insérer une date de restitution
@@ -556,7 +558,7 @@ class commande_lm extends commande {
 //    * Permet de mettre a jour la date Resiliation en ajax
 //    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 //	* @param array $infos
-//    */   	
+//    */
 //	public function updateDateRestitution_effective($infos){
 //		$commande = $this->select($infos['id_commande']);
 //		parent::updateDate($infos);
@@ -567,7 +569,7 @@ class commande_lm extends commande {
 	/**
     * Vérification si on peut modifier/supprimer une commande
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    */   	
+    */
 	public function checkUpdateAR($affaire){
 		//On ne peux pas modifier les dates d'une commande qui est parente d'une autre commande
 		if($affaire->get("id_fille")){
@@ -578,11 +580,11 @@ class commande_lm extends commande {
 			}
 		}
 	}
-	
+
 	/**
     * Vérification si on peut modifier/supprimer une commande
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    */   	
+    */
 	public function checkUpdateAVT($affaireEnfant){
 		if($affaireEnfant["nature"]=="vente"){
 			throw new errorATF("On ne peut pas modifier/supprimer car des produits de cette affaire sont vendus dans l'affaire (".$affaireEnfant["ref"].")",875);
@@ -595,7 +597,7 @@ class commande_lm extends commande {
 			}
 		}
 	}
-	
+
 	/**
     * Vérification des dates de la commande, et modification automatiques éventuelles
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -605,38 +607,38 @@ class commande_lm extends commande {
 	* 	infos[field]		date_debut|date_evolution|retour_contrat|retour_prel|retour_pv|date_demande_resiliation|date_prevision_restituion|date_restitution_effective
 	* 	infos[date]
 	* @return bool
-    */   	
+    */
 	public function checkAndUpdateDates($infos){
 		$commande = new commande_lm($infos['id_commande']);
-		
-		$affaire = $commande->getAffaire();		
+
+		$affaire = $commande->getAffaire();
 		//On ne doit pas pouvoir modifier une commande Annulée et remplacée
 		$this->checkUpdateAR($affaire);
 
 		ATF::affaire()->q->reset()->addCondition("id_parent",$affaire->get("id_affaire"))->setDimension("row");
 		$affaireParent=ATF::affaire()->sa();
-		
-		if(($infos["field"] !== "date_demande_resiliation") &&  ($infos["field"] !== "date_prevision_restitution") && ($infos["field"] !== "date_restitution_effective")){			
+
+		if(($infos["field"] !== "date_demande_resiliation") &&  ($infos["field"] !== "date_prevision_restitution") && ($infos["field"] !== "date_restitution_effective")){
 			//On ne peux pas modifier les dates d'une commande qui est parente d'une autre commande
-			if($affaireParent){				
+			if($affaireParent){
 				$this->checkUpdateAVT($affaireParent);
 			}
 		}
-		
+
 		//Création du tableau des affaires parentes
 		if ($ap = $affaire->getParentAR()) {
 			// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 			foreach ($ap as $a) {
 				if(ATF::$codename == "lmbe") $affaires_parentes[] = new affaire_lmbe($a["id_affaire"]);
 				else $affaires_parentes[] = new affaire_lm($a["id_affaire"]);
-				
+
 			}
 		} elseif ($affaire->get('id_parent')) {
 			$affaire_parente = $affaire->getParentAvenant();
 		}
-		
+
 		$affaireFillesAR=ATF::affaire()->getFillesAR($affaire->get("id_affaire"));
-		
+
 		$devis = $affaire->getDevis();
 		switch ($infos["field"]) {
 			case "date_debut":
@@ -645,7 +647,7 @@ class commande_lm extends commande {
 					// Si avenant loyer unique
 					if ($affaire->isAvenant() && $devis->get("loyer_unique")==="oui") {
 						$commande->set("date_evolution",$affaire_parente->getCommande()->get("date_evolution"));
-					
+
 						//l'affaire parente ne peut pas avoir une date début supérieur à la date début de l'affaire avenant
 						if($affaire_parente->getCommande()->get("date_debut") > $infos["date"]){
 							$commande->set("date_debut",$affaire_parente->getCommande()->get("date_debut"));
@@ -659,7 +661,7 @@ class commande_lm extends commande {
 						if($prolongation){
 							ATF::prolongation()->delete($prolongation[0]["id_prolongation"]);
 						}
-						// Créer une prolongation qui arrête le contrat (fréquence = « p », id_refinanceur = cléodis)				
+						// Créer une prolongation qui arrête le contrat (fréquence = « p », id_refinanceur = cléodis)
 						$lastId=ATF::prolongation()->i(array(
 							"id_affaire"=>$commande->get("id_affaire")
 							,"ref"=>$commande->get("ref")
@@ -674,43 +676,45 @@ class commande_lm extends commande {
 						$date_fin_calculee = $devis->getDateFinPrevue($infos["date"]);
 						$commande->set("date_evolution",$date_fin_calculee);
 					}
-					
+
 					$this->checkEtat($commande,$affaires_parentes);
-					
+
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
-					ATF::facturation_fournisseur()->createEcheancier($affaire);					
-					
+					ATF::facturation_fournisseur()->createEcheancier($affaire);
+					ATF::facturation_fournisseur()->createFactureFournisseurAchat($affaire);
+
+
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
 					if($commande->get("etat")=="prolongation"){
-						if ($prolongation = $affaire->getProlongation($affaire->get('id_affaire'))) {						
+						if ($prolongation = $affaire->getProlongation($affaire->get('id_affaire'))) {
 							//if (strtotime($prolongation->get("date_fin"))<strtotime(date("Y-m-d"))) {
 								// Si l'on a atteint la date d'arrêt (définie dans prolongation) on passe l'état de la commande en « restitution »
 								$commande->set("etat","restitution");
 							//}
 						}
 					}
-					
+
 					if($commande->get("etat")=="restitution"){
-						if ($prolongation = $affaire->getProlongation($affaire->get('id_affaire'))) {						
+						if ($prolongation = $affaire->getProlongation($affaire->get('id_affaire'))) {
 							if ($prolongation->get("date_restitution_effective") !== "") {
 								// Si on a une date de restitution,  on passe l'état de la commande en « arreter »
 								$commande->set("etat","arreter");
 							}
 						}
 					}
-					
+
 					if (!$affaire->get("date_installation_reel")) {
 						// Si aucune date d'installation réelle, on la définie à la date de début de contrat
 						$affaire->set("date_installation_reel",$commande->get("date_debut"));
 					}
-					
+
 //					$affaire->majGarantieParc($affaire->get("date_garantie"));
-					
+
 				} else {
 					// Suppression de la date de début de contrat
 					$commande->set("date_evolution",NULL);
-					
+
 					// Si une affaire parente
 					if ($affaires_parentes) {
 						foreach ($affaires_parentes as $affaire_parente) {
@@ -725,7 +729,7 @@ class commande_lm extends commande {
 								// La date prévue d'évolution de la commande parente n'est pas dépassée
 								$commande_parente->set("etat","non_loyer");
 							}
-							
+
 //							if ($affaire->get("etat") == "facture_refi") {
 //								// L'affaire est en état facture_refi
 //								$affaire_parente->set("etat","facture_refi");
@@ -734,21 +738,21 @@ class commande_lm extends commande {
 //							}
 						}
 					}
-					
+
 					$commande->set("etat","non_loyer");
-					
+
 					//Mise à jour des facturations
 					ATF::facturation()->delete_special($commande->get("id_affaire"));
-					
+
 					//Mise à jour des facturations
 					ATF::facturation_fournisseur()->delete_special("id_affaire",$commande->get("id_affaire"));
-					
+
 					//Mise à jour des prolongations (supprimer les dates)
 					ATF::prolongation()->unsetDate($commande->get("id_affaire"));
-					
+
 				}
 				break;
-			case "retour_contrat":	
+			case "retour_contrat":
 				// Si aucune commande."date de prélèvement" ou "date de PV" on définie à "date de retour contrat"
 				if (!$commande->get("retour_prel")) {
 					$commande->set("retour_prel",$commande->get("retour_contrat"));
@@ -757,7 +761,7 @@ class commande_lm extends commande {
 					$commande->set("retour_pv",$commande->get("retour_contrat"));
 				}
 				break;
-			case "date_evolution":				
+			case "date_evolution":
 				if (!$commande->isAR()) {
 					// Si la commande n'a pas été annulée et remplacée
 					if ($commande->dateEvolutionDepassee()) {
@@ -772,29 +776,29 @@ class commande_lm extends commande {
 			case "date_demande_resiliation":
 				$this->checkEtat($commande);
 			break;
-			case "date_prevision_restitution":						
-				$affPar = $this->checkEtat($commande);	
-				
-				//Si $commande est un avenant, on récupere l'affaire parente							
+			case "date_prevision_restitution":
+				$affPar = $this->checkEtat($commande);
+
+				//Si $commande est un avenant, on récupere l'affaire parente
 				if($infos["date"] && $affPar){
-					$data = $infos;					
-					$data["id_commande"] = $affPar["commande.id_commande"];	
+					$data = $infos;
+					$data["id_commande"] = $affPar["commande.id_commande"];
 					$this->checkAndUpdateDates($data);
 				}else{
 					$reload = true;
-				}				
-				
+				}
+
 			break;
 			case "date_restitution_effective":
 				//if (!$commande->isAR()) {
 				// Si la commande n'a pas été annulée et remplacée
-				
+
 				if($infos["date"] != NULL){
 					$commande->set("date_arret",$infos["date"]);
 					if($infos["date"] <= date("Y-m-d")){
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($infos["id_commande"]);
-						
+
 						$notifie = array(21, 35 , 94);
 						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94){
 							$notifie[] = ATF::$usr->getID();
@@ -811,14 +815,14 @@ class commande_lm extends commande {
 						);
 						ATF::suivi()->insert($suivi);
 					}
-				}else{					
+				}else{
 					throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
-				}	
+				}
 				//}
 			break;
 		}
 		ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
-		//MAJ date garantie de l'affaire 
+		//MAJ date garantie de l'affaire
 		if(!$affaire->get("date_garantie") && $commande->get("date_evolution") && !$affaire_parente){
 			if($devis->get("type_contrat")=="lrp"){
 				//pour les devis LRP : la date fin garantie = date evolution - 3 mois
@@ -828,21 +832,21 @@ class commande_lm extends commande {
 			}
 		}
 		$affaire->majForecastProcess();
-		
+
 		if($infos["field"] !== "date_prevision_restitution" || $reload){
 			if($commande->get("id_affaire")){
 				ATF::affaire()->redirection("select",$commande->get("id_affaire"));
 			}
 		}
-		
-		
+
+
 	}
-	
-	/** 
-	* Met à jour l'état de la commande ainsi que l'état de la commnade des affaires parentes (dans la modif checkAndUpdateDate) ou des affaires filles (dans lmStatut) 
+
+	/**
+	* Met à jour l'état de la commande ainsi que l'état de la commnade des affaires parentes (dans la modif checkAndUpdateDate) ou des affaires filles (dans lmStatut)
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	*/
-	function checkEtat($commande,$affaires_parentes=false,$affaireFillesAR=false){				
+	function checkEtat($commande,$affaires_parentes=false,$affaireFillesAR=false){
 		if(ATF::affaire()->select($commande->get("id_affaire"),"nature")=="vente"){
 			ATF::facture()->q->reset()->addCondition("id_affaire",$commande->get("id_affaire"));
 			if(ATF::facture()->sa()){
@@ -857,7 +861,7 @@ class commande_lm extends commande {
 				$commandeFilleAR=ATF::commande()->sa();
 			}
 			// Si on est dans la période du contrat
-			if ($commande->estEnCours()) {								
+			if ($commande->estEnCours()) {
 				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
 					$commande->set("etat","AR");
 				}else{
@@ -867,19 +871,19 @@ class commande_lm extends commande {
 						}else{
 							$commande->set("etat","prolongation");
 						}
-					}else{*/						
+					}else{*/
 						if(strpos( $commande->get("etat"), "contentieux")){
 							$commande->set("etat","mis_loyer_contentieux");
 						}else{
 							$commande->set("etat","mis_loyer");
 						}
-					//}					
+					//}
 				}
 				foreach ($affaires_parentes as $affaire_parente) {
 					$affaire_parente->getCommande()->set("etat","AR");
 				}
-				
-			// Sinon Si la période du contrat n'a pas commencé 
+
+			// Sinon Si la période du contrat n'a pas commencé
 			} elseif(!$commande->dateDebutDepassee()) {
 				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
 					$commande->set("etat","AR");
@@ -895,12 +899,12 @@ class commande_lm extends commande {
 					} elseif(!$commande_parente->dateDebutDepassee()) {
 						// Sinon si la date évolution de l'affaire parente n'est pas dépassée
 						$affaire_parente->getCommande()->set("etat","non_loyer");
-					} elseif($commande_parente->dateEvolutionDepassee()) {						
+					} elseif($commande_parente->dateEvolutionDepassee()) {
 						// Sinon si la date évolution de l'affaire parente est dépassée
 						$affaire_parente->getCommande()->set("etat","prolongation");
 					}
 				}
-			// Sinon Si la période du contrat est dépassé 
+			// Sinon Si la période du contrat est dépassé
 			} elseif($commande->dateEvolutionDepassee()){
 				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
 					$commande->set("etat","AR");
@@ -909,7 +913,7 @@ class commande_lm extends commande {
 					if($commande->dateRestitutionEffectiveDepassee()){
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($commande->get("id_commande"));
-						
+
 						$notifie = array(21, 35 , 94);
 						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94 ){
 							$notifie[] = ATF::$usr->getID();
@@ -929,19 +933,19 @@ class commande_lm extends commande {
 								$commande->set("etat","restitution_contentieux");
 							}else{
 								$commande->set("etat","restitution");
-							}								
+							}
 							if(ATF::affaire()->select($commande->get("id_affaire"),"nature") == "avenant"){
 								//Mettre en restitution l'affaire parente
 								$id_aff_parent = ATF::affaire()->select($commande->get("id_affaire"),"id_parent");
 								if($id_aff_parent){
-									ATF::commande()->q->reset()->where("commande.id_affaire", $id_aff_parent);		
+									ATF::commande()->q->reset()->where("commande.id_affaire", $id_aff_parent);
 									return ATF::commande()->select_row();
-								}																								
+								}
 							}
 					} else{
 						if(strpos( $commande->get("etat"), "contentieux")){
 							$commande->set("etat","prolongation_contentieux");
-						}else{							
+						}else{
 							$commande->set("etat","prolongation");
 						}
 					}
@@ -949,11 +953,11 @@ class commande_lm extends commande {
 				foreach ($affaires_parentes as $affaire_parente) {
 					$affaire_parente->getCommande()->set("etat","AR");
 				}
-			} 
+			}
 		}
 	}
 
-	/** 
+	/**
 	* Retourne l'objet affaire associé à la commande passée en paramètre, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @return commande_lm
@@ -963,7 +967,7 @@ class commande_lm extends commande {
 		return new affaire_lm($this->infos['id_affaire']);
 	}
 
-	/** 
+	/**
 	* Retourne la date de début de la commande
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @return string Date de début
@@ -977,11 +981,11 @@ class commande_lm extends commande {
 		return $this->select($this->decryptId($infos["id_commande"]), "date_prevision_restitution");
 	}
 
-	/** 
+	/**
 	* Impossible de supprimer une commande qui n'est pas en non_loyer
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_delete($id,$infos=false){
 		$commande = new commande_lm($id);
@@ -993,7 +997,7 @@ class commande_lm extends commande {
 
 		ATF::affaire()->q->reset()->addCondition("id_parent",$affaire->get("id_affaire"))->setDimension("row");
 		$affaireEnfant=ATF::affaire()->sa();
-				
+
 		//On ne peux pas modifier les dates d'une commande qui est parente d'une autre commande
 		if($affaireEnfant){
 			$this->checkUpdateAVT($affaireEnfant);
@@ -1001,15 +1005,15 @@ class commande_lm extends commande {
 
 		ATF::facture()->q->reset()->addCondition("id_commande",$commande->get("id_commande"))
 								  ->addCondition("type_facture","ap","AND",false,"!=");
-		
+
 		if(ATF::facture()->sa()){
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a des factures dans cette affaire",879);
 		}
-		
+
 		if($this->select($id,"etat")!="non_loyer" && $this->select($id,"etat")!="pending"){
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("non_loyer")."'",879);
 		}
-		
+
 		// On ne peut pas supprimer un contrat qui a des matériels "actifs"
 		ATF::parc()->q->reset()
 			->where("id_affaire",$affaire->get("id_affaire"))
@@ -1017,22 +1021,22 @@ class commande_lm extends commande {
 			->setCountOnly();
 		if (ATF::parc()->sa()>0) {
 			throw new errorATF("On ne peut pas supprimer un contrat qui a des matériels 'actifs'",84513);
-		}			
-		
+		}
+
 		return true;
 	}
 
-	/** 
+	/**
 	* Impossible de modifier une commande
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
 		return false;
 	}
-	
-	/** 
+
+	/**
 	* Surcharge de delete afin de supprimer les lignes de commande et modifier l'état de l'affaire et du devis
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $infos le ou les identificateurs de l'élément que l'on désire inséré
@@ -1045,42 +1049,42 @@ class commande_lm extends commande {
 			$id=$this->decryptId($infos);
 			$commande=$this->select($id);
 //log::logger("delete1",'error.log');
-	
+
 			//Commande
 			if($commande){
 //*****************************Transaction********************************
 //log::logger("delete2",'error.log');
 				ATF::db($this->db)->begin_transaction();
 				parent::delete($id,$s);
-	
+
 				//Affaire
 				$affaire = array("id_affaire"=>$commande["id_affaire"],"etat"=>"devis");
 				ATF::affaire()->u($affaire);
-	
+
 				//Devis
 				ATF::devis()->q->reset()->addCondition("id_affaire",$commande["id_affaire"])->setDimension("row");
-				$devis=ATF::devis()->sa();	
+				$devis=ATF::devis()->sa();
 				$devis_update = array("id_devis"=>$devis["id_devis"],"etat"=>"attente");
 				ATF::devis()->u($devis_update);
-	
+
 				// Mise à jour du forecast
 				$affaire = new affaire_lm($commande['id_affaire']);
 				$affaire->majForecastProcess();
-	
+
 				//Suppression des facturations
 				ATF::facturation()->delete_special($commande["id_affaire"]);
 
 
 				ATF::tache()->q->reset()->where("id_affaire", $commande["id_affaire"])->where("type_tache","creation_contrat");
 				foreach (ATF::tache()->select_all() as $key => $value) { ATF::tache()->d(array("id_tache"=>$value["id_tache"])); }
-					
+
 				ATF::db($this->db)->commit_transaction();
 	//*****************************************************************************
 //log::logger("redirection",'error.log');
-				
+
 				ATF::affaire()->redirection("select",$commande["id_affaire"]);
-				
-				return true; 
+
+				return true;
 			}
 		} elseif (is_array($infos) && $infos) {
 
@@ -1091,12 +1095,12 @@ class commande_lm extends commande {
 	}
 
 	/**
-	* Met à jour une valeur d'attribut 
+	* Met à jour une valeur d'attribut
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	* @param string $attribute
 	* @param string $value
 	* @return mixed Résultat de la requête d'effacement
-	*/	
+	*/
 	function set($attribute,$value){
 		ATF::$cr->block("top");
 		$oldValue = $this->get($attribute);
@@ -1114,14 +1118,14 @@ class commande_lm extends commande {
 					if ($value=="arreter") {
 						if(ATF::$codename == "lmbe") $a = new affaire_lmbe($this->get('id_affaire'));
 						else $a = new affaire_lm($this->get('id_affaire'));
-						
+
 						$a->set('etat','terminee');
 					}
 			}
 		}
 	}
 
-	/** 
+	/**
 	* Prédicat qui retourne VRAI si le contrat est en cours, et non terminé, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id_affaire Affaire qui demande sa commande
@@ -1132,7 +1136,7 @@ class commande_lm extends commande {
 		return $this->get("date_debut") && $this->get("date_debut") <= date("Y-m-d") && $this->get("date_evolution") && $this->get("date_evolution") >= date("Y-m-d")  && $this->get("etat")!="arreter";
 	}
 
-	/** 
+	/**
 	* Prédicat qui retourne VRAI si le contrat a débuté, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id_affaire Affaire qui demande sa commande
@@ -1143,7 +1147,7 @@ class commande_lm extends commande {
 		return $this->get("date_debut") && $this->get("date_debut") <= date("Y-m-d");
 	}
 
-	/** 
+	/**
 	* Prédicat, retourne VRAI si la date d'évolution a été dépassée, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id_affaire Affaire qui demande sa commande
@@ -1153,9 +1157,9 @@ class commande_lm extends commande {
 		$this->notSingleton();
 		return $this->get("date_evolution") && $this->get("date_evolution") < date("Y-m-d");
 	}
-	
-	
-	/** 
+
+
+	/**
 	* Prédicat, retourne VRAI si il y a une date de demande de resiliation, méthode d'objet et non de singleton
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param int $id_affaire Affaire qui demande sa commande
@@ -1170,18 +1174,18 @@ class commande_lm extends commande {
 		}
 	}
 
-	/** 
+	/**
 	* Prédicat, retourne VRAI si il y a une date de demande de restitution, méthode d'objet et non de singleton
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param int $id_affaire Affaire qui demande sa commande
 	* @return commande_lm
 	*/
 	function dateRestitutionPrevue(){
-		$this->notSingleton();		
+		$this->notSingleton();
 		return $this->get("date_prevision_restitution") && $this->get("date_prevision_restitution") < date("Y-m-d");
 	}
 
-	/** 
+	/**
 	* Prédicat qui retourne VRAI si le contrat a été annulé et remplacé, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @return commande_lm
@@ -1191,7 +1195,7 @@ class commande_lm extends commande {
 		return $this->get("etat") === "AR";
 	}
 
-	/** 
+	/**
 	* Prédicat qui retourne VRAI si le contrat est signé, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @return commande_lm
@@ -1200,11 +1204,11 @@ class commande_lm extends commande {
 		$this->notSingleton();
 		return $this->get("retour_contrat") && $this->get("retour_contrat") <= date("Y-m-d");
 	}
-	
+
 	/**
     * Avoir toujours les dates, quelle que soit la vue utilisateur
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
-    */ 
+    */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 		$this->q
 			->addField("commande.id_affaire")
@@ -1254,8 +1258,15 @@ class commande_lm extends commande {
 			} else {
 				$return['data'][$k]['factureAllow'] = false;
 			}
+
+			//Check affichage de création de facture
+			if (($i["commande.etat"] == "pending" || $i["commande.etat"] == "non_loyer")) {
+				$return['data'][$k]['abandonAllow'] = true;
+			} else {
+				$return['data'][$k]['abandonAllow'] = false;
+			}
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
-            
+
             // check des fichiers courriers types
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiContratEtBilan"))) {
                 $return['data'][$k]["envoiContratEtBilanExists"] = true;
@@ -1286,7 +1297,7 @@ class commande_lm extends commande {
                 $return['data'][$k]["ctSigneSlimpayExists"] = true;
             }
 		}
-		
+
 		return $return;
 	}
 
@@ -1297,7 +1308,7 @@ class commande_lm extends commande {
 	* @param array $infos
 	* 	$infos[id_commande]
 	* 	$infos[id_fournisseur]
-    */ 
+    */
 	function getCommande_ligne(&$infos){
 		//log::logger($infos , "mfleurquin");
 
@@ -1305,40 +1316,68 @@ class commande_lm extends commande {
 		$id_fournisseur=ATF::societe()->decryptId($infos["id_fournisseur"]);
 
 
-		//log::logger($id_commande , "mfleurquin");
-		//log::logger($id_fournisseur , "mfleurquin");
-
-
 		if ($id_commande && $id_fournisseur) {
-			$this->q->reset()->addCondition("id_commande",$id_commande);		
+			$this->q->reset()->addCondition("id_commande",$id_commande);
 			if($commandes=$this->sa()){
-			foreach($commandes as $key=>$item){
+				foreach($commandes as $key=>$item){
 					//Ligne de la commande pour le fournisseur il ne faut pas que ces lignes soient présentes dans un autre bon de commande
 					ATF::commande_ligne()->q->reset()->addOrder("commande_ligne.id_commande_ligne","asc")
-													 ->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
+													 //->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
 													 ->where("id_commande",$item["id_commande"])
-													 ->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
+													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
 													 ->where("id_fournisseur",$id_fournisseur);
-					$commande_ligne=ATF::commande_ligne()->sa();			
+					$commande_ligne=ATF::commande_ligne()->sa();
 					if($commande_ligne){
-						$id_commande=$this->cryptId($item["id_commande_fk"]);
+						$id_commande=$this->cryptId($item["id_commande"]);
 						unset($ligne_commande);
 						foreach($commande_ligne as $k=>$i){
-							$ligne_commande[]=array(
-												"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+
+							if(!$i["prix_achat"] || $i["prix_achat"] == "0.00"){
+								//Si ce n'est pas de l'achat c'est qu'il y a echeancier fournisseur
+								// X facture de produit_echeancier prix
+								ATF::produit_fournisseur_loyer()->q->reset()->where("id_produit", $i["id_produit"])
+																			->where("nature","engagement");
+								$loyer = ATF::produit_fournisseur_loyer()->select_all();
+								$quantite_prod = $i["quantite"];
+								foreach ($loyer as $kl => $vl) {
+									$i["prix_achat"] += $vl["loyer"]*$quantite_prod;
+									$i["quantite"] = $vl["nb_loyer"];
+								}
+							}
+
+							if($i["quantite"] > 1){
+								$n = 1;
+								for($n=1; $n<=$i["quantite"];$n++){
+									$ligne_commande[]=array(
+												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
 												,"id"=>$i["id_commande_ligne"]
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]
+												,"prix_ht"=>$i["prix_achat"]
+												,"quantite"=>1
+												,"icon"=>ATF::$staticserver."images/blank.gif"
+												,"checked"=>false
+										);
+								}
+							}else{
+								$ligne_commande[]=array(
+												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+												,"id"=>$i["id_commande_ligne"]
+												,"leaf"=>true
+												,"prix"=>$i["prix_achat_ttc"]
 												,"quantite"=>$i["quantite"]
 												,"icon"=>ATF::$staticserver."images/blank.gif"
-												,"checked"=>false		
+												,"checked"=>false
 										);
+							}
+
+
 						}
-					
+
 						if ($ligne_commande) {
 							$commande[]=array(
 								"text"=>$item["ref"]." ".$item["commande"]
-								,"id"=>$item["id_commande_fk"]
+								,"id"=>$item["id_commande"]
 								,"leaf"=>false
 								,"href"=>"javascript:window.open('commande-select-".$id_commande.".html');"
 								,"cls"=>"folder"
@@ -1352,14 +1391,14 @@ class commande_lm extends commande {
 				}
 			}
 			$infos['display'] = true;
-	
+
 			return json_encode($commande);
 		}else{
 			return false;
 		}
 	}
 
-	/** 
+	/**
 	* Retourne les lignes d'un type, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param string $type visible|invisible|reprise
@@ -1392,7 +1431,7 @@ class commande_lm extends commande {
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
-    */   	
+    */
  	public function majMail($id_societe){
 		return nl2br("Bonjour,\n\nCi-joint la commande pour la société ".ATF::societe()->nom($id_societe).".\nCommande éditée le ".date("d/m/Y").".\n");
 	}
@@ -1400,7 +1439,7 @@ class commande_lm extends commande {
 	/**
     * Retourne mise à jour du statut
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    */   	
+    */
 	public function lmStatut(){
 		$this->q->setCount()->addOrder("id_commande","DESC");
 		$commandeSa=$this->sa();
@@ -1408,38 +1447,67 @@ class commande_lm extends commande {
 		ATF::db($this->db)->begin_transaction();
 		foreach($commandeSa["data"] as $key=>$item){
 			unset($affaires_parentes);
-			
+
 //			log::logger($i." \ ".$commandeSa["count"],'lm_statut.log');
-			if(ATF::$codename == "lmbe") $commande = new commande_lmbe($item['id_commande']);
-			else $commande = new commande_lm($item['id_commande']);
-			
+			$commande = new commande_lm($item['id_commande']);
+
 			$affaire = $commande->getAffaire();
-			
+
 			//Création du tableau des affaires parentes
 			if ($ap = $affaire->getParentAR()) {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
-					if(ATF::$codename == "lmbe") $affaires_parentes[] = new affaire_lmbe($a["id_affaire"]);
-					else $affaires_parentes[] = new affaire_lm($a["id_affaire"]);
-					
+					$affaires_parentes[] = new affaire_lm($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
 				$affaire_parente = $affaire->getParentAvenant();
 			}
-			
+
 			$affaireFillesAR=ATF::affaire()->getFillesAR($commande->get("id_affaire"));
-		
+
 			$etat=$commande->get("etat");
 
-			$this->checkEtat($commande,false,$affaireFillesAR);
-			$etat_modifie=$commande->get("etat");
-			if($etat!=$etat_modifie){				
-				log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');
+			if($etat !== "abandon" || $etat !== "pending"){
+				$this->checkEtat($commande,false,$affaireFillesAR);
+				$etat_modifie=$commande->get("etat");
+				if($etat!=$etat_modifie){
+					log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');
+				}
+				ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			}
-			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
+
+
 			$i++;
 		}
 		ATF::db($this->db)->commit_transaction();
+	}
+
+	/**
+    * Passe une commande en abandonnée
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function abandonCommande($infos){
+		$commande = new commande_lm($infos['id_commande']);
+
+		if ($commande) {
+			$commande->set('etat','abandon');
+			$comm = ATF::commande()->select($infos['id_commande']);
+			$affaire = $commande->getAffaire();
+
+			$notifie[] = ATF::$usr->getID();
+
+
+			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
+							,"id_societe"=>$comm['id_societe']
+							,"type_suivi"=>'Contrat'
+							,"texte"=>"Le contrat ".$affaire->get("ref")." est passé en abandonné"
+						);
+			ATF::suivi()->insert($suivi);
+
+			ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
+		}
 	}
 
 	/**
@@ -1447,23 +1515,21 @@ class commande_lm extends commande {
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
-    */   	
+    */
 	public function stopCommande($infos){
-		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($infos['id_commande']);
-		else $commande = new commande_lm($infos['id_commande']);
+		$commande = new commande_lm($infos['id_commande']);
 
 		if ($commande) {
-			
+
 			$commande->set('etat','arreter');
 			$commande->set('date_arret',date("Y-m-d"));
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
-			
-			$notifie = array(21, 35 , 94);
-			if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94){
-				$notifie[] = ATF::$usr->getID();
-			}
-						
+
+
+			$notifie[] = ATF::$usr->getID();
+
+
 
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
@@ -1474,31 +1540,30 @@ class commande_lm extends commande {
 							,'suivi_notifie'=>$notifie
 						);
 			ATF::suivi()->insert($suivi);
-			
-				
-			
+
+
+
 			//Création du tableau des affaires parentes
 			if ($ap = $affaire->getParentAR()) {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
-					if(ATF::$codename == "lmbe") $affaires_parentes[] = new affaire_lmbe($a["id_affaire"]);
-					else $affaires_parentes[] = new affaire_lm($a["id_affaire"]);					
+					$affaires_parentes[] = new affaire_lm($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
 				$affaire_parente = $affaire->getParentAvenant();
 			}
-			
+
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
 		}
 	}
-	
+
 	/**
     * Met à jour létat de la comande en 'arreter'
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
-    */   	
+    */
 	public function reactiveCommande($infos){
 		if(ATF::$codename == "lmbe") $commande = new commande_lmbe($infos['id_commande']);
 		else $commande = new commande_lm($infos['id_commande']);
@@ -1507,7 +1572,7 @@ class commande_lm extends commande {
 			$commande->set('etat','non_loyer');
 			$commande->set('date_arret',NULL);
 			$affaire = $commande->getAffaire();
-			
+
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
@@ -1526,17 +1591,17 @@ class commande_lm extends commande {
 			} elseif ($affaire->get('id_parent')) {
 				$affaire_parente = $affaire->getParentAvenant();
 			}
-			
+
 			$affaireFillesAR=ATF::affaire()->getFillesAR($affaire->get("id_affaire"));
-	
+
 			$this->checkEtat($commande,$affaires_parentes,$affaireFillesAR);
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
 
 		}
 	}
-    
-    
+
+
     /**
     * Génère un courrier type pour une commande
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -1547,17 +1612,17 @@ class commande_lm extends commande {
         if (!$infos['id_commande'] || !$infos['pdf']) return false;;
         $commande = $this->select($infos['id_commande']);
 
-        $data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);     
+        $data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
         $this->store($s,$infos['id_commande'],$infos['pdf'],$data,$infos["preview"]?true:false);
-        
+
         ATF::$json->add("fileToPrevisu",$infos['pdf']);
-        
+
         return $infos['id_commande'];
     }
-    
+
 
     public function initStyle(){
-				
+
 		$style_titre1 = new excel_style();
 		$style_titre1->setWrap()->alignement('center')->setSize(13)->setBorder("thin")->setBold();
 		$this->setStyle("titre1",$style_titre1->getStyle());
@@ -1598,92 +1663,92 @@ class commande_lm extends commande {
 		$style_cel_right->setWrap()->alignement("center","right")->setSize(11);
 		$this->setStyle("cel_right",$style_cel_right->getStyle());
 	}
-	
+
 	public function setStyle($nom,$objet){
 		$this->style[$nom]=$objet;
 	}
-	
+
 	public function getStyle($nom){
 		return $this->style[$nom];
 	}
 
 
-    /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique 
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>              
-     * @param array $infos : contient le nom de l'onglet 
-     */     
-	 public function export_loyer_assurance($infos,$testUnitaire="false",$reset="true"){       
-	 	
+    /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	 public function export_loyer_assurance($infos,$testUnitaire="false",$reset="true"){
+
 	 	if($testUnitaire == "true"){
 	 		$donnees = $infos;
-		}else{	
+		}else{
 			if($reset == "true")	$this->q->reset();
-			
+
          	if($infos['onglet']) $this->setQuerier(ATF::_s("pager")->create($infos['onglet']));
 
-			$this->q->from("commande","id_affaire","loyer","id_affaire")	
+			$this->q->from("commande","id_affaire","loyer","id_affaire")
 					->addAllFields("commande")
-					->addAllFields("loyer")					
+					->addAllFields("loyer")
 					->where('commande.etat',"AR","AND","sous_req","!=")
 					->where('commande.etat',"arreter","AND","sous_req","!=")
 					->where('commande.etat',"vente","AND","sous_req","!=")
 					->setLimit(-1)->unsetCount();
-			$donnees = $this->select_all(); 
+			$donnees = $this->select_all();
 		}
-		
+
 
 		$onglet = str_replace("gsa_commande_", "", $infos["onglet"]);
 		$onglet = str_replace("commande_", "", $onglet);
 		if(is_numeric($onglet)){ $onglet = ATF::filtre_optima()->select($onglet , "filtre_optima"); }
-		
 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-            
-		//premier onglet  
+
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle($onglet); 
-		$sheets=array("auto"=>$worksheet_auto);         
+		$worksheet_auto->sheet->setTitle($onglet);
+		$sheets=array("auto"=>$worksheet_auto);
 		$this->initStyle();
-		if($donnees){		
+		if($donnees){
 			$this->ajoutTitreExport_loyer_assurance($sheets,$donnees);
-			$this->ajoutDonneesExport_loyer_assurance($sheets,$donnees);			       
+			$this->ajoutDonneesExport_loyer_assurance($sheets,$donnees);
 		}
-		
+
 		$writer = new PHPExcel_Writer_Excel5($workbook);
-		
-		$writer->save($fname);           
+
+		$writer->save($fname);
 		header('Content-type: application/vnd.ms-excel');
-		header('Content-Disposition:inline;filename=export_loyer_assurance.xls');			
+		header('Content-Disposition:inline;filename=export_loyer_assurance.xls');
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct();		
-		                     
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+
     }
 
 
-    /** Mise en place des titres         
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
-     */     
+    /** Mise en place des titres
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     */
      public function ajoutTitreExport_loyer_assurance(&$sheets, $donnees){
      	$row_data = array();
      	//A =65 Z=90
      	$lettre1 = 65;
 		$lettre2 = 0;
 
-		
+
 		unset($donnees[0]["commande.prix_achat"],$donnees[0]["commande.id_user"], $donnees[0]["commande.date"] );
 
 
-		$donnees[0]["loyer.Total"] = "";	
+		$donnees[0]["loyer.Total"] = "";
 
      	foreach ($donnees[0] as $key => $value) {
      		$data = array();
-     		$data = explode(".", $key);     		
+     		$data = explode(".", $key);
      		if( !strpos($data[1],"_fk") ){
 
 
@@ -1691,9 +1756,9 @@ class commande_lm extends commande {
      				$char = chr($lettre1);
      				$lettre1++;
      			}else{
-     				if($lettre2 == 0){ 
+     				if($lettre2 == 0){
      					$lettre1 =  $lettre2 = 65;
-     					$char = chr($lettre1).chr($lettre2); 
+     					$char = chr($lettre1).chr($lettre2);
      				}elseif($lettre2 == 90){
 						$lettre1++;
 						$lettre2 = 65;
@@ -1701,31 +1766,31 @@ class commande_lm extends commande {
 					}else{
 						$lettre2++;
 						$char = chr($lettre1).chr($lettre2);
-					}     				
-     			}				
-			    $row_data[$char] = array(ATF::$usr->trans($data[1],$data[0]),20);	     			
-     		} 
-     	} 
+					}
+     			}
+			    $row_data[$char] = array(ATF::$usr->trans($data[1],$data[0]),20);
+     		}
+     	}
 
-        foreach($sheets as $nom=>$onglet){              
-             foreach($row_data as $col=>$titre){         
-				  $sheets[$nom]->write($col.'1',$titre[0],$this->getStyle("titre1"));  
+        foreach($sheets as $nom=>$onglet){
+             foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre[0],$this->getStyle("titre1"));
 				  $sheets[$nom]->sheet->getColumnDimension($col)->setWidth($titre[1]);
-            }             
-        }		 
-    }     
-	
+            }
+        }
+    }
 
-	/** Mise en place du contenu         
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
-    * @param array $sheets : contient les 30 onglets     
-    * @param array $infos : contient tous les enregistrements         
-    */     
+
+	/** Mise en place du contenu
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @param array $sheets : contient les 30 onglets
+    * @param array $infos : contient tous les enregistrements
+    */
     public function ajoutDonneesExport_loyer_assurance(&$sheets,$infos){
-        $row_auto=1;         
+        $row_auto=1;
 
 		foreach ($infos as $key => $value) {
-			
+
 			unset($value["commande.prix_achat"],$value["commande.id_user"], $value["commande.date"]);
 
 			$value["loyer.total"] = ($value["loyer.loyer"]+$value["loyer.assurance"]+$value["loyer.frais_gestion"])*$value["loyer.duree"];
@@ -1734,18 +1799,18 @@ class commande_lm extends commande {
 	     	//A =65 Z=90
 	     	$lettre1 = 65;
 			$lettre2 = 0;
-			 
-			foreach ($value as $k => $v) {	     	
+
+			foreach ($value as $k => $v) {
 	     		$data = array();
-	     		$data = explode(".", $k);     		
+	     		$data = explode(".", $k);
 	     		if( !strpos($data[1],"_fk") ){
 	     			if($lettre1 <= 90 && $lettre2 == 0){
 	     				$char = chr($lettre1);
 	     				$lettre1++;
 	     			}else{
-	     				if($lettre2 == 0){ 
+	     				if($lettre2 == 0){
 	     					$lettre1 =  $lettre2 = 65;
-	     					$char = chr($lettre1).chr($lettre2); 
+	     					$char = chr($lettre1).chr($lettre2);
 	     				}elseif($lettre2 == 90){
 							$lettre1++;
 							$lettre2 = 65;
@@ -1753,87 +1818,87 @@ class commande_lm extends commande {
 						}else{
 							$lettre2++;
 							$char = chr($lettre1).chr($lettre2);
-						}     				
-	     			}				
+						}
+	     			}
 				    $row_data[$char] = array($v , "border_cel_left");
 	     		}
 	     	}
 
-	     	if($row_data){           
-				$row_auto++;         
+	     	if($row_data){
+				$row_auto++;
 				foreach($row_data as $col=>$valeur){
-					$sheets['auto']->write($col.$row_auto, $valeur[0], $this->getStyle($valeur[1]));              
-				}     
+					$sheets['auto']->write($col.$row_auto, $valeur[0], $this->getStyle($valeur[1]));
+				}
 			}
 
-		
-		}	
+
+		}
 	}
-    
-    
-	 /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique 
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>              
-     * @param array $infos : contient le nom de l'onglet 
-     */     
-	 public function export_contrat_refinanceur_loyer($infos,$testUnitaire="false",$reset="true"){       
-	 	
+
+
+	 /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	 public function export_contrat_refinanceur_loyer($infos,$testUnitaire="false",$reset="true"){
+
 	 	if($testUnitaire == "true"){
 	 		$donnees = $infos;
-		}else{	
+		}else{
 			if($reset == "true")	$this->q->reset();
-			
+
          	$this->setQuerier(ATF::_s("pager")->create($infos['onglet']));
 
-			$this->q->from("commande","id_affaire","loyer","id_affaire")	
+			$this->q->from("commande","id_affaire","loyer","id_affaire")
 					->addAllFields("commande")
 					->addAllFields("loyer")
 					->setLimit(-1)->unsetCount();
-			$donnees = $this->select_all(); 
+			$donnees = $this->select_all();
 		}
-		
+
 
 		$onglet = str_replace("gsa_commande_", "", $infos["onglet"]);
 		$onglet = str_replace("commande_", "", $onglet);
 		if(is_numeric($onglet)){ $onglet = ATF::filtre_optima()->select($onglet , "filtre_optima"); }
 
-		
-        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-            
-		//premier onglet  
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle($onglet); 
-		$sheets=array("auto"=>$worksheet_auto);         
+		$worksheet_auto->sheet->setTitle($onglet);
+		$sheets=array("auto"=>$worksheet_auto);
 		$this->initStyle();
-		if($donnees){		
-			//mise en place des titres       
-			$this->ajoutTitreExport_contrat_refinanceur_loyer($sheets,$donnees);    			
-			//ajout des donnÃ©es  
-			$this->ajoutDonneesExport_contrat_refinanceur_loyer($sheets,$donnees);			       
+		if($donnees){
+			//mise en place des titres
+			$this->ajoutTitreExport_contrat_refinanceur_loyer($sheets,$donnees);
+			//ajout des donnÃ©es
+			$this->ajoutDonneesExport_contrat_refinanceur_loyer($sheets,$donnees);
 		}
-		
+
 		$writer = new PHPExcel_Writer_Excel5($workbook);
-		
-		$writer->save($fname);           
+
+		$writer->save($fname);
 		header('Content-type: application/vnd.ms-excel');
-		header('Content-Disposition:inline;filename=export_contrat_refinanceur_loyer.xls');			
+		header('Content-Disposition:inline;filename=export_contrat_refinanceur_loyer.xls');
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct();                         
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
     }
 
 
-    /** Mise en place des titres         
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
-     */     
+    /** Mise en place des titres
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     */
     public function ajoutTitreExport_contrat_refinanceur_loyer(&$sheets, $donnees){
-    	$row_auto=0;  
+    	$row_auto=0;
 
-    	$donnees[0]["loyer.Total"] = "";	   	
+    	$donnees[0]["loyer.Total"] = "";
     	$donnees[0]["commande.Refincanceur"] = "";
 
     	$donnees[0]["comite.Comite"] = "";
@@ -1843,18 +1908,18 @@ class commande_lm extends commande {
     	$donnees[0]["comite.observations"] = "";
 
 
-		if(isset($donnees[0]["commande.ref"])){			
-			unset($donnees[0]["commande.ref"], 
+		if(isset($donnees[0]["commande.ref"])){
+			unset($donnees[0]["commande.ref"],
 				  $donnees[0]["commande.date_debut"],
 				  $donnees[0]["commande.mise_en_place"],
-				  $donnees[0]["commande.id_devis"], 
+				  $donnees[0]["commande.id_devis"],
 				  $donnees[0]["commande.tva"],
-				  $donnees[0]["commande.clause_logicielle"], 
+				  $donnees[0]["commande.clause_logicielle"],
 				  $donnees[0]["commande.type"],
-				  $donnees[0]["commande.date_arret"], 
+				  $donnees[0]["commande.date_arret"],
 				  $donnees[0]["commande.date_evolution"],
 				  $donnees[0]["commande.date_restitution_effective"],
-				  $donnees[0]["commande.date_prevision_restitution"], 
+				  $donnees[0]["commande.date_prevision_restitution"],
 				  $donnees[0]["commande.date_demande_resiliation"],
 				  $donnees[0]["commande.prix_achat"],
 				  $donnees[0]["commande.id_user"],
@@ -1867,19 +1932,19 @@ class commande_lm extends commande {
      	//A =65 Z=90
      	$lettre1 = 65;
 		$lettre2 = 0;
-		foreach ($donnees[0] as $key => $value) {		
+		foreach ($donnees[0] as $key => $value) {
 
      		$data = array();
-     		$data = explode(".", $key);     		
+     		$data = explode(".", $key);
      		if( !strpos($data[1],"_fk") && !strpos($key , "loyer.id_") ){
 
      			if($lettre1 <= 90 && $lettre2 == 0){
      				$char = chr($lettre1);
      				$lettre1++;
      			}else{
-     				if($lettre2 == 0){ 
+     				if($lettre2 == 0){
      					$lettre1 =  $lettre2 = 65;
-     					$char = chr($lettre1).chr($lettre2); 
+     					$char = chr($lettre1).chr($lettre2);
      				}elseif($lettre2 == 90){
 						$lettre1++;
 						$lettre2 = 65;
@@ -1887,38 +1952,38 @@ class commande_lm extends commande {
 					}else{
 						$lettre2++;
 						$char = chr($lettre1).chr($lettre2);
-					}     				
-     			}				
-			    $row_data[$char] = array(ATF::$usr->trans($data[1],$data[0]),20);			
-     		} 
-     	} 
+					}
+     			}
+			    $row_data[$char] = array(ATF::$usr->trans($data[1],$data[0]),20);
+     		}
+     	}
 
 
-     	if($row_data){           
-			$row_auto++;         
+     	if($row_data){
+			$row_auto++;
 			foreach($row_data as $col=>$valeur){
-				$sheets['auto']->write($col.$row_auto, $valeur[0], $this->getStyle("titre1"));    
-				$sheets['auto']->sheet->getColumnDimension($col)->setWidth(20);       
-			}     
-		}		
-		
+				$sheets['auto']->write($col.$row_auto, $valeur[0], $this->getStyle("titre1"));
+				$sheets['auto']->sheet->getColumnDimension($col)->setWidth(20);
+			}
+		}
+
     }
 
 
 
-    /** Mise en place du contenu         
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
+    /** Mise en place du contenu
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     * @param array $sheets : contient les 30 onglets
-    * @param array $infos : contient tous les enregistrements         
-    */     
+    * @param array $infos : contient tous les enregistrements
+    */
     public function ajoutDonneesExport_contrat_refinanceur_loyer(&$sheets,$infos){
-        $row_auto=1;      
+        $row_auto=1;
 		foreach ($infos as $key => $value) {
-			
+
 			if(!$value["commande.id_affaire_fk"]) $value["commande.id_affaire_fk"] = $value["commande.id_affaire"];
 
 			$value["loyer.total"] = ($value["loyer.loyer"]+$value["loyer.assurance"]+$value["loyer.frais_gestion"])*$value["loyer.duree"];
-			
+
 			ATF::demande_refi()->q->reset()->where("id_affaire", $value["commande.id_affaire_fk"],"AND")
 										   ->where("etat", "valide");
 			$refi = ATF::demande_refi()->select_row();
@@ -1933,11 +1998,11 @@ class commande_lm extends commande {
 				foreach ($comites as $k => $v) {
 					if($k !== 0){
 						$decisiondate = $decisiondate."\n". $v["date"];
-						$commentaire = $commentaire."\n".$v["commentaire"]; 
+						$commentaire = $commentaire."\n".$v["commentaire"];
 						$decision = $decision."\n".$v["decisionComite"];
 						$date_accord = $date_accord."\n".$v["validite_accord"];
 						$observations 	  = $observations."\n".$v["observations"];
-						
+
 					}else{
 						$decisiondate = $v["date"];
 						$commentaire  = $v["commentaire"];
@@ -1959,18 +2024,18 @@ class commande_lm extends commande {
 	     	//A =65 Z=90
 	     	$lettre1 = 65;
 			$lettre2 = 0;
-			
-			foreach ($value as $k => $v) {	     	
+
+			foreach ($value as $k => $v) {
 	     		$data = array();
-	     		$data = explode(".",$k);     		
+	     		$data = explode(".",$k);
 	     		if( !strpos($data[1],"_fk") ){
 	     			if($lettre1 <= 90 && $lettre2 == 0){
 	     				$char = chr($lettre1);
 	     				$lettre1++;
 	     			}else{
-	     				if($lettre2 == 0){ 
+	     				if($lettre2 == 0){
 	     					$lettre1 =  $lettre2 = 65;
-	     					$char = chr($lettre1).chr($lettre2); 
+	     					$char = chr($lettre1).chr($lettre2);
 	     				}elseif($lettre2 == 90){
 							$lettre1++;
 							$lettre2 = 65;
@@ -1978,20 +2043,20 @@ class commande_lm extends commande {
 						}else{
 							$lettre2++;
 							$char = chr($lettre1).chr($lettre2);
-						}     				
+						}
 	     			}
-	     			if($k == "commande.etat"){ $v = ATF::$usr->trans($v,$this->table); }				
+	     			if($k == "commande.etat"){ $v = ATF::$usr->trans($v,$this->table); }
 				    $row_data[$char] = array($v , "border_cel_left");
 	     		}
 	     	}
 
-	     	if($row_data){           
-				$row_auto++;         
+	     	if($row_data){
+				$row_auto++;
 				foreach($row_data as $col=>$valeur){
-					$sheets['auto']->write($col.$row_auto,$valeur[0], $this->getStyle($valeur[1]));              
-				}     
-			}		
-		}	
+					$sheets['auto']->write($col.$row_auto,$valeur[0], $this->getStyle($valeur[1]));
+				}
+			}
+		}
 	}
 
 
@@ -2010,13 +2075,13 @@ class commande_lm extends commande {
 			if($item_list)$this->q->addCondition("YEAR(`date`)",$key_list);
 		}
 		ATF::stats()->conditionYear(ATF::stats()->liste_annees[$this->table],$this->q,"date");
-		
+
 		switch ($type) {
 			case "o2m":
 			case "autre":
 				if($widget){
-					$this->q->reset()							
-						->addField("COUNT(*)","nb")					
+					$this->q->reset()
+						->addField("COUNT(*)","nb")
 						->setStrict()
 						->addJointure("commande","id_societe","societe","id_societe")
 						->addJointure("commande","id_affaire","affaire","id_affaire")
@@ -2028,7 +2093,7 @@ class commande_lm extends commande {
 								->addCondition("societe.code_client",'%C%',"OR","nonFinie","LIKE")
 								->addCondition("societe.code_client",'%B%',"OR","nonFinie","LIKE")
 								->addCondition("societe.code_client",'%F%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%Y%',"OR","nonFinie","LIKE");	
+								->addCondition("societe.code_client",'%Y%',"OR","nonFinie","LIKE");
 					}else{
 						$this->q->addCondition("societe.code_client",'%M%',"AND","nonFinie","NOT LIKE")
 								->addCondition("societe.code_client",'%C%',"AND","nonFinie","NOT LIKE")
@@ -2036,7 +2101,7 @@ class commande_lm extends commande {
 								->addCondition("societe.code_client",'%F%',"AND","nonFinie","NOT LIKE")
 								->addCondition("societe.code_client",'%Y%',"AND","nonFinie","NOT LIKE");
 					}
-							
+
 
 					$this->q->addCondition("commande.etat","prolongation" ,"AND", "conditiondevis", "NOT LIKE")
 							->addCondition("commande.etat","AR" ,"AND", "conditiondevis", "NOT LIKE")
@@ -2046,24 +2111,24 @@ class commande_lm extends commande {
 							->addCondition("commande.etat","mis_loyer_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 							->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
 							->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
-							
+
 							->addCondition("affaire.affaire","%transfert%" ,"AND", "conditiondevis", "NOT LIKE")
 
-							
+
 
 							->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
-							
+
 							->addField("DATE_FORMAT(`".$this->table."`.`mise_en_place`,'%Y')","year")
 							->addField("DATE_FORMAT(`".$this->table."`.`mise_en_place`,'%m')","month")
-													
+
 							->addGroup("year")->addGroup("month")
 							->addOrder("year")->addOrder("month")
-							
-							->addCondition("`".$this->table."`.`mise_en_place`",$date."-01-01","AND",false,">");	
 
-					$result= parent::select_all();											
-					
-				
+							->addCondition("`".$this->table."`.`mise_en_place`",$date."-01-01","AND",false,">");
+
+					$result= parent::select_all();
+
+
 					$annee = $date-3;
 					if($date <2017) $id_agence = 1;
 					ATF::stat_snap()->q->reset()->addField("stat_snap.nb","nb")
@@ -2071,11 +2136,11 @@ class commande_lm extends commande {
 												->addField("DATE_FORMAT(`stat_snap`.`date`,'%m')","month")
 												->addCondition("`stat_snap`.`date`",$annee."-01-01","AND",false,">=")
 												->addCondition("`stat_snap`.`date`",$date."-01-01","AND",false,"<")
-												->addCondition("`stat_snap`.`id_agence`",$id_agence)						
+												->addCondition("`stat_snap`.`id_agence`",$id_agence)
 												->addGroup("year")->addGroup("month")
 												->addOrder("year")->addOrder("month")
 												->where("stat_concerne", "mep-".$type);
-					$res = ATF::stat_snap()->select_all();		
+					$res = ATF::stat_snap()->select_all();
 				}
 
 
@@ -2092,11 +2157,11 @@ class commande_lm extends commande {
 					$avg = $reel = $obj =array();
 
 					if(count($result) < 12){
-						for ($i=0; $i < 12; $i++) { 
+						for ($i=0; $i < 12; $i++) {
 							if($i <10) $month = "0".$i+1;
 							else $month = $i+1;
 							$temp[$i] = array("nb"=>0, "year"=>date("Y"), "month"=>$month);
-							foreach ($result as $key => $value) {	
+							foreach ($result as $key => $value) {
 								if($month == $value["month"]){
 									$temp[$i]["nb"] = $value["nb"];
 									$temp[$i]["year"] = $value["year"];
@@ -2106,9 +2171,9 @@ class commande_lm extends commande {
 						}
 						$result = $temp;
 					}
-					
 
-					foreach ($res as $i) {	
+
+					foreach ($res as $i) {
 						if($avg[$i["month"]]["value"]){
 							$avg[$i["month"]]["value"] = $avg[$i["month"]]["value"]+$i["nb"];
 						}else{
@@ -2118,12 +2183,12 @@ class commande_lm extends commande {
 
 						if($graph['year'][$i['year']]["count"]){ $graph['year'][$i['year']]["count"] = $graph['year'][$i['year']]["count"] + $i["nb"]; }
 						else{ $graph['year'][$i['year']]["count"] = $i["nb"]; }
-						$graph['year'][$i['year']]["annee"] = $i["year"];							
-						
-					}
-					
+						$graph['year'][$i['year']]["annee"] = $i["year"];
 
-					foreach ($result as $i) {						
+					}
+
+
+					foreach ($result as $i) {
 						$reel[$i["month"]]["value"]= $i["nb"];
 						$reel[$i["month"]]["titre"] = "Objectif MENSUEL : ".$reel[$i["month"]]["value"];
 
@@ -2131,7 +2196,7 @@ class commande_lm extends commande {
 						else{ $graph['year'][$i['year']]["count"] = $i["nb"]; }
 						$graph['year'][$i['year']]["annee"] = $i["year"];
 					}
-			
+
 					$totalPrec = 0;
 					if($type == "o2m"){	$objectif = $agence["objectif_devis_reseaux"]; }
 					else{ 	$objectif = $agence["objectif_devis_autre"]; }
@@ -2139,32 +2204,32 @@ class commande_lm extends commande {
 					foreach ($avg as $key => $value) {
 						$avg[$key]["value"] = round($value["value"]/3);
 						$totalPrec += $avg[$key]["value"];
-					}	
+					}
 
 
-					foreach ($avg as $key => $value) {	
+					foreach ($avg as $key => $value) {
 						$pourcentage = ($avg[$key]["value"]/$totalPrec)*100;
 						$obj[$key]["value"] = round(($objectif/100)*$pourcentage);
 					}
-					
 
-					
+
+
 
 					$graph['dataset']["objectif"] = $obj;
 					$graph['dataset']["moyenne"] = $avg;
-					$graph['dataset']["reel"] = $reel;	
+					$graph['dataset']["reel"] = $reel;
 
-					
+
 
 
 				} else {
 					foreach (ATF::stats()->recupMois($type) as $k=>$i) {
 						$graph['categories']["category"][] = array("label"=>substr($i,0,4),"hoverText"=>$i);
 					}
-				}								
-				
+				}
+
 				return $graph;
-		
+
 
 			default:
 				return parent::stats($stats,$type,$widget);

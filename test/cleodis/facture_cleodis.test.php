@@ -1613,7 +1613,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                             $this->obj->getRef(57,"libre"),
                             "getRef libre");    
 
-        $this->assertEquals("0607004-6",
+        $this->assertEquals("0607004-7",
                             $this->obj->getRef(33),
                             "getRef");  
 

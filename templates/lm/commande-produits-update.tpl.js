@@ -10,6 +10,7 @@
 	, "{$current_class->table}.ref"
 	, "{$current_class->table}.id_fournisseur"
 	, "{$current_class->table}.prix_achat"
+	, "{$current_class->table}.prix_achat_ttc"
 	, "{$current_class->table}.code"
 	, "{$current_class->table}.id_produit"
 	, "{$current_class->table}.commentaire"
