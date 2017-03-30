@@ -1360,51 +1360,6 @@ class societe extends classes_optima {
 		}
 	}
 
-	/** Méthode GET REST pour API
-	* Retourne les dernières activités
-	* @author Yann GAUTHERON <ygautheron@absystech.fr>
-	*/
-	/*public static function _GET($get,$post) {
-		$columns = $get["columns"];
-
-		ATF::societe()->q->reset()->setLimit($get["length"],$get["start"])->setPage($get["start"]/$get["length"]);
-
-
-		foreach ($columns as $key => $value) {
-			ATF::societe()->q->addField($value["name"]);
-		}
-
-		if($get["search"]["value"]){
-			ATF::societe()->q->setSearch($get["search"]["value"]);
-		}
-
-		ATF::societe()->q->addOrder($columns[$get["order"][0]["column"]]["name"],$get["order"][0]["dir"]);
-
-		$data_sql = ATF::societe()->select_all();
-
-		$data = array();
-
-		ATF::societe()->q->setCountOnly()->setLimit(0);
-		$total = ATF::societe()->select_row();
-
-		foreach ($data_sql as $key => $value) {
-
-			$d = array();
-			foreach ($columns as $k => $v) {
-				$d[] = $value[$v["name"]];
-			}
-			$data[] = $d;
-		}
-
-		$return["data"] = $data;
-		$return["draw"] = $get["draw"];
-		$return["recordsTotal"] = $total;
-		$return["recordsFiltered"] = $total;
-//throw new Exception("test",500);
-		return $return;
-	}	*/
-
-
 	/**
 	* Permet de récupérer la liste des tickets hotline pour telescope
 	* @package Telescope
@@ -1426,14 +1381,6 @@ class societe extends classes_optima {
 		// Gestion de la page
 		if (!$get['page']) $get['page'] = 0;
 
-		/*$colsData = array(
-			"societe.id_societe"=>array(),
-			"societe.ref"=>array(),
-			"societe.societe"=>array(),
-			"societe.etat"=>array()
-		);*/
-
-
 		$this->q->reset();
 
 		if($get["search"]){
@@ -1444,20 +1391,27 @@ class societe extends classes_optima {
 		if ($get['id']) {
 			$this->q->where("societe",$get['id'])->setLimit(1);
 		} else {
-			$this->q->setLimit($get['limit']);
 
+			if ($get['filters']['active'] == "on") {
+				$this->q->where("societe.etat","actif","OR","sta");
+			}
+			if ($get['filters']['inactive'] == "on") {
+				$this->q->where("societe.etat","inactif","OR","sta");
+			}
+			if ($get['filters']['douteux'] == "on") {
+				$this->q->where("societe.etat","douteux","OR","sta");
+			}
+
+			$this->q->setLimit($get['limit']);
 		}
 
 		switch ($get['tri']) {
-			case 'id_societe':
-			case 'etat':
+			default:
 				$get['tri'] = "societe.".$get['tri'];
 			break;
 		}
 
-
 		$this->q->addAllFields("societe");
-
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
@@ -1469,23 +1423,31 @@ class societe extends classes_optima {
 					unset($data['data'][$k][$k_]);
 				}
 			}
+			// On récupère le domaine
+			$data['data'][$k]['domaines'] = self::getDomaine($data['data'][$k]['id_societe_fk']);
 		}
 
 		if ($get['id']) {
-	        $return = $data['data'][0];
+      $return = $data['data'][0];
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
 
-	        $return = $data['data'];
+      $return = $data['data'];
 		}
 
 		return $return;
 	}
 
-	public function _DELETE($get,$post) {
+	/**
+	 * Supprime une société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get  Contient l'ID de la société
+	 * @return Boolean TRUE si OK, FALSE si NOK
+	 */
+	public function _DELETE($get) {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 		$return['result'] = $this->delete($get);
     	// Récupération des notices créés
@@ -1493,9 +1455,72 @@ class societe extends classes_optima {
         return $return;
 	}
 
+	/**
+	 * Renvoi les domaines des sociétés avec un flag pour indiquer l'affectation et une classe CLS pour le rendu
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  INT $id id_societe
+	 * @return array L'ensemble des domaines de sociétés avec le flag et la classe CLS
+	 */
+	public function getDomaine($id) {
+		// Récupération des domaines
+		ATF::domaine()->q->reset()
+			->from("domaine","id_domaine","societe_domaine","id_domaine",false,false,false,"test")
+			->where('societe_domaine.id_societe',$id,false,"test");
+		if ($domaines = ATF::domaine()->sa()) {
+			foreach ($domaines as $k=>$lines) {
+				foreach ($lines as $k_=>$val) {
+					if (strpos($k_,".")) {
+						$tmp = explode(".",$k_);
+						$domaines[$k][$tmp[1]] = $val;
+						unset($domaines[$k][$k_]);
+					}
+				}
+				switch ($lines['id_domaine']) {
+					case 1: // Support
+						$domaines[$k]['cls'] = 'warning';
+					break;
+					case 2: // Hardware
+						$domaines[$k]['cls'] = 'success';
+					break;
+					case 3: // Web agency
+						$domaines[$k]['cls'] = 'danger';
+					break;
+					case 4: // Web service
+						$domaines[$k]['cls'] = 'primary';
+					break;
+					case 5: // Telecom
+						$domaines[$k]['cls'] = 'purple';
+					break;
+				}
+			}
+		}
 
-	public function _getSociete($get,$post) {
-		return array("societe"=>$this->select($get["id_societe"]) , "module"=>$this);
+		return $domaines;
+	}
+
+	/**
+	 * Affecte/Désaffecte un domaine a une société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get USELESS
+	 * @param  array $post $_POST
+	 */
+	public function _setDomaine($get,$post) {
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
+		$return = true;
+
+		if (!$post['idSociete']) throw new errorATF("ID_SOCIETE_MISSING",3256);
+		if (!$post['domaine']) throw new errorATF("DOMAINE_MISSING",3257);
+
+		if ($post['id']) {
+			// Delete la liaison
+			ATF::societe_domaine()->delete($post['id']);
+		} else {
+			// Ajout de la liaison
+			$return = ATF::societe_domaine()->insert(array("id_societe"=>$post['idSociete'], 'id_domaine'=>$post['domaine']));
+		}
+
+		return $return;
 	}
 
 
@@ -1552,5 +1577,6 @@ class societe extends classes_optima {
 
 		return $this->select_all();
 	}
+
 
 }
