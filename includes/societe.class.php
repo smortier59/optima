@@ -1389,7 +1389,7 @@ class societe extends classes_optima {
 		}
 
 		if ($get['id']) {
-			$this->q->where("societe",$get['id'])->setLimit(1);
+			$this->q->where("societe.id_societe",$get['id'])->setLimit(1);
 		} else {
 
 			if ($get['filters']['active'] == "on") {
@@ -1412,7 +1412,6 @@ class societe extends classes_optima {
 		}
 
 		$this->q->addAllFields("societe");
-
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
 		foreach ($data["data"] as $k=>$lines) {
@@ -1426,9 +1425,9 @@ class societe extends classes_optima {
 			// On récupère le domaine
 			$data['data'][$k]['domaines'] = self::getDomaine($data['data'][$k]['id_societe_fk']);
 		}
-
 		if ($get['id']) {
       $return = $data['data'][0];
+			$data['panels'] = $this->panels;
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
