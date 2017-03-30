@@ -3673,8 +3673,10 @@ class hotline extends classes_optima {
 
 		if ($get['id']) {
 			$this->q->where("id_hotline",$get['id'])->setLimit(1);
+		} elseif ($get['id_societe']) {
+			$this->q->where("hotline.id_societe",$get['id_societe']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		} else {
-
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
 			if ($get['filters']['free'] == "on") {
@@ -3717,6 +3719,7 @@ class hotline extends classes_optima {
 				$this->q->where("hotline.pole_concerne","telecom","OR","pole");
 			}
 
+
 			// TRI
 			switch ($get['tri']) {
 				case 'id_societe':
@@ -3727,7 +3730,7 @@ class hotline extends classes_optima {
 				break;
 			}
 
-			$this->q->setLimit($get['limit']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 
 		}
 
@@ -3740,7 +3743,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
 		$this->q->setToString();
-		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
+		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
 		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);

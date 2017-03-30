@@ -585,9 +585,18 @@ class contact extends classes_optima {
 
 		if ($get['id']) {
 			$this->q->where("id_contact",$get['id'])->setLimit(1);
+		} elseif ($get['id_societe']) {
+			$this->q->where("contact.id_societe",$get['id_societe']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		} else {
+			if($get["filter"]){
+				foreach ($get["filter"] as $key => $value) {
+					if (strpos($key, 'contact') !== false) {
+						$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+					}
+				}
+			}
 			$this->q->setLimit($get['limit']);
-
 		}
 		switch ($get['tri']) {
 			case 'id_societe':
@@ -595,13 +604,7 @@ class contact extends classes_optima {
 			break;
 		}
 
-		if($get["filter"]){
-			foreach ($get["filter"] as $key => $value) {
-				if (strpos($key, 'contact') !== false) {
-					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
-				}
-			}
-		}
+
 
 		$this->q->addField($colsData);
 

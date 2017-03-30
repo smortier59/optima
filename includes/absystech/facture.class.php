@@ -1968,6 +1968,7 @@ class facture_absystech extends facture {
 			if ($get['id_societe']) {
 				$this->q->where("facture.id_societe",$get['id_societe']);
 			}
+
 			if ($get['filters']['payee']) {
 				$this->q->where("facture.etat","payee","OR","etat");
 			}
@@ -1983,7 +1984,7 @@ class facture_absystech extends facture {
 			if ($get['filters']['end']) {
 				$this->q->where("facture.date",date('Y-m-d',strtotime($get['filters']['end'])),"AND","date","<=");
 			}
-			$this->q->setLimit($get['limit']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		}
 
 		switch ($get['tri']) {
@@ -1996,7 +1997,9 @@ class facture_absystech extends facture {
 				$get['tri'] = "facture.".$get['tri'];
 			break;
 		}
-
+		// $this->q->setToString();
+		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),'qjanon');
+		// $this->q->unsetToString();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
@@ -2023,6 +2026,22 @@ class facture_absystech extends facture {
 		}
 
 		return $return;
+	}
+
+	public function _export($get) {
+
+		$data = self::_GET($get);
+		$fn = $this->filepath(ATF::$usr->getID(),"exportList",true);
+		$file = fopen($fn, "w+");
+		fputs($file, implode(",",array_keys($data)),"\n");
+
+		foreach ($data as $line) {
+		  fputcsv($file, $line);
+		  fputs("\n");
+		}
+		fclose($file);
+
+		return file_get_contents($fn);
 	}
 
 	/**
@@ -2113,19 +2132,14 @@ class facture_absystech extends facture {
 
 
 	public function _getImpaye($get,$post){
-		if($get["filter"]["facture.id_societe"]) $id_societe =  $get["filter"]["facture.id_societe"];
-		$get["filter"]= array();
-		if($id_societe) $get["filter"]["facture.id_societe"] = $id_societe;
-		$get["filter"]["facture.etat"] = "impayee";
+		$get["filters"]["impayee"] = true;
+		$get['tri'] = "retard";
+		$get['trid'] = "desc";
 		return $this->_GET($get,$post);
 	}
 
 	public function _getPaye($get,$post){
-		if($get["filter"]["facture.id_societe"]) $id_societe = $get["filter"]["facture.id_societe"];
-		$get["filter"]= array();
-		if($id_societe) $get["filter"]["facture.id_societe"] = $id_societe;
-		$get["filter"]["facture.etat"] = "payee";
-		$get['limit'] = 15;
+		$get["filters"]["payee"] = true;
 		$get['tri'] = "facture.date";
 		$get['trid'] = "desc";
 		return $this->_GET($get,$post);
