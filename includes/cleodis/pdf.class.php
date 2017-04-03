@@ -1865,9 +1865,11 @@ class pdf_cleodis extends pdf {
 
 		if ($commentaire) $d4 .= "Commentaire : ".$commentaire;
 		if ($produit['commentaire']){
-			if (!$commentaire) $d4 .= "Commentaire : ";
-			else $d4 .= " - ";
-			$d4 .= $produit['commentaire'];
+			if($commentaire !== $produit['commentaire']){
+				if (!$commentaire) $d4 .= "Commentaire : ";
+				else $d4 .= " - ";
+				$d4 .= $produit['commentaire'];
+			}
 		}
 
 		$details = $d1.$d2.$d3.$d4;
