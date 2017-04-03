@@ -3634,10 +3634,11 @@ class hotline extends classes_optima {
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
-		if (!$get['limit']) $get['limit'] = 30;
+		if (!$get['limit'] && !$get['no-limit']) $get['limit'] = 30;
 
 		// Gestion de la page
 		if (!$get['page']) $get['page'] = 0;
+		if ($get['no-limit']) $get['page'] = false;
 
 		$colsData = array(
 			"hotline.id_hotline"=>array(),
@@ -3742,9 +3743,9 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
-		$this->q->setToString();
-		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
-		$this->q->unsetToString();
+		// $this->q->setToString();
+		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
+		// $this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
@@ -3770,10 +3771,11 @@ class hotline extends classes_optima {
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
-			header("ts-max-page: ".ceil($data['count']/$get['limit']));
-			header("ts-active-page: ".$get['page']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
 
-	        $return = $data['data'];
+      $return = $data['data'];
 		}
 
 		return $return;
