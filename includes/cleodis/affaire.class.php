@@ -264,7 +264,7 @@ class affaire_cleodis extends affaire {
 								,'public'=>'oui'
 								,'id_contact'=>NULL
 								,'suivi_societe'=>array(0=>ATF::$usr->getID())
-								,'suivi_notifie'=>array(0 => 35)
+								,'suivi_notifie'=>NULL
 								,'champsComplementaire'=>$infos['key']
 							);
 							$suivi["no_redirect"] = true;
