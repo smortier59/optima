@@ -161,15 +161,18 @@ class facture_lm extends facture {
 
 				$data[$mandat_slimpay]["libelle"] .= $f["ref"]." ";
 
-
-				if($data[$mandat_slimpay]){
+				if($data[$mandat_slimpay]["paymentReference"]){
 					$data[$mandat_slimpay]["prix"] += $f["prix"];
 					$data[$mandat_slimpay]["id_facture"][] = $key;
-					$data[$mandat_slimpay]["paymentReference"] .= "/ ".$f["ref"]." ";
+
+					$id_affaire = $this->getAffaireMere($f["id_affaire"]);
+					$d = str_replace(ATF::affaire()->select($id_affaire, "ref"), "", $f["ref"]);
+
+					$data[$mandat_slimpay]["paymentReference"] .= "/".$d;
 				}else{
 					$data[$mandat_slimpay]["prix"] = $f["prix"];
 					$data[$mandat_slimpay]["id_facture"][] = $key;
-					$data[$mandat_slimpay]["paymentReference"] = $f["ref"]." ";
+					$data[$mandat_slimpay]["paymentReference"] = $f["ref"];
 				}
 			}
 
@@ -187,6 +190,16 @@ class facture_lm extends facture {
 			}
 		}
 		return true;
+	}
+
+	public function getAffaireMere($id_affaire){
+		if(ATF::affaire()->select($f["id_affaire"], "nature") == "avenant"){
+			ATF::affaire()->q->reset()->where("id_affaire", $id_affaire);
+			$aff = ATF::affaire()->select_row();
+			return $this->getAffaireMere($aff["id_affaire"]);
+		}else{
+			return $id_affaire;
+		}
 	}
 
 	/**
