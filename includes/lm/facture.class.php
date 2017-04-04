@@ -82,6 +82,12 @@ class facture_lm extends facture {
 			,"emailTexte"=>array("custom"=>true,'null'=>true,"xtype"=>"htmleditor")
 		);
 
+		$this->colonnes['panel']['slimpay'] = array(
+			"id_slimpay",
+			"executionStatus",
+			"executionDate"
+		);
+
 		// Propriété des panels
 		$this->panels['primary'] = array("visible"=>true,'nbCols'=>3);
 		$this->panels['refi'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
@@ -96,7 +102,7 @@ class facture_lm extends facture {
 		// Champs masqués
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['cloner'] =
-		$this->colonnes['bloquees']['update'] = array('ref','tva','etat','date_paiement','date_relance','id_user','envoye_mail','rejet');
+		$this->colonnes['bloquees']['update'] = array('ref','tva','etat','date_paiement','date_relance','id_user','envoye_mail','rejet',"id_slimpay","executionStatus","executionDate");
 		$this->fieldstructure();
 
 		$this->onglets = array('facture_ligne');
@@ -112,11 +118,119 @@ class facture_lm extends facture {
 		$this->addPrivilege("export_cegid");
 		$this->addPrivilege("export_GL_LM");
 
+		$this->addPrivilege("aPrelever");
+		$this->addPrivilege("massPrelevementSlimpay");
+
+
 
 
 		$this->field_nom="ref";
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true);
 		$this->selectAllExtjs=true;
+	}
+
+	/**
+	* Renvoi toutes les factures en attente de prélèvement
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function aPrelever($infos){
+		$this->q->reset()->whereIsNull("date_paiement","AND")->whereIsNull("id_slimpay","AND");
+		$return = $this->sa();
+		foreach ($return as $key => $value) {
+			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
+			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
+			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+		}
+		return $return;
+	}
+
+	/**
+	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function massPrelevementSlimpay($infos){
+		$data = array();
+
+		if($infos["factures"]){
+			foreach ($infos["factures"] as $key => $value) {
+				$f = ATF::facture()->select($key);
+				$mandat_slimpay = $this->getMandatSlimpay($f["id_affaire"]);
+
+				$data[$mandat_slimpay]["libelle"] .= $f["ref"]." ";
+
+
+				if($data[$mandat_slimpay]){
+					$data[$mandat_slimpay]["prix"] += $f["prix"];
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+					$data[$mandat_slimpay]["paymentReference"] .= "/ ".$f["ref"]." ";
+				}else{
+					$data[$mandat_slimpay]["prix"] = $f["prix"];
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+					$data[$mandat_slimpay]["paymentReference"] = $f["ref"]." ";
+				}
+			}
+
+			foreach ($data as $key => $value) {
+				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+				foreach ($value["id_facture"] as $kfacture => $vfacture) {
+					$this->u(array("id_facture"=>$vfacture,
+								   "id_slimpay"=>$status["id"],
+								   "executionStatus"=>$status["executionStatus"],
+								   "executionDate"=>$status["executionDate"]
+								  )
+							);
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function statusDebitEnCours(){
+		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
+						 ->where("executionStatus","toprocess","AND",false,"!=");
+
+		if($factures = $this->select_all()){
+			foreach ($factures as $key => $value) {
+				$facture = $this->select($value["facture.id_facture"], "id_slimpay");
+				$status = ATF::slimpay()->getStatutDebit($facture["id_slimpay"]);
+
+				if($facture["executionStatus"] !== $status["executionStatus"]){
+					$this->u(array("id_facture"=>$vfacture,
+								   "executionStatus"=>$status["executionStatus"]
+								  )
+							);
+				}
+			}
+
+		}
+
+	}
+
+	/**
+	* Retourne le mandat SLIMPAY d'une affaire passée en parametre
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function getMandatSlimpay($id_affaire){
+		if($mandatSlimpay = ATF::affaire()->select($id_affaire , "ref_mandate")){
+			return $mandatSlimpay;
+		}else{
+			if($id_parent = ATF::affaire()->select($id_affaire , "id_parent")){
+				return $this->getMandatSlimpay($id_parent);
+			}else{
+				throw new errorATF("Error Processing Request", 1);
+
+			}
+		}
 	}
 
 		/**
