@@ -572,7 +572,7 @@ class bon_de_commande_lm extends bon_de_commande {
 			$bon_de_commande_ligne["quantite"]=1;
 			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"];
 			$bon_de_commande_ligne["prix_ttc"]=$commande_ligne["prix_achat_ttc"];
-			$prix_total += $bon_de_commande_ligne["prix"];
+			$prix_total += $bon_de_commande_ligne["prix_ttc"];
 			ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne);
 		}
 
