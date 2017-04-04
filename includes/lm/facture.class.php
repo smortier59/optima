@@ -147,7 +147,7 @@ class facture_lm extends facture {
 	}
 
 	/**
-	* Regrouper les factures du meme contrat et envoyer le prélèvement SLIMPAY
+	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*
 	*/
@@ -189,6 +189,11 @@ class facture_lm extends facture {
 		return true;
 	}
 
+	/**
+	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
 						 ->where("executionStatus","toprocess","AND",false,"!=");
@@ -210,6 +215,11 @@ class facture_lm extends facture {
 
 	}
 
+	/**
+	* Retourne le mandat SLIMPAY d'une affaire passée en parametre
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
 	public function getMandatSlimpay($id_affaire){
 		if($mandatSlimpay = ATF::affaire()->select($id_affaire , "ref_mandate")){
 			return $mandatSlimpay;
