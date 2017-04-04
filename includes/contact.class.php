@@ -552,10 +552,11 @@ class contact extends classes_optima {
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
-		if (!$get['limit']) $get['limit'] = 30;
+		if (!$get['limit'] && !$get['no-limit']) $get['limit'] = 30;
 
 		// Gestion de la page
 		if (!$get['page']) $get['page'] = 0;
+		if ($get['no-limit']) $get['page'] = false;
 
 		$colsData = array(
 			"contact.id_contact"=>array(),
@@ -596,7 +597,7 @@ class contact extends classes_optima {
 					}
 				}
 			}
-			$this->q->setLimit($get['limit']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		}
 		switch ($get['tri']) {
 			case 'id_societe':
@@ -628,8 +629,10 @@ class contact extends classes_optima {
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
-			header("ts-max-page: ".ceil($data['count']/$get['limit']));
-			header("ts-active-page: ".$get['page']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
+
 	    $return = $data['data'];
 		}
 
