@@ -22,8 +22,8 @@ class demande_refi extends classes_optima {
 			,'demande_refi.date_cession'=>array("renderer"=>"updateDate","width"=>170)
 			,'demande_refi.duree_refinancement'
 		);
-		
-		$this->colonnes['primary'] = array(		 
+
+		$this->colonnes['primary'] = array(
 			"id_societe"=>array("disabled"=>true)
 			,"id_affaire"=>array("disabled"=>true)
 			,"id_refinanceur"
@@ -47,7 +47,7 @@ class demande_refi extends classes_optima {
 //		$this->colonnes['panel']['loyer_lignes'] = array(
 //			"loyer"=>array("custom"=>true)
 //		);
-		
+
 		// Javascript expérimental
 		$javascript = "function (t) {
 			ATF.ajax('affaire,getCompteTLoyerActualise.ajax'
@@ -58,7 +58,7 @@ class demande_refi extends classes_optima {
 				}
 			);
 		}";
-		
+
 		$this->colonnes['panel']['chiffres'] = array(
 			"taux"=>array("formatNumeric"=>true,"xtype"=>"textfield","listeners"=>array("change"=>$javascript))
 			,"valeur_residuelle"=>array("formatNumeric"=>true,"xtype"=>"textfield","listeners"=>array("change"=>$javascript))
@@ -93,11 +93,11 @@ class demande_refi extends classes_optima {
 		$this->colonnes['panel']['statut'] = array(
 			"etat"
 		);
-		
+
 		$this->field_nom = "description";
 		$this->fieldstructure();
 
-		//$this->colonnes['bloquees']['insert'] = array('score',"avis_credit");	
+		//$this->colonnes['bloquees']['insert'] = array('score',"avis_credit");
 
 		$this->noTruncateSA = true;
 		$this->files["pdf"] = array("type"=>"pdf","preview"=>true);
@@ -108,7 +108,7 @@ class demande_refi extends classes_optima {
 		$this->panels['notes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['statut'] = array("visible"=>true, 'nbCols'=>1);
 		$this->no_insert = true;
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 	}
 
 	public function uploadFileFromSA(&$infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
@@ -117,9 +117,9 @@ class demande_refi extends classes_optima {
 		if (!$class) return false;
 		if (!$infos['id']) return false;
 		if (!$files) return false;
-		
+
 		$id = $class->decryptID($infos['id']);
-		
+
 		$id_affaire = $class->select($id, "id_affaire");
 
 		foreach ($files as $k=>$i) {
@@ -128,18 +128,18 @@ class demande_refi extends classes_optima {
 			$this->store($s,$id,$k,$i);
 
 			copy($class->filepath($id,$k), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
-			
+
 		}
 		ATF::$cr->block('generationTime');
 		ATF::$cr->block('top');
-		
-		
-		
+
+
+
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
 
-	/** 
+	/**
 	* Surcharge de l'insert afin de modifier l'etat de l'affaire
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -154,7 +154,7 @@ class demande_refi extends classes_optima {
 			$preview=$infos["preview"];
 		}else{
 			$preview=false;
-		}		
+		}
 		$this->infoCollapse($infos);
 
 		$notifie_suivi = $infos["suivi_notifie"];
@@ -163,9 +163,9 @@ class demande_refi extends classes_optima {
 //*****************************Transaction********************************
 		ATF::db($this->db)->begin_transaction();
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-	
-		ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"],"etat"=>"demande_refi"));	
-		
+
+		ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"],"etat"=>"demande_refi"));
+
 		if($preview){
 			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -183,13 +183,13 @@ class demande_refi extends classes_optima {
 					,'id_contact'=>NULL
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
 					,'suivi_notifie'=>$notifie_suivi
-				);													
-				ATF::suivi()->insert($suivi);							
+				);
+				ATF::suivi()->insert($suivi);
 			}elseif($infos["etat"] === "accepte"){
 				$resp_societe = ATF::societe()->select($infos['id_societe'], "id_owner");
 
-				if($resp_societe == 35 || $resp_societe == 93){ $suivi_notif = array(35,93);}
-				else{ $suivi_notif = array(35,93,$resp_societe); }
+				if($resp_societe == 93){ $suivi_notif = array(93);}
+				else{ $suivi_notif = array(93,$resp_societe); }
 
 				$suivi = array(
 					"id_user"=>ATF::$usr->get('id_user')
@@ -201,10 +201,10 @@ class demande_refi extends classes_optima {
 					,'id_contact'=>NULL
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
 					,'suivi_notifie'=>$resp_societe
-				);													
-				ATF::suivi()->insert($suivi);							
+				);
+				ATF::suivi()->insert($suivi);
 			}
-			
+
 
 
 			ATF::db($this->db)->commit_transaction();
@@ -216,7 +216,7 @@ class demande_refi extends classes_optima {
 		return $this->cryptId($last_id);
 	}
 
-	/* 
+	/*
 	* Surcharge de l'update afin de modifier l'etat de l'affaire
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -232,7 +232,7 @@ class demande_refi extends classes_optima {
 		}else{
 			$preview=false;
 		}
-		
+
 		$this->infoCollapse($infos);
 		$infos["filestoattach"]["pdf"]="";
 		$notifie_suivi = $infos["suivi_notifie"];
@@ -240,7 +240,7 @@ class demande_refi extends classes_optima {
 		/*****************************Transaction********************************/
 		ATF::db($this->db)->begin_transaction();
 		parent::update($infos,$s,$files);
-		
+
 		if($preview){
 			$this->move_files($infos["id_demande_refi"],$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -248,7 +248,7 @@ class demande_refi extends classes_optima {
 		}else{
 			$this->move_files($infos["id_demande_refi"],$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 
-			
+
 			if($infos["etat"] === "passage_comite"){
 				$suivi = array(
 					 "id_user"=>ATF::$usr->get('id_user')
@@ -260,8 +260,8 @@ class demande_refi extends classes_optima {
 					,'id_contact'=>NULL
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
 					,'no_redirect'=>true
-				);			
-				$id_suivi = ATF::suivi()->insert($suivi);	
+				);
+				$id_suivi = ATF::suivi()->insert($suivi);
 
 				$liste_email = "";
 				foreach ($notifie_suivi as $key => $value) {
@@ -279,7 +279,7 @@ class demande_refi extends classes_optima {
 							"id_suivi"=>$id_suivi,
 							"from"=>ATF::$usr->get('email')));
 				}
-				
+
 
 
 			}elseif($infos["etat"] === "accepte"){
@@ -296,7 +296,7 @@ class demande_refi extends classes_optima {
 					,'id_contact'=>NULL
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
 					,'no_redirect'=>true
-				);													
+				);
 				$id_suivi = ATF::suivi()->insert($suivi);
 
 				$mail = new mail(array(
@@ -311,7 +311,7 @@ class demande_refi extends classes_optima {
 
 			}
 
-			if($mail){				
+			if($mail){
 				if($mail->send()){
 					ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
 				}
@@ -323,7 +323,7 @@ class demande_refi extends classes_optima {
 			if(is_array($cadre_refreshed)){
 				ATF::affaire()->redirection("select",$infos["id_affaire"]);
 			}
-			
+
 			$id_demande_refi=$this->decryptId($infos["id_demande_refi"]);
 			return $id_demande_refi;
 		}
@@ -355,7 +355,7 @@ class demande_refi extends classes_optima {
 				loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
 				,ATF::$usr->trans("notice_success_title")
 			);
-			
+
 //			$id_affaire=$this->select($infosMaj["id_".$this->table],"id_affaire");
 //			ATF::affaire()->redirection("select",$id_affaire);
 			return true;
@@ -395,11 +395,11 @@ class demande_refi extends classes_optima {
 			if(!$commande["date_evolution"]){
 				throw new errorATF("Impossible d'insérer date de cession car il n'y a pas de date de fin de contrat",875);
 			}
-			
+
 			$datetime1 = new DateTime($infosMaj[$infos["key"]]);
 			$datetime2 = new DateTime($commande["date_evolution"]);
 			$interval = date_diff($datetime1, $datetime2);
-			
+
 			if($interval->invert>0){
 				throw new errorATF("La date de cession date est inférieur à la date de début de contrat",876);
 			}
@@ -420,17 +420,17 @@ class demande_refi extends classes_optima {
 
 			ATF::loyer()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row");
 			$loyer=ATF::loyer()->sa();
-			
+
 			if($loyer["frequence_loyer"]=="an"){
 				$frequence_loyer=12;
 			}elseif($loyer["frequence_loyer"]=="semestre"){
 				$frequence_loyer=6;
 			}elseif($loyer["frequence_loyer"]=="trimestre"){
-				$frequence_loyer=3;			
+				$frequence_loyer=3;
 			}elseif($loyer["frequence_loyer"]=="mois"){
 				$frequence_loyer=1;
 			}
-			
+
 			$infosMaj["duree_refinancement"]=ceil($m/$frequence_loyer)." ".$loyer["frequence_loyer"]."(s)";
 		}else{
 			$infosMaj["duree_refinancement"]=NULL;
@@ -441,9 +441,9 @@ class demande_refi extends classes_optima {
 	/**
     * Fonction qui permet de savoir s'il y a une demande refi validé pour une affaire
     * @author Mathieu TRIBOUILLARD <qjanon@absystech.fr>
-    * @param int $id_affaire 
+    * @param int $id_affaire
     * @return boolean à true s'il y en a une
-    */    
+    */
 	public function existDemandeRefi($id_affaire){
 		$this->q->reset()->addCondition("id_affaire",$this->decryptId($id_affaire))
 						 ->addCondition("etat","valide")
@@ -455,8 +455,8 @@ class demande_refi extends classes_optima {
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -464,7 +464,7 @@ class demande_refi extends classes_optima {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
 		if ($id_affaire = ATF::_r('id_affaire')) {
 			$affaire=ATF::affaire()->select($id_affaire);
@@ -479,7 +479,7 @@ class demande_refi extends classes_optima {
 		}
 
 
-		
+
 
 		switch ($field) {
 			case "id_societe":
@@ -487,10 +487,10 @@ class demande_refi extends classes_optima {
 					return $affaire['id_societe'];
 				}
 				break;
-			case "id_refinanceur" :					
+			case "id_refinanceur" :
 					if($comite){	return $comite["id_refinanceur"];	}
 				break;
-			case "score":				
+			case "score":
 				return ATF::$usr->trans(ATF::societe()->select($societe, "score"), "societe_score");
 			case "avis_credit":
 				return ATF::$usr->trans(ATF::societe()->select($societe, "avis_credit"), "societe_avis_credit");
@@ -521,20 +521,20 @@ class demande_refi extends classes_optima {
 				}
 			break;
 		}
-	
+
 		return parent::default_value($field,$s,$request);
 	}
-	
-	/** 
+
+	/**
 	* Impossible de supprimer une demande refi qui a été facturée
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_delete($id){
 		$id = $this->decryptId($id);
 		ATF::facture()->q->reset()->addCondition("id_demande_refi",$id)->setCount();
-		$count=ATF::facture()->sa();		
+		$count=ATF::facture()->sa();
 		if($count["count"]>0){
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il y a une ".ATF::$usr->trans("facture")." liée.",878);
 		}elseif($this->select($id,"etat")=="valide"){
@@ -543,21 +543,21 @@ class demande_refi extends classes_optima {
 			return true;
 		}
 	}
-	
-	/** 
+
+	/**
 	* Impossible de modifier une demande refi qui a été facturée
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
 		return $this->can_delete($id);
 	}
-	
+
 	/** Permet de récupérer le refinanceur
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param int id_affaire : identifiant de l'affaire courante
-	*/		
+	*/
 	public function id_refinanceur($id_affaire) {
 		$this->q->reset()->addField("id_refinanceur")->setStrict()
 						->addCondition('id_affaire',$id_affaire)->addCondition('etat','valide')

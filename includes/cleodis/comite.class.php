@@ -19,12 +19,12 @@ class comite extends classes_optima {
 			,'comite.etat'=>array("width"=>30,"renderer"=>"etat")
 			,'comite.validite_accord'=>array("renderer"=>"updateDate","width"=>170)
 			,'comite.date_cession'=>array("renderer"=>"updateDate","width"=>170)
-			,'comite.duree_refinancement'			
+			,'comite.duree_refinancement'
 			,'decision'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteDecision","width"=>50)
 			,"decisionComite"
 		);
-		
-		$this->colonnes['primary'] = array(		 
+
+		$this->colonnes['primary'] = array(
 			"id_societe"=>array("disabled"=>true)
 			,"activite"
 			,"id_affaire"=>array("disabled"=>true)
@@ -43,14 +43,14 @@ class comite extends classes_optima {
 				)
 			),
 			"date_creation"
-			
+
 
 		);
 //
 //		$this->colonnes['panel']['loyer_lignes'] = array(
 //			"loyer"=>array("custom"=>true)
 //		);
-		
+
 		// Javascript expérimental
 		$javascript = "function (t) {
 			ATF.ajax('affaire,getCompteTLoyerActualise.ajax'
@@ -74,9 +74,9 @@ class comite extends classes_optima {
 			,"maison_mere1"
 			,"maison_mere2"
 			,"maison_mere3"
-			,"maison_mere4"			
+			,"maison_mere4"
 		);
-		
+
 		$this->colonnes['panel']['chiffres'] = array(
 			"taux"=>array("formatNumeric"=>true,"xtype"=>"textfield","listeners"=>array("change"=>$javascript))
 			,"valeur_residuelle"=>array("formatNumeric"=>true,"xtype"=>"textfield","listeners"=>array("change"=>$javascript))
@@ -89,7 +89,7 @@ class comite extends classes_optima {
 			,"frais_de_gestion"=>array("readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
 		);
 
-		
+
 
 		$this->colonnes['panel']['dates'] = array(
 			"date"
@@ -108,7 +108,7 @@ class comite extends classes_optima {
 		$this->colonnes['panel']['notifie'] = array(
 			"suivi_notifie"=>array("custom"=>true)
 		);
-		
+
 		$this->field_nom = "description";
 
 		$this->colonnes['bloquees']['select'] =   array_merge(array('note'));
@@ -119,7 +119,7 @@ class comite extends classes_optima {
 
 		$this->fieldstructure();
 
-		//$this->colonnes['bloquees']['insert'] = array('score',"avis_credit");	
+		//$this->colonnes['bloquees']['insert'] = array('score',"avis_credit");
 
 		$this->noTruncateSA = true;
 		$this->files["pdf"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true);
@@ -130,14 +130,14 @@ class comite extends classes_optima {
 		$this->panels['statut'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['creditSafeInfos'] = array("visible"=>true, 'nbCols'=>4);
 		$this->no_insert = true;
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 
 		$this->addPrivilege("getInfosFromCREDITSAFE");
 		$this->addPrivilege("decision");
 
 	}
 
-	/** 
+	/**
 	* Surcharge de l'insert afin de modifier l'etat de l'affaire
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -151,7 +151,7 @@ class comite extends classes_optima {
 			$preview=$infos["preview"];
 		}else{
 			$preview=false;
-		}		
+		}
 		$this->infoCollapse($infos);
 
 		$notifie_suivi = $infos["suivi_notifie"];
@@ -164,15 +164,15 @@ class comite extends classes_optima {
 //*****************************Transaction********************************
 		ATF::db($this->db)->begin_transaction();
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-		
+
 		if($preview){
 			if(!$tu) $this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
 		}else{
 			if(!$tu) $this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 
-			
-			
+
+
 			if($notifie_suivi != array(0=>"")){
 				$recipient = "";
 				$info_mail["suivi_notifie"] = "";
@@ -188,24 +188,24 @@ class comite extends classes_optima {
 				$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";;
 				$info_mail["html"] = true;
 				$info_mail["template"] = "comite";
-				
+
 				$info_mail["recipient"] = $recipient;
 				$info_mail["objet"] = "Une demande de comité vient d'être créée pour l'affaire ".ATF::affaire()->select($infos['id_affaire'], "ref").".";
-				
+
 				$info_mail["reception_comite"] = "Un comité est en attente de votre part, voici quelques informations concernant ce dernier";
 				$info_mail["id_user"] = ATF::$usr->getID();
 				$info_mail["id_societe"] = $infos["id_societe"];
 				$info_mail["id_affaire"] = $infos["id_affaire"];
 				$info_mail["optima_url"] = ATF::permalink()->getURL($this->createPermalink($this->cryptId($last_id)));
-				
+
 				$mail = new mail($info_mail);
-			
-				if(!$tu) $mail->send();						
+
+				if(!$tu) $mail->send();
 
 				$this->u(array("id_comite"=>$last_id , "notifie_utilisateur"=>$info_mail["suivi_notifie"]));
 			}
 
-			
+
 			ATF::db($this->db)->commit_transaction();
 		}
 
@@ -213,7 +213,7 @@ class comite extends classes_optima {
 		return $this->cryptId($last_id);
 	}
 
-	/* 
+	/*
 	* Surcharge de l'update afin de modifier l'etat de l'affaire
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -229,12 +229,12 @@ class comite extends classes_optima {
 		}else{
 			$preview=false;
 		}
-		
+
 		$this->infoCollapse($infos);
 
-		
+
 		foreach ($infos["suivi_notifie"] as $key => $value) {
-			$user_notifie .= ATF::user()->nom($value).",";			
+			$user_notifie .= ATF::user()->nom($value).",";
 		}
 		$user_notifie = substr($user_notifie, 0, -1);
 
@@ -242,12 +242,11 @@ class comite extends classes_optima {
 
 
 		$infos["filestoattach"]["pdf"]="";
-		$notifie_suivi = $infos["suivi_notifie"];	
+		$notifie_suivi = $infos["suivi_notifie"];
 
 		ATF::devis()->q->reset()->where("devis.id_affaire", $this->select($id, "id_affaire"));
 		$devis = ATF::devis()->select_row();
 
-		$notifie_suivi[] = 35;
 		$notifie_suivi[] = $devis["id_user"];
 		$notifie_suivi[] = ATF::$usr->getID();
 
@@ -258,7 +257,7 @@ class comite extends classes_optima {
 		/*****************************Transaction********************************/
 		ATF::db($this->db)->begin_transaction();
 		parent::update($infos,$s,$files);
-		
+
 		if($preview){
 			if(!$tu) $this->move_files($infos["id_comite"],$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -266,7 +265,7 @@ class comite extends classes_optima {
 		}else{
 			if(!$tu) $this->move_files($infos["id_comite"],$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 
-			
+
 			if($infos["etat"]){
 				$suivi = array(
 					 "id_user"=>ATF::$usr->get('id_user')
@@ -282,31 +281,31 @@ class comite extends classes_optima {
 					,'no_redirect'=>true
 				);
 				if(!$tu) $id_suivi = ATF::suivi()->insert($suivi);
-			}		
+			}
 
 			ATF::db($this->db)->commit_transaction();
 			/****************************************************************************/
 
 			if(is_array($cadre_refreshed)){	ATF::affaire()->redirection("select",$infos["id_affaire"]);	}
-			
+
 			$id_comite=$this->decryptId($infos["id_comite"]);
 			return $id_comite;
 		}
 
 	}
 
-	/** 
+	/**
 	* Impossible de modifier un devis qui n'est pas en attente
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
 		if($this->select($id,"etat")=="en_attente"){
 			return true;
 		}else{
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
-			return false; 
+			return false;
 		}
 	}
 
@@ -337,8 +336,8 @@ class comite extends classes_optima {
 			);
 		}else{ return false; }
 		return true;
-	}	
-	
+	}
+
 	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -346,38 +345,37 @@ class comite extends classes_optima {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
 			$id_devis = ATF::_r("id_devis");
 
 			$id_affaire=ATF::devis()->select(ATF::devis()->decryptId($id_devis), "id_affaire");
 			$affaire = ATF::affaire()->select($id_affaire);
 			$societe = $affaire["id_societe"];
-			
+
 		switch ($field) {
-			case "id_affaire":	return $id_affaire; 
+			case "id_affaire":	return $id_affaire;
 			case "id_societe": return $affaire['id_societe'];
 			case "id_user":	return ATF::$usr->get('id_user');
 			case "date":
 				return date("d-m-Y");
-			case "id_contact":				
+			case "id_contact":
 					$devis = ATF::affaire()->getDevis($affaire['id_affaire']);
-					return $devis->infos['id_contact'];	
-			case "prix":				
+					return $devis->infos['id_contact'];
+			case "prix":
 					$devis = ATF::affaire()->getDevis($affaire['id_affaire']);
-					return $devis->infos['prix'];	
+					return $devis->infos['prix'];
 			case "description":	return $affaire['affaire'];
 			case "loyer_actualise":		return ATF::affaire()->getCompteTLoyerActualise($affaire);
 
-			case "pourcentage_materiel" : $pourcentage = ATF::affaire()->getPourcentagesMateriel($id_affaire);										  
+			case "pourcentage_materiel" : $pourcentage = ATF::affaire()->getPourcentagesMateriel($id_affaire);
 										  return $pourcentage["pourcentagesMat"];
 			case "suivi_notifie" :		  if(ATF::_r("id_comite")){
 												$return = array();
 												$data = array(  '16' => 'Jérôme LOISON',
 																'17' => 'Christophe LOISON',
 																'18' => 'Pierre CAMINEL',
-																'93' => 'Térence DELATTRE',
-																'35' => 'Frédérique RANDOUX');
+																'93' => 'Térence DELATTRE');
 
 												$notifie = $this->select( $this->decryptId(ATF::_r("id_comite")), "notifie_utilisateur");
 												$notifie = explode(",", $notifie);
@@ -386,20 +384,20 @@ class comite extends classes_optima {
 												}
 												return $return;
 										   }
-				
-			
+
+
 
 		}
-	
+
 		return parent::default_value($field,$s,$request);
 	}
 
 
 	public function getInfosFromCREDITSAFE($infos){
-		$siret = ATF::societe()->select($infos["societe"], "siret");		
+		$siret = ATF::societe()->select($infos["societe"], "siret");
 		$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
-		
-		
+
+
 
 
 		$xml = simplexml_load_string($res);
@@ -425,45 +423,45 @@ class comite extends classes_optima {
 
 		$data["activite"] = (string)$bi->activitydescription;
 
-		
-		
+
+
 		$data['ca'] = (string)$s->financialsummary->tradingtodate[0]->turnover;
-	
+
 
 		$data["resultat_exploitation"] = (string)$b->balancesheet->profitloss->operatingprofitloss;
 		$data["capital_social"] = (string)$bi->sharecapital;
 		$data["capitaux_propres"] = (string)$b->balancesheet->passiveaccount->shareholdersequity;
-		$data["dettes_financieres"] = (string)$b->balancesheet->passiveaccount->financialliabilities;		
+		$data["dettes_financieres"] = (string)$b->balancesheet->passiveaccount->financialliabilities;
 
 		if(strpos($data["capital_social"], "Euros")){ $data["capital_social"] = str_replace(" Euros", "", $data["capital_social"]); }
 		return $data;
 	}
 
 
-	public function decision($infos){		
+	public function decision($infos){
 
 		$validite = explode("/", $infos["date"]);
 		$validite_accord = $validite[2]."-".$validite[1]."-".$validite[0];
-		
+
 		$id = $this->decryptId($infos["id"]);
 
 		if($infos["comboDisplay"] == "refus_comite"){
 			$etat = "refuse";
 		}elseif($infos["comboDisplay"] == "attente_retour"){
-			$etat = "en_attente";		
+			$etat = "en_attente";
 		}else{
 			$etat = "accepte";
-			
+
 			$id_affaire = ATF::comite()->select($id, "id_affaire");
 
 			ATF::comite()->q->reset()->where("id_affaire", $id_affaire)
 							 ->where("etat", "accepte");
-	
-			$c = ATF::comite()->sa();				
 
-			if($c){				
+			$c = ATF::comite()->sa();
+
+			if($c){
 				foreach ($c as $key => $value) {
-					ATF::comite()->u(array("id_comite"=>$value["id_comite"] , "etat"=> "accord_non utilise"));				
+					ATF::comite()->u(array("id_comite"=>$value["id_comite"] , "etat"=> "accord_non utilise"));
 				}
 			}
 		}
@@ -480,16 +478,16 @@ class comite extends classes_optima {
 		ATF::devis()->q->reset()->where("devis.id_affaire", $this->select($id, "id_affaire"));
 		$devis = ATF::devis()->select_row();
 
-		
 
-		$notifie_suivi = array(35, ATF::$usr->getID(), $devis["id_user"], ATF::societe()->select($this->select($id , "id_societe"), "id_owner"));
+
+		$notifie_suivi = array(ATF::$usr->getID(), $devis["id_user"], ATF::societe()->select($this->select($id , "id_societe"), "id_owner"));
 
 		$notifie_suivi = array_unique($notifie_suivi);
 
 		$suivi_notifie = "";
-		
+
 		foreach ($notifie_suivi as $key => $value) {
-			$suivi_notifie .= ATF::user()->nom($value).",";			
+			$suivi_notifie .= ATF::user()->nom($value).",";
 		}
 		$suivi_notifie = substr($suivi_notifie, 0, -1);
 		$this->u(array("id_comite"=>$id , "notifie_utilisateur"=>$suivi_notifie));
@@ -506,7 +504,7 @@ class comite extends classes_optima {
 					,'suivi_notifie'=>$notifie_suivi
 					,"permalink"=> ATF::permalink()->getURL($this->createPermalink($id))
 					,'no_redirect'=>true
-				);													
+				);
 		$id_suivi = ATF::suivi()->insert($suivi);
 
 
@@ -516,16 +514,16 @@ class comite extends classes_optima {
 	/**
     * Avoir des infos sur la société
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-    */ 
+    */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
 
 		foreach ($return['data'] as $k=>$i) {
 			if($i["comite.id_societe_fk"]){ $id_societe = $i["comite.id_societe_fk"]; }else{$id_societe = $i["id_societe"]; }
-			
+
 			if(ATF::societe()->select($id_societe , "code_client") && strpos(ATF::societe()->select($id_societe , "code_client"), "S") === false){
-				//Reseau				
+				//Reseau
 				$return['data'][$k]["reseau"] = true;
 			}else{
 				//Autre
