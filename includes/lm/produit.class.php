@@ -39,8 +39,9 @@ class produit_lm extends produit {
 														 'sous_produit_unique');
 
 		$this->colonnes["panel"]["affichage_site_souscription"] = array("afficher",
-																		"description",
 																		"ordre",
+																		"description",
+
 																		"quantite"=>array("custom"=>true,
 																		  "targetCols"=>1,
 																		  'null'=>true,
@@ -59,7 +60,9 @@ class produit_lm extends produit {
 			"produit_fournisseur"=>array("custom"=>true),
 			'tva_prix_achat',
 			'controle_fournisseur',
-			'declencheur_mep'
+			'declencheur_mep',
+			'element_declencheur',
+			'mode_paiement'
 
 		);
 
@@ -67,9 +70,8 @@ class produit_lm extends produit {
 		$this->colonnes["panel"]["loyer_lignes"] = array(
 			"loyer"=>array("custom"=>true),
 			'tva_loyer',
-			'visible_pdf',
-			'element_declencheur',
-			'mode_paiement'
+			'visible_pdf'
+
 		);
 
 		$this->autocomplete = array(
