@@ -780,7 +780,7 @@ class facture_absystech extends facture {
 				$duree = $devis["duree_contrat_cout_copie"];
 				$nb_facture = intval($duree/3)-1;
 
-				ATF::facture()->q->reset()->where("id_affaire",$infos["id_affaire"])
+				ATF::facture()->q->reset()->where("facture.id_affaire",$infos["id_affaire"])
 										  ->setCountOnly();
 				$nb = 	ATF::facture()->select_row();
 				if($nb_facture == $nb){
