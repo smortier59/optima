@@ -26,12 +26,11 @@ ATF.buildGridEditor({
 
 
 			var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
-			console.log(records);
 
 			if (records) {
 				for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
-					prix+=records[i].data.{$current_class->table}__dot__prix_ttc;
-					prix_ht+=records[i].data.{$current_class->table}__dot__prix;
+					prix+=parseFloat(records[i].data.{$current_class->table}__dot__prix_ttc);
+					prix_ht+=parseFloat(records[i].data.{$current_class->table}__dot__prix);
 				}
 			}
 
