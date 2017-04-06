@@ -58,7 +58,7 @@
 				Ext.ComponentMgr.get('bon_de_commande[prix_cleodis]').setValue(ATF.formatNumeric(prix));
 			}
 
-			Ext.getCmp('commandes').setValue(this.getChecked('id').join(','));
+			Ext.getCmp('commandes').setValue(this.getChecked('id_commande_ligne').join(','));
 		}
 	}
 }),{

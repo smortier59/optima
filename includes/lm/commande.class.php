@@ -1330,6 +1330,7 @@ class commande_lm extends commande {
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande"]);
 						unset($ligne_commande);
+						$cle=0;
 						foreach($commande_ligne as $k=>$i){
 
 							if(!$i["prix_achat"] || $i["prix_achat"] == "0.00"){
@@ -1348,21 +1349,25 @@ class commande_lm extends commande {
 							if($i["quantite"] > 1){
 								$n = 1;
 								for($n=1; $n<=$i["quantite"];$n++){
+									$cle++;
 									$ligne_commande[]=array(
 												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
-												,"id"=>$i["id_commande_ligne"]
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat_ttc"]
-												,"prix_ht"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]/$i["quantite"]
+												,"prix_ht"=>$i["prix_achat"]/$i["quantite"]
 												,"quantite"=>1
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
 										);
 								}
 							}else{
+								$cle++;
 								$ligne_commande[]=array(
 												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id"=>$i["id_commande_ligne"]
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
 												,"leaf"=>true
 												,"prix"=>$i["prix_achat_ttc"]
 												,"quantite"=>$i["quantite"]
