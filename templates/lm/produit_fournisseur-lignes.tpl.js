@@ -3,7 +3,7 @@ $current_class
 $proxyUrl
 *}
 ATF.buildGridEditor({
-	title:'{$title}',
+	title:'Achats direct Fournisseurs',
 	id:'{$id}',
 	height: 300,
 	autoExpandColumn: 'common',

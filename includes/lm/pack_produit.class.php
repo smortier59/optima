@@ -19,8 +19,6 @@ class pack_produit extends classes_optima {
 
 
 		$this->colonnes['primary']=array('etat',
-										 'type_pack',
-										 'id_produit',
 										 'type_contrat',
 										 'id_document_contrat',
 										 'id_rayon',
@@ -59,6 +57,11 @@ class pack_produit extends classes_optima {
 		$this->panels['affichage_magasin'] = array('nbCols'=>1);
 		$this->panels['affichage_site_souscription'] = array('nbCols'=>1);
 
+
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['update'] =
+		$this->colonnes['bloquees']['clone'] =
+		$this->colonnes['bloquees']['select'] = array('type_pack', 'id_produit');
 
 		$this->formExt=true;
 		//$this->no_delete = true;
