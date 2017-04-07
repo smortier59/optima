@@ -26,7 +26,6 @@ class produit_lm extends produit {
 
 		$this->colonnes['primary']=array('produit',
 										 'ref_lm',
-										 'libelle_a_revoyer_lm',
 										 'url_produit',
 										 'id_pack_produit',
 										 'etat',
@@ -59,11 +58,7 @@ class produit_lm extends produit {
 			"loyer_fournisseur"=>array("custom"=>true),
 			"produit_fournisseur"=>array("custom"=>true),
 			'tva_prix_achat',
-			'controle_fournisseur',
-			'declencheur_mep',
-			'element_declencheur',
-			'mode_paiement'
-
+			'element_declencheur'
 		);
 
 
@@ -98,6 +93,11 @@ class produit_lm extends produit {
 		$this->foreign_key["id_compte_produit"] = "compte_produit";
 
 		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer');
+
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['update'] =
+		$this->colonnes['bloquees']['clone'] =
+		$this->colonnes['bloquees']['select'] = array('libelle_a_revoyer_lm', 'controle_fournisseur','declencheur_mep','mode_paiement');
 
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("actifUpdate");
