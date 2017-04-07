@@ -780,8 +780,6 @@ class facture_fournisseur extends classes_optima {
 									,"AD"=>array($fournisseur)
 								);
 
-
-
 					$row_auto++;
 					foreach($row_data as $col=>$valeur){
 						$sheets['auto']->write($col.$row_auto, $valeur[0],$this->getStyle("centre"));
