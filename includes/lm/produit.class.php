@@ -33,6 +33,12 @@ class produit_lm extends produit {
 										 'id_fabriquant',
 										 'id_compte_produit');
 
+		$this->colonnes["panel"]["quantite"] = array(
+			 "min"
+			,"max"
+			,"defaut"
+		);
+
 		$this->colonnes["panel"]["sous_produit"] = array('id_produit_principal',
 														 'qte_lie_principal',
 														 'sous_produit_unique');
@@ -40,16 +46,6 @@ class produit_lm extends produit {
 		$this->colonnes["panel"]["affichage_site_souscription"] = array("afficher",
 																		"ordre",
 																		"description",
-
-																		"quantite"=>array("custom"=>true,
-																		  "targetCols"=>1,
-																		  'null'=>true,
-																		  'xtype'=>'compositefield',
-																		  'fields'=>array(
-																				"min"
-																				,"max"
-																				,"defaut"
-																			)),
 																		'pas'
 																		);
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
@@ -77,6 +73,7 @@ class produit_lm extends produit {
 		$this->colonnes['bloquees']['select'] =  array('loyer')	;
 
 		$this->panels['primary'] = array('nbCols'=>1,'visible'=>true);
+		$this->panels['quantite'] = array('nbCols'=>3);
 		$this->panels['loyer_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['fournisseur_lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['sous_produit'] = array('nbCols'=>1);
