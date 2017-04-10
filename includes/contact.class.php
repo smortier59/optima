@@ -552,10 +552,11 @@ class contact extends classes_optima {
 		if (!$get['trid']) $get['trid'] = "desc";
 
 		// Gestion du limit
-		if (!$get['limit']) $get['limit'] = 30;
+		if (!$get['limit'] && !$get['no-limit']) $get['limit'] = 30;
 
 		// Gestion de la page
 		if (!$get['page']) $get['page'] = 0;
+		if ($get['no-limit']) $get['page'] = false;
 
 		$colsData = array(
 			"contact.id_contact"=>array(),
@@ -585,9 +586,18 @@ class contact extends classes_optima {
 
 		if ($get['id']) {
 			$this->q->where("id_contact",$get['id'])->setLimit(1);
+		} elseif ($get['id_societe']) {
+			$this->q->where("contact.id_societe",$get['id_societe']);
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		} else {
-			$this->q->setLimit($get['limit']);
-
+			if($get["filter"]){
+				foreach ($get["filter"] as $key => $value) {
+					if (strpos($key, 'contact') !== false) {
+						$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
+					}
+				}
+			}
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		}
 		switch ($get['tri']) {
 			case 'id_societe':
@@ -595,13 +605,7 @@ class contact extends classes_optima {
 			break;
 		}
 
-		if($get["filter"]){
-			foreach ($get["filter"] as $key => $value) {
-				if (strpos($key, 'contact') !== false) {
-					$this->q->addCondition(str_replace("'", "",$key), str_replace("'", "",$value), "AND");
-				}
-			}
-		}
+
 
 		$this->q->addField($colsData);
 
@@ -625,8 +629,10 @@ class contact extends classes_optima {
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
-			header("ts-max-page: ".ceil($data['count']/$get['limit']));
-			header("ts-active-page: ".$get['page']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
+
 	    $return = $data['data'];
 		}
 

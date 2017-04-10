@@ -17,6 +17,7 @@ class bon_de_commande_lm extends bon_de_commande {
 			,"bon_de_commande.etat"=>array("renderer"=>"etat","width"=>30)
 			,"bon_de_commande.prix"=>array("aggregate"=>array("min","avg","max","sum"),"type"=>"decimal","renderer"=>"money")
 			,'solde_ht'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","suffix"=>"€","type"=>"decimal","renderer"=>"money")
+			,'solde_ttc'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","suffix"=>"€","type"=>"decimal","renderer"=>"money")
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			,'pdf'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70,"renderer"=>"uploadFile")
 			,'factureFournisseur'=>array("custom"=>true,"nosort"=>true,"align"=>"center","width"=>50,"renderer"=>"expandToFactureFournisseur")
@@ -269,14 +270,15 @@ class bon_de_commande_lm extends bon_de_commande {
 		$this->q
 			->addJointure("bon_de_commande","id_bon_de_commande","facture_fournisseur","id_bon_de_commande")
 			->addJointure("bon_de_commande","id_commande","commande","id_commande")
-			->addField("(`bon_de_commande`.`prix`*`bon_de_commande`.`tva`) - (SUM(
-																					IF(
-																						(`facture_fournisseur`.`prix`)
-																						,(`facture_fournisseur`.`prix`*`facture_fournisseur`.`tva`)
-																						,0)
-																					)
+
+			->addField("(`bon_de_commande`.`prix`/`bon_de_commande`.`tva`) - (SUM(
+														IF(
+															(`facture_fournisseur`.`prix_ht`)
+															,`facture_fournisseur`.`prix_ht`
+															,0)
+														)
 													)"
-													,"solde")
+													,"solde_ht")
 			->addField("`bon_de_commande`.`prix` - (SUM(
 														IF(
 															(`facture_fournisseur`.`prix`)
@@ -284,7 +286,7 @@ class bon_de_commande_lm extends bon_de_commande {
 															,0)
 														)
 													)"
-													,"solde_ht")
+													,"solde_ttc")
 			->addGroup("bon_de_commande.id_bon_de_commande");
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -507,7 +509,6 @@ class bon_de_commande_lm extends bon_de_commande {
 		}else{
 			$preview=false;
 		}
-
 		//Gestion ligne de bon de commande
 		if($infos["commandes"]){
 			$infos_bon_de_commande_ligne=explode(",",$infos["commandes"]);
@@ -561,6 +562,7 @@ class bon_de_commande_lm extends bon_de_commande {
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		$prix_total = 0;
+		log::logger($infos_bon_de_commande_ligne , "mfleurquin");
 		foreach($infos_bon_de_commande_ligne as $key=>$item){
 			$commande_ligne=ATF::commande_ligne()->select($item);
 			$bon_de_commande_ligne["id_commande_ligne"]=$item;
@@ -568,22 +570,17 @@ class bon_de_commande_lm extends bon_de_commande {
 			$bon_de_commande_ligne["ref"]=$commande_ligne["ref"];
 			$bon_de_commande_ligne["produit"]=$commande_ligne["produit"];
 			$bon_de_commande_ligne["quantite"]=1;
-			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"];
-			$bon_de_commande_ligne["prix_ttc"]=$commande_ligne["prix_achat_ttc"];
-			$prix_total += $bon_de_commande_ligne["prix"];
+			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"]/$commande_ligne["quantite"];
+			$bon_de_commande_ligne["prix_ttc"]=$commande_ligne["prix_achat_ttc"]/$commande_ligne["quantite"];
+			$prix_total += $bon_de_commande_ligne["prix_ttc"];
 			ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne);
-		}
-
-		if($societe=="CLEODIS" || $societe=="CLEOFI"){
-			if($prix_total != $infos["prix"]){
-				$prix_total=$infos["prix"];
-			}
 		}
 
 		// Ajout de la facture non parvenue globale du bon de commande
 		ATF::facture_non_parvenue()->i(array(
 			'ref'=>$infos['ref']."-FNP"
 			,'prix'=>$prix_total // Valeur positive
+			,'prix_ht'=>$prix_total/$infos["tva"] // Valeur positive
 			,'id_affaire'=>$infos["id_affaire"]
 			,'tva'=>$infos["tva"]
 			,'id_bon_de_commande'=>$last_id

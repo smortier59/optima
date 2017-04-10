@@ -437,6 +437,19 @@ if($infos["id_societe"]){
         }
 
     }catch(errorATF $e){
+        unset($_POST["societe_form"]["password"]);
+        $mail = new mail(array(
+                //"recipient"=>"benjamin.tronquit@leroymerlin.fr"
+                "recipient"=>"debug@absystech.fr"
+                ,"objet"=>"Une erreur s'est produite lors d'une souscription"
+                ,"html"=>true
+                ,"template"=>"erreur"
+                ,'erreur'=>$e
+                ,'data'=>array("Client"=>$_POST["societe_form"], "Pack"=>$infos["panier"]["pack"]["libelle"])
+                ,"from"=>"contact@abonnement.leroymerlin.fr"));
+
+        $mail->send();
+
         log::logger($e->getMessage(),'lm');
         echo "Erreur, merci de contacter le service client.";
     }

@@ -1584,6 +1584,10 @@ class devis_lm extends devis {
 			$loyer[$value['id_produit']]["id_produit"] = $value['id_produit'];
 			$loyer[$value['id_produit']]["loyer"] = ATF::produit_loyer()->select_all();
 
+			foreach ($loyer[$value['id_produit']]["loyer"] as $kl => $vl) {
+				$loyer[$value['id_produit']]["loyer"][$kl]['loyer'] = $vl["loyer"] * __TVA__;
+			}
+
 			if($this->estpresent($contratLigne , $value['id_produit'])){
 				unset($packLigne[$key]);
 			}
@@ -1726,6 +1730,7 @@ class devis_lm extends devis {
 				$item["visible"] = $produit["visible_pdf"];
 
 				$item["produit"] = $produit["produit"];
+				$item["ref"] = $produit["ref_lm"];
 
 				if($item["quantite"] < 0) $item["id_affaire_provenance"] = $affaire_parent["id_affaire"];
 
@@ -1741,7 +1746,10 @@ class devis_lm extends devis {
 				if($fournisseurs){
 					foreach ($fournisseurs as $kf => $vf) {
 						$item["id_fournisseur"] = $vf["id_fournisseur"];
-						if($vf["prix_prestation"]) $item["prix_achat"] = $vf["prix_prestation"];
+						if($vf["prix_prestation"]){
+							$item["prix_achat"] = $vf["prix_prestation"];
+							$item["prix_achat_ttc"] = $vf["prix_prestation"]*__TVA__;
+						}
 
 						if(!$item["id_fournisseur"]){
 						ATF::db($this->db)->rollback_transaction();
@@ -1761,7 +1769,10 @@ class devis_lm extends devis {
 						foreach ($fournisseurs as $kf => $vf) {
 							$item["id_fournisseur"] = $vf["id_fournisseur"];
 							unset($item["prix_achat"]);
-							if($vf["prix_prestation"]){ $item["prix_achat"] = $vf["prix_prestation"]; }
+							if($vf["prix_prestation"]){
+								$item["prix_achat"] = $vf["prix_prestation"];
+								$item["prix_achat_ttc"] = $vf["prix_prestation"]*__TVA__;
+							}
 
 							if(!$item["id_fournisseur"]){
 								ATF::db($this->db)->rollback_transaction();

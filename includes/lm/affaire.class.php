@@ -1147,11 +1147,18 @@ class affaire_lm extends affaire {
 					$date_expedition = date("Y-m-d", strtotime($vmail->date));
 					$body =  ATF::imap()->returnBody($vmail->uid);
 
-					$this->q->reset()->where("ref_commande_lm",$num_commande_lm);
-					$affaire = $this->select_row();
+					$bdc = array();
 
-					if($affaire){
-						$affaire = $this->select($affaire["affaire.id_affaire"]);
+					ATF::bon_de_commande()->q->reset()->addField("bon_de_commande.id_affaire")
+													  ->where("num_bdc", "%".$num_commande_lm,"AND",false,"LIKE");
+					$bdc = ATF::bon_de_commande()->select_row();
+
+
+					/*$this->q->reset()->where("ref_commande_lm",$num_commande_lm);
+					$affaire = $this->select_row();*/
+
+					if($bdc){
+						$affaire = $this->select($bdc["bon_de_commande.id_affaire_fk"]);
 						$client = ATF::societe()->select($affaire["id_societe"]);
 
 						$body = str_replace("\n", "", $body);

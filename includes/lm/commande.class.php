@@ -1330,6 +1330,7 @@ class commande_lm extends commande {
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande"]);
 						unset($ligne_commande);
+						$cle=0;
 						foreach($commande_ligne as $k=>$i){
 
 							if(!$i["prix_achat"] || $i["prix_achat"] == "0.00"){
@@ -1348,21 +1349,25 @@ class commande_lm extends commande {
 							if($i["quantite"] > 1){
 								$n = 1;
 								for($n=1; $n<=$i["quantite"];$n++){
+									$cle++;
 									$ligne_commande[]=array(
 												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
-												,"id"=>$i["id_commande_ligne"]
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat_ttc"]
-												,"prix_ht"=>$i["prix_achat"]
+												,"prix"=>$i["prix_achat_ttc"]/$i["quantite"]
+												,"prix_ht"=>$i["prix_achat"]/$i["quantite"]
 												,"quantite"=>1
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
 										);
 								}
 							}else{
+								$cle++;
 								$ligne_commande[]=array(
 												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id"=>$i["id_commande_ligne"]
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
 												,"leaf"=>true
 												,"prix"=>$i["prix_achat_ttc"]
 												,"quantite"=>$i["quantite"]
@@ -1467,12 +1472,16 @@ class commande_lm extends commande {
 
 			$etat=$commande->get("etat");
 
-			$this->checkEtat($commande,false,$affaireFillesAR);
-			$etat_modifie=$commande->get("etat");
-			if($etat!=$etat_modifie){
-				log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');
+			if($etat !== "abandon" || $etat !== "pending"){
+				$this->checkEtat($commande,false,$affaireFillesAR);
+				$etat_modifie=$commande->get("etat");
+				if($etat!=$etat_modifie){
+					log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');
+				}
+				ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			}
-			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
+
+
 			$i++;
 		}
 		ATF::db($this->db)->commit_transaction();
@@ -1498,10 +1507,7 @@ class commande_lm extends commande {
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
 							,"type_suivi"=>'Contrat'
-							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en abandonnée "
-							,'public'=>'oui'
-							,'suivi_societe'=>ATF::$usr->getID()
-							,'suivi_notifie'=>$notifie
+							,"texte"=>"Le contrat ".$affaire->get("ref")." est passé en abandonné"
 						);
 			ATF::suivi()->insert($suivi);
 
