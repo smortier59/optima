@@ -1112,8 +1112,32 @@ class stock_absystech extends stock {
 		}
 		return parent::update($infos);
 	}	
+  /**
+  * Fonction _POST pour telescope
+  * @package Telescope - Hyperviseur CC
+  * @author Charlier Cyril <ccharlier@absystech.fr>
+  * @param $get array.
+  * @param $post array Argument obligatoire.
+  * @return boolean | integer
+  */
+  public function _POST($get,$post) {
+    $post['ref'] = strtoupper($post['ref']);
+    // parser la date sous le bon format pour mysql
+    $post["date_achat"]=date("Y-m-d",strtotime($post["date_valeur"]));
 
-};
+    ATF::db($this->db)->begin_transaction();
+    try {
+      $id = $this->insert($post);
+      // $post['id_echeancier_ligne_periodique'] = $id;
+      $post['id'] = $id;
+      $return['row'] = $post;
+    } catch (errorATF $e) {
+      ATF::db($this->db)->rollback_transaction();
+      throw $e; // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+    }
+    ATF::db($this->db)->commit_transaction();
+    return $return;
+  }
 class errorStock extends errorATF {};
 
 class stock_att extends stock_absystech { };
