@@ -3,7 +3,7 @@ $current_class
 $proxyUrl
 *}
 ATF.buildGridEditor({
-	title:'{$title}',
+	title:'Lignes de loyer',
 	id:'{$id}',
 	height: 300,
 	autoExpandColumn: 'common',
@@ -11,23 +11,23 @@ ATF.buildGridEditor({
 	clicksToEdit: 1,
 	maj: function(){
 		var records = this.store.getRange();
-		
 
-				
+
+
 	},
 	{if !$no_update}
 		tbar: [{
 			text: '',
 			iconCls: 'arrow_up-button',
 			handler : function(field){
-	
+
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i-1]){
@@ -49,10 +49,10 @@ ATF.buildGridEditor({
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i+1]){
@@ -80,20 +80,20 @@ ATF.buildGridEditor({
 					{/foreach}
 				});
 				grid.stopEditing();
-				
+
 				var idx = 0; // Numéro de ligne par défaut.
 
-				if(store.getCount() != 0){					
-					idx = store.getCount();					
+				if(store.getCount() != 0){
+					idx = store.getCount();
 				}
 
-				if(idx == 0){				
+				if(idx == 0){
 					var index = grid.getSelectionModel().getSelectedCell();
 					if (index) {
 						idx = index[0]+1; // Numéro de ligne sélectionné
 					}
-				}				
-				
+				}
+
 				store.insert(idx, p);
 				grid.startEditing(idx, 0);
 				var records = Ext.ComponentMgr.get('{$id}').store.getRange();
@@ -110,7 +110,7 @@ ATF.buildGridEditor({
 				var rec = grid.store.getAt(index[0]);
 				grid.store.remove(rec);
 				grid.refreshHiddenValues();
-				
+
 				Ext.ComponentMgr.get('{$id}').maj();
 			}
 		}],
@@ -146,7 +146,7 @@ ATF.buildGridEditor({
 				renderer: 'money',
 				editor: new Ext.form.TextField({
 					value:0
-				})				
+				})
 			},{
 				header: 'Nature',
 				width:20,
@@ -164,12 +164,12 @@ ATF.buildGridEditor({
 		root: 'result',
 		totalProperty: 'totalCount',
 		idProperty: 'id',
-		remoteSort: true,	
+		remoteSort: true,
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView())}),
 		{if $function}baseParams:{ 'function':'{$function}' },{/if}
 		proxy: new Ext.data.HttpProxy({
 			url: '{if $proxyUrl}{$proxyUrl}{else}{$current_class->table},extJSgsa.ajax,pager={$pager}{/if}'
 			,method:'POST'
-		})	
+		})
 	})
 })

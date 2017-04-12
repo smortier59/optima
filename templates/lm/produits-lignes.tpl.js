@@ -2,6 +2,9 @@
 $current_class
 $proxyUrl
 *}
+
+
+
 ATF.buildGridEditor({
 	title:'{$title}',
 	id:'{$id}',
@@ -15,54 +18,108 @@ ATF.buildGridEditor({
 		var marge_absolue = 0;
 		var prix = 0;
 
-		var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
-		if (records) {
-			for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
-				prix_achat+=records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite;
+		console.log("OK");
+
+		{if $current_class->table==facture_fournisseur_ligne}
+			var prix = 0;
+			var prix_ht = 0;
+
+
+			var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
+
+			if (records) {
+				for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
+					prix+=parseFloat(records[i].data.{$current_class->table}__dot__prix_ttc);
+					prix_ht+=parseFloat(records[i].data.{$current_class->table}__dot__prix);
+				}
 			}
-		}
 
-		var pnv = Ext.ComponentMgr.get('{$parent_class->table}[produits_non_visible]');
-		if (pnv) {
-			var records_parent = pnv.store.getRange();
-			for (var i = 0; i < pnv.store.getRange().length; i++) {
-				prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite;
+			if(Ext.ComponentMgr.get('{$parent_class->table}[prix]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
 			}
-		}
 
-		var pr = Ext.ComponentMgr.get('{$parent_class->table}[produits_repris]');
-		if (pr) {
-			var records_parent = pr.store.getRange();
-			for (var i = 0; i < pr.store.getRange().length; i++) {
-				prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite;
+			if(Ext.ComponentMgr.get('{$parent_class->table}[prix_ht]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[prix_ht]').setValue(ATF.formatNumeric(prix_ht));
 			}
-		}
+		{else}
+			var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
+			if (records) {
+				for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
+					prix_achat+=records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite;
+				}
+			}
 
-		if(Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]')){
-			Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));
-		}
+			var pnv = Ext.ComponentMgr.get('{$parent_class->table}[produits_non_visible]');
+			if (pnv) {
+				var records_parent = pnv.store.getRange();
+				for (var i = 0; i < pnv.store.getRange().length; i++) {
+					prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite;
+				}
+			}
 
-		if(Ext.ComponentMgr.get('{$parent_class->table}[marge]')){
-			Ext.ComponentMgr.get('{$parent_class->table}[marge]').setValue(ATF.formatNumeric(parseFloat((Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1-prix_achat)/Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1)*100));
-		}
+			var pr = Ext.ComponentMgr.get('{$parent_class->table}[produits_repris]');
+			if (pr) {
+				var records_parent = pr.store.getRange();
+				for (var i = 0; i < pr.store.getRange().length; i++) {
+					prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite;
+				}
+			}
 
-		if(Ext.ComponentMgr.get('{$parent_class->table}[marge_absolue]')){
-			Ext.ComponentMgr.get('{$parent_class->table}[marge_absolue]').setValue(ATF.formatNumeric(parseFloat(Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1-prix_achat)));
-		}
+			if(Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));
+			}
+
+			if(Ext.ComponentMgr.get('{$parent_class->table}[marge]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[marge]').setValue(ATF.formatNumeric(parseFloat((Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1-prix_achat)/Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1)*100));
+			}
+
+			if(Ext.ComponentMgr.get('{$parent_class->table}[marge_absolue]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[marge_absolue]').setValue(ATF.formatNumeric(parseFloat(Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1-prix_achat)));
+			}
+		{/if}
+
+
+
+
+
 	},
 	majFour: function(field,id){
-		var prix = 0;
 
-		var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
-		if (records) {
-			for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
-				prix+=records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite;
+		{if $current_class->table==facture_fournisseur_ligne}
+			var prix = 0;
+			var prix_ht = 0;
+
+
+			var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
+			if (records) {
+				for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
+					prix+=records[i].data.{$current_class->table}__dot__prix_ttc;
+					prix_ht+=records[i].data.{$current_class->table}__dot__prix;
+				}
 			}
-		}
 
-		if(Ext.ComponentMgr.get('{$parent_class->table}[prix]')){
-			Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
-		}
+			if(Ext.ComponentMgr.get('{$parent_class->table}[prix]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
+			}
+
+			if(Ext.ComponentMgr.get('{$parent_class->table}[prix_ht]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[prix_ht]').setValue(ATF.formatNumeric(prix_ht));
+			}
+		{else}
+			var prix = 0;
+
+			var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
+			if (records) {
+				for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
+					prix+=records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite;
+				}
+			}
+
+			if(Ext.ComponentMgr.get('{$parent_class->table}[prix]')){
+				Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
+			}
+		{/if}
+
 
 	},
 	fourniRepris: function(field,id){
@@ -256,9 +313,8 @@ ATF.buildGridEditor({
 	},
 	listeners: {
 		'afteredit': function(field, newVal, oldVal){
-			{if $current_class->table!=facture_fournisseur_ligne}
-				Ext.ComponentMgr.get('{$id}').maj();
-			{/if}
+			Ext.ComponentMgr.get('{$id}').maj();
+
 		}
 	},
 	cm:new Ext.grid.ColumnModel({
@@ -305,9 +361,7 @@ ATF.buildGridEditor({
 				dataIndex: '{$current_class->table}__dot__produit',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store){
 					if (value) {
-						console.log(value);
 						var a = value.split(ATF.extJSGridComboboxSeparator);
-						console.log(a);
 						if (a[1]) {
 							record.set('{$current_class->table}__dot__id_produit_fk',a[1]);
 						}
@@ -444,11 +498,14 @@ ATF.buildGridEditor({
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView(),["{$current_class->table}.id_fournisseur_fk","{$current_class->table}.id_produit_fk","{$current_class->table}.id_{$current_class->table}"])}),
 		{if $function}baseParams:{ 'function':'{$function}' },{/if}
 		proxy: new Ext.data.HttpProxy({
-			url: '{if $proxyUrl}{$proxyUrl}{else}{$current_class->table},extJSgsa.ajax,pager={$pager}{/if}'
+			 url: '{if $proxyUrl}{$proxyUrl}{else}{$current_class->table},extJSgsa.ajax,pager={$pager}{/if}'
 			,method:'POST'
 		})
 		,listeners:{
-			load:function(field, newVal, oldVal){ {if $calcul_prix} Ext.ComponentMgr.get('{$id}').maj(); {/if} ATF.{$current_class->table}{$pager}__id_produit=Array();}
+			load:function(field, newVal, oldVal){
+					Ext.ComponentMgr.get('{$id}').maj();
+					ATF.{$current_class->table}{$pager}__id_produit=Array();
+			}
 		}
 	})
 })

@@ -128,6 +128,7 @@ class commande_cleodis extends commande {
 		$this->addPrivilege("export_loyer_assurance");
 		$this->addPrivilege("export_contrat_refinanceur_loyer");
 		$this->addPrivilege("getDateResti");
+		$this->addPrivilege("export_contrat_pas_mep");
 
 		/* Important pour patcher le problème de FK FROM relevé dans le ticket : 7775 */
 		$this->foreign_key["id_fournisseur"] = "societe";
@@ -504,9 +505,6 @@ class commande_cleodis extends commande {
 								,'champsComplementaire'=>$infos['key']
 							);
 							if(($infos['key'] == "date_prevision_restitution") || ($infos['key'] == "date_prevision_restitution")){	$suivi["type_suivi"] = "Restitution";	}
-							if(ATF::societe()->select($cmd['id_societe'],'id_owner') != 35){
-								$suivi['suivi_notifie'][1] = 35;
-							}
 
 							ATF::suivi()->insert($suivi);
 							ATF::$msg->addNotice(ATF::$usr->trans("suivi_plus_email_envoye_to_owner",$this->table));
@@ -820,8 +818,8 @@ class commande_cleodis extends commande {
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($infos["id_commande"]);
 
-						$notifie = array(21, 35 , 94);
-						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94){
+						$notifie = array(21, 94);
+						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 94){
 							$notifie[] = ATF::$usr->getID();
 						}
 
@@ -935,8 +933,8 @@ class commande_cleodis extends commande {
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($commande->get("id_commande"));
 
-						$notifie = array(21, 35 , 94);
-						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94 ){
+						$notifie = array(21, 94);
+						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 94 ){
 							$notifie[] = ATF::$usr->getID();
 						}
 						$suivi = array(
@@ -1468,8 +1466,8 @@ class commande_cleodis extends commande {
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
-			$notifie = array(21, 35 , 94);
-			if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 35 && ATF::$usr->getID() != 94){
+			$notifie = array(21, 94);
+			if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 94){
 				$notifie[] = ATF::$usr->getID();
 			}
 
@@ -1780,6 +1778,8 @@ class commande_cleodis extends commande {
 	}
 
 
+
+
 	 /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @param array $infos : contient le nom de l'onglet
@@ -2004,6 +2004,215 @@ class commande_cleodis extends commande {
 	}
 
 
+	/** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	 public function export_contrat_pas_mep($infos,$testUnitaire="false",$reset="true"){
+
+	 	if($testUnitaire == "true"){
+	 		$donnees = $infos;
+		}else{
+			if($reset == "true")	$this->q->reset();
+
+			$this->q->from("commande","id_affaire","loyer","id_affaire")
+					->from("commande","id_affaire","affaire","id_affaire")
+					->where("commande.etat","non_loyer","AND")
+					->whereIsNull("commande.date_debut")
+					->addAllFields("commande")
+					->addAllFields("affaire")
+					->addAllFields("loyer")
+					->setLimit(-1)->unsetCount();
+			$donnees = $this->select_all();
+		}
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		$feuilles = array(array("title"=> "Pas MEP C", "code_client"=> "C"),
+						  array("title"=> "Pas MEP H", "code_client"=> "H"),
+						  array("title"=> "Pas MEP M", "code_client"=> "M"),
+						  array("title"=> "Pas MEP MOA", "code_client"=> "MOA"),
+						  array("title"=> "Pas MEP D", "code_client"=> "D"),
+						  array("title"=> "Pas MEP B", "code_client"=> "B"),
+						  array("title"=> "Pas MEP S", "code_client"=> "S"),
+						  array("title"=> "Pas MEP ATOL", "code_client"=> ""),
+						  array("title"=> "Pas MEP non repertorié")
+						);
+
+		$data = array();
+
+		foreach ($donnees as $key => $value) {
+			if($value["affaire.nature"] !== "avenant" && $value["affaire.nature"] !== "vente"){
+				$societe = ATF::societe()->select($value["commande.id_societe_fk"]);
+
+				$value["code_client"] = $societe["code_client"];
+
+				$ref = preg_replace('/\-?\d+/', '',$societe["code_client"]);
+				$esp = 0;
+
+				foreach ($feuilles as $kf => $vf) {
+					if($esp ===0 && $kf === count($feuilles)-1) {
+						$data[$kf][] = $value;
+					}else{
+						if($esp === 0){
+							if($vf["code_client"] === "" && strlen($ref) === 0 && is_numeric($societe["code_client"])){
+								$data[$kf][] = $value;
+								$esp = 1;
+							}elseif(strpos($vf["code_client"], $ref) !== false && strpos($vf["code_client"], $ref) === 0){
+								$data[$kf][] = $value;
+								$esp = 1;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		$premfeuille = true;
+
+
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+
+
+		foreach ($feuilles as $key => $value) {
+			if ($premfeuille){
+				$workbook->setActiveSheetIndex($key);
+			    $sheet = $workbook->getActiveSheet();
+			    $sheet->setTitle($value["title"]);
+			    $premfeuille = false;
+			}else{
+				$sheet = $workbook->createSheet($key);
+				$workbook->setActiveSheetIndex($key);
+				$sheet = $workbook->getActiveSheet();
+				$sheet ->setTitle($value["title"]);
+			}
+
+			$cols = array(	array("title"=> "Affaire", "size"=>15),
+								array("title"=> "Entité", "size"=>30),
+								array("title"=> "Contrat", "size"=>60),
+								array("title"=> "Code client", "size"=>15),
+								array("title"=> "Installation prévue", "size"=>15),
+								array("title"=> "Retour (AP)", "size"=>15),
+								array("title"=> "Retour (PV)", "size"=>15),
+								array("title"=> "Retour", "size"=>15),
+								array("title"=> "Loyer", "size"=>15),
+								array("title"=> "Durée", "size"=>15),
+								array("title"=> "Fréquence du loyer", "size"=>15),
+								array("title"=> "Total", "size"=>15),
+								array("title"=> "Refinanceur", "size"=>30),
+								array("title"=> "Comité", "size"=>15),
+								array("title"=> "Décision Comité", "size"=>15),
+								array("title"=> "Validité de l'accord", "size"=>15),
+								array("title"=> "Commentaire", "size"=>60),
+								array("title"=> "Observations", "size"=>60));
+
+			$i=0;
+	    	foreach($cols as $col=>$titre){
+	    		$lettre1 = 65 +$i;
+
+				$sheet->setCellValueByColumnAndRow($i , 1, $titre["title"]);
+				$sheet->getColumnDimension(chr($lettre1))->setWidth($titre["size"]);
+				$i++;
+	        }
+
+			$this->dataPasMep($sheet, $data[$key]);
+
+	    }
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_ct_pas_mep.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+    }
+
+    public function dataPasMep(&$sheet,$donnees){
+
+    	$row_data = array();
+    	foreach ($donnees as $key => $value) {
+
+	    	$row_data[$key][] = $value["commande.ref"];
+			$row_data[$key][] = $value["affaire.id_societe"];
+			$row_data[$key][] = $value["affaire.affaire"];
+			$row_data[$key][] = $value["code_client"];
+			$row_data[$key][] = $value["affaire.date_installation_prevu"];
+			$row_data[$key][] = $value["commande.retour_prel"];
+			$row_data[$key][] = $value["commande.retour_pv"];
+			$row_data[$key][] = $value["commande.retour_contrat"];
+			$row_data[$key][] = $value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"];
+			$row_data[$key][] = $value["loyer.duree"];
+			$row_data[$key][] = $value["loyer.frequence_loyer"];
+			$row_data[$key][] = ($value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"]) * $value["loyer.duree"];
+
+
+			ATF::demande_refi()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"],"AND")
+									   ->where("etat", "valide");
+
+			$refi = ATF::demande_refi()->select_row();
+			if($refi)	$row_data[$key][] = ATF::refinanceur()->select($refi["id_refinanceur"] , "refinanceur");
+			else $row_data[$key][] = "";
+
+
+			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
+			$comites = ATF::comite()->select_all();
+
+			if($comites){
+				$commentaire = $decision = $observations = "";
+				foreach ($comites as $k => $v) {
+					if($k !== 0){
+						$decisiondate = $decisiondate."\n". $v["date"];
+						$commentaire = $commentaire."\n".$v["commentaire"];
+						$decision = $decision."\n".$v["decisionComite"];
+						$date_accord = $date_accord."\n".$v["validite_accord"];
+						$observations 	  = $observations."\n".$v["observations"];
+
+					}else{
+						$decisiondate = $v["date"];
+						$commentaire  = $v["commentaire"];
+						$decision 	  = $v["decisionComite"];
+						$date_accord =  $v["validite_accord"];
+						$observations  = $v["observations"];
+					}
+				}
+
+				$row_data[$key][] = $decisiondate;
+				$row_data[$key][] = $decision;
+				$row_data[$key][] = $date_accord;
+				$row_data[$key][] = $commentaire;
+				$row_data[$key][] = $observations;
+
+			} else {
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+			}
+
+
+    	}
+
+
+		$i=0;
+    	$j=2;
+
+    	foreach ($row_data as $ligne => $value){
+	    	foreach($value as $col=>$val){
+				$sheet->setCellValueByColumnAndRow($i , $j, $val);
+				$i++;
+	        }
+	        $i=0;
+	        $j++;
+	    }
+    }
 
 
 	/**

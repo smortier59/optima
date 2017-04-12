@@ -285,6 +285,11 @@ class societe_lm extends societe {
 			ATF::suivi()->insert($suivi);
 		}
 
+		// Mot de passe fournisseur
+		if ($infos["mdp"] && strlen($infos["mdp"])!=64) {
+			$infos["mdp"] = hash('sha256',$infos["mdp"]);
+		}
+
 		return parent::update($infos,$s,$files,$cadre_refreshed,$nolog);
 	}
 
@@ -308,6 +313,11 @@ class societe_lm extends societe {
 
 		if($infos["societe"]["type_societe"] == "client"){
 			$infos["societe"]["societe"] = $infos["societe"]["nom"]." ".$infos["societe"]["prenom"];
+		}
+
+		// Mot de passe fournisseur
+		if ($infos["mdp"]) {
+			$infos["mdp"] = hash('sha256',$infos["mdp"]);
 		}
 
 		$last_id = parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
