@@ -143,7 +143,13 @@ class commande_cleodis extends commande {
 
 		$data = $post['data'];
 		$contract_id = $post['contract_id'];
-		$file = $this->filepath($contract_id, 'retour', null, 'cleodis');
+
+		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->addField('id_affaire')->setDimension('cell');
+		$id_affaire = ATF::affaire()->select_all();
+		$commande = ATF::affaire()->getCommande($id_affaire);
+
+		$file = $this->filepath($commande->get('id_commande'), 'retour', null, 'cleodis');
 		try {
 			util::file_put_contents($file,base64_decode($data));
 			$return = true;
