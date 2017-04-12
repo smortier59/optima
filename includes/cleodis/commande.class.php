@@ -146,7 +146,7 @@ class commande_cleodis extends commande {
 		$contract_id = $post['contract_id'];
 
 		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
-		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->addField('id_affaire')->setDimension('cell');
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->addField('commande.id_affaire')->setDimension('cell');
 		$id_affaire = ATF::affaire()->select_all();
 		$commande = ATF::affaire()->getCommande($id_affaire);
 
