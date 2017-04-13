@@ -152,6 +152,7 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_contact_signataire"] = "contact";
     $this->foreign_key["id_prospection"] = "contact";
     $this->foreign_key["id_assistante"] = "user";
+    $this->foreign_key["id_owner"] = "user";
 
 
 
