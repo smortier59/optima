@@ -144,7 +144,13 @@ class commande_cleodis extends commande {
 
 		$data = $post['data'];
 		$contract_id = $post['contract_id'];
-		$file = $this->filepath($contract_id, 'retour', null, 'cleodis');
+
+		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('commande.id_affaire')->setDimension('cell');
+		$id_affaire = ATF::affaire()->select_all();
+		$commande = ATF::affaire()->getCommande($id_affaire);
+
+		$file = $this->filepath($commande->get('id_commande'), 'retour', null, 'cleodis');
 		try {
 			util::file_put_contents($file,base64_decode($data));
 			$return = true;
@@ -812,8 +818,8 @@ class commande_cleodis extends commande {
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($infos["id_commande"]);
 
-						$notifie = array(21, 94);
-						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 94){
+						$notifie = array(21);
+						if(ATF::$usr->getID() !=21){
 							$notifie[] = ATF::$usr->getID();
 						}
 
@@ -927,8 +933,8 @@ class commande_cleodis extends commande {
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($commande->get("id_commande"));
 
-						$notifie = array(21, 94);
-						if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 94 ){
+						$notifie = array(21);
+						if(ATF::$usr->getID() !=21){
 							$notifie[] = ATF::$usr->getID();
 						}
 						$suivi = array(
@@ -1227,8 +1233,7 @@ class commande_cleodis extends commande {
 			->addField("commande.date_prevision_restitution")
 			->addField("commande.date_restitution_effective")
 			->from("commande","id_societe","societe","id_societe")
-			->from("commande","id_affaire","affaire","id_affaire")
-			;
+			->from("commande","id_affaire","affaire","id_affaire");
 		$return = parent::select_all($order_by,$asc,$page,$count);
 
 		foreach ($return['data'] as $k=>$i) {
@@ -1460,8 +1465,8 @@ class commande_cleodis extends commande {
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
-			$notifie = array(21, 94);
-			if(ATF::$usr->getID() !=21 && ATF::$usr->getID() != 94){
+			$notifie = array(21);
+			if(ATF::$usr->getID() !=21){
 				$notifie[] = ATF::$usr->getID();
 			}
 
@@ -2007,7 +2012,7 @@ class commande_cleodis extends commande {
 	 	if($testUnitaire == "true"){
 	 		$donnees = $infos;
 		}else{
-			if($reset == "true")	$this->q->reset();
+			$this->q->reset();
 
 			$this->q->from("commande","id_affaire","loyer","id_affaire")
 					->from("commande","id_affaire","affaire","id_affaire")
@@ -2017,7 +2022,7 @@ class commande_cleodis extends commande {
 					->addAllFields("affaire")
 					->addAllFields("loyer")
 					->setLimit(-1)->unsetCount();
-			$donnees = $this->select_all();
+			$donnees = $this->sa();
 		}
 
         require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
@@ -2237,25 +2242,7 @@ class commande_cleodis extends commande {
 						->addJointure("societe","id_owner","user","id_user")
 						->where("user.id_agence",$id_agence);
 
-					/*if($type == "o2m"){
-						$this->q->addCondition("societe.code_client",'%M%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%C%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%BK%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%F%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%Y%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%H%',"OR","nonFinie","LIKE");
-					}elseif($type == "autre"){
-						$this->q->addCondition("societe.code_client",'%M%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%C%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%BK%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%F%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%Y%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%H%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE");
-					}else{
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE");
-					}*/
+
 					if($type == "reseau"){
 						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
 								->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
@@ -2288,7 +2275,11 @@ class commande_cleodis extends commande {
 
 							->addCondition("`".$this->table."`.`mise_en_place`",$date."-01-01","AND",false,">");
 
+
 					$result= parent::select_all();
+
+					$this->q->setToString();
+					log::logger(parent::select_all() , "mfleurquin");
 
 
 					$annee = $date-3;
