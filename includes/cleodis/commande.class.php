@@ -2023,7 +2023,6 @@ class commande_cleodis extends commande {
 					->addAllFields("loyer")
 					->setLimit(-1)->unsetCount();
 			$donnees = $this->sa();
-			log::logger($donnees , "mfleurquin");
 		}
 
         require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
