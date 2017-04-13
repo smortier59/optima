@@ -1233,8 +1233,7 @@ class commande_cleodis extends commande {
 			->addField("commande.date_prevision_restitution")
 			->addField("commande.date_restitution_effective")
 			->from("commande","id_societe","societe","id_societe")
-			->from("commande","id_affaire","affaire","id_affaire")
-			;
+			->from("commande","id_affaire","affaire","id_affaire");
 		$return = parent::select_all($order_by,$asc,$page,$count);
 
 		foreach ($return['data'] as $k=>$i) {
@@ -2013,7 +2012,7 @@ class commande_cleodis extends commande {
 	 	if($testUnitaire == "true"){
 	 		$donnees = $infos;
 		}else{
-			if($reset == "true")	$this->q->reset();
+			$this->q->reset();
 
 			$this->q->from("commande","id_affaire","loyer","id_affaire")
 					->from("commande","id_affaire","affaire","id_affaire")
@@ -2023,7 +2022,7 @@ class commande_cleodis extends commande {
 					->addAllFields("affaire")
 					->addAllFields("loyer")
 					->setLimit(-1)->unsetCount();
-			$donnees = $this->select_all();
+			$donnees = $this->sa();
 		}
 
         require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
