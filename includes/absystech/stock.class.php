@@ -1124,17 +1124,16 @@ class stock_absystech extends stock {
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "ref";
 		if (!$get['trid']) $get['trid'] = "desc";
-		log::logger("hey",'ccharlier');
 		// Gestion du limit
 		if (!$get['limit']) $get['limit'] = 30;
-
-		// Gestion de la page
+		log::logger($get,'ccharlier');
+		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
 
 		$colsData = array(
-			"id_stock",
+			"stock.id_stock",
 			"serial",
-			'id_affaire'
+			'stock.id_affaire'
 		);
 		$this->q->reset();
 		if ($get['serial']) {
@@ -1146,7 +1145,15 @@ class stock_absystech extends stock {
 		$this->q->addField($colsData)
 				->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
 		// si l'on recupère un seul user, on renvoie directement la premiere ligne du tableau
 		if($get['serial']){
 			$return = $data['data'][0];	

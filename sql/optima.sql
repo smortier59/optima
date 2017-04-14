@@ -2,7 +2,9 @@ CREATE TABLE `alerte_imprimante` (
   `id_alerte_imprimante` mediumint(8) NOT NULL,
   `id_stock` mediumint(8) UNSIGNED NOT NULL,
   `code` varchar(50) NOT NULL,
-  `message` varchar(255) NOT NULL
+  `message` varchar(255) NOT NULL,
+  `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `notification` enum('oui','non') NOT NULL DEFAULT 'oui'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE `alerte_imprimante`
@@ -11,10 +13,9 @@ ALTER TABLE `alerte_imprimante`
 
 ALTER TABLE `alerte_imprimante`
   MODIFY `id_alerte_imprimante` mediumint(8) NOT NULL AUTO_INCREMENT;
-
+  
 ALTER TABLE `alerte_imprimante`
   ADD CONSTRAINT `alerte_imprimante_ibfk_1` FOREIGN KEY (`id_stock`) REFERENCES `stock` (`id_stock`) ON DELETE CASCADE ON UPDATE CASCADE;
-
 
 
 CREATE TABLE `etat_imprimante` (
