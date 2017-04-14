@@ -1472,7 +1472,7 @@ class commande_lm extends commande {
 
 			$etat=$commande->get("etat");
 
-			if($etat !== "abandon" || $etat !== "pending"){
+			if($etat !== "abandon" && $etat !== "pending"){
 				$this->checkEtat($commande,false,$affaireFillesAR);
 				$etat_modifie=$commande->get("etat");
 				if($etat!=$etat_modifie){
