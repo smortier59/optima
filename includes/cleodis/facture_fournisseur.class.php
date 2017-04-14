@@ -5,10 +5,10 @@
 */
 class facture_fournisseur extends classes_optima {
 	function __construct($table_or_id=NULL) {
-		$this->table = "facture_fournisseur"; 
+		$this->table = "facture_fournisseur";
 
 		parent::__construct($table_or_id);
-		
+
 
 		$this->colonnes['fields_column'] = array(
 			"facture_fournisseur.ref"
@@ -21,7 +21,7 @@ class facture_fournisseur extends classes_optima {
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			//,'pdf'
 		);
-		
+
 		$this->colonnes['primary'] = array(
 			"ref"
 			,"id_affaire"=>array("disabled"=>true)
@@ -51,13 +51,13 @@ class facture_fournisseur extends classes_optima {
 		$this->panels['lignes'] = array('nbCols'=>1,'visible'=>true);
 		$this->panels['dates'] = array('nbCols'=>2,'visible'=>true);
 		$this->panels['statut'] = array('nbCols'=>3,'visible'=>true);
-		
+
 		// Champs masqués
-		$this->colonnes['bloquees']['insert'] = 
-		$this->colonnes['bloquees']['cloner'] = 
-		$this->colonnes['bloquees']['update'] = array("date_paiement","deja_exporte_immo","deja_exporte_achat");	
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] = array("date_paiement","deja_exporte_immo","deja_exporte_achat");
 		$this->fieldstructure();
-		
+
 
 		$this->addPrivilege("export_data");
 		$this->addPrivilege("export_cegid");
@@ -67,8 +67,8 @@ class facture_fournisseur extends classes_optima {
 		$this->files["fichier_joint"] = array("obligatoire"=>true);
 		$this->can_insert_from = array("bon_de_commande");
 		$this->no_insert = true;
-		$this->selectAllExtjs=true; 
-	}			
+		$this->selectAllExtjs=true;
+	}
 
 	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
@@ -77,12 +77,12 @@ class facture_fournisseur extends classes_optima {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
 		if ($id_bon_de_commande = ATF::_r('id_bon_de_commande')) {
 			$bon_de_commande=ATF::bon_de_commande()->select($id_bon_de_commande);
-		}	
-		
+		}
+
 		switch ($field) {
 			case "id_fournisseur":
 				return $bon_de_commande['id_fournisseur'];
@@ -93,16 +93,16 @@ class facture_fournisseur extends classes_optima {
 				ATF::bon_de_commande()->q->reset()
 										 ->addCondition("bon_de_commande.id_bon_de_commande",$bon_de_commande['id_bon_de_commande'])
 										 ->setDimension("row");
-					
+
 				$return = ATF::bon_de_commande()->select_all();
 
 				return $return["solde_ht"];
 			case "tva":
-				return $bon_de_commande['tva'];			
+				return $bon_de_commande['tva'];
 		}
-	
+
 		return parent::default_value($field,$s,$request);
-	}	
+	}
 
 	/**
 	* Permet de modifier la date sur un select_all
@@ -128,7 +128,7 @@ class facture_fournisseur extends classes_optima {
 				loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
 				,ATF::$usr->trans("notice_success_title")
 			);
-			
+
 //			$id_affaire=$this->select($infosMaj["id_".$this->table],"id_affaire");
 //			ATF::affaire()->redirection("select",$id_affaire);
 			return true;
@@ -137,8 +137,8 @@ class facture_fournisseur extends classes_optima {
 		}
 	}
 
-	
-	/** 
+
+	/**
 	* Insertion de la facture non parvenue négative dès l'insertion d'une facture fournisseur
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -151,18 +151,18 @@ class facture_fournisseur extends classes_optima {
 		$this->infoCollapse($infos);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 
-		
+
 
 //*****************************Transaction********************************
 		ATF::db($this->db)->begin_transaction();
 
 			$infos["tva"]=ATF::bon_de_commande()->select($infos["id_bon_de_commande"],"tva");
 			$last_id=parent::insert($infos,$s);
-			
+
 			ATF::facture_non_parvenue()->q->reset()->where("id_affaire",$infos["id_affaire"])
 												   ->where("id_bon_de_commande",$infos["id_bon_de_commande"]);
 			$fnps = ATF::facture_non_parvenue()->select_all();
-			
+
 			$fnp = array(
 				'ref'=>$infos['ref']."-FNP"
 				,'id_facture_fournisseur'=>$last_id
@@ -200,7 +200,7 @@ class facture_fournisseur extends classes_optima {
 						$item[str_replace("facture_fournisseur_ligne.","",$k_unescape)]=$i;
 						unset($item[$k]);
 					}
-					
+
 					//Facture fournisseur
 					$item["id_facture_fournisseur"]=$last_id;
 					$item["id_bon_de_commande_ligne"]=$item["id_facture_fournisseur_ligne"];
@@ -221,15 +221,15 @@ class facture_fournisseur extends classes_optima {
 		$class = ATF::getClass("facture_fournisseur");
 
 		$id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$infos["id_affaire"], "provenance"=>ATF::$usr->trans($class->name(), "module")." ref : ".$infos['ref']));
-		
+
 		copy($this->filepath($last_id,"fichier_joint"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint2"));
 
 		ATF::affaire()->redirection("select",$affaire["id_affaire"]);
-		
+
 		return $last_id;
 	}
 
-	/** 
+	/**
 	* Surcharge de delete afin de supprimer les parcs insérés
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $infos le ou les identificateurs de l'élément que l'on désire inséré
@@ -238,51 +238,51 @@ class facture_fournisseur extends classes_optima {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function delete($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL) {
-		
+
 		if (!is_array($infos)) {
 			$id_affaire = $this->select($infos,"id_affaire");
 		} elseif(!is_array($infos["id"])) {
 			$id_affaire = $this->nom($infos["id"],"id_affaire");
 		}
-		
+
 		if($return = parent::delete($infos,$s,$files,$cadre_refreshed)){
 			ATF::affaire()->redirection("select",$id_affaire);
 		}
 		return $return;
 	}
 
-	
-	/** 
+
+	/**
 	* Impossible de supprimer une facture fournisseur payee
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_delete($id){
 		if($this->select($id,"etat")=="impayee"){
-			return true; 
+			return true;
 		}else{
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",883);
-			return false; 
+			return false;
 		}
 	}
 
-	/** 
+	/**
 	* Impossible de modifier une facture fournisseur payee
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
 		return $this->can_delete($id);
 	}
 
 //
-//	/** 
+//	/**
 //	* Permet de savoir si toutes les lignes d'un bon de commande sont passées en facture fournisseur
 //	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 //	* @param int $id
-//	* @return boolean 
+//	* @return boolean
 //	*/
 //	public function factureFournisseurByBdC($id_bon_de_commande){
 //		ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_bon_de_commande",$id_bon_de_commande)->setCount();
@@ -300,7 +300,7 @@ class facture_fournisseur extends classes_optima {
 //				}
 //			}
 //		}
-//		
+//
 //		if($nb_facture_fournisseur_ligne==$nb_bon_de_commande_ligne){
 //			return true;
 //		}else{
@@ -310,57 +310,57 @@ class facture_fournisseur extends classes_optima {
 //
 
 
-	
+
 	/** Permet l'export des facture_fournisseur
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>    
-     * @param array $infos : contient le nom de l'onglet 
-     */     
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
 	 public function export_data($infos){
         if(!$infos["tu"]){ $this->q->reset(); }
 
         $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
-        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();        
-        $this->q->where("facture_fournisseur.deja_exporte_achat","non");  
-        $infos = $this->sa();        
-        		 	      
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-            
-		//premier onglet  
-		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle('facture_fournisseurs'); 
-		$sheets=array("auto"=>$worksheet_auto);         
-				  
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        $this->q->where("facture_fournisseur.deja_exporte_achat","non");
+        $infos = $this->sa();
 
-		//mise en place des titres       
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('facture_fournisseurs');
+		$sheets=array("auto"=>$worksheet_auto);
+
+
+		//mise en place des titres
 		$this->ajoutTitre($sheets);
-		
+
 		//ajout des donnÃ©es
-		$this->ajoutDonnees($sheets,$infos);        
-		  
-		
-		$writer = new PHPExcel_Writer_Excel5($workbook);		
-		
-		$writer->save($fname);           
-		header('Content-type: application/vnd.ms-excel');              
-		header('Content-Disposition:inline;filename=export_facture_fournisseur.xls');            
+		$this->ajoutDonnees($sheets,$infos);
+
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_facture_fournisseur.xls');
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct(); 	
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
     }
-        
-            
-            
-     /** Mise en place des titres         
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>              
+
+
+
+     /** Mise en place des titres
+     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $sheets : contient les 5 onglets     
-     */     
+     * @param array $sheets : contient les 5 onglets
+     */
     public function ajoutTitre(&$sheets){
         $row_data = array(
         	"A"=>'Type'
@@ -375,89 +375,89 @@ class facture_fournisseur extends classes_optima {
 			,"J"=>'Section A1'
 			,"K"=>'Date echeance'
 			,'L'=>'Date paiement'
-		);           
-            
-         foreach($sheets as $nom=>$onglet){              
-             foreach($row_data as $col=>$titre){         
-				  $sheets[$nom]->write($col.'1',$titre);  
-				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);    
-             }             
-         }  
-     }      
-            
-     /** Mise en place du contenu         
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>              
+		);
+
+         foreach($sheets as $nom=>$onglet){
+             foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre);
+				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
+             }
+         }
+     }
+
+     /** Mise en place du contenu
+     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $sheets : contient les 5 onglets     
-     * @param array $infos : contient tous les enregistrements          
-     */     
+     * @param array $sheets : contient les 5 onglets
+     * @param array $infos : contient tous les enregistrements
+     */
     public function ajoutDonnees(&$sheets,$infos){
-		$row_auto=1;      
-		$increment=0;     
-		foreach ($infos as $key => $item) { 
+		$row_auto=1;
+		$increment=0;
+		foreach ($infos as $key => $item) {
 
 			$this->u(array("id_facture_fournisseur"=> $item["facture_fournisseur.id_facture_fournisseur_fk"], "deja_exporte_achat"=>"oui"));
 
-			$increment++; 
-			if($item){				
+			$increment++;
+			if($item){
 				//initialisation des données
-				$societe = ATF::societe()->select(ATF::affaire()->select($item["facture_fournisseur.id_affaire_fk"] , "id_societe"));  
-				
-	 			$date=date("dmY",strtotime($item['facture_fournisseur.date']));        
-				$affaire=ATF::affaire()->select($item['facture_fournisseur.id_affaire_fk']);  
+				$societe = ATF::societe()->select(ATF::affaire()->select($item["facture_fournisseur.id_affaire_fk"] , "id_societe"));
+
+	 			$date=date("dmY",strtotime($item['facture_fournisseur.date']));
+				$affaire=ATF::affaire()->select($item['facture_fournisseur.id_affaire_fk']);
 
 				if($item["facture_fournisseur.type"] !== "maintenance"){
 					$libelle = $item["facture_fournisseur.id_facture_fournisseur"]."-".$societe["code_client"] ."-".ATF::societe()->nom($societe["id_societe"]);
 				}else{
 					$libelle = $item["facture_fournisseur.id_facture_fournisseur"]."-".$societe["code_client"] ."-".ATF::societe()->nom($societe["id_societe"])."-".$item["periodicite"];
 				}
-				
+
 				$date_echeance = "".date("d/m/y",strtotime($item['facture_fournisseur.date_echeance']));
 				if(!$item['facture_fournisseur.date_paiement']){
-					$date_paiement = "";					
+					$date_paiement = "";
 				}else{ $date_paiement = " ".date("d/m/y",strtotime($item['facture_fournisseur.date_paiement'])); }
-				
+
 				$cle = $key+1;
 				if($cle <10){ $inc = "00".$cle; }
 				elseif($cle <100){ $inc = "0".$cle;  } else{ $inc = $cle; }
 
 				ATF::demande_refi()->q->reset()->where("demande_refi.id_affaire",$item['facture_fournisseur.id_affaire_fk'],false,"AND")
 											   ->where("demande_refi.etat","valide");
-				$refi = ATF::demande_refi()->select_row();							   
+				$refi = ATF::demande_refi()->select_row();
 
 				ATF::commande()->q->reset()->where("commande.id_affaire" , $item['facture_fournisseur.id_affaire_fk']);
 				$commande = ATF::commande()->select_row();
 
-				$reference = "A".date("ym",strtotime($item['facture_fournisseur.date'])).$inc;   			
-				   
+				$reference = "A".date("ym",strtotime($item['facture_fournisseur.date'])).$inc;
 
-				
-				//insertion des donnÃ©es     
+
+
+				//insertion des donnÃ©es
 				for ($i = 1; $i <= 4; $i++) {
-					$row_data=array();       
+					$row_data=array();
 					if($i==1){
-						$row_data["A"]='G';  
-						$row_data["B"]="‘".$date;
+						$row_data["A"]='G';
+						$row_data["B"]="".$date;
 						$row_data["C"]='AC';
 						$row_data["D"]="401000";
-						$row_data["E"]=ATF::societe()->select($item["facture_fournisseur.id_fournisseur_fk"], "code_fournisseur");      
-						$row_data["F"]='C';             
-												    
-						$row_data["G"]=round(abs($item['facture_fournisseur.prix']*$item["facture_fournisseur.tva"]),2);	
-						$row_data["H"]=$libelle;            
-						$row_data["I"]=$reference;  
-						$row_data["J"]="";   
-						$row_data["K"]=$date_echeance;          
-						$row_data["L"]="‘".$date_paiement;            
-					}elseif($i==2){          
-						$row_data["A"]='G';  
-						$row_data["B"]="‘".$date;
+						$row_data["E"]=ATF::societe()->select($item["facture_fournisseur.id_fournisseur_fk"], "code_fournisseur");
+						$row_data["F"]='C';
+
+						$row_data["G"]=round(abs($item['facture_fournisseur.prix']*$item["facture_fournisseur.tva"]),2);
+						$row_data["H"]=$libelle;
+						$row_data["I"]=$reference;
+						$row_data["J"]="";
+						$row_data["K"]=$date_echeance;
+						$row_data["L"]="".$date_paiement;
+					}elseif($i==2){
+						$row_data["A"]='G';
+						$row_data["B"]="".$date;
 						$row_data["C"]='AC';
 						$row_data["F"]='D';
 
 						if($refi && $refi["id_refinanceur"] == 4){
 							if($commande["etat"] == "non_loyer"){ $row_data["D"]="231800"; }
-							else{ $row_data["D"]="218310"; }							
+							else{ $row_data["D"]="218310"; }
 						}else{
 							if($commande["etat"] == "non_loyer"){ $row_data["D"]="231800"; }
 							else{
@@ -467,22 +467,22 @@ class facture_fournisseur extends classes_optima {
 							}
 						}
 
-						$row_data["G"]=round(abs($item['facture_fournisseur.prix']),2); 
-						
-						$row_data["H"]=$libelle;            
-						$row_data["I"]=$reference; 
-						$row_data["J"]="";						 
-						$row_data["K"]="";          
-						$row_data["L"]="‘".$date_paiement;         
+						$row_data["G"]=round(abs($item['facture_fournisseur.prix']),2);
+
+						$row_data["H"]=$libelle;
+						$row_data["I"]=$reference;
+						$row_data["J"]="";
+						$row_data["K"]="";
+						$row_data["L"]="".$date_paiement;
 					}elseif($i==3 && ($refi["id_refinanceur"] != 4)){
-						$row_data["A"]='A1';  
-						$row_data["B"]="‘".$date;
+						$row_data["A"]='A1';
+						$row_data["B"]="".$date;
 						$row_data["C"]='AC';
 						$row_data["F"]='D';
 
 						if($refi && $refi["id_refinanceur"] == 4){
 							if($commande["etat"] == "non_loyer"){ $row_data["D"]="231800"; }
-							else{ $row_data["D"]="218310"; }							
+							else{ $row_data["D"]="218310"; }
 						}else{
 							if($commande["etat"] == "non_loyer"){ $row_data["D"]="231800"; }
 							else{
@@ -491,50 +491,50 @@ class facture_fournisseur extends classes_optima {
 								else{ $row_data["D"]="607110"; }
 							}
 						}
-						$row_data["G"]=round(abs($item['facture_fournisseur.prix']),2); 
-						
-						$row_data["H"]=$libelle;            
-						$row_data["I"]=$reference;    
-						if($affaire["nature"]=="avenant"){             
-							//Faire en sorte que l1296 = 2008 et non pas 208
-							$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."AV";           
-						}else{           
-							$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."00";           
-						}     
-						$row_data["K"]="";          
-						$row_data["L"]="‘".$date_paiement;
+						$row_data["G"]=round(abs($item['facture_fournisseur.prix']),2);
 
-					}elseif($i==4){       
-						
-						$row_data["A"]='G';            
-						$row_data["B"]="‘".$date;           
+						$row_data["H"]=$libelle;
+						$row_data["I"]=$reference;
+						if($affaire["nature"]=="avenant"){
+							//Faire en sorte que l1296 = 2008 et non pas 208
+							$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
+						}else{
+							$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
+						}
+						$row_data["K"]="";
+						$row_data["L"]="".$date_paiement;
+
+					}elseif($i==4){
+
+						$row_data["A"]='G';
+						$row_data["B"]="".$date;
 						$row_data["C"]='AC';
 						if($refi && $refi["id_refinanceur"] == 4){	$row_data["D"]="445620"; }
-						else{	$row_data["D"]="445660"; }						
+						else{	$row_data["D"]="445660"; }
 						$row_data["E"]='';
 						$row_data["F"]='D';
-						$row_data["G"]=round(abs(($item['facture_fournisseur.prix']*$item['facture_fournisseur.tva'])-$item['facture_fournisseur.prix']),2); 							  
-						$row_data["H"]=$libelle;        
-						$row_data["I"]=$reference; 						      
-						$row_data["J"]="";     
-						$row_data["K"]="";          
-						$row_data["L"]="‘".$date_paiement;	
+						$row_data["G"]=round(abs(($item['facture_fournisseur.prix']*$item['facture_fournisseur.tva'])-$item['facture_fournisseur.prix']),2);
+						$row_data["H"]=$libelle;
+						$row_data["I"]=$reference;
+						$row_data["J"]="";
+						$row_data["K"]="";
+						$row_data["L"]="".$date_paiement;
 					}
-					
-												
-					if($row_data){						
-						$row_auto++; 
-						foreach($row_data as $col=>$valeur){							
-							$sheets['auto']->write($col.$row_auto, $valeur);              
+
+
+					if($row_data){
+						$row_auto++;
+						foreach($row_data as $col=>$valeur){
+							$sheets['auto']->write($col.$row_auto, $valeur);
 						}
-					}        
-				}             
-			}  
+					}
+				}
+			}
 		}
 	}
 
 	public function initStyle(){
-				
+
 		$style_titre1 = new excel_style();
 		$style_titre1->setWrap()->alignement('center')->setSize(13)->setBorder("thin")->setBold();
 		$this->setStyle("titre1",$style_titre1->getStyle());
@@ -575,51 +575,51 @@ class facture_fournisseur extends classes_optima {
 		$style_cel_right->setWrap()->alignement("center","right")->setSize(11);
 		$this->setStyle("cel_right",$style_cel_right->getStyle());
 	}
-	
+
 	public function setStyle($nom,$objet){
 		$this->style[$nom]=$objet;
 	}
-	
+
 	public function getStyle($nom){
 		return $this->style[$nom];
 	}
-	
 
-	/** Export CEGID      
+
+	/** Export CEGID
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @param array $infos : contient le nom de l'onglet
-     */     
-	public function export_cegid($infos){	
+     */
+	public function export_cegid($infos){
 		if(!$infos["tu"]){ $this->q->reset(); }
 
         $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
         $force = false;
-        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();  
-        if(!$infos["force"]){ $this->q->where("facture_fournisseur.deja_exporte_immo","non"); $force=true; } 
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        if(!$infos["force"]){ $this->q->where("facture_fournisseur.deja_exporte_immo","non"); $force=true; }
         $infos = $this->sa();
 
 		$this->export_xls_cegid($infos,$force);
-    }   
+    }
 
 
     /** Surcharge pour avoir un export
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>   
-     * @param array $infos : contient tous les enregistrements          
-     */     
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient tous les enregistrements
+     */
     public function export_xls_cegid(&$infos,$force){
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-            
-		//premier onglet  
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle('EXPORT CEGID'); 
-		$sheets=array("auto"=>$worksheet_auto);         
+		$worksheet_auto->sheet->setTitle('EXPORT CEGID');
+		$sheets=array("auto"=>$worksheet_auto);
 		$this->initStyle();
-		
-		//mise en place des titres       
+
+		//mise en place des titres
 		$row_data = array(
         	 "A"=>array('Compte',40)
         	,"B"=>array('Date entrée',40)
@@ -628,9 +628,9 @@ class facture_fournisseur extends classes_optima {
 			,"E"=>array('Date début amortissement fiscal',40)
 			,"F"=>array('Réference',40)
 			,"G"=>array('Libellé',40)
-			,"H"=>array('Prix unitaire',40)			
+			,"H"=>array('Prix unitaire',40)
 			,"I"=>array('Montant HT',40)
-			,"J"=>array('Quantité',40)			
+			,"J"=>array('Quantité',40)
 			,"K"=>array('Montant TVA',40)
 			,"L"=>array('Taux TVA',40)
 			,"M"=>array('Prorata TVA',40)
@@ -651,58 +651,58 @@ class facture_fournisseur extends classes_optima {
 			,"AB"=>array('Critère 1',40)
 			,"AC"=>array('Réference 2',40)
 			,"AD"=>array('Compte fournisseur',40)
-		);           
-        
-	
-		    
-        foreach($sheets as $nom=>$onglet){              
-            foreach($row_data as $col=>$titre){         
-				$sheets[$nom]->write($col.'1',$titre[0],$this->getStyle("titre1"));  
+		);
+
+
+
+        foreach($sheets as $nom=>$onglet){
+            foreach($row_data as $col=>$titre){
+				$sheets[$nom]->write($col.'1',$titre[0],$this->getStyle("titre1"));
 				$sheets[$nom]->sheet->getColumnDimension($col)->setWidth($titre[1]);
-            }             
+            }
         }
 
 
-		//ajout des donnÃ©es             
+		//ajout des donnÃ©es
 		if($infos){
 			$row_auto=1;
 
-			foreach ($infos as $key => $value) {	
-				if($force){ $this->u(array("id_facture_fournisseur"=> $value["facture_fournisseur.id_facture_fournisseur_fk"], "deja_exporte_immo"=>"oui")); }						
-				
+			foreach ($infos as $key => $value) {
+				if($force){ $this->u(array("id_facture_fournisseur"=> $value["facture_fournisseur.id_facture_fournisseur_fk"], "deja_exporte_immo"=>"oui")); }
+
 				ATF::facture()->q->reset()->addCondition("type_facture","refi")
 									  ->addCondition("id_affaire",$value["facture_fournisseur.id_affaire_fk"]);
 				$facture_refi = ATF::facture()->sa();
 
 				//Il faut aussi vérifier que l'affaire ne va pas être céder
-				$demande_refi=ATF::demande_refi()->existDemandeRefi($value["facture_fournisseur.id_affaire_fk"]);				
-				
+				$demande_refi=ATF::demande_refi()->existDemandeRefi($value["facture_fournisseur.id_affaire_fk"]);
+
 				if(!$facture_refi || ATF::refinanceur()->select($facture_refi[0]["id_refinanceur"],"code_refi")=="REFACTURATION"){
-					
+
 					$facture  = ATF::facture_fournisseur()->select($value["facture_fournisseur.id_facture_fournisseur_fk"]);
 					$affaire  = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"]);
 					ATF::commande()->q->reset()->where("commande.id_affaire", $value["facture_fournisseur.id_affaire_fk"]);
 					$commande = ATF::commande()->select_row();
-					
-					$societe  = ATF::societe()->select($affaire["id_societe"]);				
+
+					$societe  = ATF::societe()->select($affaire["id_societe"]);
 					$fournisseur = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"], "societe");
 
 					$date_mise_service = "";
 					if($commande["commande.date_debut"]){ $date_mise_service = date("d/m/Y", strtotime($commande["commande.date_debut"])); }
-					
+
 					$duree = 0;
 
 					ATF::loyer()->q->reset()->where("loyer.id_affaire", $value["facture_fournisseur.id_affaire_fk"]);
 					$loyers = ATF::loyer()->select_all();
 
 					foreach ($loyers as $k => $v) {
-						if($v["frequence_loyer"] == "an"){ $duree = $duree + $v["duree"]; 
+						if($v["frequence_loyer"] == "an"){ $duree = $duree + $v["duree"];
 						}elseif($v["frequence_loyer"] == "trimestre"){ $duree = $duree + ($v["duree"]/4);
 						}elseif($v["frequence_loyer"] == "semestre"){ $duree = $duree + ($v["duree"]/3);
 						}else{ $duree = $duree + ($v["duree"]/12);		}
 					}
 
-					if($commande["commande.date_debut"] && $commande["commande.date_evolution"]){ 					
+					if($commande["commande.date_debut"] && $commande["commande.date_evolution"]){
 						$datetime1 = new DateTime($commande["commande.date_debut"]);
 						$datetime2 = new DateTime($commande["commande.date_evolution"]);
 						$duree = $datetime1->diff($datetime2);
@@ -721,9 +721,9 @@ class facture_fournisseur extends classes_optima {
 									,"E"=>array($date_mise_service)
 									,"F"=>array('')
 									,"G"=>array($societe["societe"]." ".$affaire["ref"]."-".$societe["code_client"])
-									,"H"=>array('')			
+									,"H"=>array('')
 									,"I"=>array($facture["prix"])
-									,"J"=>array('1')			
+									,"J"=>array('1')
 									,"K"=>array(($facture["prix"]*$facture["tva"])-$facture["prix"])
 									,"L"=>array(abs(($facture['tva']-1)*100),2,'.',' ')
 									,"M"=>array('100')
@@ -741,7 +741,7 @@ class facture_fournisseur extends classes_optima {
 									,"Y"=>array('09')
 									,"Z"=>array('09')
 									,"AA"=>array('0')
-									,"AB"=>array($critere1)
+									,"AB"=>array($critere1." ")
 									,"AC"=>array($facture["ref"])
 									,"AD"=>array($fournisseur)
 								);
@@ -749,26 +749,26 @@ class facture_fournisseur extends classes_optima {
 
 
 					$row_auto++;
-					foreach($row_data as $col=>$valeur){							
+					foreach($row_data as $col=>$valeur){
 						$sheets['auto']->write($col.$row_auto, $valeur[0],$this->getStyle("centre"));
-					}	
-				}		   
+					}
+				}
 			}
 	    }
-		
+
 		$writer = new PHPExcel_Writer_Excel5($workbook);
-		
-		$writer->save($fname);           
+
+		$writer->save($fname);
 		header('Content-type: application/vnd.ms-excel');
 		header('Content-Disposition:inline;filename=export_CEGID.xls');
-           
-		            
+
+
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct();	   
-	} 
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+	}
 };
 
 class facture_fournisseur_cleodisbe extends facture_fournisseur { };
