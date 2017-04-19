@@ -885,7 +885,13 @@ class facture_fournisseur extends classes_optima {
 			$donnees[$key][1][26] = "";
 			$donnees[$key][1][27] = $ref_cmd_lm;  //N° Commande site LM
 			$donnees[$key][1][28] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire"); //Numéro du contrat / affaire
-			$donnees[$key][1][29] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire");
+			$description = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire");
+			if (strlen($description) > 200){
+				$donnees[$key][1][29] = substr($description, 0, strrpos(substr($description, 0, 200), ''));
+			}else{
+				$donnees[$key][1][29] = $description;
+			}
+
 			$donnees[$key][1][30] = "";
 			$donnees[$key][1][31] = "";
 
@@ -1023,7 +1029,7 @@ class facture_fournisseur extends classes_optima {
 
 
 	        	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
-	        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "num_magasin_lm");
+	        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");
 	        	}
 
 	        	ATF::loyer()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])
