@@ -220,7 +220,7 @@ class facture_lm extends facture {
 				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> ".$status , "StatutDebitSlimpay");
 
 				if($facture["executionStatus"] !== $status["executionStatus"]){
-					$this->u(array("id_facture"=>$vfacture,
+					$this->u(array("id_facture"=>$facture["id_facture"],
 								   "executionStatus"=>$status["executionStatus"]
 								  )
 							);
