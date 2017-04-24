@@ -217,7 +217,7 @@ class facture_lm extends facture {
 				$facture = $this->select($value["facture.id_facture"]);
 				$status = ATF::slimpay()->getStatutDebit($facture["id_slimpay"]);
 
-				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> ".$status , "StatutDebitSlimpay");
+				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> ".$status["executionStatus"] , "StatutDebitSlimpay");
 
 				if($facture["executionStatus"] !== $status["executionStatus"]){
 					$this->u(array("id_facture"=>$facture["id_facture"],
