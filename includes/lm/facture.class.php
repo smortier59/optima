@@ -209,12 +209,15 @@ class facture_lm extends facture {
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						 ->where("executionStatus","toprocess","AND",false,"!=");
+						 ->where("executionStatus","toprocess","AND");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
+
 				$facture = $this->select($value["facture.id_facture"], "id_slimpay");
 				$status = ATF::slimpay()->getStatutDebit($facture["id_slimpay"]);
+
+				log::logger("Paiement : ".$facture."  ---> ".$status , "StatutDebitSlimpay");
 
 				if($facture["executionStatus"] !== $status["executionStatus"]){
 					$this->u(array("id_facture"=>$vfacture,
