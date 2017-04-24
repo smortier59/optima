@@ -439,8 +439,8 @@ if($infos["id_societe"]){
     }catch(errorATF $e){
         unset($_POST["societe_form"]["password"]);
         $mail = new mail(array(
-                //"recipient"=>"benjamin.tronquit@leroymerlin.fr"
-                "recipient"=>"debug@absystech.fr"
+                "recipient"=>"benjamin.tronquit@leroymerlin.fr"
+                //"recipient"=>"debug@absystech.fr"
                 ,"objet"=>"Une erreur s'est produite lors d'une souscription"
                 ,"html"=>true
                 ,"template"=>"erreur"

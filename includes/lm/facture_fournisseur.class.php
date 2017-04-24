@@ -829,7 +829,7 @@ class facture_fournisseur extends classes_optima {
         	$ref_cmd_lm = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref_commande_lm");
 
         	if($value["facture_fournisseur.id_fournisseur_fk"] == 2){
-        		$code_magasin = ATF::magasin()->select(ATF::bon_de_commande()->select($value["facture_fournisseur.id_bon_de_commande_fk"] , "id_magasin"), "entite_lm");
+        		$code_magasin = ATF::magasin()->select(ATF::bon_de_commande()->select($value["facture_fournisseur.id_bon_de_commande_fk"] , "id_magasin"), "num_magasin_lm");
         	}
 
         	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
@@ -885,7 +885,13 @@ class facture_fournisseur extends classes_optima {
 			$donnees[$key][1][26] = "";
 			$donnees[$key][1][27] = $ref_cmd_lm;  //N° Commande site LM
 			$donnees[$key][1][28] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "ref")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire"); //Numéro du contrat / affaire
-			$donnees[$key][1][29] = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire");
+			$description = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "affaire");
+			if (strlen($description) > 200){
+				$donnees[$key][1][29] = substr($description, 0, strrpos(substr($description, 0, 200), ''));
+			}else{
+				$donnees[$key][1][29] = $description;
+			}
+
 			$donnees[$key][1][30] = "";
 			$donnees[$key][1][31] = "";
 
@@ -993,7 +999,7 @@ class facture_fournisseur extends classes_optima {
 
         $string .=  "98;".count($donnees).";CLEODIS\n";
         $lignes ++;
-        $string .= "99;".number_format($total_debit,2).";EUR\n";
+        $string .= "99;".number_format($total_debit,2,".","").";EUR\n";
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
