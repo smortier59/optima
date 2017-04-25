@@ -1,24 +1,25 @@
 <?
 /** 
-* Classe alerte_imprimante
+* Classe etat_imprimante
 * @author Cyril Charlier <ccharlier@absystech.fr>
 * @package Optima
 * @subpackage Absystech
 */
-class alerte_imprimante_absystech extends classes_optima {
+class etat_imprimante_absystech extends classes_optima {
 	/**
 	* Constructeur
 	*/
 	public function __construct() {
 		parent::__construct();
-        $this->table='alerte_imprimante';
+        $this->table='etat_imprimante';
 		$this->colonnes['fields_column']  = array(
-			'alerte_imprimante.id_stock'
-			,'alerte_imprimante.code'
-			,'alerte_imprimante.ville'
-			,'alerte_imprimante.message'
-			,'alerte_imprimante.date'
-			,'alerte_imprimante.notification'
+			'etat_imprimante.id_stock'
+			,'etat_imprimante.name'
+			,'etat_imprimante.date'
+			,'etat_imprimante.color'
+			,'etat_imprimante.current'
+			,'etat_imprimante.max'
+			,'etat_imprimante.type'
 		); 
 	}
 	
@@ -32,7 +33,7 @@ class alerte_imprimante_absystech extends classes_optima {
 	*/
 	public function _GET($get,$post) {
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "date";
+		if (!$get['tri']) $get['tri'] = "id_stock";
 		if (!$get['trid']) $get['trid'] = "desc";
 		// Gestion du limit
 		if (!$get['limit']) $get['limit'] = 30;
@@ -40,9 +41,6 @@ class alerte_imprimante_absystech extends classes_optima {
 		if (!$get['page']) $get['page'] = 0;
 
 		$this->q->reset();
-		if ($get['notification'] == "oui") {
-			$this->q->where("alerte_imprimante.notification","oui");
-		}
 		$this->q->setLimit($get['limit']);
 		$this->q->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -62,8 +60,9 @@ class alerte_imprimante_absystech extends classes_optima {
 		return $return;
 	}
 	/**
-	* Permet d'ajouter une ou plusieurs notifications
+	* Permet d'ajouter une ou plusieurs informations sur l'imprimante
 	* @author cyril CHARLIER <ccharlier@absystech.fr>
+	* @package Telescope\Printer
 	* @param $get array Argument obligatoire mais inutilisé ici.
 	* @param $post array Contient les données envoyé en POST par le formulaire.
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
@@ -72,25 +71,21 @@ class alerte_imprimante_absystech extends classes_optima {
 		$input = file_get_contents('php://input');
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
-		$alertes = json_decode($post['alerts'],true);
-		foreach ($alertes as $k=>$i) {
+		// ajout de toutes les cartouches & de leur état
+		$toner = json_decode($post['toner'],true);
+		foreach ($toner as $k=>$i) {
 			$toinsert[]= array(
-				"code"=>$i['code']
-				,"message"=>$i['message']
-				,"id_stock"=>$post['id_stock']
-
+				"name"=>$i['name']
+				,"current"=>$i['current']
+				,"color"=>$i['id_stock']
+				,"max"=>$i['max']
 			);
 		}
+		// Ajouter maintenant les cout copies
+		// 
         try {	  
         	ATF::db($this->db)->begin_transaction();  		
-			if(sizeof($toinsert)==1)
-			{
-				log::logger('insert 1', 'ccharlier');
-				log::logger(parent::i($toinsert[0]),'ccharlier');
-				$result = $this->i($toinsert[0]);
-			}else{
-				$result = $this->multi_insert($toinsert);
-			}
+			$result = $this->multi_insert($toinsert);
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			log::logger($e->getMessage(),'ccharlier');
@@ -101,7 +96,7 @@ class alerte_imprimante_absystech extends classes_optima {
 
 		log::logger($result,'ccharlier');
         $return['result'] = true;
-        $return['id_alerte'] = $result;
+        $return['id_etat_imprimante'] = $result;
         log::logger($return,'ccharlier');
         return $return;
 	}

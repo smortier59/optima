@@ -1126,7 +1126,6 @@ class stock_absystech extends stock {
 		if (!$get['trid']) $get['trid'] = "desc";
 		// Gestion du limit
 		if (!$get['limit']) $get['limit'] = 30;
-		log::logger($get,'ccharlier');
 		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
 
@@ -1136,8 +1135,8 @@ class stock_absystech extends stock {
 			'stock.id_affaire'
 		);
 		$this->q->reset();
-		if ($get['serial']) {
-			$this->q->where("serial",$get['serial'])->setLimit(1);
+		if ($get['adresse_mac']) {
+			$this->q->where("adresse_mac",$get['adresse_mac'])->setLimit(1);
 
 		} else {
 			$this->q->setLimit($get['limit']);
@@ -1155,7 +1154,7 @@ class stock_absystech extends stock {
 			}
 		}
 		// si l'on recupère un seul user, on renvoie directement la premiere ligne du tableau
-		if($get['serial']){
+		if($get['adresse_mac']){
 			$return = $data['data'][0];	
 		}else{	
 			header("ts-total-row: ".$data['count']);
