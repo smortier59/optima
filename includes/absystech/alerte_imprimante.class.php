@@ -15,7 +15,6 @@ class alerte_imprimante_absystech extends classes_optima {
 		$this->colonnes['fields_column']  = array(
 			'alerte_imprimante.id_stock'
 			,'alerte_imprimante.code'
-			,'alerte_imprimante.ville'
 			,'alerte_imprimante.message'
 			,'alerte_imprimante.date'
 			,'alerte_imprimante.notification'
@@ -73,36 +72,25 @@ class alerte_imprimante_absystech extends classes_optima {
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
 		$alertes = json_decode($post['alerts'],true);
-		foreach ($alertes as $k=>$i) {
-			$toinsert[]= array(
-				"code"=>$i['code']
-				,"message"=>$i['message']
-				,"id_stock"=>$post['id_stock']
-
-			);
-		}
         try {	  
         	ATF::db($this->db)->begin_transaction();  		
-			if(sizeof($toinsert)==1)
-			{
-				log::logger('insert 1', 'ccharlier');
-				log::logger(parent::i($toinsert[0]),'ccharlier');
-				$result = $this->i($toinsert[0]);
-			}else{
+				foreach ($alertes as $k=>$i) {
+					$toinsert[]= array(
+						"code"=>$i['code']
+						,"message"=>$i['message']
+						,"id_stock"=>$post['id_stock']
+						,'date'=>$post['date']
+					);
 				$result = $this->multi_insert($toinsert);
 			}
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
-			log::logger($e->getMessage(),'ccharlier');
 			throw new errorATF('Erreur Insert',500);
 		}
 		ATF::db($this->db)->commit_transaction();
-		log::logger('result','ccharlier');
 
-		log::logger($result,'ccharlier');
         $return['result'] = true;
-        $return['id_alerte'] = $result;
-        log::logger($return,'ccharlier');
+        $return['records'] = $result['Records'];
         return $return;
 	}
 

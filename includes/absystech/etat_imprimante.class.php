@@ -72,32 +72,43 @@ class etat_imprimante_absystech extends classes_optima {
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
 		// ajout de toutes les cartouches & de leur état
-		$toner = json_decode($post['toner'],true);
-		foreach ($toner as $k=>$i) {
+		$etat = json_decode($post['etat'],true);
+		foreach ($etat['toners'] as $k=>$i) {
 			$toinsert[]= array(
-				"name"=>$i['name']
+				"id_stock"=>$post['id_stock']
+				,"name"=>$i['name']
 				,"current"=>$i['current']
+				,"date"=>$etat['date']
 				,"color"=>$i['id_stock']
 				,"max"=>$i['max']
+				,"type"=>'toner'
 			);
 		}
 		// Ajouter maintenant les cout copies
-		// 
+		foreach ($etat['copies'] as $k=>$i) {
+				log::logger($k,'ccharlier');
+			$toinsert[]= array(
+				"id_stock"=>$post['id_stock']
+				,"name"=>$k
+				,"current"=>$i
+				,"date"=>$etat['date']
+				,"type"=> ($k == 'mono')?'copies_noir':'copies_couleur'
+				,"color"=> NULL
+				,"max"=>NULL
+
+			);
+		}
         try {	  
         	ATF::db($this->db)->begin_transaction();  		
 			$result = $this->multi_insert($toinsert);
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
-			log::logger($e->getMessage(),'ccharlier');
 			throw new errorATF('Erreur Insert',500);
 		}
 		ATF::db($this->db)->commit_transaction();
-		log::logger('result','ccharlier');
 
-		log::logger($result,'ccharlier');
         $return['result'] = true;
-        $return['id_etat_imprimante'] = $result;
-        log::logger($return,'ccharlier');
+        $return['etat_imprimante'] = $result['Records'];
         return $return;
 	}
 
