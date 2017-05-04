@@ -1110,7 +1110,7 @@ class facture_fournisseur extends classes_optima {
 					$donnees[$key][1][20] = $montant; //Montant debit
 					$donnees[$key][1][21] = "0"; //Montant credit
 		        	$donnees[$key][1][22] = "0";
-					$donnees[$key][1][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
+					$donnees[$key][1][23] = "Dotation aux amortissements au ".date("d/m/Y", strtotime($date))." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
 					$donnees[$key][1][24] = $date_comptable; //date comptable
 					$donnees[$key][1][25] = "";
 					$donnees[$key][1][26] = "";
@@ -1147,7 +1147,7 @@ class facture_fournisseur extends classes_optima {
 					$donnees[$key][2][20] = "0"; //Montant debit
 					$donnees[$key][2][21] = $montant; //Montant credit
 		        	$donnees[$key][2][22] = "0";
-					$donnees[$key][2][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
+					$donnees[$key][2][23] = "Dotation aux amortissements au ".date("d/m/Y", strtotime($date))." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
 					$donnees[$key][2][24] = $date_comptable; //date comptable
 					$donnees[$key][2][25] = "";
 					$donnees[$key][2][26] = "";
