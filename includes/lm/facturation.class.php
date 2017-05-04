@@ -1411,7 +1411,8 @@ class facturation extends classes_optima {
 						"mode_paiement"=>$commande["type"],
 						"id_affaire"=>$affaire["id_affaire"],
 						"date_previsionnelle"=>$facture_date_previsionnelle,
-						"date_paiement"=>NULL
+						"date_paiement"=>NULL,
+						"nature" => $facturation["nature"]
 					);
 
 					$id_facture=ATF::facture()->i($facture);

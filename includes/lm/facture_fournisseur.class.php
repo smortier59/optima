@@ -1007,12 +1007,40 @@ class facture_fournisseur extends classes_optima {
     }
 
 
+    /** Permet de savoir si une affaire était en periode d'engagement à une date donnée
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @date 04/05/2017
+     */
+    public function estEnPeriodeEngagement($date, $id_affaire){
+    	ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+    	$commande = ATF::commande()->select_row();
+
+    	if($commande["commande.date_debut"]){
+    		$dateDeb = strtotime($commande["commande.date_debut"]);
+	    	$dateFin = strtotime($commande["commande.date_evolution"]);
+
+	    	log::logger($commande , "mfleurquin");
+
+	    	if($dateDeb <= $date && $date <= $dateFin){
+	    		return true;
+	    	}
+    	}
+
+    	return false;
+
+    }
+
+
      /** Export des immobilisation pour ADEO Services
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @date 22/12/2016
      * @param array $infos : contient tous les enregistrements
      */
     public function export_immo_adeo(&$infos,$force){
+
+    	$date = date("Y-m-d");
+    	if($infos["date"]) $date = $infos["date"];
+
     	$infos["display"] = true;
 
 		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
@@ -1025,111 +1053,114 @@ class facture_fournisseur extends classes_optima {
         foreach ($data as $key => $value) {
 
         	if($value["facture_fournisseur.type"] == "achat"){
-        		$code_magasin = "M0380"; //Par defaut web
 
+        		if($this->estEnPeriodeEngagement($date,$value["facture_fournisseur.id_affaire_fk"])){
 
-	        	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
-	        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");
-	        	}
+        			$code_magasin = "M0380"; //Par defaut web
 
-	        	ATF::loyer()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])
-	        							->where("nature","prolongation","AND",false,"!=")
-	        							->where("nature","prolongation_probable","AND",false,"!=");
-	        	$loyers_engagement = ATF::loyer()->sa();
+		        	if(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin")){
+		        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"] , "id_magasin"), "entite_lm");
+		        	}
 
-	        	$engagement = 0;
-	        	foreach ($loyers_engagement as $kv => $vv) {
-	        		$engagement += $vv["duree"];
-	        	}
-	        	$montant = number_format($value["facture_fournisseur.prix"]/$engagement ,2 ,".","");
-	        	$total += $montant;
+		        	ATF::loyer()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])
+		        							->where("nature","prolongation","AND",false,"!=")
+		        							->where("nature","prolongation_probable","AND",false,"!=");
+		        	$loyers_engagement = ATF::loyer()->sa();
 
-	        	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
-        		$devis = ATF::devis()->select_row();
+		        	$engagement = 0;
+		        	foreach ($loyers_engagement as $kv => $vv) {
+		        		$engagement += $vv["duree"];
+		        	}
+		        	$montant = number_format($value["facture_fournisseur.prix"]/$engagement ,2 ,".","");
+		        	$total += $montant;
 
-	        	ATF::devis_ligne()->q->reset()->where("id_devis",$devis["id_devis"])
-        									->setLimit(1);
-	        	$ligne = ATF::devis_ligne()->select_row();
-				$pack = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit"));
-				$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
+		        	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
+	        		$devis = ATF::devis()->select_row();
 
-				$d1 = date("Y-m-01", strtotime(date("Y-m-d")." +1 month"));
-				$d1 = date("Ymd", strtotime($d1. " -1 day"));
+		        	ATF::devis_ligne()->q->reset()->where("id_devis",$devis["id_devis"])
+	        									->setLimit(1);
+		        	$ligne = ATF::devis_ligne()->select_row();
+					$pack = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit"));
+					$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
 
-				$date_comptable = $date_app_taux = $d1;
+					$d1 = date("Y-m-01", strtotime(date("Y-m-d")." +1 month"));
+					$d1 = date("Ymd", strtotime($d1. " -1 day"));
 
-	        	$donnees[$key][1][1] = "1";
-	        	$donnees[$key][1][2] = "1";
-	        	$donnees[$key][1][3] = "54";
-	        	$donnees[$key][1][4] = $code_magasin;
-	        	$donnees[$key][1][5] = "120";
-	        	$donnees[$key][1][6] = "CLEODIS";
-	        	$donnees[$key][1][7] = "20";
-	        	$donnees[$key][1][8] =  $date_comptable; //date comptable = Denier jour de la periode
-	        	$donnees[$key][1][9] =  "1";
-	        	$donnees[$key][1][10] = "EUR";
-	        	$donnees[$key][1][11] = $date_app_taux; //date application du taux
-	        	$donnees[$key][1][12] = $rayon; //Centre cout/profit R03(Alarme)- R04(Chaudiere) - 00000(Immo)
-	        	$donnees[$key][1][13] = "1";
-	    		$donnees[$key][1][14] = "681120";
-	    		$donnees[$key][1][15] = "000000000";
-	        	$donnees[$key][1][16] = "0";
-	        	$donnees[$key][1][17] = "0";
-	        	$donnees[$key][1][18] = "0";
-	        	$donnees[$key][1][19] = "0";
-				$donnees[$key][1][20] = $montant; //Montant debit
-				$donnees[$key][1][21] = "0"; //Montant credit
-	        	$donnees[$key][1][22] = "0";
-				$donnees[$key][1][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
-				$donnees[$key][1][24] = $date_comptable; //date comptable
-				$donnees[$key][1][25] = "";
-				$donnees[$key][1][26] = "";
-				$donnees[$key][1][27] = "";
-				$donnees[$key][1][28] = "";
-				$donnees[$key][1][29] = "";
-				$donnees[$key][1][30] = "";
-				$donnees[$key][1][31] = "";
-				$donnees[$key][1][32] = "";
-				$donnees[$key][1][33] = "";
-				$donnees[$key][1][34] = "";
-				$donnees[$key][1][35] = "";
-				$donnees[$key][1][36] = "";
+					$date_comptable = $date_app_taux = $d1;
 
-				$donnees[$key][2][1] = "1";
-	        	$donnees[$key][2][2] = "1";
-	        	$donnees[$key][2][3] = "54";
-	        	$donnees[$key][2][4] = $code_magasin;
-	        	$donnees[$key][2][5] = "120";
-	        	$donnees[$key][2][6] = "CLEODIS";
-	        	$donnees[$key][2][7] = "20";
-	        	$donnees[$key][2][8] =  $date_comptable; //date comptable = Denier jour de la periode
-	        	$donnees[$key][2][9] =  "1";
-	        	$donnees[$key][2][10] = "EUR";
-	        	$donnees[$key][2][11] = $date_app_taux; //date application du taux
-	        	$donnees[$key][2][12] = "00000";
-	        	$donnees[$key][2][13] = "1";
-	    		$donnees[$key][2][14] = "281560";
-	    		$donnees[$key][2][15] = "000000000";
-	        	$donnees[$key][2][16] = "0";
-	        	$donnees[$key][2][17] = "0";
-	        	$donnees[$key][2][18] = "0";
-	        	$donnees[$key][2][19] = "0";
-				$donnees[$key][2][20] = "0"; //Montant debit
-				$donnees[$key][2][21] = $montant; //Montant credit
-	        	$donnees[$key][2][22] = "0";
-				$donnees[$key][2][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
-				$donnees[$key][2][24] = $date_comptable; //date comptable
-				$donnees[$key][2][25] = "";
-				$donnees[$key][2][26] = "";
-				$donnees[$key][2][27] = "";
-				$donnees[$key][2][28] = "";
-				$donnees[$key][2][29] = "";
-				$donnees[$key][2][30] = "";
-				$donnees[$key][2][31] = "";
-				$donnees[$key][2][32] = "";
-				$donnees[$key][2][33] = "";
-				$donnees[$key][2][34] = "";
-				$donnees[$key][2][35] = "";
+		        	$donnees[$key][1][1] = "1";
+		        	$donnees[$key][1][2] = "1";
+		        	$donnees[$key][1][3] = "54";
+		        	$donnees[$key][1][4] = $code_magasin;
+		        	$donnees[$key][1][5] = "120";
+		        	$donnees[$key][1][6] = "CLEODIS";
+		        	$donnees[$key][1][7] = "20";
+		        	$donnees[$key][1][8] =  $date_comptable; //date comptable = Denier jour de la periode
+		        	$donnees[$key][1][9] =  "1";
+		        	$donnees[$key][1][10] = "EUR";
+		        	$donnees[$key][1][11] = $date_app_taux; //date application du taux
+		        	$donnees[$key][1][12] = $rayon; //Centre cout/profit R03(Alarme)- R04(Chaudiere) - 00000(Immo)
+		        	$donnees[$key][1][13] = "1";
+		    		$donnees[$key][1][14] = "681120";
+		    		$donnees[$key][1][15] = "000000000";
+		        	$donnees[$key][1][16] = "0";
+		        	$donnees[$key][1][17] = "0";
+		        	$donnees[$key][1][18] = "0";
+		        	$donnees[$key][1][19] = "0";
+					$donnees[$key][1][20] = $montant; //Montant debit
+					$donnees[$key][1][21] = "0"; //Montant credit
+		        	$donnees[$key][1][22] = "0";
+					$donnees[$key][1][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
+					$donnees[$key][1][24] = $date_comptable; //date comptable
+					$donnees[$key][1][25] = "";
+					$donnees[$key][1][26] = "";
+					$donnees[$key][1][27] = "";
+					$donnees[$key][1][28] = "";
+					$donnees[$key][1][29] = "";
+					$donnees[$key][1][30] = "";
+					$donnees[$key][1][31] = "";
+					$donnees[$key][1][32] = "";
+					$donnees[$key][1][33] = "";
+					$donnees[$key][1][34] = "";
+					$donnees[$key][1][35] = "";
+					$donnees[$key][1][36] = "";
+
+					$donnees[$key][2][1] = "1";
+		        	$donnees[$key][2][2] = "1";
+		        	$donnees[$key][2][3] = "54";
+		        	$donnees[$key][2][4] = $code_magasin;
+		        	$donnees[$key][2][5] = "120";
+		        	$donnees[$key][2][6] = "CLEODIS";
+		        	$donnees[$key][2][7] = "20";
+		        	$donnees[$key][2][8] =  $date_comptable; //date comptable = Denier jour de la periode
+		        	$donnees[$key][2][9] =  "1";
+		        	$donnees[$key][2][10] = "EUR";
+		        	$donnees[$key][2][11] = $date_app_taux; //date application du taux
+		        	$donnees[$key][2][12] = "00000";
+		        	$donnees[$key][2][13] = "1";
+		    		$donnees[$key][2][14] = "281560";
+		    		$donnees[$key][2][15] = "000000000";
+		        	$donnees[$key][2][16] = "0";
+		        	$donnees[$key][2][17] = "0";
+		        	$donnees[$key][2][18] = "0";
+		        	$donnees[$key][2][19] = "0";
+					$donnees[$key][2][20] = "0"; //Montant debit
+					$donnees[$key][2][21] = $montant; //Montant credit
+		        	$donnees[$key][2][22] = "0";
+					$donnees[$key][2][23] = "Dotation aux amortissements au ".date("d/m/Y")." / ".ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"], "ref");
+					$donnees[$key][2][24] = $date_comptable; //date comptable
+					$donnees[$key][2][25] = "";
+					$donnees[$key][2][26] = "";
+					$donnees[$key][2][27] = "";
+					$donnees[$key][2][28] = "";
+					$donnees[$key][2][29] = "";
+					$donnees[$key][2][30] = "";
+					$donnees[$key][2][31] = "";
+					$donnees[$key][2][32] = "";
+					$donnees[$key][2][33] = "";
+					$donnees[$key][2][34] = "";
+					$donnees[$key][2][35] = "";
+        		}
         	}
 
         }
