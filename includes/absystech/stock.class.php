@@ -1138,6 +1138,9 @@ class stock_absystech extends stock {
 		if ($get['adresse_mac']) {
 			$this->q->where("adresse_mac",$get['adresse_mac'])->setLimit(1);
 
+		} else if ($get['id_stock']) {
+			$this->q->where("stock.id_stock",$get['id_stock'])->setLimit(1);
+
 		} else {
 			$this->q->setLimit($get['limit']);
 		}
@@ -1154,7 +1157,7 @@ class stock_absystech extends stock {
 			}
 		}
 		// si l'on recupère un seul user, on renvoie directement la premiere ligne du tableau
-		if($get['adresse_mac']){
+		if($get['adresse_mac'] || $get['id_stock']){
 			$return = $data['data'][0];	
 		}else{	
 			header("ts-total-row: ".$data['count']);

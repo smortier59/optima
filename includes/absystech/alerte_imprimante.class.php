@@ -38,12 +38,30 @@ class alerte_imprimante_absystech extends classes_optima {
 		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
 
+		$colsData = array(
+			'id_stock'
+			,'code'
+			,'message'
+			,'id_alerte_imprimante'
+			,'date'
+			,'notification'
+			,'date_cloture'
+		);
+
+
 		$this->q->reset();
-		if ($get['notification'] == "oui") {
-			$this->q->where("alerte_imprimante.notification","oui");
+		$this->q->addField($colsData);
+
+		if ($get['id_stock']) {
+			$this->q->where("id_stock",$get['id_stock']);
 		}
+		if ($get['date_cloture'] && $get['date_cloture']==='NULL') {
+			$this->q->addCondition("date_cloture",null,"OR",false,"IS NULL");
+		}
+		$this->q->addOrder('date','desc');
 		$this->q->setLimit($get['limit']);
 		$this->q->setCount();
+
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
@@ -54,10 +72,13 @@ class alerte_imprimante_absystech extends classes_optima {
 				}				
 			}
 		}
-		header("ts-total-row: ".$data['count']);
-		header("ts-max-page: ".ceil($data['count']/$get['limit']));
-		header("ts-active-page: ".$get['page']);
+		if (!$get['id_stock']){
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+		}
 		$return = $data['data'];
+			
 		return $return;
 	}
 	/**
@@ -85,12 +106,40 @@ class alerte_imprimante_absystech extends classes_optima {
 			}
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF('Erreur Insert',500);
+  			throw new errorATF($e->getMessage(),500);
 		}
 		ATF::db($this->db)->commit_transaction();
 
         $return['result'] = true;
         $return['records'] = $result['Records'];
+        return $return;
+	}
+	/**
+	* Permet de modifier une notification d'alerte
+	* @author cyril CHARLIER <ccharlier@absystech.fr>
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array Contient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/  
+	public function _PUT($get,$post){
+		$input = file_get_contents('php://input');
+	    if (!empty($input)) parse_str($input,$post);
+		$return = array();
+		if($post['id_alerte_imprimante']){
+			$post['notification']='non';
+			$this->update($post);
+		}else{
+		    try {
+		    	foreach ($post as $key => $value) {
+			    	$this->update($value);
+		    	}
+		        $return['notices'] = ATF::$msg->getNotices();
+		    } catch (errorATF $e) {
+	  			throw new errorATF($e->getMessage(),500);
+		    }			
+		}
+
+        $return['result'] = true;
         return $return;
 	}
 

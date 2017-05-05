@@ -39,9 +39,24 @@ class etat_imprimante_absystech extends classes_optima {
 		if (!$get['limit']) $get['limit'] = 30;
 		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
+		
+		$colsData = array(
+			'id_stock'
+			,'MAX(date)'=>array('alias'=>'date')
+			,'name'
+			,'color'
+			,'current'
+			,'max'
+			,'type'
+		);
 
 		$this->q->reset();
-		$this->q->setLimit($get['limit']);
+		$this->q->addField($colsData)
+				->addGroup('name');
+		if ($get['id_stock']) {
+			$this->q->where("id_stock",$get['id_stock']);
+		}
+		$this->q->setLimit($get['limit']); 
 		$this->q->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 		foreach ($data["data"] as $k=>$lines) {
@@ -53,9 +68,11 @@ class etat_imprimante_absystech extends classes_optima {
 				}				
 			}
 		}
-		header("ts-total-row: ".$data['count']);
-		header("ts-max-page: ".ceil($data['count']/$get['limit']));
-		header("ts-active-page: ".$get['page']);
+		if (!$get['id_stock']){
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+		}
 		$return = $data['data'];
 		return $return;
 	}
@@ -79,31 +96,31 @@ class etat_imprimante_absystech extends classes_optima {
 				,"name"=>$i['name']
 				,"current"=>$i['current']
 				,"date"=>$etat['date']
-				,"color"=>$i['id_stock']
+				,"color"=>$i['color']
 				,"max"=>$i['max']
 				,"type"=>'toner'
 			);
 		}
 		// Ajouter maintenant les cout copies
 		foreach ($etat['copies'] as $k=>$i) {
-				log::logger($k,'ccharlier');
 			$toinsert[]= array(
 				"id_stock"=>$post['id_stock']
 				,"name"=>$k
 				,"current"=>$i
 				,"date"=>$etat['date']
-				,"type"=> ($k == 'mono')?'copies_noir':'copies_couleur'
+				,"type"=> ($k == 'mono')?'copie_noir':'copie_couleur'
 				,"color"=> NULL
 				,"max"=>NULL
 
 			);
 		}
+
         try {	  
         	ATF::db($this->db)->begin_transaction();  		
 			$result = $this->multi_insert($toinsert);
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF('Erreur Insert',500);
+  			throw new errorATF($e->getMessage(),500);
 		}
 		ATF::db($this->db)->commit_transaction();
 
