@@ -225,21 +225,21 @@ class facture_lm extends facture {
 								   "executionStatus"=>$status["executionStatus"]
 								  )
 							);
-					if($status === "processed") {
+					if($status["executionStatus"] === "processed") {
 						$this->u(array("id_facture"=>$vfacture,
 										"status"=> "payee",
 										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
 									));
 					}
 
-					if($status === "rejected") {
+					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$vfacture,
 										"rejet"=>"non_preleve",
 										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
 									));
 					}
 
-					if($status === "contested") {
+					if($status["executionStatus"] === "contested") {
 						$this->u(array("id_facture"=>$vfacture,
 										"rejet"=>"contestation_debiteur",
 										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
