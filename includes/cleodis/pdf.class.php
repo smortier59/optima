@@ -4604,7 +4604,7 @@ class pdf_cleodis extends pdf {
 					$this->cell(0,5,"A réception de facture",0,1);
 				} elseif ($this->facture['mode_paiement']=="virement") {
 					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
-				} else {
+				} elseif($this->facture['mode_paiement'] !="mandat") {
 					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
 				}
 			}
@@ -4616,7 +4616,7 @@ class pdf_cleodis extends pdf {
 			$this->cell(0,5,"ICS ".__ICS__ ,0,1);
 		}
 
-		if($this->facture["mode_paiement"] == "virement"){
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
 			$cadre = array();
 			$cadre[] = $this->societe["nom_banque"];
 			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
@@ -8903,7 +8903,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					$this->cell(0,5,"A réception de facture",0,1);
 				} elseif ($this->facture['mode_paiement']=="virement") {
 					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
-				} else {
+				} elseif($this->facture['mode_paiement'] !="mandat") {
 					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
 				}
 			}
@@ -8915,7 +8915,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cell(0,5,"ICS ".__ICS__ ,0,1);
 
 
-		if($this->facture["mode_paiement"] == "virement"){
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
 			$cadre = array();
 			$cadre[] = $this->societe["nom_banque"];
 			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
