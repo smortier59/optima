@@ -209,7 +209,7 @@ class facture_lm extends facture {
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						 ->where("executionStatus","toprocess","AND");
+						 ->where("executionStatus","processed","AND",false,"!=");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
@@ -220,7 +220,7 @@ class facture_lm extends facture {
 				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> " , "StatutDebitSlimpay");
 				log::logger($status , "StatutDebitSlimpay");
 
-				if($facture["executionStatus"] !== $status["executionStatus"]){
+				if($facture["executionStatus"] !== $status["executionStatus"] || $status["executionStatus"] != "processed" ){
 					$this->u(array("id_facture"=>$facture["id_facture"],
 								   "executionStatus"=>$status["executionStatus"]
 								  )
