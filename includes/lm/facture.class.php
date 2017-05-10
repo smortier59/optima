@@ -183,7 +183,7 @@ class facture_lm extends facture {
 					$this->u(array("id_facture"=>$vfacture,
 								   "id_slimpay"=>$status["id"],
 								   "executionStatus"=>$status["executionStatus"],
-								   "executionDate"=>$status["executionDate"]
+								   "executionDate"=>$status["executionDate"],
 								  )
 							);
 				}
@@ -224,6 +224,26 @@ class facture_lm extends facture {
 								   "executionStatus"=>$status["executionStatus"]
 								  )
 							);
+					if($status === "processed") {
+						$this->u(array("id_facture"=>$vfacture,
+										"status"=> "payee",
+										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
+
+					if($status === "rejected") {
+						$this->u(array("id_facture"=>$vfacture,
+										"rejet"=>"non_preleve",
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
+
+					if($status === "contested") {
+						$this->u(array("id_facture"=>$vfacture,
+										"rejet"=>"contestation_debiteur",
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
 				}
 			}
 

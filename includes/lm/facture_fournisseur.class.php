@@ -853,8 +853,28 @@ class facture_fournisseur extends classes_optima {
 				$compteComptable = "604100";
         	}
 
+        	ATF::facture_fournisseur_ligne()->q->reset()->where("id_facture_fournisseur",$value["facture_fournisseur.id_facture_fournisseur_fk"]);
+			$lignes_ff = ATF::facture_fournisseur_ligne()->select_all();
+
+
+
 
         	$rayon = ATF::rayon()->select($pack["id_rayon"] , "centre_cout_profit");
+
+
+        	$recap_produit = array();
+        	$TTC_lignes = 0;
+
+			foreach ($lignes_ff as $k => $v) {
+				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
+				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+			}
+
+			foreach ($recap_produit as $kl => $vl) {
+				if($vl["prix"] > 0){
+					$TTC_lignes += $vl["prix_ttc"];
+				}
+			}
 
         	//TTC
     		$donnees[$key][1][1] = "1";
@@ -868,7 +888,7 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][9] =  date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
         	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
         	$donnees[$key][1][11] = date("Ymd");
-        	$donnees[$key][1][12] = number_format(($value["facture_fournisseur.prix"]),2,".",""); //Montant TTC separateur numeric .
+        	$donnees[$key][1][12] = number_format($TTC_lignes,2,".",""); //Montant TTC separateur numeric .
         	$donnees[$key][1][13] = "EUR";
     		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
     		$donnees[$key][1][15] = "";
@@ -895,10 +915,9 @@ class facture_fournisseur extends classes_optima {
 			$donnees[$key][1][30] = "";
 			$donnees[$key][1][31] = "";
 
-			$total_debit += number_format(($value["facture_fournisseur.prix"]),2,".","");
+			$total_debit += number_format(($TTC_lignes),2,".","");
 
-			ATF::facture_fournisseur_ligne()->q->reset()->where("id_facture_fournisseur",$value["facture_fournisseur.id_facture_fournisseur_fk"]);
-			$lignes_ff = ATF::facture_fournisseur_ligne()->select_all();
+
 
 			$recap_produit = array();
 
@@ -909,8 +928,6 @@ class facture_fournisseur extends classes_optima {
 
 			$i = 2;
 			foreach ($recap_produit as $kl => $vl) {
-
-
 				if($vl["prix"] > 0){
 					$TTC_ligne = $vl["prix_ttc"];
 					$HT_ligne = round($vl["prix"] ,2);
