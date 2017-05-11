@@ -494,10 +494,10 @@ class commande_cleodis extends commande {
 
 							$notifies = array(ATF::societe()->select($cmd['id_societe'],'id_owner'));
 
-							//On met Ludivine en notifié pour les MEP de contrat
+							//On met Jennifer en notifié pour les MEP de contrat
 							if($infos['key']=="date_debut"){
-								$notifies[] = 91; //Cleodis et Cleodis BE lbowe = id_user -> 91
-
+								if(ATF::$codename == "cleodis") $notifies[] = 106;
+								if(ATF::$codename == "cleodisbe") $notifies[] = 107;
 							}
 
 							$suivi = array(
