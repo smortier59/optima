@@ -2044,7 +2044,7 @@ class facture_lm extends facture {
         	$rayon =  $legaccHT = NULL;
 
         	if(ATF::affaire()->select($value["facture.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin")){
-        		$code_magasin = ATF::magasin(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
+        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
         	}
 
         	//On recupere le 1er produit de la facture pour connaitre le pack et donc le rayon
