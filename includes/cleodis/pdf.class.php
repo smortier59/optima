@@ -2839,8 +2839,6 @@ class pdf_cleodis extends pdf {
 				$this->multicell(0,5,"La facture est payable par prélèvement.");
 			}
 
-
-
 		} else {
 			//$this->sety(167);
 			$this->setfont('arial','B',8);
