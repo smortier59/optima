@@ -5,21 +5,21 @@
 * @package Optima
 * @subpackage Absystech
 */
-class etat_imprimante_absystech extends classes_optima {
+class consommable_imprimante_absystech extends classes_optima {
 	/**
 	* Constructeur
 	*/
 	public function __construct() {
 		parent::__construct();
-        $this->table='etat_imprimante';
+		$this->field_nom = 'designation';
+        $this->table='consommable_imprimante';
 		$this->colonnes['fields_column']  = array(
-			'etat_imprimante.id_stock'
-			,'etat_imprimante.name'
-			,'etat_imprimante.date'
-			,'etat_imprimante.color'
-			,'etat_imprimante.current'
-			,'etat_imprimante.max'
-			,'etat_imprimante.type'
+			'id_consommable_imprimante'
+			,'designation'
+			,'code'
+			,'duree'
+			,'prix'
+			,'ref_imprimante'
 		); 
 	}
 	
@@ -33,30 +33,20 @@ class etat_imprimante_absystech extends classes_optima {
 	*/
 	public function _GET($get,$post) {
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "id_stock";
-		if (!$get['trid']) $get['trid'] = "desc";
+		if (!$get['tri']) $get['tri'] = "code";
+		if (!$get['trid']) $get['trid'] = "asc";
 		// Gestion du limit
 		if (!$get['limit']) $get['limit'] = 30;
 		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
 		
-		$colsData = array(
-			'id_stock'
-			,'date'
-			,'name'
-			,'color'
-			,'current'
-			,'max'
-			,'type'
-		);
 
 		$this->q->reset();
-		$this->q->addField($colsData);
-		if ($get['id_stock']) {
-			$this->q->where("id_stock",$get['id_stock'])
-					->addGroup('name')
-					->addOrder('date','desc');
-
+		if ($get['id_consommable_imprimante']) {
+			$this->q->where("id_consommable_imprimante",$get['id_consommable_imprimante']);
+		}
+		if ($get['ref_imprimante']) {
+			$this->q->where("ref_imprimante",$get['ref_imprimante']);
 		}
 		$this->q->setLimit($get['limit']); 
 		$this->q->setCount();
@@ -70,16 +60,18 @@ class etat_imprimante_absystech extends classes_optima {
 				}				
 			}
 		}
-		if (!$get['id_stock']){
+		if($get['id_consommable_imprimante']){
+			$return= $data['data'][0];
+		}else{
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
+			$return = $data['data'];
 		}
-		$return = $data['data'];
 		return $return;
 	}
 	/**
-	* Permet d'ajouter une ou plusieurs informations sur l'imprimante
+	* Permet d'ajouter un consommable sur la reference de l'imprimante
 	* @author cyril CHARLIER <ccharlier@absystech.fr>
 	* @package Telescope\Printer
 	* @param $get array Argument obligatoire mais inutilisé ici.
@@ -91,43 +83,36 @@ class etat_imprimante_absystech extends classes_optima {
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
 		// ajout de toutes les cartouches & de leur état
-		$etat = json_decode($post['etat'],true);
-		foreach ($etat['toners'] as $k=>$i) {
-			$toinsert[]= array(
-				"id_stock"=>$post['id_stock']
-				,"name"=>$i['name']
-				,"current"=>$i['current']
-				,"date"=>$etat['date']
-				,"color"=>$i['color']
-				,"max"=>$i['max']
-				,"type"=>'toner'
-			);
-		}
-		// Ajouter maintenant les cout copies
-		foreach ($etat['copies'] as $k=>$i) {
-			$toinsert[]= array(
-				"id_stock"=>$post['id_stock']
-				,"name"=>$k
-				,"current"=>$i
-				,"date"=>$etat['date']
-				,"type"=> ($k == 'mono')?'copie_noir':'copie_couleur'
-				,"color"=> NULL
-				,"max"=>NULL
-
-			);
-		}
 
         try {	  
-        	ATF::db($this->db)->begin_transaction();  		
-			$result = $this->multi_insert($toinsert);
+			$result = $this->insert($post);
 		} catch (errorATF $e) {
-			ATF::db($this->db)->rollback_transaction();
   			throw new errorATF($e->getMessage(),500);
 		}
-		ATF::db($this->db)->commit_transaction();
 
         $return['result'] = true;
-        $return['etat_imprimante'] = $result['Records'];
+        $return['id_consommable'] = $result;
+        return $return;
+	}
+	/**
+	* Permet de supprimer
+	* @author cyril CHARLIER <ccharlier@absystech.fr>
+	* @package Telescope Hyperviseur CC
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array Contient id_consommable_imprimante 
+	* @return boolean
+	*/  	
+	public function _DELETE($get,$post){
+		$input = file_get_contents('php://input');
+	    if (!empty($input)) parse_str($input,$post);
+		$return = array();
+        try {	  
+			$result = $this->delete($post);
+		} catch (errorATF $e) {
+  			throw new errorATF($e->getMessage(),500);
+		}
+
+        $return['result'] = true;
         return $return;
 	}
 

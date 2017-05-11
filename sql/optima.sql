@@ -33,3 +33,25 @@ ALTER TABLE `etat_imprimante`
 
 ALTER TABLE `etat_imprimante`
   ADD CONSTRAINT `etat_imprimante_ibfk_1` FOREIGN KEY (`id_stock`) REFERENCES `stock` (`id_stock` ON DELETE CASCADE ON UPDATE CASCADE;);
+
+
+
+
+
+
+
+
+
+  CREATE TABLE `extranet_v3_absystech`.`consommable_imprimante` (
+  `id_consommable_imprimante` MEDIUMINT(8) UNSIGNED NOT NULL AUTO_INCREMENT , 
+  `designation` VARCHAR(255) NOT NULL ,
+  `code` VARCHAR(50) NOT NULL , 
+  `duree` INT(10) NOT NULL ,
+  `prix` DECIMAL(10,2) NOT NULL , 
+  `ref_imprimante` VARCHAR(32) NOT NULL ,  
+  PRIMARY KEY (`id_consommable_imprimante`)) ENGINE = InnoDB;
+  
+  ALTER TABLE `consommable_imprimante` DROP FOREIGN KEY `consommable_imprimante_ibfk_1`; ALTER TABLE `consommable_imprimante` 
+  ADD CONSTRAINT `consommable_imprimante_ibfk_1` 
+  FOREIGN KEY (`ref_imprimante`) 
+  REFERENCES `stock`(`ref`) ON DELETE CASCADE ON UPDATE CASCADE;

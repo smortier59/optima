@@ -1132,7 +1132,8 @@ class stock_absystech extends stock {
 		$colsData = array(
 			"stock.id_stock",
 			"serial",
-			'stock.id_affaire'
+			'stock.id_affaire',
+			'ref'
 		);
 		$this->q->reset();
 		if ($get['adresse_mac']) {
