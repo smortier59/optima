@@ -2830,7 +2830,15 @@ class pdf_cleodis extends pdf {
 			$this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
 			$numArticle++;
 			$this->setfont('arial','',8);
-			$this->multicell(0,5,"La facture est payable par chèque à 30 jours date de facture.");
+
+			if($this->commande['type'] == "virement"){
+				$this->multicell(0,5,"La facture est payable par virement.");
+			} elseif($this->commande['type'] == "cheque"){
+				$this->multicell(0,5,"La facture est payable par chèque à 30 jours date de facture.");
+			}else {
+				$this->multicell(0,5,"La facture est payable par prélèvement.");
+			}
+
 
 
 		} else {
