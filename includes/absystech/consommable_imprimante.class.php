@@ -94,6 +94,31 @@ class consommable_imprimante_absystech extends classes_optima {
         $return['id_consommable'] = $result;
         return $return;
 	}
+
+	/**
+	* Permet de modifier un consommable
+	* @author cyril CHARLIER <ccharlier@absystech.fr>
+	* @package Telescope Hyperviseur CC
+	* @param $get array Argument obligatoire mais inutilisé ici.
+	* @param $post array Contient les données envoyé en POST par le formulaire.
+	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*/  
+	public function _PUT($get,$post){
+		$input = file_get_contents('php://input');
+	    if (!empty($input)) parse_str($input,$post);
+		$return = array();
+		// ajout de toutes les cartouches & de leur état
+
+        try {	  
+			$result = $this->update($post);
+		} catch (errorATF $e) {
+  			throw new errorATF($e->getMessage(),500);
+		}
+
+        $return['result'] = true;
+        $return['id_consommable'] = $result;
+        return $return;
+	}
 	/**
 	* Permet de supprimer
 	* @author cyril CHARLIER <ccharlier@absystech.fr>
