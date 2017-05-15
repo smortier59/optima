@@ -34,7 +34,8 @@ class pack_produit extends classes_optima {
 		$this->colonnes["panel"]["affichage_magasin"] = array('libelle_ecran_magasin',
 															  'type_pack_magasin');
 
-		$this->colonnes["panel"]["affichage_site_souscription"] = array('description',
+		$this->colonnes["panel"]["affichage_site_souscription"] = array('pack_alarme',
+																		'description',
 																		'service_inclus',
 																		'fin_formulaire'
 																);

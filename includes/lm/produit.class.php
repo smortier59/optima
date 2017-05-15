@@ -39,6 +39,8 @@ class produit_lm extends produit {
 			,"defaut"
 		);
 
+
+
 		$this->colonnes["panel"]["sous_produit"] = array('id_produit_principal',
 														 'qte_lie_principal',
 														 'sous_produit_unique');
@@ -48,6 +50,16 @@ class produit_lm extends produit {
 																		"description",
 																		'pas'
 																		);
+
+		$this->colonnes["panel"]["simulateur"] = array('text',
+													   'question',
+													   'popin',
+													   'nb_produit_inclus');
+
+		$this->panels['simulateur'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true);
+    	$this->colonnes['panel']["affichage_site_souscription"][]=array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'simulateur');
+
+
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->colonnes["panel"]["fournisseur_lignes"] = array(
