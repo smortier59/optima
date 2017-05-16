@@ -1348,7 +1348,7 @@ class facture_cleodis extends facture {
 					}elseif($i==3){
 						$commande = ATF::commande()->select($item['facture.id_commande_fk']);
 
-						$cleofi == false;
+						$cleofi = false;
 						if($refinanceur['refinanceur']=='CLEOFI'){
 							if($commande["etat"] !== "prolongation" && $commande["etat"] !== "prolongation_contentieux"){
 								$cleofi = true;
