@@ -1235,10 +1235,10 @@ class facture_cleodis extends facture {
 						}
 						$compte_3='445715';
 
-						if(ATF::$codename === "cleodisbe"){
+						/*if(ATF::$codename === "cleodisbe"){
 							$compte_2="706400";
 							$compte_3="445710";
-						}
+						}*/
 						$type="mad";
 
 					}else{
@@ -1248,10 +1248,10 @@ class facture_cleodis extends facture {
 							$compte_2='706400';
 						}
 						$compte_3='445710';
-						if(ATF::$codename === "cleodisbe"){
+						/*if(ATF::$codename === "cleodisbe"){
 							$compte_2="706200";
 							$compte_3="445710";
-						}
+						}*/
 						$type="divers";
 					}
 				}
@@ -2440,10 +2440,10 @@ class facture_cleodisbe extends facture_cleodis {
 						}
 						$compte_3='445715';
 
-						if(ATF::$codename === "cleodisbe"){
+						/*if(ATF::$codename === "cleodisbe"){
 							$compte_2="706400";
 							$compte_3="445710";
-						}
+						}*/
 						$type="mad";
 
 					}else{
@@ -2453,10 +2453,10 @@ class facture_cleodisbe extends facture_cleodis {
 							$compte_2='706400';
 						}
 						$compte_3='445710';
-						if(ATF::$codename === "cleodisbe"){
+						/*if(ATF::$codename === "cleodisbe"){
 							$compte_2="706200";
 							$compte_3="445710";
-						}
+						}*/
 						$type="divers";
 					}
 				}
