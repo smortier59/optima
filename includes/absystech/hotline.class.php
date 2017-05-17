@@ -3106,7 +3106,7 @@ class hotline extends classes_optima {
 
 								//Requête cloturée ou annulée donc pas d'interaction !!
 								$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
-				   				$info_mail["from"] = "optima-hotline@absystech.fr";
+				   				$info_mail["from"] = "optima-hotline@absystech.net";
 				   				$info_mail["html"] = false;
 				   				$info_mail["template"] = 'hotline_deja_cloture';
 				   				$info_mail["text"] = $id_hotline;
