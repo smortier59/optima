@@ -314,7 +314,7 @@ class mockObjectForIMAP extends imap {
 		$return = array(
 			array(
 				"subject" => "=?utf-8?Q?Subject_TU_=31?="
-				,"from" => "TU Expediteur <tu@absystech.fr>"
+				,"from" => "TU Expediteur <tu@absystech.net>"
 				,"to" =>"tu1@absystech-speedmail.com"
 				,"date" => "Mon, 4 Apr 2011 09:14:15 +0200 (CEST)"
 				,"message_id" => "<1170c999570fefd4d26b56c65bac137b@dev.optima.absystech.net>"
@@ -331,7 +331,7 @@ class mockObjectForIMAP extends imap {
 			),
 			array(
 				"subject" => "=?utf-8?Q?Subject_TU_=31?="
-				,"from" => "TU Expediteur <tu@absystech.fr>"
+				,"from" => "TU Expediteur <tu@absystech.net>"
 				,"to" =>"No-reply <tu8-speedmail@absystech-speedmail.com>"
 				,"date" => "Mon, 4 Apr 2011 09:14:15 +0200 (CEST)"
 				,"message_id" => "<1170c999570fefd4d26b56c65bac137b@dev.optima.absystech.net>"
@@ -348,7 +348,7 @@ class mockObjectForIMAP extends imap {
 			),
 			array(
 				"subject" => "=?utf-8?Q?Subject_TU_=31?="
-				,"from" => "TU Expediteur <tu@absystech.fr>"
+				,"from" => "TU Expediteur <tu@absystech.net>"
 				,"to" =>"-speedmail@absystech-speedmail.com"
 				,"date" => "Mon, 4 Apr 2011 09:14:15 +0200 (CEST)"
 				,"message_id" => "<1170c999570fefd4d26b56c65bac137b@dev.optima.absystech.net>"
@@ -365,7 +365,7 @@ class mockObjectForIMAP extends imap {
 			),
 			array(
 				"subject" => "=?utf-8?Q?Subject_TU_=31?="
-				,"from" => "TU Expediteur <tu@absystech.fr>"
+				,"from" => "TU Expediteur <tu@absystech.net>"
 				,"to" =>md5($this->ej)."-".md5($this->ecl)."-".base64_encode(ATF::$codename)."-speedmail@absystech-speedmail.com"
 				,"date" => "Mon, 4 Apr 2011 09:14:15 +0200 (CEST)"
 				,"message_id" => "<1170c999570fefd4d26b56c65bac137b@dev.optima.absystech.net>"

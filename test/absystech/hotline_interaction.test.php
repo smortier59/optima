@@ -101,7 +101,7 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
 			,"pole"=>"system"
 			,"id_agence"=>$this->id_agence
 			,"id_profil"=>$this->id_profil
-			,"email"=>"tu@absystech.fr"
+			,"email"=>"tu@absystech.net"
 			,"custom"=>serialize(array("preference"=>array("langue"=>"fr")))
 			,"date_connection"=>date("Y-m-d H:i:s")
 		);
@@ -599,7 +599,7 @@ class hotline_interaction_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::$msg->getNotices();//Flush des notices
 
         //Modif du mail pour éviter l'erreur "same_mail"
-        ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.fr"));
+        ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.net"));
 
         //Création du jeu de données
         $hotline_interaction['id_hotline']=$this->id_hotline;

@@ -934,7 +934,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         unset($commande["values_commande"]["produits_non_visible"]);
         unset($commande["preview"]);
         $commande["panel_courriel-checkbox"]="on";
-        $commande["commande"]["email"]="tu@absystech.fr";
+        $commande["commande"]["email"]="tu@absystech.net";
         $commande["commande"]["emailCopie"]="tucopie@absystech.fr";
         $commande["commande"]["emailTexte"]="texte tu mail";
         $commande["commande"]["id_devis"]=$id_devis;
@@ -974,7 +974,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         }
         $this->assertEquals(350,$error,"Erreur d'email non declenchée");
 
-        $commande["commande"]["email"]="tu@absystech.fr";
+        $commande["commande"]["email"]="tu@absystech.net";
         //Obligé de faire ça à cause des transactions (la commande s insère et il y a une unicité sur ref !)
         $this->obj->q->reset()->addCondition("ref",ATF::affaire()->select(ATF::devis()->select($id_devis,"id_affaire"),"ref"))->setDimension("row");
         $commandeRef=$this->obj->sa();

@@ -54,7 +54,7 @@ class emailing_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->ep = array(
 			"emailing_projet"=>"Projet TU 1"
 			,"subject"=>"Subject TU 1"
-			,"mail_from"=>"tu@absystech.fr"
+			,"mail_from"=>"tu@absystech.net"
 			,"nom_expediteur"=>"TU Expediteur"
 			,"couleur_fond"=>"EFEFEF"
 			,"corps"=>"Corps du [LINK=".$this->elien[1]['id_emailing_lien']."] mail de projet TU parsemé [LINK=".$this->elien[2]['id_emailing_lien']."] avec des liens\n\n"

@@ -144,7 +144,7 @@ class hotline_test extends ATF_PHPUnit_Framework_TestCase {
 			,"pole"=>"dev"
 			,"id_agence"=>$this->id_agence
 			,"id_profil"=>$this->id_profil
-			,"email"=>"tu@absystech.fr"
+			,"email"=>"tu@absystech.net"
 			,"custom"=>serialize(array("preference"=>array("langue"=>"fr")))
 			,"date_connection"=>date("Y-m-d H:i:s")
 		);
