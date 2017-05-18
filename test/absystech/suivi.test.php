@@ -258,14 +258,14 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_suiviSpeedInsertForWebmail() {
 		ATF::unsetSingleton("messagerie");
 		ATF::setSingleton("messagerie", new mockObjectForMessagerie());
-		ATF::contact()->i(array("nom"=>"TU","email"=>"tu@absystech.fr","id_societe"=>ATF::$usr->get('id_societe')));
+		ATF::contact()->i(array("nom"=>"TU","email"=>"tu@absystech.net","id_societe"=>ATF::$usr->get('id_societe')));
 		$r = $this->obj->suiviSpeedInsertForWebmail($infos);
 		
 		$this->assertNotNull(strpos($r,',value: "email"'),"1/ L'infos n'est pas a la bonne position");
 		$this->assertNotNull(strpos($r,",value: '01-01-2025'"),"2/ L'infos n'est pas a la bonne position");
 		$this->assertNotNull(strpos($r,",value:'01-01-2025'+' '+'09:00'"),"3/ L'infos n'est pas a la bonne position");
 
-		ATF::contact()->i(array("nom"=>"TU2","email"=>"tu@absystech.fr","id_societe"=>ATF::$usr->get('id_societe')));
+		ATF::contact()->i(array("nom"=>"TU2","email"=>"tu@absystech.net","id_societe"=>ATF::$usr->get('id_societe')));
 		ATF::_r("mime",true);
 		$r = $this->obj->suiviSpeedInsertForWebmail($infos);
 	}
@@ -276,9 +276,9 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 		$q = "DELETE FROM suivi ORDER BY id_suivi DESC LIMIT 10";
 		ATF::db()->query($q);
 		
-		$id_user1=ATF::user()->i(array("login"=>"TULOG1","password"=>"TUPWD1","civilite"=>"M","prenom"=>"TU1","nom"=>"TU1","email"=>"tu@absystech.fr"));
-		$id_user2=ATF::user()->i(array("login"=>"TULOG2","password"=>"TUPWD2","civilite"=>"M","prenom"=>"TU2","nom"=>"TU2","email"=>"tu@absystech.fr"));
-		$id_user3=ATF::user()->i(array("login"=>"TULOG3","password"=>"TUPWD3","civilite"=>"M","prenom"=>"TU3","nom"=>"TU3","email"=>"tu@absystech.fr"));
+		$id_user1=ATF::user()->i(array("login"=>"TULOG1","password"=>"TUPWD1","civilite"=>"M","prenom"=>"TU1","nom"=>"TU1","email"=>"tu@absystech.net"));
+		$id_user2=ATF::user()->i(array("login"=>"TULOG2","password"=>"TUPWD2","civilite"=>"M","prenom"=>"TU2","nom"=>"TU2","email"=>"tu@absystech.net"));
+		$id_user3=ATF::user()->i(array("login"=>"TULOG3","password"=>"TUPWD3","civilite"=>"M","prenom"=>"TU3","nom"=>"TU3","email"=>"tu@absystech.net"));
 
 		$tab["preferences"]=array("suivi.mail_digest"=>"non");
 
@@ -336,7 +336,7 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 class mockObjectForMessagerie extends messagerie {
 	public function select($id) {
 		return array(
-			"from"=>"tu@absystech.fr"
+			"from"=>"tu@absystech.net"
 			,"date"=>"2025-01-01 09:00:00"
 		);
 	}

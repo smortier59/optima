@@ -86,7 +86,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_generatePremiereRelance() {
 		$contact["nom"]="Tu_devis";
 		$contact["id_societe"]=ATF::$usr->get('id_societe');
-		$contact["email"]="tu@absystech.fr";
+		$contact["email"]="tu@absystech.net";
 		$this->id_contact=ATF::contact()->i($contact);
 
 		$societe = array(
@@ -120,7 +120,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_generateDeuxiemeRelance() {
 		$contact["nom"]="Tu_devis";
 		$contact["id_societe"]=ATF::$usr->get('id_societe');
-		$contact["email"]="tu@absystech.fr";
+		$contact["email"]="tu@absystech.net";
 		$this->id_contact=ATF::contact()->i($contact);
 
 		$societe = array(
@@ -151,7 +151,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_generateMiseEnDemeure() {
 		$contact["nom"]="Tu_devis";
 		$contact["id_societe"]=ATF::$usr->get('id_societe');
-		$contact["email"]="tu@absystech.fr";
+		$contact["email"]="tu@absystech.net";
 		$this->id_contact=ATF::contact()->i($contact);
 
 		$societe = array(
@@ -183,7 +183,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_generateInjonction() {
 		$contact["nom"]="Tu_devis";
 		$contact["id_societe"]=ATF::$usr->get('id_societe');
-		$contact["email"]="tu@absystech.fr";
+		$contact["email"]="tu@absystech.net";
 		$this->id_contact=ATF::contact()->i($contact);
 
 		$societe = array(
@@ -216,7 +216,7 @@ class relance_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_generateCycleTermine() {
 		$contact["nom"]="Tu_devis";
 		$contact["id_societe"]=ATF::$usr->get('id_societe');
-		$contact["email"]="tu@absystech.fr";
+		$contact["email"]="tu@absystech.net";
 		$this->id_contact=ATF::contact()->i($contact);
 
 		$societe = array(

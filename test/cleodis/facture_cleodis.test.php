@@ -255,7 +255,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         unset($facture["preview"]);
         $facture["panel_courriel-checkbox"]="on";
         $facture["facture"]["type_facture"]="facture";
-        $facture["facture"]["email"]="tu@absystech.fr";
+        $facture["facture"]["email"]="tu@absystech.net";
         $facture["facture"]["emailCopie"]="tucopie@absystech.fr";
         $facture["facture"]["emailTexte"]="texte tu mail";
         $facture["facture"]["id_commande"]=$this->id_commande;
@@ -323,7 +323,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "mode_paiement"=>NULL,
                                     "id_demande_refi"=>NULL,
                                     "id_refinanceur"=>NULL,
-                                    "envoye_mail"=>"tu@absystech.fr",
+                                    "envoye_mail"=>"tu@absystech.net",
                                     "rejet"=>"non_rejet",                               
                                     "commentaire"=> NULL,
                                     "type_libre"=>NULL ,
