@@ -531,8 +531,10 @@ class pdf_lm extends pdf_cleodis {
 					$lignesFormate[$key] = $value;
 					$lignesFormateKey[$value["id_produit"]] = $key;
 				}else{
-					$keyProdPrinc = $lignesFormateKey[ATF::produit()->select($value["id_produit"], "id_produit_principal")];
-					$lignesFormate[$keyProdPrinc]["sous_prod"][$key] = $value;
+					if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
+						$keyProdPrinc = $lignesFormateKey[ATF::produit()->select($value["id_produit"], "id_produit_principal")];
+						$lignesFormate[$keyProdPrinc]["sous_prod"][$key] = $value;
+					}
 				}
 			}
 
