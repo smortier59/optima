@@ -431,6 +431,13 @@ class pdf_lm extends pdf_cleodis {
 		);
 
 		$t = "Pour Leroy Merlin Abonnements";
+		$cadre = array(
+			" ",
+			"Par : Leroy Merlin Abonnements",
+			"Fait à : Lille Lezennes",
+			"Le : ".date('d/m/Y'),
+			" "
+		);
 
 		$this->cadre(110,$y,80,48,$cadre,$t);
 
