@@ -39,6 +39,7 @@ class etat_imprimante_absystech extends classes_optima {
 		if (!$get['limit']) $get['limit'] = 30;
 		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
+		if($get['graph']) $get['page'] == null;
 		
 		$colsData = array(
 			'id_stock'
@@ -54,11 +55,12 @@ class etat_imprimante_absystech extends classes_optima {
 		$this->q->addField($colsData);
 		if ($get['id_stock']) {
 			$this->q->where("id_stock",$get['id_stock'])
-					->addGroup('name')
 					->addOrder('date','desc');
 
 		}
-		$this->q->setLimit($get['limit']); 
+		if ($get['id_stock'] && $get['graph'] != true){
+			$this->q->setLimit($get['limit']); 			
+		}
 		$this->q->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 		foreach ($data["data"] as $k=>$lines) {
@@ -69,6 +71,23 @@ class etat_imprimante_absystech extends classes_optima {
 					unset($data['data'][$k][$k_]);
 				}				
 			}
+		}
+		if ($get['id_stock'] && $get['graph'] != true) {
+			log::logger('ccharlier','ccharlier');
+			$test = array();
+
+			foreach ($data['data'] as $key => $value) {
+				if(!$test[$value['name']]){
+					$test[$value['name']] = $value;
+				}
+			}
+			$data['data'] = array_values($test);
+			$order = array('cyan','magenta','yellow','black',null,null);
+			usort($data['data'], function ($item1, $item2) use ($order){
+				$pos_a = array_search($item1['color'], $order);
+    			$pos_b = array_search($item2['color'], $order);
+    			return $pos_a - $pos_b;
+			});
 		}
 		if (!$get['id_stock']){
 			header("ts-total-row: ".$data['count']);

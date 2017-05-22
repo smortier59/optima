@@ -1122,7 +1122,7 @@ class stock_absystech extends stock {
 	*/
 	public function _GET($get,$post) {
 		// Gestion du tri
-		if (!$get['tri']) $get['tri'] = "ref";
+		if (!$get['tri']) $get['tri'] = "stock.ref";
 		if (!$get['trid']) $get['trid'] = "desc";
 		// Gestion du limit
 		if (!$get['limit']) $get['limit'] = 30;
@@ -1133,15 +1133,19 @@ class stock_absystech extends stock {
 			"stock.id_stock",
 			"serial",
 			'stock.id_affaire',
-			'ref'
+			'stock.ref'
 		);
 		$this->q->reset();
 		if ($get['adresse_mac']) {
 			$this->q->where("adresse_mac",$get['adresse_mac'])->setLimit(1);
 
 		} else if ($get['id_stock']) {
-			$this->q->where("stock.id_stock",$get['id_stock'])->setLimit(1);
 
+			$this->q->addField($colsData)
+					->addField("societe.societe")
+					->addJointure("stock","id_affaire","affaire","id_affaire")
+					->addJointure("affaire","id_societe","societe","id_societe")
+					->where("stock.id_stock",$get['id_stock'])->setLimit(1);
 		} else {
 			$this->q->setLimit($get['limit']);
 		}
