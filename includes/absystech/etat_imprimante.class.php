@@ -39,7 +39,7 @@ class etat_imprimante_absystech extends classes_optima {
 		if (!$get['limit']) $get['limit'] = 30;
 		// Gestionde la page
 		if (!$get['page']) $get['page'] = 0;
-		if($get['graph']) $get['page'] == null;
+		if($get['graph']) $get['page'] = false;
 		
 		$colsData = array(
 			'id_stock'
@@ -58,8 +58,14 @@ class etat_imprimante_absystech extends classes_optima {
 					->addOrder('date','desc');
 
 		}
-		if ($get['id_stock'] && $get['graph'] != true){
+		if ($get['id_stock'] && $get['graph'] != 'true'){
 			$this->q->setLimit($get['limit']); 			
+		}
+		if ($get['graph'] == 'true'){
+			$range = ($get['range'] && $get['range']=="three")?date('Y-m-d H:i:s',strtotime('-3 years')):date('Y-m-d H:i:s',strtotime('-1 years'));
+			$this->q->andWhere("date",$range,false,">")
+					->addOrder('date','asc');
+;
 		}
 		$this->q->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -72,8 +78,7 @@ class etat_imprimante_absystech extends classes_optima {
 				}				
 			}
 		}
-		if ($get['id_stock'] && $get['graph'] != true) {
-			log::logger('ccharlier','ccharlier');
+		if ($get['id_stock'] && $get['graph'] != 'true') {
 			$test = array();
 
 			foreach ($data['data'] as $key => $value) {
