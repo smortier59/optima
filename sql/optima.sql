@@ -1,5 +1,7 @@
+
 UPDATE `user` SET civilite= 'Mme' WHERE civilite = 'Mlle';
 ALTER TABLE `user` CHANGE `civilite` `civilite` ENUM('M','Mme') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'M';
+
 CREATE TABLE `etat_imprimante` (
   `id_etat_imprimante` mediumint(8) UNSIGNED NOT NULL,
   `id_stock` mediumint(8) UNSIGNED NOT NULL,
@@ -83,4 +85,3 @@ ALTER TABLE `consommable_imprimante`
 ALTER TABLE `stock` ADD INDEX(`ref`);
 ALTER TABLE `consommable_imprimante`
   ADD CONSTRAINT `consommable_imprimante_ibfk_1` FOREIGN KEY (`ref_imprimante`) REFERENCES `stock` (`ref`) ON DELETE CASCADE ON UPDATE CASCADE;
-
