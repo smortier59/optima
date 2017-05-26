@@ -80,3 +80,10 @@ ALTER TABLE `consommable_imprimante`
 
 ALTER TABLE `consommable_imprimante`
   ADD CONSTRAINT `consommable_imprimante_ibfk_1` FOREIGN KEY (`ref_imprimante`) REFERENCES `stock` (`ref`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+
+ALTER TABLE `consommable_imprimante` ADD `couleur_consommable` ENUM('noir','cyan','magenta','jaune') NULL AFTER `ref_imprimante`;
+
+

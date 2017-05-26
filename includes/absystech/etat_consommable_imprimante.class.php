@@ -40,7 +40,9 @@ class etat_consommable_imprimante_absystech extends classes_optima {
 		
 		$colsData = array(
 			"consommable_imprimante.designation",
-			"date"
+			"date",
+			"couleur_consommable",
+			"duree"
 		);
 
 		$this->q->reset();
@@ -88,7 +90,7 @@ class etat_consommable_imprimante_absystech extends classes_optima {
 		} catch (errorATF $e) {
   			throw new errorATF($e->getMessage(),500);
 		}
-
+ 
         $return['result'] = true;
         $return['id_etat_consommable_imprimante'] = $result;
         return $return;

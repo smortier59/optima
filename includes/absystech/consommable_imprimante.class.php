@@ -91,7 +91,7 @@ class consommable_imprimante_absystech extends classes_optima {
 		}
 
         $return['result'] = true;
-        $return['id_consommable'] = $result;
+        $return['id_consommable_imprimante'] = $result;
         return $return;
 	}
 
