@@ -4375,9 +4375,16 @@ class pdf_cleodis extends pdf {
 		$this->setMargins(15,30);
 		$this->sety(10);
 
+
+
+
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
-			$this->multicell(0,15,'FACTURE',0,'C');
+			if($this->facture["type_libre"] === "liberatoire"){
+				$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
+			}else{
+				$this->multicell(0,15,'FACTURE',0,'C');
+			}
 		}else{
 			$this->multicell(0,15,'AVOIR',0,'C');
 		}

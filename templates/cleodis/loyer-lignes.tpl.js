@@ -14,8 +14,8 @@ ATF.buildGridEditor({
 		var prix = 0;
 		var total = 0;
 
-		for (var i = 0; i < this.store.getRange().length; i++) {			
-			
+		for (var i = 0; i < this.store.getRange().length; i++) {
+
 			console.log(records[i].data);
 
 
@@ -28,18 +28,18 @@ ATF.buildGridEditor({
 				records[i].data.{$current_class->table}__dot__hotline*1+
 				records[i].data.{$current_class->table}__dot__supervision*1+
 				records[i].data.{$current_class->table}__dot__support*1
-			)*records[i].data.{$current_class->table}__dot__duree; 
+			)*records[i].data.{$current_class->table}__dot__duree;
 			records[i].set('{$current_class->table}__dot__loyer_total',prix);
-			
+
 			{if $current_class->table == "loyer_prolongation"}
 				total+=prix;
-			{else}				
+			{else}
 				if(records[i].data.{$current_class->table}__dot__avec_option == "non"){
 					total+=prix;
 				}
-			{/if}			
-			
-			
+			{/if}
+
+
 		}
 		if(Ext.ComponentMgr.get('{$table}[prix]')){
 			Ext.ComponentMgr.get('{$table}[prix]').setValue(ATF.formatNumeric(total));
@@ -58,14 +58,14 @@ ATF.buildGridEditor({
 			text: '',
 			iconCls: 'arrow_up-button',
 			handler : function(field){
-	
+
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i-1]){
@@ -87,10 +87,10 @@ ATF.buildGridEditor({
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i+1]){
@@ -118,28 +118,28 @@ ATF.buildGridEditor({
 					{/foreach}
 				});
 				grid.stopEditing();
-				
+
 				var idx = 0; // Numéro de ligne par défaut.
 
-				if(store.getCount() != 0){					
-					idx = store.getCount();					
+				if(store.getCount() != 0){
+					idx = store.getCount();
 				}
 
-				if(idx == 0){				
+				if(idx == 0){
 					var index = grid.getSelectionModel().getSelectedCell();
 					if (index) {
 						idx = index[0]+1; // Numéro de ligne sélectionné
 					}
-				}				
-				
+				}
+
 				store.insert(idx, p);
 				grid.startEditing(idx, 0);
 				var records = Ext.ComponentMgr.get('{$id}').store.getRange();
 				records[idx].set('{$current_class->table}__dot__frequence_loyer','mois');
 				{if $current_class->table != "loyer_prolongation"}
-					records[idx].set('{$current_class->table}__dot__avec_option','non');				
+					records[idx].set('{$current_class->table}__dot__avec_option','non');
 				{/if}
-				
+
 			}
 		}, '-', {
 			text: '{ATF::$usr->trans(delete)|escape:javascript}',
@@ -153,7 +153,7 @@ ATF.buildGridEditor({
 				var rec = grid.store.getAt(index[0]);
 				grid.store.remove(rec);
 				grid.refreshHiddenValues();
-				
+
 				Ext.ComponentMgr.get('{$id}').maj();
 			}
 		}],
@@ -191,6 +191,13 @@ ATF.buildGridEditor({
 					editor: new Ext.form.TextField({
 						value:0
 					})
+				{/if}
+			},{
+				header: 'Type',
+				width:20,
+				dataIndex: '{$current_class->table}__dot__type'
+				{if !$no_update}
+					,editor: {include file="generic-gridpanel-combo.tpl.js" key=type function=null}
 				{/if}
 			},{
 				header: 'Frais',
@@ -292,7 +299,7 @@ ATF.buildGridEditor({
 		root: 'result',
 		totalProperty: 'totalCount',
 		idProperty: 'id',
-		remoteSort: true,	
+		remoteSort: true,
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView())}),
 		{if $function}baseParams:{ 'function':'{$function}' },{/if}
 		proxy: new Ext.data.HttpProxy({
