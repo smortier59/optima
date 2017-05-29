@@ -29,7 +29,7 @@ class stock_absystech extends stock {
 			,'stock.libelle'=>array("width"=>100,"align"=>"left","rowEditor"=>"setInfos")
 			,'stock.serial'=>array("width"=>150,"rowEditor"=>"setInfos")
 			,'stock.serialAT'=>array("width"=>150,"rowEditor"=>"setInfos")
-            ,'stock.adresse_mac'=>array("width"=>150,"rowEditor"=>"setInfos")
+			,'stock.adresse_mac'=>array("width"=>150,"rowEditor"=>"setInfos")
 			,'etat'=>array("custom"=>true,"width"=>30,"align"=>"center","renderer"=>"etat")
 			,'affaire.id_societe'=>array()
 			,'stock.prix'=>array("rowEditor"=>"setInfos")
@@ -64,7 +64,7 @@ class stock_absystech extends stock {
 		//Panel group
 		$this->colonnes['panel']['group'] = array(
 			"grouper"=>array("custom"=>true,"xtype"=>"combo","data"=>array("oui","non"),"default"=>"non")
-		 	,"quantite"=>array("custom"=>true,"xtype"=>"numberfield","default"=>"1")
+			,"quantite"=>array("custom"=>true,"xtype"=>"numberfield","default"=>"1")
 		);
 
 		/* Clées étrangères*/
@@ -184,7 +184,7 @@ class stock_absystech extends stock {
 		//verification des etat de la livraison
 		//si elle est completement terminée
 		$nb_ligne=ATF::livraison_ligne()
-		     ->delivery_status_verification($livraison["id_livraison"]);
+			 ->delivery_status_verification($livraison["id_livraison"]);
 		if($nb_ligne!=0){
 			//si il y'a encore du stock non livré
 			$livraison['etat'] = "termine_partiel";
@@ -560,28 +560,28 @@ class stock_absystech extends stock {
 			} else {
 				$return['data'][$k]['allowLivre'] = false;	
 			}
-            $return['data'][$k]['quantiteInMagento'] = $this->getQuantity($i['stock.ref']);
-            $return['data'][$k]['quantite'] = $this->getQuantity($i['stock.ref'],'non');
-            if ($i['etat']=="stock") {
-                $return['data'][$k]['allowMagento'] = true;
-            } else {
-                $return['data'][$k]['allowMagento'] = false;
-            }
-            if ($i['stock.ref']) {
-                $return['data'][$k]['allowVente'] = true;
-            } else {
-                $return['data'][$k]['allowVente'] = false;
-            }
+			$return['data'][$k]['quantiteInMagento'] = $this->getQuantity($i['stock.ref']);
+			$return['data'][$k]['quantite'] = $this->getQuantity($i['stock.ref'],'non');
+			if ($i['etat']=="stock") {
+				$return['data'][$k]['allowMagento'] = true;
+			} else {
+				$return['data'][$k]['allowMagento'] = false;
+			}
+			if ($i['stock.ref']) {
+				$return['data'][$k]['allowVente'] = true;
+			} else {
+				$return['data'][$k]['allowVente'] = false;
+			}
 
 		}
 		return $return;
 	}	
 	
 	/**
-    * Surcharge de la méthode autocomplete pour faire apparaître les infos suplémentaire
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* Surcharge de la méthode autocomplete pour faire apparaître les infos suplémentaire
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param array $infos 
-    */   	
+	*/   	
 	function autocomplete($infos) {
 		if ($infos["limit"]>25) return; // Protection nombre d'enregistrements par page
 		
@@ -609,87 +609,87 @@ class stock_absystech extends stock {
 	
 	/**
 	* Prépare les produits a envoyer a Magento
-    * @author Quentin JANON <qjanon@absystech.fr>
-    * @param array $infos tableau associatif en vue d'un update
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param array $infos tableau associatif en vue d'un update
 	* @return booleen false si il y a eu un problème et true si tout c'est bien passé
 	*/
 	public function updateForMagento($infos) {
 		if (!$infos['prix']) unset($infos['prix']);
-		        		
+						
 		if (!$infos["id_stock"]) return false;
-        else $id_stock = $this->decryptId($infos["id_stock"]);
-        // Récupération du Stock et de ses infos
+		else $id_stock = $this->decryptId($infos["id_stock"]);
+		// Récupération du Stock et de ses infos
 		$this->q->reset()
 				->addField('ref')
 				->addField('prix')
-                ->addField('description')
-                ->addField('short_description')
-                ->addField('categories_magento')
+				->addField('description')
+				->addField('short_description')
+				->addField('categories_magento')
 				->addField('libelle')
 				->addField('marque')
 				->where('stock.id_stock',$this->decryptId($infos["id_stock"]));
 		$r = $this->select_row();
-        // Si pas de ref alors on renvoi une erreur claire !
-        if (!$r['ref']) {
-            throw new errorStock("il_manque_la_ref",902);
-        }
-        
-        // Est ce que le produit a une marque ? Sinon on essaye de la retrouver
-        if (!$r['marque']) {
-            $r['marque'] = $this->getMarque($r['libelle']);
-            if (!$r['marque']) {
-                throw new errorStock("impossible_de_definir_la_marque_du_stock",904);
-            }
-        }
-        
-        // On prépare notre tableau pour Magento
-        $magento = array(
-            "ref"=>$r['ref'],
-            "libelle"=>$r['libelle'],
-            "marque"=>$r['marque'],
-            "id_stock"=>$id_stock,
-            "prix"=>$infos['prix']?$infos['prix']:$r['prix'],
-            "categories_magento"=>$infos["categories_magento"]?$infos["categories_magento"]:$r['categories_magento'],
-            "description"=>$r['description'],
-            "short_description"=>$r["short_description"]
-        );
-        
-        // Throw si pas de prix !
-        
+		// Si pas de ref alors on renvoi une erreur claire !
+		if (!$r['ref']) {
+			throw new errorStock("il_manque_la_ref",902);
+		}
+		
+		// Est ce que le produit a une marque ? Sinon on essaye de la retrouver
+		if (!$r['marque']) {
+			$r['marque'] = $this->getMarque($r['libelle']);
+			if (!$r['marque']) {
+				throw new errorStock("impossible_de_definir_la_marque_du_stock",904);
+			}
+		}
+		
+		// On prépare notre tableau pour Magento
+		$magento = array(
+			"ref"=>$r['ref'],
+			"libelle"=>$r['libelle'],
+			"marque"=>$r['marque'],
+			"id_stock"=>$id_stock,
+			"prix"=>$infos['prix']?$infos['prix']:$r['prix'],
+			"categories_magento"=>$infos["categories_magento"]?$infos["categories_magento"]:$r['categories_magento'],
+			"description"=>$r['description'],
+			"short_description"=>$r["short_description"]
+		);
+		
+		// Throw si pas de prix !
+		
 		ATF::db($this->db)->begin_transaction();
-        
-        try {
-            // Envoi vers Magento
-            if ($infos['action'] == 'send') {
-                $magento['to_magento'] = "oui";
-                if ($infos['icecatParsing']) $this->ParserIcecat($magento);
-                // Mise a jour du stock (et de tous ses confrères)
-                $this->update($magento);
-                $this->update_all_ref($magento);
-                $behavior = "append";
-            } else {
-                // Supression de Magento
-                $magento['to_magento'] = "non";
-                
-                if ($infos['nb'] == "yes") { // On enlève tous les produits avec la même ref de magento
-                    $behavior = "delete";
-                    $this->update($magento);
-                    $this->update_all_ref($magento);
-                    
-                } else { // On ne supprime qu'un produit (dans le cas d'une vente par exemple)
-                    $behavior = "replace";
-                    $this->u($magento);
-                }
-            }
-            $this->sendToMagento($magento,$behavior);
-        } catch (errorStock $e) {
-            ATF::db()->rollback_transaction();
-            throw $e; 
-        }
-        
-        ATF::$msg->addNotice(loc::mt(ATF::$usr->trans("notice_update_success"),array("record"=>$r['ref'])),ATF::$usr->trans("notice_success_title"));
-        ATF::db($this->db)->commit_transaction();
-                
+		
+		try {
+			// Envoi vers Magento
+			if ($infos['action'] == 'send') {
+				$magento['to_magento'] = "oui";
+				if ($infos['icecatParsing']) $this->ParserIcecat($magento);
+				// Mise a jour du stock (et de tous ses confrères)
+				$this->update($magento);
+				$this->update_all_ref($magento);
+				$behavior = "append";
+			} else {
+				// Supression de Magento
+				$magento['to_magento'] = "non";
+				
+				if ($infos['nb'] == "yes") { // On enlève tous les produits avec la même ref de magento
+					$behavior = "delete";
+					$this->update($magento);
+					$this->update_all_ref($magento);
+					
+				} else { // On ne supprime qu'un produit (dans le cas d'une vente par exemple)
+					$behavior = "replace";
+					$this->u($magento);
+				}
+			}
+			$this->sendToMagento($magento,$behavior);
+		} catch (errorStock $e) {
+			ATF::db()->rollback_transaction();
+			throw $e; 
+		}
+		
+		ATF::$msg->addNotice(loc::mt(ATF::$usr->trans("notice_update_success"),array("record"=>$r['ref'])),ATF::$usr->trans("notice_success_title"));
+		ATF::db($this->db)->commit_transaction();
+				
 		return true;
 	}
 	
@@ -746,16 +746,16 @@ class stock_absystech extends stock {
 
 	/**
 	* Méthode permettant de recuperer les infos icecat de compléter avant l'insert
-    * Infos récupéré : description, shortDescription, poids et les images
-    * @author Antoine MAITRE <amaitre@absystech.fr>
-    * @author Quentin JANON <qjanon@absystech.fr>
-    * @param array $infos tableau représentant l'insert
+	* Infos récupéré : description, shortDescription, poids et les images
+	* @author Antoine MAITRE <amaitre@absystech.fr>
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param array $infos tableau représentant l'insert
 	* @return bool retourne true si tout se passe bien et false en cas d echec
 	*/
 	
 	public function getDataFromIcecat($marque,$ref,$id_stock) {
-	    		
-        // URL ICE CAT VERS LA FICHE TECHNIQUE DU PRODUIT
+				
+		// URL ICE CAT VERS LA FICHE TECHNIQUE DU PRODUIT
 		$urls = "http://prf.icecat.biz/?shopname=openIcecat-url;smi=product;vendor=".urlencode($marque).';prod_id='.urlencode($ref).";lang=fr";
 
 		$ch = curl_init($urls); 
@@ -765,39 +765,39 @@ class stock_absystech extends stock {
 		$html = curl_exec($ch);
 		$html = mb_convert_encoding($html, "UTF-8"); 
 		curl_close($ch);
-        
-        // Pour éviter les caractère pourries qui empêche la bonne résolution des Regex
-        $html = str_replace("`","'",$html);
-        
-        // La fiche technique est inaccessible : Produit obsolète ou alors la REF n'est pas bonn, ou bien la marque :/
+		
+		// Pour éviter les caractère pourries qui empêche la bonne résolution des Regex
+		$html = str_replace("`","'",$html);
+		
+		// La fiche technique est inaccessible : Produit obsolète ou alors la REF n'est pas bonn, ou bien la marque :/
 		if (preg_match('#Désolé, pour ce produit, nous n\'avons pas trouvé d\'autres informations produit.<br>Si vous n\'êtes pas redirigés automatiquement, veuillez cliquer#', $html) || !$html) {
-            throw new errorStock(ATF::$usr->trans("fiche_technique_inaccessible_for_url : ").$urls,910);
-        }
-                
+			throw new errorStock(ATF::$usr->trans("fiche_technique_inaccessible_for_url : ").$urls,910);
+		}
+				
 		$html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");
 		
-        // On récupère l'id icecat pour pouvoir appeler le XML qui est plus facile a parser que le HTML
-        preg_match('#<input type="hidden" name="icecat_id"\s+value="(.*?)" />#si', $html, $pregResult);
+		// On récupère l'id icecat pour pouvoir appeler le XML qui est plus facile a parser que le HTML
+		preg_match('#<input type="hidden" name="icecat_id"\s+value="(.*?)" />#si', $html, $pregResult);
 
-        if ($idIceCat = $pregResult[1]) {
-            $dom = new DOMDocument();
-            //$dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/435466.xml"); // Fiche avec tout ce qui faut comme infos
-            $dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/".$idIceCat.".xml"); 
-            $xpath = new Domxpath($dom); 
-            
-            $shortDesc = $xpath->query("//ShortSummaryDescription");
-            if ($shortDesc->length) $return['short_description'] = $shortDesc->item(0)->nodeValue; 
-            $desc = $dom->getElementsByTagName('ProductDescription'); 
-            $return['description'] = ($desc->length && $desc->item(0)->getAttribute("LongDesc"))?$desc->item(0)->getAttribute("LongDesc"):$xpath->query("//LongSummaryDescription")->item(0)->nodeValue; 
-            $nodePoids = $xpath->query("//ProductFeature[@No='100021']");
-            if ($nodePoids->length) $return['poids'] = $nodePoids->item(0)->getAttribute("Presentation_Value");
-            
-            if (!file_exists($this->filepath($id_stock, "photo"))) {
-                $this->getImageFromIcecat($dom, $id_stock);
-            }   
-        }
-        
-        $return["description"] .= "<br /><br /><a href=".$urls." target=_blank>Pour plus d'informations, cliquez sur ce lien.<a>";
+		if ($idIceCat = $pregResult[1]) {
+			$dom = new DOMDocument();
+			//$dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/435466.xml"); // Fiche avec tout ce qui faut comme infos
+			$dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/".$idIceCat.".xml"); 
+			$xpath = new Domxpath($dom); 
+			
+			$shortDesc = $xpath->query("//ShortSummaryDescription");
+			if ($shortDesc->length) $return['short_description'] = $shortDesc->item(0)->nodeValue; 
+			$desc = $dom->getElementsByTagName('ProductDescription'); 
+			$return['description'] = ($desc->length && $desc->item(0)->getAttribute("LongDesc"))?$desc->item(0)->getAttribute("LongDesc"):$xpath->query("//LongSummaryDescription")->item(0)->nodeValue; 
+			$nodePoids = $xpath->query("//ProductFeature[@No='100021']");
+			if ($nodePoids->length) $return['poids'] = $nodePoids->item(0)->getAttribute("Presentation_Value");
+			
+			if (!file_exists($this->filepath($id_stock, "photo"))) {
+				$this->getImageFromIcecat($dom, $id_stock);
+			}   
+		}
+		
+		$return["description"] .= "<br /><br /><a href=".$urls." target=_blank>Pour plus d'informations, cliquez sur ce lien.<a>";
 		return $return; 
 	}
 
@@ -809,228 +809,228 @@ class stock_absystech extends stock {
 	*/
 	
 	public function getImageFromIcecat($dom,$id) {
-	    if (!$dom) return false;
-        if ($product = $dom->getElementsByTagName('Product')) {
-            $urlHighPic = $product->item(0)->getAttribute("HighPic");
-            $data = file_get_contents($urlHighPic);
-            if (strlen($data)) {
-                ATF::util()->file_put_contents($this->filepath($id, "photo"), $data);
-                ATF::$msg->addNotice(ATF::$usr->trans("stock_image_stock_success"), ATF::$usr->trans("stock_image_stock_success_title"));  
-            } else {
-                ATF::$msg->addWarning(ATF::$usr->trans("stock_image_stock_failure"), ATF::$usr->trans("stock_image_stock_failure_title"));  
-            }
-        }
+		if (!$dom) return false;
+		if ($product = $dom->getElementsByTagName('Product')) {
+			$urlHighPic = $product->item(0)->getAttribute("HighPic");
+			$data = file_get_contents($urlHighPic);
+			if (strlen($data)) {
+				ATF::util()->file_put_contents($this->filepath($id, "photo"), $data);
+				ATF::$msg->addNotice(ATF::$usr->trans("stock_image_stock_success"), ATF::$usr->trans("stock_image_stock_success_title"));  
+			} else {
+				ATF::$msg->addWarning(ATF::$usr->trans("stock_image_stock_failure"), ATF::$usr->trans("stock_image_stock_failure_title"));  
+			}
+		}
 	}
 	
 	/**
 	* Méthode permettant de finir de compléter avant l'insert
-    * Récupère la description, le poids et les images du produit
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* Récupère la description, le poids et les images du produit
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param array $infos tableau représentant l'insert
 	* @param mixed $id définit l'id stock de l'objet pour la création de la photo
 	* @return bool false en cas d'erreur et true si tout se passe bien
 	*/
 		
 	public function ParserIcecat(&$data) {
-        if (!$data['marque']) {
-            throw new errorStock("pas_de_marque_pour_ce_stock_impossible_d_interroger_icecat",909);
-        } else {
-            foreach (explode(',',$data['marque']) as $k=>$marque) {
-                $r = $this->getDataFromIcecat($marque,$data['ref'],$data['id_stock']);
-                $data['description'] = $r['description'];
-                $data['short_description'] = $r['short_description'];
-                $data['poids'] = $r['poids'];                
-            }           
-        }
+		if (!$data['marque']) {
+			throw new errorStock("pas_de_marque_pour_ce_stock_impossible_d_interroger_icecat",909);
+		} else {
+			foreach (explode(',',$data['marque']) as $k=>$marque) {
+				$r = $this->getDataFromIcecat($marque,$data['ref'],$data['id_stock']);
+				$data['description'] = $r['description'];
+				$data['short_description'] = $r['short_description'];
+				$data['poids'] = $r['poids'];                
+			}           
+		}
 		return true;
 	}
 
-    /**
-    * Méthode permettant l'envoie d'un produit sur magento
-    * @author Antoine MAITRE <amaitre@absystech.fr>
-    * @author Quentin JANON <qjanon@absystech.fr>
-     *     * @param array $infos correspond aux valeurs necessaires à l'import du produit
-    * @return bool return false quand une erreur survient et true si tout se passe normalement
-    */
+	/**
+	* Méthode permettant l'envoie d'un produit sur magento
+	* @author Antoine MAITRE <amaitre@absystech.fr>
+	* @author Quentin JANON <qjanon@absystech.fr>
+	 *     * @param array $infos correspond aux valeurs necessaires à l'import du produit
+	* @return bool return false quand une erreur survient et true si tout se passe normalement
+	*/
 
-    public function sendToMagento($infos,$behavior="append"){ 
-        $qte = $this->getQuantity($infos['ref'],$infos['to_magento']);
-        if ($behavior=="replace") {
-            $qte = $this->getQuantity($infos['ref'],"oui");
-        }
-        if ($qte<1) $behavior = "delete";  
-        
-            
-        $line = array(
-            "sku"=>$infos['ref'],
-            "_attribute_set"=>"Default",                    //Attribut à mettre par défaut, non optionnel
-            "_type"=>"simple",                              //Attribut à mettre par défaut, non optionnel
-            "qty"=> number_format($qte,4),
-            "description"=>$infos["description"],
-            "image" => NULL,
-            "is_in_stock"=>1,
-            "media_gallery" => NULL,
-            "name"=>substr($infos["libelle"],0,254),    //Le name ne peut pas dépasser 255 caractères, sinon il n'est pas pris par magento
-            "news_from_date"=>date("Y-m-d")." 00:00:00",
-            "news_to_date"=>date("Y-m-d",strtotime("+1 week"))." 00:00:00",
-            "price"=>$infos["prix"],
-            "short_description"=>$infos["short_description"],
-            "small_image" => NULL,
-            "status"=>1,
-            "tax_class_id"=>2,
-            "thumbnail" => NULL,
-            "visibility"=>4,
-            "weight"=>$infos['poids']?number_format($infos['poids'], 4):0,
-            "_category"=>ATF::$usr->trans($infos['categories_magento'], "stock"),          //Chemin de l'emplacement de l'objet dans le magasin
-            "_media_attribute_id" => 88,
-            "_media_image" => NULL,
-            "_media_is_disabled" => 0,
-            "_product_websites"=>"base",                    //Permets le stock des produits dans le frontend et pas seulement le backend
-            "_root_category"=>"Default Category"        //Permets de sélectionner le magasin
-        );
+	public function sendToMagento($infos,$behavior="append"){ 
+		$qte = $this->getQuantity($infos['ref'],$infos['to_magento']);
+		if ($behavior=="replace") {
+			$qte = $this->getQuantity($infos['ref'],"oui");
+		}
+		if ($qte<1) $behavior = "delete";  
+		
+			
+		$line = array(
+			"sku"=>$infos['ref'],
+			"_attribute_set"=>"Default",                    //Attribut à mettre par défaut, non optionnel
+			"_type"=>"simple",                              //Attribut à mettre par défaut, non optionnel
+			"qty"=> number_format($qte,4),
+			"description"=>$infos["description"],
+			"image" => NULL,
+			"is_in_stock"=>1,
+			"media_gallery" => NULL,
+			"name"=>substr($infos["libelle"],0,254),    //Le name ne peut pas dépasser 255 caractères, sinon il n'est pas pris par magento
+			"news_from_date"=>date("Y-m-d")." 00:00:00",
+			"news_to_date"=>date("Y-m-d",strtotime("+1 week"))." 00:00:00",
+			"price"=>$infos["prix"],
+			"short_description"=>$infos["short_description"],
+			"small_image" => NULL,
+			"status"=>1,
+			"tax_class_id"=>2,
+			"thumbnail" => NULL,
+			"visibility"=>4,
+			"weight"=>$infos['poids']?number_format($infos['poids'], 4):0,
+			"_category"=>ATF::$usr->trans($infos['categories_magento'], "stock"),          //Chemin de l'emplacement de l'objet dans le magasin
+			"_media_attribute_id" => 88,
+			"_media_image" => NULL,
+			"_media_is_disabled" => 0,
+			"_product_websites"=>"base",                    //Permets le stock des produits dans le frontend et pas seulement le backend
+			"_root_category"=>"Default Category"        //Permets de sélectionner le magasin
+		);
 
-        $photoPath = $this->filepath($infos['id_stock'], "photo");
-        if (file_exists($photoPath)) {
-            if (!copy($photoPath, __STORE_PATH__.'media/import/'.$infos['id_stock'].".photo.png")) {
-                ATF::$msg->addWarning(ATF::$usr->trans("stock_image_stock_failure").__STORE_PATH__.'media/import/', ATF::$usr->trans("stock_image_stock_failure_title"));
-                $line['image'] = NULL;
-                $line['media_gallery'] = NULL;
-                $line['small_image'] = NULL;
-                $line['_media_image'] = NULL;
-            } else {
-                $line['image'] = $infos['id_stock'].".photo.png";
-                $line['media_gallery'] = $infos['id_stock'].".photo.png";
-                $line['small_image'] = $infos['id_stock'].".photo.png";
-                $line['_media_image'] = $infos['id_stock'].".photo.png";
-            }
-        }
-        
-        // Création du fichier CSV pour l'import
-        $filenameCSV = "/tmp/Produit_mag.csv";
-        $tmpCSV = fopen($filenameCSV, 'w+');
-        // Entête
-        fputcsv($tmpCSV, array_keys($line));
-        fputcsv($tmpCSV, $line);
-        fclose($tmpCSV);
-        
-        $string = "login[username]=".urlencode('Optima')."&login[password]=".urlencode('qGS4Fb7d7BOKZTj');
-        
-        $formulaire = array();
-        $formulaire["entity"]=urlencode('catalog_product');
-        // Comportement de l'import : create (append), update (replace) ou delete 
-        $formulaire["behavior"]=$behavior;
-        $formulaire["import_file"] = '@'.realpath($filenameCSV);
-        
-        $cookPath = '/tmp/cookieForMagento.txt';
-        $cook = realpath($cookPath);
-        if ($cook !== false) {
-            unlink($cook);
-            touch($cook);
-            chmod($cook, 0666);
-            fopen($cook, 'w+');
-        } else {
-            touch($cookPath);
-            chmod($cookPath, 0666);
-            fopen($cookPath, 'w+');
-            $cook = realpath($cookPath);
-        }
-        
-        // Connexion a l'admin du STORE
-        $ch = curl_init('http://dev.store.absystech.fr/index.php/admin/admin/');
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_COOKIE, session_name().'='.session_id());
-        curl_setopt($ch, CURLOPT_COOKIESESSION, true);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $cook);
-        $output = curl_exec($ch);
-        
-        if ($err = curl_error($ch)){
-            throw new errorStock("Erreur cURL 0: ".curl_errno($ch)." : ".curl_error($ch));  
-        }
-        unset($err);        
-        curl_close($ch);
-        
-        $ch = curl_init(__STORE_URL__.'index.php/admin/admin/import/');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
-        //curl_setopt($ch, CURLOPT_VERBOSE, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $output = curl_exec($ch);
-        if ($err = curl_error($ch)){
-            throw new errorStock("Erreur cURL 1 : ".curl_errno($ch)." : ".curl_error($ch));  
-        }
-        unset($err);
-        curl_close($ch);
+		$photoPath = $this->filepath($infos['id_stock'], "photo");
+		if (file_exists($photoPath)) {
+			if (!copy($photoPath, __STORE_PATH__.'media/import/'.$infos['id_stock'].".photo.png")) {
+				ATF::$msg->addWarning(ATF::$usr->trans("stock_image_stock_failure").__STORE_PATH__.'media/import/', ATF::$usr->trans("stock_image_stock_failure_title"));
+				$line['image'] = NULL;
+				$line['media_gallery'] = NULL;
+				$line['small_image'] = NULL;
+				$line['_media_image'] = NULL;
+			} else {
+				$line['image'] = $infos['id_stock'].".photo.png";
+				$line['media_gallery'] = $infos['id_stock'].".photo.png";
+				$line['small_image'] = $infos['id_stock'].".photo.png";
+				$line['_media_image'] = $infos['id_stock'].".photo.png";
+			}
+		}
+		
+		// Création du fichier CSV pour l'import
+		$filenameCSV = "/tmp/Produit_mag.csv";
+		$tmpCSV = fopen($filenameCSV, 'w+');
+		// Entête
+		fputcsv($tmpCSV, array_keys($line));
+		fputcsv($tmpCSV, $line);
+		fclose($tmpCSV);
+		
+		$string = "login[username]=".urlencode('Optima')."&login[password]=".urlencode('qGS4Fb7d7BOKZTj');
+		
+		$formulaire = array();
+		$formulaire["entity"]=urlencode('catalog_product');
+		// Comportement de l'import : create (append), update (replace) ou delete 
+		$formulaire["behavior"]=$behavior;
+		$formulaire["import_file"] = '@'.realpath($filenameCSV);
+		
+		$cookPath = '/tmp/cookieForMagento.txt';
+		$cook = realpath($cookPath);
+		if ($cook !== false) {
+			unlink($cook);
+			touch($cook);
+			chmod($cook, 0666);
+			fopen($cook, 'w+');
+		} else {
+			touch($cookPath);
+			chmod($cookPath, 0666);
+			fopen($cookPath, 'w+');
+			$cook = realpath($cookPath);
+		}
+		
+		// Connexion a l'admin du STORE
+		$ch = curl_init('http://dev.store.absystech.fr/index.php/admin/admin/');
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $string);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_COOKIE, session_name().'='.session_id());
+		curl_setopt($ch, CURLOPT_COOKIESESSION, true);
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $cook);
+		$output = curl_exec($ch);
+		
+		if ($err = curl_error($ch)){
+			throw new errorStock("Erreur cURL 0: ".curl_errno($ch)." : ".curl_error($ch));  
+		}
+		unset($err);        
+		curl_close($ch);
+		
+		$ch = curl_init(__STORE_URL__.'index.php/admin/admin/import/');
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
+		//curl_setopt($ch, CURLOPT_VERBOSE, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$output = curl_exec($ch);
+		if ($err = curl_error($ch)){
+			throw new errorStock("Erreur cURL 1 : ".curl_errno($ch)." : ".curl_error($ch));  
+		}
+		unset($err);
+		curl_close($ch);
 
-        preg_match("#FORM_KEY = '([a-zA-Z0-9]+)';#si", $output, $matches);
-        $formulaire['form_key'] = $matches[1];
-        if (!$formulaire['form_key']){
-            throw new errorStock("Aucune cle trouvee... : ".$output);
-        }
+		preg_match("#FORM_KEY = '([a-zA-Z0-9]+)';#si", $output, $matches);
+		$formulaire['form_key'] = $matches[1];
+		if (!$formulaire['form_key']){
+			throw new errorStock("Aucune cle trouvee... : ".$output);
+		}
 
-        $ch = curl_init(__STORE_URL__.'index.php/admin/admin/import/validate/?form_key='.$formulaire['form_key']);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $formulaire);
-        $output = curl_exec($ch);
+		$ch = curl_init(__STORE_URL__.'index.php/admin/admin/import/validate/?form_key='.$formulaire['form_key']);
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $formulaire);
+		$output = curl_exec($ch);
 
-        if ($err = curl_error($ch)){
-            throw new errorStock("Erreur cURL 2 : ".curl_errno($ch)." : ".curl_error($ch));  
-        }
-        unset($err);        
-        curl_close($ch);
-        
-        // Si le fichier est invalide, alors on déclenche une erreur en affichant le problème
-        if (!preg_match('#File is valid#', $output)) {
-            preg_match('#"innerHTML":\{"import_validation_messages":(.*?)"\}#i',$output,$m);
-            // check des erreurs connues 
-            if (preg_match("#Required attribute '([a-zA-Z_]*)' has an empty value in rows#i",$m[1],$field)) {
-                $msg = ATF::$usr->trans("champ_obligatoire")." Il manque les infos pour le champ : ".ATF::$usr->trans($field[1],"stock");
-            } else {
-                $msg = ATF::$usr->trans("csv_format")." ".$m[1]." (".$output.")";
-            }
-            throw new errorStock($msg);
-        }
+		if ($err = curl_error($ch)){
+			throw new errorStock("Erreur cURL 2 : ".curl_errno($ch)." : ".curl_error($ch));  
+		}
+		unset($err);        
+		curl_close($ch);
+		
+		// Si le fichier est invalide, alors on déclenche une erreur en affichant le problème
+		if (!preg_match('#File is valid#', $output)) {
+			preg_match('#"innerHTML":\{"import_validation_messages":(.*?)"\}#i',$output,$m);
+			// check des erreurs connues 
+			if (preg_match("#Required attribute '([a-zA-Z_]*)' has an empty value in rows#i",$m[1],$field)) {
+				$msg = ATF::$usr->trans("champ_obligatoire")." Il manque les infos pour le champ : ".ATF::$usr->trans($field[1],"stock");
+			} else {
+				$msg = ATF::$usr->trans("csv_format")." ".$m[1]." (".$output.")";
+			}
+			throw new errorStock($msg);
+		}
 
-        $formulaire['import_file'] = "";
-        
-        $ch = curl_init(__STORE_URL__.'index.php/admin/admin/import/start/');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $formulaire);
-        $output = curl_exec($ch);
-        if ($err = curl_error($ch)){
-            throw new errorStock("Erreur cURL 3 : ".curl_errno($ch)." : ".curl_error($ch));  
-        }
-        unset($err);        
-        
-        $index = array();
-        
-        $index['form_key'] = $formulaire['form_key'];
-        $index['process'] = '1,2,3,4,5,6,7,8,9';
-        $index['massaction_prepare_key'] = 'process';
-        
-        $ch = curl_init(__STORE_URL__.'index.php/admin/admin/process/massReindex/');
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $index);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//       curl_setopt($ch, CURLOPT_VERBOSE, true);
-        $output = curl_exec($ch);
-        if ($err = curl_error($ch)){
-            throw new errorStock("Erreur cURL 4 : ".curl_errno($ch)." : ".curl_error($ch));  
-        }
-        unset($err);        
-                
-        curl_close($ch);
+		$formulaire['import_file'] = "";
+		
+		$ch = curl_init(__STORE_URL__.'index.php/admin/admin/import/start/');
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $formulaire);
+		$output = curl_exec($ch);
+		if ($err = curl_error($ch)){
+			throw new errorStock("Erreur cURL 3 : ".curl_errno($ch)." : ".curl_error($ch));  
+		}
+		unset($err);        
+		
+		$index = array();
+		
+		$index['form_key'] = $formulaire['form_key'];
+		$index['process'] = '1,2,3,4,5,6,7,8,9';
+		$index['massaction_prepare_key'] = 'process';
+		
+		$ch = curl_init(__STORE_URL__.'index.php/admin/admin/process/massReindex/');
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $cook);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $index);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);//       curl_setopt($ch, CURLOPT_VERBOSE, true);
+		$output = curl_exec($ch);
+		if ($err = curl_error($ch)){
+			throw new errorStock("Erreur cURL 4 : ".curl_errno($ch)." : ".curl_error($ch));  
+		}
+		unset($err);        
+				
+		curl_close($ch);
 
-        unlink($cook);
-        unlink($filenameCSV);
-        ATF::$msg->addNotice(ATF::$usr->trans("import_mag_success"),ATF::$usr->trans("mag_success_title"));
-        return true;
+		unlink($cook);
+		unlink($filenameCSV);
+		ATF::$msg->addNotice(ATF::$usr->trans("import_mag_success"),ATF::$usr->trans("mag_success_title"));
+		return true;
 
-    }
+	}
 
 	/**
 	* Méthode permettant l'update de tous les produits ayant la même ref et étant en stock
@@ -1042,28 +1042,28 @@ class stock_absystech extends stock {
 	public function update_all_ref($infos){
 	return true;	
 	if (!$infos['id_stock']) return false;
-        //$infos['id_stock'] = $this->decryptId($infos['id_stock']);        
-        $r = $this->select($infos['id_stock']);
+		//$infos['id_stock'] = $this->decryptId($infos['id_stock']);        
+		$r = $this->select($infos['id_stock']);
 
-        $product = array(
-            "ref"=>$r["ref"],
-            "libelle"=>$r["libelle"],
-            "prix"=>$r['prix'],
-            "marque"=>$r["marque"],
-            "description"=>$r["description"],
-            "short_description"=>$r["short_description"],
-            "poids"=>$r["poids"],
-            "categories_magento"=>$r["categories_magento"],
-            "to_magento"=>$r["to_magento"],
-        );
-        
+		$product = array(
+			"ref"=>$r["ref"],
+			"libelle"=>$r["libelle"],
+			"prix"=>$r['prix'],
+			"marque"=>$r["marque"],
+			"description"=>$r["description"],
+			"short_description"=>$r["short_description"],
+			"poids"=>$r["poids"],
+			"categories_magento"=>$r["categories_magento"],
+			"to_magento"=>$r["to_magento"],
+		);
+		
 		$this->q->reset()->addField('id_stock')->where('ref', $product['ref']);
 		$r = $this->sa();
 		foreach($r as $k=>$i) {
-            $product['id_stock'] = $i['id_stock'];
-            $this->update($product);
+			$product['id_stock'] = $i['id_stock'];
+			$this->update($product);
 		}
-        
+		
 		return true;
 	}
 
@@ -1111,9 +1111,69 @@ class stock_absystech extends stock {
 								));
 		}
 		return parent::update($infos);
-	}	
+	}
+	/**
+	* Fonction _GET pour telescope
+	* @package Telescope - Hyperviseur CC
+	* @author Charlier Cyril <ccharlier@absystech.fr>
+	* @param $get array.
+	* @param $post array Argument obligatoire.
+	* @return boolean | integer
+	*/
+	public function _GET($get,$post) {
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "stock.ref";
+		if (!$get['trid']) $get['trid'] = "desc";
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+		// Gestionde la page
+		if (!$get['page']) $get['page'] = 0;
 
-};
+		$colsData = array(
+			"stock.id_stock",
+			"serial",
+			'stock.id_affaire',
+			'stock.ref'
+		);
+		$this->q->reset();
+		if ($get['adresse_mac']) {
+			$this->q->where("adresse_mac",$get['adresse_mac'])->setLimit(1);
+
+		} else if ($get['id_stock']) {
+
+			$this->q->addField($colsData)
+					->addField("societe.societe")
+					->addJointure("stock","id_affaire","affaire","id_affaire")
+					->addJointure("affaire","id_societe","societe","id_societe")
+					->where("stock.id_stock",$get['id_stock'])->setLimit(1);
+		} else {
+			$this->q->setLimit($get['limit']);
+		}
+		$this->q->addField($colsData)
+				->setCount();
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+				}				
+			}
+		}
+		// si l'on recupère un seul user, on renvoie directement la premiere ligne du tableau
+		if($get['adresse_mac'] || $get['id_stock']){
+			$return = $data['data'][0];	
+		}else{	
+			header("ts-total-row: ".$data['count']);
+			header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			header("ts-active-page: ".$get['page']);
+			$return = $data['data'];
+		}
+		return $return;
+	}
+}
+
 class errorStock extends errorATF {};
 
 class stock_att extends stock_absystech { };
