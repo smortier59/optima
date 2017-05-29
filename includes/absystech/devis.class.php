@@ -471,9 +471,8 @@ class devis_absystech extends devis {
 				->setToString();
 				$subQuery = $d->select_all();
 
-				$this->q
-				->addCondition("devis.id_devis",$subQuery,'AND',false,"=",false,true)
-				->addOrder('devis.date_modification','desc');
+				$this->q->addCondition("devis.id_devis",$subQuery,'AND',false,"=",false,true);
+				if(!$order_by) $this->q->addOrder('devis.date_modification','desc');
 			}
 		}
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -493,6 +492,13 @@ class devis_absystech extends devis {
 			} else {
 				$return['data'][$k]['allowCancel'] = false;
 			}
+
+			if (file_exists($this->filepath($i['devis.id_devis_fk'],"fichier_joint"))){
+				$return['data'][$k]["fichier_joint"] = true;
+			} else {
+				$return['data'][$k]["fichier_joint"] = false;
+			}
+
 		}
 
 
@@ -657,6 +663,8 @@ class devis_absystech extends devis {
 
 		if($infos["type_devis"] != "consommable"){
 			// On calcul le prix par rapport aux lignes
+
+
 			foreach($infos_ligne as $key=>$item){
 				foreach($item as $k=>$i){
 					$k_unescape=util::extJSUnescapeDot($k);
@@ -665,6 +673,9 @@ class devis_absystech extends devis {
 				}
 
 				if(!$item["quantite"]) $item["quantite"]=0;
+
+
+
 
 				$prixFinal += $item["prix"]*$item["quantite"];
 			}
@@ -764,6 +775,11 @@ class devis_absystech extends devis {
 		if($infos_ligne){
 			$totalCom = 0;
 			foreach($infos_ligne as $key=>$item){
+				if($item["devis_ligne_dot_visible"] == "on" || $item["devis_ligne_dot_visible"] == "off"){
+					$item["devis_ligne_dot_visible"] = "oui";
+					if($item["devis_ligne_dot_visible"] == "off") $item["devis_ligne_dot_visible"] = "non";
+				}
+
 				if(!$item["devis_ligne__dot__quantite"]){
 					$item["devis_ligne__dot__quantite"]=0;
 				}
@@ -796,13 +812,17 @@ class devis_absystech extends devis {
 				if(!$item["quantite"]){
 					$item["quantite"]=0;
 				}
-				//$item["visible"] = ($item["visible"] == "on")? 'oui':'non';
+				//Pour Telescope visibilité de la ligne
+				if($item["visible"] == "on" || !isset($item["visible"])){
+					$item["visible"] = ($item["visible"] == "on")? 'oui':'non';
+				}
 				ATF::devis_ligne()->insert($item,$s);
 			}
 		}
 
 		if($consommables && $infos["type_devis"] == "consommable"){
 			foreach($consommables as $key=>$item){
+
 				foreach($item as $k=>$i){
 					$k_unescape=util::extJSUnescapeDot($k);
 					$item[str_replace("devis_ligne.","",$k_unescape)]=$i;
@@ -816,6 +836,13 @@ class devis_absystech extends devis {
 				$item["index"]=util::extJSEscapeDot($key);
 				$item["quantite"]=1;
 
+				//log::logger($item , "mfleurquin");
+
+				//Pour Telescope visibilité de la ligne
+				if($item["visible"] == "on" || !isset($item["visible"])){
+					$item["visible"] = ($item["visible"] == "on")? 'oui':'non';
+				}
+
 				if(!isset($item["index_nb"])){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF(ATF::$usr->trans("index_nb_inexistant"));
@@ -824,7 +851,6 @@ class devis_absystech extends devis {
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF(ATF::$usr->trans("index_couleur_inexistant"));
 				}
-
 				ATF::devis_ligne()->insert($item,$s);
 			}
 		}
@@ -1503,7 +1529,7 @@ class devis_absystech extends devis {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array("devis.id_devis","devis.ref","resume","affaire","societe.id_societe","revision","devis.id_affaire","devis.etat");
+    $colsData = array("devis.id_devis","devis.ref","resume","affaire","societe.id_societe","revision","devis.id_affaire","devis.etat","devis.prix","devis.validite");
 
     $this->q->reset();
 
@@ -1515,6 +1541,27 @@ class devis_absystech extends devis {
       header("ts-search-term: ".$get['search']);
       $this->q->setSearch($get['search']);
     }
+
+    // Filtre sur l'etat de l'affaire
+
+    if ($get['filters']['gagne'] == "on") {
+		$this->q->where("devis.etat","gagne","OR","etatdevis");
+	}
+	if ($get['filters']['attente'] == "on") {
+		$this->q->where("devis.etat","attente","OR","etatdevis");
+	}
+	if ($get['filters']['remplace'] == "on") {
+		$this->q->where("devis.etat","remplace","OR","etatdevis");
+	}
+	if ($get['filters']['annule'] == "on") {
+		$this->q->where("devis.etat","annule","OR","etatdevis");
+	}
+	if ($get['filters']['bloque'] == "on") {
+		$this->q->where("devis.etat","bloque","OR","etatdevis");
+	}
+	if ($get['filters']['perdu'] == "on") {
+		$this->q->where("devis.etat","perdu","OR","etatdevis");
+	}
 
     if ($get['id_devis']) {
 
@@ -1552,11 +1599,10 @@ class devis_absystech extends devis {
 		$this->q->reset()->where("devis.id_affaire", $data["id_affaire"]);
 		$data["devisAffaire"] = $this->sa();
 
-		$data["idcrypted"] = $this->cryptId($get["id_devis"]);
-
     } else {
       $this->q->setLimit($get['limit'])->setCount();
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
     }
 
 
@@ -1573,6 +1619,7 @@ class devis_absystech extends devis {
 
     	$return = $data;
     }else{
+
       header("ts-total-row: ".$data['count']);
       header("ts-max-page: ".ceil($data['count']/$get['limit']));
       header("ts-active-page: ".$get['page']);
@@ -1599,12 +1646,12 @@ class devis_absystech extends devis {
   	$infos["values_devis"]["consommables"] = json_encode($post["values_devis"]["consommables"]);
   	if($post["preview"]){
   		$infos["preview"] = true;
+  		$infos["telescope"] = true;
   		unset($post["preview"]);
   	}
 
   	unset($post["values_devis"]);
   	$infos["devis"] = $post;
-
 
   	$return= $this->insert($infos);
 
