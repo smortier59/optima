@@ -1,3 +1,9 @@
+#16045 - Facturation loyer libératoire
+ALTER TABLE `loyer` ADD `type` ENUM('engagement','liberatoire') NOT NULL DEFAULT 'engagement' AFTER `duree`;
+ALTER TABLE `facturation` CHANGE `type` `type` ENUM('contrat','prolongation','liberatoire') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'contrat';
+ALTER TABLE `facture` CHANGE `type_libre` `type_libre` ENUM('normale','retard','contentieux','liberatoire') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+
 #DEVIS CLEODIS V2
 ALTER TABLE `devis_ligne` ADD `options` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire`;
 ALTER TABLE `devis` ADD `commentaire_offre_partenaire` TEXT NULL DEFAULT NULL AFTER `raison_refus`;
@@ -134,6 +140,3 @@ ALTER TABLE `questionnaire_fl_ligne`
 
 ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','top office','burger king','flunch') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 
-
-
-ALTER TABLE `affaire` ADD `id_contract_sellandsign` INT(10) UNSIGNED NULL DEFAULT NULL AFTER `type_affaire`;

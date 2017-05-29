@@ -891,6 +891,10 @@ class facturation extends classes_optima {
 							}
 						}
 						if($contact && $item["type"] !=="prolongation"){
+							if($item["type"] =="liberatoire"){
+								$item["type"] = "contrat";
+							}
+
 							if($contact["email"]){
 
 								$path=array("facture"=>"fichier_joint");
@@ -1394,6 +1398,8 @@ class facturation extends classes_optima {
 			$i=$item;
 		}
 
+		if($type=="liberatoire") $type = "contrat";
+
 		if($type){
 			$prefix=$type.$prefix;
 		}
@@ -1507,7 +1513,16 @@ class facturation extends classes_optima {
 						"date_paiement"=>$facture_date_previsionnelle
 					);
 
+					if($facturation["type"] == "liberatoire"){
+						$facture["type_libre"] = "liberatoire";
+					}
+
 					$id_facture=ATF::facture()->i($facture);
+
+					$facture = ATF::facture()->select($id_facture);
+					if($facture["type_libre"] == "liberatoire"){
+						ATF::commande()->stopCommande(array("id_commande"=>$commande["id_commande"]));
+					}
 
 					//Insertion des lignes de factures
 					ATF::commande_ligne()->q->reset()
