@@ -1235,10 +1235,7 @@ class facture_cleodis extends facture {
 						}
 						$compte_3='445715';
 
-						/*if(ATF::$codename === "cleodisbe"){
-							$compte_2="706400";
-							$compte_3="445710";
-						}*/
+
 						$type="mad";
 
 					}else{
@@ -1248,10 +1245,7 @@ class facture_cleodis extends facture {
 							$compte_2='706400';
 						}
 						$compte_3='445710';
-						/*if(ATF::$codename === "cleodisbe"){
-							$compte_2="706200";
-							$compte_3="445710";
-						}*/
+
 						$type="divers";
 					}
 				}
@@ -1350,13 +1344,23 @@ class facture_cleodis extends facture {
 
 						$cleofi = false;
 						if($refinanceur['refinanceur']=='CLEOFI'){
-							if($commande["etat"] !== "prolongation" && $commande["etat"] !== "prolongation_contentieux"){
+							//Si le contrat est en cours pendant la période de la facture, pas d'analytique
+
+							log::logger($commande["date_debut"] , "mfleurquin");
+							log::logger($commande["date_evolution"] , "mfleurquin");
+							log::logger($item['facture.date_periode_debut'] , "mfleurquin");
+							log::logger($item['facture.date_periode_fin'] , "mfleurquin");
+
+							log::logger("--------------------------" , "mfleurquin");
+
+
+							if(strtotime($commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) &&
+							   strtotime($commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
 								$cleofi = true;
 							}
 						}
 
 						if(!$cleofi){
-
 							$row_data["A"]='A1';
 							$row_data["B"]=" ".$date;
 							$row_data["C"]='VEN';
@@ -1390,7 +1394,7 @@ class facture_cleodis extends facture {
 							$row_data["K"]=$dateDebut;
 							$row_data["L"]=$dateFin;
 							$row_data["M"]=$datePrelevement;
-							$row_data["N"] = $refinancement;
+							$row_data["N"]=$refinancement;
 						}
 					}elseif($i==4){
 						if($refinanceur['refinanceur']!='CLEOFI'){
