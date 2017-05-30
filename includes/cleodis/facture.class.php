@@ -1345,15 +1345,6 @@ class facture_cleodis extends facture {
 						$cleofi = false;
 						if($refinanceur['refinanceur']=='CLEOFI'){
 							//Si le contrat est en cours pendant la période de la facture, pas d'analytique
-
-							log::logger($commande["date_debut"] , "mfleurquin");
-							log::logger($commande["date_evolution"] , "mfleurquin");
-							log::logger($item['facture.date_periode_debut'] , "mfleurquin");
-							log::logger($item['facture.date_periode_fin'] , "mfleurquin");
-
-							log::logger("--------------------------" , "mfleurquin");
-
-
 							if(strtotime($commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) &&
 							   strtotime($commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
 								$cleofi = true;
