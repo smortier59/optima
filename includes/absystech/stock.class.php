@@ -1167,7 +1167,6 @@ class stock_absystech extends stock {
 			$return =$data['data'][0];
 			// on envoi un mail à system avec l'adresse mac non connue
 			if($get['identity'] == 'hyperPrint' && $return == NULL){
-				log::logger('null','ccharlier');
 				//Construction du mail  // adresse support.absystech.net
 	  			$infos_mail['adresse_mac']=$get['adresse_mac'];
 	    		$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
@@ -1177,8 +1176,8 @@ class stock_absystech extends stock {
 	    		$info_mail["html"] = true;
 	     		
 	    		//Envoi du mail
-	    		//$mail = new mail($infos_mail);
-	    		//$mail->send();
+	    		$mail = new mail($infos_mail);
+	    		$mail->send();
 			}			
 		}else{	
 			header("ts-total-row: ".$data['count']);
