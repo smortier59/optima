@@ -1149,6 +1149,7 @@ class stock_absystech extends stock {
 		} else {
 			$this->q->setLimit($get['limit']);
 		}
+
 		$this->q->addField($colsData)
 				->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -1163,14 +1164,28 @@ class stock_absystech extends stock {
 		}
 		// si l'on recupère un seul user, on renvoie directement la premiere ligne du tableau
 		if($get['adresse_mac'] || $get['id_stock']){
-			$return = $data['data'][0];	
+			$return =$data['data'][0];
+			// on envoi un mail à system avec l'adresse mac non connue
+			if($get['identity'] == 'hyperPrint' && $return == NULL){
+				//Construction du mail  // adresse support.absystech.net
+	  			$infos_mail['adresse_mac']=$get['adresse_mac'];
+	    		$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
+	    		$infos_mail["objet"] = "Nouvelle imprimante";
+	    		$infos_mail["recipient"] = 'support@absystech.net';
+	    		$infos_mail["template"] = "newPrinterMail";
+	    		$info_mail["html"] = true;
+	     		
+	    		//Envoi du mail
+	    		$mail = new mail($infos_mail);
+	    		$mail->send();
+			}			
 		}else{	
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
 			$return = $data['data'];
 		}
-		return $return;
+		return $return ;
 	}
 }
 
