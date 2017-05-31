@@ -109,7 +109,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
     public function test_createMailInsertERROR2(){
         $this->initHotline();
         //Modif du mail pour éviter l'erreur "same_mail"
-        ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.fr","pole"=>""));
+        ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.net","pole"=>""));
         
         $this->obj->createMailInsert($this->id_hotline);
  
@@ -131,7 +131,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->initInteractions();
 		
 		//Modif du mail pour éviter l'erreur "same_mail"
-		ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.fr"));
+		ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.net"));
 		
 		$this->obj->createMailBilling($this->id_hotline);
 		$this->obj->sendMail();
@@ -157,7 +157,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->initInteractions();
 		
 		//Modif du mail pour éviter l'erreur "same_mail"
-		ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.fr"));
+		ATF::user()->update(array("id_user"=>$this->id_user,"email"=>"tu@absystech.net"));
 		
 		$this->obj->createMailInteraction($this->id_hotline,$this->id_hotline_interaction,false,"1,2");
 		
@@ -183,7 +183,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$usr->set("id_user" , NULL);
 		$id_hotline_interaction = 57162;
 		$id_hotline = 9806;
-		$to = "tu@absystech.fr";
+		$to = "tu@absystech.net";
 		$this->obj->createMailInteractionInternal($to,$id_hotline,$id_hotline_interaction);
 
 	}

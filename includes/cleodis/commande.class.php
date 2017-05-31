@@ -492,6 +492,14 @@ class commande_cleodis extends commande {
 							$client = ATF::societe()->select($cmd['id_societe']);
 							$num_contrat = $cmd['ref'].($client["code_client"]?"-".$client["code_client"]:"");
 
+							$notifies = array(ATF::societe()->select($cmd['id_societe'],'id_owner'));
+
+							//On met Jennifer en notifié pour les MEP de contrat
+							if($infos['key']=="date_debut"){
+								if(ATF::$codename == "cleodis") $notifies[] = 106;
+								if(ATF::$codename == "cleodisbe") $notifies[] = 107;
+							}
+
 							$suivi = array(
 								"id_user"=>ATF::$usr->get('id_user')
 								,"id_societe"=>$cmd['id_societe']
@@ -501,7 +509,7 @@ class commande_cleodis extends commande {
 								,'public'=>'oui'
 								,'suivi_contact'=>array(ATF::devis()->select($cmd['id_devis'],'id_contact'))
 								,'suivi_societe'=>array(ATF::$usr->getID())
-								,'suivi_notifie'=>array(ATF::societe()->select($cmd['id_societe'],'id_owner'))
+								,'suivi_notifie'=>$notifies
 								,'champsComplementaire'=>$infos['key']
 							);
 							if(($infos['key'] == "date_prevision_restitution") || ($infos['key'] == "date_prevision_restitution")){	$suivi["type_suivi"] = "Restitution";	}

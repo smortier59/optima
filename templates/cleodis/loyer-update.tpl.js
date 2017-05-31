@@ -5,6 +5,7 @@
 {$fields=[
 	"{$current_class->table}.loyer"
 	, "{$current_class->table}.duree"
+	, "{$current_class->table}.type"
 	, "{$current_class->table}.assurance"
 	, "{$current_class->table}.frais_de_gestion"
 	, "{$current_class->table}.frequence_loyer"

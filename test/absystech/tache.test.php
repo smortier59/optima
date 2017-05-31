@@ -439,7 +439,7 @@ class tache_test extends ATF_PHPUnit_Framework_TestCase {
 	/* @author Quentin JANON <qjanon@absystech.fr> */
 	public function testDefault_value(){
 
-		$id_user=ATF::user()->i(array("login"=>"TULOG1","password"=>"TUPWD1","civilite"=>"M","prenom"=>"TU1","nom"=>"TU1","email"=>"tu@absystech.fr"));
+		$id_user=ATF::user()->i(array("login"=>"TULOG1","password"=>"TUPWD1","civilite"=>"M","prenom"=>"TU1","nom"=>"TU1","email"=>"tu@absystech.net"));
 		$id_societe=ATF::societe()->i(array("societe"=>"TU"));
 		$id_affaire=ATF::affaire()->i(array("id_societe"=>$id_societe,"affaire"=>"TU 1","date"=>date("Y-m-d")));
 		$id_suivi=ATF::suivi()->i(array("id_user"=>$id_user,"id_societe"=>$id_societe,"id_affaire"=>$id_affaire,"texte"=>"suivi 1"));	

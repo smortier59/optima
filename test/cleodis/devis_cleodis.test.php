@@ -27,7 +27,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["devis"]["id_opportunite"]=10;
 		$devis["devis"]["RIB"]="30027 17536 00013420801 37";
 		$devis["panel_courriel-checkbox"]="on";
-		$devis["devis"]["email"]="tu@absystech.fr";
+		$devis["devis"]["email"]="tu@absystech.net";
 		$devis["devis"]["emailCopie"]="tucopie@absystech.fr";
 		$devis["devis"]["emailTexte"]="texte tu mail";
 		$devis["values_devis"]["produits_non_visible"]='[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]';
@@ -87,7 +87,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["devis"]["id_opportunite"]=10;
 		$devis["devis"]["RIB"]="30027 17536 00013420801 37";
 		$devis["panel_courriel-checkbox"]="on";
-		$devis["devis"]["email"]="tu@absystech.fr";
+		$devis["devis"]["email"]="tu@absystech.net";
 		$devis["devis"]["emailCopie"]="tucopie@absystech.fr";
 		$devis["devis"]["emailTexte"]="texte tu mail";
 
@@ -357,7 +357,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$devis["vente"] = "affaire_26";
 
-		ATF::contact()->u(array("id_contact"=>$devis["devis"]["id_contact"],"email"=>"tu@absystech.fr"));
+		ATF::contact()->u(array("id_contact"=>$devis["devis"]["id_contact"],"email"=>"tu@absystech.net"));
 
 		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
 		$this->assertNotNull($id_devis,'Devis non créé');

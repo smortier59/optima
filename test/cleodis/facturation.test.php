@@ -2043,7 +2043,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::facturation()->d($facturation["id_facturation"]);
 		
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
-		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>"tu@absystech.fr","id_societe" => $id_societe, "nom" => "Toto"));
+		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>"tu@absystech.net","id_societe" => $id_societe, "nom" => "Toto"));
 		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"prolongation","envoye"=>'non',"id_facture"=>NULL));		
 		$return8=$this->obj->facturationMensuelleRestitution(true);	
 		

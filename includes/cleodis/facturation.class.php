@@ -298,6 +298,8 @@ class facturation extends classes_optima {
 						}else{
 							$frequence=1;
 						}
+						$type = "contrat";
+						if($item["type"] == "liberatoire") $type = "liberatoire";
 						if($item["frequence_loyer"] == "jour"){
 							$date_fin=date("Y-m-d H:i:s",strtotime($date_debut."+".$item['duree']." day"));
 							$this->i(array(
@@ -313,7 +315,7 @@ class facturation extends classes_optima {
 												"support"=>$item["support"],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat")
+												"type"=>$type)
 											);
 						}else{
 							//Pour chaque échéance d'une période
@@ -333,7 +335,7 @@ class facturation extends classes_optima {
 												"support"=>$item["support"],
 												"date_periode_fin"=>$date_fin,
 												"date_periode_debut"=>$date_debut,
-												"type"=>"contrat")
+												"type"=>$type)
 											);
 								$date_debut=date("Y-m-d H:i:s",strtotime($date_debut."+".$frequence." month"));
 							}
@@ -889,6 +891,10 @@ class facturation extends classes_optima {
 							}
 						}
 						if($contact && $item["type"] !=="prolongation"){
+							if($item["type"] =="liberatoire"){
+								$item["type"] = "contrat";
+							}
+
 							if($contact["email"]){
 
 								$path=array("facture"=>"fichier_joint");
@@ -1392,6 +1398,8 @@ class facturation extends classes_optima {
 			$i=$item;
 		}
 
+		if($type=="liberatoire") $type = "contrat";
+
 		if($type){
 			$prefix=$type.$prefix;
 		}
@@ -1407,8 +1415,8 @@ class facturation extends classes_optima {
 	public function sendFactures($date_debut,$date_fin,$facture_contrat,$type,$texte,$s){
 		//$emailGlobalFacture["email"]=ATF::societe()->select(246,"email");
 		$emailGlobalFacture["email"] =ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
-		$emailGlobalFacture["texte"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
-		$emailGlobalFacture["objet"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
+		$emailGlobalFacture["texte"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
+		$emailGlobalFacture["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		foreach($facture_contrat as $key => $item){
 			//Envoi d'un pdf contenant toutes les factures contrat
 			//Tri des factures par rapport au code, Societe ou date
@@ -1422,8 +1430,8 @@ class facturation extends classes_optima {
 	public function sendGrille($facturer,$fc,$fp,$date_debut,$date_fin,$type,$texte,$s){
 		//$emailGrille["email"]=ATF::societe()->select(246,"email");
 		$emailGrille["email"] = ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
-		$emailGrille["texte"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
-		$emailGrille["objet"]=$texte." pour la période du ".$date_debut."  au ".$date_fin.".";
+		$emailGrille["texte"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
+		$emailGrille["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 
 		foreach($facturer as $key=>$item){
 			//Tri des factures par rapport au code, Societe ou date
@@ -1505,7 +1513,16 @@ class facturation extends classes_optima {
 						"date_paiement"=>$facture_date_previsionnelle
 					);
 
+					if($facturation["type"] == "liberatoire"){
+						$facture["type_libre"] = "liberatoire";
+					}
+
 					$id_facture=ATF::facture()->i($facture);
+
+					$facture = ATF::facture()->select($id_facture);
+					if($facture["type_libre"] == "liberatoire"){
+						ATF::commande()->stopCommande(array("id_commande"=>$commande["id_commande"]));
+					}
 
 					//Insertion des lignes de factures
 					ATF::commande_ligne()->q->reset()

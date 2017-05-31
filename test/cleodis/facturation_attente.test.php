@@ -66,7 +66,7 @@ class facturation_attente_test extends ATF_PHPUnit_Framework_TestCase {
 
         ATF::facturation()->u(array("id_facturation"=>$facturation[0]["id_facturation"], "id_facture"=>$this->id_facture));
 
-        $data = array("mail"=>json_encode(array("email"=>"tu@absystech.fr","texte"=>"Votre facture pour la pu00e9riode 2015-09-01 - 2015-09-30")),
+        $data = array("mail"=>json_encode(array("email"=>"tu@absystech.net","texte"=>"Votre facture pour la pu00e9riode 2015-09-01 - 2015-09-30")),
         			  "id_facture"=>$this->id_facture,
         			  "nom_table"=>"facture",
         			  "path"=>json_encode(array("facture"=>"fichier_joint")),

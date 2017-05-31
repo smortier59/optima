@@ -1493,13 +1493,15 @@ class commande_lm extends commande {
 	* @param int $id_societe
 	* @return string texte du mail
     */
-	public function abandonCommande($infos){
+	public function abandonCommande($infos, $no_redirect = false){
 		$commande = new commande_lm($infos['id_commande']);
 
 		if ($commande) {
 			$commande->set('etat','abandon');
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
+
+			ATF::affaire()->u(array("id_affaire"=>$affaire->get("id_affaire"), "etat"=>"abandon"));
 
 			$notifie[] = ATF::$usr->getID();
 
@@ -1510,8 +1512,7 @@ class commande_lm extends commande {
 							,"texte"=>"Le contrat ".$affaire->get("ref")." est passé en abandonné"
 						);
 			ATF::suivi()->insert($suivi);
-
-			ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
+			if(!$no_redirect) ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
 		}
 	}
 

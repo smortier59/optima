@@ -183,7 +183,7 @@ class facture_lm extends facture {
 					$this->u(array("id_facture"=>$vfacture,
 								   "id_slimpay"=>$status["id"],
 								   "executionStatus"=>$status["executionStatus"],
-								   "executionDate"=>$status["executionDate"]
+								   "executionDate"=>$status["executionDate"],
 								  )
 							);
 				}
@@ -209,18 +209,42 @@ class facture_lm extends facture {
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						 ->where("executionStatus","toprocess","AND",false,"!=");
+						 ->where("executionStatus","processed","AND",false,"!=");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
-				$facture = $this->select($value["facture.id_facture"], "id_slimpay");
+
+				$facture = $this->select($value["facture.id_facture"]);
 				$status = ATF::slimpay()->getStatutDebit($facture["id_slimpay"]);
 
-				if($facture["executionStatus"] !== $status["executionStatus"]){
-					$this->u(array("id_facture"=>$vfacture,
+				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> " , "StatutDebitSlimpay");
+				log::logger($status , "StatutDebitSlimpay");
+
+				if($facture["executionStatus"] !== $status["executionStatus"] || $status["executionStatus"] != "processed" ){
+					$this->u(array("id_facture"=>$facture["id_facture"],
 								   "executionStatus"=>$status["executionStatus"]
 								  )
 							);
+					if($status["executionStatus"] === "processed") {
+						$this->u(array("id_facture"=>$facture["id_facture"],
+										"status"=> "payee",
+										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
+
+					if($status["executionStatus"] === "rejected") {
+						$this->u(array("id_facture"=>$facture["id_facture"],
+										"rejet"=>"non_preleve",
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
+
+					if($status["executionStatus"] === "contested") {
+						$this->u(array("id_facture"=>$facture["id_facture"],
+										"rejet"=>"contestation_debiteur",
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
 				}
 			}
 
@@ -2020,7 +2044,7 @@ class facture_lm extends facture {
         	$rayon =  $legaccHT = NULL;
 
         	if(ATF::affaire()->select($value["facture.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin")){
-        		$code_magasin = ATF::magasin(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
+        		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
         	}
 
         	//On recupere le 1er produit de la facture pour connaitre le pack et donc le rayon

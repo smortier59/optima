@@ -1985,6 +1985,9 @@ class facture_absystech extends facture {
 			if ($get['filters']['end']) {
 				$this->q->where("facture.date",date('Y-m-d',strtotime($get['filters']['end'])),"AND","date","<=");
 			}
+			if ($get['filters']['compta']) {
+				$this->q->whereIsNull("facture.id_export_comptable");
+			}
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 		}
 
@@ -2145,6 +2148,205 @@ class facture_absystech extends facture {
 		$get['tri'] = "facture.date";
 		$get['trid'] = "desc";
 		return $this->_GET($get,$post);
+	}
+
+	/**
+	 * Génère l'esport comptable des factures du listing
+	 * Affecte un id export comptable aux factures
+	 * Stock le fichier d'export pour pouvoir le ressortir par la suite
+	 * Enregistre les refs client sur les sociétés
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get $_GET
+	 * @return NULL
+	 */
+	//UPDATE `facture` SET `id_export_comptable` = NULL WHERE `id_export_comptable` IS NOT NULL
+	public function _export_comptable($get,$post) {
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
+		log::logger($post,'qjanon');
+		ATF::db($this->db)->begin_transaction();
+		$facturesATraiter = explode(",",$post['factures']);
+		try {
+
+			if (!$post['date_debut']) throw new Exception("DATE_DEBUT_MISSING",1001);
+			if (!$post['date_fin']) throw new Exception("DATE_FIN_MISSING",1002);
+			if (!$post['factures']) throw new Exception("FACTURES_MISSING",1003);
+
+
+			// FIRST STEP : enregistrer les références comptable si il y en a
+			$countRefUpdate = 0;
+			log::logger(count($post['ref_comptable'])." REF COMPTABLE A METTRE A JOUR","export-comptable");
+			if ($post['ref_comptable']) {
+				log::logger($post['ref_comptable'],"export-comptable");
+				foreach ($post['ref_comptable'] as $id_societe=>$ref_comptable) {
+					$toUpdate = array("id_societe"=>$id_societe,"ref_comptable"=>$ref_comptable);
+					log::logger("TO UPDATE","export-comptable");
+					log::logger($toUpdate,"export-comptable");
+					ATF::societe()->u($toUpdate);
+					$countRefUpdate++;
+				}
+			}
+			log::logger($countRefUpdate." REF COMPTABLE MISE A JOUR","export-comptable");
+			// SECOND STEP : Création de l'enregistrement dans la table export_comptable
+			$toInsert = array(
+				"date_debut"=>date("Y-m-d",strtotime($post['date_debut'])),
+				"date_fin"=>date("Y-m-d",strtotime($post['date_fin'])),
+				"id_user"=>ATF::$usr->getID(),
+				"factures"=>$post['factures']
+			);
+			log::logger("CREATION EXPORT BDD","export-comptable");
+			log::logger($toInsert,"export-comptable");
+			$id_export_comptable = ATF::export_comptable()->i($toInsert);
+
+			// THIRD STEP : Affecter l'id export comptable a chacune des factures
+			$countFactureTraitées = 0;
+			log::logger("AFFECTATION ID EXPORT AUX FACTURES","export-comptable");
+			log::logger($facturesATraiter,"export-comptable");
+			foreach ($facturesATraiter as $key=>$id_facture) {
+				ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
+				$countFactureTraitées++;
+			}
+			log::logger($countFactureTraitées." ID EXPORT RELIE AUX FACTURES","export-comptable");
+
+			// FOURTH STEP : génération de l'export, stockage sur le serveur + envoi au navigateur
+			$fn = $this->filepath($id_export_comptable,"exportComptable");
+			log::logger("FILENAME = ".$fn,"export-comptable");
+			$file = fopen($fn, "w+");
+			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit");
+			fputcsv($file, $head, ";");
+
+			foreach ($facturesATraiter as $id_facture) {
+				$facture = ATF::facture()->select($id_facture);
+				$societe = ATF::societe()->select($facture['id_societe']);
+
+				$ttc = $facture['prix']*$facture['tva'];
+				$tvamnt = $ttc - $facture['prix'];
+				$tva = ($facture['tva'] - 1) * 100;
+
+				$line = array(
+					"VT",
+					date('d/m/Y',strtotime($facture['date'])),
+					$societe['ref_comptable'] ? $societe['ref_comptable'] : $post['ref_comptable'][$societe['id_societe']],
+					$societe['societe'],
+					$facture['ref'],
+					$facture['ref']."-".date('d/m/Y',strtotime($facture['date'])),
+					number_format($ttc, 2, ",", ""),
+					""
+				);
+			  fputcsv($file, $line, ";");
+			  fputs("\n");
+
+			  // LIGNES VENTILEES
+				$lignes = $this->getLignes($id_facture);
+				$ventilation = array();
+			  foreach ($lignes as $ligne) {
+			  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
+			  }
+			  foreach ($ventilation as $id_compte=>$total) {
+				  // LIGNES DE VENTILATION
+					$line = array(
+						"VT",
+						date('d/m/Y',strtotime($facture['date'])),
+						ATF::compte_absystech()->select($id_compte,'code'),
+						ATF::compte_absystech()->nom($id_compte),
+						$facture['ref'],
+						$facture['ref']."-".$societe['societe'],
+						"",
+						number_format($total, 2, ",", "")
+					);
+				  fputcsv($file, $line, ";");
+				  fputs("\n");
+			  }
+
+			  // FRAIS DE PORT
+			  if ($facture['frais_de_port'] > 0) {
+					$line = array(
+						"VT",
+						date('d/m/Y',strtotime($facture['date'])),
+						"708500",
+						"FRAIS DE PORT",
+						$facture['ref'],
+						$facture['ref']."-".$societe['societe'],
+						"",
+						number_format($facture['frais_de_port'], 2, ",", "")
+					);
+				  fputcsv($file, $line, ";");
+				  fputs("\n");
+			  }
+
+			  // LIGNES DE TVA
+				$line = array(
+					"VT",
+					date('d/m/Y',strtotime($facture['date'])),
+					"445710",
+					"TVA COLLECTEE ".$tva."%",
+					$facture['ref'],
+					$facture['ref']."-".$societe['societe'],
+					"",
+					number_format($tvamnt, 2, ",", "")
+				);
+			  fputcsv($file, $line, ";");
+			  fputs("\n");
+
+			}
+			fclose($file);
+		} catch (Exception $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
+		ATF::db($this->db)->commit_transaction();
+
+		$mail["recipient"]="compta@absystech.fr";
+		$mail["from"]="Telescope NO-REPLY <no-reply@absystech.fr>";
+		$mail["objet"]= utf8_decode("Export de comptabilité - ").$post['date_debut']." / ".$post['date_fin']." - ".ATF::$usr->get('login');
+		$mail["template"] = "export-comptabilite";
+
+		$m = new mail($mail);
+		$m->addFile($fn,"export_comptabilite.csv",true);
+		$m->send();
+
+		return true;
+	}
+
+	/**
+	 * A partir d'un echantillon ed factures (issu du listing), la fonction va renvoyer toutes les sociétés qui n'ont pas de référence client
+	 * La référence se base sur le champs 'ref_comptable'
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get $_GET
+	 * @return array      Liste de société avec leur réf pré généré
+	 */
+	public function _getClientsExportComptable($get, $post) {
+		// On force le filtre pour avoir uniquzement les factures e traiter
+		$get['filters']['compta'] = 'on';
+		$factures = self::_GET($get);
+		$ids = array();
+		foreach ($factures as $f) {
+			if ($f['id_export_comptable']) continue;
+			$ids[] = $f['id_facture'];
+			ATF::societe()->q->reset()->where('id_societe', $f['id_societe_fk'])->whereIsNull('ref_comptable');
+			$el = ATF::societe()->select_row();
+
+			if (!$el) continue;
+
+			$str = str_replace(" ","",$el['societe']);
+			$str = str_replace("-","",$str);
+			$str = str_replace("'","",$str);
+			$str = str_replace("\"","",$str);
+			$str = util::removeAccents($str);
+			$ref_comptable = "411".strtoupper(substr($str,0,10));
+
+			$return['data'][$el['id_societe']] = array(
+				"id_societe"=>$el['id_societe'],
+				"societe"=>$el['societe'],
+				"ref_comptable"=>$ref_comptable
+			);
+		}
+
+		$return['date_debut'] = $get['filters']['start'];
+		$return['date_fin'] = $get['filters']['end'];
+		$return['factures'] = implode(",", $ids);
+
+		return $return;
 	}
 
 };

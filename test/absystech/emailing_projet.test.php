@@ -160,7 +160,7 @@ class emailing_projet_test extends emailing_test {
 		
 		$params = array(
 			"id_emailing_projet"=>$this->ep['id_emailing_projet']
-			,"email"=>"tu@absystech.fr"
+			,"email"=>"tu@absystech.net"
 		);
 		//Simulation d'URL généré par le fileManager
 		$src = "http://speedmail.absystech.net/emailing_projet-".$this->obj->specialCrypt($this->ep['id_emailing_projet'])."-Fichier1.jpg-200-".base64_encode(ATF::$codename).".jpg";
@@ -169,7 +169,7 @@ class emailing_projet_test extends emailing_test {
 		$this->obj->send($params,$params,true);
 		
 		try {
-			$mbox = imap_open("{zimbra.absystech.net:143/imap/notls}INBOX",'tu@absystech.fr','!1337!');
+			$mbox = imap_open("{zimbra.absystech.net:143/imap/notls}INBOX",'tu@absystech.net','!1337!');
 			$NB = imap_num_msg($mbox);
 	
 			$overview = imap_fetch_overview($mbox, "1:$NB",0);
@@ -179,8 +179,8 @@ class emailing_projet_test extends emailing_test {
 					if ($val->subject!="TEST Subject TU 1") continue;
 					$this->assertNotNull(preg_match("/<img src=\"cid:/",imap_body($mbox,$val->msgno)),"Erreur : Pas d'image en mode CID");
 					$this->assertNotNull(preg_match("/--00002ImagesEmbarquees/",imap_body($mbox,$val->msgno)),"Erreur : Pas d'image embarqué");
-					$this->assertEquals("tu@absystech.fr",$val->to,"Erreur : Le to du mail n'est pas le bon");
-					$this->assertEquals("TU Expediteur <tu@absystech.fr>",$val->from,"Erreur : Le from du mail n'est pas le bon");
+					$this->assertEquals("tu@absystech.net",$val->to,"Erreur : Le to du mail n'est pas le bon");
+					$this->assertEquals("TU Expediteur <tu@absystech.net>",$val->from,"Erreur : Le from du mail n'est pas le bon");
 					$counter++;
 					imap_delete($mbox,$val->msgno);
 				}

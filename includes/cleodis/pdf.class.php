@@ -1083,13 +1083,16 @@ class pdf_cleodis extends pdf {
 	public function devisClassique() {
 		if (!$this->devis) return false;
 
+		if($this->affaire["type_affaire"] == "2SI") $cleodis = "2SI Lease by CLEODIS";
+		else $cleodis = "CLEODIS";
+
 		/* PAGE 2 */
 		$this->setHeader();
 		$this->setTopMargin(30);
 		$this->addpage();
 
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"1 – La ".ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." CLEODIS");
+		$this->multicell(0,5,"1 – La ".ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." ".$cleodis);
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -1107,14 +1110,14 @@ class pdf_cleodis extends pdf {
 
 		$this->ln(10);
 		$this->setfont('arial','U',10);
-		$this->multicell(0,5,"La réponse de CLEODIS");
+		$this->multicell(0,5,"La réponse de ".$cleodis);
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
-		$this->multicell(0,5,"L'objectif de CLEODIS est la mise à disposition de matériels adaptés aux besoins de chaque utilisateur en recherchant la plus grande homogénéité du parc tout en optimisant les coûts liés à la gestion et l'évolution des systèmes d'information.");
-		$this->multicell(0,5,"Pour ce faire CLEODIS s'appuie sur un contrat de location, support financier idéal par sa souplesse, sa capacité à évoluer à tout moment et à intégrer des services de gestion quotidienne du parc. Ainsi, il permet une mise à jour régulière de l'adéquation entre les besoins techniques et les ressources financières.");
+		$this->multicell(0,5,"L'objectif de ".$cleodis." est la mise à disposition de matériels adaptés aux besoins de chaque utilisateur en recherchant la plus grande homogénéité du parc tout en optimisant les coûts liés à la gestion et l'évolution des systèmes d'information.");
+		$this->multicell(0,5,"Pour ce faire ".$cleodis." s'appuie sur un contrat de location, support financier idéal par sa souplesse, sa capacité à évoluer à tout moment et à intégrer des services de gestion quotidienne du parc. Ainsi, il permet une mise à jour régulière de l'adéquation entre les besoins techniques et les ressources financières.");
 
-		$this->multicell(0,5,"Schéma comparatif LLD CLEODIS / ACHAT ou CREDIT-BAIL :");
+		$this->multicell(0,5,"Schéma comparatif LLD ".$cleodis." / ACHAT ou CREDIT-BAIL :");
 		$this->image(__PDF_PATH__.'cleodis/graph.jpg',50,155,100);
 
 		$this->sety(240);
@@ -1123,11 +1126,11 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
-		$this->multicell(0,5,"Créée par des professionnels de la location évolutive, CLEODIS s'appuie sur un réseau d'établissements financiers partenaires - filiales spécialisées des grandes banques françaises et européennes - pour mettre en place ses contrats de location.");
+		$this->multicell(0,5,"Créée par des professionnels de la location évolutive, ".$cleodis." s'appuie sur un réseau d'établissements financiers partenaires - filiales spécialisées des grandes banques françaises et européennes - pour mettre en place ses contrats de location.");
 		$this->ln(5);
 		$this->setfont('arial','I',8);
 		$this->RoundedRect(15,$this->gety(),180,10,3);
-		$this->multicell(0,5,"Réduire les coûts  de détention du parc informatique de ses clients, liés à l'utilisation de leur système d'information, tel est l'objectif de l'équipe de proximité, professionnelle et réactive de CLEODIS.",0,'C');
+		$this->multicell(0,5,"Réduire les coûts  de détention du parc informatique de ses clients, liés à l'utilisation de leur système d'information, tel est l'objectif de l'équipe de proximité, professionnelle et réactive de ".$cleodis.".",0,'C');
 		$this->setfont('arial','',8);
 
 		/* PAGE 3 */
@@ -1146,14 +1149,14 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"> Communication – Multimédia : borne interactive, écrans plats...");
 		$this->SetLeftMargin(15);
 
-		$this->multicell(0,5,"L'objectif de CLEODIS est de proposer à ses clients des solutions pertinentes et cohérentes en rapport avec leur envergure et leur budget.");
-		$this->multicell(0,5,"Afin de toujours proposer les meilleures offres, CLEODIS travaille en partenariat avec des distributeurs, éditeurs et SSII locales et nationales, validés pour leurs compétences et leur professionnalisme,  capables d'appréhender toute problématique autour du système d'information.");
+		$this->multicell(0,5,"L'objectif de ".$cleodis." est de proposer à ses clients des solutions pertinentes et cohérentes en rapport avec leur envergure et leur budget.");
+		$this->multicell(0,5,"Afin de toujours proposer les meilleures offres, ".$cleodis." travaille en partenariat avec des distributeurs, éditeurs et SSII locales et nationales, validés pour leurs compétences et leur professionnalisme,  capables d'appréhender toute problématique autour du système d'information.");
 
 		$this->image(__PDF_PATH__.'cleodis/domaine.jpg',60,85,81);
 
 		$this->sety(160);
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"2 – La Location Longue Durée selon CLEODIS");
+		$this->multicell(0,5,"2 – La Location Longue Durée selon ".$cleodis."");
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -1190,7 +1193,7 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,"=> La location évolutive, un moyen efficace");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"En dehors des services CLEODIS qui facilitent la gestion quotidienne et optimisent les coûts de détention de votre parc, le contrat de location constitue intrinsèquement la solution à ces problématiques d'évolution :");
+		$this->multicell(0,5,"En dehors des services ".$cleodis." qui facilitent la gestion quotidienne et optimisent les coûts de détention de votre parc, le contrat de location constitue intrinsèquement la solution à ces problématiques d'évolution :");
 		$this->setFontDecoration('B');
 		$this->setx(35);
 		$this->multicell(0,5,"Une charge inscrite au compte de résultat n'obérant pas la capacité d'investissement ;");
@@ -1202,21 +1205,21 @@ class pdf_cleodis extends pdf {
 
 		$this->ln(3);
 		$this->setfont('arial','U',10);
-		$this->multicell(0,5,"La location selon CLEODIS, une valeur ajoutée clairement exprimée");
+		$this->multicell(0,5,"La location selon ".$cleodis.", une valeur ajoutée clairement exprimée");
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Conseil");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Forte de l'expérience de ses collaborateurs dans le monde informatique, CLEODIS est à même de vous conseiller sur les orientations stratégiques de votre système d'information : tant sur le plan Matériel que Logiciel.");
-		$this->multicell(0,5,"CLEODIS intervient sur tout type de logiciel et de plate formes : INTEL, AS400, UNIX mais également Télécom et réseau. CLEODIS vous conseille et vous accompagne dans l'étude et la mise en place de vos projets informatiques.");
-		$this->multicell(0,5,"Pour une refonte complète de votre système d'information, CLEODIS peut faire appel à des consultants externes qu'elle missionne pour votre compte.");
+		$this->multicell(0,5,"Forte de l'expérience de ses collaborateurs dans le monde informatique, ".$cleodis." est à même de vous conseiller sur les orientations stratégiques de votre système d'information : tant sur le plan Matériel que Logiciel.");
+		$this->multicell(0,5,"CLEODIS intervient sur tout type de logiciel et de plate formes : INTEL, AS400, UNIX mais également Télécom et réseau. ".$cleodis." vous conseille et vous accompagne dans l'étude et la mise en place de vos projets informatiques.");
+		$this->multicell(0,5,"Pour une refonte complète de votre système d'information, ".$cleodis." peut faire appel à des consultants externes qu'elle missionne pour votre compte.");
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Mise en relation");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"CLEODIS n'a pas pour objectif de réaliser des prestations techniques ou même de vous distribuer des matériels, CLEODIS souhaite vous faciliter le montage du projet en vous mettant en relation avec des SSII, VAR ou éditeur après avoir qualifié ensemble votre projet.");
-		$this->multicell(0,5,"Ces sociétés sont référencées par CLEODIS en fonction d'un certain nombre de critères :");
+		$this->multicell(0,5,"CLEODIS n'a pas pour objectif de réaliser des prestations techniques ou même de vous distribuer des matériels, ".$cleodis." souhaite vous faciliter le montage du projet en vous mettant en relation avec des SSII, VAR ou éditeur après avoir qualifié ensemble votre projet.");
+		$this->multicell(0,5,"Ces sociétés sont référencées par ".$cleodis." en fonction d'un certain nombre de critères :");
 		$this->setx(40);
 		$this->multicell(0,5,"- compétences spécifiques");
 		$this->setx(40);
@@ -1226,41 +1229,41 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Suivi de projet, maîtrise d'ouvrage");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Au-delà du montage du dossier locatif, CLEODIS vous accompagne dans la mise en oeuvre de votre projet jusqu'à sa complète réalisation.");
+		$this->multicell(0,5,"Au-delà du montage du dossier locatif, ".$cleodis." vous accompagne dans la mise en oeuvre de votre projet jusqu'à sa complète réalisation.");
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Mise en location");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Conjointement à la remise des devis établis en fonction du cahier des charges défini ensemble, CLEODIS vous remettra une proposition locative intégrant :");
+		$this->multicell(0,5,"Conjointement à la remise des devis établis en fonction du cahier des charges défini ensemble, ".$cleodis." vous remettra une proposition locative intégrant :");
 		$this->setx(40);
-		$this->multicell(0,5,"- Montant de l'investissement avec répartition HW et SW");
+		$this->cell(90,5,"- Montant de l'investissement avec répartition HW et SW");
+		$this->setx(120);
+		$this->cell(90,5,"- Services associés souhaités",0,1);
 		$this->setx(40);
-		$this->multicell(0,5,"- Services associés souhaités");
-		$this->setx(40);
-		$this->multicell(0,5,"- Durée de la location");
-		$this->setx(40);
-		$this->multicell(0,5,"- Loyers linéaires, dégressifs, progressifs ou spécifiques");
+		$this->cell(90,5,"- Durée de la location");
+		$this->setx(120);
+		$this->cell(90,5,"- Loyers linéaires, dégressifs, progressifs ou spécifiques",0,1);
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Services associés");
 		$this->unsetFontDecoration();
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Gestion de parc");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Pour vous faciliter la gestion quotidienne de votre parc, CLEODIS vous donne accès via son site Web à la base de donnée reprenant tous les équipements intégrés au contrat de location. Vous y trouverez toutes les informations concernant vos contrats, les données techniques des matériels et logiciels.");
+		$this->multicell(0,5,"Pour vous faciliter la gestion quotidienne de votre parc, ".$cleodis." vous donne accès via son site Web à la base de donnée reprenant tous les équipements intégrés au contrat de location. Vous y trouverez toutes les informations concernant vos contrats, les données techniques des matériels et logiciels.");
 		$this->ln(3);
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Assurance remplacement");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"CLEODIS vous propose d'intégrer au contrat une assurance remplacement (et non remboursement à la valeur vénale) du matériel en cas de sinistre partiel ou total lors d'un vol avec effraction, un incendie ou un dégât des eaux.");
+		$this->multicell(0,5,$cleodis." vous propose d'intégrer au contrat une assurance remplacement (et non remboursement à la valeur vénale) du matériel en cas de sinistre partiel ou total lors d'un vol avec effraction, un incendie ou un dégât des eaux.");
 		$this->ln(3);
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Brokerage – Matériel de seconde main");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"CLEODIS a la possibilité de vous fournir des matériels de seconde main, ou  de reprendre vos équipements en fin de vie en vue de les revendre sur le marché de l'occasion ou de les recycler dans le respect des normes environnementales.");
+		$this->multicell(0,5,$cleodis." a la possibilité de vous fournir des matériels de seconde main, ou  de reprendre vos équipements en fin de vie en vue de les revendre sur le marché de l'occasion ou de les recycler dans le respect des normes environnementales.");
 		$this->ln(4);
 		$this->setFontDecoration('I');
 		$this->multicell(0,4,"=>Formatage des disques durs / effacement des données utilisateurs");
 		$this->unsetFontDecoration();
-		$this->multicell(0,4,"Lors de la reprise de vos unités centrales à l'issue de votre contrat, CLEODIS se charge d'effacer les données utilisateurs présentes sur les disques durs. Un formatage bas niveau est systématiquement inclus dans nos offres avec la possibilité - en option - de procéder à un formatage niveau 7 qui vous garantit l'impossibilité de récupérer vos données.");
+		$this->multicell(0,4,"Lors de la reprise de vos unités centrales à l'issue de votre contrat, ".$cleodis." se charge d'effacer les données utilisateurs présentes sur les disques durs. Un formatage bas niveau est systématiquement inclus dans nos offres avec la possibilité - en option - de procéder à un formatage niveau 7 qui vous garantit l'impossibilité de récupérer vos données.");
 
 		/*	PAGE 5	*/
 		$this->AddPage();
@@ -1268,7 +1271,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','I',8);
 		$this->multicell(0,7,"=>L'évolution et le suivi du contrat de location");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"La possibilité d'évoluer à tout moment sur tout ou partie des matériels passe par la capacité de CLEODIS à savoir re-commercialiser l'ensemble des équipements nécessitant une évolution. Cette valorisation viendra en déduction du nouvel investissement.");
+		$this->multicell(0,5,"La possibilité d'évoluer à tout moment sur tout ou partie des matériels passe par la capacité de ".$cleodis." à savoir re-commercialiser l'ensemble des équipements nécessitant une évolution. Cette valorisation viendra en déduction du nouvel investissement.");
 
 		$this->ln(5);
 		$this->setfont('arial','U',10);
@@ -1276,21 +1279,21 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
-		$this->multicell(0,5,"Afin de toujours mieux répondre aux demandes du marché, CLEODIS propose le Contrat de Mise à Disposition de Logiciels.");
+		$this->multicell(0,5,"Afin de toujours mieux répondre aux demandes du marché, ".$cleodis." propose le Contrat de Mise à Disposition de Logiciels.");
 		$this->multicell(0,5,"Semblable à un contrat de location classique, celui-ci permet le financement d'offres composées à 100% de logiciels, et ce quel que soit le montant.");
 		$this->multicell(0,5,"Le coût de la mise à disposition est comparable à celui d'une location classique d'équipements informatiques.");
 		$this->multicell(0,5,"Ce contrat permet l'acquisition de licences logicielles en diminuant sensiblement les contraintes budgétaires puisque le coût des licences est étalé dans le temps.");
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,"L'entreprise n'est alors plus contrainte d'utiliser ses fonds propres pour acquérir un logiciel et n'est plus tenue de l'amortir sur 1 an ; elle peut désormais répartir la charge sur la période d'utilisation et budgétiser ainsi le coût de ce logiciel ainsi que celui de ses mises à jours.");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"En outre, le contrat étant évolutif, il permet d'incorporer au fur et à mesure des besoins, de nouveaux modules ou versions de logiciel au travers d'un budget mensuel. Le travail de CLEODIS consistant à vous conseiller pour gérer avec vous le contrat et proposer les évolutions aux meilleurs moments afin de vous maintenir un budget constant.");
+		$this->multicell(0,5,"En outre, le contrat étant évolutif, il permet d'incorporer au fur et à mesure des besoins, de nouveaux modules ou versions de logiciel au travers d'un budget mensuel. Le travail de ".$cleodis." consistant à vous conseiller pour gérer avec vous le contrat et proposer les évolutions aux meilleurs moments afin de vous maintenir un budget constant.");
 		$this->ln(5);
 		$this->RoundedRect(15,$this->gety(),180,15,3);
-		$this->multicell(0,5,"La solution locative de CLEODIS, avantageuse d'un point de vue comptable et opérationnel, vous assure la possibilité de mettre en adéquation vos besoins d'évolution technique avec  vos contraintes budgétaires. L'équipe CLEODIS est également présente tout au long du contrat pour vous accompagner dans vos choix d'évolution.");
+		$this->multicell(0,5,"La solution locative de ".$cleodis.", avantageuse d'un point de vue comptable et opérationnel, vous assure la possibilité de mettre en adéquation vos besoins d'évolution technique avec  vos contraintes budgétaires. L'équipe ".$cleodis." est également présente tout au long du contrat pour vous accompagner dans vos choix d'évolution.");
 
 		$this->ln(5);
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"3 – Proposition commerciale CLEODIS pour ".$this->client['societe']);
+		$this->multicell(0,5,"3 – Proposition commerciale ".$cleodis." pour ".$this->client['societe']);
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -1432,7 +1435,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',14);
 		if(ATF::$codename == "cleodis"){
 			$this->RoundedRect(15,10,140,25,5);
-			$this->multicell(140,6,"Proposition locative CLEODIS",0,'C');
+			$this->multicell(140,6,"Proposition locative ".$cleodis,0,'C');
 			$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
 			$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
 			$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
@@ -1603,7 +1606,8 @@ class pdf_cleodis extends pdf {
 		$this->sety(10);
 		$this->setfont('arial','B',14);
 		$this->RoundedRect(15,10,140,25,5);
-		$this->multicell(140,6,"Proposition locative CLEODIS",0,'C');
+		if($this->affaire["type_affaire"] == "2SI") $this->multicell(140,6,"Proposition locative 2SI Lease by CLEODIS",0,'C');
+		else $this->multicell(140,6,"Proposition locative CLEODIS",0,'C');
 		$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
 		$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
 		$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
@@ -2826,7 +2830,8 @@ class pdf_cleodis extends pdf {
 			$this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
 			$numArticle++;
 			$this->setfont('arial','',8);
-			$this->multicell(0,5,"La facture est payable par chèque à 30 jours date de facture.");
+			$this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
+
 
 
 		} else {
@@ -4370,9 +4375,16 @@ class pdf_cleodis extends pdf {
 		$this->setMargins(15,30);
 		$this->sety(10);
 
+
+
+
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
-			$this->multicell(0,15,'FACTURE',0,'C');
+			if($this->facture["type_libre"] === "liberatoire"){
+				$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
+			}else{
+				$this->multicell(0,15,'FACTURE',0,'C');
+			}
 		}else{
 			$this->multicell(0,15,'AVOIR',0,'C');
 		}
@@ -4600,7 +4612,7 @@ class pdf_cleodis extends pdf {
 					$this->cell(0,5,"A réception de facture",0,1);
 				} elseif ($this->facture['mode_paiement']=="virement") {
 					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
-				} else {
+				} elseif($this->facture['mode_paiement'] !="mandat") {
 					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
 				}
 			}
@@ -4612,7 +4624,7 @@ class pdf_cleodis extends pdf {
 			$this->cell(0,5,"ICS ".__ICS__ ,0,1);
 		}
 
-		if($this->facture["mode_paiement"] == "virement"){
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
 			$cadre = array();
 			$cadre[] = $this->societe["nom_banque"];
 			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
@@ -7626,7 +7638,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 			if ($this->societe['id_pays'] =='FR') {
 				$this->multicell(65,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0,"C");
 			} else {
-				$this->multicell(65,3,"N° TVA  ".$this->societe['siret'],0,"C");
+
+				if(substr($this->societe['siret'],0,2) === "BE"){
+					$num_tva = str_replace(" ", "", $this->societe['siret']);
+					$num_tva = substr($num_tva,0,2)." ".substr($num_tva,2,4)." ".substr($num_tva,6,3)." ".substr($num_tva,9);
+				}else{
+					$num_tva = $this->societe['siret'];
+				}
+				$this->multicell(65,3,"N° TVA  ".$num_tva,0,"C");
+
+
 			}
 
 			if ($this->A3) {
@@ -8018,7 +8039,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
 			$numArticle++;
 			$this->setfont('arial','',8);
-			$this->multicell(0,5,"La facture est payable par chèque à 30 jours date de facture.");
+			$this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
 
 
 		} else {
@@ -8890,7 +8911,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					$this->cell(0,5,"A réception de facture",0,1);
 				} elseif ($this->facture['mode_paiement']=="virement") {
 					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
-				} else {
+				} elseif($this->facture['mode_paiement'] !="mandat") {
 					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
 				}
 			}
@@ -8902,7 +8923,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cell(0,5,"ICS ".__ICS__ ,0,1);
 
 
-		if($this->facture["mode_paiement"] == "virement"){
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
 			$cadre = array();
 			$cadre[] = $this->societe["nom_banque"];
 			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);

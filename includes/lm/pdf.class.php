@@ -431,6 +431,13 @@ class pdf_lm extends pdf_cleodis {
 		);
 
 		$t = "Pour Leroy Merlin Abonnements";
+		$cadre = array(
+			" ",
+			"Par : Leroy Merlin Abonnements",
+			"Fait à : Lille Lezennes",
+			"Le : ".date('d/m/Y'),
+			" "
+		);
 
 		$this->cadre(110,$y,80,48,$cadre,$t);
 
@@ -524,27 +531,26 @@ class pdf_lm extends pdf_cleodis {
 			}
 		}
 		if($lignes){
+			$lignesFormate = $lignesFormateKey = array();
+
+			foreach ($lignes as $key => $value) {
+				if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")){
+					$lignesFormate[$key] = $value;
+					$lignesFormateKey[$value["id_produit"]] = $key;
+				}else{
+					if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
+						$keyProdPrinc = $lignesFormateKey[ATF::produit()->select($value["id_produit"], "id_produit_principal")];
+						$lignesFormate[$keyProdPrinc]["sous_prod"][$key] = $value;
+					}
+				}
+			}
+
+
 			if($type == "produit"){
 				$head = array("Quantité","Description des produits");
 				$width = array(30,166);
 				$data = array();
 				$style = array();
-
-				foreach ($lignes as $key => $value) {
-					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")
-					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
-						$data[$key][0] = $value["quantite"];
-						$data[$key][1] = str_replace(">","", str_replace("&nbsp;", "", $value["produit"]));
-						$style[$key][1] = $this->leftStyle;
-					 }else{
-					 	if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
-					 		$data[$key][0] = $value["quantite"];
-							$data[$key][1] = str_replace(">","", str_replace("&nbsp;", "", $value["produit"]))." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
-							$style[$key][1] = $this->leftStyle;
-					 	}
-					 }
-				}
-				$this->tableau($head,$data,$width,7,$style,260);
 			}
 
 			if($type == "service"){
@@ -553,7 +559,43 @@ class pdf_lm extends pdf_cleodis {
 				$data = array();
 				$style = array();
 
-				foreach ($lignes as $key => $value) {
+
+			}
+
+			foreach ($lignesFormate as $key => $value) {
+				if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
+					$data[$key][0] = $value["quantite"];
+					$data[$key][1] = str_replace(">","", str_replace("&nbsp;", "", $value["produit"]));
+					$style[$key][1] = $this->leftStyle;
+
+					if($value["sous_prod"]){
+						foreach ($value["sous_prod"] as $ksp => $vsp) {
+							$data[$key][1] .= "\n        ".$vsp["quantite"]." ".str_replace(">","", str_replace("&nbsp;", "", $vsp["produit"]));
+						}
+
+					}
+
+				}
+			}
+				/*foreach ($lignes as $key => $value) {
+					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")
+					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
+						$data[$key][0] = $value["quantite"];
+						$data[$key][1] = str_replace(">","", str_replace("&nbsp;", "", $value["produit"]));
+						$style[$key][1] = $this->leftStyle;
+					 }else{
+					 	if(ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
+					 		$data[$key][0] = $value["quantite"];
+							$data[$key][1] = str_replace(">","", str_replace("&nbsp;", "", $value["produit"]))." - lié à ".ATF::produit()->select(ATF::produit()->select($value["id_produit"], "id_produit_principal"), "produit");
+							$style[$key][1] = $this->leftStyle;
+					 	}
+					 }
+				}*/
+
+
+			$this->tableau($head,$data,$width,7,$style,260);
+
+				/*foreach ($lignes as $key => $value) {
 					if(!ATF::produit()->select($value["id_produit"], "id_produit_principal")
 					 && ATF::produit()->select($value["id_produit"], "visible_pdf") == "oui"){
 						$data[$key][0] = $value["quantite"];
@@ -567,8 +609,8 @@ class pdf_lm extends pdf_cleodis {
 					 	}
 					 }
 				}
-				$this->tableau($head,$data,$width,7,$style,260);
-			}
+				$this->tableau($head,$data,$width,7,$style,260);*/
+
 
 		}
 

@@ -154,6 +154,39 @@ class affaire_lm extends affaire {
 	}
 
 	/**
+    * Permet de passer les affaires en abandonner au bout de 2 mois
+    * @author Morgan Fleurquin <mfleurquin@absystech.fr>
+    */
+	public function aAbandonner(){
+
+		$date = date("Y-m-d", strtotime('-2 months'));
+
+		ATF::affaire()->q->reset()->where("affaire.etat",'devis','OR','etat_affaire',"=")
+								  ->where("affaire.etat",'slimpay_en_cours','OR','etat_affaire',"=")
+								  ->where("affaire.etat",'commande','OR','etat_affaire',"=")
+								  ->where("affaire.date",$date,"AND",false,"<=");
+
+		if($affaires = ATF::affaire()->select_all()){
+			foreach ($affaires as $key => $value) {
+
+				if($value["commande.etat"]){
+					if($value["commande.etat"] === "pending" || $value["commande.etat"] === "non_loyer" || $value["commande.etat"] === "abandon"){
+
+						ATF::commande()->q->reset()->where("commande.id_affaire",$value["affaire.id_affaire"]);
+						$commande = ATF::commande()->select_row();
+
+						ATF::commande()->abandonCommande(array("id_commande"=>$commande["commande.id_commande"]) ,true);
+					}
+				}else{
+					ATF::affaire()->u(array("id_affaire"=>$value["affaire.id_affaire"], "etat"=>"abandon"));
+				}
+
+			}
+		}
+
+	}
+
+	/**
     * Permet de formater les données pour l'insertion d'une affaire
     * @author Mathieu Tribouillard <mtribouillard@absystech.fr>
 	* @param array $infos

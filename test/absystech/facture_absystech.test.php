@@ -158,12 +158,12 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(166,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas d'email pour ce contact)");
 		ATF::societe()->update(array("id_societe"=>ATF::societe()->decryptId($this->id_societe),"id_contact_facturation"=>ATF::contact()->decryptId($this->id_contact)));
-		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.fr"));
+		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.net"));
 
 		$this->obj->update($facture,$this->s);
 
-		$facture["facture"]["email"]="tu@absystech.fr";
-		$facture["facture"]["emailCopie"]="Tu@absystech.fr";
+		$facture["facture"]["email"]="tu@absystech.net";
+		$facture["facture"]["emailCopie"]="tu@absystech.net";
 	
 		//Facture_ligne
 		$facture["values_facture"]=array("produits"=>'[{
@@ -447,8 +447,8 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture3["facture"]["id_commande"]=$this->id_commande;
 		$facture3["facture"]["finale"]=true;
 		$facture3["facture"]["emailTexte"]="TU facture";
-		$facture3["facture"]["email"]="tu@absystech.fr";
-		$facture3["facture"]["emailCopie"]="Tu@absystech.fr";
+		$facture3["facture"]["email"]="tu@absystech.net";
+		$facture3["facture"]["emailCopie"]="tu@absystech.net";
 
 		$id_facture3=$this->obj->insert($facture3,$this->s);
 		$facture3_select=$this->obj->select($id_facture3);
@@ -509,7 +509,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(170,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (il n'y a pas de facture parente pour l'avoir)");
 		$facture4["facture"]["id_facture_parente"]=1;
 
-		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.fr"));
+		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.net"));
 		ATF::societe()->update(array("id_societe"=>ATF::societe()->decryptId($this->id_societe),"id_contact_facturation"=>ATF::contact()->decryptId($this->id_contact)));
 		unset($facture4["facture"]["id_affaire"]);
 		$facture4["facture"]["affaire_sans_devis"]=true;
@@ -569,8 +569,8 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture3["facture"]["id_commande"]=$this->id_commande;
 		$facture3["facture"]["finale"]=true;
 		$facture3["facture"]["emailTexte"]="TU facture";
-		$facture3["facture"]["email"]="tu@absystech.fr";
-		$facture3["facture"]["emailCopie"]="Tu@absystech.fr";
+		$facture3["facture"]["email"]="tu@absystech.net";
+		$facture3["facture"]["emailCopie"]="tu@absystech.net";
 
 		$id_facture3=$this->obj->insert($facture3,$this->s);
 		$facture3_select=$this->obj->select($id_facture3);
@@ -617,7 +617,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(166,$erreur_trouvee11,"ERREUR 11 NON ATTRAPPEE (il n'y a pas d'email pour ce contact)");
 
 		//Avec mail
-		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.fr"));
+		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.net"));
 		
 		ATF::societe()->u(array("id_societe" => $this->id_societe, "etat"=> "inactif"));
 		try {
@@ -1150,10 +1150,10 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		ATF::societe()->update(array("id_societe"=>ATF::societe()->decryptId($this->id_societe),"id_contact_facturation"=>ATF::contact()->decryptId($this->id_contact)));
 
-		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.fr"));
+		ATF::contact()->update(array("id_contact"=>ATF::contact()->decryptId($this->id_contact),"email"=>"tu@absystech.net"));
 
 		$email=$this->obj->default_value("email");
-		$this->assertEquals("tu@absystech.fr",$email,"default_value ne renvoie pas le bon 'email' 3");
+		$this->assertEquals("tu@absystech.net",$email,"default_value ne renvoie pas le bon 'email' 3");
 
 		$id_societe=$this->obj->default_value("id_societe");
 		$this->assertEquals($this->id_societe,$id_societe,"default_value ne renvoie pas le bon 'id_societe'");
@@ -1213,7 +1213,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals((round(((350-$prix_achat)/350)*100,2)."%"),$marge,"default_value ne renvoie pas le bon 'marge' (facture)");
 
 		$email=$this->obj->default_value("email");
-		$this->assertEquals("tu@absystech.fr",$email,"default_value ne renvoie pas le bon 'email' (facture)");
+		$this->assertEquals("tu@absystech.net",$email,"default_value ne renvoie pas le bon 'email' (facture)");
 
 		$id_affaire=$this->obj->default_value("id_affaire");
 		$this->assertEquals($this->facture["facture"]["id_affaire"],$id_affaire,"default_value ne renvoie pas le bon 'id_affaire' (facture)");
