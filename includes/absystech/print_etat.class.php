@@ -66,7 +66,6 @@ class print_etat_absystech extends classes_optima {
 			$range = ($get['range'] && $get['range']=="three")?date('Y-m-d H:i:s',strtotime('-3 years')):date('Y-m-d H:i:s',strtotime('-1 years'));
 			$this->q->andWhere("date",$range,false,">")
 					->addOrder('date','asc');
-;
 		}
 		$this->q->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
