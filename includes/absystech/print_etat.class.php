@@ -1,25 +1,25 @@
 <?
 /** 
-* Classe etat_imprimante
+* Classe print_etat
 * @author Cyril Charlier <ccharlier@absystech.fr>
 * @package Optima
 * @subpackage Absystech
 */
-class etat_imprimante_absystech extends classes_optima {
+class print_etat_absystech extends classes_optima {
 	/**
 	* Constructeur
 	*/
 	public function __construct() {
 		parent::__construct();
-        $this->table='etat_imprimante';
+        $this->table='print_etat';
 		$this->colonnes['fields_column']  = array(
-			'etat_imprimante.id_stock'
-			,'etat_imprimante.name'
-			,'etat_imprimante.date'
-			,'etat_imprimante.color'
-			,'etat_imprimante.current'
-			,'etat_imprimante.max'
-			,'etat_imprimante.type'
+			'print_etat.id_stock'
+			,'print_etat.name'
+			,'print_etat.date'
+			,'print_etat.color'
+			,'print_etat.current'
+			,'print_etat.max'
+			,'print_etat.type'
 		); 
 	}
 	
@@ -32,6 +32,7 @@ class etat_imprimante_absystech extends classes_optima {
 	* @return boolean | integer
 	*/
 	public function _GET($get,$post) {
+		log::logger('ccharlier','ccharlier');
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "id_stock";
 		if (!$get['trid']) $get['trid'] = "desc";

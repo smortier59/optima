@@ -1,23 +1,23 @@
 <?
 /** 
-* Classe etat_imprimante
+* Classe print_etat_consommable
 * @author Cyril Charlier <ccharlier@absystech.fr>
 * @package Optima
 * @subpackage Absystech
 */
-class etat_consommable_imprimante_absystech extends classes_optima {
+class print_etat_consommable_absystech extends classes_optima {
 	/**
 	* Constructeur
 	*/
 	public function __construct() {
 		parent::__construct();
 		$this->field_nom = 'date';
-        $this->table='etat_consommable_imprimante';
+        $this->table='print_etat_consommable';
 		$this->colonnes['fields_column']  = array(
-			'id_etat_consommable_imprimante'
+			'id_print_etat_consommable'
 			,'date'
 			,'id_stock'
-			,'id_consommable_imprimante'
+			,'id_print_consommable'
 		); 
 	}
 	
@@ -39,7 +39,7 @@ class etat_consommable_imprimante_absystech extends classes_optima {
 		if (!$get['page']) $get['page'] = 0;
 		
 		$colsData = array(
-			"consommable_imprimante.designation",
+			"print_consommable.designation",
 			"date",
 			"couleur_consommable",
 			"duree"
@@ -50,7 +50,7 @@ class etat_consommable_imprimante_absystech extends classes_optima {
 			$this->q->where("id_stock",$get['id_stock']);
 		}
 		$this->q->addField($colsData);
-		$this->q->from("etat_consommable_imprimante", "id_consommable_imprimante" , "consommable_imprimante" , "id_consommable_imprimante")
+		$this->q->from("print_etat_consommable", "id_print_consommable" , "print_consommable" , "id_print_consommable")
 				->setLimit($get['limit']) 
 				->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
@@ -92,7 +92,7 @@ class etat_consommable_imprimante_absystech extends classes_optima {
 		}
  
         $return['result'] = true;
-        $return['id_etat_consommable_imprimante'] = $result;
+        $return['id_print_etat_consommable'] = $result;
         return $return;
 	}
 }
