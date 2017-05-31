@@ -1,0 +1,6 @@
+Bonjour {$infos["contact"]} ,
+
+Une nouvelle imprimante cherche à se connecter sur l'hyperviseur.
+Celle-ci est peut être identifiée à l'aide de cette adresse mac : {$infos["adresse_mac"]}
+
+Pensez à l'attribuer à un stock afin de pouvoir l'hyperviser
