@@ -370,7 +370,7 @@ class stock_absystech extends stock {
 			unset($infos["commentaire"]);
 			$redirection=$infos["redirection_custom"];
 			unset($infos["redirection_custom"]);
-			unset($infos["grouper"]);
+			unset($infos["grouper"],$infos["quantite"]);
 			//----------Insertion Stock--------------//
 			$id=parent::insert($infos,$s);
 			//---------Insertion Stock-Etat---------//

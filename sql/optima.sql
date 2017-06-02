@@ -1,5 +1,5 @@
 --
--- Base de donnÃ©es :  `extranet_v3_absystech`
+-- Base de données :  `extranet_v3_absystech`
 --
 
 -- --------------------------------------------------------
@@ -17,7 +17,7 @@ CREATE TABLE `export_comptable` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Index pour les tables exportÃ©es
+-- Index pour les tables exportées
 --
 
 --
@@ -29,7 +29,7 @@ ALTER TABLE `export_comptable`
   ADD KEY `id_user` (`id_user`);
 
 --
--- AUTO_INCREMENT pour les tables exportÃ©es
+-- AUTO_INCREMENT pour les tables exportées
 --
 
 --
@@ -38,7 +38,7 @@ ALTER TABLE `export_comptable`
 ALTER TABLE `export_comptable`
   MODIFY `id_export_comptable` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
--- Contraintes pour les tables exportÃ©es
+-- Contraintes pour les tables exportées
 --
 
 --
@@ -55,7 +55,7 @@ ALTER TABLE `facture` ADD `id_export_comptable` MEDIUMINT(8) UNSIGNED NULL AFTER
 ALTER TABLE `facture` ADD FOREIGN KEY (`id_export_comptable`) REFERENCES `export_comptable`(`id_export_comptable`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Ajout du champs, de l'index et de la clÃ© unique pour la rÃ©fÃ©rence comptable
+-- Ajout du champs, de l'index et de la clé unique pour la référence comptable
 --
 ALTER TABLE `societe` ADD `ref_comptable` VARCHAR(20) NULL AFTER `ref`, ADD INDEX (`ref_comptable`);
 ALTER TABLE `societe` ADD UNIQUE(`ref_comptable`);
