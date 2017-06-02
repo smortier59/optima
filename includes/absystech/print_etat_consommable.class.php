@@ -41,7 +41,7 @@ class print_etat_consommable_absystech extends classes_optima {
 		$colsData = array(
 			"print_consommable.designation",
 			"date",
-			"couleur_consommable",
+			"couleur",
 			"duree"
 		);
 
