@@ -1,23 +1,23 @@
 <?
 /** 
-* Classe alerte_imprimante
+* Classe print_alerte
 * @author Cyril Charlier <ccharlier@absystech.fr>
 * @package Optima
 * @subpackage Absystech
 */
-class alerte_imprimante_absystech extends classes_optima {
+class print_alerte_absystech extends classes_optima {
 	/**
 	* Constructeur
 	*/
 	public function __construct() {
 		parent::__construct();
-        $this->table='alerte_imprimante';
+        $this->table='print_alerte';
 		$this->colonnes['fields_column']  = array(
-			'alerte_imprimante.id_stock'
-			,'alerte_imprimante.code'
-			,'alerte_imprimante.message'
-			,'alerte_imprimante.date'
-			,'alerte_imprimante.notification'
+			'print_alerte.id_stock'
+			,'print_alerte.code'
+			,'print_alerte.message'
+			,'print_alerte.date'
+			,'print_alerte.notification'
 		); 
 	}
 	
@@ -42,7 +42,7 @@ class alerte_imprimante_absystech extends classes_optima {
 			'id_stock'
 			,'code'
 			,'message'
-			,'id_alerte_imprimante'
+			,'id_print_alerte'
 			,'date'
 			,'notification'
 			,'date_cloture'
@@ -125,7 +125,7 @@ class alerte_imprimante_absystech extends classes_optima {
 		$input = file_get_contents('php://input');
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
-		if($post['id_alerte_imprimante']){
+		if($post['id_print_alerte']){
 			$post['notification']='non';
 			$this->update($post);
 		}else{

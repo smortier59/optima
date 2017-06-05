@@ -1,86 +1,61 @@
-UPDATE `user` SET civilite= 'Mme' WHERE civilite = 'Mlle';
-ALTER TABLE `user` CHANGE `civilite` `civilite` ENUM('M','Mme') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'M';
-CREATE TABLE `etat_imprimante` (
-  `id_etat_imprimante` mediumint(8) UNSIGNED NOT NULL,
-  `id_stock` mediumint(8) UNSIGNED NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `color` enum('other','unknow','cyan','magenta','yellow','black') DEFAULT NULL,
-  `current` bigint(20) NOT NULL,
-  `max` int(11) DEFAULT NULL,
-  `type` enum('toner','copie_noir','copie_couleur') NOT NULL
+--
+-- Base de données :  `extranet_v3_absystech`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `export_comptable`
+--
+
+CREATE TABLE `export_comptable` (
+  `id_export_comptable` mediumint(8) UNSIGNED NOT NULL,
+  `date_debut` date NOT NULL,
+  `date_fin` date NOT NULL,
+  `id_user` mediumint(8) UNSIGNED NOT NULL,
+  `factures` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE `etat_imprimante`
-  ADD PRIMARY KEY (`id_etat_imprimante`),
-  ADD KEY `id_stock` (`id_stock`);
+--
+-- Index pour les tables exportées
+--
 
-ALTER TABLE `etat_imprimante`
-  MODIFY `id_etat_imprimante` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1258;
+--
+-- Index pour la table `export_comptable`
+--
+ALTER TABLE `export_comptable`
+  ADD PRIMARY KEY (`id_export_comptable`),
+  ADD KEY `date_debut` (`date_debut`,`date_fin`),
+  ADD KEY `id_user` (`id_user`);
 
-ALTER TABLE `etat_imprimante`
-  ADD CONSTRAINT `etat_imprimante_ibfk_1` FOREIGN KEY (`id_stock`) REFERENCES `stock` (`id_stock`) ON DELETE CASCADE ON UPDATE CASCADE;
+--
+-- AUTO_INCREMENT pour les tables exportées
+--
 
+--
+-- AUTO_INCREMENT pour la table `export_comptable`
+--
+ALTER TABLE `export_comptable`
+  MODIFY `id_export_comptable` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+--
+-- Contraintes pour les tables exportées
+--
 
-
-CREATE TABLE `etat_consommable_imprimante` (
-  `id_etat_consommable_imprimante` mediumint(8) UNSIGNED NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_stock` mediumint(8) UNSIGNED NOT NULL,
-  `id_consommable_imprimante` mediumint(8) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE `etat_consommable_imprimante`
-  ADD PRIMARY KEY (`id_etat_consommable_imprimante`),
-  ADD KEY `id_stock` (`id_stock`),
-  ADD KEY `id_consommable` (`id_consommable_imprimante`);
-
-ALTER TABLE `etat_consommable_imprimante`
-  MODIFY `id_etat_consommable_imprimante` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
-
-ALTER TABLE `etat_consommable_imprimante`
-  ADD CONSTRAINT `etat_consommable_imprimante_ibfk_1` FOREIGN KEY (`id_stock`) REFERENCES `stock` (`id_stock`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `etat_consommable_imprimante_ibfk_2` FOREIGN KEY (`id_consommable_imprimante`) REFERENCES `consommable_imprimante` (`id_consommable_imprimante`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-CREATE TABLE `alerte_imprimante` (
-  `id_alerte_imprimante` mediumint(8) NOT NULL,
-  `id_stock` mediumint(8) UNSIGNED NOT NULL,
-  `code` varchar(50) NOT NULL,
-  `message` varchar(255) NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `notification` enum('oui','non') NOT NULL DEFAULT 'oui',
-  `date_cloture` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE `alerte_imprimante`
-  ADD PRIMARY KEY (`id_alerte_imprimante`),
-  ADD KEY `id_stock` (`id_stock`),
-  ADD KEY `date_cloture` (`date_cloture`);
-
-ALTER TABLE `alerte_imprimante`
-  MODIFY `id_alerte_imprimante` mediumint(8) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1901;
-
-ALTER TABLE `alerte_imprimante`
-  ADD CONSTRAINT `alerte_imprimante_ibfk_1` FOREIGN KEY (`id_stock`) REFERENCES `stock` (`id_stock`) ON DELETE CASCADE ON UPDATE CASCADE;
+--
+-- Contraintes pour la table `export_comptable`
+--
+ALTER TABLE `export_comptable`
+  ADD CONSTRAINT `export_comptable_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-CREATE TABLE `consommable_imprimante` (
-  `id_consommable_imprimante` mediumint(8) UNSIGNED NOT NULL,
-  `designation` varchar(255) NOT NULL,
-  `code` varchar(50) NOT NULL,
-  `duree` int(10) NOT NULL,
-  `prix` decimal(10,2) NOT NULL,
-  `ref_imprimante` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+--
+-- Ajout du champs et de la contraite pour la liaison avec l'export comptable dans la table des factures
+--
+ALTER TABLE `facture` ADD `id_export_comptable` MEDIUMINT(8) UNSIGNED NULL AFTER `id_echeancier`, ADD INDEX (`id_export_comptable`);
+ALTER TABLE `facture` ADD FOREIGN KEY (`id_export_comptable`) REFERENCES `export_comptable`(`id_export_comptable`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE `consommable_imprimante`
-  ADD PRIMARY KEY (`id_consommable_imprimante`),
-  ADD KEY `consommable_imprimante_ibfk_1` (`ref_imprimante`);
-
-ALTER TABLE `consommable_imprimante`
-  MODIFY `id_consommable_imprimante` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
-ALTER TABLE `stock` ADD INDEX(`ref`);
-ALTER TABLE `consommable_imprimante`
-  ADD CONSTRAINT `consommable_imprimante_ibfk_1` FOREIGN KEY (`ref_imprimante`) REFERENCES `stock` (`ref`) ON DELETE CASCADE ON UPDATE CASCADE;
-
+--
+-- Ajout du champs, de l'index et de la clé unique pour la référence comptable
+--
+ALTER TABLE `societe` ADD `ref_comptable` VARCHAR(20) NULL AFTER `ref`, ADD INDEX (`ref_comptable`);
+ALTER TABLE `societe` ADD UNIQUE(`ref_comptable`);
