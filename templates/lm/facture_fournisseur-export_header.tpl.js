@@ -36,7 +36,7 @@
 			frame: true,
 			width: 900,
 			items: [{
-				html: "<strong>Choisissez les factures à prélever : </strong>"
+				html: "<strong>Export des immo pour les contrats en engagement en date du : </strong>"
 			},
 			{
 				xtype: 'datefield',
