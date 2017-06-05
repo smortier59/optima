@@ -2163,7 +2163,6 @@ class facture_absystech extends facture {
 	public function _export_comptable($get,$post) {
 		$input = file_get_contents('php://input');
 		if (!empty($input)) parse_str($input,$post);
-		log::logger($post,'qjanon');
 		ATF::db($this->db)->begin_transaction();
 		$facturesATraiter = explode(",",$post['factures']);
 		try {
@@ -2248,7 +2247,7 @@ class facture_absystech extends facture {
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
 						ATF::compte_absystech()->select($id_compte,'code'),
-						ATF::compte_absystech()->nom($id_compte),
+						$societe['societe'],
 						$facture['ref'],
 						$facture['ref']."-".$societe['societe'],
 						"",
@@ -2333,7 +2332,7 @@ class facture_absystech extends facture {
 			$str = str_replace("'","",$str);
 			$str = str_replace("\"","",$str);
 			$str = util::removeAccents($str);
-			$ref_comptable = "411".strtoupper(substr($str,0,10));
+			$ref_comptable = "411".strtoupper(substr($str,0,9));
 
 			$return['data'][$el['id_societe']] = array(
 				"id_societe"=>$el['id_societe'],
