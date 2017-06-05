@@ -1024,7 +1024,7 @@ class facture_fournisseur extends classes_optima {
     }
 
 
-    /** Permet de savoir si une affaire était en periode d'engagement à une date donnée
+     /** Permet de savoir si une affaire était en periode d'engagement à une date donnée
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @date 04/05/2017
      */
@@ -1036,13 +1036,10 @@ class facture_fournisseur extends classes_optima {
     		$dateDeb = strtotime($commande["commande.date_debut"]);
 	    	$dateFin = strtotime($commande["commande.date_evolution"]);
 
-	    	log::logger($commande , "mfleurquin");
-
-	    	if($dateDeb <= $date && $date <= $dateFin){
+	    	if($dateDeb <= strtotime($date) && $date >= strtotime($dateFin)){
 	    		return true;
 	    	}
     	}
-
     	return false;
 
     }
