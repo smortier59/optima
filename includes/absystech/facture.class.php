@@ -2222,6 +2222,14 @@ class facture_absystech extends facture {
 				$tvamnt = $ttc - $facture['prix'];
 				$tva = ($facture['tva'] - 1) * 100;
 
+				$credit = false;
+				$debit = false;
+				if ($facture['type_facture']=='avoir') {
+					$credit = number_format($ttc, 2, ",", "");
+				} else {
+					$debit = number_format($ttc, 2, ",", "");
+				}
+
 				$line = array(
 					"VT",
 					date('d/m/Y',strtotime($facture['date'])),
@@ -2229,8 +2237,8 @@ class facture_absystech extends facture {
 					$societe['societe'],
 					$facture['ref'],
 					$facture['ref']."-".date('d/m/Y',strtotime($facture['date'])),
-					number_format($ttc, 2, ",", ""),
-					""
+					$debit?abs($debit):"",
+					$credit?abs($credit):""
 				);
 			  fputcsv($file, $line, ";");
 			  fputs("\n");
@@ -2242,6 +2250,14 @@ class facture_absystech extends facture {
 			  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
 			  }
 			  foreach ($ventilation as $id_compte=>$total) {
+					$credit = false;
+					$debit = false;
+					if ($facture['type_facture']=='avoir') {
+						$debit = number_format($total, 2, ",", "");
+					} else {
+						$credit = number_format($total, 2, ",", "");
+					}
+
 				  // LIGNES DE VENTILATION
 					$line = array(
 						"VT",
@@ -2250,8 +2266,8 @@ class facture_absystech extends facture {
 						$societe['societe'],
 						$facture['ref'],
 						$facture['ref']."-".$societe['societe'],
-						"",
-						number_format($total, 2, ",", "")
+						$debit?abs($debit):"",
+						$credit?abs($credit):""
 					);
 				  fputcsv($file, $line, ";");
 				  fputs("\n");
@@ -2273,6 +2289,13 @@ class facture_absystech extends facture {
 				  fputs("\n");
 			  }
 
+				$credit = false;
+				$debit = false;
+				if ($facture['type_facture']=='avoir') {
+					$debit = number_format($tvamnt, 2, ",", "");
+				} else {
+					$credit = number_format($tvamnt, 2, ",", "");
+				}
 			  // LIGNES DE TVA
 				$line = array(
 					"VT",
@@ -2281,8 +2304,8 @@ class facture_absystech extends facture {
 					"TVA COLLECTEE ".$tva."%",
 					$facture['ref'],
 					$facture['ref']."-".$societe['societe'],
-					"",
-					number_format($tvamnt, 2, ",", "")
+					$debit?abs($debit):"",
+					$credit?abs($credit):""
 				);
 			  fputcsv($file, $line, ";");
 			  fputs("\n");
