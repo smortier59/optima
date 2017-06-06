@@ -227,7 +227,7 @@ class facture_lm extends facture {
 							);
 					if($status["executionStatus"] === "processed") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										"status"=> "payee",
+										"etat"=> "payee",
 										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
 									));
 					}
