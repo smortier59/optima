@@ -55,7 +55,7 @@ class slimpay {
             'label' => $libelle,
             'executionDate'=>$date."T13:00:00.000+0000",
             'creditor' => [
-                'reference' => 'lma'
+                'reference' => __CREDITOR_REFERENCE__
             ],
             'mandate' => [
                 'reference' => $ref_mandate
@@ -108,7 +108,7 @@ class slimpay {
             'scheme' => 'SEPA.DIRECT_DEBIT.CORE',
             'amount' => 29.99,
             'creditor' => [
-                'reference' => 'lma'
+                'reference' => __CREDITOR_REFERENCE__
             ],
             'mandate' => [
                 'reference' => $mandate
@@ -121,8 +121,8 @@ class slimpay {
             echo "$i. Payment " . $payment->getState()['id'] . ' created.\n';
         }*/
 
-        $follow = new Http\Follow(new Hal\CustomRel('https://api.slimpay.net/alps#search-payment-issues'), 'GET', [
-            'creditorReference' => 'lma',
+        $follow = new Http\Follow(new Hal\CustomRel(self::getRelationNamespace().'search-payment-issues'), 'GET', [
+            'creditorReference' => __CREDITOR_REFERENCE__,
             'scheme' => 'SEPA.DIRECT_DEBIT.CORE',
             'executionStatus' => 'toprocess'
         ]);
