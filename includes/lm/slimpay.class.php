@@ -92,8 +92,60 @@ class slimpay {
         return $state;
     }
 
+
+
+
+
+    public function simulateIssue($mandate){
+        $hapiClient = self::connection();
+        // The Relations Namespace
+        $relNs = self::getRelationNamespace();
+
+
+        //$rel = new Hal\CustomRel('https://api.slimpay.net/alps#create-payins');
+        /*$follow = new Http\Follow($rel, 'POST', null, new Http\JsonBody(
+        [
+            'scheme' => 'SEPA.DIRECT_DEBIT.CORE',
+            'amount' => 29.99,
+            'creditor' => [
+                'reference' => 'lma'
+            ],
+            'mandate' => [
+                'reference' => $mandate
+            ]
+        ]
+        ));
+
+        for ($i = 1; $i <= 4; $i++) {
+            $payment = $hapiClient->sendFollow($follow);
+            echo "$i. Payment " . $payment->getState()['id'] . ' created.\n';
+        }*/
+
+        $follow = new Http\Follow(new Hal\CustomRel('https://api.slimpay.net/alps#search-payment-issues'), 'GET', [
+            'creditorReference' => 'lma',
+            'scheme' => 'SEPA.DIRECT_DEBIT.CORE',
+            'executionStatus' => 'toprocess'
+        ]);
+        $collection = $hapiClient->sendFollow($follow);
+
+        while ($collection->getState()['page']['totalElements'] > 0) {
+            foreach ($collection->getEmbeddedResources('paymentIssues') as $issue) {
+                // Some information about the issue itself
+                $issueState = $issue->getState();
+                echo '<pre>Issue:<br>' . print_r($issueState, true) . '</pre>';
+
+                log::logger($issueState , "mfleurquin");
+
+                /*$id = $issueState['id'];
+                $rejectAmount = $issueState['rejectAmount'];
+                $currency = $issueState['currency'];
+                $returnReasonCode = $issueState['returnReasonCode'];*/
+            }
+        }
+
+
+
+    }
+
 }
-
-
-
 ?>
