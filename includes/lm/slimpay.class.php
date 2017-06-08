@@ -120,13 +120,16 @@ class slimpay {
             $payment = $hapiClient->sendFollow($follow);
             echo "$i. Payment " . $payment->getState()['id'] . ' created.\n';
         }*/
+        $rel = new Hal\CustomRel(self::getRelationNamespace().'search-payment-issues');
 
-        $follow = new Http\Follow(new Hal\CustomRel(self::getRelationNamespace().'search-payment-issues'), 'GET', [
+        $follow = new Http\Follow($rel, 'GET', [
             'creditorReference' => __CREDITOR_REFERENCE__,
             'scheme' => 'SEPA.DIRECT_DEBIT.CORE',
             'executionStatus' => 'toprocess'
         ]);
         $collection = $hapiClient->sendFollow($follow);
+
+        log::logger($collection , "mfleurquin");
 
         while ($collection->getState()['page']['totalElements'] > 0) {
             foreach ($collection->getEmbeddedResources('paymentIssues') as $issue) {
