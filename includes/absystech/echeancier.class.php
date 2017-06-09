@@ -113,11 +113,11 @@ class echeancier extends classes_optima {
     } else {
       // gestion des filtres
       if ($get['filters']['encours'] == "on") {
-        $this->q->where("echeancier.prochaine_echeance",'CURRENT_DATE','OR','echeance',"<",false,true);
+        $this->q->where("echeancier.prochaine_echeance",'CURRENT_DATE','OR','echeance',"<=",false,true);
       }
       if ($get['filters']['actif'] == "on") {
         $this->q->whereIsNull("echeancier.fin",'OR','fin');
-        $this->q->where("echeancier.fin",'CURRENT_DATE','OR','fin',">",false,true);
+        $this->q->where("echeancier.fin",'CURRENT_DATE','OR','fin',">=",false,true);
         $this->q->where("actif","oui");
       }
 

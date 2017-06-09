@@ -32,6 +32,10 @@ class abonnement extends classes_optima {
 
 		$this->q
 			->addJointure("abonnement","id_affaire","facture","id_affaire","f")
+			->addField("nbre_user_actif")
+			->addField("liste_user")
+			->addField("espace_utilise")
+			->addField("codename")
 			->addField("SUM(f.prix)","marge")
 			->addField("SUM(IF(`f`.`date` >= '2014-06-04 17:25:24',`f`.`prix`,0))","marge12month")
 			->addGroup("codename");

@@ -3704,7 +3704,7 @@ class pdf_cleodis extends pdf {
 
 		$this->setleftmargin(30);
 		$y = $this->getY();
-		$date = split("/", $this->comite["date_creation"]);
+		$date = explode("/", $this->comite["date_creation"]);
 
 		if( (date("Y") - $date[1] ) >= 2 ){
 			$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
