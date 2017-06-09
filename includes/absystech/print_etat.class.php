@@ -32,7 +32,7 @@ class print_etat_absystech extends classes_optima {
 	* @return boolean | integer
 	*/
 	public function _GET($get,$post) {
-		log::logger('ccharlier','ccharlier');
+
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "id_stock";
 		if (!$get['trid']) $get['trid'] = "desc";

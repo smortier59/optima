@@ -51,15 +51,6 @@ class print_consommable_absystech extends classes_optima {
 		$this->q->setLimit($get['limit']); 
 		$this->q->setCount();
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-		foreach ($data["data"] as $k=>$lines) {
-			foreach ($lines as $k_=>$val) {
-				if (strpos($k_,".")) {
-					$tmp = explode(".",$k_);
-					$data['data'][$k][$tmp[1]] = $val;
-					unset($data['data'][$k][$k_]);
-				}				
-			}
-		}
 		if($get['id_print_consommable']){
 			$return= $data['data'][0];
 		}else{
@@ -131,13 +122,10 @@ class print_consommable_absystech extends classes_optima {
 		$input = file_get_contents('php://input');
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
-        try {	  
-			$result = $this->delete($post);
-		} catch (errorATF $e) {
-  			throw new errorATF($e->getMessage(),500);
-		}
 
-        $return['result'] = true;
+        if (!$get['id']) throw new errorATF("MISSING_ID",1000);
+        $return['notices'] = ATF::$msg->getNotices();
+		$return['result'] = $this->delete($post);
         return $return;
 	}
 

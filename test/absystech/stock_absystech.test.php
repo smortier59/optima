@@ -22,129 +22,141 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	private $_livraison;
 	private $_livraison_ligne;
 	
-	
 	/** 
-	* test apres chaque requete SQL d'un jeu de test 
-	*/
-	private function requete_valide($table){
-		return $this->assertNotNull($this->_.$table["id_".$table],"La requête de ".$table." ne se crée pas... - assert ");
-	}
-	
-	
-	// Initialisation d'un jeu de test 
-	private function environnement_test(){
-		ATF::db()->truncate("stock");
-		//devis
-		$contact["nom"]="Tu_devis";
-		$this->id_contact=ATF::contact()->insert($contact);
-		$this->devis["devis"]["id_contact"]=$this->id_contact;
-		$this->devis["devis"]['resume']='Tu_devis_stock';
-		$this->devis["devis"]['id_societe']=1;
-		$this->devis["devis"]['validite']=date('Y-m-d');
-		$this->devis["devis"]['prix']="200";
-		$this->devis["devis"]['frais_de_port']="50";
-		$this->devis["devis"]['prix_achat']="50";
-		$this->devis["devis"]["date"]=date('Y-m-d');
-		$this->devis["values_devis"]=array("produits"=>'[{"devis_ligne__dot__ref":"REF_DEVIS","devis_ligne__dot__produit":"Tu_devis","devis_ligne__dot__quantite":"15","devis_ligne__dot__poids":"10","devis_ligne__dot__prix":"10","devis_ligne__dot__prix_achat":"10","devis_ligne__dot__id_fournisseur":"1","devis_ligne__dot__id_compte_absystech":"1","devis_ligne__dot__marge":97.14,"devis_ligne__dot__id_fournisseur_fk":"1"}]');
-		
-		//                    [instance DEVIS]
-		$this->_devis = ATF::devis()->insert($this->devis,$this->s);
-		$this->requete_valide("devis");
-		
-		//                   [instance AFFAIRE]
-		$this->_affaire = ATF::devis()->select($this->_devis,"id_affaire");
-		$this->requete_valide("affaire");
+    * test apres chaque requete SQL d'un jeu de test 
+    */
+    private function requete_valide($table){
+        return $this->assertNotNull($this->_.$table["id_".$table],"La requête de ".$table." ne se crée pas... - assert ");
+    }
+    
+    
+    // Initialisation d'un jeu de test 
+    private function environnement_test(){
+        ATF::db()->truncate("stock");
+        //devis
+        $contact["nom"]="Tu_devis";
+        $this->id_contact=ATF::contact()->insert($contact);
+        $this->devis["devis"]["id_contact"]=$this->id_contact;
+        $this->devis["devis"]['resume']='Tu_devis_stock';
+        $this->devis["devis"]['id_societe']=1;
+        $this->devis["devis"]['validite']=date('Y-m-d');
+        $this->devis["devis"]['prix']="200";
+        $this->devis["devis"]['frais_de_port']="50";
+        $this->devis["devis"]['prix_achat']="50";
+        $this->devis["devis"]["date"]=date('Y-m-d');
+        $this->devis["values_devis"]=array("produits"=>'[{"devis_ligne__dot__ref":"REF_DEVIS","devis_ligne__dot__produit":"Tu_devis","devis_ligne__dot__quantite":"15","devis_ligne__dot__poids":"10","devis_ligne__dot__prix":"10","devis_ligne__dot__prix_achat":"10","devis_ligne__dot__id_fournisseur":"1","devis_ligne__dot__id_compte_absystech":"1","devis_ligne__dot__marge":97.14,"devis_ligne__dot__id_fournisseur_fk":"1"}]');
+        
+        //                    [instance DEVIS]
+        $this->_devis = ATF::devis()->insert($this->devis,$this->s);
+        $this->requete_valide("devis");
+        
+        //                   [instance AFFAIRE]
+        $this->_affaire = ATF::devis()->select($this->_devis,"id_affaire");
+        $this->requete_valide("affaire");
 
-		//Commande
-		$commande["commande"]=$this->devis["devis"];
-		$commande["commande"]["id_affaire"]=$this->_affaire;
-		$commande["commande"]["id_devis"]=$this->_devis;
-		$commande["values_commande"]=array("produits"=>'[{"commande_ligne__dot__ref":"REF_Produit","commande_ligne__dot__produit":"Tu_commande","commande_ligne__dot__quantite":"15","commande_ligne__dot__prix":"10","commande_ligne__dot__prix_achat":"10","commande_ligne__dot__id_fournisseur":"1","commande_ligne__dot__id_compte_absystech":"1","commande_ligne__dot__marge":97.14,"commande_ligne__dot__id_fournisseur_fk":"1"}]');
-		unset($commande["commande"]["id_contact"]);
-		unset($commande["commande"]["validite"]);
-		
-		//                   [instance COMMANDE]
-		$this->_commande = ATF::commande()->insert($commande,$this->s);
-		$this->requete_valide("commande");
-		$this->commande=$commande;
-	 	//bon_de_commande
-		$bon_de_commande["bon_de_commande"]=$this->commande["commande"];
-		$bon_de_commande["bon_de_commande"]["ref"]="REF_bon_de_commande";
-		$bon_de_commande["bon_de_commande"]["id_commande"] = $this->_commande; 
-		$bon_de_commande["bon_de_commande"]["id_fournisseurFinal"]= 1589;
-		$bon_de_commande["bon_de_commande"]["id_fournisseur"]= 1589;	 	
-		$bon_de_commande["values_bon_de_commande"]=array("produits"=>'[{"bon_de_commande_ligne__dot__ref":"REF_Produit","bon_de_commande_ligne__dot__produit":"Tu_bon_de_commande","bon_de_commande_ligne__dot__quantite":"15","bon_de_commande_ligne__dot__prix":"10","bon_de_commande_ligne__dot__prix_achat":"10","bon_de_commande_ligne__dot__id_fournisseur":"1","bon_de_commande_ligne__dot__serial":"AZSQDERF12","bon_de_commande_ligne__dot__id_compte_absystech":"1","bon_de_commande_ligne__dot__marge":97.14,"bon_de_commande_ligne__dot__id_fournisseur_fk":"1"}]');
-		unset($bon_de_commande["bon_de_commande"]["prix_achat"]);
-		unset($bon_de_commande["bon_de_commande"]["id_devis"]);
-		$this->bon_de_commande=$bon_de_commande;
-		
-		//                   [instance BON DE COMMANDE]
-		$this->_bon_de_commande = ATF::bon_de_commande()->insert($this->bon_de_commande,$this->s);
-		$this->requete_valide("bon_de_commande");
-		
-		//                   [instance BON DE COMMANDE LIGNE]
-		$this->_bon_de_commande_ligne = ATF::bon_de_commande_ligne()->ss("id_bon_de_commande",$this->_bon_de_commande);
-		$this->requete_valide("bon_de_commande_ligne");
+        //Commande
+        $commande["commande"]=$this->devis["devis"];
+        $commande["commande"]["id_affaire"]=$this->_affaire;
+        $commande["commande"]["id_devis"]=$this->_devis;
+        $commande["values_commande"]=array("produits"=>'[{"commande_ligne__dot__ref":"REF_Produit","commande_ligne__dot__produit":"Tu_commande","commande_ligne__dot__quantite":"15","commande_ligne__dot__prix":"10","commande_ligne__dot__prix_achat":"10","commande_ligne__dot__id_fournisseur":"1","commande_ligne__dot__id_compte_absystech":"1","commande_ligne__dot__marge":97.14,"commande_ligne__dot__id_fournisseur_fk":"1"}]');
+        unset($commande["commande"]["id_contact"]);
+        unset($commande["commande"]["validite"]);
+        
+        //                   [instance COMMANDE]
+        $this->_commande = ATF::commande()->insert($commande,$this->s);
+        $this->requete_valide("commande");
+        $this->commande=$commande;
+        //bon_de_commande
+        $bon_de_commande["bon_de_commande"]=$this->commande["commande"];
+        $bon_de_commande["bon_de_commande"]["ref"]="REF_bon_de_commande";
+        $bon_de_commande["bon_de_commande"]["id_commande"] = $this->_commande; 
+        $bon_de_commande["bon_de_commande"]["id_fournisseurFinal"]= 1589;
+        $bon_de_commande["bon_de_commande"]["id_fournisseur"]= 1589;        
+        $bon_de_commande["values_bon_de_commande"]=array("produits"=>'[{"bon_de_commande_ligne__dot__ref":"REF_Produit","bon_de_commande_ligne__dot__produit":"Tu_bon_de_commande","bon_de_commande_ligne__dot__quantite":"15","bon_de_commande_ligne__dot__prix":"10","bon_de_commande_ligne__dot__prix_achat":"10","bon_de_commande_ligne__dot__id_fournisseur":"1","bon_de_commande_ligne__dot__serial":"AZSQDERF12","bon_de_commande_ligne__dot__id_compte_absystech":"1","bon_de_commande_ligne__dot__marge":97.14,"bon_de_commande_ligne__dot__id_fournisseur_fk":"1"}]');
+        unset($bon_de_commande["bon_de_commande"]["prix_achat"]);
+        unset($bon_de_commande["bon_de_commande"]["id_devis"]);
+        $this->bon_de_commande=$bon_de_commande;
+        
+        //                   [instance BON DE COMMANDE]
+        $this->_bon_de_commande = ATF::bon_de_commande()->insert($this->bon_de_commande,$this->s);
+        $this->requete_valide("bon_de_commande");
+        
+        //                   [instance BON DE COMMANDE LIGNE]
+        $this->_bon_de_commande_ligne = ATF::bon_de_commande_ligne()->ss("id_bon_de_commande",$this->_bon_de_commande);
+        $this->requete_valide("bon_de_commande_ligne");
 
-		//				         [instance STOCK]
-		$this->_stock = $this->obj->sa();
-		$this->requete_valide("stock");
-		
-		//                       [instance STOCK ETAT]
-		$this->_stock_etat = ATF::stock_etat()->sa();
-		$this->requete_valide("stock_etat");	
-	}
-	
-	
-	/**
-	* jeu de test pour une livraison
-	*/
-	private function init_livraison(){
-		$this->livraison["livraison"]["id_commande"] = $this->_commande;
-		$this->livraison["livraison"]["id_societe"]=$this->id_societe;
-		$this->livraison["livraison"]["id_affaire"]=$this->_affaire;
-		$this->livraison["livraison"]["date"]=date('Y-m-d');
-		$this->livraison["values_livraison"]=array("produits"=>'[{"stock__dot__id_stock_fk":'.$this->_stock[0]["id_stock"].',"stock__dot__ref":"1201","stock__dot__libelle":"manette","stock__dot__serial":"kokfghghhghhhgys"},{"stock__dot__id_stock_fk":'.$this->_stock[1]["id_stock"].',"stock__dot__ref":"1201","stock__dot__libelle":"manette","stock__dot__serial":"klmlkmlkh"}]');	
-		//                      [instance LIVRAISON]
-		$this->_livraison = ATF::livraison()->insert($this->livraison);
-		$this->requete_valide("livraison");
-		
-		// 						[instance LIVRAISON LIGNE]	
-		$this->_livraison_ligne= ATF::livraison_ligne()->sa();
-		$this->requete_valide("livraison_ligne");
-		
-		//                       [instance STOCK ETAT]
-		$this->_stock_etat = ATF::stock_etat()->sa();
-		$this->requete_valide("stock_etat");	
-	}
+        //                       [instance STOCK]
+        $this->_stock = $this->obj->sa();
+        $this->requete_valide("stock");
+        
+        //                       [instance STOCK ETAT]
+        $this->_stock_etat = ATF::stock_etat()->sa();
+        $this->requete_valide("stock_etat");    
+    }
+    
+    
+    /**
+    * jeu de test pour une livraison
+    */
+    private function init_livraison(){
+        $this->livraison["livraison"]["id_commande"] = $this->_commande;
+        $this->livraison["livraison"]["id_societe"]=$this->id_societe;
+        $this->livraison["livraison"]["id_affaire"]=$this->_affaire;
+        $this->livraison["livraison"]["date"]=date('Y-m-d');
+        $this->livraison["values_livraison"]=array("produits"=>'[{"stock__dot__id_stock_fk":'.$this->_stock[0]["id_stock"].',"stock__dot__ref":"1201","stock__dot__libelle":"manette","stock__dot__serial":"kokfghghhghhhgys"},{"stock__dot__id_stock_fk":'.$this->_stock[1]["id_stock"].',"stock__dot__ref":"1201","stock__dot__libelle":"manette","stock__dot__serial":"klmlkmlkh"}]');   
+        //                      [instance LIVRAISON]
+        $this->_livraison = ATF::livraison()->insert($this->livraison);
+        $this->requete_valide("livraison");
+        
+        //                      [instance LIVRAISON LIGNE]  
+        $this->_livraison_ligne= ATF::livraison_ligne()->sa();
+        $this->requete_valide("livraison_ligne");
+        
+        //                       [instance STOCK ETAT]
+        $this->_stock_etat = ATF::stock_etat()->sa();
+        $this->requete_valide("stock_etat");    
+    }
 
 
-	/**
-	* cette méthode est appelée avant le test.
-	* @access protected
-	*/
-	protected function setUp(){
-		ATF::constante()->setValue('__STORE_URL__', 'http://dev.store.absystech.fr/');
-		ATF::constante()->setValue('__STORE_PATH__', '/home/www/absystech.fr-store/');
-		$this->initUser();
-		$this->environnement_test();
-		$this->ref = 'XW477AT';
-	}
-	
-		
-	/**
-	* cette méthode est appelée apres le test.
-	* @access protected
-	*/
-	protected function tearDown(){
+    /**
+    * cette méthode est appelée avant le test.
+    * @access protected
+    */
+    protected function setUp(){
+        ATF::constante()->setValue('__STORE_URL__', 'http://dev.store.absystech.fr/');
+        ATF::constante()->setValue('__STORE_PATH__', '/home/www/absystech.fr-store/');
+        $this->initUser();
+        $this->environnement_test();
+        $this->ref = 'XW477AT';
+    }
+    
+        
+    /**
+    * cette méthode est appelée apres le test.
+    * @access protected
+    */
+    protected function tearDown(){
 //echo ATF::db()->numberTransaction();
-		ATF::db()->rollback_transaction(true);
-		
-		//Flush des notices
-		ATF::$msg->getNotices();
-		ATF::$msg->getWarnings();
-	}
-/*
+        ATF::db()->rollback_transaction(true);
+        
+        //Flush des notices
+        ATF::$msg->getNotices();
+        ATF::$msg->getWarnings();
+    }
+    /**
+      * Test Method _GET avec adresse mac
+      * @author Cyril Charlier <ccharlier@absystech.net>
+    */
+    public function test_GETByMac() {
+       $insertStock = ATF::stock()->i(array("libelle" =>"print stock test TU",
+            "serial"=>"AZEAZEAZE",
+            'adresse_mac'=>"AZ12BE45"
+        )); 
+       $get = array('adresse_mac'=>'AZ12BE45');
+       $ret =ATF::stock()->_GET($get,'');
+        $this->assertEquals("AZEAZEAZE", $ret['serial'],"Erreur serial de retour");
+    }
+    /*
     // @author Quentin JANON <qjanon@absystech.fr>
     public function test_updateForMagentoDelete() {
         $this->test_updateForMagentoSend();
@@ -1196,7 +1208,75 @@ class stock_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(189,$p2After["prix"],"Le deuxième produit de même ref n'as pas vu son prix mise a jour automatiquement");
         $this->assertEquals("divers",$p2After["categories_magento"],"Le deuxième produit de même ref n'as pas vu son prix mise a jour automatiquement");
 
-    }    // @author Quentin JANON <qjanon@absystech.fr>
+    }
+    /**
+      * Test Method _GET avec id_stock
+      * @author Cyril Charlier <ccharlier@absystech.net>
+    */
+    public function test_GETById() {
 
-   
+        $commercial = ATF::user()->i(array("login" =>"userTest",
+            'password'=>"az78qs45",
+            'nom'=>'test',
+            'civilite'=>'m',
+            'prenom'=>'test prenom'
+        ));
+        $societe = ATF::societe()->insert(array("societe"=>"Societe Test",
+            'id_commercial'=>$commercial
+        ));
+       $affaire = ATF::affaire()->insert(array(
+            "id_societe"=> $societe,
+            "affaire"=>"affaire test",
+            'id_commercial'=> $commercial
+        )); 
+       $insertStock = ATF::stock()->i(array("libelle" =>"other one",
+            "serial"=>"test",
+            "id_affaire"=> $affaire,
+            'adresse_mac'=>"AB123436"
+        ));
+       $get = array('id_stock'=> $insertStock);
+
+       $ret =ATF::stock()->_GET($get,'');
+        $this->assertEquals("test", $ret['serial'],"Erreur serial de retour");
+        $this->assertEquals("affaire test", $ret['id_affaire'],"Erreur affaire de retour");
+        $this->assertEquals("Societe Test", $ret['societe'],"Erreur societe de retour");
+    }
+    /**
+      * Test Method _GET avec avec une adresse mac inconnue
+      * @author Cyril Charlier <ccharlier@absystech.net>
+    */
+    public function test_GETUnknowMac() {
+
+        $insertStock = ATF::stock()->i(array("libelle" =>"other one",
+            "serial"=>"test",
+            "id_affaire"=> $affaire,
+            'adresse_mac'=>"AB123436"
+        ));
+        $get = array(
+            'adresse_mac'=> 'AB96046NB',
+            'identity'=>'hyperPrint'
+            );
+       
+        $ret =ATF::stock()->_GET($get,'');
+        $this->assertEquals("test", $ret['serial'],"Erreur serial de retour");
+        $this->assertEquals("affaire test", $ret['id_affaire'],"Erreur affaire de retour");
+        $this->assertEquals("Societe Test", $ret['societe'],"Erreur societe de retour");
+    }
+    /**
+      * Test Method _GET sans params
+      * @author Cyril Charlier <ccharlier@absystech.net>
+    */
+    public function test_GET() {
+       ATF::stock()->i(array("libelle" =>"premier stock",
+            "serial"=>"S22aS",
+            'adresse_mac'=>"AB24CD98"
+        ));
+        ATF::stock()->i(array("libelle" =>"deuxieme stock",
+            "serial"=>"IK57IHC",
+            'adresse_mac'=>"AB98CD24"
+        )); 
+        $ret =ATF::stock()->_GET();
+        $this->assertEquals("S22aS", $ret[15]['serial'],"Erreur serial de retour");
+        $this->assertEquals("IK57IHC", $ret[16]['serial'],"Erreur serial de retour");
+    }
 }

@@ -95,15 +95,15 @@ class print_alerte_absystech extends classes_optima {
 		$alertes = json_decode($post['alerts'],true);
         try {	  
         	ATF::db($this->db)->begin_transaction();  		
-				foreach ($alertes as $k=>$i) {
-					$toinsert[]= array(
-						"code"=>$i['code']
-						,"message"=>$i['message']
-						,"id_stock"=>$post['id_stock']
-						,'date'=>$post['date']
-					);
-				$result = $this->multi_insert($toinsert);
+			foreach ($alertes as $k=>$i) {
+				$toinsert[]= array(
+					"code"=>$i['code']
+					,"message"=>$i['message']
+					,"id_stock"=>$post['id_stock']
+					,'date'=>$post['date']
+				);
 			}
+			$result = $this->multi_insert($toinsert);
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
   			throw new errorATF($e->getMessage(),500);
@@ -133,7 +133,6 @@ class print_alerte_absystech extends classes_optima {
 		    	foreach ($post as $key => $value) {
 			    	$this->update($value);
 		    	}
-		        $return['notices'] = ATF::$msg->getNotices();
 		    } catch (errorATF $e) {
 	  			throw new errorATF($e->getMessage(),500);
 		    }			
