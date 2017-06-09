@@ -122,8 +122,7 @@ class print_consommable_absystech extends classes_optima {
 		$input = file_get_contents('php://input');
 	    if (!empty($input)) parse_str($input,$post);
 		$return = array();
-
-        if (!$get['id']) throw new errorATF("MISSING_ID",1000);
+        if (!$post['id']) throw new errorATF("MISSING_ID",1000);
         $return['notices'] = ATF::$msg->getNotices();
 		$return['result'] = $this->delete($post);
         return $return;
