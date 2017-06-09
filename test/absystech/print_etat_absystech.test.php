@@ -44,11 +44,14 @@ class print_etat_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 	public function test_GETForGraph(){
 		$this->environnement_test();
+		$currentDate = new DateTime();
 		for ($i=0; $i < 30; $i++) { 
-			$date = new DateTime("2017-08-"+$i);
+			$date = new DateTime();
+			$date->sub(new DateInterval('P'.$i.'D'));
+
 			$id_etat = ATF::print_etat()->insert(array(
-				"date"=> date_format($date,'Y-M-d H:i:s'),
-				'name'=>"Cartouche Test noir"+$i,
+				"date"=> date_format($date,'Y-m-d H:i:s'),
+				'name'=>"Cartouche Test noir ".$i,
 				'color'=>'black',
 				'id_stock'=> $this->id_stock,
 				'current' => 2500-($i*5),
@@ -59,122 +62,128 @@ class print_etat_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		$get = array('id_stock' => $this->id_stock,"graph"=> "true");
 		$ret =ATF::print_etat()->_GET($get);
-		log::logger($ret,'ccharlier');
-		//$this->assertEquals("Cartouche Test noir",$ret[0]["name"],"Probleme de name retour print etat");
-		//$this->assertEquals("black",$ret[0]["color"],"Probleme de duree retour print etat");
-		//$this->assertEquals(3000,$ret[0]["max"],"Probleme de retour max");
-	}
-	/*
-	public function test_GET(){
-		$this->environnement_test();	
-		ATF::print_consommable()->insert(array(
-			"designation"=>"Test noir",
-			'duree'=>"12500",
-			'prix'=>12.5,
-			'ref_stock'=> $this->ref_stock,
-			'couleur'=> 'noir'
-		));
-		ATF::print_consommable()->insert(array(
-			"designation"=>"Test magenta",
-			'duree'=>"18500",
-			'prix'=>1298.5,
-			'ref_stock'=> $this->ref_stock,
-			'couleur'=> 'magenta'
-		));
-		ATF::print_consommable()->insert(array(
-			"designation"=>"Test yellow",
-			'duree'=>"18600",
-			'prix'=>198.35,
-			'ref_stock'=> $this->ref_stock,
-			'couleur'=> 'jaune'
-		));
-		$ret =ATF::print_consommable()->_GET();
-		$this->assertEquals("Test noir",$ret[0]["designation"],"Probleme de designation retour print consommable");
-		$this->assertEquals("12500",$ret[0]["duree"],"Probleme de duree retour print consommable");
-		$this->assertEquals("noir",$ret[0]["couleur"],"Probleme de code couleur");
+		// point le plus ancien en premier
+		$this->assertEquals(date_format($date,'Y-m-d H:i:s'),$ret[0]["date"],"Probleme de date retour print etat");
+		$this->assertEquals("black",$ret[0]["color"],"Probleme de color retour print etat");
+		$this->assertEquals("Cartouche Test noir 29",$ret[0]["name"],"Probleme de retour max");
 
-		$this->assertEquals("Test magenta",$ret[1]["designation"],"Probleme de designation retour print consommable");
-		$this->assertEquals("18500",$ret[1]["duree"],"Probleme de duree retour print consommable");
-		$this->assertEquals("magenta",$ret[1]["couleur"],"Probleme de code couleur");
-
-		$this->assertEquals("Test yellow",$ret[2]["designation"],"Probleme de designation retour print consommable");
-		$this->assertEquals("18600",$ret[2]["duree"],"Probleme de duree retour print consommable");
-		$this->assertEquals("jaune",$ret[2]["couleur"],"Probleme de code couleur");
-	}
-	public function test_GETByRefStock(){
-		$this->environnement_test();	
-		
-		ATF::stock()->insert(array(
-			"libelle" =>"print stock test 2",
-			"ref"=>'789789789',
-			'adresse_mac'=>"15GH65IORJ",
-			'quantite'=> 1
-		));
-		ATF::print_consommable()->insert(array(
-			"designation"=>"Test noir",
-			'duree'=>"12500",
-			'prix'=>12.5,
-			'ref_stock'=> $this->ref_stock,
-			'couleur'=> 'noir'
-		));
-		ATF::print_consommable()->insert(array(
-			"designation"=>"Test magenta",
-			'duree'=>"18500",
-			'prix'=>1298.5,
-			'ref_stock'=> $this->ref_stock,
-			'couleur'=> 'magenta'
-		));
-		ATF::print_consommable()->insert(array(
-			"designation"=>"Test yellow",
-			'duree'=>"18600",
-			'prix'=>198.35,
-			'ref_stock'=> '789789789',
-			'couleur'=> 'jaune'
-		));
-		$get = array('ref_stock' => $this->ref_stock);
-		$ret =ATF::print_consommable()->_GET($get);
-		$this->assertEquals("Test noir",$ret[0]["designation"],"Probleme de designation retour print consommable");
-		$this->assertEquals("12500",$ret[0]["duree"],"Probleme de duree retour print consommable");
-		$this->assertEquals("noir",$ret[0]["couleur"],"Probleme de code couleur");
-
-		$this->assertEquals("Test magenta",$ret[1]["designation"],"Probleme de designation retour print consommable");
-		$this->assertEquals("18500",$ret[1]["duree"],"Probleme de duree retour print consommable");
-		$this->assertEquals("magenta",$ret[1]["couleur"],"Probleme de code couleur");
+		$this->assertEquals(date_format($currentDate,'Y-m-d H:i:s'),$ret[29]["date"],"Probleme de date retour print etat");
+		$this->assertEquals("black",$ret[29]["color"],"Probleme de color retour print etat");
+		$this->assertEquals("Cartouche Test noir 0",$ret[29]["name"],"Probleme de retour max");		
 	}
 	
+	public function test_GET(){
+		$this->environnement_test();	
+		$date = new DateTime();
+
+		ATF::print_etat()->insert(array(
+			"date"=> date_format($date,'Y-m-d H:i:s'),
+			'name'=>"Cartouche Test noir",
+			'color'=>'black',
+			'id_stock'=> $this->id_stock,
+			'current' => 20000,
+			'max' => 33000,
+			'type'=> 'toner'
+		));
+		ATF::print_etat()->insert(array(
+			"date"=> date_format($date,'Y-m-d H:i:s'),
+			'name'=>"Cartouche Test jaune",
+			'color'=>'yellow',
+			'id_stock'=> $this->id_stock,
+			'current' => 2500,
+			'max' => 3000,
+			'type'=> 'toner'
+		));
+		ATF::print_etat()->insert(array(
+			"date"=> date_format($date,'Y-m-d H:i:s'),
+			'name'=>"Cartouche Test magenta",
+			'color'=>'magenta',
+			'id_stock'=> $this->id_stock,
+			'current' => 500,
+			'max' => 5000,
+			'type'=> 'toner'
+		));
+		$ret =ATF::print_etat()->_GET();
+
+		$this->assertEquals("Cartouche Test noir",$ret[0]["name"],"Probleme de name retour print consommable");
+		$this->assertEquals("20000",$ret[0]["current"],"Probleme de current retour print consommable");
+		$this->assertEquals("black",$ret[0]["color"],"Probleme de code color");
+
+		$this->assertEquals("Cartouche Test jaune",$ret[1]["name"],"Probleme de name retour print consommable");
+		$this->assertEquals("2500",$ret[1]["current"],"Probleme de current retour print consommable");
+		$this->assertEquals("yellow",$ret[1]["color"],"Probleme de code color");
+
+		$this->assertEquals("Cartouche Test magenta",$ret[2]["name"],"Probleme de name retour print consommable");
+		$this->assertEquals("500",$ret[2]["current"],"Probleme de current retour print consommable");
+		$this->assertEquals("magenta",$ret[2]["color"],"Probleme de code color");
+	}
+
 	public function test_POST(){
 		$this->environnement_test();	
 		$date = new DateTime("2017-05-02");
 		$post = array(
-			"designation"=>"Test noir",
-			'duree'=>"12500",
-			'prix'=>12.5,
-			'ref_stock'=> $this->ref_stock,
-			'couleur'=> 'noir'
+			'id_stock'=> $this->id_stock,
+			'etat' => json_encode( array(
+				"toners"=> array(array(
+					"date"=> date_format($date,'Y-m-d H:i:s'),
+					'name'=>"Cartouche Test post",
+					'color'=>'black',
+					'current' => 200,
+					'max' => 8000,
+				)),
+				'copies' => array(
+					"mono"=> 654321,
+					'color'=> 123456
+				)
+
+			))
 		);
 
 		$ret =ATF::print_etat()->_POST('',$post);
 		$this->assertTrue($ret['result'],"probleme d'insertion via POST");
-		$consommable = ATF::print_consommable()->select_all();
-		$this->assertEquals($consommable['data'][0]['id_print_consommable'],$ret['id_print_consommable'],'Probleme consommable inséré');
+		$etat = ATF::print_etat()->select_all();
+
+		$this->assertEquals($this->id_stock,$etat[0]['id_stock'],'Probleme id_stock insérée');
+		$this->assertEquals('color',$etat[0]['name'],'Probleme name insérée');
+		$this->assertEquals('copie_couleur',$etat[0]['type'],'Probleme type inséré');
+
+		$this->assertEquals($this->id_stock,$etat[1]['id_stock'],'Probleme id_stock insérée');
+		$this->assertEquals('mono',$etat[1]['name'],'Probleme name insérée');
+		$this->assertEquals('copie_noir',$etat[1]['type'],'Probleme type inséré');
+
+
+		$this->assertEquals($this->id_stock,$etat[2]['id_stock'],'Probleme id_stock insérée');
+		$this->assertEquals('Cartouche Test post',$etat[2]['name'],'Probleme name insérée');
+		$this->assertEquals('toner',$etat[2]['type'],'Probleme type inséré');
 	}
 	public function test_POSTError(){
 		$this->environnement_test();	
 		try {
-			$post = array(
-				"designation"=>"",
-				'duree'=>"12500",
-				'prix'=>12.5,
-				'ref_stock'=> $this->ref_stock,
-				'couleur'=> 'noir'
-			);
-			ATF::print_consommable()->_POST(false,$post);
+			// id_stock is missing 
+		$post = array(
+			'id_stock'=> '',
+			'etat' => json_encode( array(
+				"toners"=> array(array(
+					"date"=> date_format($date,'Y-m-d H:i:s'),
+					'name'=>"Cartouche Test post",
+					'color'=>'black',
+					'current' => 200,
+					'max' => 8000,
+				)),
+				'copies' => array(
+					"mono"=> 654321,
+					'color'=> 123456
+				)
+
+			))
+		);
+			ATF::print_etat()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(500,$error,'problème sur post lorsqu il y a un champ manquant');
 
 	}
-	*/
+
 }
 ?>

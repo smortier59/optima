@@ -200,8 +200,8 @@ class print_consommable_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			'ref_stock'=> $this->ref_stock,
 			'couleur'=> 'noir'
 		));
-		$get = array('id'=>$id_print_consommable);
-		$ret =ATF::print_consommable()->_DELETE($get);
+		$post = array('id'=>$id_print_consommable);
+		$ret =ATF::print_consommable()->_DELETE(false,$post);
 		$this->assertTrue($ret['result'],'doit retourner true');
 	}
 	public function test_DELETE_Error(){

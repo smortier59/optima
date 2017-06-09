@@ -1,0 +1,1 @@
+ALTER TABLE `print_consommable` CHANGE `couleur` `couleur` ENUM('noir','cyan','magenta','jaune','autre') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
