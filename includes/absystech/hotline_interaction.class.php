@@ -28,87 +28,87 @@ class hotline_interaction extends classes_optima {
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","width"=>50,"align"=>"center")
 		);
 
-        $this->colonnes['primary'] = array(
-            "detail"=>array("editor"=>"simpleEditor")
-        );
-        $this->panels['primary'] = array('nbCols'=>1);
+		$this->colonnes['primary'] = array(
+			"detail"=>array("editor"=>"simpleEditor")
+		);
+		$this->panels['primary'] = array('nbCols'=>1);
 
 
-        $this->colonnes['panel']['horaires_fs'] = array(
-        	 "heure_depart_dep"=>array("listeners"=>array("change"=>"ATF.changeHeureDep","select"=>"ATF.selectHeureDep"))
-        	,"heure_debut_presta"=>array("listeners"=>array("change"=>"ATF.changeHeurePresta","select"=>"ATF.selectHeurePresta"))
-        	,"duree_pause"=>array("listeners"=>array("change"=>"ATF.changeDureePause","select"=>"ATF.selectDureePause"), "min"=>"00:00")
-        	,"heure_fin_presta"=>array("listeners"=>array("change"=>"ATF.changeHeurePresta","select"=>"ATF.selectHeurePresta"))
-        	,"heure_arrive_dep"=>array("listeners"=>array("change"=>"ATF.changeHeureDep","select"=>"ATF.selectHeureDep"))
-        );
-        $this->panels['horaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
+		$this->colonnes['panel']['horaires_fs'] = array(
+			 "heure_depart_dep"=>array("listeners"=>array("change"=>"ATF.changeHeureDep","select"=>"ATF.selectHeureDep"))
+			,"heure_debut_presta"=>array("listeners"=>array("change"=>"ATF.changeHeurePresta","select"=>"ATF.selectHeurePresta"))
+			,"duree_pause"=>array("listeners"=>array("change"=>"ATF.changeDureePause","select"=>"ATF.selectDureePause"), "min"=>"00:00")
+			,"heure_fin_presta"=>array("listeners"=>array("change"=>"ATF.changeHeurePresta","select"=>"ATF.selectHeurePresta"))
+			,"heure_arrive_dep"=>array("listeners"=>array("change"=>"ATF.changeHeureDep","select"=>"ATF.selectHeureDep"))
+		);
+		$this->panels['horaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
 
 
-        $this->colonnes['panel']['duree_credit_fs'] = array(
-        	 "duree_presta"=>array("listeners"=>array("change"=>"ATF.changeDureePresta","select"=>"ATF.selectDureePresta"), "min"=>"00:00")
-        	,"credit_presta"=>array("listeners"=>array("change"=>"ATF.changeCreditPresta"))
-        	,"duree_dep"=>array("disabled"=>true, "min"=>"00:00")
-        	,"credit_dep"=>array("listeners"=>array("change"=>"ATF.changeCreditDep"))
-        	,"matos"=>array("xtype"=>"switchbutton","default"=>"non")
-        	,"champ_alerte"=>array("custom"=>true, "xtype"=>"textarea","targetCols"=>1,"hidden"=>true)
-        );
-        $this->panels['duree_credit_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
+		$this->colonnes['panel']['duree_credit_fs'] = array(
+			 "duree_presta"=>array("listeners"=>array("change"=>"ATF.changeDureePresta","select"=>"ATF.selectDureePresta"), "min"=>"00:00")
+			,"credit_presta"=>array("listeners"=>array("change"=>"ATF.changeCreditPresta"))
+			,"duree_dep"=>array("disabled"=>true, "min"=>"00:00")
+			,"credit_dep"=>array("listeners"=>array("change"=>"ATF.changeCreditDep"))
+			,"matos"=>array("xtype"=>"switchbutton","default"=>"non")
+			,"champ_alerte"=>array("custom"=>true, "xtype"=>"textarea","targetCols"=>1,"hidden"=>true)
+		);
+		$this->panels['duree_credit_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
 
-        // Sous panel de temps
-        $this->colonnes['panel']['temps_fs'] = array(
-        	"nature"=>array("data"=>array("internal", 'relation_client', 'interaction'),"xtype"=>"combo", "listeners"=>array("select"=>"ATF.selectNature"))
-        	,"date"
-        	,"deplacements"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'horaires_fs')
-        	,"prestations"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'duree_credit_fs')
-        );
-        $this->panels['temps_fs'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
+		// Sous panel de temps
+		$this->colonnes['panel']['temps_fs'] = array(
+			"nature"=>array("data"=>array("internal", 'relation_client', 'interaction'),"xtype"=>"combo", "listeners"=>array("select"=>"ATF.selectNature"))
+			,"date"
+			,"deplacements"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'horaires_fs')
+			,"prestations"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'duree_credit_fs')
+		);
+		$this->panels['temps_fs'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
 
 
 
-        // Sous panel de paramétrage
-        $this->colonnes['panel']['options_fs'] = array(
-            "etat_wait"=>array("xtype"=>"switchbutton","default"=>"non")
-            ,"send_mail"=>array("xtype"=>"switchbutton","null"=>true)
-            ,"mep_mail"=>array("xtype"=>"switchbutton","default"=>"non")
-            ,"visible"=>array("xtype"=>"switchbutton")
-            ,"id_contact"
-            ,"id_user"=>array("custom"=>true)
-            ,"id_ordre_de_mission"
-            ,"sp_transfert"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'transfert_fs')
-            ,"notifications"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'notifications_fs')
-        );
-        $this->panels['options_fs'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
+		// Sous panel de paramétrage
+		$this->colonnes['panel']['options_fs'] = array(
+			"etat_wait"=>array("xtype"=>"switchbutton","default"=>"non")
+			,"send_mail"=>array("xtype"=>"switchbutton","null"=>true)
+			,"mep_mail"=>array("xtype"=>"switchbutton","default"=>"non")
+			,"visible"=>array("xtype"=>"switchbutton")
+			,"id_contact"
+			,"id_user"=>array("custom"=>true)
+			,"id_ordre_de_mission"
+			,"sp_transfert"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'transfert_fs')
+			,"notifications"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'notifications_fs')
+		);
+		$this->panels['options_fs'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
 
-        // Sous panel de paramétrage
-        $this->colonnes['panel']['notifications_fs'] = array(
-            "anotherNotify"=>array("custom"=>true)
-            ,"actifNotify"=>array("custom"=>true)
-        );
-        $this->panels['notifications_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
+		// Sous panel de paramétrage
+		$this->colonnes['panel']['notifications_fs'] = array(
+			"anotherNotify"=>array("custom"=>true)
+			,"actifNotify"=>array("custom"=>true)
+		);
+		$this->panels['notifications_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
 
-        // Sous panel de paramétrage
-        $this->colonnes['panel']['transfert_fs'] = array(
-            "transfert"=>array("custom"=>true)
-            ,"transfert_pole"=>array("custom"=>true)
-        );
-        $this->panels['transfert_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
+		// Sous panel de paramétrage
+		$this->colonnes['panel']['transfert_fs'] = array(
+			"transfert"=>array("custom"=>true)
+			,"transfert_pole"=>array("custom"=>true)
+		);
+		$this->panels['transfert_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
 
-        // Panel qui contient tous les sous panel
-        $this->colonnes['panel']['parametre'] = array(
-            "sp_temps"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'temps_fs'),
-            "options"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'options_fs')
-        );
-        $this->panels['parametre'] = array("visible"=>true);
+		// Panel qui contient tous les sous panel
+		$this->colonnes['panel']['parametre'] = array(
+			"sp_temps"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'temps_fs'),
+			"options"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'options_fs')
+		);
+		$this->panels['parametre'] = array("visible"=>true);
 
-        //Panel intéraction du ticket
-        /*$this->colonnes['panel']['lignes_interactions'] = array(
-            "interactions"=>array("custom"=>true)
-            ,"rappel-hotline"=>array("custom"=>true,"xtype"=>"displayfield","readonly"=>true)
-            ,"rappelDetail-hotline"=>array("custom"=>true,"xtype"=>"displayfield","readonly"=>true)
-        );
-        $this->panels['lignes_interactions'] = array('nbCols'=>1);*/
+		//Panel intéraction du ticket
+		/*$this->colonnes['panel']['lignes_interactions'] = array(
+			"interactions"=>array("custom"=>true)
+			,"rappel-hotline"=>array("custom"=>true,"xtype"=>"displayfield","readonly"=>true)
+			,"rappelDetail-hotline"=>array("custom"=>true,"xtype"=>"displayfield","readonly"=>true)
+		);
+		$this->panels['lignes_interactions'] = array('nbCols'=>1);*/
 
-        $this->fieldstructure();
+		$this->fieldstructure();
 
 
 		$this->color["etat"]["done"] = "#AAAAAA";
@@ -161,15 +161,15 @@ class hotline_interaction extends classes_optima {
 
 	/**
 	* INSERTION d'une interaction de hotline
-    * @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param array $infos Les informations de l'interaction
 	* @param array $s La session
 	* @param array $files Les fichiers uploadés
 	* @param boolean $mail True si on désire
 	* @param boolean $pointage True si on désire créer le pointage
-    * @return boolean true
-    */
+	* @return boolean true
+	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true) {
 
 		$this->infoCollapse($infos);
@@ -353,9 +353,9 @@ class hotline_interaction extends classes_optima {
 			,"detail"=>$infos["detail"]
 			,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 			,"id_contact"=>$infos["id_contact"]
-            ,"id_hotline"=>$infos["id_hotline"]
-            ,"visible"=>$infos["visible"]
-            ,"nature"=>$infos["nature"]
+			,"id_hotline"=>$infos["id_hotline"]
+			,"visible"=>$infos["visible"]
+			,"nature"=>$infos["nature"]
 			,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 		);
 
@@ -532,13 +532,13 @@ class hotline_interaction extends classes_optima {
 	}
 
 	/**
-    * Retourne la valeur par défaut spécifique aux données passées en paramètres
-    * @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
+	* Retourne la valeur par défaut spécifique aux données passées en paramètres
+	* @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
 	* @param string $field
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */
+	*/
 	public function default_value($field,&$s,&$request){
 		switch ($field) {
 			case "id_user":
@@ -598,21 +598,21 @@ class hotline_interaction extends classes_optima {
 
 			$credit = explode(".", strval($credit));
 
-	        if($credit[1] > 0){
-	            if($credit[1] <= 250){
-	                $nb = 0.25;
-	            }elseif($credit[1] <= 500){
-	                $nb = 0.50;
-	            }elseif($credit[1] <= 750){
-	                $nb = 0.75;
-	            }else{
-	                $nb = 1;
-	            }
-	        }
-	        $nb = $nb + $credit[0];
+			if($credit[1] > 0){
+				if($credit[1] <= 250){
+					$nb = 0.25;
+				}elseif($credit[1] <= 500){
+					$nb = 0.50;
+				}elseif($credit[1] <= 750){
+					$nb = 0.75;
+				}else{
+					$nb = 1;
+				}
+			}
+			$nb = $nb + $credit[0];
 		}
 
-        return $nb;
+		return $nb;
 	}
 
 
@@ -641,8 +641,8 @@ class hotline_interaction extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id L'identifiant de l'interaction
-    * @return int le temps en base 10 (1 = 1h)
-    */
+	* @return int le temps en base 10 (1 = 1h)
+	*/
 	private function getTime($id_hotline_interaction,$temps) {
 		if($temps == "credit"){
 			$this->q->reset()
@@ -1561,31 +1561,31 @@ class hotline_interaction extends classes_optima {
 	public function getDataMargeHotline($data, $id_user , &$workedHour){
 		$return = array();
 		foreach ($data as $key => $value) {
-      		$compteur=0;
-    		foreach ($value as $khi => $vhi) {
-    			if($compteur == 0){
-    				$hotline = ATF::hotline()->select($vhi["id_hotline"]);
-		    		$return[$key]["id_hotline"] = $hotline["id_hotline"];
-		    		$return[$key]["hotline"] = $hotline["hotline"];
-		    		$return[$key]["societe"] = ATF::societe()->select($hotline["id_societe"],"societe");
-		    		$return[$key]["date"] =date("d/m/Y", strtotime($hotline["date"]));
-		    		$id_affaire = $hotline["id_affaire"];
+			$compteur=0;
+			foreach ($value as $khi => $vhi) {
+				if($compteur == 0){
+					$hotline = ATF::hotline()->select($vhi["id_hotline"]);
+					$return[$key]["id_hotline"] = $hotline["id_hotline"];
+					$return[$key]["hotline"] = $hotline["hotline"];
+					$return[$key]["societe"] = ATF::societe()->select($hotline["id_societe"],"societe");
+					$return[$key]["date"] =date("d/m/Y", strtotime($hotline["date"]));
+					$id_affaire = $hotline["id_affaire"];
 
-		    		if($hotline["date_fin"]){ $return[$key]["date_fin"] = date("d/m/Y", strtotime($hotline["date_fin"])); }
-		    		else{ $return[$key]["date_fin"] = ""; }
-    			}
+					if($hotline["date_fin"]){ $return[$key]["date_fin"] = date("d/m/Y", strtotime($hotline["date_fin"])); }
+					else{ $return[$key]["date_fin"] = ""; }
+				}
 
-    			if ($id_affaire && !$affaires[$id_affaire]) {
-	    			$affaires[$id_affaire] = ATF::affaire()->select($id_affaire);
-    			}
+				if ($id_affaire && !$affaires[$id_affaire]) {
+					$affaires[$id_affaire] = ATF::affaire()->select($id_affaire);
+				}
 
-    			$temps_passe = (ATF::hotline()->getSecond($vhi["duree_presta"])
-    						   +ATF::hotline()->getSecond($vhi["duree_dep"]))
-    			   			   -ATF::hotline()->getSecond($vhi["duree_pause"]);
+				$temps_passe = (ATF::hotline()->getSecond($vhi["duree_presta"])
+							   +ATF::hotline()->getSecond($vhi["duree_dep"]))
+							   -ATF::hotline()->getSecond($vhi["duree_pause"]);
 
-    			if($id_user) $workedHour[$id_user] += round($temps_passe/3600,2);
+				if($id_user) $workedHour[$id_user] += round($temps_passe/3600,2);
 
-    			$return[$key]["temps_passe"] += round($temps_passe/3600,2);
+				$return[$key]["temps_passe"] += round($temps_passe/3600,2);
 
 				if($temps_passe != 0){
 					$facturation_ticket = $hotline["facturation_ticket"];
@@ -1595,7 +1595,7 @@ class hotline_interaction extends classes_optima {
 						$return[$key]["temps_facture"] += round($temps,2);
 						$return[$key]["marge_brute"] += round($temps*__TAUX_HORAIRE_TICKET__,2);
 						$return[$key]["affaire"] = "";
-    					$return[$key]["taux_horaire"] = __TAUX_HORAIRE_TICKET__;
+						$return[$key]["taux_horaire"] = __TAUX_HORAIRE_TICKET__;
 
 					}else{
 						if($id_affaire){
@@ -1606,7 +1606,7 @@ class hotline_interaction extends classes_optima {
 								}
 								$return[$key]["marge_brute"] += round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
 								$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
-	    						$return[$key]["taux_horaire"] = round($THAffaire[$id_affaire],2);
+								$return[$key]["taux_horaire"] = round($THAffaire[$id_affaire],2);
 
 							} else {
 								// Affaires non signées
@@ -1615,13 +1615,13 @@ class hotline_interaction extends classes_optima {
 								}
 								$return[$key]["marge_brute"] = round(($temps_passe/3600)*$THAffaire[$id_affaire],2);
 								$return[$key]["affaire"] = ATF::affaire()->select($id_affaire , "affaire");
-	    						$return[$key]["taux_horaire"] = 0;
+								$return[$key]["taux_horaire"] = 0;
 							}
 						}else{
 							$return[$key]["temps_facture"] = 0;
 							$return[$key]["marge_brute"] = 0;
-    						$return[$key]["affaire"] = "";
-    						$return[$key]["taux_horaire"] = 0;
+							$return[$key]["affaire"] = "";
+							$return[$key]["taux_horaire"] = 0;
 
 						}
 					}
@@ -1629,9 +1629,9 @@ class hotline_interaction extends classes_optima {
 					$return[$key]["marge_nette"] = round($return[$key]["marge_brute"] - $return[$key]["cout_homme"] ,2);
 				}
 				$compteur++;
-	    	}
-    	}
-    	return $return;
+			}
+		}
+		return $return;
 	}
 
 	public function export_marge_hotline($infos){
@@ -1677,11 +1677,11 @@ class hotline_interaction extends classes_optima {
 		foreach ($feuilles as $key => $value) {
 			if ($premfeuille){
 				$workbook->setActiveSheetIndex($key);
-			    $sheet = $workbook->getActiveSheet();
-			    $sheet->setTitle($value["titre"]);
-			    $this->ajoutTitreExport($sheet);
-			    $this->ajoutDataExport($sheet, $users[$value["user"]] ,$value["user"], $workedHour);
-			    $premfeuille = false;
+				$sheet = $workbook->getActiveSheet();
+				$sheet->setTitle($value["titre"]);
+				$this->ajoutTitreExport($sheet);
+				$this->ajoutDataExport($sheet, $users[$value["user"]] ,$value["user"], $workedHour);
+				$premfeuille = false;
 			}else{
 				$sheet = $workbook->createSheet($key);
 				$workbook->setActiveSheetIndex($key);
@@ -1707,33 +1707,33 @@ class hotline_interaction extends classes_optima {
 	}
 
 	/** Mise en place des titres
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-     */
-    public function ajoutTitreExport(&$sheet, $titre){
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function ajoutTitreExport(&$sheet, $titre){
 
-    	$titre = array("#","Hotline","Société","Affaire","Date","Date de cloture","Nombre heures passées","Nombre heures facturées","Marge brute", "Taux horaire","Coût homme","Marge Nette");
+		$titre = array("#","Hotline","Société","Affaire","Date","Date de cloture","Nombre heures passées","Nombre heures facturées","Marge brute", "Taux horaire","Coût homme","Marge Nette");
 
-    	foreach ($titre as $key => $value) { $row_data[] = array($value,150); }
-    	$i=0;
-    	foreach($row_data as $col=>$titre){
+		foreach ($titre as $key => $value) { $row_data[] = array($value,150); }
+		$i=0;
+		foreach($row_data as $col=>$titre){
 			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
 			$sheet->getColumnDimension($col)->setWidth($titre[1]);
 			$i++;
-        }
-    }
+		}
+	}
 
 
 
-    /** Insertion des données dans le tableau
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-    */
-    public function ajoutDataExport(&$sheet, $data, $id_user ,&$workedHour){
-    	$row_auto=1;
+	/** Insertion des données dans le tableau
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function ajoutDataExport(&$sheet, $data, $id_user ,&$workedHour){
+		$row_auto=1;
 
-    	$result = $this->getDataMargeHotline($data, $id_user , $workedHour);
+		$result = $this->getDataMargeHotline($data, $id_user , $workedHour);
 
-      	foreach ($result as $key => $value) {
-      		$row_data[$key][0] = $value["id_hotline"];
+		foreach ($result as $key => $value) {
+			$row_data[$key][0] = $value["id_hotline"];
 			$row_data[$key][1] = $value["hotline"];
 			$row_data[$key][2] = $value["societe"];
 			$row_data[$key][3] = $value["affaire"];
@@ -1745,60 +1745,60 @@ class hotline_interaction extends classes_optima {
 			$row_data[$key][9] = $value["taux_horaire"];
 			$row_data[$key][10] = $value["cout_homme"];
 			$row_data[$key][11] = $value["marge_nette"];
-      	}
+		}
 
-    	$i=0;
-    	$j=2;
-    	foreach ($row_data as $ligne => $value){
-	    	foreach($value as $col=>$titre){
+		$i=0;
+		$j=2;
+		foreach ($row_data as $ligne => $value){
+			foreach($value as $col=>$titre){
 				$sheet->setCellValueByColumnAndRow($i , $j, $titre);
 				$i++;
-	        }
-	        $i=0;
-	        $j++;
-	    }
+			}
+			$i=0;
+			$j++;
+		}
 
-	    $j+3;
-	    if($id_user){
-	   		$sheet->setCellValueByColumnAndRow(0 , $j, "Temps pointé");
-	   		$sheet->setCellValueByColumnAndRow(1 , $j, $workedHour[$id_user]);
-	   		$j++;
-	   		$temps_partiel = number_format(ATF::user()->select($id_user ,"temps_partiel"),2);
-	   		$sheet->setCellValueByColumnAndRow(0 , $j, "Temps travaillé");
-	   		$sheet->setCellValueByColumnAndRow(1 , $j, ($workedHour[0]*7*$temps_partiel));
-	   		$j++;
-	   		$sheet->setCellValueByColumnAndRow(0 , $j, "Non pointé");
-	   		$npt = ($workedHour[0]*7*$temps_partiel)-$workedHour[$id_user];
-	   		$workedHour["ALL"]["pointe"] += $workedHour[$id_user];
-	   		$workedHour["ALL"]["travaille"] += $workedHour[0]*7*$temps_partiel;
-	   		if($npt > 0){
-	   			$workedHour["ALL"]["non_pointe"] += $npt;
-		   		$sheet->setCellValueByColumnAndRow(3 , $j, "");
-	   			$sheet->setCellValueByColumnAndRow(6 , $j, round($npt,2));
-		   		$sheet->setCellValueByColumnAndRow(8 , $j, 0);
-		   		$sheet->setCellValueByColumnAndRow(9 , $j, __TAUX_HORAIRE_TICKET__);
-		   		$sheet->setCellValueByColumnAndRow(10 , $j, round($npt*__COUT_HORAIRE_TECH__ ,2));
-		   		$sheet->setCellValueByColumnAndRow(11 , $j, 0 - round($npt*__COUT_HORAIRE_TECH__ ,2));
-	   		}
-	    }else{
-	    	$sheet->setCellValueByColumnAndRow(0 , $j, "Temps pointé");
-	   		$sheet->setCellValueByColumnAndRow(1 , $j, $workedHour["ALL"]["pointe"]);
-	   		$j++;
-	   		$sheet->setCellValueByColumnAndRow(0 , $j, "Temps travaillé");
-	   		$sheet->setCellValueByColumnAndRow(1 , $j, $workedHour["ALL"]["travaille"]);
-	   		$j++;
-	   		$sheet->setCellValueByColumnAndRow(0 , $j, "Non pointé");
-	   		$npt = $workedHour["ALL"]["non_pointe"];
-	   		$sheet->setCellValueByColumnAndRow(3 , $j, "");
-   			$sheet->setCellValueByColumnAndRow(6 , $j, round($npt,2));
-	   		$sheet->setCellValueByColumnAndRow(8 , $j, 0);
-	   		$sheet->setCellValueByColumnAndRow(9 , $j, __TAUX_HORAIRE_TICKET__);
-	   		$sheet->setCellValueByColumnAndRow(10 , $j, round($npt*__COUT_HORAIRE_TECH__ ,2));
-	   		$sheet->setCellValueByColumnAndRow(11 , $j, 0 - round($npt*__COUT_HORAIRE_TECH__ ,2));
+		$j+3;
+		if($id_user){
+			$sheet->setCellValueByColumnAndRow(0 , $j, "Temps pointé");
+			$sheet->setCellValueByColumnAndRow(1 , $j, $workedHour[$id_user]);
+			$j++;
+			$temps_partiel = number_format(ATF::user()->select($id_user ,"temps_partiel"),2);
+			$sheet->setCellValueByColumnAndRow(0 , $j, "Temps travaillé");
+			$sheet->setCellValueByColumnAndRow(1 , $j, ($workedHour[0]*7*$temps_partiel));
+			$j++;
+			$sheet->setCellValueByColumnAndRow(0 , $j, "Non pointé");
+			$npt = ($workedHour[0]*7*$temps_partiel)-$workedHour[$id_user];
+			$workedHour["ALL"]["pointe"] += $workedHour[$id_user];
+			$workedHour["ALL"]["travaille"] += $workedHour[0]*7*$temps_partiel;
+			if($npt > 0){
+				$workedHour["ALL"]["non_pointe"] += $npt;
+				$sheet->setCellValueByColumnAndRow(3 , $j, "");
+				$sheet->setCellValueByColumnAndRow(6 , $j, round($npt,2));
+				$sheet->setCellValueByColumnAndRow(8 , $j, 0);
+				$sheet->setCellValueByColumnAndRow(9 , $j, __TAUX_HORAIRE_TICKET__);
+				$sheet->setCellValueByColumnAndRow(10 , $j, round($npt*__COUT_HORAIRE_TECH__ ,2));
+				$sheet->setCellValueByColumnAndRow(11 , $j, 0 - round($npt*__COUT_HORAIRE_TECH__ ,2));
+			}
+		}else{
+			$sheet->setCellValueByColumnAndRow(0 , $j, "Temps pointé");
+			$sheet->setCellValueByColumnAndRow(1 , $j, $workedHour["ALL"]["pointe"]);
+			$j++;
+			$sheet->setCellValueByColumnAndRow(0 , $j, "Temps travaillé");
+			$sheet->setCellValueByColumnAndRow(1 , $j, $workedHour["ALL"]["travaille"]);
+			$j++;
+			$sheet->setCellValueByColumnAndRow(0 , $j, "Non pointé");
+			$npt = $workedHour["ALL"]["non_pointe"];
+			$sheet->setCellValueByColumnAndRow(3 , $j, "");
+			$sheet->setCellValueByColumnAndRow(6 , $j, round($npt,2));
+			$sheet->setCellValueByColumnAndRow(8 , $j, 0);
+			$sheet->setCellValueByColumnAndRow(9 , $j, __TAUX_HORAIRE_TICKET__);
+			$sheet->setCellValueByColumnAndRow(10 , $j, round($npt*__COUT_HORAIRE_TECH__ ,2));
+			$sheet->setCellValueByColumnAndRow(11 , $j, 0 - round($npt*__COUT_HORAIRE_TECH__ ,2));
 
-	    }
+		}
 
-    }
+	}
 
 
 
@@ -1915,21 +1915,22 @@ class hotline_interaction extends classes_optima {
 		}
 
 		if ($get['id']) {
-	        $return = $data['data'][0];
-	        $return['isFacturable'] = ATF::hotline()->_isFacturable(array("id_hotline_interaction"=>$get['id']));
+			$return = $data['data'][0];
+			$return['isFacturable'] = ATF::hotline()->_isFacturable(array("id_hotline_interaction"=>$get['id']));
 		} elseif ($get['id_hotline']) {
-	        $return = $data['data'];
-	        foreach ($return as $k=>$o) {
-		        $isFacturable = ATF::hotline()->_isFacturable(array("id_hotline_interaction"=>$o['id_hotline_interaction_fk']));
-	        	$return[$k]['isFacturable'] = $isFacturable;
-	        }
+			$return = $data['data'];
+			foreach ($return as $k=>$o) {
+				$isFacturable = ATF::hotline()->_isFacturable(array("id_hotline_interaction"=>$o['id_hotline_interaction_fk']));
+				$return[$k]['isFacturable'] = $isFacturable;
+				$return[$k]['pj'] = file_exists(ATF::hotline_interaction()->filepath($o['id_hotline_interaction_fk'], "fichier_joint"));
+			}
 		} else {
 			// Envoi des headers
 			header("ts-total-row: ".$data['count']);
 			header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			header("ts-active-page: ".$get['page']);
 
-	        $return = $data['data'];
+			$return = $data['data'];
 		}
 
 		return $return;
@@ -1943,21 +1944,21 @@ class hotline_interaction extends classes_optima {
 	* @param $repto string replacementstring chaine modifié.
 	*/
 	public function remove_empty_tags_recursive ($str, $repto = NULL){
-	    //** Return if string not given or empty.
-	    if (!is_string ($str) || trim ($str) == '') return $str;
-	    //** Recursive empty HTML tags.
-	    $str = preg_replace(
-	        //** Pattern written by Junaid Atari.
-	        '/<([^<\/>]*)>([\s]*?|(?R))<\/\1>/imsU',
-	        //** Replace with nothing if string empty.
-	        !is_string ($repto) ? '' : $repto,
-	        //** Source string
-	        $str
-	    );
+		//** Return if string not given or empty.
+		if (!is_string ($str) || trim ($str) == '') return $str;
+		//** Recursive empty HTML tags.
+		$str = preg_replace(
+			//** Pattern written by Junaid Atari.
+			'/<([^<\/>]*)>([\s]*?|(?R))<\/\1>/imsU',
+			//** Replace with nothing if string empty.
+			!is_string ($repto) ? '' : $repto,
+			//** Source string
+			$str
+		);
 
-	    // ENleve les multiple BR
-	    $str = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $str);
-	    return $str;
+		// ENleve les multiple BR
+		$str = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $str);
+		return $str;
 	}
 
 	/**
@@ -1970,79 +1971,79 @@ class hotline_interaction extends classes_optima {
 	*/
 	public function _POST($get,$post) {
 
-    	$return = array();
+		$return = array();
 
-        try {
+		try {
 
-	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-	        // Check des champs obligatoire
-	        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1100);
-	        if (!$post['detail'] || $post['detail']=="<p><br></p>") throw new Exception("CONTENT_MISSING",1101);
-	        if (!$post['temps_passe'] || $post['temps_passe']=="00:00:00") throw new Exception("TEMPS_PASSE_MISSING",1102);
-	        if (!$post['date']) $post['date'] = date("Y-m-d H:i:s");
+			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+			// Check des champs obligatoire
+			if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1100);
+			if (!$post['detail'] || $post['detail']=="<p><br></p>") throw new Exception("CONTENT_MISSING",1101);
+			if (!$post['temps_passe'] || $post['temps_passe']=="00:00:00") throw new Exception("TEMPS_PASSE_MISSING",1102);
+			if (!$post['date']) $post['date'] = date("Y-m-d H:i:s");
 
-	        // Mapping pour BDD Optima
-	        $tps = substr($post['temps_passe'],0,5);
-	        if ($tps == "00:00") {
-	        	$tps = "00:01";
-	        }
-	        $post['temps_passe'] = $post['duree_presta'] = $tps;
+			// Mapping pour BDD Optima
+			$tps = substr($post['temps_passe'],0,5);
+			if ($tps == "00:00") {
+				$tps = "00:01";
+			}
+			$post['temps_passe'] = $post['duree_presta'] = $tps;
 
-	        if (!$post['heure_debut_presta'] || !$post['heure_fin_presta']) {
-	        	// On créer un date time
-	        	$date = new DateTime();
-	        	// On stock la date car c'est la date de fin
-	        	$dayEnd = $date->format('d');
-	        	$post['heure_fin_presta'] = $date->format('H:i:s');
-	        	// On initialise l'interval a soustraire grace au temps passé
-	        	$tosub = new DateInterval("PT".str_replace(":", "H", $tps)."M");
-	        	$date->sub($tosub);
-	        	$post['heure_debut_presta'] = $date->format('H:i:s');
-	        	$dayBegin = $date->format('d');
+			if (!$post['heure_debut_presta'] || !$post['heure_fin_presta']) {
+				// On créer un date time
+				$date = new DateTime();
+				// On stock la date car c'est la date de fin
+				$dayEnd = $date->format('d');
+				$post['heure_fin_presta'] = $date->format('H:i:s');
+				// On initialise l'interval a soustraire grace au temps passé
+				$tosub = new DateInterval("PT".str_replace(":", "H", $tps)."M");
+				$date->sub($tosub);
+				$post['heure_debut_presta'] = $date->format('H:i:s');
+				$dayBegin = $date->format('d');
 
-	        	if ($dayEnd != $dayBegin) {
-	        		throw new errorATF("Impossible d'enregistrer l'interaction car elle chevauche deux jours. Veuillez résuire le temps passé.");
-	        	}
-	        }
+				if ($dayEnd != $dayBegin) {
+					throw new errorATF("Impossible d'enregistrer l'interaction car elle chevauche deux jours. Veuillez résuire le temps passé.");
+				}
+			}
 
 
-	        if ($post['visible']=="on") $post['visible'] = "oui";
-	        else $post['visible'] = "non";
+			if ($post['visible']=="on") $post['visible'] = "oui";
+			else $post['visible'] = "non";
 
-	        if ($post['send_mail']=="on") $post['send_mail'] = "oui";
-	        else $post['send_mail'] = "non";
+			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
+			else $post['send_mail'] = "non";
 
-	        // Calcul du nombre de crédit
-	        if (!$post['credit_presta']) {
-	        	$tmp = explode(":", $post['temps_passe']);
+			// Calcul du nombre de crédit
+			if (!$post['credit_presta']) {
+				$tmp = explode(":", $post['temps_passe']);
 
-	        	$creditMin = $tmp[1]/60;
+				$creditMin = $tmp[1]/60;
 
-	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
-	        }
+				$post['credit_presta'] = round($creditMin + $tmp[0],2);
+			}
 
 			if (!$post['id_user']) {
- 	        	$post['id_user'] = ATF::$usr->getId();
- 	        }
-	        // Insertion
-	        $id = self::insertTS($post);
+				$post['id_user'] = ATF::$usr->getId();
+			}
+			// Insertion
+			$id = self::insertTS($post);
 
-	        $p = array("id"=>$id);
-        	$return['result'] = self::_GET($p);
-        	// Traitement de l'id_user
-        	if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
-        		$return["result"]["id_user_fk"] = $return["result"]["id_user"];
-        		$return["result"]["id_user"] = ATF::user()->nom($return["result"]["id_user"]);
-        	}
-        	// Récupération des notices créés
-        	$return['notices'] = ATF::$msg->getNotices();
-	        return $return;
-        } catch (errorATF $e) {
-        	throw $e;
-        } catch (Exception $e) {
-        	throw $e;
-        }
-        return false;
+			$p = array("id"=>$id);
+			$return['result'] = self::_GET($p);
+			// Traitement de l'id_user
+			if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
+				$return["result"]["id_user_fk"] = $return["result"]["id_user"];
+				$return["result"]["id_user"] = ATF::user()->nom($return["result"]["id_user"]);
+			}
+			// Récupération des notices créés
+			$return['notices'] = ATF::$msg->getNotices();
+			return $return;
+		} catch (errorATF $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw $e;
+		}
+		return false;
 	}
 
 
@@ -2055,8 +2056,8 @@ class hotline_interaction extends classes_optima {
 	* @param array $files Les fichiers uploadés
 	* @param boolean $mail True si on désire
 	* @param boolean $pointage True si on désire créer le pointage
-    * @return boolean true
-    */
+	* @return boolean true
+	*/
 	public function insertTS($infos,$mail = true) {
 
 		$recipient = array();
@@ -2255,9 +2256,9 @@ class hotline_interaction extends classes_optima {
 				,"detail"=>$infos["detail"]
 				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 				,"id_contact"=>$infos["id_contact"]
-	            ,"id_hotline"=>$infos["id_hotline"]
-	            ,"visible"=>$infos["visible"]
-	            ,"nature"=>$infos["nature"]
+				,"id_hotline"=>$infos["id_hotline"]
+				,"visible"=>$infos["visible"]
+				,"nature"=>$infos["nature"]
 				,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 				,'recipient'=>$res
 			);
@@ -2480,83 +2481,83 @@ class hotline_interaction extends classes_optima {
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/
 	public function _PUT($get,$post) {
-        $input = file_get_contents('php://input');
-        if (!empty($input)) parse_str($input,$post);
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
 
-    	$return = array();
+		$return = array();
 
-        try {
+		try {
 
-	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-	        // Check des champs obligatoire
-	        if (!$post['id_hotline_interaction']) throw new Exception("ID_HOTLINE_INTERACTION_MISSING",1103);
-	        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1100);
-	        if (!$post['detail'] || $post['detail']=="<p><br></p>") throw new Exception("CONTENT_MISSING",1101);
-	        if (!$post['temps_passe'] || $post['temps_passe']=="00:00:00") throw new Exception("TEMPS_PASSE_MISSING",1102);
+			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+			// Check des champs obligatoire
+			if (!$post['id_hotline_interaction']) throw new Exception("ID_HOTLINE_INTERACTION_MISSING",1103);
+			if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1100);
+			if (!$post['detail'] || $post['detail']=="<p><br></p>") throw new Exception("CONTENT_MISSING",1101);
+			if (!$post['temps_passe'] || $post['temps_passe']=="00:00:00") throw new Exception("TEMPS_PASSE_MISSING",1102);
 
-	        // Mapping pour BDD Optima
-	        $tps = substr($post['temps_passe'],0,5);
-	        if ($tps == "00:00") {
-	        	$tps = "00:01";
-	        }
-	        $post['temps_passe'] = $post['duree_presta'] = $tps;
+			// Mapping pour BDD Optima
+			$tps = substr($post['temps_passe'],0,5);
+			if ($tps == "00:00") {
+				$tps = "00:01";
+			}
+			$post['temps_passe'] = $post['duree_presta'] = $tps;
 
-	        if (!$post['heure_debut_presta'] || !$post['heure_fin_presta']) {
-	        	// On créer un date time
-	        	$date = new DateTime();
-	        	// On stock la date car c'est la date de fin
-	        	$dayEnd = $date->format('d');
-	        	$post['heure_fin_presta'] = $date->format('H:i:s');
-	        	// On initialise l'interval a soustraire grace au temps passé
-	        	$tosub = new DateInterval("PT".str_replace(":", "H", $tps)."M");
-	        	$date->sub($tosub);
-	        	$post['heure_debut_presta'] = $date->format('H:i:s');
-	        	$dayBegin = $date->format('d');
+			if (!$post['heure_debut_presta'] || !$post['heure_fin_presta']) {
+				// On créer un date time
+				$date = new DateTime();
+				// On stock la date car c'est la date de fin
+				$dayEnd = $date->format('d');
+				$post['heure_fin_presta'] = $date->format('H:i:s');
+				// On initialise l'interval a soustraire grace au temps passé
+				$tosub = new DateInterval("PT".str_replace(":", "H", $tps)."M");
+				$date->sub($tosub);
+				$post['heure_debut_presta'] = $date->format('H:i:s');
+				$dayBegin = $date->format('d');
 
-	        	if ($dayEnd != $dayBegin) {
-	        		throw new errorATF("Impossible d'enregistrer l'interaction car elle chevauche deux jours. Veuillez ajuster les horaires.",1000);
-	        	}
-	        }
+				if ($dayEnd != $dayBegin) {
+					throw new errorATF("Impossible d'enregistrer l'interaction car elle chevauche deux jours. Veuillez ajuster les horaires.",1000);
+				}
+			}
 
-	        if ($post['visible']=="on") $post['visible'] = "oui";
-	        else $post['visible'] = "non";
+			if ($post['visible']=="on") $post['visible'] = "oui";
+			else $post['visible'] = "non";
 
-	        if ($post['send_mail']=="on") $post['send_mail'] = "oui";
-	        else $post['send_mail'] = "non";
+			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
+			else $post['send_mail'] = "non";
 
-	        // Calcul du nombre de crédit
-	        if (!$post['credit_presta']) {
-	        	$tmp = explode(":", $post['temps_passe']);
+			// Calcul du nombre de crédit
+			if (!$post['credit_presta']) {
+				$tmp = explode(":", $post['temps_passe']);
 
-	        	$creditMin = $tmp[1]/60;
+				$creditMin = $tmp[1]/60;
 
-	        	$post['credit_presta'] = round($creditMin + $tmp[0],2);
-	        }
+				$post['credit_presta'] = round($creditMin + $tmp[0],2);
+			}
 
 			if (!$post['id_user']) {
- 	        	$post['id_user'] = ATF::$usr->getId();
- 	        }
+				$post['id_user'] = ATF::$usr->getId();
+			}
 
-	        // Modification
-	        $post['update'] = true;
-	        self::insertTS($post);
-	        $p = array("id"=>$post['id_hotline_interaction']);
-        	$return['result'] = self::_GET($p);
+			// Modification
+			$post['update'] = true;
+			self::insertTS($post);
+			$p = array("id"=>$post['id_hotline_interaction']);
+			$return['result'] = self::_GET($p);
 
-        	// Traitement de l'id_user
-        	// if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
-        	// 	$return["result"]["id_user_fk"] = $return["result"]["id_user"];
-        	// 	$return["result"]["id_user"] = ATF::user()->nom($return["result"]["id_user"]);
-        	// }
-        	// Récupération des notices créés
-        	$return['notices'] = ATF::$msg->getNotices();
-	        return $return;
-        } catch (errorATF $e) {
-        	throw $e;
-        } catch (Exception $e) {
-        	throw $e;
-        }
-        return false;
+			// Traitement de l'id_user
+			// if ($return["result"]["id_user"] && !$return["result"]["id_user_fk"]) {
+			// 	$return["result"]["id_user_fk"] = $return["result"]["id_user"];
+			// 	$return["result"]["id_user"] = ATF::user()->nom($return["result"]["id_user"]);
+			// }
+			// Récupération des notices créés
+			$return['notices'] = ATF::$msg->getNotices();
+			return $return;
+		} catch (errorATF $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw $e;
+		}
+		return false;
 	}
 
 	/**
@@ -2570,14 +2571,14 @@ class hotline_interaction extends classes_optima {
 	public function _credit($get,$post) {
 		if (!$get['tps'] || $get['tps']=="00:00:00") return 0;
 
- 		if ($get['field']=="credit_dep") {
- 			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
- 		}
-    	$tmp = explode(":", $get['tps']);
+		if ($get['field']=="credit_dep") {
+			if ($val = ATF::hotline()->estAuForfait($get)) return round($val,2);
+		}
+		$tmp = explode(":", $get['tps']);
 
-    	$creditMin = $tmp[1]/60;
+		$creditMin = $tmp[1]/60;
 
-    	return round($creditMin + $tmp[0],2);
+		return round($creditMin + $tmp[0],2);
 	}
 
 	/**
