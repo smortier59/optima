@@ -2202,7 +2202,7 @@ class facture_absystech extends facture {
 			log::logger("AFFECTATION ID EXPORT AUX FACTURES","export-comptable");
 			log::logger($facturesATraiter,"export-comptable");
 			foreach ($facturesATraiter as $key=>$id_facture) {
-				ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
+				// ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
 				$countFactureTraitées++;
 			}
 			log::logger($countFactureTraitées." ID EXPORT RELIE AUX FACTURES","export-comptable");
@@ -2225,9 +2225,9 @@ class facture_absystech extends facture {
 				$credit = false;
 				$debit = false;
 				if ($facture['type_facture']=='avoir') {
-					$credit = number_format($ttc, 2, ",", "");
+					$credit = number_format($ttc, 2, ".", "");
 				} else {
-					$debit = number_format($ttc, 2, ",", "");
+					$debit = number_format($ttc, 2, ".", "");
 				}
 
 				$line = array(
@@ -2236,7 +2236,7 @@ class facture_absystech extends facture {
 					$societe['ref_comptable'] ? $societe['ref_comptable'] : $post['ref_comptable'][$societe['id_societe']],
 					$societe['societe'],
 					$facture['ref'],
-					$facture['ref']."-".date('d/m/Y',strtotime($facture['date'])),
+					$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
 					$debit?abs($debit):"",
 					$credit?abs($credit):""
 				);
@@ -2253,9 +2253,9 @@ class facture_absystech extends facture {
 					$credit = false;
 					$debit = false;
 					if ($facture['type_facture']=='avoir') {
-						$debit = number_format($total, 2, ",", "");
+						$debit = number_format($total, 2, ".", "");
 					} else {
-						$credit = number_format($total, 2, ",", "");
+						$credit = number_format($total, 2, ".", "");
 					}
 
 				  // LIGNES DE VENTILATION
@@ -2265,7 +2265,7 @@ class facture_absystech extends facture {
 						ATF::compte_absystech()->select($id_compte,'code'),
 						$societe['societe'],
 						$facture['ref'],
-						$facture['ref']."-".$societe['societe'],
+						$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
 						$debit?abs($debit):"",
 						$credit?abs($credit):""
 					);
@@ -2279,11 +2279,11 @@ class facture_absystech extends facture {
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
 						"708500",
-						"FRAIS DE PORT",
+						$societe['societe'],
 						$facture['ref'],
-						$facture['ref']."-".$societe['societe'],
+						$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
 						"",
-						number_format($facture['frais_de_port'], 2, ",", "")
+						number_format($facture['frais_de_port'], 2, ".", "")
 					);
 				  fputcsv($file, $line, ";");
 				  fputs("\n");
@@ -2292,23 +2292,24 @@ class facture_absystech extends facture {
 				$credit = false;
 				$debit = false;
 				if ($facture['type_facture']=='avoir') {
-					$debit = number_format($tvamnt, 2, ",", "");
+					$debit = number_format($tvamnt, 2, ".", "");
 				} else {
-					$credit = number_format($tvamnt, 2, ",", "");
+					$credit = number_format($tvamnt, 2, ".", "");
 				}
 			  // LIGNES DE TVA
 				$line = array(
 					"VT",
 					date('d/m/Y',strtotime($facture['date'])),
 					"445710",
-					"TVA COLLECTEE ".$tva."%",
+					$societe['societe'],
 					$facture['ref'],
-					$facture['ref']."-".$societe['societe'],
+					$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
 					$debit?abs($debit):"",
 					$credit?abs($credit):""
 				);
 			  fputcsv($file, $line, ";");
 			  fputs("\n");
+
 
 			}
 			fclose($file);
