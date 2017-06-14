@@ -2236,7 +2236,7 @@ class facture_absystech extends facture {
 					$societe['ref_comptable'] ? $societe['ref_comptable'] : $post['ref_comptable'][$societe['id_societe']],
 					$societe['societe'],
 					$facture['ref'],
-					$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
+					$societe['societe']."-".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($post['date_fin_periode'])),
 					$debit?abs($debit):"",
 					$credit?abs($credit):""
 				);
@@ -2265,7 +2265,7 @@ class facture_absystech extends facture {
 						ATF::compte_absystech()->select($id_compte,'code'),
 						$societe['societe'],
 						$facture['ref'],
-						$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
+						$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($post['date_fin_periode'])),
 						$debit?abs($debit):"",
 						$credit?abs($credit):""
 					);
@@ -2281,7 +2281,7 @@ class facture_absystech extends facture {
 						"708500",
 						$societe['societe'],
 						$facture['ref'],
-						$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
+						$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($post['date_fin_periode'])),
 						"",
 						number_format($facture['frais_de_port'], 2, ".", "")
 					);
@@ -2303,7 +2303,7 @@ class facture_absystech extends facture {
 					"445710",
 					$societe['societe'],
 					$facture['ref'],
-					$societe['societe']."-".$facture['ref']."-".date("Y-m-d",strtotime($post['date_debut']))."-".date("Y-m-d",strtotime($post['date_fin'])),
+					$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($post['date_fin_periode'])),
 					$debit?abs($debit):"",
 					$credit?abs($credit):""
 				);
