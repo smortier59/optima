@@ -239,8 +239,14 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',7);
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
 
+		$this->setleftMargin(50);
+		$this->multicell(60,5,"\n\n\n[sc_sceaudeconfiance/]");
 		$this->setleftMargin(130);
 		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+
+
+
+
 		$this->setleftMargin(15);
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
