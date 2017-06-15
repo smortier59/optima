@@ -9,9 +9,9 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	public function setUp() {
 		ATF::db()->begin_transaction(true);
 	}
-	
+
 	/** Méthode post-test, exécute après chaque test unitaire*/
-	
+
 	public function tearDown(){
 		ATF::db()->rollback_transaction(true);
 		ATF::$msg->getNotices();
@@ -21,16 +21,16 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$res = $this->obj->getOpca();
 		$this->assertNotNull($res, "Get Opca vide ??");
 	}
-	
-	/*@author Yann GAUTHERON <ygautheron@absystech.fr>  
-	  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+
+	/*@author Yann GAUTHERON <ygautheron@absystech.fr>
+	  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function test_insert(){
 		ATF::db()->rollback_transaction(true);
 		$this->initUser();
 		$this->obj = ATF::societe();
 		$this->assertEquals(get_class($this->obj),'societe_cleodis','Classe dans $this->obj incorrecte');
-		
+
 		$societe = array(
 			'societe'=>'Test cleodis TU',
 			"siret" => "123456789"
@@ -49,7 +49,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(878,$error,"Une société existe déja avec le SIRET ");
 	}
 
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */ 
+	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function testAutocompleteFournisseursDeCommande(){
 		$infos["query"]="PARA OPTIC SARL";
 		$autocompleteFournisseursDeCommande=$this->obj->autocompleteFournisseursDeCommande($infos);
@@ -60,7 +60,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("PARA OPTIC SARL",$autocompleteFournisseursDeCommande[0]["raw_3"],"autocompleteFournisseursDeCommande ne renvoie pas le bon fournisseur");
 	}
 
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */ 
+	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function testAutocompleteAvecAdresse(){
 		$infos["query"]="PARA OPTIC SARL";
 		$autocompleteAvecAdresse=$this->obj->autocompleteAvecAdresse($infos);
@@ -77,7 +77,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals('PARA OPTIC SARL',$autocompleteAvecAdresse[0]["raw_4"],"autocompleteAvecAdresse ne renvoie pas le bon span");
 	}
 
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */ 
+	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function testAutocompleteAvecFiliale(){
 		$infos["query"]="EQUIPEMENT";
 		$autocompleteAvecFiliale=$this->obj->autocompleteAvecFiliale($infos);
@@ -90,11 +90,11 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("CLEODIS EQUIPEMENT",$autocompleteAvecFiliale[0]["raw_2"],"autocompleteAvecFiliale ne renvoie pas le bon societe");
 	}
 
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */ 
+	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function test_formateGetParc(){
 		ATF::db()->rollback_transaction(true);
 		$this->initUser();
-		
+
 		$id_affaire1=ATF::affaire()->i(array("ref"=>"refTu1","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu1"));
 		$id_affaire2=ATF::affaire()->i(array("ref"=>"refTu2","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu2","etat"=>"perdue"));
 		$id_affaire3=ATF::affaire()->i(array("ref"=>"refTu3","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu3"));
@@ -204,7 +204,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 							count($formateGetParc1["children"]),
 							"formateGetParc1 ne devrait renvoyer qu'un parc");
 
-		
+
 
 		unset($parc);
 		$parc[]=ATF::parc()->select($id_parc2);
@@ -300,10 +300,10 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(1,
 							count($formateGetParc4["children"]),
 							"formateGetParc4 ne devrait renvoyer qu'un parc");
-		
+
 	}
-	
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */ 
+
+	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function test_getParc(){
 		ATF::db()->rollback_transaction(true);
 		$this->initUser();
@@ -421,7 +421,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */ 
+	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function test_getParcVente(){
 		ATF::db()->rollback_transaction(true);
 		$this->initUser();
@@ -445,14 +445,14 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 							count($getParcVente1[0]->children),
 							"getParc devrait renvoyer 2 parc");
 
-		
+
 		$id_affaire2=ATF::affaire()->i(array("ref"=>"refTu2","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu2"));
 		$id_commande2=ATF::commande()->i(array("ref"=>"refTu2","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire2,"etat"=>"arreter"));
 
 		$id_parc4=ATF::parc()->i(array("id_affaire"=>$id_affaire2,"libelle"=>"parc tu4","serial"=>"parc tu4","etat"=>"loue","existence"=>"actif"));
 		$id_parc5=ATF::parc()->i(array("id_affaire"=>$id_affaire2,"libelle"=>"parc tu5","serial"=>"parc tu5","etat"=>"broke","existence"=>"actif"));
 		$id_parc6=ATF::parc()->i(array("id_affaire"=>$id_affaire2,"libelle"=>"parc tu6","serial"=>"parc tu6","etat"=>"broke","existence"=>"inactif"));
-		
+
 		$getParcVente2=$this->obj->getParcVente($infos);
 		$getParcVente2=json_decode($getParcVente2);
 
@@ -473,33 +473,33 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		// Le initUser est pas dans le set up, du coup on rollback et on appelle le initUser
 		ATF::db()->rollback_transaction(true);
 		$this->initUser();
-		
+
 		$societe = ATF::societe()->select($this->id_societe);
-		
+
 		$societe['score'] = "7";
 		$r = $this->obj->update($societe);
-		
+
 		$this->assertEquals(1,$r,"Nombre de ligne modifié mauvais");
-		
+
 		ATF::suivi()->q->reset()->where("suivi.id_societe",$this->id_societe);
 		$suivi = ATF::suivi()->sa();
 
 		$this->assertEquals(1,count($suivi),"Il ne doit y avoir qu'un suivi a ce niveau là");
 		$this->assertEquals("La société passe du score 'NC' à '7'",$suivi[0]['texte'],"le message du suivi n'est pas correct");
 	}
-	
+
 	public function test_updateAvis() {
 		// Le initUser est pas dans le set up, du coup on rollback et on appelle le initUser
 		ATF::db()->rollback_transaction(true);
 		$this->initUser();
-		
+
 		$societe = ATF::societe()->select($this->id_societe);
-		
+
 		$societe['avis_credit'] = "NR";
 		$r = $this->obj->update($societe);
-		
+
 		$this->assertEquals(1,$r,"Nombre de ligne modifié mauvais");
-		
+
 		ATF::suivi()->q->reset()->where("suivi.id_societe",$this->id_societe);
 		$suivi = ATF::suivi()->sa();
 
@@ -517,7 +517,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_select_allMidas(){
 		$sm=new societe_midas();
 		$sm->select_all();
-		$this->assertEquals("43fcdbfc38638d57f3e5afebb5278caf",md5($sm->q->lastSQL),"La requête n'est pas bonne");
+		$this->assertEquals("458ff5933c92c0432ba21636aba63591",md5($sm->q->lastSQL),"La requête n'est pas bonne");
 	}
 
 
@@ -547,20 +547,20 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 						"formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
 																				 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
 																				array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
-																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")																				
+																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
 																				)
 																		)
 					);
 		$this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
 
-		$res = $this->obj->autocompleteFournisseurFormationDevis(array("condition_field"=> "formation_devis.id_formation_devis", 
-																	   "condition_value"=> $this->id_devis_formation, 
+		$res = $this->obj->autocompleteFournisseurFormationDevis(array("condition_field"=> "formation_devis.id_formation_devis",
+																	   "condition_value"=> $this->id_devis_formation,
 																	  ),true,true);
 		$this->assertEquals(2 , $res["count"], "error");
 
 		$this->obj->q->reset()->setLimit(30);
-		$res = $this->obj->autocompleteFournisseurFormationDevis(array("condition_field"=> "formation_devis.id_formation_devis", 
-																	   "condition_value"=> $this->id_devis_formation, 
+		$res = $this->obj->autocompleteFournisseurFormationDevis(array("condition_field"=> "formation_devis.id_formation_devis",
+																	   "condition_value"=> $this->id_devis_formation,
 																	  ),false,false);
 		$this->assertEquals("ABSYSTECH", $res[0][1], "error 1");
 
@@ -626,10 +626,10 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		ob_start();
 		$infos=array($data);
-		$this->obj->export($infos,ATF::_s());		
-		
+		$this->obj->export($infos,ATF::_s());
+
 		$fichier=ob_get_contents();
-		
+
 		ob_end_clean();
 	}
 };

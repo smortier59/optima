@@ -4,20 +4,20 @@
 */
 class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	protected static $devis = 'a:9:{s:9:"extAction";s:5:"devis";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:11:"label_devis";a:5:{s:10:"id_filiale";s:7:"CLEODIS";s:14:"id_opportunite";s:8:"Aucun(e)";s:10:"id_societe";s:7:"FINORPA";s:10:"id_contact";s:16:"M Philippe MOONS";s:10:"AR_societe";s:7:"FINORPA";}s:5:"devis";a:21:{s:10:"id_filiale";s:3:"246";s:5:"devis";s:2:"TU";s:3:"tva";s:5:"1.196";s:11:"date_accord";s:10:"08-02-2011";s:14:"id_opportunite";s:0:"";s:10:"id_societe";i:5391;s:12:"type_contrat";s:3:"lld";s:8:"validite";s:10:"23-02-2011";s:10:"id_contact";s:4:"5753";s:6:"loyers";s:4:"0.00";s:23:"frais_de_gestion_unique";s:4:"0.00";s:16:"assurance_unique";s:4:"0.00";s:10:"AR_societe";s:0:"";s:5:"marge";s:5:"99.96";s:13:"marge_absolue";s:8:"8 021.00";s:4:"prix";s:8:"8 024.00";s:10:"prix_achat";s:4:"3.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:4:"<br>";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:13:"filestoattach";a:1:{s:13:"fichier_joint";s:0:"";}}s:7:"avenant";s:0:"";s:2:"AR";s:0:"";s:5:"loyer";a:1:{s:15:"frequence_loyer";s:1:"m";}s:12:"values_devis";a:2:{s:5:"loyer";s:185:"[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]";s:8:"produits";s:415:"[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]";}}';
-	
+
 	protected static $commande = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:10:"10-05-2011";s:10:"id_affaire";s:4:"6002";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:8:"8 024.00";s:10:"prix_achat";s:4:"3.00";s:5:"marge";s:5:"99.96";s:13:"marge_absolue";s:8:"8 021.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"5929";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:194:"[{"loyer__dot__loyer":"233.00","loyer__dot__duree":"34","loyer__dot__assurance":"2.00","loyer__dot__frais_de_gestion":"1.00","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]";s:15:"produits_repris";s:0:"";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"b0b7d2cb34ecebdb2b0016f2774297c3","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"a54f087ade4365f565b92d07124b2de3","commande_ligne__dot__id_commande_ligne":"044def0d691d5872f596e3a26813547f"}]";s:20:"produits_non_visible";s:0:"";}}';
 
 //	* Méthode pré-test, exécute avant chaque test unitaire
 //	* besoin d'un user pour les traduction
-//	
+//
 	public function setUp() {
 		$this->initUser();
 //		$this->s = ATF::_s();
 //		ATF::db()->begin_transaction(true);
 	}
-	
+
 	/** Méthode post-test, exécute après chaque test unitaire*/
-	
+
 	public function tearDown(){
 		ATF::db()->rollback_transaction(true);
         ATF::$msg->getNotices();
@@ -33,7 +33,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
 
         ATF::_r('id_devis',$id_devis);
-        $devis = ATF::devis()->select($id_devis);       
+        $devis = ATF::devis()->select($id_devis);
         $this->assertEquals($id_devis,ATF::commande()->default_value("id_devis"),'valeur id_devis');
         $this->assertEquals("5391",ATF::commande()->default_value("id_societe"),'valeur societe');
         $this->assertEquals($devis["ref"],ATF::commande()->default_value("ref"),'valeur ref');
@@ -54,11 +54,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande = unserialize(self::$commande);
         $commande["values_commande"]["produits"]='[{"commande_ligne__dot__produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
-        $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));  
-        ATF::$msg->getNotices();   
+        $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));
+        ATF::$msg->getNotices();
 
         ATF::_r('id_commande',$id_commande);
-        $commande = ATF::commande()->select($id_commande);      
+        $commande = ATF::commande()->select($id_commande);
         $this->assertEquals($id_devis,ATF::commande()->default_value("id_devis"),'valeur id_devis');
         $this->assertEquals("5391",ATF::commande()->default_value("id_societe"),'valeur societe');
         $this->assertEquals($commande["ref"],ATF::commande()->default_value("ref"),'valeur ref');
@@ -75,28 +75,28 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     }
 
     /*@author Morgan FLEURQUIN <mfleurquin@absystech.fr>  */
-    
+
     public function testgetDateResti(){
         $this->assertEquals("2016-02-29",$this->obj->getDateResti(array("id_commande"=>6968)),'Date Resti incorrect');
     }
 
 
-    
+
     /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
-    
+
     public function testCheckUpdateAR(){
         $fille=array("ref"=>"fille","id_societe"=>$this->id_societe,"affaire"=>"fille");
         $id_fille=ATF::affaire()->i($fille);
         $objFille = new affaire_cleodis($id_fille);
         $this->obj->checkUpdateAR($objFille);
-        
+
         $affaire=array("ref"=>"affaire","id_societe"=>$this->id_societe,"affaire"=>"testCheckUpdateAR","id_fille"=>$id_fille);
         $id_affaire=ATF::affaire()->i($affaire);
         $commande=array("ref"=>"avenant","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1.196","id_affaire"=>$id_fille);
         $id_commande=ATF::commande()->i($commande);
         $objAffaire = new affaire_cleodis($id_affaire);
         $this->obj->checkUpdateAR($objAffaire);
-        
+
         ATF::commande()->u(array("id_commande"=>$id_commande,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d")));
         try {
             $this->obj->checkUpdateAR($objAffaire);
@@ -104,7 +104,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $error = $e->getCode();
         }
         $this->assertEquals(877,$error,'On ne peut pas modifier/supprimer une commande qui est AnnulÃ©e et RemplacÃ©e par une autre affaire');
-    
+
     }
 
     /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
@@ -123,12 +123,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $error1 = $e->getCode();
         }
         $this->assertEquals(875,$error1,'On ne peut pas modifier/supprimer cette commande car ses produits sont vendus dans l affaire');
-    
+
         $avenant=array("ref"=>"avenant","id_societe"=>$this->id_societe,"affaire"=>"avenant","nature"=>"avenant");
         $id_avenant=ATF::affaire()->i($avenant);
         $selectAvenant =ATF::affaire()->select($id_avenant);
         $this->obj->checkUpdateAVT($selectAvenant);
-        
+
         $commande=array("ref"=>"avenant","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1.196","id_affaire"=>$id_avenant,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d"));
         ATF::commande()->i($commande);
         try {
@@ -139,9 +139,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(876,$error2,'On ne peut pas modifier/supprimer une commande qui a un avenant, il faut d abord supprimer les dates de l avenant');
     }
 
-    
+
 /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
- * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  */ 
+ * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  */
     public function testCan_delete(){
 
         $devis = unserialize(self::$devis);
@@ -155,10 +155,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande["values_commande"]["produits"]='[{"commande_ligne__dot__produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
         $commande["commande"]["id_affaire"]=$devis_select["id_affaire"];
-        $id_commande = $this->obj->insert($commande,$this->s,NULL,$refresh);        
+        $id_commande = $this->obj->insert($commande,$this->s,NULL,$refresh);
 
         $this->assertTrue($this->obj->can_delete($id_commande),'Can_delete doit pouvoir laisser une commande en "non_loyer" être supprimée');
-        
+
         $id_parc = ATF::parc()->i(array("id_societe"=> $this->id_societe , "id_produit"=>5, "id_affaire"=>$commande["commande"]["id_affaire"] , "ref"=>"Une ref", "libelle"=>"libelle", "serial"=>"toto", "etat"=>"loue" , "existence"=>"actif"));
         try {
              $this->obj->can_delete($id_commande);
@@ -167,7 +167,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         }
         $this->assertEquals(84513,$error,'can_delete ne doit pas supprimer une commande avec un parc actif');
         ATF::parc()->d(array("id_parc" =>$id_parc ));
-        
+
         $this->obj->u(array("id_commande"=>$id_commande,"etat"=>"mis_loyer"));
         try {
              $this->obj->can_delete($id_commande);
@@ -177,14 +177,14 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer une commande "mis_loyer" 1');
 
         $id_affaire2=ATF::affaire()->i(array("ref"=>"refTuEnfant","id_societe"=>$this->id_societe,"affaire"=>"AffaireTuEnfant","id_parent"=>$devis_select["id_affaire"]));
-         
+
         try {
              $this->obj->can_delete($id_commande);
         } catch (errorATF $e) {
             $error = $e->getCode();
         }
         $this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer une commande "mis_loyer" 2');
-        
+
         ATF::facture()->i(array("ref"=>"test_tu","id_societe"=>$this->id_societe,"prix"=>100,"date"=>date("Y-m-d"),"tva"=>"1.96","id_commande"=>$id_commande,"id_affaire"=>$commande["commande"]["id_affaire"]));
         try {
              $this->obj->can_delete($id_commande);
@@ -192,10 +192,10 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $error = $e->getCode();
         }
         $this->assertEquals(879,$error,'can_delete ne doit pas laisser supprimer une commande avec une facture');
-        
+
     }
 
-    
+
     /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function testCan_update(){
         $devis = unserialize(self::$devis);
@@ -207,13 +207,13 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande = unserialize(self::$commande);
         $commande["values_commande"]["produits"]='[{"commande_ligne__dot__produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
-        $id_commande = $this->obj->insert($commande,$this->s,NULL,$refresh);        
+        $id_commande = $this->obj->insert($commande,$this->s,NULL,$refresh);
 
         $this->assertFalse($this->obj->can_update($id_commande),'On ne doit pas pouvoir modifier une commande');
     }
 
 
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_checkEtat(){
 
         /**************************VENTE***********************/
@@ -230,19 +230,19 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $commande = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:10:"11-05-2011";s:10:"id_affaire";s:4:"6210";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:8:"3 000.00";s:10:"prix_achat";s:6:"103.00";s:5:"marge";s:5:"96.57";s:13:"marge_absolue";s:8:"2 897.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"6137";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:190:"[{"loyer__dot__loyer":"3000.00","loyer__dot__duree":"1","loyer__dot__assurance":null,"loyer__dot__frais_de_gestion":null,"loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":3000}]";s:15:"produits_repris";s:572:"[{"commande_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","commande_ligne__dot__id_fournisseur":"DELL","commande_ligne__dot__id_fournisseur_fk":"e397ce41979133ecb54f810af7de6f25","commande_ligne__dot__prix_achat":"100.00","commande_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__id_produit_fk":"22bc1812bc68989afcde8962b81b0882","commande_ligne__dot__serial":"5X7ZB2J","commande_ligne__dot__id_commande_ligne":"f010c6c164d0c6ea083a7fdedc4cea27"}]";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"2af4569e9740cafd20b61f5bc957797b","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"f23a58cfc5353c62f5e261b25d791ea6","commande_ligne__dot__id_commande_ligne":"202dae48031c294619bd62aa26bd6936"}]";s:20:"produits_non_visible";s:0:"";}}';
         $commande = unserialize($commande);
-        
+
         $commande["values_commande"]["produits_repris"] = '[{"commande_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","commande_ligne__dot__id_fournisseur":"DELL","commande_ligne__dot__id_fournisseur_fk":"1351","commande_ligne__dot__prix_achat":"100.00","commande_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__id_produit_fk":"5893","commande_ligne__dot__serial":"5X7ZB2J","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[1]["id_devis_ligne"].'"}]';
         $commande["values_commande"]["produits"] = '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
         $commande["commande"]["date"]=date("Y-m-01");
-        
+
         $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));
         ATF::$msg->getNotices();
         ATF::commande()->u(array("id_commande"=>$id_commande,"etat"=>"non_loyer"));
         $commande = new commande_cleodis($id_commande);
         $this->obj->checkEtat($commande);
         $this->assertEquals("non_loyer",$commande->get("etat"),'Une vente doit rester en non_loyer tant qu il n y a pas de facture');
-        
+
         ATF::facture()->i(array("ref"=>"test_tu","id_societe"=>$this->id_societe,"prix"=>100,"date"=>date("Y-m-d"),"tva"=>"1.96","id_commande"=>$id_commande,"id_affaire"=>$commande->get("id_affaire")));
 
         ATF::commande()->u(array("id_commande"=>$id_commande,"etat"=>"non_loyer"));
@@ -252,20 +252,21 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'vente'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
                             "Les notices ne sont pas cohérentes dépassé 1 !");
-                            
+
 
         /**************************CONTRAT SIMPLE***********************/
 
         $id_affaireParent=ATF::affaire()->i(array("ref"=>"refTuParent","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","id_fille"=>$id_affaireFille));
         $id_commandeParent=ATF::commande()->i(array("ref"=>"Ref tuParent","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaireParent));
 
-                                                                                
+
             /**************************mis_loyer***********************/
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 1 day")),"etat"=>"non_loyer"));
         $commandeParent = new commande_cleodis($id_commandeParent);
@@ -273,14 +274,15 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
                             "Les notices ne sont pas cohérentes dépassé 1 !");
         $this->assertEquals("mis_loyer",$commandeParent->get("etat"),"la commande doit être en en_cours !");
-        
+
             /**************************prolongation***********************/
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,"date_debut"=>date("Y-m-d",strtotime(date("Y-m-d")."- 2 day")),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day")),"etat"=>"non_loyer"));
         $commandeParent = new commande_cleodis($id_commandeParent);
@@ -288,20 +290,21 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'Prolong.'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
                             "Les notices ne sont pas cohérentes dépassé 2 !");
         $this->assertEquals("prolongation",$commandeParent->get("etat"),"la commande doit être en prolongation !");
-        
+
             /**************************non_loyer***********************/
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,"date_debut"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 1 day")),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 2 day")),"etat"=>"non_loyer"));
         $commandeParent = new commande_cleodis($id_commandeParent);
         $this->obj->checkEtat($commandeParent);
         $this->assertEquals("non_loyer",$commandeParent->get("etat"),"la commande doit être en non_loyer !");
-        
+
         /**************************CONTRAT AR FILLE***********************/
 
         $id_affaireFille=ATF::affaire()->i(array("ref"=>"refTuFille","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
@@ -316,14 +319,15 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'AR'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
                             "Les notices ne sont pas cohérentes dépassé 4 !");
         $this->assertEquals("AR",$commandeParent->get("etat"),"la commandeParent doit être en AR !");
-        
+
             /**************************prolongation***********************/
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,"date_debut"=>date("Y-m-d",strtotime(date("Y-m-d")."- 2 day")),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day")),"etat"=>"non_loyer"));
         $commandeParent = new commande_cleodis($id_commandeParent);
@@ -331,14 +335,15 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'AR'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
                             "Les notices ne sont pas cohérentes dépassé 5 !");
         $this->assertEquals("AR",$commandeParent->get("etat"),"la commandeParent doit être en AR !");
-        
+
             /**************************non_loyer***********************/
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,"date_debut"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 1 day")),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 2 day")),"etat"=>"non_loyer"));
         $commandeParent = new commande_cleodis($id_commandeParent);
@@ -346,8 +351,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'AR'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
@@ -356,7 +362,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
         /**************************CONTRAT AR PARENT***********************/
-        
+
         $commandeFille = new commande_cleodis($id_commandeFille);
         $affaireFilles = $commandeFille->getAffaire();
 
@@ -376,13 +382,15 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuFille' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'AR'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
@@ -399,13 +407,15 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuFille' a changé de 'En attente' à 'Prolong.'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'AR'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
@@ -423,8 +433,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
@@ -450,15 +461,16 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'Ref tuParent' a changé de 'En attente' à 'Prolong.'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
                             "Les notices ne sont pas cohérentes dépassé 11 !");
         $this->assertEquals("non_loyer",$commandeFille->get("etat"),"la commandeFille doit être en non_loyer 11 !");
         $this->assertEquals("prolongation",$commandeParent->get("etat"),"la commandeParent doit être en prolongation 11 !");
-        
+
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,
                                  "date_debut"=>date("Y-m-d",strtotime(date("Y-m-d")."- 4 day")),
                                  "date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 2 day")),
@@ -467,8 +479,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande = new commande_cleodis($id_commandeParent);
         $this->obj->checkEtat($commande);
         $this->assertEquals("restitution",$commande->get("etat"),"la commande doit être en restitution !");
-        
-        
+
+
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,
                                  "date_debut"=>date("Y-m-d",strtotime(date("Y-m-d")."- 3 day")),
                                  "date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 2 day")),
@@ -480,95 +492,95 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
     }
 
-    
-    
+
+
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_checkEtatContentieux(){
         $id_affaireParent=ATF::affaire()->i(array("ref"=>"refTuParent","nature"=>"avenant","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
         $id_commandeParent=ATF::commande()->i(array("ref"=>"Ref tuParent","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaireParent));
-        
+
         $id_affaireParentParent = ATF::affaire()->i(array("ref"=>"ParentParent","id_societe"=>$this->id_societe,"affaire"=>"AffParentP","id_fille"=>$id_affaireParent));
         $id_commandeParentParent=ATF::commande()->i(array("ref"=>"Ref tuParentPa","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaireParentParent));
-            
-        
+
+
         //EN COURS
         ATF::commande()->u(array("id_commande"=>$id_commandeParent,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 1 day")),"etat"=>"non_loyer"));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $this->obj->checkEtat($commandeParent);     
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("mis_loyer",$commandeParent->get("etat"),"la commande doit être en en_cours !");
-        
-        ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "prolongation_contentieux")); 
-        $commandeParent = new commande_cleodis($id_commandeParent); 
-        $this->obj->checkEtat($commandeParent);     
+
+        ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "prolongation_contentieux"));
+        $commandeParent = new commande_cleodis($id_commandeParent);
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("mis_loyer_contentieux",$commandeParent->get("etat"),"la commande doit être en en_cours_contentieux !!!");
-        
-        
+
+
         //RESTITUTION d'un contrat en cours
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day")),  "etat" => "mis_loyer", "date_prevision_restitution"=> date("Y-m-d",strtotime(date("Y-m-d")."- 2 day"))));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $this->obj->checkEtat($commandeParent);     
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("restitution",$commandeParent->get("etat"),"la commande doit être en restitution_contentieux !!!");
 
-    
+
         ATF::affaire()->u(array("id_affaire"=> $id_affaireParent , "id_parent"=> $id_affaireParentParent));
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "mis_loyer_contentieux"));
-                    
-        
+
+
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $res = $this->obj->checkEtat($commandeParent);      
+        $res = $this->obj->checkEtat($commandeParent);
         $this->assertEquals("restitution_contentieux",$commandeParent->get("etat"),"la commande doit être en restitution_contentieux !!!");
         $this->assertEquals($id_affaireParentParent,$res["commande.id_affaire_fk"],"Affaire Parente incorrecte");
-        
-                    
+
+
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "mis_loyer_contentieux", "date_restitution_effective"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day"))));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $res = $this->obj->checkEtat($commandeParent);      
+        $res = $this->obj->checkEtat($commandeParent);
         $this->assertEquals("arreter",$commandeParent->get("etat"),"la commande doit être en arreter !!!");
-        
-                       
+
+
         //PROLONGATION
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat"=>"non_loyer" ,"date_prevision_restitution"=> NULL, "date_restitution_effective"=>NULL,"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day"))));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $this->obj->checkEtat($commandeParent);     
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("prolongation",$commandeParent->get("etat"),"la commande doit être en prolongation !!!");
-        
+
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "mis_loyer_contentieux" ,"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day"))));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $this->obj->checkEtat($commandeParent);     
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("prolongation_contentieux",$commandeParent->get("etat"),"la commande doit être en prolongation_contentieux !!!");
-        
-        //Restitution d'un contrat en prolongation      
+
+        //Restitution d'un contrat en prolongation
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "prolongation", "date_prevision_restitution"=> date("Y-m-d",strtotime(date("Y-m-d")."- 2 day"))));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $this->obj->checkEtat($commandeParent);     
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("restitution",$commandeParent->get("etat"),"la commande doit être en restitution_contentieux !!!");
 
-        
+
         ATF::commande()->u(array("id_commande"=>$id_commandeParent, "etat" => "prolongation_contentieux"));
         $commandeParent = new commande_cleodis($id_commandeParent);
-        $this->obj->checkEtat($commandeParent);     
+        $this->obj->checkEtat($commandeParent);
         $this->assertEquals("restitution_contentieux",$commandeParent->get("etat"),"la commande doit être en restitution_contentieux !!!");
     }
 
-    
+
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_checkAndUpdatesDates(){
-                
+
         $id_affaire=ATF::affaire()->i(array("ref"=>"refTuParent","nature"=>"avenant","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
         $id_commande=ATF::commande()->i(array("ref"=>"Ref tuParent","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire , "date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."+ 1 day")),"etat"=>"mis_loyer", date_demande_resiliation => date("Y-m-d",strtotime(date("Y-m-d")."- 1 day")) ));
-        
+
         $id_affaireParentParent = ATF::affaire()->i(array("ref"=>"ParentParent","id_societe"=>$this->id_societe,"affaire"=>"AffParentP"));
         $id_commandeParentParent=ATF::commande()->i(array("ref"=>"Ref tuParentPa","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaireParentParent));
         ATF::affaire()->u(array("id_affaire"=> $id_affaire , "id_parent"=> $id_affaireParentParent));
         ATF::commande()->u(array("id_commande"=>$id_commande,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-d")."- 1 day")),"etat"=>"prolongation"));
         ATF::commande()->u(array("id_commande"=>$id_commande, "etat" => "mis_loyer", "date_prevision_restitution"=> date("Y-m-d",strtotime(date("Y-m-d")."- 2 day"))));
-        
+
 
         $infos = array('id_commande' => $id_commande, 'field' => "date_prevision_restitution"  ,'date' =>  date("Y-m-d",strtotime(date("Y-m-d")."- 2 day")));
         $this->obj->checkAndUpdateDates($infos);
-                                
+
         $infos = array('id_commande' => $id_commande, 'field' => "date_restitution_effective"  ,'date' => NULL );
-        
+
         try {
             $this->obj->checkAndUpdateDates($infos);
         } catch (errorATF $e) {
@@ -576,8 +588,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         }
         $this->assertEquals("Il est impossible d'inserer une date de restitution effective nulle",$error2,'On ne peux pas inserer date_restitution_effective NULL');
     }
-    
-    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenant(){
 
 
@@ -639,8 +651,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         return $id_commande;
     }
 
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantContratDepasseProlongation(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDateAvenant();
@@ -669,20 +681,20 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande = $this->obj->select($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');     
-        $this->assertEquals($commande["date_debut"],$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
-        
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
+        $this->assertEquals($commande["date_debut"],$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
+
         try {
             $this->obj->delete(48);
         } catch (errorATF $e) {
-            ATF::db($this->db)->rollback_transaction(); 
+            ATF::db($this->db)->rollback_transaction();
             $error = $e->getCode();
         }
         $this->assertEquals(876,$error,'On ne doit pas pouvoir supprimer un avenant parent');
 
 ////////////////////////On arrête le contrat///////////////////////////////////////
 
-        
+
         $id_prolongation=ATF::prolongation()->i(
                                 array(
                                         "id_affaire"=>$affaire["id_affaire"],
@@ -700,23 +712,23 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"key" => "date_debut"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->updateDate($date_debut);
-        
+
         $getNotices=ATF::$msg->getNotices();
         $this->assertEquals("arreter",$this->obj->select($id_commande,"etat"),"L'état ne passe pas en terminee sur test_updateDateAvenantContratDepasseProlongation 1");
 
         $commande = $this->obj->select($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');     
-        $this->assertEquals($commande["etat"],"arreter",'le contrat devrait etre en etat arreter');     
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 3 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");   
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
+        $this->assertEquals($commande["etat"],"arreter",'le contrat devrait etre en etat arreter');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 3 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
 
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantContratDepasse(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDateAvenant();
@@ -744,12 +756,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
         $commande = $this->obj->select($id_commande);
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');     
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 5 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 5 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantContratEnCours(){
         /////////////////////////////////////////////////////Contrat encours//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDateAvenant();
@@ -778,18 +790,18 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
         $commande = $this->obj->select($id_commande);
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente contrat en cours !');        
-        $this->assertEquals($commande["etat"],"mis_loyer",'Date debut : le contrat devrait etre en etat contrat en cours');     
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 1 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente test_updateDateAvenantContratEnCours !"); 
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente contrat en cours !');
+        $this->assertEquals($commande["etat"],"mis_loyer",'Date debut : le contrat devrait etre en etat contrat en cours');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 1 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente test_updateDateAvenantContratEnCours !");
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantContratNonDemarre(){
         /////////////////////////////////////////////////////Contrat non démarré//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDateAvenant();
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
-        
+
         //Une fois que l'avenant n'a plus de date, on peut inialiser les dates de l'affaires parentes
         $date_debut = array(
             "value" => date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month"))
@@ -813,9 +825,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
         $commande = $this->obj->select($id_commande);
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');     
-        $this->assertEquals($commande["etat"],"non_loyer",'Date debut : le contrat devrait etre en etat non_loyer non démarré');        
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
+        $this->assertEquals($commande["etat"],"non_loyer",'Date debut : le contrat devrait etre en etat non_loyer non démarré');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
 
@@ -847,7 +859,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     }
 
     public function insertDevis ($id_affaire){
-        
+
         $id_devis =ATF::devis()->i(
                                         array(
                                                 "ref"=>"0610001AVT1",
@@ -863,7 +875,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                                 "id_contact"=>$this->id_contact
                                             )
                                         );
-                
+
         $id_devis_ligne1 =ATF::devis_ligne()->i(
                                         array(
                                                 "type"=>"fixe",
@@ -891,9 +903,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         return $id_devis;
     }
 
-    
+
     public function insertCommande ($id_affaire,$id_devis){
-        
+
         $id_commande =ATF::commande()->i(
                                         array(
                                                 "ref"=>"0610001AVT1",
@@ -914,8 +926,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_insert(){
 
         $id_affaire=$this->insertAffaire();
@@ -963,14 +975,14 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->q->reset()->addCondition("ref",ATF::affaire()->select(ATF::devis()->select($id_devis,"id_affaire"),"ref"))->setDimension("row");
         $commandeRef=$this->obj->sa();
         $this->obj->d($commandeRef["id_commande"]);
-        
+
         // Erreur de contact non present
         unset($commande["commande"]["email"]);
         try {
             $error = NULL;
             classes::decryptId(ATF::commande()->insert($commande,$this->s));
         } catch (errorATF $e) {
-            $error = $e->getCode(); 
+            $error = $e->getCode();
         }
         $this->assertEquals(350,$error,"Erreur d'email non declenchée");
 
@@ -1059,39 +1071,39 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "neuf"=>"oui",
                                     'date_achat' => NULL,
                                     'commentaire' => NULL
-                                )                           
+                                )
                             )
                             ,$commande_ligne,'Erreur sur les lignes de commande');
-    
+
         $affaire=ATF::affaire()->select($selectCommande["id_affaire"]);
         $this->assertEquals($affaire["etat"],"commande",'Erreur sur la commande');
-    
-    }
-    
 
-    
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+    }
+
+
+
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_delete(){
         $id_affaire=$this->insertAffaire();
         $id_devis=$this->insertDevis($id_affaire);
         $id_commande=$this->insertCommande($id_affaire,$id_devis);
-        
+
         $commande_select = $this->obj->select($id_commande);
 
         $delete_commande=array("id"=>array(0=>$id_commande,1=>"aaa"));
         $this->obj->delete($delete_commande);
-        
+
         $affaire=ATF::affaire()->select($commande_select["id_affaire"]);
         $this->assertEquals("devis",$affaire["etat"],'Lorsque la commande est supprimée l affaire doit être en devis');
-    
+
         $devis=ATF::devis()->select($id_devis);
         $this->assertEquals("attente",$devis["etat"],'Lorsque la commande est supprimée le devis doit être en attente');
         $this->assertEquals(NULL,$devis["date_accord"],'Lorsque la commande est supprimée le devis doit être en date_accord NULL');
-                
+
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_insertVente(){
         $id_affaire=$this->insertAffaire();
         ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"vente","id_parent"=>26));
@@ -1105,12 +1117,12 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $commande = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:10:"11-05-2011";s:10:"id_affaire";s:4:"6210";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:8:"3 000.00";s:10:"prix_achat";s:6:"103.00";s:5:"marge";s:5:"96.57";s:13:"marge_absolue";s:8:"2 897.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"6137";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:190:"[{"loyer__dot__loyer":"3000.00","loyer__dot__duree":"1","loyer__dot__assurance":null,"loyer__dot__frais_de_gestion":null,"loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":3000}]";s:15:"produits_repris";s:572:"[{"commande_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","commande_ligne__dot__id_fournisseur":"DELL","commande_ligne__dot__id_fournisseur_fk":"e397ce41979133ecb54f810af7de6f25","commande_ligne__dot__prix_achat":"100.00","commande_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__id_produit_fk":"22bc1812bc68989afcde8962b81b0882","commande_ligne__dot__serial":"5X7ZB2J","commande_ligne__dot__id_commande_ligne":"f010c6c164d0c6ea083a7fdedc4cea27"}]";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"2af4569e9740cafd20b61f5bc957797b","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"f23a58cfc5353c62f5e261b25d791ea6","commande_ligne__dot__id_commande_ligne":"202dae48031c294619bd62aa26bd6936"}]";s:20:"produits_non_visible";s:0:"";}}';
         $commande = unserialize($commande);
-        
+
         $commande["values_commande"]["produits_repris"] = '[{"commande_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","commande_ligne__dot__id_fournisseur":"DELL","commande_ligne__dot__id_fournisseur_fk":"1351","commande_ligne__dot__prix_achat":"100.00","commande_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__id_produit_fk":"5893","commande_ligne__dot__serial":"5X7ZB2J","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[1]["id_devis_ligne"].'"}]';
         $commande["values_commande"]["produits"] = '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
         $commande["commande"]["date"]=date("Y-m-01");
-        
+
         $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));
         ATF::$msg->getNotices();
         $selectCommande = $this->obj->select($id_commande);
@@ -1179,7 +1191,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "neuf"=>"oui",
                                     'date_achat' => NULL,
                                     'commentaire' => NULL
-                                )                           
+                                )
                             )
                             ,$commande_ligne,'Erreur sur les lignes de commande');
 
@@ -1214,16 +1226,16 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(875,$error,'Erreur on ne doit pas pouvoir modifier les dates d une affaire qui a un avenant non démarré');
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function testUpdateDate(){
         $this->obj = ATF::commande();
         $this->assertEquals(get_class($this->obj),'commande_cleodis','Classe dans $this->obj incorrecte');
-        
+
         $id_affaire=$this->insertAffaire();
         $id_devis=$this->insertDevis($id_affaire);
         $id_commande=$this->insertCommande($id_affaire,$id_devis);
-        
+
         // Tests de prédicats
         $c = new commande_cleodis($id_commande);
         $this->assertFalse($c->estEnCours(),'1 Cette commande ne devrait pas etre en cours');
@@ -1231,7 +1243,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertFalse($c->dateEvolutionDepassee(),'3 Cette commande ne devrait pas etre en cours');
         $this->assertFalse($c->isAR(),'4 isAR Cette commande ne devrait pas etre en cours');
         $this->assertFalse($c->estSigne(),'5 estSigne Cette commande ne devrait pas etre en cours');
-        
+
         // Test update impossible
         try {
             $error = NULL;
@@ -1258,7 +1270,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $error = $e->getCode();
         }
         $this->assertEquals($error,987,'Erreur de type date inexistante non declenchee');
-        
+
         // Date de début
         $date_debut = array(
             "value" => date("Y-m-01")
@@ -1268,7 +1280,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_debut);
         $c = new commande_cleodis($id_commande);
         $this->assertTrue($c->estEnCours(),'Cette commande devrait etre en cours 1');
-        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat mis_loyer');      
+        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat mis_loyer');
 
         // Retour contrat
         $retour_contrat = array(
@@ -1281,7 +1293,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals($c->get("retour_prel"),$retour_contrat['value'],'Retour contrat : retour_prel resultant incorrect');
         $this->assertEquals($c->get("retour_pv"),$retour_contrat['value'],'Retour contrat : retour_pv resultant incorrect');
 
-        // Date évolution       
+        // Date évolution
         $date_evolution = array(
             "value" => "2020-01-01"
             ,"key" => "date_evolution"
@@ -1318,7 +1330,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_demande_resiliation);
         $c = new commande_cleodis($id_commande);
         $this->assertEquals("restitution",$c->get("etat"),'Date restitution : etat de la commande devrait etre restitution');
-        
+
         $date_prevision_restitution = array(
             "value" => date('Y-m-d', strtotime('-1 day'))
             ,"key" => "date_prevision_restitution"
@@ -1327,8 +1339,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_prevision_restitution);
         $c = new commande_cleodis($id_commande);
         $this->assertEquals(date('Y-m-d', strtotime('-1 day')),$c->get("date_prevision_restitution"),'Date restitution prévue incorrecte');
-        
-                
+
+
         //date_restitution_effective
         $date_restitution_effective = array(
             "value" => date('Y-m-d', strtotime('-1 day'))
@@ -1338,17 +1350,17 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate($date_restitution_effective);
         $c = new commande_cleodis($id_commande);
         $this->assertEquals("arreter",$c->get("etat"),'Date restitution effective : etat de la commande devrait etre arreter');
-        
+
         // Tests des notices
         $notices = ATF::$msg->getNotices();
         $this->assertEquals(count($notices),30,'Le nombre de notices est incorrect');
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantLoyerUnique(){
         $devisSerialize = 'a:9:{s:9:"extAction";s:5:"devis";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:11:"label_devis";a:5:{s:10:"id_filiale";s:7:"CLEODIS";s:14:"id_opportunite";s:8:"Aucun(e)";s:10:"id_societe";s:7:"FINORPA";s:10:"id_contact";s:16:"M Philippe MOONS";s:10:"AR_societe";s:7:"FINORPA";}s:5:"devis";a:21:{s:10:"id_filiale";s:3:"246";s:5:"devis";s:2:"TU";s:3:"tva";s:5:"1.196";s:11:"date_accord";s:10:"08-02-2011";s:14:"id_opportunite";s:0:"";s:10:"id_societe";i:5391;s:12:"type_contrat";s:3:"lld";s:8:"validite";s:10:"23-02-2011";s:10:"id_contact";s:4:"5753";s:6:"loyers";s:4:"0.00";s:23:"frais_de_gestion_unique";s:4:"0.00";s:16:"assurance_unique";s:4:"0.00";s:10:"AR_societe";s:0:"";s:5:"marge";s:5:"99.96";s:13:"marge_absolue";s:8:"8 021.00";s:4:"prix";s:8:"8 024.00";s:10:"prix_achat";s:4:"3.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:4:"<br>";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:13:"filestoattach";a:1:{s:13:"fichier_joint";s:0:"";}}s:7:"avenant";s:0:"";s:2:"AR";s:0:"";s:5:"loyer";a:1:{s:15:"frequence_loyer";s:1:"m";}s:12:"values_devis";a:2:{s:5:"loyer";s:185:"[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]";s:8:"produits";s:415:"[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]";}}';
         $devis = unserialize($devisSerialize);
-        
+
         $devis["values_devis"]["produits_repris"] = '[{"devis_ligne__dot__produit":"LATITUDE D520","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"DELLLAT-1","devis_ligne__dot__prix_achat":"50","devis_ligne__dot__id_produit":"LATITUDE D520","devis_ligne__dot__id_fournisseur":"CBASE","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"BBPZB2J","devis_ligne__dot__id_produit_fk":"6066","devis_ligne__dot__id_parc":"6995","devis_ligne__dot__id_affaire_provenance":"43","devis_ligne__dot__id_fournisseur_fk":"1349"}]';
         $devis["avenant"] = "affaire_43";
         $devis["devis"]["loyer_unique"]="oui";
@@ -1359,7 +1371,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
         ATF::devis_ligne()->q->reset()->addCondition("id_devis",$id_devis);
         $devis_ligne=ATF::devis_ligne()->sa();
-        
+
         $commandeSerialize = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:0:"";s:10:"id_affaire";s:4:"6429";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:9:"39 780.00";s:10:"prix_achat";s:5:"53.00";s:5:"marge";s:5:"99.87";s:13:"marge_absolue";s:9:"39 727.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"6356";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:198:"[{"loyer__dot__loyer":"1000.00","loyer__dot__duree":"39","loyer__dot__assurance":"10.00","loyer__dot__frais_de_gestion":"10.00","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":39780}]";s:15:"produits_repris";s:527:"[{"commande_ligne__dot__produit":"LATITUDE D520","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"DELLLAT-1","commande_ligne__dot__id_fournisseur":"CBASE","commande_ligne__dot__id_fournisseur_fk":"faf6cbeded2dea2b761ebe7905d9a1ea","commande_ligne__dot__prix_achat":"50.00","commande_ligne__dot__id_produit":"LATITUDE D520","commande_ligne__dot__id_produit_fk":"bf606b897aa6a431fd1bdadda788129d","commande_ligne__dot__serial":"BBPZB2J","commande_ligne__dot__id_commande_ligne":"5f9fb4146f2a2f610b23e492f89aa47a"}]";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"c3fa67e42bb24869e490543b88af9df2","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"8892f086954296d8ec3a1fd4810bc9d2","commande_ligne__dot__id_commande_ligne":"87316a8c4ab84c44e2ef2b3170902366"}]";s:20:"produits_non_visible";s:0:"";}}';
         $commande = unserialize($commandeSerialize);
         $commande["commande"]["id_devis"] = $id_devis;
@@ -1371,8 +1383,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         return $id_commande;
     }
 
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantLoyerUniqueEnCours(){
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
         $date_debut = array(
@@ -1404,18 +1416,18 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "existence" =>"inactif",
                                         'date_achat' => null),
                                     $parcAncien[0],
-                                    "L'ancien parc n'est pas cohérent !");  
+                                    "L'ancien parc n'est pas cohérent !");
 
 
-        
+
         /////////////////////////////////////////////////////Contrat démarré//////////////////////////////////////////////////////////////
-        
+
         $id_commande=$this->test_updateDateAvenantLoyerUnique();
-        
+
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
-        
+
         // Date de début sur avenant
         $date_debut = array(
             "value" => date("Y-m-01")
@@ -1423,59 +1435,66 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"id_commande" => $id_commande
         );
         $this->obj->updateDate($date_debut);
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
         $a = new affaire_cleodis($affaire["id_affaire"]);
         $ap = $a->getParentAvenant(); // Méthode pour avenant
         $ap2 = new affaire_cleodis(43);
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente démarré !');     
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente démarré !');
         $this->assertTrue($c->estEnCours(),'Cette commande ne devrait pas etre en cours Avenant démarré');
-        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat mis_loyer démarré');      
-        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente démarré !");   
-        $this->assertEquals(date("Y-m-01"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente démarré !");   
+        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat mis_loyer démarré');
+        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente démarré !");
+        $this->assertEquals(date("Y-m-01"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente démarré !");
 
         $notices = ATF::$msg->getNotices();
         /*
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de la commande '0610001AVT1' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             $notices,
-                            "Les notices ne sont pas cohérentes pas cohérente démarré !");  
+                            "Les notices ne sont pas cohérentes pas cohérente démarré !");
 
         */
         //Check Prolongation
@@ -1494,8 +1513,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $prolongation,
-                                    "La prolongation n'est pas cohérente démarré !");   
-        
+                                    "La prolongation n'est pas cohérente démarré !");
+
 
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -1512,7 +1531,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "date_periode_debut" => $c->get("date_debut"),
                                         "type" => "contrat",
                                         "envoye" => "non",
-                                        "date_periode_fin" =>$c->get("date_evolution"),                                        
+                                        "date_periode_fin" =>$c->get("date_evolution"),
                                         'serenite' => '0.00',
                                         'maintenance' => '0.00',
                                         'hotline' => '0.00',
@@ -1521,8 +1540,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $facturation,
-                                    "La facturation n'est pas cohérente démarré !");    
-        
+                                    "La facturation n'est pas cohérente démarré !");
+
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $parc=ATF::parc()->sa();
 
@@ -1531,8 +1550,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->assertEquals($parcProv,
                                     $parc,
-                                    "Probleme sur les parcs avenant loyer unique démarré !");   
-        
+                                    "Probleme sur les parcs avenant loyer unique démarré !");
+
         $this->assertEquals(array(
                                 array(
                                         "id_parc" => $parc[0]["id_parc"],
@@ -1553,7 +1572,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         'date_achat' => null)
                                     ),
                                     $parc,
-                                    "Le nouveau parc n'est pas cohérent démarré !");    
+                                    "Le nouveau parc n'est pas cohérent démarré !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",43);
         $parcAncien=ATF::parc()->sa();
@@ -1576,7 +1595,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "existence" =>"inactif",
                                         'date_achat' => null),
                                     $parcAncien[0],
-                                    "L'ancien parc n'est pas cohérent démarré !");  
+                                    "L'ancien parc n'est pas cohérent démarré !");
 
         //Tester erreur sur modif avenant
         $date_debut = array(
@@ -1601,37 +1620,42 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
 
         $this->obj->updateDate($date_debut);
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Suppression de '1' enregistrement(s) effectués avec succès dans le module 'Prolong.'.",
                                     "title" => "Succès !",
-                                    "timer" => ""
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de la commande '0610001AVT1' a changé de 'En cours' à 'En attente'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente démarré !");  
+                            "Les notices ne sont pas cohérentes pas cohérente démarré !");
 
 
         //Check Prolongation
@@ -1650,13 +1674,13 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $prolongation,
-                                    "La prolongation n'est pas cohérente démarré !");   
+                                    "La prolongation n'est pas cohérente démarré !");
 
 
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantLoyerUniqueEnCoursNonDemarre(){
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
         $date_debut = array(
@@ -1668,22 +1692,25 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente démarré !");  
+                            "Les notices ne sont pas cohérentes pas cohérente démarré !");
         //Le parc doit donc être actif
         ATF::parc()->q->reset()->addCondition("id_affaire",43);
         $parcAncien=ATF::parc()->sa();
@@ -1706,16 +1733,16 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "existence" =>"inactif",
                                         'date_achat' => null),
                                     $parcAncien[0],
-                                    "L'ancien parc n'est pas cohérent !");  
+                                    "L'ancien parc n'est pas cohérent !");
 
 
-        
+
         /////////////////////////////////////////////////////Contrat démarré//////////////////////////////////////////////////////////////
-        
+
         $id_commande=$this->test_updateDateAvenantLoyerUnique();
-        
+
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         ATF::affaire()->u(array("id_affaire"=>$c->get("id_affaire"),"date_installation_reel"=>NULL));
@@ -1730,35 +1757,38 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente démarré !");  
+                            "Les notices ne sont pas cohérentes pas cohérente démarré !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
         $a = new affaire_cleodis($affaire["id_affaire"]);
         $ap = $a->getParentAvenant(); // Méthode pour avenant
         $ap2 = new affaire_cleodis(43);
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente démarré !');     
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente démarré !');
         $this->assertFalse($c->estEnCours(),'Cette commande ne devrait pas etre en cours Avenant démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en etat mis_loyer démarré');      
-        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente démarré !");   
-        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_debut"),"La date début n'est pas cohérente démarré !"); 
-        $this->assertEquals($c->get("date_debut"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente démarré !");    
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en etat mis_loyer démarré');
+        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente démarré !");
+        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_debut"),"La date début n'est pas cohérente démarré !");
+        $this->assertEquals($c->get("date_debut"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente démarré !");
 
         //Check Prolongation
         ATF::prolongation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -1776,8 +1806,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $prolongation,
-                                    "La prolongation n'est pas cohérente démarré !");   
-        
+                                    "La prolongation n'est pas cohérente démarré !");
+
 
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -1803,8 +1833,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $facturation,
-                                    "La facturation n'est pas cohérente démarré !");    
-        
+                                    "La facturation n'est pas cohérente démarré !");
+
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $parc=ATF::parc()->sa();
 
@@ -1813,8 +1843,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->assertEquals($parcProv,
                                     $parc,
-                                    "Probleme sur les parcs avenant loyer unique démarré !");   
-        
+                                    "Probleme sur les parcs avenant loyer unique démarré !");
+
         $this->assertEquals(array(
                                 array(
                                         "id_parc" => $parc[0]["id_parc"],
@@ -1835,7 +1865,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         'date_achat' => null)
                                     ),
                                     $parc,
-                                    "Le nouveau parc n'est pas cohérent démarré !");    
+                                    "Le nouveau parc n'est pas cohérent démarré !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",43);
         $parcAncien=ATF::parc()->sa();
@@ -1858,7 +1888,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "existence" =>"actif",
                                         'date_achat' => null),
                                     $parcAncien[0],
-                                    "L'ancien parc n'est pas cohérent démarré !");  
+                                    "L'ancien parc n'est pas cohérent démarré !");
 
         //Tester erreur sur modif avenant
         $date_debut = array(
@@ -1874,8 +1904,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         }
         $this->assertEquals(876,$error,'Erreur on ne doit pas pouvoir modifier les dates d une affaire qui a un avenant non démarré');
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAvenantLoyerUniqueNonDemarre(){
 
         $id_commande=$this->test_updateDateAvenantLoyerUnique();
@@ -1891,22 +1921,25 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente non démarré 2 !");    
+                            "Les notices ne sont pas cohérentes pas cohérente non démarré 2 !");
 
 
         // Suppression de date début
@@ -1919,13 +1952,14 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente non démarré !");  
-        $c = new commande_cleodis($id_commande);    
+                            "Les notices ne sont pas cohérentes pas cohérente non démarré !");
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
         $a = new affaire_cleodis($affaire["id_affaire"]);
         $ap = $a->getParentAvenant(); // Méthode pour avenant
@@ -1933,16 +1967,16 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         //Check Prolongation
         ATF::prolongation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $prolongation=ATF::prolongation()->sa();
-        $this->assertNull($prolongation,"La prolongation n'est pas cohérente quand elle est ré-initialisée non démarré !"); 
+        $this->assertNull($prolongation,"La prolongation n'est pas cohérente quand elle est ré-initialisée non démarré !");
 
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $facturation=ATF::facturation()->sa();
-        $this->assertNull($facturation," Il ne devrait pas y avoir de facturation quand c'est ré-initialisée non démarré !");   
-        
+        $this->assertNull($facturation," Il ne devrait pas y avoir de facturation quand c'est ré-initialisée non démarré !");
+
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $parc=ATF::parc()->sa();
-        
+
         $this->assertEquals(array(
                                 array(
                                         "id_parc" => $parc[0]["id_parc"],
@@ -1963,7 +1997,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         'date_achat' => null)
                                     ),
                                     $parc,
-                                    "Le nouveau parc n'est pas cohérent quand c'est ré-initialisée non démarré !"); 
+                                    "Le nouveau parc n'est pas cohérent quand c'est ré-initialisée non démarré !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",43);
         $parcAncien=ATF::parc()->sa();
@@ -1986,7 +2020,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "existence" =>"actif",
                                         'date_achat' => null),
                                     $parcAncien[0],
-                                    "L'ancien parc n'est pas cohérent quand c'est ré-initialisée non démarré !");   
+                                    "L'ancien parc n'est pas cohérent quand c'est ré-initialisée non démarré !");
 
 
         // Date de début sur avenant
@@ -1996,34 +2030,37 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"id_commande" => $id_commande
         );
         $this->obj->updateDate($date_debut);
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');     
+        $this->assertEquals("2009-11-01",$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer Avenant non démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en etat non_loyer non démarré');      
-        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");   
-        $this->assertEquals($c->get("date_debut"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");    
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en etat non_loyer non démarré');
+        $this->assertEquals($ap->getCommande()->get("date_evolution"),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");
+        $this->assertEquals($c->get("date_debut"),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente non démarré !");  
+                            "Les notices ne sont pas cohérentes pas cohérente non démarré !");
 
 
         //Check Prolongation
@@ -2042,8 +2079,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $prolongation,
-                                    "La prolongation n'est pas cohérente non démarré !");   
-        
+                                    "La prolongation n'est pas cohérente non démarré !");
+
 
         //Check facturation
         ATF::facturation()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
@@ -2069,8 +2106,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         )
                                     ),
                                     $facturation,
-                                    "La facturation n'est pas cohérente !");    
-        
+                                    "La facturation n'est pas cohérente !");
+
         ATF::parc()->q->reset()->addCondition("id_affaire",$affaire["id_affaire"]);
         $parc=ATF::parc()->sa();
 
@@ -2079,8 +2116,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->assertEquals($parcProv,
                                     $parc,
-                                    "Probleme sur les parcs avenant loyer unique non démarré !");   
-        
+                                    "Probleme sur les parcs avenant loyer unique non démarré !");
+
         $this->assertEquals(array(
                                 array(
                                         "id_parc" => $parc[0]["id_parc"],
@@ -2101,7 +2138,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         'date_achat' => null)
                                     ),
                                     $parc,
-                                    "Le nouveau parc n'est pas cohérent non démarré !");    
+                                    "Le nouveau parc n'est pas cohérent non démarré !");
 
         ATF::parc()->q->reset()->addCondition("id_affaire",43);
         $parcAncien=ATF::parc()->sa();
@@ -2124,20 +2161,20 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "existence" =>"actif",
                                         'date_achat' => null),
                                     $parcAncien[0],
-                                    "L'ancien parc n'est pas cohérent non démarré !");  
+                                    "L'ancien parc n'est pas cohérent non démarré !");
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDate(){
 
         $devisSerialize = 'a:9:{s:9:"extAction";s:5:"devis";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:11:"label_devis";a:5:{s:10:"id_filiale";s:7:"CLEODIS";s:14:"id_opportunite";s:8:"Aucun(e)";s:10:"id_societe";s:7:"FINORPA";s:10:"id_contact";s:16:"M Philippe MOONS";s:10:"AR_societe";s:7:"FINORPA";}s:5:"devis";a:21:{s:10:"id_filiale";s:3:"246";s:5:"devis";s:2:"TU";s:3:"tva";s:5:"1.196";s:11:"date_accord";s:10:"08-02-2011";s:14:"id_opportunite";s:0:"";s:10:"id_societe";i:5391;s:12:"type_contrat";s:3:"lld";s:8:"validite";s:10:"23-02-2011";s:10:"id_contact";s:4:"5753";s:6:"loyers";s:4:"0.00";s:23:"frais_de_gestion_unique";s:4:"0.00";s:16:"assurance_unique";s:4:"0.00";s:10:"AR_societe";s:0:"";s:5:"marge";s:5:"99.96";s:13:"marge_absolue";s:8:"8 021.00";s:4:"prix";s:8:"8 024.00";s:10:"prix_achat";s:4:"3.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:4:"<br>";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:13:"filestoattach";a:1:{s:13:"fichier_joint";s:0:"";}}s:7:"avenant";s:0:"";s:2:"AR";s:0:"";s:5:"loyer";a:1:{s:15:"frequence_loyer";s:1:"m";}s:12:"values_devis";a:2:{s:5:"loyer";s:185:"[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]";s:8:"produits";s:415:"[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]";}}';
 
         $devis = unserialize($devisSerialize);
-        
+
         $id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
         ATF::devis_ligne()->q->reset()->addCondition("id_devis",$id_devis);
         $devis_ligne=ATF::devis_ligne()->sa();
-        
+
         $commandeSerialize = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:0:"";s:10:"id_affaire";s:4:"6429";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:9:"39 780.00";s:10:"prix_achat";s:5:"53.00";s:5:"marge";s:5:"99.87";s:13:"marge_absolue";s:9:"39 727.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"6356";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:198:"[{"loyer__dot__loyer":"1000.00","loyer__dot__duree":"39","loyer__dot__assurance":"10.00","loyer__dot__frais_de_gestion":"10.00","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":39780}]";s:15:"produits_repris";s:527:"[{"commande_ligne__dot__produit":"LATITUDE D520","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"DELLLAT-1","commande_ligne__dot__id_fournisseur":"CBASE","commande_ligne__dot__id_fournisseur_fk":"faf6cbeded2dea2b761ebe7905d9a1ea","commande_ligne__dot__prix_achat":"50.00","commande_ligne__dot__id_produit":"LATITUDE D520","commande_ligne__dot__id_produit_fk":"bf606b897aa6a431fd1bdadda788129d","commande_ligne__dot__serial":"BBPZB2J","commande_ligne__dot__id_commande_ligne":"5f9fb4146f2a2f610b23e492f89aa47a"}]";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"c3fa67e42bb24869e490543b88af9df2","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"8892f086954296d8ec3a1fd4810bc9d2","commande_ligne__dot__id_commande_ligne":"87316a8c4ab84c44e2ef2b3170902366"}]";s:20:"produits_non_visible";s:0:"";}}';
         $commande = unserialize($commandeSerialize);
         $commande["commande"]["id_devis"] = $id_devis;
@@ -2149,14 +2186,14 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertNotNull($id_commande,'Commande non créé');
         return $id_commande;
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateContratDepasseProlongation(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDate();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         // Date de début sur avenant
@@ -2170,85 +2207,92 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                             array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'Prolong.'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                 "msg" => "Email envoyé au(x) notifié(s)",
                                 "title" => "",
-                                "timer" => ""
+                                "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé !");    
+                            "Les notices ne sont pas cohérentes dépassé !");
 
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');        
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer non démarré');
-        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en etat non_loyer prolongation');      
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 3 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");   
-        
+        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en etat non_loyer prolongation');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 3 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
+
 
 ////////////////////////On arrête le contrat///////////////////////////////////////
-        
+
         // Date de début sur avenant
         $date_debut = array(
             "value" => date("Y-m-d",strtotime(date("Y-m-01")."- 6 year"))
             ,"key" => "date_debut"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                         "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         ),
                                 array(
                                         "msg" => "Date 'Début' modifiée",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé !");    
+                            "Les notices ne sont pas cohérentes dépassé !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en arrete non démarré');
-        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en etat arreter');     
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 3 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");   
-        
+        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en etat arreter');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 3 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
+
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateContratDepasse(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDate();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         ATF::devis()->q->reset()->addCondition("id_affaire",$this->obj->select($id_commande,"id_affaire"))->setDimension("row");
@@ -2266,47 +2310,51 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                             array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'Prolong.'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                 "msg" => "Email envoyé au(x) notifié(s)",
-                                "title" => "",
-                                "timer" => ""
+                                "title" => null,
+                                "timer" => null,
+                                "type" => "success"
                                     ),
                             array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé 2 !");  
+                            "Les notices ne sont pas cohérentes dépassé 2 !");
 
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals(date("Y-m-d",strtotime($c->get("date_evolution")."-3 month")),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');        
+        $this->assertEquals(date("Y-m-d",strtotime($c->get("date_evolution")."-3 month")),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer Avenant non démarré');
-        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en etat non_loyer prolongation');      
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 month - 2 year - 1 day")),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");    
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 5 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en etat non_loyer prolongation');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 month - 2 year - 1 day")),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 5 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
-    
-    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateContratEnCours(){
         /////////////////////////////////////////////////////Contrat encours//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDate();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         // Date de début sur avenant
@@ -2320,41 +2368,45 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                             array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes contrat en cours !");   
+                            "Les notices ne sont pas cohérentes contrat en cours !");
 
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente contrat en cours !');       
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente contrat en cours !');
         $this->assertTrue($c->estEnCours(),'Cette commande devrait etre en mis_loyer Avenant non démarré');
-        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat contrat en cours');       
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 month + 2 year - 1 day")),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente contrat en cours !");   
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 1 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente contrat en cours !"); 
+        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat contrat en cours');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 month + 2 year - 1 day")),$c->get("date_evolution"),"La date d'évolution n'est pas cohérente contrat en cours !");
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")." - 1 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente contrat en cours !");
 
     }
-    
-    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateContratNonDemarre(){
         /////////////////////////////////////////////////////Contrat non démarré//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDate();
@@ -2370,36 +2422,39 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente non démarré 2 !");    
+                            "Les notices ne sont pas cohérentes pas cohérente non démarré 2 !");
 
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');        
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer Avenant non démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en etat non_loyer non démarré');      
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 year + 1 month - 1 day")),date("Y-m-d",strtotime($c->get("date_evolution"))),"La date d'évolution n'est pas cohérente non démarré !");   
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en etat non_loyer non démarré');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 year + 1 month - 1 day")),date("Y-m-d",strtotime($c->get("date_evolution"))),"La date d'évolution n'est pas cohérente non démarré !");
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
     }
-    
 
-    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateErreur(){
         /////////////////////////////////////////////////////Contrat non démarré//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDate();
@@ -2443,21 +2498,21 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(880,$error,'Mauvaise date 31');
     }
 
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAR(){
 
         $devisSerialize = 'a:9:{s:9:"extAction";s:5:"devis";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:11:"label_devis";a:5:{s:10:"id_filiale";s:7:"CLEODIS";s:14:"id_opportunite";s:8:"Aucun(e)";s:10:"id_societe";s:7:"FINORPA";s:10:"id_contact";s:16:"M Philippe MOONS";s:10:"AR_societe";s:7:"FINORPA";}s:5:"devis";a:21:{s:10:"id_filiale";s:3:"246";s:5:"devis";s:2:"TU";s:3:"tva";s:5:"1.196";s:11:"date_accord";s:10:"08-02-2011";s:14:"id_opportunite";s:0:"";s:10:"id_societe";i:5391;s:12:"type_contrat";s:3:"lld";s:8:"validite";s:10:"23-02-2011";s:10:"id_contact";s:4:"5753";s:6:"loyers";s:4:"0.00";s:23:"frais_de_gestion_unique";s:4:"0.00";s:16:"assurance_unique";s:4:"0.00";s:10:"AR_societe";s:0:"";s:5:"marge";s:5:"99.96";s:13:"marge_absolue";s:8:"8 021.00";s:4:"prix";s:8:"8 024.00";s:10:"prix_achat";s:4:"3.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:4:"<br>";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:13:"filestoattach";a:1:{s:13:"fichier_joint";s:0:"";}}s:7:"avenant";s:0:"";s:2:"AR";s:0:"";s:5:"loyer";a:1:{s:15:"frequence_loyer";s:1:"m";}s:12:"values_devis";a:2:{s:5:"loyer";s:185:"[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]";s:8:"produits";s:415:"[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]";}}';
 
         $devis = unserialize($devisSerialize);
-        
+
         $devis["values_devis"]["produits_repris"] = '[{"devis_ligne__dot__produit":"LATITUDE D520","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"DELLLAT-1","devis_ligne__dot__prix_achat":"50","devis_ligne__dot__id_produit":"LATITUDE D520","devis_ligne__dot__id_fournisseur":"CBASE","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"BBPZB2J","devis_ligne__dot__id_produit_fk":"6066","devis_ligne__dot__id_parc":"6995","devis_ligne__dot__id_affaire_provenance":"43","devis_ligne__dot__id_fournisseur_fk":"1349"}]';
         $devis["AR"] = "affaire_43";
         $devis["panel_AR-checkbox"] = "on";
         $id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
         ATF::devis_ligne()->q->reset()->addCondition("id_devis",$id_devis);
         $devis_ligne=ATF::devis_ligne()->sa();
-        
+
         $commandeSerialize = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:0:"";s:10:"id_affaire";s:4:"6429";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:9:"39 780.00";s:10:"prix_achat";s:5:"53.00";s:5:"marge";s:5:"99.87";s:13:"marge_absolue";s:9:"39 727.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"6356";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:198:"[{"loyer__dot__loyer":"1000.00","loyer__dot__duree":"39","loyer__dot__assurance":"10.00","loyer__dot__frais_de_gestion":"10.00","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":39780}]";s:15:"produits_repris";s:527:"[{"commande_ligne__dot__produit":"LATITUDE D520","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"DELLLAT-1","commande_ligne__dot__id_fournisseur":"CBASE","commande_ligne__dot__id_fournisseur_fk":"faf6cbeded2dea2b761ebe7905d9a1ea","commande_ligne__dot__prix_achat":"50.00","commande_ligne__dot__id_produit":"LATITUDE D520","commande_ligne__dot__id_produit_fk":"bf606b897aa6a431fd1bdadda788129d","commande_ligne__dot__serial":"BBPZB2J","commande_ligne__dot__id_commande_ligne":"5f9fb4146f2a2f610b23e492f89aa47a"}]";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"c3fa67e42bb24869e490543b88af9df2","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"8892f086954296d8ec3a1fd4810bc9d2","commande_ligne__dot__id_commande_ligne":"87316a8c4ab84c44e2ef2b3170902366"}]";s:20:"produits_non_visible";s:0:"";}}';
         $commande = unserialize($commandeSerialize);
         $commande["commande"]["id_devis"] = $id_devis;
@@ -2468,8 +2523,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertNotNull($id_commande,'Commande non créé');
         return $id_commande;
     }
-    
-    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateARContratDepasseProlongation(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
@@ -2483,28 +2538,31 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente DepasseProlongation 1 !");    
+                            "Les notices ne sont pas cohérentes pas cohérente DepasseProlongation 1 !");
 
 
         $id_commande = $this->test_updateDateAR();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
         // Date de début sur avenant
         $date_debut = array(
@@ -2517,85 +2575,93 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                             array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "L'état de la commande '0610001' a changé de 'arreter' à 'AR'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                             array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-
-                                    "timer" => ""
-                                    )
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
+                                )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé 2 !");  
+                            "Les notices ne sont pas cohérentes dépassé 2 !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré ! 1');      
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente non démarré ! 1');
         $this->assertTrue($c->estEnCours(),'Cette commande devrait etre en non_loyer Avenant non démarré');
-        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en mis_loyer');       
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"AR",'Date debut : le contrat de l affaire AR devrait etre en AR');      
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");   
+        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en mis_loyer');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"AR",'Date debut : le contrat de l affaire AR devrait etre en AR');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
 ////////////////////////On arrête le contrat///////////////////////////////////////
-        
+
         // Date de début sur avenant
         $date_debut = array(
             "value" => date("Y-m-d",strtotime(date("Y-m-01")."- 6 year"))
             ,"key" => "date_debut"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->updateDate($date_debut);
         $this->assertEquals(array(
                                 array(
                                         "msg" => "L'état de la commande '7001001' a changé de 'En cours' à 'Prolong.'",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         ),
                                 array(
                                         "msg" => "Email envoyé au(x) notifié(s)",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         ),
                                 array(
                                         "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         ),
                                 array(
                                         "msg" => "Date 'Début' modifiée",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé !");    
+                            "Les notices ne sont pas cohérentes dépassé !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en arreter non démarré');
-        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en arreter');      
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"AR",'Date debut : le contrat de l affaire AR devrait etre en AR');      
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");   
+        $this->assertEquals($c->get("etat"),"prolongation",'Date debut : le contrat devrait etre en arreter');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"AR",'Date debut : le contrat de l affaire AR devrait etre en AR');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."- 2 year")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
         /*Plus de date*/
         // Date de début sur avenant
@@ -2604,38 +2670,41 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"key" => "date_debut"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->updateDate($date_debut);
-        
+
         $this->assertEquals(array(
                                 array(
                                         "msg" => "L'état de la commande '0610001' a changé de 'AR' à 'Prolong.'",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         ),
                                 array(
                                         "msg" => "L'état de la commande '7001001' a changé de 'Prolong.' à 'En attente'",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         ),
                                 array(
                                         "msg" => "Date 'Début' modifiée",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                         )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé !");    
+                            "Les notices ne sont pas cohérentes dépassé !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en arreter non démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en arreter');     
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"prolongation",'Date debut : le contrat de l affaire AR devrait etre en prolongation');      
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en arreter');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"prolongation",'Date debut : le contrat de l affaire AR devrait etre en prolongation');
     }
 
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateAREnCours(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
@@ -2649,29 +2718,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente en cours !"); 
+                            "Les notices ne sont pas cohérentes pas cohérente en cours !");
 
 
         $id_commande = $this->test_updateDateAR();
 
         // Test sans date d'install réeelle
         $this->obj->u(array("id_commande"=>48,"etat"=>"non_loyer"));
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         $date_debut = array(
@@ -2684,30 +2756,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande '0610001' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes NonDemarre !"); 
+                            "Les notices ne sont pas cohérentes NonDemarre !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en arreter non démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer');       
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"mis_loyer",'Date debut : le contrat de l affaire AR devrait etre en non_loyer');        
-        $this->assertEquals(NULL,$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");    
-        $this->assertEquals(NULL,NULL,"La date_installation_reel n'est pas cohérente non démarré !");   
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"mis_loyer",'Date debut : le contrat de l affaire AR devrait etre en non_loyer');
+        $this->assertEquals(NULL,$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");
+        $this->assertEquals(NULL,NULL,"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateARContratNonDemarre(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
@@ -2721,28 +2795,31 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente NonDemarre !");   
+                            "Les notices ne sont pas cohérentes pas cohérente NonDemarre !");
 
 
         $id_commande = $this->test_updateDateAR();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         $date_debut = array(
@@ -2755,35 +2832,39 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande '0610001' a changé de 'arreter' à 'En attente'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes NonDemarre !"); 
+                            "Les notices ne sont pas cohérentes NonDemarre !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente NonDemarre !');     
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente NonDemarre !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer NonDemarre');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer NonDemarre');        
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"non_loyer",'Date debut : le contrat de l affaire AR devrait etre en AR NonDemarre');        
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer NonDemarre');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"non_loyer",'Date debut : le contrat de l affaire AR devrait etre en AR NonDemarre');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
         /*Plus de date*/
         // Date de début sur avenant
@@ -2792,31 +2873,32 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"key" => "date_debut"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->updateDate($date_debut);
-        
+
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé !");    
+                            "Les notices ne sont pas cohérentes dépassé !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en arreter non démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en arreter');     
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"non_loyer",'Date debut : le contrat de l affaire AR devrait etre en non_loyer');        
-        $this->assertEquals(NULL,$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");    
-        $this->assertEquals(NULL,NULL,"La date_installation_reel n'est pas cohérente non démarré !");   
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en arreter');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"non_loyer",'Date debut : le contrat de l affaire AR devrait etre en non_loyer');
+        $this->assertEquals(NULL,$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");
+        $this->assertEquals(NULL,NULL,"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateARContratNonDemarreARDemarre(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
@@ -2830,28 +2912,31 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente NonDemarre 1 !"); 
+                            "Les notices ne sont pas cohérentes pas cohérente NonDemarre 1 !");
 
 
         $id_commande = $this->test_updateDateAR();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         $date_debut = array(
@@ -2864,30 +2949,33 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes NonDemarre 2 !");   
+                            "Les notices ne sont pas cohérentes NonDemarre 2 !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente NonDemarre !');     
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente NonDemarre !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer NonDemarre');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer NonDemarre');        
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"arreter",'Date debut : le contrat de l affaire AR devrait etre en arreter NonDemarre');     
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer NonDemarre');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"arreter",'Date debut : le contrat de l affaire AR devrait etre en arreter NonDemarre');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
         /*Plus de date*/
         $date_debut = array(
@@ -2895,35 +2983,37 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"key" => "date_debut"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->updateDate($date_debut);
-        
+
         $this->assertEquals(array(
                                 array(
                                         "msg" => "L'état de la commande '0610001' a changé de 'arreter' à 'En attente'",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                     ),
                                 array(
                                         "msg" => "Date 'Début' modifiée",
-                                        "title" => "",
-                                        "timer" => ""
+                                        "title" => null,
+                                        "timer" => null,
+                                        "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé 3 !");  
-        $c = new commande_cleodis($id_commande);    
+                            "Les notices ne sont pas cohérentes dépassé 3 !");
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
 
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en arreter non démarré');
-        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer');       
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"non_loyer",'Date debut : le contrat de l affaire AR devrait etre en mis_loyer');        
-        $this->assertEquals(NULL,$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");    
-        $this->assertEquals(NULL,NULL,"La date_installation_reel n'est pas cohérente non démarré !");   
+        $this->assertEquals($c->get("etat"),"non_loyer",'Date debut : le contrat devrait etre en non_loyer');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"non_loyer",'Date debut : le contrat de l affaire AR devrait etre en mis_loyer');
+        $this->assertEquals(NULL,$c->get("date_evolution"),"La date d'évolution n'est pas cohérente non démarré !");
+        $this->assertEquals(NULL,NULL,"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_updateDateARContratNonDemarreARDepasse(){
         /////////////////////////////////////////////////////Contrat dépassé//////////////////////////////////////////////////////////////
         $this->obj->u(array("id_commande"=>48,"etat"=>"arreter"));
@@ -2937,28 +3027,31 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente NonDemarre !");   
+                            "Les notices ne sont pas cohérentes pas cohérente NonDemarre !");
 
 
         $id_commande = $this->test_updateDateAR();
 
         // Test sans date d'install réeelle
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $c->getAffaire()->set("date_installation_reel","");
 
         $date_debut = array(
@@ -2971,39 +3064,43 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande '0610001' a changé de 'arreter' à 'Prolong.'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes NonDemarre !"); 
+                            "Les notices ne sont pas cohérentes NonDemarre !");
 
-        $c = new commande_cleodis($id_commande);    
+        $c = new commande_cleodis($id_commande);
         $affaire=ATF::affaire()->select($this->obj->select($id_commande,"id_affaire"));
-        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente NonDemarre !');     
+        $this->assertEquals($c->get("date_evolution"),$affaire["date_garantie"],'date_garantie  n est pas cohérente NonDemarre !');
         $this->assertFalse($c->estEnCours(),'Cette commande devrait etre en non_loyer NonDemarre');
-        $this->assertEquals($c->get("etat"),"non_loyer",'etat : le contrat devrait etre en non_loyer NonDemarre');      
-        $this->assertEquals(ATF::commande()->select(48,"etat"),"prolongation",'etat : le contrat de l affaire AR devrait etre en mis_loyer NonDemarre');        
-        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");  
+        $this->assertEquals($c->get("etat"),"non_loyer",'etat : le contrat devrait etre en non_loyer NonDemarre');
+        $this->assertEquals(ATF::commande()->select(48,"etat"),"prolongation",'etat : le contrat de l affaire AR devrait etre en mis_loyer NonDemarre');
+        $this->assertEquals(date("Y-m-d",strtotime(date("Y-m-01")."+ 3 month")),$affaire["date_installation_reel"],"La date_installation_reel n'est pas cohérente non démarré !");
 
     }
-    
-///*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */   
+
+///*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 //  public function test_updateDateARError(){
 //
 //      $id_commande = $this->test_updateDateAR();
@@ -3024,8 +3121,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      $this->assertEquals(877,$error,'Erreur modification date commande AR non attrapée');
 //
 //  }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_getCommande_ligne(){
         $devis = unserialize(self::$devis);
         $devis["values_devis"]["produits"]= '[{"devis_ligne__dot__produit":"ZywallVis 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]';
@@ -3044,20 +3141,20 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $id_commande = $this->obj->insert($commande,$this->s,NULL,$refresh);
         $commande_select = $this->obj->select($id_commande);
-        
+
         $infos["id_commande"]=$id_commande;
 
         $this->assertFalse($this->obj->getCommande_ligne($infos),'getcommande_ligne ne doit rien renvoyer si il n y a pas un id_fourniseur ET un id_commande');
 
         $infos["id_fournisseur"]=1583;
-        $this->obj->getCommande_ligne($infos);  
-        
+        $this->obj->getCommande_ligne($infos);
+
         $this->assertTrue($infos["display"],'getcommande_ligne ne renvoie pas le bon display');
         $this->assertEquals(1583,$infos["id_fournisseur"],'getcommande_ligne ne renvoie pas le bon display');
         $this->assertEquals($id_commande,$infos["id_commande"],'getcommande_ligne ne renvoie pas le bon display');
     }
-    
-/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */ 
+
+/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_getLignes(){
         $devis = unserialize(self::$devis);
         $devis["preview"]=true;
@@ -3072,23 +3169,23 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $commande = 'a:5:{s:9:"extAction";s:8:"commande";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:8:"commande";a:15:{s:8:"commande";s:2:"TU";s:4:"type";s:11:"prelevement";s:10:"id_societe";s:4:"5391";s:4:"date";s:10:"11-05-2011";s:10:"id_affaire";s:4:"6210";s:17:"clause_logicielle";s:3:"non";s:4:"prix";s:8:"3 000.00";s:10:"prix_achat";s:6:"103.00";s:5:"marge";s:5:"96.57";s:13:"marge_absolue";s:8:"2 897.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:0:"";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:8:"id_devis";s:4:"6137";s:10:"__redirect";s:5:"devis";}s:15:"values_commande";a:4:{s:5:"loyer";s:190:"[{"loyer__dot__loyer":"3000.00","loyer__dot__duree":"1","loyer__dot__assurance":null,"loyer__dot__frais_de_gestion":null,"loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":3000}]";s:15:"produits_repris";s:572:"[{"commande_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","commande_ligne__dot__id_fournisseur":"DELL","commande_ligne__dot__id_fournisseur_fk":"e397ce41979133ecb54f810af7de6f25","commande_ligne__dot__prix_achat":"100.00","commande_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__id_produit_fk":"22bc1812bc68989afcde8962b81b0882","commande_ligne__dot__serial":"5X7ZB2J","commande_ligne__dot__id_commande_ligne":"f010c6c164d0c6ea083a7fdedc4cea27"}]";s:8:"produits";s:533:"[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"2af4569e9740cafd20b61f5bc957797b","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"f23a58cfc5353c62f5e261b25d791ea6","commande_ligne__dot__id_commande_ligne":"202dae48031c294619bd62aa26bd6936"}]";s:20:"produits_non_visible";s:0:"";}}';
         $commande = unserialize($commande);
-        
-        
+
+
         $commande["values_commande"]["produits_repris"] = '[{"commande_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__quantite":"1","commande_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","commande_ligne__dot__id_fournisseur":"DELL","commande_ligne__dot__id_fournisseur_fk":"1351","commande_ligne__dot__prix_achat":"100.00","commande_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","commande_ligne__dot__id_produit_fk":"5893","commande_ligne__dot__serial":"5X7ZB2J","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[1]["id_devis_ligne"].'"}]';
         $commande["values_commande"]["produits"] = '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
         $commande["commande"]["date"]=date("Y-m-01");
-        
+
         $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));
         ATF::$msg->getNotices();
         $commande_select = $this->obj->select($id_commande);
-        
+
         ATF::commande_ligne()->q->reset()->addCondition("id_commande",$id_commande);
         $commande_ligne=ATF::commande_ligne()->sa();
-        
+
         $affaire = new affaire_cleodis($commande_select["id_affaire"]);
         $commande = $affaire->getCommande();
-        
+
         // Lignes
         if ($commande) {
             // Si on a une commande, on utilise les lignes du contrat
@@ -3101,182 +3198,182 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array("ref"=>"OptiGX520 17 DVD 48X-1","id_fournisseur"=>"DELL","quantite"=>1,"prix_achat"=>"100.00","id_fournisseur_fk"=>1351,"id_commande_ligne"=>$commande_ligne[1]["id_commande_ligne"]),$lignesDataReprises[0],'lignesDataReprises ne renvoie pas les bonnes lignes');
         $this->assertNull($lignesDataNonVisibles,'lignesDataNonVisibles ne renvoie pas les bonnes lignes');
 
-    }   
+    }
 
 
-    //  @author Quentin JANON <qjanon@absystech.fr>  
+    //  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all_checkEnvoiContratEtBilanExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"envoiContratEtBilan");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['envoiContratEtBilanExists'],"Erreur, le fichier envoiContratEtBilan n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
 
-    //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+    //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_select_all_checkEnvoiCourrierClassiqueExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"envoiCourrierClassique");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['envoiCourrierClassiqueExists'],"Erreur, le fichier envoiCourrierClassique n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
 
-     //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+     //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_select_all_checkctlettreBelfiusExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"lettreBelfius");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['ctlettreBelfiusExists'],"Erreur, le fichier ctlettreBelfiusExists n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
 
-     //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>  
+     //  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_select_all_checkEnvoictSGEFExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"lettreSGEF");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['ctSGEFExists'],"Erreur, le fichier ctSGEFExists n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
 
-    
-    //  @author Quentin JANON <qjanon@absystech.fr>  
+
+    //  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all_checkenvoiContratSsBilanExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"envoiContratSsBilan");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['envoiContratSsBilanExists'],"Erreur, le fichier envoiContratSsBilanExists n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
-    
-    //  @author Quentin JANON <qjanon@absystech.fr>  
+
+    //  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all_checkenvoiAvenantExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"envoiAvenant");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['envoiAvenantExists'],"Erreur, le fichier envoiAvenant n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
-    
-        //  @author Quentin JANON <qjanon@absystech.fr>  
+
+        //  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all_checkcontratTransfertExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"contratTransfert");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['contratTransfertExists'],"Erreur, le fichier contratTransfert n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
-    
-    //  @author Quentin JANON <qjanon@absystech.fr>  
+
+    //  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all_checkEnvoictSigneExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"ctSigne");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['ctSigneExists'],"Erreur, le fichier ctSigne n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
 
 
-    //  @author Quentin JANON <qjanon@absystech.fr>  
+    //  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all_checkCourrierRestitutionExists() {
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
-        
+
         $f = $this->obj->filepath($id_commande,"CourrierRestitution");
 
         file_put_contents($f,"toto");
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $r = $r['data'];
 
         $this->assertTrue($r[0]['CourrierRestitutionExists'],"Erreur, le fichier CourrierRestitution n'est pas reconnu comme présent");
-        
+
         unlink($f);
     }
-    
-//  @author Quentin JANON <qjanon@absystech.fr>  
+
+//  @author Quentin JANON <qjanon@absystech.fr>
     public function test_select_all() {
 
         $id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu")));
-        
+
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
         $id_commande_ligne1=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
         $id_commande_ligne2=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS1","produit"=>"Ordinateur TOM TOM GO5001","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
 
@@ -3302,7 +3399,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         //,'ctSigneExists' => true
                                         )
                                         ,$r["data"][0]
-                                        ,'select_all pb 1');        
+                                        ,'select_all pb 1');
 
 
         //Vente
@@ -3329,7 +3426,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                         )
                                         ,$r["data"][0]
-                                        ,'select_all pb Vente');        
+                                        ,'select_all pb Vente');
             ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"affaire"));
 
         //Prolongation
@@ -3356,7 +3453,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                         )
                                         ,$r["data"][0]
-                                        ,'select_all pb prolongationAllow');        
+                                        ,'select_all pb prolongationAllow');
 
 
             //Une vente ne doit pas avoir de prolongation
@@ -3383,8 +3480,8 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                         )
                                         ,$r["data"][0]
-                                        ,'select_all pb prolongationAllow vente');      
-        
+                                        ,'select_all pb prolongationAllow vente');
+
             ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"affaire"));
 
         ATF::commande()->u(array("id_commande"=>$id_commande,"date_evolution"=>NULL));
@@ -3406,16 +3503,16 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                 ,"ville" => "LYON"
                                 ,"id_user" => $this->id_user
         );
-        
+
         $id_bon_de_commande=classes::decryptId(ATF::bon_de_commande()->i($bon_de_commande));
-        
+
         $bon_de_commande_ligne1=array(
                                         "id_bon_de_commande"=>$id_bon_de_commande,
                                         "produit"=>"produit a",
                                         "id_commande_ligne"=>$id_commande_ligne1,
                                         "quantite"=>1
                                     );
-        
+
         $id_bon_de_commande_ligne1=ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne1);
 
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
@@ -3440,7 +3537,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                     )
                                     ,$r["data"][0]
-                                    ,'select_all pb prolongationAllow bdc 1');      
+                                    ,'select_all pb prolongationAllow bdc 1');
 
         $bon_de_commande_ligne2=array(
                                         "id_bon_de_commande"=>$id_bon_de_commande,
@@ -3448,7 +3545,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "id_commande_ligne"=>$id_commande_ligne2,
                                         "quantite"=>1
                                     );
-        
+
         $id_bon_de_commande_ligne2=ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne2);
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
@@ -3472,11 +3569,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                     )
                                     ,$r["data"][0]
-                                    ,'select_all pb prolongationAllow bdc 2');      
+                                    ,'select_all pb prolongationAllow bdc 2');
 
         ATF::bon_de_commande()->d($id_bon_de_commande);
 
-        
+
         //Demande refi
         $id_demande_refi=ATF::demande_refi()->i(array("date"=>date("Y-m-d"),"id_contact"=>$this->id_contact,"id_refinanceur"=>1,"id_affaire"=>$id_affaire,"id_societe"=>$this->id_societe,"description"=>"Tu description","etat"=>"valide"));
 
@@ -3502,7 +3599,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                     )
                                     ,$r["data"][0]
-                                    ,'select_all pb Demande refi');         
+                                    ,'select_all pb Demande refi');
 
         ATF::demande_refi()->u(array("id_demande_refi"=>$id_demande_refi,"etat"=>"accepte"));
         ATF::demande_refi()->d($id_demande_refi);
@@ -3534,7 +3631,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "id_commande_ligne"=>$id_commande_ligne1,
                                         "quantite"=>1
                                     );
-        
+
         $id_bon_de_commande_ligne1=ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne1);
         $bon_de_commande_ligne2=array(
                                         "id_bon_de_commande"=>$id_bon_de_commande,
@@ -3542,9 +3639,9 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                         "id_commande_ligne"=>$id_commande_ligne2,
                                         "quantite"=>1
                                     );
-        
-        $id_bon_de_commande_ligne2=ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne2);            
-        
+
+        $id_bon_de_commande_ligne2=ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne2);
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande)->setCount();
         $r = $this->obj->select_all();
         $this->assertEquals(array(
@@ -3567,14 +3664,14 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "id_affaireCrypt"=>ATF::affaire()->cryptId($id_affaire)
                                     )
                                     ,$r["data"][0]
-                                    ,'select_all pb Facture');      
-        
+                                    ,'select_all pb Facture');
+
 
     }
 
     public function test_cleodisStatut() {
         $this->obj = ATF::commande();
-        
+
         //Devis
         $devis = unserialize(self::$devis);
         $devis["values_devis"]["produits"]= '[{"devis_ligne__dot__produit":"ZywallVis 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]';
@@ -3585,11 +3682,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande = unserialize(self::$commande);
         $commande["values_commande"]["produits"]='[{"commande_ligne__dot__produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"ZywallVis 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175","commande_ligne__dot__id_commande_ligne":"'.$devis_ligne[0]["id_devis_ligne"].'"}]';
         $commande["commande"]["id_devis"]=$id_devis;
-        $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));   
-        ATF::$msg->getNotices();  
+        $id_commande = classes::decryptId(ATF::commande()->insert($commande,$this->s));
+        ATF::$msg->getNotices();
 
         ATF::affaire()->u(array("id_affaire"=>$this->obj->select($id_commande,"id_affaire"),"id_parent"=>43));
-        
+
         // Date de début
         $date_debut = array(
             "value" => date("Y-m-01")
@@ -3600,51 +3697,56 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande '7001001' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes dépassé 1 !");  
+                            "Les notices ne sont pas cohérentes dépassé 1 !");
 
         $c = new commande_cleodis($id_commande);
-        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat mis_loyer');      
+        $this->assertEquals($c->get("etat"),"mis_loyer",'Date debut : le contrat devrait etre en etat mis_loyer');
 
         $this->obj->u(array("id_commande"=>$id_commande,"date_debut"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 month"))));
 
         $this->obj->q->reset()->addCondition("id_commande",$id_commande);
         $this->obj->cleodisStatut();
-        
+
         $c = new commande_cleodis($id_commande);
-        $this->assertEquals($c->get("etat"),"non_loyer",'cleodisStatut : le contrat devrait etre en etat non_loyer 1');         
-        
+        $this->assertEquals($c->get("etat"),"non_loyer",'cleodisStatut : le contrat devrait etre en etat non_loyer 1');
+
         $this->assertEquals(array(
                         array(
                             "msg" => "L'état de la commande '7001001' a changé de 'En cours' à 'En attente'",
-                            "title" => "",
-                            "timer" => ""
-                            )
+                            "title" => null,
+                            "timer" => null,
+                            "type" => "success"
+                        )
                     ),
                     ATF::$msg->getNotices(),
-                    "Les notices ne sont pas cohérentes dépassé 1 !");  
-                    
-                    
-                    
+                    "Les notices ne sont pas cohérentes dépassé 1 !");
+
+
+
         //Une fois que l'avenant n'a plus de date, on peut inialiser les dates de l'affaires parentes
         $date_debut = array(
             "value" => date("Y-m-d",strtotime(date("Y-m-01")."- 3 year - 4 month"))
@@ -3655,33 +3757,36 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(array(
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Un e-mail de suivi a été envoyé au responsable",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "Date 'Début' modifiée",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente DepasseProlongation !");  
+                            "Les notices ne sont pas cohérentes pas cohérente DepasseProlongation !");
 
 
         $id_commande2 = classes::decryptId($this->test_updateDateAR());
 
         $this->obj->u(array("id_commande"=>$id_commande2,"date_debut"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 month"))));
-        
+
         $this->obj->q->reset()->addCondition("id_commande",$id_commande2);
         $this->obj->cleodisStatut();
-        
+
         $c = new commande_cleodis($id_commande2);
-        $this->assertEquals($c->get("etat"),"non_loyer",'cleodisStatut : le contrat devrait etre en etat non_loyer 2');         
+        $this->assertEquals($c->get("etat"),"non_loyer",'cleodisStatut : le contrat devrait etre en etat non_loyer 2');
 
     }
 
@@ -3693,28 +3798,31 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande["id_commande"]=ATF::commande()->i($commande);
         $this->obj->stopCommande($commande);
         $selectCommande =$this->obj->select($commande["id_commande"]);
-        $this->assertEquals("arreter",$this->obj->select($commande["id_commande"],"etat"),'Problème sur StopCommande');         
+        $this->assertEquals("arreter",$this->obj->select($commande["id_commande"],"etat"),'Problème sur StopCommande');
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'affaire' a changé de 'En attente' à 'arreter'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de l'affaire 'affaire' a changé de 'Devis' à 'Terminee'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
-                                    "timer" => null
+                                    "timer" => null,
+                                    "type" => "success"
                                         )
 
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente StopCommande !"); 
+                            "Les notices ne sont pas cohérentes pas cohérente StopCommande !");
 
     }
 
@@ -3732,27 +3840,30 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->stopCommande($commande1);
         $selectCommande =$this->obj->select($commande1["id_commande"]);
-        $this->assertEquals("arreter",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur StopCommande AR');         
+        $this->assertEquals("arreter",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur StopCommande AR');
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'refTu1' a changé de 'En attente' à 'arreter'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de l'affaire 'refTu1' a changé de 'Devis' à 'Terminee'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
-                                    "timer" => null
+                                    "timer" => null,
+                                    "type" => "success"
                                         )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente StopCommande AR !");  
+                            "Les notices ne sont pas cohérentes pas cohérente StopCommande AR !");
 
     }
 
@@ -3766,32 +3877,35 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $avenant=array("ref"=>"avenant","id_societe"=>$this->id_societe,"affaire"=>"avenant","nature"=>"avenant","id_parent"=>$id_affaire);
         $id_avenant=ATF::affaire()->i($avenant);
-        
+
         $commande1=array("ref"=>"avenant","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1.196","id_affaire"=>$id_avenant,"date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d"));
         $commande1["id_commande"]=ATF::commande()->i($commande1);
 
         $this->obj->stopCommande($commande1);
-        $this->assertEquals("arreter",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur StopCommande AVT');        
+        $this->assertEquals("arreter",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur StopCommande AVT');
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'avenant' a changé de 'En attente' à 'arreter'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     ),
                                 array(
                                     "msg" => "L'état de l'affaire 'avenant' a changé de 'Devis' à 'Terminee'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         ),
                                 array(
                                     "msg" => "Email envoyé au(x) notifié(s)",
                                     "title" => null,
-                                    "timer" => null
+                                    "timer" => null,
+                                    "type" => "success"
                                         )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente StopCommande AVT !"); 
+                            "Les notices ne sont pas cohérentes pas cohérente StopCommande AVT !");
 
     }
 
@@ -3802,18 +3916,19 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande=array("ref"=>"affaire","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1.196","id_affaire"=>$id_affaire,"etat"=>"arreter","date_arret"=>date("Y-m-d"));
         $commande["id_commande"]=ATF::commande()->i($commande);
         $this->obj->reactiveCommande($commande);
-        $this->assertEquals("non_loyer",$this->obj->select($commande["id_commande"],"etat"),'Problème sur testReactiveCommande etat');      
-        $this->assertFalse($this->obj->select($commande1["id_commande"],"date_arret"),'Problème sur testReactiveCommande date_arret');      
+        $this->assertEquals("non_loyer",$this->obj->select($commande["id_commande"],"etat"),'Problème sur testReactiveCommande etat');
+        $this->assertFalse($this->obj->select($commande1["id_commande"],"date_arret"),'Problème sur testReactiveCommande date_arret');
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'affaire' a changé de 'arreter' à 'En attente'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                         )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente reactiveCommande !"); 
+                            "Les notices ne sont pas cohérentes pas cohérente reactiveCommande !");
 
     }
 
@@ -3829,18 +3944,19 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $commande["id_commande"]=ATF::commande()->i($commande);
 
         $this->obj->reactiveCommande($commande1);
-        $this->assertEquals("non_loyer",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur testReactiveCommandeAR etat');       
-        $this->assertNull($this->obj->select($commande1["id_commande"],"date_arret"),'Problème sur testReactiveCommandeAR date_arret');         
+        $this->assertEquals("non_loyer",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur testReactiveCommandeAR etat');
+        $this->assertNull($this->obj->select($commande1["id_commande"],"date_arret"),'Problème sur testReactiveCommandeAR date_arret');
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'refTu1' a changé de 'arreter' à 'En attente'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente testReactiveCommandeAR !");   
+                            "Les notices ne sont pas cohérentes pas cohérente testReactiveCommandeAR !");
 
     }
 
@@ -3854,27 +3970,28 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $avenant=array("ref"=>"avenant","id_societe"=>$this->id_societe,"affaire"=>"avenant","nature"=>"avenant","id_parent"=>$id_affaire);
         $id_avenant=ATF::affaire()->i($avenant);
-        
+
         $commande1=array("ref"=>"avenant","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1.196","id_affaire"=>$id_avenant,"etat"=>"non_loyer","date_debut"=>date("Y-m-d"),"date_evolution"=>date("Y-m-d"));
         $commande1["id_commande"]=ATF::commande()->i($commande1);
 
         $this->obj->reactiveCommande($commande1);
-        $this->assertEquals("mis_loyer",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur testReactiveCommandeAvt AVT non_loyer');         
-        $this->assertNull($this->obj->select($commande1["id_commande"],"date_arret"),'Problème sur testReactiveCommandeAvt AVT date_arret');        
+        $this->assertEquals("mis_loyer",$this->obj->select($commande1["id_commande"],"etat"),'Problème sur testReactiveCommandeAvt AVT non_loyer');
+        $this->assertNull($this->obj->select($commande1["id_commande"],"date_arret"),'Problème sur testReactiveCommandeAvt AVT date_arret');
 
         $this->assertEquals(array(
                                 array(
                                     "msg" => "L'état de la commande 'avenant' a changé de 'En attente' à 'En cours'",
-                                    "title" => "",
-                                    "timer" => ""
+                                    "title" => null,
+                                    "timer" => null,
+                                    "type" => "success"
                                     )
                             ),
                             ATF::$msg->getNotices(),
-                            "Les notices ne sont pas cohérentes pas cohérente testReactiveCommandeAvt!");   
+                            "Les notices ne sont pas cohérentes pas cohérente testReactiveCommandeAvt!");
 
         ATF::$msg->getNotices();
     }
-    
+
 //  /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 //  public function test_updateDateResiliation(){
 //      $id_affaire=$this->insertAffaire();
@@ -3882,16 +3999,16 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      $infos["id_commande"]=$id_commande;
 //      $infos["key"]="date_resiliation";
 //      $infos["value"]=date("Y-m-d");
-//      
+//
 //      $this->obj->updateDateResiliation($infos);
-//      
+//
 //      $this->assertEquals(date("Y-m-d"),
 //                          $this->obj->select($id_commande,"date_resiliation"),
-//                          "La date de résiliation ne se met pas à jour"); 
-//      
-//      $this->obj->u(array("id_commande"=>$id_commande,"date_restitution"=>date("Y-m-d")));    
+//                          "La date de résiliation ne se met pas à jour");
+//
+//      $this->obj->u(array("id_commande"=>$id_commande,"date_restitution"=>date("Y-m-d")));
 //      $infos["value"]="undefined";
-//      
+//
 //      try {
 //          $this->obj->updateDateResiliation($infos);
 //      } catch (errorATF $e) {
@@ -3900,7 +4017,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      $this->assertEquals(881,$error,"Impossible de supprimer la date de résiliation si la date de restitution est renseignée");
 //      ATF::$msg->getNotices();
 //  }
-//  
+//
 //  /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 //  public function test_updateDateRestitution(){
 //      $id_affaire=$this->insertAffaire();
@@ -3908,7 +4025,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      $infos["id_commande"]=$id_commande;
 //      $infos["key"]="date_restitution";
 //      $infos["value"]=date("Y-m-d");
-//      
+//
 //      try {
 //          $this->obj->updateDateRestitution($infos);
 //      } catch (errorATF $e) {
@@ -3916,17 +4033,17 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      }
 //      $this->assertEquals(882,$error,"Il faut une date de resiliation pour pouvoir renseigner la date de restitution");
 //
-//      $this->obj->u(array("id_commande"=>$id_commande,"date_resiliation"=>date("Y-m-d")));    
+//      $this->obj->u(array("id_commande"=>$id_commande,"date_resiliation"=>date("Y-m-d")));
 //
 //      $this->obj->updateDateRestitution($infos);
-//      
+//
 //      $this->assertEquals(date("Y-m-d"),
 //                          $this->obj->select($id_commande,"date_restitution"),
-//                          "La date de date_restitution ne se met pas à jour");    
-//      
-//      $this->obj->u(array("id_commande"=>$id_commande,"date_restitution_effective"=>date("Y-m-d")));  
+//                          "La date de date_restitution ne se met pas à jour");
+//
+//      $this->obj->u(array("id_commande"=>$id_commande,"date_restitution_effective"=>date("Y-m-d")));
 //      $infos["value"]="undefined";
-//      
+//
 //      try {
 //          $this->obj->updateDateRestitution($infos);
 //      } catch (errorATF $e) {
@@ -3943,11 +4060,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 //      $infos["id_commande"]=$id_commande;
 //      $infos["key"]="date_restitution_effective";
 //      $infos["value"]=date("Y-m-d");
-//      
+//
 //      $this->obj->updateDateRestitution_effective($infos);
 //      ATF::$msg->getNotices();
 //  }
-/*  
+/*
     public function test_updateDateAvenant2(){
         /////////////////////////////////////////////////////Contrat encours//////////////////////////////////////////////////////////////
         $id_commande = $this->test_updateDateAvenant();
@@ -3957,30 +4074,30 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             ,"field" => "date_prevision_restitution"
             ,"id_commande" => $id_commande
         );
-        
+
         $this->obj->checkAndUpdateDates($date_restitution_prevision);
         $this->assertEquals("restitution", ATF::commande()->select($id_commande , "etat"), "Damned !");
-    
+
         //On ajoute une facture refusé pour mettre le contrat en contentieux !
         $fact = array("type_facture"=> "libre" , "ref"=> "TU Facture", "id_societe" => 5391, "date"=> date("Y-m-d"), "tva"=> 1.19, "prix"=>200, "id_affaire"=>$this->id_affaire, "rejet"=> "contestation");
-        
+
     }
-*/  
+*/
     /* @author Nicolas BERTEMONT <nbertemont@absystech.fr> */
     public function test_commandeMidas(){
         $cm=new commande_midas();
         $this->assertEquals('a:9:{s:12:"commande.ref";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"16";s:7:"default";N;s:5:"width";i:70;}s:12:"specificDate";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:8:"renderer";s:15:"dateCleCommande";s:5:"width";i:300;}s:19:"commande.id_societe";a:4:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;}s:19:"commande.id_affaire";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:17:"commande.id_devis";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:13:"commande.etat";a:6:{s:4:"type";s:4:"enum";s:5:"xtype";s:5:"combo";s:4:"data";a:10:{i:0;s:9:"non_loyer";i:1;s:9:"mis_loyer";i:2;s:12:"prolongation";i:3;s:2:"AR";i:4;s:7:"arreter";i:5;s:5:"vente";i:6;s:11:"restitution";i:7;s:21:"mis_loyer_contentieux";i:8;s:24:"prolongation_contentieux";i:9;s:23:"restitution_contentieux";}s:7:"default";s:9:"non_loyer";s:5:"width";i:70;s:8:"renderer";s:4:"etat";}s:5:"files";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:8:"renderer";s:11:"pdfCommande";s:5:"width";i:120;}s:6:"retour";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"width";i:70;}s:8:"retourPV";a:4:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"width";i:70;}}',serialize($cm->colonnes['fields_column']),"Le constructeur de la classe midas a changé");
-        
+
     }
-    
+
     public function test_generateCourrierType() {
         $param = array("id_commande"=>1);
-        $this->assertFalse($this->obj->generateCourrierType($param),"Erreur, pas de pdf");  
+        $this->assertFalse($this->obj->generateCourrierType($param),"Erreur, pas de pdf");
         $param = array("pdf"=>1);
-        $this->assertFalse($this->obj->generateCourrierType($param),"Erreur, pas de id_commande");  
+        $this->assertFalse($this->obj->generateCourrierType($param),"Erreur, pas de id_commande");
         $param = array();
-        $this->assertFalse($this->obj->generateCourrierType($param),"Erreur, pas de param");  
-        
+        $this->assertFalse($this->obj->generateCourrierType($param),"Erreur, pas de param");
+
         $id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"Ref tu","id_societe"=>$this->id_societe,"id_user"=>$this->id_user,"tva"=>"1,196","id_affaire"=>$id_affaire)));
         $param = array(
             "id_commande"=>$id_commande,
@@ -4006,11 +4123,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     ->addAllFields("affaire");
         $infos = ATF::commande()->sa();
 
-              
+
         ob_start();
         $this->obj->export_loyer_assurance($infos , true);
          //récupération des infos
-        $fichier=ob_get_contents();     
+        $fichier=ob_get_contents();
         ob_end_clean();
 
         $this->assertNotNull($fichier, "L'export ne s'est pas bien passé??");
@@ -4027,11 +4144,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     ->addAllFields("commande")
                                     ->addAllFields("loyer")
                                     ->addAllFields("affaire");
-                  
+
         ob_start();
         $this->obj->export_loyer_assurance(array("onglet"=>"commande_gsa_commande_tu") , "false", "false");
          //récupération des infos
-        $fichier=ob_get_contents();     
+        $fichier=ob_get_contents();
         ob_end_clean();
         $this->assertNotNull($fichier, "L'export ne s'est pas bien passé??");
     }
@@ -4048,7 +4165,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     ->addField("commande.id_affaire","commande.id_affaire_fk");
         $infos = ATF::commande()->sa();
 
-              
+
         ob_start();
         $this->obj->export_contrat_refinanceur_loyer($infos , true);
          //récupération des infos
@@ -4070,11 +4187,11 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                             ->addAllFields("loyer")
                             ->addAllFields("affaire");
 
-              
+
         ob_start();
         $this->obj->export_contrat_refinanceur_loyer(array("onglet"=>"commande_gsa_commande_tu") , "false", "false");
          //récupération des infos
-        $fichier=ob_get_contents();     
+        $fichier=ob_get_contents();
         ob_end_clean();
 
         $this->assertNotNull(array(), "L'export ne s'est pas bien passé??");
@@ -4092,15 +4209,15 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>30,"stat_concerne"=>"devis-reseau","id_agence"=>1));
         ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>10,"stat_concerne"=>"mep-les_S","id_agence"=>1));
         ATF::stat_snap()->i(array("date"=>"2013-01-01", "nb"=>15,"stat_concerne"=>"devis-les_S","id_agence"=>1));
-      
 
-        $return = $this->obj->commande_mep_stats(NULL, "reseau", "true" , 2015,1);   
+
+        $return = $this->obj->commande_mep_stats(NULL, "reseau", "true" , 2015,1);
         $return = $this->obj->commande_mep_stats(NULL, "les_S", "false" , 2015,1);
-        $this->assertEquals(185.0, $return["dataset"]["objectif"]["01"]["value"] , "Retour incorrect 3");
+        $this->assertEquals(285.0, $return["dataset"]["objectif"]["01"]["value"] , "Retour incorrect 3");
         $this->assertEquals(7.0, $return["dataset"]["moyenne"]["01"]["value"] , "Retour incorrect 4");
 
 
-        $return = $this->obj->commande_mep_stats(NULL, "les_S", NULL , 2015,1);       
+        $return = $this->obj->commande_mep_stats(NULL, "les_S", NULL , 2015,1);
         $this->assertEquals("Janv", $return["categories"]["category"][0]["label"] , "Retour incorrect 5");
 
         $return = $this->obj->commande_mep_stats(NULL, "test", NULL , 2015,1);
@@ -4115,7 +4232,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     }
 
 
-     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
+     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     * @date 08/12/2015
     */
     public function test_uploadFileFromSA() {
@@ -4128,7 +4245,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos = array(
             "extAction"=>"commande"
         );
-        $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas d'id en entrée, renvoi FALSE");        
+        $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas d'id en entrée, renvoi FALSE");
         $infos = array(
             "id"=>$commande["id_commande"]
         );
@@ -4137,7 +4254,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos['extAction'] = "commande";
         $infos['field'] = "tu";
         $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas de files en entrée, renvoi FALSE");
-        
+
         $file = __ABSOLUTE_PATH__."test/cleodis/pdf_exemple.pdf";
         $files = array(
             "tu"=> array(
@@ -4150,7 +4267,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
         if(!file_exists(__ABSOLUTE_PATH__."../temp/testsuite/commande/"))util::mkdir(__ABSOLUTE_PATH__."../temp/testsuite/commande/");
         if(!file_exists(__ABSOLUTE_PATH__."../temp/testsuite/pdf_affaire/"))util::mkdir(__ABSOLUTE_PATH__."../temp/testsuite/pdf_affaire/");
-        
+
         $r = $this->obj->uploadFileFromSA($infos,ATF::_s(),$files);
         $this->assertEquals('{"success":true}',$r,"Erreur dans le retour de l'upload");
         $f = __ABSOLUTE_PATH__."../data/testsuite/commande/".$commande["id_commande"].".tu";
@@ -4168,7 +4285,7 @@ class commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 };
 
-class objet_excel_commande { 
+class objet_excel_commande {
     public function __construct(){
         $this->sheet=new objet_sheet();
     }

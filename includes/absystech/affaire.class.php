@@ -101,7 +101,7 @@ class affaire_absystech extends affaire {
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
-
+		if(!$page) $page=0;
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
@@ -118,7 +118,7 @@ class affaire_absystech extends affaire {
 						    (SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
 						 	)","margenette")
 			->addField("IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, commande.prix-`commande`.`prix_achat`)","marge_commandee")
-			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee' , 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
+			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
 			->setView(array("align"=>array("marge"=>"right","pourcent"=>"center")));
 		$this->saFilter();
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -871,6 +871,13 @@ class affaire_absystech extends affaire {
 
 
 			unset($data["id_societe"],  $data["id_commercial"]);
+		}
+
+		foreach ($data["devis"] as $key => $value) {
+			$data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
+
+			if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
+			if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
 		}
 
 		/*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);

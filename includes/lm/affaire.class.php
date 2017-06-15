@@ -45,6 +45,7 @@ class affaire_lm extends affaire {
 			,'type_affaire'
 			,"compte_t"=>array("custom"=>true)
 			,'id_magasin'
+			,'id_collaborateur'
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(

@@ -55,7 +55,7 @@ class produit_absystech extends produit {
 				->addJointure("devis_ligne","id_devis","devis","id_devis")
 				->addCondition("devis_ligne.produit","%".ATF::db($this->db)->real_escape_string($infos["query"])."%","OR","cle",'LIKE')
 				->addCondition("devis_ligne.ref","%".ATF::db($this->db)->real_escape_string($infos["query"])."%","OR","cle",'LIKE')
-				->addCondition("devis.id_user",ATF::$usr->getID(),'AND')
+				//->addCondition("devis.id_user",ATF::$usr->getID(),'AND')
 				->addCondition("devis_ligne.id_produit",NULL,'AND',false,'IS NULL')
 				->addField("devis_ligne.produit","produit")
 				->addField("devis_ligne.ref","ref")

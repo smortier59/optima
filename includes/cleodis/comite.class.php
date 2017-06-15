@@ -334,7 +334,7 @@ class comite extends classes_optima {
 				loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
 				,ATF::$usr->trans("notice_success_title")
 			);
-		}else{ return false; }
+		}
 		return true;
 	}
 
