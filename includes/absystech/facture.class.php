@@ -2232,7 +2232,7 @@ class facture_absystech extends facture {
 
 				// Si on a la période, on utilise les debut/fin dans le libellé, sinon la date de facture
 				if ($facture['date_debut_periode']) {
-					$date_ou_periodes = date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($post['date_fin_periode']));
+					$date_ou_periodes = date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($facture['date_fin_periode']));
 				} else {
 					$date_ou_periodes = date("Y-m-d",strtotime($facture['date']));
 				}
