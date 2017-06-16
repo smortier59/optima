@@ -2249,38 +2249,75 @@ class facture_absystech extends facture {
 			  fputcsv($file, $line, ";");
 			  fputs("\n");
 
-			  // LIGNES VENTILEES
-				$lignes = $this->getLignes($id_facture);
-				$ventilation = array();
-			  foreach ($lignes as $ligne) {
-			  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
-			  }
-			  foreach ($ventilation as $id_compte=>$total) {
-					$credit = false;
-					$debit = false;
-					if ($facture['type_facture']=='avoir') {
-						$debit = number_format($total, 2, ".", "");
-					} else {
-						$credit = number_format($total, 2, ".", "");
-					}
-
-				  // LIGNES DE VENTILATION
+			  if ($facture['type_facture']=='acompte') {
+			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
-						ATF::compte_absystech()->select($id_compte,'code'),
+						"419000",
 						$societe['societe'],
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
-						$debit?abs($debit):"",
-						$credit?abs($credit):""
+						"",
+						$facture['prix']
 					);
 				  fputcsv($file, $line, ";");
 				  fputs("\n");
-			  }
 
+			  } else {
+				  // LIGNES VENTILEES
+					$lignes = $this->getLignes($id_facture);
+					$ventilation = array();
+				  foreach ($lignes as $ligne) {
+				  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
+				  }
+				  foreach ($ventilation as $id_compte=>$total) {
+						$credit = false;
+						$debit = false;
+						if ($facture['type_facture']=='avoir') {
+							$debit = number_format($total, 2, ".", "");
+						} else {
+							$credit = number_format($total, 2, ".", "");
+						}
+
+					  // LIGNES DE VENTILATION
+						$line = array(
+							"VT",
+							date('d/m/Y',strtotime($facture['date'])),
+							ATF::compte_absystech()->select($id_compte,'code'),
+							$societe['societe'],
+							$facture['ref'],
+							$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
+							$debit?abs($debit):"",
+							$credit?abs($credit):""
+						);
+					  fputcsv($file, $line, ";");
+					  fputs("\n");
+				  }
+
+				  // SI on est dans une facture de solde, il faut rappeler les facture d'acompte qui lui sont lié (par l'affaire et le type)
+  			  if ($facture['type_facture']=='solde') {
+  			  	$this->q->reset()->where("id_societe",$facture['id_societe'])->where("id_affaire",$facture['id_affaire'])->where("type_facture","acompte");
+  			  	foreach ($this->sa() as $acompte) {
+							$line = array(
+								"VT",
+								date('d/m/Y',strtotime($acompte['date'])),
+								"419000",
+								$societe['societe'],
+								$acompte['ref'],
+								$societe['societe']." - ".$acompte['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
+								$acompte['prix'],
+								""
+							);
+						  fputcsv($file, $line, ";");
+						  fputs("\n");
+
+  			  	}
+  			  }
+				}
 			  // FRAIS DE PORT
-			  if ($facture['frais_de_port'] > 0) {
+			  // Uniquement si présent, ou si facture type différend d'une facture d'acompte.
+			  if ($facture['frais_de_port'] > 0 && $facture['type_facture']!='acompte') {
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
