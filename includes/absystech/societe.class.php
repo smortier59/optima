@@ -1216,40 +1216,7 @@ class societe_absystech extends societe {
 
 		$indicator["credit_restant"] = $this->getSolde($infos["id_societe"]);
 
-		ATF::facture()->q->reset()->addAllFields("facture")->where("facture.id_societe",$infos["id_societe"]);
-		ATF::facture()->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
-								,0
-								,IF(
-									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-									,(facture.prix*facture.tva)
-								)),2)","solde")
-						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
-						    ->addField("IF(facture.etat!='perte'
-										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
-											,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-											    *ROUND(IF(
-													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-													,facture.prix*facture.tva
-												),2))
-										,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-											    *ROUND(IF(
-													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-													,facture.prix*facture.tva
-												),2))>0
-											, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-										    *ROUND(IF(
-												(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-												,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-												,facture.prix*facture.tva
-											),2))
-											, 0 )
-										)
-									,0)","interet")
-						    ->addGroup("facture.id_facture");
-		$factures = ATF::facture()->select_all();
+		$factures = ATF::facture()->ss("facture.id_societe",$infos["id_societe"]);
 
 		if (!$factures) return null;
 
