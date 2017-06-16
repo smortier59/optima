@@ -2301,7 +2301,7 @@ class facture_absystech extends facture {
   			  	foreach ($this->sa() as $acompte) {
 							$line = array(
 								"VT",
-								date('d/m/Y',strtotime($acompte['date'])),
+								date('d/m/Y',strtotime($facture['date'])),
 								"419000",
 								$societe['societe'],
 								$acompte['ref'],
