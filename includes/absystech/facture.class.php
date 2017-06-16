@@ -2166,11 +2166,9 @@ class facture_absystech extends facture {
 		ATF::db($this->db)->begin_transaction();
 		$facturesATraiter = explode(",",$post['factures']);
 		try {
-
 			if (!$post['date_debut']) throw new Exception("DATE_DEBUT_MISSING",1001);
 			if (!$post['date_fin']) throw new Exception("DATE_FIN_MISSING",1002);
 			if (!$post['factures']) throw new Exception("FACTURES_MISSING",1003);
-
 
 			// FIRST STEP : enregistrer les références comptable si il y en a
 			$countRefUpdate = 0;
@@ -2178,6 +2176,7 @@ class facture_absystech extends facture {
 			if ($post['ref_comptable']) {
 				log::logger($post['ref_comptable'],"export-comptable");
 				foreach ($post['ref_comptable'] as $id_societe=>$ref_comptable) {
+					if (strlen($ref_comptable)>12) throw new Exception("REF_COMPTABLE_TOO_LONG",1004);
 					$toUpdate = array("id_societe"=>$id_societe,"ref_comptable"=>$ref_comptable);
 					log::logger("TO UPDATE","export-comptable");
 					log::logger($toUpdate,"export-comptable");
@@ -2202,7 +2201,7 @@ class facture_absystech extends facture {
 			log::logger("AFFECTATION ID EXPORT AUX FACTURES","export-comptable");
 			log::logger($facturesATraiter,"export-comptable");
 			foreach ($facturesATraiter as $key=>$id_facture) {
-				// ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
+				ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
 				$countFactureTraitées++;
 			}
 			log::logger($countFactureTraitées." ID EXPORT RELIE AUX FACTURES","export-comptable");
