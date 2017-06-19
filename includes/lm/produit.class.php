@@ -197,10 +197,6 @@ class produit_lm extends produit {
 
 		ATF::db($this->db)->begin_transaction();
 
-		log::logger($infos_loyer , "mfleurquin");
-		log::logger($infos_fournisseur , "mfleurquin");
-		log::logger($infos_loyer_fournisseur , "mfleurquin");
-
 		$last_id = parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 
 		foreach ($infos_loyer as $key => $value) {

@@ -67,9 +67,6 @@ class pdf_affaire extends classes_optima {
 
     	$previewFn = $pathPDF.'/'.$id_pdf_affaire.".previewPDF";
 
-
-    	log::logger( $fn, "mfleurquin");
-
    		//On recupere le nombre de page
    		$page = array();
    		$handle = fopen($path, "r");
@@ -86,8 +83,6 @@ class pdf_affaire extends classes_optima {
    			 //execute imageMagick's 'convert', setting the color space to RGB
 		    $cmd = "convert \"{$fn}[".$i."]\" -colorspace RGB -geometry 900 -quality 100 -flatten ".$previewFn."_".$i.".png";
 		    exec($cmd);
-		   	log::logger( "--- Exec ", "mfleurquin");
-		   	log::logger( exec($cmd), "mfleurquin");
 		    // Renommer l'image créée par le convert pour lui soustraire son extension
     		util::rename($previewFn."_".$i.".png",$previewFn."_".$i);
    		}
