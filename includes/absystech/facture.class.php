@@ -2215,6 +2215,7 @@ class facture_absystech extends facture {
 
 			foreach ($facturesATraiter as $id_facture) {
 				$facture = ATF::facture()->select($id_facture);
+				$affaire = ATF::affaire()->select($facture["id_affaire"]);
 				$societe = ATF::societe()->select($facture['id_societe']);
 
 				$ttc = $facture['prix']*$facture['tva'];
@@ -2255,6 +2256,21 @@ class facture_absystech extends facture {
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
 						"419000",
+						$societe['societe'],
+						$facture['ref'],
+						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
+						"",
+						$facture['prix']
+					);
+				  fputcsv($file, $line, ";");
+				  fputs("\n");
+
+			  elseif ($affaire['nature']=='consommable') {
+			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
+					$line = array(
+						"VT",
+						date('d/m/Y',strtotime($facture['date'])),
+						"707140",
 						$societe['societe'],
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
