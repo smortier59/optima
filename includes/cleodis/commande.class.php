@@ -484,7 +484,29 @@ class commande_cleodis extends commande {
 						,"date"=>$d[$infos['key']]
 					));
 
+					if($infos['key'] === "date_debut" && $infos['value']){
+						//Creation de la facture prorata si besoin
+						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
+						$affaire = ATF::affaire()->select($id_affaire);
+						if($affaire["date_installation_reel"]){
+							$data = array("date_installation_reel" => $affaire["date_installation_reel"],
+										  "id_affaire" => $affaire["id_affaire"],
+										  "date_debut_contrat" => $infos['value'],
+										  "id_commande"=> $infos["id_commande"]
+										);
 
+							ATF::facture()->createFactureProrata($data);
+						}
+
+						$data = array(  "id_affaire" => $affaire["id_affaire"],
+										"date_debut_contrat" => $infos['value'],
+										"id_commande"=> $infos["id_commande"]
+									 );
+
+						//Creation de la premiere facture
+						ATF::facture()->createPremiereFacture($data);
+
+					}
 
 					$cmd = $this->select($infos['id_commande']);
 					if($infos['value']){

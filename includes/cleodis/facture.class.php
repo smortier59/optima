@@ -632,6 +632,99 @@ class facture_cleodis extends facture {
 		return ATF::facture_ligne()->sa();
 	}
 
+
+	/**
+	 * Permet de créer des factures au prorata par rapport à la date d'installation et date
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $infos [description]
+	 */
+	public function createFactureProrata($infos){
+
+		if(strtotime($infos["date_installation_reel"]) < strtotime($infos["date_debut_contrat"])){
+
+			$affaire = ATF::affaire()->select($infos["id_affaire"]);
+			$commande = ATF::commande()->select($infos["id_commande"]);
+
+			ATF::loyer()->q->reset()->where("id_affaire", $infos["id_affaire"])
+									->addOrder("id_loyer", "ASC");
+			$loyers = ATF::loyer()->select_all();
+
+			$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
+											date("m", strtotime($infos["date_installation_reel"])),
+											date("Y", strtotime($infos["date_installation_reel"])));
+
+			$nbJProRata = $nbDInMonth - date("d", strtotime($infos["date_installation_reel"]));
+
+			$loyerAuJour = $loyers[0]["loyer"]/$nbDInMonth;
+
+			$total = $loyerAuJour * $nbJProRata;
+
+			$facture["facture"] = array(
+	            "id_societe" => $affaire["id_societe"],
+	            "type_facture" => "libre",
+	            "mode_paiement" => "cb",
+	            "id_affaire" => $affaire["id_affaire"],
+	            "type_libre" => "prorata",
+	            "date" => date("d-m-Y"),
+	            "id_commande" => $commande["id_commande"],
+	            "date_previsionnelle" => date("d-m-Y"),
+	            "date_periode_debut" => $infos["date_installation_reel"],
+	            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "prix" => round($total, 2),
+	            "date_periode_debut_libre" => $infos["date_installation_reel"],
+	            "date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "prix_libre" => round($total, 2),
+	            "nature" => "engagement"
+	        );
+	        $this->insert($facture);
+		}
+	}
+
+	/**
+	 * Permet de créer la premiere facture du contrat
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param
+	 */
+	public function createPremiereFacture($infos){
+
+		$affaire = ATF::affaire()->select($infos["id_affaire"]);
+		$commande = ATF::commande()->select($infos["id_commande"]);
+
+		ATF::loyer()->q->reset()->where("id_affaire", $infos["id_affaire"])
+								->addOrder("id_loyer", "ASC");
+		$loyers = ATF::loyer()->select_all();
+
+		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
+											date("m", strtotime($infos["date_debut_contrat"])),
+											date("Y", strtotime($infos["date_debut_contrat"])));
+
+		$facture["facture"] = array(
+            "id_societe" => $affaire["id_societe"],
+            "type_facture" => "libre",
+            "type_libre" => "normale",
+            "mode_paiement" => "cb",
+            "id_affaire" => $affaire["id_affaire"],
+            "date" => date("d-m-Y"),
+            "id_commande" => $commande["id_commande"],
+            "date_previsionnelle" => date("d-m-Y"),
+            "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+            "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+			"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+            "prix_libre" => round($loyers[0]["loyer"], 2),
+            "prix" => round($loyers[0]["loyer"], 2),
+            "nature" => "engagement"
+        );
+
+
+        $id_facture = $this->insert($facture);
+
+        $this->libreToNormale(array("id_facture"=> $id_facture));
+
+
+	}
+
+
 	/**
 	* Surcharge de l'insert afin d'insérer les lignes de devis de créer l'affaire si elle n'existe pas
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
