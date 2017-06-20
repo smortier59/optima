@@ -2473,8 +2473,9 @@ class facture_cleodisbe extends facture_cleodis {
 
 				$infos_commande = ATF::commande()->select($item['facture.id_commande_fk']);
 
+				$libelle = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
+
 				if($devis["type_contrat"] == "vente"){
-					log::logger("vente" , "mfleurquin");
 					//Vente de CONTRAT
 					$compte1 = "411000";
 					$compte2 = "707110";
@@ -2933,6 +2934,7 @@ class facture_exactitude extends facture {
 			$increment++;
 			if($item){
 				//initialisation des données
+				log::logger($item , "mfleurquin");
 
 				$facture = ATF::facture()->select($item["facture.id_facture"]);
 				$devis=ATF::devis()->select_special("id_affaire",$facture["id_affaire"]);
@@ -2951,6 +2953,7 @@ class facture_exactitude extends facture {
 				$libelle = 'F'.$facture['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
 				if($facture["prix"]<0) $libelle = 'A'.$facture['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
 
+				log::logger($libelle , "mfleurquin");
 
 				if($devis[0]["type_contrat"] == "recrutement"){	$compte_2='706000';  }
 				elseif($devis[0]["type_contrat"] == "conseil"){ $compte_2='706300'; }
