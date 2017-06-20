@@ -293,7 +293,7 @@ class facture_lm extends facture {
 	            "date_periode_debut_libre" => $infos["date_installation_reel"],
 	            "date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix_libre" => round($total, 2),
-	            "nature" => "engagement"
+	            "nature" => "prorata"
 	        );
 	        $this->insert($facture);
 		}

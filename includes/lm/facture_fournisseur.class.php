@@ -296,10 +296,13 @@ class facture_fournisseur extends classes_optima {
 	 */
 	public function estBAP($infos){
 		if($infos["id_facture_fournisseur"]){
+			$id_affaire = $this->select($infos["id_facture_fournisseur"], "id_affaire");
+
 			$this->u(array("id_facture_fournisseur"=>$this->decryptId($infos["id_facture_fournisseur"]),
 						   "bap"=>"1",
 						   "date_bap"=>date("Y-m-d"),
-						   "id_user"=>ATF::$usr->get('id_user')
+						   "id_user"=>ATF::$usr->get('id_user'),
+						   "num_bap"=>ATF::affaire()->select($id_affaire , "ref")
 						   )
 					 ,$s);
 
