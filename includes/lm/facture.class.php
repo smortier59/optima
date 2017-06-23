@@ -295,6 +295,28 @@ class facture_lm extends facture {
 	            "prix_libre" => round($total, 2),
 	            "nature" => "prorata"
 	        );
+
+			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+			$lignes = ATF::commande_ligne()->select_all();
+
+			foreach ($lignes as $key => $value) {
+				$ligne = array();
+				$ligne["facture_ligne__dot__produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+	            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+	            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+	            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+	            $ligne["facture_ligne__dot__serial"] = "";
+	            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+
+	            $facture["values_facture"]["produits"][] = $ligne;
+			}
+
+			$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
 	        $this->insert($facture);
 		}
 	}
@@ -314,8 +336,8 @@ class facture_lm extends facture {
 		$loyers = ATF::loyer()->select_all();
 
 		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
-											date("m", strtotime($infos["date_debut_contrat"])),
-											date("Y", strtotime($infos["date_debut_contrat"])));
+										date("m", strtotime($infos["date_debut_contrat"])),
+										date("Y", strtotime($infos["date_debut_contrat"])));
 
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],
@@ -334,6 +356,29 @@ class facture_lm extends facture {
             "prix" => round($loyers[0]["loyer"], 2),
             "nature" => "engagement"
         );
+
+
+		ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+		$lignes = ATF::commande_ligne()->select_all();
+
+		foreach ($lignes as $key => $value) {
+			$ligne = array();
+			$ligne["facture_ligne__dot__produit"] = $value["produit"];
+            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+            $ligne["facture_ligne__dot__serial"] = "";
+            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+
+            $facture["values_facture"]["produits"][] = $ligne;
+		}
+
+		$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
         $id_facture = $this->insert($facture);
 
         $this->libreToNormale(array("id_facture"=> $id_facture));
@@ -611,6 +656,8 @@ class facture_lm extends facture {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
+
 
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
