@@ -2253,6 +2253,7 @@ class facture_absystech extends facture {
 
 			  if ($facture['type_facture']=='acompte' || $type_parent == 'acompte') {
 			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
+					$facture['prix'] = number_format($facture['prix'], 2, ".", "");
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
@@ -2261,7 +2262,7 @@ class facture_absystech extends facture {
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 						$facture['type_facture']=="avoir"?abs($facture['prix']):"",
-						$facture['type_facture']=="avoir"?"":$facture['prix']
+						$facture['type_facture']=="avoir"?"":abs($facture['prix'])
 					);
 				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
@@ -2301,6 +2302,7 @@ class facture_absystech extends facture {
   			  if ($facture['type_facture']=='solde') {
   			  	$this->q->reset()->where("id_societe",$facture['id_societe'])->where("id_affaire",$facture['id_affaire'])->where("type_facture","acompte");
   			  	foreach ($this->sa() as $acompte) {
+							$acompte['prix'] = number_format($acompte['prix'], 2, ".", "");
 							$line = array(
 								"VT",
 								date('d/m/Y',strtotime($facture['date'])),
@@ -2308,7 +2310,7 @@ class facture_absystech extends facture {
 								$societe['societe'],
 								$facture['ref'],
 								$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
-								$acompte['prix'],
+								abs($acompte['prix']),
 								""
 							);
 						  fputcsv($file, $line, ";", chr(0));
