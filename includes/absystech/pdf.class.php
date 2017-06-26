@@ -695,7 +695,7 @@ class pdf_absystech extends pdf {
 			$data = array();
 			if($infos_devis["type_devis"] == "normal") {
 				$head = array("Référence","Désignation","Qté","Prix unitaire","Total");
-				$width = array(25,105,11,20,25);
+				$width = array(25,105,10,21,25);
 			}else{
 				$head = array("Référence","Désignation","Qté","Total mensuel");
 				$width = array(25,116,23,22);
