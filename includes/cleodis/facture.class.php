@@ -25,6 +25,7 @@ class facture_cleodis extends facture {
             ,'relance'=>array("custom"=>true,"nosort"=>true,"renderer"=>"relanceFacture","width"=>70)
             ,'facture.date_rejet'=>array("renderer"=>"updateDate","width"=>170)
             ,'facture.date_regularisation'=>array("renderer"=>"updateDate","width"=>170)
+            ,'facture.nature'
 		);
 
 		// Panel principal
@@ -34,11 +35,13 @@ class facture_cleodis extends facture {
 			,"id_commande"=>array("disabled"=>true)
 			,"type_facture"
 			,"type_libre"=>array("disabled"=>true)
+			,'nature'=>array("disabled"=>true)
 			,"redevance"=>array("disabled"=>true)
 			,"mode_paiement"
 			,"date"
 			,"date_previsionnelle"
 			,"commentaire"=>array("xtype"=>"textarea")
+
 		);
 
 		$this->colonnes['panel']['refi'] = array(
@@ -809,6 +812,10 @@ class facture_cleodis extends facture {
 
 		if(($infos["type_facture"] === "libre") && (!$infos["type_libre"])){
 			throw new errorATF("Il faut un type de facture libre",351);
+		}
+
+		if(($infos["type_facture"] === "libre") && (!$infos["nature"])){
+			throw new errorATF("Il faut une nature pour la facture libre",351);
 		}
 
 		if($infos["type_facture"]=="refi"){
