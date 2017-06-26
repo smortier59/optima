@@ -699,7 +699,6 @@ class pdf_absystech extends pdf {
 			}else{
 				$head = array("Référence","Désignation","Qté","Total mensuel");
 				$width = array(25,116,23,22);
-
 			}
 
 			if ($infos_devis_produit)  {
