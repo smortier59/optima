@@ -1510,7 +1510,8 @@ class facturation extends classes_optima {
 						"mode_paiement"=>$commande["type"],
 						"id_affaire"=>$affaire["id_affaire"],
 						"date_previsionnelle"=>$facture_date_previsionnelle,
-						"date_paiement"=>$facture_date_previsionnelle
+						"date_paiement"=>$facture_date_previsionnelle,
+						"nature"=> $facturation["type"]
 					);
 
 					if($facturation["type"] == "liberatoire"){
