@@ -1272,7 +1272,7 @@ class facture_fournisseur extends classes_optima {
 		        	foreach ($loyers_engagement as $kv => $vv) {
 		        		$engagement += $vv["duree"];
 		        	}
-		        	$montant = number_format($value["facture_fournisseur.prix"]/$engagement ,2 ,".","");
+		        	$montant = number_format($value["facture_fournisseur.prix_ht"]/$engagement ,2 ,".","");
 		        	$total += $montant;
 
 		        	ATF::devis()->q->reset()->where("id_affaire",$value["facture_fournisseur.id_affaire_fk"])->setLimit(1);
