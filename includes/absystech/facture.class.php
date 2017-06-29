@@ -2211,7 +2211,7 @@ class facture_absystech extends facture {
 			log::logger("FILENAME = ".$fn,"export-comptable");
 			$file = fopen($fn, "w+");
 			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit");
-			fputcsv($file, $head, ";");
+			fputcsv($file, $head, ";", chr(0));
 
 			foreach ($facturesATraiter as $id_facture) {
 				$facture = ATF::facture()->select($id_facture);
@@ -2223,7 +2223,9 @@ class facture_absystech extends facture {
 
 				$credit = false;
 				$debit = false;
+				$type_parent = false;
 				if ($facture['type_facture']=='avoir') {
+					$type_parent = ATF::facture()->select($facture['id_facture_parente'],'type_facture');
 					$credit = number_format($ttc, 2, ".", "");
 				} else {
 					$debit = number_format($ttc, 2, ".", "");
@@ -2246,11 +2248,12 @@ class facture_absystech extends facture {
 					$debit?abs($debit):"",
 					$credit?abs($credit):""
 				);
-			  fputcsv($file, $line, ";");
+			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
 
-			  if ($facture['type_facture']=='acompte') {
+			  if ($facture['type_facture']=='acompte' || $type_parent == 'acompte') {
 			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
+					$facture['prix'] = number_format($facture['prix'], 2, ".", "");
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
@@ -2258,10 +2261,10 @@ class facture_absystech extends facture {
 						$societe['societe'],
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
-						"",
-						$facture['prix']
+						$facture['type_facture']=="avoir"?abs($facture['prix']):"",
+						$facture['type_facture']=="avoir"?"":abs($facture['prix'])
 					);
-				  fputcsv($file, $line, ";");
+				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
 
 			  } else {
@@ -2291,7 +2294,7 @@ class facture_absystech extends facture {
 							$debit?abs($debit):"",
 							$credit?abs($credit):""
 						);
-					  fputcsv($file, $line, ";");
+					  fputcsv($file, $line, ";", chr(0));
 					  fputs("\n");
 				  }
 
@@ -2299,17 +2302,18 @@ class facture_absystech extends facture {
   			  if ($facture['type_facture']=='solde') {
   			  	$this->q->reset()->where("id_societe",$facture['id_societe'])->where("id_affaire",$facture['id_affaire'])->where("type_facture","acompte");
   			  	foreach ($this->sa() as $acompte) {
+							$acompte['prix'] = number_format($acompte['prix'], 2, ".", "");
 							$line = array(
 								"VT",
 								date('d/m/Y',strtotime($facture['date'])),
 								"419000",
 								$societe['societe'],
-								$acompte['ref'],
-								$societe['societe']." - ".$acompte['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
-								$acompte['prix'],
+								$facture['ref'],
+								$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
+								abs($acompte['prix']),
 								""
 							);
-						  fputcsv($file, $line, ";");
+						  fputcsv($file, $line, ";", chr(0));
 						  fputs("\n");
 
   			  	}
@@ -2317,7 +2321,7 @@ class facture_absystech extends facture {
 				}
 			  // FRAIS DE PORT
 			  // Uniquement si présent, ou si facture type différend d'une facture d'acompte.
-			  if ($facture['frais_de_port'] > 0 && $facture['type_facture']!='acompte') {
+			  if ($facture['frais_de_port'] > 0 && ($facture['type_facture']!='acompte' || $type_parent == 'acompte')) {
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
@@ -2328,7 +2332,7 @@ class facture_absystech extends facture {
 						"",
 						number_format($facture['frais_de_port'], 2, ".", "")
 					);
-				  fputcsv($file, $line, ";");
+				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
 			  }
 
@@ -2350,7 +2354,7 @@ class facture_absystech extends facture {
 					$debit?abs($debit):"",
 					$credit?abs($credit):""
 				);
-			  fputcsv($file, $line, ";");
+			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
 
 
