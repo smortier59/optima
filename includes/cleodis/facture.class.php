@@ -667,7 +667,7 @@ class facture_cleodis extends facture {
 	            "type_facture" => "libre",
 	            "mode_paiement" => "cb",
 	            "id_affaire" => $affaire["id_affaire"],
-	            "type_libre" => "prorata",
+	            "type_libre" => "normale",
 	            "date" => date("d-m-Y"),
 	            "id_commande" => $commande["id_commande"],
 	            "date_previsionnelle" => date("d-m-Y"),
@@ -677,7 +677,7 @@ class facture_cleodis extends facture {
 	            "date_periode_debut_libre" => $infos["date_installation_reel"],
 	            "date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix_libre" => round($total, 2),
-	            "nature" => "engagement"
+	            "nature" => "prorata"
 	        );
 
 			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
