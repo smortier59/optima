@@ -110,6 +110,24 @@ class produit_lm extends produit {
 
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("actifUpdate");
+		$this->addPrivilege("autocompleteProduitPack");
+	}
+
+
+	/**
+	* Autocomplete retournant seulement les fournisseurs ayant des produits dans les ligne de la commande passée en paramètre,
+	* des lignes qui ne sont pas reprise (sans id_affaire_provenance)
+	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
+	* @param array $infos ($_POST habituellement attendu)
+	*	string $infos[recherche]
+	* @param boolean $reset VRAI si on reset lme querier, FAUX si on a initialisé qqch de précis avant...
+	* @return string HTML de retour
+	*/
+	public function autocompleteProduitPack($infos,$reset=true) {
+		if ($reset) {
+			$this->q->reset();
+		}
+		return parent::autocomplete($infos,false);
 	}
 
 	/**
@@ -196,10 +214,6 @@ class produit_lm extends produit {
 		$this->infoCollapse($infos);
 
 		ATF::db($this->db)->begin_transaction();
-
-		log::logger($infos_loyer , "mfleurquin");
-		log::logger($infos_fournisseur , "mfleurquin");
-		log::logger($infos_loyer_fournisseur , "mfleurquin");
 
 		$last_id = parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 

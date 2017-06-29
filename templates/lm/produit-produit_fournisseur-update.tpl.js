@@ -5,6 +5,7 @@
 {$fields=[
 	"{$current_class->table}.id_fournisseur",
 	"{$current_class->table}.prix_prestation",
+	"{$current_class->table}.prix_ttc",
 	"{$current_class->table}.recurrence",
 	"{$current_class->table}.departement"
 ]}
@@ -15,7 +16,7 @@
 {/if}
 
 {if $id_produit}
-	{$q->reset()->where("id_produit",ATF::produit()->decryptId($id_produit))->setView([order=>$fields])->end()}	
+	{$q->reset()->where("id_produit",ATF::produit()->decryptId($id_produit))->setView([order=>$fields])->end()}
 {else}
 	{$q->reset()->where("id_produit",0)->setView([order=>$fields])->end()}
 {/if}

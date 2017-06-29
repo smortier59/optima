@@ -25,6 +25,7 @@ class facture_cleodis extends facture {
             ,'relance'=>array("custom"=>true,"nosort"=>true,"renderer"=>"relanceFacture","width"=>70)
             ,'facture.date_rejet'=>array("renderer"=>"updateDate","width"=>170)
             ,'facture.date_regularisation'=>array("renderer"=>"updateDate","width"=>170)
+            ,'facture.nature'
 		);
 
 		// Panel principal
@@ -34,11 +35,13 @@ class facture_cleodis extends facture {
 			,"id_commande"=>array("disabled"=>true)
 			,"type_facture"
 			,"type_libre"=>array("disabled"=>true)
+			,'nature'=>array("disabled"=>true)
 			,"redevance"=>array("disabled"=>true)
 			,"mode_paiement"
 			,"date"
 			,"date_previsionnelle"
 			,"commentaire"=>array("xtype"=>"textarea")
+
 		);
 
 		$this->colonnes['panel']['refi'] = array(
@@ -632,6 +635,142 @@ class facture_cleodis extends facture {
 		return ATF::facture_ligne()->sa();
 	}
 
+
+	/**
+	 * Permet de créer des factures au prorata par rapport à la date d'installation et date
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $infos [description]
+	 */
+	public function createFactureProrata($infos){
+
+		if(strtotime($infos["date_installation_reel"]) < strtotime($infos["date_debut_contrat"])){
+
+			$affaire = ATF::affaire()->select($infos["id_affaire"]);
+			$commande = ATF::commande()->select($infos["id_commande"]);
+
+			ATF::loyer()->q->reset()->where("id_affaire", $infos["id_affaire"])
+									->addOrder("id_loyer", "ASC");
+			$loyers = ATF::loyer()->select_all();
+
+			$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
+											date("m", strtotime($infos["date_installation_reel"])),
+											date("Y", strtotime($infos["date_installation_reel"])));
+
+			$nbJProRata = $nbDInMonth - date("d", strtotime($infos["date_installation_reel"]));
+
+			$loyerAuJour = $loyers[0]["loyer"]/$nbDInMonth;
+
+			$total = $loyerAuJour * $nbJProRata;
+
+			$facture["facture"] = array(
+	            "id_societe" => $affaire["id_societe"],
+	            "type_facture" => "libre",
+	            "mode_paiement" => "cb",
+	            "id_affaire" => $affaire["id_affaire"],
+	            "type_libre" => "prorata",
+	            "date" => date("d-m-Y"),
+	            "id_commande" => $commande["id_commande"],
+	            "date_previsionnelle" => date("d-m-Y"),
+	            "date_periode_debut" => $infos["date_installation_reel"],
+	            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "prix" => round($total, 2),
+	            "date_periode_debut_libre" => $infos["date_installation_reel"],
+	            "date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "prix_libre" => round($total, 2),
+	            "nature" => "engagement"
+	        );
+
+			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+			$lignes = ATF::commande_ligne()->select_all();
+
+			foreach ($lignes as $key => $value) {
+				$ligne = array();
+				$ligne["facture_ligne__dot__produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+	            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+	            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+	            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+	            $ligne["facture_ligne__dot__serial"] = "";
+	            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+
+	            $facture["values_facture"]["produits"][] = $ligne;
+			}
+
+			$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
+	        $this->insert($facture);
+		}
+	}
+
+	/**
+	 * Permet de créer la premiere facture du contrat
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param
+	 */
+	public function createPremiereFacture($infos){
+
+		$affaire = ATF::affaire()->select($infos["id_affaire"]);
+		$commande = ATF::commande()->select($infos["id_commande"]);
+
+		ATF::loyer()->q->reset()->where("id_affaire", $infos["id_affaire"])
+								->addOrder("id_loyer", "ASC");
+		$loyers = ATF::loyer()->select_all();
+
+		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
+											date("m", strtotime($infos["date_debut_contrat"])),
+											date("Y", strtotime($infos["date_debut_contrat"])));
+
+		$facture["facture"] = array(
+            "id_societe" => $affaire["id_societe"],
+            "type_facture" => "libre",
+            "type_libre" => "normale",
+            "mode_paiement" => "cb",
+            "id_affaire" => $affaire["id_affaire"],
+            "date" => date("d-m-Y"),
+            "id_commande" => $commande["id_commande"],
+            "date_previsionnelle" => date("d-m-Y"),
+            "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+            "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+			"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+            "prix_libre" => round($loyers[0]["loyer"], 2),
+            "prix" => round($loyers[0]["loyer"], 2),
+            "nature" => "engagement"
+        );
+
+        ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+		$lignes = ATF::commande_ligne()->select_all();
+
+		foreach ($lignes as $key => $value) {
+			$ligne = array();
+			$ligne["facture_ligne__dot__produit"] = $value["produit"];
+            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+            $ligne["facture_ligne__dot__serial"] = "";
+            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+
+            $facture["values_facture"]["produits"][] = $ligne;
+		}
+
+		$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
+
+        $id_facture = $this->insert($facture);
+
+        $this->libreToNormale(array("id_facture"=> $id_facture));
+
+
+	}
+
+
 	/**
 	* Surcharge de l'insert afin d'insérer les lignes de devis de créer l'affaire si elle n'existe pas
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -673,6 +812,10 @@ class facture_cleodis extends facture {
 
 		if(($infos["type_facture"] === "libre") && (!$infos["type_libre"])){
 			throw new errorATF("Il faut un type de facture libre",351);
+		}
+
+		if(($infos["type_facture"] === "libre") && (!$infos["nature"])){
+			throw new errorATF("Il faut une nature pour la facture libre",351);
 		}
 
 		if($infos["type_facture"]=="refi"){
@@ -2363,10 +2506,7 @@ class facture_cleodisbe extends facture_cleodis {
 					$reference="F".date("ym",strtotime($item['facture.date']))."000".$increment;
 				}
 
-				// Récupération de : Date de debut, de fin et de prélèvement
-				$dateDebut = " ".date("d/m/y",strtotime($item['facture.date_periode_debut']));
-				$dateFin = " ".date("d/m/y",strtotime($item['facture.date_periode_fin']));
-				$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
+
 
 				$refinancement = "";
 
@@ -2378,18 +2518,33 @@ class facture_cleodisbe extends facture_cleodis {
 					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
 				}
 
+
+				// Récupération de : Date de debut, de fin et de prélèvement
+				$dateDebut = " ".date("d/m/y",strtotime($item['facture.date_periode_debut']));
+				$dateFin = " ".date("d/m/y",strtotime($item['facture.date_periode_fin']));
+				$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
+
+
 				$infos_commande = ATF::commande()->select($item['facture.id_commande_fk']);
 
-				if($devis["type_contrat"] == "vente"){
-					log::logger("vente" , "mfleurquin");
+				$libelle = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
+
+
+				//Facture refinancement
+
+				if($item["facture.type_facture"] == "refi"){
 					//Vente de CONTRAT
 					$compte1 = "411000";
 					$compte2 = "707110";
 					$compte3 = "707110";
 					$compte4 = "445710";
+					$dateDebut = "";
+					$dateFin = "";
+
 				}else if(strtotime($infos_commande['date_debut']) > strtotime($item['facture.date_periode_debut'])){
 
-					if($refinancement !== ""){
+					//Refinancé et autre CLEODIS BE
+					if($refinancement !== "" && $refinancement !== "CLEODIS BE"){
 						// Prorata sur contrat refinance
 						$compte1 = "411000";
 						$compte2 = "706400";
@@ -2403,9 +2558,7 @@ class facture_cleodisbe extends facture_cleodis {
 						$compte4 = "445710";
 					}
 				}else if((strtotime($infos_commande['date_evolution']) < strtotime($item['facture.date_periode_debut']))
-						/*||
-						(strtotime($infos_commande["date_prevision_restitution"] &&
-							(strtotime($infos_commande["date_prevision_restitution"] < strtotime($item['facture.date_periode_debut'])*/){
+					){
 					// Prolongation/Restitution CLEODIS BE
 					$compte1 = "411000";
 					$compte2 = "707230";
@@ -2534,427 +2687,3 @@ class facture_cleodisbe extends facture_cleodis {
 
 };
 class facture_cap extends facture_cleodis { };
-class facture_exactitude extends facture {
-
-	function __construct($table_or_id=NULL) {
-		parent::__construct($table_or_id);
-
-		$this->table = "facture";
-		$this->colonnes['fields_column'] = array(
-			'facture.ref'
-			,'facture.id_societe'
-			,'societe.code_client'=>array("custom"=>true)
-			,'facture.id_affaire'
-			,'facture.date'
-			,'facture.prix'=>array("aggregate"=>array("min","avg","max","sum"),"renderer"=>"money")
-			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","width"=>50,"align"=>"center")
-            ,'facture.rejet'=>array("renderer"=>"updateEnumFactureRejetCledodis","width"=>200)
-            ,'relance'=>array("custom"=>true,"nosort"=>true,"renderer"=>"relanceFacture","width"=>70)
-            ,'facture.date_rejet'=>array("renderer"=>"updateDate","width"=>170)
-            ,'facture.date_regularisation'=>array("renderer"=>"updateDate","width"=>170)
-		);
-
-		// Panel principal
-		$this->colonnes['primary'] = array(
-			"id_societe"=>array("disabled"=>true)
-			,"id_affaire"=>array("disabled"=>true)
-			,"date"
-			,"type_facture"
-			,"ref"
-			,"commentaire"=>array("xtype"=>"textarea")
-		);
-		$this->colonnes['panel']['lignes'] = array(
-					"prods"=>array("custom"=>true)
-				);
-		$this->colonnes["panel"]['price'] = array(
-			 "prix"
-			,"tva"
-			,"id_termes"
-			,"mode_paiement"
-			,"date_rejet"
-			,"date_regularisation"
-			,"date_echeance"
-		);
-		$this->panels['primary'] = array("visible"=>true,'nbCols'=>3);
-		$this->panels['lignes'] = array("visible"=>true,'nbCols'=>1);
-		$this->panels['price'] = array("visible"=>true,'nbCols'=>2);
-
-		$this->colonnes['bloquees']['insert'] =
-				$this->colonnes['bloquees']['cloner'] =
-				$this->colonnes['bloquees']['update'] = array('etat','date_paiement','date_relance','id_user','envoye_mail','rejet');
-
-		$this->fieldstructure();
-
-		$this->onglets = array('facture_ligne');
-		$this->no_insert = true;
-		$this->no_update = true;
-		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true);
-		$this->selectAllExtjs=true;
-
-		$this->addPrivilege("export_special");
-		$this->addPrivilege("export_special2");
-
-	}
-
-
-		/**
-    * Retourne la valeur par défaut spécifique aux données des formulaires
-    * @author Quentin JANON <qjanon@absystech.fr>
-	* @param string $field
-	* @param array &$s La session
-	* @param array &$request Paramètres disponibles (clés étrangères)
-	* @return string
-    */
-	public function default_value($field,&$s,&$request){
-
-		if($id_facture = ATF::_r('id_facture')){
-			$facture=$this->select($id_facture);
-		}elseif ($id_devis = ATF::_r('id_devis')){
-			$facture=ATF::devis()->select($id_devis);
-		}
-
-		switch ($field) {
-			case "id_societe":
-				if ($facture) {
-					return $facture['id_societe'];
-				}
-			case "id_user":
-				if ($facture) {
-					$id_user = $facture['id_user'];
-				}else{
-					$id_user = ATF::$usr->get('id_user');
-				}
-				return $id_user;
-			case "id_affaire":
-				if ($facture) {
-					return $facture['id_affaire'];
-				}
-			case "date":
-				return date("Y-m-d");
-			case "prix":
-				if ($facture) {
-					if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){ $prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
-					}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){ 	$prix=$facture["prix"];	}
-				}
-				if($prix){
-					return $prix;
-				}else{
-					return 0;
-				}
-			case "tva": return 1.2;
-			case "mode_paiement" : return "virement";
-
-
-
-		}
-
-		return parent::default_value($field,$s,$request);
-	}
-
-
-	/**
-	* Surcharge de l'insert afin d'insérer les lignes de devis de créer l'affaire si elle n'existe pas
-	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-    * @author Yann GAUTHERON <ygautheron@absystech.fr>
-	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
-	* @param array &$s La session
-	* @param array $files $_FILES
-	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
-	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
-	*/
-	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-
-		if(isset($infos["preview"])){
-			$preview=$infos["preview"];
-		}else{
-			$preview=false;
-		}
-		$infos_ligne = json_decode($infos["values_".$this->table]["prods"],true);
-		unset($infos["values_".$this->table]["prods"]);
-
-		$this->infoCollapse($infos);
-
-		$infos["etat"]="impayee";
-		$infos["id_user"] = ATF::$usr->getID();
-		$infos["date_relance"]=date("Y-m-d",strtotime("+1 month"));
-		$societe=ATF::societe()->select($infos["id_societe"]);
-
-		if(!$infos["prix"]){ throw new errorATF("Il faut un prix pour la facture",351); }
-		ATF::db($this->db)->begin_transaction();
-
-		//*****************************Transaction********************************
-
-		////////////////Affaire
-		ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"],"etat"=>"facture"));
-
-
-		////////////////Facture
-		unset($infos["marge"],$infos["marge_absolue"],$infos["prix_achat"],$infos["id_devis"]);
-		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-
-		//Lignes
-		if($infos_ligne){
-			$infos_ligne=ATF::devis()->extJSUnescapeDot($infos_ligne,"facture_ligne");
-			foreach($infos_ligne as $key=>$item){
-				$item["id_facture"]=$last_id;
-				ATF::facture_ligne()->i($item,$s);
-			}
-		}
-
-//*****************************************************************************
-		if($preview){
-			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
-			ATF::db($this->db)->rollback_transaction();
-			return $this->cryptId($last_id);
-		}else{
-			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
-			ATF::db($this->db)->commit_transaction();
-		}
-
-		if(is_array($cadre_refreshed)){	ATF::affaire()->redirection("select",$infos["id_affaire"]);	}
-		return $last_id;
-	}
-
-	/**
-    * Permet d'avoir le code client sur le select_all
-    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    */
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
-		$this->q
-    		 ->addJointure("facture","id_societe","societe","id_societe")
-			 ->addField("societe.code_client");
-
-		$return = parent::select_all($order_by,$asc,$page,$count);
-        return $return;
-	}
-
-
-	 public function export_special2($infos){
-	 	$infos["rejet"] = "ok";
-	 	$this->export_special($infos);
-	 }
-
-	 /** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $infos : contient le nom de l'onglet
-     */
-	 public function export_special($infos){
-         if($infos["reset"]) $this->q->reset();
-
-         if($infos["onglet"]) $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
-
-         if($infos["rejet"]) $rejet = true;
-
-         $this->q->setLimit(-1)->unsetCount();
-         $infos = $this->select_all();
-
-		 if($rejet) $infos["rejet"] = true;
-
-		 $this->export_xls_special($infos);
-     }
-
-     /** Surcharge pour avoir un export identique Ã  celui de Nebula
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $infos : contient tous les enregistrements
-     */
-     public function export_xls_special(&$infos){
-
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
-		$workbook = new PHPExcel;
-
-		//premier onglet
-		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle('Autoporté');
-		$sheets=array("auto"=>$worksheet_auto);
-
-		//mise en place des titres
-		$this->ajoutTitre($sheets);
-
-		//ajout des donnÃ©es
-		if($infos){
-			 $this->ajoutDonnees($sheets,$infos);
-		}
-
-		$writer = new PHPExcel_Writer_Excel5($workbook);
-
-		$writer->save($fname);
-		header('Content-type: application/vnd.ms-excel');
-		header('Content-Disposition:inline;filename=export_facture.xls');
-		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");
-		fpassthru($fh);
-		unlink($fname);
-		PHPExcel_Calculation::getInstance()->__destruct();
-		// Pour remettre la prÃ©cision correcte ! sinon ini_set('precision',14)... sinon ca provoque un pb avec php > var_dump((1.196-1)*100); => float(19.59999999999999432) ( https://bugs.php.net/bug.php?id=55368 )
-     }
-
-     /** Mise en place des titres
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $sheets : contient les 5 onglets
-     */
-     public function ajoutTitre(&$sheets){
-        $row_data = array(
-        	"A"=>'Type'
-        	,"B"=>'Date'
-			,"C"=>'Journal'
-			,"D"=>'Général'
-			,"E"=>'Auxiliaire'
-			,"F"=>'Sens'
-			,"G"=>'Montant'
-			,"H"=>'Libellé'
-			,"I"=>'Référence'
-			,"J"=>'Section A1'
-			/*,"K"=>'Date début'
-			,"L"=>'Date de fin'
-			,"M"=>'Date de prélèvement'*/
-		);
-
-         foreach($sheets as $nom=>$onglet){
-             foreach($row_data as $col=>$titre){
-				  $sheets[$nom]->write($col.'1',$titre);
-				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
-             }
-         }
-     }
-
-     /** Mise en place du contenu
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $sheets : contient les 5 onglets
-     * @param array $infos : contient tous les enregistrements
-     */
-     public function ajoutDonnees(&$sheets,$infos){
-		$row_auto=1;
-		$increment=0;
-
-		$rejet = false;
-		if($infos["rejet"]) $rejet = true; unset($infos["rejet"]);
-
-		foreach ($infos as $key => $item) {
-			$increment++;
-			if($item){
-				//initialisation des données
-
-				$facture = ATF::facture()->select($item["facture.id_facture"]);
-				$devis=ATF::devis()->select_special("id_affaire",$facture["id_affaire"]);
-				$societe = ATF::societe()->select($facture['id_societe']);
-
-				$societe["code_client"] = substr($societe["code_client"], 0, 6);
-				$facture["ref"] = substr($facture["ref"], 0, 7);
-
-	 			$date=date("dmY",strtotime($facture['date']));
-				$affaire=ATF::affaire()->select($facture['id_affaire']);
-				if($increment>999){ $reference="F".date("ym",strtotime($facture['date'])).$increment;
-				}elseif($increment>99){ $reference="F".date("ym",strtotime($facture['date']))."0".$increment;
-				}elseif($increment>9){$reference="F".date("ym",strtotime($facture['date']))."00".$increment;
-				}else{ $reference="F".date("ym",strtotime($facture['date']))."000".$increment;  }
-
-				$libelle = 'F'.$facture['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-				if($facture["prix"]<0) $libelle = 'A'.$facture['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-
-
-				if($devis[0]["type_contrat"] == "recrutement"){	$compte_2='706000';  }
-				elseif($devis[0]["type_contrat"] == "conseil"){ $compte_2='706300'; }
-				elseif($devis[0]["type_contrat"] == "audit" || $devis[0]["type_contrat"] == "audit_site_web"){ $compte_2='706200';  }
-
-
-				$compte_3='445710';
-				$type="divers";
-
-				//insertion des donnÃ©es
-				for ($i = 1; $i <= 4; $i++) {
-					$row_data=array();
-					if($i==1){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["D"]="411000";
-						$row_data["E"]=$societe["code_client"];
-
-						if($facture['prix']<0){ $row_data["F"]='C';
-						}else{$row_data["F"]='D'; }
-
-						if($rejet){ $row_data["G"]=round(abs($facture['prix']*$facture['tva']),2);
-						}else{
-							if(date("y",strtotime($facture['date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){$row_data["G"]=round(abs($facture['prix']*1.2),2);
-							}else{ $row_data["G"]=round(abs($facture['prix']*$devis[0]["tva"]),2);	}
-						}
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-
-					}elseif($i==2){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-
-						if($facture['prix']<0){ $row_data["F"]='D';
-						}else{ $row_data["F"]='C'; }
-
-						$row_data["G"]=abs($facture['prix']);
-						$row_data["D"]=$compte_2;
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-					}elseif($i==3){
-
-						$row_data["A"]='A1';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["J"]= substr($affaire["ref"],0,7).$societe["code_client"]."00";
-						$row_data["D"]=$compte_2;
-
-						if($facture['prix']<0){ $row_data["F"]='D';
-						}else{  $row_data["F"]='C'; }
-
-						$row_data["G"]=abs($facture['prix']);
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-					}elseif($i==4){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["D"]=$compte_3;
-
-						if($facture['prix']<0){ $row_data["F"]='D';
-						}else{ $row_data["F"]='C'; }
-
-						if($rejet){ $row_data["G"]=abs(($facture['prix']*$facture['tva']-$facture['prix']));
-						}else{
-							if(date("y",strtotime($facture['date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){$row_data["G"]=abs(($facture['prix']*1.2-$facture['prix']));
-							}else{$row_data["G"]=abs(($facture['prix']*$devis[0]["tva"]-$facture['prix'])); }
-
-						}
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-					}
-
-
-					if($row_data){
-						if($rejet){
-							if($row_data["G"] != 0){
-								$row_auto++;
-								foreach($row_data as $col=>$valeur){
-									$sheets['auto']->write($col.$row_auto, $valeur);
-								}
-							}
-						}else{
-							$row_auto++;
-							foreach($row_data as $col=>$valeur){
-								$sheets['auto']->write($col.$row_auto, $valeur);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-
-
-
-};
