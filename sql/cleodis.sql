@@ -1,5 +1,3 @@
-ALTER TABLE `facture` ADD `nature` ENUM('prorata','engagement','prolongation') NULL DEFAULT NULL AFTER `date_regularisation`;
-
 
 #16045 - Facturation loyer libératoire
 ALTER TABLE `loyer` ADD `type` ENUM('engagement','liberatoire') NOT NULL DEFAULT 'engagement' AFTER `duree`;
