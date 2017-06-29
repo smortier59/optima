@@ -665,7 +665,7 @@ class facture_cleodis extends facture {
 			$facture["facture"] = array(
 	            "id_societe" => $affaire["id_societe"],
 	            "type_facture" => "libre",
-	            "mode_paiement" => "cb",
+	            "mode_paiement" => "prelevement",
 	            "id_affaire" => $affaire["id_affaire"],
 	            "type_libre" => "normale",
 	            "date" => date("d-m-Y"),
@@ -727,7 +727,7 @@ class facture_cleodis extends facture {
             "id_societe" => $affaire["id_societe"],
             "type_facture" => "libre",
             "type_libre" => "normale",
-            "mode_paiement" => "cb",
+            "mode_paiement" => "prelevement",
             "id_affaire" => $affaire["id_affaire"],
             "date" => date("d-m-Y"),
             "id_commande" => $commande["id_commande"],
