@@ -693,7 +693,7 @@ class facture_cleodis extends facture {
 	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
 	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
 	            $ligne["facture_ligne__dot__serial"] = "";
-	            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+	            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
 	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
 	            $facture["values_facture"]["produits"][] = $ligne;
@@ -754,7 +754,7 @@ class facture_cleodis extends facture {
             $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
             $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
             $ligne["facture_ligne__dot__serial"] = "";
-            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
             $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
             $facture["values_facture"]["produits"][] = $ligne;
