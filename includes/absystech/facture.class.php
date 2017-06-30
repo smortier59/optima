@@ -2201,7 +2201,7 @@ class facture_absystech extends facture {
 			log::logger("AFFECTATION ID EXPORT AUX FACTURES","export-comptable");
 			log::logger($facturesATraiter,"export-comptable");
 			foreach ($facturesATraiter as $key=>$id_facture) {
-				ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
+				// ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
 				$countFactureTraitées++;
 			}
 			log::logger($countFactureTraitées." ID EXPORT RELIE AUX FACTURES","export-comptable");
@@ -2210,7 +2210,7 @@ class facture_absystech extends facture {
 			$fn = $this->filepath($id_export_comptable,"exportComptable");
 			log::logger("FILENAME = ".$fn,"export-comptable");
 			$file = fopen($fn, "w+");
-			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit");
+			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance");
 			fputcsv($file, $head, ";", chr(0));
 
 			foreach ($facturesATraiter as $id_facture) {
@@ -2246,7 +2246,8 @@ class facture_absystech extends facture {
 					$facture['ref'],
 					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 					$debit?abs($debit):"",
-					$credit?abs($credit):""
+					$credit?abs($credit):"",
+					date('d/m/Y',strtotime($facture['date_previsionnelle']))
 				);
 			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
@@ -2262,7 +2263,8 @@ class facture_absystech extends facture {
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 						$facture['type_facture']=="avoir"?abs($facture['prix']):"",
-						$facture['type_facture']=="avoir"?"":abs($facture['prix'])
+						$facture['type_facture']=="avoir"?"":abs($facture['prix']),
+						date('d/m/Y',strtotime($facture['date_previsionnelle']))
 					);
 				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
@@ -2270,6 +2272,8 @@ class facture_absystech extends facture {
 			  } else {
 				  // LIGNES VENTILEES
 					$lignes = $this->getLignes($id_facture);
+
+
 					$ventilation = array();
 				  foreach ($lignes as $ligne) {
 				  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
@@ -2277,7 +2281,7 @@ class facture_absystech extends facture {
 				  foreach ($ventilation as $id_compte=>$total) {
 						$credit = false;
 						$debit = false;
-						if ($facture['type_facture']=='avoir') {
+						if ($facture['type_facture']=='avoir' || $total<0) {
 							$debit = number_format($total, 2, ".", "");
 						} else {
 							$credit = number_format($total, 2, ".", "");
@@ -2292,10 +2296,12 @@ class facture_absystech extends facture {
 							$facture['ref'],
 							$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 							$debit?abs($debit):"",
-							$credit?abs($credit):""
+							$credit?abs($credit):"",
+							date('d/m/Y',strtotime($facture['date_previsionnelle']))
 						);
 					  fputcsv($file, $line, ";", chr(0));
 					  fputs("\n");
+
 				  }
 
 				  // SI on est dans une facture de solde, il faut rappeler les facture d'acompte qui lui sont lié (par l'affaire et le type)
@@ -2311,7 +2317,8 @@ class facture_absystech extends facture {
 								$facture['ref'],
 								$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
 								abs($acompte['prix']),
-								""
+								"",
+								date('d/m/Y',strtotime($facture['date_previsionnelle']))
 							);
 						  fputcsv($file, $line, ";", chr(0));
 						  fputs("\n");
@@ -2330,7 +2337,8 @@ class facture_absystech extends facture {
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 						"",
-						number_format($facture['frais_de_port'], 2, ".", "")
+						number_format($facture['frais_de_port'], 2, ".", ""),
+						date('d/m/Y',strtotime($facture['date_previsionnelle']))
 					);
 				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
@@ -2352,7 +2360,8 @@ class facture_absystech extends facture {
 					$facture['ref'],
 					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 					$debit?abs($debit):"",
-					$credit?abs($credit):""
+					$credit?abs($credit):"",
+					date('d/m/Y',strtotime($facture['date_previsionnelle']))
 				);
 			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
