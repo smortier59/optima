@@ -671,7 +671,7 @@ class facture_cleodis extends facture {
 			//Ajout des assurance .... sur le prix prix_libre
 
 
-			$loyerAuJour = ($loyers[0]["loyer"] + $loyer["assurance"] )/$nbDInPeriode;
+			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
 			$total = $loyerAuJour * $nbJProRata;
 
 			$facture["facture"] = array(
@@ -682,7 +682,7 @@ class facture_cleodis extends facture {
 	            "type_libre" => "normale",
 	            "date" => date("d-m-Y"),
 	            "id_commande" => $commande["id_commande"],
-	            "date_previsionnelle" => date("d-m-Y", strtotime($infos["date_installation_reel"])),
+	            "date_previsionnelle" => date("d-m-Y"),
 	            "date_periode_debut" => $infos["date_installation_reel"],
 	            "date_periode_fin" => $nbDInPeriode."-".date("m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix" => round($total, 2),
@@ -732,11 +732,16 @@ class facture_cleodis extends facture {
 								->addOrder("id_loyer", "ASC");
 		$loyers = ATF::loyer()->select_all();
 
+		if(strtotime(date("d-m-Y")) < strtotime($infos["date_debut_contrat"]))
+			$date_previsionnelle = $infos["date_debut_contrat"];
+		else
+			$date_previsionnelle = date("d-m-Y");
+
 		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
 											date("m", strtotime($infos["date_debut_contrat"])),
 											date("Y", strtotime($infos["date_debut_contrat"])));
 
-		$totalLoyer = $loyers[0]["loyer"]+$loyers[0]["assurance"];
+		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],
             "type_facture" => "libre",
@@ -745,7 +750,7 @@ class facture_cleodis extends facture {
             "id_affaire" => $affaire["id_affaire"],
             "date" => date("d-m-Y"),
             "id_commande" => $commande["id_commande"],
-            "date_previsionnelle" => date("d-m-Y", strtotime($infos["date_debut_contrat"].' last Thursday of last month')),
+            "date_previsionnelle" => $date_previsionnelle,
             "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
             "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
             "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
