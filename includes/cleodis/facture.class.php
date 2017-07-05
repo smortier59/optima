@@ -642,7 +642,6 @@ class facture_cleodis extends facture {
 	 * @param  [type] $infos [description]
 	 */
 	public function createFactureProrata($infos){
-
 		if(strtotime($infos["date_installation_reel"]) < strtotime($infos["date_debut_contrat"])){
 
 			$affaire = ATF::affaire()->select($infos["id_affaire"]);
@@ -652,14 +651,27 @@ class facture_cleodis extends facture {
 									->addOrder("id_loyer", "ASC");
 			$loyers = ATF::loyer()->select_all();
 
-			$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
-											date("m", strtotime($infos["date_installation_reel"])),
-											date("Y", strtotime($infos["date_installation_reel"])));
+			if($loyers[0]["frequence_loyer"] == "mois"){
+				$nbDInPeriode = 30;
 
-			$nbJProRata = $nbDInMonth - date("d", strtotime($infos["date_installation_reel"]));
+			}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
+				$nbDInPeriode = 90;	
 
-			$loyerAuJour = $loyers[0]["loyer"]/$nbDInMonth;
+			}elseif($loyers[0]["frequence"] == "semestre"){
+				$nbDInPeriode = 180;
 
+			}else{
+				$nbDInPeriode = 365;	
+			}
+			$nbJProRata = $nbDInPeriode - date("d", strtotime($infos["date_installation_reel"])); 
+
+
+			//Calcul du bon prix par rapport à la frequence
+			//Calcul des bonnes periodes (date_debut date_fin) par rapport aux periodes
+			//Ajout des assurance .... sur le prix prix_libre
+
+
+			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
 			$total = $loyerAuJour * $nbJProRata;
 
 			$facture["facture"] = array(
@@ -672,10 +684,10 @@ class facture_cleodis extends facture {
 	            "id_commande" => $commande["id_commande"],
 	            "date_previsionnelle" => date("d-m-Y"),
 	            "date_periode_debut" => $infos["date_installation_reel"],
-	            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "date_periode_fin" => $nbDInPeriode."-".date("m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix" => round($total, 2),
 	            "date_periode_debut_libre" => $infos["date_installation_reel"],
-	            "date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "date_periode_fin_libre" => $nbDInPeriode."-".date("m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix_libre" => round($total, 2),
 	            "nature" => "prorata"
 	        );
@@ -692,7 +704,7 @@ class facture_cleodis extends facture {
 	            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
 	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
 	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
-	            $ligne["facture_ligne__dot__serial"] = "";
+	            $ligne["facture_ligne__dot__serial"] = $value["serial"];
 	            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
 	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
@@ -712,6 +724,7 @@ class facture_cleodis extends facture {
 	 */
 	public function createPremiereFacture($infos){
 
+
 		$affaire = ATF::affaire()->select($infos["id_affaire"]);
 		$commande = ATF::commande()->select($infos["id_commande"]);
 
@@ -719,10 +732,16 @@ class facture_cleodis extends facture {
 								->addOrder("id_loyer", "ASC");
 		$loyers = ATF::loyer()->select_all();
 
+		if(strtotime(date("d-m-Y")) < strtotime($infos["date_debut_contrat"]))
+			$date_previsionnelle = $infos["date_debut_contrat"];
+		else
+			$date_previsionnelle = date("d-m-Y");
+
 		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
 											date("m", strtotime($infos["date_debut_contrat"])),
 											date("Y", strtotime($infos["date_debut_contrat"])));
 
+		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],
             "type_facture" => "libre",
@@ -731,15 +750,16 @@ class facture_cleodis extends facture {
             "id_affaire" => $affaire["id_affaire"],
             "date" => date("d-m-Y"),
             "id_commande" => $commande["id_commande"],
-            "date_previsionnelle" => date("d-m-Y"),
+            "date_previsionnelle" => $date_previsionnelle,
             "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
             "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
             "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
 			"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
-            "prix_libre" => round($loyers[0]["loyer"], 2),
-            "prix" => round($loyers[0]["loyer"], 2),
+            "prix_libre" => round($totalLoyer, 2),
+            "prix" => round($totalLoyer, 2),
             "nature" => "engagement"
         );
+
 
         ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
 		$lignes = ATF::commande_ligne()->select_all();
@@ -753,7 +773,7 @@ class facture_cleodis extends facture {
             $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
             $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
             $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
-            $ligne["facture_ligne__dot__serial"] = "";
+            $ligne["facture_ligne__dot__serial"] = $value["serial"];
             $ligne["facture_ligne__dot__afficher"] = $value["visible"];
             $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
