@@ -653,24 +653,45 @@ class facture_cleodis extends facture {
 
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
+				$nbJProRata = 30 - date("d", strtotime($infos["date_installation_reel"]));
 
 			}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
-				$nbDInPeriode = 90;	
+				$nbDInPeriode = 90;
+				// récupérer la date de début du trimestre pour déduire les jours écoulés
+				$start_date = strtotime('3 months ago');
+				$start_quarter = ceil(date('m', $start_date) / 3);
+				$start_month = ($start_quarter * 3) - 2;
+				$start_year = date('Y', $start_date);
+				$start_timestamp = mktime(0, 0, 0, $start_month, 1, $start_year);
+				$days_difference = 90 - (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
+				$nbJProRata = $days_difference;
 
-			}elseif($loyers[0]["frequence"] == "semestre"){
+			}elseif($loyers[0]["frequence_loyer"] == "semestre"){
+				// Pas de loyer semestriel pour le moment coté cleodis
+				// Partie non testée
 				$nbDInPeriode = 180;
+				$start_date = strtotime('6 months ago');
+				$start_semestre = ceil(date('m', $start_date) / 6);
+				$start_month = ($start_quarter * 6) - 5;
+				$start_year = date('Y', $start_date);
+				$start_timestamp = mktime(0, 0, 0, $start_month, 1, $start_year);
+				$days_difference = (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
 
+				$nbJProRata = $days_difference;
 			}else{
-				$nbDInPeriode = 365;	
+				// Pas de loyer semestriel pour le moment coté cleodis
+				// Partie non testée
+				// a voir avec cleodis BE
+				$nbDInPeriode = 365;
+				$dateYear = strtotime('first day of January '.date('Y'));
+				$days_difference = (strtotime($infos["date_installation_reel"])- $dateYear)/24/3600;
+				log::logger('start semestre','ccharlier');
+				log::logger(date('d-m-Y',$days_difference),'ccharlier');
+
 			}
-			$nbJProRata = $nbDInPeriode - date("d", strtotime($infos["date_installation_reel"])); 
-
-
 			//Calcul du bon prix par rapport à la frequence
 			//Calcul des bonnes periodes (date_debut date_fin) par rapport aux periodes
 			//Ajout des assurance .... sur le prix prix_libre
-
-
 			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
 			$total = $loyerAuJour * $nbJProRata;
 
@@ -684,10 +705,10 @@ class facture_cleodis extends facture {
 	            "id_commande" => $commande["id_commande"],
 	            "date_previsionnelle" => date("d-m-Y"),
 	            "date_periode_debut" => $infos["date_installation_reel"],
-	            "date_periode_fin" => $nbDInPeriode."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "date_periode_fin" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix" => round($total, 2),
 	            "date_periode_debut_libre" => $infos["date_installation_reel"],
-	            "date_periode_fin_libre" => $nbDInPeriode."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "date_periode_fin_libre" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
 	            "prix_libre" => round($total, 2),
 	            "nature" => "prorata"
 	        );
@@ -732,8 +753,9 @@ class facture_cleodis extends facture {
 								->addOrder("id_loyer", "ASC");
 		$loyers = ATF::loyer()->select_all();
 
-		if(strtotime(date("d-m-Y")) < strtotime($infos["date_debut_contrat"]))
+		if(strtotime(date("d-m-Y")) < strtotime($infos["date_debut_contrat"])){
 			$date_previsionnelle = $infos["date_debut_contrat"];
+		}
 		else
 			$date_previsionnelle = date("d-m-Y");
 
