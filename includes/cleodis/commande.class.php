@@ -495,7 +495,7 @@ class commande_cleodis extends commande {
 										  "id_commande"=> $infos["id_commande"]
 										);
 
-							ATF::facture_cleodis()->createFactureProrata($data);
+							ATF::facture()->createFactureProrata($data);
 						}
 
 						$data = array(  "id_affaire" => $affaire["id_affaire"],
@@ -504,7 +504,7 @@ class commande_cleodis extends commande {
 									 );
 
 						//Creation de la premiere facture
-						ATF::facture_cleodis()->createPremiereFacture($data);
+						ATF::facture()->createPremiereFacture($data);
 
 					}
 
