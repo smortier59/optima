@@ -6,6 +6,7 @@
 class echeancier_ligne_ponctuelle extends classes_optima {
 
   /**
+   *  
    * Constructeur
    */
   public function __construct() {
@@ -80,7 +81,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
   * @return array result en booleen et notice sous forme d'un tableau
   */
   public function _DELETE($get,$post) {
-    if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    if (!$get['id']) throw new errorATF("MISSING_ID",1000);
     // gerer le cas du montant sur le delete
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
@@ -102,7 +103,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
     $input = file_get_contents('php://input');
     if (!empty($input)) parse_str($input,$post);
 
-    if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+    if (!$post) throw new errorATF("POST_DATA_MISSING",1000);
     // parser la date sous le bon format pour mysql
     $post["date_valeur"]=date("Y-m-d",strtotime($post["date_valeur"]));
     try {
@@ -111,7 +112,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
       $return['row'] = $post;
       $return['notices'] = ATF::$msg->getNotices();
     } catch (errorATF $e) {
-      throw $e; // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      throw new errorATF($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
     return $return;
   }
