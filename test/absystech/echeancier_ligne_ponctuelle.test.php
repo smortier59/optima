@@ -161,7 +161,6 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(1,$ret['result'],'problème sur le retour du delete');
 		$this->assertEquals('success',$ret['notices'][0]['type'],'problème sur le retour du delete');
 	}
-	/*
 	public function test_POSTWithoutIdEcheancier(){
 		try {
 			$post = array('test'=> 'test');
@@ -178,7 +177,7 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_POSTWithoutRef(){
 		try {
 			$post = array('id_echeancier'=> $this->echeancier);
-			ATF::echeancier_ligne_periodique()->_POST(false,$post);
+			ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$code_error = $e->getCode();
 			$message_error= $e->getMessage();
@@ -194,7 +193,7 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 				'id_echeancier'=> $this->echeancier,
 				'ref'=> "MaRef"	
 			);
-			ATF::echeancier_ligne_periodique()->_POST(false,$post);
+			ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$code_error = $e->getCode();
 			$message_error= $e->getMessage();
@@ -210,7 +209,7 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 				'ref'=> "MaRef",
 				'designation'=> "Ma Designation"
 			);
-			ATF::echeancier_ligne_periodique()->_POST(false,$post);
+			ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$code_error = $e->getCode();
 			$message_error= $e->getMessage();
@@ -219,7 +218,7 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$this->assertEquals(5042,$code_error,'problème sur l\'erreur du post lorsqu il y a des fields manquants');
 	}
-	public function test_POSTWithoutMiseEnService(){
+	public function test_POSTWithoutDateValeur(){
 		try {
 			$post = array(
 				'id_echeancier'=> $this->echeancier,
@@ -227,12 +226,12 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 				'designation'=> "Ma Designation",
 				'quantite'=> 3
 			);
-			ATF::echeancier_ligne_periodique()->_POST(false,$post);
+			ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$code_error = $e->getCode();
 			$message_error= $e->getMessage();
 		}
-		$this->assertEquals("MISE_EN_SERVICE_MISSING",$message_error,'problème sur l\'erreur du post lorsqu il y a des fields manquants');
+		$this->assertEquals("DATE_VALEUR_MISSING",$message_error,'problème sur l\'erreur du post lorsqu il y a des fields manquants');
 
 		$this->assertEquals(5042,$code_error,'problème sur l\'erreur du post lorsqu il y a des fields manquants');
 	}
@@ -243,9 +242,9 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 				'ref'=> "MaRef",
 				'designation'=> "Ma Designation",
 				'quantite'=> 3,
-				'mise_en_service'=> date('d-m-Y')
+				'date_valeur'=> date('d-m-Y')
 			);
-			ATF::echeancier_ligne_periodique()->_POST(false,$post);
+			ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$code_error = $e->getCode();
 			$message_error= $e->getMessage();
@@ -260,36 +259,33 @@ class echeancier_ligne_ponctuelle_test extends ATF_PHPUnit_Framework_TestCase {
 			'ref'=> "Marefzer",
 			'designation'=> "Ma Designation",
 			'quantite'=> 3,
-			'mise_en_service'=> date('d-m-Y'),
-			'id_compte_absystech'=> 2,
-			'valeur_variable' => 'on'
+			'date_valeur'=> date('d-m-Y'),
+			'id_compte_absystech'=> 2
 		);
-		$ret = ATF::echeancier_ligne_periodique()->_POST(false,$post);
+		$ret = ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		$this->assertEquals("MAREFZER",$ret['row']['ref'],'problème sur la ref retournée par le post');
 		$this->assertEquals($this->echeancier, $ret['row']['id_echeancier'],'problème sur l\' id echeancier retournée par le post');
 		$this->assertEquals(3, $ret['row']['quantite'],'problème sur la quantité retournée par le post');
-		$this->assertEquals("oui", $ret['row']['valeur_variable'],'problème sur la valeur_variable retournée par le post');
 		$this->assertEquals("Ma Designation", $ret['row']['designation'],'problème sur la designation retournée par le post');
 		$this->assertEquals(2, $ret['row']['id_compte_absystech'],'problème sur l\' id_compte_absystech retournée par le post');
 	}
 	public function test_POSTErrorInsert(){
 		try{
 			$post = array(
-				'id_echeancier'=>'azerty',
-				'ref'=> "Marefzer",
-				'designation'=> "Ma Designation",
-				'quantite'=> 3,
-				'mise_en_service'=> date('d-m-Y'),
-				'id_compte_absystech'=> 2,
-				'valeur_variable' => 'on'
-			);
-			ATF::echeancier_ligne_periodique()->_POST(false,$post);
+			'id_echeancier'=>"azerty",
+			'ref'=> "Marefzer",
+			'designation'=> "Ma Designation",
+			'quantite'=> 3,
+			'date_valeur'=> date('d-m-Y'),
+			'id_compte_absystech'=> 2
+		);
+			ATF::echeancier_ligne_ponctuelle()->_POST(false,$post);
 		} catch (errorATF $e) {
 			$code_error = $e->getCode();
 		};
 		$this->assertEquals(500, $code_error,'probleme retour code erreur post');
 
 	}
-	*/
+
 }
 ?>

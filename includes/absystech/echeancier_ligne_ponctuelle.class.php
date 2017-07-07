@@ -65,7 +65,7 @@ class echeancier_ligne_ponctuelle extends classes_optima {
       $return['row'] = $post;
     } catch (errorATF $e) {
       ATF::db($this->db)->rollback_transaction();
-      throw $e; // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      throw errorATF($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
     ATF::db($this->db)->commit_transaction();
     return $return;
