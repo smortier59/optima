@@ -113,8 +113,6 @@ class contact_absystech extends contact {
 			header("ts-search-term: ".$get['search']);
 			$this->q->setSearch($get["search"]);
 		}
-
-			log::logger($get,"qjanon");
 		if ($get['id']) {
 			$this->q->where("id_contact",$get['id'])->setLimit(1);
 		} else {
