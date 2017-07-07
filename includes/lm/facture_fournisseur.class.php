@@ -1223,7 +1223,7 @@ class facture_fournisseur extends classes_optima {
     		$dateDeb = strtotime($commande["commande.date_debut"]);
 	    	$dateFin = strtotime($commande["commande.date_evolution"]);
 
-	    	if($dateDeb <= strtotime($date) && $date >= strtotime($dateFin)){
+	    	if($dateDeb <= strtotime($date) && strtotime($date) <= $dateFin){
 	    		return true;
 	    	}
     	}
