@@ -60,7 +60,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		//Facture
 		$this->facture["facture"]=$this->commande["commande"];
-		$this->facture["facture"]["date"]="2010-01-01";
+		$this->facture["facture"]["date"]=date('Y-m-d');
 		$this->facture["facture"]["id_affaire"]=$this->id_affaire;
 		$this->facture["facture"]["mode"]="facture";
 		$this->facture["facture"]["id_termes"]=2;
@@ -863,12 +863,12 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$id_facture_paiement = ATF::facture_paiement()->insert($facture_paiement);
 		$n = ATF::$msg->getNotices();
-/*
-		$this->assertEquals(array(
-									0=>array(
-										"msg"=>"La facture '".$facture[0]["facture.ref"]."' est passée en payée.","title"=>"Succès !","timer"=>""
-										)
-							),$n,"3 La notice de facture payée ne se fait pas");*/
+		/*$this->assertEquals(array(
+										0=>array(
+											"msg"=>"La facture '".$facture[0]["facture.ref"]."' est passée en payée.","title"=>"Succès !","timer"=>""
+											)
+								),$n,"3 La notice de facture payée ne se fait pas");
+		*/
 		$this->obj->q->reset()->addCondition("id_affaire",$this->id_affaire)->setCount()->end();
 		$r = $this->obj->select_all();
 		$facture = $r['data'];
@@ -1491,6 +1491,18 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($id_avoir,$r[0][0],"Ce n'est pas la bonne facture qui remonte. !");
 
 	}
+	/* @author Cyril Charlier <ccharlier@absystech.fr> */
+	public function test_GET() {
 
+		$ret = ATF::facture()->_GET();
+		log::logger($ret[0],'ccharlier');
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(2,$ret[0]['id_termes_fk'],"Ce n'est pas le bon terme qui remonte. !");
+
+
+		
+	}
 };
 ?>
