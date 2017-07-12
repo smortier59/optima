@@ -402,6 +402,8 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
+	// @author Cyril CHARLIER <ccharlier@absystech.fr>
+
 	function testInsertErreurs(){
 
 		//Facture sans commande
@@ -422,14 +424,14 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture2["facture"]["tva"]=3;
 		$facture2["facture"]["dematerialisation"]=3;
 		$facture2["preview"]=true;
-		ATF::$usr->set('id_profil',2);
+		ATF::$usr->set('id_profil',3);
 		$id_facture2=$this->obj->insert($facture2,$this->s);
 		ATF::$usr->set('id_profil',1);
 		$this->assertEquals(array(
 									0=>array(
 										"msg"=>"Seul le profil Associé permet de modifier la TVA. La TVA de cette facture sera donc de 1.2",
 										"title"=>"Droits d'accès requis pour cette opération ! ",
-										"timer"=>""
+										"timer"=>null
 										)
 							),ATF::$msg->getNotices(),"La notice de TVA ne se fait pas");
 
@@ -461,6 +463,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		unset($facture4["facture"]["id_affaire"]);
 		$facture4["facture"]["mode"]="avoir";		
 		$facture4["facture"]["emailTexte"]="TU facture";
+
 		//Pas de lignes
 		try {
 			unset($facture4["values_facture"]);
@@ -548,9 +551,10 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$usr->set('id_profil',1);
 		$this->assertEquals(array(
 									0=>array(
-										"msg"=>"Seul le profil Associé permet de modifier la TVA. La TVA de cette facture sera donc de 1.2",
+										"msg"=>"error_403_facture_tva",
 										"title"=>"Droits d'accès requis pour cette opération ! ",
-										"timer"=>""
+										"timer"=>null,
+										"type"=>'success'
 										)
 							),ATF::$msg->getNotices(),"La notice de TVA ne se fait pas");
 
@@ -636,7 +640,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_facture4=$this->obj->insert($facture4,$this->s);
 		$facture4_select=$this->obj->select($id_facture4);
 		$affaire2=ATF::affaire()->select($facture4_select["id_affaire"]);
-		$this->assertEquals("-50.00",$facture4_select["prix"],"13 Problème sur les prix de port d'un solde");
+		$this->assertEquals("-936.00",$facture4_select["prix"],"13 Problème sur les prix de port d'un solde");
 		$this->assertEquals("avoir",$facture4_select["type_facture"],"14 Problème sur le type facture de port d'un solde");
 		$this->assertEquals(ATF::affaire()->decryptId($this->id_affaire),$facture4_select["id_affaire"],"14 Problème sur l'id_affaire facture de port d'un solde");
 
@@ -848,7 +852,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	function testSelect_all(){
 		ATF::$msg->getNotices();
-		$this->obj->q->reset()->addCondition("id_affaire",$this->id_affaire)->end();
+		$this->obj->q->reset()->addCondition("facture.id_affaire",$this->id_affaire)->end();
 		$this->obj->q->setCount();
 		$r = $this->obj->select_all();
 		$facture = $r['data'];
@@ -869,7 +873,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 											)
 								),$n,"3 La notice de facture payée ne se fait pas");
 		*/
-		$this->obj->q->reset()->addCondition("id_affaire",$this->id_affaire)->setCount()->end();
+		$this->obj->q->reset()->addCondition("facture.id_affaire",$this->id_affaire)->setCount()->end();
 		$r = $this->obj->select_all();
 		$facture = $r['data'];
 
@@ -880,7 +884,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	function testSelect_all_allowSolde(){
 		ATF::$msg->getNotices();
-		$this->obj->q->reset()->addCondition("id_affaire",$this->id_affaire)->end();
+		$this->obj->q->reset()->addCondition("facture.id_affaire",$this->id_affaire)->end();
 		$this->obj->q->setCount();
 		$r = $this->obj->select_all();
 		$facture = $r['data'];
@@ -896,7 +900,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_facture_paiement = ATF::facture_paiement()->insert($facture_paiement);
 		$n = ATF::$msg->getNotices();
 
-		$this->obj->q->reset()->addCondition("id_affaire",$this->id_affaire)->setCount()->end();
+		$this->obj->q->reset()->addCondition("facture.id_affaire",$this->id_affaire)->setCount()->end();
 		$r = $this->obj->select_all();
 		$facture = $r['data'];
 		$this->assertEquals("420.00",$facture[0]["prix_ttc"],"4 select_all ne renvoi pas le bon ttc pour une facture payée");
@@ -910,7 +914,7 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$relance = array("id_facture"=>$this->id_facture,"date_1"=>date('Y-m-d'),"date_2"=>date('Y-m-d'),"date_demeurre"=>date('Y-m-d'));
 		ATF::relance()->insert($relance);
 		
-		$this->obj->q->reset()->addCondition("id_affaire",$this->id_affaire)->end();
+		$this->obj->q->reset()->addCondition("facture.id_affaire",$this->id_affaire)->end();
 		$this->obj->q->setCount();
 		$r = $this->obj->select_all();
 		$facture = $r['data'];
@@ -1056,8 +1060,9 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$notice = array(
 			array(
 				"msg"=>ATF::$usr->trans("facture_regenere_avec_succes",$this->obj->table),
-				"title"=>"",
-				"timer"=>""
+				"title"=>null,
+				"timer"=>null,
+				"type" => "success"
 			)
 		);
 		$this->assertEquals($notice,ATF::$msg->getNotices(),"La notice ne se fait pas");
@@ -1065,8 +1070,9 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$warning = array(
 			array(
 				"msg"=>ATF::$usr->trans("email_sauvegarde_old_facture_doesnt_exist",$this->obj->table),
-				"title"=>"",
-				"timer"=>""
+				"title"=>null,
+				"timer"=>null,
+				'type' => 'warning'
 			)
 		);
 		$this->assertEquals($warning,ATF::$msg->getWarnings(),"La warning ne se fait pas");
@@ -1091,15 +1097,17 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		
 		$notice = array(
 			"msg"=>ATF::$usr->trans("facture_regenere_avec_succes",$this->obj->table),
-			"title"=>"",
-			"timer"=>""
+			"title"=>null,
+			"timer"=>null,
+			"type" =>success
 		);
 		$this->assertEquals($notice,$nReturned[1],"La notice ne se fait pas");
 		
 		$notice = array(
 			"msg"=>ATF::$usr->trans("email_sauvegarde_old_facture_send",$this->obj->table),
-			"title"=>"",
-			"timer"=>""
+			"title"=>null,
+			"timer"=>null,
+			'type'=>'success'
 		);
 		$this->assertEquals($notice,$nReturned[0],"La notice 2 ne se fait pas");
 	}
@@ -1282,10 +1290,15 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 				,"date_previsionnelle"=>"2050-08-31 09:00:00"
 			)	
 		);
-
+		$commercial1 =ATF::contact()->i(array(
+			'civilite' => 'M',
+			'nom'=>"Test",
+			'prenom'=>"Test"
+		));
 		$societe1 = array(
 			"societe"=>"societe TEST TU 1",
-			"id_filiale"=>$this->id_societe
+			"id_filiale"=>$this->id_societe,
+			"id_commercial" => $commercial1
 		);
 		$id_societe1 = ATF::societe()->decryptId(ATF::societe()->i($societe1));
 		$id_facture1 = ATF::facture()->i(
@@ -1301,10 +1314,16 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 				,"date_previsionnelle"=>"2050-08-31 09:00:00"
 			)	
 		);
-
+		$commercial2 =ATF::contact()->i(array(
+			'civilite' => 'M',
+			'nom'=>"Test",
+			'prenom'=>"Test"
+		));
 		$societe2 = array(
 			"societe"=>"societe TEST TU 2",
-			"id_filiale"=>$id_societe1
+			"id_filiale"=>$id_societe1,
+			"id_commercial" =>$commercial2
+
 		);
 		$id_societe2 = ATF::societe()->i($societe2);
 		$id_facture2 = ATF::facture()->i(
@@ -1491,18 +1510,933 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($id_avoir,$r[0][0],"Ce n'est pas la bonne facture qui remonte. !");
 
 	}
-	/* @author Cyril Charlier <ccharlier@absystech.fr> */
+			/* @author Cyril Charlier <ccharlier@absystech.fr> */
 	public function test_GET() {
 
 		$ret = ATF::facture()->_GET();
-		log::logger($ret[0],'ccharlier');
 		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
 		$this->assertEquals("Tu_devis",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
 		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
-		$this->assertEquals(2,$ret[0]['id_termes_fk'],"Ce n'est pas le bon terme qui remonte. !");
-
-
-		
+		$this->assertEquals(2,$ret[0]['id_termes_fk'],"Ce n'est pas le bon terme qui remonte. !");	
 	}
+	public function test_GETWithId() {
+		$get = array('id'=> $this->obj->decryptId($this->id_facture));
+		$ret = ATF::facture()->_GET($get);
+
+		$this->assertEquals("TestTU",$ret["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis",$ret['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(2,$ret['id_termes_fk'],"Ce n'est pas le bon terme qui remonte. !");	
+	}
+
+	public function test_GETWithSocieteAndFilterPayeeandTri() {
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$this->id_devis = ATF::devis()->insert($devis,$this->s);
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$this->id_affaire;
+		$this->commande["commande"]["id_devis"]=$this->id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+
+		$this->id_affaire = ATF::devis()->select($this->id_devis,"id_affaire");
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$this->id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		
+		//Facture_ligne
+		$this->facture["values_facture"]=array("produits"=>'[{
+			"facture_ligne__dot__ref":"TU payee",
+			"facture_ligne__dot__produit":"Tu_facture payee",
+			"facture_ligne__dot__quantite":"15",
+			"facture_ligne__dot__prix":"200",
+			"facture_ligne__dot__prix_achat":"100",
+			"facture_ligne__dot__id_fournisseur":"1",
+			"facture_ligne__dot__serial":"777",
+			"facture_ligne__dot__id_compte_absystech":"1",
+			"facture_ligne__dot__marge":97.14,
+			"facture_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($this->facture,$this->s);
+		
+		$get = array('id_societe'=> $this->id_societe,
+			"tri" => 'date',
+			'filters'=> array("payee"=> true)
+		);
+		$ret = ATF::facture()->_GET($get);
+
+        $this->assertCount(1, $ret,"ne doit renvoyer qu'une seule ligne");
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis_filter",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(100.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");
+
+	}
+	public function test_GETWithSocieteAndFilterImpayee() {
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$this->id_devis = ATF::devis()->insert($devis,$this->s);
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$this->id_affaire;
+		$this->commande["commande"]["id_devis"]=$this->id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$this->id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		
+		//Facture_ligne
+		$this->facture["values_facture"]=array("produits"=>'[{
+			"facture_ligne__dot__ref":"TU payee",
+			"facture_ligne__dot__produit":"Tu_facture payee",
+			"facture_ligne__dot__quantite":"15",
+			"facture_ligne__dot__prix":"200",
+			"facture_ligne__dot__prix_achat":"100",
+			"facture_ligne__dot__id_fournisseur":"1",
+			"facture_ligne__dot__serial":"777",
+			"facture_ligne__dot__id_compte_absystech":"1",
+			"facture_ligne__dot__marge":97.14,
+			"facture_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($this->facture,$this->s);
+		
+		$get = array('id_societe'=> $this->id_societe,
+			'filters'=> array("impayee"=> true));
+		$ret = ATF::facture()->_GET($get);
+        $this->assertCount(1, $ret,"ne doit renvoyer qu'une seule ligne");
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(50.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($this->id_facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");
+	}
+	public function test_GETWithSocieteAndFilterPerte() {
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$this->id_devis = ATF::devis()->insert($devis,$this->s);
+		$this->id_affaire = ATF::devis()->select($this->id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$this->id_affaire;
+		$this->commande["commande"]["id_devis"]=$this->id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$this->id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="perte";
+
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		
+		//Facture_ligne
+		$this->facture["values_facture"]=array("produits"=>'[{
+			"facture_ligne__dot__ref":"TU payee",
+			"facture_ligne__dot__produit":"Tu_facture payee",
+			"facture_ligne__dot__quantite":"15",
+			"facture_ligne__dot__prix":"200",
+			"facture_ligne__dot__prix_achat":"100",
+			"facture_ligne__dot__id_fournisseur":"1",
+			"facture_ligne__dot__serial":"777",
+			"facture_ligne__dot__id_compte_absystech":"1",
+			"facture_ligne__dot__marge":97.14,
+			"facture_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($this->facture,$this->s);
+		
+		$get = array('id_societe'=> $this->id_societe,
+			'filters'=> array("perte"=> true));
+		$ret = ATF::facture()->_GET($get);
+
+        $this->assertCount(1, $ret,"ne doit renvoyer qu'une seule ligne");
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis_filter",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(100.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");
+	}
+	public function test_GETWithFilterDate() {
+
+		$get = array('filters'=> array(
+			"start"=> date('Y-m-d',strtotime('-1 day')),
+			"end"=>date('Y-m-d',strtotime('+1 day'))
+		));
+		$ret = ATF::facture()->_GET($get);
+        $this->assertCount(1, $ret,"ne doit renvoyer qu'une seule ligne");
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(50.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($this->id_facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");
+	}
+	public function test_GETWithSearch() {
+
+		$get = array('search'=> "TestTU");
+		$ret = ATF::facture()->_GET($get);
+        $this->assertCount(1, $ret,"ne doit renvoyer qu'une seule ligne");
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(50.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($this->id_facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");
+	}
+	public function test_GETWithFilterCompta() {
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d',strtotime('+5 day'));
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d',strtotime('+5 day'));
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$this->id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($this->id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$this->id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$facture["facture"]=$this->commande["commande"];
+		$facture["facture"]["date"]=date('Y-m-d');
+		$facture["facture"]["id_affaire"]=$id_affaire;
+		$facture["facture"]["mode"]="facture";
+		$facture["facture"]["etat"]="perte";
+
+		$facture["facture"]["id_termes"]=2;
+		$facture["facture"]["tva"]=5.2;
+		
+		//Facture_ligne
+		$facture["values_facture"]=array("produits"=>'[{
+			"facture_ligne__dot__ref":"TU payee",
+			"facture_ligne__dot__produit":"Tu_facture payee",
+			"facture_ligne__dot__quantite":"15",
+			"facture_ligne__dot__prix":"200",
+			"facture_ligne__dot__prix_achat":"100",
+			"facture_ligne__dot__id_fournisseur":"1",
+			"facture_ligne__dot__serial":"777",
+			"facture_ligne__dot__id_compte_absystech":"1",
+			"facture_ligne__dot__marge":97.14,
+			"facture_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		unset($facture["facture"]["resume"],$facture["facture"]["prix_achat"],$facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($facture,$this->s);
+
+		$post = array(
+			"date_debut"=> date('Y-m-d',strtotime('-1 day')),
+			"date_fin"=> date('Y-m-d',strtotime('+1 day')),
+			"factures"=> $this->obj->decryptId($facture)
+		);
+		$this->obj->_export_comptable(false,$post);
+
+		$get = array('filters'=> array(
+				"compta"=> true
+			)
+		);
+		$ret = ATF::facture()->_GET($get);
+
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("Tu_devis",$ret[0]['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(50.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($this->id_facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");
+	}
+
+	public function test_getFactureSociete() {
+		$post = array('id_societe'=> $this->id_societe);
+		$ret = ATF::facture()->_getFactureSociete(false,$post);
+
+		$this->assertEquals($this->id_societe,$ret[0]["id_societe"],"Ce n'est pas la bonne facture qui remonte. !");
+		$this->assertEquals("impayee",$ret[0]['etat'],"Ce n'est pas la bon etat qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(50.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($this->id_facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");	
+	}
+
+	public function test_getPaye() {
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		
+		//Facture_ligne
+		$this->facture["values_facture"]=array("produits"=>'[{
+			"facture_ligne__dot__ref":"TU payee",
+			"facture_ligne__dot__produit":"Tu_facture payee",
+			"facture_ligne__dot__quantite":"15",
+			"facture_ligne__dot__prix":"200",
+			"facture_ligne__dot__prix_achat":"100",
+			"facture_ligne__dot__id_fournisseur":"1",
+			"facture_ligne__dot__serial":"777",
+			"facture_ligne__dot__id_compte_absystech":"1",
+			"facture_ligne__dot__marge":97.14,
+			"facture_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($this->facture,$this->s);
+		
+		$ret = ATF::facture()->_getPaye();
+
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne societe qui remonte. !");
+		$this->assertEquals("payee",$ret[0]['etat'],"Ce n'est pas la bon etat qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(100.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($id_affaire,$ret[0]['id_affaire_fk'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");	
+	}
+	/* @author Charlier Cyril <ccharlier@absystech.net>
+		Methode _getImpaye non testable pour le moment -> Tri sur retard -> champ inexistant 
+	*/
+	/*
+	public function test_getImpaye() {
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$this->id_devis = ATF::devis()->insert($devis,$this->s);
+		$this->id_affaire = ATF::devis()->select($this->id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$this->id_affaire;
+		$this->commande["commande"]["id_devis"]=$this->id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('2000-m-d');
+		$this->facture["facture"]["id_affaire"]=$this->id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="impayee";
+
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		
+		//Facture_ligne
+		$this->facture["values_facture"]=array("produits"=>'[{
+			"facture_ligne__dot__ref":"TU payee",
+			"facture_ligne__dot__produit":"Tu_facture impayee",
+			"facture_ligne__dot__quantite":"15",
+			"facture_ligne__dot__prix":"200",
+			"facture_ligne__dot__prix_achat":"100",
+			"facture_ligne__dot__id_fournisseur":"1",
+			"facture_ligne__dot__serial":"777",
+			"facture_ligne__dot__id_compte_absystech":"1",
+			"facture_ligne__dot__marge":97.14,
+			"facture_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($this->facture,$this->s);
+		
+		$ret = ATF::facture()->_getImpaye();
+
+		$this->assertEquals("TestTU",$ret[0]["id_societe"],"Ce n'est pas la bonne societe qui remonte. !");
+		$this->assertEquals("impayee",$ret[0]['etat'],"Ce n'est pas la bon etat qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret[0]["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(50.00,$ret[0]['frais_de_port'],"Ce n'est pas le bon frais de port qui remonte. !");	
+		$this->assertEquals($this->id_affaire,$ret[0]['id_affaire'],"Ce n'est pas le bon id affaire qui remonte. !");
+		$this->assertEquals($this->obj->decryptId($this->id_facture),$ret[0]['id_facture'],"Ce n'est pas le bon id facture qui remonte. !");	
+	}
+	*/
+	public function test_InsertAcompteWithoutFactureLigne(){ 
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+		$this->facture["facture"]["type_facture"]="acompte";
+
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		$this->facture["values_facture"]='';
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		try{
+			$facture = $this->obj->insert($this->facture,$this->s);
+		}catch(errorATF $e){
+			$errorMessage = $e->getMessage();
+			$errorCode = $e->getCode();
+			
+		}
+		$this->assertEquals(161,$errorCode,"Ce n'est pas le bon code d'erreur");
+		$this->assertEquals("Une facture doit comporter au moins une ligne.",$errorMessage,"Ce n'est pas le bon message d'erreur");
+	}
+
+	public function test_InsertWithoutSociete(){ 
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+		$this->facture["facture"]["type_facture"]="acompte";
+		$this->facture["id_societe"]= "";
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"],$this->facture["facture"]["id_societe"]);
+		try{
+			$facture = $this->obj->insert($this->facture,$this->s);
+		}catch(errorATF $e){
+			$errorMessage = $e->getMessage();
+			$errorCode = $e->getCode();
+			
+		}
+		$this->assertEquals(167,$errorCode,"Ce n'est pas le bon code d'erreur");
+		$this->assertEquals("Vous devez spécifier la société (Entité)",$errorMessage,"Ce n'est pas le bon message d'erreur");
+	}
+	public function test_InsertWithSocieteFermee(){ 
+		
+		$this->contact =ATF::contact()->i(array(
+			'civilite' => 'M',
+			'nom'=>"Test",
+			'prenom'=>"Test"
+		));
+		$societe =ATF::societe()->i(array(
+			"societe"=>"societe TEST TU",
+			"etat"=> "inactif",
+			"id_commercial"=> $this->contact
+		));
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		//Devis_ligne
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+		$this->facture["facture"]["type_facture"]="acompte";
+		$this->facture["id_societe"]= "";
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		$this->facture["facture"]['id_societe']=$societe;
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		try{
+			$facture = $this->obj->insert($this->facture,$this->s);
+		}catch(errorATF $e){
+			$errorMessage = $e->getMessage();
+			$errorCode = $e->getCode();
+			
+		}
+		$this->assertEquals(12,$errorCode,"Ce n'est pas le bon code d'erreur");
+		$this->assertEquals("Impossible d'ajouter une facture sur une entité fermée",$errorMessage,"Ce n'est pas le bon message d'erreur");
+	}
+	public function test_insertWithoutDevis(){ 
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU",
+			"devis_ligne__dot__produit":"Tu_devis",
+			"devis_ligne__dot__quantite":"15",
+			"devis_ligne__dot__poids":"10",
+			"devis_ligne__dot__prix":"10",
+			"devis_ligne__dot__prix_achat":"10",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":97.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+		$this->facture["facture"]["type_facture"]="acompte";
+		$this->facture["id_societe"]= "";
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		$this->facture["facture"]['affaire_sans_devis'] = true;
+
+		$facture["values_facture"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		try{
+			$facture = $this->obj->insert($this->facture,$this->s);
+		}catch(errorATF $e){
+			$errorMessage = $e->getMessage();
+			$errorCode = $e->getCode();
+			
+		}
+		$this->assertEquals(162,$errorCode,"Ce n'est pas le bon code d'erreur");
+		$this->assertEquals("Pour une affaire sans devis, il faut saisir un libellé de votre choix.",$errorMessage,"Ce n'est pas le bon message d'erreur");
+	}
+	public function test_insertWithDevisLibelle(){ 
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU",
+			"devis_ligne__dot__produit":"Tu_devis",
+			"devis_ligne__dot__quantite":"15",
+			"devis_ligne__dot__poids":"10",
+			"devis_ligne__dot__prix":"10",
+			"devis_ligne__dot__prix_achat":"10",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":97.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+		$this->facture["facture"]["type_facture"]="facture";
+		$this->facture["id_societe"]= "";
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		$this->facture["facture"]['affaire_sans_devis'] = true;
+		$this->facture["facture"]['affaire_sans_devis_libelle'] = "affaireSansDevisTest";
+
+		$facture["values_facture"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+		//Insertion
+		unset($this->facture["facture"]["resume"],$this->facture["facture"]["prix_achat"],$this->facture["facture"]["id_devis"]);
+		$facture = $this->obj->insert($this->facture,$this->s);
+		$ret = $this->obj->select($this->obj->decryptId($facture));
+
+		$this->assertEquals($this->id_societe,$ret["id_societe"],"Ce n'est pas la bonne societe qui remonte. !");
+		$this->assertEquals($id_affaire,$ret['id_affaire'],"Ce n'est pas la bonne affaire qui remonte. !");
+		$this->assertEquals(date('Y-m-d'),$ret["date"],"Ce n'est pas la bonne date qui remonte. !");
+		$this->assertEquals(2,$ret['id_termes'],"Ce n'est pas le bon terme qui remonte. !");
+		$this->assertEquals(100.00,$ret['frais_de_port'],"Ce n'est pas le frais de port etat qui remonte. !");	
+
+
+	}
+	public function test_insertWithoutAffaire(){ 
+		//Devis
+		$devis["devis"]["id_contact"]=$this->id_contact;
+		$devis["devis"]['resume']='Tu_devis_filter';
+		$devis["devis"]["date"]=date('Y-m-d');
+		$devis["devis"]['id_societe']=$this->id_societe;
+		$devis["devis"]['validite']=date('Y-m-d');
+		$devis["devis"]['prix']="200";
+		$devis["devis"]['frais_de_port']="100";
+		$devis["devis"]['prix_achat']="550";
+		
+		$devis["values_devis"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU",
+			"devis_ligne__dot__produit":"Tu_devis",
+			"devis_ligne__dot__quantite":"15",
+			"devis_ligne__dot__poids":"10",
+			"devis_ligne__dot__prix":"10",
+			"devis_ligne__dot__prix_achat":"10",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":97.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+		//Insertion
+		$id_devis = ATF::devis()->insert($devis,$this->s);
+		$id_affaire = ATF::devis()->select($id_devis,"id_affaire");
+
+
+		$this->commande["commande"]=$devis["devis"];
+		$this->commande["commande"]["id_affaire"]=$id_affaire;
+		$this->commande["commande"]["id_devis"]=$id_devis;
+		unset($this->commande["commande"]["id_contact"],$this->commande["commande"]["validite"]);
+
+		$this->id_commande = ATF::commande()->insert($this->commande,$this->s);
+
+		$this->facture["facture"]=$this->commande["commande"];
+		$this->facture["facture"]["date"]=date('Y-m-d');
+		$this->facture["facture"]["id_affaire"]=$id_affaire;
+		$this->facture["facture"]["mode"]="facture";
+		$this->facture["facture"]["etat"]="payee";
+		$this->facture["facture"]["type_facture"]="acompte";
+		$this->facture["id_societe"]= "";
+		$this->facture["facture"]["id_termes"]=2;
+		$this->facture["facture"]["tva"]=5.2;
+		$facture["values_facture"]=array("produits"=>'[{
+			"devis_ligne__dot__ref":"TU filter",
+			"devis_ligne__dot__produit":"Tu_devis_filter",
+			"devis_ligne__dot__quantite":"10",
+			"devis_ligne__dot__poids":"15",
+			"devis_ligne__dot__prix":"1",
+			"devis_ligne__dot__prix_achat":"1",
+			"devis_ligne__dot__id_fournisseur":"1",
+			"devis_ligne__dot__id_compte_absystech":"1",
+			"devis_ligne__dot__marge":25.14,
+			"devis_ligne__dot__id_fournisseur_fk":"1"
+		}]');
+		//Insertion
+		unset(
+			$this->facture["facture"]["resume"],
+			$this->facture["facture"]["prix_achat"],
+			$this->facture["facture"]["id_devis"],
+			$this->facture["facture"]["id_affaire"]
+		);
+		try{
+			$facture = $this->obj->insert($this->facture,$this->s);
+		}catch(errorATF $e){
+			$errorMessage = $e->getMessage();
+			$errorCode = $e->getCode();
+		}
+		$this->assertEquals(160,$errorCode,"Ce n'est pas le bon code d'erreur");
+		$this->assertEquals("Vous devez spécifier une affaire, sinon cochez la case CREER AFFAIRE SANS DEVIS, alors une affaire sera créée avec pour nomination 'Libellé affaire sans devis'.",$errorMessage,"Ce n'est pas le bon message d'erreur");
+	}
+
 };
 ?>
