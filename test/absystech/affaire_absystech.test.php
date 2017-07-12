@@ -491,7 +491,35 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($devis['id_affaire'],ATF::affaire()->decryptId($r2[0]['id']),"Problème dans le relevé du id_affaire");
 		$this->assertEquals("smallIconFacture",$r2[0]['iconCls'],"Problème dans le relevé du iconCls");
 	}
+	/*@author Cyril Charlier <ccharlier@absystech.fr> */ 
+	public function test_ac(){
+		$get = array('q'=>'Tu_devis');
+		$ret=ATF::affaire()->_ac($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
 
+	}
+	/*@author Cyril Charlier <ccharlier@absystech.fr> */ 
+	public function test_acWithSociete(){
+		$get = array('id_societe'=>$this->id_societe);
+		$ret=ATF::affaire()->_ac($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+	}
+		public function test_acSpecialWithSearch(){
+		$test = ATF::affaire()->i(array("etat"=>"perdue","date"=>date('Y-m-d'),'affaire'=>"Affaire perdue Test",'id_societe'=>$this->id_societe));
+		$get = array('q'=>'Tu_devis');
+		$ret=ATF::affaire()->_acSpecial($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+	}
+	public function test_acSpecialWithSociete(){
+		$test = ATF::affaire()->i(array("etat"=>"perdue","date"=>date('Y-m-d'),'affaire'=>"Affaire perdue Test",'id_societe'=>$this->id_societe));
+		$get = array('id_societe'=>$this->id_societe);
+		$ret=ATF::affaire()->_acSpecial($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+	}
 
 };
 
