@@ -34,5 +34,25 @@ class produit_test extends ATF_PHPUnit_Framework_TestCase {
 		$produit=$this->obj->select($id_produit);
 		$this->assertEquals($id_produit,$produit["id_produit"],"select ne renvoie pas la bon produit");
 	}
+	public function test_autocompleteConsommable(){
+		ATF::produit()->i(array("ref"=>"TestRef","produit"=>"TestProduit","description"=>"ceci est un test","prix"=>10.10,"id_fabriquant"=>20,"id_sous_categorie"=>5));
+		$get = array("query"=>"TestRef","limit"=>'2');
+		$ret = ATF::produit()->autocompleteConsommable($get);
+		$get = array("description"=>"ceci est un test");
+
+		$this->assertEquals(1,count($ret),"Devrait retourner un seul produit");
+		$this->assertEquals("TestProduit",$ret[0][0],"Ne retourne pas le bon produit");
+		$this->assertEquals("TestRef",$ret[0][5],"Ne retourne pas la bonne reference");
+		$this->assertEquals(10.10,$ret[0][2],"Ne retourne pas le bon prix");
+	}
+	public function test_ac(){
+		$get = array("q"=>"TestRef");
+		ATF::produit()->i(array("ref"=>"TestRef","produit"=>"TestProduit","description"=>"ceci est un test","prix"=>10.10,"id_fabriquant"=>20,"id_sous_categorie"=>5));
+		$ret = ATF::produit()->_ac($get);
+		$this->assertEquals(1,count($ret),"Devrait retourner un seul produit");
+		$this->assertEquals("TestProduit",$ret[0]["produit"],"Ne retourne pas le bon produit");
+		$this->assertEquals("TestRef",$ret[0]["ref"],"Ne retourne pas la bonne reference");
+		$this->assertEquals(10.10,$ret[0]["prix"],"Ne retourne pas le bon prix");
+	}
 };
 ?>
