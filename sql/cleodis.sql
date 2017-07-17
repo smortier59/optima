@@ -1,3 +1,4 @@
+
 #16045 - Facturation loyer libératoire
 ALTER TABLE `loyer` ADD `type` ENUM('engagement','liberatoire') NOT NULL DEFAULT 'engagement' AFTER `duree`;
 ALTER TABLE `facturation` CHANGE `type` `type` ENUM('contrat','prolongation','liberatoire') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'contrat';

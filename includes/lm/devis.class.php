@@ -1807,7 +1807,6 @@ class devis_lm extends devis {
 
 
 		}catch(errorATF $e){
-			log::logger($e->getMessage() , "mfleurquin");
 			ATF::db($this->db)->rollback_transaction();
 		}
 

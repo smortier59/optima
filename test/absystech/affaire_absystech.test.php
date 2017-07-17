@@ -491,8 +491,128 @@ class affaire_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($devis['id_affaire'],ATF::affaire()->decryptId($r2[0]['id']),"Problème dans le relevé du id_affaire");
 		$this->assertEquals("smallIconFacture",$r2[0]['iconCls'],"Problème dans le relevé du iconCls");
 	}
+	/*@author Cyril Charlier <ccharlier@absystech.fr> */ 
+	public function test_ac(){
+		$get = array('q'=>'Tu_devis');
+		$ret=ATF::affaire()->_ac($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+
+	}
+	/*@author Cyril Charlier <ccharlier@absystech.fr> */ 
+	public function test_acWithSociete(){
+		$get = array('id_societe'=>$this->id_societe);
+		$ret=ATF::affaire()->_ac($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+	}
+	public function test_acSpecialWithSearch(){
+		ATF::affaire()->i(array("etat"=>"perdue","date"=>date('Y-m-d'),'affaire'=>"Affaire perdue Test",'id_societe'=>$this->id_societe));
+		$get = array('q'=>'Tu_devis');
+		$ret=ATF::affaire()->_acSpecial($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+	}
+	public function test_acSpecialWithSociete(){
+		$test = ATF::affaire()->i(array("etat"=>"perdue","date"=>date('Y-m-d'),'affaire'=>"Affaire perdue Test",'id_societe'=>$this->id_societe));
+		$get = array('id_societe'=>$this->id_societe);
+		$ret=ATF::affaire()->_acSpecial($get);
+		$this->assertEquals("Tu_devis",$ret[0]['affaire'],"Problème dans le retour affaire");
+		$this->assertEquals(1,count($ret),"Problème dans le relevé du nom");
+	}
+	public function test_getSearchFilterDevis(){
+		$id_affaire = ATF::affaire()->i(array("date"=>date('Y-m-d'),'affaire'=>"Affaire test filter",'id_societe'=>$this->id_societe,"etat"=>"devis"));
+		$get = array(
+			"search" => 'TestTU',
+			"filters" => array('devis'=>'on')
+		);
+		$ret = ATF::affaire()->_GET($get);
+
+		$this->assertEquals($id_affaire,$ret[0]['id_affaire'],"Mauvais id affaire retourné");
+
+		$this->assertEquals("TestTU",$ret[0]['societe.societe'],"Mauvaise societé retournée");
+		$this->assertEquals("vente",$ret[0]['nature'],"Mauvaise nature retournée");
+		$this->assertEquals("devis",$ret[0]['etat'],"Mauvais etat retournée");
+	}
+	public function test_getSearchFilterCommande(){
+		$id_affaire = ATF::affaire()->i(array("date"=>date('Y-m-d'),'affaire'=>"Affaire test filter",'id_societe'=>$this->id_societe,"etat"=>"commande"));
+		$get = array(
+			"search" => 'TestTU',
+			"filters" => array('commande'=>'on')
+		);
+		$ret = ATF::affaire()->_GET($get);
+
+		$this->assertEquals($id_affaire,$ret[0]['id_affaire'],"Mauvais id affaire retourné");
+
+		$this->assertEquals("TestTU",$ret[0]['societe.societe'],"Mauvaise societé retournée");
+		$this->assertEquals("vente",$ret[0]['nature'],"Mauvaise nature retournée");
+		$this->assertEquals("commande",$ret[0]['etat'],"Mauvais etat retournée");
+	}
+	public function test_getSearchFilterFacture(){
+		$id_affaire = ATF::affaire()->i(array("date"=>date('Y-m-d'),'affaire'=>"Affaire test filter",'id_societe'=>$this->id_societe,"etat"=>"facture"));
+		$get = array(
+			"search" => 'TestTU',
+			"filters" => array('facture'=>'on')
+		);
+		$ret = ATF::affaire()->_GET($get);
+
+		//$this->assertEquals($id_affaire,$ret[0]['id_affaire'],"Mauvais id affaire retourné");
+
+		$this->assertEquals("TestTU",$ret[0]['societe.societe'],"Mauvaise societé retournée");
+		$this->assertEquals("vente",$ret[0]['nature'],"Mauvaise nature retournée");
+		$this->assertEquals("facture",$ret[0]['etat'],"Mauvais etat retournée");
+	}
+	public function test_getSearchFilterTerminee(){
+		$id_affaire = ATF::affaire()->i(array("date"=>date('Y-m-d'),'affaire'=>"Affaire test filter",'id_societe'=>$this->id_societe,"etat"=>"terminee"));
+		$get = array(
+			"search" => 'TestTU',
+			"filters" => array('terminee'=>'on')
+		);
+		$ret = ATF::affaire()->_GET($get);
+
+		$this->assertEquals($id_affaire,$ret[0]['id_affaire'],"Mauvais id affaire retourné");
+
+		$this->assertEquals("TestTU",$ret[0]['societe.societe'],"Mauvaise societé retournée");
+		$this->assertEquals("vente",$ret[0]['nature'],"Mauvaise nature retournée");
+		$this->assertEquals("terminee",$ret[0]['etat'],"Mauvais etat retournée");
+	}
+	public function test_getSearchFilterPerdue(){
+		$id_affaire = ATF::affaire()->i(array("date"=>date('Y-m-d'),'affaire'=>"Affaire test filter",'id_societe'=>$this->id_societe,"etat"=>"perdue"));
+		$get = array(
+			"search" => 'TestTU',
+			"filters" => array('perdue'=>'on')
+		);
+		$ret = ATF::affaire()->_GET($get);
+
+		$this->assertEquals($id_affaire,$ret[0]['id_affaire'],"Mauvais id affaire retourné");
+
+		$this->assertEquals("TestTU",$ret[0]['societe.societe'],"Mauvaise societé retournée");
+		$this->assertEquals("vente",$ret[0]['nature'],"Mauvaise nature retournée");
+		$this->assertEquals("perdue",$ret[0]['etat'],"Mauvais etat retournée");
+	}
+	public function test_getWithAffaire(){
+		$get = array("id_affaire" => $this->id_affaire);
+		$ret = ATF::affaire()->_GET($get);
+		$this->assertEquals($this->id_affaire,$ret['id_affaire'],"Mauvais id affaire retourné");
+
+		$this->assertEquals("vente",$ret['nature'],"Mauvaise nature retournée");
+		$this->assertEquals("c. unitaire",$ret['devis'][0]["user"],"Mauvais user devis retournée");
+		$this->assertEquals("DSO17070001",$ret['devis'][0]["ref"],"Mauvaise ref retournée");
+		$this->assertEquals("Tu_devis",$ret['devis'][0]["resume"],"Mauvais user devis retournée");
+
+		$this->assertEquals("FR",$ret['societe']['id_pays'],"Mauvaise pays societé retournée");
+		$this->assertEquals("139 rue des arts",$ret['societe']['adresse'],"Mauvaise adresse societe retournée");
+		$this->assertEquals("TestTU",$ret['societe']['societe'],"Mauvaise societe retournée");
+		$this->assertEquals(59100,$ret['societe']["cp"],"Mauvais cp retourné");
 
 
+		$this->assertEquals("tutul",$ret['user']['login'],"Mauvaise login user retournée");
+		$this->assertEquals("normal",$ret['user']['etat'],"Mauvais etat user retourné");
+		$this->assertEquals("class:",$ret['user']['prenom'],"Mauvais prenom user retourné");
+		$this->assertEquals("unitaire",$ret['user']["nom"],"Mauvais nom user retourné");
+		$this->assertEquals("debug@absystech.fr",$ret['user']["email"],"Mauvais email user retourné");
+	}
+	
 };
 
 class mockObject1 extends classes_optima {

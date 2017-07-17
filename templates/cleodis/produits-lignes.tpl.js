@@ -153,7 +153,7 @@ ATF.buildGridEditor({
 					grid.startEditing(idx, 0);
 	
 					var records = Ext.ComponentMgr.get('{$id}').store.getRange();
-					records[idx].set('{$current_class->table}__dot__visibilite_prix','visible');
+					records[idx].set('{$current_class->table}__dot__visibilite_prix','invisible');
 					records[idx].set('{$current_class->table}__dot__neuf','oui');
 				}
 		{else}

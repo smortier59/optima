@@ -31,7 +31,7 @@
 			fields: [
 				'myId',
 				'displayText'
-			],			
+			],
 			data: [
 				{if $est_nul}
 					['', '{$item.libNull|default:"-"}'],
@@ -55,13 +55,15 @@
 					Ext.getCmp('panel_dates_facture').hide();
 					Ext.getCmp('panel_dates_facture_libre').hide();
 					Ext.getCmp('combofacture[type_libre]').disable();
-					Ext.getCmp('combofacture[redevance]').disable();					
-				}else if(n.data.myId=='facture'){										
+					Ext.getCmp('combofacture[nature]').disable();
+					Ext.getCmp('combofacture[redevance]').disable();
+				}else if(n.data.myId=='facture'){
 					Ext.getCmp('panel_refi').hide();
 					Ext.getCmp('panel_midas').hide();
 					Ext.getCmp('panel_dates_facture').show();
 					Ext.getCmp('panel_dates_facture_libre').hide();
 					Ext.getCmp('combofacture[type_libre]').disable();
+					Ext.getCmp('combofacture[nature]').disable();
 					Ext.getCmp('combofacture[redevance]').disable();
 				}else if(n.data.myId=='libre'){
 					Ext.getCmp('panel_refi').hide();
@@ -73,12 +75,15 @@
 					Ext.getCmp('facture[prix_libre]').show();
 					Ext.getCmp('combofacture[type_libre]').enable();
 					Ext.getCmp('combofacture[redevance]').enable();
+					Ext.getCmp('combofacture[nature]').enable();
 				}else if(n.data.myId=='ap'){
 					Ext.getCmp('panel_midas').hide();
-					Ext.getCmp('combofacture[type_libre]').disable();					
+					Ext.getCmp('combofacture[type_libre]').disable();
+					Ext.getCmp('combofacture[nature]').disable();
 					Ext.getCmp('combofacture[redevance]').disable();
 				}else if(n.data.myId=='midas'){
 					Ext.getCmp('panel_midas').show();
+					Ext.getCmp('combofacture[nature]').disable();
 					Ext.getCmp('panel_refi').hide();
 					Ext.getCmp('panel_dates_facture').hide();
 					Ext.getCmp('panel_dates_facture_libre').hide();
@@ -106,6 +111,6 @@
 		{if $renderTo  || $item.hidden},renderTo:'{$renderTo|escape:javascript}'{/if}
 		{if $anchor || $item.anchor},anchor:'{$anchor|default:$item.anchor}%'{/if}
 		{if $style || $item.style},style:'{$style|default:$item.style}'{/if}
-		{if $width || $item.width},width:{$width|default:$item.width}{/if}				
-		
+		{if $width || $item.width},width:{$width|default:$item.width}{/if}
+
 	}

@@ -19,33 +19,31 @@ class suivi_absystech extends suivi {
 
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 
-		// if($infos["suivi"]["suivi_from_mail"][0]){
-		// 	$mail = 'optima.'.ATF::$codename.'.suivi@absystech.fr';
-		// 	$host = "zimbra.absystech.net";
-		// 	$port = 143;
-		// 	$password = "az78qs45";
+		if($infos["suivi"]["suivi_from_mail"][0]){
+			$mail = 'optima.'.ATF::$codename.'.suivi@absystech.net';
+			$host = "zimbra.absystech.net";
+			$port = 143;
+			$password = ATF::$codename=="att"?"P272nqX4tG":"43b52RaNNz";
 
-		// 	ATF::imap()->init($host, $port, $mail, $password);
-		// 	if (ATF::imap()->error) { throw new errorATF(ATF::imap()->error);	}
-		// 	$mails = ATF::imap()->imap_fetch_overview('1:*');
+			ATF::imap()->init($host, $port, $mail, $password);
+			if (ATF::imap()->error) { throw new errorATF(ATF::imap()->error);	}
+			$mails = ATF::imap()->imap_fetch_overview('1:*');
 
-
-		// 	if (is_array($mails)){
-		// 		$i=0;
-		// 		while ($mails[$i]->subject." | ".$mails[$i]->from != $infos["suivi"]["suivi_from_mail"][0]) {
-		// 			$i++;
-		// 		}
-		// 		$mail = $mails[$i];
-
-
-		// 		$text = ATF::imap()->returnBody($mail->uid);
-		// 		$piece_jointe = ATF::imap()->get_attachments($mail->uid);
-
-		// 		$infos["suivi"]["texte"] .= "\n\nMail :\n\n".$text;
+			if (is_array($mails)){
+				$i=0;
+				while ($mails[$i]->subject." | ".$mails[$i]->from != $infos["suivi"]["suivi_from_mail"][0]) {
+					$i++;
+				}
+				$mail = $mails[$i];
 
 
-		// 	}
-		// }
+				$text = ATF::imap()->returnBody($mail->uid);
+				$piece_jointe = ATF::imap()->get_attachments($mail->uid);
+
+				$infos["suivi"]["texte"] .= "\n\nMail :\n\n".$text;
+
+			}
+		}
 		unset($infos["suivi"]["suivi_from_mail"]);
 
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
@@ -71,33 +69,33 @@ class suivi_absystech extends suivi {
 	}
 
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		// if($infos["suivi"]["suivi_from_mail"][0]){
-		// 	$mail = 'optima.'.ATF::$codename.'.suivi@absystech.fr';
-		// 	$host = "zimbra.absystech.net";
-		// 	$port = 143;
-		// 	$password = "az78qs45";
+		if($infos["suivi"]["suivi_from_mail"][0]){
+			$mail = 'optima.'.ATF::$codename.'.suivi@absystech.net';
+			$host = "zimbra.absystech.net";
+			$port = 143;
+			$password = ATF::$codename=="att"?"P272nqX4tG":"43b52RaNNz";
 
-		// 	ATF::imap()->init($host, $port, $mail, $password);
-		// 	if (ATF::imap()->error) { throw new errorATF(ATF::imap()->error);	}
-		// 	$mails = ATF::imap()->imap_fetch_overview('1:*');
-
-
-		// 	if (is_array($mails)){
-		// 		$i=0;
-		// 		while ($mails[$i]->subject." | ".$mails[$i]->from != $infos["suivi"]["suivi_from_mail"][0]) {
-		// 			$i++;
-		// 		}
-		// 		$mail = $mails[$i];
+			ATF::imap()->init($host, $port, $mail, $password);
+			if (ATF::imap()->error) { throw new errorATF(ATF::imap()->error);	}
+			$mails = ATF::imap()->imap_fetch_overview('1:*');
 
 
-		// 		$text = ATF::imap()->returnBody($mail->uid);
-		// 		$piece_jointe = ATF::imap()->get_attachments($mail->uid);
+			if (is_array($mails)){
+				$i=0;
+				while ($mails[$i]->subject." | ".$mails[$i]->from != $infos["suivi"]["suivi_from_mail"][0]) {
+					$i++;
+				}
+				$mail = $mails[$i];
 
-		// 		$infos["suivi"]["texte"] .= "\n\nMail :\n\n".$text;
+
+				$text = ATF::imap()->returnBody($mail->uid);
+				$piece_jointe = ATF::imap()->get_attachments($mail->uid);
+
+				$infos["suivi"]["texte"] .= "\n\nMail :\n\n".$text;
 
 
-		// 	}
-		// }
+			}
+		}
 		unset($infos["suivi"]["suivi_from_mail"]);
 
 		parent::update($infos,$s,NULL,$var=NULL,NULL,true);
