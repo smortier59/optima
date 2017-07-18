@@ -6,13 +6,12 @@ ATF::define("tracabilite",false);
 
 
 ATF::facture_fournisseur()->q->reset()->addAllFields("facture")
-						  ->whereIsNull("DATE_EXPORT_BAP","AND")
-						  ->where("facture_fournisseur.date",date("Y-m-d"),"AND",false,"<=");
+									  ->whereIsNull("DATE_EXPORT_BAP","AND")
+									  ->where("facture_fournisseur.date",date("Y-m-d"),"AND",false,"<=");
 
 $infos = array();
 if($factures = ATF::facture()->sa()){
 	$file = ATF::facture_fournisseur()->export_bap($infos,$factures);
-	log::logger($file,'ccharlier');
 	// fichier de test envoyé
 	$path = '/tmp/';
 	$myText = 'MyChain \n test';
@@ -31,8 +30,8 @@ if($factures = ATF::facture()->sa()){
 		echo "Le fichier $file a été chargé avec succès\n";
 		// Si le fichier a été chargé , envoyer un mail avec le nom du fichier
 		$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
-		$infos_mail["objet"] = "Export Comptable";
-		$infos_mail["recipient"] = 'ccharlier@absystech.net';
+		$infos_mail["objet"] = "Export Comptable BAP";
+		$infos_mail["recipient"] = 'mfleurquin@absystech.net';
 		$infos_mail["template"] = "invoice_cleodis_file_updated";
 		$info_mail["html"] = true;
 
@@ -44,7 +43,6 @@ if($factures = ATF::facture()->sa()){
 	} else {
 		echo "Il y a eu un problème lors du chargement du fichier $file\n";
 	}
-
 	// Fermeture de la connexion
 	ftp_close($conn_id);
 }
