@@ -474,20 +474,11 @@ class facture_absystech extends facture {
 		//*****************************Transaction********************************
 
 			// Affaire
-			if($infos["id_affaire"]){
-				$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
-				if ($etat_affaire=="devis" || $etat_affaire=="commande") {
-					$affaire["id_affaire"]=$infos["id_affaire"];
-					$affaire["etat"]="facture";
-					ATF::affaire()->u($affaire,$s);
-				}
-			} else {
-				$affaire["id_societe"]=$infos["id_societe"];
+			$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
+			if ($etat_affaire=="devis" || $etat_affaire=="commande") {
+				$affaire["id_affaire"]=$infos["id_affaire"];
 				$affaire["etat"]="facture";
-				$affaire["date"]=$infos["date"];
-				$affaire["forecast"]=100;
-				$affaire["affaire"]=$infos["affaire_sans_devis_libelle"];
-				$infos["id_affaire"]=ATF::affaire()->insert($affaire,$s);
+				ATF::affaire()->u($affaire,$s);
 			}
 			unset($infos["affaire_sans_devis_libelle"]);
 

@@ -2162,18 +2162,18 @@ class facture_lm extends facture {
 	public function export_GL_LM(&$infos,$invoice=null){
 
 
-		if($invoice){
-			$data = $invoice;
-		}else{
+		if($infos['onglet']){
 			$infos["display"] = true;
-
 			$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
 	        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
 	        $data = $this->sa();
+
+		}else{
+			$data = $invoice;
 		}
 
-
+		log::logger($data, "mfleurquin");
 
         $string = "";
         $total_debit = 0;
@@ -2181,6 +2181,8 @@ class facture_lm extends facture {
         $lignes = 0;
 
         $donnees = array();
+
+
 
         foreach ($data as $key => $value) {
         	$code_magasin = "M0380"; //Par defaut web
@@ -2190,6 +2192,8 @@ class facture_lm extends facture {
         	if(ATF::affaire()->select($value["facture.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin")){
         		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
         	}
+
+
 
         	//On recupere le 1er produit de la facture pour connaitre le pack et donc le rayon
         	ATF::facture_ligne()->q->reset()->where("id_facture",$value["facture.id_facture_fk"])
@@ -2354,13 +2358,14 @@ class facture_lm extends facture {
         $lignes++;
         $string .=  "0;".$lignes.";".date("Ymd");
 
-        if($invoice){
-        	return array("filename"=>$filename, "content"=>$string);
-        }else{
+        if($infos['onglet']){
         	header('Content-Type: application/fic');
 			header('Content-Disposition: attachment; filename="'.$filename.'"');
 
 	        echo $string;
+
+        }else{
+        	return array("filename"=>$filename, "content"=>$string);
         }
 
 

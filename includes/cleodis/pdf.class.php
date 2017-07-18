@@ -4377,6 +4377,7 @@ class pdf_cleodis extends pdf {
 		if(!$global){
 			$this->open();
 		}
+		$this->setHeader();
 		$this->addpage();
 		$this->setMargins(15,30);
 		$this->sety(10);
