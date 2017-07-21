@@ -1,3 +1,13 @@
+#Projet TOSHIBA
+#ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','top office','burger king','flunch','toshiba') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE `pack_produit_ligne` ADD `min` INT NOT NULL DEFAULT '0' AFTER `quantite`, ADD `max` INT NOT NULL DEFAULT '0' AFTER `min`;
+
+ALTER TABLE `produit` CHANGE `commentaire` `commentaire` VARCHAR(512) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+INSERT INTO `sous_categorie` (`id_sous_categorie`, `id_categorie`, `sous_categorie`) VALUES (NULL, '33', 'Lecteurs / Graveurs - DVD'), (NULL, '33', 'Stations d\'accueil'), (NULL, '33', 'Adaptateurs de voyage'), (NULL, '33', 'Réplicateurs de ports'), (NULL, '33', 'Adaptateur secteur'), (NULL, '33', 'Housses'), (NULL, '33', 'Sécurité'), (NULL, '33', 'Périphériques');
+
+
 
 #16045 - Facturation loyer libératoire
 ALTER TABLE `loyer` ADD `type` ENUM('engagement','liberatoire') NOT NULL DEFAULT 'engagement' AFTER `duree`;
