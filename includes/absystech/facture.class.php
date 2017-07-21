@@ -2192,7 +2192,7 @@ class facture_absystech extends facture {
 			log::logger("AFFECTATION ID EXPORT AUX FACTURES","export-comptable");
 			log::logger($facturesATraiter,"export-comptable");
 			foreach ($facturesATraiter as $key=>$id_facture) {
-				// ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
+				ATF::facture()->u(array("id_facture"=>$id_facture, "id_export_comptable"=>$id_export_comptable));
 				$countFactureTraitées++;
 			}
 			log::logger($countFactureTraitées." ID EXPORT RELIE AUX FACTURES","export-comptable");
