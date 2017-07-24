@@ -1216,6 +1216,7 @@ class societe_absystech extends societe {
 
 		$indicator["credit_restant"] = $this->getSolde($infos["id_societe"]);
 
+
 		$factures = ATF::facture()->ss("facture.id_societe",$infos["id_societe"]);
 
 		if (!$factures) return null;
@@ -1227,8 +1228,6 @@ class societe_absystech extends societe {
 		$indicator["retard"] = 0;
 
 		$last_year = date("Y")-1;
-
-
 
 		foreach ($factures as $key => $value) {
 			$date_edition = "";

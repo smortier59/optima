@@ -304,25 +304,55 @@ class echeancier extends classes_optima {
     if (!empty($input)) parse_str($input,$post);
     $return = array();
 
-
     if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-    // Si on fait un ajout de l'echeance
-    else {
-      // Insertion
-      $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
-      $post["prochaine_echeance"] = $post["prochaine_echeance"] ? date("Y-m-d",strtotime($post["prochaine_echeance"])) : $post["debut"];
 
-      unset($post["id_echeancier"],$post['custom']);
-      empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
-      try {
-        // Try / catch pour avoir une erreur 500 forcée
-        $result = $this->insert($post);
-      }catch(errorATF $e){
-        throw new errorATF($e->getMessage(),500);
-      }
-      $return['result'] = true;
-      $return['id_echeancier'] = $result;
+    if (!$post['id_societe']) throw new Exception("SOCIETE_MISSING",1001);
+    if (!$post['designation']) throw new Exception("DESIGNATION_MISSING",1002);
+    if (!$post['periodicite']) throw new Exception("PERIODICITE_MISSING",1003);
+    if (!$post['debut']) throw new Exception("DEBUT_CONTRAT_MISSING",1004);
+    if (!$post['prochaine_echeance']) throw new Exception("PROCHAINE_ECHEANCE_MISSING",1005);
+    if (!$post['jour_facture']) throw new Exception("JOUR_FACTURE_MISSING",1006);
+
+
+    if ($post['clone']) {
+      $clone = $post['clone'];
+      $importLinesFlag = $post['import_lines'] ? true : false;
+      unset($post['clone'], $post['import_lines']);
     }
+    // Si on fait un ajout de l'echeance
+    // Insertion
+    $post["debut"]=date("Y-m-d",strtotime($post["debut"]));
+    $post["prochaine_echeance"] = $post["prochaine_echeance"] ? date("Y-m-d",strtotime($post["prochaine_echeance"])) : $post["debut"];
+
+    unset($post["id_echeancier"],$post['custom']);
+    empty(rtrim($post['fin']))? $post['fin']= NULL :$post['fin']=date("Y-m-d",strtotime($post['fin']));
+
+    ATF::db($this->db)->begin_transaction();
+    try {
+      // Try / catch pour avoir une erreur 500 forcée
+      $result = $this->insert($post);
+      if ($clone && $importLinesFlag) {
+        ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$clone);
+        $lignes = ATF::echeancier_ligne_ponctuelle()->sa();
+        foreach ($lignes as $k=>$i) {
+          $i['id_echeancier'] = $result;
+          ATF::echeancier_ligne_ponctuelle()->i($i);
+        }
+        ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$clone);
+        $lignes = ATF::echeancier_ligne_periodique()->sa();
+        foreach ($lignes as $k=>$i) {
+          $i['id_echeancier'] = $result;
+          ATF::echeancier_ligne_periodique()->i($i);
+        }
+      }
+    } catch (Exception $e) {
+      ATF::db($this->db)->rollback_transaction();
+      throw $e;
+      // throw new errorATF($e->getMessage(),500);
+    }
+    ATF::db($this->db)->commit_transaction();
+    $return['result'] = true;
+    $return['id_echeancier'] = $result;
     return $return;
   }
 
