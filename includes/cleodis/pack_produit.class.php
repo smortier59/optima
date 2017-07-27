@@ -1,5 +1,5 @@
 <?
-/** Classe pack_produit 
+/** Classe pack_produit
 * @package Optima
 * @subpackage Cléodis
 */
@@ -8,31 +8,31 @@ class pack_produit extends classes_optima {
 	public static $autocompleteMapping = array(
 		array("name"=>'id_pack_produit', "mapping"=>0),
 		array("name"=>'nom', "mapping"=>1),
-		array("name"=>'site_associe', "mapping"=>2)		
+		array("name"=>'site_associe', "mapping"=>2)
 	);
 
 
 	function __construct($table_or_id=NULL) {
-		$this->table ="pack_produit"; 
+		$this->table ="pack_produit";
 		parent::__construct($table_or_id);
-		
+
 		$this->colonnes['fields_column'] = array(
 			 'pack_produit.nom'
 			,'pack_produit.site_associe'
 			,'loyer'=>array("width"=>80,"rowEditor"=>"setInfos")
 			,'duree'=>array("width"=>80,"rowEditor"=>"setInfos")
-			,'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)				
+			,'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)
 		);
-		
-		$this->colonnes['primary'] = array(		 
+
+		$this->colonnes['primary'] = array(
 			 'nom'
-			,'site_associe'	
-			,'etat'	
+			,'site_associe'
+			,'etat'
 			,'id_pack_produit_besoin'
 			,'id_pack_produit_produit'
 		);
-	
-		
+
+
 
 		$this->colonnes['panel']['lignes'] = array(
 			"produits"=>array("custom"=>true)
@@ -41,25 +41,25 @@ class pack_produit extends classes_optima {
 		$this->colonnes['panel']['lignes_non_visible'] = array(
 			"produits_non_visible"=>array("custom"=>true)
 		);
-		
+
 		// Propriété des panels
-		
+
 		$this->panels['lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['lignes_non_visible'] = array("visible"=>true, 'nbCols'=>1);
 
-		
+
 		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->field_nom = "nom";
-		
-		$this->fieldstructure();			
+
+		$this->fieldstructure();
 
 		$this->onglets = array('pack_produit_ligne');
-		
-		
-		$this->formExt=true;		
+
+
+		$this->formExt=true;
 		//$this->no_delete = true;
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("EtatUpdate");
@@ -68,13 +68,13 @@ class pack_produit extends classes_optima {
 	/**
     * Surcharge de la méthode autocomplete pour faire apparaître sous_catégorie et catégorie
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @param array $infos 
-    * @return int  id si enregistrement ok 
-    */   	
+	* @param array $infos
+    * @return int  id si enregistrement ok
+    */
 	function autocomplete($infos) {
-			
+
 			// Récupérer les produits
-			$this->q->reset()				
+			$this->q->reset()
 				->addField("id_pack_produit")
 				->addField("nom")
 				->addField("site_associe");
@@ -96,13 +96,13 @@ class pack_produit extends classes_optima {
 				loc::mt(ATF::$usr->trans("notice_update_success"))
 				,ATF::$usr->trans("notice_success_title")
 			);
-		}		
+		}
 	}
 	public function EtatUpdate($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
-        
+
         $data["id_pack_produit"] = $this->decryptId($infos["id_pack_produit"]);
         $data[$infos["field"]] = $infos[$infos["field"]];
-               
+
         if ($r=$this->u($data)) {
             ATF::$msg->addNotice(loc::mt(ATF::$usr->trans("notice_update_success")));
         }
@@ -111,27 +111,27 @@ class pack_produit extends classes_optima {
 
 
 
-	/** 
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes de pack_produit de créer l'affaire si elle n'existe pas
 	* @author Morgan FLEURQUIN <mfleruquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
-	* @param array &$s La session	
+	* @param array &$s La session
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
-	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){		
+	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 
 		$this->infoCollapse($infos);
-		
+
 		$infos["url"] = util::mod_rewrite($infos["nom"],1,true);
-		
+
 
 		ATF::db($this->db)->begin_transaction();
-			
+
 		$last_id=parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
-			
+
 		//Lignes non visibles
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
@@ -139,7 +139,7 @@ class pack_produit extends classes_optima {
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
 			}
 		}
-		
+
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"pack_produit_ligne");
@@ -148,21 +148,21 @@ class pack_produit extends classes_optima {
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
-				}				
+				}
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("pack_produit sans produits",877);
-		}		
+		}
 		ATF::db($this->db)->commit_transaction();
 
 
 		if(is_array($cadre_refreshed)){	ATF::pack_produit()->redirection("select",$last_id); }
 		return $last_id;
 	}
-	
-	/** 
+
+	/**
 	* corrige les lignes de pack_produit
 	* @author Morgan FLEURQUIN <mfleruquin@absystech.fr>
 	* @param array $infos_ligne ligne de pack_produit
@@ -185,7 +185,7 @@ class pack_produit extends classes_optima {
 		return $infos_ligne_escapeDot;
 	}
 
-	/** 
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes de pack_produit de créer l'affaire si elle n'existe pas
 	* @author Morgan FLEURQUIN <mfleruquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -199,8 +199,8 @@ class pack_produit extends classes_optima {
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 
 		$this->infoCollapse($infos);
-		
-		
+
+
 
 		if(!$infos["url"]){
 			$infos["url"] = util::mod_rewrite($infos["nom"],1,true);
@@ -218,9 +218,9 @@ class pack_produit extends classes_optima {
 		}
 
 		ATF::db($this->db)->begin_transaction();
-			
+
 		parent::update($infos,$s,$files,$cadre_refreshed,$nolog);
-			
+
 		//Lignes non visibles
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
@@ -228,7 +228,7 @@ class pack_produit extends classes_optima {
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
 			}
 		}
-		
+
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"pack_produit_ligne");
@@ -237,19 +237,25 @@ class pack_produit extends classes_optima {
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
-				}				
+				}
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("pack_produit sans produits",877);
-		}		
+		}
 		ATF::db($this->db)->commit_transaction();
 
 
 		if(is_array($cadre_refreshed)){	ATF::pack_produit()->redirection("select",$last_id); }
 		return $last_id;
 	}
+
+	public function _getBase($get, $post){
+		$path = ATF::pack_produit()->filepath($get['id'],"photo");
+		$data = file_get_contents($path);
+  	return base64_encode($data);
+  }
 
 }
 ?>

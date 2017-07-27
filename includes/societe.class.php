@@ -1604,4 +1604,9 @@ class societe extends classes_optima {
 		return $this->select_all();
 	}
 
+
+	public function _getInfosFromCREDITSAFE($get, $post){
+	  return self::getInfosFromCREDITSAFE($get);
+	}
+
 }
