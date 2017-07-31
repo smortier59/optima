@@ -685,8 +685,6 @@ class facture_cleodis extends facture {
 				$nbDInPeriode = 365;
 				$dateYear = strtotime('first day of January '.date('Y'));
 				$days_difference = (strtotime($infos["date_installation_reel"])- $dateYear)/24/3600;
-				log::logger('start semestre','ccharlier');
-				log::logger(date('d-m-Y',$days_difference),'ccharlier');
 
 			}
 			//Calcul du bon prix par rapport à la frequence
@@ -695,46 +693,50 @@ class facture_cleodis extends facture {
 			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
 			$total = $loyerAuJour * $nbJProRata;
 
-			$facture["facture"] = array(
-	            "id_societe" => $affaire["id_societe"],
-	            "type_facture" => "libre",
-	            "mode_paiement" => "prelevement",
-	            "id_affaire" => $affaire["id_affaire"],
-	            "type_libre" => "normale",
-	            "date" => date("d-m-Y"),
-	            "id_commande" => $commande["id_commande"],
-	            "date_previsionnelle" => date("d-m-Y"),
-	            "date_periode_debut" => $infos["date_installation_reel"],
-	            "date_periode_fin" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
-	            "prix" => round($total, 2),
-	            "date_periode_debut_libre" => $infos["date_installation_reel"],
-	            "date_periode_fin_libre" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
-	            "prix_libre" => round($total, 2),
-	            "nature" => "prorata"
-	        );
+			if($nbJProRata > 0 && $total != 0){
+				$facture["facture"] = array(
+		            "id_societe" => $affaire["id_societe"],
+		            "type_facture" => "libre",
+		            "mode_paiement" => "prelevement",
+		            "id_affaire" => $affaire["id_affaire"],
+		            "type_libre" => "normale",
+		            "date" => date("d-m-Y"),
+		            "id_commande" => $commande["id_commande"],
+		            "date_previsionnelle" => date("d-m-Y"),
+		            "date_periode_debut" => $infos["date_installation_reel"],
+		            "date_periode_fin" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
+		            "prix" => round($total, 2),
+		            "date_periode_debut_libre" => $infos["date_installation_reel"],
+		            "date_periode_fin_libre" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
+		            "prix_libre" => round($total, 2),
+		            "nature" => "prorata"
+		        );
 
-			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
-			$lignes = ATF::commande_ligne()->select_all();
+				ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+				$lignes = ATF::commande_ligne()->select_all();
 
-			foreach ($lignes as $key => $value) {
-				$ligne = array();
-				$ligne["facture_ligne__dot__produit"] = $value["produit"];
-	            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
-	            $ligne["facture_ligne__dot__ref"] = $value["ref"];
-	            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
-	            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
-	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
-	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
-	            $ligne["facture_ligne__dot__serial"] = $value["serial"];
-	            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
-	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+				foreach ($lignes as $key => $value) {
+					$ligne = array();
+					$ligne["facture_ligne__dot__produit"] = $value["produit"];
+		            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+		            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+		            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+		            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+		            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+		            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+		            $ligne["facture_ligne__dot__serial"] = $value["serial"];
+		            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
+		            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
-	            $facture["values_facture"]["produits"][] = $ligne;
+		            $facture["values_facture"]["produits"][] = $ligne;
+				}
+
+				$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
+		        $this->insert($facture);
 			}
 
-			$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
 
-	        $this->insert($facture);
 		}
 	}
 
@@ -764,50 +766,53 @@ class facture_cleodis extends facture {
 											date("Y", strtotime($infos["date_debut_contrat"])));
 
 		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
-		$facture["facture"] = array(
-            "id_societe" => $affaire["id_societe"],
-            "type_facture" => "libre",
-            "type_libre" => "normale",
-            "mode_paiement" => "prelevement",
-            "id_affaire" => $affaire["id_affaire"],
-            "date" => date("d-m-Y"),
-            "id_commande" => $commande["id_commande"],
-            "date_previsionnelle" => $date_previsionnelle,
-            "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
-            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
-            "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
-			"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
-            "prix_libre" => round($totalLoyer, 2),
-            "prix" => round($totalLoyer, 2),
-            "nature" => "engagement"
-        );
+
+		if($total != 0){
+			$facture["facture"] = array(
+	            "id_societe" => $affaire["id_societe"],
+	            "type_facture" => "libre",
+	            "type_libre" => "normale",
+	            "mode_paiement" => "prelevement",
+	            "id_affaire" => $affaire["id_affaire"],
+	            "date" => date("d-m-Y"),
+	            "id_commande" => $commande["id_commande"],
+	            "date_previsionnelle" => $date_previsionnelle,
+	            "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+	            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+	            "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+				"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+	            "prix_libre" => round($totalLoyer, 2),
+	            "prix" => round($totalLoyer, 2),
+	            "nature" => "engagement"
+	        );
 
 
-        ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
-		$lignes = ATF::commande_ligne()->select_all();
+	        ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+			$lignes = ATF::commande_ligne()->select_all();
 
-		foreach ($lignes as $key => $value) {
-			$ligne = array();
-			$ligne["facture_ligne__dot__produit"] = $value["produit"];
-            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
-            $ligne["facture_ligne__dot__ref"] = $value["ref"];
-            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
-            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
-            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
-            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
-            $ligne["facture_ligne__dot__serial"] = $value["serial"];
-            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
-            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+			foreach ($lignes as $key => $value) {
+				$ligne = array();
+				$ligne["facture_ligne__dot__produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+	            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+	            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+	            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+	            $ligne["facture_ligne__dot__serial"] = $value["serial"];
+	            $ligne["facture_ligne__dot__afficher"] = $value["visible"];
+	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
 
-            $facture["values_facture"]["produits"][] = $ligne;
-		}
+	            $facture["values_facture"]["produits"][] = $ligne;
+			}
 
-		$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+			$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
 
 
-        $id_facture = $this->insert($facture);
+	        $id_facture = $this->insert($facture);
 
-        $this->libreToNormale(array("id_facture"=> $id_facture));
+	        $this->libreToNormale(array("id_facture"=> $id_facture));
+	    }
 
 
 	}

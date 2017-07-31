@@ -914,6 +914,11 @@ class societe extends classes_optima {
 
 		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
 		$company = $item->CompanyIdentification;
+
+		$bi = $xml->xmlresponse->body->company->baseinformation;
+		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+
 		// Nom de société
 		$return['societe'] = (string)$company->BasicInformation->BusinessName;
 		// Pays de société
@@ -981,6 +986,12 @@ class societe extends classes_optima {
 
 		// Charges financières
 		$return['financialcharges'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", "");
+
+
+		$return["resultat_exploitation"] = number_format(intval((string)$b->balancesheet->profitloss->operatingprofitloss) , 0, ",", "");
+		$return["capital_social"] = number_format(intval((string)$bi->sharecapital) , 0, ",", "");
+		$return["capitaux_propres"] = number_format(intval((string)$b->balancesheet->passiveaccount->shareholdersequity) , 0, ",", "");
+		$return["dettes_financieres"] = number_format(intval((string)$b->balancesheet->passiveaccount->financialliabilities) , 0, ",", "");
 
 		// ETAT
 		switch ((string)$company->BasicInformation->CompanyStatus->Code) {
@@ -1604,9 +1615,5 @@ class societe extends classes_optima {
 		return $this->select_all();
 	}
 
-
-	public function _getInfosFromCREDITSAFE($get, $post){
-	  return self::getInfosFromCREDITSAFE($get);
-	}
 
 }
