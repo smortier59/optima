@@ -238,6 +238,7 @@ class devis_cleodis extends devis {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{

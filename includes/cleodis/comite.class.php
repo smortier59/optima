@@ -147,6 +147,7 @@ class comite extends classes_optima {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false,$tu=false){
+		
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{

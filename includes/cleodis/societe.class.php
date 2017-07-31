@@ -995,6 +995,204 @@ class societe_cleodis extends societe {
     );
     return $return;
   }
+
+
+  public function _sendDataToshiba($get, $post){
+
+    ATF::$usr->set('id_user',16);
+    ATF::$usr->set('id_agence',1);
+
+    $email = $get["email"];
+
+
+    $data = self::getInfosFromCREDITSAFE($get);
+
+
+    ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                              ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+    $res = ATF::societe()->select_row();
+
+
+    if($res){
+      $id_societe = $res["id_societe"];
+    } else {
+      unset($data["nb_employe"]);
+      $id_societe = $this->insert($data);
+    }
+
+    $contact = array( "nom"=>"gerant",
+                      "email"=>$email,
+                      "id_societe"=> $id_societe
+                    );
+    $gerant = ATF::contact()->insert( $contact );
+
+    $pack = ATF::pack_produit()->select($get["id_pack_produit"]);
+
+
+    $devis = array(
+            "id_societe" => $id_societe,
+            "type_contrat" => "lld",
+            "validite" => date("d-m-Y", strtotime("+1 month")),
+            "tva" => __TVA__,
+            "devis" => $pack["nom"],
+            "date" => date("d-m-Y"),
+            "type_devis" => "normal",
+            "id_contact" => $gerant,
+            "type_affaire" => "normal");
+    $values_devis =array();
+
+    $montantLoyer = $duree = 0;
+
+    $loyer = array();
+    $produits = array();
+
+    foreach ($get["lignes"] as $key => $value) {
+      if($value > 0){
+        $produit = ATF::produit()->select($key);
+
+        $loyer[0] = array(
+                      "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * ($value * $get["selectQtePack"])),
+                      "loyer__dot__duree"=>$produit["duree"],
+                      "loyer__dot__type"=>"engagement",
+                      "loyer__dot__assurance"=>"",
+                      "loyer__dot__frais_de_gestion"=>"",
+                      "loyer__dot__frequence_loyer"=>"mois",
+                      "loyer__dot__serenite"=>"",
+                      "loyer__dot__maintenance"=>"",
+                      "loyer__dot__hotline"=>"",
+                      "loyer__dot__supervision"=>"",
+                      "loyer__dot__support"=>"",
+                      "loyer__dot__avec_option"=>"non"
+                    );
+
+        $produits[] = array(
+                            "devis_ligne__dot__produit"=> $produit["produit"],
+                            "devis_ligne__dot__quantite"=>$value*$get["selectQtePack"],
+                            "devis_ligne__dot__type"=>"sans_objet",
+                            "devis_ligne__dot__ref"=>$produit["ref"],
+                            "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
+                            "devis_ligne__dot__id_produit"=>$produit["id_produit"],
+                            "devis_ligne__dot__id_fournisseur"=>"TOSHIBA TEC",
+                            "devis_ligne__dot__visibilite_prix"=>"invisible",
+                            "devis_ligne__dot__date_achat"=>"",
+                            "devis_ligne__dot__commentaire"=>"",
+                            "devis_ligne__dot__neuf"=>"oui",
+                            "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
+                            "devis_ligne__dot__id_fournisseur_fk"=>"5474"
+                          );
+      }
+    }
+    $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
+
+    try {
+       $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+    } catch (errorATF $e) {
+      throw new errorATF($e ,500);
+    }
+    $devis = ATF::devis()->select($id_devis);
+
+    if($data["cs_avis_credit"] == "Limite de crédit non applicable")   $data["cs_avis_credit"] = "";
+
+    $comite = array
+        (
+            "id_societe" => $id_societe,
+            "id_affaire" => $devis["id_affaire"],
+            "id_contact" => $gerant,
+            "activite" => $data["activite"],
+            "id_refinanceur" => "98b08c04b5f5632e49a93b6b324c5678",
+            "date_creation" => $data["date_creation"],
+            "date_compte" => $data["lastaccountdate"],
+            "capitaux_propres" => $data["capitaux_propres"],
+            "note" => $data["cs_score"],
+            "dettes_financieres" => $data["dettes_financieres"],
+            "limite" => $data["cs_avis_credit"],
+            "ca" => $data["ca"],
+            "capital_social" => $data["capital_social"],
+            "resultat_exploitation" => $data["resultat_exploitation"],
+            "date" => date("d-m-Y"),
+            "description" => "Comite CreditSafe",
+            "suivi_notifie"=>array(0=>"")
+        );
+
+
+    $creation = new DateTime( $data["date_creation"] );
+    $creation = $creation->format("Ymd");
+    $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
+    $past2Years = $past2Years->format("Ymd");
+
+
+    if($data["cs_score"] > 50 && $creation < $past2Years ){
+      $comite["etat"] = "accepte";
+      $comite["decisionComite"] = "Accepté automatiquement";
+
+    }else{
+      $comite["etat"] = "refuse";
+      $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
+    }
+
+    $comite["reponse"] = date("Y-m-d");
+    $comite["validite_accord"] = date("Y-m-d");
+
+    try{
+       ATF::comite()->insert(array("comite"=>$comite));
+    }catch (errorATF $e) {
+      throw new errorATF($e->getMessage() ,500);
+    }
+
+    if($comite["etat"]== "accepte"){
+      return array("id_affaire"=> $devis["id_affaire"],
+                   "duree"=>$loyer[0]["loyer__dot__duree"],
+                   "montant"=> $loyer[0]["loyer__dot__duree"] * $loyer[0]["loyer__dot__loyer"],
+                   "loyer"=>$loyer[0]["loyer__dot__loyer"],
+                   "siren"=>$data["siren"],
+                   "societe"=>ATF::societe()->select($id_societe)
+                  );
+    }
+    return false;
+  }
+
+  public function _comiteSGEF ($get, $post){
+    ATF::comite()->q->reset()->where("id_affaire",$post["id_affaire"]);
+    $comiteCS = ATF::comite()->select_row();
+
+    $comite = $comiteCS;
+
+    $comite["id_refinanceur"] = "7c414d4d3e01579eebf055c12c5f7ccd";
+    $comite["description"] = "Comite SGEF";
+    $comite["suivi_notifie"] = array(0=>"");
+
+
+    if($post["resultat"] === true){
+      $comite["etat"] = "accepte";
+        $comite["decisionComite"] = "Accepté automatiquement";
+    } else {
+      $comite["etat"] = "refuse";
+      $comite["decisionComite"] = "Refusé automatiquement";
+    }
+
+    unset($comite["id_comite"]);
+    try{
+       ATF::comite()->insert(array("comite"=>$comite));
+    }catch (errorATF $e) {
+      throw new errorATF($e->getMessage() ,500);
+    }
+
+  }
+
+  public function _updateGerant($get, $post) {
+    $id_societe = ATF::affaire()->select($post["id_affaire"], "id_societe");
+    ATF::contact()->q->reset()->where("id_societe", $id_societe)
+                              ->where("contact.nom", "GERANT");
+    $contact = ATF::contact()->select_row();
+    log::logger($contact , "mfleurquin");
+
+    ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
+                            "nom"=>$post["nom_gerant"],
+                            "prenom"=>$post["prenom_gerant"],
+                            "tel"=>$post["tel"]
+                    ));
+  }
+
 };
 
 class societe_cleodisbe extends societe_cleodis {
