@@ -918,7 +918,9 @@ class societe_cleodis extends societe {
     $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$id_affaire;
     return $url/*."&sref=".urlencode($url)*/;
   }
-
+  public function _getUrlSign($get,$post){
+    return $this->getUrlSign($get['id_affaire']);
+  } 
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>

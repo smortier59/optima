@@ -4,6 +4,8 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
 	function setUp() {
 		$this->initUser();
+		ATF::db()->query("Update devis Set id_remplacant= NULL");
+		ATF::db()->truncate("devis");
 
 		$contact["nom"]="Tu_devis";
 		$this->id_contact=ATF::contact()->insert($contact);
@@ -16,8 +18,19 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->devis["devis"]['frais_de_port']="50";
 		$this->devis["devis"]['prix_achat']="50";
 		$this->devis["values_devis"]=array("produits"=>'[{"devis_ligne__dot__ref":"TU","devis_ligne__dot__produit":"Tu_devis","devis_ligne__dot__quantite":"15","devis_ligne__dot__poids":"10","devis_ligne__dot__prix":"10","devis_ligne__dot__prix_achat":"10","devis_ligne__dot__id_fournisseur":"1","devis_ligne__dot__id_compte_absystech":"1","devis_ligne__dot__marge":97.14,"devis_ligne__dot__id_fournisseur_fk":"1"}]');
-
+		
 		$this->id_devis = $this->obj->insert($this->devis,$this->s);
+
+		$this->devis["devis"]['resume']='Tu_devis2';
+		$this->devis["devis"]['id_societe']=1;
+		$this->devis["devis"]['etat']="gagne";
+
+		$this->devis["devis"]['validite']=date('Y-m-d');
+		$this->devis["devis"]['prix']="200";
+		$this->devis["devis"]['frais_de_port']="150";
+		$this->devis["devis"]['prix_achat']="150";
+		$this->devis["values_devis"]=array("produits"=>'[{"devis_ligne__dot__ref":"TU2","devis_ligne__dot__produit":"Tu_devis2","devis_ligne__dot__quantite":"15","devis_ligne__dot__poids":"10","devis_ligne__dot__prix":"10","devis_ligne__dot__prix_achat":"10","devis_ligne__dot__id_fournisseur":"1","devis_ligne__dot__id_compte_absystech":"1","devis_ligne__dot__marge":97.14,"devis_ligne__dot__id_fournisseur_fk":"1"}]');
+		$this->obj->insert($this->devis,$this->s);
 		$this->id_affaire = $this->obj->select($this->id_devis,"id_affaire");
 	}
 
@@ -360,9 +373,9 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 
     	$notices = array(array(
-            'msg' => 'Suppression de l\'enregistrement \'CSO17030001\' avec succès.',
+            'msg' => 'Suppression de l\'enregistrement \'CSO17080001\' avec succès.',
             'title' => 'Succès !',
-            'timer' => '',
+            'timer' => null,
             'type' => 'success')
         );
 
@@ -868,5 +881,125 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			$this->assertTrue(false,"Le dernier devis date de plus de 30 jours ?");
 		}
 	}
+
+
+	// @author Cyril CHARLIER <ccharlier@absystech.fr>
+	public function test_GET(){
+		$ret =ATF::devis()->_GET();
+		$this->assertEquals($ret[0]["devis.ref"],"DSO17080001","La ref retourné n'est pas correct");
+		$this->assertEquals($ret[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret[0]["resume"],"Tu_devis","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret[0]["affaire"],"Tu_devis","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
+		
+		$this->assertEquals($ret[1]["devis.ref"],"DSO17080002","La ref retourné n'est pas correct");
+		$this->assertEquals($ret[1]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret[1]["resume"],"Tu_devis2","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret[1]["affaire"],"Tu_devis2","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret[1]["societe.id_societe"],"AbsysTech","La societe 2 retournée n'est pas correcte");
+
+	}
+	public function test_GETWithSearch(){
+		$get = array("search"=>"Tu_devis2");
+		$ret =ATF::devis()->_GET($get);
+
+		$this->assertEquals($ret[0]["devis.ref"],"DSO17080002","La ref retourné n'est pas correct");
+		$this->assertEquals($ret[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret[0]["resume"],"Tu_devis2","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret[0]["affaire"],"Tu_devis2","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
+
+	}
+	public function test_GETWithFilter(){
+		$get = array("filters"=>array("gagne"=>"on"));
+		$ret =ATF::devis()->_GET($get);
+		$this->assertEquals($ret[0]["devis.etat"],"gagne","L'etat retourné n'est pas correct");
+
+		$this->assertEquals($ret[0]["devis.ref"],"DSO17080002","La ref retourné n'est pas correct");
+		$this->assertEquals($ret[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret[0]["resume"],"Tu_devis2","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret[0]["affaire"],"Tu_devis2","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
+		
+		$get = array("filters"=>array("attente"=>"on"));
+		$ret2 =ATF::devis()->_GET($get);
+		$this->assertEquals($ret2[0]["devis.etat"],"attente","L'etat retourné n'est pas correct");
+
+		$this->assertEquals($ret2[0]["devis.ref"],"DSO17080001","La ref retourné n'est pas correct");
+		$this->assertEquals($ret2[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret2[0]["resume"],"Tu_devis","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret2[0]["affaire"],"Tu_devis","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret2[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
+
+		$this->devis["devis"]['etat']= "remplace";
+		$this->devis["devis"]['resume']= "Tu_devis3";
+
+		$this->obj->insert($this->devis,$this->s);
+
+		$get = array("filters"=>array("remplace"=>"on"));
+		$ret3 =ATF::devis()->_GET($get);
+		$this->assertEquals($ret3[0]["devis.etat"],"remplace","L'etat retourné n'est pas correct");
+		$this->assertEquals($ret3[0]["devis.ref"],"DSO17080003","La ref retourné n'est pas correct");
+		$this->assertEquals($ret3[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret3[0]["resume"],"Tu_devis3","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret3[0]["affaire"],"Tu_devis3","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret3[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");	
+
+		$this->devis["devis"]['etat']= "annule";
+		$this->devis["devis"]['resume']= "Tu_devis4";
+
+		$this->obj->insert($this->devis,$this->s);
+
+		$get = array("filters"=>array("annule"=>"on"));
+		$ret4 =ATF::devis()->_GET($get);
+		$this->assertEquals($ret4[0]["devis.etat"],"annule","L'etat retourné n'est pas correct");
+		$this->assertEquals($ret4[0]["devis.ref"],"DSO17080004","La ref retourné n'est pas correct");
+		$this->assertEquals($ret4[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret4[0]["resume"],"Tu_devis4","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret4[0]["affaire"],"Tu_devis4","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret4[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");	
+
+		$this->devis["devis"]['etat']= "bloque";
+		$this->devis["devis"]['resume']= "Tu_devis5";
+
+		$this->obj->insert($this->devis,$this->s);
+
+		$get = array("filters"=>array("bloque"=>"on"));
+		$ret5 =ATF::devis()->_GET($get);
+		$this->assertEquals($ret5[0]["devis.etat"],"bloque","L'etat retourné n'est pas correct");
+		$this->assertEquals($ret5[0]["devis.ref"],"DSO17080005","La ref retourné n'est pas correct");
+		$this->assertEquals($ret5[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret5[0]["resume"],"Tu_devis5","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret5[0]["affaire"],"Tu_devis5","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret5[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");	
+
+		$this->devis["devis"]['etat']= "perdu";
+		$this->devis["devis"]['resume']= "Tu_devis6";
+
+		$this->obj->insert($this->devis,$this->s);
+
+		$get = array("filters"=>array("perdu"=>"on"));
+		$ret6 =ATF::devis()->_GET($get);
+		$this->assertEquals($ret6[0]["devis.etat"],"perdu","L'etat retourné n'est pas correct");
+		$this->assertEquals($ret6[0]["devis.ref"],"DSO17080006","La ref retourné n'est pas correct");
+		$this->assertEquals($ret6[0]["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret6[0]["resume"],"Tu_devis6","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret6[0]["affaire"],"Tu_devis6","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret6[0]["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");	
+	}
+	/*
+	pb de requete SQL 
+	public function test_GETWithId(){
+		$get = array("id_devis"=>$this->id_devis);
+		$ret =ATF::devis()->_GET($get);
+		$this->assertEquals($ret["devis.etat"],"gagne","L'etat retourné n'est pas correct");
+
+		$this->assertEquals($ret["devis.ref"],"DSO17080002","La ref retourné n'est pas correct");
+		$this->assertEquals($ret["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret["resume"],"Tu_devis2","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret["affaire"],"Tu_devis2","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
+	}
+	*/
 };
 ?>

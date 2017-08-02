@@ -1137,7 +1137,6 @@ class affaire_cleodis extends affaire {
     * @return array un tableau avec les données
     */
     public function _GET($get,$post) {
-      log::logger('test', 'alahlah');
       // Gestion du tri
       if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
       if (!$get['trid']) $get['trid'] = "desc";
@@ -1148,15 +1147,20 @@ class affaire_cleodis extends affaire {
       // Gestion de la page
       if (!$get['page']) $get['page'] = 0;
 
-      $colsData = array("affaire.*","societe.societe");
+      $colsData = array("affaire.*","societe.societe",'societe.id_contact_signataire','contact.email','loyer.loyer');
 
       $this->q->reset();
 
       if ($get['id_affaire']) $colsData = array("affaire.*");
 
-      $this->q->addField($colsData);
+      $this->q->addField($colsData)->addField("Count(commande.id_commande)","total_cmd");
       $this->q->from("affaire","id_societe","societe","id_societe");
-      $this->q->where("societe.societe","CLEODIS");
+      $this->q->from("societe","id_contact_signataire","contact","id_contact");
+      $this->q->from("affaire","id_affaire","commande","id_affaire");
+      $this->q->from("affaire","id_affaire","loyer","id_affaire");
+
+      $this->q->whereIsNotNull("site_associe")
+      		->addGroup("id_affaire");
 
       if($get["search"]){
         header("ts-search-term: ".$get['search']);
