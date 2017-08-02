@@ -996,6 +996,36 @@ class societe_cleodis extends societe {
     return $return;
   }
 
+  public function getCodeClient($site_associe){
+    $prefixe = "TOSH";
+
+
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(code_client FROM -4))','max')
+      ->addCondition('code_client',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+    if($max<10){
+      $ref.='000'.$max;
+    }elseif($max<100){
+      $ref.='00'.$max;
+    }elseif($max<1000){
+      $ref.='0'.$max;
+    }elseif($max<10000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $prefixe.$ref;
+
+  }
 
   public function _sendDataToshiba($get, $post){
 
@@ -1014,9 +1044,17 @@ class societe_cleodis extends societe {
 
 
     if($res){
+
       $id_societe = $res["id_societe"];
+
+      if(!$res["code_client"]){
+        $code_client = $this->getCodeClient("toshiba");
+        ATF::societe()->u(array("id_societe"=>$id_societe, "code_client"=>$code_client));
+      }
     } else {
       unset($data["nb_employe"]);
+      $code_client = $this->getCodeClient("toshiba");
+      $data["code_client"]= $code_client;
       $id_societe = $this->insert($data);
     }
 
@@ -1145,7 +1183,8 @@ class societe_cleodis extends societe {
                    "montant"=> $loyer[0]["loyer__dot__duree"] * $loyer[0]["loyer__dot__loyer"],
                    "loyer"=>$loyer[0]["loyer__dot__loyer"],
                    "siren"=>$data["siren"],
-                   "societe"=>ATF::societe()->select($id_societe)
+                   "societe"=>ATF::societe()->select($id_societe),
+                   "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
                   );
     }
     return false;
@@ -1184,7 +1223,8 @@ class societe_cleodis extends societe {
     ATF::contact()->q->reset()->where("id_societe", $id_societe)
                               ->where("contact.nom", "GERANT");
     $contact = ATF::contact()->select_row();
-    log::logger($contact , "mfleurquin");
+
+    ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
 
     ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
                             "nom"=>$post["nom_gerant"],
