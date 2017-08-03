@@ -1220,6 +1220,11 @@ class affaire_cleodis extends affaire {
         if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
       }
 
+      ATF::loyer()->q->reset()->where("loyer.id_affaire", $get['id_affaire']);
+      $data["loyer"] = ATF::loyer()->sa();
+
+      $data["comites"] = $this->getComite($get["id_affaire"]);
+
       /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
       $data["affaireAffaire"] = $this->sa();
       */
@@ -1241,6 +1246,11 @@ class affaire_cleodis extends affaire {
         $return = $data['data'];
       }
       return $return;
+    }
+
+    public function getComite($id_affaire){
+    	ATF::comite()->q->reset()->where("comite.id_affaire" , $id_affaire);
+    	return ATF::comite()->sa();
     }
 
 
