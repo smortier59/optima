@@ -233,7 +233,7 @@ class hotline extends classes_optima {
 								THEN FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep))
 
 							END)
-                            /((SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600)+(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600)),2),
+							/((SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600)+(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600)),2),
 							NULL)", "ratio");
 
 		// Derrnier crédit restant basé sur gestion_ticket
@@ -250,7 +250,7 @@ class hotline extends classes_optima {
 			->addOrder("hotline.date","asc");*/
 		$sa=$this->select_all();
 
-    	// Trier par défaut dans l'ordre d'urgence (priorité)
+		// Trier par défaut dans l'ordre d'urgence (priorité)
 		// On ajoute sur la première page le calcul de la deadline en fonction de la priorité, des jours ouvrés, du temps estimé et du travail déjà effectué.
 
 		//--Calcul de la deadline
@@ -330,7 +330,7 @@ class hotline extends classes_optima {
 	public function getTimeFactureCalcule($line){
 		if($line["hotline.id_affaire_fk"]){
 			ATF::devis()->q->reset()->where("devis.id_affaire", $line["hotline.id_affaire_fk"])
-								    ->where("devis.etat","gagne","OR","condEtatDevis","=")
+									->where("devis.etat","gagne","OR","condEtatDevis","=")
 									->where("devis.etat","attente","OR","condEtatDevis","=")
 									->where("devis.etat","bloque","OR","condEtatDevis","=");
 
@@ -374,21 +374,21 @@ class hotline extends classes_optima {
 
 			$credit = explode(".", strval($credit));
 
-	        if($credit[1] > 0){
-	            if($credit[1] <= 250){
-	                $nb = 0.25;
-	            }elseif($credit[1] <= 500){
-	                $nb = 0.50;
-	            }elseif($credit[1] <= 750){
-	                $nb = 0.75;
-	            }else{
-	                $nb = 1;
-	            }
-	        }
-	        $nb = $nb + $credit[0];
+			if($credit[1] > 0){
+				if($credit[1] <= 250){
+					$nb = 0.25;
+				}elseif($credit[1] <= 500){
+					$nb = 0.50;
+				}elseif($credit[1] <= 750){
+					$nb = 0.75;
+				}else{
+					$nb = 1;
+				}
+			}
+			$nb = $nb + $credit[0];
 		}
 
-        return $nb;
+		return $nb;
 
 
 	}
@@ -517,13 +517,13 @@ class hotline extends classes_optima {
 
 	/**
 	* Prend en charge la requête
-    * @author Quentin JANON <qjanon@absystech.fr>
-    * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param array $infos
 	* @param array $s
 	* @param array $files
-    * @return boolean true
-    */
+	* @return boolean true
+	*/
 	public function takeRequest($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		$this->infoCollapse($infos);
 
@@ -581,7 +581,7 @@ class hotline extends classes_optima {
 
 	/**
 	* Génère le formulaire de choix de facturation
-    * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	*/
 	public function getFormBillingMode($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$this->infoCollapse($infos);
@@ -615,7 +615,7 @@ class hotline extends classes_optima {
 
 	/**
 	* Relance la facturation
-    * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	*/
 	public function boostBilling($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$this->infoCollapse($infos);
@@ -634,12 +634,12 @@ class hotline extends classes_optima {
 	* Choix du mode de facturation en fonction de deux paramètres : type de requête et charge de la requête
 	* Type de requête : R&D, Maintenance, Intervention
 	* Charge de la reuqête : Par rapport à une affaire, tickets ou à la charge d'AbsysTech
-    * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param array $infos
 	* @param array $s
 	* @param array $files
-    * @return boolean true
-    */
+	* @return boolean true
+	*/
 	public function setBillingMode($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$this->infoCollapse($infos);
 
@@ -1163,14 +1163,14 @@ class hotline extends classes_optima {
 		return true;
 	}
 
-   	/**
+	/**
 	* Passage d'une requête wait en fixing
-    * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param array $infos
 	* @param array $s
 	* @param array $files
-    * @return boolean true
-    */
+	* @return boolean true
+	*/
 	public function fixingRequest($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		$this->infoCollapse($infos);
 
@@ -1200,12 +1200,12 @@ class hotline extends classes_optima {
 
 	/**
 	* Passage d'une requête en etat Wait
-    * @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param array $infos
 	* @param array $s
 	* @param array $files
-    * @return boolean true
-    */
+	* @return boolean true
+	*/
 	public function setWait($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		$this->infoCollapse($infos);
 
@@ -1235,13 +1235,13 @@ class hotline extends classes_optima {
 
 
 	/**
-    * Retourne la valeur par défaut spécifique aux données passées en paramètres
-    * @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
+	* Retourne la valeur par défaut spécifique aux données passées en paramètres
+	* @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
 	* @param string $field
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */
+	*/
 	public function default_value($field){
 		switch ($field) {
 			case "pole_concerne":
@@ -1269,7 +1269,7 @@ class hotline extends classes_optima {
 	*/
 	public function setWaitMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Vérification des infos
- 		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
+		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
@@ -1315,7 +1315,7 @@ class hotline extends classes_optima {
 	*/
 	public function setMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Vérification des infos
- 		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
+		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
@@ -1361,7 +1361,7 @@ class hotline extends classes_optima {
 	*/
 	public function cancelMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Vérification des infos
- 		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
+		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
 
 		//Mode transactionel
 		ATF::db($this->db)->begin_transaction();
@@ -1416,7 +1416,7 @@ class hotline extends classes_optima {
 	public function createPortailHotlineURL($login,$passwd,$id_hotline,$id_contact,$event="select"){
 		$url=__HOTLINE_URL__."login.php?login=".base64_encode($login)."&password=".base64_encode($passwd)."&contact=".base64_encode($id_contact)."&url=";
 		$url.=base64_encode(__HOTLINE_URL__."hotline.php?table=hotline&event=".$event."&id_hotline=".$id_hotline);
-        $url.= "&schema=".base64_encode(ATF::$codename);
+		$url.= "&schema=".base64_encode(ATF::$codename);
 		return $url;
 	}
 
@@ -1557,7 +1557,7 @@ class hotline extends classes_optima {
 
 	/**
 	* Retourne le temps total passé sur les tickets non résolus (en cours)
-    * @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param boolean $useForecast Si VRAI alors on pondère le CA par le pourcentage de forecast
 	* @return int
 	*/
@@ -2218,8 +2218,8 @@ class hotline extends classes_optima {
 		$seconds = 0;
 		foreach ($timeArr as $key => $value)
 		{
-		    if ($key > 2) break;
-		    $seconds += pow(60, $key) * $value;
+			if ($key > 2) break;
+			$seconds += pow(60, $key) * $value;
 		}
 		return $seconds;
 
@@ -2289,19 +2289,19 @@ class hotline extends classes_optima {
 
 	//Retourne le nbre de jours ouvrés entre 2 dates
 	function getJoursOuvres($datedeb,$datefin){
-	    $nb_jours=0;
-	    $dated=explode('-',$datedeb);
-	    $datef=explode('-',$datefin);
-	    $timestampcurr=mktime(0,0,0,$dated[1],$dated[2],$dated[0]);
-	    $timestampf=mktime(0,0,0,$datef[1],$datef[2],$datef[0]);
-	    while($timestampcurr<$timestampf){
+		$nb_jours=0;
+		$dated=explode('-',$datedeb);
+		$datef=explode('-',$datefin);
+		$timestampcurr=mktime(0,0,0,$dated[1],$dated[2],$dated[0]);
+		$timestampf=mktime(0,0,0,$datef[1],$datef[2],$datef[0]);
+		while($timestampcurr<$timestampf){
 
-			      if((date('w',$timestampcurr)!=0)&&(date('w',$timestampcurr)!=6)){
-			        $nb_jours++;
-			      }
+				  if((date('w',$timestampcurr)!=0)&&(date('w',$timestampcurr)!=6)){
+					$nb_jours++;
+				  }
 			$timestampcurr=mktime(0,0,0,date('m',$timestampcurr),(date('d',$timestampcurr)+1)   ,date('Y',$timestampcurr));
 
-	    }
+		}
 		return $nb_jours+1;
 	}
 
@@ -2557,34 +2557,34 @@ class hotline extends classes_optima {
 
 	//Simple function to sort an array by a specific key. Maintains index association.
 	function array_sort($array, $on, $order=SORT_ASC){
-	    $new_array = array();
-	    $sortable_array = array();
+		$new_array = array();
+		$sortable_array = array();
 
-	    if (count($array) > 0) {
-	        foreach ($array as $k => $v) {
-	            if (is_array($v)) {
-	                foreach ($v as $k2 => $v2) {
-	                    if ($k2 == $on) {
-	                        $sortable_array[$k] = $v2;
-	                    }
-	                }
-	            } else {
-	                $sortable_array[$k] = $v;
-	            }
-	        }
-	        switch ($order) {
-	            case SORT_ASC:  asort($sortable_array);
-	            break;
-	            case SORT_DESC: arsort($sortable_array);
-	            break;
-	        }
+		if (count($array) > 0) {
+			foreach ($array as $k => $v) {
+				if (is_array($v)) {
+					foreach ($v as $k2 => $v2) {
+						if ($k2 == $on) {
+							$sortable_array[$k] = $v2;
+						}
+					}
+				} else {
+					$sortable_array[$k] = $v;
+				}
+			}
+			switch ($order) {
+				case SORT_ASC:  asort($sortable_array);
+				break;
+				case SORT_DESC: arsort($sortable_array);
+				break;
+			}
 
-	        foreach ($sortable_array as $k => $v) {
-	            $new_array[$k] = $array[$k];
-	        }
-	    }
+			foreach ($sortable_array as $k => $v) {
+				$new_array[$k] = $array[$k];
+			}
+		}
 
-	    return $new_array;
+		return $new_array;
 	}
 
 	public function getTauxHorraire($id_affaire){
@@ -3106,17 +3106,17 @@ class hotline extends classes_optima {
 
 								//Requête cloturée ou annulée donc pas d'interaction !!
 								$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
-				   				$info_mail["from"] = "optima-hotline@absystech.net";
-				   				$info_mail["html"] = false;
-				   				$info_mail["template"] = 'hotline_deja_cloture';
-				   				$info_mail["text"] = $id_hotline;
-				   				$info_mail["recipient"] = $from;
+								$info_mail["from"] = "optima-hotline@absystech.net";
+								$info_mail["html"] = false;
+								$info_mail["template"] = 'hotline_deja_cloture';
+								$info_mail["text"] = $id_hotline;
+								$info_mail["recipient"] = $from;
 
 
-				   				$this->facture_mail = new mail($info_mail);
-				   				$this->facture_mail->send();
+								$this->facture_mail = new mail($info_mail);
+								$this->facture_mail->send();
 
-				   				ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
+								ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
 
 
 							}else{
@@ -3125,14 +3125,14 @@ class hotline extends classes_optima {
 								$interaction = array("id_hotline" =>  $id_hotline,
 													 "date" => $date,
 													 "duree_presta" => "00:00",
-											         'no_test_credit'=>true,
+													 'no_test_credit'=>true,
 													 'heure_debut_presta'=>date("H:i"),
-											         'heure_fin_presta'=>date("H:i"),
+													 'heure_fin_presta'=>date("H:i"),
 													 "detail" => $message,
 													 "id_user" => $id_user,
-								 					 "id_contact" => $id_contact,
-								 					 "id_ordre_de_mission" => NULL,
-								 					 "visible" => "oui");
+													 "id_contact" => $id_contact,
+													 "id_ordre_de_mission" => NULL,
+													 "visible" => "oui");
 
 								$id = ATF::hotline_interaction()->insert($interaction);
 
@@ -3326,7 +3326,7 @@ class hotline extends classes_optima {
 		$id_hotline = $this->decryptId($id_hotline);
 
 		$path = $this->filepath($id_hotline,"fichier_joint");
-    	$path2extract = dirname($path)."/";
+		$path2extract = dirname($path)."/";
 
 		$mappingFiletype = array(
 			//"pdf"=>"pdfB.png",
@@ -3348,65 +3348,65 @@ class hotline extends classes_optima {
 
 		//Dézippage
 		$zip = new ZipArchive();
-        $zip->open($path);
+		$zip->open($path);
 
-        for($i = 0; $i < $zip->numFiles; $i++){
+		for($i = 0; $i < $zip->numFiles; $i++){
 
 			$infos_fichier = $zip->statIndex($i);
 
 			//$name = utf8_decode($infos_fichier['name']);
 			$name = $infos_fichier['name'];
 
-		    $extension=strtolower(substr(strrchr($name,".") ,1));
+			$extension=strtolower(substr(strrchr($name,".") ,1));
 
-		    $size=util::formatBytes($infos_fichier['size']);
-        	$array[$i] = array(
-        		"name"=>utf8_encode($name),
-        		"size"=>$size,
-        		"type"=>$extension,
-        	);
+			$size=util::formatBytes($infos_fichier['size']);
+			$array[$i] = array(
+				"name"=>utf8_encode($name),
+				"size"=>$size,
+				"type"=>$extension,
+			);
 
-	        $zip->extractTo($path2extract,$name);
+			$zip->extractTo($path2extract,$name);
 
-	        if ($extension =="jpg" || $extension =="png" || $extension =="gif") {
-	        	$filename = "image";
-		    	$array[$i]['URL'] = __MANUAL_WEB_PATH__.$this->table."-".$id_hotline_crypted."-".$filename.$i."-200-50.".$extension."?v=".rand(0,10000);
-		    	$array[$i]['URLHD'] = __MANUAL_WEB_PATH__.$this->table."-".$id_hotline_crypted."-".$filename.$i."-800-600.".$extension."?v=".rand(0,10000);
+			if ($extension =="jpg" || $extension =="png" || $extension =="gif") {
+				$filename = "image";
+				$array[$i]['URL'] = __MANUAL_WEB_PATH__.$this->table."-".$id_hotline_crypted."-".$filename.$i."-200-50.".$extension."?v=".rand(0,10000);
+				$array[$i]['URLHD'] = __MANUAL_WEB_PATH__.$this->table."-".$id_hotline_crypted."-".$filename.$i."-800-600.".$extension."?v=".rand(0,10000);
 
-		    } elseif ($extension =="pdf") {
-		    	// Nom du document final
-	        	$filename = "dldoc";
-	        	// Filename du fichier a convertir
-		    	$fn = $path2extract.$name;
-		    	// Chemin vers la miniature
-		    	$previewFn = $path2extract.$id_hotline.".previewPDF".$i;
+			} elseif ($extension =="pdf") {
+				// Nom du document final
+				$filename = "dldoc";
+				// Filename du fichier a convertir
+				$fn = $path2extract.$name;
+				// Chemin vers la miniature
+				$previewFn = $path2extract.$id_hotline.".previewPDF".$i;
 
-			    //execute imageMagick's 'convert', setting the color space to RGB
-			    //This will create a jpg having the widthg of 200PX
-			    $cmd = "convert \"{$fn}[0]\" -colorspace RGB -geometry 200 ".$previewFn.".png";
-			    exec($cmd);
+				//execute imageMagick's 'convert', setting the color space to RGB
+				//This will create a jpg having the widthg of 200PX
+				$cmd = "convert \"{$fn}[0]\" -colorspace RGB -geometry 200 ".$previewFn.".png";
+				exec($cmd);
 
 
-			    // Renommer l'image créée par le convert pour lui soustraire son extension
-		    	util::rename($previewFn.".png",$previewFn);
+				// Renommer l'image créée par le convert pour lui soustraire son extension
+				util::rename($previewFn.".png",$previewFn);
 
-		    	// On prépare nos URL de vignette et de DL
-			    $array[$i]['URL'] = __MANUAL_WEB_PATH__.$this->table."-".$id_hotline_crypted."-previewPDF".$i."-200-50.png";
-		    	$array[$i]['URLDL'] = __MANUAL_WEB_PATH__.$this->table."-select-".$filename.$i."-".$id_hotline_crypted."-".$extension.".dl";
+				// On prépare nos URL de vignette et de DL
+				$array[$i]['URL'] = __MANUAL_WEB_PATH__.$this->table."-".$id_hotline_crypted."-previewPDF".$i."-200-50.png";
+				$array[$i]['URLDL'] = __MANUAL_WEB_PATH__.$this->table."-select-".$filename.$i."-".$id_hotline_crypted."-".$extension.".dl";
 
-	        } else {
-	        	$filename = "dldoc";
-		    	$array[$i]['URL'] = ATF::$staticserver.'images/icones/'.$mappingFiletype[$extension];
-		    	$array[$i]['URLDL'] = __MANUAL_WEB_PATH__.$this->table."-select-".$filename.$i."-".$id_hotline_crypted."-".$extension.".dl";
-	        }
+			} else {
+				$filename = "dldoc";
+				$array[$i]['URL'] = ATF::$staticserver.'images/icones/'.$mappingFiletype[$extension];
+				$array[$i]['URLDL'] = __MANUAL_WEB_PATH__.$this->table."-select-".$filename.$i."-".$id_hotline_crypted."-".$extension.".dl";
+			}
 
-	        // Ici on renomme les fichiers extrait avec leur vrai nom par le nom qu'on leur attribut
-	        rename($path2extract.$name,$path2extract.$id_hotline.".".$filename.$i);
+			// Ici on renomme les fichiers extrait avec leur vrai nom par le nom qu'on leur attribut
+			rename($path2extract.$name,$path2extract.$id_hotline.".".$filename.$i);
 
-        }
+		}
 
-        $zip->close();
-        return $array;
+		$zip->close();
+		return $array;
 
 	}
 
@@ -3527,26 +3527,26 @@ class hotline extends classes_optima {
 				//On accepte la facturation auto
 				$detail = "Acceptation AUTOMATIQUE de la facturation de la requête en fonction du temps passé au tarif de 1 crédit/heure (après délai de ".$delai." jours francs sans réponse)";
 
-		        // Modification du ticket
-		        $h = array(
-		        	"id_hotline"=>$value['id_hotline'],
-		        	"ok_facturation"=>"oui",
-		        	"disabledInternalInteraction"=>true
-		        );
-		        ATF::hotline()->update($h);
+				// Modification du ticket
+				$h = array(
+					"id_hotline"=>$value['id_hotline'],
+					"ok_facturation"=>"oui",
+					"disabledInternalInteraction"=>true
+				);
+				ATF::hotline()->update($h);
 
-		        // Insertion de l'interaction
-		        $i = array(
-		            "id_hotline"=>$value["id_hotline"],
-		            "detail"=>$detail,
-		            "id_contact"=>$value["id_contact"]
-		        );
-		        $id = ATF::hotline_interaction()->i($i);
+				// Insertion de l'interaction
+				$i = array(
+					"id_hotline"=>$value["id_hotline"],
+					"detail"=>$detail,
+					"id_contact"=>$value["id_contact"]
+				);
+				$id = ATF::hotline_interaction()->i($i);
 
-		         if (ATF::hotline()->select($value['id_hotline'],"etat")=="wait") {
-		            $h = array("id_hotline"=>$value['id_hotline'],"etat"=>"fixing");
-		            ATF::hotline()->u($h);
-		        }
+				 if (ATF::hotline()->select($value['id_hotline'],"etat")=="wait") {
+					$h = array("id_hotline"=>$value['id_hotline'],"etat"=>"fixing");
+					ATF::hotline()->u($h);
+				}
 			}
 
 		}
@@ -3571,7 +3571,7 @@ class hotline extends classes_optima {
 		$qC = "SELECT COUNT(*) as cloture FROM hotline WHERE DATE_FORMAT(date_fin, '%Y-%m-%d') ='".$date."'";
 		$data['cloture'] = ATF::db()->ffc($qC);
 
-        return json_encode($data);
+		return json_encode($data);
 	}
 
 
@@ -3600,7 +3600,7 @@ class hotline extends classes_optima {
 		}
 
 
-      	return json_encode($data);
+		return json_encode($data);
 	}
 
 	public function getSatisfaction($get,$post) {
@@ -3775,7 +3775,7 @@ class hotline extends classes_optima {
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
 
-      $return = $data['data'];
+	  $return = $data['data'];
 		}
 
 		return $return;
@@ -3789,36 +3789,37 @@ class hotline extends classes_optima {
 	* @param $post array COntient les données envoyé en POST par le formulaire.
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/
-	public function _POST($get,$post) {
+	public function _POST($get,$post,$files) {
+		$return = array();
 
-    	$return = array();
+		try {
+			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+			// Check des champs obligatoire
+			if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
+			if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
+			if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
+			if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
+			if (!$post['pole']) throw new Exception("POLE_MISSING",1024);
 
-        try {
+			// Mapping pour BDD Optima
+			$post['pole_concerne'] = $post['pole']; unset($post['pole']);
+			$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
+			$post['visible'] = $post['visible']=='on'?"oui":"non";
 
-	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
-	        // Check des champs obligatoire
-	        if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
-	        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
-	        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
-	        if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
-	        if (!$post['pole']) throw new Exception("POLE_MISSING",1024);
+			$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
 
-	        // Mapping pour BDD Optima
-	        $post['pole_concerne'] = $post['pole']; unset($post['pole']);
-	        $post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
-	        $post['visible'] = $post['visible']=='on'?"oui":"non";
+			// Insertion
+			$return['id'] = self::insert($post);
 
-	        // Insertion
-        	$return['id'] = self::insert($post);
-        	// Récupération des notices créés
-        	$return['notices'] = ATF::$msg->getNotices();
-	        return $return;
-        } catch (errorATF $e) {
-        	throw $e;
-        } catch (Exception $e) {
-        	throw $e;
-        }
-        return false;
+			// Récupération des notices créés
+			$return['notices'] = ATF::$msg->getNotices();
+			return $return;
+		} catch (errorATF $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw $e;
+		}
+		return false;
 	}
 
 	private function forward($infos) {
@@ -3894,7 +3895,7 @@ class hotline extends classes_optima {
 			throw $e;
 		}
 
-    	$return['notices'] = ATF::$msg->getNotices();
+		$return['notices'] = ATF::$msg->getNotices();
 		$return['result'] = true;
 		ATF::db($this->db)->commit_transaction();
 		return $return;
@@ -3911,100 +3912,100 @@ class hotline extends classes_optima {
 	public function _PUT($get,$post) {
 		$input = file_get_contents('php://input');
 		if (!empty($input)) parse_str($input,$post);
-    	$return = array();
+		$return = array();
 
-        try {
-	        if (!$post) throw new Exception("POST_DATA_MISSING",1000);
+		try {
+			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 
-        	// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
-        	if ($post['specialAction']) {
-        		switch ($post['specialAction']) {
-        			case "forward":
-				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-				        $action = $post['specialAction'];
-        				$return = self::$post['specialAction']($post);
-         				$lastInteractionRequired = true;
-	       			break;
-        			case "setPriorite":
-				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-				        $action = $post['specialAction'];
-        				self::$action($post);
-        				$return['result'] = true;
-        			break;
-        			case "takeRequest":
-        			case "cancelRequest":
-        			case "resolveRequest":
-				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				$action = $post['specialAction'];
-        				self::$action($post);
-        				$return['result'] = true;
-        				$lastInteractionRequired = true;
-        				if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
+			// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
+			if ($post['specialAction']) {
+				switch ($post['specialAction']) {
+					case "forward":
+						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+						$action = $post['specialAction'];
+						$return = self::$post['specialAction']($post);
+						$lastInteractionRequired = true;
+					break;
+					case "setPriorite":
+						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+						$action = $post['specialAction'];
+						self::$action($post);
+						$return['result'] = true;
+					break;
+					case "takeRequest":
+					case "cancelRequest":
+					case "resolveRequest":
+						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+						$action = $post['specialAction'];
+						self::$action($post);
+						$return['result'] = true;
+						$lastInteractionRequired = true;
+						if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
 
-        			break;
-        			case "setWait":
-				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				if ($post['etat']=="wait") {
-        					$action = $post['specialAction'];
-	        				self::$action($post);
-        				} else {
-        					$this->fixingRequest($post);
-        				}
-        				$return['result'] = true;
-        				$lastInteractionRequired = true;
-        			break;
-        			case "setBillingMode":
-				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-        				self::setBillingModeNew($post);
-        				$return['result'] = $this->getBillingMode($post['id_hotline'],true);
-        				$lastInteractionRequired = true;
-        			break;
-        			case "sendMailTeamviewer":
-				        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1024);
-        				ATF::contact()->sendMailTeamViewer($post);
-        			break;
-        			case "sendMEP":
-				        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-				        if (!$post['action']) throw new Exception("ACTION_MISSING",1030);
-				        $action = $post["action"];
-        				$this->$action($post);
-        				$lastInteractionRequired = true;
-        			break;
-        		}
-        	// Si on fait un update pur et simple du ticket
-        	} else {
-		        // Check des champs obligatoire
-		        if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-		        if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
-		        if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
-		        if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
-		        if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
+					break;
+					case "setWait":
+						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+						if ($post['etat']=="wait") {
+							$action = $post['specialAction'];
+							self::$action($post);
+						} else {
+							$this->fixingRequest($post);
+						}
+						$return['result'] = true;
+						$lastInteractionRequired = true;
+					break;
+					case "setBillingMode":
+						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+						self::setBillingModeNew($post);
+						$return['result'] = $this->getBillingMode($post['id_hotline'],true);
+						$lastInteractionRequired = true;
+					break;
+					case "sendMailTeamviewer":
+						if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1024);
+						ATF::contact()->sendMailTeamViewer($post);
+					break;
+					case "sendMEP":
+						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+						if (!$post['action']) throw new Exception("ACTION_MISSING",1030);
+						$action = $post["action"];
+						$this->$action($post);
+						$lastInteractionRequired = true;
+					break;
+				}
+			// Si on fait un update pur et simple du ticket
+			} else {
+				// Check des champs obligatoire
+				if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
+				if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
+				if (!$post['id_contact']) throw new Exception("ID_CONTACT_MISSING",1021);
+				if (!$post['hotline']) throw new Exception("TITLE_MISSING",1022);
+				if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
 
-		        // Mapping pour BDD Optima
-		        $post['pole_concerne'] = $post['pole']; unset($post['pole']);
-		        $post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
-		        $post['visible'] = $post['visible']=='on'?"oui":"non";
+				// Mapping pour BDD Optima
+				$post['pole_concerne'] = $post['pole']; unset($post['pole']);
+				$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
+				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
-		        // Insertion
-	        	$return['aff'] = self::update($post);
-	        	$return['result'] = true;
-        	}
+				// Insertion
+				$return['aff'] = self::update($post);
+				$return['result'] = true;
+			}
 
-        	// last itneraction
-        	if ($lastInteractionRequired) {
-        		$p = array("limit"=>1,"id_hotline"=>$post['id_hotline']);
+			// last itneraction
+			if ($lastInteractionRequired) {
+				$p = array("limit"=>1,"id_hotline"=>$post['id_hotline']);
 						$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
-        	}
+			}
 
-        	// Récupération des notices créés
-        	$return['notices'] = ATF::$msg->getAllNotices();
-	        return $return;
-        } catch (error $e) {
-        	throw $e;
-        } catch (Exception $e) {
-        	throw $e;
-        }
-        return false;
+			// Récupération des notices créés
+			$return['notices'] = ATF::$msg->getAllNotices();
+			return $return;
+		} catch (error $e) {
+			throw $e;
+		} catch (Exception $e) {
+			throw $e;
+		}
+		return false;
 	}
 
 	/**
@@ -4018,9 +4019,9 @@ class hotline extends classes_optima {
 	public function _DELETE($get,$post) {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 		$return['result'] = $this->delete($get);
-    	// Récupération des notices créés
-    	$return['notices'] = ATF::$msg->getNotices();
-        return $return;
+		// Récupération des notices créés
+		$return['notices'] = ATF::$msg->getNotices();
+		return $return;
 	}
 
 	/**
