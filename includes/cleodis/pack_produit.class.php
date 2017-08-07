@@ -254,8 +254,8 @@ class pack_produit extends classes_optima {
 	public function _getBase($get, $post){
 		$path = ATF::pack_produit()->filepath($get['id'],"photo");
 		$data = file_get_contents($path);
-  	return base64_encode($data);
-  }
+	  	return base64_encode($data);
+	}
 
 }
 ?>
