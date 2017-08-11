@@ -14,6 +14,8 @@ class personnel extends classes_optima {
 			,'personnel.ville'
 			,'personnel.email'
 			,'personnel.tel'
+			,'personnel.date_ajout'
+			,'detail'=>array("width"=>80,"nosort"=>true,"renderer"=>"detailRapide","custom"=>true)
 			,'personnel.etat'=>array("width"=>50,"renderer"=>"etat")
 			,'cv'=>array("width"=>50,"nosort"=>true,"type"=>"file","custom"=>true)
 		);
@@ -23,6 +25,8 @@ class personnel extends classes_optima {
 			,"nom"
 			,"prenom"
 			,"etat"
+			,'date_ajout'
+
 		);	
 		$this->panels['primary'] = array("visible"=>true,'nbCols'=>4);
 
@@ -77,6 +81,8 @@ class personnel extends classes_optima {
 		$this->onglets = array('mission_ligne');
 
 		$this->addPrivilege('generateFicheCasting');
+		$this->addPrivilege('detailPersonnel');
+
 	}
 
 	public function generateFicheCasting($infos) {
@@ -175,6 +181,34 @@ class personnel extends classes_optima {
 		}
 		return false;
 	}
+	/* Autocomplete sur les personnes
+	* @author Cyril CHARLIER <ccharlier@absystech.fr>
+	* @param array $infos ($_POST habituellement attendu)
+	*	string $infos[recherche]
+	* @param boolean $reset VRAI si on reset lme querier, FAUX si on a initialisé qqch de précis avant...
+	* @return string HTML de retour
+	*/
+	public function autocomplete($infos,$reset=true) {
+		if ($reset) {
+			$this->q->reset();
+		}
+		$this->q->addOrder("personnel.nom","asc");
+		return parent::autocomplete($infos,false);
+	}
+	public function detailPersonnel($infos,$reset=true) {
+		if ($reset) {
+			$this->q->reset();
+		}
+		$this->q->addField("personnel.mensuration_haut")
+				->addField('personnel.mensuration_bas')
+				->addField('personnel.taille')
 
+				->where("personnel.id_personnel",$this->decryptId($infos['id']))
+				->setDimension('row');
+		$data = $this->select_all();
+		log::logger('yolo','ccharlier');
+		log::logger($data,'ccharlier');
+		return $data;
+	}
 };
 ?>
