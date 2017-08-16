@@ -1001,5 +1001,21 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($ret["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
 	}
 	*/
+/*
+	public function test_PUT(){
+		$clone = $this->devis["devis"];
+		$clone['resume']= "TuPost";
+		$clone['revision']= "B";
+		$clone['id_devis']= $this->id_devis;
+
+		$ret =ATF::devis()->_PUT(false,$clone);
+
+		$this->assertEquals($ret["devis.ref"],"DSO17080002","La ref retourné n'est pas correct");
+		$this->assertEquals($ret["revision"],"A","La revision retournée n'est pas correcte");
+		$this->assertEquals($ret["resume"],"Tu_devis2","Le resume retourné n'est pas correct");
+		$this->assertEquals($ret["affaire"],"Tu_devis2","L'affaire retournée n'est pas correcte");
+		$this->assertEquals($ret["societe.id_societe"],"AbsysTech","La societe retournée n'est pas correcte");
+	}
+*/
 };
 ?>

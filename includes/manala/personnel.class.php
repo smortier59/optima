@@ -19,7 +19,6 @@ class personnel extends classes_optima {
 			,'personnel.etat'=>array("width"=>50,"renderer"=>"etat")
 			,'cv'=>array("width"=>50,"nosort"=>true,"type"=>"file","custom"=>true)
 		);
-
 		$this->colonnes['primary'] = array(
 			"civilite"
 			,"nom"
@@ -193,7 +192,69 @@ class personnel extends classes_optima {
 			$this->q->reset();
 		}
 		$this->q->addOrder("personnel.nom","asc");
-		return parent::autocomplete($infos,false);
+
+		if (!$infos["query"]) {
+			$infos["query"] = "%";
+		}
+
+			// On ne doit pas écraser une limite particulière demandée...
+			if (!$this->q->getLimit()) {
+				$this->q->setLimit(false);
+			}
+
+			$this->q
+				->setCount()
+				->setStrict(1)
+				->setDimension('row_arro')
+				->setSearch(stripslashes(urldecode($infos["query"])))
+				->addField(array("CONCAT(".$this->table.".id_".$this->table.")"=>array("alias"=>"id","nosearch"=>true))); // Clé primaire brute
+
+			/* On défini les champs sur lesquels effectuer la recherche */
+			if ($this->autocomplete["view"]) {
+				$this->q->addField($this->autocomplete["view"]);
+			} else {
+				$this->q->addField($this->table.".id_".$this->table);
+			}
+			if (count($this->autocomplete["view"])<2) {
+				$this->q->addField('""',"detail");
+			}
+
+			// Clée étrangère
+			if($infos["condition_field"] && $infos["condition_value"]){
+
+				/* Lorsqu'on a une string pour condition_field */
+				if (!is_array($infos["condition_field"])) {
+					$infos["condition_field"] = array($infos["condition_field"]);
+					$infos["condition_value"] = array($infos["condition_value"]);
+				}
+
+				foreach ($infos["condition_value"] as $k => $v) {
+					$this->q->addCondition($infos["condition_field"][$k],$this->decryptId($infos["condition_value"][$k]));
+				}
+			}
+
+			// Ordre particulier
+			if($infos["order_field"] && $infos["order_sens"]){
+				$this->q->addOrder($infos["order_field"],$infos["order_sens"]);
+			}
+			if ($result = $this->select_data()) {
+				// On met en valeur la chaîne recherchée dans les réponses
+				$replacement = ATF::$html->fetch("search_replacement.tpl.htm","sr");
+				foreach ($result["data"] as $k => $i) {
+					foreach ($result["data"][$k] as $k_ => $i_) { // Mettre en valeur
+						$result["data"][$k]["raw_".$k_] = $i_;
+						if ($k_>0 || !is_numeric($i_)) {
+							$result["data"][$k][$k_] = util::searchHighlight($i_, $infos["query"], $replacement);
+						} else {
+							$result["data"][$k][$k_] = classes::cryptId($i_);
+						}
+					}
+				}
+			}
+			ATF::$json->add("totalCount",$result["count"]);
+		//}
+		ATF::$cr->rm("top");
+		return $result["data"];
 	}
 	public function detailPersonnel($infos,$reset=true) {
 		if ($reset) {
@@ -206,8 +267,6 @@ class personnel extends classes_optima {
 				->where("personnel.id_personnel",$this->decryptId($infos['id']))
 				->setDimension('row');
 		$data = $this->select_all();
-		log::logger('yolo','ccharlier');
-		log::logger($data,'ccharlier');
 		return $data;
 	}
 };
