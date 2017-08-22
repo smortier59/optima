@@ -1159,11 +1159,12 @@ class affaire_cleodis extends affaire {
 
       if ($get['id_affaire']) $colsData = array("affaire.*");
 
-      $this->q->addField($colsData)->addField("Count(commande.id_commande)","total_cmd");
-      $this->q->from("affaire","id_societe","societe","id_societe");
-      $this->q->from("societe","id_contact_signataire","contact","id_contact");
-      $this->q->from("affaire","id_affaire","commande","id_affaire");
-      $this->q->from("affaire","id_affaire","loyer","id_affaire");
+      $this->q->addField($colsData)
+      			->addField("Count(commande.id_commande)","total_cmd")
+              	->from("affaire","id_societe","societe","id_societe")
+      			->from("societe","id_contact_signataire","contact","id_contact")
+      			->from("affaire","id_affaire","commande","id_affaire")
+      			->from("affaire","id_affaire","loyer","id_affaire");
 
       $this->q->whereIsNotNull("site_associe")
       		->addGroup("affaire.id_affaire");
@@ -1174,22 +1175,15 @@ class affaire_cleodis extends affaire {
       }
 
     // Filtre sur l'etat de l'affaire
-    if ($get['filters']['devis'] == "on") {
-      $this->q->where("affaire.etat","devis","OR","etatAffaire");
+    if ($get['filters']['accepte'] == "on") {
+      $this->q->where("affaire.etat_comite","accepte","OR","etatComite");
     }
-    if ($get['filters']['commande'] == "on") {
-      $this->q->where("affaire.etat","commande","OR","etatAffaire");
+    if ($get['filters']['refuse'] == "on") {
+      $this->q->where("affaire.etat_comite","refuse","OR","etatComite");
     }
-    if ($get['filters']['facture'] == "on") {
-      $this->q->where("affaire.etat","facture","OR","etatAffaire");
+    if ($get['filters']['attente'] == "on") {
+      $this->q->where("affaire.etat_comite","attente","OR","etatComite");
     }
-    if ($get['filters']['terminee'] == "on") {
-      $this->q->where("affaire.etat","terminee","OR","etatAffaire");
-    }
-    if ($get['filters']['perdue'] == "on") {
-      $this->q->where("affaire.etat","perdue","OR","etatAffaire");
-    }
-
 
 
     if ($get['id_affaire']) {
@@ -1223,7 +1217,6 @@ class affaire_cleodis extends affaire {
 
         unset($data["id_societe"],  $data["id_commercial"]);
       }
-
       foreach ($data["devis"] as $key => $value) {
         $data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
         if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
