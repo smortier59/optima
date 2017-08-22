@@ -23,7 +23,9 @@ class affaire_cleodis extends affaire {
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,'mail_signature'
 			,'mail_document'
-			,'document_fournis'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'bilan'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 		);
 
@@ -107,14 +109,12 @@ class affaire_cleodis extends affaire {
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
-		$this->files["document_fournis"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+		$this->files["cni"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+		$this->files["bilan"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
-
-		$this->files["cni"] = array("type"=>"file","preview"=>false,"no_upload"=>false);
-		$this->files["bilan"] = array("type"=>"file","preview"=>false,"no_upload"=>false);
-
 		$this->field_nom="ref";
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
@@ -1066,8 +1066,7 @@ class affaire_cleodis extends affaire {
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
 			$societe = ATF::societe()->select(246);
-			//$from = $societe["societe"]." <".$societe["email"].">";
-			$from = __SOCIETE__." <".__MAIL_SOCIETE__.">";
+			$from = $societe["societe"]." <".$societe["email"].">";
 		}
 
 		if(!$email["objet"]){
@@ -1244,7 +1243,7 @@ class affaire_cleodis extends affaire {
         $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
       	foreach ($data['data'] as $key => $value) {
-		  $data['data'][$key]["document_fournis"] = file_exists($this->filepath($value['id_affaire'],"document_fournis")) ? true : false;
+		  $data['data'][$key]["cni"] = file_exists($this->filepath($value['id_affaire'],"cni")) ? true : false;
 		  $data['data'][$key]["contrat_signe"] = file_exists($this->filepath($value['id_affaire'],"contrat_signe")) ? true : false;
      	}
       }
