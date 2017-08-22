@@ -147,7 +147,7 @@ class comite extends classes_optima {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false,$tu=false){
-		
+
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{
@@ -171,7 +171,11 @@ class comite extends classes_optima {
 			ATF::db($this->db)->rollback_transaction();
 		}else{
 			if(!$tu) $this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
-
+			if($infos["etat"] == "accepte" || $infos["etat"] == "refuse"){
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$infos["etat"]));
+			}else{
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
+			}
 
 
 			if($notifie_suivi != array(0=>"")){
@@ -265,6 +269,7 @@ class comite extends classes_optima {
 			return $this->cryptId($infos["id_comite"]);
 		}else{
 			if(!$tu) $this->move_files($infos["id_comite"],$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
+			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$infos["etat"]));
 
 
 			if($infos["etat"]){
@@ -448,10 +453,13 @@ class comite extends classes_optima {
 
 		if($infos["comboDisplay"] == "refus_comite"){
 			$etat = "refuse";
+			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
 		}elseif($infos["comboDisplay"] == "attente_retour"){
 			$etat = "en_attente";
+			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
 		}else{
 			$etat = "accepte";
+			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
 
 			$id_affaire = ATF::comite()->select($id, "id_affaire");
 

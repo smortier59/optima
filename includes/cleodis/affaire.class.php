@@ -111,6 +111,10 @@ class affaire_cleodis extends affaire {
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
+
+		$this->files["cni"] = array("type"=>"file","preview"=>false,"no_upload"=>false);
+		$this->files["bilan"] = array("type"=>"file","preview"=>false,"no_upload"=>false);
+
 		$this->field_nom="ref";
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
@@ -1062,7 +1066,8 @@ class affaire_cleodis extends affaire {
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
 			$societe = ATF::societe()->select(246);
-			$from = $societe["societe"]." <".$societe["email"].">";
+			//$from = $societe["societe"]." <".$societe["email"].">";
+			$from = __SOCIETE__." <".__MAIL_SOCIETE__.">";
 		}
 
 		if(!$email["objet"]){
