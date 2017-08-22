@@ -21,6 +21,10 @@ class affaire_cleodis extends affaire {
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
 			,'commande.etat'=>array("width"=>30,"renderer"=>"etat")
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
+			,'mail_signature'
+			,'mail_document'
+			,'document_fournis'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 		);
 
 		$this->colonnes['primary'] = array(
@@ -103,6 +107,8 @@ class affaire_cleodis extends affaire {
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
+		$this->files["document_fournis"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="ref";
@@ -1142,11 +1148,11 @@ class affaire_cleodis extends affaire {
       if (!$get['trid']) $get['trid'] = "desc";
 
       // Gestion du limit
-      if (!$get['limit']) $get['limit'] = 30;
+      if (!$get['limit'] && !$get['no-limit']) $get['limit'] = 30;
 
       // Gestion de la page
       if (!$get['page']) $get['page'] = 0;
-
+ 	  if ($get['no-limit']) $get['page'] = false;
       $colsData = array("affaire.*","societe.societe",'societe.id_contact_signataire','contact.email','loyer.loyer');
 
       $this->q->reset();
@@ -1160,7 +1166,7 @@ class affaire_cleodis extends affaire {
       $this->q->from("affaire","id_affaire","loyer","id_affaire");
 
       $this->q->whereIsNotNull("site_associe")
-      		->addGroup("id_affaire");
+      		->addGroup("affaire.id_affaire");
 
       if($get["search"]){
         header("ts-search-term: ".$get['search']);
@@ -1186,7 +1192,7 @@ class affaire_cleodis extends affaire {
 
 
 
-      if ($get['id_affaire']) {
+    if ($get['id_affaire']) {
 
       $this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
       $data = $this->sa();
@@ -1197,7 +1203,12 @@ class affaire_cleodis extends affaire {
                   ->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
       $data["devis"] = ATF::devis()->sa();
 
+      ATF::loyer()->q->reset()->addField("*")
+                  ->from("loyer","id_affaire","affaire","id_affaire")
+                  ->where("loyer.id_affaire",$get['id_affaire'])->addOrder('id_loyer', 'desc');
+      $data["loyer"] = ATF::loyer()->sa();
       foreach ($data as $key => $value) {
+
         if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
         //if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
         if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
@@ -1215,7 +1226,6 @@ class affaire_cleodis extends affaire {
 
       foreach ($data["devis"] as $key => $value) {
         $data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
-
         if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
         if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
       }
@@ -1231,8 +1241,14 @@ class affaire_cleodis extends affaire {
       $data["idcrypted"] = $this->cryptId($get["id_affaire"]);
 
       } else {
-        $this->q->setLimit($get['limit'])->setCount();
+      	if (!$get['no-limit']) $this->q->setLimit($get['limit']);
+        $this->q->setCount();
         $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+      	foreach ($data['data'] as $key => $value) {
+		  $data['data'][$key]["document_fournis"] = file_exists($this->filepath($value['id_affaire'],"document_fournis")) ? true : false;
+		  $data['data'][$key]["contrat_signe"] = file_exists($this->filepath($value['id_affaire'],"contrat_signe")) ? true : false;
+     	}
       }
 
 
@@ -1240,16 +1256,19 @@ class affaire_cleodis extends affaire {
       if($get['id_affaire']){
         $return = $data;
       }else{
-        header("ts-total-row: ".$data['count']);
-        header("ts-max-page: ".ceil($data['count']/$get['limit']));
-        header("ts-active-page: ".$get['page']);
+			header("ts-total-row: ".$data['count']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
         $return = $data['data'];
       }
       return $return;
     }
 
     public function getComite($id_affaire){
-    	ATF::comite()->q->reset()->where("comite.id_affaire" , $id_affaire);
+    	ATF::comite()->q->reset()
+    	->from("comite","id_refinanceur","refinanceur","id_refinanceur")
+    	->where("comite.id_affaire" , $id_affaire);
     	return ATF::comite()->sa();
     }
 
