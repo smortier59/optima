@@ -1206,6 +1206,9 @@ class societe_cleodis extends societe {
     if($post["resultat"] === true){
       $comite["etat"] = "accepte";
         $comite["decisionComite"] = "Accepté automatiquement";
+    } elseif($post["resultat"] === 'etude'){
+      $comite["etat"] = "en_attente";
+        $comite["decisionComite"] = "Résultat SGEF : A l'étude";
     } else {
       $comite["etat"] = "refuse";
       $comite["decisionComite"] = "Refusé automatiquement";
