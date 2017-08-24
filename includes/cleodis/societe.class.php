@@ -1091,7 +1091,7 @@ class societe_cleodis extends societe {
     $loyer = array();
     $produits = array();
 
-    foreach ($get["lignes"] as $key => $value) {
+    foreach ($get["produits"] as $key => $value) {
       if($value > 0){
         $produit = ATF::produit()->select($key);
 
@@ -1229,6 +1229,10 @@ class societe_cleodis extends societe {
   }
 
   public function _createContratToshiba($get , $post){
+
+    ATF::$usr->set('id_user',16);
+    ATF::$usr->set('id_agence',1);
+
     $id_affaire = $post["id_affaire"];
     ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
     $devis = ATF::devis()->select_row();
