@@ -1138,6 +1138,10 @@ class societe_cleodis extends societe {
 
     ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba"));
 
+    ATF::affaire_etat()->insert(array(
+                                  "id_affaire"=>$devis["id_affaire"],
+                                  "etat"=>"reception_demande"
+                              ));
 
     $comite = array  (
             "id_societe" => $id_societe,

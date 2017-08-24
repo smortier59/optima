@@ -1142,6 +1142,12 @@ class affaire_cleodis extends affaire {
 		if (!empty($input)) parse_str($input,$post);
 		$data = base64_decode($post['base64']);
 		ATF::affaire()->store(ATF::_s(),$post['id_affaire'],$post['ext'],$data,false);
+
+		ATF::affaire_etat()->insert(array(
+                                  "id_affaire"=>$post["id_affaire"],
+                                  "etat"=>"reception_pj"
+                              ));
+
 		return true;
 	}
 	/**
@@ -1255,7 +1261,7 @@ class affaire_cleodis extends affaire {
 			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['id_affaire'],"cni")) ? true : false;
 
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['id_affaire']);
-			  $commande = ATF::commande()->select_row(); 
+			  $commande = ATF::commande()->select_row();
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 			  }else{
