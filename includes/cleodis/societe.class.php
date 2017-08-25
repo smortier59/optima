@@ -1030,6 +1030,7 @@ class societe_cleodis extends societe {
   }
 
   public function _sendDataToshiba($get, $post){
+
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
 
@@ -1135,7 +1136,12 @@ class societe_cleodis extends societe {
     }
     $devis = ATF::devis()->select($id_devis);
 
-    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba"));
+    if($post["provenance"]){
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"));
+    }else{
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
+    }
+
 
     ATF::affaire_etat()->insert(array(
                                   "id_affaire"=>$devis["id_affaire"],
