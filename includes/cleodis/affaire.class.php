@@ -1177,10 +1177,10 @@ class affaire_cleodis extends affaire {
 	 	if ($get['id_affaire']) $colsData = array("affaire.*");
 
 	 	$this->q->addField($colsData)
-				->addField("Count(commande.id_commande)","total_cmd")
+				->addField("Count(bon_de_commande.id_bon_de_commande)","total_cmd")
 				->from("affaire","id_societe","societe","id_societe")
 				->from("societe","id_contact_signataire","contact","id_contact")
-				->from("affaire","id_affaire","commande","id_affaire")
+				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire");
 
 	 	$this->q->whereIsNotNull("site_associe")
@@ -1201,22 +1201,25 @@ class affaire_cleodis extends affaire {
 		if ($get['filters']['attente'] == "on") {
 		  $this->q->where("affaire.etat_comite","attente","OR","etatComite");
 		}
-
-
+		if ($get['filters']['commande'] == "on") {
+		  $this->q->whereIsNotNull("bon_de_commande.id_commande");
+		}
+		if ($get['filters']['atraiter'] == "on") {
+		  $this->q->whereIsNull("bon_de_commande.id_commande");
+		}
 		if ($get['id_affaire']) {
-
-		  $this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
+		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
 
 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
-					  ->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
+					  ->where("devis.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_devis', 'desc');
 		  $data["devis"] = ATF::devis()->sa();
 
 		  ATF::loyer()->q->reset()->addField("*")
 					  ->from("loyer","id_affaire","affaire","id_affaire")
-					  ->where("loyer.id_affaire",$get['id_affaire'])->addOrder('id_loyer', 'desc');
+					  ->where("loyer.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_loyer', 'desc');
 		  $data["loyer"] = ATF::loyer()->sa();
 		  foreach ($data as $key => $value) {
 
@@ -1239,19 +1242,30 @@ class affaire_cleodis extends affaire {
 			if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
 			if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
 		  }
-		  $data["file_cni"] = file_exists($this->filepath($data['id_affaire'],"cni")) ? true : false;
-		  $data["file_bilan"] = file_exists($this->filepath($data['id_affaire'],"bilan")) ? true : false;
 
 		  ATF::loyer()->q->reset()->where("loyer.id_affaire", $get['id_affaire']);
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
-
+		  
+		  $data["file_cni"] = file_exists($this->filepath($data['id_affaire'],"cni")) ? "oui" : "non";
+		  foreach ($data["comites"] as $key => $value) {
+		  	if($value['etat'] === 'en_attente'){
+		  		$data["file_bilan"] = file_exists($this->filepath($data['id_affaire'],"bilan")) ? 'oui' : 'non';
+		  	}
+		  }
 		  /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
 		  $data["affaireAffaire"] = $this->sa();
 		  */
 		  $data["idcrypted"] = $this->cryptId($get["id_affaire"]);
-
+		  ATF::commande()->q->reset()->where("commande.id_affaire",$this->decryptId($get["id_affaire"]));
+		  $commande = ATF::commande()->select_row();
+		  if($commande){
+			$data["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+		  }else{
+			$data["contrat_signe"] = false;
+		  }
+		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']); 
 		} else {
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			$this->q->setCount();
@@ -1280,7 +1294,6 @@ class affaire_cleodis extends affaire {
 		}
 		return $return;
 	}
-
 	public function getComite($id_affaire){
 		ATF::comite()->q->reset()
 		->from("comite","id_refinanceur","refinanceur","id_refinanceur")
