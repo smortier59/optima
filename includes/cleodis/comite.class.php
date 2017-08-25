@@ -516,7 +516,6 @@ class comite extends classes_optima {
 				);
 		$id_suivi = ATF::suivi()->insert($suivi);
 
-
 	}
 
 
@@ -541,6 +540,16 @@ class comite extends classes_optima {
 		}
 		return $return;
 
+	}
+	public function _POST($get,$post) {
+	 	$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
+
+	 	if($post['id'] && $post['etat']){
+			$post["comboDisplay"] = $post['etat']=='refuse'?'refus_comite':$post['etat'];
+			$post["date"] =  date("d/m/Y");
+			return $this->decision($post);
+	 	}
 	}
 };
 
