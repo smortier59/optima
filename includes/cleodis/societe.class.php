@@ -1091,7 +1091,7 @@ class societe_cleodis extends societe {
     $loyer = array();
     $produits = array();
 
-    foreach ($post["lignes"] as $key => $value) {
+    foreach ($post["produits"] as $key => $value) {
       if($value > 0){
         $produit = ATF::produit()->select($key);
 
