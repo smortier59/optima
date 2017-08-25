@@ -1208,19 +1208,18 @@ class affaire_cleodis extends affaire {
 		  $this->q->whereIsNull("bon_de_commande.id_commande");
 		}
 		if ($get['id_affaire']) {
-
-		  $this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
+		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
 
 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
-					  ->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
+					  ->where("devis.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_devis', 'desc');
 		  $data["devis"] = ATF::devis()->sa();
 
 		  ATF::loyer()->q->reset()->addField("*")
 					  ->from("loyer","id_affaire","affaire","id_affaire")
-					  ->where("loyer.id_affaire",$get['id_affaire'])->addOrder('id_loyer', 'desc');
+					  ->where("loyer.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_loyer', 'desc');
 		  $data["loyer"] = ATF::loyer()->sa();
 		  foreach ($data as $key => $value) {
 
