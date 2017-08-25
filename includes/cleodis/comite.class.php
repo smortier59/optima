@@ -550,6 +550,9 @@ class comite extends classes_optima {
 			$post["comboDisplay"] = $post['etat']=='refuse'?'refus_comite':$post['etat'];
 			$post["date"] =  date("d/m/Y");
 			$this->decision($post);
+			if($post['etat'] === "accepte"){
+				ATF::societe()->_createContratToshiba(false,array('id_affaire'=>$post['id_affaire']));
+			}
 			return true; 
 	 	}
 	}

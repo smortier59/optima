@@ -1258,9 +1258,13 @@ class affaire_cleodis extends affaire {
 		  $data["affaireAffaire"] = $this->sa();
 		  */
 		  $data["idcrypted"] = $this->cryptId($get["id_affaire"]);
-		  ATF::commande()->q->reset()->where("commande.id_affaire",$value['id_affaire']);
+		  ATF::commande()->q->reset()->where("commande.id_affaire",$this->decryptId($get["id_affaire"]));
 		  $commande = ATF::commande()->select_row();
-
+		  if($commande){
+			$data["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+		  }else{
+			$data["contrat_signe"] = false;
+		  }
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']); 
 		} else {
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
