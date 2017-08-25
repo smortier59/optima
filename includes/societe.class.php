@@ -901,6 +901,7 @@ class societe extends classes_optima {
 				$data = $this->cleanCSResponse($response);
 			}
 		}
+		log::logger($data,'creditsafe');
 		return $data;
 	}
 
@@ -1019,6 +1020,7 @@ class societe extends classes_optima {
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$s = $xml->xmlresponse->body->company->summary;
+		$b =  $xml->xmlresponse->body->company->balancesynthesis;
 
 		if ($bi->branches->numberofbranches>1) {
 			for ($i=0; $i<=$bi->branches->numberofbranches; $i++) {
@@ -1114,6 +1116,11 @@ class societe extends classes_optima {
 
 		// Charges financières
 		$return['financialcharges'] = number_format(intval((string)$balancesheet->profitloss->financialcharges) , 0, ",", " ");
+
+		$return["resultat_exploitation"] = number_format(intval((string)$b->balancesheet->profitloss->operatingprofitloss) , 0, ",", "");
+		$return["capital_social"] = number_format(intval((string)$bi->sharecapital) , 0, ",", "");
+		$return["capitaux_propres"] = number_format(intval((string)$b->balancesheet->passiveaccount->shareholdersequity) , 0, ",", "");
+		$return["dettes_financieres"] = number_format(intval((string)$b->balancesheet->passiveaccount->financialliabilities) , 0, ",", "");
 
 		// ETAT
 		switch ((string)$x->status) {
