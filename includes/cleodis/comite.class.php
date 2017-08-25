@@ -544,11 +544,13 @@ class comite extends classes_optima {
 	public function _POST($get,$post) {
 	 	$input = file_get_contents('php://input');
 		if (!empty($input)) parse_str($input,$post);
-
+		// met entre 7 & 8 secondes a s'executer
+		// & a rendre une réponse
 	 	if($post['id'] && $post['etat']){
 			$post["comboDisplay"] = $post['etat']=='refuse'?'refus_comite':$post['etat'];
 			$post["date"] =  date("d/m/Y");
-			return $this->decision($post);
+			$this->decision($post);
+			return true; 
 	 	}
 	}
 };
