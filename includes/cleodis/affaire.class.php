@@ -1224,7 +1224,7 @@ class affaire_cleodis extends affaire {
 		  foreach ($data as $key => $value) {
 
 			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
-			//if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
+			if($key == "id_contact_signataire") $data["contact"] = ATF::contact()->select($value);
 			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
 			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
 			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
@@ -1247,7 +1247,7 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
-		  
+
 		  $data["file_cni"] = file_exists($this->filepath($data['id_affaire'],"cni")) ? "oui" : "non";
 		  foreach ($data["comites"] as $key => $value) {
 		  	if($value['etat'] === 'en_attente'){
@@ -1265,7 +1265,7 @@ class affaire_cleodis extends affaire {
 		  }else{
 			$data["contrat_signe"] = false;
 		  }
-		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']); 
+		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
 		} else {
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			$this->q->setCount();
