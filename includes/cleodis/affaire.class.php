@@ -1170,7 +1170,7 @@ class affaire_cleodis extends affaire {
 	 	// Gestion de la page
 	 	if (!$get['page']) $get['page'] = 0;
 	 	if ($get['no-limit']) $get['page'] = false;
-	 	$colsData = array("affaire.*","societe.societe",'societe.id_contact_signataire','contact.email','loyer.loyer');
+	 	$colsData = array("affaire.*","societe.societe",'societe.id_contact_signataire','loyer.loyer');
 
 	 	$this->q->reset();
 
@@ -1211,7 +1211,7 @@ class affaire_cleodis extends affaire {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
 
-		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
+		 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
 					  ->where("devis.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_devis', 'desc');
@@ -1221,10 +1221,13 @@ class affaire_cleodis extends affaire {
 					  ->from("loyer","id_affaire","affaire","id_affaire")
 					  ->where("loyer.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_loyer', 'desc');
 		  $data["loyer"] = ATF::loyer()->sa();
+
+
+		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["id_societe"], "id_contact_signataire"));
+
 		  foreach ($data as $key => $value) {
 
 			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
-			if($key == "id_contact_signataire") $data["contact"] = ATF::contact()->select($value);
 			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
 			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
 			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
@@ -1266,6 +1269,7 @@ class affaire_cleodis extends affaire {
 			$data["contrat_signe"] = false;
 		  }
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
+
 		} else {
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			$this->q->setCount();
