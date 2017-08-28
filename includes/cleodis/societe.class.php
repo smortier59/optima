@@ -1059,10 +1059,11 @@ class societe_cleodis extends societe {
     } else {
 
 
-      unset($data["nb_employe"],$data["resultat_exploitation"],$data["capitaux_propres"],$data["dettes_financieres"],$data["capital_social"]);
       $code_client = $this->getCodeClient("toshiba");
       $data["code_client"]= $code_client;
-      $id_societe = $this->insert($data);
+      $data_soc = $data;
+      unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"]);
+      $id_societe = $this->insert($data_soc);
     }
 
     $contact = array( "nom"=>"gerant",
