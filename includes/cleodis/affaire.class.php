@@ -1251,10 +1251,10 @@ class affaire_cleodis extends affaire {
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
 
-		  $data["file_cni"] = file_exists($this->filepath($data['id_affaire'],"cni")) ? "oui" : "non";
+		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  foreach ($data["comites"] as $key => $value) {
 		  	if($value['etat'] === 'en_attente'){
-		  		$data["file_bilan"] = file_exists($this->filepath($data['id_affaire'],"bilan")) ? 'oui' : 'non';
+		  		$data["file_bilan"] = file_exists($this->filepath($get['id_affaire'],"bilan")) ? 'oui' : 'non';
 		  	}
 		  }
 		  /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
