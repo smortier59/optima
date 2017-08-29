@@ -1222,8 +1222,6 @@ class affaire_cleodis extends affaire {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
 
-		  log::logger($data , "mfleurquin");
-
 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
