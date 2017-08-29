@@ -1170,17 +1170,28 @@ class affaire_cleodis extends affaire {
 	 	// Gestion de la page
 	 	if (!$get['page']) $get['page'] = 0;
 	 	if ($get['no-limit']) $get['page'] = false;
-	 	$colsData = array("affaire.*","societe.societe",'societe.id_contact_signataire','loyer.loyer');
+	 	$colsData = array("affaire.affaire",
+	 		"affaire.id_affaire",
+	 		"affaire.etat",
+	 		'affaire.provenance',
+	 		'affaire.date',
+	 		'affaire.ref',
+	 		'affaire.etat_comite',
+	 		'affaire.id_societe',
+	 		'societe.societe',
+	 		'societe.id_contact_signataire',
+	 		'loyer.loyer'); 
+		$this->q->reset();
 
-	 	$this->q->reset();
-
-	 	if ($get['id_affaire']) $colsData = array("affaire.*");
+	 	if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe');
 
 	 	$this->q->addField($colsData)
-				->addField("Count(bon_de_commande.id_bon_de_commande)","total_cmd")
+				->addField("Count(bon_de_commande.id_bon_de_commande)","total_bdc")
+				->addField("Count(commande.id_commande)","nb_contrat")
 				->from("affaire","id_societe","societe","id_societe")
 				->from("societe","id_contact_signataire","contact","id_contact")
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
+				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire");
 
 	 	$this->q->whereIsNotNull("site_associe")
@@ -1223,11 +1234,36 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 
-		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["id_societe"], "id_contact_signataire"));
+		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["id_societe_fk"], "id_contact_signataire"));
 
 		  foreach ($data as $key => $value) {
+			if (strpos($key,".")) {
+				$tmp = explode(".",$key);
+				$data[$tmp[1]] = $value;
+				unset($data[$key]);
+			}
+			if($key == "affaire.id_societe_fk"){
+				ATF::societe()->q->reset()
+					->addField("adresse")
+					->addField("adresse_2")
+					->addField("adresse_3")
+					->addField("code_client")
+					->addField("societe")
+					->addField("cp")
+					->addField("ville")
+					->addField("pays.pays")
+					->addField("tel")
+					->from("pays","id_pays","societe","id_pays")
+					->where("id_societe", $value)
 
-			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
+					->setDimension('row');
+
+				$data["societe"] = ATF::societe()->sa();
+				$data["societe"]['id_pays'] = $data["societe"]["pays.pays"];
+				unset($data["societe"]["pays.pays"],$data["societe"]["pays.pays_fk"]);
+
+			} 
+
 			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
 			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
 			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
@@ -1273,12 +1309,21 @@ class affaire_cleodis extends affaire {
 		} else {
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			$this->q->setCount();
-			$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+			$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+		  	
 
 			foreach ($data['data'] as $key => $value) {
-			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['id_affaire'],"cni")) ? true : false;
-
-			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['id_affaire']);
+				foreach ($value as $k_=>$val) {
+					if (strpos($k_,".")) {
+						$tmp = explode(".",$k_);
+						$data['data'][$key][$tmp[1]] = $val;
+						unset($data['data'][$key][$k_]);
+					}				
+				}
+		  	  $data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
+			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
+		  	  $data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
+			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
