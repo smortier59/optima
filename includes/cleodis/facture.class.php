@@ -1230,6 +1230,7 @@ class facture_cleodis extends facture {
      */
      public function export_xls_special(&$infos){
 
+
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
@@ -1327,6 +1328,7 @@ class facture_cleodis extends facture {
      * @param array $infos : contient tous les enregistrements
      */
      public function ajoutDonnees(&$sheets,$infos){
+
 		$row_auto=1;
 		$increment=0;
 		foreach ($infos as $key => $item) {
@@ -1368,6 +1370,8 @@ class facture_cleodis extends facture {
 				if($ResRefinancement){
 					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
 				}
+
+				log::logger($item , "mfleurquin");
 
 
 				//exceptions
@@ -2574,7 +2578,8 @@ class facture_cleodisbe extends facture_cleodis {
 
 				$infos_commande = ATF::commande()->select($item['facture.id_commande_fk']);
 
-				$libelle = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
+
+				$libelle = 'F'.$item['facture.id_facture'].'-'.$societe['code_client'].'/'.$societe['societe'];
 
 
 				//Facture refinancement

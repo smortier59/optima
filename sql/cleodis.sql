@@ -138,5 +138,3 @@ ALTER TABLE `questionnaire_fl`
 ALTER TABLE `questionnaire_fl_ligne`
   MODIFY `id_questionnaire_fl_ligne` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
-ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','top office','burger king','flunch') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-

@@ -914,11 +914,13 @@ class societe_cleodis extends societe {
 
   public function getUrlSign($id_affaire){
     $url = "https://";
-    if(__DEV__) $url .= "pre-";
-    $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$id_affaire;
+    if(__PRE__) $url .= "pre-";
+    $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
     return $url/*."&sref=".urlencode($url)*/;
   }
-
+  public function _getUrlSign($get,$post){
+    return $this->getUrlSign($get['id_affaire']);
+  }
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -996,16 +998,49 @@ class societe_cleodis extends societe {
     return $return;
   }
 
+  public function getCodeClient($site_associe){
+    $prefixe = "TOSH";
+
+
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(code_client FROM -4))','max')
+      ->addCondition('code_client',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+    if($max<10){
+      $ref.='000'.$max;
+    }elseif($max<100){
+      $ref.='00'.$max;
+    }elseif($max<1000){
+      $ref.='0'.$max;
+    }elseif($max<10000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $prefixe.$ref;
+
+  }
 
   public function _sendDataToshiba($get, $post){
 
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
 
-    $email = $get["email"];
+    $email = $post["email"];
 
 
-    $data = self::getInfosFromCREDITSAFE($get);
+    $data = self::getInfosFromCREDITSAFE($post);
+
+    if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
+    if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
 
 
     ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
@@ -1014,10 +1049,21 @@ class societe_cleodis extends societe {
 
 
     if($res){
+
       $id_societe = $res["id_societe"];
+
+      if(!$res["code_client"]){
+        $code_client = $this->getCodeClient("toshiba");
+        ATF::societe()->u(array("id_societe"=>$id_societe, "code_client"=>$code_client));
+      }
     } else {
-      unset($data["nb_employe"]);
-      $id_societe = $this->insert($data);
+
+
+      $code_client = $this->getCodeClient("toshiba");
+      $data["code_client"]= $code_client;
+      $data_soc = $data;
+      unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"]);
+      $id_societe = $this->insert($data_soc);
     }
 
     $contact = array( "nom"=>"gerant",
@@ -1026,7 +1072,7 @@ class societe_cleodis extends societe {
                     );
     $gerant = ATF::contact()->insert( $contact );
 
-    $pack = ATF::pack_produit()->select($get["id_pack_produit"]);
+    $pack = ATF::pack_produit()->select($post["id_pack_produit"]);
 
 
     $devis = array(
@@ -1046,12 +1092,12 @@ class societe_cleodis extends societe {
     $loyer = array();
     $produits = array();
 
-    foreach ($get["lignes"] as $key => $value) {
+    foreach ($post["produits"] as $key => $value) {
       if($value > 0){
         $produit = ATF::produit()->select($key);
 
         $loyer[0] = array(
-                      "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * ($value * $get["selectQtePack"])),
+                      "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * ($value * $post["selectQtePack"])),
                       "loyer__dot__duree"=>$produit["duree"],
                       "loyer__dot__type"=>"engagement",
                       "loyer__dot__assurance"=>"",
@@ -1067,7 +1113,7 @@ class societe_cleodis extends societe {
 
         $produits[] = array(
                             "devis_ligne__dot__produit"=> $produit["produit"],
-                            "devis_ligne__dot__quantite"=>$value*$get["selectQtePack"],
+                            "devis_ligne__dot__quantite"=>$value*$post["selectQtePack"],
                             "devis_ligne__dot__type"=>"sans_objet",
                             "devis_ligne__dot__ref"=>$produit["ref"],
                             "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
@@ -1091,10 +1137,19 @@ class societe_cleodis extends societe {
     }
     $devis = ATF::devis()->select($id_devis);
 
-    if($data["cs_avis_credit"] == "Limite de crédit non applicable")   $data["cs_avis_credit"] = "";
+    if($post["provenance"]){
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"));
+    }else{
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
+    }
 
-    $comite = array
-        (
+
+    ATF::affaire_etat()->insert(array(
+                                  "id_affaire"=>$devis["id_affaire"],
+                                  "etat"=>"reception_demande"
+                              ));
+
+    $comite = array  (
             "id_societe" => $id_societe,
             "id_affaire" => $devis["id_affaire"],
             "id_contact" => $gerant,
@@ -1140,15 +1195,18 @@ class societe_cleodis extends societe {
     }
 
     if($comite["etat"]== "accepte"){
-      return array("id_affaire"=> $devis["id_affaire"],
+      return array("result"=>true,
+                   "id_affaire"=> $devis["id_affaire"],
+                   "id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"]),
                    "duree"=>$loyer[0]["loyer__dot__duree"],
                    "montant"=> $loyer[0]["loyer__dot__duree"] * $loyer[0]["loyer__dot__loyer"],
                    "loyer"=>$loyer[0]["loyer__dot__loyer"],
                    "siren"=>$data["siren"],
-                   "societe"=>ATF::societe()->select($id_societe)
+                   "societe"=>ATF::societe()->select($id_societe),
+                   "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
                   );
     }
-    return false;
+    return array("result"=>false , "societe"=>ATF::societe()->select($id_societe));
   }
 
   public function _comiteSGEF ($get, $post){
@@ -1161,11 +1219,13 @@ class societe_cleodis extends societe {
     $comite["description"] = "Comite SGEF";
     $comite["suivi_notifie"] = array(0=>"");
 
-
-    if($post["resultat"] === true){
+    if($post["resultat"] == "true"){
       $comite["etat"] = "accepte";
-        $comite["decisionComite"] = "Accepté automatiquement";
-    } else {
+      $comite["decisionComite"] = "Accepté automatiquement";
+    }elseif($post["resultat"] === "etude") {
+      $comite["etat"] = "en_attente";
+      $comite["decisionComite"] = "Comité à l'étude";
+    }else{
       $comite["etat"] = "refuse";
       $comite["decisionComite"] = "Refusé automatiquement";
     }
@@ -1176,7 +1236,48 @@ class societe_cleodis extends societe {
     }catch (errorATF $e) {
       throw new errorATF($e->getMessage() ,500);
     }
+  }
 
+  public function _createContratToshiba($get , $post){
+
+    ATF::$usr->set('id_user',16);
+    ATF::$usr->set('id_agence',1);
+
+    $id_affaire = $post["id_affaire"];
+    ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
+    $devis = ATF::devis()->select_row();
+
+    ATF::devis_ligne()->q->reset()->where("id_devis", $devis["id_devis"]);
+    $lignes = ATF::devis_ligne()->select_all();
+
+    $commande =array(
+            "commande" => $devis["devis"],
+            "type" => "prelevement",
+            "id_societe" => $devis["id_societe"],
+            "date" => date("d-m-Y"),
+            "id_affaire" => $id_affaire,
+            "id_devis" => $devis["id_devis"]
+        );
+
+    $produits = array();
+
+    foreach ($lignes as $key => $value) {
+      $fournisseur = ATF::societe()->select($value["id_fournisseur"]);
+
+      $produits[] = array(
+          "commande_ligne__dot__produit"=>$value["produit"],
+          "commande_ligne__dot__quantite"=>$value["quantite"],
+          "commande_ligne__dot__ref"=>$value["ref"],
+          "commande_ligne__dot__id_fournisseur"=>$fournisseur["societe"],
+          "commande_ligne__dot__id_fournisseur_fk"=>$fournisseur["id_societe"],
+          "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
+          "commande_ligne__dot__id_produit"=>$value["produit"],
+          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"]
+        );
+    }
+    $values_commande = array( "produits" => json_encode($produits));
+
+    ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
   }
 
   public function _updateGerant($get, $post) {
@@ -1184,12 +1285,14 @@ class societe_cleodis extends societe {
     ATF::contact()->q->reset()->where("id_societe", $id_societe)
                               ->where("contact.nom", "GERANT");
     $contact = ATF::contact()->select_row();
-    log::logger($contact , "mfleurquin");
+
+    ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
 
     ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
                             "nom"=>$post["nom_gerant"],
                             "prenom"=>$post["prenom_gerant"],
-                            "tel"=>$post["tel"]
+                            "tel"=>$post["tel"],
+                            "email"=>$post["email"]
                     ));
   }
 
