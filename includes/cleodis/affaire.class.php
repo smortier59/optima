@@ -1180,7 +1180,7 @@ class affaire_cleodis extends affaire {
 	 		'affaire.id_societe',
 	 		'societe.societe',
 	 		'societe.id_contact_signataire',
-	 		'loyer.loyer'); 
+	 		'loyer.loyer');
 		$this->q->reset();
 
 	 	if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe');
@@ -1222,7 +1222,9 @@ class affaire_cleodis extends affaire {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
 
-		 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
+		  log::logger($data , "mfleurquin");
+
+		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
 					  ->where("devis.id_affaire",$this->decryptId($get["id_affaire"]))->addOrder('id_devis', 'desc');
@@ -1234,7 +1236,7 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 
-		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["id_societe_fk"], "id_contact_signataire"));
+		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["affaire.id_societe_fk"], "id_contact_signataire"));
 
 		  foreach ($data as $key => $value) {
 			if (strpos($key,".")) {
@@ -1262,7 +1264,7 @@ class affaire_cleodis extends affaire {
 				$data["societe"]['id_pays'] = $data["societe"]["pays.pays"];
 				unset($data["societe"]["pays.pays"],$data["societe"]["pays.pays_fk"]);
 
-			} 
+			}
 
 			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
 			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
@@ -1310,7 +1312,7 @@ class affaire_cleodis extends affaire {
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			$this->q->setCount();
 			$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
-		  	
+
 
 			foreach ($data['data'] as $key => $value) {
 				foreach ($value as $k_=>$val) {
@@ -1318,7 +1320,7 @@ class affaire_cleodis extends affaire {
 						$tmp = explode(".",$k_);
 						$data['data'][$key][$tmp[1]] = $val;
 						unset($data['data'][$key][$k_]);
-					}				
+					}
 				}
 		  	  $data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
