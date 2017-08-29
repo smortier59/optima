@@ -481,12 +481,20 @@ class commande_lm extends commande {
 						//Creation de la premiere facture
 						ATF::facture()->createPremiereFacture($data);
 
+						ATF::comite()->q->reset()->where("id_affaire" , $id_affaire, "AND")
+												 ->where("comite.etat","accepte","AND",false,"!=");
+						$comite = ATF::comite()->sa();
+						//Si pas de comite pour cette affaire, on envoi le mail de courrier d'information
+						if(!$comite){
+							ATF::commande()->q->reset()->where("commande.id_commande",$this->decryptId($infos['id_commande']));
+							$commandeComite = ATF::commande()->select_row();
+
+							ATF::comite()->envoiCourrierInformation($commandeComite);
+						}
+
 					}
 
 					$commande = $this->select($infos['id_commande']);
-
-
-
 
 					$cmd = $this->select($infos['id_commande']);
 					if($infos['value']){
