@@ -4386,7 +4386,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->setfont('arial','B',22);
-		if($this->facture["prix"]>0){
+		if($this->facture["prix"]>=0){
 			if($this->facture["type_libre"] === "liberatoire"){
 				$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
 			}else{
@@ -8741,7 +8741,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cell(0,5,"N° TVA : ".$this->client["reference_tva"]);
 		$this->setLeftMargin(15);
 		$this->setfont('arial','B',22);
-		if($this->facture["prix"]>0){
+		if($this->facture["prix"]>=0){
 			$t = 'FACTURE';
 		}else{
 			$t = 'AVOIR';
