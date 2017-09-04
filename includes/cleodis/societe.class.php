@@ -999,7 +999,7 @@ class societe_cleodis extends societe {
   }
 
   public function getCodeClient($site_associe){
-    $prefixe = "TOSH";
+    $prefixe = "TO";
 
 
     //Recherche du max en base
