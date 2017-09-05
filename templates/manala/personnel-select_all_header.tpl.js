@@ -47,11 +47,12 @@
 			    itemCls: 'x-check-group-alt',
 			    id: "nom_client"
 			},{
-				xtype: "textfield",
-				fieldLabel: '{ATF::$usr->trans(date,personnel)|escape:javascript}',
-			    itemCls: 'x-check-group-alt',
-			    value: d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear(),
-			    id: "date"
+				xtype:'datefield'
+				,fieldLabel: '{ATF::$usr->trans(date,personnel)|escape:javascript}'
+			    ,itemCls: 'x-check-group-alt'
+				,format:'d-m-Y'
+				,width:120
+				,id: 'date'
 			},{
 				xtype: "textfield",
 				fieldLabel: '{ATF::$usr->trans(lieu,personnel)|ucfirst}',

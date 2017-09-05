@@ -93,7 +93,7 @@ class pdf_manala extends pdf {
 		$this->settextcolor("ff5c9c");
 		$this->multicell(0,15,"Prestation",0,"R");
 		if ($data['client']) $this->multicell(0,15,$data['client'],0,"R");
-		if ($data['date']) $this->multicell(0,15,$data['date'],0,"R");
+		if ($data['date']) $this->multicell(0,15,date('d/m/Y',strtotime($data['date'])),0,"R");
 		if ($data['lieu']) $this->multicell(0,15,$data['lieu'],0,"R");
 		$this->settextcolor("000000");
 
