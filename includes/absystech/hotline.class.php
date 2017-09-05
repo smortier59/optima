@@ -3910,8 +3910,6 @@ class hotline extends classes_optima {
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/
 	public function _PUT($get,$post) {
-		$input = file_get_contents('php://input');
-		if (!empty($input)) parse_str($input,$post);
 		$return = array();
 
 		try {
@@ -3982,9 +3980,17 @@ class hotline extends classes_optima {
 				if (!$post['detail']) throw new Exception("CONTENT_MISSING",1023);
 
 				// Mapping pour BDD Optima
-				$post['pole_concerne'] = $post['pole']; unset($post['pole']);
-				$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
+				if ($post['pole']) {
+					$post['pole_concerne'] = $post['pole'];
+					unset($post['pole']);
+				}
+				if ($post['id_gep_projet']) {
+					$post['id_gep_projet'] = $post['id_projet'];
+					unset($post['id_projet']);
+				}
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
+
+				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
 
 				// Insertion
 				$return['aff'] = self::update($post);
@@ -3994,7 +4000,7 @@ class hotline extends classes_optima {
 			// last itneraction
 			if ($lastInteractionRequired) {
 				$p = array("limit"=>1,"id_hotline"=>$post['id_hotline']);
-						$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
+				$return['interaction'] = ATF::hotline_interaction()->_GET($p)[0];
 			}
 
 			// Récupération des notices créés
