@@ -914,7 +914,7 @@ class societe_cleodis extends societe {
 
   public function getUrlSign($id_affaire){
     $url = "https://";
-    if(__PRE__) $url .= "pre-";
+    if(__PRE__ === true) $url .= "pre-";
     $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
     return $url/*."&sref=".urlencode($url)*/;
   }
@@ -999,7 +999,7 @@ class societe_cleodis extends societe {
   }
 
   public function getCodeClient($site_associe){
-    $prefixe = "TOSH";
+    $prefixe = "TO";
 
 
     //Recherche du max en base
