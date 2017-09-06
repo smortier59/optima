@@ -64,7 +64,7 @@ class mission extends classes_optima {
 		$this->colonnes['bloquees']['update'] = array('ref','etat');
 
 
-		$this->files["DUE"] = array("type"=>"pdf");
+		$this->files["DUE"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->fieldstructure();
 
