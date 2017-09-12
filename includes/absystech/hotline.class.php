@@ -3917,16 +3917,15 @@ class hotline extends classes_optima {
 
 			// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
 			if ($post['specialAction']) {
+				$action = $post['specialAction'];
 				switch ($post['specialAction']) {
 					case "forward":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-						$action = $post['specialAction'];
-						$return = self::$post['specialAction']($post);
+						$return = self::$action($post);
 						$lastInteractionRequired = true;
 					break;
 					case "setPriorite":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-						$action = $post['specialAction'];
 						self::$action($post);
 						$return['result'] = true;
 					break;
@@ -3934,7 +3933,6 @@ class hotline extends classes_optima {
 					case "cancelRequest":
 					case "resolveRequest":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
-						$action = $post['specialAction'];
 						self::$action($post);
 						$return['result'] = true;
 						$lastInteractionRequired = true;
@@ -3944,7 +3942,6 @@ class hotline extends classes_optima {
 					case "setWait":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 						if ($post['etat']=="wait") {
-							$action = $post['specialAction'];
 							self::$action($post);
 						} else {
 							$this->fixingRequest($post);
@@ -3965,7 +3962,7 @@ class hotline extends classes_optima {
 					case "sendMEP":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 						if (!$post['action']) throw new Exception("ACTION_MISSING",1030);
-						$action = $post["action"];
+						$action = $post['action'];
 						$this->$action($post);
 						$lastInteractionRequired = true;
 					break;

@@ -1506,11 +1506,9 @@ class societe extends classes_optima {
 	 * @param  array $post $_POST
 	 */
 	public function _setDomaine($get,$post) {
-		$input = file_get_contents('php://input');
-		if (!empty($input)) parse_str($input,$post);
 		$return = true;
 
-		if (!$post['idSociete']) throw new errorATF("ID_SOCIETE_MISSING",3256);
+		if (!$post['id_societe']) throw new errorATF("ID_SOCIETE_MISSING",3256);
 		if (!$post['domaine']) throw new errorATF("DOMAINE_MISSING",3257);
 
 		if ($post['id']) {
