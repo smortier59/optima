@@ -281,7 +281,7 @@ class facture_lm extends facture {
 			$facture["facture"] = array(
 	            "id_societe" => $affaire["id_societe"],
 	            "type_facture" => "libre",
-	            "mode_paiement" => "cb",
+	            "mode_paiement" => "prelevement",
 	            "id_affaire" => $affaire["id_affaire"],
 	            "type_libre" => "prorata",
 	            "date" => date("d-m-Y"),
@@ -2161,7 +2161,6 @@ class facture_lm extends facture {
 
 	public function export_GL_LM(&$infos,$invoice=null){
 
-
 		if($infos['onglet']){
 			$infos["display"] = true;
 			$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
@@ -2172,8 +2171,6 @@ class facture_lm extends facture {
 		}else{
 			$data = $invoice;
 		}
-
-		log::logger($data, "mfleurquin");
 
         $string = "";
         $total_debit = 0;

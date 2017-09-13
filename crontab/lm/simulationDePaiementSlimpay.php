@@ -7,7 +7,6 @@ $refMandate = $_SERVER['argv'][2];
 $montant = $_SERVER['argv'][3];
 
 
-
 ATF::slimpay()->simulateIssue($refMandate, $montant);
 
 

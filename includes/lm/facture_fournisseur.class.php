@@ -810,13 +810,22 @@ class facture_fournisseur extends classes_optima {
      * @date 28/06/2016
      * @param array $infos : contient tous les enregistrements
      */
-	public function export_ap(&$infos,$force){
-		$infos["display"] = true;
+	public function export_ap(&$infos,$invoice=null){
 
-		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+		if($infos['onglet']){
+			$infos["display"] = true;
+			$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
-        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
-        $data = $this->sa();
+	        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+	        $data = $this->sa();
+
+
+		}else{
+			$data = $invoice;
+			foreach ($data as $key => $value) {
+				$data[$key]["facture_fournisseur.id_facture_fournisseur"] = $value["facture_fournisseur.ref"];
+			}
+		}
 
         $string = "";
         $total_debit = 0;
@@ -873,6 +882,7 @@ class facture_fournisseur extends classes_optima {
         	$TTC_lignes = 0;
 
 			foreach ($lignes_ff as $k => $v) {
+//Ajouter le check sur le compte comptabke ICI !!
 				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
 				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
 			}
@@ -894,7 +904,7 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][8] =  $value["facture_fournisseur.id_facture_fournisseur"];
         	$donnees[$key][1][9] =  date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
         	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
-        	$donnees[$key][1][11] = date("Ymd");
+        	$donnees[$key][1][11] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
         	$donnees[$key][1][12] = number_format($TTC_lignes,2,".",""); //Montant TTC separateur numeric .
         	$donnees[$key][1][13] = "EUR";
     		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
@@ -1027,7 +1037,14 @@ class facture_fournisseur extends classes_optima {
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
-        echo $string;
+		if($invoice){
+        	return array("filename"=>$filename, "content"=>$string);
+        }else{
+        	header('Content-Type: application/fic');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+	        echo $string;
+        }
     }
 
 
@@ -1037,13 +1054,22 @@ class facture_fournisseur extends classes_optima {
      * @date 28/06/2016
      * @param array $infos : contient tous les enregistrements
      */
-	public function export_bap(&$infos,$force){
-		$infos["display"] = true;
+	public function export_bap(&$infos,$invoice=null){
 
-		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+		if($infos['onglet']){
+			$infos["display"] = true;
+			$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
-        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
-        $data = $this->sa();
+	        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+	        $data = $this->sa();
+
+		}else{
+			$data = $invoice;
+			foreach ($data as $key => $value) {
+				$data[$key]["facture_fournisseur.id_facture_fournisseur"] = $value["facture_fournisseur.ref"];
+			}
+
+		}
 
         $string = "";
         $total_debit = 0;
@@ -1121,7 +1147,7 @@ class facture_fournisseur extends classes_optima {
         	$donnees[$key][1][8] =  $value["facture_fournisseur.id_facture_fournisseur"];
         	$donnees[$key][1][9] =  date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
         	$donnees[$key][1][10] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
-        	$donnees[$key][1][11] = date("Ymd");
+        	$donnees[$key][1][11] = date("Ymd", strtotime($value["facture_fournisseur.date"]));
         	$donnees[$key][1][12] = number_format($TTC_lignes,2,".",""); //Montant TTC separateur numeric .
         	$donnees[$key][1][13] = "EUR";
     		$donnees[$key][1][14] = date("Ymd", strtotime($value["facture_fournisseur.date_echeance"]));
@@ -1205,7 +1231,14 @@ class facture_fournisseur extends classes_optima {
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
-        echo $string;
+		if($invoice){
+        	return array("filename"=>$filename, "content"=>$string);
+        }else{
+        	header('Content-Type: application/fic');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+	        echo $string;
+        }
     }
 
 
