@@ -25,6 +25,7 @@ class affaire_lm extends affaire {
 			,'commande.etat'=>array("width"=>30,"renderer"=>"etat","width"=>80)
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,"ref_commande_lm"=>array("rowEditor"=>"setInfos")
+			,'affaire.id_pack_produit'
 		);
 
 		$this->colonnes['primary'] = array(
