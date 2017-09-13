@@ -93,10 +93,7 @@ class slimpay {
     }
 
 
-
-
-
-    public function simulateIssue($mandate,$montant){
+    public function simulateIssue($mandate, $montant){
         $hapiClient = self::connection();
         // The Relations Namespace
         $relNs = self::getRelationNamespace();

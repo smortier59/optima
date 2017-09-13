@@ -41,7 +41,7 @@ class produit_lm extends produit {
 
 
 
-		$this->colonnes["panel"]["sous_produit"] = array('id_produit_principal',
+		$this->colonnes["panel"]["sous_produit"] = array('id_produit_principal'=>array("autocomplete"=>array("function"=>"autocompleteProduitPack")),
 														 'qte_lie_principal',
 														 'sous_produit_unique');
 
