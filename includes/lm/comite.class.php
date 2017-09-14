@@ -309,7 +309,7 @@ class comite extends classes_optima {
 					  "reponse"=>date("Y-m-d"),
 					  "decisionComite"=>$infos["decision"]
 					);
-		//$this->u($data);
+		$this->u($data);
 
 		ATF::devis()->q->reset()->where("devis.id_affaire", $this->select($id, "id_affaire"));
 		$devis = ATF::devis()->select_row();
