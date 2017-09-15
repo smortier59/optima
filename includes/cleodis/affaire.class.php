@@ -1194,7 +1194,8 @@ class affaire_cleodis extends affaire {
 				->from("societe","id_contact_signataire","contact","id_contact")
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","commande","id_affaire")
-				->from("affaire","id_affaire","loyer","id_affaire");
+				->from("affaire","id_affaire","loyer","id_affaire")
+				->from("affaire", "id_affaire", "commande", "id_affaire");
 
 	 	$this->q->whereIsNotNull("site_associe")
 			->addGroup("affaire.id_affaire");
@@ -1220,6 +1221,120 @@ class affaire_cleodis extends affaire {
 		if ($get['filters']['atraiter'] == "on") {
 		  $this->q->whereIsNull("bon_de_commande.id_commande");
 		}
+
+		//filtre sur l'etat de l'affaire en fonction de la vue
+		if ($get['filters']['devis']) {
+		  if ($get['filters']['devis']['relancer']) {
+		    //devis sans bpa
+		  }
+		  if ($get['filters']['devis']['gagnes']) {
+		    //devis transformé en contrat
+		  }
+		  if ($get['filters']['devis']['perdus']) {
+		    //devis perdu
+		  }
+		}
+
+		if ($get['filters']['actif']) {
+		  if ($get['filters']['actif']['encours']) {
+		    //contrat en cours
+		    $this->q
+		    	->where("commande.etat","mis_loyer","OR","etat_contrat")
+		    	->where("commande.etat","mis_loyer_contentieux","OR","etat_contrat");
+		  }
+		  if ($get['filters']['actif']['prolongation']) {
+		  	$this->q
+		    	->where("commande.etat","prolongation","OR","etat_contrat")
+		    	->where("commande.etat","prolongation_contentieux","OR","etat_contrat");
+		  }
+		  if ($get['filters']['actif']['restitution']) {
+		  	$this->q
+		    	->where("commande.etat","restitution","OR","etat_contrat")
+		    	->where("commande.etat","restitution_contentieux","OR","etat_contrat");
+		  }
+		  if ($get['filters']['actif']['contentieux']) {
+		  	$this->q
+		    	->where("commande.etat","mis_loyer_contentieux","OR","etat_contrat")
+		    	->where("commande.etat","prolongation_contentieux","OR","etat_contrat")
+		    	->where("commande.etat","restitution_contentieux","OR","etat_contrat");
+		  }
+		}
+
+		if ($get['filters']['finance']) {
+		  if ($get['filters']['finance']['valider']) {
+		    //emis sans reponse
+		  }
+		  if ($get['filters']['finance']['acceptes']) {
+		    //au moins 1 accord comité
+		  }
+		  if ($get['filters']['finance']['refuses']) {
+		    //aucun comité accepté
+		  }
+		  if ($get['filters']['finance']['faire']) {
+		    //affaire sans comité
+		  }
+		}
+
+		if ($get['filters']['administratif']) {
+			if ($get['filters']['startdate']) {
+				$this->q
+		    	->where("affaire.date_verification", $get['filters']['startdate'], "AND", false, ">=");
+			}
+
+			if ($get['filters']['enddate']) {
+			  $this->q
+		    	->where("affaire.date_verification", $get['filters']['enddate'], "AND", false, "<=");
+			}
+
+		  if ($get['filters']['administratif']['verifier']) {
+		    $this->q
+		    	->whereIsNull("affaire.date_verification");
+		  }
+
+		  if ($get['filters']['administratif']['acceptes']) {
+		  	$this->q
+		    	->whereIsNotNull("affaire.date_verification", "AND")
+		    	->where("affaire.pieces","OK","AND");
+		    //pieces verifiées avec date de verification
+		  }
+
+		  if ($get['filters']['administratif']['incomplets']) {
+		    //pieces refusées ou manquantes
+		    $this->q
+		    	->whereIsNotNull("affaire.date_verification", "AND")
+		    	->where("affaire.pieces","NOK","AND");
+		  }
+		}
+
+		if ($get['filters']['commande']) {
+		  if ($get['filters']['commande']['verifier']) {
+		    //pas encore de date de vérif FINANCE et/ou MONTAGE
+		  }
+		  if ($get['filters']['commande']['commander']) {
+		    //finance et montage ok ou dérogation
+		  }
+		  if ($get['filters']['commande']['commandes']) {
+		    //commande passée, facture non reçue
+		  }
+		  if ($get['filters']['commande']['livres']) {
+
+		  }
+		}
+
+		if ($get['filters']['contrat']) {
+		  if ($get['filters']['contrat']['recusok']) {
+		    //cad VALIDATION DOSSIER OK : FINANCE acceptés et MONTAGE acceptés + PV ok
+		  }
+		  if ($get['filters']['contrat']['recusko']) {
+		    //Commandes passées, mais FINANCE NOK ou MONTAGE NOK
+		  }
+		}
+
+
+
+
+
+
 		if ($get['id_affaire']) {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
@@ -1326,6 +1441,7 @@ class affaire_cleodis extends affaire {
 		  	  $data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
 		  	  $data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
+
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  if($commande){
