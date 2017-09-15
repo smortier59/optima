@@ -1917,6 +1917,7 @@ class hotline_interaction extends classes_optima {
 		if ($get['id']) {
 			$return = $data['data'][0];
 			$return['isFacturable'] = ATF::hotline()->_isFacturable(array("id_hotline_interaction"=>$get['id']));
+			$return['pj'] = file_exists(ATF::hotline_interaction()->filepath($get['id'], "fichier_joint"));
 		} elseif ($get['id_hotline']) {
 			$return = $data['data'];
 			foreach ($return as $k=>$o) {
@@ -2025,6 +2026,7 @@ class hotline_interaction extends classes_optima {
 			if (!$post['id_user']) {
 				$post['id_user'] = ATF::$usr->getId();
 			}
+
 			// Insertion
 			$id = self::insertTS($post);
 
@@ -2265,7 +2267,8 @@ class hotline_interaction extends classes_optima {
 
 
 			// Pas de file si pas de files !
-			if($infos["filestoattach"]) $data["filestoattach"]=$infos["filestoattach"];
+			// if($infos["filestoattach"]) $data["filestoattach"]=$infos["filestoattach"];
+			$data["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
 
 			//Petit message pour le transfert
 			if($infos["transfert"]){
@@ -2402,8 +2405,9 @@ class hotline_interaction extends classes_optima {
 				if($infos["filestoattach"]["fichier_joint"]){
 					//Ajout du fichier joint
 					$path = $this->filepath($id_hotline_interaction,"fichier_joint");
-					$mail=ATF::hotline_mail()->getCurrentMail();
-					$mail->addFile($path,"fichier_joint.zip",true);
+					if ($mail=ATF::hotline_mail()->getCurrentMail()) {
+						$mail->addFile($path,"fichier_joint.zip",true);
+					}
 				}
 
 				ATF::hotline_mail()->sendMail();
