@@ -1029,6 +1029,14 @@ class societe_cleodis extends societe {
 
   }
 
+
+  /**
+   * Permet l'insertion du client TOSHIBA si la société n'existe pas, de l'affaire et du comité CreditSafe
+   * @param  [type] $get  [description]
+   * @param  [type] $post [description]
+   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @return [type]       [description]
+   */
   public function _sendDataToshiba($get, $post){
 
     ATF::$usr->set('id_user',16);
@@ -1038,6 +1046,11 @@ class societe_cleodis extends societe {
 
 
     $data = self::getInfosFromCREDITSAFE($post);
+
+    $gerants = $data["gerant"];
+
+
+
 
     if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
     if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
@@ -1049,31 +1062,57 @@ class societe_cleodis extends societe {
 
 
     if($res){
-
       $id_societe = $res["id_societe"];
-
       if(!$res["code_client"]){
         $code_client = $this->getCodeClient("toshiba");
         ATF::societe()->u(array("id_societe"=>$id_societe, "code_client"=>$code_client));
       }
     } else {
-
-
       $code_client = $this->getCodeClient("toshiba");
       $data["code_client"]= $code_client;
       $data_soc = $data;
-      unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"]);
+
+      unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
       $id_societe = $this->insert($data_soc);
     }
 
-    $contact = array( "nom"=>"gerant",
-                      "email"=>$email,
-                      "id_societe"=> $id_societe
+    if($gerants){
+      foreach ( $gerants as $key => $value) {
+        ATF::contact()->q->reset()->where("LOWER(nom)", strtolower($value["nom"]),"AND")
+                                  ->where("LOWER(prenom)", strtolower($value["prenom"]),"AND")
+                                  ->where("id_societe", $id_societe,"AND");
+        $gerant[$key] = $contact;
+        $c = ATF::contact()->select_row();
+        if(!$c){
+          $contact = array( "nom"=>$value["nom"],
+                        "prenom"=>$value["prenom"],
+                        "fonction"=>$value["fonction"],
+                        "email"=>$email,
+                        "id_societe"=> $id_societe
+                      );
+          $gerant[$key] = $contact;
+          $gerant[$key]["id_contact"] = ATF::contact()->insert( $contact );
+        } else {
+          $gerant[$key] = array(  "nom"=>$c["nom"],
+                                  "prenom"=>$c["prenom"],
+                                  "fonction"=>$c["fonction"],
+                                  "gsm"=>$c["gsm"],
+                                  "email"=>$c["email"],
+                                  "id_societe"=> $id_societe,
+                                  "id_contact"=>$c["id_contact"]
+                                );
+        }
+      }
+    }else{
+      $contact = array( "nom"=>"gerant",
+                        "email"=>$email,
+                        "id_societe"=> $id_societe
                     );
-    $gerant = ATF::contact()->insert( $contact );
+      $gerant[0] = $contact;
+      $gerant[0]["id_contact"] = ATF::contact()->insert( $contact );
+    }
 
     $pack = ATF::pack_produit()->select($post["id_pack_produit"]);
-
 
     $devis = array(
             "id_societe" => $id_societe,
@@ -1083,7 +1122,7 @@ class societe_cleodis extends societe {
             "devis" => $pack["nom"],
             "date" => date("d-m-Y"),
             "type_devis" => "normal",
-            "id_contact" => $gerant,
+            "id_contact" => $gerant[0]["id_contact"],
             "type_affaire" => "normal");
     $values_devis =array();
 
@@ -1152,7 +1191,7 @@ class societe_cleodis extends societe {
     $comite = array  (
             "id_societe" => $id_societe,
             "id_affaire" => $devis["id_affaire"],
-            "id_contact" => $gerant,
+            "id_contact" => $gerant[0]["id_contact"],
             "activite" => $data["activite"],
             "id_refinanceur" => "98b08c04b5f5632e49a93b6b324c5678",
             "date_creation" => $data["date_creation"],
@@ -1202,6 +1241,7 @@ class societe_cleodis extends societe {
                    "montant"=> $loyer[0]["loyer__dot__duree"] * $loyer[0]["loyer__dot__loyer"],
                    "loyer"=>$loyer[0]["loyer__dot__loyer"],
                    "siren"=>$data["siren"],
+                   "gerants"=>$gerant,
                    "societe"=>ATF::societe()->select($id_societe),
                    "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
                   );
@@ -1280,20 +1320,48 @@ class societe_cleodis extends societe {
     ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
   }
 
+
+  /**
+   * Permet de mettre à jour le contact signataire / ou créer un nouveau contact pour etre signataire
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  [type] $get  [description]
+   * @param  [type] $post [description]
+   */
   public function _updateGerant($get, $post) {
+
     $id_societe = ATF::affaire()->select($post["id_affaire"], "id_societe");
-    ATF::contact()->q->reset()->where("id_societe", $id_societe)
+
+
+    if($post["id_contact"] === "0"){
+      ATF::contact()->q->reset()->where("id_societe", $id_societe)
                               ->where("contact.nom", "GERANT");
-    $contact = ATF::contact()->select_row();
-
-    ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
-
-    ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
-                            "nom"=>$post["nom_gerant"],
-                            "prenom"=>$post["prenom_gerant"],
-                            "tel"=>$post["tel"],
-                            "email"=>$post["email"]
-                    ));
+      $contact = ATF::contact()->select_row();
+      if($contact){
+        ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
+                                "nom"=>$post["nom_gerant"],
+                                "prenom"=>$post["prenom_gerant"],
+                                "tel"=>$post["tel"],
+                                "email"=>$post["email"]
+                        ));
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
+      } else {
+        $id_contact = ATF::contact()->i(array(
+                                "nom"=>$post["nom_gerant"],
+                                "prenom"=>$post["prenom_gerant"],
+                                "tel"=>$post["phone_gerant"],
+                                "email"=>$post["email_gerant"],
+                                "fonction"=>$post["fonction_gerant"]
+                        ));
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact));
+      }
+    }else{
+      ATF::contact()->u(array("id_contact"=>$post["id_contact"],
+                              "tel"=>$post["tel"],
+                              "fax"=>$post["fax"],
+                              "email"=>$post["email"]
+                      ));
+       ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$post["id_contact"]));
+    }
   }
 
 };
@@ -1319,7 +1387,7 @@ class societe_cleodisbe extends societe_cleodis {
   */
   public function getInfosFromCREDITSAFE($infos) {
 
-    $client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
+    /*$client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
 
     $params = (object)array
     ( 'countries' => array ('BE'),
@@ -1333,7 +1401,9 @@ class societe_cleodisbe extends societe_cleodis {
     $response = $client->__soapCall('FindCompanies',array($params));
 
 
-    file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
+    file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));*/
+
+    $response = file_get_contents("/home/optima/core/log/creditsafe.xml");
 
     $xml = $response;
 
