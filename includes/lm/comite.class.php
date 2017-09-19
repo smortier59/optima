@@ -93,7 +93,7 @@ class comite extends classes_optima {
 
 
 		if($notifie_suivi != array(0=>"")){
-			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com";
+			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com,herve.anvroin@leroymerlin.fr";
 			$info_mail["suivi_notifie"] = "";
 
 			foreach ($notifie_suivi as $key => $value) {
