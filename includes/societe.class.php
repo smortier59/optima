@@ -910,7 +910,6 @@ class societe extends classes_optima {
 	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
 	*/
 	public function cleanGGSResponse($r) {
-
 		$xml = $r;
 
 		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
@@ -918,7 +917,6 @@ class societe extends classes_optima {
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$b =  $xml->xmlresponse->body->company->balancesynthesis;
-
 
 		// Nom de société
 		$return['societe'] = (string)$company->BasicInformation->BusinessName;
@@ -1016,11 +1014,25 @@ class societe extends classes_optima {
 	*/
 	private function cleanCSResponse($r) {
 
+
 		$xml = simplexml_load_string($r);
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$s = $xml->xmlresponse->body->company->summary;
 		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+
+		$directors = $xml->xmlresponse->body->company->directors;
+
+		$gerant = array();
+		foreach ($directors->director as $key => $value) {
+			if($value->typeofmanager == "Personne physique" && !preg_match("/Commissaire aux comptes/" ,$value->managerposition)){
+				$return['gerant'][] = array("nom"=>(string)$value->familyname,
+								  "prenom"=>(string)$value->christianname,
+								  "fonction"=>(string)$value->managerposition);
+			}
+		}
+
 
 		if ($bi->branches->numberofbranches>1) {
 			for ($i=0; $i<=$bi->branches->numberofbranches; $i++) {

@@ -1185,6 +1185,10 @@ class affaire_cleodis extends affaire {
 	 		'loyer.loyer');
 		$this->q->reset();
 
+
+		$this->q->setCount();
+
+
 	 	if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe');
 
 	 	$this->q->addField($colsData)
@@ -1194,7 +1198,8 @@ class affaire_cleodis extends affaire {
 				->from("societe","id_contact_signataire","contact","id_contact")
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","commande","id_affaire")
-				->from("affaire","id_affaire","loyer","id_affaire");
+				->from("affaire","id_affaire","loyer","id_affaire")
+				->from("affaire", "id_affaire", "commande", "id_affaire");
 
 	 	$this->q->whereIsNotNull("site_associe")
 			->addGroup("affaire.id_affaire");
@@ -1204,22 +1209,6 @@ class affaire_cleodis extends affaire {
 			$this->q->setSearch($get['search']);
 		}
 
-		// Filtre sur l'etat de l'affaire
-		if ($get['filters']['accepte'] == "on") {
-		  $this->q->where("affaire.etat_comite","accepte","OR","etatComite");
-		}
-		if ($get['filters']['refuse'] == "on") {
-		  $this->q->where("affaire.etat_comite","refuse","OR","etatComite");
-		}
-		if ($get['filters']['attente'] == "on") {
-		  $this->q->where("affaire.etat_comite","attente","OR","etatComite");
-		}
-		if ($get['filters']['commande'] == "on") {
-		  $this->q->whereIsNotNull("bon_de_commande.id_commande");
-		}
-		if ($get['filters']['atraiter'] == "on") {
-		  $this->q->whereIsNull("bon_de_commande.id_commande");
-		}
 		if ($get['id_affaire']) {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
@@ -1310,9 +1299,279 @@ class affaire_cleodis extends affaire {
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
 
 		} else {
-			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
-			$this->q->setCount();
-			$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+
+			// Filtre sur l'etat de l'affaire
+			if ($get['filters']['accepte'] == "on") $this->q->where("affaire.etat_comite","accepte","OR","etatComite");
+			if ($get['filters']['refuse'] == "on") $this->q->where("affaire.etat_comite","refuse","OR","etatComite");
+			if ($get['filters']['attente'] == "on") $this->q->where("affaire.etat_comite","attente","OR","etatComite");
+			if ($get['filters']['commande'] == "on") $this->q->whereIsNotNull("bon_de_commande.id_commande");
+			if ($get['filters']['atraiter'] == "on") $this->q->whereIsNull("bon_de_commande.id_commande");
+
+			//filtre sur l'etat de l'affaire en fonction de la vue
+			if ($get['filters']['devis']) {
+			  if ($get['filters']['devis']['relancer']) {
+			    //devis sans bpa -> Sans contrat  sans Premiere date accord sur le devis)
+			    $this->q->from("affaire", "id_affaire", "devis", "id_affaire")
+			    		->whereIsNull("devis.first_date_accord");
+			  }
+			  if ($get['filters']['devis']['gagnes']) {
+			    //devis transformé en contrat
+			    $this->q->from("affaire", "id_affaire", "devis", "id_affaire")
+			    		->where("devis.etat","commande",'OR',"affaireEtat")
+			    		->where("devis.etat","facture",'OR',"affaireEtat")
+			    		->where("devis.etat","demande_refi",'OR',"affaireEtat")
+			    		->where("devis.etat","dfacture_refi",'OR',"affaireEtat");
+			  }
+			  if ($get['filters']['devis']['perdus']) {
+			    //devis perdu
+			    $this->q->from("affaire", "id_affaire", "devis", "id_affaire")
+			    		->where("devis.etat","perdu");
+			  }
+			}
+
+			if ($get['filters']['actif']) {
+			  if ($get['filters']['actif']['encours']) {
+			    //contrat en cours
+			    $this->q
+			    	->where("commande.etat","mis_loyer","OR","etat_contrat")
+			    	->where("commande.etat","mis_loyer_contentieux","OR","etat_contrat");
+			  }
+			  if ($get['filters']['actif']['prolongation']) {
+			  	$this->q
+			    	->where("commande.etat","prolongation","OR","etat_contrat")
+			    	->where("commande.etat","prolongation_contentieux","OR","etat_contrat");
+			  }
+			  if ($get['filters']['actif']['restitution']) {
+			  	$this->q
+			    	->where("commande.etat","restitution","OR","etat_contrat")
+			    	->where("commande.etat","restitution_contentieux","OR","etat_contrat");
+			  }
+			  if ($get['filters']['actif']['contentieux']) {
+			  	$this->q
+			    	->where("commande.etat","mis_loyer_contentieux","OR","etat_contrat")
+			    	->where("commande.etat","prolongation_contentieux","OR","etat_contrat")
+			    	->where("commande.etat","restitution_contentieux","OR","etat_contrat");
+			  }
+			}
+
+			if ($get['filters']['finance']) {
+			  $res  = $this->sa($get['tri'],$get['trid'],false, false);
+			  $data["data"] = array();
+
+			  if ($get['filters']['finance']['valider']) {
+			    //emis sans reponse
+			    foreach ($res["data"] as $k => $v) {
+			    	ATF::comite()->q->reset()->where("comite.id_affaire",$v['affaire.id_affaire_fk'])
+				    						 ->where("comite.etat", "en_attente");
+			    	$comite = ATF::comite()->sa();
+			    	if($comite){
+			    		$data["data"][$k] = $v;
+			    	}
+			    }
+			  }
+			  if ($get['filters']['finance']['acceptes']) {
+			    //au moins 1 accord comité
+			    foreach ($res["data"] as $k => $v) {
+			    	ATF::comite()->q->reset()->where("id_affaire",$v['affaire.id_affaire_fk'])
+			    							 ->where("comite.etat", "accepte");
+			    	$comite = ATF::comite()->sa();
+			    	if($comite){
+			    		$data["data"][$k] = $v;
+			    	}
+			    }
+			  }
+			  if ($get['filters']['finance']['refuses']) {
+			    //aucun comité accepté
+			    foreach ($res["data"] as $k => $v) {
+				    ATF::comite()->q->reset()->where("comite.id_affaire",$v['affaire.id_affaire_fk'])
+				    						 ->where("comite.etat", "accepte","OR")
+				    						 ->where("comite.etat", "en_attente");
+			    	$comite = ATF::comite()->sa();
+
+			    	if(!$comite){
+			    		$data["data"][$k] = $v;
+			    	}
+			    }
+			  }
+			  if ($get['filters']['finance']['faire']) {
+			    //affaire sans comité
+			    foreach ($res["data"] as $k => $v) {
+			    	ATF::comite()->q->reset()->where("id_affaire",$v['affaire.id_affaire_fk']);
+			    	$comite = ATF::comite()->sa();
+			    	if(!$comite){
+			    		$data["data"][$k] = $v;
+			    	}
+			    }
+			  }
+
+			  $d = $data["data"];
+			  $data["data"] = array();
+			  foreach ($d as $key => $value) {
+			  	$data["data"][] = $value;
+			  }
+
+
+			  $data["count"] = count($data["data"]);
+			}
+
+			if ($get['filters']['administratif']) {
+				if ($get['filters']['startdate']) {
+					$this->q
+			    	->where("affaire.date_verification", $get['filters']['startdate'], "AND", false, ">=");
+				}
+
+				if ($get['filters']['enddate']) {
+				  $this->q
+			    	->where("affaire.date_verification", $get['filters']['enddate'], "AND", false, "<=");
+				}
+
+			  if ($get['filters']['administratif']['verifier']) {
+			    $this->q
+			    	->whereIsNull("affaire.date_verification");
+			  }
+
+			  if ($get['filters']['administratif']['acceptes']) {
+			  	$this->q
+			    	->whereIsNotNull("affaire.date_verification", "AND")
+			    	->where("affaire.pieces","OK","AND");
+			    //pieces verifiées avec date de verification
+			  }
+
+			  if ($get['filters']['administratif']['incomplets']) {
+			    //pieces refusées ou manquantes
+			    $this->q
+			    	->whereIsNotNull("affaire.date_verification", "AND")
+			    	->where("affaire.pieces","NOK","AND");
+			  }
+			}
+
+			if ($get['filters']['commande']) {
+			  $res = $this->sa($get['tri'],$get['trid'],false, false);
+			  $d = array();
+
+			  if ($get['filters']['commande']['verifier']) {
+			    //pas encore de date de vérif FINANCE et/ou MONTAGE
+			    //Pas de date de verif des pieces ou dernier comite pas accepte
+			    foreach ($res["data"] as $k => $v) {
+			    	if(!$this->select($v["affaire.id_affaire_fk"], "date_verification")){
+			    		$d[$k] = $v;
+			    	}else{
+			    		ATF::comite()->q->reset()->where("comite.id_affaire",$v['affaire.id_affaire_fk'])
+				    						   ->setLimit(1)
+				    						   ->addOrder("id_comite","DESC");
+				    	$comite = ATF::comite()->select_row();
+				    	if($comite["etat"] == "en_attente"){
+				    		$d[$k] = $v;
+				    	}
+				    }
+			    }
+			  }
+			  if ($get['filters']['commande']['commander']) {
+			    //finance et montage ok
+			    foreach ($res["data"] as $k => $v) {
+			    	if($this->select($v["affaire.id_affaire_fk"], "date_verification")){
+			    		ATF::comite()->q->reset()->where("comite.id_affaire",$v['affaire.id_affaire_fk'])
+				    						   ->setLimit(1)
+				    						   ->addOrder("id_comite","DESC");
+				    	$comite = ATF::comite()->select_row();
+				    	if($comite["etat"] == "accepte"){
+				    		$d[$k] = $v;
+				    	}
+			    	}
+			    }
+			  }
+			  if ($get['filters']['commande']['commandes']) {
+			    //commande passée, facture non reçue
+			    //on a un bon de commande mais pas de facture fournisseur pour cette commande
+			    foreach ($res["data"] as $k => $v) {
+			    	ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $v['affaire.id_affaire_fk']);
+			    	if($bdc = ATF::bon_de_commande()->select_row()){
+			    		ATF::facture_fournisseur()->q->reset()->where("id_bon_de_commande", $bdc["bon_de_commande.id_bon_de_commande"]);
+			    		$ff = ATF::facture_fournisseur()->sa();
+
+			    		if(!$ff){
+			    			$d[$k] = $v;
+			    		}
+			    	}
+			    }
+			  }
+			  if ($get['filters']['commande']['livres']) {
+			  	//on a un bon de commande et une de facture fournisseur pour cette commande
+			  	foreach ($res["data"] as $k => $v) {
+			    	ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $v['affaire.id_affaire_fk']);
+			    	if($bdc = ATF::bon_de_commande()->select_row()){
+			    		ATF::facture_fournisseur()->q->reset()->where("id_bon_de_commande", $bdc["bon_de_commande.id_bon_de_commande"]);
+			    		$ff = ATF::facture_fournisseur()->sa();
+			    		if($ff){
+			    			$d[$k] = $v;
+			    		}
+			    	}
+			    }
+			  }
+
+			  $data["data"] = array();
+			  foreach ($d as $key => $value) {
+			  	$data["data"][] = $value;
+			  }
+			  $data["count"] = count($d);
+			}
+
+			if ($get['filters']['contrat']) {
+			   $res  = $this->sa($get['tri'],$get['trid'],false, false);
+			   $data["data"] = array();
+
+			  if ($get['filters']['contrat']['recusok']) {
+			    //cad VALIDATION DOSSIER OK : FINANCE acceptés et MONTAGE acceptés + PV ok
+			    //Finance -> au moins un comité accepte
+			    //Montage verification des pieces
+			    foreach ($res["data"] as $k => $v) {
+			    	if($this->select($v["affaire.id_affaire_fk"], "pieces")){
+			    		ATF::comite()->q->reset()->where("comite.id_affaire", $v['affaire.id_affaire_fk'])
+			    								->addOrder("comite.id_comite","DESC")
+			    								->setLimit(1);
+			    		$comite = ATF::comite()->select_row();
+			    		if($comite["etat"] == "accepte"){
+			    			$d[$k]= $v;
+			    		}
+			    	}
+			    }
+
+			  }
+			  if ($get['filters']['contrat']['recusko']) {
+			    //Commandes passées, mais FINANCE NOK ou MONTAGE NOK
+			    foreach ($res["data"] as $k => $v) {
+			    	ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $v['affaire.id_affaire_fk']);
+			    	$bdc = ATF::bon_de_commande()->select_all();
+			    	if($bdc){
+			    		if($this->select($v["affaire.id_affaire_fk"], "pieces") === NULL){
+			    			$d[$k]= $v;
+			    		}else{
+			    			ATF::comite()->q->reset()->where("comite.id_affaire", $v['affaire.id_affaire_fk'])
+			    								->addOrder("comite.id_comite","DESC")
+			    								->setLimit(1);
+			    			$comite = ATF::comite()->select_row();
+
+			    			if($comite["etat"] !== "accepte"){
+			    				$d[$k]= $v;
+			    			}
+			    		}
+			    	}
+			    }
+			  }
+
+			  $data["data"] = array();
+			  foreach ($d as $key => $value) {
+			  	$data["data"][] = $value;
+			  }
+			  $data["count"] = count($d);
+			}
+
+
+			if(!$data){
+				if (!$get['no-limit']) $this->q->setLimit($get['limit']);
+				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+			}
+
 
 
 			foreach ($data['data'] as $key => $value) {
@@ -1326,6 +1585,7 @@ class affaire_cleodis extends affaire {
 		  	  $data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
 		  	  $data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
+
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  if($commande){
