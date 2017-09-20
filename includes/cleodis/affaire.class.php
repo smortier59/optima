@@ -1606,6 +1606,44 @@ class affaire_cleodis extends affaire {
 		}
 		return $return;
 	}
+
+	/**
+	*
+	* Fonctions _updatePiece pour cleoscope
+	* @package Telescope
+	* @author Anthony LAHLAH <alahlah@absystech.fr>
+	* @param $get array.
+	* @param $post array qui contient ok ou notok pour la validation des pièces.
+	* @return true ou false, resultat du traitement
+	*/
+	public function _updatePiece($get,$post) {
+		if (!$post['action']) throw new Exception("Il manque l'action", 500);
+		if (!$post['id_affaire']) throw new Exception("Il manque l'id de l'affaire", 500);
+
+		$action = $post['action'] == "valider" ? "OK" : "NOK";
+		$id_affaire = $this->decryptId($post["id_affaire"]);
+
+		try {
+			ATF::affaire()->update(array(
+				'id_affaire'=>$id_affaire
+				,'pieces'=>$action
+				,'date_verification'=>date("Y-m-d")
+			));
+
+			ATF::affaire_etat()->insert(array(
+				'id_affaire'=>$id_affaire
+				,'etat'=>'valide_administratif'
+				,'id_user'=>ATF::$usr->get('id_user')
+			));
+
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
+
+	}
+
+
 	public function getComite($id_affaire){
 		ATF::comite()->q->reset()
 		->from("comite","id_refinanceur","refinanceur","id_refinanceur")
