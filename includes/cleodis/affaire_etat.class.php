@@ -21,8 +21,12 @@ class affaire_etat extends classes_optima {
 
 
 	public function _GET($get, $post){
-		ATF::affaire_etat()->q->reset()->where("id_affaire", $get["id_affaire"])
-									   ->addOrder("date","desc");
+		ATF::affaire_etat()
+			->q
+			->reset()
+			->addJointure("affaire_etat","id_user","user","id_user") //rajout d'une jointure pour récupérer le login
+			->where("id_affaire", $get["id_affaire"])
+			->addOrder("affaire_etat.date","desc");
 		return ATF::affaire_etat()->select_all();
 	}
 }

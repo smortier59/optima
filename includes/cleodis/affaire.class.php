@@ -1269,12 +1269,16 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
+		  $data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est insérer automatiquement quelque soit le resultat sgef/creditSafe
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
 		  foreach ($data["comites"] as $key => $value) {
 		  	if($value['etat'] === 'en_attente'){
 		  		$data["file_bilan"] = file_exists($this->filepath($get['id_affaire'],"bilan")) ? 'oui' : 'non';
+		  	}
+		  	if($value['description']=== 'Comité CLEODIS'){
+		  		$data["etat_comite_cleodis"] = $value['etat']; //je (Anthony) rajoute cet etat car l'etat de baserenvoyé ne concerne pas le comite cleodis
 		  	}
 		  }
 		  /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);

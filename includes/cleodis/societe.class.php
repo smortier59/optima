@@ -1238,7 +1238,7 @@ class societe_cleodis extends societe {
       throw new errorATF($e->getMessage() ,500);
     }
 
-    if($comite["etat"]== "accepte"){
+    //if($comite["etat"]== "accepte"){ // desactivation de la condition pour l'insertion d'un commité automatique meme en cas de refu
 
       //Création du comité CLEODIS
       $comite["description"] = "Comité CLEODIS";
@@ -1258,8 +1258,32 @@ class societe_cleodis extends societe {
                    "societe"=>ATF::societe()->select($id_societe),
                    "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
                   );
+    //}
+    //return array("result"=>false , "societe"=>ATF::societe()->select($id_societe));
+  }
+
+  public function _comiteCleodis ($get, $post){
+    $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
+    $decisionAffaireEtat = $post['action'] == "valider" ? "comite_cleodis_valide" : "comite_cleodis_refuse"; // pareil pour la timeline
+    ATF::comite()->q->reset() // on récupére le comite cleodis concerné
+      ->where("id_affaire",$post["id_affaire"], 'AND')
+      ->where("description", "Comité CLEODIS", 'AND')
+      ->where("etat", "en_attente");
+    $comite = ATF::comite()->select_row();
+
+    try {
+      // on met à jour l'état
+      ATF::comite()->u(array("id_comite"=>$comite['id_comite'], "etat"=>$decision, "decisionComite"=>"Accepté manuellement"));
+      // ainsi que la table affaire etat pour la timeline
+      ATF::affaire_etat()->insert(array(
+          "id_affaire"=>$post["id_affaire"],
+          "etat"=> $decisionAffaireEtat,
+          "id_user"=>ATF::$usr->get('id_user')
+      ));
+      return true;
+    } catch (Exception $e) {
+      return $e;
     }
-    return array("result"=>false , "societe"=>ATF::societe()->select($id_societe));
   }
 
   public function _comiteSGEF ($get, $post){

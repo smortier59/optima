@@ -139,3 +139,15 @@ ALTER TABLE `questionnaire_fl`
 ALTER TABLE `questionnaire_fl_ligne`
   MODIFY `id_questionnaire_fl_ligne` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
+
+/*SQL pour cleoscope et le portail www*/
+ALTER TABLE `affaire` ADD `pieces` ENUM('NOK','OK') NULL DEFAULT NULL AFTER `provenance`, ADD `date_verification` DATE NULL DEFAULT NULL AFTER `pieces`;
+
+ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE `affaire_etat` ADD `id_user` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `commentaire`, ADD INDEX (`id_user`);
+
+ALTER TABLE `affaire_etat` ADD FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif','comite_cleodis_valide','comite_cleodis_refuse') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+/******/
