@@ -1083,16 +1083,19 @@ class societe_cleodis extends societe {
                                   ->where("id_societe", $id_societe,"AND");
         $gerant[$key] = $contact;
         $c = ATF::contact()->select_row();
+        //Si le contact n'exite pas dans optima, on l'insert
         if(!$c){
           $contact = array( "nom"=>$value["nom"],
-                        "prenom"=>$value["prenom"],
-                        "fonction"=>$value["fonction"],
-                        "email"=>$email,
-                        "id_societe"=> $id_societe
-                      );
+                            "prenom"=>$value["prenom"],
+                            "fonction"=>$value["fonction"],
+                            "email"=>$email,
+                            "id_societe"=> $id_societe,
+                            "est_dirigeant"=>"oui"
+                          );
           $gerant[$key] = $contact;
           $gerant[$key]["id_contact"] = ATF::contact()->insert( $contact );
         } else {
+          //Sinon on le met à jour
           $gerant[$key] = array(  "nom"=>$c["nom"],
                                   "prenom"=>$c["prenom"],
                                   "fonction"=>$c["fonction"],
@@ -1101,9 +1104,11 @@ class societe_cleodis extends societe {
                                   "id_societe"=> $id_societe,
                                   "id_contact"=>$c["id_contact"]
                                 );
+          ATF::contact()->u(array("id_contact"=>$c["id_contact"], "est_dirigeant"=>"oui"));
         }
       }
     }else{
+      //Si Credit Safe n'a retourné aucun dirigeant, on en cré un en attendant
       $contact = array( "nom"=>"gerant",
                         "email"=>$email,
                         "id_societe"=> $id_societe
@@ -1234,6 +1239,14 @@ class societe_cleodis extends societe {
     }
 
     if($comite["etat"]== "accepte"){
+
+      //Création du comité CLEODIS
+      $comite["description"] = "Comité CLEODIS";
+      $comite["etat"] = "en_attente";
+      $comite["reponse"] = NULL;
+      $comite["validite_accord"] = NULL;
+      ATF::comite()->insert($comite);
+
       return array("result"=>true,
                    "id_affaire"=> $devis["id_affaire"],
                    "id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"]),
@@ -1360,10 +1373,9 @@ class societe_cleodis extends societe {
                               "fax"=>$post["fax"],
                               "email"=>$post["email"]
                       ));
-       ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$post["id_contact"]));
+      ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$post["id_contact"]));
     }
   }
-
 };
 
 class societe_cleodisbe extends societe_cleodis {

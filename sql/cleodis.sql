@@ -1,7 +1,8 @@
-#16045 - Facturation loyer libératoire
-ALTER TABLE `loyer` ADD `type` ENUM('engagement','liberatoire') NOT NULL DEFAULT 'engagement' AFTER `duree`;
-ALTER TABLE `facturation` CHANGE `type` `type` ENUM('contrat','prolongation','liberatoire') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'contrat';
-ALTER TABLE `facture` CHANGE `type_libre` `type_libre` ENUM('normale','retard','contentieux','liberatoire') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+ALTER TABLE `contact` ADD `est_dirigeant` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Est un dirigeant de la société (récupéré de l\'interogation CreditSafe)' AFTER `fonction`;
+
+
+
+ALTER TABLE `pack_produit_ligne` ADD `option_incluse` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `max`;
 
 
 #DEVIS CLEODIS V2

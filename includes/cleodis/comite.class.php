@@ -403,9 +403,6 @@ class comite extends classes_optima {
 		$siret = ATF::societe()->select($infos["societe"], "siret");
 		$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
 
-
-
-
 		$xml = simplexml_load_string($res);
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
@@ -553,7 +550,7 @@ class comite extends classes_optima {
 			if($post['etat'] === "accepte"){
 				ATF::societe()->_createContratToshiba(false,array('id_affaire'=>$post['id_affaire']));
 			}
-			return true; 
+			return true;
 	 	}
 	}
 };

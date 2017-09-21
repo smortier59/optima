@@ -1226,6 +1226,7 @@ class affaire_cleodis extends affaire {
 
 
 		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["affaire.id_societe_fk"], "id_contact_signataire"));
+		  $data["retourPV"] = NULL;
 
 		  foreach ($data as $key => $value) {
 			if (strpos($key,".")) {
@@ -1254,16 +1255,7 @@ class affaire_cleodis extends affaire {
 				unset($data["societe"]["pays.pays"],$data["societe"]["pays.pays_fk"]);
 
 			}
-
 			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
-			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
-			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
-
-			//$data["fichier_joint"] = $data["documentAnnexes"] = false;
-
-			//if (file_exists($this->filepath($get['id_affaire'],"fichier_joint"))) $data["fichier_joint"] = true;
-			//if (file_exists($this->filepath($get['id_affaire'],"documentAnnexes"))) $data["documentAnnexes"] = true;
-
 
 			unset($data["id_societe"],  $data["id_commercial"]);
 		  }
@@ -1293,6 +1285,7 @@ class affaire_cleodis extends affaire {
 		  $commande = ATF::commande()->select_row();
 		  if($commande){
 			$data["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+			$data["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 		  }else{
 			$data["contrat_signe"] = false;
 		  }
@@ -1588,8 +1581,11 @@ class affaire_cleodis extends affaire {
 
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
+			  $data['data'][$key]["retourPV"] = false;
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+log::logger($commande , "mfleurquin");
+				$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 			  }else{
 				$data['data'][$key]["contrat_signe"] = false;
 			  }
@@ -1649,6 +1645,23 @@ class affaire_cleodis extends affaire {
 		->from("comite","id_refinanceur","refinanceur","id_refinanceur")
 		->where("comite.id_affaire" , $id_affaire);
 		return ATF::comite()->sa();
+	}
+
+	/**
+	 * Retourne le premier loyer d'une affaire, utilisé pour le paiement CB Toshiba
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $get  (id_affaire)
+	 * @param  array $post
+	 * @return float       le loyer
+	 */
+	public function _get_loyer($get,$post){
+		$id_affaire = $this->decryptId($get["id_affaire"]);
+
+		ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
+								->addOrder("id_loyer", "ASC")
+								->setLimit(1);
+		$loyer = ATF::loyer()->select_row();
+		return $loyer;
 	}
 
 
