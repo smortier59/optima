@@ -1189,7 +1189,7 @@ class affaire_cleodis extends affaire {
 		$this->q->setCount();
 
 
-	 	if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe');
+	 	if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 	 	$this->q->addField($colsData)
 				->addField("Count(bon_de_commande.id_bon_de_commande)","total_bdc")
@@ -1269,7 +1269,7 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
-		  $data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est insérer automatiquement quelque soit le resultat sgef/creditSafe
+		  $data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
@@ -1278,7 +1278,7 @@ class affaire_cleodis extends affaire {
 		  		$data["file_bilan"] = file_exists($this->filepath($get['id_affaire'],"bilan")) ? 'oui' : 'non';
 		  	}
 		  	if($value['description']=== 'Comité CLEODIS'){
-		  		$data["etat_comite_cleodis"] = $value['etat']; //je (Anthony) rajoute cet etat car l'etat de baserenvoyé ne concerne pas le comite cleodis
+		  		$data["etat_comite_cleodis"] = $value['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
 		  	}
 		  }
 		  /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
@@ -1621,6 +1621,7 @@ log::logger($commande , "mfleurquin");
 		if (!$post['id_affaire']) throw new Exception("Il manque l'id de l'affaire", 500);
 
 		$action = $post['action'] == "valider" ? "OK" : "NOK";
+		$etat = $post['action'] == "valider" ? "valide_administratif" : "refus_administratif";
 		$id_affaire = $this->decryptId($post["id_affaire"]);
 
 		try {
@@ -1632,7 +1633,7 @@ log::logger($commande , "mfleurquin");
 
 			ATF::affaire_etat()->insert(array(
 				'id_affaire'=>$id_affaire
-				,'etat'=>'valide_administratif'
+				,'etat'=>$etat
 				,'id_user'=>ATF::$usr->get('id_user')
 			));
 

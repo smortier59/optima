@@ -1282,7 +1282,7 @@ class societe_cleodis extends societe {
       ));
       return true;
     } catch (Exception $e) {
-      return $e;
+      return $e->getMessage();
     }
   }
 
