@@ -22,6 +22,7 @@ class comite extends classes_optima {
 			,'comite.duree_refinancement'
 			,'decision'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteDecision","width"=>50)
 			,"decisionComite"
+			,'envoi_mail_demandeRefi'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"envoi_mail_demandeRefi","width"=>50)
 		);
 
 		$this->colonnes['primary'] = array(
@@ -134,6 +135,7 @@ class comite extends classes_optima {
 
 		$this->addPrivilege("getInfosFromCREDITSAFE");
 		$this->addPrivilege("decision");
+		$this->addPrivilege("sendMailDemandeRefi");
 
 	}
 
@@ -353,11 +355,11 @@ class comite extends classes_optima {
 	* @return string
     */
 	public function default_value($field,&$s,&$request){
-			$id_devis = ATF::_r("id_devis");
+		$id_devis = ATF::_r("id_devis");
 
-			$id_affaire=ATF::devis()->select(ATF::devis()->decryptId($id_devis), "id_affaire");
-			$affaire = ATF::affaire()->select($id_affaire);
-			$societe = $affaire["id_societe"];
+		$id_affaire=ATF::devis()->select(ATF::devis()->decryptId($id_devis), "id_affaire");
+		$affaire = ATF::affaire()->select($id_affaire);
+		$societe = $affaire["id_societe"];
 
 		switch ($field) {
 			case "id_affaire":	return $id_affaire;
@@ -391,14 +393,16 @@ class comite extends classes_optima {
 												return $return;
 										   }
 
-
-
 		}
 
 		return parent::default_value($field,$s,$request);
 	}
 
-
+	/**
+	 * Permet d'interoger Credit Safe et de récupérer les infos de la société
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $infos
+	 */
 	public function getInfosFromCREDITSAFE($infos){
 		$siret = ATF::societe()->select($infos["societe"], "siret");
 		$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
@@ -441,6 +445,11 @@ class comite extends classes_optima {
 	}
 
 
+	/**
+	 * Permet de rendre une décision sur un comité (Accepte/Refusé)
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $infos [description]
+	 */
 	public function decision($infos){
 
 		$validite = explode("/", $infos["date"]);
@@ -515,6 +524,66 @@ class comite extends classes_optima {
 
 	}
 
+	/**
+	 * Permet d'envoyer le mail de demande de refi au refinanceur du comité
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $infos  array(id) -> ID du comité
+	 */
+	public function sendMailDemandeRefi($infos){
+		$id = $this->decryptId($infos["id"]);
+
+		$comite = $this->select($id);
+		$refinanceur = ATF::refinanceur()->select($comite["id_refinanceur"]);
+		$societe = ATF::societe()->select($comite["id_societe"]);
+		$affaire = ATF::affaire()->select($comite["id_affaire"], "affaire");
+
+		if(ATF::$codename === "cleodisbe"){
+			$info_mail["from"] = "Quentin ELLEBOUDT | Cleodis <quentin.elleboudt@cleodis.com>";
+		}else{
+			$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
+		}
+
+		$info_mail["html"] = true;
+		$info_mail["template"] = "demande_refi";
+
+		$info_mail["recipient"] = $refinanceur["email"];
+		$info_mail["objet"] = "Demande ".$societe["societe"];
+
+
+		$info_mail["societe"] = $societe["societe"];
+		$info_mail["num_tva"] = $societe["num_ident"];
+		$info_mail["adresse"] = $societe["adresse"];
+		$info_mail["adresse_2"] = $societe["adresse_2"];
+		$info_mail["adresse_3"] = $societe["adresse_3"];
+		$info_mail["cp"] = $societe["cp"];
+		$info_mail["ville"] = $societe["ville"];
+		$info_mail["nom_affaire"] = $affaire;
+		$info_mail["loyer_actualise"] = $comite["loyer_actualise"];
+		$info_mail["duree_refinancement"] = $comite["duree_refinancement"];
+		$info_mail["observations"] = $comite["observations"];
+
+
+		$mail = new mail($info_mail);
+
+		$mail->send();
+
+
+		$suivi = array(
+			 "id_user"=>ATF::$usr->get('id_user')
+			,"id_societe"=>$this->select($id, "id_societe")
+			,"id_affaire"=>$this->select($id, "id_affaire")
+			,"type_suivi"=>'Passage_comite'
+			,"texte"=>"Envoi du mail au refinanceur ".$refinanceur["refinanceur"]
+			,'public'=>'oui'
+			,'id_contact'=>NULL
+			,'suivi_societe'=>array(0=>ATF::$usr->getID())
+			,'suivi_notifie'=>$notifie_suivi
+			,"permalink"=> ATF::permalink()->getURL($this->createPermalink($id))
+			,'no_redirect'=>true
+		);
+		$id_suivi = ATF::suivi()->insert($suivi);
+	}
+
 
 	/**
     * Avoir des infos sur la société
@@ -534,6 +603,9 @@ class comite extends classes_optima {
 				//Autre
 				$return['data'][$k]["reseau"] = false;
 			}
+
+			$return['data'][$k]["email"] = ATF::refinanceur()->select($i["comite.id_refinanceur_fk"], "email");
+
 		}
 		return $return;
 
