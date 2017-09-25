@@ -867,8 +867,11 @@ class societe extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function getInfosFromCREDITSAFE($infos) {
-
-	    $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+		if(__DEV__ === true){
+			$response = file_get_contents("/home/optima/core/log/creditsafe.xml");
+			$xml = simplexml_load_string($response);
+		} else {
+			 $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 		    <xmlrequest>
 		        <header>
 		            <username>".__CREDIT_SAFE_LOGIN__."</username>
@@ -884,13 +887,17 @@ class societe extends classes_optima {
 
 		        </body>
 		    </xmlrequest>";
-	    $url = 'https://www.creditsafe.fr/getdata/service/CSFRServices.asmx/GetData';
-	    $params = array('requestXmlStr' => $xmlReq);
-	    $response = $this->processCSRequest($url, $params);
+		    $url = 'https://www.creditsafe.fr/getdata/service/CSFRServices.asmx/GetData';
+		    $params = array('requestXmlStr' => $xmlReq);
 
-		file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
 
-		$xml = simplexml_load_string($response);
+		    $response = $this->processCSRequest($url, $params);
+
+			file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
+
+			$xml = simplexml_load_string($response);
+		}
+
 
 		if($xml->xmlresponse->body->errors){
 			ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$xml->xmlresponse->body->errors->errordetail->code ,ATF::$usr->trans("notice_title"));
@@ -906,7 +913,7 @@ class societe extends classes_optima {
 	}
 
 
-/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
+	/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
 	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
 	*/
 	public function cleanGGSResponse($r) {

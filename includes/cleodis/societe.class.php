@@ -1050,8 +1050,6 @@ class societe_cleodis extends societe {
     $gerants = $data["gerant"];
 
 
-
-
     if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
     if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
 
@@ -1083,6 +1081,10 @@ class societe_cleodis extends societe {
                                   ->where("id_societe", $id_societe,"AND");
         $gerant[$key] = $contact;
         $c = ATF::contact()->select_row();
+
+        log::logger($value , "mfleurquin");
+        log::logger($c , "mfleurquin");
+
         //Si le contact n'exite pas dans optima, on l'insert
         if(!$c){
           $contact = array( "nom"=>$value["nom"],
@@ -1423,7 +1425,7 @@ class societe_cleodisbe extends societe_cleodis {
   */
   public function getInfosFromCREDITSAFE($infos) {
 
-    /*$client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
+    $client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
 
     $params = (object)array
     ( 'countries' => array ('BE'),
@@ -1434,12 +1436,18 @@ class societe_cleodisbe extends societe_cleodis {
       'customData' => null,
       'chargeReference' => 'example searchCriteria with name',
     );
+
+log::logger($params , "mfleurquin");
+
     $response = $client->__soapCall('FindCompanies',array($params));
 
+    log::logger($response , "mfleurquin");
 
-    file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));*/
+    file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
 
     $response = file_get_contents("/home/optima/core/log/creditsafe.xml");
+
+
 
     $xml = $response;
 
