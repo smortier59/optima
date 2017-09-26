@@ -361,6 +361,19 @@ ATF.buildGridEditor({
 					})
 				}
 			{/if}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Option Incluse',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__option_incluse',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
+					{/if}
+				}
+			{/if}
+
+
+
 			{if $current_class->table=="devis_ligne" && ATF::$codename != "exactitude"}
 				, {
 					header: 'Type',

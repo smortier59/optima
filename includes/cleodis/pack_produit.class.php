@@ -206,8 +206,6 @@ class pack_produit extends classes_optima {
 			$infos["url"] = util::mod_rewrite($infos["nom"],1,true);
 		}
 
-		log::logger($infos, "mfleurquin");
-
 		$last_id = $this->decryptId($infos["id_pack_produit"]);
 
 		ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $last_id);

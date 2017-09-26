@@ -3616,9 +3616,6 @@ class hotline extends classes_optima {
 
 
 
-
-
-
 	/**
 	* Permet de récupérer la liste des tickets hotline pour telescope
 	* @package Telescope
@@ -3626,6 +3623,24 @@ class hotline extends classes_optima {
 	* @param $get array Paramètre de filtrage, de tri, de pagination, etc...
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
+	*
+	* @apiDescription Permet de récupérer la liste des tickets hotline pour telescope
+	* @api {get} /hotline||/hotline/:id Récupérer les/un ticket(s)
+	* @apiName GET
+	* @apiGroup Hotline
+	* @apiDescription Description...
+	* @apiParam {Array} get Paramègre $_GET (useless)
+	* @apiParam {string} [get.tri="id_hotline"] Colonne pour le tri des données.
+	* @apiParam {string="asc","desc"} [get.trid="desc"] Sens du tri.
+	* @apiParam {Number} [get.limit="30"] Nombre d'enregirstrment a retourner.
+	* @apiParam {Number="0...X"} [get.page="0"] Numéro de page.
+	* @apiParam {Boolean} [get.no-limit="false"] Flag pour bipassé la limit.
+	* @apiParam {string} [get.id] Identifiant unique d'un ticket.
+	* @apiParam {string} [get.search] Terme de recherche.
+	* @apiParam {Array} [filters] Filtres prédéfini à activer sur les résultats.
+	* @apiParam {Number} id_societe Filtrage via un identifiant unique de société.
+	*
+	* @apiSuccess {Array} hotline Echantillon de ticket hotline.
 	*/
 	public function _GET($get,$post) {
 
@@ -3788,6 +3803,24 @@ class hotline extends classes_optima {
 	* @param $get array Argument obligatoire mais inutilisé ici.
 	* @param $post array COntient les données envoyé en POST par le formulaire.
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*
+	* @apiDescription Insère un ticket hotline
+	* @api {post} /hotline Insertion
+	* @apiName POST
+	* @apiGroup Hotline
+	* @apiDescription Description...
+	* @apiParam {Array} get Paramègre $_GET (useless)
+	* @apiParam {Array} post Paramètre $_POST
+	* @apiParam {Number} post.id_societe Identifiant de la société
+	* @apiParam {Number} post.id_contact Identifiant du contact
+	* @apiParam {String} post.hotline Titre du ticket
+	* @apiParam {Text} post.detail Résumé de la requête
+	* @apiParam {string="dev","telecom","system"} post.pole="dev" Pôle concerné par la requête
+	* @apiParam {Boolean} [post.visible="non"] Flag de visibilité du ticket par le client
+	* @apiParam {Number} [post.id_gep_projet] Identifiant du projet
+	*
+	* @apiSuccess (200) {Number} id ID du ticket inséré.
+	* @apiSuccess (200) {Array} notices Notice lié a linsertion.
 	*/
 	public function _POST($get,$post,$files) {
 		$return = array();
@@ -3822,85 +3855,6 @@ class hotline extends classes_optima {
 		return false;
 	}
 
-	private function forward($infos) {
-
-		ATF::db($this->db)->begin_transaction();
-
-		try {
-			if ($infos['type'] == 'pole') {
-				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
-					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".ATF::$usr->trans($infos['val'],"hotline_pole_concerne"),
-					"internal"=>true,
-					"visible"=>"oui",
-					"duree_presta"=>"00:05",
-					"id_user"=>$infos["id_user"],
-					"id_hotline"=>$infos['id_hotline']
-				));
-				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
-
-
-				ATF::hotline()->update(array(
-					"id_hotline"=>$infos["id_hotline"],
-					"pole_concerne"=>$infos["val"],
-					"disabledInternalInteraction"=>true
-				));
-
-				//Récupération de l'email du nouveau utilisateur en charge
-				$email="hotline.".$infos["val"]."@absystech.fr";
-
-				ATF::hotline_mail()->createMailPoleTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
-				ATF::hotline_mail()->sendMail();
-
-				//Notice
-				$this->createMailNotice("hotline_transfert_pole");
-
-			} else if ($infos['type'] == 'user') {
-				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
-					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." à ".ATF::user()->nom($infos['val']),
-					"internal"=>true,
-					"visible"=>"oui",
-					"duree_presta"=>"00:05",
-					"id_user"=>$infos["id_user"],
-					"id_hotline"=>$infos['id_hotline']
-				));
-				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
-				$return['new_user'] = ATF::user()->nom($infos['val']);
-
-				//Récupération du pôle de l'utilisateur
-				$pole=explode(",",ATF::user()->select($infos["val"],"pole"));
-				$return['new_pole'] = ((is_array($pole) && isset($pole[0]) && !empty($pole[0]))?$pole[0]:"dev");
-
-
-				ATF::hotline()->update(
-					array(
-						"id_hotline"=>$infos["id_hotline"]
-						,"id_user"=>$infos["val"]
-						,"pole_concerne"=>$return['new_pole']
-						,"disabledInternalInteraction"=>true)
-				);
-
-				//Mise à jour de l'état
-				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
-				//Récupération de l'email du nouvel utilisateur en charge
-				$email=ATF::user()->select($infos["val"],"email");
-
-				ATF::hotline_mail()->createMailUserTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
-				ATF::hotline_mail()->sendMail();
-
-				//Notice
-				ATF::hotline()->createMailNotice("hotline_transfert_user");
-			}
-		} catch (errorATF $e) {
-			ATF::db($this->db)->rollback_transaction();
-			throw $e;
-		}
-
-		$return['notices'] = ATF::$msg->getNotices();
-		$return['result'] = true;
-		ATF::db($this->db)->commit_transaction();
-		return $return;
-	}
-
 	/**
 	* Permet de modifier un ticket hotline depuis telescope
 	* @package Telescope
@@ -3908,17 +3862,37 @@ class hotline extends classes_optima {
 	* @param $get array Argument obligatoire mais inutilisé ici.
 	* @param $post array COntient les données envoyé en POST par le formulaire.
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
+	*
+	* @apiDescription Modifie un ticket hotline
+	* @api {post} /hotline/put Modification
+	* @apiName PUT
+	* @apiGroup Hotline
+	* @apiDescription Description...
+	* @apiParam {Array} get Paramègre $_GET (useless)
+	* @apiParam {Array} post Paramètre $_POST
+	* @apiParam {Number} post.id_societe Identifiant de la société
+	* @apiParam {Number} post.id_contact Identifiant du contact
+	* @apiParam {String} post.hotline Titre du ticket
+	* @apiParam {Text} post.detail Résumé de la requête
+	* @apiParam {string="dev","telecom","system"} post.pole="dev" Pôle concerné par la requête
+	* @apiParam {Boolean} [post.visible="non"] Flag de visibilité du ticket par le client
+	* @apiParam {Number} [post.id_gep_projet] Identifiant du projet
+	* @apiParam {String="forward","setPriorite","takeRequest","cancelRequest","resolveRequest","setWait","setBillingMode","sendMailTeamviewer","sendMEP"} [specialAction] Action spéciale a effectuer sur le ticket
+	*
+	* @apiSuccess (200) {Number} id ID du ticket inséré.
+	* @apiSuccess (200) {Array} notices Notice lié a linsertion.
 	*/
 	public function _PUT($get,$post) {
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
 		$return = array();
-
 		try {
 			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 
 			// SI on fait une demande de mise en prod, une mise en attente ou tout autre action spécifique
 			if ($post['specialAction']) {
 				$action = $post['specialAction'];
-				switch ($post['specialAction']) {
+				switch ($action) {
 					case "forward":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
 						$return = self::$action($post);
@@ -3937,7 +3911,6 @@ class hotline extends classes_optima {
 						$return['result'] = true;
 						$lastInteractionRequired = true;
 						if ($post['specialAction']=="takeRequest") $return['user-in-charge'] = ATF::user()->nom(ATF::$usr->getId());
-
 					break;
 					case "setWait":
 						if (!$post['id_hotline']) throw new Exception("ID_HOTLINE_MISSING",1019);
@@ -4018,12 +3991,104 @@ class hotline extends classes_optima {
 	* @param $get array contient l'id a l'index 'id'
 	* @param $post array vide
 	* @return array result en booleen et notice sous forme d'un tableau
+	*
+	* @apiDescription Supprime un ticket hotline
+	* @api {delete} /hotline/put Suppression
+	* @apiName DELETE
+	* @apiGroup Hotline
+	* @apiDescription Description...
+	* @apiParam {Array} get Paramègre $_GET (useless)
+	* @apiParam {Number} get.id Identifiant du ticket
+	*
+	* @apiSuccess (200) {Boolean} result TRUE | FALSE.
+	* @apiSuccess (200) {Array} notices Notice lié a linsertion.
 	*/
 	public function _DELETE($get,$post) {
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 		$return['result'] = $this->delete($get);
 		// Récupération des notices créés
 		$return['notices'] = ATF::$msg->getNotices();
+		return $return;
+	}
+
+	private function forward($infos) {
+
+		ATF::db($this->db)->begin_transaction();
+
+		try {
+			if ($infos['type'] == 'pole') {
+				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
+					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".ATF::$usr->trans($infos['val'],"hotline_pole_concerne"),
+					"internal"=>true,
+					"visible"=>"oui",
+					"duree_presta"=>"00:05",
+					"id_user"=>$infos["id_user"],
+					"id_hotline"=>$infos['id_hotline']
+				));
+				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
+
+
+				ATF::hotline()->update(array(
+					"id_hotline"=>$infos["id_hotline"],
+					"pole_concerne"=>$infos["val"],
+					"disabledInternalInteraction"=>true
+				));
+
+				//Récupération de l'email du nouveau utilisateur en charge
+				$email="hotline.".$infos["val"]."@absystech.fr";
+
+				ATF::hotline_mail()->createMailPoleTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
+				ATF::hotline_mail()->sendMail();
+
+				//Notice
+				$this->createMailNotice("hotline_transfert_pole");
+
+			} else if ($infos['type'] == 'user') {
+				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
+					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." à ".ATF::user()->nom($infos['val']),
+					"internal"=>true,
+					"visible"=>"oui",
+					"duree_presta"=>"00:05",
+					"id_user"=>$infos["id_user"],
+					"id_hotline"=>$infos['id_hotline']
+				));
+				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
+				$return['new_user'] = ATF::user()->nom($infos['val']);
+
+				//Récupération du pôle de l'utilisateur
+				$pole=explode(",",ATF::user()->select($infos["val"],"pole"));
+				$return['new_pole'] = ((is_array($pole) && isset($pole[0]) && !empty($pole[0]))?$pole[0]:"dev");
+
+
+				ATF::hotline()->update(
+					array(
+						"id_hotline"=>$infos["id_hotline"]
+						,"id_user"=>$infos["val"]
+						,"pole_concerne"=>$return['new_pole']
+						,"disabledInternalInteraction"=>true)
+				);
+
+				//Mise à jour de l'état
+				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
+				//Récupération de l'email du nouvel utilisateur en charge
+				$email=ATF::user()->select($infos["val"],"email");
+
+				ATF::hotline_mail()->createMailUserTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
+				ATF::hotline_mail()->sendMail();
+
+				//Notice
+				ATF::hotline()->createMailNotice("hotline_transfert_user");
+			}
+		} catch (errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
+
+		$return['notices'] = ATF::$msg->getNotices();
+		$return['result'] = true;
+		ATF::db($this->db)->commit_transaction();
 		return $return;
 	}
 

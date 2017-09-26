@@ -1,7 +1,32 @@
-#16045 - Facturation loyer libératoire
-ALTER TABLE `loyer` ADD `type` ENUM('engagement','liberatoire') NOT NULL DEFAULT 'engagement' AFTER `duree`;
-ALTER TABLE `facturation` CHANGE `type` `type` ENUM('contrat','prolongation','liberatoire') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'contrat';
-ALTER TABLE `facture` CHANGE `type_libre` `type_libre` ENUM('normale','retard','contentieux','liberatoire') CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+/*SQL pour cleoscope et le portail www*/
+ALTER TABLE `contact` ADD `est_dirigeant` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Est un dirigeant de la société (récupéré de l\'interogation CreditSafe)' AFTER `fonction`;
+ALTER TABLE `pack_produit_ligne` ADD `option_incluse` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `max`;
+
+
+
+ALTER TABLE `affaire` ADD `pieces` ENUM('NOK','OK') NULL DEFAULT NULL AFTER `provenance`, ADD `date_verification` DATE NULL DEFAULT NULL AFTER `pieces`;
+ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `affaire_etat` ADD `id_user` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `commentaire`, ADD INDEX (`id_user`);
+ALTER TABLE `affaire_etat` ADD FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif','comite_cleodis_valide','comite_cleodis_refuse','refus_administratif') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #DEVIS CLEODIS V2
@@ -137,4 +162,3 @@ ALTER TABLE `questionnaire_fl`
 
 ALTER TABLE `questionnaire_fl_ligne`
   MODIFY `id_questionnaire_fl_ligne` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
-

@@ -6,7 +6,7 @@
 class echeancier_ligne_periodique extends classes_optima {
 
   /**
-   * Constructeur 
+   * Constructeur
    */
   public function __construct() {
     parent::__construct();

@@ -1,5 +1,4 @@
 {strip}
-	console.log(Ext.getCmp("facture[tva]").getValue());
 	if (Ext.getCmp("facture[tva]").getValue()!="1.200" && Ext.getCmp("facture[tva]").getValue()!="1.2" && Ext.getCmp("facture[tva]").getValue()!="1.20") {
 		var r = confirm("La valeur de la TVA n'est pas à jour, êtes vous sûr ?");
 		if (r) {

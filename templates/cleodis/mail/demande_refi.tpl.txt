@@ -1,0 +1,31 @@
+Bonjour,
+
+Pourrais-tu nous donner un accord pour un nouveau projet chez:
+
+{$data.societe}
+{$data.num_tva} BE 0437.576.896 (N° de TVA)
+{$data.adresse} Route de Luxembourg 97 (adresse)
+{if $data.adresse_2} {$data.adresse_2} {/if}
+{if $data.adresse_3} {$data.adresse_3} {/if}
+{$data.cp} {$data.ville} 6700 Arlon (adresse)
+
+
+(NDLR : Infos existantes dans comité ajouter BELFIUS LEASE dans les refinanceurs possibles)
+{$data.nom_affaire}
+Montant {$data.loyer_actualise} €
+Durée {$data.duree_financement}
+{$data.observation}
+
+
+
+Met vriendelijke groeten,
+
+
+Quentin ELLEBOUDT
+Managing Director
+Mobile   +32 498 870 614
+
+
+Avenue Louise 523 - 1050 Bruxelles
+Tel:
++32 (0)2 588 52 90 - www.cleodis.com

@@ -131,8 +131,6 @@ class facturation extends classes_optima {
 						->addCondition("prix",0,"AND",false,"<")
 						->setDimension("row");
 
-						//log::logger( ATF::facture()->sa() , "mfleurquin");
-
 						if (!($avoir_correspondant = ATF::facture()->sa())) {
 							// Avoir non trouvé, alors on raise l'erreur
 							$this->raiseErrorAvoirNonTrouve(

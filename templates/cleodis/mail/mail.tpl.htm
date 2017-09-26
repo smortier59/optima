@@ -16,11 +16,13 @@
         <table cellspacing="0" cellpadding="0" border="0">
             <tbody>
                 {if ATF::$codename == "cleodisbe"}
-                    <td valign="top" style="width:640px;">
-                        <center>
-                            <img style="width:200px;" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodisbe/belgique.gif")}"/>
-                        </center>
-                    </td>
+                    {if $infos.template !== "demande_refi"}
+                        <td valign="top" style="width:640px;">
+                            <center>
+                                <img style="width:200px;" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodisbe/belgique.gif")}"/>
+                            </center>
+                        </td>
+                    {/if}
                 {/if}
 
                 <tr>
@@ -35,6 +37,7 @@
                         {/if}
                     </td>
                 </tr>
+                {if $infos.template !== "demande_refi"}
                 <tr>
                     <!--ICI SIGNATURE DE L'UTILISATEUR-->
                     <td align="left" valign="top" style="width:640px;">
@@ -44,7 +47,7 @@
                <tr>
                     <!--LOGO DE LA SOCIETE-->
                     <td align="left">
-                        <br />                        
+                        <br />
                         {if ATF::$codename == "cap"}
                             {$societe=ATF::societe()->select(1)}
                             <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}"/>
@@ -58,10 +61,11 @@
                 <tr>
                     <!--INFO DE LA SOCIETE-->
                     <td align="left">
-                        {$societe.adresse} - {$societe.cp} {$societe.ville} - {ATF::pays()->nom($societe.id_pays)}<br /> 
+                        {$societe.adresse} - {$societe.cp} {$societe.ville} - {ATF::pays()->nom($societe.id_pays)}<br />
                         Tél : {$societe.tel} - Fax : {$societe.fax}
                     </td>
                 </tr>
+                {/if}
             </tbody>
         </table>
     </body>

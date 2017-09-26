@@ -20,11 +20,11 @@ class pack_produit extends classes_optima {
 
 		$this->colonnes['primary']=array('etat',
 										 'type_contrat',
+										 'id_courrier_information_pack',
 										 'id_document_contrat',
 										 'id_rayon',
 										 'url_redirection',
-										 'message_redirection',
-										 'id_courrier_information_pack'
+										 'message_redirection'
 										);
 
 		$this->colonnes["panel"]["affichage_lm"] = array('ref_lm_principale',

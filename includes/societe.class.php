@@ -867,8 +867,11 @@ class societe extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function getInfosFromCREDITSAFE($infos) {
-
-	    $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+		if(__DEV__ === true){
+			$response = file_get_contents("/home/optima/core/log/creditsafe.xml");
+			$xml = simplexml_load_string($response);
+		} else {
+			 $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 		    <xmlrequest>
 		        <header>
 		            <username>".__CREDIT_SAFE_LOGIN__."</username>
@@ -884,13 +887,17 @@ class societe extends classes_optima {
 
 		        </body>
 		    </xmlrequest>";
-	    $url = 'https://www.creditsafe.fr/getdata/service/CSFRServices.asmx/GetData';
-	    $params = array('requestXmlStr' => $xmlReq);
-	    $response = $this->processCSRequest($url, $params);
+		    $url = 'https://www.creditsafe.fr/getdata/service/CSFRServices.asmx/GetData';
+		    $params = array('requestXmlStr' => $xmlReq);
 
-		file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
 
-		$xml = simplexml_load_string($response);
+		    $response = $this->processCSRequest($url, $params);
+
+			file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
+
+			$xml = simplexml_load_string($response);
+		}
+
 
 		if($xml->xmlresponse->body->errors){
 			ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$xml->xmlresponse->body->errors->errordetail->code ,ATF::$usr->trans("notice_title"));
@@ -906,11 +913,10 @@ class societe extends classes_optima {
 	}
 
 
-/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
+	/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
 	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
 	*/
 	public function cleanGGSResponse($r) {
-
 		$xml = $r;
 
 		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
@@ -918,7 +924,6 @@ class societe extends classes_optima {
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$b =  $xml->xmlresponse->body->company->balancesynthesis;
-
 
 		// Nom de société
 		$return['societe'] = (string)$company->BasicInformation->BusinessName;
@@ -1016,11 +1021,25 @@ class societe extends classes_optima {
 	*/
 	private function cleanCSResponse($r) {
 
+
 		$xml = simplexml_load_string($r);
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$s = $xml->xmlresponse->body->company->summary;
 		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+
+		$directors = $xml->xmlresponse->body->company->directors;
+
+		$gerant = array();
+		foreach ($directors->director as $key => $value) {
+			if($value->typeofmanager == "Personne physique" && !preg_match("/Commissaire aux comptes/" ,$value->managerposition)){
+				$return['gerant'][] = array("nom"=>(string)$value->familyname,
+								  "prenom"=>(string)$value->christianname,
+								  "fonction"=>(string)$value->managerposition);
+			}
+		}
+
 
 		if ($bi->branches->numberofbranches>1) {
 			for ($i=0; $i<=$bi->branches->numberofbranches; $i++) {
@@ -1461,6 +1480,22 @@ class societe extends classes_optima {
 	}
 
 	/**
+	 * Modifie une société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get $_GET
+	 * @param  array $get $_POST
+	 * @return Boolean TRUE si OK, FALSE si NOK
+	 */
+	public function _PUT($get, $post) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		throw new Exception("IN PROGRESS",1000);
+		$return['result'] = $this->delete($get);
+    	// Récupération des notices créés
+    	$return['notices'] = ATF::$msg->getNotices();
+        return $return;
+	}
+
+	/**
 	 * Supprime une société
 	 * @author Quentin JANON <qjanon@absystech.fr>
 	 * @param  array $get  Contient l'ID de la société
@@ -1525,8 +1560,10 @@ class societe extends classes_optima {
 	 */
 	public function _setDomaine($get,$post) {
 		$return = true;
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
 
-		if (!$post['id_societe']) throw new errorATF("ID_SOCIETE_MISSING",3256);
+		if (!$post['idSociete']) throw new errorATF("ID_SOCIETE_MISSING",3256);
 		if (!$post['domaine']) throw new errorATF("DOMAINE_MISSING",3257);
 
 		if ($post['id']) {
@@ -1618,6 +1655,20 @@ class societe extends classes_optima {
 
 
 		return $this->select_all();
+	}
+
+	public function _set($get, $post) {
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
+
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		return $this->update(array(
+			"id_societe"=>$post['pk'],
+			$post['name']=>$post['value']
+		));
 	}
 
 

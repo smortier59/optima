@@ -18,8 +18,6 @@ ATF.buildGridEditor({
 		var marge_absolue = 0;
 		var prix = 0;
 
-		console.log("OK");
-
 		{if $current_class->table==facture_fournisseur_ligne}
 			var prix = 0;
 			var prix_ht = 0;

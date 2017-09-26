@@ -1,0 +1,32 @@
+Bonjour,<br /><br />
+
+Pourrais-tu nous donner un accord pour un nouveau projet chez:<br /><br />
+
+{$infos.societe} <br />
+{$infos.num_tva}  <br />
+{$infos.adresse}  <br />
+{if $infos.adresse_2} {$infos.adresse_2} <br />{/if}
+{if $infos.adresse_3} {$infos.adresse_3}  <br />{/if}
+{$infos.cp} {$infos.ville}  <br />
+
+<br /><br />
+
+{$infos.nom_affaire}<br />
+Montant {$infos.loyer_actualise} €<br />
+Durée {$infos.duree_refinancement}<br />
+{$infos.observations}<br />
+<br /><br />
+
+
+{if ATF::$codename === "cleodisbe"}
+	Met vriendelijke groeten,<br /><br />
+
+	Quentin ELLEBOUDT<br />
+	Managing Director<br />
+	Mobile   +32 498 870 614<br />
+	<br />
+	<img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/logos/cleodis_groupe.jpg")}" style="max-width:150px;" alt="" />
+	<br />
+	Avenue Louise 523 - 1050 Bruxelles<br />
+	Tel: +32 (0)2 588 52 90 - www.cleodis.com
+{/if}

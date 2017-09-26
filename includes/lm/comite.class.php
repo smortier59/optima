@@ -93,7 +93,7 @@ class comite extends classes_optima {
 
 
 		if($notifie_suivi != array(0=>"")){
-			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com";
+			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com,herve.anvroin@leroymerlin.fr";
 			$info_mail["suivi_notifie"] = "";
 
 			foreach ($notifie_suivi as $key => $value) {
@@ -347,26 +347,25 @@ class comite extends classes_optima {
 										 ->setLimit(1);
 		$ligne = ATF::commande_ligne()->sa();
 
-
+		$client = ATF::commande()->select($commande["commande.id_commande"], "id_societe");
 
 		$id_courrier = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit") , "id_courrier_information_pack");
 
 		if($id_courrier){
-			$filename = ATF::courrier_information_pack()->filepath($id_courrier,"fichier_joint");
+
+			//On envoi le mail avec ou sans le PDF
+			$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
+			$infos_mail["objet"] = "Courrier d'information suite à votre souscription";
+			$infos_mail["recipient"] = ATF::societe()->select($client , "email");
+			$infos_mail["template"] = "courrierInformationPack/".ATF::courrier_information_pack()->select($id_courrier, "template_mail_courrier");
+			$infos_mail["html"] = true;
+
+		   	$mail = new mail($infos_mail);
+		   	$filename = ATF::courrier_information_pack()->filepath($id_courrier,"fichier_joint");
 			if(file_exists($filename)){
-				//On envoi le mail avec ou sans le PDF
-				$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
-				$infos_mail["objet"] = "Courrier d'information suite à votre souscription";
-				$infos_mail["recipient"] = 'mfleurquin@absystech.net';
-				$infos_mail["template"] = "courrierInformationPack/".ATF::courrier_information_pack()->select($id_courrier, "template_mail_courrier");
-				$info_mail["html"] = true;
-
-			   	$mail = new mail($infos_mail);
-			   	$mail->addFile($filename,"Courrier d'information.pdf",true);
-
-			   	return $mail->send();
-
+		   		$mail->addFile($filename,"Courrier d'information.pdf",true);
 		   	}
+		   	return $mail->send();
 		}
 	}
 
