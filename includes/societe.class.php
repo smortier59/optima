@@ -1480,6 +1480,22 @@ class societe extends classes_optima {
 	}
 
 	/**
+	 * Modifie une société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get $_GET
+	 * @param  array $get $_POST
+	 * @return Boolean TRUE si OK, FALSE si NOK
+	 */
+	public function _PUT($get, $post) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		throw new Exception("IN PROGRESS",1000);
+		$return['result'] = $this->delete($get);
+    	// Récupération des notices créés
+    	$return['notices'] = ATF::$msg->getNotices();
+        return $return;
+	}
+
+	/**
 	 * Supprime une société
 	 * @author Quentin JANON <qjanon@absystech.fr>
 	 * @param  array $get  Contient l'ID de la société
@@ -1544,8 +1560,10 @@ class societe extends classes_optima {
 	 */
 	public function _setDomaine($get,$post) {
 		$return = true;
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
 
-		if (!$post['id_societe']) throw new errorATF("ID_SOCIETE_MISSING",3256);
+		if (!$post['idSociete']) throw new errorATF("ID_SOCIETE_MISSING",3256);
 		if (!$post['domaine']) throw new errorATF("DOMAINE_MISSING",3257);
 
 		if ($post['id']) {
@@ -1637,6 +1655,20 @@ class societe extends classes_optima {
 
 
 		return $this->select_all();
+	}
+
+	public function _set($get, $post) {
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
+
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		return $this->update(array(
+			"id_societe"=>$post['pk'],
+			$post['name']=>$post['value']
+		));
 	}
 
 
