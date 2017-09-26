@@ -817,7 +817,7 @@ class affaire_absystech extends affaire {
 
     $this->q->reset();
 
-    if ($get['id_affaire']) $colsData = array("affaire.*");
+    if ($get['id']) $colsData = array("affaire.*");
 
     $this->q->addField($colsData);
     $this->q->from("affaire","id_societe","societe","id_societe");
@@ -846,15 +846,15 @@ class affaire_absystech extends affaire {
 
 
 
-    if ($get['id_affaire']) {
+    if ($get['id']) {
 
-		$this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
+		$this->q->where("affaire.id_affaire",$get['id'])->setCount(false)->setDimension('row');
 		$data = $this->sa();
 
 		ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 								->addField("devis.*")
 								->from("devis","id_user","user","id_user")
-								->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
+								->where("devis.id_affaire",$get['id'])->addOrder('id_devis', 'desc');
 		$data["devis"] = ATF::devis()->sa();
 
 		foreach ($data as $key => $value) {
@@ -866,8 +866,8 @@ class affaire_absystech extends affaire {
 
 			//$data["fichier_joint"] = $data["documentAnnexes"] = false;
 
-			//if (file_exists($this->filepath($get['id_affaire'],"fichier_joint"))) $data["fichier_joint"] = true;
-			//if (file_exists($this->filepath($get['id_affaire'],"documentAnnexes"))) $data["documentAnnexes"] = true;
+			//if (file_exists($this->filepath($get['id'],"fichier_joint"))) $data["fichier_joint"] = true;
+			//if (file_exists($this->filepath($get['id'],"documentAnnexes"))) $data["documentAnnexes"] = true;
 
 
 			unset($data["id_societe"],  $data["id_commercial"]);
@@ -892,7 +892,7 @@ class affaire_absystech extends affaire {
 
 
 
-    if($get['id_affaire']){
+    if($get['id']){
       $return = $data;
     }else{
       header("ts-total-row: ".$data['count']);
