@@ -166,8 +166,6 @@ ATF.renderer.envoi_mail_demandeRefi=function(table, field){
 		var idDiv = Ext.id();
 		var id = record.data[table+'__dot__id_comite'];
 
-		console.log(record.json.email);
-
 		var btnSendMail = {
 			xtype:'button',
 			id:"decision"+id,

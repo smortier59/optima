@@ -1,4 +1,3 @@
-console.log(record.data);
 record.data.article = Ext.util.Format.stripTags(record.data.article);
 $('#{$id|replace:"[":"\\\\["|replace:"]":"\\\\]"}').val(record.data.article);
 

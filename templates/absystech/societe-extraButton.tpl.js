@@ -20,7 +20,6 @@
 			"societe,getInfosFromCREDITSAFE,ajax"
 			,"siret="+siret			, {
 				onComplete: function (r) {
-					console.log(r);
 					Ext.iterate(r.result, function(key, value) {
 					  	if (r.result[key]) {
 							Ext.getCmp('societe['+key+']').setValue(value);

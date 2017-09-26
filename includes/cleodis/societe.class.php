@@ -1082,9 +1082,6 @@ class societe_cleodis extends societe {
         $gerant[$key] = $contact;
         $c = ATF::contact()->select_row();
 
-        log::logger($value , "mfleurquin");
-        log::logger($c , "mfleurquin");
-
         //Si le contact n'exite pas dans optima, on l'insert
         if(!$c){
           $contact = array( "nom"=>$value["nom"],
@@ -1437,11 +1434,8 @@ class societe_cleodisbe extends societe_cleodis {
       'chargeReference' => 'example searchCriteria with name',
     );
 
-log::logger($params , "mfleurquin");
 
     $response = $client->__soapCall('FindCompanies',array($params));
-
-    log::logger($response , "mfleurquin");
 
     file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
 

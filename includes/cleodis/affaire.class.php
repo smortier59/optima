@@ -1588,7 +1588,6 @@ class affaire_cleodis extends affaire {
 			  $data['data'][$key]["retourPV"] = false;
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
-log::logger($commande , "mfleurquin");
 				$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 			  }else{
 				$data['data'][$key]["contrat_signe"] = false;

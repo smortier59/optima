@@ -1584,8 +1584,6 @@ class commande_cleodis extends commande {
         $commande = $this->select($infos['id_commande']);
 
         if(ATF::affaire()->select($commande["id_affaire"], "type_affaire") === "NL"){
-        	log::logger($infos["pdf"].'NL' , "mfleurquin");
-
         	$data = ATF::pdf()->generic($infos['pdf']."NL",$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
         }else{
         	$data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
@@ -2403,10 +2401,6 @@ class commande_cleodis extends commande {
 						$obj[$key]["value"] = round(($objectif/100)*$pourcentage);
 					}
 
-
-					if($type == "o2m"){
-							log::logger($reel , "mfleurquin");
-						}
 
 					$graph['dataset']["objectif"] = $obj;
 					$graph['dataset']["moyenne"] = $avg;
