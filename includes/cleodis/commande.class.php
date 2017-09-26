@@ -137,7 +137,14 @@ class commande_cleodis extends commande {
 	}
 
 
-
+	/**
+	 * Permet de stocker le PDF signé de Sell&Sign
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $get
+	 * @param  array $post
+	 * @return
+	 */
 	public function _getSignedContract($get, $post){
 		if (!$post['data']) throw new Exception("Il manque le base64", 500);
 		if (!$post['contract_id']) throw new Exception("Il manque l'id du contract", 500);
@@ -153,6 +160,12 @@ class commande_cleodis extends commande {
 		$file = $this->filepath($commande->get('id_commande'), 'retour', null, 'cleodis');
 		try {
 			util::file_put_contents($file,base64_decode($data));
+			//On met à jour la date de retour et retourPV du contrat
+			ATF::commande()->u(array("id_commande"=>$commande->get('id_commande'),
+									 "retour_pv"=> date("Y-m-d"),
+									 "retour_contrat"=>date("Y-m-d")
+									)
+								);
 			$return = true;
 		} catch (Exception $e) {
 			$return  = array("error"=>true, "data"=>$e);
