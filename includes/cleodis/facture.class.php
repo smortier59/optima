@@ -1371,8 +1371,6 @@ class facture_cleodis extends facture {
 					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
 				}
 
-				log::logger($item , "mfleurquin");
-
 
 				//exceptions
 				if($item['facture.type_facture']=='refi'){
@@ -1551,9 +1549,9 @@ class facture_cleodis extends facture {
 							$row_data["C"]='VEN';
 							if($affaire["nature"]=="avenant"){
 								//Faire en sorte que l1296 = 2008 et non pas 208
-								$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
+								$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
 							}else{
-								$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
+								$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
 							}
 							if($devis[0][ "type_contrat"] == "presta"){	$row_data["D"]=='706240'; }
 							else{
@@ -1656,8 +1654,10 @@ class facture_cleodis extends facture {
 	}
 
 
-
-
+	/**
+	 * Export comptable provenant d'optima Exporter > export CLEOFI
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
 	 public function export_cleofi(&$infos){
 	 	$infos["display"] = true;
 
@@ -1872,9 +1872,9 @@ class facture_cleodis extends facture {
 								$row_data["H"]=$libelle;
 								$row_data["I"]=$reference;
 								if($affaire["nature"]=="avenant"){
-									$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."AV";
+									$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."AV";
 								}else{
-									$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."00";
+									$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00";
 								}
 							}elseif($i==4){
 								$row_data["A"]='G';
@@ -2687,9 +2687,9 @@ class facture_cleodisbe extends facture_cleodis {
 						$row_data["I"]=$reference;
 
 						if($affaire["nature"]=="avenant"){
-							$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
+							$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
 						}else{
-							$row_data["J"]="20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
+							$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
 						}
 
 						$row_data["K"]=$dateDebut;
