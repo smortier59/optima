@@ -1437,9 +1437,9 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
-    file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
+    file_put_contents("/home/optima/core/log/creditsafebe.xml",simplexml_load_string($response));
 
-    $response = file_get_contents("/home/optima/core/log/creditsafe.xml");
+    $response = file_get_contents("/home/optima/core/log/creditsafebe.xml");
 
 
 
