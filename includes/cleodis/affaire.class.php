@@ -1152,6 +1152,25 @@ class affaire_cleodis extends affaire {
 
 		return true;
 	}
+
+	/**
+	*
+	* Fonctions paiementIsReceived pour determiner si une affaire a été payé ou non pour le listing cleoscope
+	* @package Telescope
+	* @author Anthony LAHLAH <mfleurquin@absystech.fr>
+	* @param $id_affaire number contient l'id affaire qui va servir à la requete.
+	* @return boolean, retourne le boolean qui represente l'etat du paiement
+	*/
+	public function paiementIsReceived($id_affaire) {
+		ATF::transaction_banque()->q->reset()
+			->where('id_affaire', $id_affaire)
+			->where('response_code', "00")
+			->setDimension('row');
+
+		$row = ATF::transaction_banque()->sa();
+		return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
+	}
+
 	/**
 	*
 	* Fonctions _GET pour telescope
@@ -1212,7 +1231,8 @@ class affaire_cleodis extends affaire {
 		if ($get['id_affaire']) {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
-
+		  // on check si l'affaire est "payee"
+		  $data['payee'] = $this->paiementIsReceived($data['affaire.id_affaire_fk']);
 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
@@ -1586,8 +1606,10 @@ class affaire_cleodis extends affaire {
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  $data['data'][$key]["retourPV"] = false;
+				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk']);
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+
 				$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 			  }else{
 				$data['data'][$key]["contrat_signe"] = false;
@@ -1660,12 +1682,16 @@ class affaire_cleodis extends affaire {
 	 */
 	public function _get_loyer($get,$post){
 		$id_affaire = $this->decryptId($get["id_affaire"]);
-
-		ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
-								->addOrder("id_loyer", "ASC")
-								->setLimit(1);
-		$loyer = ATF::loyer()->select_row();
-		return $loyer;
+		if ($this->paiementIsReceived($id_affaire)){
+			return false;
+		}
+		else{
+			ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
+									->addOrder("id_loyer", "ASC")
+									->setLimit(1);
+			$loyer = ATF::loyer()->select_row();
+			return $loyer;
+		}
 	}
 
 
