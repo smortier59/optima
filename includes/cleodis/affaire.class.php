@@ -1171,6 +1171,11 @@ class affaire_cleodis extends affaire {
 		return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
 	}
 
+	/**
+	 * fonction qui retourne toutes les infos d'un signataire d'une affaire
+	 * @param  $id_affaire, int contenant l'id_affaire NON crypté
+	 * @return array, return un tableau contenant toutes les infos du signataire de l'affaire
+	 */
 	public function getInfoSignataire($id_affaire) {
 		ATF::affaire()->q->reset()
 			->addField('contact.*')
