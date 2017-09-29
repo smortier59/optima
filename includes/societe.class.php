@@ -893,7 +893,11 @@ class societe extends classes_optima {
 
 		    $response = $this->processCSRequest($url, $params);
 
-			file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
+		    if(__PRE__ === true){
+				file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafe.xml",$response);
+			}else{
+				file_put_contents("/home/absystech/optima/core/log/creditsafe.xml",$response);
+			}
 
 			$xml = simplexml_load_string($response);
 		}

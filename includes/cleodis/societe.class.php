@@ -1099,13 +1099,13 @@ class societe_cleodis extends societe {
           //Sinon on le met à jour
           $gerant[$key] = array(  "nom"=>$c["nom"],
                                   "prenom"=>$c["prenom"],
-                                  "fonction"=>$c["fonction"],
+                                  "fonction"=>$value["fonction"],
                                   "gsm"=>$c["gsm"],
                                   "email"=>$c["email"],
                                   "id_societe"=> $id_societe,
                                   "id_contact"=>$c["id_contact"]
                                 );
-          ATF::contact()->u(array("id_contact"=>$c["id_contact"], "est_dirigeant"=>"oui"));
+          ATF::contact()->u(array("id_contact"=>$c["id_contact"], "fonction"=>$value["fonction"], "est_dirigeant"=>"oui"));
         }
       }
     }else{
@@ -1380,7 +1380,7 @@ class societe_cleodis extends societe {
                                 "nom"=>$post["nom_gerant"],
                                 "prenom"=>$post["prenom_gerant"],
                                 "tel"=>$post["tel"],
-                                "email"=>$post["email"]
+                                "email"=>$post["email_gerant"]
                         ));
         ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
       } else {
@@ -1443,7 +1443,12 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
-    file_put_contents("/home/optima/core/log/creditsafebe.xml",simplexml_load_string($response));
+    if(__PRE__ === true){
+        file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafebe.xml",simplexml_load_string($response));
+      }else{
+         file_put_contents("/home/optima/core/log/creditsafebe.xml",simplexml_load_string($response));
+      }
+
 
     $response = file_get_contents("/home/optima/core/log/creditsafebe.xml");
 
