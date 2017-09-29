@@ -1047,6 +1047,7 @@ class societe_cleodis extends societe {
 
     $data = self::getInfosFromCREDITSAFE($post);
 
+
     $gerants = $data["gerant"];
 
 
@@ -1078,8 +1079,8 @@ class societe_cleodis extends societe {
 
     if($gerants){
       foreach ( $gerants as $key => $value) {
-        ATF::contact()->q->reset()->where("LOWER(nom)", strtolower($value["nom"]),"AND")
-                                  ->where("LOWER(prenom)", strtolower($value["prenom"]),"AND")
+        ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($value["nom"])),"AND")
+                                  ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($value["prenom"])),"AND")
                                   ->where("id_societe", $id_societe,"AND");
         $gerant[$key] = $contact;
         $c = ATF::contact()->select_row();
@@ -1379,7 +1380,7 @@ class societe_cleodis extends societe {
         ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
                                 "nom"=>$post["nom_gerant"],
                                 "prenom"=>$post["prenom_gerant"],
-                                "tel"=>$post["tel"],
+                                "gsm"=>$post["tel"],
                                 "email"=>$post["email_gerant"]
                         ));
         ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
@@ -1387,7 +1388,7 @@ class societe_cleodis extends societe {
         $new = array(
                         "nom"=>$post["nom_gerant"],
                         "prenom"=>$post["prenom_gerant"],
-                        "tel"=>$post["phone_gerant"],
+                        "gsm"=>$post["phone_gerant"],
                         "email"=>$post["email_gerant"],
                         "fonction"=>$post["fonction_gerant"],
                         "id_societe"=>$id_societe
