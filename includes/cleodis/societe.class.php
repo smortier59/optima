@@ -1063,7 +1063,9 @@ class societe_cleodis extends societe {
       $id_societe = $res["id_societe"];
       if(!$res["code_client"]){
         $code_client = $this->getCodeClient("toshiba");
-        ATF::societe()->u(array("id_societe"=>$id_societe, "code_client"=>$code_client));
+        ATF::societe()->u(array("id_societe"=>$id_societe,
+                                "code_client"=>$code_client
+                               ));
       }
     } else {
       $code_client = $this->getCodeClient("toshiba");
@@ -1181,9 +1183,9 @@ class societe_cleodis extends societe {
     $devis = ATF::devis()->select($id_devis);
 
     if($post["provenance"]){
-      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"));
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
     }else{
-      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"/*,"id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/ ));
     }
 
 
@@ -1367,8 +1369,9 @@ class societe_cleodis extends societe {
 
     $id_societe = ATF::affaire()->select($post["id_affaire"], "id_societe");
 
+    if($post["id_contact"] === "0" || $post["id_contact"] === 0){
 
-    if($post["id_contact"] === "0"){
+
       ATF::contact()->q->reset()->where("id_societe", $id_societe)
                               ->where("contact.nom", "GERANT");
       $contact = ATF::contact()->select_row();
@@ -1381,13 +1384,16 @@ class societe_cleodis extends societe {
                         ));
         ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
       } else {
-        $id_contact = ATF::contact()->i(array(
-                                "nom"=>$post["nom_gerant"],
-                                "prenom"=>$post["prenom_gerant"],
-                                "tel"=>$post["phone_gerant"],
-                                "email"=>$post["email_gerant"],
-                                "fonction"=>$post["fonction_gerant"]
-                        ));
+        $new = array(
+                        "nom"=>$post["nom_gerant"],
+                        "prenom"=>$post["prenom_gerant"],
+                        "tel"=>$post["phone_gerant"],
+                        "email"=>$post["email_gerant"],
+                        "fonction"=>$post["fonction_gerant"],
+                        "id_societe"=>$id_societe
+                );
+
+        $id_contact = ATF::contact()->i($new);
         ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact));
       }
     }else{
