@@ -1380,7 +1380,7 @@ class societe_cleodis extends societe {
         ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
                                 "nom"=>$post["nom_gerant"],
                                 "prenom"=>$post["prenom_gerant"],
-                                "tel"=>$post["tel"],
+                                "gsm"=>$post["tel"],
                                 "email"=>$post["email_gerant"]
                         ));
         ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
@@ -1388,7 +1388,7 @@ class societe_cleodis extends societe {
         $new = array(
                         "nom"=>$post["nom_gerant"],
                         "prenom"=>$post["prenom_gerant"],
-                        "tel"=>$post["phone_gerant"],
+                        "gsm"=>$post["phone_gerant"],
                         "email"=>$post["email_gerant"],
                         "fonction"=>$post["fonction_gerant"],
                         "id_societe"=>$id_societe
