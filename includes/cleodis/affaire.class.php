@@ -1171,6 +1171,17 @@ class affaire_cleodis extends affaire {
 		return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
 	}
 
+	public function getInfoSignataire($id_affaire) {
+		ATF::affaire()->q->reset()
+			->addField('contact.*')
+			->addJointure("affaire","id_societe","societe","id_societe")
+			->addJointure("societe","id_contact_signataire","contact","id_contact")
+			->where('id_affaire', $id_affaire)
+			->setDimension('row');
+
+			return ATF::affaire()->sa();
+	}
+
 	/**
 	*
 	* Fonctions _GET pour telescope
@@ -1233,6 +1244,8 @@ class affaire_cleodis extends affaire {
 		  $data = $this->sa();
 		  // on check si l'affaire est "payee"
 		  $data['payee'] = $this->paiementIsReceived($data['affaire.id_affaire_fk']);
+		  // on set les infos signataire pour la relance des paiements
+		  $data['infos_signataire'] = $this->getInfoSignataire($data['affaire.id_affaire_fk']);
 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
@@ -1316,13 +1329,23 @@ class affaire_cleodis extends affaire {
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
 
 		} else {
-
 			// Filtre sur l'etat de l'affaire
 			if ($get['filters']['accepte'] == "on") $this->q->where("affaire.etat_comite","accepte","OR","etatComite");
 			if ($get['filters']['refuse'] == "on") $this->q->where("affaire.etat_comite","refuse","OR","etatComite");
 			if ($get['filters']['attente'] == "on") $this->q->where("affaire.etat_comite","attente","OR","etatComite");
 			if ($get['filters']['commande'] == "on") $this->q->whereIsNotNull("bon_de_commande.id_commande");
 			if ($get['filters']['atraiter'] == "on") $this->q->whereIsNull("bon_de_commande.id_commande");
+
+
+			if ($get['filters']['startdate']) {
+				$this->q
+		    	->where("affaire.date", $get['filters']['startdate'], "AND", false, ">=");
+			}
+
+			if ($get['filters']['enddate']) {
+			  $this->q
+		    	->where("affaire.date", $get['filters']['enddate'], "AND", false, "<=");
+			}
 
 			//filtre sur l'etat de l'affaire en fonction de la vue
 			if ($get['filters']['devis']) {
@@ -1432,15 +1455,6 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['administratif']) {
-				if ($get['filters']['startdate']) {
-					$this->q
-			    	->where("affaire.date_verification", $get['filters']['startdate'], "AND", false, ">=");
-				}
-
-				if ($get['filters']['enddate']) {
-				  $this->q
-			    	->where("affaire.date_verification", $get['filters']['enddate'], "AND", false, "<=");
-				}
 
 			  if ($get['filters']['administratif']['verifier']) {
 			    $this->q
