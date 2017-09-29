@@ -1047,6 +1047,7 @@ class societe_cleodis extends societe {
 
     $data = self::getInfosFromCREDITSAFE($post);
 
+
     $gerants = $data["gerant"];
 
 
@@ -1078,8 +1079,8 @@ class societe_cleodis extends societe {
 
     if($gerants){
       foreach ( $gerants as $key => $value) {
-        ATF::contact()->q->reset()->where("LOWER(nom)", strtolower($value["nom"]),"AND")
-                                  ->where("LOWER(prenom)", strtolower($value["prenom"]),"AND")
+        ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($value["nom"])),"AND")
+                                  ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($value["prenom"])),"AND")
                                   ->where("id_societe", $id_societe,"AND");
         $gerant[$key] = $contact;
         $c = ATF::contact()->select_row();
