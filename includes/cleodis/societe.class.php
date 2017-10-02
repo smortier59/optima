@@ -1240,7 +1240,7 @@ class societe_cleodis extends societe {
       throw new errorATF($e->getMessage() ,500);
     }
 
-    //if($comite["etat"]== "accepte"){ // desactivation de la condition pour l'insertion d'un commité automatique meme en cas de refu
+    if($comite["etat"]== "accepte"){
 
       //Création du comité CLEODIS
       $comite["description"] = "Comité CLEODIS";
@@ -1260,8 +1260,8 @@ class societe_cleodis extends societe {
                    "societe"=>ATF::societe()->select($id_societe),
                    "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
                   );
-    //}
-    //return array("result"=>false , "societe"=>ATF::societe()->select($id_societe));
+    }
+    return array("result"=>false , "societe"=>ATF::societe()->select($id_societe));
   }
 
   public function _comiteCleodis ($get, $post){
