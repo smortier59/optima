@@ -1601,7 +1601,6 @@ class affaire_cleodis extends affaire {
 			  $data["count"] = count($d);
 			}
 
-
 			if(!$data){
 				if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
