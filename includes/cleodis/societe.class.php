@@ -1200,7 +1200,7 @@ class societe_cleodis extends societe {
             "id_affaire" => $devis["id_affaire"],
             "id_contact" => $gerant[0]["id_contact"],
             "activite" => $data["activite"],
-            "id_refinanceur" => "98b08c04b5f5632e49a93b6b324c5678",
+            "id_refinanceur" => 4,
             "date_creation" => $data["date_creation"],
             "date_compte" => $data["lastaccountdate"],
             "capitaux_propres" => $data["capitaux_propres"],
