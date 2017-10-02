@@ -1222,9 +1222,6 @@ class societe_cleodis extends societe {
     $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
     $past2Years = $past2Years->format("Ymd");
 
-
-    log::logger($data , "mfleurquin");
-
     if($data["cs_score"] > 50 && $creation < $past2Years ){
       $comite["etat"] = "accepte";
       $comite["decisionComite"] = "Accepté automatiquement";
@@ -1236,13 +1233,16 @@ class societe_cleodis extends societe {
     $comite["reponse"] = date("Y-m-d");
     $comite["validite_accord"] = date("Y-m-d");
 
-    log::logger($comite , "mfleurquin");
+
 
     try{
       ATF::comite()->insert(array("comite"=>$comite));
     }catch (errorATF $e) {
+      log::logger($e->getMessage() , "mfleurquin");
       throw new errorATF($e->getMessage() ,500);
     }
+
+    log::logger($comite , "mfleurquin");
 
     if($comite["etat"]== "accepte"){
 
