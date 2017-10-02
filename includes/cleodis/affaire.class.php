@@ -26,6 +26,8 @@ class affaire_cleodis extends affaire {
 			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+
 		);
 
 		$this->colonnes['primary'] = array(
@@ -112,6 +114,7 @@ class affaire_cleodis extends affaire {
 		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="ref";
@@ -1262,6 +1265,7 @@ class affaire_cleodis extends affaire {
 
 		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["affaire.id_societe_fk"], "id_contact_signataire"));
 		  $data["retourPV"] = NULL;
+		  $data["pouvoir"] = file_exists(ATF::affaire()->filepath($get['id_affaire'],"pouvoir")) ? true : false;
 
 		  foreach ($data as $key => $value) {
 			if (strpos($key,".")) {
@@ -1308,6 +1312,7 @@ class affaire_cleodis extends affaire {
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
+
 		  foreach ($data["comites"] as $key => $value) {
 		  	if($value['description']=== 'Comité CLEODIS'){
 		  		$data["etat_comite_cleodis"] = $value['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
