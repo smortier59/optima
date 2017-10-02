@@ -25,7 +25,6 @@ class affaire_cleodis extends affaire {
 			,'mail_document'
 			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
-			,'bilan'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 		);
@@ -112,8 +111,6 @@ class affaire_cleodis extends affaire {
 		);
 		$this->files["cni"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-		$this->files["bilan"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
@@ -1406,11 +1403,7 @@ class affaire_cleodis extends affaire {
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
-		  foreach ($data["comites"] as $key => $value) {
-		  	if($value['etat'] === 'en_attente'){
-		  		$data["file_bilan"] = file_exists($this->filepath($get['id_affaire'],"bilan")) ? 'oui' : 'non';
-		  	}
-		  }
+
 		  /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
 		  $data["affaireAffaire"] = $this->sa();
 		  */
