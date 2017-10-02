@@ -1692,20 +1692,21 @@ class affaire_cleodis extends affaire {
 
 	/**
 	 * Retourne le premier loyer d'une affaire, utilisé pour le paiement CB Toshiba
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * Si aucun loyer, on retourne false
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author Anthony LAHLAH <alahlah@absystech.fr>
 	 * @param  array $get  (id_affaire)
 	 * @param  array $post
-	 * @return float       le loyer
+	 * @return float|boolean       le loyer, sinon FALSE si déjà payé
 	 */
 	public function _get_loyer($get,$post){
 		$id_affaire = $this->decryptId($get["id_affaire"]);
 		if ($this->paiementIsReceived($id_affaire)){
 			return false;
-		}
-		else{
+		} else {
 			ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
-									->addOrder("id_loyer", "ASC")
-									->setLimit(1);
+				->addOrder("id_loyer", "ASC")
+				->setLimit(1);
 			$loyer = ATF::loyer()->select_row();
 			return $loyer;
 		}
