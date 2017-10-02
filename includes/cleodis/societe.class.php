@@ -1236,12 +1236,11 @@ class societe_cleodis extends societe {
 
 
     try{
-      ATF::comite()->insert(array($comite);
+      ATF::comite()->insert(array($comite));
     }catch (errorATF $e) {
-      log::logger($e->getMessage() , "mfleurquin");
       throw new errorATF($e->getMessage() ,500);
     }
-    log::logger($comite , "mfleurquin");
+
 
     if($comite["etat"]== "accepte"){
       //Création du comité CLEODIS
