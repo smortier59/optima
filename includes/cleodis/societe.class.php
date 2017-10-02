@@ -1216,16 +1216,18 @@ class societe_cleodis extends societe {
         );
 
 
+
     $creation = new DateTime( $data["date_creation"] );
     $creation = $creation->format("Ymd");
     $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
     $past2Years = $past2Years->format("Ymd");
 
 
+    log::logger($data , "mfleurquin");
+
     if($data["cs_score"] > 50 && $creation < $past2Years ){
       $comite["etat"] = "accepte";
       $comite["decisionComite"] = "Accepté automatiquement";
-
     }else{
       $comite["etat"] = "refuse";
       $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
@@ -1234,8 +1236,10 @@ class societe_cleodis extends societe {
     $comite["reponse"] = date("Y-m-d");
     $comite["validite_accord"] = date("Y-m-d");
 
+    log::logger($comite , "mfleurquin");
+
     try{
-       ATF::comite()->insert(array("comite"=>$comite));
+      ATF::comite()->insert(array("comite"=>$comite));
     }catch (errorATF $e) {
       throw new errorATF($e->getMessage() ,500);
     }
@@ -1261,7 +1265,8 @@ class societe_cleodis extends societe {
                    "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
                   );
     }
-    return array("result"=>false , "societe"=>ATF::societe()->select($id_societe));
+    return array("result"=>false ,
+                 "societe"=>ATF::societe()->select($id_societe));
   }
 
   public function _comiteCleodis ($get, $post){
