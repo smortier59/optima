@@ -1308,7 +1308,7 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
-		  $data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
+		  //$data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
@@ -1655,12 +1655,12 @@ class affaire_cleodis extends affaire {
 	* @return true ou false, resultat du traitement
 	*/
 	public function _updatePiece($get,$post) {
-		if (!$post['action']) throw new Exception("Il manque l'action", 500);
 		if (!$post['id_affaire']) throw new Exception("Il manque l'id de l'affaire", 500);
 
-		$action = $post['action'] == "valider" ? "OK" : "NOK";
-		$etat = $post['action'] == "valider" ? "valide_administratif" : "refus_administratif";
-		$id_affaire = $this->decryptId($post["id_affaire"]);
+		// au cas ou il y aurait un changement de format d'id transmis
+		$id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
+		$action = "OK";
+		$etat = "valide_administratif";
 
 		try {
 			ATF::affaire()->update(array(

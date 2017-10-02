@@ -21,11 +21,13 @@ class affaire_etat extends classes_optima {
 
 
 	public function _GET($get, $post){
+		// au cas ou il y aurait un changement de format d'id transmis
+		$id_affaire =  strlen($get["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($get["id_affaire"]) : $get['id_affaire'];
 		ATF::affaire_etat()
 			->q
 			->reset()
 			->addJointure("affaire_etat","id_user","user","id_user") //rajout d'une jointure pour récupérer le login
-			->where("id_affaire", $get["id_affaire"])
+			->where("id_affaire", $id_affaire)
 			->addOrder("affaire_etat.date","desc");
 		return ATF::affaire_etat()->select_all();
 	}
