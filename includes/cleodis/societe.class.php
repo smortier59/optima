@@ -1236,7 +1236,7 @@ class societe_cleodis extends societe {
 
 
     try{
-      ATF::comite()->insert(array($comite));
+      ATF::comite()->insert($comite);
     }catch (errorATF $e) {
       throw new errorATF($e->getMessage() ,500);
     }
