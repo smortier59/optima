@@ -1236,8 +1236,9 @@ class societe_cleodis extends societe {
 
 
     try{
-      ATF::comite()->insert($comite);
+      ATF::comite()->insert(array("comite"=>$comite));
     }catch (errorATF $e) {
+      log::logger($e->getMessage() , "mfleurquin");
       throw new errorATF($e->getMessage() ,500);
     }
 
@@ -1248,7 +1249,7 @@ class societe_cleodis extends societe {
       $comite["etat"] = "en_attente";
       $comite["reponse"] = NULL;
       $comite["validite_accord"] = NULL;
-      ATF::comite()->insert($comite);
+      //ATF::comite()->insert(array("comite"=>$comite));
 
       return array("result"=>true,
                    "id_affaire"=> $devis["id_affaire"],
