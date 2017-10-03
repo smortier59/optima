@@ -1049,7 +1049,6 @@ class societe_cleodis extends societe {
 
 
     if($data){
-      log::logger("Fuck" , "mfleurquin");
       $gerants = $data["gerant"];
 
       if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
