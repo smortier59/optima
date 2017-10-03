@@ -1269,8 +1269,11 @@ class societe_cleodis extends societe {
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
     $decisionAffaireEtat = $post['action'] == "valider" ? "comite_cleodis_valide" : "comite_cleodis_refuse"; // pareil pour la timeline
+
+    // au cas ou il y aurait un changement de format d'id transmis
+    $id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
     ATF::comite()->q->reset() // on récupére le comite cleodis concerné
-      ->where("id_affaire",$post["id_affaire"], 'AND')
+      ->where("id_affaire",$id_affaire, 'AND')
       ->where("description", "Comité CLEODIS", 'AND')
       ->where("etat", "en_attente");
     $comite = ATF::comite()->select_row();
@@ -1280,10 +1283,12 @@ class societe_cleodis extends societe {
       ATF::comite()->u(array("id_comite"=>$comite['id_comite'], "etat"=>$decision, "decisionComite"=>"Accepté manuellement"));
       // ainsi que la table affaire etat pour la timeline
       ATF::affaire_etat()->insert(array(
-          "id_affaire"=>$post["id_affaire"],
+          "id_affaire"=>$id_affaire,
           "etat"=> $decisionAffaireEtat,
           "id_user"=>ATF::$usr->get('id_user')
       ));
+      if ($decision === "accepte")
+        $this->_createContratToshiba(false, array("id_affaire"=>$id_affaire));
       return true;
     } catch (Exception $e) {
       return $e->getMessage();

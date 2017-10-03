@@ -1308,7 +1308,7 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
-		  $data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
+		  //$data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
@@ -1655,12 +1655,12 @@ class affaire_cleodis extends affaire {
 	* @return true ou false, resultat du traitement
 	*/
 	public function _updatePiece($get,$post) {
-		if (!$post['action']) throw new Exception("Il manque l'action", 500);
 		if (!$post['id_affaire']) throw new Exception("Il manque l'id de l'affaire", 500);
 
-		$action = $post['action'] == "valider" ? "OK" : "NOK";
-		$etat = $post['action'] == "valider" ? "valide_administratif" : "refus_administratif";
-		$id_affaire = $this->decryptId($post["id_affaire"]);
+		// au cas ou il y aurait un changement de format d'id transmis
+		$id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
+		$action = "OK";
+		$etat = "valide_administratif";
 
 		try {
 			ATF::affaire()->update(array(
@@ -1692,20 +1692,21 @@ class affaire_cleodis extends affaire {
 
 	/**
 	 * Retourne le premier loyer d'une affaire, utilisé pour le paiement CB Toshiba
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * Si aucun loyer, on retourne false
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author Anthony LAHLAH <alahlah@absystech.fr>
 	 * @param  array $get  (id_affaire)
 	 * @param  array $post
-	 * @return float       le loyer
+	 * @return float|boolean       le loyer, sinon FALSE si déjà payé
 	 */
 	public function _get_loyer($get,$post){
 		$id_affaire = $this->decryptId($get["id_affaire"]);
 		if ($this->paiementIsReceived($id_affaire)){
 			return false;
-		}
-		else{
+		} else {
 			ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
-									->addOrder("id_loyer", "ASC")
-									->setLimit(1);
+				->addOrder("id_loyer", "ASC")
+				->setLimit(1);
 			$loyer = ATF::loyer()->select_row();
 			return $loyer;
 		}
