@@ -17,7 +17,7 @@ log::logger($infos, "mfleurquin");
 if($infos["create_tache"]){
     try{
         $tache = array("tache"=>array("id_societe"=> $infos["id_societe"],
-                                       "id_user"=>18,
+                                       "id_user"=>23,
                                        "origine"=>"societe_commande",
                                        "tache"=>"Une nouvelle commande viens d'être passée et validée par SLIMPAY",
                                        "id_affaire"=>$infos["id_affaire"],
@@ -25,17 +25,17 @@ if($infos["create_tache"]){
                                        "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
                                        "no_redirect"=>"true"
                                       ),
-                        "dest"=>18
+                        "dest"=>23
                     );
         $id_tache = ATF::tache()->insert($tache);
 
-        ATF::comite()->insert(    array("date"=>date("Y-m-d"),
-                                        "id_affaire"=>$infos["id_affaire"],
-                                        "id_societe"=>$infos["id_societe"],
-                                        "etat"=>"en_attente",
-                                        "date_creation"=>date("Y-m-d"),
-                                        "suivi_notifie"=>array(18)
-                                    ));
+        ATF::comite()->insert(  array("date"=>date("Y-m-d"),
+                                    "id_affaire"=>$infos["id_affaire"],
+                                    "id_societe"=>$infos["id_societe"],
+                                    "etat"=>"en_attente",
+                                    "date_creation"=>date("Y-m-d"),
+                                    "suivi_notifie"=>array(18,23)
+                                ));
         die;
     }catch(errorATF $e){
         log::logger($e->getMessage(),'lm');
@@ -146,7 +146,6 @@ if ($infos["id_facture"]) {
 
     $id_facture = ATF::facture()->decryptId($infos["id_facture"]);
 
-    log::logger(ATF::facture()->decryptId($id_facture), "mfleurquin");
     $filename = ATF::facture()->filepath($id_facture,"fichier_joint");
 
     if(file_exists($filename)){
