@@ -1222,7 +1222,7 @@ class societe_cleodis extends societe {
     $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
     $past2Years = $past2Years->format("Ymd");
 
-    if($data["cs_score"] > 50 && $creation < $past2Years ){
+    if($data["cs_score"] > 0 && $creation < $past2Years ){
       $comite["etat"] = "accepte";
       $comite["decisionComite"] = "Accepté automatiquement";
     }else{
@@ -1401,7 +1401,7 @@ class societe_cleodis extends societe {
       }
     }else{
       ATF::contact()->u(array("id_contact"=>$post["id_contact"],
-                              "tel"=>$post["tel"],
+                              "gsm"=>$post["tel"],
                               "fax"=>$post["fax"],
                               "email"=>$post["email"]
                       ));
