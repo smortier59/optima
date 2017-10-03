@@ -490,12 +490,13 @@ class echeancier extends classes_optima {
       "frais_de_port" => NULL,
       "marge_absolue" => NULL,
       "prix" =>  NULL,
-      "tva" => "1.200",
       "prix_achat" => NULL,
       "email" => NULL,
       "emailTexte" => NULL,
       "emailCopie" => NULL,
     );
+
+    $facture["facture"]["tva"] = ATF::facture()->getTVA($post["id_societe"]);
 
     if($post["affaire_sans_devis"]){
       $facture["facture"]["affaire_sans_devis"]= $post["affaire_sans_devis"];

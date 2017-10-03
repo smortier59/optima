@@ -415,7 +415,6 @@ class facture_absystech extends facture {
 		$assistantDirection = 9;
 		if(ATF::$codename == "att") $assistantDirection = 5;
 
-
 		if($tva!=$infos["tva"] && (ATF::$usr->get("id_profil")!=1 && ATF::$usr->get("id_profil")!=$assistantDirection )){
 			$profil=ATF::profil()->select(1);
 			ATF::$msg->addNotice(
