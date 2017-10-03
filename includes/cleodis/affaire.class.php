@@ -25,9 +25,9 @@ class affaire_cleodis extends affaire {
 			,'mail_document'
 			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
-			,'bilan'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
-
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+
 		);
 
 		$this->colonnes['primary'] = array(
@@ -112,9 +112,9 @@ class affaire_cleodis extends affaire {
 		);
 		$this->files["cni"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-		$this->files["bilan"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="ref";
@@ -1152,6 +1152,41 @@ class affaire_cleodis extends affaire {
 
 		return true;
 	}
+
+	/**
+	*
+	* Fonctions paiementIsReceived pour determiner si une affaire a été payé ou non pour le listing cleoscope
+	* @package Telescope
+	* @author Anthony LAHLAH <mfleurquin@absystech.fr>
+	* @param $id_affaire number contient l'id affaire qui va servir à la requete.
+	* @return boolean, retourne le boolean qui represente l'etat du paiement
+	*/
+	public function paiementIsReceived($id_affaire) {
+		ATF::transaction_banque()->q->reset()
+			->where('id_affaire', $id_affaire)
+			->where('response_code', "00")
+			->setDimension('row');
+
+		$row = ATF::transaction_banque()->sa();
+		return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
+	}
+
+	/**
+	 * fonction qui retourne toutes les infos d'un signataire d'une affaire
+	 * @param  $id_affaire, int contenant l'id_affaire NON crypté
+	 * @return array, return un tableau contenant toutes les infos du signataire de l'affaire
+	 */
+	public function getInfoSignataire($id_affaire) {
+		ATF::affaire()->q->reset()
+			->addField('contact.*')
+			->addJointure("affaire","id_societe","societe","id_societe")
+			->addJointure("societe","id_contact_signataire","contact","id_contact")
+			->where('id_affaire', $id_affaire)
+			->setDimension('row');
+
+			return ATF::affaire()->sa();
+	}
+
 	/**
 	*
 	* Fonctions _GET pour telescope
@@ -1212,7 +1247,10 @@ class affaire_cleodis extends affaire {
 		if ($get['id_affaire']) {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
-
+		  // on check si l'affaire est "payee"
+		  $data['payee'] = $this->paiementIsReceived($data['affaire.id_affaire_fk']);
+		  // on set les infos signataire pour la relance des paiements
+		  $data['infos_signataire'] = $this->getInfoSignataire($data['affaire.id_affaire_fk']);
 		  ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
 					  ->addField("devis.*")
 					  ->from("devis","id_user","user","id_user")
@@ -1227,6 +1265,7 @@ class affaire_cleodis extends affaire {
 
 		  $data["contact"] = ATF::contact()->select(ATF::societe()->select($data["affaire.id_societe_fk"], "id_contact_signataire"));
 		  $data["retourPV"] = NULL;
+		  $data["pouvoir"] = file_exists(ATF::affaire()->filepath($get['id_affaire'],"pouvoir")) ? true : false;
 
 		  foreach ($data as $key => $value) {
 			if (strpos($key,".")) {
@@ -1269,14 +1308,12 @@ class affaire_cleodis extends affaire {
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
-		  $data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
+		  //$data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
 
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
 		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
+
 		  foreach ($data["comites"] as $key => $value) {
-		  	if($value['etat'] === 'en_attente'){
-		  		$data["file_bilan"] = file_exists($this->filepath($get['id_affaire'],"bilan")) ? 'oui' : 'non';
-		  	}
 		  	if($value['description']=== 'Comité CLEODIS'){
 		  		$data["etat_comite_cleodis"] = $value['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
 		  	}
@@ -1296,13 +1333,23 @@ class affaire_cleodis extends affaire {
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
 
 		} else {
-
 			// Filtre sur l'etat de l'affaire
 			if ($get['filters']['accepte'] == "on") $this->q->where("affaire.etat_comite","accepte","OR","etatComite");
 			if ($get['filters']['refuse'] == "on") $this->q->where("affaire.etat_comite","refuse","OR","etatComite");
 			if ($get['filters']['attente'] == "on") $this->q->where("affaire.etat_comite","attente","OR","etatComite");
 			if ($get['filters']['commande'] == "on") $this->q->whereIsNotNull("bon_de_commande.id_commande");
 			if ($get['filters']['atraiter'] == "on") $this->q->whereIsNull("bon_de_commande.id_commande");
+
+
+			if ($get['filters']['startdate']) {
+				$this->q
+		    	->where("affaire.date", $get['filters']['startdate'], "AND", false, ">=");
+			}
+
+			if ($get['filters']['enddate']) {
+			  $this->q
+		    	->where("affaire.date", $get['filters']['enddate'], "AND", false, "<=");
+			}
 
 			//filtre sur l'etat de l'affaire en fonction de la vue
 			if ($get['filters']['devis']) {
@@ -1412,15 +1459,6 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['administratif']) {
-				if ($get['filters']['startdate']) {
-					$this->q
-			    	->where("affaire.date_verification", $get['filters']['startdate'], "AND", false, ">=");
-				}
-
-				if ($get['filters']['enddate']) {
-				  $this->q
-			    	->where("affaire.date_verification", $get['filters']['enddate'], "AND", false, "<=");
-				}
 
 			  if ($get['filters']['administratif']['verifier']) {
 			    $this->q
@@ -1563,7 +1601,6 @@ class affaire_cleodis extends affaire {
 			  $data["count"] = count($d);
 			}
 
-
 			if(!$data){
 				if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
@@ -1586,8 +1623,10 @@ class affaire_cleodis extends affaire {
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  $data['data'][$key]["retourPV"] = false;
+				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk']);
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+
 				$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 			  }else{
 				$data['data'][$key]["contrat_signe"] = false;
@@ -1616,12 +1655,12 @@ class affaire_cleodis extends affaire {
 	* @return true ou false, resultat du traitement
 	*/
 	public function _updatePiece($get,$post) {
-		if (!$post['action']) throw new Exception("Il manque l'action", 500);
 		if (!$post['id_affaire']) throw new Exception("Il manque l'id de l'affaire", 500);
 
-		$action = $post['action'] == "valider" ? "OK" : "NOK";
-		$etat = $post['action'] == "valider" ? "valide_administratif" : "refus_administratif";
-		$id_affaire = $this->decryptId($post["id_affaire"]);
+		// au cas ou il y aurait un changement de format d'id transmis
+		$id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
+		$action = "OK";
+		$etat = "valide_administratif";
 
 		try {
 			ATF::affaire()->update(array(
@@ -1653,19 +1692,24 @@ class affaire_cleodis extends affaire {
 
 	/**
 	 * Retourne le premier loyer d'une affaire, utilisé pour le paiement CB Toshiba
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * Si aucun loyer, on retourne false
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author Anthony LAHLAH <alahlah@absystech.fr>
 	 * @param  array $get  (id_affaire)
 	 * @param  array $post
-	 * @return float       le loyer
+	 * @return float|boolean       le loyer, sinon FALSE si déjà payé
 	 */
 	public function _get_loyer($get,$post){
 		$id_affaire = $this->decryptId($get["id_affaire"]);
-
-		ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
-								->addOrder("id_loyer", "ASC")
-								->setLimit(1);
-		$loyer = ATF::loyer()->select_row();
-		return $loyer;
+		if ($this->paiementIsReceived($id_affaire)){
+			return false;
+		} else {
+			ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
+				->addOrder("id_loyer", "ASC")
+				->setLimit(1);
+			$loyer = ATF::loyer()->select_row();
+			return $loyer;
+		}
 	}
 
 

@@ -55,11 +55,12 @@ class tache_lm extends tache {
 
 		if ($concerne || ATF::$usr->privilege('tache','update')) {
 			if (parent::update($infos)) {
-				if ($email_envoye=$this->envoyer_mail($infos["id_tache"],"tache_valid")) {
+				return $infos['id_tache'];
+				/*if ($email_envoye=$this->envoyer_mail($infos["id_tache"],"tache_valid")) {
 					ATF::$msg->addNotice(ATF::$usr->trans("email_envoye"));
-				}
+				}*/
 			}
-			return $infos['id_tache'];
+
 		}else{
 			throw new errorATF("Vous n'avez pas le droit de modifier cette tache");
 		}

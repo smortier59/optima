@@ -1,33 +1,3 @@
-/*SQL pour cleoscope et le portail www*/
-ALTER TABLE `contact` ADD `est_dirigeant` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Est un dirigeant de la société (récupéré de l\'interogation CreditSafe)' AFTER `fonction`;
-ALTER TABLE `pack_produit_ligne` ADD `option_incluse` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `max`;
-
-
-
-ALTER TABLE `affaire` ADD `pieces` ENUM('NOK','OK') NULL DEFAULT NULL AFTER `provenance`, ADD `date_verification` DATE NULL DEFAULT NULL AFTER `pieces`;
-ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-ALTER TABLE `affaire_etat` ADD `id_user` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `commentaire`, ADD INDEX (`id_user`);
-ALTER TABLE `affaire_etat` ADD FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE SET NULL ON UPDATE CASCADE;
-ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif','comite_cleodis_valide','comite_cleodis_refuse','refus_administratif') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #DEVIS CLEODIS V2
 ALTER TABLE `devis_ligne` ADD `options` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire`;
