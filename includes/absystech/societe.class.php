@@ -1219,7 +1219,7 @@ class societe_absystech extends societe {
 
 		$factures = ATF::facture()->ss("facture.id_societe",$infos["id_societe"]);
 
-		if (!$factures) return null;
+		if (!$factures) return array();
 
 		$indicator["CA"] =
 		$indicator["CA_Prev"] =
