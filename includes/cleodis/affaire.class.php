@@ -1170,6 +1170,20 @@ class affaire_cleodis extends affaire {
 		$row = ATF::transaction_banque()->sa();
 		return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
 	}
+	/**
+	 * [_paiementIsReceived permet de verifier si une affaire est payée ou non pour le recap toshiba www]
+	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
+	 * @param  [Array] $get  Array contenant les paramètres de la requete
+	 * @return true or false, verifie si le paiement a bien été reçu
+	 */
+	public function _paiementIsReceived($get) {
+
+		if(strlen($get["id_affaire"]) ===32){
+			return self::paiementIsReceived(ATF::affaire()->decryptId($get["id_affaire"]));
+		}else{
+			return false;
+		}
+	}
 
 	/**
 	 * fonction qui retourne toutes les infos d'un signataire d'une affaire
