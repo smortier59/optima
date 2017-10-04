@@ -123,7 +123,7 @@ class comite extends classes_optima {
 			$info_mail["id_user"] = ATF::$usr->getID();
 			$info_mail["id_societe"] = $infos["id_societe"];
 			$info_mail["id_affaire"] = $infos["id_affaire"];
-			//$info_mail["optima_url"] = ATF::permalink()->getURL($this->createPermalink($this->cryptId($last_id)));
+			$info_mail["optima_url"] = ATF::permalink()->getURL($this->createPermalink($this->cryptId($last_id)));
 
 			$mail = new mail($info_mail);
 
