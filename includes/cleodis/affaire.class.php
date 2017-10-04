@@ -1630,7 +1630,15 @@ class affaire_cleodis extends affaire {
 						unset($data['data'][$key][$k_]);
 					}
 				}
-		  	  $data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
+
+				// pour chaque affaire on recupere ses comites
+				foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
+					if($comite['description']=== 'Comité CLEODIS'){
+						$data['data'][$key]["etat_comite_cleodis"] = $comite['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
+					}
+				}
+
+		  	$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
 		  	  $data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
 
