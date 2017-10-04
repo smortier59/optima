@@ -818,14 +818,14 @@ class facture_fournisseur extends classes_optima {
 
 	        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
 	        $data = $this->sa();
-
-
 		}else{
 			$data = $invoice;
 			foreach ($data as $key => $value) {
 				$data[$key]["facture_fournisseur.id_facture_fournisseur"] = $value["facture_fournisseur.ref"];
 			}
 		}
+
+		log::logger($data , "mfleurquin");
 
         $string = "";
         $total_debit = 0;
