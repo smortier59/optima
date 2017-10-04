@@ -113,7 +113,7 @@ class comite extends classes_optima {
 
 
 			$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";;
-			$info_mail["html"] = true;
+			//$info_mail["html"] = true;
 			$info_mail["template"] = "comite";
 
 			$info_mail["recipient"] = $recipient;
