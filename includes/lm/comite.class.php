@@ -113,7 +113,7 @@ class comite extends classes_optima {
 
 
 			$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";;
-			//$info_mail["html"] = true;
+			$info_mail["html"] = true;
 			$info_mail["template"] = "comite";
 
 			$info_mail["recipient"] = $recipient;
@@ -365,7 +365,7 @@ class comite extends classes_optima {
 		if($id_courrier){
 
 			//On envoi le mail avec ou sans le PDF
-			$infos_mail["from"] = "Leroy Merlin Abonnement  <no-reply@leroymerlin.fr>";
+			$infos_mail["from"] = "Leroy Merlin Abonnement <noreply@abonnement-leroymerlin.fr>";
 			$infos_mail["objet"] = "Informations sur votre contrat";
 			$infos_mail["recipient"] = ATF::societe()->select($client , "email");
 			$infos_mail["template"] = "courrierInformationPack/".ATF::courrier_information_pack()->select($id_courrier, "template_mail_courrier");
