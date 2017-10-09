@@ -192,7 +192,9 @@ if ($infos["getPdfSigne"]) {
 //Récuperation du PDF signé du contrat
 if ($infos["getPDFCourrierInformation"]) {
 
-    $filename = ATF::courrier_information_pack()->filepath($infos["courrier_information_pack"],"fichier_joint");
+    $id_affaire = ATF::affaire()->decryptId($infos["affaire"]);
+
+    $filename = ATF::affaire()->filepath($id_affaire,"courrier_information");
 
     if(file_exists($filename)){
         $handle = fopen($filename, "r");

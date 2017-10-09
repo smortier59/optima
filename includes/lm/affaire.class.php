@@ -116,6 +116,7 @@ class affaire_lm extends affaire {
 
 		$this->files["bon_inter"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["facture"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["courrier_information"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		//$this->files["mandat_slimpay"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 

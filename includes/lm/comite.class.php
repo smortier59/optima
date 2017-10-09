@@ -15,12 +15,14 @@ class comite extends classes_optima {
 			,'comite.etat'=>array("width"=>30,"renderer"=>"etat")
 			,'decision'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteDecision","width"=>50)
 			,"decisionComite"
+			,"comite.destinataire"
 		);
 
 		$this->colonnes['primary'] = array(
 			"id_societe"=>array("disabled"=>true)
 			,"id_affaire"=>array("disabled"=>true)
 			,"date_creation"
+			,"destinataire"
 
 		);
 
@@ -31,9 +33,9 @@ class comite extends classes_optima {
 
 
 
-		$this->colonnes['panel']['notifie'] = array(
+		/*$this->colonnes['panel']['notifie'] = array(
 			"suivi_notifie"=>array("custom"=>true)
-		);
+		);*/
 
 		$this->field_nom = "%id_affaire% (%date_creation%)";
 
@@ -41,7 +43,7 @@ class comite extends classes_optima {
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['update'] =
-		$this->colonnes['bloquees']['clone']  = array_merge(array('etat','commentaire','decision', 'decisionComite', "notifie_utilisateur"));
+		$this->colonnes['bloquees']['clone']  = array_merge(array('etat','commentaire','decision', 'decisionComite', "notifie_utilisateur", "suivi_notifie"));
 
 		$this->fieldstructure();
 
@@ -54,6 +56,7 @@ class comite extends classes_optima {
 		$this->panels['notes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['statut'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['creditSafeInfos'] = array("visible"=>true, 'nbCols'=>4);
+		$this->panels['notifie'] = array("visible"=>false);
 		$this->selectAllExtjs=true;
 
 		$this->addPrivilege("getInfosFromCREDITSAFE");
@@ -71,6 +74,7 @@ class comite extends classes_optima {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false,$tu=false){
+
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{
@@ -91,10 +95,13 @@ class comite extends classes_optima {
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 
+		if($infos["destinataire"]){
 
-		if($notifie_suivi != array(0=>"")){
-			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com,herve.anvroin@leroymerlin.fr";
-			$info_mail["suivi_notifie"] = "";
+			$recipient = $infos["destinataire"];
+
+			//$recipient = "jerome.loison@cleodis.com,lma@cleodis.com,herve.anvroin@leroymerlin.fr";
+
+			/*$info_mail["suivi_notifie"] = "";
 
 			foreach ($notifie_suivi as $key => $value) {
 				$info_mail["suivi_notifie"] .= ATF::user()->nom($value).",";
@@ -102,7 +109,8 @@ class comite extends classes_optima {
 			}
 
 			//$recipient = substr($recipient, 0, -1);
-			$info_mail["suivi_notifie"] = substr($info_mail["suivi_notifie"], 0, -1);
+			$info_mail["suivi_notifie"] = substr($info_mail["suivi_notifie"], 0, -1);*/
+
 
 			$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";;
 			$info_mail["html"] = true;
@@ -117,12 +125,15 @@ class comite extends classes_optima {
 			$info_mail["id_affaire"] = $infos["id_affaire"];
 			$info_mail["optima_url"] = ATF::permalink()->getURL($this->createPermalink($this->cryptId($last_id)));
 
-
 			$mail = new mail($info_mail);
 
-			if(!$tu) $mail->send();
 
-			$this->u(array("id_comite"=>$last_id , "notifie_utilisateur"=>$info_mail["suivi_notifie"]));
+			if($mail->send()){
+				ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
+			}
+
+
+			//$this->u(array("id_comite"=>$last_id , "notifie_utilisateur"=>$info_mail["suivi_notifie"]));
 		}
 
 
@@ -354,7 +365,7 @@ class comite extends classes_optima {
 		if($id_courrier){
 
 			//On envoi le mail avec ou sans le PDF
-			$infos_mail["from"] = "Leroy Merlin Abonnement  <no-reply@leroymerlin.fr>";
+			$infos_mail["from"] = "Leroy Merlin Abonnement <noreply@abonnement-leroymerlin.fr>";
 			$infos_mail["objet"] = "Informations sur votre contrat";
 			$infos_mail["recipient"] = ATF::societe()->select($client , "email");
 			$infos_mail["template"] = "courrierInformationPack/".ATF::courrier_information_pack()->select($id_courrier, "template_mail_courrier");
