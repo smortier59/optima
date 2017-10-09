@@ -162,7 +162,7 @@ class commande_cleodis extends commande {
 			util::file_put_contents($file,base64_decode($data));
 			//On met à jour la date de retour et retourPV du contrat
 			ATF::commande()->u(array("id_commande"=>$commande->get('id_commande'),
-									 "retour_pv"=> date("Y-m-d"),
+									 "retour_prel"=> date("Y-m-d"),
 									 "retour_contrat"=>date("Y-m-d")
 									)
 								);
