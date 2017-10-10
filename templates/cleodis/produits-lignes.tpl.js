@@ -16,17 +16,17 @@ ATF.buildGridEditor({
 		var prix = 0;
 
 		var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
-		if (records) {			
+		if (records) {
 			for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
-				prix_achat+=records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite; 
+				prix_achat+=records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite;
 			}
 		}
-		
+
 		var pnv = Ext.ComponentMgr.get('{$parent_class->table}[produits_non_visible]');
 		if (pnv) {
 			var records_parent = pnv.store.getRange();
 			for (var i = 0; i < pnv.store.getRange().length; i++) {
-				prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite; 
+				prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite;
 			}
 		}
 
@@ -34,14 +34,14 @@ ATF.buildGridEditor({
 		if (pr) {
 			var records_parent = pr.store.getRange();
 			for (var i = 0; i < pr.store.getRange().length; i++) {
-				prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite; 
+				prix_achat+=records_parent[i].data.{$current_class->table}__dot__prix_achat*records_parent[i].data.{$current_class->table}__dot__quantite;
 			}
 		}
 
 		if(Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]')){
 			Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));
 		}
-	
+
 
 		if(Ext.ComponentMgr.get('{$parent_class->table}[marge]')){
 			Ext.ComponentMgr.get('{$parent_class->table}[marge]').setValue(ATF.formatNumeric(parseFloat((Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1-prix_achat)/Ext.ComponentMgr.get('{$parent_class->table}[prix]').getValue().replace(' ','')*1)*100));
@@ -57,13 +57,13 @@ ATF.buildGridEditor({
 		var records = Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange();
 		if (records) {
 			for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
-				prix+=records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite; 				
+				prix+=records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite;
 			}
 		}
-		
+
 		if(Ext.ComponentMgr.get('{$parent_class->table}[prix]')){
 			Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
-		}				
+		}
 
 	},
 	fourniRepris: function(field,id){
@@ -72,7 +72,7 @@ ATF.buildGridEditor({
 			var records_parent = pr.store.getRange();
 			for (var i = 1; i < pr.store.getRange().length; i++) {
 				records_parent[i].set('{$current_class->table}__dot__id_fournisseur',field);
-				records_parent[i].set('{$current_class->table}__dot__id_fournisseur_fk',id);				
+				records_parent[i].set('{$current_class->table}__dot__id_fournisseur_fk',id);
 			}
 		}
 	},
@@ -81,14 +81,14 @@ ATF.buildGridEditor({
 			text: '',
 			iconCls: 'arrow_up-button',
 			handler : function(field){
-	
+
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i-1]){
@@ -110,10 +110,10 @@ ATF.buildGridEditor({
 				var grid = Ext.ComponentMgr.get('{$id}');
 				var index = grid.getSelectionModel().getSelectedCell();
 				var rec = grid.store.getAt(index[0]);
-	
+
 				var store = grid.getStore();
 				var records = store.getRange();
-	
+
 				for (var i = 0; i < records.length; i++) {
 					if(rec.id==records[i].id){
 						if(records[i+1]){
@@ -142,18 +142,18 @@ ATF.buildGridEditor({
 						{/foreach}
 					});
 					grid.stopEditing();
-					
+
 					var idx = 0; // Numéro de ligne par défaut
 					var index = grid.getSelectionModel().getSelectedCell();
 					if (index) {
 						idx = index[0]+1; // Numéro de ligne sélectionné
 					}
-					
+
 					store.insert(idx, p);
 					grid.startEditing(idx, 0);
-	
+
 					var records = Ext.ComponentMgr.get('{$id}').store.getRange();
-					records[idx].set('{$current_class->table}__dot__visibilite_prix','visible');
+					records[idx].set('{$current_class->table}__dot__visibilite_prix','invisible');
 					records[idx].set('{$current_class->table}__dot__neuf','oui');
 				}
 		{else}
@@ -163,10 +163,10 @@ ATF.buildGridEditor({
 				handler: function(btn, ev) {
 					var grid = Ext.ComponentMgr.get('{$id}');
 					var store = grid.getStore();
-	
+
 					/*On vide le grid*/
 					store.removeAll();
-					
+
 					if(Ext.ComponentMgr.get('panel_avenant_lignes').collapsed==false){
 						var tree = Ext.ComponentMgr.get('avenant_tree');
 					}else if(Ext.ComponentMgr.get('panel_AR').collapsed==false){
@@ -174,11 +174,11 @@ ATF.buildGridEditor({
 					}else if(Ext.ComponentMgr.get('panel_vente').collapsed==false){
 						var tree = Ext.ComponentMgr.get('vente_tree');
 					}
-	
+
 					var checked=tree.getChecked();
 					for (var i = 0; i < checked.length; i++) {
 						if(checked[i].attributes.id_produit_fk){
-	
+
 							var theType = store.recordType;
 							var p = new theType({
 								{foreach from=$fields item=i}
@@ -186,13 +186,13 @@ ATF.buildGridEditor({
 								{/foreach}
 							});
 							grid.stopEditing();
-							
+
 							var idx = 0; // Numéro de ligne par défaut
 							var index = grid.getSelectionModel().getSelectedCell();
 							if (index) {
 								idx = index[0]+1; // Numéro de ligne sélectionné
 							}
-							
+
 							store.insert(idx, p);
 							grid.startEditing(idx, 0);
 							var records = Ext.ComponentMgr.get('{$id}').store.getRange();
@@ -224,7 +224,7 @@ ATF.buildGridEditor({
 				var rec = grid.store.getAt(index[0]);
 				grid.store.remove(rec);
 				grid.refreshHiddenValues();
-				
+
 				Ext.ComponentMgr.get('{$id}').maj();
 			}
 		}],
@@ -273,7 +273,7 @@ ATF.buildGridEditor({
 				iconCls: 'insert-button',
 				width:20,
 				dataIndex: 'id',
-					renderer: function() { 
+					renderer: function() {
 						{$produit="produits"}
 						{$key_class=ATF::getClass('produit')}
 						{capture assign=quickInsert}
@@ -284,7 +284,7 @@ ATF.buildGridEditor({
 										var r = Ext.ComponentMgr.get('{$id}').getStore().getRange(c[0],c[0]);
 										if(r){
 											var id_produit = r[0].get('{$current_class->table}__dot__id_produit_fk');
-											
+
 										}else{
 											var id_produit = 0;
 										}
@@ -310,7 +310,7 @@ ATF.buildGridEditor({
 				header: 'Produit',
 				height:60,
 				dataIndex: '{$current_class->table}__dot__produit',
-				renderer: function (value, metaData, record, rowIndex, colIndex, store){					
+				renderer: function (value, metaData, record, rowIndex, colIndex, store){
 					if (value) {
 						var a = value.split(ATF.extJSGridComboboxSeparator);
 						if (a[1]) {
@@ -341,6 +341,39 @@ ATF.buildGridEditor({
 					})
 				{/if}
 			}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Min',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__min',
+					editor: new Ext.form.TextField({
+						value:0
+					})
+				}
+			{/if}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Max',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__max',
+					editor: new Ext.form.TextField({
+						value:0
+					})
+				}
+			{/if}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Option Incluse',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__option_incluse',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
+					{/if}
+				}
+			{/if}
+
+
+
 			{if $current_class->table=="devis_ligne" && ATF::$codename != "exactitude"}
 				, {
 					header: 'Type',
@@ -352,7 +385,7 @@ ATF.buildGridEditor({
 				, {
 					header: 'Ordre',
 					width:20,
-					dataIndex: '{$current_class->table}__dot__ordre',								
+					dataIndex: '{$current_class->table}__dot__ordre',
 					editor: new Ext.form.TextField({
 						value:0
 					})
@@ -367,7 +400,7 @@ ATF.buildGridEditor({
 					header: 'Prix',
 					width:20,
 					dataIndex: '{$current_class->table}__dot__prix',
-					renderer: 'money',	
+					renderer: 'money',
 					editor: new Ext.form.TextField({ })
 				}, {
 					header: 'Commentaire produit',
@@ -375,7 +408,7 @@ ATF.buildGridEditor({
 					dataIndex: '{$current_class->table}__dot__commentaire',
 					editor: new Ext.form.TextField({
 						value:""
-					})	
+					})
 				}
 			{else}
 				{if $current_class->table==facture_fournisseur_ligne ||  $current_class->table==parc}
@@ -434,15 +467,15 @@ ATF.buildGridEditor({
 								value:0
 							})
 						{/if}
-					{if $current_class->table =='facture_ligne' && ($id == "facture[produits_repris]" || $id== "facture[produits]")}					
+					{if $current_class->table =='facture_ligne' && ($id == "facture[produits_repris]" || $id== "facture[produits]")}
 						}, {
 							header: 'Afficher sur le pdf',
 							width:20,
 							dataIndex: '{$current_class->table}__dot__afficher',
 							editor: {include file="generic-gridpanel-combo.tpl.js" key=afficher function=null}
-																			
+
 					{/if}
-					{if $current_class->table=='devis_ligne'}
+					{if $current_class->table=='devis_ligne' || $current_class->table=='pack_produit_ligne'}
 						}, {
 							header: 'Visibilité Prix',
 							width:20,
@@ -451,7 +484,7 @@ ATF.buildGridEditor({
 								editor: {include file="generic-gridpanel-combo.tpl.js" key=visibilite_prix value="oui" function=null}
 							{/if}
 					{/if}
-					
+
 					{if $current_class->table=='devis_ligne' && !$repris}
 						}, {
 							header: 'Neuf',
@@ -463,12 +496,12 @@ ATF.buildGridEditor({
 						}, {
 							header: 'Ref SIMAG',
 							width:20,
-							dataIndex: '{$current_class->table}__dot__ref_simag',					
+							dataIndex: '{$current_class->table}__dot__ref_simag',
 							editor: new Ext.form.TextField({
 								value:""
-							})			
-					{/if}				
-					
+							})
+					{/if}
+
 					{if $repris}
 						}, {
 							hidden:true,
@@ -485,7 +518,7 @@ ATF.buildGridEditor({
 							dataIndex: '{$current_class->table}__dot__commentaire',
 							editor: new Ext.form.TextField({
 								value:""
-							})	
+							})
 						}
 					{/if}
 				{/if}
@@ -496,7 +529,7 @@ ATF.buildGridEditor({
 		root: 'result',
 		totalProperty: 'totalCount',
 		idProperty: 'id',
-		remoteSort: true,	
+		remoteSort: true,
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView(),["{$current_class->table}.id_fournisseur_fk","{$current_class->table}.id_produit_fk","{$current_class->table}.id_{$current_class->table}"])}),
 		{if $function}baseParams:{ 'function':'{$function}' },{/if}
 		proxy: new Ext.data.HttpProxy({

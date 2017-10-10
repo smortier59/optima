@@ -797,8 +797,15 @@ class pdf_lm extends pdf_cleodis {
 
 		$pack = ATF::produit()->select($facture_lignes[0]['id_produit'] , "id_pack_produit");
 
+		if($facture["type_facture"] == "libre" && $facture["type_libre"] == "prorata"){
+			$data[0][0] = "Abonnement à l'offre ".
+						  ATF::pack_produit()->select($pack , "libelle").
+						  " - période de ".ATF::$usr->date_trans(date("Y-m",strtotime($facture["date_periode_debut"])),true).
+						  " (du ".date("d/m/Y",strtotime($facture["date_periode_debut"]))." au ".date("d/m/Y",strtotime($facture["date_periode_fin"])).")";
+		}else{
+			$data[0][0] = "Abonnement à l'offre ".ATF::pack_produit()->select($pack , "libelle").($facture["date_periode_debut"]?" - période de ".ATF::$usr->date_trans(date("Y-m",strtotime($facture["date_periode_debut"])),true):"");
+		}
 
-		$data[0][0] = "Abonnement à l'offre ".ATF::pack_produit()->select($pack , "libelle").($facture["date_periode_debut"]?" - période de ".ATF::$usr->date_trans(date("Y-m",strtotime($facture["date_periode_debut"])),true):"");
 		$style[0][0] = $this->leftStyle;
 		$data[0][1] = number_format(($facture["prix"] / 1.2) ,2)." €" ;
 		$data[0][2] = "20%";

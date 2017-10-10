@@ -17,11 +17,11 @@
 ]}
 {if ATF::_r(id_devis)}
 	{$calcul_prix='true'}
-	{$q->reset()->addCondition("id_devis",classes::decryptId(ATF::_r(id_devis)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->addCondition("visible","oui","AND")->setView([order=>$fields])->end()}
+	{$q->reset()->addCondition("id_devis",classes::decryptId(ATF::_r(id_devis)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->setView([order=>$fields])->end()}
 	{include file="produits-update.tpl.js" proxyUrl="devis_ligne,extJSgsa.ajax,pager={$pager}" function="toCommandeLigne"}
 {elseif ATF::_r(id_commande)}
 	{$calcul_prix='true'}
-	{$q->reset()->addCondition("id_commande",classes::decryptId(ATF::_r(id_commande)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->addCondition("visible","oui","AND")->setView([order=>$fields])->end()}
+	{$q->reset()->addCondition("id_commande",classes::decryptId(ATF::_r(id_commande)))->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->setView([order=>$fields])->end()}
 	{include file="produits-update.tpl.js"}
 {else}
 	{$q->reset()->addCondition("id_commande",0)->addCondition("visible","oui","AND")->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->setView([order=>$fields])->end()}

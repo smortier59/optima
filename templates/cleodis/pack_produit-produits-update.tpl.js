@@ -5,6 +5,9 @@
 {$fields=[
 	  "{$current_class->table}.produit"
 	, "{$current_class->table}.quantite"
+	, "{$current_class->table}.min"
+	, "{$current_class->table}.max"
+	, "{$current_class->table}.option_incluse"
 	, "{$current_class->table}.type"
 	, "{$current_class->table}.ref"
 	, "{$current_class->table}.prix_achat"

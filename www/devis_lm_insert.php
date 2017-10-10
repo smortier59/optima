@@ -76,10 +76,15 @@ if($infos["OffreMagasin"]){
 //Validation d'une offre Magasin par une hotesse, on crée la commande correspondante au devis
 if($infos["create_commande"]){
     try{
-        ATF::devis()->q->reset()->where("id_affaire",$infos["id_affaire"]);
+        ATF::devis()->q->reset()->where("devis.id_affaire",$infos["id_affaire"]);
         $devis = ATF::devis()->select_row();
         ATF::devis_ligne()->q->reset()->where("id_devis",$devis["id_devis"]);
         $lignes = ATF::devis_ligne()->select_all();
+
+        ATF::commande()->q->reset()->where("commande.id_affaire",$infos["id_affaire"]);
+        if($com = ATF::commande()->select_row()){
+            ATF::commande()->delete($com["id_commande"]);
+        }
 
         $commande = $commande_ligne = array();
         $commande["ref"] = $devis["ref"];
@@ -182,6 +187,23 @@ if ($infos["getPdfSigne"]) {
             echo "Probleme de récupération du PDF";
             die;
         }
+    }
+}
+
+//Récuperation du PDF signé du contrat
+if ($infos["getPDFCourrierInformation"]) {
+
+    $filename = ATF::courrier_information_pack()->filepath($infos["courrier_information_pack"],"fichier_joint");
+
+    if(file_exists($filename)){
+        $handle = fopen($filename, "r");
+        $contents = fread($handle, filesize($filename));
+        fclose($handle);
+        echo $contents;
+        die;
+    }else{
+        echo "Probleme de récupération du PDF";
+        die;
     }
 }
 

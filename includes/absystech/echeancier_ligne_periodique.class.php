@@ -47,7 +47,7 @@ class echeancier_ligne_periodique extends classes_optima {
   * @return array result en booleen et notice sous forme d'un tableau
   */
   public function _DELETE($get,$post) {
-    if (!$get['id']) throw new Exception("MISSING_ID",1000);
+    if (!$get['id']) throw new errorATF("MISSING_ID",1000);
 
     $return['result'] = $this->delete($get);
     // Récupération des notices créés
@@ -65,7 +65,7 @@ class echeancier_ligne_periodique extends classes_optima {
   */
   public function _POST($get,$post) {
 
-    if (!$post['id_echeancier']) throw new errorATF("ID_ECHENCIER_MISSING",5042);
+    if (!$post['id_echeancier']) throw new errorATF("ID_ECHEANCIER_MISSING",5042);
     if (!$post['ref']) throw new errorATF("REF_MISSING",5042);
     if (!$post['designation']) throw new errorATF("DESIGNATION_MISSING",5042);
     if (!$post['quantite']) throw new errorATF("QTE_MISSING",5042);
@@ -93,7 +93,7 @@ class echeancier_ligne_periodique extends classes_optima {
 
     } catch (errorATF $e) {
       ATF::db($this->db)->rollback_transaction();
-      throw $e;
+     throw new errorATF($e->getMessage(),500);
     }
     ATF::db($this->db)->commit_transaction();
     return $return;
@@ -122,7 +122,7 @@ class echeancier_ligne_periodique extends classes_optima {
       $return['row'] = $post;
       $return['notices'] = ATF::$msg->getNotices();
     } catch (errorATF $e) {
-      throw $e; // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+      throw new errorATF($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
     }
     return $return;
   }

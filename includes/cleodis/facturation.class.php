@@ -131,8 +131,6 @@ class facturation extends classes_optima {
 						->addCondition("prix",0,"AND",false,"<")
 						->setDimension("row");
 
-						//log::logger( ATF::facture()->sa() , "mfleurquin");
-
 						if (!($avoir_correspondant = ATF::facture()->sa())) {
 							// Avoir non trouvé, alors on raise l'erreur
 							$this->raiseErrorAvoirNonTrouve(
@@ -1510,7 +1508,8 @@ class facturation extends classes_optima {
 						"mode_paiement"=>$commande["type"],
 						"id_affaire"=>$affaire["id_affaire"],
 						"date_previsionnelle"=>$facture_date_previsionnelle,
-						"date_paiement"=>$facture_date_previsionnelle
+						"date_paiement"=>$facture_date_previsionnelle,
+						"nature"=> $facturation["type"]
 					);
 
 					if($facturation["type"] == "liberatoire"){

@@ -415,7 +415,6 @@ class facture_absystech extends facture {
 		$assistantDirection = 9;
 		if(ATF::$codename == "att") $assistantDirection = 5;
 
-
 		if($tva!=$infos["tva"] && (ATF::$usr->get("id_profil")!=1 && ATF::$usr->get("id_profil")!=$assistantDirection )){
 			$profil=ATF::profil()->select(1);
 			ATF::$msg->addNotice(
@@ -474,20 +473,11 @@ class facture_absystech extends facture {
 		//*****************************Transaction********************************
 
 			// Affaire
-			if($infos["id_affaire"]){
-				$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
-				if ($etat_affaire=="devis" || $etat_affaire=="commande") {
-					$affaire["id_affaire"]=$infos["id_affaire"];
-					$affaire["etat"]="facture";
-					ATF::affaire()->u($affaire,$s);
-				}
-			} else {
-				$affaire["id_societe"]=$infos["id_societe"];
+			$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
+			if ($etat_affaire=="devis" || $etat_affaire=="commande") {
+				$affaire["id_affaire"]=$infos["id_affaire"];
 				$affaire["etat"]="facture";
-				$affaire["date"]=$infos["date"];
-				$affaire["forecast"]=100;
-				$affaire["affaire"]=$infos["affaire_sans_devis_libelle"];
-				$infos["id_affaire"]=ATF::affaire()->insert($affaire,$s);
+				ATF::affaire()->u($affaire,$s);
 			}
 			unset($infos["affaire_sans_devis_libelle"]);
 
@@ -2210,8 +2200,8 @@ class facture_absystech extends facture {
 			$fn = $this->filepath($id_export_comptable,"exportComptable");
 			log::logger("FILENAME = ".$fn,"export-comptable");
 			$file = fopen($fn, "w+");
-			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit");
-			fputcsv($file, $head, ";");
+			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance");
+			fputcsv($file, $head, ";", chr(0));
 
 			foreach ($facturesATraiter as $id_facture) {
 				$facture = ATF::facture()->select($id_facture);
@@ -2223,7 +2213,9 @@ class facture_absystech extends facture {
 
 				$credit = false;
 				$debit = false;
+				$type_parent = false;
 				if ($facture['type_facture']=='avoir') {
+					$type_parent = ATF::facture()->select($facture['id_facture_parente'],'type_facture');
 					$credit = number_format($ttc, 2, ".", "");
 				} else {
 					$debit = number_format($ttc, 2, ".", "");
@@ -2244,13 +2236,15 @@ class facture_absystech extends facture {
 					$facture['ref'],
 					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 					$debit?abs($debit):"",
-					$credit?abs($credit):""
+					$credit?abs($credit):"",
+					date('d/m/Y',strtotime($facture['date_previsionnelle']))
 				);
-			  fputcsv($file, $line, ";");
+			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
 
-			  if ($facture['type_facture']=='acompte') {
+			  if ($facture['type_facture']=='acompte' || $type_parent == 'acompte') {
 			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
+					$facture['prix'] = number_format($facture['prix'], 2, ".", "");
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
@@ -2258,15 +2252,18 @@ class facture_absystech extends facture {
 						$societe['societe'],
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
-						"",
-						$facture['prix']
+						$facture['type_facture']=="avoir"?abs($facture['prix']):"",
+						$facture['type_facture']=="avoir"?"":abs($facture['prix']),
+						date('d/m/Y',strtotime($facture['date_previsionnelle']))
 					);
-				  fputcsv($file, $line, ";");
+				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
 
 			  } else {
 				  // LIGNES VENTILEES
 					$lignes = $this->getLignes($id_facture);
+
+
 					$ventilation = array();
 				  foreach ($lignes as $ligne) {
 				  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
@@ -2274,7 +2271,7 @@ class facture_absystech extends facture {
 				  foreach ($ventilation as $id_compte=>$total) {
 						$credit = false;
 						$debit = false;
-						if ($facture['type_facture']=='avoir') {
+						if ($facture['type_facture']=='avoir' || $total<0) {
 							$debit = number_format($total, 2, ".", "");
 						} else {
 							$credit = number_format($total, 2, ".", "");
@@ -2289,27 +2286,31 @@ class facture_absystech extends facture {
 							$facture['ref'],
 							$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 							$debit?abs($debit):"",
-							$credit?abs($credit):""
+							$credit?abs($credit):"",
+							date('d/m/Y',strtotime($facture['date_previsionnelle']))
 						);
-					  fputcsv($file, $line, ";");
+					  fputcsv($file, $line, ";", chr(0));
 					  fputs("\n");
+
 				  }
 
 				  // SI on est dans une facture de solde, il faut rappeler les facture d'acompte qui lui sont lié (par l'affaire et le type)
   			  if ($facture['type_facture']=='solde') {
   			  	$this->q->reset()->where("id_societe",$facture['id_societe'])->where("id_affaire",$facture['id_affaire'])->where("type_facture","acompte");
   			  	foreach ($this->sa() as $acompte) {
+							$acompte['prix'] = number_format($acompte['prix'], 2, ".", "");
 							$line = array(
 								"VT",
 								date('d/m/Y',strtotime($facture['date'])),
 								"419000",
 								$societe['societe'],
-								$acompte['ref'],
-								$societe['societe']." - ".$acompte['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
-								$acompte['prix'],
-								""
+								$facture['ref'],
+								$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
+								abs($acompte['prix']),
+								"",
+								date('d/m/Y',strtotime($facture['date_previsionnelle']))
 							);
-						  fputcsv($file, $line, ";");
+						  fputcsv($file, $line, ";", chr(0));
 						  fputs("\n");
 
   			  	}
@@ -2317,7 +2318,7 @@ class facture_absystech extends facture {
 				}
 			  // FRAIS DE PORT
 			  // Uniquement si présent, ou si facture type différend d'une facture d'acompte.
-			  if ($facture['frais_de_port'] > 0 && $facture['type_facture']!='acompte') {
+			  if ($facture['frais_de_port'] > 0 && ($facture['type_facture']!='acompte' || $type_parent == 'acompte')) {
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
@@ -2326,9 +2327,10 @@ class facture_absystech extends facture {
 						$facture['ref'],
 						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 						"",
-						number_format($facture['frais_de_port'], 2, ".", "")
+						number_format($facture['frais_de_port'], 2, ".", ""),
+						date('d/m/Y',strtotime($facture['date_previsionnelle']))
 					);
-				  fputcsv($file, $line, ";");
+				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
 			  }
 
@@ -2348,9 +2350,10 @@ class facture_absystech extends facture {
 					$facture['ref'],
 					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 					$debit?abs($debit):"",
-					$credit?abs($credit):""
+					$credit?abs($credit):"",
+					date('d/m/Y',strtotime($facture['date_previsionnelle']))
 				);
-			  fputcsv($file, $line, ";");
+			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
 
 

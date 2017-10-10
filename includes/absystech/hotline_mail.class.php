@@ -151,7 +151,8 @@ class hotline_mail {
 	public function getCurrentMail(){
 
 		//Current mail
-		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
+		if(!$this->current_mail) ATF::$msg->addWarning(ATF::$usr->trans("le_mail_n_a_pas_ete_envoye"));
+		// if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
 		return $this->current_mail;
 	}
 

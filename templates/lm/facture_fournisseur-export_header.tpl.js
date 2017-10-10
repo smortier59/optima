@@ -26,6 +26,12 @@
 	}
 },
 {
+	text: 'Export fichier BAP (ADEO)'
+	, handler: function(b,e){
+		window.location='{$current_class->name()},export_bap.ajax,onglet={$pager}';
+	}
+},
+{
 	text: 'Export Immo pour ADEO'
 	, /*handler: function(b,e){
 		window.location='{$current_class->name()},export_immo_adeo.ajax,onglet={$pager}';

@@ -914,11 +914,13 @@ class societe_cleodis extends societe {
 
   public function getUrlSign($id_affaire){
     $url = "https://";
-    if(__DEV__) $url .= "pre-";
-    $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$id_affaire;
+    if (__PRE__===true) $url .= "pre-";
+    $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
     return $url/*."&sref=".urlencode($url)*/;
   }
-
+  public function _getUrlSign($get,$post){
+    return $this->getUrlSign($get['id_affaire']);
+  }
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -995,6 +997,422 @@ class societe_cleodis extends societe {
     );
     return $return;
   }
+
+  public function getCodeClient($site_associe){
+    $prefixe = "TO";
+
+
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(code_client FROM -4))','max')
+      ->addCondition('code_client',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+    if($max<10){
+      $ref.='000'.$max;
+    }elseif($max<100){
+      $ref.='00'.$max;
+    }elseif($max<1000){
+      $ref.='0'.$max;
+    }elseif($max<10000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $prefixe.$ref;
+
+  }
+
+
+  /**
+   * Permet l'insertion du client TOSHIBA si la société n'existe pas, de l'affaire et du comité CreditSafe
+   * @param  [type] $get  [description]
+   * @param  [type] $post [description]
+   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @return [type]       [description]
+   */
+  public function _sendDataToshiba($get, $post){
+
+    ATF::$usr->set('id_user',16);
+    ATF::$usr->set('id_agence',1);
+
+    $email = $post["email"];
+
+
+    $data = self::getInfosFromCREDITSAFE($post);
+
+
+    $gerants = $data["gerant"];
+
+
+    if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
+    if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
+
+
+    ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                              ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+    $res = ATF::societe()->select_row();
+
+
+    if($res){
+      $id_societe = $res["id_societe"];
+      if(!$res["code_client"]){
+        $code_client = $this->getCodeClient("toshiba");
+        ATF::societe()->u(array("id_societe"=>$id_societe,
+                                "code_client"=>$code_client
+                               ));
+      }
+    } else {
+      $code_client = $this->getCodeClient("toshiba");
+      $data["code_client"]= $code_client;
+      $data_soc = $data;
+
+      unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
+      $id_societe = $this->insert($data_soc);
+    }
+
+    if($gerants){
+      foreach ( $gerants as $key => $value) {
+        ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($value["nom"])),"AND")
+                                  ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($value["prenom"])),"AND")
+                                  ->where("id_societe", $id_societe,"AND");
+        $gerant[$key] = $contact;
+        $c = ATF::contact()->select_row();
+
+        //Si le contact n'exite pas dans optima, on l'insert
+        if(!$c){
+          $contact = array( "nom"=>$value["nom"],
+                            "prenom"=>$value["prenom"],
+                            "fonction"=>$value["fonction"],
+                            "email"=>$email,
+                            "id_societe"=> $id_societe,
+                            "est_dirigeant"=>"oui"
+                          );
+          $gerant[$key] = $contact;
+          $gerant[$key]["id_contact"] = ATF::contact()->insert( $contact );
+        } else {
+          //Sinon on le met à jour
+          $gerant[$key] = array(  "nom"=>$c["nom"],
+                                  "prenom"=>$c["prenom"],
+                                  "fonction"=>$value["fonction"],
+                                  "gsm"=>$c["gsm"],
+                                  "email"=>$c["email"],
+                                  "id_societe"=> $id_societe,
+                                  "id_contact"=>$c["id_contact"]
+                                );
+          ATF::contact()->u(array("id_contact"=>$c["id_contact"], "fonction"=>$value["fonction"], "est_dirigeant"=>"oui"));
+        }
+      }
+    }else{
+      //Si Credit Safe n'a retourné aucun dirigeant, on en cré un en attendant
+      $contact = array( "nom"=>"gerant",
+                        "email"=>$email,
+                        "id_societe"=> $id_societe
+                    );
+      $gerant[0] = $contact;
+      $gerant[0]["id_contact"] = ATF::contact()->insert( $contact );
+    }
+
+    $pack = ATF::pack_produit()->select($post["id_pack_produit"]);
+
+    $devis = array(
+            "id_societe" => $id_societe,
+            "type_contrat" => "lld",
+            "validite" => date("d-m-Y", strtotime("+1 month")),
+            "tva" => __TVA__,
+            "devis" => $pack["nom"],
+            "date" => date("d-m-Y"),
+            "type_devis" => "normal",
+            "id_contact" => $gerant[0]["id_contact"],
+            "type_affaire" => "normal");
+    $values_devis =array();
+
+    $montantLoyer = $duree = 0;
+
+    $loyer = array();
+    $produits = array();
+
+    foreach ($post["produits"] as $key => $value) {
+      if($value > 0){
+        $produit = ATF::produit()->select($key);
+
+        $loyer[0] = array(
+                      "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * ($value * $post["selectQtePack"])),
+                      "loyer__dot__duree"=>$produit["duree"],
+                      "loyer__dot__type"=>"engagement",
+                      "loyer__dot__assurance"=>"",
+                      "loyer__dot__frais_de_gestion"=>"",
+                      "loyer__dot__frequence_loyer"=>"mois",
+                      "loyer__dot__serenite"=>"",
+                      "loyer__dot__maintenance"=>"",
+                      "loyer__dot__hotline"=>"",
+                      "loyer__dot__supervision"=>"",
+                      "loyer__dot__support"=>"",
+                      "loyer__dot__avec_option"=>"non"
+                    );
+
+        $produits[] = array(
+                            "devis_ligne__dot__produit"=> $produit["produit"],
+                            "devis_ligne__dot__quantite"=>$value*$post["selectQtePack"],
+                            "devis_ligne__dot__type"=>"sans_objet",
+                            "devis_ligne__dot__ref"=>$produit["ref"],
+                            "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
+                            "devis_ligne__dot__id_produit"=>$produit["id_produit"],
+                            "devis_ligne__dot__id_fournisseur"=>"TOSHIBA TEC",
+                            "devis_ligne__dot__visibilite_prix"=>"invisible",
+                            "devis_ligne__dot__date_achat"=>"",
+                            "devis_ligne__dot__commentaire"=>"",
+                            "devis_ligne__dot__neuf"=>"oui",
+                            "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
+                            "devis_ligne__dot__id_fournisseur_fk"=>"5474"
+                          );
+      }
+    }
+    $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
+
+    try {
+       $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+    } catch (errorATF $e) {
+      throw new errorATF($e ,500);
+    }
+    $devis = ATF::devis()->select($id_devis);
+
+    if($post["provenance"]){
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+    }else{
+      ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"/*,"id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/ ));
+    }
+
+
+    ATF::affaire_etat()->insert(array(
+                                  "id_affaire"=>$devis["id_affaire"],
+                                  "etat"=>"reception_demande"
+                              ));
+
+    $comite = array  (
+            "id_societe" => $id_societe,
+            "id_affaire" => $devis["id_affaire"],
+            "id_contact" => $gerant[0]["id_contact"],
+            "activite" => $data["activite"],
+            "id_refinanceur" => 4,
+            "date_creation" => $data["date_creation"],
+            "date_compte" => $data["lastaccountdate"],
+            "capitaux_propres" => $data["capitaux_propres"],
+            "note" => $data["cs_score"],
+            "dettes_financieres" => $data["dettes_financieres"],
+            "limite" => $data["cs_avis_credit"],
+            "ca" => $data["ca"],
+            "capital_social" => $data["capital_social"],
+            "resultat_exploitation" => $data["resultat_exploitation"],
+            "date" => date("d-m-Y"),
+            "description" => "Comite CreditSafe",
+            "suivi_notifie"=>array(0=>"")
+        );
+
+
+
+    $creation = new DateTime( $data["date_creation"] );
+    $creation = $creation->format("Ymd");
+    $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
+    $past2Years = $past2Years->format("Ymd");
+
+    if($data["cs_score"] > 50 && $creation < $past2Years ){
+      $comite["etat"] = "accepte";
+      $comite["decisionComite"] = "Accepté automatiquement";
+    }else{
+      $comite["etat"] = "refuse";
+      $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
+    }
+
+    $comite["reponse"] = date("Y-m-d");
+    $comite["validite_accord"] = date("Y-m-d");
+
+
+
+    try{
+      ATF::comite()->insert(array("comite"=>$comite));
+    }catch (errorATF $e) {
+      throw new errorATF($e->getMessage() ,500);
+    }
+
+
+    if($comite["etat"]== "accepte"){
+      //Création du comité CLEODIS
+      $comite["description"] = "Comité CLEODIS";
+      $comite["etat"] = "en_attente";
+      $comite["reponse"] = NULL;
+      $comite["validite_accord"] = NULL;
+      ATF::comite()->insert(array("comite"=>$comite));
+
+      return array("result"=>true,
+                   "id_affaire"=> $devis["id_affaire"],
+                   "id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"]),
+                   "duree"=>$loyer[0]["loyer__dot__duree"],
+                   "montant"=> $loyer[0]["loyer__dot__duree"] * $loyer[0]["loyer__dot__loyer"],
+                   "loyer"=>$loyer[0]["loyer__dot__loyer"],
+                   "siren"=>$data["siren"],
+                   "gerants"=>$gerant,
+                   "societe"=>ATF::societe()->select($id_societe),
+                   "url_sign"=> $this->getUrlSign(ATF::affaire()->cryptId($devis["id_affaire"]))
+                  );
+    }
+    return array("result"=>false ,
+                 "societe"=>ATF::societe()->select($id_societe));
+  }
+
+  public function _comiteCleodis ($get, $post){
+    $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
+    $decisionAffaireEtat = $post['action'] == "valider" ? "comite_cleodis_valide" : "comite_cleodis_refuse"; // pareil pour la timeline
+
+    // au cas ou il y aurait un changement de format d'id transmis
+    $id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
+    ATF::comite()->q->reset() // on récupére le comite cleodis concerné
+      ->where("id_affaire",$id_affaire, 'AND')
+      ->where("description", "Comité CLEODIS", 'AND')
+      ->where("etat", "en_attente");
+    $comite = ATF::comite()->select_row();
+
+    try {
+      // on met à jour l'état
+      ATF::comite()->u(array("id_comite"=>$comite['id_comite'], "etat"=>$decision, "decisionComite"=>"Accepté manuellement"));
+      // ainsi que la table affaire etat pour la timeline
+      ATF::affaire_etat()->insert(array(
+          "id_affaire"=>$id_affaire,
+          "etat"=> $decisionAffaireEtat,
+          "id_user"=>ATF::$usr->get('id_user')
+      ));
+      if ($decision === "accepte")
+        $this->_createContratToshiba(false, array("id_affaire"=>$id_affaire));
+      return true;
+    } catch (Exception $e) {
+      return $e->getMessage();
+    }
+  }
+
+  public function _comiteSGEF ($get, $post){
+    ATF::comite()->q->reset()->where("id_affaire",$post["id_affaire"]);
+    $comiteCS = ATF::comite()->select_row();
+
+    $comite = $comiteCS;
+
+    $comite["id_refinanceur"] = "7c414d4d3e01579eebf055c12c5f7ccd";
+    $comite["description"] = "Comite SGEF";
+    $comite["suivi_notifie"] = array(0=>"");
+
+    if($post["resultat"] == "true"){
+      $comite["etat"] = "accepte";
+      $comite["decisionComite"] = "Accepté automatiquement";
+    }elseif($post["resultat"] === "etude") {
+      $comite["etat"] = "en_attente";
+      $comite["decisionComite"] = "Comité à l'étude";
+    }else{
+      $comite["etat"] = "refuse";
+      $comite["decisionComite"] = "Refusé automatiquement";
+    }
+
+    unset($comite["id_comite"]);
+    try{
+       ATF::comite()->insert(array("comite"=>$comite));
+    }catch (errorATF $e) {
+      throw new errorATF($e->getMessage() ,500);
+    }
+  }
+
+  public function _createContratToshiba($get , $post){
+
+    ATF::$usr->set('id_user',16);
+    ATF::$usr->set('id_agence',1);
+
+    $id_affaire = $post["id_affaire"];
+    ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
+    $devis = ATF::devis()->select_row();
+
+    ATF::devis_ligne()->q->reset()->where("id_devis", $devis["id_devis"]);
+    $lignes = ATF::devis_ligne()->select_all();
+
+    $commande =array(
+            "commande" => $devis["devis"],
+            "type" => "prelevement",
+            "id_societe" => $devis["id_societe"],
+            "date" => date("d-m-Y"),
+            "id_affaire" => $id_affaire,
+            "id_devis" => $devis["id_devis"]
+        );
+
+    $produits = array();
+
+    foreach ($lignes as $key => $value) {
+      $fournisseur = ATF::societe()->select($value["id_fournisseur"]);
+
+      $produits[] = array(
+          "commande_ligne__dot__produit"=>$value["produit"],
+          "commande_ligne__dot__quantite"=>$value["quantite"],
+          "commande_ligne__dot__ref"=>$value["ref"],
+          "commande_ligne__dot__id_fournisseur"=>$fournisseur["societe"],
+          "commande_ligne__dot__id_fournisseur_fk"=>$fournisseur["id_societe"],
+          "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
+          "commande_ligne__dot__id_produit"=>$value["produit"],
+          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"]
+        );
+    }
+    $values_commande = array( "produits" => json_encode($produits));
+
+    ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
+  }
+
+
+  /**
+   * Permet de mettre à jour le contact signataire / ou créer un nouveau contact pour etre signataire
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  [type] $get  [description]
+   * @param  [type] $post [description]
+   */
+  public function _updateGerant($get, $post) {
+
+    $id_societe = ATF::affaire()->select($post["id_affaire"], "id_societe");
+
+    if($post["id_contact"] === "0" || $post["id_contact"] === 0){
+
+
+      ATF::contact()->q->reset()->where("id_societe", $id_societe)
+                              ->where("contact.nom", "GERANT");
+      $contact = ATF::contact()->select_row();
+      if($contact){
+        ATF::contact()->u(array("id_contact"=>$contact["id_contact"],
+                                "nom"=>$post["nom_gerant"],
+                                "prenom"=>$post["prenom_gerant"],
+                                "gsm"=>$post["tel"],
+                                "email"=>$post["email_gerant"]
+                        ));
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$contact["id_contact"]));
+      } else {
+        $new = array(
+                        "nom"=>$post["nom_gerant"],
+                        "prenom"=>$post["prenom_gerant"],
+                        "gsm"=>$post["phone_gerant"],
+                        "email"=>$post["email_gerant"],
+                        "fonction"=>$post["fonction_gerant"],
+                        "id_societe"=>$id_societe
+                );
+
+        $id_contact = ATF::contact()->i($new);
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact));
+      }
+    }else{
+      ATF::contact()->u(array("id_contact"=>$post["id_contact"],
+                              "gsm"=>$post["tel"],
+                              "fax"=>$post["fax"],
+                              "email"=>$post["email"]
+                      ));
+      ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$post["id_contact"]));
+    }
+  }
 };
 
 class societe_cleodisbe extends societe_cleodis {
@@ -1029,10 +1447,20 @@ class societe_cleodisbe extends societe_cleodis {
       'customData' => null,
       'chargeReference' => 'example searchCriteria with name',
     );
+
+
     $response = $client->__soapCall('FindCompanies',array($params));
 
+    if(__PRE__ === true){
+        file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafebe.xml",simplexml_load_string($response));
+      }else{
+         file_put_contents("/home/optima/core/log/creditsafebe.xml",simplexml_load_string($response));
+      }
 
-    file_put_contents("/home/optima/core/log/creditsafe.xml",simplexml_load_string($response));
+
+    $response = file_get_contents("/home/optima/core/log/creditsafebe.xml");
+
+
 
     $xml = $response;
 

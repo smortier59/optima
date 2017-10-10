@@ -15,7 +15,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
     try{
         ATF::societe()->q->reset()->where("siret",$infos['siret']);
         $soc = ATF::societe()->select_row();
-        
+
         if(!$soc){
              $societe = array("societe" => $infos["societe"],
                          "siret"   => $infos["siret"],
@@ -42,7 +42,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                                     "tel"    => $infos["tel"],
                                     "gsm" => $infos["mobile"]
                                 )
-                             );            
+                             );
 
         }else{
             $contact = array("id_societe" => $id_societe,
@@ -64,8 +64,8 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
             $devis[$value["duree"]]["loyer"]= $devis[$value["duree"]]["loyer"] + ($value["loyer"]*$value["quantite"]);
         }
 
-        
-        foreach ($devis as $key => $value) { 
+
+        foreach ($devis as $key => $value) {
             $loyer = $devis = $produits = array();
 
             $prix_achat = $prix = 0;
@@ -104,7 +104,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                                         "devis_ligne__dot__prix_achat"=>$prod["prix_achat"],
                                         "devis_ligne__dot__id_produit"=>$prod["id_produit"],
                                         "devis_ligne__dot__id_fournisseur"=>"1FOTEAM",
-                                        "devis_ligne__dot__visibilite_prix"=>"visible",
+                                        "devis_ligne__dot__visibilite_prix"=>"invisible",
                                         "devis_ligne__dot__date_achat"=>"",
                                         "devis_ligne__dot__commentaire"=>$prod["commentaire"],
                                         "devis_ligne__dot__neuf"=>"oui",
@@ -140,13 +140,13 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                                             "devis_ligne__dot__id_produit_fk"=>$prod["id_produit"],
                                             "devis_ligne__dot__id_fournisseur_fk"=>$vpp["id_fournisseur"]);
                         $prix_achat +=  $vpp["prix_achat"]*($v["quantite"]*$vpp["quantite"]);
-                    }  
+                    }
                 }
             }
 
             $devis["prix_achat"] = $prix_achat;
             $devis["prix"] = $prix;
-            if($_POST["codename"] == "cleodis"){ $devis["marge"] = $prix - $prix_achat;  }       
+            if($_POST["codename"] == "cleodis"){ $devis["marge"] = $prix - $prix_achat;  }
             //$devis["marge_absolue"] = 0;
 
             $values_devis = array( "loyer" => json_encode($loyer),
@@ -156,15 +156,15 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
 
 
             ATF::devis()->insert($data);
-        }       
+        }
 
         return true;
-    }catch(errorATF $e){  
+    }catch(errorATF $e){
         print_r($e);
         die();
         return $e->getMessage();
-    }       
-}else{    
+    }
+}else{
     return false;
 }
 

@@ -695,11 +695,10 @@ class pdf_absystech extends pdf {
 			$data = array();
 			if($infos_devis["type_devis"] == "normal") {
 				$head = array("Référence","Désignation","Qté","Prix unitaire","Total");
-				$width = array(25,105,11,20,25);
+				$width = array(25,105,10,21,25);
 			}else{
 				$head = array("Référence","Désignation","Qté","Total mensuel");
-				$width = array(25,116,23,22);
-
+				$width = array(25,115,23,23);
 			}
 
 			if ($infos_devis_produit)  {
@@ -727,24 +726,24 @@ class pdf_absystech extends pdf {
 
 
 			if($infos_devis["type_devis"] == "normal"){
-				$this->cell(141,5,"",0,0,'L');
-				$this->cell(20,5,"Frais de port",1,0,'R');
+				$this->cell(140,5,"",0,0,'L');
+				$this->cell(21,5,"Frais de port",1,0,'R');
 				$this->cell(25,5,number_format($infos_devis['frais_de_port'],2,',',' ')." €",1,1,'R');
-				$this->cell(141,5,"",0,0,'L');
-				$this->cell(20,5,"Total HT",1,0,'R');
+				$this->cell(140,5,"",0,0,'L');
+				$this->cell(21,5,"Total HT",1,0,'R');
 				$this->cell(25,5,number_format($total,2,',',' ')." €",1,1,'R');
 			}else{
-				$this->cell(141,5,"",0,0,'L');
+				$this->cell(140,5,"",0,0,'L');
 				$this->cell(23,5,"Total HT /mois",1,0,'R');
 				$this->cell(22,5,number_format($infos_devis["prix_location"],2,',',' ')." €",1,1,'R');
 			}
 
 			if(($infos_client["facturation_id_pays"]=="FR" && $infos_client["facturation_adresse"]) || (!$infos_client["facturation_adresse"] && $infos_client["id_pays"]=="FR") && (!$infos_client["reference_tva"] || substr($infos_client["reference_tva"],0,2)=="FR")){
 				if (defined("__TVA__") && __TVA__>1) {
-					$this->cell(141,5,"",0,0,'L');
+					$this->cell(140,5,"",0,0,'L');
 
 					if($infos_devis["type_devis"] == "normal"){
-						$this->cell(20,5,"Total TTC",1,0,'R');
+						$this->cell(21,5,"Total TTC",1,0,'R');
 						$this->cell(25,5,number_format($total * __TVA__,2,',',' ')." €",1,1,'R');
 					}else{
 						$this->cell(23,5,"Total TTC /mois",1,0,'R');
@@ -753,8 +752,8 @@ class pdf_absystech extends pdf {
 
 				}
 			}else{
-				$this->cell(141,5,"",0,0,'L');
-				$this->cell(20,5,"Total exonéré",1,0,'R');
+				$this->cell(140,5,"",0,0,'L');
+				$this->cell(21,5,"Total exonéré",1,0,'R');
 				$this->cell(25,5,number_format($total,2,',',' ')." €",1,1,'R');
 			}
 		}

@@ -3,7 +3,7 @@
 * @package Optima
 * @subpackage Cléodis
 */
-class comite extends classes_optima { 
+class comite extends classes_optima {
 	function __construct($table_or_id) {
 		$this->table ="comite";
 		parent::__construct($table_or_id);
@@ -16,25 +16,25 @@ class comite extends classes_optima {
 			,'decision'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"comiteDecision","width"=>50)
 			,"decisionComite"
 		);
-		
-		$this->colonnes['primary'] = array(		 
-			"id_societe"=>array("disabled"=>true)
-			,"id_affaire"=>array("disabled"=>true)		
-			,"date_creation"	
 
-		);		
+		$this->colonnes['primary'] = array(
+			"id_societe"=>array("disabled"=>true)
+			,"id_affaire"=>array("disabled"=>true)
+			,"date_creation"
+
+		);
 
 		$this->colonnes['panel']['dates'] = array(
 			"date"
 			,"reponse"
 		);
 
-		
+
 
 		$this->colonnes['panel']['notifie'] = array(
 			"suivi_notifie"=>array("custom"=>true)
 		);
-		
+
 		$this->field_nom = "%id_affaire% (%date_creation%)";
 
 		$this->colonnes['bloquees']['select'] =   array_merge(array('note'));
@@ -45,7 +45,7 @@ class comite extends classes_optima {
 
 		$this->fieldstructure();
 
-		//$this->colonnes['bloquees']['insert'] = array('score',"avis_credit");	
+		//$this->colonnes['bloquees']['insert'] = array('score',"avis_credit");
 
 		$this->noTruncateSA = true;
 		$this->panels['loyer_lignes'] = array('nbCols'=>1);
@@ -54,14 +54,14 @@ class comite extends classes_optima {
 		$this->panels['notes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['statut'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['creditSafeInfos'] = array("visible"=>true, 'nbCols'=>4);
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 
 		$this->addPrivilege("getInfosFromCREDITSAFE");
 		$this->addPrivilege("decision");
 
 	}
 
-	/** 
+	/**
 	* Surcharge de l'insert afin de modifier l'etat de l'affaire
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -75,7 +75,7 @@ class comite extends classes_optima {
 			$preview=$infos["preview"];
 		}else{
 			$preview=false;
-		}		
+		}
 
 		$this->infoCollapse($infos);
 
@@ -89,11 +89,11 @@ class comite extends classes_optima {
 //*****************************Transaction********************************
 		ATF::db($this->db)->begin_transaction();
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-		
 
-					
+
+
 		if($notifie_suivi != array(0=>"")){
-			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com";
+			$recipient = "jerome.loison@cleodis.com,lma@cleodis.com,herve.anvroin@leroymerlin.fr";
 			$info_mail["suivi_notifie"] = "";
 
 			foreach ($notifie_suivi as $key => $value) {
@@ -107,33 +107,33 @@ class comite extends classes_optima {
 			$info_mail["from"] = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";;
 			$info_mail["html"] = true;
 			$info_mail["template"] = "comite";
-			
+
 			$info_mail["recipient"] = $recipient;
 			$info_mail["objet"] = "Une demande de comité vient d'être créée pour l'affaire ".ATF::affaire()->select($infos['id_affaire'], "ref").".";
-			
+
 			$info_mail["reception_comite"] = "Un comité est en attente de votre part, voici quelques informations concernant ce dernier";
 			$info_mail["id_user"] = ATF::$usr->getID();
 			$info_mail["id_societe"] = $infos["id_societe"];
 			$info_mail["id_affaire"] = $infos["id_affaire"];
 			$info_mail["optima_url"] = ATF::permalink()->getURL($this->createPermalink($this->cryptId($last_id)));
-			
-			
+
+
 			$mail = new mail($info_mail);
-		
-			if(!$tu) $mail->send();						
+
+			if(!$tu) $mail->send();
 
 			$this->u(array("id_comite"=>$last_id , "notifie_utilisateur"=>$info_mail["suivi_notifie"]));
 		}
 
-			
+
 			ATF::db($this->db)->commit_transaction();
-		
+
 
 		if(is_array($cadre_refreshed)){	ATF::affaire()->redirection("select",$infos["id_affaire"]);	}
 		return $this->cryptId($last_id);
 	}
 
-	/* 
+	/*
 	* Surcharge de l'update afin de modifier l'etat de l'affaire
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -149,12 +149,12 @@ class comite extends classes_optima {
 		}else{
 			$preview=false;
 		}
-		
+
 		$this->infoCollapse($infos);
 
-		
+
 		foreach ($infos["suivi_notifie"] as $key => $value) {
-			$user_notifie .= ATF::user()->nom($value).",";			
+			$user_notifie .= ATF::user()->nom($value).",";
 		}
 		$user_notifie = substr($user_notifie, 0, -1);
 
@@ -162,7 +162,7 @@ class comite extends classes_optima {
 
 
 		$infos["filestoattach"]["pdf"]="";
-		$notifie_suivi = $infos["suivi_notifie"];	
+		$notifie_suivi = $infos["suivi_notifie"];
 
 		ATF::devis()->q->reset()->where("devis.id_affaire", $this->select($id, "id_affaire"));
 		$devis = ATF::devis()->select_row();
@@ -178,7 +178,7 @@ class comite extends classes_optima {
 		/*****************************Transaction********************************/
 		ATF::db($this->db)->begin_transaction();
 		parent::update($infos,$s,$files);
-		
+
 		if($preview){
 			if(!$tu) $this->move_files($infos["id_comite"],$s,true,$infos["filestoattach"]); // Génération du PDF de preview
 			ATF::db($this->db)->rollback_transaction();
@@ -186,7 +186,7 @@ class comite extends classes_optima {
 		}else{
 			if(!$tu) $this->move_files($infos["id_comite"],$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 
-			
+
 			if($infos["etat"]){
 				$suivi = array(
 					 "id_user"=>ATF::$usr->get('id_user')
@@ -194,38 +194,38 @@ class comite extends classes_optima {
 					,"id_affaire"=>$infos['id_affaire']
 					,"type_suivi"=>'Passage_comite'
 					,"texte"=>"La demande de comité vient de changer d'état (nouvel état : ".ATF::$usr->trans($infos["etat"],$this->table).")\n par ".ATF::$usr->getNom().".\n Refinanceur : ".ATF::refinanceur()->select($infos["id_refinanceur"] , "refinanceur")
-					,'public'=>'oui'					
+					,'public'=>'oui'
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
 					,'suivi_notifie'=>$notifie_suivi
 					,"permalink"=> ATF::permalink()->getURL($this->createPermalink($infos["id_comite"]))
 					,'no_redirect'=>true
 				);
 				if(!$tu) $id_suivi = ATF::suivi()->insert($suivi);
-			}		
+			}
 
 			ATF::db($this->db)->commit_transaction();
 			/****************************************************************************/
 
 			if(is_array($cadre_refreshed)){	ATF::affaire()->redirection("select",$infos["id_affaire"]);	}
-			
+
 			$id_comite=$this->decryptId($infos["id_comite"]);
 			return $id_comite;
 		}
 
 	}
 
-	/** 
+	/**
 	* Impossible de modifier un devis qui n'est pas en attente
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
 		if($this->select($id,"etat")=="en_attente"){
 			return true;
 		}else{
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
-			return false; 
+			return false;
 		}
 	}
 
@@ -256,8 +256,8 @@ class comite extends classes_optima {
 			);
 		}else{ return false; }
 		return true;
-	}	
-	
+	}
+
 	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -265,42 +265,42 @@ class comite extends classes_optima {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
 			$id_devis = ATF::_r("id_devis");
 
 			$id_affaire=ATF::devis()->select(ATF::devis()->decryptId($id_devis), "id_affaire");
 			$affaire = ATF::affaire()->select($id_affaire);
 			$societe = $affaire["id_societe"];
-			
+
 		switch ($field) {
-			case "id_affaire":	return $id_affaire; 
+			case "id_affaire":	return $id_affaire;
 			case "id_societe": return $affaire['id_societe'];
 			case "id_user":	return ATF::$usr->get('id_user');
 			case "date":
-				return date("d-m-Y");			
-			case "prix":				
+				return date("d-m-Y");
+			case "prix":
 					$devis = ATF::affaire()->getDevis($affaire['id_affaire']);
-					return $devis->infos['prix'];	
+					return $devis->infos['prix'];
 			case "description":	return $affaire['affaire'];
 			case "loyer_actualise":		return ATF::affaire()->getCompteTLoyerActualise($affaire);
 		}
-	
+
 		return parent::default_value($field,$s,$request);
 	}
 
 
-	public function decision($infos){		
+	public function decision($infos){
 
 		$validite = explode("/", $infos["date"]);
 		$validite_accord = $validite[2]."-".$validite[1]."-".$validite[0];
-		
+
 		$id = $this->decryptId($infos["id"]);
 
 		if($infos["comboDisplay"] == "refus_comite"){
-			$etat = "refuse";		
+			$etat = "refuse";
 		}else{
-			$etat = "accepte";	
+			$etat = "accepte";
 		}
 
 		$data = array("id_comite"=>$id,
@@ -323,23 +323,61 @@ class comite extends classes_optima {
 			ATF::commande()->u(array("id_commande"=>$commande["commande.id_commande"], "etat"=>"non_loyer"));
 			ATF::affaire()->u(array("id_affaire"=>$this->select($id, "id_affaire") , "etat"=>"commande"));
 			self::envoiNotificationPrestataires($commande["commande.id_commande"]);
+
+			$this->envoiCourrierInformation($commande);
+
 		}
 
 		if($etat == "refuse"){
 			ATF::affaire()->u(array("id_affaire"=>$this->select($id, "id_affaire"), "etat"=>"refuse"));
 			if($commande )	ATF::commande()->d($commande["commande.id_commande"]);
-		}	
+		}
 	}
 
-	/** 
-    * 
+	/**
+	 * Envoi du mail de courrier d'information suite à l'acceptation du comité ou validation du contrat si pas de comité
+	 * @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	 * @param   $commande    la commande client
+	 */
+	public function envoiCourrierInformation($commande){
+
+		//Envoi du mail avec le courrier Information
+		ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande"])
+										 ->setDimension("row")
+										 ->setLimit(1);
+		$ligne = ATF::commande_ligne()->sa();
+
+		$client = ATF::commande()->select($commande["commande.id_commande"], "id_societe");
+
+		$id_courrier = ATF::pack_produit()->select(ATF::produit()->select($ligne["id_produit"] , "id_pack_produit") , "id_courrier_information_pack");
+
+		if($id_courrier){
+
+			//On envoi le mail avec ou sans le PDF
+			$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
+			$infos_mail["objet"] = "Courrier d'information suite à votre souscription";
+			$infos_mail["recipient"] = ATF::societe()->select($client , "email");
+			$infos_mail["template"] = "courrierInformationPack/".ATF::courrier_information_pack()->select($id_courrier, "template_mail_courrier");
+			$infos_mail["html"] = true;
+
+		   	$mail = new mail($infos_mail);
+		   	$filename = ATF::courrier_information_pack()->filepath($id_courrier,"fichier_joint");
+			if(file_exists($filename)){
+		   		$mail->addFile($filename,"Courrier d'information.pdf",true);
+		   	}
+		   	return $mail->send();
+		}
+	}
+
+	/**
+    *
     * @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
     * @param string $prefixe Le préfixe de la référence (exemple SLI0911)
     * @return int la référence max
     */
     public static function envoiNotificationPrestataires($id_commande){
         // Pour chaque prestataire concerné, on envoi un email de commande
-        
+
         try {
             ATF::commande()->q->reset()
                 ->select('societe.email_notification')
@@ -348,32 +386,32 @@ class comite extends classes_optima {
                 ->select('commande_ligne.id_fournisseur')
                 ->from("commande","id_commande","commande_ligne","id_commande")
                 ->from("commande_ligne","id_fournisseur","societe","id_societe")
-                ->from("commande_ligne","id_produit","produit","id_produit") 
-                ->where("produit.element_declencheur","acceptation_comite","AND")                
+                ->from("commande_ligne","id_produit","produit","id_produit")
+                ->where("produit.element_declencheur","acceptation_comite","AND")
                 ->where("commande.id_commande", $id_commande,"AND")
                 ->setStrict()
                 ->addGroup('commande_ligne.id_fournisseur');
-            if ($fournisseurs = ATF::commande()->select_all()) {            	
+            if ($fournisseurs = ATF::commande()->select_all()) {
                 foreach ($fournisseurs as $f) {
-                	$f = ATF::societe()->select($f["commande_ligne.id_fournisseur"]);                	
-                	$p = ATF::pack_produit()->select($f["produit.id_pack_produit"]);                	
+                	$f = ATF::societe()->select($f["commande_ligne.id_fournisseur"]);
+                	$p = ATF::pack_produit()->select($f["produit.id_pack_produit"]);
                     if ($f["email_notification"]) {
                         $commande = self::getInfosCommande($id_commande,$f["id_societe"]);
                         $info_mail["from"] = __EMAIL_FROM_NAME__." <".__EMAIL_FROM__.">";;
 						$info_mail["recipient"] = $f["email_notification"];
 						$info_mail["objet"] = "[LMA pour ".ATF::societe()->select($f["id_societe"],"societe")."] Nouvelle souscription de ".$commande["prenom"]." ".$commande["nom"]." du pack ";
 						$info_mail["body"] = json_encode($commande, JSON_PRETTY_PRINT)."\n\n".print_r($commande, true);
-					
+
 						$mail = new mail($info_mail);
-					
-						$mail->send();	                        
+
+						$mail->send();
                     }
                 }
             }
         } catch (Exception $e) {
             log::logger($e->getMessage(),"mail_error");
         }
-    }   
+    }
 
 
     /**
@@ -384,27 +422,27 @@ class comite extends classes_optima {
     * @return array
     */
     public static function getInfosCommande($id_commande, $id_fournisseur){ // fonction get accessible uniquement par le prestataire
-       
+
     	$element_declencheur = "acceptation_comite";
 		$produit_declencheur = array();
-        $q = "SELECT 
-                commande.id_commande, 
-                commande.ref, 
-                commande.commande, 
-                commande.id_societe, 
+        $q = "SELECT
+                commande.id_commande,
+                commande.ref,
+                commande.commande,
+                commande.id_societe,
                 societe.prenom,
                 societe.nom,
                 societe.tel,
                 societe.email,
-                affaire.adresse_livraison, 
-                affaire.cp_adresse_livraison, 
-                affaire.ville_adresse_livraison 
-            FROM commande 
-                INNER JOIN commande_ligne ON commande.id_commande = commande_ligne.id_commande 
-                INNER JOIN affaire ON affaire.id_affaire=commande.id_affaire 
-                INNER JOIN societe ON societe.id_societe=commande.id_societe 
-            WHERE 
-                commande.id_commande = '".ATF::db()->real_escape_string($id_commande)."' 
+                affaire.adresse_livraison,
+                affaire.cp_adresse_livraison,
+                affaire.ville_adresse_livraison
+            FROM commande
+                INNER JOIN commande_ligne ON commande.id_commande = commande_ligne.id_commande
+                INNER JOIN affaire ON affaire.id_affaire=commande.id_affaire
+                INNER JOIN societe ON societe.id_societe=commande.id_societe
+            WHERE
+                commande.id_commande = '".ATF::db()->real_escape_string($id_commande)."'
             GROUP BY commande.id_commande";
         $cmd = ATF::db()->fasso($q);
         $q = "SELECT * FROM commande_ligne WHERE id_fournisseur='".ATF::db()->real_escape_string($id_fournisseur)."' AND id_commande='".ATF::db()->real_escape_string($id_commande)."'";
@@ -417,13 +455,13 @@ class comite extends classes_optima {
                 unset($p["element_declencheur"]);
 
                 $cmd['produit'][] = $p; // on ajout dans la commande sur laquelle on itère le produit en question dans un tableau 'produit'
-            	
-            	
+
+
             }
         }
         $cmd["produit_declencheur"] = $produit_declencheur;
         return $cmd;
-    } 
+    }
 };
 
 ?>
