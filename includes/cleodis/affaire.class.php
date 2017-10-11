@@ -1613,7 +1613,6 @@ class affaire_cleodis extends affaire {
 							// le contrat a été signé & PV non retourné 
 				    	if($this->select($v["affaire.id_affaire_fk"], "pieces")  === 'OK' ){
 				    		// puis validation des pieces OK 
-				    		log::logger('HERE AFTER VERIF DES PIECES','ccharlier');
 				    		ATF::comite()->q->reset()->where("comite.id_affaire", $v['affaire.id_affaire_fk'])
 				    								->addOrder("comite.id_comite","DESC")
 				    								->setLimit(1);
