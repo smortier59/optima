@@ -1,0 +1,18 @@
+<p>{ATF::$usr->trans('bonjour',mail)}</p>
+
+<p style="background : #ff3737 ; display : inline ; text-align : center ;">{$infos.reception_comite}</p>
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('de',mail)}</span> {ATF::user()->nom($infos.id_user)}</p>
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->nom($infos.id_societe)}</p>
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('concerne',mail)}</span>{$infos.suivi_notifie}</p>
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->nom($infos.id_affaire)}</p>
+
+
+
+
+<p><a href="{$infos.optima_url}">{ATF::$usr->trans('permalink')}</a></p>
+
+<p>{ATF::$usr->trans('remerciement_suivi',mail)}</p>
