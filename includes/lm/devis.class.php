@@ -371,6 +371,16 @@ class devis_lm extends devis {
 				if(!$id_pack_produit){
 					$id_pack_produit = ATF::produit()->select($item["id_produit"] , "id_pack_produit");
 					ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "id_pack_produit"=>$id_pack_produit));
+
+					//On recupere le courrier d'information pour le stocker sur l'affaire
+					$id_courrier_information_pack = ATF::pack_produit()->select($id_pack_produit , "id_courrier_information_pack");
+					if($id_courrier_information_pack){
+						$filename = ATF::courrier_information_pack()->filepath($id_courrier_information_pack,"fichier_joint");
+						if(file_exists($filename)){
+							copy($filename, ATF::affaire()->filepath($infos["id_affaire"],"courrier_information"));
+						}
+					}
+
 				}
 
 				//Si on est sur un produit principal ou sur un sous produit dont le produit principal est présent, on insere sinon on ne prend pas le sous-produit

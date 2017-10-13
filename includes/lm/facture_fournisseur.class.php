@@ -818,14 +818,13 @@ class facture_fournisseur extends classes_optima {
 
 	        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
 	        $data = $this->sa();
-
-
 		}else{
 			$data = $invoice;
 			foreach ($data as $key => $value) {
 				$data[$key]["facture_fournisseur.id_facture_fournisseur"] = $value["facture_fournisseur.ref"];
 			}
 		}
+
 
         $string = "";
         $total_debit = 0;
@@ -882,7 +881,7 @@ class facture_fournisseur extends classes_optima {
         	$TTC_lignes = 0;
 
 			foreach ($lignes_ff as $k => $v) {
-//Ajouter le check sur le compte comptabke ICI !!
+					//Ajouter le check sur le compte comptabke ICI !!
 				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
 				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
 			}
@@ -1037,13 +1036,16 @@ class facture_fournisseur extends classes_optima {
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
-		if($invoice){
-        	return array("filename"=>$filename, "content"=>$string);
-        }else{
+
+
+
+		if($infos['onglet']){
         	header('Content-Type: application/fic');
 			header('Content-Disposition: attachment; filename="'.$filename.'"');
 
 	        echo $string;
+        }else{
+        	return array("filename"=>$filename, "content"=>$string);
         }
     }
 
@@ -1231,13 +1233,14 @@ class facture_fournisseur extends classes_optima {
        	$lignes ++;
         $string .= "0;".$lignes.";".date("Ymd");
 
-		if($invoice){
-        	return array("filename"=>$filename, "content"=>$string);
-        }else{
+
+        if($infos['onglet']){
         	header('Content-Type: application/fic');
 			header('Content-Disposition: attachment; filename="'.$filename.'"');
 
 	        echo $string;
+        }else{
+        	return array("filename"=>$filename, "content"=>$string);
         }
     }
 
