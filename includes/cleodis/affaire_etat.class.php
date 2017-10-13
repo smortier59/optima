@@ -29,6 +29,7 @@ class affaire_etat extends classes_optima {
 			->addJointure("affaire_etat","id_user","user","id_user") //rajout d'une jointure pour récupérer le login
 			->where("id_affaire", $id_affaire)
 			->addOrder("affaire_etat.date","desc");
-		return ATF::affaire_etat()->select_all();
+		$ret = ATF::affaire_etat()->select_all();
+		return $ret?$ret:false;
 	}
 }

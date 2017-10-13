@@ -950,7 +950,7 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','',10);
 		$this->cell(0,5,ATF::delai_de_realisation()->nom($infos_devis['id_delai_de_realisation']),0,1);
 
-		$this->cadre(20,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),"","","","","",""),"Partie réservée au client");
+		$this->cadre(20,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),array('txt'=>"\n\n\n\n\n\n\n\nLa signature vaut pour acceptation de nos conditions générales de vente", 'align'=>"C","size"=>6,'italic'=>true)),"Partie réservée au client");
 		$this->setfont('arial','',10);
 		$this->cadre(110,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),"","","","","",""),"Partie réservée à Absystech");
 
