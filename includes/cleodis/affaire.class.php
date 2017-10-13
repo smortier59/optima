@@ -1249,9 +1249,14 @@ class affaire_cleodis extends affaire {
 				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire")
 				->from("affaire", "id_affaire", "commande", "id_affaire");
-
-	 	$this->q->whereIsNotNull("site_associe")
-			->addGroup("affaire.id_affaire");
+		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
+		 	$this->q->where("site_associe",'toshiba')
+				->addGroup("affaire.id_affaire");
+		}else if ($get['site_associe'] && $get['site_associe'] === 'cleodis'){
+		 	$this->q->whereIsNull("site_associe")
+		 			->orWhere("site_associe",'')
+				->addGroup("affaire.id_affaire");	
+		}
 
 		if($get["search"]){
 			header("ts-search-term: ".$get['search']);
