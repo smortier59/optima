@@ -3692,6 +3692,10 @@ class hotline extends classes_optima {
 		} elseif ($get['id_societe']) {
 			$this->q->where("hotline.id_societe",$get['id_societe']);
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
+			// Filtre ticket actif
+			if ($get['filters']['fixing'] == "on") {
+				$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
+			}
 		} else {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
