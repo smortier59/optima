@@ -1528,7 +1528,7 @@ class affaire_cleodis extends affaire {
 			    //finance et montage ok
 			    foreach ($res["data"] as $k => $v) {
 			    	ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $v['affaire.id_affaire_fk']);
-			    	$bdc = ATF::bon_de_commande()->select_row()
+			    	$bdc = ATF::bon_de_commande()->select_row();
 			    	if(!$bdc){
 				    	if($this->select($v["affaire.id_affaire_fk"], "date_verification")){
 				    		ATF::comite()->q->reset()->where("comite.id_affaire",$v['affaire.id_affaire_fk'])
