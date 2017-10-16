@@ -1112,7 +1112,7 @@ class societe_cleodis extends societe {
             }
           }else{
             //Si Credit Safe n'a retourné aucun dirigeant, on en cré un en attendant
-            $contact = array( "nom"=>"gerant",
+            $contact = array( "nom"=>"GERANT",
                               "email"=>$email,
                               "id_societe"=> $id_societe
                           );
@@ -1220,7 +1220,7 @@ class societe_cleodis extends societe {
 
           $creation = new DateTime( $data["date_creation"] );
           $creation = $creation->format("Ymd");
-          $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
+          $past2Years = new DateTime( date("Y-m-d", strtotime("-5 years")) );
           $past2Years = $past2Years->format("Ymd");
 
           if($data["cs_score"] > 50 && $creation < $past2Years ){
