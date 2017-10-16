@@ -1074,6 +1074,10 @@ class societe_cleodis extends societe {
             $data["code_client"]= $code_client;
             $data_soc = $data;
 
+            $data["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
+            $data["id_fournisseur"] = 6241; //Fournisseur ALSO
+
+
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
             $id_societe = $this->insert($data_soc);
           }
