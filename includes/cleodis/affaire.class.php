@@ -13,7 +13,7 @@ class affaire_cleodis extends affaire {
 		$this->colonnes['fields_column'] = array(
 			'affaire.ref'
 			,'affaire.date'
-			,'affaire.affaire'   
+			,'affaire.affaire'
 			,'affaire.id_societe'
 			,'affaire.type_affaire'
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
@@ -1120,8 +1120,12 @@ class affaire_cleodis extends affaire {
 		$pourcentagesImmat = $pourcentagesMat = 0;
 		foreach ($lignes as $key => $value) {
 			if($value["prix_achat"]){
-				if($value["type"] != "fixe" && $value["type"] != "portable"){ $pourcentagesImmat = $pourcentagesImmat + ($value["prix_achat"]*$value["quantite"]);	 }
-				else{ $pourcentagesMat = $pourcentagesMat + ($value["prix_achat"]*$value["quantite"]);  }
+				$type = ATF::produit()->select($value["id_produit"], "type");
+				if($type != "fixe" && $type != "portable"){
+					$pourcentagesImmat = $pourcentagesImmat + ($value["prix_achat"]*$value["quantite"]);
+				} else {
+					$pourcentagesMat = $pourcentagesMat + ($value["prix_achat"]*$value["quantite"]);
+				}
 			}
 		}
 
@@ -1255,7 +1259,7 @@ class affaire_cleodis extends affaire {
 		}else if ($get['site_associe'] && $get['site_associe'] === 'cleodis'){
 		 	$this->q->whereIsNull("site_associe")
 		 			->orWhere("site_associe",'')
-				->addGroup("affaire.id_affaire");	
+				->addGroup("affaire.id_affaire");
 		}
 
 		if($get["search"]){
@@ -1583,13 +1587,13 @@ class affaire_cleodis extends affaire {
 						$commande = ATF::commande()->select_row();
 
 						if(
-							$commande 
-							&& file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) 
+							$commande
+							&& file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour"))
 							&& file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV"))
 						){
-							// le contrat a été signé & PV retourné 
+							// le contrat a été signé & PV retourné
 				    	if($this->select($v["affaire.id_affaire_fk"], "pieces")  === 'OK' ){
-				    		// puis validation des pieces OK 
+				    		// puis validation des pieces OK
 				    		ATF::comite()->q->reset()->where("comite.id_affaire", $v['affaire.id_affaire_fk'])
 				    								->addOrder("comite.id_comite","DESC")
 				    								->setLimit(1);
@@ -1611,13 +1615,13 @@ class affaire_cleodis extends affaire {
 						$commande = ATF::commande()->select_row();
 
 						if(
-							$commande 
-							&& file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) 
+							$commande
+							&& file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour"))
 							&& !file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV"))
 						){
-							// le contrat a été signé & PV non retourné 
+							// le contrat a été signé & PV non retourné
 				    	if($this->select($v["affaire.id_affaire_fk"], "pieces")  === 'OK' ){
-				    		// puis validation des pieces OK 
+				    		// puis validation des pieces OK
 				    		ATF::comite()->q->reset()->where("comite.id_affaire", $v['affaire.id_affaire_fk'])
 				    								->addOrder("comite.id_comite","DESC")
 				    								->setLimit(1);
