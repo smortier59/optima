@@ -1147,7 +1147,7 @@ class societe_cleodis extends societe {
           $pack_pro_ligne = ATF::pack_produit_ligne()->select_all();
           // tri dans l'ordre croissant 
           usort($pack_pro_ligne, function ($item1, $item2) {
-            return $item1['ordre'] <=> $item2['ordre'];
+            return strcmp($item1['ordre'],$item2['ordre']);
           });
           // maintenant il faut appliquer cet ordre aux pack produits
           foreach ($pack_pro_ligne as $k => $v) {
