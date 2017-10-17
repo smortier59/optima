@@ -1080,6 +1080,9 @@ class societe_cleodis extends societe {
 
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
             $id_societe = $this->insert($data_soc);
+
+            $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+
           }
 
           if($gerants){
@@ -1145,7 +1148,7 @@ class societe_cleodis extends societe {
           $produitsAfterTri = array();
           ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit',$post["id_pack_produit"]);
           $pack_pro_ligne = ATF::pack_produit_ligne()->select_all();
-          // tri dans l'ordre croissant 
+          // tri dans l'ordre croissant
           usort($pack_pro_ligne, function ($item1, $item2) {
             return strcmp($item1['ordre'],$item2['ordre']);
           });
