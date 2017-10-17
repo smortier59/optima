@@ -1142,8 +1142,22 @@ class societe_cleodis extends societe {
 
           $loyer = array();
           $produits = array();
-
-          foreach ($post["produits"] as $key => $value) {
+          $produitsAfterTri = array();
+          ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit',$post["id_pack_produit"]);
+          $pack_pro_ligne = ATF::pack_produit_ligne()->select_all();
+          // tri dans l'ordre croissant 
+          usort($pack_pro_ligne, function ($item1, $item2) {
+            return $item1['ordre'] <=> $item2['ordre'];
+          });
+          // maintenant il faut appliquer cet ordre aux pack produits
+          foreach ($pack_pro_ligne as $k => $v) {
+            foreach ($post["produits"] as $key => $value) {
+              if($key == $v['id_produit']){
+                $produitsAfterTri[$key]= $value;
+              }
+            }
+          }
+          foreach ($produitsAfterTri as $key => $value) {
             if($value > 0){
               $produit = ATF::produit()->select($key);
 

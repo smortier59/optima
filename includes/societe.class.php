@@ -1669,10 +1669,33 @@ class societe extends classes_optima {
 		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
 		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
 
-		return $this->update(array(
-			"id_societe"=>$post['pk'],
-			$post['name']=>$post['value']
-		));
+		switch ($post['name']) {
+			case 'address':
+				$toUpdate = array(
+					"adresse"=>$post['value']["adresse"],
+					"adresse_2"=>$post['value']["adresse_2"],
+					"adresse_3"=>$post['value']["adresse_3"],
+					"cp"=>$post['value']["cp"],
+					"ville"=>$post['value']["ville"],
+				);
+			break;
+			case 'adresse_facturation':
+				$toUpdate = array(
+					"facturation_adresse"=>$post['value']["adresse"],
+					"facturation_adresse_2"=>$post['value']["adresse_2"],
+					"facturation_adresse_3"=>$post['value']["adresse_3"],
+					"facturation_cp"=>$post['value']["cp"],
+					"facturation_ville"=>$post['value']["ville"],
+				);
+			break;
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_societe'] = $post['pk'];
+
+		return $this->update($toUpdate);
 	}
 
 

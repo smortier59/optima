@@ -1319,11 +1319,11 @@ class societe_absystech extends societe {
 
 		$evoCA = ((number_format($indicator["CA"],2,"",",")-number_format($indicator["CA_Prev"],2,"",","))/number_format($indicator["CA_Prev"],2,"",","))*100;
 
-		$indicator["evoCA"] = number_format($evoCA ,0," ",",");
-		$indicator["CA"] = number_format($indicator["CA"] ,2,","," ");
-		$indicator["en_cours"] = number_format($indicator["en_cours"] ,2,","," ");
-		$indicator["retard"] = number_format($indicator["retard"] ,2,","," ");
-		$indicator["delai_paiement"] = number_format($indicator["delai_paiement"]/$nb_delai_paiement,0);
+		$indicator["evoCA"] = $evoCA;
+		$indicator["CA"] = $indicator["CA"];
+		$indicator["en_cours"] = $indicator["en_cours"];
+		$indicator["retard"] = $indicator["retard"];
+		$indicator["delai_paiement"] = $indicator["delai_paiement"]/$nb_delai_paiement;
 
 		$indicator["meteo"] = $this->meteo_icone($this->select($infos["id_societe"], "meteo"));
 
