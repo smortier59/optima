@@ -1437,7 +1437,7 @@ class societe_cleodis extends societe {
                 );
 
         $id_contact = ATF::contact()->i($new);
-        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact));
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact,"id_contact_facturation"=>$id_contact));
       }
     }else{
       ATF::contact()->u(array("id_contact"=>$post["id_contact"],
