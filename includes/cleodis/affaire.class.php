@@ -1384,10 +1384,10 @@ class affaire_cleodis extends affaire {
 			  if ($get['filters']['devis']['gagnes']) {
 			    //devis transformé en contrat
 			    $this->q->from("affaire", "id_affaire", "devis", "id_affaire")
-			    		->where("devis.etat","commande",'OR',"affaireEtat")
-			    		->where("devis.etat","facture",'OR',"affaireEtat")
-			    		->where("devis.etat","demande_refi",'OR',"affaireEtat")
-			    		->where("devis.etat","dfacture_refi",'OR',"affaireEtat");
+			    		->where("affaire.etat","commande",'OR',"affaireEtat")
+			    		->where("affaire.etat","facture",'OR',"affaireEtat")
+			    		->where("affaire.etat","demande_refi",'OR',"affaireEtat")
+			    		->where("affaire.etat","facture_refi",'OR',"affaireEtat");
 			  }
 			  if ($get['filters']['devis']['perdus']) {
 			    //devis perdu
