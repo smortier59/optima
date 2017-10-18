@@ -1638,6 +1638,8 @@ class facture_absystech extends facture {
 			$facture["date_previsionnelle"]="";
 			$facture["date_effective"]="";
 			$facture["date_relance"]="";
+			$facture["id_export_comptable"]=NULL;
+			$facture["id_echeancier"]=NULL;
 		}
 		return $facture;
 	}
@@ -2365,7 +2367,7 @@ class facture_absystech extends facture {
 		}
 		ATF::db($this->db)->commit_transaction();
 
-		$mail["recipient"]="compta@absystech.fr";
+		$mail["recipient"]="qjanon@absystech.fr";
 		$mail["from"]="Telescope NO-REPLY <no-reply@absystech.fr>";
 		$mail["objet"]= utf8_decode("Export de comptabilité - ").$post['date_debut']." / ".$post['date_fin']." - ".ATF::$usr->get('login');
 		$mail["template"] = "export-comptabilite";
