@@ -1074,8 +1074,15 @@ class societe_cleodis extends societe {
             $data["code_client"]= $code_client;
             $data_soc = $data;
 
+            $data_soc["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
+            $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
+
+
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
             $id_societe = $this->insert($data_soc);
+
+            $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+
           }
 
           if($gerants){
@@ -1112,7 +1119,7 @@ class societe_cleodis extends societe {
             }
           }else{
             //Si Credit Safe n'a retourné aucun dirigeant, on en cré un en attendant
-            $contact = array( "nom"=>"gerant",
+            $contact = array( "nom"=>"GERANT",
                               "email"=>$email,
                               "id_societe"=> $id_societe
                           );
@@ -1138,8 +1145,27 @@ class societe_cleodis extends societe {
 
           $loyer = array();
           $produits = array();
-
-          foreach ($post["produits"] as $key => $value) {
+          $produitsAfterTri = array();
+          ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit',$post["id_pack_produit"]);
+          $pack_pro_ligne = ATF::pack_produit_ligne()->select_all();
+          // tri dans l'ordre croissant
+          usort($pack_pro_ligne, function ($item1, $item2) {
+            // sensible à la casse ! [1,3,100,10] => [1,10,100,3]
+            // return strcmp($item1['ordre'],$item2['ordre']);
+            if ($item1['ordre'] ==$item2['ordre']) {
+              return 0;
+            }
+            return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;  
+          });
+          // maintenant il faut appliquer cet ordre aux pack produits
+          foreach ($pack_pro_ligne as $k => $v) {
+            foreach ($post["produits"] as $key => $value) {
+              if($key == $v['id_produit']){
+                $produitsAfterTri[$key]= $value;
+              }
+            }
+          }
+          foreach ($produitsAfterTri as $key => $value) {
             if($value > 0){
               $produit = ATF::produit()->select($key);
 
@@ -1220,7 +1246,7 @@ class societe_cleodis extends societe {
 
           $creation = new DateTime( $data["date_creation"] );
           $creation = $creation->format("Ymd");
-          $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
+          $past2Years = new DateTime( date("Y-m-d", strtotime("-5 years")) );
           $past2Years = $past2Years->format("Ymd");
 
           if($data["cs_score"] > 50 && $creation < $past2Years ){
@@ -1411,7 +1437,7 @@ class societe_cleodis extends societe {
                 );
 
         $id_contact = ATF::contact()->i($new);
-        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact));
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact,"id_contact_facturation"=>$id_contact));
       }
     }else{
       ATF::contact()->u(array("id_contact"=>$post["id_contact"],
