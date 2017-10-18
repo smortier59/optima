@@ -2367,7 +2367,7 @@ class facture_absystech extends facture {
 		}
 		ATF::db($this->db)->commit_transaction();
 
-		$mail["recipient"]="qjanon@absystech.fr";
+		$mail["recipient"]="compta@absystech.fr";
 		$mail["from"]="Telescope NO-REPLY <no-reply@absystech.fr>";
 		$mail["objet"]= utf8_decode("Export de comptabilité - ").$post['date_debut']." / ".$post['date_fin']." - ".ATF::$usr->get('login');
 		$mail["template"] = "export-comptabilite";
