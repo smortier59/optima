@@ -1150,7 +1150,12 @@ class societe_cleodis extends societe {
           $pack_pro_ligne = ATF::pack_produit_ligne()->select_all();
           // tri dans l'ordre croissant
           usort($pack_pro_ligne, function ($item1, $item2) {
-            return strcmp($item1['ordre'],$item2['ordre']);
+            // sensible à la casse ! [1,3,100,10] => [1,10,100,3]
+            // return strcmp($item1['ordre'],$item2['ordre']);
+            if ($item1['ordre'] ==$item2['ordre']) {
+              return 0;
+            }
+            return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;  
           });
           // maintenant il faut appliquer cet ordre aux pack produits
           foreach ($pack_pro_ligne as $k => $v) {
@@ -1432,7 +1437,7 @@ class societe_cleodis extends societe {
                 );
 
         $id_contact = ATF::contact()->i($new);
-        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact));
+        ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$id_contact,"id_contact_facturation"=>$id_contact));
       }
     }else{
       ATF::contact()->u(array("id_contact"=>$post["id_contact"],
