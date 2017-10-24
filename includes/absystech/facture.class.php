@@ -1638,6 +1638,8 @@ class facture_absystech extends facture {
 			$facture["date_previsionnelle"]="";
 			$facture["date_effective"]="";
 			$facture["date_relance"]="";
+			$facture["id_export_comptable"]=NULL;
+			$facture["id_echeancier"]=NULL;
 		}
 		return $facture;
 	}
