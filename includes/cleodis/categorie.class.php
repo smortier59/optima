@@ -3,11 +3,12 @@
 * @package Optima
 * @subpackage Cleodis
 */
-class categorie extends classes_optima {
+require_once dirname(__FILE__)."/../categorie.class.php";
+class categorie_cleodis extends categorie {
     
     function __construct() {
         parent::__construct(); 
-        $this->table = __CLASS__;
+        $this->table = "categorie";
         $this->colonnes['fields_column'] = array( 
              'categorie.categorie'
         );
@@ -21,6 +22,29 @@ class categorie extends classes_optima {
             'sous_categorie'=>array('opened'=>true)
         );
         $this->controlled_by = "produit";
+    }
+    /**
+     * fonction qui retourne la liste des categories avec la gestion de l'autocomplete
+     * @author Cyril CHARLIER <ccharlier@absystech.fr>
+     * @param  $get  paramètres get
+     * @param  $post parametre envoyées en post inutile ici
+     * @return [array] categories [description]
+     */
+    public function _ac($get,$post){
+        $length = 25;
+        $start = 0;
+
+        $this->q->reset();
+
+        // On ajoute les champs utiles pour l'autocomplete
+        $this->q->addField("id_categorie")->addField("categorie");
+
+        if ($get['q']) {
+            $this->q->setSearch($get["q"]);
+        }
+        $this->q->setLimit($length,$start)->setPage($start/$length);
+
+        return $this->select_all();    
     }
 };
 

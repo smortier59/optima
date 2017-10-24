@@ -3,7 +3,8 @@
 * @package Optima
 * @subpackage Cleodis
 */
-class sous_categorie extends classes_optima {
+require_once dirname(__FILE__)."/../sous_categorie.class.php";
+class sous_categorie_cleodis extends sous_categorie {
 	// Mapping prévu pour un autocomplete sur produit
 	public static $autocompleteMapping = array(
 		array("name"=>'id', "mapping"=>0),
@@ -45,7 +46,29 @@ class sous_categorie extends classes_optima {
 				->addField("categorie.categorie");
 		return parent::autocomplete($infos,false);
 	}
+    /**
+     * fonction qui retourne la liste des categories avec la gestion de l'autocomplete
+     * @author Cyril CHARLIER <ccharlier@absystech.fr>
+     * @param  $get  paramètres get
+     * @param  $post parametre envoyées en post inutile ici
+     * @return [array] categories [description]
+     */
+    public function _ac($get,$post){
+        $length = 25;
+        $start = 0;
 
+        $this->q->reset();
+
+        // On ajoute les champs utiles pour l'autocomplete
+        $this->q->addField("id_sous_categorie")->addField("sous_categorie")->where("id_categorie",$get["id"]);
+
+        if ($get['q']) {
+            $this->q->setSearch($get["q"]);
+        }
+        $this->q->setLimit($length,$start)->setPage($start/$length);
+
+        return $this->select_all();    
+    }
 };
 
 class sous_categorie_cleodisbe extends sous_categorie { };
