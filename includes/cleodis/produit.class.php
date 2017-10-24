@@ -530,6 +530,27 @@ class produit_cleodis extends produit {
 	  	return base64_encode($data);
 	}
 
+
+/** Fonction qui génère les résultat pour les champs d'auto complétion
+	* @author Cyril CHARLIER <ccharlier@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+		$length = 25;
+		$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("id_produit")->addField("ref")->addField("produit")->where("id_sous_categorie",$get['id']);
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+		$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
+
 };
 
 class produit_cleodisbe extends produit_cleodis { };
