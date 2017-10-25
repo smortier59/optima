@@ -1308,7 +1308,7 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
-
+    log::logger("in _infosCredisafePartenaire !",'ccharlier');
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
         $gerants = $data["gerant"];
