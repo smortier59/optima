@@ -2,13 +2,14 @@
 class categorie_test extends ATF_PHPUnit_Framework_TestCase {
 	
 	public function setUp() {
+		$this->begin_transaction(true);
+		
 		ATF::db()->truncate("commande_ligne");
 		ATF::db()->truncate("facture_ligne");		
 		
 		ATF::db()->truncate("produit");		
 		ATF::db()->truncate("sous_categorie");
 		ATF::db()->truncate("categorie");		
-		$this->begin_transaction(true);
 	}
 	
 	/** Méthode post-test, exécute après chaque test unitaire*/
