@@ -1290,7 +1290,7 @@ class societe_cleodis extends societe {
                         );
           }
           return array("result"=>false ,
-                       "societe"=>ATF::societe()->select($id_societe));
+                       "societe"=>ATF::societe()->select($res['id_societe']));
 
       } catch (Exception $e) {
 
@@ -1300,7 +1300,97 @@ class societe_cleodis extends societe {
     }
 
   }
+  /**
+   * Permet de retourner les infos creditsafe de la societe
+   * @param  [type] $get  [description]
+   * @param  [type] $post [description]
+   * @author Cyril Charlier <ccharlier@absystech.fr>
+   * @return [type]       [description]
+   */
+  public function _infosCredisafePartenaire($get, $post){
+    log::logger('_infosCredisafePartenaire','ccharlier');
 
+    ATF::$usr->set('id_user',16);
+    ATF::$usr->set('id_agence',1);
+
+    $email = 'test@test.fr';
+
+
+    $data = self::getInfosFromCREDITSAFE($post);
+    if($data){
+        $gerants = $data["gerant"];
+
+        if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
+        if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
+        ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+        $res = ATF::societe()->select_row();
+
+        try {
+
+            if($res){
+                $id_societe = $res["id_societe"];
+                ATF::societe()->u($res);
+            } else {
+                log::logger($_SESSION["user"]->id_societe,'ccharlier');
+                $data_soc = $data;
+                                // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
+                $data_soc["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
+                $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
+                                            // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
+
+                unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
+                $id_societe = $this->insert($data_soc);
+
+                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+            }
+            if($gerants){
+                foreach ( $gerants as $key => $value) {
+                    ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($value["nom"])),"AND")
+                                                ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($value["prenom"])),"AND")
+                                                ->where("id_societe", $id_societe,"AND");
+                    $gerant[$key] = $contact;
+                    $c = ATF::contact()->select_row();
+
+                      //Si le contact n'exite pas dans optima, on l'insert
+                    if(!$c){
+                        $contact = array( "nom"=>$value["nom"],
+                                          "prenom"=>$value["prenom"],
+                                          "fonction"=>$value["fonction"],
+                                          "email"=>$email,
+                                          "id_societe"=> $id_societe,
+                                          "est_dirigeant"=>"oui"
+                                        );
+                        $gerant[$key] = $contact;
+                        $gerant[$key]["id_contact"] = ATF::contact()->insert( $contact );
+                    } else {
+                        //Sinon on le met à jour
+                        $gerant[$key] = array(  "nom"=>$c["nom"],
+                                                "prenom"=>$c["prenom"],
+                                                "fonction"=>$value["fonction"],
+                                                "gsm"=>$c["gsm"],
+                                                "email"=>$c["email"],
+                                                "id_societe"=> $id_societe,
+                                                "id_contact"=>$c["id_contact"]
+                                              );
+                        ATF::contact()->u(array("id_contact"=>$c["id_contact"], "fonction"=>$value["fonction"], "est_dirigeant"=>"oui"));
+                    }
+                }
+            }
+            return array("result"=>true ,
+                "societe"=>ATF::societe()->select($id_societe),
+                "gerants"=>$gerant,
+
+
+            );
+        } catch (Exception $e) {
+            throw new errorATF("erreurCS",500);
+
+        }
+    } else{
+        throw new errorATF("erreurCS",404);
+    }
+  }
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
     $decisionAffaireEtat = $post['action'] == "valider" ? "comite_cleodis_valide" : "comite_cleodis_refuse"; // pareil pour la timeline

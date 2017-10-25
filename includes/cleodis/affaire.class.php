@@ -1773,6 +1773,7 @@ class affaire_cleodis extends affaire {
 	 * @return float|boolean       le loyer, sinon FALSE si déjà payé
 	 */
 	public function _get_loyer($get,$post){
+
 		$id_affaire = $this->decryptId($get["id_affaire"]);
 		if ($this->paiementIsReceived($id_affaire)){
 			return false;
@@ -1785,6 +1786,134 @@ class affaire_cleodis extends affaire {
 		}
 	}
 
+	/** Fonction qui crée une affaire partenaire
+	* @author Cyril CHARLIER <ccharlier@absystech.fr>
+	*/
+	public function _CreateAffairePartenaire($get,$post) {
+		$id_societe = ATF::societe()->decryptId($post['id_societe']);
+		$devis = array(
+	      "id_societe" => $id_societe,
+	      "type_contrat" => "lld",
+	      "validite" => date("d-m-Y", strtotime("+1 month")),
+	      "tva" => __TVA__,
+	      "devis" => $post['id_societe'],
+	      "date" => date("d-m-Y"),
+	      "type_devis" => "normal",
+	      "id_contact" => $post["id_contact"],
+	      "type_affaire" => "normal");
+      	$values_devis =array();
+
+      	$montantLoyer = $duree = 0;
+
+      	$loyer = array();
+      	$produits = array();
+      	ATF::produit()->q->reset()->where('id_produit',$post["id_produit"]);
+	    $produit = ATF::produit()->select_all();
+
+      	$loyer[0] = array(
+            "loyer__dot__loyer"=>$post["loyer"],
+            "loyer__dot__duree"=>$post["duree"],
+            "loyer__dot__type"=>"engagement",
+            "loyer__dot__assurance"=>"",
+            "loyer__dot__frais_de_gestion"=>"",
+            "loyer__dot__frequence_loyer"=>"mois",
+            "loyer__dot__serenite"=>"",
+            "loyer__dot__maintenance"=>"",
+            "loyer__dot__hotline"=>"",
+            "loyer__dot__supervision"=>"",
+            "loyer__dot__support"=>"",
+            "loyer__dot__avec_option"=>"non"
+        );
+
+	    $produits[0] = array(
+          "devis_ligne__dot__produit"=> $produit["produit"],
+          "devis_ligne__dot__quantite"=>1,
+          "devis_ligne__dot__type"=>"sans_objet",
+          "devis_ligne__dot__ref"=>$produit["ref"],
+          "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
+          "devis_ligne__dot__id_produit"=>$produit["id_produit"],
+          "devis_ligne__dot__id_fournisseur"=>"TOSHIBA TEC",
+          "devis_ligne__dot__visibilite_prix"=>"invisible",
+          "devis_ligne__dot__date_achat"=>"",
+          "devis_ligne__dot__commentaire"=>$post['libelle'],
+          "devis_ligne__dot__neuf"=>"oui",
+          "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
+          "devis_ligne__dot__id_fournisseur_fk"=>"5474"
+        );
+	    $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
+
+        try {
+            $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+        } catch (errorATF $e) {
+            throw new errorATF($e ,500);
+        }
+	    $devis = ATF::devis()->select($id_devis);
+
+	    if($post["provenance"]){
+	        ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire"));
+	    }
+
+        ATF::affaire_etat()->insert(array(
+            "id_affaire"=>$devis["id_affaire"],
+            "etat"=>"reception_demande"
+        ));
+		$societe = ATF::societe()->select($post["id_societe"]);
+      	$comite = array  (
+            "id_societe" => $id_societe,
+            "id_affaire" => $devis["id_affaire"],
+            "id_contact" => $gerant["id_contact"],
+            "activite" => $societe["activite"],
+            "id_refinanceur" => 4,
+            "date_creation" => $societe["date_creation"],
+            "date_compte" => $societe["lastaccountdate"],
+            "capitaux_propres" => $societe["capitaux_propres"],
+            "note" => $societe["cs_score"],
+            "dettes_financieres" => $societe["dettes_financieres"],
+            "limite" => $societe["cs_avis_credit"],
+            "ca" => $societe["ca"],
+            "capital_social" => $societe["capital_social"],
+            "resultat_exploitation" => $societe["resultat_exploitation"],
+            "date" => date("d-m-Y"),
+            "description" => "Comite CreditSafe",
+            "suivi_notifie"=>array(0=>"")
+        );
+		$creation = new DateTime( $societe["date_creation"] );
+        $creation = $creation->format("Ymd");
+        $past2Years = new DateTime( date("Y-m-d", strtotime("-5 years")) );
+        $past2Years = $past2Years->format("Ymd");
+
+      	if($societe["cs_score"] > 50 && $creation < $past2Years ){
+        	$comite["etat"] = "accepte";
+        	$comite["decisionComite"] = "Accepté automatiquement";
+     	}else{
+        	$comite["etat"] = "refuse";
+        	$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
+      	}
+
+        $comite["reponse"] = date("Y-m-d");
+        $comite["validite_accord"] = date("Y-m-d");
+
+        try{
+            ATF::comite()->insert(array("comite"=>$comite));
+        }catch (errorATF $e) {
+            throw new errorATF($e->getMessage() ,500);
+        }
+        if($comite["etat"]== "accepte"){
+            //Création du comité CLEODIS
+            $comite["description"] = "Comité CLEODIS";
+            $comite["etat"] = "en_attente";
+            $comite["reponse"] = NULL;
+            $comite["validite_accord"] = NULL;
+            ATF::comite()->insert(array("comite"=>$comite));
+            return array(
+            	"result"=>true,
+                "id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"]),
+                "duree"=>$loyer[0]["loyer__dot__duree"],
+                "montant"=> $loyer[0]["loyer__dot__duree"] * $loyer[0]["loyer__dot__loyer"],
+                "loyer"=>$loyer[0]["loyer__dot__loyer"],
+            );
+        }
+	}
 
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
 	* @author Quentin JANON <qjanon@absystech.fr>
