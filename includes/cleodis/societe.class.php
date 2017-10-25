@@ -1308,14 +1308,7 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
-    log::logger('_infosCredisafePartenaire','ccharlier');
-
-    ATF::$usr->set('id_user',16);
-    ATF::$usr->set('id_agence',1);
-
-    $email = 'test@test.fr';
-
-
+
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
         $gerants = $data["gerant"];
@@ -1342,7 +1335,7 @@ class societe_cleodis extends societe {
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
 
-                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => ATF::usr()->));
             }
             if($gerants){
                 foreach ( $gerants as $key => $value) {
@@ -1357,7 +1350,7 @@ class societe_cleodis extends societe {
                         $contact = array( "nom"=>$value["nom"],
                                           "prenom"=>$value["prenom"],
                                           "fonction"=>$value["fonction"],
-                                          "email"=>$email,
+                                          "email"=>"",
                                           "id_societe"=> $id_societe,
                                           "est_dirigeant"=>"oui"
                                         );
