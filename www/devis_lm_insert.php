@@ -19,7 +19,7 @@ if($infos["create_tache"]){
         $tache = array("tache"=>array("id_societe"=> $infos["id_societe"],
                                        "id_user"=>23,
                                        "origine"=>"societe_commande",
-                                       "tache"=>"Une nouvelle commande viens d'être passée et validée par SLIMPAY",
+                                       "tache"=>"Une nouvelle commande vient d'être passée et validée par SLIMPAY",
                                        "id_affaire"=>$infos["id_affaire"],
                                        "type_tache"=>"creation_contrat",
                                        "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
