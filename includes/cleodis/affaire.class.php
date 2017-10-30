@@ -2409,7 +2409,7 @@ class affaire_cleodis extends affaire {
 	public function _AffaireParc($get,$post){
 		// on recupère l'apporteur
 		//log::logger(ATF::usr()->getId(),'ccharlier');
-		log::logger(ATF::_s(),'ccharlier');
+		//log::logger(ATF::_s(),'ccharlier');
 		$apporteur = 28531;//ATF::user()->select(ATF::usr()->getId() , "id_societe");
 
 		ATF::societe()->q->reset()->where('id_apporteur',$apporteur);
@@ -2419,18 +2419,24 @@ class affaire_cleodis extends affaire {
 			ATF::affaire()->q->reset()->addField("affaire.ref","ref")->where('affaire.id_societe',$v["id_societe"]);
 
 			$affaires = ATF::affaire()->select_all();
-			ATF::parc()->q->reset()->addField("parc.ref","ref")->where('parc.id_societe',$v["id_societe"]);
-			$parc = ATF::parc()->select_all();
-			log::logger('parc','ccharlier');
-			log::logger($parc,'ccharlier');
+			$parc = [];
+			foreach ($affaires as $kaff => $vaff) {
+				$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
+				if(!empty($affaires[$kaff]["parc"])) {
+				    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
+        				$parc[]= $vparc;	
+        			}
+				}
+			}
 			$ret[$v["id_societe"]]=array(
 				"societe"=> $v,
 				"affaires"=> $affaires,
-				//"parc"=> $parc
+				"parc"=> $parc
 			);
 		}
 		return $ret;
  	}
+
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
