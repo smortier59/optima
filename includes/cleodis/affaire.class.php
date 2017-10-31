@@ -1217,7 +1217,6 @@ class affaire_cleodis extends affaire {
 	* @return array un tableau avec les données
 	*/
 	public function _affairePartenaire($get,$post) {
-		log::logger('_affairePartenaire','ccharlier');
 	 	// Gestion du tri
 	 	if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
 	 	if (!$get['trid']) $get['trid'] = "desc";
@@ -1768,9 +1767,9 @@ class affaire_cleodis extends affaire {
 		 	$this->q->whereIsNull("site_associe")
 		 			->orWhere("site_associe",'')
 				->addGroup("affaire.id_affaire");
-		}
-		if ($get['provenance'] && $get['provenance'] === 'partenaire'){
+		}else if ($get['provenance'] && $get['provenance'] === 'true' && !$get['site_associe']){
 		 	$this->q->where("provenance",'partenaire')
+		 		->whereIsNotNull('affaire.id_partenaire')
 				->addGroup("affaire.id_affaire");
 		}
 
@@ -2356,7 +2355,9 @@ class affaire_cleodis extends affaire {
         $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
       
 	    $devis = ATF::devis()->select($id_devis);
-	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire"));
+	    // récupérer dans la session l'id societe partenaire quic rée le contrat
+	    // @ccharlier@absystech.fr
+	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_apporteur'=>28531));
         
         ATF::affaire_etat()->insert(array(
             "id_affaire"=>$devis["id_affaire"],
