@@ -1155,7 +1155,7 @@ class societe_cleodis extends societe {
             if ($item1['ordre'] ==$item2['ordre']) {
               return 0;
             }
-            return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;  
+            return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;
           });
           // maintenant il faut appliquer cet ordre aux pack produits
           foreach ($pack_pro_ligne as $k => $v) {
@@ -1210,10 +1210,24 @@ class societe_cleodis extends societe {
           }
           $devis = ATF::devis()->select($id_devis);
 
+          switch ($post["provenance"]) {
+            case 'd023ef3680189f828a53810e3eda0ecc':
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+            break;
+
+            case '7154b414c85f24ffefcefe53490c49bd':
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"la_poste"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+            break;
+
+            default:
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"/*,"id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/ ));
+            break;
+          }
+
           if($post["provenance"]){
-            ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+
           }else{
-            ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"/*,"id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/ ));
+
           }
 
 
@@ -1308,6 +1322,8 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
+    log::logger("ICI" , "mfleurquin");
+
     log::logger("in _infosCredisafePartenaire !",'ccharlier');
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
