@@ -2255,10 +2255,7 @@ class pdf_cleodis extends pdf {
 
 	}
 
-	/** CGL d'un PDF d'un contrat en A3
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @date 25-01-2011
-	*/
+	/*
 	public function conditionsGeneralesDeLocationA3()  {
 		$this->unsetHeader();
 		$this->AddPage();
@@ -2343,8 +2340,6 @@ class pdf_cleodis extends pdf {
 		$this->multicell(95,2,"9.1 Le Locataire ne pourra ni sous-louer, ni prêter, mettre à disposition de quiconque à quelque titre et sous quelque forme que ce soit, tout ou partie des Equipements sans l’accord écrit du Loueur.");
 		$this->multicell(95,2,"9.2 Le Locataire reconnaît que le Loueur l’a tenu informé de l’éventualité d’une cession, d’un nantissement ou d’une délégation, des Equipements ou des créances, au profit du Cessionnaire de son choix, pour une durée n’excédant pas la période initiale de location. Le Cessionnaire sera alors lié par les termes et conditions du contrat, ce que le Locataire accepte dès à présent et sans réserve. En cas d’acceptation par le Cessionnaire, celui-ci se substitue alors à CLEODIS sachant que l’obligation du Cessionnaire se limite à laisser au Locataire la libre disposition des Equipements, les autres obligations restant à la charge de CLEODIS.");
 
-
-
 		//page droite
 		$this->setautopagebreak('disabled',10);
 		$this->SetLeftMargin(210);
@@ -2362,7 +2357,6 @@ class pdf_cleodis extends pdf {
 		$this->article(215,44,'10','ASSURANCE – SINISTRES',8);
 		$this->setfont('arial','I',7);
 		$this->multicell(95,2,"Le Locataire est gardien responsable du matériel qu'il détient. Dès sa mise à disposition et jusqu'à la restitution effective de celui-ci et tant que le matériel reste sous sa garde, le Locataire assume tous les risques de détérioration et de perte, même en cas fortuit. Il est responsable de tout dommage causé par le matériel dans toutes circonstances. Il s'oblige en conséquence à souscrire une assurance couvrant sa responsabilité civile ainsi que celle du Loueur, et couvrant tous les risques de dommages ou de vol subis par les matériels loués avec une clause de délégation d'indemnités au profit du Loueur et une clause renonciation aux recours contre ce dernier. Le Locataire doit informer sans délai le Loueur de tout sinistre en précisant ses circonstances et ses conséquences. En cas de sinistre total ou de vol, couvert ou non par l'assurance, le contrat est résilié. Le Locataire doit au Loueur une indemnisation pour la perte du matériel et pour l'interruption prématurée du contrat calculée et exigible à la date de résiliation. Le montant global de cette indemnisation est égal aux loyers restant à échoir jusqu'à l'issue de la période de location, augmentés de la valeur estimée du matériel détruit ou volé au terme de cette période ou si une expertise est nécessaire, de sa valeur à dire d'expert au jour du sinistre. Les indemnités d'assurances, éventuellement perçues par le Loueur s'imputent en premier lieu sur l'indemnisation de la perte du matériel et ensuite sur l'indemnisation de l'interruption prématurée. Pour un sinistre partiel, en cas d'insuffisance de l'indemnité reçue de la Compagnie d'assurance, le Locataire est tenu de parfaire la remise en état complète des Equipements à ses frais");
-
 
 		$this->article(215,96,'11','EVOLUTION DES EQUIPEMENTS',8);
 		$this->setfont('arial','I',7);
@@ -2428,16 +2422,7 @@ class pdf_cleodis extends pdf {
 		} else{
 			$this->image(__PDF_PATH__.$this->logo,330,200,35);
 		}
-
-
-
-
 	}
-
-	/** CGL d'un PDF d'un contrat en A3
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @date 10-08-2012
-	*/
 	public function conditionsGeneralesDeLocationA4($type)  {
 		$this->unsetHeader();
 		$this->AddPage();
@@ -2594,7 +2579,37 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','BI',8);
 		$this->multicell(0,3,"CGL CLEODIS V09-14",0,"R");
 		$this->setAutoPageBreak(true);
+	}*/
+
+	/** CGL d'un PDF d'un contrat en A3
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @date 18-10-2017
+	*/
+	public function conditionsGeneralesDeLocationA3()  {
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->unsetFooter();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA3.pdf");
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, 5, 5, 400, 0, true);
+
 	}
+
+	/** CGL d'un PDF d'un contrat en A4
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @date 18-10-2017
+	*/
+	public function conditionsGeneralesDeLocationA4($type)  {
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->unsetFooter();
+
+		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA4.pdf");
+		$tplIdx = $this->importPage(1);
+		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
+	}
+
 
 
 	public function contratA4Signature($id){

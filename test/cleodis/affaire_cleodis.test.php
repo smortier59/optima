@@ -1271,7 +1271,58 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(5500 , $res , "PrixTotal incorrect");
 
 	}
+	public function test_CreateAffairePartenaire(){
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+	 	$gerant =ATF::contact()->i(array(
+	 		"id_societe" => $id_soc,
+	 		"nom" => 'mister Test',
+	 	));
+		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
+		$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+		$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
+		$id_produit = ATF::produit()->insert(array(
+			"ref"=>"Test produit",
+			"produit"=>"Produit",
+			"prix_achat"=>500,
+			"id_fabriquant"=> $fab,
+			"id_sous_categorie"=>$sousCat
+		));
+		$post = array(
+			'id_societe'=> $id_soc,
+			'gerant'=> $gerant,
+			'loyer'=> 120,
+			'duree'=> 36,
+			'libelle'=> 'Test Test',
+			'id_produit'=>$id_produit,
+		);
+			$ret = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+		$this->assertEquals($ret["result"],true,'doit retourner true');
 
+		$id_soc2=ATF::societe()->i(
+			array(
+				"societe"=>"myTest",
+				"code_client"=>"M12341",
+				"cs_score"=>75,
+				'date_creation'=> date("Y-m-d", strtotime("-10 years")) 
+			)
+		);
+		$post = array(
+			'id_societe'=> $id_soc2,
+			'gerant'=> $gerant,
+			'loyer'=> 120,
+			'duree'=> 36,
+			'libelle'=> 'Test Test',
+			'id_produit'=>$id_produit,
+		);
+		$ret2 = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+
+		ATF::comite()->q->reset()->where("id_societe",$id_soc2);
+		$res = ATF::comite()->select_all();
+		log::logger($res,'ccharlier');
+		$this->assertEquals($res[0]["etat"],"en_attente",'doit retourner le dernier comité en attente');
+
+
+	}
 
 
 }

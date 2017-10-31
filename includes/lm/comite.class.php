@@ -117,7 +117,7 @@ class comite extends classes_optima {
 			$info_mail["template"] = "comite";
 
 			$info_mail["recipient"] = $recipient;
-			$info_mail["objet"] = "Une demande de comité viens d'être créée pour l'affaire ".ATF::affaire()->select($infos['id_affaire'], "ref").".";
+			$info_mail["objet"] = "Une demande de comité vient d'être créée pour l'affaire ".ATF::affaire()->select($infos['id_affaire'], "ref").".";
 
 			$info_mail["reception_comite"] = "Un comité est en attente de votre part, voici quelques informations concernant ce dernier";
 			$info_mail["id_user"] = ATF::$usr->getID();

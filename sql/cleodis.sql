@@ -132,3 +132,8 @@ ALTER TABLE `questionnaire_fl`
 
 ALTER TABLE `questionnaire_fl_ligne`
   MODIFY `id_questionnaire_fl_ligne` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+
+
+
+
+ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis','vendeur','partenaire') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;

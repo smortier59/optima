@@ -253,7 +253,33 @@ class parc_cleodis extends classes_optima {
 		
 		return $this->i($serial,$s);
 	}
+	public function getParcPartenaire($id_affaire){
+		/*Si contrat pas encore démarré et qu'on a une facture sur la periode actuelle
+				Afficher les parcs meme ceux qui sont inactif
+		Sinon faire comme actuellement*/
+		$parc = NULL;
 
+		ATF::commande()->q->reset()->where("affaire.id_affaire", $id_affaire);
+		$commande = ATF::commande()->select_row();
+
+		if($commande["etat"] == "non_loyer"){
+			ATF::facture()->q->reset()->addField('loyer.loyer')
+									  ->where("facture.date_periode_debut",date("Y-m-d"),"AND","cond_date","<=")
+									  ->where("facture.date_periode_fin",date("Y-m-d"),"AND","cond_date",">=")
+									  ->where("facture.id_affaire", $id_affaire);
+			if(ATF::facture()->select_all()){
+				$this->q->reset()->addCondition("parc.id_affaire",$id_affaire)->addOrder("parc.id_parc","asc");
+				$parc = $this->sa();
+			}
+		}else{
+			$this->q->reset()->addCondition("parc.id_affaire",$id_affaire)
+							   ->addCondition("parc.existence","inactif","AND",NULL,"!=")
+							   ->addCondition("parc.etat","broke","AND",1,"!=")
+							   ->addOrder("parc.id_parc","asc");	
+			$parc = $this->sa();	
+		}
+		return $parc;	
+	}
 	/** 
 	* Retourne un id_parc actif du serial demandé
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
