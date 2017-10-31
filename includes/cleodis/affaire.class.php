@@ -1165,14 +1165,17 @@ class affaire_cleodis extends affaire {
 	* @param $id_affaire number contient l'id affaire qui va servir à la requete.
 	* @return boolean, retourne le boolean qui represente l'etat du paiement
 	*/
-	public function paiementIsReceived($id_affaire) {
+	public function paiementIsReceived($id_affaire, $detail = false) {
 		ATF::transaction_banque()->q->reset()
 			->where('id_affaire', $id_affaire)
 			->where('response_code', "00")
 			->setDimension('row');
 
 		$row = ATF::transaction_banque()->sa();
-		return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
+		if ($row && $detail)
+			return $row;
+		else
+			return !!$row; //on s'embete pas avec les details superflu, c'est true ou false
 	}
 	/**
 	 * [_paiementIsReceived permet de verifier si une affaire est payée ou non pour le recap toshiba www]
@@ -1653,8 +1656,7 @@ class affaire_cleodis extends affaire {
 				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
 			}
 
-
-
+			
 			foreach ($data['data'] as $key => $value) {
 				foreach ($value as $k_=>$val) {
 					if (strpos($k_,".")) {
@@ -1673,12 +1675,22 @@ class affaire_cleodis extends affaire {
 
 		  	$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
-		  	  $data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
-
+				$data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
+				if($loyer = $this->getLoyers($value['affaire.id_affaire_fk'])){
+						$data['data'][$key]["loyer"] = $loyer; // on recupere tous les loyers
+						$data['data'][$key]["duree"] = 0; // la duree de l'affaire (somme des durees de tous les loyers)
+						$data['data'][$key]["montant"] = 0; // montant => duree * montant loyer de tous les loyers
+						foreach ($loyer as $i => $l) {
+							$data['data'][$key]["duree"] += $l["duree"];
+							$data['data'][$key]["montant"] += $l["loyer"]*$l["duree"];
+						}
+				}
+				
+				
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  $data['data'][$key]["retourPV"] = false;
-				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk']);
+				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk'], true);
 			  if($commande){
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
@@ -1697,6 +1709,7 @@ class affaire_cleodis extends affaire {
 			if ($get['no-limit']) header("ts-no-limit: 1");
 			$return = $data['data'];
 		}
+		
 		return $return;
 	}
 
