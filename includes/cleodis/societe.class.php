@@ -1312,72 +1312,75 @@ class societe_cleodis extends societe {
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
         $gerants = $data["gerant"];
-
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
         if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
         ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
                                     ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
         $res = ATF::societe()->select_row();
-
         try {
-
             if($res){
                 $id_societe = $res["id_societe"];
-                ATF::societe()->u($res);
-            } else {
-                log::logger($_SESSION["user"]->id_societe,'ccharlier');
+            }else {
+                //log::logger($_SESSION["user"]->id_societe,'ccharlier');
                 $data_soc = $data;
-                                // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
+                // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
                 $data_soc["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
                 $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
-                                            // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
+                // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
-
-                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241/*ATF::usr()->*/));
+                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
             }
             if($gerants){
                 foreach ( $gerants as $key => $value) {
-                    ATF::contact()->q->reset()->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($value["nom"])),"AND")
-                                                ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($value["prenom"])),"AND")
-                                                ->where("id_societe", $id_societe,"AND");
+                    ATF::contact()->q->reset()
+                        ->where("LOWER(nom)", ATF::db($this->db)->real_escape_string(strtolower($value["nom"])),"AND")
+                        ->where("LOWER(prenom)", ATF::db($this->db)->real_escape_string(strtolower($value["prenom"])),"AND")
+                        ->where("id_societe", $id_societe,"AND");
+                  $gerant[$key] = $contact;
+                  $c = ATF::contact()->select_row();
+                  //Si le contact n'exite pas dans optima, on l'insert
+                  if(!$c){
+                    $contact = array( "nom"=>$value["nom"],
+                                      "prenom"=>$value["prenom"],
+                                      "fonction"=>$value["fonction"],
+                                      "email"=>$email,
+                                      "id_societe"=> $id_societe,
+                                      "est_dirigeant"=>"oui"
+                                    );
                     $gerant[$key] = $contact;
-                    $c = ATF::contact()->select_row();
-
-                      //Si le contact n'exite pas dans optima, on l'insert
-                    if(!$c){
-                        $contact = array( "nom"=>$value["nom"],
-                                          "prenom"=>$value["prenom"],
-                                          "fonction"=>$value["fonction"],
-                                          "email"=>"",
-                                          "id_societe"=> $id_societe,
-                                          "est_dirigeant"=>"oui"
-                                        );
-                        $gerant[$key] = $contact;
-                        $gerant[$key]["id_contact"] = ATF::contact()->insert( $contact );
-                    } else {
-                        //Sinon on le met à jour
-                        $gerant[$key] = array(  "nom"=>$c["nom"],
-                                                "prenom"=>$c["prenom"],
-                                                "fonction"=>$value["fonction"],
-                                                "gsm"=>$c["gsm"],
-                                                "email"=>$c["email"],
-                                                "id_societe"=> $id_societe,
-                                                "id_contact"=>$c["id_contact"]
-                                              );
-                        ATF::contact()->u(array("id_contact"=>$c["id_contact"], "fonction"=>$value["fonction"], "est_dirigeant"=>"oui"));
-                    }
+                    $gerant[$key]["id_contact"] = ATF::contact()->insert( $contact );
+                  } else {
+                    //Sinon on le met à jour
+                    $gerant[$key] = array(  "nom"=>$c["nom"],
+                                            "prenom"=>$c["prenom"],
+                                            "fonction"=>$value["fonction"],
+                                            "gsm"=>$c["gsm"],
+                                            "email"=>$c["email"],
+                                            "id_societe"=> $id_societe,
+                                            "id_contact"=>$c["id_contact"]
+                                          );
+                    ATF::contact()->u(array("id_contact"=>$c["id_contact"], "fonction"=>"Gérant"));
+                  }
                 }
+
+            }else{
+                //Si Credit Safe n'a retourné aucun dirigeant, on en cré un en attendant
+                $contact = array( "nom"=>"GERANT",
+                                  "email"=>$email,
+                                  "id_societe"=> $id_societe
+                              );
+                $gerant[0] = $contact;
+                $gerant[0]["id_contact"] = ATF::contact()->insert( $contact );
             }
             return array("result"=>true ,
                 "societe"=>ATF::societe()->select($id_societe),
-                "gerants"=>$gerant,
-
-
+                "gerants"=>$gerant
             );
-        } catch (Exception $e) {
-            throw new errorATF("erreurCS",500);
+        } catch (ATFerror $e) {
+            log::logger($e->getMessage(),"ccharlier");
+            throw new errorATF("erreurCS inside",500);
 
         }
     } else{

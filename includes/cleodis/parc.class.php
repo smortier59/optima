@@ -263,7 +263,8 @@ class parc_cleodis extends classes_optima {
 		$commande = ATF::commande()->select_row();
 
 		if($commande["etat"] == "non_loyer"){
-			ATF::facture()->q->reset()->where("facture.date_periode_debut",date("Y-m-d"),"AND","cond_date","<=")
+			ATF::facture()->q->reset()->addField('loyer.loyer')
+									  ->where("facture.date_periode_debut",date("Y-m-d"),"AND","cond_date","<=")
 									  ->where("facture.date_periode_fin",date("Y-m-d"),"AND","cond_date",">=")
 									  ->where("facture.id_affaire", $id_affaire);
 			if(ATF::facture()->select_all()){
