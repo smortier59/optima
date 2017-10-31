@@ -65,58 +65,6 @@ class contact_cleodis extends contact {
 		}
 
 	}
-	/**
-	 * Methode temporaire de login pour le portail partenaire, UNIQUEMENT pour depanner le temps du retour de yann
-	 * @param  [array] $infos [Infos pour le login]
-	 * @return [array] $res   [champs de la table contact qui constitueront la session]
-	 */
-	public function login($infos){
-		$this->q->reset()
-			->where('login',ATF::db()->escape_string($infos["login"]))
-			->setDimension('row');
-
-		//Test du login et initialisation des informations utilisateurs
-		if ($res = $this->select_all()) {
-			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["password"])==hash('sha256',__GOD_PASSWORD__))
-				|| hash('sha256',$infos["password"])==$res["pwd"]
-				|| (strlen($infos["password"])==64 && $infos["password"]==$res["pwd"])
-				|| $infos["api_key"] && $infos["api_key"]==base64_encode(sha1($res["api_key"]))
-				){
-				//$this->website_codename = $infos["schema"];
-				//$this->last_activity = $res["date_activity"];
-
-				//$this->init($res["id_".self::$dbSyncClassName]);
-
-				// Redirection immédiate vers le permalien
-				//if ($infos["k"] && $permalink = ATF::permalink()->getPermalink($infos["k"])) $this->redirect($permalink);
-
-				// Stocker en cookies
-				if ($infos["store"]) {
-					setcookie("l",$infos["login"], time()+86400*7,"/");
-					setcookie("p",$infos["password"], time()+86400*7,"/");
-					setcookie("s",$infos["seed"], time()+86400*7,"/");
-				} else{
-					setcookie("l","", time()+86400*7,"/");
-					setcookie("p","", time()+86400*7,"/");
-					setcookie("s","", time()+86400*7,"/");
-				}
-
-				//ATF::tracabilite()->insert(array("tracabilite"=>"insert", "id_user"=>$this->getID(), "nom_element"=>"LOGIN"));
-
-				return $res;
-
-			} elseif (strlen($res["pwd"])==32) {
-
-				session_destroy();
-				header(utf8_decode('x-error-reason: Pour renforcer la sécurité de vos informations, vous devez réinitialiser votre mot de passe. Merci de votre compréhension. Cliquez sur le lien - mot de passe oublié - du formulaire.'));
-				return false;
-
-			}
-		}
-
-		session_destroy();
-		return false;
-	}
 };
 
 class contact_cleodisbe extends contact_cleodis { };

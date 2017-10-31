@@ -643,6 +643,32 @@ class contact extends classes_optima {
 		$this->q->reset()->where("id_societe",$post['id_societe']);
 		return $this->select_all();
 	}
-};
 
-?>
+	/**
+	 * Methode de login pour sur login/pwd de la table contact
+	 * @param  [array] $infos [Infos pour le login]
+	 * @param  [array] $infos[p]
+	 * @param  [array] $infos[u]
+	 * @return [array] $res   [champs de la table contact qui constitueront la session]
+	 */
+	public function login($infos){
+		$this->q->reset()
+			/*->select('contact.id_societe')
+			->select('contact.civilite')
+			->select('contact.prenom')
+			->select('contact.nom')*/
+			->where('login',ATF::db()->escape_string($infos["u"]))
+			->setDimension('row');
+
+		//Test du login et initialisation des informations utilisateurs
+		if ($res = $this->select_all()) {
+			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["p"])==hash('sha256',__GOD_PASSWORD__))
+				|| hash('sha256',$infos["p"])==$res["pwd"]
+				){
+				return $res;
+			}
+		}
+
+		return false;
+	}
+}
