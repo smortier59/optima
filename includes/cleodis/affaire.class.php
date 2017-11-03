@@ -2423,6 +2423,8 @@ class affaire_cleodis extends affaire {
 	public function _AffaireParc($get,$post){
 		// on recupère l'apporteur
 		$utilisateur = ATF::$usr->get("contact");
+		log::logger($utilisateur , "mfleurquin");
+
 		$apporteur = $utilisateur["id_societe"];
 
 		ATF::societe()->q->reset()->where('id_apporteur',$apporteur);
