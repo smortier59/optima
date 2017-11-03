@@ -2423,7 +2423,7 @@ class affaire_cleodis extends affaire {
 	public function _AffaireParc($get,$post){
 		// on recupère l'apporteur
 		//$apporteur = 28531;
-		$utilisateur  = ATF::usr()->get("contact");
+		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
 
 		if($apporteur){
