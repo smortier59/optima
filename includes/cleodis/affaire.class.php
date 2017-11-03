@@ -2470,7 +2470,7 @@ class affaire_cleodis extends affaire {
 					);
 				}
 			}else{
-				header("ts-total-row: ".0);
+				header("ts-total-row:0");
 				$ret=array(	);
 			}
 
