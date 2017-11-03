@@ -2610,6 +2610,28 @@ class pdf_cleodis extends pdf {
 		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
 	}
 
+  /**
+   * @author Anthony Lahlah <alahlah@absystech.fr>
+   * [_documents Retourne le binaire d'un pdf en fonction du type de doc voulu]
+   * @param  [array] $get [contient l'id affaire et le type de document]
+   * @return [type]      [description]
+   */
+	public function _documents($get){
+    $id_affaire = $get["id_affaire"];
+		$fonction = $get["document"];
+    ATF::commande()->q->reset()
+      ->addField("id_commande")
+      ->where("id_affaire", ATF::affaire()->decryptId($id_affaire))
+      ->setDimension('cell');
+    $id_commande = ATF::commande()->sa();
+
+	  $buffer = $this->generic($fonction,$id_commande, true);
+    return array(
+      "data" => base64_encode($buffer),
+      "strMimeType" => "application/pdf"
+    );
+
+	}
 
 
 	public function contratA4Signature($id){
