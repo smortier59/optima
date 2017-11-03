@@ -278,13 +278,13 @@ class parc_cleodis extends classes_optima {
 			$this->q->reset()->addCondition("parc.id_affaire",$id_affaire)
 							   ->addCondition("parc.existence","inactif","AND",NULL,"!=")
 							   ->addCondition("parc.etat","broke","AND",1,"!=")
-							   ->addOrder("parc.id_parc","asc");	
-			$parc = $this->sa();	
+							   ->addOrder("parc.id_parc","asc");
+			$parc = $this->sa();
 		}
-		return $parc;	
+		return $parc;
 	}
 
-	/** 
+	/**
 	* Retourne un id_parc actif du serial demandé
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param string $serial
