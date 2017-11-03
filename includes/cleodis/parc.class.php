@@ -26,6 +26,7 @@ class parc_cleodis extends classes_optima {
 	}
 
 	public function updateExistenzOriginale($commande,$affaire,$affaire_parente=NULL,$affaires_parentes=NULL){
+
 		ATF::parc()->q->reset()->addCondition("id_affaire",$affaire->get('id_affaire'));
 		$parc=ATF::parc()->sa();
 		//Pour tous les parcs de l'affaire
@@ -98,7 +99,6 @@ class parc_cleodis extends classes_optima {
 								}
 							}
 						}
-
 					}
 				}
 			}
