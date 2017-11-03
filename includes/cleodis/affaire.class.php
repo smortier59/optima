@@ -2436,37 +2436,44 @@ class affaire_cleodis extends affaire {
 									  ->addGroup('affaire.id_affaire');
 			$affaires = ATF::affaire()->select_all();
 
-			foreach ($affaires as $key => $value) {
-				$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
-				$societes["data"][$id_soc] = ATF::societe()->select($id_soc);
-			}
 
-			$societes["count"] = count($societes["data"]);
-
-			foreach ($societes['data'] as $k => $v) {
-				$v["id_societe"] = ATF::societe()->cryptID($v['id_societe']);
-				$parc = [];
-
-				foreach ($affaires as $kaff => $vaff) {
-					$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
-					$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
-					$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
-
-					unset($affaires[$kaff]['affaire.id_affaire']);
-					if(!empty($affaires[$kaff]["parc"])) {
-					    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
-					    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
-	        				$parc[]= $vparc;
-	        			}
-					}
+			if($affaires){
+				foreach ($affaires as $key => $value) {
+					$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
+					$societes["data"][$id_soc] = ATF::societe()->select($id_soc);
 				}
-				header("ts-total-row: ".$societes['count']);
-				$ret[$v["id_societe"]]=array(
-					"societe"=> $v,
-					"affaires"=> $affaires,
-					"parc"=> $parc
-				);
+
+				$societes["count"] = count($societes["data"]);
+
+				foreach ($societes['data'] as $k => $v) {
+					$v["id_societe"] = ATF::societe()->cryptID($v['id_societe']);
+					$parc = [];
+
+					foreach ($affaires as $kaff => $vaff) {
+						$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
+						$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
+						$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
+
+						unset($affaires[$kaff]['affaire.id_affaire']);
+						if(!empty($affaires[$kaff]["parc"])) {
+						    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
+						    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
+		        				$parc[]= $vparc;
+		        			}
+						}
+					}
+					header("ts-total-row: ".$societes['count']);
+					$ret[$v["id_societe"]]=array(
+						"societe"=> $v,
+						"affaires"=> $affaires,
+						"parc"=> $parc
+					);
+				}
+			}else{
+				header("ts-total-row: ".0);
+				$ret=array(	);
 			}
+
 
 			return $ret;
 		} else {
