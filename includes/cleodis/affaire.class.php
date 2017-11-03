@@ -2477,7 +2477,7 @@ class affaire_cleodis extends affaire {
 
 			return $ret;
 		} else {
-			throw new ATFerror("Probleme d'apporteur", 500);
+			throw new errorATF("Probleme d'apporteur",500);
 
 		}
  	}
