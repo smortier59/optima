@@ -2471,16 +2471,22 @@ class affaire_cleodis extends affaire {
 					$parc = [];
 
 					foreach ($affaires as $kaff => $vaff) {
-						$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire'] ? $vaff['affaire.id_affaire'] : $this->decryptID($vaff['id_affaire']));
-						$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
-						$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
+						$idaff = $vaff['affaire.id_affaire'];
+						if (!$idaff) {
+							$idaff = $this->decryptID($vaff['id_affaire']):
+						}
+						if ($idaff) {// Parfois l'id_affaire est vide ! (à vérifier)
+							$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($id_affaire);
+							$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
+							$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
 
-						unset($affaires[$kaff]['affaire.id_affaire']);
-						if(!empty($affaires[$kaff]["parc"])) {
-						    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
-						    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
-		        				$parc[]= $vparc;
-		        			}
+							unset($affaires[$kaff]['affaire.id_affaire']);
+							if(!empty($affaires[$kaff]["parc"])) {
+							    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
+							    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
+			        				$parc[]= $vparc;
+			        			}
+							}
 						}
 					}
 					header("ts-total-row: ".$societes['count']);
