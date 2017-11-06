@@ -1036,6 +1036,7 @@ class affaire_cleodis extends affaire {
 			} else {
 				$return['data'][$k]['parentes'] = "";
 			}
+
 		}
 		return $return;
 	}
@@ -1706,6 +1707,10 @@ class affaire_cleodis extends affaire {
 				  }else{
 					$data['data'][$key]["contrat_signe"] = false;
 				  }
+
+					$data['data'][$key]["file_facture_fournisseur"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"facture_fournisseur"));
+					$data['data'][$key]["file_cni"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"cni"));
+
 				}
 			}
 			if($get['id_affaire']){
@@ -1846,9 +1851,9 @@ class affaire_cleodis extends affaire {
 			unset($data["id_societe"],  $data["id_commercial"]);
 		  }
 		  foreach ($data["devis"] as $key => $value) {
-			$data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
-			if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
-			if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
+				$data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
+				if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
+				if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
 		  }
 
 		  ATF::loyer()->q->reset()->where("loyer.id_affaire", $get['id_affaire']);
@@ -1857,8 +1862,9 @@ class affaire_cleodis extends affaire {
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
 		  //$data["etat_comite_cleodis"] = "en_attente"; //état par defaut vu que le comite est inséré automatiquement quelque soit le resultat sgef/creditSafe
 
-		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni")) ? "oui" : "non";
-		  $data["file_cniVerso"] = file_exists($this->filepath($get['id_affaire'],"cniVerso")) ? "oui" : "non";
+		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni"));
+		  $data["file_facture_fournisseur"] = file_exists($this->filepath($get["id_affaire"],"facture_fournisseur"));
+		  $data["file_cniVerso"] = file_exists($this->filepath($get["id_affaire"],"cniVerso"));
 
 		  foreach ($data["comites"] as $key => $value) {
 		  	if($value['description']=== 'Comité CLEODIS'){
