@@ -2442,7 +2442,6 @@ class affaire_cleodis extends affaire {
 		$apporteur = $utilisateur["id_societe"];
 
 		if($apporteur){
-
 			$societes = $ret= [];
 			ATF::affaire()->q->reset()->addField("affaire.ref","ref")
 									  ->addField("devis.id_devis",'id_devis')
