@@ -245,6 +245,11 @@ class contact extends classes_optima {
 			$infos['id_owner'] = ATF::$usr->getID();
 		}
 
+		if($infos["pwd"]){
+			$infos["pwd"] = hash('sha256',$infos["pwd"]);
+		}
+
+
 		$return = parent::insert($infos,$s,$files,$cadre_refreshed);
 
 		if ($this->syncLdap) {
@@ -266,6 +271,10 @@ class contact extends classes_optima {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		// Sauvegarde de l'ancien CN ldap
 		$this->infoCollapse($infos);
+
+		if($infos["pwd"]){
+			$infos["pwd"] = hash('sha256',$infos["pwd"]);
+		}
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -662,6 +671,7 @@ class contact extends classes_optima {
 
 		//Test du login et initialisation des informations utilisateurs
 		if ($res = $this->select_all()) {
+
 			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["p"])==hash('sha256',__GOD_PASSWORD__))
 				|| hash('sha256',$infos["p"])==$res["pwd"]
 				){
