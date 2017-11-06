@@ -144,17 +144,14 @@ class commande_cleodis extends commande {
 	 * @return [array]       [description]
 	 */
 	public function _contratPartenaire($get,$post) {
-		$utilisateur  = ATF::$usr->get("contact");
-		$apporteur = $utilisateur["id_societe"];
-		if ($apporteur) {
+		if ($apporteur = ATF::$usr->get("contact")) {
 			ATF::commande()->q->reset()
 				//->addField('affaire.*, loyer.*')
 				->addJointure("commande","id_societe","societe","id_societe")
 				->addJointure("commande","id_affaire","affaire","id_affaire")
 				->addJointure("commande","id_affaire","loyer","id_affaire")
 				->where("affaire.provenance", "partenaire")
-				//->where("affaire.id_partenaire", $apporteur); // en attendant la resolution du probleme de session
-				->where("commande.id_societe", "28672"); // en attendant la resolution du probleme de session
+				->where("affaire.id_partenaire", $apporteur["id_societe"]); // en attendant la resolution du probleme de session
 
 			if($get["search"]) {
 				ATF::commande()->q->where("affaire.ref", "%".$get["search"]."%" , "OR", "search", "LIKE")
