@@ -1323,8 +1323,10 @@ class societe_cleodis extends societe {
    */
   public function _infosCredisafePartenaire($get, $post){
     log::logger("ICI" , "mfleurquin");
-
+    $utilisateur  = ATF::$usr->get("contact");
+    $apporteur = $utilisateur["id_societe"];
     log::logger("in _infosCredisafePartenaire !",'ccharlier');
+    log::logger($apporteur,'ccharlier');
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
         $gerants = $data["gerant"];
@@ -1340,13 +1342,13 @@ class societe_cleodis extends societe {
                 //log::logger($_SESSION["user"]->id_societe,'ccharlier');
                 $data_soc = $data;
                 // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
-                $data_soc["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
+                //$data_soc["id_apporteur"]   = $apporteur; //Apporteur d'affaire TOSHIBA
                 $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
                 // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
-                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => 6241));
             }
             if($gerants){
                 foreach ( $gerants as $key => $value) {

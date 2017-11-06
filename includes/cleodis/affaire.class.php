@@ -115,6 +115,7 @@ class affaire_cleodis extends affaire {
 
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
+		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="ref";
@@ -2369,7 +2370,10 @@ class affaire_cleodis extends affaire {
 	    $devis = ATF::devis()->select($id_devis);
 	    // récupérer dans la session l'id societe partenaire quic rée le contrat
 	    // @ccharlier@absystech.fr
-	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_apporteur'=>28531));
+	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_apporteur'=>$apporteur));
+
+	    // une fois l'id affaire connue on peut ajouter le devis
+	    //ATF::optimaUploadFile(req, files.cni, 'affaire', $devis["id_affaire"],'cni')
 
         ATF::affaire_etat()->insert(array(
             "id_affaire"=>$devis["id_affaire"],
