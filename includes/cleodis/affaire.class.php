@@ -2314,7 +2314,8 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post) {
-		$id_societe = $post['id_societe']; //ATF::societe()->decryptId($post['id_societe']);
+		$id_societe = ATF::$usr->get('contact','id_societe');
+		$id_contact = ATF::$usr->get('contact','id_contact');
 		$devis = array(
 	      "id_societe" => ATF::$usr->get('contact','id_societe'),
 	      "type_contrat" => "lld",
@@ -2323,10 +2324,10 @@ class affaire_cleodis extends affaire {
 	      "devis" => $post['libelle'],
 	      "date" => date("d-m-Y"),
 	      "type_devis" => "normal",
-	      "id_contact" => ATF::$usr->get('contact','id_contact'),
+	      "id_contact" => $id_contact,
 	      "id_user"=>ATF::usr()->getId(), // + tard id de l'user loggué sur
 	      "type_affaire" => "normal");
-log::logger($devis,ygautheron)		;
+
       	$values_devis =array();
 
       	$montantLoyer = $duree = 0;
@@ -2371,7 +2372,7 @@ log::logger($devis,ygautheron)		;
 	    $devis = ATF::devis()->select($id_devis);
 	    // récupérer dans la session l'id societe partenaire quic rée le contrat
 	    // @ccharlier@absystech.fr
-	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>$id_societe));
 
 	    // une fois l'id affaire connue on peut ajouter le devis
 	    //ATF::optimaUploadFile(req, files.cni, 'affaire', $devis["id_affaire"],'cni')
@@ -2380,11 +2381,11 @@ log::logger($devis,ygautheron)		;
             "id_affaire"=>$devis["id_affaire"],
             "etat"=>"reception_demande"
         ));
-		$societe = ATF::societe()->select($post["id_societe"]);
+		$societe = ATF::societe()->select($îd_societe);
       	$comite = array  (
             "id_societe" => $id_societe,
             "id_affaire" => $devis["id_affaire"],
-            "id_contact" => $post['gerant'],
+            "id_contact" => $id_contact,
             "activite" => $societe["activite"],
             "id_refinanceur" => 4,
             "date_creation" => $societe["date_creation"],
