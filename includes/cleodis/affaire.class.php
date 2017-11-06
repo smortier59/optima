@@ -2372,7 +2372,7 @@ class affaire_cleodis extends affaire {
 	    $devis = ATF::devis()->select($id_devis);
 	    // récupérer dans la session l'id societe partenaire quic rée le contrat
 	    // @ccharlier@absystech.fr
-	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>$id_societe));
+	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 	    // une fois l'id affaire connue on peut ajouter le devis
 	    //ATF::optimaUploadFile(req, files.cni, 'affaire', $devis["id_affaire"],'cni')
