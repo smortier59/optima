@@ -2457,7 +2457,7 @@ class affaire_cleodis extends affaire {
 									  ->where('affaire.id_partenaire',$apporteur)
 									  ->addGroup('affaire.id_affaire');
 			$affaires = ATF::affaire()->select_all();
-
+log::logger($affaires,ygautheron);
 
 			if($affaires){
 				foreach ($affaires as $key => $value) {
