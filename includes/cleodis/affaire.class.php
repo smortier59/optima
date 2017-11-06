@@ -2326,6 +2326,7 @@ class affaire_cleodis extends affaire {
 	      "id_contact" => ATF::$usr->get('contact','id_contact'),
 	      "id_user"=>ATF::usr()->getId(), // + tard id de l'user loggué sur
 	      "type_affaire" => "normal");
+log::logger($devis,ygautheron)		;
       	$values_devis =array();
 
       	$montantLoyer = $duree = 0;
