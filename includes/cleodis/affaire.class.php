@@ -2314,8 +2314,8 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post) {
-		$id_societe = ATF::$usr->get('contact','id_societe');
-		$id_contact = ATF::$usr->get('contact','id_contact');
+		$id_societe = $post["id_societe"];
+		$id_contact = $post["gerant"];
 		$devis = array(
 	      "id_societe" => ATF::$usr->get('contact','id_societe'),
 	      "type_contrat" => "lld",
