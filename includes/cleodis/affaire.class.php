@@ -2317,7 +2317,7 @@ class affaire_cleodis extends affaire {
 		$id_societe = $post["id_societe"];
 		$id_contact = $post["gerant"];
 		$devis = array(
-	      "id_societe" => ATF::$usr->get('contact','id_societe'),
+	      "id_societe" => $id_societe,
 	      "type_contrat" => "lld",
 	      "validite" => date("d-m-Y", strtotime("+1 month")),
 	      "tva" => __TVA__,
