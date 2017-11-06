@@ -2457,7 +2457,6 @@ class affaire_cleodis extends affaire {
 									  ->where('affaire.id_partenaire',$apporteur)
 									  ->addGroup('affaire.id_affaire');
 			$affaires = ATF::affaire()->select_all();
-log::logger($affaires,ygautheron);
 
 			if($affaires){
 				foreach ($affaires as $key => $value) {
@@ -2472,8 +2471,7 @@ log::logger($affaires,ygautheron);
 					$parc = [];
 
 					foreach ($affaires as $kaff => $vaff) {
-log::logger($vaff,ygautheron);
-						$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
+						$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire'] ? $vaff['affaire.id_affaire'] : $this->decryptID($vaff['affaire.id_affaire']));
 						$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
 						$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
 
