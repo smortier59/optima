@@ -2472,6 +2472,7 @@ log::logger($affaires,ygautheron);
 					$parc = [];
 
 					foreach ($affaires as $kaff => $vaff) {
+log::logger($vaff,ygautheron);
 						$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
 						$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
 						$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
