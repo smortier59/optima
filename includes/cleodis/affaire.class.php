@@ -1655,7 +1655,7 @@ class affaire_cleodis extends affaire {
 				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
 			}
 
-			
+
 			foreach ($data['data'] as $key => $value) {
 				foreach ($value as $k_=>$val) {
 					if (strpos($k_,".")) {
@@ -1684,8 +1684,8 @@ class affaire_cleodis extends affaire {
 							$data['data'][$key]["montant"] += $l["loyer"]*$l["duree"];
 						}
 				}
-				
-				
+
+
 			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
 			  $commande = ATF::commande()->select_row();
 			  $data['data'][$key]["retourPV"] = false;
@@ -1708,7 +1708,7 @@ class affaire_cleodis extends affaire {
 			if ($get['no-limit']) header("ts-no-limit: 1");
 			$return = $data['data'];
 		}
-		
+
 		return $return;
 	}
 
@@ -2353,12 +2353,12 @@ class affaire_cleodis extends affaire {
 	    $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
         $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
-      
+
 	    $devis = ATF::devis()->select($id_devis);
 	    // récupérer dans la session l'id societe partenaire quic rée le contrat
 	    // @ccharlier@absystech.fr
 	    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_apporteur'=>28531));
-        
+
         ATF::affaire_etat()->insert(array(
             "id_affaire"=>$devis["id_affaire"],
             "etat"=>"reception_demande"
@@ -2422,40 +2422,64 @@ class affaire_cleodis extends affaire {
 	*/
 	public function _AffaireParc($get,$post){
 		// on recupère l'apporteur
-		//log::logger(ATF::usr()->getId(),'ccharlier');
-		//log::logger(ATF::_s(),'ccharlier');
-		$apporteur = 28531;//ATF::user()->select(ATF::usr()->getId() , "id_societe");
+		//$apporteur = 28531;
+		$utilisateur  = ATF::$usr->get("contact");
+		$apporteur = $utilisateur["id_societe"];
 
-		ATF::societe()->q->reset()->where('id_apporteur',$apporteur);
-		$societes = ATF::societe()->select_all(false,'desc',false,true);
-		$ret= [];
-		foreach ($societes['data'] as $k => $v) {
-			ATF::affaire()->q->reset()->addField("affaire.ref","ref")->addField("devis.id_devis",'id_devis')->from("affaire","id_affaire","devis","id_affaire")
-			->where('affaire.id_societe',$v["id_societe"])->addGroup('affaire.id_affaire');
+		if($apporteur){
+
+			$societes = $ret= [];
+			ATF::affaire()->q->reset()->addField("affaire.ref","ref")
+									  ->addField("devis.id_devis",'id_devis')
+									  ->from("affaire","id_affaire","devis","id_affaire")
+									  ->where('affaire.id_partenaire',$apporteur)
+									  ->addGroup('affaire.id_affaire');
 			$affaires = ATF::affaire()->select_all();
-			$v["id_societe"] = $this->cryptID($v['id_societe']);
-			$parc = [];
-			foreach ($affaires as $kaff => $vaff) {
-				$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
-				$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
-				$affaires[$kaff]["id_devis"] = $this->cryptID($vaff['id_devis']);
 
-				unset($affaires[$kaff]['affaire.id_affaire']);
-				if(!empty($affaires[$kaff]["parc"])) {
-				    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
-				    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
-        				$parc[]= $vparc;
-        			}
+
+			if($affaires){
+				foreach ($affaires as $key => $value) {
+					$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
+					$societes["data"][$id_soc] = ATF::societe()->select($id_soc);
 				}
+
+				$societes["count"] = count($societes["data"]);
+
+				foreach ($societes['data'] as $k => $v) {
+					$v["id_societe"] = ATF::societe()->cryptID($v['id_societe']);
+					$parc = [];
+
+					foreach ($affaires as $kaff => $vaff) {
+						$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($vaff['affaire.id_affaire']);
+						$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
+						$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
+
+						unset($affaires[$kaff]['affaire.id_affaire']);
+						if(!empty($affaires[$kaff]["parc"])) {
+						    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
+						    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
+		        				$parc[]= $vparc;
+		        			}
+						}
+					}
+					header("ts-total-row: ".$societes['count']);
+					$ret[$v["id_societe"]]=array(
+						"societe"=> $v,
+						"affaires"=> $affaires,
+						"parc"=> $parc
+					);
+				}
+			}else{
+				header("ts-total-row:0");
+				$ret=array(	);
 			}
-		header("ts-total-row: ".$societes['count']);
-			$ret[$v["id_societe"]]=array(
-				"societe"=> $v,
-				"affaires"=> $affaires,
-				"parc"=> $parc
-			);
+
+
+			return $ret;
+		} else {
+			throw new errorATF("Probleme d'apporteur",500);
+
 		}
-		return $ret;
  	}
 
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
