@@ -2381,7 +2381,7 @@ class affaire_cleodis extends affaire {
             "id_affaire"=>$devis["id_affaire"],
             "etat"=>"reception_demande"
         ));
-		$societe = ATF::societe()->select($îd_societe);
+		$societe = ATF::societe()->select($id_societe);
       	$comite = array  (
             "id_societe" => $id_societe,
             "id_affaire" => $devis["id_affaire"],
