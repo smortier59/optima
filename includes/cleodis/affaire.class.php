@@ -2316,14 +2316,14 @@ class affaire_cleodis extends affaire {
 	public function _CreateAffairePartenaire($get,$post) {
 		$id_societe = $post['id_societe']; //ATF::societe()->decryptId($post['id_societe']);
 		$devis = array(
-	      "id_societe" => $id_societe,
+	      "id_societe" => ATF::$usr->get('contact','id_societe'),
 	      "type_contrat" => "lld",
 	      "validite" => date("d-m-Y", strtotime("+1 month")),
 	      "tva" => __TVA__,
 	      "devis" => $post['libelle'],
 	      "date" => date("d-m-Y"),
 	      "type_devis" => "normal",
-	      "id_contact" => $post["gerant"],
+	      "id_contact" => ATF::$usr->get('contact','id_contact'),
 	      "id_user"=>ATF::usr()->getId(), // + tard id de l'user loggué sur
 	      "type_affaire" => "normal");
       	$values_devis =array();
