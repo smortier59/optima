@@ -138,6 +138,58 @@ class commande_cleodis extends commande {
 
 
 	/**
+	 * [_contratPartenaire retourne les contrats du contact loggué]
+	 * @param  [type] $get  [description]
+	 * @param  [type] $post [description]
+	 * @return [array]       [description]
+	 */
+	public function _contratPartenaire($get,$post) {
+		$utilisateur  = ATF::$usr->get("contact");
+		$apporteur = $utilisateur["id_societe"];
+		if ($apporteur) {
+			ATF::commande()->q->reset()
+				//->addField('affaire.*, loyer.*')
+				->addJointure("commande","id_societe","societe","id_societe")
+				->addJointure("commande","id_affaire","affaire","id_affaire")
+				->addJointure("commande","id_affaire","loyer","id_affaire")
+				->where("affaire.provenance", "partenaire")
+				//->where("affaire.id_partenaire", $apporteur); // en attendant la resolution du probleme de session
+				->where("commande.id_societe", "28672"); // en attendant la resolution du probleme de session
+
+			if($get["search"]) {
+				ATF::commande()->q->where("affaire.ref", "%".$get["search"]."%" , "OR", "search", "LIKE")
+													->where("societe.societe", "%".$get["search"]."%" , "OR", "search", "LIKE")
+													->where("societe.siret", "%".$get["search"]."%" , "OR", "search", "LIKE")
+													->where("affaire.affaire", "%".$get["search"]."%" , "OR", "search", "LIKE");
+			}
+			// filtre sur les dates
+			if ($get["filters"] && $get["filters"]["startdate"]){
+				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"]);
+			}
+
+			if ($get["filters"] && $get["filters"]["enddate"]){
+				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
+			}
+
+			if($commande = ATF::commande()->sa()){
+				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
+				foreach ($commande as $key => $cmd) {
+					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
+					$commande[$key]["somme_loyer"] = $cmd["loyer"] * $cmd["duree"];
+				}
+				header("ts-total-row: ".count($commande));
+				return $commande;
+			}
+			else {
+				header("ts-total-row: 0");
+				return array();
+			}
+		}
+	}
+
+
+
+	/**
 	 * Permet de stocker le PDF signé de Sell&Sign
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
