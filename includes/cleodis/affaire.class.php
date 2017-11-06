@@ -2476,7 +2476,7 @@ class affaire_cleodis extends affaire {
 							$idaff = $this->decryptID($vaff['id_affaire']):
 						}
 						if ($idaff) {// Parfois l'id_affaire est vide ! (à vérifier)
-							$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($id_affaire);
+							$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($idaff);
 							$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
 							$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
 
