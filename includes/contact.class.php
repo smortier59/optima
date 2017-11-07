@@ -272,7 +272,7 @@ class contact extends classes_optima {
 		// Sauvegarde de l'ancien CN ldap
 		$this->infoCollapse($infos);
 
-		if($infos["pwd"]){
+		if($infos["pwd"] && strlen($infos["pwd"]) !== 64){
 			$infos["pwd"] = hash('sha256',$infos["pwd"]);
 		}
 
