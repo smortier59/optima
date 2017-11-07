@@ -151,6 +151,14 @@ class commande_cleodis extends commande {
 				->addJointure("commande","id_affaire","affaire","id_affaire")
 				->addJointure("commande","id_affaire","loyer","id_affaire")
 				->where("affaire.provenance", "partenaire")
+
+
+				->where("commande.etat", "non_loyer","AND", false, "!=")
+				->where("commande.etat", "AR","AND", false, "!=")
+				->where("commande.etat", "arreter","AND", false, "!=")
+				->where("commande.etat", "vente","AND", false, "!=")
+
+
 				->where("affaire.id_partenaire", $apporteur["id_societe"]); // en attendant la resolution du probleme de session
 
 			if($get["search"]) {
