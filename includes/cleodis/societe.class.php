@@ -1415,6 +1415,7 @@ class societe_cleodis extends societe {
     try {
       // on met à jour l'état
       ATF::comite()->u(array("id_comite"=>$comite['id_comite'], "etat"=>$decision, "decisionComite"=>"Accepté manuellement"));
+      ATF::affaire()->u(array("id_affaire"=>$id_affaire, "etat_comite"=>$decision));
       // ainsi que la table affaire etat pour la timeline
       ATF::affaire_etat()->insert(array(
           "id_affaire"=>$id_affaire,
