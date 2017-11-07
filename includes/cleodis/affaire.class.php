@@ -1220,7 +1220,7 @@ class affaire_cleodis extends affaire {
 	* @return array un tableau avec les données
 	*/
 	public function _affairePartenaire($get,$post) {
- 
+
 
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
@@ -1244,6 +1244,7 @@ class affaire_cleodis extends affaire {
 		 		'affaire.ref',
 		 		'affaire.etat_comite',
 		 		'affaire.id_societe',
+		 		'affaire.pieces',
 		 		'societe.societe',
 		 		'societe.id_contact_signataire',
 		 		'loyer.loyer');
@@ -2087,7 +2088,7 @@ class affaire_cleodis extends affaire {
 		    // récupérer dans la session l'id societe partenaire qui crée le contrat
 		    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
-		    // une fois l'id affaire connue on peut ajouter le devis		    
+		    // une fois l'id affaire connue on peut ajouter le devis
 		   	$content_file = file_get_contents($files['devis_file']['tmp_name']);
 
 		    $this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file);
@@ -2144,7 +2145,7 @@ class affaire_cleodis extends affaire {
 	            $comite["validite_accord"] = NULL;
 	            ATF::comite()->insert(array("comite"=>$comite));
 	        }
-	    	
+
 	    	ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
