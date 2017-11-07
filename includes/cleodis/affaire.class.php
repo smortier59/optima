@@ -2084,15 +2084,13 @@ class affaire_cleodis extends affaire {
 	        $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
 
 		    $devis = ATF::devis()->select($id_devis);
-		    // récupérer dans la session l'id societe partenaire quic rée le contrat
-		    // @ccharlier@absystech.fr
+		    // récupérer dans la session l'id societe partenaire qui crée le contrat
 		    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
-		    // une fois l'id affaire connue on peut ajouter le devis
-		    log::logger('files','ccharlier');
-		    
-		    log::logger($files,'ccharlier');
-		    $this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$files['devis_file']);
+		    // une fois l'id affaire connue on peut ajouter le devis		    
+		   	$content_file = file_get_contents($files['devis_file']['tmp_name']);
+
+		    $this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file);
 	        ATF::affaire_etat()->insert(array(
 	            "id_affaire"=>$devis["id_affaire"],
 	            "etat"=>"reception_demande"
