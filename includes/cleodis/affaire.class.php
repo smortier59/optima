@@ -1245,6 +1245,7 @@ class affaire_cleodis extends affaire {
 		 		'affaire.ref',
 		 		'affaire.etat_comite',
 		 		'affaire.id_societe',
+		 		'affaire.pieces',
 		 		'societe.societe',
 		 		'societe.id_contact_signataire',
 		 		'loyer.loyer');
@@ -2040,7 +2041,7 @@ class affaire_cleodis extends affaire {
 		      "date" => date("d-m-Y"),
 		      "type_devis" => "normal",
 		      "id_contact" => $id_contact,
-		      "id_user"=>ATF::usr()->getId(), // + tard id de l'user loggué sur
+		      "id_user"=>ATF::$usr->get('contact','id_user'),
 		      "type_affaire" => "normal");
 
 	      	$values_devis =array();
@@ -2116,6 +2117,7 @@ class affaire_cleodis extends affaire {
 	            "description" => "Comite CreditSafe",
 	            "suivi_notifie"=>array(0=>"")
 	        );
+
 			$creation = new DateTime( $societe["date_creation"] );
 	        $creation = $creation->format("Ymd");
 	        $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
@@ -2132,11 +2134,7 @@ class affaire_cleodis extends affaire {
 	        $comite["reponse"] = date("Y-m-d");
 	        $comite["validite_accord"] = date("Y-m-d");
 
-	        try{
 	            ATF::comite()->insert(array("comite"=>$comite));
-	        }catch (errorATF $e) {
-	            throw new errorATF($e->getMessage() ,500);
-	        }
 	        if($comite["etat"]== "accepte"){
 	            //Création du comité CLEODIS
 	            $comite["description"] = "Comité CLEODIS";
