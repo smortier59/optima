@@ -1272,16 +1272,24 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 	public function test_CreateAffairePartenaire(){
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+
 		$contact = ATF::contact()->i(
 			array(
 				"nom"=> "TU affaire",
 				"prenom"=> "affaire new",
-				"nom"=> "TU affaire"
+				"nom"=> "TU affaire",
+				'id_societe' => $id_soc
 			)
 		);
-		ATF::$usr->set('contact', $contact);
+		ATF::user()->q->reset()->Where('login','partenaire');
+		$user = ATF::user()->select_row();
 
-		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		ATF::$usr->set('contact', array(
+			"id_contact"=> $contact,
+			"id_user"=> $user['id_user'],
+			"id_societe"=> $id_soc
+		));
 	 	$gerant =ATF::contact()->i(array(
 	 		"id_societe" => $id_soc,
 	 		"nom" => 'mister Test',
@@ -1343,17 +1351,28 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 	public function test_GetAffairePartenaire(){
-		/*
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		$id_soc2=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		ATF::user()->q->reset()->Where('login','partenaire');
+		$user = ATF::user()->select_row();
 		$contact = ATF::contact()->i(
 			array(
 				"nom"=> "TU affaire",
 				"prenom"=> "affaire new",
-				"nom"=> "TU affaire"
+				"nom"=> "TU affaire",
+				"id_societe" => $id_soc
+
 			)
 		);
-		ATF::$usr->set('contact', $contact);
+		$contact2 = ATF::contact()->i(
+			array(
+				"nom"=> "TU affaire 2",
+				"prenom"=> "affaire new",
+				"nom"=> "TU affaire 2",
+				"id_societe" => $id_soc2
 
-		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+			)
+		);
 	 	$gerant =ATF::contact()->i(array(
 	 		"id_societe" => $id_soc,
 	 		"nom" => 'mister Test',
@@ -1386,11 +1405,70 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 				,"size"=>filesize($file)
 			)
 		);
-		log::logger("test in test ",'ccharlier');
+		ATF::$usr->set('contact', array());
+
+ 		try{
+			ATF::affaire()->_affairePartenaire();
+ 		}catch(errorATF $e){
+ 			$msg = $e->getMessage();
+ 		}
+ 		$this->assertEquals("Probleme d'apporteur", $msg , "Probleme d'apporteur");
+		ATF::$usr->set('contact', array(
+			"id_contact"=> $contact,
+			"id_user"=> $user['id_user'],
+			"id_societe"=> $id_soc
+		));
+		ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
+		ATF::$usr->set('contact', array(
+			"id_contact"=> $contact2,
+			"id_user"=> $user['id_user'],
+			"id_societe"=> $id_soc2
+		));
 
 		ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
+		$post['libelle'] = 'azertyuiop';
+		$aff_crypt = ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
 		$ret = ATF::affaire()->_affairePartenaire();
-		log::logger($ret,"ccharlier");
-		*/
-	}
+		$this->assertEquals(2, count($ret), "Probleme nombre affaire retournées");
+		$this->assertEquals("Test Test", $ret[0]["affaire"], "Probleme affaire retournée");
+		$this->assertEquals("36", $ret[0]["duree"], "Probleme duree affaire retournée");
+		$this->assertEquals(120.00, $ret[0]["loyer"][0]['loyer'], "Probleme loyer affaire retournée");
+
+
+		ATF::affaire()->u(
+			array(
+				"id_affaire"=> ATF::affaire()->decryptId($aff_crypt['id_crypt']),
+				"date"=>date("Y-m-d", strtotime("-5 day"))
+			)
+		);
+
+		$get= array("filters"=> array(
+			'startdate'=> date("Y-m-d", strtotime("-1 day")),
+			'enddate'=> date("Y-m-d", strtotime("+1 day"))
+		));
+		$retFilter = ATF::affaire()->_affairePartenaire($get);
+		$this->assertEquals(1, count($retFilter), "Probleme nombre affaire retournées");
+
+		$get= array("id_affaire"=> ATF::affaire()->decryptId($aff_crypt['id_crypt']));
+		$ret2 = ATF::affaire()->_affairePartenaire($get);
+		$this->assertEquals("azertyuiop", $ret2["affaire"], "Probleme affaire retournée");
+		
+
+
+		// créer une commande sur une affaire		
+		ATF::commande()->i(array(
+			'id_user' => $user['id_user'],
+			'id_affaire'=>ATF::affaire()->decryptId($aff_crypt['id_crypt']),
+			'ref'=> "TestRef",
+			'tva' => "15.2",
+			"id_societe"=> $id_soc2
+		));
+		$get= array("search"=> 'azertyuiop');
+		$ret3 = ATF::affaire()->_affairePartenaire($get);
+		$this->assertEquals(1, count($ret3), "Probleme nombre affaire retournées");
+		$this->assertEquals("azertyuiop", $ret3[0]["affaire"], "Probleme affaire retournée");
+		$this->assertFalse($ret3[0]["contrat_signe"], "Probleme contrat signé retourné");
+		$this->assertFalse($ret3[0]["retourPV"], "Probleme retourPV retourné");
+
+	} 
 }
