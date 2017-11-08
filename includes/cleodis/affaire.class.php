@@ -1395,25 +1395,31 @@ class affaire_cleodis extends affaire {
 					if($loyer = $this->getLoyers($value['affaire.id_affaire_fk'])){
 							$data['data'][$key]["loyer"] = $loyer; // on recupere tous les loyers
 							$data['data'][$key]["duree"] = 0; // la duree de l'affaire (somme des durees de tous les loyers)
-							$data['data'][$key]["montant"] = 0; // montant => duree * montant loyer de tous les loyers
 							foreach ($loyer as $i => $l) {
 								$data['data'][$key]["duree"] += $l["duree"];
-								$data['data'][$key]["montant"] += $l["loyer"]*$l["duree"];
 							}
 					}
 
+					$data['data'][$key]["montant"] = 0; // montant => Somme de tout les prix d'achat
+					ATF::devis_ligne()->q->reset()->from("devis_ligne","id_devis","devis","id_devis")
+												  ->where("devis.id_affaire", $value['affaire.id_affaire_fk']);
+					$devis_ligne = ATF::devis_ligne()->sa();
+					foreach ($devis_ligne as $k => $v) {
+						$data['data'][$key]["montant"] += $v["prix_achat"];
+					}
 
-				  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
-				  $commande = ATF::commande()->select_row();
-				  $data['data'][$key]["retourPV"] = false;
+
+					ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
+					$commande = ATF::commande()->select_row();
+					$data['data'][$key]["retourPV"] = false;
 					$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk'], true);
-				  if($commande){
+					if($commande){
 					$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
 					$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
-				  }else{
+					}else{
 					$data['data'][$key]["contrat_signe"] = false;
-				  }
+					}
 
 					$data['data'][$key]["file_facture_fournisseur"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"facture_fournisseur"));
 					$data['data'][$key]["file_cni"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"cni"));
@@ -2051,7 +2057,7 @@ class affaire_cleodis extends affaire {
 	      	$loyer = array();
 	      	$produits = array();
 	      	$loyer[0] = array(
-	            "loyer__dot__loyer"=>$post["loyer"],
+	            "loyer__dot__loyer"=>0,
 	            "loyer__dot__duree"=>$post["duree"],
 	            "loyer__dot__type"=>"engagement",
 	            "loyer__dot__assurance"=>"",
@@ -2072,7 +2078,7 @@ class affaire_cleodis extends affaire {
 	          "devis_ligne__dot__quantite"=>1,
 	          "devis_ligne__dot__type"=>"sans_objet",
 	          "devis_ligne__dot__ref"=>"",
-	          "devis_ligne__dot__prix_achat"=>"",
+	          "devis_ligne__dot__prix_achat"=>$post["loyer"],
 	          "devis_ligne__dot__id_produit"=>"",
 	          "devis_ligne__dot__id_fournisseur"=>"",
 	          "devis_ligne__dot__visibilite_prix"=>"invisible",
