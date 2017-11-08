@@ -2169,6 +2169,11 @@ class affaire_cleodis extends affaire {
 									  ->addField("devis.id_societe",'id_societe')
 									  ->from("affaire","id_affaire","devis","id_affaire")
 									  ->where('affaire.id_partenaire',$apporteur)
+
+									  ->where("affaire.etat","devis","AND",false,"!=")
+									  ->where("affaire.etat","perdue","AND",false,"!=")
+									  ->where("affaire.etat","terminee","AND",false,"!=")
+
 									  ->addGroup('affaire.id_affaire');
 			$affaires = ATF::affaire()->select_all();
 
