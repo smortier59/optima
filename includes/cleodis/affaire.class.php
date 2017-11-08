@@ -123,6 +123,7 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
+		$this->foreign_key['id_partenaire'] =  "societe";
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
@@ -1220,7 +1221,7 @@ class affaire_cleodis extends affaire {
 	* @return array un tableau avec les données
 	*/
 	public function _affairePartenaire($get,$post) {
- 
+
 
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
@@ -2087,7 +2088,7 @@ class affaire_cleodis extends affaire {
 		    // récupérer dans la session l'id societe partenaire qui crée le contrat
 		    ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
-		    // une fois l'id affaire connue on peut ajouter le devis		    
+		    // une fois l'id affaire connue on peut ajouter le devis
 		   	$content_file = file_get_contents($files['devis_file']['tmp_name']);
 
 		    $this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file);
@@ -2144,7 +2145,7 @@ class affaire_cleodis extends affaire {
 	            $comite["validite_accord"] = NULL;
 	            ATF::comite()->insert(array("comite"=>$comite));
 	        }
-	    	
+
 	    	ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
@@ -2167,54 +2168,56 @@ class affaire_cleodis extends affaire {
 			$societes = $ret= [];
 			ATF::affaire()->q->reset()->addField("affaire.ref","ref")
 									  ->addField("devis.id_devis",'id_devis')
+									  ->addField("devis.id_societe",'id_societe')
 									  ->from("affaire","id_affaire","devis","id_affaire")
 									  ->where('affaire.id_partenaire',$apporteur)
 									  ->addGroup('affaire.id_affaire');
 			$affaires = ATF::affaire()->select_all();
 
 			if($affaires){
+
+				$affaire_soc = $parc_soc = array();
+
 				foreach ($affaires as $key => $value) {
 					$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
-					$societes["data"][$id_soc] = ATF::societe()->select($id_soc);
+					$id_soc = ATF::societe()->cryptID($id_soc);
+
+					$societes[$id_soc] = ATF::societe()->select($id_soc);
+
+					$value['id_affaire'] = $this->cryptID($value['affaire.id_affaire']);
+					$value["id_devis"] = ATF::devis()->cryptID($value['id_devis']);
+
+
+					$affaire_soc[$id_soc][$value["affaire.id_affaire"]] = $value;
+					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
+					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
+
+
 				}
 
-				$societes["count"] = count($societes["data"]);
+				foreach ($affaire_soc as $key => $value) {
+					$societes[$key]["affaires"] = $value;
+					$societes[$key]["parc_societe"] = array();
+				}
 
-				foreach ($societes['data'] as $k => $v) {
-					$v["id_societe"] = ATF::societe()->cryptID($v['id_societe']);
-					$parc = [];
+				foreach ($parc_soc as $key => $value) {
+					//On stocke les parcs de la société par affaire
+					$societes[$key]["parc"] = $value;
 
-					foreach ($affaires as $kaff => $vaff) {
-						$idaff = $vaff['affaire.id_affaire'];
-						if (!$idaff) {
-							$idaff = $this->decryptID($vaff['id_affaire']);
-						}
-						if ($idaff) {// Parfois l'id_affaire est vide ! (à vérifier)
-							$affaires[$kaff]['parc']= ATF::parc()->getParcPartenaire($idaff);
-							$affaires[$kaff]['id_affaire'] = $this->cryptID($vaff['affaire.id_affaire']);
-							$affaires[$kaff]["id_devis"] = ATF::devis()->cryptID($vaff['id_devis']);
-
-							unset($affaires[$kaff]['affaire.id_affaire']);
-							if(!empty($affaires[$kaff]["parc"])) {
-							    foreach($affaires[$kaff]["parc"] as $kparc => $vparc){
-							    	$vparc['id_parc'] = $this->cryptID($vparc['id_parc']);
-			        				$parc[]= $vparc;
-			        			}
+					//On stocke les parcs de la société pour l'onglet parc (dans le panel societe)
+					foreach ($value as $kaffaireParc => $vaffaireParc) {
+						if($vaffaireParc["parc"]){
+							foreach ($vaffaireParc["parc"] as $kparc => $vparc) {
+								$societes[$key]["parc_societe"][] = $vparc;
 							}
 						}
 					}
-					header("ts-total-row: ".$societes['count']);
-					$ret[$v["id_societe"]]=array(
-						"societe"=> $v,
-						"affaires"=> $affaires,
-						"parc"=> $parc
-					);
+
 				}
+				return array("societes" => $societes);
 			}else{
-				header("ts-total-row:0");
 				$ret=array(	);
 			}
-
 
 			return $ret;
 		} else {
