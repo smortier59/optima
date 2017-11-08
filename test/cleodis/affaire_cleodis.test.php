@@ -1271,6 +1271,9 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(5500 , $res , "PrixTotal incorrect");
 
 	}
+	/**
+	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
+	 */
 	public function test_CreateAffairePartenaire(){
 		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 
@@ -1350,6 +1353,9 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 	}
+	/**
+	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
+	 */
 	public function test_GetAffairePartenaire(){
 		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 		$id_soc2=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
@@ -1469,6 +1475,5 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("azertyuiop", $ret3[0]["affaire"], "Probleme affaire retournée");
 		$this->assertFalse($ret3[0]["contrat_signe"], "Probleme contrat signé retourné");
 		$this->assertFalse($ret3[0]["retourPV"], "Probleme retourPV retourné");
-
-	} 
+	}
 }
