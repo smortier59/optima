@@ -1221,9 +1221,10 @@ class affaire_cleodis extends affaire {
 	*/
 	public function _affairePartenaire($get,$post) {
 
-
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
+		log::logger('apporteur','ccharlier');
+		log::logger($apporteur,'ccharlier');
 
 		if($apporteur){
 
@@ -2040,7 +2041,7 @@ class affaire_cleodis extends affaire {
 		      "date" => date("d-m-Y"),
 		      "type_devis" => "normal",
 		      "id_contact" => $id_contact,
-		      "id_user"=>ATF::usr()->getId(), // + tard id de l'user loggué sur
+		      "id_user"=>ATF::$usr->get('contact','id_user'),
 		      "type_affaire" => "normal");
 
 	      	$values_devis =array();
@@ -2116,6 +2117,7 @@ class affaire_cleodis extends affaire {
 	            "description" => "Comite CreditSafe",
 	            "suivi_notifie"=>array(0=>"")
 	        );
+
 			$creation = new DateTime( $societe["date_creation"] );
 	        $creation = $creation->format("Ymd");
 	        $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
@@ -2132,11 +2134,7 @@ class affaire_cleodis extends affaire {
 	        $comite["reponse"] = date("Y-m-d");
 	        $comite["validite_accord"] = date("Y-m-d");
 
-	        try{
 	            ATF::comite()->insert(array("comite"=>$comite));
-	        }catch (errorATF $e) {
-	            throw new errorATF($e->getMessage() ,500);
-	        }
 	        if($comite["etat"]== "accepte"){
 	            //Création du comité CLEODIS
 	            $comite["description"] = "Comité CLEODIS";
@@ -2145,7 +2143,7 @@ class affaire_cleodis extends affaire {
 	            $comite["validite_accord"] = NULL;
 	            ATF::comite()->insert(array("comite"=>$comite));
 	        }
-
+	    	
 	    	ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();

@@ -1272,6 +1272,15 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 	public function test_CreateAffairePartenaire(){
+		$contact = ATF::contact()->i(
+			array(
+				"nom"=> "TU affaire",
+				"prenom"=> "affaire new",
+				"nom"=> "TU affaire"
+			)
+		);
+		ATF::$usr->set('contact', $contact);
+
 		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 	 	$gerant =ATF::contact()->i(array(
 	 		"id_societe" => $id_soc,
@@ -1295,7 +1304,17 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			'libelle'=> 'Test Test',
 			'id_produit'=>$id_produit,
 		);
-			$ret = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+		$file = __ABSOLUTE_PATH__."test/cleodis/pdf_exemple.pdf";
+ 		$files = array(
+ 			"devis_file"=> array(
+				"name"=>"pdf_exemple"
+				,"type"=>"application/pdf"
+				,"tmp_name"=>$file
+				,"error"=>0
+				,"size"=>filesize($file)
+			)
+		);
+		$ret = ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
 		$this->assertEquals($ret["result"],true,'doit retourner true');
 
 		$id_soc2=ATF::societe()->i(
@@ -1314,15 +1333,64 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			'libelle'=> 'Test Test',
 			'id_produit'=>$id_produit,
 		);
-		$ret2 = ATF::affaire()->_CreateAffairePartenaire(false,$post);
-
-		ATF::comite()->q->reset()->where("id_societe",$id_soc2);
-		$res = ATF::comite()->select_all();
-		log::logger($res,'ccharlier');
-		$this->assertEquals($res[0]["etat"],"en_attente",'doit retourner le dernier comité en attente');
+		try{
+			$ret2 = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+		}catch(errorATF $e){
+			$message = $e->getMessage();
+		}
+		$this->assertEquals($message,"Pas de donnée à enregistrer",'doit retourner une erreur');
 
 
 	}
+	public function test_GetAffairePartenaire(){
+		/*
+		$contact = ATF::contact()->i(
+			array(
+				"nom"=> "TU affaire",
+				"prenom"=> "affaire new",
+				"nom"=> "TU affaire"
+			)
+		);
+		ATF::$usr->set('contact', $contact);
 
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+	 	$gerant =ATF::contact()->i(array(
+	 		"id_societe" => $id_soc,
+	 		"nom" => 'mister Test',
+	 	));
+		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
+		$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+		$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
+		$id_produit = ATF::produit()->insert(array(
+			"ref"=>"Test produit",
+			"produit"=>"Produit",
+			"prix_achat"=>500,
+			"id_fabriquant"=> $fab,
+			"id_sous_categorie"=>$sousCat
+		));
+		$post = array(
+			'id_societe'=> $id_soc,
+			'gerant'=> $gerant,
+			'loyer'=> 120,
+			'duree'=> 36,
+			'libelle'=> 'Test Test',
+			'id_produit'=>$id_produit,
+		);
+		$file = __ABSOLUTE_PATH__."test/cleodis/pdf_exemple.pdf";
+ 		$files = array(
+ 			"devis_file"=> array(
+				"name"=>"pdf_exemple"
+				,"type"=>"application/pdf"
+				,"tmp_name"=>$file
+				,"error"=>0
+				,"size"=>filesize($file)
+			)
+		);
+		log::logger("test in test ",'ccharlier');
 
+		ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
+		$ret = ATF::affaire()->_affairePartenaire();
+		log::logger($ret,"ccharlier");
+		*/
+	}
 }
