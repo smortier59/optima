@@ -1378,14 +1378,6 @@ class societe_cleodis extends societe {
                   }
                 }
 
-            }else{
-                //Si Credit Safe n'a retourné aucun dirigeant, on en cré un en attendant
-                $contact = array( "nom"=>"GERANT",
-                                  "email"=>$email,
-                                  "id_societe"=> $id_societe
-                              );
-                $gerant[0] = $contact;
-                $gerant[0]["id_contact"] = ATF::contact()->insert( $contact );
             }
             return array("result"=>true ,
                 "societe"=>ATF::societe()->select($id_societe),
