@@ -2041,7 +2041,7 @@ class affaire_cleodis extends affaire {
 		      "date" => date("d-m-Y"),
 		      "type_devis" => "normal",
 		      "id_contact" => $id_contact,
-		      "id_user"=>ATF::$usr->get('contact','id_user'),
+		      "id_user"=>ATF::$usr->getID(),
 		      "type_affaire" => "normal");
 
 	      	$values_devis =array();
@@ -2050,8 +2050,6 @@ class affaire_cleodis extends affaire {
 
 	      	$loyer = array();
 	      	$produits = array();
-	      	ATF::produit()->q->reset()->where('id_produit',$post["id_produit"]);
-		    $produit = ATF::produit()->select_all();
 	      	$loyer[0] = array(
 	            "loyer__dot__loyer"=>$post["loyer"],
 	            "loyer__dot__duree"=>$post["duree"],
@@ -2066,20 +2064,23 @@ class affaire_cleodis extends affaire {
 	            "loyer__dot__support"=>"",
 	            "loyer__dot__avec_option"=>"non"
 	        );
+	        // categorie / sous categorie
+	        $categorie = ATF::categorie()->select($post["categorie"]);
+	        $sous_categorie = ATF::sous_categorie()->select($post["sous-categorie"]);
 		    $produits[0] = array(
-	          "devis_ligne__dot__produit"=> $produit[0]["produit"],
+	          "devis_ligne__dot__produit"=> $categorie['categorie'].' - '.$sous_categorie['sous_categorie'],
 	          "devis_ligne__dot__quantite"=>1,
 	          "devis_ligne__dot__type"=>"sans_objet",
-	          "devis_ligne__dot__ref"=>$produit[0]["ref"],
-	          "devis_ligne__dot__prix_achat"=>$produit[0]["prix_achat"],
-	          "devis_ligne__dot__id_produit"=>$produit[0]["id_produit"],
-	          "devis_ligne__dot__id_fournisseur"=>"TOSHIBA TEC",
+	          "devis_ligne__dot__ref"=>"",
+	          "devis_ligne__dot__prix_achat"=>"",
+	          "devis_ligne__dot__id_produit"=>"",
+	          "devis_ligne__dot__id_fournisseur"=>"",
 	          "devis_ligne__dot__visibilite_prix"=>"invisible",
 	          "devis_ligne__dot__date_achat"=>"",
 	          "devis_ligne__dot__commentaire"=>"",
 	          "devis_ligne__dot__neuf"=>"oui",
-	          "devis_ligne__dot__id_produit_fk"=>$produit[0]["id_produit"],
-	          "devis_ligne__dot__id_fournisseur_fk"=>"5474"
+	          "devis_ligne__dot__id_produit_fk"=>"",
+	          "devis_ligne__dot__id_fournisseur_fk"=>246
 	        );
 		    $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
