@@ -1588,27 +1588,14 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
-    if(__PRE__ === true){
-        file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafebe.xml",simplexml_load_string($response));
-      }else{
-         file_put_contents("/home/optima/core/log/creditsafebe.xml",simplexml_load_string($response));
-      }
-
-
-    $response = file_get_contents("/home/optima/core/log/creditsafebe.xml");
-
-
-
     $xml = $response;
 
     // response/Messages / Message type = error
     $error = False;
     $messageSociete =$xml->FindCompaniesResult->Messages->Message;
-    foreach ( $messageSociete as $msg ) {
-      if($msg->Type == "Error"){
-        ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-        return $error = True;
-      }
+    if($messageSociete && $messageSociete->Type == "Error"){
+      ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
+      return $error = True;
     }
     if($error == False){
       $param = (object)array
@@ -1621,20 +1608,14 @@ class societe_cleodisbe extends societe_cleodis {
         'storeInReportbox' => false
       );
       $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
-
       $messageReport =$res->RetrieveCompanyOnlineReportResult->Messages->Message;
-
-      foreach ( $messageReport as $msg ) {
-        if($msg->Type == "Error"){
-          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-          return $error = True;
+      if(!$messageReport){
+        $data = $this->cleanGGSResponse($res);
+      }else{
+        if($messageReport->Type == "Error"){
+          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"));
         }
-        // si aucune notice d'erreur n'est retournée, alors on peut clean la réponse GGS
-        if($error == False){
-          $data = $this->cleanGGSResponse($res);
-        }else{
-          $data = Null;
-        }
+        $data = Null;
       }
     }else{
       $data = Null;
