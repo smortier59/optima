@@ -99,8 +99,5 @@ class contact_midas extends contact_cleodis {
 		return parent::saCustom();
 	}
 
-	public function _tt($get,$post) {
-		return "test";
-	}
 };
 ?>
