@@ -451,7 +451,7 @@ class contact extends classes_optima {
 	public function getContactFromSociete($id_societe){
 		$id_societe = ATF::societe()->decryptId($id_societe);
 		$this->q->reset()->where("contact.id_societe",$id_societe)->where("contact.etat","actif");
-		return parent::autocomplete(true,false);
+		return parent::autocomplete(array(),false);
 	}
 
 
