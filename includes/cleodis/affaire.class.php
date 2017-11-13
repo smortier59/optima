@@ -2033,10 +2033,25 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
-		ATF::db($this->db)->begin_transaction();
 
+		ATF::db($this->db)->begin_transaction();
 		try {
 			$id_societe = $post["id_societe"];
+	    	// dans le cas d'un nouveau dirigeant
+			if($post['gerant'] === "0"){
+				$post['gerant'] = ATF::contact()->i(
+					array(
+						"nom"=>$post["nom_gerant"],
+						"prenom"=>$post["prenom_gerant"],
+						"tel"=>$post["phone_gerant"],
+						"email"=>$post["email_gerant"],
+						"fonction"=> $post["fonction_gerant"],
+						"id_societe"=> $id_societe,
+						"est_dirigeant"=> "oui"
+					)
+				);
+			}
+			
 			$id_contact = $post["gerant"];
 			$devis = array(
 		      "id_societe" => $id_societe,
@@ -2150,7 +2165,6 @@ class affaire_cleodis extends affaire {
 	            $comite["validite_accord"] = NULL;
 	            ATF::comite()->insert(array("comite"=>$comite));
 	        }
-
 	    	ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();

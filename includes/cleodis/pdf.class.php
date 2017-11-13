@@ -2610,28 +2610,39 @@ class pdf_cleodis extends pdf {
 		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
 	}
 
+
   /**
-   * @author Anthony Lahlah <alahlah@absystech.fr>
-   * [_documents Retourne le binaire d'un pdf en fonction du type de doc voulu]
-   * @param  [array] $get [contient l'id affaire et le type de document]
-   * @return [type]      [description]
-   */
-	public function _documents($get){
+  * Uniquement pour le portail partenaire
+  * @author Anthony Lahlah <alahlah@absystech.fr>
+  * [_documents Retourne le binaire d'un pdf en fonction du type de doc voulu]
+  * @param  [array] $get [contient l'id affaire et le type de document]
+  * @return [type]      [description]
+  */
+  public function _documents($get){
     $id_affaire = $get["id_affaire"];
-		$fonction = $get["document"];
-    ATF::commande()->q->reset()
-      ->addField("id_commande")
-      ->where("id_affaire", ATF::affaire()->decryptId($id_affaire))
-      ->setDimension('cell');
-    $id_commande = ATF::commande()->sa();
+    $fonction = $get["document"];
+    $docAuth = array("contratA4", "mandatSepa", "contratPV"); // liste des documents autorisés
 
-	  $buffer = $this->generic($fonction,$id_commande, true);
-    return array(
-      "data" => base64_encode($buffer),
-      "strMimeType" => "application/pdf"
-    );
+    if (ATF::affaire()->decryptId($id_affaire) && in_array($fonction, $docAuth)) {
+      ATF::commande()->q->reset()
+       ->addField("id_commande")
+       ->from("commande", "id_affaire", "affaire", "id_affaire")
+       ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
+       // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
+       ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+       ->setDimension('cell');
 
-	}
+      if ($id_commande = ATF::commande()->sa()) {
+       return array(
+         "data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
+         "strMimeType" => "application/pdf"
+       );
+      }
+    }
+
+    return false;
+
+  }
 
 
 	public function contratA4Signature($id){
