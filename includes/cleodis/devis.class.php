@@ -220,7 +220,7 @@ class devis_cleodis extends devis {
 		if(!$affaire && $type!="vente"){
 			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
 		//Si c'est un avenant il ne peut y avoir qu'une affaire parente (sauf pour les AR)
-		}elseif(count($return["affaire"])>1 && ($type=="avenant" || $type=="vente")){
+		}elseif(count($return["affaire"])>1 && ($type=="avenant" /*|| $type=="vente"*/)){
 			throw new errorATF("Il ne peut y avoir qu'une affaire reprise par ".$type,878);
 		}else{
 			return $return;
