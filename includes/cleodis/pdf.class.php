@@ -2621,7 +2621,7 @@ class pdf_cleodis extends pdf {
   public function _documents($get){
     $id_affaire = $get["id_affaire"];
     $fonction = $get["document"];
-    $docAuth = array("contratA4", "mandatSepa", "contratPV"); // liste des documents autorisés
+    $docAuth = array("contratA4", "mandatSepa", "contratPV", "bon_de_commande"); // liste des documents autorisés
 
     if (ATF::affaire()->decryptId($id_affaire) && in_array($fonction, $docAuth)) {
       ATF::commande()->q->reset()
