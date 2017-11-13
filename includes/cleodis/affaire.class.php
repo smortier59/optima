@@ -2241,10 +2241,13 @@ class affaire_cleodis extends affaire {
 					}
 
 				}
+				header("ts-total-row: ".count($societes));
+
 				return array("societes" => $societes);
 			}else{
 				$ret=array(	);
 			}
+			header("ts-total-row: 0");
 
 			return $ret;
 		} else {
