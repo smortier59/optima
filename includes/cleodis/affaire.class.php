@@ -2174,6 +2174,7 @@ class affaire_cleodis extends affaire {
 		}
 		return array(
 			"result"=>true,
+			"resultat_comite" => $comite["etat"],
 			"id_crypt"=>ATF::affaire()->cryptId($devis["id_affaire"])
 		);
 	}
