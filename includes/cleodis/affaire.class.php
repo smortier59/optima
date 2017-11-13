@@ -1578,6 +1578,7 @@ class affaire_cleodis extends affaire {
 		  $data["file_cni"] = file_exists($this->filepath($get['id_affaire'],"cni"));
 		  $data["file_facture_fournisseur"] = file_exists($this->filepath($get["id_affaire"],"facture_fournisseur"));
 		  $data["file_cniVerso"] = file_exists($this->filepath($get["id_affaire"],"cniVerso"));
+		  $data["file_devis_partenaire"] = file_exists($this->filepath($get["id_affaire"],"devis_partenaire"));
 
 		  foreach ($data["comites"] as $key => $value) {
 		  	if($value['description']=== 'Comité CLEODIS'){
@@ -2051,7 +2052,7 @@ class affaire_cleodis extends affaire {
 					)
 				);
 			}
-			
+
 			$id_contact = $post["gerant"];
 			$devis = array(
 		      "id_societe" => $id_societe,
