@@ -678,7 +678,7 @@ class contact extends classes_optima {
 	 * @return [array] $res   [champs de la table contact qui constitueront la session]
 	 */
 	public function login($infos){
-		$this->loginQuery();
+		$this->loginQuery($infos);
 
 		//Test du login et initialisation des informations utilisateurs
 		if ($res = $this->select_all()) {
