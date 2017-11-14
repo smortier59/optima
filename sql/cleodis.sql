@@ -1,3 +1,12 @@
+#Portail Partenaire TOSHIBA
+
+ALTER TABLE `pack_produit_ligne` ADD `id_partenaire` `id_partenaire` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `id_fournisseur`;;
+ALTER TABLE `pack_produit_ligne` ADD KEY `id_partenaire` (`id_partenaire`);
+ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+
+
+
 #DEVIS CLEODIS V2
 ALTER TABLE `devis_ligne` ADD `options` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire`;
 ALTER TABLE `devis` ADD `commentaire_offre_partenaire` TEXT NULL DEFAULT NULL AFTER `raison_refus`;

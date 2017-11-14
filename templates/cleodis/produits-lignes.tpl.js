@@ -521,6 +521,29 @@ ATF.buildGridEditor({
 							})
 						}
 					{/if}
+
+					{if $pager=="ProduitsUpdateOptionPartenaire"}
+						, {
+							header: 'Partenaire',
+							dataIndex: '{$current_class->table}__dot__id_partenaire',
+							renderer: function (value, metaData, record, rowIndex, colIndex, store){
+								if (value) {
+									var a = value.split(ATF.extJSGridComboboxSeparator);
+									if (a[1]) {
+										record.set('{$current_class->table}__dot__id_partenaire_fk',a[1]);
+									}
+									return a[0];
+								}
+							},
+							editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_partenaire function=autocompleteFournisseurs  forceId="id_partenaire{$id}" extJSGridComboboxSeparator=true},{
+									listWidth:200
+							})
+						}
+						,{
+							hidden:true,
+							dataIndex: '{$current_class->table}__dot__id_partenaire_fk'
+						}
+					{/if}
 				{/if}
 			{/if}
 		]
