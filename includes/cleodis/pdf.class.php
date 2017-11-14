@@ -12613,10 +12613,10 @@ class pdf_cap extends pdf_cleodis {
 		$this->cell(35,3,"Tél. : +33 (0) 3 28 16 71 30",0,0,"L");
 		$this->setfont('arial','',8);
 		$this->cell(35,3,"  Fax : + 33 (0)3 20 97 68 82",0,1,"L");
-		$this->cell(35,3,"bureau@cap-recouvrement.fr",0,1,"L");
+		$this->cell(35,3,"contact@groupe-cap.com",0,1,"L");
 		$this->setfont('arial','B',8);
 		$this->settextcolor(186,19,26);
-		$this->cell(35,3,"www.cap-recouvrement.fr",0,1,"L");
+		$this->cell(35,3,"wwww.groupe-cap.com",0,1,"L");
 		$this->settextcolor(0,0,0);
 		$this->setfont('arial','',6);
 		$this->cell(35,3,"SIREN 392 468 443 - RCS LILLE METROPOLE",0,1,"L");
