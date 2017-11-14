@@ -662,11 +662,14 @@ class contact extends classes_optima {
 	 */
 	public function login($infos){
 		$this->q->reset()
+			->addField("contact.*")
+			->addField("societe.lead", "lead")
 			/*->select('contact.id_societe')
 			->select('contact.civilite')
 			->select('contact.prenom')
 			->select('contact.nom')*/
-			->where('login',ATF::db()->escape_string($infos["u"]))
+			->addJointure("contact","id_societe","societe","id_societe")
+			->where('contact.login',ATF::db()->escape_string($infos["u"]))
 			->setDimension('row');
 
 		//Test du login et initialisation des informations utilisateurs
