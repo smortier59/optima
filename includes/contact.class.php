@@ -654,6 +654,23 @@ class contact extends classes_optima {
 	}
 
 	/**
+	 * Methode qui prépare la requête de login sur contact
+	 * @param  [array] $infos [Infos pour le login]
+	 * @param  [array] $infos[p]
+	 * @param  [array] $infos[u]
+	 * @return [array] $res   [champs de la table contact qui constitueront la session]
+	 */
+	public function loginQuery($infos){
+		$this->q->reset()
+			/*->select('contact.id_societe')
+			->select('contact.civilite')
+			->select('contact.prenom')
+			->select('contact.nom')*/
+			->where('login',ATF::db()->escape_string($infos["u"]))
+			->setDimension('row');
+	}
+
+	/**
 	 * Methode de login pour sur login/pwd de la table contact
 	 * @param  [array] $infos [Infos pour le login]
 	 * @param  [array] $infos[p]
@@ -661,16 +678,7 @@ class contact extends classes_optima {
 	 * @return [array] $res   [champs de la table contact qui constitueront la session]
 	 */
 	public function login($infos){
-		$this->q->reset()
-			->addField("contact.*")
-			->addField("societe.lead", "lead")
-			/*->select('contact.id_societe')
-			->select('contact.civilite')
-			->select('contact.prenom')
-			->select('contact.nom')*/
-			->addJointure("contact","id_societe","societe","id_societe")
-			->where('contact.login',ATF::db()->escape_string($infos["u"]))
-			->setDimension('row');
+		$this->loginQuery();
 
 		//Test du login et initialisation des informations utilisateurs
 		if ($res = $this->select_all()) {
