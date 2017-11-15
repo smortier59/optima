@@ -535,7 +535,7 @@ ATF.buildGridEditor({
 									return a[0];
 								}
 							},
-							editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_partenaire function=autocompleteFournisseurs  forceId="id_partenaire{$id}" extJSGridComboboxSeparator=true},{
+							editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_partenaire function=null  forceId="id_partenaire{$id}" extJSGridComboboxSeparator=true},{
 									listWidth:200
 							})
 						}

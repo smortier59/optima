@@ -626,6 +626,13 @@ class devis_cleodis extends devis {
 		$affaire["date_ouverture"] 			= ATF::affaire()->select($devis["id_affaire"] , "date_ouverture");
 		$affaire["date_recettage_cablage"]  = ATF::affaire()->select($devis["id_affaire"] , "date_recettage_cablage");
 
+		$affaire["site_associe"]  = ATF::affaire()->select($devis["id_affaire"] , "site_associe");
+		$affaire["etat_comite"]  = ATF::affaire()->select($devis["id_affaire"] , "etat_comite");
+		$affaire["provenance"]  = ATF::affaire()->select($devis["id_affaire"] , "provenance");
+		$affaire["pieces"]  = ATF::affaire()->select($devis["id_affaire"] , "pieces");
+		$affaire["date_verification"]  = ATF::affaire()->select($devis["id_affaire"] , "date_verification");
+		$affaire["id_partenaire"]  = ATF::affaire()->select($devis["id_affaire"] , "id_partenaire");
+
 
 
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
