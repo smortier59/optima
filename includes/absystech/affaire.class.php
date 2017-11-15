@@ -804,7 +804,7 @@ class affaire_absystech extends affaire {
   public function _GET($get,$post) {
 
     // Gestion du tri
-    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
+    if (!$get['tri']) $get['tri'] = "date";
     if (!$get['trid']) $get['trid'] = "desc";
 
     // Gestion du limit
@@ -813,11 +813,17 @@ class affaire_absystech extends affaire {
     // Gestion de la page
     if (!$get['page']) $get['page'] = 0;
 
-    $colsData = array("affaire.*","societe.societe");
 
     $this->q->reset();
 
-    if ($get['id']) $colsData = array("affaire.*");
+		$colsData = array(
+			"affaire.id_affaire"=>array(),
+			"affaire.date"=>array(),
+			"affaire.etat"=>array(),
+			"affaire.id_societe"=>array("visible"=>false),
+			"affaire.affaire"=>array(),
+			"societe.societe"=>array()
+		);
 
     $this->q->addField($colsData);
     $this->q->from("affaire","id_societe","societe","id_societe");
@@ -827,77 +833,105 @@ class affaire_absystech extends affaire {
       $this->q->setSearch($get['search']);
     }
 
-	// Filtre sur l'etat de l'affaire
-	if ($get['filters']['devis'] == "on") {
-		$this->q->where("affaire.etat","devis","OR","etatAffaire");
-	}
-	if ($get['filters']['commande'] == "on") {
-		$this->q->where("affaire.etat","commande","OR","etatAffaire");
-	}
-	if ($get['filters']['facture'] == "on") {
-		$this->q->where("affaire.etat","facture","OR","etatAffaire");
-	}
-	if ($get['filters']['terminee'] == "on") {
-		$this->q->where("affaire.etat","terminee","OR","etatAffaire");
-	}
-	if ($get['filters']['perdue'] == "on") {
-		$this->q->where("affaire.etat","perdue","OR","etatAffaire");
-	}
+		// Filtre sur l'etat de l'affaire
+		if ($get['filters']['devis'] == "on") {
+			$this->q->where("affaire.etat","devis","OR","etatAffaire");
+		}
+		if ($get['filters']['commande'] == "on") {
+			$this->q->where("affaire.etat","commande","OR","etatAffaire");
+		}
+		if ($get['filters']['facture'] == "on") {
+			$this->q->where("affaire.etat","facture","OR","etatAffaire");
+		}
+		if ($get['filters']['terminee'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+		}
+		if ($get['filters']['perdue'] == "on") {
+			$this->q->where("affaire.etat","perdue","OR","etatAffaire");
+		}
+
+		// On check si on a des infos de contact, si c'est le cas, alors on vient d'un portail partenaire...
+		if ($contact = ATF::$usr->get('contact')) {
+			// On recherche des filiales
+			$filiales = array();
+			ATF::societe()->q->reset()->addField('id_societe')->where('id_filiale', $contact['id_societe'])->setStrict();
+			$filiales = ATF::societe()->sa();
+
+			// On créer notre tableau d'ID de société a sonder
+			$ids = $filiales;
+			array_push($ids, array("id_societe"=>$contact['id_societe']));
+
+			foreach ($ids as $k=>$id) {
+				$this->q->where("affaire.id_societe", $id['id_societe']);
+			}
+
+		}
 
 
 
     if ($get['id']) {
-
-		$this->q->where("affaire.id_affaire",$get['id'])->setCount(false)->setDimension('row');
-		$data = $this->sa();
-
-		ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
-								->addField("devis.*")
-								->from("devis","id_user","user","id_user")
-								->where("devis.id_affaire",$get['id'])->addOrder('id_devis', 'desc');
-		$data["devis"] = ATF::devis()->sa();
-
-		foreach ($data as $key => $value) {
-			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
-			//if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
-			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
-			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
-			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
-
-			//$data["fichier_joint"] = $data["documentAnnexes"] = false;
-
-			//if (file_exists($this->filepath($get['id'],"fichier_joint"))) $data["fichier_joint"] = true;
-			//if (file_exists($this->filepath($get['id'],"documentAnnexes"))) $data["documentAnnexes"] = true;
-
-
-			unset($data["id_societe"],  $data["id_commercial"]);
-		}
-
-		foreach ($data["devis"] as $key => $value) {
-			$data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
-
-			if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
-			if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
-		}
-
-		/*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
-		$data["affaireAffaire"] = $this->sa();
-		*/
-		$data["idcrypted"] = $this->cryptId($get["id_affaire"]);
+			$this->q->where("affaire.id_affaire",$get['id'])->setLimit(1);
 
     } else {
-      $this->q->setLimit($get['limit'])->setCount();
+			// TRI
+			switch ($get['tri']) {
+				case 'societe':
+					$get['tri'] = "societe.".$get['tri'];
+				break;
+				default:
+					$get['tri'] = "affaire.".$get['tri'];
+				break;
+			}
+
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
       $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
     }
 
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
 
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+					$k_ = $tmp[1];
+				}
+
+				if ($k_ == 'id_affaire_fk') {
+					$data["data"][$k]['id_affaire_fk'] = $this->cryptId($val);
+				}
+			}
+		}
 
     if($get['id']){
+			ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
+									->addField("devis.*")
+									->from("devis","id_user","user","id_user")
+									->where("devis.id_affaire",$get['id'])->addOrder('id_devis', 'desc');
+			$data["devis"] = ATF::devis()->sa();
+
+			foreach ($data as $key => $value) {
+				if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
+				if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
+				unset($data["id_societe"],  $data["id_commercial"]);
+			}
+
+			foreach ($data["devis"] as $key => $value) {
+				$data['devis'][$key]["fichier_joint"] = $data['devis'][$key]["documentAnnexes"] = false;
+
+				if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $data['devis'][$key]["fichier_joint"] = true;
+				if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
+			}
+
+
       $return = $data;
     }else{
-      header("ts-total-row: ".$data['count']);
-      header("ts-max-page: ".ceil($data['count']/$get['limit']));
-      header("ts-active-page: ".$get['page']);
+			header("ts-total-row: ".$data['count']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
+
       $return = $data['data'];
     }
     return $return;
