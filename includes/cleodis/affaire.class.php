@@ -1504,6 +1504,10 @@ class affaire_cleodis extends affaire {
 				->addGroup("affaire.id_affaire");
 		}
 
+		if ($get['revendeurs']){
+			$this->q->where("societe.revendeur",'oui');
+		}
+
 		if($get["search"]){
 			header("ts-search-term: ".$get['search']);
 			$this->q->setSearch($get['search']);
