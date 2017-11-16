@@ -1268,11 +1268,6 @@ class affaire_cleodis extends affaire {
 					->where("id_partenaire", $apporteur)
 					->addGroup("affaire.id_affaire");
 
-			if($get["search"]){
-				header("ts-search-term: ".$get['search']);
-				$this->q->setSearch($get['search']);
-			}
-
 			if ($get['id_affaire']) {
 			  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 			  $data = $this->sa();
