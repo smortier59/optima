@@ -16,8 +16,17 @@ class societe_cleodis extends societe {
 
     /*-----------Quick Insert-----------------------*/
     $this->quick_insert = array('societe'=>'societe');
-    $this->colonnes['fields_column'][] = "societe.nom_commercial";
-    $this->colonnes['fields_column'][] = "societe.code_client";
+
+    $this->colonnes['fields_column'] = array(
+      'societe.societe'
+      ,'societe.tel' => array("tel"=>true)
+      ,'societe.fax' => array("tel"=>true)
+      ,'societe.email'
+      ,'societe.ville'
+      ,"societe.nom_commercial"
+      ,"societe.code_client"
+      ,'logo'=> array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70,"renderer"=>"uploadFile")
+    );
 
     // Panel prinicpal
     $this->colonnes['primary'] = array(
@@ -153,6 +162,8 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_prospection"] = "contact";
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
+
+    $this->files["logo"] = array("type"=>"png","no_upload"=>false,"no_generate"=>true);
 
 
 
@@ -1317,7 +1328,6 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
-    log::logger("ICI" , "mfleurquin");
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
     log::logger("in _infosCredisafePartenaire !",'ccharlier');
