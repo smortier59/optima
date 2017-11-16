@@ -1052,12 +1052,9 @@ class societe_cleodis extends societe {
 
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
-
     $email = $post["email"];
-
-
+    $fournisseur = 6241;
     $data = self::getInfosFromCREDITSAFE($post);
-
 
     if($data){
       $gerants = $data["gerant"];
@@ -1086,13 +1083,13 @@ class societe_cleodis extends societe {
             $data_soc = $data;
 
             $data_soc["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
-            $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
+            $data_soc["id_fournisseur"] = $fournisseur; //Fournisseur ALSO
 
 
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
             $id_societe = $this->insert($data_soc);
 
-            $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+            $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => $fournisseur));
 
           }
 
@@ -1168,6 +1165,21 @@ class societe_cleodis extends societe {
             }
             return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;
           });
+          // fournisseur par défaut
+          $fournisseur_produit = 'TOSHIBA TEC';
+          $fournisseur_produit_id = "5474";
+          // si une provenance est présente on récupère les infos de cette société
+          if($post["provenance"]){
+            $this->q->reset()  
+                    ->where("lead",$post['provenance'])
+                    ->AndWhere('revendeur','oui');
+            $revendeur = $this->select_row();
+            if($revendeur){
+              $fournisseur_produit_id = $revendeur['id_societe'];
+              $fournisseur_produit = $revendeur['societe'];
+            }
+          }
+
           // maintenant il faut appliquer cet ordre aux pack produits
           foreach ($pack_pro_ligne as $k => $v) {
             foreach ($post["produits"] as $key => $value) {
@@ -1202,37 +1214,34 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__ref"=>$produit["ref"],
                                   "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
                                   "devis_ligne__dot__id_produit"=>$produit["id_produit"],
-                                  "devis_ligne__dot__id_fournisseur"=>"TOSHIBA TEC",
+                                  "devis_ligne__dot__id_fournisseur"=>$fournisseur_produit,
                                   "devis_ligne__dot__visibilite_prix"=>"invisible",
                                   "devis_ligne__dot__date_achat"=>"",
                                   "devis_ligne__dot__commentaire"=>"",
                                   "devis_ligne__dot__neuf"=>"oui",
                                   "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
-                                  "devis_ligne__dot__id_fournisseur_fk"=>"5474"
+                                  "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id
                                 );
             }
           }
           $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
-
           try {
              $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
           } catch (errorATF $e) {
             throw new errorATF($e ,500);
           }
           $devis = ATF::devis()->select($id_devis);
-
-
           switch ($post["provenance"]) {
             case 'd023ef3680189f828a53810e3eda0ecc':
-              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"));
             break;
 
             case '7154b414c85f24ffefcefe53490c49bd':
-              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"la_poste"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"la_poste"));
             break;
 
             default:
-              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"/*,"id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/ ));
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
             break;
           }
 
@@ -1330,8 +1339,6 @@ class societe_cleodis extends societe {
   public function _infosCredisafePartenaire($get, $post){
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
-    log::logger("in _infosCredisafePartenaire !",'ccharlier');
-    log::logger($apporteur,'ccharlier');
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
         $gerants = $data["gerant"];
@@ -1344,7 +1351,6 @@ class societe_cleodis extends societe {
             if($res){
                 $id_societe = $res["id_societe"];
             }else {
-                //log::logger($_SESSION["user"]->id_societe,'ccharlier');
                 $data_soc = $data;
                 // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
                 //$data_soc["id_apporteur"]   = $apporteur; //Apporteur d'affaire TOSHIBA
@@ -1402,7 +1408,6 @@ class societe_cleodis extends societe {
                 "gerants"=>$gerant
             );
         } catch (ATFerror $e) {
-            log::logger($e->getMessage(),"ccharlier");
             throw new errorATF("erreurCS inside",500);
 
         }
