@@ -1170,7 +1170,7 @@ class societe_cleodis extends societe {
           $fournisseur_produit_id = "5474";
           // si une provenance est présente on récupère les infos de cette société
           if($post["provenance"]){
-            $this->q->reset()  
+            $this->q->reset()
                     ->where("lead",$post['provenance'])
                     ->AndWhere('revendeur','oui');
             $revendeur = $this->select_row();
@@ -1479,9 +1479,12 @@ class societe_cleodis extends societe {
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
 
-    $id_affaire = $post["id_affaire"];
+    $id_affaire = ATF::affaire()->decryptId($post["id_affaire"]);
+
+
     ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
     $devis = ATF::devis()->select_row();
+
 
     ATF::devis_ligne()->q->reset()->where("id_devis", $devis["id_devis"]);
     $lignes = ATF::devis_ligne()->select_all();
