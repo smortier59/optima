@@ -1169,6 +1169,8 @@ class societe_cleodis extends societe {
           $fournisseur_produit = 'TOSHIBA TEC';
           $fournisseur_produit_id = "5474";
           // si une provenance est présente on récupère les infos de cette société
+
+
           if($post["provenance"]){
             $this->q->reset()
                     ->where("lead",$post['provenance'])
@@ -1177,6 +1179,10 @@ class societe_cleodis extends societe {
             if($revendeur){
               $fournisseur_produit_id = $revendeur['id_societe'];
               $fournisseur_produit = $revendeur['societe'];
+
+
+              $devis["id_partenaire"] = $revendeur['id_societe'];
+
             }
           }
 
@@ -1231,6 +1237,7 @@ class societe_cleodis extends societe {
             throw new errorATF($e ,500);
           }
           $devis = ATF::devis()->select($id_devis);
+
           switch ($post["provenance"]) {
             case 'd023ef3680189f828a53810e3eda0ecc':
               ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"));
@@ -1604,6 +1611,8 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
+log::logger($response , "mfleurquin");
+
     $xml = $response;
 
     // response/Messages / Message type = error
@@ -1624,6 +1633,9 @@ class societe_cleodisbe extends societe_cleodis {
         'storeInReportbox' => false
       );
       $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
+
+log::logger($res , "mfleurquin");
+
       $messageReport =$res->RetrieveCompanyOnlineReportResult->Messages->Message;
       if(!$messageReport){
         $data = $this->cleanGGSResponse($res);
