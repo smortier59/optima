@@ -1328,6 +1328,18 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$ret = ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
 		$this->assertEquals($ret["result"],true,'doit retourner true');
 
+		$post['gerant'] = "0";
+		$post["nom_gerant"] = "tutu";
+		$post["prenom_gerant"] ="utut";
+		$post["email_gerant"] = "tu@absystech.fr";
+		$post["fonction_gerant"] = "testeur";
+
+		$ret = ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
+		$this->assertEquals($ret["result"],true,'doit retourner true');
+
+
+
+
 		$id_soc2=ATF::societe()->i(
 			array(
 				"societe"=>"myTest",
@@ -1337,19 +1349,14 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			)
 		);
 		$post = array(
-			'id_societe'=> $id_soc2,
-			'gerant'=> $gerant,
-			'loyer'=> 120,
-			'duree'=> 36,
 			'libelle'=> 'Test Test',
-			'id_produit'=>$id_produit,
 		);
 		try{
 			$ret2 = ATF::affaire()->_CreateAffairePartenaire(false,$post);
 		}catch(errorATF $e){
-			$message = $e->getMessage();
+			$erreur = $e->getErrno();
 		}
-		$this->assertEquals($message,"Pas de donnée à enregistrer",'doit retourner une erreur');
+		$this->assertEquals($erreur,600,'doit retourner une erreur 600');
 
 
 	}
@@ -1438,7 +1445,6 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(2, count($ret), "Probleme nombre affaire retournées");
 		$this->assertEquals("Test Test", $ret[0]["affaire"], "Probleme affaire retournée");
 		$this->assertEquals("36", $ret[0]["duree"], "Probleme duree affaire retournée");
-		$this->assertEquals(120.00, $ret[0]["loyer"][0]['loyer'], "Probleme loyer affaire retournée");
 
 
 		ATF::affaire()->u(
@@ -1475,5 +1481,47 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("azertyuiop", $ret3[0]["affaire"], "Probleme affaire retournée");
 		$this->assertFalse($ret3[0]["contrat_signe"], "Probleme contrat signé retourné");
 		$this->assertFalse($ret3[0]["retourPV"], "Probleme retourPV retourné");
+	}
+	/**
+	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
+	 */
+	public function test_AffaireParc(){
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		// gestion des erreurs
+		ATF::$usr->set("contact","");
+		try{
+			ATF::affaire()->_AffaireParc();
+		}catch(errorATF $e){
+			$erreur = $e->getErrno();
+			$message = $e->getMessage();
+		}
+		$this->assertEquals($erreur,500,'doit retourner une erreur 500');
+		$this->assertEquals($erreur,500,'Probleme d\'apporteur');
+	
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		$contact = ATF::contact()->i(
+			array(
+				"nom"=> "TU affaire",
+				"prenom"=> "affaire new",
+				"nom"=> "TU affaire",
+				'id_societe' => $id_soc
+			)
+		);
+
+		// avec  resultat vide
+		ATF::user()->q->reset()->Where('login','partenaire');
+		$user = ATF::user()->select_row();
+
+		ATF::$usr->set('contact', array(
+			"id_contact"=> $contact,
+			'id_societe' => $id_soc
+
+		));
+		$ret = ATF::affaire()->_AffaireParc();
+		$this->assertEquals(count($ret),0, 'Devrait retourner 0');
+		// test a finir -> créer des affaires de differentes societes qui sont en cours
+		// avoir des bdc passés auprès des fournisseurs 
+
+
 	}
 }

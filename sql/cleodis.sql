@@ -1,3 +1,7 @@
+#ajout du lead
+ALTER TABLE `societe` ADD `lead` VARCHAR(32) NULL DEFAULT NULL AFTER `typologie`;
+
+
 #Portail Partenaire TOSHIBA
 
 ALTER TABLE `pack_produit_ligne` ADD `id_partenaire` `id_partenaire` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `id_fournisseur`;;

@@ -20,7 +20,7 @@
 	, "{$current_class->table}.ordre"
 ]}
 {if ATF::_r(id_pack_produit)}
-	{$q->reset()->addCondition("pack_produit_ligne.id_pack_produit",classes::decryptId(ATF::_r(id_pack_produit)))->addCondition("visible","oui","AND")->setView([order=>$fields],true)->end()}
+	{$q->reset()->addCondition("pack_produit_ligne.id_pack_produit",classes::decryptId(ATF::_r(id_pack_produit)))->addCondition("visible","oui","AND")->whereIsNull("id_partenaire","AND")->setView([order=>$fields],true)->end()}
 {else}
 	{$q->reset()->addCondition("pack_produit_ligne.id_pack_produit",0)->setView([order=>$fields],true)->end()}
 {/if}

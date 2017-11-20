@@ -219,7 +219,6 @@ class pack_produit extends classes_optima {
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne_option_partenaire = json_decode($infos["values_".$this->table]["produits_option_partenaire"],true);
 
-
 		$this->infoCollapse($infos);
 
 
@@ -264,7 +263,6 @@ class pack_produit extends classes_optima {
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"pack_produit_ligne");
 			foreach($infos_ligne as $key=>$item){
-
 				$item["id_pack_produit"]=$last_id;
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
