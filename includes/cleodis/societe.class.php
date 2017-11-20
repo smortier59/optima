@@ -1172,6 +1172,7 @@ class societe_cleodis extends societe {
 
 
           if($post["provenance"]){
+            // On récupère l'identifiant du revendeur à partir du ?lead
             $this->q->reset()
                     ->where("lead",$post['provenance'])
                     ->AndWhere('revendeur','oui');
@@ -1179,10 +1180,13 @@ class societe_cleodis extends societe {
             if($revendeur){
               $fournisseur_produit_id = $revendeur['id_societe'];
               $fournisseur_produit = $revendeur['societe'];
+            }
 
-
-              $devis["id_partenaire"] = $revendeur['id_societe'];
-
+            // On récupère l'identifiant du partenaire à partir du ?lead
+            $this->q->reset()
+                    ->where("lead",$post['provenance']);
+            if($partenaire = $this->select_row()){
+              $devis["id_partenaire"] = $partenaire['id_societe'];
             }
           }
 
