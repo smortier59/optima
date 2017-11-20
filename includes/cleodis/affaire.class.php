@@ -1536,6 +1536,7 @@ class affaire_cleodis extends affaire {
 			"affaire.etat",
 			'affaire.provenance',
 			'affaire.date',
+			"affaire.site_associe",
 			'affaire.ref',
 			'affaire.etat_comite',
 			'affaire.id_societe',
