@@ -2624,20 +2624,39 @@ class pdf_cleodis extends pdf {
     $docAuth = array("contratA4", "mandatSepa", "contratPV", "bon_de_commande"); // liste des documents autorisés
 
     if (ATF::affaire()->decryptId($id_affaire) && in_array($fonction, $docAuth)) {
-      ATF::commande()->q->reset()
-       ->addField("id_commande")
-       ->from("commande", "id_affaire", "affaire", "id_affaire")
-       ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
-       // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
-       ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
-       ->setDimension('cell');
 
-      if ($id_commande = ATF::commande()->sa()) {
-       return array(
-         "data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
-         "strMimeType" => "application/pdf"
-       );
-      }
+    	if($fonction === "bon_de_commande"){
+    		ATF::bon_de_commande()->q->reset()
+		       ->addField("id_bon_de_commande")
+		       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
+		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
+		       // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
+		       ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+		       ->setDimension('cell');
+
+		      if ($bon_de_commande = ATF::bon_de_commande()->sa()) {
+		       return array(
+		         "data" => base64_encode( $this->generic($fonction,$bon_de_commande[0], true) ),
+		         "strMimeType" => "application/pdf"
+		       );
+		      }
+    	}else{
+    		ATF::commande()->q->reset()
+		       ->addField("id_commande")
+		       ->from("commande", "id_affaire", "affaire", "id_affaire")
+		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
+		       // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
+		       ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+		       ->setDimension('cell');
+
+		      if ($id_commande = ATF::commande()->sa()) {
+		       return array(
+		         "data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
+		         "strMimeType" => "application/pdf"
+		       );
+		      }
+    	}
+
     }
 
     return false;
