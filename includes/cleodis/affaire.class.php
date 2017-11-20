@@ -1486,6 +1486,8 @@ class affaire_cleodis extends affaire {
 				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire")
 				->from("affaire", "id_affaire", "commande", "id_affaire");
+
+
 		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
 			$this->q->where("site_associe",'toshiba')
 				->addGroup("affaire.id_affaire");
@@ -1500,7 +1502,8 @@ class affaire_cleodis extends affaire {
 		}
 
 		if ($get['revendeurs']){
-			$this->q->where("societe.revendeur",'oui');
+			$this->q->from("affaire","id_partenaire","societe","id_societe","partenaire")
+							->where("partenaire.revendeur",'oui');
 		}
 
 		if($get["search"]){
