@@ -89,7 +89,7 @@ try {
             "fax"=>$ligne[8],
             "email"=>$emailDefault,
             "login"=>"rm".$ligne[1],
-            "pwd"=>"fock"
+            "pwd"=>hash('sha256',"tsm");
         );
 
         log::logger("========= CONTACT",$logFile);
