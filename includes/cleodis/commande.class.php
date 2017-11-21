@@ -2710,5 +2710,45 @@ class commande_midas extends commande_cleodis {
 	}
 };
 
-class commande_cap extends commande_cleodis { };
+class commande_cap extends commande_cleodis {
+
+
+	/**
+	 * Permet de stocker le PDF signé de Sell&Sign
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $get
+	 * @param  array $post
+	 * @return
+	*/
+	public function _getSignedContract($get, $post){
+		if (!$post['data']) throw new Exception("Il manque le base64", 500);
+		if (!$post['contract_id']) throw new Exception("Il manque l'id du contract", 500);
+
+		$data = $post['data'];
+		$contract_id = $post['contract_id'];
+
+		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('mandat.id_affaire')->setDimension('cell');
+		$id_affaire = ATF::affaire()->select_all();
+		$mandat = ATF::affaire()->geMandat($id_affaire);
+
+		$file = $this->filepath($mandat->get('id_mandat'), 'retourBPA', null, 'cleodis');
+		try {
+			util::file_put_contents($file,base64_decode($data));
+			//On met à jour la date de retour et retourPV du contrat
+			ATF::mandat()->u(array("id_mandat"=>$mandat->get('id_mandat'),
+									 "date_retour"=> date("Y-m-d")
+									)
+								);
+			$return = true;
+		} catch (Exception $e) {
+			$return  = array("error"=>true, "data"=>$e);
+		}
+
+		return $return;
+	}
+
+
+};
 ?>
