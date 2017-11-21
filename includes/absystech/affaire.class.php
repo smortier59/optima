@@ -487,7 +487,7 @@ class affaire_absystech extends affaire {
 	* @param int $id_parent
 	* @return string ref
 		*/
-	function getRef($date,$class){
+	function getRef($date,$class,$agence=NULL){
 		if (!$date) {
 			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);
 		}
@@ -498,7 +498,10 @@ class affaire_absystech extends affaire {
 		}elseif($class=="facture"){
 			$prefix="F";
 		}
-		$prefix.=strtoupper(substr(ATF::agence()->nom(ATF::$usr->get('id_agence')),0,2)).date("ym",strtotime($date));
+		if (!$agence) {
+			$agence = ATF::agence()->nom(ATF::$usr->get('id_agence'));
+		}
+		$prefix.=strtoupper(substr($agence,0,2)).date("ym",strtotime($date));
 		ATF::$class()->q->reset()
 						 ->addCondition("ref",$prefix."%","AND",false,"LIKE")
 						 ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
@@ -945,7 +948,7 @@ class affaire_att extends affaire_absystech {
 	* @param int $id_parent
 	* @return string ref
 		*/
-	function getRef($date,$class){
+	function getRef($date,$class,$agence=NULL){
 		if (!$date) {
 			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);
 		}
@@ -956,7 +959,10 @@ class affaire_att extends affaire_absystech {
 		}elseif($class=="facture"){
 			$prefix="AF";
 		}
-		$prefix.=strtoupper(substr(ATF::agence()->nom(ATF::$usr->get('id_agence')),0,2)).date("ym",strtotime($date));
+		if (!$agence) {
+			$agence = ATF::agence()->nom(ATF::$usr->get('id_agence'));
+		}
+		$prefix.=strtoupper(substr($agence,0,2)).date("ym",strtotime($date));
 		ATF::$class()->q->reset()
 						 ->addCondition("ref",$prefix."%","AND",false,"LIKE")
 						 ->addField('SUBSTRING(`ref`,9)+1',"max_ref")
@@ -1081,6 +1087,10 @@ class affaire_partenaire extends affaire {
 			$this->q->where("affaire.id_societe", $id['id_societe']);
 		}
 
+		// On check le flag
+		$this->q->where("suivi_ec",true);
+
+
 		if ($get['id']) {
 			$this->q->where("affaire.id_affaire",$get['id'])->setLimit(1);
 
@@ -1141,7 +1151,25 @@ class affaire_partenaire extends affaire {
 
 	public function getJalons($get) {
 		ATF::jalon()->q->reset()->where('module','affaire');
-		return ATF::jalon()->sa();
+		$r = ATF::jalon()->sa();
+
+		if ($get['groupByCategory']) {
+			$result = array();
+			foreach ($r as $k=>$i) {
+				$el['text'] = $i['jalon'];
+				$el['id'] = $i['id_jalon'];
+
+				$childs[$i['category']][] = $el;
+			}
+
+			foreach (array_keys($childs) as $k=>$i) {
+				$result[$k]['text'] = strtoupper($i);
+				$result[$k]['children'] = $childs[$i];
+			}
+			$return = $result;
+		}
+
+		return $return;
 	}
 
 	public function getJalonsHistory($id) {
@@ -1154,7 +1182,7 @@ class affaire_partenaire extends affaire {
 		foreach ($return as $k=>$i) {
 			$return[$k] = $this->infosJalon($return[$k]);
 		}
-		return $return;
+		return $return ? $return : array();
 	}
 
 	private function infosJalon($jalon) {
@@ -1179,6 +1207,38 @@ class affaire_partenaire extends affaire {
 				$jalon['icon'] = "pli-laser";
 				$jalon['classname'] = "warning";
 			break;
+			case 6: // Installation lien SDSL
+				$jalon['icon'] = "ti-link";
+				$jalon['classname'] = "primary";
+			break;
+			case 7: // Installation lien ADSL
+				$jalon['icon'] = "ti-link";
+				$jalon['classname'] = "info";
+			break;
+			case 8: // Pose routeur SDSL
+				$jalon['icon'] = "pli-data-settings";
+				$jalon['classname'] = "success";
+			break;
+			case 9: // Pose routeur ADSL
+				$jalon['icon'] = "pli-data-settings";
+				$jalon['classname'] = "success";
+			break;
+			case 10: // Livraison prévue
+				$jalon['icon'] = "fa fa-calendar-plus-o";
+				$jalon['classname'] = "info";
+			break;
+			case 11: // Livraison réalisée
+				$jalon['icon'] = "fa fa-calendar-check-o";
+				$jalon['classname'] = "success";
+			break;
+			case 12: // 	Intervention planifiée
+				$jalon['icon'] = "fa fa-calendar-plus-o";
+				$jalon['classname'] = "info";
+			break;
+			case 13: // Intervention réalisée
+				$jalon['icon'] = "fa fa-calendar-check-o";
+				$jalon['classname'] = "success";
+			break;
 			default:
 				$jalon['icon'] = "pli-box-open";
 				$jalon['classname'] = "default";
@@ -1186,6 +1246,7 @@ class affaire_partenaire extends affaire {
 		}
 
 		$jalon['jalon'] = ATF::jalon()->nom($jalon['id_jalon']);
+		$jalon['category'] = strtoupper(ATF::jalon()->select($jalon['id_jalon'], 'category'));
 
 		return $jalon;
 	}
