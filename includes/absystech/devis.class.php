@@ -708,7 +708,7 @@ class devis_absystech extends devis {
 		if(!$infos["ref"]){
 			$infos["ref"] = ATF::affaire()->getRef($infos["date"],"devis");
 		}
-		$infos["id_user"] = ATF::$usr->getID();
+		if (!$infos["id_user"]) $infos["id_user"] = ATF::$usr->getID();
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 		if($societe["id_pays"]!="FR") $infos["tva"] =  1;
