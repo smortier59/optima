@@ -2636,7 +2636,7 @@ class pdf_cleodis extends pdf {
 
 		      if ($bon_de_commande = ATF::bon_de_commande()->sa()) {
 		       return array(
-		         "data" => base64_encode( $this->generic($fonction,$bon_de_commande[0], true) ),
+		         "data" => base64_encode( $this->generic($fonction,$bon_de_commande, true) ),
 		         "strMimeType" => "application/pdf"
 		       );
 		      }
