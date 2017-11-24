@@ -3797,7 +3797,7 @@ class hotline extends classes_optima {
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
 
-	  $return = $data['data'];
+	  	$return = $data['data'];
 		}
 
 		return $return;

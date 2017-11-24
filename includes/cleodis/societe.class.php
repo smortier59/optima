@@ -16,8 +16,17 @@ class societe_cleodis extends societe {
 
     /*-----------Quick Insert-----------------------*/
     $this->quick_insert = array('societe'=>'societe');
-    $this->colonnes['fields_column'][] = "societe.nom_commercial";
-    $this->colonnes['fields_column'][] = "societe.code_client";
+
+    $this->colonnes['fields_column'] = array(
+      'societe.societe'
+      ,'societe.tel' => array("tel"=>true)
+      ,'societe.fax' => array("tel"=>true)
+      ,'societe.email'
+      ,'societe.ville'
+      ,"societe.nom_commercial"
+      ,"societe.code_client"
+      ,'logo'=> array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70,"renderer"=>"uploadFile")
+    );
 
     // Panel prinicpal
     $this->colonnes['primary'] = array(
@@ -153,6 +162,8 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_prospection"] = "contact";
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
+
+    $this->files["logo"] = array("type"=>"png","no_upload"=>false,"no_generate"=>true);
 
 
 
@@ -1041,12 +1052,9 @@ class societe_cleodis extends societe {
 
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
-
     $email = $post["email"];
-
-
+    $fournisseur = 6241;
     $data = self::getInfosFromCREDITSAFE($post);
-
 
     if($data){
       $gerants = $data["gerant"];
@@ -1075,13 +1083,13 @@ class societe_cleodis extends societe {
             $data_soc = $data;
 
             $data_soc["id_apporteur"]   = 28531; //Apporteur d'affaire TOSHIBA
-            $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
+            $data_soc["id_fournisseur"] = $fournisseur; //Fournisseur ALSO
 
 
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
             $id_societe = $this->insert($data_soc);
 
-            $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => 6241));
+            $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => $fournisseur));
 
           }
 
@@ -1157,6 +1165,31 @@ class societe_cleodis extends societe {
             }
             return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;
           });
+          // fournisseur par défaut
+          $fournisseur_produit = 'ALSO FRANCE';
+          $fournisseur_produit_id = "6241";
+          // si une provenance est présente on récupère les infos de cette société
+
+
+          if($post["provenance"]){
+            // On récupère l'identifiant du revendeur à partir du ?lead
+            $this->q->reset()
+                    ->where("lead",$post['provenance'])
+                    ->AndWhere('revendeur','oui');
+            $revendeur = $this->select_row();
+            if($revendeur){
+              $fournisseur_produit_id = $revendeur['id_societe'];
+              $fournisseur_produit = $revendeur['societe'];
+            }
+
+            // On récupère l'identifiant du partenaire à partir du ?lead
+            $this->q->reset()
+                    ->where("lead",$post['provenance']);
+            if($partenaire = $this->select_row()){
+              $devis["id_partenaire"] = $partenaire['id_societe'];
+            }
+          }
+
           // maintenant il faut appliquer cet ordre aux pack produits
           foreach ($pack_pro_ligne as $k => $v) {
             foreach ($post["produits"] as $key => $value) {
@@ -1191,18 +1224,17 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__ref"=>$produit["ref"],
                                   "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
                                   "devis_ligne__dot__id_produit"=>$produit["id_produit"],
-                                  "devis_ligne__dot__id_fournisseur"=>"TOSHIBA TEC",
+                                  "devis_ligne__dot__id_fournisseur"=>$fournisseur_produit,
                                   "devis_ligne__dot__visibilite_prix"=>"invisible",
                                   "devis_ligne__dot__date_achat"=>"",
                                   "devis_ligne__dot__commentaire"=>"",
                                   "devis_ligne__dot__neuf"=>"oui",
                                   "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
-                                  "devis_ligne__dot__id_fournisseur_fk"=>"5474"
+                                  "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id
                                 );
             }
           }
           $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
-
           try {
              $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
           } catch (errorATF $e) {
@@ -1212,22 +1244,16 @@ class societe_cleodis extends societe {
 
           switch ($post["provenance"]) {
             case 'd023ef3680189f828a53810e3eda0ecc':
-              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"toshiba"));
             break;
 
             case '7154b414c85f24ffefcefe53490c49bd':
-              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"la_poste"/*, "id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/));
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"la_poste"));
             break;
 
             default:
-              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"/*,"id_apporteur"=> "SOCIETE TOSHIBA","id_fournisseur"=> 6241*/ ));
+              ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
             break;
-          }
-
-          if($post["provenance"]){
-
-          }else{
-
           }
 
 
@@ -1322,11 +1348,8 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
-    log::logger("ICI" , "mfleurquin");
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
-    log::logger("in _infosCredisafePartenaire !",'ccharlier');
-    log::logger($apporteur,'ccharlier');
     $data = self::getInfosFromCREDITSAFE($post);
     if($data){
         $gerants = $data["gerant"];
@@ -1339,7 +1362,6 @@ class societe_cleodis extends societe {
             if($res){
                 $id_societe = $res["id_societe"];
             }else {
-                //log::logger($_SESSION["user"]->id_societe,'ccharlier');
                 $data_soc = $data;
                 // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
                 //$data_soc["id_apporteur"]   = $apporteur; //Apporteur d'affaire TOSHIBA
@@ -1397,7 +1419,6 @@ class societe_cleodis extends societe {
                 "gerants"=>$gerant
             );
         } catch (ATFerror $e) {
-            log::logger($e->getMessage(),"ccharlier");
             throw new errorATF("erreurCS inside",500);
 
         }
@@ -1420,6 +1441,7 @@ class societe_cleodis extends societe {
     try {
       // on met à jour l'état
       ATF::comite()->u(array("id_comite"=>$comite['id_comite'], "etat"=>$decision, "decisionComite"=>"Accepté manuellement"));
+      ATF::affaire()->u(array("id_affaire"=>$id_affaire, "etat_comite"=>$decision));
       // ainsi que la table affaire etat pour la timeline
       ATF::affaire_etat()->insert(array(
           "id_affaire"=>$id_affaire,
@@ -1468,9 +1490,12 @@ class societe_cleodis extends societe {
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
 
-    $id_affaire = $post["id_affaire"];
+    $id_affaire = ATF::affaire()->decryptId($post["id_affaire"]);
+
+
     ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
     $devis = ATF::devis()->select_row();
+
 
     ATF::devis_ligne()->q->reset()->where("id_devis", $devis["id_devis"]);
     $lignes = ATF::devis_ligne()->select_all();
@@ -1590,27 +1615,16 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
-    if(__PRE__ === true){
-        file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafebe.xml",simplexml_load_string($response));
-      }else{
-         file_put_contents("/home/optima/core/log/creditsafebe.xml",simplexml_load_string($response));
-      }
-
-
-    $response = file_get_contents("/home/optima/core/log/creditsafebe.xml");
-
-
+log::logger($response , "mfleurquin");
 
     $xml = $response;
 
     // response/Messages / Message type = error
     $error = False;
     $messageSociete =$xml->FindCompaniesResult->Messages->Message;
-    foreach ( $messageSociete as $msg ) {
-      if($msg->Type == "Error"){
-        ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-        return $error = True;
-      }
+    if($messageSociete && $messageSociete->Type == "Error"){
+      ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
+      return $error = True;
     }
     if($error == False){
       $param = (object)array
@@ -1624,19 +1638,16 @@ class societe_cleodisbe extends societe_cleodis {
       );
       $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
 
-      $messageReport =$res->RetrieveCompanyOnlineReportResult->Messages->Message;
+log::logger($res , "mfleurquin");
 
-      foreach ( $messageReport as $msg ) {
-        if($msg->Type == "Error"){
-          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-          return $error = True;
+      $messageReport =$res->RetrieveCompanyOnlineReportResult->Messages->Message;
+      if(!$messageReport){
+        $data = $this->cleanGGSResponse($res);
+      }else{
+        if($messageReport->Type == "Error"){
+          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"));
         }
-        // si aucune notice d'erreur n'est retournée, alors on peut clean la réponse GGS
-        if($error == False){
-          $data = $this->cleanGGSResponse($res);
-        }else{
-          $data = Null;
-        }
+        $data = Null;
       }
     }else{
       $data = Null;

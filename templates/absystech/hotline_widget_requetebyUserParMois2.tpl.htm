@@ -6,28 +6,28 @@
 {$type = requetebyUserParMois}
 <div id="{$module}_grapherequetebyUserParMois2" class="widget"></div>
 
-{$nbjOuvres = ATF::hotline()->getJoursOuvres(date("Y-m-01" , strtotime("-1 month", strtotime(date("Y-m-01")))), date("Y-m-d", strtotime("-1 day", strtotime(date("Y-m-01")))))} 
+{$nbjOuvres = ATF::hotline()->getJoursOuvres(date("Y-m-01" , strtotime("-1 month", strtotime(date("Y-m-01")))), date("Y-m-d", strtotime("-1 day", strtotime(date("Y-m-01")))))}
 
 <script type="text/javascript">
-{$data = ATF::getClass($module)->requetebyUserParMois(-1)} 
+{$data = ATF::getClass($module)->requetebyUserParMois(-1)}
 Ext.onReady(function(){
     var chart = new Highcharts.Chart({
         chart: {
             renderTo: '{$module}_grapherequetebyUserParMois2',
             type: 'spline'
-        },        
+        },
         title: {
            text: '{$data["params"]["titre"]}'
         },
-        colors :[            
-            '#737373',         
+        colors :[
+            '#737373',
             '#FF0004',
-            '#19FF30',            
-            '#FFCF23' 
+            '#19FF30',
+            '#FFCF23'
         ],
         xAxis: {
             categories: [
-                {foreach $data["categories"]["category"] as $cat}                    
+                {foreach $data["categories"]["category"] as $cat}
                     '{$cat["label"]}' {if !$cat@last},{/if}
                 {/foreach}
                 ]
@@ -41,62 +41,62 @@ Ext.onReady(function(){
             title: {
                 text: null
             }
-        }, 
-        tooltip: {           
+        },
+        tooltip: {
             shared: true
-        },       
-        series: [                
-               {                   
+        },
+        series: [
+               {
                    type: 'column'
-                   ,name: "Congés"                   
+                   ,name: "Congés"
                    ,data: [
                           {foreach $data["categories"]["category"] as $key => $cat}
-                              [  
+                              [
                                  {$data["dataset"]["conges"]["set"][$key]["value"]}
                                  {if !$key@last},{/if}
-                              ] 
+                              ]
                               {if !$key@last},{/if}
-                         {/foreach}    
-                         ] 
-              }, {                   
+                         {/foreach}
+                         ]
+              }, {
                    type: 'column'
-                   ,name: "Tps non facturé"                   
+                   ,name: "Tps non facturé"
                    ,data: [
                           {foreach $data["categories"]["category"] as $key => $cat}
-                                                    [  
+                                                    [
                                 {$data["dataset"]["non"]["set"][$key]["value"]}
-                                                           
+
                           ]
                           {if !$key@last},{/if}
-                          {/foreach} 
+                          {/foreach}
                         ]
               }  ,
-              {                   
+              {
                    type: 'column'
-                   ,name: "Tps facturé"                   
+                   ,name: "Tps facturé"
                    ,data: [
                           {foreach $data["categories"]["category"] as $key => $cat}
-                              [  
+                              [
                                  {$data["dataset"]["oui"]["set"][$key]["value"]}
                                  {if !$key@last},{/if}
-                              ] 
+                              ]
                               {if !$key@last},{/if}
-                         {/foreach}    
-                         ] 
+                         {/foreach}
+                         ]
               },  {
                         type: 'spline',
                         name: 'Objectif',
                         data: [
-                                {foreach $data["categories"]["category"] as $key => $cat}   
-                                      {if $key == 60} {$nbjOuvres}*6*0.8 {else} {$nbjOuvres}*6 {/if}
+                                {foreach $data["categories"]["category"] as $key => $cat}
+                                      {$nbjOuvres}*6
                                       {if !$key@last},{/if}
-                                {/foreach}    
+                                {/foreach}
                             ]
                         ,marker: {
                              enabled: false
-                          }                   
-                    }                      
-           ]        
+                          }
+                    }
+           ]
     });
 });
 </script>
