@@ -1,3 +1,11 @@
+INSERT INTO `campagne` (`id_campagne`, `campagne`) VALUES (NULL, 'OB RESEAUX');
+
+
+
+
+
+
+
 ALTER TABLE `mandat` CHANGE `nature` `nature` ENUM('normal','cedre','orange_bleue') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'normal';
 ALTER TABLE `mandat_ligne` CHANGE `mandat_type` `mandat_type` ENUM('btob','btoc','cedre','orange_bleue') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 

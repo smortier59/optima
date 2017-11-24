@@ -1,4 +1,4 @@
-<?	
+<?
 /** Classe devis
 * @package Optima
 * @subpackage Cleodis
@@ -15,7 +15,7 @@ class sous_categorie_cleodis extends sous_categorie {
 	function __construct() {
 		parent::__construct();
 		$this->table = "sous_categorie";
-		$this->colonnes['fields_column'] = array( 
+		$this->colonnes['fields_column'] = array(
 			 'sous_categorie.sous_categorie'
 		);
 
@@ -23,7 +23,7 @@ class sous_categorie_cleodis extends sous_categorie {
 			"sous_categorie"
 		);
 
-		$this->fieldstructure();	
+		$this->fieldstructure();
 		$this->onglets = array(
 			'produit'=>array('opened'=>true)
 		);
@@ -33,11 +33,11 @@ class sous_categorie_cleodis extends sous_categorie {
 	/**
     * Surcharge de la méthode autocomplete pour faire apparaître sous_catégorie et catégorie
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $infos 
-    * @return int  id si enregistrement ok 
-    */   	
+	* @param array $infos
+    * @return int  id si enregistrement ok
+    */
 	function autocomplete($infos) {
-			
+
 			// Récupérer les produits
 			$this->q->reset()
 				->addJointure("sous_categorie","id_categorie","categorie","id_categorie")
@@ -60,14 +60,14 @@ class sous_categorie_cleodis extends sous_categorie {
         $this->q->reset();
 
         // On ajoute les champs utiles pour l'autocomplete
-        $this->q->addField("id_sous_categorie")->addField("sous_categorie")->where("id_categorie",$get["id"]);
+        $this->q->addField("id_sous_categorie")->addField("sous_categorie")->where("id_categorie",$get["id"])->addOrder('sous_categorie','ASC');
 
         if ($get['q']) {
             $this->q->setSearch($get["q"]);
         }
         $this->q->setLimit($length,$start)->setPage($start/$length);
 
-        return $this->select_all();    
+        return $this->select_all();
     }
 };
 

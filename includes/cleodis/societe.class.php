@@ -1166,8 +1166,8 @@ class societe_cleodis extends societe {
             return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;
           });
           // fournisseur par défaut
-          $fournisseur_produit = 'TOSHIBA TEC';
-          $fournisseur_produit_id = "5474";
+          $fournisseur_produit = 'ALSO FRANCE';
+          $fournisseur_produit_id = "6241";
           // si une provenance est présente on récupère les infos de cette société
 
 

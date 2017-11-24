@@ -678,16 +678,22 @@ class contact extends classes_optima {
 	 * @return [array] $res   [champs de la table contact qui constitueront la session]
 	 */
 	public function login($infos){
+
 		$this->loginQuery($infos);
 
 		//Test du login et initialisation des informations utilisateurs
 		if ($res = $this->select_all()) {
-
 			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["p"])==hash('sha256',__GOD_PASSWORD__))
 				|| hash('sha256',$infos["p"])==$res["pwd"]
 				){
 				return $res;
+			} else {
+
+				throw new Exception("LOGIN_ERROR, votre identifiant et/ou mot de passe est/sont incorrecte(s)",6455);
 			}
+		} else {
+
+			throw new Exception("LOGIN_ERROR, votre identifiant et/ou mot de passe est/sont incorrecte(s)",6456);
 		}
 
 		return false;

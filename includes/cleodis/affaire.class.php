@@ -2623,6 +2623,29 @@ class affaire_cap extends affaire {
 	}
 
 
+	/**
+	* Retouren l'objet mandat associé à l'affaire passée en paramètre
+	* @author Morgan FLEURUQUIN <mfleurquin@absystech.fr>
+	* @param int $id_affaire Affaire qui demande sa commande
+	* @return commande_cleodis
+	*/
+	function getMandat($id_affaire=NULL){
+		if (!$id_affaire && $this->infos["id_affaire"]) {
+			$id_affaire = $this->infos["id_affaire"];
+		}
+		if($id_affaire){
+			ATF::mandat()->q->reset()->setStrict()->addField('mandat.id_mandat')->addCondition("mandat.id_affaire",$id_affaire)->setDimension("cell");
+			if($id_mandat = ATF::mandat()->sa()) {
+				return new mandat_cleodis($id_mandat);
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	}
+
+
 };
 
 ?>
