@@ -2109,13 +2109,13 @@ class affaire_cleodis extends affaire {
 
 		$id_affaire = $this->decryptId($get["id_affaire"]);
 		if ($this->paiementIsReceived($id_affaire)){
-			return false;
+			return array("result"=>false);
 		} else {
 			ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)
 				->addOrder("id_loyer", "ASC")
 				->setLimit(1);
 			$loyer = ATF::loyer()->select_row();
-			return $loyer;
+			return array("result"=>$loyer);
 		}
 	}
 
