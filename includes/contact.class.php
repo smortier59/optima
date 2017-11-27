@@ -662,10 +662,6 @@ class contact extends classes_optima {
 	 */
 	public function loginQuery($infos){
 		$this->q->reset()
-			/*->select('contact.id_societe')
-			->select('contact.civilite')
-			->select('contact.prenom')
-			->select('contact.nom')*/
 			->where('login',ATF::db()->escape_string($infos["u"]))
 			->setDimension('row');
 	}
@@ -686,10 +682,11 @@ class contact extends classes_optima {
 			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["p"])==hash('sha256',__GOD_PASSWORD__))
 				|| hash('sha256',$infos["p"])==$res["pwd"]
 				){
+
 				return $res;
 			} else {
 
-				throw new Exception("LOGIN_ERROR, votre identifiant et/ou mot de passe est/sont incorrecte(s)",6455);
+				throw new Exception("PWD_ERROR, votre identifiant et/ou mot de passe est/sont incorrecte(s)",6455);
 			}
 		} else {
 
