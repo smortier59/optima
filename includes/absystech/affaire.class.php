@@ -835,6 +835,27 @@ class affaire_absystech extends affaire {
 		}
 	}
 
+	public function _set($get, $post) {
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
+
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if ($post['name'] != "date_fin") throw new Exception("NON_MODIFIABLE",1203);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		switch ($post['name']) {
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_affaire'] = $post['pk'];
+
+		return $this->u($toUpdate);
+	}
+
+
 
 
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
@@ -1032,6 +1053,7 @@ class affaire_partenaire extends affaire {
 			"affaire.date"=>array(),
 			"affaire.etat"=>array(),
 			"affaire.id_societe"=>array(),
+			"affaire.date_fin"=>array(),
 			"devis.id_devis"=>array(),
 			"devis.id_contact"=>array(),
 			'contact.fonction'=>array(),
@@ -1042,13 +1064,15 @@ class affaire_partenaire extends affaire {
 			'societe.adresse_2'=>array(),
 			'societe.adresse_3'=>array(),
 			'societe.cp'=>array(),
-			'societe.ville'=>array()
+			'societe.ville'=>array(),
+			'MAX(affaire_etat.date)'=>array("alias"=>"last_jalon")
 		);
 
 		$this->q->addField($colsData);
 		$this->q->from("affaire","id_societe","societe","id_societe");
 		$this->q->from("affaire","id_affaire","devis","id_affaire");
 		$this->q->from("devis","id_contact","contact","id_contact");
+		$this->q->from("affaire","id_affaire","affaire_etat","id_affaire");
 
 		if($get["search"]){
 			header("ts-search-term: ".$get['search']);
@@ -1090,6 +1114,13 @@ class affaire_partenaire extends affaire {
 		// On check le flag
 		$this->q->where("suivi_ec",true);
 
+		// Filtre sur l'etat de l'affaire
+		if ($get['filters']['en_cours'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire","!=");
+		}
+		if ($get['filters']['terminee'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+		}
 
 		if ($get['id']) {
 			$this->q->where("affaire.id_affaire",$get['id'])->setLimit(1);
@@ -1099,6 +1130,9 @@ class affaire_partenaire extends affaire {
 			switch ($get['tri']) {
 				case 'societe':
 					$get['tri'] = "societe.".$get['tri'];
+				break;
+				case 'last_jalon':
+					$get['tri'] = $get['tri'];
 				break;
 				default:
 					$get['tri'] = "affaire.".$get['tri'];
@@ -1186,6 +1220,7 @@ class affaire_partenaire extends affaire {
 	}
 
 	private function infosJalon($jalon) {
+
 		switch ($jalon['id_jalon']) {
 			case 1: // Préparation en cours
 				$jalon['icon'] = "pli-box-open";
@@ -1245,8 +1280,17 @@ class affaire_partenaire extends affaire {
 			break;
 		}
 
+
 		$jalon['jalon'] = ATF::jalon()->nom($jalon['id_jalon']);
 		$jalon['category'] = strtoupper(ATF::jalon()->select($jalon['id_jalon'], 'category'));
+
+		if ($jalon['category'] === 'ERGATEL') {
+			$jalon['classname'] = "purple";
+		} else if ($jalon['category'] === 'IRIS') {
+			$jalon['classname'] = "pink";
+		} else {
+			$jalon['classname'] = "primary";
+		}
 
 		return $jalon;
 	}
