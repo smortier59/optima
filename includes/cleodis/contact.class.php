@@ -77,6 +77,7 @@ class contact_cleodis extends contact {
 		$this->q->reset()
 			->addField("contact.*")
 			->addField("societe.lead", "lead")
+			->addField("societe.id_filiale", "id_filiale")
 			/*->select('contact.id_societe')
 			->select('contact.civilite')
 			->select('contact.prenom')
