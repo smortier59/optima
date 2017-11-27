@@ -633,7 +633,13 @@ class devis_cleodis extends devis {
 		$affaire["date_verification"]  = ATF::affaire()->select($devis["id_affaire"] , "date_verification");
 		$affaire["id_partenaire"]  = ATF::affaire()->select($devis["id_affaire"] , "id_partenaire");
 
-
+		// Déplacer toutes les pièces jointes anciennes vers le nouveau
+		$datapath = dirname(ATF::affaire()->filepath($devis["id_affaire"],"temp"));
+		$id_temp = md5(mt_rand(0,time()));
+		if ($handle = opendir($datapath)) {
+		    while (false !== ($fileName = readdir($handle))) if (strpos($fileName,$devis["id_affaire"].".")===0) rename($datapath."/".$fileName, $datapath."/".str_replace($devis["id_affaire"].".",$id_temp.".",$fileName));
+		    closedir($handle);
+		}
 
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
 
@@ -641,14 +647,18 @@ class devis_cleodis extends devis {
 
 		$id_affaire = $this->select($last_id,"id_affaire");
 
+		// Déplacer toutes les pièces jointes anciennes vers le nouveau
+		if ($handle = opendir($datapath)) {
+		    while (false !== ($fileName = readdir($handle))) if (strpos($fileName,$id_temp.".")===0) rename($datapath."/".$fileName, $datapath."/".str_replace($id_temp.".",$id_affaire.".",$fileName));
+		    closedir($handle);
+		}
+
 		if($id_affaire){
 			$affaire["id_affaire"] = $id_affaire;
 			if($affaire["affaire"] != $this->select($last_id , "devis")) $affaire["affaire"] = $this->select($last_id , "devis");
 
 			ATF::affaire()->u($affaire);
 		}
-
-
 
 		//On récupère les suivis de l'affaire modifier (supprimer en fait)
 		foreach($suivis as $key=>$item){
