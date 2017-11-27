@@ -1165,22 +1165,14 @@ class societe_cleodis extends societe {
             }
             return ($item1['ordre'] < $item2['ordre']) ? -1 : 1;
           });
-          // fournisseur par défaut
-          $fournisseur_produit = 'ALSO FRANCE';
-          $fournisseur_produit_id = "6241";
+
           // si une provenance est présente on récupère les infos de cette société
-
-
           if($post["provenance"]){
             // On récupère l'identifiant du revendeur à partir du ?lead
             $this->q->reset()
                     ->where("lead",$post['provenance'])
                     ->AndWhere('revendeur','oui');
             $revendeur = $this->select_row();
-            if($revendeur){
-              $fournisseur_produit_id = $revendeur['id_societe'];
-              $fournisseur_produit = $revendeur['societe'];
-            }
 
             // On récupère l'identifiant du partenaire à partir du ?lead
             $this->q->reset()
@@ -1216,6 +1208,22 @@ class societe_cleodis extends societe {
                             "loyer__dot__support"=>"",
                             "loyer__dot__avec_option"=>"non"
                           );
+
+              if($revendeur){
+                $fournisseur_produit_id = $revendeur['id_societe'];
+                $fournisseur_produit = $revendeur['societe'];
+              } else {
+                // fournisseur par défaut
+                $fournisseur_produit = 'ALSO FRANCE';
+                $fournisseur_produit_id = "6241";
+
+                /*ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
+                                                     ->where("id_produit", $produit["id_produit"]);
+                $ligne = ATF::pack_produit_ligne()->select_row();*/
+
+
+              }
+
 
               $produits[] = array(
                                   "devis_ligne__dot__produit"=> $produit["produit"],
@@ -1365,12 +1373,12 @@ class societe_cleodis extends societe {
                 $data_soc = $data;
                 // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
                 //$data_soc["id_apporteur"]   = $apporteur; //Apporteur d'affaire TOSHIBA
-                $data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
+                //$data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
                 // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
-                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => 6241));
+                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
             }
             if($gerants){
                 foreach ( $gerants as $key => $value) {
