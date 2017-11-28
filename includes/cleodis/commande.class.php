@@ -150,7 +150,8 @@ class commande_cleodis extends commande {
 				->addJointure("commande","id_societe","societe","id_societe")
 				->addJointure("commande","id_affaire","affaire","id_affaire")
 				->addJointure("commande","id_affaire","loyer","id_affaire")
-				->where("affaire.provenance", "partenaire")
+
+				//->where("affaire.provenance", "partenaire")
 
 
 				->where("commande.etat", "non_loyer","AND", false, "!=")

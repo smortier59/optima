@@ -71,6 +71,6 @@ class sous_categorie_cleodis extends sous_categorie {
     }
 };
 
-class sous_categorie_cleodisbe extends sous_categorie { };
-class sous_categorie_cap extends sous_categorie { };
+class sous_categorie_cleodisbe extends sous_categorie_cleodis { };
+class sous_categorie_cap extends sous_categorie_cleodis { };
 ?>

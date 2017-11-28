@@ -1358,7 +1358,19 @@ class societe_cleodis extends societe {
   public function _infosCredisafePartenaire($get, $post){
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
-    $data = self::getInfosFromCREDITSAFE($post);
+
+    if(ATF::$codename == "cleodisbe"){
+      $post["num_ident"] = $post["siret"];
+      $data = ATF::societe_cleodisbe()::getInfosFromCREDITSAFE($post);
+      if(!$data["societe"]){
+        throw new errorATF("erreurCS BELGIQUE",404);
+      }
+      //On ne recupere pas de dirigeant pour CLEODIS BE, on simule un retour vide dans ce cas
+      $data["gerant"] = array();
+    }else{
+       $data = self::getInfosFromCREDITSAFE($post);
+    }
+
     if($data){
         $gerants = $data["gerant"];
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
@@ -1608,6 +1620,7 @@ class societe_cleodisbe extends societe_cleodis {
   */
   public function getInfosFromCREDITSAFE($infos) {
 
+
     $client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
 
     $params = (object)array
@@ -1623,7 +1636,6 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
-log::logger($response , "mfleurquin");
 
     $xml = $response;
 
@@ -1646,19 +1658,18 @@ log::logger($response , "mfleurquin");
       );
       $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
 
-log::logger($res , "mfleurquin");
-
       $messageReport =$res->RetrieveCompanyOnlineReportResult->Messages->Message;
       if(!$messageReport){
         $data = $this->cleanGGSResponse($res);
       }else{
         if($messageReport->Type == "Error"){
           ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"));
+          throw new errorATF((string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"),500);
         }
-        $data = Null;
       }
     }else{
-      $data = Null;
+      throw new errorATF((string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"),500);
+
     }
     return $data;
   }

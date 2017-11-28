@@ -48,4 +48,6 @@ class categorie_cleodis extends categorie {
     }
 };
 
+class categorie_cleodisbe extends categorie_cleodis {}
+
 ?>
