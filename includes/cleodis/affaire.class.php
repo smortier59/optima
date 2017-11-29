@@ -1485,6 +1485,7 @@ class affaire_cleodis extends affaire {
 				$data['data'][$key]["retourPV"] = false;
 				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk'], true);
 				if($commande){
+				$data['data'][$key]["id_commande_crypt"] = ATF::commande()->cryptId($commande['commande.id_commande']);
 				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
 				$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
