@@ -1269,7 +1269,36 @@ class affaire_cleodis extends affaire {
 					->where("id_partenaire", $apporteur)
 					->addGroup("affaire.id_affaire");
 
-			return $this->returnGetPortail($get, $post);
+			$retour =  $this->returnGetPortail($get, $post);
+
+			foreach ($retour as $key => $value) {
+				$retour[$key]["date_paiement"] = NULL;
+
+				if($value["bon_de_commande"] === true){
+					ATF::bon_de_commande()->q->reset()
+				       ->addField("id_bon_de_commande")
+				       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
+				       ->where("affaire.id_affaire",$value['id_affaire_fk'], "AND")
+				       ->setDimension('cell');
+				    $bdc = ATF::bon_de_commande()->sa();
+
+				    if($bdc){
+				    	ATF::facture_fournisseur()->q->reset()->where("id_bon_de_commande", $bdc)->setDimension('cell');
+				    	$ff = ATF::facture_fournisseur()->sa();
+
+				    	if($ff){
+				    		$ff = ATF::facture_fournisseur()->select($ff);
+				    		if($ff["etat"] == "payee"){
+				    			$retour[$key]["date_paiement"] = $ff["date_paiement"];
+				    		}
+				    	}
+				    }
+				}
+			}
+
+			return $retour;
+
+
 		} else{
 			throw new errorATF("Probleme d'apporteur",500);
 		}
@@ -1502,8 +1531,10 @@ class affaire_cleodis extends affaire {
 			       ->where("affaire.id_affaire", ATF::affaire()->decryptId($data['data'][$key]['id_affaire_fk']), "AND")
 			       ->setDimension('cell');
 			    $bdc = ATF::bon_de_commande()->sa();
+
 			    if($bdc){
 			    	$data['data'][$key]["bon_de_commande"] = true;
+
 			    }else{
 			    	$data['data'][$key]["bon_de_commande"] = false;
 			    }
