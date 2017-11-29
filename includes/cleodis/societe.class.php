@@ -1361,7 +1361,7 @@ class societe_cleodis extends societe {
 
     if(ATF::$codename == "cleodisbe"){
       $post["num_ident"] = $post["siret"];
-      $data = ATF::societe_cleodisbe()::getInfosFromCREDITSAFE($post);
+      $data = ATF::societe_cleodisbe()->getInfosFromCREDITSAFE($post);
       if(!$data["societe"]){
         throw new errorATF("erreurCS BELGIQUE",404);
       }
