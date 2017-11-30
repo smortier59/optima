@@ -3,12 +3,15 @@
 	fieldLabel: '{ATF::$usr->trans($key,$current_class->table)|escape:javascript}',
 	name: '{$alternateName|default:$name}[]',
 	id: '{$alternateId|default:$id}',
-	width: 400,
-	height: 200, 
-	store: [		
+	width: 600,
+	height: 200,
+	store: [
 			['16', 'Jérome Loison'],
-			['18', 'Benjamin Tronquit']
-	]	
+			['18', 'Benjamin Tronquit'],
+			['20', 'Clotilde Theret'],
+			['23', 'Hervé Anvroin'],
+			['24', 'Basile Mayer']
+	]
 	,listeners: {
 		render : function(){
 			{if ATF::comite()->default_value("suivi_notifie")}
