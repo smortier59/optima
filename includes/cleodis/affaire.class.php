@@ -1267,7 +1267,16 @@ class affaire_cleodis extends affaire {
 					->from("affaire", "id_affaire", "commande", "id_affaire")
 					->where("provenance",'partenaire')
 					->where("id_partenaire", $apporteur)
+
+					->where("affaire.etat", "devis","AND")
+
 					->addGroup("affaire.id_affaire");
+
+
+			if($get["search"]){
+				$this->q->where("affaire.affaire","%".$get["search"]."%","AND","searchquery","LIKE")
+						->where("societe.societe","%".$get["search"]."%","OR","searchquery","LIKE");
+			}
 
 			$retour =  $this->returnGetPortail($get, $post);
 
