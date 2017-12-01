@@ -3780,12 +3780,14 @@ class pdf_cleodis extends pdf {
 
 		$this->setleftmargin(30);
 		$y = $this->getY();
-		$date = explode("/", $this->comite["date_creation"]);
+		//$date = explode("/", $this->comite["date_creation"]);
+		$date = explode("-", $this->comite["date_creation"]);
+
 
 		if( (date("Y") - $date[1] ) >= 2 ){
 			$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
 		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
-		$this->cell(0,5,"Ancienneté > à 2 ans ( ".$date[1]." )",0,1,"L");
+		$this->cell(0,5,"Ancienneté > à 2 ans ( ".$date[0]." )",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();

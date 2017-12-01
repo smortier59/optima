@@ -1302,7 +1302,7 @@ class societe_cleodis extends societe {
             $comite["decisionComite"] = "Accepté automatiquement";
           }else{
             $comite["etat"] = "refuse";
-            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
+            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 5ans";
           }
 
           $comite["reponse"] = date("Y-m-d");
