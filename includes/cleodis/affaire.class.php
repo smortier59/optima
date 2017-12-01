@@ -1544,6 +1544,7 @@ class affaire_cleodis extends affaire {
 
 				$data['data'][$key]["file_facture_fournisseur"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"facture_fournisseur"));
 				$data['data'][$key]["file_cni"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"cni"));
+				$data['data'][$key]["file_cniVerso"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"cniVerso"));
 
 				ATF::bon_de_commande()->q->reset()
 			       ->addField("id_bon_de_commande")
