@@ -1551,9 +1551,7 @@ class affaire_cleodis extends affaire {
 			       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
 			       ->where("affaire.id_affaire", ATF::affaire()->decryptId($data['data'][$key]['id_affaire_fk']), "AND")
 			       ->setDimension('cell');
-			    $id_bon_de_commande = ATF::bon_de_commande()->sa();
-
-			    if($bdc){
+			    if($id_bon_de_commande = ATF::bon_de_commande()->sa()){
 			    	$data['data'][$key]["bon_de_commande"] = true;
 			    	$data['data'][$key]["id_bon_de_commande_crypt"] = ATF::bon_de_commande()->cryptId($id_bon_de_commande);
 
@@ -1748,9 +1746,7 @@ class affaire_cleodis extends affaire {
 		       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
 		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($data["idcrypted"]), "AND")
 		       ->setDimension('cell');
-		    $id_bon_de_commande = ATF::bon_de_commande()->sa();
-
-		    if($bdc){
+		    if($id_bon_de_commande = ATF::bon_de_commande()->sa()){
 		    	$data["bon_de_commande"] = true;
 		    	$data["id_bon_de_commande_crypt"] = ATF::bon_de_commande()->cryptId($id_bon_de_commande);
 
