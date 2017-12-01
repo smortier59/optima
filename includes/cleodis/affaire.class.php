@@ -1268,7 +1268,8 @@ class affaire_cleodis extends affaire {
 					->where("provenance",'partenaire')
 					->where("id_partenaire", $apporteur)
 
-					->where("affaire.etat", "devis","AND")
+					->where("affaire.etat", "devis","OR","affaire_demande","=")
+					->where("commande.etat", "non_loyer","OR","affaire_demande","=")
 
 					->addGroup("affaire.id_affaire");
 
@@ -1369,7 +1370,8 @@ class affaire_cleodis extends affaire {
 					->from("affaire", "id_affaire", "commande", "id_affaire")
 					->where("site_associe", "toshiba")
 
-					->where("affaire.etat", "devis","AND")
+					->where("affaire.etat", "devis","OR","affaire_demande","=")
+					->where("commande.etat", "non_loyer","OR","affaire_demande","=")
 
 					->where("id_partenaire", $apporteur)
 					->addGroup("affaire.id_affaire");
