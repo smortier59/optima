@@ -1555,9 +1555,11 @@ class affaire_cleodis extends affaire {
 
 			    if($bdc){
 			    	$data['data'][$key]["bon_de_commande"] = true;
+			    	$data['data'][$key]["id_bon_de_commande_crypt"] = ATF::bon_de_commande()->cryptId($bdc[0]["id_bon_de_commande"]);
 
 			    }else{
 			    	$data['data'][$key]["bon_de_commande"] = false;
+			    	$data['data'][$key]["id_bon_de_commande_crypt"] = null;
 			    }
 
 			}
