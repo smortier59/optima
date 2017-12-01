@@ -1368,6 +1368,9 @@ class affaire_cleodis extends affaire {
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
 					->where("site_associe", "toshiba")
+
+					->where("affaire.etat", "devis","AND")
+
 					->where("id_partenaire", $apporteur)
 					->addGroup("affaire.id_affaire");
 

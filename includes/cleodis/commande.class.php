@@ -164,9 +164,11 @@ class commande_cleodis extends commande {
 
 			if($get["search"]) {
 				ATF::commande()->q->where("affaire.ref", "%".$get["search"]."%" , "OR", "search", "LIKE")
-													->where("societe.societe", "%".$get["search"]."%" , "OR", "search", "LIKE")
-													->where("societe.siret", "%".$get["search"]."%" , "OR", "search", "LIKE")
-													->where("affaire.affaire", "%".$get["search"]."%" , "OR", "search", "LIKE");
+								->where("societe.societe", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("societe.code_client", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								>where("societe.cp", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("societe.siret", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("affaire.affaire", "%".$get["search"]."%" , "OR", "search", "LIKE");
 			}
 			// filtre sur les dates
 			if ($get["filters"] && $get["filters"]["startdate"]){
