@@ -867,10 +867,10 @@ class societe extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function getInfosFromCREDITSAFE($infos) {
-		if(__DEV__ === true){
+		/*if(__DEV__ === true){
 			$response = file_get_contents("/home/optima/core/log/creditsafe.xml");
 			$xml = simplexml_load_string($response);
-		} else {
+		} else {*/
 			 $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 		    <xmlrequest>
 		        <header>
@@ -900,7 +900,7 @@ class societe extends classes_optima {
 			}
 
 			$xml = simplexml_load_string($response);
-		}
+		//}
 
 
 		if($xml->xmlresponse->body->errors){
