@@ -1146,6 +1146,7 @@ class societe_cleodis extends societe {
                   "date" => date("d-m-Y"),
                   "type_devis" => "normal",
                   "id_contact" => $gerant[0]["id_contact"],
+                  "prix_achat"=>0,
                   "type_affaire" => "normal");
           $values_devis =array();
 
@@ -1212,17 +1213,17 @@ class societe_cleodis extends societe {
                             "loyer__dot__avec_option"=>"non"
                           );
 
+               ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
+                                                       ->where("id_produit", $produit["id_produit"]);
+                $ligne = ATF::pack_produit_ligne()->select_row();
+
               if($revendeur){
                 $fournisseur_produit_id = $revendeur['id_societe'];
                 $fournisseur_produit = $revendeur['societe'];
               } else {
                 // fournisseur par défaut
-                $fournisseur_produit = 'ALSO FRANCE';
-                $fournisseur_produit_id = "6241";
-
-                ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
-                                                       ->where("id_produit", $produit["id_produit"]);
-                $ligne = ATF::pack_produit_ligne()->select_row();
+                //$fournisseur_produit = 'ALSO FRANCE';
+                //$fournisseur_produit_id = "6241";
 
                 $fournisseur_produit_id = "Fournisseur par defaut";
                 $fournisseur_produit_id = $ligne["id_fournisseur"];
@@ -1234,7 +1235,7 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__quantite"=>$value*$post["selectQtePack"],
                                   "devis_ligne__dot__type"=>"sans_objet",
                                   "devis_ligne__dot__ref"=>$produit["ref"],
-                                  "devis_ligne__dot__prix_achat"=>$produit["prix_achat"],
+                                  "devis_ligne__dot__prix_achat"=>$ligne["prix_achat"],
                                   "devis_ligne__dot__id_produit"=>$produit["id_produit"],
                                   "devis_ligne__dot__id_fournisseur"=>$fournisseur_produit,
                                   "devis_ligne__dot__visibilite_prix"=>"invisible",
@@ -1244,6 +1245,8 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
                                   "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id
                                 );
+              $devis["prix_achat"] += $ligne["prix_achat"];
+
             }
           }
           $values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
