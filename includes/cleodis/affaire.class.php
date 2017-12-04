@@ -1686,6 +1686,7 @@ class affaire_cleodis extends affaire {
 					->addField("adresse_2")
 					->addField("adresse_3")
 					->addField("code_client")
+					->addField("siren")
 					->addField("societe")
 					->addField("cp")
 					->addField("ville")
@@ -1711,7 +1712,7 @@ class affaire_cleodis extends affaire {
 				if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $data['devis'][$key]["documentAnnexes"] = true;
 		  }
 
-		  ATF::loyer()->q->reset()->where("loyer.id_affaire", $get['id_affaire']);
+		  ATF::loyer()->q->reset()->where("loyer.id_affaire", $this->decryptId($get["id_affaire"]));
 		  $data["loyer"] = ATF::loyer()->sa();
 
 		  $data["comites"] = $this->getComite($get["id_affaire"]);
