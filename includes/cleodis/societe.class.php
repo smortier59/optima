@@ -1213,17 +1213,17 @@ class societe_cleodis extends societe {
                             "loyer__dot__avec_option"=>"non"
                           );
 
+               ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
+                                                       ->where("id_produit", $produit["id_produit"]);
+                $ligne = ATF::pack_produit_ligne()->select_row();
+
               if($revendeur){
                 $fournisseur_produit_id = $revendeur['id_societe'];
                 $fournisseur_produit = $revendeur['societe'];
               } else {
                 // fournisseur par défaut
-                $fournisseur_produit = 'ALSO FRANCE';
-                $fournisseur_produit_id = "6241";
-
-                ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
-                                                       ->where("id_produit", $produit["id_produit"]);
-                $ligne = ATF::pack_produit_ligne()->select_row();
+                //$fournisseur_produit = 'ALSO FRANCE';
+                //$fournisseur_produit_id = "6241";
 
                 $fournisseur_produit_id = "Fournisseur par defaut";
                 $fournisseur_produit_id = $ligne["id_fournisseur"];
