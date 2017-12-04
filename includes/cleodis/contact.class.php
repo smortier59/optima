@@ -14,6 +14,32 @@ class contact_cleodis extends contact {
 		$this->table = "contact";
 	}
 
+
+	/**
+	* Surcharge de l'insert de contact
+	* Permet de modifier le responsable de la société lorsqu'il ne fait plus parti de CLEODIS
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @date 2017-12-04
+	* @param array $infos
+	*/
+	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+
+		if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
+			if(preg_match('/(?=.*[a-z])(?=.*\d)[a-zA-Z\d]/', $infos["contact"]["pwd"]) == 0){
+				throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+			} else {
+				if(strlen($infos["contact"]["pwd"]) < 6){
+					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				}
+			}
+		}
+
+		parent::insert($infos,$s,$files,$cadre_refreshed);
+	}
+
+
+
+
 	/**
 	* Surcharge de l'update de contact
 	* Permet de modifier le responsable de la société lorsqu'il ne fait plus parti de CLEODIS
@@ -22,7 +48,21 @@ class contact_cleodis extends contact {
 	* @param array $infos
 	*/
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+
+		if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
+			if(preg_match('/(?=.*[a-z])(?=.*\d)[a-zA-Z\d]/', $infos["contact"]["pwd"]) == 0){
+				throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+			} else {
+				if(strlen($infos["contact"]["pwd"]) < 6){
+					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				}
+			}
+		}
+
 		parent::update($infos,$s,$files,$cadre_refreshed);
+
+
+
 
 		if($infos["contact"]["etat"] === "inactif"){
 			//Si l'utilisateur fait parti de CLEODIS ou CLEOFI ...
