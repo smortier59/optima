@@ -912,7 +912,6 @@ class societe extends classes_optima {
 				$data = $this->cleanCSResponse($response);
 			}
 		}
-		log::logger($data,'creditsafe');
 		return $data;
 	}
 
@@ -928,6 +927,20 @@ class societe extends classes_optima {
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+		$directors = $item->Directors->CurrentDirectors;
+
+		foreach ($directors->Director as $key => $value) {
+			if(!preg_match("/Commissaire aux comptes/" ,$value->Position->_)){
+
+				$nom = explode("  ", (string)$value->Name);
+
+				$return['gerant'][] = array("nom"=>$nom[1],
+											"prenom"=>$nom[0],
+								  			"fonction"=>(string)$value->Position->_);
+			}
+		}
+
 
 		// Nom de société
 		$return['societe'] = (string)$company->BasicInformation->BusinessName;

@@ -23,7 +23,6 @@ class contact_cleodis extends contact {
 	* @param array $infos
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
-
 		if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
 			if(preg_match('/(?=.*[a-z])(?=.*\d)[a-zA-Z\d]/', $infos["contact"]["pwd"]) == 0){
 				throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
@@ -33,8 +32,7 @@ class contact_cleodis extends contact {
 				}
 			}
 		}
-
-		parent::insert($infos,$s,$files,$cadre_refreshed);
+		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
 
 
@@ -59,7 +57,7 @@ class contact_cleodis extends contact {
 			}
 		}
 
-		parent::update($infos,$s,$files,$cadre_refreshed);
+		$return = parent::update($infos,$s,$files,$cadre_refreshed);
 
 
 
@@ -103,6 +101,7 @@ class contact_cleodis extends contact {
 				}
 			}
 		}
+		return $return;
 
 	}
 
