@@ -1190,6 +1190,9 @@ class societe_cleodis extends societe {
               }
             }
           }
+
+
+
           foreach ($produitsAfterTri as $key => $value) {
             if($value > 0){
               $produit = ATF::produit()->select($key);
@@ -1217,11 +1220,12 @@ class societe_cleodis extends societe {
                 $fournisseur_produit = 'ALSO FRANCE';
                 $fournisseur_produit_id = "6241";
 
-                /*ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
-                                                     ->where("id_produit", $produit["id_produit"]);
-                $ligne = ATF::pack_produit_ligne()->select_row();*/
+                ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
+                                                       ->where("id_produit", $produit["id_produit"]);
+                $ligne = ATF::pack_produit_ligne()->select_row();
 
-
+                $fournisseur_produit_id = "Fournisseur par defaut";
+                $fournisseur_produit_id = $ligne["id_fournisseur"];
               }
 
 
