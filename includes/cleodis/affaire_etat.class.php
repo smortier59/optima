@@ -33,27 +33,25 @@ class affaire_etat extends classes_optima {
 		return $ret?$ret:false;
 	}
 
+	/**
+	 * [_POST insere un nouvel état de l'affaire]
+	 * @param  [type] $get
+	 * @param  [type] $post
+	 * @return [boolean]
+	 */
 	public function _POST($get, $post){
-		log::logger('here', 'alahlah');
-		// au cas ou il y aurait un changement de format d'id transmis
 		$id_affaire = ATF::affaire()->decryptId($post["id_affaire"]);
 		$etat = "autre";
 		$commentaire = json_encode($post);
 
-		try {
+		ATF::affaire_etat()->insert(array(
+			'id_affaire'=>$id_affaire
+			,'etat'=>$etat
+			,'id_user'=>ATF::$usr->get('id_user')
+			,'date'=>date("Y-m-d H:i:s")
+			,'commentaire'=>$commentaire
+		));
 
-			ATF::affaire_etat()->insert(array(
-				'id_affaire'=>$id_affaire
-				,'etat'=>$etat
-				,'id_user'=>ATF::$usr->get('id_user')
-				,'date'=>date("Y-m-d H:i:s")
-				,'commentaire'=>$commentaire
-			));
-
-			return true;
-		} catch (Exception $e) {
-			//log::logger($e, 'alahlah');
-			return $e->getMessage();
-		}
+		return true;
 	}
 }
