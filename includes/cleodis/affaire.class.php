@@ -1616,7 +1616,7 @@ class affaire_cleodis extends affaire {
 		$this->q->setCount();
 
 
-		if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
+		if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.provenance','affaire.id_partenaire','affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 		$this->q->addField($colsData)
 				->addField("Count(bon_de_commande.id_bon_de_commande)","total_bdc")
@@ -1626,7 +1626,8 @@ class affaire_cleodis extends affaire {
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire")
-				->from("affaire", "id_affaire", "commande", "id_affaire");
+				->from("affaire","id_affaire", "commande", "id_affaire")
+				->from("affaire","id_partenaire", "societe", "id_societe");
 
 
 		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
@@ -1655,6 +1656,12 @@ class affaire_cleodis extends affaire {
 		if ($get['id_affaire']) {
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
+
+		  $data["partenaire"] = NULL;
+		  if($data["affaire.id_partenaire"]){
+		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire"] , "societe");
+		  }
+
 		  // on check si l'affaire est "payee"
 		  $data['payee'] = $this->paiementIsReceived($data['affaire.id_affaire_fk']);
 		  // on set les infos signataire pour la relance des paiements
@@ -2510,6 +2517,33 @@ class affaire_cleodis extends affaire {
 		}
 		return $return;
 
+	}
+
+
+	/**
+	 * Permet d'updater des champs editable depuis CLEOSCOPE
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $get  [description]
+	 * @param  [type] $post [description]
+	 */
+	public function _set($get, $post) {
+
+	  	$input = file_get_contents('php://input');
+
+	  	if (!empty($input)) parse_str($input,$post);
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		switch ($post['name']) {
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_affaire'] = $post['pk'];
+
+		return $this->u($toUpdate);
 	}
 
 

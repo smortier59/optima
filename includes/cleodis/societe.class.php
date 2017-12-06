@@ -198,6 +198,29 @@ class societe_cleodis extends societe {
 
   }
 
+
+
+  /** Fonction qui génère les résultat pour les champs d'auto complétion société pour CLEOSCOPE
+  * @authorMorgan FLEURQUIN <mfleurquin@absystech.fr>
+  */
+  public function _ac($get,$post) {
+    $this->q->reset();
+
+    // On ajoute les champs utiles pour l'autocomplete
+    $this->q->addField("id_societe")->addField("societe")->addField("ref")->addField("societe");
+
+    if ($get['q']) {
+      $this->q->setSearch($get["q"]);
+    }
+
+    // Clause globale
+    $this->q->where("etat","actif");
+    $this->q->addOrder("societe","ASC");
+    return $this->select_all();
+  }
+
+
+
   public function getOpca(){
     $this->q->reset()->where("societe.etat", "actif");
     return $this->select_all();
