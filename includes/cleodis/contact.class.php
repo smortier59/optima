@@ -24,7 +24,7 @@ class contact_cleodis extends contact {
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
-			if(preg_match("/^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z]).{6,}$/", $infos["contact"]["pwd"]) == 0){
+			if(preg_match("^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd"]) == 0){
 				throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 			} else {
 				if(strlen($infos["contact"]["pwd"]) < 6){
@@ -48,7 +48,7 @@ class contact_cleodis extends contact {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 
 		if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
-			if(preg_match("/^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z]).{6,}$/", $infos["contact"]["pwd"]) == 0){
+			if(preg_match("^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd"]) == 0){
 				throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 			} else {
 				if(strlen($infos["contact"]["pwd"]) < 6){
