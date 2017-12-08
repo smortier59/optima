@@ -3783,6 +3783,9 @@ class hotline extends classes_optima {
 
 			$return = $data['data'][0];
 
+			// SPécial patch pour éviter que les balises html flingue le formattage
+			$return['detail'] = htmlspecialchars($return['detail']);
+
 			// Check PJ
 			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
 			$return["idc"] = $this->cryptId($get['id']);
