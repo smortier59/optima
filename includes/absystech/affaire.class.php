@@ -1131,8 +1131,8 @@ class affaire_partenaire extends affaire {
 				case 'societe':
 					$get['tri'] = "societe.".$get['tri'];
 				break;
-				case 'last_jalon':
-					$get['tri'] = $get['tri'];
+				case 'date_fin':
+					$get['tri'] = "-".$get['tri'];
 				break;
 				default:
 					$get['tri'] = "affaire.".$get['tri'];
@@ -1144,9 +1144,9 @@ class affaire_partenaire extends affaire {
 			$this->q->addGroup('affaire.id_affaire');
 		}
 
-		// $this->q->setToString();
-		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
-		// $this->q->unsetToString();
+		$this->q->setToString();
+		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
+		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
