@@ -1627,8 +1627,7 @@ class affaire_cleodis extends affaire {
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire")
-				->from("affaire","id_affaire", "commande", "id_affaire")
-				->from("affaire","id_partenaire", "societe", "id_societe");
+				->from("affaire","id_affaire", "commande", "id_affaire");
 
 
 		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
@@ -1663,8 +1662,8 @@ class affaire_cleodis extends affaire {
 
 
 		  $data["partenaire"] = NULL;
-		  if($data["affaire.id_partenaire_fk"]){
-		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire_fk"] , "societe");
+		  if($data["affaire.id_partenaire"]){
+		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire"] , "societe");
 		  }
 
 		  // on check si l'affaire est "payee"
@@ -1687,6 +1686,9 @@ class affaire_cleodis extends affaire {
 		  $data["retourPV"] = NULL;
 		  $data["pouvoir"] = file_exists(ATF::affaire()->filepath($get['id_affaire'],"pouvoir")) ? true : false;
 
+
+
+
 		  foreach ($data as $key => $value) {
 			if (strpos($key,".")) {
 				$tmp = explode(".",$key);
@@ -1694,6 +1696,7 @@ class affaire_cleodis extends affaire {
 				unset($data[$key]);
 			}
 			if($key == "affaire.id_societe_fk"){
+
 				ATF::societe()->q->reset()
 					->addField("adresse")
 					->addField("adresse_2")
@@ -2090,6 +2093,12 @@ class affaire_cleodis extends affaire {
 
 			foreach ($data['data'] as $key => $value) {
 				foreach ($value as $k_=>$val) {
+					if($k_ === "affaire.id_partenaire"){
+						$data['data'][$key]["id_partenaire_fk"] = $value;
+						$data['data'][$key][$k_] = ATF::societe()->select($value , "societe");
+					}
+
+
 					if (strpos($k_,".")) {
 						$tmp = explode(".",$k_);
 						$data['data'][$key][$tmp[1]] = $val;
@@ -2104,21 +2113,21 @@ class affaire_cleodis extends affaire {
 					}
 				}
 
-			$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
-			  $data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
-			  $data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
+				$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
+				$data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
+				$data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
 
-			  ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
-			  $commande = ATF::commande()->select_row();
-			  $data['data'][$key]["retourPV"] = false;
-				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk']);
-			  if($commande){
-				$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+				ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
+				$commande = ATF::commande()->select_row();
+				$data['data'][$key]["retourPV"] = false;
+					$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk']);
+				if($commande){
+					$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
-				$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
-			  }else{
-				$data['data'][$key]["contrat_signe"] = false;
-			  }
+					$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
+				}else{
+					$data['data'][$key]["contrat_signe"] = false;
+				}
 			}
 		}
 		if($get['id_affaire']){
