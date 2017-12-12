@@ -20,6 +20,7 @@ class hotline extends classes_optima {
 			,'hotline.id_contact'
 			,'hotline.id_user'
 			,'hotline.hotline'=>array("truncate"=>false)
+			,'credit_total'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","width"=>80)
 			,'temps_estime'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			//,'temps_total'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
 			,'temps_facture_calcule'=>array("custom"=>true,"align"=>"right","width"=>80)
@@ -31,8 +32,6 @@ class hotline extends classes_optima {
 			,'hotline.priorite'=>array("custom"=>true,"renderer"=>"priorite","rowEditor"=>"prioriteUpdate","width"=>150)
 			,"ratio"=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"),"type"=>"decimal")
 		);
-
-
 
 		//Colonnes principales
 		$this->colonnes['primary'] = array(
@@ -199,6 +198,7 @@ class hotline extends classes_optima {
 			->addField("ROUND(hotline.id_hotline)","id_hotline")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.temps))/3600*4)/4,2)","temps")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600*4)/4,2)","duree_dep")
+			->addField("IF(hotline.facturation_ticket = 'oui' AND hotline.charge = 'intervention',SUM(hotline_interaction.credit_presta + hotline_interaction.credit_dep),0)","credit_total")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600*4)/4,2)","duree_presta")
 			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta)-TIME_TO_SEC(IF(hotline_interaction.duree_pause IS NULL,0,hotline_interaction.duree_pause)))/3600*4)/4,2)","duree_work")
 			->addField("hotline.id_affaire","hotline.id_affaire_fk")
@@ -3783,6 +3783,9 @@ class hotline extends classes_optima {
 
 			$return = $data['data'][0];
 
+			// SPécial patch pour éviter que les balises html flingue le formattage
+			$return['detail'] = htmlspecialchars($return['detail']);
+
 			// Check PJ
 			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
 			$return["idc"] = $this->cryptId($get['id']);
@@ -3794,7 +3797,7 @@ class hotline extends classes_optima {
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
 
-	  $return = $data['data'];
+	  	$return = $data['data'];
 		}
 
 		return $return;
