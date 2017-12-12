@@ -125,6 +125,8 @@ class pack_produit extends classes_optima {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
+
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne_option_partenaire = json_decode($infos["values_".$this->table]["produits_option_partenaire"],true);
@@ -151,7 +153,7 @@ class pack_produit extends classes_optima {
 
 		if($infos_ligne_option_partenaire){
 			foreach($infos_ligne_option_partenaire as $key=>$item){
-				if(!$item["id_partenaire"]){
+				if(!$item["pack_produit_ligne__dot__id_partenaire_fk"]){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Ligne d'option partenaire sans partenaire",882);
 				}
