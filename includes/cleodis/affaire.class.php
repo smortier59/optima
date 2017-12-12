@@ -1656,14 +1656,14 @@ class affaire_cleodis extends affaire {
 		if ($get['id_affaire']) {
 
 
+
 		  $this->q->where("affaire.id_affaire",$this->decryptId($get["id_affaire"]))->setCount(false)->setDimension('row');
 		  $data = $this->sa();
 
 
-
 		  $data["partenaire"] = NULL;
-		  if($data["affaire.id_partenaire"]){
-		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire"] , "societe");
+		  if($data["affaire.id_partenaire_fk"]){
+		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire_fk"] , "societe");
 		  }
 
 		  // on check si l'affaire est "payee"
