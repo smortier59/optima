@@ -930,16 +930,30 @@ class societe extends classes_optima {
 
 		$directors = $item->Directors->CurrentDirectors;
 
-		foreach ($directors->Director as $key => $value) {
-			if(!preg_match("/Commissaire aux comptes/" ,$value->Position->_)){
 
-				$nom = explode("  ", (string)$value->Name);
+		if(count($directors->Director)==1){
+			if(!preg_match("/Commissaire aux comptes/" ,$directors->Director->Position->_)){
+					$nom = explode("  ", (string)$directors->Director->Name);
 
-				$return['gerant'][] = array("nom"=>$nom[1],
-											"prenom"=>$nom[0],
-								  			"fonction"=>(string)$value->Position->_);
+					$return['gerant'][] = array("nom"=>$nom[1],
+												"prenom"=>$nom[0],
+									  			"fonction"=>(string)$directors->Director->Position->_);
+				}
+		} else{
+			foreach ($directors->Director as $key => $value) {
+				if(!preg_match("/Commissaire aux comptes/" ,$value->Position->_)){
+
+
+					$nom = explode("  ", (string)$value->Name);
+
+					$return['gerant'][] = array("nom"=>$nom[1],
+												"prenom"=>$nom[0],
+									  			"fonction"=>(string)$value->Position->_);
+				}
 			}
 		}
+
+
 
 
 		// Nom de société
