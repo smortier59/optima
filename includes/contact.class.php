@@ -245,9 +245,9 @@ class contact extends classes_optima {
 			$infos['id_owner'] = ATF::$usr->getID();
 		}
 
-		if($infos["pwd"]){
+		/*if($infos["pwd"]){
 			$infos["pwd"] = hash('sha256',$infos["pwd"]);
-		}
+		}*/
 
 
 		$return = parent::insert($infos,$s,$files,$cadre_refreshed);
