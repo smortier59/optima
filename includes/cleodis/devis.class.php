@@ -65,6 +65,8 @@ class devis_cleodis extends devis {
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,"type_affaire"=>array("custom"=>true,"data"=>array("normal","2SI"),"xtype"=>"combo")
+			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
+
 		);
 
 		$this->colonnes['panel']['partenaire'] = array(
@@ -382,7 +384,7 @@ class devis_cleodis extends devis {
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
 
 		////////////////Devis
-		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"]);
+		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["langue"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast
@@ -953,6 +955,8 @@ class devis_cleodis extends devis {
 					return $marge_absolue;
 				case "emailTexte":
 					return $this->majMail($devis["id_societe"]);
+				case "langue":
+					return ATF::affaire()->select($devis["id_affaire"], "langue");
 				case "RIB":
 				case "BIC":
 				case "IBAN":
@@ -994,6 +998,9 @@ class devis_cleodis extends devis {
 				case "marge_absolue":
 					$marge_absolue=0;
 					return $marge_absolue;
+				case "langue":
+					if(ATF::_r('id_societe')) return ATF::societe()->select(ATF::_r('id_societe'),"langue");
+					return "FR";
 				case "RIB":
 				case "BIC":
 				case "IBAN":
