@@ -20,7 +20,8 @@ class commande_cleodis extends commande {
 			,'commande.id_societe'
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
-			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90)
+			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
+			,'filesLangue'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommandeLangue","width"=>110) //PDF dans la langue de la société
 			,'courriers'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCourriers","width"=>90)
 			,'retour'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'retourPV'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
@@ -96,10 +97,17 @@ class commande_cleodis extends commande {
 		$this->no_insert = true;
 		$this->no_update = true;
 		$this->onglets = array('commande_ligne','bon_de_commande');
+
+
+
 		$this->files["contratA3"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratA4"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratAP"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratPV"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+
+		//$this->files["contratA4NL"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+
+
 		$this->files["retour"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["retourPV"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
@@ -1341,7 +1349,11 @@ class commande_cleodis extends commande {
 
 		foreach ($return['data'] as $k=>$i) {
 			$affaire = ATF::affaire()->select($i['commande.id_affaire_fk']);
+
 			if (!$affaire) continue;
+
+			$return['data'][$k]["langue"] = $affaire["langue"];
+
 			//Check si c'est une vente
 			if ($affaire['nature']=="vente") {
 				$return['data'][$k]['vente'] = true;

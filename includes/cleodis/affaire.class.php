@@ -153,6 +153,7 @@ class affaire_cleodis extends affaire {
 		$affaire["date"]=$infos["date"];
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
+		$affaire["langue"]=$infos["langue"];
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -1708,6 +1709,7 @@ class affaire_cleodis extends affaire {
 					->addField("ville")
 					->addField("pays.pays")
 					->addField("tel")
+					->addField("langue")
 					->from("pays","id_pays","societe","id_pays")
 					->where("id_societe", $value)
 
@@ -2244,7 +2246,9 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>ATF::$usr->getID(),
-			  "type_affaire" => "normal");
+			  "type_affaire" => "normal",
+			  "langue"=>ATF::societe()->select($id_societe, "langue")
+			);
 
 			$values_devis =array();
 

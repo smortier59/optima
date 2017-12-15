@@ -39,7 +39,7 @@
 ATF.renderer.dateCleCommande=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
 		var idDiv = Ext.id();
-		var id = record.data[table+'__dot__id_'+table]; 
+		var id = record.data[table+'__dot__id_'+table];
 		if (!record.data.vente) {
 			(function(){
 				var params = {
@@ -147,10 +147,10 @@ ATF.renderer.dateCleCommande=function(table,field) {
 				var p = new Ext.FormPanel(params);
 			}).defer(25);
 		}
-		
-		
+
+
 		html = '<div id="'+idDiv+'"></div>';
-		
+
 		return html;
 	}
 };
@@ -161,32 +161,75 @@ ATF.renderer.pdfCommande=function(table,field) {
 		var idDiv = Ext.id();
 		var id = record.data[table+'__dot__id_'+table];
 		var html = "";
-	
+
+
+
 		html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
 		html += '</a><br /><hr>';
-		
+
 		html += '<a href="contratA4-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande');
 		html += '</a><br /><hr>';
 
 		html += '<a href="mandatSepa-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande');
-		html += '</a><br /><hr>';		
-		
-		
+		html += '</a><br /><hr>';
+
+
+
+
 		{if ATF::$codename!="midas"}
 			html += '<a href="contratAP-'+id+'.pdf" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratAP','commande');
 			html += '</a><br /><hr>';
-			
+
 			html += '<a href="contratPV-'+id+'.pdf" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratPV','commande');
 			html += '</a><br /><hr>';
-		{/if}		
+		{/if}
 
 
 		return '<div id="'+idDiv+'">'+html+'</div>';
+	}
+};
+
+ATF.renderer.pdfCommandeLangue=function(table,field) {
+	return function(filetype, meta, record, rowIndex, colIndex, store) {
+		var idDiv = Ext.id();
+		var id = record.data[table+'__dot__id_'+table];
+		var html = "";
+
+		if(record.json["langue"] !== 'FR'){
+			/*html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
+			html += '</a><br /><hr>';*/
+
+			html += '<a href="contratA4'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande')+' ('+record.json["langue"]+')';
+			html += '</a><br /><hr>';
+
+			html += '<a href="mandatSepa'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande')+' ('+record.json["langue"]+')';
+			html += '</a><br /><hr>';
+
+
+
+
+			{if ATF::$codename!="midas"}
+				/*html += '<a href="contratAP'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
+				html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratAP','commande')+' ('+record.json["langue"]+')';
+				html += '</a><br /><hr>';*/
+
+				html += '<a href="contratPV'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
+				html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratPV','commande')+' ('+record.json["langue"]+')';
+				html += '</a><br /><hr>';
+			{/if}
+
+		}
+		return '<div id="'+idDiv+'">'+html+'</div>';
+
+
 	}
 };
 
@@ -195,15 +238,15 @@ ATF.renderer.pdfCourriers=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
 		var idDiv = Ext.id();
 		var id = record.data[table+'__dot__id_'+table];
-		
+
 		var html = "";
-		
+
 		if (record.data.envoiCourrierClassiqueExists==true) {
 			html += '<a href="commande-select-envoiCourrierClassique-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Courrier classique','commande');
 			html += '</a><br /><hr>';
 		}
-				
+
 		if (record.data.envoiContratEtBilanExists==true) {
 			html += '<a href="commande-select-envoiContratEtBilan-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat avec demande de bilan','commande');
@@ -214,19 +257,19 @@ ATF.renderer.pdfCourriers=function(table,field) {
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat sans demande de bilan','commande');
 			html += '</a><br /><hr>';
 		}
-		
+
 		if (record.data.envoiAvenantExists==true) {
 			html += '<a href="commande-select-envoiAvenant-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Avenant','commande');
 			html += '</a><br /><hr>';
 		}
-		
+
 		if (record.data.contratTransfertExists==true) {
 			html += '<a href="commande-select-contratTransfert-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat de transfert','commande');
 			html += '</a><br /><hr>';
 		}
-		
+
 		if (record.data.ctSigneExists==true) {
 			html += '<a href="commande-select-ctSigne-'+id+'.dl" target="_blank">';
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat signé','commande');
@@ -246,23 +289,23 @@ ATF.renderer.pdfCourriers=function(table,field) {
 		}
 
 
-		{if ATF::$codename == "cleodis"} 
+		{if ATF::$codename == "cleodis"}
 			if (record.data.ctSGEFExists==true) {
 				html += '<a href="commande-select-lettreSGEF-'+id+'.dl" target="_blank">';
 				html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat vente SGEF','commande');
 				html += '</a><br /><hr>';
 			}
-			{util::push($fieldsKeys,"")} 
+			{util::push($fieldsKeys,"")}
 		{/if}
 		{if ATF::$codename == "cleodisbe"}
 			if (record.data.ctlettreBelfiusExists==true) {
 				html += '<a href="commande-select-lettreBelfius-'+id+'.dl" target="_blank">';
 				html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('Contrat vente Belfius','commande');
 				html += '</a><br /><hr>';
-			}		
+			}
 		{/if}
-		
-				
+
+
 		return '<div id="'+idDiv+'">'+html+'</div>';
 	}
 };
@@ -297,7 +340,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
 			}
-			
+
 			/* Demande refi Expand */
 			if (!record.data.demandeRefiExist) {
 				html += '<p>';
@@ -307,7 +350,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
 			}
-			
+
 			/* Facture Expand */
 			if (record.data.factureAllow) {
 				html += '<p>';
@@ -317,7 +360,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
 			}
-			
+
 			if (etat=='mis_loyer' || etat=='prolongation' || etat=='restitution' || etat=='mis_loyer_contentieux' || etat=='prolongation_contentieux' || etat=='restitution_contentieux') {
 				/* Stop CMD */
 				html += '<p>';
@@ -351,30 +394,30 @@ ATF.renderer.pdfCourriers=function(table,field) {
 							html: '<span class="bold">{ATF::$usr->trans("choixCourrier","commande")|escape:javascript}</span><hr>',
 							xtype:'container'
 						}
-						,					
+						,
 						{
 							xtype: 'combo'
-							,name: 'combo_pdf' 
+							,name: 'combo_pdf'
 							,hiddenName:'pdf'
 							,id: 'choixCourrierPdf'
-							,fieldLabel:'{ATF::$usr->trans("documentCR","commande")|escape:javascript}'							
+							,fieldLabel:'{ATF::$usr->trans("documentCR","commande")|escape:javascript}'
 						    ,store: new Ext.data.ArrayStore({
 						        fields: ['myId','displayText'],
 						        data: [
 						        	['envoiCourrierClassique', 'Courrier classique'],
-						        	['envoiContratEtBilan', 'Contrat avec demande de bilan'], 
-						        	['envoiContratSsBilan', 'Contrat sans demande de bilan'], 
-						        	['envoiAvenant', 'Avenant'], 
-						        	['contratTransfert', 'Contrat de transfert'], 
+						        	['envoiContratEtBilan', 'Contrat avec demande de bilan'],
+						        	['envoiContratSsBilan', 'Contrat sans demande de bilan'],
+						        	['envoiAvenant', 'Avenant'],
+						        	['contratTransfert', 'Contrat de transfert'],
 						        	['ctSigne', 'Contrat signé'],
 						        	['CourrierRestitution', 'Courrier de restitution'],
-						        	{if ATF::$codename == "cleodis"} 
+						        	{if ATF::$codename == "cleodis"}
 						        		['lettreSGEF', 'Contrat vente SGEF']
 									{/if}
 									{if ATF::$codename == "cleodisbe"}
 										['lettreBelfius', 'Contrat vente Belfius']
 									{/if}
-						        	
+
 						        ]
 						    }),
 						    valueField: 'myId',
@@ -385,31 +428,31 @@ ATF.renderer.pdfCourriers=function(table,field) {
 						    mode: 'local',
 						    editable:false,
 						    listeners: {
-						    	select: function(field) {  
+						    	select: function(field) {
 						    		if(field.value == "lettreSGEF"){
-						    			Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				
-                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);                     				
+						    			Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
+                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
                         				Ext.getCmp("num_contrat"+id).setVisible(true);
                         				Ext.getCmp("date_signature"+id).setVisible(true);
-                        				Ext.getCmp("equipement"+id).setVisible(true); 
+                        				Ext.getCmp("equipement"+id).setVisible(true);
                         			}else if(field.value =="lettreBelfius"){
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				
-                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);                     				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
+                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
                         				Ext.getCmp("num_contrat"+id).setVisible(true);
                         				Ext.getCmp("date_signature"+id).setVisible(true);
-                        				Ext.getCmp("equipement"+id).setVisible(true); 
+                        				Ext.getCmp("equipement"+id).setVisible(true);
 						    		} else if(field.value == "envoiAvenant"){
-                        				Ext.getCmp("bdc"+id).setVisible(true);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                     				
-                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);                     				
+                        				Ext.getCmp("bdc"+id).setVisible(true);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
+                        				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
@@ -417,9 +460,9 @@ ATF.renderer.pdfCourriers=function(table,field) {
                         				Ext.getCmp("date_signature"+id).setVisible(false);
                         				Ext.getCmp("equipement"+id).setVisible(false);
                         			} else if (field.value == "contratTransfert") {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(true);   
-                        				Ext.getCmp("docSupAretourner"+id).setVisible(true);                     				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(true);
+                        				Ext.getCmp("docSupAretourner"+id).setVisible(true);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
@@ -427,8 +470,8 @@ ATF.renderer.pdfCourriers=function(table,field) {
                         				Ext.getCmp("date_signature"+id).setVisible(false);
                         				Ext.getCmp("equipement"+id).setVisible(false);
                         			} else if (field.value == "envoiContratEtBilan" || field.value == "envoiContratSsBilan" || field.value == "envoiCourrierClassique") {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                           				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(true);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
@@ -437,8 +480,8 @@ ATF.renderer.pdfCourriers=function(table,field) {
                         				Ext.getCmp("date_signature"+id).setVisible(false);
                         				Ext.getCmp("equipement"+id).setVisible(false);
                         			} else if (field.value == "CourrierRestitution") {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                           				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(true);
@@ -448,40 +491,40 @@ ATF.renderer.pdfCourriers=function(table,field) {
                         				Ext.getCmp("equipement"+id).setVisible(false);
                         				ATF.ajax("commande,getDateResti.ajax"
                         						,"id_commande="+id
-                        						,{ onComplete: function (result) {                        								
+                        						,{ onComplete: function (result) {
                         								if(result.result){
                         									Ext.getCmp("date_echeance"+id).setValue(result.result);
-                        								}                        							
+                        								}
                         							}
                         						}
-                        				);                     				
-                        				
+                        				);
+
                         			}else {
-                        				Ext.getCmp("bdc"+id).setVisible(false);  
-                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);                           				
+                        				Ext.getCmp("bdc"+id).setVisible(false);
+                        				Ext.getCmp("reprise_magasin"+id).setVisible(false);
                         				Ext.getCmp("docSupAretourner"+id).setVisible(false);
                         				Ext.getCmp("type_devis"+id).setVisible(false);
-                        				Ext.getCmp("date_echeance"+id).setVisible(false);  
-                        				Ext.getCmp("rar"+id).setVisible(false);   
+                        				Ext.getCmp("date_echeance"+id).setVisible(false);
+                        				Ext.getCmp("rar"+id).setVisible(false);
                         				Ext.getCmp("num_contrat"+id).setVisible(false);
                         				Ext.getCmp("date_signature"+id).setVisible(false);
-                        				Ext.getCmp("equipement"+id).setVisible(false);                   				
+                        				Ext.getCmp("equipement"+id).setVisible(false);
                         			}
-                        			
+
                         		}
-						    }						    
+						    }
 						},{
 		                    xtype: 'textfield',
 		                    fieldLabel: 'Type du devis',
 		                    name : 'type_devis',
 		                    id : 'type_devis'+id,
-		                    hidden: true,						
+		                    hidden: true,
 						},{
 		                    xtype: 'textfield',
 		                    fieldLabel: 'Bon de commande',
 		                    name : 'bdc',
 		                    id : 'bdc'+id,
-		                    hidden: true,						
+		                    hidden: true,
 						},{
 							xtype: 'textfield',
 		                    fieldLabel: 'Reprise Magasin',
@@ -490,7 +533,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 		                    hidden: true,
 						},{
 							xtype: 'textfield'
-							,name: 'id_commande' 
+							,name: 'id_commande'
 							,id: 'id_commande'
 							,value: id
 							,hidden:true
@@ -532,7 +575,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 		                    hidden: true,
 						}
 					],
-				
+
 					buttons: [{
 						text: 'Ok',
 						handler: function(a,b,c,d){
@@ -553,7 +596,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 									Ext.getCmp(store.baseParams.pager).store.reload();
 								}
 								,timeout:3600
-							});								
+							});
 						}
 					},{
 						text: '{ATF::$usr->trans(preview)|escape:javascript}',
@@ -592,7 +635,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 									}
 								}
 								,timeout:3600
-							});									
+							});
 						}
 					},{
 						text: 'Annuler',
@@ -602,7 +645,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 						}
 					}]
 				});
-			}	
+			}
 			if (!Ext.getCmp('mywindow'+id)) {
 				new Ext.Window({
 					title: '{ATF::$usr->trans("creerCourrierType","commande")}',
@@ -614,7 +657,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 					items: [Ext.getCmp('myForm'+id)]
 				});
 			}
-			
+
 
 			html += '<p>';
 			html += '<a href="javascript:;"  onclick="Ext.getCmp(\'mywindow'+id+'\').show();">';
@@ -622,7 +665,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 			html += ATF.usr.trans('creerCourrierType','commande');
 			html += '</a>';
 			html += '</p>';
-						
+
 			return '<div id="'+idDiv+'">'+html+'</div>';
 		}
 	};
@@ -632,11 +675,11 @@ ATF.renderer.pdfCourriers=function(table,field) {
 {if ATF::$codename=="midas"}
 	ATF.renderer.uploadFileMidas=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {
-			if(record.json){		
+			if(record.json){
 				var id = record.data[table+'__dot__id_'+table];
-				
+
 				html = '<div class="floatLeft" style="width:50%; text-align:center">';
-		
+
 				if (filetype) {
 					html += '<a href="'+table+'-select-'+field+'-'+id+'.dl" alt="'+ATF.usr.trans("popup_download",table)+'">'+
 						'<img class="smallIcon '+filetype+'" src="'+ATF.blank_png+'" class="icone" />'+
@@ -645,7 +688,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 					html += '<img class="smallIcon warning" src="'+ATF.blank_png+'" />';
 				}
 				html += '</div>';
-				
+
 				return html;
 			}
 		}
