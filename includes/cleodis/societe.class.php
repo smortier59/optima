@@ -614,7 +614,7 @@ class societe_cleodis extends societe {
 
     if($infos["societe"]["siret"] != NULL){
       //On check si le siret existe déja
-      $this->q->reset()->where("siret",$infos["societe"]["siret"]);
+      $this->q->reset()->where("siret",$infos["societe"]["siret"],"AND")->where("id_societe",$this->decryptId($infos["societe"]["id_societe"]),"AND",false,"!=");
       if($this->select_all()){
         throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
       }
