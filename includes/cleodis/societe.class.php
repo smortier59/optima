@@ -611,6 +611,15 @@ class societe_cleodis extends societe {
   * @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
   */
   public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
+    if($infos["societe"]["siret"] != NULL){
+      //On check si le siret existe déja
+      $this->q->reset()->where("siret",$infos["societe"]["siret"]);
+      if($this->select_all()){
+        throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
+      }
+    }
+
     // Vérification qu'il n'existe aucun autre parc d'existence active avec le même serial
     $this->infoCollapse($infos);
 
