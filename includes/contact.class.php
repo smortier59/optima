@@ -245,9 +245,11 @@ class contact extends classes_optima {
 			$infos['id_owner'] = ATF::$usr->getID();
 		}
 
+		/*
+		L'encryptage est déja fait dans classes
 		if($infos["pwd"]){
 			$infos["pwd"] = hash('sha256',$infos["pwd"]);
-		}
+		}*/
 
 
 		$return = parent::insert($infos,$s,$files,$cadre_refreshed);
