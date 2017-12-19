@@ -1,12 +1,3 @@
-ALTER TABLE `contact` DROP `langue`;
-
-ALTER TABLE `contact` ADD `langue` ENUM('FR','NL') NOT NULL DEFAULT 'FR' AFTER `id_owner`;
-ALTER TABLE `societe` ADD `langue` ENUM('FR','NL') NOT NULL DEFAULT 'FR' AFTER `id_pays`;
-ALTER TABLE `affaire` ADD `langue` ENUM('FR','NL') NOT NULL DEFAULT 'FR' AFTER type_affaire;
-
-
-
-
 #DEVIS CLEODIS V2
 ALTER TABLE `devis_ligne` ADD `options` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire`;
 ALTER TABLE `devis` ADD `commentaire_offre_partenaire` TEXT NULL DEFAULT NULL AFTER `raison_refus`;

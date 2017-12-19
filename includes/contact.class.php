@@ -245,7 +245,9 @@ class contact extends classes_optima {
 			$infos['id_owner'] = ATF::$usr->getID();
 		}
 
-		/*if($infos["pwd"]){
+		/*
+		L'encryptage est déja fait dans classes
+		if($infos["pwd"]){
 			$infos["pwd"] = hash('sha256',$infos["pwd"]);
 		}*/
 
