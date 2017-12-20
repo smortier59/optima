@@ -201,7 +201,7 @@ ATF.renderer.pdfCommandeLangue=function(table,field) {
 		var html = "";
 
 		var langue = record.json["langue"];
-		if (record.json["langue"] === "FR") lange = "NL";
+		if (record.json["langue"] === "FR") langue = "NL";
 
 		/*html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
@@ -223,8 +223,8 @@ ATF.renderer.pdfCommandeLangue=function(table,field) {
 			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratAP','commande')+' ('+record.json["langue"]+')';
 			html += '</a><br /><hr>';*/
 
-			html += '<a href="contratPV'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratPV','commande')+' ('+record.json["langue"]+')';
+			html += '<a href="contratPV'+langue+'-'+id+'.pdf" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratPV','commande')+' ('+langue+')';
 			html += '</a><br /><hr>';
 		{/if}
 
