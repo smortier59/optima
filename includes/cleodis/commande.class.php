@@ -2758,7 +2758,7 @@ class commande_cap extends commande_cleodis {
 		$id_affaire = ATF::affaire()->select_all();
 		$mandat = ATF::affaire()->geMandat($id_affaire);
 
-		$file = $this->filepath($mandat->get('id_mandat'), 'retourBPA', null, 'cleodis');
+		$file = ATF::mandat()->filepath($mandat->get('id_mandat'), 'retourBPA', null, 'cap');
 		try {
 			util::file_put_contents($file,base64_decode($data));
 			//On met à jour la date de retour et retourPV du contrat

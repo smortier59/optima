@@ -7688,6 +7688,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public $texteHT = "HTVA";
 	public $texteTTC = "TVAC";
 	public $heightLimitTableContratPV = 70;
+	public $langue = "FR";
+
 
 	/* Header spécifique aux documents cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -7730,8 +7732,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if(!$this->facturePDF){
 			$this->sety(12);
 
-			if($this->affaire['langue'] == "NL"){
-				$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"DE VERHUURDER",0,'C');
+			if($this->langue == "NL"){
+				$this->multicell(65,5,$this->affaire['nature']=="vente"?"DE VERKOPER":"DE VERHUURDER",0,'C');
 			}else{
 				$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
 			}
@@ -7767,8 +7769,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->sety(12);
 
 			$this->setfont('arial','B',10);
-			if($this->affaire['langue'] == "NL"){
-				$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"DE HUURDER","L","C");
+			if($this->langue == "NL"){
+				$this->multicell(0,5,$this->affaire['nature']=="vente"?"KOPER":"DE HUURDER","L","C");
 			}else{
 				$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE","L","C");
 			}
@@ -8453,7 +8455,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratA4NL($id) {
 
-
+		$this->langue = "NL";
 		if($this->affaire["langue"] !== "NL"){
 			$this->showFiligramme = true;
 		}
@@ -9400,6 +9402,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->open();
 		}
 
+		$this->langue = "NL";
 		if($this->affaire["langue"] !== "NL"){
 			$this->showFiligramme = true;
 		}
