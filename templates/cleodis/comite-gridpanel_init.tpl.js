@@ -9,7 +9,7 @@
  || $id_user == 93
  || $id_user == 35
  || $id_user == 21
- || (ATF::$codenamde == "cleodisbe" &&$id_user == 113) || (ATF::$codenamde == "cleodis" &&$id_user == 116) }
+ || (ATF::$codename == "cleodisbe" &&$id_user == 113) || (ATF::$codename == "cleodis" &&$id_user == 116) }
 	ATF.renderer.comiteDecision=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {
 			var idDiv = Ext.id();
