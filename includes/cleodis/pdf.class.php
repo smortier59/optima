@@ -23,6 +23,25 @@ class pdf_cleodis extends pdf {
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
 
+	public $showFiligramme = false;
+
+
+
+	public function filigramme(){
+		$this->setX(40);
+		$this->setY(20);
+
+		$this->Rotate(-55);
+		$this->setLineWidth(0.5);
+		$this->setfont('arial',"B",95);
+		$this->setTextColor(211,211,211);
+		$this->multicell(300,10,"Pour information ",0,"C");
+
+
+		$this->setTextColor("black");
+		$this->setfont('arial',"",8);
+		$this->Rotate(0);
+	}
 
 
 	/* Génère le pied de page des PDF Cléodis
@@ -7675,6 +7694,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function Header() {
+
+		if($this->showFiligramme) $this->filigramme();
+
 		if ($this->getHeader()) return false;
 		$this->setfont('arial','B',10);
 
@@ -7868,6 +7890,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 
 	}
+
+
 
 	/* Génère le titre du document à la sauce CleodisBE
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -8094,6 +8118,13 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
+
+		log::logger($this->affaire , "mfleurquin");
+
+		if($this->affaire["langue"] !== "FR"){
+			$this->showFiligramme = true;
+		}
+
 
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;

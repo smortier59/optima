@@ -2514,6 +2514,15 @@ class commande_cleodis extends commande {
 
 class commande_cleodisbe extends commande_cleodis {
 
+	function __construct($table_or_id=NULL) {
+		$this->table="commande";
+		parent::__construct($table_or_id);
+
+		$this->fieldstructure();
+
+		$this->files["contratA4NL"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+	}
+
 
 	/** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
