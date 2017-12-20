@@ -136,7 +136,7 @@ class echeancier_ligne_periodique extends classes_optima {
    */
   public function _GET($get, $post) {
     // Gestion du tri
-    if (!$get['tri'] ) $get['tri'] = "id_echeancier_ligne_periodique";
+    if (!$get['tri'] ) $get['tri'] = "offset";
     if (!$get['trid']) $get['trid'] = "asc";
 
     // Gestion du limit
@@ -214,5 +214,24 @@ class echeancier_ligne_periodique extends classes_optima {
     return $return;
   }
 
+  public function _reorder($get, $post) {
+    $input = file_get_contents('php://input');
+    if (!empty($input)) parse_str($input,$post);
 
+    if (!$post) throw new Exception("DATA, impossible de traiter la demande.", 5000);
+    if (!$post['order']) throw new Exception("LINES_MISSING, impossible de traiter la demande.", 5001);
+
+    ATF::db($this->db)->begin_transaction();
+    try {
+      foreach ($post['order'] as $offset=>$id) {
+        $toUpdate = array("id_echeancier_ligne_periodique"=>$id, "offset"=> $offset+1);
+        $this->u($toUpdate);
+      }
+    } catch (errorATF $e) {
+      ATF::db($this->db)->rollback_transaction();
+      throw new errorATF($e->getMessage(),500); // L'erreur 500 permet pour telescope de savoir que c'est une erreur
+    }
+    ATF::db($this->db)->commit_transaction();
+    return true;
+  }
 }

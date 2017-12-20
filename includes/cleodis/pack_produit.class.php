@@ -38,6 +38,10 @@ class pack_produit extends classes_optima {
 			"produits"=>array("custom"=>true)
 		);
 
+		$this->colonnes['panel']['lignes_option_partenaire'] = array(
+			"produits_option_partenaire"=>array("custom"=>true)
+		);
+
 		$this->colonnes['panel']['lignes_non_visible'] = array(
 			"produits_non_visible"=>array("custom"=>true)
 		);
@@ -45,6 +49,7 @@ class pack_produit extends classes_optima {
 		// Propriété des panels
 
 		$this->panels['lignes'] = array("visible"=>true, 'nbCols'=>1);
+		$this->panels['lignes_option_partenaire'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['lignes_non_visible'] = array("visible"=>true, 'nbCols'=>1);
 
 
@@ -120,8 +125,14 @@ class pack_produit extends classes_optima {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
+
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
+		$infos_ligne_option_partenaire = json_decode($infos["values_".$this->table]["produits_option_partenaire"],true);
+
+
+
 
 		$this->infoCollapse($infos);
 
@@ -137,6 +148,16 @@ class pack_produit extends classes_optima {
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["pack_produit_ligne__dot__visible"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
+			}
+		}
+
+		if($infos_ligne_option_partenaire){
+			foreach($infos_ligne_option_partenaire as $key=>$item){
+				if(!$item["pack_produit_ligne__dot__id_partenaire_fk"]){
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Ligne d'option partenaire sans partenaire",882);
+				}
+				$infos_ligne[]=$infos_ligne_option_partenaire[$key];
 			}
 		}
 
@@ -176,8 +197,9 @@ class pack_produit extends classes_optima {
 				unset($item[$k]);
 			}
 			$item["id_fournisseur"]=ATF::societe()->decryptId($item["id_fournisseur_fk"]);
+			$item["id_partenaire"]=ATF::societe()->decryptId($item["id_partenaire_fk"]);
 			$item["id_produit"]=ATF::produit()->decryptId($item["id_produit_fk"]);
-			unset($item["id_fournisseur_fk"],$item["id_produit_fk"]);
+			unset($item["id_fournisseur_fk"],$item["id_produit_fk"], $item["id_partenaire_fk"]);
 			$item["index"]=util::extJSEscapeDot($key);
 			if(!$item["quantite"]){	$item["quantite"]=0; }
 			$infos_ligne_escapeDot[]=$item;
@@ -197,6 +219,7 @@ class pack_produit extends classes_optima {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
+		$infos_ligne_option_partenaire = json_decode($infos["values_".$this->table]["produits_option_partenaire"],true);
 
 		$this->infoCollapse($infos);
 
@@ -224,6 +247,17 @@ class pack_produit extends classes_optima {
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["pack_produit_ligne__dot__visible"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
+			}
+		}
+
+		//Ligne d'option partenaire
+		if($infos_ligne_option_partenaire){
+			foreach($infos_ligne_option_partenaire as $key=>$item){
+				if(!$item["pack_produit_ligne__dot__id_partenaire_fk"]){
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Ligne d'option partenaire sans partenaire",882);
+				}
+				$infos_ligne[]=$infos_ligne_option_partenaire[$key];
 			}
 		}
 

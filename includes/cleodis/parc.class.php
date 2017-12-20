@@ -256,6 +256,7 @@ class parc_cleodis extends classes_optima {
 
 		return $this->i($serial,$s);
 	}
+
 	public function getParcPartenaire($id_affaire){
 		/*Si contrat pas encore démarré et qu'on a une facture sur la periode actuelle
 				Afficher les parcs meme ceux qui sont inactif
@@ -283,6 +284,7 @@ class parc_cleodis extends classes_optima {
 		}
 		return $parc;
 	}
+
 	/**
 	* Retourne un id_parc actif du serial demandé
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>

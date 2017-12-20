@@ -241,7 +241,7 @@ class echeancier extends classes_optima {
     }
 
     if ($get['type'] == 'ponctuelle' || !$get['type']) {
-      ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id']);
+      ATF::echeancier_ligne_ponctuelle()->q->reset()->where("id_echeancier",$get['id'])->addOrder('offset','asc');
       if ($get['periode_debut']) {
         ATF::echeancier_ligne_ponctuelle()->q->where("date_valeur",date('Y-m-d',strtotime($get['periode_debut'])),"AND","periode",">=");
       }
@@ -252,7 +252,7 @@ class echeancier extends classes_optima {
     }
 
     if ($get['type'] == 'periodique' || !$get['type']) {
-      ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id']);
+      ATF::echeancier_ligne_periodique()->q->reset()->where("id_echeancier",$get['id'])->addOrder('offset','asc');
       if ($date_ref) {
         ATF::echeancier_ligne_periodique()->q->where("mise_en_service",$date_ref,"AND","periode","<=");
       }

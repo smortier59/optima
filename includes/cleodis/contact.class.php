@@ -14,6 +14,33 @@ class contact_cleodis extends contact {
 		$this->table = "contact";
 	}
 
+
+	/**
+	* Surcharge de l'insert de contact
+	* Permet de modifier le responsable de la société lorsqu'il ne fait plus parti de CLEODIS
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @date 2017-12-04
+	* @param array $infos
+	*/
+	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		if(strlen($infos["contact"]["pwd"]) != 64) {
+			if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
+				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd"]) == 0){
+					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				} else {
+					if(strlen($infos["contact"]["pwd"]) < 6){
+						throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+					}
+				}
+			}
+		}
+
+		return parent::insert($infos,$s,$files,$cadre_refreshed);
+	}
+
+
+
+
 	/**
 	* Surcharge de l'update de contact
 	* Permet de modifier le responsable de la société lorsqu'il ne fait plus parti de CLEODIS
@@ -22,7 +49,22 @@ class contact_cleodis extends contact {
 	* @param array $infos
 	*/
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
-		parent::update($infos,$s,$files,$cadre_refreshed);
+		if(strlen($infos["contact"]["pwd"]) != 64) {
+			if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
+				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd"]) == 0){
+					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				} else {
+					if(strlen($infos["contact"]["pwd"]) < 6){
+						throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+					}
+				}
+			}
+		}
+
+		$return = parent::update($infos,$s,$files,$cadre_refreshed);
+
+
+
 
 		if($infos["contact"]["etat"] === "inactif"){
 			//Si l'utilisateur fait parti de CLEODIS ou CLEOFI ...
@@ -63,7 +105,29 @@ class contact_cleodis extends contact {
 				}
 			}
 		}
+		return $return;
 
+	}
+
+	/**
+	 * Methode qui prépare la requête de login sur contact
+	 * @param  [array] $infos [Infos pour le login]
+	 * @param  [array] $infos[p]
+	 * @param  [array] $infos[u]
+	 * @return [array] $res   [champs de la table contact qui constitueront la session]
+	 */
+	public function loginQuery($infos){
+		$this->q->reset()
+			->addField("contact.*")
+			->addField("societe.lead", "lead")
+			->addField("societe.id_filiale", "id_filiale")
+			/*->select('contact.id_societe')
+			->select('contact.civilite')
+			->select('contact.prenom')
+			->select('contact.nom')*/
+			->addJointure("contact","id_societe","societe","id_societe")
+			->where('contact.login',ATF::db()->escape_string($infos["u"]))
+			->setDimension('row');
 	}
 };
 
@@ -99,8 +163,5 @@ class contact_midas extends contact_cleodis {
 		return parent::saCustom();
 	}
 
-	public function _tt($get,$post) {
-		return "test";
-	}
 };
 ?>

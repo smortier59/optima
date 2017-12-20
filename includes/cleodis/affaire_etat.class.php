@@ -22,7 +22,7 @@ class affaire_etat extends classes_optima {
 
 	public function _GET($get, $post){
 		// au cas ou il y aurait un changement de format d'id transmis
-		$id_affaire =  strlen($get["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($get["id_affaire"]) : $get['id_affaire'];
+		$id_affaire =  ATF::affaire()->decryptId($get["id_affaire"]);
 		ATF::affaire_etat()
 			->q
 			->reset()
@@ -31,5 +31,27 @@ class affaire_etat extends classes_optima {
 			->addOrder("affaire_etat.date","desc");
 		$ret = ATF::affaire_etat()->select_all();
 		return $ret?$ret:false;
+	}
+
+	/**
+	 * [_POST insere un nouvel état de l'affaire]
+	 * @param  [type] $get
+	 * @param  [type] $post
+	 * @return [boolean]
+	 */
+	public function _POST($get, $post){
+		$id_affaire = ATF::affaire()->decryptId($post["id_affaire"]);
+		$etat = "autre";
+		$commentaire = json_encode($post);
+
+		ATF::affaire_etat()->insert(array(
+			'id_affaire'=>$id_affaire
+			,'etat'=>$etat
+			,'id_user'=>ATF::$usr->get('id_user')
+			,'date'=>date("Y-m-d H:i:s")
+			,'commentaire'=>$commentaire
+		));
+
+		return true;
 	}
 }

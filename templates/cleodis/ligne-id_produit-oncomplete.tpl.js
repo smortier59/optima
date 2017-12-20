@@ -3,6 +3,8 @@
 
 {if $pager=="ProduitsUpdateVisible"}
 	{$produit="produits"}
+{elseif $pager=="ProduitsUpdateOptionPartenaire"}
+	{$produit="produits_option_partenaire"}
 {elseif $pager=="ProduitsUpdateNonVisible"}
 	{$produit="produits_non_visible"}
 {elseif $pager=="ProduitsUpdateRepris"}

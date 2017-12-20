@@ -867,10 +867,10 @@ class societe extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function getInfosFromCREDITSAFE($infos) {
-		if(__DEV__ === true){
+		/*if(__DEV__ === true){
 			$response = file_get_contents("/home/optima/core/log/creditsafe.xml");
 			$xml = simplexml_load_string($response);
-		} else {
+		} else {*/
 			 $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 		    <xmlrequest>
 		        <header>
@@ -900,7 +900,7 @@ class societe extends classes_optima {
 			}
 
 			$xml = simplexml_load_string($response);
-		}
+		//}
 
 
 		if($xml->xmlresponse->body->errors){
@@ -912,7 +912,6 @@ class societe extends classes_optima {
 				$data = $this->cleanCSResponse($response);
 			}
 		}
-		log::logger($data,'creditsafe');
 		return $data;
 	}
 
@@ -928,6 +927,34 @@ class societe extends classes_optima {
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+		$directors = $item->Directors->CurrentDirectors;
+
+
+		if(count($directors->Director)==1){
+			if(!preg_match("/Commissaire aux comptes/" ,$directors->Director->Position->_)){
+					$nom = explode("  ", (string)$directors->Director->Name);
+
+					$return['gerant'][] = array("nom"=>$nom[1],
+												"prenom"=>$nom[0],
+									  			"fonction"=>(string)$directors->Director->Position->_);
+				}
+		} else{
+			foreach ($directors->Director as $key => $value) {
+				if(!preg_match("/Commissaire aux comptes/" ,$value->Position->_)){
+
+
+					$nom = explode("  ", (string)$value->Name);
+
+					$return['gerant'][] = array("nom"=>$nom[1],
+												"prenom"=>$nom[0],
+									  			"fonction"=>(string)$value->Position->_);
+				}
+			}
+		}
+
+
+
 
 		// Nom de société
 		$return['societe'] = (string)$company->BasicInformation->BusinessName;

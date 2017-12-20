@@ -1,15 +1,15 @@
-<?  
+<?
 /** Classe produit_puissance
 * @package Optima
 * @subpackage Cleodis
 */
 require_once dirname(__FILE__)."/../categorie.class.php";
 class categorie_cleodis extends categorie {
-    
+
     function __construct() {
-        parent::__construct(); 
+        parent::__construct();
         $this->table = "categorie";
-        $this->colonnes['fields_column'] = array( 
+        $this->colonnes['fields_column'] = array(
              'categorie.categorie'
         );
 
@@ -17,7 +17,7 @@ class categorie_cleodis extends categorie {
             "categorie"
         );
 
-        $this->fieldstructure();    
+        $this->fieldstructure();
         $this->onglets = array(
             'sous_categorie'=>array('opened'=>true)
         );
@@ -37,15 +37,17 @@ class categorie_cleodis extends categorie {
         $this->q->reset();
 
         // On ajoute les champs utiles pour l'autocomplete
-        $this->q->addField("id_categorie")->addField("categorie");
+        $this->q->addField("id_categorie")->addField("categorie")->addOrder('categorie','ASC');
 
         if ($get['q']) {
             $this->q->setSearch($get["q"]);
         }
         $this->q->setLimit($length,$start)->setPage($start/$length);
 
-        return $this->select_all();    
+        return $this->select_all();
     }
 };
+
+class categorie_cleodisbe extends categorie_cleodis {}
 
 ?>
