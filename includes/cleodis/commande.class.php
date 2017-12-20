@@ -21,7 +21,6 @@ class commande_cleodis extends commande {
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
 			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
-			,'filesLangue'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommandeLangue","width"=>110) //PDF dans la langue de la société
 			,'courriers'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCourriers","width"=>90)
 			,'retour'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'retourPV'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
@@ -2517,6 +2516,8 @@ class commande_cleodisbe extends commande_cleodis {
 	function __construct($table_or_id=NULL) {
 		$this->table="commande";
 		parent::__construct($table_or_id);
+
+		$this->colonnes['fields_column']['filesLangue']  = array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommandeLangue","width"=>110); //PDF dans la langue de la société
 
 		$this->fieldstructure();
 
