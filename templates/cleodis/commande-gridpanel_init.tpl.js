@@ -200,16 +200,19 @@ ATF.renderer.pdfCommandeLangue=function(table,field) {
 		var id = record.data[table+'__dot__id_'+table];
 		var html = "";
 
+		var langue = record.json["langue"];
+		if (record.json["langue"] === "FR") lange = "NL";
+
 		/*html += '<a href="contratA3-'+id+'.pdf" target="_blank">';
 		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA3','commande');
 		html += '</a><br /><hr>';*/
 
-		html += '<a href="contratA4'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
-		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande')+' ('+record.json["langue"]+')';
+		html += '<a href="contratA4'+langue+'-'+id+'.pdf" target="_blank">';
+		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('contratA4','commande')+' ('+langue+')';
 		html += '</a><br /><hr>';
 
-		html += '<a href="mandatSepa'+record.json["langue"]+'-'+id+'.pdf" target="_blank">';
-		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande')+' ('+record.json["langue"]+')';
+		html += '<a href="mandatSepa'+langue+'-'+id+'.pdf" target="_blank">';
+		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />'+ATF.usr.trans('mandatSepa','commande')+' ('+langue+')';
 		html += '</a><br /><hr>';
 
 
