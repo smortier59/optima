@@ -8119,7 +8119,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratA4($id) {
 
-		log::logger($this->affaire , "mfleurquin");
 
 		if($this->affaire["langue"] !== "FR"){
 			$this->showFiligramme = true;
@@ -8453,6 +8452,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4NL($id) {
+
+
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
 
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
@@ -9174,6 +9178,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if(!$global){
 			$this->open();
 		}
+
+		if($this->affaire["langue"] !== "FR"){
+			$this->showFiligramme = true;
+		}
+
 		$this->addpage();
 
 		$this->setY(80);
@@ -9390,6 +9399,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if(!$global){
 			$this->open();
 		}
+
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
+
 		$this->addpage();
 
 		$this->setY(80);
@@ -10259,6 +10273,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratPV($id,$s,$previsu) {
 
+		if($this->affaire["langue"] !== "FR"){
+			$this->showFiligramme = true;
+		}
+
 		$this->commandeInit($id,$s,$previsu);
 
 		$this->Open();
@@ -10470,6 +10488,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 01/09/2017
 	*/
 	public function contratPVNL($id,$s,$previsu){
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
+
 		$this->commandeInit($id,$s,$previsu);
 
 		$this->Open();
