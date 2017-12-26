@@ -2754,15 +2754,15 @@ class commande_cap extends commande_cleodis {
 		$contract_id = $post['contract_id'];
 
 		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
-		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('mandat.id_affaire')->setDimension('cell');
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('id_affaire')->setDimension('cell');
 		$id_affaire = ATF::affaire()->select_all();
-		$mandat = ATF::affaire()->geMandat($id_affaire);
+		$id_mandat = ATF::affaire()->getMandat($id_affaire);
 
-		$file = ATF::mandat()->filepath($mandat->get('id_mandat'), 'retourBPA', null, 'cap');
+		$file = ATF::mandat()->filepath($id_mandat, 'retourBPA', null, 'cap');
 		try {
 			util::file_put_contents($file,base64_decode($data));
 			//On met à jour la date de retour et retourPV du contrat
-			ATF::mandat()->u(array("id_mandat"=>$mandat->get('id_mandat'),
+			ATF::mandat()->u(array("id_mandat"=>$id_mandat,
 									 "date_retour"=> date("Y-m-d")
 									)
 								);
@@ -2770,7 +2770,6 @@ class commande_cap extends commande_cleodis {
 		} catch (Exception $e) {
 			$return  = array("error"=>true, "data"=>$e);
 		}
-
 		return $return;
 	}
 

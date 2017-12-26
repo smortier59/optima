@@ -2758,7 +2758,7 @@ class affaire_cap extends affaire {
 		if($id_affaire){
 			ATF::mandat()->q->reset()->setStrict()->addField('mandat.id_mandat')->addCondition("mandat.id_affaire",$id_affaire)->setDimension("cell");
 			if($id_mandat = ATF::mandat()->sa()) {
-				return new mandat_cleodis($id_mandat);
+				return $id_mandat;
 			}else{
 				return false;
 			}
