@@ -29,6 +29,9 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertTrue($c instanceOf affaire_cap, "L'objet affaire_cap n'est pas de bon type");
 	}
 
+
+
+
 	/* @author Yann GAUTHERON <ygautheron@absystech.fr> */
 	public function test_getCompteT(){
 		$this->obj = ATF::affaire();
@@ -102,6 +105,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture = unserialize(self::$facture);
 		$facture["facture"]["type_facture"]="libre";
 		$facture["facture"]["type_libre"]="normale";
+		$facture["facture"]["nature"]= "engagement";
 		$facture["facture"]["prix_libre"]=1000;
 		$facture["facture"]["id_commande"]=$id_commande;
 		$facture["facture"]["id_affaire"]=$infos["id_affaire"];
@@ -337,7 +341,9 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"date_livraison_prevu"=>date("Y-m-d 00:00:00",strtotime(date("Y-m-d")." - 2 month")),
 									"id_parent"=>NULL,
 									"date_garantie"=>NULL,
-									"ref"=>$this->obj->getRef(date("Y-m-d"))
+									"ref"=>$this->obj->getRef(date("Y-m-d")),
+									'id_partenaire' => NULL,
+    								'langue' => NULL
 								),
 							$affaireFormateClassique,
 							"Le formateInsertUpdate ne renvoie pas le bon tab classique");
@@ -374,7 +380,9 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"id_parent"=>NULL,
 									"date_garantie"=>"2009-11-01",
 									"ref"=>$this->obj->getRefAvenant(26),
-									"id_parent"=>26
+									"id_parent"=>26,
+									'id_partenaire' => NULL,
+    								'langue' => NULL
 								),
 							$affaireFormateAvenant,
 							"Le formateInsertUpdate ne renvoie pas le bon tab avenant");
@@ -411,7 +419,9 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"id_parent"=>NULL,
 									"date_garantie"=>NULL,
 									"ref"=>$this->obj->getRef(date("Y-m-d")),
-									"id_parent"=>26
+									"id_parent"=>26,
+									'id_partenaire' => NULL,
+    								'langue' => NULL
 								),
 							$affaireFormateVente,
 							"Le formateInsertUpdate ne renvoie pas le bon tab vente");
@@ -1271,10 +1281,24 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(5500 , $res , "PrixTotal incorrect");
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 	/**
 	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
 	 */
 	public function test_CreateAffairePartenaire(){
+		$this->initUser(true);
+
 		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 
 		$contact = ATF::contact()->i(
@@ -1345,7 +1369,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 				"societe"=>"myTest",
 				"code_client"=>"M12341",
 				"cs_score"=>75,
-				'date_creation'=> date("Y-m-d", strtotime("-10 years")) 
+				'date_creation'=> date("Y-m-d", strtotime("-10 years"))
 			)
 		);
 		$post = array(
@@ -1354,16 +1378,20 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		try{
 			$ret2 = ATF::affaire()->_CreateAffairePartenaire(false,$post);
 		}catch(errorATF $e){
-			$erreur = $e->getErrno();
+			$erreur =  $e->getCode();
 		}
-		$this->assertEquals($erreur,600,'doit retourner une erreur 600');
+		$this->assertEquals($erreur,12,'doit retourner une erreur 12');
 
+		ATF::db()->rollback_transaction(true);
 
 	}
+
 	/**
 	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
 	 */
 	public function test_GetAffairePartenaire(){
+		$this->initUser(true);
+
 		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 		$id_soc2=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 		ATF::user()->q->reset()->Where('login','partenaire');
@@ -1391,7 +1419,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	 		"nom" => 'mister Test',
 	 	));
 		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
-		$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+		$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
 		$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
 		$id_produit = ATF::produit()->insert(array(
 			"ref"=>"Test produit",
@@ -1432,6 +1460,12 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			"id_societe"=> $id_soc
 		));
 		ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
+
+
+		ATF::societe()->u(array("id_societe"=>$id_soc,"cs_score"=>80,"date_creation"=>"2000-01-01"));
+		$affaire = ATF::affaire()->_CreateAffairePartenaire(false,$post,$files);
+
+
 		ATF::$usr->set('contact', array(
 			"id_contact"=> $contact2,
 			"id_user"=> $user['id_user'],
@@ -1463,11 +1497,13 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$get= array("id_affaire"=> ATF::affaire()->decryptId($aff_crypt['id_crypt']));
 		$ret2 = ATF::affaire()->_affairePartenaire($get);
+
+
 		$this->assertEquals("azertyuiop", $ret2["affaire"], "Probleme affaire retournée");
-		
 
 
-		// créer une commande sur une affaire		
+
+		// créer une commande sur une affaire
 		ATF::commande()->i(array(
 			'id_user' => $user['id_user'],
 			'id_affaire'=>ATF::affaire()->decryptId($aff_crypt['id_crypt']),
@@ -1477,11 +1513,16 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		));
 		$get= array("search"=> 'azertyuiop');
 		$ret3 = ATF::affaire()->_affairePartenaire($get);
+
+
 		$this->assertEquals(1, count($ret3), "Probleme nombre affaire retournées");
 		$this->assertEquals("azertyuiop", $ret3[0]["affaire"], "Probleme affaire retournée");
 		$this->assertFalse($ret3[0]["contrat_signe"], "Probleme contrat signé retourné");
 		$this->assertFalse($ret3[0]["retourPV"], "Probleme retourPV retourné");
+
+		ATF::db()->rollback_transaction(true);
 	}
+
 	/**
 	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
 	 */
@@ -1497,7 +1538,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		}
 		$this->assertEquals($erreur,500,'doit retourner une erreur 500');
 		$this->assertEquals($erreur,500,'Probleme d\'apporteur');
-	
+
 		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
 		$contact = ATF::contact()->i(
 			array(
@@ -1520,8 +1561,256 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$ret = ATF::affaire()->_AffaireParc();
 		$this->assertEquals(count($ret),0, 'Devrait retourner 0');
 		// test a finir -> créer des affaires de differentes societes qui sont en cours
-		// avoir des bdc passés auprès des fournisseurs 
+		// avoir des bdc passés auprès des fournisseurs
 
 
 	}
+
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test_ac(){
+		$this->initUser(true);
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		ATF::user()->q->reset()->Where('login','partenaire');
+				$user = ATF::user()->select_row();
+				$contact = ATF::contact()->i(
+					array(
+						"nom"=> "TU affaire",
+						"prenom"=> "affaire new",
+						"nom"=> "TU affaire",
+						"id_societe" => $id_soc
+					)
+				);
+		$gerant =ATF::contact()->i(array(
+			 		"id_societe" => $id_soc,
+			 		"nom" => 'mister Test',
+			 	));
+		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
+				$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+				$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
+				$id_produit = ATF::produit()->insert(array(
+					"ref"=>"Test produit",
+					"produit"=>"Produit",
+					"prix_achat"=>500,
+					"id_fabriquant"=> $fab,
+					"id_sous_categorie"=>$sousCat
+				));
+		$post = array(
+					'id_societe'=> $id_soc,
+					'gerant'=> $gerant,
+					'loyer'=> 120,
+					'duree'=> 36,
+					'libelle'=> 'Test Test',
+					'id_produit'=>$id_produit,
+				);
+		$id_affaire = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+		$id_affaire = ATF::affaire()->decryptId($id_affaire["id_crypt"]);
+
+		$affaires_ac1 = ATF::affaire()->_ac(array("q"=>"Test"), NULL);
+
+
+		$this->assertEquals($affaires_ac1[0]["id_affaire"],$id_affaire,'Retour _ac incorrect 1');
+
+		$affaires_ac2 = ATF::affaire()->_ac(array("id_societe"=>$id_soc), NULL);
+		$this->assertEquals($affaires_ac2[0]["id_affaire"],$id_affaire,'Retour _ac incorrect 2');
+
+
+
+
+		ATF::db()->rollback_transaction(true);
+	}
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test_acSpecial(){
+		$this->initUser(true);
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		ATF::user()->q->reset()->Where('login','partenaire');
+				$user = ATF::user()->select_row();
+				$contact = ATF::contact()->i(
+					array(
+						"nom"=> "TU affaire",
+						"prenom"=> "affaire new",
+						"nom"=> "TU affaire",
+						"id_societe" => $id_soc
+					)
+				);
+		$gerant =ATF::contact()->i(array(
+			 		"id_societe" => $id_soc,
+			 		"nom" => 'mister Test',
+			 	));
+		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
+				$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+				$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
+				$id_produit = ATF::produit()->insert(array(
+					"ref"=>"Test produit",
+					"produit"=>"Produit",
+					"prix_achat"=>500,
+					"id_fabriquant"=> $fab,
+					"id_sous_categorie"=>$sousCat
+				));
+		$post = array(
+					'id_societe'=> $id_soc,
+					'gerant'=> $gerant,
+					'loyer'=> 120,
+					'duree'=> 36,
+					'libelle'=> 'Test Test',
+					'id_produit'=>$id_produit,
+				);
+		$id_affaire = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+		$id_affaire = ATF::affaire()->decryptId($id_affaire["id_crypt"]);
+
+		$affaires_ac1 = ATF::affaire()->_acSpecial(array("q"=>"Test"), NULL);
+
+
+		$this->assertEquals($affaires_ac1[0]["id_affaire"],$id_affaire,'Retour _acSpecial incorrect 1');
+
+		$affaires_ac2 = ATF::affaire()->_acSpecial(array("id_societe"=>$id_soc), NULL);
+		$this->assertEquals($affaires_ac2[0]["id_affaire"],$id_affaire,'Retour _acSpecial incorrect 2');
+
+
+
+
+		ATF::db()->rollback_transaction(true);
+	}
+
+
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test_get_loyer(){
+		$this->initUser(true);
+		$id_soc=ATF::societe()->i(array("societe"=>"myTest","code_client"=>"M12341"));
+		ATF::user()->q->reset()->Where('login','partenaire');
+				$user = ATF::user()->select_row();
+				$contact = ATF::contact()->i(
+					array(
+						"nom"=> "TU affaire",
+						"prenom"=> "affaire new",
+						"nom"=> "TU affaire",
+						"id_societe" => $id_soc
+					)
+				);
+		$gerant =ATF::contact()->i(array(
+			 		"id_societe" => $id_soc,
+			 		"nom" => 'mister Test',
+			 	));
+		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
+				$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+				$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
+				$id_produit = ATF::produit()->insert(array(
+					"ref"=>"Test produit",
+					"produit"=>"Produit",
+					"prix_achat"=>500,
+					"id_fabriquant"=> $fab,
+					"id_sous_categorie"=>$sousCat
+				));
+		$post = array(
+					'id_societe'=> $id_soc,
+					'gerant'=> $gerant,
+					'loyer'=> 120,
+					'duree'=> 36,
+					'libelle'=> 'Test Test',
+					'id_produit'=>$id_produit,
+				);
+		$affaire = ATF::affaire()->_CreateAffairePartenaire(false,$post);
+
+
+		$res = ATF::affaire()->_get_loyer(array("id_affaire" => $affaire["id_crypt"], NULL));
+
+		$this->assertEquals($res["result"]["loyer"], 0, "Erreur retour loyer");
+
+		ATF::transaction_banque()->i(array("id_affaire"=>ATF::affaire()->decryptId($affaire["id_crypt"]),
+										   "data"=>"Data de transaction banque",
+										   "response_code"=>"00",
+										   "amount"=>300,
+										   "transaction_id"=>"12345",
+										   "merchant_id"=>"12345"
+									));
+
+		$res = ATF::affaire()->_get_loyer(array("id_affaire" => $affaire["id_crypt"], NULL));
+		$this->assertEquals($res["result"], false, "Erreur retour loyer 2");
+
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	private function beginTransaction($codename){
+		ATF::db()->select_db("extranet_v3_".$codename);
+    	ATF::$codename = $codename;
+    	ATF::db()->begin_transaction(true);
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	private function RollBackTransaction($codename){
+		ATF::$msg->getNotices();
+		ATF::db()->rollback_transaction(true);
+        ATF::$codename = "cleodis";
+        ATF::db()->select_db("extranet_v3_cleodis");
+	}
+
+
+
+	public function test_insert(){
+		$this->beginTransaction("cap");
+		$a = new affaire_cap();
+		$c = new audit();
+		$m = new mandat_cap();
+
+		$data = array("ref"=> "123456",
+					  "id_user"=> 1,
+					  "type"=>"gestion_poste",
+					  "id_societe"=>9969,
+					  "date"=>"2015-10-26"
+					 );
+
+		$id_audit = $c->insert(array("audit"=>$data, "tu"=>true));
+
+		$audit = $c->select($id_audit);
+
+
+
+		$mandat = array("ref"=>"123456",
+						"id_societe"=>9969,
+						"id_affaire"=>$audit["id_affaire"],
+						"date"=>date("Y-m-d"),
+						"id_audit"=>$id_audit,
+						"indemnite_retard"=>300,
+						"contact"=>array(9509,9510)
+					   );
+
+
+
+
+		$ret1 = $a->getMandat();
+
+		$ret2 = $a->getMandat($audit["id_affaire"]);
+
+		$id_mandat = $m->insert(array("mandat"=>$mandat, "preview"=>false, "tu"=>true));
+
+		$ret3 = $a->getMandat($audit["id_affaire"]);
+
+		$this->RollBackTransaction("cleodis");
+
+		$this->assertEquals(false, $ret1, "Erreur de retour Mandat 1");
+		$this->assertEquals(false, $ret2, "Erreur de retour Mandat 2");
+		$this->assertEquals($id_mandat, $ret3, "Erreur de retour Mandat 3");
+
+	}
+
+
 }
