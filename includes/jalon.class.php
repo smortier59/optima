@@ -9,6 +9,15 @@ class jalon extends classes_optima {
 
 	}
 
+	/**
+	*
+	* Fonctions _GET pour telescope, renvoi la collection des jalons selon plusieurs critères.
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param $get array contient le tri, page limit et potentiellement un id.
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
 	public function _GET($get, $post) {
 		$this->q->reset();
 
