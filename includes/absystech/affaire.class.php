@@ -1132,7 +1132,7 @@ class affaire_partenaire extends affaire {
 					$get['tri'] = "societe.".$get['tri'];
 				break;
 				case 'date_fin':
-					$get['tri'] = "-".$get['tri'];
+					$this->q->addOrder("affaire.date_fin", "IS NULL"); // Les NULL en LAST, THAT TRICK !
 				break;
 				default:
 					$get['tri'] = "affaire.".$get['tri'];
@@ -1144,9 +1144,9 @@ class affaire_partenaire extends affaire {
 			$this->q->addGroup('affaire.id_affaire');
 		}
 
-		$this->q->setToString();
-		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
-		$this->q->unsetToString();
+		// $this->q->setToString();
+		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
+		// $this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
@@ -1190,8 +1190,15 @@ class affaire_partenaire extends affaire {
 		if ($get['groupByCategory']) {
 			$result = array();
 			foreach ($r as $k=>$i) {
+				$el = array();
 				$el['text'] = $i['jalon'];
 				$el['id'] = $i['id_jalon'];
+
+				if ($settings = ATF::settings()->getSettings("jalon", $i['id_jalon'], ATF::$usr->get("contact",'id_societe'))) {
+					$el['id_settings'] = $settings[0]['id_settings'];
+					$el['mail_to'] = $settings[0]['mail_to'];
+					$el['mail_content'] = $settings[0]['mail_content'];
+				}
 
 				$childs[$i['category']][] = $el;
 			}
@@ -1299,7 +1306,8 @@ class affaire_partenaire extends affaire {
 		if (!ATF::$usr->get('contact'))throw new Exception("SESSION_ERROR, impossible d'insérer le jalon.",1999);
 		if (!$post['id_affaire']) throw new Exception("AFFAIRE_MISSING, impossible d'insérer le jalon.",2000);
 		if (!$post['jalon']) throw new Exception("JALON_MISSING, impossible d'insérer le jalon.",2001);
-
+		// log::logger($post, 'qjanon');
+		// throw new Exception("WIP", 1032);
 		$toInsert = array(
 			"id_jalon"=>$post['jalon'],
 			"id_affaire"=>ATF::affaire()->decryptId($post['id_affaire']),
@@ -1308,14 +1316,44 @@ class affaire_partenaire extends affaire {
 		);
 
 		$id = ATF::affaire_etat()->insert($toInsert);
+		$id_societe = ATF::affaire()->select($post['id_affaire'], "id_societe");
+		$societe = ATF::societe()->nom($id_societe);
 
+		if ($post['sendmail']) {
+			$settings = ATF::settings()->select($post['sendmail']);
+			if ($settings) {
+				if (ATF::mail()->check_mail($settings["mail_to"])) {
+					$mail = array(
+						"objet"=>utf8_decode("Changement d'état de l'installation pour ".$societe)
+						,"from"=>"Espace client Absystech <no-reply@absystech.fr>"
+						,"html"=>true
+						,"template"=>'jalon'
+						,"template_only"=>true
+						,"recipient"=>$settings["mail_to"]
+						,"texte"=> nl2br(utf8_decode($settings['mail_content']))
+						,"societe"=>$societe
+					);
+					$notification = new mail($mail);
+					if ($notification->send()) {
+						ATF::$msg->addNotice("Notifications envoyées avec succès");
+					}
+				}
+			} else {
+				ATF::$msg->addWarning("Impossible d'envoyer les notifications mails, la configuration est corrompue...");
+			}
+		}
+		$n = array();
+		$n = array_merge($n, ATF::$msg->getWarnings(), ATF::$msg->getNotices());
 		$return = array(
-			'id_jalon'=>$post['jalon'],
-			'comment'=>$post['comment'],
-			'date'=>date('Y-m-d H:i')
+			"result"=>array(
+				'id_jalon'=>$post['jalon'],
+				'comment'=>$post['comment'],
+				'date'=>date('Y-m-d H:i')
+			),
+			"notices"=>$n
 		);
 
-		$return = $this->infosJalon($return);
+		$return["result"] = $this->infosJalon($return["result"]);
 
 		return $return;
 
@@ -1324,7 +1362,6 @@ class affaire_partenaire extends affaire {
 
 class affaire_telescope extends affaire_absystech {
 	/**
-	*
 	* Fonctions _GET pour telescope
 	* @package Telescope
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>

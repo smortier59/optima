@@ -7,7 +7,7 @@
 */
 require_once dirname(__FILE__)."/../../libs/ATF/includes/user.class.php";
 class user_absystech extends user {
-	public function __construct() { 
+	public function __construct() {
 		parent::__construct();
 		$this->addPrivilege("autocompleteAssDirection");
 		$this->addPrivilege("autocompleteTechnicien");
@@ -20,7 +20,7 @@ class user_absystech extends user {
 			,'devis'
 		);
 	}
-	
+
 	/**
 	* Autocomplete pour les assistantes de direction
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -69,14 +69,14 @@ class user_absystech extends user {
 		return !!$this->update($post);
 
 	}
-	
+
 };
 class user_att extends user_absystech {
-	public function __construct() { 
+	public function __construct() {
 		parent::__construct();
 		$this->colonnes["restante"]["pole"]["default"] = "telecom";
 		$this->colonnes["restante"]["pole"]["xtype"] = "hidden";
-		$this->colonnes["primary"]["pole"]= $this->colonnes["restante"]["pole"];	
+		$this->colonnes["primary"]["pole"]= $this->colonnes["restante"]["pole"];
 	}
 };
 class user_demo extends user_absystech { };
