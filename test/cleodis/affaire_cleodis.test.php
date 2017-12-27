@@ -493,25 +493,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->updateDate($infosDate_installation_prevu);
 
 		$affaire=$this->obj->select($id_affaire);
-		/*$this->assertEquals(array(
-						array(
-							"msg" => "Email envoyé au(x) notifié(s)",
-							"title" => NULL,
-							"timer" => NULL
-							),
-						array(
-							"msg" => "date_livraison_prevu_modifiee",
-							"title" => NULL,
-							"timer" => NULL
-							),
-						array(
-							"msg" => "date_installation_prevu_modifiee",
-							"title" => NULL,
-							"timer" => NULL
-							)
-					),
-					ATF::$msg->getNotices(),
-					"Les notices ne sont pas cohérentes pas cohérente updateDate Date_installation_prevu");	*/
+
 
 		$this->assertEquals("2010-01-01",
 							$affaire["date_installation_prevu"],
@@ -550,22 +532,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$affaire=$this->obj->select($id_affaire);
 		ATF::$msg->getNotices();
-		/*$this->assertEquals(array(
-						array(
-							"msg" => "Garantie",
-							"title" => null,
-							"timer" => null,
-							"type" => "success"
-							),
-						array(
-							"msg" => "date_installation_reel_modifiee",
-							"title" => null,
-							"timer" => null,
-							"type" => "success"
-							)
-					),
-					ATF::$msg->getNotices(),
-					"Les notices ne sont pas cohérentes pas cohérente updateDate Date_installation_reel");	*/
+
 
 		$this->assertEquals("2010-01-01",
 							$affaire["date_installation_prevu"],
@@ -583,18 +550,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->updateDate($infosDate_garantie);
 		$affaire=$this->obj->select($id_affaire);
 		ATF::$msg->getNotices();
-		/*
-		$this->assertEquals(array(
-						array(
-							"msg" => "date_garantie_modifiee",
-							"title" => null,
-							"timer" => null,
-							"type" => "success"
-							)
-					),
-					ATF::$msg->getNotices(),
-					"Les notices ne sont pas cohérentes pas cohérente updateDate Date_installation_reel");
-		*/
+
 
 		$this->assertEquals("2012-01-01",
 							$affaire["date_garantie"],
@@ -607,18 +563,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->updateDate($infosDate_livraison_prevu);
 		$affaire=$this->obj->select($id_affaire);
 		ATF::$msg->getNotices();
-		/*
-		$this->assertEquals(array(
-						array(
-							"msg" => "date_livraison_prevu_modifiee",
-							"title" => null,
-							"timer" => null,
-							"type" => "success"
-							)
-					),
-					ATF::$msg->getNotices(),
-					"Les notices ne sont pas cohérentes pas cohérente updateDate Date_installation_reel");
-		*/
+
 
 		$this->assertEquals("2010-02-01",
 							$affaire["date_livraison_prevu"],
@@ -1046,22 +991,6 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("2010-01-11",$this->obj->getDateLivraison("2010-01-01",10),"getDateLivraison ne fonctionne pas si pas de date");
 	}
 
-//	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
-//	public function test_majGarantieParc(){
-//
-//		ATF::db()->rollback_transaction(true);
-//		$this->initUser();
-//
-//		$id_affaire=$this->obj->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
-//		$id_parc1=ATF::parc()->i(array("id_affaire"=>$id_affaire,"libelle"=>"parc tu","serial"=>"parc tu","etat"=>"broke"));
-//		$id_parc2=ATF::parc()->i(array("id_affaire"=>$id_affaire,"libelle"=>"parc tu","serial"=>"parc tu","etat"=>"broke","provenance"=>$id_affaire));
-//
-//		$affaire = new affaire_cleodis($id_affaire);
-//		$affaire->majGarantieParc("2010-01-01");
-//
-//		$this->assertEquals("2010-01-01",ATF::parc()->select($id_parc1,"date_garantie"),"majGarantieParc ne met pas à jour la garantie");
-//		$this->assertEquals("",ATF::parc()->select($id_parc2,"date_garantie"),"majGarantieParc ne devrait pas mettre à jour car il y a une provenance");
-//	}
 
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	public function test_majForecastProcess(){
@@ -1281,17 +1210,6 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(5500 , $res , "PrixTotal incorrect");
 
 	}
-
-
-
-
-
-
-
-
-
-
-
 
 	/**
 	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
@@ -1523,6 +1441,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::db()->rollback_transaction(true);
 	}
 
+
 	/**
 	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
 	 */
@@ -1678,7 +1597,6 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
-
 	/**
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
@@ -1735,6 +1653,107 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$res = ATF::affaire()->_get_loyer(array("id_affaire" => $affaire["id_crypt"], NULL));
 		$this->assertEquals($res["result"], false, "Erreur retour loyer 2");
 
+		ATF::db()->rollback_transaction(true);
+
+	}
+
+
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test_paiementIsReceived(){
+		ATF::affaire()->q->reset()->addOrder("affaire.id_affaire","desc")->setLimit(1);
+		$affaire = ATF::affaire()->select_row();
+
+
+		$return = ATF::affaire()->paiementIsReceived($affaire["affaire.id_affaire"],true);
+		$this->assertEquals($return, false, "Retour incorrect paiementIsReceived");
+
+
+
+		ATF::transaction_banque()->i(array("id_affaire"=>$affaire["affaire.id_affaire"],
+										   "data"=>"Data de transaction banque",
+										   "response_code"=>"00",
+										   "amount"=>300,
+										   "transaction_id"=>"12345",
+										   "merchant_id"=>"12345"
+									));
+
+		$return = ATF::affaire()->paiementIsReceived($affaire["affaire.id_affaire"],true);
+
+
+		$this->assertEquals($return["data"], "Data de transaction banque", "Retour incorrect paiementIsReceived 2");
+
+	}
+
+
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test__paiementIsReceived(){
+		ATF::affaire()->q->reset()->addOrder("affaire.id_affaire","desc")->setLimit(1);
+		$affaire = ATF::affaire()->select_row();
+
+		ATF::transaction_banque()->i(array("id_affaire"=>$affaire["affaire.id_affaire"],
+										   "data"=>"Data de transaction banque",
+										   "response_code"=>"00",
+										   "amount"=>300,
+										   "transaction_id"=>"12345",
+										   "merchant_id"=>"12345"
+									));
+		$return = ATF::affaire()->_paiementIsReceived(array("id_affaire"=>$affaire["affaire.id_affaire"]));
+		$this->assertEquals($return, false, "Retour incorrect _paiementIsReceived");
+
+		$return = ATF::affaire()->_paiementIsReceived(array("id_affaire"=>ATF::affaire()->cryptId($affaire["affaire.id_affaire"])));
+
+
+		$this->assertEquals($return, true, "Retour incorrect paiementIsReceived 2");
+
+	}
+
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test_repriseContratToshiba(){
+		unlink(__ABSOLUTE_PATH__."../data/testsuite/commande/16462.retour");
+		$file = __ABSOLUTE_PATH__."test/cleodis/pdf_exemple.pdf";
+
+		$attendu = array("sign"=>false,
+                         "pieces"=>false,
+                         "paiement"=>false);
+
+
+		$return = $this->obj->_repriseContratToshiba(array(),array("id_affaire"=>22170));
+		$this->assertEquals($attendu, $return, "Retour incorrect _repriseContratToshiba");
+
+
+		copy($file, __ABSOLUTE_PATH__."../data/testsuite/commande/16462.retour");
+		$attendu["sign"] = true;
+		$return = $this->obj->_repriseContratToshiba(array(),array("id_affaire"=>22170));
+		$this->assertEquals($attendu,$return,"Retour incorrect _repriseContratToshiba 2");
+
+
+		$this->obj->u(array("id_affaire"=>22170, "pieces"=>"OK"));
+		$attendu["pieces"] = true;
+		$return = $this->obj->_repriseContratToshiba(array(),array("id_affaire"=>22170));
+		$this->assertEquals($attendu,$return,"Retour incorrect _repriseContratToshiba 3");
+
+
+
+		ATF::transaction_banque()->i(array("id_affaire"=>22170,
+										   "data"=>"Data de transaction banque",
+										   "response_code"=>"00",
+										   "amount"=>300,
+										   "transaction_id"=>"12345",
+										   "merchant_id"=>"12345"
+									));
+		$attendu["paiement"] = true;
+		$return = $this->obj->_repriseContratToshiba(array(),array("id_affaire"=>22170));
+		$this->assertEquals($attendu,$return,"Retour incorrect _repriseContratToshiba 4");
+
+		unlink(__ABSOLUTE_PATH__."../data/testsuite/commande/16462.retour");
 
 	}
 
@@ -1748,7 +1767,11 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 
-	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+
+
+
+
+		// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	private function beginTransaction($codename){
 		ATF::db()->select_db("extranet_v3_".$codename);
     	ATF::$codename = $codename;
@@ -1811,6 +1834,16 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($id_mandat, $ret3, "Erreur de retour Mandat 3");
 
 	}
+
+
+
+
+
+
+
+
+
+
 
 
 }
