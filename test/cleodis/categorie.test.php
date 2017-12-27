@@ -1,17 +1,17 @@
 <?
 class categorie_test extends ATF_PHPUnit_Framework_TestCase {
-	
+
 	public function setUp() {
 		$this->begin_transaction(true);
-		
+
 		ATF::db()->truncate("commande_ligne");
-		ATF::db()->truncate("facture_ligne");		
-		
-		ATF::db()->truncate("produit");		
+		ATF::db()->truncate("facture_ligne");
+
+		ATF::db()->truncate("produit");
 		ATF::db()->truncate("sous_categorie");
-		ATF::db()->truncate("categorie");		
+		ATF::db()->truncate("categorie");
 	}
-	
+
 	/** Méthode post-test, exécute après chaque test unitaire*/
 	public function tearDown(){
 		ATF::db()->rollback_transaction(true);
@@ -35,7 +35,6 @@ class categorie_test extends ATF_PHPUnit_Framework_TestCase {
 		$cat3 = ATF::categorie()->i(array('categorie' =>'troisieme categorie'));
 
 		$res=ATF::categorie()->_ac();
-		log::logger($res,'ccharlier');
 		$this->assertEquals(sizeof($res),3,'le nombre de retour n\'est pas bon');
 		$this->assertEquals($res[0]['categorie'], 'troisieme categorie', 'pas la bonne categorie retournée');
 		$this->assertEquals($res[1]['categorie'], 'deuxieme categorie', 'pas la bonne categorie retournée');
