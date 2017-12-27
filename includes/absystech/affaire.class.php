@@ -1183,6 +1183,13 @@ class affaire_partenaire extends affaire {
 		return $return;
 	}
 
+	/**
+	 * Récupération des jalons lié au module affaire, regroupé par catégory ou non
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get paramètre $_GET
+	 *                    groupByCategory	Regroupement des jalons par nom de category
+	 * @return array      Listes des jalons
+	 */
 	public function getJalons($get) {
 		ATF::jalon()->q->reset()->where('module','affaire');
 		$r = ATF::jalon()->sa();
@@ -1213,6 +1220,12 @@ class affaire_partenaire extends affaire {
 		return $return;
 	}
 
+	/**
+	 * Retourne l'historique des jalons pour une affaire (stocké dans affaire_etat)
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  string $id ID crypté de l'affaire
+	 * @return array     Collection des jalons affecté a une affaire
+	 */
 	public function getJalonsHistory($id) {
 		ATF::affaire_etat()->q->reset()
 			->where('id_affaire',ATF::affaire()->decryptId($id))
@@ -1226,6 +1239,12 @@ class affaire_partenaire extends affaire {
 		return $return ? $return : array();
 	}
 
+	/**
+	 * Renvoi les informations spécifiques supplémentaires pour les jalons (icon & classname). Utile pour le rendu des jalons
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $jalon Modèle de jalon
+	 * @return array        Modèle de jalon complété avec les informations supplémentaires
+	 */
 	private function infosJalon($jalon) {
 
 		switch ($jalon['id_jalon']) {
@@ -1302,6 +1321,15 @@ class affaire_partenaire extends affaire {
 		return $jalon;
 	}
 
+	/**
+	 * Ajoute un jalon sur une affaire, lié a un contact connecté.
+	 * Récupère ensuite les paramètres de notification dans les settings pour envoyer un mail d'alerte
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $post data $_POST
+	 * @return array $return
+	 *         					result Informations sur le jalon inséré pour le rendre côté HTML
+	 *         					notices Ensemble des notices générées pendant le traitement
+	 */
 	public function addJalon($post) {
 		if (!ATF::$usr->get('contact'))throw new Exception("SESSION_ERROR, impossible d'insérer le jalon.",1999);
 		if (!$post['id_affaire']) throw new Exception("AFFAIRE_MISSING, impossible d'insérer le jalon.",2000);

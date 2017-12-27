@@ -9,6 +9,15 @@ class settings extends classes_optima {
 
 	}
 
+	/**
+	 * Renvoi le paramétrage pour un module, un élément et une société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  string $module     Nom du module
+	 * @param  number $id         ID de l'élement
+	 * @param  number $id_societe ID de la société (facultatif)
+	 * @param  array $fields     Champs a renvoyer
+	 * @return array             renvoi tous le paramétrage correspondant aux critères
+	 */
 	public function getSettings($module, $id, $id_societe, $fields = null) {
 		$this->q->reset();
 
@@ -26,6 +35,13 @@ class settings extends classes_optima {
 
 	}
 
+	/**
+	 * Sauvegarde des paramètres mail_to et mail_content pour un module-element-société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get  $_GET
+	 * @param  array $post $_POST
+	 * @return boolean TRUE si tout s'est bien passé
+	 */
 	public function _setSettings($get, $post) {
 		if (!$post) throw new errorATF("POST MISSING",1002);
 		if (!$post['module']) throw new errorATF("MODULE_MISSING",1003);
