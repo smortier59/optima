@@ -4173,6 +4173,21 @@ class pdf_cleodis extends pdf {
 			$this->factureRefi($global);
 		} elseif ($this->facture['type_facture']=="facture" || $this->facture['type_facture']=="libre") {
 			$this->factureClassique($global);
+
+
+			if($this->affaire["commentaire_facture"]){
+
+				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
+				$commentaire_facture = strip_tags($commentaire_facture);
+
+				$head = array("Commentaire");
+				$w = array(180);
+				$data = $styles = array();
+				$data[0][0] = $commentaire_facture;
+				$styles[0][0] = $this->colsProduitAlignLeft;
+				$this->tableauBigHead($head,$data,$w,5,$styles);
+			}
+
 		}elseif($this->facture['type_facture']=="midas"){
 			$this->factureMidas($global);
 		}
@@ -8974,9 +8989,24 @@ class pdf_cleodisbe extends pdf_cleodis {
 			}else{
 				$this->factureClassique($global);
 			}
+
+			if($this->affaire["commentaire_facture"]){
+
+				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
+				$commentaire_facture = strip_tags($commentaire_facture);
+
+				$head = array("Commentaire");
+				$w = array(180);
+				$data = $styles = array();
+				$data[0][0] = $commentaire_facture;
+				$styles[0][0] = $this->colsProduitAlignLeft;
+				$this->tableauBigHead($head,$data,$w,5,$styles);
+			}
 		}elseif($this->facture['type_facture']=="midas"){
 			$this->factureMidas($global);
 		}
+
+
 
 		$this->SetXY(10,-30);
 		$this->setfont('arial','',7);
