@@ -127,6 +127,10 @@ class devis_cleodis extends devis {
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
+		$this->colonnes['panel']['commentaire'] = array(
+			"commentaire_facture"=>array("custom"=>true,"xtype"=>"htmleditor")
+		);
+
 		$this->colonnes['panel']['courriel'] = array(
 			"email"=>array("custom"=>true,'null'=>true)
 			,"emailCopie"=>array("custom"=>true,'null'=>true)
@@ -151,6 +155,7 @@ class devis_cleodis extends devis {
 		$this->panels['lignes_non_visible'] = array("visible"=>false, 'nbCols'=>1);
 		$this->panels['total'] = array("visible"=>true,'nbCols'=>4);
 		$this->panels['courriel'] = array('nbCols'=>2,"checkboxToggle"=>true);
+		$this->panels['commentaire'] = array('nbCols'=>1);
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['clone'] =
@@ -384,7 +389,7 @@ class devis_cleodis extends devis {
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
 
 		////////////////Devis
-		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["langue"]);
+		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["langue"],$infos["commentaire_facture"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast
@@ -621,19 +626,23 @@ class devis_cleodis extends devis {
 
 		$infos["devis"]["ref"]=ATF::affaire()->select($devis["id_affaire"],'ref');
 		$affaire = array();
-		$affaire["date_installation_prevu"] = ATF::affaire()->select($devis["id_affaire"], "date_installation_prevu");
-		$affaire["date_installation_reel"]  = ATF::affaire()->select($devis["id_affaire"] , "date_installation_reel" );
-		$affaire["date_livraison_prevu"] 	= ATF::affaire()->select($devis["id_affaire"] , "date_livraison_prevu");
-		$affaire["date_garantie"] 			= ATF::affaire()->select($devis["id_affaire"] , "date_garantie");
-		$affaire["date_ouverture"] 			= ATF::affaire()->select($devis["id_affaire"] , "date_ouverture");
-		$affaire["date_recettage_cablage"]  = ATF::affaire()->select($devis["id_affaire"] , "date_recettage_cablage");
 
-		$affaire["site_associe"]  = ATF::affaire()->select($devis["id_affaire"] , "site_associe");
-		$affaire["etat_comite"]  = ATF::affaire()->select($devis["id_affaire"] , "etat_comite");
-		$affaire["provenance"]  = ATF::affaire()->select($devis["id_affaire"] , "provenance");
-		$affaire["pieces"]  = ATF::affaire()->select($devis["id_affaire"] , "pieces");
-		$affaire["date_verification"]  = ATF::affaire()->select($devis["id_affaire"] , "date_verification");
-		$affaire["id_partenaire"]  = ATF::affaire()->select($devis["id_affaire"] , "id_partenaire");
+		$data_affaire = ATF::affaire()->select($devis["id_affaire"]);
+
+		$affaire["date_installation_prevu"] = $data_affaire["date_installation_prevu"];
+		$affaire["date_installation_reel"]  = $data_affaire["date_installation_reel" ];
+		$affaire["date_livraison_prevu"] 	= $data_affaire["date_livraison_prevu"];
+		$affaire["date_garantie"] 			= $data_affaire["date_garantie"];
+		$affaire["date_ouverture"] 			= $data_affaire["date_ouverture"];
+		$affaire["date_recettage_cablage"]  = $data_affaire["date_recettage_cablage"];
+
+		$affaire["site_associe"]  = $data_affaire["site_associe"];
+		$affaire["etat_comite"]  = $data_affaire["etat_comite"];
+		$affaire["provenance"]  = $data_affaire["provenance"];
+		$affaire["pieces"]  = $data_affaire["pieces"];
+		$affaire["date_verification"]  = $data_affaire["date_verification"];
+		$affaire["id_partenaire"]  = $data_affaire["id_partenaire"];
+		//$affaire["commentaire_facture"]  = $data_affaire["commentaire_facture"];
 
 		// Déplacer toutes les pièces jointes anciennes vers le nouveau
 		$datapath = dirname(ATF::affaire()->filepath($devis["id_affaire"],"temp"));
@@ -931,6 +940,7 @@ class devis_cleodis extends devis {
 	public function default_value($field){
 		if(ATF::_r('id_devis')){
 			$devis=ATF::devis()->select(ATF::_r('id_devis'));
+			$affaire = ATF::affaire()->select(ATF::devis()->select(ATF::_r('id_devis'), "id_affaire"));
 		}
 
 		if($devis){
@@ -968,6 +978,9 @@ class devis_cleodis extends devis {
 					if($devis["type_contrat"]=='vente'){
 						return $devis["prix"];
 					}
+					break;
+				case "commentaire_facture":
+					return $affaire["commentaire_facture"];
 					break;
 			}
 		}else{

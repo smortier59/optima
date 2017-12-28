@@ -1,3 +1,8 @@
+#17390 - Ajout message sur la facture
+ALTER TABLE `affaire` ADD `commentaire_facture` TEXT NULL COMMENT 'Commentaire qui sera afficher sur les factures clients' AFTER `id_partenaire`;
+
+
+
 #DEVIS CLEODIS V2
 ALTER TABLE `devis_ligne` ADD `options` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire`;
 ALTER TABLE `devis` ADD `commentaire_offre_partenaire` TEXT NULL DEFAULT NULL AFTER `raison_refus`;
