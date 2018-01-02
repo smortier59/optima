@@ -63,11 +63,9 @@ class settings extends classes_optima {
 
 				if ($post['id_settings'][$k]) {
 					$data['id_settings'] = $post['id_settings'][$k];
-					$this->u($data);
+					if ($data['mail_content']) $this->u($data);
 				} else {
-					if ($data['mail_to'] && $data['mail_content']) {
-						$this->i($data);
-					}
+					if ($data['mail_content']) $this->i($data);
 				}
 
 			}
