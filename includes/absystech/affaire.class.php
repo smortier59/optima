@@ -1060,6 +1060,8 @@ class affaire_partenaire extends affaire {
 			'contact.tel'=>array(),
 			'contact.gsm'=>array(),
 			'contact.email'=>array(),
+			'societe.code_groupe'=>array(),
+			'CASE WHEN (societe.code_groupe) THEN CONCAT(societe.societe, " [", societe.code_groupe, "]") ELSE societe.societe END'=>array("alias"=>"nom_societe"),
 			'societe.adresse'=>array(),
 			'societe.adresse_2'=>array(),
 			'societe.adresse_3'=>array(),
@@ -1076,7 +1078,8 @@ class affaire_partenaire extends affaire {
 
 		if($get["search"]){
 			header("ts-search-term: ".$get['search']);
-			$this->q->setSearch($get['search']);
+			$this->q->where('CASE WHEN (societe.code_groupe) THEN CONCAT(societe.societe, " [", societe.code_groupe, "]") ELSE societe.societe END', "%".$get['search']."%", "OR", "search", "LIKE");
+			$this->q->where("affaire.affaire", "%".$get['search']."%", "OR", "search", "LIKE");
 		}
 
 		// Filtre sur l'etat de l'affaire
@@ -1134,6 +1137,9 @@ class affaire_partenaire extends affaire {
 				case 'date_fin':
 					$this->q->addOrder("affaire.date_fin", "IS NULL"); // Les NULL en LAST, THAT TRICK !
 				break;
+				case 'nom_societe':
+					$get['tri'] = "nom_societe";
+				break;
 				default:
 					$get['tri'] = "affaire.".$get['tri'];
 				break;
@@ -1144,9 +1150,9 @@ class affaire_partenaire extends affaire {
 			$this->q->addGroup('affaire.id_affaire');
 		}
 
-		// $this->q->setToString();
-		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
-		// $this->q->unsetToString();
+		$this->q->setToString();
+		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
+		$this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
