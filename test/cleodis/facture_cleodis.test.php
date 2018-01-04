@@ -3,6 +3,347 @@
 * Classe de test sur le module societe_cleodis
 */
 class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
+
+
+    public function initDevis_Commande(){
+        $this->devis_1 = array (
+                          'extAction' => 'devis',
+                          'extMethod' => 'insert',
+                          'preview' => 'true',
+                          'label_devis' =>
+                          array (
+                            'id_filiale' => 'CLEODIS',
+                            'id_opportunite' => 'Aucun(e)',
+                            'id_societe' => 'FINORPA',
+                            'id_contact' => 'M Philippe MOONS',
+                            'AR_societe' => 'FINORPA',
+                          ),
+                          'devis' =>
+                          array (
+                            'id_filiale' => '246',
+                            'devis' => 'TU',
+                            'tva' => '1.200',
+                            'date_accord' => '08-02-2011',
+                            'id_opportunite' => '',
+                            'id_societe' => 5391,
+                            'type_contrat' => 'lld',
+                            'validite' => '23-02-2011',
+                            'id_contact' => '5753',
+                            'loyers' => '0.00',
+                            'frais_de_gestion_unique' => '0.00',
+                            'assurance_unique' => '0.00',
+                            'AR_societe' => '',
+                            'marge' => '99.96',
+                            'marge_absolue' => '8 021.00',
+                            'prix' => '8 024.00',
+                            'prix_achat' => '3.00',
+                            'email' => 'pmoons@finorpa.fr',
+                            'emailTexte' => '<br>',
+                            'emailCopie' => 'jerome.loison@cleodis.fr',
+                            'filestoattach' =>
+                            array (
+                              'fichier_joint' => '',
+                            ),
+                          ),
+                          'avenant' => '',
+                          'AR' => '',
+                          'loyer' =>
+                          array (
+                            'frequence_loyer' => 'm',
+                          ),
+                          'values_devis' =>
+                          array (
+                            'loyer' => '[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]',
+                            'produits' => '[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]',
+                          ),
+                        );
+
+        $this->devis_2 = array (
+                          'extAction' => 'devis',
+                          'extMethod' => 'insert',
+                          'preview' => 'true',
+                          'label_devis' =>
+                          array (
+                            'id_filiale' => 'CLEODIS',
+                            'id_opportunite' => 'Aucun(e)',
+                            'id_societe' => 'FINORPA',
+                            'id_contact' => 'M Philippe MOONS',
+                            'AR_societe' => 'FINORPA',
+                          ),
+                          'devis' =>
+                          array (
+                            'id_filiale' => '246',
+                            'devis' => 'TU',
+                            'tva' => '1.200',
+                            'date_accord' => '08-02-2011',
+                            'id_opportunite' => '',
+                            'id_societe' => 5391,
+                            'type_contrat' => 'lld',
+                            'validite' => '23-02-2011',
+                            'id_contact' => '5753',
+                            'loyers' => '0.00',
+                            'frais_de_gestion_unique' => '0.00',
+                            'assurance_unique' => '0.00',
+                            'AR_societe' => '',
+                            'marge' => '99.96',
+                            'marge_absolue' => '8 021.00',
+                            'prix' => '8 024.00',
+                            'prix_achat' => '3.00',
+                            'email' => 'pmoons@finorpa.fr',
+                            'emailTexte' => '<br>',
+                            'emailCopie' => 'jerome.loison@cleodis.fr',
+                            'filestoattach' =>
+                            array (
+                              'fichier_joint' => '',
+                            ),
+                          ),
+                          'avenant' => '',
+                          'AR' => '',
+                          'loyer' =>
+                          array (
+                            'frequence_loyer' => 'm',
+                          ),
+                          'values_devis' =>
+                          array (
+                            'loyer' => '[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"trimestre","loyer__dot__loyer_total":8024}]',
+                            'produits' => '[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]',
+                          ),
+                        );
+
+        $this->devis_3 = array (
+                          'extAction' => 'devis',
+                          'extMethod' => 'insert',
+                          'preview' => 'true',
+                          'label_devis' =>
+                          array (
+                            'id_filiale' => 'CLEODIS',
+                            'id_opportunite' => 'Aucun(e)',
+                            'id_societe' => 'FINORPA',
+                            'id_contact' => 'M Philippe MOONS',
+                            'AR_societe' => 'FINORPA',
+                          ),
+                          'devis' =>
+                          array (
+                            'id_filiale' => '246',
+                            'devis' => 'TU',
+                            'tva' => '1.200',
+                            'date_accord' => '08-02-2011',
+                            'id_opportunite' => '',
+                            'id_societe' => 5391,
+                            'type_contrat' => 'lld',
+                            'validite' => '23-02-2011',
+                            'id_contact' => '5753',
+                            'loyers' => '0.00',
+                            'frais_de_gestion_unique' => '0.00',
+                            'assurance_unique' => '0.00',
+                            'AR_societe' => '',
+                            'marge' => '99.96',
+                            'marge_absolue' => '8 021.00',
+                            'prix' => '8 024.00',
+                            'prix_achat' => '3.00',
+                            'email' => 'pmoons@finorpa.fr',
+                            'emailTexte' => '<br>',
+                            'emailCopie' => 'jerome.loison@cleodis.fr',
+                            'filestoattach' =>
+                            array (
+                              'fichier_joint' => '',
+                            ),
+                          ),
+                          'avenant' => '',
+                          'AR' => '',
+                          'loyer' =>
+                          array (
+                            'frequence_loyer' => 'm',
+                          ),
+                          'values_devis' =>
+                          array (
+                            'loyer' => '[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"semestre","loyer__dot__loyer_total":8024}]',
+                            'produits' => '[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]',
+                          ),
+                        );
+
+        $this->devis_4 = array (
+                          'extAction' => 'devis',
+                          'extMethod' => 'insert',
+                          'preview' => 'true',
+                          'label_devis' =>
+                          array (
+                            'id_filiale' => 'CLEODIS',
+                            'id_opportunite' => 'Aucun(e)',
+                            'id_societe' => 'FINORPA',
+                            'id_contact' => 'M Philippe MOONS',
+                            'AR_societe' => 'FINORPA',
+                          ),
+                          'devis' =>
+                          array (
+                            'id_filiale' => '246',
+                            'devis' => 'TU',
+                            'tva' => '1.200',
+                            'date_accord' => '08-02-2011',
+                            'id_opportunite' => '',
+                            'id_societe' => 5391,
+                            'type_contrat' => 'lld',
+                            'validite' => '23-02-2011',
+                            'id_contact' => '5753',
+                            'loyers' => '0.00',
+                            'frais_de_gestion_unique' => '0.00',
+                            'assurance_unique' => '0.00',
+                            'AR_societe' => '',
+                            'marge' => '99.96',
+                            'marge_absolue' => '8 021.00',
+                            'prix' => '8 024.00',
+                            'prix_achat' => '3.00',
+                            'email' => 'pmoons@finorpa.fr',
+                            'emailTexte' => '<br>',
+                            'emailCopie' => 'jerome.loison@cleodis.fr',
+                            'filestoattach' =>
+                            array (
+                              'fichier_joint' => '',
+                            ),
+                          ),
+                          'avenant' => '',
+                          'AR' => '',
+                          'loyer' =>
+                          array (
+                            'frequence_loyer' => 'an',
+                          ),
+                          'values_devis' =>
+                          array (
+                            'loyer' => '[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"an","loyer__dot__loyer_total":8024}]',
+                            'produits' => '[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]',
+                          ),
+                        );
+
+
+
+        $this->commande_1 = array (
+                                  'extAction' => 'commande',
+                                  'extMethod' => 'insert',
+                                  'preview' => 'true',
+                                  'commande' =>
+                                  array (
+                                    'commande' => 'TU',
+                                    'type' => 'prelevement',
+                                    'id_societe' => '5391',
+                                    'date' => '10-05-2011',
+                                    'id_affaire' => '6002',
+                                    'clause_logicielle' => 'non',
+                                    'prix' => '8 024.00',
+                                    'prix_achat' => '3.00',
+                                    'marge' => '99.96',
+                                    'marge_absolue' => '8 021.00',
+                                    'email' => 'pmoons@finorpa.fr',
+                                    'emailTexte' => '',
+                                    'emailCopie' => 'jerome.loison@cleodis.fr',
+                                    'id_devis' => '5929',
+                                    '__redirect' => 'devis',
+                                  ),
+                                  'values_commande' =>
+                                  array (
+                                    'loyer' => '[{"loyer__dot__loyer":"233.00","loyer__dot__duree":"34","loyer__dot__assurance":"2.00","loyer__dot__frais_de_gestion":"1.00","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]',
+                                    'produits_repris' => '',
+                                    'produits' => '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175"}]',
+                                    'produits_non_visible' => '',
+                                  ),
+                                );
+
+        $this->commande_2 = array (
+                                  'extAction' => 'commande',
+                                  'extMethod' => 'insert',
+                                  'preview' => 'true',
+                                  'commande' =>
+                                  array (
+                                    'commande' => 'TU',
+                                    'type' => 'prelevement',
+                                    'id_societe' => '5391',
+                                    'date' => '10-05-2011',
+                                    'id_affaire' => '6002',
+                                    'clause_logicielle' => 'non',
+                                    'prix' => '8 024.00',
+                                    'prix_achat' => '3.00',
+                                    'marge' => '99.96',
+                                    'marge_absolue' => '8 021.00',
+                                    'email' => 'pmoons@finorpa.fr',
+                                    'emailTexte' => '',
+                                    'emailCopie' => 'jerome.loison@cleodis.fr',
+                                    'id_devis' => '5929',
+                                    '__redirect' => 'devis',
+                                  ),
+                                  'values_commande' =>
+                                  array (
+                                    'loyer' => '[{"loyer__dot__loyer":"233.00","loyer__dot__duree":"34","loyer__dot__assurance":"2.00","loyer__dot__frais_de_gestion":"1.00","loyer__dot__frequence_loyer":"trimestre","loyer__dot__loyer_total":8024}]',
+                                    'produits_repris' => '',
+                                    'produits' => '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175"}]',
+                                    'produits_non_visible' => '',
+                                  ),
+                                );
+
+        $this->commande_3 = array (
+                                  'extAction' => 'commande',
+                                  'extMethod' => 'insert',
+                                  'preview' => 'true',
+                                  'commande' =>
+                                  array (
+                                    'commande' => 'TU',
+                                    'type' => 'prelevement',
+                                    'id_societe' => '5391',
+                                    'date' => '10-05-2011',
+                                    'id_affaire' => '6002',
+                                    'clause_logicielle' => 'non',
+                                    'prix' => '8 024.00',
+                                    'prix_achat' => '3.00',
+                                    'marge' => '99.96',
+                                    'marge_absolue' => '8 021.00',
+                                    'email' => 'pmoons@finorpa.fr',
+                                    'emailTexte' => '',
+                                    'emailCopie' => 'jerome.loison@cleodis.fr',
+                                    'id_devis' => '5929',
+                                    '__redirect' => 'devis',
+                                  ),
+                                  'values_commande' =>
+                                  array (
+                                    'loyer' => '[{"loyer__dot__loyer":"233.00","loyer__dot__duree":"34","loyer__dot__assurance":"2.00","loyer__dot__frais_de_gestion":"1.00","loyer__dot__frequence_loyer":"semestre","loyer__dot__loyer_total":8024}]',
+                                    'produits_repris' => '',
+                                    'produits' => '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175"}]',
+                                    'produits_non_visible' => '',
+                                  ),
+                                );
+
+        $this->commande_4 = array (
+                                  'extAction' => 'commande',
+                                  'extMethod' => 'insert',
+                                  'preview' => 'true',
+                                  'commande' =>
+                                  array (
+                                    'commande' => 'TU',
+                                    'type' => 'prelevement',
+                                    'id_societe' => '5391',
+                                    'date' => '10-05-2011',
+                                    'id_affaire' => '6002',
+                                    'clause_logicielle' => 'non',
+                                    'prix' => '8 024.00',
+                                    'prix_achat' => '3.00',
+                                    'marge' => '99.96',
+                                    'marge_absolue' => '8 021.00',
+                                    'email' => 'pmoons@finorpa.fr',
+                                    'emailTexte' => '',
+                                    'emailCopie' => 'jerome.loison@cleodis.fr',
+                                    'id_devis' => '5929',
+                                    '__redirect' => 'devis',
+                                  ),
+                                  'values_commande' =>
+                                  array (
+                                    'loyer' => '[{"loyer__dot__loyer":"233.00","loyer__dot__duree":"34","loyer__dot__assurance":"2.00","loyer__dot__frais_de_gestion":"1.00","loyer__dot__frequence_loyer":"an","loyer__dot__loyer_total":8024}]',
+                                    'produits_repris' => '',
+                                    'produits' => '[{"commande_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__quantite":"3","commande_ligne__dot__ref":"ZYX-FW","commande_ligne__dot__id_fournisseur":"DJP SERVICE","commande_ligne__dot__id_fournisseur_fk":"1583","commande_ligne__dot__prix_achat":"1.00","commande_ligne__dot__id_produit":"Zywall 5 - dispositif de sécurité","commande_ligne__dot__id_produit_fk":"1175"}]',
+                                    'produits_non_visible' => '',
+                                  ),
+                                );
+
+
+    }
+
+
 	public function setUp() {
 		$this->initUser();
 
@@ -171,6 +512,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 
+
     //@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     public function test_delete(){
         $this->insertFacture();
@@ -288,15 +630,15 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
         //Avec date
-		$date_debut = ATF::facturation()->select($this->id_facturation , "date_periode_debut");
-		$date_debut = explode("-", $date_debut);
-		$date_fin = ATF::facturation()->select($this->id_facturation , "date_periode_fin");
-		$date_fin = explode("-", $date_fin);
+        $date_debut = ATF::facturation()->select($this->id_facturation , "date_periode_debut");
+        $date_debut = explode("-", $date_debut);
+        $date_fin = ATF::facturation()->select($this->id_facturation , "date_periode_fin");
+        $date_fin = explode("-", $date_fin);
 
 
-		$facture["facture"]["date_periode_debut"]= $date_debut[2]."-".$date_debut[1]."-".$date_debut[0];
+        $facture["facture"]["date_periode_debut"]= $date_debut[2]."-".$date_debut[1]."-".$date_debut[0];
         $facture["facture"]["date_periode_fin"]=$date_fin[2]."-".$date_fin[1]."-".$date_fin[0];
-		try {
+        try {
              $id_facture = $this->obj->insert($facture);
         } catch (errorATF $e) {
             $error = $e->getCode();
@@ -316,7 +658,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "date_relance"=>date('Y-m-d',strtotime(date("Y-m-d")." + 1 month")),
                                     "date_periode_debut"=>date('Y-m-d',strtotime(date("Y-m-01")." + 1 month")),
                                     "date_periode_fin"=>date('Y-m-d',strtotime(date("Y-m-01")." + 2 month")),
-                                    "tva"=>"1.2",
+                                    "tva"=>"1.200",
                                     "id_user"=>$this->id_user,
                                     "id_commande"=>$this->id_commande,
                                     "id_affaire"=>$this->id_affaire,
@@ -329,7 +671,8 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "type_libre"=>NULL ,
                                     "redevance"=> "oui",
                                     'date_rejet' => NULL,
-                                    'date_regularisation' => NULL
+                                    'date_regularisation' => NULL,
+                                    'nature' => null
                                     )
                             ,$this->obj->select($id_facture)
                             ,"La facture s'est mal inséré");
@@ -400,19 +743,19 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                             ,"la facturation est bien facturée");
 
 
-		//Facture avec date
-		$date_debut = ATF::facturation()->select($this->id_facturation2 , "date_periode_debut");
-		$date_debut = explode("-", $date_debut);
-		$date_fin = ATF::facturation()->select($this->id_facturation2 , "date_periode_fin");
-		$date_fin = explode("-", $date_fin);
+        //Facture avec date
+        $date_debut = ATF::facturation()->select($this->id_facturation2 , "date_periode_debut");
+        $date_debut = explode("-", $date_debut);
+        $date_fin = ATF::facturation()->select($this->id_facturation2 , "date_periode_fin");
+        $date_fin = explode("-", $date_fin);
 
 
-		$facture["facture"]["date_periode_debut"]= $date_debut[2]."-".$date_debut[1]."-".$date_debut[0];
+        $facture["facture"]["date_periode_debut"]= $date_debut[2]."-".$date_debut[1]."-".$date_debut[0];
         $facture["facture"]["date_periode_fin"]=$date_fin[2]."-".$date_fin[1]."-".$date_fin[0];
 
         $id_facture = $this->obj->insert($facture);
 
-		$this->assertEquals($id_facture, ATF::facturation()->select($this->id_facturation2 , "id_facture"),'ERREUR la facture dans l echeancier incorrecte');
+        $this->assertEquals($id_facture, ATF::facturation()->select($this->id_facturation2 , "id_facture"),'ERREUR la facture dans l echeancier incorrecte');
 
 
         //REFI
@@ -470,7 +813,8 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "type_libre"=>NULL  ,
                                     "redevance"=> "oui" ,
                                     'date_rejet' => NULL,
-                                    'date_regularisation' => NULL
+                                    'date_regularisation' => NULL,
+                                    'nature' => null
                                     )
                             ,$this->obj->select($id_facture)
                             ,"La facture REFI s'est mal inséré");
@@ -490,8 +834,17 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals(351,$error,'Il n y a pas de type libre pour cette facture libre');
 
         $facture["facture"]["type_libre"]="retard";
-        $id_facture = $this->obj->insert($facture,$this->s,NULL,$refresh);
 
+        try {
+             $id_facture = $this->obj->insert($facture,$this->s,NULL,$refresh);
+        } catch (errorATF $e) {
+            $error = $e->getCode();
+        }
+        $this->assertEquals(351,$error,'Il faut une nature pour la facture libre');
+
+
+        $facture["facture"]["nature"]="engagement";
+        $id_facture = $this->obj->insert($facture,$this->s,NULL,$refresh);
         $this->assertEquals("vente"
                             ,ATF::commande()->select($this->id_commande,"etat")
                             ,"la commande est passée en vente");
@@ -523,7 +876,8 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "type_libre"=>"retard"   ,
                                     "redevance"=> "oui"  ,
                                     'date_rejet' => NULL,
-                                    'date_regularisation' => NULL
+                                    'date_regularisation' => NULL,
+                                    'nature' => 'engagement'
                                     )
                             ,$this->obj->select($id_facture)
                             ,"La facture LIBRE s'est mal inséré");
@@ -683,7 +1037,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     }
 
 
-	function test_updateEnumRejet2(){
+    function test_updateEnumRejet2(){
         $this->insertFacture();
 
         $mod["id_facture"]=$this->id_facture2;
@@ -693,37 +1047,37 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateEnumRejet($mod);
         $this->assertEquals("prolongation_contentieux" , ATF::commande()->select($this->id_commande, "etat"), "UpdateEnum 2 - 1 L'etat n'a pas changé");
 
-		ATF::$msg->getNotices();
-	}
+        ATF::$msg->getNotices();
+    }
 
-	function test_updateEnumRejet21(){
-		$this->insertFacture();
-		$mod["id_facture"]=$this->id_facture2;
+    function test_updateEnumRejet21(){
+        $this->insertFacture();
+        $mod["id_facture"]=$this->id_facture2;
         $mod["key"]="rejet";
         $mod["value"]="non_rejet";
 
         ATF::commande()->u(array("id_commande"=>$this->id_commande , "etat"=>"mis_loyer_contentieux"));
-		$this->obj->updateEnumRejet($mod);
+        $this->obj->updateEnumRejet($mod);
         $this->assertEquals("mis_loyer" , ATF::commande()->select($this->id_commande, "etat"), "UpdateEnum 2 - 1 L'etat n'a pas changé");
-	}
-	function test_updateEnumRejet22(){
-		$this->insertFacture();
-		$mod["id_facture"]=$this->id_facture2;
+    }
+    function test_updateEnumRejet22(){
+        $this->insertFacture();
+        $mod["id_facture"]=$this->id_facture2;
         $mod["key"]="rejet";
         $mod["value"]="non_rejet";
 
-		ATF::commande()->u(array("id_commande"=>$this->id_commande , "etat"=>"restitution_contentieux"));
-		$this->obj->updateEnumRejet($mod);
+        ATF::commande()->u(array("id_commande"=>$this->id_commande , "etat"=>"restitution_contentieux"));
+        $this->obj->updateEnumRejet($mod);
         $this->assertEquals("restitution" , ATF::commande()->select($this->id_commande, "etat"), "UpdateEnum 2 - 2 L'etat n'a pas changé");
-	}
-	function test_updateEnumRejet23(){
-		$this->insertFacture();
-		$mod["id_facture"]=$this->id_facture2;
+    }
+    function test_updateEnumRejet23(){
+        $this->insertFacture();
+        $mod["id_facture"]=$this->id_facture2;
         $mod["key"]="rejet";
         $mod["value"]="non_rejet";
 
-		ATF::commande()->u(array("id_commande"=>$this->id_commande , "etat"=>"prolongation_contentieux"));
-		$this->obj->updateEnumRejet($mod);
+        ATF::commande()->u(array("id_commande"=>$this->id_commande , "etat"=>"prolongation_contentieux"));
+        $this->obj->updateEnumRejet($mod);
         $this->assertEquals("prolongation" , ATF::commande()->select($this->id_commande, "etat"), "UpdateEnum 2 - 3 L'etat n'a pas changé");
     }
 
@@ -803,7 +1157,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplies");
         $this->assertEquals("FREFTu-/",$sheets['auto']->H4,"La cellule H4 est mal remplie");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie");
@@ -856,7 +1210,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplies auto");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie auto");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie auto");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie auto");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie auto");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie auto");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie auto");
@@ -909,7 +1263,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplies CLEODIS");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie CLEODIS");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie CLEODIS");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie CLEODIS");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie CLEODIS");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie CLEODIS");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie CLEODIS");
@@ -957,7 +1311,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplies BMF");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie BMF");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie BMF");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie BMF");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie BMF");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie BMF");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie BMF");
@@ -1006,7 +1360,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplies CLEOFI");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie CLEOFI");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie CLEOFI");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie CLEOFI");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie CLEOFI");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie CLEOFI");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie CLEOFI");
@@ -1059,7 +1413,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplie ventes");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie vente");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie vente");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie vente");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie vente");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie vente");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie vente");
@@ -1112,7 +1466,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplie pros");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie pro");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie pro");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie pro");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie pro");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie pro");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie pro");
@@ -1167,7 +1521,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplie mads");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie mad");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie mad");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie mad");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie mad");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie mad");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie mad");
@@ -1218,7 +1572,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplie avoirs");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie avoir");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie avoir");
-        $this->assertEquals("20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie avoir");
+        $this->assertEquals(" 20REFTu00 ",$sheets['auto']->J4,"La cellule J4 est mal remplie avoir");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie avoir");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie avoir");
@@ -1270,7 +1624,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("100",$sheets['auto']->G4,"La cellule G4 est mal remplie avenants");
         $this->assertEquals("-",$sheets['auto']->H4,"La cellule H4 est mal remplie avenant");
         $this->assertEquals("F70010001",$sheets['auto']->I4,"La cellule I4 est mal remplie avenant");
-        $this->assertEquals("20REFTuAV ",$sheets['auto']->J4,"La cellule J4 est mal remplie avenant");
+        $this->assertEquals(" 20REFTuAV ",$sheets['auto']->J4,"La cellule J4 est mal remplie avenant");
 
         $this->assertEquals("G",$sheets['auto']->A5,"La cellule A5 est mal remplie avenant");
         $this->assertEquals("01011970",$sheets['auto']->B5,"La cellule B5 est mal remplie avenant");
@@ -1304,8 +1658,8 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
     }
 
-	public function testAjoutDonneesRejet(){
-		//pour refi
+    public function testAjoutDonneesRejet(){
+        //pour refi
         $obj_refi = new objet_excel();
         $sheets=array("auto"=>$obj_refi);
 
@@ -1331,11 +1685,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->ajoutDonnees($sheets,$infos);
 
         $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie auto");
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie auto");
-		$this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie auto");
-		$this->assertEquals("771000",$sheets['auto']->D3,"La cellule D6 est mal remplie auto");
-		$this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie auto");
-		$this->assertEquals("445710",$sheets['auto']->D4,"La cellule D4 est mal remplie auto");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie auto");
+        $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie auto");
+        $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D6 est mal remplie auto");
+        $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie auto");
+        $this->assertEquals("445710",$sheets['auto']->D4,"La cellule D4 est mal remplie auto");
 
 
         //pour CLEODIS
@@ -1349,11 +1703,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->ajoutDonnees($sheets,$infos,true);
 
         $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie cleodis");
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie cleodis");
-		$this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie cleodis");
-		$this->assertEquals("771000",$sheets['auto']->D3,"La cellule D6 est mal remplie cleodis");
-		$this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie cleodis");
-		$this->assertEquals("445712",$sheets['auto']->D4,"La cellule D4 est mal remplie cleodis");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie cleodis");
+        $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie cleodis");
+        $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D6 est mal remplie cleodis");
+        $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie cleodis");
+        $this->assertEquals("445712",$sheets['auto']->D4,"La cellule D4 est mal remplie cleodis");
 
 
         //pour BMF
@@ -1365,7 +1719,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie BMF");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie BMF");
 
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie BMF");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie BMF");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie BMF");
         $this->assertEquals("445712",$sheets['auto']->D4,"La cellule D4 est mal remplie BMF");
 
@@ -1375,11 +1729,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
 
-       	$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie CLEOFI");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie CLEOFI");
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie CLEOFI");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie CLEOFI");
 
-		$this->assertEquals("706230",$sheets['auto']->D2,"La cellule D2 est mal remplie CLEOFI");
+        $this->assertEquals("706230",$sheets['auto']->D2,"La cellule D2 est mal remplie CLEOFI");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie CLEOFI");
         $this->assertEquals("445712",$sheets['auto']->D4,"La cellule D4 est mal remplie CLEOFI");
 
@@ -1392,11 +1746,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
 
-		$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie vente");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie vente");
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie vente");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie vente");
 
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie vente");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie vente");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie vente");
         $this->assertEquals("445710",$sheets['auto']->D4,"La cellule D4 est mal remplie vente");
 
@@ -1409,11 +1763,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos=array(0=>array('facture.id_affaire_fk'=>$id_affaire,'facture.type_facture'=>'facture','facture.date_periode_debut'=>date('Y-m-d'),'facture.id_commande_fk'=>$id_commande,'facture.prix'=>'100'));
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
-       	$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie pro");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie pro");
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie pro");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie pro");
 
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie pro");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie pro");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie pro");
         $this->assertEquals("445713",$sheets['auto']->D4,"La cellule D4 est mal remplie pro");
 
@@ -1427,11 +1781,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
 
-		$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie mad");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie mad");
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie mad");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie mad");
 
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie mad");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie mad");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie mad");
         $this->assertEquals("445715",$sheets['auto']->D4,"La cellule D4 est mal remplie mad");
 
@@ -1442,11 +1796,11 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos=array(0=>array('facture.id_affaire_fk'=>$id_affaire,'facture.prix'=>'-100'));
          $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
-		$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie avoir");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie avoir");
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie avoir");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie avoir");
 
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie avoir");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie avoir");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie avoir");
         $this->assertEquals("445710",$sheets['auto']->D4,"La cellule D4 est mal remplie avoir");
 
@@ -1457,10 +1811,10 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos=array(0=>array('facture.id_affaire_fk'=>$id_affaire,'facture.prix'=>'-100'));
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
- 		$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie avenant");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie avenant");
         $this->assertEquals("A1",$sheets['auto']->A3,"La cellule A3 est mal remplie avenant");
         $this->assertEquals("G",$sheets['auto']->A4,"La cellule A4 est mal remplie avenant");
-		$this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie avenant");
+        $this->assertEquals("771000",$sheets['auto']->D2,"La cellule D2 est mal remplie avenant");
         $this->assertEquals("771000",$sheets['auto']->D3,"La cellule D3 est mal remplie avenant");
         $this->assertEquals("445710",$sheets['auto']->D4,"La cellule D4 est mal remplie avenant");
 
@@ -1476,73 +1830,73 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 $infos[$i]=NULL;
             }
         }
-		$infos["rejet"] = "ok";
+        $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
-		$this->assertEquals("F70010003",$sheets['auto']->I6,"La cellule I6 est mal remplie");
-		$this->assertEquals("F70010012",$sheets['auto']->I8,"La cellule I8 est mal remplie");
+        $this->assertEquals("F70010003",$sheets['auto']->I6,"La cellule I6 est mal remplie");
+        $this->assertEquals("F70010012",$sheets['auto']->I8,"La cellule I8 est mal remplie");
 
 
-		//pour prolongation refi par CLEOFI
+        //pour prolongation refi par CLEOFI
         ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"affaire"));
-		ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"refinanceur"=>"CLEOFI"));
+        ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"refinanceur"=>"CLEOFI"));
         $id_commande=ATF::commande()->i(array("ref"=>"TU22","date_debut"=>date('Y-m-d',strtotime("-2 month")),"date_evolution"=>date('Y-m-d',strtotime("-1 month")),"id_societe"=>$id_societe,"id_user"=>ATF::$usr->getId(),"tva"=>"19.6"));
         $obj_pro = new objet_excel();
         $sheets=array("auto"=>$obj_pro);
         $infos=array(0=>array('facture.id_affaire_fk'=>$id_affaire,'facture.type_facture'=>'facture','facture.date_periode_debut'=>date('Y-m-d'),'facture.id_commande_fk'=>$id_commande,'facture.prix'=>'100'));
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
-       	$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie prolongation refi par CLEOFI");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie prolongation refi par CLEOFI");
         $this->assertEquals("G",$sheets['auto']->A3,"La cellule A3 est mal remplie prolongation refi par CLEOFI");
 
 
-		$this->assertEquals("706230",$sheets['auto']->D2,"La cellule D2 est mal remplie prolongation refi par CLEOFI");
+        $this->assertEquals("706230",$sheets['auto']->D2,"La cellule D2 est mal remplie prolongation refi par CLEOFI");
         $this->assertEquals("445713",$sheets['auto']->D3,"La cellule D3 est mal remplie prolongation refi par CLEOFI");
 
-		ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"avenant"));
-		ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"refinanceur"=>"CLEOFI"));
+        ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"avenant"));
+        ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"refinanceur"=>"CLEOFI"));
         $id_commande=ATF::commande()->i(array("ref"=>"TU23","date_debut"=>date('Y-m-d',strtotime("-3 month")),"date_evolution"=>date('Y-m-d',strtotime("-2 month")),"id_societe"=>$id_societe,"id_user"=>ATF::$usr->getId(),"tva"=>"19.6"));
         $obj_pro2 = new objet_excel();
         $sheets=array("auto"=>$obj_pro2);
         $infos=array(0=>array('facture.id_affaire_fk'=>$id_affaire,'facture.type_facture'=>'facture','facture.date_periode_debut'=>date('Y-m-d'),'facture.id_commande_fk'=>$id_commande,'facture.prix'=>'100'));
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
-       	$this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie prolongation refi par CLEOFI 2");
+        $this->assertEquals("G",$sheets['auto']->A2,"La cellule A2 est mal remplie prolongation refi par CLEOFI 2");
         $this->assertEquals("G",$sheets['auto']->A3,"La cellule A3 est mal remplie prolongation refi par CLEOFI 2");
 
-		$this->assertEquals("706230",$sheets['auto']->D2,"La cellule D2 est mal remplie prolongation refi par CLEOFI 2");
+        $this->assertEquals("706230",$sheets['auto']->D2,"La cellule D2 est mal remplie prolongation refi par CLEOFI 2");
         $this->assertNull($sheets['auto']->J3,"La cellule D3 est mal remplie prolongation refi par CLEOFI 2");
 
 
-		$obj_pro = new objet_excel();
+        $obj_pro = new objet_excel();
         $sheets=array("auto"=>$obj_pro);
         $infos=array(0=>array('facture.id_affaire_fk'=>"0705048",
-        					  'facture.type_facture'=>'facture',
-        					  'facture.date_periode_debut'=>"2010-01-01",
-        					  'facture.prix'=>'100',
-							  "facture.tva "=> "1.196",
-							  "facture.id_societe_fk" => "372",
-					          "facture.id_affaire_fk" => "599",
-					          "commande.etat_fk" => "1450",
-					          "facture.id_facture_fk" => "14362",
-					          "facture.id_user_fk" => 21));
+                              'facture.type_facture'=>'facture',
+                              'facture.date_periode_debut'=>"2010-01-01",
+                              'facture.prix'=>'100',
+                              "facture.tva "=> "1.196",
+                              "facture.id_societe_fk" => "372",
+                              "facture.id_affaire_fk" => "599",
+                              "commande.etat_fk" => "1450",
+                              "facture.id_facture_fk" => "14362",
+                              "facture.id_user_fk" => 21));
         $infos["rejet"] = "ok";
         $this->obj->ajoutDonnees($sheets,$infos);
 
-		$obj_pro = new objet_excel();
+        $obj_pro = new objet_excel();
         $sheets=array("auto"=>$obj_pro);
         $infos=array(0=>array('facture.id_affaire_fk'=>"0705048",
-        					  'facture.type_facture'=>'facture',
-        					  'facture.date_periode_debut'=>"2010-01-01",
-        					  'facture.prix'=>'100',
-							  "facture.tva "=> "1.196",
-							  "facture.id_societe_fk" => "372",
-					          "facture.id_affaire_fk" => "599",
-					          "commande.etat_fk" => "1450",
-					          "facture.id_facture_fk" => "14362",
-					          "facture.id_user_fk" => 21));
+                              'facture.type_facture'=>'facture',
+                              'facture.date_periode_debut'=>"2010-01-01",
+                              'facture.prix'=>'100',
+                              "facture.tva "=> "1.196",
+                              "facture.id_societe_fk" => "372",
+                              "facture.id_affaire_fk" => "599",
+                              "commande.etat_fk" => "1450",
+                              "facture.id_facture_fk" => "14362",
+                              "facture.id_user_fk" => 21));
         unset($infos["rejet"]);
         $this->obj->ajoutDonnees($sheets,$infos);
-	}
+    }
 
     // @author Nicolas BERTEMONT <nbertemont@absystech.fr>
     public function test_export_xls_special(){
@@ -1594,7 +1948,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         if($c_fact->message){
             $this->assertTrue(false,$c_fact->message);
         }
-		$c_fact->export_special2(array('onglet'=>"gsa_lol_lol"));
+        $c_fact->export_special2(array('onglet'=>"gsa_lol_lol"));
     }
 
     //@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -1702,12 +2056,12 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
     }
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+    //@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     //@author Quentin JANON <qjanon@absystech.fr>
-		public function test_select_all(){
-		$this->insertFacture(true);
-		ATF::societe()->u(array("id_societe"=>$this->id_societe,"code_client"=>"CODETU"));
-		$this->obj->q->reset()->setCount()->addCondition("id_facture",$this->id_facture);
+        public function test_select_all(){
+        $this->insertFacture(true);
+        ATF::societe()->u(array("id_societe"=>$this->id_societe,"code_client"=>"CODETU"));
+        $this->obj->q->reset()->setCount()->addCondition("id_facture",$this->id_facture);
 
         $attendu = array(
             array(
@@ -1725,8 +2079,8 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             )
         );
         $r = $this->obj->select_all();
-		$this->assertEquals($attendu,$r['data'],'Problème dans les colonnes/valeurs retournées');
-	}
+        $this->assertEquals($attendu,$r['data'],'Problème dans les colonnes/valeurs retournées');
+    }
 
 
     //@author Morgan Fleurquin <mfleurquin@absystech.fr>
@@ -1742,7 +2096,7 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $this->assertTrue(false,$c_fact->message);
         }
 
-		ob_start();
+        ob_start();
         $c_fact->export_autoportes(array('onglet'=>"gsa_lol_lol", "refi"=>true));
         ob_end_clean();
         if($c_fact->message){
@@ -1750,20 +2104,20 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         }
      }
 
-	//@author Morgan Fleurquin <mfleurquin@absystech.fr>
+    //@author Morgan Fleurquin <mfleurquin@absystech.fr>
     public function test_export_autoportes2(){
         $this->initUserOnly(false);
         $q=ATF::_s("pager")->create("gsa_facture_facture");
         $q->addField("ref")->setStrict()->addCondition("id_facture",0);
         $c_fact=new fact();
-		ob_start();
-		try{
-			$c_fact->export_autoportes(array('onglet'=>"gsa_facture_facture"));
-		}catch (errorATF $e) {
-			$erreur = $e->getMessage();
-		}
-		ob_end_clean();
-		$this->assertEquals($erreur , "Il faut générer les fichier Excell à partir d'un filtre personnalisé" , "L'erreur doit se déclencher si on n'est pas sur un filtre perso");
+        ob_start();
+        try{
+            $c_fact->export_autoportes(array('onglet'=>"gsa_facture_facture"));
+        }catch (errorATF $e) {
+            $erreur = $e->getMessage();
+        }
+        ob_end_clean();
+        $this->assertEquals($erreur , "Il faut générer les fichier Excell à partir d'un filtre personnalisé" , "L'erreur doit se déclencher si on n'est pas sur un filtre perso");
     }
 
     //@author Morgan Fleurquin <mfleurquin@absystech.fr>
@@ -1771,26 +2125,26 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     public function test_export_xls_autoportes(){
         ob_start();
 
-		// Simulation d'un loyer annuel
-		$query = "UPDATE loyer SET frequence_loyer='an' WHERE id_loyer=15145";
-		ATF::db()->query($query);
+        // Simulation d'un loyer annuel
+        $query = "UPDATE loyer SET frequence_loyer='an' WHERE id_loyer=15145";
+        ATF::db()->query($query);
 
-		//AFFAIRE -> 1110019 (pas de refi),
-		//			 1107026(CLEOFI + maj + mois),
-		//			 1206055(CLEODIS + T + maj)
-		//					(A)
-		$i=0;
-		foreach (array(68176,65416,60117,53799,64608,10032) as $i => $id) {
-			$infos[$i] = ATF::facture()->select($id);
+        //AFFAIRE -> 1110019 (pas de refi),
+        //           1107026(CLEOFI + maj + mois),
+        //           1206055(CLEODIS + T + maj)
+        //                  (A)
+        $i=0;
+        foreach (array(68176,65416,60117,53799,64608,10032) as $i => $id) {
+            $infos[$i] = ATF::facture()->select($id);
 
-			$infos[$i]["facture.id_affaire_fk"] = $infos[$i]["id_affaire"];
-			$infos[$i]["facture.id_societe_fk"] = $infos[$i]["id_societe"];
-			$infos[$i]["facture.id_commande_fk"] = $infos[$i]["id_commande"];
-			$infos[$i]["commande.etat_fk"] = $infos[$i]["id_commande"];
-			$infos[$i]["facture.id_demande_refi_fk"] = $infos[$i]["id_demande_refi"];
-			$infos[$i]["facture.id_refinanceur_fk"] =$infos[$i]["id_refinanceur"];
-			ATF::commande()->u(array("id_commande"=> $infos[$i]["id_commande"] , "date_evolution" => date('Y-m-01',strtotime("+1 year"))));
-		}
+            $infos[$i]["facture.id_affaire_fk"] = $infos[$i]["id_affaire"];
+            $infos[$i]["facture.id_societe_fk"] = $infos[$i]["id_societe"];
+            $infos[$i]["facture.id_commande_fk"] = $infos[$i]["id_commande"];
+            $infos[$i]["commande.etat_fk"] = $infos[$i]["id_commande"];
+            $infos[$i]["facture.id_demande_refi_fk"] = $infos[$i]["id_demande_refi"];
+            $infos[$i]["facture.id_refinanceur_fk"] =$infos[$i]["id_refinanceur"];
+            ATF::commande()->u(array("id_commande"=> $infos[$i]["id_commande"] , "date_evolution" => date('Y-m-01',strtotime("+1 year"))));
+        }
 
         $this->obj->export_xls_autoportes($infos,true);
         ob_end_clean();
@@ -1800,32 +2154,32 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         }
     }
 
-	//@author Morgan Fleurquin <mfleurquin@absystech.fr>
+    //@author Morgan Fleurquin <mfleurquin@absystech.fr>
     public function test_export_xls_autoportes2(){
          ob_start();
 
-		// Simulation d'un loyer annuel
-		$query = "UPDATE loyer SET frequence_loyer='an' WHERE id_loyer=15145";
-		ATF::db()->query($query);
+        // Simulation d'un loyer annuel
+        $query = "UPDATE loyer SET frequence_loyer='an' WHERE id_loyer=15145";
+        ATF::db()->query($query);
 
-		//AFFAIRE -> 1110019 (pas de refi),
-		//			 1107026(CLEOFI + maj + mois),
-		//			 1206055(CLEODIS + T + maj)
-		//					(A)
-		$i=0;
-		foreach (array(68176,65416,60117,53799,64608,10032,2) as $i => $id) {
-			$infos[$i] = ATF::facture()->select($id);
-			$infos[$i]["facture.id_affaire_fk"] = $infos[$i]["id_affaire"];
-			$infos[$i]["facture.id_societe_fk"] = $infos[$i]["id_societe"];
-			$infos[$i]["facture.id_commande_fk"] = $infos[$i]["id_commande"];
-			$infos[$i]["commande.etat_fk"] = $infos[$i]["id_commande"];
-			$infos[$i]["facture.id_demande_refi_fk"] = $infos[$i]["id_demande_refi"];
-			$infos[$i]["facture.id_refinanceur_fk"] =$infos[$i]["id_refinanceur"];
-			if($id != 2){
-				ATF::commande()->u(array("id_commande"=> $infos[$i]["id_commande"] , "date_evolution" => date('Y-m-01',strtotime("+1 year"))));
-			}
+        //AFFAIRE -> 1110019 (pas de refi),
+        //           1107026(CLEOFI + maj + mois),
+        //           1206055(CLEODIS + T + maj)
+        //                  (A)
+        $i=0;
+        foreach (array(68176,65416,60117,53799,64608,10032,2) as $i => $id) {
+            $infos[$i] = ATF::facture()->select($id);
+            $infos[$i]["facture.id_affaire_fk"] = $infos[$i]["id_affaire"];
+            $infos[$i]["facture.id_societe_fk"] = $infos[$i]["id_societe"];
+            $infos[$i]["facture.id_commande_fk"] = $infos[$i]["id_commande"];
+            $infos[$i]["commande.etat_fk"] = $infos[$i]["id_commande"];
+            $infos[$i]["facture.id_demande_refi_fk"] = $infos[$i]["id_demande_refi"];
+            $infos[$i]["facture.id_refinanceur_fk"] =$infos[$i]["id_refinanceur"];
+            if($id != 2){
+                ATF::commande()->u(array("id_commande"=> $infos[$i]["id_commande"] , "date_evolution" => date('Y-m-01',strtotime("+1 year"))));
+            }
 
-		}
+        }
         $this->obj->export_xls_autoportes($infos);
         ob_end_clean();
 
@@ -1865,62 +2219,62 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
    public function test_contientFactureRejetee(){
-   		 $this->insertFacture();
+         $this->insertFacture();
 
-		$mod["id_facture"]=$this->id_facture;
+        $mod["id_facture"]=$this->id_facture;
         $mod["key"]="rejet";
         $mod["value"]="contestation_debiteur";
         $this->obj->updateEnumRejet($mod);
-		$mod["id_facture"]=$this->id_facture2;
+        $mod["id_facture"]=$this->id_facture2;
         $mod["key"]="rejet";
         $mod["value"]="contestation_debiteur";
         $this->obj->updateEnumRejet($mod);
 
-		$this->assertEquals(1 , $this->obj->contientFactureRejetee($this->id_commande , ATF::facture()->cryptId($this->id_facture)), "Damned");
+        $this->assertEquals(1 , $this->obj->contientFactureRejetee($this->id_commande , ATF::facture()->cryptId($this->id_facture)), "Damned");
 
    }
 
 
-	public function test_libreToNormale(){
-		$id_aff=ATF::affaire()->i(array("ref"=>"ref lol test","id_societe"=>$this->id_soc,"affaire"=>"aff lol test"));
-		$id_facturation = ATF::facturation()->i(array("id_affaire" => $id_aff,"montant"=> 10, "frais_de_gestion"=> 10,"id_societe"=>$this->id_soc, "id_facture" => NULL, "date_periode_debut" => "2012-01-01", "date_periode_fin"=> "2012-02-01"));
-		$factureLibre = ATF::facture()->i(array("ref"=>"ref lol test","id_societe"=>$this->id_soc,"prix"=>45,"date"=>"2011-12-01","tva"=>"19.6","id_affaire"=>$id_aff, "type_facture" => "libre" , "type_libre" => "contentieux", "date_periode_debut" => "2012-01-01" , "date_periode_fin" => "2012-02-01"));
+    public function test_libreToNormale(){
+        $id_aff=ATF::affaire()->i(array("ref"=>"ref lol test","id_societe"=>$this->id_soc,"affaire"=>"aff lol test"));
+        $id_facturation = ATF::facturation()->i(array("id_affaire" => $id_aff,"montant"=> 10, "frais_de_gestion"=> 10,"id_societe"=>$this->id_soc, "id_facture" => NULL, "date_periode_debut" => "2012-01-01", "date_periode_fin"=> "2012-02-01"));
+        $factureLibre = ATF::facture()->i(array("ref"=>"ref lol test","id_societe"=>$this->id_soc,"prix"=>45,"date"=>"2011-12-01","tva"=>"19.6","id_affaire"=>$id_aff, "type_facture" => "libre" , "type_libre" => "contentieux", "date_periode_debut" => "2012-01-01" , "date_periode_fin" => "2012-02-01"));
 
-		 try {
+         try {
              $this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
         } catch (errorATF $e) {
             $error = $e->getMessage();
         }
         $this->assertEquals("Il n'est pas possible de passer une facture libre contentieux en facture normale",$error,"LibreToNormale 1");
 
-		ATF::facture()->u(array("id_facture" => $factureLibre , "type_libre" => "normale", "date_periode_debut" => "2013-01-01" , "date_periode_fin" => "2013-02-01"));
+        ATF::facture()->u(array("id_facture" => $factureLibre , "type_libre" => "normale", "date_periode_debut" => "2013-01-01" , "date_periode_fin" => "2013-02-01"));
         $this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
-		ATF::facturation()->q->reset()->where("id_facture" , $factureLibre);
+        ATF::facturation()->q->reset()->where("id_facture" , $factureLibre);
         $facturation = ATF::facturation()->select_row();
 
-		$this->assertEquals("2013-01-01" , $facturation["date_periode_debut"] ,"LibreToNormale 2.1");
+        $this->assertEquals("2013-01-01" , $facturation["date_periode_debut"] ,"LibreToNormale 2.1");
         $this->assertEquals("2013-02-01" , $facturation["date_periode_fin"] ,"LibreToNormale 2.2");
          $this->assertEquals("45.00" , $facturation["montant"] ,"LibreToNormale 2.3");
 
-		ATF::facturation()->u(array("id_facturation" => $id_facturation , "id_facture" => $factureLibre));
-		ATF::facture()->u(array("id_facture" => $factureLibre , "date_periode_debut" => "2012-01-01" , "date_periode_fin" => "2012-02-01"));
-		try {
+        ATF::facturation()->u(array("id_facturation" => $id_facturation , "id_facture" => $factureLibre));
+        ATF::facture()->u(array("id_facture" => $factureLibre , "date_periode_debut" => "2012-01-01" , "date_periode_fin" => "2012-02-01"));
+        try {
              $this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
         } catch (errorATF $e) {
             $error = $e->getMessage();
         }
-		$this->assertEquals("Il y a déja une facture pour la période du 2012-01-01 au 2012-02-01",$error,"LibreToNormale 3");
+        $this->assertEquals("Il y a déja une facture pour la période du 2012-01-01 au 2012-02-01",$error,"LibreToNormale 3");
 
-		ATF::facturation()->u(array("id_facturation" => $id_facturation , "id_facture" => NULL));
-		$this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
+        ATF::facturation()->u(array("id_facturation" => $id_facturation , "id_facture" => NULL));
+        $this->obj->libreToNormale(array("id_facture" => $this->obj->cryptId($factureLibre)));
 
-		$this->assertEquals("facture",ATF::facture()->select($factureLibre , "type_facture"),"LibreToNormale 4");
-		$this->assertEquals($factureLibre,ATF::facturation()->select($id_facturation , "id_facture"),"LibreToNormale 5");
+        $this->assertEquals("facture",ATF::facture()->select($factureLibre , "type_facture"),"LibreToNormale 4");
+        $this->assertEquals($factureLibre,ATF::facturation()->select($id_facturation , "id_facture"),"LibreToNormale 5");
 
-		ATF::suivi()->q->reset()->where("id_affaire" , $id_aff);
-		$suivis = ATF::suivi()->select_row();
-		$this->assertNotNull($suivis,'Pas de suivis ???');
-	}
+        ATF::suivi()->q->reset()->where("id_affaire" , $id_aff);
+        $suivis = ATF::suivi()->select_row();
+        $this->assertNotNull($suivis,'Pas de suivis ???');
+    }
 
 
     public function test_export_xls_cegid(){
@@ -1961,6 +2315,243 @@ class facture_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($fichier, "L'export ne s'est pas bien passé??");
     }
+
+
+
+
+
+
+    public function test_createFactureProrata(){
+        $this->initDevis_Commande();
+
+        //Facture ProRata en mois
+        $devis1 = ATF::devis()->insert($this->devis_1);
+        $devis1 = ATF::devis()->decryptId($devis1);
+        $affaire1 = ATF::devis()->select($devis1, "id_affaire");
+        $this->commande_1["commande"]["id_devis"] = $devis1;
+        $commande1 = ATF::commande()->insert($this->commande_1);
+        $commande1 = ATF::commande()->decryptId($commande1);
+
+        $data = array("date_installation_reel" => "2017-11-15",
+                      "id_affaire" => $affaire1,
+                      "date_debut_contrat" => "2017-12-05",
+                      "id_commande"=> $commande1
+
+                    );
+
+        $this->obj->createFactureProrata($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire1)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture1 = ATF::facture()->select_row();
+
+        $this->assertEquals(118.00,$facture1["facture.prix"], "Prix incorrect facture prorata mensuelle");
+        $this->assertEquals("2017-11-15",$facture1["facture.date_periode_debut"], "Debut periode facture prorata mensuelle");
+        $this->assertEquals("2017-11-30",$facture1["facture.date_periode_fin"], "Fin periode facture prorata mensuelle");
+        $this->assertEquals("prorata",$facture1["facture.nature"], "nature facture prorata mensuelle");
+
+
+        //Facture ProRata en trimestre
+        $devis2 = ATF::devis()->insert($this->devis_2);
+        $devis2 = ATF::devis()->decryptId($devis2);
+        $affaire2 = ATF::devis()->select($devis2, "id_affaire");
+        $this->commande_2["commande"]["id_devis"] = $devis2;
+        $commande2 = ATF::commande()->insert($this->commande_2);
+        $commande2 = ATF::commande()->decryptId($commande2);
+
+        $data = array("date_installation_reel" => "2017-06-15",
+                      "id_affaire" => $affaire2,
+                      "date_debut_contrat" => "2017-12-05",
+                      "id_commande"=> $commande2
+                    );
+
+        $this->obj->createFactureProrata($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire2)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture2 = ATF::facture()->select_row();
+
+
+        $this->assertEquals(277.96,$facture2["facture.prix"], "Prix incorrect facture prorata trimestrielle");
+        $this->assertEquals("2017-06-15",$facture2["facture.date_periode_debut"], "Debut periode facture prorata trimestrielle");
+        $this->assertEquals("2017-06-30",$facture2["facture.date_periode_fin"], "Fin periode facture prorata trimestrielle");
+        $this->assertEquals("prorata",$facture2["facture.nature"], "nature facture prorata trimestrielle");
+
+
+        //Facture ProRata en semestre
+        $devis3 = ATF::devis()->insert($this->devis_3);
+        $devis3 = ATF::devis()->decryptId($devis3);
+        $affaire3 = ATF::devis()->select($devis3, "id_affaire");
+        $this->commande_3["commande"]["id_devis"] = $devis3;
+        $commande3 = ATF::commande()->insert($this->commande_3);
+        $commande3 = ATF::commande()->decryptId($commande3);
+
+        $data = array("date_installation_reel" => "2016-06-01",
+                      "id_affaire" => $affaire3,
+                      "date_debut_contrat" => "2017-06-01",
+                      "id_commande"=> $commande3
+                    );
+
+        $this->obj->createFactureProrata($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire3)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture3 = ATF::facture()->select_row();
+
+        /*$this->assertEquals(477.96,$facture4["facture.prix"], "Prix incorrect facture prorata annuelle");
+        $this->assertEquals("2017-06-15",$facture4["facture.date_periode_debut"], "Debut periode facture prorata annuelle");
+        $this->assertEquals("2017-06-30",$facture4["facture.date_periode_fin"], "Fin periode facture prorata annuelle");
+        $this->assertEquals("prorata",$facture4["facture.nature"], "nature facture prorata annuelle");*/
+
+        //Facture ProRata en année
+        $devis4 = ATF::devis()->insert($this->devis_4);
+        $devis4 = ATF::devis()->decryptId($devis4);
+        $affaire4 = ATF::devis()->select($devis4, "id_affaire");
+        $this->commande_4["commande"]["id_devis"] = $devis4;
+        $commande4 = ATF::commande()->insert($this->commande_4);
+        $commande4 = ATF::commande()->decryptId($commande4);
+
+        $data = array("date_installation_reel" => "2016-06-01",
+                      "id_affaire" => $affaire4,
+                      "date_debut_contrat" => "2017-06-01",
+                      "id_commande"=> $commande4
+                    );
+
+        $this->obj->createFactureProrata($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire4)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture4 = ATF::facture()->select_row();
+
+        /*$this->assertEquals(477.96,$facture4["facture.prix"], "Prix incorrect facture prorata annuelle");
+        $this->assertEquals("2017-06-15",$facture4["facture.date_periode_debut"], "Debut periode facture prorata annuelle");
+        $this->assertEquals("2017-06-30",$facture4["facture.date_periode_fin"], "Fin periode facture prorata annuelle");
+        $this->assertEquals("prorata",$facture4["facture.nature"], "nature facture prorata annuelle");*/
+
+    }
+
+
+
+
+    public function test_createPremiereFacture(){
+        $this->initDevis_Commande();
+
+        //Facture ProRata en mois
+        $devis1 = ATF::devis()->insert($this->devis_1);
+        $devis1 = ATF::devis()->decryptId($devis1);
+        $affaire1 = ATF::devis()->select($devis1, "id_affaire");
+        $this->commande_1["commande"]["id_devis"] = $devis1;
+        $commande1 = ATF::commande()->insert($this->commande_1);
+        $commande1 = ATF::commande()->decryptId($commande1);
+
+        $data = array("id_affaire" => $affaire1,
+                      "date_debut_contrat" => "2017-12-05",
+                      "id_commande"=> $commande1
+                    );
+
+        $this->obj->createPremiereFacture($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire1)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture1 = ATF::facture()->select_row();
+
+        $this->assertEquals(118.00,$facture1["facture.prix"], "Prix incorrect Premiere facture mensuelle");
+        $this->assertEquals("2017-11-15",$facture1["facture.date_periode_debut"], "Debut periode Premiere facture mensuelle");
+        $this->assertEquals("2017-11-30",$facture1["facture.date_periode_fin"], "Fin periode Premiere facture mensuelle");
+        $this->assertEquals("prorata",$facture1["facture.nature"], "nature Premiere facture mensuelle");
+
+
+        //Premiere facture en trimestre
+        $devis2 = ATF::devis()->insert($this->devis_2);
+        $devis2 = ATF::devis()->decryptId($devis2);
+        $affaire2 = ATF::devis()->select($devis2, "id_affaire");
+        $this->commande_2["commande"]["id_devis"] = $devis2;
+        $commande2 = ATF::commande()->insert($this->commande_2);
+        $commande2 = ATF::commande()->decryptId($commande2);
+
+        $data = array("id_affaire" => $affaire2,
+                      "date_debut_contrat" => "2017-12-05",
+                      "id_commande"=> $commande2
+                    );
+
+        $this->obj->createPremiereFacture($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire2)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture2 = ATF::facture()->select_row();
+
+
+        $this->assertEquals(277.96,$facture2["facture.prix"], "Prix incorrect Premiere facture trimestrielle");
+        $this->assertEquals("2017-06-15",$facture2["facture.date_periode_debut"], "Debut periode Premiere facture trimestrielle");
+        $this->assertEquals("2017-06-30",$facture2["facture.date_periode_fin"], "Fin periode Premiere facture trimestrielle");
+        $this->assertEquals("prorata",$facture2["facture.nature"], "nature Premiere facture trimestrielle");
+
+
+        //Premiere facture en semestre
+        $devis3 = ATF::devis()->insert($this->devis_3);
+        $devis3 = ATF::devis()->decryptId($devis3);
+        $affaire3 = ATF::devis()->select($devis3, "id_affaire");
+        $this->commande_3["commande"]["id_devis"] = $devis3;
+        $commande3 = ATF::commande()->insert($this->commande_3);
+        $commande3 = ATF::commande()->decryptId($commande3);
+
+        $data = array("id_affaire" => $affaire3,
+                      "date_debut_contrat" => "2017-06-01",
+                      "id_commande"=> $commande3
+                    );
+
+        $this->obj->createPremiereFacture($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire3)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture3 = ATF::facture()->select_row();
+
+        /*$this->assertEquals(477.96,$facture4["facture.prix"], "Prix incorrect Premiere facture annuelle");
+        $this->assertEquals("2017-06-15",$facture4["facture.date_periode_debut"], "Debut periode Premiere facture annuelle");
+        $this->assertEquals("2017-06-30",$facture4["facture.date_periode_fin"], "Fin periode Premiere facture annuelle");
+        $this->assertEquals("prorata",$facture4["facture.nature"], "nature Premiere facture annuelle");*/
+
+        //Premiere facture en année
+        $devis4 = ATF::devis()->insert($this->devis_4);
+        $devis4 = ATF::devis()->decryptId($devis4);
+        $affaire4 = ATF::devis()->select($devis4, "id_affaire");
+        $this->commande_4["commande"]["id_devis"] = $devis4;
+        $commande4 = ATF::commande()->insert($this->commande_4);
+        $commande4 = ATF::commande()->decryptId($commande4);
+
+        $data = array("id_affaire" => $affaire4,
+                      "date_debut_contrat" => "2017-06-01",
+                      "id_commande"=> $commande4
+                    );
+
+        $this->obj->createPremiereFacture($data);
+
+        ATF::facture()->q->reset()->where("facture.id_affaire",$affaire4)->addOrder("id_facture", "desc")->addAllFields("facture")->setLimit(1);
+        $facture4 = ATF::facture()->select_row();
+
+        /*$this->assertEquals(477.96,$facture4["facture.prix"], "Prix incorrect Premiere facture annuelle");
+        $this->assertEquals("2017-06-15",$facture4["facture.date_periode_debut"], "Debut periode Premiere facture annuelle");
+        $this->assertEquals("2017-06-30",$facture4["facture.date_periode_fin"], "Fin periode Premiere facture annuelle");
+        $this->assertEquals("prorata",$facture4["facture.nature"], "nature Premiere facture annuelle");*/
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // @author Morgan FLEURQUIN <mfleurquin@absystech.fr>

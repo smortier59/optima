@@ -1230,8 +1230,14 @@ class societe_cleodis extends societe {
             if($value > 0){
               $produit = ATF::produit()->select($key);
 
+              if($post["QteProduit"][$produit["id_produit"]]){
+                $qte = $post["QteProduit"][$produit["id_produit"]];
+              }else{
+                $qte = $value*$post["selectQtePack"];
+              }
+
               $loyer[0] = array(
-                            "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * ($value * $post["selectQtePack"])),
+                            "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * $qte),
                             "loyer__dot__duree"=>$produit["duree"],
                             "loyer__dot__type"=>"engagement",
                             "loyer__dot__assurance"=>"",
@@ -1262,9 +1268,12 @@ class societe_cleodis extends societe {
               }
 
 
+
+
+
               $produits[] = array(
                                   "devis_ligne__dot__produit"=> $produit["produit"],
-                                  "devis_ligne__dot__quantite"=>$value*$post["selectQtePack"],
+                                  "devis_ligne__dot__quantite"=>$qte,
                                   "devis_ligne__dot__type"=>"sans_objet",
                                   "devis_ligne__dot__ref"=>$produit["ref"],
                                   "devis_ligne__dot__prix_achat"=>$ligne["prix_achat"],

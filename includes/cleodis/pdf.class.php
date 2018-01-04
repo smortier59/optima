@@ -23,6 +23,25 @@ class pdf_cleodis extends pdf {
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
 
+	public $showFiligramme = false;
+
+
+
+	public function filigramme(){
+		$this->setX(40);
+		$this->setY(20);
+
+		$this->Rotate(-55);
+		$this->setLineWidth(0.5);
+		$this->setfont('arial',"B",95);
+		$this->setTextColor(211,211,211);
+		$this->multicell(300,10,"Pour information ",0,"C");
+
+
+		$this->setTextColor("black");
+		$this->setfont('arial',"",8);
+		$this->Rotate(0);
+	}
 
 
 	/* Génère le pied de page des PDF Cléodis
@@ -4173,6 +4192,21 @@ class pdf_cleodis extends pdf {
 			$this->factureRefi($global);
 		} elseif ($this->facture['type_facture']=="facture" || $this->facture['type_facture']=="libre") {
 			$this->factureClassique($global);
+
+
+			if($this->affaire["commentaire_facture"]){
+
+				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
+				$commentaire_facture = strip_tags($commentaire_facture);
+
+				$head = array("Commentaire");
+				$w = array(180);
+				$data = $styles = array();
+				$data[0][0] = $commentaire_facture;
+				$styles[0][0] = $this->colsProduitAlignLeft;
+				$this->tableauBigHead($head,$data,$w,5,$styles);
+			}
+
 		}elseif($this->facture['type_facture']=="midas"){
 			$this->factureMidas($global);
 		}
@@ -7669,12 +7703,17 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public $texteHT = "HTVA";
 	public $texteTTC = "TVAC";
 	public $heightLimitTableContratPV = 70;
+	public $langue = "FR";
+
 
 	/* Header spécifique aux documents cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
 	*/
 	public function Header() {
+
+		if($this->showFiligramme) $this->filigramme();
+
 		if ($this->getHeader()) return false;
 		$this->setfont('arial','B',10);
 
@@ -7708,8 +7747,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if(!$this->facturePDF){
 			$this->sety(12);
 
-			if($this->affaire['langue'] == "NL"){
-				$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"DE VERHUURDER",0,'C');
+			if($this->langue == "NL"){
+				$this->multicell(65,5,$this->affaire['nature']=="vente"?"DE VERKOPER":"DE VERHUURDER",0,'C');
 			}else{
 				$this->multicell(65,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
 			}
@@ -7745,8 +7784,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$this->sety(12);
 
 			$this->setfont('arial','B',10);
-			if($this->affaire['langue'] == "NL"){
-				$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"DE HUURDER","L","C");
+			if($this->langue == "NL"){
+				$this->multicell(0,5,$this->affaire['nature']=="vente"?"KOPER":"DE HUURDER","L","C");
 			}else{
 				$this->multicell(0,5,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE","L","C");
 			}
@@ -7868,6 +7907,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 
 	}
+
+
 
 	/* Génère le titre du document à la sauce CleodisBE
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -8094,6 +8135,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
+
+
+		if($this->affaire["langue"] !== "FR"){
+			$this->showFiligramme = true;
+		}
+
 
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
@@ -8422,6 +8469,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4NL($id) {
+
+		$this->langue = "NL";
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
 
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
@@ -9120,9 +9172,24 @@ class pdf_cleodisbe extends pdf_cleodis {
 			}else{
 				$this->factureClassique($global);
 			}
+
+			if($this->affaire["commentaire_facture"]){
+
+				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
+				$commentaire_facture = strip_tags($commentaire_facture);
+
+				$head = array("Commentaire");
+				$w = array(180);
+				$data = $styles = array();
+				$data[0][0] = $commentaire_facture;
+				$styles[0][0] = $this->colsProduitAlignLeft;
+				$this->tableauBigHead($head,$data,$w,5,$styles);
+			}
 		}elseif($this->facture['type_facture']=="midas"){
 			$this->factureMidas($global);
 		}
+
+
 
 		$this->SetXY(10,-30);
 		$this->setfont('arial','',7);
@@ -9143,6 +9210,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if(!$global){
 			$this->open();
 		}
+
+		if($this->affaire["langue"] !== "FR"){
+			$this->showFiligramme = true;
+		}
+
 		$this->addpage();
 
 		$this->setY(80);
@@ -9359,6 +9431,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if(!$global){
 			$this->open();
 		}
+
+		$this->langue = "NL";
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
+
 		$this->addpage();
 
 		$this->setY(80);
@@ -10228,6 +10306,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratPV($id,$s,$previsu) {
 
+		if($this->affaire["langue"] !== "FR"){
+			$this->showFiligramme = true;
+		}
+
 		$this->commandeInit($id,$s,$previsu);
 
 		$this->Open();
@@ -10439,6 +10521,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 01/09/2017
 	*/
 	public function contratPVNL($id,$s,$previsu){
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
+
 		$this->commandeInit($id,$s,$previsu);
 
 		$this->Open();
