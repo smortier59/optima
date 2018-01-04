@@ -1140,6 +1140,9 @@ class affaire_partenaire extends affaire {
 				case 'nom_societe':
 					$get['tri'] = "nom_societe";
 				break;
+				case 'last_jalon':
+					$this->q->addOrder("last_jalon");
+				break;
 				default:
 					$get['tri'] = "affaire.".$get['tri'];
 				break;
