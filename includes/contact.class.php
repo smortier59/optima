@@ -681,6 +681,8 @@ class contact extends classes_optima {
 
 		//Test du login et initialisation des informations utilisateurs
 		if ($res = $this->select_all()) {
+			log::logger($res, "qjanon");
+			log::logger($infos, "qjanon");
 			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["p"])==hash('sha256',__GOD_PASSWORD__))
 				|| hash('sha256',$infos["p"])==$res["pwd"]
 				){
