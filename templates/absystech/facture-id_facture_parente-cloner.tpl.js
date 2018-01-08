@@ -12,6 +12,7 @@
   size: 'small',
 
   store: [
+    {ATF::facture()->q->reset()->where('facture.id_societe', '1930')->where('type','facture')->end()}
     {foreach from=ATF::facture()->autocomplete(false,false) key=k item=i}
       ['{$i[0]}', '{$i[1]|escape:javascript}']
       {if !$i@last},{/if}
