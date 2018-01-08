@@ -439,27 +439,20 @@ class facture_absystech extends facture {
 			if(!$infos["id_facture_parente"]){
 				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
-
-			$parent = $this->select($infos["id_facture_parente"]);
-			unset($parent['ref']);
-			//$infos = $parent;
 			$infos["type_facture"]="avoir";
-			$infos['prix'] = 0-$parent["prix"];
-
-			// ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
-			// if($id_commande_factures=ATF::commande_facture()->select_all()){
-			// 	$commande=ATF::commande()->select($id_commande_factures[0]["id_commande"]);
-
-			// 	if($commande["prix"]!=$infos["prix"]){
-			// 		$infos["frais_de_port"]=$infos["frais_de_port"];
-			// 		//Si c'est un solde ou un acompte
-			// 		$sum_anc_facture=ATF::facture()->facture_by_commande($commande["id_commande"],true);
-			// 	}
-			// }
-
-			// $infos["prix"] = $infos["prix"] - $sum_anc_facture["prix"];
-
-
+			$multipleFactureParente = false;
+			if (is_array($infos["id_facture_parente"])) {
+				// Avoir multiple
+				foreach ($infos["id_facture_parente"] as $k=>$id) {
+					$parent = $this->select($id);
+					$infos['prix'] = 0-$parent["prix"];
+				}
+				$multipleFactureParente = $infos["id_facture_parente"];
+				unset($infos["id_facture_parente"]);
+			} else {
+				$parent = $this->select($infos["id_facture_parente"]);
+				$infos['prix'] = 0-$parent["prix"];
+			}
 		}elseif($type_check=="factor"){
 			$infos["type_facture"]="factor";
 			if(!$societe["rib_affacturage"] || !$societe["iban_affacturage"] || !$societe["bic_affacturage"]){
@@ -509,6 +502,15 @@ class facture_absystech extends facture {
 				}
 				ATF::facture_ligne()->i($item,$s);
 			}
+
+			// Avoir avec plusieurs factures parentes
+			if ($multipleFactureParente) {
+				foreach($multipleFactureParente as $id){
+					$toInsert = array("id_facture"=>$last_id, "id_parente"=>$this->decryptId($id));
+					ATF::facture_parente()->i($toInsert);
+				}
+			}
+
 
 			if($infos["periodicite"] && !$echeancier){
 
