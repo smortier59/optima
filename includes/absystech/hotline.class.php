@@ -3704,7 +3704,11 @@ class hotline extends classes_optima {
 			} else {
 				// Filtre ticket actif
 				if ($get['filters']['fixing'] == "on") {
-					$this->q->where("hotline.etat","fixing")->where("hotline.etat","wait");
+					$this->q->where("hotline.etat","fixing");
+				}
+				// Filtre ticket en attente
+				if ($get['filters']['wait'] == "on") {
+					$this->q->where("hotline.etat","wait");
 				}
 				// Filtre MES tickets
 				if ($get['filters']['mine'] == "on") {
@@ -3784,7 +3788,8 @@ class hotline extends classes_optima {
 			$return = $data['data'][0];
 
 			// SPécial patch pour éviter que les balises html flingue le formattage
-			$return['detail'] = htmlspecialchars($return['detail']);
+			//$return['detail'] = htmlspecialchars($return['detail']);
+			$return['detail'] = strip_tags($return['detail'], '<br><p><a><span>');
 
 			// Check PJ
 			$return["pj"] = file_exists($this->filepath($get['id'],"fichier_joint"));
