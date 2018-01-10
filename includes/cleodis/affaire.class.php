@@ -2160,7 +2160,12 @@ class affaire_cleodis extends affaire {
 		// au cas ou il y aurait un changement de format d'id transmis
 		$id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
 		$action = $post["action"];
+
 		$etat = "valide_administratif";
+
+		if($action === "NOK"){
+			$etat = "refus_administratif";
+		}
 
 		try {
 			ATF::affaire()->update(array(
