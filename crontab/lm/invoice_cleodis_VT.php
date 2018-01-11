@@ -27,7 +27,7 @@ $result = `$cmd`;
 		// Si le fichier a été chargé , envoyer un mail avec le nom du fichier
 		$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
 		$infos_mail["objet"] = "Export Comptable";
-		$infos_mail["recipient"] = 'mfleurquin@absystech.net';
+		$infos_mail["recipient"] = 'dev@absystech.fr';
 		$infos_mail["template"] = "invoice_cleodis_file_updated";
 		$info_mail["html"] = true;
 
