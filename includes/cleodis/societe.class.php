@@ -1230,8 +1230,14 @@ class societe_cleodis extends societe {
             if($value > 0){
               $produit = ATF::produit()->select($key);
 
+              if($post["QteProduit"][$produit["id_produit"]]){
+                $qte = $post["QteProduit"][$produit["id_produit"]];
+              }else{
+                $qte = $value*$post["selectQtePack"];
+              }
+
               $loyer[0] = array(
-                            "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * ($value * $post["selectQtePack"])),
+                            "loyer__dot__loyer"=> $loyer[0]["loyer__dot__loyer"] + ($produit["loyer"] * $qte),
                             "loyer__dot__duree"=>$produit["duree"],
                             "loyer__dot__type"=>"engagement",
                             "loyer__dot__assurance"=>"",
@@ -1262,9 +1268,12 @@ class societe_cleodis extends societe {
               }
 
 
+
+
+
               $produits[] = array(
                                   "devis_ligne__dot__produit"=> $produit["produit"],
-                                  "devis_ligne__dot__quantite"=>$value*$post["selectQtePack"],
+                                  "devis_ligne__dot__quantite"=>$qte,
                                   "devis_ligne__dot__type"=>"sans_objet",
                                   "devis_ligne__dot__ref"=>$produit["ref"],
                                   "devis_ligne__dot__prix_achat"=>$ligne["prix_achat"],
@@ -1401,6 +1410,7 @@ class societe_cleodis extends societe {
     if(ATF::$codename == "cleodisbe"){
       $post["num_ident"] = $post["siret"];
       $data = ATF::societe_cleodisbe()->getInfosFromCREDITSAFE($post);
+
       if(!$data["societe"]){
         throw new errorATF("erreurCS BELGIQUE",404);
       }
@@ -1420,12 +1430,12 @@ class societe_cleodis extends societe {
         try {
             if($res){
                 $id_societe = $res["id_societe"];
+                if($res["langue"] !== $post["langue"]) $this->u(array("id_societe"=>$id_societe, "langue"=>$post["langue"]));
+
             }else {
                 $data_soc = $data;
-                // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
-                //$data_soc["id_apporteur"]   = $apporteur; //Apporteur d'affaire TOSHIBA
-                //$data_soc["id_fournisseur"] = 6241; //Fournisseur ALSO
-                // get id_apporteur depuis la session : $_SESSION["user"]->id_societe
+
+                $data_soc["langue"] = $post["langue"];
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
@@ -1658,6 +1668,9 @@ class societe_cleodisbe extends societe_cleodis {
   * @author Cyril Charlier <ccharlier@absystech.fr>
   */
   public function getInfosFromCREDITSAFE($infos) {
+
+    $infos["num_ident"] = str_replace(" ", "", $infos["num_ident"]);
+    $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
 
 
     $client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));

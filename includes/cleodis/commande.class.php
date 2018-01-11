@@ -20,7 +20,7 @@ class commande_cleodis extends commande {
 			,'commande.id_societe'
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
-			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90)
+			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
 			,'courriers'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCourriers","width"=>90)
 			,'retour'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'retourPV'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
@@ -96,10 +96,17 @@ class commande_cleodis extends commande {
 		$this->no_insert = true;
 		$this->no_update = true;
 		$this->onglets = array('commande_ligne','bon_de_commande');
+
+
+
 		$this->files["contratA3"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratA4"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratAP"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratPV"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+
+		//$this->files["contratA4NL"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+
+
 		$this->files["retour"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["retourPV"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
@@ -1341,7 +1348,11 @@ class commande_cleodis extends commande {
 
 		foreach ($return['data'] as $k=>$i) {
 			$affaire = ATF::affaire()->select($i['commande.id_affaire_fk']);
+
 			if (!$affaire) continue;
+
+			$return['data'][$k]["langue"] = $affaire["langue"];
+
 			//Check si c'est une vente
 			if ($affaire['nature']=="vente") {
 				$return['data'][$k]['vente'] = true;
@@ -2502,6 +2513,17 @@ class commande_cleodis extends commande {
 
 class commande_cleodisbe extends commande_cleodis {
 
+	function __construct($table_or_id=NULL) {
+		$this->table="commande";
+		parent::__construct($table_or_id);
+
+		$this->colonnes['fields_column']['filesLangue']  = array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommandeLangue","width"=>110); //PDF dans la langue de la société
+
+		$this->fieldstructure();
+
+		$this->files["contratA4NL"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+	}
+
 
 	/** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -2732,15 +2754,15 @@ class commande_cap extends commande_cleodis {
 		$contract_id = $post['contract_id'];
 
 		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
-		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('mandat.id_affaire')->setDimension('cell');
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('id_affaire')->setDimension('cell');
 		$id_affaire = ATF::affaire()->select_all();
-		$mandat = ATF::affaire()->geMandat($id_affaire);
+		$id_mandat = ATF::affaire()->getMandat($id_affaire);
 
-		$file = $this->filepath($mandat->get('id_mandat'), 'retourBPA', null, 'cleodis');
+		$file = ATF::mandat()->filepath($id_mandat, 'retourBPA', null, 'cap');
 		try {
 			util::file_put_contents($file,base64_decode($data));
 			//On met à jour la date de retour et retourPV du contrat
-			ATF::mandat()->u(array("id_mandat"=>$mandat->get('id_mandat'),
+			ATF::mandat()->u(array("id_mandat"=>$id_mandat,
 									 "date_retour"=> date("Y-m-d")
 									)
 								);
@@ -2748,7 +2770,6 @@ class commande_cap extends commande_cleodis {
 		} catch (Exception $e) {
 			$return  = array("error"=>true, "data"=>$e);
 		}
-
 		return $return;
 	}
 

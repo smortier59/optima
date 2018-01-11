@@ -845,8 +845,6 @@ class facture_cleodis extends facture {
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
 
-		//Ligne pour crontab batch_facture -- MAJ TVA à 19.6%
-		if($infos["batch"]){ $batch = true; unset($infos["batch"]); $ref = $infos["ref"];}
 
 		$commande=ATF::commande()->select($infos["id_commande"]);
 		$infos["id_affaire"]=$commande["id_affaire"];
@@ -940,11 +938,11 @@ class facture_cleodis extends facture {
 			throw new errorATF("Il faut un prix pour la facture",351);
 		}
 
-		if(!$batch){
-			if($infos["tva"] == "1.196"){
-				$infos["tva"]= "1.2";
-			}
-		}else{ $infos["tva"] = $infos["batchtva"]; $infos["ref"] = $ref; unset($infos["batchtva"]); }
+
+		if($infos["tva"] == "1.196"){
+			$infos["tva"]= "1.2";
+		}
+
 
 
 		//Si on a une TVA 19.6 et qu'on est en 2014 ---> TVA passe à 20% !!

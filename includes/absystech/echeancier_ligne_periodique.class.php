@@ -224,7 +224,7 @@ class echeancier_ligne_periodique extends classes_optima {
     ATF::db($this->db)->begin_transaction();
     try {
       foreach ($post['order'] as $offset=>$id) {
-        $toUpdate = array("id_echeancier_ligne_periodique"=>$id, "offset"=> $offset+1);
+        $toUpdate = array("id_echeancier_ligne_periodique"=>ATF::db($this->db)->real_escape_string($id), "offset"=> $offset+1);
         $this->u($toUpdate);
       }
     } catch (errorATF $e) {

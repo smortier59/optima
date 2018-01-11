@@ -153,6 +153,8 @@ class affaire_cleodis extends affaire {
 		$affaire["date"]=$infos["date"];
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
+		$affaire["langue"]=$infos["langue"];
+		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -1708,6 +1710,7 @@ class affaire_cleodis extends affaire {
 					->addField("ville")
 					->addField("pays.pays")
 					->addField("tel")
+					->addField("langue")
 					->from("pays","id_pays","societe","id_pays")
 					->where("id_societe", $value)
 
@@ -2156,8 +2159,13 @@ class affaire_cleodis extends affaire {
 
 		// au cas ou il y aurait un changement de format d'id transmis
 		$id_affaire =  strlen($post["id_affaire"]) === 32 ?  ATF::affaire()->decryptId($post["id_affaire"]) : $post['id_affaire'];
-		$action = "OK";
+		$action = $post["action"];
+
 		$etat = "valide_administratif";
+
+		if($action === "NOK"){
+			$etat = "refus_administratif";
+		}
 
 		try {
 			ATF::affaire()->update(array(
@@ -2244,7 +2252,9 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>ATF::$usr->getID(),
-			  "type_affaire" => "normal");
+			  "type_affaire" => "normal",
+			  "langue"=>ATF::societe()->select($id_societe, "langue")
+			);
 
 			$values_devis =array();
 
@@ -2754,7 +2764,7 @@ class affaire_cap extends affaire {
 		if($id_affaire){
 			ATF::mandat()->q->reset()->setStrict()->addField('mandat.id_mandat')->addCondition("mandat.id_affaire",$id_affaire)->setDimension("cell");
 			if($id_mandat = ATF::mandat()->sa()) {
-				return new mandat_cleodis($id_mandat);
+				return $id_mandat;
 			}else{
 				return false;
 			}
