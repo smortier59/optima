@@ -17,20 +17,18 @@ if($factures = ATF::facture_fournisseur()->sa()){
 	$path = '/tmp/';
 	file_put_contents($path.$file['filename'], $file['content']);
 	// infos concernant l'envoi sur un FTP
-	$ftp_server = __FTP_SERVER__;
 
-	$ftp_conn = ftp_connect($ftp_server) or die("Could not connect to $ftp_server");
+$cmd = "sftp -i ".__DIR__."/id_dsa_adeo -P 2222 lmab_cleodis@ftptransfer-prod.adeoservices.com << EOF
+put ".$path.$file['filename']." IN/
+EOF";
+$result = `$cmd`;
 
-	$ftp_username = __FTP_USERNAME__;
-	$ftp_userpass = __FTP_USERPASS__;
-	$login_res = ftp_login($ftp_conn, $ftp_username, $ftp_userpass);
-
-	if(ftp_put($ftp_conn,'/web/test/'.$file['filename'], $path.$file['filename'], FTP_ASCII)){
+	if($result){
 		echo "Le fichier ".$file['filename']." a été chargé avec succès\n";
 		// Si le fichier a été chargé , envoyer un mail avec le nom du fichier
 		$infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
 		$infos_mail["objet"] = "Export Comptable";
-		$infos_mail["recipient"] = 'ccharlier@absystech.net';
+		$infos_mail["recipient"] = 'dev@absystech.fr';
 		$infos_mail["template"] = "invoice_cleodis_file_updated";
 		$info_mail["html"] = true;
 
