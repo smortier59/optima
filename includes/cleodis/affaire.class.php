@@ -154,6 +154,8 @@ class affaire_cleodis extends affaire {
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
+		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
+		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {

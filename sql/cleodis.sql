@@ -1,5 +1,7 @@
 #17390 - Ajout message sur la facture
-ALTER TABLE `affaire` ADD `commentaire_facture` TEXT NULL COMMENT 'Commentaire qui sera afficher sur les factures clients' AFTER `id_partenaire`;
+ALTER TABLE `affaire` CHANGE `commentaire_facture` `commentaire_facture` VARCHAR(500) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `affaire` ADD `commentaire_facture2` VARCHAR(500) NULL DEFAULT NULL AFTER `commentaire_facture`,
+            ADD `commentaire_facture3` VARCHAR(500) NULL DEFAULT NULL AFTER `commentaire_facture2`;
 
 
 

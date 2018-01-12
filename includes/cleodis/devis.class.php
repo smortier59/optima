@@ -126,7 +126,10 @@ class devis_cleodis extends devis {
 		);
 
 		$this->colonnes['panel']['commentaire'] = array(
-			"commentaire_facture"=>array("custom"=>true,"xtype"=>"htmleditor")
+			"commentaire_facture"=>array("custom"=>true,"xtype"=>"textfield", "rowEditor"=>"setInfos"),
+			"commentaire_facture2"=>array("custom"=>true,"xtype"=>"textfield", "rowEditor"=>"setInfos"),
+			"commentaire_facture3"=>array("custom"=>true,"xtype"=>"textfield", "rowEditor"=>"setInfos")
+
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
@@ -387,7 +390,7 @@ class devis_cleodis extends devis {
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
 
 		////////////////Devis
-		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["commentaire_facture"]);
+		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast
@@ -977,6 +980,12 @@ class devis_cleodis extends devis {
 					break;
 				case "commentaire_facture":
 					return $affaire["commentaire_facture"];
+					break;
+				case "commentaire_facture2":
+					return $affaire["commentaire_facture2"];
+					break;
+				case "commentaire_facture3":
+					return $affaire["commentaire_facture3"];
 					break;
 			}
 		}else{

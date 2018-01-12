@@ -4175,16 +4175,24 @@ class pdf_cleodis extends pdf {
 			$this->factureClassique($global);
 
 
-			if($this->affaire["commentaire_facture"]){
-
-				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
-				$commentaire_facture = strip_tags($commentaire_facture);
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
-				$data[0][0] = $commentaire_facture;
-				$styles[0][0] = $this->colsProduitAlignLeft;
+
+				$commentaire = "";
+
+				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
+				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
+				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
+
+				$data[0][0] = $commentaire;
+				$styles[0][0] = $this->styleDetailsProduit;
+
+
+
+
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 
@@ -8990,16 +8998,23 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$this->factureClassique($global);
 			}
 
-			if($this->affaire["commentaire_facture"]){
-
-				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
-				$commentaire_facture = strip_tags($commentaire_facture);
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
-				$data[0][0] = $commentaire_facture;
-				$styles[0][0] = $this->colsProduitAlignLeft;
+
+				$commentaire = "";
+
+				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
+				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
+				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
+
+				$data[0][0] = $commentaire;
+				$styles[0][0] = $this->styleDetailsProduit;
+
+
+
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 		}elseif($this->facture['type_facture']=="midas"){
