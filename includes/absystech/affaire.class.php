@@ -1367,7 +1367,7 @@ class affaire_partenaire extends affaire {
 						,"template"=>'jalon'
 						,"template_only"=>true
 						,"recipient"=>$settings["mail_to"]
-						,"texte"=> nl2br(utf8_decode($settings['mail_content']))
+						,"texte"=> nl2br($settings['mail_content'])
 						,"societe"=>$societe
 					);
 					$notification = new mail($mail);
