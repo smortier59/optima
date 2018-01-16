@@ -3743,6 +3743,42 @@ class pdf_cleodis extends pdf {
 			$this->annexes($annexes);
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
+
+		if($this->fournisseur["revendeur"] == "oui"){
+			ATF::document_revendeur()->q->reset()->where("site_associe", $this->affaire["site_associe"]);
+			$docs = ATF::document_revendeur()->select_all();
+			if($docs){
+				$doc = array();
+				foreach ($docs as $key => $value) {
+					if(!$doc){
+						if($value["id_societe"] === NULL ||  $value["id_societe"] === $this->fournisseur["id_societe"]){
+							$doc = $value;
+						}
+					}else{
+
+						if($doc["id_societe"] === NULL && $value["id_societe"] === $this->fournisseur["id_societe"] ){
+							$doc = $value;
+						}
+					}
+				}
+
+				$filepath = ATF::document_revendeur()->filepath($doc["id_document_revendeur"],"fichier_joint");
+
+				if (file_exists($filepath)){
+					$pageCount = $this->setSourceFile($filepath);
+
+					for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						$this->unsetHeader();
+						$this->unsetFooter();
+			            $tplIdx = $this->ImportPage($pageNo);
+			            $r = $this->getTemplatesize($tplIdx);
+			            $this->AddPage($r['w'] > $r['h'] ? 'L' : 'P', array($r['w'], $r['h']));
+			            $this->useTemplate($tplIdx);
+			        }
+				}
+			}
+		}
+
 	}
 
 	/** Initialise les variables pour générer une demande de refi
