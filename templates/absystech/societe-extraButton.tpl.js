@@ -21,12 +21,15 @@
 			,"siret="+siret			, {
 				onComplete: function (r) {
 					Ext.iterate(r.result, function(key, value) {
-					  	if (r.result[key]) {
-							Ext.getCmp('societe['+key+']').setValue(value);
-						} else {
-							Ext.getCmp('societe['+key+']').reset();
+						if(Ext.getCmp('societe['+key+']') !== undefined){
+							if (r.result[key]) {
+								Ext.getCmp('societe['+key+']').setValue(value);
+							} else {
+								Ext.getCmp('societe['+key+']').reset();
 
+							}
 						}
+
 					});
 
 					ATF.loadMask.hide();
