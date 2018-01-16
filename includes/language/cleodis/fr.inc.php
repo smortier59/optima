@@ -1,1 +1,1 @@
-<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("affaire_langue"=>"Langue"));?>
+<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("affaire_commentaire_facture3"=>"Commentaire de facture (3)","affaire_commentaire_facture2"=>"Commentaire de facture (2)","affaire_commentaire_facture"=>"Commentaire de facture","affaire_langue"=>"Langue"));?>
