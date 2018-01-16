@@ -1,0 +1,1 @@
+jQuery.extend(ATF.loc,{"affaire_langue":"Langue"});
