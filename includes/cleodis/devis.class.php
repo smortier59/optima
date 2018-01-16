@@ -128,9 +128,9 @@ class devis_cleodis extends devis {
 		);
 
 		$this->colonnes['panel']['commentaire'] = array(
-			"commentaire_facture"=>array("custom"=>true,"xtype"=>"textfield", "rowEditor"=>"setInfos"),
-			"commentaire_facture2"=>array("custom"=>true,"xtype"=>"textfield", "rowEditor"=>"setInfos"),
-			"commentaire_facture3"=>array("custom"=>true,"xtype"=>"textfield", "rowEditor"=>"setInfos")
+			"commentaire_facture"=>array("custom"=>true,"xtype"=>"textfield"),
+			"commentaire_facture2"=>array("custom"=>true,"xtype"=>"textfield"),
+			"commentaire_facture3"=>array("custom"=>true,"xtype"=>"textfield")
 
 		);
 
