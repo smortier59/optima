@@ -28,6 +28,10 @@ class affaire_cleodis extends affaire {
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 
+			,"affaire.commentaire_facture"=>array("rowEditor"=>"setInfos")
+			,"affaire.commentaire_facture2"=>array("rowEditor"=>"setInfos")
+			,"affaire.commentaire_facture3"=>array("rowEditor"=>"setInfos")
+
 		);
 
 		$this->colonnes['primary'] = array(
@@ -68,6 +72,11 @@ class affaire_cleodis extends affaire {
 		$this->panels['refRefi'] = array("visible"=>true, 'nbCols'=>1);
 
 
+		$this->colonnes['panel']['commentaire_facture'] = array(
+			 "specifiqueCommentaireFacture"=>array("custom"=>true)
+		);
+		$this->panels['commentaire_facture'] = array("visible"=>true, 'nbCols'=>1);
+
 		$this->colonnes['panel']['chiffres'] = array(
 			'total_depense'
 			,'total_recette'
@@ -84,7 +93,7 @@ class affaire_cleodis extends affaire {
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['cloner'] =
 		$this->colonnes['bloquees']['update'] = array('data','nature');
-		$this->colonnes['bloquees']['select'] = array('id_parent','data','RIB','BIC','IBAN','RUM','nom_banque','ville_banque','date_previsionnelle');
+		$this->colonnes['bloquees']['select'] = array('id_parent','data','RIB','BIC','IBAN','RUM','nom_banque','ville_banque','date_previsionnelle','commentaire_facture','commentaire_facture2','commentaire_facture3');
 
 		$this->onglets = array(
 			'loyer'
@@ -129,11 +138,54 @@ class affaire_cleodis extends affaire {
 		$this->addPrivilege("updateFacturation","update");
 		$this->addPrivilege("getCompteT");
 		$this->addPrivilege("getCompteTLoyerActualise");
+		$this->addPrivilege("updateCommentaireFacture");
+		$this->addPrivilege("setInfos");
 		$this->no_delete = true;
 		$this->no_update = true;
 		$this->no_insert = true;
 		$this->can_insert_from = array("societe");
 	}
+
+	public function setInfos($infos){
+		if($infos["commentaire_facture"]) {
+			$infos["field"] = "commentaire_facture";
+			$infos["value"] = $infos["commentaire_facture"];
+			unset($infos["commentaire_facture"]);
+		}
+
+		if($infos["commentaire_facture2"]) {
+			$infos["field"] = "commentaire_facture2";
+			$infos["value"] = $infos["commentaire_facture2"];
+			unset($infos["commentaire_facture2"]);
+		}
+
+		if($infos["commentaire_facture3"]) {
+			$infos["field"] = "commentaire_facture3";
+			$infos["value"] = $infos["commentaire_facture3"];
+			unset($infos["commentaire_facture3"]);
+		}
+
+		$this->updateCommentaireFacture($infos);
+
+	}
+
+	public function updateCommentaireFacture($infos){
+		$id_affaire = $this->decryptId($infos["id_affaire"]);
+
+		ATF::db($this->db)->begin_transaction();
+		try {
+			$this->u(array("id_affaire"=>$id_affaire,  $infos["field"]=>$infos["value"]));
+			ATF::db($this->db)->commit_transaction();
+			ATF::$msg->addNotice(ATF::$usr->trans($infos['field'], $this->table)." modifié avec succes");
+		} catch(errorATF $e) {
+						//On commit le tout
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
+
+
+	}
+
 
 	/**
 	* Permet de formater les données pour l'insertion d'une affaire
