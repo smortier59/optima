@@ -72,10 +72,10 @@ class affaire_cleodis extends affaire {
 		$this->panels['refRefi'] = array("visible"=>true, 'nbCols'=>1);
 
 
-		$this->colonnes['panel']['commentaire_facture'] = array(
+		$this->colonnes['panel']['commentaire_sur_facture'] = array(
 			 "specifiqueCommentaireFacture"=>array("custom"=>true)
 		);
-		$this->panels['commentaire_facture'] = array("visible"=>true, 'nbCols'=>1);
+		$this->panels['commentaire_sur_facture'] = array("visible"=>true, 'nbCols'=>1);
 
 		$this->colonnes['panel']['chiffres'] = array(
 			'total_depense'
