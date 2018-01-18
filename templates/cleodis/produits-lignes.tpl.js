@@ -370,6 +370,15 @@ ATF.buildGridEditor({
 						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
 					{/if}
 				}
+
+				, {
+					header: 'Option Incluse Obligatoire',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__option_incluse_obligatoire',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse_obligatoire value="oui" function=null}
+					{/if}
+				}
 			{/if}
 
 
