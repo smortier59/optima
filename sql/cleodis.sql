@@ -1,5 +1,6 @@
 #17312 - Options incluse Toshiba avec possibilité d'afficher ou non l'option sans
 ALTER TABLE `pack_produit_ligne` ADD `option_incluse_obligatoire` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `option_incluse`;
+ALTER TABLE `pack_produit_ligne` ADD `visible_sur_pdf` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `visible`;
 
 
 #17482 - Revendeurs Toshiba - Ajout document pdf sur le bon de commande
