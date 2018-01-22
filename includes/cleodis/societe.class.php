@@ -1596,7 +1596,9 @@ class societe_cleodis extends societe {
           "commande_ligne__dot__id_fournisseur_fk"=>$fournisseur["id_societe"],
           "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
           "commande_ligne__dot__id_produit"=>$value["produit"],
-          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"]
+          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
+          "commande_ligne__dot__visible"=>$value["visible"]
+
         );
     }
     $values_commande = array( "produits" => json_encode($produits));
