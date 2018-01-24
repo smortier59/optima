@@ -183,11 +183,12 @@ class pdf_cleodis extends pdf {
 		$this->AddPage();
 
 
+
 		$this->setfillcolor(208,255,208);
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,5,5,40);
+		$this->image(__PDF_PATH__.$this->logo,15,5,15);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -270,6 +271,32 @@ class pdf_cleodis extends pdf {
 		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
 
 
+		if(ATF::$codename === "cleodis"){
+			$this->line(5,160,205,160);
+
+			//Mandat de prelevement
+			$this->image(__PDF_PATH__.'cleodis/mandat-prel.jpg',5,170,200);
+
+			$this->setfont('arial','',11);
+
+			$this->setLeftMargin(45);
+			$this->SetY(195);
+			$this->cell(150,5,$this->client["structure"]." ".$this->client["societe"],0,1);
+
+			$this->multicell(150,4,$this->adresseClient);
+
+			$this->cell(150,5,$this->client["siret"],0,1);
+			$this->cell(150,5,$this->client["BIC"],0,1);
+			$this->cell(150,5,$this->client["IBAN"],0,1);
+
+			$this->SetXY(40,247);
+			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+
+
+			$this->SetXY(120,248);
+			$this->multicell(100,6,"Lille\n".date('d/m/Y'));
+
+		}
 
 
 		$this->setleftMargin(15);
