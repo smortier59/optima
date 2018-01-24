@@ -271,7 +271,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
 
 
-		if(ATF::$codename === "cleodis"){
+		/*if(ATF::$codename === "cleodis"){
 			$this->line(5,160,205,160);
 
 			//Mandat de prelevement
@@ -296,7 +296,7 @@ class pdf_cleodis extends pdf {
 			$this->SetXY(120,248);
 			$this->multicell(100,6,"Lille\n".date('d/m/Y'));
 
-		}
+		}*/
 
 
 		$this->setleftMargin(15);
