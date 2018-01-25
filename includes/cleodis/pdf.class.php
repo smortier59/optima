@@ -26,6 +26,12 @@ class pdf_cleodis extends pdf {
 	public $showFiligramme = false;
 
 
+	//Couleur CLEODIS
+	public $Rentete = 149;
+	public $Gentete = 193;
+	public $Bentete = 31;
+
+
 
 	public function filigramme(){
 		$this->setX(40);
@@ -110,13 +116,13 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-			$this->image(__PDF_PATH__.$this->logo,295,5,35);
+			$this->image(__PDF_PATH__.$this->logo,298,5,25);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,75,10,60);
+				$this->image(__PDF_PATH__.$this->logo,30,20,40);
 			}
             $this->setfont('arial','',11);
             if ($this->client) {
@@ -137,7 +143,7 @@ class pdf_cleodis extends pdf {
         		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
 				$this->sety(20);
         	}else{
-        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,35); }
+        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,25); }
 
 				$this->sety(20);
         	}
@@ -177,11 +183,12 @@ class pdf_cleodis extends pdf {
 		$this->AddPage();
 
 
+
 		$this->setfillcolor(208,255,208);
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,5,5,40);
+		$this->image(__PDF_PATH__.$this->logo,15,5,15);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -264,6 +271,32 @@ class pdf_cleodis extends pdf {
 		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
 
 
+		/*if(ATF::$codename === "cleodis"){
+			$this->line(5,160,205,160);
+
+			//Mandat de prelevement
+			$this->image(__PDF_PATH__.'cleodis/mandat-prel.jpg',5,170,200);
+
+			$this->setfont('arial','',11);
+
+			$this->setLeftMargin(45);
+			$this->SetY(195);
+			$this->cell(150,5,$this->client["structure"]." ".$this->client["societe"],0,1);
+
+			$this->multicell(150,4,$this->adresseClient);
+
+			$this->cell(150,5,$this->client["siret"],0,1);
+			$this->cell(150,5,$this->client["BIC"],0,1);
+			$this->cell(150,5,$this->client["IBAN"],0,1);
+
+			$this->SetXY(40,247);
+			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+
+
+			$this->SetXY(120,248);
+			$this->multicell(100,6,"Lille\n".date('d/m/Y'));
+
+		}*/
 
 
 		$this->setleftMargin(15);
@@ -306,7 +339,7 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,90,55,35);
 			$this->sety(90);
 			$this->setfont('arial','B',12);
-			$this->multicell(0,5,$this->societe['societe'],0,'C');
+			$this->multicell(0,5,/*$this->societe['societe']*/"",0,'C');
 			$this->ln(10);
 			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
 
@@ -1218,6 +1251,7 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,"=> La location évolutive, un moyen efficace");
 		$this->unsetFontDecoration();
+		$this->ln(8);
 		$this->multicell(0,5,"En dehors des services ".$cleodis." qui facilitent la gestion quotidienne et optimisent les coûts de détention de votre parc, le contrat de location constitue intrinsèquement la solution à ces problématiques d'évolution :");
 		$this->setFontDecoration('B');
 		$this->setx(35);
@@ -1296,6 +1330,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','I',8);
 		$this->multicell(0,7,"=>L'évolution et le suivi du contrat de location");
 		$this->unsetFontDecoration();
+		$this->ln(6);
 		$this->multicell(0,5,"La possibilité d'évoluer à tout moment sur tout ou partie des matériels passe par la capacité de ".$cleodis." à savoir re-commercialiser l'ensemble des équipements nécessitant une évolution. Cette valorisation viendra en déduction du nouvel investissement.");
 
 		$this->ln(5);
@@ -1421,6 +1456,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"3.2 Valorisation des matériels sortants pour ".$this->client['societe']);
 		$this->ln(5);
 		$this->setfont('arial','',8);
+		$this->ln(4);
 
 		$this->multicell(0,5,"L'intérêt de la location vient en grande partie de la faculté du loueur à ne vous faire payer que l'utilisation des matériels. Cela est rendu possible par notre capacité à valoriser les matériels à l'issu de la location et/ou lors de la mise en place de la solution locative.");
 		$this->multicell(0,5,"La valeur marché vient alors en déduction du nouvel investissement et participe à la baisse de budget pour ".$this->client['societe'].".");
@@ -2079,7 +2115,7 @@ class pdf_cleodis extends pdf {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor("cleodis");
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -2166,7 +2202,7 @@ class pdf_cleodis extends pdf {
 		$this->setEnteteBGColor("white");
 		$this->cadre(320,35,70,35,$cadreLoueur,$loueur);
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor("cleodis");
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -2707,7 +2743,7 @@ class pdf_cleodis extends pdf {
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
 		} else{
-			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
 		}
 
 
@@ -2745,7 +2781,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(15);
 		$this->setfont('arial','B',10);
@@ -2776,7 +2812,7 @@ class pdf_cleodis extends pdf {
 		}
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,73,220,73);
 
 		$this->setxy(15,75);
@@ -3017,7 +3053,7 @@ class pdf_cleodis extends pdf {
 
 		$this->setY(219);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(64,192,0);
+		$this->SetTextColor(149,193,31);
 		$this->setfont('arial','B',10);
 		if(!$sellsign){
 			$this->multicell(0,5,"Fait en trois exemplaires",0,'C');
@@ -4955,7 +4991,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
 		$this->sety(62);
@@ -4993,7 +5029,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
@@ -5128,7 +5164,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,10,$titre,0,'C');
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,35,220,35);
 		$this->setLeftMargin(10);
 		$this->sety(37);
@@ -5219,7 +5255,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
 		$this->sety(62);
@@ -5303,7 +5339,7 @@ class pdf_cleodis extends pdf {
 			,"font" => "arial"
 			,"border" => 1
 			,"align" => "J"
-			,"bgcolor" => "c7ebb5"
+			,"bgcolor" => "95C11F"
 		);
 
 		$this->headStyle[0] = $newStyleHead;
@@ -8451,9 +8487,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 
 		$this->setY(219);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(64,192,0);
+		$this->SetTextColor(149,193,31);
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Fait en trois exemplaires",0,'C');
 		$this->SetDrawColor(0,0,0);
@@ -8789,9 +8825,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 
 		$this->setY(219);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(64,192,0);
+		$this->SetTextColor(149,193,31);
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Opgesteld in drie exemplaren, één voor elk van de partijen.",0,'C');
 		$this->SetDrawColor(0,0,0);
@@ -9030,7 +9066,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor("cleodis");
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -9073,7 +9109,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor("cleodis");
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
