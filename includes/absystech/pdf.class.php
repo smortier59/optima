@@ -186,15 +186,6 @@ class pdf_absystech extends pdf {
 					$this->multicell(50,5,"N° ".$infos_facture['ref'],0,'C');
 					if ($infos_facture['id_facture_parente']) {
 						$this->multicell(50,5,"Sur Facture ".ATF::facture()->select($infos_facture['id_facture_parente'] , "ref"),0,'C');
-					} else { // plusieurs factures parentes
-						$parentes = ATF::facture_parente()->ss("id_facture", $id);
-						$txt = "Sur Factures : \n";
-						foreach ($parentes as $fac) {
-							$txt .= ATF::facture()->select($fac['id_parente'] , "ref").", ";
-						}
-						$this->setleftmargin(5);
-						$this->multicell(70,5,$txt,0,'C');
-						$this->setleftmargin(10);
 					}
 				break;
 				default:
