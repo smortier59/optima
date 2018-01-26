@@ -7805,7 +7805,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				$this->image(__PDF_PATH__.$this->logo,15,3,30);
 				$this->setLeftMargin(70);
 
 			}
