@@ -18,6 +18,7 @@ class mission_ligne extends classes_optima {
 			,'mission_ligne.defraiement'
 			,'mission_ligne.indemnite_defraiement'
 			,'mission_ligne.poste'
+			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfMission","width"=>90)
 			,'contratTravail'=>array("width"=>50,"nosort"=>true,"type"=>"file","custom"=>true)
 			,'mission_ligne.note'=>array("renderer"=>"rating","width"=>70)
 			,'mission_ligne.etat'=>array('renderer'=>'etat',"width"=>50)
