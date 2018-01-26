@@ -312,12 +312,21 @@ class pdf_manala extends pdf {
 		$this->setFont('arial','B',10);
 		$this->multicell(90,5,"Article 1 : Objet / Fonction");
 		$this->setFont('arial','',8);
-		$this->multicell(90,4,"Le salarié est engagé le ".ATF::$usr->date_trans($mission['date_debut'],true,true)." en tant que ".$el['poste'].". Le présent contrat est conclu dans le cadre d’un plan d’animation pour la société ".$client['societe']." en raison d’un surcroît de travail lié avec notre client.",0,"FJ");
+		$this->multicell(90,4,"Le salarié est engagé le :");
+
+		$this->setFont('arial','B',8);
+		$this->multicell(90,4,ATF::$usr->date_trans($mission['date_debut'],true,true)." en tant que ".$el['poste']);
+		$this->setFont('arial','',8);
+		$this->multicell(90,4,"Le présent contrat est conclu dans le cadre d’un plan d’animation pour la société ".$client['societe']." en raison d’un surcroît de travail lié avec notre client.",0,"FJ");
 
 		$this->setFont('arial','B',10);
 		$this->multicell(90,5,"Article 2 : Durée / horaires");
 		$this->setFont('arial','',8);
-		$this->multicell(90,4,"Le présent contrat est conclu pour commencer le ".ATF::$usr->date_trans($mission['date_debut'],true,true)." et finir le ".ATF::$usr->date_trans($mission['date_fin'],true,true)." pour un nombre total d’heures travaillées de : ".$el['heure_totale']." heure(s). Les horaires journaliers sont définis dans le dossier de travail remis au salarié. En cas de nécessité, le salarié devra assurer d’éventuels dépassements d’horaires à la demande de son supérieur hiérarchique",0,"FJ");
+		$this->multicell(90,4,"Le présent contrat est conclu pour commencer :");
+		$this->setFont('arial','B',8);
+		$this->multicell(90,4,"du ".ATF::$usr->date_trans($mission['date_debut'],true,true)." au ".ATF::$usr->date_trans($mission['date_fin'],true,true)." pour un nombre total d’heures travaillées de ".$el['heure_totale']." heure(s).");
+		$this->setFont('arial','',8);
+		$this->multicell(90,4,"Les horaires journaliers sont définis dans le dossier de travail remis au salarié. En cas de nécessité, le salarié devra assurer d’éventuels dépassements d’horaires à la demande de son supérieur hiérarchique",0,"FJ");
 
 		$this->setFont('arial','B',10);
 		$this->multicell(90,5,"Article 3 : Fonctions et obligations professionnelles");
@@ -328,7 +337,9 @@ class pdf_manala extends pdf {
 		$this->setFont('arial','B',10);
 		$this->multicell(90,5,"Article 4 : Lieu de travail");
 		$this->setFont('arial','',8);
-		$this->multicell(90,4,"Le salarié exercera ses fonctions à l’adresse indiquée dans le dossier de travail remis au salarié et à tout autre endroit où les nécessités du service l’exigeront.",0,"FJ");
+		$this->multicell(90,4,"Le salarié exercera ses fonctions à :",0,"FJ");
+		$this->setFont('arial','B',8);
+		$this->multicell(90,4,$mission["lieu"],0,"FJ");
 
 
 		$this->setFont('arial','B',10);
@@ -407,11 +418,11 @@ class pdf_manala extends pdf {
 		$this->setLeftMargin(15);
 
 		$this->ln(5);
+		$this->ln(5);
 		$this->multicell(0,5,"Fait à Tourcoing, le ".date("d/m/Y"));
 
 
 
-		$this->ln(5);
 		$this->cell(85,5,"Pour la société",0,0,"C");
 		$this->cell(10,5,"");
 		$this->cell(85,5,"Pour le salarié",0,1,"C");
@@ -542,7 +553,7 @@ class pdf_manala extends pdf {
 		$this->multicell(0,5,"(à remettre aux salariés intervenants dans les magasins pour remise au pointeau sécurité)",0,"C");
 		$this->ln(5);
 		$this->setFont('arial','',10);
-		$this->multicell(0,5,"      Je soussignée Emmanuelle OLLIVIER, Gérante de MANALA SARL (siret : 53748734000037) situé 200 rue de Roubaix BP 32000 59203 TOURCOING, certifie que le porteur de la présente : ".ATF::personnel()->nom($personnel['id_personnel']).", né(e) le ".$personnel['date_naissance']." et résidant ".$personnel['adresse'].", ".$personnel['cp']." ".$personnel['ville']." est inscrit à l'effectif depuis le ".date("d/m/Y",strtotime($mission['date_debut'])).", sous contrat à durée déterminée en qualité de : ".$el['poste']);
+		$this->multicell(0,5,"      Je soussignée Emmanuelle OLLIVIER, Gérante de MANALA SARL (siret : 53748734000045) situé 59 rue de l'union BP 32000 59203 TOURCOING, certifie que le porteur de la présente : ".ATF::personnel()->nom($personnel['id_personnel']).", né(e) le ".$personnel['date_naissance']." et résidant ".$personnel['adresse'].", ".$personnel['cp']." ".$personnel['ville']." est inscrit à l'effectif depuis le ".date("d/m/Y",strtotime($mission['date_debut'])).", sous contrat à durée déterminée en qualité de : ".$el['poste']);
 
 		$this->ln(10);
 		$this->multicell(0,5,"Et que conformément aux dispositions de la loi du 31 décembre 1991 relative au travail clandestin, il est fait application des dispositions des articles L 324-9 et suivants concernant « le travail dissimulé », des articles L L 3243-1, L3243-2, L L1221-10, L1221-13, L1221-15  du code du travail relatifs au bulletin de paie et au Registre unique du Personnel, et des articles L 5221-1 et suivants relatifs au « travail des étrangers ».");
@@ -640,15 +651,28 @@ class pdf_manala extends pdf {
 		$this->sety(50);
 		$this->multicell(0,10,"A L’ATTENTION DU SERVICE SECURITE",0,"C");
 		$this->setFont('arial','BU',12);
-		$this->multicell(0,5,"Concerne : ".$client['societe'],0,"C");
+		$this->multicell(0,5,"Concerne : ".$mission['lieu'],0,"C");
 		$this->ln(5);
 		$this->setFont('arial','',10);
 		$this->multicell(0,5,"Madame, Monsieur, ");
 		$this->ln(5);
-		$this->multicell(0,5,"En accord avec les termes de vos conditions d’accès en magasin, nous vous informons que nous, société MANALA, avons été mandatés par la société ".$client['societe']." afin de réaliser une animation le ".ATF::$usr->date_trans($mission['date_debut'],true,true));
-
+		$this->multicell(0,5,"En accord avec les termes de vos conditions d’accès en magasin, nous vous informons que nous, société MANALA, avons été mandatés par la société :");
+		$this->setFont('arial','BU',10);
 		$this->ln(5);
-		$this->multicell(0,5,"Nous embauchons ".ATF::personnel()->nom($personnel['id_personnel'])." afin de réaliser ce jour d’animation.");
+		$this->multicell(0,5,$client['societe']);
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->multicell(0,5,"afin de réaliser une animation le :");
+		$this->ln(5);
+		$this->setFont('arial','BU',10);
+		$this->multicell(0,5,ATF::$usr->date_trans($mission['date_debut'],true,true));
+		$this->setFont('arial','',10);
+		$this->ln(5);
+		$this->multicell(0,5,"Nous embauchons ".strtoupper(ATF::personnel()->nom($personnel['id_personnel']))." afin de réaliser ces prestations d'animation commerciales sur la gamme des produits :");
+		$this->setFont('arial','BU',10);
+		$this->ln(5);
+		$this->multicell(0,5,'- '.$client['societe']);
+		$this->setFont('arial','',10);
 
 		$this->ln(5);
 		$this->multicell(0,5,"Vous souhaitant bonne réception de la présente,");
