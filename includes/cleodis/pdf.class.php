@@ -6331,8 +6331,8 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
-		$this-> datamandatSepa($id,$s);
-		$this-> datamandatSepa($id,$s);
+		$this->datamandatSepa($id,$s);
+		$this->datamandatSepa($id,$s);
 
 	}
 
@@ -6351,6 +6351,9 @@ class pdf_cleodis extends pdf {
         if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
+
+		$this->image(__PDF_PATH__.$this->logo,15,5,35);
+
 		$this->setfont('arial',"",8);
 		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
 
@@ -10123,7 +10126,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+		$this->image(__PDF_PATH__.$this->logo,15,5,35);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
@@ -10261,7 +10264,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function datamandatSepaNL(){
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+		$this->image(__PDF_PATH__.$this->logo,10,5,30);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"EUROPEES DOMICILIERINGSMANDAAT",0,0,"C");
