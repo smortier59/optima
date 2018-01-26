@@ -2,6 +2,24 @@
 {* Ajout du champ nécessaire pour ce renderer *}
 {util::push($fieldsKeys,"allowCmd")}
 
+ATF.renderer.pdfMission=function(table,field) {
+	return function(filetype, meta, record, rowIndex, colIndex, store) {
+		var idDiv = Ext.id();
+		var id = record.data[table+'__dot__id_mission_fk'];
+		var html = "";
+
+		html += '<a href="attestationSecurite-'+id+'.pdf" target="_blank">';
+		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" /> Att.Sécu';
+		html += '</a><br /><hr>';
+
+		html += '<a href="attestationEmploi-'+id+'.pdf" target="_blank">';
+		html += '<img src="{ATF::$staticserver}images/icones/pdf.png" /> Att.Emploi';
+		html += '</a><br /><hr>';
+
+		return '<div id="'+idDiv+'">'+html+'</div>';
+	}
+};
+
 ATF.renderer.actionsMissionligne=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
 		if(record.json){
