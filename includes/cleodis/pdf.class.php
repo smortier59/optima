@@ -116,13 +116,13 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-			$this->image(__PDF_PATH__.$this->logo,298,5,25);
+
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,30,20,40);
+
 			}
             $this->setfont('arial','',11);
             if ($this->client) {
@@ -3856,7 +3856,7 @@ class pdf_cleodis extends pdf {
 		$this->addpage();
 		$this->unsetHeader();
 		$this->setleftmargin(10);
-		$this->sety(10);
+		$this->sety(20);
 
 		$this->setfont('arial','BU',14);
 		$this->cell(0,5,ATF::societe()->nom($this->client["id_societe"]),0,1,'C');
@@ -7799,10 +7799,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		if(!$this->facturePDF){
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->image(__PDF_PATH__.$this->logo,15,5,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -7896,10 +7896,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,20,30,55);
+				$this->image(__PDF_PATH__.$this->logo,15,15,40);
 				$this->setLeftMargin(60);
 
 			}
