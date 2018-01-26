@@ -8136,15 +8136,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratA4($id) {
 
+		//$this->pdfEnveloppe = true;
+		//$this->noPageNo = true;
+		$this->commandeInit($id);
 
 		if($this->affaire["langue"] !== "FR"){
 			$this->showFiligramme = true;
 		}
 
-
-		//$this->pdfEnveloppe = true;
-		//$this->noPageNo = true;
-		$this->commandeInit($id);
 		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
@@ -8471,13 +8470,15 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function contratA4NL($id) {
 
 		$this->langue = "NL";
-		if($this->affaire["langue"] !== "NL"){
-			$this->showFiligramme = true;
-		}
 
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
+
+		if($this->affaire["langue"] !== "NL"){
+			$this->showFiligramme = true;
+		}
+
 		$this->Open();
 		$this->AddPage();
 		$this->A3 = false;
@@ -10306,11 +10307,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function contratPV($id,$s,$previsu) {
 
+		$this->commandeInit($id,$s,$previsu);
+
 		if($this->affaire["langue"] !== "FR"){
 			$this->showFiligramme = true;
 		}
-
-		$this->commandeInit($id,$s,$previsu);
 
 		$this->Open();
 		$this->AddPage();
@@ -10521,11 +10522,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 01/09/2017
 	*/
 	public function contratPVNL($id,$s,$previsu){
+
+		$this->commandeInit($id,$s,$previsu);
+
 		if($this->affaire["langue"] !== "NL"){
 			$this->showFiligramme = true;
 		}
-
-		$this->commandeInit($id,$s,$previsu);
 
 		$this->Open();
 		$this->AddPage();

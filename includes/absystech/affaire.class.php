@@ -1322,7 +1322,13 @@ class affaire_partenaire extends affaire {
 		if ($jalon['category'] === 'ERGATEL') {
 			$jalon['classname'] = "purple";
 		} else if ($jalon['category'] === 'IRIS') {
-			$jalon['classname'] = "pink";
+			$jalon['classname'] = "mint";
+		} else if ($jalon['category'] === 'SDCT') {
+			$jalon['classname'] = "warning";
+		} else if ($jalon['category'] === 'GENERAL') {
+			$jalon['classname'] = "danger";
+		} else if ($jalon['category'] === 'SAINT-MACLOU') {
+			$jalon['classname'] = "info";
 		} else {
 			$jalon['classname'] = "primary";
 		}
@@ -1367,7 +1373,7 @@ class affaire_partenaire extends affaire {
 						,"template"=>'jalon'
 						,"template_only"=>true
 						,"recipient"=>$settings["mail_to"]
-						,"texte"=> nl2br(utf8_decode($settings['mail_content']))
+						,"texte"=> nl2br($settings['mail_content'])
 						,"societe"=>$societe
 					);
 					$notification = new mail($mail);
