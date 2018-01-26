@@ -116,13 +116,13 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-			$this->image(__PDF_PATH__.$this->logo,298,5,25);
+
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,30,20,40);
+
 			}
             $this->setfont('arial','',11);
             if ($this->client) {
@@ -271,7 +271,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
 
 
-		/*if(ATF::$codename === "cleodis"){
+		if(ATF::$codename === "cleodis"){
 			$this->line(5,160,205,160);
 
 			//Mandat de prelevement
@@ -296,7 +296,7 @@ class pdf_cleodis extends pdf {
 			$this->SetXY(120,248);
 			$this->multicell(100,6,"Lille\n".date('d/m/Y'));
 
-		}*/
+		}
 
 
 		$this->setleftMargin(15);
@@ -3779,6 +3779,42 @@ class pdf_cleodis extends pdf {
 			$this->annexes($annexes);
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
+
+		if($this->fournisseur["revendeur"] == "oui"){
+			ATF::document_revendeur()->q->reset()->where("site_associe", $this->affaire["site_associe"]);
+			$docs = ATF::document_revendeur()->select_all();
+			if($docs){
+				$doc = array();
+				foreach ($docs as $key => $value) {
+					if(!$doc){
+						if($value["id_societe"] === NULL ||  $value["id_societe"] === $this->fournisseur["id_societe"]){
+							$doc = $value;
+						}
+					}else{
+
+						if($doc["id_societe"] === NULL && $value["id_societe"] === $this->fournisseur["id_societe"] ){
+							$doc = $value;
+						}
+					}
+				}
+
+				$filepath = ATF::document_revendeur()->filepath($doc["id_document_revendeur"],"fichier_joint");
+
+				if (file_exists($filepath)){
+					$pageCount = $this->setSourceFile($filepath);
+
+					for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						$this->unsetHeader();
+						$this->unsetFooter();
+			            $tplIdx = $this->ImportPage($pageNo);
+			            $r = $this->getTemplatesize($tplIdx);
+			            $this->AddPage($r['w'] > $r['h'] ? 'L' : 'P', array($r['w'], $r['h']));
+			            $this->useTemplate($tplIdx);
+			        }
+				}
+			}
+		}
+
 	}
 
 	/** Initialise les variables pour générer une demande de refi
@@ -3820,7 +3856,7 @@ class pdf_cleodis extends pdf {
 		$this->addpage();
 		$this->unsetHeader();
 		$this->setleftmargin(10);
-		$this->sety(10);
+		$this->sety(20);
 
 		$this->setfont('arial','BU',14);
 		$this->cell(0,5,ATF::societe()->nom($this->client["id_societe"]),0,1,'C');
@@ -4230,16 +4266,24 @@ class pdf_cleodis extends pdf {
 			$this->factureClassique($global);
 
 
-			if($this->affaire["commentaire_facture"]){
-
-				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
-				$commentaire_facture = strip_tags($commentaire_facture);
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
-				$data[0][0] = $commentaire_facture;
-				$styles[0][0] = $this->colsProduitAlignLeft;
+
+				$commentaire = "";
+
+				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
+				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
+				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
+
+				$data[0][0] = $commentaire;
+				$styles[0][0] = $this->styleDetailsProduit;
+
+
+
+
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 
@@ -7755,10 +7799,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		if(!$this->facturePDF){
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->image(__PDF_PATH__.$this->logo,15,5,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -7852,10 +7896,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,20,30,55);
+				$this->image(__PDF_PATH__.$this->logo,15,15,40);
 				$this->setLeftMargin(60);
 
 			}
@@ -9210,16 +9254,23 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$this->factureClassique($global);
 			}
 
-			if($this->affaire["commentaire_facture"]){
-
-				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
-				$commentaire_facture = strip_tags($commentaire_facture);
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
-				$data[0][0] = $commentaire_facture;
-				$styles[0][0] = $this->colsProduitAlignLeft;
+
+				$commentaire = "";
+
+				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
+				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
+				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
+
+				$data[0][0] = $commentaire;
+				$styles[0][0] = $this->styleDetailsProduit;
+
+
+
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 		}elseif($this->facture['type_facture']=="midas"){
