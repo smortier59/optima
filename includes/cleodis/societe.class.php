@@ -1251,7 +1251,7 @@ class societe_cleodis extends societe {
                             "loyer__dot__avec_option"=>"non"
                           );
 
-               ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
+                ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $post["id_pack_produit"])
                                                        ->where("id_produit", $produit["id_produit"]);
                 $ligne = ATF::pack_produit_ligne()->select_row();
 
@@ -1267,8 +1267,10 @@ class societe_cleodis extends societe {
                 $fournisseur_produit_id = $ligne["id_fournisseur"];
               }
 
-
-
+              $visible = "oui";
+              if($ligne["visible_sur_pdf"] === "non" || "visible" === "non") {
+                $visible = "non";
+              }
 
 
               $produits[] = array(
@@ -1284,8 +1286,11 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__commentaire"=>"",
                                   "devis_ligne__dot__neuf"=>"oui",
                                   "devis_ligne__dot__id_produit_fk"=>$produit["id_produit"],
-                                  "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id
+                                  "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id,
+                                  "devis_ligne__dot__visible"=>$visible
                                 );
+                log::logger($produits , "mfleurquin");
+
               $devis["prix_achat"] += $ligne["prix_achat"];
 
             }
@@ -1591,7 +1596,9 @@ class societe_cleodis extends societe {
           "commande_ligne__dot__id_fournisseur_fk"=>$fournisseur["id_societe"],
           "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
           "commande_ligne__dot__id_produit"=>$value["produit"],
-          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"]
+          "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
+          "commande_ligne__dot__visible"=>$value["visible"]
+
         );
     }
     $values_commande = array( "produits" => json_encode($produits));

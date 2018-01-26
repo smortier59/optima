@@ -1322,13 +1322,7 @@ class affaire_partenaire extends affaire {
 		if ($jalon['category'] === 'ERGATEL') {
 			$jalon['classname'] = "purple";
 		} else if ($jalon['category'] === 'IRIS') {
-			$jalon['classname'] = "mint";
-		} else if ($jalon['category'] === 'SDCT') {
-			$jalon['classname'] = "warning";
-		} else if ($jalon['category'] === 'GENERAL') {
-			$jalon['classname'] = "danger";
-		} else if ($jalon['category'] === 'SAINT-MACLOU') {
-			$jalon['classname'] = "info";
+			$jalon['classname'] = "pink";
 		} else {
 			$jalon['classname'] = "primary";
 		}

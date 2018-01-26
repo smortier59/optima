@@ -370,6 +370,25 @@ ATF.buildGridEditor({
 						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
 					{/if}
 				}
+
+				, {
+					header: 'Option Incluse Obligatoire',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__option_incluse_obligatoire',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse_obligatoire value="oui" function=null}
+					{/if}
+				}
+
+				,{
+					header: 'Afficher sur PDF',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__visible_sur_pdf',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=visible_sur_pdf value="oui" function=null}
+					{/if}
+				}
+
 			{/if}
 
 

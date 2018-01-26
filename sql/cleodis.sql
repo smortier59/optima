@@ -1,5 +1,27 @@
+#17312 - Options incluse Toshiba avec possibilité d'afficher ou non l'option sans
+ALTER TABLE `pack_produit_ligne` ADD `option_incluse_obligatoire` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `option_incluse`;
+ALTER TABLE `pack_produit_ligne` ADD `visible_sur_pdf` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `visible`;
+
+
+#17482 - Revendeurs Toshiba - Ajout document pdf sur le bon de commande
+CREATE TABLE `document_revendeur` (
+  `id_document_revendeur` mediumint(8) UNSIGNED NOT NULL,
+  `id_societe` mediumint(8) UNSIGNED DEFAULT NULL,
+  `site_associe` enum('toshiba') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE `document_revendeur`
+  ADD PRIMARY KEY (`id_document_revendeur`),
+  ADD KEY `id_societe` (`id_societe`);
+
+ALTER TABLE `document_revendeur`  MODIFY `id_document_revendeur` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `document_revendeur` ADD CONSTRAINT `document_revendeur_ibfk_1` FOREIGN KEY (`id_societe`) REFERENCES `societe` (`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
 #17390 - Ajout message sur la facture
-ALTER TABLE `affaire` ADD `commentaire_facture` TEXT NULL COMMENT 'Commentaire qui sera afficher sur les factures clients' AFTER `id_partenaire`;
+ALTER TABLE `affaire` CHANGE `commentaire_facture` `commentaire_facture` VARCHAR(500) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `affaire` ADD `commentaire_facture2` VARCHAR(500) NULL DEFAULT NULL AFTER `commentaire_facture`,
+            ADD `commentaire_facture3` VARCHAR(500) NULL DEFAULT NULL AFTER `commentaire_facture2`;
 
 
 
