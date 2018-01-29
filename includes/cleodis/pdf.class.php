@@ -6352,7 +6352,8 @@ class pdf_cleodis extends pdf {
 
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,15,5,35);
+		$this->image(__PDF_PATH__.$this->logo,90,5,20);
+		$this->ln(10);
 
 		$this->setfont('arial',"",8);
 		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
