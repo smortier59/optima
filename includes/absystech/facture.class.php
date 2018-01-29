@@ -2210,7 +2210,7 @@ class facture_absystech extends facture {
 			$fn = $this->filepath($id_export_comptable,"exportComptable");
 			log::logger("FILENAME = ".$fn,"export-comptable");
 			$file = fopen($fn, "w+");
-			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance");
+			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance","Prélévement");
 			fputcsv($file, $head, ";", chr(0));
 
 			foreach ($facturesATraiter as $id_facture) {
@@ -2231,6 +2231,11 @@ class facture_absystech extends facture {
 					$debit = number_format($ttc, 2, ".", "");
 				}
 
+				$prelevement = "";
+				if ($facture['id_termes'] == 24 || $facture['id_termes'] == 25 || $facture['id_termes'] == 38 || $facture['id_termes'] == 31) {
+					$prelevement = "Prélévement";
+				}
+
 				// Si on a la période, on utilise les debut/fin dans le libellé, sinon la date de facture
 				if ($facture['date_debut_periode']) {
 					$date_ou_periodes = date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($post['date_fin_periode']));
@@ -2247,7 +2252,8 @@ class facture_absystech extends facture {
 					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 					$debit?abs($debit):"",
 					$credit?abs($credit):"",
-					date('d/m/Y',strtotime($facture['date_previsionnelle']))
+					date('d/m/Y',strtotime($facture['date_previsionnelle'])),
+					$prelevement
 				);
 			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
