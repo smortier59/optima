@@ -31,8 +31,6 @@ class pdf_cleodis extends pdf {
 	public $Gentete = 193;
 	public $Bentete = 31;
 
-
-
 	public function filigramme(){
 		$this->setX(40);
 		$this->setY(20);
@@ -116,7 +114,7 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-
+			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
@@ -2115,7 +2113,7 @@ class pdf_cleodis extends pdf {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -2202,7 +2200,7 @@ class pdf_cleodis extends pdf {
 		$this->setEnteteBGColor("white");
 		$this->cadre(320,35,70,35,$cadreLoueur,$loueur);
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -9070,7 +9068,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -9113,7 +9111,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
