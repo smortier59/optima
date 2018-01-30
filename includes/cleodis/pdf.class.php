@@ -192,7 +192,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -8087,7 +8087,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -11832,7 +11832,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->cell(0,4,"SARL CAP RECOUVREMENT",0,1);
 		$this->setfont('arial','',9);
-		$this->cell(0,4,"Adresse 144 rue nationale - 59000 LILLE",0,1);
+		$this->cell(0,4,"Adresse 45 rue Solferino - 59000 LILLE",0,1);
 		$this->cell(0,4,"SIREN 392 468 443 RCS LILLE METROPOLE",0,1);
 		$this->cell(0,4,"Nom et fonction du représentant Olivier DUBENSKI, gérant",0,1);
 
@@ -12504,7 +12504,7 @@ class pdf_cap extends pdf_cleodis {
 		if(!$signature){
 			$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
 			$this->setFont('arial','B',8);
-			$this->cell(0,4,"CAP RECOUVREMENT - 144 rue nationale - 59000 LILLE",0,1,"C");
+			$this->cell(0,4,"CAP RECOUVREMENT - 45 rue Solferino - 59000 LILLE",0,1,"C");
 		}
 
 
@@ -12605,7 +12605,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->cell(0,4,"SARL CAP RECOUVREMENT",0,1);
 		$this->setfont('arial','',9);
-		$this->cell(0,4,"Adresse 144 rue nationale - 59000 LILLE",0,1);
+		$this->cell(0,4,"Adresse 45 rue Solferino - 59000 LILLE",0,1);
 		$this->cell(0,4,"SIREN 392 468 443 RCS LILLE METROPOLE",0,1);
 		$this->cell(0,4,"Nom et fonction du représentant Olivier DUBENSKI, gérant",0,1);
 
@@ -12965,7 +12965,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setleftmargin(120);
 		$this->setY(260);
 		$this->setfont('arial','',8);
-		$this->cell(0,3,"144 rue nationale - 59000 LILLE",0,1,"L");
+		$this->cell(0,3,"45 rue Solferino - 59000 LILLE",0,1,"L");
 		$this->setfont('arial','B',8);
 		$this->cell(35,3,"Tél. : +33 (0) 3 28 16 71 30",0,0,"L");
 		$this->setfont('arial','',8);
