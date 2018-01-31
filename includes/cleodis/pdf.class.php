@@ -26,6 +26,10 @@ class pdf_cleodis extends pdf {
 	public $showFiligramme = false;
 
 
+	//Couleur CLEODIS
+	public $Rentete = 149;
+	public $Gentete = 193;
+	public $Bentete = 31;
 
 	public function filigramme(){
 		$this->setX(40);
@@ -110,13 +114,13 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-			$this->image(__PDF_PATH__.$this->logo,295,5,35);
+			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,75,10,60);
+
 			}
             $this->setfont('arial','',11);
             if ($this->client) {
@@ -137,7 +141,7 @@ class pdf_cleodis extends pdf {
         		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
 				$this->sety(20);
         	}else{
-        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,35); }
+        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,25); }
 
 				$this->sety(20);
         	}
@@ -177,17 +181,18 @@ class pdf_cleodis extends pdf {
 		$this->AddPage();
 
 
+
 		$this->setfillcolor(208,255,208);
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,5,5,40);
+		$this->image(__PDF_PATH__.$this->logo,15,5,15);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -264,6 +269,32 @@ class pdf_cleodis extends pdf {
 		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
 
 
+		if(ATF::$codename === "cleodis"){
+			$this->line(5,160,205,160);
+
+			//Mandat de prelevement
+			$this->image(__PDF_PATH__.'cleodis/mandat-prel.jpg',5,170,200);
+
+			$this->setfont('arial','',11);
+
+			$this->setLeftMargin(45);
+			$this->SetY(195);
+			$this->cell(150,5,$this->client["structure"]." ".$this->client["societe"],0,1);
+
+			$this->multicell(150,4,$this->adresseClient);
+
+			$this->cell(150,5,$this->client["siret"],0,1);
+			$this->cell(150,5,$this->client["BIC"],0,1);
+			$this->cell(150,5,$this->client["IBAN"],0,1);
+
+			$this->SetXY(40,247);
+			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+
+
+			$this->SetXY(120,248);
+			$this->multicell(100,6,"Lille\n".date('d/m/Y'));
+
+		}
 
 
 		$this->setleftMargin(15);
@@ -306,7 +337,7 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,90,55,35);
 			$this->sety(90);
 			$this->setfont('arial','B',12);
-			$this->multicell(0,5,$this->societe['societe'],0,'C');
+			$this->multicell(0,5,/*$this->societe['societe']*/"",0,'C');
 			$this->ln(10);
 			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
 
@@ -1218,6 +1249,7 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,"=> La location évolutive, un moyen efficace");
 		$this->unsetFontDecoration();
+		$this->ln(8);
 		$this->multicell(0,5,"En dehors des services ".$cleodis." qui facilitent la gestion quotidienne et optimisent les coûts de détention de votre parc, le contrat de location constitue intrinsèquement la solution à ces problématiques d'évolution :");
 		$this->setFontDecoration('B');
 		$this->setx(35);
@@ -1296,6 +1328,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','I',8);
 		$this->multicell(0,7,"=>L'évolution et le suivi du contrat de location");
 		$this->unsetFontDecoration();
+		$this->ln(6);
 		$this->multicell(0,5,"La possibilité d'évoluer à tout moment sur tout ou partie des matériels passe par la capacité de ".$cleodis." à savoir re-commercialiser l'ensemble des équipements nécessitant une évolution. Cette valorisation viendra en déduction du nouvel investissement.");
 
 		$this->ln(5);
@@ -1421,6 +1454,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"3.2 Valorisation des matériels sortants pour ".$this->client['societe']);
 		$this->ln(5);
 		$this->setfont('arial','',8);
+		$this->ln(4);
 
 		$this->multicell(0,5,"L'intérêt de la location vient en grande partie de la faculté du loueur à ne vous faire payer que l'utilisation des matériels. Cela est rendu possible par notre capacité à valoriser les matériels à l'issu de la location et/ou lors de la mise en place de la solution locative.");
 		$this->multicell(0,5,"La valeur marché vient alors en déduction du nouvel investissement et participe à la baisse de budget pour ".$this->client['societe'].".");
@@ -2079,7 +2113,7 @@ class pdf_cleodis extends pdf {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor(149,193,31);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -2166,7 +2200,7 @@ class pdf_cleodis extends pdf {
 		$this->setEnteteBGColor("white");
 		$this->cadre(320,35,70,35,$cadreLoueur,$loueur);
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor(149,193,31);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -2707,7 +2741,7 @@ class pdf_cleodis extends pdf {
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
 		} else{
-			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
 		}
 
 
@@ -2745,7 +2779,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(15);
 		$this->setfont('arial','B',10);
@@ -2776,7 +2810,7 @@ class pdf_cleodis extends pdf {
 		}
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,73,220,73);
 
 		$this->setxy(15,75);
@@ -3017,7 +3051,7 @@ class pdf_cleodis extends pdf {
 
 		$this->setY(219);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(64,192,0);
+		$this->SetTextColor(149,193,31);
 		$this->setfont('arial','B',10);
 		if(!$sellsign){
 			$this->multicell(0,5,"Fait en trois exemplaires",0,'C');
@@ -3743,6 +3777,42 @@ class pdf_cleodis extends pdf {
 			$this->annexes($annexes);
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
+
+		if($this->fournisseur["revendeur"] == "oui"){
+			ATF::document_revendeur()->q->reset()->where("site_associe", $this->affaire["site_associe"]);
+			$docs = ATF::document_revendeur()->select_all();
+			if($docs){
+				$doc = array();
+				foreach ($docs as $key => $value) {
+					if(!$doc){
+						if($value["id_societe"] === NULL ||  $value["id_societe"] === $this->fournisseur["id_societe"]){
+							$doc = $value;
+						}
+					}else{
+
+						if($doc["id_societe"] === NULL && $value["id_societe"] === $this->fournisseur["id_societe"] ){
+							$doc = $value;
+						}
+					}
+				}
+
+				$filepath = ATF::document_revendeur()->filepath($doc["id_document_revendeur"],"fichier_joint");
+
+				if (file_exists($filepath)){
+					$pageCount = $this->setSourceFile($filepath);
+
+					for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						$this->unsetHeader();
+						$this->unsetFooter();
+			            $tplIdx = $this->ImportPage($pageNo);
+			            $r = $this->getTemplatesize($tplIdx);
+			            $this->AddPage($r['w'] > $r['h'] ? 'L' : 'P', array($r['w'], $r['h']));
+			            $this->useTemplate($tplIdx);
+			        }
+				}
+			}
+		}
+
 	}
 
 	/** Initialise les variables pour générer une demande de refi
@@ -3784,7 +3854,7 @@ class pdf_cleodis extends pdf {
 		$this->addpage();
 		$this->unsetHeader();
 		$this->setleftmargin(10);
-		$this->sety(10);
+		$this->sety(20);
 
 		$this->setfont('arial','BU',14);
 		$this->cell(0,5,ATF::societe()->nom($this->client["id_societe"]),0,1,'C');
@@ -4194,16 +4264,24 @@ class pdf_cleodis extends pdf {
 			$this->factureClassique($global);
 
 
-			if($this->affaire["commentaire_facture"]){
-
-				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
-				$commentaire_facture = strip_tags($commentaire_facture);
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
-				$data[0][0] = $commentaire_facture;
-				$styles[0][0] = $this->colsProduitAlignLeft;
+
+				$commentaire = "";
+
+				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
+				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
+				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
+
+				$data[0][0] = $commentaire;
+				$styles[0][0] = $this->styleDetailsProduit;
+
+
+
+
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 
@@ -4911,7 +4989,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
 		$this->sety(62);
@@ -4949,7 +5027,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
@@ -5084,7 +5162,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,10,$titre,0,'C');
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,35,220,35);
 		$this->setLeftMargin(10);
 		$this->sety(37);
@@ -5175,7 +5253,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
 		$this->sety(62);
@@ -5259,7 +5337,7 @@ class pdf_cleodis extends pdf {
 			,"font" => "arial"
 			,"border" => 1
 			,"align" => "J"
-			,"bgcolor" => "c7ebb5"
+			,"bgcolor" => "95C11F"
 		);
 
 		$this->headStyle[0] = $newStyleHead;
@@ -6251,8 +6329,8 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
-		$this-> datamandatSepa($id,$s);
-		$this-> datamandatSepa($id,$s);
+		$this->datamandatSepa($id,$s);
+		$this->datamandatSepa($id,$s);
 
 	}
 
@@ -6271,6 +6349,10 @@ class pdf_cleodis extends pdf {
         if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
+
+		$this->image(__PDF_PATH__.$this->logo,90,5,20);
+		$this->ln(10);
+
 		$this->setfont('arial',"",8);
 		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
 
@@ -7719,10 +7801,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		if(!$this->facturePDF){
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->image(__PDF_PATH__.$this->logo,15,3,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -7816,10 +7898,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,220,10,55);
+				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,20,30,55);
+				$this->image(__PDF_PATH__.$this->logo,15,15,40);
 				$this->setLeftMargin(60);
 
 			}
@@ -8005,7 +8087,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -8407,9 +8489,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 
 		$this->setY(219);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(64,192,0);
+		$this->SetTextColor(149,193,31);
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Fait en trois exemplaires",0,'C');
 		$this->SetDrawColor(0,0,0);
@@ -8745,9 +8827,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 
 		$this->setY(219);
-		$this->SetDrawColor(64,192,0);
+		$this->SetDrawColor(149,193,31);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(64,192,0);
+		$this->SetTextColor(149,193,31);
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Opgesteld in drie exemplaren, één voor elk van de partijen.",0,'C');
 		$this->SetDrawColor(0,0,0);
@@ -8986,7 +9068,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor(149,193,31);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -9029,7 +9111,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("base");
+		$this->setEnteteBGColor(149,193,31);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -9174,16 +9256,23 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$this->factureClassique($global);
 			}
 
-			if($this->affaire["commentaire_facture"]){
-
-				$commentaire_facture = str_replace("<br>", "\n", $this->affaire["commentaire_facture"]);
-				$commentaire_facture = strip_tags($commentaire_facture);
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
-				$data[0][0] = $commentaire_facture;
-				$styles[0][0] = $this->colsProduitAlignLeft;
+
+				$commentaire = "";
+
+				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
+				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
+				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
+
+				$data[0][0] = $commentaire;
+				$styles[0][0] = $this->styleDetailsProduit;
+
+
+
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 		}elseif($this->facture['type_facture']=="midas"){
@@ -10036,7 +10125,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+		$this->image(__PDF_PATH__.$this->logo,15,5,35);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
@@ -10174,7 +10263,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function datamandatSepaNL(){
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+		$this->image(__PDF_PATH__.$this->logo,10,5,30);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"EUROPEES DOMICILIERINGSMANDAAT",0,0,"C");
@@ -11743,7 +11832,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->cell(0,4,"SARL CAP RECOUVREMENT",0,1);
 		$this->setfont('arial','',9);
-		$this->cell(0,4,"Adresse 144 rue nationale - 59000 LILLE",0,1);
+		$this->cell(0,4,"Adresse 45 rue Solferino - 59000 LILLE",0,1);
 		$this->cell(0,4,"SIREN 392 468 443 RCS LILLE METROPOLE",0,1);
 		$this->cell(0,4,"Nom et fonction du représentant Olivier DUBENSKI, gérant",0,1);
 
@@ -12415,7 +12504,7 @@ class pdf_cap extends pdf_cleodis {
 		if(!$signature){
 			$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
 			$this->setFont('arial','B',8);
-			$this->cell(0,4,"CAP RECOUVREMENT - 144 rue nationale - 59000 LILLE",0,1,"C");
+			$this->cell(0,4,"CAP RECOUVREMENT - 45 rue Solferino - 59000 LILLE",0,1,"C");
 		}
 
 
@@ -12516,7 +12605,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->cell(0,4,"SARL CAP RECOUVREMENT",0,1);
 		$this->setfont('arial','',9);
-		$this->cell(0,4,"Adresse 144 rue nationale - 59000 LILLE",0,1);
+		$this->cell(0,4,"Adresse 45 rue Solferino - 59000 LILLE",0,1);
 		$this->cell(0,4,"SIREN 392 468 443 RCS LILLE METROPOLE",0,1);
 		$this->cell(0,4,"Nom et fonction du représentant Olivier DUBENSKI, gérant",0,1);
 
@@ -12876,7 +12965,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setleftmargin(120);
 		$this->setY(260);
 		$this->setfont('arial','',8);
-		$this->cell(0,3,"144 rue nationale - 59000 LILLE",0,1,"L");
+		$this->cell(0,3,"45 rue Solferino - 59000 LILLE",0,1,"L");
 		$this->setfont('arial','B',8);
 		$this->cell(35,3,"Tél. : +33 (0) 3 28 16 71 30",0,0,"L");
 		$this->setfont('arial','',8);
