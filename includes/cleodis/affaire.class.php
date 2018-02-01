@@ -1798,9 +1798,15 @@ class affaire_cleodis extends affaire {
 		  $data["file_devis_partenaire"] = file_exists($this->filepath($get["id_affaire"],"devis_partenaire"));
 
 		  foreach ($data["comites"] as $key => $value) {
-			if($value['description']=== 'Comité CLEODIS'){
-				$data["etat_comite_cleodis"] = $value['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
-			}
+		  	if(ATF::affaire()->select($get['id_affaire'],"site_associe") == 'toshiba'){
+		  		if($value['description']=== 'Comité CLEODIS'){
+					$data["etat_comite_cleodis"] = $value['etat'];
+				}
+		  	}else{
+		  		if(ATF::refinanceur()->select($value["id_refinanceur"], 'refinanceur') === 'CLEODIS'){
+					$data["etat_comite_cleodis"] = $value['etat'];
+				}
+		  	}
 		  }
 		  /*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
 		  $data["affaireAffaire"] = $this->sa();
@@ -1872,6 +1878,8 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['actif']) {
+				$this->q->where("affaire.etat","perdu","AND",false,'!=');
+
 			  if ($get['filters']['actif']['encours']) {
 				//contrat en cours
 				$this->q
@@ -1897,6 +1905,8 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['finance']) {
+				$this->q->where("affaire.etat","perdu","AND",false,'!=');
+
 			  $res  = $this->sa($get['tri'],$get['trid'],false, false);
 			  $data["data"] = array();
 
@@ -1957,6 +1967,8 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['administratif']) {
+				$this->q->where("affaire.etat","perdu","AND",false,'!=');
+
 
 			  if ($get['filters']['administratif']['verifier']) {
 				$this->q
@@ -1979,6 +1991,8 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['commande']) {
+				$this->q->where("affaire.etat","perdu","AND",false,'!=');
+
 			  $res = $this->sa($get['tri'],$get['trid'],false, false);
 			  $d = array();
 
@@ -2054,6 +2068,8 @@ class affaire_cleodis extends affaire {
 			}
 
 			if ($get['filters']['contrat']) {
+				$this->q->where("affaire.etat","perdu","AND",false,'!=');
+
 			   $res  = $this->sa($get['tri'],$get['trid'],false, false);
 			   $data["data"] = array();
 
@@ -2165,9 +2181,15 @@ class affaire_cleodis extends affaire {
 
 				// pour chaque affaire on recupere ses comites
 				foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
-					if($comite['description']=== 'Comité CLEODIS'){
-						$data['data'][$key]["etat_comite_cleodis"] = $comite['etat']; //je (Anthony) rajoute cet etat car la propriété "etat_comite" de base renvoyé ne concerne pas le comite cleodis
-					}
+					if(ATF::affaire()->select($data['data'][$key]["id_affaire_fk"],"site_associe") == 'toshiba'){
+				  		if($comite['description']=== 'Comité CLEODIS'){
+							$data['data'][$key]["etat_comite_cleodis"] = $comite['etat'];
+						}
+				  	}else{
+				  		if(ATF::refinanceur()->select($comite["id_refinanceur"], 'refinanceur') === 'CLEODIS'){
+							$data['data'][$key]["etat_comite_cleodis"] = $comite['etat'];
+						}
+				  	}
 				}
 
 				$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
