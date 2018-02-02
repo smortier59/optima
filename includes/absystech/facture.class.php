@@ -404,8 +404,30 @@ class facture_absystech extends facture {
 		$infos["id_user"] = ATF::$usr->getID();
 		$infos["ref"] = ATF::affaire()->getRef($infos["date"],"facture");
 
+		$id_termes = ATF::termes()->decryptId($infos['id_termes']);
+		if (!$id_termes && $infos["id_affaire"]) {
+			$id_termes = ATF::affaire()->select($infos["id_affaire"], "id_termes");
+			$infos['id_termes'] = $id_termes;
+		}
 		if(!$infos["date_previsionnelle"]){
-			$infos["date_previsionnelle"] = date('Y-m-d',strtotime(date("Y-m-d")." + 30 day"));
+			switch ($id_termes) {
+				case 24: // prélèvement mensuel
+				case 25: // prélèvement trimestriel
+				case 31: // prélèvement bancaire
+				case 38: // prélèvement annuel
+					$dayFacture = date('d', strtotime($infos['date']));
+					$monthFacture = date('m', strtotime($infos['date']));
+					if ($dayFacture > 15) $monthFacture += 1; // On incrémente si on a dépassé le 15 du mois
+					if ($monthFacture < 10) $monthFacture = "0".(int)$monthFacture; // On push des 0 significatif pour que la date soit correcte
+					$infos["date_previsionnelle"] = date('Y-'.$monthFacture.'-15',strtotime($infos['date']));
+				break;
+				case 1: // A reception
+					$infos["date_previsionnelle"] = $infos['date'];
+				break;
+				default:
+					$infos["date_previsionnelle"] = date('Y-m-d',strtotime($infos['date']." + 30 day"));
+				break;
+			}
 		}
 
 		$societe=ATF::societe()->select($infos["id_societe"]);
