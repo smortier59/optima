@@ -141,7 +141,7 @@ class pdf_cleodis extends pdf {
         		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
 				$this->sety(20);
         	}else{
-        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,25); }
+        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,20); }
 
 				$this->sety(20);
         	}
@@ -2645,8 +2645,7 @@ class pdf_cleodis extends pdf {
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA3.pdf");
 		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 5, 5, 400, 0, true);
-
+		$r = $this->useTemplate($tplIdx, 0,0,0,0, true);
 	}
 
 	/** CGL d'un PDF d'un contrat en A4
@@ -2660,7 +2659,7 @@ class pdf_cleodis extends pdf {
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cgv-contratA4.pdf");
 		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 5, 5, 200, 0, true);
+		$r = $this->useTemplate($tplIdx, 0,0,0,0, true);
 	}
 
 
@@ -4312,12 +4311,12 @@ class pdf_cleodis extends pdf {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,15,10,55);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->image(__PDF_PATH__.$this->logo,15,5,20);
 			}
 		}
 
 		$this->setMargins(15,30);
-		$this->sety(10);
+		$this->sety(15);
 
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
@@ -4564,7 +4563,7 @@ class pdf_cleodis extends pdf {
 		$this->setHeader();
 		$this->addpage();
 		$this->setMargins(15,30);
-		$this->sety(10);
+		$this->sety(15);
 
 
 
@@ -8194,7 +8193,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function conditionsGeneralesDeLocationA4($type)  {
 		$this->unsetHeader();
 		$this->AddPage();
-
+		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf");
 		$tplIdx = $this->importPage(1);
@@ -8204,7 +8203,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function conditionsGeneralesDeLocationA4NL(){
 		$this->unsetHeader();
 		$this->AddPage();
-
+		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4NL.pdf");
 		$tplIdx = $this->importPage(1);
