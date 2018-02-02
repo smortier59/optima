@@ -214,9 +214,6 @@ class societe_lm extends societe {
 	* @return string HTML de retour
 	*/
 	public function autocompleteFournisseursDeCommande($infos,$reset=true) {
-
-		log::logger($infos , "mfleurquin");
-
 		if ($reset) {
 			$this->q->reset();
 		}

@@ -64,6 +64,8 @@ class mission extends classes_optima {
 		$this->colonnes['bloquees']['update'] = array('ref','etat');
 
 
+		$this->files["DUE"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+
 		$this->fieldstructure();
 
 		$this->field_nom = "[%ref%] %mission%";
@@ -234,7 +236,7 @@ class mission extends classes_optima {
 			$email = ATF::personnel()->select($i['id_personnel'],"email");
 			if (!$email) continue;
 			$mail["objet"] = "Recrutement validé pour la mission : ".$mission['mission'];
-			$mail["from"] = "Emmanuelle Ollivier <eo.manala@hotmail.fr>";
+			$mail["from"] = "Valérie DEBURCQ / Manala <vd.manala@outlook.fr>";
 			$mail["html"] = false;
 			$mail["template"] = 'mission';
 			$mail["texte"] = "";

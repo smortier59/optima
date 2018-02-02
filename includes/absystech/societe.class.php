@@ -130,18 +130,18 @@ class societe_absystech extends societe {
 		$this->selectExtjs=true;
 	}
 /*
-    public function select($id,$f=false) {
-        $r = parent::select($id,$f);
-        $r['societe'] = addslashes($r['societe']);
-        $r['societe'] = str_replace("'","OO",$r['societe']);
-        return $r;
-    }
+		public function select($id,$f=false) {
+				$r = parent::select($id,$f);
+				$r['societe'] = addslashes($r['societe']);
+				$r['societe'] = str_replace("'","OO",$r['societe']);
+				return $r;
+		}
 
-    public function nom($id) {
-        $r = parent::nom($id);
-        $r = addslashes($r);
-        return $r;
-    }
+		public function nom($id) {
+				$r = parent::nom($id);
+				$r = addslashes($r);
+				return $r;
+		}
 */
 
 	/**
@@ -199,10 +199,10 @@ class societe_absystech extends societe {
 	}
 
 	/**
-    * Retourne toutes les sociétés débitrices
-    * @author Jérémie Gwiazdowski <jgw@absystech.fr>
-    * @return array $societe
-    */
+		* Retourne toutes les sociétés débitrices
+		* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+		* @return array $societe
+		*/
 	public function societes_debitrices($limite=NULL){
 		$this->q->reset()->addField('societe.id_societe','id_societe')->addField('societe.societe','societe')->setToString();
 		$subQuery = $this->saCustom();
@@ -285,10 +285,10 @@ class societe_absystech extends societe {
 	}
 
 	/**
-    * Retourne le solde négatif de toutes les sociétés
-    * @author Jérémie Gwiazdowski <jgw@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
-    * @return array
-    */
+		* Retourne le solde négatif de toutes les sociétés
+		* @author Jérémie Gwiazdowski <jgw@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
+		* @return array
+		*/
 	public function getSoldeSNegatives(){
 		$this->q->reset()->setToString()
 						->addCondition("societe.etat","actif");
@@ -306,8 +306,8 @@ class societe_absystech extends societe {
 
 	/**
 	* Retourne le cumul des solde de toutes les sociétés (permet de voir s'il y a du crédit de tickets au client)
-    * @author Jérémie Gwiazdowski <jgw@absystech.fr>
-    * @return array
+		* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+		* @return array
 	*/
 	public function getSoldeS(){
 		$this->q->reset()->setToString();
@@ -324,27 +324,27 @@ class societe_absystech extends societe {
 	}
 
 	/**
-    * Dans le cas où on ajoute des tickets en passant par le select des sociétés
+		* Dans le cas où on ajoute des tickets en passant par le select des sociétés
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
-    * @author Fanny DECLERCK <fdeclerck@absystech.fr>
+		* @author Fanny DECLERCK <fdeclerck@absystech.fr>
 	* @param array $infos $infos['id_societe'] et $infos['credits']
 	* @param array $s
 	* @param file $files
 	* @param array $cadre_refreshed
-    * @return boolean true
-    */
+		* @return boolean true
+		*/
 	public function add_ticket($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		return ATF::gestion_ticket()->add_ticket($infos,$s,$files,$cadre_refreshed);
 	}
 
 	/**
-    * Redirection vers le portail hotline
-    * @author Fanny DECLERCK <fdeclerck@absystech.fr>
-    * @author Jérémie Gwiazdowski <jgw@absystech.fr>
+		* Redirection vers le portail hotline
+		* @author Fanny DECLERCK <fdeclerck@absystech.fr>
+		* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	* @param string $reference la Référence de la société (SLI09110001)
 	* @param string $password_hotline Le mot de passe hotline (divers_5) de la société
-    * @return string $url Le lien direct vers la hotline
-    */
+		* @return string $url Le lien direct vers la hotline
+		*/
 	public function redirect_hotline($reference,$password_hotline){
 		/*lien pour autologin et redirect*/
 		return __HOTLINE_URL__."login.php?login=".base64_encode($reference)."&password=".base64_encode($password_hotline)."&contact=".base64_encode("choix_contact")."&url=".base64_encode(__HOTLINE_URL__."choix_contact.php")."&schema=".base64_encode(ATF::$codename);
@@ -654,7 +654,7 @@ class societe_absystech extends societe {
 		$this->q->reset()
 			->addField("(SUM(facture.prix))","prix")
 			->addJointure("societe","id_societe","facture","id_societe",NULL,NULL,NULL,NULL,"INNER")
-            ->addCondition("facture.date",date('Y-m-d',strtotime("-3 year")),"AND",false,">=")
+						->addCondition("facture.date",date('Y-m-d',strtotime("-3 year")),"AND",false,">=")
 			->addCondition("societe.id_societe",$id_societe);
 		$facture = parent::select_all();
 
@@ -662,7 +662,7 @@ class societe_absystech extends societe {
 		$this->q->reset()
 			->addField("(SUM(IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)))","prix_achat")
 			->addJointure("societe","id_societe","commande","id_societe",NULL,NULL,NULL,NULL,"INNER")
-            ->addCondition("commande.date",date('Y-m-d',strtotime("-3 year")),"AND",false,">=")
+						->addCondition("commande.date",date('Y-m-d',strtotime("-3 year")),"AND",false,">=")
 			->addCondition("societe.id_societe",$id_societe);
 		$commande = parent::select_all();
 
@@ -1122,14 +1122,14 @@ class societe_absystech extends societe {
 	*/
 	public function autocompleteFournisseursDeCommande($infos,$reset=true) {
 		if ($reset) {
-               $this->q->reset();
-       }
-       $this->q
-		    ->from("societe","id_societe","commande_ligne","id_fournisseur")
-		    ->addGroup("societe.id_societe")
-		    ->where("societe.fournisseur","oui");
+							 $this->q->reset();
+			 }
+			 $this->q
+				->from("societe","id_societe","commande_ligne","id_fournisseur")
+				->addGroup("societe.id_societe")
+				->where("societe.fournisseur","oui");
 
-       return parent::autocomplete($infos,false);
+			 return parent::autocomplete($infos,false);
 	}
 
 	/**
@@ -1142,11 +1142,11 @@ class societe_absystech extends societe {
 	*/
 	public function autocompleteFournisseurs($infos,$reset=true) {
 		if ($reset) {
-               $this->q->reset();
-       }
-       $this->q->where("societe.fournisseur","oui");
+							 $this->q->reset();
+			 }
+			 $this->q->where("societe.fournisseur","oui");
 
-       return parent::autocomplete($infos,false);
+			 return parent::autocomplete($infos,false);
 	}
 
 
@@ -1201,7 +1201,7 @@ class societe_absystech extends societe {
 	*/
 	public function update($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
 		$this->infoCollapse($infos);
-        $infos['id_societe'] = $this->decryptId($infos['id_societe']);
+				$infos['id_societe'] = $this->decryptId($infos['id_societe']);
 		$retour=parent::update($infos,$s,$files,$cadre_refreshed);
 
 		if($infos_soc['etat']!=$infos['etat'] && $infos['etat']=='inactif'){
@@ -1216,42 +1216,68 @@ class societe_absystech extends societe {
 
 		$indicator["credit_restant"] = $this->getSolde($infos["id_societe"]);
 
-		ATF::facture()->q->reset()->addAllFields("facture")->where("facture.id_societe",$infos["id_societe"]);
-		ATF::facture()->q->addField("ROUND(IF(facture.date_effective IS NOT NULL
-								,0
-								,IF(
-									(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-									,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-									,(facture.prix*facture.tva)
-								)),2)","solde")
-						    ->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard")
-						    ->addField("IF(facture.etat!='perte'
-										,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
-											,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-											    *ROUND(IF(
-													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-													,facture.prix*facture.tva
-												),2))
-										,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-											    *ROUND(IF(
-													(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-													,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-													,facture.prix*facture.tva
-												),2))>0
-											, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
-										    *ROUND(IF(
-												(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
-												,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
-												,facture.prix*facture.tva
-											),2))
-											, 0 )
-										)
-									,0)","interet")
-						    ->addGroup("facture.id_facture");
+
+		ATF::facture()->q->reset()
+			->addField("facture.ref")
+			->addField("facture.type_facture")
+			->addField("facture.id_societe")
+			->addField("facture.date")
+			->addField("facture.prix")
+			->addField("facture.etat")
+			->addField("facture.date_previsionnelle")
+			->addField("facture.date_effective")
+			->addField("facture.date_relance")
+			->addField("facture.tva")
+			->addField("facture.frais_de_port")
+			->addField("facture.divers_1")
+			->addField("facture.date_modification")
+			->addField("facture.infosSup")
+			->addField("facture.date_debut_periode")
+			->addField("facture.date_fin_periode")
+			->addField("facture.periodicite")
+			->where("facture.id_societe",$infos["id_societe"]);
+
+		// Ajout du solde
+		ATF::facture()->q->addField("ROUND(
+			IF(facture.date_effective IS NOT NULL, 0 ,
+				IF((facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0,
+					(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+					,(facture.prix*facture.tva)
+				)
+			)
+		,2)","solde");
+		// Ajout du retard en jours
+		ATF::facture()->q->addField("TO_DAYS(IF(facture.date_effective IS NOT NULL,facture.date_effective,NOW())) - TO_DAYS(facture.date_previsionnelle)","retard");
+		// Calcul des intérêts
+		ATF::facture()->q->addField("IF(facture.etat!='perte'
+				,IF((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle))>1
+					,40+ ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+							*ROUND(IF(
+							(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+							,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+							,facture.prix*facture.tva
+						),2))
+				,IF( ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+							*ROUND(IF(
+							(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+							,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+							,facture.prix*facture.tva
+						),2))>0
+					, ((((TO_DAYS(IF(facture.date_effective IS NULL,NOW(),facture.date_effective)) - TO_DAYS(facture.date_previsionnelle)) *0.048)/365)
+						*ROUND(IF(
+						(facture.prix*facture.tva)-SUM(facture_paiement.montant)>=0
+						,(facture.prix*facture.tva)-SUM(facture_paiement.montant)
+						,facture.prix*facture.tva
+					),2))
+				, 0 )
+			)
+		,0)","interet");
+		// On groupe par facture
+		ATF::facture()->q->addGroup("facture.id_facture");
+
 		$factures = ATF::facture()->select_all();
 
-		if (!$factures) return null;
+		if (!$factures) return array();
 
 		$indicator["CA"] =
 		$indicator["CA_Prev"] =
@@ -1260,8 +1286,6 @@ class societe_absystech extends societe {
 		$indicator["retard"] = 0;
 
 		$last_year = date("Y")-1;
-
-
 
 		foreach ($factures as $key => $value) {
 			$date_edition = "";
@@ -1295,11 +1319,11 @@ class societe_absystech extends societe {
 
 		$evoCA = ((number_format($indicator["CA"],2,"",",")-number_format($indicator["CA_Prev"],2,"",","))/number_format($indicator["CA_Prev"],2,"",","))*100;
 
-		$indicator["evoCA"] = number_format($evoCA ,0," ",",");
-		$indicator["CA"] = number_format($indicator["CA"] ,2,","," ");
-		$indicator["en_cours"] = number_format($indicator["en_cours"] ,2,","," ");
-		$indicator["retard"] = number_format($indicator["retard"] ,2,","," ");
-		$indicator["delai_paiement"] = number_format($indicator["delai_paiement"]/$nb_delai_paiement,0);
+		$indicator["evoCA"] = $evoCA;
+		$indicator["CA"] = $indicator["CA"];
+		$indicator["en_cours"] = $indicator["en_cours"];
+		$indicator["retard"] = $indicator["retard"];
+		$indicator["delai_paiement"] = $indicator["delai_paiement"]/$nb_delai_paiement;
 
 		$indicator["meteo"] = $this->meteo_icone($this->select($infos["id_societe"], "meteo"));
 
@@ -1415,22 +1439,22 @@ class societe_absystech extends societe {
 		$date_fin = $post["date_fin_rapport"];
 
 		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","id_hotline")
-								  ->addField("gestion_ticket.solde","solde")
-								  ->addField("gestion_ticket.id_facture","id_facture")
-								  ->addField("gestion_ticket.libelle","libelle")
-								  ->addField("gestion_ticket.nbre_tickets","nbre_tickets")
-								  ->addField("gestion_ticket.date","date")
-								  ->addField("gestion_ticket.id_facture","id_facture")
-								  ->addField("hotline.id_contact","id_contact")
-								  ->addField("hotline.id_user","id_user")
-								  ->addField("hotline.hotline","hotline")
-								  ->addField("hotline.facturation_ticket","facturation_ticket")
-								  ->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($post["id_societe"]))
-								  //->whereIsNotNull("id_hotline")
-								  ->addCondition("gestion_ticket.date",util::formatDate($date_fin),"AND",false,"<=")
-								  ->addCondition("gestion_ticket.date",util::formatDate($date_debut),"AND",false,">=")
-								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
-								  ->addOrder("gestion_ticket.date");
+									->addField("gestion_ticket.solde","solde")
+									->addField("gestion_ticket.id_facture","id_facture")
+									->addField("gestion_ticket.libelle","libelle")
+									->addField("gestion_ticket.nbre_tickets","nbre_tickets")
+									->addField("gestion_ticket.date","date")
+									->addField("gestion_ticket.id_facture","id_facture")
+									->addField("hotline.id_contact","id_contact")
+									->addField("hotline.id_user","id_user")
+									->addField("hotline.hotline","hotline")
+									->addField("hotline.facturation_ticket","facturation_ticket")
+									->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($post["id_societe"]))
+									//->whereIsNotNull("id_hotline")
+									->addCondition("gestion_ticket.date",util::formatDate($date_fin),"AND",false,"<=")
+									->addCondition("gestion_ticket.date",util::formatDate($date_debut),"AND",false,">=")
+									->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
+									->addOrder("gestion_ticket.date");
 		$result = ATF::gestion_ticket()->sa();
 
 		$res = ATF::pdf()->generic("recapHotline",array("data"=>$result, "debut"=>$date_debut, "fin"=>$date_fin, "societe"=>$post["id_societe"]) ,true);

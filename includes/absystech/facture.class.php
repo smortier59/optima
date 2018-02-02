@@ -415,7 +415,6 @@ class facture_absystech extends facture {
 		$assistantDirection = 9;
 		if(ATF::$codename == "att") $assistantDirection = 5;
 
-
 		if($tva!=$infos["tva"] && (ATF::$usr->get("id_profil")!=1 && ATF::$usr->get("id_profil")!=$assistantDirection )){
 			$profil=ATF::profil()->select(1);
 			ATF::$msg->addNotice(
@@ -474,20 +473,11 @@ class facture_absystech extends facture {
 		//*****************************Transaction********************************
 
 			// Affaire
-			if($infos["id_affaire"]){
-				$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
-				if ($etat_affaire=="devis" || $etat_affaire=="commande") {
-					$affaire["id_affaire"]=$infos["id_affaire"];
-					$affaire["etat"]="facture";
-					ATF::affaire()->u($affaire,$s);
-				}
-			} else {
-				$affaire["id_societe"]=$infos["id_societe"];
+			$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
+			if ($etat_affaire=="devis" || $etat_affaire=="commande") {
+				$affaire["id_affaire"]=$infos["id_affaire"];
 				$affaire["etat"]="facture";
-				$affaire["date"]=$infos["date"];
-				$affaire["forecast"]=100;
-				$affaire["affaire"]=$infos["affaire_sans_devis_libelle"];
-				$infos["id_affaire"]=ATF::affaire()->insert($affaire,$s);
+				ATF::affaire()->u($affaire,$s);
 			}
 			unset($infos["affaire_sans_devis_libelle"]);
 
@@ -1648,6 +1638,8 @@ class facture_absystech extends facture {
 			$facture["date_previsionnelle"]="";
 			$facture["date_effective"]="";
 			$facture["date_relance"]="";
+			$facture["id_export_comptable"]=NULL;
+			$facture["id_echeancier"]=NULL;
 		}
 		return $facture;
 	}
@@ -2166,11 +2158,9 @@ class facture_absystech extends facture {
 		ATF::db($this->db)->begin_transaction();
 		$facturesATraiter = explode(",",$post['factures']);
 		try {
-
 			if (!$post['date_debut']) throw new Exception("DATE_DEBUT_MISSING",1001);
 			if (!$post['date_fin']) throw new Exception("DATE_FIN_MISSING",1002);
 			if (!$post['factures']) throw new Exception("FACTURES_MISSING",1003);
-
 
 			// FIRST STEP : enregistrer les références comptable si il y en a
 			$countRefUpdate = 0;
@@ -2178,6 +2168,7 @@ class facture_absystech extends facture {
 			if ($post['ref_comptable']) {
 				log::logger($post['ref_comptable'],"export-comptable");
 				foreach ($post['ref_comptable'] as $id_societe=>$ref_comptable) {
+					if (strlen($ref_comptable)>12) throw new Exception("REF_COMPTABLE_TOO_LONG",1004);
 					$toUpdate = array("id_societe"=>$id_societe,"ref_comptable"=>$ref_comptable);
 					log::logger("TO UPDATE","export-comptable");
 					log::logger($toUpdate,"export-comptable");
@@ -2211,8 +2202,8 @@ class facture_absystech extends facture {
 			$fn = $this->filepath($id_export_comptable,"exportComptable");
 			log::logger("FILENAME = ".$fn,"export-comptable");
 			$file = fopen($fn, "w+");
-			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit");
-			fputcsv($file, $head, ";");
+			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance");
+			fputcsv($file, $head, ";", chr(0));
 
 			foreach ($facturesATraiter as $id_facture) {
 				$facture = ATF::facture()->select($id_facture);
@@ -2222,70 +2213,151 @@ class facture_absystech extends facture {
 				$tvamnt = $ttc - $facture['prix'];
 				$tva = ($facture['tva'] - 1) * 100;
 
+				$credit = false;
+				$debit = false;
+				$type_parent = false;
+				if ($facture['type_facture']=='avoir') {
+					$type_parent = ATF::facture()->select($facture['id_facture_parente'],'type_facture');
+					$credit = number_format($ttc, 2, ".", "");
+				} else {
+					$debit = number_format($ttc, 2, ".", "");
+				}
+
+				// Si on a la période, on utilise les debut/fin dans le libellé, sinon la date de facture
+				if ($facture['date_debut_periode']) {
+					$date_ou_periodes = date("Y-m-d",strtotime($facture['date_debut_periode']))." au ".date("Y-m-d",strtotime($facture['date_fin_periode']));
+				} else {
+					$date_ou_periodes = date("Y-m-d",strtotime($facture['date']));
+				}
+
 				$line = array(
 					"VT",
 					date('d/m/Y',strtotime($facture['date'])),
 					$societe['ref_comptable'] ? $societe['ref_comptable'] : $post['ref_comptable'][$societe['id_societe']],
 					$societe['societe'],
 					$facture['ref'],
-					$facture['ref']."-".date('d/m/Y',strtotime($facture['date'])),
-					number_format($ttc, 2, ",", ""),
-					""
+					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
+					$debit?abs($debit):"",
+					$credit?abs($credit):"",
+					date('d/m/Y',strtotime($facture['date_previsionnelle']))
 				);
-			  fputcsv($file, $line, ";");
+			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
 
-			  // LIGNES VENTILEES
-				$lignes = $this->getLignes($id_facture);
-				$ventilation = array();
-			  foreach ($lignes as $ligne) {
-			  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
-			  }
-			  foreach ($ventilation as $id_compte=>$total) {
-				  // LIGNES DE VENTILATION
+			  if ($facture['type_facture']=='acompte' || $type_parent == 'acompte') {
+			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
+					$facture['prix'] = number_format($facture['prix'], 2, ".", "");
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
-						ATF::compte_absystech()->select($id_compte,'code'),
+						"419000",
 						$societe['societe'],
 						$facture['ref'],
-						$facture['ref']."-".$societe['societe'],
-						"",
-						number_format($total, 2, ",", "")
+						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
+						$facture['type_facture']=="avoir"?abs($facture['prix']):"",
+						$facture['type_facture']=="avoir"?"":abs($facture['prix']),
+						date('d/m/Y',strtotime($facture['date_previsionnelle']))
 					);
-				  fputcsv($file, $line, ";");
+				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
-			  }
 
+			  } else {
+				  // LIGNES VENTILEES
+					$lignes = $this->getLignes($id_facture);
+
+
+					$ventilation = array();
+				  foreach ($lignes as $ligne) {
+				  	$ventilation[$ligne['id_compte_absystech']] += $ligne['prix']*$ligne['quantite'];
+				  }
+				  foreach ($ventilation as $id_compte=>$total) {
+						$credit = false;
+						$debit = false;
+						if ($facture['type_facture']=='avoir' || $total<0) {
+							$debit = number_format($total, 2, ".", "");
+						} else {
+							$credit = number_format($total, 2, ".", "");
+						}
+
+					  // LIGNES DE VENTILATION
+						$line = array(
+							"VT",
+							date('d/m/Y',strtotime($facture['date'])),
+							ATF::compte_absystech()->select($id_compte,'code'),
+							$societe['societe'],
+							$facture['ref'],
+							$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
+							$debit?abs($debit):"",
+							$credit?abs($credit):"",
+							date('d/m/Y',strtotime($facture['date_previsionnelle']))
+						);
+					  fputcsv($file, $line, ";", chr(0));
+					  fputs("\n");
+
+				  }
+
+				  // SI on est dans une facture de solde, il faut rappeler les facture d'acompte qui lui sont lié (par l'affaire et le type)
+  			  if ($facture['type_facture']=='solde') {
+  			  	$this->q->reset()->where("id_societe",$facture['id_societe'])->where("id_affaire",$facture['id_affaire'])->where("type_facture","acompte");
+  			  	foreach ($this->sa() as $acompte) {
+							$acompte['prix'] = number_format($acompte['prix'], 2, ".", "");
+							$line = array(
+								"VT",
+								date('d/m/Y',strtotime($facture['date'])),
+								"419000",
+								$societe['societe'],
+								$facture['ref'],
+								$societe['societe']." - ".$facture['ref']." - ".date("Y-m-d",strtotime($facture['date'])),
+								abs($acompte['prix']),
+								"",
+								date('d/m/Y',strtotime($facture['date_previsionnelle']))
+							);
+						  fputcsv($file, $line, ";", chr(0));
+						  fputs("\n");
+
+  			  	}
+  			  }
+				}
 			  // FRAIS DE PORT
-			  if ($facture['frais_de_port'] > 0) {
+			  // Uniquement si présent, ou si facture type différend d'une facture d'acompte.
+			  if ($facture['frais_de_port'] > 0 && ($facture['type_facture']!='acompte' || $type_parent == 'acompte')) {
 					$line = array(
 						"VT",
 						date('d/m/Y',strtotime($facture['date'])),
 						"708500",
-						"FRAIS DE PORT",
+						$societe['societe'],
 						$facture['ref'],
-						$facture['ref']."-".$societe['societe'],
+						$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
 						"",
-						number_format($facture['frais_de_port'], 2, ",", "")
+						number_format($facture['frais_de_port'], 2, ".", ""),
+						date('d/m/Y',strtotime($facture['date_previsionnelle']))
 					);
-				  fputcsv($file, $line, ";");
+				  fputcsv($file, $line, ";", chr(0));
 				  fputs("\n");
 			  }
 
+				$credit = false;
+				$debit = false;
+				if ($facture['type_facture']=='avoir') {
+					$debit = number_format($tvamnt, 2, ".", "");
+				} else {
+					$credit = number_format($tvamnt, 2, ".", "");
+				}
 			  // LIGNES DE TVA
 				$line = array(
 					"VT",
 					date('d/m/Y',strtotime($facture['date'])),
 					"445710",
-					"TVA COLLECTEE ".$tva."%",
+					$societe['societe'],
 					$facture['ref'],
-					$facture['ref']."-".$societe['societe'],
-					"",
-					number_format($tvamnt, 2, ",", "")
+					$societe['societe']." - ".$facture['ref']." - ".$date_ou_periodes,
+					$debit?abs($debit):"",
+					$credit?abs($credit):"",
+					date('d/m/Y',strtotime($facture['date_previsionnelle']))
 				);
-			  fputcsv($file, $line, ";");
+			  fputcsv($file, $line, ";", chr(0));
 			  fputs("\n");
+
 
 			}
 			fclose($file);

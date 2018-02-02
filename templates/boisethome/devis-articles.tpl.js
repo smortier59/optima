@@ -109,7 +109,6 @@ return ATF.buildGridEditor({
 	},
 	listeners: {
 		'cellclick': function(cell){
-			console.log(cell,arguments);
 		},
 		'afteredit': function(field, newVal, oldVal){
 			updateCustomFields();

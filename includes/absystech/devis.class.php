@@ -708,7 +708,7 @@ class devis_absystech extends devis {
 		if(!$infos["ref"]){
 			$infos["ref"] = ATF::affaire()->getRef($infos["date"],"devis");
 		}
-		$infos["id_user"] = ATF::$usr->getID();
+		if (!$infos["id_user"]) $infos["id_user"] = ATF::$usr->getID();
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 		if($societe["id_pays"]!="FR") $infos["tva"] =  1;
@@ -1533,7 +1533,7 @@ class devis_absystech extends devis {
 
     $this->q->reset();
 
-    if ($get['id_devis']) $colsData = array("devis.*");
+    if ($get['id']) $colsData = array("devis.*");
 
     $this->q->addField($colsData);
 
@@ -1563,9 +1563,9 @@ class devis_absystech extends devis {
 		$this->q->where("devis.etat","perdu","OR","etatdevis");
 	}
 
-    if ($get['id_devis']) {
+    if ($get['id']) {
 
-		$this->q->where("devis.id_devis",$get['id_devis'])->setCount(false)->setDimension('row');
+		$this->q->where("devis.id_devis",$get['id'])->setCount(false)->setDimension('row');
 		$data = $this->sa();
 
 		foreach ($data as $key => $value) {
@@ -1583,8 +1583,8 @@ class devis_absystech extends devis {
 
 			$data["fichier_joint"] = $data["documentAnnexes"] = false;
 
-			if (file_exists($this->filepath($get['id_devis'],"fichier_joint"))) $data["fichier_joint"] = true;
-			if (file_exists($this->filepath($get['id_devis'],"documentAnnexes"))) $data["documentAnnexes"] = true;
+			if (file_exists($this->filepath($get['id'],"fichier_joint"))) $data["fichier_joint"] = true;
+			if (file_exists($this->filepath($get['id'],"documentAnnexes"))) $data["documentAnnexes"] = true;
 
 			$data["id_societe_fk"] = $data["societe"]["societe"];
 			$data["id_contact_fk"] = $data["contact"]["nom"]." ".$data["contact"]["prenom"];
@@ -1607,9 +1607,9 @@ class devis_absystech extends devis {
 
 
 
-    if($get['id_devis']){
+    if($get['id']){
     	// GET d'un élément, on ajoute ses lignes récurrentes et ponctuelles
-    	$data['ligne'] = ATF::devis_ligne()->select_special('id_devis', $get['id_devis']);
+    	$data['ligne'] = ATF::devis_ligne()->select_special('id_devis', $get['id']);
 
 		foreach($data["ligne"] as $k => $v){
 			$data["ligne"][$k]["id_fournisseur_fk"] = $data["ligne"][$k]["id_compte_absystech_fk"] = " - ";

@@ -1,6 +1,6 @@
 <?
 require_once dirname(__FILE__)."/../pdf.class.php";
-/**  
+/**
 * @package Optima
 * @subpackage Manala
 */
@@ -17,7 +17,7 @@ class pdf_manala extends pdf {
 		,"border" => ""
 		,"align" => "L"
 	);
-	
+
 	private $leftStyleItalique = array(
 		"size" => 8
 		,"color" => 000000
@@ -26,7 +26,7 @@ class pdf_manala extends pdf {
 		,"border" => ""
 		,"align" => "L"
 	);
-	
+
 
 	private $rightStyle = array(
 		 "size" => 8
@@ -35,7 +35,7 @@ class pdf_manala extends pdf {
 		,"border" => ""
 		,"align" => "R"
 	);
-		
+
 	private $boldStyle = array(
 		 "size" => 8
 		,"color" => 000000
@@ -44,7 +44,7 @@ class pdf_manala extends pdf {
 		,"align" => "L"
 		,"decoration" => "B"
 	);
-	
+
 	var $repeatEntete = true;
 
 	private $noPageNo = true;
@@ -57,7 +57,7 @@ class pdf_manala extends pdf {
 		if ($this->getHeader()) return false;
 
 	}
-	
+
 	public function Footer() {
 		if($this->previsu){
 			$this->settextcolor('black');
@@ -93,7 +93,7 @@ class pdf_manala extends pdf {
 		$this->settextcolor("ff5c9c");
 		$this->multicell(0,15,"Prestation",0,"R");
 		if ($data['client']) $this->multicell(0,15,$data['client'],0,"R");
-		if ($data['date']) $this->multicell(0,15,$data['date'],0,"R");
+		if ($data['date']) $this->multicell(0,15,date('d/m/Y',strtotime($data['date'])),0,"R");
 		if ($data['lieu']) $this->multicell(0,15,$data['lieu'],0,"R");
 		$this->settextcolor("000000");
 
@@ -119,7 +119,7 @@ class pdf_manala extends pdf {
 			$fp1 = ATF::personnel()->filepath($p['id_personnel'],"photo_identite");
 			if (file_exists($fp1)) {
 				$x = 15;
-				$y = 50; 
+				$y = 50;
 				$w = 80;
 				$h = false;
 				$type = "jpg";
@@ -132,7 +132,7 @@ class pdf_manala extends pdf {
 			$fp2 = ATF::personnel()->filepath($p['id_personnel'],"photo_pleine");
 			if (file_exists($fp2)) {
 				$x = 200;
-				$y = 20; 
+				$y = 20;
 				$w = false;
 				$h = 160;
 				$type = "jpg";
@@ -209,7 +209,7 @@ class pdf_manala extends pdf {
 										->setStrict()
 										->setLimit(3)
 										->addOrder("date","desc");
-				$lm = ATF::mission_ligne()->sa(); 
+				$lm = ATF::mission_ligne()->sa();
 
 				$clients = "";
 				foreach ($lm as $i) {
@@ -241,7 +241,7 @@ class pdf_manala extends pdf {
 		$this->multicell(0,10,ATF::societe()->maSociete['adresse']);
 		$this->multicell(0,10,ATF::societe()->maSociete['adresse_2']);
 		$this->multicell(0,10,ATF::societe()->maSociete['cp'].' '.ATF::societe()->maSociete['ville']);
-		
+
 		$this->ln(5);
 
 		$this->multicell(0,10,"Votre contact : Emmanuelle OLLIVIER");
@@ -262,6 +262,7 @@ class pdf_manala extends pdf {
 
 
 	}
+
 
 	public function contratTravail($id) {
 		$el = ATF::mission_ligne()->select($id);
@@ -289,7 +290,7 @@ class pdf_manala extends pdf {
 			ATF::societe()->getAddress(ATF::societe()->maSociete['id_societe'],true),
 			"N° de SIRET : ".ATF::societe()->maSociete['siret'],
 			"Code NAF : ".ATF::societe()->maSociete['naf'],
-			"Représentée par Melle Emmanuelle OLLIVIER"
+			"Représentée par Mme Emmanuelle OLLIVIER"
 		);
 
 		$this->cadre(15,30,85,30,$lasociete,"La société");
@@ -304,74 +305,132 @@ class pdf_manala extends pdf {
 
 		$this->cadre(110,30,85,30,$lepersonnel,"Le salarié");
 
-		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article 1 : Objet / Fonction");
-		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Le salarié est engagé le ".ATF::$usr->date_trans($mission['date_debut'],true,true)." comme ".$el['poste'].". Le présent contrat est conclu dans le cadre d’un plan d’animation pour la société ".$client['societe']." en raison d’un surcroît de travail lié avec notre client.");
+
+
+		$y = $this->getY();
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article 2 : Durée / horaires");
+		$this->multicell(90,5,"Article 1 : Objet / Fonction");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Le présent contrat est conclu pour commencer le ".ATF::$usr->date_trans($mission['date_debut'],true,true)." et finir le ".ATF::$usr->date_trans($mission['date_fin'],true,true)." pour un nombre total d’heures travaillées de : ".$el['heure_totale']." heure(s). Les horaires journaliers sont définis dans le dossier de travail remis au salarié. En cas de nécessité, le salarié devra assurer d’éventuels dépassements d’horaires à la demande de son supérieur hiérarchique.");
+		$this->multicell(90,4,"Le salarié est engagé le :");
+
+		$this->setFont('arial','B',8);
+		$this->multicell(90,4,ATF::$usr->date_trans($mission['date_debut'],true,true)." en tant que ".$el['poste']);
+		$this->setFont('arial','',8);
+		$this->multicell(90,4,"Le présent contrat est conclu dans le cadre d’un plan d’animation pour la société ".$client['societe']." en raison d’un surcroît de travail lié avec notre client.",0,"FJ");
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Articles 3 : Fonctions et obligations professionnelles");
+		$this->multicell(90,5,"Article 2 : Durée / horaires");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Les attributions du salarié sont définies dans le dossier de travail remis au salarié. Des tâches annexes pourront être confiées au salarié lorsque la bonne marche de l’entreprise l’exigera. Le salarié devra impérativement respecter les consignes que lui signifiera son supérieur, de même que les consignes générales de travail comme le respect des horaires, itinéraires, délais et autres informations. A défaut, il s’exposera à des sanctions pouvant aller jusqu’à la rupture du présent contrat. Compte tenu de la nature de l’activité et des fonctions du salarié, celui-ci devra scrupuleusement observer les règles de politesse et de bienséance. Toute attitude de nature à nuire à l’image de la société pourra entraîner la rupture immédiate du contrat sans rémunération. Étant donné la nature de ses fonctions, le salarié devra respecter la plus grande discrétion et observer en toute circonstance une obligation de réserve et de confidentialité.");
+		$this->multicell(90,4,"Le présent contrat est conclu pour commencer :");
+		$this->setFont('arial','B',8);
+		$this->multicell(90,4,"du ".ATF::$usr->date_trans($mission['date_debut'],true,true)." au ".ATF::$usr->date_trans($mission['date_fin'],true,true)." pour un nombre total d’heures travaillées de ".$el['heure_totale']." heure(s).");
+		$this->setFont('arial','',8);
+		$this->multicell(90,4,"Les horaires journaliers sont définis dans le dossier de travail remis au salarié. En cas de nécessité, le salarié devra assurer d’éventuels dépassements d’horaires à la demande de son supérieur hiérarchique",0,"FJ");
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article 4 : Lieu de travail");
+		$this->multicell(90,5,"Article 3 : Fonctions et obligations professionnelles");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Le salarié exercera ses fonctions à l’adresse indiquée dans le dossier de travail remis au salarié et à tout autre endroit où les nécessités du service l’exigeront.");
+		$this->multicell(90,4,"Les attributions du salarié sont définies dans le dossier de travail remis au salarié. Des tâches annexes pourront être confiées au salarié lorsque la bonne marche de l’entreprise l’exigera. Le salarié devra impérativement respecter les consignes que lui signifiera son supérieur, de même que les consignes générales de travail comme le respect des horaires, itinéraires, délais et autres informations. A défaut, il s’exposera à des sanctions pouvant aller jusqu’à la rupture du présent contrat. Compte tenu de la nature de l’activité et des fonctions du salarié, celui-ci devra scrupuleusement observer les règles de politesse et de bienséance. Toute attitude de nature à nuire à l’image de la société pourra entraîner la rupture immédiate du contrat sans rémunération. Étant donné la nature de ses fonctions, le salarié devra respecter la plus grande discrétion et observer en toute circonstance une obligation de réserve et de confidentialité.",0,"FJ");
+
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article 5 : Rémunération / congés");
+		$this->multicell(90,5,"Article 4 : Lieu de travail");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Le salarié percevra une rémunération brute de ".$el['prix']." € de l’heure. A l’issue de ce contrat, le salarié percevra des indemnités de fin de mission : une indemnité de congés payés de 10% ainsi qu’une indemnité de précarité de 10% également.");
+		$this->multicell(90,4,"Le salarié exercera ses fonctions à :",0,"FJ");
+		$this->setFont('arial','B',8);
+		$this->multicell(90,4,$mission["lieu"],0,"FJ");
+
+
+		$this->setFont('arial','B',10);
+		$this->multicell(90,5,"Article 5 : Rémunération / congés");
+		$this->setFont('arial','',8);
+		$this->multicell(90,4,"Le salarié percevra une rémunération brute de ".$el['prix']." € de l’heure. A l’issue de ce contrat, le salarié percevra des indemnités de fin de mission : une indemnité de congés payés de 10% ainsi qu’une indemnité de précarité de 10% également.",0,'FJ');
+
+
+		$this->setLeftMargin(110);
+		$this->setY($y);
+
+
 
 		$numarticle = 6;
+
+		if ($el['panier_repas']=="oui") {
+			$this->setFont('arial','B',10);
+			$this->multicell(90,5,"Article ".$numarticle." : Indemnités repas");
+			$this->setFont('arial','',8);
+			$this->multicell(90,4,"Le salarié percevra une indemnité forfaitaire de panier-repas de ",0,'FJ');
+			$this->setFont('arial','B',8);
+			$this->multicell(90,4,$el["prix_panier_repas"]." € par jour.");
+			$this->setFont('arial','',8);
+			$numarticle++;
+		}
+
 		if ($el['defraiement']=="oui") {
 			$this->setFont('arial','B',10);
-			$this->multicell(0,5,"Article ".$numarticle." : Indemnités kilométriques");
+			$this->multicell(90,5,"Article ".$numarticle." : Indemnités kilométriques");
 			$this->setFont('arial','',8);
-			$this->multicell(0,4,"Dans le cas où l’utilisation de son véhicule personnel est constatée, le salarié percevra des indemnités kilométriques depuis son domicile jusqu’à son lieu de travail aller et retour : les indemnités kilométriques sont calculées à partir du site Mappy.fr. Cette indemnité est plafonné à 13€.");
+			/*$this->multicell(90,4,"Dans le cas où l’utilisation de son véhicule personnel est constatée, le salarié percevra des indemnités kilométriques depuis son domicile jusqu’à son lieu de travail aller et retour : les indemnités kilométriques sont calculées à partir du site Mappy.fr. Cette indemnité est plafonné à 13€.");*/
+			$this->multicell(90,4,"Le salarié percevra des indemnités kilométriques à hauteur de ",0,'FJ');
+			$this->setFont('arial','B',8);
+			$this->multicell(90,4,$el['indemnite_defraiement']."€/km.");
+			$this->setFont('arial','',8);
 			$numarticle++;
 		} else if ($el['defraiement']=="forfait") {
 			$this->setFont('arial','B',10);
-			$this->multicell(0,5,"Article ".$numarticle." : Indemnités kilométriques");
+			$this->multicell(90,5,"Article ".$numarticle." : Indemnités kilométriques");
 			$this->setFont('arial','',8);
-			$this->multicell(0,4,"Dans le cas où l’utilisation de son véhicule personnel est constatée, le salarié percevra des indemnités kilométriques depuis son domicile jusqu’à son lieu de travail aller et retour : les indemnités kilométriques sont calculées au forfait pour un montant de ".$el['indemnite_defraiement']."€. ");
+			$this->multicell(90,4,"Dans le cas où l’utilisation de son véhicule personnel est constatée, le salarié percevra des indemnités kilométriques depuis son domicile jusqu’à son lieu de travail aller et retour : les indemnités kilométriques sont calculées au forfait pour un montant de ".$el['indemnite_defraiement']."€. ");
 			$numarticle++;
 		}
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article ".$numarticle." : Annulation");
+		$this->multicell(90,5,"Article ".$numarticle." : Annulation");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"En cas d’annulation moins de 24 heures avant la date de l’animation, le salarié percevra une indemnité égale à 20% de sa rémunération brute hors primes et hors indemnités repas. En cas d’annulation plus de 24 heures avant la date de l’animation, le salarié ne percevra aucune rémunération ni dédommagement.");
+		$this->multicell(90,4,"En cas d’annulation moins de 24 heures avant la date de l’animation, le salarié percevra une indemnité égale à 20% de sa rémunération brute hors primes et hors indemnités repas. En cas d’annulation plus de 24 heures avant la date de l’animation, le salarié ne percevra aucune rémunération ni dédommagement.",0,'FJ');
 		$numarticle++;
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article ".$numarticle." : Cession de droit à l’image");
+		$this->multicell(90,5,"Article ".$numarticle." : Cession de droit à l’image");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Le salarié autorise la société à utiliser des photos du salarié prises lors de son animation. Ces photos sont réservées à un usage très limité de reporting pour les besoins du client de la société. Ces photos pourront également être utilisées par la société pour son site internet ou des présentations de son activité à des prospects commerciaux. Cette cession de droit à l’image n’a pas de limite de durée et ne donne droit à aucune contrepartie financière au profit du salarié.");
+		$this->multicell(90,4,"Le salarié autorise la société à utiliser des photos du salarié prises lors de son animation. Ces photos sont réservées à un usage très limité de reporting pour les besoins du client de la société. Ces photos pourront également être utilisées par la société pour son site internet ou des présentations de son activité à des prospects commerciaux. Cette cession de droit à l’image n’a pas de limite de durée et ne donne droit à aucune contrepartie financière au profit du salarié.",0,"FJ");
 		$numarticle++;
 
 		$this->setFont('arial','B',10);
-		$this->multicell(0,5,"Article ".$numarticle." : Retraite");
+		$this->multicell(90,5,"Article ".$numarticle." : Avantages sociaux");
 		$this->setFont('arial','',8);
-		$this->multicell(0,4,"Les cotisations seront versées aux organismes sociaux compétents.");
+
+		$text = ucfirst($personnel['civilite'])." ".$personnel['nom']." ".$personnel['prenom']." bénéficiera des lois sociales instituées en faveur des salariés notamment en matière de sécurité sociale et en ce qui concerne le régime de : retraite complémentaire et santé";
+
+		$this->multicell(90,4,$text,0,'FJ');
+		$this->multicell(90,4,ucfirst($personnel['civilite'])." ".$personnel['nom']." ".$personnel['prenom']." relève de la catégorie Employé, et sera affiliée dès son entrée de la Société aux caisses correspondantes à sa qualification:",0,"FJ");
+
+		$this->multicell(90,4,"       - Pour la retraite au Groupe KLESIA : 4-22 Rue Marie-Georges Piquart, 75017 Paris\n       - Pour le régime de frais de santé a QUATREM : 59-61 rue de la Fayette, 75009 Paris");
 		$numarticle++;
 
-		$this->ln(5);
-		$this->multicell(0,5,"Fait en 2 exemplaires le ".date("d/m/Y"));
+		$this->setFont('arial','B',10);
+		$this->multicell(90,5,"Article ".$numarticle." : Tenue de travail");
+		$this->setFont('arial','',8);
+		$this->multicell(90,4,"Dans le cas où la société Manala est amenée à prêter au salarié une tenue de travail et/ou accessoire et/ou matériel informatique type tablette ou ordinateur, le salarié s'engage à en prendre l'entière responsabilité. Il tiendra au salarié d'en prendre soin et de restituer l'ensemble dans son intégralité à son employeur dans un délai de deux semaines maximum, sous peine de retenue sur salaire.",0,'FJ');
+
+
+		$this->setY(224);
+		$this->setLeftMargin(15);
 
 		$this->ln(5);
+		$this->ln(5);
+		$this->multicell(0,5,"Fait à Tourcoing, le ".date("d/m/Y"));
+
+
+
 		$this->cell(85,5,"Pour la société",0,0,"C");
 		$this->cell(10,5,"");
 		$this->cell(85,5,"Pour le salarié",0,1,"C");
-		$this->cell(85,5,strtoupper(ATF::societe()->maSociete['societe'])." représentée par Melle Emmanuelle Ollivier.",0,0,"C");
+		$this->setFont('arial','B',8);
+		$this->cell(85,5,strtoupper(ATF::societe()->maSociete['societe'])." représentée par Mme Emmanuelle Ollivier.",0,0,"C");
 		$this->cell(10,5,"");
 		$this->cell(85,5,ATF::personnel()->nom($el['id_personnel']),0,1,"C");
+		$this->setFont('arial','',8);
 
 
 		$y = $this->gety();
@@ -379,6 +438,14 @@ class pdf_manala extends pdf {
 		$this->cadre(15,$y,85,35,false,"Signature");
 		$this->cadre(110,$y,85,35,array(array("txt"=>"(précédée de la mention lu et approuvé, bon pour accord)","italic"=>true,"size"=>6,"align"=>"C"),"","","","",""),"Signature");
 
+	}
+
+	public function textToSpace($tbold){
+		$return = "";
+		for($i=0; $i<strlen($tbold); $i++){
+			$return = $return." ";
+		}
+		return $return;
 	}
 
 	public function facture($id) {
@@ -486,7 +553,7 @@ class pdf_manala extends pdf {
 		$this->multicell(0,5,"(à remettre aux salariés intervenants dans les magasins pour remise au pointeau sécurité)",0,"C");
 		$this->ln(5);
 		$this->setFont('arial','',10);
-		$this->multicell(0,5,"      Je soussignée Emmanuelle OLLIVIER, Gérante de MANALA SARL (siret : 53748734000037) situé 200 rue de Roubaix BP 32000 59203 TOURCOING, certifie que le porteur de la présente : ".ATF::personnel()->nom($personnel['id_personnel']).", né(e) le ".$personnel['date_naissance']." et résidant ".$personnel['adresse'].", ".$personnel['cp']." ".$personnel['ville']." est inscrit à l'effectif depuis le ".date("d/m/Y",strtotime($mission['date_debut'])).", sous contrat à durée déterminée en qualité de : ".$el['poste']);
+		$this->multicell(0,5,"      Je soussignée Emmanuelle OLLIVIER, Gérante de MANALA SARL (siret : 53748734000045) situé 59 rue de l'union BP 32000 59203 TOURCOING, certifie que le porteur de la présente : ".ATF::personnel()->nom($personnel['id_personnel']).", né(e) le ".$personnel['date_naissance']." et résidant ".$personnel['adresse'].", ".$personnel['cp']." ".$personnel['ville']." est inscrit à l'effectif depuis le ".date("d/m/Y",strtotime($mission['date_debut'])).", sous contrat à durée déterminée en qualité de : ".$el['poste']);
 
 		$this->ln(10);
 		$this->multicell(0,5,"Et que conformément aux dispositions de la loi du 31 décembre 1991 relative au travail clandestin, il est fait application des dispositions des articles L 324-9 et suivants concernant « le travail dissimulé », des articles L L 3243-1, L3243-2, L L1221-10, L1221-13, L1221-15  du code du travail relatifs au bulletin de paie et au Registre unique du Personnel, et des articles L 5221-1 et suivants relatifs au « travail des étrangers ».");
@@ -515,7 +582,7 @@ class pdf_manala extends pdf {
 		$this->setFont('arial','B',10);
 		$this->multicell(0,5,"En cas d'accident ou d'incendie : appeler la SECURITE au 218","","C");
 		$this->ln(5);
-	
+
 		$this->setFont('arial','',10);
 		$this->multicell(0,5,"Je soussigné(e) ".ATF::personnel()->nom($personnel['id_personnel']).", salarié(e) de la société MANALA SARL, reconnais avoir été informé des mesures générales d’hygiène et de sécurité qui sont en vigueur au sein de l’établissement ".$mission['lieu']." , et notamment de :");
 		$this->ln(5);
@@ -527,7 +594,7 @@ class pdf_manala extends pdf {
 		$this->multicell(0,5,"Toute personne présente dans l’établissement doit, par son comportement, contribuer au respect des règles d’hygiène.");
 		$this->multicell(0,5,"Elle exécute  un travail au sein de l’établissement et doit donc veiller au respect de l’ensemble des règles d’hygiène  et en particulier la propreté. ");
 		$this->ln(5);
-	
+
 
 		$this->setFont('arial','BU',11);
 		$this->multicell(0,5,"2.	Mesures générales concernant la sécurité :");
@@ -539,28 +606,28 @@ class pdf_manala extends pdf {
 		$this->multicell(0,5,"-	respectant les dispositions réglementaires qui interdisent de fumer dans tous les lieux fermés et couverts qui accueillent du public ;");
 		$this->multicell(0,5,"-	circulant dans les couloirs réservés aux piétons ;");
 		$this->multicell(0,5,"-	utilisant les sorties destinées à la clientèle ;");
-		$this->multicell(0,5,"-	ne pénétrant pas dans les locaux, réserves, etc. destinés aux seuls salariés de la société cliente.");	
+		$this->multicell(0,5,"-	ne pénétrant pas dans les locaux, réserves, etc. destinés aux seuls salariés de la société cliente.");
 		$this->setLeftMargin(15);
 
 		$this->multicell(0,5,"2.3.	Toute personne exécutant un travail au sein de l’établissement doit :");
 		$this->setLeftMargin(30);
 		$this->multicell(0,5,"-	disposer des autorisations nécessaires à l’utilisation des machines indispensables à son travail ;");
-		$this->multicell(0,5,"-	utiliser les appareils ou dispositifs de protection individuelle mis à sa disposition par son employeur.");	
+		$this->multicell(0,5,"-	utiliser les appareils ou dispositifs de protection individuelle mis à sa disposition par son employeur.");
 		$this->setLeftMargin(15);
 
 
 		$this->multicell(0,5,"2.4.	Par ailleurs  il est rappelé  pour des raisons de sécurité que toute personne doit veiller :");
 		$this->setLeftMargin(30);
 		$this->multicell(0,5,"-	à ne pas stationner à proximité des portes battantes ;");
-		$this->multicell(0,5,"-	à ne pas sortir du champ de vision des conducteurs d'engins ;");	
-		$this->multicell(0,5,"-	à ne pas passer sous une charge.");	
-		$this->multicell(0,5,"- à laisser libre d’accès  en permanence les issues de secours");	
-		$this->multicell(0,5,"- à laisser les moyens de lutte contre l’incendie , libre d’accès en permanence");	
+		$this->multicell(0,5,"-	à ne pas sortir du champ de vision des conducteurs d'engins ;");
+		$this->multicell(0,5,"-	à ne pas passer sous une charge.");
+		$this->multicell(0,5,"- à laisser libre d’accès  en permanence les issues de secours");
+		$this->multicell(0,5,"- à laisser les moyens de lutte contre l’incendie , libre d’accès en permanence");
 		$this->setLeftMargin(15);
 		$this->ln(10);
 
 		$this->multicell(0,5,"L’utilisation des moyens de levage et de manutention qui sont dans les réserves est interdite à toute personne étrangère à la société ".$client['societe'].".");
-		
+
 		$this->ln(10);
 
 		$this->multicell(0,5,"Fait en double exemplaire à Tourcoing");
@@ -584,28 +651,41 @@ class pdf_manala extends pdf {
 		$this->sety(50);
 		$this->multicell(0,10,"A L’ATTENTION DU SERVICE SECURITE",0,"C");
 		$this->setFont('arial','BU',12);
-		$this->multicell(0,5,"Concerne : ".$client['societe'],0,"C");
+		$this->multicell(0,5,"Concerne : ".$mission['lieu'],0,"C");
 		$this->ln(5);
 		$this->setFont('arial','',10);
 		$this->multicell(0,5,"Madame, Monsieur, ");
 		$this->ln(5);
-		$this->multicell(0,5,"En accord avec les termes de vos conditions d’accès en magasin, nous vous informons que nous, société MANALA, avons été mandatés par la société ".$client['societe']." afin de réaliser une animation le ".ATF::$usr->date_trans($mission['date_debut'],true,true));
-		
+		$this->multicell(0,5,"En accord avec les termes de vos conditions d’accès en magasin, nous vous informons que nous, société MANALA, avons été mandatés par la société :");
+		$this->setFont('arial','BU',10);
 		$this->ln(5);
-		$this->multicell(0,5,"Nous embauchons ".ATF::personnel()->nom($personnel['id_personnel'])." afin de réaliser ce jour d’animation.");
-		
+		$this->multicell(0,5,$client['societe']);
+		$this->ln(5);
+		$this->setFont('arial','',10);
+		$this->multicell(0,5,"afin de réaliser une animation le :");
+		$this->ln(5);
+		$this->setFont('arial','BU',10);
+		$this->multicell(0,5,ATF::$usr->date_trans($mission['date_debut'],true,true));
+		$this->setFont('arial','',10);
+		$this->ln(5);
+		$this->multicell(0,5,"Nous embauchons ".strtoupper(ATF::personnel()->nom($personnel['id_personnel']))." afin de réaliser ces prestations d'animation commerciales sur la gamme des produits :");
+		$this->setFont('arial','BU',10);
+		$this->ln(5);
+		$this->multicell(0,5,'- '.$client['societe']);
+		$this->setFont('arial','',10);
+
 		$this->ln(5);
 		$this->multicell(0,5,"Vous souhaitant bonne réception de la présente,");
-		
+
 		$this->ln(5);
 		$this->multicell(0,5,"Nous vous prions d’agréer, Madame, Monsieur, l’expression de nos salutations distinguées.");
-		
+
 		$this->ln(5);
 		$this->multicell(0,5,"Fait à Tourcoing, le ".date("d/m/Y"));
-		
+
 		$this->ln(5);
 		$this->multicell(0,5,"Pour la société MANALA représentée par ");
-		
+
 		$this->ln(5);
 		$this->multicell(0,5,"Melle Emmanuelle Ollivier\n06.23.20.57.10");
 

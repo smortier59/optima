@@ -421,15 +421,10 @@ class demande_refi extends classes_optima {
 			ATF::loyer()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row");
 			$loyer=ATF::loyer()->sa();
 
-			if($loyer["frequence_loyer"]=="an"){
-				$frequence_loyer=12;
-			}elseif($loyer["frequence_loyer"]=="semestre"){
-				$frequence_loyer=6;
-			}elseif($loyer["frequence_loyer"]=="trimestre"){
-				$frequence_loyer=3;
-			}elseif($loyer["frequence_loyer"]=="mois"){
-				$frequence_loyer=1;
-			}
+			if($loyer["frequence_loyer"]=="an"){	$frequence_loyer=12;
+			}elseif($loyer["frequence_loyer"]=="semestre"){	$frequence_loyer=6;
+			}elseif($loyer["frequence_loyer"]=="trimestre"){ $frequence_loyer=3;
+			}elseif($loyer["frequence_loyer"]=="mois"){	$frequence_loyer=1;	}
 
 			$infosMaj["duree_refinancement"]=ceil($m/$frequence_loyer)." ".$loyer["frequence_loyer"]."(s)";
 		}else{

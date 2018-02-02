@@ -55,7 +55,7 @@ class slimpay {
             'label' => $libelle,
             'executionDate'=>$date."T13:00:00.000+0000",
             'creditor' => [
-                'reference' => 'lma'
+                'reference' => __CREDITOR_REFERENCE__
             ],
             'mandate' => [
                 'reference' => $ref_mandate
@@ -92,8 +92,29 @@ class slimpay {
         return $state;
     }
 
+
+    public function simulateIssue($mandate, $montant){
+        $hapiClient = self::connection();
+        // The Relations Namespace
+        $relNs = self::getRelationNamespace();
+
+
+        $rel = new Hal\CustomRel(self::getRelationNamespace().'create-payins');
+        $follow = new Http\Follow($rel, 'POST', null, new Http\JsonBody(
+        [
+            'scheme' => 'SEPA.DIRECT_DEBIT.CORE',
+            'amount' => $montant,
+            'creditor' => [
+                'reference' => __CREDITOR_REFERENCE__
+            ],
+            'mandate' => [
+                'reference' => $mandate
+            ]
+        ]
+        ));
+        $payment = $hapiClient->sendFollow($follow);
+
+    }
+
 }
-
-
-
 ?>

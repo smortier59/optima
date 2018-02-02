@@ -33,5 +33,8 @@ class affaire extends classes_optima {
 	public function getMargeTotaleDepuisDebutAnneeDifferenceAnneePrecedente(){
 		return $this->getMargeTotaleDepuisDebutAnnee()-$this->getMargeTotaleDepuisDebutAnnee(-1);
 	}
+
+
+
 };
 ?>

@@ -8,7 +8,7 @@ class parc_cleodis extends classes_optima {
 		parent::__construct();
 		$this->table = "parc";
 		$this->colonnes['fields_column']  = array('parc.ref','parc.libelle','parc.id_societe','parc.date_garantie'=> array("renderer"=>"updateDate"),'parc.serial','parc.etat','parc.existence','parc.provenance', "parc.date_achat" => array("renderer"=>"updateDate"));
-		
+
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['update'] =array("serial","id_societe","id_produit","id_affaire","ref","libelle","divers","etat","code","date","date_inactif","date_garantie","provenance","existence");
 		$this->colonnes['panel']['lignes'] = array(
@@ -26,6 +26,7 @@ class parc_cleodis extends classes_optima {
 	}
 
 	public function updateExistenzOriginale($commande,$affaire,$affaire_parente=NULL,$affaires_parentes=NULL){
+
 		ATF::parc()->q->reset()->addCondition("id_affaire",$affaire->get('id_affaire'));
 		$parc=ATF::parc()->sa();
 		//Pour tous les parcs de l'affaire
@@ -33,12 +34,12 @@ class parc_cleodis extends classes_optima {
 			if($commande->get('etat')=="arreter"){
 				if($item["existence"]=="actif"){
 					ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif","date_inactif"=>date("Y-m-d")));
-					
+
 					$this->q->reset()->addCondition("etat","broke")
 									 ->addCondition("serial",$item["serial"])
 									 ->addCondition("id_affaire",$item["id_affaire"])
 									 ->setDimension("row");
-									 
+
 					if($brokeExiste=$this->sa()){
 						ATF::parc()->u(array("id_parc"=>$brokeExiste["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
 					}else{
@@ -50,7 +51,7 @@ class parc_cleodis extends classes_optima {
 					}
 				}
 			}else{
-			
+
 				//Le parc de l'affaire doit passer en actif si affaire/fille==mis_loyer || prolongation
 				if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation" || $commande->get('etat')=="vente"){
 					//Si c'est un broke et que ce n'est pas un avenant alors c'est que le broke provient de l'affaire fille qui ne reprend pas le parc mais si la parente est active alors c'est que le parc doit être inactif
@@ -68,7 +69,7 @@ class parc_cleodis extends classes_optima {
 						ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
 					}
 				}
-	
+
 				if($affaire->get('nature')=="avenant" || $affaire->get('nature')=="vente"){
 					if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation" || $commande->get('etat')=="vente"){
 						//Si un parc passe en actif alors les autres parcs du même serial doivent passer en inactif
@@ -78,7 +79,7 @@ class parc_cleodis extends classes_optima {
 						if($parc_serial){
 							foreach($parc_serial as $k=>$i){
 								if($i["id_parc"]!=$item["id_parc"]){
-									if($i["existence"]!="inactif"  || $i["date_inactif"]!= $commande->get('date_debut')){								
+									if($i["existence"]!="inactif"  || $i["date_inactif"]!= $commande->get('date_debut')){
 										//Tous les parcs dupliqués doivent passer en inactif si affaire/fille==mis_loyer || prolongation sauf si c'est le parc de l'affaire fille !!!
 										ATF::parc()->u(array("id_parc"=>$i["id_parc"],"existence"=>"inactif","date_inactif"=>$commande->get('date_debut')));
 									}
@@ -87,13 +88,15 @@ class parc_cleodis extends classes_optima {
 						}
 					}elseif($commande->get('etat')=="non_loyer"){
 						//Sinon le parc de l'affaire parente repasse en actif
-						ATF::parc()->q->reset()->addCondition("id_affaire",$affaire_parente->get("id_affaire"))
-											   ->addCondition("serial",$item["serial"])
-											   ->setDimension("row");
-						$parc_serial=ATF::parc()->sa();
-						if($parc_serial){
-							if($parc_serial["existence"]!="actif"  || $parc_serial["date_inactif"]){
-								ATF::parc()->u(array("id_parc"=>$parc_serial["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+						if($affaire_parente) {
+							ATF::parc()->q->reset()->addCondition("id_affaire",$affaire_parente->get("id_affaire"))
+												   ->addCondition("serial",$item["serial"])
+												   ->setDimension("row");
+							$parc_serial=ATF::parc()->sa();
+							if($parc_serial){
+								if($parc_serial["existence"]!="actif"  || $parc_serial["date_inactif"]){
+									ATF::parc()->u(array("id_parc"=>$parc_serial["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+								}
 							}
 						}
 					}
@@ -138,15 +141,15 @@ class parc_cleodis extends classes_optima {
 			}
 		}
 	}
-	
+
 	/* Routine de prévention pour les doublons de parcs actifs => Si on en trouve, on ne garde que le parc le plus récent
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
-	*/ 
+	*/
 	public function preventionDoublonsActifs($id_affaire){
 		$this->q->reset()
 			->where("id_affaire",$id_affaire)
 			->where("existence","actif");
-		if ($parcs = $this->sa()) {				
+		if ($parcs = $this->sa()) {
 			// Pour tous les parcs de l'affaire
 			foreach($parcs as $parc){
 				// On check si un autre parc avec ce serial est en état actif dans toute la base de données
@@ -162,7 +165,7 @@ class parc_cleodis extends classes_optima {
 							//log::logger($k."[".$parc["serial"]." | ".$parc["id_affaire"]." | ".$parcDeMemeSerial["id_parc"]."] on ne garde que l'etat actif '".$parcDeMemeSerial["etat"]."'","preventionDoublonsActifs");
 						} else {
 							$this->update(array("id_parc"=>$parcDeMemeSerial["id_parc"],"existence"=>"inactif","date_inactif"=>date("Y-m-d")));
-							
+
 							// Log
 							$s = $k."[".$parc["serial"]." | ".$parc["id_affaire"]." | ".$parcDeMemeSerial["id_parc"]."] on passe en inactif l'état '".$parcDeMemeSerial["etat"]."'";
 							//mail("ygautheron@absystech.fr","Cleodis preventionDoublonsActifs ".$parc["serial"],$s);
@@ -173,17 +176,17 @@ class parc_cleodis extends classes_optima {
 			}
 		}
 	}
-		
+
 	/**
     * Méthode qui met à jour l'activité des parcs
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    */ 
+    */
 	public function updateExistenz($commande,$affaire,$affaire_parente=NULL,$affaires_parentes=NULL){
 		$this->updateExistenzOriginale($commande,$affaire,$affaire_parente,$affaires_parentes);
 		$this->preventionDoublonsActifs($affaire->get('id_affaire'));
 	}
-	
-	/** 
+
+	/**
 	* select_all qui permet de n'avoir que les parcs existant
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	*/
@@ -198,7 +201,7 @@ class parc_cleodis extends classes_optima {
 	}
 
 
-	/** 
+	/**
 	* Insertion du parc
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param array $item
@@ -206,20 +209,20 @@ class parc_cleodis extends classes_optima {
 	*/
 	public function insertParcSerial($item,$commande_ligne){
 		$type=ATF::produit()->select($item["id_produit"],"type");
-							
+
 		if(!$item["serial"]){
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Il faut un serial pour le produit ".$item["produit"],883);
 		}
-		
+
 		//Parcs, insertion des parcs uniquement s'ils ne proviennent pas d'une affaire (car déjà présent)
 		$affaire=ATF::affaire()->select(ATF::commande()->select($commande_ligne["id_commande"],"id_affaire"));
-		
+
 		if(!$affaire["date_garantie"]){
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Il n'y a pas de date de garantie pour cette affaire",880);
 		}
-	
+
 		/*Le serial ne doit pas déjà exister*/
 		$this->q->reset()->addCondition("serial",$item["serial"])->setCount();
 		$countParc=$this->sa();
@@ -244,17 +247,45 @@ class parc_cleodis extends classes_optima {
 
 		$commande_ligne["serial"].=" ".$item["serial"];
 		ATF::commande_ligne()->u($commande_ligne);
-		
+
 		/*
 		if($this->parcSerialIsActif($serial["serial"])){
 			throw new errorATF("Impossible d'insérer ce parc car un parc ACTIF existe déjà avec ce même serial. (serial=".$serial["serial"].")",347);
 		}
 		 * Ne sert pas, car on teste deja plus haut qu'aucun autre parc existe deja avec ce serial ! */
-		
+
 		return $this->i($serial,$s);
 	}
 
-	/** 
+	public function getParcPartenaire($id_affaire){
+		/*Si contrat pas encore démarré et qu'on a une facture sur la periode actuelle
+				Afficher les parcs meme ceux qui sont inactif
+		Sinon faire comme actuellement*/
+		$parc = NULL;
+
+		ATF::commande()->q->reset()->where("affaire.id_affaire", $id_affaire);
+		$commande = ATF::commande()->select_row();
+
+		if($commande["etat"] == "non_loyer"){
+			ATF::facture()->q->reset()->addField('loyer.loyer')
+									  ->where("facture.date_periode_debut",date("Y-m-d"),"AND","cond_date","<=")
+									  ->where("facture.date_periode_fin",date("Y-m-d"),"AND","cond_date",">=")
+									  ->where("facture.id_affaire", $id_affaire);
+			if(ATF::facture()->select_all()){
+				$this->q->reset()->addCondition("parc.id_affaire",$id_affaire)->addOrder("parc.id_parc","asc");
+				$parc = $this->sa();
+			}
+		}else{
+			$this->q->reset()->addCondition("parc.id_affaire",$id_affaire)
+							   ->addCondition("parc.existence","inactif","AND",NULL,"!=")
+							   ->addCondition("parc.etat","broke","AND",1,"!=")
+							   ->addOrder("parc.id_parc","asc");
+			$parc = $this->sa();
+		}
+		return $parc;
+	}
+
+	/**
 	* Retourne un id_parc actif du serial demandé
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param string $serial
@@ -269,17 +300,17 @@ class parc_cleodis extends classes_optima {
 		return $this->select_all();
 	}
 
-	/** 
+	/**
 	* Retourne VRAI si un serial de parc  est déjà actif
   * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param string $serial
 	* @return boolean
 	*/
-	public function parcSerialIsActif($serial){		
+	public function parcSerialIsActif($serial){
 		return !!$this->getParcActifFromSerial($serial);
 	}
 
-	/** 
+	/**
 	* Insertion des parcs d'un bon de commande
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
@@ -292,7 +323,7 @@ class parc_cleodis extends classes_optima {
 		$this->infoCollapse($infos);
 
 		$id_affaire=ATF::bon_de_commande()->select($infos["id_bon_de_commande"],"id_affaire");
-		
+
 		//Lignes
 		if($infos_ligne){
 			ATF::db($this->db)->begin_transaction();
@@ -318,11 +349,11 @@ class parc_cleodis extends classes_optima {
 		return true;
 	}
 
-	/** 
+	/**
 	* Permet de savoir si tous les produits d'un Bdc sont insérés dans le parc
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_bon_de_commande
-	* @return boolean 
+	* @return boolean
 	*/
 	function parcByBdc($id_bon_de_commande){
 		ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_bon_de_commande",$id_bon_de_commande);
@@ -335,11 +366,11 @@ class parc_cleodis extends classes_optima {
 		}
 	}
 
-	/** 
+	/**
 	* Permet de savoir si tous les produits d'une affaire sont insérés dans le parc
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_bon_de_commande
-	* @return boolean 
+	* @return boolean
 	*/
 	function parcByAffaire($id_affaire){
 		ATF::bon_de_commande()->q->reset()->addCondition("id_affaire",$id_affaire);
@@ -349,7 +380,7 @@ class parc_cleodis extends classes_optima {
 				return true;
 			}
 		}
-		return false;		
+		return false;
 	}
 
 	/**
@@ -359,10 +390,10 @@ class parc_cleodis extends classes_optima {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	function updateDate($infos){
-		
+
 		if($infos["key"] == "date_achat"){
 			$id_affaire = $this->select($this->decryptId($infos["id_parc"]) , "id_affaire");
-			ATF::loyer()->q->reset()->where("id_affaire" , $id_affaire);			
+			ATF::loyer()->q->reset()->where("id_affaire" , $id_affaire);
 			$loyer = ATF::loyer()->select_row();
 
 			$freq = "";
@@ -386,8 +417,8 @@ class parc_cleodis extends classes_optima {
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
 		$infosMaj["id_".$this->table]=$infos["id_".$this->table];
-		$infosMaj[$infos["key"]]=$infos["value"];	
-		
+		$infosMaj[$infos["key"]]=$infos["value"];
+
 		if($this->u($infosMaj)){
 			ATF::$msg->addNotice(
 				loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
@@ -411,15 +442,15 @@ class parc_midas extends parc_cleodis {
 												,'parc.date_garantie'=>array("updateDate"=>true)
 												,'parc.serial'
 												,'parc.etat');
-		
+
 		$this->filtre_ob['parc_franc']=array("titre"=>"Franchisées","function"=>"selectAllFranch");
 		$this->filtre_ob['parc_franc_cours']=array("titre"=>"Franchisées en cours","function"=>"selectAllFranchCours");
 		$this->filtre_ob['parc_franc_cours_info']=array("titre"=>"Franchisées en cours informatique","function"=>"selectAllFranchCoursInfo");
-		
+
 		$this->filtre_ob['parc_suc']=array("titre"=>"Succursales","function"=>"selectAllSuc");
 		$this->filtre_ob['parc_suc_cours']=array("titre"=>"Succursales en cours","function"=>"selectAllSucCours");
 		$this->filtre_ob['parc_suc_cours_info']=array("titre"=>"Succursales en cours informatique","function"=>"selectAllSucCoursInfo");
-												
+
 		$this->fieldstructure();
 	}
 	/** On affiche que les sociétés midas et que les parcs actifs
@@ -432,7 +463,7 @@ class parc_midas extends parc_cleodis {
 				->addCondition("parc.existence","actif");
 		return parent::select_all($order_by,$asc,$page,$count);
 	}
-	
+
 	/** Surcharge pour filtrer le select_all si clic sur le filtre
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -440,7 +471,7 @@ class parc_midas extends parc_cleodis {
 		$this->q->addConditionNull("societe.id_filiale");
 		return $this->select_all();
 	}
-	
+
 	/** Surcharge pour filtrer le select_all si clic sur le filtre
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -450,7 +481,7 @@ class parc_midas extends parc_cleodis {
 				->addCondition("commande.etat","prolongation","OR")->addCondition("commande.etat","mis_loyer","OR");
 		return $this->selectAllFranch();
 	}
-	
+
 	/** Surcharge pour filtrer le select_all si clic sur le filtre
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -460,7 +491,7 @@ class parc_midas extends parc_cleodis {
 				->addCondition("libelle","%Brother%","OR",false,"LIKE");
 		return $this->selectAllFranchCours();
 	}
-	
+
 	/** Surcharge pour filtrer le select_all si clic sur le filtre
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -468,7 +499,7 @@ class parc_midas extends parc_cleodis {
 		$this->q->addConditionNotNull("societe.id_filiale");
 		return $this->select_all();
 	}
-	
+
 	/** Surcharge pour filtrer le select_all si clic sur le filtre
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -478,7 +509,7 @@ class parc_midas extends parc_cleodis {
 				->addCondition("commande.etat","prolongation","OR")->addCondition("commande.etat","mis_loyer","OR");
 		return $this->selectAllSuc();
 	}
-	
+
 	/** Surcharge pour filtrer le select_all si clic sur le filtre
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/

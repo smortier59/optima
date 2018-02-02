@@ -562,7 +562,6 @@ class bon_de_commande_lm extends bon_de_commande {
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		$prix_total = 0;
-		log::logger($infos_bon_de_commande_ligne , "mfleurquin");
 		foreach($infos_bon_de_commande_ligne as $key=>$item){
 			$commande_ligne=ATF::commande_ligne()->select($item);
 			$bon_de_commande_ligne["id_commande_ligne"]=$item;

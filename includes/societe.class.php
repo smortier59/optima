@@ -867,8 +867,11 @@ class societe extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function getInfosFromCREDITSAFE($infos) {
-
-	    $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+		/*if(__DEV__ === true){
+			$response = file_get_contents("/home/optima/core/log/creditsafe.xml");
+			$xml = simplexml_load_string($response);
+		} else {*/
+			 $xmlReq = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 		    <xmlrequest>
 		        <header>
 		            <username>".__CREDIT_SAFE_LOGIN__."</username>
@@ -884,13 +887,21 @@ class societe extends classes_optima {
 
 		        </body>
 		    </xmlrequest>";
-	    $url = 'https://www.creditsafe.fr/getdata/service/CSFRServices.asmx/GetData';
-	    $params = array('requestXmlStr' => $xmlReq);
-	    $response = $this->processCSRequest($url, $params);
+		    $url = 'https://www.creditsafe.fr/getdata/service/CSFRServices.asmx/GetData';
+		    $params = array('requestXmlStr' => $xmlReq);
 
-		file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
 
-		$xml = simplexml_load_string($response);
+		    $response = $this->processCSRequest($url, $params);
+
+		    if(__PRE__ === true){
+				file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafe.xml",$response);
+			}else{
+				file_put_contents("/home/absystech/optima/core/log/creditsafe.xml",$response);
+			}
+
+			$xml = simplexml_load_string($response);
+		//}
+
 
 		if($xml->xmlresponse->body->errors){
 			ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$xml->xmlresponse->body->errors->errordetail->code ,ATF::$usr->trans("notice_title"));
@@ -905,15 +916,46 @@ class societe extends classes_optima {
 	}
 
 
-/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
+	/** Prépare les résultats de GGS creditsafe pour intégration dans Optima
 	* @author Cyril CHARLIER  <ccharlier@absystech.fr>
 	*/
 	public function cleanGGSResponse($r) {
-
 		$xml = $r;
 
 		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
 		$company = $item->CompanyIdentification;
+
+		$bi = $xml->xmlresponse->body->company->baseinformation;
+		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+		$directors = $item->Directors->CurrentDirectors;
+
+
+		if(count($directors->Director)==1){
+			if(!preg_match("/Commissaire aux comptes/" ,$directors->Director->Position->_)){
+					$nom = explode("  ", (string)$directors->Director->Name);
+
+					$return['gerant'][] = array("nom"=>$nom[1],
+												"prenom"=>$nom[0],
+									  			"fonction"=>(string)$directors->Director->Position->_);
+				}
+		} else{
+			foreach ($directors->Director as $key => $value) {
+				if(!preg_match("/Commissaire aux comptes/" ,$value->Position->_)){
+
+
+					$nom = explode("  ", (string)$value->Name);
+
+					$return['gerant'][] = array("nom"=>$nom[1],
+												"prenom"=>$nom[0],
+									  			"fonction"=>(string)$value->Position->_);
+				}
+			}
+		}
+
+
+
+
 		// Nom de société
 		$return['societe'] = (string)$company->BasicInformation->BusinessName;
 		// Pays de société
@@ -982,6 +1024,12 @@ class societe extends classes_optima {
 		// Charges financières
 		$return['financialcharges'] = number_format(intval((string)$item->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", "");
 
+
+		$return["resultat_exploitation"] = number_format(intval((string)$b->balancesheet->profitloss->operatingprofitloss) , 0, ",", "");
+		$return["capital_social"] = number_format(intval((string)$bi->sharecapital) , 0, ",", "");
+		$return["capitaux_propres"] = number_format(intval((string)$b->balancesheet->passiveaccount->shareholdersequity) , 0, ",", "");
+		$return["dettes_financieres"] = number_format(intval((string)$b->balancesheet->passiveaccount->financialliabilities) , 0, ",", "");
+
 		// ETAT
 		switch ((string)$company->BasicInformation->CompanyStatus->Code) {
 			case '':
@@ -1004,10 +1052,25 @@ class societe extends classes_optima {
 	*/
 	private function cleanCSResponse($r) {
 
+
 		$xml = simplexml_load_string($r);
 
 		$bi = $xml->xmlresponse->body->company->baseinformation;
 		$s = $xml->xmlresponse->body->company->summary;
+		$b =  $xml->xmlresponse->body->company->balancesynthesis;
+
+
+		$directors = $xml->xmlresponse->body->company->directors;
+
+		$gerant = array();
+		foreach ($directors->director as $key => $value) {
+			if($value->typeofmanager == "Personne physique" && !preg_match("/Commissaire aux comptes/" ,$value->managerposition)){
+				$return['gerant'][] = array("nom"=>(string)$value->familyname,
+								  "prenom"=>(string)$value->christianname,
+								  "fonction"=>(string)$value->managerposition);
+			}
+		}
+
 
 		if ($bi->branches->numberofbranches>1) {
 			for ($i=0; $i<=$bi->branches->numberofbranches; $i++) {
@@ -1103,6 +1166,11 @@ class societe extends classes_optima {
 
 		// Charges financières
 		$return['financialcharges'] = number_format(intval((string)$balancesheet->profitloss->financialcharges) , 0, ",", " ");
+
+		$return["resultat_exploitation"] = number_format(intval((string)$b->balancesheet->profitloss->operatingprofitloss) , 0, ",", "");
+		$return["capital_social"] = number_format(intval((string)$bi->sharecapital) , 0, ",", "");
+		$return["capitaux_propres"] = number_format(intval((string)$b->balancesheet->passiveaccount->shareholdersequity) , 0, ",", "");
+		$return["dettes_financieres"] = number_format(intval((string)$b->balancesheet->passiveaccount->financialliabilities) , 0, ",", "");
 
 		// ETAT
 		switch ((string)$x->status) {
@@ -1443,6 +1511,22 @@ class societe extends classes_optima {
 	}
 
 	/**
+	 * Modifie une société
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get $_GET
+	 * @param  array $get $_POST
+	 * @return Boolean TRUE si OK, FALSE si NOK
+	 */
+	public function _PUT($get, $post) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		throw new Exception("IN PROGRESS",1000);
+		$return['result'] = $this->delete($get);
+    	// Récupération des notices créés
+    	$return['notices'] = ATF::$msg->getNotices();
+        return $return;
+	}
+
+	/**
 	 * Supprime une société
 	 * @author Quentin JANON <qjanon@absystech.fr>
 	 * @param  array $get  Contient l'ID de la société
@@ -1506,9 +1590,9 @@ class societe extends classes_optima {
 	 * @param  array $post $_POST
 	 */
 	public function _setDomaine($get,$post) {
-		$input = file_get_contents('php://input');
-		if (!empty($input)) parse_str($input,$post);
 		$return = true;
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
 
 		if (!$post['idSociete']) throw new errorATF("ID_SOCIETE_MISSING",3256);
 		if (!$post['domaine']) throw new errorATF("DOMAINE_MISSING",3257);
@@ -1603,5 +1687,43 @@ class societe extends classes_optima {
 
 		return $this->select_all();
 	}
+
+	public function _set($get, $post) {
+  	$input = file_get_contents('php://input');
+  	if (!empty($input)) parse_str($input,$post);
+
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		switch ($post['name']) {
+			case 'address':
+				$toUpdate = array(
+					"adresse"=>$post['value']["adresse"],
+					"adresse_2"=>$post['value']["adresse_2"],
+					"adresse_3"=>$post['value']["adresse_3"],
+					"cp"=>$post['value']["cp"],
+					"ville"=>$post['value']["ville"],
+				);
+			break;
+			case 'adresse_facturation':
+				$toUpdate = array(
+					"facturation_adresse"=>$post['value']["adresse"],
+					"facturation_adresse_2"=>$post['value']["adresse_2"],
+					"facturation_adresse_3"=>$post['value']["adresse_3"],
+					"facturation_cp"=>$post['value']["cp"],
+					"facturation_ville"=>$post['value']["ville"],
+				);
+			break;
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_societe'] = $post['pk'];
+
+		return $this->update($toUpdate);
+	}
+
 
 }

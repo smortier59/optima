@@ -20,7 +20,7 @@ class commande_cleodis extends commande {
 			,'commande.id_societe'
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
-			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90)
+			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
 			,'courriers'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCourriers","width"=>90)
 			,'retour'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'retourPV'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
@@ -96,10 +96,17 @@ class commande_cleodis extends commande {
 		$this->no_insert = true;
 		$this->no_update = true;
 		$this->onglets = array('commande_ligne','bon_de_commande');
+
+
+
 		$this->files["contratA3"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratA4"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratAP"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
 		$this->files["contratPV"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+
+		//$this->files["contratA4NL"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+
+
 		$this->files["retour"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["retourPV"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
@@ -137,7 +144,74 @@ class commande_cleodis extends commande {
 	}
 
 
+	/**
+	 * [_contratPartenaire retourne les contrats du contact loggué]
+	 * @param  [type] $get  [description]
+	 * @param  [type] $post [description]
+	 * @return [array]       [description]
+	 */
+	public function _contratPartenaire($get,$post) {
+		if ($apporteur = ATF::$usr->get("contact")) {
+			ATF::commande()->q->reset()
+				//->addField('affaire.*, loyer.*')
+				->addJointure("commande","id_societe","societe","id_societe")
+				->addJointure("commande","id_affaire","affaire","id_affaire")
+				->addJointure("commande","id_affaire","loyer","id_affaire")
 
+				//->where("affaire.provenance", "partenaire")
+
+
+				->where("commande.etat", "non_loyer","AND", false, "!=")
+				->where("commande.etat", "AR","AND", false, "!=")
+				->where("commande.etat", "arreter","AND", false, "!=")
+				->where("commande.etat", "vente","AND", false, "!=")
+
+
+				->where("affaire.id_partenaire", $apporteur["id_societe"]); // en attendant la resolution du probleme de session
+
+			if($get["search"]) {
+				ATF::commande()->q->where("affaire.ref", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("societe.societe", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("societe.code_client", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("societe.cp", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("societe.siret", "%".$get["search"]."%" , "OR", "search", "LIKE")
+								->where("affaire.affaire", "%".$get["search"]."%" , "OR", "search", "LIKE");
+			}
+			// filtre sur les dates
+			if ($get["filters"] && $get["filters"]["startdate"]){
+				ATF::commande()->q->where("commande.date_debut", $get["filters"]["startdate"]);
+			}
+
+			if ($get["filters"] && $get["filters"]["enddate"]){
+				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
+			}
+
+			if($commande = ATF::commande()->sa()){
+				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
+				foreach ($commande as $key => $cmd) {
+					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
+					$commande[$key]["somme_loyer"] = $cmd["loyer"] * $cmd["duree"];
+				}
+				header("ts-total-row: ".count($commande));
+				return $commande;
+			}
+			else {
+				header("ts-total-row: 0");
+				return array();
+			}
+		}
+	}
+
+
+
+	/**
+	 * Permet de stocker le PDF signé de Sell&Sign
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $get
+	 * @param  array $post
+	 * @return
+	 */
 	public function _getSignedContract($get, $post){
 		if (!$post['data']) throw new Exception("Il manque le base64", 500);
 		if (!$post['contract_id']) throw new Exception("Il manque l'id du contract", 500);
@@ -153,6 +227,12 @@ class commande_cleodis extends commande {
 		$file = $this->filepath($commande->get('id_commande'), 'retour', null, 'cleodis');
 		try {
 			util::file_put_contents($file,base64_decode($data));
+			//On met à jour la date de retour et retourPV du contrat
+			ATF::commande()->u(array("id_commande"=>$commande->get('id_commande'),
+									 "retour_prel"=> date("Y-m-d"),
+									 "retour_contrat"=>date("Y-m-d")
+									)
+								);
 			$return = true;
 		} catch (Exception $e) {
 			$return  = array("error"=>true, "data"=>$e);
@@ -484,7 +564,29 @@ class commande_cleodis extends commande {
 						,"date"=>$d[$infos['key']]
 					));
 
+					if($infos['key'] === "date_debut" && $infos['value']){
+						//Creation de la facture prorata si besoin
+						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
+						$affaire = ATF::affaire()->select($id_affaire);
+						if($affaire["date_installation_reel"]){
+							$data = array("date_installation_reel" => $affaire["date_installation_reel"],
+										  "id_affaire" => $affaire["id_affaire"],
+										  "date_debut_contrat" => $infos['value'],
+										  "id_commande"=> $infos["id_commande"]
+										);
 
+							ATF::facture()->createFactureProrata($data);
+						}
+
+						$data = array(  "id_affaire" => $affaire["id_affaire"],
+										"date_debut_contrat" => $infos['value'],
+										"id_commande"=> $infos["id_commande"]
+									 );
+
+						//Creation de la premiere facture
+						ATF::facture()->createPremiereFacture($data);
+
+					}
 
 					$cmd = $this->select($infos['id_commande']);
 					if($infos['value']){
@@ -1246,7 +1348,11 @@ class commande_cleodis extends commande {
 
 		foreach ($return['data'] as $k=>$i) {
 			$affaire = ATF::affaire()->select($i['commande.id_affaire_fk']);
+
 			if (!$affaire) continue;
+
+			$return['data'][$k]["langue"] = $affaire["langue"];
+
 			//Check si c'est une vente
 			if ($affaire['nature']=="vente") {
 				$return['data'][$k]['vente'] = true;
@@ -1561,7 +1667,13 @@ class commande_cleodis extends commande {
         if (!$infos['id_commande'] || !$infos['pdf']) return false;;
         $commande = $this->select($infos['id_commande']);
 
-        $data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
+        if(ATF::affaire()->select($commande["id_affaire"], "type_affaire") === "NL"){
+        	$data = ATF::pdf()->generic($infos['pdf']."NL",$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
+        }else{
+        	$data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
+        }
+
+
         $this->store($s,$infos['id_commande'],$infos['pdf'],$data,$infos["preview"]?true:false);
 
         ATF::$json->add("fileToPrevisu",$infos['pdf']);
@@ -2015,7 +2127,7 @@ class commande_cleodis extends commande {
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @param array $infos : contient le nom de l'onglet
      */
-	 public function export_contrat_pas_mep($infos,$testUnitaire="false",$reset="true"){
+	public function export_contrat_pas_mep($infos,$testUnitaire="false",$reset="true"){
 
 	 	if($testUnitaire == "true"){
 	 		$donnees = $infos;
@@ -2374,10 +2486,6 @@ class commande_cleodis extends commande {
 					}
 
 
-					if($type == "o2m"){
-							log::logger($reel , "mfleurquin");
-						}
-
 					$graph['dataset']["objectif"] = $obj;
 					$graph['dataset']["moyenne"] = $avg;
 					$graph['dataset']["reel"] = $reel;
@@ -2403,7 +2511,208 @@ class commande_cleodis extends commande {
 
 };
 
-class commande_cleodisbe extends commande_cleodis { };
+class commande_cleodisbe extends commande_cleodis {
+
+	function __construct($table_or_id=NULL) {
+		$this->table="commande";
+		parent::__construct($table_or_id);
+
+		$this->colonnes['fields_column']['filesLangue']  = array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommandeLangue","width"=>110); //PDF dans la langue de la société
+
+		$this->fieldstructure();
+
+		$this->files["contratA4NL"] = array("type"=>"pdf","preview"=>true,"no_upload"=>true,"force_generate"=>true);
+	}
+
+
+	/** Surcharge de l'export filtrÃ© pour avoir tous les champs nÃ©cessaire Ã  l'export spÃ©cifique
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	public function export_contrat_pas_mep($infos,$testUnitaire="false",$reset="true"){
+
+	 	if($testUnitaire == "true"){
+	 		$donnees = $infos;
+		}else{
+			$this->q->reset();
+
+			$this->q->from("commande","id_affaire","loyer","id_affaire")
+					->from("commande","id_affaire","affaire","id_affaire")
+					->where("commande.etat","non_loyer","AND")
+					->whereIsNull("commande.date_debut")
+					->addAllFields("commande")
+					->addAllFields("affaire")
+					->addAllFields("loyer")
+					->setLimit(-1)->unsetCount();
+			$donnees = $this->sa();
+		}
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		$feuilles = array(
+						  array("title"=> "Pas MEP")
+						);
+
+		$data = array();
+
+		foreach ($donnees as $key => $value) {
+			if($value["affaire.nature"] !== "avenant" && $value["affaire.nature"] !== "vente"){
+				$societe = ATF::societe()->select($value["commande.id_societe_fk"]);
+
+				foreach ($feuilles as $kf => $vf) {
+					$data[$kf][] = $value;
+				}
+			}
+		}
+
+		$premfeuille = true;
+
+
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+
+
+		foreach ($feuilles as $key => $value) {
+			/*if ($premfeuille){
+				$workbook->setActiveSheetIndex($key);
+			    $sheet = $workbook->getActiveSheet();
+			    $sheet->setTitle($value["title"]);
+			    $premfeuille = false;
+			}else{*/
+				$sheet = $workbook->createSheet($key);
+				$workbook->setActiveSheetIndex($key);
+				$sheet = $workbook->getActiveSheet();
+				$sheet ->setTitle($value["title"]);
+			//}
+
+			$cols = array(	array("title"=> "Affaire", "size"=>15),
+								array("title"=> "Entité", "size"=>30),
+								array("title"=> "Contrat", "size"=>60),
+								array("title"=> "Code client", "size"=>15),
+								array("title"=> "Installation prévue", "size"=>15),
+								array("title"=> "Retour (AP)", "size"=>15),
+								array("title"=> "Retour (PV)", "size"=>15),
+								array("title"=> "Retour", "size"=>15),
+								array("title"=> "Loyer", "size"=>15),
+								array("title"=> "Durée", "size"=>15),
+								array("title"=> "Fréquence du loyer", "size"=>15),
+								array("title"=> "Total", "size"=>15),
+								array("title"=> "Refinanceur", "size"=>30),
+								array("title"=> "Comité", "size"=>15),
+								array("title"=> "Décision Comité", "size"=>15),
+								array("title"=> "Validité de l'accord", "size"=>15),
+								array("title"=> "Commentaire", "size"=>60),
+								array("title"=> "Observations", "size"=>60));
+
+			$i=0;
+	    	foreach($cols as $col=>$titre){
+	    		$lettre1 = 65 +$i;
+
+				$sheet->setCellValueByColumnAndRow($i , 1, $titre["title"]);
+				$sheet->getColumnDimension(chr($lettre1))->setWidth($titre["size"]);
+				$i++;
+	        }
+
+			$this->dataPasMep($sheet, $data[$key]);
+
+	    }
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_ct_pas_mep.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+    }
+
+    public function dataPasMep(&$sheet,$donnees){
+
+    	$row_data = array();
+    	foreach ($donnees as $key => $value) {
+
+	    	$row_data[$key][] = $value["commande.ref"];
+			$row_data[$key][] = $value["affaire.id_societe"];
+			$row_data[$key][] = $value["affaire.affaire"];
+			$row_data[$key][] = $value["code_client"];
+			$row_data[$key][] = $value["affaire.date_installation_prevu"];
+			$row_data[$key][] = $value["commande.retour_prel"];
+			$row_data[$key][] = $value["commande.retour_pv"];
+			$row_data[$key][] = $value["commande.retour_contrat"];
+			$row_data[$key][] = $value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"];
+			$row_data[$key][] = $value["loyer.duree"];
+			$row_data[$key][] = $value["loyer.frequence_loyer"];
+			$row_data[$key][] = ($value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"]) * $value["loyer.duree"];
+
+
+			ATF::demande_refi()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"],"AND")
+									   ->where("etat", "valide");
+
+			$refi = ATF::demande_refi()->select_row();
+			if($refi)	$row_data[$key][] = ATF::refinanceur()->select($refi["id_refinanceur"] , "refinanceur");
+			else $row_data[$key][] = "";
+
+
+			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
+			$comites = ATF::comite()->select_all();
+
+			if($comites){
+				$commentaire = $decision = $observations = "";
+				foreach ($comites as $k => $v) {
+					if($k !== 0){
+						$decisiondate = $decisiondate."\n". $v["date"];
+						$commentaire = $commentaire."\n".$v["commentaire"];
+						$decision = $decision."\n".$v["decisionComite"];
+						$date_accord = $date_accord."\n".$v["validite_accord"];
+						$observations 	  = $observations."\n".$v["observations"];
+
+					}else{
+						$decisiondate = $v["date"];
+						$commentaire  = $v["commentaire"];
+						$decision 	  = $v["decisionComite"];
+						$date_accord =  $v["validite_accord"];
+						$observations  = $v["observations"];
+					}
+				}
+
+				$row_data[$key][] = $decisiondate;
+				$row_data[$key][] = $decision;
+				$row_data[$key][] = $date_accord;
+				$row_data[$key][] = $commentaire;
+				$row_data[$key][] = $observations;
+
+			} else {
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+				$row_data[$key][] = "";
+			}
+
+
+    	}
+
+
+		$i=0;
+    	$j=2;
+
+    	foreach ($row_data as $ligne => $value){
+	    	foreach($value as $col=>$val){
+				$sheet->setCellValueByColumnAndRow($i , $j, $val);
+				$i++;
+	        }
+	        $i=0;
+	        $j++;
+	    }
+    }
+
+
+};
 
 class commande_midas extends commande_cleodis {
 	function __construct($table_or_id=NULL) {
@@ -2426,5 +2735,44 @@ class commande_midas extends commande_cleodis {
 	}
 };
 
-class commande_cap extends commande_cleodis { };
+class commande_cap extends commande_cleodis {
+
+
+	/**
+	 * Permet de stocker le PDF signé de Sell&Sign
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $get
+	 * @param  array $post
+	 * @return
+	*/
+	public function _getSignedContract($get, $post){
+		if (!$post['data']) throw new Exception("Il manque le base64", 500);
+		if (!$post['contract_id']) throw new Exception("Il manque l'id du contract", 500);
+
+		$data = $post['data'];
+		$contract_id = $post['contract_id'];
+
+		// Récupérer l'id_commande a partir de l'id_contract_sellandsign
+		ATF::affaire()->q->reset()->where("id_contract_sellandsign",$post['contract_id'])->setStrict()->addField('id_affaire')->setDimension('cell');
+		$id_affaire = ATF::affaire()->select_all();
+		$id_mandat = ATF::affaire()->getMandat($id_affaire);
+
+		$file = ATF::mandat()->filepath($id_mandat, 'retourBPA', null, 'cap');
+		try {
+			util::file_put_contents($file,base64_decode($data));
+			//On met à jour la date de retour et retourPV du contrat
+			ATF::mandat()->u(array("id_mandat"=>$id_mandat,
+									 "date_retour"=> date("Y-m-d")
+									)
+								);
+			$return = true;
+		} catch (Exception $e) {
+			$return  = array("error"=>true, "data"=>$e);
+		}
+		return $return;
+	}
+
+
+};
 ?>

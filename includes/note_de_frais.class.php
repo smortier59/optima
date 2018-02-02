@@ -3,15 +3,23 @@
 * @package Optima
 */
 class note_de_frais extends classes_optima {
-	
+
 	private $jourLimit = 26;
 	private $idSmortier = 3;
 	private $idMmortier = 5;
 	private $idMmortierATT = 31;
+
+	private $idTPruvost = 64;
+	private $idTPruvostATT = 49;
+
+	private $idLRibeiro = 68;
+	private $idLRibeiroATT = 54;
+
+
 	public $mailFrais = "frais@absystech.net";
-	
+
 	private $god = array();
-	
+
 	function __construct() {
 		parent::__construct();
 		$this->table = __CLASS__;
@@ -31,7 +39,7 @@ class note_de_frais extends classes_optima {
 		$this->colonnes['panel']['lignes'] = array(
 			"depenses"=>array("custom"=>true,"null"=>true)
 		);
-		  
+
 		$this->panels['lignes'] = array("visible"=>true, 'nbCols'=>1);
 
 		// Champs masqués
@@ -40,26 +48,31 @@ class note_de_frais extends classes_optima {
 			,'depenses'
 		);
 
-		$this->colonnes['bloquees']['insert'] =  
-		$this->colonnes['bloquees']['cloner'] =  
-		$this->colonnes['bloquees']['update'] =  array('note_de_frais','etat');	
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] =  array('note_de_frais','etat');
 
 		$this->fieldstructure();
 		$this->onglets = array('note_de_frais_ligne'=>array('opened'=>true));
-		
+
 		$this->files = array(
 			"justificatifs"=>array("custom"=>true,'type'=>"zip","multiUpload"=>true,'opened'=>true)
 		);
 		$this->addPrivilege("valid","update");
 		$this->addPrivilege("refus","update");
-		
+
 		$this->helpMeURL = "http://wiki.optima.absystech.net/index.php/Notes_de_frais";
-		
+
 		$this->god[] = $this->idSmortier;
 		$this->god[] = $this->idMmortier;
 		$this->god[] = $this->idMmortierATT;
+		$this->god[] = $this->idTPruvost;
+		$this->god[] = $this->idTPruvostATT;
+		$this->god[] = $this->idLRibeiro;
+		$this->god[] = $this->idLRibeiroATT;
+
 	}
-	
+
 	/**
     * Retourne la valeur par défaut spécifique aux données passées en paramètres
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -68,7 +81,7 @@ class note_de_frais extends classes_optima {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field){
 
 		switch ($field) {
@@ -77,9 +90,9 @@ class note_de_frais extends classes_optima {
 			default:
 				return parent::default_value($field);
 		}
-	}	
+	}
 
-	/** 
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes de note de frais, et initialise le nom comme il faut via la date
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 09-03-2011
@@ -95,14 +108,14 @@ class note_de_frais extends classes_optima {
 			throw new errorATF(ATF::$usr->trans("aucunes_lignes_saisies"));
 		}
 		$this->infoCollapse($infos);
-		
+
 		ATF::db($this->db)->begin_transaction();
-		
+
 		// Insertion de la note de frais.
 		$infos['note_de_frais'] = $this->getDateReference(strtotime($infos['date']));
 
 		$id = parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
-		
+
 		foreach ($lignes as $k=>$i) {
 			foreach($i as $k_=>$i_){
 				$k_unescape=util::extJSUnescapeDot($k_);
@@ -113,15 +126,15 @@ class note_de_frais extends classes_optima {
 			$i['id_societe'] = ATF::societe()->decryptID($i['id_societe_fk']);
 			$i['id_frais_kilometrique'] = ATF::societe()->decryptID($i['id_frais_kilometrique_fk']);
 			unset($i['id_societe_fk'],$i['id_frais_kilometrique_fk']);
-			ATF::note_de_frais_ligne()->insert($i,$s);	
+			ATF::note_de_frais_ligne()->insert($i,$s);
 		}
-		
+
 		ATF::db($this->db)->commit_transaction();
 //		ATF::db($this->db)->rollback();
 		return $id;
 	}
-	
-	/** 
+
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes de note de frais, et initialise le nom comme il faut via la date
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 09-03-2011
@@ -140,9 +153,9 @@ class note_de_frais extends classes_optima {
 		$this->infoCollapse($infos);
 
 		ATF::db($this->db)->begin_transaction();
-		
+
 		parent::update($infos,$s,$files,$cadre_refreshed,$nolog);
-		
+
 		foreach ($this->files as $k=>$i) {
 			// Récupération des fichier a mettre dans le zip
 			$dir = dirname($this->filepath(ATF::$usr->getID(),"*",true));
@@ -150,13 +163,13 @@ class note_de_frais extends classes_optima {
 				foreach (scandir($dir) as $k_=>$i_) {
 					$f = explode(".",$i_);
 					if ($f[0]!=ATF::$usr->getID()) continue;
-					
+
 					$filename = str_replace(ATF::$usr->getID().".".$k.".","",$i_);
 					$fileToZip[$filename] = $dir."/".$i_;
 					$filesToRm[] = $dir."/".$i_;
 				}
 			}
-			
+
 			if ($fileToZip) {
 				$zip = new ZipArchive();
 				$zipFileName = $this->filepath($this->decryptId($infos['id_note_de_frais']),$k);
@@ -164,16 +177,16 @@ class note_de_frais extends classes_optima {
 				if (!file_exists($zipFileName)) {
 					touch($zipFileName); // Nécessaire pour créer le fichier avant de l'open
 				}
-	
+
 				if ($zip->open($zipFileName) !== TRUE) {
 					ATF::db()->rollback_transaction();
 					throw new errorATF("Problème avec l'ouverture du zip : ".$res,501);
 				}
-	
+
 				foreach ($fileToZip as $k_=>$i_) {
 					$zip->addFile($i_,$k_);
 				}
-	
+
 				if (!$zip->close()) {
 					ATF::db()->rollback_transaction();
 					throw new errorATF("Problème avec la fermeture du zip.",502);
@@ -209,16 +222,16 @@ class note_de_frais extends classes_optima {
 			}
 
 			if ($i['id_note_de_frais_ligne']) {
-				ATF::note_de_frais_ligne()->update($i,$s);	
+				ATF::note_de_frais_ligne()->update($i,$s);
 			} else {
-				ATF::note_de_frais_ligne()->insert($i,$s);	
+				ATF::note_de_frais_ligne()->insert($i,$s);
 			}
 		}
-		
+
 		ATF::db($this->db)->commit_transaction();
 		return true;
 	}
-	
+
 	/**
     * Retourne VRAI si l'utilisateur peut accéder aux icônes de validation de la note de frais, sinon FALSE
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -227,7 +240,7 @@ class note_de_frais extends classes_optima {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function canValid($idUser){
 		if (in_array(ATF::$usr->getId(),$this->god)) {
 			return true;
@@ -237,7 +250,7 @@ class note_de_frais extends classes_optima {
 		}
 		return false;
 	}
-	
+
 	/**
     * N'affiche que les notes de frais de l'utilisateur trié par date + l'aggrégat
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -262,10 +275,10 @@ class note_de_frais extends classes_optima {
 				$return['data'][$k]['canValid'] = false;
 			}
 		}
-		
+
 		return $return;
 	}
-	
+
 	/**
     * Prédicat retournant VRAI si la date limite est dépassée
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -274,15 +287,15 @@ class note_de_frais extends classes_optima {
 	* @param boolean TRUE si la date est dépassée
     */
 	public function checkDateLimite($time,$nf){
-		
+
 		// Récupérer le timestamp de la date de la note de frais, jour 20
 		$dateLimitTmp = strtotime($nf['note_de_frais']."-".$this->jourLimit);
 		$datelimit = mktime(0,0,0,date('m',$dateLimitTmp),date("d",$dateLimitTmp),date('Y',$dateLimitTmp));
-		
+
 		return $datelimit < $time;
 	}
-	
-	/** 
+
+	/**
 	* Retourne false car impossibilité
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 09-03-2011
@@ -290,11 +303,11 @@ class note_de_frais extends classes_optima {
 	*/
 	public function can_update($id,$infos=false){
 		$nf = $this->select($id);
-		
+
 		if (in_array(ATF::$usr->getId(),$this->god)) {
 			return true;
 		}
-			
+
 		//Si on a depassé le 20 du mois, impossible de modifier
 		if ($nf['etat']!="en_cours") {
 			throw new errorATF(ATF::$usr->trans("impossible_modifer_note_de_frais_qui_nest_pas_en_cours",$this->table),8766);
@@ -309,59 +322,59 @@ class note_de_frais extends classes_optima {
 		}
 		return true;
 	}
-	
-	/** 
+
+	/**
 	* Retourne false car impossibilité
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 21-03-2011
-	* @return boolean 
+	* @return boolean
 	*/
-	public function isExists(){ 
+	public function isExists(){
 		$this->q->reset()
 					->addField("id_note_de_frais")
 					->where("note_de_frais",$this->getDateReference())
 					->where('id_user',ATF::$usr->getID())
 					->setStrict()
 					->setDimension('cell');
-		
-		// Check si on a depassé le 20 du mois courant		
+
+		// Check si on a depassé le 20 du mois courant
 		if (strtotime($this->getDateReference()."-".$this->jourLimit) < time()) return false;
-		
+
 		return $this->sa();
 	}
-		
-	/** 
+
+	/**
 	* Retourne le nom d'une note de frais par rapport a une date.
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param date Date de base pour le calcul
-	* @return string Date 
+	* @return string Date
 	*/
 	public function getDateReference($d=false){
 		if (!$d) {
-			$d = time();	
+			$d = time();
 		}
 		if (date('d',$d)>=$this->jourLimit) {
-			$d = mktime(0,0,0,date('m',$d)+1,1,date('Y',$d));	
+			$d = mktime(0,0,0,date('m',$d)+1,1,date('Y',$d));
 		}
 
 		return date("Y-m",$d);
 	}
-				
-	/** 
+
+	/**
 	* Retourne le jour limit pour la saisi de la note de frais
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-03-2011
-	* @return jourLimit 
+	* @return jourLimit
 	*/
 	public function getJourLimit(){
 		return $this->jourLimit;
 	}
-	
-	/** 
+
+	/**
 	* Valide une  note de frais
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-03-2011
-	* @return boolean 
+	* @return boolean
 	*/
 	public function valid($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		$lignes = ATF::note_de_frais_ligne()->ss("id_note_de_frais",$this->decryptID($infos['id_note_de_frais']));
@@ -370,24 +383,24 @@ class note_de_frais extends classes_optima {
 			if ($i['etat']=="en_cours") {
 				$i['etat'] = "ok";
 				ATF::note_de_frais_ligne()->update($i);
-//				throw new errorATF("Toutes les lignes ne sont pas validées.");	
+//				throw new errorATF("Toutes les lignes ne sont pas validées.");
 			}
 		}
-		
+
 		$u = array(
 			"id_note_de_frais"=>$infos['id_note_de_frais']
 			,"etat"=>"ok"
 		);
 		$this->u($u);
-		
+
 		return true;
 	}
-	
-	/** 
+
+	/**
 	* Refuse une  note de frais
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 22-03-2011
-	* @return boolean 
+	* @return boolean
 	*/
 	public function refus($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		$lignes = ATF::note_de_frais_ligne()->ss("id_note_de_frais",$this->decryptID($infos['id_note_de_frais']));
@@ -396,16 +409,16 @@ class note_de_frais extends classes_optima {
 			if ($i['etat']=="en_cours") {
 				$i['etat'] = "nok";
 				ATF::note_de_frais_ligne()->update($i);
-//				throw new errorATF("Toutes les lignes ne sont pas validées.");	
+//				throw new errorATF("Toutes les lignes ne sont pas validées.");
 			}
 		}
-		
+
 		$u = array(
 			"id_note_de_frais"=>$infos['id_note_de_frais']
 			,"etat"=>"nok"
 		);
 		$this->u($u);
-		
+
 		return true;
 	}
 
@@ -431,13 +444,13 @@ class note_de_frais extends classes_optima {
 				$info_mail["data"] = $data;
 				$info_mail["recipient"] = $this->mailFrais;
 
-					
+
 				$mail = new mail($info_mail);
 				$mail->send();
 			}
 		}
 
 	}
-	
+
 };
 ?>

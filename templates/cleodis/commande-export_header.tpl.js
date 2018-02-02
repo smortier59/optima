@@ -11,7 +11,7 @@
 		window.location='{$current_class->name()},export_contrat_refinanceur_loyer.ajax,onglet={$pager}';
 	}
 }
-{if ATF::$codename == "cleodis"}
+{if ATF::$codename == "cleodis" ||  ATF::$codename == "cleodisbe"}
 	,
 	{
 		text: '{ATF::$usr->trans(export_contrat_pas_mep,$current_class->name())}'

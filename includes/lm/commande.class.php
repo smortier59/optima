@@ -432,7 +432,6 @@ class commande_lm extends commande {
 
 					$id_societe = $this->select($infos["id_commande"] , "id_societe");
 					if(ATF::societe()->select($id_societe, "relation") !== "client"){ ATF::societe()->u(array("id_societe"=> $id_societe, "relation"=>"client")); }
-
 				}
 				//Mode transactionel
 				ATF::db($this->db)->begin_transaction();
@@ -452,7 +451,7 @@ class commande_lm extends commande {
 					}
 
 					$this->u($d);
-					$commande = $this->select($infos['id_commande']);
+
 
 					$this->checkAndUpdateDates(array(
 						"id_commande"=>$infos['id_commande']
@@ -460,7 +459,42 @@ class commande_lm extends commande {
 						,"date"=>$d[$infos['key']]
 					));
 
+					if($infos['key'] === "date_debut" && $infos['value']){
+						//Creation de la facture prorata si besoin
+						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
+						$affaire = ATF::affaire()->select($id_affaire);
+						if($affaire["date_installation_reel"]){
+							$data = array("date_installation_reel" => $affaire["date_installation_reel"],
+										  "id_affaire" => $affaire["id_affaire"],
+										  "date_debut_contrat" => $infos['value'],
+										  "id_commande"=> $infos["id_commande"]
+										);
 
+							ATF::facture()->createFactureProrata($data);
+						}
+
+						$data = array(  "id_affaire" => $affaire["id_affaire"],
+										"date_debut_contrat" => $infos['value'],
+										"id_commande"=> $infos["id_commande"]
+									 );
+
+						//Creation de la premiere facture
+						ATF::facture()->createPremiereFacture($data);
+
+						ATF::comite()->q->reset()->where("id_affaire" , $id_affaire, "AND")
+												 ->where("comite.etat","accepte","AND",false,"!=");
+						$comite = ATF::comite()->sa();
+						//Si pas de comite pour cette affaire, on envoi le mail de courrier d'information
+						if(!$comite){
+							ATF::commande()->q->reset()->where("commande.id_commande",$this->decryptId($infos['id_commande']));
+							$commandeComite = ATF::commande()->select_row();
+
+							ATF::comite()->envoiCourrierInformation($commandeComite);
+						}
+
+					}
+
+					$commande = $this->select($infos['id_commande']);
 
 					$cmd = $this->select($infos['id_commande']);
 					if($infos['value']){
@@ -1290,8 +1324,6 @@ class commande_lm extends commande {
             if (file_exists($this->filepath($i['commande.id_commande'],"envoiCourrierClassique"))) {
                 $return['data'][$k]["envoiCourrierClassiqueExists"] = true;
             }
-
-            log::logger($i["commande.id_commande"] , "mfleurquin");
 
             if (file_exists($this->filepath($i['commande.id_commande'],"retour"))) {
                 $return['data'][$k]["ctSigneSlimpayExists"] = true;

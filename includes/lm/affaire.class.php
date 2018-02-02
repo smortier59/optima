@@ -16,6 +16,8 @@ class affaire_lm extends affaire {
 			,'affaire.affaire'
 			,'affaire.id_societe'
 			,'ref_client'=>array("custom"=>true)
+			,'email_client'=>array("custom"=>true)
+			,'carte_maison'=>array("custom"=>true)
 			,'affaire.type_affaire'=>array('EnumTranslate'=>true)
 			,'affaire.forecast'=>array("aggregate"=>array("min","avg","max"),"width"=>100,"renderer"=>"progress",'align'=>"center")
 			,'affaire.nature'=>array("width"=>80,'align'=>"center")
@@ -23,6 +25,7 @@ class affaire_lm extends affaire {
 			,'commande.etat'=>array("width"=>30,"renderer"=>"etat","width"=>80)
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,"ref_commande_lm"=>array("rowEditor"=>"setInfos")
+			,'affaire.id_pack_produit'
 		);
 
 		$this->colonnes['primary'] = array(
@@ -45,6 +48,7 @@ class affaire_lm extends affaire {
 			,'type_affaire'
 			,"compte_t"=>array("custom"=>true)
 			,'id_magasin'
+			,'id_collaborateur'
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -112,6 +116,7 @@ class affaire_lm extends affaire {
 
 		$this->files["bon_inter"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["facture"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["courrier_information"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		//$this->files["mandat_slimpay"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 
@@ -1053,6 +1058,8 @@ class affaire_lm extends affaire {
 		$this->q->addJointure("affaire","id_affaire","commande","id_affaire")
 				->addJointure("affaire","id_societe","societe","id_societe")
 				->addField("societe.ref","ref_client")
+				->addField("societe.email","email_client")
+				->addField("societe.id_carte_maison","carte_maison")
 				->addField("commande.etat");
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		$a = new affaire_lm();

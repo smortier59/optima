@@ -20,6 +20,7 @@ class pack_produit extends classes_optima {
 
 		$this->colonnes['primary']=array('etat',
 										 'type_contrat',
+										 'id_courrier_information_pack',
 										 'id_document_contrat',
 										 'id_rayon',
 										 'url_redirection',

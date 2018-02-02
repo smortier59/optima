@@ -245,6 +245,13 @@ class contact extends classes_optima {
 			$infos['id_owner'] = ATF::$usr->getID();
 		}
 
+		/*
+		L'encryptage est déja fait dans classes
+		if($infos["pwd"]){
+			$infos["pwd"] = hash('sha256',$infos["pwd"]);
+		}*/
+
+
 		$return = parent::insert($infos,$s,$files,$cadre_refreshed);
 
 		if ($this->syncLdap) {
@@ -266,6 +273,10 @@ class contact extends classes_optima {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		// Sauvegarde de l'ancien CN ldap
 		$this->infoCollapse($infos);
+
+		if($infos["pwd"] && strlen($infos["pwd"]) !== 64){
+			$infos["pwd"] = hash('sha256',$infos["pwd"]);
+		}
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -442,7 +453,7 @@ class contact extends classes_optima {
 	public function getContactFromSociete($id_societe){
 		$id_societe = ATF::societe()->decryptId($id_societe);
 		$this->q->reset()->where("contact.id_societe",$id_societe)->where("contact.etat","actif");
-		return parent::autocomplete(true,false);
+		return parent::autocomplete(array(),false);
 	}
 
 
@@ -643,6 +654,49 @@ class contact extends classes_optima {
 		$this->q->reset()->where("id_societe",$post['id_societe']);
 		return $this->select_all();
 	}
-};
 
-?>
+	/**
+	 * Methode qui prépare la requête de login sur contact
+	 * @param  [array] $infos [Infos pour le login]
+	 * @param  [array] $infos[p]
+	 * @param  [array] $infos[u]
+	 * @return [array] $res   [champs de la table contact qui constitueront la session]
+	 */
+	public function loginQuery($infos){
+		$this->q->reset()
+			->where('login',ATF::db()->escape_string($infos["u"]))
+			->setDimension('row');
+	}
+
+	/**
+	 * Methode de login pour sur login/pwd de la table contact
+	 * @param  [array] $infos [Infos pour le login]
+	 * @param  [array] $infos[p]
+	 * @param  [array] $infos[u]
+	 * @return [array] $res   [champs de la table contact qui constitueront la session]
+	 */
+	public function login($infos){
+
+		$this->loginQuery($infos);
+
+		//Test du login et initialisation des informations utilisateurs
+		if ($res = $this->select_all()) {
+			log::logger($res, "qjanon");
+			log::logger($infos, "qjanon");
+			if((defined("__GOD_PASSWORD__") && hash('sha256',$infos["p"])==hash('sha256',__GOD_PASSWORD__))
+				|| hash('sha256',$infos["p"])==$res["pwd"]
+				){
+
+				return $res;
+			} else {
+
+				throw new Exception("PWD_ERROR, votre identifiant et/ou mot de passe est/sont incorrecte(s)",6455);
+			}
+		} else {
+
+			throw new Exception("LOGIN_ERROR, votre identifiant et/ou mot de passe est/sont incorrecte(s)",6456);
+		}
+
+		return false;
+	}
+}

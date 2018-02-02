@@ -1,4 +1,4 @@
-<?	
+<?
 /** Classe devis
 * @package Optima
 * @subpackage Cleodis
@@ -52,13 +52,13 @@ class produit_cleodis extends produit {
 													'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80),
 													'services');
 
-		$this->fk_ligne =  'ref,prix_achat,id_fournisseur,id_produit,code,produit,type';  
+		$this->fk_ligne =  'ref,prix_achat,id_fournisseur,id_produit,code,produit,type';
 		$this->autocomplete = array(
 			"field"=>array("produit","ref")
 			,"show"=>array("produit","ref")
 			,"popup"=>array("produit","ref")
 		);
-		$this->colonnes["speed_insert"] = array('ref','id_fabriquant');		
+		$this->colonnes["speed_insert"] = array('ref','id_fabriquant');
 		$this->colonnes["speed_insert1"] = array(
 			'produit'
 			,'prix_achat'
@@ -87,10 +87,10 @@ class produit_cleodis extends produit {
 			,'id_produit_env'
 			,'commentaire'
 		);
-		
-		$this->colonnes['bloquees']['insert'] =  
-		$this->colonnes['bloquees']['cloner'] =  
-		$this->colonnes['bloquees']['update'] =  array('code','id_produit_dotpitch');	
+
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
+		$this->colonnes['bloquees']['update'] =  array('code','id_produit_dotpitch');
 
 
 		$this->panels['caracteristiques'] = array('nbCols'=>2,'visible'=>true);
@@ -101,13 +101,13 @@ class produit_cleodis extends produit {
 		$this->foreign_key['id_produit_garantie_uc'] =  "produit_garantie";
 		$this->foreign_key['id_produit_garantie_ecran'] =  "produit_garantie";
 		$this->foreign_key['id_produit_garantie_imprimante'] =  "produit_garantie";
-		
+
 		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 		$this->files["photo1"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 		$this->files["photo2"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->addPrivilege("getInfosFromICECAT");
-		$this->addPrivilege("setInfos","update");		
+		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("EtatUpdate");
 
 		$this->onglets = array("produit_fournisseur_loyer");
@@ -128,14 +128,14 @@ class produit_cleodis extends produit {
 				loc::mt(ATF::$usr->trans("notice_update_success"))
 				,ATF::$usr->trans("notice_success_title")
 			);
-		}		
+		}
 	}
 
 	public function EtatUpdate($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
-        
+
         $data["id_produit"] = $this->decryptId($infos["id_produit"]);
         $data[$infos["field"]] = $infos[$infos["field"]];
-               
+
         if ($r=$this->u($data)) {
             ATF::$msg->addNotice(loc::mt(ATF::$usr->trans("notice_update_success")));
         }
@@ -143,13 +143,13 @@ class produit_cleodis extends produit {
     }
 
 	/**
-    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur 
+    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $infos 
-    * @return int  id si enregistrement ok 
-    */   	
+	* @param array $infos
+    * @return int  id si enregistrement ok
+    */
 	function autocomplete($infos) {
-		
+
 			// Récupérer les produits
 			$this->q->reset()
 				->addJointure("produit","id_fournisseur","societe","id_societe")
@@ -202,16 +202,16 @@ class produit_cleodis extends produit {
 //	/**
 //    * Permet de regroupé les lignes de produits par provenance
 //    * @author Quentin JANON <qjanon@absystech.fr>
-//	* @param array $lignes 
-//    * @return int  id si enregistrement ok 
-//    */   	
+//	* @param array $lignes
+//    * @return int  id si enregistrement ok
+//    */
 //	function groupByProvenance($lignes) {
 //		foreach ($lignes as $k=>$i) {
 //			$return[$i['id_affaire_provenance']][] = $i;
 //		}
 //		return $return;
 //	}
-	
+
 	/**
 	* Surcharge du speed_insert pour pouvoir renvoyer les champs voulus
 	* Utilisation d'un querier d'insertion
@@ -223,8 +223,8 @@ class produit_cleodis extends produit {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	* @version 3
 	* @return boolean TRUE si cela s'est correctement passé
-	*/	
-	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {	
+	*/
+	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {
 		$last_id = $this->insert($infos,$s,$files,$cadre_refreshed,$nolog);
 		$result["nom"]=$this->nom($last_id);
 		$result["id"]=$last_id;
@@ -253,10 +253,10 @@ class produit_cleodis extends produit {
 				ATF::_r($key,$item);
 			}
 		}
-		
+
 		return parent::speed_insert_template($infos);
 	}
-	
+
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		$this->infoCollapse($infos);
 		$this->q->reset()->addCondition("ref",$infos["ref"])->setCount();
@@ -267,13 +267,13 @@ class produit_cleodis extends produit {
 		if($count["count"]>0){
 			throw new errorATF("Cette Ref existe déjà !",987);
 		}
-		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);	
+		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 	}
 
-	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){		
+	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		parent::update($infos,$s,$files);
 	}
-	
+
 	/**
 	* On ne doit avoir que les produits actifs
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -304,10 +304,10 @@ class produit_cleodis extends produit {
 
         $r['produit'] = $d['produit'];
         $r['url'] = $d['url'];
- 
+
     	if ($d['dd']) {
     		$r['dd'] = $this->dealWith("produit_dd",$d['dd']);
-    	}	
+    	}
 
     	if ($d['type_ecran']) {
     		$r['typeecran'] = $this->dealWith("produit_typeecran",$d['type_ecran']);
@@ -365,13 +365,13 @@ class produit_cleodis extends produit {
         	$r['photo2'] = $d['photo2'];
     	}
 
-    	return $r;  
+    	return $r;
 	}
 
 	/**
 	* Traite les différents type de données renvoyées par Icecat
     * @author Quentin JANON <qjanon@absystech.fr>
-    * @param string $nom libellé 
+    * @param string $nom libellé
 	*/
 	public function dealWith($type,$nom) {
 		ATF::_s("preselected_".$type,NULL);
@@ -385,11 +385,11 @@ class produit_cleodis extends produit {
 			ATF::_s("preselected_".$type,$res);
 			foreach ($res as $k=>$i) {
 				$r[] = array("id_".$type=>$i['id_'.$type],"libelle"=>$nom);
-			}		
+			}
 		}
 		return $r;
 	}
-	
+
 	/**
 	* Méthode permettant de recuperer les infos icecat de compléter avant l'insert
     * Infos récupéré : description, shortDescription, poids et les images
@@ -398,38 +398,38 @@ class produit_cleodis extends produit {
     * @param array $infos tableau représentant l'insert
 	* @return bool retourne true si tout se passe bien et false en cas d echec
 	*/
-	
+
 	public function getDataFromIcecat($marque,$ref) {
-	    		
+
         // URL ICE CAT VERS LA FICHE TECHNIQUE DU PRODUIT
 		$urls = "http://prf.icecat.biz/?shopname=toto;smi=product;vendor=".urlencode($marque).';prod_id='.urlencode($ref).";lang=fr";
 		$r['url'] = $urls;
 
-		$ch = curl_init($urls); 
+		$ch = curl_init($urls);
 		curl_setopt($ch, CURLOPT_COOKIEFILE, realpath('cookie.txt'));
 //		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$html = curl_exec($ch);
-		$html = mb_convert_encoding($html, "UTF-8"); 
+		$html = mb_convert_encoding($html, "UTF-8");
 		curl_close($ch);
 
 
-        
+
         // Pour éviter les caractère pourries qui empêche la bonne résolution des Regex
         $html = str_replace("`","'",$html);
         // La fiche technique est inaccessible : Produit obsolète ou alors la REF n'est pas bonn, ou bien la marque :/
 		if (preg_match('#Sorry, for this product no additional product information is found#', $html) || !$html) {
             throw new errorATF(ATF::$usr->trans("Produit introuvable sur ICECAT !"),910);
         }
-                
+
 		$html = mb_convert_encoding($html, 'HTML-ENTITIES', "UTF-8");
-		
+
 
 
         // On récupère l'id icecat pour pouvoir appeler le XML qui est plus facile a parser que le HTML
         preg_match('#<input type="hidden" name="productId"\s+value="(.*?)" >#si', $html, $pregResult);
 
-        
+
         if ($idIceCat = $pregResult[1]) {
             $url = "http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/".$idIceCat.".xml";
 
@@ -437,12 +437,12 @@ class produit_cleodis extends produit {
             $xml = file_get_contents($url);
 
 
-           
+
             $dom = new DOMDocument();
-            $dom->loadXML($xml); 
+            $dom->loadXML($xml);
             //$dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/435466.xml"); // Fiche avec tout ce qui faut comme infos
-            //$dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/".$idIceCat.".xml"); 
-            $xpath = new Domxpath($dom); 
+            //$dom->load("http://openIcecat-xml:freeaccess@data.icecat.biz/export/freexml.int/FR/".$idIceCat.".xml");
+            $xpath = new Domxpath($dom);
 
 
             // libellé
@@ -456,7 +456,7 @@ class produit_cleodis extends produit {
             // processeur
             $q = $xpath->query("//Feature/Name[@Value='Modèle de processeur']");
             if ($q->item(0)) $r['proc_modele'] = $q->item(0)->parentNode->parentNode->getAttribute("Presentation_Value");
-            
+
             $q = $xpath->query("//Feature/Name[@Value='Vitesse du processeur']");
             $q2 = $xpath->query("//Feature/Name[@Value='Nombre de coeurs de processeurs']");
             if ($q->item(0) && $q2->item(0)) $r['proc_puissance'] = $q2->item(0)->parentNode->parentNode->getAttribute("Presentation_Value")." x ".$q->item(0)->parentNode->parentNode->getAttribute("Presentation_Value");
@@ -465,7 +465,7 @@ class produit_cleodis extends produit {
             $q = $xpath->query("//Feature/Name[@Value='Mémoire interne']");
             if ($q->item(0)) $r['mem'] = $q->item(0)->parentNode->parentNode->getAttribute("Presentation_Value");
 
-            // DD 
+            // DD
             $q = $xpath->query("//Feature/Name[@Value='Quantité de disques durs installés']");
             $q2 = $xpath->query("//Feature/Name[@Value='Capacité disque dur']");
             if ($q->item(0) && $q2->item(0))$r['dd'] = $q->item(0)->parentNode->parentNode->getAttribute("Presentation_Value")." x ".$q2->item(0)->parentNode->parentNode->getAttribute("Presentation_Value");
@@ -483,7 +483,7 @@ class produit_cleodis extends produit {
             if ($q->item(0)) $r['os'] = $q->item(0)->parentNode->parentNode->getAttribute("Presentation_Value");
 
             // Type de l'écran
-            $q = $xpath->query("//Feature/Name[@Value='Écran']");            
+            $q = $xpath->query("//Feature/Name[@Value='Écran']");
             if ($q->item(0)) $r['type_ecran'] = $q->item(0)->parentNode->parentNode->getAttribute("Presentation_Value");
 
             // Taille de l'écran
@@ -513,10 +513,43 @@ class produit_cleodis extends produit {
             	$r['photo2'] = $q->item(2)->getAttribute("Original");
             }
         }
-        
-		return $r; 
+
+		return $r;
 	}
 
+	/**
+	* Méthode permettant de recuperer l'image en base64 du produit
+    * @author Morgan FLEURUQUIN <mfleurquin@absystech.fr>
+    * @param array $get  tableau des parametre get envoyé par le site avec l'id du produit
+    * @param array $post
+	* @return string le base64 du fichier
+	*/
+	public function _getBase($get, $post){
+		$path = ATF::produit()->filepath($get['id'],"photo");
+		$data = file_get_contents($path);
+	  	return base64_encode($data);
+	}
+
+
+/** Fonction qui génère les résultat pour les champs d'auto complétion
+	* @author Cyril CHARLIER <ccharlier@absystech.fr>
+	*/
+	public function _ac($get,$post) {
+		$length = 25;
+		$start = 0;
+
+		$this->q->reset();
+
+		// On ajoute les champs utiles pour l'autocomplete
+		$this->q->addField("id_produit")->addField("ref")->addField("produit")->where("id_sous_categorie",$get['id']);
+
+		if ($get['q']) {
+			$this->q->setSearch($get["q"]);
+		}
+		$this->q->setLimit($length,$start)->setPage($start/$length);
+
+		return $this->select_all();
+	}
 
 };
 
@@ -530,7 +563,7 @@ class produit_cap extends produit {
 		array("name"=>'prix_achat', "mapping"=>2),
 		array("name"=>'id', "mapping"=>3)
 	);
-		
+
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
@@ -538,21 +571,21 @@ class produit_cap extends produit {
 		$this->colonnes['primary']=array('ref','produit','commentaire');
 		$this->colonnes['panel']['caracteristiques']=array('prix_achat');
 		$this->colonnes['panel']['site_web']=array('description', 'avis_expert', 'type_offre','visible_sur_site',"prix");
- 
-		
+
+
 		$this->autocomplete = array(
 			"field"=>array("produit","ref")
 			,"show"=>array("produit","ref")
 			,"popup"=>array("produit","ref")
 		);
-		$this->colonnes["speed_insert"] = array('ref');		
+		$this->colonnes["speed_insert"] = array('ref');
 		$this->colonnes["speed_insert1"] = array(
 			 'produit'
-			,'prix_achat'			
+			,'prix_achat'
 			,'commentaire'
 			,"prix"
 		);
-		
+
 		$this->panels['caracteristiques'] = array('nbCols'=>2,'visible'=>true);
 		$this->panels['site_web'] = array('nbCols'=>2,'visible'=>true);
 
@@ -570,21 +603,21 @@ class produit_cap extends produit {
 
 		if($count["count"]>0) throw new errorATF("Cette Ref existe déjà !",987);
 
-		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);	
+		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 	}
 
 	/**
-    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur 
+    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $infos 
-    * @return int  id si enregistrement ok 
-    */   	
-	function autocomplete($infos) {		
+	* @param array $infos
+    * @return int  id si enregistrement ok
+    */
+	function autocomplete($infos) {
 		// Récupérer les produits
-		$this->q->reset()			
-			->addField("produit.produit")				
-			->addField("produit.ref","ref")				
-			->addField("produit.prix_achat","prix_achat")				
+		$this->q->reset()
+			->addField("produit.produit")
+			->addField("produit.ref","ref")
+			->addField("produit.prix_achat","prix_achat")
 			->addField("produit.id_produit","id")
 			->addField("produit.id_produit","id_produit_fk");
 		return parent::autocomplete($infos,false);
@@ -596,7 +629,7 @@ class produit_cap extends produit {
 			foreach($produit as $key=>$item){
 				ATF::_r($key,$item);
 			}
-		}		
+		}
 		return parent::speed_insert_template($infos);
 	}
 
@@ -611,8 +644,8 @@ class produit_cap extends produit {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	* @version 3
 	* @return boolean TRUE si cela s'est correctement passé
-	*/	
-	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {	
+	*/
+	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {
 		$last_id = $this->insert($infos,$s,$files,$cadre_refreshed,$nolog);
 		$result["nom"]=$this->nom($last_id);
 		$result["id"]=$last_id;
@@ -637,7 +670,7 @@ class produit_exactitude extends produit {
 		array("name"=>'prix', "mapping"=>3),
 		array("name"=>'id', "mapping"=>4)
 	);
-		
+
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
@@ -645,21 +678,21 @@ class produit_exactitude extends produit {
 		$this->colonnes['primary']=array('ref','produit','commentaire');
 		$this->colonnes['panel']['caracteristiques']=array('prix_achat');
 		$this->colonnes['panel']['site_web']=array('description', 'avis_expert', 'type_offre','visible_sur_site',"prix");
- 
-		
+
+
 		$this->autocomplete = array(
 			"field"=>array("produit","ref")
 			,"show"=>array("produit","ref")
 			,"popup"=>array("produit","ref")
 		);
-		$this->colonnes["speed_insert"] = array('ref');		
+		$this->colonnes["speed_insert"] = array('ref');
 		$this->colonnes["speed_insert1"] = array(
 			 'produit'
-			,'prix_achat'			
+			,'prix_achat'
 			,'commentaire'
 			,"prix"
 		);
-		
+
 		$this->panels['caracteristiques'] = array('nbCols'=>2,'visible'=>true);
 		$this->panels['site_web'] = array('nbCols'=>2,'visible'=>true);
 
@@ -674,23 +707,23 @@ class produit_exactitude extends produit {
 
 		$infos["url"] = util::mod_rewrite($infos["produit"]);
 
-		if($count["count"]>0) throw new errorATF("Cette Ref existe déjà !",987); 
-		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);	
+		if($count["count"]>0) throw new errorATF("Cette Ref existe déjà !",987);
+		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
 	}
 
 	/**
-    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur 
+    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $infos 
-    * @return int  id si enregistrement ok 
-    */   	
-	function autocomplete($infos) {		
+	* @param array $infos
+    * @return int  id si enregistrement ok
+    */
+	function autocomplete($infos) {
 		// Récupérer les produits
-		$this->q->reset()			
-			->addField("produit.produit")				
-			->addField("produit.ref","ref")				
+		$this->q->reset()
+			->addField("produit.produit")
+			->addField("produit.ref","ref")
 			->addField("produit.prix_achat","prix_achat")
-			->addField("produit.prix","prix")				
+			->addField("produit.prix","prix")
 			->addField("produit.id_produit","id")
 			->addField("produit.id_produit","id_produit_fk");
 		return parent::autocomplete($infos,false);
@@ -702,7 +735,7 @@ class produit_exactitude extends produit {
 			foreach($produit as $key=>$item){
 				ATF::_r($key,$item);
 			}
-		}		
+		}
 		return parent::speed_insert_template($infos);
 	}
 
@@ -717,8 +750,8 @@ class produit_exactitude extends produit {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	* @version 3
 	* @return boolean TRUE si cela s'est correctement passé
-	*/	
-	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {	
+	*/
+	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {
 		$last_id = $this->insert($infos,$s,$files,$cadre_refreshed,$nolog);
 		$result["nom"]=$this->nom($last_id);
 		$result["id"]=$last_id;
@@ -729,6 +762,6 @@ class produit_exactitude extends produit {
 		$result["data"]=$this->sa();
 		return $result;
 	}
-	
+
 };
 ?>

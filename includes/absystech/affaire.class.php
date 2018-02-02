@@ -101,7 +101,7 @@ class affaire_absystech extends affaire {
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
-
+		if(!$page) $page=0;
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
@@ -112,13 +112,13 @@ class affaire_absystech extends affaire {
 			->addField("(SUM(facture.prix)
 							 -IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
 			->addField("(SUM(facture.prix)
-			 			-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
+						-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
 						-IF(COUNT(`hotline`.`id_hotline`)=0,
 							0,
-						    (SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
-						 	)","margenette")
+								(SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
+							)","margenette")
 			->addField("IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, commande.prix-`commande`.`prix_achat`)","marge_commandee")
-			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee' , 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
+			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
 			->setView(array("align"=>array("marge"=>"right","pourcent"=>"center")));
 		$this->saFilter();
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -482,12 +482,12 @@ class affaire_absystech extends affaire {
 	}
 
 	/**
-    * Retourne la ref d'une affaire autre qu'avenant
-    * @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+		* Retourne la ref d'une affaire autre qu'avenant
+		* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
 	* @param int $id_parent
 	* @return string ref
-    */
-	function getRef($date,$class){
+		*/
+	function getRef($date,$class,$agence=NULL){
 		if (!$date) {
 			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);
 		}
@@ -498,34 +498,37 @@ class affaire_absystech extends affaire {
 		}elseif($class=="facture"){
 			$prefix="F";
 		}
-		$prefix.=strtoupper(substr(ATF::agence()->nom(ATF::$usr->get('id_agence')),0,2)).date("ym",strtotime($date));
+		if (!$agence) {
+			$agence = ATF::agence()->nom(ATF::$usr->get('id_agence'));
+		}
+		$prefix.=strtoupper(substr($agence,0,2)).date("ym",strtotime($date));
 		ATF::$class()->q->reset()
-					   ->addCondition("ref",$prefix."%","AND",false,"LIKE")
-					   ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
-					   ->addOrder('ref',"DESC")
-					   ->setDimension("row")
-					   ->setLimit(1);
+						 ->addCondition("ref",$prefix."%","AND",false,"LIKE")
+						 ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
+						 ->addOrder('ref',"DESC")
+						 ->setDimension("row")
+						 ->setLimit(1);
 
 		$nb=ATF::$class()->sa();
 
 		// On regarde aussi les références des contrat de maintenance des copieur car ils ont le même numéro séquentiel
 		/*if ($class=="devis") {
 			ATF::copieur_contrat()->q->reset()
-						   ->addCondition("ref",$prefix."%","AND",false,"LIKE")
-						   ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
-						   ->addOrder('ref',"DESC")
-						   ->setDimension("row")
-						   ->setLimit(1);
+							 ->addCondition("ref",$prefix."%","AND",false,"LIKE")
+							 ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
+							 ->addOrder('ref',"DESC")
+							 ->setDimension("row")
+							 ->setLimit(1);
 			$nb=max(ATF::copieur_contrat()->sa(),$nb);
 		}
 		// On regarde aussi les références des contrat de maintenance des copieur car ils ont le même numéro séquentiel
 		if ($class=="facture") {
 			ATF::copieur_facture()->q->reset()
-						   ->addCondition("ref",$prefix."%","AND",false,"LIKE")
-						   ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
-						   ->addOrder('ref',"DESC")
-						   ->setDimension("row")
-						   ->setLimit(1);
+							 ->addCondition("ref",$prefix."%","AND",false,"LIKE")
+							 ->addField('SUBSTRING(`ref`,8)+1',"max_ref")
+							 ->addOrder('ref',"DESC")
+							 ->setDimension("row")
+							 ->setLimit(1);
 			$nb=max(ATF::copieur_facture()->sa(),$nb);
 		}*/
 
@@ -655,11 +658,11 @@ class affaire_absystech extends affaire {
 		if (!$get['page']) $get['page'] = 0;
 
 		if ($get['filters']['field-date_debut_periode']) {
- 			$field = "date_debut_periode";
- 		} else {
- 			$field = "date";
+			$field = "date_debut_periode";
+		} else {
+			$field = "date";
 
- 		}
+		}
 
 		ATF::affaire()->q->reset()
 			->addField("affaire.id_societe")
@@ -673,7 +676,7 @@ class affaire_absystech extends affaire {
 			->from("affaire","id_affaire","facture","id_affaire")
 			->where("devis.etat","gagne")
 			->where("commande.etat","annulee","OR",false,"!=")
- 			->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year'],"OR",false,"<=")
+			->where("DATE_FORMAT(facture."+$field+",'%Y')",$get['year'],"OR",false,"<=")
 			->whereIsNotNull("devis_ligne.periode")
 			->addGroup("affaire.id_affaire")
 			->addGroup("affaire.id_societe")
@@ -722,179 +725,137 @@ class affaire_absystech extends affaire {
 
 	public function _export_rapport_facturation_periodique(&$get,$post) {
 
-        include_once __ATF_PATH__."libs/PHPExcel/Classes/PHPExcel.php";
-        $o = new PHPExcel();
-        $o->getProperties()
-           ->setCreator('Quentin JANON <qjanon@absystech.fr>')
-           ->setTitle('Export listing de la facturation périodique')
-           ->setDescription("Document reprenant le listing de la facturation périodique")
-           ->setCategory('export')
-           ;
+				include_once __ATF_PATH__."libs/PHPExcel/Classes/PHPExcel.php";
+				$o = new PHPExcel();
+				$o->getProperties()
+					 ->setCreator('Quentin JANON <qjanon@absystech.fr>')
+					 ->setTitle('Export listing de la facturation périodique')
+					 ->setDescription("Document reprenant le listing de la facturation périodique")
+					 ->setCategory('export')
+					 ;
 
-        $s = $o->getSheet(0);
-        $s->setTitle("Facturation périodique");
+				$s = $o->getSheet(0);
+				$s->setTitle("Facturation périodique");
 
-        $get['noLimit'] = true;
+				$get['noLimit'] = true;
 		$data = self::_rapportFacturePeriodique($get,$post);
 		$data = $data['data'];
-        // HEader
-        $h = array("Société","Affaire","Date de commande","Jan","Fév","Mar","Avr","Mai","Juin","Jui","Aou","Sept","Oct","Nov","Déc.");
+				// HEader
+				$h = array("Société","Affaire","Date de commande","Jan","Fév","Mar","Avr","Mai","Juin","Jui","Aou","Sept","Oct","Nov","Déc.");
 
-        $row = 1;
-        $s->fromArray($h," ","A".$row);
+				$row = 1;
+				$s->fromArray($h," ","A".$row);
 
-        $header = 'a1:z1';
-        // $ews->getStyle($header)->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB('00ffff00');
-        $style = array(
-            'font' => array('bold' => true),
-            'alignment' => array('horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,),
-        );
-        $s->getStyle($header)->applyFromArray($style);
+				$header = 'a1:z1';
+				// $ews->getStyle($header)->getFill()->setFillType(\PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setARGB('00ffff00');
+				$style = array(
+						'font' => array('bold' => true),
+						'alignment' => array('horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_CENTER,),
+				);
+				$s->getStyle($header)->applyFromArray($style);
 
-        $row = 3;
-        foreach ($data as $k=>$i) {
+				$row = 3;
+				foreach ($data as $k=>$i) {
 
-            $d = array(
-                $i['id_societe'],
-                $i['id_affaire']." (".$i['periode'].")",
-                $i['date_cmd'],
-                number_format($i['Jan'],2),
-                number_format($i['Feb'],2),
-                number_format($i['Mar'],2),
-                number_format($i['Apr'],2),
-                number_format($i['May'],2),
-                number_format($i['Jun'],2),
-                number_format($i['Jul'],2),
-                number_format($i['Aug'],2),
-                number_format($i['Sept'],2),
-                number_format($i['Oct'],2),
-                number_format($i['Nov'],2),
-                number_format($i['Dec'],2),
-            );
+						$d = array(
+								$i['id_societe'],
+								$i['id_affaire']." (".$i['periode'].")",
+								$i['date_cmd'],
+								number_format($i['Jan'],2),
+								number_format($i['Feb'],2),
+								number_format($i['Mar'],2),
+								number_format($i['Apr'],2),
+								number_format($i['May'],2),
+								number_format($i['Jun'],2),
+								number_format($i['Jul'],2),
+								number_format($i['Aug'],2),
+								number_format($i['Sept'],2),
+								number_format($i['Oct'],2),
+								number_format($i['Nov'],2),
+								number_format($i['Dec'],2),
+						);
 
-            $s->fromArray($d," ","A".$row);
-            $row++;
-        }
+						$s->fromArray($d," ","A".$row);
+						$row++;
+				}
 
-        for ($col = ord('a'); $col <= ord('z'); $col++) {
-            $s->getColumnDimension(chr($col))->setAutoSize(true);
-        }
+				for ($col = ord('a'); $col <= ord('z'); $col++) {
+						$s->getColumnDimension(chr($col))->setAutoSize(true);
+				}
 
-        $writer = \PHPExcel_IOFactory::createWriter($o, 'Excel5');
+				$writer = \PHPExcel_IOFactory::createWriter($o, 'Excel5');
 
-        $fn = $this->filepath(ATF::$usr->getId(),"rapport_facturation_periodique",true);
-        util::file_put_contents($fn,"");
-        $writer->save($fn);
-        $return['URL'] = __ABSOLUTE_WEB_PATH__."/affaire-".ATF::user()->cryptId(ATF::$usr->getId())."-rapport_facturation_periodique.temp";
+				$fn = $this->filepath(ATF::$usr->getId(),"rapport_facturation_periodique",true);
+				util::file_put_contents($fn,"");
+				$writer->save($fn);
+				$return['URL'] = __ABSOLUTE_WEB_PATH__."/affaire-".ATF::user()->cryptId(ATF::$usr->getId())."-rapport_facturation_periodique.temp";
 
-        return $return;
+				return $return;
 	}
 
-/* PARTIE DES FONCTIONS POUR TELESCOPE*/
+
+
+
+
+
 
 	/**
-  *
-  * Fonctions _GET pour telescope
-  * @package Telescope
-  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-  * @param $get array contient le tri, page limit et potentiellement un id.
-  * @param $post array Argument obligatoire mais inutilisé ici.
-  * @return array un tableau avec les données
-  */
-  public function _GET($get,$post) {
-
-    // Gestion du tri
-    if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "affaire.date";
-    if (!$get['trid']) $get['trid'] = "desc";
-
-    // Gestion du limit
-    if (!$get['limit']) $get['limit'] = 30;
-
-    // Gestion de la page
-    if (!$get['page']) $get['page'] = 0;
-
-    $colsData = array("affaire.*","societe.societe");
-
-    $this->q->reset();
-
-    if ($get['id_affaire']) $colsData = array("affaire.*");
-
-    $this->q->addField($colsData);
-    $this->q->from("affaire","id_societe","societe","id_societe");
-
-    if($get["search"]){
-      header("ts-search-term: ".$get['search']);
-      $this->q->setSearch($get['search']);
-    }
-
-	// Filtre sur l'etat de l'affaire
-	if ($get['filters']['devis'] == "on") {
-		$this->q->where("affaire.etat","devis","OR","etatAffaire");
-	}
-	if ($get['filters']['commande'] == "on") {
-		$this->q->where("affaire.etat","commande","OR","etatAffaire");
-	}
-	if ($get['filters']['facture'] == "on") {
-		$this->q->where("affaire.etat","facture","OR","etatAffaire");
-	}
-	if ($get['filters']['terminee'] == "on") {
-		$this->q->where("affaire.etat","terminee","OR","etatAffaire");
-	}
-	if ($get['filters']['perdue'] == "on") {
-		$this->q->where("affaire.etat","perdue","OR","etatAffaire");
+	*
+	* Fonctions _GET pour telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param $get array contient le tri, page limit et potentiellement un id.
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function _GET($get,$post) {
+		if ($c = ATF::$usr->get('contact')) {
+			$return = ATF::affaire_partenaire()->_GET($get);
+		} else {
+			$return = ATF::affaire_telescope()->_GET($get);
+		}
+		return $return;
 	}
 
+	public function _getJalons($get) {
+		if ($c = ATF::$usr->get('contact')) {
+			return ATF::affaire_partenaire()->getJalons($get);
+		}
+	}
 
+	public function _getJalonsHistory($get) {
+		if ($c = ATF::$usr->get('contact')) {
+			return ATF::affaire_partenaire()->getJalonsHistory($get['id']);
+		}
+	}
 
-    if ($get['id_affaire']) {
+	public function _addJalon($get, $post) {
+		if ($c = ATF::$usr->get('contact')) {
+			return ATF::affaire_partenaire()->addJalon($post);
+		}
+	}
 
-		$this->q->where("affaire.id_affaire",$get['id_affaire'])->setCount(false)->setDimension('row');
-		$data = $this->sa();
+	public function _set($get, $post) {
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
 
-		ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
-								->addField("devis.*")
-								->from("devis","id_user","user","id_user")
-								->where("devis.id_affaire",$get['id_affaire'])->addOrder('id_devis', 'desc');
-		$data["devis"] = ATF::devis()->sa();
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if ($post['name'] != "date_fin") throw new Exception("NON_MODIFIABLE",1203);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
 
-		foreach ($data as $key => $value) {
-			if($key == "id_societe") $data["societe"] = ATF::societe()->select($value);
-			//if($key == "id_contact") $data["contact"] = ATF::contact()->select($value);
-			if($key == "id_commercial") $data["user"] = ATF::user()->select($value);
-			//if($key == "id_user_technique") $data["user_technique"] = ATF::user()->select($value);
-			//if($key == "id_user_admin") $data["user_admin"] = ATF::user()->select($value);
-
-			//$data["fichier_joint"] = $data["documentAnnexes"] = false;
-
-			//if (file_exists($this->filepath($get['id_affaire'],"fichier_joint"))) $data["fichier_joint"] = true;
-			//if (file_exists($this->filepath($get['id_affaire'],"documentAnnexes"))) $data["documentAnnexes"] = true;
-
-
-			unset($data["id_societe"],  $data["id_commercial"]);
+		switch ($post['name']) {
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
 		}
 
-		/*$this->q->reset()->where("affaire.id_affaire", $data["id_affaire"]);
-		$data["affaireAffaire"] = $this->sa();
-		*/
-		$data["idcrypted"] = $this->cryptId($get["id_affaire"]);
+		$toUpdate['id_affaire'] = $post['pk'];
 
-    } else {
-      $this->q->setLimit($get['limit'])->setCount();
-      $data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-    }
+		return $this->u($toUpdate);
+	}
 
 
-
-    if($get['id_affaire']){
-      $return = $data;
-    }else{
-      header("ts-total-row: ".$data['count']);
-      header("ts-max-page: ".ceil($data['count']/$get['limit']));
-      header("ts-active-page: ".$get['page']);
-      $return = $data['data'];
-    }
-    return $return;
-  }
 
 
 	/** Fonction qui génère les résultat pour les champs d'auto complétion affaire
@@ -957,7 +918,7 @@ class affaire_absystech extends affaire {
 class affaire_att extends affaire_absystech {
 	/**
 	* Retourne la marge effectuée entre le début de l'année passée en paramètre et NOW()
-    * @author Yann GAUTHERON <ygautheron@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
+		* @author Yann GAUTHERON <ygautheron@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param int $offset Décalage de l'année demandé
 	* @return int
 	*/
@@ -1002,13 +963,13 @@ class affaire_att extends affaire_absystech {
 	}
 
 	/**
-    * Retourne la ref d'une affaire autre qu'avenant
-    * @author Mathieu Tribouillard <mtribouillard@absystech.fr>
-    * @author Yann GAUTHERON <ygautheron@absystech.fr>
+		* Retourne la ref d'une affaire autre qu'avenant
+		* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+		* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param int $id_parent
 	* @return string ref
-    */
-	function getRef($date,$class){
+		*/
+	function getRef($date,$class,$agence=NULL){
 		if (!$date) {
 			throw new errorATF(ATF::$usr->trans("impossible_de_generer_la_ref_sans_date"),321);
 		}
@@ -1019,13 +980,16 @@ class affaire_att extends affaire_absystech {
 		}elseif($class=="facture"){
 			$prefix="AF";
 		}
-		$prefix.=strtoupper(substr(ATF::agence()->nom(ATF::$usr->get('id_agence')),0,2)).date("ym",strtotime($date));
+		if (!$agence) {
+			$agence = ATF::agence()->nom(ATF::$usr->get('id_agence'));
+		}
+		$prefix.=strtoupper(substr($agence,0,2)).date("ym",strtotime($date));
 		ATF::$class()->q->reset()
-					   ->addCondition("ref",$prefix."%","AND",false,"LIKE")
-					   ->addField('SUBSTRING(`ref`,9)+1',"max_ref")
-					   ->addOrder('ref',"DESC")
-					   ->setDimension("row")
-					   ->setLimit(1);
+						 ->addCondition("ref",$prefix."%","AND",false,"LIKE")
+						 ->addField('SUBSTRING(`ref`,9)+1',"max_ref")
+						 ->addOrder('ref',"DESC")
+						 ->setDimension("row")
+						 ->setLimit(1);
 
 		$nb=ATF::$class()->sa();
 
@@ -1044,13 +1008,532 @@ class affaire_att extends affaire_absystech {
 		}
 		return $prefix.$suffix;
 	}
-
-
-
-
-
 };
-class affaire_wapp6 extends affaire_absystech { }
-class affaire_demo extends affaire_absystech { }
 
-?>
+class affaire_wapp6 extends affaire_absystech { };
+class affaire_demo extends affaire_absystech { };
+
+class affaire_partenaire extends affaire {
+	public $table = "affaire";
+	/**
+	*
+	* Fonctions _GET pour telescope
+	* @package Telescope
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param $get array contient le tri, page limit et potentiellement un id.
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function _GET($get) {
+		if (!$contact = ATF::$usr->get('contact')) {
+			throw new Exception("Vous devriez être connecté en tant que partenaire pour accéder a cette demande.", 1526);
+		}
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_affaire";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+		if ($get['no-limit']) $get['page'] = false;
+
+		if ($get['id']) {
+			// Decrypt de l'ID
+			$get['id'] = $this->decryptId($get['id']);
+			// Unset du tri
+			$get['tri'] = false;
+		}
+
+		$this->q->reset();
+
+		$colsData = array(
+			"affaire.id_affaire"=>array(),
+			"affaire.date"=>array(),
+			"affaire.etat"=>array(),
+			"affaire.id_societe"=>array(),
+			"affaire.date_fin"=>array(),
+			"devis.id_devis"=>array(),
+			"devis.id_contact"=>array(),
+			'contact.fonction'=>array(),
+			'contact.tel'=>array(),
+			'contact.gsm'=>array(),
+			'contact.email'=>array(),
+			'societe.code_groupe'=>array(),
+			'CASE WHEN (societe.code_groupe) THEN CONCAT(societe.societe, " [", societe.code_groupe, "]") ELSE societe.societe END'=>array("alias"=>"nom_societe"),
+			'societe.adresse'=>array(),
+			'societe.adresse_2'=>array(),
+			'societe.adresse_3'=>array(),
+			'societe.cp'=>array(),
+			'societe.ville'=>array(),
+			'MAX(affaire_etat.date)'=>array("alias"=>"last_jalon")
+		);
+
+		$this->q->addField($colsData);
+		$this->q->from("affaire","id_societe","societe","id_societe");
+		$this->q->from("affaire","id_affaire","devis","id_affaire");
+		$this->q->from("devis","id_contact","contact","id_contact");
+		$this->q->from("affaire","id_affaire","affaire_etat","id_affaire");
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->where('CASE WHEN (societe.code_groupe) THEN CONCAT(societe.societe, " [", societe.code_groupe, "]") ELSE societe.societe END', "%".$get['search']."%", "OR", "search", "LIKE");
+			$this->q->where("affaire.affaire", "%".$get['search']."%", "OR", "search", "LIKE");
+		}
+
+		// Filtre sur l'etat de l'affaire
+		if ($get['filters']['devis'] == "on") {
+			$this->q->where("affaire.etat","devis","OR","etatAffaire");
+		}
+		if ($get['filters']['commande'] == "on") {
+			$this->q->where("affaire.etat","commande","OR","etatAffaire");
+		}
+		if ($get['filters']['facture'] == "on") {
+			$this->q->where("affaire.etat","facture","OR","etatAffaire");
+		}
+		if ($get['filters']['terminee'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+		}
+		if ($get['filters']['perdue'] == "on") {
+			$this->q->where("affaire.etat","perdue","OR","etatAffaire");
+		}
+
+		// On check si on a des infos de contact, si c'est le cas, alors on vient d'un portail partenaire...
+		// On recherche des filiales
+		ATF::societe()->q->reset()->addField('id_societe')->where('id_filiale', $contact['id_societe'])->setStrict();
+		if ($filiales = ATF::societe()->sa()) {
+			// On créer notre tableau d'ID de société a sonder
+			$ids = $filiales;
+			array_push($ids, array("id_societe"=>$contact['id_societe']));
+		} else {
+			$ids = array(array("id_societe"=>$contact['id_societe']));
+		}
+
+		foreach ($ids as $k=>$id) {
+			$this->q->where("affaire.id_societe", $id['id_societe']);
+		}
+
+		// On check le flag
+		$this->q->where("suivi_ec",true);
+
+		// Filtre sur l'etat de l'affaire
+		if ($get['filters']['en_cours'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire","!=");
+		}
+		if ($get['filters']['terminee'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+		}
+
+		if ($get['id']) {
+			$this->q->where("affaire.id_affaire",$get['id'])->setLimit(1);
+
+		} else {
+			// TRI
+			switch ($get['tri']) {
+				case 'societe':
+					$get['tri'] = "societe.".$get['tri'];
+				break;
+				case 'date_fin':
+					$this->q->addOrder("affaire.date_fin", "IS NULL"); // Les NULL en LAST, THAT TRICK !
+				break;
+				case 'nom_societe':
+					$get['tri'] = "nom_societe";
+				break;
+				case 'last_jalon':
+					$this->q->addOrder("last_jalon");
+				break;
+				default:
+					$get['tri'] = "affaire.".$get['tri'];
+				break;
+			}
+
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
+
+			$this->q->addGroup('affaire.id_affaire');
+		}
+
+		$this->q->setToString();
+		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
+		$this->q->unsetToString();
+
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+					$k_ = $tmp[1];
+				}
+
+				if ($k_ == 'id_affaire_fk') {
+					$data["data"][$k]['id_affaire_fk'] = $this->cryptId($val);
+				}
+			}
+		}
+
+		if($get['id']){
+			$return = $data['data'][0];
+
+			// On récupère le devis et surtout les lignes
+			$return['materiel'] = ATF::devis_ligne()->ss('id_devis', $return['id_devis_fk']);
+
+		}else{
+			header("ts-total-row: ".$data['count']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
+
+			$return = $data['data'];
+		}
+		return $return;
+	}
+
+	/**
+	 * Récupération des jalons lié au module affaire, regroupé par catégory ou non
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $get paramètre $_GET
+	 *                    groupByCategory	Regroupement des jalons par nom de category
+	 * @return array      Listes des jalons
+	 */
+	public function getJalons($get) {
+		ATF::jalon()->q->reset()->where('module','affaire');
+		$r = ATF::jalon()->sa();
+
+		if ($get['groupByCategory']) {
+			$result = array();
+			foreach ($r as $k=>$i) {
+				$el = array();
+				$el['text'] = $i['jalon'];
+				$el['id'] = $i['id_jalon'];
+
+				if ($settings = ATF::settings()->getSettings("jalon", $i['id_jalon'], ATF::$usr->get("contact",'id_societe'))) {
+					$el['id_settings'] = $settings[0]['id_settings'];
+					$el['mail_to'] = $settings[0]['mail_to'];
+					$el['mail_content'] = $settings[0]['mail_content'];
+				}
+
+				$childs[$i['category']][] = $el;
+			}
+
+			foreach (array_keys($childs) as $k=>$i) {
+				$result[$k]['text'] = strtoupper($i);
+				$result[$k]['children'] = $childs[$i];
+			}
+			$return = $result;
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Retourne l'historique des jalons pour une affaire (stocké dans affaire_etat)
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  string $id ID crypté de l'affaire
+	 * @return array     Collection des jalons affecté a une affaire
+	 */
+	public function getJalonsHistory($id) {
+		ATF::affaire_etat()->q->reset()
+			->where('id_affaire',ATF::affaire()->decryptId($id))
+			->addOrder('date','desc');
+
+		$return = ATF::affaire_etat()->sa();
+
+		foreach ($return as $k=>$i) {
+			$return[$k] = $this->infosJalon($return[$k]);
+		}
+		return $return ? $return : array();
+	}
+
+	/**
+	 * Renvoi les informations spécifiques supplémentaires pour les jalons (icon & classname). Utile pour le rendu des jalons
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $jalon Modèle de jalon
+	 * @return array        Modèle de jalon complété avec les informations supplémentaires
+	 */
+	private function infosJalon($jalon) {
+
+		switch ($jalon['id_jalon']) {
+			case 1: // Préparation en cours
+				$jalon['icon'] = "pli-box-open";
+				$jalon['classname'] = "info";
+			break;
+			case 2: // Préparation terminé. Expédition programmé
+				$jalon['icon'] = "pli-box-close";
+				$jalon['classname'] = "success";
+			break;
+			case 3: // Colis remis au transporteur
+				$jalon['icon'] = "pli-truck";
+				$jalon['classname'] = "info";
+			break;
+			case 4: // Colis livré par le transporteur
+				$jalon['icon'] = "pli-map-marker-2";
+				$jalon['classname'] = "purple";
+			break;
+			case 5: // Le système a détecté les téléphones
+				$jalon['icon'] = "pli-laser";
+				$jalon['classname'] = "warning";
+			break;
+			case 6: // Installation lien SDSL
+				$jalon['icon'] = "ti-link";
+				$jalon['classname'] = "primary";
+			break;
+			case 7: // Installation lien ADSL
+				$jalon['icon'] = "ti-link";
+				$jalon['classname'] = "info";
+			break;
+			case 8: // Pose routeur SDSL
+				$jalon['icon'] = "pli-data-settings";
+				$jalon['classname'] = "success";
+			break;
+			case 9: // Pose routeur ADSL
+				$jalon['icon'] = "pli-data-settings";
+				$jalon['classname'] = "success";
+			break;
+			case 10: // Livraison prévue
+				$jalon['icon'] = "fa fa-calendar-plus-o";
+				$jalon['classname'] = "info";
+			break;
+			case 11: // Livraison réalisée
+				$jalon['icon'] = "fa fa-calendar-check-o";
+				$jalon['classname'] = "success";
+			break;
+			case 12: // 	Intervention planifiée
+				$jalon['icon'] = "fa fa-calendar-plus-o";
+				$jalon['classname'] = "info";
+			break;
+			case 13: // Intervention réalisée
+				$jalon['icon'] = "fa fa-calendar-check-o";
+				$jalon['classname'] = "success";
+			break;
+			default:
+				$jalon['icon'] = "pli-box-open";
+				$jalon['classname'] = "default";
+			break;
+		}
+
+
+		$jalon['jalon'] = ATF::jalon()->nom($jalon['id_jalon']);
+		$jalon['category'] = strtoupper(ATF::jalon()->select($jalon['id_jalon'], 'category'));
+
+		if ($jalon['category'] === 'ERGATEL') {
+			$jalon['classname'] = "purple";
+		} else if ($jalon['category'] === 'IRIS') {
+			$jalon['classname'] = "mint";
+		} else if ($jalon['category'] === 'SDCT') {
+			$jalon['classname'] = "warning";
+		} else if ($jalon['category'] === 'GENERAL') {
+			$jalon['classname'] = "danger";
+		} else if ($jalon['category'] === 'SAINT-MACLOU') {
+			$jalon['classname'] = "info";
+		} else {
+			$jalon['classname'] = "primary";
+		}
+
+		return $jalon;
+	}
+
+	/**
+	 * Ajoute un jalon sur une affaire, lié a un contact connecté.
+	 * Récupère ensuite les paramètres de notification dans les settings pour envoyer un mail d'alerte
+	 * @author Quentin JANON <qjanon@absystech.fr>
+	 * @param  array $post data $_POST
+	 * @return array $return
+	 *         					result Informations sur le jalon inséré pour le rendre côté HTML
+	 *         					notices Ensemble des notices générées pendant le traitement
+	 */
+	public function addJalon($post) {
+		if (!ATF::$usr->get('contact'))throw new Exception("SESSION_ERROR, impossible d'insérer le jalon.",1999);
+		if (!$post['id_affaire']) throw new Exception("AFFAIRE_MISSING, impossible d'insérer le jalon.",2000);
+		if (!$post['jalon']) throw new Exception("JALON_MISSING, impossible d'insérer le jalon.",2001);
+		// log::logger($post, 'qjanon');
+		// throw new Exception("WIP", 1032);
+		$toInsert = array(
+			"id_jalon"=>$post['jalon'],
+			"id_affaire"=>ATF::affaire()->decryptId($post['id_affaire']),
+			"id_contact"=>ATF::$usr->get('contact','id_contact'),
+			"comment"=>$post['comment']
+		);
+
+		$id = ATF::affaire_etat()->insert($toInsert);
+		$id_societe = ATF::affaire()->select($post['id_affaire'], "id_societe");
+		$societe = ATF::societe()->nom($id_societe);
+
+		if ($post['sendmail']) {
+			$settings = ATF::settings()->select($post['sendmail']);
+			if ($settings) {
+				if (ATF::mail()->check_mail($settings["mail_to"])) {
+					$mail = array(
+						"objet"=>utf8_decode("Changement d'état de l'installation pour ".$societe)
+						,"from"=>"Espace client Absystech <no-reply@absystech.fr>"
+						,"html"=>true
+						,"template"=>'jalon'
+						,"template_only"=>true
+						,"recipient"=>$settings["mail_to"]
+						,"texte"=> nl2br($settings['mail_content'])
+						,"societe"=>$societe
+					);
+					$notification = new mail($mail);
+					if ($notification->send()) {
+						ATF::$msg->addNotice("Notifications envoyées avec succès");
+					}
+				}
+			} else {
+				ATF::$msg->addWarning("Impossible d'envoyer les notifications mails, la configuration est corrompue...");
+			}
+		}
+		$n = array();
+		$n = array_merge($n, ATF::$msg->getWarnings(), ATF::$msg->getNotices());
+		$return = array(
+			"result"=>array(
+				'id_jalon'=>$post['jalon'],
+				'comment'=>$post['comment'],
+				'date'=>date('Y-m-d H:i')
+			),
+			"notices"=>$n
+		);
+
+		$return["result"] = $this->infosJalon($return["result"]);
+
+		return $return;
+
+	}
+};
+
+class affaire_telescope extends affaire_absystech {
+	/**
+	* Fonctions _GET pour telescope
+	* @package Telescope
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param $get array contient le tri, page limit et potentiellement un id.
+	* @param $post array Argument obligatoire mais inutilisé ici.
+	* @return array un tableau avec les données
+	*/
+	public function _GET($get) {
+
+		// Gestion du tri
+		if (!$get['tri']) $get['tri'] = "id_affaire";
+		if (!$get['trid']) $get['trid'] = "desc";
+
+		// Gestion du limit
+		if (!$get['limit']) $get['limit'] = 30;
+
+		// Gestion de la page
+		if (!$get['page']) $get['page'] = 0;
+		if ($get['no-limit']) $get['page'] = false;
+
+		if ($get['id']) {
+			// Decrypt de l'ID
+			$get['id'] = $this->decryptId($get['id']);
+			// Unset du tri
+			$get['tri'] = false;
+		}
+
+		$this->q->reset();
+
+		$colsData = array(
+			"affaire.id_affaire"=>array(),
+			"affaire.date"=>array(),
+			"affaire.etat"=>array(),
+			"affaire.id_societe"=>array("visible"=>false),
+			"affaire.affaire"=>array(),
+			"societe.societe"=>array()
+		);
+
+		$this->q->addField($colsData);
+		$this->q->from("affaire","id_societe","societe","id_societe");
+
+		if($get["search"]){
+			header("ts-search-term: ".$get['search']);
+			$this->q->setSearch($get['search']);
+		}
+
+		// Filtre sur l'etat de l'affaire
+		if ($get['filters']['devis'] == "on") {
+			$this->q->where("affaire.etat","devis","OR","etatAffaire");
+		}
+		if ($get['filters']['commande'] == "on") {
+			$this->q->where("affaire.etat","commande","OR","etatAffaire");
+		}
+		if ($get['filters']['facture'] == "on") {
+			$this->q->where("affaire.etat","facture","OR","etatAffaire");
+		}
+		if ($get['filters']['terminee'] == "on") {
+			$this->q->where("affaire.etat","terminee","OR","etatAffaire");
+		}
+		if ($get['filters']['perdue'] == "on") {
+			$this->q->where("affaire.etat","perdue","OR","etatAffaire");
+		}
+
+		if ($get['id']) {
+			$this->q->where("affaire.id_affaire",$get['id'])->setLimit(1);
+
+		} else {
+			// TRI
+			switch ($get['tri']) {
+				case 'societe':
+					$get['tri'] = "societe.".$get['tri'];
+				break;
+				default:
+					$get['tri'] = "affaire.".$get['tri'];
+				break;
+			}
+
+			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
+
+		}
+
+		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		foreach ($data["data"] as $k=>$lines) {
+			foreach ($lines as $k_=>$val) {
+
+				if (strpos($k_,".")) {
+					$tmp = explode(".",$k_);
+					$data['data'][$k][$tmp[1]] = $val;
+					unset($data['data'][$k][$k_]);
+					$k_ = $tmp[1];
+				}
+
+				if ($k_ == 'id_affaire_fk') {
+					$data["data"][$k]['id_affaire_fk'] = $this->cryptId($val);
+				}
+			}
+		}
+
+		if($get['id']){
+			$return = $data['data'][0];
+
+			ATF::devis()->q->reset()->addField("CONCAT(SUBSTR(user.prenom, 1,1),'. ',user.nom)","user")
+									->addField("devis.*")
+									->from("devis","id_user","user","id_user")
+									->where("devis.id_affaire",$get['id'])->addOrder('id_devis', 'desc');
+			$return["devis"] = ATF::devis()->sa();
+
+			foreach ($return as $key => $value) {
+				if($key == "id_societe") $return["societe"] = ATF::societe()->select($value);
+				if($key == "id_commercial") $return["user"] = ATF::user()->select($value);
+				unset($return["id_societe"],  $return["id_commercial"]);
+			}
+
+			foreach ($return["devis"] as $key => $value) {
+				$return['devis'][$key]["fichier_joint"] = $return['devis'][$key]["documentAnnexes"] = false;
+
+				if (file_exists(ATF::devis()->filepath($value['id_devis'],"fichier_joint"))) $return['devis'][$key]["fichier_joint"] = true;
+				if (file_exists(ATF::devis()->filepath($value['id_devis'],"documentAnnexes"))) $return['devis'][$key]["documentAnnexes"] = true;
+			}
+
+		}else{
+			header("ts-total-row: ".$data['count']);
+			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
+
+			$return = $data['data'];
+		}
+		return $return;
+	}
+};

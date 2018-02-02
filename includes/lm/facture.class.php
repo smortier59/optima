@@ -227,7 +227,7 @@ class facture_lm extends facture {
 							);
 					if($status["executionStatus"] === "processed") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										"status"=> "payee",
+										"etat"=> "payee",
 										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
 									));
 					}
@@ -249,6 +249,140 @@ class facture_lm extends facture {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Permet de créer des factures au prorata par rapport à la date d'installation et date
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $infos [description]
+	 */
+	public function createFactureProrata($infos){
+
+		if(strtotime($infos["date_installation_reel"]) < strtotime($infos["date_debut_contrat"])){
+
+			$affaire = ATF::affaire()->select($infos["id_affaire"]);
+			$commande = ATF::commande()->select($infos["id_commande"]);
+
+			ATF::loyer()->q->reset()->where("id_affaire", $infos["id_affaire"])
+									->addOrder("id_loyer", "ASC");
+			$loyers = ATF::loyer()->select_all();
+
+			$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
+											date("m", strtotime($infos["date_installation_reel"])),
+											date("Y", strtotime($infos["date_installation_reel"])));
+
+			$nbJProRata = $nbDInMonth - date("d", strtotime($infos["date_installation_reel"]));
+
+			$loyerAuJour = $loyers[0]["loyer"]/$nbDInMonth;
+
+			$total = $loyerAuJour * $nbJProRata;
+
+			$facture["facture"] = array(
+	            "id_societe" => $affaire["id_societe"],
+	            "type_facture" => "libre",
+	            "mode_paiement" => "prelevement",
+	            "id_affaire" => $affaire["id_affaire"],
+	            "type_libre" => "prorata",
+	            "date" => date("d-m-Y"),
+	            "id_commande" => $commande["id_commande"],
+	            "date_previsionnelle" => date("d-m-Y"),
+	            "date_periode_debut" => $infos["date_installation_reel"],
+	            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "prix" => round($total, 2),
+	            "date_periode_debut_libre" => $infos["date_installation_reel"],
+	            "date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_installation_reel"])),
+	            "prix_libre" => round($total, 2),
+	            "nature" => "prorata"
+	        );
+
+			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+			$lignes = ATF::commande_ligne()->select_all();
+
+			foreach ($lignes as $key => $value) {
+				$ligne = array();
+				$ligne["facture_ligne__dot__produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+	            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+	            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+	            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+	            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+	            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+	            $ligne["facture_ligne__dot__serial"] = "";
+	            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+	            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+
+	            $facture["values_facture"]["produits"][] = $ligne;
+			}
+
+			$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
+	        $this->insert($facture);
+		}
+	}
+
+	/**
+	 * Permet de créer la premiere facture du contrat
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param
+	 */
+	public function createPremiereFacture($infos){
+
+		$affaire = ATF::affaire()->select($infos["id_affaire"]);
+		$commande = ATF::commande()->select($infos["id_commande"]);
+
+		ATF::loyer()->q->reset()->where("id_affaire", $infos["id_affaire"])
+								->addOrder("id_loyer", "ASC");
+		$loyers = ATF::loyer()->select_all();
+
+		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
+										date("m", strtotime($infos["date_debut_contrat"])),
+										date("Y", strtotime($infos["date_debut_contrat"])));
+
+		$facture["facture"] = array(
+            "id_societe" => $affaire["id_societe"],
+            "type_facture" => "libre",
+            "type_libre" => "normale",
+            "mode_paiement" => "cb",
+            "id_affaire" => $affaire["id_affaire"],
+            "date" => date("d-m-Y"),
+            "id_commande" => $commande["id_commande"],
+            "date_previsionnelle" => date("d-m-Y"),
+            "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+            "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
+			"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+            "prix_libre" => round($loyers[0]["loyer"], 2),
+            "prix" => round($loyers[0]["loyer"], 2),
+            "nature" => "engagement"
+        );
+
+
+		ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
+		$lignes = ATF::commande_ligne()->select_all();
+
+		foreach ($lignes as $key => $value) {
+			$ligne = array();
+			$ligne["facture_ligne__dot__produit"] = $value["produit"];
+            $ligne["facture_ligne__dot__quantite"] = $value["quantite"];
+            $ligne["facture_ligne__dot__ref"] = $value["ref"];
+            $ligne["facture_ligne__dot__id_fournisseur_fk"] = $value["id_fournisseur"];
+            $ligne["facture_ligne__dot__prix_achat"] = $value["prix_achat"];
+            $ligne["facture_ligne__dot__id_produit"] = $value["produit"];
+            $ligne["facture_ligne__dot__id_produit_fk"] = $value["id_produit"];
+            $ligne["facture_ligne__dot__serial"] = "";
+            $ligne["facture_ligne__dot__afficher"] = ATF::produit()->select($value["id_produit"], "visible_pdf");
+            $ligne["facture_ligne__dot__id_facture_ligne"] = $value["id_commande_ligne"];
+
+            $facture["values_facture"]["produits"][] = $ligne;
+		}
+
+		$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
+
+        $id_facture = $this->insert($facture);
+
+        $this->libreToNormale(array("id_facture"=> $id_facture));
+
 
 	}
 
@@ -522,6 +656,8 @@ class facture_lm extends facture {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
+
 
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
@@ -2023,13 +2159,18 @@ class facture_lm extends facture {
 	}
 
 
-	public function export_GL_LM(&$infos){
-		$infos["display"] = true;
+	public function export_GL_LM(&$infos,$invoice=null){
 
-		$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+		if($infos['onglet']){
+			$infos["display"] = true;
+			$this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
-        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
-        $data = $this->sa();
+	        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+	        $data = $this->sa();
+
+		}else{
+			$data = $invoice;
+		}
 
         $string = "";
         $total_debit = 0;
@@ -2037,6 +2178,8 @@ class facture_lm extends facture {
         $lignes = 0;
 
         $donnees = array();
+
+
 
         foreach ($data as $key => $value) {
         	$code_magasin = "M0380"; //Par defaut web
@@ -2046,6 +2189,8 @@ class facture_lm extends facture {
         	if(ATF::affaire()->select($value["facture.id_affaire_fk"] , "type_souscription") == "magasin" && ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin")){
         		$code_magasin = ATF::magasin()->select(ATF::affaire()->select($value["facture.id_affaire_fk"] , "id_magasin"), "entite_lm");
         	}
+
+
 
         	//On recupere le 1er produit de la facture pour connaitre le pack et donc le rayon
         	ATF::facture_ligne()->q->reset()->where("id_facture",$value["facture.id_facture_fk"])
@@ -2078,6 +2223,12 @@ class facture_lm extends facture {
         	$ref_societe = ATF::societe()->select($value["facture.id_societe_fk"] , "ref");
 
         	$lettrage_date_facture = $this->getMoisFrancais(date("m", strtotime($value["facture.date_periode_debut"])))." - ".date("Y", strtotime($value["facture.date_periode_debut"]));
+
+        	$this->u(
+					array("id_facture"=>$value["facture.id_facture_fk"] ,
+						  "DATE_EXPORT_VTE"=>date("Y-m-d")
+					)
+				);
 
         	for($i=1;$i<4;$i++){
 	        	if($i==1){
@@ -2185,11 +2336,7 @@ class facture_lm extends facture {
         $sequence = ATF::constante()->getSequence("__SEQUENCE_GL__");
         $filename = 'CLEODIS_VT'.$sequence.'.fic';
 
-        header('Content-Type: application/fic');
-		header('Content-Disposition: attachment; filename="'.$filename.'"');
-
-
-		foreach ($donnees as $key => $value) {
+        foreach ($donnees as $key => $value) {
 			foreach ($value as $k => $v) {
 				for($i=1;$i<=36;$i++){
 					if(isset($v[$i])){
@@ -2207,7 +2354,18 @@ class facture_lm extends facture {
 
         $lignes++;
         $string .=  "0;".$lignes.";".date("Ymd");
-        echo $string;
+
+        if($infos['onglet']){
+        	header('Content-Type: application/fic');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+	        echo $string;
+
+        }else{
+        	return array("filename"=>$filename, "content"=>$string);
+        }
+
+
 	}
 
 

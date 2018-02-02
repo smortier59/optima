@@ -559,7 +559,60 @@ class produit_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 						),$infos,"speed_insert_template ne retourne rien");
 
 	}
+	/**
+	 * Test méthode autocomplete
+	 * @author Cyril CHARLIER <ccharlier@absystech.fr>
+	 */
+	public function test_ac(){
+		$fab = ATF::fabriquant()->i(array('fabriquant' =>'test fabriquant'));
+		$cat = ATF::categorie()->i(array('categorie' =>'test categorie'));
+		$sousCat = ATF::sous_categorie()->i(array('sous_categorie' =>'test sous categorie','id_categorie'=>$cat));
+		$sousCat2 = ATF::sous_categorie()->i(array('sous_categorie' =>'test souscat','id_categorie'=>$cat));
 
+		$infos = array(
+			"ref"=>"Test produit",
+			"produit"=>"Produit",
+			"prix_achat"=>500,
+			"id_fabriquant"=> $fab,
+			"id_sous_categorie"=>$sousCat
+		);
+		$infos2 = array(
+			"ref"=>"My test 2",
+			"produit"=>"Produit2",
+			"prix_achat"=>400,
+			"id_fabriquant"=> $fab,
+			"id_sous_categorie"=>$sousCat
+		);
+		$infos3 = array(
+			"ref"=>"Test produit3",
+			"produit"=>"Produit3",
+			"prix_achat"=>400,
+			"id_fabriquant"=> $fab,
+			"id_sous_categorie"=>$sousCat2
+		);
+
+		$id = ATF::produit_cleodis()->insert($infos);
+		$id2 = ATF::produit_cleodis()->insert($infos2);
+		$id3 = ATF::produit_cleodis()->insert($infos3);
+
+		$get= array('id' => $sousCat);
+		$res=ATF::produit_cleodis()->_ac($get,false);
+
+		$this->assertEquals(sizeof($res),2,'le nombre de retour n\'est pas bon');
+		$this->assertEquals($res[0]['ref'], $infos['ref'], 'pas la bonne ref retournée');
+		$this->assertEquals($res[1]['ref'], $infos2['ref'], 'pas la bonne ref retournée');
+		$get['q']="my";
+		$reswithParams=ATF::produit_cleodis()->_ac($get,false);
+		$this->assertEquals(sizeof($reswithParams),1,'le nombre de retour n\'est pas bon');
+		$this->assertEquals($reswithParams[0]['ref'], $infos2['ref'], 'pas la bonne ref retournée');
+
+
+		$res2=ATF::produit_cleodis()->_ac(array('id' => $sousCat2),false);
+
+		$this->assertEquals(sizeof($res2),1,'le nombre de retour n\'est pas bon');
+		$this->assertEquals($res2[0]['ref'], $infos3['ref'], 'pas la bonne ref retournée');
+
+	}
 
 
 /**

@@ -1,0 +1,14 @@
+{ATF::$usr->trans('bonjour',mail)}
+
+{$infos.reception_comite}
+
+{ATF::$usr->trans('de',mail)}: {ATF::user()->nom($infos.id_user)}
+
+{ATF::$usr->trans('client',mail)}: {ATF::societe()->nom($infos.id_societe)}
+
+{ATF::$usr->trans('concerne',mail)}:{$infos.suivi_notifie}
+
+{ATF::$usr->trans('affaire',mail)}: {ATF::affaire()->nom($infos.id_affaire)}
+
+
+{ATF::$usr->trans('remerciement_suivi',mail)}

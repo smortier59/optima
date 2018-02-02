@@ -17,25 +17,25 @@ log::logger($infos, "mfleurquin");
 if($infos["create_tache"]){
     try{
         $tache = array("tache"=>array("id_societe"=> $infos["id_societe"],
-                                       "id_user"=>18,
+                                       "id_user"=>23,
                                        "origine"=>"societe_commande",
-                                       "tache"=>"Une nouvelle commande viens d'être passée et validée par SLIMPAY",
+                                       "tache"=>"Une nouvelle commande vient d'être passée et validée par SLIMPAY",
                                        "id_affaire"=>$infos["id_affaire"],
                                        "type_tache"=>"creation_contrat",
                                        "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
                                        "no_redirect"=>"true"
                                       ),
-                        "dest"=>18
+                        "dest"=>23
                     );
         $id_tache = ATF::tache()->insert($tache);
 
-        ATF::comite()->insert(    array("date"=>date("Y-m-d"),
-                                        "id_affaire"=>$infos["id_affaire"],
-                                        "id_societe"=>$infos["id_societe"],
-                                        "etat"=>"en_attente",
-                                        "date_creation"=>date("Y-m-d"),
-                                        "suivi_notifie"=>array(18)
-                                    ));
+        ATF::comite()->insert(  array("date"=>date("Y-m-d"),
+                                    "id_affaire"=>$infos["id_affaire"],
+                                    "id_societe"=>$infos["id_societe"],
+                                    "etat"=>"en_attente",
+                                    "date_creation"=>date("Y-m-d"),
+                                    "suivi_notifie"=>array(18,23)
+                                ));
         die;
     }catch(errorATF $e){
         log::logger($e->getMessage(),'lm');
@@ -76,10 +76,15 @@ if($infos["OffreMagasin"]){
 //Validation d'une offre Magasin par une hotesse, on crée la commande correspondante au devis
 if($infos["create_commande"]){
     try{
-        ATF::devis()->q->reset()->where("id_affaire",$infos["id_affaire"]);
+        ATF::devis()->q->reset()->where("devis.id_affaire",$infos["id_affaire"]);
         $devis = ATF::devis()->select_row();
         ATF::devis_ligne()->q->reset()->where("id_devis",$devis["id_devis"]);
         $lignes = ATF::devis_ligne()->select_all();
+
+        ATF::commande()->q->reset()->where("commande.id_affaire",$infos["id_affaire"]);
+        if($com = ATF::commande()->select_row()){
+            ATF::commande()->delete($com["id_commande"]);
+        }
 
         $commande = $commande_ligne = array();
         $commande["ref"] = $devis["ref"];
@@ -141,7 +146,6 @@ if ($infos["id_facture"]) {
 
     $id_facture = ATF::facture()->decryptId($infos["id_facture"]);
 
-    log::logger(ATF::facture()->decryptId($id_facture), "mfleurquin");
     $filename = ATF::facture()->filepath($id_facture,"fichier_joint");
 
     if(file_exists($filename)){
@@ -182,6 +186,25 @@ if ($infos["getPdfSigne"]) {
             echo "Probleme de récupération du PDF";
             die;
         }
+    }
+}
+
+//Récuperation du PDF signé du contrat
+if ($infos["getPDFCourrierInformation"]) {
+
+    $id_affaire = ATF::affaire()->decryptId($infos["affaire"]);
+
+    $filename = ATF::affaire()->filepath($id_affaire,"courrier_information");
+
+    if(file_exists($filename)){
+        $handle = fopen($filename, "r");
+        $contents = fread($handle, filesize($filename));
+        fclose($handle);
+        echo $contents;
+        die;
+    }else{
+        echo "Probleme de récupération du PDF";
+        die;
     }
 }
 

@@ -65,6 +65,8 @@ class devis_cleodis extends devis {
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,"type_affaire"=>array("custom"=>true,"data"=>array("normal","2SI"),"xtype"=>"combo")
+			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
+
 		);
 
 		$this->colonnes['panel']['partenaire'] = array(
@@ -125,6 +127,10 @@ class devis_cleodis extends devis {
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
+		$this->colonnes['panel']['commentaire'] = array(
+			"commentaire_facture"=>array("custom"=>true,"xtype"=>"htmleditor")
+		);
+
 		$this->colonnes['panel']['courriel'] = array(
 			"email"=>array("custom"=>true,'null'=>true)
 			,"emailCopie"=>array("custom"=>true,'null'=>true)
@@ -149,6 +155,7 @@ class devis_cleodis extends devis {
 		$this->panels['lignes_non_visible'] = array("visible"=>false, 'nbCols'=>1);
 		$this->panels['total'] = array("visible"=>true,'nbCols'=>4);
 		$this->panels['courriel'] = array('nbCols'=>2,"checkboxToggle"=>true);
+		$this->panels['commentaire'] = array('nbCols'=>1);
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['clone'] =
@@ -220,7 +227,7 @@ class devis_cleodis extends devis {
 		if(!$affaire && $type!="vente"){
 			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
 		//Si c'est un avenant il ne peut y avoir qu'une affaire parente (sauf pour les AR)
-		}elseif(count($return["affaire"])>1 && ($type=="avenant" || $type=="vente")){
+		}elseif(count($return["affaire"])>1 && ($type=="avenant" /*|| $type=="vente"*/)){
 			throw new errorATF("Il ne peut y avoir qu'une affaire reprise par ".$type,878);
 		}else{
 			return $return;
@@ -238,6 +245,7 @@ class devis_cleodis extends devis {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
 		}else{
@@ -381,7 +389,7 @@ class devis_cleodis extends devis {
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
 
 		////////////////Devis
-		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"]);
+		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["langue"],$infos["commentaire_facture"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast
@@ -618,14 +626,31 @@ class devis_cleodis extends devis {
 
 		$infos["devis"]["ref"]=ATF::affaire()->select($devis["id_affaire"],'ref');
 		$affaire = array();
-		$affaire["date_installation_prevu"] = ATF::affaire()->select($devis["id_affaire"], "date_installation_prevu");
-		$affaire["date_installation_reel"]  = ATF::affaire()->select($devis["id_affaire"] , "date_installation_reel" );
-		$affaire["date_livraison_prevu"] 	= ATF::affaire()->select($devis["id_affaire"] , "date_livraison_prevu");
-		$affaire["date_garantie"] 			= ATF::affaire()->select($devis["id_affaire"] , "date_garantie");
-		$affaire["date_ouverture"] 			= ATF::affaire()->select($devis["id_affaire"] , "date_ouverture");
-		$affaire["date_recettage_cablage"]  = ATF::affaire()->select($devis["id_affaire"] , "date_recettage_cablage");
 
+		$data_affaire = ATF::affaire()->select($devis["id_affaire"]);
 
+		$affaire["date_installation_prevu"] = $data_affaire["date_installation_prevu"];
+		$affaire["date_installation_reel"]  = $data_affaire["date_installation_reel" ];
+		$affaire["date_livraison_prevu"] 	= $data_affaire["date_livraison_prevu"];
+		$affaire["date_garantie"] 			= $data_affaire["date_garantie"];
+		$affaire["date_ouverture"] 			= $data_affaire["date_ouverture"];
+		$affaire["date_recettage_cablage"]  = $data_affaire["date_recettage_cablage"];
+
+		$affaire["site_associe"]  = $data_affaire["site_associe"];
+		$affaire["etat_comite"]  = $data_affaire["etat_comite"];
+		$affaire["provenance"]  = $data_affaire["provenance"];
+		$affaire["pieces"]  = $data_affaire["pieces"];
+		$affaire["date_verification"]  = $data_affaire["date_verification"];
+		$affaire["id_partenaire"]  = $data_affaire["id_partenaire"];
+		//$affaire["commentaire_facture"]  = $data_affaire["commentaire_facture"];
+
+		// Déplacer toutes les pièces jointes anciennes vers le nouveau
+		$datapath = dirname(ATF::affaire()->filepath($devis["id_affaire"],"temp"));
+		$id_temp = md5(mt_rand(0,time()));
+		if ($handle = opendir($datapath)) {
+		    while (false !== ($fileName = readdir($handle))) if (strpos($fileName,$devis["id_affaire"].".")===0) rename($datapath."/".$fileName, $datapath."/".str_replace($devis["id_affaire"].".",$id_temp.".",$fileName));
+		    closedir($handle);
+		}
 
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
 
@@ -633,14 +658,18 @@ class devis_cleodis extends devis {
 
 		$id_affaire = $this->select($last_id,"id_affaire");
 
+		// Déplacer toutes les pièces jointes anciennes vers le nouveau
+		if ($handle = opendir($datapath)) {
+		    while (false !== ($fileName = readdir($handle))) if (strpos($fileName,$id_temp.".")===0) rename($datapath."/".$fileName, $datapath."/".str_replace($id_temp.".",$id_affaire.".",$fileName));
+		    closedir($handle);
+		}
+
 		if($id_affaire){
 			$affaire["id_affaire"] = $id_affaire;
 			if($affaire["affaire"] != $this->select($last_id , "devis")) $affaire["affaire"] = $this->select($last_id , "devis");
 
 			ATF::affaire()->u($affaire);
 		}
-
-
 
 		//On récupère les suivis de l'affaire modifier (supprimer en fait)
 		foreach($suivis as $key=>$item){
@@ -911,6 +940,7 @@ class devis_cleodis extends devis {
 	public function default_value($field){
 		if(ATF::_r('id_devis')){
 			$devis=ATF::devis()->select(ATF::_r('id_devis'));
+			$affaire = ATF::affaire()->select(ATF::devis()->select(ATF::_r('id_devis'), "id_affaire"));
 		}
 
 		if($devis){
@@ -935,6 +965,8 @@ class devis_cleodis extends devis {
 					return $marge_absolue;
 				case "emailTexte":
 					return $this->majMail($devis["id_societe"]);
+				case "langue":
+					return ATF::affaire()->select($devis["id_affaire"], "langue");
 				case "RIB":
 				case "BIC":
 				case "IBAN":
@@ -946,6 +978,9 @@ class devis_cleodis extends devis {
 					if($devis["type_contrat"]=='vente'){
 						return $devis["prix"];
 					}
+					break;
+				case "commentaire_facture":
+					return $affaire["commentaire_facture"];
 					break;
 			}
 		}else{
@@ -976,6 +1011,9 @@ class devis_cleodis extends devis {
 				case "marge_absolue":
 					$marge_absolue=0;
 					return $marge_absolue;
+				case "langue":
+					if(ATF::_r('id_societe')) return ATF::societe()->select(ATF::_r('id_societe'),"langue");
+					return "FR";
 				case "RIB":
 				case "BIC":
 				case "IBAN":
