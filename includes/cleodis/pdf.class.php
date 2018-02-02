@@ -8179,13 +8179,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function conditionsGeneralesDeLocationA3()  {
 		$this->unsetHeader();
-		$this->unsetFooter();
 		$this->AddPage();
+		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA3.pdf");
 		$tplIdx = $this->importPage(1);
 		$r = $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-
 	}
 
 	/** CGL d'un PDF d'un contrat en A4
