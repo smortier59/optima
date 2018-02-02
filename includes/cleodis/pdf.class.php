@@ -31,8 +31,6 @@ class pdf_cleodis extends pdf {
 	public $Gentete = 193;
 	public $Bentete = 31;
 
-
-
 	public function filigramme(){
 		$this->setX(40);
 		$this->setY(20);
@@ -116,7 +114,7 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-
+			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
@@ -194,7 +192,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -2115,7 +2113,7 @@ class pdf_cleodis extends pdf {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -2202,7 +2200,7 @@ class pdf_cleodis extends pdf {
 		$this->setEnteteBGColor("white");
 		$this->cadre(320,35,70,35,$cadreLoueur,$loueur);
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -6331,8 +6329,8 @@ class pdf_cleodis extends pdf {
 		$this->unsetFooter();
 
 		$this->open();
-		$this-> datamandatSepa($id,$s);
-		$this-> datamandatSepa($id,$s);
+		$this->datamandatSepa($id,$s);
+		$this->datamandatSepa($id,$s);
 
 	}
 
@@ -6351,6 +6349,10 @@ class pdf_cleodis extends pdf {
         if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
+
+		$this->image(__PDF_PATH__.$this->logo,90,5,20);
+		$this->ln(10);
+
 		$this->setfont('arial',"",8);
 		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
 
@@ -8085,7 +8087,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n144 rue Nationale\n59000 Lille - France");
+		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -9066,7 +9068,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -9109,7 +9111,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor("cleodis");
+		$this->setEnteteBGColor(149,193,31);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -10123,7 +10125,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+		$this->image(__PDF_PATH__.$this->logo,15,5,35);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
@@ -10261,7 +10263,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function datamandatSepaNL(){
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,17,55);
+		$this->image(__PDF_PATH__.$this->logo,10,5,30);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"EUROPEES DOMICILIERINGSMANDAAT",0,0,"C");
@@ -11830,7 +11832,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->cell(0,4,"SARL CAP RECOUVREMENT",0,1);
 		$this->setfont('arial','',9);
-		$this->cell(0,4,"Adresse 144 rue nationale - 59000 LILLE",0,1);
+		$this->cell(0,4,"Adresse 45 rue Solferino - 59000 LILLE",0,1);
 		$this->cell(0,4,"SIREN 392 468 443 RCS LILLE METROPOLE",0,1);
 		$this->cell(0,4,"Nom et fonction du représentant Olivier DUBENSKI, gérant",0,1);
 
@@ -12502,7 +12504,7 @@ class pdf_cap extends pdf_cleodis {
 		if(!$signature){
 			$this->cell(0,4,"Adresse de gestion à laquelle envoyer le présent document signé en 2 exemplaires",0,1,"C");
 			$this->setFont('arial','B',8);
-			$this->cell(0,4,"CAP RECOUVREMENT - 144 rue nationale - 59000 LILLE",0,1,"C");
+			$this->cell(0,4,"CAP RECOUVREMENT - 45 rue Solferino - 59000 LILLE",0,1,"C");
 		}
 
 
@@ -12603,7 +12605,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',9);
 		$this->cell(0,4,"SARL CAP RECOUVREMENT",0,1);
 		$this->setfont('arial','',9);
-		$this->cell(0,4,"Adresse 144 rue nationale - 59000 LILLE",0,1);
+		$this->cell(0,4,"Adresse 45 rue Solferino - 59000 LILLE",0,1);
 		$this->cell(0,4,"SIREN 392 468 443 RCS LILLE METROPOLE",0,1);
 		$this->cell(0,4,"Nom et fonction du représentant Olivier DUBENSKI, gérant",0,1);
 
@@ -12963,7 +12965,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setleftmargin(120);
 		$this->setY(260);
 		$this->setfont('arial','',8);
-		$this->cell(0,3,"144 rue nationale - 59000 LILLE",0,1,"L");
+		$this->cell(0,3,"45 rue Solferino - 59000 LILLE",0,1,"L");
 		$this->setfont('arial','B',8);
 		$this->cell(35,3,"Tél. : +33 (0) 3 28 16 71 30",0,0,"L");
 		$this->setfont('arial','',8);
