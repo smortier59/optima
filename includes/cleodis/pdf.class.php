@@ -141,7 +141,7 @@ class pdf_cleodis extends pdf {
         		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
 				$this->sety(20);
         	}else{
-        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,25); }
+        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,20); }
 
 				$this->sety(20);
         	}
@@ -4312,12 +4312,12 @@ class pdf_cleodis extends pdf {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,15,10,55);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->image(__PDF_PATH__.$this->logo,15,5,20);
 			}
 		}
 
 		$this->setMargins(15,30);
-		$this->sety(10);
+		$this->sety(15);
 
 		$this->setfont('arial','B',22);
 		if($this->facture["prix"]>0){
@@ -4564,7 +4564,7 @@ class pdf_cleodis extends pdf {
 		$this->setHeader();
 		$this->addpage();
 		$this->setMargins(15,30);
-		$this->sety(10);
+		$this->sety(15);
 
 
 
