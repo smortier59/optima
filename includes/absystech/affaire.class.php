@@ -1054,7 +1054,7 @@ class affaire_partenaire extends affaire {
 			"affaire.etat"=>array(),
 			"affaire.id_societe"=>array(),
 			"affaire.date_fin"=>array(),
-			"devis.id_devis"=>array(),
+			"MAX(devis.id_devis)"=>array("alias"=>"id_devis"),
 			"devis.id_contact"=>array(),
 			'contact.fonction'=>array(),
 			'contact.tel'=>array(),
@@ -1153,10 +1153,6 @@ class affaire_partenaire extends affaire {
 			$this->q->addGroup('affaire.id_affaire');
 		}
 
-		$this->q->setToString();
-		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
-		$this->q->unsetToString();
-
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
 		foreach ($data["data"] as $k=>$lines) {
@@ -1179,7 +1175,7 @@ class affaire_partenaire extends affaire {
 			$return = $data['data'][0];
 
 			// On récupère le devis et surtout les lignes
-			$return['materiel'] = ATF::devis_ligne()->ss('id_devis', $return['id_devis_fk']);
+			$return['materiel'] = ATF::devis_ligne()->ss('id_devis', $return['id_devis']);
 
 		}else{
 			header("ts-total-row: ".$data['count']);

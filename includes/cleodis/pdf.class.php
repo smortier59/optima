@@ -8180,11 +8180,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function conditionsGeneralesDeLocationA3()  {
 		$this->unsetHeader();
 		$this->AddPage();
+		$this->unsetFooter();
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA3.pdf");
 		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 5, 5, 400, 0, true);
-
+		$r = $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 	}
 
 	/** CGL d'un PDF d'un contrat en A4
@@ -8198,7 +8198,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4.pdf");
 		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, -8, -8, 226, 0, true);
+		$r = $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 	}
 
 	public function conditionsGeneralesDeLocationA4NL(){
@@ -8208,7 +8208,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodisbe/cgv-contratA4NL.pdf");
 		$tplIdx = $this->importPage(1);
-		$r = $this->useTemplate($tplIdx, 0, 0, 206, 0, true);
+		$r = $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 	}
 
 
