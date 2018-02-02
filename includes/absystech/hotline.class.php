@@ -3744,6 +3744,15 @@ class hotline extends classes_optima {
 			}
 
 
+			if ($get['filters']['custom']) {
+				foreach ($get['filters']['custom'] as $key => $value) {
+					$this->q->where("hotline.id_".$key, $value);
+					//log::logger($key, "alahlah");
+					//log::logger($value, "alahlah");
+				}
+			}
+
+
 			// TRI
 			switch ($get['tri']) {
 				case 'id_societe':
