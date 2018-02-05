@@ -1321,7 +1321,7 @@ class affaire_cleodis extends affaire {
 					->from("affaire","id_affaire","commande","id_affaire")
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
-					->where("provenance",'partenaire')
+					//->where("provenance",'partenaire')
 					->where("id_partenaire", $apporteur)
 
 					->where("affaire.etat", "devis","OR","affaire_demande","=")
