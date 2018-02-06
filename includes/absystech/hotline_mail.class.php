@@ -14,7 +14,7 @@ class hotline_mail {
 	*/
 	private $mail_billing=NULL;
 
-	/**
+	/*
 	* Mail de notification nouveau mail
 	* @var mixed
 	*/
