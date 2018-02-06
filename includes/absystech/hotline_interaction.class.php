@@ -2060,7 +2060,7 @@ class hotline_interaction extends classes_optima {
 	* @param boolean $pointage True si on désire créer le pointage
 	* @return boolean true
 	*/
-	public function insertTS($infos,$mail = true) {
+	public function insertTS($infos,$mail = true, $files) {
 
 		$recipient = array();
 		//Ajout des actifs selectionné
@@ -2402,9 +2402,9 @@ class hotline_interaction extends classes_optima {
 
 				ATF::hotline_mail()->createMailInteraction($hotline["id_hotline"],$id_hotline_interaction,$infos["filestoattach"]["fichier_joint"],$infos["anotherNotify"],$infos['mep_mail']);
 
-				if($infos["filestoattach"]["fichier_joint"]){
+				$path = $this->filepath($id_hotline_interaction,"fichier_joint");
+				if(file_exists($path)){
 					//Ajout du fichier joint
-					$path = $this->filepath($id_hotline_interaction,"fichier_joint");
 					if ($mail=ATF::hotline_mail()->getCurrentMail()) {
 						$mail->addFile($path,"fichier_joint.zip",true);
 					}
