@@ -11551,7 +11551,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cap Recouvrement\n30 Boulevard du Général Leclerc\n59100 Roubaix - France");
+		$this->multicell(70,4,"Cap Recouvrement\n144 rue Nationale \n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
