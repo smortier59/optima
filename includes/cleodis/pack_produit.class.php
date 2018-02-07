@@ -231,14 +231,15 @@ class pack_produit extends classes_optima {
 
 		$last_id = $this->decryptId($infos["id_pack_produit"]);
 
+		ATF::db($this->db)->begin_transaction();
+
+
 		ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $last_id);
 		$lignes = ATF::pack_produit_ligne()->sa();
 
 		foreach ($lignes as $key => $value) {
 			ATF::pack_produit_ligne()->d($value["id_pack_produit_ligne"]);
 		}
-
-		ATF::db($this->db)->begin_transaction();
 
 		parent::update($infos,$s,$files,$cadre_refreshed,$nolog);
 
