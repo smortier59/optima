@@ -1095,8 +1095,9 @@ class societe_cleodis extends societe {
       if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
 
 
-      ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+      /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+      ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
       $res = ATF::societe()->select_row();
 
       try {
@@ -1429,8 +1430,9 @@ class societe_cleodis extends societe {
         $gerants = $data["gerant"];
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
         if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
-        ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+        /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+        ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
         $res = ATF::societe()->select_row();
         try {
             if($res){
