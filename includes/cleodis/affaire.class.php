@@ -1720,6 +1720,8 @@ class affaire_cleodis extends affaire {
 		  $data["partenaire"] = NULL;
 		  if($data["affaire.id_partenaire_fk"]){
 		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire_fk"] , "societe");
+		  	$data["partenaire_revendeur"] = ATF::societe()->select($data["affaire.id_partenaire_fk"] , "revendeur");
+
 		  }
 
 		  // on check si l'affaire est "payee"
@@ -1822,7 +1824,8 @@ class affaire_cleodis extends affaire {
 		  }
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
 
-			ATF::bon_de_commande()->q->reset()
+
+		  	ATF::bon_de_commande()->q->reset()
 		       ->addField("id_bon_de_commande")
 		       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
 		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($data["idcrypted"]), "AND")
@@ -1835,6 +1838,9 @@ class affaire_cleodis extends affaire {
 		    	$data["bon_de_commande"] = false;
 		    	$data["id_bon_de_commande_crypt"] = null;
 		    }
+
+
+
 
 		} else {
 			// Filtre sur l'etat de l'affaire
