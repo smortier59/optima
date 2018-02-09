@@ -1351,13 +1351,14 @@ class affaire_partenaire extends affaire {
 		$id = ATF::affaire_etat()->insert($toInsert);
 		$id_societe = ATF::affaire()->select($post['id_affaire'], "id_societe");
 		$societe = ATF::societe()->nom($id_societe);
+		$cat = ATF::jalon()->select($post['jalon'], 'category');
 
 		if ($post['sendmail']) {
 			$settings = ATF::settings()->select($post['sendmail']);
 			if ($settings) {
 				if (ATF::mail()->check_mail($settings["mail_to"])) {
 					$mail = array(
-						"objet"=>utf8_decode("Changement d'état de l'installation pour ".$societe)
+						"objet"=>"[".strtoupper($cat)."] Changement d'état de l'installation pour ".$societe
 						,"from"=>"Espace client Absystech <no-reply@absystech.fr>"
 						,"html"=>true
 						,"template"=>'jalon'
