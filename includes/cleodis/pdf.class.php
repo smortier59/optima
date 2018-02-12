@@ -3777,7 +3777,7 @@ class pdf_cleodis extends pdf {
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
 
-		if($this->fournisseur["revendeur"] == "oui"){
+		if($this->fournisseur["revendeur"] == "oui" && $this->affaire["site_associe"]){
 			ATF::document_revendeur()->q->reset()->where("site_associe", $this->affaire["site_associe"]);
 			$docs = ATF::document_revendeur()->select_all();
 			if($docs){
