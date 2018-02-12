@@ -2224,12 +2224,15 @@ class facture_absystech extends facture {
 			$fn = $this->filepath($id_export_comptable,"exportComptable");
 			log::logger("FILENAME = ".$fn,"export-comptable");
 			$file = fopen($fn, "w+");
-			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance","Prélévement");
+			$head = array("JournalCode","PieceData","CompteNum","CompteLib","PieceRef","EcritureLib","Debit","Credit","DateEcheance",utf8_decode("Prélévement"));
 			fputcsv($file, $head, ";", chr(0));
 
 			foreach ($facturesATraiter as $id_facture) {
 				$facture = ATF::facture()->select($id_facture);
 				$societe = ATF::societe()->select($facture['id_societe']);
+
+				// Réglages encodage de caractère attendu en ISO, il faut décoder l'UTF8
+				$societe['societe'] = utf8_decode($societe['societe']);
 
 				$ttc = $facture['prix']*$facture['tva'];
 				$tvamnt = $ttc - $facture['prix'];
@@ -2247,7 +2250,7 @@ class facture_absystech extends facture {
 
 				$prelevement = "";
 				if ($facture['id_termes'] == 24 || $facture['id_termes'] == 25 || $facture['id_termes'] == 38 || $facture['id_termes'] == 31) {
-					$prelevement = "Prélévement";
+					$prelevement = utf8_decode("Prélévement");
 				}
 
 				// Si on a la période, on utilise les debut/fin dans le libellé, sinon la date de facture
