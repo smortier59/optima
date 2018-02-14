@@ -63,4 +63,6 @@ foreach ($data as $key => $value) {
 		echo $e->getMessage();
 		ATF::db()->rollback_transaction();
 	}
+
+	echo '.';
 }
