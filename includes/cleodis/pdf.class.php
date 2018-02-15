@@ -120,7 +120,7 @@ class pdf_cleodis extends pdf {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
-
+				$this->image(__PDF_PATH__.$this->logo,10,10,40);
 			}
             $this->setfont('arial','',11);
             if ($this->client) {
