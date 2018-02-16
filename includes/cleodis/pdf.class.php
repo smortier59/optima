@@ -12101,7 +12101,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(0,8,"1. Identification du mandataire");
 
 		$this->setFont('arial','',9);
-		$this->multicell(0,4,"Le mandataire (ci-après désigné « prestataire »)\nSarl CAP RECOUVREMENT, inscrite au RCS LILLE METROPOLE sous le n° 392 468 443\nSiège : 30 Boulevard du Général Leclerc – 59100 ROUBAIX\nReprésentée par Olivier DUBENSKI en qualité de gérant\nN° de TVA INTRACOMMUNAUTAIRE : FR38392468443",0,"L");
+		$this->multicell(0,4,"Le mandataire (ci-après désigné « prestataire »)\nSarl CAP RECOUVREMENT, inscrite au RCS LILLE METROPOLE sous le n° 392 468 443\nSiège : 144 rue Nationale – 59000 LILLE\nReprésentée par Olivier DUBENSKI en qualité de gérant\nN° de TVA INTRACOMMUNAUTAIRE : FR38392468443",0,"L");
 
 
 		$this->setFont('arial','U',10);
