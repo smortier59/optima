@@ -2471,7 +2471,7 @@ class commande_cleodis extends commande {
 					}
 
 					$totalPrec = 0;
-					if($type == "o2m"){	$objectif = $agence["objectif_devis_reseaux"]; }
+					if($type == "o2m" ||$type== 'reseau'){	$objectif = $agence["objectif_devis_reseaux"]; }
 					else{ 	$objectif = $agence["objectif_devis_autre"]; }
 
 					foreach ($avg as $key => $value) {
