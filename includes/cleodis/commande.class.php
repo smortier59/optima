@@ -153,8 +153,6 @@ class commande_cleodis extends commande {
 	public function _contratPartenaire($get,$post) {
 		if ($apporteur = ATF::$usr->get("contact")) {
 
-			log::logger($get , "mfleurquin");
-
 			// Gestion du tri
 			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "commande.ref";
 			if (!$get['trid']) $get['trid'] = "desc";
