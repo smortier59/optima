@@ -396,6 +396,22 @@ class mandat_cap extends mandat {
             }
         }
     }
+
+
+
+
+    /**
+    * Pouvoir trier des mandats avec les champs de sociétés et affaire
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    */
+    public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
+        $this->q
+            ->from("mandat","id_societe","societe","id_societe")
+            ->from("mandat","id_affaire","affaire","id_affaire");
+        $return = parent::select_all($order_by,$asc,$page,$count);
+
+        return $return;
+    }
 }
 
 ?>
