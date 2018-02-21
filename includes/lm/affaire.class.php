@@ -1209,8 +1209,10 @@ class affaire_lm extends affaire {
 						preg_match_all($pattern_num_expedition , $body, $ids);
 						$num_expedition = $ids[1][0];
 
-						$pattern_ref_colissimo = "/<strong>Colis n=C2=B0= ([a-zA-Z0-9]*)<\/strong>/";
+						$pattern_ref_colissimo = "/Colis n=C2=B0 ([a-zA-Z0-9]*)</";
 						preg_match_all($pattern_ref_colissimo , $body, $ids_colissimo);
+
+
 						$ref_colissimo = $ids_colissimo[1][0];
 						$lien_colissimo = "http://www.colissimo.fr/portail_colissimo/suivre.do?colispart=".$ref_colissimo;
 
