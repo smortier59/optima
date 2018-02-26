@@ -41,9 +41,9 @@
 									fields: ["id", "text"],
 									data: [  ["refus_comite", "Refus comité"]
 											,["accord_portage", "Accord de portage"]
-											,["accord_portage_receherche_cession", "Accord de portage avec recherche et cession"]
-											,["accord_portage", "Accord de portage avec recherche et cession GROUPEE"]
-											,["accord_portage_receherche_cession_groupee", "Accord réserve de cession"]
+											,["accord_portage_recherche_cession", "Accord de portage avec recherche et cession"]
+											,["accord_portage_recherche_cession_groupee", "Accord de portage avec recherche et cession GROUPEE"]
+											,["accord_portage_receherche_cession_groupee", "Accord sous réserve de cession"]
 											,["attente_retour", "Attente de retour"]
 
 										  ]
