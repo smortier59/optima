@@ -460,7 +460,7 @@ class comite extends classes_optima {
 		if($infos["comboDisplay"] == "refus_comite"){
 			$etat = "refuse";
 			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
-		}elseif($infos["comboDisplay"] == "attente_retour"){
+		}elseif($infos["comboDisplay"] == "attente_retour" || $infos["comboDisplay"] == "accord_reserve_cession"){
 			$etat = "en_attente";
 			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
 		}else{
