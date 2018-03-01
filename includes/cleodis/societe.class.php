@@ -679,6 +679,8 @@ class societe_cleodis extends societe {
       }
     }
 
+
+
     //Creation d'un Nouveau RUM automatique
     if(!$infos["societe"]['RUM']){
       $infos["societe"]['RUM'] = $this->create_rum();
@@ -1134,6 +1136,7 @@ class societe_cleodis extends societe {
    */
   public function _sendDataToshiba($get, $post){
 
+
     ATF::$usr->set('id_user',16);
     ATF::$usr->set('id_agence',1);
     $email = $post["email"];
@@ -1155,6 +1158,7 @@ class societe_cleodis extends societe {
       try {
 
           if($res){
+
             $id_societe = $res["id_societe"];
             if(!$res["code_client"]){
               $code_client = $this->getCodeClient("toshiba");
@@ -1163,6 +1167,7 @@ class societe_cleodis extends societe {
                                      ));
             }
           } else {
+
             $code_client = $this->getCodeClient("toshiba");
             $data["code_client"]= $code_client;
             $data_soc = $data;
@@ -1172,9 +1177,12 @@ class societe_cleodis extends societe {
 
 
             unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
-            $id_societe = $this->insert($data_soc);
+
+            $id_societe = $this->insert(array("societe"=>$data_soc));
 
             $this->u(array("id_societe"=> $id_societe, "id_apporteur" => 28531, "id_fournisseur" => $fournisseur));
+
+            $res['id_societe'] = $id_societe;
 
           }
 
@@ -1342,7 +1350,6 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur_produit_id,
                                   "devis_ligne__dot__visible"=>$visible
                                 );
-                log::logger($produits , "mfleurquin");
 
               $devis["prix_achat"] += $ligne["prix_achat"];
 
