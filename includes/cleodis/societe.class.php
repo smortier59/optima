@@ -679,13 +679,12 @@ class societe_cleodis extends societe {
       }
     }
 
-
-
     //Creation d'un Nouveau RUM automatique
     if(!$infos["societe"]['RUM']){
       $infos["societe"]['RUM'] = $this->create_rum();
       if($infos["societe"]['code_client']) $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
     }
+
 
     return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
   }
