@@ -682,6 +682,7 @@ class societe_cleodis extends societe {
     //Creation d'un Nouveau RUM automatique
     if(!$infos["societe"]['RUM']){
       $infos["societe"]['RUM'] = $this->create_rum();
+      if($infos["societe"]['code_client']) $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
     }
 
     return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
@@ -700,7 +701,7 @@ class societe_cleodis extends societe {
     //On recupere le dernier RUM automatique généré du type A123456
     //Recherche du max en base
     $this->q->reset()
-      ->addField('MAX(SUBSTRING(RUM FROM 2))','max')
+      ->addField('MAX(SUBSTRING(RUM FROM 2,6))','max')
       ->addCondition('RUM',$prefixe.'%','OR',false,'LIKE');
     $result=$this->sa();
 
