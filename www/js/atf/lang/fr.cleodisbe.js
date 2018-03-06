@@ -1,1 +1,1 @@
-jQuery.extend(ATF.loc,{"affaire_commentaire_facture3":"Commentaire de facture (3)","affaire_commentaire_facture2":"Commentaire de facture (2)","affaire_commentaire_facture":"Commentaire de facture","affaire_langue":"Langue"});
+jQuery.extend(ATF.loc,{"societe_particulier_civilite":"Civilité"});
