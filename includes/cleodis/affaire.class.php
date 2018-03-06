@@ -1315,12 +1315,15 @@ class affaire_cleodis extends affaire {
 			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 			$this->q->addField($colsData)
+					->addField("famille.famille","famille")
+
 					->from("affaire","id_societe","societe","id_societe")
 					->from("societe","id_contact_signataire","contact","id_contact")
 					->from("affaire","id_affaire","bon_de_commande","id_affaire")
 					->from("affaire","id_affaire","commande","id_affaire")
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
+					->from("societe","id_famille", "famille", "id_famille")
 					//->where("provenance",'partenaire')
 					->where("id_partenaire", $apporteur)
 
@@ -1418,12 +1421,14 @@ class affaire_cleodis extends affaire {
 			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 			$this->q->addField($colsData)
+					->addField("famille.famille","famille")
 					->from("affaire","id_societe","societe","id_societe")
 					->from("societe","id_contact_signataire","contact","id_contact")
 					->from("affaire","id_affaire","bon_de_commande","id_affaire")
 					->from("affaire","id_affaire","commande","id_affaire")
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
+					->from("societe","id_famille", "famille", "id_famille")
 					->where("site_associe", "toshiba")
 
 					->where("affaire.etat", "devis","OR","affaire_demande","=")
@@ -1678,12 +1683,14 @@ class affaire_cleodis extends affaire {
 		$this->q->addField($colsData)
 				->addField("Count(bon_de_commande.id_bon_de_commande)","total_bdc")
 				->addField("Count(commande.id_commande)","nb_contrat")
+				->addField("famille.famille","famille")
 				->from("affaire","id_societe","societe","id_societe")
 				->from("societe","id_contact_signataire","contact","id_contact")
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire")
-				->from("affaire","id_affaire", "commande", "id_affaire");
+				->from("affaire","id_affaire", "commande", "id_affaire")
+				->from("societe","id_famille", "famille", "id_famille");
 
 
 		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
