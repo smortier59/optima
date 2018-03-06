@@ -32,7 +32,16 @@ class societe_cleodis extends societe {
     $this->colonnes['primary'] = array(
       "code_client"
       ,"ref"
-      ,"nom"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+      ,"id_famille"=>array("listeners"=>array("change"=>"ATF.changeFamille"))
+    );
+
+    //Reinitialise les panels poru remettre dans l'ordre
+    $panel = $this->colonnes['panel'];
+    $this->colonnes['panel'] = array();
+
+
+    $this->colonnes['panel']['societe_fs'] = array(
+      "nom"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
         "societe"
         ,"nom_commercial"
       ))
@@ -40,7 +49,6 @@ class societe_cleodis extends societe {
         "siren"
         ,"siret"
       ))
-      ,"id_famille"
       ,"avis_credit"
       ,"cs_avis_credit"
       ,"score"
@@ -53,7 +61,43 @@ class societe_cleodis extends societe {
       ,"date_creation"
       ,"relation"
       ,"joignable"
+
     );
+    $this->panels['societe_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
+
+    $this->colonnes['panel']['particulier_fs'] = array(
+      "client"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+           "particulier_civilite"
+          ,"particulier_nom"
+          ,"particulier_prenom"
+      )),
+      "particulier_portable",
+      "particulier_fixe",
+      "particulier_fax",
+      "particulier_email"
+    );
+    $this->panels['particulier_fs'] = array('nbCols'=>2,'collapsible'=>false,'visible'=>true);
+
+
+
+
+    foreach ($panel as $key => $value) {
+      $this->colonnes['panel'][$key] = $value;
+    }
+
+
+    $this->colonnes['panel']['fidelite'] = array(
+      'num_carte_fidelite',
+      'dernier_magasin'
+    );
+    $this->panels['fidelite'] = array('nbCols'=>2,'collapsible'=>true,'visible'=>false);
+
+    $this->colonnes['panel']['optin'] = array(
+      'optin_offre_commerciales',
+      'optin_offre_commerciale_partenaire'
+    );
+    $this->panels['optin'] = array('nbCols'=>2,'collapsible'=>true,'visible'=>false);
+
 
     /* Définition statique des clés étrangère de la table */
     $this->onglets = array(
@@ -204,7 +248,8 @@ class societe_cleodis extends societe {
   * @authorMorgan FLEURQUIN <mfleurquin@absystech.fr>
   */
   public function _ac($get,$post) {
-    $this->q->reset();
+    $this->q->reset()->setLimit(10);
+
 
     // On ajoute les champs utiles pour l'autocomplete
     $this->q->addField("id_societe")->addField("societe")->addField("ref")->addField("societe");
@@ -612,6 +657,20 @@ class societe_cleodis extends societe {
   */
   public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 
+    //Si on insere un particulier, il faut un Nom Prénom et civilité et on renseigne le champs société pour les listing
+    if($infos['label_societe']['famille'] === "Foyer"){
+        if(!$infos['societe']["particulier_civilite"]){
+          throw new errorATF("Le champs civilite est obligatoire pour un particulier!",878);
+        } elseif(!$infos['societe']["particulier_nom"]){
+          throw new errorATF("Le champs nom est obligatoire pour un particulier!",878);
+        }elseif(!$infos['societe']["particulier_prenom"]){
+          throw new errorATF("Le champs prenom est obligatoire pour un particulier!",878);
+        }else{
+          $infos["societe"]["societe"] = $infos['societe']["particulier_civilite"]." ".$infos['societe']["particulier_nom"]." ".$infos['societe']["particulier_prenom"];
+        }
+    }
+
+
     if($infos["societe"]["siret"] != NULL){
       //On check si le siret existe déja
       $this->q->reset()->where("siret",$infos["societe"]["siret"],"AND")->where("id_societe",$this->decryptId($infos["societe"]["id_societe"]),"AND",false,"!=");
@@ -671,12 +730,26 @@ class societe_cleodis extends societe {
   * @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
   */
   public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
     if($infos["societe"]["siret"] != NULL){
       //On check si le siret existe déja
       $this->q->reset()->where("siret",$infos["societe"]["siret"]);
       if($this->select_all()){
         throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
       }
+    }
+
+    //Si on insere un particulier, il faut un Nom Prénom et civilité et on renseigne le champs société pour les listing
+    if($infos['label_societe']['id_famille'] === "Foyer"){
+        if(!$infos['societe']["particulier_civilite"]){
+          throw new errorATF("Le champs civilite est obligatoire pour un particulier!",878);
+        } elseif(!$infos['societe']["particulier_nom"]){
+          throw new errorATF("Le champs nom est obligatoire pour un particulier!",878);
+        }elseif(!$infos['societe']["particulier_prenom"]){
+          throw new errorATF("Le champs prenom est obligatoire pour un particulier!",878);
+        }else{
+          $infos["societe"]["societe"] = $infos['societe']["particulier_civilite"]." ".$infos['societe']["particulier_prenom"]." ".$infos['societe']["particulier_nom"];
+        }
     }
 
     //Creation d'un Nouveau RUM automatique
