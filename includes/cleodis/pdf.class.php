@@ -120,7 +120,7 @@ class pdf_cleodis extends pdf {
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
-
+				$this->image(__PDF_PATH__.$this->logo,10,10,40);
 			}
             $this->setfont('arial','',11);
             if ($this->client) {
@@ -11578,7 +11578,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cap Recouvrement\n30 Boulevard du Général Leclerc\n59100 Roubaix - France");
+		$this->multicell(70,4,"Cap Recouvrement\n144 rue Nationale \n59000 Lille - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -12128,7 +12128,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(0,8,"1. Identification du mandataire");
 
 		$this->setFont('arial','',9);
-		$this->multicell(0,4,"Le mandataire (ci-après désigné « prestataire »)\nSarl CAP RECOUVREMENT, inscrite au RCS LILLE METROPOLE sous le n° 392 468 443\nSiège : 30 Boulevard du Général Leclerc – 59100 ROUBAIX\nReprésentée par Olivier DUBENSKI en qualité de gérant\nN° de TVA INTRACOMMUNAUTAIRE : FR38392468443",0,"L");
+		$this->multicell(0,4,"Le mandataire (ci-après désigné « prestataire »)\nSarl CAP RECOUVREMENT, inscrite au RCS LILLE METROPOLE sous le n° 392 468 443\nSiège : 144 rue Nationale – 59000 LILLE\nReprésentée par Olivier DUBENSKI en qualité de gérant\nN° de TVA INTRACOMMUNAUTAIRE : FR38392468443",0,"L");
 
 
 		$this->setFont('arial','U',10);
