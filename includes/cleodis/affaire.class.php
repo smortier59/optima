@@ -77,6 +77,19 @@ class affaire_cleodis extends affaire {
 		);
 		$this->panels['commentaire_sur_facture'] = array("visible"=>true, 'nbCols'=>1);
 
+		$this->colonnes['panel']['infos_signature_contrat'] = array(
+			"tel_signature",
+			"mail_signataire",
+			"date_signature",
+			"signataire"
+		);
+		$this->panels['infos_signature_contrat'] = array("visible"=>false);
+
+
+
+
+
+
 		$this->colonnes['panel']['chiffres'] = array(
 			'total_depense'
 			,'total_recette'

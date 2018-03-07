@@ -1,3 +1,9 @@
+#17391 - Gestion des signataires et des modifications de contacts
+ALTER TABLE `affaire` ADD `tel_signature` VARCHAR(20) NULL DEFAULT NULL AFTER `commentaire_facture3`,
+					  ADD `mail_signataire` VARCHAR(100) NULL DEFAULT NULL AFTER `tel_signature`,
+					  ADD `date_signature` DATETIME NULL DEFAULT NULL AFTER `mail_signature`,
+					  ADD `signataire` VARCHAR(150) NULL DEFAULT NULL AFTER `date_signature`;
+
 
 ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif','comite_cleodis_valide','comite_cleodis_refuse','refus_administratif','autre','envoi_mail_relance') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 
@@ -13,7 +19,11 @@ ALTER TABLE `societe` ADD `particulier_civilite` ENUM('M','Mme','Mlle') NULL DEF
 					  ADD `num_carte_fidelite` VARCHAR(50) NULL DEFAULT NULL AFTER `particulier_portable`,
 					  ADD `dernier_magasin` VARCHAR(50) NULL DEFAULT NULL AFTER `num_carte_fidelite`,
 					  ADD `optin_offre_commerciales` ENUM('oui','non') NULL DEFAULT NULL AFTER `dernier_magasin`,
-					  ADD `otpin_offre_commerciale_partenaire` ENUM('oui','non') NULL DEFAULT NULL AFTER `optin_offre_commerciales`;
+					  ADD `optin_offre_commerciale_partenaire` ENUM('oui','non') NULL DEFAULT NULL AFTER `optin_offre_commerciales`;
+
+ALTER TABLE `contact` ADD `tel_perso` VARCHAR(20) NULL DEFAULT NULL AFTER `email`,
+					  ADD `email_perso` VARCHAR(255) NULL DEFAULT NULL AFTER `tel_perso`,
+					  ADD `gsm_perso` VARCHAR(20) NULL DEFAULT NULL AFTER `email_perso`;
 
 
 

@@ -1092,7 +1092,7 @@ class societe_cleodis extends societe {
   }
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
   */
   public function _signAndGetPDF($post,$get){
@@ -1108,7 +1108,7 @@ class societe_cleodis extends societe {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-    ATF::societe()->u(array("id_societe"=>$id_societe, "tel"=>$tel , "BIC"=>$bic , "IBAN"=>$iban));
+    ATF::societe()->u(array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban));
 
     $societe = ATF::societe()->select($id_societe);
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
@@ -1116,6 +1116,16 @@ class societe_cleodis extends societe {
     $this->checkIBAN($iban);
 
     ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
+
+    //On stocke les infos de signature sur l'affaire
+    ATF::affaire()->u(array('id_affaire'=>$id_affaire,
+                            'tel_signature'=> $tel,
+                            'mail_signataire'=> $contact["email"],
+                            'date_signature'=> date('Y-m-d H:i:s'),
+                            'signataire'=> $contact["prenom"]." ".$contact["nom"]
+                            )
+                      );
+
 
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
