@@ -1,3 +1,6 @@
+#17855 - Evolution location evolutive suite ticket 17759
+ALTER TABLE `produit` CHANGE `type_offre` `type_offre` ENUM('bureautique','informatique','telephonie','multimedia','atol','services_complementaires_atol') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
 #17391 - Gestion des signataires et des modifications de contacts
 ALTER TABLE `affaire` ADD `tel_signature` VARCHAR(20) NULL DEFAULT NULL AFTER `commentaire_facture3`,
 					  ADD `mail_signataire` VARCHAR(100) NULL DEFAULT NULL AFTER `tel_signature`,
@@ -25,6 +28,7 @@ ALTER TABLE `contact` ADD `tel_perso` VARCHAR(20) NULL DEFAULT NULL AFTER `email
 					  ADD `email_perso` VARCHAR(255) NULL DEFAULT NULL AFTER `tel_perso`,
 					  ADD `gsm_perso` VARCHAR(20) NULL DEFAULT NULL AFTER `email_perso`;
 
+ALTER TABLE `societe` ADD `code_client_partenaire` VARCHAR(255) NULL DEFAULT NULL AFTER `code_client`;
 
 
 #17759 - Location Evolutive : packs au panier + options dans les packs

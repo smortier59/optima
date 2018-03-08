@@ -33,6 +33,7 @@ class societe_cleodis extends societe {
       "code_client"
       ,"ref"
       ,"id_famille"=>array("listeners"=>array("change"=>"ATF.changeFamille"))
+      ,"code_client_partenaire"
     );
 
     //Reinitialise les panels poru remettre dans l'ordre
