@@ -1234,7 +1234,7 @@ class societe_cleodis extends societe {
 
 
       /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+                                  ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
       ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
       $res = ATF::societe()->select_row();
 
@@ -1249,6 +1249,16 @@ class societe_cleodis extends societe {
                                       "code_client"=>$code_client
                                      ));
             }
+
+            if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
+                ATF::societe()->u(array("id_societe"=>$id_societe,
+                                        "adresse"=>$data["adresse"],
+                                        "cp"=>$data["cp"],
+                                        "ville"=>$data["ville"]
+                                     ));
+            }
+
+
           } else {
 
             $code_client = $this->getCodeClient("toshiba");
@@ -1580,6 +1590,14 @@ class societe_cleodis extends societe {
             if($res){
                 $id_societe = $res["id_societe"];
                 if($res["langue"] !== $post["langue"]) $this->u(array("id_societe"=>$id_societe, "langue"=>$post["langue"]));
+
+                if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
+                  ATF::societe()->u(array("id_societe"=>$id_societe,
+                                          "adresse"=>$data["adresse"],
+                                          "cp"=>$data["cp"],
+                                          "ville"=>$data["ville"]
+                                       ));
+                }
 
             }else {
                 $data_soc = $data;
