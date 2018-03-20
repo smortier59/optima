@@ -9,10 +9,12 @@ class user_cleodis extends user {
 
 		$this->addPrivilege("export_user_infos");
 		$this->addPrivilege("export_commercial_partenaire");
+		$this->addPrivilege("export_prospection");
+
 	}
 
 	public function getFeuilles($infos){
-		if($infos['id_user']){
+		if($infos['id_user'] /*|| $infos['id_contact']*/){
 			return array("Export Optima",
 					  "RDV",
 					  "Appels",
@@ -33,6 +35,13 @@ class user_cleodis extends user {
 	}
 
 
+	public function export_prospection($infos){
+		if($infos['id_contact']){
+			$infos['id_contact'] = ATF::contact()->decryptId($infos['id_contact']);
+			$this->export_user_infos($infos);
+		}
+	}
+
 
 	public function export_commercial_partenaire($infos){
 		if($infos['id_partenaire']){
@@ -48,6 +57,8 @@ class user_cleodis extends user {
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		if($infos['id_user']){
 			$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		}elseif($infos['id_contact']){
+			$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.$infos['id_contact']);
 		}else{
 			$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__."_all");
 		}
@@ -201,6 +212,12 @@ class user_cleodis extends user {
 				if($infos['id_user']){
 					ATF::devis()->q->where("societe.id_owner",ATF::user()->decryptId($infos["id_user"]),"OR","user_filtre","=")
 								   ->where("devis.id_user",ATF::user()->decryptId($infos["id_user"]),"OR","user_filtre","=")->addOrder("devis.date");
+				}elseif($infos['id_contact']){
+
+					ATF::devis()->q->where("societe","id_prospection",$infos['id_contact'])
+								   ->addOrder("devis.date");
+
+
 				}else{
 					if($infos['id_partenaire']){
 						ATF::devis()->q->from("devis","id_affaire","affaire","id_affaire")
@@ -296,6 +313,9 @@ class user_cleodis extends user {
 											->where("commande.etat", "mis_loyer","OR");
 				if($infos["id_user"]){
 					ATF::commande()->q->where("societe.id_owner",ATF::user()->decryptId($infos["id_user"]));
+				}elseif($infos['id_contact']){
+
+					ATF::commande()->q->where("societe.id_prospection",$infos['id_contact']);
 				}else{
 					if($infos['id_partenaire']){
 						ATF::commande()->q->whereIsNotNull("societe.id_owner")

@@ -2672,6 +2672,30 @@ class affaire_cleodis extends affaire {
 		return $this->u($toUpdate);
 	}
 
+	public function _setPartenaire($get, $post) {
+
+	  	$input = file_get_contents('php://input');
+
+	  	if (!empty($input)) parse_str($input,$post);
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		switch ($post['name']) {
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_affaire'] = $post['pk'];
+
+		if( $this->u($toUpdate) ){
+			return array('id'=> $post['value'], "name"=> ATF::societe()->select($post["value"], "societe"));
+		}
+	}
+
+
+
 
 };
 class affaire_midas extends affaire_cleodis {
