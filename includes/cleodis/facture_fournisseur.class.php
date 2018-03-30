@@ -463,7 +463,7 @@ class facture_fournisseur extends classes_optima {
 							else{
 								if($item["facture_fournisseur.type"] == "cout_copie"){ $row_data["D"]="611100";  }
 								elseif($item["facture_fournisseur.type"] == "maintenance") { $row_data["D"]="611200"; }
-								else{ $row_data["D"]="607110"; }
+								else{ $row_data["D"]="472000"; }
 							}
 						}
 
@@ -488,7 +488,7 @@ class facture_fournisseur extends classes_optima {
 							else{
 								if($item["facture_fournisseur.type"] == "cout_copie"){ $row_data["D"]="611100";  }
 								elseif($item["facture_fournisseur.type"] == "maintenance") { $row_data["D"]="611200"; }
-								else{ $row_data["D"]="607110"; }
+								else{ $row_data["D"]="607110"; continue; }
 							}
 						}
 						$row_data["G"]=round(abs($item['facture_fournisseur.prix']),2);
