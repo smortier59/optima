@@ -1111,6 +1111,11 @@ class societe_cleodis extends societe {
     }
     ATF::societe()->u(array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban));
 
+    //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
+    if(ATF::societe()->select($id_societe, "tel") === NULL) {
+      ATF::societe()->u(array("id_societe"=>$id_societe, 'tel'=>$tel));
+    }
+
     $societe = ATF::societe()->select($id_societe);
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
