@@ -2491,7 +2491,12 @@ class affaire_cleodis extends affaire {
 									  ->where("affaire.etat","terminee","AND",false,"!=")
 
 									  ->addGroup('affaire.id_affaire');
+			if($get["id_societe"])	ATF::affaire()->q->where("affaire.id_societe",$get['id_societe']);
+			if($get["id_affaire"])  ATF::affaire()->q->where("affaire.id_affaire",$get['id_affaire']);
+
 			$affaires = ATF::affaire()->select_all();
+
+
 
 			if($affaires){
 
@@ -2506,8 +2511,19 @@ class affaire_cleodis extends affaire {
 					$value['id_affaire'] = $this->cryptID($value['affaire.id_affaire']);
 					$value["id_devis"] = ATF::devis()->cryptID($value['id_devis']);
 
+					$societes[$id_soc]["show"] = false;
+
+					if($id_soc === ATF::societe()->cryptID($get["id_societe"])){
+						$societes[$id_soc]["show"] = true;
+					}
 
 					$affaire_soc[$id_soc][$value["affaire.id_affaire"]] = $value;
+					$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = false;
+
+					if($get["id_affaire"] && $value["affaire.id_affaire"] == $get["id_affaire"]){
+						$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = true;
+					}
+
 					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
 					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
 
@@ -2517,6 +2533,7 @@ class affaire_cleodis extends affaire {
 				foreach ($affaire_soc as $key => $value) {
 					$societes[$key]["affaires"] = $value;
 					$societes[$key]["parc_societe"] = array();
+					$societes[$key]["parc_societe"]["show"] = true;
 				}
 
 				foreach ($parc_soc as $key => $value) {
@@ -2525,9 +2542,17 @@ class affaire_cleodis extends affaire {
 
 					//On stocke les parcs de la société pour l'onglet parc (dans le panel societe)
 					foreach ($value as $kaffaireParc => $vaffaireParc) {
+						$societes[$key]["parc"][$kaffaireParc]["show"] = false;
+
+
+						if($get["id_affaire"] && $kaffaireParc == $get["id_affaire"]){
+							$societes[$key]["parc_societe"]["show"] = false;
+							$societes[$key]["parc"][$kaffaireParc]["show"] = true;
+						}
+
 						if($vaffaireParc["parc"]){
 							foreach ($vaffaireParc["parc"] as $kparc => $vparc) {
-								$societes[$key]["parc_societe"][] = $vparc;
+								$societes[$key]["parc_societe"]['parc'][] = $vparc;
 							}
 						}
 					}
