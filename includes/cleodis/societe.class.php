@@ -1847,7 +1847,7 @@ class societe_cleodisbe extends societe_cleodis {
     $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
 
 
-    $client = new SoapClient("https://testwebservices.creditsafe.com/GlobalData/1.3/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
+    $client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3i/MainServiceBasic.svc/meta?wsdl ",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
 
     $params = (object)array
     ( 'countries' => array ('BE'),
