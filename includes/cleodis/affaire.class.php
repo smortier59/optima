@@ -2459,6 +2459,32 @@ class affaire_cleodis extends affaire {
 				$comite["validite_accord"] = NULL;
 				ATF::comite()->insert(array("comite"=>$comite));
 			}
+
+			//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
+			if(ATF::$codename=='cleodisbe'){
+				$partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
+
+				$info_mail["from"] = "request@cleodis.com";
+				$info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
+				$info_mail["html"] = false;
+				$info_mail["template"] = "devis_partenaire";
+
+				$info_mail["partenaire"] = $partenaire;
+				$info_mail["client"] = $societe["societe"];
+				$info_mail["url"] = __MANUAL_WEB_PATH__."accueil.html#affaire-select-".$this->cryptId($devis["id_affaire"]).".html";
+				$info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
+
+
+				$info_mail["recipient"] = "request@cleodis.com";
+
+
+
+				$mail = new mail($info_mail);
+				$mail->send();
+
+			}
+
+
 			ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();

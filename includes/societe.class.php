@@ -921,7 +921,6 @@ class societe extends classes_optima {
 	*/
 	public function cleanGGSResponse($r) {
 		$xml = $r;
-
 		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
 		$company = $item->CompanyIdentification;
 

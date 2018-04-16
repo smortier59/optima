@@ -1589,7 +1589,15 @@ class societe_cleodis extends societe {
         if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
         /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
                                     ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
-        ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
+        if(ATF::$codename === "cleodisbe"){
+          $data["num_ident"] = 'BE'.$post["num_ident"];
+
+          ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string('BE'.$data["num_ident"]),"OR","siret")
+                                    ->where("reference_tva",$data["reference_tva"],"OR","siret");
+        }else{
+          ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
+        }
+
         $res = ATF::societe()->select_row();
         try {
             if($res){
@@ -1847,7 +1855,7 @@ class societe_cleodisbe extends societe_cleodis {
     $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
 
 
-    $client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3i/MainServiceBasic.svc/meta?wsdl ",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
+    $client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3i/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
 
     $params = (object)array
     ( 'countries' => array ('BE'),
