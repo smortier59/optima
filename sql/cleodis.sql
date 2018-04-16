@@ -18,7 +18,7 @@ ALTER TABLE `societe` ADD `particulier_civilite` ENUM('M','Mme','Mlle') NULL DEF
 					  ADD `particulier_portable` VARCHAR(15) NULL DEFAULT NULL AFTER `particulier_prenom`,
 					  ADD `particulier_fixe` VARCHAR(20) NULL DEFAULT NULL AFTER `particulier_portable`,
 					  ADD `particulier_fax` VARCHAR(20) NULL DEFAULT NULL AFTER `particulier_fixe`,
-					  ADD `particulier_email` VARCHAR(255) NULL DEFAULT NULL AFTER `particulier_fax`
+					  ADD `particulier_email` VARCHAR(255) NULL DEFAULT NULL AFTER `particulier_fax`,
 					  ADD `num_carte_fidelite` VARCHAR(50) NULL DEFAULT NULL AFTER `particulier_portable`,
 					  ADD `dernier_magasin` VARCHAR(50) NULL DEFAULT NULL AFTER `num_carte_fidelite`,
 					  ADD `optin_offre_commerciales` ENUM('oui','non') NULL DEFAULT NULL AFTER `dernier_magasin`,
