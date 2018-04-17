@@ -2512,10 +2512,10 @@ class affaire_cleodis extends affaire {
 									  ->from("affaire","id_affaire","devis","id_affaire")
 									  ->where('affaire.id_partenaire',$apporteur)
 
-									  /*->where("affaire.etat","devis","AND",false,"!=")
+									  ->where("affaire.etat","devis","AND",false,"!=")
 									  ->where("affaire.etat","perdue","AND",false,"!=")
-									  ->where("affaire.etat","terminee","AND",false,"!=")*/
-									   ->where("affaire.etat","facture","AND",false,"=")
+									  ->where("affaire.etat","terminee","AND",false,"!=")
+
 
 									  ->where("affaire.nature","vente","AND",false,"!=")
 
@@ -2532,29 +2532,41 @@ class affaire_cleodis extends affaire {
 				$affaire_soc = $parc_soc = array();
 
 				foreach ($affaires as $key => $value) {
-					$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
-					$id_soc = ATF::societe()->cryptID($id_soc);
 
-					$societes[$id_soc] = ATF::societe()->select($id_soc);
+					ATF::commande()->q->reset()->where("id_affaire",$value['affaire.id_affaire'],"AND")
+											   ->where("etat", "non_loyer","AND")
+											   ->where("etat", "AR","AND")
+											   ->where("etat", "arreter","AND")
+											   ->where("etat", "vente","AND");
+					$contrat = ATF::commande()->select_row();
 
-					$value['id_affaire'] = $this->cryptID($value['affaire.id_affaire']);
-					$value["id_devis"] = ATF::devis()->cryptID($value['id_devis']);
+					if($contrat){
+						$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
+						$id_soc = ATF::societe()->cryptID($id_soc);
 
-					$societes[$id_soc]["show"] = false;
+						$societes[$id_soc] = ATF::societe()->select($id_soc);
 
-					if($id_soc === ATF::societe()->cryptID($get["id_societe"])){
-						$societes[$id_soc]["show"] = true;
+						$value['id_affaire'] = $this->cryptID($value['affaire.id_affaire']);
+						$value["id_devis"] = ATF::devis()->cryptID($value['id_devis']);
+
+						$societes[$id_soc]["show"] = false;
+
+						if($id_soc === ATF::societe()->cryptID($get["id_societe"])){
+							$societes[$id_soc]["show"] = true;
+						}
+
+						$affaire_soc[$id_soc][$value["affaire.id_affaire"]] = $value;
+						$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = false;
+
+						if($get["id_affaire"] && $value["affaire.id_affaire"] == $get["id_affaire"]){
+							$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = true;
+						}
+
+						$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
+						$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
 					}
 
-					$affaire_soc[$id_soc][$value["affaire.id_affaire"]] = $value;
-					$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = false;
 
-					if($get["id_affaire"] && $value["affaire.id_affaire"] == $get["id_affaire"]){
-						$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = true;
-					}
-
-					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
-					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
 
 
 				}
