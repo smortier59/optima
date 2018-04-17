@@ -2378,11 +2378,10 @@ class affaire_cleodis extends affaire {
 				"loyer__dot__support"=>"",
 				"loyer__dot__avec_option"=>"non"
 			);
-			// categorie / sous categorie
-			$categorie = ATF::categorie()->select($post["categorie"]);
-			$sous_categorie = ATF::sous_categorie()->select($post["sous-categorie"]);
+
+
 			$produits[0] = array(
-			  "devis_ligne__dot__produit"=> $categorie['categorie'].' - '.$sous_categorie['sous_categorie'],
+			  "devis_ligne__dot__produit"=> $post['libelle'],
 			  "devis_ligne__dot__quantite"=>1,
 			  "devis_ligne__dot__type"=>"sans_objet",
 			  "devis_ligne__dot__ref"=>"",
