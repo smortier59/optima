@@ -2504,6 +2504,9 @@ class affaire_cleodis extends affaire {
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
 
+		log::logger($utilisateur , "mfleurquin");
+
+
 		if($apporteur){
 			$societes = $ret= [];
 			ATF::affaire()->q->reset()->addField("affaire.ref","ref")
@@ -2534,10 +2537,10 @@ class affaire_cleodis extends affaire {
 				foreach ($affaires as $key => $value) {
 
 					ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire'],"AND")
-											   ->where("commande.etat", "non_loyer","AND")
-											   ->where("commande.etat", "AR","AND")
-											   ->where("commande.etat", "arreter","AND")
-											   ->where("commande.etat", "vente","AND");
+											   ->where("commande.etat", "non_loyer","AND", false, "!=")
+											   ->where("commande.etat", "AR","AND", false, "!=")
+											   ->where("commande.etat", "arreter","AND", false, "!=")
+											   ->where("commande.etat", "vente","AND", false, "!=");
 					$contrat = ATF::commande()->select_row();
 
 					if($contrat){
@@ -2565,10 +2568,6 @@ class affaire_cleodis extends affaire {
 						$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
 						$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
 					}
-
-
-
-
 				}
 
 				foreach ($affaire_soc as $key => $value) {
