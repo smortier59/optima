@@ -2439,7 +2439,7 @@ class affaire_cleodis extends affaire {
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
 
-			if(($societe["cs_score"] > 50 && $creation < $past2Years) || ATF::$codename=='cleodisbe' ){
+			if(($societe["cs_score"] > 50 && $creation < $past2Years)){
 				$comite["etat"] = "accepte";
 				$comite["decisionComite"] = "Accepté automatiquement";
 			}else{
