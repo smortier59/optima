@@ -2533,11 +2533,11 @@ class affaire_cleodis extends affaire {
 
 				foreach ($affaires as $key => $value) {
 
-					ATF::commande()->q->reset()->where("id_affaire",$value['affaire.id_affaire'],"AND")
-											   ->where("etat", "non_loyer","AND")
-											   ->where("etat", "AR","AND")
-											   ->where("etat", "arreter","AND")
-											   ->where("etat", "vente","AND");
+					ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire'],"AND")
+											   ->where("commande.etat", "non_loyer","AND")
+											   ->where("commande.etat", "AR","AND")
+											   ->where("commande.etat", "arreter","AND")
+											   ->where("commande.etat", "vente","AND");
 					$contrat = ATF::commande()->select_row();
 
 					if($contrat){
