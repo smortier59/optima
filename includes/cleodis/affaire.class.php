@@ -2512,9 +2512,12 @@ class affaire_cleodis extends affaire {
 									  ->from("affaire","id_affaire","devis","id_affaire")
 									  ->where('affaire.id_partenaire',$apporteur)
 
-									  ->where("affaire.etat","devis","AND",false,"!=")
+									  /*->where("affaire.etat","devis","AND",false,"!=")
 									  ->where("affaire.etat","perdue","AND",false,"!=")
-									  ->where("affaire.etat","terminee","AND",false,"!=")
+									  ->where("affaire.etat","terminee","AND",false,"!=")*/
+									   ->where("affaire.etat","facture","AND",false,"=")
+
+									  ->where("affaire.nature","vente","AND",false,"!=")
 
 									  ->addGroup('affaire.id_affaire');
 			if($get["id_societe"])	ATF::affaire()->q->where("affaire.id_societe",$get['id_societe']);
