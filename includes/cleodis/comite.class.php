@@ -457,29 +457,44 @@ class comite extends classes_optima {
 
 		$id = $this->decryptId($infos["id"]);
 
-		if($infos["comboDisplay"] == "refus_comite"){
-			$etat = "refuse";
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
-		}elseif($infos["comboDisplay"] == "attente_retour" || $infos["comboDisplay"] == "accord_reserve_cession"){
-			$etat = "en_attente";
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
-		}else{
-			$etat = "accepte";
-			ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
 
-			$id_affaire = ATF::comite()->select($id, "id_affaire");
 
-			ATF::comite()->q->reset()->where("id_affaire", $id_affaire)
-							 ->where("etat", "accepte");
+		switch($infos["comboDisplay"]){
 
-			$c = ATF::comite()->sa();
+			case "refus_comite":
+				$etat = "refuse";
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
+			break;
 
-			if($c){
-				foreach ($c as $key => $value) {
-					ATF::comite()->u(array("id_comite"=>$value["id_comite"] , "etat"=> "accord_non utilise"));
+			case "attente_retour":
+			case "accord_reserve_cession";
+				$etat = "en_attente";
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>"attente"));
+			break;
+
+
+			case "accord_portage" :
+			case "accord_portage_recherche_cession" :
+			case "accord_portage_recherche_cession_groupee" :
+				$etat = "accepte";
+				ATF::affaire()->u(array("id_affaire"=>$infos["id_affaire"], "etat_comite"=>$etat));
+
+				$id_affaire = ATF::comite()->select($id, "id_affaire");
+
+				ATF::comite()->q->reset()->where("id_affaire", $id_affaire)
+								 ->where("etat", "accepte");
+
+				$c = ATF::comite()->sa();
+
+				if($c){
+					foreach ($c as $key => $value) {
+						ATF::comite()->u(array("id_comite"=>$value["id_comite"] , "etat"=> "accord_non utilise"));
+					}
 				}
-			}
+			break;
+
 		}
+
 
 		$data = array("id_comite"=>$id,
 					  "etat"=>$etat,
