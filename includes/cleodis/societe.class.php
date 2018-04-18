@@ -756,7 +756,20 @@ class societe_cleodis extends societe {
     //Creation d'un Nouveau RUM automatique
     if(!$infos["societe"]['RUM']){
       $infos["societe"]['RUM'] = $this->create_rum();
-      if($infos["societe"]['code_client']) $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
+      if($infos["societe"]['code_client']){
+        if(strlen($infos["societe"]['code_client']) === 6){
+          $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
+        }elseif(strlen($infos["societe"]['code_client']) > 6){
+          $infos["societe"]['RUM'] .= substr($infos["societe"]['code_client'], -1, 6);
+        }else{
+          for ($i=0; $i < 6 - strlen($infos["societe"]['code_client']); $i++) {
+            $infos["societe"]['RUM'] .= '0';
+          }
+          $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
+        }
+      }else{
+        $infos["societe"]['RUM'] .= '000000';
+      }
     }
 
 
