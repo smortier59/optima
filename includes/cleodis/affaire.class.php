@@ -2479,10 +2479,10 @@ class affaire_cleodis extends affaire {
 
 				$info_mail["recipient"] = "mfleurquin@cleodis.com";
 
-
+				log::logger($info_mail , "mfleurquin");
 
 				$mail = new mail($info_mail);
-				$mail->send();
+				log::logger($mail->send()  , "mfleurquin");
 
 			}
 
