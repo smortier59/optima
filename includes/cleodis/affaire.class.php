@@ -2446,11 +2446,14 @@ class affaire_cleodis extends affaire {
 				$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
 			}
 
+
 			$comite["reponse"] = date("Y-m-d");
 			$comite["validite_accord"] = date("Y-m-d");
 
+
+
 			ATF::comite()->insert(array("comite"=>$comite));
-			if($comite["etat"]== "accepte"){
+			if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
 				//Création du comité CLEODIS
 				$comite["description"] = "Comité CLEODIS";
 				$comite["etat"] = "en_attente";
@@ -2502,8 +2505,6 @@ class affaire_cleodis extends affaire {
 		// on recupère l'apporteur;
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
-
-		log::logger($utilisateur , "mfleurquin");
 
 
 		if($apporteur){
