@@ -2466,7 +2466,7 @@ class affaire_cleodis extends affaire {
 			if(ATF::$codename=='cleodisbe'){
 				$partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
 
-				$info_mail["from"] = "mfleurquin@cleodis.com";
+				$info_mail["from"] = "mfleurquin@absystech.fr";
 				$info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
 				$info_mail["html"] = false;
 				$info_mail["template"] = "devis_partenaire";
@@ -2477,7 +2477,7 @@ class affaire_cleodis extends affaire {
 				$info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
 
 
-				$info_mail["recipient"] = "mfleurquin@cleodis.com";
+				$info_mail["recipient"] = "mfleurquin@absystech.fr";
 
 				log::logger($info_mail , "mfleurquin");
 
