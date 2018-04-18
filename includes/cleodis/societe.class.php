@@ -1592,11 +1592,12 @@ class societe_cleodis extends societe {
         if(ATF::$codename === "cleodisbe"){
           $data["num_ident"] = 'BE'.$post["num_ident"];
 
-          ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string('BE'.$data["num_ident"]),"OR","siret")
+          ATF::societe()->q->reset()->where("num_ident",ATF::db($this->db)->real_escape_string($data["num_ident"]),"OR","siret")
                                     ->where("reference_tva",$data["reference_tva"],"OR","siret");
         }else{
           ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
         }
+
 
         $res = ATF::societe()->select_row();
         try {
