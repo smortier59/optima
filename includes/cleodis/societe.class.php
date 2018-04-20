@@ -757,10 +757,12 @@ class societe_cleodis extends societe {
     if(!$infos["societe"]['RUM']){
       $infos["societe"]['RUM'] = $this->create_rum();
       if($infos["societe"]['code_client']){
+
         if(strlen($infos["societe"]['code_client']) === 6){
+
           $infos["societe"]['RUM'] .= $infos["societe"]['code_client'];
         }elseif(strlen($infos["societe"]['code_client']) > 6){
-          $infos["societe"]['RUM'] .= substr($infos["societe"]['code_client'], -1, 6);
+          $infos["societe"]['RUM'] .= substr($infos["societe"]['code_client'], -6);
         }else{
           for ($i=0; $i < 6 - strlen($infos["societe"]['code_client']); $i++) {
             $infos["societe"]['RUM'] .= '0';

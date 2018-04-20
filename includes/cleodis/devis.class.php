@@ -395,7 +395,7 @@ class devis_cleodis extends devis {
 					if(strlen($societe['code_client']) === 6){
 						$RUM .= $societe['code_client'];
 					}elseif(strlen($societe['code_client']) > 6){
-						$RUM .= substr($societe['code_client'], -1, 6);
+						$RUM .= substr($societe['code_client'], -6);
 					}else{
 						for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
 							$RUM .= '0';
