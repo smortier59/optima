@@ -1867,8 +1867,11 @@ class societe_cleodisbe extends societe_cleodis {
   */
   public function getInfosFromCREDITSAFE($infos) {
 
+
+
     $infos["num_ident"] = str_replace(" ", "", $infos["num_ident"]);
     $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
+    $infos["num_ident"] = str_replace("BE", "", $infos["num_ident"]);
 
 
     $client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3i/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
@@ -1886,8 +1889,7 @@ class societe_cleodisbe extends societe_cleodis {
 
     $response = $client->__soapCall('FindCompanies',array($params));
 
-
-    $xml = $response;
+     $xml = $response;
 
     // response/Messages / Message type = error
     $error = False;

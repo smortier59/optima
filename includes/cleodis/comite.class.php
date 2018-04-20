@@ -404,8 +404,14 @@ class comite extends classes_optima {
 	 * @param  array $infos
 	 */
 	public function getInfosFromCREDITSAFE($infos){
-		$siret = ATF::societe()->select($infos["societe"], "siret");
-		$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
+
+		if(ATF::$codename == "cleodisbe"){
+			$num_ident = ATF::societe()->select($infos["societe"], "num_ident");
+			$res = ATF::societe()->getInfosFromCREDITSAFE(array("num_ident"=>$num_ident, "returnxml"=>"oui"));
+		}else{
+			$siret = ATF::societe()->select($infos["societe"], "siret");
+			$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
+		}
 
 		$xml = simplexml_load_string($res);
 
