@@ -242,7 +242,7 @@ class pdf_cleodis extends pdf {
 		$this->setY(27);
 		$this->setLeftMargin(125);
 		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->cell(55, 4, $this->affaire["RUM"],0,1);
 		$this->setfont('arial','',9);
 		$this->cell(55, 4, "Référence unique du mandat",0,1);
 
