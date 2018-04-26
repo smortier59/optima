@@ -170,6 +170,11 @@ class pack_produit extends classes_optima {
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
 				}
+
+				if(!$item["id_produit"]){
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF($item["produit"]. " ne fait réference à aucun produit (Manque Id produit)",882);
+				}
 				ATF::pack_produit_ligne()->i($item);
 			}
 		}else{
@@ -270,6 +275,10 @@ class pack_produit extends classes_optima {
 				if(!$item["id_fournisseur"]){
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Ligne de pack_produit sans fournisseur",882);
+				}
+				if(!$item["id_produit"]){
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF($item["produit"]. " ne fait réference à aucun produit (Manque Id produit)",882);
 				}
 				ATF::pack_produit_ligne()->i($item);
 			}

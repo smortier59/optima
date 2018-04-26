@@ -381,8 +381,36 @@ class devis_cleodis extends devis {
 				}
 			}
 		}
-		$affaire["RUM"] = $RUM;
+		if(!$RUM){
+			if(ATF::societe()->select($infos['id_societe'], 'RUM')){
+				$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
+			}else{
+				//Si il n'y a pas de RUM, on en ajoute un pour cette société
+			    $RUM = ATF::societe()->create_rum();
 
+			    $societe = ATF::societe()->select($infos['id_societe']);
+
+				if($societe['code_client']){
+
+					if(strlen($societe['code_client']) === 6){
+						$RUM .= $societe['code_client'];
+					}elseif(strlen($societe['code_client']) > 6){
+						$RUM .= substr($societe['code_client'], -6);
+					}else{
+						for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
+							$RUM .= '0';
+						}
+						$RUM .= $societe['code_client'];
+					}
+				}else{
+					$RUM .= '000000';
+				}
+
+
+			    ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+			}
+		}
+		$affaire["RUM"] = $RUM;
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);

@@ -94,6 +94,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
             unset($value["loyer"]);
 
             foreach ($value as $k => $v) {
+
                 if($v["produit"]){
                     $prod = ATF::produit()->select($v["produit"]);
 
@@ -123,26 +124,30 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                     $produits_pack = ATF::pack_produit_ligne()->select_all();
 
                     foreach ($produits_pack as $kpp => $vpp) {
-                        $prod = ATF::produit()->select($vpp["id_produit"]);
 
-                        $produits[] = array("devis_ligne__dot__produit"=>$prod["produit"],
-                                            "devis_ligne__dot__quantite"=>$v["quantite"]*$vpp["quantite"],
-                                            "devis_ligne__dot__type"=>$prod["type"],
-                                            "devis_ligne__dot__ref"=>$prod["ref"],
-                                            "devis_ligne__dot__prix_achat"=>$prod["prix_achat"],
-                                            "devis_ligne__dot__id_produit"=>$prod["id_produit"],
-                                            "devis_ligne__dot__id_fournisseur"=>"1FOTEAM",
-                                            "devis_ligne__dot__visibilite_prix"=>$vpp["visibilite_prix"],
-                                            "devis_ligne__dot__visible"=>$vpp["visible"],
-                                            "devis_ligne__dot__date_achat"=>"",
-                                            "devis_ligne__dot__commentaire"=>$prod["commentaire"],
-                                            "devis_ligne__dot__neuf"=>"oui",
-                                            "devis_ligne__dot__id_produit_fk"=>$prod["id_produit"],
-                                            "devis_ligne__dot__id_fournisseur_fk"=>$vpp["id_fournisseur"]);
-                        $prix_achat +=  $vpp["prix_achat"]*($v["quantite"]*$vpp["quantite"]);
+                        if($vpp["id_produit"]){
+                             $prod = ATF::produit()->select($vpp["id_produit"]);
+
+                            $produits[] = array("devis_ligne__dot__produit"=>$prod["produit"],
+                                                "devis_ligne__dot__quantite"=>$v["quantite"]*$vpp["quantite"],
+                                                "devis_ligne__dot__type"=>$prod["type"],
+                                                "devis_ligne__dot__ref"=>$prod["ref"],
+                                                "devis_ligne__dot__prix_achat"=>$prod["prix_achat"],
+                                                "devis_ligne__dot__id_produit"=>$prod["id_produit"],
+                                                "devis_ligne__dot__id_fournisseur"=>"1FOTEAM",
+                                                "devis_ligne__dot__visibilite_prix"=>$vpp["visibilite_prix"],
+                                                "devis_ligne__dot__visible"=>$vpp["visible"],
+                                                "devis_ligne__dot__date_achat"=>"",
+                                                "devis_ligne__dot__commentaire"=>$prod["commentaire"],
+                                                "devis_ligne__dot__neuf"=>"oui",
+                                                "devis_ligne__dot__id_produit_fk"=>$prod["id_produit"],
+                                                "devis_ligne__dot__id_fournisseur_fk"=>$vpp["id_fournisseur"]);
+                            $prix_achat +=  $vpp["prix_achat"]*($v["quantite"]*$vpp["quantite"]);
+                        }
                     }
                 }
             }
+
 
             $devis["prix_achat"] = $prix_achat;
             $devis["prix"] = $prix;
@@ -156,6 +161,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
 
 
             ATF::devis()->insert($data);
+
         }
 
         return true;

@@ -242,7 +242,7 @@ class pdf_cleodis extends pdf {
 		$this->setY(27);
 		$this->setLeftMargin(125);
 		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->cell(55, 4, $this->affaire["RUM"],0,1);
 		$this->setfont('arial','',9);
 		$this->cell(55, 4, "Référence unique du mandat",0,1);
 
@@ -4263,26 +4263,43 @@ class pdf_cleodis extends pdf {
 			$this->factureClassique($global);
 
 
-			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"]){
+			ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
+										   ->where('etat','valide','AND')
+										   ->from('demande_refi','id_refinanceur','refinanceur','id_refinanceur')
+										   ->where('refinanceur.code_refi','REFACTURATION');
+
+			$refi = ATF::demande_refi()->select_row();
+
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"] || $refi){
 
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
 
-				$commentaire = "";
+
 
 				if($this->affaire["commentaire_facture"]) $commentaire .= $this->affaire["commentaire_facture"]."\n";
 				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
 				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
 
+				ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
+										   ->where('etat','valide','AND')
+										   ->from('demande_refi','id_refinanceur','refinanceur','id_refinanceur')
+										   ->where('refinanceur.code_refi','REFACTURATION');
+
+				if($refi = ATF::demande_refi()->select_row()){
+					if($commentaire) $commentaire .= 'Information de prélèvements : ';
+					$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+				}
+
+
 				$data[0][0] = $commentaire;
 				$styles[0][0] = $this->styleDetailsProduit;
 
-
-
-
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
+
+
 
 		}elseif($this->facture['type_facture']=="midas"){
 			$this->factureMidas($global);
@@ -6353,7 +6370,12 @@ class pdf_cleodis extends pdf {
 		$this->ln(10);
 
 		$this->setfont('arial',"",8);
-		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
+		if($this->affaire['RUM']){
+			$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ".$this->affaire['RUM']);
+		}else{
+			$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
+		}
+
 
 
 		$this->setfont('arial',"I",7);
@@ -8136,7 +8158,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setY(27);
 		$this->setLeftMargin(125);
 		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->cell(55, 4, $this->affaire["RUM"],0,1);
 		$this->setfont('arial','',9);
 		$this->cell(55, 4, "Référence unique du mandat",0,1);
 
@@ -10132,7 +10154,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->setfont('arial',"B",8);
 		$this->setLeftMargin(70);
-		$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
+		if($this->affaire['RUM']){
+			$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT ".$this->affaire['RUM'],1,1);
+		}else{
+			$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
+		}
+
 		$this->setLeftMargin(10);
 		$this->ln(10);
 
@@ -11601,7 +11628,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->setY(27);
 		$this->setLeftMargin(125);
 		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["RUM"],0,1);
+		$this->cell(55, 4, $this->affaire["RUM"],0,1);
 		$this->setfont('arial','',9);
 		$this->cell(55, 4, "Référence unique du mandat",0,1);
 

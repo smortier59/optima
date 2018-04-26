@@ -12,6 +12,40 @@ class contact_cleodis extends contact {
 	public function __construct() {
 		parent::__construct();
 		$this->table = "contact";
+
+
+		unset($this->colonnes['panel']['adresse_complete_fs']['tel_complet'],
+			  $this->colonnes['panel']['adresse_complete_fs']['email']);
+
+		$this->colonnes['panel']['pro_fs'] = array(
+			'tel'=>array("quick_update"=>true,"custom"=>true,"tel"=>true),
+			'gsm'=>array("custom"=>true,"tel"=>true),
+			'fax',
+			'email'=>array("quick_update"=>true)
+		);
+
+		$this->colonnes['panel']['perso_fs'] = array(
+			'tel_perso'=>array("quick_update"=>true,"custom"=>true,"tel"=>true),
+			'gsm_perso'=>array("custom"=>true,"tel"=>true),
+			'email_perso'=>array("quick_update"=>true)
+		);
+
+
+		$this->colonnes['panel']['espace_perso'] = array(
+			'login',
+			'pwd'
+		);
+
+
+		$this->panels['pro_fs'] = array('nbCols'=>1, 'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+		$this->panels['perso_fs'] = array('nbCols'=>1, 'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+		$this->panels['espace_perso'] = array('nbCols'=>2,'collapsible'=>true);
+
+		$this->colonnes['panel']['coordonnees']["pro"]  = array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'pro_fs');
+		$this->colonnes['panel']['coordonnees']["perso"]  = array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'perso_fs');
+
+
+		$this->fieldstructure();
 	}
 
 

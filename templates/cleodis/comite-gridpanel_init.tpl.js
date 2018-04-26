@@ -41,9 +41,11 @@
 									fields: ["id", "text"],
 									data: [  ["refus_comite", "Refus comité"]
 											,["accord_portage", "Accord de portage"]
-											,["accord_reserve_cession", "Accord réserve de cession"]
+											,["accord_portage_recherche_cession", "Accord de portage avec recherche et cession"]
+											,["accord_portage_recherche_cession_groupee", "Accord de portage avec recherche et cession GROUPEE"]
+											,["accord_reserve_cession", "Accord sous réserve de cession"]
 											,["attente_retour", "Attente de retour"]
-											,["favorable_cession", "Favorable à la cession"]
+
 										  ]
 								});
 								var hiddenField = new Ext.form.Hidden({

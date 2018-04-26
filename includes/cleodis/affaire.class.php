@@ -77,6 +77,19 @@ class affaire_cleodis extends affaire {
 		);
 		$this->panels['commentaire_sur_facture'] = array("visible"=>true, 'nbCols'=>1);
 
+		$this->colonnes['panel']['infos_signature_contrat'] = array(
+			"tel_signature",
+			"mail_signataire",
+			"date_signature",
+			"signataire"
+		);
+		$this->panels['infos_signature_contrat'] = array("visible"=>false);
+
+
+
+
+
+
 		$this->colonnes['panel']['chiffres'] = array(
 			'total_depense'
 			,'total_recette'
@@ -1315,12 +1328,15 @@ class affaire_cleodis extends affaire {
 			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 			$this->q->addField($colsData)
+					->addField("famille.famille","famille")
+
 					->from("affaire","id_societe","societe","id_societe")
 					->from("societe","id_contact_signataire","contact","id_contact")
 					->from("affaire","id_affaire","bon_de_commande","id_affaire")
 					->from("affaire","id_affaire","commande","id_affaire")
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
+					->from("societe","id_famille", "famille", "id_famille")
 					//->where("provenance",'partenaire')
 					->where("id_partenaire", $apporteur)
 
@@ -1418,12 +1434,14 @@ class affaire_cleodis extends affaire {
 			if ($get['id_affaire']) $colsData = array("affaire.affaire","affaire.id_affaire","affaire.etat",'affaire.date','affaire.ref','affaire.etat_comite','affaire.id_societe', 'affaire.pieces', 'affaire.date_verification');
 
 			$this->q->addField($colsData)
+					->addField("famille.famille","famille")
 					->from("affaire","id_societe","societe","id_societe")
 					->from("societe","id_contact_signataire","contact","id_contact")
 					->from("affaire","id_affaire","bon_de_commande","id_affaire")
 					->from("affaire","id_affaire","commande","id_affaire")
 					->from("affaire","id_affaire","loyer","id_affaire")
 					->from("affaire", "id_affaire", "commande", "id_affaire")
+					->from("societe","id_famille", "famille", "id_famille")
 					->where("site_associe", "toshiba")
 
 					->where("affaire.etat", "devis","OR","affaire_demande","=")
@@ -1678,12 +1696,14 @@ class affaire_cleodis extends affaire {
 		$this->q->addField($colsData)
 				->addField("Count(bon_de_commande.id_bon_de_commande)","total_bdc")
 				->addField("Count(commande.id_commande)","nb_contrat")
+				->addField("famille.famille","famille")
 				->from("affaire","id_societe","societe","id_societe")
 				->from("societe","id_contact_signataire","contact","id_contact")
 				->from("affaire","id_affaire","bon_de_commande","id_affaire")
 				->from("affaire","id_affaire","commande","id_affaire")
 				->from("affaire","id_affaire","loyer","id_affaire")
-				->from("affaire","id_affaire", "commande", "id_affaire");
+				->from("affaire","id_affaire", "commande", "id_affaire")
+				->from("societe","id_famille", "famille", "id_famille");
 
 
 		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
@@ -1720,6 +1740,8 @@ class affaire_cleodis extends affaire {
 		  $data["partenaire"] = NULL;
 		  if($data["affaire.id_partenaire_fk"]){
 		  	$data["partenaire"] = ATF::societe()->select($data["affaire.id_partenaire_fk"] , "societe");
+		  	$data["partenaire_revendeur"] = ATF::societe()->select($data["affaire.id_partenaire_fk"] , "revendeur");
+
 		  }
 
 		  // on check si l'affaire est "payee"
@@ -1822,7 +1844,8 @@ class affaire_cleodis extends affaire {
 		  }
 		  $data['id_commande_crypt'] = ATF::commande()->cryptId($commande['commande.id_commande']);
 
-			ATF::bon_de_commande()->q->reset()
+
+		  	ATF::bon_de_commande()->q->reset()
 		       ->addField("id_bon_de_commande")
 		       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
 		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($data["idcrypted"]), "AND")
@@ -1835,6 +1858,9 @@ class affaire_cleodis extends affaire {
 		    	$data["bon_de_commande"] = false;
 		    	$data["id_bon_de_commande_crypt"] = null;
 		    }
+
+
+
 
 		} else {
 			// Filtre sur l'etat de l'affaire
@@ -2352,11 +2378,10 @@ class affaire_cleodis extends affaire {
 				"loyer__dot__support"=>"",
 				"loyer__dot__avec_option"=>"non"
 			);
-			// categorie / sous categorie
-			$categorie = ATF::categorie()->select($post["categorie"]);
-			$sous_categorie = ATF::sous_categorie()->select($post["sous-categorie"]);
+
+
 			$produits[0] = array(
-			  "devis_ligne__dot__produit"=> $categorie['categorie'].' - '.$sous_categorie['sous_categorie'],
+			  "devis_ligne__dot__produit"=> $post['libelle'],
 			  "devis_ligne__dot__quantite"=>1,
 			  "devis_ligne__dot__type"=>"sans_objet",
 			  "devis_ligne__dot__ref"=>"",
@@ -2413,7 +2438,7 @@ class affaire_cleodis extends affaire {
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
 
-			if($societe["cs_score"] > 50 && $creation < $past2Years ){
+			if(($societe["cs_score"] > 50 && $creation < $past2Years)){
 				$comite["etat"] = "accepte";
 				$comite["decisionComite"] = "Accepté automatiquement";
 			}else{
@@ -2421,11 +2446,14 @@ class affaire_cleodis extends affaire {
 				$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
 			}
 
+
 			$comite["reponse"] = date("Y-m-d");
 			$comite["validite_accord"] = date("Y-m-d");
 
+
+
 			ATF::comite()->insert(array("comite"=>$comite));
-			if($comite["etat"]== "accepte"){
+			if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
 				//Création du comité CLEODIS
 				$comite["description"] = "Comité CLEODIS";
 				$comite["etat"] = "en_attente";
@@ -2433,6 +2461,29 @@ class affaire_cleodis extends affaire {
 				$comite["validite_accord"] = NULL;
 				ATF::comite()->insert(array("comite"=>$comite));
 			}
+
+			//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
+			if(ATF::$codename=='cleodisbe'){
+				$partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
+
+				$info_mail["from"] = ATF::$usr->get('contact','email');
+				$info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
+				$info_mail["html"] = false;
+				$info_mail["template"] = "devis_partenaire";
+
+				$info_mail["partenaire"] = $partenaire;
+				$info_mail["client"] = $societe["societe"];
+				$info_mail["url"] = __MANUAL_WEB_PATH__."accueil.html#affaire-select-".$this->cryptId($devis["id_affaire"]).".html";
+				$info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
+
+
+				$info_mail["recipient"] = "request@cleodis.com";
+
+				$mail = new mail($info_mail);
+
+			}
+
+
 			ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
@@ -2452,6 +2503,7 @@ class affaire_cleodis extends affaire {
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
 
+
 		if($apporteur){
 			$societes = $ret= [];
 			ATF::affaire()->q->reset()->addField("affaire.ref","ref")
@@ -2464,33 +2516,61 @@ class affaire_cleodis extends affaire {
 									  ->where("affaire.etat","perdue","AND",false,"!=")
 									  ->where("affaire.etat","terminee","AND",false,"!=")
 
+
+									  ->where("affaire.nature","vente","AND",false,"!=")
+
 									  ->addGroup('affaire.id_affaire');
+			if($get["id_societe"])	ATF::affaire()->q->where("affaire.id_societe",$get['id_societe']);
+			if($get["id_affaire"])  ATF::affaire()->q->where("affaire.id_affaire",$get['id_affaire']);
+
 			$affaires = ATF::affaire()->select_all();
+
+
 
 			if($affaires){
 
 				$affaire_soc = $parc_soc = array();
 
 				foreach ($affaires as $key => $value) {
-					$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
-					$id_soc = ATF::societe()->cryptID($id_soc);
 
-					$societes[$id_soc] = ATF::societe()->select($id_soc);
+					ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire'],"AND")
+											   ->where("commande.etat", "non_loyer","AND", false, "!=")
+											   ->where("commande.etat", "AR","AND", false, "!=")
+											   ->where("commande.etat", "arreter","AND", false, "!=")
+											   ->where("commande.etat", "vente","AND", false, "!=");
+					$contrat = ATF::commande()->select_row();
 
-					$value['id_affaire'] = $this->cryptID($value['affaire.id_affaire']);
-					$value["id_devis"] = ATF::devis()->cryptID($value['id_devis']);
+					if($contrat){
+						$id_soc = ATF::affaire()->select($value["affaire.id_affaire"] , "id_societe");
+						$id_soc = ATF::societe()->cryptID($id_soc);
 
+						$societes[$id_soc] = ATF::societe()->select($id_soc);
 
-					$affaire_soc[$id_soc][$value["affaire.id_affaire"]] = $value;
-					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
-					$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
+						$value['id_affaire'] = $this->cryptID($value['affaire.id_affaire']);
+						$value["id_devis"] = ATF::devis()->cryptID($value['id_devis']);
 
+						$societes[$id_soc]["show"] = false;
 
+						if($id_soc === ATF::societe()->cryptID($get["id_societe"])){
+							$societes[$id_soc]["show"] = true;
+						}
+
+						$affaire_soc[$id_soc][$value["affaire.id_affaire"]] = $value;
+						$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = false;
+
+						if($get["id_affaire"] && $value["affaire.id_affaire"] == $get["id_affaire"]){
+							$affaire_soc[$id_soc][$value["affaire.id_affaire"]]['show'] = true;
+						}
+
+						$parc_soc[$id_soc][$value["affaire.id_affaire"]]['parc'] = ATF::parc()->getParcPartenaire($value["affaire.id_affaire"]);
+						$parc_soc[$id_soc][$value["affaire.id_affaire"]]['id_devis'] = $value["id_devis"];
+					}
 				}
 
 				foreach ($affaire_soc as $key => $value) {
 					$societes[$key]["affaires"] = $value;
 					$societes[$key]["parc_societe"] = array();
+					$societes[$key]["parc_societe"]["show"] = true;
 				}
 
 				foreach ($parc_soc as $key => $value) {
@@ -2499,9 +2579,17 @@ class affaire_cleodis extends affaire {
 
 					//On stocke les parcs de la société pour l'onglet parc (dans le panel societe)
 					foreach ($value as $kaffaireParc => $vaffaireParc) {
+						$societes[$key]["parc"][$kaffaireParc]["show"] = false;
+
+
+						if($get["id_affaire"] && $kaffaireParc == $get["id_affaire"]){
+							$societes[$key]["parc_societe"]["show"] = false;
+							$societes[$key]["parc"][$kaffaireParc]["show"] = true;
+						}
+
 						if($vaffaireParc["parc"]){
 							foreach ($vaffaireParc["parc"] as $kparc => $vparc) {
-								$societes[$key]["parc_societe"][] = $vparc;
+								$societes[$key]["parc_societe"]['parc'][] = $vparc;
 							}
 						}
 					}
@@ -2645,6 +2733,30 @@ class affaire_cleodis extends affaire {
 
 		return $this->u($toUpdate);
 	}
+
+	public function _setPartenaire($get, $post) {
+
+	  	$input = file_get_contents('php://input');
+
+	  	if (!empty($input)) parse_str($input,$post);
+		if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		switch ($post['name']) {
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_affaire'] = $post['pk'];
+
+		if( $this->u($toUpdate) ){
+			return array('id'=> $post['value'], "name"=> ATF::societe()->select($post["value"], "societe"));
+		}
+	}
+
+
 
 
 };
