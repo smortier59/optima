@@ -1387,8 +1387,8 @@ class commande_lm extends commande {
 												,"id_commande_ligne"=>$i["id_commande_ligne"]
 												,"id"=>$cle
 												,"leaf"=>true
-												,"prix"=>$i["prix_achat_ttc"]/$i["quantite"]
-												,"prix_ht"=>$i["prix_achat"]/$i["quantite"]
+												,"prix"=>$i["prix_achat_ttc"]
+												,"prix_ht"=>$i["prix_achat"]
 												,"quantite"=>1
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
