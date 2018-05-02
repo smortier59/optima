@@ -5,7 +5,7 @@
 			Ext.getCmp("panel_societe_fs").hide();
 			Ext.getCmp("panel_codes_fs").hide();
 			Ext.getCmp("panel_caracteristiques").hide();
-			Ext.getCmp("panel_deploiement").hide();
+			if (Ext.getCmp("panel_deploiement")) Ext.getCmp("panel_deploiement").hide();
 
 			Ext.getCmp("panel_coordonnees_supplementaires_fs").hide();
 
@@ -19,7 +19,7 @@
 			Ext.getCmp("panel_societe_fs").show();
 			Ext.getCmp("panel_codes_fs").show();
 			Ext.getCmp("panel_caracteristiques").show();
-			Ext.getCmp("panel_deploiement").show();
+			if (Ext.getCmp("panel_deploiement")) Ext.getCmp("panel_deploiement").show();
 
 			Ext.getCmp("panel_coordonnees_supplementaires_fs").show();
 
