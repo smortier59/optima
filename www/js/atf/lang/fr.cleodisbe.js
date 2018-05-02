@@ -1,1 +1,0 @@
-jQuery.extend(ATF.loc,{"societe_particulier_civilite":"Civilité"});
