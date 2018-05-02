@@ -2463,25 +2463,20 @@ class affaire_cleodis extends affaire {
 			}
 
 			//Si on est sur partenaire CLEODIS BE, on envoi un mail à request@cleodis.com
-			if(ATF::$codename=='cleodisbe'){
-				$partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
-
-				$info_mail["from"] = ATF::$usr->get('contact','email');
-				$info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
-				$info_mail["html"] = false;
-				$info_mail["template"] = "devis_partenaire";
-
-				$info_mail["partenaire"] = $partenaire;
-				$info_mail["client"] = $societe["societe"];
-				$info_mail["url"] = __MANUAL_WEB_PATH__."accueil.html#affaire-select-".$this->cryptId($devis["id_affaire"]).".html";
-				$info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
-
-
-				$info_mail["recipient"] = "request@cleodis.com";
-
-				$mail = new mail($info_mail);
-
-			}
+            if(ATF::$codename=='cleodisbe'){
+                $partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'), 'societe');
+                $info_mail["from"] = ATF::$usr->get('contact','email');
+                $info_mail["objet"] = "Nouvelle demande du partenaire ".$partenaire;
+                $info_mail["html"] = false;
+                $info_mail["template"] = "devis_partenaire";
+                $info_mail["partenaire"] = $partenaire;
+                $info_mail["client"] = $societe["societe"];
+                $info_mail["url"] = __MANUAL_WEB_PATH__."accueil.html#affaire-select-".$this->cryptId($devis["id_affaire"]).".html";
+                $info_mail["url_cleoscope"] = __CLEOSCOPE_WEB_PATH__."#!affaire/".$devis["id_affaire"];
+                $info_mail["recipient"] = "request@cleodis.com";
+                $mail = new mail($info_mail);
+                $mail->send($info_mail["recipient"]);
+            }
 
 
 			ATF::db($this->db)->commit_transaction();
