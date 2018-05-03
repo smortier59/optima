@@ -187,8 +187,11 @@ class societe_cleodis extends societe {
 
 
     if(ATF::$codename == "cleodisbe"){
-      $this->colonnes['primary']["sirens"]["fields"][0] = "num_ident";
-      $this->colonnes['primary']["sirens"]["fields"][1] = "reference_tva";
+
+      $this->colonnes['primary']["sirens"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+        "num_ident"
+        ,"reference_tva"
+      ));
 
       $this->colonnes['panel']['facturation_fs']["ref_tva"]=array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array("tva"));
 
