@@ -678,8 +678,59 @@ class societe_cleodis extends societe {
         throw new errorATF("Une société existe déja avec le SIRET ".$infos["societe"]["siret"],878);
       }
     }
+
+    //Creation d'un Nouveau RUM automatique
+    if(!$infos["societe"]['RUM']){
+      $infos["societe"]['RUM'] = $this->create_rum();
+    }
+
     return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
   }
+
+
+  /**
+   * Permet de générer un nouveau RUM automatique
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @return String RUM du type A123456
+   */
+  public function create_rum(){
+
+    $prefixe = "A";
+
+    //On recupere le dernier RUM automatique généré du type A123456
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(RUM FROM 2))','max')
+      ->addCondition('RUM',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+
+    if($max<10){
+      $ref.='00000'.$max;
+    }elseif($max<100) {
+      $ref.= '0000'.$max;
+    }elseif($max<1000){
+      $ref.='000'.$max;
+    }elseif($max<10000){
+      $ref.='00'.$max;
+    }elseif($max<100000){
+      $ref.='0'.$max;
+    }elseif($max<1000000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('RUM trop grand'),80853);
+    }
+    return $prefixe.$ref;
+
+
+  }
+
 
   public function autocompleteFournisseurFormationDevis($infos,$reset=true,$count=false){
     if($reset){
@@ -1095,8 +1146,9 @@ class societe_cleodis extends societe {
       if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
 
 
-      ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+      /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+      ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
       $res = ATF::societe()->select_row();
 
       try {
@@ -1429,8 +1481,9 @@ class societe_cleodis extends societe {
         $gerants = $data["gerant"];
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
         if($data["cs_avis_credit"] == "Limite de crédit non applicable") unset($data["cs_avis_credit"]);
-        ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
-                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));
+        /*ATF::societe()->q->reset()->where("societe",ATF::db($this->db)->real_escape_string($data["societe"]),"AND")
+                                    ->where("adresse",ATF::db($this->db)->real_escape_string($data["adresse"]));*/
+        ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
         $res = ATF::societe()->select_row();
         try {
             if($res){

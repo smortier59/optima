@@ -6353,7 +6353,12 @@ class pdf_cleodis extends pdf {
 		$this->ln(10);
 
 		$this->setfont('arial',"",8);
-		$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
+		if($this->affaire['RUM']){
+			$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ".$this->affaire['RUM']);
+		}else{
+			$this->multicell(0,15, "REFERENCE UNIQUE DU MANDAT ....");
+		}
+
 
 
 		$this->setfont('arial',"I",7);
@@ -10132,7 +10137,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->setfont('arial',"B",8);
 		$this->setLeftMargin(70);
-		$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
+		if($this->affaire['RUM']){
+			$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT ".$this->affaire['RUM'],1,1);
+		}else{
+			$this->cell(100,10, "  REFERENCE UNIQUE DU MANDAT :",1,1);
+		}
+
 		$this->setLeftMargin(10);
 		$this->ln(10);
 

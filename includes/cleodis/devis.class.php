@@ -381,8 +381,13 @@ class devis_cleodis extends devis {
 				}
 			}
 		}
-		$affaire["RUM"] = $RUM;
+		if(!$RUM){
+			//Si il n'y a pas de RUM, on en ajoute un pour cette société
+		    $RUM = ATF::societe()->create_rum();
+		    ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
 
+		}
+		$affaire["RUM"] = $RUM;
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
@@ -407,12 +412,43 @@ class devis_cleodis extends devis {
 			}
 		}
 
+		if(ATF::$codename === 'cleodis'){
+			//17492 - Frais de dossiers et frais de cession SGEF et BNP - ajouter en produits non visibles
+			$produitSGEFBNP = array('REFI-CESSION-SGEF' ,'REFI-CESSION-BNP', 'REFI-ETUDE-SGEF', 'REFI-ETUDE-BNP');
+		}else{
+			$produitSGEFBNP = array();
+		}
+
+
 		//Lignes non visibles
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["devis_ligne__dot__visible"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
+				foreach ($produitSGEFBNP as $kpsb => $vpsb) {
+					if($infos_ligne_non_visible[$key]["devis_ligne__dot__ref"] === $vpsb){
+						unset($produitSGEFBNP[$kpsb]);
+					}
+				}
 			}
+		}
+
+		foreach ($produitSGEFBNP as $kpsb => $vpsb) {
+			ATF::produit()->q->reset()->where("ref",$vpsb);
+			$p = ATF::produit()->select_row();
+
+            $infos_ligne[] = array( 'devis_ligne__dot__produit' => $p['produit'],
+						            'devis_ligne__dot__quantite' => '1',
+						            'devis_ligne__dot__type' => $p['type'],
+						            'devis_ligne__dot__ref' => $p['ref'],
+						            'devis_ligne__dot__prix_achat' => $p['prix_achat'],
+						            'devis_ligne__dot__id_produit' => $p['id_produit'],
+						            'devis_ligne__dot__id_fournisseur' => ATF::societe()->select($p['id_fournisseur'], 'societe'),
+						            'devis_ligne__dot__visibilite_prix' => 'invisible',
+						            'devis_ligne__dot__neuf' => 'oui',
+						            'devis_ligne__dot__id_produit_fk' => $p['id_produit'],
+						            'devis_ligne__dot__id_fournisseur_fk' => $p['id_fournisseur'],
+						         	'devis_ligne__dot__visible'=> 'non');
 		}
 
 		//Lignes

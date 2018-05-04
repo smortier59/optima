@@ -152,6 +152,11 @@ class commande_cleodis extends commande {
 	 */
 	public function _contratPartenaire($get,$post) {
 		if ($apporteur = ATF::$usr->get("contact")) {
+
+			// Gestion du tri
+			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "commande.ref";
+			if (!$get['trid']) $get['trid'] = "desc";
+
 			ATF::commande()->q->reset()
 				//->addField('affaire.*, loyer.*')
 				->addJointure("commande","id_societe","societe","id_societe")
@@ -186,7 +191,7 @@ class commande_cleodis extends commande {
 				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
 			}
 
-			if($commande = ATF::commande()->sa()){
+			if($commande = ATF::commande()->sa($get['tri'],$get['trid'])){
 				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
 				foreach ($commande as $key => $cmd) {
 					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
