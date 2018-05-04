@@ -4270,7 +4270,7 @@ class pdf_cleodis extends pdf {
 
 			$refi = ATF::demande_refi()->select_row();
 
-			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"] || $refi){
+			if($this->affaire["commentaire_facture"] || $this->affaire["commentaire_facture2"] || $this->affaire["commentaire_facture3"] || ($refi && $this->facture['type_facture'] !== "refi" && $refi['refinanceur'] !== "CLEODIS" && $this->facture["nature"] !== "prolongation")){
 
 				$head = array("Commentaire");
 				$w = array(180);
