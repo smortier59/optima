@@ -1,0 +1,10 @@
+Bonjour,
+
+Votre partenaire {$infos.partenaire} vient de créer une demande pour le client {$infos.client}.
+
+Vous pouvez accéder au dossier :
+{$infos.url}
+ou
+{$infos.url_cleoscope}
+
+Cordialement

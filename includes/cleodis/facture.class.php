@@ -1502,7 +1502,7 @@ class facture_cleodis extends facture {
 								}else{
 									$row_data["D"]="706500";
 								}
-							}elseif($refinanceur['refinanceur']=='CLEOFI'){
+							}elseif($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
 
 								$infos_commande=ATF::commande()->select(ATF::facture()->select($item['facture.id_facture_fk'] , "id_commande"));
 								if($infos_commande['date_evolution'] > $item['facture.date_periode_debut']){
@@ -1512,7 +1512,12 @@ class facture_cleodis extends facture {
 									    if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){ $row_data["G"]=round(abs($item['facture.prix']*1.2),2); }
 									    else{ $row_data["G"]=round(abs($item['facture.prix']*$devis[0]["tva"]),2); }
 									}
-									$row_data["D"]="467500";
+									if($refinanceur['refinanceur']=='FRANFINANCE'){
+										$row_data["D"]="467800";
+									}else{
+										$row_data["D"]="467500";
+									}
+
 								}else{
 									$row_data["G"]=abs($item['facture.prix']);
 									$row_data["D"]="706230";
@@ -1533,7 +1538,7 @@ class facture_cleodis extends facture {
 						$commande = ATF::commande()->select($item['facture.id_commande_fk']);
 
 						$cleofi = false;
-						if($refinanceur['refinanceur']=='CLEOFI'){
+						if($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
 							//Si le contrat est en cours pendant la période de la facture, pas d'analytique
 							if(strtotime($commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) &&
 							   strtotime($commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
@@ -1578,7 +1583,7 @@ class facture_cleodis extends facture {
 							$row_data["N"]=$refinancement;
 						}
 					}elseif($i==4){
-						if($refinanceur['refinanceur']!='CLEOFI'){
+						if($refinanceur['refinanceur']!='CLEOFI' && $refinanceur['refinanceur']!='FRANFINANCE'){
 
 							$row_data["A"]='G';
 							$row_data["B"]=" ".$date;
@@ -1608,7 +1613,7 @@ class facture_cleodis extends facture {
 							$row_data["L"]=$dateFin;
 							$row_data["M"]=$datePrelevement;
 							$row_data["N"] = $refinancement;
-						}elseif($refinanceur['refinanceur']=='CLEOFI'){
+						}elseif($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
 
 							$infos_commande=ATF::commande()->select(ATF::facture()->select($item['facture.id_facture_fk'] , "id_commande"));
 							//Si prolongation

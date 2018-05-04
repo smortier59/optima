@@ -396,7 +396,7 @@ class facture_fournisseur extends classes_optima {
 		$increment=0;
 		foreach ($infos as $key => $item) {
 
-			$this->u(array("id_facture_fournisseur"=> $item["facture_fournisseur.id_facture_fournisseur_fk"], "deja_exporte_achat"=>"oui"));
+			//$this->u(array("id_facture_fournisseur"=> $item["facture_fournisseur.id_facture_fournisseur_fk"], "deja_exporte_achat"=>"oui"));
 
 			$increment++;
 			if($item){
@@ -463,7 +463,13 @@ class facture_fournisseur extends classes_optima {
 							else{
 								if($item["facture_fournisseur.type"] == "cout_copie"){ $row_data["D"]="611100";  }
 								elseif($item["facture_fournisseur.type"] == "maintenance") { $row_data["D"]="611200"; }
-								else{ $row_data["D"]="607110"; }
+								else{
+									if($commande["etat"] === "non_loyer"){
+										$row_data["D"]="472000";
+									}else{
+										$row_data["D"]="607110";
+									}
+								}
 							}
 						}
 
@@ -474,7 +480,9 @@ class facture_fournisseur extends classes_optima {
 						$row_data["J"]="";
 						$row_data["K"]="";
 						$row_data["L"]="".$date_paiement;
-					}elseif($i==3 && ($refi["id_refinanceur"] != 4)){
+					}elseif($i==3
+						    && ($refi["id_refinanceur"] != 4)
+						    && ($commande["etat"]!== 'non_loyer' && $item["facture_fournisseur.type"]!=='achat')){
 						$row_data["A"]='A1';
 						$row_data["B"]="".$date;
 						$row_data["C"]='AC';
@@ -488,7 +496,13 @@ class facture_fournisseur extends classes_optima {
 							else{
 								if($item["facture_fournisseur.type"] == "cout_copie"){ $row_data["D"]="611100";  }
 								elseif($item["facture_fournisseur.type"] == "maintenance") { $row_data["D"]="611200"; }
-								else{ $row_data["D"]="607110"; }
+								else{
+									if($commande["etat"] === "non_loyer"){
+										$row_data["D"]="472000";
+									}else{
+										$row_data["D"]="607110";
+									}
+								}
 							}
 						}
 						$row_data["G"]=round(abs($item['facture_fournisseur.prix']),2);
