@@ -9,13 +9,13 @@ class produit_links extends classes_optima {
 		$this->controlled_by = 'produit';
 		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array( 
-			,'produit_links.id_produit'
+			'produit_links.id_produit'
 			,'produit_links.id_produit_cible'
 			,'produit_links.etat'
 		);
 
 		$this->colonnes['primary'] = array(
-			,"id_produit"
+			"id_produit"
 			,'id_produit_cible'
 			,'etat'
 		);
