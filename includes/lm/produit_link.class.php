@@ -6,6 +6,7 @@
 class produit_link extends classes_optima {
 	function __construct() {
 		parent::__construct();
+		$this->controlled_by = 'produit';
 		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array( 
 			,'produit_link.id_produit'
