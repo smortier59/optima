@@ -101,7 +101,7 @@ class produit_lm extends produit {
 		$this->foreign_key["id_pack_produit"] = "pack_produit";
 		$this->foreign_key["id_compte_produit"] = "compte_produit";
 
-		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer','produit_link');
+		$this->onglets = array('produit_loyer','produit_fournisseur','produit_fournisseur_loyer','produit_links');
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['update'] =
