@@ -12,3 +12,6 @@ ALTER TABLE `parc` CHANGE `etat` `etat` ENUM('broke','loue','reloue','vole','ven
 
 ALTER TABLE `parc` ADD `provenanceParcReloue` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `provenance`, ADD INDEX (`provenanceParcReloue`);
 ALTER TABLE `parc` ADD FOREIGN KEY (`provenanceParcReloue`) REFERENCES `parc`(`id_parc`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `parc` CHANGE `provenanceParcReloue` `provenanceParcReloue` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL COMMENT 'Parc repris du stock (dont l\'etat est attente_location)';
+
+ALTER TABLE `parc` ADD FOREIGN KEY (`provenance`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;

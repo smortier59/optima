@@ -484,9 +484,6 @@ class parc extends classes_optima {
 	public function retourEnStock($data){
 		$this->u(array("id_parc"=>$this->decryptId($data["id_parc"]), "etat"=>"attente_location"));
 		return true;
-
 	}
 };
-
-
 ?>
