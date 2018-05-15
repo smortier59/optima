@@ -15,3 +15,8 @@ ALTER TABLE `parc` ADD FOREIGN KEY (`provenanceParcReloue`) REFERENCES `parc`(`i
 ALTER TABLE `parc` CHANGE `provenanceParcReloue` `provenanceParcReloue` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL COMMENT 'Parc repris du stock (dont l\'etat est attente_location)';
 
 ALTER TABLE `parc` ADD FOREIGN KEY (`provenance`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+ALTER TABLE `pack_produit` ADD `afficher_tout_les_produits` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `id_courrier_information_pack`;
+ALTER TABLE `produit` ADD `prevenir_presta_arret` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `seuil`;
+ALTER TABLE `produit` CHANGE `prevenir_presta_arret` `prevenir_presta_arret` ENUM('oui','non') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'oui' COMMENT 'Prevenir le prestataire en cas d\'arret du service? Permet de savoir si on envoi, un mail pour prevenir le presta lors de l\'arret du contrat';

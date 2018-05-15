@@ -24,7 +24,8 @@ class pack_produit extends classes_optima {
 										 'id_document_contrat',
 										 'id_rayon',
 										 'url_redirection',
-										 'message_redirection'
+										 'message_redirection',
+										 'afficher_tout_les_produits'
 										);
 
 		$this->colonnes["panel"]["affichage_lm"] = array('ref_lm_principale',
