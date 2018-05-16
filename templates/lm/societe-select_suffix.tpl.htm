@@ -59,7 +59,7 @@
                             <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />
                         </a>
                         -->
-                        <a href="javascript:;" onclick="ATF.ajax('societe,setToken.ajax','id_societe={$requests[$current_class->table]["id_{$current_class->table}"]}', { onSuccess:function(obj){ if (obj.result) window.location='{$smarty.const.__MANUAL_WEB_PATH__|replace:'lma-optima':'presta-lma'}#!commande?token='+obj.result; } });">
+                        <a href="javascript:;" onclick="ATF.ajax('societe,setToken.ajax','id_societe={$requests[$current_class->table]["id_{$current_class->table}"]}', { onSuccess:function(obj){ if (obj.result) window.location='{$smarty.const.__MANUAL_WEB_PATH__|replace:'lma-optima':'lma-presta'}#!commande?token='+obj.result; } });">
                             <img src="{ATF::$staticserver}images/logos/lm.png" style="width:40px;" alt="{ATF::$usr->trans("joignable",$current_class->table)}" />
                         </a>
                     </td>
