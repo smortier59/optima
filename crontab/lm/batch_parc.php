@@ -6,6 +6,10 @@ error_reporting(E_ALL);
 
 include(dirname(__FILE__)."/../../global.inc.php");
 
+
+ATF::affaire()->q->reset()->where("affaire.etat", "commande", "OR")
+						  ->where("affaire.etat", "facture", "OR");
+
 //Création des parcs pour toute les affaires ayant des BDC
 try{
 	ATF::begin_transaction();
@@ -25,16 +29,27 @@ try{
 
 						//On insere uniquement des parcs dont le produit est de nature produit
 						if($produit["nature"] == "produit"){
+
+							$serial = $value['ref']."-".$vbdc["id_fournisseur"].'-';
+							$serial = ATF::parc()->getMaxSerial($serial.$produit["id_produit"]."-");
+
 							$parc = array(
 											"id_societe"=> $value["id_societe"],
 											"id_produit"=> $produit["id_produit"],
 											"id_affaire"=> $value["id_affaire"],
 											"ref"=> $vl["ref"],
 											"libelle"=> $produit["produit"],
-											"etat"=>"loue"
+											"etat"=>"loue",
+											"date_achat"=>$value["date"],
+											"serial"=>$serial
 										 );
 
 							ATF::parc()->i($parc);
+
+							$commande_ligne=ATF::commande_ligne()->select($vl["id_commande_ligne"]);
+							$commande_ligne["serial"].=" ".$serial;
+							ATF::commande_ligne()->u($commande_ligne);
+
 						}
 
 					}

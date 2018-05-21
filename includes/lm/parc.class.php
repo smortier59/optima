@@ -261,7 +261,6 @@ class parc extends classes_optima {
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Le serial ".$item["serial"]." n'est pas valide car il est déjà utilisé par le parc '".$countParc["data"][0]["libelle"]."' de l'affaire '".ATF::affaire()->nom($countParc["data"][0]["id_affaire"])."'",881);
 		}*/
-
 		$serial["id_societe"]=$affaire["id_societe"];
 		$serial["id_affaire"]=$affaire["id_affaire"];
 		if($affaire["nature"]=="vente"){
@@ -275,6 +274,7 @@ class parc extends classes_optima {
 		$serial["ref"]=$item["ref"];
 		$serial["id_produit"]=$item["id_produit"];
 		$serial["existence"]="actif";
+		$serial["date_achat"]=$item["date_achat"];
 
 		$commande_ligne["serial"].=" ".$item["serial"];
 		ATF::commande_ligne()->u($commande_ligne);
@@ -322,10 +322,16 @@ class parc extends classes_optima {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+
+		$date_achat = $infos["parc"]["date_achat"];
+
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$this->infoCollapse($infos);
 
 		$id_affaire=ATF::bon_de_commande()->select($infos["id_bon_de_commande"],"id_affaire");
+
+		$serial = ATF::affaire()->select($id_affaire, 'ref')."-".ATF::bon_de_commande()->select($infos["id_bon_de_commande"], "id_fournisseur").'-';
+
 
 		//Lignes
 		if($infos_ligne){
@@ -342,6 +348,11 @@ class parc extends classes_optima {
 				$commande_ligne=ATF::commande_ligne()->select($bon_de_commande_ligne["id_commande_ligne"]);
 				$item["id_produit"]=ATF::commande_ligne()->select($bon_de_commande_ligne["id_commande_ligne"],"id_produit");
 				unset($item["id_facture_fournisseur_ligne"]);
+
+				$item["serial"] = $this->getMaxSerial($serial.$item["id_produit"]."-");
+
+
+				$item["date_achat"] = $date_achat;
 				$this->insertParcSerial($item,$commande_ligne);
 			}
 			ATF::db($this->db)->commit_transaction();
@@ -350,6 +361,31 @@ class parc extends classes_optima {
 		}
 		ATF::affaire()->redirection("select",$id_affaire);
 		return true;
+	}
+
+	function getMaxSerial($serial){
+		$size = strlen($serial)+1;
+		$this->q->reset()
+				->addCondition("serial",$serial."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`serial`, '.$size.' )+1',"max_serial")
+				->addOrder('serial',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+
+		$nb=$this->sa();
+
+		if($nb["max_serial"]){
+			if($nb["max_serial"]<10){
+				$suffix="00".$nb["max_serial"];
+			}elseif($nb["max_serial"]<100){
+				$suffix="0".$nb["max_serial"];
+			}else{
+				$suffix=$nb["max_serial"];
+			}
+		}else{
+			$suffix="001";
+		}
+		return $serial.$suffix;
 	}
 
 	/**
@@ -459,11 +495,29 @@ class parc extends classes_optima {
 							"date_inactif"=>date("Y-m-d"))
 					);
 
+			//On remplace le serial sur la ligne de commande
+			ATF::commande()->q->reset()->where("commande.id_affaire", $parc["id_affaire"]);
+			$commande = ATF::commande()->select_row();
+
+			ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["commande.id_commande"])
+											 ->where("commande_ligne.id_produit", ATF::parc()->select($this->decryptId($data["id"]), "id_produit"));
+			$lignes = ATF::commande_ligne()->select_all();
+
+
+			foreach ($lignes as $key => $value) {
+				if(strpos($value["serial"], ATF::parc()->select($this->decryptId($data["id"]), "serial"))){
+					$value["serial"] = str_replace(ATF::parc()->select($this->decryptId($data["id"]), "serial"), $parc["serial"], $value["serial"]);
+					ATF::commande_ligne()->u(array("id_commande_ligne"=> $value["id_commande_ligne"], "serial"=>$value["serial"]));
+				}
+			}
+
 			// On renseigne l'affaire de provenance, provenanceParcReloue, sur le nouveau parc
 			$this->u(array("id_parc"=>$this->decryptId($data["id"]),
 							"etat"=>"loue",
 							"provenance"=>$parc["id_affaire"],
-							"provenanceParcReloue"=>$parc["id_parc"])
+							"provenanceParcReloue"=>$parc["id_parc"],
+							"serial"=>$parc["serial"]
+						)
 					);
 
 
