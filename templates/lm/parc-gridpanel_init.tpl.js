@@ -16,7 +16,7 @@ ATF.renderer.parc_recuperation=function(table,field) {
 				buttonText: '',
 				buttonOnly: true,
 				iconCls: 'retourEnStock',
-				tooltip: '{ATF::$usr->trans("Retour au stock")}',
+				tooltip: '{ATF::$usr->trans("Récupérer un matériel du client")}',
 				tooltipType:'title',
 				listeners: {
 					'click': function(fb, v){
@@ -59,7 +59,7 @@ ATF.renderer.parc_existant=function(table,field) {
 				buttonOnly: true,
 				iconCls: 'relocationParc',
 				cls:'floatLeft',
-				tooltip: '{ATF::$usr->trans("Relocation de parc")}',
+				tooltip: '{ATF::$usr->trans("Affecter un matériel présent en stock")}',
 				tooltipType:'title',
 				listeners: {
 					'click': function(fb, v){
