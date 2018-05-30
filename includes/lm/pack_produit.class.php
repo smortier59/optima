@@ -41,7 +41,9 @@ class pack_produit extends classes_optima {
 																		'service_inclus',
 																		'fin_formulaire'
 																);
-
+		$this->colonnes["panel"]["loyer_total_min"] = array('prix_min_avec_produit',
+														 'prix_min_sans_produit'
+														);
 
 
 		$this->field_nom = "%id_pack_produit% - %libelle%";
@@ -59,6 +61,7 @@ class pack_produit extends classes_optima {
 		$this->panels['affichage_lm'] = array('nbCols'=>1);
 		$this->panels['affichage_magasin'] = array('nbCols'=>1);
 		$this->panels['affichage_site_souscription'] = array('nbCols'=>1);
+		$this->panels['loyer_total_min'] = array('nbCols'=>2);
 
 
 		$this->colonnes['bloquees']['insert'] =
