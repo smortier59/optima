@@ -62,6 +62,8 @@ class produit_lm extends produit {
 
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
+		$this->files["cga_produit"] = array("type"=>"pdf");
+
 		$this->colonnes["panel"]["fournisseur_lignes"] = array(
 			"loyer_fournisseur"=>array("custom"=>true),
 			"produit_fournisseur"=>array("custom"=>true),
