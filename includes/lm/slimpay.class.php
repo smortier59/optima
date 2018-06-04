@@ -150,7 +150,7 @@ class slimpay {
 
         $pdf = $state["content"];
 
-        ATF::commande()->q->reset()->where("id_affaire",$id_affaire);
+        ATF::commande()->q->reset()->where("commande.id_affaire",$id_affaire);
         $commande =  ATF::commande()->select_row();
 
         $data = array("save_contrat"=>true,
