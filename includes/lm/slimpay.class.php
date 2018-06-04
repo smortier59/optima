@@ -160,7 +160,7 @@ class slimpay {
                      );
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, __OPTIMA_URL__.'devis_lm_insert.php');
+        curl_setopt($ch, CURLOPT_URL, __MANUAL_WEB_PATH__.'devis_lm_insert.php');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
