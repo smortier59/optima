@@ -116,5 +116,58 @@ class slimpay {
 
     }
 
+
+     public function recup_pdf_slimpay($id_affaire){
+        log::logger("RECUP PDF SLIMPAY" , "mfleurquin");
+        log::logger($id_affaire , "mfleurquin");
+
+        $hapiClient = self::connection();
+
+        // The Relations Namespace
+        $relNs = self::getRelationNamespace();
+
+        // Follow get-orders
+        $rel = new Hal\CustomRel($relNs .'get-orders');
+        $follow = new Http\Follow($rel, 'GET', [
+            'creditorReference' => __CREDITOR_REFERENCE__,
+            'reference' => ATF::affaire()->select($id_affaire , "ref_slimpay ")
+        ]);
+
+
+        $res = $hapiClient->sendFollow($follow);
+
+        // Follow get-document
+        $rel = new Hal\CustomRel($relNs .'get-document');
+        $follow = new Http\Follow($rel, 'GET');
+        $res = $hapiClient->sendFollow($follow, $res);
+
+        // Follow get-binary-content
+        $rel = new Hal\CustomRel($relNs .'get-binary-content');
+        $follow = new Http\Follow($rel, 'GET');
+        $res = $hapiClient->sendFollow($follow, $res);
+
+        $state = $res->getState();
+
+        $pdf = $state["content"];
+
+        ATF::commande()->q->reset()->where("id_affaire",$id_affaire);
+        $commande =  ATF::commande()->select_row();
+
+        $data = array("save_contrat"=>true,
+                      "id_affaire"=>$id_affaire,
+                      "id_commande"=>$commande["id_commande"],
+                      "pdf"=>$pdf
+                     );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, __OPTIMA_URL__.'devis_lm_insert.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+    }
+
 }
 ?>
