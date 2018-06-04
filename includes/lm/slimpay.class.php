@@ -159,6 +159,8 @@ class slimpay {
                       "pdf"=>$pdf
                      );
 
+        log::logger($data , "mfleurquin");
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, __MANUAL_WEB_PATH__.'devis_lm_insert.php');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
