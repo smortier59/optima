@@ -311,7 +311,7 @@ if($infos["id_societe"]){
             $l = ATF::produit_loyer()->sa();
 
             foreach ($l as $kl => $vl) {
-                if($qte = $infos["panier"]["product"][$value["id_produit"]]["quantite"]){
+                if($qte = $infos["panier"]["product"][$value["id_produit"]]){
 
                     //Si pas un sous produit
                     if(!$value["id_produit_principal"]){
@@ -320,7 +320,7 @@ if($infos["id_societe"]){
                         $loyers["loyer"][$vl["ordre"]]["loyer"] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
                         $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
                     }else{
-                        $qte_produit_princ = $infos["panier"]["product"][$value["id_produit_principal"]]["quantite"];
+                        $qte_produit_princ = $infos["panier"]["product"][$value["id_produit_principal"]];
                         if($qte_produit_princ && $qte_produit_princ > 0){
                             if($value["qte_lie_principal"] == "non"){
                                 $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
@@ -383,9 +383,16 @@ if($infos["id_societe"]){
 
         if($infos["id_magasin"]) $devis["id_magasin"] = $infos["id_magasin"];
 
+        $nb_produit = $nb_service = 0;
+
+
         foreach ($loyers["produits"] as $k => $v) {
-            if($qte = $infos["panier"]["product"][$v["id_produit"]]["quantite"]){
+            if($qte = $infos["panier"]["product"][$v["id_produit"]]){
                 $prod = ATF::produit()->select($v["id_produit"]);
+
+                if($prod["nature"] === "produit") $nb_produit++;
+                if($prod["nature"] === "service") $nb_service++;
+
                 $produits[] = array(
                     "devis_ligne__dot__produit"=>$v["produit"],
                     "devis_ligne__dot__quantite"=>$qte,
@@ -419,6 +426,21 @@ if($infos["id_societe"]){
                 $prix_achat +=  $prod["prix_achat_ht"];
             }
         }
+
+
+        $prix_min_avec_produit = ATF::pack_produit()->select($infos["panier"]["pack"]["id_pack_produit"], "prix_min_avec_produit");
+        $prix_min_sans_produit = ATF::pack_produit()->select($infos["panier"]["pack"]["id_pack_produit"], "prix_min_sans_produit");
+        if($nb_produit === 0 && $loyer["0"]["loyer__dot__loyer"] < $prix_min_sans_produit){
+            foreach ($loyer as $key => $value) {
+                $loyer[$key]["loyer__dot__loyer"] = $prix_min_sans_produit;
+            }
+        }
+        if($nb_produit !== 0 && $loyer["0"]["loyer__dot__loyer"] < $prix_min_avec_produit){
+            foreach ($loyer as $key => $value) {
+                $loyer[$key]["loyer__dot__loyer"] = $prix_min_avec_produit;
+            }
+        }
+
 
         $devis["prix_achat"] = $prix_achat;
         $devis["prix"] = $prix;
