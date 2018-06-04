@@ -480,7 +480,10 @@ if($infos["id_societe"]){
             $loyerService = reset($total_service);
         }
 
-        $loyer[0]['loyer__dot__loyer'] = $loyerPod + $loyerService;
+        foreach ($loyer as $key => $value) {
+            $loyer[$key]['loyer__dot__loyer'] = $loyerPod + $loyerService;
+        }
+
 
 
 
