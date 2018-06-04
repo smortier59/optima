@@ -447,17 +447,18 @@ if($infos["id_societe"]){
 
         $loyerPod = $loyerService =0;
 
-        if ($prix_min_avec_produit && $prix_min_avec_produit > $totalProduit && $nb_produit > 0){
+        if ($prix_min_avec_produit && $prix_min_avec_produit > $total_produit[0]['loyer__dot__loyer'] && $nb_produit > 0){
           $loyerPod = $prix_min_avec_produit;
         }else{
-           $loyerPod = $totalProduit;
+           $loyerPod = $total_produit[0]['loyer__dot__loyer'];
         }
 
-        if ($prix_min_sans_produit && $prix_min_sans_produit > $totalService && $nb_service > 0 && $nb_produit == 0){
+        if ($prix_min_sans_produit && $prix_min_sans_produit > $total_service[0]['loyer__dot__loyer'] && $nb_service > 0 && $nb_produit == 0){
           $loyerService = $prix_min_sans_produit;
         }else{
-            $loyerService = $totalService;
+            $loyerService = $total_service[0]['loyer__dot__loyer'];
         }
+
 
         $loyer[0]['loyer__dot__loyer'] = $loyerPod + $loyerService;
 
