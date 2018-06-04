@@ -153,11 +153,9 @@ class slimpay {
         ATF::commande()->q->reset()->where("commande.id_affaire",$id_affaire);
         $commande =  ATF::commande()->select_row();
 
-        log::logger($commande , "mfleurquin");
-
         $data = array("save_contrat"=>true,
                       "id_affaire"=>$id_affaire,
-                      "id_commande"=>$commande["id_commande"],
+                      "id_commande"=>$commande["commande.id_commande"],
                       "pdf"=>$pdf
                      );
 
