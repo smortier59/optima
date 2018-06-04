@@ -153,13 +153,15 @@ class slimpay {
         ATF::commande()->q->reset()->where("commande.id_affaire",$id_affaire);
         $commande =  ATF::commande()->select_row();
 
+        log::logger($commande , "mfleurquin");
+
         $data = array("save_contrat"=>true,
                       "id_affaire"=>$id_affaire,
                       "id_commande"=>$commande["id_commande"],
                       "pdf"=>$pdf
                      );
 
-        log::logger($data , "mfleurquin");
+
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, __MANUAL_WEB_PATH__.'devis_lm_insert.php');
