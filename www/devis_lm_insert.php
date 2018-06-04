@@ -215,7 +215,7 @@ if($infos["save_contrat"]){
     util::file_put_contents(ATF::commande()->filepath($infos["id_commande"],"retour"), base64_decode($infos["pdf"]));
     $id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$infos["id_affaire"], "provenance"=>"Contrat signé par SLIMPAY"));
     copy(ATF::commande()->filepath($infos["id_commande"],"retour"), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
-    log::logger("AJOUT Date retour contrat & AP", "mfleurquin");
+    log::logger("AJOUT Date retour contrat & AP sur le contrat ".$infos["id_commande"], "mfleurquin");
     ATF::commande()->u(array("id_commande"=>$infos["id_commande"], "retour_contrat"=>date("Y-m-d") , "retour_prel"=>date("Y-m-d")));
     die;
 }
