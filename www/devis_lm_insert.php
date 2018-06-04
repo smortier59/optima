@@ -304,7 +304,7 @@ if($infos["id_societe"]){
 
         // Calcul des loyers par rapport aux produits choisis
         $loyers=array();
-        $total_produit = $total_service = array();
+        $total_produit = $total_service = $total_remise = array();
 
 
         ATF::produit()->q->reset()->where("produit.id_pack_produit",$infos["panier"]["pack"]["id_pack_produit"])->addOrder("produit.ordre");
@@ -324,7 +324,14 @@ if($infos["id_societe"]){
                         $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
 
                         if($value["nature"] === "produit") $total_produit[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
-                        if($value["nature"] === "service") $total_service[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                        if($value["nature"] === "service"){
+                            if($vl["loyer"] > 0){
+                                $total_service[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                            }else{
+                                $total_remise[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                            }
+
+                        }
 
                     }else{
                         $qte_produit_princ = $infos["panier"]["product"][$value["id_produit_principal"]];
@@ -336,7 +343,14 @@ if($infos["id_societe"]){
                                 $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
 
                                 if($value["nature"] === "produit") $total_produit[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
-                                if($value["nature"] === "service") $total_service[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                                if($value["nature"] === "service"){
+                                    if($vl["loyer"] > 0){
+                                        $total_service[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                                    }else{
+                                        $total_remise[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*$qte);
+                                    }
+                                }
+
                             }else{
                                 $loyers["produits"][$key]["loyer"][$vl["ordre"]]["loyer"] = number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","");
                                 $loyers["loyer"][$vl["ordre"]]["duree"] = $vl["duree"];
@@ -344,7 +358,14 @@ if($infos["id_societe"]){
                                 $loyers["loyer"][$vl["ordre"]]["nature"] = $vl["nature"];
 
                                 if($value["nature"] === "produit") $total_produit[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*($qte*$qte_produit_princ));
-                                if($value["nature"] === "service") $total_service[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*($qte*$qte_produit_princ));
+
+                                if($value["nature"] === "service"){
+                                    if($vl["loyer"] > 0){
+                                        $total_service[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*($qte*$qte_produit_princ));
+                                    }else{
+                                        $total_remise[$vl["ordre"]] += (number_format(($vl["loyer"]*$value["tva_loyer"]),2,".","")*($qte*$qte_produit_princ));
+                                    }
+                                }
 
                             }
                         }
@@ -447,21 +468,19 @@ if($infos["id_societe"]){
 
         $loyerPod = $loyerService =0;
 
-        if ($prix_min_avec_produit && $prix_min_avec_produit > $total_produit[0]['loyer__dot__loyer'] && $nb_produit > 0){
+        if ($prix_min_avec_produit && $prix_min_avec_produit > reset($total_produit) && $nb_produit > 0){
           $loyerPod = $prix_min_avec_produit;
         }else{
-           $loyerPod = $total_produit[0]['loyer__dot__loyer'];
+           $loyerPod = reset($total_produit);
         }
 
-        if ($prix_min_sans_produit && $prix_min_sans_produit > $total_service[0]['loyer__dot__loyer'] && $nb_service > 0 && $nb_produit == 0){
-          $loyerService = $prix_min_sans_produit;
+        if ($prix_min_sans_produit && $prix_min_sans_produit > reset($total_service) && $nb_service > 0 && $nb_produit == 0){
+            $loyerService = $prix_min_sans_produit;
         }else{
-            $loyerService = $total_service[0]['loyer__dot__loyer'];
+            $loyerService = reset($total_service);
         }
-
 
         $loyer[0]['loyer__dot__loyer'] = $loyerPod + $loyerService;
-
 
 
 
