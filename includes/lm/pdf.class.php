@@ -706,10 +706,10 @@ class pdf_lm extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$cadre2[] = "          ".strtoupper($client["civilite"]." ".$client["prenom"]." ".$client["nom"]);
-		$cadre2[] = "          ".$this->affaire["adresse_facturation"];
-		if($this->affaire["adresse_facturation_2"]) $cadre2[] = "          ".$this->affaire["adresse_facturation_2"];
-		if($this->affaire["adresse_facturation_3"]) $cadre2[] = "          ".$this->affaire["adresse_facturation_3"];
-		$cadre2[] = "          ".$this->affaire["cp_adresse_facturation"]." ".$this->affaire["ville_adresse_facturation"];
+		$cadre2[] = "          ".html_entity_decode($client["adresse"], ENT_QUOTES);
+		if($client["adresse_2"]) $cadre2[] = "          ".html_entity_decode($client["adresse_2"], ENT_QUOTES);
+		if($client["adresse_3"]) $cadre2[] = "          ".html_entity_decode($client["adresse_3"], ENT_QUOTES);
+		$cadre2[] = "          ".$client["cp"]." ".html_entity_decode($client["ville"], ENT_QUOTES);
 
 		$this->cadre(110,$y,90,30,$cadre2,false,0);
 
