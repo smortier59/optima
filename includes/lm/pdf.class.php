@@ -271,8 +271,7 @@ class pdf_lm extends pdf_cleodis {
 					case 'an' : $data[$key][1] = "Annuel"; break;
 				}
 				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
-				$data[$key][3] = $value["loyer"]." €";
-				//$style[$key][1] = $this->leftStyle;
+				$data[$key][3] = number_format(round($value["loyer"],2),2,"."," ")." €";
 			}
 
 		}
@@ -311,7 +310,7 @@ class pdf_lm extends pdf_cleodis {
 					case 'an' : $data[$key][1] = "Annuel"; break;
 				}
 				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
-				$data[$key][3] = $value["loyer"]." €";
+				$data[$key][3] = number_format(round($value["loyer"],2),2,"."," ")." €";
 				//$style[$key][1] = $this->leftStyle;
 			}
 
