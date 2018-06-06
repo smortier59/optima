@@ -250,7 +250,7 @@ if($infos["id_societe"]){
             $pays_livraison = $infos["societe_form"]["id_pays"];
 
             $adresse_facturation = $adresse_facturation_2 = $adresse_facturation_3 = NULL;
-            if($infos["societe_form"]["facturation_same_livraisonCheckbox"] == "non"){
+            //if($infos["societe_form"]["facturation_same_livraisonCheckbox"] == "non"){
                 $adresse_facturation = $infos["societe_form"]["facturation_adresse"];
                 if($infos["societe_form"]["facturation_adresse_2"] )  $adresse_facturation_2  = $infos["societe_form"]["facturation_adresse_2"];
                 if($infos["societe_form"]["facturation_adresse_3"] )  $adresse_facturation_3  = $infos["societe_form"]["facturation_adresse_3"];
@@ -259,14 +259,14 @@ if($infos["id_societe"]){
                 $pays_facturation = $infos["societe_form"]["facturation_id_pays"];
 
 
-            }else{
+            /*}else{
                 $adresse_facturation = $adresse_livraison;
                 $adresse_facturation_2 = $adresse_livraison_2;
                 $adresse_facturation_3 = $adresse_livraison_3;
                 $cp_facturation = $cp_livraison;
                 $ville_facturation =  $ville_livraison;
                 $pays_facturation = $pays_livraison;
-            }
+            }*/
         }else{
             $adresse_livraison = $societe["adresse"];
             if($societe["adresse_2"] !== "" )  $adresse_livraison_2  = $societe["adresse_2"];
