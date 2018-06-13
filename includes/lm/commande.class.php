@@ -1506,6 +1506,28 @@ class commande_lm extends commande {
 
 			if($etat !== "abandon" && $etat !== "pending"){
 				$this->checkEtat($commande,false,$affaireFillesAR);
+
+				$id_commande = $commande->get("id_commande");
+				$etatCommande = $commande->get("etat");
+
+				//On check l'etat pour verifier si il doit etre au contentieux ou non
+				if(!ATF::facture()->contientFactureRejetee($id_commande)){
+					if($etatCommande === "mis_loyer_contentieux"){
+						$etatCommande = "mis_loyer";
+					}elseif( $etatCommande === "prolongation_contentieux"){
+						$etatCommande = "prolongation";
+					}elseif( $etatCommande === "restitution_contentieux"){
+						$etatCommande = "restitution";
+					}
+				}else{
+					if(!stripos($etatCommande, "contentieux")){
+						if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution"){
+							$etatCommande = $etatCommande."_contentieux";
+						}
+					}
+				}
+				ATF::commande()->u(array("id_commande" => $id_commande , "etat" => $etatCommande));
+
 				$etat_modifie=$commande->get("etat");
 				if($etat!=$etat_modifie){
 					log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'lm_statut.log');

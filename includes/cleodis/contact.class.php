@@ -166,7 +166,16 @@ class contact_cleodis extends contact {
 };
 
 class contact_cleodisbe extends contact_cleodis { };
-class contact_cap extends contact_cleodis { };
+class contact_cap extends contact_cleodis {
+	public function __construct() {
+		parent::__construct();
+		$this->table = "contact";
+
+		unset($this->colonnes['panel']['espace_perso']);
+
+		$this->fieldstructure();
+	}
+};
 
 class contact_midas extends contact_cleodis {
 	public function __construct() {
