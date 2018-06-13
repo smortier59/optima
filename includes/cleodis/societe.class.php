@@ -1101,9 +1101,7 @@ class societe_cleodis extends societe {
 
 
   public function getUrlSign($id_affaire){
-    $url = "https://";
-    if (__PRE__===true) $url .= "pre-";
-    $url .= "sign.absystech.net/#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
+    $url = __SIGN_URL__."#!".ATF::$codename."?k=".$this->cryptId($id_affaire);
     return $url/*."&sref=".urlencode($url)*/;
   }
   public function _getUrlSign($get,$post){
