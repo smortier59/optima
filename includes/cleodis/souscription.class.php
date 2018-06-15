@@ -273,12 +273,10 @@ class souscription_cleodis extends souscription {
     ATF::commande()->q->reset()->where('commande.id_affaire', $id_affaire);
     $contrat = ATF::commande()->select_row();
 
-    // $contratA4 = ATF::pdf()->generic('contratA4',$contrat['id_commande'],true);
-    // $contratPV = ATF::pdf()->generic('contratPV',$contrat['id_commande'],true);
-    // $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+    $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+    $contratA4 = ATF::pdf()->generic('contratA4',$contrat['commande.id_commande'],true);
+    $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
 
-    log::logger($contrat, "qjanon");
-    log::logger($contratA4, "qjanon");
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
