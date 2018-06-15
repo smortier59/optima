@@ -209,7 +209,8 @@ class facture_lm extends facture {
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						 ->where("executionStatus","processed","AND",false,"!=");
+						// ->where("executionStatus","processed","AND",false,"!=")
+						;
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
