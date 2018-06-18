@@ -69,6 +69,18 @@ class contact_cleodis extends contact {
 			}
 		}
 
+		if(strlen($infos["contact"]["pwd_client"]) != 64) {
+			if($infos["contact"]["pwd_client"] !== "" && $infos["contact"]["pwd_client"] !== NULL){
+				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd_client"]) == 0){
+					throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				} else {
+					if(strlen($infos["contact"]["pwd_client"]) < 6){
+						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+					}
+				}
+			}
+		}
+
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
 
@@ -89,7 +101,19 @@ class contact_cleodis extends contact {
 					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 				} else {
 					if(strlen($infos["contact"]["pwd"]) < 6){
-						throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+					}
+				}
+			}
+		}
+
+		if(strlen($infos["contact"]["pwd_client"]) != 64) {
+			if($infos["contact"]["pwd_client"] !== "" && $infos["contact"]["pwd_client"] !== NULL){
+				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd_client"]) == 0){
+					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				} else {
+					if(strlen($infos["contact"]["pwd_client"]) < 6){
+						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 					}
 				}
 			}
