@@ -33,7 +33,8 @@ class contact_cleodis extends contact {
 
 		$this->colonnes['panel']['espace_perso'] = array(
 			'login',
-			'pwd'
+			'pwd',
+			'pwd_client'
 		);
 
 
