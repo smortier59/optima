@@ -80,7 +80,7 @@ class contact_cleodis extends contact {
 					}
 				}
 
-				$infos["contact"]["pwd_client"] = hash('sha256',$infos["pwd_client"]);
+				$infos["contact"]["pwd_client"] = hash('sha256',$infos["contact"]["pwd_client"]);
 			}
 		}
 
@@ -119,7 +119,7 @@ class contact_cleodis extends contact {
 						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 					}
 				}
-				$infos["contact"]["pwd_client"] = hash('sha256',$infos["pwd_client"]);
+				$infos["contact"]["pwd_client"] = hash('sha256',$infos["contact"]["pwd_client"]);
 			}
 		}
 
