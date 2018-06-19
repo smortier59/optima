@@ -165,6 +165,9 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->fieldstructure();
 
 		$this->addPrivilege("updateDate");
+		$this->addPrivilege("export_cegid");
+		$this->addPrivilege("export_servantissimmo");
+
 
 		$this->noTruncateSA = true;
 		$this->no_insert = true;
@@ -746,6 +749,387 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}else{
 			return false;
 		}
+	}
+
+
+	public function initStyle(){
+
+		$style_titre1 = new excel_style();
+		$style_titre1->setWrap()->alignement('center')->setSize(13)->setBorder("thin")->setBold();
+		$this->setStyle("titre1",$style_titre1->getStyle());
+		/*-------------------------------------------*/
+		$style_titre1_right = new excel_style();
+		$style_titre1_right->setWrap()->alignement("center","right")->setSize(13)->setBorder("thin")->setBold();
+		$this->setStyle("titre1_right",$style_titre1_right->getStyle());
+		/*-------------------------------------------*/
+		$style_titre1_left = new excel_style();
+		$style_titre1_left->setWrap()->alignement("center", "left")->setSize(13)->setBorder("thin")->setBold();
+		$this->setStyle("titre1_left",$style_titre1_left->getStyle());
+		/*-------------------------------------------*/
+		$style_titre2 = new excel_style();
+		$style_titre2->setWrap()->alignement('center')->setSize(11)->setBorder("thin");
+		$this->setStyle("titre2",$style_titre2->getStyle());
+		/*-------------------------------------------*/
+		$style_titre2_right = new excel_style();
+		$style_titre2_right->setWrap()->alignement("center","right")->setSize(11)->setBorder("thin");
+		$this->setStyle("titre2_right",$style_titre2_right->getStyle());
+		/*-------------------------------------------*/
+		$style_centre = new excel_style();
+		$style_centre->alignement();
+		$this->setStyle("centre",$style_centre->getStyle());
+		/*-------------------------------------------*/
+		$style_cel_c = new excel_style();
+		$style_cel_c->setWrap()->alignement('center')->setSize(11)->setBorder("thin");
+		$this->setStyle("border_cel",$style_cel_c->getStyle());
+		/*-------------------------------------------*/
+		$style_border_cel_right = new excel_style();
+		$style_border_cel_right->setWrap()->alignement("center","right")->setSize(11)->setBorder("thin");
+		$this->setStyle("border_cel_right",$style_border_cel_right->getStyle());
+		/*-------------------------------------------*/
+		$style_border_cel_left = new excel_style();
+		$style_border_cel_left->setWrap()->alignement("center","left")->setSize(11)->setBorder("thin");
+		$this->setStyle("border_cel_left",$style_border_cel_left->getStyle());
+		/*-------------------------------------------*/
+		$style_cel_right = new excel_style();
+		$style_cel_right->setWrap()->alignement("center","right")->setSize(11);
+		$this->setStyle("cel_right",$style_cel_right->getStyle());
+	}
+
+	public function setStyle($nom,$objet){
+		$this->style[$nom]=$objet;
+	}
+
+	public function getStyle($nom){
+		return $this->style[$nom];
+	}
+
+
+
+	/** Export CEGID
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	public function export_cegid($infos){
+		if(!$infos["tu"]){ $this->q->reset(); }
+
+        $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        $infos = $this->sa();
+
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('IMPORT CEGID');
+		$sheets=array("auto"=>$worksheet_auto);
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$header = array('TYPE',
+						'DATE',
+						'JOURNAL',
+						'GENERAL',
+						'AUXILIAIRE',
+						'SENS',
+						'MONTANT',
+						'LIBELLE',
+						'REFERENCE INTERNE',
+						'AXE1');
+
+		$i = 65; //Caractere A
+
+		foreach ($header as $key => $value) {
+			$row_data[chr($i)] = $value;
+			$i++;
+		}
+
+		foreach($sheets as $nom=>$onglet){
+           	foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre);
+				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        }
+
+        if($infos){
+			$row_auto=1;
+			foreach ($infos as $key => $value) {
+				if(!$value["export_cegid"]){
+					$refinancement = "";
+					ATF::demande_refi()->q->reset()->where("id_affaire",$value['bon_de_commande.id_affaire_fk'],"AND")
+												   ->where("etat","valide");
+					$ResRefinancement = ATF::demande_refi()->select_row();
+
+					if($ResRefinancement){
+						$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
+					}
+
+
+					for ($l=1; $l <= 3; $l++) {
+						$row_data=array();
+
+						$ref_affaire = ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref");
+						if(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "nature") == "avenant" ){
+							$axe1 =" 20".ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref").ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client")."AV";
+						}else{
+							$axe1 =" 20".ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref").ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client")."00";
+						}
+
+						if($l == 1){
+							$row_data["A"]='G';
+							$row_data["B"]=" ".$date;
+							$row_data["C"]='ACH';
+
+							if($refinancement === "CLEODIS"){
+								$row_data["D"]='218310';
+							}else{
+								$row_data["D"]='607110';
+							}
+
+
+							$row_data["E"]=ATF::societe()->select($value['bon_de_commande.id_fournisseur_fk'], 'code_fournisseur');
+							$row_data["F"]='D';
+							$row_data["G"]=number_format($value["bon_de_commande.prix"]  , 2, ',','');
+							$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
+							$row_data["I"]=$ref_affaire;
+							$row_data["J"]=$axe1;
+
+
+						}elseif($l == 2){
+							if($refinancement !== "CLEODIS"){
+								$row_data["A"]='A1';
+								$row_data["B"]=" ".$date;
+								$row_data["C"]='ACH';
+								$row_data["D"]='607110';
+								$row_data["E"]='';
+								$row_data["F"]='D';
+								$row_data["G"]=number_format(($value["bon_de_commande.prix"]*__TVA__) - $value["bon_de_commande.prix"] , 2, ',','');
+								$row_data["H"]="";
+								$row_data["I"]=$ref_affaire;
+								$row_data["J"]="";
+							}
+
+						}elseif($l == 3){
+							$row_data["A"]='G';
+							$row_data["B"]=" ".$date;
+							$row_data["C"]='ACH';
+							$row_data["D"]='408100';
+							$row_data["E"]='';
+							$row_data["F"]='C';
+							$row_data["G"]=number_format($value["bon_de_commande.prix"]*__TVA__  , 2, ',','');
+							$row_data["H"]="";
+							$row_data["I"]=$ref_affaire;
+							$row_data["J"]="";
+
+
+						}
+
+						if($row_data){
+							$row_auto++;
+							foreach($row_data as $col=>$valeur){
+								$sheets['auto']->write($col.$row_auto, $valeur);
+							}
+						}
+					}
+
+					$this->u(array("id_bon_de_commande"=>$value["bon_de_commande.id_bon_de_commande_fk"],
+								   "export_cegid"=>date("Y-m-d H:i:s")
+								  ));
+				}
+			}
+		}
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:attachment;filename=export_cegid.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
+
+	/** Export Servantissimmmo
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	public function export_servantissimmo($infos){
+		if(!$infos["tu"]){ $this->q->reset(); }
+
+        $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        $infos = $this->sa();
+
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('IMPORT SERVANTISSIMMO');
+		$sheets=array("auto"=>$worksheet_auto);
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$header = array('Compte',
+						'Date d\'entréee',
+						'Date de mise en service',
+						'Date de début d\'amortissement comptable',
+						'Date de début d\'amortissement fiscal',
+						'Référence',
+						'Libelle',
+						'Prix unitaire',
+						'Montant HT',
+						'Quantité',
+						'Montant TVA',
+						'Taux de TVA',
+						'Prorata',
+						'Montant TTC',
+						'Type de sortie',
+						'Date de sortie',
+						'Base comptable (=montant HT)',
+						'Méthode comptable',
+						'Durée comptable',
+						'Base fiscale',
+						'Méthode fiscale',
+						'Durée fiscale',
+						'Nature du bien',
+						'Type d\'entrée',
+						'Niveau de réalité',
+						'Totalcumulantérieur',
+						'Totalcumulantérieur fiscal',
+						'Critère 1',
+						'Réference 2',
+						'Compte fourn');
+
+		$i = 65; //Caractere A
+		$j = 0;
+
+		foreach ($header as $key => $value) {
+			if(!$j){
+				$row_data[chr($i)] = $value;
+				if($i < 90){ $i++; }
+				else{ $i = 65; $j = 65;}
+			}else{
+				$row_data[chr($i).chr($j)] = $value;
+				if($j < 90) { $j++; }
+				else{ $i++; $j = 65;}
+			}
+		}
+		foreach($sheets as $nom=>$onglet){
+           	foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre);
+				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        }
+
+        if($infos){
+			$row_auto=1;
+			foreach ($infos as $key => $value) {
+				if(!$value["bon_de_commande.export_servantissimmo"]){
+
+					$data = array();
+
+					$refinancement = NULL;
+					ATF::demande_refi()->q->reset()->where("id_affaire",$value['bon_de_commande.id_affaire_fk'],"AND")
+												   ->where("etat","valide");
+					$ResRefinancement = ATF::demande_refi()->select_row();
+
+					if($ResRefinancement){
+						$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
+					}
+
+					if($refinancement && $refinancement === "CLEODIS"){
+						ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $value["bon_de_commande.id_affaire_fk"]);
+						$contrat = ATF::commande()->select_row();
+
+						$datetime1 = date_create($contrat["commande.date_debut"]);
+						$datetime2 = date_create($contrat["commande.date_evolution"]);
+						$interval = date_diff($datetime1, $datetime2);
+
+						$duree = (($interval->format('%y')*12) + $interval->format('%m') /12);
+
+
+						$data = array(	'218310',
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										'',
+										$client["bon_de_commande.id_societe"].$contrat["commande.ref"],
+										'',
+										$value["bon_de_commande.prix"],
+										'1',
+										$value["bon_de_commande.prix"]*(__TVA__ -1),
+										(__TVA__ -1)*100,
+										'100',
+										$value["bon_de_commande.prix"]*__TVA__,
+										'00',
+										'30/12/2099',
+										$value["bon_de_commande.prix"],
+										'01',
+										number_format($duree, 3, ',' , ''),
+										$value["bon_de_commande.prix"],
+										'01',
+										number_format($duree, 3, ',' , ''),
+										'01',
+										'01',
+										'09',
+										'09',
+										'0',
+										'20'.$contrat["commande.ref"].'00',
+										$value["bon_de_commande.id_bon_de_commande"],
+										$value["bon_de_commande.id_fournisseur"]);
+
+
+						$row_auto++;
+
+						$i = 65;
+						$j = 0;
+
+						foreach ($data as $k => $v) {
+							if(!$j){
+								$row_data[chr($i)] = $v;
+								if($i < 90){ $i++; }
+								else{ $i = 65; $j = 65;}
+							}else{
+								$row_data[chr($i).chr($j)] = $v;
+								if($j < 90) { $j++; }
+								else{ $i++; $j = 65;}
+							}
+						}
+
+
+
+						foreach($row_data as $col=>$valeur){
+							$sheets['auto']->write($col.$row_auto, $valeur);
+						}
+						$this->u(array("id_bon_de_commande"=>$value["bon_de_commande.id_bon_de_commande_fk"],
+									   "export_servantissimmo"=>date("Y-m-d H:i:s")
+									  ));
+					}
+				}
+
+
+			}
+		}
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:attachment;filename=export_servantissimo.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
 	}
 
 };

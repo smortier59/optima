@@ -61,6 +61,10 @@ class facture_fournisseur extends classes_optima {
 
 		$this->addPrivilege("export_data");
 		$this->addPrivilege("export_cegid");
+		$this->addPrivilege("export_cegid_v2");
+
+
+
 		$this->field_nom = "ref";
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->onglets = array('facture_fournisseur_ligne','facture_non_parvenue');
@@ -783,6 +787,155 @@ class facture_fournisseur extends classes_optima {
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
 	}
+
+
+	/** Export CEGID V2 (Export demandé en Juin 2018)
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	public function export_cegid_v2($infos){
+		if(!$infos["tu"]){ $this->q->reset(); }
+
+        $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+
+        $force = false;
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        if(!$infos["force"]){ $this->q->where("facture_fournisseur.deja_exporte_cegid","non"); $force=true; }
+        $infos = $this->sa();
+
+		$this->export_xls_cegid_v2($infos,$force);
+    }
+
+    /** Surcharge pour avoir un export
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient tous les enregistrements
+     */
+    public function export_xls_cegid_v2(&$infos,$force){
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('EXPORT CEGID');
+		$sheets=array("auto"=>$worksheet_auto);
+		$this->initStyle();
+
+		//mise en place des titres
+		$row_data = array(
+        	 "A"=>array('TYPE',40)
+        	,"B"=>array('DATE',40)
+			,"C"=>array('JOURNAL',40)
+			,"D"=>array('GENERAL',40)
+			,"E"=>array('AUXILIAIRE',40)
+			,"F"=>array('SENS',40)
+			,"G"=>array('MONTANT',40)
+			,"H"=>array('LIBELLE',40)
+			,"I"=>array('REFERENCE INTERNE',40)
+			,"J"=>array('AXE1',40)
+		);
+
+
+
+        foreach($sheets as $nom=>$onglet){
+            foreach($row_data as $col=>$titre){
+				$sheets[$nom]->write($col.'1',$titre[0],$this->getStyle("titre1"));
+				$sheets[$nom]->sheet->getColumnDimension($col)->setWidth($titre[1]);
+            }
+        }
+
+
+		//ajout des donnÃ©es
+		if($infos){
+			$row_auto=1;
+
+			foreach ($infos as $key => $value) {
+			 	$this->u(array("id_facture_fournisseur"=> $value["facture_fournisseur.id_facture_fournisseur_fk"], "deja_exporte_cegid"=>"oui"));
+
+
+				$affaire  = ATF::affaire()->select($value["facture_fournisseur.id_affaire_fk"]);
+				ATF::commande()->q->reset()->where("commande.id_affaire", $value["facture_fournisseur.id_affaire_fk"]);
+				$commande = ATF::commande()->select_row();
+
+				$societe  = ATF::societe()->select($affaire["id_societe"]);
+				$fournisseur = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"]);
+
+
+				$data[0] = array(
+					        	 "A"=>array('G')
+					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
+								,"C"=>array('AC')
+								,"D"=>array('408100')
+								,"E"=>array($fournisseur['code_fournisseur'])
+								,"F"=>array('D')
+								,"G"=>array($value["facture_fournisseur.prix"]*__TVA__)
+								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"I"=>array($affaire["ref"])
+								,"J"=>array('')
+							);
+				$data[1] = array(
+					        	 "A"=>array('G')
+					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
+								,"C"=>array('AC')
+								,"D"=>array('445860')
+								,"E"=>array($fournisseur['code_fournisseur'])
+								,"F"=>array('C')
+								,"G"=>array($value["facture_fournisseur.prix"]*(__TVA__-1))
+								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"I"=>array($affaire["ref"])
+								,"J"=>array('')
+							);
+
+				$data[2] = array(
+					        	 "A"=>array('G')
+					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
+								,"C"=>array('AC')
+								,"D"=>array('401000')
+								,"E"=>array($fournisseur['code_fournisseur'])
+								,"F"=>array('C')
+								,"G"=>array($value["facture_fournisseur.prix"]*__TVA__)
+								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"I"=>array($affaire["ref"])
+								,"J"=>array('')
+							);
+
+				$data[3] = array(
+					        	 "A"=>array('G')
+					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
+								,"C"=>array('AC')
+								,"D"=>array('445660')
+								,"E"=>array($fournisseur['code_fournisseur'])
+								,"F"=>array('D')
+								,"G"=>array($value["facture_fournisseur.prix"]*(__TVA__-1))
+								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"I"=>array($affaire["ref"])
+								,"J"=>array('')
+							);
+
+				foreach ($data as $key => $row_data) {
+					$row_auto++;
+					foreach($row_data as $col=>$valeur){
+						$sheets['auto']->write($col.$row_auto, $valeur[0],$this->getStyle("centre"));
+					}
+				}
+			}
+	    }
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_CEGID.xls');
+
+
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
 };
 
 class facture_fournisseur_cleodisbe extends facture_fournisseur { };
