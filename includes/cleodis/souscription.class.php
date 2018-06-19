@@ -82,7 +82,7 @@ class souscription_cleodis extends souscription {
         throw $e;
     }
     ATF::db($this->db)->commit_transaction();
-    return true;
+    return $id_affaire;
   }
 
   /**
@@ -274,7 +274,6 @@ class souscription_cleodis extends souscription {
     $contrat = ATF::commande()->select_row();
 
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-    $contratA4 = ATF::pdf()->generic('contratA4',$contrat['commande.id_commande'],true);
     $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
 
     $return = array(
@@ -292,8 +291,7 @@ class souscription_cleodis extends souscription {
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>array(
-        "mandat_prelevement.pdf"=> base64_encode($pdf_mandat), // base64
-        "contrat-A4.pdf"=> base64_encode($contratA4), // base64
+        "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
         "contrat-PV.pdf"=> base64_encode($contratPV) // base64
 
       )
