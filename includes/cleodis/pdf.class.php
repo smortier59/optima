@@ -3170,11 +3170,14 @@ class pdf_cleodis extends pdf {
 		$this->cell(30,12,"L'ABONNÉ",1,0,'C');
 		$this->multicell(
 			0,4,
-			$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["email_perso"]?"Email: ".$this->client["email_perso"]:"")."\n".
-			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]."\n-"
+			$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["particulier_email"]?"Email: ".$this->client["particulier_email"]:"")."\n".
+			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]
 			,1
 		);
 
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"",0,'C');
+		$this->setleftMargin(15);
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON AVEC CESSION DU MATERIEL ET DU CONTRAT DE LOCATION N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
 		$this->setleftMargin(15);
