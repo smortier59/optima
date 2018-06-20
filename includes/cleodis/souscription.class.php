@@ -148,7 +148,7 @@ class souscription_cleodis extends souscription {
     );
 
     foreach ($produits as $k=>$produit) {
-        ATF::produit()->q->reset()->addField("loyer")->addField("duree")->where("id_produit", $produit['id_produit']);
+        ATF::produit()->q->reset()->addField("loyer")->addField("duree")->addField("type")->addField("prix_achat")->addField("id_fournisseur")->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
 
         if ($toInsertProduitDevis[$produit['id_produit']]) {
@@ -157,11 +157,11 @@ class souscription_cleodis extends souscription {
           $toInsertProduitDevis[$produit['id_produit']] =  array(
             "devis_ligne__dot__produit"=> $produit['produit'],
             "devis_ligne__dot__quantite"=>$produit['quantite'],
-            "devis_ligne__dot__type"=>"sans_objet",
+            "devis_ligne__dot__type"=>$produitLoyer['type'],
             "devis_ligne__dot__ref"=>$produit['ref'],
-            "devis_ligne__dot__prix_achat"=>$produitLoyer["loyer"],
+            "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
             "devis_ligne__dot__id_produit"=>$produit['produit'],
-            "devis_ligne__dot__id_fournisseur"=>$produit['id_fournisseur'] ? $produit['id_fournisseur'] : $this->id_fournisseur,
+            "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'],
             "devis_ligne__dot__visibilite_prix"=>"invisible",
             "devis_ligne__dot__date_achat"=>"",
             "devis_ligne__dot__commentaire"=>"",
