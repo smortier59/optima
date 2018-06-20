@@ -3171,7 +3171,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(
 			0,4,
 			$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["email_perso"]?"Email: ".$this->client["email_perso"]:"")."\n".
-			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]."\n"
+			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]."\n-"
 			,1
 		);
 
