@@ -3142,7 +3142,165 @@ class pdf_cleodis extends pdf {
 		$this->unsetHeader();
 		$this->Open();
 		$this->AddPage();
+		if ($this->client['id_famille'] == 9) { // Document spécial pour les particuliers
+			$this->contratPVParticulier($id,$s,$previsu);
+		} else {
+			$this->contratPVSociete($id,$s,$previsu);
+		}
+	}
 
+	/** Génère un Procès verbal
+	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
+	*/
+	public function contratPVParticulier($id,$s,$previsu) {
+		$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+
+		$this->setfont('arial','I',8);
+		//Cadre du haut avec Loueur et Locataire
+		$this->sety(5);
+		$this->setleftMargin(40);
+		$this->cell(30,12,"LE LOUEUR",1,0,'C');
+		$this->multicell(
+			0,4,
+			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
+			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
+			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
+			,1
+		);
+		$this->cell(30,12,"L'ABONNÉ",1,0,'C');
+		$this->multicell(
+			0,4,
+			$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["email_perso"]?"Email: ".$this->client["email_perso"]:"")."\n".
+			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]."\n".
+			,1
+		);
+
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON AVEC CESSION DU MATERIEL ET DU CONTRAT DE LOCATION N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
+		$this->setleftMargin(15);
+
+		$this->ln(5);
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"IL EST EXPOSE ET CONVENU CE QUI SUIT :");
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du _____________________, le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
+
+		$this->setfont('arial','',8);
+		//$this->ln(5);
+		if ($this->lignes) {
+			$w = array(20,35,35,95);
+
+			$lignesVides = 15-count($this->lignes);
+
+			$lignes=$this->groupByAffaire($this->lignes);
+
+
+			$this->setFillColor(255,255,255);
+
+			$head = array("Quantité","Type","Marque","Désignation");
+			foreach ($lignes as $k => $i) {
+				$this->setfont('arial','B',10);
+				if (!$k) {
+					$title = "NOUVEAU(X) EQUIPEMENT(S)";
+				} else {
+					$affaire_provenance=ATF::affaire()->select($k);
+					if($this->affaire["nature"]=="avenant"){
+						$title = "EQUIPEMENT(S) RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+					}elseif($this->affaire["nature"]=="AR"){
+						$title = "EQUIPEMENT(S) PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+					}
+				}
+				$this->setfont('arial','',8);
+
+
+				unset($data);
+				foreach ($i as $k_ => $i_) {
+					$etat = "( NEUF )";
+					if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
+						if($i_["neuf"] == "non"){
+								$etat = "( OCCASION )";
+						}
+					}
+					$produit = ATF::produit()->select($i_['id_produit']);
+					//Si c'est une prestation, on affiche pas l'etat
+					if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){	$etat = "";		}
+
+					if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+					$data[] = array(
+						round($i_['quantite'])
+						,ATF::sous_categorie()->nom($produit['id_sous_categorie'])
+						,ATF::fabriquant()->nom($produit['id_fabriquant'])
+						,$i_['produit'].$etat
+					);
+				}
+
+				$tableau[$k] = array(
+					"head"=>$head
+					,"data"=>$data
+					,"w"=>$w
+					,"styles"=>$st
+					,"title"=>$title
+				);
+			}
+			$h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
+			foreach ($tableau as $k=>$i) {
+				if ($i['head']) $h += 5;
+				$h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+
+			foreach ($tableau as $k=>$i) {
+				$this->setFillColor(239,239,239);
+				$this->setfont('arial','B',10);
+				$this->multicell(0,5,$i['title'],1,'C',1);
+				$this->setfont('arial','',8);
+				if ($h>$this->heightLimitTableContratPV) {
+					$this->multicellAnnexe();
+					$annexes[$k] = $i;
+				} else {
+					$this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+				}
+			}
+
+
+		}
+
+		$this->ln(3);
+		$this->setfont('arial','B',9);
+		$this->multicell(0,5,"LIVRAISON :");
+		$this->setfont('arial','',8);
+		$this->multicell(0,4,"La livraison est à ce jour complète et définitivement acceptée par L'Abonné sans restriction ni réserve. L'Abonné reconnaît que : ");
+		$this->multicell(0,4,"=> le matériel est bien en ordre de marche, qu'il est réglementaire, conforme notamment aux lois, règlements, prescriptions administratives, normes.");
+		$this->multicell(0,4,"=> Qu'en conséquence l'abonnement est devenu effectif en totale conformité avec le Contrat d'Abonnement.");
+
+		$this->ln(5);
+		$this->setfont('arial','',8);
+		$cadre = array(
+			"Fait à : ______________________"
+			,"Le : ______________________"
+			,"Nom : ______________________"
+		);
+		$this->cadre(25,215,70,60,$cadre,"Locataire");
+
+		$cadre[]="Qualité : ______________________";
+		$this->cadre(115,215,70,60,$cadre,"Loueur");
+		
+		$this->setxy(25,269);
+		$this->setFillColor(255,255,0);
+		$this->cell(10,5,"");
+		$this->cell(50,5,"Signature et cachet du Locataire",0,0,'C',1);
+		$this->cell(10,5,"",0,1);
+		$this->setxy(115,270);
+		$this->multicell(70,5,"Signature et cachet du Loueur",0,'C');
+
+		return true;
+	}
+
+	/** Génère un Procès verbal
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 11-02-2011
+	*/
+	public function contratPVSociete($id,$s,$previsu) {
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",4,5,35);
 		} else{

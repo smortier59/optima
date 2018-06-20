@@ -161,7 +161,7 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__ref"=>$produit['ref'],
             "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
             "devis_ligne__dot__id_produit"=>$produit['produit'],
-            "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'],
+            "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
             "devis_ligne__dot__visibilite_prix"=>"invisible",
             "devis_ligne__dot__date_achat"=>"",
             "devis_ligne__dot__commentaire"=>"",
