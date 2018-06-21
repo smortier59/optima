@@ -275,6 +275,7 @@ class souscription_cleodis extends souscription {
 
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
     $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
+    $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
 
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
@@ -292,7 +293,8 @@ class souscription_cleodis extends souscription {
       "cell_phone"=>$tel,
       "files2sign"=>array(
         "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
-        "contrat-PV.pdf"=> base64_encode($contratPV) // base64
+        "contrat-PV.pdf"=> base64_encode($contratPV), // base64
+        "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
 
       )
     );
