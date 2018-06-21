@@ -149,6 +149,18 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
+
+  public function noticeAssurance() {
+    $this->Open();
+    $this->unsetHeader();
+    $this->AddPage();
+    $this->unsetFooter();
+
+    $pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
+    $tplIdx = $this->importPage(1);
+    $r = $this->useTemplate($tplIdx, 0,0,0,0, true);
+  }
+
 	/* Ecrit un titre d'article pour les CGV
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
