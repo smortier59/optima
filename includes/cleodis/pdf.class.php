@@ -153,12 +153,22 @@ class pdf_cleodis extends pdf {
   public function noticeAssurance() {
     $this->Open();
     $this->unsetHeader();
-    $this->AddPage();
     $this->unsetFooter();
 
     $pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
-    $tplIdx = $this->importPage(1);
-    $r = $this->useTemplate($tplIdx, 0,0,0,0, true);
+
+    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+      $tplIdx = $this->importPage($pageNo);
+
+      // add a page
+      $this->AddPage();
+      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+    }
+
+
+
+    // $tplIdx = $this->importPage(1);
+    // $r = $this->useTemplate($tplIdx, 0,0,0,0, true);
   }
 
 	/* Ecrit un titre d'article pour les CGV
