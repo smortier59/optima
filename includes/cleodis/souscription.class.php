@@ -28,7 +28,6 @@ class souscription_cleodis extends souscription {
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
-    $fournisseur = $post['fournisseur'] ? $post['fournisseur'] : $this->fournisseur;
 
 
     ATF::db($this->db)->begin_transaction();
@@ -37,7 +36,7 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit']);
 
-        $id_devis = $this->createDevis($post, $libelle, $fournisseur);
+        $id_devis = $this->createDevis($post, $libelle);
 
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
@@ -148,8 +147,15 @@ class souscription_cleodis extends souscription {
     );
 
     foreach ($produits as $k=>$produit) {
-        ATF::produit()->q->reset()->addField("loyer")->addField("duree")->addField("type")->addField("prix_achat")->addField("id_fournisseur")->where("id_produit", $produit['id_produit']);
+        ATF::produit()->q->reset()
+          ->addField("loyer")
+          ->addField("duree")
+          ->addField("type")
+          ->addField("prix_achat")
+          ->addField("id_fournisseur")
+          ->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
+
 
         if ($toInsertProduitDevis[$produit['id_produit']]) {
           $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
@@ -167,7 +173,7 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__commentaire"=>"",
             "devis_ligne__dot__neuf"=>"oui",
             "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
-            "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur
+            "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
           );
         }
 
