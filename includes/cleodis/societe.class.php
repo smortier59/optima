@@ -1845,6 +1845,62 @@ class societe_cleodis extends societe {
       ATF::societe()->u(array("id_societe"=>$id_societe, "id_contact_signataire"=>$post["id_contact"]));
     }
   }
+
+  /**
+  * Retourne le préfixe utilisé, peut être surchargé
+  * @author Yann GAUTHERON <ygautheron@absystech.fr>
+  * @return string $prefix
+  */
+  public function create_ref_prefix($s){
+    return $s['id_famille'] == 9 ? "P" : "S";
+  }
+
+  /**
+  * Construit la référence de l'entité (spécifique à chaque Optima)
+  * @author Jérémie Gwiazdowski <jgw@absystech.fr>
+  * @author Yann GAUTHERON <ygautheron@absystech.fr>
+  * @param array $s La session
+  * @return string $ref la référence de l'entité
+  */
+  public function create_ref(&$s){
+    $ref=$this->create_ref_prefix($s);
+    $id_agence = ATF::$usr->get('id_agence');
+    if (!$id_agence) {
+      ATF::agence()->q->reset()->addField('id_agence')->addOrder('id_agence','asc')->setLimit(1);
+      $id_agence = ATF::agence()->select_cell();
+    }
+
+
+    if($id_agence){
+      //Recherche agence + date
+      $ref.=strtoupper(
+        substr(
+          ATF::agence()->select($id_agence,'agence'),0,2)
+        ).date('ym');
+
+      //Recherche du maximum
+      $max=$this->get_max_ref($ref);
+      if($max<10){
+        $ref.='000'.$max;
+      }elseif($max<100){
+        $ref.='00'.$max;
+      }elseif($max<1000){
+        $ref.='0'.$max;
+      }elseif($max<10000){
+        $ref.=$max;
+      }else{
+        throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+      }
+
+      return $ref;
+    }else{
+      throw new errorATF(ATF::$usr->trans('societe_agence_user_false'),80846);
+    }
+  }
+
+
+
+
 };
 
 class societe_cleodisbe extends societe_cleodis {
