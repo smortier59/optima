@@ -3172,7 +3172,7 @@ class pdf_cleodis extends pdf {
     }
 
     $this->sety(10);
-    $this->multicell(0,5,"L'ABONNÉ",0,'C');
+    $this->multicell(0,5,"LE LOUEUR",0,'C');
     $this->setLeftMargin(65);
     $this->setfont('arial','B',7);
     $this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
@@ -3185,7 +3185,7 @@ class pdf_cleodis extends pdf {
     $this->setLeftMargin(15);
     $this->ln(5);
     $this->setfont('arial','B',10);
-    $this->multicell(0,6,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE",0,'C');
+    $this->multicell(0,6,"L'ABONNÉ",0,'C');
     $this->setLeftMargin(65);
     $this->setfont('arial','B',7);
     $this->multicell(0,3,"Nom : ".$this->client['societe'],0);
@@ -3355,18 +3355,18 @@ class pdf_cleodis extends pdf {
       $this->setfont('arial','',8);
       if($this->devis['loyer_unique']=='oui'){
         if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est identique à celle du contrat principal."); }
-        else{ $this->multicell(0,3,"La durée de la location est identique à celle du contrat principal."); }
+        else{ $this->multicell(0,3,"La durée de l'abonnement est identique à celle du contrat principal."); }
 
       }elseif($this->affaire["nature"]=="avenant"){
         if($this->devis["type_contrat"] == "presta"){ $texte = "La durée est fixée à ".$duree." mois"." à compter du "; }
-        else{ $texte = "La durée de la location est fixée à ".$duree." mois"." à compter du "; }
+        else{ $texte = "La durée de l'abonnement est fixée à ".$duree." mois"." à compter du "; }
         if($this->commande['date_debut']){
           $texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
         }
         $this->multicell(0,3,$texte);
       }else{
         if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
-        else{ $this->multicell(0,3,"La durée de la location est fixée à ".$duree." mois."); }
+        else{ $this->multicell(0,3,"La durée de l'abonnement est fixée à ".$duree." mois."); }
 
       }
       $this->ln(2);
@@ -3418,18 +3418,6 @@ class pdf_cleodis extends pdf {
     $this->setfont('arial','',8);
     $this->cell(0,6,"Cette offre d'abonnement prend effet à compter du jour de la signature du contrat par le locataire.",0,1);
 
-// ARTICLE 5 : ASSURANCE
-// En contractant cette offre d’abonnement, l’abonné a également souscrit une assurance garantissant contre la casse du vélo et des équipements de
-// cycle.
-// ARTICLE 6 : MISE A DISPOSITION ET RESTITUTION
-// L’abonné a souhaité souscrire cette offre d’abonnement et a librement choisi les équipements objets de cette location.
-// Ces équipements lui sont mis à disposition le jour de la signature du présent contrat directement en magasin. La restitution doit être effectuée par
-// l’abonné le jour de la fin du contrat directement en magasin.
-// L’abonné :
-//
-// - déclare être titulaire d’une assurance couvrant sa responsabilité civile ;
-// - reconnait louer les équipements en parfait état de fonctionnement.
-
     $this->setfont('arial','B',8);
     $this->multicell(0,5,"ARTICLE ".$numArticle." : ASSURANCE");
     $numArticle++;
@@ -3444,7 +3432,7 @@ class pdf_cleodis extends pdf {
     $this->ln(1);
     $this->setfont('arial','',8);
     $this->multicell(0,3,"L'abonné a souhaité souscrire cette offre d’abonnement et a librement choisi les équipements objets de cette location.");
-    $this->multicell(0,3,"Ces équipements lui sont mis à disposition le jour de la signature du présent contrat directement en magasin. La restitution doit être effectuée par l'abonné le jour de la fin du contrat directement en magasin.");
+    $this->multicell(0,3,"Ces équipements lui sont mis à disposition le jour de la signature du présent contrat directement en magasin. La restitution doit être effectuée par l'abonné au plus tôt après la durée d’engagement et au plus tard 2 ans après la date de signature directement en magasin.");
     $this->multicell(0,3,"L'abonné :");
     $this->multicell(0,3,"     - déclare avoir pris connaissance des conditions générales d'abonnement de vélo figurant ci-après et les accepter ;");
     $this->multicell(0,3,"     - déclare être titulaire d’une assurance couvrant sa responsabilité civile ;");
@@ -3488,11 +3476,8 @@ class pdf_cleodis extends pdf {
 
 
     $y = $this->gety()+2;
-    if ($this->affaire['nature']=="vente") {
-      $t = "L'acheteur";
-    } else {
-      $t = "Le Locataire";
-    }
+    $t = "L'abonné";
+
     $this->cadre(20,$y,80,48,$cadre,$t);
     if(!$signature){
       $cadre = array(
@@ -3527,6 +3512,19 @@ class pdf_cleodis extends pdf {
     $this->setfont('arial','B',9);
     $this->setY(275.9);
     $this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES CI APRES",0,'C');
+
+    $this->unsetHeader();
+    $this->unsetFooter();
+
+    $pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
+
+    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+      $tplIdx = $this->importPage($pageNo);
+
+      // add a page
+      $this->AddPage();
+      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+    }
 
   }
 
@@ -3576,7 +3574,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"",0,'C');
 		$this->setleftMargin(15);
 		$this->setfont('arial','B',8);
-		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON AVEC CESSION DU MATERIEL ET DU CONTRAT DE LOCATION N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
+		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON DU CONTRAT D'ABONNEMENT N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
 		$this->setleftMargin(15);
 
 		$this->ln(5);
