@@ -3572,6 +3572,7 @@ class pdf_cleodis extends pdf {
 			,1
 		);
 
+		$this->ln(10);
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"",0,'C');
 		$this->setleftMargin(15);
@@ -3583,7 +3584,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"IL EST EXPOSE ET CONVENU CE QUI SUIT :");
 		$this->setfont('arial','',8);
-		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du _____________________, le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
+		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du ".date("d/m/Y").", le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
 
 		$this->setfont('arial','',8);
 		//$this->ln(5);
