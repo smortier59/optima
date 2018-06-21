@@ -172,6 +172,7 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__date_achat"=>"",
             "devis_ligne__dot__commentaire"=>"",
             "devis_ligne__dot__neuf"=>"oui",
+            "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
             "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
             "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
           );
@@ -221,13 +222,13 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__produit"=>$value["produit"],
           "commande_ligne__dot__quantite"=>$value["quantite"],
           "commande_ligne__dot__ref"=>$value["ref"],
-          "commande_ligne__dot__id_fournisseur"=>"",
-          "commande_ligne__dot__id_fournisseur_fk"=>"",
+          "commande_ligne__dot__id_fournisseur"=>$value['id_fournisseur'],
+          "commande_ligne__dot__id_fournisseur_fk"=>$value['id_fournisseur'],
           "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
           "commande_ligne__dot__id_produit"=>$value["produit"],
           "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
-          "commande_ligne__dot__visible"=>$value["visible"]
-
+          "commande_ligne__dot__visible"=>$value["visible"],
+          "commande_ligne__dot__serial"=>$value['serial'] ? $value['serial'] : '',
         );
     }
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
@@ -243,7 +244,7 @@ class souscription_cleodis extends souscription {
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
   */
-  public function _signAndGetPDF($post,$get){
+  public function _signAndGetPDF($post,$get) {
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
@@ -253,14 +254,22 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-    ATF::societe()->u(array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban));
-
-    //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
-    if(ATF::societe()->select($id_societe, "tel") === NULL) {
-      ATF::societe()->u(array("id_societe"=>$id_societe, 'tel'=>$tel));
+    $societe = ATF::societe()->select($id_societe);
+    $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
+    if (!$societe['ref']) {
+      // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+      $refSociete = ATF::societe()->create_ref($societe);
+      $toUpdate['ref'] = $refSociete;
     }
 
-    $societe = ATF::societe()->select($id_societe);
+    //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
+    if($societe["tel"] === NULL) {
+      $toUpdate['tel'] = $tel;
+    }
+
+    ATF::societe()->u($toUpdate);
+
+
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
     $this->checkIBAN($iban);
@@ -283,6 +292,7 @@ class souscription_cleodis extends souscription {
     $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
     $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
 
+
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
@@ -294,12 +304,12 @@ class souscription_cleodis extends souscription {
       "city"=>$societe["ville"],
       "email"=>$contact["email"],
       "company_name"=>$societe["societe"],
-      "ref"=>ATF::$codename.$societe["code_client"],
+      "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>array(
-        "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
-        "contrat-PV.pdf"=> base64_encode($contratPV), // base64
+         "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+         "contrat-PV.pdf"=> base64_encode($contratPV), // base64
         "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
 
       )
