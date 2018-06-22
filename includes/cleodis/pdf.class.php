@@ -3320,7 +3320,6 @@ class pdf_cleodis extends pdf {
           $this->multicellAnnexe();
           $annexes[$k] = $i;
         } else {
-
           $this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
         }
       }
@@ -3389,12 +3388,12 @@ class pdf_cleodis extends pdf {
         if ($this->affaire['nature']=="avenant"){
           $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
         }else{
-          $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de la location.");
+          $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de l'abonnement.");
           $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue directement en magasin, par carte bancaire, le jour de la prise de possession des équipements.");
         }
         if($duree){
           $donnee = array();
-          $head = array("Nombre de Loyers","Périodicité : Mois (M) Trimestre (T) Semestre (S) ou Année (A)","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
+          $head = array("Nombre de Loyers","Périodicité","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
           foreach ($this->loyer as $k=>$i) {
             $data[] = array(
               $i['duree']
@@ -3405,7 +3404,7 @@ class pdf_cleodis extends pdf {
           }
           $this->SetLineWidth(0.20);
           $this->ln(3);
-          $this->tableau($head,$data,180,3);
+          $this->tableau($head,$data,180,5);
         }
       }
       $numArticle = 4;
@@ -3416,7 +3415,7 @@ class pdf_cleodis extends pdf {
     $this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
     $numArticle++;
     $this->setfont('arial','',8);
-    $this->cell(0,6,"Cette offre d'abonnement prend effet à compter du jour de la signature du contrat par le locataire.",0,1);
+    $this->cell(0,6,"Cette offre d'abonnement prend effet à compter du jour de la signature du contrat par l'abonné.",0,1);
 
     $this->setfont('arial','B',8);
     $this->multicell(0,5,"ARTICLE ".$numArticle." : ASSURANCE");
