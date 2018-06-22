@@ -152,10 +152,12 @@
 	$ctInsertPackL=0;
 	$ctUpdatePackL=0;
 
+
+print_r($listPack);
 	while ($ligne = fgetcsv($fppa)) {
 		$id_pack = $listPack[$ligne[0]];
 		$id_produit = $listProduit[$ligne[2]];
-
+		echo "LIGNE 0 = ".$ligne[0]." soit id_pack = ".$listPack[$ligne[0]]."\n";
 		$pack_produit_ligne = array(
 			"id_pack_produit"=>$id_pack,
 			"id_produit"=>$id_produit,
