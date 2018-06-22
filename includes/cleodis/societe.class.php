@@ -1199,10 +1199,7 @@ class societe_cleodis extends societe {
     return $return;
   }
 
-  public function getCodeClient($site_associe){
-    $prefixe = "TO";
-
-
+  public function getCodeClient($site_associe, $prefixe = "TO"){
     //Recherche du max en base
     $this->q->reset()
       ->addField('MAX(SUBSTRING(code_client FROM -4))','max')
@@ -1897,8 +1894,6 @@ class societe_cleodis extends societe {
       throw new errorATF(ATF::$usr->trans('societe_agence_user_false'),80846);
     }
   }
-
-
 
 
 };
