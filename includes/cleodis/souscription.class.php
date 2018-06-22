@@ -257,11 +257,21 @@ class souscription_cleodis extends souscription {
     }
     $societe = ATF::societe()->select($id_societe);
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
+    // Gestion de la reference société
     $refSociete = $societe['ref'];
     if (!$refSociete) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
       $refSociete = ATF::societe()->create_ref($societe);
       $toUpdate['ref'] = $refSociete;
+    }
+    // Gestion du code client
+    $codeClient = $societe['code_client'];
+    log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    if (!$codeClient) {
+      // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+      $codeClient = ATF::societe()->getCodeClient($societe, "P");
+      $toUpdate['code_client'] = $codeClient;
+      log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     }
 
     //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
