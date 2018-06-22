@@ -29,6 +29,7 @@ class souscription_cleodis extends souscription {
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
 
+    $this->checkIBAN($post['iban']);
 
     ATF::db($this->db)->begin_transaction();
     try {
