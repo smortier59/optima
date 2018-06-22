@@ -4,7 +4,7 @@ $_SERVER["argv"][1] = "cleodis";
 include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
-error_reporting(E_ALL);
+ATF::db()->begin_transaction();
 $fileProduit = "./products-utf8.csv";
 
 $fpr = fopen($fileProduit, 'rb');
@@ -54,6 +54,7 @@ while ($ligne = fgetcsv($fpr)) {
 
 		$listProduit[$ligne[0]] = $id_produit;
 	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
 		print_r($produit);
 		echo "Produit EAN : ".$produit['ean']."/".$id_produit." ERREUR\n";
 		throw $e;
@@ -102,6 +103,7 @@ while ($ligne = fgetcsv($fpa)) {
 
 		$listPack[$ligne[0]] = $id_pack_produit;
 	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
 		print_r($pack_produit);
 		echo "Pack : ".$pack_produit['nom']."/".$id_pack_produit." ERREUR\n";
 		throw $e;
@@ -158,6 +160,7 @@ while ($ligne = fgetcsv($fppa)) {
 
 		$listPack[$ligne[0]] = $id_pack_produit_ligne;
 	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
 		print_r($pack_produit_ligne);
 		echo "Pack : ".$pack_produit_ligne['produit']."/".$id_pack_produit_ligne." ERREUR\n";
 		throw $e;
@@ -167,3 +170,4 @@ while ($ligne = fgetcsv($fppa)) {
 }
 echo $ctInsertPackL." Pack Produit Ligne insérés\n";
 echo $ctUpdatePackL." Pack Produit Ligne modifiés\n";
+ATF::db()->commit_transaction();
