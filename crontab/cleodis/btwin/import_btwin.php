@@ -159,7 +159,7 @@
 		$pack_produit_ligne = array(
 			"id_pack_produit"=>$id_pack,
 			"id_produit"=>$id_produit,
-			"produit"=>utf8_encode($ligne[3]),
+			"produit"=>$ligne[3],
 			"quantite"=>$ligne[4],
 			"min"=>$ligne[5],
 			"max"=>$ligne[6],
