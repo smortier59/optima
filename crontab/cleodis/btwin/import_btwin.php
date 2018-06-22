@@ -48,8 +48,6 @@
 		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 		$ean = "0".$ligne[4];
-		print_r($ligne);
-		print_r($matriceFRS);
 		$produit = array(
 			"produit"=>$ligne[1],
 			"type"=>$ligne[2],
