@@ -257,7 +257,8 @@ class souscription_cleodis extends souscription {
     }
     $societe = ATF::societe()->select($id_societe);
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
-    if (!$societe['ref']) {
+    $refSociete = $societe['ref'];
+    if (!$refSociete) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
       $refSociete = ATF::societe()->create_ref($societe);
       $toUpdate['ref'] = $refSociete;
