@@ -861,6 +861,13 @@ class facture_fournisseur extends classes_optima {
 				$societe  = ATF::societe()->select($affaire["id_societe"]);
 				$fournisseur = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"]);
 
+				$libelle = $value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"];
+
+				$search  = utf8_decode("çñÄÂÀÁäâàáËÊÈÉéèëêÏÎÌÍïîìíÖÔÒÓöôòóÜÛÙÚüûùúµ@µ$£Ãš");
+				$replace = "cnAAAAaaaaEEEEeeeeIIIIiiiiOOOOooooUUUUuuuuuauSLas";
+				$libelle = utf8_encode(strtr(utf8_decode($libelle), $search, $replace));
+
+				$libelle = substr($libelle , 0, 34);
 
 				$data[0] = array(
 					        	 "A"=>array('G')
@@ -869,8 +876,8 @@ class facture_fournisseur extends classes_optima {
 								,"D"=>array('408100')
 								,"E"=>array($fournisseur['code_fournisseur'])
 								,"F"=>array('D')
-								,"G"=>array($value["facture_fournisseur.prix"]*__TVA__)
-								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"G"=>array(number_format($value["facture_fournisseur.prix"]*__TVA__, 2, '.', ''))
+								,"H"=>array($libelle)
 								,"I"=>array($affaire["ref"])
 								,"J"=>array('')
 							);
@@ -879,10 +886,10 @@ class facture_fournisseur extends classes_optima {
 					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
 								,"C"=>array('AC')
 								,"D"=>array('445860')
-								,"E"=>array($fournisseur['code_fournisseur'])
+								,"E"=>array('')
 								,"F"=>array('C')
-								,"G"=>array($value["facture_fournisseur.prix"]*(__TVA__-1))
-								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"G"=>array(number_format($value["facture_fournisseur.prix"]*(__TVA__-1), 2, '.', ''))
+								,"H"=>array($libelle)
 								,"I"=>array($affaire["ref"])
 								,"J"=>array('')
 							);
@@ -892,10 +899,10 @@ class facture_fournisseur extends classes_optima {
 					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
 								,"C"=>array('AC')
 								,"D"=>array('401000')
-								,"E"=>array($fournisseur['code_fournisseur'])
+								,"E"=>array('')
 								,"F"=>array('C')
-								,"G"=>array($value["facture_fournisseur.prix"]*__TVA__)
-								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"G"=>array(number_format($value["facture_fournisseur.prix"]*__TVA__, 2, '.', ''))
+								,"H"=>array($libelle)
 								,"I"=>array($affaire["ref"])
 								,"J"=>array('')
 							);
@@ -905,10 +912,10 @@ class facture_fournisseur extends classes_optima {
 					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
 								,"C"=>array('AC')
 								,"D"=>array('445660')
-								,"E"=>array($fournisseur['code_fournisseur'])
+								,"E"=>array('')
 								,"F"=>array('D')
-								,"G"=>array($value["facture_fournisseur.prix"]*(__TVA__-1))
-								,"H"=>array($value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"])
+								,"G"=>array(number_format($value["facture_fournisseur.prix"]*(__TVA__-1), 2, '.', ''))
+								,"H"=>array($libelle)
 								,"I"=>array($affaire["ref"])
 								,"J"=>array('')
 							);
