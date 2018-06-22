@@ -153,15 +153,13 @@
 	$ctUpdatePackL=0;
 
 
-print_r($listPack);
 	while ($ligne = fgetcsv($fppa)) {
 		$id_pack = $listPack[$ligne[0]];
 		$id_produit = $listProduit[$ligne[2]];
-		echo "LIGNE 0 = ".$ligne[0]." soit id_pack = ".$listPack[$ligne[0]]."\n";
 		$pack_produit_ligne = array(
 			"id_pack_produit"=>$id_pack,
 			"id_produit"=>$id_produit,
-			"produit"=>$ligne[3],
+			"produit"=>utf8_decode($ligne[3]),
 			"quantite"=>$ligne[4],
 			"min"=>$ligne[5],
 			"max"=>$ligne[6],
@@ -191,7 +189,6 @@ print_r($listPack);
 				$ctInsertPackL++;
 			}
 
-			$listPack[$ligne[0]] = $id_pack_produit_ligne;
 		} catch (errorATF $e) {
 			ATF::db()->rollback_transaction();
 			print_r($pack_produit_ligne);
