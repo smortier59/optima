@@ -1886,7 +1886,8 @@ class affaire_cleodis extends affaire {
 			  if ($get['filters']['devis']['relancer']) {
 				//devis sans bpa -> Sans contrat  sans Premiere date accord sur le devis)
 				$this->q->from("affaire", "id_affaire", "devis", "id_affaire")
-						->whereIsNull("devis.first_date_accord");
+						->whereIsNull("devis.first_date_accord")
+						->where("affaire.etat","devis");
 			  }
 			  if ($get['filters']['devis']['gagnes']) {
 				//devis transformé en contrat
