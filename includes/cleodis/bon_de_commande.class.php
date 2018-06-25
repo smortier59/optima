@@ -875,18 +875,20 @@ class bon_de_commande_cleodis extends bon_de_commande {
 						$row_data=array();
 						$ref_affaire = ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref");
 
+						$code_client = str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client"));
+						$code_client = str_replace('EX-', '',$code_client);
 
 
 						if(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "nature") == "avenant" ){
 							$axe1 ="20".
 									substr(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref"),0 , 7).
-									str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client")).
-									"AV ";
+									$code_client.
+									"AV";
 						}else{
 							$axe1 ="20".
 									ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref").
-									str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client")).
-									"00 ";
+									$code_client.
+									"00";
 						}
 
 
@@ -910,7 +912,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 							$row_data["G"]=number_format($value["bon_de_commande.prix"]  , 2, '.','');
 							$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
 							$row_data["I"]=$ref_affaire." ";
-							$row_data["J"]=$axe1;
+							$row_data["J"]="";
 
 						//HT
 						}elseif($l == 2){
@@ -924,7 +926,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 								$row_data["G"]=number_format($value["bon_de_commande.prix"] , 2, '.','');
 								$row_data["H"]="";
 								$row_data["I"]=$ref_affaire." ";
-								$row_data["J"]="";
+								$row_data["J"]=$axe1;
 							}
 						//TVA
 						}elseif($l == 3){
@@ -932,10 +934,11 @@ class bon_de_commande_cleodis extends bon_de_commande {
 							$row_data["B"]=" ".$date;
 							$row_data["C"]='ACH';
 							$row_data["D"]='445860';
-							$row_data["E"]=ATF::societe()->select($value['bon_de_commande.id_fournisseur_fk'], 'code_fournisseur');
+							//$row_data["E"]=ATF::societe()->select($value['bon_de_commande.id_fournisseur_fk'], 'code_fournisseur');
+							$row_data["E"]="";
 							$row_data["F"]='D';
 							$row_data["G"]=number_format(($value["bon_de_commande.prix"]*__TVA__) - $value["bon_de_commande.prix"]  , 2, '.','');
-							$row_data["H"]="";
+							$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
 							$row_data["I"]=$ref_affaire." ";
 							$row_data["J"]="";
 
@@ -948,7 +951,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 							$row_data["E"]="";
 							$row_data["F"]='C';
 							$row_data["G"]=number_format($value["bon_de_commande.prix"]*__TVA__  , 2, '.','');
-							$row_data["H"]="";
+							$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
 							$row_data["I"]=$ref_affaire." ";
 							$row_data["J"]="";
 						}
@@ -1097,16 +1100,20 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 						$client = ATF::societe()->select($value["bon_de_commande.id_societe_fk"]);
 
+						$code_client = str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client"));
+						$code_client = str_replace('EX-', '',$code_client);
+
+
 						if(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "nature") == "avenant" ){
 							$axe1 ="20".
 									substr(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref"),0 , 7).
-									str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client")).
-									"AV ";
+									$code_client.
+									"AV";
 						}else{
 							$axe1 ="20".
 									ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref").
-									str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client")).
-									"00 ";
+									$code_client.
+									"00";
 						}
 
 
@@ -1116,7 +1123,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
 										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
 										'',
-										$client["societe"]." ".$contrat["commande.ref"]." -".$client["code_client"],
+										$client["societe"]." ".$contrat["commande.ref"]."-".$client["code_client"],
 										'',
 										number_format($value["bon_de_commande.prix"] , 2, '.',''),
 										'1',

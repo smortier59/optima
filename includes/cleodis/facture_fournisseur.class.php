@@ -874,7 +874,7 @@ class facture_fournisseur extends classes_optima {
 					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
 								,"C"=>array('AC')
 								,"D"=>array('408100')
-								,"E"=>array($fournisseur['code_fournisseur'])
+								,"E"=>array('')
 								,"F"=>array('D')
 								,"G"=>array(number_format($value["facture_fournisseur.prix"]*__TVA__, 2, '.', ''))
 								,"H"=>array($libelle)
@@ -899,13 +899,25 @@ class facture_fournisseur extends classes_optima {
 					        	,"B"=>array(date("dmY", strtotime($value["facture_fournisseur.date"])))
 								,"C"=>array('AC')
 								,"D"=>array('401000')
-								,"E"=>array('')
+								,"E"=>array($fournisseur['code_fournisseur'])
 								,"F"=>array('C')
 								,"G"=>array(number_format($value["facture_fournisseur.prix"]*__TVA__, 2, '.', ''))
 								,"H"=>array($libelle)
 								,"I"=>array($affaire["ref"])
 								,"J"=>array('')
 							);
+
+
+
+				$refinancement = "";
+				ATF::demande_refi()->q->reset()->where("id_affaire",$value['facture_fournisseur.id_affaire_fk'],"AND")
+											   ->where("etat","valide");
+				$ResRefinancement = ATF::demande_refi()->select_row();
+
+				if($ResRefinancement){
+					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
+				}
+
 
 				$data[3] = array(
 					        	 "A"=>array('G')
@@ -919,6 +931,7 @@ class facture_fournisseur extends classes_optima {
 								,"I"=>array($affaire["ref"])
 								,"J"=>array('')
 							);
+				if($refinancement == "CLEODIS"){ $data[3]['D'] = array('445620'); }
 
 				foreach ($data as $key => $row_data) {
 					$row_auto++;
