@@ -314,7 +314,7 @@ class souscription_cleodis extends souscription {
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
-      "email"=>$contact["email"],
+      "email"=>$societe["particulier_email"],
       "company_name"=>$societe["societe"],
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
