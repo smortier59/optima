@@ -266,14 +266,14 @@ class souscription_cleodis extends souscription {
     }
     // Gestion du code client
     $codeClient = $societe['code_client'];
+
     log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     if (!$codeClient) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-      $codeClient = ATF::societe()->getCodeClient($societe, "P");
+      $codeClient = ATF::societe()->getCodeClient($societe, "BT");
       $toUpdate['code_client'] = $codeClient;
       log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     }
-
     //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
     if($societe["tel"] === NULL) {
       $toUpdate['tel'] = $tel;
@@ -322,8 +322,7 @@ class souscription_cleodis extends souscription {
       "files2sign"=>array(
          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
          "contrat-PV.pdf"=> base64_encode($contratPV), // base64
-        "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
-
+         "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
       )
     );
     return $return;

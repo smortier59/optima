@@ -164,11 +164,6 @@ class pdf_cleodis extends pdf {
       $this->AddPage();
       $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
     }
-
-
-
-    // $tplIdx = $this->importPage(1);
-    // $r = $this->useTemplate($tplIdx, 0,0,0,0, true);
   }
 
 	/* Ecrit un titre d'article pour les CGV
