@@ -302,7 +302,8 @@ class souscription_cleodis extends souscription {
 
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
     $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
-    $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
+    // $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
+    $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
 
 
     $return = array(
