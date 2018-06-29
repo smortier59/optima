@@ -28,8 +28,8 @@ class souscription_cleodis extends souscription {
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
-    $fournisseur = $post['fournisseur'] ? $post['fournisseur'] : $this->fournisseur;
 
+    $this->checkIBAN($post['iban']);
 
     ATF::db($this->db)->begin_transaction();
     try {
@@ -37,7 +37,7 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit']);
 
-        $id_devis = $this->createDevis($post, $libelle, $fournisseur);
+        $id_devis = $this->createDevis($post, $libelle);
 
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
@@ -82,7 +82,7 @@ class souscription_cleodis extends souscription {
         throw $e;
     }
     ATF::db($this->db)->commit_transaction();
-    return true;
+    return $id_affaire;
   }
 
   /**
@@ -148,8 +148,15 @@ class souscription_cleodis extends souscription {
     );
 
     foreach ($produits as $k=>$produit) {
-        ATF::produit()->q->reset()->addField("loyer")->addField("duree")->where("id_produit", $produit['id_produit']);
+        ATF::produit()->q->reset()
+          ->addField("loyer")
+          ->addField("duree")
+          ->addField("type")
+          ->addField("prix_achat")
+          ->addField("id_fournisseur")
+          ->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
+
 
         if ($toInsertProduitDevis[$produit['id_produit']]) {
           $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
@@ -157,17 +164,18 @@ class souscription_cleodis extends souscription {
           $toInsertProduitDevis[$produit['id_produit']] =  array(
             "devis_ligne__dot__produit"=> $produit['produit'],
             "devis_ligne__dot__quantite"=>$produit['quantite'],
-            "devis_ligne__dot__type"=>"sans_objet",
+            "devis_ligne__dot__type"=>$produitLoyer['type'],
             "devis_ligne__dot__ref"=>$produit['ref'],
-            "devis_ligne__dot__prix_achat"=>$produitLoyer["loyer"],
+            "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
             "devis_ligne__dot__id_produit"=>$produit['produit'],
-            "devis_ligne__dot__id_fournisseur"=>$produit['id_fournisseur'] ? $produit['id_fournisseur'] : $this->id_fournisseur,
+            "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
             "devis_ligne__dot__visibilite_prix"=>"invisible",
             "devis_ligne__dot__date_achat"=>"",
             "devis_ligne__dot__commentaire"=>"",
             "devis_ligne__dot__neuf"=>"oui",
+            "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
             "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
-            "devis_ligne__dot__id_fournisseur_fk"=>$fournisseur
+            "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
           );
         }
 
@@ -215,13 +223,13 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__produit"=>$value["produit"],
           "commande_ligne__dot__quantite"=>$value["quantite"],
           "commande_ligne__dot__ref"=>$value["ref"],
-          "commande_ligne__dot__id_fournisseur"=>"",
-          "commande_ligne__dot__id_fournisseur_fk"=>"",
+          "commande_ligne__dot__id_fournisseur"=>$value['id_fournisseur'],
+          "commande_ligne__dot__id_fournisseur_fk"=>$value['id_fournisseur'],
           "commande_ligne__dot__prix_achat"=>$value["prix_achat"],
           "commande_ligne__dot__id_produit"=>$value["produit"],
           "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
-          "commande_ligne__dot__visible"=>$value["visible"]
-
+          "commande_ligne__dot__visible"=>$value["visible"],
+          "commande_ligne__dot__serial"=>$value['serial'] ? $value['serial'] : '',
         );
     }
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
@@ -237,7 +245,7 @@ class souscription_cleodis extends souscription {
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
   */
-  public function _signAndGetPDF($post,$get){
+  public function _signAndGetPDF($post,$get) {
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
@@ -247,14 +255,33 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-    ATF::societe()->u(array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban));
+    $societe = ATF::societe()->select($id_societe);
+    $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
+    // Gestion de la reference société
+    $refSociete = $societe['ref'];
+    if (!$refSociete) {
+      // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+      $refSociete = ATF::societe()->create_ref($societe);
+      $toUpdate['ref'] = $refSociete;
+    }
+    // Gestion du code client
+    $codeClient = $societe['code_client'];
 
+    log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    if (!$codeClient) {
+      // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+      $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+      $toUpdate['code_client'] = $codeClient;
+      log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    }
     //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
-    if(ATF::societe()->select($id_societe, "tel") === NULL) {
-      ATF::societe()->u(array("id_societe"=>$id_societe, 'tel'=>$tel));
+    if($societe["tel"] === NULL) {
+      $toUpdate['tel'] = $tel;
     }
 
-    $societe = ATF::societe()->select($id_societe);
+    ATF::societe()->u($toUpdate);
+
+
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
     $this->checkIBAN($iban);
@@ -274,8 +301,10 @@ class souscription_cleodis extends souscription {
     $contrat = ATF::commande()->select_row();
 
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-    $contratA4 = ATF::pdf()->generic('contratA4',$contrat['commande.id_commande'],true);
     $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
+    // $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
+    $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
+
 
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
@@ -286,16 +315,15 @@ class souscription_cleodis extends souscription {
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
-      "email"=>$contact["email"],
+      "email"=>$societe["particulier_email"],
       "company_name"=>$societe["societe"],
-      "ref"=>ATF::$codename.$societe["code_client"],
+      "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>array(
-        "mandat_prelevement.pdf"=> base64_encode($pdf_mandat), // base64
-        "contrat-A4.pdf"=> base64_encode($contratA4), // base64
-        "contrat-PV.pdf"=> base64_encode($contratPV) // base64
-
+         "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+         "contrat-PV.pdf"=> base64_encode($contratPV), // base64
+         "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
       )
     );
     return $return;
