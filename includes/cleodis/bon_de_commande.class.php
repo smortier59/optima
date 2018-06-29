@@ -924,7 +924,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 								$row_data["E"]='';
 								$row_data["F"]='D';
 								$row_data["G"]=number_format($value["bon_de_commande.prix"] , 2, '.','');
-								$row_data["H"]="";
+								$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
 								$row_data["I"]=$ref_affaire." ";
 								$row_data["J"]=$axe1;
 							}
