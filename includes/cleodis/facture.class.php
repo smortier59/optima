@@ -768,11 +768,15 @@ class facture_cleodis extends facture {
 		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
 
 		if($total != 0){
+			$mode_paiement = "prelevement";
+			if($affaire["site_associe"] === 'toshiba') $mode_paiement = "cb";
+			if($affaire["site_associe"] === 'btwin') $mode_paiement = "pre-paiement";
+
 			$facture["facture"] = array(
 	            "id_societe" => $affaire["id_societe"],
 	            "type_facture" => "libre",
 	            "type_libre" => "normale",
-	            "mode_paiement" => "prelevement",
+	            "mode_paiement" => $mode_paiement,
 	            "id_affaire" => $affaire["id_affaire"],
 	            "date" => date("d-m-Y"),
 	            "id_commande" => $commande["id_commande"],
