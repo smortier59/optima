@@ -79,9 +79,9 @@ try{
 		array("80123661" , "[SECURITE] - Alarme maison sans fil connectée compatible animaux Starter pack SOMFY protect" , "BU0101003C93" , "attente_location" , "actif"),
 		array("80123661" , "[SECURITE] - Alarme maison sans fil connectée compatible animaux Starter pack SOMFY protect" , "BU010100403A" , "attente_location" , "actif"),
 		array("79355052" , "Support mural Security Camera" , "BI40100022D8" , "attente_location" , "actif"),
-		array("68624906" , "Télécommande 4 boutons" , "FO30041508CR2032" , "attente_location" , "actif"),
-		array("68624906" , "Télécommande 4 boutons" , "FO30041605CR2032" , "attente_location" , "actif"),
-		array("68624906" , "Télécommande 4 boutons" , "FO30041508CR2032" , "attente_location" , "actif")
+		array("68624906" , "Télécommande 4 boutons" , "FO30041508CR20321" , "attente_location" , "actif"),
+		array("68624906" , "Télécommande 4 boutons" , "FO30041605CR20322" , "attente_location" , "actif"),
+		array("68624906" , "Télécommande 4 boutons" , "FO30041508CR20323" , "attente_location" , "actif")
 	);
 
 	foreach($parc as $key=>$value){
