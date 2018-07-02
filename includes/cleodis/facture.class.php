@@ -1447,169 +1447,39 @@ class facture_cleodis extends facture {
 				//insertion des donnÃ©es
 				for ($i = 1; $i <= 4; $i++) {
 					$row_data=array();
-					if($i==1){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
 
-
-						if($refinanceur['refinanceur']=='BMF'){
-							$row_data["D"]="467000";
-							//          $row_data["E"]=$refinanceur['code_refi'];
-							$row_data["E"]="B".substr($societe["code_client"],1);
-						}elseif($item['facture.type_facture']=="refi"){
-							$row_data["D"]="411000";
-							$row_data["E"]=$refinanceur['code_refi']." ".$refinanceur["refinanceur"];
-						}else{
-							$row_data["D"]="411000";
-							//          $row_data["E"]=$refinanceur['code_refi'];
-							$row_data["E"]=$societe["code_client"];
-						}
-
-
-						if($item['facture.prix']<0){
-							$row_data["F"]='C';
-						}else{
-							$row_data["F"]='D';
-						}
-
-						if($infos["rejet"]){
-						 	$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
-						}else{
-							if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){$row_data["G"]=round(abs($item['facture.prix']*1.2),2);
-							}else{ $row_data["G"]=round(abs($item['facture.prix']*$devis[0]["tva"]),2);	}
-						}
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-						$row_data["K"]=$dateDebut;
-						$row_data["L"]=$dateFin;
-						$row_data["M"]=$datePrelevement;
-						$row_data["N"] = $refinancement;
-					}elseif($i==2){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-
-						if($item['facture.prix']<0){
-							$row_data["F"]='D';
-						}else{
-							$row_data["F"]='C';
-						}
-						$row_data["G"]=abs($item['facture.prix']);
-						if($devis[0][ "type_contrat"] == "presta"){	$row_data["D"]=='706240'; }
-						else{
-
-
-							if($refinanceur['refinanceur']=='BMF'){
-								if($infos["rejet"]){
-							 		$row_data["D"]=='771000';
-								}else{
-									$row_data["D"]="706500";
-								}
-							}elseif($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
-
-								$infos_commande=ATF::commande()->select(ATF::facture()->select($item['facture.id_facture_fk'] , "id_commande"));
-								if($infos_commande['date_evolution'] > $item['facture.date_periode_debut']){
-									if($infos["rejet"]){
-								 		$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva']));
-									}else{
-									    if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){ $row_data["G"]=round(abs($item['facture.prix']*1.2),2); }
-									    else{ $row_data["G"]=round(abs($item['facture.prix']*$devis[0]["tva"]),2); }
-									}
-									if($refinanceur['refinanceur']=='FRANFINANCE'){
-										$row_data["D"]="467800";
-									}else{
-										$row_data["D"]="467500";
-									}
-
-								}else{
-									$row_data["G"]=abs($item['facture.prix']);
-									$row_data["D"]="706230";
-								}
-							}else{
-								$row_data["D"]=$compte_2;
-							}
-						}
-
-
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-						$row_data["K"]=$dateDebut;
-						$row_data["L"]=$dateFin;
-						$row_data["M"]=$datePrelevement;
-						$row_data["N"] = $refinancement;
-					}elseif($i==3){
-						$commande = ATF::commande()->select($item['facture.id_commande_fk']);
-
-						$cleofi = false;
-						if($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
-							//Si le contrat est en cours pendant la période de la facture, pas d'analytique
-							if(strtotime($commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) &&
-							   strtotime($commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
-								$cleofi = true;
-							}
-						}
-
-						if(!$cleofi){
-							$row_data["A"]='A1';
-							$row_data["B"]=" ".$date;
-							$row_data["C"]='VEN';
-							if($affaire["nature"]=="avenant"){
-								//Faire en sorte que l1296 = 2008 et non pas 208
-								$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
-							}else{
-								$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
-							}
-							if($devis[0][ "type_contrat"] == "presta"){	$row_data["D"]=='706240'; }
-							else{
-								if($refinanceur['refinanceur']=='BMF'){
-									if($infos["rejet"]){
-							 			$row_data["D"]=='771000';
-									}else{
-										$row_data["D"]="706500";
-									}
-								}else{
-									$row_data["D"]= $compte_2;
-								}
-							}
-
-							if($item['facture.prix']<0){
-								$row_data["F"]='D';
-							}else{
-								$row_data["F"]='C';
-							}
-							$row_data["G"]=abs($item['facture.prix']);
-							$row_data["H"]=$libelle;
-							$row_data["I"]=$reference;
-							$row_data["K"]=$dateDebut;
-							$row_data["L"]=$dateFin;
-							$row_data["M"]=$datePrelevement;
-							$row_data["N"]=$refinancement;
-						}
-					}elseif($i==4){
-						if($refinanceur['refinanceur']!='CLEOFI' && $refinanceur['refinanceur']!='FRANFINANCE'){
-
+					if($item['facture.mode_paiement'] !== "pre-paiement"){
+						if($i==1){
 							$row_data["A"]='G';
 							$row_data["B"]=" ".$date;
 							$row_data["C"]='VEN';
-							if($refinanceur['refinanceur']=='BMF'){
-								$row_data["D"]="445712";
 
+
+							if($refinanceur['refinanceur']=='BMF'){
+								$row_data["D"]="467000";
+								//          $row_data["E"]=$refinanceur['code_refi'];
+								$row_data["E"]="B".substr($societe["code_client"],1);
+							}elseif($item['facture.type_facture']=="refi"){
+								$row_data["D"]="411000";
+								$row_data["E"]=$refinanceur['code_refi']." ".$refinanceur["refinanceur"];
 							}else{
-								$row_data["D"]=$compte_3;
+								$row_data["D"]="411000";
+								//          $row_data["E"]=$refinanceur['code_refi'];
+								$row_data["E"]=$societe["code_client"];
 							}
+
+
 							if($item['facture.prix']<0){
-								$row_data["F"]='D';
-							}else{
 								$row_data["F"]='C';
+							}else{
+								$row_data["F"]='D';
 							}
 
 							if($infos["rejet"]){
-						 		$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva']-$item['facture.prix']));
+							 	$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
 							}else{
-								if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){$row_data["G"]=abs(($item['facture.prix']*1.2-$item['facture.prix']));
-								}else{$row_data["G"]=abs(($item['facture.prix']*$devis[0]["tva"]-$item['facture.prix'])); }
-
+								if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){$row_data["G"]=round(abs($item['facture.prix']*1.2),2);
+								}else{ $row_data["G"]=round(abs($item['facture.prix']*$devis[0]["tva"]),2);	}
 							}
 							$row_data["H"]=$libelle;
 							$row_data["I"]=$reference;
@@ -1617,27 +1487,193 @@ class facture_cleodis extends facture {
 							$row_data["L"]=$dateFin;
 							$row_data["M"]=$datePrelevement;
 							$row_data["N"] = $refinancement;
-						}elseif($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
+						}elseif($i==2){
+							$row_data["A"]='G';
+							$row_data["B"]=" ".$date;
+							$row_data["C"]='VEN';
 
-							$infos_commande=ATF::commande()->select(ATF::facture()->select($item['facture.id_facture_fk'] , "id_commande"));
-							//Si prolongation
-							if($infos_commande['date_evolution'] < $item['facture.date_periode_debut']){
+							if($item['facture.prix']<0){
+								$row_data["F"]='D';
+							}else{
+								$row_data["F"]='C';
+							}
+							$row_data["G"]=abs($item['facture.prix']);
+							if($devis[0][ "type_contrat"] == "presta"){	$row_data["D"]=='706240'; }
+							else{
+
+
+								if($refinanceur['refinanceur']=='BMF'){
+									if($infos["rejet"]){
+								 		$row_data["D"]=='771000';
+									}else{
+										$row_data["D"]="706500";
+									}
+								}elseif($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
+
+									$infos_commande=ATF::commande()->select(ATF::facture()->select($item['facture.id_facture_fk'] , "id_commande"));
+									if($infos_commande['date_evolution'] > $item['facture.date_periode_debut']){
+										if($infos["rejet"]){
+									 		$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva']));
+										}else{
+										    if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){ $row_data["G"]=round(abs($item['facture.prix']*1.2),2); }
+										    else{ $row_data["G"]=round(abs($item['facture.prix']*$devis[0]["tva"]),2); }
+										}
+										if($refinanceur['refinanceur']=='FRANFINANCE'){
+											$row_data["D"]="467800";
+										}else{
+											$row_data["D"]="467500";
+										}
+
+									}else{
+										$row_data["G"]=abs($item['facture.prix']);
+										$row_data["D"]="706230";
+									}
+								}else{
+									$row_data["D"]=$compte_2;
+								}
+							}
+
+
+							$row_data["H"]=$libelle;
+							$row_data["I"]=$reference;
+							$row_data["K"]=$dateDebut;
+							$row_data["L"]=$dateFin;
+							$row_data["M"]=$datePrelevement;
+							$row_data["N"] = $refinancement;
+						}elseif($i==3){
+							$commande = ATF::commande()->select($item['facture.id_commande_fk']);
+
+							$cleofi = false;
+							if($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
+								//Si le contrat est en cours pendant la période de la facture, pas d'analytique
+								if(strtotime($commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) &&
+								   strtotime($commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
+									$cleofi = true;
+								}
+							}
+
+							if(!$cleofi){
+								$row_data["A"]='A1';
+								$row_data["B"]=" ".$date;
+								$row_data["C"]='VEN';
+								if($affaire["nature"]=="avenant"){
+									//Faire en sorte que l1296 = 2008 et non pas 208
+									$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
+								}else{
+									$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
+								}
+								if($devis[0][ "type_contrat"] == "presta"){	$row_data["D"]=='706240'; }
+								else{
+									if($refinanceur['refinanceur']=='BMF'){
+										if($infos["rejet"]){
+								 			$row_data["D"]=='771000';
+										}else{
+											$row_data["D"]="706500";
+										}
+									}else{
+										$row_data["D"]= $compte_2;
+									}
+								}
+
+								if($item['facture.prix']<0){
+									$row_data["F"]='D';
+								}else{
+									$row_data["F"]='C';
+								}
+								$row_data["G"]=abs($item['facture.prix']);
+								$row_data["H"]=$libelle;
+								$row_data["I"]=$reference;
+								$row_data["K"]=$dateDebut;
+								$row_data["L"]=$dateFin;
+								$row_data["M"]=$datePrelevement;
+								$row_data["N"]=$refinancement;
+							}
+						}elseif($i==4){
+							if($refinanceur['refinanceur']!='CLEOFI' && $refinanceur['refinanceur']!='FRANFINANCE'){
+
 								$row_data["A"]='G';
 								$row_data["B"]=" ".$date;
 								$row_data["C"]='VEN';
-								$row_data["D"]='445713';
-								$row_data["E"]='';
-								$row_data["F"]='C';
-								$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']);
+								if($refinanceur['refinanceur']=='BMF'){
+									$row_data["D"]="445712";
+
+								}else{
+									$row_data["D"]=$compte_3;
+								}
+								if($item['facture.prix']<0){
+									$row_data["F"]='D';
+								}else{
+									$row_data["F"]='C';
+								}
+
+								if($infos["rejet"]){
+							 		$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva']-$item['facture.prix']));
+								}else{
+									if(date("y",strtotime($item['facture.date_periode_debut'])) >= 14 && $devis[0]["tva"]==1.196){$row_data["G"]=abs(($item['facture.prix']*1.2-$item['facture.prix']));
+									}else{$row_data["G"]=abs(($item['facture.prix']*$devis[0]["tva"]-$item['facture.prix'])); }
+
+								}
 								$row_data["H"]=$libelle;
 								$row_data["I"]=$reference;
 								$row_data["K"]=$dateDebut;
 								$row_data["L"]=$dateFin;
 								$row_data["M"]=$datePrelevement;
 								$row_data["N"] = $refinancement;
+							}elseif($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE'){
+
+								$infos_commande=ATF::commande()->select(ATF::facture()->select($item['facture.id_facture_fk'] , "id_commande"));
+								//Si prolongation
+								if($infos_commande['date_evolution'] < $item['facture.date_periode_debut']){
+									$row_data["A"]='G';
+									$row_data["B"]=" ".$date;
+									$row_data["C"]='VEN';
+									$row_data["D"]='445713';
+									$row_data["E"]='';
+									$row_data["F"]='C';
+									$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']);
+									$row_data["H"]=$libelle;
+									$row_data["I"]=$reference;
+									$row_data["K"]=$dateDebut;
+									$row_data["L"]=$dateFin;
+									$row_data["M"]=$datePrelevement;
+									$row_data["N"] = $refinancement;
+								}
 							}
 						}
+					}else{
+						if($i==1){
+							$row_data["A"]='G';
+							$row_data["B"]=" ".$date;
+							$row_data["C"]='OD1';
+							$row_data["D"]="401000";
+							$row_data["E"]="B".substr($societe["code_client"],1);
+							$row_data["F"]='D';
+							$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
+							$row_data["H"]=$libelle;
+							$row_data["I"]="OD000001";
+							$row_data["J"]="";
+							$row_data["I"]="OD000001";
+							$row_data["L"]=$dateFin;
+							$row_data["M"]=$datePrelevement;
+							$row_data["N"]=$refinancement;
+						}elseif($i==2){
+							$row_data["A"]='G';
+							$row_data["B"]=" ".$date;
+							$row_data["C"]='OD1';
+							$row_data["D"]="401000";
+							$row_data["E"]="B".substr($societe["code_client"],1);
+							$row_data["F"]='C';
+							$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
+							$row_data["H"]=$libelle;
+							$row_data["I"]="OD000001";
+							$row_data["J"]="";
+							$row_data["I"]="OD000001";
+							$row_data["L"]=$dateFin;
+							$row_data["M"]=$datePrelevement;
+							$row_data["N"]=$refinancement;
+						}
 					}
+
 
 
 					if($row_data){
@@ -2437,8 +2473,6 @@ class facture_cleodis extends facture {
 			$row_auto=1;
 
 			foreach ($infos as $key => $value) {
-
-
 				$facture  = ATF::facture()->select($value["facture.id_facture_fk"]);
 				$affaire  = ATF::affaire()->select($value["facture.id_affaire_fk"]);
 				$commande = ATF::commande()->select($value["facture.id_commande_fk"]);
