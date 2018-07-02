@@ -18,7 +18,8 @@ class parc extends classes_optima {
 													'parc.provenanceParcReloue',
 													"parc.date_achat" => array("renderer"=>"updateDate"),
 													'parc_existant'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_existant"),
-													'parc_recuperation'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_recuperation")
+													'parc_recuperation'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_recuperation"),
+													'parc_broke'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_broke")
 												);
 
 		$this->colonnes['bloquees']['insert'] =
@@ -55,6 +56,7 @@ class parc extends classes_optima {
 		$this->addPrivilege("getAllParcAttenteRelocation");
 		$this->addPrivilege("relocationParc");
 		$this->addPrivilege("retourEnStock");
+		$this->addPrivilege("parcToBroke");
 
 
 	}
@@ -543,5 +545,17 @@ class parc extends classes_optima {
 		$this->u(array("id_parc"=>$this->decryptId($data["id_parc"]), "etat"=>"attente_location"));
 		return true;
 	}
+
+	/**
+	 * Permet de passer un parc en BROKE
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  Array $data  [id] => ID Crypté du parc actuel
+						    [comboDisplay] => ID du parc a passer en broke
+	*/
+	public function parcToBroke($data){
+		$this->u(array("id_parc"=>$this->decryptId($data["id_parc"]), "etat"=>"broke"));
+		return true;
+	}
+
 };
 ?>
