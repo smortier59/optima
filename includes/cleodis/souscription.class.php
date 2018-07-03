@@ -28,12 +28,25 @@ class souscription_cleodis extends souscription {
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
+    $societe = ATF::societe()->select($post["id_societe"]);
 
     $this->checkIBAN($post['iban']);
 
     ATF::db($this->db)->begin_transaction();
     try {
+        // Gestion du code client
+        $codeClient = $societe['code_client'];
 
+        if (!$codeClient) {
+          // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+          $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+          $toUpdate = array(
+            'id_societe' => $societe["id_societe"],
+            'code_client' => $codeClient
+          );
+          log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+          ATF::societe()->u($toUpdate);
+        }
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit']);
 
@@ -264,6 +277,8 @@ class souscription_cleodis extends souscription {
       $refSociete = ATF::societe()->create_ref($societe);
       $toUpdate['ref'] = $refSociete;
     }
+
+
     // Gestion du code client
     $codeClient = $societe['code_client'];
 
@@ -281,6 +296,16 @@ class souscription_cleodis extends souscription {
 
     ATF::societe()->u($toUpdate);
 
+    // Gestion du RUM, après avoir mis a jour le code client, car il est utile pour lé génération
+    // $codeClient = $societe['code_client'];
+
+    // log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    // if (!$codeClient) {
+    //   // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+    //   $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+    //   $toUpdate['code_client'] = $codeClient;
+    //   log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    // }
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
