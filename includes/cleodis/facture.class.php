@@ -1660,7 +1660,7 @@ class facture_cleodis extends facture {
 							$row_data["A"]='G';
 							$row_data["B"]=" ".$date;
 							$row_data["C"]='OD1';
-							$row_data["D"]="401000";
+							$row_data["D"]="411000";
 							$row_data["E"]="B".substr($societe["code_client"],1);
 							$row_data["F"]='C';
 							$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
