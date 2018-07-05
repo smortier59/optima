@@ -1348,7 +1348,10 @@ class affaire_lm extends affaire {
 
 
 		$data = array();
-		$i = 0;
+		$data[0] = array("ContratProduit", "ContratNum", "ContratDateDebut", "ClientLMANum", "BeneficiaireNom", "BeneficiairePrenom", "BeneficiaireTitre", "BeneficiaireDateNaissance", "BeneficiaireAdresse1", "BeneficiaireAdresse2","BeneficiaireCP", "BeneficiaireVille", "Produits loués");
+
+
+		$i = 1;
 		foreach($affaire_ok as $k => $v){
 			$client = ATF::societe()->select($k);
 
