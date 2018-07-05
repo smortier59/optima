@@ -1361,6 +1361,9 @@ class affaire_lm extends affaire {
 				}
 				$lignes = ATF::commande_ligne()->select_all();
 
+				ATF::comite()->q->reset()->where("id_affaire", $value['affaires'][0])->where("comite.etat", "accepte");
+				$comite = ATF::comite()->select_row();
+
 				//Tout les produits dont le fournisseur est Opteven
 				foreach ($lignes as $kl => $vl) {
 					if($vl["id_fournisseur"] ==  $OPTEVEN["id_societe"]){
@@ -1369,7 +1372,7 @@ class affaire_lm extends affaire {
 				}
 
 				$data[$i][1] = ATF::affaire()->select($value['affaires'][0], "ref");
-				$data[$i][2] = "Date debut";
+				$data[$i][2] = $comite["date"];
 				$data[$i][3] = strtoupper($client["ref_client"]);
 				$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
 				$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
