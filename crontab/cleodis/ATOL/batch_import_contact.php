@@ -1194,10 +1194,10 @@ $contact4 = array(
 );
 
 
-
+/*
 ATF::db()->begin_transaction();
 try{
-	/*foreach ($contact1 as $key => $value) {
+	foreach ($contact1 as $key => $value) {
 		ATF::contact()->u(array("id_contact"=>$value[0],
 								"login"=>$value[1],
 							    "pwd_client"=>hash('sha256',$value[2])
@@ -1218,20 +1218,29 @@ try{
 								"login"=>$value[2],
 							    "pwd_client"=>hash('sha256',$value[3])
 							));
-	}*/
+	}
 
-	foreach ($contact4 as $key => $value) {
+	ATF::db()->commit_transaction();
+}catch (errorATF $e) {
+	ATF::db()->rollback_transaction();
+	$e->getMessage();
+	throw $e;
+}
+*/
+
+foreach ($contact4 as $key => $value) {
+	ATF::db()->begin_transaction();
+	try{
 		ATF::contact()->u(array("id_contact"=>$value[0],
 								"login"=>$value[1],
 							    "pwd_client"=>hash('sha256',$value[2])
 							));
 		echo '.';
+		ATF::db()->commit_transaction();
+	}catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
+		echo $e->getMessage();
+		throw $e;
 	}
 
-
-	ATF::db()->commit_transaction();
-}catch (errorATF $e) {
-	ATF::db()->rollback_transaction();
-	print_r($e);
-	throw $e;
 }
