@@ -1283,17 +1283,25 @@ class affaire_lm extends affaire {
     * Permet l'export CSV des données OPTEVEN
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     */
-	public function export_opteven(){
-		// output headers so that the file is downloaded rather than displayed
-		header('Content-type: text/csv');
-		header('Content-Disposition: attachment; filename="demo.csv"');
+	public function export_opteven($export=true){
 
-		// do not cache the file
-		header('Pragma: no-cache');
-		header('Expires: 0');
+		if($export){
+			// output headers so that the file is downloaded rather than displayed
+			header('Content-type: text/csv');
+			header('Content-Disposition: attachment; filename="demo.csv"');
 
-		// create a file pointer connected to the output stream
-		$file = fopen('php://output', 'w');
+			// do not cache the file
+			header('Pragma: no-cache');
+			header('Expires: 0');
+
+			// create a file pointer connected to the output stream
+			$file = fopen('php://output', 'w');
+		}else{
+			if (!$file = fopen('php://temp', 'w+')) return FALSE;
+		}
+
+
+
 
 		ATF::affaire()->q->reset()->where("affaire.etat",'commande', 'OR', 'statuAffaire')
 								  ->where("affaire.etat",'facture', 'OR', 'statuAffaire');
@@ -1389,7 +1397,7 @@ class affaire_lm extends affaire {
 				//Tout les produits loués des affaires
 				foreach ($lignes as $kl => $vl) {
 					if($data[$i][12]){
-						$data[$i][12] .= " | ".$vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+						$data[$i][12] .= "$".$vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
 					}else{
 						$data[$i][12] = $vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
 					}
@@ -1401,13 +1409,20 @@ class affaire_lm extends affaire {
 
 		}
 
-
 		// output each row of the data
 		foreach ($data as $row){
 			fputcsv($file, $row, ';', '"');
 		}
 
-		exit();
+		if($export){
+			exit();
+		}else{
+			// Place stream pointer at beginning
+		    rewind($file);
+
+		    // Return the data
+			return stream_get_contents($file);
+		}
 	}
 
 

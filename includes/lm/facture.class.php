@@ -208,8 +208,8 @@ class facture_lm extends facture {
 	*
 	*/
 	public function statusDebitEnCours(){
-		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						 ->where("executionStatus","processed","AND",false,"!=");
+		$this->q->reset()->whereIsNotNull("id_slimpay");
+						 //->where("executionStatus","processed","AND",false,"!=");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
@@ -234,7 +234,7 @@ class facture_lm extends facture {
 
 					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										"rejet"=>"non_preleve",
+										//"rejet"=>"non_preleve",
 										"date_rejet"=>date("Y-m-d")
 									));
 					}
