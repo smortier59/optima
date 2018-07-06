@@ -234,7 +234,7 @@ class facture_lm extends facture {
 
 					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										//"rejet"=>"non_preleve",
+										// "rejet"=>"non_preleve",
 										"date_rejet"=>date("Y-m-d")
 									));
 					}
