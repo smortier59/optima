@@ -443,6 +443,10 @@ class demande_refi extends classes_optima {
 		$this->q->reset()->addCondition("id_affaire",$this->decryptId($id_affaire))
 						 ->addCondition("etat","valide")
 						 ->setCount();
+		if(ATF::$codename == "cleodis"){
+			$this->q->addCondition("id_refinanceur", 17, "AND", false, "!=");
+		}
+
 		$demande_refi=$this->sa();
 		if($demande_refi["count"]>0){
 			return $demande_refi["data"];

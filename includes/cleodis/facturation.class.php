@@ -849,7 +849,7 @@ class facturation extends classes_optima {
 			$demande_refi=ATF::demande_refi()->existDemandeRefi($item["id_affaire"]);
 			$contact = NULL;
 
-			if(!$facture_refi || ($demande_refi[0]["date_cession"] && ($demande_refi[0]["date_cession"]>$date_debut)) || $code_refi=="REFACTURATION" || $item["type"]=="prolongation"){
+			if(!$demande_refi || ($demande_refi[0]["date_cession"] && ($demande_refi[0]["date_cession"]>$date_debut)) || $code_refi=="REFACTURATION" || $item["type"]=="prolongation"){
 
 				$affaire = ATF::affaire()->select($item["id_affaire"]);
 				$societe = ATF::societe()->select($affaire["id_societe"]);
