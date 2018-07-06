@@ -3568,7 +3568,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"",0,'C');
 		$this->setleftMargin(15);
 		$this->setfont('arial','B',8);
-		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON DU CONTRAT D'ABONNEMENT N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
+		$this->multicell(0,5,"PROCES-VERBAL ENLÈVEMENT DU CONTRAT D'ABONNEMENT N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
 		$this->setleftMargin(15);
 
 		$this->ln(5);
