@@ -488,9 +488,11 @@ class parc extends classes_optima {
 		try{
 			ATF::db($this->db)->begin_transaction();
 			// Il faut passer le parc a relouer en etat Relouée et on le passe en inactif
-			$parc = $this->select($data["comboDisplay"]);
+			$parc_provenance = $this->select($data["comboDisplay"]);
+			$parc = $this->select($this->decryptId($data["id"]));
 
-			$this->u(array("id_parc"=>$parc["id_parc"],
+
+			$this->u(array("id_parc"=>$parc_provenance["id_parc"],
 							"etat"=>"reloue",
 							"existence"=>"inactif",
 							"date_inactif"=>date("Y-m-d"))
@@ -507,7 +509,7 @@ class parc extends classes_optima {
 
 			foreach ($lignes as $key => $value) {
 				if(strpos($value["serial"], ATF::parc()->select($this->decryptId($data["id"]), "serial"))){
-					$value["serial"] = str_replace(ATF::parc()->select($this->decryptId($data["id"]), "serial"), $parc["serial"], $value["serial"]);
+					$value["serial"] = str_replace(ATF::parc()->select($this->decryptId($data["id"]), "serial"), $parc_provenance["serial"], $value["serial"]);
 					ATF::commande_ligne()->u(array("id_commande_ligne"=> $value["id_commande_ligne"], "serial"=>$value["serial"]));
 				}
 			}
@@ -515,9 +517,9 @@ class parc extends classes_optima {
 			// On renseigne l'affaire de provenance, provenanceParcReloue, sur le nouveau parc
 			$this->u(array("id_parc"=>$this->decryptId($data["id"]),
 							"etat"=>"loue",
-							"provenance"=>$parc["id_affaire"],
-							"provenanceParcReloue"=>$parc["id_parc"],
-							"serial"=>$parc["serial"]
+							"provenance"=>$parc_provenance["id_affaire"],
+							"provenanceParcReloue"=>$parc_provenance["id_parc"],
+							"serial"=>$parc_provenance["serial"]
 						)
 					);
 
