@@ -205,7 +205,6 @@ class facture_lm extends facture {
 	/**
 	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay");
