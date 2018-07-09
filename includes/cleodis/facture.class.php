@@ -1653,6 +1653,7 @@ class facture_cleodis extends facture {
 							$row_data["I"]="OD000001";
 							$row_data["J"]="";
 							$row_data["I"]="OD000001";
+							$row_data["K"]=$dateDebut;
 							$row_data["L"]=$dateFin;
 							$row_data["M"]=$datePrelevement;
 							$row_data["N"]=$refinancement;
@@ -1667,7 +1668,7 @@ class facture_cleodis extends facture {
 							$row_data["H"]=$libelle;
 							$row_data["I"]="OD000001";
 							$row_data["J"]="";
-							$row_data["I"]="OD000001";
+							$row_data["K"]=$dateDebut;
 							$row_data["L"]=$dateFin;
 							$row_data["M"]=$datePrelevement;
 							$row_data["N"]=$refinancement;
