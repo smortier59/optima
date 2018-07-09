@@ -490,8 +490,6 @@ class parc extends classes_optima {
 			// Il faut passer le parc a relouer en etat Relouée et on le passe en inactif
 			$parc = $this->select($data["comboDisplay"]);
 
-			log::logger($parc , "mfleurquin");
-
 			$this->u(array("id_parc"=>$parc["id_parc"],
 							"etat"=>"reloue",
 							"existence"=>"inactif",
