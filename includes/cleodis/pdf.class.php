@@ -5378,7 +5378,11 @@ class pdf_cleodis extends pdf {
     $this->setfont('arial','',8);
     if($this->facture["prix"]>0){
       if($this->facture['mode_paiement']){
-        if ($this->facture['mode_paiement']=="cheque") {
+      	if ($this->facture['mode_paiement']=="pre-paiement") {
+ 			$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+        } elseif ($this->facture['mode_paiement']=="cb") {
+          	$this->cell(0,5,"Vous avez déja réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+        }elseif ($this->facture['mode_paiement']=="cheque") {
           $this->cell(0,5,"A réception de facture",0,1);
         } elseif ($this->facture['mode_paiement']=="virement") {
           $this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
@@ -5651,10 +5655,12 @@ class pdf_cleodis extends pdf {
 		if($this->facture["prix"]>0){
 			if($this->facture['mode_paiement']){
 				if ($this->facture['mode_paiement']=="pre-paiement") {
-          $this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-        } elseif ($this->facture['mode_paiement']=="cheque") {
-          $this->cell(0,5,"A réception de facture",0,1);
-        } elseif ($this->facture['mode_paiement']=="virement") {
+         			$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+		        } elseif ($this->facture['mode_paiement']=="cb") {
+		          	$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+		        } elseif ($this->facture['mode_paiement']=="cheque") {
+		          	$this->cell(0,5,"A réception de facture",0,1);
+		        } elseif ($this->facture['mode_paiement']=="virement") {
 					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
 				} elseif($this->facture['mode_paiement'] !="mandat") {
 					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
