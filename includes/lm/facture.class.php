@@ -249,7 +249,6 @@ class facture_lm extends facture {
 										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
 										"etat"=>"impayee",
 										"date_paiement"=> NULL
-
 									));
 					}
 				}
