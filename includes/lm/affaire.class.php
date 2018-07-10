@@ -1283,9 +1283,11 @@ class affaire_lm extends affaire {
     * Permet l'export CSV des données OPTEVEN
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     */
-	public function export_opteven($export=true){
+	public function export_opteven($toCSV){
 
-		if($export){
+		log::logger($toCSV , "mfleurquin");
+
+		if($toCSV !== false){
 			// output headers so that the file is downloaded rather than displayed
 			header('Content-type: text/csv');
 			header('Content-Disposition: attachment; filename="demo.csv"');
@@ -1414,7 +1416,7 @@ class affaire_lm extends affaire {
 			fputcsv($file, $row, ';', '"');
 		}
 
-		if($export){
+		if($toCSV !== false){
 			exit();
 		}else{
 			// Place stream pointer at beginning
