@@ -181,6 +181,10 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                 $id_tache = ATF::tache()->insert($tache);
                 log::logger($id_tache , "mfleurquin");
             }
+            $id_affaire = ATF::devis()->select($id_devis, "id_affaire");
+            ATF::affaire()->u(array("id_affaire"=>$id_affaire, "site_associe"=>"location_evolutive","provenance"=>"cleodis"));
+            ATF::affaire()->createTacheAffaireFromSite($id_affaire);
+
         }
 
         return true;
