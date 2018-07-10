@@ -221,8 +221,7 @@ class facture_lm extends facture {
 				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> " , "StatutDebitSlimpay");
 				log::logger($status , "StatutDebitSlimpay");
 
-
-				if($facture["executionStatus"] !== $status["executionStatus"] || $status["executionStatus"] != "processed" ){
+				if($facture["executionStatus"] !== $status["executionStatus"] /*|| $status["executionStatus"] != "processed"*/ ){
 					$this->u(array("id_facture"=>$facture["id_facture"],
 								   "executionStatus"=>$status["executionStatus"]
 								  )
@@ -238,14 +237,18 @@ class facture_lm extends facture {
 					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
 										"rejet"=>"non_preleve",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
+										"etat"=>"impayee",
+										"date_paiement"=> NULL
 									));
 					}
 
 					if($status["executionStatus"] === "contested") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
 										"rejet"=>"contestation_debiteur",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
+										"etat"=>"impayee",
+										"date_paiement"=> NULL
 									));
 					}
 				}
