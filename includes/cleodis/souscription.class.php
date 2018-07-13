@@ -62,6 +62,11 @@ class souscription_cleodis extends souscription {
             "etat_comite"=>"accepte"
         ));
 
+        if($post["site_associe"] === "btwin"){
+          $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
+          ATF::affaire()->store($s, $id_affaire, "noticeAssurance", $noticeAssurance);
+        }
+
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
 
