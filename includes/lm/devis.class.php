@@ -1695,7 +1695,7 @@ class devis_lm extends devis {
 											 ));
 
 			$cp_adresse_livraison = $infos["cp_adresse_livraison"];
-
+			$parent = 	$infos["id_parent"];
 			unset(  $infos["adresse_livraison"],
 					$infos["adresse_facturation"],
 					$infos["adresse_facturation_2"],
@@ -1810,6 +1810,39 @@ class devis_lm extends devis {
 				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "LP"));
 			} else {
 				ATF::affaire()->u(array("id_affaire" => $infos['id_affaire'], "type_affaire" => "SP"));
+			}
+
+			//On crée le parc repris (quantité -)
+			foreach ($infos_ligne as $key => $value) {
+				if($value["quantite"] < 0){
+					for($i=0; $i>$value["quantite"]; $i--){
+						//On recherche le parc associé au produit de l'affaire parente
+						ATF::parc()->q->reset()->where("id_affaire", $parent)
+											   ->where("id_produit", $value["id_produit"])
+											   ->where("existence","actif");
+
+
+						if($parc = ATF::parc()->sa()){
+							log::logger($parc , "mfleurquin");
+							//On passe le parc associé de l'affaire parente en inactif
+							ATF::parc()->u(array("id_parc"=>$parc[0]["id_parc"],
+												 "existence"=> "inactif",
+												 "date_inactif"=>date("Y-m-d")
+												)
+											);
+
+							//On crée le nouveau parc en attente de location sur l'avenant avec une date de reprise pour ne pas toucher l'etat lorsqu'on passe la routine
+							$nouveau_parc = $parc[0];
+							unset($nouveau_parc["id_parc"]);
+							$nouveau_parc["provenance"] = $nouveau_parc["id_affaire"];
+							$nouveau_parc["id_affaire"] = $infos["id_affaire"];
+							$nouveau_parc["date_recuperation"] = date("Y-m-d");
+							$nouveau_parc["etat"] = "attente_location";
+							ATF::parc()->i($nouveau_parc);
+						}
+
+					}
+				}
 			}
 
 			if($preview){

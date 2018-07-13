@@ -103,7 +103,7 @@ class parc extends classes_optima {
 							}
 						}
 					}elseif($commande->get('etat')=="non_loyer"){
-						if($item["existence"]!="inactif"){
+						if($item["existence"]!="inactif" && !$item["date_recuperation"]){
 							ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
 						}
 					}
