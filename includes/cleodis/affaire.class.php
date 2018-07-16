@@ -1709,6 +1709,9 @@ class affaire_cleodis extends affaire {
 		if($get['site_associe'] && $get['site_associe'] === 'toshiba'){
 			$this->q->where("site_associe",'toshiba')
 				->addGroup("affaire.id_affaire");
+		}else if ($get['site_associe'] && $get['site_associe'] === 'btwin'){
+			$this->q->where("site_associe",'btwin')
+				->addGroup("affaire.id_affaire");
 		}else if ($get['site_associe'] && $get['site_associe'] === 'cleodis'){
 			$this->q->whereIsNull("site_associe")
 					->orWhere("site_associe",'')
