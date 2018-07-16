@@ -38,6 +38,7 @@ class facture_cleodis extends facture {
 			,'nature'=>array("disabled"=>true)
 			,"redevance"=>array("disabled"=>true)
 			,"mode_paiement"
+			,"id_fournisseur_prepaiement"
 			,"date"
 			,"date_previsionnelle"
 			,"commentaire"=>array("xtype"=>"textarea")
@@ -123,6 +124,7 @@ class facture_cleodis extends facture {
 
 
 		$this->field_nom="ref";
+		$this->foreign_key["id_fournisseur_prepaiement"] = "societe";
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true);
 		$this->selectAllExtjs=true;
 	}
@@ -712,6 +714,8 @@ class facture_cleodis extends facture {
 		            "nature" => "prorata"
 		        );
 
+
+
 				ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
 				$lignes = ATF::commande_ligne()->select_all();
 
@@ -789,6 +793,7 @@ class facture_cleodis extends facture {
 	            "prix" => round($totalLoyer, 2),
 	            "nature" => "engagement"
 	        );
+			if($affaire["site_associe"] === 'btwin') $facture["id_fournisseur_prepaiement"] = "29109"; //Decathlon BTWIN
 
 
 	        ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
