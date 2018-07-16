@@ -347,7 +347,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
-		$affaire = new affaire_cleodis($bdc['id_affaire']);
+		if(ATF::$codename == "cleodisbe"){
+			$affaire = new affaire_cleodisbe($bdc['id_affaire']);
+		}else{
+			$affaire = new affaire_cleodis($bdc['id_affaire']);
+		}
+
 
 		//On ne doit pas pouvoir modifier une affaire Annulée et remplacée
 		ATF::commande()->checkUpdateAR($affaire);
