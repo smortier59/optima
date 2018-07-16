@@ -1653,7 +1653,8 @@ class facture_cleodis extends facture {
 							$row_data["B"]=" ".$date;
 							$row_data["C"]='OD1';
 							$row_data["D"]="401000";
-							$row_data["E"]="B".substr($societe["code_client"],1);
+							$row_data["E"] = "";
+							if($item["facture.id_fournisseur_prepaiement_fk"]) $row_data["E"] = ATF::societe()->select($item["facture.id_fournisseur_prepaiement_fk"], "code_fournisseur");
 							$row_data["F"]='D';
 							$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
 							$row_data["H"]=$libelle;
