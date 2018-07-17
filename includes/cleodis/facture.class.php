@@ -761,11 +761,12 @@ class facture_cleodis extends facture {
 								->addOrder("id_loyer", "ASC");
 		$loyers = ATF::loyer()->select_all();
 
-		if(strtotime(date("d-m-Y")) < strtotime($infos["date_debut_contrat"])){
+		if(strtotime(date("Y-m-d")) < strtotime($infos["date_debut_contrat"])){
 			$date_previsionnelle = $infos["date_debut_contrat"];
 		}
-		else
-			$date_previsionnelle = date("d-m-Y");
+		else{
+			$date_previsionnelle = date("Y-m-d");
+		}
 
 		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
 											date("m", strtotime($infos["date_debut_contrat"])),
@@ -773,7 +774,9 @@ class facture_cleodis extends facture {
 
 		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
 
-		if($total != 0){
+
+
+		if($totalLoyer != 0){
 			$mode_paiement = "prelevement";
 			if($affaire["site_associe"] === 'toshiba') $mode_paiement = "cb";
 			if($affaire["site_associe"] === 'btwin') $mode_paiement = "pre-paiement";
@@ -784,19 +787,18 @@ class facture_cleodis extends facture {
 	            "type_libre" => "normale",
 	            "mode_paiement" => $mode_paiement,
 	            "id_affaire" => $affaire["id_affaire"],
-	            "date" => date("d-m-Y"),
+	            "date" => date("Y-m-d"),
 	            "id_commande" => $commande["id_commande"],
 	            "date_previsionnelle" => $date_previsionnelle,
-	            "date_periode_debut" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
-	            "date_periode_fin" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
-	            "date_periode_debut_libre" => date("d-m-Y", strtotime($infos["date_debut_contrat"])),
-				"date_periode_fin_libre" => $nbDInMonth."-".date("m-Y", strtotime($infos["date_debut_contrat"])),
+	            "date_periode_debut" => date("Y-m-d", strtotime($infos["date_debut_contrat"])),
+	            "date_periode_fin" => date("Y-m", strtotime($infos["date_debut_contrat"]))."-".$nbDInMonth,
+	            "date_periode_debut_libre" => date("Y-m-d", strtotime($infos["date_debut_contrat"])),
+				"date_periode_fin_libre" => date("Y-m", strtotime($infos["date_debut_contrat"]))."-".$nbDInMonth,
 	            "prix_libre" => round($totalLoyer, 2),
 	            "prix" => round($totalLoyer, 2),
 	            "nature" => "engagement"
 	        );
-			if($affaire["site_associe"] === 'btwin') $facture["id_fournisseur_prepaiement"] = "29109"; //Decathlon BTWIN
-
+			if($affaire["site_associe"] === 'btwin') $facture["facture"]["id_fournisseur_prepaiement"] = "29109"; //Decathlon BTWIN
 
 	        ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["id_commande"]);
 			$lignes = ATF::commande_ligne()->select_all();
