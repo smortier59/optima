@@ -165,6 +165,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->fieldstructure();
 
 		$this->addPrivilege("updateDate");
+		$this->addPrivilege("createAllBDC");
+
 		$this->addPrivilege("export_cegid");
 		$this->addPrivilege("export_servantissimmo");
 
@@ -666,6 +668,88 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
 		return $last_id;
+
+	}
+
+
+
+	public function createAllBDC($infos){
+
+
+		if(!$infos["id_commande"]) return false;
+
+		$cadre_refreshed = NULL;
+
+		$id_commande = ATF::commande()->decryptId($infos["id_commande"]);
+		$commande =  ATF::commande()->select($id_commande);
+		$client = ATF::societe()->select($commande["id_societe"]);
+
+		ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $id_commande);
+		$lignes = ATF::commande_ligne()->sa();
+
+
+		$groupByFournisseur = array();
+		//On regroupe les lignes par fournisseurs
+		foreach ($lignes as $key => $value) {
+			$groupByFournisseur[$value["id_fournisseur"]][] = $value;
+		}
+
+		try{
+			ATF::db($this->db)->begin_transaction();
+
+			foreach ($groupByFournisseur as $key => $value) {
+				$id_fournisseur = $key;
+				$bdc = $bon_de_commande = array();
+
+				$bon_de_commande["id_societe"] = $commande["id_societe"];
+				$bon_de_commande["id_commande"] = $id_commande;
+				$bon_de_commande["id_fournisseur"] = $id_fournisseur;
+				$bon_de_commande["commentaire"] = "";
+				$bon_de_commande["id_affaire"] = $commande["id_affaire"];
+				$bon_de_commande["bon_de_commande"] = ATF::affaire()->select($commande["id_affaire"], "affaire");
+
+				$bon_de_commande["id_contact"] = "";
+
+				$bon_de_commande["destinataire"] = $client["societe"];
+				$bon_de_commande["adresse"] = $client["adresse"];
+				$bon_de_commande["adresse_2"] = $client["adresse_2"];
+				$bon_de_commande["adresse_3"] = $client["adresse_3"];
+				$bon_de_commande["cp"] = $client["cp"];
+				$bon_de_commande["ville"] = $client["ville"];
+				$bon_de_commande["id_pays"] = $client["id_pays"];
+
+
+
+
+				$bon_de_commande["tva"] = 1.2;
+				$bon_de_commande["payee"] = "non";
+				$bon_de_commande["date"] = date("Y-m-d");
+
+				$commandes = "xnode";
+
+				foreach ($value as $kl => $vl) {
+					$commandes .= ",".$vl["id_commande_ligne"];
+					$bon_de_commande["prix"] += $vl["prix_achat"]*$vl["quantite"];
+	 			}
+
+	 			$bdc["bon_de_commande"] = $bon_de_commande;
+	 			$bdc["commandes"] = $commandes;
+
+	 			$bdc["bon_de_commande"]["prix_cleodis"] = $bdc["bon_de_commande"]["prix"];
+
+	 			if($bdc["bon_de_commande"]["prix"] && $bdc["bon_de_commande"]["prix"] > 0){
+	 				$this->insert($bdc, $s, NULL, $cadre_refreshed);
+	 			}
+			}
+
+			ATF::affaire()->redirection("select",$commande["id_affaire"]);
+			ATF::db($this->db)->commit_transaction();
+			return true;
+		}catch(errorATF $e){
+			ATF::db($this->db)->rollback_transaction();
+			throw new ErrorATF($e->getMessage(), 1);
+		}
+
 
 	}
 
