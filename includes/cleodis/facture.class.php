@@ -38,7 +38,7 @@ class facture_cleodis extends facture {
 			,'nature'=>array("disabled"=>true)
 			,"redevance"=>array("disabled"=>true)
 			,"mode_paiement"
-			,"id_fournisseur_prepaiement"=>array("disabled"=>true, "autocomplete"=>array(
+			,"id_fournisseur_prepaiement"=>array("autocomplete"=>array(
    				"function"=>"autocompleteFournisseurs"
      		))
 			,"date"
