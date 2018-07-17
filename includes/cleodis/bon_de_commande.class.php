@@ -672,7 +672,11 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	}
 
 
-
+	/**
+	 * Pouvoir générer tout les BDC d'une affaire d'un coup
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $infos [id_commande]
+	 */
 	public function createAllBDC($infos){
 
 
