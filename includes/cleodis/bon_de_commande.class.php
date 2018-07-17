@@ -1002,6 +1002,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
      */
 	public function export_servantissimmo($infos){
 		if(!$infos["tu"]){ $this->q->reset(); }
+		$force = false;
+		if($infos["force"]){	$force = true; }
 
         $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
 
@@ -1074,8 +1076,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
         if($infos){
 			$row_auto=1;
 			foreach ($infos as $key => $value) {
-				if(!$value["bon_de_commande.export_servantissimmo"]){
 
+				if(!$value["bon_de_commande.export_servantissimmo"] || $force){
 					$data = array();
 
 					$refinancement = NULL;
@@ -1088,6 +1090,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 					}
 
 					if($refinancement && $refinancement === "CLEODIS"){
+
 						ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $value["bon_de_commande.id_affaire_fk"]);
 						$contrat = ATF::commande()->select_row();
 
@@ -1181,9 +1184,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 						foreach($row_data as $col=>$valeur){
 							$sheets['auto']->write($col.$row_auto, $valeur);
 						}
-						$this->u(array("id_bon_de_commande"=>$value["bon_de_commande.id_bon_de_commande_fk"],
-									   "export_servantissimmo"=>date("Y-m-d H:i:s")
+						if(!$value["bon_de_commande.export_servantissimmo"]){
+							$this->u(array("id_bon_de_commande"=>$value["bon_de_commande.id_bon_de_commande_fk"],
+									   	   "export_servantissimmo"=>date("Y-m-d H:i:s")
 									  ));
+						}
+
 					}
 				}
 

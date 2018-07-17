@@ -12,5 +12,11 @@
     window.location='{$current_class->name()},export_servantissimmo.ajax,onglet={$pager}';
   }
 },
+{
+  text: 'Export SERVANTISSIMMO (y compris déja exporté)'
+  , handler: function(b,e){
+    window.location='{$current_class->name()},export_servantissimmo.ajax,onglet={$pager}&force=true';
+  }
+},
 {/if}
 {/strip}
