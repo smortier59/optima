@@ -67,7 +67,8 @@ class produit_lm extends produit {
 			"produit_fournisseur"=>array("custom"=>true),
 			'tva_prix_achat',
 			'element_declencheur',
-			'prevenir_presta_arret'
+			'prevenir_presta_arret',
+			'ref_fournisseur'
 		);
 
 
