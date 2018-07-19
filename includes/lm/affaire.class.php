@@ -1380,7 +1380,11 @@ class affaire_lm extends affaire {
 				//Tout les produits dont le fournisseur est Opteven
 				foreach ($lignes as $kl => $vl) {
 					if($vl["id_fournisseur"] ==  $OPTEVEN["id_societe"]){
-						$data[$i][0] .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+						if($vl["ref_fournisseur"]){
+							$data[$i][0] .= utf8_decode($vl["ref_fournisseur"]);
+						}else{
+							$data[$i][0] .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+						}
 					}
 				}
 
