@@ -534,6 +534,7 @@ class parc extends classes_optima {
 					return true;
 				}catch(errorATF $e){
 					ATF::db($this->db)->rollback_transaction();
+					log::logger($e->getMessage(), "error");
 					throw new errorATF("Une erreur s'est produite",877);
 
 				}
