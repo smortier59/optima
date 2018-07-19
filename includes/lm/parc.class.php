@@ -484,67 +484,65 @@ class parc extends classes_optima {
 						    [comboDisplay] => ID du parc qui est en attente de location, qui sera reloué à la place du parc actuel
 	*/
 	public function relocationParc($data){
+		log::logger($data , "mfleurquin");
+
+		// Il faut passer le parc a relouer en etat Relouée et on le passe en inactif
+		$parc_provenance = $this->select($data["comboDisplay"]);
+		$parc = $this->select($this->decryptId($data["id"]));
+
+		//On remplace le serial sur la ligne de commande
+		ATF::commande()->q->reset()->where("commande.id_affaire", $parc["id_affaire"]);
+		$commande = ATF::commande()->select_row();
+
+		if($commande &&  isset($commande["commande.id_commande"])){
+			try{
+				ATF::db($this->db)->begin_transaction();
+				$this->u(array("id_parc"=>$parc_provenance["id_parc"],
+							"etat"=>"reloue",
+							"existence"=>"inactif",
+							"date_inactif"=>date("Y-m-d"))
+						);
 
 
-			// Il faut passer le parc a relouer en etat Relouée et on le passe en inactif
-			$parc_provenance = $this->select($data["comboDisplay"]);
-			$parc = $this->select($this->decryptId($data["id"]));
-
-						//On remplace le serial sur la ligne de commande
-			ATF::commande()->q->reset()->where("commande.id_affaire", $parc["id_affaire"]);
-			$commande = ATF::commande()->select_row();
-
-			if($commande &&  isset($commande["commande.id_commande"])){
-				try{
-					ATF::db($this->db)->begin_transaction();
-					$this->u(array("id_parc"=>$parc_provenance["id_parc"],
-								"etat"=>"reloue",
-								"existence"=>"inactif",
-								"date_inactif"=>date("Y-m-d"))
-							);
+				ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["commande.id_commande"])
+											 ->where("commande_ligne.id_produit", ATF::parc()->select($this->decryptId($data["id"]), "id_produit"));
+				$lignes = ATF::commande_ligne()->select_all();
 
 
-					ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $commande["commande.id_commande"])
-												 ->where("commande_ligne.id_produit", ATF::parc()->select($this->decryptId($data["id"]), "id_produit"));
-					$lignes = ATF::commande_ligne()->select_all();
-
-
-					foreach ($lignes as $key => $value) {
-						if(strpos($value["serial"], ATF::parc()->select($this->decryptId($data["id"]), "serial"))){
-							$value["serial"] = str_replace(ATF::parc()->select($this->decryptId($data["id"]), "serial"), $parc_provenance["serial"], $value["serial"]);
-							ATF::commande_ligne()->u(array("id_commande_ligne"=> $value["id_commande_ligne"], "serial"=>$value["serial"]));
-						}
+				foreach ($lignes as $key => $value) {
+					if(strpos($value["serial"], ATF::parc()->select($this->decryptId($data["id"]), "serial"))){
+						$value["serial"] = str_replace(ATF::parc()->select($this->decryptId($data["id"]), "serial"), $parc_provenance["serial"], $value["serial"]);
+						ATF::commande_ligne()->u(array("id_commande_ligne"=> $value["id_commande_ligne"], "serial"=>$value["serial"]));
 					}
-
-					// On renseigne l'affaire de provenance, provenanceParcReloue, sur le nouveau parc
-					$this->u(array("id_parc"=>$this->decryptId($data["id"]),
-									"etat"=>"loue",
-									"provenance"=>$parc_provenance["id_affaire"],
-									"provenanceParcReloue"=>$parc_provenance["id_parc"],
-									"serial"=>$parc_provenance["serial"]
-								)
-							);
-
-
-					ATF::$msg->addNotice(
-						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-						,ATF::$usr->trans("notice_success_title")
-					);
-					ATF::db($this->db)->commit_transaction();
-					return true;
-				}catch(errorATF $e){
-					ATF::db($this->db)->rollback_transaction();
-					log::logger($e->getMessage(), "error");
-					throw new errorATF("Une erreur s'est produite",877);
-
 				}
-			}else{
+
+				// On renseigne l'affaire de provenance, provenanceParcReloue, sur le nouveau parc
+				$this->u(array("id_parc"=>$this->decryptId($data["id"]),
+								"etat"=>"loue",
+								"provenance"=>$parc_provenance["id_affaire"],
+								"provenanceParcReloue"=>$parc_provenance["id_parc"],
+								"serial"=>$parc_provenance["serial"]
+							)
+						);
+
+
+				ATF::$msg->addNotice(
+					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+					,ATF::$usr->trans("notice_success_title")
+				);
+				ATF::db($this->db)->commit_transaction();
+				return true;
+			}catch(errorATF $e){
 				ATF::db($this->db)->rollback_transaction();
-				throw new errorATF("Il faut un contrat pour mettre à jour le serial de ce parc !!",877);
-				return false;
+				log::logger($e->getMessage(), "error");
+				throw new errorATF("Une erreur s'est produite",877);
+
 			}
-
-
+		}else{
+			ATF::db($this->db)->rollback_transaction();
+			throw new errorATF("Il faut un contrat pour mettre à jour le serial de ce parc !!",877);
+			return false;
+		}
 		return false;
 	}
 
