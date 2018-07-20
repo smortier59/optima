@@ -59,7 +59,10 @@ class souscription_cleodis extends souscription {
             "id_affaire"=>$id_affaire,
             "site_associe"=>$post['site_associe'],
             "provenance"=>$post['site_associe'],
-            "etat_comite"=>"accepte"
+            "etat_comite"=>"accepte",
+            "IBAN"=>$societe["IBAN"],
+            "RUM"=>$societe["RUM"],
+            "BIC"=>$societe["BIC"]
         ));
 
         if($post["site_associe"] === "btwin"){
