@@ -1168,7 +1168,7 @@ class facturation extends classes_optima {
 		$restitution=ATF::db()->sql2array($query);
 		//log::logger($restitution , "mfleurquin");
 		foreach($restitution as $key => $item){
-
+			$contact = NULL;
 			/*if(strtotime($item["date_evolution"]) > strtotime($date_deb)){
 				//En restitution mais dans la periode du contrat
 				//Facturation normale
