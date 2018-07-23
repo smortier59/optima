@@ -5393,10 +5393,12 @@ class pdf_cleodis extends pdf {
     }else{
       $this->cell(0,5,"Par remboursement ou compensation",0,1);
     }
-    if(ATF::$codename !== "cleodisbe"){
-      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
-    }
+    if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
+		if(ATF::$codename !== "cleodisbe"){
+	      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+	      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
+	    }
+	}
 
     if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
       $cadre = array();
@@ -5668,6 +5670,13 @@ class pdf_cleodis extends pdf {
 			}
 		}else{
 			$this->cell(0,5,"Par remboursement ou compensation",0,1);
+		}
+
+		if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
+			if(ATF::$codename !== "cleodisbe"){
+		      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		    }
 		}
 
 		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
