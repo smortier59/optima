@@ -472,8 +472,11 @@ class parc extends classes_optima {
 
 
 	public function getAllParcAttenteRelocation(){
-		$this->q->reset()->where("parc.etat", "attente_location");
-		return $this->select_all();
+        $this->q->reset()->addField("CONCAT(libelle, ' ( ', serial , ' )')", "text")->addField("parc.id_parc", "id_parc")->where("parc.etat", "attente_location");
+        $return = $this->select_all();
+
+        log::logger($return, "mfleurquin");
+        return $return;
 	}
 
 
