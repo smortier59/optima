@@ -71,95 +71,95 @@ ATF.renderer.parc_existant=function(table,field) {
                                                 idProperty: 'id',
                                                 autoLoad: true,
                                                 fields: [
-                                                                        { name:'value', mapping: 'id_parc' },
-                                                                        { name:'text', mapping: 'text' }
-                                                                ]
+                                                            { name:'value', mapping: 'id_parc' },
+                                                            { name:'text', mapping: 'text' }
+	                                                    ]
 
-                                                        });
+                                        });
 
 
-                                                        var hiddenField = new Ext.form.Hidden({
-                                                            name: 'comboDisplay'
-                                                        });
+                                        var hiddenField = new Ext.form.Hidden({
+                                            name: 'comboDisplay'
+                                        });
 
-                                                        var form = new Ext.FormPanel({
-                                                                        frame:true,
-                                                                        autoHeight:true,
-                                                                        id:'myForm'+id,
-                                                                        name:'myFormName'+id,
-                                                                        title: '',
-                                                                        bodyStyle:'padding:5px 5px 0',
-                                                                        items: [
-                                                                                {
-                                                                                         xtype: "combo"
-                                                                                        ,fieldLabel: "parc en attente de relocation"
-                                                                                        ,name:"parc_existant"
-                                                                                        ,store: parc_existant
-                                                                                        ,displayField: "text"
-                                                                                        ,mode: "local"
-                                                                                        ,anchor: '100%'
+                                        var form = new Ext.FormPanel({
+                                                        frame:true,
+                                                        autoHeight:true,
+                                                        id:'myForm'+id,
+                                                        name:'myFormName'+id,
+                                                        title: '',
+                                                        bodyStyle:'padding:5px 5px 0',
+                                                        items: [
+                                                                {
+                                                                         xtype: "combo"
+                                                                        ,fieldLabel: "parc en attente de relocation"
+                                                                        ,name:"parc_existant"
+                                                                        ,store: parc_existant
+                                                                        ,displayField: "text"
+                                                                        ,mode: "local"
+                                                                        ,anchor: '100%'
 
-                                                                                        ,listeners: {
-                                                                                        select: function(combo, record) {
-                                                                                            hiddenField.setValue(record.data['value']);
-                                                                                        }
-                                                                                    }
-                                                                                },
-                                                                                hiddenField
-                                                                        ],
-                                                                        buttons: [{
-                                                                                 text: 'Ok'
-                                                                                ,handler: function(a,b,c,d){
-                                                                                        Ext.getCmp('myForm'+id).getForm().submit({
-                                                                                                submitEmptyText:false,
-                                                                                                method  : 'post',
-                                                                                                waitMsg : '{ATF::$usr->trans(loading_new_page)|escape:javascript}',
-                                                                                                waitTitle :'{ATF::$usr->trans(loading)|escape:javascript}',
-                                                                                                url     : 'extjs.ajax',
-                                                                                                params: {
-                                                                                                        'extAction':'parc'
-                                                                                                        ,'extMethod':'relocationParc'
-                                                                                                        ,'id':id
-                                                                                                }
-                                                                                                ,success:function(form, action) {
-                                                                                                        ATF.ajax_refresh(action.result,true);
-                                                                                                        Ext.getCmp('myForm'+id).destroy();
-                                                                                                        Ext.getCmp('mywindow'+id).destroy();
-                                                                                                        store.reload();
-                                                                                                }
-                                                                                                ,timeout:3600
-                                                                                        });
+                                                                        ,listeners: {
+                                                                        select: function(combo, record) {
+                                                                            hiddenField.setValue(record.data['value']);
+                                                                        }
+                                                                    }
+                                                                },
+                                                                hiddenField
+                                                        ],
+                                                        buttons: [{
+                                                                 text: 'Ok'
+                                                                ,handler: function(a,b,c,d){
+                                                                        Ext.getCmp('myForm'+id).getForm().submit({
+                                                                                submitEmptyText:false,
+                                                                                method  : 'post',
+                                                                                waitMsg : '{ATF::$usr->trans(loading_new_page)|escape:javascript}',
+                                                                                waitTitle :'{ATF::$usr->trans(loading)|escape:javascript}',
+                                                                                url     : 'extjs.ajax',
+                                                                                params: {
+                                                                                        'extAction':'parc'
+                                                                                        ,'extMethod':'relocationParc'
+                                                                                        ,'id':id
                                                                                 }
-                                                                        },
-                                                                        {
-                                                                                text: 'Annuler',
-                                                                                handler: function(){
+                                                                                ,success:function(form, action) {
+                                                                                        ATF.ajax_refresh(action.result,true);
                                                                                         Ext.getCmp('myForm'+id).destroy();
                                                                                         Ext.getCmp('mywindow'+id).destroy();
+                                                                                        store.reload();
                                                                                 }
-                                                                        }]
-                                                        });
+                                                                                ,timeout:3600
+                                                                        });
+                                                                }
+                                                        },
+                                                        {
+                                                                text: 'Annuler',
+                                                                handler: function(){
+                                                                        Ext.getCmp('myForm'+id).destroy();
+                                                                        Ext.getCmp('mywindow'+id).destroy();
+                                                                }
+                                                        }]
+                                        });
 
 
-                                                        var height = 700;
-                                                        var width = 700;
-                                                        new Ext.Window({
-                                                                title: '{ATF::$usr->trans("Parc provenant du stock : ")}',
-                                                                id:'mywindow'+id,
-                                                                plain:true,
-                                                                bodyStyle:'padding:5px;',
-                                                                buttonAlign:'center'
-                                                        });
-                                                        if (form) {
-                                                                Ext.getCmp('mywindow'+id).add(form);
-                                                                height += 400;
-                                                                width = 800;
-                                                        }
-                                                        if (!Ext.getCmp('mywindow'+id)) {
-                                                        }
-                                                        Ext.getCmp('mywindow'+id).setHeight(height);
-                                                        Ext.getCmp('mywindow'+id).setWidth(width);
-                                                        Ext.getCmp('mywindow'+id).show();
+                                        var height = 700;
+                                        var width = 700;
+                                        new Ext.Window({
+                                                title: '{ATF::$usr->trans("Parc provenant du stock : ")}',
+                                                id:'mywindow'+id,
+                                                plain:true,
+                                                bodyStyle:'padding:5px;',
+                                                buttonAlign:'center'
+                                        });
+                                        if (form) {
+                                                Ext.getCmp('mywindow'+id).add(form);
+                                                height += 400;
+                                                width = 800;
+                                        }
+                                        if (!Ext.getCmp('mywindow'+id)) {
+                                        }
+                                        Ext.getCmp('mywindow'+id).setHeight(height);
+                                        Ext.getCmp('mywindow'+id).setWidth(width);
+                                        Ext.getCmp('mywindow'+id).show();
                                         }
                                 }
                         };
