@@ -831,10 +831,31 @@ class societe_cleodis extends societe {
       $this->q->reset();
     }
 
-
     $this->q->from("societe","id_societe","formation_devis_fournisseur","id_societe")
         ->from("formation_devis_fournisseur","id_formation_devis","formation_devis","id_formation_devis")
         ->where($infos["condition_field"],ATF::formation_devis()->decryptId($infos["condition_value"]))
+        ->addField("societe.id_societe","id_societe")
+        ->addField("societe.societe","nom");
+    if($count){
+      $this->q->setCount();
+      $return = $this->select_all();
+    }else{
+      $return = parent::autocomplete($infos,false);
+    }
+
+    return $return;
+  }
+
+
+  public function autocompleteFournisseurPrePaiement($infos,$reset=true,$count=false){
+    if($reset){
+      $this->q->reset();
+    }
+
+
+    $this->q->from("facture","id_commande","commande","id_commande")
+        ->from("commande","id_commande","commande_ligne","id_commande")
+        ->where("facture.id_commande",ATF::facture()->decryptId($infos["condition_value"]))
         ->addField("societe.id_societe","id_societe")
         ->addField("societe.societe","nom");
     if($count){

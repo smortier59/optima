@@ -22,3 +22,7 @@ CHANGE `type_offre` `type_offre`
 ENUM('multimedia','atol','midas','bv','moa','domino','dafy','gifar','heytens','glastint','osilog-axa','atol-table-vente','atol-impression','atol-digital')
 CHARACTER
 SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+#Fournisseur de pre paiement
+ALTER TABLE `facture` ADD `id_fournisseur_prepaiement` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `mode_paiement`, ADD INDEX (`id_fournisseur_prepaiement`);
+ALTER TABLE `facture` ADD FOREIGN KEY (`id_fournisseur_prepaiement`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;
