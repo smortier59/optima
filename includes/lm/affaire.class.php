@@ -1380,8 +1380,9 @@ class affaire_lm extends affaire {
 				//Tout les produits dont le fournisseur est Opteven
 				foreach ($lignes as $kl => $vl) {
 					if($vl["id_fournisseur"] ==  $OPTEVEN["id_societe"]){
-						if($vl["ref_fournisseur"]){
-							$data[$i][0] .= utf8_decode($vl["ref_fournisseur"]);
+						$ref_four = ATF::produit()->select($vl["id_produit"], "ref_fournisseur");
+						if($ref_four){
+							$data[$i][0] .= utf8_decode($ref_four);
 						}else{
 							$data[$i][0] .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
 						}
@@ -1390,7 +1391,7 @@ class affaire_lm extends affaire {
 
 				$data[$i][1] = ATF::affaire()->select($value['affaires'][0], "ref");
 				$data[$i][2] = $comite["date"];
-				$data[$i][3] = strtoupper($client["ref_client"]);
+				$data[$i][3] = strtoupper($client["ref"]);
 				$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
 				$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
 				$data[$i][6] = $client["civilite"];
@@ -1402,13 +1403,14 @@ class affaire_lm extends affaire {
 
 				//Tout les produits loués des affaires
 				foreach ($lignes as $kl => $vl) {
-					if($data[$i][12]){
-						$data[$i][12] .= "$".$vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
-					}else{
-						$data[$i][12] = $vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+					if(ATF::produit()->select($v["id_produit"], "nature") == "produit"){
+						if($data[$i][12]){
+							$data[$i][12] .= "$".$vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+						}else{
+							$data[$i][12] = $vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+						}
 					}
 				}
-
 
 				$i++;
 			}
