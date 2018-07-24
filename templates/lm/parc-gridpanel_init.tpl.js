@@ -46,50 +46,6 @@ ATF.renderer.parc_recuperation=function(table,field) {
 	}
 };
 
-ATF.renderer.parc_broke=function(table,field) {
-	return function(filetype, meta, record, rowIndex, colIndex, store) {
-
-		if(record.data["parc__dot__existence"] == "actif" && record.data["parc__dot__etat"] !== "broke"){
-			var idDivActionsRecupParc = Ext.id();
-			var id = record.data[table+'__dot__id_'+table];
-
-			var btnretourEnStock = {
-				xtype:'button',
-				id:"parc_broke",
-				buttonText: '',
-				buttonOnly: true,
-				iconCls: 'warning',
-				tooltip: '{ATF::$usr->trans("Passer le matériel en BROKE")}',
-				tooltipType:'title',
-				listeners: {
-					'click': function(fb, v){
-						if(confirm('Etes-vous sur de passer ce parc en broke?')){
-							ATF.ajax('parc,parcToBroke.ajax','id_parc='+id);
-							store.reload();
-						}
-					}
-				}
-			};
-
-			(function(){
-				var params = {
-					renderTo: idDivActionsRecupParc,
-					layout:'fit',
-					items:[btnretourEnStock]
-
-				};
-				var p = new Ext.Container(params);
-			}).defer(25);
-
-			return '<div class="left" id="'+idDivActionsRecupParc+'"></div>';
-		}else{
-			return '<div class="left" id="'+idDivActionsRecupParc+'"><img src="{ATF::$staticserver}images/icones/no_2.png" /></div>';
-
-		}
-	}
-};
-
-
 ATF.renderer.parc_existant=function(table,field) {
         return function(filetype, meta, record, rowIndex, colIndex, store) {
                 var idDiv = Ext.id();
