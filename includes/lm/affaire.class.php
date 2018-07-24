@@ -1403,7 +1403,7 @@ class affaire_lm extends affaire {
 
 				//Tout les produits loués des affaires
 				foreach ($lignes as $kl => $vl) {
-					if(ATF::produit()->select($v["id_produit"], "nature") == "produit"){
+					if(ATF::produit()->select($vl["id_produit"], "nature") == "produit"){
 						if($data[$i][12]){
 							$data[$i][12] .= "$".$vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
 						}else{
