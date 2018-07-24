@@ -48,7 +48,6 @@ class parc extends classes_optima {
 		$this->foreign_key["provenanceParcReloue"] = "parc";
 
 
-
 		$this->addPrivilege("updateDate_garantie");
 		$this->no_delete = true;
 		$this->no_insert = true;
