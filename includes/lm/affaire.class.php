@@ -1325,7 +1325,8 @@ class affaire_lm extends affaire {
 			if($comite){
 
 				ATF::commande()->q->reset()->where("commande.id_affaire", $va["id_affaire"], 'AND')
-										   ->where("commande.date_evolution", date("Y-m-d"), 'AND', false, '>=')
+										   ->where("commande.date_evolution", date("Y-m-d"), 'OR', 'contratPendingEncours', '>=')
+										   ->whereIsNull("commande.date_evolution", 'OR', 'contratPendingEncours')
 										   ->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
 										   ->where("commande.etat", "abandon", 'AND', 'commandeEtat', "!=");
 				$contrat = ATF::commande()->select_row();
