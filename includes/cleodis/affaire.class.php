@@ -2762,6 +2762,10 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
+		$dest = array("21","112", "103");
+
+		if(ATF::$codename === "cleodisbe") $dest = array("21", "104");
+
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>116,
 									   "origine"=>"societe_commande",
@@ -2771,7 +2775,7 @@ class affaire_cleodis extends affaire {
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
 									   "no_redirect"=>"true"
 									  ),
-						"dest"=>array("21","112", "103")
+						"dest"=>$dest
 					  );
 		$id_tache = ATF::tache()->insert($tache);
 	}
