@@ -50,6 +50,7 @@ class hotline_interaction extends classes_optima {
 			,"duree_dep"=>array("disabled"=>true, "min"=>"00:00")
 			,"credit_dep"=>array("listeners"=>array("change"=>"ATF.changeCreditDep"))
 			,"matos"=>array("xtype"=>"switchbutton","default"=>"non")
+			,"teamviewer"=>array("xtype"=>"switchbutton","default"=>"non")
 			,"champ_alerte"=>array("custom"=>true, "xtype"=>"textarea","targetCols"=>1,"hidden"=>true)
 		);
 		$this->panels['duree_credit_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
@@ -356,6 +357,7 @@ class hotline_interaction extends classes_optima {
 			,"id_hotline"=>$infos["id_hotline"]
 			,"visible"=>$infos["visible"]
 			,"nature"=>$infos["nature"]
+			,"teamviewer"=>$infos["teamviewer"]
 			,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 		);
 
