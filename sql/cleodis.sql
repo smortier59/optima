@@ -22,3 +22,8 @@ CHANGE `type_offre` `type_offre`
 ENUM('multimedia','atol','midas','bv','moa','domino','dafy','gifar','heytens','glastint','osilog-axa','atol-table-vente','atol-impression','atol-digital')
 CHARACTER
 SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
+
+-- Pour BTWIN
+ALTER TABLE `produit` CHANGE `loyer` `loyer` FLOAT(6,3) NULL DEFAULT NULL;
+ALTER TABLE `produit` CHANGE `loyer1` `loyer1` FLOAT(6,3) NULL DEFAULT NULL;
+ALTER TABLE `produit` CHANGE `loyer2` `loyer2` FLOAT(6,3) NULL DEFAULT NULL;

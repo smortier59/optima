@@ -11,6 +11,8 @@ class souscription_cleodis extends souscription {
   public $id_agence = 1; // ID De l'agence qui sera attaché aux éléments
   public $fournisseur = 246; // ID Du fournisseur par défaut qui sera attaché aux éléments DEFAULT : cléodis
 
+  public $id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
+
 
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
@@ -57,9 +59,13 @@ class souscription_cleodis extends souscription {
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         ATF::affaire()->u(array(
             "id_affaire"=>$id_affaire,
+            "id_partenaire"=>$this->id_partenaire,
             "site_associe"=>$post['site_associe'],
             "provenance"=>$post['site_associe'],
-            "etat_comite"=>"accepte"
+            "etat_comite"=>"accepte",
+            "IBAN"=>$societe["IBAN"],
+            "RUM"=>$societe["RUM"],
+            "BIC"=>$societe["BIC"]
         ));
 
         if($post["site_associe"] === "btwin"){
@@ -434,5 +440,27 @@ class souscription_cleodis extends souscription {
     return $return;
   }
 
+  /**
+  * Appel Sell & Sign, store les documents signés dans Optima
+  * @author Quentin JANON <qjanon@absystech.fr>
+  * @param array $post["id_affaire"]
+  */
+  public function _storeDocumentsInAffaire($post){
+    $file = $this->filepath("46638", 'retour', null, 'cleodis');
+    log::logger('FILE = '.$file, 'qjanon');
+    // $file = "/home/qjanon/tmp.pdf";
+    log::logger(array_keys($post), 'qjanon');
+    log::logger($post['data'], 'qjanon');
+    log::logger(mb_detect_encoding($post['data']), 'qjanon');
+    try {
+      util::file_put_contents($file,base64_decode($post['data']));
+
+      log::logger('FILE EXIST = '.file_exists($file), 'qjanon');
+    } catch (Exception $e) {
+      $return  = array("error"=>true, "data"=>$e);
+    }
+
+    die();
+  }
 
 }
