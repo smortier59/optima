@@ -825,6 +825,16 @@ class facture_cleodis extends facture {
 	        $id_facture = $this->insert($facture);
 
 	        $this->libreToNormale(array("id_facture"=> $id_facture));
+
+	        //Sur l'echeancier, le montant ne doit pas être Loyer + aussrance + frais de dossier
+	        ATF::facturation()->q->reset()->where("id_facture", $id_facture);
+	        $facturation = ATF::facturation()->select_row();
+	        ATF::facturation()->u(array("id_facturation"=> $facturation["id_facturation"],
+	        							"loyer"=> $loyers[0]["loyer"],
+	        							"assurance"=>  $loyers[0]["assurance"],
+	        							"frais_de_gestion" => loyers[0]["frais_de_gestion"]
+	    						));
+
 	    }
 
 
