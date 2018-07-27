@@ -832,7 +832,7 @@ class facture_cleodis extends facture {
 	        ATF::facturation()->u(array("id_facturation"=> $facturation["id_facturation"],
 	        							"loyer"=> $loyers[0]["loyer"],
 	        							"assurance"=>  $loyers[0]["assurance"],
-	        							"frais_de_gestion" => loyers[0]["frais_de_gestion"]
+	        							"frais_de_gestion" => $loyers[0]["frais_de_gestion"]
 	    						));
 
 	    }
