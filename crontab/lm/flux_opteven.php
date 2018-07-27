@@ -16,7 +16,7 @@ file_put_contents($path.$filename, $export_opteven);
 
 
 //Envoi à OPTEVEN via SFTP
-$cmd = 'lftp -p 222 sftp://leroymerlin2018:KOcSoDLmfKe0vS4ehIFo@46.218.94.135 -e "put -O / '.$path.$filename.'; bye"';
+$cmd = 'lftp -p 222 sftp://leroymerlin2018:KOcSoDLmfKe0vS4ehIFo@46.218.94.135 -e "put -O put/ '.$path.$filename.'; bye"';
 `$cmd`;
 
 //Si on est le 1er du mois, on envoi le fichier par mail également à Benjamin et Estelle
