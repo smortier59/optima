@@ -341,6 +341,13 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += ATF.usr.trans('creerBDC','commande');
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
+
+				html += '<p>';
+				html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'bon_de_commande,createAllBDC.ajax\',\'id_commande='+id+'\');">';
+				html += '<img src="{ATF::$staticserver}images/module/16/bon_de_commande.png" />';
+				html += ATF.usr.trans('creerAllBDC','commande');
+				html += '</a>&nbsp;&nbsp;&nbsp;';
+				html += '</p>';
 			}
 
 			/* Demande refi Expand */
