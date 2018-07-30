@@ -11,8 +11,8 @@ $panier = $_POST["panier"];
 $infos = $_POST["infos"];
 $vente = $_POST["vente"];
 
-if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && $infos["ville"]  &&  $infos["civilite"] && $infos["nom"] && $infos["prenom"] &&  $infos["email"] &&  $infos["tel"]){
-
+if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && $infos["ville"]  &&  $infos["civilite"] && $infos["nom"] && $infos["prenom"] &&  $infos["email"] &&  $infos["mobile"]){
+    log::logger("Ok", "mfleurquin");
     try{
         ATF::societe()->q->reset()->where("siret",$infos['siret']);
         $soc = ATF::societe()->select_row();
@@ -181,6 +181,10 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                 $id_tache = ATF::tache()->insert($tache);
                 log::logger($id_tache , "mfleurquin");
             }
+            $id_affaire = ATF::devis()->select($id_devis, "id_affaire");
+            ATF::affaire()->u(array("id_affaire"=>$id_affaire, "site_associe"=>"location_evolutive","provenance"=>"cleodis"));
+            ATF::affaire()->createTacheAffaireFromSite($id_affaire);
+
         }
 
         return true;
@@ -190,6 +194,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
         return $e->getMessage();
     }
 }else{
+    log::logger("Fuck", "mfleurquin");
     return false;
 }
 

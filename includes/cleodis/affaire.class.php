@@ -2407,6 +2407,8 @@ class affaire_cleodis extends affaire {
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
+			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
+
 			// une fois l'id affaire connue on peut ajouter le devis
 			if ($content_file = file_get_contents($files['devis_file']['tmp_name'])) {
 				$this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file);
@@ -2756,6 +2758,35 @@ class affaire_cleodis extends affaire {
 	}
 
 
+
+
+	/**
+	 * Creer une tache à destination d'Emily, Severine et Alison pour les affaires provenant des portails Hors Optima (Toshiba, Btwin, espace partenaire ...)
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  $id_affaire
+	 */
+	public function createTacheAffaireFromSite($id_affaire){
+		$dest = array("21","112", "103");  //Allison, Severine, Emily
+		$id_user = 116; //Benjamin Tronquit
+
+		if(ATF::$codename === "cleodisbe"){
+			$dest = array("21", "104");  //Allison, Severine
+			$id_user = 113;  //Benjamin Tronquit
+		}
+
+		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
+									   "id_user"=>$id_user,
+									   "origine"=>"societe_commande",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter ",
+									   "id_affaire"=>$id_affaire,
+									   "type_tache"=>"creation_contrat",
+									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+									   "no_redirect"=>"true"
+									  ),
+						"dest"=>$dest
+					  );
+		$id_tache = ATF::tache()->insert($tache);
+	}
 
 
 };
