@@ -2,6 +2,19 @@
 ###	SQL A METTRE SUR LA BDD CLEODIS / CLEODIS BE
 ###
 
+CREATE TABLE `collaborateur`(
+	`id_collaborateur` int(10) unsigned NOT NULL  auto_increment ,
+	`nom` varchar(255) COLLATE utf8_general_ci NOT NULL  ,
+	`prenom` varchar(255) COLLATE utf8_general_ci NOT NULL  ,
+	`email` varchar(255) COLLATE utf8_general_ci NOT NULL  ,
+	`enable` tinyint(1) NOT NULL  ,
+	`id_magasin` mediumint(10) unsigned NOT NULL  ,
+	PRIMARY KEY (`id_collaborateur`) ,
+	KEY `id_magasin`(`id_magasin`) ,
+	CONSTRAINT `collaborateur_ibfk_1`
+	FOREIGN KEY (`id_magasin`) REFERENCES `magasin` (`id_magasin`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET='utf8' COLLATE='utf8_general_ci';
+
 ALTER TABLE `affaire`
 	ADD `date_diag` date   NULL after `id_fille` ,
 	ADD `ref_slimpay` varchar(50)  COLLATE latin1_swedish_ci NULL after `date_recettage_cablage` ,
@@ -35,6 +48,7 @@ ALTER TABLE `affaire`
 	ADD KEY `id_pack_produit`(`id_pack_produit`) ,
 	ADD KEY `pays_facturation`(`pays_facturation`) ,
 	ADD KEY `pays_livraison`(`pays_livraison`);
+
 ALTER TABLE `affaire`
 	ADD CONSTRAINT `affaire_ibfk_5` FOREIGN KEY (`pays_livraison`) REFERENCES `pays` (`id_pays`) ON UPDATE CASCADE ,
 	ADD CONSTRAINT `affaire_ibfk_6` FOREIGN KEY (`pays_facturation`) REFERENCES `pays` (`id_pays`) ON UPDATE CASCADE ,
@@ -72,18 +86,7 @@ CREATE TABLE `cgl_texte`(
 	FOREIGN KEY (`id_cgl_article`) REFERENCES `cgl_article` (`id_cgl_article`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE `collaborateur`(
-	`id_collaborateur` int(10) unsigned NOT NULL  auto_increment ,
-	`nom` varchar(255) COLLATE utf8_general_ci NOT NULL  ,
-	`prenom` varchar(255) COLLATE utf8_general_ci NOT NULL  ,
-	`email` varchar(255) COLLATE utf8_general_ci NOT NULL  ,
-	`enable` tinyint(1) NOT NULL  ,
-	`id_magasin` mediumint(10) unsigned NOT NULL  ,
-	PRIMARY KEY (`id_collaborateur`) ,
-	KEY `id_magasin`(`id_magasin`) ,
-	CONSTRAINT `collaborateur_ibfk_1`
-	FOREIGN KEY (`id_magasin`) REFERENCES `magasin` (`id_magasin`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET='utf8' COLLATE='utf8_general_ci';
+
 
 ALTER TABLE `comite` ADD `destinataire` varchar(500)  COLLATE latin1_swedish_ci NOT NULL DEFAULT 'jerome.loison@cleodis.com,lma@cleodis.com,herve.anvroin@leroymerlin.fr' after `notifie_utilisateur` ;
 
@@ -206,12 +209,9 @@ ALTER TABLE `facture_fournisseur`
 	ADD `num_bap` varchar(15)  COLLATE utf8_general_ci NULL after `id_user` ,
 	ADD `DATE_EXPORT_BAP` date   NULL after `num_bap` ,
 	ADD `DATE_EXPORT_FACT` date   NULL after `DATE_EXPORT_BAP` ,
-	ADD KEY `id_user`(`id_user`) ,
-	DROP FOREIGN KEY `facture_fournisseur_ibfk_1`  ,
-	DROP FOREIGN KEY `facture_fournisseur_ibfk_2`  ,
-	DROP FOREIGN KEY `facture_fournisseur_ibfk_3`  ;
+	ADD KEY `id_user`(`id_user`);
 ALTER TABLE `facture_fournisseur`
-	ADD CONSTRAINT `facture_fournisseur_ibfk_1`
+	ADD CONSTRAINT `facture_fournisseur_ibfk_4`
 	FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`) ON DELETE SET NULL ON UPDATE CASCADE ;
 
 
@@ -227,7 +227,6 @@ ALTER TABLE `facture_fournisseur_ligne`
 
 ALTER TABLE `facture_fournisseur_ligne`
 	CHANGE `prix` `prix` decimal(10,4) unsigned   NULL COMMENT 'Prix HT' after `quantite` ,
-	ADD `prix_ttc` decimal(10,2)   NOT NULL DEFAULT 0.00 COMMENT 'Prix TTC' after `prix` ,
 	CHANGE `id_bon_de_commande_ligne` `id_bon_de_commande_ligne` mediumint(8) unsigned   NULL after `prix_ttc` ,
 	CHANGE `serial` `serial` varchar(300)  COLLATE latin1_swedish_ci NULL after `id_bon_de_commande_ligne`;
 
@@ -236,13 +235,7 @@ ALTER TABLE `facture_fournisseur_ligne`
 ALTER TABLE `facture_non_parvenue`
 	ADD `prix_ht` decimal(12,4)   NOT NULL DEFAULT 0.0000 after `prix` ,
 	CHANGE `tva` `tva` decimal(4,3) unsigned   NOT NULL after `prix_ht` ;
-ALTER TABLE `facture_non_parvenue`
-	ADD CONSTRAINT `facture_non_parvenue_ibfk_1`
-	FOREIGN KEY (`id_affaire`) REFERENCES `affaire` (`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE ,
-	ADD CONSTRAINT `facture_non_parvenue_ibfk_2`
-	FOREIGN KEY (`id_bon_de_commande`) REFERENCES `bon_de_commande` (`id_bon_de_commande`) ON DELETE CASCADE ON UPDATE CASCADE ,
-	ADD CONSTRAINT `facture_non_parvenue_ibfk_3`
-	FOREIGN KEY (`id_facture_fournisseur`) REFERENCES `facture_fournisseur` (`id_facture_fournisseur`) ON DELETE CASCADE ON UPDATE CASCADE ;
+
 
 ALTER TABLE `loyer`
 	CHANGE `loyer` `loyer` decimal(10,4)   NOT NULL after `id_affaire` ,
@@ -256,17 +249,17 @@ ALTER TABLE `loyer`
 	DROP COLUMN `maintenance` ,
 	DROP COLUMN `serenite` ,
 	DROP COLUMN `supervision` ,
-	DROP COLUMN `support` ,
-	DROP FOREIGN KEY `loyer_ibfk_1`  ;
+	DROP COLUMN `support`;
+
 ALTER TABLE `loyer_prolongation`
 	CHANGE `frequence_loyer` `frequence_loyer` enum('mois','trimestre','semestre','an')  COLLATE utf8_general_ci NOT NULL DEFAULT 'mois' after `frais_de_gestion` ,
 	DROP COLUMN `hotline` ,
 	DROP COLUMN `serenite` ,
 	DROP COLUMN `maintenance` ,
 	DROP COLUMN `supervision` ,
-	DROP COLUMN `support` ,
-	DROP FOREIGN KEY `loyer_prolongation_ibfk_1`  ,
-	DROP FOREIGN KEY `loyer_prolongation_ibfk_2`  ;
+	DROP COLUMN `support` ;
+
+
 ALTER TABLE `magasin`
 	ADD `entite_lm` varchar(10)  COLLATE utf8_general_ci NULL after `site_associe` ,
 	ADD `langue` varchar(2)  COLLATE utf8_general_ci NULL DEFAULT 'FR' after `entite_lm` ,
@@ -274,6 +267,7 @@ ALTER TABLE `magasin`
 	ADD `afficher` enum('oui','non')  COLLATE utf8_general_ci NOT NULL DEFAULT 'oui' after `num_magasin_lm` ,
 	ADD `email` varchar(256)  COLLATE utf8_general_ci NULL after `afficher` ,
 	ADD `password` varchar(255)  COLLATE utf8_general_ci NOT NULL after `email` ;
+
 ALTER TABLE `pack_produit`
 	CHANGE `id_pack_produit` `id_pack_produit` smallint(5) unsigned   NOT NULL auto_increment first ,
 	ADD `libelle` varchar(500)  COLLATE utf8_general_ci NULL after `frequence` ,
@@ -305,14 +299,10 @@ ALTER TABLE `pack_produit`
 	ADD UNIQUE KEY `pack_alarme`(`pack_alarme`);
 
 ALTER TABLE `pack_produit`
-	ADD CONSTRAINT `pack_produit_ibfk_2`
-	FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE SET NULL ON UPDATE CASCADE ,
-	ADD CONSTRAINT `pack_produit_ibfk_3`
-	FOREIGN KEY (`id_rayon`) REFERENCES `rayon` (`id_rayon`) ON DELETE SET NULL ON UPDATE CASCADE ,
-	ADD CONSTRAINT `pack_produit_ibfk_4`
-	FOREIGN KEY (`id_courrier_information_pack`) REFERENCES `courrier_information_pack` (`id_courrier_information_pack`) ON DELETE SET NULL ON UPDATE CASCADE ;
+	ADD CONSTRAINT `pack_produit_ibfk_doc_contrat` FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE SET NULL ON UPDATE CASCADE ,
+	ADD CONSTRAINT `pack_produit_ibfk_rayon` FOREIGN KEY (`id_rayon`) REFERENCES `rayon` (`id_rayon`) ON DELETE SET NULL ON UPDATE CASCADE ,
+	ADD CONSTRAINT `pack_produit_ibfk_courrier` FOREIGN KEY (`id_courrier_information_pack`) REFERENCES `courrier_information_pack` (`id_courrier_information_pack`) ON DELETE SET NULL ON UPDATE CASCADE ;
 
-/* Alter table in target */
 ALTER TABLE `parc`
 	CHANGE `serial` `serial` varchar(64)  COLLATE latin1_swedish_ci NULL after `divers` ,
 	CHANGE `etat` `etat` enum('broke','loue','reloue','vole','vendu','attente_location')  COLLATE latin1_swedish_ci NOT NULL after `serial` ,
@@ -321,13 +311,11 @@ ALTER TABLE `parc`
 	ADD `date_recuperation` date   NULL after `existence` ,
 	ADD KEY `provenanceParcReloue`(`provenanceParcReloue`);
 ALTER TABLE `parc`
-	ADD CONSTRAINT `parc_ibfk_1`
-	FOREIGN KEY (`provenanceParcReloue`) REFERENCES `parc` (`id_parc`) ON DELETE SET NULL ON UPDATE CASCADE ,
-	ADD CONSTRAINT `parc_ibfk_2`
-	FOREIGN KEY (`provenance`) REFERENCES `affaire` (`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE ;
+	ADD CONSTRAINT `parc_ibfk_parc` FOREIGN KEY (`provenanceParcReloue`) REFERENCES `parc` (`id_parc`) ON DELETE SET NULL ON UPDATE CASCADE ,
+	ADD CONSTRAINT `parc_ibfk_provenance` FOREIGN KEY (`provenance`) REFERENCES `affaire` (`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE ;
 
 
-/* Alter table in target */
+
 ALTER TABLE `produit`
 	ADD `url_produit` varchar(255)  COLLATE latin1_swedish_ci NULL after `prix_achat` ,
 	CHANGE `id_fabriquant` `id_fabriquant` mediumint(8) unsigned   NULL after `url_produit` ,
@@ -362,13 +350,12 @@ ALTER TABLE `produit`
 	ADD KEY `id_compte_produit`(`id_compte_produit`) ,
 	ADD KEY `id_pack_produit`(`id_pack_produit`) ,
 	ADD KEY `id_produit_principal`(`id_produit_principal`);
+
 ALTER TABLE `produit`
-	ADD CONSTRAINT `produit_ibfk_1`
+	ADD CONSTRAINT `produit_ibfk_pack`
 	FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit` (`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE ,
-	ADD CONSTRAINT `produit_ibfk_2`
-	FOREIGN KEY (`id_compte_produit`) REFERENCES `compte_produit` (`id_compte_produit`) ON DELETE SET NULL ON UPDATE CASCADE ,
-	ADD CONSTRAINT `produit_ibfk_3`
-	FOREIGN KEY (`id_produit_principal`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE ;
+	ADD CONSTRAINT `produit_ibfk_compte`
+	FOREIGN KEY (`id_compte_produit`) REFERENCES `compte_produit` (`id_compte_produit`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 CREATE TABLE `produit_fournisseur`(
 	`id_produit_fournisseur` mediumint(8) unsigned NOT NULL  auto_increment ,
@@ -487,3 +474,26 @@ CREATE TABLE `token`(
 ) ENGINE=InnoDB DEFAULT CHARSET='utf8mb4' COLLATE='utf8mb4_general_ci';
 
 
+CREATE TABLE `facturation_fournisseur_detail`(
+	`id_facturation_fournisseur_detail` bigint(20) unsigned NOT NULL  auto_increment ,
+	`id_facturation_fournisseur` int(10) unsigned NOT NULL  ,
+	`id_produit_fournisseur_loyer` mediumint(8) unsigned NOT NULL  ,
+	`quantite` tinyint(3) unsigned NOT NULL  DEFAULT 1 ,
+	PRIMARY KEY (`id_facturation_fournisseur_detail`) ,
+	KEY `fact four`(`id_facturation_fournisseur`) ,
+	KEY `loyer`(`id_produit_fournisseur_loyer`) ,
+	CONSTRAINT `id_facturation_fournisseur`
+	FOREIGN KEY (`id_facturation_fournisseur`) REFERENCES `facturation_fournisseur` (`id_facturation_fournisseur`) ON DELETE CASCADE ON UPDATE CASCADE ,
+	CONSTRAINT `loyer`
+	FOREIGN KEY (`id_produit_fournisseur_loyer`) REFERENCES `produit_fournisseur_loyer` (`id_produit_fournisseur_loyer`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET='utf8mb4' COLLATE='utf8mb4_general_ci';
+
+
+/* Alter table in target */
+ALTER TABLE `facture`
+	CHANGE `type_libre` `type_libre` enum('normale','retard','contentieux','prorata','liberatoire')  COLLATE utf8_general_ci NULL after `type_facture` ,
+	CHANGE `nature` `nature` enum('promo','majoration','prolongation_probable','prorata','engagement','prolongation','contrat')  COLLATE utf8_general_ci NULL after `date_regularisation` ,
+	ADD COLUMN `id_slimpay` varchar(38)  COLLATE utf8_general_ci NULL after `nature` ,
+	ADD COLUMN `executionStatus` enum('processing','rejected','processed','notprocessed','transformed','contested','toreplay','togenerate','toprocess')  COLLATE utf8_general_ci NULL after `id_slimpay` ,
+	ADD COLUMN `executionDate` datetime   NULL after `executionStatus` ,
+	ADD COLUMN `DATE_EXPORT_VTE` date   NULL after `executionDate` ;
