@@ -12,16 +12,22 @@ class produit_fournisseur_loyer extends classes_optima {
 			 'produit_fournisseur_loyer.id_fournisseur'
 			,'produit_fournisseur_loyer.id_produit'
 			,'produit_fournisseur_loyer.loyer'
-			,'produit_fournisseur_loyer.frequence_loyer'
-			
+			,'produit_fournisseur_loyer.nb_loyer'
+			,'produit_fournisseur_loyer.periodicite'
+			,'produit_fournisseur_loyer.nature'
+			,'produit_fournisseur_loyer.departement'
+			,'produit_fournisseur_loyer.ordre'
 		);
 
 		$this->colonnes['primary'] = array(
 			 "id_fournisseur"=>array("custom"=>true,"autocomplete"=>array("function"=>"autocompleteFournisseurs"))
 			,'id_produit'
-			,'loyer'	
-			,'frequence_loyer'	
-			
+			,'loyer'
+			,'nb_loyer'
+			,'periodicite'
+			,'nature'
+			,'departement'
+			,'ordre'
 		);
 		
 		$this->colonnes['bloquees']['insert'] =  array('id_produit');
@@ -29,7 +35,11 @@ class produit_fournisseur_loyer extends classes_optima {
 			 'produit_fournisseur_loyer.id_fournisseur'
 			,'produit_fournisseur_loyer.id_produit'
 			,'produit_fournisseur_loyer.loyer'
-			,'produit_fournisseur_loyer.frequence_loyer'			
+			,'produit_fournisseur_loyer.nb_loyer'
+			,'produit_fournisseur_loyer.periodicite'
+			,'produit_fournisseur_loyer.nature'
+			,'produit_fournisseur_loyer.departement'
+			,'produit_fournisseur_loyer.ordre'
 		);
 
 		$this->field_nom = "%id_produit% %id_fournisseur%";

@@ -11,6 +11,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 		$this->colonnes['fields_column'] = array(
 			"bon_de_commande.ref"
+			,"bon_de_commande.num_bdc"=>array("rowEditor"=>"setInfos")
 			,"bon_de_commande.id_fournisseur"
 			,"bon_de_commande.bon_de_commande"
 			,"bon_de_commande.etat"=>array("renderer"=>"etat","width"=>30)
@@ -182,6 +183,24 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->files["pdf"] = array("type"=>"pdf","no_upload"=>true,"no_generate"=>true);
 		$this->can_insert_from = array("commande");
 		$this->selectAllExtjs=true;
+	}
+
+
+	/**
+	 * Permet de modifier un champs en AJAX
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @return bool
+	 */
+	public function setInfos($infos){
+		$res = $this->u(array("id_bon_de_commande"=> $this->decryptId($infos["id_bon_de_commande"]),
+						  $infos["field"] => $infos[$infos["field"]])
+					);
+		if($res){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success"))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
 	}
 
 	public function uploadFileFromSA(&$infos,&$s,$files=NULL,&$cadre_refreshed=NULL){

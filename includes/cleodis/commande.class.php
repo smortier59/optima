@@ -145,6 +145,35 @@ class commande_cleodis extends commande {
 
 
 	/**
+    * Passe une commande en abandonnée
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function abandonCommande($infos, $no_redirect = false){
+		$commande = new commande_lm($infos['id_commande']);
+
+		if ($commande) {
+			$commande->set('etat','abandon');
+			$comm = ATF::commande()->select($infos['id_commande']);
+			$affaire = $commande->getAffaire();
+
+			ATF::affaire()->u(array("id_affaire"=>$affaire->get("id_affaire"), "etat"=>"abandon"));
+
+			$notifie[] = ATF::$usr->getID();
+
+
+			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
+							,"id_societe"=>$comm['id_societe']
+							,"type_suivi"=>'Contrat'
+							,"texte"=>"Le contrat ".$affaire->get("ref")." est passé en abandonné"
+						);
+			ATF::suivi()->insert($suivi);
+			if(!$no_redirect) ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
+		}
+	}
+
+	/**
 	 * [_contratPartenaire retourne les contrats du contact loggué]
 	 * @param  [type] $get  [description]
 	 * @param  [type] $post [description]
