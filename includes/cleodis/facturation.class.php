@@ -989,7 +989,12 @@ class facturation extends classes_optima {
 
 		$prolongation=ATF::db()->sql2array($query);
 		foreach ($prolongation as $key=>$item) {
-			$objAffaire = new affaire_cleodis($item['id_affaire']);
+			if(ATF::$codename== "cleodisbe"){
+				$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+			}else{
+				$objAffaire = new affaire_cleodis($item['id_affaire']);
+			}
+
 			$objCommande = $objAffaire->getCommande();
 
 			try {
@@ -1274,7 +1279,11 @@ class facturation extends classes_optima {
 				//Si il n'y a pas de facture
 				if(!$facturePresente){
 					//En restitution et fin de contrat dépassée
-					$objAffaire = new affaire_cleodis($item['id_affaire']);
+					if(ATF::$codename== "cleodisbe"){
+						$objAffaire = new affaire_cleodisbe($item['id_affaire']);
+					}else{
+						$objAffaire = new affaire_cleodis($item['id_affaire']);
+					}
 					$objCommande = $objAffaire->getCommande();
 
 					$affaire = ATF::affaire()->select($item["id_affaire"]);
