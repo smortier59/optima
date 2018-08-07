@@ -167,10 +167,13 @@ class facturation_fournisseur extends classes_optima {
 			ATF::produit_fournisseur_loyer()->q->reset()
 				->where('produit_fournisseur_loyer.id_fournisseur',$ligne_commande['id_fournisseur'])
 				->where('produit_fournisseur_loyer.id_produit',$ligne_commande['id_produit'])
-					->andWhere('produit_fournisseur_loyer.departement','(^|,)'.$departement.'($|,)','dep','REGEXP')
 					->whereIsNull('produit_fournisseur_loyer.departement','OR','dep')
 				//->where("produit_fournisseur_loyer.nature","engagement")
 				->addOrder('ordre','asc');
+			if($departement) ATF::produit_fournisseur_loyer()->andWhere('produit_fournisseur_loyer.departement','(^|,)'.$departement.'($|,)','dep','REGEXP');
+
+
+
 			if ($fournisseur_loyer = ATF::produit_fournisseur_loyer()->sa()) {
 				// Boucle de calcul de chaque échéances (cumul de chaque loyers pour une meme date)
 				// Pour chaque occurence de la durée

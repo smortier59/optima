@@ -497,3 +497,14 @@ ALTER TABLE `facture`
 	ADD COLUMN `executionStatus` enum('processing','rejected','processed','notprocessed','transformed','contested','toreplay','togenerate','toprocess')  COLLATE utf8_general_ci NULL after `id_slimpay` ,
 	ADD COLUMN `executionDate` datetime   NULL after `executionStatus` ,
 	ADD COLUMN `DATE_EXPORT_VTE` date   NULL after `executionDate` ;
+
+
+ALTER TABLE `affaire`
+    CHANGE `adresse_livraison` `adresse_livraison` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+    CHANGE `cp_adresse_livraison` `cp_adresse_livraison` VARCHAR(5) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+    CHANGE `ville_adresse_livraison` `ville_adresse_livraison` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+    CHANGE `adresse_facturation` `adresse_facturation` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+    CHANGE `cp_adresse_facturation` `cp_adresse_facturation` VARCHAR(5) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,
+    CHANGE `ville_adresse_facturation` `ville_adresse_facturation` VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+

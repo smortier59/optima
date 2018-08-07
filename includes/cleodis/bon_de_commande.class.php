@@ -167,6 +167,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 		$this->addPrivilege("updateDate");
 		$this->addPrivilege("createAllBDC");
+		$this->addPrivilege("setInfos","update");
 
 		$this->addPrivilege("export_cegid");
 		$this->addPrivilege("export_servantissimmo");
