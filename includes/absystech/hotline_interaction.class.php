@@ -1973,6 +1973,7 @@ class hotline_interaction extends classes_optima {
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/
 	public function _POST($get,$post) {
+		log::logger($post , "mfleurquin");
 
 		$return = array();
 
@@ -2015,6 +2016,9 @@ class hotline_interaction extends classes_optima {
 
 			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
 			else $post['send_mail'] = "non";
+
+			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
+			else $post['teamviewer'] = "non";
 
 			// Calcul du nombre de crédit
 			if (!$post['credit_presta']) {
@@ -2097,6 +2101,7 @@ class hotline_interaction extends classes_optima {
 				,"visible"=>$infos["visible"]
 				,"recipient"=> $res
 				,"nature"=>"internal"
+				,"teamviewer"=>$infos["teamviewer"]
 			);
 			log::logger($data,"hotline");
 			return parent::insert($data,$s,$files);
@@ -2265,6 +2270,7 @@ class hotline_interaction extends classes_optima {
 				,"nature"=>$infos["nature"]
 				,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 				,'recipient'=>$res
+				,"teamviewer"=>$infos["teamviewer"]
 			);
 
 
@@ -2530,6 +2536,9 @@ class hotline_interaction extends classes_optima {
 
 			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
 			else $post['send_mail'] = "non";
+
+			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
+			else $post['teamviewer'] = "non";
 
 			// Calcul du nombre de crédit
 			if (!$post['credit_presta']) {
