@@ -444,7 +444,7 @@ class demande_refi extends classes_optima {
 						 ->addCondition("etat","valide")
 						 ->setCount();
 		if(ATF::$codename == "cleodis"){
-			$this->q->addCondition("id_refinanceur", 17, "AND", false, "!=");
+			$this->q->addCondition("demande_refi.id_refinanceur", 17, "AND", false, "!=");
 		}
 
 
