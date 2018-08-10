@@ -447,9 +447,8 @@ class demande_refi extends classes_optima {
 			$this->q->addCondition("id_refinanceur", 17, "AND", false, "!=");
 		}
 
-		if(ATF::$codename == "cleodisbe"){
-			$this->q->from("demande_refi", "id_refinanceur", "refinanceur","id_refinanceur")->addCondition("refinanceur.code_refi", "REFACTURATION", "AND", false, "!=");
-		}
+
+		$this->q->from("demande_refi", "id_refinanceur", "refinanceur","id_refinanceur")->addCondition("refinanceur.code_refi", "REFACTURATION", "AND", false, "!=");
 
 		$demande_refi=$this->sa();
 		if($demande_refi["count"]>0){
