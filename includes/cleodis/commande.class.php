@@ -1377,7 +1377,7 @@ class commande_cleodis extends commande {
 				$return['data'][$k]['bdcExist'] = false;
 			}
 			//Check l'existence de création de demande refi
-			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"]) || $affaire['nature']=="vente") {
+			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false) || $affaire['nature']=="vente") {
 				$return['data'][$k]['demandeRefiExist'] = true;
 			} else {
 				$return['data'][$k]['demandeRefiExist'] = false;
