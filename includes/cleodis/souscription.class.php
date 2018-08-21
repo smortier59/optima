@@ -57,16 +57,19 @@ class souscription_cleodis extends souscription {
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
-        ATF::affaire()->u(array(
+        $aff = array(
             "id_affaire"=>$id_affaire,
             "id_partenaire"=>$this->id_partenaire,
             "site_associe"=>$post['site_associe'],
             "provenance"=>$post['site_associe'],
             "etat_comite"=>"accepte",
             "IBAN"=>$societe["IBAN"],
-            "RUM"=>$societe["RUM"],
             "BIC"=>$societe["BIC"]
-        ));
+        );
+
+        //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
+        if($societe["RUM"]) $aff["RUM"]=$societe["RUM"];
+        ATF::affaire()->u($aff);
 
         if($post["site_associe"] === "btwin"){
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
@@ -461,10 +464,10 @@ class souscription_cleodis extends souscription {
         ATF::commande()->q->reset()->addfield("id_commande")->where('commande.id_affaire', $post["id_affaire"]);
         $id = ATF::commande()->select_cell();
         $type = 'retourPV';
-      break; 
+      break;
       case 'notice_assurance': // Notice d'assurance
       case 'notice_assurance.pdf': // Notice d'assurance
-        $module = "affaire"; 
+        $module = "affaire";
         $id = $post['id_affaire'];
         $type = 'retourNoticeAssurance';
       break;
