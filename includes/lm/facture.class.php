@@ -347,6 +347,7 @@ class facture_lm extends facture {
 			$mode_paiement = "prelevement";
 		}
 
+
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],
             "type_facture" => "libre",
