@@ -9,6 +9,7 @@ ATF::_s("user",ATF::$usr);
 
 $panier = $_POST["panier"];
 $infos = $_POST["infos"];
+$vente = $_POST["vente"];
 
 if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && $infos["ville"]  &&  $infos["civilite"] && $infos["nom"] && $infos["prenom"] &&  $infos["email"] &&  $infos["tel"]){
 
@@ -160,8 +161,26 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
             $data = array("devis"=>$devis, "values_devis"=>$values_devis);
 
 
-            ATF::devis()->insert($data);
+            $id_devis = ATF::devis()->insert($data);
 
+
+            if($vente){
+
+                $tache['tache'] = array(
+                    "tache" => 'Demande de devis de vente par le client',
+                    "id_societe" => $id_societe,
+                    "type_tache" => 'creation_contrat',
+                    "horaire_fin" => date("Y-m-d H:i:s", strtotime("+7 jours")),
+                    "etat" => 'en_cours',
+                    "type" => 'vtodo',
+                    "id_affaire" => ATF::devis()->select($id_devis, "id_affaire")
+                );
+                $tache["no_redirect"] = true;
+                $tache["dest"]=  array(112);
+
+                $id_tache = ATF::tache()->insert($tache);
+                log::logger($id_tache , "mfleurquin");
+            }
         }
 
         return true;

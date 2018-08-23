@@ -271,8 +271,7 @@ class pdf_lm extends pdf_cleodis {
 					case 'an' : $data[$key][1] = "Annuel"; break;
 				}
 				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
-				$data[$key][3] = $value["loyer"]." €";
-				//$style[$key][1] = $this->leftStyle;
+				$data[$key][3] = number_format(round($value["loyer"],2),2,"."," ")." €";
 			}
 
 		}
@@ -311,7 +310,7 @@ class pdf_lm extends pdf_cleodis {
 					case 'an' : $data[$key][1] = "Annuel"; break;
 				}
 				$data[$key][2] = number_format(round(($value["loyer"]/__TVA__),2),2,"."," ")." €";
-				$data[$key][3] = $value["loyer"]." €";
+				$data[$key][3] = number_format(round($value["loyer"],2),2,"."," ")." €";
 				//$style[$key][1] = $this->leftStyle;
 			}
 
@@ -707,10 +706,10 @@ class pdf_lm extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$cadre2[] = "          ".strtoupper($client["civilite"]." ".$client["prenom"]." ".$client["nom"]);
-		$cadre2[] = "          ".$client["adresse"];
-		if($client["adresse_2"]) $cadre2[] = "          ".$client["adresse_2"];
-		if($client["adresse_3"]) $cadre2[] = "          ".$client["adresse_3"];
-		$cadre2[] = "          ".$client["cp"]." ".$client["ville"];
+		$cadre2[] = "          ".html_entity_decode($client["adresse"], ENT_QUOTES);
+		if($client["adresse_2"]) $cadre2[] = "          ".html_entity_decode($client["adresse_2"], ENT_QUOTES);
+		if($client["adresse_3"]) $cadre2[] = "          ".html_entity_decode($client["adresse_3"], ENT_QUOTES);
+		$cadre2[] = "          ".$client["cp"]." ".html_entity_decode($client["ville"], ENT_QUOTES);
 
 		$this->cadre(110,$y,90,30,$cadre2,false,0);
 

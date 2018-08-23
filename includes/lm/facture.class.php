@@ -205,11 +205,10 @@ class facture_lm extends facture {
 	/**
 	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*
 	*/
 	public function statusDebitEnCours(){
-		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						 ->where("executionStatus","processed","AND",false,"!=");
+		$this->q->reset()->whereIsNotNull("id_slimpay");
+						 //->where("executionStatus","processed","AND",false,"!=");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
@@ -220,11 +219,12 @@ class facture_lm extends facture {
 				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> " , "StatutDebitSlimpay");
 				log::logger($status , "StatutDebitSlimpay");
 
-				if($facture["executionStatus"] !== $status["executionStatus"] || $status["executionStatus"] != "processed" ){
+				if($facture["executionStatus"] !== $status["executionStatus"] /*|| $status["executionStatus"] != "processed"*/ ){
 					$this->u(array("id_facture"=>$facture["id_facture"],
 								   "executionStatus"=>$status["executionStatus"]
 								  )
 							);
+
 					if($status["executionStatus"] === "processed") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
 										"etat"=> "payee",
@@ -234,18 +234,21 @@ class facture_lm extends facture {
 
 					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										"rejet"=>"non_preleve",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+										// "rejet"=>"non_preleve",
+										"date_rejet"=>date("Y-m-d")
 									));
 					}
 
 					if($status["executionStatus"] === "contested") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
 										"rejet"=>"contestation_debiteur",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"]))
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
+										"etat"=>"impayee",
+										"date_paiement"=> NULL
 									));
 					}
 				}
+
 			}
 
 		}
@@ -949,30 +952,37 @@ class facture_lm extends facture {
 			}
 			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));
 
-			if ($infos['value'] == "undefined") $infos["value"] = "";
-			$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
-			$infosMaj["id_".$this->table]=$infos["id_".$this->table];
-			$infosMaj[$infos["key"]]=$infos["value"];
+			if(!isset($infos['no_update'])){
+				if ($infos['value'] == "undefined") $infos["value"] = "";
+				$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
+				$infosMaj["id_".$this->table]=$infos["id_".$this->table];
+				$infosMaj[$infos["key"]]=$infos["value"];
 
-			if($this->u($infosMaj)){
-				ATF::$msg->addNotice(
-					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-					,ATF::$usr->trans("notice_success_title")
-				);
+				if($this->u($infosMaj)){
+					ATF::$msg->addNotice(
+						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+						,ATF::$usr->trans("notice_success_title")
+					);
+				}
+				ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			}
-			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
+
 			return true;
 		}else{
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
 	}
 
-	public function contientFactureRejetee($id_commande, $FactureEnCours){
-		$idFactEnCours = $this->decryptId($FactureEnCours);
+	public function contientFactureRejetee($id_commande, $FactureEnCours=NULL){
+		if($FactureEnCours) $idFactEnCours = $this->decryptId($FactureEnCours);
 		$this->q->reset()->where("facture.id_commande", $id_commande)->addField("facture.rejet")->addField("facture.date_regularisation");
 		$res = $this->select_all();
 		foreach($res as $k=>$v){
-			if($idFactEnCours !== $v["facture.id_facture"] ){
+			if(isset($idFactEnCours) && ($idFactEnCours !== $v["facture.id_facture"])){
+				if(($v["facture.rejet"] != "non_rejet") && ($v["facture.rejet"] != "non_preleve_mandat") && (!$v["facture.date_regularisation"])){
+					return 1;
+				}
+			}else{
 				if(($v["facture.rejet"] != "non_rejet") && ($v["facture.rejet"] != "non_preleve_mandat") && (!$v["facture.date_regularisation"])){
 					return 1;
 				}
