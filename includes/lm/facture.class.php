@@ -339,11 +339,16 @@ class facture_lm extends facture {
 										date("m", strtotime($infos["date_debut_contrat"])),
 										date("Y", strtotime($infos["date_debut_contrat"])));
 
+		$mode_paiement = "cb";
+		if($affaire["nature"] == "avenant"){
+			$mode_paiement = "prelevement";
+		}
+
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],
             "type_facture" => "libre",
             "type_libre" => "normale",
-            "mode_paiement" => "cb",
+            "mode_paiement" => $mode_paiement,
             "id_affaire" => $affaire["id_affaire"],
             "date" => date("d-m-Y"),
             "id_commande" => $commande["id_commande"],
