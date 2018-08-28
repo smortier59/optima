@@ -1391,12 +1391,12 @@ class affaire_lm extends affaire {
 				}
 
 				$data[$i][1] = ATF::affaire()->select($value['affaires'][0], "ref");
-				$data[$i][2] = $comite["date"];
+				$data[$i][2] = date("dmY", strtotime($comite["date"]);
 				$data[$i][3] = strtoupper($client["ref"]);
 				$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
 				$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
 				$data[$i][6] = $client["civilite"];
-				$data[$i][7] = $client["date_naissance"];
+				$data[$i][7] = date("dmY", strtotime($client["date_naissance"]);
 				$data[$i][8] = strtoupper(utf8_decode($value["adresse"]["adresse"]));
 				$data[$i][9] = strtoupper(utf8_decode($value["adresse"]["adresse2"]." ".$value["adresse"]["adresse3"]));
 				$data[$i][10] = strtoupper($value["adresse"]["cp"]);
