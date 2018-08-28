@@ -72,7 +72,7 @@ ATF.renderer.parc_existant=function(table,field) {
 				                autoLoad: true,
 				                fields: [
 									{ name:'value', mapping: 'id_parc' },
-									{ name:'text', mapping: 'produit' }
+									{ name:'text', mapping: 'text' }
 								]
 
 							});
@@ -91,12 +91,14 @@ ATF.renderer.parc_existant=function(table,field) {
 									bodyStyle:'padding:5px 5px 0',
 									items: [
 										{
-											xtype: "combo"
+											 xtype: "combo"
 										 	,fieldLabel: "parc en attente de relocation"
 										 	,name:"parc_existant"
 										 	,store: parc_existant
 										 	,displayField: "text"
 										 	,mode: "local"
+										 	,anchor: '100%'
+
 										 	,listeners: {
 										        select: function(combo, record) {
 										            hiddenField.setValue(record.data['value']);
