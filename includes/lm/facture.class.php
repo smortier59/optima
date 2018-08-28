@@ -205,12 +205,10 @@ class facture_lm extends facture {
 	/**
 	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*
 	*/
 	public function statusDebitEnCours(){
-		$this->q->reset()->whereIsNotNull("id_slimpay","AND")
-						// ->where("executionStatus","processed","AND",false,"!=")
-						;
+		$this->q->reset()->whereIsNotNull("id_slimpay");
+						 //->where("executionStatus","processed","AND",false,"!=");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
@@ -236,10 +234,8 @@ class facture_lm extends facture {
 
 					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										"rejet"=>"non_preleve",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
-										"etat"=>"impayee",
-										"date_paiement"=> NULL
+										// "rejet"=>"non_preleve",
+										"date_rejet"=>date("Y-m-d")
 									));
 					}
 
@@ -346,11 +342,17 @@ class facture_lm extends facture {
 										date("m", strtotime($infos["date_debut_contrat"])),
 										date("Y", strtotime($infos["date_debut_contrat"])));
 
+		$mode_paiement = "cb";
+		if($affaire["nature"] == "avenant"){
+			$mode_paiement = "prelevement";
+		}
+
+
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],
             "type_facture" => "libre",
             "type_libre" => "normale",
-            "mode_paiement" => "cb",
+            "mode_paiement" => $mode_paiement,
             "id_affaire" => $affaire["id_affaire"],
             "date" => date("d-m-Y"),
             "id_commande" => $commande["id_commande"],
