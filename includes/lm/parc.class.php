@@ -35,7 +35,10 @@ class parc extends classes_optima {
 													"date_inactif",
 													"date_garantie",
 													"provenance",
-													"existence");
+													"existence",
+													'provenanceParcReloue',
+													"parc_recuperation",
+													'parc_existant');
 		$this->colonnes['panel']['lignes'] = array(
 			"produits"=>array("custom"=>true)
 		);

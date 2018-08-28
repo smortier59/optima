@@ -59,8 +59,11 @@ class produit_lm extends produit {
 		$this->panels['simulateur'] = array("visible"=>true,'nbCols'=>1,'isSubPanel'=>true);
     	$this->colonnes['panel']["affichage_site_souscription"][]=array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'simulateur');
 
+    	$this->files["cga_produit"] = array("type"=>"pdf");
 
 		$this->files["photo_pop_up"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
+
+
 
 		$this->colonnes["panel"]["fournisseur_lignes"] = array(
 			"loyer_fournisseur"=>array("custom"=>true),

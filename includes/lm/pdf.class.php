@@ -463,6 +463,25 @@ class pdf_lm extends pdf_cleodis {
 		        }
 			}
 		}
+
+
+		foreach ($this->lignes as $key => $value) {
+			$filepath = ATF::produit()->filepath($value["id_produit"],"cga_produit");
+
+			if (file_exists($filepath)){
+
+				$pageCount = $this->setSourceFile($filepath);
+				log::logger('ICI' , "mfleurquin");
+				for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+					$this->unsetHeader();
+					$this->unsetFooter();
+		            $tplIdx = $this->ImportPage($pageNo);
+		            $r = $this->getTemplatesize($tplIdx);
+		            $this->AddPage($r['w'] > $r['h'] ? 'L' : 'P', array($r['w'], $r['h']));
+		            $this->useTemplate($tplIdx);
+		        }
+			}
+		}
 	}
 
 
