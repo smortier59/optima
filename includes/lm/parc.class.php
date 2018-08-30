@@ -18,7 +18,8 @@ class parc extends classes_optima {
 													'parc.provenanceParcReloue',
 													"parc.date_achat" => array("renderer"=>"updateDate"),
 													'parc_existant'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_existant"),
-													'parc_recuperation'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_recuperation")
+													'parc_recuperation'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_recuperation"),
+													'parc_broke'=> array("custom"=>true,"align"=>"center","width"=>50,"renderer"=>"parc_broke")
 												);
 
 		$this->colonnes['bloquees']['insert'] =
@@ -57,6 +58,7 @@ class parc extends classes_optima {
 		$this->addPrivilege("getAllParcAttenteRelocation");
 		$this->addPrivilege("relocationParc");
 		$this->addPrivilege("retourEnStock");
+		$this->addPrivilege("parcToBroke");
 
 
 	}
@@ -66,104 +68,108 @@ class parc extends classes_optima {
 		$parc=ATF::parc()->sa();
 		//Pour tous les parcs de l'affaire
 		foreach($parc as $key=>$item){
-			if($commande->get('etat')=="arreter"){
-				if($item["existence"]=="actif"){
-					ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif","date_inactif"=>date("Y-m-d")));
 
-					$this->q->reset()->addCondition("etat","broke")
-									 ->addCondition("serial",$item["serial"])
-									 ->addCondition("id_affaire",$item["id_affaire"])
-									 ->setDimension("row");
+			if($item["etat"]!=="broke") {
 
-					if($brokeExiste=$this->sa()){
-						ATF::parc()->u(array("id_parc"=>$brokeExiste["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
-					}else{
-						$new_parc=$item;
-						unset($new_parc["id_parc"]);
-						$new_parc["date_inactif"]=NULL;
-						$new_parc["etat"]="broke";
-						ATF::parc()->i($new_parc);
-					}
-				}
-			}else{
+				if($commande->get('etat')=="arreter"){
+					if($item["existence"]=="actif"){
+						ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif","date_inactif"=>date("Y-m-d")));
 
-				//Le parc de l'affaire doit passer en actif si affaire/fille==mis_loyer || prolongation
-				if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation" || $commande->get('etat')=="vente"){
-					//Si c'est un broke et que ce n'est pas un avenant alors c'est que le broke provient de l'affaire fille qui ne reprend pas le parc mais si la parente est active alors c'est que le parc doit être inactif
-					if($item["etat"]=="broke" && $affaire->get('nature')!="avenant"){
-						if($item["existence"]!="inactif"){
-							ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
-						}
-					}else{
-						if($item["existence"]!="actif" || $item["date_inactif"]){
-							ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+						$this->q->reset()->addCondition("etat","attente_location")
+										 ->addCondition("serial",$item["serial"])
+										 ->addCondition("id_affaire",$item["id_affaire"])
+										 ->setDimension("row");
+
+						if($brokeExiste=$this->sa()){
+							ATF::parc()->u(array("id_parc"=>$brokeExiste["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+						}else{
+							$new_parc=$item;
+							unset($new_parc["id_parc"]);
+							$new_parc["date_inactif"]=NULL;
+							$new_parc["etat"]="attente_location";
+							ATF::parc()->i($new_parc);
 						}
 					}
-				}elseif($commande->get('etat')=="non_loyer"){
-					if($item["existence"]!="inactif"){
-						ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
-					}
-				}
+				}else{
 
-				if($affaire->get('nature')=="avenant" || $affaire->get('nature')=="vente"){
+					//Le parc de l'affaire doit passer en actif si affaire/fille==mis_loyer || prolongation
 					if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation" || $commande->get('etat')=="vente"){
-						//Si un parc passe en actif alors les autres parcs du même serial doivent passer en inactif
-						ATF::parc()->q->reset()->addCondition("serial",$item["serial"])
-											   ->addCondition("id_parc",$item["id_parc"],false,false,"!=");
-						$parc_serial=ATF::parc()->sa();
-						if($parc_serial){
-							foreach($parc_serial as $k=>$i){
-								if($i["id_parc"]!=$item["id_parc"]){
-									if($i["existence"]!="inactif"  || $i["date_inactif"]!= $commande->get('date_debut')){
-										//Tous les parcs dupliqués doivent passer en inactif si affaire/fille==mis_loyer || prolongation sauf si c'est le parc de l'affaire fille !!!
-										ATF::parc()->u(array("id_parc"=>$i["id_parc"],"existence"=>"inactif","date_inactif"=>$commande->get('date_debut')));
-									}
-								}
+						//Si c'est un broke et que ce n'est pas un avenant alors c'est que le broke provient de l'affaire fille qui ne reprend pas le parc mais si la parente est active alors c'est que le parc doit être inactif
+						if($item["etat"]=="attente_location" && $affaire->get('nature')!="avenant"){
+							if($item["existence"]!="inactif"){
+								ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
+							}
+						}else{
+							if($item["existence"]!="actif" || $item["date_inactif"]){
+								ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
 							}
 						}
 					}elseif($commande->get('etat')=="non_loyer"){
-						//Sinon le parc de l'affaire parente repasse en actif
-						ATF::parc()->q->reset()->addCondition("id_affaire",$affaire_parente->get("id_affaire"))
-											   ->addCondition("serial",$item["serial"])
-											   ->setDimension("row");
-						$parc_serial=ATF::parc()->sa();
-						if($parc_serial){
-							if($parc_serial["existence"]!="actif"  || $parc_serial["date_inactif"]){
-								ATF::parc()->u(array("id_parc"=>$parc_serial["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+						if($item["existence"]!="inactif" && !$item["date_recuperation"]){
+							ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
+						}
+					}
+
+					if($affaire->get('nature')=="avenant" || $affaire->get('nature')=="vente"){
+						if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation" || $commande->get('etat')=="vente"){
+							//Si un parc passe en actif alors les autres parcs du même serial doivent passer en inactif
+							ATF::parc()->q->reset()->addCondition("serial",$item["serial"])
+												   ->addCondition("id_parc",$item["id_parc"],false,false,"!=");
+							$parc_serial=ATF::parc()->sa();
+							if($parc_serial){
+								foreach($parc_serial as $k=>$i){
+									if($i["id_parc"]!=$item["id_parc"]){
+										if($i["existence"]!="inactif"  || $i["date_inactif"]!= $commande->get('date_debut')){
+											//Tous les parcs dupliqués doivent passer en inactif si affaire/fille==mis_loyer || prolongation sauf si c'est le parc de l'affaire fille !!!
+											ATF::parc()->u(array("id_parc"=>$i["id_parc"],"existence"=>"inactif","date_inactif"=>$commande->get('date_debut')));
+										}
+									}
+								}
+							}
+						}elseif($commande->get('etat')=="non_loyer"){
+							//Sinon le parc de l'affaire parente repasse en actif
+							ATF::parc()->q->reset()->addCondition("id_affaire",$affaire_parente->get("id_affaire"))
+												   ->addCondition("serial",$item["serial"])
+												   ->setDimension("row");
+							$parc_serial=ATF::parc()->sa();
+							if($parc_serial){
+								if($parc_serial["existence"]!="actif"  || $parc_serial["date_inactif"]){
+									ATF::parc()->u(array("id_parc"=>$parc_serial["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+								}
 							}
 						}
 					}
 				}
-			}
-			//Dans le cas d'un AR tous les parcs passent en inactif sauf ceux abroker qui passent en actif
-			if($affaire->get('nature')=="AR"){
-				if ($affaires_parentes) {
-					foreach ($affaires_parentes as $affaire_parente) {
-						$commande_parent = $affaire_parente->getCommande();
-						if($commande_parent && $commande_parent->get("etat")!="arreter"){
-							ATF::parc()->q->reset()->addCondition("id_affaire",$affaire_parente->get("id_affaire"));
-							$parc_parent=ATF::parc()->sa();
-							foreach($parc_parent as $key=>$item) {
-								//Si l'etat de la commande est mis_loyer/prolongation alors tous les parcs passent en inactif sauf ceux à broker
-								if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation"){
-									if($item["etat"]=="broke"){
-										if($item["existence"]!="actif"  || $item["date_inactif"]){
-											ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+				//Dans le cas d'un AR tous les parcs passent en inactif sauf ceux abroker qui passent en actif
+				if($affaire->get('nature')=="AR"){
+					if ($affaires_parentes) {
+						foreach ($affaires_parentes as $affaire_parente) {
+							$commande_parent = $affaire_parente->getCommande();
+							if($commande_parent && $commande_parent->get("etat")!="arreter"){
+								ATF::parc()->q->reset()->addCondition("id_affaire",$affaire_parente->get("id_affaire"));
+								$parc_parent=ATF::parc()->sa();
+								foreach($parc_parent as $key=>$item) {
+									//Si l'etat de la commande est mis_loyer/prolongation alors tous les parcs passent en inactif sauf ceux à broker
+									if($commande->get('etat')=="mis_loyer" || $commande->get('etat')=="prolongation"){
+										if($item["etat"]=="attente_location"){
+											if($item["existence"]!="actif"  || $item["date_inactif"]){
+												ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+											}
+										}else{
+											if($item["existence"]!="inactif"  || $item["date_inactif"]!= $commande->get('date_debut')){
+												ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif","date_inactif"=>$commande->get('date_debut')));
+											}
 										}
-									}else{
-										if($item["existence"]!="inactif"  || $item["date_inactif"]!= $commande->get('date_debut')){
-											ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif","date_inactif"=>$commande->get('date_debut')));
-										}
-									}
-								}elseif($commande->get('etat')=="non_loyer"){
-								//Si l'etat de la commande n'est pas mis_loyer/prolongation alors tous les parcs passent en actif sauf ceux à broker
-									if($item["etat"]=="broke"){
-										if($item["existence"]!="inactif"  || $item["date_inactif"]!= $commande->get('date_debut')){
-											ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
-										}
-									}else{
-										if($item["existence"]!="actif"  || $item["date_inactif"]){
-											ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+									}elseif($commande->get('etat')=="non_loyer"){
+									//Si l'etat de la commande n'est pas mis_loyer/prolongation alors tous les parcs passent en actif sauf ceux à broker
+										if($item["etat"]=="attente_location"){
+											if($item["existence"]!="inactif"  || $item["date_inactif"]!= $commande->get('date_debut')){
+												ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"inactif"));
+											}
+										}else{
+											if($item["existence"]!="actif"  || $item["date_inactif"]){
+												ATF::parc()->u(array("id_parc"=>$item["id_parc"],"existence"=>"actif","date_inactif"=>NULL));
+											}
 										}
 									}
 								}
@@ -554,5 +560,17 @@ class parc extends classes_optima {
 		$this->u(array("id_parc"=>$this->decryptId($data["id_parc"]), "etat"=>"attente_location"));
 		return true;
 	}
+
+	/**
+	 * Permet de passer un parc en BROKE
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  Array $data  [id] => ID Crypté du parc actuel
+						    [comboDisplay] => ID du parc a passer en broke
+	*/
+	public function parcToBroke($data){
+		$this->u(array("id_parc"=>$this->decryptId($data["id_parc"]), "etat"=>"broke"));
+		return true;
+	}
+
 };
 ?>
