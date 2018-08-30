@@ -117,7 +117,7 @@ class facture_paiement extends classes_optima {
 		$paiement = array("id_facture"=>$infos['id_facture_avoir'],"montant"=>$infos['montant'],"mode_paiement"=>"lettrage","date"=>$infos["date"]);
 		$id_p_avoir=parent::insert($paiement,$s,$files);
 
-		$avoirToUpdate = array("id_facture"=>$infos['id_facture_avoir'],"etat"=>"payee");
+		$avoirToUpdate = array("id_facture"=>$infos['id_facture_avoir'],"etat"=>"payee", "date_effective"=>date("Y-m-d"));
 		ATF::facture()->u($avoirToUpdate);
 
 		return $last_id;
