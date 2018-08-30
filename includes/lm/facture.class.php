@@ -205,7 +205,6 @@ class facture_lm extends facture {
 	/**
 	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay");
@@ -234,10 +233,8 @@ class facture_lm extends facture {
 
 					if($status["executionStatus"] === "rejected") {
 						$this->u(array("id_facture"=>$facture["id_facture"],
-										"rejet"=>"non_preleve",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
-										"etat"=>"impayee",
-										"date_paiement"=> NULL
+										// "rejet"=>"non_preleve",
+										"date_rejet"=>date("Y-m-d")
 									));
 					}
 
