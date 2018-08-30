@@ -250,10 +250,24 @@ class devis_lm extends devis {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 
+
+		/*
 		if(!$infos["type_affaire"]){
 		  $pack = ATF::produit()->select($infos_ligne[0]["devis_ligne__dot__id_produit"], "id_pack_produit");
 		  $infos["type_affaire"] = ATF::pack_produit()->select($pack, "type_contrat");
+		}*/
+
+
+		$nb_produit = $nb_service = 0;
+		foreach ($infos_ligne as $key => $value) {
+			if(ATF::produit()->select($value["devis_ligne__dot__id_produit_fk"], "nature") === 'produit') $nb_produit++;
+			if(ATF::produit()->select($value["devis_ligne__dot__id_produit_fk"], "nature") === 'service') $nb_service++;
 		}
+
+		if($nb_produit !== 0 && $nb_service !== 0){ $infos["type_affaire"]="LS"; }
+		elseif($nb_produit !== 0){ $infos["type_affaire"]= "LP"; }
+		else { $infos["type_affaire"]= "SP"; }
+
 
 
 		//Vérification du devis

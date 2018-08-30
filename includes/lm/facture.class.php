@@ -208,7 +208,6 @@ class facture_lm extends facture {
 	*/
 	public function statusDebitEnCours(){
 		$this->q->reset()->whereIsNotNull("id_slimpay");
-						 //->where("executionStatus","processed","AND",false,"!=");
 
 		if($factures = $this->select_all()){
 			foreach ($factures as $key => $value) {
@@ -247,6 +246,37 @@ class facture_lm extends facture {
 										"date_paiement"=> NULL
 									));
 					}
+
+					if($status["executionStatus"] === "rejected") {
+						//un suivi sans destinataire "Facture xxxx impayée"
+						$suivis = array(
+							"id_societe" => $this->select($facture["id_facture"] , "id_societe"),
+							"type" => "note",
+							"date" => date("Y-m-d H:i:s"),
+							"texte" => "Facture ".$this->select($facture["id_facture"] , "ref")." impayée",
+							"id_affaire" => $this->select($facture["id_facture"] , "id_affaire"),
+							"type_suivi" => "Contrat",
+							"no_redirect" => true
+					  	);
+
+						ATF::suivi()->insert($suivis);
+
+					}else{
+						//si le nouveau statut est différent de rejected, on crée une tâche à destination de Benjamin Tronquit et Estelle Tampigny "Changement de statut de la facture XXXX. Merci de vérifier".
+						$tache = array("tache"=>array(
+										   "id_societe"=> $this->select($facture["id_facture"] , "id_societe"),
+	                                       "tache"=>"Changement de statut de la facture ".$this->select($facture["id_facture"] , "ref").". Merci de vérifier",
+	                                       "id_affaire"=>$this->select($facture["id_facture"] , "id_affaire"),
+	                                       "type_tache"=>"note",
+	                                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+	                                       "no_redirect"=>"true"
+	                                     ),
+				                        "dest"=>array(18,26)
+	                    			);
+        				$id_tache = ATF::tache()->insert($tache);
+
+					}
+
 				}
 
 			}
@@ -343,10 +373,7 @@ class facture_lm extends facture {
 										date("Y", strtotime($infos["date_debut_contrat"])));
 
 		$mode_paiement = "cb";
-		if($affaire["nature"] == "avenant"){
-			$mode_paiement = "prelevement";
-		}
-
+		if($affaire["type_affaire"] == "avenant") $mode_paiement = "prelevement";
 
 		$facture["facture"] = array(
             "id_societe" => $affaire["id_societe"],

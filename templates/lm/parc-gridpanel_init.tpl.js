@@ -64,16 +64,16 @@ ATF.renderer.parc_existant=function(table,field) {
                                 listeners: {
                                         'click': function(fb, v){
 
-                                                        var parc_existant = new Ext.data.JsonStore({
-                                                                url : 'parc,getAllParcAttenteRelocation.ajax',
-                                                                root : 'result',
-                                                storeId: 'autreFactureStore',
-                                                idProperty: 'id',
-                                                autoLoad: true,
-                                                fields: [
-                                                            { name:'value', mapping: 'id_parc' },
-                                                            { name:'text', mapping: 'text' }
-	                                                    ]
+							var parc_existant = new Ext.data.JsonStore({
+								url : 'parc,getAllParcAttenteRelocation.ajax',
+								root : 'result',
+				                storeId: 'autreFactureStore',
+				                idProperty: 'id',
+				                autoLoad: true,
+				                fields: [
+									{ name:'value', mapping: 'id_parc' },
+									{ name:'text', mapping: 'text' }
+								]
 
                                         });
 
