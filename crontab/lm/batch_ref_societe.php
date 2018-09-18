@@ -12,9 +12,7 @@ $client_sans_ref = ATF::db()->sql2array($q);
 foreach ($client_sans_ref as $key => $value){
 	ATF::begin_transaction();
 	try{
-
 		$ref = "SLI".date("ym", strtotime($value["date"]));
-
 		$max=ATF::societe()->get_max_ref($ref);
 		if($max<10){
 			$ref.='000'.$max;
@@ -31,10 +29,11 @@ foreach ($client_sans_ref as $key => $value){
 		ATF::societe()->u(array("id_societe"=>$value["id_societe"], "ref"=>$ref));
 
 		echo $value["id_societe"]." ---> ".$ref."\n";
-		ATF::commit_transaction();
+
 	}catch(errorATF $e){
 		echo $e->getMessage();
 		ATF::rollback_transaction();
 	}
+	ATF::commit_transaction();
 }
 
