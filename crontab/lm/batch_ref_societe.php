@@ -26,6 +26,6 @@ foreach ($client_sans_ref as $key => $value){
 		throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
 	}
 
-	echo $value["id_societe"]." ---> ".$ref;
+	echo $value["id_societe"]." ---> ".$ref."\n";
 
 }
