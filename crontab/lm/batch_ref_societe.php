@@ -12,7 +12,7 @@ ATF::begin_transaction();
 try{
 	foreach ($client_sans_ref as $key => $value){
 
-		$ref = "SLI".date("Ym", strtotime($value["date"]));
+		$ref = "SLI".date("ym", strtotime($value["date"]));
 
 		$max=ATF::societe()->get_max_ref($ref);
 		if($max<10){
