@@ -8,9 +8,10 @@ ATF::define("tracabilite",false);
 $q = "SELECT id_societe, ref, date  FROM `societe` WHERE `ref` IS NULL";
 $client_sans_ref = ATF::db()->sql2array($q);
 
-ATF::begin_transaction();
-try{
-	foreach ($client_sans_ref as $key => $value){
+
+foreach ($client_sans_ref as $key => $value){
+	ATF::begin_transaction();
+	try{
 
 		$ref = "SLI".date("ym", strtotime($value["date"]));
 
@@ -30,10 +31,10 @@ try{
 		ATF::societe()->u(array("id_societe"=>$value["id_societe"], "ref"=>$ref));
 
 		echo $value["id_societe"]." ---> ".$ref."\n";
+		ATF::commit_transaction();
+	}catch(errorATF $e){
+		echo $e->getMessage();
+		ATF::rollback_transaction();
 	}
-}catch(errorATF $e){
-	echo $e->getMessage();
-	ATF::rollback_transaction();
 }
 
-ATF::rollback_transaction();
