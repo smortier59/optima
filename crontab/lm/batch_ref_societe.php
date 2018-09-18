@@ -27,7 +27,7 @@ try{
 			throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
 		}
 
-		ATF::societe()->u->array("id_societe"=>$value["id_societe"], "ref"=>$ref);
+		ATF::societe()->u(array("id_societe"=>$value["id_societe"], "ref"=>$ref));
 
 		echo $value["id_societe"]." ---> ".$ref."\n";
 	}
