@@ -79,31 +79,6 @@ class souscription_cleodis extends souscription {
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
 
-        // ATF::affaire_etat()->insert(array(
-        //     "id_affaire"=>$devis["id_affaire"],
-        //     "etat"=>"reception_demande"
-        // ));
-
-        // $comite = array  (
-        //     "id_societe" => $post['id_societe'],
-        //     "id_affaire" => $devis["id_affaire"],
-        //     "id_contact" => $gerant[0]["id_contact"],
-        //     "activite" => $data["activite"],
-        //     "id_refinanceur" => "",
-        //     "date_creation" => $data["date_creation"],
-        //     "date_compte" => "",
-        //     "capitaux_propres" => "",
-        //     "note" => "",
-        //     "dettes_financieres" => "",
-        //     "limite" => $data["cs_avis_credit"],
-        //     "ca" => $data["ca"],
-        //     "capital_social" => $data["capital_social"],
-        //     "resultat_exploitation" => $data["resultat_exploitation"],
-        //     "date" => date("d-m-Y"),
-        //     "description" => "Comite CreditSafe",
-        //     "suivi_notifie"=>array(0=>"")
-        // );
-
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
         throw $e;
@@ -310,17 +285,6 @@ class souscription_cleodis extends souscription {
 
     ATF::societe()->u($toUpdate);
 
-    // Gestion du RUM, après avoir mis a jour le code client, car il est utile pour lé génération
-    // $codeClient = $societe['code_client'];
-
-    // log::logger('CODE CLIENT = '.$codeClient,"qjanon");
-    // if (!$codeClient) {
-    //   // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-    //   $codeClient = ATF::societe()->getCodeClient($societe, "BT");
-    //   $toUpdate['code_client'] = $codeClient;
-    //   log::logger('CODE CLIENT = '.$codeClient,"qjanon");
-    // }
-
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
     $this->checkIBAN($iban);
@@ -340,7 +304,7 @@ class souscription_cleodis extends souscription {
     $contrat = ATF::commande()->select_row();
 
     $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-    $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
+    $contratPV = ATF::pdf()->generic('contratPVSignature',$contrat['commande.id_commande'],true);
     // $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
     $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
 
@@ -447,7 +411,7 @@ class souscription_cleodis extends souscription {
   * Appel Sell & Sign, store les documents signés dans Optima
   * @author Quentin JANON <qjanon@absystech.fr>
   * @param array $post["id_affaire"]
-  */
+  */ 
   public function _storeSignedDocuments($post){
 
     switch ($post['type']) {

@@ -27,3 +27,5 @@ SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL;
 ALTER TABLE `produit` CHANGE `loyer` `loyer` FLOAT(6,3) NULL DEFAULT NULL;
 ALTER TABLE `produit` CHANGE `loyer1` `loyer1` FLOAT(6,3) NULL DEFAULT NULL;
 ALTER TABLE `produit` CHANGE `loyer2` `loyer2` FLOAT(6,3) NULL DEFAULT NULL;
+
+ALTER TABLE `societe` ADD `date_blocage` TIMESTAMP NULL COMMENT 'Date de fin du blocage d\'un compte particulier (BtoB) pour les applications utilisant le tunnel de souscription (btwin, ...)' AFTER `sms_tentative`;
