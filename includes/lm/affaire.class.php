@@ -1380,7 +1380,7 @@ class affaire_lm extends affaire {
 
 				//Tout les produits dont le fournisseur est Opteven
 				foreach ($lignes as $kl => $vl) {
-					if($vl["id_fournisseur"] ==  $OPTEVEN["id_societe"]){
+					if($vl["id_fournisseur"] ==  $OPTEVEN["id_societe"] && $vl["quantite"] > 0){
 						$ref_four = ATF::produit()->select($vl["id_produit"], "ref_fournisseur");
 						if($ref_four){
 							$data[$i][0] .= utf8_decode($ref_four);
