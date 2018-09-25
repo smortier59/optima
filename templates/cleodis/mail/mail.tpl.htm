@@ -37,36 +37,82 @@
                         {/if}
                     </td>
                 </tr>
-                {if $infos.template !== "demande_refi"}
+
+            </tbody>
+        </table>
+
+
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tbody>
                 <tr>
-                    <!--ICI SIGNATURE DE L'UTILISATEUR-->
-                    <td align="left" valign="top" style="width:640px;">
-                        <br />Cordialement {ATF::user()->nom(ATF::$usr->getId())}.
+                    <td width="165" style="width:112.5pt;padding:7.5pt 7.5pt 7.5pt 7.5pt">
+                        <p style="line-height:105%">
+                            {if ATF::$codename == "cap"}
+                                {$societe=ATF::societe()->select(1)}
+                                 <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}" alt="CAP Recouvrement">
+                            {else}
+                                {$societe=ATF::societe()->select(246)}
+                                <a href="http://cleodis.com/">
+                                    <span style="color:blue; text-decoration:none">
+                                        <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodis/cleodis_v3.png")}" alt="Cleodis">
+                                    </span>
+                                </a>
+                            {/if}
+                        </p>
+                    </td>
+                    <td style="padding:1.5pt 1.5pt 1.5pt 1.5pt">
+                        <p  style="line-height:105%">
+                            <b>
+                                <span style="font-size:10.5pt;line-height:105%;color:#073851;">
+                                    {ATF::user()->nom(ATF::$usr->getId())}
+                                </span>
+                            </b>
+                        </p>
+
+                        <p  style="line-height:105%">
+                            <b><span style="font-size:8.5pt;line-height:105%;color:#073851;">&nbsp;<br>
+                            Bureau / </span></b>
+                            <b>
+                                <span style="font-size:8.5pt;line-height:105%;color:#073851;">
+                                    {$societe.tel}
+                                </span>
+                            </b>
+                        </p>
+                        <p style="line-height:105%">
+                            {$user = ATF::user()->select(ATF::$usr->getId())}
+                            <b>
+                                <span style="font-size:8.5pt;line-height:105%;color:#5CB000;">
+                                    <span style="color:#073851;text-decoration:none">
+                                        {$user["email"]}
+                                    </span>
+                                </span>
+                            </b>
+                            <b>
+                                <span style="font-size:8.5pt;line-height:105%;color:#5CB000;">
+                                <br>
+                                <br>
+                                </span>
+                            </b>
+                            <b>
+                                <span style="font-size:8.5pt;line-height:105%;color:#5CB000;">
+                                    <a href="{{$societe.web}}">
+                                        <span style="color:#5CB000;text-decoration:none">
+                                            {{$societe.web}}
+                                        </span>
+                                    </a>
+                                </span>
+                            </b>
+                        </p>
+                        <p  style="line-height:105%">
+                            <span style="font-size:8.5pt;line-height:105%;color:#073851;">
+                                {$societe.adresse} - {$societe.cp} {$societe.ville} - {ATF::pays()->nom($societe.id_pays)}
+                            </span>
+                        </p>
                     </td>
                 </tr>
-               <tr>
-                    <!--LOGO DE LA SOCIETE-->
-                    <td align="left">
-                        <br />
-                        {if ATF::$codename == "cap"}
-                            {$societe=ATF::societe()->select(1)}
-                            <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}"/>
-                        {else}
-                            {$societe=ATF::societe()->select(246)}
-                            <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodis/bottom_new.jpg")}"/>
-                        {/if}
-                        <br /><br />
-                    </td>
-                </tr>
-                <tr>
-                    <!--INFO DE LA SOCIETE-->
-                    <td align="left">
-                        {$societe.adresse} - {$societe.cp} {$societe.ville} - {ATF::pays()->nom($societe.id_pays)}<br />
-                        Tél : {$societe.tel} - Fax : {$societe.fax}
-                    </td>
-                </tr>
-                {/if}
             </tbody>
         </table>
     </body>
 </html>
+
+
