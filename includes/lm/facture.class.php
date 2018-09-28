@@ -263,7 +263,9 @@ class facture_lm extends facture {
 
 					}else{
 						//si le nouveau statut est différent de rejected, on crée une tâche à destination de Benjamin Tronquit et Estelle Tampigny "Changement de statut de la facture XXXX. Merci de vérifier".
-						$tache = array("tache"=>array(
+						//Ne pas créer de tache si la facture passe en processed
+						if($status["executionStatus"] !== "processed"){
+							$tache = array("tache"=>array(
 										   "id_societe"=> $this->select($facture["id_facture"] , "id_societe"),
 	                                       "tache"=>"Changement de statut de la facture ".$this->select($facture["id_facture"] , "ref").". Merci de vérifier",
 	                                       "id_affaire"=>$this->select($facture["id_facture"] , "id_affaire"),
@@ -273,7 +275,8 @@ class facture_lm extends facture {
 	                                     ),
 				                        "dest"=>array(18,26)
 	                    			);
-        				$id_tache = ATF::tache()->insert($tache);
+        					$id_tache = ATF::tache()->insert($tache);
+						}
 
 					}
 
