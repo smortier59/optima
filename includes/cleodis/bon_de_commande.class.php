@@ -949,7 +949,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
         if($infos){
 			$row_auto=1;
 			foreach ($infos as $key => $value) {
-				if(!$value["export_cegid"]){
+				if(!$value["bon_de_commande.export_cegid"]){
 					$refinancement = "";
 					ATF::demande_refi()->q->reset()->where("id_affaire",$value['bon_de_commande.id_affaire_fk'],"AND")
 												   ->where("etat","valide");

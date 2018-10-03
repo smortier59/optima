@@ -861,7 +861,7 @@ class facture_fournisseur extends classes_optima {
 				$societe  = ATF::societe()->select($affaire["id_societe"]);
 				$fournisseur = ATF::societe()->select($value["facture_fournisseur.id_fournisseur_fk"]);
 
-				$libelle = $value["facture_fournisseur.id_facture_fournisseur"].'-'.$societe["code_client"].'-'.$societe["societe"];
+				$libelle = $affaire["ref"].'-'.$societe["code_client"].'-'.$value["facture_fournisseur.id_facture_fournisseur"];
 
 				$search  = utf8_decode("çñÄÂÀÁäâàáËÊÈÉéèëêÏÎÌÍïîìíÖÔÒÓöôòóÜÛÙÚüûùúµ@µ$£Ãš");
 				$replace = "cnAAAAaaaaEEEEeeeeIIIIiiiiOOOOooooUUUUuuuuuauSLas";
@@ -878,7 +878,7 @@ class facture_fournisseur extends classes_optima {
 								,"F"=>array('D')
 								,"G"=>array(number_format($value["facture_fournisseur.prix"]*__TVA__, 2, '.', ''))
 								,"H"=>array($libelle)
-								,"I"=>array($affaire["ref"])
+								,"I"=>array('')
 								,"J"=>array('')
 							);
 				$data[1] = array(
@@ -890,7 +890,7 @@ class facture_fournisseur extends classes_optima {
 								,"F"=>array('C')
 								,"G"=>array(number_format($value["facture_fournisseur.prix"]*(__TVA__-1), 2, '.', ''))
 								,"H"=>array($libelle)
-								,"I"=>array($affaire["ref"])
+								,"I"=>array('')
 								,"J"=>array('')
 							);
 
@@ -903,7 +903,7 @@ class facture_fournisseur extends classes_optima {
 								,"F"=>array('C')
 								,"G"=>array(number_format($value["facture_fournisseur.prix"]*__TVA__, 2, '.', ''))
 								,"H"=>array($libelle)
-								,"I"=>array($affaire["ref"])
+								,"I"=>array('')
 								,"J"=>array('')
 							);
 
@@ -928,7 +928,7 @@ class facture_fournisseur extends classes_optima {
 								,"F"=>array('D')
 								,"G"=>array(number_format($value["facture_fournisseur.prix"]*(__TVA__-1), 2, '.', ''))
 								,"H"=>array($libelle)
-								,"I"=>array($affaire["ref"])
+								,"I"=>array('')
 								,"J"=>array('')
 							);
 				if($refinancement == "CLEODIS"){ $data[3]['D'] = array('445620'); }
