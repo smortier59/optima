@@ -1622,6 +1622,9 @@ class societe_cleodis extends societe {
        $data = self::getInfosFromCREDITSAFE($post);
     }
 
+
+
+
     if($data){
         $gerants = $data["gerant"];
         if($data["cs_score"] == "Note non disponible") unset($data["cs_score"]);
@@ -1707,12 +1710,26 @@ class societe_cleodis extends societe {
                 "societe"=>ATF::societe()->select($id_societe),
                 "gerants"=>$gerant
             );
+        } catch (errorSQL $e) {
+            log::logger("====================================================================", "creditsafe");
+            log::logger("ERREUR SQL : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+            log::logger($e->getMessage(), "creditsafe");
+            log::logger($data, "creditsafe");
+            throw $e;
         } catch (ATFerror $e) {
+            log::logger("====================================================================", "creditsafe");
+            log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+            log::logger($data, "creditsafe");
             throw new errorATF("erreurCS inside",500);
         }
     } else{
+        log::logger("====================================================================", "creditsafe");
+        log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+        log::logger($data, "creditsafe");
+
         throw new errorATF("erreurCS",404);
     }
+
   }
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé
