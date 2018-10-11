@@ -19,8 +19,8 @@ try{
 			ATF::affaire()->q->reset()->where("affaire.ref", $exp[0]);
 			$aff = ATF::affaire()->select_row();
 
-			//ATF::affaire()->u(array("id_affaire" => $aff["affaire.id_affaire"], "subscriber_reference"=> $v));
-			log::logger(array("id_affaire" => $aff["affaire.id_affaire"], "subscriber_reference"=> $v) , "mfleurquin");
+			ATF::affaire()->u(array("id_affaire" => $aff["affaire.id_affaire"], "subscriber_reference"=> $v));
+
 		}else{
 			//On met à jour toute les affaires du code client
 			ATF::societe()->q->reset()->where("societe.ref", $v);
@@ -30,8 +30,7 @@ try{
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $key => $value) {
-				//ATF::affaire()->u(array("id_affaire" => $value["id_affaire"], "subscriber_reference"=> $v));
-				log::logger(array("id_affaire" => $value["id_affaire"], "subscriber_reference"=> $v) , "mfleurquin");
+				ATF::affaire()->u(array("id_affaire" => $value["id_affaire"], "subscriber_reference"=> $v));
 			}
 		}
 
