@@ -1287,7 +1287,7 @@ class affaire_lm extends affaire {
 
 		log::logger($toCSV , "mfleurquin");
 
-		if($toCSV !== false){
+		/*if($toCSV !== false){
 			// output headers so that the file is downloaded rather than displayed
 			header('Content-type: text/csv');
 			header('Content-Disposition: attachment; filename="demo.csv"');
@@ -1300,62 +1300,83 @@ class affaire_lm extends affaire {
 			$file = fopen('php://output', 'w');
 		}else{
 			if (!$file = fopen('php://temp', 'w+')) return FALSE;
-		}
-
-
-
-
-		ATF::affaire()->q->reset()->where("affaire.etat",'commande', 'OR', 'statuAffaire')
-								  ->where("affaire.etat",'facture', 'OR', 'statuAffaire');
-		$affaires_en_cours = ATF::affaire()->sa();
+		}*/
 
 		ATF::societe()->q->reset()->where("societe", "Opteven");
 		$OPTEVEN = ATF::societe()->select_row();
 
 
+		ATF::affaire()->q->reset()  ->select("affaire.id_societe, adresse_livraison")
+									->from("affaire","id_affaire" , "commande","id_affaire")
+									->from("commande","id_commande" , "commande_ligne","id_commande")
+									->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
+									->where("commande.etat", "vente", 'AND', 'commandeEtat', "!=")
+									->where("commande.etat", "pending", 'AND', 'commandeEtat', "!=")
+									->where("commande.etat", "abandon", 'AND', 'commandeEtat', "!=")
+									->where("commande_ligne.id_fournisseur", $OPTEVEN["id_societe"])
+									->where("affaire.etat",'commande', 'OR', 'statuAffaire')
+							  		->where("affaire.etat",'facture', 'OR', 'statuAffaire')
+							  		->addGroup("adresse_livraison,affaire.id_societe");
+
+		$affaires = ATF::affaire()->sa();
+
+
 		$affaire_ok = array();
-		foreach ($affaires_en_cours as $ka => $va) {
+		foreach ($affaires as $key => $value) {
+			$affaire_societe = array();
 
+			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"]);
 
-			ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
+			$affs = ATF::affaire()->sa();
+
+			foreach ($affs as $k => $v) {
+				ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
 									 ->where("etat", "accepte", 'AND')
-									 ->where("id_affaire", $va["id_affaire"], 'AND');
-			$comite = ATF::comite()->select_row();
+									 ->where("id_affaire", $v["id_affaire"], 'AND');
+				$comite = ATF::comite()->select_row();
 
-			if($comite){
+				if($comite){
+					$adresse = ATF::affaire()->select($v["affaire.id_affaire"], "adresse_livraison");
+					$affaire_ok[$value["affaire.id_societe_fk"]][$adresse][] = array("id_affaire" =>$v["id_affaire"]);
+				}
+			}
+		}
 
-				ATF::commande()->q->reset()->where("commande.id_affaire", $va["id_affaire"], 'AND')
+		foreach ($affaire_ok as $ksoc => $vsoc) {
+			$i = 0;
+			foreach ($vsoc as $key => $affs) {
+				if($i == 0){
+					$a = ATF::affaire()->select($affs[0]["id_affaire"]);
+					$adresse_livraison = strtolower($a["adresse_livraison"].$a["adresse_livraison_2"].$a["adresse_livraison_3"].$a["cp_adresse_livraison"].$a["ville_adresse_livraison"]);
+					$adresse_livraison = str_replace(" ", "", $adresse_livraison);
+					$adresse_livraison = str_replace("'", "", $adresse_livraison);
+					$adresse_livraison = base64_encode($adresse_livraison);
+				}
+				foreach ($affs as $kaff => $v) {
+
+					ATF::commande()->q->reset()->where("commande.id_affaire", $v["id_affaire"], 'AND')
 										   ->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
 										   ->where("commande.etat", "vente", 'AND', 'commandeEtat', "!=")
 										   ->where("commande.etat", "pending", 'AND', 'commandeEtat', "!=")
 										   ->where("commande.etat", "abandon", 'AND', 'commandeEtat', "!=");
-				$contrat = ATF::commande()->select_row();
+					$contrat = ATF::commande()->select_row();
 
-				if($contrat){
-					ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")
-													->where("id_fournisseur", $OPTEVEN["id_societe"])
-													->where("id_affaire", $va["id_affaire"]);
+					if($contrat){
+						ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")
+														 ->where("id_affaire", $v["id_affaire"]);
+						if(ATF::commande_ligne()->sa()){
 
-					if(ATF::commande_ligne()->sa()){
-						$adresse_livraison = strtolower($va["adresse_livraison"].$va["adresse_livraison_2"].$va["adresse_livraison_3"].$va["cp_adresse_livraison"].$va["ville_adresse_livraison"]);
-						$adresse_livraison = str_replace(" ", "", $adresse_livraison);
-						$adresse_livraison = str_replace("'", "", $adresse_livraison);
-						$adresse_livraison = base64_encode($adresse_livraison);
+							$affaire_ok[$ksoc][$key][$kaff]["adresse"] = $adresse_livraison;
 
-						$affaire_ok[$va["id_societe"]][$adresse_livraison]["adresse"] = array("adresse"=>$va["adresse_livraison"],
-																							  "adresse2"=>$va["adresse_livraison_2"],
-																							  "adresse3"=>$va["adresse_livraison_3"],
-																							  "cp"=>$va["cp_adresse_livraison"],
-																							  "ville"=>$va["ville_adresse_livraison"]);
-
-						$affaire_ok[$va["id_societe"]][$adresse_livraison]["affaires"][] = $va["id_affaire"];
+						}
+					}else{
+						unset($affaire_ok[$ksoc][$key][$kaff]);
 					}
-
 				}
-
 			}
-
 		}
+
+		log::logger($affaire_ok , "mfleurquin");
 
 
 		$data = array();
