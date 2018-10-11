@@ -16,17 +16,17 @@ try{
 		if (strpos($v, '- ') !== false) {
 			$exp = explode("-", $v);
 
-			ATF::affaire()->q->reset()->where("ref", $exp[0]);
+			ATF::affaire()->q->reset()->where("affaire.ref", $exp[0]);
 			$aff = ATF::affaire()->select_row();
 
 			//ATF::affaire()->u(array("id_affaire" => $aff["id_affaire"], "subscriber_reference"=> $v));
 			log::logger(array("id_affaire" => $aff["id_affaire"], "subscriber_reference"=> $v) , "mfleurquin");
 		}else{
 			//On met à jour toute les affaires du code client
-			ATF::societe()->q->reset()->where("ref", $v);
+			ATF::societe()->q->reset()->where("societe.ref", $v);
 			$soc = ATF::societe()->select_row();
 
-			ATF::affaire()->q->reset()->where("id_societe", $soc["id_societe"]);
+			ATF::affaire()->q->reset()->where("affaire.id_societe", $soc["id_societe"]);
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $key => $value) {
