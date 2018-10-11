@@ -19,6 +19,8 @@ try{
 			ATF::affaire()->q->reset()->where("affaire.ref", $exp[0]);
 			$aff = ATF::affaire()->select_row();
 
+			log::logger($aff , "mfleurquin");
+
 			//ATF::affaire()->u(array("id_affaire" => $aff["id_affaire"], "subscriber_reference"=> $v));
 			log::logger(array("id_affaire" => $aff["id_affaire"], "subscriber_reference"=> $v) , "mfleurquin");
 		}else{
