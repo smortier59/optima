@@ -1285,9 +1285,8 @@ class affaire_lm extends affaire {
     */
 	public function export_opteven($toCSV){
 
-		log::logger($toCSV , "mfleurquin");
 
-		/*if($toCSV !== false){
+		if($toCSV !== false){
 			// output headers so that the file is downloaded rather than displayed
 			header('Content-type: text/csv');
 			header('Content-Disposition: attachment; filename="demo.csv"');
@@ -1300,7 +1299,7 @@ class affaire_lm extends affaire {
 			$file = fopen('php://output', 'w');
 		}else{
 			if (!$file = fopen('php://temp', 'w+')) return FALSE;
-		}*/
+		}
 
 		ATF::societe()->q->reset()->where("societe", "Opteven");
 		$OPTEVEN = ATF::societe()->select_row();
@@ -1330,6 +1329,7 @@ class affaire_lm extends affaire {
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $k => $v) {
+
 				ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
 									 ->where("etat", "accepte", 'AND')
 									 ->where("id_affaire", $v["id_affaire"], 'AND');
@@ -1376,60 +1376,67 @@ class affaire_lm extends affaire {
 			}
 		}
 
-		log::logger($affaire_ok , "mfleurquin");
-
 
 		$data = array();
 		$data[0] = array("ContratProduit", "ContratNum", "ContratDateDebut", "ClientLMANum", "BeneficiaireNom", "BeneficiairePrenom", "BeneficiaireTitre", "BeneficiaireDateNaissance", "BeneficiaireAdresse1", "BeneficiaireAdresse2","BeneficiaireCP", "BeneficiaireVille", utf8_decode("Produits loués"));
 
 
 		$i = 1;
-		foreach($affaire_ok as $k => $v){
-			$client = ATF::societe()->select($k);
+		foreach($affaire_ok as $ksoc => $vsoc){
+			$client = ATF::societe()->select($ksoc);
 
-			foreach ($v as $key => $value) {
 
-				ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")->addOrder("commande_ligne.produit", "ASC");
+			foreach ($vsoc as $key => $affaire_adresse) {
+				$ligne = array();
 
-				foreach ($value['affaires'] as $ka => $va) {
-					ATF::commande_ligne()->q->where("commande.id_affaire", $va, "OR", "id_affaire", "=");
-				}
-				$lignes = ATF::commande_ligne()->select_all();
+				$data_aff = ATF::affaire()->select($affaire_adresse[0]["id_affaire"]);
 
-				ATF::comite()->q->reset()->where("id_affaire", $value['affaires'][0])->where("comite.etat", "accepte");
+				ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
 				$comite = ATF::comite()->select_row();
 
-				//Tout les produits dont le fournisseur est Opteven
-				foreach ($lignes as $kl => $vl) {
-					if($vl["id_fournisseur"] ==  $OPTEVEN["id_societe"] && $vl["quantite"] > 0){
-						$ref_four = ATF::produit()->select($vl["id_produit"], "ref_fournisseur");
-						if($ref_four){
-							$data[$i][0] .= utf8_decode($ref_four);
-						}else{
-							$data[$i][0] .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
-						}
-					}
-				}
-
-				$data[$i][1] = ATF::affaire()->select($value['affaires'][0], "ref");
+				$data[$i][0] = "";
+				$data[$i][1] = $data_aff["ref"];
 				$data[$i][2] = date("dmY", strtotime($comite["date"]));
 				$data[$i][3] = strtoupper($client["ref"]);
 				$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
 				$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
 				$data[$i][6] = $client["civilite"];
 				$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
-				$data[$i][8] = strtoupper(utf8_decode($value["adresse"]["adresse"]));
-				$data[$i][9] = strtoupper(utf8_decode($value["adresse"]["adresse2"]." ".$value["adresse"]["adresse3"]));
-				$data[$i][10] = strtoupper($value["adresse"]["cp"]);
-				$data[$i][11] = strtoupper(utf8_decode($value["adresse"]["ville"]));
+				$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
+				$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
+				$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
+				$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
 
-				//Tout les produits loués des affaires
-				foreach ($lignes as $kl => $vl) {
-					if(ATF::produit()->select($vl["id_produit"], "nature") == "produit"){
-						if($data[$i][12]){
-							$data[$i][12] .= "$".$vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+				$produits = array();
+				ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")
+										->addOrder("commande_ligne.produit", "ASC");
+				foreach ($affaire_adresse as $kl => $vl) {
+					ATF::commande_ligne()->q->where("commande.id_affaire", $vl["id_affaire"], "OR", "id_affaire", "=");
+				}
+				$lignes_commande = ATF::commande_ligne()->select_all();
+
+				foreach ($lignes_commande as $klc => $vlc) {
+					$produits[$vlc["id_produit"]]["produit"] = $vlc["produit"];
+					$produits[$vlc["id_produit"]]["quantite"] += $vlc["quantite"];
+					$produits[$vlc["id_produit"]]["id_fournisseur"] = $vlc["id_fournisseur"];
+				}
+
+				foreach ($produits as $kp => $vp) {
+					//Tout les produits dont le fournisseur est Opteven
+					if($vp["id_fournisseur"] ==  $OPTEVEN["id_societe"] && $vp["quantite"] > 0){
+						$ref_four = ATF::produit()->select($kp, "ref_fournisseur");
+						if($ref_four){
+							$data[$i][0] .= utf8_decode($ref_four);
 						}else{
-							$data[$i][12] = $vl["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vl["produit"])));
+							$data[$i][0] .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+						}
+					}
+
+					if(ATF::produit()->select($kp, "nature") == "produit"){
+						if($data[$i][12]){
+							$data[$i][12] .= "$".$vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+						}else{
+							$data[$i][12] = $vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
 						}
 					}
 				}
