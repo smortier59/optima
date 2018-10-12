@@ -1389,23 +1389,6 @@ class affaire_lm extends affaire {
 			foreach ($vsoc as $key => $affaire_adresse) {
 				$ligne = array();
 
-				$data_aff = ATF::affaire()->select($affaire_adresse[0]["id_affaire"]);
-
-				ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
-				$comite = ATF::comite()->select_row();
-
-				$data[$i][0] = "";
-				$data[$i][1] = $data_aff["ref"];
-				$data[$i][2] = date("dmY", strtotime($comite["date"]));
-				$data[$i][3] = strtoupper($client["ref"]);
-				$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
-				$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
-				$data[$i][6] = $client["civilite"];
-				$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
-				$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
-				$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
-				$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
-				$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
 
 				$produits = array();
 				ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")
@@ -1441,7 +1424,27 @@ class affaire_lm extends affaire {
 					}
 				}
 
-				$i++;
+				if(strlen($data[$i][0] > 1)){
+					$data_aff = ATF::affaire()->select($affaire_adresse[0]["id_affaire"]);
+
+					ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
+					$comite = ATF::comite()->select_row();
+
+					$data[$i][1] = $data_aff["ref"];
+					$data[$i][2] = date("dmY", strtotime($comite["date"]));
+					$data[$i][3] = strtoupper($client["ref"]);
+					$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
+					$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
+					$data[$i][6] = $client["civilite"];
+					$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
+					$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
+					$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
+					$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
+					$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
+
+
+					$i++;
+				}
 			}
 
 		}
