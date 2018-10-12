@@ -1404,9 +1404,11 @@ class affaire_lm extends affaire {
 					$produits[$vlc["id_produit"]]["id_fournisseur"] = $vlc["id_fournisseur"];
 				}
 
+				$produits_opteven = false;
 				foreach ($produits as $kp => $vp) {
 					//Tout les produits dont le fournisseur est Opteven
 					if($vp["id_fournisseur"] ==  $OPTEVEN["id_societe"] && $vp["quantite"] > 0){
+						$produits_opteven = true;
 						$ref_four = ATF::produit()->select($kp, "ref_fournisseur");
 						if($ref_four){
 							$data[$i][0] .= utf8_decode($ref_four);
@@ -1424,7 +1426,7 @@ class affaire_lm extends affaire {
 					}
 				}
 
-				if(strlen($data[$i][0] > 1)){
+				if($produits_opteven){
 					$data_aff = ATF::affaire()->select($affaire_adresse[0]["id_affaire"]);
 
 					ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
@@ -1442,9 +1444,12 @@ class affaire_lm extends affaire {
 					$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
 					$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
 
-
 					$i++;
 				}
+
+
+
+
 			}
 
 		}
