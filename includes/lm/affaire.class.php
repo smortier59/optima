@@ -1404,24 +1404,25 @@ class affaire_lm extends affaire {
 					$produits[$vlc["id_produit"]]["id_fournisseur"] = $vlc["id_fournisseur"];
 				}
 
-				$produits_opteven = false;
+				$produits_opteven = "";
+				$produits_affaire = "";
 				foreach ($produits as $kp => $vp) {
 					//Tout les produits dont le fournisseur est Opteven
 					if($vp["id_fournisseur"] ==  $OPTEVEN["id_societe"] && $vp["quantite"] > 0){
-						$produits_opteven = true;
+
 						$ref_four = ATF::produit()->select($kp, "ref_fournisseur");
 						if($ref_four){
-							$data[$i][0] .= utf8_decode($ref_four);
+							$produits_opteven .= utf8_decode($ref_four);
 						}else{
-							$data[$i][0] .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+							$produits_opteven .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
 						}
 					}
 
 					if(ATF::produit()->select($kp, "nature") == "produit"){
-						if($data[$i][12]){
-							$data[$i][12] .= "$".$vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+						if($produits_affaire){
+							$produits_affaire .= "$".$vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
 						}else{
-							$data[$i][12] = $vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+							$produits_affaire = $vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
 						}
 					}
 				}
@@ -1432,6 +1433,7 @@ class affaire_lm extends affaire {
 					ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
 					$comite = ATF::comite()->select_row();
 
+					$data[$i][0] = $produits_opteven;
 					$data[$i][1] = $data_aff["ref"];
 					$data[$i][2] = date("dmY", strtotime($comite["date"]));
 					$data[$i][3] = strtoupper($client["ref"]);
@@ -1443,6 +1445,7 @@ class affaire_lm extends affaire {
 					$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
 					$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
 					$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
+					$data[$i][12] = $produits_affaire;
 
 					$i++;
 				}
