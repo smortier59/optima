@@ -1331,22 +1331,19 @@ class affaire_lm extends affaire {
 
 			foreach ($affs as $k => $v) {
 
+				log::logger($v, "mfleurquin");
+
 				ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
 									 ->where("etat", "accepte", 'AND')
 									 ->where("id_affaire", $v["id_affaire"], 'AND');
 				$comite = ATF::comite()->select_row();
 
 				if($comite){
-					log::logger($v, "mfleurquin");
 					$adresse = ATF::affaire()->select($v["id_affaire"], "adresse_livraison");
-					log::logger($adresse, "mfleurquin");
 					$affaire_ok[$value["affaire.id_societe_fk"]][$adresse][] = array("id_affaire" =>$v["id_affaire"]);
 				}
 			}
 		}
-
-
-log::logger($affaire_ok, "mfleurquin");
 
 
 		foreach ($affaire_ok as $ksoc => $vsoc) {
