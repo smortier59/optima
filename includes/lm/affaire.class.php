@@ -1338,7 +1338,7 @@ class affaire_lm extends affaire {
 
 				if($comite){
 					log::logger($v, "mfleurquin");
-					$adresse = ATF::affaire()->select($v["affaire.id_affaire"], "adresse_livraison");
+					$adresse = ATF::affaire()->select($v["id_affaire"], "adresse_livraison");
 					log::logger($adresse, "mfleurquin");
 					$affaire_ok[$value["affaire.id_societe_fk"]][$adresse][] = array("id_affaire" =>$v["id_affaire"]);
 				}
