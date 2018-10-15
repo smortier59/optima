@@ -1432,14 +1432,12 @@ class affaire_lm extends affaire {
 				}
 
 				if($produits_opteven){
-					$data_aff = ATF::affaire()->select($affaire_adresse[0]["id_affaire"]);
 
-					log::logger($affaire_adresse, "mfleurquin");
-					log::logger(reset($affaire_adresse), "mfleurquin");
+					$first = reset($affaire_adresse);
 
-					log::logger("-------------------------", "mfleurquin");
+					$data_aff = ATF::affaire()->select($first["id_affaire"]);
 
-					ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
+					ATF::comite()->q->reset()->where("id_affaire", $first["id_affaire"])->where("comite.etat", "accepte");
 					$comite = ATF::comite()->select_row();
 
 					$data[$i][0] = $produits_opteven;
