@@ -1434,6 +1434,11 @@ class affaire_lm extends affaire {
 				if($produits_opteven){
 					$data_aff = ATF::affaire()->select($affaire_adresse[0]["id_affaire"]);
 
+					log::logger($affaire_adresse, "mfleurquin");
+					log::logger(reset($affaire_adresse), "mfleurquin");
+
+					log::logger("-------------------------", "mfleurquin");
+
 					ATF::comite()->q->reset()->where("id_affaire", $affaire_adresse[0]["id_affaire"])->where("comite.etat", "accepte");
 					$comite = ATF::comite()->select_row();
 
