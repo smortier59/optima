@@ -1320,6 +1320,7 @@ class affaire_lm extends affaire {
 		$affaires = ATF::affaire()->sa();
 
 
+
 		$affaire_ok = array();
 		foreach ($affaires as $key => $value) {
 			$affaire_societe = array();
@@ -1327,6 +1328,10 @@ class affaire_lm extends affaire {
 			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"]);
 
 			$affs = ATF::affaire()->sa();
+
+			if($value["affaire.id_societe_fk"] == 837){
+				log::logger($value, "mfleurquin");
+			}
 
 			foreach ($affs as $k => $v) {
 
