@@ -1400,9 +1400,6 @@ class affaire_lm extends affaire {
 				}
 				$lignes_commande = ATF::commande_ligne()->select_all();
 
-				if($ksoc == 684){
-					log::logger($lignes_commande , "mfleurquin");
-				}
 
 				foreach ($lignes_commande as $klc => $vlc) {
 					$produits[$vlc["id_produit"]]["produit"] = $vlc["produit"];
@@ -1426,6 +1423,11 @@ class affaire_lm extends affaire {
 						}else{
 							$produits_opteven .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
 						}
+					}
+
+					if($ksoc == 684){
+						log::logger($kp." ".$vp["produit"] , "mfleurquin");
+						log::logger("NATURE --> ".ATF::produit()->select($kp, "nature") == "produit"  "mfleurquin");
 					}
 
 					if(ATF::produit()->select($kp, "nature") == "produit"){
