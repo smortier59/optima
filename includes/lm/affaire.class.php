@@ -1329,9 +1329,6 @@ class affaire_lm extends affaire {
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $k => $v) {
-
-				log::logger($v, "mfleurquin");
-
 				ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
 									 ->where("etat", "accepte", 'AND')
 									 ->where("id_affaire", $v["id_affaire"], 'AND');
@@ -1407,10 +1404,6 @@ class affaire_lm extends affaire {
 					$produits[$vlc["id_produit"]]["id_fournisseur"] = $vlc["id_fournisseur"];
 				}
 
-				if($ksoc == 684){
-					log::logger($produits , "mfleurquin");
-				}
-
 				$produits_opteven = "";
 				$produits_affaire = "";
 				foreach ($produits as $kp => $vp) {
@@ -1423,11 +1416,6 @@ class affaire_lm extends affaire {
 						}else{
 							$produits_opteven .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
 						}
-					}
-
-					if($ksoc == 684){
-						log::logger($kp." ".$vp["produit"] , "mfleurquin");
-						log::logger("NATURE --> ".ATF::produit()->select($kp, "nature"), "mfleurquin");
 					}
 
 					if(ATF::produit()->select($kp, "nature") == "produit"){
