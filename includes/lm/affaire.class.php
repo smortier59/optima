@@ -1320,7 +1320,6 @@ class affaire_lm extends affaire {
 		$affaires = ATF::affaire()->sa();
 
 
-
 		$affaire_ok = array();
 		foreach ($affaires as $key => $value) {
 			$affaire_societe = array();
@@ -1379,6 +1378,8 @@ class affaire_lm extends affaire {
 				}
 			}
 		}
+
+		log::logger($affaire_ok , "export_opteven_affaires");
 
 
 		$data = array();
