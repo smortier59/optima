@@ -888,7 +888,7 @@ class facture_fournisseur extends classes_optima {
 
 			foreach ($recap_produit as $kl => $vl) {
 				if($vl["prix"] > 0){
-					$TTC_lignes += $vl["prix_ttc"]*$vl["quantite"]*;
+					$TTC_lignes += $vl["prix_ttc"]*$vl["quantite"];
 				}
 			}
 
