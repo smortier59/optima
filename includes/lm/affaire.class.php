@@ -1427,7 +1427,7 @@ class affaire_lm extends affaire {
 
 					if($ksoc == 684){
 						log::logger($kp." ".$vp["produit"] , "mfleurquin");
-						log::logger("NATURE --> ".ATF::produit()->select($kp, "nature") == "produit"  "mfleurquin");
+						log::logger("NATURE --> ".ATF::produit()->select($kp, "nature"), "mfleurquin");
 					}
 
 					if(ATF::produit()->select($kp, "nature") == "produit"){
