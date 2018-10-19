@@ -1137,7 +1137,11 @@ class facture_fournisseur extends classes_optima {
 
 			foreach ($lignes_ff as $k => $v) {
 				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
-				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+				else {
+					$recap_produit[$v["id_produit"]]["prix"] += $v["prix"];
+					$recap_produit[$v["id_produit"]]["prix_ttc"] += $v["prix_ttc"];
+					$recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+				}
 			}
 
 			foreach ($recap_produit as $kl => $vl) {
@@ -1193,7 +1197,11 @@ class facture_fournisseur extends classes_optima {
 
 			foreach ($lignes_ff as $k => $v) {
 				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
-				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+				else {
+					$recap_produit[$v["id_produit"]]["prix"] += $v["prix"];
+					$recap_produit[$v["id_produit"]]["prix_ttc"] += $v["prix_ttc"];
+					$recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+				}
 			}
         }
 
