@@ -887,6 +887,7 @@ class facture_fournisseur extends classes_optima {
 			}
 
 			foreach ($recap_produit as $kl => $vl) {
+				log::logger($vl , "mfleurquin");
 				if($vl["prix"] > 0){
 					$TTC_lignes += $vl["prix_ttc"];
 				}
