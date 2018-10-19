@@ -1379,8 +1379,6 @@ class affaire_lm extends affaire {
 			}
 		}
 
-		log::logger($affaire_ok , "export_opteven_affaires");
-
 
 		$data = array();
 		$data[0] = array("ContratProduit", "ContratNum", "ContratDateDebut", "ClientLMANum", "BeneficiaireNom", "BeneficiairePrenom", "BeneficiaireTitre", "BeneficiaireDateNaissance", "BeneficiaireAdresse1", "BeneficiaireAdresse2","BeneficiaireCP", "BeneficiaireVille", utf8_decode("Produits loués"));
@@ -1389,7 +1387,6 @@ class affaire_lm extends affaire {
 		$i = 1;
 		foreach($affaire_ok as $ksoc => $vsoc){
 			$client = ATF::societe()->select($ksoc);
-
 
 			foreach ($vsoc as $key => $affaire_adresse) {
 				$ligne = array();
@@ -1403,10 +1400,18 @@ class affaire_lm extends affaire {
 				}
 				$lignes_commande = ATF::commande_ligne()->select_all();
 
+				if($ksoc == 684){
+					log::logger($lignes_commande , "mfleurquin");
+				}
+
 				foreach ($lignes_commande as $klc => $vlc) {
 					$produits[$vlc["id_produit"]]["produit"] = $vlc["produit"];
 					$produits[$vlc["id_produit"]]["quantite"] += $vlc["quantite"];
 					$produits[$vlc["id_produit"]]["id_fournisseur"] = $vlc["id_fournisseur"];
+				}
+
+				if($ksoc == 684){
+					log::logger($produits , "mfleurquin");
 				}
 
 				$produits_opteven = "";
