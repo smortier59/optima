@@ -1320,7 +1320,6 @@ class affaire_lm extends affaire {
 		$affaires = ATF::affaire()->sa();
 
 
-
 		$affaire_ok = array();
 		foreach ($affaires as $key => $value) {
 			$affaire_societe = array();
@@ -1330,9 +1329,6 @@ class affaire_lm extends affaire {
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $k => $v) {
-
-				log::logger($v, "mfleurquin");
-
 				ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
 									 ->where("etat", "accepte", 'AND')
 									 ->where("id_affaire", $v["id_affaire"], 'AND');
@@ -1389,7 +1385,6 @@ class affaire_lm extends affaire {
 		foreach($affaire_ok as $ksoc => $vsoc){
 			$client = ATF::societe()->select($ksoc);
 
-
 			foreach ($vsoc as $key => $affaire_adresse) {
 				$ligne = array();
 
@@ -1401,6 +1396,7 @@ class affaire_lm extends affaire {
 					ATF::commande_ligne()->q->where("commande.id_affaire", $vl["id_affaire"], "OR", "id_affaire", "=");
 				}
 				$lignes_commande = ATF::commande_ligne()->select_all();
+
 
 				foreach ($lignes_commande as $klc => $vlc) {
 					$produits[$vlc["id_produit"]]["produit"] = $vlc["produit"];
