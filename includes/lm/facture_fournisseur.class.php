@@ -883,12 +883,15 @@ class facture_fournisseur extends classes_optima {
 			foreach ($lignes_ff as $k => $v) {
 					//Ajouter le check sur le compte comptabke ICI !!
 				if(!$recap_produit[$v["id_produit"]]) $recap_produit[$v["id_produit"]] = $v;
-				else $recap_produit[$v["id_produit"]]["quantite"] += $v["quantite"];
+				else{
+					$recap_produit[$v["id_produit"]]["prix"] += $v["prix"];
+					$recap_produit[$v["id_produit"]]["prix_ttc"] += $v["prix_ttc"];
+				}
 			}
 
 			foreach ($recap_produit as $kl => $vl) {
 				if($vl["prix"] > 0){
-					$TTC_lignes += $vl["prix_ttc"]*$vl["quantite"];
+					$TTC_lignes += $vl["prix_ttc"];
 				}
 			}
 
@@ -945,8 +948,8 @@ class facture_fournisseur extends classes_optima {
 			$i = 2;
 			foreach ($recap_produit as $kl => $vl) {
 				if($vl["prix"] > 0){
-					$TTC_ligne = $vl["prix_ttc"]*$vl["quantite"];
-					$HT_ligne = round($vl["prix"]*$vl["quantite"] ,2);
+					$TTC_ligne = $vl["prix_ttc"];
+					$HT_ligne = round($vl["prix"] ,2);
 					$total_credit = $TTC_ligne;
 
 					//HT
