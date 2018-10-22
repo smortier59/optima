@@ -1427,22 +1427,6 @@ class facture_cleodis extends facture {
 						}
 						$compte_3='445713';
 						$type="pro";
-					}elseif($refinanceur['refinanceur']=='CLEODIS' || !$refinanceur
-						 	&& $item['facture.date_periode_debut'])	{
-						if($infos["rejet"]){
-						 	$compte_2='771000';
-						}else{
-							if ($infos_commande['date_debut']
-							&& ($item['facture.date_periode_debut']>$infos_commande['date_debut'])){
-								$compte_2='706300';
-							} else{
-								$compte_2='706200';
-							}
-
-						}
-						$compte_3='445712';
-						$type="auto_porte";
-
 					}elseif( $item['facture.date_periode_debut']
 						  && $infos_commande['date_debut']
 						  && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])){
@@ -1455,6 +1439,16 @@ class facture_cleodis extends facture {
 
 
 						$type="mad";
+
+					}elseif($refinanceur['refinanceur']=='CLEODIS' || !$refinanceur
+						 	&& $item['facture.date_periode_debut']){
+						if($infos["rejet"]){
+						 	$compte_2='771000';
+						}else{
+							$compte_2='706200';
+						}
+						$compte_3='445712';
+						$type="auto_porte";
 
 					}else{
 						if($infos["rejet"]){
