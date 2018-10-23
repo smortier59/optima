@@ -1287,9 +1287,10 @@ class affaire_lm extends affaire {
 
 
 		if($toCSV !== false){
+			$filename = "LeroyMerlin" . date("Ymd") . ".csv";
 			// output headers so that the file is downloaded rather than displayed
 			header('Content-type: text/csv');
-			header('Content-Disposition: attachment; filename="demo.csv"');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
 
 			// do not cache the file
 			header('Pragma: no-cache');
