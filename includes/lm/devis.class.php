@@ -1672,6 +1672,7 @@ class devis_lm extends devis {
 		$infos["tva"] = __TVA__;
 		$infos["date"] = date("Y-m-d");
 		$infos["validite"] = date("Y-m-d",strtotime("+15 day"));
+		$infos["subscriber_reference"] = $affaire_parent["subscriber_reference"];
 
 		ATF::contact()->q->reset()->where("id_societe", $infos["id_societe"])->where("etat", "actif");
 		$contact = ATF::contact()->select_row();
@@ -1729,7 +1730,9 @@ class devis_lm extends devis {
 					$infos["type_souscription"],
 					$infos["id_parent"],
 					$infos["nature"],
-					$infos["type_affaire"]);
+					$infos["type_affaire"],
+					$infos["subscriber_reference"]
+				);
 
 			$affaire=ATF::affaire()->select($infos["id_affaire"]);
 			$infos["ref"]=$affaire["ref"];
