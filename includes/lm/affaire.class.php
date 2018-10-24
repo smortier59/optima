@@ -243,6 +243,7 @@ class affaire_lm extends affaire {
 
 		if($affaire["nature"]=="avenant"){
 			$affaire["date_garantie"]=$this->select($infos["id_parent"],"date_garantie");
+			$affaire["subscriber_reference"] = $infos["subscriber_reference"];
 			if (!$affaire["ref"] || !(strstr($affaire["ref"],"AVT"))) {
 				$affaire["ref"]=$this->getRefAvenant($infos["id_parent"]);
 			}
