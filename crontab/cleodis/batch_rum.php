@@ -80,7 +80,7 @@ foreach ($societe_sans_rum as $key => $value) {
 	$affaire = ATF::affaire()->select_row();
 
 	if($affaire){
-		//ATF::societe()->u(array("id_societe"=> $value["id_societe"], "RUM"=>$affaire["RUM"]));
+		ATF::societe()->u(array("id_societe"=> $value["id_societe"], "RUM"=>$affaire["RUM"]));
 		echo $value["ref"]." - ".$value["societe"]." ---> RUM : ".$affaire["RUM"]."\n";
 	}
 }
