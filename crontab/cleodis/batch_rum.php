@@ -1,16 +1,15 @@
 <?php
 define("__BYPASS__",true);
-$_SERVER["argv"][1] = "cleodis";
 include(dirname(__FILE__)."/../../global.inc.php");
 ATF::define("tracabilite",false);
 
 $dataPath = __DATA_PATH__."cleodis/";
 
 /*
-$q = "SELECT * 
+$q = "SELECT *
 	  FROM  `TABLE 145`";
 
-$rums = ATF::db()->sql2array($q);	  
+$rums = ATF::db()->sql2array($q);
 
 foreach ($rums as $key => $value) {
 	if($key > 0){
