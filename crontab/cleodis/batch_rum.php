@@ -38,7 +38,7 @@ foreach ($res as $key => $value) {
 
 $q = "ALTER TABLE `societe` DROP  `rum`";
 ATF::db()->sql2array($q);
-*/
+
 
 
 ATF::affaire()->q->reset()->addField("affaire.RIB", "RIB")
@@ -63,7 +63,25 @@ foreach ($affairesRUM as $key => $value) {
 		echo "Mise à jour de l'affaire ".ATF::affaire()->select($v["affaire.id_affaire"] , "ref")."\n";
 	}
 }
+*/
 
 
+$q= "SELECT *
+	FROM `societe`
+	WHERE RUM IS NULL";
+$societe_sans_rum = ATF::db()->sql2array($q);
+
+foreach ($societe_sans_rum as $key => $value) {
+	ATF::affaire()->q->reset()->addField("RUM")
+							  ->where("affaire.id_societe", $value["id_societe"])
+							  ->whereIsNotNull("RUM")
+							  ->addOrder("affaire.id_affaire", "DESC");
+	$affaire = ATF::affaire()->select_row();
+
+	if($affaire){
+		ATF::societe()->u(array("id_societe"=> $value["id_societe"], "RUM"=>$affaire["RUM"]));
+		echo $value["ref"]." - ".$value["societe"]." ---> RUM : ".$affaire["RUM"]."\n";
+	}
+}
 
 ?>
