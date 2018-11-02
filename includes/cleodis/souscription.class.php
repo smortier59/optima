@@ -41,16 +41,26 @@ class souscription_cleodis extends souscription {
 
         if (!$codeClient) {
           // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-          $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+          $codeClient = ATF::societe()->getCodeClient($societe, self::getPrefixCodeClient($post['site_associe']));
           $toUpdate = array(
             'id_societe' => $societe["id_societe"],
             'code_client' => $codeClient
           );
-          log::logger('CODE CLIENT = '.$codeClient,"qjanon");
           ATF::societe()->u($toUpdate);
         }
+
+        // On update le signataire de la societe pour y mettre celui qu'on reçoit.
+        if ($post['id_contact']) {
+          $toUpdate = array(
+            'id_societe' => $societe["id_societe"],
+            'id_contact_signataire' => $post['id_contact']
+          );
+          ATF::societe()->u($toUpdate);          
+        }
+
+
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit']);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
 
         $id_devis = $this->createDevis($post, $libelle);
 
@@ -63,6 +73,14 @@ class souscription_cleodis extends souscription {
             "site_associe"=>$post['site_associe'],
             "provenance"=>$post['site_associe'],
             "etat_comite"=>"accepte",
+            "adresse_livraison"=>$post['livraison']['adresse'],
+            "adresse_livraison_2"=>$post['livraison']['adresse_2'],
+            "cp_adresse_livraison"=>$post['livraison']['cp'],
+            "ville_adresse_livraison"=>$post['livraison']['ville'],
+            "adresse_facturation"=>$post['facturation']['adresse'],
+            "adresse_facturation_2"=>$post['facturation']['adresse_2'],
+            "cp_adresse_facturation"=>$post['facturation']['cp'],
+            "ville_adresse_facturation"=>$post['facturation']['ville'],
             "IBAN"=>$societe["IBAN"],
             "RUM"=>$societe["RUM"],
             "BIC"=>$societe["BIC"]
@@ -75,31 +93,6 @@ class souscription_cleodis extends souscription {
 
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
-
-        // ATF::affaire_etat()->insert(array(
-        //     "id_affaire"=>$devis["id_affaire"],
-        //     "etat"=>"reception_demande"
-        // ));
-
-        // $comite = array  (
-        //     "id_societe" => $post['id_societe'],
-        //     "id_affaire" => $devis["id_affaire"],
-        //     "id_contact" => $gerant[0]["id_contact"],
-        //     "activite" => $data["activite"],
-        //     "id_refinanceur" => "",
-        //     "date_creation" => $data["date_creation"],
-        //     "date_compte" => "",
-        //     "capitaux_propres" => "",
-        //     "note" => "",
-        //     "dettes_financieres" => "",
-        //     "limite" => $data["cs_avis_credit"],
-        //     "ca" => $data["ca"],
-        //     "capital_social" => $data["capital_social"],
-        //     "resultat_exploitation" => $data["resultat_exploitation"],
-        //     "date" => date("d-m-Y"),
-        //     "description" => "Comite CreditSafe",
-        //     "suivi_notifie"=>array(0=>"")
-        // );
 
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
@@ -115,16 +108,28 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits) {
-    ATF::pack_produit()->q->reset()
-        ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
-        ->setStrict()
-        ->setLimit(1);
-    foreach ($id_pack_produits as $id_pack) {
-        ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
+  private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+    if ($id_pack_produits) {
+      ATF::pack_produit()->q->reset()
+          ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
+          ->setStrict()
+          ->setLimit(1);
+      foreach ($id_pack_produits as $id_pack) {
+          ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
+      }
+
+      $suffix = ATF::pack_produit()->select_cell();
+    }
+    switch ($site_associe) {
+      case "btwin":
+        $r = "BTWIN - Location ".$suffix;
+      break;
+      case "boulangerpro":
+        $r = "BOULANGER PRO - Location ".$suffix;
+      break;
     }
 
-    return "BTWIN - Location ".ATF::pack_produit()->select_cell();
+    return $r;
   }
 
   /**
@@ -296,7 +301,7 @@ class souscription_cleodis extends souscription {
     log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     if (!$codeClient) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-      $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+      $codeClient = ATF::societe()->getCodeClient($societe, $post['site_associe']);
       $toUpdate['code_client'] = $codeClient;
       log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     }
@@ -307,16 +312,7 @@ class souscription_cleodis extends souscription {
 
     ATF::societe()->u($toUpdate);
 
-    // Gestion du RUM, après avoir mis a jour le code client, car il est utile pour lé génération
-    // $codeClient = $societe['code_client'];
-
-    // log::logger('CODE CLIENT = '.$codeClient,"qjanon");
-    // if (!$codeClient) {
-    //   // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-    //   $codeClient = ATF::societe()->getCodeClient($societe, "BT");
-    //   $toUpdate['code_client'] = $codeClient;
-    //   log::logger('CODE CLIENT = '.$codeClient,"qjanon");
-    // }
+    if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500); 
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
@@ -336,10 +332,28 @@ class souscription_cleodis extends souscription {
     ATF::commande()->q->reset()->where('commande.id_affaire', $id_affaire);
     $contrat = ATF::commande()->select_row();
 
-    $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-    $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
-    // $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
-    $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
+    switch ($post['site_associe']) {
+      case 'btwin':
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+        $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
+        $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
+        $f = array(
+          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+          "contrat-PV.pdf"=> base64_encode($contratPV), // base64
+          "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
+        );
+      break;
+      case 'boulangerpro':
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+        $f = array(
+          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
+        );
+      break;
+      default:
+        throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500); 
+      break;
+    }
+
 
 
     $return = array(
@@ -356,11 +370,7 @@ class souscription_cleodis extends souscription {
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
-      "files2sign"=>array(
-         "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
-         "contrat-PV.pdf"=> base64_encode($contratPV), // base64
-         "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
-      )
+      "files2sign"=>$f
     );
     return $return;
   }
@@ -462,5 +472,22 @@ class souscription_cleodis extends souscription {
 
     die();
   }
+
+  private function getPrefixCodeClient($site_associe) {
+    switch ($site_associe) {
+      case 'boulangerpro':
+        $r = "BG";
+      break;
+      case "btwin":
+        $r = "BT";
+      break; 
+      default:
+        $r = "";
+      break;
+    }
+    return $r;
+  }
+
+
 
 }
