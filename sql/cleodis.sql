@@ -10,3 +10,25 @@ DELETE FROM `pack_produit_ligne` WHERE id_pack_produit NOT IN (SELECT id_pack_pr
 -- Contraintes
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit`(`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+
+#Ajout des CG/CP
+CREATE TABLE `document_contrat` (
+  `id_document_contrat` mediumint(8) UNSIGNED NOT NULL,
+  `document_contrat` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `document_contrat` ADD PRIMARY KEY (`id_document_contrat`);
+ALTER TABLE `document_contrat` MODIFY `id_document_contrat` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `document_contrat` ADD `type_signature` ENUM('commune_avec_contrat','hors_contrat') NOT NULL DEFAULT 'commune_avec_contrat',
+							   ADD `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' AFTER `type_signature`;
+
+ALTER TABLE `pack_produit` ADD `id_document_contrat` mediumint(8) UNSIGNED DEFAULT NULL;
+ALTER TABLE `pack_produit` ADD KEY `id_document_contrat` (`id_document_contrat`);
+ALTER TABLE `pack_produit` ADD CONSTRAINT `pack_produit_document` FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `produit` ADD `id_document_contrat` mediumint(8) UNSIGNED DEFAULT NULL;
+ALTER TABLE `produit` ADD KEY `id_document_contrat` (`id_document_contrat`);
+ALTER TABLE `produit` ADD CONSTRAINT `produit_ibfk_document` FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE SET NULL ON UPDATE CASCADE;
