@@ -55,7 +55,7 @@ class souscription_cleodis extends souscription {
             'id_societe' => $societe["id_societe"],
             'id_contact_signataire' => $post['id_contact']
           );
-          ATF::societe()->u($toUpdate);          
+          ATF::societe()->u($toUpdate);
         }
 
 
@@ -312,7 +312,7 @@ class souscription_cleodis extends souscription {
 
     ATF::societe()->u($toUpdate);
 
-    if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500); 
+    if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500);
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
@@ -348,9 +348,34 @@ class souscription_cleodis extends souscription {
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
         );
+
+        $docsHorsContrat = array();
+
+        //On récupère les documents du/des produits de cette affaire
+        ATF::commande_ligne()->q->reset()->where("id_commande", $contrat['commande.id_commande']);
+        $lignes = ATF::commande_ligne()->sa();
+
+        foreach ($lignes as $key => $value) {
+          $id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
+          if($id_doc){
+            $doc = ATF::document_contrat()->select($id_doc);
+            if($doc["etat"] == "actif" && $doc["type_signature"] == "hors_contrat"){
+              $docsHorsContrat[$id_doc] = $doc["document_contrat"];
+            }
+          }
+        }
+
+        if($docsHorsContrat){
+          foreach ($docsHorsContrat as $key => $value) {
+            $file = util::mod_rewrite($value).".pdf";
+
+            $CG = ATF::document_contrat()->filepath($key,"fichier_joint");
+            $f[$file] = base64_encode(file_get_contents($CG));
+          }
+        }
       break;
       default:
-        throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500); 
+        throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500);
       break;
     }
 
@@ -480,7 +505,7 @@ class souscription_cleodis extends souscription {
       break;
       case "btwin":
         $r = "BT";
-      break; 
+      break;
       default:
         $r = "";
       break;
