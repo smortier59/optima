@@ -13,7 +13,7 @@ class affaire_lm extends affaire {
 		$this->colonnes['fields_column'] = array(
 			'affaire.ref'
 			,'affaire.date'
-			,'affaire.affaire'
+			,'affaire.affaire'=>array("rowEditor"=>"setInfos")
 			,'affaire.id_societe'
 			,'ref_client'=>array("custom"=>true)
 			,'email_client'=>array("custom"=>true)
@@ -126,6 +126,7 @@ class affaire_lm extends affaire {
 		$this->foreign_key['id_magasin'] =  "magasin";
 		$this->foreign_key['pays_livraison'] =  "pays";
 		$this->foreign_key['pays_facturation'] =  "pays";
+
 
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
