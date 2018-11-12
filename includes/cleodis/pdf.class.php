@@ -333,17 +333,24 @@ class pdf_cleodis extends pdf {
 
 				    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
 				    if (file_exists($filepath)){
-					    $pageCount = $this->setSourceFile($filepath);
+				    	try {
+						    $pageCount = $this->setSourceFile($filepath);
 
-					    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-					      $tplIdx = $this->importPage($pageNo);
+						    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						      $tplIdx = $this->importPage($pageNo);
 
-					      // add a page
-					      $this->unsetHeader();
-				    	  $this->unsetFooter();
-					      $this->AddPage();
-					      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-					    }
+						      // add a page
+						      $this->unsetHeader();
+					    	  $this->unsetFooter();
+						      $this->AddPage();
+						      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+						    }
+						} catch (Exception $e) {
+  							log::logger('filepath CGS = '.$filepath,"qjanon");
+							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
+							log::logger($e->getMessage(),"qjanon");
+							continue;
+						}
 					}
 				}
 			}
