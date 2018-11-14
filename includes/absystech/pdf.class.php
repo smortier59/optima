@@ -583,6 +583,10 @@ class pdf_absystech extends pdf {
 		}
 	}
 
+	// Retourne TRUE si on ne doit pas signer avec le nom/prenom
+	public function nePasSignerMonNom($id_user) {
+		return in_array(ATF::user()->get($id_user,'login'),array("aduquesne","rviseux","psorriaux","ppersyn"));
+	}
 
 	public function devis_normal($id){
 		$infos_devis = ATF::devis()->select($id);
@@ -762,7 +766,11 @@ class pdf_absystech extends pdf {
 		$this->ln(5);
 		$this->setx(15);
 		$this->multicell(0,5,ATF::politesse()->nom($infos_devis['id_politesse_post']));
-		$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
+			$this->multicell(0,5,"",0,'R');
+		} else {
+			$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+		}
 
 		$this->pied($infos_societe);
 
@@ -794,7 +802,11 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT COMMERCIAL :",0,1);
 		$this->setfont('arial','',10);
-		$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
+			$this->cell(0,5,"",0,1);
+		} else {
+			$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+		}
 		$this->ln(5);
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT TECHNIQUE :",0,1);
