@@ -585,7 +585,7 @@ class pdf_absystech extends pdf {
 
 	// Retourne TRUE si on ne doit pas signer avec le nom/prenom
 	public function nePasSignerMonNom($id_user) {
-		return in_array(ATF::user()->get($id_user,'login'),array("aduquesne","rviseux","psorriaux","ppersyn"));
+		return in_array(ATF::user()->select($id_user,'login'),array("aduquesne","rviseux","psorriaux","ppersyn"));
 	}
 
 	public function devis_normal($id){
