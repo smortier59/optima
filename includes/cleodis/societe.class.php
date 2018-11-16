@@ -1436,11 +1436,6 @@ class societe_cleodis extends societe {
                             "loyer__dot__assurance"=>"",
                             "loyer__dot__frais_de_gestion"=>"",
                             "loyer__dot__frequence_loyer"=>"mois",
-                            "loyer__dot__serenite"=>"",
-                            "loyer__dot__maintenance"=>"",
-                            "loyer__dot__hotline"=>"",
-                            "loyer__dot__supervision"=>"",
-                            "loyer__dot__support"=>"",
                             "loyer__dot__avec_option"=>"non"
                           );
 

@@ -128,6 +128,7 @@ class commande_cleodis extends commande {
 		$this->addPrivilege("getCommande_ligne");
 		$this->addPrivilege("stopCommande","update");
 		$this->addPrivilege("reactiveCommande","update");
+		$this->addPrivilege("abandonCommande","update");
 		$this->addPrivilege("generateCourrierType");
 //		$this->addPrivilege("updateDateResiliation","update");
 //		$this->addPrivilege("updateDateRestitution","update");
@@ -143,6 +144,35 @@ class commande_cleodis extends commande {
 		$this->selectAllExtjs=true;
 	}
 
+
+	/**
+    * Passe une commande en abandonnée
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function abandonCommande($infos, $no_redirect = false){
+		$commande = new commande_cleodis($infos['id_commande']);
+
+		if ($commande) {
+			$commande->set('etat','abandon');
+			$comm = ATF::commande()->select($infos['id_commande']);
+			$affaire = $commande->getAffaire();
+
+			ATF::affaire()->u(array("id_affaire"=>$affaire->get("id_affaire"), "etat"=>"abandon"));
+
+			$notifie[] = ATF::$usr->getID();
+
+
+			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
+							,"id_societe"=>$comm['id_societe']
+							,"type_suivi"=>'Contrat'
+							,"texte"=>"Le contrat ".$affaire->get("ref")." est passé en abandonné"
+						);
+			ATF::suivi()->insert($suivi);
+			if(!$no_redirect) ATF::affaire()->redirection("select",$affaire->get("id_affaire"));
+		}
+	}
 
 	/**
 	 * [_contratPartenaire retourne les contrats du contact loggué]
@@ -820,6 +850,7 @@ class commande_cleodis extends commande {
 
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
+					ATF::facturation_fournisseur()->createEcheancier($affaire);
 
 
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
@@ -880,6 +911,9 @@ class commande_cleodis extends commande {
 
 					//Mise à jour des facturations
 					ATF::facturation()->delete_special($commande->get("id_affaire"));
+
+					//Mise à jour des facturations
+					ATF::facturation_fournisseur()->delete_special("id_affaire",$commande->get("id_affaire"));
 
 					//Mise à jour des prolongations (supprimer les dates)
 					ATF::prolongation()->unsetDate($commande->get("id_affaire"));
@@ -1388,6 +1422,14 @@ class commande_cleodis extends commande {
 			} else {
 				$return['data'][$k]['factureAllow'] = false;
 			}
+
+			//Check affichage de création de facture
+			if (($i["commande.etat"] == "pending" || $i["commande.etat"] == "non_loyer")) {
+				$return['data'][$k]['abandonAllow'] = true;
+			} else {
+				$return['data'][$k]['abandonAllow'] = false;
+			}
+
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
 
             // check des fichiers courriers types
