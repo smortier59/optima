@@ -9,13 +9,13 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 	public function setUp() {
 		$this->initUser();
 	}
-	
+
 	/** Méthode post-test, exécute après chaque test unitaire*/
 	public function tearDown(){
 		ATF::$msg->getNotices();
 		ATF::db()->rollback_transaction(true);
 	}
-	
+
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	public function test_defaultValues(){
 
@@ -36,7 +36,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_existProlongation(){
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$this->assertFalse($this->obj->existProlongation($id_affaire),"Il n'y a pas de prolongation pour cette affaire");
-		
+
 		$id_prolongation=$this->obj->i(array("id_affaire"=>$id_affaire,"ref"=>"prolongTu","id_societe"=>$this->id_societe));
 		$this->assertTrue($this->obj->existProlongation($id_affaire),"Il y a une prolongation pour cette affaire");
 	}
@@ -45,7 +45,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_getByaffaire(){
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$this->assertNull($this->obj->getByaffaire($id_affaire),"Il n'y a pas de prolongation pour cette affaire");
-		
+
 		$id_prolongation=$this->obj->i(array("id_affaire"=>$id_affaire,"ref"=>"prolongTu","id_societe"=>$this->id_societe));
 		$this->assertEquals($this->obj->select($id_prolongation),$this->obj->getByaffaire($id_affaire),"Il y a une prolongation pour cette affaire");
 	}
@@ -110,7 +110,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->d($prolog_delete["id_prolongation"]);
 
 		$refresh = array();
-		
+
 		$prolongation["prolongation"]=array(
 												"id_affaire"=>$id_affaire,
 												"id_societe"=>$this->id_societe,
@@ -122,7 +122,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 												"id_commande"=>$id_commande,
 												"date_arret"=>date("Y-m-d",strtotime(date("Y-m-d")." +5 year"))
 											);
-	
+
 		$id_prolongation=$this->obj->decryptId($this->obj->insert($prolongation,$this->s,NULL,$refresh));
 		$prolog_select=$this->obj->select($id_prolongation);
 		ATF::loyer_prolongation()->q->reset()->addCondition("id_prolongation",$id_prolongation);
@@ -151,12 +151,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>"10.00",
 									"frequence_loyer"=>"mois",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 6 month")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 year")),
-									'serenite' => '0.00',
-									'maintenance' => '0.00',
-									'hotline' => '0.00',
-									'supervision' => '0.00',
-									'support' => '0.00'
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 year"))
 									)
 							,$loyer_prolongation[0],'Le loyer_prolongation n est pas bon 0');
 
@@ -170,15 +165,10 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"trimestre",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 1 year")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 1 year")),
-									'serenite' => '0.00',
-									'maintenance' => '0.00',
-									'hotline' => '0.00',
-									'supervision' => '0.00',
-									'support' => '0.00'
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 1 year"))
 									)
 							,$loyer_prolongation[1],'Le loyer_prolongation n est pas bon 1');
-		
+
 
 		$this->assertEquals(array(
 									"id_loyer_prolongation"=>$loyer_prolongation[2]["id_loyer_prolongation"],
@@ -190,12 +180,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"an",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 6 month + 1 year")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 2 year")),
-									'serenite' => '0.00',
-									'maintenance' => '0.00',
-									'hotline' => '0.00',
-									'supervision' => '0.00',
-									'support' => '0.00'
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 2 year"))
 									)
 							,$loyer_prolongation[2],'Le loyer_prolongation n est pas bon 2');
 
@@ -209,24 +194,19 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"semestre",
 									"date_debut"=>date("Y-m-d",strtotime(date("Y-m-02")." + 6 month + 2 year")),
-									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 3 year")),
-									'serenite' => '0.00',
-									'maintenance' => '0.00',
-									'hotline' => '0.00',
-									'supervision' => '0.00',
-									'support' => '0.00'
+									"date_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 6 month + 3 year"))
 									)
 							,$loyer_prolongation[3],'Le loyer_prolongation n est pas bon 3');
 
-		
+
 	}
 
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	public function testUpdateDate(){
-		
+
 	}
 
-	
+
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	public function testUpdateFinProlongation(){
 		$id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire")));
@@ -255,14 +235,14 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos["id_prolongation"]=$id_prolongation;
 		$infos["key"]="date_arret";
 		$infos["value"]="01-01-2010";
-		
+
 		try {
 			$updateDate=$this->obj->updateDate($infos);
 		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(879,$error,'La date insérée est inférieure à la date de prolongation');
-		
+
 		$infos["value"]="31-12-2011";
 		try {
 			$updateDate=$this->obj->updateDate($infos);
@@ -273,11 +253,11 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		ATF::facturation()->u(array("id_facturation"=>$id_facturation5,"id_facture"=>NULL));
 		$this->assertTrue($this->obj->updateDate($infos),'Problème updateDate 1');
-					
+
 		$this->assertNull(ATF::facturation()->select($id_facturation5),'La facturation ne c est pas bien supprimée');
 		$this->assertEquals("2011-12-31",$this->obj->select($id_prolongation,"date_arret"),'La prolongation ne prend pas la date arrêt');
 
-		$infos["value"]=NULL;	
+		$infos["value"]=NULL;
 		$this->assertTrue($this->obj->updateDate($infos),'Problème updateDate 2');
 		$this->assertNull($this->obj->select($id_prolongation,"date_arret"),'La date arrêt ne se supprime pas');
 
@@ -292,7 +272,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 	public function testDelete(){
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$id_prolongation=$this->obj->i(array("id_affaire"=>$id_affaire,"ref"=>"prolongTu","id_societe"=>$this->id_societe));
-		
+
 		$infos["id"][]=$id_prolongation;
 		$this->obj->delete($infos);
 		$this->assertNull($this->obj->select($id_prolongation),'La prolongation ne c est pas bien supprimée');
@@ -302,12 +282,12 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 	public function testUnsetDate(){
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$id_prolongation=$this->obj->i(array("id_affaire"=>$id_affaire,"ref"=>"prolongTu","id_societe"=>$this->id_societe));
-	
+
 		$id_loyer_prolongation1=ATF::loyer_prolongation()->i(array("id_affaire"=>$id_affaire,"id_prolongation"=>$id_prolongation,"loyer"=>"100","duree"=>12,"frequence_loyer"=>"mois","date_debut"=>"2010-01-01","date_fin"=>"2010-12-31"));
 		$id_loyer_prolongation2=ATF::loyer_prolongation()->i(array("id_affaire"=>$id_affaire,"id_prolongation"=>$id_prolongation,"loyer"=>"100","duree"=>6,"frequence_loyer"=>"mois","date_debut"=>"2011-01-01","date_fin"=>"2011-07-01"));
-		
+
 		$this->obj->unsetDate($id_affaire);
-		
+
 		$loyer_prolongation1=ATF::loyer_prolongation()->select($id_loyer_prolongation1);
 		$this->assertNull($loyer_prolongation1["date_debut"],'unset n a pas supprimée la date_debut');
 		$this->assertNull($loyer_prolongation1["date_fin"],'unset n a pas supprimée la date_fin');
@@ -315,25 +295,25 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
 		$loyer_prolongation2=ATF::loyer_prolongation()->select($id_loyer_prolongation2);
 		$this->assertNull($loyer_prolongation2["date_debut"],'unset n a pas supprimée la date_debut');
 		$this->assertNull($loyer_prolongation2["date_fin"],'unset n a pas supprimée la date_fin');
-		
+
 	}
 
 
-	 /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr> 
+	 /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr>
     * @date 08/12/2015
     */
     public function test_uploadFileFromSA() {
 
     	$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$id_prolongation=$this->obj->i(array("id_affaire"=>$id_affaire,"ref"=>"prolongTu","id_societe"=>$this->id_societe));
-	
-        
+
+
 
 
         $infos = array(
             "extAction"=>"prolongation"
         );
-        $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas d'id en entrée, renvoi FALSE");        
+        $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas d'id en entrée, renvoi FALSE");
         $infos = array(
             "id"=>$id_prolongation
         );
@@ -342,7 +322,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
         $infos['extAction'] = "prolongation";
         $infos['field'] = "tu";
         $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas de files en entrée, renvoi FALSE");
-        
+
         $file = __ABSOLUTE_PATH__."test/cleodis/pdf_exemple.pdf";
         $files = array(
             "tu"=> array(
@@ -355,7 +335,7 @@ class prolongation_test extends ATF_PHPUnit_Framework_TestCase {
         );
         if(!file_exists(__ABSOLUTE_PATH__."../temp/testsuite/prolongation/"))util::mkdir(__ABSOLUTE_PATH__."../temp/testsuite/prolongation/");
         if(!file_exists(__ABSOLUTE_PATH__."../temp/testsuite/pdf_affaire/"))util::mkdir(__ABSOLUTE_PATH__."../temp/testsuite/pdf_affaire/");
-        
+
         $r = $this->obj->uploadFileFromSA($infos,ATF::_s(),$files);
         $this->assertEquals('{"success":true}',$r,"Erreur dans le retour de l'upload");
         $f = __ABSOLUTE_PATH__."../data/testsuite/prolongation/".$id_prolongation.".tu";

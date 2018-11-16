@@ -34,6 +34,7 @@ class affaire_lm extends affaire {
 			,"etat"
 			,"date"
 			,"id_societe"
+			,"id_filiale"
 			,"nature"
 			,"forecast"
 			,"parentes"=>array("custom"=>true)
@@ -77,6 +78,19 @@ class affaire_lm extends affaire {
 			,'apporteur'
 		);
 		$this->panels['chiffres'] = array("visible"=>true, 'nbCols'=>1);
+
+		$this->colonnes['panel']['commentaire_sur_facture'] = array(
+			 "specifiqueCommentaireFacture"=>array("custom"=>true)
+		);
+		$this->panels['commentaire_sur_facture'] = array("visible"=>true, 'nbCols'=>1);
+
+		$this->colonnes['panel']['infos_signature_contrat'] = array(
+			"tel_signature",
+			"mail_signataire",
+			"date_signature",
+			"signataire"
+		);
+		$this->panels['infos_signature_contrat'] = array("visible"=>false);
 
 		$this->fieldstructure();
 
