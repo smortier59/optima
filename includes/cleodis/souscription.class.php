@@ -94,6 +94,8 @@ class souscription_cleodis extends souscription {
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
 
+        // Mise à jour du panier avec l'ID affaire et le statut 'affaire'
+
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
         throw $e;
@@ -153,7 +155,7 @@ class souscription_cleodis extends souscription {
         "prix_achat"=>0,
         "type_affaire" => "normal"
     );
-
+    log::logger($post, 'qjanon');
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
@@ -186,6 +188,7 @@ class souscription_cleodis extends souscription {
           ->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
 
+        log::logger($produitLoyer, "qjanon");
 
         if ($toInsertProduitDevis[$produit['id_produit']]) {
           $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
@@ -219,6 +222,60 @@ class souscription_cleodis extends souscription {
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
     $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+
+
+
+    // foreach ($produits as $k=>$produit) {
+    //     ATF::produit()->q->reset()
+    //       ->addField("loyer")
+    //       ->addField("duree")
+    //       ->addField("type")
+    //       ->addField("prix_achat")
+    //       ->addField("id_fournisseur")
+    //       ->where("id_produit", $produit['id_produit']);
+    //     $produitLoyer = ATF::produit()->select_row();
+
+    //     log::logger($produitLoyer, "qjanon");
+
+    //     $duree[$produitLoyer['duree']][] = $produitLoyer;
+
+    // }
+
+    // foreach ($duree as $d => $produits) {
+    //   foreach ($produits as $k=>$produit) {
+
+    //       if ($toInsertProduitDevis[$produit['id_produit']]) {
+    //         $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
+    //       } else {
+    //         $toInsertProduitDevis[$produit['id_produit']] =  array(
+    //           "devis_ligne__dot__produit"=> $produit['produit'],
+    //           "devis_ligne__dot__quantite"=>$produit['quantite'],
+    //           "devis_ligne__dot__type"=>$produitLoyer['type'],
+    //           "devis_ligne__dot__ref"=>$produit['ref'],
+    //           "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
+    //           "devis_ligne__dot__id_produit"=>$produit['produit'],
+    //           "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
+    //           "devis_ligne__dot__visibilite_prix"=>"invisible",
+    //           "devis_ligne__dot__date_achat"=>"",
+    //           "devis_ligne__dot__commentaire"=>"",
+    //           "devis_ligne__dot__neuf"=>"oui",
+    //           "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
+    //           "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
+    //           "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
+    //         );
+    //       }
+
+    //       $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
+    //       $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
+
+    //   }
+    //   // Faire sauter les index
+    //   $toInsertProduitDevis = array_values($toInsertProduitDevis);
+
+    //   $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
+    //   $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
+    //   $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+    // }
 
     return $id_devis;
   }
