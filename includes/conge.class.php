@@ -93,16 +93,8 @@ class conge extends classes_optima {
 				+IF(
 					WEEKDAY(conge.date_fin)=4 AND conge.periode!='am'
 					,1
-					"./* Retrancher le Samedi férié chômé qui suit) */"
-					-nbSamediFerieCetteAnneeLa(
-						YEAR(DATE_ADD(conge.date_fin, INTERVAL 1 DAY))
-						,DATE_ADD(conge.date_fin, INTERVAL 1 DAY)
-						,DATE_ADD(conge.date_fin, INTERVAL 1 DAY)
-					)
 					,0
 				)
-				"./* Retrancher les Samedi fériés chômés) */"
-				-nbSamediFerie(conge.date_debut,conge.date_fin)
 			,1)","duree");
 		
 		$this->q->addField("ROUND(
