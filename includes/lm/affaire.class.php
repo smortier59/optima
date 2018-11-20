@@ -1326,6 +1326,7 @@ class affaire_lm extends affaire {
 		foreach ($affaires as $key => $value) {
 			$affaire_societe = array();
 
+			//On recupere les affaires parentes et filles par rapport
 			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"]);
 
 			$affs = ATF::affaire()->sa();
@@ -1432,27 +1433,30 @@ class affaire_lm extends affaire {
 				if($produits_opteven){
 
 					$first = reset($affaire_adresse);
+					if($first["id_affaire"]){
+						$data_aff = ATF::affaire()->select($first["id_affaire"]);
 
-					$data_aff = ATF::affaire()->select($first["id_affaire"]);
+						ATF::comite()->q->reset()->where("id_affaire", $first["id_affaire"])->where("comite.etat", "accepte");
+						$comite = ATF::comite()->select_row();
 
-					ATF::comite()->q->reset()->where("id_affaire", $first["id_affaire"])->where("comite.etat", "accepte");
-					$comite = ATF::comite()->select_row();
+						$data[$i][0] = $produits_opteven;
+						$data[$i][1] = $data_aff["ref"];
+						$data[$i][2] = date("dmY", strtotime($comite["date"]));
+						$data[$i][3] = strtoupper($client["ref"]);
+						$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
+						$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
+						$data[$i][6] = $client["civilite"];
+						$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
+						$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
+						$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
+						$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
+						$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
+						$data[$i][12] = $produits_affaire;
 
-					$data[$i][0] = $produits_opteven;
-					$data[$i][1] = $data_aff["ref"];
-					$data[$i][2] = date("dmY", strtotime($comite["date"]));
-					$data[$i][3] = strtoupper($client["ref"]);
-					$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
-					$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
-					$data[$i][6] = $client["civilite"];
-					$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
-					$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
-					$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
-					$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
-					$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
-					$data[$i][12] = $produits_affaire;
+						$i++;
+					}
 
-					$i++;
+
 				}
 
 
