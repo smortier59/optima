@@ -1307,7 +1307,7 @@ class affaire_lm extends affaire {
 		$OPTEVEN = ATF::societe()->select_row();
 
 
-		ATF::affaire()->q->reset()  ->select("affaire.id_societe, adresse_livraison")
+		ATF::affaire()->q->reset()  ->select("affaire.id_societe,adresse_livraison")
 									->from("affaire","id_affaire" , "commande","id_affaire")
 									->from("commande","id_commande" , "commande_ligne","id_commande")
 									->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
@@ -1326,9 +1326,13 @@ class affaire_lm extends affaire {
 		foreach ($affaires as $key => $value) {
 			$affaire_societe = array();
 
-			//On recupere les affaires parentes et filles par rapport
-			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"]);
 
+			$ref_affaire = ATF::affaire()->select($value["affaire.id_affaire"], "ref");
+			$ref_affaire = substr($ref_affaire , 0, 8);
+
+			//On recupere les affaires parentes et filles par rapport à la ref
+			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"])
+									  ->where("ref", $ref_affaire."%", "AND", false, "LIKE");
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $k => $v) {
