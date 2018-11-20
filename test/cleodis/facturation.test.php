@@ -6,15 +6,15 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 	/** Méthode pré-test, exécute avant chaque test unitaire
 	* besoin d'un user pour les traduction
 	*/
-	public function setUp() {
+	public function setUp() {		
 		$this->initUser();
 	}
-
+	
 	/** Méthode post-test, exécute après chaque test unitaire*/
 	public function tearDown(){
 		ATF::db()->rollback_transaction(true);
 	}
-
+	
 
   	// @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -23,18 +23,18 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTu","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis,"etat"=>"mis_loyer","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>date("2010-01-01"),"date_evolution"=>date("2010-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire)));
 		$id_commande_ligne1=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
 		$id_commande_ligne2=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS1","produit"=>"Ordinateur TOM TOM GO5001","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
-
+		
 		$id_affaire_parente=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTuParenre","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire","id_fille"=>$id_affaire)));
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis_parent=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTuParenre","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire_parente,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_parent_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis_parent,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande_parent=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTuParenre","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis_parent,"etat"=>"mis_loyer","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>NULL,"date_evolution"=>date("2009-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire_parente)));
@@ -46,7 +46,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::affaire()->decryptId(ATF::affaire()->u(array("id_affaire"=>$id_affaire,"nature"=>"AR")));
 
 		$affaire=new affaire_cleodis($id_affaire);
-		$affaire_parent=new affaire_cleodis($id_affaire_parente);
+		$affaire_parent=new affaire_cleodis($id_affaire_parente);	
 		$this->obj->update_facturations($affaire_parent,$affaire);
 		$this->assertFalse($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer false car la commande parent n a pas de date debut');
 
@@ -61,11 +61,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 			,"date_periode_debut"=>"2009-01-01"
 			,"date_periode_fin"=>"2010-04-01"
 			,"type_facture"=>"facture"
-		));
+		));	
 		try {
 			$this->obj->update_facturations($affaire_parent,$affaire);
 		} catch (errorATF $e) {
-			$errno = $e->getCode();
+			$errno = $e->getCode();	
 		}
 		$this->assertEquals(878,$errno,"Erreur non retrouvée");
 
@@ -81,7 +81,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 			,"type_facture"=>"libre"
 		));
 		$this->assertTrue($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer true car la commande parent a une date debut 2');
-
+		
 		$infos_facturation = array(
 			"id_affaire"=>$id_affaire_parente
 			,"id_societe"=>$this->id_societe
@@ -91,39 +91,39 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 			,"date_periode_fin"=>"2009-01-31"
 			,"envoye"=>"oui"
 		);
-		$id_facturation_mois_dernier=$this->obj->i($infos_facturation);
+		$id_facturation_mois_dernier=$this->obj->i($infos_facturation);	
 		$commande = $affaire->getCommande();
-		$commande->set("date_debut","2008-01-01");
+		$commande->set("date_debut","2008-01-01");	
 		$this->assertTrue($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer true car la commande parent a une date debut 3');
-
+	
 		// Avec facture associee a facturation
-		ATF::facture()->d($id_facture_avoir);
+		ATF::facture()->d($id_facture_avoir);		
 		try {
 			$this->obj->update_facturations($affaire_parent,$affaire);
 		} catch (errorATF $e) {
-			$errno = $e->getCode();
+			$errno = $e->getCode();	
 		}
-		$this->assertEquals(879,$errno,"Erreur non retrouvée");
+		$this->assertEquals(879,$errno,"Erreur non retrouvée");	
 	}
-
+	
 	// @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	function testUpdate_facturations(){
 		$id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire")));
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTu","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis,"etat"=>"mis_loyer","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>date("2010-01-01"),"date_evolution"=>date("2010-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire)));
 		$id_commande_ligne1=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
 		$id_commande_ligne2=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS1","produit"=>"Ordinateur TOM TOM GO5001","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
-
+		
 		$id_affaire_parente=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTuParenre","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire","id_fille"=>$id_affaire)));
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis_parent=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTuParenre","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire_parente,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_parent_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis_parent,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande_parent=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTuParenre","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis_parent,"etat"=>"mis_loyer","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>NULL,"date_evolution"=>date("2009-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire_parente)));
@@ -136,13 +136,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$affaire=new affaire_cleodis($id_affaire);
 		$affaire_parent=new affaire_cleodis($id_affaire_parente);
-
+		
 		$this->obj->update_facturations($affaire_parent,$affaire);
 		$this->assertFalse($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer false car la commande parent n a pas de date debut');
-
+		
 		ATF::commande()->u(array("id_commande"=>$id_commande_parent,"date_debut"=>date("2009-01-01")));
 		$this->assertTrue($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer true car la commande parent a une date debut');
-
+		
 		$this->obj->q->reset()->addCondition("id_affaire",$id_affaire_parente)->addOrder("date_periode_debut");
 		$facturations_parente=$this->obj->sa();
 		$this->assertEquals(array(
@@ -158,7 +158,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-01-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								1=>array(
 										"id_facturation"=>$facturations_parente[1]["id_facturation"],
@@ -172,7 +176,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-02-28",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								2=>array(
 										"id_facturation"=>$facturations_parente[2]["id_facturation"],
@@ -186,7 +194,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-03-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								3=>array(
 										"id_facturation"=>$facturations_parente[3]["id_facturation"],
@@ -200,27 +212,31 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"oui",
 										"date_periode_fin"=>"2009-06-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$facturations_parente,'insert_facturation ne créé pas les bonnes facturations parent ');
 
-
+		
 		ATF::devis()->decryptId(ATF::devis()->u(array("id_devis"=>$id_devis_parent,"loyer_unique"=>"oui")));
 		$this->assertTrue($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer true car la commande parent a une date debut');
-
+		
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer1,"frequence_loyer"=>"trimestre"));
 		$this->assertTrue($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer true car la commande parent a une date debut');
-
+		
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer1,"frequence_loyer"=>"an"));
 		$this->assertTrue($this->obj->update_facturations($affaire_parent,$affaire),'update_facturations doit renvoyer true car la commande parent a une date debut');
 
 	}
-
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  
 	public function testDelete_special(){
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
-
+		
 		$id_facture = ATF::facture()->i(
 			array(
 				"id_affaire"=>$id_affaire
@@ -235,25 +251,25 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$id_facturation=$this->obj->i(array("id_affaire"=>$id_affaire,"id_societe"=>$this->id_societe,"id_facture"=>$id_facture,"montant"=>100,"date_periode_debut"=>"2010-01-01","date_periode_fin"=>"2010-02-01","envoye"=>"oui"));
 		try {
-			$this->obj->delete_special($id_affaire,"contrat");
+			$this->obj->delete_special($id_affaire,"contrat");	
 		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,'Impossible de supprimer une facturation envoyée');
-
+		
 		$this->obj->u(array("id_facturation"=>$id_facturation,"envoye"=>"non"));
 		try {
-			$this->obj->delete_special($id_affaire,"contrat");
+			$this->obj->delete_special($id_affaire,"contrat");	
 		} catch (errorATF $e) {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(879,$error,'Impossible de supprimer une facturation qui a une facture');
 
 		$this->obj->u(array("id_facturation"=>$id_facturation,"id_facture"=>NULL));
-
+		
 //		$target = $this->obj->filepath($id_facturation,"facturation");
 //		util::file_put_contents($target,"tuFacturation");
-
+		
 		ATF::db($this->db)->begin_transaction();
 		$this->assertTrue($this->obj->delete_special($id_affaire,"contrat"),"delete_special devrait renvoyer true");
 		ATF::db($this->db)->rollback_transaction();
@@ -262,9 +278,9 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	public function testPeriode_facturation(){
-
+	
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$id_facturation=$this->obj->i(array("id_affaire"=>$id_affaire,"id_societe"=>$this->id_societe,"id_facture"=>$id_facture,"montant"=>100,"date_periode_debut"=>date("Y-m-d"),"date_periode_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 month")),"envoye"=>"oui"));
 
@@ -273,9 +289,9 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->obj->select($id_facturation),$this->obj->periode_facturation($id_affaire,true),'Periode_facturation ne renvoi pas la bonne facturation');
 	}
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	public function testgetResteAPayer(){
-
+	
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$id_facture = ATF::facture()->i(
 			array(
@@ -296,7 +312,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 											"date_periode_debut"=>date("Y-m-d"),
 											"date_periode_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 month - 1 day")),
 											"envoye"=>"oui"
-											)
+											)									
 										);
 
 		$id_facturation=$this->obj->i(array(
@@ -307,7 +323,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 											"date_periode_debut"=>date("Y-m-d",strtotime(date("Y-m-01")." + 1 month")),
 											"date_periode_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 2 month - 1 day")),
 											"envoye"=>"non"
-											)
+											)									
 										);
 
 
@@ -319,15 +335,15 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 											"date_periode_debut"=>date("Y-m-d",strtotime(date("Y-m-01")." + 2 month")),
 											"date_periode_fin"=>date("Y-m-d",strtotime(date("Y-m-01")." + 3 month - 1 day")),
 											"envoye"=>"non"
-											)
+											)									
 										);
 		$this->assertEquals(50,$this->obj->getResteAPayer($id_affaire),'getResteAPayer ne renvoi pas le bon montant');
 	}
 
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	public function testMontant_total(){
-
+	
 		$id_affaire=ATF::affaire()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu"));
 		$commande=array(
 						"ref"=>"affaire",
@@ -356,9 +372,9 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	public function testInsert_facturation_prolongation(){
-
+	
 		$id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire")));
 		$id_devis=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTu","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
@@ -367,11 +383,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_commande_ligne2=ATF::commande_ligne()->i(array("id_commande"=>$id_commande,"id_produit"=>6,"ref"=>"GPAC-GPS1","produit"=>"Ordinateur TOM TOM GO5001","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui"));
 
 		$id_prolongation=ATF::prolongation()->i(array("id_affaire"=>$id_affaire,"ref"=>"prolongTu","id_societe"=>$this->id_societe,"date_debut"=>date("2011-01-01"),"date_fin"=>"2012-09-30"));
-
+	
 		$id_loyer_prolongation1=ATF::loyer_prolongation()->i(array("id_affaire"=>$id_affaire,"id_prolongation"=>$id_prolongation,"loyer"=>"100","duree"=>3,"frequence_loyer"=>"mois","date_debut"=>"2011-01-01","date_fin"=>"2011-03-31"));
 		$id_loyer_prolongation2=ATF::loyer_prolongation()->i(array("id_affaire"=>$id_affaire,"id_prolongation"=>$id_prolongation,"loyer"=>"50","duree"=>2,"frequence_loyer"=>"trimestre","date_debut"=>"2011-04-01","date_fin"=>"2011-09-30"));
 		$id_loyer_prolongation3=ATF::loyer_prolongation()->i(array("id_affaire"=>$id_affaire,"id_prolongation"=>$id_prolongation,"loyer"=>"25","duree"=>1,"frequence_loyer"=>"an","date_debut"=>"2011-10-01","date_fin"=>"2012-09-30"));
-
+		
 		$commande = new commande_cleodis($id_commande);
 		$this->assertTrue($this->obj->insert_facturation_prolongation($commande),"insert_facturation_prolongation devrait renvoyer true");
 		$this->assertEquals(
@@ -398,7 +414,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"mois",
 									"date_debut"=>"2011-01-01",
-									"date_fin"=>"2011-03-31"
+									"date_fin"=>"2011-03-31",
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 							)
 							,ATF::loyer_prolongation()->select($id_loyer_prolongation1),'insert_facturation_prolongation ne met pas à jour les dates de loyer_prolongation1');
 
@@ -413,7 +434,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"trimestre",
 									"date_debut"=>"2011-04-01",
-									"date_fin"=>"2011-09-30"
+									"date_fin"=>"2011-09-30",
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 							)
 							,ATF::loyer_prolongation()->select($id_loyer_prolongation2),'insert_facturation_prolongation ne met pas à jour les dates de loyer_prolongation2');
 
@@ -428,11 +454,16 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"frais_de_gestion"=>NULL,
 									"frequence_loyer"=>"an",
 									"date_debut"=>"2011-10-01",
-									"date_fin"=>"2012-09-30"
+									"date_fin"=>"2012-09-30",
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 							)
 							,ATF::loyer_prolongation()->select($id_loyer_prolongation3),'insert_facturation_prolongation ne met pas à jour les dates de loyer_prolongation3');
 
-
+		
 		$this->obj->q->reset()->addCondition("id_affaire",$id_affaire);
 		$facturations=$this->obj->sa();
 		$this->assertEquals(array(
@@ -448,7 +479,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-01-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								1=>array(
 										"id_facturation"=>$facturations[1]["id_facturation"],
@@ -462,7 +497,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-02-28",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								2=>array(
 										"id_facturation"=>$facturations[2]["id_facturation"],
@@ -476,7 +515,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-03-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								3=>array(
 										"id_facturation"=>$facturations[3]["id_facturation"],
@@ -490,7 +533,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-06-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								4=>array(
 										"id_facturation"=>$facturations[4]["id_facturation"],
@@ -504,7 +551,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-09-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								5=>array(
 										"id_facturation"=>$facturations[5]["id_facturation"],
@@ -518,22 +569,26 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2012-09-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$this->obj->sa(),'insert_facturation_prolongation ne créé pas les bonnes facturations');
 
 	}
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	public function testInsert_facturations(){
-
+	
 		$id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire")));
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
 		$id_loyer4=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"jour")));
-
+		
 
 		$id_devis=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTu","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
@@ -561,7 +616,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2010-01-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 
 
 								),
@@ -577,7 +636,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2010-02-28",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 
 								),
 								2=>array(
@@ -592,7 +655,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2010-03-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 
 								),
 								3=>array(
@@ -607,7 +674,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2010-06-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 
 								),
 								4=>array(
@@ -622,7 +693,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-06-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 
 								),
 								5=>array(
@@ -637,7 +712,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2011-07-02",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 
 								)
 							)
@@ -648,7 +727,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_parente,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis_parent=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTuParenre","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire_parente,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_parent_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis_parent,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande_parent=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTuParenre","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis_parent,"etat"=>"mis_loyer","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>date("2009-01-01"),"date_evolution"=>date("2009-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire_parente)));
@@ -667,7 +746,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 				$affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 			}
 		}
-
+		
 		$this->assertTrue($this->obj->insert_facturations($commande,$affaire,$affaires_parentes,$devis,"contrat"),"insert_facturation devrait renvoyer true" );
 		$this->obj->q->reset()->addCondition("id_affaire",$id_affaire_parente);
 		$facturations_parente=$this->obj->sa();
@@ -684,7 +763,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-01-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								1=>array(
 										"id_facturation"=>$facturations_parente[1]["id_facturation"],
@@ -698,7 +781,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-02-28",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								2=>array(
 										"id_facturation"=>$facturations_parente[2]["id_facturation"],
@@ -712,7 +799,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-03-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								),
 								3=>array(
 										"id_facturation"=>$facturations_parente[3]["id_facturation"],
@@ -726,7 +817,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-06-30",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$facturations_parente,'insert_facturation ne créé pas les bonnes facturations parent 2');
@@ -737,7 +832,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_avenant,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_avenant,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire_avenant,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis_avenant=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTuAvenant","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire_avenant,"tva"=>"1.196","loyer_unique"=>"oui","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_avenant_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis_avenant,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande_avenant=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTuAvenant","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis_avenant,"etat"=>"mis_loyer","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>date("2009-01-01"),"date_evolution"=>date("2009-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire_avenant)));
@@ -750,7 +845,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis_avenant = new devis_cleodis($id_devis_avenant);
 		$affaire_avenant=new affaire_cleodis($id_affaire_avenant);
 
-
+		
 		$this->assertTrue($this->obj->insert_facturations($commande_avenant,$affaire_avenant,false,$devis_avenant,"contrat"),"insert_facturation avenant devrait renvoyer true" );
 		$this->obj->q->reset()->addCondition("id_affaire",$id_affaire_avenant);
 		$facturations_avenant=$this->obj->sa();
@@ -767,7 +862,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"contrat",
 										"envoye"=>"non",
 										"date_periode_fin"=>"2009-12-31",
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 							)
 							,$facturations_avenant,'insert_facturation ne créé pas les bonnes facturations avenant');
@@ -776,18 +875,18 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
-	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	//@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> 
 	public function testInsert_facturation(){
-
+		
 		$date_debut_periode = date("Y-m-d",mktime(0,0,0,date("m"),01,date("Y")));
 		$date_debut_periode=date("Y-m-d",strtotime($date_debut_periode."+1 month"));
 		$date_fin_periode=date("Y-m-d",strtotime($date_debut_periode."+1 month"));
-
+	
 		$id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire")));
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTu","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis,"etat"=>"arreter","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>date("2010-01-01"),"date_evolution"=>date("2010-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire)));
@@ -816,7 +915,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day")),
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id)
 								,"L'insertion de la facturation ne fonctionne pas fréquence an");
@@ -836,7 +939,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 month - 1 day")),
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id)
 								,"L'insertion de la facturation ne fonctionne pas fréquence mois");
@@ -856,7 +963,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 3 month - 1 day")),
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");
@@ -868,7 +979,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_loyer_prolongation3=ATF::loyer_prolongation()->i(array("id_affaire"=>$id_affaire,"id_prolongation"=>$id_prolongation,"loyer"=>"25","duree"=>1,"frequence_loyer"=>"an","date_debut"=>"2011-10-01","date_fin"=>"2012-09-30"));
 
 		$this->assertFalse($this->obj->insert_facturation($commande,$affaire),"L'insertion de facturation ne devrait pas se faire car le dernier loyer est arrêté");
-
+		
 		ATF::prolongation()->u(array("id_prolongation"=>$id_prolongation,"date_arret"=>NULL));
 
 		$id_facturation=$this->obj->insert_facturation($commande,$affaire);
@@ -884,24 +995,28 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day")),
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");
-		$this->obj->d($id_facturation);
+		$this->obj->d($id_facturation);	
 		}
 
 	public function test_insertfacturation2(){
-
+			
 		$date_debut_periode = date("Y-m-d",mktime(0,0,0,date("m"),01,date("Y")));
 		$date_debut_periode=date("Y-m-d",strtotime($date_debut_periode."+1 month"));
 		$date_fin_periode=date("Y-m-d",strtotime($date_debut_periode."+1 month"));
-
+	
 		$id_affaire=ATF::affaire()->decryptId(ATF::affaire()->i(array("etat"=>"commande","date"=>date("Y-m-d"),"ref"=>"refTu","id_societe"=>$this->id_societe,"affaire"=>"AffaireTu","nature"=>"affaire")));
 		$id_loyer1=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>200,"duree"=>3,"assurance"=>20,"frais_de_gestion"=>2,"frequence_loyer"=>"mois")));
 		$id_loyer2=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>1,"assurance"=>10,"frais_de_gestion"=>1,"frequence_loyer"=>"trimestre")));
 		$id_loyer3=ATF::loyer()->decryptId(ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>50,"duree"=>1,"assurance"=>5,"frais_de_gestion"=>0,"frequence_loyer"=>"an")));
-
+		
 		$id_devis=ATF::devis()->decryptId(ATF::devis()->i(array("ref"=>"refTu","id_user"=>$this->id_user,"id_societe"=>$this->id_societe,"id_filiale"=>246,"prix"=>600,"date"=>date("Y-m-d"),"devis"=>"AffaireTu","type_contrat"=>"lld","date_accord"=>date("Y-m-d"),"etat"=>"gagne","id_contact"=>$this->id_contact,"id_affaire"=>$id_affaire,"tva"=>"1.196","loyer_unique"=>"non","prix_achat"=>0,"validite"=>date("Y-m-d"))));
 		$id_devis_ligne=ATF::devis_ligne()->i(array("type"=>"portable","id_devis"=>$id_devis,"id_produit"=>6,"ref"=>"GPAC-GPS","produit"=>"Ordinateur TOM TOM GO500","quantite"=>2,"id_fournisseur"=>5385,"prix_achat"=>"0","visible"=>"oui","visibilite_prix"=>"visible"));
 		$id_commande=ATF::commande()->decryptId(ATF::commande()->i(array("ref"=>"refTu","id_societe"=>$this->id_societe,"commande"=>"AffaireTu","prix_achat"=>0,"prix"=>600,"date"=>date("Y-m-d"),"id_devis"=>$id_devis,"etat"=>"arreter","id_user"=>$this->id_user,"tva"=>"1.196","clause_logicielle"=>"non","date_debut"=>date("2010-01-01"),"date_evolution"=>date("2010-12-31"),"type"=>"prelevement","id_affaire"=>$id_affaire)));
@@ -911,13 +1026,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$commande = new commande_cleodis($id_commande);
 		$devis = new devis($id_devis);
 		$affaire=new affaire_cleodis($id_affaire);
-
-		//******************************* RESTITUTION *****************************************************
-		//Anuelle
+		
+		//******************************* RESTITUTION *****************************************************	
+		//Anuelle					
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer3,"frequence_loyer"=>"an"));
 		ATF::commande()->u(array("id_commande"=>$id_commande,"etat"=>"restitution" , "date_prevision_restitution" => date("Y-m-d",strtotime($date_debut_periode." - 2 month"))));
-		$commande = new commande_cleodis($id_commande);
-		$id_facturation=$this->obj->insert_facturation($commande,$affaire);
+		$commande = new commande_cleodis($id_commande);	
+		$id_facturation=$this->obj->insert_facturation($commande,$affaire);		
 		$this->assertEquals(array(	"id_facturation"=>$id_facturation,
 									"id_affaire"=>$id_affaire,
 									"id_societe"=>$this->id_societe,
@@ -929,16 +1044,20 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"type"=>"prolongation",
 									"envoye"=>"non",
 									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 year - 1 day - 2 month")),
-										'nature' => 'engagement'
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence annuelle, restitution");
 		//Trimestre
-		$this->obj->d($id_facturation);
+		$this->obj->d($id_facturation);	
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer3,"frequence_loyer"=>"trimestre"));
-		$commande = new commande_cleodis($id_commande);
-		$id_facturation=$this->obj->insert_facturation($commande,$affaire);
-
+		$commande = new commande_cleodis($id_commande);	
+		$id_facturation=$this->obj->insert_facturation($commande,$affaire);					
+		
 		$this->assertEquals(array(	"id_facturation"=>$id_facturation,
 									"id_affaire"=>$id_affaire,
 									"id_societe"=>$this->id_societe,
@@ -950,17 +1069,21 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"type"=>"prolongation",
 									"envoye"=>"non",
 									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." + 1 month - 1 day")),
-										'nature' => 'engagement'
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
 								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre, restitution");
-
+								
 		//Mensuelle
-		$this->obj->d($id_facturation);
+		$this->obj->d($id_facturation);	
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer3,"frequence_loyer"=>"mois"));
-		$commande = new commande_cleodis($id_commande);
-		$id_facturation=$this->obj->insert_facturation($commande,$affaire);
-
+		$commande = new commande_cleodis($id_commande);	
+		$id_facturation=$this->obj->insert_facturation($commande,$affaire);					
+		
 		$this->assertEquals(array(	"id_facturation"=>$id_facturation,
 									"id_affaire"=>$id_affaire,
 									"id_societe"=>$this->id_societe,
@@ -972,17 +1095,21 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"type"=>"prolongation",
 									"envoye"=>"non",
 									"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." -1 month -1 day")),
-										'nature' => 'engagement'
+									'serenite' => '0.00',
+									'maintenance' => '0.00',
+									'hotline' => '0.00',
+									'supervision' => '0.00',
+									'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
-								,"L'insertion de la facturation ne fonctionne pas fréquence mois, restitution");
+								,"L'insertion de la facturation ne fonctionne pas fréquence mois, restitution");	
 
 
-		ATF::facturation()->d($id_facturation);
-
+		ATF::facturation()->d($id_facturation);	
+						
 		$id_prolongation=ATF::prolongation()->i(array("id_affaire"=>$affaire->get("id_affaire"),"ref"=>"prolongTu","id_societe"=>$this->id_societe,"date_debut"=>date("2011-01-01"),"date_fin"=>"2012-09-30"));
-
-		$id_facturation=$this->obj->insert_facturation($commande,$affaire);
+		
+		$id_facturation=$this->obj->insert_facturation($commande,$affaire);	
 		$this->assertEquals(array(
 										"id_facturation"=>$id_facturation,
 										"id_affaire"=>$id_affaire,
@@ -995,22 +1122,26 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 										"type"=>"prolongation",
 										"envoye"=>"non",
 										"date_periode_fin"=>date("Y-m-d",strtotime($date_debut_periode." - 1 day -1 month")),
-										'nature' => 'engagement'
+										'serenite' => '0.00',
+										'maintenance' => '0.00',
+										'hotline' => '0.00',
+										'supervision' => '0.00',
+										'support' => '0.00'
 								)
 								,$this->obj->select($id_facturation)
-								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");
+								,"L'insertion de la facturation ne fonctionne pas fréquence trimestre");			
 	}
-
-	// @author Yann GAUTHERON <ygautheron@absystech.fr>
+	
+	// @author Yann GAUTHERON <ygautheron@absystech.fr>	
 	function testInsert_facture1(){
 		$this->Insert_facture();
 	}
-
+	
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	function testInsert_facture2(){
 		$this->Insert_facture(6);
 	}
-
+	
 	// @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	function Insert_facture($date_previsionnelle=NULL){
@@ -1020,11 +1151,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 						"affaire"=>"insert_facture"
 						);
 		if ($date_previsionnelle) {
-			$affaire["date_previsionnelle"]=$date_previsionnelle;
-		}
+			$affaire["date_previsionnelle"]=$date_previsionnelle;	
+		}		
 		$id_affaire=ATF::affaire()->i($affaire);
 		$affaire=ATF::affaire()->select($id_affaire);
-
+	
 		$facturation=array(
 							"id_affaire"=>$id_affaire,
 							"id_societe"=>$this->id_societe,
@@ -1068,7 +1199,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture_ligne=ATF::facture_ligne()->sa();
 
 		$this->assertEquals(array(
-
+							
 									"id_facture"=>(string)$id_facture,
 									"type_facture"=>"facture",
 									"ref"=>"affaire-1",
@@ -1094,13 +1225,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 									"type_libre"=>NULL,
 									'redevance' => 'oui',
 									'date_rejet' => NULL,
-									'date_regularisation' => NULL,
-									'id_fournisseur_prepaiement' => null,
-									'nature' => 'contrat',
-									'id_slimpay' => null,
-									'executionStatus' => null,
-									'executionDate' => null,
-									'DATE_EXPORT_VTE' => null
+									'date_regularisation' => NULL
 							)
 							,$facture,'insert_facture ne créé pas la bonne facture');
 
@@ -1129,12 +1254,12 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertFalse($this->obj->insert_facture($affaire,$facturation),'La facture ne doit pas se faire car il existe deja une facture');
 
 	}
-
+	
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	public function test_facturationMensuelleContrat1(){
-
+	
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"id_societe"=>$id_societe,
@@ -1145,7 +1270,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-01")."+1 day"))
 											)
 										);
-
+							
 		$id_facturation=ATF::facturation()->i(array(
 													"id_affaire"=>$id_affaire,
 													"id_societe"=>$id_societe,
@@ -1155,11 +1280,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 													)
 												);
 
-
+		
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture1=ATF::facture()->sa();
-		$this->assertNotNull($facture1,"Problème car une facture type ne passe pas");
+		$this->assertNotNull($facture1,"Problème car une facture type ne passe pas");	
 		ATF::facture()->d($facture1["id_facture"]);
 
 		//Mauvaise date 1
@@ -1172,7 +1297,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture2=ATF::facture()->sa();
-		$this->assertNull($facture2,"Problème car une facture avec mauvaise date debut passe pas");
+		$this->assertNull($facture2,"Problème car une facture avec mauvaise date debut passe pas");	
 
 		//Mauvaise date 2
 		ATF::facturation()->u(array(
@@ -1183,7 +1308,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture3=ATF::facture()->sa();
-		$this->assertNull($facture3,"Problème car une facture avec mauvaise date debut passe pas");
+		$this->assertNull($facture3,"Problème car une facture avec mauvaise date debut passe pas");	
 
 		//Ré-initialisation 1
 		ATF::facturation()->u(array(
@@ -1195,9 +1320,9 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture4=ATF::facture()->sa();
-		$this->assertNotNull($facture4,"Problème car une facture type ne passe pas 1");
+		$this->assertNotNull($facture4,"Problème car une facture type ne passe pas 1");	
 		ATF::facture()->d($facture4["id_facture"]);
-
+		
 		//Envoye==oui
 		ATF::facturation()->u(array(
 										"id_facturation"=>$id_facturation,
@@ -1207,7 +1332,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture5=ATF::facture()->sa();
-		$this->assertNull($facture5,"Problème car une facturation envoye ne doit plus l'etre");
+		$this->assertNull($facture5,"Problème car une facturation envoye ne doit plus l'etre");	
 
 		//Ré-initialisation 2
 		ATF::facturation()->u(array(
@@ -1218,16 +1343,16 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture6=ATF::facture()->sa();
-		$this->assertNotNull($facture6,"Problème car une facture type ne passe pas 2");
+		$this->assertNotNull($facture6,"Problème car une facture type ne passe pas 2");	
 		ATF::facture()->d($facture6["id_facture"]);
 
 	}
-
+	
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	public function test_facturationMensuelleContrat1b(){
-
+	
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"id_societe"=>$id_societe,
@@ -1238,7 +1363,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-01")."+1 day"))
 											)
 										);
-
+							
 		$id_facturation=ATF::facturation()->i(array(
 													"id_affaire"=>$id_affaire,
 													"id_societe"=>$id_societe,
@@ -1248,7 +1373,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 													)
 												);
 
-
+	
 
 		//id_facture
 		$id_facture1 = ATF::facture()->i(
@@ -1271,7 +1396,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::facture()->d($id_facture1);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture7=ATF::facture()->sa();
-		$this->assertNull($facture7,"Problème car un on ne peut facturer une echéance de facturation qui a déjà été facturée");
+		$this->assertNull($facture7,"Problème car un on ne peut facturer une echéance de facturation qui a déjà été facturée");	
 
 		//Ré-initialisation 3
 		ATF::facturation()->u(array(
@@ -1282,7 +1407,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture8=ATF::facture()->sa();
-		$this->assertNotNull($facture8,"Problème car une facture type ne passe pas 3");
+		$this->assertNotNull($facture8,"Problème car une facture type ne passe pas 3");	
 		ATF::facture()->d($facture8["id_facture"]);
 
 		//etat==perdu
@@ -1294,7 +1419,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture9=ATF::facture()->sa();
-		$this->assertNull($facture9,"Problème car une facturation envoye ne doit pas sortir si affaire arreter");
+		$this->assertNull($facture9,"Problème car une facturation envoye ne doit pas sortir si affaire arreter");	
 
 		//Ré-initialisation 4
 		ATF::affaire()->u(array(
@@ -1305,7 +1430,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture10=ATF::facture()->sa();
-		$this->assertNotNull($facture10,"Problème car une facture type ne passe pas 4");
+		$this->assertNotNull($facture10,"Problème car une facture type ne passe pas 4");	
 		ATF::facture()->d($facture10["id_facture"]);
 
 		//etat==arreter
@@ -1317,7 +1442,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture11=ATF::facture()->sa();
-		$this->assertNull($facture11,"Problème car une facturation envoye ne doit pas sortir si commande arreter");
+		$this->assertNull($facture11,"Problème car une facturation envoye ne doit pas sortir si commande arreter");	
 
 
 		//etat==AR
@@ -1329,7 +1454,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture12=ATF::facture()->sa();
-		$this->assertNull($facture12,"Problème car une facturation envoye ne doit pas sortir si commande AR");
+		$this->assertNull($facture12,"Problème car une facturation envoye ne doit pas sortir si commande AR");	
 
 		//Ré-initialisation 5
 		ATF::commande()->u(array(
@@ -1340,7 +1465,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture13=ATF::facture()->sa();
-		$this->assertNotNull($facture13,"Problème car une facture type ne passe pas 5");
+		$this->assertNotNull($facture13,"Problème car une facture type ne passe pas 5");	
 		ATF::facture()->d($facture13["id_facture"]);
 
 		//nature==vente
@@ -1352,7 +1477,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture14=ATF::facture()->sa();
-		$this->assertNull($facture14,"Problème car une facturation envoye ne doit pas sortir si nature vente");
+		$this->assertNull($facture14,"Problème car une facturation envoye ne doit pas sortir si nature vente");	
 
 		//Ré-initialisation 6
 		ATF::affaire()->u(array(
@@ -1363,15 +1488,15 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$re=$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture15=ATF::facture()->sa();
-		$this->assertNotNull($facture15,"Problème car une facture type ne passe pas 6");
+		$this->assertNotNull($facture15,"Problème car une facture type ne passe pas 6");	
 		ATF::facture()->d($facture15["id_facture"]);
 	}
 
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	public function test_facturationMensuelleContrat2(){
-
+	
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"id_societe"=>$id_societe,
@@ -1382,7 +1507,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-01")."+1 day"))
 											)
 										);
-
+							
 		$id_facturation=ATF::facturation()->i(array(
 													"id_affaire"=>$id_affaire,
 													"id_societe"=>$id_societe,
@@ -1411,52 +1536,52 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture16=ATF::facture()->sa();
-		$this->assertNull($facture16,"Problème car une facturation envoye ne doit pas sortir si facture refi");
-
+		$this->assertNull($facture16,"Problème car une facturation envoye ne doit pas sortir si facture refi");	
+	
 		//Avec refinanceur REFACTURATION
 		ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"code_refi"=>"REFACTURATION"));
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture17=ATF::facture()->sa();
-		$this->assertNotNull($facture17,"Problème car une facture refi avec un refinanceur FACTURATION doit être facturée");
+		$this->assertNotNull($facture17,"Problème car une facture refi avec un refinanceur FACTURATION doit être facturée");	
 		ATF::facture()->d($facture17["id_facture"]);
 		ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"code_refi"=>"123"));
-
+	
 		//Avec demande de refi
 		//Demande refi session > date
 		$id_demande_refi=ATF::demande_refi()->i(array("id_contact"=>$this->id_contact,"date"=>date("Y-m-d"),"id_refinanceur"=>$id_refinanceur,"id_affaire"=>$id_affaire,"id_societe"=>$id_societe,"description"=>"TU","etat"=>"valide","date_cession"=>date("Y-m-d",strtotime("- 1 year"))));
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture18=ATF::facture()->sa();
-		$this->assertNull($facture18,"Problème car une facture refi avec une date de session inférieur à aujourd'hui ne doit pas se faire facturer");
-
+		$this->assertNull($facture18,"Problème car une facture refi avec une date de session inférieur à aujourd'hui ne doit pas se faire facturer");	
+		
 		//Demande refi session < date
 		ATF::demande_refi()->u(array("id_demande_refi"=>$id_demande_refi,"date_cession"=>date("Y-m-d",strtotime("+ 1 year"))));
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture19=ATF::facture()->sa();
-		$this->assertNotNull($facture19,"Problème car une facture refi avec une date de session supérieur à aujourd'hui doit  se faire facturer");
+		$this->assertNotNull($facture19,"Problème car une facture refi avec une date de session supérieur à aujourd'hui doit  se faire facturer");	
 		ATF::facture()->d($facture19["id_facture"]);
-
+		
 		ATF::demande_refi()->u(array("id_demande_refi"=>$id_demande_refi,"etat"=>"en_attente"));
 		ATF::demande_refi()->d($id_demande_refi);
 		ATF::facture()->d($id_facture2);
 		ATF::refinanceur()->d($id_refinanceur);
 
 		$return1=$this->obj->facturationMensuelle(true);
-		$this->assertEquals("pc",$return1["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact");
-		$this->assertEquals(array(),$return1["facturer"],"Il n'y a pas de facture envoye 1");
-		$this->assertNull($return1["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 1");
+		$this->assertEquals("pc",$return1["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact");	
+		$this->assertEquals(array(),$return1["facturer"],"Il n'y a pas de facture envoye 1");	
+		$this->assertNull($return1["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 1");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
-		ATF::facture()->d($facture20["id_facture"]);
-
+		ATF::facture()->d($facture20["id_facture"]);	
+		
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
-		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL , "id_societe" => $id_societe));
+		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL , "id_societe" => $id_societe));		
 		$return2=$this->obj->facturationMensuelle(true);
-		$this->assertEquals("an",$return2["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact avec mail");
-		$this->assertEquals(array(),$return2["facturer"],"Il n'y a pas de facture envoye 2");
-		$this->assertNull($return2["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 2");
+		$this->assertEquals("an",$return2["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact avec mail");	
+		$this->assertEquals(array(),$return2["facturer"],"Il n'y a pas de facture envoye 2");	
+		$this->assertNull($return2["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 2");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture21=ATF::facture()->sa();
 		ATF::facture()->d($facture21["id_facture"]);
@@ -1468,10 +1593,10 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation["ltrimsociete"]="TU";
 		$facturation["ltrimcode_client"]="TU";
 		$facturation["email"]="bidon@absystech.fr";
-
-		$this->assertEquals($facturation,$return3["facturer"]["contratclientSociete"]["TU".$id_facturation],"La facturation doit être envoyée");
-		$this->assertEquals(array(),$return3["non_envoye"],"Il n'y a pas de facture non_envoye 1");
-		$this->assertNull($return3["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 3");
+		
+		$this->assertEquals($facturation,$return3["facturer"]["contratclientSociete"]["TU".$id_facturation],"La facturation doit être envoyée");	
+		$this->assertEquals(array(),$return3["non_envoye"],"Il n'y a pas de facture non_envoye 1");	
+		$this->assertNull($return3["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 3");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture22=ATF::facture()->sa();
 		ATF::facture()->d($facture22["id_facture"]);
@@ -1482,34 +1607,34 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation["ltrimsociete"]="TU";
 		$facturation["ltrimcode_client"]="TU";
 		$facturation["email"]="bidon@absystech.fr";
-		$this->assertEquals(NULL,$return4["facturer"]["prolongationclientSociete"]["TU".$id_facturation],"La prolongation ne doit pas être envoyée");
-		//$this->assertEquals(array(),$return4["non_envoye"],"Il n'y a pas de facture non_envoye 2");
-		$this->assertNull($return4["facturer"]["contratclientSociete"],"Il n'y a pas de facture");
+		$this->assertEquals(NULL,$return4["facturer"]["prolongationclientSociete"]["TU".$id_facturation],"La prolongation ne doit pas être envoyée");	
+		//$this->assertEquals(array(),$return4["non_envoye"],"Il n'y a pas de facture non_envoye 2");	
+		$this->assertNull($return4["facturer"]["contratclientSociete"],"Il n'y a pas de facture");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture23=ATF::facture()->sa();
-
+		
 		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"contrat","envoye"=>'non',"id_facture"=>NULL));
 		$return5=$this->obj->facturationMensuelle(true);
-		$this->assertEquals("pi",$return5["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il existe déjà une facture pour cette date");
-		$this->assertEquals(array(),$return5["facturer"],"Il n'y a pas de facture envoye 3");
-		$this->assertNull($return5["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 4");
+		$this->assertEquals("pi",$return5["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il existe déjà une facture pour cette date");	
+		$this->assertEquals(array(),$return5["facturer"],"Il n'y a pas de facture envoye 3");	
+		$this->assertNull($return5["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 4");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture24=ATF::facture()->sa();
 		ATF::facture()->d($facture23["id_facture"]);
 
 		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"contrat","envoye"=>'non',"id_facture"=>NULL,"montant"=>"0.00"));
 		$return6=$this->obj->facturationMensuelle(true);
-		$this->assertEquals(array(),$return6["non_envoye"],"Il n'y a pas de facture non envoye car montant 0");
-		$this->assertEquals(array(),$return6["facturer"],"Il n'y a pas de facture car montant 0");
+		$this->assertEquals(array(),$return6["non_envoye"],"Il n'y a pas de facture non envoye car montant 0");	
+		$this->assertEquals(array(),$return6["facturer"],"Il n'y a pas de facture car montant 0");	
 
 	}
 
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	public function test_facturationMensuelleProlongation(){
-
+	
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));
-		$id_loyer=ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>10));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));		
+		$id_loyer=ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>10));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"id_societe"=>$id_societe,
@@ -1520,13 +1645,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-01")."-1 year"))
 											)
 										);
+							
 
-
-
+		
 		$return1=$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture1=ATF::facture()->sa();
-		$this->assertNotNull($facture1,"Problème car une facture type ne passe pas");
+		$this->assertNotNull($facture1,"Problème car une facture type ne passe pas");	
 		ATF::facture()->d($facture1["id_facture"]);
 
 		//etat==perdu
@@ -1538,7 +1663,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture9=ATF::facture()->sa();
-		$this->assertNull($facture9,"Problème car une facturation envoye ne doit pas sortir si affaire arreter");
+		$this->assertNull($facture9,"Problème car une facturation envoye ne doit pas sortir si affaire arreter");	
 
 		//etat==arreter
 		ATF::commande()->u(array(
@@ -1549,7 +1674,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture11=ATF::facture()->sa();
-		$this->assertNull($facture11,"Problème car une facturation envoye ne doit pas sortir si commande arreter");
+		$this->assertNull($facture11,"Problème car une facturation envoye ne doit pas sortir si commande arreter");	
 
 
 		//etat==AR
@@ -1561,7 +1686,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture12=ATF::facture()->sa();
-		$this->assertNull($facture12,"Problème car une facturation envoye ne doit pas sortir si commande AR");
+		$this->assertNull($facture12,"Problème car une facturation envoye ne doit pas sortir si commande AR");	
 
 		//nature==vente
 		ATF::affaire()->u(array(
@@ -1572,7 +1697,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture14=ATF::facture()->sa();
-		$this->assertNull($facture14,"Problème car une facturation envoye ne doit pas sortir si nature vente");
+		$this->assertNull($facture14,"Problème car une facturation envoye ne doit pas sortir si nature vente");	
 
 		ATF::commande()->u(array(
 										"id_commande"=>$id_commande,
@@ -1591,9 +1716,9 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation=ATF::facturation()->sa();
 		ATF::facturation()->d($facturation["id_facturation"]);
 
-		$this->assertEquals("pc",$return1["non_envoye"]["prolongationclient_non_envoyeSociete"]["TU".$facturation["id_facturation"]]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact");
-		$this->assertEquals(array(),$return1["facturer"],"Il n'y a pas de facture envoye 1");
-		$this->assertNull($return1["facturer"]["contratclient_non_envoyeSociete"],"Il n'y a pas de contrat 1");
+		$this->assertEquals("pc",$return1["non_envoye"]["prolongationclient_non_envoyeSociete"]["TU".$facturation["id_facturation"]]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact");	
+		$this->assertEquals(array(),$return1["facturer"],"Il n'y a pas de facture envoye 1");	
+		$this->assertNull($return1["facturer"]["contratclient_non_envoyeSociete"],"Il n'y a pas de contrat 1");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
 		ATF::facture()->d($facture20["id_facture"]);
@@ -1602,13 +1727,13 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::facturation()->d($facturation["id_facturation"]);
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
 		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL));
-
+	
 		$return2=$this->obj->facturationMensuelle(true);
 		ATF::facturation()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addOrder("id_facturation");
 		$facturation=ATF::facturation()->sa();
-		$this->assertEquals("pc",$return2["non_envoye"]["prolongationclient_non_envoyeSociete"]["TU".$facturation["id_facturation"]]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact avec mail");
-		$this->assertEquals(array(),$return2["facturer"],"Il n'y a pas de facture envoye 2");
-		$this->assertNull($return2["facturer"]["contratclient_non_envoyeSociete"],"Il n'y a pas de contrat 2");
+		$this->assertEquals("pc",$return2["non_envoye"]["prolongationclient_non_envoyeSociete"]["TU".$facturation["id_facturation"]]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact avec mail");	
+		$this->assertEquals(array(),$return2["facturer"],"Il n'y a pas de facture envoye 2");	
+		$this->assertNull($return2["facturer"]["contratclient_non_envoyeSociete"],"Il n'y a pas de contrat 2");	
 		ATF::facturation()->d($facturation["id_facturation"]);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture21=ATF::facture()->sa();
@@ -1616,32 +1741,32 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 
 		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>"bidon@absystech.fr"));
 		$return3=$this->obj->facturationMensuelle(true);
-		$this->assertNull($return3["facturer"]["contratclientSociete"],"Il n'y a pas de prolongation 3");
+		$this->assertNull($return3["facturer"]["contratclientSociete"],"Il n'y a pas de prolongation 3");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		ATF::facturation()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addOrder("id_facturation");
 		$facturation=ATF::facturation()->sa();
 		$facturation["ltrimsociete"]="TU";
 		$facturation["ltrimcode_client"]="TU";
 		$facturation["email"]="bidon@absystech.fr";
-		//$this->assertEquals($facturation,$return3["facturer"]["prolongationclientSociete"]["TU".$facturation["id_facturation"]],"La facturation doit être envoyée");
-		//$this->assertEquals(array(),$return3["non_envoye"],"Il n'y a pas de facture non_envoye 4");
+		//$this->assertEquals($facturation,$return3["facturer"]["prolongationclientSociete"]["TU".$facturation["id_facturation"]],"La facturation doit être envoyée");	
+		//$this->assertEquals(array(),$return3["non_envoye"],"Il n'y a pas de facture non_envoye 4");	
 		ATF::facturation()->d($facturation["id_facturation"]);
 		$facture22=ATF::facture()->sa();
 		ATF::facture()->d($facture22["id_facture"]);
 
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer,"loyer"=>"0"));
 		$return6=$this->obj->facturationMensuelle(true);
-		$this->assertEquals(array(),$return6["non_envoye"],"Il n'y a pas de facture non envoye car montant 0");
-		$this->assertEquals(array(),$return6["facturer"],"Il n'y a pas de facture car montant 0");
+		$this->assertEquals(array(),$return6["non_envoye"],"Il n'y a pas de facture non envoye car montant 0");	
+		$this->assertEquals(array(),$return6["facturer"],"Il n'y a pas de facture car montant 0");	
 
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer,"loyer"=>"100"));
 		$return6=$this->obj->facturationMensuelle(true);
 	}
 
 	/*public function test_facturationMensuelleRestitutionDansContrat(){
-
+		
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"id_societe"=>$id_societe,
@@ -1654,7 +1779,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_prevision_restitution"=>date("Y-m-d",strtotime(date("Y-m-01")."+2 day"))
 											)
 										);
-
+							
 		$id_facturation=ATF::facturation()->i(array(
 													"id_affaire"=>$id_affaire,
 													"id_societe"=>$id_societe,
@@ -1664,11 +1789,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 													)
 												);
 
-
+		
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture1=ATF::facture()->sa();
-		//$this->assertNotNull($facture1,"Problème car une facture type ne passe pas");
+		//$this->assertNotNull($facture1,"Problème car une facture type ne passe pas");	
 		ATF::facture()->d($facture1["id_facture"]);
 
 		//Mauvaise date 1
@@ -1681,7 +1806,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture2=ATF::facture()->sa();
-		$this->assertNull($facture2,"Problème car une facture avec mauvaise date debut passe pas");
+		$this->assertNull($facture2,"Problème car une facture avec mauvaise date debut passe pas");	
 
 		//Mauvaise date 2
 		ATF::facturation()->u(array(
@@ -1692,7 +1817,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture3=ATF::facture()->sa();
-		$this->assertNull($facture3,"Problème car une facture avec mauvaise date debut passe pas");
+		$this->assertNull($facture3,"Problème car une facture avec mauvaise date debut passe pas");	
 
 		//Ré-initialisation 1
 		ATF::facturation()->u(array(
@@ -1704,9 +1829,9 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture4=ATF::facture()->sa();
-		//$this->assertNotNull($facture4,"Problème car une facture type ne passe pas 1");
+		//$this->assertNotNull($facture4,"Problème car une facture type ne passe pas 1");	
 		ATF::facture()->d($facture4["id_facture"]);
-
+		
 		//Envoye==oui
 		ATF::facturation()->u(array(
 										"id_facturation"=>$id_facturation,
@@ -1716,7 +1841,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture5=ATF::facture()->sa();
-		//$this->assertNull($facture5,"Problème car une facturation envoye ne doit plus l'etre");
+		//$this->assertNull($facture5,"Problème car une facturation envoye ne doit plus l'etre");	
 
 		//Ré-initialisation 2
 		ATF::facturation()->u(array(
@@ -1727,14 +1852,14 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture6=ATF::facture()->sa();
-		//$this->assertNotNull($facture6,"Problème car une facture type ne passe pas 2");
+		//$this->assertNotNull($facture6,"Problème car une facture type ne passe pas 2");	
 		ATF::facture()->d($facture6["id_facture"]);
 
-
-
+	
+	
 	/*
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU"));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"etat"=>"restitution",
@@ -1746,7 +1871,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-01")."+1 day"))
 											)
 										);
-
+							
 		$id_facturation=ATF::facturation()->i(array(
 													"id_affaire"=>$id_affaire,
 													"id_societe"=>$id_societe,
@@ -1776,47 +1901,47 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->facturationMensuelle(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture16=ATF::facture()->sa();
-		//$this->assertNull($facture16,"Problème car une facturation envoye ne doit pas sortir si facture refi");
-
+		//$this->assertNull($facture16,"Problème car une facturation envoye ne doit pas sortir si facture refi");	
+				
 		//Avec refinanceur REFACTURATION
 		ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"code_refi"=>"REFACTURATION"));
 		$this->obj->facturationMensuelleRestitution(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture17=ATF::facture()->sa();
-		//$this->assertNotNull($facture17,"Problème car une facture refi avec un refinanceur FACTURATION doit être facturée");
+		//$this->assertNotNull($facture17,"Problème car une facture refi avec un refinanceur FACTURATION doit être facturée");	
 		ATF::facture()->d($facture17["id_facture"]);
 		ATF::refinanceur()->u(array("id_refinanceur"=>$id_refinanceur,"code_refi"=>"123"));
-
-		//Avec demande de refi
+	
+		//Avec demande de refi		
 		//Demande refi session < date
 		ATF::demande_refi()->u(array("id_demande_refi"=>$id_demande_refi,"date_cession"=>date("Y-m-d",strtotime("+ 1 year"))));
 		$this->obj->facturationMensuelleRestitution(true);
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture19=ATF::facture()->sa();
-		//$this->assertNotNull($facture19,"Problème car une facture refi avec une date de session supérieur à aujourd'hui doit  se faire facturer");
+		//$this->assertNotNull($facture19,"Problème car une facture refi avec une date de session supérieur à aujourd'hui doit  se faire facturer");	
 		ATF::facture()->d($facture19["id_facture"]);
-
+		
 		ATF::demande_refi()->u(array("id_demande_refi"=>$id_demande_refi,"etat"=>"en_attente"));
 		ATF::demande_refi()->d($id_demande_refi);
 		ATF::facture()->d($id_facture2);
 		ATF::refinanceur()->d($id_refinanceur);
-
+		
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
 		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL , "id_societe" => 1854));
 		$return1=$this->obj->facturationMensuelleRestitution(true);
-		//$this->assertEquals("pc",$return1["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact");
-		//$this->assertEquals(array(),$return1["facturer"],"Il n'y a pas de facture envoye 1");
-		//$this->assertNull($return1["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 1");
+		//$this->assertEquals("pc",$return1["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact");	
+		//$this->assertEquals(array(),$return1["facturer"],"Il n'y a pas de facture envoye 1");	
+		//$this->assertNull($return1["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 1");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
-		ATF::facture()->d($facture20["id_facture"]);
-
+		ATF::facture()->d($facture20["id_facture"]);	
+		
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
-		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL , "id_societe" => $id_societe));
+		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL , "id_societe" => $id_societe));		
 		$return2=$this->obj->facturationMensuelleRestitution(true);
-		//$this->assertEquals("an",$return2["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact avec mail");
-		//$this->assertEquals(array(),$return2["facturer"],"Il n'y a pas de facture envoye 2");
-		//$this->assertNull($return2["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 2");
+		//$this->assertEquals("an",$return2["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il n'y a pas de contact avec mail");	
+		//$this->assertEquals(array(),$return2["facturer"],"Il n'y a pas de facture envoye 2");	
+		//$this->assertNull($return2["non_envoye"]["prolongationclientSociete"],"Il n'y a pas de prolongation 2");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture21=ATF::facture()->sa();
 		ATF::facture()->d($facture21["id_facture"]);
@@ -1828,10 +1953,10 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation["ltrimsociete"]="TU";
 		$facturation["ltrimcode_client"]="TU";
 		$facturation["email"]="bidon@absystech.fr";
-
-		//$this->assertEquals($facturation,$return3["facturer"]["contratclientSociete"]["TU".$id_facturation],"La facturation doit être envoyée");
-		//$this->assertEquals(array(),$return3["non_envoye"],"Il n'y a pas de facture non_envoye 1");
-		//$this->assertNull($return3["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 3");
+		
+		//$this->assertEquals($facturation,$return3["facturer"]["contratclientSociete"]["TU".$id_facturation],"La facturation doit être envoyée");	
+		//$this->assertEquals(array(),$return3["non_envoye"],"Il n'y a pas de facture non_envoye 1");	
+		//$this->assertNull($return3["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 3");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture22=ATF::facture()->sa();
 		ATF::facture()->d($facture22["id_facture"]);
@@ -1842,33 +1967,33 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation["ltrimsociete"]="TU";
 		$facturation["ltrimcode_client"]="TU";
 		$facturation["email"]="bidon@absystech.fr";
-		//$this->assertEquals($facturation,$return4["facturer"]["prolongationclientSociete"]["TU".$id_facturation],"La prolongation doit être envoyée");
-		//$this->assertEquals(array(),$return4["non_envoye"],"Il n'y a pas de facture non_envoye 2");
-		//$this->assertNull($return4["facturer"]["contratclientSociete"],"Il n'y a pas de facture");
+		//$this->assertEquals($facturation,$return4["facturer"]["prolongationclientSociete"]["TU".$id_facturation],"La prolongation doit être envoyée");	
+		//$this->assertEquals(array(),$return4["non_envoye"],"Il n'y a pas de facture non_envoye 2");	
+		//$this->assertNull($return4["facturer"]["contratclientSociete"],"Il n'y a pas de facture");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture23=ATF::facture()->sa();
-
+		
 		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"contrat","envoye"=>'non',"id_facture"=>NULL));
 		$return5=$this->obj->facturationMensuelleRestitution(true);
-		$this->assertEquals("pi",$return5["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il existe déjà une facture pour cette date");
-		$this->assertEquals(array(),$return5["facturer"],"Il n'y a pas de facture envoye 3");
-		$this->assertNull($return5["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 4");
+		$this->assertEquals("pi",$return5["non_envoye"]["contratclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"La facturation ne doit pas êter envoyée car il existe déjà une facture pour cette date");	
+		$this->assertEquals(array(),$return5["facturer"],"Il n'y a pas de facture envoye 3");	
+		$this->assertNull($return5["facturer"]["prolongationclientSociete"],"Il n'y a pas de prolongation 4");	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture24=ATF::facture()->sa();
 		ATF::facture()->d($facture23["id_facture"]);
 
 		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"contrat","envoye"=>'non',"id_facture"=>NULL,"montant"=>"0.00"));
 		$return6=$this->obj->facturationMensuelleRestitution(true);
-		//$this->assertEquals(array(),$return6["non_envoye"],"Il n'y a pas de facture non envoye car montant 0");
-		//$this->assertEquals(array(),$return6["facturer"],"Il n'y a pas de facture car montant 0");
-
+		//$this->assertEquals(array(),$return6["non_envoye"],"Il n'y a pas de facture non envoye car montant 0");	
+		//$this->assertEquals(array(),$return6["facturer"],"Il n'y a pas de facture car montant 0");	
+	
 	}*/
-
+	
 	public function test_facturationMensuelleRestitution(){
-
+		
 		$id_societe=ATF::societe()->i(array("societe"=>"TU","code_client"=>"TU"));
-		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU","nature"=>"affaire","etat"=>"devis"));
-		$id_loyer=ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>10));
+		$id_affaire=ATF::affaire()->i(array("ref"=>"REFTu","id_societe"=>$id_societe,"affaire"=>"ATU","nature"=>"affaire","etat"=>"devis"));		
+		$id_loyer=ATF::loyer()->i(array("id_affaire"=>$id_affaire,"loyer"=>100,"duree"=>10));		
 		$id_commande=ATF::commande()->i(array(
 												"ref"=>"Ref tu",
 												"etat"=>"restitution",
@@ -1880,7 +2005,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 												"date_evolution"=>date("Y-m-d",strtotime(date("Y-m-01")."-1 year")),
 												"date_prevision_restitution" =>date("Y-m-d",strtotime(date("Y-m-01")."-6 month"))
 											)
-										);
+										);	
 		$id_facturation=ATF::facturation()->i(array(
 													"id_affaire"=>$id_affaire,
 													"id_societe"=>$id_societe,
@@ -1889,40 +2014,40 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 													"date_periode_fin"=>date("Y-m-01",strtotime(date("Y-m-01")." -1 month -1day"))
 													)
 												);
-
-		$return6=$this->obj->facturationMensuelleRestitution(true);
-
+										
+		$return6=$this->obj->facturationMensuelleRestitution(true);	
+				
 		ATF::facturation()->q->reset()->where("id_facture", $return6["facture_prolongation"]["prolongationCode"]["TU"]);
 		$res = ATF::facturation()->select_row();
 		$id_facturation = $res["id_facturation"];
-		$this->assertEquals("pc",$return6["non_envoye"]["prolongationclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"1 - La facturation ne doit pas êter envoyée car il n'y a pas de contact");
-
-
+		$this->assertEquals("pc",$return6["non_envoye"]["prolongationclient_non_envoyeSociete"]["TU".$id_facturation]["cause"],"1 - La facturation ne doit pas êter envoyée car il n'y a pas de contact");	
+		
+		
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
 		ATF::facture()->d($facture20["id_facture"]);
 		ATF::facturation()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addOrder("id_facturation");
 		$facturation=ATF::facturation()->sa();
-		ATF::facturation()->d($facturation["id_facturation"]);
+		ATF::facturation()->d($facturation["id_facturation"]);		
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
 		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL,"id_societe" => $id_societe, "nom" => "Toto"));
-
-
-		$return7=$this->obj->facturationMensuelleRestitution(true);
-
+		
+		
+		$return7=$this->obj->facturationMensuelleRestitution(true);	
+		
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
 		ATF::facture()->d($facture20["id_facture"]);
 		ATF::facturation()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addOrder("id_facturation");
 		$facturation=ATF::facturation()->sa();
 		ATF::facturation()->d($facturation["id_facturation"]);
-
+		
 		ATF::societe()->u(array("id_societe"=>$id_societe,"id_contact_facturation"=>$this->id_contact));
 		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>"tu@absystech.net","id_societe" => $id_societe, "nom" => "Toto"));
-		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"prolongation","envoye"=>'non',"id_facture"=>NULL));
-		$return8=$this->obj->facturationMensuelleRestitution(true);
-
-		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL,"id_societe" => $id_societe, "nom" => "Toto"));
+		$this->obj->u(array("id_facturation"=>$id_facturation,"type"=>"prolongation","envoye"=>'non',"id_facture"=>NULL));		
+		$return8=$this->obj->facturationMensuelleRestitution(true);	
+		
+		ATF::contact()->u(array("id_contact"=>$this->id_contact,"email"=>NULL,"id_societe" => $id_societe, "nom" => "Toto"));		
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
 		ATF::facture()->d($facture20["id_facture"]);
@@ -1930,7 +2055,7 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation=ATF::facturation()->sa();
 		ATF::facturation()->d($facturation["id_facturation"]);
 		$return11=$this->obj->facturationMensuelleRestitution(true);
-
+	
 		ATF::facture()->q->reset()->addCondition("id_affaire",$id_affaire)->setDimension("row")->addCondition("type_facture","facture");
 		$facture20=ATF::facture()->sa();
 		ATF::facture()->d($facture20["id_facture"]);
@@ -1938,11 +2063,11 @@ class facturation_test extends ATF_PHPUnit_Framework_TestCase {
 		$facturation=ATF::facturation()->sa();
 		ATF::facturation()->d($facturation["id_facturation"]);
 		ATF::loyer()->u(array("id_loyer"=>$id_loyer,"loyer"=>"0"));
-
-		$return9=$this->obj->facturationMensuelleRestitution(true);
-
-
-
+		
+		$return9=$this->obj->facturationMensuelleRestitution(true);	
+		
+		
+			
 	}
 
 }

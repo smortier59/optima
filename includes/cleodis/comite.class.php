@@ -646,57 +646,6 @@ class comite extends classes_optima {
 			return true;
 	 	}
 	}
-
-
-
-	/**
-    * Permet de recuperer une commande
-    * @author Anthony Lahlah <alahlah@absystech.fr>
-    * @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
-    * @param get et post classique
-    * @return array
-    */
-    public static function getInfosCommande($id_commande, $id_fournisseur){ // fonction get accessible uniquement par le prestataire
-
-    	$element_declencheur = "acceptation_comite";
-		$produit_declencheur = array();
-        $q = "SELECT
-                commande.id_commande,
-                commande.ref,
-                commande.commande,
-                commande.id_societe,
-                societe.prenom,
-                societe.nom,
-                societe.tel,
-                societe.email,
-                affaire.adresse_livraison,
-                affaire.cp_adresse_livraison,
-                affaire.ville_adresse_livraison
-            FROM commande
-                INNER JOIN commande_ligne ON commande.id_commande = commande_ligne.id_commande
-                INNER JOIN affaire ON affaire.id_affaire=commande.id_affaire
-                INNER JOIN societe ON societe.id_societe=commande.id_societe
-            WHERE
-                commande.id_commande = '".ATF::db()->real_escape_string($id_commande)."'
-            GROUP BY commande.id_commande";
-        $cmd = ATF::db()->fasso($q);
-        $q = "SELECT * FROM commande_ligne WHERE id_fournisseur='".ATF::db()->real_escape_string($id_fournisseur)."' AND id_commande='".ATF::db()->real_escape_string($id_commande)."'";
-        if ($all_lines = ATF::db()->arr($q)) { // on recupère toutes ses lignes
-            foreach ($all_lines as $key_lines => $lc) { // pour chaque lignes de la commande
-                $q = "SELECT produit, id_produit, ref_lm, element_declencheur FROM produit WHERE id_produit='".ATF::db()->real_escape_string($lc['id_produit'])."'";
-                $p = ATF::db()->fasso($q);
-                $p["quantite"] = $lc["quantite"];
-                if($p["element_declencheur"] == $element_declencheur) $produit_declencheur[] = $p['produit']." (id_produit : ".$p["id_produit"].")";
-                unset($p["element_declencheur"]);
-
-                $cmd['produit'][] = $p; // on ajout dans la commande sur laquelle on itère le produit en question dans un tableau 'produit'
-
-
-            }
-        }
-        $cmd["produit_declencheur"] = $produit_declencheur;
-        return $cmd;
-    }
 };
 
 ?>
