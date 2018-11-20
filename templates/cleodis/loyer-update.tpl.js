@@ -9,6 +9,11 @@
 	, "{$current_class->table}.assurance"
 	, "{$current_class->table}.frais_de_gestion"
 	, "{$current_class->table}.frequence_loyer"
+	, "{$current_class->table}.serenite"
+	, "{$current_class->table}.maintenance"
+	, "{$current_class->table}.hotline"
+	, "{$current_class->table}.supervision"
+	, "{$current_class->table}.support"
 	, "{$current_class->table}.avec_option"
 ]}
 {if ATF::_r(id_devis)}
