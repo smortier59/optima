@@ -8296,12 +8296,20 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$adresse = $adresse2 = $adresse3 = $cp = $ville = NULL;
 
-		if($this->client['facturation_adresse']){
-			$adresse = $this->client['facturation_adresse'];
-			$adresse2 = $this->client['facturation_adresse_2'];
-			$adresse3 = $this->client['facturation_adresse_3'];
-			$cp = $this->client['facturation_cp'];
-			$ville = $this->client['facturation_ville'];
+		if($this->facturePDF){
+			if($this->client['facturation_adresse']){
+				$adresse = $this->client['facturation_adresse'];
+				$adresse2 = $this->client['facturation_adresse_2'];
+				$adresse3 = $this->client['facturation_adresse_3'];
+				$cp = $this->client['facturation_cp'];
+				$ville = $this->client['facturation_ville'];
+			}else{
+				$adresse = $this->client['adresse'];
+				$adresse2 = $this->client['adresse_2'];
+				$adresse3 = $this->client['adresse_3'];
+				$cp = $this->client['cp'];
+				$ville = $this->client['ville'];
+			}
 		}else{
 			$adresse = $this->client['adresse'];
 			$adresse2 = $this->client['adresse_2'];
@@ -8309,6 +8317,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$cp = $this->client['cp'];
 			$ville = $this->client['ville'];
 		}
+
 
 		if(!$this->facturePDF){
 			$this->sety(12);
