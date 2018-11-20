@@ -1,7 +1,7 @@
 <?
 class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	protected static $devis = 'a:9:{s:9:"extAction";s:5:"devis";s:9:"extMethod";s:6:"insert";s:7:"preview";s:4:"true";s:11:"label_devis";a:5:{s:10:"id_filiale";s:7:"CLEODIS";s:14:"id_opportunite";s:8:"Aucun(e)";s:10:"id_societe";s:7:"FINORPA";s:10:"id_contact";s:16:"M Philippe MOONS";s:10:"AR_societe";s:7:"FINORPA";}s:5:"devis";a:21:{s:10:"id_filiale";s:3:"246";s:5:"devis";s:2:"TU";s:3:"tva";s:5:"1.196";s:11:"date_accord";s:10:"08-02-2011";s:14:"id_opportunite";s:0:"";s:10:"id_societe";i:5391;s:12:"type_contrat";s:3:"lld";s:8:"validite";s:10:"23-02-2011";s:10:"id_contact";s:4:"5753";s:6:"loyers";s:4:"0.00";s:23:"frais_de_gestion_unique";s:4:"0.00";s:16:"assurance_unique";s:4:"0.00";s:10:"AR_societe";s:0:"";s:5:"marge";s:5:"99.96";s:13:"marge_absolue";s:8:"8 021.00";s:4:"prix";s:8:"8 024.00";s:10:"prix_achat";s:4:"3.00";s:5:"email";s:17:"pmoons@finorpa.fr";s:10:"emailTexte";s:4:"<br>";s:10:"emailCopie";s:24:"jerome.loison@cleodis.fr";s:13:"filestoattach";a:1:{s:13:"fichier_joint";s:0:"";}}s:7:"avenant";s:0:"";s:2:"AR";s:0:"";s:5:"loyer";a:1:{s:15:"frequence_loyer";s:1:"m";}s:12:"values_devis";a:2:{s:5:"loyer";s:185:"[{"loyer__dot__loyer":"233","loyer__dot__duree":"34","loyer__dot__assurance":"2","loyer__dot__frais_de_gestion":"1","loyer__dot__frequence_loyer":"mois","loyer__dot__loyer_total":8024}]";s:8:"produits";s:415:"[{"devis_ligne__dot__produit":"Zywall 5 - dispositif de sécurité","devis_ligne__dot__quantite":"3","devis_ligne__dot__type":"fixe","devis_ligne__dot__ref":"ZYX-FW","devis_ligne__dot__prix_achat":"1","devis_ligne__dot__id_produit":"","devis_ligne__dot__id_fournisseur":"<span class=\"searchSelectionFound\">D</span>JP SERVICE","devis_ligne__dot__id_produit_fk":"1175","devis_ligne__dot__id_fournisseur_fk":"1583"}]";}}';
-
+	
 	/** Méthode pré-test, exécute avant chaque test unitaire
 	* besoin d'un user pour les traduction
 	*/
@@ -9,7 +9,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->initUser();
 //		echo "(".ATF::db()->numberTransaction()."|";
 	}
-
+	
 	/** Méthode post-test, exécute après chaque test unitaire*/
 	public function tearDown(){
 //		echo ATF::db()->numberTransaction().")";
@@ -17,7 +17,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
-	 /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr>
+	 /* @author NMorgan FLEURQUIN <mfleurquin@absystech.fr> 
     * @date 08/12/2015
     */
     public function test_uploadFileFromSA() {
@@ -35,13 +35,13 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$id_devis=classes::decryptId(ATF::devis()->insert($devis,$this->s,NULL,$refresh));
 		$id_affaire = ATF::devis()->select($id_devis,'id_affaire');
 
-
+        
 
 
         $infos = array(
             "extAction"=>"devis"
         );
-        $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas d'id en entrée, renvoi FALSE");
+        $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas d'id en entrée, renvoi FALSE");        
         $infos = array(
             "id"=>$id_devis
         );
@@ -50,7 +50,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos['extAction'] = "devis";
         $infos['field'] = "tu";
         $this->assertFalse($this->obj->uploadFileFromSA($infos),"Erreur, pas de files en entrée, renvoi FALSE");
-
+        
         $file = __ABSOLUTE_PATH__."test/cleodis/pdf_exemple.pdf";
         $files = array(
             "tu"=> array(
@@ -63,7 +63,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         );
         if(!file_exists(__ABSOLUTE_PATH__."../temp/testsuite/devis/"))util::mkdir(__ABSOLUTE_PATH__."../temp/testsuite/devis/");
         if(!file_exists(__ABSOLUTE_PATH__."../temp/testsuite/pdf_affaire/"))util::mkdir(__ABSOLUTE_PATH__."../temp/testsuite/pdf_affaire/");
-
+        
         $r = $this->obj->uploadFileFromSA($infos,ATF::_s(),$files);
         $this->assertEquals('{"success":true}',$r,"Erreur dans le retour de l'upload");
         $f = __ABSOLUTE_PATH__."../data/testsuite/devis/".$id_devis.".tu";
@@ -151,37 +151,37 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 								 )
 			,$affaire
 			,"L'affaire ne renvoie pas les bonnes infos"
-		);
+		);	
 
 		ATF::devis_ligne()->q->reset()->addCondition("id_devis",$id_devis);
 		$devis_ligne = ATF::devis_ligne()->sa();
 		$this->assertEquals(array("id_devis_ligne"=>$devis_ligne[0]["id_devis_ligne"],"type"=>"fixe","id_devis"=>$id_devis,"id_produit"=>1175,"ref"=>"ZYX-FW","produit"=>"Zywall 5 - dispositif de sécurité","quantite"=>3,"id_fournisseur"=>1583,"prix_achat"=>"1.00","code"=>NULL,"id_affaire_provenance"=>NULL,"serial"=>NULL,"visible"=>"oui","visibilite_prix"=>"visible","neuf"=>"oui",'date_achat' => null, 'ref_simag' => null,'commentaire' => null,'options' => 'non')
 			,$devis_ligne[0]
 			,"L'affaire ne renvoie pas les bonnes lignes de devis"
-		);
+		);	
 		$this->assertEquals(array("id_devis_ligne"=>$devis_ligne[1]["id_devis_ligne"],"type"=>"fixe","id_devis"=>$id_devis,"id_produit"=>1175,"ref"=>"ZYX-FW","produit"=>"Zywall 5 - dispositif de sécurité","quantite"=>"0","id_fournisseur"=>1583,"prix_achat"=>"1.00","code"=>NULL,"id_affaire_provenance"=>NULL,"serial"=>NULL,"visible"=>"non","visibilite_prix"=>"visible","neuf"=>"oui",'date_achat' => null, 'ref_simag' => null,'commentaire' => null,'options' => 'non')
 			,$devis_ligne[1]
 			,"L'affaire ne renvoie pas les bonnes lignes de devis"
-		);
+		);	
 
 		ATF::loyer()->q->reset()->addCondition("id_affaire",$id_affaire);
 		$loyer = ATF::loyer()->sa();
-		$this->assertEquals(array("id_loyer"=>$loyer[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"233.00","duree"=>34,"assurance"=>"2.00","frais_de_gestion"=>"1.00","frequence_loyer"=>"mois",'avec_option' => 'non')
+		$this->assertEquals(array("id_loyer"=>$loyer[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"233.00","duree"=>34,"assurance"=>"2.00","frais_de_gestion"=>"1.00","frequence_loyer"=>"mois",'serenite' => '0.00','maintenance' => '0.00','hotline' => '0.00','supervision' => '0.00','support' => '0.00','avec_option' => 'non')
 			,$loyer[0]
 			,"L'affaire ne renvoie pas les bons loyers"
-		);
+		);	
 	}
 
 
-
+	
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	// Annule et remplace
-	public function test_insertAR(){
+	public function test_insertAR(){ 
 		$devis = unserialize(self::$devis);
 		unset($devis["preview"]);
 		$devis["panel_AR-checkbox"] = "on";
 		$devis["devis"]["RIB"]="30027 17536 00013420801 37";
-
+		
 		$devis["values_devis"]["produits_repris"] = '[{"devis_ligne__dot__produit":"Optiplex GX520 TFT 17 DVD 48X","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"OptiGX520 17 DVD 48X-1","devis_ligne__dot__prix_achat":"100","devis_ligne__dot__id_produit":"Optiplex GX520 TFT 17 DVD 48X","devis_ligne__dot__id_fournisseur":"DELL","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"5X7ZB2J","devis_ligne__dot__id_produit_fk":"5893","devis_ligne__dot__id_parc":"17","devis_ligne__dot__id_affaire_provenance":"26","devis_ligne__dot__id_fournisseur_fk":"1351"},{"devis_ligne__dot__produit":"LATITUDE D520","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"DELLLAT-1","devis_ligne__dot__prix_achat":"50","devis_ligne__dot__id_produit":"LATITUDE D520","devis_ligne__dot__id_fournisseur":"CBASE","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"BBPZB2J","devis_ligne__dot__id_produit_fk":"6066","devis_ligne__dot__id_parc":"6995","devis_ligne__dot__id_affaire_provenance":"43","devis_ligne__dot__id_fournisseur_fk":"1349"}]';
 		try {
 			classes::decryptId(ATF::devis()->insert($devis,$this->s));
@@ -199,22 +199,22 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$affaire=ATF::affaire()->select($id_affaire);
 		$this->assertEquals("AR",$affaire["nature"]
 			,"L'affaire ne prend pas la nature AR"
-		);
+		);	
 		$this->assertEquals(NULL,$affaire["id_parent"]
 			,"L'affaire qui AR ne doit pas avoir de id_parent"
-		);
+		);	
 		ATF::parc()->q->reset()->addCondition("id_affaire",$id_affaire);
 		$parcs=ATF::parc()->sa();
 
 		$this->assertEquals(array("id_parc"=>$parcs[0]["id_parc"],"id_societe"=>$affaire["id_societe"],"id_produit"=>"5893","id_affaire"=>$id_affaire,"ref"=>"OptiGX520 17 DVD 48X","libelle"=>"Optiplex GX520 TFT 17 DVD 48X","divers"=>NULL,"serial"=>"5X7ZB2J","etat"=>"reloue","code"=>"23W001280206DVRO1XPP323T173#####|Office 2003 PME - Lecteur DVD 48X","date"=>$parcs[0]["date"],"date_inactif"=>date("Y-m-d"),"date_garantie"=>"2009-11-01","provenance"=>"26","existence"=>"inactif",'date_achat' => null)
 			,$parcs[0]
 			,"Le 1er parc ne renvoie pas les bons infos"
-		);
+		);	
 
 		$this->assertEquals(array("id_parc"=>$parcs[1]["id_parc"],"id_societe"=>$affaire["id_societe"],"id_produit"=>"6066","id_affaire"=>$id_affaire,"ref"=>"DELLLAT","libelle"=>"LATITUDE D520","divers"=>NULL,"serial"=>"BBPZB2J","etat"=>"reloue","code"=>"23P007161202CDRW#XPP323T153#####|Microsoft Office 2003 Small","date"=>$parcs[1]["date"],"date_inactif"=>date("Y-m-d"),"date_garantie"=>"2009-11-01","provenance"=>"43","existence"=>"inactif",'date_achat' => null)
 			,$parcs[1]
 			,"Le 2ème parc ne renvoie pas les bons infos"
-		);
+		);	
 
 		$a = new affaire_cleodis($id_affaire);
 		$ap = $a->getParentAR($id_affaire); // Méthode pour avenant
@@ -227,8 +227,8 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			)
 			,$ap
 			,"Les affaires parentes ne sont pas celles attendues !"
-		);
-		// Tests avec mauvais parc
+		);	
+		// Tests avec mauvais parc	
 		$error = NULL;
 		try {
 			$devis["AR"] = "affaire_4358,parc_23242,affaire_4358,parc_7421,parc_7423";
@@ -238,7 +238,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		}
 		$this->assertEquals(891,$error,'Erreur parc_checked_sans_affaire non declenchee AR');
 	}
-
+	
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	// Annule et remplace
 	public function test_insertAvenant(){
@@ -277,18 +277,18 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$affaire=ATF::affaire()->select($id_affaire);
 		$this->assertEquals("avenant",$affaire["nature"]
 			,"L'affaire ne prend pas la nature avenant"
-		);
+		);	
 		$this->assertEquals(26,$affaire["id_parent"]
 			,"L'affaire avenant doit avoir un id_parent"
-		);
+		);	
 		ATF::parc()->q->reset()->addCondition("id_affaire",$id_affaire);
 		$parcs=ATF::parc()->sa();
 		$this->assertEquals(array("id_parc"=>$parcs[0]["id_parc"],"id_societe"=>$affaire["id_societe"],"id_produit"=>"5893","id_affaire"=>$id_affaire,"ref"=>"OptiGX520 17 DVD 48X","libelle"=>"Optiplex GX520 TFT 17 DVD 48X","divers"=>NULL,"serial"=>"5X7ZB2J","etat"=>"broke","code"=>"23W001280206DVRO1XPP323T173#####|Office 2003 PME - Lecteur DVD 48X","date"=>$parcs[0]["date"],"date_inactif"=>date("Y-m-d"),"date_garantie"=>"2009-11-01","provenance"=>"26","existence"=>"inactif",'date_achat' => null)
 			,$parcs[0]
 			,"Le 1er parc ne renvoie pas les bons infos"
-		);
-
-
+		);	
+		
+		
 		$devis["values_devis"]["produits_repris"] = '[{"devis_ligne__dot__produit":"LATITUDE D520","devis_ligne__dot__quantite":1,"devis_ligne__dot__type":"sans_objet","devis_ligne__dot__ref":"DELLLAT-1","devis_ligne__dot__prix_achat":"50","devis_ligne__dot__id_produit":"LATITUDE D520","devis_ligne__dot__id_fournisseur":"CBASE","devis_ligne__dot__visibilite_prix":"invisible","devis_ligne__dot__serial":"BBPZB2J","devis_ligne__dot__id_produit_fk":"6066","devis_ligne__dot__id_parc":"6995","devis_ligne__dot__id_affaire_provenance":"43","devis_ligne__dot__id_fournisseur_fk":"1349"}]';
 		$devis["avenant"] = "affaire_43";
 		$devis["devis"]["loyer_unique"]="oui";
@@ -304,7 +304,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			$error3 = $e->getCode();
 		}
 		$this->assertEquals(881,$error3,'Erreur "Un loyer unique est forcément un avenant" non declenchee avenant');
-
+		
 
 		$devis["panel_avenant_lignes-checkbox"] = "on";
 		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
@@ -314,11 +314,11 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(1
 			,count($loyers)
 			,"Pour un loyer unique il ne peut y avoir qu'un loyer"
-		);
-		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"1000.00","duree"=>1,"assurance"=>"10.00","frais_de_gestion"=>"10.00","frequence_loyer"=>"mois",'avec_option' => 'non')
+		);	
+		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"1000.00","duree"=>1,"assurance"=>"10.00","frais_de_gestion"=>"10.00","frequence_loyer"=>"mois",'serenite' => '0.00','maintenance' => '0.00','hotline' => '0.00','supervision' => '0.00','support' => '0.00','avec_option' => 'non')
 			,$loyers[0]
 			,"Le loyer ne renvoi pas les bonnes infos"
-		);
+		);	
 
 	}
 
@@ -365,24 +365,24 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$affaire=ATF::affaire()->select($id_affaire);
 		$this->assertEquals("vente",$affaire["nature"]
 			,"L'affaire ne prend pas la nature vente"
-		);
+		);	
 		ATF::parc()->q->reset()->addCondition("id_affaire",$id_affaire);
 		$parcs=ATF::parc()->sa();
 		$this->assertEquals(array("id_parc"=>$parcs[0]["id_parc"],"id_societe"=>$affaire["id_societe"],"id_produit"=>"5893","id_affaire"=>$id_affaire,"ref"=>"OptiGX520 17 DVD 48X","libelle"=>"Optiplex GX520 TFT 17 DVD 48X","divers"=>NULL,"serial"=>"5X7ZB2J","etat"=>"vendu","code"=>"23W001280206DVRO1XPP323T173#####|Office 2003 PME - Lecteur DVD 48X","date"=>$parcs[0]["date"],"date_inactif"=>date("Y-m-d"),"date_garantie"=>"2009-11-01","provenance"=>"26","existence"=>"inactif",'date_achat' => null)
 			,$parcs[0]
 			,"Le 1er parc ne renvoie pas les bons infos"
-		);
-
+		);	
+		
 		ATF::loyer()->q->reset()->addCondition("id_affaire",$id_affaire);
 		$loyers=ATF::loyer()->sa();
 		$this->assertEquals(1
 			,count($loyers)
 			,"Pour une vente il ne peut y avoir qu'un loyer"
-		);
-		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"3000.00","duree"=>1,"assurance"=>NULL,"frais_de_gestion"=>NULL,"frequence_loyer"=>"mois",'avec_option' => 'non')
+		);	
+		$this->assertEquals(array("id_loyer"=>$loyers[0]["id_loyer"],"id_affaire"=>$id_affaire,"loyer"=>"3000.00","duree"=>1,"assurance"=>NULL,"frais_de_gestion"=>NULL,"frequence_loyer"=>"mois",'serenite' => '0.00','maintenance' => '0.00','hotline' => '0.00','supervision' => '0.00','support' => '0.00','avec_option' => 'non')
 			,$loyers[0]
 			,"Le loyer ne renvoi pas les bonnes infos"
-		);
+		);	
 
 	}
 
@@ -399,12 +399,12 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 		$devis = unserialize(self::$devis);
-
+		
 		// Insertion
 		unset($devis["preview"]);
 		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
 		$this->assertNotNull($id_devis,'Devis non créé en mode preview');
-
+		
 		$d = new devis_cleodis($id_devis);
 		$this->assertEquals("1992-10-31",$d->getDateFinPrevue("1990-01-01"),'Devis non créé en mode preview');
 	}
@@ -415,7 +415,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis = unserialize(self::$devis);
 		$id_devis = ATF::devis()->insert($devis,$this->s);
 		$this->assertNotNull($id_devis,'Devis non créé');
-
+		
 		$d = new devis_cleodis($id_devis);
 		$d->set("etat","gagne");
 		$this->assertFalse(ATF::devis()->can_delete($id_devis),'Can delete ne retourne pas false');
@@ -432,11 +432,11 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertTrue(ATF::devis()->can_update($id_devis),'Can update ne retourne pas true lorsque le devis est en attente');
 	}
 
-
+	
 	/*@author Yann GAUTHERON <ygautheron@absystech.fr>  */
 	public function test_defaultValues(){
 		ATF::$usr->maj_infos(16);
-
+		
 		$this->assertEquals("",ATF::devis()->default_value("emailTexte"),'valeur emailTexte avant remplissage du request');
 		$this->assertEquals(0,ATF::devis()->default_value("marge_absolue"),'valeur marge_absolue avant remplissage du request');
 		$this->assertEquals(0,ATF::devis()->default_value("marge"),'valeur marge avant remplissage du request');
@@ -461,16 +461,16 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("TUIBAN",ATF::devis()->default_value("IBAN"),'valeur IBAN');
 		$this->assertEquals("TUbanque",ATF::devis()->default_value("nom_banque"),'valeur banque');
 		$this->assertEquals("TUville_banque",ATF::devis()->default_value("ville_banque"),'valeur ville_banque');
-
+		
 		ATF::$codename = "cleodisbe";
 		$this->assertEquals("4225",ATF::devis()->default_value("id_filiale"),'valeur id_filiale avant remplissage du request cleodis be');
 		ATF::$codename = "cleodis";
-
+		
 		$devis = unserialize(self::$devis);
 		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
 
 		ATF::_r('id_devis',$id_devis);
-		$devis = ATF::devis()->select($id_devis);
+		$devis = ATF::devis()->select($id_devis);		
 		$this->assertEquals(ATF::devis()->majMail($devis["id_societe"]),ATF::devis()->default_value("emailTexte"),'valeur emailTexte');
 		$this->assertEquals("8021",ATF::devis()->default_value("marge_absolue"),'valeur marge_absolue');
 		$this->assertEquals("99.96%",ATF::devis()->default_value("marge"),'valeur marge');
@@ -484,7 +484,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("",ATF::devis()->default_value("nom_banque"),'valeur banque');
 		$this->assertEquals("",ATF::devis()->default_value("ville_banque"),'valeur ville_banque');
 		$this->assertNull(ATF::devis()->default_value("prix_vente"),'valeur prix_vente');
-
+		
 		ATF::societe()->update(array("id_societe"=>$devis["id_societe"],"tva"=>6.66));
 		ATF::_r('id_societe',$devis["id_societe"]);
 		ATF::_r('id_devis',false);
@@ -499,12 +499,12 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$devis["vente"] = "affaire_26";
 		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
 		ATF::_r('id_devis',$id_devis);
-
+	
 		$this->assertEquals("3000.00",ATF::devis()->default_value("prix_vente"),'valeur prix_vente');
 
-
+		
 	}
-
+	
 
 	function testGetFournisseurs(){
 		$devis = unserialize(self::$devis);
@@ -522,9 +522,9 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$comite=array("id_societe"=>$this->id_societe,"id_contact"=>$devis["devis"]["id_contact"] ,"id_affaire"=>$this->obj->select($id_devis,"id_affaire"), "id_refinanceur"=>1,"date"=>date("Y-m-d"),"description"=>"description");
 		$id_comite=ATF::comite()->i($comite);
-
+		
 		$this->assertEquals("perdu",$this->obj->select($id_devis,"etat"),'Perdu ne passe pas le devis en perdu');
-
+		
 		$affaire=ATF::affaire()->select(ATF::devis()->select($id_devis,'id_affaire'));
 		$this->assertEquals("perdue",$affaire["etat"],'Perdu ne passe pas l affaire en perdu');
 		$this->assertEquals(0,$affaire["forecast"],'Perdu ne change pas le forecast de l affaire');
@@ -543,7 +543,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::affaire()->u(array("id_affaire"=>ATF::affaire()->decryptId($id_parent),"id_fille"=>ATF::devis()->select($id_devis,'id_affaire')));
 
 		$this->obj->u(array("id_devis"=>$id_devis,"etat"=>"attente"));
-
+		
 		$this->obj->perdu(array("id_devis"=>$id_devis));
 		$this->assertEquals(array(0=>array("msg"=>"notice_devis_perdu","title"=>"Succès !","timer"=>""),1=>array("msg"=>"Email envoyé au(x) notifié(s)","title"=>"","timer"=>"")),ATF::$msg->getNotices(),'Perdu ne renvoi pas le bon getNotices');
 
@@ -585,14 +585,14 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 	function testUpdate(){
-
+		
 		$devis = unserialize(self::$devis);
 		$devis["devis"]["id_opportunite"]=10;
 		$id_devis = ATF::devis()->insert($devis,$this->s);
 		$devis["devis"]["id_devis"]=$id_devis;
 		$devis["devis"]["devis"]="DEVIS REVISE";
 		$devis["devis"]["filestoattach"]["fichier_joint"]="true";
-
+		
 		$suivi=array("id_societe"=>$this->id_societe,"texte"=>"tu devis update","id_affaire"=>$this->obj->select($id_devis,"id_affaire"),"type_suivi"=>"Devis");
 		$id_suivi=ATF::suivi()->i($suivi);
 		$tache=array("id_societe"=>$this->id_societe,"tache"=>"tu devis update","horaire_debut"=>"2000-01-01 00:00:00","horaire_fin"=>"2000-01-01 00:00:00","id_affaire"=>$this->obj->select($id_devis,"id_affaire"));
@@ -622,12 +622,12 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("DEVIS REVISE",ATF::devis()->select($id_devis,"devis"),'Update ne se fait pas bien');
 		$this->assertEquals(ATF::suivi()->select($id_suivi,"id_affaire"),ATF::devis()->select($id_devis,"id_affaire"),'Suivi supprimer sur update devis');
 		$this->assertEquals(ATF::tache()->select($id_tache,"id_affaire"),ATF::devis()->select($id_devis,"id_affaire"),'Tache supprimer sur update devis');
-
+		
 		$this->assertNull(ATF::parc()->select($id_parc),"le parc de l'affaire modifiée doit être supprimé");
 		$this->assertNull(ATF::parc()->select($id_parcParent1),"le parc parent de l'affaire modifiée doit être supprimé");
 		$this->assertNull(ATF::parc()->select($id_parcParent2),"le parc broke parent de l'affaire modifiée doit être supprimé");
 		$this->assertNull(ATF::parc()->select($id_parcParentAVT),"le parc parent de l'affaire modifiée doit être supprimé");
-
+		
 		$devis["devis"]["id_devis"]=$id_devis;
 		$devis["preview"]=false;
 		$refresh = array();
@@ -641,9 +641,9 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	public function test_devMidas(){
 		$dm=new devis_midas();
 		$this->assertEquals('a:6:{s:9:"devis.ref";a:4:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"16";s:7:"default";N;}s:16:"devis.id_societe";a:4:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;}s:16:"devis.id_affaire";a:5:{s:4:"type";s:3:"int";s:5:"xtype";s:11:"numberfield";s:9:"maxlength";s:1:"8";s:7:"default";N;s:4:"null";b:1;}s:11:"devis.devis";a:4:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;}s:10:"devis.etat";a:7:{s:4:"type";s:4:"enum";s:5:"xtype";s:5:"combo";s:4:"data";a:3:{i:0;s:5:"gagne";i:1;s:7:"attente";i:2;s:5:"perdu";}s:7:"default";s:7:"attente";s:4:"null";b:1;s:8:"renderer";s:4:"etat";s:5:"width";i:30;}s:10:"devis.date";a:4:{s:4:"type";s:4:"date";s:5:"xtype";s:9:"datefield";s:7:"default";N;s:4:"null";b:1;}}',serialize($dm->colonnes['fields_column']),"Le constructeur de la classe midas a changé");
-
+		
 	}
-
+	
 	public function test_select_all(){
 		$c=new devis_midas();
 		$c->select_all();
@@ -656,11 +656,11 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $infos = ATF::devis()->sa();
         foreach ($infos as $key => $value) {
            	$infos[$key]["devis.id_affaire_fk"] = $value["id_affaire"];
-        }
+        }        
         ob_start();
         $this->obj->export_devis_loyer($infos , "true");
          //récupération des infos
-        $fichier=ob_get_contents();
+        $fichier=ob_get_contents();     
         ob_end_clean();
 
         $this->assertNotNull($fichier, "L'export ne s'est pas bien passé??");
@@ -675,7 +675,7 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ob_start();
         $this->obj->export_devis_loyer(array('onglet'=>"gsa_lol_lol") , "false", "false");
          //récupération des infos
-        $fichier=ob_get_contents();
+        $fichier=ob_get_contents();     
         ob_end_clean();
 
         $this->assertNotNull($fichier, "L'export ne s'est pas bien passé??");
@@ -706,13 +706,13 @@ class devis_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	    	ATF::$codename = $codename;
 	    	ATF::db()->begin_transaction(true);
 		}
-
+		
 		if($commit){
 			ATF::db()->rollback_transaction(true);
 	        ATF::$codename = "cleodis";
 	        ATF::db()->select_db("extranet_v3_cleodis");
 		}
-
+		
 	}
 };
 ?>

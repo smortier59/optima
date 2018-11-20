@@ -54,9 +54,6 @@ class affaire_cleodis extends affaire {
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
 			,"type_affaire"
-			,'id_magasin'
-			,'id_collaborateur'
-
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -124,7 +121,6 @@ class affaire_cleodis extends affaire {
 			,'facture_fournisseur'
 			,'facture_non_parvenue'
 			,'facturation'
-			,'facturation_fournisseur'
 			,'intervention'
 			,'parc'
 			,'livraison'
@@ -2379,6 +2375,11 @@ class affaire_cleodis extends affaire {
 				"loyer__dot__assurance"=>"",
 				"loyer__dot__frais_de_gestion"=>"",
 				"loyer__dot__frequence_loyer"=>"mois",
+				"loyer__dot__serenite"=>"",
+				"loyer__dot__maintenance"=>"",
+				"loyer__dot__hotline"=>"",
+				"loyer__dot__supervision"=>"",
+				"loyer__dot__support"=>"",
 				"loyer__dot__avec_option"=>"non"
 			);
 
@@ -2786,161 +2787,6 @@ class affaire_cleodis extends affaire {
 					  );
 		$id_tache = ATF::tache()->insert($tache);
 	}
-
-
-
-/**
- * ********************************************
- * 					PROVENANT DE LMA
- * ********************************************
- */
-
-	/**
-    * Permet de passer les affaires en abandonner au bout de 2 mois
-    * @author Morgan Fleurquin <mfleurquin@absystech.fr>
-    */
-	public function aAbandonner(){
-
-		$date = date("Y-m-d", strtotime('-2 months'));
-
-		ATF::affaire()->q->reset()->where("affaire.etat",'devis','OR','etat_affaire',"=")
-								  ->where("affaire.etat",'slimpay_en_cours','OR','etat_affaire',"=")
-								  ->where("affaire.etat",'commande','OR','etat_affaire',"=")
-								  ->where("affaire.date",$date,"AND",false,"<=");
-
-		if($affaires = ATF::affaire()->select_all()){
-			foreach ($affaires as $key => $value) {
-
-				if($value["commande.etat"]){
-					if($value["commande.etat"] === "pending" || $value["commande.etat"] === "non_loyer" || $value["commande.etat"] === "abandon"){
-
-						ATF::commande()->q->reset()->where("commande.id_affaire",$value["affaire.id_affaire"]);
-						$commande = ATF::commande()->select_row();
-
-						ATF::commande()->abandonCommande(array("id_commande"=>$commande["commande.id_commande"]) ,true);
-					}
-				}else{
-					ATF::affaire()->u(array("id_affaire"=>$value["affaire.id_affaire"], "etat"=>"abandon"));
-				}
-
-			}
-		}
-
-	}
-
-	/**
-    * Parsing des mails d'expedition de commande
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @param $mail boite mail à parser
-	* @param $host Host de la boite mail
-	* @param $port Port de la boite mail
-	* @param $password Password de connection boite mail
-    */
-	public function checkMailBoxExpeditionCommande($mail, $host, $port, $password){
-
-		ATF::imap()->init($host, $port, $mail, $password, "INBOX", false, "/imap/ssl");
-		if (ATF::imap()->error) {
-			throw new errorATF(ATF::imap()->error);
-		}
-		$mails = ATF::imap()->imap_fetch_overview('1:*');
-
-
-		if(is_array($mails)){
-			foreach ($mails as $kmail => $vmail) {
-
-				if (strpos(str_replace(" ","",$vmail->subject),"=?UTF-8?Q?Exp=C3=A9dition_de_votre_commande_n=C2=B0")!==false){
-					$num_commande_lm = str_replace("=?UTF-8?Q?Exp=C3=A9dition_de_votre_commande_n=C2=B0","",$vmail->subject);
-					$num_commande_lm = str_replace("?=","",$num_commande_lm);
-
-					$date_expedition = date("Y-m-d", strtotime($vmail->date));
-					$body =  ATF::imap()->returnBody($vmail->uid);
-
-					$bdc = array();
-
-					ATF::bon_de_commande()->q->reset()->addField("bon_de_commande.id_affaire")
-													  ->where("num_bdc", "%".$num_commande_lm,"AND",false,"LIKE");
-					$bdc = ATF::bon_de_commande()->select_row();
-
-
-					/*$this->q->reset()->where("ref_commande_lm",$num_commande_lm);
-					$affaire = $this->select_row();*/
-
-					if($bdc){
-						$affaire = $this->select($bdc["bon_de_commande.id_affaire_fk"]);
-						$client = ATF::societe()->select($affaire["id_societe"]);
-
-						$body = str_replace("\n", "", $body);
-						$body = str_replace("\r", "", $body);
-
-
-						$pattern_num_expedition = "/Leroy Merlin : Exp=C3=A9dition n=C2==B0 ([0-9]*) de votre commande/";
-						preg_match_all($pattern_num_expedition , $body, $ids);
-						$num_expedition = $ids[1][0];
-
-						$pattern_ref_colissimo = "/Colis n=C2=B0 ([a-zA-Z0-9]*)</";
-						preg_match_all($pattern_ref_colissimo , $body, $ids_colissimo);
-
-
-						$ref_colissimo = $ids_colissimo[1][0];
-						$lien_colissimo = "http://www.colissimo.fr/portail_colissimo/suivre.do?colispart=".$ref_colissimo;
-
-
-						$pattern_produits = "/<em>Ref : ([0-9]*)<\/em><\/font>/";
-						preg_match_all($pattern_produits , $body, $ids_produits);
-						$ref_produits = $ids_produits[1];
-
-
-						ATF::devis()->q->reset()->where("id_affaire" , $affaire["id_affaire"]);
-						$devis = ATF::devis()->select_row();
-						ATF::devis_ligne()->q->reset()->where("id_devis" , $devis["id_devis"]);
-						$lignes = ATF::devis_ligne()->select_all();
-
-
-						$produits = array();
-						$i = 0;
-						foreach ($ref_produits as $k_produit => $v_produit) {
-							foreach ($lignes as $kl => $vl) {
-								if($vl["ref"] == $v_produit){
-									$produits[$i]["ref"] = $vl["ref"];
-									$produits[$i]["produit"] = $vl["produit"];
-									$produits[$i]["qte"] = $vl["quantite"];
-									$i++;
-								}
-							}
-						}
-
-
-						$mail = new mail(array(
-							"recipient"=>$client["email"]
-							,"objet"=>"Expédition de votre commande n°".$num_commande_lm
-							,"template"=>"expedition_commande"
-							,"html"=>true
-							,"affaire"=>$affaire
-							,"client"=>$client
-							,"produits"=>$produits
-							,"num_expedition"=>$num_expedition
-							,"commande_lm"=>$num_commande_lm
-							,"date_envoi"=>$date_expedition
-							,"colissimo_ref"=>$ref_colissimo
-							,"lien_colissimo"=>$lien_colissimo
-							,"from"=>"no-reply@leroymerlin.fr"));
-						$mail->setCustomHeaders(array("Bcc"=>"contact@abonnement.leroymerlin.fr"));
-
-						$mail->send();
-
-						ATF::imap()->imap_mail_move( $vmail->uid, "Mail_Expedition_traitee");
-					}
-
-				}
-			}
-		}
-		ATF::imap()->imap_expunge();
-		return true;
-	}
-
-
-
-
 
 
 };
