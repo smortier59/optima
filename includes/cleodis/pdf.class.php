@@ -25,6 +25,8 @@ class pdf_cleodis extends pdf {
 
 	public $showFiligramme = false;
 
+	public $headerAdresseFacturation = false;
+
 
 	//Couleur CLEODIS
 	public $Rentete = 149;
@@ -8296,7 +8298,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$adresse = $adresse2 = $adresse3 = $cp = $ville = NULL;
 
-		if($this->facturePDF){
+		if($this->headerAdresseFacturation){
 			if($this->client['facturation_adresse']){
 				$adresse = $this->client['facturation_adresse'];
 				$adresse2 = $this->client['facturation_adresse_2'];
@@ -9736,6 +9738,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->styleDetailsProduit = array("border"=>1,"bgcolor"=>"efefef","decoration"=>"I","size"=>8,"align"=>"L");
 
 		$this->facturePDF = true;
+		$this->headerAdresseFacturation = true;
 		$this->setHeader(false);
 
 		if ($this->facture['type_facture']=="refi") {
