@@ -11,8 +11,11 @@ $panier = $_POST["panier"];
 $infos = $_POST["infos"];
 $vente = $_POST["vente"];
 
+
+log::logger($_POST , "devis_cleodis_insert");
+
 if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && $infos["ville"]  &&  $infos["civilite"] && $infos["nom"] && $infos["prenom"] &&  $infos["email"] &&  $infos["mobile"]){
-    log::logger("Ok", "mfleurquin");
+    log::logger("Ok", "devis_cleodis_insert");
     try{
         ATF::societe()->q->reset()->where("siret",$infos['siret']);
         $soc = ATF::societe()->select_row();
@@ -179,7 +182,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                 $tache["dest"]=  array(112);
 
                 $id_tache = ATF::tache()->insert($tache);
-                log::logger($id_tache , "mfleurquin");
+                log::logger($id_tache , "devis_cleodis_insert");
             }
             $id_affaire = ATF::devis()->select($id_devis, "id_affaire");
             ATF::affaire()->u(array("id_affaire"=>$id_affaire, "site_associe"=>"location_evolutive","provenance"=>"cleodis"));
@@ -190,11 +193,11 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
         return true;
     }catch(errorATF $e){
         print_r($e);
-        die();
+        log::logger($e->getMessage(), "devis_cleodis_insert");
         return $e->getMessage();
     }
 }else{
-    log::logger("Fuck", "mfleurquin");
+    log::logger("Fuck", "devis_cleodis_insert");
     return false;
 }
 
