@@ -67,24 +67,32 @@ class souscription_cleodis extends souscription {
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
-        ATF::affaire()->u(array(
-            "id_affaire"=>$id_affaire,
-            "id_partenaire"=>$this->id_partenaire,
-            "site_associe"=>$post['site_associe'],
-            "provenance"=>$post['site_associe'],
-            "etat_comite"=>"accepte",
-            "adresse_livraison"=>$post['livraison']['adresse'],
-            "adresse_livraison_2"=>$post['livraison']['adresse_2'],
-            "cp_adresse_livraison"=>$post['livraison']['cp'],
-            "ville_adresse_livraison"=>$post['livraison']['ville'],
-            "adresse_facturation"=>$post['facturation']['adresse'],
-            "adresse_facturation_2"=>$post['facturation']['adresse_2'],
-            "cp_adresse_facturation"=>$post['facturation']['cp'],
-            "ville_adresse_facturation"=>$post['facturation']['ville'],
-            "IBAN"=>$societe["IBAN"],
-            "RUM"=>$societe["RUM"],
-            "BIC"=>$societe["BIC"]
-        ));
+        $affToUpdate = array(
+          "id_affaire"=>$id_affaire,
+          "id_partenaire"=>$this->id_partenaire,
+          "id_panier"=>$post['id_panier'],
+          "hash_panier"=>$post['hash_panier'],
+          "site_associe"=>$post['site_associe'],
+          "provenance"=>$post['site_associe'],
+          "etat_comite"=>"accepte",
+          "adresse_livraison"=>$post['livraison']['adresse'],
+          "adresse_livraison_2"=>$post['livraison']['adresse_2'],
+          "cp_adresse_livraison"=>$post['livraison']['cp'],
+          "ville_adresse_livraison"=>$post['livraison']['ville'],
+          "adresse_facturation"=>$post['facturation']['adresse'],
+          "adresse_facturation_2"=>$post['facturation']['adresse_2'],
+          "cp_adresse_facturation"=>$post['facturation']['cp'],
+          "ville_adresse_facturation"=>$post['facturation']['ville'],
+          "IBAN"=>$societe["IBAN"],
+          "RUM"=>$societe["RUM"],
+          "BIC"=>$societe["BIC"]
+        );
+        
+        ATF::affaire()->u($affToUpdate);
+
+        if ($post['id_panier']) {
+          ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
+        }
 
         if($post["site_associe"] === "btwin"){
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
