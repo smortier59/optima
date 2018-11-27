@@ -1,9 +1,9 @@
 RewriteEngine on
 
 # Redirection HTTPS uniquement pour production
-RewriteCond %{HTTPS} !=on
-RewriteCond %{HTTP_HOST}   ^optima.absystech.net [NC]
-RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+#RewriteCond %{HTTPS} !=on
+#RewriteCond %{HTTP_HOST}   ^optima.absystech.net [NC]
+#RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 # SVN
 RewriteRule ^\.svn(.*)$ http://fr.wikipedia.org/wiki/Hacker [L]
