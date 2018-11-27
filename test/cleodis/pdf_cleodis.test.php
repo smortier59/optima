@@ -642,7 +642,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	private function beginTransaction($codename, $begin, $commit){
 		if($begin){
-			ATF::db()->select_db("extranet_v3_".$codename);
+			ATF::db()->select_db("optima_".$codename);
 	    	ATF::$codename = $codename;
 	    	ATF::db()->begin_transaction(true);
 		}
@@ -650,7 +650,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		if($commit){
 			ATF::db()->rollback_transaction(true);
 	        ATF::$codename = "cleodis";
-	        ATF::db()->select_db("extranet_v3_cleodis");
+	        ATF::db()->select_db("optima_cleodis");
 		}
 
 	}
@@ -4468,7 +4468,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_mandat_modifiable_cap(){
         ATF::unsetSingleton("pdf");
-        ATF::db()->select_db("extranet_v3_cap");
+        ATF::db()->select_db("optima_cap");
 
         $c = new pdf_cap();
 
@@ -4506,7 +4506,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("ddf66b29bce860534df66f6690b41b73",$md5,"Erreur de génération du mandat CAP SANS SIREN");
 
 		*/
-        ATF::db()->select_db("extranet_v3_cleodis");
+        ATF::db()->select_db("optima_cleodis");
     }
 
 

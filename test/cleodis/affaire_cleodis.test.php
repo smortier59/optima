@@ -1773,7 +1773,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	private function beginTransaction($codename){
-		ATF::db()->select_db("extranet_v3_".$codename);
+		ATF::db()->select_db("optima_".$codename);
     	ATF::$codename = $codename;
     	ATF::db()->begin_transaction(true);
 	}
@@ -1783,7 +1783,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$msg->getNotices();
 		ATF::db()->rollback_transaction(true);
         ATF::$codename = "cleodis";
-        ATF::db()->select_db("extranet_v3_cleodis");
+        ATF::db()->select_db("optima_cleodis");
 	}
 
 

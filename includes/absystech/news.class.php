@@ -32,7 +32,7 @@ class news_absystech extends news {
 		$q = "SELECT details FROM news WHERE type = 'tips' ORDER BY RAND() LIMIT 1";
 		ATF::define_db("db","optima");
 		$tips =  ATF::db()->ffc($q);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		return $tips;
 	}
 	

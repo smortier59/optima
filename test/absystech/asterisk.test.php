@@ -108,13 +108,13 @@ class asterisk_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("0.00", ATF::asterisk()->getCreditFromRef("04060047"));
 		$this->assertEquals(1, count(ATF::$msg->getNotices()), "Nombre de notices incorrect");
 		
-		/*ATF::db()->select_db("extranet_v3_att");
+		/*ATF::db()->select_db("optima_att");
 		try{
 			$this->assertEquals("0.00", ATF::asterisk()->getCreditFromRef("09120011"));
 		}catch(errorATF $e){
 			echo $e->getTraceAsString();
 		}		
-		ATF::db()->select_db("extranet_v3_absystech");
+		ATF::db()->select_db("optima_absystech");
 		$this->assertEquals(1, count(ATF::$msg->getNotices()), "Nombre de notices incorrect");*/
 	}
 	
@@ -126,13 +126,13 @@ class asterisk_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertNull(ATF::asterisk()->callCancelled("04060047"));
 		$this->assertEquals(1, count(ATF::$msg->getNotices()), "Nombre de notices incorrect");
 		
-		/*ATF::db()->select_db("extranet_v3_att");
+		/*ATF::db()->select_db("optima_att");
 		try{
 			$this->assertNull(ATF::asterisk()->callCancelled("09120011"));
 		}catch(errorATF $e){
 			echo $e->getTraceAsString();
 		}		
-		ATF::db()->select_db("extranet_v3_absystech");
+		ATF::db()->select_db("optima_absystech");
 		$this->assertEquals(1, count(ATF::$msg->getNotices()), "Nombre de notices incorrect");*/
 	}
 	

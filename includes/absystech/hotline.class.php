@@ -1789,10 +1789,10 @@ class hotline extends classes_optima {
 	public function _graph_tickets_hotline($get, $post){
 		/*
 		$at = $this->stats(true);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->stats(true);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
@@ -1802,10 +1802,10 @@ class hotline extends classes_optima {
 
 	public function _stats($get, $post){
 		$at = $this->stats(true);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->stats(true);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
@@ -2308,10 +2308,10 @@ class hotline extends classes_optima {
 	public function _requetebyUserParMois($get,$post){
 		$moment = $get['moment'] == "now" ? date("Y-m") : -1;
 		$at = $this->requetebyUserParMois($moment);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->requetebyUserParMois($moment);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"requetebyUserParMois"));
@@ -4205,10 +4205,10 @@ class hotline extends classes_optima {
 		log::logger($post , "mfleurquin");
 
 		$at = $this->stats(true,"partTicket");
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->stats(true,"partTicket");
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		$res = array();
