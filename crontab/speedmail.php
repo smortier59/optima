@@ -35,12 +35,13 @@ $cmd['sender'] = "/usr/bin/php ".__DIR__."/speedmail_sender.php";
 $db_to_send = NULL;
 foreach ($bases as $k => $i) {
 	if ($tableExist = ATF::db()->sql2array("SHOW TABLES FROM `".$i['Database']."` LIKE 'emailing_%'")) {
-		$strCmd = $cmd['sender']." ".substr($i['Database'],12)." toSent";
+		$db = explode("optima_",$i['Database']); $db=$db[1];
+		$strCmd = $cmd['sender']." ".$db." toSent";
 		echo "\nExecution de la commande : ".$strCmd." ";
 	    $r = `$strCmd`;
 		if (is_numeric($r)) {
 			echo $r." mail(s) a envoyer sur ".$i['Database']."\n";
-			$db_to_send[substr($i['Database'],12)]=$r;
+			$db_to_send[$db]=$r;
 		} else {
 		    echo $r;
 		}
