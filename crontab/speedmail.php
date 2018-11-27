@@ -27,8 +27,8 @@ ATF::constante()->setValue("__LAST_SPEEDMAIL_SENDER__",date("Y-m-d H:i:s",time()
 
 /* DEBUT SECTION CRITIQUE */
 $_GET["debug"]=1;
-// Séléction de toute les BDD extranet_v3_*
-$bases = ATF::db()->sql2array("SHOW DATABASES WHERE `Database` LIKE 'extranet_v3_%'");
+// Séléction de toute les BDD optima_*
+$bases = ATF::db()->sql2array("SHOW DATABASES WHERE `Database` LIKE 'optima_%'");
 
 // Commende de lancement du script d'envoi de mail
 $cmd['sender'] = "/usr/bin/php ".__DIR__."/speedmail_sender.php";
