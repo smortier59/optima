@@ -31,7 +31,7 @@ $_GET["debug"]=1;
 $bases = ATF::db()->sql2array("SHOW DATABASES WHERE `Database` LIKE 'extranet_v3_%'");
 
 // Commende de lancement du script d'envoi de mail
-$cmd['sender'] = "/usr/bin/php ".__DIR__."speedmail_sender.php";
+$cmd['sender'] = "/usr/bin/php ".__DIR__."/speedmail_sender.php";
 $db_to_send = NULL;
 foreach ($bases as $k => $i) {
 	if ($tableExist = ATF::db()->sql2array("SHOW TABLES FROM `".$i['Database']."` LIKE 'emailing_%'")) {
