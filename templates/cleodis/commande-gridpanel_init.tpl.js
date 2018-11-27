@@ -20,7 +20,6 @@
 {util::push($fieldsKeys,"demandeRefiExist")}
 /* Pour les Factures */
 {util::push($fieldsKeys,"factureAllow")}
-{util::push($fieldsKeys,"abandonAllow")}
 {util::push($fieldsKeys,"id_affaireCrypt")}
 /* Pour les Ventes */
 {util::push($fieldsKeys,"vente")}
@@ -391,25 +390,6 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</p>';
 			}
 
-			html += '<p>';
-			html += '<a href="javascript:;"  onclick="Ext.getCmp(\'mywindow'+id+'\').show();">';
-			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />';
-			html += ATF.usr.trans('creerCourrierType','commande');
-			html += '</a>';
-			html += '</p>';
-
-
-			/* Abandon Expand */
-			if (record.data.abandonAllow) {
-				html += '<p><br />';
-				html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'commande,abandonCommande.ajax\',\'id_commande='+id+'\');">';
-				html += '<img src="{ATF::$staticserver}images/icones/delete.png" />';
-				html += 'Abandonner le contrat';
-				html += '</a>&nbsp;&nbsp;&nbsp;';
-				html += '</p>';
-			}
-
-
 
 			if (!Ext.getCmp('myForm'+id)) {
 				 var formPanel = new Ext.FormPanel({
@@ -687,6 +667,13 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				});
 			}
 
+
+			html += '<p>';
+			html += '<a href="javascript:;"  onclick="Ext.getCmp(\'mywindow'+id+'\').show();">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />';
+			html += ATF.usr.trans('creerCourrierType','commande');
+			html += '</a>';
+			html += '</p>';
 
 			return '<div id="'+idDiv+'">'+html+'</div>';
 		}

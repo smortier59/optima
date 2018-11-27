@@ -13,7 +13,7 @@ class affaire_lm extends affaire {
 		$this->colonnes['fields_column'] = array(
 			'affaire.ref'
 			,'affaire.date'
-			,'affaire.affaire'
+			,'affaire.affaire'=>array("rowEditor"=>"setInfos")
 			,'affaire.id_societe'
 			,'ref_client'=>array("custom"=>true)
 			,'email_client'=>array("custom"=>true)
@@ -34,7 +34,6 @@ class affaire_lm extends affaire {
 			,"etat"
 			,"date"
 			,"id_societe"
-			,"id_filiale"
 			,"nature"
 			,"forecast"
 			,"parentes"=>array("custom"=>true)
@@ -78,19 +77,6 @@ class affaire_lm extends affaire {
 			,'apporteur'
 		);
 		$this->panels['chiffres'] = array("visible"=>true, 'nbCols'=>1);
-
-		$this->colonnes['panel']['commentaire_sur_facture'] = array(
-			 "specifiqueCommentaireFacture"=>array("custom"=>true)
-		);
-		$this->panels['commentaire_sur_facture'] = array("visible"=>true, 'nbCols'=>1);
-
-		$this->colonnes['panel']['infos_signature_contrat'] = array(
-			"tel_signature",
-			"mail_signataire",
-			"date_signature",
-			"signataire"
-		);
-		$this->panels['infos_signature_contrat'] = array("visible"=>false);
 
 		$this->fieldstructure();
 
@@ -140,6 +126,7 @@ class affaire_lm extends affaire {
 		$this->foreign_key['id_magasin'] =  "magasin";
 		$this->foreign_key['pays_livraison'] =  "pays";
 		$this->foreign_key['pays_facturation'] =  "pays";
+
 
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
@@ -1302,9 +1289,10 @@ class affaire_lm extends affaire {
 
 
 		if($toCSV !== false){
+			$filename = "LeroyMerlin" . date("Ymd") . ".csv";
 			// output headers so that the file is downloaded rather than displayed
 			header('Content-type: text/csv');
-			header('Content-Disposition: attachment; filename="demo.csv"');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
 
 			// do not cache the file
 			header('Pragma: no-cache');
@@ -1320,7 +1308,7 @@ class affaire_lm extends affaire {
 		$OPTEVEN = ATF::societe()->select_row();
 
 
-		ATF::affaire()->q->reset()  ->select("affaire.id_societe, adresse_livraison")
+		ATF::affaire()->q->reset()  ->select("affaire.id_societe,adresse_livraison")
 									->from("affaire","id_affaire" , "commande","id_affaire")
 									->from("commande","id_commande" , "commande_ligne","id_commande")
 									->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
@@ -1339,8 +1327,13 @@ class affaire_lm extends affaire {
 		foreach ($affaires as $key => $value) {
 			$affaire_societe = array();
 
-			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"]);
 
+			$ref_affaire = ATF::affaire()->select($value["affaire.id_affaire"], "ref");
+			$ref_affaire = substr($ref_affaire , 0, 8);
+
+			//On recupere les affaires parentes et filles par rapport à la ref
+			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"])
+									  ->where("ref", $ref_affaire."%", "AND", false, "LIKE");
 			$affs = ATF::affaire()->sa();
 
 			foreach ($affs as $k => $v) {
@@ -1445,27 +1438,30 @@ class affaire_lm extends affaire {
 				if($produits_opteven){
 
 					$first = reset($affaire_adresse);
+					if($first["id_affaire"]){
+						$data_aff = ATF::affaire()->select($first["id_affaire"]);
 
-					$data_aff = ATF::affaire()->select($first["id_affaire"]);
+						ATF::comite()->q->reset()->where("id_affaire", $first["id_affaire"])->where("comite.etat", "accepte");
+						$comite = ATF::comite()->select_row();
 
-					ATF::comite()->q->reset()->where("id_affaire", $first["id_affaire"])->where("comite.etat", "accepte");
-					$comite = ATF::comite()->select_row();
+						$data[$i][0] = $produits_opteven;
+						$data[$i][1] = $data_aff["ref"];
+						$data[$i][2] = date("dmY", strtotime($comite["date"]));
+						$data[$i][3] = strtoupper($client["ref"]);
+						$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
+						$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
+						$data[$i][6] = $client["civilite"];
+						$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
+						$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
+						$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
+						$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
+						$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
+						$data[$i][12] = $produits_affaire;
 
-					$data[$i][0] = $produits_opteven;
-					$data[$i][1] = $data_aff["ref"];
-					$data[$i][2] = date("dmY", strtotime($comite["date"]));
-					$data[$i][3] = strtoupper($client["ref"]);
-					$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
-					$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
-					$data[$i][6] = $client["civilite"];
-					$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
-					$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
-					$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
-					$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
-					$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
-					$data[$i][12] = $produits_affaire;
+						$i++;
+					}
 
-					$i++;
+
 				}
 
 

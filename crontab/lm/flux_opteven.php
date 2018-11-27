@@ -24,6 +24,7 @@ if(date("d") === "01"){
     $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
 	$infos_mail["objet"] = "Fichier envoyé à Opteven le ".date("d/m/Y", strtotime("-1 day"));
 	$infos_mail["recipient"] = 'benjamin.tronquit@cleodis.com; estelle.tampigny@leroymerlin.fr';
+	//$infos_mail["recipient"] = 'mfleurquin@absystech.fr';
 	$infos_mail["template"] = "flux_opteven";
 	$info_mail["html"] = true;
 
