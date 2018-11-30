@@ -17,7 +17,7 @@ class commande_cleodis extends commande {
 			,'specificDate'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommande","width"=>330)
 //			,'specificDateRestitution'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommandeRestitution","width"=>290)
 			,'commande.id_affaire'
-			,'commande.id_societe'
+			,'code_client'=>array("custom"=>true)
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
 			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
@@ -1339,6 +1339,7 @@ class commande_cleodis extends commande {
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 		$this->q
 			->addField("commande.id_affaire")
+			->addField("societe.code_client","code_client")
 			->addField("commande.date_debut")
 			->addField("commande.date_evolution")
 			->addField("commande.retour_contrat")
