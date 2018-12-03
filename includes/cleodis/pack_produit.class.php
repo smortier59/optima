@@ -292,4 +292,19 @@ class pack_produit extends classes_optima {
 		if(is_array($cadre_refreshed)){	ATF::pack_produit()->redirection("select",$last_id); }
 		return $last_id;
 	}
+
+	/**
+	 * Retourne la durée du pack par rapport au produit principal
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $id_pack_produit [description]
+	 * @return int  duree
+	 */
+	public function getDureePack($id_pack_produit){
+		ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)->addOrder("ordre","ASC")->setLimit(1);
+		$princ = ATF::pack_produit_ligne()->select_row();
+
+		return ATF::produit()->select($princ["id_produit"], "duree");
+
+
+	}
 }
