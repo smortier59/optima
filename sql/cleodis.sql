@@ -12,19 +12,3 @@ ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES 
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-#Multi magasin BTWIN
-ALTER TABLE `magasin` ADD `code` VARCHAR(25) NULL DEFAULT NULL AFTER `magasin`;
-ALTER TABLE `magasin`
-  DROP `entite_lm`,
-  DROP `langue`,
-  DROP `num_magasin_lm`,
-  DROP `afficher`,
-  DROP `email`,
-  DROP `password`;
-ALTER TABLE `magasin` CHANGE `site_associe` `site_associe` ENUM('toshiba','btwin') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-ALTER TABLE `magasin` ADD `id_societe` MEDIUMINT UNSIGNED NOT NULL;
-ALTER TABLE `magasin` ADD INDEX(`id_societe`);
-ALTER TABLE `magasin` ADD FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_societe`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-ALTER TABLE `affaire` ADD `id_magasin` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `pays_facturation`;
-ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_magasin`) ON DELETE RESTRICT ON UPDATE RESTRICT;
