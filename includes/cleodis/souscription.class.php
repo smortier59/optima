@@ -65,7 +65,8 @@ class souscription_cleodis extends souscription {
             "etat_comite"=>"accepte",
             "IBAN"=>$societe["IBAN"],
             "RUM"=>$societe["RUM"],
-            "BIC"=>$societe["BIC"]
+            "BIC"=>$societe["BIC"],
+            "id_magasin"=>$post["id_magasin"]
         ));
 
         if($post["site_associe"] === "btwin"){
