@@ -21,7 +21,7 @@
 			ATF::db()->begin_transaction();
 			ATF::societe()->q->reset()->where("SIRET", $ligne[0]);
 			if($soc = ATF::societe()->select_row()){
-				echo "\nSIRET existant ".$ligne[0]." ( ".$soc["societe"]." )\n";
+				log::logger("SIRET existant ".$ligne[0]." ( ".$soc["societe"]." )", "soc_existante_import_client");
 			}else{
 				$cs = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$ligne[0]));
 				$cs["code_client"] = ATF::societe()->getCodeClient("boulangerpro", "BP");
