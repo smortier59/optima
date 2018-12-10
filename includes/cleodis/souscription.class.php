@@ -444,8 +444,6 @@ class souscription_cleodis extends souscription {
       break;
     }
 
-
-
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
@@ -455,13 +453,18 @@ class souscription_cleodis extends souscription {
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
-      "email"=>$societe["particulier_email"],
       "company_name"=>$societe["societe"],
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>$f
     );
+
+    if ($type == 'particulier') {
+      $return["email"]=$societe["particulier_email"];
+    } else {
+      $return["email"]=$contact["email"];
+    }
     return $return;
   }
 
