@@ -28,3 +28,8 @@ ALTER TABLE `magasin` ADD FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_so
 
 ALTER TABLE `affaire` ADD `id_magasin` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `pays_facturation`;
 ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_magasin`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+#Systeme Bureau Valley Toshiba-www
+ALTER TABLE `pack_produit` ADD `specifique_partenaire` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `etat`, ADD INDEX (`specifique_partenaire`);
+ALTER TABLE `pack_produit` ADD FOREIGN KEY (`specifique_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;
