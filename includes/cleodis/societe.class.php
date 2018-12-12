@@ -1606,6 +1606,9 @@ class societe_cleodis extends societe {
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
 
+    if($post["api"]) $api = true;
+    if(!$post["langue"]) $post["langue"] = "FR";
+
     if(ATF::$codename == "cleodisbe"){
       $post["num_ident"] = $post["siret"];
       $data = ATF::societe_cleodisbe()->getInfosFromCREDITSAFE($post);
@@ -1618,6 +1621,9 @@ class societe_cleodis extends societe {
     }else{
        $data = self::getInfosFromCREDITSAFE($post);
     }
+
+
+
 
     if($data){
         $gerants = $data["gerant"];
@@ -1634,11 +1640,12 @@ class societe_cleodis extends societe {
           ATF::societe()->q->reset()->where("siret",ATF::db($this->db)->real_escape_string($data["siret"]));
         }
 
-
         $res = ATF::societe()->select_row();
         try {
+
             if($res){
                 $id_societe = $res["id_societe"];
+
                 if($res["langue"] !== $post["langue"]) $this->u(array("id_societe"=>$id_societe, "langue"=>$post["langue"]));
 
                 if($res['adresse'] != $data["adresse"] || $res['cp'] != $data["cp"] || $res['ville'] != $data["ville"]){
@@ -1648,7 +1655,6 @@ class societe_cleodis extends societe {
                                           "ville"=>$data["ville"]
                                        ));
                 }
-
             }else {
                 $data_soc = $data;
 
@@ -1656,7 +1662,7 @@ class societe_cleodis extends societe {
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
-                $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
+                if($apporteur) $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
             }
 
 
@@ -1704,13 +1710,26 @@ class societe_cleodis extends societe {
                 "societe"=>ATF::societe()->select($id_societe),
                 "gerants"=>$gerant
             );
+        } catch (errorSQL $e) {
+            log::logger("====================================================================", "creditsafe");
+            log::logger("ERREUR SQL : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+            log::logger($e->getMessage(), "creditsafe");
+            log::logger($data, "creditsafe");
+            throw $e;
         } catch (ATFerror $e) {
+            log::logger("====================================================================", "creditsafe");
+            log::logger("ERREUR ATF : Déclenchée dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+            log::logger($data, "creditsafe");
             throw new errorATF("erreurCS inside",500);
-
         }
     } else{
+        log::logger("====================================================================", "creditsafe");
+        log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
+        log::logger($data, "creditsafe");
+
         throw new errorATF("erreurCS",404);
     }
+
   }
   public function _comiteCleodis ($get, $post){
     $decision = $post['action'] == "valider" ? "accepte" : "refuse"; // on set la decision en fonction de l'action envoyé

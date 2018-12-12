@@ -41,33 +41,58 @@ class souscription_cleodis extends souscription {
 
         if (!$codeClient) {
           // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-          $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+          $codeClient = ATF::societe()->getCodeClient($societe, self::getPrefixCodeClient($post['site_associe']));
           $toUpdate = array(
             'id_societe' => $societe["id_societe"],
             'code_client' => $codeClient
           );
-          log::logger('CODE CLIENT = '.$codeClient,"qjanon");
           ATF::societe()->u($toUpdate);
         }
+
+        // On update le signataire de la societe pour y mettre celui qu'on reçoit.
+        if ($post['id_contact']) {
+          $toUpdate = array(
+            'id_societe' => $societe["id_societe"],
+            'id_contact_signataire' => $post['id_contact']
+          );
+          ATF::societe()->u($toUpdate);
+        }
+
+
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit']);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
 
         $id_devis = $this->createDevis($post, $libelle);
 
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
-        ATF::affaire()->u(array(
-            "id_affaire"=>$id_affaire,
-            "id_partenaire"=>$this->id_partenaire,
-            "site_associe"=>$post['site_associe'],
-            "provenance"=>$post['site_associe'],
-            "etat_comite"=>"accepte",
-            "IBAN"=>$societe["IBAN"],
-            "RUM"=>$societe["RUM"],
-            "BIC"=>$societe["BIC"],
-            "id_magasin"=>$post["id_magasin"]
-        ));
+        $affToUpdate = array(
+          "id_affaire"=>$id_affaire,
+          "id_partenaire"=>$this->id_partenaire,
+          "id_panier"=>$post['id_panier'],
+          "hash_panier"=>$post['hash_panier'],
+          "site_associe"=>$post['site_associe'],
+          "provenance"=>$post['site_associe'],
+          "etat_comite"=>"accepte",
+          "adresse_livraison"=>$post['livraison']['adresse'],
+          "adresse_livraison_2"=>$post['livraison']['adresse_2'],
+          "cp_adresse_livraison"=>$post['livraison']['cp'],
+          "ville_adresse_livraison"=>$post['livraison']['ville'],
+          "adresse_facturation"=>$post['facturation']['adresse'],
+          "adresse_facturation_2"=>$post['facturation']['adresse_2'],
+          "cp_adresse_facturation"=>$post['facturation']['cp'],
+          "ville_adresse_facturation"=>$post['facturation']['ville'],
+          "IBAN"=>$societe["IBAN"],
+          "RUM"=>$societe["RUM"],
+          "BIC"=>$societe["BIC"]
+        );
+        
+        ATF::affaire()->u($affToUpdate);
+
+        if ($post['id_panier']) {
+          ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
+        }
 
         if($post["site_associe"] === "btwin"){
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
@@ -77,30 +102,7 @@ class souscription_cleodis extends souscription {
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
 
-        // ATF::affaire_etat()->insert(array(
-        //     "id_affaire"=>$devis["id_affaire"],
-        //     "etat"=>"reception_demande"
-        // ));
-
-        // $comite = array  (
-        //     "id_societe" => $post['id_societe'],
-        //     "id_affaire" => $devis["id_affaire"],
-        //     "id_contact" => $gerant[0]["id_contact"],
-        //     "activite" => $data["activite"],
-        //     "id_refinanceur" => "",
-        //     "date_creation" => $data["date_creation"],
-        //     "date_compte" => "",
-        //     "capitaux_propres" => "",
-        //     "note" => "",
-        //     "dettes_financieres" => "",
-        //     "limite" => $data["cs_avis_credit"],
-        //     "ca" => $data["ca"],
-        //     "capital_social" => $data["capital_social"],
-        //     "resultat_exploitation" => $data["resultat_exploitation"],
-        //     "date" => date("d-m-Y"),
-        //     "description" => "Comite CreditSafe",
-        //     "suivi_notifie"=>array(0=>"")
-        // );
+        // Mise à jour du panier avec l'ID affaire et le statut 'affaire'
 
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
@@ -116,16 +118,28 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits) {
-    ATF::pack_produit()->q->reset()
-        ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
-        ->setStrict()
-        ->setLimit(1);
-    foreach ($id_pack_produits as $id_pack) {
-        ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
+  private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+    if ($id_pack_produits) {
+      ATF::pack_produit()->q->reset()
+          ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
+          ->setStrict()
+          ->setLimit(1);
+      foreach ($id_pack_produits as $id_pack) {
+          ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
+      }
+
+      $suffix = ATF::pack_produit()->select_cell();
+    }
+    switch ($site_associe) {
+      case "btwin":
+        $r = "BTWIN - Location ".$suffix;
+      break;
+      case "boulangerpro":
+        $r = "BOULANGER PRO - Location ".$suffix;
+      break;
     }
 
-    return "BTWIN - Location ".ATF::pack_produit()->select_cell();
+    return $r;
   }
 
   /**
@@ -149,7 +163,7 @@ class souscription_cleodis extends souscription {
         "prix_achat"=>0,
         "type_affaire" => "normal"
     );
-
+    log::logger($post, 'qjanon');
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
@@ -182,6 +196,7 @@ class souscription_cleodis extends souscription {
           ->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
 
+        log::logger($produitLoyer, "qjanon");
 
         if ($toInsertProduitDevis[$produit['id_produit']]) {
           $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
@@ -215,6 +230,60 @@ class souscription_cleodis extends souscription {
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
     $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+
+
+
+    // foreach ($produits as $k=>$produit) {
+    //     ATF::produit()->q->reset()
+    //       ->addField("loyer")
+    //       ->addField("duree")
+    //       ->addField("type")
+    //       ->addField("prix_achat")
+    //       ->addField("id_fournisseur")
+    //       ->where("id_produit", $produit['id_produit']);
+    //     $produitLoyer = ATF::produit()->select_row();
+
+    //     log::logger($produitLoyer, "qjanon");
+
+    //     $duree[$produitLoyer['duree']][] = $produitLoyer;
+
+    // }
+
+    // foreach ($duree as $d => $produits) {
+    //   foreach ($produits as $k=>$produit) {
+
+    //       if ($toInsertProduitDevis[$produit['id_produit']]) {
+    //         $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
+    //       } else {
+    //         $toInsertProduitDevis[$produit['id_produit']] =  array(
+    //           "devis_ligne__dot__produit"=> $produit['produit'],
+    //           "devis_ligne__dot__quantite"=>$produit['quantite'],
+    //           "devis_ligne__dot__type"=>$produitLoyer['type'],
+    //           "devis_ligne__dot__ref"=>$produit['ref'],
+    //           "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
+    //           "devis_ligne__dot__id_produit"=>$produit['produit'],
+    //           "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
+    //           "devis_ligne__dot__visibilite_prix"=>"invisible",
+    //           "devis_ligne__dot__date_achat"=>"",
+    //           "devis_ligne__dot__commentaire"=>"",
+    //           "devis_ligne__dot__neuf"=>"oui",
+    //           "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
+    //           "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
+    //           "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
+    //         );
+    //       }
+
+    //       $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
+    //       $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
+
+    //   }
+    //   // Faire sauter les index
+    //   $toInsertProduitDevis = array_values($toInsertProduitDevis);
+
+    //   $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
+    //   $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
+    //   $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+    // }
 
     return $id_devis;
   }
@@ -280,6 +349,11 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
+
+    if (!$post['type']) {
+      throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
+    }
+
     $societe = ATF::societe()->select($id_societe);
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
     // Gestion de la reference société
@@ -297,7 +371,7 @@ class souscription_cleodis extends souscription {
     log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     if (!$codeClient) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-      $codeClient = ATF::societe()->getCodeClient($societe, "BT");
+      $codeClient = ATF::societe()->getCodeClient($societe, $post['site_associe']);
       $toUpdate['code_client'] = $codeClient;
       log::logger('CODE CLIENT = '.$codeClient,"qjanon");
     }
@@ -308,16 +382,7 @@ class souscription_cleodis extends souscription {
 
     ATF::societe()->u($toUpdate);
 
-    // Gestion du RUM, après avoir mis a jour le code client, car il est utile pour lé génération
-    // $codeClient = $societe['code_client'];
-
-    // log::logger('CODE CLIENT = '.$codeClient,"qjanon");
-    // if (!$codeClient) {
-    //   // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-    //   $codeClient = ATF::societe()->getCodeClient($societe, "BT");
-    //   $toUpdate['code_client'] = $codeClient;
-    //   log::logger('CODE CLIENT = '.$codeClient,"qjanon");
-    // }
+    if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500);
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
@@ -337,11 +402,52 @@ class souscription_cleodis extends souscription {
     ATF::commande()->q->reset()->where('commande.id_affaire', $id_affaire);
     $contrat = ATF::commande()->select_row();
 
-    $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-    $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
-    // $noticeAssurance = ATF::pdf()->generic('noticeAssurance',$contrat['commande.id_commande'],true);
-    $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
+    switch ($post['site_associe']) {
+      case 'btwin':
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+        $contratPV = ATF::pdf()->generic('contratPV',$contrat['commande.id_commande'],true);
+        $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
+        $f = array(
+          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+          "contrat-PV.pdf"=> base64_encode($contratPV), // base64
+          "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
+        );
+      break;
+      case 'boulangerpro':
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+        $f = array(
+          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
+        );
 
+        $docsHorsContrat = array();
+
+        //On récupère les documents du/des produits de cette affaire
+        ATF::commande_ligne()->q->reset()->where("id_commande", $contrat['commande.id_commande']);
+        $lignes = ATF::commande_ligne()->sa();
+
+        foreach ($lignes as $key => $value) {
+          $id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
+          if($id_doc){
+            $doc = ATF::document_contrat()->select($id_doc);
+            if($doc["etat"] == "actif" && $doc["type_signature"] == "hors_contrat"){
+              $docsHorsContrat[$id_doc] = $doc["document_contrat"];
+            }
+          }
+        }
+
+        if($docsHorsContrat){
+          foreach ($docsHorsContrat as $key => $value) {
+            $file = util::mod_rewrite($value).".pdf";
+
+            $CG = ATF::document_contrat()->filepath($key,"fichier_joint");
+            $f[$file] = base64_encode(file_get_contents($CG));
+          }
+        }
+      break;
+      default:
+        throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500);
+      break;
+    }
 
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
@@ -352,17 +458,20 @@ class souscription_cleodis extends souscription {
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
-      "email"=>$societe["particulier_email"],
       "company_name"=>$societe["societe"],
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
-      "files2sign"=>array(
-         "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
-         "contrat-PV.pdf"=> base64_encode($contratPV), // base64
-         "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
-      )
+      "files2sign"=>$f
     );
+
+    if ($post['type'] == 'particulier') {
+      $return["email"]=$societe["particulier_email"];
+    } else if ($post['type'] == 'professionnel') {
+      $return["email"]=$contact["email"];
+    } else {
+      $return['email'] = $societe["particulier_email"];
+    }
     return $return;
   }
 
@@ -463,5 +572,22 @@ class souscription_cleodis extends souscription {
 
     die();
   }
+
+  private function getPrefixCodeClient($site_associe) {
+    switch ($site_associe) {
+      case 'boulangerpro':
+        $r = "BG";
+      break;
+      case "btwin":
+        $r = "BT";
+      break;
+      default:
+        $r = "";
+      break;
+    }
+    return $r;
+  }
+
+
 
 }

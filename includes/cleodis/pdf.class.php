@@ -319,7 +319,67 @@ class pdf_cleodis extends pdf {
 		$this->setleftMargin(15);
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
+		$this->setfont('arial','B',9);
+		$this->setY(275.9);
+
+
+		//On récupère les documents du/des produits de cette affaire
+        ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
+        $lignes = ATF::commande_ligne()->sa();
+
+        foreach ($lignes as $key => $value) {
+			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
+			if($id_doc){
+	            $doc = ATF::document_contrat()->select($id_doc);
+	            if($doc["etat"] == "actif" && $doc["type_signature"] == "commune_avec_contrat"){
+
+				    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
+				    if (file_exists($filepath)){
+				    	try {
+						    $pageCount = $this->setSourceFile($filepath);
+
+						    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						      $tplIdx = $this->importPage($pageNo);
+
+						      // add a page
+						      $this->unsetHeader();
+					    	  $this->unsetFooter();
+						      $this->AddPage();
+						      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+						    }
+						} catch (Exception $e) {
+  							log::logger('filepath CGS = '.$filepath,"qjanon");
+							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
+							log::logger($e->getMessage(),"qjanon");
+							continue;
+						}
+					}
+				}
+			}
+		}
+
 	}
+
+	/*public function get_CGS($id_doc) {
+		$this->Open();
+	    $this->unsetHeader();
+	    $this->unsetFooter();
+
+	    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
+	    log::logger($filepath , "mfleurquin");
+	    log::logger(__PDF_PATH__."cleodis/notice_assurance.pdf" , "mfleurquin");
+	    //$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
+	    $pageCount = $this->setSourceFile($filepath);
+
+	    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+	      $tplIdx = $this->importPage($pageNo);
+
+	      // add a page
+	      $this->AddPage();
+	      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+	    }
+
+	}*/
 
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
 	* @author Quentin JANON <qjanon@absystech.fr>
