@@ -340,6 +340,8 @@ class souscription_cleodis extends souscription {
   * @param array $infos Simple dimension des champs à insérer
   */
   public function _signAndGetPDF($post,$get) {
+    log::logger("=============================","souscription");
+    log::logger($post,"souscription");
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
@@ -368,29 +370,40 @@ class souscription_cleodis extends souscription {
     // Gestion du code client
     $codeClient = $societe['code_client'];
 
-    log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    log::logger('CODE CLIENT = '.$codeClient,"souscription");
     if (!$codeClient) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
       $codeClient = ATF::societe()->getCodeClient($societe, $post['site_associe']);
       $toUpdate['code_client'] = $codeClient;
-      log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+      log::logger('CODE CLIENT = '.$codeClient,"souscription");
     }
     //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
     if($societe["tel"] === NULL) {
       $toUpdate['tel'] = $tel;
     }
 
+    log::logger('UPDATE SOCIETE',"souscription");
+    log::logger($toUpdate,"souscription");
     ATF::societe()->u($toUpdate);
 
     if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500);
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
+    log::logger('GET CONTACT',"souscription");
+    log::logger($contact,"souscription");
+
+    log::logger('CHECK IBAN',"souscription");
+    log::logger($iban,"souscription");
 
     $this->checkIBAN($iban);
+
+    log::logger('UPDATE CONTACT',"souscription");
+    log::logger(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel),"souscription");
 
     ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
 
     //On stocke les infos de signature sur l'affaire
+    log::logger('UPDATE AFFAIRE '.$id_affaire,"souscription");
     ATF::affaire()->u(array('id_affaire'=>$id_affaire,
                             'tel_signature'=> $tel,
                             'mail_signataire'=> $contact["email"],
@@ -402,6 +415,7 @@ class souscription_cleodis extends souscription {
     ATF::commande()->q->reset()->where('commande.id_affaire', $id_affaire);
     $contrat = ATF::commande()->select_row();
 
+    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],"souscription");
     switch ($post['site_associe']) {
       case 'btwin':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
@@ -472,6 +486,8 @@ class souscription_cleodis extends souscription {
     } else {
       $return['email'] = $societe["particulier_email"];
     }
+    log::logger("RETOUR","souscription");
+    log::logger($return,"souscription");
     return $return;
   }
 
