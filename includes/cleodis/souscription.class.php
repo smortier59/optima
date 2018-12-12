@@ -349,6 +349,11 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
+
+    if (!$post['type']) {
+      throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
+    }
+
     $societe = ATF::societe()->select($id_societe);
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
     // Gestion de la reference société
@@ -460,10 +465,12 @@ class souscription_cleodis extends souscription {
       "files2sign"=>$f
     );
 
-    if ($type == 'particulier') {
+    if ($post['type'] == 'particulier') {
       $return["email"]=$societe["particulier_email"];
-    } else {
+    } else if ($post['type'] == 'professionnel') {
       $return["email"]=$contact["email"];
+    } else {
+      $return['email'] = $societe["particulier_email"];
     }
     return $return;
   }
