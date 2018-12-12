@@ -423,8 +423,8 @@ class souscription_cleodis extends souscription {
         $noticeAssurance = file_get_contents(__PDF_PATH__."cleodis/notice_assurance.pdf");
         $f = array(
           // "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
-          "contrat-PV.pdf"=> base64_encode($contratPV), // base64
-          "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
+          // "contrat-PV.pdf"=> base64_encode($contratPV), // base64
+          // "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
         );
       break;
       case 'boulangerpro':
