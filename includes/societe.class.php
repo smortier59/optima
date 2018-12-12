@@ -912,6 +912,7 @@ class societe extends classes_optima {
 				$data = $this->cleanCSResponse($response);
 			}
 		}
+
 		return $data;
 	}
 
