@@ -12,19 +12,23 @@ ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES 
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-#Multi magasin BTWIN
-ALTER TABLE `magasin` ADD `code` VARCHAR(25) NULL DEFAULT NULL AFTER `magasin`;
-ALTER TABLE `magasin`
-  DROP `entite_lm`,
-  DROP `langue`,
-  DROP `num_magasin_lm`,
-  DROP `afficher`,
-  DROP `email`,
-  DROP `password`;
-ALTER TABLE `magasin` CHANGE `site_associe` `site_associe` ENUM('toshiba','btwin') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-ALTER TABLE `magasin` ADD `id_societe` MEDIUMINT UNSIGNED NOT NULL;
-ALTER TABLE `magasin` ADD INDEX(`id_societe`);
-ALTER TABLE `magasin` ADD FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_societe`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
-ALTER TABLE `affaire` ADD `id_magasin` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `pays_facturation`;
-ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_magasin`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+#Ajout des CG/CP
+CREATE TABLE `document_contrat` (
+  `id_document_contrat` mediumint(8) UNSIGNED NOT NULL,
+  `document_contrat` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `document_contrat` ADD PRIMARY KEY (`id_document_contrat`);
+ALTER TABLE `document_contrat` MODIFY `id_document_contrat` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `document_contrat` ADD `type_signature` ENUM('commune_avec_contrat','hors_contrat') NOT NULL DEFAULT 'commune_avec_contrat',
+							   ADD `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' AFTER `type_signature`;
+
+ALTER TABLE `pack_produit` ADD `id_document_contrat` mediumint(8) UNSIGNED DEFAULT NULL;
+ALTER TABLE `pack_produit` ADD KEY `id_document_contrat` (`id_document_contrat`);
+ALTER TABLE `pack_produit` ADD CONSTRAINT `pack_produit_document` FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `produit` ADD `id_document_contrat` mediumint(8) UNSIGNED DEFAULT NULL;
+ALTER TABLE `produit` ADD KEY `id_document_contrat` (`id_document_contrat`);
+ALTER TABLE `produit` ADD CONSTRAINT `produit_ibfk_document` FOREIGN KEY (`id_document_contrat`) REFERENCES `document_contrat` (`id_document_contrat`) ON DELETE SET NULL ON UPDATE CASCADE;

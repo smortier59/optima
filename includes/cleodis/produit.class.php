@@ -35,8 +35,8 @@ class produit_cleodis extends produit {
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
-		$this->colonnes['fields_column'] = array('produit.produit','produit.type','produit.ref','produit.id_fournisseur','produit.prix_achat'=>array("width"=>80,"rowEditor"=>"setInfos"),'produit.etat');
-		$this->colonnes['primary']=array('ref','produit','etat','commentaire');
+		$this->colonnes['fields_column'] = array('produit.produit','produit.type','produit.ref','produit.id_fournisseur','produit.prix_achat'=>array("width"=>80,"rowEditor"=>"setInfos"),'produit.etat','produit.id_document_contrat');
+		$this->colonnes['primary']=array('ref','produit','etat','commentaire','id_document_contrat');
 		$this->colonnes['panel']['caracteristiques']=array('prix_achat','id_fabriquant','type','id_sous_categorie','id_fournisseur','obsolete');
 		$this->colonnes['panel']['uc']=array('id_produit_besoins','id_produit_type','id_processeur','id_produit_puissance','id_produit_ram','id_produit_dd','id_produit_lecteur','id_produit_lan','id_produit_OS','id_produit_garantie_uc');
 		$this->colonnes['panel']['ecran']=array('id_produit_typeecran','id_produit_viewable','id_produit_garantie_ecran');

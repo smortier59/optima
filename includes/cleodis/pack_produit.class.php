@@ -21,7 +21,9 @@ class pack_produit extends classes_optima {
 			,'pack_produit.site_associe'
 			,'loyer'=>array("width"=>80,"rowEditor"=>"setInfos")
 			,'duree'=>array("width"=>80,"rowEditor"=>"setInfos")
+			,'id_document_contrat'
 			,'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)
+
 		);
 
 		$this->colonnes['primary'] = array(
