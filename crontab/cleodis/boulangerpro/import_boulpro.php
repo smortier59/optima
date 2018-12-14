@@ -5,34 +5,6 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
 
-$fileProduit = "./produit.csv";
-$fpr = fopen($fileProduit, 'rb');
-$entete = fgetcsv($fpr);
-$produits = array();
-try {
-
-	while ($ligne = fgetcsv($fpr)) {
-		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-
-		$ean = $ligne[13];
-
-		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
-		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
-
-		$p = ATF::produit()->select_row();
-
-		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "commentaire"=>$ligne[3]));
-
-	}
-
-} catch (errorATF $e) {
-	ATF::db()->rollback_transaction();
-	//print_r($produit);
-	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
-	throw $e;
-}
-
-
 
 
 /*
@@ -288,5 +260,87 @@ function get_sous_categorie($sous_categorie, $categorie){
 		return ATF::sous_categorie()->i(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
 	}
 }
+
+$fileProduit = "./produit.csv";
+$fpr = fopen($fileProduit, 'rb');
+$entete = fgetcsv($fpr);
+$produits = array();
+try {
+
+	while ($ligne = fgetcsv($fpr)) {
+		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+
+		$ean = $ligne[13];
+
+		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
+		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+
+		$p = ATF::produit()->select_row();
+
+		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "commentaire"=>$ligne[3]));
+
+	}
+
+} catch (errorATF $e) {
+	ATF::db()->rollback_transaction();
+	//print_r($produit);
+	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
+	throw $e;
+}
 */
+
+
+$fileProduit = "./produit.csv";
+$fpr = fopen($fileProduit, 'rb');
+$entete = fgetcsv($fpr);
+$produits = array();
+try {
+
+	while ($ligne = fgetcsv($fpr)) {
+		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+
+		$ean = $ligne[13];
+
+		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
+		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+		$p = ATF::produit()->select_row();
+
+		$id_categorie = get_categorie($ligne[8]);
+		$id_sous_categorie = get_sous_categorie($id_categorie, $ligne[9]);
+
+		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "id_sous_categorie"=>$id_sous_categorie));
+
+	}
+
+} catch (errorATF $e) {
+	ATF::db()->rollback_transaction();
+	//print_r($produit);
+	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
+	throw $e;
+}
+
+
+function get_categorie($categorie){
+	ATF::categorie()->q->reset()->where("categorie", $categorie, "AND", false, "LIKE");
+	$f = ATF::categorie()->select_row();
+
+	if($f){
+		return $f["id_categorie"];
+	}else{
+		return ATF::categorie()->i(array("categorie"=>$categorie));
+	}
+}
+
+function get_sous_categorie($sous_categorie, $categorie){
+	ATF::sous_categorie()->q->reset()->where("sous_categorie", $sous_categorie, "AND", false, "LIKE")
+									 ->where("id_categorie", $categorie, "AND", false);
+	$f = ATF::sous_categorie()->select_row();
+
+	if($f){
+		return $f["id_sous_categorie"];
+	}else{
+		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
+		return ATF::sous_categorie()->i(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
+	}
+}
 ?>
