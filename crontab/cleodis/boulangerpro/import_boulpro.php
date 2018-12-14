@@ -5,6 +5,37 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
 
+$fileProduit = "./produit.csv";
+$fpr = fopen($fileProduit, 'rb');
+$entete = fgetcsv($fpr);
+$produits = array();
+try {
+
+	while ($ligne = fgetcsv($fpr)) {
+		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+
+		$ean = $ligne[13];
+
+		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
+		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+
+		$p = ATF::produit()->select_row();
+
+		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "commentaire"=>$ligne[3]));
+
+	}
+
+} catch (errorATF $e) {
+	ATF::db()->rollback_transaction();
+	//print_r($produit);
+	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
+	throw $e;
+}
+
+
+
+
+/*
 $type = array(
 	"Fixe"=>"fixe",
 	"portable"=>"portable",
@@ -24,6 +55,27 @@ ATF::db()->begin_transaction();
 ATF::db()->commit_transaction();
 
 
+$directory = dirname(__FILE__)."/";
+$folder_cleodis = dirname(__FILE__)."/../../../../data/cleodis/";
+
+//Copie des images de produit
+foreach ($produits as $key => $value) {
+    $images = glob($directory . "/produit/".$key.".*");
+    if($images[0]){
+        if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
+            echo "Echec de copy de l'image du produit ".$key."\n";
+        }
+    }
+}
+
+//Copie des images de pack
+foreach ($packs as $key => $value) {
+    $images = glob($directory . "/pack/".$key.".*");
+    if($images[0]){
+        copy($images[0], $folder_cleodis."pack_produit/".$value.".photo");
+    }
+}
+
 function import_produit(){
 	$fileProduit = "./produit.csv";
 	$fpr = fopen($fileProduit, 'rb');
@@ -41,6 +93,7 @@ function import_produit(){
 
 			$p = ATF::produit()->select_row();
 
+			// Référence;Désignation;Etat;Commentaire;Prix d'achat;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;TYPE
 
 			$produit = array(
 				"produit"=>$ligne[1],
@@ -59,6 +112,19 @@ function import_produit(){
 				"visible_sur_site"=>"oui"
 			);
 
+			// Image spécifique
+			$folder_cleodis = __DIR__."/../../../../data/cleodis/";
+			if ($ligne[15] == "LIVRAISON") {
+		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
+		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
+		        }
+			}
+
+			if ($ligne[15] == "EXTENSION GARANTIE") {
+		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
+		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
+		        }
+			}
 
 			if($p){
 				$produit["id_produit"] = $p["id_produit"];
@@ -141,6 +207,7 @@ function import_ligne($packs, $produits){
 												 ->where("id_produit", $id_produit);
 			$l = ATF::pack_produit_ligne()->select_row();
 
+			// N° Pack;Réf Produit;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Visible;Px achat
 			$pack_produit_ligne = array(
 				"id_pack_produit"=>$id_pack_produit,
 				"id_produit"=>$id_produit,
@@ -151,7 +218,8 @@ function import_ligne($packs, $produits){
 				"option_incluse"=>$ligne[5],
 				"option_incluse_obligatoire"=>$ligne[6],
 				"ref"=>$ligne[1],
-				"visible"=> $ligne[7],
+				"prix_achat"=> $ligne[10],
+				"visible"=> $ligne[9],
 				"ordre" => $ligne[8]
 			);
 
@@ -220,4 +288,5 @@ function get_sous_categorie($sous_categorie, $categorie){
 		return ATF::sous_categorie()->i(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
 	}
 }
+*/
 ?>
