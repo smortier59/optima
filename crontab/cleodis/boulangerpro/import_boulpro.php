@@ -308,16 +308,17 @@ try {
 		$id_categorie = get_categorie($ligne[8]);
 		$id_sous_categorie = get_sous_categorie($ligne[9], $id_categorie);
 
-		$produit = array("id_produit"=>$p["id_produit"], "id_sous_categorie"=>$id_sous_categorie);
+		$produit = array("id_produit"=>$p["id_produit"],
+						 "id_sous_categorie"=>$id_sous_categorie);
 
 		ATF::produit()->u($produit);
 
 	}
 
 } catch (errorATF $e) {
-	ATF::db()->rollback_transaction();
 	print_r($produit);
 	echo "Produit EAN : ".$ligne[0]." ERREUR\n";
+	print_r($e);
 	throw $e;
 }
 
