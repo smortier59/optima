@@ -324,26 +324,26 @@ try {
 
 
 function get_categorie($categorie){
-	ATF::categorie()->q->reset()->where("categorie", $categorie, "AND", false, "LIKE");
+	ATF::categorie()->q->reset()->where("categorie", ATF::db()->real_escape_string($categorie), "AND", false, "LIKE");
 	$f = ATF::categorie()->select_row();
 
 	if($f){
 		return $f["id_categorie"];
 	}else{
-		return ATF::categorie()->i(array("categorie"=>$categorie));
+		return ATF::categorie()->i(array("categorie"=>ATF::db()->real_escape_string($categorie)));
 	}
 }
 
 function get_sous_categorie($sous_categorie, $categorie){
-	ATF::sous_categorie()->q->reset()->where("sous_categorie", $sous_categorie, "AND", false, "LIKE")
-									 ->where("id_categorie", $categorie, "AND", false);
+	ATF::sous_categorie()->q->reset()->where("sous_categorie", ATF::db()->real_escape_string($sous_categorie), "AND", false, "LIKE")
+									 ->where("id_categorie", ATF::db()->real_escape_string($categorie), "AND", false);
 	$f = ATF::sous_categorie()->select_row();
 
 	if($f){
 		return $f["id_sous_categorie"];
 	}else{
 		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
-		return ATF::sous_categorie()->i(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
+		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
 ?>
