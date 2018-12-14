@@ -306,7 +306,7 @@ try {
 		$p = ATF::produit()->select_row();
 
 		$id_categorie = get_categorie($ligne[8]);
-		$id_sous_categorie = get_sous_categorie($id_categorie, $ligne[9]);
+		$id_sous_categorie = get_sous_categorie($ligne[9], $id_categorie);
 
 		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "id_sous_categorie"=>$id_sous_categorie));
 
