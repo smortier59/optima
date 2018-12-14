@@ -1726,8 +1726,9 @@ class societe_cleodis extends societe {
         log::logger("====================================================================", "creditsafe");
         log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
         log::logger($data, "creditsafe");
+        log::logger($post, "creditsafe");
 
-        throw new errorATF("erreurCS",404);
+        throw new errorATF("erreurCS : Il n'y a aucun retour de créditsafe",500);
     }
 
   }
