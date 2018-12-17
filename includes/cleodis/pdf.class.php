@@ -5055,7 +5055,9 @@ class pdf_cleodis extends pdf {
 
 				$this->tableauBigHead($head,$data,$w,5,$styles,265);
 
-				if ($this->facture['commentaire']) {
+
+				//Si on a un commentaire et qu'on est sur le dernier tableau de produits
+				if ($this->facture['commentaire'] && $k == count($lignes)-1) {
 					$com = array(array("Commentaire : ".$this->facture['commentaire']));
 					$sCom = array(array($this->styleDetailsProduit));
 					$this->tableau(false,$com,185,5,$sCom);

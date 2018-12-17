@@ -17,7 +17,7 @@ class souscription_cleodis extends souscription {
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
   /*--------------------------------------------------------------*/
-  public function __construct() {
+  public function __construct() { 
     parent::__construct();
     $this->table = "affaire";
   }
@@ -85,7 +85,8 @@ class souscription_cleodis extends souscription {
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
           "RUM"=>$societe["RUM"],
-          "BIC"=>$societe["BIC"]
+          "BIC"=>$societe["BIC"],
+          "id_magasin"=>$post["id_magasin"]
         );
         
         ATF::affaire()->u($affToUpdate);
@@ -486,8 +487,8 @@ class souscription_cleodis extends souscription {
     } else {
       $return['email'] = $societe["particulier_email"];
     }
-    log::logger("RETOUR","souscription");
-    log::logger($return,"souscription");
+    // log::logger("RETOUR","souscription");
+    // log::logger($return,"souscription");
     return $return;
   }
 
