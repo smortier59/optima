@@ -1603,6 +1603,7 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
+    log::logger($post, "creditsafe");
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
 
@@ -1622,8 +1623,7 @@ class societe_cleodis extends societe {
        $data = self::getInfosFromCREDITSAFE($post);
     }
 
-
-
+    log::logger($data, "creditsafe");
 
     if($data){
         $gerants = $data["gerant"];
