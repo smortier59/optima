@@ -84,16 +84,19 @@ class souscription_cleodis extends souscription {
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
-          "RUM"=>$societe["RUM"],
           "BIC"=>$societe["BIC"],
           "id_magasin"=>$post["id_magasin"]
         );
+
+        //Il ne faut pas   craser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
+        if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
         
         ATF::affaire()->u($affToUpdate);
 
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
         }
+
 
         if($post["site_associe"] === "btwin"){
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
@@ -572,22 +575,44 @@ class souscription_cleodis extends souscription {
   * @author Quentin JANON <qjanon@absystech.fr>
   * @param array $post["id_affaire"]
   */
-  public function _storeDocumentsInAffaire($post){
-    $file = $this->filepath("46638", 'retour', null, 'cleodis');
-    log::logger('FILE = '.$file, 'qjanon');
-    // $file = "/home/qjanon/tmp.pdf";
-    log::logger(array_keys($post), 'qjanon');
-    log::logger($post['data'], 'qjanon');
-    log::logger(mb_detect_encoding($post['data']), 'qjanon');
+  public function _storeSignedDocuments($post){
+
+    switch ($post['type']) {
+      case 'mandatSellAndSign': // Contrat signé
+      case 'mandatSellAndSign.pdf': // Contrat signé
+        $module = "commande";
+        ATF::commande()->q->reset()->addfield("id_commande")->where('commande.id_affaire', $post["id_affaire"]);
+        $id = ATF::commande()->select_cell();
+        $type = 'retour';
+      break;
+      case 'contrat-PV': // PV signé
+      case 'contrat-PV.pdf': // PV signé
+        $module = "commande";
+        ATF::commande()->q->reset()->addfield("id_commande")->where('commande.id_affaire', $post["id_affaire"]);
+        $id = ATF::commande()->select_cell();
+        $type = 'retourPV';
+      break; 
+      case 'notice_assurance': // Notice d'assurance
+      case 'notice_assurance.pdf': // Notice d'assurance
+        $module = "affaire"; 
+        $id = $post['id_affaire'];
+        $type = 'retourNoticeAssurance';
+      break;
+    }
+
+    if (!$id) throw new Exception('Il manque l\'identifiant', 500);
+    if (!$module) throw new Exception('Il manque le module', 500);
+
+    $file = ATF::getClass($module)->filepath($id, $type, null, 'cleodis');
+
     try {
       util::file_put_contents($file,base64_decode($post['data']));
-
-      log::logger('FILE EXIST = '.file_exists($file), 'qjanon');
+      $return = true;
     } catch (Exception $e) {
       $return  = array("error"=>true, "data"=>$e);
     }
 
-    die();
+    return $return;
   }
 
   private function getPrefixCodeClient($site_associe) {
