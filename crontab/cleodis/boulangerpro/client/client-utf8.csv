@@ -1,4 +1,4 @@
-"N° SIRET","Code Client","Code Client Partenaire","Apporteur","Email"
+cd "N° SIRET","Code Client","Code Client Partenaire","Apporteur","Email"
 "81992580100014","BPxxxxxx","C048AUDACE","Boulanger Pro","audace.association@hotmail.com"
 "78444843300101",,"C048CEREPP","Boulanger Pro","secretariat.siege@cerep-phymentin.orf"
 "53311074800019",,"C048ASSREZ","Boulanger Pro","sebastien.roblain@rezonance.media"
@@ -92,7 +92,7 @@
 "19740003900016",,"C048LYCEEG","Boulanger Pro","roseline.garcin@ac-grenoble.fr"
 "19693446700016",,"C048LYCCSI","Boulanger Pro","isabelle.merle1@ac-lyon.fr"
 "19240150300011",,"C048LYCBEA","Boulanger Pro","ce.0241137f@ac-bordeaux.fr"
-"19650027600015",,"C048LYCDUP","Boulanger Pro","0650027B_gest@ac_toulouse.fr"
+"19650027600015",,"C048LYCDUP","Boulanger Pro",
 "19180024200015",,"C048LYCMOU","Boulanger Pro","ce.0180024d@ac-orleans-tours.fr"
 "19590110300018",,"C048LYCPER","Boulanger Pro","ce.0590110z@ac-lille.fr"
 "19160049300016",,"C048LYCROS","Boulanger Pro","beatrice.grenoux@ac-poitiers.fr"
@@ -151,7 +151,7 @@
 "78362708600011",,"C048MONCAT","Boulanger Pro","sebastien.abbaye@orange.fr"
 "13000798200106",,"C048ARSPAC","Boulanger Pro","ars-paca-sante-environnement@ars.sante.fr"
 "17540111600561",,"C048TGIVAL","Boulanger Pro","chg.tgi-briey@justice.fr"
-"13001835100010",,"C048UNIBOR","Boulanger Pro","lebna.mizani@u_bordeaux.fr"
+"13001835100010",,"C048UNIBOR","Boulanger Pro",
 "13002358300011",,"C048UNIVLI","Boulanger Pro","muriel.vernay@univ-lille.fr"
 "19440984300019",,"C048UNIVE4","Boulanger Pro","yann.pelloquin@univ-nantes.fr"
 "19931238000017",,"C048UNIV13","Boulanger Pro","dir-daps@univ-paris13.fr"
