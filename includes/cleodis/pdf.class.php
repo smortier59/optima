@@ -5346,7 +5346,16 @@ class pdf_cleodis extends pdf {
         }elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
         }else{  $data[0]['details'] = "Matériels objets de la location"; }
         foreach ($this->lignes as $k => $i) {
-          $data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+        	$produit = ATF::produit()->select($i["id_produit"]);
+        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+        	$detail = "\n".round($i['quantite'])." ";
+        	if($sous_categorie) $detail .= $sous_categorie." ";
+        	if($fabriquant) $detail .= $fabriquant." ";
+        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+		    $data[0]['details'] .= $detail;
         }
         $styles[0] = array(
           ""
@@ -5363,7 +5372,17 @@ class pdf_cleodis extends pdf {
             $data[0]['details'] = "Matériels objets de la location";
           }
           foreach ($this->lignes as $k => $i) {
-            $data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+            	$produit = ATF::produit()->select($i["id_produit"]);
+	        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+	        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+	        	$detail = "\n".round($i['quantite'])." ";
+	        	if($sous_categorie) $detail .= $sous_categorie." ";
+	        	if($fabriquant) $detail .= $fabriquant." ";
+	        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+	          	$data[0]['details'] .= $detail;
           }
           $styles[0] = array(
             ""
@@ -5624,7 +5643,16 @@ class pdf_cleodis extends pdf {
 				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
 				}else{	$data[0]['details'] = "Matériels objets de la location"; }
 				foreach ($this->lignes as $k => $i) {
-					$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+					$produit = ATF::produit()->select($i["id_produit"]);
+		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+		        	$detail = "\n".round($i['quantite'])." ";
+		        	if($sous_categorie) $detail .= $sous_categorie." ";
+		        	if($fabriquant) $detail .= $fabriquant." ";
+		        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+		          	$data[0]['details'] .= $detail;
 				}
 				$styles[0] = array(
 					""
@@ -5641,7 +5669,16 @@ class pdf_cleodis extends pdf {
 						$data[0]['details'] = "Matériels objets de la location";
 					}
 					foreach ($this->lignes as $k => $i) {
-						$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+						$produit = ATF::produit()->select($i["id_produit"]);
+			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+			        	$detail = "\n".round($i['quantite'])." ";
+			        	if($sous_categorie) $detail .= $sous_categorie." ";
+			        	if($fabriquant) $detail .= $fabriquant." ";
+			        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+			          	$data[0]['details'] .= $detail;
 					}
 					$styles[0] = array(
 						""
@@ -10334,7 +10371,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
 				}else{	$data[0]['details'] = "Matériels objets de la location"; }
 				foreach ($this->lignes as $k => $i) {
-					$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+						$produit = ATF::produit()->select($i["id_produit"]);
+		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+		        	$detail = "\n".round($i['quantite'])." ";
+		        	if($sous_categorie) $detail .= $sous_categorie." ";
+		        	if($fabriquant) $detail .= $fabriquant." ";
+		        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+		          	$data[0]['details'] .= $detail;
 				}
 				$styles[0] = array(
 					""
@@ -10351,7 +10397,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 						$data[0]['details'] = "Matériels objets de la location";
 					}
 					foreach ($this->lignes as $k => $i) {
-						$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+						$produit = ATF::produit()->select($i["id_produit"]);
+			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+			        	$detail = "\n".round($i['quantite'])." ";
+			        	if($sous_categorie) $detail .= $sous_categorie." ";
+			        	if($fabriquant) $detail .= $fabriquant." ";
+			        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+			         	$data[0]['details'] .= $detail;
 					}
 					$styles[0] = array(
 						""
@@ -10556,7 +10611,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 				}else*/if($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
 				}else{	$data[0]['details'] = "Verhuurd materieel"; }
 				foreach ($this->lignes as $k => $i) {
-					$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+					$produit = ATF::produit()->select($i["id_produit"]);
+		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+		        	$detail = "\n".round($i['quantite'])." ";
+		        	if($sous_categorie) $detail .= $sous_categorie." ";
+		        	if($fabriquant) $detail .= $fabriquant." ";
+		        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+		          	$data[0]['details'] .= $detail;
 				}
 				$styles[0] = array(
 					""
@@ -10573,7 +10637,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 						$data[0]['details'] = "Verhuurd materieel";
 					//}
 					foreach ($this->lignes as $k => $i) {
-						$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+						$produit = ATF::produit()->select($i["id_produit"]);
+			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+			        	$detail = "\n".round($i['quantite'])." ";
+			        	if($sous_categorie) $detail .= $sous_categorie." ";
+			        	if($fabriquant) $detail .= $fabriquant." ";
+			        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+			         	$data[0]['details'] .= $detail;
 					}
 					$styles[0] = array(
 						""
