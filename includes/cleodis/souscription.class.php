@@ -88,15 +88,14 @@ class souscription_cleodis extends souscription {
           "id_magasin"=>$post["id_magasin"]
         );
         
+        //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
+        if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
         ATF::affaire()->u($affToUpdate);
+
 
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
         }
-
-        //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
-        if($societe["RUM"]) $aff["RUM"]=$societe["RUM"];
-        ATF::affaire()->u($aff);
 
         if($post["site_associe"] === "btwin"){
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
@@ -165,7 +164,7 @@ class souscription_cleodis extends souscription {
         "prix_achat"=>0,
         "type_affaire" => "normal"
     );
-    log::logger($post, 'qjanon');
+
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
@@ -192,13 +191,21 @@ class souscription_cleodis extends souscription {
         ATF::produit()->q->reset()
           ->addField("loyer")
           ->addField("duree")
-          ->addField("type")
+          ->addField("ean")
+          ->addField("id_sous_categorie")
+          ->addField("visible_sur_site")
           ->addField("prix_achat")
           ->addField("id_fournisseur")
           ->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
 
-        log::logger($produitLoyer, "qjanon");
+        if ($produit['id_pack_produit']) {
+          $id_pack = $produit['id_pack_produit'];
+        } else if ($produit['id_pack_produit_ligne']) {
+          ATF::pack_produit_ligne()->q->reset()->addField("id_pack_produit")->where("id_pack_produit_ligne", $produit['id_pack_produit_ligne']);
+          $id_pack = ATF::pack_produit_ligne()->select_cell();
+        } 
+
 
         if ($toInsertProduitDevis[$produit['id_produit']]) {
           $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
@@ -217,7 +224,15 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__neuf"=>"oui",
             "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
             "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
-            "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
+            "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
+            "devis_ligne__dot__duree"=>$produitLoyer['duree'],
+            "devis_ligne__dot__loyer"=>$produitLoyer['loyer'],
+            "devis_ligne__dot__id_sous_categorie"=>$produitLoyer['id_sous_categorie'],
+            "devis_ligne__dot__id_pack_produit"=>$id_pack,
+            "devis_ligne__dot__sous_categorie"=>ATF::sous_categorie()->nom($produitLoyer['id_sous_categorie']),
+            "devis_ligne__dot__pack_produit"=>ATF::pack_produit()->nom($id_pack),
+            "devis_ligne__dot__ean"=>$produitLoyer['ean']
+
           );
         }
 
@@ -232,60 +247,6 @@ class souscription_cleodis extends souscription {
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
     $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
-
-
-
-    // foreach ($produits as $k=>$produit) {
-    //     ATF::produit()->q->reset()
-    //       ->addField("loyer")
-    //       ->addField("duree")
-    //       ->addField("type")
-    //       ->addField("prix_achat")
-    //       ->addField("id_fournisseur")
-    //       ->where("id_produit", $produit['id_produit']);
-    //     $produitLoyer = ATF::produit()->select_row();
-
-    //     log::logger($produitLoyer, "qjanon");
-
-    //     $duree[$produitLoyer['duree']][] = $produitLoyer;
-
-    // }
-
-    // foreach ($duree as $d => $produits) {
-    //   foreach ($produits as $k=>$produit) {
-
-    //       if ($toInsertProduitDevis[$produit['id_produit']]) {
-    //         $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
-    //       } else {
-    //         $toInsertProduitDevis[$produit['id_produit']] =  array(
-    //           "devis_ligne__dot__produit"=> $produit['produit'],
-    //           "devis_ligne__dot__quantite"=>$produit['quantite'],
-    //           "devis_ligne__dot__type"=>$produitLoyer['type'],
-    //           "devis_ligne__dot__ref"=>$produit['ref'],
-    //           "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
-    //           "devis_ligne__dot__id_produit"=>$produit['produit'],
-    //           "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
-    //           "devis_ligne__dot__visibilite_prix"=>"invisible",
-    //           "devis_ligne__dot__date_achat"=>"",
-    //           "devis_ligne__dot__commentaire"=>"",
-    //           "devis_ligne__dot__neuf"=>"oui",
-    //           "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
-    //           "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
-    //           "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
-    //         );
-    //       }
-
-    //       $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
-    //       $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
-
-    //   }
-    //   // Faire sauter les index
-    //   $toInsertProduitDevis = array_values($toInsertProduitDevis);
-
-    //   $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
-    //   $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
-    //   $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
-    // }
 
     return $id_devis;
   }
@@ -326,7 +287,15 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
           "commande_ligne__dot__visible"=>$value["visible"],
           "commande_ligne__dot__serial"=>$value['serial'] ? $value['serial'] : '',
-        );
+
+          "commande_ligne__dot__duree"=>$value['duree'],
+          "commande_ligne__dot__loyer"=>$value['loyer'],
+          "commande_ligne__dot__id_sous_categorie"=>$value['id_sous_categorie'],
+          "commande_ligne__dot__id_pack_produit"=>$value['id_pack_produit'],
+          "commande_ligne__dot__sous_categorie"=>$value['sous_categorie'],
+          "commande_ligne__dot__pack_produit"=>$value['pack_produit'],
+          "commande_ligne__dot__ean"=>$value['ean']        
+      );
     }
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
 
