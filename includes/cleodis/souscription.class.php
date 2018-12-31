@@ -84,7 +84,6 @@ class souscription_cleodis extends souscription {
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
-          "RUM"=>$societe["RUM"],
           "BIC"=>$societe["BIC"],
           "id_magasin"=>$post["id_magasin"]
         );
