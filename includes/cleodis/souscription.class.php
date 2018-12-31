@@ -90,13 +90,11 @@ class souscription_cleodis extends souscription {
 
         //Il ne faut pas   craser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
-        
         ATF::affaire()->u($affToUpdate);
 
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
         }
-
 
         if($post["site_associe"] === "btwin"){
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
@@ -105,8 +103,6 @@ class souscription_cleodis extends souscription {
 
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
-
-        // Mise à jour du panier avec l'ID affaire et le statut 'affaire'
 
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
@@ -574,7 +570,7 @@ class souscription_cleodis extends souscription {
   * Appel Sell & Sign, store les documents signés dans Optima
   * @author Quentin JANON <qjanon@absystech.fr>
   * @param array $post["id_affaire"]
-  */
+  */ 
   public function _storeSignedDocuments($post){
 
     switch ($post['type']) {
@@ -591,10 +587,10 @@ class souscription_cleodis extends souscription {
         ATF::commande()->q->reset()->addfield("id_commande")->where('commande.id_affaire', $post["id_affaire"]);
         $id = ATF::commande()->select_cell();
         $type = 'retourPV';
-      break; 
+      break;
       case 'notice_assurance': // Notice d'assurance
       case 'notice_assurance.pdf': // Notice d'assurance
-        $module = "affaire"; 
+        $module = "affaire";
         $id = $post['id_affaire'];
         $type = 'retourNoticeAssurance';
       break;

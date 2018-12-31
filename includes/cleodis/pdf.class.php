@@ -124,48 +124,48 @@ class pdf_cleodis extends pdf {
 			}else{
 				$this->image(__PDF_PATH__.$this->logo,10,10,40);
 			}
-            $this->setfont('arial','',11);
-            if ($this->client) {
-                $cadre = array(
-                    array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
-                    ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
-                    ,array("txt"=>$this->client["adresse"],"size"=>10)
-                );
-                if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
-                if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
-                $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
-                $this->cadre(110,45,85,35,$cadre);
-            }
-            $this->setfont('arial','',12);
-        } else {
-        	if($this->pdf_devis){
-        		$this->image(__PDF_PATH__.$this->logo,10,10,35);
-        		$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
+			$this->setfont('arial','',11);
+			if ($this->client) {
+				$cadre = array(
+					array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
+					,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
+					,array("txt"=>$this->client["adresse"],"size"=>10)
+				);
+				if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
+				if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
+				$cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
+				$this->cadre(110,45,85,35,$cadre);
+			}
+			$this->setfont('arial','',12);
+		} else {
+			if($this->pdf_devis){
+				$this->image(__PDF_PATH__.$this->logo,10,10,35);
+				$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
 				$this->sety(20);
-        	}else{
-        		if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,20); }
+			}else{
+				if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,20); }
 
 				$this->sety(20);
-        	}
+			}
 
 		}
 	}
 
 
   public function noticeAssurance() {
-    $this->Open();
-    $this->unsetHeader();
-    $this->unsetFooter();
+	$this->Open();
+	$this->unsetHeader();
+	$this->unsetFooter();
 
-    $pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
+	$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
 
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-      $tplIdx = $this->importPage($pageNo);
+	for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+	  $tplIdx = $this->importPage($pageNo);
 
-      // add a page
-      $this->AddPage();
-      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-    }
+	  // add a page
+	  $this->AddPage();
+	  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+	}
   }
 
 	/* Ecrit un titre d'article pour les CGV
@@ -454,86 +454,86 @@ class pdf_cleodis extends pdf {
 
 
 	public function devis_new($id,$s) {
-  		$this->devis = ATF::devis()->select($id);
-  		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
+		$this->devis = ATF::devis()->select($id);
+		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
 
-  		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
-  		$this->lignes = ATF::devis_ligne()->sa();
+		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+		$this->lignes = ATF::devis_ligne()->sa();
 
-  		$this->user = ATF::user()->select($this->devis['id_user']);
-  		$this->societe = ATF::societe()->select($this->user['id_societe']);
-  		$this->client = ATF::societe()->select($this->devis['id_societe']);
-  		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-  		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
-  		$this->agence = ATF::agence()->select($this->user['id_agence']);
+		$this->user = ATF::user()->select($this->devis['id_user']);
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
+		$this->client = ATF::societe()->select($this->devis['id_societe']);
+		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
+		$this->agence = ATF::agence()->select($this->user['id_agence']);
 
-  		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
-  		if($this->devis["type_devis"] === "optic_2000"){
-  			$this->devisoptic_2000($id);
-  		}else{
-  			$this->pdf_devis = true;
-  			/* PAGE 1 */
-  			//$this->unsetHeader();
-  			$this->Addpage();
-  			$this->setHeader();
-  			$this->SetLeftMargin(15);
+		if($this->devis["type_devis"] === "optic_2000"){
+			$this->devisoptic_2000($id);
+		}else{
+			$this->pdf_devis = true;
+			/* PAGE 1 */
+			//$this->unsetHeader();
+			$this->Addpage();
+			$this->setHeader();
+			$this->SetLeftMargin(15);
 
-  			$this->sety(30);
-  			$this->setfont('arial','B',18);
-  			$this->multicell(0,7,"PAYEZ A L’USAGE VOS SOLUTIONS\nINFORMATIQUES ET DIGITALES",0,'C');
+			$this->sety(30);
+			$this->setfont('arial','B',18);
+			$this->multicell(0,7,"PAYEZ A L’USAGE VOS SOLUTIONS\nINFORMATIQUES ET DIGITALES",0,'C');
 
-  			$this->image(__PDF_PATH__."cleodis/page1_devis.jpg",20,60,160);
+			$this->image(__PDF_PATH__."cleodis/page1_devis.jpg",20,60,160);
 
-  			$this->setY(200);
+			$this->setY(200);
 
-  			$this->setfont('arial','',12);
+			$this->setfont('arial','',12);
 
-  			$this->cell(36,5,"Livraison",1,0,'C');
-  			$this->cell(36,5,"Connexion",1,0,'C');
-  			$this->cell(36,5,"Maintenance",1,0,'C');
-  			$this->cell(36,5,"Evolution",1,0,'C');
-  			$this->cell(36,5,"Récupération",1,1,'C');
-  			$this->ln(8);
-  			$this->setfont('arial','B',18);
+			$this->cell(36,5,"Livraison",1,0,'C');
+			$this->cell(36,5,"Connexion",1,0,'C');
+			$this->cell(36,5,"Maintenance",1,0,'C');
+			$this->cell(36,5,"Evolution",1,0,'C');
+			$this->cell(36,5,"Récupération",1,1,'C');
+			$this->ln(8);
+			$this->setfont('arial','B',18);
 
-  			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
 
-  			$this->setfont('arial','',8);
-  			$this->ln(5);
-  			$y = $this->getY();
+			$this->setfont('arial','',8);
+			$this->ln(5);
+			$y = $this->getY();
 
 
-  			$this->multicell(85,5,"Votre Interlocuteur CLEODIS ");
-  			$this->setfont('arial','IB',11);
-  			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
-  			$this->setfont('arial','',8);
-  			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));
-  			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));
-  			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
+			$this->multicell(85,5,"Votre Interlocuteur CLEODIS ");
+			$this->setfont('arial','IB',11);
+			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
+			$this->setfont('arial','',8);
+			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));
+			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));
+			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
 
-  			$this->setY($y);
-  			$this->setleftmargin(110);
-  			$this->setfont('arial','IB',11);
-  			$this->multicell(85,10,$this->client['societe']);
-  			$this->setfont('arial','',8);
-  			$this->multicell(85,5,$this->client['adresse']);
-  			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);
-  			$this->setfont('arial','B',11);
-  			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
-  			$this->setfont('arial','',8);
-  			$this->setleftmargin(15);
+			$this->setY($y);
+			$this->setleftmargin(110);
+			$this->setfont('arial','IB',11);
+			$this->multicell(85,10,$this->client['societe']);
+			$this->setfont('arial','',8);
+			$this->multicell(85,5,$this->client['adresse']);
+			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);
+			$this->setfont('arial','B',11);
+			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
+			$this->setfont('arial','',8);
+			$this->setleftmargin(15);
 
-  			if($this->devis['type_contrat'] =='vente'){
-  				$this->devisVente();
-  			}elseif($this->affaire['nature'] =='avenant'){
-  				$this->devisAvenant();
-  			}else{
-  				$this->devisClassique();
-  			}
-  		}
-  		return true;
-  	}
+			if($this->devis['type_contrat'] =='vente'){
+				$this->devisVente();
+			}elseif($this->affaire['nature'] =='avenant'){
+				$this->devisAvenant();
+			}else{
+				$this->devisClassique();
+			}
+		}
+		return true;
+	}
 
 
 
@@ -1082,8 +1082,8 @@ class pdf_cleodis extends pdf {
 		$data[0][] = "Mise à disposition mensuelle HT";
 		$s[0][] = $style["col1"];
 		foreach ($this->loyer as $key => $value) {
-		  	$data[0][] = $value["loyer"]." €";
-		  	$s[0][] = $style["prix"];
+			$data[0][] = $value["loyer"]." €";
+			$s[0][] = $style["prix"];
 		}
 
 
@@ -1123,8 +1123,8 @@ class pdf_cleodis extends pdf {
 				$s[$ligne][] = $style["col1"];
 
 				foreach ($this->loyer as $key => $value) {
-				  	$data[$ligne][] = $value[$kopt]." €";
-				  	$s[$ligne][] = $style["prix"];
+					$data[$ligne][] = $value[$kopt]." €";
+					$s[$ligne][] = $style["prix"];
 				}
 				$ligne ++;
 
@@ -1135,16 +1135,16 @@ class pdf_cleodis extends pdf {
 
 						$s[$ligne][] = $style["col_detail"];
 						foreach ($this->loyer as $key => $value) {
-						  	$data[$ligne][] = "";
-						  	$s[$ligne][] = $style["prix_detail"];
+							$data[$ligne][] = "";
+							$s[$ligne][] = $style["prix_detail"];
 						}
 						$ligne ++;
 
 						$data[$ligne][] = "Redevance Mensuelle HT";
 						$s[$ligne][] = $style["col1_blue"];
 						foreach ($this->loyer as $key => $value) {
-						  	$data[$ligne][] = number_format(($value["loyer"]+$value["frais_de_gestion"]),2," ",",")." €";;
-						  	$s[$ligne][] = $style["prix_blue"];
+							$data[$ligne][] = number_format(($value["loyer"]+$value["frais_de_gestion"]),2," ",",")." €";;
+							$s[$ligne][] = $style["prix_blue"];
 						}
 						$ligne ++;
 					break;
@@ -1153,8 +1153,8 @@ class pdf_cleodis extends pdf {
 						$data[$ligne][] = "En cas de vol avec effraction, incendie, dégât des eaux :\nRemplacement des équipements à l’équivalent ou annulation du contrat et renouvellement global dans le cadre d’un nouveau contrat";
 						$s[$ligne][] = $style["col_detail"];
 						foreach ($this->loyer as $key => $value) {
-						  	$data[$ligne][] = "";
-						  	$s[$ligne][] = $style["prix_detail"];
+							$data[$ligne][] = "";
+							$s[$ligne][] = $style["prix_detail"];
 						}
 						$ligne ++;
 					break;
@@ -1170,13 +1170,13 @@ class pdf_cleodis extends pdf {
 			$data[$ligne][] = "Redevance Mensuelle option(s) comprise";
 			$s[$ligne][] = $style["col1_blue"];
 			foreach ($this->loyer as $key => $value) {
-			  	$total = $value["loyer"];
-			  	foreach ($options as $kopt => $vopt) {
-			  		$total += $value[$kopt];
-			  	}
+				$total = $value["loyer"];
+				foreach ($options as $kopt => $vopt) {
+					$total += $value[$kopt];
+				}
 
-			  	$data[$ligne][] = number_format($total,2," ",",")." €";
-			  	$s[$ligne][] = $style["prix_blue"];
+				$data[$ligne][] = number_format($total,2," ",",")." €";
+				$s[$ligne][] = $style["prix_blue"];
 			}
 			$ligne ++;
 		}
@@ -2750,47 +2750,47 @@ class pdf_cleodis extends pdf {
   * @return [type]      [description]
   */
   public function _documents($get){
-    $id_affaire = $get["id_affaire"];
-    $fonction = $get["document"];
-    $docAuth = array("contratA4", "mandatSepa", "contratPV", "bon_de_commande"); // liste des documents autorisés
+	$id_affaire = $get["id_affaire"];
+	$fonction = $get["document"];
+	$docAuth = array("contratA4", "mandatSepa", "contratPV", "bon_de_commande"); // liste des documents autorisés
 
-    if (ATF::affaire()->decryptId($id_affaire) && in_array($fonction, $docAuth)) {
+	if (ATF::affaire()->decryptId($id_affaire) && in_array($fonction, $docAuth)) {
 
-    	if($fonction === "bon_de_commande"){
-    		ATF::bon_de_commande()->q->reset()
-		       ->addField("id_bon_de_commande")
-		       ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
-		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
-		       // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
-		       ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
-		       ->setDimension('cell');
+		if($fonction === "bon_de_commande"){
+			ATF::bon_de_commande()->q->reset()
+			   ->addField("id_bon_de_commande")
+			   ->from("bon_de_commande", "id_affaire", "affaire", "id_affaire")
+			   ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
+			   // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
+			   ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+			   ->setDimension('cell');
 
-		      if ($bon_de_commande = ATF::bon_de_commande()->sa()) {
-		       return array(
-		         "data" => base64_encode( $this->generic($fonction,$bon_de_commande, true) ),
-		         "strMimeType" => "application/pdf"
-		       );
-		      }
-    	}else{
-    		ATF::commande()->q->reset()
-		       ->addField("id_commande")
-		       ->from("commande", "id_affaire", "affaire", "id_affaire")
-		       ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
-		       // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
-		       ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
-		       ->setDimension('cell');
+			  if ($bon_de_commande = ATF::bon_de_commande()->sa()) {
+			   return array(
+				 "data" => base64_encode( $this->generic($fonction,$bon_de_commande, true) ),
+				 "strMimeType" => "application/pdf"
+			   );
+			  }
+		}else{
+			ATF::commande()->q->reset()
+			   ->addField("id_commande")
+			   ->from("commande", "id_affaire", "affaire", "id_affaire")
+			   ->where("affaire.id_affaire", ATF::affaire()->decryptId($id_affaire), "AND")
+			   // securite pour s'assurer qu'il ne peut voir que les documents qui lui appartiennent
+			   ->where("affaire.id_partenaire", ATF::$usr->get('contact', 'id_societe'))
+			   ->setDimension('cell');
 
-		      if ($id_commande = ATF::commande()->sa()) {
-		       return array(
-		         "data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
-		         "strMimeType" => "application/pdf"
-		       );
-		      }
-    	}
+			  if ($id_commande = ATF::commande()->sa()) {
+			   return array(
+				 "data" => base64_encode( $this->generic($fonction,$id_commande, true) ),
+				 "strMimeType" => "application/pdf"
+			   );
+			  }
+		}
 
-    }
+	}
 
-    return false;
+	return false;
 
   }
 
@@ -2805,7 +2805,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
-    $this->commandeInit($id,$s,$previsu);
+	$this->commandeInit($id,$s,$previsu);
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		$this->commandeInit($id);
@@ -2817,770 +2817,770 @@ class pdf_cleodis extends pdf {
 
 		$this->setfont('arial','B',10);
 
-    if ($this->client['id_famille'] == 9) {
-      $this->contratA4Particulier($id, $signature,$sellsign);
-    } else {
-      $this->contratA4Societe($id, $signature,$sellsign);
-    }
+	if ($this->client['id_famille'] == 9) {
+	  $this->contratA4Particulier($id, $signature,$sellsign);
+	} else {
+	  $this->contratA4Societe($id, $signature,$sellsign);
+	}
 	}
 
   public function contratA4Societe($id, $signature,$sellsign) {
-    if($this->affaire["type_affaire"] == "2SI"){
-      $this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
-    } else{
-      $this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
-    }
+	if($this->affaire["type_affaire"] == "2SI"){
+	  $this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
+	} else{
+	  $this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
+	}
 
 
 
-    $this->sety(10);
-    $this->multicell(0,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
-    $this->setLeftMargin(65);
-    $this->setfont('arial','B',7);
-    $this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
-    $this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
-    if($this->societe['id_pays'] =='FR'){
-      $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
-    }else{
-      $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
-    }
-    $this->setLeftMargin(15);
-    $this->ln(5);
-    $this->setfont('arial','B',10);
-    $this->multicell(0,6,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE",0,'C');
-    $this->setLeftMargin(65);
-    $this->setfont('arial','B',7);
-    $this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
-    $this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
-    $this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
+	$this->sety(10);
+	$this->multicell(0,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
+	$this->setLeftMargin(65);
+	$this->setfont('arial','B',7);
+	$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
+	$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
+	if($this->societe['id_pays'] =='FR'){
+	  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+	}else{
+	  $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
+	}
+	$this->setLeftMargin(15);
+	$this->ln(5);
+	$this->setfont('arial','B',10);
+	$this->multicell(0,6,$this->affaire['nature']=="vente"?"L'ACHETEUR":"LE LOCATAIRE",0,'C');
+	$this->setLeftMargin(65);
+	$this->setfont('arial','B',7);
+	$this->multicell(0,3,"Raison sociale : ".$this->client['societe'],0);
+	$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
+	$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
 
-    if(ATF::$codename == "cleodisbe"){
-      $this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva']." Tél : ".$this->client['tel'],0);
-    }else{
-      if($this->client['id_pays'] =='FR'){
-        $this->multicell(0,3,"SIRET : ".$this->client['siret']." Tél : ".$this->client['tel'],0);
-      }else{
-        $this->multicell(0,3,"NUMERO DE TVA : ".($this->client['siret']?$this->client['siret']:"-")." Tél : ".$this->client['tel'],0);
-      }
-    }
-
-
-    $this->SetLineWidth(0.35);
-    $this->SetDrawColor(149,193,31);
-    $this->line(0,60,220,60);
-    $this->setLeftMargin(15);
-    $this->setfont('arial','B',10);
-    $this->setY(62);
-
-    if($this->affaire["nature"]=="avenant"){
-      if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU CONTRAT DE PRESTATION N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-      }else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU CONTRAT DE ".($this->affaire['nature']=="vente"?"VENTE":"LOCATION")." N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
-      $this->ln(5);
-    }else{
-      if($this->devis["type_contrat"] == "presta"){
-        $this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de PRESTATION n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-      }else{
-        $this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de ".($this->affaire['nature']=="vente"?"vente":"location")." n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
-
-      }
-      if($this->lignes && $this->affaire["nature"]=="AR"){
-        foreach($this->AR as $k=>$i){
-          $affaire=ATF::affaire()->select($i['id_affaire']);
-          $ref_ar .=" ".$affaire["ref"]." (".$affaire["affaire"]."), ";
-        }
-        $this->ln(2);
-        $this->setfont('arial','BI',7.5);
-        $this->multicell(0,2,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
-      } else {
-        $this->ln(5);
-      }
-    }
-
-    $this->SetLineWidth(0.35);
-    $this->SetDrawColor(149,193,31);
-    $this->line(0,73,220,73);
-
-    $this->setxy(15,75);
-    $this->SetDrawColor(0,0,0);
-    $this->SetLineWidth(0.2);
-
-    if($this->affaire["nature"]=="avenant"){
-      $titre = "ARTICLE 1 : OBJET DE L'AVENANT";
-      $texte = "L'objet de cet avenant concerne l'ajout et le retrait d'équipements au contrat de base cité en référence.";
-    }else{
-      $titre = "ARTICLE 1 : OBJET DU CONTRAT";
-      //$texte = "L'objet du contrat est la ".($this->affaire['nature']=="vente"?"vente":"mise en location")." d'équipements dont le détail figure ci-après. ";
-
-      if($this->devis["type_contrat"] == "presta"){
-        $texte = "L'objet du contrat concerne les prestations dont le détail figure ci-après. ";
-      }else{
-        $texte = "L'objet du contrat est la ".($this->affaire['nature']=="vente"?"vente":"mise en location")." d'équipements dont le détail figure ci-après. ";
-      }
+	if(ATF::$codename == "cleodisbe"){
+	  $this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva']." Tél : ".$this->client['tel'],0);
+	}else{
+	  if($this->client['id_pays'] =='FR'){
+		$this->multicell(0,3,"SIRET : ".$this->client['siret']." Tél : ".$this->client['tel'],0);
+	  }else{
+		$this->multicell(0,3,"NUMERO DE TVA : ".($this->client['siret']?$this->client['siret']:"-")." Tél : ".$this->client['tel'],0);
+	  }
+	}
 
 
-      if ($this->affaire['nature']=="AR" && $this->AR) {
-        $texte .= "Ce contrat annule et remplace le(s) contrat(s) suivant(s) : ";
-        foreach ($this->AR as $k=>$i) {
-          $texte .= ATF::affaire()->nom($i['id_affaire']).", ";
-        }
-      }
-    }
-    $this->setfont('arial','B',8);
-    $this->cell(0,5,$titre,0,1);
-    $this->setfont('arial','',8);
-    $this->multicell(0,4,$texte,0,1);
+	$this->SetLineWidth(0.35);
+	$this->SetDrawColor(149,193,31);
+	$this->line(0,60,220,60);
+	$this->setLeftMargin(15);
+	$this->setfont('arial','B',10);
+	$this->setY(62);
 
-    $w = array(20,30,30,105);
+	if($this->affaire["nature"]=="avenant"){
+	  if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU CONTRAT DE PRESTATION N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+	  }else{  $this->multicell(0,3,"AVENANT N°".ATF::affaire()->num_avenant($this->affaire["ref"])." AU CONTRAT DE ".($this->affaire['nature']=="vente"?"VENTE":"LOCATION")." N°".ATF::affaire()->select($this->affaire["id_parent"],"ref").($this->client["code_client"]?"-".$this->client["code_client"]:NULL)); }
+	  $this->ln(5);
+	}else{
+	  if($this->devis["type_contrat"] == "presta"){
+		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de PRESTATION n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+	  }else{
+		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat de ".($this->affaire['nature']=="vente"?"vente":"location")." n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
-    $eq = "EQUIPEMENT(S)";
+	  }
+	  if($this->lignes && $this->affaire["nature"]=="AR"){
+		foreach($this->AR as $k=>$i){
+		  $affaire=ATF::affaire()->select($i['id_affaire']);
+		  $ref_ar .=" ".$affaire["ref"]." (".$affaire["affaire"]."), ";
+		}
+		$this->ln(2);
+		$this->setfont('arial','BI',7.5);
+		$this->multicell(0,2,"Annule et remplace le(s) contrat(s) n° ".$ref_ar." (cf. tableau descriptif des équipements) et reprend tout ou partie des matériels ainsi que tous leurs encours.",0,'L');
+	  } else {
+		$this->ln(5);
+	  }
+	}
 
-    if($this->devis["type_contrat"] == "presta") $eq = "PRESTATION(S)";
+	$this->SetLineWidth(0.35);
+	$this->SetDrawColor(149,193,31);
+	$this->line(0,73,220,73);
 
+	$this->setxy(15,75);
+	$this->SetDrawColor(0,0,0);
+	$this->SetLineWidth(0.2);
 
-    if ($this->lignes) {
-      $this->setFillColor(239,239,239);
-      // Groupe les lignes par affaire
-      $lignes=$this->groupByAffaire($this->lignes);
-      // Flag pour savoir si le tableau part en annexe ou pas
-      foreach ($lignes as $k => $i) {
-        $this->setfont('arial','B',10);
-        if (!$k) {
-          if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
-          else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
+	if($this->affaire["nature"]=="avenant"){
+	  $titre = "ARTICLE 1 : OBJET DE L'AVENANT";
+	  $texte = "L'objet de cet avenant concerne l'ajout et le retrait d'équipements au contrat de base cité en référence.";
+	}else{
+	  $titre = "ARTICLE 1 : OBJET DU CONTRAT";
+	  //$texte = "L'objet du contrat est la ".($this->affaire['nature']=="vente"?"vente":"mise en location")." d'équipements dont le détail figure ci-après. ";
 
-        } else {
-          $affaire_provenance=ATF::affaire()->select($k);
-          if($this->affaire["nature"]=="avenant"){
-            $title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-          }elseif($this->affaire["nature"]=="AR"){
-            $title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-          }elseif($this->affaire["nature"]=="vente"){
-            $title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-          }
-        }
-        unset($data,$st);
-        foreach ($i as $k_ => $i_) {
-          $produit = ATF::produit()->select($i_['id_produit']);
-          $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
-          $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
-          //On prépare le détail de la ligne
-          $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-          //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
-
-
-          $etat = "( NEUF )";
-          if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
-            if($i_["neuf"] == "non"){
-                $etat = "( OCCASION )";
-            }
-          }
-
-          if(ATF::$codename == "cleodisbe"){ $etat = ""; }
-
-          //Si c'est une prestation, on affiche pas l'etat
-          if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
-
-          if ($details == "") unset($details);
-          $data[] = array(
-            round($i_['quantite'])
-            ,$ssCat
-            ,$fab
-            ,$i_['produit'].$etat
-            ,"details"=>$details
-          );
-
-          $st[] = array(
-            ($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
-            ,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-            ,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-
-            ,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
-            ,"details"=>$this->styleDetailsProduit
-          );
-
-        }
-        $tableau[$k] = array(
-          "head"=>$head
-          ,"data"=>$data
-          ,"w"=>$w
-          ,"styles"=>$st
-          ,"title"=>$title
-        );
-      }
-      unset($data,$st);
-      $h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
-      foreach ($tableau as $k=>$i) {
-        if ($i['head']) $h += 5;
-        $h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
-      }
-
-      foreach ($tableau as $k=>$i) {
-        $this->setFillColor(239,239,239);
-        $this->setfont('arial','B',10);
-        $this->multicell(0,5,$i['title'],1,'C',1);
-        $this->setfont('arial','',8);
-        if ($h>$this->heightLimitTableContratA4 || $this->commande["clause_logicielle"]=="oui") {
-          $this->multicellAnnexe();
-          $annexes[$k] = $i;
-        } else {
-
-          $this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
-        }
-      }
-    }
-    $this->ln(3);
+	  if($this->devis["type_contrat"] == "presta"){
+		$texte = "L'objet du contrat concerne les prestations dont le détail figure ci-après. ";
+	  }else{
+		$texte = "L'objet du contrat est la ".($this->affaire['nature']=="vente"?"vente":"mise en location")." d'équipements dont le détail figure ci-après. ";
+	  }
 
 
-    if ($this->affaire['nature']=="vente") {
-      $this->setfont('arial','B',8);
-      $this->multicell(0,5,"ARTICLE 2 : PRIX DE VENTE");
-      $this->setfont('arial','',8);
-      $prix = $this->loyer[0]["loyer"]+$this->loyer[0]["assurance"]+$this->loyer[0]["frais_de_gestion"];
-      $this->multicell(0,5,"Le prix de vente est fixé à ".number_format($prix,2,"."," ")." € ".$this->texteHT." soit ".number_format((($prix)*$this->commande["tva"]),2,"."," ")." € ".$this->texteTTC);
-      $numArticle = 3;
+	  if ($this->affaire['nature']=="AR" && $this->AR) {
+		$texte .= "Ce contrat annule et remplace le(s) contrat(s) suivant(s) : ";
+		foreach ($this->AR as $k=>$i) {
+		  $texte .= ATF::affaire()->nom($i['id_affaire']).", ";
+		}
+	  }
+	}
+	$this->setfont('arial','B',8);
+	$this->cell(0,5,$titre,0,1);
+	$this->setfont('arial','',8);
+	$this->multicell(0,4,$texte,0,1);
 
-      $this->setfont('arial','B',8);
-      $this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
-      $numArticle++;
-      $this->setfont('arial','',8);
-      $this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
+	$w = array(20,30,30,105);
+
+	$eq = "EQUIPEMENT(S)";
+
+	if($this->devis["type_contrat"] == "presta") $eq = "PRESTATION(S)";
 
 
+	if ($this->lignes) {
+	  $this->setFillColor(239,239,239);
+	  // Groupe les lignes par affaire
+	  $lignes=$this->groupByAffaire($this->lignes);
+	  // Flag pour savoir si le tableau part en annexe ou pas
+	  foreach ($lignes as $k => $i) {
+		$this->setfont('arial','B',10);
+		if (!$k) {
+		  if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
+		  else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
 
-    } else {
-      //$this->sety(167);
-      $this->setfont('arial','B',8);
-      if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,5,"ARTICLE 2 : DUREE"); }
-      else{ $this->multicell(0,5,"ARTICLE 2 : DUREE DE LA LOCATION"); }
+		} else {
+		  $affaire_provenance=ATF::affaire()->select($k);
+		  if($this->affaire["nature"]=="avenant"){
+			$title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+		  }elseif($this->affaire["nature"]=="AR"){
+			$title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+		  }elseif($this->affaire["nature"]=="vente"){
+			$title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+		  }
+		}
+		unset($data,$st);
+		foreach ($i as $k_ => $i_) {
+		  $produit = ATF::produit()->select($i_['id_produit']);
+		  $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
+		  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
+		  //On prépare le détail de la ligne
+		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+		  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
-      $this->setfont('arial','B',10);
-      $duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
-      $this->setfont('arial','',8);
-      if($this->devis['loyer_unique']=='oui'){
-        if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est identique à celle du contrat principal."); }
-        else{ $this->multicell(0,3,"La durée de la location est identique à celle du contrat principal."); }
 
-      }elseif($this->affaire["nature"]=="avenant"){
-        if($this->devis["type_contrat"] == "presta"){ $texte = "La durée est fixée à ".$duree." mois"." à compter du "; }
-        else{ $texte = "La durée de la location est fixée à ".$duree." mois"." à compter du "; }
-        if($this->commande['date_debut']){
-          $texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
-        }
-        $this->multicell(0,3,$texte);
-      }else{
-        if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
-        else{ $this->multicell(0,3,"La durée de la location est fixée à ".$duree." mois."); }
+		  $etat = "( NEUF )";
+		  if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
+			if($i_["neuf"] == "non"){
+				$etat = "( OCCASION )";
+			}
+		  }
 
-      }
-      $this->ln(2);
+		  if(ATF::$codename == "cleodisbe"){ $etat = ""; }
 
-      if($this->devis['loyer_unique']=='oui'){
-        $this->setfont('arial','B',8);
-        $this->multicell(0,5,"ARTICLE 3 : LOYER UNIQUE");
-        $this->setfont('arial','',8);
-        $this->multicell(0,3,"Il est payable terme à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et est fixe et non révisable pendant toute la durée de la location.");
-        if(($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"])>0){
-          $this->multicell(0,3,"Le montant du loyer unique est fixé à ".number_format($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"],2,"."," ")." € HT.");
-        }else{
-          $this->multicell(0,3,"Les loyers restent inchangés.");
-        }
-      }else{
-        $this->setfont('arial','B',8);
-        $this->multicell(0,5,"ARTICLE 3 : LOYERS");
-        $this->setfont('arial','',7);
-        $this->setfont('arial','',8);
-        if ($this->affaire['nature']=="avenant"){
-          $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
-        }else{
-          $this->multicell(0,3,"Ils sont payables termes à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et sont fixes et non révisables pendant toute la durée de la location.");
-        }
-        if($duree){
-          $donnee = array();
-          $head = array("Nombre de Loyers","Périodicité : Mois (M) Trimestre (T) Semestre (S) ou Année (A)","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
-          foreach ($this->loyer as $k=>$i) {
-            $data[] = array(
-              $i['duree']
-              ,strtoupper($i['frequence_loyer'])
-              ,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
-              ,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])*$this->commande["tva"]),2,"."," ")." €"
-            );
-          }
-          $this->SetLineWidth(0.20);
-          $this->ln(3);
-          $this->tableau($head,$data,180,3);
-        }
-      }
-      $numArticle = 4;
-    }
+		  //Si c'est une prestation, on affiche pas l'etat
+		  if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
 
-    $this->setfont('arial','B',8);
-    $this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
-    $numArticle++;
-    $this->setfont('arial','',8);
-    $this->cell(0,6,"La présente proposition ne deviendra une offre ferme qu'après acceptation du Comité des Agréments de CLEODIS.",0,1);
+		  if ($details == "") unset($details);
+		  $data[] = array(
+			round($i_['quantite'])
+			,$ssCat
+			,$fab
+			,$i_['produit'].$etat
+			,"details"=>$details
+		  );
 
-    if ($this->commande["clause_logicielle"]=="oui") {
-      $this->setfont('arial','B',8);
-      $this->multicell(0,5,"ARTICLE ".$numArticle." : MISE A DISPOSITION DES LOGICIELS");
-      $this->ln(1);
-      $this->setfont('arial','',8);
-      $this->multicell(0,3,"ETANT PREALABLEMENT EXPOSE :");
-      $this->multicell(0,3,"Pour les besoins de son activité, le Locataire a souhaité la mise à disposition d'une configuration informatique composée de matériels et de logiciels [ci-après désignés les «Logiciels »] objet du contrat ci-dessus référencé.");
-      $this->multicell(0,3,"Le Locataire a obtenu du Fournisseur de pouvoir utiliser les Logiciels dans le cadre d'une licence dont il a approuvé les termes.");
-      $this->multicell(0,3,"Le mode de souscription de ce droit d'utilisation s'effectue dans le cadre d'une mise à disposition temporaire convenue dans le cadre du Contrat en référence.");
-      $this->multicell(0,3,"LE LOCATAIRE DECLARE :");
-      $this->multicell(0,3,"=>reconnaître que le Contrat lui permet de bénéficier d'une mise à disposition des Logiciels et donc de l'utilisation de ceux-ci conformément à ses besoins;");
-      $this->multicell(0,3,"=>qu'en cas de contradiction, les clauses du contrat ci-dessus référencé prévalent, dans ses relations avec le Loueur, sur celles qui régissent ou constituent la licence;");
-      $this->multicell(0,3,"=>que les configurations informatiques seront livrées et installées, les prestations réalisées conformément à la commande qu'il a passé aux fournisseurs et selon les modalités convenues directement avec l'éditeur des Logiciels ou les prestataires et/ou les fournisseurs des matériels;");
-      $this->multicell(0,3,"=>prendre livraison des configurations informatiques à ses frais et risques, et reconnaît avoir choisi seul sans que le Loueur et/ou l'Etablissement Cessionnaire du contrat n'interviennent en quoi que ce soit dans ce choix;");
-      $this->multicell(0,3,"En conséquence, ce choix relevant de la responsabilité exclusive du Locataire, ce dernier s'engage à régler ponctuellement l'ensemble des sommes dues au titre du Contrat et ce, même en cas de défaillance des éditeurs ou de leurs logiciels ainsi que des Prestataires.");
-    }
+		  $st[] = array(
+			($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
+			,($details?$this->colsProduitAvecDetail:$this->colsProduit)
+			,($details?$this->colsProduitAvecDetail:$this->colsProduit)
 
-    $this->setY(219);
-    $this->line(0,$this->gety(),238,$this->gety());
-    $this->SetTextColor(149,193,31);
-    $this->setfont('arial','B',10);
-    if(!$sellsign){
-      $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
-    }
+			,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
+			,"details"=>$this->styleDetailsProduit
+		  );
 
-    $this->SetDrawColor(0,0,0);
-    $this->SetTextColor(0,0,0);
+		}
+		$tableau[$k] = array(
+		  "head"=>$head
+		  ,"data"=>$data
+		  ,"w"=>$w
+		  ,"styles"=>$st
+		  ,"title"=>$title
+		);
+	  }
+	  unset($data,$st);
+	  $h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
+	  foreach ($tableau as $k=>$i) {
+		if ($i['head']) $h += 5;
+		$h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+	  }
 
-    $this->setfont('arial','',9);
+	  foreach ($tableau as $k=>$i) {
+		$this->setFillColor(239,239,239);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,$i['title'],1,'C',1);
+		$this->setfont('arial','',8);
+		if ($h>$this->heightLimitTableContratA4 || $this->commande["clause_logicielle"]=="oui") {
+		  $this->multicellAnnexe();
+		  $annexes[$k] = $i;
+		} else {
 
-    $this->setFillColor(255,255,0);
+		  $this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+		}
+	  }
+	}
+	$this->ln(3);
+
+
+	if ($this->affaire['nature']=="vente") {
+	  $this->setfont('arial','B',8);
+	  $this->multicell(0,5,"ARTICLE 2 : PRIX DE VENTE");
+	  $this->setfont('arial','',8);
+	  $prix = $this->loyer[0]["loyer"]+$this->loyer[0]["assurance"]+$this->loyer[0]["frais_de_gestion"];
+	  $this->multicell(0,5,"Le prix de vente est fixé à ".number_format($prix,2,"."," ")." € ".$this->texteHT." soit ".number_format((($prix)*$this->commande["tva"]),2,"."," ")." € ".$this->texteTTC);
+	  $numArticle = 3;
+
+	  $this->setfont('arial','B',8);
+	  $this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
+	  $numArticle++;
+	  $this->setfont('arial','',8);
+	  $this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
 
 
 
-    if(!$signature){
-      $cadre = array(
-        "Fait à : "
-        ,"Le : "
-        ,"Nom : "
-        ,"Qualité : "
-        ,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
-      );
-    }else{
-      $cadre = array(
-        " ",
-        "[SignatureContractant]",
-        " ",
-        " ",
-        " ",
-        "[/SignatureContractant]"
-      );
-    }
+	} else {
+	  //$this->sety(167);
+	  $this->setfont('arial','B',8);
+	  if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,5,"ARTICLE 2 : DUREE"); }
+	  else{ $this->multicell(0,5,"ARTICLE 2 : DUREE DE LA LOCATION"); }
+
+	  $this->setfont('arial','B',10);
+	  $duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
+	  $this->setfont('arial','',8);
+	  if($this->devis['loyer_unique']=='oui'){
+		if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est identique à celle du contrat principal."); }
+		else{ $this->multicell(0,3,"La durée de la location est identique à celle du contrat principal."); }
+
+	  }elseif($this->affaire["nature"]=="avenant"){
+		if($this->devis["type_contrat"] == "presta"){ $texte = "La durée est fixée à ".$duree." mois"." à compter du "; }
+		else{ $texte = "La durée de la location est fixée à ".$duree." mois"." à compter du "; }
+		if($this->commande['date_debut']){
+		  $texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
+		}
+		$this->multicell(0,3,$texte);
+	  }else{
+		if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
+		else{ $this->multicell(0,3,"La durée de la location est fixée à ".$duree." mois."); }
+
+	  }
+	  $this->ln(2);
+
+	  if($this->devis['loyer_unique']=='oui'){
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"ARTICLE 3 : LOYER UNIQUE");
+		$this->setfont('arial','',8);
+		$this->multicell(0,3,"Il est payable terme à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et est fixe et non révisable pendant toute la durée de la location.");
+		if(($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"])>0){
+		  $this->multicell(0,3,"Le montant du loyer unique est fixé à ".number_format($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"],2,"."," ")." € HT.");
+		}else{
+		  $this->multicell(0,3,"Les loyers restent inchangés.");
+		}
+	  }else{
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"ARTICLE 3 : LOYERS");
+		$this->setfont('arial','',7);
+		$this->setfont('arial','',8);
+		if ($this->affaire['nature']=="avenant"){
+		  $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
+		}else{
+		  $this->multicell(0,3,"Ils sont payables termes à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et sont fixes et non révisables pendant toute la durée de la location.");
+		}
+		if($duree){
+		  $donnee = array();
+		  $head = array("Nombre de Loyers","Périodicité : Mois (M) Trimestre (T) Semestre (S) ou Année (A)","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
+		  foreach ($this->loyer as $k=>$i) {
+			$data[] = array(
+			  $i['duree']
+			  ,strtoupper($i['frequence_loyer'])
+			  ,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
+			  ,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])*$this->commande["tva"]),2,"."," ")." €"
+			);
+		  }
+		  $this->SetLineWidth(0.20);
+		  $this->ln(3);
+		  $this->tableau($head,$data,180,3);
+		}
+	  }
+	  $numArticle = 4;
+	}
+
+	$this->setfont('arial','B',8);
+	$this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
+	$numArticle++;
+	$this->setfont('arial','',8);
+	$this->cell(0,6,"La présente proposition ne deviendra une offre ferme qu'après acceptation du Comité des Agréments de CLEODIS.",0,1);
+
+	if ($this->commande["clause_logicielle"]=="oui") {
+	  $this->setfont('arial','B',8);
+	  $this->multicell(0,5,"ARTICLE ".$numArticle." : MISE A DISPOSITION DES LOGICIELS");
+	  $this->ln(1);
+	  $this->setfont('arial','',8);
+	  $this->multicell(0,3,"ETANT PREALABLEMENT EXPOSE :");
+	  $this->multicell(0,3,"Pour les besoins de son activité, le Locataire a souhaité la mise à disposition d'une configuration informatique composée de matériels et de logiciels [ci-après désignés les «Logiciels »] objet du contrat ci-dessus référencé.");
+	  $this->multicell(0,3,"Le Locataire a obtenu du Fournisseur de pouvoir utiliser les Logiciels dans le cadre d'une licence dont il a approuvé les termes.");
+	  $this->multicell(0,3,"Le mode de souscription de ce droit d'utilisation s'effectue dans le cadre d'une mise à disposition temporaire convenue dans le cadre du Contrat en référence.");
+	  $this->multicell(0,3,"LE LOCATAIRE DECLARE :");
+	  $this->multicell(0,3,"=>reconnaître que le Contrat lui permet de bénéficier d'une mise à disposition des Logiciels et donc de l'utilisation de ceux-ci conformément à ses besoins;");
+	  $this->multicell(0,3,"=>qu'en cas de contradiction, les clauses du contrat ci-dessus référencé prévalent, dans ses relations avec le Loueur, sur celles qui régissent ou constituent la licence;");
+	  $this->multicell(0,3,"=>que les configurations informatiques seront livrées et installées, les prestations réalisées conformément à la commande qu'il a passé aux fournisseurs et selon les modalités convenues directement avec l'éditeur des Logiciels ou les prestataires et/ou les fournisseurs des matériels;");
+	  $this->multicell(0,3,"=>prendre livraison des configurations informatiques à ses frais et risques, et reconnaît avoir choisi seul sans que le Loueur et/ou l'Etablissement Cessionnaire du contrat n'interviennent en quoi que ce soit dans ce choix;");
+	  $this->multicell(0,3,"En conséquence, ce choix relevant de la responsabilité exclusive du Locataire, ce dernier s'engage à régler ponctuellement l'ensemble des sommes dues au titre du Contrat et ce, même en cas de défaillance des éditeurs ou de leurs logiciels ainsi que des Prestataires.");
+	}
+
+	$this->setY(219);
+	$this->line(0,$this->gety(),238,$this->gety());
+	$this->SetTextColor(149,193,31);
+	$this->setfont('arial','B',10);
+	if(!$sellsign){
+	  $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
+	}
+
+	$this->SetDrawColor(0,0,0);
+	$this->SetTextColor(0,0,0);
+
+	$this->setfont('arial','',9);
+
+	$this->setFillColor(255,255,0);
 
 
-    $y = $this->gety()+2;
-    if ($this->affaire['nature']=="vente") {
-      $t = "L'acheteur";
-    } else {
-      $t = "Le Locataire";
-    }
-    $this->cadre(20,$y,80,48,$cadre,$t);
-    if(!$signature){
-      $cadre = array(
-        "Fait à : "
-        ,"Le : "
-        ,"Nom : "
-        ,"Qualité : "
-        ,"Signature et cachet commercial : "
-      );
-    }else{
-      $cadre = array(
-        " ",
-        "[SignatureFournisseur]",
-        " ",
-        " ",
-        " ",
-        "[/SignatureFournisseur]"
-      );
 
-    }
+	if(!$signature){
+	  $cadre = array(
+		"Fait à : "
+		,"Le : "
+		,"Nom : "
+		,"Qualité : "
+		,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
+	  );
+	}else{
+	  $cadre = array(
+		" ",
+		"[SignatureContractant]",
+		" ",
+		" ",
+		" ",
+		"[/SignatureContractant]"
+	  );
+	}
 
 
-    if ($this->affaire['nature']=="vente") {
-      $t = "Le Vendeur";
-    } else {
-      $t = "Le Loueur";
-    }
-    $this->cadre(110,$y,80,48,$cadre,$t);
+	$y = $this->gety()+2;
+	if ($this->affaire['nature']=="vente") {
+	  $t = "L'acheteur";
+	} else {
+	  $t = "Le Locataire";
+	}
+	$this->cadre(20,$y,80,48,$cadre,$t);
+	if(!$signature){
+	  $cadre = array(
+		"Fait à : "
+		,"Le : "
+		,"Nom : "
+		,"Qualité : "
+		,"Signature et cachet commercial : "
+	  );
+	}else{
+	  $cadre = array(
+		" ",
+		"[SignatureFournisseur]",
+		" ",
+		" ",
+		" ",
+		"[/SignatureFournisseur]"
+	  );
 
-    //$this->Annot(110,$y,"SignatureDebtor");
+	}
 
-    $this->setfont('arial','B',9);
-    $this->setY(275.9);
-    $this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES AU VERSO",0,'C');
-    if($this->devis["type_contrat"] == "presta"){ }
-    else{ $this->conditionsGeneralesDeLocationA4($this->affaire['nature']); }
 
-    if ($annexes) {
-      $this->annexes($annexes);
-    }
+	if ($this->affaire['nature']=="vente") {
+	  $t = "Le Vendeur";
+	} else {
+	  $t = "Le Loueur";
+	}
+	$this->cadre(110,$y,80,48,$cadre,$t);
+
+	//$this->Annot(110,$y,"SignatureDebtor");
+
+	$this->setfont('arial','B',9);
+	$this->setY(275.9);
+	$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES AU VERSO",0,'C');
+	if($this->devis["type_contrat"] == "presta"){ }
+	else{ $this->conditionsGeneralesDeLocationA4($this->affaire['nature']); }
+
+	if ($annexes) {
+	  $this->annexes($annexes);
+	}
   }
 
   public function contratA4Particulier($id, $signature,$sellsign) {
-    if($this->affaire["type_affaire"] == "2SI"){
-      $this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
-    } else{
-      $this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
-    }
+	if($this->affaire["type_affaire"] == "2SI"){
+	  $this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
+	} else{
+	  $this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
+	}
 
-    $this->sety(10);
-    $this->multicell(0,5,"LE LOUEUR",0,'C');
-    $this->setLeftMargin(65);
-    $this->setfont('arial','B',7);
-    $this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
-    $this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
-    if($this->societe['id_pays'] =='FR'){
-      $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
-    }else{
-      $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
-    }
-    $this->setLeftMargin(15);
-    $this->ln(5);
-    $this->setfont('arial','B',10);
-    $this->multicell(0,6,"L'ABONNÉ",0,'C');
-    $this->setLeftMargin(65);
-    $this->setfont('arial','B',7);
-    $this->multicell(0,3,"Nom : ".$this->client['societe'],0);
-    $this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
-    $this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
+	$this->sety(10);
+	$this->multicell(0,5,"LE LOUEUR",0,'C');
+	$this->setLeftMargin(65);
+	$this->setfont('arial','B',7);
+	$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
+	$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
+	if($this->societe['id_pays'] =='FR'){
+	  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
+	}else{
+	  $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
+	}
+	$this->setLeftMargin(15);
+	$this->ln(5);
+	$this->setfont('arial','B',10);
+	$this->multicell(0,6,"L'ABONNÉ",0,'C');
+	$this->setLeftMargin(65);
+	$this->setfont('arial','B',7);
+	$this->multicell(0,3,"Nom : ".$this->client['societe'],0);
+	$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
+	$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
 
-    $this->multicell(0,3,"Mail : ".$this->client['particulier_email'],0);
-
-
-    $this->SetLineWidth(0.35);
-    $this->SetDrawColor(149,193,31);
-    $this->line(0,60,220,60);
-    $this->setLeftMargin(15);
-    $this->setfont('arial','B',10);
-    $this->setY(62);
+	$this->multicell(0,3,"Mail : ".$this->client['particulier_email'],0);
 
 
-    $this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+	$this->SetLineWidth(0.35);
+	$this->SetDrawColor(149,193,31);
+	$this->line(0,60,220,60);
+	$this->setLeftMargin(15);
+	$this->setfont('arial','B',10);
+	$this->setY(62);
 
 
-    $this->ln(5);
-
-    $this->SetLineWidth(0.35);
-    $this->SetDrawColor(149,193,31);
-    $this->line(0,73,220,73);
-
-    $this->setxy(15,75);
-    $this->SetDrawColor(0,0,0);
-    $this->SetLineWidth(0.2);
+	$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 
 
-    $titre = "ARTICLE 1 : OBJET DU CONTRAT";
+	$this->ln(5);
 
-    if($this->devis["type_contrat"] == "presta"){
-      $texte = "L'objet du contrat concerne les prestations dont le détail figure ci-après. ";
-    }else{
-      $texte = "L'objet du contrat est l'abonnement à un service comprenant la mise en location d'équipements dont le détail figure ci-après ainsi que des services associés. ";
-    }
+	$this->SetLineWidth(0.35);
+	$this->SetDrawColor(149,193,31);
+	$this->line(0,73,220,73);
 
-    $this->setfont('arial','B',8);
-    $this->cell(0,5,$titre,0,1);
-    $this->setfont('arial','',8);
-    $this->multicell(0,4,$texte,0,1);
-
-    $w = array(20,30,30,105);
-
-    $eq = "EQUIPEMENT(S)";
-
-    if ($this->lignes) {
-      $this->setFillColor(239,239,239);
-      // Groupe les lignes par affaire
-      $lignes=$this->groupByAffaire($this->lignes);
-      // Flag pour savoir si le tableau part en annexe ou pas
-      foreach ($lignes as $k => $i) {
-        $this->setfont('arial','B',10);
-        if (!$k) {
-          if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
-          else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
-
-        } else {
-          $affaire_provenance=ATF::affaire()->select($k);
-          if($this->affaire["nature"]=="avenant"){
-            $title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-          }elseif($this->affaire["nature"]=="AR"){
-            $title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-          }elseif($this->affaire["nature"]=="vente"){
-            $title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
-          }
-        }
-        unset($data,$st);
-        foreach ($i as $k_ => $i_) {
-          $produit = ATF::produit()->select($i_['id_produit']);
-          $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
-          $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
-          //On prépare le détail de la ligne
-          $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-          //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+	$this->setxy(15,75);
+	$this->SetDrawColor(0,0,0);
+	$this->SetLineWidth(0.2);
 
 
-          $etat = "( NEUF )";
-          if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
-            if($i_["neuf"] == "non"){
-                $etat = "( OCCASION )";
-            }
-          }
+	$titre = "ARTICLE 1 : OBJET DU CONTRAT";
 
-          if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+	if($this->devis["type_contrat"] == "presta"){
+	  $texte = "L'objet du contrat concerne les prestations dont le détail figure ci-après. ";
+	}else{
+	  $texte = "L'objet du contrat est l'abonnement à un service comprenant la mise en location d'équipements dont le détail figure ci-après ainsi que des services associés. ";
+	}
 
-          //Si c'est une prestation, on affiche pas l'etat
-          if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
+	$this->setfont('arial','B',8);
+	$this->cell(0,5,$titre,0,1);
+	$this->setfont('arial','',8);
+	$this->multicell(0,4,$texte,0,1);
 
-          if ($details == "") unset($details);
-          $data[] = array(
-            round($i_['quantite'])
-            ,$ssCat
-            ,$fab
-            ,$i_['produit'].$etat
-            ,"details"=>$details
-          );
+	$w = array(20,30,30,105);
 
-          $st[] = array(
-            ($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
-            ,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-            ,($details?$this->colsProduitAvecDetail:$this->colsProduit)
+	$eq = "EQUIPEMENT(S)";
 
-            ,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
-            ,"details"=>$this->styleDetailsProduit
-          );
+	if ($this->lignes) {
+	  $this->setFillColor(239,239,239);
+	  // Groupe les lignes par affaire
+	  $lignes=$this->groupByAffaire($this->lignes);
+	  // Flag pour savoir si le tableau part en annexe ou pas
+	  foreach ($lignes as $k => $i) {
+		$this->setfont('arial','B',10);
+		if (!$k) {
+		  if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
+		  else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
 
-        }
-        $tableau[$k] = array(
-          "head"=>$head
-          ,"data"=>$data
-          ,"w"=>$w
-          ,"styles"=>$st
-          ,"title"=>$title
-        );
-      }
-      unset($data,$st);
-      $h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
-      foreach ($tableau as $k=>$i) {
-        if ($i['head']) $h += 5;
-        $h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
-      }
-
-      foreach ($tableau as $k=>$i) {
-        $this->setFillColor(239,239,239);
-        $this->setfont('arial','B',10);
-        $this->multicell(0,5,$i['title'],1,'C',1);
-        $this->setfont('arial','',8);
-        if ($h>$this->heightLimitTableContratA4 || $this->commande["clause_logicielle"]=="oui") {
-          $this->multicellAnnexe();
-          $annexes[$k] = $i;
-        } else {
-          $this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
-        }
-      }
-    }
-    $this->ln(3);
+		} else {
+		  $affaire_provenance=ATF::affaire()->select($k);
+		  if($this->affaire["nature"]=="avenant"){
+			$title = $eq." RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+		  }elseif($this->affaire["nature"]=="AR"){
+			$title = $eq." PROVENANT(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+		  }elseif($this->affaire["nature"]=="vente"){
+			$title = $eq." VENDU(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+		  }
+		}
+		unset($data,$st);
+		foreach ($i as $k_ => $i_) {
+		  $produit = ATF::produit()->select($i_['id_produit']);
+		  $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
+		  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
+		  //On prépare le détail de la ligne
+		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+		  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
-    if ($this->affaire['nature']=="vente") {
-      $this->setfont('arial','B',8);
-      $this->multicell(0,5,"ARTICLE 2 : PRIX DE VENTE");
-      $this->setfont('arial','',8);
-      $prix = $this->loyer[0]["loyer"]+$this->loyer[0]["assurance"]+$this->loyer[0]["frais_de_gestion"];
-      $this->multicell(0,5,"Le prix de vente est fixé à ".number_format($prix,2,"."," ")." € ".$this->texteHT." soit ".number_format((($prix)*$this->commande["tva"]),2,"."," ")." € ".$this->texteTTC);
-      $numArticle = 3;
+		  $etat = "( NEUF )";
+		  if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
+			if($i_["neuf"] == "non"){
+				$etat = "( OCCASION )";
+			}
+		  }
 
-      $this->setfont('arial','B',8);
-      $this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
-      $numArticle++;
-      $this->setfont('arial','',8);
-      $this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
+		  if(ATF::$codename == "cleodisbe"){ $etat = ""; }
 
+		  //Si c'est une prestation, on affiche pas l'etat
+		  if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
 
+		  if ($details == "") unset($details);
+		  $data[] = array(
+			round($i_['quantite'])
+			,$ssCat
+			,$fab
+			,$i_['produit'].$etat
+			,"details"=>$details
+		  );
 
-    } else {
-      //$this->sety(167);
-      $this->setfont('arial','B',8);
-      if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,5,"ARTICLE 2 : DUREE"); }
-      else{ $this->multicell(0,5,"ARTICLE 2 : DUREE DE L'ABONNEMENT"); }
+		  $st[] = array(
+			($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
+			,($details?$this->colsProduitAvecDetail:$this->colsProduit)
+			,($details?$this->colsProduitAvecDetail:$this->colsProduit)
 
-      $this->setfont('arial','B',10);
-      $duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
-      $this->setfont('arial','',8);
-      if($this->devis['loyer_unique']=='oui'){
-        if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est identique à celle du contrat principal."); }
-        else{ $this->multicell(0,3,"La durée de l'abonnement est identique à celle du contrat principal."); }
+			,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
+			,"details"=>$this->styleDetailsProduit
+		  );
 
-      }elseif($this->affaire["nature"]=="avenant"){
-        if($this->devis["type_contrat"] == "presta"){ $texte = "La durée est fixée à ".$duree." mois"." à compter du "; }
-        else{ $texte = "La durée de l'abonnement est fixée à ".$duree." mois"." à compter du "; }
-        if($this->commande['date_debut']){
-          $texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
-        }
-        $this->multicell(0,3,$texte);
-      }else{
-        if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
-        else{ $this->multicell(0,3,"La durée de l'abonnement est fixée à ".$duree." mois."); }
+		}
+		$tableau[$k] = array(
+		  "head"=>$head
+		  ,"data"=>$data
+		  ,"w"=>$w
+		  ,"styles"=>$st
+		  ,"title"=>$title
+		);
+	  }
+	  unset($data,$st);
+	  $h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
+	  foreach ($tableau as $k=>$i) {
+		if ($i['head']) $h += 5;
+		$h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+	  }
 
-      }
-      $this->ln(2);
-
-      if($this->devis['loyer_unique']=='oui'){
-        $this->setfont('arial','B',8);
-        $this->multicell(0,5,"ARTICLE 3 : LOYER UNIQUE");
-        $this->setfont('arial','',8);
-        $this->multicell(0,3,"Il est payable terme à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et est fixe et non révisable pendant toute la durée de la location.");
-        if(($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"])>0){
-          $this->multicell(0,3,"Le montant du loyer unique est fixé à ".number_format($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"],2,"."," ")." € HT.");
-        }else{
-          $this->multicell(0,3,"Les loyers restent inchangés.");
-        }
-      }else{
-        $this->setfont('arial','B',8);
-        $this->multicell(0,5,"ARTICLE 3 : LOYERS");
-        $this->setfont('arial','',7);
-        $this->setfont('arial','',8);
-        if ($this->affaire['nature']=="avenant"){
-          $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
-        }else{
-          $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de l'abonnement.");
-          $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue directement en magasin, par carte bancaire, le jour de la prise de possession des équipements.");
-        }
-        if($duree){
-          $donnee = array();
-          $head = array("Nombre de Loyers","Périodicité","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
-          foreach ($this->loyer as $k=>$i) {
-            $data[] = array(
-              $i['duree']
-              ,strtoupper($i['frequence_loyer'])
-              ,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
-              ,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])*$this->commande["tva"]),2,"."," ")." €"
-            );
-          }
-          $this->SetLineWidth(0.20);
-          $this->ln(3);
-          $this->tableau($head,$data,180,5);
-        }
-      }
-      $numArticle = 4;
-    }
+	  foreach ($tableau as $k=>$i) {
+		$this->setFillColor(239,239,239);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,5,$i['title'],1,'C',1);
+		$this->setfont('arial','',8);
+		if ($h>$this->heightLimitTableContratA4 || $this->commande["clause_logicielle"]=="oui") {
+		  $this->multicellAnnexe();
+		  $annexes[$k] = $i;
+		} else {
+		  $this->tableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+		}
+	  }
+	}
+	$this->ln(3);
 
 
-    $this->setfont('arial','B',8);
-    $this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
-    $numArticle++;
-    $this->setfont('arial','',8);
-    $this->cell(0,6,"Cette offre d'abonnement prend effet à compter du jour de la signature du contrat par l'abonné.",0,1);
+	if ($this->affaire['nature']=="vente") {
+	  $this->setfont('arial','B',8);
+	  $this->multicell(0,5,"ARTICLE 2 : PRIX DE VENTE");
+	  $this->setfont('arial','',8);
+	  $prix = $this->loyer[0]["loyer"]+$this->loyer[0]["assurance"]+$this->loyer[0]["frais_de_gestion"];
+	  $this->multicell(0,5,"Le prix de vente est fixé à ".number_format($prix,2,"."," ")." € ".$this->texteHT." soit ".number_format((($prix)*$this->commande["tva"]),2,"."," ")." € ".$this->texteTTC);
+	  $numArticle = 3;
 
-    $this->setfont('arial','B',8);
-    $this->multicell(0,5,"ARTICLE ".$numArticle." : ASSURANCE");
-    $numArticle++;
-    $this->ln(1);
-    $this->setfont('arial','',8);
-    $this->multicell(0,3,"En contractant cette offre d’abonnement, l'abonné a également souscrit une assurance garantissant contre la casse du vélo et des équipements de cycle.");
-
-
-    $this->setfont('arial','B',8);
-    $this->multicell(0,5,"ARTICLE ".$numArticle." : MISE A DISPOSITION ET RESTITUTION");
-    $numArticle++;
-    $this->ln(1);
-    $this->setfont('arial','',8);
-    $this->multicell(0,3,"L'abonné a souhaité souscrire cette offre d’abonnement et a librement choisi les équipements objets de cette location.");
-    $this->multicell(0,3,"Ces équipements lui sont mis à disposition le jour de la signature du présent contrat directement en magasin. La restitution doit être effectuée par l'abonné au plus tôt après la durée d’engagement et au plus tard 2 ans après la date de signature directement en magasin.");
-    $this->multicell(0,3,"L'abonné :");
-    $this->multicell(0,3,"     - déclare avoir pris connaissance des conditions générales d'abonnement de vélo figurant ci-après et les accepter ;");
-    $this->multicell(0,3,"     - déclare être titulaire d’une assurance couvrant sa responsabilité civile ;");
-    $this->multicell(0,3,"     - reconnait louer les équipements en parfait état de fonctionnement.");
-
-
-    $this->setY(219);
-    $this->line(0,$this->gety(),238,$this->gety());
-    $this->SetTextColor(149,193,31);
-    $this->setfont('arial','B',10);
-    if(!$sellsign){
-      $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
-    }
-
-    $this->SetDrawColor(0,0,0);
-    $this->SetTextColor(0,0,0);
-
-    $this->setfont('arial','',9);
-
-    $this->setFillColor(255,255,0);
+	  $this->setfont('arial','B',8);
+	  $this->multicell(0,5,"ARTICLE ".$numArticle." : CONDITION DE PAIEMENT ET ECHEANCE");
+	  $numArticle++;
+	  $this->setfont('arial','',8);
+	  $this->multicell(0,5,"La facture est payable par ".ATF::$usr->trans($this->commande['type'],'commande'));
 
 
 
-    if(!$signature){
-      $cadre = array(
-        "Fait à : "
-        ,"Le : "
-        ,"Nom : "
-        ,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
-      );
-    }else{
-      $cadre = array(
-        " ",
-        "[SignatureContractant]",
-        " ",
-        " ",
-        " ",
-        "[/SignatureContractant]"
-      );
-    }
+	} else {
+	  //$this->sety(167);
+	  $this->setfont('arial','B',8);
+	  if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,5,"ARTICLE 2 : DUREE"); }
+	  else{ $this->multicell(0,5,"ARTICLE 2 : DUREE DE L'ABONNEMENT"); }
+
+	  $this->setfont('arial','B',10);
+	  $duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
+	  $this->setfont('arial','',8);
+	  if($this->devis['loyer_unique']=='oui'){
+		if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est identique à celle du contrat principal."); }
+		else{ $this->multicell(0,3,"La durée de l'abonnement est identique à celle du contrat principal."); }
+
+	  }elseif($this->affaire["nature"]=="avenant"){
+		if($this->devis["type_contrat"] == "presta"){ $texte = "La durée est fixée à ".$duree." mois"." à compter du "; }
+		else{ $texte = "La durée de l'abonnement est fixée à ".$duree." mois"." à compter du "; }
+		if($this->commande['date_debut']){
+		  $texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
+		}
+		$this->multicell(0,3,$texte);
+	  }else{
+		if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
+		else{ $this->multicell(0,3,"La durée de l'abonnement est fixée à ".$duree." mois."); }
+
+	  }
+	  $this->ln(2);
+
+	  if($this->devis['loyer_unique']=='oui'){
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"ARTICLE 3 : LOYER UNIQUE");
+		$this->setfont('arial','',8);
+		$this->multicell(0,3,"Il est payable terme à échoir par ".ATF::$usr->trans($this->commande['type'],'commande')." et est fixe et non révisable pendant toute la durée de la location.");
+		if(($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"])>0){
+		  $this->multicell(0,3,"Le montant du loyer unique est fixé à ".number_format($this->loyer["loyer"]+$this->loyer["assurance"]+$this->loyer["frais_de_gestion"],2,"."," ")." € HT.");
+		}else{
+		  $this->multicell(0,3,"Les loyers restent inchangés.");
+		}
+	  }else{
+		$this->setfont('arial','B',8);
+		$this->multicell(0,5,"ARTICLE 3 : LOYERS");
+		$this->setfont('arial','',7);
+		$this->setfont('arial','',8);
+		if ($this->affaire['nature']=="avenant"){
+		  $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
+		}else{
+		  $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de l'abonnement.");
+		  $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue directement en magasin, par carte bancaire, le jour de la prise de possession des équipements.");
+		}
+		if($duree){
+		  $donnee = array();
+		  $head = array("Nombre de Loyers","Périodicité","Loyer ".$this->texteHT,"Loyer ".$this->texteTTC);
+		  foreach ($this->loyer as $k=>$i) {
+			$data[] = array(
+			  $i['duree']
+			  ,strtoupper($i['frequence_loyer'])
+			  ,number_format($i["loyer"]+$i["frais_de_gestion"]+$i["assurance"],2,"."," ")." €"
+			  ,number_format((($i['loyer']+$i["frais_de_gestion"]+$i["assurance"])*$this->commande["tva"]),2,"."," ")." €"
+			);
+		  }
+		  $this->SetLineWidth(0.20);
+		  $this->ln(3);
+		  $this->tableau($head,$data,180,5);
+		}
+	  }
+	  $numArticle = 4;
+	}
 
 
-    $y = $this->gety()+2;
-    $t = "L'abonné";
+	$this->setfont('arial','B',8);
+	$this->multicell(0,5,"ARTICLE ".$numArticle." : VALIDITE");
+	$numArticle++;
+	$this->setfont('arial','',8);
+	$this->cell(0,6,"Cette offre d'abonnement prend effet à compter du jour de la signature du contrat par l'abonné.",0,1);
 
-    $this->cadre(20,$y,80,48,$cadre,$t);
-    if(!$signature){
-      $cadre = array(
-        "Fait à : "
-        ,"Le : "
-        ,"Nom : "
-        ,"Qualité : "
-        ,"Signature et cachet commercial : "
-      );
-    }else{
-      $cadre = array(
-        " ",
-        "[SignatureFournisseur]",
-        " ",
-        " ",
-        " ",
-        "[/SignatureFournisseur]"
-      );
-
-    }
+	$this->setfont('arial','B',8);
+	$this->multicell(0,5,"ARTICLE ".$numArticle." : ASSURANCE");
+	$numArticle++;
+	$this->ln(1);
+	$this->setfont('arial','',8);
+	$this->multicell(0,3,"En contractant cette offre d’abonnement, l'abonné a également souscrit une assurance garantissant contre la casse du vélo et des équipements de cycle.");
 
 
-    if ($this->affaire['nature']=="vente") {
-      $t = "Le Vendeur";
-    } else {
-      $t = "Le Loueur";
-    }
-    $this->cadre(110,$y,80,48,$cadre,$t);
+	$this->setfont('arial','B',8);
+	$this->multicell(0,5,"ARTICLE ".$numArticle." : MISE A DISPOSITION ET RESTITUTION");
+	$numArticle++;
+	$this->ln(1);
+	$this->setfont('arial','',8);
+	$this->multicell(0,3,"L'abonné a souhaité souscrire cette offre d’abonnement et a librement choisi les équipements objets de cette location.");
+	$this->multicell(0,3,"Ces équipements lui sont mis à disposition le jour de la signature du présent contrat directement en magasin. La restitution doit être effectuée par l'abonné au plus tôt après la durée d’engagement et au plus tard 2 ans après la date de signature directement en magasin.");
+	$this->multicell(0,3,"L'abonné :");
+	$this->multicell(0,3,"     - déclare avoir pris connaissance des conditions générales d'abonnement de vélo figurant ci-après et les accepter ;");
+	$this->multicell(0,3,"     - déclare être titulaire d’une assurance couvrant sa responsabilité civile ;");
+	$this->multicell(0,3,"     - reconnait louer les équipements en parfait état de fonctionnement.");
 
-    //$this->Annot(110,$y,"SignatureDebtor");
 
-    $this->setfont('arial','B',9);
-    $this->setY(275.9);
-    $this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES CI APRES",0,'C');
+	$this->setY(219);
+	$this->line(0,$this->gety(),238,$this->gety());
+	$this->SetTextColor(149,193,31);
+	$this->setfont('arial','B',10);
+	if(!$sellsign){
+	  $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
+	}
 
-    $this->unsetHeader();
-    $this->unsetFooter();
+	$this->SetDrawColor(0,0,0);
+	$this->SetTextColor(0,0,0);
 
-    $pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
+	$this->setfont('arial','',9);
 
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-      $tplIdx = $this->importPage($pageNo);
+	$this->setFillColor(255,255,0);
 
-      // add a page
-      $this->AddPage();
-      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-    }
+
+
+	if(!$signature){
+	  $cadre = array(
+		"Fait à : "
+		,"Le : "
+		,"Nom : "
+		,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
+	  );
+	}else{
+	  $cadre = array(
+		" ",
+		"[SignatureContractant]",
+		" ",
+		" ",
+		" ",
+		"[/SignatureContractant]"
+	  );
+	}
+
+
+	$y = $this->gety()+2;
+	$t = "L'abonné";
+
+	$this->cadre(20,$y,80,48,$cadre,$t);
+	if(!$signature){
+	  $cadre = array(
+		"Fait à : "
+		,"Le : "
+		,"Nom : "
+		,"Qualité : "
+		,"Signature et cachet commercial : "
+	  );
+	}else{
+	  $cadre = array(
+		" ",
+		"[SignatureFournisseur]",
+		" ",
+		" ",
+		" ",
+		"[/SignatureFournisseur]"
+	  );
+
+	}
+
+
+	if ($this->affaire['nature']=="vente") {
+	  $t = "Le Vendeur";
+	} else {
+	  $t = "Le Loueur";
+	}
+	$this->cadre(110,$y,80,48,$cadre,$t);
+
+	//$this->Annot(110,$y,"SignatureDebtor");
+
+	$this->setfont('arial','B',9);
+	$this->setY(275.9);
+	$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES CI APRES",0,'C');
+
+	$this->unsetHeader();
+	$this->unsetFooter();
+
+	$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
+
+	for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+	  $tplIdx = $this->importPage($pageNo);
+
+	  // add a page
+	  $this->AddPage();
+	  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+	}
 
   }
 
@@ -3594,16 +3594,32 @@ class pdf_cleodis extends pdf {
 		$this->Open();
 		$this->AddPage();
 		if ($this->client['id_famille'] == 9) { // Document spécial pour les particuliers
-			$this->contratPVParticulier($id,$s,$previsu);
+			$this->contratPVParticulier($id);
 		} else {
-			$this->contratPVSociete($id,$s,$previsu);
+			$this->contratPVSociete($id);
+		}
+	}
+
+	/** Génère un Procès verbal
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 11-02-2011
+	*/
+	public function contratPVSignature($id,$s,$previsu) {
+		$this->commandeInit($id,$s,$previsu);
+		$this->unsetHeader();
+		$this->Open();
+		$this->AddPage();
+		if ($this->client['id_famille'] == 9) { // Document spécial pour les particuliers
+			$this->contratPVParticulier($id, true);
+		} else {
+			$this->contratPVSociete($id, true);
 		}
 	}
 
 	/** Génère un Procès verbal
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	*/
-	public function contratPVParticulier($id,$s,$previsu) {
+	public function contratPVParticulier($id,$signature=false) {
 		$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
 
 		$this->setfont('arial','I',8);
@@ -3729,14 +3745,47 @@ class pdf_cleodis extends pdf {
 
 		$this->ln(5);
 		$this->setfont('arial','',8);
-		$cadre = array(
-			"Fait à : ______________________"
-			,"Le : ______________________"
-			,"Nom : ______________________"
-		);
+
+
+		if ($signature) {
+			$cadre = array(
+				"[SignatureContractant]"
+				," "
+				," "
+				," "
+				," "
+				," "
+				,"[/SignatureContractant]"
+			);		
+		} else {
+			$cadre = array(
+				"Fait à : ______________________"
+				,"Le : ______________________"
+				,"Nom : ______________________"
+			);		
+		}
+
 		$this->cadre(25,215,70,60,$cadre,"Locataire");
 
-		$cadre[]="Qualité : ______________________";
+		if ($signature) {
+			$cadre = array(
+				"[SignatureFournisseur]"
+				," "
+				," "
+				," "
+				," "
+				," "
+				,"[/SignatureFournisseur]"
+			);		
+		} else {
+			$cadre = array(
+				"Fait à : ______________________"
+				,"Le : ______________________"
+				,"Nom : ______________________"
+				,"Qualité : ______________________"
+			);		
+		}
+
 		$this->cadre(115,215,70,60,$cadre,"Loueur");
 
 		$this->setxy(25,269);
@@ -3754,7 +3803,7 @@ class pdf_cleodis extends pdf {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 11-02-2011
 	*/
-	public function contratPVSociete($id,$s,$previsu) {
+	public function contratPVSociete($id,$signature=false) {
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",4,5,35);
 		} else{
@@ -4415,11 +4464,11 @@ class pdf_cleodis extends pdf {
 					for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 						$this->unsetHeader();
 						$this->unsetFooter();
-			            $tplIdx = $this->ImportPage($pageNo);
-			            $r = $this->getTemplatesize($tplIdx);
-			            $this->AddPage($r['w'] > $r['h'] ? 'L' : 'P', array($r['w'], $r['h']));
-			            $this->useTemplate($tplIdx);
-			        }
+						$tplIdx = $this->ImportPage($pageNo);
+						$r = $this->getTemplatesize($tplIdx);
+						$this->AddPage($r['w'] > $r['h'] ? 'L' : 'P', array($r['w'], $r['h']));
+						$this->useTemplate($tplIdx);
+					}
 				}
 			}
 		}
@@ -5189,11 +5238,11 @@ class pdf_cleodis extends pdf {
   * @param int $id Identifiant Facture
   */
   public function factureClassique($global=false) {
-    if ($this->client['id_famille'] == 9) {
-      $this->factureClassiqueParticulier($global);
-    } else {
-      $this->factureClassiqueSociete($global);
-    }
+	if ($this->client['id_famille'] == 9) {
+	  $this->factureClassiqueParticulier($global);
+	} else {
+	  $this->factureClassiqueSociete($global);
+	}
   }
 
   /** PDF d'une facture Classique aussi dit 'Autre Facture' - POUR LE BtoB
@@ -5201,277 +5250,275 @@ class pdf_cleodis extends pdf {
   * @date 22-02-2011
   */
   public function factureClassiqueSociete($global=false){
-    if(!$global){
-      $this->open();
-    }
-    $this->setHeader();
-    $this->addpage();
-    $this->setMargins(15,30);
-    $this->sety(15);
+	if(!$global){
+	  $this->open();
+	}
+	$this->setHeader();
+	$this->addpage();
+	$this->setMargins(15,30);
+	$this->sety(15);
 
 
 
 
-    $this->setfont('arial','B',22);
-    if($this->facture["prix"]>=0){
-      if($this->facture["type_libre"] === "liberatoire"){
-        $this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
-      }else{
-        $this->multicell(0,15,'FACTURE',0,'C');
-      }
-    }else{
-      $this->multicell(0,15,'AVOIR',0,'C');
-    }
-    $this->setfont('arial','',8);
+	$this->setfont('arial','B',22);
+	if($this->facture["prix"]>=0){
+	  if($this->facture["type_libre"] === "liberatoire"){
+		$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
+	  }else{
+		$this->multicell(0,15,'FACTURE',0,'C');
+	  }
+	}else{
+	  $this->multicell(0,15,'AVOIR',0,'C');
+	}
+	$this->setfont('arial','',8);
 
-    if(ATF::$codename == "cleodisbe"){
-      $cadre = array(
-        $this->societe['adresse']
-        ,$this->societe['adresse_2']
-        ,$this->societe['cp']." ".$this->societe['ville']
-        ,"Tel : ".$this->agence['tel']
-        ,"TVA : BE 0 ".$this->societe["siren"]
-        ," "
-      );
-      $this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
+	if(ATF::$codename == "cleodisbe"){
+	  $cadre = array(
+		$this->societe['adresse']
+		,$this->societe['adresse_2']
+		,$this->societe['cp']." ".$this->societe['ville']
+		,"Tel : ".$this->agence['tel']
+		,"TVA : BE 0 ".$this->societe["siren"]
+		," "
+	  );
+	  $this->cadre(20,30,80,35,$cadre,$this->societe['societe']);
 
-    }else{
-      //CADRE Societe
-      $cadre = array(
-        $this->societe['adresse']
-        ,$this->societe['adresse_2']
-        ,$this->societe['cp']." ".$this->societe['ville']
-        ,"Tel : ".$this->agence['tel']
-        ,"N° TVA intra : FR 91 ".$this->societe["siren"]
-        ,"RCS ".$this->societe['ville']." ".$this->societe['siren']
-      );
-      $this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
-    }
-
-    //CADRE Client
-    if($this->client['facturation_adresse']){
-      $cadre = array(
-         $this->client['facturation_adresse']
-        ,$this->client['facturation_adresse_2']
-        ,$this->client['facturation_adresse_3']
-        ,$this->client['facturation_cp']." ".$this->client['facturation_ville']
-        ,"Tel : ".$this->client['tel']
-      );
-    }else{
-      $cadre = array(
-         $this->client['adresse']
-        ,$this->client['adresse_2']
-        ,$this->client['adresse_3']
-        ,$this->client['cp']." ".$this->client['ville']
-        ,"Tel : ".$this->client['tel']
-      );
-    }
-
-    if(ATF::$codename == "cleodisbe"){ $cadre[] = "TVA : BE 0 ".$this->client["siren"]; }
-
-    $this->cadre(110,35,80,35,$cadre,$this->client['societe']);
-
-    $this->multicell(0,5,"A l'attention du service comptabilité,");
-    $this->ln(5);
-    $y = $this->gety();
-
-
-    //CADRE Date
-    $cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
-    $this->cadre(10,$y,60,13,$cadre);
-
-    //CADRE Client
-
-    if($this->client['nom_commercial']){
-      $cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
-    }else{
-      $cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL),"align"=>"C"));
-    }
-
-    $this->cadre(75,$y,60,13,$cadre);
-
-    //CADRE Facture
-    $cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),"align"=>"C"));
-    $this->cadre(140,$y,60,13,$cadre);
-
-    if ($this->lignes) {
-      $head = array("Quantité","Désignation","Montant");
-      $w = array(20,120,40);
-      $data = $styles = array();
-      //Quantite
-      $data[0][0] = "1";
-      if($this->facture['type_facture'] !== "libre") {
-        //Désignation L1
-        if($this->affaire['nature']=="vente"){
-          $data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-        }else{
-          if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-          }else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
-        }
-        //Désignation L2
-        if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
-          $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-        }
-      }else{
-        if($this->facture['type_libre'] === "normale"){
-          //Désignation L1
-          if($this->affaire['nature']=="vente"){
-            $data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-          }else{
-            if($this->facture["redevance"] === "oui"){
-              if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-              }else{  $data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
-            }
-          }
-          //Désignation L2
-          if($this->facture["redevance"] === "oui"){
-            if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
-              $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
-            }
-          }
-        }
-      }
-      //Désignation L3
-      $data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
-      //Désignation L4
-      list($annee,$mois,$jour)= explode("-",$this->facture['date']);
-      //$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
-      // Montant Facture
-      $data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
-
-      if($this->facture['type_facture'] !== "libre"){
-        //Préparation du détail
-        if($this->affaire['nature']=="vente"){
-          $data[0]['details'] = "Equipements objets de la vente";
-        }elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-        }else{  $data[0]['details'] = "Matériels objets de la location"; }
-        foreach ($this->lignes as $k => $i) {
-          $data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
-        }
-        $styles[0] = array(
-          ""
-          ,$this->colsProduitAlignLeft
-          ,""
-          ,"details"=>$this->styleDetailsProduit
-        );
-      }else{
-        if($this->facture['type_libre'] === "normale"){
-          //Préparation du détail
-          if($this->affaire['nature']=="vente"){
-            $data[0]['details'] = "Equipements objets de la vente";
-          }else{
-            $data[0]['details'] = "Matériels objets de la location";
-          }
-          foreach ($this->lignes as $k => $i) {
-            $data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
-          }
-          $styles[0] = array(
-            ""
-            ,$this->colsProduitAlignLeft
-            ,""
-            ,"details"=>$this->styleDetailsProduit
-          );
-        }
-      }
-
-      $this->tableauBigHead($head,$data,$w,5,$styles);
-
-      if ($this->facture['commentaire']) {
-        $com = array(array("Commentaire : ".$this->facture['commentaire']));
-        $sCom = array(array($this->styleDetailsProduit));
-        $this->tableau(false,$com,180,5,$sCom);
-      }
-
-      if($this->facture['type_facture'] === "libre"){
-        if($this->facture['type_libre'] !== "normale"){
-          $InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
-          $sInfosTVA = array(array($this->styleDetailsProduit));
-          $this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
-        }
-      }
-
-      $this->ln(5);
-      $total = $this->facture['prix'];
-      $totalTTC = $total*$this->facture['tva'];
-      if($this->facture['type_facture'] === "libre"){
-        if($this->facture['type_libre'] === "normale"){
-          $head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-          $data = array(
-            array(
-              number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-              ,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
-              ,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
-              ,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
-            )
-          );
-        }else{
-          $head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
-          $data = array(
-            array(
-              number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-              ,number_format(abs((1-1)*100),2,'.',' ')."%"
-              ,number_format(abs(round(($this->facture["prix"]*0),2)),2,'.',' ')." €"
-              ,number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-            )
-          );
-        }
-      }else{
-        $head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-          $data = array(
-            array(
-              number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-              ,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
-              ,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
-              ,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
-            )
-          );
-      }
-
-
-
-      $this->tableau($head,$data);
-
-    }
-
-
-
-    $this->ln(10);
-    $y = $this->getY();
-    $this->setfont('arial','U',8);
-    $this->cell(60,5,"TERMES DE PAIEMENT",0,1);
-    $this->setfont('arial','',8);
-    if($this->facture["prix"]>0){
-      if($this->facture['mode_paiement']){
-      	if ($this->facture['mode_paiement']=="pre-paiement") {
- 			$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-        } elseif ($this->facture['mode_paiement']=="cb") {
-          	$this->cell(0,5,"Vous avez déja réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-        }elseif ($this->facture['mode_paiement']=="cheque") {
-          $this->cell(0,5,"A réception de facture",0,1);
-        } elseif ($this->facture['mode_paiement']=="virement") {
-          $this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
-        } elseif($this->facture['mode_paiement'] !="mandat") {
-          $this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
-        }
-      }
-    }else{
-      $this->cell(0,5,"Par remboursement ou compensation",0,1);
-    }
-    if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
-		if(ATF::$codename !== "cleodisbe"){
-	      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
-	      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
-	    }
+	}else{
+	  //CADRE Societe
+	  $cadre = array(
+		$this->societe['adresse']
+		,$this->societe['adresse_2']
+		,$this->societe['cp']." ".$this->societe['ville']
+		,"Tel : ".$this->agence['tel']
+		,"N° TVA intra : FR 91 ".$this->societe["siren"]
+		,"RCS ".$this->societe['ville']." ".$this->societe['siren']
+	  );
+	  $this->cadre(20,35,80,35,$cadre,$this->societe['societe']);
 	}
 
-    if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
-      $cadre = array();
-      $cadre[] = $this->societe["nom_banque"];
-      $cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
-      $cadre[] = "IBAN : ".$this->societe["IBAN"];
-      $cadre[] = "BIC : ".$this->societe["BIC"];
-      $this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
-    }
+	//CADRE Client
+	if($this->client['facturation_adresse']){
+	  $cadre = array(
+		 $this->client['facturation_adresse']
+		,$this->client['facturation_adresse_2']
+		,$this->client['facturation_adresse_3']
+		,$this->client['facturation_cp']." ".$this->client['facturation_ville']
+		,"Tel : ".$this->client['tel']
+	  );
+	}else{
+	  $cadre = array(
+		 $this->client['adresse']
+		,$this->client['adresse_2']
+		,$this->client['adresse_3']
+		,$this->client['cp']." ".$this->client['ville']
+		,"Tel : ".$this->client['tel']
+	  );
+	}
+
+	if(ATF::$codename == "cleodisbe"){ $cadre[] = "TVA : BE 0 ".$this->client["siren"]; }
+
+	$this->cadre(110,35,80,35,$cadre,$this->client['societe']);
+
+	$this->multicell(0,5,"A l'attention du service comptabilité,");
+	$this->ln(5);
+	$y = $this->gety();
+
+
+	//CADRE Date
+	$cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
+	$this->cadre(10,$y,60,13,$cadre);
+
+	//CADRE Client
+
+	if($this->client['nom_commercial']){
+	  $cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
+	}else{
+	  $cadre = array(array("txt"=>util::truncate($this->client['societe'],25).($this->client['code_client']?"(".$this->client['code_client'].")":NULL),"align"=>"C"));
+	}
+
+	$this->cadre(75,$y,60,13,$cadre);
+
+	//CADRE Facture
+	$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),"align"=>"C"));
+	$this->cadre(140,$y,60,13,$cadre);
+
+	if ($this->lignes) {
+	  $head = array("Quantité","Désignation","Montant");
+	  $w = array(20,120,40);
+	  $data = $styles = array();
+	  //Quantite
+	  $data[0][0] = "1";
+	  if($this->facture['type_facture'] !== "libre") {
+		//Désignation L1
+		if($this->affaire['nature']=="vente"){
+		  $data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+		}else{
+		  if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+		  }else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+		}
+		//Désignation L2
+		if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+		  $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+		}
+	  }else{
+		if($this->facture['type_libre'] === "normale"){
+		  //Désignation L1
+		  if($this->affaire['nature']=="vente"){
+			$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+		  }else{
+			if($this->facture["redevance"] === "oui"){
+			  if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+			  }else{  $data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+			}
+		  }
+		  //Désignation L2
+		  if($this->facture["redevance"] === "oui"){
+			if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+			  $data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+			}
+		  }
+		}
+	  }
+	  //Désignation L3
+	  $data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+	  //Désignation L4
+	  list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+	  //$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+	  // Montant Facture
+	  $data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+	  if($this->facture['type_facture'] !== "libre"){
+		//Préparation du détail
+		if($this->affaire['nature']=="vente"){
+		  $data[0]['details'] = "Equipements objets de la vente";
+		}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
+		}else{  $data[0]['details'] = "Matériels objets de la location"; }
+		foreach ($this->lignes as $k => $i) {
+		  $data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+		}
+		$styles[0] = array(
+		  ""
+		  ,$this->colsProduitAlignLeft
+		  ,""
+		  ,"details"=>$this->styleDetailsProduit
+		);
+	  }else{
+		if($this->facture['type_libre'] === "normale"){
+		  //Préparation du détail
+		  if($this->affaire['nature']=="vente"){
+			$data[0]['details'] = "Equipements objets de la vente";
+		  }else{
+			$data[0]['details'] = "Matériels objets de la location";
+		  }
+		  foreach ($this->lignes as $k => $i) {
+			$data[0]['details'] .= "\n".round($i['quantite'])." ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+		  }
+		  $styles[0] = array(
+			""
+			,$this->colsProduitAlignLeft
+			,""
+			,"details"=>$this->styleDetailsProduit
+		  );
+		}
+	  }
+
+	  $this->tableauBigHead($head,$data,$w,5,$styles);
+
+	  if ($this->facture['commentaire']) {
+		$com = array(array("Commentaire : ".$this->facture['commentaire']));
+		$sCom = array(array($this->styleDetailsProduit));
+		$this->tableau(false,$com,180,5,$sCom);
+	  }
+
+	  if($this->facture['type_facture'] === "libre"){
+		if($this->facture['type_libre'] !== "normale"){
+		  $InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
+		  $sInfosTVA = array(array($this->styleDetailsProduit));
+		  $this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
+		}
+	  }
+
+	  $this->ln(5);
+	  $total = $this->facture['prix'];
+	  $totalTTC = $total*$this->facture['tva'];
+	  if($this->facture['type_facture'] === "libre"){
+		if($this->facture['type_libre'] === "normale"){
+		  $head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+		  $data = array(
+			array(
+			  number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+			  ,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+			  ,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+			  ,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+			)
+		  );
+		}else{
+		  $head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
+		  $data = array(
+			array(
+			  number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+			  ,number_format(abs((1-1)*100),2,'.',' ')."%"
+			  ,number_format(abs(round(($this->facture["prix"]*0),2)),2,'.',' ')." €"
+			  ,number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+			)
+		  );
+		}
+	  }else{
+		$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+		  $data = array(
+			array(
+			  number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+			  ,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+			  ,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+			  ,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+			)
+		  );
+	  }
+
+
+
+	  $this->tableau($head,$data);
+
+	}
+
+
+
+	$this->ln(10);
+	$y = $this->getY();
+	$this->setfont('arial','U',8);
+	$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
+	$this->setfont('arial','',8);
+	if($this->facture["prix"]>0){
+	  if($this->facture['mode_paiement']){
+		if ($this->facture['mode_paiement']=="pre-paiement") {
+			$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+		} elseif ($this->facture['mode_paiement']=="cb") {
+			$this->cell(0,5,"Vous avez déja réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+		}elseif ($this->facture['mode_paiement']=="cheque") {
+		  $this->cell(0,5,"A réception de facture",0,1);
+		} elseif ($this->facture['mode_paiement']=="virement") {
+		  $this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
+		} elseif($this->facture['mode_paiement'] !="mandat") {
+		  $this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
+		}
+	  }
+	}else{
+	  $this->cell(0,5,"Par remboursement ou compensation",0,1);
+	}
+	if(ATF::$codename !== "cleodisbe"){
+	  $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+	  $this->cell(0,5,"ICS ".__ICS__ ,0,1);
+	}
+
+	if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
+	  $cadre = array();
+	  $cadre[] = $this->societe["nom_banque"];
+	  $cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
+	  $cadre[] = "IBAN : ".$this->societe["IBAN"];
+	  $cadre[] = "BIC : ".$this->societe["BIC"];
+	  $this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
+	}
   }
 
   /** PDF d'une facture Classique aussi dit 'Autre Facture' - POUR LE BtoC
@@ -5721,12 +5768,12 @@ class pdf_cleodis extends pdf {
 		if($this->facture["prix"]>0){
 			if($this->facture['mode_paiement']){
 				if ($this->facture['mode_paiement']=="pre-paiement") {
-         			$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-		        } elseif ($this->facture['mode_paiement']=="cb") {
-		          	$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
-		        } elseif ($this->facture['mode_paiement']=="cheque") {
-		          	$this->cell(0,5,"A réception de facture",0,1);
-		        } elseif ($this->facture['mode_paiement']=="virement") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cb") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cheque") {
+					$this->cell(0,5,"A réception de facture",0,1);
+				} elseif ($this->facture['mode_paiement']=="virement") {
 					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
 				} elseif($this->facture['mode_paiement'] !="mandat") {
 					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
@@ -6283,35 +6330,35 @@ class pdf_cleodis extends pdf {
 	* @date 06-02-2013
 	*/
 	public function relance($id){
-	    if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
 
 		$this->relance = ATF::relance()->select($id);
-        $this->client = ATF::societe()->select($this->relance['id_societe']);
-        $this->contact = ATF::contact()->select($this->relance['id_contact']);
-        $this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->client = ATF::societe()->select($this->relance['id_societe']);
+		$this->contact = ATF::contact()->select($this->relance['id_contact']);
+		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 
 
-        ATF::relance_facture()->q->reset()->where('id_relance',$this->relance['id_relance'])->setCount();
-        $this->factures = ATF::relance_facture()->sa();
+		ATF::relance_facture()->q->reset()->where('id_relance',$this->relance['id_relance'])->setCount();
+		$this->factures = ATF::relance_facture()->sa();
 
-        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
 		$this->sety(80);
-        if ($this->relance['type']=="premiere") {
-            self::premiereRelance($id);
-        } elseif ($this->relance['type']=="seconde") {
-            self::deuxiemeRelance($id);
-        } elseif ($this->relance['type']=="mise_en_demeure") {
-            self::miseDemeure($id);
-        }
+		if ($this->relance['type']=="premiere") {
+			self::premiereRelance($id);
+		} elseif ($this->relance['type']=="seconde") {
+			self::deuxiemeRelance($id);
+		} elseif ($this->relance['type']=="mise_en_demeure") {
+			self::miseDemeure($id);
+		}
 
 
 		$this->multicell(0,10,"Nous vous prions d'agréer, Madame, Monsieur, l'expression de nos salutations distinguées.",0);
 		$this->multicell(0,10,"Le service comptable,");
-        $this->setfont("arial","I",12);
+		$this->setfont("arial","I",12);
 		$this->multicell(0,10,"Pièce jointe (copie) facture(s) impayée(s)");
 
 	}
@@ -6324,42 +6371,42 @@ class pdf_cleodis extends pdf {
 	*/
 	public function premiereRelance(){
 		$this->multicell(0,10,"Objet : Relance facture impayée ");
-        $this->ln(5);
+		$this->ln(5);
 
 		$this->multicell(0,5,"Madame, Monsieur, ");
-        $this->ln(5);
+		$this->ln(5);
 
-        if ($this->factures['count']>1) {
-            $phrase = "Vos factures n°";
-            foreach ($this->factures['data'] as $k=>$i) {
-                $phrase .= ATF::facture()->select($i['id_facture'],"ref").", ";
-            }
-            $phrase .= "ayant pour montants respectifs : ";
-            foreach ($this->factures['data'] as $k=>$i) {
-                $phrase .= ATF::facture()->select($i['id_facture'],"prix")."€ HT, ";
-            }
-            $phrase .= " ont été rejetées pour le(s) motif(s) suivant(s) : ";
+		if ($this->factures['count']>1) {
+			$phrase = "Vos factures n°";
+			foreach ($this->factures['data'] as $k=>$i) {
+				$phrase .= ATF::facture()->select($i['id_facture'],"ref").", ";
+			}
+			$phrase .= "ayant pour montants respectifs : ";
+			foreach ($this->factures['data'] as $k=>$i) {
+				$phrase .= ATF::facture()->select($i['id_facture'],"prix")."€ HT, ";
+			}
+			$phrase .= " ont été rejetées pour le(s) motif(s) suivant(s) : ";
 
-            $phrase .= "\n\n".$this->relance['texte']."\n\n";
+			$phrase .= "\n\n".$this->relance['texte']."\n\n";
 
-            $this->multicell(0,5,$phrase);
-        } else {
-            $phrase = "Votre facture n°".
-                            ATF::facture()->select($this->factures['data'][0]['id_facture'],"ref").
-                            " du ".
-                            ATF::facture()->select($this->factures['data'][0]['id_facture'],"date").
-                            " d'un montant de ".
-                            ATF::facture()->select($this->factures['data'][0]['id_facture'],"prix").
-                            "€ HT a été rejetée pour le motif suivant :";
+			$this->multicell(0,5,$phrase);
+		} else {
+			$phrase = "Votre facture n°".
+							ATF::facture()->select($this->factures['data'][0]['id_facture'],"ref").
+							" du ".
+							ATF::facture()->select($this->factures['data'][0]['id_facture'],"date").
+							" d'un montant de ".
+							ATF::facture()->select($this->factures['data'][0]['id_facture'],"prix").
+							"€ HT a été rejetée pour le motif suivant :";
 
-            $phrase .= "\n\n".$this->relance['texte']."\n\n";
+			$phrase .= "\n\n".$this->relance['texte']."\n\n";
 
-            $this->multicell(0,5,$phrase);
-        }
-        $this->ln(5);
+			$this->multicell(0,5,$phrase);
+		}
+		$this->ln(5);
 
 		$this->multicell(0,5,"Nous vous rapellons que selon l'article 6.6, du contrat de location que vous avez signé avec CLEODIS : Les loyers (".$this->texteTTC.") et les redevances de mise à disposition (".$this->texteTTC.") non payés à leur échéance porteront interêt au profit du Loueur, de plein droit et sans qu'il soit besoin de quelconque mise en demeure, au taux conventionnel de 1.5% par mois à compter de leur date d'exigibilité.");
-        $this->ln(5);
+		$this->ln(5);
 	}
 
 	/**
@@ -6370,39 +6417,39 @@ class pdf_cleodis extends pdf {
 	*/
 	public function deuxiemeRelance(){
 		$this->multicell(0,5,"Objet : 2ème Relance facture impayée ");
-        $this->ln(5);
+		$this->ln(5);
 
-        $this->multicell(0,5,"Madame, Monsieur, ");
-        $this->ln(5);
+		$this->multicell(0,5,"Madame, Monsieur, ");
+		$this->ln(5);
 
-        if ($this->factures['count']>1) {
-            $phrase = "Malgré notre première relance, vos factures n°";
-            foreach ($this->factures['data'] as $k=>$i) {
-                $phrase .= ATF::facture()->select($i['id_facture'],"ref").", ";
-            }
-            $phrase .= "ayant pour montants respectifs : ";
-            foreach ($this->factures['data'] as $k=>$i) {
-                $phrase .= ATF::facture()->select($i['id_facture'],"prix")."€ HT, ";
-            }
-            $phrase .= " n'ont, à ce jour, pas été reglées";
+		if ($this->factures['count']>1) {
+			$phrase = "Malgré notre première relance, vos factures n°";
+			foreach ($this->factures['data'] as $k=>$i) {
+				$phrase .= ATF::facture()->select($i['id_facture'],"ref").", ";
+			}
+			$phrase .= "ayant pour montants respectifs : ";
+			foreach ($this->factures['data'] as $k=>$i) {
+				$phrase .= ATF::facture()->select($i['id_facture'],"prix")."€ HT, ";
+			}
+			$phrase .= " n'ont, à ce jour, pas été reglées";
 
-            $phrase .= "\n\n".$this->relance['texte']."\n\n";
+			$phrase .= "\n\n".$this->relance['texte']."\n\n";
 
-            $this->multicell(0,5,$phrase);
-        } else {
-            $phrase = "Malgré notre première relance, votre facture n°".
-                            ATF::facture()->select($this->factures['data'][0]['id_facture'],"ref").
-                            " du ".
-                            ATF::facture()->select($this->factures['data'][0]['id_facture'],"date").
-                            " d'un montant de ".
-                            ATF::facture()->select($this->factures['data'][0]['id_facture'],"prix").
-                            "€ HT n'a, à ce jour, pas été reglée.";
+			$this->multicell(0,5,$phrase);
+		} else {
+			$phrase = "Malgré notre première relance, votre facture n°".
+							ATF::facture()->select($this->factures['data'][0]['id_facture'],"ref").
+							" du ".
+							ATF::facture()->select($this->factures['data'][0]['id_facture'],"date").
+							" d'un montant de ".
+							ATF::facture()->select($this->factures['data'][0]['id_facture'],"prix").
+							"€ HT n'a, à ce jour, pas été reglée.";
 
-            $phrase .= "\n\n".$this->relance['texte']."\n\n";
+			$phrase .= "\n\n".$this->relance['texte']."\n\n";
 
-            $this->multicell(0,5,$phrase);
-        }
-        $this->ln(5);
+			$this->multicell(0,5,$phrase);
+		}
+		$this->ln(5);
 
 		$this->multicell(0,5,"Sans retour de votre part sous huitaine, nous engagerons une procédure de recouvrement. Vous vous exposez dès lors du calcul des intérêts de retard.");
 		$this->ln(5);
@@ -6419,50 +6466,50 @@ class pdf_cleodis extends pdf {
 	* @date 06-02-2013
 	*/
 	public function miseDemeure(){
-        $this->ln(5);
-        $this->multicell(0,5,"Objet : Mise en demeure - Lettre recommandée avec accusé de reception");
-        $this->ln(5);
+		$this->ln(5);
+		$this->multicell(0,5,"Objet : Mise en demeure - Lettre recommandée avec accusé de reception");
+		$this->ln(5);
 
-        $this->multicell(0,5,"Madame, Monsieur, ");
-        $this->ln(5);
+		$this->multicell(0,5,"Madame, Monsieur, ");
+		$this->ln(5);
 
-        if ($this->factures['count']>1) {
-            foreach ($this->factures['data'] as $k=>$i) {
-                $refs .= ATF::facture()->select($i['id_facture'],"ref").", ";
-                $prix .= ATF::facture()->select($i['id_facture'],"prix")." € HT, ";
-                $total += $prix;
-                $totalTTC += $prix*ATF::facture()->select($i['id_facture'],"tva");
-            }
-            $p = "Malgré nos multiples relances, le réglement des factures ".$refs." pour des montants respectifs de ".$prix.", ne nous est toujours pas parvenu.";
-        } else {
-            $refs = ATF::facture()->select($this->factures['data'][0]['id_facture'],"ref");
-            $prix = ATF::facture()->select($this->factures['data'][0]['id_facture'],"prix");
-            $total += $prix;
-            $totalTTC += $prix*ATF::facture()->select($this->factures['data'][0]['id_facture'],"tva");
-            $p = "Malgré nos multiples relances, le réglement de la facture ".$refs." pour un montant de ".$prix." € HT, ne nous est toujours pas parvenu.";
+		if ($this->factures['count']>1) {
+			foreach ($this->factures['data'] as $k=>$i) {
+				$refs .= ATF::facture()->select($i['id_facture'],"ref").", ";
+				$prix .= ATF::facture()->select($i['id_facture'],"prix")." € HT, ";
+				$total += $prix;
+				$totalTTC += $prix*ATF::facture()->select($i['id_facture'],"tva");
+			}
+			$p = "Malgré nos multiples relances, le réglement des factures ".$refs." pour des montants respectifs de ".$prix.", ne nous est toujours pas parvenu.";
+		} else {
+			$refs = ATF::facture()->select($this->factures['data'][0]['id_facture'],"ref");
+			$prix = ATF::facture()->select($this->factures['data'][0]['id_facture'],"prix");
+			$total += $prix;
+			$totalTTC += $prix*ATF::facture()->select($this->factures['data'][0]['id_facture'],"tva");
+			$p = "Malgré nos multiples relances, le réglement de la facture ".$refs." pour un montant de ".$prix." € HT, ne nous est toujours pas parvenu.";
 
-        }
+		}
 
- 		$this->multicell(0,5,$p,0);
-        $this->ln(5);
+		$this->multicell(0,5,$p,0);
+		$this->ln(5);
 
 		$this->multicell(0,5,"Aussi, par la présente, nous vous mettons en demeure de nous verser, à titre principal, la somme de ".$total." € HT, soit ".$totalTTC." € ".$this->texteTTC.". Conformément à l'article 6.6 des conditions générales du contrat de location, cette somme sera majorée des intérêts au taux conventionnel de 1.5%.");
-        $this->ln(5);
+		$this->ln(5);
 
 		$this->multicell(0,5,"Nous vous informons que ces pénalités courent dès réception de la présente.",0);
-        $this->ln(5);
+		$this->ln(5);
 
 		$this->multicell(0,5,"Si dans un délai de 15 jours à compter de cette date vous ne vous êtes pas acquitté de cette somme, nous saisirons la juridiction compétente afin d'obtenir le paiement des sommes dues.");
-        $this->ln(5);
+		$this->ln(5);
 
 		$this->multicell(0,5,"Si vous nous avez adressé votre réglement entre-temps, nous vous prions de ne pas tenir compte de la présente");
-        $this->ln(5);
+		$this->ln(5);
 	}
 
 
 	/**
 	* Génère le Contrat avec Bilan
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $id id de la commande
 	* @date 03-03-2013
 	*/
@@ -6494,11 +6541,11 @@ class pdf_cleodis extends pdf {
 		}else{
 			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
 		$this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->ln(5);
 
 		if($this->affaire["nature"] == "AR"){
 			$this->multicell(0,5,"Pour faire suite à la réception du devis ".$s['type_devis']." signé, j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]." qui annule et remplace le précédent.");
@@ -6533,27 +6580,27 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration("I");
 		$phrase = "=> Si vous le souhaitez, nous pouvons contacter votre expert comptable pour vous. Dans ce cas, merci de renseigner les éléments suivants :";
 		$this->multicell(0,5,$phrase);
-        $this->ln(3);
+		$this->ln(3);
 		$this->setx(40);
 		$phrase  = "Expert comptable : ...................................................... \n";
 		$phrase .= "Nom : ....................................................................\n";
 		$phrase .= "Téléphone : ..............................................................";
 		$this->multicell(0,5,$phrase);
-        $this->unsetFontDecoration();
+		$this->unsetFontDecoration();
 
-        $this->ln(5);
-        $this->multicell(0,5,"Vous en souhaitant une bonne réception, je vous remercie d'avoir choisi ".$this->societe["societe"]." et demeure a votre entière disposition pour tout complément d'information.");
-        $this->ln(5);
-        $this->multicell(0,5,"Veuillez agréer, ".$this->contact["civilite"]." ".$this->contact["nom"].", l'expression de mes salutations distinguées.");
+		$this->ln(5);
+		$this->multicell(0,5,"Vous en souhaitant une bonne réception, je vous remercie d'avoir choisi ".$this->societe["societe"]." et demeure a votre entière disposition pour tout complément d'information.");
+		$this->ln(5);
+		$this->multicell(0,5,"Veuillez agréer, ".$this->contact["civilite"]." ".$this->contact["nom"].", l'expression de mes salutations distinguées.");
 
-        $this->ln(15);
-        $this->setfont('arial','I',12);
-        $this->multicell(0,5,ATF::user()->select(ATF::usr()->getId() , "prenom")." ".ATF::user()->select(ATF::usr()->getId() , "nom"));
+		$this->ln(15);
+		$this->setfont('arial','I',12);
+		$this->multicell(0,5,ATF::user()->select(ATF::usr()->getId() , "prenom")." ".ATF::user()->select(ATF::usr()->getId() , "nom"));
 	}
 
 	/**
-    * Génère le Contrat Sans Bilan
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* Génère le Contrat Sans Bilan
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $id id de la commande
 	* @date 03-03-2013
 	*/
@@ -6562,7 +6609,7 @@ class pdf_cleodis extends pdf {
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -6570,25 +6617,25 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-        $this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
-        if(ATF::$codename == "cleodis") {
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
+		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}else{
 			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
-        $this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->ln(5);
+		$this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->ln(5);
 
 		if($this->affaire["nature"] == "AR"){
 			$this->multicell(0,5,"Pour faire suite à la réception du devis ".$s['type_devis']." signé, j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]." qui annule et remplace le précédent.");
@@ -6598,7 +6645,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Vous trouverez ci-joints les éléments suivants :");
-        $this->ln(5);
+		$this->ln(5);
 		$this->setfont('arial','',11);
 		$this->setx(15);
 		$phrase = "- 3 exemplaires du contrat de location\n";
@@ -6610,7 +6657,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Je vous remercie de bien vouloir nous retourner :");
 		$this->setfont('arial','',11);
-        $this->ln(5);
+		$this->ln(5);
 		$this->setx(15);
 		$phrase  = "- l'ensemble des documents signés et paraphés avec le cachet de la société\n";
 		if(ATF::$codename == "cleodis") {
@@ -6633,8 +6680,8 @@ class pdf_cleodis extends pdf {
 	}
 
 	/**
-    * Génère l'avenant courrier type
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* Génère l'avenant courrier type
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $id id de la commande
 	* @date 03-03-2013
 	*/
@@ -6644,7 +6691,7 @@ class pdf_cleodis extends pdf {
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -6652,33 +6699,33 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-        $this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
-        if(ATF::$codename == "cleodis") {
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
+		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}else{
 			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
-        $this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->ln(5);
+		$this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->ln(5);
 
 		$this->multicell(0,5,"Suite à la réception du bon de commande ".$s["bdc"].", j'ai le plaisir de vous transmettre l'avenant à votre contrat de location ".$this->societe["societe"]."");
 		$this->ln(5);
-        $t = "Je vous remercie de bien vouloir retourner ";
+		$t = "Je vous remercie de bien vouloir retourner ";
 		$this->cell(81    ,5,$t);
-        $this->setFontDecoration("B");
-        $this->cell(50,5,"les 2 exemplaires signés avec le cachet de la société.",0,1);
-        $this->unsetFontDecoration();
+		$this->setFontDecoration("B");
+		$this->cell(50,5,"les 2 exemplaires signés avec le cachet de la société.",0,1);
+		$this->unsetFontDecoration();
 		$this->ln(5);
 
 		$this->setx(0);
@@ -6694,8 +6741,8 @@ class pdf_cleodis extends pdf {
 	}
 
 	/**
-    * Génère le transfert de contrat courrier type
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* Génère le transfert de contrat courrier type
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $id id de la commande
 	* @date 03-03-2013
 	*/
@@ -6704,88 +6751,8 @@ class pdf_cleodis extends pdf {
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
-
-        $this->commande = ATF::commande()->select($id);
-        $this->client = ATF::societe()->select($this->commande['id_societe']);
-        $this->devis = ATF::devis()->select($this->commande["id_devis"]);
-        $this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
-        $this->contact = ATF::contact()->select($this->devis['id_contact']);
-
-        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
-
-		$this->open();
-		$this->addpage();
-		$this->sety(80);
-		$this->setFont("arial","B",10);
-
-        $this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
-        if(ATF::$codename == "cleodis") {
-			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
-		}else{
-			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
-		}
-        $this->setFont("arial","",12);
-
-        $this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->ln(5);
-
-
-		$this->multicell(0,5,"Pour faire suite à la reprise ".$s["reprise_magasin"].", j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]."");
-		$this->ln(5);
-		$this->setfont("arial","U",12);
-		$this->multicell(0,5,"Vous trouverez ci-joints les éléments suivants :");
-		$this->setfont('arial','',11);
-		$this->setx(15);
-		$phrase = "- 3 exemplaires du contrat de location\n";
-		$phrase .= "- 3 exemplaires du procès verbal de livraison\n";
-	    $phrase .= "- 2 exemplaires de mandats SEPA\n";
-		$this->multicell(0,5,$phrase);
-		$this->ln(5);
-		$this->setx(10);
-		$this->setfont("arial","U",12);
-		$this->multicell(0,5,"Je vous remercie de bien vouloir nous retourner :");
-		$this->setfont('arial','',11);
-		$this->setleftMargin(15);
-		$this->multicell(0,5,"- l'ensemble des documents signés et paraphés avec le cachet de la société");
-	    if(ATF::$codename == "cleodis") {
-			$this->multicell(0,5, "- RIB mentionnant le nom de la banque");
-		}
-
-		$this->multicell(0,5,"- la copie recto/verso d'une pièce d'identité");
-        if ($s['docSupAretourner']) {
-            $this->multicell(0,5,"- ".$s['docSupAretourner']);
-        }
-
-        $this->setleftMargin(10);
-		$this->ln(5);
-
-        $this->ln(5);
-        $foot = "Lors de la mise en place de votre contrat, des frais de transfert d'un montant de 195 euros HT seront prélevés sur votre compte.\n\nVous en souhaitant bonne réception, je vous remercie d'avoir choisi ".$this->societe["societe"]." et demeure à votre entière disposition pour tout complément d'information.
-        \nVeuillez agréer, ".$this->contact["civilite"]." ".$this->contact["nom"].", l'expression de mes salutations distinguées.";
-        $this->multicell(0,5,$foot);
-
-        $this->ln(15);
-        $this->setfont('arial','I',12);
-        $this->multicell(0,5,ATF::user()->select(ATF::usr()->getId() , "prenom")." ".ATF::user()->select(ATF::usr()->getId() , "nom"));
-
-	}
-
-	/**
-    * Génère le contrat signécourrier type
-    * @author Quentin JANON <qjanon@absystech.fr>
-	* @param $id id de la commande
-	* @date 03-03-2013
-	*/
-	public function ctSigne($id,$s){
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
-
-		$this->facturePDF = true;
-		$this->envoiContrat = true;
-        $this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -6800,18 +6767,98 @@ class pdf_cleodis extends pdf {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-        $this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
-        if(ATF::$codename == "cleodis") {
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
+		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}else{
 			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
-        $this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->ln(15);
+		$this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->ln(5);
+
+
+		$this->multicell(0,5,"Pour faire suite à la reprise ".$s["reprise_magasin"].", j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]."");
+		$this->ln(5);
+		$this->setfont("arial","U",12);
+		$this->multicell(0,5,"Vous trouverez ci-joints les éléments suivants :");
+		$this->setfont('arial','',11);
+		$this->setx(15);
+		$phrase = "- 3 exemplaires du contrat de location\n";
+		$phrase .= "- 3 exemplaires du procès verbal de livraison\n";
+		$phrase .= "- 2 exemplaires de mandats SEPA\n";
+		$this->multicell(0,5,$phrase);
+		$this->ln(5);
+		$this->setx(10);
+		$this->setfont("arial","U",12);
+		$this->multicell(0,5,"Je vous remercie de bien vouloir nous retourner :");
+		$this->setfont('arial','',11);
+		$this->setleftMargin(15);
+		$this->multicell(0,5,"- l'ensemble des documents signés et paraphés avec le cachet de la société");
+		if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5, "- RIB mentionnant le nom de la banque");
+		}
+
+		$this->multicell(0,5,"- la copie recto/verso d'une pièce d'identité");
+		if ($s['docSupAretourner']) {
+			$this->multicell(0,5,"- ".$s['docSupAretourner']);
+		}
+
+		$this->setleftMargin(10);
+		$this->ln(5);
+
+		$this->ln(5);
+		$foot = "Lors de la mise en place de votre contrat, des frais de transfert d'un montant de 195 euros HT seront prélevés sur votre compte.\n\nVous en souhaitant bonne réception, je vous remercie d'avoir choisi ".$this->societe["societe"]." et demeure à votre entière disposition pour tout complément d'information.
+		\nVeuillez agréer, ".$this->contact["civilite"]." ".$this->contact["nom"].", l'expression de mes salutations distinguées.";
+		$this->multicell(0,5,$foot);
+
+		$this->ln(15);
+		$this->setfont('arial','I',12);
+		$this->multicell(0,5,ATF::user()->select(ATF::usr()->getId() , "prenom")." ".ATF::user()->select(ATF::usr()->getId() , "nom"));
+
+	}
+
+	/**
+	* Génère le contrat signécourrier type
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param $id id de la commande
+	* @date 03-03-2013
+	*/
+	public function ctSigne($id,$s){
+		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+
+		$this->facturePDF = true;
+		$this->envoiContrat = true;
+		$this->noPageNo = true;
+
+		$this->commande = ATF::commande()->select($id);
+		$this->client = ATF::societe()->select($this->commande['id_societe']);
+		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
+		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
+		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+
+		$this->open();
+		$this->addpage();
+		$this->sety(80);
+		$this->setFont("arial","B",10);
+
+		$this->multicell(0,5,"Objet : Contrat de location ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
+		if(ATF::$codename == "cleodis") {
+			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}else{
+			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
+		}
+		$this->setFont("arial","",12);
+
+		$this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->ln(15);
 
 		$this->multicell(0,5,"J'ai le plaisir de vous retourner votre original du contrat de location ".$this->societe["societe"]." signé par nos soins, ainsi que la ou les facture(s) correspondante(s).");
 		$this->ln(15);
@@ -6827,8 +6874,8 @@ class pdf_cleodis extends pdf {
 	}
 
 	/**
-    * Génère le courrier de restitution
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* Génère le courrier de restitution
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 20-08-2015
 	*/
@@ -6837,7 +6884,7 @@ class pdf_cleodis extends pdf {
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -6853,20 +6900,20 @@ class pdf_cleodis extends pdf {
 		else $this->sety(80);
 
 		$this->setFont("arial","BIU",12);
-        $this->multicell(0,5,"Objet : Restitution de matériel ");
-        $this->setFont("arial","B",12);
-        $this->cell(0,5,"RAR : ".$s["rar"],0,1);
-        $this->setFont("arial","I",10);
-        if(ATF::$codename == "cleodis") {
+		$this->multicell(0,5,"Objet : Restitution de matériel ");
+		$this->setFont("arial","B",12);
+		$this->cell(0,5,"RAR : ".$s["rar"],0,1);
+		$this->setFont("arial","I",10);
+		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}else{
 			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}
-        $this->setFont("arial","",10);
+		$this->setFont("arial","",10);
 
-        $this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->multicell(0,5,"En réponse à votre courrier du ".ATF::$usr->date_trans($this->commande['date_demande_resiliation']?$this->commande['date_demande_resiliation']:date("Y-m-d"),"force",true).", nous vous confirmons par la présente prendre acte de la résiliation de votre contrat ".ATF::affaire()->select($this->affaire['id_affaire'], "ref")."-".ATF::societe()->select($this->client["id_societe"], "code_client").".");
+		$this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->multicell(0,5,"En réponse à votre courrier du ".ATF::$usr->date_trans($this->commande['date_demande_resiliation']?$this->commande['date_demande_resiliation']:date("Y-m-d"),"force",true).", nous vous confirmons par la présente prendre acte de la résiliation de votre contrat ".ATF::affaire()->select($this->affaire['id_affaire'], "ref")."-".ATF::societe()->select($this->client["id_societe"], "code_client").".");
 		$this->ln(5);
 		$this->multicell(0,5,"Conformément à l’article 14.2 des Conditions Générales, nous vous invitons à nous restituer le matériel du contrat ".ATF::affaire()->select($this->affaire['id_affaire'], "ref")."-".ATF::societe()->select($this->client["id_societe"], "code_client")." au plus tard le ".ATF::$usr->date_trans(implode('-', array_reverse(explode('/', $s['date_echeance']))),"force",true).", date d’échéance de votre contrat à :");
 		$this->ln(5);
@@ -6907,8 +6954,8 @@ class pdf_cleodis extends pdf {
 	}
 
 	/**
-    * Génère la lettre de banque
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* Génère la lettre de banque
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 05-11-2015
 	*/
@@ -6924,7 +6971,7 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		ATF::loyer()->q->reset()->where("id_affaire", $this->devis['id_affaire']);
 		$this->loyer = ATF::loyer()->select_all();
@@ -7066,8 +7113,8 @@ class pdf_cleodis extends pdf {
 
 
 	/**
-    * Génère la lettre de banque Belfius pour Cleodis BE
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* Génère la lettre de banque Belfius pour Cleodis BE
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 05-11-2015
 	*/
@@ -7246,8 +7293,8 @@ class pdf_cleodis extends pdf {
 	}
 
 	/**
-    * Génère le mandat SEPA
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* Génère le mandat SEPA
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 18-12-2013
 	*/
@@ -7274,7 +7321,7 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-        if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
 
@@ -7408,7 +7455,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 	/**
 	* Génère le Courrier classique
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 06-03-2014
 	*/
@@ -7419,7 +7466,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 		$this->envoiContrat = true;
 		$this->facturePDF = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -7434,18 +7481,18 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-        $this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
-        if(ATF::$codename == "cleodis") {
+		$this->multicell(0,5,"Objet : contrat de location ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
+		if(ATF::$codename == "cleodis") {
 			$this->multicell(0,5,"Lille, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}else{
 			$this->multicell(0,5,"Bruxelles, le ".ATF::$usr->date_trans($s['date']?$s['date']:date("Y-m-d"),"force",true));
 		}
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
-        $this->ln(5);
-        $this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
-        $this->ln(5);
+		$this->ln(5);
+		$this->multicell(0,5,ATF::$usr->trans($this->contact['civilite']).", ");
+		$this->ln(5);
 
 		if($this->affaire["nature"] == "AR"){
 			$this->multicell(0,5,"J'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]." qui annule et remplace le précédent.");
@@ -7455,7 +7502,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->ln(5);
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Vous trouverez ci-joints les éléments suivants :");
-        $this->ln(5);
+		$this->ln(5);
 		$this->setfont('arial','',11);
 		$this->setx(15);
 		$phrase = "- 3 exemplaires du contrat de location\n";
@@ -7467,7 +7514,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Je vous remercie de bien vouloir nous retourner :");
 		$this->setfont('arial','',11);
-        $this->ln(5);
+		$this->ln(5);
 		$this->setx(15);
 		$phrase  = "- l'ensemble des documents signés et paraphés avec le cachet de la société\n";
 		if(ATF::$codename == "cleodis") {
@@ -7553,7 +7600,7 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 				}
 				$this->cell(70,5,"Loyer(s) HT : ".$l,0,1,'L');
 
-			    ATF::parc()->q->addCondition("parc.id_affaire",$value['id_affaire'],"OR",2);
+				ATF::parc()->q->addCondition("parc.id_affaire",$value['id_affaire'],"OR",2);
 			}
 			ATF::parc()->q->addCondition("parc.existence","actif","AND")
 						   ->addCondition("parc.etat","loue","AND",1)
@@ -7682,14 +7729,14 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 		$frequence = "";
 		if($this->loyer[0]["frequence_loyer"] == "mois"){
-            $frequence = "Mensuel";
-        }elseif($this->loyer[0]["frequence_loyer"] == "trimestre"){
-            $frequence = "Trimestriel";
-        }elseif($this->loyer[0]["frequence_loyer"] == "semestre"){
-            $frequence = "Semestriel";
-        }else{
-            $frequence = "Annuel";
-        }
+			$frequence = "Mensuel";
+		}elseif($this->loyer[0]["frequence_loyer"] == "trimestre"){
+			$frequence = "Trimestriel";
+		}elseif($this->loyer[0]["frequence_loyer"] == "semestre"){
+			$frequence = "Semestriel";
+		}else{
+			$frequence = "Annuel";
+		}
 
 		$this->ln(5);
 		if($this->getY() >= 250){ 	$this->Addpage(); 	$this->sety(20); }
@@ -7773,21 +7820,21 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 
 	public function formation_devis_light($devis, $formation_devis_ligne){
 		$cadre = array(
-                     array("txt"=>$this->client['societe'],"size"=>10)
-                    ,array("txt"=>$this->client["adresse"],"size"=>10)
-                );
+					 array("txt"=>$this->client['societe'],"size"=>10)
+					,array("txt"=>$this->client["adresse"],"size"=>10)
+				);
 		if ($this->client["adresse2"]) $cadre[] = array("txt"=>$this->client["adresse2"],"size"=>10);
-        if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
-        $cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
+		if ($this->client["adresse3"]) $cadre[] = array("txt"=>$this->client["adresse3"],"size"=>10);
+		$cadre[] = array("txt"=>$this->client["cp"]." ".$this->client["ville"],"size"=>10);
 
-        $this->cadre(110,20,85,35,$cadre);
-
-
-        $this->ln(20);
-        $this->cell(80,5,"Lille, le ".date("d/m/Y", strtotime($devis["date"])),0,1,'L');
+		$this->cadre(110,20,85,35,$cadre);
 
 
-        $this->setfont('arial','B',18);
+		$this->ln(20);
+		$this->cell(80,5,"Lille, le ".date("d/m/Y", strtotime($devis["date"])),0,1,'L');
+
+
+		$this->setfont('arial','B',18);
 		$this->cell(0,5,"DEVIS N° ".$devis["numero_dossier"],0,1,'C');
 		$this->ln(10);
 
@@ -8827,14 +8874,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 			if($this->pdfEnveloppe){
 				$cadre = array(
-                    array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
-                    ,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
-                    ,array("txt"=>$adresse,"size"=>10)
-                );
-                if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
-                if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
-                $cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
-                $this->cadre(110,45,85,40,$cadre);
+					array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
+					,array("txt"=>($this->contact?"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']):""),"italic"=>true,"size"=>8)
+					,array("txt"=>$adresse,"size"=>10)
+				);
+				if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
+				if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
+				$cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
+				$this->cadre(110,45,85,40,$cadre);
 			}
 			$this->setLeftMargin(15);
 		}else{
@@ -8850,15 +8897,15 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 			$this->setfont('arial','',12);
 			$cadre = array(
-	            array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
-	            ,array("txt"=>$adresse,"size"=>10)
-	        );
-	        if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
-	        if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
-	        $cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
-	        $this->cadre(100,45,95,40,$cadre);
+				array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
+				,array("txt"=>$adresse,"size"=>10)
+			);
+			if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
+			if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
+			$cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
+			$this->cadre(100,45,95,40,$cadre);
 
-	        $this->setfont('arial','',12);
+			$this->setfont('arial','',12);
 
 			$this->setMargins(15,50);
 		}
@@ -10897,7 +10944,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 	/**
 	* Génère le Contrat avec Bilan
-    * @author Quentin JANON <qjanon@absystech.fr>
+	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param $id id de la commande
 	* @date 03-03-2013
 	*/
@@ -10907,7 +10954,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -10920,27 +10967,27 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-        $this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
+		$this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
 
 		 if($s["date"]){
-        	$s['date'] = date("d", strtotime($s['date']))." ".$this->moisNL(date("m", strtotime($s['date'])))." ".date("Y", strtotime($s['date']));
-        }else{
-        	$s["date"] = date("d")." ".$this->moisNL(date("m"))." ".date("Y");
-        }
-        $this->multicell(0,5,"Brussel, ".$s["date"]);
+			$s['date'] = date("d", strtotime($s['date']))." ".$this->moisNL(date("m", strtotime($s['date'])))." ".date("Y", strtotime($s['date']));
+		}else{
+			$s["date"] = date("d")." ".$this->moisNL(date("m"))." ".date("Y");
+		}
+		$this->multicell(0,5,"Brussel, ".$s["date"]);
 
 
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
-        $this->ln(10);
+		$this->ln(10);
 
-        if($this->contact['civilite'] == "M"){
-        	$this->multicell(0,5,"Geachte heer,");
-        }else{
-        	$this->multicell(0,5,"Geachte mevrouw,");
-        }
-        $this->ln(10);
+		if($this->contact['civilite'] == "M"){
+			$this->multicell(0,5,"Geachte heer,");
+		}else{
+			$this->multicell(0,5,"Geachte mevrouw,");
+		}
+		$this->ln(10);
 
 		$this->multicell(0,5,"Het is mij een genoegen om u het origineel van uw CLEODIS.BE huurcontract, door ons ondertekend, op te sturen.");
 		$this->ln(5);
@@ -10949,7 +10996,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->ln(10);
 
 		$this->multicell(0,5,"Met de meeste hoogachting,");
-        $this->ln(5);
+		$this->ln(5);
 
 
 		$this->ln(15);
@@ -10959,8 +11006,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 	}
 
 	/**
-    * Génère le Contrat Sans Bilan
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* Génère le Contrat Sans Bilan
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 31/08/2017
 	*/
@@ -10970,7 +11017,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
-        $this->noPageNo = true;
+		$this->noPageNo = true;
 
 		$this->commande = ATF::commande()->select($id);
 		$this->client = ATF::societe()->select($this->commande['id_societe']);
@@ -10983,28 +11030,28 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->sety(80);
 		$this->setFont("arial","B",10);
 
-        $this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]."");
-        $this->setFont("arial","I",10);
-        if($s["date"]){
-        	$s['date'] = date("d", strtotime($s['date']))." ".$this->moisNL(date("m", strtotime($s['date'])))." ".date("Y", strtotime($s['date']));
-        }else{
-        	$s["date"] = date("d")." ".$this->moisNL(date("m"))." ".date("Y");
-        }
-        $this->multicell(0,5,"Brussel, ".$s["date"]);
+		$this->multicell(0,5,"Betreft: huurcontract ".$this->societe["societe"]."");
+		$this->setFont("arial","I",10);
+		if($s["date"]){
+			$s['date'] = date("d", strtotime($s['date']))." ".$this->moisNL(date("m", strtotime($s['date'])))." ".date("Y", strtotime($s['date']));
+		}else{
+			$s["date"] = date("d")." ".$this->moisNL(date("m"))." ".date("Y");
+		}
+		$this->multicell(0,5,"Brussel, ".$s["date"]);
 
 
-        $this->setFont("arial","",12);
+		$this->setFont("arial","",12);
 
-        $this->ln(5);
+		$this->ln(5);
 
-        if($this->contact['civilite'] == "M"){
-        	$this->multicell(0,5,"Geachte heer,");
-        }else{
-        	$this->multicell(0,5,"Geachte mevrouw,");
-        }
+		if($this->contact['civilite'] == "M"){
+			$this->multicell(0,5,"Geachte heer,");
+		}else{
+			$this->multicell(0,5,"Geachte mevrouw,");
+		}
 
 
-        $this->ln(5);
+		$this->ln(5);
 
 		if($this->affaire["nature"] == "AR"){
 			$this->multicell(0,5,"Pour faire suite à la réception du devis ".$s['type_devis']." signé, j'ai le plaisir de vous transmettre votre contrat de location ".$this->societe["societe"]." qui annule et remplace le précédent.");
@@ -11014,7 +11061,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->ln(5);
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Bijgevoegd vindt u de volgende stukken :");
-        $this->ln(5);
+		$this->ln(5);
 		$this->setfont('arial','',11);
 		$this->setx(15);
 		$phrase = "- 3 exemplaren van het huurcontract\n";
@@ -11026,7 +11073,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont("arial","U",12);
 		$this->multicell(0,5,"Bedankt om ons het volgende terug te bezorgen :");
 		$this->setfont('arial','',11);
-        $this->ln(5);
+		$this->ln(5);
 		$this->setx(15);
 		$phrase  = "- alle documenten, ondertekend en met de stempel van het bedrijf\n";
 		$phrase .= "- Een document van de bank met het rekeningnummer en de naam van de bank\n";
@@ -11192,8 +11239,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 
 	/**
-    * Génère le mandat SEPA
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* Génère le mandat SEPA
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param $id id de la commande
 	* @date 15-12-2017
 	*/
@@ -12090,7 +12137,7 @@ class pdf_cap extends pdf_cleodis {
 
 		$this->open();
 		$this->unsetHeader();
-        $this->addFont('Calibri','',"calibri.php");
+		$this->addFont('Calibri','',"calibri.php");
 
 		foreach (ATF::_s('ids') as $k=>$id_crypt) {
 			if (!$id_crypt) continue;
@@ -12098,28 +12145,28 @@ class pdf_cap extends pdf_cleodis {
 
 			$this->addPage();
 
-	        $this->image(__PDF_PATH__."cap/courrierType-".ATF::_s('societe_source').".jpg",0,0,210);
-	        $this->setfont('Calibri','',14);
+			$this->image(__PDF_PATH__."cap/courrierType-".ATF::_s('societe_source').".jpg",0,0,210);
+			$this->setfont('Calibri','',14);
 
-	        $this->setxy(110,45);
-	        $this->cell(80,30,"",0);
+			$this->setxy(110,45);
+			$this->cell(80,30,"",0);
 
-	        $this->setxy(112,45);
-	        $this->multicell(80,5,$client['societe'],0);
-	        $this->setx(112);
-	        $this->multicell(80,5,$client['adresse'],0);
-	        if ($client['adresse_2']){
-		        $this->setx(112);
-		        $this->multicell(80,5,$client['adresse_2'],0);
-	        }
-	        if ($client['adresse_3']){
-		        $this->setx(112);
-		        $this->multicell(80,5,$client['adresse_3'],0);
-	        }
-	        $this->setx(112);
-	        $this->multicell(80,5,$client['cp']." ".$client['ville'],0);
-	        $this->setx(112);
-	        $this->multicell(80,5,ATF::pays()->nom($client['id_pays']),0);
+			$this->setxy(112,45);
+			$this->multicell(80,5,$client['societe'],0);
+			$this->setx(112);
+			$this->multicell(80,5,$client['adresse'],0);
+			if ($client['adresse_2']){
+				$this->setx(112);
+				$this->multicell(80,5,$client['adresse_2'],0);
+			}
+			if ($client['adresse_3']){
+				$this->setx(112);
+				$this->multicell(80,5,$client['adresse_3'],0);
+			}
+			$this->setx(112);
+			$this->multicell(80,5,$client['cp']." ".$client['ville'],0);
+			$this->setx(112);
+			$this->multicell(80,5,ATF::pays()->nom($client['id_pays']),0);
 
 		}
 		ATF::_s('ids',false);
@@ -12743,7 +12790,7 @@ class pdf_cap extends pdf_cleodis {
 
 
 		/* ----------------------------------------
-		  					PAGE 3
+							PAGE 3
 		   ---------------------------------------- */
 		$this->Addpage();
 		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
@@ -13516,7 +13563,7 @@ class pdf_cap extends pdf_cleodis {
 
 
 		/* ----------------------------------------
-		  					PAGE 3
+							PAGE 3
 		   ---------------------------------------- */
 		$this->Addpage();
 		$this->image(__PDF_PATH__."cap/cap.jpg",10,-15,70);
