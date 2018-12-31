@@ -153,9 +153,12 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 					$k++;
 				}
 			}
-			//On retire les éléments ayant déjà un serial
 			foreach($return as $key=>$item){
-				if($item["parc.serial"]){
+				// On cherhe dans la gestion de parc si un élément avec le même serial UNIQUE existe déjà
+				ATF::parc()->q->reset()->where("serial", $item["parc.serial"])->setCountOnly();
+				// if($item["parc.serial"]){
+				//On retire les éléments ayant déjà un serial
+				if(ATF::parc()->sa()){
 					unset($return[$key]);
 				}else{
 					$res["data"][]=$item;
