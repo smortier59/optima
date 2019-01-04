@@ -20,6 +20,7 @@ ALTER TABLE `devis_ligne` ADD `duree` INT(11) NULL DEFAULT NULL AFTER `options`,
 	ADD `id_sous_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `id_pack_produit`, 
 	ADD INDEX (`id_sous_categorie`), ADD INDEX (`id_pack_produit`);
 
+
 ALTER TABLE `commande_ligne` ADD `duree` INT(11) NULL DEFAULT NULL, 
 	ADD `loyer` FLOAT(6,3) NULL DEFAULT NULL AFTER `duree`, 
 	ADD `ean` VARCHAR(14) NULL DEFAULT NULL AFTER `loyer`, 
@@ -29,3 +30,11 @@ ALTER TABLE `commande_ligne` ADD `duree` INT(11) NULL DEFAULT NULL,
 
 ALTER TABLE `devis_ligne` ADD `pack_produit` VARCHAR(255) NULL DEFAULT NULL AFTER `id_sous_categorie`, ADD `sous_categorie` VARCHAR(255) NULL DEFAULT NULL AFTER `pack_produit`;
 ALTER TABLE `commande_ligne` ADD `pack_produit` VARCHAR(255) NULL DEFAULT NULL AFTER `id_sous_categorie`, ADD `sous_categorie` VARCHAR(255) NULL DEFAULT NULL AFTER `pack_produit`;
+
+ALTER TABLE `affaire` ADD `id_magasin` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `pays_facturation`;
+ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_magasin`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+#Systeme Bureau Valley Toshiba-www
+ALTER TABLE `pack_produit` ADD `specifique_partenaire` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `etat`, ADD INDEX (`specifique_partenaire`);
+ALTER TABLE `pack_produit` ADD FOREIGN KEY (`specifique_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;
