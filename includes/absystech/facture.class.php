@@ -416,10 +416,13 @@ class facture_absystech extends facture {
 				case 31: // prélèvement bancaire
 				case 38: // prélèvement annuel
 					$dayFacture = date('d', strtotime($infos['date']));
-					$monthFacture = date('m', strtotime($infos['date']));
-					if ($dayFacture > 15) $monthFacture += 1; // On incrémente si on a dépassé le 15 du mois
-					if ($monthFacture < 10) $monthFacture = "0".(int)$monthFacture; // On push des 0 significatif pour que la date soit correcte
-					$infos["date_previsionnelle"] = date('Y-'.$monthFacture.'-15',strtotime($infos['date']));
+
+					if ($dayFacture > 15) {
+						$infos["date_previsionnelle"] = date('Y-m-15',strtotime($infos['date'].' +1 month'));
+					} else {
+						$infos["date_previsionnelle"] = date('Y-m-15',strtotime($infos['date']));
+					}
+
 				break;
 				case 1: // A reception
 					$infos["date_previsionnelle"] = $infos['date'];
@@ -429,7 +432,7 @@ class facture_absystech extends facture {
 				break;
 			}
 		}
-
+		log::logger($infos['date_previsionnelle'], "qjanon");
 		$societe=ATF::societe()->select($infos["id_societe"]);
 
 		//Seuls les associés et Emma peuvent modifier la tva
