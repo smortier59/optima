@@ -229,10 +229,10 @@ class souscription_cleodis extends souscription {
         } 
 
 
-        if ($toInsertProduitDevis[$produit['id_produit']]) {
-          $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
+        if ($toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]) {
+          $toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]['devis_ligne__dot__quantite'] += $produit['quantite'];
         } else {
-          $toInsertProduitDevis[$produit['id_produit']] =  array(
+          $toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']] =  array(
             "devis_ligne__dot__produit"=> $produit['produit'],
             "devis_ligne__dot__quantite"=>$produit['quantite'],
             "devis_ligne__dot__type"=>$produitLoyer['type'],
@@ -261,8 +261,6 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
             "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_pdf'],
             "devis_ligne__dot__ordre"=>$produitLoyer['ordre']
-
-
           );
         }
 
