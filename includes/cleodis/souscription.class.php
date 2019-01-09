@@ -66,6 +66,9 @@ class souscription_cleodis extends souscription {
 
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
+
+
+
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
           "id_affaire"=>$id_affaire,
@@ -87,6 +90,20 @@ class souscription_cleodis extends souscription {
           "BIC"=>$societe["BIC"],
           "id_magasin"=>$post["id_magasin"]
         );
+        
+        // On stock le JSON du pack complet au cas où.
+        if ($post['id_pack_produit']) {
+          foreach ($post['id_pack_produit'] as $id_pack_produit) {
+            $pack_produit = ATF::pack_produit()->select($id_pack_produit);
+            if (!$pack_produit) continue;
+            $pack_produit['lignes'] = ATF::pack_produit_ligne()->select_special('id_pack_produit', $id_pack_produit);
+            foreach ($pack_produit['lignes'] as $k=>$ligne) {
+              $pack_produit['lignes'][$k]['produit'] = ATF::produit()->select($ligne['id_produit']);
+            }
+          }
+          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit);
+        }
+
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
         ATF::affaire()->u($affToUpdate);
@@ -201,8 +218,14 @@ class souscription_cleodis extends souscription {
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
         } else if ($produit['id_pack_produit_ligne']) {
-          ATF::pack_produit_ligne()->q->reset()->addField("id_pack_produit")->where("id_pack_produit_ligne", $produit['id_pack_produit_ligne']);
-          $id_pack = ATF::pack_produit_ligne()->select_cell();
+          ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit_ligne", $produit['id_pack_produit_ligne']);
+          $packProduitLigne = ATF::pack_produit_ligne()->select_row();
+          $id_pack = $packProduitLigne['id_pack_produit'];
+
+          $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
+
+          $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
+
         } 
 
 
@@ -230,7 +253,15 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__id_pack_produit"=>$id_pack,
             "devis_ligne__dot__sous_categorie"=>ATF::sous_categorie()->nom($produitLoyer['id_sous_categorie']),
             "devis_ligne__dot__pack_produit"=>ATF::pack_produit()->nom($id_pack),
-            "devis_ligne__dot__ean"=>$produitLoyer['ean']
+            "devis_ligne__dot__ean"=>$produitLoyer['ean'],
+
+            "devis_ligne__dot__id_categorie"=>$souscategorie['id_categorie'],
+            "devis_ligne__dot__categorie"=>ATF::categorie()->nom($souscategorie['id_categorie']),
+            "devis_ligne__dot__commentaire_produit"=>$produitLoyer['commentaire'],
+            "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
+            "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_pdf'],
+            "devis_ligne__dot__ordre"=>$produitLoyer['ordre']
+
 
           );
         }
@@ -293,7 +324,13 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__id_pack_produit"=>$value['id_pack_produit'],
           "commande_ligne__dot__sous_categorie"=>$value['sous_categorie'],
           "commande_ligne__dot__pack_produit"=>$value['pack_produit'],
-          "commande_ligne__dot__ean"=>$value['ean']        
+          "commande_ligne__dot__ean"=>$value['ean'],    
+          "commande_ligne__dot__id_categorie"=>$value['id_categorie'],
+          "commande_ligne__dot__categorie"=>$value['categorie'],
+          "commande_ligne__dot__commentaire_produit"=>$value['commentaire'],
+          "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
+          "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
+          "commande_ligne__dot__ordre"=>$value['ordre']
       );
     }
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));

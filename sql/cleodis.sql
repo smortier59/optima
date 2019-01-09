@@ -31,6 +31,7 @@ ALTER TABLE `commande_ligne` ADD `duree` INT(11) NULL DEFAULT NULL,
 ALTER TABLE `devis_ligne` ADD `pack_produit` VARCHAR(255) NULL DEFAULT NULL AFTER `id_sous_categorie`, ADD `sous_categorie` VARCHAR(255) NULL DEFAULT NULL AFTER `pack_produit`;
 ALTER TABLE `commande_ligne` ADD `pack_produit` VARCHAR(255) NULL DEFAULT NULL AFTER `id_sous_categorie`, ADD `sous_categorie` VARCHAR(255) NULL DEFAULT NULL AFTER `pack_produit`;
 
+<<<<<<< HEAD
 ALTER TABLE `affaire` ADD `id_magasin` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `pays_facturation`;
 ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_magasin`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
@@ -38,3 +39,22 @@ ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_ma
 #Systeme Bureau Valley Toshiba-www
 ALTER TABLE `pack_produit` ADD `specifique_partenaire` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `etat`, ADD INDEX (`specifique_partenaire`);
 ALTER TABLE `pack_produit` ADD FOREIGN KEY (`specifique_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;
+=======
+ALTER TABLE `devis_ligne` ADD `id_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `sous_categorie`, 
+	ADD `categorie` VARCHAR(64) NULL DEFAULT NULL AFTER `id_categorie`, 
+	ADD `commentaire_produit` VARCHAR(512) NULL DEFAULT NULL AFTER `categorie`, 
+	ADD `visible_sur_site` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire_produit`, 
+	ADD `visible_pdf` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `visible_sur_site`, 
+	ADD `ordre` INT NOT NULL DEFAULT '1' AFTER `visible_pdf`, 
+	ADD INDEX (`id_categorie`);
+
+ALTER TABLE `commande_ligne` ADD `id_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `sous_categorie`, 
+	ADD `categorie` VARCHAR(64) NULL DEFAULT NULL AFTER `id_categorie`, 
+	ADD `commentaire_produit` VARCHAR(512) NULL DEFAULT NULL AFTER `categorie`, 
+	ADD `visible_sur_site` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire_produit`, 
+	ADD `visible_pdf` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `visible_sur_site`, 
+	ADD `ordre` INT NOT NULL DEFAULT '1' AFTER `visible_pdf`, 
+	ADD INDEX (`id_categorie`);
+
+ALTER TABLE `affaire` ADD `snapshot_pack_produit` TEXT NULL DEFAULT NULL AFTER `hash_panier`;
+>>>>>>> b946605006ff027096acf0e9d474fed25608bb2b
