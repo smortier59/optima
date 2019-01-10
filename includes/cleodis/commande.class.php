@@ -1453,15 +1453,18 @@ class commande_cleodis extends commande {
 						$id_commande=$this->cryptId($item["id_commande_fk"]);
 						unset($ligne_commande);
 						foreach($commande_ligne as $k=>$i){
-							$ligne_commande[]=array(
-												"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id"=>$i["id_commande_ligne"]
-												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
-												,"quantite"=>$i["quantite"]
-												,"icon"=>ATF::$staticserver."images/blank.gif"
-												,"checked"=>false
-										);
+							for($n=1;$n<=$i["quantite"]; $n++){
+								$ligne_commande[]=array(
+										"text"=>$i["produit"]." ".$i["ref"]." (1)"
+										,"id"=>$i["id_commande_ligne"]
+										,"leaf"=>true
+										,"prix"=>$i["prix_achat"]
+										,"quantite"=>1
+										,"icon"=>ATF::$staticserver."images/blank.gif"
+										,"checked"=>false
+								);
+							}
+
 						}
 
 						if ($ligne_commande) {
