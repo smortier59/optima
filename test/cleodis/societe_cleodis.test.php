@@ -26,7 +26,6 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function test_insert(){
-		ATF::db()->rollback_transaction(true);
 		$this->initUser();
 		$this->obj = ATF::societe();
 		$this->assertEquals(get_class($this->obj),'societe_cleodis','Classe dans $this->obj incorrecte');
@@ -35,9 +34,7 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			'societe'=>'Test cleodis TU',
 			"siret" => "123456789"
 		);
-		$id=$this->obj->insert(array(
-			'societe'=>$societe
-		));
+		$id=$this->obj->insert(array('societe'=>$societe));
 		$this->assertEquals($this->obj->select($id,'societe'),$societe['societe'],'Stockage de la societe incorrect');
 
 		$societe["siret"] = "45307981600048";
@@ -47,6 +44,158 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 			$error = $e->getCode();
 		}
 		$this->assertEquals(878,$error,"Une société existe déja avec le SIRET ");
+	}
+
+	/*
+	  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function test_insert_RUM_soc(){
+		$this->initUser();
+		$this->obj = ATF::societe();
+		$this->assertEquals(get_class($this->obj),'societe_cleodis','Classe dans $this->obj incorrecte');
+
+		$prefixRum = $this->obj->create_rum();
+
+		$societe = array(
+			'societe'=>'Test cleodis TU',
+			"siret" => "123456789",
+			"code_client" => "123456"
+		);
+		$id=$this->obj->insert(array('societe'=>$societe));
+		$this->assertSame($prefixRum."123456",$this->obj->select($id,'RUM'),'Stockage du RUM incorrect 1');
+
+		$this->obj->d(array("id_societe"=>$id));
+		$societe = array(
+			'societe'=>'Test cleodis TU',
+			"siret" => "123456789",
+			"code_client" => "123456111"
+		);
+		$id=$this->obj->insert(array('societe'=>$societe));
+		$this->assertSame($prefixRum."456111",$this->obj->select($id,'RUM'),'Stockage du RUM incorrect 2');
+
+		$this->obj->d(array("id_societe"=>$id));
+		$societe = array(
+			'societe'=>'Test cleodis TU',
+			"siret" => "123456789",
+			"code_client" => "123"
+		);
+		$id=$this->obj->insert(array('societe'=>$societe));
+		$this->assertSame($prefixRum."000123",$this->obj->select($id,'RUM'),'Stockage du RUM incorrect 3');
+	}
+
+	/*
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function test_update(){
+		$this->initUser();
+		$this->obj = ATF::societe();
+		$this->assertEquals(get_class($this->obj),'societe_cleodis','Classe dans $this->obj incorrecte');
+
+		$societe = array('societe'=>'Test cleodis TU',"siret" => "123456789");
+		$id=$this->obj->insert(array('societe'=>$societe));
+
+		$societe2 = array('societe'=>'Test cleodis TU 2',"siret" => "1123456789");
+		$id2=$this->obj->insert(array('societe'=>$societe2));
+
+		try{
+			$this->obj->update(array("societe"=>array("id_societe"=>$id2, "siret"=>"123456789")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Une société existe déja avec le SIRET 123456789", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+	}
+
+
+	/*
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function test_updateFoyer(){
+		$this->initUser();
+		$this->obj = ATF::societe();
+		$this->assertEquals(get_class($this->obj),'societe_cleodis','Classe dans $this->obj incorrecte');
+
+		$societe = array('societe'=>'Test cleodis TU',"siret" => "123456789");
+		$id=$this->obj->insert(array('societe'=>$societe));
+
+		try{
+			$this->obj->update(array('label_societe'=>array('famille'=>'Foyer'),
+									 "societe"=>array("id_societe"=>$id, "particulier_nom"=>"toto")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Le champs civilite est obligatoire pour un particulier!", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+
+		try{
+			$this->obj->update(array('label_societe'=>array('famille'=>'Foyer'),"societe"=>array("id_societe"=>$id, "particulier_civilite"=>"M")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Le champs nom est obligatoire pour un particulier!", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+
+		try{
+			$this->obj->update(array('label_societe'=>array('famille'=>'Foyer'),"societe"=>array("id_societe"=>$id, "particulier_civilite"=>"M", "particulier_nom"=>"toto")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Le champs prenom est obligatoire pour un particulier!", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+		$this->obj->update(array('label_societe'=>array('famille'=>'Foyer'),"societe"=>array("id_societe"=>$id, "particulier_civilite"=>"M", "particulier_nom"=>"toto", "particulier_prenom"=>"toto")));
+
+		$this->assertSame("M toto toto", $this->obj->select($id, "societe"), "Societe particulier non mis à jour ??");
+	}
+
+	/*
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function test_insertFoyer(){
+		$this->initUser();
+		$this->obj = ATF::societe();
+		$this->assertEquals(get_class($this->obj),'societe_cleodis','Classe dans $this->obj incorrecte');
+
+		try{
+			$this->obj->insert(array('label_societe'=>array('id_famille'=>'Foyer'),
+									 "societe"=>array('societe'=>'Test cleodis TU', "particulier_nom"=>"toto")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Le champs civilite est obligatoire pour un particulier!", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+
+		try{
+			$this->obj->insert(array('label_societe'=>array('id_famille'=>'Foyer'),"societe"=>array('societe'=>'Test cleodis TU', "particulier_civilite"=>"M")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Le champs nom est obligatoire pour un particulier!", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+
+		try{
+			$this->obj->insert(array('label_societe'=>array('id_famille'=>'Foyer'),"societe"=>array('societe'=>'Test cleodis TU', "particulier_civilite"=>"M", "particulier_nom"=>"toto")));
+		}catch(errorATF $e){
+			$error = $e->getCode();
+			$errorM = $e->getMessage();
+		}
+		$this->assertSame("Le champs prenom est obligatoire pour un particulier!", $errorM, "Message erreur incorrect ?");
+		$this->assertSame(878, $error, "Erreur incorrecte ?");
+
+		$id = $this->obj->insert(array('label_societe'=>array('id_famille'=>'Foyer'),"societe"=>array('societe'=>'Test cleodis TU', "particulier_civilite"=>"M", "particulier_nom"=>"toto", "particulier_prenom"=>"toto")));
+
+		$this->assertSame("M toto toto", $this->obj->select($id, "societe"), "Societe particulier non mis à jour ??");
 	}
 
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
@@ -577,13 +726,13 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	/* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
 	public function test_conCleodisBE(){
 		$sm=new societe_cleodisbe();
-		$this->assertEquals('a:8:{s:15:"societe.societe";a:4:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"128";s:7:"default";N;}s:11:"societe.tel";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:11:"societe.fax";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:13:"societe.email";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}s:13:"societe.ville";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"32";s:7:"default";N;s:4:"null";b:1;}s:12:"dernierSuivi";a:2:{s:6:"custom";b:1;s:6:"nosort";b:1;}s:22:"societe.nom_commercial";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"64";s:7:"default";N;s:4:"null";b:1;}s:19:"societe.code_client";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}}',serialize($sm->colonnes['fields_column']),"Le constructeur de la classe cleodisbe a changé");
+		$this->assertEquals('a:8:{s:15:"societe.societe";a:4:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"128";s:7:"default";N;}s:11:"societe.tel";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:11:"societe.fax";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:13:"societe.email";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}s:13:"societe.ville";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"32";s:7:"default";N;s:4:"null";b:1;}s:22:"societe.nom_commercial";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"64";s:7:"default";N;s:4:"null";b:1;}s:19:"societe.code_client";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}s:4:"logo";a:6:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"align";s:6:"center";s:5:"width";i:70;s:8:"renderer";s:10:"uploadFile";}}',serialize($sm->colonnes['fields_column']),"Le constructeur de la classe cleodisbe a changé");
 	}
 
 	/* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
 	public function test_conCAP(){
 		$sm=new societe_cap();
-		$this->assertEquals('a:8:{s:15:"societe.societe";a:4:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"128";s:7:"default";N;}s:11:"societe.tel";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:11:"societe.fax";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:13:"societe.email";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}s:13:"societe.ville";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"32";s:7:"default";N;s:4:"null";b:1;}s:12:"dernierSuivi";a:2:{s:6:"custom";b:1;s:6:"nosort";b:1;}s:22:"societe.nom_commercial";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"64";s:7:"default";N;s:4:"null";b:1;}s:19:"societe.code_client";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}}',serialize($sm->colonnes['fields_column']),"Le constructeur de la classe cap a changé");
+		$this->assertEquals('a:8:{s:15:"societe.societe";a:4:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"128";s:7:"default";N;}s:11:"societe.tel";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:11:"societe.fax";a:6:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"20";s:7:"default";N;s:4:"null";b:1;s:3:"tel";b:1;}s:13:"societe.email";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}s:13:"societe.ville";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"32";s:7:"default";N;s:4:"null";b:1;}s:22:"societe.nom_commercial";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:2:"64";s:7:"default";N;s:4:"null";b:1;}s:19:"societe.code_client";a:5:{s:4:"type";s:4:"text";s:5:"xtype";s:9:"textfield";s:9:"maxlength";s:3:"255";s:7:"default";N;s:4:"null";b:1;}s:4:"logo";a:6:{s:6:"custom";b:1;s:6:"nosort";b:1;s:4:"type";s:4:"file";s:5:"align";s:6:"center";s:5:"width";i:70;s:8:"renderer";s:10:"uploadFile";}}',serialize($sm->colonnes['fields_column']),"Le constructeur de la classe cap a changé");
 	}
 
 

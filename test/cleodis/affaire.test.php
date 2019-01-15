@@ -29,6 +29,71 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertTrue($c instanceOf affaire_cap, "L'objet affaire_cap n'est pas de bon type");
 	}
 
+	/**
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @testdox Set Infos commentaire facture 1
+	 */
+	public function test__setInfosErreur(){
+		$data = ['commentaire_facture' => "Commentaire 1"];
+
+		$this->obj = ATF::affaire();
+		try{
+			ATF::affaire()->setInfos($data);
+		}catch(errorATF $e) {
+			$this->assertSame('[SQL Error] : 1064 : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \')\' at line 1 [Query] : UPDATE `affaire` SET `id_affaire` = null,`commentaire_facture` = "Commentaire 1" WHERE (id_affaire =)', $e->getMessage());
+		}
+
+
+
+
+	}
+
+	/**
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @testdox Set Infos commentaire facture 1
+	 */
+	public function test__setInfos(){
+		$data = ['id_affaire'=> "8657b31577e56fcff8664b356ff1d2c2",
+	 			 'commentaire_facture' => "Commentaire 1"];
+
+		$this->obj = ATF::affaire();
+		ATF::affaire()->setInfos($data);
+		ATF::affaire()->select($data["id_affaire"], "commentaire_facture");
+
+		$this->assertSame("Commentaire", ATF::affaire()->select($data["id_affaire"], "commentaire_facture"));
+	}
+
+
+	/**
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @testdox Set Infos commentaire facture 1
+	 */
+	public function test__setInfos2(){
+		$data = ['id_affaire'=> "8657b31577e56fcff8664b356ff1d2c2",
+	 			 'commentaire_facture2' => "Commentaire 2"];
+
+		$this->obj = ATF::affaire();
+		ATF::affaire()->setInfos($data);
+
+		ATF::affaire()->select($data["id_affaire"], "commentaire_facture2");
+
+		$this->assertSame("Commentaire 2", ATF::affaire()->select($data["id_affaire"], "commentaire_facture2"));
+	}
+
+	/**
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @testdox Set Infos commentaire facture 1
+	 */
+	public function test__setInfos3(){
+		$data = ['id_affaire'=> "8657b31577e56fcff8664b356ff1d2c2",
+	 			 'commentaire_facture3' => "Commentaire 3"];
+
+		$this->obj = ATF::affaire();
+		ATF::affaire()->setInfos($data);
+		ATF::affaire()->select($data["id_affaire"], "commentaire_facture3");
+
+		$this->assertSame("Commentaire 3", ATF::affaire()->select($data["id_affaire"], "commentaire_facture3"));
+	}
 
 
 
