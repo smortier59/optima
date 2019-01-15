@@ -11,7 +11,7 @@ class souscription_cleodis extends souscription {
   public $id_agence = 1; // ID De l'agence qui sera attaché aux éléments
   public $fournisseur = 246; // ID Du fournisseur par défaut qui sera attaché aux éléments DEFAULT : cléodis
 
-  public $id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
+  public $id_partenaire = NULL;
 
 
   /*--------------------------------------------------------------*/
@@ -37,6 +37,10 @@ class souscription_cleodis extends souscription {
         ATF::societe()->q->reset()->where("siret", "45122067700087");
         $boulpro = ATF::societe()->select_row();
         $this->id_partenaire = $boulpro["id_societe"];
+      break;
+
+      case 'btwin':
+        $this->id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
       break;
 
     }
