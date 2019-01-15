@@ -17,7 +17,7 @@ class souscription_cleodis extends souscription {
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
   /*--------------------------------------------------------------*/
-  public function __construct() { 
+  public function __construct() {
     parent::__construct();
     $this->table = "affaire";
   }
@@ -31,6 +31,15 @@ class souscription_cleodis extends souscription {
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
+
+    switch ($post['site_associe']) {
+      case 'boulangerpro':
+        ATF::societe()->q->reset()->where("siret", "45122067700087");
+        $boulpro = ATF::societe()->select_row();
+        $this->id_partenaire = $boulpro["id_societe"];
+      break;
+
+    }
 
     $this->checkIBAN($post['iban']);
 
@@ -90,7 +99,7 @@ class souscription_cleodis extends souscription {
           "BIC"=>$societe["BIC"],
           "id_magasin"=>$post["id_magasin"]
         );
-        
+
         // On stock le JSON du pack complet au cas où.
         if ($post['id_pack_produit']) {
           foreach ($post['id_pack_produit'] as $id_pack_produit) {
@@ -226,7 +235,7 @@ class souscription_cleodis extends souscription {
 
           $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
 
-        } 
+        }
 
 
         if ($toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]) {
@@ -322,7 +331,7 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__id_pack_produit"=>$value['id_pack_produit'],
           "commande_ligne__dot__sous_categorie"=>$value['sous_categorie'],
           "commande_ligne__dot__pack_produit"=>$value['pack_produit'],
-          "commande_ligne__dot__ean"=>$value['ean'],    
+          "commande_ligne__dot__ean"=>$value['ean'],
           "commande_ligne__dot__id_categorie"=>$value['id_categorie'],
           "commande_ligne__dot__categorie"=>$value['categorie'],
           "commande_ligne__dot__commentaire_produit"=>$value['commentaire'],
@@ -575,7 +584,7 @@ class souscription_cleodis extends souscription {
   * Appel Sell & Sign, store les documents signés dans Optima
   * @author Quentin JANON <qjanon@absystech.fr>
   * @param array $post["id_affaire"]
-  */ 
+  */
   public function _storeSignedDocuments($post){
 
     switch ($post['type']) {
