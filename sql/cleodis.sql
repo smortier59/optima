@@ -47,3 +47,7 @@ ALTER TABLE `commande_ligne` ADD `id_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAU
 	ADD INDEX (`id_categorie`);
 
 ALTER TABLE `affaire` ADD `snapshot_pack_produit` TEXT NULL DEFAULT NULL AFTER `hash_panier`;
+
+#Systeme Bureau Valley Toshiba-www
+ALTER TABLE `pack_produit` ADD `specifique_partenaire` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `etat`, ADD INDEX (`specifique_partenaire`);
+ALTER TABLE `pack_produit` ADD FOREIGN KEY (`specifique_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;

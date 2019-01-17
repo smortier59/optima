@@ -32,6 +32,7 @@ class pack_produit extends classes_optima {
 			,'etat'
 			,'id_pack_produit_besoin'
 			,'id_pack_produit_produit'
+			,'specifique_partenaire'
 		);
 
 
@@ -58,6 +59,7 @@ class pack_produit extends classes_optima {
 		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->field_nom = "nom";
+		$this->foreign_key["specifique_partenaire"] = "societe";
 
 		$this->fieldstructure();
 
