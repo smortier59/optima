@@ -49,28 +49,50 @@ class souscription_cleodis extends souscription {
 
     ATF::db($this->db)->begin_transaction();
     try {
-        // Gestion du code client
-        $codeClient = $societe['code_client'];
+      // Gestion du code client
+      $codeClient = $societe['code_client'];
 
-        if (!$codeClient) {
-          // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-          $codeClient = ATF::societe()->getCodeClient($societe, self::getPrefixCodeClient($post['site_associe']));
-          $toUpdate = array(
-            'id_societe' => $societe["id_societe"],
-            'code_client' => $codeClient
-          );
-          ATF::societe()->u($toUpdate);
+
+      if (!$codeClient) {
+        // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+        $codeClient = ATF::societe()->getCodeClient($societe, self::getPrefixCodeClient($post['site_associe']));
+        $toUpdate = array(
+          'id_societe' => $societe["id_societe"],
+          'code_client' => $codeClient
+        );
+        ATF::societe()->u($toUpdate);
+      }
+
+
+      // On update le signataire de la societe pour y mettre celui qu'on reçoit.
+      if ($post['id_contact']) {
+        $toUpdate = array(
+          'id_societe' => $societe["id_societe"],
+          'id_contact_signataire' => $post['id_contact']
+        );
+        ATF::societe()->u($toUpdate);
+      }
+
+      //On check les durées sur chaque pack pour regrouper/affaire
+      $lignes = json_decode($post["produits"], true);
+      $post["produits"] = $affaires = $lignes_par_duree = array();
+
+
+      foreach ($lignes as $key => $value) {
+        $duree = ATF::pack_produit()->getDureePack($value["id_pack_produit"]);
+        $lignes_par_duree[$duree][] = $value;
+      }
+
+      foreach ($lignes_par_duree as $key => $value) {
+        $post["produits"] = json_encode($value);
+
+        //On récupère les id pack de chaque ligne pour le libelle de l'affaire
+        $post['id_pack_produit'] = array();
+        foreach ($value as $k => $v) {
+          $post['id_pack_produit'][] = $v["id_pack_produit"];
         }
-
-        // On update le signataire de la societe pour y mettre celui qu'on reçoit.
-        if ($post['id_contact']) {
-          $toUpdate = array(
-            'id_societe' => $societe["id_societe"],
-            'id_contact_signataire' => $post['id_contact']
-          );
-          ATF::societe()->u($toUpdate);
-        }
-
+        // On retire les doublons
+        $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
@@ -80,7 +102,7 @@ class souscription_cleodis extends souscription {
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
 
-
+        $affaires[] = $id_affaire;
 
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
@@ -104,6 +126,7 @@ class souscription_cleodis extends souscription {
           "id_magasin"=>$post["id_magasin"]
         );
 
+
         // On stock le JSON du pack complet au cas où.
         if ($post['id_pack_produit']) {
           foreach ($post['id_pack_produit'] as $id_pack_produit) {
@@ -119,6 +142,7 @@ class souscription_cleodis extends souscription {
 
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
+
         ATF::affaire()->u($affToUpdate);
 
 
@@ -130,16 +154,19 @@ class souscription_cleodis extends souscription {
           $noticeAssurance = ATF::pdf()->generic("noticeAssurance",$id_affaire,true);
           ATF::affaire()->store($s, $id_affaire, "noticeAssurance", $noticeAssurance);
         }
-
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
 
+       // Mise à jour du panier avec l'ID affaire et le statut 'affaire'
+      }
+
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
+
         throw $e;
     }
     ATF::db($this->db)->commit_transaction();
-    return $id_affaire;
+    return $affaires;
   }
 
   /**
