@@ -261,15 +261,9 @@ class souscription_cleodis extends souscription {
           $id_pack = $packProduitLigne['id_pack_produit'];
 
           $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
-<<<<<<< HEAD
 
           $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
 
-=======
-
-          $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
-
->>>>>>> 220c9969b3a81ec24d8448bc2a3747fc24d668b3
         }
 
 
