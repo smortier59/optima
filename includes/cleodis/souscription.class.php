@@ -123,6 +123,7 @@ class souscription_cleodis extends souscription {
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
           "BIC"=>$societe["BIC"],
+          "RUM"=>$societe["RUM"],
           "id_magasin"=>$post["id_magasin"]
         );
 
@@ -388,7 +389,9 @@ class souscription_cleodis extends souscription {
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
-    $id_affaire = $post["id"];
+    //$id_affaire = $post["id"];
+    $id_affaire = $post[0]["id"];
+
 
     $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
     if (!$id_societe) {
