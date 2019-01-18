@@ -11,7 +11,7 @@ class souscription_cleodis extends souscription {
   public $id_agence = 1; // ID De l'agence qui sera attaché aux éléments
   public $fournisseur = 246; // ID Du fournisseur par défaut qui sera attaché aux éléments DEFAULT : cléodis
 
-  public $id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
+  public $id_partenaire = NULL;
 
 
   /*--------------------------------------------------------------*/
@@ -31,6 +31,19 @@ class souscription_cleodis extends souscription {
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
+
+    switch ($post['site_associe']) {
+      case 'boulangerpro':
+        ATF::societe()->q->reset()->where("siret", "45122067700087");
+        $boulpro = ATF::societe()->select_row();
+        $this->id_partenaire = $boulpro["id_societe"];
+      break;
+
+      case 'btwin':
+        $this->id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
+      break;
+
+    }
 
     $this->checkIBAN($post['iban']);
 
@@ -109,11 +122,27 @@ class souscription_cleodis extends souscription {
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
-          "RUM"=>$societe["RUM"],
-          "BIC"=>$societe["BIC"]
+          "BIC"=>$societe["BIC"],
+          "id_magasin"=>$post["id_magasin"]
         );
 
+        // On stock le JSON du pack complet au cas où.
+        if ($post['id_pack_produit']) {
+          foreach ($post['id_pack_produit'] as $id_pack_produit) {
+            $pack_produit = ATF::pack_produit()->select($id_pack_produit);
+            if (!$pack_produit) continue;
+            $pack_produit['lignes'] = ATF::pack_produit_ligne()->select_special('id_pack_produit', $id_pack_produit);
+            foreach ($pack_produit['lignes'] as $k=>$ligne) {
+              $pack_produit['lignes'][$k]['produit'] = ATF::produit()->select($ligne['id_produit']);
+            }
+          }
+          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit);
+        }
+
+        //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
+        if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
         ATF::affaire()->u($affToUpdate);
+
 
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
@@ -189,7 +218,7 @@ class souscription_cleodis extends souscription {
         "prix_achat"=>0,
         "type_affaire" => "normal"
     );
-    log::logger($post, 'qjanon');
+
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
     $produits = json_decode($post['produits'], true);
@@ -216,18 +245,32 @@ class souscription_cleodis extends souscription {
         ATF::produit()->q->reset()
           ->addField("loyer")
           ->addField("duree")
-          ->addField("type")
+          ->addField("ean")
+          ->addField("id_sous_categorie")
+          ->addField("visible_sur_site")
           ->addField("prix_achat")
           ->addField("id_fournisseur")
           ->where("id_produit", $produit['id_produit']);
         $produitLoyer = ATF::produit()->select_row();
 
-        log::logger($produitLoyer, "qjanon");
+        if ($produit['id_pack_produit']) {
+          $id_pack = $produit['id_pack_produit'];
+        } else if ($produit['id_pack_produit_ligne']) {
+          ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit_ligne", $produit['id_pack_produit_ligne']);
+          $packProduitLigne = ATF::pack_produit_ligne()->select_row();
+          $id_pack = $packProduitLigne['id_pack_produit'];
 
-        if ($toInsertProduitDevis[$produit['id_produit']]) {
-          $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
+          $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
+
+          $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
+
+        }
+
+
+        if ($toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]) {
+          $toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]['devis_ligne__dot__quantite'] += $produit['quantite'];
         } else {
-          $toInsertProduitDevis[$produit['id_produit']] =  array(
+          $toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']] =  array(
             "devis_ligne__dot__produit"=> $produit['produit'],
             "devis_ligne__dot__quantite"=>$produit['quantite'],
             "devis_ligne__dot__type"=>$produitLoyer['type'],
@@ -241,7 +284,21 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__neuf"=>"oui",
             "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
             "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
-            "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
+            "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
+            "devis_ligne__dot__duree"=>$produitLoyer['duree'],
+            "devis_ligne__dot__loyer"=>$produitLoyer['loyer'],
+            "devis_ligne__dot__id_sous_categorie"=>$produitLoyer['id_sous_categorie'],
+            "devis_ligne__dot__id_pack_produit"=>$id_pack,
+            "devis_ligne__dot__sous_categorie"=>ATF::sous_categorie()->nom($produitLoyer['id_sous_categorie']),
+            "devis_ligne__dot__pack_produit"=>ATF::pack_produit()->nom($id_pack),
+            "devis_ligne__dot__ean"=>$produitLoyer['ean'],
+
+            "devis_ligne__dot__id_categorie"=>$souscategorie['id_categorie'],
+            "devis_ligne__dot__categorie"=>ATF::categorie()->nom($souscategorie['id_categorie']),
+            "devis_ligne__dot__commentaire_produit"=>$produitLoyer['commentaire'],
+            "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
+            "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_pdf'],
+            "devis_ligne__dot__ordre"=>$produitLoyer['ordre']
           );
         }
 
@@ -256,60 +313,6 @@ class souscription_cleodis extends souscription {
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
     $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
-
-
-
-    // foreach ($produits as $k=>$produit) {
-    //     ATF::produit()->q->reset()
-    //       ->addField("loyer")
-    //       ->addField("duree")
-    //       ->addField("type")
-    //       ->addField("prix_achat")
-    //       ->addField("id_fournisseur")
-    //       ->where("id_produit", $produit['id_produit']);
-    //     $produitLoyer = ATF::produit()->select_row();
-
-    //     log::logger($produitLoyer, "qjanon");
-
-    //     $duree[$produitLoyer['duree']][] = $produitLoyer;
-
-    // }
-
-    // foreach ($duree as $d => $produits) {
-    //   foreach ($produits as $k=>$produit) {
-
-    //       if ($toInsertProduitDevis[$produit['id_produit']]) {
-    //         $toInsertProduitDevis[$produit['id_produit']]['devis_ligne__dot__quantite'] += $produit['quantite'];
-    //       } else {
-    //         $toInsertProduitDevis[$produit['id_produit']] =  array(
-    //           "devis_ligne__dot__produit"=> $produit['produit'],
-    //           "devis_ligne__dot__quantite"=>$produit['quantite'],
-    //           "devis_ligne__dot__type"=>$produitLoyer['type'],
-    //           "devis_ligne__dot__ref"=>$produit['ref'],
-    //           "devis_ligne__dot__prix_achat"=>$produitLoyer["prix_achat"],
-    //           "devis_ligne__dot__id_produit"=>$produit['produit'],
-    //           "devis_ligne__dot__id_fournisseur"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur,
-    //           "devis_ligne__dot__visibilite_prix"=>"invisible",
-    //           "devis_ligne__dot__date_achat"=>"",
-    //           "devis_ligne__dot__commentaire"=>"",
-    //           "devis_ligne__dot__neuf"=>"oui",
-    //           "devis_ligne__dot__serial"=>$produit['serial'] ? $produit['serial'] : '',
-    //           "devis_ligne__dot__id_produit_fk"=>$produit['id_produit'],
-    //           "devis_ligne__dot__id_fournisseur_fk"=>$produitLoyer['id_fournisseur'] ? $produitLoyer['id_fournisseur'] : $this->id_fournisseur
-    //         );
-    //       }
-
-    //       $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
-    //       $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
-
-    //   }
-    //   // Faire sauter les index
-    //   $toInsertProduitDevis = array_values($toInsertProduitDevis);
-
-    //   $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
-    //   $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
-    //   $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
-    // }
 
     return $id_devis;
   }
@@ -350,7 +353,21 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__id_produit_fk"=>$value["id_produit"],
           "commande_ligne__dot__visible"=>$value["visible"],
           "commande_ligne__dot__serial"=>$value['serial'] ? $value['serial'] : '',
-        );
+
+          "commande_ligne__dot__duree"=>$value['duree'],
+          "commande_ligne__dot__loyer"=>$value['loyer'],
+          "commande_ligne__dot__id_sous_categorie"=>$value['id_sous_categorie'],
+          "commande_ligne__dot__id_pack_produit"=>$value['id_pack_produit'],
+          "commande_ligne__dot__sous_categorie"=>$value['sous_categorie'],
+          "commande_ligne__dot__pack_produit"=>$value['pack_produit'],
+          "commande_ligne__dot__ean"=>$value['ean'],
+          "commande_ligne__dot__id_categorie"=>$value['id_categorie'],
+          "commande_ligne__dot__categorie"=>$value['categorie'],
+          "commande_ligne__dot__commentaire_produit"=>$value['commentaire'],
+          "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
+          "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
+          "commande_ligne__dot__ordre"=>$value['ordre']
+      );
     }
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
 
@@ -366,6 +383,8 @@ class souscription_cleodis extends souscription {
   * @param array $infos Simple dimension des champs à insérer
   */
   public function _signAndGetPDF($post,$get) {
+    log::logger("=============================","souscription");
+    log::logger($post,"souscription");
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
@@ -375,6 +394,11 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
+
+    if (!$post['type']) {
+      throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
+    }
+
     $societe = ATF::societe()->select($id_societe);
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
     // Gestion de la reference société
@@ -389,29 +413,40 @@ class souscription_cleodis extends souscription {
     // Gestion du code client
     $codeClient = $societe['code_client'];
 
-    log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+    log::logger('CODE CLIENT = '.$codeClient,"souscription");
     if (!$codeClient) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
       $codeClient = ATF::societe()->getCodeClient($societe, $post['site_associe']);
       $toUpdate['code_client'] = $codeClient;
-      log::logger('CODE CLIENT = '.$codeClient,"qjanon");
+      log::logger('CODE CLIENT = '.$codeClient,"souscription");
     }
     //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
     if($societe["tel"] === NULL) {
       $toUpdate['tel'] = $tel;
     }
 
+    log::logger('UPDATE SOCIETE',"souscription");
+    log::logger($toUpdate,"souscription");
     ATF::societe()->u($toUpdate);
 
     if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500);
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
+    log::logger('GET CONTACT',"souscription");
+    log::logger($contact,"souscription");
+
+    log::logger('CHECK IBAN',"souscription");
+    log::logger($iban,"souscription");
 
     $this->checkIBAN($iban);
+
+    log::logger('UPDATE CONTACT',"souscription");
+    log::logger(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel),"souscription");
 
     ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
 
     //On stocke les infos de signature sur l'affaire
+    log::logger('UPDATE AFFAIRE '.$id_affaire,"souscription");
     ATF::affaire()->u(array('id_affaire'=>$id_affaire,
                             'tel_signature'=> $tel,
                             'mail_signataire'=> $contact["email"],
@@ -423,6 +458,7 @@ class souscription_cleodis extends souscription {
     ATF::commande()->q->reset()->where('commande.id_affaire', $id_affaire);
     $contrat = ATF::commande()->select_row();
 
+    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],"souscription");
     switch ($post['site_associe']) {
       case 'btwin':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
@@ -470,8 +506,6 @@ class souscription_cleodis extends souscription {
       break;
     }
 
-
-
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
@@ -481,13 +515,22 @@ class souscription_cleodis extends souscription {
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
-      "email"=>$societe["particulier_email"],
       "company_name"=>$societe["societe"],
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>$f
     );
+
+    if ($post['type'] == 'particulier') {
+      $return["email"]=$societe["particulier_email"];
+    } else if ($post['type'] == 'professionnel') {
+      $return["email"]=$contact["email"];
+    } else {
+      $return['email'] = $societe["particulier_email"];
+    }
+    // log::logger("RETOUR","souscription");
+    // log::logger($return,"souscription");
     return $return;
   }
 
@@ -571,22 +614,44 @@ class souscription_cleodis extends souscription {
   * @author Quentin JANON <qjanon@absystech.fr>
   * @param array $post["id_affaire"]
   */
-  public function _storeDocumentsInAffaire($post){
-    $file = $this->filepath("46638", 'retour', null, 'cleodis');
-    log::logger('FILE = '.$file, 'qjanon');
-    // $file = "/home/qjanon/tmp.pdf";
-    log::logger(array_keys($post), 'qjanon');
-    log::logger($post['data'], 'qjanon');
-    log::logger(mb_detect_encoding($post['data']), 'qjanon');
+  public function _storeSignedDocuments($post){
+
+    switch ($post['type']) {
+      case 'mandatSellAndSign': // Contrat signé
+      case 'mandatSellAndSign.pdf': // Contrat signé
+        $module = "commande";
+        ATF::commande()->q->reset()->addfield("id_commande")->where('commande.id_affaire', $post["id_affaire"]);
+        $id = ATF::commande()->select_cell();
+        $type = 'retour';
+      break;
+      case 'contrat-PV': // PV signé
+      case 'contrat-PV.pdf': // PV signé
+        $module = "commande";
+        ATF::commande()->q->reset()->addfield("id_commande")->where('commande.id_affaire', $post["id_affaire"]);
+        $id = ATF::commande()->select_cell();
+        $type = 'retourPV';
+      break;
+      case 'notice_assurance': // Notice d'assurance
+      case 'notice_assurance.pdf': // Notice d'assurance
+        $module = "affaire";
+        $id = $post['id_affaire'];
+        $type = 'retourNoticeAssurance';
+      break;
+    }
+
+    if (!$id) throw new Exception('Il manque l\'identifiant', 500);
+    if (!$module) throw new Exception('Il manque le module', 500);
+
+    $file = ATF::getClass($module)->filepath($id, $type, null, 'cleodis');
+
     try {
       util::file_put_contents($file,base64_decode($post['data']));
-
-      log::logger('FILE EXIST = '.file_exists($file), 'qjanon');
+      $return = true;
     } catch (Exception $e) {
       $return  = array("error"=>true, "data"=>$e);
     }
 
-    die();
+    return $return;
   }
 
   private function getPrefixCodeClient($site_associe) {
