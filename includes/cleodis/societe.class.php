@@ -1603,6 +1603,7 @@ class societe_cleodis extends societe {
    * @return [type]       [description]
    */
   public function _infosCredisafePartenaire($get, $post){
+    log::logger($post, "creditsafe");
     $utilisateur  = ATF::$usr->get("contact");
     $apporteur = $utilisateur["id_societe"];
 
@@ -1622,8 +1623,7 @@ class societe_cleodis extends societe {
        $data = self::getInfosFromCREDITSAFE($post);
     }
 
-
-
+    log::logger($data, "creditsafe");
 
     if($data){
         $gerants = $data["gerant"];
@@ -1726,8 +1726,9 @@ class societe_cleodis extends societe {
         log::logger("====================================================================", "creditsafe");
         log::logger("ERREUR : Aucune donnée dans DATA dans la fonction ".__CLASS__."/".__FUNCTION__, "creditsafe");
         log::logger($data, "creditsafe");
+        log::logger($post, "creditsafe");
 
-        throw new errorATF("erreurCS",404);
+        throw new errorATF("erreurCS : Il n'y a aucun retour de créditsafe",500);
     }
 
   }

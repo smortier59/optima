@@ -5,6 +5,9 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
 
+
+
+/*
 $type = array(
 	"Fixe"=>"fixe",
 	"portable"=>"portable",
@@ -24,26 +27,26 @@ ATF::db()->begin_transaction();
 ATF::db()->commit_transaction();
 
 
-$directory = dirname(__FILE__)."/"; 
-$folder_cleodis = dirname(__FILE__)."/../../../../data/cleodis/"; 
- 
-//Copie des images de produit 
-foreach ($produits as $key => $value) { 
-    $images = glob($directory . "/produit/".$key.".*"); 
-    if($images[0]){ 
-        if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){ 
-            echo "Echec de copy de l'image du produit ".$key."\n"; 
-        } 
-    } 
-} 
+$directory = dirname(__FILE__)."/";
+$folder_cleodis = dirname(__FILE__)."/../../../../data/cleodis/";
 
-//Copie des images de pack 
-foreach ($packs as $key => $value) { 
-    $images = glob($directory . "/pack/".$key.".*"); 
-    if($images[0]){ 
-        copy($images[0], $folder_cleodis."pack_produit/".$value.".photo"); 
-    } 
-} 
+//Copie des images de produit
+foreach ($produits as $key => $value) {
+    $images = glob($directory . "/produit/".$key.".*");
+    if($images[0]){
+        if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
+            echo "Echec de copy de l'image du produit ".$key."\n";
+        }
+    }
+}
+
+//Copie des images de pack
+foreach ($packs as $key => $value) {
+    $images = glob($directory . "/pack/".$key.".*");
+    if($images[0]){
+        copy($images[0], $folder_cleodis."pack_produit/".$value.".photo");
+    }
+}
 
 function import_produit(){
 	$fileProduit = "./produit.csv";
@@ -82,17 +85,17 @@ function import_produit(){
 			);
 
 			// Image spécifique
-			$folder_cleodis = __DIR__."/../../../../data/cleodis/"; 
+			$folder_cleodis = __DIR__."/../../../../data/cleodis/";
 			if ($ligne[15] == "LIVRAISON") {
-		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){ 
-		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n"; 
-		        } 
+		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
+		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
+		        }
 			}
 
 			if ($ligne[15] == "EXTENSION GARANTIE") {
-		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){ 
-		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n"; 
-		        } 
+		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
+		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
+		        }
 			}
 
 			if($p){
@@ -255,6 +258,92 @@ function get_sous_categorie($sous_categorie, $categorie){
 	}else{
 		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
 		return ATF::sous_categorie()->i(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
+	}
+}
+
+$fileProduit = "./produit.csv";
+$fpr = fopen($fileProduit, 'rb');
+$entete = fgetcsv($fpr);
+$produits = array();
+try {
+
+	while ($ligne = fgetcsv($fpr)) {
+		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+
+		$ean = $ligne[13];
+
+		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
+		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+
+		$p = ATF::produit()->select_row();
+
+		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "commentaire"=>$ligne[3]));
+
+	}
+
+} catch (errorATF $e) {
+	ATF::db()->rollback_transaction();
+	//print_r($produit);
+	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
+	throw $e;
+}
+*/
+
+
+$fileProduit = "./produit.csv";
+$fpr = fopen($fileProduit, 'rb');
+$entete = fgetcsv($fpr);
+$produits = array();
+try {
+
+	while ($ligne = fgetcsv($fpr)) {
+		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+
+		$ean = $ligne[13];
+
+		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
+		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+		$p = ATF::produit()->select_row();
+
+		$id_categorie = get_categorie($ligne[8]);
+		$id_sous_categorie = get_sous_categorie($ligne[9], $id_categorie);
+
+		$produit = array("id_produit"=>$p["id_produit"],
+						 "id_sous_categorie"=>$id_sous_categorie);
+
+		ATF::produit()->u($produit);
+
+	}
+
+} catch (errorATF $e) {
+	print_r($produit);
+	echo "Produit EAN : ".$ligne[0]." ERREUR\n";
+	print_r($e);
+	throw $e;
+}
+
+
+function get_categorie($categorie){
+	ATF::categorie()->q->reset()->where("categorie", ATF::db()->real_escape_string($categorie), "AND", false, "LIKE");
+	$f = ATF::categorie()->select_row();
+
+	if($f){
+		return $f["id_categorie"];
+	}else{
+		return ATF::categorie()->i(array("categorie"=>ATF::db()->real_escape_string($categorie)));
+	}
+}
+
+function get_sous_categorie($sous_categorie, $categorie){
+	ATF::sous_categorie()->q->reset()->where("sous_categorie", ATF::db()->real_escape_string($sous_categorie), "AND", false, "LIKE")
+									 ->where("id_categorie", ATF::db()->real_escape_string($categorie), "AND", false);
+	$f = ATF::sous_categorie()->select_row();
+
+	if($f){
+		return $f["id_sous_categorie"];
+	}else{
+		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
+		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
 ?>

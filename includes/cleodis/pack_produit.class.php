@@ -21,7 +21,9 @@ class pack_produit extends classes_optima {
 			,'pack_produit.site_associe'
 			,'loyer'=>array("width"=>80,"rowEditor"=>"setInfos")
 			,'duree'=>array("width"=>80,"rowEditor"=>"setInfos")
+			,'id_document_contrat'
 			,'visible_sur_site'=>array("rowEditor"=>"ouinon","renderer"=>"etat","width"=>80)
+
 		);
 
 		$this->colonnes['primary'] = array(
@@ -30,6 +32,7 @@ class pack_produit extends classes_optima {
 			,'etat'
 			,'id_pack_produit_besoin'
 			,'id_pack_produit_produit'
+			,'specifique_partenaire'
 		);
 
 
@@ -56,6 +59,7 @@ class pack_produit extends classes_optima {
 		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 		$this->field_nom = "nom";
+		$this->foreign_key["specifique_partenaire"] = "societe";
 
 		$this->fieldstructure();
 

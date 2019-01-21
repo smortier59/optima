@@ -12,19 +12,42 @@ ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES 
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
-#Multi magasin BTWIN
-ALTER TABLE `magasin` ADD `code` VARCHAR(25) NULL DEFAULT NULL AFTER `magasin`;
-ALTER TABLE `magasin`
-  DROP `entite_lm`,
-  DROP `langue`,
-  DROP `num_magasin_lm`,
-  DROP `afficher`,
-  DROP `email`,
-  DROP `password`;
-ALTER TABLE `magasin` CHANGE `site_associe` `site_associe` ENUM('toshiba','btwin') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
-ALTER TABLE `magasin` ADD `id_societe` MEDIUMINT UNSIGNED NOT NULL;
-ALTER TABLE `magasin` ADD INDEX(`id_societe`);
-ALTER TABLE `magasin` ADD FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_societe`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+-- Ajout des loyer et des infos de pack / produits au niveau de l'affaire
+ALTER TABLE `devis_ligne` ADD `duree` INT(11) NULL DEFAULT NULL AFTER `options`, 
+	ADD `loyer` FLOAT(6,3) NULL DEFAULT NULL AFTER `duree`, 
+	ADD `ean` VARCHAR(14) NULL DEFAULT NULL AFTER `loyer`, 
+	ADD `id_pack_produit` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `ean`, 
+	ADD `id_sous_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `id_pack_produit`, 
+	ADD INDEX (`id_sous_categorie`), ADD INDEX (`id_pack_produit`);
 
-ALTER TABLE `affaire` ADD `id_magasin` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `pays_facturation`;
-ALTER TABLE `affaire` ADD FOREIGN KEY (`id_magasin`) REFERENCES `magasin`(`id_magasin`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `commande_ligne` ADD `duree` INT(11) NULL DEFAULT NULL, 
+	ADD `loyer` FLOAT(6,3) NULL DEFAULT NULL AFTER `duree`, 
+	ADD `ean` VARCHAR(14) NULL DEFAULT NULL AFTER `loyer`, 
+	ADD `id_pack_produit` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `ean`, 
+	ADD `id_sous_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `id_pack_produit`, 
+	ADD INDEX (`id_sous_categorie`), ADD INDEX (`id_pack_produit`);
+
+ALTER TABLE `devis_ligne` ADD `pack_produit` VARCHAR(255) NULL DEFAULT NULL AFTER `id_sous_categorie`, ADD `sous_categorie` VARCHAR(255) NULL DEFAULT NULL AFTER `pack_produit`;
+ALTER TABLE `commande_ligne` ADD `pack_produit` VARCHAR(255) NULL DEFAULT NULL AFTER `id_sous_categorie`, ADD `sous_categorie` VARCHAR(255) NULL DEFAULT NULL AFTER `pack_produit`;
+
+ALTER TABLE `devis_ligne` ADD `id_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `sous_categorie`, 
+	ADD `categorie` VARCHAR(64) NULL DEFAULT NULL AFTER `id_categorie`, 
+	ADD `commentaire_produit` VARCHAR(512) NULL DEFAULT NULL AFTER `categorie`, 
+	ADD `visible_sur_site` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire_produit`, 
+	ADD `visible_pdf` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `visible_sur_site`, 
+	ADD `ordre` INT NOT NULL DEFAULT '1' AFTER `visible_pdf`, 
+	ADD INDEX (`id_categorie`);
+
+ALTER TABLE `commande_ligne` ADD `id_categorie` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `sous_categorie`, 
+	ADD `categorie` VARCHAR(64) NULL DEFAULT NULL AFTER `id_categorie`, 
+	ADD `commentaire_produit` VARCHAR(512) NULL DEFAULT NULL AFTER `categorie`, 
+	ADD `visible_sur_site` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `commentaire_produit`, 
+	ADD `visible_pdf` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `visible_sur_site`, 
+	ADD `ordre` INT NOT NULL DEFAULT '1' AFTER `visible_pdf`, 
+	ADD INDEX (`id_categorie`);
+
+ALTER TABLE `affaire` ADD `snapshot_pack_produit` TEXT NULL DEFAULT NULL AFTER `hash_panier`;
+
+#Systeme Bureau Valley Toshiba-www
+ALTER TABLE `pack_produit` ADD `specifique_partenaire` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `etat`, ADD INDEX (`specifique_partenaire`);
+ALTER TABLE `pack_produit` ADD FOREIGN KEY (`specifique_partenaire`) REFERENCES `societe`(`id_societe`) ON DELETE SET NULL ON UPDATE CASCADE;

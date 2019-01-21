@@ -1452,17 +1452,68 @@ class commande_cleodis extends commande {
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande_fk"]);
 						unset($ligne_commande);
+						$cle=0;
 						foreach($commande_ligne as $k=>$i){
-							$ligne_commande[]=array(
-												"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id"=>$i["id_commande_ligne"]
+
+							if($i["quantite"] > 1){
+								$n = 1;
+								for($n=1; $n<=$i["quantite"];$n++){
+									$cle++;
+									$ligne_commande[]=array(
+												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
+												,"leaf"=>true
+												,"prix"=>$i["prix_achat"]
+												,"quantite"=>1
+												,"icon"=>ATF::$staticserver."images/blank.gif"
+												,"checked"=>false
+										);
+								}
+							}else{
+								$cle++;
+								$ligne_commande[]=array(
+												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
 												,"leaf"=>true
 												,"prix"=>$i["prix_achat"]
 												,"quantite"=>$i["quantite"]
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
 										);
+							}
+
+
 						}
+
+
+
+
+						/*foreach($commande_ligne as $k=>$i){
+							$ligne_commande[]=array(
+									"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+									,"id"=>$i["id_commande_ligne"]
+									,"leaf"=>true
+									,"prix"=>$i["prix_achat"]
+									,"quantite"=>$i["quantite"]
+									,"icon"=>ATF::$staticserver."images/blank.gif"
+									,"checked"=>false
+							);
+
+							/*for($n=1;$n<=$i["quantite"]; $n++){
+								$ligne_commande[]=array(
+										"text"=>$i["produit"]." ".$i["ref"]." (1)"
+										,"id"=>$i["id_commande_ligne"]
+										,"leaf"=>true
+										,"prix"=>$i["prix_achat"]
+										,"quantite"=>1
+										,"icon"=>ATF::$staticserver."images/blank.gif"
+										,"checked"=>false
+								);
+							}*/
+
+						//}
 
 						if ($ligne_commande) {
 							$commande[]=array(

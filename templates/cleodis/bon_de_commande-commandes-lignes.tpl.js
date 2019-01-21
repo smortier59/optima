@@ -21,7 +21,7 @@
 			if (checked && node.parentNode && !node.parentNode.checked && this.getChecked('id',node.parentNode).length===1) {
 				node.parentNode.getUI().toggleCheck(checked);
 			}
-					
+
 			/* Dérouler tous les parcs */
 			if(checked){
 				node.expand();
@@ -52,13 +52,13 @@
 				}
 				var prixmaj=true;
 			}
-			
+
 			if(prixmaj==true){
 				Ext.ComponentMgr.get('bon_de_commande[prix]').setValue(ATF.formatNumeric(prix));
 				Ext.ComponentMgr.get('bon_de_commande[prix_cleodis]').setValue(ATF.formatNumeric(prix));
 			}
 
-			Ext.getCmp('commandes').setValue(this.getChecked('id').join(','));
+			Ext.getCmp('commandes').setValue(this.getChecked('id_commande_ligne').join(','));
 		}
 	}
 }),{

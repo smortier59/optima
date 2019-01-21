@@ -245,9 +245,11 @@ class parc_cleodis extends classes_optima {
 		$serial["id_produit"]=$item["id_produit"];
 		$serial["existence"]="actif";
 
-		$commande_ligne["serial"].=" ".$item["serial"];
-		ATF::commande_ligne()->u($commande_ligne);
-
+		// On met à jour le serial de contrat ssi il n'est pas encore présent dedans
+		if (!(strpos($commande_ligne["serial"], $item["serial"]) !== false)) {
+			$commande_ligne["serial"].=" ".$item["serial"];
+			ATF::commande_ligne()->u($commande_ligne);
+		}
 		/*
 		if($this->parcSerialIsActif($serial["serial"])){
 			throw new errorATF("Impossible d'insérer ce parc car un parc ACTIF existe déjà avec ce même serial. (serial=".$serial["serial"].")",347);
