@@ -391,9 +391,13 @@ class souscription_cleodis extends souscription {
     $iban = $post["iban"];
     $id_affaire = $post["id"];
 
-    log::logger("ID Affaire : ".$id_affaire , "souscription");
+
+
+    log::logger("ID Affaire --> " , "souscription");
+    log::logger($id_affaire , "souscription");
     $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
-    log::logger("ID Societe : ".$id_societe , "souscription");
+    log::logger("ID Societe : " , "souscription");
+    log::logger($id_societe , "souscription");
 
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
