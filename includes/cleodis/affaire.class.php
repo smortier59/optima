@@ -2405,6 +2405,7 @@ class affaire_cleodis extends affaire {
 
 			$devis = ATF::devis()->select($id_devis);
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
+			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
