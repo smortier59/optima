@@ -87,7 +87,7 @@ class societe extends classes_optima {
 				,"longitude"
 			))
 		);
-		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
+		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true);
 
 		// Informations supplémentaires de facturation
 		$this->colonnes['panel']['facturation_fs'] = array(
@@ -121,9 +121,9 @@ class societe extends classes_optima {
 		// Panel prinicpal des coordonnées
 		$this->colonnes['panel']['coordonnees'] = array(
 			"adresse_complete"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'adresse_complete_fs')
+			,"coordonnees_supplementaires"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'coordonnees_supplementaires_fs')
 			,"adresse_facturation_complete"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'adresse_facturation_complete_fs')
 			,"facturation"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'facturation_fs')
-			,"coordonnees_supplementaires"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'coordonnees_supplementaires_fs')
 			,"codes"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'codes_fs')
 		);
 		$this->panels['coordonnees'] = array("visible"=>true);
