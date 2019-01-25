@@ -74,21 +74,6 @@ class societe extends classes_optima {
 		);
 		$this->panels['adresse_facturation_complete_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
 
-		// Coordonnées supplémentaires
-		$this->colonnes['panel']['coordonnees_supplementaires_fs'] = array(
-			"tel_complet"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
-				"tel"=>array("quick_update"=>true,"renderer"=>"tel","custom"=>true,"tel"=>true)
-				,"fax"=>array("renderer"=>"tel")
-			))
-			,"email"=>array("quick_update"=>true)
-			,"web"
-			,"coordonnees_gps"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
-				"latitude"
-				,"longitude"
-			))
-		);
-		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-
 		// Informations supplémentaires de facturation
 		$this->colonnes['panel']['facturation_fs'] = array(
 			"banque"
@@ -107,6 +92,21 @@ class societe extends classes_optima {
 			))
 		);
 		$this->panels['facturation_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
+
+		// Coordonnées supplémentaires
+		$this->colonnes['panel']['coordonnees_supplementaires_fs'] = array(
+			"tel_complet"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+				"tel"=>array("quick_update"=>true,"renderer"=>"tel","custom"=>true,"tel"=>true)
+				,"fax"=>array("renderer"=>"tel")
+			))
+			,"email"=>array("quick_update"=>true)
+			,"web"
+			,"coordonnees_gps"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+				"latitude"
+				,"longitude"
+			))
+		);
+		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
 
 		// Coordonnées supplémentaires (codes)
 		$this->colonnes['panel']['codes_fs'] = array(
