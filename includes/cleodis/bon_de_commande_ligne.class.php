@@ -120,32 +120,38 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 		if ($sa = $this->select_all()) {
 			// Maquillage des devis_ligne en commande_ligne
 			$k=0;
+			$produit_key = array();
 			foreach ($sa["data"] as $kRow => $row) {
 				$id_commande_ligne=$this->select($row["bon_de_commande_ligne.id_bon_de_commande_ligne"],"id_commande_ligne");
 				$commande_ligne=ATF::commande_ligne()->select($id_commande_ligne);
 				$type=ATF::produit()->select($commande_ligne["id_produit"],"type");
-
 				if((!$commande_ligne["id_affaire_provenance"] && $type!="sans_objet") && $commande_ligne){
+
+					if(isset($produit_key[$commande_ligne["id_commande_ligne"]])){
+						$produit_key[$commande_ligne["id_commande_ligne"]] += 1;
+					}else{
+						$produit_key[$commande_ligne["id_commande_ligne"]] = 0;
+					}
+
 					$spy_add_ligne = true;
 
 					if($commande_ligne["serial"]){
 						$serials = explode(" ",$commande_ligne["serial"]);
-						if(!isset($serials[$k])){
+						if(!isset($serials[$produit_key[$commande_ligne["id_commande_ligne"]]])){
 							$row["bon_de_commande_ligne.serial"]="";
-
 						}else{
 							//Si il y a un serial sur la ligne de commande, il faut verifier qu'il y a bien un parc pour ce serial, sinon il faut l'ajouter
 							$id_affaire = ATF::commande()->select($commande_ligne["id_commande"], "id_affaire");
 
 							ATF::parc()->q->reset()->where("parc.id_affaire", $id_affaire)
-													->where("parc.serial", $serials[$k])
+													->where("parc.serial", $serials[$produit_key[$commande_ligne["id_commande_ligne"]]])
 													->where("parc.id_produit", $commande_ligne["id_produit"]);
 							$parc_exist = ATF::parc()->select_row();
 
 							if($parc_exist){
 								$spy_add_ligne = false;
 							}else{
-								$row["bon_de_commande_ligne.serial"]= $serials[$k];
+								$row["bon_de_commande_ligne.serial"] = $serials[$produit_key[$commande_ligne["id_commande_ligne"]]];
 							}
 						}
 					}
