@@ -10,3 +10,7 @@ DELETE FROM `pack_produit_ligne` WHERE id_pack_produit NOT IN (SELECT id_pack_pr
 -- Contraintes
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit`(`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- Boulanger PRO
+ALTER TABLE `produit` ADD `new_prix` DECIMAL(10,2) UNSIGNED NULL DEFAULT NULL AFTER `prix_achat`;

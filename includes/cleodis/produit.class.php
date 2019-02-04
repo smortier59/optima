@@ -551,6 +551,19 @@ class produit_cleodis extends produit {
 		return $this->select_all();
 	}
 
+	/**
+	* Retour tous les packs où l'on trouve le produit
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function getPacks($id_produit) {
+		ATF::pack_produit_ligne()->q->reset()
+			->addField('id_pack_produit')
+			->where('id_produit', $id_produit);
+		return ATF::pack_produit_ligne()->sa();
+	}
+
+
+
 };
 
 class produit_cleodisbe extends produit_cleodis { };
@@ -762,6 +775,9 @@ class produit_exactitude extends produit {
 		$result["data"]=$this->sa();
 		return $result;
 	}
+
+
+
 
 };
 ?>
