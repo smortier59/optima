@@ -391,7 +391,7 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($id);
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
 
-		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("visible_pdf","oui")->where("id_devis",$this->devis['id_devis']);
 		$this->lignes = ATF::devis_ligne()->sa();
 
 		$this->user = ATF::user()->select($this->devis['id_user']);
@@ -457,7 +457,7 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($id);
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
 
-		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("visible_pdf","oui")->where("id_devis",$this->devis['id_devis']);
 		$this->lignes = ATF::devis_ligne()->sa();
 
 		$this->user = ATF::user()->select($this->devis['id_user']);
@@ -1957,7 +1957,7 @@ class pdf_cleodis extends pdf {
 		$this->colsProduitAvecDetailFirst = array("border"=>"TL","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduitAvecDetailFirst");
 		$this->colsProduitAvecDetailLast = array("border"=>"TR","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduitAvecDetailLast");
 		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
-		ATF::commande_ligne()->q->reset()->where("visible","oui")->where("id_commande",$this->commande['id_commande']);
+		ATF::commande_ligne()->q->reset()->where("visible","oui")->where("visible_pdf","oui")->where("id_commande",$this->commande['id_commande']);
 		$this->lignes = ATF::commande_ligne()->sa();
 
 		$this->devis = ATF::devis()->select($this->commande['id_devis']);
@@ -3756,13 +3756,13 @@ class pdf_cleodis extends pdf {
 				," "
 				," "
 				,"[/SignatureContractant]"
-			);		
+			);
 		} else {
 			$cadre = array(
 				"Fait à : ______________________"
 				,"Le : ______________________"
 				,"Nom : ______________________"
-			);		
+			);
 		}
 
 		$this->cadre(25,215,70,60,$cadre,"Locataire");
@@ -3776,14 +3776,14 @@ class pdf_cleodis extends pdf {
 				," "
 				," "
 				,"[/SignatureFournisseur]"
-			);		
+			);
 		} else {
 			$cadre = array(
 				"Fait à : ______________________"
 				,"Le : ______________________"
 				,"Nom : ______________________"
 				,"Qualité : ______________________"
-			);		
+			);
 		}
 
 		$this->cadre(115,215,70,60,$cadre,"Loueur");
@@ -4224,7 +4224,24 @@ class pdf_cleodis extends pdf {
 	public function initBDC($id,$s) {
 		$this->bdc = ATF::bon_de_commande()->select($id);
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
-		$this->lignes = ATF::bon_de_commande_ligne()->sa();
+		$bdclignes = ATF::bon_de_commande_ligne()->sa();
+
+		$lignes = array();
+		foreach($bdclignes as $k=>$i) {
+			if($lignes[$i["id_commande_ligne"]]){
+				$lignes[$i["id_commande_ligne"]]["quantite"] += $i["quantite"];
+				$lignes[$i["id_commande_ligne"]]["prix"] = $i["prix"];
+				$lignes[$i["id_commande_ligne"]]["prix_ttc"] = $i["prix_ttc"];
+			}else{
+				$lignes[$i["id_commande_ligne"]] = $i;
+			}
+		}
+
+		foreach ($lignes as $key => $value) {
+			$this->lignes[] = $value;
+		}
+
+		log::logger($this->lignes , "mfleurquin");
 
 		$this->client = ATF::societe()->select($this->bdc['id_societe']);
 		$this->user = ATF::user()->select($this->bdc['id_user']);
@@ -4342,6 +4359,7 @@ class pdf_cleodis extends pdf {
 		if ($this->lignes) {
 			$head = array("Référence","Désignation","Quantité","P.U","Total");
 			$w = array(30,100,20,20,20);
+
 			foreach($this->lignes as $k=>$i) {
 				if ($i['id_produit']) $produit = ATF::produit()->select($i['id_produit']);
 				$data[] = array(
