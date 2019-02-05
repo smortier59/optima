@@ -255,16 +255,23 @@ class souscription_cleodis extends souscription {
 
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
+
+          //Il faut récupérer l'affichage sur PDF
+          ATF::pack_produit_ligne()->q->reset()
+                                   ->where("id_pack_produit", $produit['id_pack_produit'])
+                                   ->where("id_produit", $produit['id_produit']);
+          $packProduitLigne = ATF::pack_produit_ligne()->select_row();
+          $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
+
         } else if ($produit['id_pack_produit_ligne']) {
           ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit_ligne", $produit['id_pack_produit_ligne']);
           $packProduitLigne = ATF::pack_produit_ligne()->select_row();
           $id_pack = $packProduitLigne['id_pack_produit'];
 
-          $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
-
-          $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
-
         }
+
+        $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
+        $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
 
 
         if ($toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]) {
