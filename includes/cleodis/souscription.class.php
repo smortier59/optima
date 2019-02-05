@@ -298,7 +298,7 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__categorie"=>ATF::categorie()->nom($souscategorie['id_categorie']),
             "devis_ligne__dot__commentaire_produit"=>$produitLoyer['commentaire'],
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
-            "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_pdf'],
+            "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_sur_pdf'],
             "devis_ligne__dot__ordre"=>$produitLoyer['ordre']
           );
         }
