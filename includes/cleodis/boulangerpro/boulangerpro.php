@@ -7,7 +7,6 @@ class boulangerpro {
 
     public function _majPrix () {
         require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
-
         if (__DEV__) {
           $id_fournisseur = 28973;
           $host = "https://test.api.boulanger.pro/v2/";

@@ -18,7 +18,7 @@ class souscription_cleodis extends souscription {
   /*                   Constructeurs                              */
   /*--------------------------------------------------------------*/
   public function __construct() { 
-    parent::__construct();
+    parent::__construct(); 
     $this->table = "affaire";
   }
 
@@ -646,14 +646,21 @@ class souscription_cleodis extends souscription {
           $response = $api->get('price/'.$produit['ref']);
 
           $r = $response->getContent();
-
+          log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
+          log::logger($r, "batch-majPrixCatalogueProduit");
           if ($r['error_code']) {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
           } else {
+
+
+
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
+            // Mise a jour des taxes du produit
             $p = $r[0];
+            log::logger("Mise à jour des taxes, taxe éco: ".$p['ecotax']." - ecomob : ".$p['ecomob'],"batch-majPrixCatalogueProduit");
+            ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"taxe_ecotaxe"=>$p['ecotax'],"taxe_ecomob"=>$p['ecomob']));
             if ($produit['prix_achat'] != $p['price_tax_excl']) {
               // echo "\n ----- Prix modifié pour ce produit";
               log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
