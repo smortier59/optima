@@ -673,7 +673,6 @@ class souscription_cleodis extends souscription {
                 // echo "\n ----- Produit inclus - on désactive le pack, quantité min ".$produit['min'].", max ".$produit['max'].", defaut ".$produit['defaut'];
                 log::logger("----- Produit inclus - on désactive le pack, quantité min ".$produit['min'].", max ".$produit['max'].", defaut ".$produit['defaut'],"batch-majPrixCatalogueProduit");
                 $packs = ATF::produit()->getPacks($produit['id_produit']);
-
                 foreach ($packs as $pack) {
                   // echo "\n ----- Désactivation pack associé : ".$pack['id_pack_produit'];
                   log::logger("----- Désactivation pack associé : ".$pack['id_pack_produit'],"batch-majPrixCatalogueProduit");
@@ -686,7 +685,7 @@ class souscription_cleodis extends souscription {
                 // echo "\n ----- On désactive le produit car il est non inclus";
                 log::logger("----- On désactive le produit car il est non inclus","batch-majPrixCatalogueProduit");
                 ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
-                $produitDesactive[] = $produit['id_produit'];
+                $produitDesactive[] = $produit;
               }
             } else {
               // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
@@ -708,27 +707,51 @@ class souscription_cleodis extends souscription {
       // print_r($packDesactive);
       // echo "\nProduits désactivés";
       // print_r($produitDesactive);
-
       $sendmail = false;
       $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
-      $infos_mail["objet"] = "[BOULMANGER PRO] Batch prix - packs et produits désactivés";
-      $infos_mail["recipient"] = "qjanon@absystech.fr";
+      $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
+      $infos_mail["recipient"] = "qjanon@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
 
       $infos_mail['body'] = '';
-
+      $fpack = __TEMP_PATH__."packs_desactives.csv";
       if (!empty($packDesactive)) {
+        $filepack= fopen($fpack, "w+");
         $sendmail = true;
-        $infos_mail['body'] .= "Packs désactivés : ".implode($packDesactive, ",");
+        foreach ($packDesactive as $k=>$id_pack) {
+          ATF::pack_produit()->q->reset()->addAllFields('pack_produit')->where("pack_produit.id_pack_produit",$id_pack)->setLimit(1);
+          $p = ATF::pack_produit()->select_row();
+          if ($k == 0) {
+            foreach (array_keys($p) as $col=>$i) $entetes[str_replace('pack_produit.','',$col)] = $i;
+            fputcsv($filepack, $entetes);
+            fputs("\n");
+          }
+          fputcsv($filepack, $p);
+          fputs("\n");
+        }
+        fclose($filepack);
       }
-
+      $fproduit = __TEMP_PATH__."produits_desactives.csv";
       if (!empty($produitDesactive)) {
+        $fileproduit= fopen($fproduit, "w+");
+        fputs($fileproduit, array_keys($produitDesactive)."\n");
         $sendmail = true;
-        $infos_mail['body'] .= "Produits désactivés : ".implode($produitDesactive, ",");
+        foreach ($produitDesactive as $line) {
+          fputcsv($fileproduit, $line);
+          fputs("\n");
+        }
+        fclose($fileproduit);        
       }
-
 
       if ($sendmail) {
         $mail = new mail($infos_mail);
+        if (file_exists($fpack)) {
+          $mail->addFile($fpack, "Packs désactivés.csv");
+          unlink($fpack);
+        }
+        if (file_exists($fproduit)) {
+          $mail->addFile($fproduit, "Produits désactivés.csv");
+          unlink($fproduit);
+        }
         $mail->send();    
       }
       log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
