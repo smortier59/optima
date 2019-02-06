@@ -754,9 +754,9 @@ class souscription_cleodis extends souscription {
         $mail->send();    
       }
       log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
-      log::logger($packDesactive,"batch-majPrixCatalogueProduit");
+      log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
       log::logger("Produits désactivés","batch-majPrixCatalogueProduit");
-      log::logger($produitDesactive,"batch-majPrixCatalogueProduit");
+      log::logger(count($produitDesactive),"batch-majPrixCatalogueProduit");
       log::logger("========== FIN  DU  BATCH ==========\n","batch-majPrixCatalogueProduit");
 
 
