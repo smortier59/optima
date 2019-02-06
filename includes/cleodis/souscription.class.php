@@ -649,7 +649,7 @@ class souscription_cleodis extends souscription {
           log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
           log::logger($r, "batch-majPrixCatalogueProduit");
           if (!$r) {
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE");
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE","batch-majPrixCatalogueProduit");
           } else if ($r['error_code']) {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
