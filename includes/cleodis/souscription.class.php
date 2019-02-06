@@ -648,13 +648,12 @@ class souscription_cleodis extends souscription {
           $r = $response->getContent();
           log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
           log::logger($r, "batch-majPrixCatalogueProduit");
-          if ($r['error_code']) {
+          if (!$r) {
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE";
+          } else if ($r['error_code']) {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
           } else {
-
-
-
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
             // Mise a jour des taxes du produit
