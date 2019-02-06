@@ -147,7 +147,7 @@ function import_pack(){
 				$packs[$ligne[0]] = $p["id_pack_produit"];
 				echo "Pack mis à jour (N° : ".$ligne[0].") \n";
 			}else{
-				$produits[$ligne[0]] = ATF::pack_produit()->i($pack);
+				$packs[$ligne[0]] = ATF::pack_produit()->i($pack);
 				echo "Pack inseré (N° : ".$ligne[0].") \n";
 			}
 		}
