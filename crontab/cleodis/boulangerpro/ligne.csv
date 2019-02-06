@@ -1,877 +1,1749 @@
-N° Pack,Réf Produit,Quantité,Min,Max,option_incluse,option_incluse_obligatoire,Afficher sur le site,Ordre,Visible,Px achat
-2,1069347,1,1,1,non,non,oui,10,Oui,
-3,1087191,1,1,1,non,non,oui,10,Oui,
-6,1094285,1,1,1,non,non,oui,10,Oui,
-17,1094336,1,1,1,non,non,oui,10,Oui,
-18,1053443,1,1,1,non,non,oui,10,Oui,
-4,1049547,1,1,1,non,non,oui,10,Oui,
-28,1076026,1,1,1,non,non,oui,10,Oui,
-1,1066364,1,1,1,non,non,oui,10,Oui,
-5,1104639,1,1,1,non,non,oui,10,Oui,
-19,1032731,1,1,1,non,non,oui,10,Oui,
-65,1088545,1,1,1,non,non,oui,10,Oui,
-16,1093733,1,1,1,non,non,oui,10,Oui,
-61,1050568,1,1,1,non,non,oui,10,Oui,
-7,1067414,1,1,1,non,non,oui,10,Oui,
-25,1069885,1,1,1,non,non,oui,10,Oui,
-47,1107072,1,1,1,non,non,oui,10,Oui,
-15,1096011,1,1,1,non,non,oui,10,Oui,
-26,1083000,1,1,1,non,non,oui,10,Oui,
-66,1101012,1,1,1,non,non,oui,10,Oui,
-46,1094969,1,1,1,non,non,oui,10,Oui,
-45,1084691,1,1,1,non,non,oui,10,Oui,
-14,1096875,1,1,1,non,non,oui,10,Oui,
-27,155051,1,1,1,non,non,oui,10,Oui,
-12,1107956,1,1,1,non,non,oui,10,Oui,
-40,1097862,1,1,1,non,non,oui,10,Oui,
-49,1105983,1,1,1,non,non,oui,10,Oui,
-44,1071732,1,1,1,non,non,oui,10,Oui,
-9,1085964,1,1,1,non,non,oui,10,Oui,
-8,1087691,1,1,1,non,non,oui,10,Oui,
-52,1106878,1,1,1,non,non,oui,10,Oui,
-35,1026803,1,1,1,non,non,oui,10,Oui,
-84,1104051,1,1,1,non,non,oui,10,Oui,
-81,1105925,1,1,1,non,non,oui,10,Oui,
-31,1084432,1,1,1,non,non,oui,10,Oui,
-48,1072012,1,1,1,non,non,oui,10,Oui,
-79,1094554,1,1,1,non,non,oui,10,Oui,
-50,1070208,1,1,1,non,non,oui,10,Oui,
-23,1109241,1,1,1,non,non,oui,10,Oui,
-51,1076010,1,1,1,non,non,oui,10,Oui,
-13,1101679,1,1,1,non,non,oui,10,Oui,
-30,1087801,1,1,1,non,non,oui,10,Oui,
-39,1022485,1,1,1,non,non,oui,10,Oui,
-37,1048347,1,1,1,non,non,oui,10,Oui,
-34,1047998,1,1,1,non,non,oui,10,Oui,
-38,1049386,1,1,1,non,non,oui,10,Oui,
-10,1076889,1,1,1,non,non,oui,10,Oui,
-11,1106236,1,1,1,non,non,oui,10,Oui,
-24,1093899,1,1,1,non,non,oui,10,Oui,
-43,1117541,1,1,1,non,non,oui,10,Oui,
-64,1071268,1,1,1,non,non,oui,10,Oui,
-29,1047955,1,1,1,non,non,oui,10,Oui,
-106,1084246,1,1,1,non,non,oui,10,Oui,
-70,1093788,1,1,1,non,non,oui,10,Oui,
-36,1096927,1,1,1,non,non,oui,10,Oui,
-77,1097767,1,1,1,non,non,oui,10,Oui,
-57,1072839,1,1,1,non,non,oui,10,Oui,
-22,1112149,1,1,1,non,non,oui,10,Oui,
-32,1066121,1,1,1,non,non,oui,10,Oui,
-68,1093842,1,1,1,non,non,oui,10,Oui,
-105,1015964,1,1,1,non,non,oui,10,Oui,
-33,1093322,1,1,1,non,non,oui,10,Oui,
-82,146777,1,1,1,non,non,oui,10,Oui,
-78,1115895,1,1,1,non,non,oui,10,Oui,
-67,1080526,1,1,1,non,non,oui,10,Oui,
-87,1054984,1,1,1,non,non,oui,10,Oui,
-76,1095122,1,1,1,non,non,oui,10,Oui,
-56,1022923,1,1,1,non,non,oui,10,Oui,
-86,1051852,1,1,1,non,non,oui,10,Oui,
-21,1072489,1,1,1,non,non,oui,10,Oui,
-62,1087879,1,1,1,non,non,oui,10,Oui,
-69,1080530,1,1,1,non,non,oui,10,Oui,
-80,1110616,1,1,1,non,non,oui,10,Oui,
-75,1095126,1,1,1,non,non,oui,10,Oui,
-60,1046457,1,1,1,non,non,oui,10,Oui,
-20,1096024,1,1,1,non,non,oui,10,Oui,
-63,1047180,1,1,1,non,non,oui,10,Oui,
-42,1109218,1,1,1,non,non,oui,10,Oui,
-55,1093318,1,1,1,non,non,oui,10,Oui,
-59,1105916,1,1,1,non,non,oui,10,Oui,
-54,1047691,1,1,1,non,non,oui,10,Oui,
-119,1110533,1,1,1,non,non,oui,10,Oui,
-53,1118176,1,1,1,non,non,oui,10,Oui,
-41,1087875,1,1,1,non,non,oui,10,Oui,
-85,1077616,1,1,1,non,non,oui,10,Oui,
-74,1071941,1,1,1,non,non,oui,10,Oui,
-104,1066933,1,1,1,non,non,oui,10,Oui,
-117,1105892,1,1,1,non,non,oui,10,Oui,
-120,1105913,1,1,1,non,non,oui,10,Oui,
-116,1111904,1,1,1,non,non,oui,10,Oui,
-72,1091262,1,1,1,non,non,oui,10,Oui,
-92,1091565,1,1,1,non,non,oui,10,Oui,
-126,1107244,1,1,1,non,non,oui,10,Oui,
-73,1101532,1,1,1,non,non,oui,10,Oui,
-96,1110718,1,1,1,non,non,oui,10,Oui,
-118,1111965,1,1,1,non,non,oui,10,Oui,
-93,1091348,1,1,1,non,non,oui,10,Oui,
-71,1114001,1,1,1,non,non,oui,10,Oui,
-99,1106757,1,1,1,non,non,oui,10,Oui,
-121,1110861,1,1,1,non,non,oui,10,Oui,
-98,1102882,1,1,1,non,non,oui,10,Oui,
-97,1110654,1,1,1,non,non,oui,10,Oui,
-58,1093268,1,1,1,non,non,oui,10,Oui,
-122,1105911,1,1,1,non,non,oui,10,Oui,
-94,1091523,1,1,1,non,non,oui,10,Oui,
-100,1106728,1,1,1,non,non,oui,10,Oui,
-123,1111967,1,1,1,non,non,oui,10,Oui,
-95,1091526,1,1,1,non,non,oui,10,Oui,
-90,1091419,1,1,1,non,non,oui,10,Oui,
-127,1111964,1,1,1,non,non,oui,10,Oui,
-83,1084364,1,1,1,non,non,oui,10,Oui,
-101,1090519,1,1,1,non,non,oui,10,Oui,
-102,1091469,1,1,1,non,non,oui,10,Oui,
-114,1077370,1,1,1,non,non,oui,10,Oui,
-124,1110877,1,1,1,non,non,oui,10,Oui,
-89,1084759,1,1,1,non,non,oui,10,Oui,
-125,1106400,1,1,1,non,non,oui,10,Oui,
-91,1091461,1,1,1,non,non,oui,10,Oui,
-103,1112453,1,1,1,non,non,oui,10,Oui,
-88,1087280,1,1,1,non,non,oui,10,Oui,
-109,1111968,1,1,1,non,non,oui,10,Oui,
-107,1106703,1,1,1,non,non,oui,10,Oui,
-128,1110879,1,1,1,non,non,oui,10,Oui,
-108,1105333,1,1,1,non,non,oui,10,Oui,
-115,1074090,1,1,1,non,non,oui,10,Oui,
-110,1106398,1,1,1,non,non,oui,10,Oui,
-129,1113323,1,1,1,non,non,oui,10,Oui,
-111,1106004,1,1,1,non,non,oui,10,Oui,
-112,1105863,1,1,1,non,non,oui,10,Oui,
-131,1115138,1,1,1,non,non,oui,10,Oui,
-113,1107947,1,1,1,non,non,oui,10,Oui,
-132,1107192,1,1,1,non,non,oui,10,Oui,
-130,1106397,1,1,1,non,non,oui,10,Oui,
-134,1106396,1,1,1,non,non,oui,10,Oui,
-133,1115144,1,1,1,non,non,oui,10,Oui,
-135,1106395,1,1,1,non,non,oui,10,Oui,
-136,1115166,1,1,1,non,non,oui,10,Oui,
-137,1106394,1,1,1,non,non,oui,10,Oui,
-2,1119534,1,1,1,non,non,oui,20,Oui,
-3,1119534,1,1,1,non,non,oui,20,Oui,
-6,1119534,1,1,1,non,non,oui,20,Oui,
-17,1119538,1,1,1,non,non,oui,20,Oui,
-18,1119538,1,1,1,non,non,oui,20,Oui,
-4,1119534,1,1,1,non,non,oui,20,Oui,
-28,1119540,1,1,1,non,non,oui,20,Oui,
-1,1119534,1,1,1,non,non,oui,20,Oui,
-5,1119534,1,1,1,non,non,oui,20,Oui,
-19,1119538,1,1,1,non,non,oui,20,Oui,
-65,1119554,1,1,1,non,non,oui,20,Oui,
-16,1119538,1,1,1,non,non,oui,20,Oui,
-61,1119554,1,1,1,non,non,oui,20,Oui,
-7,1119534,1,1,1,non,non,oui,20,Oui,
-25,1119540,1,1,1,non,non,oui,20,Oui,
-47,1119510,1,1,1,non,non,oui,20,Oui,
-15,1119538,1,1,1,non,non,oui,20,Oui,
-26,1119540,1,1,1,non,non,oui,20,Oui,
-66,1119532,1,1,1,non,non,oui,20,Oui,
-46,1119510,1,1,1,non,non,oui,20,Oui,
-45,1119510,1,1,1,non,non,oui,20,Oui,
-14,1119538,1,1,1,non,non,oui,20,Oui,
-27,1119540,1,1,1,non,non,oui,20,Oui,
-12,1119534,1,1,1,non,non,oui,20,Oui,
-40,1119531,1,1,1,non,non,oui,20,Oui,
-49,1119537,1,1,1,non,non,oui,20,Oui,
-44,1119510,1,1,1,non,non,oui,20,Oui,
-9,1119534,1,1,1,non,non,oui,20,Oui,
-8,1119534,1,1,1,non,non,oui,20,Oui,
-52,1119537,1,1,1,non,non,oui,20,Oui,
-35,1119531,1,1,1,non,non,oui,20,Oui,
-84,1119596,1,1,1,non,non,oui,20,Oui,
-81,1119597,1,1,1,non,non,oui,20,Oui,
-31,1119554,1,1,1,non,non,oui,20,Oui,
-48,1119537,1,1,1,non,non,oui,20,Oui,
-79,1119596,1,1,1,non,non,oui,20,Oui,
-50,1119537,1,1,1,non,non,oui,20,Oui,
-23,1119538,1,1,1,non,non,oui,20,Oui,
-51,1119537,1,1,1,non,non,oui,20,Oui,
-13,1119534,1,1,1,non,non,oui,20,Oui,
-30,1119554,1,1,1,non,non,oui,20,Oui,
-39,1119531,1,1,1,non,non,oui,20,Oui,
-37,1119531,1,1,1,non,non,oui,20,Oui,
-34,1119531,1,1,1,non,non,oui,20,Oui,
-38,1119531,1,1,1,non,non,oui,20,Oui,
-10,1119534,1,1,1,non,non,oui,20,Oui,
-11,1119534,1,1,1,non,non,oui,20,Oui,
-24,1119538,1,1,1,non,non,oui,20,Oui,
-43,1119510,1,1,1,non,non,oui,20,Oui,
-64,1119552,1,1,1,non,non,oui,20,Oui,
-29,1119554,1,1,1,non,non,oui,20,Oui,
-106,1119543,1,1,1,non,non,oui,20,Oui,
-70,1119597,1,1,1,non,non,oui,20,Oui,
-36,1119531,1,1,1,non,non,oui,20,Oui,
-77,1119597,1,1,1,non,non,oui,20,Oui,
-57,1119507,1,1,1,non,non,oui,20,Oui,
-22,1119538,1,1,1,non,non,oui,20,Oui,
-32,1119531,1,1,1,non,non,oui,20,Oui,
-68,1119598,1,1,1,non,non,oui,20,Oui,
-105,1119544,1,1,1,non,non,oui,20,Oui,
-33,1119531,1,1,1,non,non,oui,20,Oui,
-82,1119597,1,1,1,non,non,oui,20,Oui,
-78,1119597,1,1,1,non,non,oui,20,Oui,
-67,1119598,1,1,1,non,non,oui,20,Oui,
-87,1119598,1,1,1,non,non,oui,20,Oui,
-76,1119598,1,1,1,non,non,oui,20,Oui,
-56,1119507,1,1,1,non,non,oui,20,Oui,
-86,1119598,1,1,1,non,non,oui,20,Oui,
-21,1119538,1,1,1,non,non,oui,20,Oui,
-62,1119552,1,1,1,non,non,oui,20,Oui,
-69,1119599,1,1,1,non,non,oui,20,Oui,
-80,1119598,1,1,1,non,non,oui,20,Oui,
-75,1119598,1,1,1,non,non,oui,20,Oui,
-60,1119554,1,1,1,non,non,oui,20,Oui,
-20,1119538,1,1,1,non,non,oui,20,Oui,
-63,1119554,1,1,1,non,non,oui,20,Oui,
-42,1119510,1,1,1,non,non,oui,20,Oui,
-55,1119507,1,1,1,non,non,oui,20,Oui,
-59,1119554,1,1,1,non,non,oui,20,Oui,
-54,1119507,1,1,1,non,non,oui,20,Oui,
-119,1119563,1,1,1,non,non,oui,20,Oui,
-53,1119507,1,1,1,non,non,oui,20,Oui,
-41,1119510,1,1,1,non,non,oui,20,Oui,
-85,1119599,1,1,1,non,non,oui,20,Oui,
-74,1119600,1,1,1,non,non,oui,20,Oui,
-104,1119545,1,1,1,non,non,oui,20,Oui,
-117,1119567,1,1,1,non,non,oui,20,Oui,
-120,1119563,1,1,1,non,non,oui,20,Oui,
-116,1119567,1,1,1,non,non,oui,20,Oui,
-72,1119600,1,1,1,non,non,oui,20,Oui,
-92,1119547,1,1,1,non,non,oui,20,Oui,
-126,1119567,1,1,1,non,non,oui,20,Oui,
-73,1119600,1,1,1,non,non,oui,20,Oui,
-96,1119548,1,1,1,non,non,oui,20,Oui,
-118,1119567,1,1,1,non,non,oui,20,Oui,
-93,1119549,1,1,1,non,non,oui,20,Oui,
-71,1119631,1,1,1,non,non,oui,20,Oui,
-99,1119549,1,1,1,non,non,oui,20,Oui,
-121,1119567,1,1,1,non,non,oui,20,Oui,
-98,1119549,1,1,1,non,non,oui,20,Oui,
-97,1119550,1,1,1,non,non,oui,20,Oui,
-58,1119554,1,1,1,non,non,oui,20,Oui,
-122,1119570,1,1,1,non,non,oui,20,Oui,
-94,1119550,1,1,1,non,non,oui,20,Oui,
-100,1119582,1,1,1,non,non,oui,20,Oui,
-123,1119570,1,1,1,non,non,oui,20,Oui,
-95,1119582,1,1,1,non,non,oui,20,Oui,
-90,1119585,1,1,1,non,non,oui,20,Oui,
-127,1119570,1,1,1,non,non,oui,20,Oui,
-83,1119675,1,1,1,non,non,oui,20,Oui,
-101,1119585,1,1,1,non,non,oui,20,Oui,
-102,1119585,1,1,1,non,non,oui,20,Oui,
-114,1119567,1,1,1,non,non,oui,20,Oui,
-124,1119570,1,1,1,non,non,oui,20,Oui,
-89,1119681,1,1,1,non,non,oui,20,Oui,
-125,1119571,1,1,1,non,non,oui,20,Oui,
-91,1119590,1,1,1,non,non,oui,20,Oui,
-103,1119590,1,1,1,non,non,oui,20,Oui,
-88,1119681,1,1,1,non,non,oui,20,Oui,
-109,1119572,1,1,1,non,non,oui,20,Oui,
-107,1119571,1,1,1,non,non,oui,20,Oui,
-128,1119572,1,1,1,non,non,oui,20,Oui,
-108,1119572,1,1,1,non,non,oui,20,Oui,
-115,1119572,1,1,1,non,non,oui,20,Oui,
-110,1119573,1,1,1,non,non,oui,20,Oui,
-129,1119572,1,1,1,non,non,oui,20,Oui,
-111,1119573,1,1,1,non,non,oui,20,Oui,
-112,1119574,1,1,1,non,non,oui,20,Oui,
-131,1119576,1,1,1,non,non,oui,20,Oui,
-113,1119576,1,1,1,non,non,oui,20,Oui,
-132,1119577,1,1,1,non,non,oui,20,Oui,
-130,1119574,1,1,1,non,non,oui,20,Oui,
-134,1119578,1,1,1,non,non,oui,20,Oui,
-133,1119578,1,1,1,non,non,oui,20,Oui,
-135,1119591,1,1,1,non,non,oui,20,Oui,
-136,1119592,1,1,1,non,non,oui,20,Oui,
-137,1119592,1,1,1,non,non,oui,20,Oui,
-2,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-3,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-6,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-17,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-18,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-4,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-28,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-1,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-5,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-19,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-65,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-16,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-61,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-7,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-25,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-47,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-15,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-26,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-66,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-46,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-45,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-14,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-27,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-12,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-40,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-49,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-44,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-9,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-8,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-52,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-35,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-84,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-81,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-31,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-48,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-79,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-50,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-23,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-51,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-13,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-30,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-39,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-37,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-34,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-38,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-10,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-11,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Oui,
-24,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-43,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-64,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-29,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-106,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-70,"BPLivrCHRON12,5a15EUR36mois",1,1,1,non,non,oui,30,Oui,
-36,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-77,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-57,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-22,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-32,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-68,"BPLivrCHRON12,5a15EUR36mois",1,1,1,non,non,oui,30,Oui,
-105,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-33,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-82,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-78,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-67,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-87,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-76,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-56,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-86,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-21,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-62,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-69,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-80,"BPLivrCHRON12,5a15EUR36mois",1,1,1,non,non,oui,30,Oui,
-75,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-60,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-20,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-63,BPLivrMeSGEODI150a175EUR60mois,1,1,1,non,non,oui,30,Oui,
-42,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-55,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-59,BPLivrMeSGEODI150a175EUR60mois,1,1,1,non,non,oui,30,Oui,
-54,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Oui,
-119,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-53,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-41,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-85,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-74,BPLivrMeSGEODI50a75EUR36mois,1,1,1,non,non,oui,30,Oui,
-104,"BPLivrCHRON17,5a20EUR36mois",1,1,1,non,non,oui,30,Oui,
-117,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-120,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-116,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-72,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-92,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-126,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-73,"BPLivrCHRON17,5a20EUR36mois",1,1,1,non,non,oui,30,Oui,
-96,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-118,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-93,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-71,"BPLivrCHRON12,5a15EUR36mois",1,1,1,non,non,oui,30,Oui,
-99,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-121,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-98,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-97,"BPLivrCHRON10a12,5EUR36mois",1,1,1,non,non,oui,30,Oui,
-58,BPLivrMeSGEODI175a200EUR60mois,1,1,1,non,non,oui,30,Oui,
-122,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-94,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-100,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-123,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-95,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-90,"BPLivrCHRON12,5a15EUR36mois",1,1,1,non,non,oui,30,Oui,
-127,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-83,BPLivrMeSGEODI50a75EUR36mois,1,1,1,non,non,oui,30,Oui,
-101,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-102,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-114,"BPLivrCHRON10a12,5EUR60mois",1,1,1,non,non,oui,30,Oui,
-124,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-89,BPLivrMeSGEODI125a150EUR36mois,1,1,1,non,non,oui,30,Oui,
-125,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-91,"BPLivrCHRON12,5a15EUR36mois",1,1,1,non,non,oui,30,Oui,
-103,"BPLivrCHRON7,5a10EUR36mois",1,1,1,non,non,oui,30,Oui,
-88,BPLivrMeSGEODI125a150EUR36mois,1,1,1,non,non,oui,30,Oui,
-109,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-107,"BPLivrCHRON12,5a15EUR60mois",1,1,1,non,non,oui,30,Oui,
-128,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-108,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-115,"BPLivrCHRON7,5a10EUR60mois",1,1,1,non,non,oui,30,Oui,
-110,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-129,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-111,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-112,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-131,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-113,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-132,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-130,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-134,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-133,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-135,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Oui,
-136,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-137,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Oui,
-2,BoulProComm60m,1,1,1,non,non,non,9999,Non,"14,67"
-3,BoulProComm60m,1,1,1,non,non,non,9999,Non,"16,91"
-6,BoulProComm60m,1,1,1,non,non,non,9999,Non,"16,85"
-17,BoulProComm60m,1,1,1,non,non,non,9999,Non,"16,96"
-18,BoulProComm60m,1,1,1,non,non,non,9999,Non,"17,82"
-4,BoulProComm60m,1,1,1,non,non,non,9999,Non,"18,27"
-28,BoulProComm60m,1,1,1,non,non,non,9999,Non,"17,82"
-1,BoulProComm60m,1,1,1,non,non,non,9999,Non,"16,82"
-5,BoulProComm60m,1,1,1,non,non,non,9999,Non,"20,2"
-19,BoulProComm60m,1,1,1,non,non,non,9999,Non,"18,84"
-65,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,93"
-16,BoulProComm60m,1,1,1,non,non,non,9999,Non,"18,47"
-61,BoulProComm60m,1,1,1,non,non,non,9999,Non,"21,33"
-7,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,65"
-25,BoulProComm60m,1,1,1,non,non,non,9999,Non,"20,77"
-47,BoulProComm60m,1,1,1,non,non,non,9999,Non,"17,44"
-15,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,07"
-26,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,91"
-66,BoulProComm60m,1,1,1,non,non,non,9999,Non,"15,56"
-46,BoulProComm60m,1,1,1,non,non,non,9999,Non,"18,78"
-45,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,21"
-14,BoulProComm60m,1,1,1,non,non,non,9999,Non,"20,09"
-27,BoulProComm60m,1,1,1,non,non,non,9999,Non,"22,87"
-12,BoulProComm60m,1,1,1,non,non,non,9999,Non,"23,76"
-40,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,41"
-49,BoulProComm60m,1,1,1,non,non,non,9999,Non,"20,38"
-44,BoulProComm60m,1,1,1,non,non,non,9999,Non,"20,52"
-9,BoulProComm60m,1,1,1,non,non,non,9999,Non,"21,54"
-8,BoulProComm60m,1,1,1,non,non,non,9999,Non,"24,39"
-52,BoulProComm60m,1,1,1,non,non,non,9999,Non,"19,9"
-35,BoulProComm60m,1,1,1,non,non,non,9999,Non,"22,01"
-84,BoulProComm36m,1,1,1,non,non,non,9999,Non,"5,81"
-81,BoulProComm36m,1,1,1,non,non,non,9999,Non,"6,37"
-31,BoulProComm60m,1,1,1,non,non,non,9999,Non,"26,25"
-48,BoulProComm60m,1,1,1,non,non,non,9999,Non,"22,97"
-79,BoulProComm36m,1,1,1,non,non,non,9999,Non,"5,97"
-50,BoulProComm60m,1,1,1,non,non,non,9999,Non,"24,62"
-23,BoulProComm60m,1,1,1,non,non,non,9999,Non,"28,63"
-51,BoulProComm60m,1,1,1,non,non,non,9999,Non,"22,74"
-13,BoulProComm60m,1,1,1,non,non,non,9999,Non,"31,23"
-30,BoulProComm60m,1,1,1,non,non,non,9999,Non,"31,35"
-39,BoulProComm60m,1,1,1,non,non,non,9999,Non,"24,65"
-37,BoulProComm60m,1,1,1,non,non,non,9999,Non,"25,1"
-34,BoulProComm60m,1,1,1,non,non,non,9999,Non,"27,54"
-38,BoulProComm60m,1,1,1,non,non,non,9999,Non,"24,39"
-10,BoulProComm60m,1,1,1,non,non,non,9999,Non,"33,11"
-11,BoulProComm60m,1,1,1,non,non,non,9999,Non,"30,12"
-24,BoulProComm60m,1,1,1,non,non,non,9999,Non,"32,51"
-43,BoulProComm60m,1,1,1,non,non,non,9999,Non,"29,56"
-64,BoulProComm60m,1,1,1,non,non,non,9999,Non,"35,79"
-29,BoulProComm60m,1,1,1,non,non,non,9999,Non,"36,33"
-106,BoulProComm36m,1,1,1,non,non,non,9999,Non,"8,41"
-70,BoulProComm36m,1,1,1,non,non,non,9999,Non,"8,22"
-36,BoulProComm60m,1,1,1,non,non,non,9999,Non,"28,05"
-77,BoulProComm36m,1,1,1,non,non,non,9999,Non,"7,78"
-57,BoulProComm60m,1,1,1,non,non,non,9999,Non,"33,49"
-22,BoulProComm60m,1,1,1,non,non,non,9999,Non,"34,96"
-32,BoulProComm60m,1,1,1,non,non,non,9999,Non,"28,78"
-68,BoulProComm36m,1,1,1,non,non,non,9999,Non,"9,17"
-105,BoulProComm36m,1,1,1,non,non,non,9999,Non,"10,34"
-33,BoulProComm60m,1,1,1,non,non,non,9999,Non,33
-82,BoulProComm36m,1,1,1,non,non,non,9999,Non,"8,55"
-78,BoulProComm36m,1,1,1,non,non,non,9999,Non,"8,68"
-67,BoulProComm36m,1,1,1,non,non,non,9999,Non,"9,31"
-87,BoulProComm36m,1,1,1,non,non,non,9999,Non,"10,23"
-76,BoulProComm36m,1,1,1,non,non,non,9999,Non,"10,31"
-56,BoulProComm60m,1,1,1,non,non,non,9999,Non,"36,96"
-86,BoulProComm36m,1,1,1,non,non,non,9999,Non,"10,3"
-21,BoulProComm60m,1,1,1,non,non,non,9999,Non,"37,44"
-62,BoulProComm60m,1,1,1,non,non,non,9999,Non,"42,94"
-69,BoulProComm36m,1,1,1,non,non,non,9999,Non,"12,17"
-80,BoulProComm36m,1,1,1,non,non,non,9999,Non,"11,49"
-75,BoulProComm36m,1,1,1,non,non,non,9999,Non,"11,45"
-60,BoulProComm60m,1,1,1,non,non,non,9999,Non,"47,6"
-20,BoulProComm60m,1,1,1,non,non,non,9999,Non,"43,22"
-63,BoulProComm60m,1,1,1,non,non,non,9999,Non,"50,52"
-42,BoulProComm60m,1,1,1,non,non,non,9999,Non,"40,1"
-55,BoulProComm60m,1,1,1,non,non,non,9999,Non,"49,7"
-59,BoulProComm60m,1,1,1,non,non,non,9999,Non,"58,4"
-54,BoulProComm60m,1,1,1,non,non,non,9999,Non,"54,98"
-119,BoulProComm60m,1,1,1,non,non,non,9999,Non,"18,17"
-53,BoulProComm60m,1,1,1,non,non,non,9999,Non,"60,86"
-41,BoulProComm60m,1,1,1,non,non,non,9999,Non,53
-85,BoulProComm36m,1,1,1,non,non,non,9999,Non,"12,49"
-74,BoulProComm36m,1,1,1,non,non,non,9999,Non,"17,35"
-104,BoulProComm36m,1,1,1,non,non,non,9999,Non,"14,7"
-117,BoulProComm60m,1,1,1,non,non,non,9999,Non,"23,82"
-120,BoulProComm60m,1,1,1,non,non,non,9999,Non,"21,49"
-116,BoulProComm60m,1,1,1,non,non,non,9999,Non,"24,53"
-72,BoulProComm36m,1,1,1,non,non,non,9999,Non,"15,17"
-92,BoulProComm36m,1,1,1,non,non,non,9999,Non,"18,16"
-126,BoulProComm60m,1,1,1,non,non,non,9999,Non,"27,14"
-73,BoulProComm36m,1,1,1,non,non,non,9999,Non,"17,59"
-96,BoulProComm36m,1,1,1,non,non,non,9999,Non,"21,21"
-118,BoulProComm60m,1,1,1,non,non,non,9999,Non,"29,51"
-93,BoulProComm36m,1,1,1,non,non,non,9999,Non,"22,57"
-71,BoulProComm36m,1,1,1,non,non,non,9999,Non,"18,42"
-99,BoulProComm36m,1,1,1,non,non,non,9999,Non,"22,96"
-121,BoulProComm60m,1,1,1,non,non,non,9999,Non,"29,84"
-98,BoulProComm36m,1,1,1,non,non,non,9999,Non,"22,94"
-97,BoulProComm36m,1,1,1,non,non,non,9999,Non,"26,21"
-58,BoulProComm60m,1,1,1,non,non,non,9999,Non,"119,32"
-122,BoulProComm60m,1,1,1,non,non,non,9999,Non,"33,18"
-94,BoulProComm36m,1,1,1,non,non,non,9999,Non,"26,57"
-100,BoulProComm36m,1,1,1,non,non,non,9999,Non,"29,29"
-123,BoulProComm60m,1,1,1,non,non,non,9999,Non,"35,13"
-95,BoulProComm36m,1,1,1,non,non,non,9999,Non,"30,3"
-90,BoulProComm36m,1,1,1,non,non,non,9999,Non,"35,05"
-127,BoulProComm60m,1,1,1,non,non,non,9999,Non,"34,56"
-83,BoulProComm36m,1,1,1,non,non,non,9999,Non,"36,3"
-101,BoulProComm36m,1,1,1,non,non,non,9999,Non,"35,29"
-102,BoulProComm36m,1,1,1,non,non,non,9999,Non,"34,67"
-114,BoulProComm60m,1,1,1,non,non,non,9999,Non,"27,35"
-124,BoulProComm60m,1,1,1,non,non,non,9999,Non,"38,05"
-89,BoulProComm36m,1,1,1,non,non,non,9999,Non,"52,05"
-125,BoulProComm60m,1,1,1,non,non,non,9999,Non,"41,6"
-91,BoulProComm36m,1,1,1,non,non,non,9999,Non,"49,31"
-103,BoulProComm36m,1,1,1,non,non,non,9999,Non,"48,07"
-88,BoulProComm36m,1,1,1,non,non,non,9999,Non,"57,25"
-109,BoulProComm60m,1,1,1,non,non,non,9999,Non,"47,3"
-107,BoulProComm60m,1,1,1,non,non,non,9999,Non,"40,33"
-128,BoulProComm60m,1,1,1,non,non,non,9999,Non,"55,53"
-108,BoulProComm60m,1,1,1,non,non,non,9999,Non,"53,83"
-115,BoulProComm60m,1,1,1,non,non,non,9999,Non,"44,97"
-110,BoulProComm60m,1,1,1,non,non,non,9999,Non,"64,32"
-129,BoulProComm60m,1,1,1,non,non,non,9999,Non,"56,13"
-111,BoulProComm60m,1,1,1,non,non,non,9999,Non,"62,47"
-112,BoulProComm60m,1,1,1,non,non,non,9999,Non,"73,05"
-131,BoulProComm60m,1,1,1,non,non,non,9999,Non,"88,06"
-113,BoulProComm60m,1,1,1,non,non,non,9999,Non,"92,9"
-132,BoulProComm60m,1,1,1,non,non,non,9999,Non,"102,92"
-130,BoulProComm60m,1,1,1,non,non,non,9999,Non,"81,33"
-134,BoulProComm60m,1,1,1,non,non,non,9999,Non,"127,24"
-133,BoulProComm60m,1,1,1,non,non,non,9999,Non,"121,19"
-135,BoulProComm60m,1,1,1,non,non,non,9999,Non,"212,04"
-136,BoulProComm60m,1,1,1,non,non,non,9999,Non,"313,71"
-137,BoulProComm60m,1,1,1,non,non,non,9999,Non,"318,2"
-82,1096741,0,0,1,non,non,oui,1000,Oui,
-82,1096743,0,0,1,non,non,oui,1010,Oui,
-82,1083851,0,0,1,non,non,oui,1020,Oui,
-19,1101460,0,0,1,non,non,oui,1000,Oui,
-19,1111131,0,0,1,non,non,oui,1010,Oui,
-19,1111134,0,0,1,non,non,oui,1020,Oui,
-19,1111133,0,0,1,non,non,oui,1030,Oui,
-19,1111132,0,0,1,non,non,oui,1040,Oui,
-4,1051683,0,0,1,non,non,oui,1000,Oui,
-4,1051684,0,0,1,non,non,oui,1010,Oui,
-4,1101460,0,0,1,non,non,oui,1020,Oui,
-4,1111000,0,0,1,non,non,oui,1030,Oui,
-4,1111131,0,0,1,non,non,oui,1040,Oui,
-4,1111134,0,0,1,non,non,oui,1050,Oui,
-4,1111133,0,0,1,non,non,oui,1060,Oui,
-4,1111132,0,0,1,non,non,oui,1070,Oui,
-18,1101460,0,0,1,non,non,oui,1000,Oui,
-18,1111131,0,0,1,non,non,oui,1010,Oui,
-18,1111134,0,0,1,non,non,oui,1020,Oui,
-18,1111133,0,0,1,non,non,oui,1030,Oui,
-18,1111132,0,0,1,non,non,oui,1040,Oui,
-1,1051683,0,0,1,non,non,oui,1000,Oui,
-1,1051684,0,0,1,non,non,oui,1010,Oui,
-1,1101460,0,0,1,non,non,oui,1020,Oui,
-1,1111000,0,0,1,non,non,oui,1030,Oui,
-1,1111131,0,0,1,non,non,oui,1040,Oui,
-1,1111134,0,0,1,non,non,oui,1050,Oui,
-1,1111133,0,0,1,non,non,oui,1060,Oui,
-1,1111132,0,0,1,non,non,oui,1070,Oui,
-7,1051683,0,0,1,non,non,oui,1000,Oui,
-7,1051684,0,0,1,non,non,oui,1010,Oui,
-7,1101460,0,0,1,non,non,oui,1020,Oui,
-7,1111000,0,0,1,non,non,oui,1030,Oui,
-7,1111131,0,0,1,non,non,oui,1040,Oui,
-7,1111134,0,0,1,non,non,oui,1050,Oui,
-7,1111133,0,0,1,non,non,oui,1060,Oui,
-7,1111132,0,0,1,non,non,oui,1070,Oui,
-2,1051683,0,0,1,non,non,oui,1000,Oui,
-2,1051684,0,0,1,non,non,oui,1010,Oui,
-2,1101460,0,0,1,non,non,oui,1020,Oui,
-2,1111000,0,0,1,non,non,oui,1030,Oui,
-2,1111131,0,0,1,non,non,oui,1040,Oui,
-2,1111134,0,0,1,non,non,oui,1050,Oui,
-2,1111133,0,0,1,non,non,oui,1060,Oui,
-2,1111132,0,0,1,non,non,oui,1070,Oui,
-50,1051684,0,0,1,non,non,oui,1000,Oui,
-50,1111131,0,0,1,non,non,oui,1010,Oui,
-50,1111134,0,0,1,non,non,oui,1020,Oui,
-50,1111133,0,0,1,non,non,oui,1030,Oui,
-48,1051684,0,0,1,non,non,oui,1000,Oui,
-48,1111131,0,0,1,non,non,oui,1010,Oui,
-48,1111134,0,0,1,non,non,oui,1020,Oui,
-48,1111133,0,0,1,non,non,oui,1030,Oui,
-21,1101460,0,0,1,non,non,oui,1000,Oui,
-21,1111131,0,0,1,non,non,oui,1010,Oui,
-21,1111134,0,0,1,non,non,oui,1020,Oui,
-21,1111133,0,0,1,non,non,oui,1030,Oui,
-21,1111132,0,0,1,non,non,oui,1040,Oui,
-51,1051684,0,0,1,non,non,oui,1000,Oui,
-51,1111131,0,0,1,non,non,oui,1010,Oui,
-51,1111134,0,0,1,non,non,oui,1020,Oui,
-51,1111133,0,0,1,non,non,oui,1030,Oui,
-10,1051683,0,0,1,non,non,oui,1000,Oui,
-10,1051684,0,0,1,non,non,oui,1010,Oui,
-10,1101460,0,0,1,non,non,oui,1020,Oui,
-10,1111000,0,0,1,non,non,oui,1030,Oui,
-10,1111131,0,0,1,non,non,oui,1040,Oui,
-10,1111134,0,0,1,non,non,oui,1050,Oui,
-10,1111133,0,0,1,non,non,oui,1060,Oui,
-10,1111132,0,0,1,non,non,oui,1070,Oui,
-67,553708,0,0,1,non,non,oui,1000,Oui,
-67,577065,0,0,1,non,non,oui,1010,Oui,
-69,1042328,0,0,1,non,non,oui,1000,Oui,
-69,553708,0,0,1,non,non,oui,1010,Oui,
-69,1042327,0,0,1,non,non,oui,1020,Oui,
-69,789516,0,0,1,non,non,oui,1030,Oui,
-69,1114858,0,0,1,non,non,oui,1040,Oui,
-69,1077338,0,0,1,non,non,oui,1050,Oui,
-69,577065,0,0,1,non,non,oui,1060,Oui,
-69,871866,0,0,1,non,non,oui,1070,Oui,
-9,1051683,0,0,1,non,non,oui,1000,Oui,
-9,1051684,0,0,1,non,non,oui,1010,Oui,
-9,1101460,0,0,1,non,non,oui,1020,Oui,
-9,1111000,0,0,1,non,non,oui,1030,Oui,
-9,1111131,0,0,1,non,non,oui,1040,Oui,
-9,1111134,0,0,1,non,non,oui,1050,Oui,
-9,1111133,0,0,1,non,non,oui,1060,Oui,
-9,1111132,0,0,1,non,non,oui,1070,Oui,
-3,1051683,0,0,1,non,non,oui,1000,Oui,
-3,1051684,0,0,1,non,non,oui,1010,Oui,
-3,1101460,0,0,1,non,non,oui,1020,Oui,
-3,1111000,0,0,1,non,non,oui,1030,Oui,
-3,1111131,0,0,1,non,non,oui,1040,Oui,
-3,1111134,0,0,1,non,non,oui,1050,Oui,
-3,1111133,0,0,1,non,non,oui,1060,Oui,
-3,1111132,0,0,1,non,non,oui,1070,Oui,
-88,1068014,0,0,1,non,non,oui,1000,Oui,
-88,1019581,0,0,1,non,non,oui,1010,Oui,
-8,1051683,0,0,1,non,non,oui,1000,Oui,
-8,1051684,0,0,1,non,non,oui,1010,Oui,
-8,1101460,0,0,1,non,non,oui,1020,Oui,
-8,1111000,0,0,1,non,non,oui,1030,Oui,
-8,1111131,0,0,1,non,non,oui,1040,Oui,
-8,1111134,0,0,1,non,non,oui,1050,Oui,
-8,1111133,0,0,1,non,non,oui,1060,Oui,
-8,1111132,0,0,1,non,non,oui,1070,Oui,
-101,1091970,0,0,1,non,non,oui,1000,Oui,
-101,1093756,0,0,1,non,non,oui,1010,Oui,
-101,1093400,0,0,1,non,non,oui,1020,Oui,
-101,1112372,0,0,1,non,non,oui,1030,Oui,
-93,1061823,0,0,1,non,non,oui,1000,Oui,
-93,1091552,0,0,1,non,non,oui,1010,Oui,
-93,8004149,0,0,1,non,non,oui,1020,Oui,
-93,1112372,0,0,1,non,non,oui,1030,Oui,
-90,141750,0,0,1,non,non,oui,1000,Oui,
-90,1097121,0,0,1,non,non,oui,1010,Oui,
-90,1112372,0,0,1,non,non,oui,1020,Oui,
-90,1107239,0,0,1,non,non,oui,1030,Oui,
-91,141750,0,0,1,non,non,oui,1000,Oui,
-91,1097121,0,0,1,non,non,oui,1010,Oui,
-91,1112372,0,0,1,non,non,oui,1020,Oui,
-91,1107239,0,0,1,non,non,oui,1030,Oui,
-102,1097121,0,0,1,non,non,oui,1000,Oui,
-102,8004773,0,0,1,non,non,oui,1010,Oui,
-102,8004133,0,0,1,non,non,oui,1020,Oui,
-102,1112372,0,0,1,non,non,oui,1030,Oui,
-94,1061823,0,0,1,non,non,oui,1000,Oui,
-94,1119273,0,0,1,non,non,oui,1010,Oui,
-94,8003787,0,0,1,non,non,oui,1020,Oui,
-94,1112372,0,0,1,non,non,oui,1030,Oui,
-95,1061823,0,0,1,non,non,oui,1000,Oui,
-95,1119273,0,0,1,non,non,oui,1010,Oui,
-95,8003787,0,0,1,non,non,oui,1020,Oui,
-95,1112372,0,0,1,non,non,oui,1030,Oui,
-92,1061823,0,0,1,non,non,oui,1000,Oui,
-92,1091552,0,0,1,non,non,oui,1010,Oui,
-92,8004149,0,0,1,non,non,oui,1020,Oui,
-92,1112372,0,0,1,non,non,oui,1030,Oui,
-16,1101460,0,0,1,non,non,oui,1000,Oui,
-16,1111131,0,0,1,non,non,oui,1010,Oui,
-16,1111134,0,0,1,non,non,oui,1020,Oui,
-16,1111133,0,0,1,non,non,oui,1030,Oui,
-16,1111132,0,0,1,non,non,oui,1040,Oui,
-70,1104534,0,0,1,non,non,oui,1000,Oui,
-70,1104532,0,0,1,non,non,oui,1010,Oui,
-70,1046722,0,0,1,non,non,oui,1020,Oui,
-68,1104534,0,0,1,non,non,oui,1000,Oui,
-68,1104532,0,0,1,non,non,oui,1010,Oui,
-68,1046722,0,0,1,non,non,oui,1020,Oui,
-24,1109662,0,0,1,non,non,oui,1000,Oui,
-24,1109664,0,0,1,non,non,oui,1010,Oui,
-24,1109663,0,0,1,non,non,oui,1020,Oui,
-24,1111131,0,0,1,non,non,oui,1030,Oui,
-24,1111134,0,0,1,non,non,oui,1040,Oui,
-24,1111133,0,0,1,non,non,oui,1050,Oui,
-24,1111132,0,0,1,non,non,oui,1060,Oui,
-6,1051683,0,0,1,non,non,oui,1000,Oui,
-6,1051684,0,0,1,non,non,oui,1010,Oui,
-6,1101460,0,0,1,non,non,oui,1020,Oui,
-6,1111000,0,0,1,non,non,oui,1030,Oui,
-6,1111131,0,0,1,non,non,oui,1040,Oui,
-6,1111134,0,0,1,non,non,oui,1050,Oui,
-6,1111133,0,0,1,non,non,oui,1060,Oui,
-6,1111132,0,0,1,non,non,oui,1070,Oui,
-17,1101460,0,0,1,non,non,oui,1000,Oui,
-17,1111131,0,0,1,non,non,oui,1010,Oui,
-17,1111134,0,0,1,non,non,oui,1020,Oui,
-17,1111133,0,0,1,non,non,oui,1030,Oui,
-17,1111132,0,0,1,non,non,oui,1040,Oui,
-15,1101460,0,0,1,non,non,oui,1000,Oui,
-15,1111131,0,0,1,non,non,oui,1010,Oui,
-15,1111134,0,0,1,non,non,oui,1020,Oui,
-15,1111133,0,0,1,non,non,oui,1030,Oui,
-15,1111132,0,0,1,non,non,oui,1040,Oui,
-20,1101460,0,0,1,non,non,oui,1000,Oui,
-20,1111131,0,0,1,non,non,oui,1010,Oui,
-20,1111134,0,0,1,non,non,oui,1020,Oui,
-20,1111133,0,0,1,non,non,oui,1030,Oui,
-20,1111132,0,0,1,non,non,oui,1040,Oui,
-14,1101460,0,0,1,non,non,oui,1000,Oui,
-14,1111131,0,0,1,non,non,oui,1010,Oui,
-14,1111134,0,0,1,non,non,oui,1020,Oui,
-14,1111133,0,0,1,non,non,oui,1030,Oui,
-14,1111132,0,0,1,non,non,oui,1040,Oui,
-13,1109662,0,0,1,non,non,oui,1000,Oui,
-13,1109664,0,0,1,non,non,oui,1010,Oui,
-13,1109663,0,0,1,non,non,oui,1020,Oui,
-13,1051683,0,0,1,non,non,oui,1030,Oui,
-13,1051684,0,0,1,non,non,oui,1040,Oui,
-13,1101460,0,0,1,non,non,oui,1050,Oui,
-13,1111000,0,0,1,non,non,oui,1060,Oui,
-13,1111131,0,0,1,non,non,oui,1070,Oui,
-13,1111134,0,0,1,non,non,oui,1080,Oui,
-13,1111133,0,0,1,non,non,oui,1090,Oui,
-13,1111132,0,0,1,non,non,oui,1100,Oui,
-5,1051683,0,0,1,non,non,oui,1000,Oui,
-5,1051684,0,0,1,non,non,oui,1010,Oui,
-5,1101460,0,0,1,non,non,oui,1020,Oui,
-5,1111000,0,0,1,non,non,oui,1030,Oui,
-5,1111131,0,0,1,non,non,oui,1040,Oui,
-5,1111134,0,0,1,non,non,oui,1050,Oui,
-5,1111133,0,0,1,non,non,oui,1060,Oui,
-5,1111132,0,0,1,non,non,oui,1070,Oui,
-112,1107036,0,0,1,non,non,oui,1000,Oui,
-112,1107020,0,0,1,non,non,oui,1010,Oui,
-112,8001874,0,0,1,non,non,oui,1020,Oui,
-112,1107033,0,0,1,non,non,oui,1030,Oui,
-112,1086596,0,0,1,non,non,oui,1040,Oui,
-117,1107033,0,0,1,non,non,oui,1000,Oui,
-117,1107020,0,0,1,non,non,oui,1010,Oui,
-117,1086596,0,0,1,non,non,oui,1020,Oui,
-117,8001874,0,0,1,non,non,oui,1030,Oui,
-122,1107033,0,0,1,non,non,oui,1000,Oui,
-122,1107020,0,0,1,non,non,oui,1010,Oui,
-122,1086596,0,0,1,non,non,oui,1020,Oui,
-122,8001874,0,0,1,non,non,oui,1030,Oui,
-120,8001874,0,0,1,non,non,oui,1000,Oui,
-81,1096741,0,0,1,non,non,oui,1000,Oui,
-81,1096743,0,0,1,non,non,oui,1010,Oui,
-81,1083851,0,0,1,non,non,oui,1020,Oui,
-49,1051684,0,0,1,non,non,oui,1000,Oui,
-49,1111131,0,0,1,non,non,oui,1010,Oui,
-49,1111134,0,0,1,non,non,oui,1020,Oui,
-49,1111133,0,0,1,non,non,oui,1030,Oui,
-111,1107020,0,0,1,non,non,oui,1000,Oui,
-111,8001874,0,0,1,non,non,oui,1010,Oui,
-111,1107033,0,0,1,non,non,oui,1020,Oui,
-111,1086596,0,0,1,non,non,oui,1030,Oui,
-11,1051683,0,0,1,non,non,oui,1000,Oui,
-11,1051684,0,0,1,non,non,oui,1010,Oui,
-11,1101460,0,0,1,non,non,oui,1020,Oui,
-11,1111000,0,0,1,non,non,oui,1030,Oui,
-11,1111131,0,0,1,non,non,oui,1040,Oui,
-11,1111134,0,0,1,non,non,oui,1050,Oui,
-11,1111133,0,0,1,non,non,oui,1060,Oui,
-11,1111132,0,0,1,non,non,oui,1070,Oui,
-137,8001874,0,0,1,non,non,oui,1000,Oui,
-135,8001874,0,0,1,non,non,oui,1000,Oui,
-134,8001874,0,0,1,non,non,oui,1000,Oui,
-130,8001874,0,0,1,non,non,oui,1000,Oui,
-110,8001874,0,0,1,non,non,oui,1000,Oui,
-125,8001874,0,0,1,non,non,oui,1000,Oui,
-100,1094054,0,0,1,non,non,oui,1000,Oui,
-100,1075049,0,0,1,non,non,oui,1010,Oui,
-100,1112372,0,0,1,non,non,oui,1020,Oui,
-100,830778,0,0,1,non,non,oui,1030,Oui,
-99,8004774,0,0,1,non,non,oui,1000,Oui,
-99,1112372,0,0,1,non,non,oui,1010,Oui,
-99,8004669,0,0,1,non,non,oui,1020,Oui,
-99,830778,0,0,1,non,non,oui,1030,Oui,
-52,1051684,0,0,1,non,non,oui,1000,Oui,
-52,1111131,0,0,1,non,non,oui,1010,Oui,
-52,1111134,0,0,1,non,non,oui,1020,Oui,
-52,1111133,0,0,1,non,non,oui,1030,Oui,
-132,8001874,0,0,1,non,non,oui,1000,Oui,
-126,8001874,0,0,1,non,non,oui,1000,Oui,
-113,8001874,0,0,1,non,non,oui,1000,Oui,
-12,1051683,0,0,1,non,non,oui,1000,Oui,
-12,1051684,0,0,1,non,non,oui,1010,Oui,
-12,1101460,0,0,1,non,non,oui,1020,Oui,
-12,1111000,0,0,1,non,non,oui,1030,Oui,
-12,1111131,0,0,1,non,non,oui,1040,Oui,
-12,1111134,0,0,1,non,non,oui,1050,Oui,
-12,1111133,0,0,1,non,non,oui,1060,Oui,
-12,1111132,0,0,1,non,non,oui,1070,Oui,
-23,1101460,0,0,1,non,non,oui,1000,Oui,
-23,1111131,0,0,1,non,non,oui,1010,Oui,
-23,1111134,0,0,1,non,non,oui,1020,Oui,
-23,1111133,0,0,1,non,non,oui,1030,Oui,
-23,1111132,0,0,1,non,non,oui,1040,Oui,
-119,8001874,0,0,1,non,non,oui,1000,Oui,
-97,1112372,0,0,1,non,non,oui,1000,Oui,
-97,8004755,0,0,1,non,non,oui,1010,Oui,
-97,8004669,0,0,1,non,non,oui,1020,Oui,
-97,830773,0,0,1,non,non,oui,1030,Oui,
-96,1112372,0,0,1,non,non,oui,1000,Oui,
-96,8004755,0,0,1,non,non,oui,1010,Oui,
-96,8004669,0,0,1,non,non,oui,1020,Oui,
-96,830773,0,0,1,non,non,oui,1030,Oui,
-121,1107033,0,0,1,non,non,oui,1000,Oui,
-121,1107020,0,0,1,non,non,oui,1010,Oui,
-121,1086596,0,0,1,non,non,oui,1020,Oui,
-121,8001874,0,0,1,non,non,oui,1030,Oui,
-124,8001874,0,0,1,non,non,oui,1000,Oui,
-128,8001874,0,0,1,non,non,oui,1000,Oui,
-116,1099578,0,0,1,non,non,oui,1000,Oui,
-116,1099587,0,0,1,non,non,oui,1010,Oui,
-116,1099583,0,0,1,non,non,oui,1020,Oui,
-116,1086596,0,0,1,non,non,oui,1030,Oui,
-116,1086597,0,0,1,non,non,oui,1040,Oui,
-116,8001874,0,0,1,non,non,oui,1050,Oui,
-127,8001874,0,0,1,non,non,oui,1000,Oui,
-118,1116487,0,0,1,non,non,oui,1000,Oui,
-118,1116488,0,0,1,non,non,oui,1010,Oui,
-118,1116489,0,0,1,non,non,oui,1020,Oui,
-118,1086596,0,0,1,non,non,oui,1030,Oui,
-118,1086597,0,0,1,non,non,oui,1040,Oui,
-118,8001874,0,0,1,non,non,oui,1050,Oui,
-123,1103463,0,0,1,non,non,oui,1000,Oui,
-123,1090849,0,0,1,non,non,oui,1010,Oui,
-123,1090851,0,0,1,non,non,oui,1020,Oui,
-123,1090853,0,0,1,non,non,oui,1030,Oui,
-123,1086596,0,0,1,non,non,oui,1040,Oui,
-123,1086597,0,0,1,non,non,oui,1050,Oui,
-123,8001874,0,0,1,non,non,oui,1060,Oui,
-109,1090850,0,0,1,non,non,oui,1000,Oui,
-109,1103464,0,0,1,non,non,oui,1010,Oui,
-109,1090852,0,0,1,non,non,oui,1020,Oui,
-109,1090854,0,0,1,non,non,oui,1030,Oui,
-109,8001874,0,0,1,non,non,oui,1040,Oui,
-109,1086597,0,0,1,non,non,oui,1050,Oui,
-109,1086596,0,0,1,non,non,oui,1060,Oui,
-22,1101460,0,0,1,non,non,oui,1000,Oui,
-22,1111131,0,0,1,non,non,oui,1010,Oui,
-22,1111134,0,0,1,non,non,oui,1020,Oui,
-22,1111133,0,0,1,non,non,oui,1030,Oui,
-22,1111132,0,0,1,non,non,oui,1040,Oui,
-103,1097121,0,0,1,non,non,oui,1000,Oui,
-103,8004773,0,0,1,non,non,oui,1010,Oui,
-103,8004133,0,0,1,non,non,oui,1020,Oui,
-103,1112372,0,0,1,non,non,oui,1030,Oui,
-129,8001874,0,0,1,non,non,oui,1000,Oui,
-71,789516,0,0,1,non,non,oui,1000,Oui,
-71,553708,0,0,1,non,non,oui,1010,Oui,
-71,577065,0,0,1,non,non,oui,1020,Oui,
-131,1022160,0,0,1,non,non,oui,1000,Oui,
-133,1022160,0,0,1,non,non,oui,1000,Oui,
-136,1022160,0,0,1,non,non,oui,1000,Oui,
+N° Pack,Réf Produit,Quantité,Min,Max,option_incluse,option_incluse_obligatoire,Afficher sur le site,Ordre,TYPE de produit,Px achat av taxes,Px d'achat HT,Eco Taxe,Eco Mobilier
+201,1092107,1,1,1,non,non,oui,10,Lignes de produits,"254,98","246,65","8,33",0
+202,1081368,1,1,1,non,non,oui,10,Lignes de produits,"282,79","274,46","8,33",0
+203,1099432,1,1,1,non,non,oui,10,Lignes de produits,"197,11","188,78","8,33",0
+204,1088812,1,1,1,non,non,oui,10,Lignes de produits,"251,52","243,19","8,33",0
+205,1014147,1,1,1,non,non,oui,10,Lignes de produits,"475,36","460,36",15,0
+206,1036531,1,1,1,non,non,oui,10,Lignes de produits,"276,52","268,19","8,33",0
+207,1093983,1,1,1,non,non,oui,10,Lignes de produits,"319,56","311,23","8,33",0
+208,1069713,1,1,1,non,non,oui,10,Lignes de produits,"452,17","443,84","8,33",0
+209,1053061,1,1,1,non,non,oui,10,Lignes de produits,"1016,6","997,43","19,17",0
+210,1011399,1,1,1,non,non,oui,10,Lignes de produits,"279,55","264,55",15,0
+211,1096578,1,1,1,non,non,oui,10,Lignes de produits,"207,33",199,"8,33",0
+212,1088909,1,1,1,non,non,oui,10,Lignes de produits,"338,72","323,72",15,0
+213,1088906,1,1,1,non,non,oui,10,Lignes de produits,"265,95","250,95",15,0
+214,1085215,1,1,1,non,non,oui,10,Lignes de produits,"523,47","508,47",15,0
+215,1022062,1,1,1,non,non,oui,10,Lignes de produits,"463,16","448,16",15,0
+216,1086653,1,1,1,non,non,oui,10,Lignes de produits,"614,23","595,06","19,17",0
+217,1073542,1,1,1,non,non,oui,10,Lignes de produits,"332,5","317,5",15,0
+218,1069997,1,1,1,non,non,oui,10,Lignes de produits,"774,67","755,5","19,17",0
+219,1073734,1,1,1,non,non,oui,10,Lignes de produits,"372,45","357,45",15,0
+220,1103002,1,1,1,non,non,oui,10,Lignes de produits,"417,05","402,05",15,0
+221,1095854,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+222,1088073,1,1,1,non,non,oui,10,Lignes de produits,"277,28","268,95","8,33",0
+223,1069277,1,1,1,non,non,oui,10,Lignes de produits,"354,46","346,13","8,33",0
+224,1069441,1,1,1,non,non,oui,10,Lignes de produits,"295,18","286,85","8,33",0
+225,1097633,1,1,1,non,non,oui,10,Lignes de produits,"304,78","296,45","8,33",0
+226,1081146,1,1,1,non,non,oui,10,Lignes de produits,"241,95","233,62","8,33",0
+227,1095855,1,1,1,non,non,oui,10,Lignes de produits,"367,13","358,8","8,33",0
+228,1049706,1,1,1,non,non,oui,10,Lignes de produits,"717,28","708,95","8,33",0
+229,1025352,1,1,1,non,non,oui,10,Lignes de produits,"363,08","354,75","8,33",0
+230,1021669,1,1,1,non,non,oui,10,Lignes de produits,"410,7","402,37","8,33",0
+231,1027330,1,1,1,non,non,oui,10,Lignes de produits,"415,5","407,17","8,33",0
+232,1028875,1,1,1,non,non,oui,10,Lignes de produits,"237,73","229,4","8,33",0
+233,1069444,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+234,1066219,1,1,1,non,non,oui,10,Lignes de produits,"421,82","413,49","8,33",0
+235,1066220,1,1,1,non,non,oui,10,Lignes de produits,"283,33",275,"8,33",0
+236,1041483,1,1,1,non,non,oui,10,Lignes de produits,"1865,57","1857,24","8,33",0
+237,1063521,1,1,1,non,non,oui,10,Lignes de produits,"217,93","209,6","8,33",0
+238,1055886,1,1,1,non,non,oui,10,Lignes de produits,"237,69","229,36","8,33",0
+239,1078293,1,1,1,non,non,oui,10,Lignes de produits,"242,5","234,17","8,33",0
+240,1109173,1,1,1,non,non,oui,10,Lignes de produits,"292,51","284,18","8,33",0
+241,1101320,1,1,1,non,non,oui,10,Lignes de produits,"225,32","216,99","8,33",0
+242,1101200,1,1,1,non,non,oui,10,Lignes de produits,"186,28","177,95","8,33",0
+243,1073316,1,1,1,non,non,oui,10,Lignes de produits,"238,81","230,48","8,33",0
+244,1096885,1,1,1,non,non,oui,10,Lignes de produits,"245,87","237,54","8,33",0
+245,1087825,1,1,1,non,non,oui,10,Lignes de produits,"510,72","502,39","8,33",0
+246,1093327,1,1,1,non,non,oui,10,Lignes de produits,"1102,28","1093,95","8,33",0
+247,1036518,1,1,1,non,non,oui,10,Lignes de produits,"577,63","569,3","8,33",0
+248,1096919,1,1,1,non,non,oui,10,Lignes de produits,"332,28","323,95","8,33",0
+249,1101212,1,1,1,non,non,oui,10,Lignes de produits,"286,91","278,58","8,33",0
+250,1101213,1,1,1,non,non,oui,10,Lignes de produits,"346,39","338,06","8,33",0
+251,1109182,1,1,1,non,non,oui,10,Lignes de produits,"424,63","416,3","8,33",0
+252,1110366,1,1,1,non,non,oui,10,Lignes de produits,"359,78","351,45","8,33",0
+253,1049279,1,1,1,non,non,oui,10,Lignes de produits,"442,4","434,07","8,33",0
+254,1087822,1,1,1,non,non,oui,10,Lignes de produits,"465,24","456,91","8,33",0
+255,1087799,1,1,1,non,non,oui,10,Lignes de produits,"465,24","456,91","8,33",0
+256,1087821,1,1,1,non,non,oui,10,Lignes de produits,"465,24","456,91","8,33",0
+257,1074503,1,1,1,non,non,oui,10,Lignes de produits,"266,19","257,86","8,33",0
+258,1074507,1,1,1,non,non,oui,10,Lignes de produits,"273,04","264,71","8,33",0
+259,1074509,1,1,1,non,non,oui,10,Lignes de produits,"326,5","318,17","8,33",0
+260,1074508,1,1,1,non,non,oui,10,Lignes de produits,"326,5","318,17","8,33",0
+261,1088521,1,1,1,non,non,oui,10,Lignes de produits,"403,39","395,06","8,33",0
+262,1088522,1,1,1,non,non,oui,10,Lignes de produits,"442,28","433,95","8,33",0
+263,1091902,1,1,1,non,non,oui,10,Lignes de produits,"469,78","461,45","8,33",0
+264,1091905,1,1,1,non,non,oui,10,Lignes de produits,"443,3","434,97","8,33",0
+265,1116028,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+266,1070012,1,1,1,non,non,oui,10,Lignes de produits,"321,07","312,74","8,33",0
+267,1106872,1,1,1,non,non,oui,10,Lignes de produits,"419,73","411,4","8,33",0
+268,1086284,1,1,1,non,non,oui,10,Lignes de produits,"323,53","315,2","8,33",0
+269,1049712,1,1,1,non,non,oui,10,Lignes de produits,"757,81","749,48","8,33",0
+270,1104464,1,1,1,non,non,oui,10,Lignes de produits,"397,14","388,81","8,33",0
+271,1079476,1,1,1,non,non,oui,10,Lignes de produits,"356,4","348,07","8,33",0
+272,1091907,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+273,1109190,1,1,1,non,non,oui,10,Lignes de produits,"365,28","356,95","8,33",0
+274,1103506,1,1,1,non,non,oui,10,Lignes de produits,"379,63","371,3","8,33",0
+275,1059952,1,1,1,non,non,oui,10,Lignes de produits,494,"485,67","8,33",0
+276,1087824,1,1,1,non,non,oui,10,Lignes de produits,"497,95","489,62","8,33",0
+277,1096754,1,1,1,non,non,oui,10,Lignes de produits,"541,28","532,95","8,33",0
+278,1090315,1,1,1,non,non,oui,10,Lignes de produits,"332,28","323,95","8,33",0
+279,1109659,1,1,1,non,non,oui,10,Lignes de produits,"302,51","294,18","8,33",0
+280,1102382,1,1,1,non,non,oui,10,Lignes de produits,"282,75","274,42","8,33",0
+281,1089059,1,1,1,non,non,oui,10,Lignes de produits,"268,51","264,34","4,17",0
+282,1087426,1,1,1,non,non,oui,10,Lignes de produits,"281,09","276,92","4,17",0
+283,1101215,1,1,1,non,non,oui,10,Lignes de produits,"236,78","232,61","4,17",0
+284,1089681,1,1,1,non,non,oui,10,Lignes de produits,"418,12","413,95","4,17",0
+285,1109745,1,1,1,non,non,oui,10,Lignes de produits,"426,05","421,88","4,17",0
+286,1085769,1,1,1,non,non,oui,10,Lignes de produits,"220,87","216,7","4,17",0
+287,1079557,1,1,1,non,non,oui,10,Lignes de produits,"260,23","256,06","4,17",0
+288,1079559,1,1,1,non,non,oui,10,Lignes de produits,"303,37","299,2","4,17",0
+289,1001925,1,1,1,non,non,oui,10,Lignes de produits,"358,91","354,74","4,17",0
+290,1099715,1,1,1,non,non,oui,10,Lignes de produits,"193,91","189,74","4,17",0
+291,1053588,1,1,1,non,non,oui,10,Lignes de produits,"347,65","343,48","4,17",0
+292,1025365,1,1,1,non,non,oui,10,Lignes de produits,"243,84","239,67","4,17",0
+293,1089710,1,1,1,non,non,oui,10,Lignes de produits,"438,23","434,06","4,17",0
+294,1025366,1,1,1,non,non,oui,10,Lignes de produits,"284,77","280,6","4,17",0
+295,1085761,1,1,1,non,non,oui,10,Lignes de produits,"204,37","200,2","4,17",0
+296,1072511,1,1,1,non,non,oui,10,Lignes de produits,"238,42","234,25","4,17",0
+297,1101512,1,1,1,non,non,oui,10,Lignes de produits,"221,41","217,24","4,17",0
+298,1076875,1,1,1,non,non,oui,10,Lignes de produits,"235,89","231,72","4,17",0
+299,1011980,1,1,1,non,non,oui,10,Lignes de produits,"340,13","331,8","8,33",0
+300,1021834,1,1,1,non,non,oui,10,Lignes de produits,"304,22","297,55","6,67",0
+301,1111082,1,1,1,non,non,oui,10,Lignes de produits,"223,99","215,66","8,33",0
+302,1075333,1,1,1,non,non,oui,10,Lignes de produits,"410,48","402,15","8,33",0
+303,1106188,1,1,1,non,non,oui,10,Lignes de produits,"236,63","229,96","6,67",0
+304,1099776,1,1,1,non,non,oui,10,Lignes de produits,"287,5","280,83","6,67",0
+305,1019579,1,1,1,non,non,oui,10,Lignes de produits,"271,35","263,02","8,33",0
+306,1106719,1,1,1,non,non,oui,10,Lignes de produits,"497,28","488,95","8,33",0
+307,1070111,1,1,1,non,non,oui,10,Lignes de produits,"611,12","602,79","8,33",0
+308,1107533,1,1,1,non,non,oui,10,Lignes de produits,"258,9","250,57","8,33",0
+309,1107535,1,1,1,non,non,oui,10,Lignes de produits,"286,35","278,02","8,33",0
+310,1107627,1,1,1,non,non,oui,10,Lignes de produits,"356,85","348,52","8,33",0
+311,1096685,1,1,1,non,non,oui,10,Lignes de produits,"386,5","378,17","8,33",0
+312,1096684,1,1,1,non,non,oui,10,Lignes de produits,"295,56","287,23","8,33",0
+313,1107609,1,1,1,non,non,oui,10,Lignes de produits,"420,28","411,95","8,33",0
+314,1070349,1,1,1,non,non,oui,10,Lignes de produits,"269,81","261,48","8,33",0
+315,1049945,1,1,1,non,non,oui,10,Lignes de produits,"292,47","284,14","8,33",0
+316,1107678,1,1,1,non,non,oui,10,Lignes de produits,"230,6","222,27","8,33",0
+317,1101210,1,1,1,non,non,oui,10,Lignes de produits,"368,64","360,31","8,33",0
+318,1101222,1,1,1,non,non,oui,10,Lignes de produits,"389,91","381,58","8,33",0
+319,1087678,1,1,1,non,non,oui,10,Lignes de produits,"304,05","295,72","8,33",0
+320,1108683,1,1,1,non,non,oui,10,Lignes de produits,"481,73","473,4","8,33",0
+321,1109302,1,1,1,non,non,oui,10,Lignes de produits,"397,66","389,33","8,33",0
+322,1091607,1,1,1,non,non,oui,10,Lignes de produits,"737,16","728,83","8,33",0
+323,1085965,1,1,1,non,non,oui,10,Lignes de produits,"601,04","594,37","6,67",0
+324,1087135,1,1,1,non,non,oui,10,Lignes de produits,"755,99","747,66","8,33",0
+325,1106007,1,1,1,non,non,oui,10,Lignes de produits,"343,3","334,97","8,33",0
+326,1086581,1,1,1,non,non,oui,10,Lignes de produits,"310,92","302,59","8,33",0
+327,1067076,1,1,1,non,non,oui,10,Lignes de produits,"415,08","406,75","8,33",0
+328,1105314,1,1,1,non,non,oui,10,Lignes de produits,"540,33",532,"8,33",0
+329,1086010,1,1,1,non,non,oui,10,Lignes de produits,"335,08","326,75","8,33",0
+330,1067079,1,1,1,non,non,oui,10,Lignes de produits,"417,72","409,39","8,33",0
+331,1037799,1,1,1,non,non,oui,10,Lignes de produits,"271,7","263,37","8,33",0
+332,1088675,1,1,1,non,non,oui,10,Lignes de produits,"296,85","288,52","8,33",0
+333,1104093,1,1,1,non,non,oui,10,Lignes de produits,"252,63","244,3","8,33",0
+334,1107679,1,1,1,non,non,oui,10,Lignes de produits,"357,63","349,3","8,33",0
+335,1049815,1,1,1,non,non,oui,10,Lignes de produits,"332,496667","324,166667","8,33",0
+336,1108236,1,1,1,non,non,oui,10,Lignes de produits,"255,17","246,84","8,33",0
+337,1108195,1,1,1,non,non,oui,10,Lignes de produits,"273,24","264,91","8,33",0
+338,1078511,1,1,1,non,non,oui,10,Lignes de produits,"324,77","316,44","8,33",0
+339,1092417,1,1,1,non,non,oui,10,Lignes de produits,"284,55","276,22","8,33",0
+340,1103691,1,1,1,non,non,oui,10,Lignes de produits,"226,81","218,48","8,33",0
+341,1008917,1,1,1,non,non,oui,10,Lignes de produits,"414,78","406,45","8,33",0
+342,1070241,1,1,1,non,non,oui,10,Lignes de produits,"280,35","272,02","8,33",0
+343,1067634,1,1,1,non,non,oui,10,Lignes de produits,"238,38","230,05","8,33",0
+344,1072495,1,1,1,non,non,oui,10,Lignes de produits,"250,84","242,51","8,33",0
+345,1017110,1,1,1,non,non,oui,10,Lignes de produits,"258,51","250,18","8,33",0
+346,1057152,1,1,1,non,non,oui,10,Lignes de produits,"338,57","330,24","8,33",0
+347,1057154,1,1,1,non,non,oui,10,Lignes de produits,"311,18","302,85","8,33",0
+348,1057155,1,1,1,non,non,oui,10,Lignes de produits,"358,95","350,62","8,33",0
+349,1090532,1,1,1,non,non,oui,10,Lignes de produits,"331,72","325,05","6,67",0
+350,1107955,1,1,1,non,non,oui,10,Lignes de produits,"326,05","317,72","8,33",0
+351,1109568,1,1,1,non,non,oui,10,Lignes de produits,"588,63","580,3","8,33",0
+352,1087696,1,1,1,non,non,oui,10,Lignes de produits,"823,5","815,17","8,33",0
+353,1084677,1,1,1,non,non,oui,10,Lignes de produits,"414,78","406,45","8,33",0
+354,1104058,1,1,1,non,non,oui,10,Lignes de produits,"460,4","452,07","8,33",0
+355,1104040,1,1,1,non,non,oui,10,Lignes de produits,"492,39","484,06","8,33",0
+356,1104034,1,1,1,non,non,oui,10,Lignes de produits,"534,24","525,91","8,33",0
+357,1111772,1,1,1,non,non,oui,10,Lignes de produits,"599,61","591,28","8,33",0
+358,1106406,1,1,1,non,non,oui,10,Lignes de produits,"623,57","615,24","8,33",0
+359,1078598,1,1,1,non,non,oui,10,Lignes de produits,"414,78","406,45","8,33",0
+360,1087188,1,1,1,non,non,oui,10,Lignes de produits,"477,97","469,64","8,33",0
+361,1009012,1,1,1,non,non,oui,10,Lignes de produits,"558,63","550,3","8,33",0
+362,1108689,1,1,1,non,non,oui,10,Lignes de produits,"259,38","252,71","6,67",0
+363,1105676,1,1,1,non,non,oui,10,Lignes de produits,"302,08","293,75","8,33",0
+364,1105985,1,1,1,non,non,oui,10,Lignes de produits,"373,54","365,21","8,33",0
+365,1085592,1,1,1,non,non,oui,10,Lignes de produits,"369,54","361,21","8,33",0
+366,1086300,1,1,1,non,non,oui,10,Lignes de produits,"281,97","273,64","8,33",0
+367,1078921,1,1,1,non,non,oui,10,Lignes de produits,"301,61","293,28","8,33",0
+368,1021547,1,1,1,non,non,oui,10,Lignes de produits,"316,23","307,9","8,33",0
+369,1105918,1,1,1,non,non,oui,10,Lignes de produits,"402,84","394,51","8,33",0
+370,1086332,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+371,1105953,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+372,1086333,1,1,1,non,non,oui,10,Lignes de produits,"610,89","602,56","8,33",0
+373,1112312,1,1,1,non,non,oui,10,Lignes de produits,"315,39","307,06","8,33",0
+374,1090200,1,1,1,non,non,oui,10,Lignes de produits,"331,65","323,32","8,33",0
+375,1060495,1,1,1,non,non,oui,10,Lignes de produits,"251,51","243,18","8,33",0
+376,1046383,1,1,1,non,non,oui,10,Lignes de produits,"474,2","467,53","6,67",0
+377,1104687,1,1,1,non,non,oui,10,Lignes de produits,"511,59","503,26","8,33",0
+378,1098636,1,1,1,non,non,oui,10,Lignes de produits,"394,1","387,44","6,66",0
+379,1077310,1,1,1,non,non,oui,10,Lignes de produits,"385,94","377,61","8,33",0
+380,1086334,1,1,1,non,non,oui,10,Lignes de produits,"403,92","395,59","8,33",0
+381,1089141,1,1,1,non,non,oui,10,Lignes de produits,"482,92","474,59","8,33",0
+382,1073568,1,1,1,non,non,oui,10,Lignes de produits,"291,3","282,97","8,33",0
+383,1073648,1,1,1,non,non,oui,10,Lignes de produits,"324,46","316,13","8,33",0
+384,1092009,1,1,1,non,non,oui,10,Lignes de produits,"334,41","326,08","8,33",0
+385,1048544,1,1,1,non,non,oui,10,Lignes de produits,"264,25","255,92","8,33",0
+386,1087168,1,1,1,non,non,oui,10,Lignes de produits,"387,28","378,95","8,33",0
+387,1087166,1,1,1,non,non,oui,10,Lignes de produits,"402,42","394,09","8,33",0
+388,1086791,1,1,1,non,non,oui,10,Lignes de produits,"372,88","364,55","8,33",0
+389,1109465,1,1,1,non,non,oui,10,Lignes de produits,"508,53","500,2","8,33",0
+390,1087169,1,1,1,non,non,oui,10,Lignes de produits,"554,76","546,43","8,33",0
+391,1073483,1,1,1,non,non,oui,10,Lignes de produits,"265,2","256,87","8,33",0
+392,1073482,1,1,1,non,non,oui,10,Lignes de produits,"270,24","261,91","8,33",0
+393,1073485,1,1,1,non,non,oui,10,Lignes de produits,"266,44","258,11","8,33",0
+394,1091741,1,1,1,non,non,oui,10,Lignes de produits,"271,79","263,46","8,33",0
+395,1103742,1,1,1,non,non,oui,10,Lignes de produits,"359,78","351,45","8,33",0
+396,1070209,1,1,1,non,non,oui,10,Lignes de produits,"676,55","669,88","6,67",0
+397,1092462,1,1,1,non,non,oui,10,Lignes de produits,"409,15","400,82","8,33",0
+398,1086813,1,1,1,non,non,oui,10,Lignes de produits,"397,78","389,45","8,33",0
+399,1092463,1,1,1,non,non,oui,10,Lignes de produits,"437,72","429,39","8,33",0
+400,1087164,1,1,1,non,non,oui,10,Lignes de produits,"551,96","543,63","8,33",0
+401,1072606,1,1,1,non,non,oui,10,Lignes de produits,"340,9","332,57","8,33",0
+402,1072633,1,1,1,non,non,oui,10,Lignes de produits,"349,79","341,46","8,33",0
+403,1072635,1,1,1,non,non,oui,10,Lignes de produits,"340,95","332,62","8,33",0
+404,1086102,1,1,1,non,non,oui,10,Lignes de produits,"236,56","229,89","6,67",0
+405,1109461,1,1,1,non,non,oui,10,Lignes de produits,"304,78","296,45","8,33",0
+406,1106418,1,1,1,non,non,oui,10,Lignes de produits,"343,25","334,92","8,33",0
+407,1109462,1,1,1,non,non,oui,10,Lignes de produits,"348,78","340,45","8,33",0
+408,1089240,1,1,1,non,non,oui,10,Lignes de produits,"384,27","375,94","8,33",0
+409,1079353,1,1,1,non,non,oui,10,Lignes de produits,"395,64","387,31","8,33",0
+410,1110369,1,1,1,non,non,oui,10,Lignes de produits,"475,28","466,95","8,33",0
+411,1088854,1,1,1,non,non,oui,10,Lignes de produits,"372,78","364,45","8,33",0
+412,1103741,1,1,1,non,non,oui,10,Lignes de produits,"300,09","291,76","8,33",0
+413,1073394,1,1,1,non,non,oui,10,Lignes de produits,"269,6","261,27","8,33",0
+414,1070222,1,1,1,non,non,oui,10,Lignes de produits,"759,28","752,61","6,67",0
+415,1070251,1,1,1,non,non,oui,10,Lignes de produits,"1184,22","1177,55","6,67",0
+416,1083059,1,1,1,non,non,oui,10,Lignes de produits,"268,81","260,48","8,33",0
+417,1087163,1,1,1,non,non,oui,10,Lignes de produits,"442,28","433,95","8,33",0
+418,1079354,1,1,1,non,non,oui,10,Lignes de produits,512,"503,67","8,33",0
+419,1090314,1,1,1,non,non,oui,10,Lignes de produits,"637,68","629,35","8,33",0
+420,1088187,1,1,1,non,non,oui,10,Lignes de produits,"506,3","497,97","8,33",0
+421,1090977,1,1,1,non,non,oui,10,Lignes de produits,"382,94","374,61","8,33",0
+422,1072516,1,1,1,non,non,oui,10,Lignes de produits,"349,78","341,45","8,33",0
+423,1093352,1,1,1,non,non,oui,10,Lignes de produits,"463,4","460,9","2,5",0
+424,1109493,1,1,1,non,non,oui,10,Lignes de produits,"232,79","230,29","2,5",0
+425,1109522,1,1,1,non,non,oui,10,Lignes de produits,"394,17","385,84","8,33",0
+426,1049683,1,1,1,non,non,oui,10,Lignes de produits,"401,44","398,94","2,5",0
+427,1050038,1,1,1,non,non,oui,10,Lignes de produits,"401,44","398,94","2,5",0
+428,1074607,1,1,1,non,non,oui,10,Lignes de produits,"248,76","246,26","2,5",0
+429,1037190,1,1,1,non,non,oui,10,Lignes de produits,"258,22","254,05","4,17",0
+430,1090316,1,1,1,non,non,oui,10,Lignes de produits,"209,3","206,8","2,5",0
+431,1036591,1,1,1,non,non,oui,10,Lignes de produits,"420,52","418,02","2,5",0
+432,1069928,1,1,1,non,non,oui,10,Lignes de produits,"341,47","338,97","2,5",0
+433,1105400,1,1,1,non,non,oui,10,Lignes de produits,"281,53","279,03","2,5",0
+434,1048441,1,1,1,non,non,oui,10,Lignes de produits,"401,4","398,9","2,5",0
+435,1110815,1,1,1,non,non,oui,10,Lignes de produits,"497,28","488,95","8,33",0
+436,1048494,1,1,1,non,non,oui,10,Lignes de produits,"275,3","272,8","2,5",0
+437,1048536,1,1,1,non,non,oui,10,Lignes de produits,"337,72","335,22","2,5",0
+438,1092731,1,1,1,non,non,oui,10,Lignes de produits,"206,97","202,8","4,17",0
+439,1034261,1,1,1,non,non,oui,10,Lignes de produits,"220,87","216,7","4,17",0
+440,1088987,1,1,1,non,non,oui,10,Lignes de produits,"189,8","185,63","4,17",0
+441,1088988,1,1,1,non,non,oui,10,Lignes de produits,"253,87","249,7","4,17",0
+442,1071339,1,1,1,non,non,oui,10,Lignes de produits,"285,12","283,04","2,08",0
+443,1091724,1,1,1,non,non,oui,10,Lignes de produits,"281,93","277,76","4,17",0
+444,1086490,1,1,1,non,non,oui,10,Lignes de produits,"239,17",235,"4,17",0
+445,1088989,1,1,1,non,non,oui,10,Lignes de produits,"239,35","235,18","4,17",0
+446,1090164,1,1,1,non,non,oui,10,Lignes de produits,"240,05","235,88","4,17",0
+447,1088998,1,1,1,non,non,oui,10,Lignes de produits,"250,99","246,82","4,17",0
+448,1084323,1,1,1,non,non,oui,10,Lignes de produits,"330,87","326,7","4,17",0
+449,1109595,1,1,1,non,non,oui,10,Lignes de produits,"275,87","271,7","4,17",0
+450,1109594,1,1,1,non,non,oui,10,Lignes de produits,"275,87","271,7","4,17",0
+451,1101214,1,1,1,non,non,oui,10,Lignes de produits,"193,37","189,2","4,17",0
+452,1074220,1,1,1,non,non,oui,10,Lignes de produits,"321,24","317,07","4,17",0
+453,1087850,1,1,1,non,non,oui,10,Lignes de produits,"251,43","247,26","4,17",0
+454,1109212,1,1,1,non,non,oui,10,Lignes de produits,"374,41","370,24","4,17",0
+455,1074582,1,1,1,non,non,oui,10,Lignes de produits,"274,91","270,74","4,17",0
+456,1088523,1,1,1,non,non,oui,10,Lignes de produits,"363,86","359,69","4,17",0
+457,1088525,1,1,1,non,non,oui,10,Lignes de produits,"468,37","464,2","4,17",0
+458,1088776,1,1,1,non,non,oui,10,Lignes de produits,"525,29","521,12","4,17",0
+459,1090509,1,1,1,non,non,oui,10,Lignes de produits,"576,54","572,37","4,17",0
+460,1088777,1,1,1,non,non,oui,10,Lignes de produits,"659,24","655,07","4,17",0
+461,1088780,1,1,1,non,non,oui,10,Lignes de produits,"874,72","870,55","4,17",0
+462,1088851,1,1,1,non,non,oui,10,Lignes de produits,"877,72","873,55","4,17",0
+463,1107063,1,1,1,non,non,oui,10,Lignes de produits,"216,69","214,61","2,08",0
+464,1107068,1,1,1,non,non,oui,10,Lignes de produits,"254,9","252,82","2,08",0
+465,1107070,1,1,1,non,non,oui,10,Lignes de produits,"311,52","309,44","2,08",0
+466,1107113,1,1,1,non,non,oui,10,Lignes de produits,"255,4","253,32","2,08",0
+467,1111583,1,1,1,non,non,oui,10,Lignes de produits,"356,55","354,47","2,08",0
+468,1109598,1,1,1,non,non,oui,10,Lignes de produits,"550,87","546,7","4,17",0
+469,1079600,1,1,1,non,non,oui,10,Lignes de produits,"1547,8","1543,63","4,17",0
+470,1073319,1,1,1,non,non,oui,10,Lignes de produits,"258,65","254,48","4,17",0
+471,1073502,1,1,1,non,non,oui,10,Lignes de produits,"495,87","491,7","4,17",0
+472,1093360,1,1,1,non,non,oui,10,Lignes de produits,"748,86","744,69","4,17",0
+473,1069829,1,1,1,non,non,oui,10,Lignes de produits,"347,28","343,11","4,17",0
+474,1091649,1,1,1,non,non,oui,10,Lignes de produits,"232,503333","228,333333","4,17",0
+475,1051603,1,1,1,non,non,oui,10,Lignes de produits,"303,37","299,2","4,17",0
+476,1046254,1,1,1,non,non,oui,10,Lignes de produits,"358,37","354,2","4,17",0
+477,1051604,1,1,1,non,non,oui,10,Lignes de produits,"358,76","354,59","4,17",0
+478,1076125,1,1,1,non,non,oui,10,Lignes de produits,"322,92","318,75","4,17",0
+479,1074602,1,1,1,non,non,oui,10,Lignes de produits,"249,93","245,76","4,17",0
+480,1072388,1,1,1,non,non,oui,10,Lignes de produits,"440,87","436,7","4,17",0
+481,1087872,1,1,1,non,non,oui,10,Lignes de produits,"255,43","251,26","4,17",0
+482,1087873,1,1,1,non,non,oui,10,Lignes de produits,"235,86","231,69","4,17",0
+483,1087874,1,1,1,non,non,oui,10,Lignes de produits,"450,21","446,04","4,17",0
+484,1071418,1,1,1,non,non,oui,10,Lignes de produits,"508,53","504,36","4,17",0
+485,1112804,1,1,1,non,non,oui,10,Lignes de produits,"450,05","445,88","4,17",0
+486,1071420,1,1,1,non,non,oui,10,Lignes de produits,"547,1","542,93","4,17",0
+487,1100525,1,1,1,non,non,oui,10,Lignes de produits,"880,87","876,7","4,17",0
+488,1072384,1,1,1,non,non,oui,10,Lignes de produits,"244,81","240,64","4,17",0
+489,1080554,1,1,1,non,non,oui,10,Lignes de produits,"265,47","261,3","4,17",0
+490,1067570,1,1,1,non,non,oui,10,Lignes de produits,"253,99","249,82","4,17",0
+491,1089587,1,1,1,non,non,oui,10,Lignes de produits,"340,13","335,96","4,17",0
+492,1089588,1,1,1,non,non,oui,10,Lignes de produits,"676,67","672,5","4,17",0
+493,1088221,1,1,1,non,non,oui,10,Lignes de produits,"307,05","292,05",15,0
+494,1088209,1,1,1,non,non,oui,10,Lignes de produits,"284,28","269,28",15,0
+495,1072263,1,1,1,non,non,oui,10,Lignes de produits,"402,24","383,07","19,17",0
+496,1088208,1,1,1,non,non,oui,10,Lignes de produits,"230,8","215,8",15,0
+497,1025804,1,1,1,non,non,oui,10,Lignes de produits,"415,833333","400,833333",15,0
+498,1086999,1,1,1,non,non,oui,10,Lignes de produits,"250,63","235,63",15,0
+499,1025104,1,1,1,non,non,oui,10,Lignes de produits,"264,02","249,02",15,0
+500,1099709,1,1,1,non,non,oui,10,Lignes de produits,"436,92","421,92",15,0
+501,1108697,1,1,1,non,non,oui,10,Lignes de produits,"559,94","540,77","19,17",0
+502,1109526,1,1,1,non,non,oui,10,Lignes de produits,"461,04","446,04",15,0
+503,1050534,1,1,1,non,non,oui,10,Lignes de produits,"427,46","412,46",15,0
+504,1051888,1,1,1,non,non,oui,10,Lignes de produits,"410,83","395,83",15,0
+505,1051887,1,1,1,non,non,oui,10,Lignes de produits,"394,75","379,75",15,0
+506,1050533,1,1,1,non,non,oui,10,Lignes de produits,"366,59","351,59",15,0
+507,1105935,1,1,1,non,non,oui,10,Lignes de produits,"468,38","453,38",15,0
+508,1073362,1,1,1,non,non,oui,10,Lignes de produits,"484,92","469,92",15,0
+509,1073381,1,1,1,non,non,oui,10,Lignes de produits,"440,833333","425,833333",15,0
+510,1073363,1,1,1,non,non,oui,10,Lignes de produits,"701,3","686,3",15,0
+511,1070644,1,1,1,non,non,oui,10,Lignes de produits,"805,67","786,5","19,17",0
+512,1087140,1,1,1,non,non,oui,10,Lignes de produits,"583,58","564,41","19,17",0
+513,1089504,1,1,1,non,non,oui,10,Lignes de produits,"640,59","621,42","19,17",0
+514,1071809,1,1,1,non,non,oui,10,Lignes de produits,"637,24","618,07","19,17",0
+515,1050616,1,1,1,non,non,oui,10,Lignes de produits,"298,48","283,48",15,0
+516,1054967,1,1,1,non,non,oui,10,Lignes de produits,"362,05","347,05",15,0
+517,1054966,1,1,1,non,non,oui,10,Lignes de produits,"338,62","323,62",15,0
+518,1073625,1,1,1,non,non,oui,10,Lignes de produits,"395,47","380,47",15,0
+519,1072706,1,1,1,non,non,oui,10,Lignes de produits,"252,48","237,48",15,0
+520,1037555,1,1,1,non,non,oui,10,Lignes de produits,"254,24","239,24",15,0
+521,8004926,1,1,1,non,non,oui,10,Lignes de produits,"334,55","319,55",15,0
+522,1089283,1,1,1,non,non,oui,10,Lignes de produits,"279,36","264,36",15,0
+523,1069887,1,1,1,non,non,oui,10,Lignes de produits,"399,34","384,34",15,0
+524,1089585,1,1,1,non,non,oui,10,Lignes de produits,"523,9","508,9",15,0
+525,1069881,1,1,1,non,non,oui,10,Lignes de produits,"628,87","613,87",15,0
+526,1072135,1,1,1,non,non,oui,10,Lignes de produits,"599,09","584,09",15,0
+527,1068623,1,1,1,non,non,oui,10,Lignes de produits,"460,98","445,98",15,0
+528,1086550,1,1,1,non,non,oui,10,Lignes de produits,"524,87","509,87",15,0
+529,1073596,1,1,1,non,non,oui,10,Lignes de produits,"360,06","345,06",15,0
+530,1073620,1,1,1,non,non,oui,10,Lignes de produits,"415,43","400,43",15,0
+531,1073847,1,1,1,non,non,oui,10,Lignes de produits,"261,69","246,69",15,0
+532,1073342,1,1,1,non,non,oui,10,Lignes de produits,"253,58","238,58",15,0
+533,1085699,1,1,1,non,non,oui,10,Lignes de produits,"267,77","252,77",15,0
+534,1072264,1,1,1,non,non,oui,10,Lignes de produits,"295,8","280,8",15,0
+535,1074177,1,1,1,non,non,oui,10,Lignes de produits,"296,04","281,04",15,0
+536,1096575,1,1,1,non,non,oui,10,Lignes de produits,"536,22","521,22",15,0
+537,1074930,1,1,1,non,non,oui,10,Lignes de produits,"409,2","394,2",15,0
+538,1067306,1,1,1,non,non,oui,10,Lignes de produits,"421,06","406,06",15,0
+539,1068874,1,1,1,non,non,oui,10,Lignes de produits,"531,12","516,12",15,0
+540,1067637,1,1,1,non,non,oui,10,Lignes de produits,"566,53","547,36","19,17",0
+541,1067635,1,1,1,non,non,oui,10,Lignes de produits,"482,13","462,96","19,17",0
+542,1074771,1,1,1,non,non,oui,10,Lignes de produits,"472,52","457,52",15,0
+543,1084854,1,1,1,non,non,oui,10,Lignes de produits,"466,96","451,96",15,0
+544,1019957,1,1,1,non,non,oui,10,Lignes de produits,"244,57","229,57",15,0
+545,1091821,1,1,1,non,non,oui,10,Lignes de produits,"943,22","924,05","19,17",0
+546,1069797,1,1,1,non,non,oui,10,Lignes de produits,"664,72","645,55","19,17",0
+547,1086656,1,1,1,non,non,oui,10,Lignes de produits,"1008,67","989,5","19,17",0
+548,1021860,1,1,1,non,non,oui,10,Lignes de produits,"1475,15","1455,98","19,17",0
+549,1105908,1,1,1,non,non,oui,10,Lignes de produits,"798,49","779,32","19,17",0
+550,1105460,1,1,1,non,non,oui,10,Lignes de produits,"1032,02","1012,85","19,17",0
+551,1105912,1,1,1,non,non,oui,10,Lignes de produits,"997,7","978,53","19,17",0
+552,1106285,1,1,1,non,non,oui,10,Lignes de produits,"979,33","960,16","19,17",0
+553,1108692,1,1,1,non,non,oui,10,Lignes de produits,"1097,34","1078,17","19,17",0
+554,1105471,1,1,1,non,non,oui,10,Lignes de produits,"1205,1","1185,93","19,17",0
+555,1106286,1,1,1,non,non,oui,10,Lignes de produits,"1699,7","1680,53","19,17",0
+556,1071213,1,1,1,non,non,oui,10,Lignes de produits,"995,97","976,8","19,17",0
+557,1084430,1,1,1,non,non,oui,10,Lignes de produits,"621,24","602,07","19,17",0
+558,1069719,1,1,1,non,non,oui,10,Lignes de produits,"559,53","540,36","19,17",0
+559,1022523,1,1,1,non,non,oui,10,Lignes de produits,"1770,76","1751,59","19,17",0
+560,1088745,1,1,1,non,non,oui,10,Lignes de produits,"1024,54","1005,37","19,17",0
+561,1072389,1,1,1,non,non,oui,10,Lignes de produits,"307,42","292,42",15,0
+562,1071472,1,1,1,non,non,oui,10,Lignes de produits,"570,88","555,88",15,0
+563,1050061,1,1,1,non,non,oui,10,Lignes de produits,"382,51","367,51",15,0
+564,1073413,1,1,1,non,non,oui,10,Lignes de produits,"304,33","289,33",15,0
+565,1088944,1,1,1,non,non,oui,10,Lignes de produits,"503,91","488,91",15,0
+566,1023376,1,1,1,non,non,oui,10,Lignes de produits,"400,55","385,55",15,0
+567,1023835,1,1,1,non,non,oui,10,Lignes de produits,415,400,15,0
+568,1043656,1,1,1,non,non,oui,10,Lignes de produits,"472,87","457,87",15,0
+569,1097132,1,1,1,non,non,oui,10,Lignes de produits,"554,55","539,55",15,0
+570,1023635,1,1,1,non,non,oui,10,Lignes de produits,"250,43","242,1","8,33",0
+571,1087088,1,1,1,non,non,oui,10,Lignes de produits,"558,94","543,94",15,0
+572,1086796,1,1,1,non,non,oui,10,Lignes de produits,"367,35","352,35",15,0
+573,1007167,1,1,1,non,non,oui,10,Lignes de produits,"352,82","337,82",15,0
+574,1007188,1,1,1,non,non,oui,10,Lignes de produits,"430,82","415,82",15,0
+575,1086797,1,1,1,non,non,oui,10,Lignes de produits,"367,36","352,36",15,0
+576,1007186,1,1,1,non,non,oui,10,Lignes de produits,"398,87","390,54","8,33",0
+577,1061790,1,1,1,non,non,oui,10,Lignes de produits,"329,05","320,72","8,33",0
+578,1049967,1,1,1,non,non,oui,10,Lignes de produits,"253,39","245,06","8,33",0
+579,1073215,1,1,1,non,non,oui,10,Lignes de produits,"381,67","366,67",15,0
+580,1086824,1,1,1,non,non,oui,10,Lignes de produits,"534,91","519,91",15,0
+581,1086524,1,1,1,non,non,oui,10,Lignes de produits,"555,79","540,79",15,0
+582,1007381,1,1,1,non,non,oui,10,Lignes de produits,"430,82","415,82",15,0
+583,1074528,1,1,1,non,non,oui,10,Lignes de produits,"444,55","429,55",15,0
+584,1110135,1,1,1,non,non,oui,10,Lignes de produits,"502,9","487,9",15,0
+585,1101472,1,1,1,non,non,oui,10,Lignes de produits,"295,63","287,3","8,33",0
+586,1048935,1,1,1,non,non,oui,10,Lignes de produits,"285,7","277,37","8,33",0
+587,1101476,1,1,1,non,non,oui,10,Lignes de produits,"302,26","293,93","8,33",0
+588,1082096,1,1,1,non,non,oui,10,Lignes de produits,"313,49","305,16","8,33",0
+589,1093083,1,1,1,non,non,oui,10,Lignes de produits,"268,43","260,1","8,33",0
+590,1093047,1,1,1,non,non,oui,10,Lignes de produits,"223,1","214,77","8,33",0
+591,1093050,1,1,1,non,non,oui,10,Lignes de produits,"325,1","316,77","8,33",0
+592,1093927,1,1,1,non,non,oui,10,Lignes de produits,"369,66","361,33","8,33",0
+593,1077263,1,1,1,non,non,oui,10,Lignes de produits,"314,63","306,3","8,33",0
+594,1077264,1,1,1,non,non,oui,10,Lignes de produits,"342,1","333,77","8,33",0
+595,1093924,1,1,1,non,non,oui,10,Lignes de produits,"570,03","561,7","8,33",0
+596,1074427,1,1,1,non,non,oui,10,Lignes de produits,"214,36","206,03","8,33",0
+597,1111222,1,1,1,non,non,oui,10,Lignes de produits,"579,61","571,28","8,33",0
+598,1093735,1,1,1,non,non,oui,10,Lignes de produits,"512,1","503,77","8,33",0
+599,1078495,1,1,1,non,non,oui,10,Lignes de produits,"329,19","320,86","8,33",0
+600,1093925,1,1,1,non,non,oui,10,Lignes de produits,"370,43","362,1","8,33",0
+601,1108919,1,1,1,non,non,oui,10,Lignes de produits,"512,1","503,77","8,33",0
+602,1058907,1,1,1,non,non,oui,10,Lignes de produits,"348,78","340,45","8,33",0
+603,1058910,1,1,1,non,non,oui,10,Lignes de produits,"369,02","360,69","8,33",0
+604,1050798,1,1,1,non,non,oui,10,Lignes de produits,"333,13","328,96","4,17",0
+605,1106746,1,1,1,non,non,oui,10,Lignes de produits,"326,02","317,69","8,33",0
+606,1107096,1,1,1,non,non,oui,10,Lignes de produits,"485,77","473,27","12,5",0
+607,1106857,1,1,1,non,non,oui,10,Lignes de produits,"252,66","248,49","4,17",0
+608,1106758,1,1,1,non,non,oui,10,Lignes de produits,"285,08","280,91","4,17",0
+609,1109861,1,1,1,non,non,oui,10,Lignes de produits,"303,02","294,69","8,33",0
+610,1106734,1,1,1,non,non,oui,10,Lignes de produits,"326,89","318,56","8,33",0
+611,1106732,1,1,1,non,non,oui,10,Lignes de produits,"379,98","371,65","8,33",0
+612,1106731,1,1,1,non,non,oui,10,Lignes de produits,"411,69","403,36","8,33",0
+613,1106682,1,1,1,non,non,oui,10,Lignes de produits,"620,13","611,8","8,33",0
+614,1106686,1,1,1,non,non,oui,10,Lignes de produits,"449,29","440,96","8,33",0
+615,1106685,1,1,1,non,non,oui,10,Lignes de produits,"374,166667","361,666667","12,5",0
+616,1106538,1,1,1,non,non,oui,10,Lignes de produits,"563,38","550,88","12,5",0
+617,1107781,1,1,1,non,non,oui,10,Lignes de produits,"1194,76","1182,26","12,5",0
+618,1114890,1,1,1,non,non,oui,10,Lignes de produits,"391,66","379,16","12,5",0
+619,1105907,1,1,1,non,non,oui,10,Lignes de produits,"1467,66","1455,16","12,5",0
+620,1110830,1,1,1,non,non,oui,10,Lignes de produits,"1012,83","1000,33","12,5",0
+621,1105882,1,1,1,non,non,oui,10,Lignes de produits,"1491,53","1479,03","12,5",0
+622,1086041,1,1,1,non,non,oui,10,Lignes de produits,"352,59","348,42","4,17",0
+623,1105854,1,1,1,non,non,oui,10,Lignes de produits,"360,54","352,21","8,33",0
+624,1105856,1,1,1,non,non,oui,10,Lignes de produits,"415,83","407,5","8,33",0
+625,1105857,1,1,1,non,non,oui,10,Lignes de produits,"432,83","424,5","8,33",0
+626,1105859,1,1,1,non,non,oui,10,Lignes de produits,"499,166667","486,666667","12,5",0
+627,1105893,1,1,1,non,non,oui,10,Lignes de produits,"495,51","483,01","12,5",0
+628,1105895,1,1,1,non,non,oui,10,Lignes de produits,"582,5",570,"12,5",0
+629,1105888,1,1,1,non,non,oui,10,Lignes de produits,"723,87","711,37","12,5",0
+630,1110426,1,1,1,non,non,oui,10,Lignes de produits,"456,51","449,01","7,5",0
+631,1110531,1,1,1,non,non,oui,10,Lignes de produits,"489,34","480,17","9,17",0
+632,1105831,1,1,1,non,non,oui,10,Lignes de produits,"1634,28","1621,78","12,5",0
+633,1072020,1,1,1,non,non,oui,10,Lignes de produits,"353,85","346,35","7,5",0
+634,1095000,1,1,1,non,non,oui,10,Lignes de produits,"344,38","336,88","7,5",0
+635,1112598,1,1,1,non,non,oui,10,Lignes de produits,"557,43","547,43",10,0
+636,1088670,1,1,1,non,non,oui,10,Lignes de produits,"493,11","483,11",10,0
+637,1108423,1,1,1,non,non,oui,10,Lignes de produits,"328,77","322,1","6,67",0
+201,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+202,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+203,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+204,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+205,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+206,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+207,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+208,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+209,1119540,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+210,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+211,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+212,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+213,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+214,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+215,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+216,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+217,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+218,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+219,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+220,1119551,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+221,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+222,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+223,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+224,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+225,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+226,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+227,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+228,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+229,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+230,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+231,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+232,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+233,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+234,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+235,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+236,1119507,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+237,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+238,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+239,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+240,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+241,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+242,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+243,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+244,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+245,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+246,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+247,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+248,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+249,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+250,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+251,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+252,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+253,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+254,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+255,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+256,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+257,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+258,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+259,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+260,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+261,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+262,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+263,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+264,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+265,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+266,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+267,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+268,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+269,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+270,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+271,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+272,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+273,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+274,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+275,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+276,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+277,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+278,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+279,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+280,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+281,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+282,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+283,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+284,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+285,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+286,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+287,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+288,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+289,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+290,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+291,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+292,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+293,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+294,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+295,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+296,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+297,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+298,1119533,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+299,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+300,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+301,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+302,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+303,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+304,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+305,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+306,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+307,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+308,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+309,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+310,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+311,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+312,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+313,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+314,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+315,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+316,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+317,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+318,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+319,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+320,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+321,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+322,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+323,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+324,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+325,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+326,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+327,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+328,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+329,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+330,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+331,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+332,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+333,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+334,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+335,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+336,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+337,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+338,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+339,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+340,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+341,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+342,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+343,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+344,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+345,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+346,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+347,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+348,1119534,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+349,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+350,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+351,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+352,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+353,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+354,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+355,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+356,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+357,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+358,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+359,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+360,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+361,1119536,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+362,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+363,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+364,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+365,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+366,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+367,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+368,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+369,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+370,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+371,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+372,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+373,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+374,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+375,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+376,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+377,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+378,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+379,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+380,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+381,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+382,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+383,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+384,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+385,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+386,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+387,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+388,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+389,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+390,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+391,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+392,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+393,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+394,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+395,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+396,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+397,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+398,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+399,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+400,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+401,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+402,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+403,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+404,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+405,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+406,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+407,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+408,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+409,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+410,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+411,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+412,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+413,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+414,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+415,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+416,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+417,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+418,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+419,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+420,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+421,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+422,1119537,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+423,1119531,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+424,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+425,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+426,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+427,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+428,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+429,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+430,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+431,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+432,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+433,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+434,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+435,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+436,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+437,1119532,1,1,1,non,non,oui,20,Lignes de produits,129,0,0,0
+438,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+439,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+440,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+441,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+442,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+443,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+444,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+445,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+446,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+447,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+448,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+449,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+450,1119508,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+451,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+452,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+453,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+454,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+455,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+456,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+457,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+458,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+459,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+460,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+461,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+462,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+463,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+464,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+465,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+466,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+467,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+468,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+469,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+470,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+471,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+472,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+473,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+474,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+475,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+476,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+477,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+478,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+479,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+480,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+481,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+482,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+483,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+484,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+485,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+486,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+487,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+488,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+489,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+490,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+491,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+492,1119510,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+493,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+494,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+495,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+496,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+497,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+498,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+499,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+500,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+501,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+502,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+503,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+504,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+505,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+506,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+507,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+508,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+509,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+510,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+511,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+512,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+513,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+514,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+515,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+516,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+517,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+518,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+519,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+520,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+521,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+522,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+523,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+524,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+525,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+526,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+527,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+528,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+529,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+530,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+531,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+532,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+533,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+534,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+535,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+536,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+537,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+538,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+539,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+540,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+541,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+542,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+543,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+544,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+545,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+546,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+547,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+548,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+549,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+550,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+551,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+552,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+553,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+554,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+555,1119552,1,1,1,non,non,oui,20,Lignes de produits,199,0,0,0
+556,1119554,1,1,1,non,non,oui,20,Lignes de produits,189,0,0,0
+557,1119554,1,1,1,non,non,oui,20,Lignes de produits,189,0,0,0
+558,1119554,1,1,1,non,non,oui,20,Lignes de produits,189,0,0,0
+559,1119554,1,1,1,non,non,oui,20,Lignes de produits,189,0,0,0
+560,1119554,1,1,1,non,non,oui,20,Lignes de produits,189,0,0,0
+561,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+562,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+563,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+564,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+565,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+566,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+567,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+568,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+569,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+570,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+571,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+572,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+573,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+574,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+575,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+576,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+577,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+578,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+579,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+580,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+581,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+582,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+583,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+584,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+585,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+586,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+587,1119539,1,1,1,non,non,oui,20,Lignes de produits,169,0,0,0
+588,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+589,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+590,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+591,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+592,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+593,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+594,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+595,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+596,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+597,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+598,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+599,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+600,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+601,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+602,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+603,1119538,1,1,1,non,non,oui,20,Lignes de produits,179,0,0,0
+604,1119506,1,1,1,non,non,oui,20,Lignes de produits,149,0,0,0
+605,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+606,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+607,1119558,1,1,1,non,non,oui,20,Lignes de produits,69,0,0,0
+608,1119558,1,1,1,non,non,oui,20,Lignes de produits,69,0,0,0
+609,1119558,1,1,1,non,non,oui,20,Lignes de produits,69,0,0,0
+610,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+611,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+612,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+613,1119563,1,1,1,non,non,oui,20,Lignes de produits,109,0,0,0
+614,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+615,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+616,1119563,1,1,1,non,non,oui,20,Lignes de produits,109,0,0,0
+617,1119570,1,1,1,non,non,oui,20,Lignes de produits,164,0,0,0
+618,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+619,1119571,1,1,1,non,non,oui,20,Lignes de produits,184,0,0,0
+620,1119570,1,1,1,non,non,oui,20,Lignes de produits,164,0,0,0
+621,1119571,1,1,1,non,non,oui,20,Lignes de produits,184,0,0,0
+622,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+623,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+624,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+625,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+626,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+627,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+628,1119563,1,1,1,non,non,oui,20,Lignes de produits,109,0,0,0
+629,1119567,1,1,1,non,non,oui,20,Lignes de produits,139,0,0,0
+630,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+631,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+632,1119572,1,1,1,non,non,oui,20,Lignes de produits,204,0,0,0
+633,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+634,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+635,1119563,1,1,1,non,non,oui,20,Lignes de produits,109,0,0,0
+636,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+637,1119560,1,1,1,non,non,oui,20,Lignes de produits,89,0,0,0
+201,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+202,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+203,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+204,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+205,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+206,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+207,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+208,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+209,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+210,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+211,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+212,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+213,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+214,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+215,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+216,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+217,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+218,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+219,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+220,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+221,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+222,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+223,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+224,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+225,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+226,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+227,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+228,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+229,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+230,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+231,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+232,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+233,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+234,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+235,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+236,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+237,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+238,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+239,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+240,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+241,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+242,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+243,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+244,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+245,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+246,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+247,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+248,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+249,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+250,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+251,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+252,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+253,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+254,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+255,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+256,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+257,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+258,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+259,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+260,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+261,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+262,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+263,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+264,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+265,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+266,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+267,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+268,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+269,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+270,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+271,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+272,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+273,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+274,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+275,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+276,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+277,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+278,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+279,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+280,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+281,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+282,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+283,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+284,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+285,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+286,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+287,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+288,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+289,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+290,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+291,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+292,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+293,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+294,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+295,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+296,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+297,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+298,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+299,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+300,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+301,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+302,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+303,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+304,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+305,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+306,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+307,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+308,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+309,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+310,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+311,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+312,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+313,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+314,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+315,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+316,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+317,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+318,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+319,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+320,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+321,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+322,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+323,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+324,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+325,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+326,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+327,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+328,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+329,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+330,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+331,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+332,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+333,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+334,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+335,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+336,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+337,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+338,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+339,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+340,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+341,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+342,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+343,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+344,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+345,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+346,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+347,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+348,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+349,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+350,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+351,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+352,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+353,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+354,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+355,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+356,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+357,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+358,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+359,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+360,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+361,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+362,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+363,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+364,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+365,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+366,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+367,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+368,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+369,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+370,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+371,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+372,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+373,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+374,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+375,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+376,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+377,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+378,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+379,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+380,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+381,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+382,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+383,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+384,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+385,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+386,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+387,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+388,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+389,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+390,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+391,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+392,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+393,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+394,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+395,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+396,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+397,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+398,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+399,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+400,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+401,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+402,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+403,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+404,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+405,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+406,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+407,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+408,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+409,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+410,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+411,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+412,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+413,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+414,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+415,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+416,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+417,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+418,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+419,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+420,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+421,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+422,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+423,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+424,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+425,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+426,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+427,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+428,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+429,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+430,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+431,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+432,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+433,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+434,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+435,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+436,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+437,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+438,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+439,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+440,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+441,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+442,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+443,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+444,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+445,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+446,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+447,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+448,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+449,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+450,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+451,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+452,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+453,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+454,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+455,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+456,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+457,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+458,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+459,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+460,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+461,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+462,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+463,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+464,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+465,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+466,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+467,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+468,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+469,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+470,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+471,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+472,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+473,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+474,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+475,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+476,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+477,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+478,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+479,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+480,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+481,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+482,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+483,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+484,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+485,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+486,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+487,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+488,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+489,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+490,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+491,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+492,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+493,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+494,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+495,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+496,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+497,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+498,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+499,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+500,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+501,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+502,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+503,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+504,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+505,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+506,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+507,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+508,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+509,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+510,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+511,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+512,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+513,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+514,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+515,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+516,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+517,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+518,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+519,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+520,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+521,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+522,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+523,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+524,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+525,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+526,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+527,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+528,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+529,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+530,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+531,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+532,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+533,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+534,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+535,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+536,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+537,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+538,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+539,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+540,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+541,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+542,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+543,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+544,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+545,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+546,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+547,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+548,BPLivrMeSGEODI150a175EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,175,0,0,0
+549,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+550,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+551,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+552,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+553,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+554,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+555,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+556,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+557,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+558,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+559,BPLivrMeSGEODI150a175EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,175,0,0,0
+560,BPLivrMeSGEODI125a150EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,150,0,0,0
+561,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+562,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+563,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+564,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+565,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+566,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+567,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+568,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+569,BPLivrMeSGEODI100a125EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,125,0,0,0
+570,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+571,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+572,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+573,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+574,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+575,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+576,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+577,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+578,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+579,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+580,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+581,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+582,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+583,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+584,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+585,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+586,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+587,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+588,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+589,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+590,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+591,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+592,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+593,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+594,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+595,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+596,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+597,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+598,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+599,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+600,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+601,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+602,BPLivrMeSGEODI75a100EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,100,0,0,0
+603,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+604,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+605,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+606,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+607,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+608,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+609,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+610,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+611,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+612,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+613,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+614,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+615,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+616,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+617,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+618,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+619,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+620,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+621,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+622,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+623,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+624,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+625,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+626,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+627,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+628,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+629,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+630,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+631,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+632,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+633,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+634,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+635,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+636,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+637,BPLivrMeSGEODI50a75EUR60mois,1,1,1,non,non,oui,30,Lignes de produits,75,0,0,0
+201,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,71",0,0,0
+202,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,02",0,0,0
+203,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,88",0,0,0
+204,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,24",0,0,0
+205,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,42",0,0,0
+206,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,87",0,0,0
+207,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,94",0,0,0
+208,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,26",0,0,0
+209,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,22",0,0,0
+210,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,32",0,0,0
+211,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,89",0,0,0
+212,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,2",0,0,0
+213,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,98",0,0,0
+214,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,82",0,0,0
+215,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,31",0,0,0
+216,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,35",0,0,0
+217,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,04",0,0,0
+218,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"26,36",0,0,0
+219,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,84",0,0,0
+220,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,96",0,0,0
+221,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,52",0,0,0
+222,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,49",0,0,0
+223,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,42",0,0,0
+224,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,94",0,0,0
+225,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,45",0,0,0
+226,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,6",0,0,0
+227,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,01",0,0,0
+228,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,49",0,0,0
+229,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,63",0,0,0
+230,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,1",0,0,0
+231,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,94",0,0,0
+232,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,5",0,0,0
+233,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,52",0,0,0
+234,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,58",0,0,0
+235,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,64",0,0,0
+236,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"54,45",0,0,0
+237,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,28",0,0,0
+238,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,5",0,0,0
+239,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,52",0,0,0
+240,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,35",0,0,0
+241,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,09",0,0,0
+242,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,11",0,0,0
+243,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,42",0,0,0
+244,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,7",0,0,0
+245,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,22",0,0,0
+246,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,01",0,0,0
+247,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,9",0,0,0
+248,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,86",0,0,0
+249,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,63",0,0,0
+250,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,22",0,0,0
+251,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,17",0,0,0
+252,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,03",0,0,0
+253,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,9",0,0,0
+254,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,19",0,0,0
+255,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,09",0,0,0
+256,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,19",0,0,0
+257,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,11",0,0,0
+258,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,28",0,0,0
+259,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,62",0,0,0
+260,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,62",0,0,0
+261,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,64",0,0,0
+262,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,61",0,0,0
+263,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,3",0,0,0
+264,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,64",0,0,0
+265,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,14",0,0,0
+266,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,58",0,0,0
+267,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,33",0,0,0
+268,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,64",0,0,0
+269,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"24,78",0,0,0
+270,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,38",0,0,0
+271,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,36",0,0,0
+272,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,24",0,0,0
+273,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,69",0,0,0
+274,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,05",0,0,0
+275,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,91",0,0,0
+276,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,9",0,0,0
+277,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,09",0,0,0
+278,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,86",0,0,0
+279,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,02",0,0,0
+280,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,52",0,0,0
+281,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,32",0,0,0
+282,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,64",0,0,0
+283,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,62",0,0,0
+284,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,41",0,0,0
+285,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,36",0,0,0
+286,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,13",0,0,0
+287,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,21",0,0,0
+288,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,29",0,0,0
+289,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,58",0,0,0
+290,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"9,46",0,0,0
+291,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,4",0,0,0
+292,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,8",0,0,0
+293,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,66",0,0,0
+294,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,07",0,0,0
+295,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"9,72",0,0,0
+296,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,57",0,0,0
+297,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,14",0,0,0
+298,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,51",0,0,0
+299,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,81",0,0,0
+300,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,46",0,0,0
+301,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,19",0,0,0
+302,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,05",0,0,0
+303,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,7",0,0,0
+304,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,17",0,0,0
+305,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,77",0,0,0
+306,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,41",0,0,0
+307,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,52",0,0,0
+308,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,45",0,0,0
+309,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,94",0,0,0
+310,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,16",0,0,0
+311,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,64",0,0,0
+312,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,37",0,0,0
+313,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,49",0,0,0
+314,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,53",0,0,0
+315,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,29",0,0,0
+316,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,55",0,0,0
+317,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,2",0,0,0
+318,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,73",0,0,0
+319,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,38",0,0,0
+320,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,55",0,0,0
+321,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,92",0,0,0
+322,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"25,21",0,0,0
+323,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,53",0,0,0
+324,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"26,96",0,0,0
+325,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,56",0,0,0
+326,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,56",0,0,0
+327,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,16",0,0,0
+328,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,49",0,0,0
+329,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,16",0,0,0
+330,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,23",0,0,0
+331,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,77",0,0,0
+332,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,4",0,0,0
+333,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,3",0,0,0
+334,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,18",0,0,0
+335,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,1",0,0,0
+336,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,96",0,0,0
+337,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,42",0,0,0
+338,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,9",0,0,0
+339,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,9",0,0,0
+340,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,45",0,0,0
+341,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,61",0,0,0
+342,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,59",0,0,0
+343,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,54",0,0,0
+344,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,86",0,0,0
+345,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,05",0,0,0
+346,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,05",0,0,0
+347,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,76",0,0,0
+348,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,96",0,0,0
+349,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,28",0,0,0
+350,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,93",0,0,0
+351,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,96",0,0,0
+352,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"27,37",0,0,0
+353,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,35",0,0,0
+354,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,29",0,0,0
+355,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,29",0,0,0
+356,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,34",0,0,0
+357,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,23",0,0,0
+358,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,83",0,0,0
+359,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,15",0,0,0
+360,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,73",0,0,0
+361,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,95",0,0,0
+362,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,69",0,0,0
+363,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,86",0,0,0
+364,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,64",0,0,0
+365,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,44",0,0,0
+366,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,25",0,0,0
+367,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,13",0,0,0
+368,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,49",0,0,0
+369,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,38",0,0,0
+370,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,27",0,0,0
+371,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,27",0,0,0
+372,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,86",0,0,0
+373,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,19",0,0,0
+374,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,88",0,0,0
+375,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,87",0,0,0
+376,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,64",0,0,0
+377,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,38",0,0,0
+378,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,44",0,0,0
+379,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,43",0,0,0
+380,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,88",0,0,0
+381,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,66",0,0,0
+382,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,59",0,0,0
+383,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,42",0,0,0
+384,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,67",0,0,0
+385,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,56",0,0,0
+386,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,89",0,0,0
+387,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,65",0,0,0
+388,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,91",0,0,0
+389,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,3",0,0,0
+390,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,18",0,0,0
+391,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,94",0,0,0
+392,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,06",0,0,0
+393,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,97",0,0,0
+394,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,1",0,0,0
+395,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,3",0,0,0
+396,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,5",0,0,0
+397,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,53",0,0,0
+398,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,53",0,0,0
+399,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,53",0,0,0
+400,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,78",0,0,0
+401,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,83",0,0,0
+402,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,05",0,0,0
+403,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,83",0,0,0
+404,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,22",0,0,0
+405,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,2",0,0,0
+406,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,79",0,0,0
+407,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,03",0,0,0
+408,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,19",0,0,0
+409,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,48",0,0,0
+410,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,19",0,0,0
+411,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,52",0,0,0
+412,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,81",0,0,0
+413,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,05",0,0,0
+414,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"25,77",0,0,0
+415,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"36,19",0,0,0
+416,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,92",0,0,0
+417,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,36",0,0,0
+418,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,58",0,0,0
+419,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,53",0,0,0
+420,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,24",0,0,0
+421,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,16",0,0,0
+422,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,95",0,0,0
+423,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,79",0,0,0
+424,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,52",0,0,0
+425,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,81",0,0,0
+426,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,74",0,0,0
+427,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,64",0,0,0
+428,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,92",0,0,0
+429,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,16",0,0,0
+430,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"9,94",0,0,0
+431,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,22",0,0,0
+432,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,49",0,0,0
+433,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,74",0,0,0
+434,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,64",0,0,0
+435,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,77",0,0,0
+436,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,59",0,0,0
+437,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,15",0,0,0
+438,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,28",0,0,0
+439,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,63",0,0,0
+440,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"9,85",0,0,0
+441,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,46",0,0,0
+442,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,24",0,0,0
+443,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,16",0,0,0
+444,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,09",0,0,0
+445,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,09",0,0,0
+446,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,11",0,0,0
+447,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,38",0,0,0
+448,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,38",0,0,0
+449,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,01",0,0,0
+450,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,01",0,0,0
+451,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"9,94",0,0,0
+452,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,14",0,0,0
+453,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,39",0,0,0
+454,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,47",0,0,0
+455,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,98",0,0,0
+456,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,21",0,0,0
+457,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,82",0,0,0
+458,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,24",0,0,0
+459,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,52",0,0,0
+460,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,59",0,0,0
+461,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"27,07",0,0,0
+462,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"27,15",0,0,0
+463,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,53",0,0,0
+464,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,48",0,0,0
+465,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,9",0,0,0
+466,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,49",0,0,0
+467,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,02",0,0,0
+468,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,98",0,0,0
+469,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"44,15",0,0,0
+470,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,58",0,0,0
+471,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,6",0,0,0
+472,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,83",0,0,0
+473,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,79",0,0,0
+474,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,92",0,0,0
+475,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,69",0,0,0
+476,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,07",0,0,0
+477,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,08",0,0,0
+478,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,18",0,0,0
+479,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,36",0,0,0
+480,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,13",0,0,0
+481,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,49",0,0,0
+482,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,01",0,0,0
+483,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,36",0,0,0
+484,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,82",0,0,0
+485,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,36",0,0,0
+486,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,79",0,0,0
+487,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"27,23",0,0,0
+488,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,23",0,0,0
+489,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,75",0,0,0
+490,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,46",0,0,0
+491,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,61",0,0,0
+492,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,03",0,0,0
+493,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,21",0,0,0
+494,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,84",0,0,0
+495,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,31",0,0,0
+496,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,11",0,0,0
+497,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,39",0,0,0
+498,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,6",0,0,0
+499,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,94",0,0,0
+500,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,91",0,0,0
+501,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,99",0,0,0
+502,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,26",0,0,0
+503,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,22",0,0,0
+504,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,8",0,0,0
+505,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,4",0,0,0
+506,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,7",0,0,0
+507,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,44",0,0,0
+508,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,86",0,0,0
+509,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,75",0,0,0
+510,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"24,26",0,0,0
+511,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"27,13",0,0,0
+512,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,58",0,0,0
+513,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,27",0,0,0
+514,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,74",0,0,0
+515,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,19",0,0,0
+516,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,78",0,0,0
+517,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,2",0,0,0
+518,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,62",0,0,0
+519,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,65",0,0,0
+520,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,41",0,0,0
+521,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,35",0,0,0
+522,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,52",0,0,0
+523,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,52",0,0,0
+524,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,83",0,0,0
+525,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,45",0,0,0
+526,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,71",0,0,0
+527,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,06",0,0,0
+528,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,11",0,0,0
+529,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,53",0,0,0
+530,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,92",0,0,0
+531,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,6",0,0,0
+532,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,4",0,0,0
+533,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,23",0,0,0
+534,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,13",0,0,0
+535,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,13",0,0,0
+536,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,66",0,0,0
+537,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,76",0,0,0
+538,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,33",0,0,0
+539,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,27",0,0,0
+540,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,42",0,0,0
+541,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,31",0,0,0
+542,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,8",0,0,0
+543,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,66",0,0,0
+544,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,45",0,0,0
+545,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"32,14",0,0,0
+546,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"25,18",0,0,0
+547,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,77",0,0,0
+548,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"46,11",0,0,0
+549,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"28,52",0,0,0
+550,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"34,36",0,0,0
+551,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,5",0,0,0
+552,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,04",0,0,0
+553,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"35,99",0,0,0
+554,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"38,68",0,0,0
+555,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"51,05",0,0,0
+556,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,21",0,0,0
+557,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,84",0,0,0
+558,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"22,3",0,0,0
+559,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"53,25",0,0,0
+560,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"33,92",0,0,0
+561,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,22",0,0,0
+562,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,61",0,0,0
+563,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,9",0,0,0
+564,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,94",0,0,0
+565,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,13",0,0,0
+566,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,35",0,0,0
+567,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,71",0,0,0
+568,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,36",0,0,0
+569,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,6",0,0,0
+570,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,22",0,0,0
+571,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,51",0,0,0
+572,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,24",0,0,0
+573,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,35",0,0,0
+574,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,3",0,0,0
+575,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,24",0,0,0
+576,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,31",0,0,0
+577,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,18",0,0,0
+578,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,29",0,0,0
+579,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,88",0,0,0
+580,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,71",0,0,0
+581,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,43",0,0,0
+582,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,83",0,0,0
+583,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"17,45",0,0,0
+584,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,53",0,0,0
+585,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,35",0,0,0
+586,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,1",0,0,0
+587,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,51",0,0,0
+588,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,42",0,0,0
+589,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,92",0,0,0
+590,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,78",0,0,0
+591,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,43",0,0,0
+592,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,83",0,0,0
+593,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,45",0,0,0
+594,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,14",0,0,0
+595,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"20,84",0,0,0
+596,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,56",0,0,0
+597,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"21,27",0,0,0
+598,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,39",0,0,0
+599,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,43",0,0,0
+600,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,85",0,0,0
+601,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,39",0,0,0
+602,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,3",0,0,0
+603,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,53",0,0,0
+604,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,44",0,0,0
+605,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,76",0,0,0
+606,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,85",0,0,0
+607,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"9,43",0,0,0
+608,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,24",0,0,0
+609,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"10,68",0,0,0
+610,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,78",0,0,0
+611,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,11",0,0,0
+612,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,9",0,0,0
+613,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"19,61",0,0,0
+614,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,84",0,0,0
+615,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,96",0,0,0
+616,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,19",0,0,0
+617,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"35,7",0,0,0
+618,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"13,4",0,0,0
+619,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"43,02",0,0,0
+620,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"31,15",0,0,0
+621,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"43,62",0,0,0
+622,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,42",0,0,0
+623,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,62",0,0,0
+624,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,14,0,0,0
+625,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"14,43",0,0,0
+626,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,18",0,0,0
+627,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,16,0,0,0
+628,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,77",0,0,0
+629,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"23,3",0,0,0
+630,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,02",0,0,0
+631,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"15,84",0,0,0
+632,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"47,44",0,0,0
+633,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,46",0,0,0
+634,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"12,22",0,0,0
+635,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"18,14",0,0,0
+636,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"16,03",0,0,0
+637,BoulProComm60m,1,1,1,non,non,non,9999,Lignes de produits non visible,"11,83",0,0,0
