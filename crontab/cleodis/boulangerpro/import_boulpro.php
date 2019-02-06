@@ -5,9 +5,6 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
 
-
-
-/*
 $type = array(
 	"Fixe"=>"fixe",
 	"portable"=>"portable",
@@ -24,7 +21,7 @@ ATF::db()->begin_transaction();
 	$packs = import_pack();
 	import_ligne($packs, $produits);
 
-ATF::db()->commit_transaction();
+//ATF::db()->commit_transaction();
 
 
 $directory = dirname(__FILE__)."/";
@@ -287,7 +284,7 @@ try {
 	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
 	throw $e;
 }
-*/
+
 
 
 $fileProduit = "./produit.csv";
@@ -346,4 +343,4 @@ function get_sous_categorie($sous_categorie, $categorie){
 		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
-?>
+*/
