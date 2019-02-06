@@ -70,15 +70,15 @@ class boulangerpro {
                     log::logger("----- Désactivation pack associé : ".$pack['id_pack_produit'],"batch-majPrixCatalogueProduit");
 
                     ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
-                    $packDesactive[] = $pack['id_pack_produit'];
+                    $packDesactive[] = $pack;
                   }
-                } else {
-                  // Produit non inclus, on va désactiver uniquement le produit
-                  echo "\n ----- On désactive le produit car il est non inclus";
-                  log::logger("----- On désactive le produit car il est non inclus","batch-majPrixCatalogueProduit");
-                  ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
-                  $produitDesactive[] = $produit['id_produit'];
                 }
+                // Produit non inclus, on va désactiver uniquement le produit
+                echo "\n ----- On désactive le produit car il est non inclus";
+                log::logger("----- On désactive le produit car il est non inclus","batch-majPrixCatalogueProduit");
+                ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
+                $produitDesactive[] = $produit;
+                
               } else {
                 echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
                 log::logger("----- Prix inchangé pour ce produit, on ne traite pas","batch-majPrixCatalogueProduit");
@@ -102,26 +102,42 @@ class boulangerpro {
 
         $sendmail = false;
         $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
-        $infos_mail["objet"] = "[BOULMANGER PRO] Batch prix - packs et produits désactivés";
+        $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
         $infos_mail["recipient"] = "qjanon@absystech.fr";
 
         $infos_mail['body'] = '';
+        $fpack = "packs_desactivés.csv";
 
         if (!empty($packDesactive)) {
+          $filepack= fopen($fpack, "w+");
+          fputs($filepack, array_keys($packDesactive)."\n");
           $sendmail = true;
-          $infos_mail['body'] .= "Packs désactivés : ".implode($packDesactive, ",");
+          foreach ($packDesactive as $line) {
+            fputcsv($filepack, $line);
+            fputs("\n");
+          }
+          fclose($filepack);
+          $infos_mail->addFile($fpack, "Packs désactivés");
         }
 
+        $fproduit = "produits_desactivés.csv";
         if (!empty($produitDesactive)) {
+          $fileproduit= fopen($fproduit, "w+");
+          fputs($fileproduit, array_keys($produitDesactive)."\n");
           $sendmail = true;
-          $infos_mail['body'] .= "Produits désactivés : ".implode($produitDesactive, ",");
+          foreach ($produitDesactive as $line) {
+            fputcsv($fileproduit, $line);
+            fputs("\n");
+          }
+          fclose($fileproduit);        
+          $infos_mail->addFile($fproduit, "Produits désactivés");
         }
-
 
         if ($sendmail) {
           $mail = new mail($infos_mail);
           $mail->send();    
         }
+        
         log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
         log::logger($packDesactive,"batch-majPrixCatalogueProduit");
         log::logger("Produits désactivés","batch-majPrixCatalogueProduit");
