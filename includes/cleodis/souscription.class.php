@@ -731,7 +731,8 @@ class souscription_cleodis extends souscription {
       $fproduit = __TEMP_PATH__."produits_desactives.csv";
       if (!empty($produitDesactive)) {
         $fileproduit= fopen($fproduit, "w+");
-        fputs($fileproduit, array_keys($produitDesactive)."\n");
+        fputcsv($fileproduit, array_keys($produitDesactive[0]));
+        fputs("\n");
         $sendmail = true;
         foreach ($produitDesactive as $line) {
           fputcsv($fileproduit, $line);
