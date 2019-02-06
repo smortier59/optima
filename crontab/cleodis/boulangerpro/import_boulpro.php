@@ -258,6 +258,7 @@ function get_sous_categorie($sous_categorie, $categorie){
 	}
 }
 
+/*
 $fileProduit = "./produit.csv";
 $fpr = fopen($fileProduit, 'rb');
 $entete = fgetcsv($fpr);
