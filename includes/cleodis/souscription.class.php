@@ -711,7 +711,6 @@ class souscription_cleodis extends souscription {
       try {
 
         ATF::produit()->q->reset()
-          ->where('site_associe', 'boulangerpro')
           ->where('etat', 'actif')
           ->where('id_fournisseur', $id_fournisseur); 
 
@@ -758,13 +757,12 @@ class souscription_cleodis extends souscription {
                   ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
                   $packDesactive[] = $pack['id_pack_produit'];
                 }
-              } else {
-                // Produit non inclus, on va désactiver uniquement le produit
-                // echo "\n ----- On désactive le produit car il est non inclus";
-                log::logger("----- On désactive le produit car il est non inclus","batch-majPrixCatalogueProduit");
-                ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
-                $produitDesactive[] = $produit;
               }
+              // Produit non inclus, on va désactiver uniquement le produit
+              // echo "\n ----- On désactive le produit car il est non inclus";
+              log::logger("----- On désactive le produit aussi du coup","batch-majPrixCatalogueProduit");
+              ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
+              $produitDesactive[] = $produit;
             } else {
               // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
               log::logger("----- Prix inchangé pour ce produit, on ne traite pas","batch-majPrixCatalogueProduit");
