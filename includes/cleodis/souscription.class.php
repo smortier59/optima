@@ -615,11 +615,11 @@ class souscription_cleodis extends souscription {
         $customerKey = "CLEODISTEST";
         $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
       } else { 
-        die('on est pas en dev');
-        $id_fournisseur = false;
+        die("j'ai pas encore la config de prod");
+        $id_fournisseur = 28973;
         $host = "https://api.boulanger.pro/v2/";
-        $customerKey = "CLEODISTEST";
-        $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
+        $customerKey = "";
+        $secretKey = "";
       }
 
 
