@@ -795,6 +795,7 @@ class souscription_cleodis extends souscription {
       $infos_mail['body'] = '';
       $fpack = __TEMP_PATH__."packs_desactives.csv";
       @unlink($fpack);
+      log::logger($fpack,"batch-majPrixCatalogueProduit");
       if (!empty($packDesactive)) {
         $filepack= fopen($fpack, "w+");
         $sendmail = true;
@@ -812,6 +813,7 @@ class souscription_cleodis extends souscription {
         fclose($filepack);
       }
       $fproduit = __TEMP_PATH__."produits_desactives.csv";
+      log::logger($fproduit,"batch-majPrixCatalogueProduit");
       @unlink($fproduit);
       if (!empty($produitDesactive)) {
         $fileproduit= fopen($fproduit, "w+");
