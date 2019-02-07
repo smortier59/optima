@@ -391,7 +391,9 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($id);
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
 
-		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("visible_pdf","oui")->where("id_devis",$this->devis['id_devis']);
+		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+		if(ATF::$codename == "cleodis") ATF::devis_ligne()->q->where("visible_pdf","oui");
+
 		$this->lignes = ATF::devis_ligne()->sa();
 
 		$this->user = ATF::user()->select($this->devis['id_user']);
@@ -457,7 +459,8 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($id);
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
 
-		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("visible_pdf","oui")->where("id_devis",$this->devis['id_devis']);
+		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
+		if(ATF::$codename == "cleodis") ATF::devis_ligne()->q->where("visible_pdf","oui");
 		$this->lignes = ATF::devis_ligne()->sa();
 
 		$this->user = ATF::user()->select($this->devis['id_user']);
@@ -1957,7 +1960,8 @@ class pdf_cleodis extends pdf {
 		$this->colsProduitAvecDetailFirst = array("border"=>"TL","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduitAvecDetailFirst");
 		$this->colsProduitAvecDetailLast = array("border"=>"TR","bgcolor"=>"efefef","size"=>9,"flag"=>"colsProduitAvecDetailLast");
 		$this->styleDetailsProduit = array("border"=>"LRB","decoration"=>"I","size"=>8,"flag"=>"styleDetailsProduit");
-		ATF::commande_ligne()->q->reset()->where("visible","oui")->where("visible_pdf","oui")->where("id_commande",$this->commande['id_commande']);
+		ATF::commande_ligne()->q->reset()->where("visible","oui")->where("id_commande",$this->commande['id_commande']);
+		if(ATF::$codename == "cleodis") ATF::commande_ligne()->q->where("visible_pdf","oui");
 		$this->lignes = ATF::commande_ligne()->sa();
 
 		$this->devis = ATF::devis()->select($this->commande['id_devis']);
