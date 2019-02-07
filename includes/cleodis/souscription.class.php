@@ -17,8 +17,8 @@ class souscription_cleodis extends souscription {
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
   /*--------------------------------------------------------------*/
-  public function __construct() {
-    parent::__construct();
+  public function __construct() { 
+    parent::__construct(); 
     $this->table = "affaire";
   }
 
@@ -122,6 +122,7 @@ class souscription_cleodis extends souscription {
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
+          "RUM"=>$societe["RUM"],
           "BIC"=>$societe["BIC"],
           "id_magasin"=>$post["id_magasin"]
         );
@@ -683,6 +684,182 @@ class souscription_cleodis extends souscription {
     return $r;
   }
 
+  public function _boulangerMajPrix($get, $post) {
+    try {
+      require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
+
+      ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
+      $id_fournisseur = ATF::societe()->select_cell();
+
+      if (__DEV__) {
+        $host = "https://test.api.boulanger.pro/v2/";
+        $customerKey = "CLEODISTEST";
+        $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
+      } else { 
+        die("j'ai pas encore la config de prod");
+        $host = "https://api.boulanger.pro/v2/";
+        $customerKey = "";
+        $secretKey = "";
+      }
+
+
+      $api = new ApiBoulangerProV2($customerKey,$secretKey,$host);
+      // echo "\n========== DEBUT DU BATCH ==========";
+      log::logger("-----------------------------------------------------------------","batch-majPrixCatalogueProduit");
+      log::logger("==========DEBUT DU BATCH==========","batch-majPrixCatalogueProduit");
+
+      ATF::db()->begin_transaction(true);
+      try {
+
+        ATF::produit()->q->reset()
+          ->where('etat', 'actif')
+          ->where('id_fournisseur', $id_fournisseur); 
+
+        $catalogueBoulProActif = ATF::produit()->sa();
+
+        // echo "\n".count($catalogueBoulProActif). " produits à traiter";
+        log::logger(count($catalogueBoulProActif). " produits à traiter","batch-majPrixCatalogueProduit");
+
+
+        foreach ($catalogueBoulProActif as $k=>$produit) {
+          $response = $api->get('price/'.$produit['ref']);
+
+          $r = $response->getContent();
+          log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
+          log::logger($r, "batch-majPrixCatalogueProduit");
+          if (!$r) {
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE","batch-majPrixCatalogueProduit");
+          } else if ($r['error_code']) {
+            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
+          } else {
+            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
+            // Mise a jour des taxes du produit
+            $p = $r[0];
+            log::logger("Mise à jour des taxes, taxe éco: ".$p['ecotax']." - ecomob : ".$p['ecomob'],"batch-majPrixCatalogueProduit");
+
+            // On sauve les old pour l'export excel
+            $produit["old_prix_achat"] = $produit["prix_achat"];
+            $produit["old_taxe_ecotaxe"] = $produit["taxe_ecotaxe"];
+            $produit["old_taxe_ecomob"] = $produit["taxe_ecomob"];
+            $produit["prix_achat"] = $p['price_tax_excl']+$p['ecotax']+$p['ecomob'];
+            $produit["taxe_ecotaxe"] = $p['ecotax'];
+            $produit["taxe_ecomob"] = $p['ecomob'];
+
+            if ($produit['prix_achat'] != $produit["old_prix_achat"]) {
+              // echo "\n ----- Prix modifié pour ce produit";
+              log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
+
+              // MAJ nouveau prix sur le produit
+              ATF::produit()->u(array(
+                "id_produit"=>$produit['id_produit'],
+                "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
+                "taxe_ecotaxe"=>$p['ecotax'],
+                "taxe_ecomob"=>$p['ecomob']
+              ));
+
+              // Produit inclus, on va désactiver tous les packs associés
+              if ($produit['max'] == $produit['min'] && $produit['max'] == $produit['defaut']) {
+                // echo "\n ----- Produit inclus - on désactive le pack, quantité min ".$produit['min'].", max ".$produit['max'].", defaut ".$produit['defaut'];
+                log::logger("----- Produit inclus - on désactive le pack, quantité min ".$produit['min'].", max ".$produit['max'].", defaut ".$produit['defaut'],"batch-majPrixCatalogueProduit");
+                $packs = ATF::produit()->getPacks($produit['id_produit']);
+                foreach ($packs as $pack) {
+                  // echo "\n ----- Désactivation pack associé : ".$pack['id_pack_produit'];
+                  log::logger("----- Désactivation pack associé : ".$pack['id_pack_produit'],"batch-majPrixCatalogueProduit");
+
+                  ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
+                  $packDesactive[] = $pack['id_pack_produit'];
+                }
+              }
+              // Produit non inclus, on va désactiver uniquement le produit
+              // echo "\n ----- On désactive le produit car il est non inclus";
+              log::logger("----- On désactive le produit aussi du coup","batch-majPrixCatalogueProduit");
+              ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
+
+              $produitDesactive[] = $produit;
+            } else {
+              // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
+              log::logger("----- Prix inchangé pour ce produit, on ne traite pas","batch-majPrixCatalogueProduit");
+            }
+          }
+
+        }
+
+
+      } catch (errorATF $e) {
+        ATF::db()->rollback_transaction(true);
+        throw $e;
+      }
+      ATF::db()->commit_transaction(true);
+
+      // echo "\n========== FIN  DU  BATCH ==========";
+      // echo "\nPacks désactivésn\n";
+      // print_r($packDesactive);
+      // echo "\nProduits désactivés";
+      // print_r($produitDesactive);
+      $sendmail = false;
+      $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.net>";
+      $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
+      // $infos_mail["recipient"] = "qjanon@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
+      $infos_mail["recipient"] = "ygautheron@absystech.fr";
+
+      $infos_mail['body'] = '';
+      $fpack = __TEMP_PATH__."packs_desactives.csv";
+      if (!empty($packDesactive)) {
+        $filepack= fopen($fpack, "w+");
+        $sendmail = true;
+        foreach ($packDesactive as $k=>$id_pack) {
+          ATF::pack_produit()->q->reset()->addAllFields('pack_produit')->where("pack_produit.id_pack_produit",$id_pack)->setLimit(1);
+          $p = ATF::pack_produit()->select_row();
+          if ($k == 0) {
+            foreach (array_keys($p) as $col=>$i) $entetes[str_replace('pack_produit.','',$col)] = $i;
+            fputcsv($filepack, $entetes);
+            fputs("\n");
+          }
+          fputcsv($filepack, $p);
+          fputs("\n");
+        }
+        fclose($filepack);
+      }
+      $fproduit = __TEMP_PATH__."produits_desactives.csv";
+      if (!empty($produitDesactive)) {
+        $fileproduit= fopen($fproduit, "w+");
+        fputcsv($fileproduit, array_keys($produitDesactive[0]));
+        fputs("\n");
+        $sendmail = true;
+        foreach ($produitDesactive as $line) {
+          fputcsv($fileproduit, $line);
+          fputs("\n");
+        }
+        fclose($fileproduit);        
+      }
+
+      if ($sendmail) {
+        $mail = new mail($infos_mail);
+        if (file_exists($fpack)) {
+          $mail->addFile($fpack, "Packs désactivés.csv");
+          unlink($fpack);
+        }
+        if (file_exists($fproduit)) {
+          $mail->addFile($fproduit, "Produits désactivés.csv");
+          unlink($fproduit);
+        }
+        $mail->send();    
+      }
+      log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
+      log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
+      log::logger("Produits désactivés","batch-majPrixCatalogueProduit");
+      log::logger(count($produitDesactive),"batch-majPrixCatalogueProduit");
+      log::logger("========== FIN  DU  BATCH ==========\n","batch-majPrixCatalogueProduit");
+
+
+    } catch (errorATF $e) {
+      throw $e;
+    }
+
+    return true;
+  }
 
 
 }

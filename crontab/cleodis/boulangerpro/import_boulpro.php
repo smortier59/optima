@@ -5,9 +5,6 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
 
-
-
-/*
 $type = array(
 	"Fixe"=>"fixe",
 	"portable"=>"portable",
@@ -24,18 +21,18 @@ ATF::db()->begin_transaction();
 	$packs = import_pack();
 	import_ligne($packs, $produits);
 
-ATF::db()->commit_transaction();
+//ATF::db()->commit_transaction();
 
 
 $directory = dirname(__FILE__)."/";
-$folder_cleodis = dirname(__FILE__)."/../../../../data/cleodis/";
+$folder_cleodis = "/home/data/cleodis/";
 
 //Copie des images de produit
 foreach ($produits as $key => $value) {
     $images = glob($directory . "/produit/".$key.".*");
     if($images[0]){
         if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
-            echo "Echec de copy de l'image du produit ".$key."\n";
+            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."produit/".$value.".photo\n";
         }
     }
 }
@@ -44,7 +41,9 @@ foreach ($produits as $key => $value) {
 foreach ($packs as $key => $value) {
     $images = glob($directory . "/pack/".$key.".*");
     if($images[0]){
-        copy($images[0], $folder_cleodis."pack_produit/".$value.".photo");
+        if (!copy($images[0], $folder_cleodis."pack_produit/".$value.".photo")) {
+            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value.".photo\n";
+        }
     }
 }
 
@@ -85,14 +84,14 @@ function import_produit(){
 			);
 
 			// Image spécifique
-			$folder_cleodis = __DIR__."/../../../../data/cleodis/";
-			if ($ligne[15] == "LIVRAISON") {
+			$folder_cleodis = "/home/data/cleodis/";
+			if ($ligne[15] == "Livraison") {
 		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
 		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
 		        }
 			}
 
-			if ($ligne[15] == "EXTENSION GARANTIE") {
+			if ($ligne[15] == "Garantie") {
 		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
 		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
 		        }
@@ -132,7 +131,7 @@ function import_pack(){
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 
-			ATF::pack_produit()->q->reset()->where("nom", $ligne[2]);
+			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($ligne[2]));
 			$p = ATF::pack_produit()->select_row();
 
 
@@ -150,7 +149,7 @@ function import_pack(){
 				$packs[$ligne[0]] = $p["id_pack_produit"];
 				echo "Pack mis à jour (N° : ".$ligne[0].") \n";
 			}else{
-				$produits[$ligne[0]] = ATF::pack_produit()->i($pack);
+				$packs[$ligne[0]] = ATF::pack_produit()->i($pack);
 				echo "Pack inseré (N° : ".$ligne[0].") \n";
 			}
 		}
@@ -165,7 +164,7 @@ function import_pack(){
 
 function import_ligne($packs, $produits){
 	$filePackLigne = "./ligne.csv";
-
+	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
 	$entete = fgetcsv($fppa);
 	try {
@@ -174,6 +173,13 @@ function import_ligne($packs, $produits){
 
 			$id_pack_produit = $packs[$ligne[0]];
 			$id_produit = $produits[$ligne[1]];
+
+			if (!$id_produit) {
+				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
+				ATF::produit()->q->reset()->select('id_produit')->where("ref", ATF::db()->real_escape_string($ligne[1]));
+				$id_produit = ATF::produit()->select_cell();
+//				continue;
+			}
 
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
 												 ->where("id_produit", $id_produit);
@@ -190,10 +196,13 @@ function import_ligne($packs, $produits){
 				"option_incluse"=>$ligne[5],
 				"option_incluse_obligatoire"=>$ligne[6],
 				"ref"=>$ligne[1],
-				"prix_achat"=> $ligne[10],
+				"prix_achat"=> is_numeric($ligne[10]) ? $ligne[10] : 0,
 				"visible"=> $ligne[9],
 				"ordre" => $ligne[8]
 			);
+
+			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
+			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
 
 			if($l){
 				$pack_produit_ligne["id_pack_produit_ligne"] = $l["id_pack_produit_ligne"];
@@ -209,6 +218,8 @@ function import_ligne($packs, $produits){
 		ATF::db()->rollback_transaction();
 		print_r($pack);
 		echo "Pack N° : ".$ligne[0]." ERREUR\n";
+		print_r($ligne);
+		print_r($pack_produit_ligne);
 		throw $e;
 	}
 
@@ -217,7 +228,7 @@ function import_ligne($packs, $produits){
 
 
 function get_fournisseur($fournisseur){
-	ATF::societe()->q->reset()->where("societe", $fournisseur, "AND", false, "LIKE");
+	ATF::societe()->q->reset()->where("societe", ATF::db()->real_escape_string($fournisseur), "AND", false, "LIKE");
 	$f = ATF::societe()->select_row();
 
 	if($f){
@@ -228,7 +239,7 @@ function get_fournisseur($fournisseur){
 }
 
 function get_fabriquant($fabriquant){
-	ATF::fabriquant()->q->reset()->where("fabriquant", $fabriquant, "AND", false, "LIKE");
+	ATF::fabriquant()->q->reset()->where("fabriquant", ATF::db()->real_escape_string($fabriquant), "AND", false, "LIKE");
 	$f = ATF::fabriquant()->select_row();
 
 	if($f){
@@ -239,28 +250,30 @@ function get_fabriquant($fabriquant){
 }
 
 function get_categorie($categorie){
-	ATF::categorie()->q->reset()->where("categorie", $categorie, "AND", false, "LIKE");
+	ATF::categorie()->q->reset()->where("categorie", ATF::db()->real_escape_string($categorie), "AND", false, "LIKE");
 	$f = ATF::categorie()->select_row();
 
 	if($f){
 		return $f["id_categorie"];
 	}else{
-		return ATF::categorie()->i(array("categorie"=>$categorie));
+		return ATF::categorie()->i(array("categorie"=>ATF::db()->real_escape_string($categorie)));
 	}
 }
 
 function get_sous_categorie($sous_categorie, $categorie){
-	ATF::sous_categorie()->q->reset()->where("sous_categorie", $sous_categorie, "AND", false, "LIKE");
+	ATF::sous_categorie()->q->reset()->where("sous_categorie", ATF::db()->real_escape_string($sous_categorie), "AND", false, "LIKE")
+									 ->where("id_categorie", ATF::db()->real_escape_string($categorie), "AND", false);
 	$f = ATF::sous_categorie()->select_row();
 
 	if($f){
 		return $f["id_sous_categorie"];
 	}else{
 		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
-		return ATF::sous_categorie()->i(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
+		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
 
+/*
 $fileProduit = "./produit.csv";
 $fpr = fopen($fileProduit, 'rb');
 $entete = fgetcsv($fpr);
@@ -287,7 +300,7 @@ try {
 	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
 	throw $e;
 }
-*/
+
 
 
 $fileProduit = "./produit.csv";
@@ -346,4 +359,4 @@ function get_sous_categorie($sous_categorie, $categorie){
 		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
-?>
+*/
