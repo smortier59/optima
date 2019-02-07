@@ -129,7 +129,7 @@ function import_pack(){
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 
-			ATF::pack_produit()->q->reset()->where("nom", $ligne[2]);
+			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($ligne[2]));
 			$p = ATF::pack_produit()->select_row();
 
 
@@ -174,7 +174,7 @@ function import_ligne($packs, $produits){
 
 			if (!$id_produit) {
 				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
-				ATF::produit()->q->reset()->select('id_produit')->where("ref", $ligne[1])->where('id_fournisseur', 28973);
+				ATF::produit()->q->reset()->select('id_produit')->where("ref", ATF::db()->real_escape_string($ligne[1]))->where('id_fournisseur', 28973);
 				$id_produit = ATF::produit()->select_cell();
 //				continue;
 			}
@@ -224,7 +224,7 @@ function import_ligne($packs, $produits){
 
 
 function get_fournisseur($fournisseur){
-	ATF::societe()->q->reset()->where("societe", $fournisseur, "AND", false, "LIKE");
+	ATF::societe()->q->reset()->where("societe", ATF::db()->real_escape_string($fournisseur), "AND", false, "LIKE");
 	$f = ATF::societe()->select_row();
 
 	if($f){
@@ -235,7 +235,7 @@ function get_fournisseur($fournisseur){
 }
 
 function get_fabriquant($fabriquant){
-	ATF::fabriquant()->q->reset()->where("fabriquant", $fabriquant, "AND", false, "LIKE");
+	ATF::fabriquant()->q->reset()->where("fabriquant", ATF::db()->real_escape_string($fabriquant), "AND", false, "LIKE");
 	$f = ATF::fabriquant()->select_row();
 
 	if($f){
