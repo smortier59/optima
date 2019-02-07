@@ -44,7 +44,7 @@ foreach ($packs as $key => $value) {
     $images = glob($directory . "/produit/".$value["raw"][1].".*");
     if($images[0]){
         if (!copy($images[0], $folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo")) {
-            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value.".photo\n";
+            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value["id_pack_produit"]..".photo\n";
         } else echo $folder_cleodis."pack_produit/".$value.".photo OK\n";
     }
 }
