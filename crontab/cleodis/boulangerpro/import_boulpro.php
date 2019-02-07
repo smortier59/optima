@@ -228,7 +228,7 @@ function import_ligne($packs, $produits){
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
 		print_r($pack);
-		echo "Pack N° : ".$ligne[0]." ERREUR\n";
+		echo "Ligne Pack N° : ".$ligne[0]." ERREUR\n";
 		print_r($ligne);
 		print_r($pack_produit_ligne);
 		throw $e;
