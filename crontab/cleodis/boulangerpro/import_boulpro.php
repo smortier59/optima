@@ -194,7 +194,7 @@ function import_ligne($packs, $produits){
 				"option_incluse"=>$ligne[5],
 				"option_incluse_obligatoire"=>$ligne[6],
 				"ref"=>$ligne[1],
-				"prix_achat"=> $ligne[10],
+				"prix_achat"=> is_numeric($ligne[10]) ? $ligne[10] : 0,
 				"visible"=> $ligne[9],
 				"ordre" => $ligne[8]
 			);
