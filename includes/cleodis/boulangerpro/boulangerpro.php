@@ -12,7 +12,7 @@ class boulangerpro {
           $host = "https://test.api.boulanger.pro/v2/";
           $customerKey = "CLEODISTEST";
           $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
-        } else { 
+        } else {
           die('on est pas en dev');
           $id_fournisseur = false;
           $host = "https://api.boulanger.pro/v2/";
@@ -32,7 +32,7 @@ class boulangerpro {
           ATF::produit()->q->reset()
             ->where('site_associe', 'boulangerpro')
             ->where('etat', 'actif')
-            ->where('id_fournisseur', $id_fournisseur); 
+            ->where('id_fournisseur', $id_fournisseur);
 
           $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -78,7 +78,7 @@ class boulangerpro {
                 log::logger("----- On désactive le produit car il est non inclus","batch-majPrixCatalogueProduit");
                 ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
                 $produitDesactive[] = $produit;
-                
+
               } else {
                 echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
                 log::logger("----- Prix inchangé pour ce produit, on ne traite pas","batch-majPrixCatalogueProduit");
@@ -129,15 +129,15 @@ class boulangerpro {
             fputcsv($fileproduit, $line);
             fputs("\n");
           }
-          fclose($fileproduit);        
+          fclose($fileproduit);
           $infos_mail->addFile($fproduit, "Produits désactivés");
         }
 
         if ($sendmail) {
           $mail = new mail($infos_mail);
-          $mail->send();    
+          $mail->send();
         }
-        
+
         log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
         log::logger($packDesactive,"batch-majPrixCatalogueProduit");
         log::logger("Produits désactivés","batch-majPrixCatalogueProduit");
@@ -146,3 +146,28 @@ class boulangerpro {
 
     }
 
+
+    public function validateOrder(){
+      require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
+      if (__DEV__) {
+        $id_fournisseur = 28973;
+        $host = "https://test.api.boulanger.pro/v2/";
+        $customerKey = "CLEODISTEST";
+        $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
+      } else {
+        die('on est pas en dev');
+        $id_fournisseur = false;
+        $host = "https://api.boulanger.pro/v2/";
+        $customerKey = "CLEODISTEST";
+        $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
+      }
+
+
+      $api = new ApiBoulangerProV2($customerKey,$secretKey,$host);
+      $response = $api->get('price/'.$produit['ref']);
+
+
+
+    }
+
+}

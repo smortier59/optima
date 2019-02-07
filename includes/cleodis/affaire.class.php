@@ -152,6 +152,7 @@ class affaire_cleodis extends affaire {
 		$this->addPrivilege("getCompteT");
 		$this->addPrivilege("getCompteTLoyerActualise");
 		$this->addPrivilege("updateCommentaireFacture");
+		$this->addPrivilege("validateOrderPartenaire");
 		$this->addPrivilege("setInfos");
 		$this->no_delete = true;
 		$this->no_update = true;
@@ -2932,6 +2933,14 @@ class affaire_midas extends affaire_cleodis {
 			->addCondition("commande.etat","mis_loyer","OR")
 			->addCondition("par.nbre_info",0,"OR",false,">")
 			->addJointure("affaire","id_affaire","par","id_affaire","par",NULL,NULL,NULL,"left",false,$subquery);
+	}
+
+
+	public function validateOrderPartenaire($data){
+		log::logger($data, "mfleurquin");
+
+		return true;
+
 	}
 
 };
