@@ -82,14 +82,14 @@ function import_produit(){
 			);
 
 			// Image spécifique
-			$folder_cleodis = __DIR__."/../../../../data/cleodis/";
-			if ($ligne[15] == "LIVRAISON") {
+			$folder_cleodis = "/home/data/cleodis/";
+			if ($ligne[15] == "Livraison") {
 		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
 		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
 		        }
 			}
 
-			if ($ligne[15] == "EXTENSION GARANTIE") {
+			if ($ligne[15] == "Garantie") {
 		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
 		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
 		        }
