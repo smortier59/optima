@@ -691,19 +691,7 @@ class souscription_cleodis extends souscription {
       ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
       $id_fournisseur = ATF::societe()->select_cell();
 
-      if (__DEV__) {
-        $host = "https://test.api.boulanger.pro/v2/";
-        $customerKey = "CLEODISTEST";
-        $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
-      } else { 
-        die("j'ai pas encore la config de prod");
-        $host = "https://api.boulanger.pro/v2/";
-        $customerKey = "";
-        $secretKey = "";
-      }
-
-
-      $api = new ApiBoulangerProV2($customerKey,$secretKey,$host);
+      $api = new ApiBoulangerProV2(__API_BOULANGER_CLIENT__,__API_BOULANGER_SECRET__,__API_BOULANGER_HOST__);
       // echo "\n========== DEBUT DU BATCH ==========";
       log::logger("-----------------------------------------------------------------","batch-majPrixCatalogueProduit");
       log::logger("==========DEBUT DU BATCH==========","batch-majPrixCatalogueProduit");
@@ -806,6 +794,7 @@ class souscription_cleodis extends souscription {
 
       $infos_mail['body'] = '';
       $fpack = __TEMP_PATH__."packs_desactives.csv";
+      @unlink($fpack);
       if (!empty($packDesactive)) {
         $filepack= fopen($fpack, "w+");
         $sendmail = true;
@@ -823,6 +812,7 @@ class souscription_cleodis extends souscription {
         fclose($filepack);
       }
       $fproduit = __TEMP_PATH__."produits_desactives.csv";
+      @unlink($fproduit);
       if (!empty($produitDesactive)) {
         $fileproduit= fopen($fproduit, "w+");
         fputcsv($fileproduit, array_keys($produitDesactive[0]));
@@ -839,11 +829,11 @@ class souscription_cleodis extends souscription {
         $mail = new mail($infos_mail);
         if (file_exists($fpack)) {
           $mail->addFile($fpack, "Packs désactivés.csv");
-          unlink($fpack);
+          //unlink($fpack);
         }
         if (file_exists($fproduit)) {
           $mail->addFile($fproduit, "Produits désactivés.csv");
-          unlink($fproduit);
+          //unlink($fproduit);
         }
         $mail->send();    
       }
