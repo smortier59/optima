@@ -25,7 +25,7 @@ ATF::db()->begin_transaction();
 
 
 $directory = dirname(__FILE__)."/";
-$folder_cleodis = dirname(__FILE__)."/../../../../data/cleodis/";
+$folder_cleodis = "/home/data/cleodis/";
 
 //Copie des images de produit
 foreach ($produits as $key => $value) {
