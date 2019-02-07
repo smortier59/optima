@@ -41,9 +41,9 @@ foreach ($produits as $key => $value) {
 //Copie des images de pack
 foreach ($packs as $key => $value) {
 	echo "pack image : ".$directory . "/produit/".$key.".*\n";
-    $images = glob($directory . "/produit/".$key.".*");
+    $images = glob($directory . "/produit/".$value["raw"][1].".*");
     if($images[0]){
-        if (!copy($images[0], $folder_cleodis."pack_produit/".$value.".photo")) {
+        if (!copy($images[0], $folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo")) {
             echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value.".photo\n";
         } else echo $folder_cleodis."pack_produit/".$value.".photo OK\n";
     }
@@ -150,10 +150,10 @@ function import_pack(){
 			if($p){
 				$pack["id_pack_produit"] = $p["id_pack_produit"];
 				ATF::pack_produit()->u($pack);
-				$packs[$ligne[1]] = $p["id_pack_produit"];
+				$packs[$ligne[0]] = array("id_pack_produit"=>$p["id_pack_produit"], "raw"=>$ligne);
 				echo "Pack mis à jour (N° : ".$ligne[0].") \n";
 			}else{
-				$packs[$ligne[1]] = ATF::pack_produit()->i($pack);
+				$packs[$ligne[0]] = array("id_pack_produit"=>ATF::pack_produit()->i($pack), "raw"=>$ligne);
 				echo "Pack inseré (N° : ".$ligne[0].") \n";
 			}
 		}
@@ -175,7 +175,7 @@ function import_ligne($packs, $produits){
 		while ($ligne = fgetcsv($fppa)) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			$id_pack_produit = $packs[$ligne[0]];
+			$id_pack_produit = $packs[$ligne[0]]["id_pack_produit"];
 			$id_produit = $produits[$ligne[1]];
 
 			ATF::produit()->q->reset()
