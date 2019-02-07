@@ -32,7 +32,7 @@ foreach ($produits as $key => $value) {
     $images = glob($directory . "/produit/".$key.".*");
     if($images[0]){
         if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
-            echo "Echec de copy de l'image du produit ".$key."\n";
+            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."produit/".$value.".photo\n";
         }
     }
 }
@@ -41,7 +41,9 @@ foreach ($produits as $key => $value) {
 foreach ($packs as $key => $value) {
     $images = glob($directory . "/pack/".$key.".*");
     if($images[0]){
-        copy($images[0], $folder_cleodis."pack_produit/".$value.".photo");
+        if (!copy($images[0], $folder_cleodis."pack_produit/".$value.".photo")) {
+            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value.".photo\n";
+        }
     }
 }
 
