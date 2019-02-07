@@ -33,7 +33,7 @@ foreach ($produits as $key => $value) {
     if($images[0]){
         if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
             echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."produit/".$value.".photo\n";
-        }
+        } else $folder_cleodis."produit/".$value.".photo OK"
     }
 }
 
@@ -43,7 +43,7 @@ foreach ($packs as $key => $value) {
     if($images[0]){
         if (!copy($images[0], $folder_cleodis."pack_produit/".$value.".photo")) {
             echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value.".photo\n";
-        }
+        } else echo $folder_cleodis."pack_produit/".$value.".photo OK"
     }
 }
 
@@ -88,14 +88,14 @@ function import_produit(){
 			// Image spécifique
 			$folder_cleodis = "/home/data/cleodis/";
 			if ($ligne[15] == "Livraison") {
-		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
-		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
+		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$ligne[0].".jpg")){
+		            echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
 		        }
 			}
 
 			if ($ligne[15] == "Garantie") {
-		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$p["id_produit"].".jpg")){
-		            echo "Echec de copy de l'image garantie du produit ".$p["id_produit"]."\n";
+		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$ligne[0].".jpg")){
+		            echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
 		        }
 			}
 
@@ -198,7 +198,7 @@ function import_ligne($packs, $produits){
 				"option_incluse"=>$ligne[5],
 				"option_incluse_obligatoire"=>$ligne[6],
 				"ref"=>$ligne[1],
-				"prix_achat"=> is_numeric($ligne[10]) ? $ligne[10] : 0,
+				"prix_achat"=> $ligne[10],
 				"visible"=> $ligne[9],
 				"ordre" => $ligne[8]
 			);
