@@ -29,21 +29,23 @@ $folder_cleodis = "/home/data/cleodis/";
 
 //Copie des images de produit
 foreach ($produits as $key => $value) {
+	echo "produit image : ".$directory . "/produit/".$key.".*\n";
     $images = glob($directory . "/produit/".$key.".*");
     if($images[0]){
         if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
             echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."produit/".$value.".photo\n";
-        } else $folder_cleodis."produit/".$value.".photo OK"
+        } else $folder_cleodis."produit/".$value.".photo OK\n";
     }
 }
 
 //Copie des images de pack
 foreach ($packs as $key => $value) {
-    $images = glob($directory . "/pack/".$key.".*");
+	echo "pack image : ".$directory . "/produit/".$key.".*\n";
+    $images = glob($directory . "/produit/".$key.".*");
     if($images[0]){
         if (!copy($images[0], $folder_cleodis."pack_produit/".$value.".photo")) {
             echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value.".photo\n";
-        } else echo $folder_cleodis."pack_produit/".$value.".photo OK"
+        } else echo $folder_cleodis."pack_produit/".$value.".photo OK\n";
     }
 }
 
@@ -148,10 +150,10 @@ function import_pack(){
 			if($p){
 				$pack["id_pack_produit"] = $p["id_pack_produit"];
 				ATF::pack_produit()->u($pack);
-				$packs[$ligne[0]] = $p["id_pack_produit"];
+				$packs[$ligne[1]] = $p["id_pack_produit"];
 				echo "Pack mis à jour (N° : ".$ligne[0].") \n";
 			}else{
-				$packs[$ligne[0]] = ATF::pack_produit()->i($pack);
+				$packs[$ligne[1]] = ATF::pack_produit()->i($pack);
 				echo "Pack inseré (N° : ".$ligne[0].") \n";
 			}
 		}
@@ -176,10 +178,15 @@ function import_ligne($packs, $produits){
 			$id_pack_produit = $packs[$ligne[0]];
 			$id_produit = $produits[$ligne[1]];
 
+			ATF::produit()->q->reset()
+				->select('id_produit')
+				->select('id_fournisseur')
+				->where("ref", ATF::db()->real_escape_string($ligne[1]));
+			$produit = ATF::produit()->select_row();
+
 			if (!$id_produit) {
 				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
-				ATF::produit()->q->reset()->select('id_produit')->where("ref", ATF::db()->real_escape_string($ligne[1]));
-				$id_produit = ATF::produit()->select_cell();
+				$id_produit = $produit["id_produit"];
 //				continue;
 			}
 
@@ -199,6 +206,7 @@ function import_ligne($packs, $produits){
 				"option_incluse_obligatoire"=>$ligne[6],
 				"ref"=>$ligne[1],
 				"prix_achat"=> $ligne[10],
+				"id_fournisseur"=> $produit["id_fournisseur"],
 				"visible"=> $ligne[9],
 				"ordre" => $ligne[8]
 			);
