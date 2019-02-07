@@ -192,8 +192,8 @@ function import_ligne($packs, $produits){
 				"ordre" => $ligne[8]
 			);
 
-			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']=="oui";
-			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']=="non";
+			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
+			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
 
 			if($l){
 				$pack_produit_ligne["id_pack_produit_ligne"] = $l["id_pack_produit_ligne"];
