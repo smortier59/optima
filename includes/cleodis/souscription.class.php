@@ -609,14 +609,15 @@ class souscription_cleodis extends souscription {
     try {
       require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
 
+      ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
+      $id_fournisseur = ATF::societe()->select_cell();
+
       if (__DEV__) {
-        $id_fournisseur = 28973;
         $host = "https://test.api.boulanger.pro/v2/";
         $customerKey = "CLEODISTEST";
         $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
       } else { 
         die("j'ai pas encore la config de prod");
-        $id_fournisseur = 28973;
         $host = "https://api.boulanger.pro/v2/";
         $customerKey = "";
         $secretKey = "";
