@@ -27,10 +27,13 @@ class affaire_cleodis extends affaire {
 			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
 			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'validateOrder'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"validateOrderRenderer")
+
 
 			,"affaire.commentaire_facture"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture2"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture3"=>array("rowEditor"=>"setInfos")
+
 
 		);
 
@@ -152,6 +155,7 @@ class affaire_cleodis extends affaire {
 		$this->addPrivilege("getCompteT");
 		$this->addPrivilege("getCompteTLoyerActualise");
 		$this->addPrivilege("updateCommentaireFacture");
+		$this->addPrivilege("validateOrderPartenaire");
 		$this->addPrivilege("setInfos");
 		$this->no_delete = true;
 		$this->no_update = true;
@@ -1097,6 +1101,10 @@ class affaire_cleodis extends affaire {
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		$a = new affaire_cleodis();
 		foreach ($return['data'] as $k=>$i) {
+			$return['data'][$k]["site_associe"] = ATF::affaire()->select($i['affaire.id_affaire'], "site_associe");
+			$return['data'][$k]["ref_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "ref_externe");
+			$return['data'][$k]["etat_cmd_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "etat_cmd_externe");
+
 			if ($i['affaire.nature'] == 'AR') {
 				foreach ($a->getParentAR($i['affaire.id_affaire']) as $k_=>$i_) {
 					$return['data'][$k]['parentes'] .= '<a href="#affaire-select-'.$a->cryptId($i_['id_affaire']).'.html">'.$i_['ref'].'</a>, ';
@@ -2789,6 +2797,25 @@ class affaire_cleodis extends affaire {
 		$id_tache = ATF::tache()->insert($tache);
 	}
 
+	public function validateOrderPartenaire($infos,&$s,$files=NULL,&$cadre_refreshed){
+
+		require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/boulangerpro.php';
+
+		$affaire = $this->select($infos["id_affaire"]);
+
+		//On recupere toute les affaires avec le meme site associé et ref_externe
+		$this->q->reset()->where("site_associe",$affaire["site_associe"])->where("ref_externe",$affaire["ref_externe"]);
+		$affaires = $this->sa();
+
+		$retour = boulangerpro::validateOrder($affaire["ref_externe"]);
+		if($retour){
+			foreach ($affaires as $key => $value) {
+				ATF::affaire()->u(array("id_affaire"=>$value["id_affaire"], "etat_cmd_externe"=>"valide"));
+				ATF::$msg->addNotice("Commande validée chez le partenaire pour l'affaire ".$value["ref"]);
+			}
+		}
+	}
+
 
 };
 class affaire_midas extends affaire_cleodis {
@@ -2934,6 +2961,9 @@ class affaire_midas extends affaire_cleodis {
 			->addCondition("par.nbre_info",0,"OR",false,">")
 			->addJointure("affaire","id_affaire","par","id_affaire","par",NULL,NULL,NULL,"left",false,$subquery);
 	}
+
+
+
 
 };
 
