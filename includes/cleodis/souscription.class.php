@@ -725,7 +725,6 @@ class souscription_cleodis extends souscription {
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
             // Mise a jour des taxes du produit
             $p = $r[0];
-            log::logger("Mise à jour des taxes, taxe éco: ".$p['ecotax']." - ecomob : ".$p['ecomob'],"batch-majPrixCatalogueProduit");
 
             // On sauve les old pour l'export excel
             $produit["old_prix_achat"] = $produit["prix_achat"];
@@ -734,6 +733,7 @@ class souscription_cleodis extends souscription {
             $produit["prix_achat"] = $p['price_tax_excl']+$p['ecotax']+$p['ecomob'];
             $produit["taxe_ecotaxe"] = $p['ecotax'];
             $produit["taxe_ecomob"] = $p['ecomob'];
+            log::logger($produit, "batch-majPrixCatalogueProduit");
 
             if ($produit['prix_achat'] != $produit["old_prix_achat"]) {
               // echo "\n ----- Prix modifié pour ce produit";

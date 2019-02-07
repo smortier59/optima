@@ -45,7 +45,7 @@ foreach ($packs as $key => $value) {
     if($images[0]){
         if (!copy($images[0], $folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo")) {
             echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo\n";
-        } else echo $folder_cleodis."pack_produit/".$value.".photo OK\n";
+        } else echo $folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo OK\n";
     }
 }
 
@@ -70,7 +70,7 @@ function import_produit(){
 
 			$produit = array(
 				"produit"=>$ligne[1],
-				"type"=>$type[$ligne[5]],
+				"type"=>strtolower($type[$ligne[5]]),
 				"ref"=>$ligne[0],
 				"ean"=>$ean,
 				"id_fournisseur"=> get_fournisseur($ligne[6]),
@@ -85,7 +85,7 @@ function import_produit(){
 				"visible_sur_site"=>"oui"
 			);
 
-			if ($produit['type']=="Sans objet") $produit['type']="sans_objet";
+			if ($produit['type']=="sans objet") $produit['type']="sans_objet";
 
 			// Image spécifique
 			$folder_cleodis = "/home/data/cleodis/";
@@ -108,7 +108,7 @@ function import_produit(){
 				echo "Produit mis à jour (ref : ".$ligne[0].") \n";
 			}else{
 				$produits[$ligne[0]] = ATF::produit()->i($produit);
-				echo "Produit inseré (ref : ".$ligne[0].") \n";
+				echo "Produit inseré (ref : ".$ligne[0].", type: ".$produit['type'].") \n";
 			}
 
 
