@@ -658,13 +658,26 @@ class souscription_cleodis extends souscription {
             // Mise a jour des taxes du produit
             $p = $r[0];
             log::logger("Mise à jour des taxes, taxe éco: ".$p['ecotax']." - ecomob : ".$p['ecomob'],"batch-majPrixCatalogueProduit");
-            ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"taxe_ecotaxe"=>$p['ecotax'],"taxe_ecomob"=>$p['ecomob']));
-            if ($produit['prix_achat'] != $p['price_tax_excl']) {
+
+            // On sauve les old pour l'export excel
+            $produit["old_prix_achat"] = $produit["prix_achat"];
+            $produit["old_taxe_ecotaxe"] = $produit["taxe_ecotaxe"];
+            $produit["old_taxe_ecomob"] = $produit["taxe_ecomob"];
+            $produit["prix_achat"] = $p['price_tax_excl']+$p['ecotax']+$p['ecomob'];
+            $produit["taxe_ecotaxe"] = $p['ecotax'];
+            $produit["taxe_ecomob"] = $p['ecomob'];
+
+            if ($produit['prix_achat'] != $produit["old_prix_achat"]) {
               // echo "\n ----- Prix modifié pour ce produit";
               log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
 
               // MAJ nouveau prix sur le produit
-              ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"new_prix"=>$p['price_tax_excl']));
+              ATF::produit()->u(array(
+                "id_produit"=>$produit['id_produit'],
+                "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
+                "taxe_ecotaxe"=>$p['ecotax'],
+                "taxe_ecomob"=>$p['ecomob']
+              ));
 
               // Produit inclus, on va désactiver tous les packs associés
               if ($produit['max'] == $produit['min'] && $produit['max'] == $produit['defaut']) {
@@ -683,6 +696,7 @@ class souscription_cleodis extends souscription {
               // echo "\n ----- On désactive le produit car il est non inclus";
               log::logger("----- On désactive le produit aussi du coup","batch-majPrixCatalogueProduit");
               ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
+
               $produitDesactive[] = $produit;
             } else {
               // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
@@ -708,7 +722,7 @@ class souscription_cleodis extends souscription {
       $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
       $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
       // $infos_mail["recipient"] = "qjanon@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
-      $infos_mail["recipient"] = "qjanon@absystech.fr";
+      $infos_mail["recipient"] = "ygautheron@absystech.fr";
 
       $infos_mail['body'] = '';
       $fpack = __TEMP_PATH__."packs_desactives.csv";
