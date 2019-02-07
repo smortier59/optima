@@ -10,15 +10,3 @@ DELETE FROM `pack_produit_ligne` WHERE id_pack_produit NOT IN (SELECT id_pack_pr
 -- Contraintes
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit`(`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-
--- Boulanger PRO
-ALTER TABLE `produit` ADD `new_prix` DECIMAL(10,2) UNSIGNED NULL DEFAULT NULL AFTER `prix_achat`;
-
-ALTER TABLE `produit`
-	ADD `taxe_ecotaxe` DECIMAL(10.2) UNSIGNED NULL DEFAULT NULL AFTER `prix_achat`,
-	ADD `taxe_ecomob` DECIMAL(10.2) UNSIGNED NULL DEFAULT NULL AFTER `taxe_ecotaxe`;
-
-
-ALTER TABLE `affaire` ADD `ref_externe` VARCHAR(50) NULL DEFAULT NULL AFTER `ref` COMMENT 'Reference externe provenant d\'un partenaire';
-ALTER TABLE `affaire` ADD `etat_cmd_externe` ENUM('attente','valide') NULL AFTER `ref_externe`;
