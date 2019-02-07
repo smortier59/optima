@@ -83,6 +83,8 @@ function import_produit(){
 				"visible_sur_site"=>"oui"
 			);
 
+			if ($produit['type']=="Sans objet") $produit['type']="sans_objet";
+
 			// Image spécifique
 			$folder_cleodis = "/home/data/cleodis/";
 			if ($ligne[15] == "Livraison") {
