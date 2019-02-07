@@ -162,7 +162,7 @@ function import_pack(){
 
 function import_ligne($packs, $produits){
 	$filePackLigne = "./ligne.csv";
-
+	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
 	$entete = fgetcsv($fppa);
 	try {
@@ -216,6 +216,8 @@ function import_ligne($packs, $produits){
 		ATF::db()->rollback_transaction();
 		print_r($pack);
 		echo "Pack N° : ".$ligne[0]." ERREUR\n";
+		print_r($ligne);
+		print_r($pack_produit_ligne);
 		throw $e;
 	}
 
