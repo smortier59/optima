@@ -172,6 +172,11 @@ function import_ligne($packs, $produits){
 			$id_pack_produit = $packs[$ligne[0]];
 			$id_produit = $produits[$ligne[1]];
 
+			if (!$id_produit) {
+				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
+				continue;
+			}
+
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
 												 ->where("id_produit", $id_produit);
 			$l = ATF::pack_produit_ligne()->select_row();
