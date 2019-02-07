@@ -20,5 +20,5 @@ ALTER TABLE `produit`
 	ADD `taxe_ecomob` DECIMAL(10.2) UNSIGNED NULL DEFAULT NULL AFTER `taxe_ecotaxe`;
 
 
-
+ALTER TABLE `affaire` ADD `ref_externe` VARCHAR(50) NULL DEFAULT NULL AFTER `ref` COMMENT 'Reference externe provenant d\'un partenaire';
 ALTER TABLE `affaire` ADD `etat_cmd_externe` ENUM('attente','valide') NULL AFTER `ref_externe`;
