@@ -147,7 +147,9 @@ class boulangerpro {
     }
 
 
-    public function validateOrder(){
+    public function validateOrder($ref){
+      log::logger("==========DEBUT DU validateOrder==========","validateOrder");
+
       require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
       if (__DEV__) {
         $id_fournisseur = 28973;
@@ -161,10 +163,18 @@ class boulangerpro {
         $customerKey = "CLEODISTEST";
         $secretKey = "yK7qcGnFRKntDRcVSm6fRxPV5hPPPwtg";
       }
-
-
+      log::logger("Appel à l'API Boulanger PRO ValidateOrder pour la ref de commande : ".$ref,"validateOrder");
       $api = new ApiBoulangerProV2($customerKey,$secretKey,$host);
-      $response = $api->get('price/'.$produit['ref']);
+      $response = $api->post('validateOrder/',array("reference"=>$ref));
+
+      $r = $response->getContent();
+      log::logger($r,"validateOrder");
+
+      if ($r['error_code']) {
+        throw new errorATF("Retour boulanger PRO ".$r["message"],500);
+      } else {
+        return true;
+      }
 
 
 

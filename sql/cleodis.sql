@@ -15,7 +15,10 @@ ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `prod
 -- Boulanger PRO
 ALTER TABLE `produit` ADD `new_prix` DECIMAL(10,2) UNSIGNED NULL DEFAULT NULL AFTER `prix_achat`;
 
-ALTER TABLE `produit` 
-	ADD `taxe_ecotaxe` DECIMAL(10.2) UNSIGNED NULL DEFAULT NULL AFTER `prix_achat`, 
+ALTER TABLE `produit`
+	ADD `taxe_ecotaxe` DECIMAL(10.2) UNSIGNED NULL DEFAULT NULL AFTER `prix_achat`,
 	ADD `taxe_ecomob` DECIMAL(10.2) UNSIGNED NULL DEFAULT NULL AFTER `taxe_ecotaxe`;
 
+
+
+ALTER TABLE `affaire` ADD `etat_cmd_externe` ENUM('attente','valide') NULL AFTER `ref_externe`;
