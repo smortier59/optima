@@ -799,7 +799,7 @@ class souscription_cleodis extends souscription {
       // echo "\nProduits désactivés";
       // print_r($produitDesactive);
       $sendmail = false;
-      $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.fr>";
+      $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.net>";
       $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
       // $infos_mail["recipient"] = "qjanon@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
       $infos_mail["recipient"] = "ygautheron@absystech.fr";
