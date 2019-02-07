@@ -174,7 +174,9 @@ function import_ligne($packs, $produits){
 
 			if (!$id_produit) {
 				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
-				continue;
+				ATF::produit()->q->reset()->select('id_produit')->where("ref", $ligne[1])->where('id_fournisseur', 28973);
+				$id_produit = ATF::produit()->select_cell();
+//				continue;
 			}
 
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
