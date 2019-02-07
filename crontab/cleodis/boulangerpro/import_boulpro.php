@@ -208,7 +208,7 @@ function import_ligne($packs, $produits){
 				"prix_achat"=> $ligne[10],
 				"id_fournisseur"=> $produit["id_fournisseur"],
 				"visible"=> $ligne[9],
-				"visible_sur_pdf"=> $ligne[10],
+				"visible_sur_pdf"=> $ligne[11],
 				"ordre" => $ligne[8]
 			);
 
