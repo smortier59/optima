@@ -700,7 +700,6 @@ class souscription_cleodis extends souscription {
       try {
 
         ATF::produit()->q->reset()
-          ->where('etat', 'actif')
           ->where('id_fournisseur', $id_fournisseur); 
 
         $catalogueBoulProActif = ATF::produit()->sa();
