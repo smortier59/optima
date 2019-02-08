@@ -393,16 +393,20 @@ $produits = array();
 try {
 
 	while ($ligne = fgetcsv($fpr)) {
+		echo "======================================\n";
 		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-
+		print_r($ligne);
 		ATF::produit()->q->reset()->where("ref", $ligne[0]);
 		$p = ATF::produit()->select_row();
+		print_r($p);
 		if ($p) {
 			echo "PRODUIT INTROUVABLE - REF = ".$ligne[0]."\n";
 			continue;
 		}
 		$t = strtolower($type[$ligne[5]]);
 		if ($t=="sans objet") $t="sans_objet";
+
+		echo "TYPE = ".$t."\n";
 
 
 		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "type"=>$t));
