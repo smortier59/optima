@@ -382,6 +382,7 @@ function get_sous_categorie($sous_categorie, $categorie){
 $type = array(
 	"Fixe"=>"fixe",
 	"portable"=>"portable",
+	"Portable"=>"portable",
 	"Sans objet"=>"sans_objet",
 	"Immateriel"=>"immateriel"
 );
