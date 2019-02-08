@@ -734,17 +734,17 @@ class souscription_cleodis extends souscription {
             $produit["taxe_ecomob"] = $p['ecomob'];
             log::logger($produit, "batch-majPrixCatalogueProduit");
 
-            // MAJ nouveau prix sur le produit
-            ATF::produit()->u(array(
-              "id_produit"=>$produit['id_produit'],
-              "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
-              "taxe_ecotaxe"=>$p['ecotax'],
-              "taxe_ecomob"=>$p['ecomob']
-            ));
             if ($produit['prix_achat'] != $produit["old_prix_achat"]) {
               // echo "\n ----- Prix modifié pour ce produit";
               log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
 
+              // MAJ nouveau prix sur le produit
+              ATF::produit()->u(array(
+                "id_produit"=>$produit['id_produit'],
+                "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
+                "taxe_ecotaxe"=>$p['ecotax'],
+                "taxe_ecomob"=>$p['ecomob']
+              ));
 
               // Produit inclus, on va désactiver tous les packs associés
               if ($produit['max'] == $produit['min'] && $produit['max'] == $produit['defaut']) {
