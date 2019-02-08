@@ -788,8 +788,8 @@ class souscription_cleodis extends souscription {
       $sendmail = false;
       $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.net>";
       $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
-      // $infos_mail["recipient"] = "qjanon@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
-      $infos_mail["recipient"] = "ygautheron@absystech.fr";
+      $infos_mail["recipient"] = "dev@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
+      // $infos_mail["recipient"] = "ygautheron@absystech.fr";
 
       $infos_mail['body'] = '';
       $fpack = __TEMP_PATH__."packs_desactives.csv";
