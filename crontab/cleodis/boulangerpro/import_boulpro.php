@@ -401,6 +401,7 @@ try {
 			echo "PRODUIT INTROUVABLE - REF = ".$ligne[0]."\n";
 			continue;
 		}
+		echo "TYPE du CSV : |".$ligne[5]."| - |".$type[$ligne[5]]."|\n";
 		$t = strtolower($type[$ligne[5]]);
 		if ($t=="sans objet") $t="sans_objet";
 
