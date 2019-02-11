@@ -10752,13 +10752,11 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function bon_de_commande($id,$s) {
 
-		//$this->initBDC($id,$s,$previsu);
-
-
 		if($this->affaire["langue"] !== "NL"){
 			parent::bon_de_commande($id, $s);
 
 		}else{
+			$this->initBDC($id,$s,$previsu);
 			$this->unsetHeader();
 			$this->open();
 			$this->addpage();
