@@ -4245,8 +4245,6 @@ class pdf_cleodis extends pdf {
 			$this->lignes[] = $value;
 		}
 
-		log::logger($this->lignes , "mfleurquin");
-
 		$this->client = ATF::societe()->select($this->bdc['id_societe']);
 		$this->user = ATF::user()->select($this->bdc['id_user']);
 		$this->affaire = ATF::affaire()->select($this->bdc['id_affaire']);
@@ -10754,7 +10752,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	*/
 	public function bon_de_commande($id,$s) {
 
-		$this->initBDC($id,$s,$previsu);
+		//$this->initBDC($id,$s,$previsu);
 
 
 		if($this->affaire["langue"] !== "NL"){
