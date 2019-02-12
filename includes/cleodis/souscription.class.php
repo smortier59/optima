@@ -17,8 +17,8 @@ class souscription_cleodis extends souscription {
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
   /*--------------------------------------------------------------*/
-  public function __construct() { 
-    parent::__construct(); 
+  public function __construct() {
+    parent::__construct();
     $this->table = "affaire";
   }
 
@@ -700,7 +700,7 @@ class souscription_cleodis extends souscription {
       try {
 
         ATF::produit()->q->reset()
-          ->where('id_fournisseur', $id_fournisseur); 
+          ->where('id_fournisseur', $id_fournisseur);
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -720,10 +720,11 @@ class souscription_cleodis extends souscription {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
           } else {
+            $p = $r[0];
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
             // Mise a jour des taxes du produit
-            $p = $r[0];
+
 
             // On sauve les old pour l'export excel
             $produit["old_prix_achat"] = $produit["prix_achat"];
@@ -823,7 +824,7 @@ class souscription_cleodis extends souscription {
           fputcsv($fileproduit, $line);
           fputs("\n");
         }
-        fclose($fileproduit);        
+        fclose($fileproduit);
       }
 
       if ($sendmail) {
@@ -836,7 +837,7 @@ class souscription_cleodis extends souscription {
           $mail->addFile($fproduit, "Produits désactivés.csv");
           //unlink($fproduit);
         }
-        $mail->send();    
+        $mail->send();
       }
       log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
       log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
