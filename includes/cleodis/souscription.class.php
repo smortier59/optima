@@ -17,8 +17,8 @@ class souscription_cleodis extends souscription {
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
   /*--------------------------------------------------------------*/
-  public function __construct() { 
-    parent::__construct(); 
+  public function __construct() {
+    parent::__construct();
     $this->table = "affaire";
   }
 
@@ -699,8 +699,7 @@ class souscription_cleodis extends souscription {
       ATF::db()->begin_transaction(true);
       try {
 
-        ATF::produit()->q->reset()
-          ->where('id_fournisseur', $id_fournisseur); 
+        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur);
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -720,21 +719,23 @@ class souscription_cleodis extends souscription {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
           } else {
-            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
-            // Mise a jour des taxes du produit
             $p = $r[0];
+            $prix_avec_taxe = number_format($p['price_tax_excl'],2)+number_format($p['ecotax'],2)+number_format($p['ecomob'],2);
+            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
+            // Mise a jour des taxes du produit
+
 
             // On sauve les old pour l'export excel
             $produit["old_prix_achat"] = $produit["prix_achat"];
             $produit["old_taxe_ecotaxe"] = $produit["taxe_ecotaxe"];
             $produit["old_taxe_ecomob"] = $produit["taxe_ecomob"];
-            $produit["prix_achat"] = $p['price_tax_excl']+$p['ecotax']+$p['ecomob'];
+            $produit["prix_achat"] = $prix_avec_taxe;
             $produit["taxe_ecotaxe"] = $p['ecotax'];
             $produit["taxe_ecomob"] = $p['ecomob'];
             log::logger($produit, "batch-majPrixCatalogueProduit");
 
-            if ($produit['prix_achat'] != $produit["old_prix_achat"]) {
+            if (number_format($produit['prix_achat'],2) != number_format($produit["old_prix_achat"],2)) {
               // echo "\n ----- Prix modifié pour ce produit";
               log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
 
@@ -823,7 +824,7 @@ class souscription_cleodis extends souscription {
           fputcsv($fileproduit, $line);
           fputs("\n");
         }
-        fclose($fileproduit);        
+        fclose($fileproduit);
       }
 
       if ($sendmail) {
@@ -836,7 +837,7 @@ class souscription_cleodis extends souscription {
           $mail->addFile($fproduit, "Produits désactivés.csv");
           //unlink($fproduit);
         }
-        $mail->send();    
+        $mail->send();
       }
       log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
       log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
