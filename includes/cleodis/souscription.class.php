@@ -736,7 +736,7 @@ class souscription_cleodis extends souscription {
             $produit["taxe_ecomob"] = $p['ecomob'];
             log::logger($produit, "batch-majPrixCatalogueProduit");
 
-            if ($produit['prix_achat'] != $produit["old_prix_achat"]) {
+            if (number_format($produit['prix_achat'],2) != number_format($produit["old_prix_achat"],2)) {
               // echo "\n ----- Prix modifié pour ce produit";
               log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
 
