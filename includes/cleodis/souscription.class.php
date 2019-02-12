@@ -722,7 +722,7 @@ class souscription_cleodis extends souscription {
           } else {
             $p = $r[0];
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']+$p['ecotax']+$p['ecomob']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
             // Mise a jour des taxes du produit
 
 
