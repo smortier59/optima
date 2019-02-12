@@ -721,8 +721,9 @@ class souscription_cleodis extends souscription {
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
           } else {
             $p = $r[0];
+            $prix_avec_taxe = number_format($p['price_tax_excl'],2)+number_format($p['ecotax'],2)+number_format($p['ecomob'],2);
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']+$p['ecotax']+$p['ecomob']." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
             // Mise a jour des taxes du produit
 
 
@@ -730,7 +731,7 @@ class souscription_cleodis extends souscription {
             $produit["old_prix_achat"] = $produit["prix_achat"];
             $produit["old_taxe_ecotaxe"] = $produit["taxe_ecotaxe"];
             $produit["old_taxe_ecomob"] = $produit["taxe_ecomob"];
-            $produit["prix_achat"] = $p['price_tax_excl']+$p['ecotax']+$p['ecomob'];
+            $produit["prix_achat"] = $prix_avec_taxe;
             $produit["taxe_ecotaxe"] = $p['ecotax'];
             $produit["taxe_ecomob"] = $p['ecomob'];
             log::logger($produit, "batch-majPrixCatalogueProduit");
