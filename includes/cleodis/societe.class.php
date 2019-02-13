@@ -1658,6 +1658,14 @@ class societe_cleodis extends societe {
             }else {
                 $data_soc = $data;
 
+                if ($post['site_associe']=='boulangerpro') {
+                  ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
+                  $id_apporteur = ATF::societe()->select_cell();
+
+
+                  $data_soc['id_apporteur'] = $id_apporteur;
+                }
+
                 $data_soc["langue"] = $post["langue"];
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
