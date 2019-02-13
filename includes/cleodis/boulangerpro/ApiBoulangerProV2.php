@@ -95,7 +95,6 @@ class ApiBoulangerProV2
             default:
                 throw new Exception('Unknown HTTP method ' . $method);
         }
-
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
