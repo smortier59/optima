@@ -13,9 +13,12 @@
   if (!defined("__API_BOULANGER_HOST__")) die('PAS DE CONFIG 3');
 
   ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
-  $id_fournisseur = ATF::societe()->select_cell();
+  $frs = ATF::societe()->select_row();
+  $id_frs = $frs['id_societe'];
+  echo "Société : ".$frs['societe']." (siret: ".$frs['siret'].") / ID = ".$id_frs."<br><br>";
 
-  ATF::produit()->q->reset()->where('id_fournisseur', 28973);
+
+  ATF::produit()->q->reset()->where('id_fournisseur', $id_frs);
 
   $catalogueBoulProActif = ATF::produit()->sa();
 
