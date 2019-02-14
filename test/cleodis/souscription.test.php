@@ -177,15 +177,16 @@ class souscription_cleodis_test  extends ATF_PHPUnit_Framework_TestCase {
 
     	//On retire les produits pour provoquer une erreur
     	// Ce test fonctionnait avant le multi affaire ....
-    	/*
+    	$post = $this->post;
+		$post["site_associe"] = "test";
     	try{
-    		$c->_devis(array(), array("id_societe"=> $post["id_societe"], "iban"=>$post["iban"]));
+    		$c->_devis(array(), $post);
     	} catch (errorATF $e) {
 			$error = $e->getMessage();
 		}
-		$erreur = 'generic message : {"text":"\'Titre (Devis)\', \'Contact (Devis)\'","params":{"title":"Certaines donn\u00e9es obligatoires sont manquantes :"}}';
+		$erreur = 'generic message : {"text":"\'Titre (Devis)\'","params":{"title":"Certaines donn\u00e9es obligatoires sont manquantes :"}}';
 		$this->assertEquals($error , $erreur, "Erreur non déclanchée ?");
-		*/
+
     }
 
 
