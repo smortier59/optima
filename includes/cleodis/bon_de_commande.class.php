@@ -558,8 +558,6 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			$infos_bon_de_commande_ligne=explode(",",$infos["commandes"]);
 			//On supprime l'élément correspondant à l'id_commande (car on ne garde que les id_bon_de_commande)
 			unset($infos_bon_de_commande_ligne[0]);
-
-			log::logger($infos_bon_de_commande_ligne , "mfleurquin");
 		}else{
 			throw new errorATF("Il faut sélectionner des lignes de bon de commande.",875);
 		}
@@ -846,67 +844,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	}
 
 
-	public function initStyle(){
-
-		$style_titre1 = new excel_style();
-		$style_titre1->setWrap()->alignement('center')->setSize(13)->setBorder("thin")->setBold();
-		$this->setStyle("titre1",$style_titre1->getStyle());
-		/*-------------------------------------------*/
-		$style_titre1_right = new excel_style();
-		$style_titre1_right->setWrap()->alignement("center","right")->setSize(13)->setBorder("thin")->setBold();
-		$this->setStyle("titre1_right",$style_titre1_right->getStyle());
-		/*-------------------------------------------*/
-		$style_titre1_left = new excel_style();
-		$style_titre1_left->setWrap()->alignement("center", "left")->setSize(13)->setBorder("thin")->setBold();
-		$this->setStyle("titre1_left",$style_titre1_left->getStyle());
-		/*-------------------------------------------*/
-		$style_titre2 = new excel_style();
-		$style_titre2->setWrap()->alignement('center')->setSize(11)->setBorder("thin");
-		$this->setStyle("titre2",$style_titre2->getStyle());
-		/*-------------------------------------------*/
-		$style_titre2_right = new excel_style();
-		$style_titre2_right->setWrap()->alignement("center","right")->setSize(11)->setBorder("thin");
-		$this->setStyle("titre2_right",$style_titre2_right->getStyle());
-		/*-------------------------------------------*/
-		$style_centre = new excel_style();
-		$style_centre->alignement();
-		$this->setStyle("centre",$style_centre->getStyle());
-		/*-------------------------------------------*/
-		$style_cel_c = new excel_style();
-		$style_cel_c->setWrap()->alignement('center')->setSize(11)->setBorder("thin");
-		$this->setStyle("border_cel",$style_cel_c->getStyle());
-		/*-------------------------------------------*/
-		$style_border_cel_right = new excel_style();
-		$style_border_cel_right->setWrap()->alignement("center","right")->setSize(11)->setBorder("thin");
-		$this->setStyle("border_cel_right",$style_border_cel_right->getStyle());
-		/*-------------------------------------------*/
-		$style_border_cel_left = new excel_style();
-		$style_border_cel_left->setWrap()->alignement("center","left")->setSize(11)->setBorder("thin");
-		$this->setStyle("border_cel_left",$style_border_cel_left->getStyle());
-		/*-------------------------------------------*/
-		$style_cel_right = new excel_style();
-		$style_cel_right->setWrap()->alignement("center","right")->setSize(11);
-		$this->setStyle("cel_right",$style_cel_right->getStyle());
-	}
-
-	public function setStyle($nom,$objet){
-		$this->style[$nom]=$objet;
-	}
-
-	public function getStyle($nom){
-		return $this->style[$nom];
-	}
-
-
-
 	/** Export CEGID
 	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @param array $infos : contient le nom de l'onglet
      */
 	public function export_cegid($infos){
-		if(!$infos["tu"]){ $this->q->reset(); }
-
-        $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+		if(!$infos["tu"]){ $this->q->reset(); $this->setQuerier(ATF::_s("pager")->create($infos['onglet']));}
 
         $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
         $infos = $this->sa();
@@ -1090,11 +1033,10 @@ class bon_de_commande_cleodis extends bon_de_commande {
      * @param array $infos : contient le nom de l'onglet
      */
 	public function export_servantissimmo($infos){
-		if(!$infos["tu"]){ $this->q->reset(); }
+
 		$force = false;
 		if($infos["force"]){	$force = true; }
-
-        $this->setQuerier(ATF::_s("pager")->create($infos['onglet'])); // Recuperer le querier actuel
+		if(!$infos["tu"]){ $this->q->reset(); $this->setQuerier(ATF::_s("pager")->create($infos['onglet']));}
 
         $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
         $infos = $this->sa();

@@ -119,8 +119,6 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->obj->updateDate(array("value"=>date("Y-m-d"), "key"=>"date_livraison_prevue",  "id_bon_de_commande"=> $id_bon_de_commande ));
 
 
-
-
         ATF::$msg->getNotices();
 
     }
@@ -190,8 +188,9 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "ref"=>"DEL-WRK-OPTGX520-19",
                                     "produit"=>"Optiplex GX520 TFT 19",
                                     "quantite"=>1,
-                                    "prix"=>"10.00",
-                                    "id_commande_ligne"=>$this->commande_ligne[0]["id_commande_ligne"]
+                                    "prix"=>"10.000",
+                                    "id_commande_ligne"=>$this->commande_ligne[0]["id_commande_ligne"],
+                                    "prix_ttc" => "0.00"
                                 )
             ,$bon_de_commande_ligne[0]
             ,"Erreur sur la création d'une ligne de commande"
@@ -210,7 +209,8 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                                     "id_affaire"=>$this->devis_select["id_affaire"],
                                     "id_bon_de_commande"=>$id_bon_de_commande,
                                     "date"=>$facture_non_parvenue[0]["date"],
-                                    'facturation_terminee' => 'non'
+                                    'facturation_terminee' => 'non',
+                                    'prix_ht'=> "0.0000"
                                 )
             ,$facture_non_parvenue[0]
             ,"Erreur sur la création d'une facture parvenue"
@@ -225,8 +225,54 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $bon_de_commande["preview"]=true;
         $bon_de_commande["bon_de_commande"]["id_fournisseur"]=246;
         $bon_de_commande["bon_de_commande"]["prix_cleodis"]=1000;
+        $bon_de_commande["bon_de_commande"]["prix"]=200;
         $id_bon_de_commande3=classes::decryptId(ATF::bon_de_commande()->insert($bon_de_commande,$this->s,NULL,$refresh));
+
+        ATF::facture_non_parvenue()->q->reset()->addCondition("id_bon_de_commande",$id_bon_de_commande3);
+        $facture_non_parvenue=ATF::facture_non_parvenue()->sa();
+        $this->assertEquals(array(
+                "id_facture_non_parvenue"=>$facture_non_parvenue[0]["id_facture_non_parvenue"],
+                "ref"=>"FCLEO-".$this->commande_select["ref"]."-1-FNP",
+                "id_facture_fournisseur"=>NULL,
+                "prix"=>"1000.00",
+                "tva"=>"1.196",
+                "etat"=>"impayee",
+                "id_affaire"=>$this->devis_select["id_affaire"],
+                "id_bon_de_commande"=>$id_bon_de_commande3,
+                "date"=>$facture_non_parvenue[0]["date"],
+                'facturation_terminee' => 'non',
+                'prix_ht'=> "0.0000"
+            )
+            ,$facture_non_parvenue[0]
+            ,"Erreur sur la création d'une facture parvenue du BDC CLEODIS"
+        );
+
     }
+
+
+    /*@author Morgan FLEURUQUIN <mfleurquin@absystech.fr>  */
+    public function test_createAllBDC(){
+        $this->insertBdc();
+
+        $id_affaire = ATF::commande()->select($this->id_commande, "id_affaire");
+
+        ATF::bon_de_commande()->createAllBDC(array("id_commande"=>$this->id_commande));
+
+        ATF::bon_de_commande()->q->reset()->where("id_affaire", $id_affaire);
+        $ret = ATF::bon_de_commande()->sa();
+
+        $this->assertEquals(count($ret), 2, "Il doit y avoir 2 BDC sur l'affaire normalement !");
+        $this->assertEquals($ret[0]["prix"]," 1528.00", "Prix du BDC 1 incorrect");
+        $this->assertEquals($ret[0]["ref"],"FDELL09-".$this->commande_select["ref"]."-1", "Ref du BDC 1 incorrect");
+        $this->assertEquals($ret[0]["id_fournisseur"]," 1351", "Fournisseur du BDC 1 incorrect");
+
+
+        $this->assertEquals($ret[1]["prix"], "3113.00", "Prix du BDC 2 incorrect");
+        $this->assertEquals($ret[1]["ref"],"FAUDIO-".$this->commande_select["ref"]."-1", "Ref du BDC 2 incorrect");
+        $this->assertEquals($ret[1]["id_fournisseur"]," 1358", "Fournisseur du BDC 2 incorrect");
+
+    }
+
 
     /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_bdcByAffaire(){
@@ -612,97 +658,97 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                             ,'33 Erreur sur le sa factureFournisseurAllow');
     }
 
-	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
-	public function test_can_delete(){
-		$this->insertBdc();
+    /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
+    public function test_can_delete(){
+        $this->insertBdc();
 
         ATF::facture_ligne()->q->reset()->where("id_affaire_provenance","6211");
         $allSQL2 = ATF::facture_ligne()->sa();
         foreach ($allSQL2 as $key => $value) { ATF::facture_ligne()->d($value["id_facture_ligne"]); }
 
-		$bon_de_commande["bon_de_commande"]=array(
-								 "id_societe" => $this->id_societe
-								,"id_commande" => $this->id_commande
-								,"id_fournisseur" => 1351
-								,"id_affaire" => $this->devis_select["id_affaire"]
-								,"bon_de_commande" => $this->devis_select["devis"]
-								,"id_contact" => 5333
-								,"prix" => "10.00"
-								,"tva" =>"1.196"
-								,"etat" => "envoyee"
-								,"payee" => "non"
-								,"date" => date("Y-m-d")
-								,"destinataire" => "AXXES"
-								,"adresse" => "26 rue de La Vilette - Part Dieu"
-								,"adresse_2" => $this->devis_select["id_devis"]
-								,"adresse_3" => $this->devis_select["id_devis"]
-								,"cp" => "69003"
-								,"ville" => "LYON"
-								,"id_pays" => "FR"
-								,"id_fournisseur_intermediaire" => NULL
-								,"livraison_destinataire" => NULL
-								,"livraison_adresse" => NULL
-								,"livraison_cp" => NULL
-								,"livraison_ville" => NULL
-								,"email" => "debug@absystech.fr"
-								,"emailTexte" => "TU<br>"
-								,"emailCopie" => "debug@absystech.fr"
-								,"filestoattach" =>  array(
-										"fichier_joint" =>NULL
-									)
+        $bon_de_commande["bon_de_commande"]=array(
+                                 "id_societe" => $this->id_societe
+                                ,"id_commande" => $this->id_commande
+                                ,"id_fournisseur" => 1351
+                                ,"id_affaire" => $this->devis_select["id_affaire"]
+                                ,"bon_de_commande" => $this->devis_select["devis"]
+                                ,"id_contact" => 5333
+                                ,"prix" => "10.00"
+                                ,"tva" =>"1.196"
+                                ,"etat" => "envoyee"
+                                ,"payee" => "non"
+                                ,"date" => date("Y-m-d")
+                                ,"destinataire" => "AXXES"
+                                ,"adresse" => "26 rue de La Vilette - Part Dieu"
+                                ,"adresse_2" => $this->devis_select["id_devis"]
+                                ,"adresse_3" => $this->devis_select["id_devis"]
+                                ,"cp" => "69003"
+                                ,"ville" => "LYON"
+                                ,"id_pays" => "FR"
+                                ,"id_fournisseur_intermediaire" => NULL
+                                ,"livraison_destinataire" => NULL
+                                ,"livraison_adresse" => NULL
+                                ,"livraison_cp" => NULL
+                                ,"livraison_ville" => NULL
+                                ,"email" => "debug@absystech.fr"
+                                ,"emailTexte" => "TU<br>"
+                                ,"emailCopie" => "debug@absystech.fr"
+                                ,"filestoattach" =>  array(
+                                        "fichier_joint" =>NULL
+                                    )
         );
-		$bon_de_commande["commandes"]="xnode-".$this->id_commande.",".$this->commande_ligne[0]["id_commande_ligne"]."";
+        $bon_de_commande["commandes"]="xnode-".$this->id_commande.",".$this->commande_ligne[0]["id_commande_ligne"]."";
 
-		// On simule une affaire enfant
-		$query = "UPDATE affaire SET id_parent=".$this->devis_select["id_affaire"]." WHERE id_affaire=26";
-		ATF::db()->query($query);
+        // On simule une affaire enfant
+        $query = "UPDATE affaire SET id_parent=".$this->devis_select["id_affaire"]." WHERE id_affaire=26";
+        ATF::db()->query($query);
 
-		$refresh = array();
-		$id_bon_de_commande=classes::decryptId(ATF::bon_de_commande()->insert($bon_de_commande,$this->s,NULL,$refresh));
-		ATF::bon_de_commande()->can_delete($id_bon_de_commande);
-		try{
-			$this->assertTrue(ATF::bon_de_commande()->can_delete($id_bon_de_commande),'1 Probleme sur le can_delete');
-		}catch (errorATF $e) {
-			$error = $e->getCode();
-		}
-		$this->assertTrue(ATF::bon_de_commande()->can_update($id_bon_de_commande),'1 Probleme sur le can_update');
+        $refresh = array();
+        $id_bon_de_commande=classes::decryptId(ATF::bon_de_commande()->insert($bon_de_commande,$this->s,NULL,$refresh));
+        ATF::bon_de_commande()->can_delete($id_bon_de_commande);
+        try{
+            $this->assertTrue(ATF::bon_de_commande()->can_delete($id_bon_de_commande),'1 Probleme sur le can_delete');
+        }catch (errorATF $e) {
+            $error = $e->getCode();
+        }
+        $this->assertTrue(ATF::bon_de_commande()->can_update($id_bon_de_commande),'1 Probleme sur le can_update');
 
-		ATF::facture_fournisseur()->i(array("ref"=>"reftu","id_fournisseur"=>1351,"prix"=>"10.00","tva"=>"1.196","etat"=>"impayee","id_affaire"=>$this->devis_select["id_affaire"],"id_bon_de_commande"=>$id_bon_de_commande,"date_echeance"=>date("Y-m-d"), "date"=> date("Y-m-d"), "type"=>"achat"));
+        ATF::facture_fournisseur()->i(array("ref"=>"reftu","id_fournisseur"=>1351,"prix"=>"10.00","tva"=>"1.196","etat"=>"impayee","id_affaire"=>$this->devis_select["id_affaire"],"id_bon_de_commande"=>$id_bon_de_commande,"date_echeance"=>date("Y-m-d"), "date"=> date("Y-m-d"), "type"=>"achat"));
 
-		try {
-			ATF::bon_de_commande()->can_delete($id_bon_de_commande);
-		} catch (errorATF $e) {
-			$error = $e->getCode();
-		}
-		$this->assertEquals(884,$error,'2 Probleme sur le can_delete car facture_fournisseur');
+        try {
+            ATF::bon_de_commande()->can_delete($id_bon_de_commande);
+        } catch (errorATF $e) {
+            $error = $e->getCode();
+        }
+        $this->assertEquals(884,$error,'2 Probleme sur le can_delete car facture_fournisseur');
 
-		try {
-			ATF::bon_de_commande()->can_update($id_bon_de_commande);
-		} catch (errorATF $e) {
-			$error = $e->getCode();
-		}
-		$this->assertEquals(884,$error,'2 Probleme sur le can_update car facture_fournisseur');
+        try {
+            ATF::bon_de_commande()->can_update($id_bon_de_commande);
+        } catch (errorATF $e) {
+            $error = $e->getCode();
+        }
+        $this->assertEquals(884,$error,'2 Probleme sur le can_update car facture_fournisseur');
 
-		// Test avec affaire parente
-		ATF::affaire()->q->reset()->whereIsNotNull("id_parent")->setLimit(1)->addField("affaire.id_parent","id_parent")->addField("affaire.id_affaire","id_affaire")->setStrict();
-		$a = ATF::affaire()->select_row();
-		$bon_de_commande["bon_de_commande"]["id_affaire"]=$a["id_parent"];
-		ATF::affaire()->u(array("id_affaire"=>$a["id_affaire"],"nature"=>"AR"));
-		$id_bon_de_commande=classes::decryptId(ATF::bon_de_commande()->insert($bon_de_commande,$this->s,NULL,$refresh));
+        // Test avec affaire parente
+        ATF::affaire()->q->reset()->whereIsNotNull("id_parent")->setLimit(1)->addField("affaire.id_parent","id_parent")->addField("affaire.id_affaire","id_affaire")->setStrict();
+        $a = ATF::affaire()->select_row();
+        $bon_de_commande["bon_de_commande"]["id_affaire"]=$a["id_parent"];
+        ATF::affaire()->u(array("id_affaire"=>$a["id_affaire"],"nature"=>"AR"));
+        $id_bon_de_commande=classes::decryptId(ATF::bon_de_commande()->insert($bon_de_commande,$this->s,NULL,$refresh));
 
-		foreach (array(6211,6989,6990,7779,7782,7784) as $i) { // Ces affaires sont censé ne pas être présente dans les facture lignes dans le champs 'id_affaire_provenance'
-			ATF::facturation()->q->reset()->where("id_affaire",$i);
-			ATF::facturation()->d();
-			ATF::facture()->q->reset()->where("id_affaire",$i);
-			ATF::facture()->d();
-			ATF::affaire()->d($i);
-		}
-		try{
-			$this->assertTrue(ATF::bon_de_commande()->can_delete($id_bon_de_commande));
-		}catch (errorATF $e) {
-			$error = $e->getCode();
-		}
-	}
+        foreach (array(6211,6989,6990,7779,7782,7784) as $i) { // Ces affaires sont censé ne pas être présente dans les facture lignes dans le champs 'id_affaire_provenance'
+            ATF::facturation()->q->reset()->where("id_affaire",$i);
+            ATF::facturation()->d();
+            ATF::facture()->q->reset()->where("id_affaire",$i);
+            ATF::facture()->d();
+            ATF::affaire()->d($i);
+        }
+        try{
+            $this->assertTrue(ATF::bon_de_commande()->can_delete($id_bon_de_commande));
+        }catch (errorATF $e) {
+            $error = $e->getCode();
+        }
+    }
 
     /*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
     public function test_autocompleteConditions(){
@@ -828,13 +874,13 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($facture_non_parvenue,'les facture_non_parvenue ne s insèrent pas');
 
-		try{
-			$this->obj->delete(array("id"=>array(0=>$id_bon_de_commande)));
+        try{
+            $this->obj->delete(array("id"=>array(0=>$id_bon_de_commande)));
 
-       		 $this->assertNull($this->obj->select($id_bon_de_commande),'le bon_de_commande ne se delete pas');
-		}catch(errorATF $e){
-			$e->setError();
-		}
+             $this->assertNull($this->obj->select($id_bon_de_commande),'le bon_de_commande ne se delete pas');
+        }catch(errorATF $e){
+            $e->setError();
+        }
 
         ATF::facture_non_parvenue()->q->reset()->addCondition("id_bon_de_commande",$id_bon_de_commande);
         $facture_non_parvenue=ATF::facture_non_parvenue()->sa();
@@ -848,6 +894,331 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ATF::parc()->q->reset()->addCondition("serial","BBPZB2J3");
         $parc2=ATF::parc()->sa();
         $this->assertNotNull($parc2,'le parc ne devrait pas se supprimer');
+
+    }
+
+
+    public function test_export_cegid(){
+        $this->insertBdc();
+
+        $id_affaire = ATF::commande()->select($this->id_commande, "id_affaire");
+        ATF::commande()->updateDate(array("id_commande"=>$this->id_commande, "key"=>"date_debut", "value"=> date("Y-m-01")));
+
+        ATF::bon_de_commande()->createAllBDC(array("id_commande"=>$this->id_commande));
+        ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $id_affaire);
+
+        ob_start();
+        ATF::bon_de_commande()->export_cegid(array("tu"=> true));
+        //récupération des infos
+        $fichier=ob_get_contents();
+        //suppression des éléments (dans tampon)
+        ob_end_clean();
+
+        //vérification des informations
+
+        $chem2=__TEMP_PATH__.ATF::$codename."/lol2.xls";
+        file_put_contents($chem2,$fichier);
+
+        //Use whatever path to an Excel file you need.
+        $inputFileName = $chem2;
+
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFileName);
+        } catch (Exception $e) {
+            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' .
+            $e->getMessage());
+        }
+
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+
+        for ($row = 1; $row <= $highestRow; $row++) {
+            $r = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, null, true, false);
+            $rowData[] = $r[$row-1];
+        }
+        unlink($chem);
+        unlink($chem2);
+
+        $this->assertEquals(count($rowData), 9, "Ligne manquante");
+
+        $header = array("TYPE", "DATE", "JOURNAL", "GENERAL", "AUXILIAIRE", "SENS", "MONTANT", "LIBELLE", "REFERENCE INTERNE" , "AXE1");
+        $this->assertEquals($rowData[0], $header, "Header incorrect");
+
+        $this->assertEquals($rowData[1][0], "G", "Cellule 1-0 incorrecte");
+        $this->assertEquals($rowData[1][1], " ".date("01mY"), "Cellule 1-1 incorrecte");
+        $this->assertEquals($rowData[1][2], "ACH", "Cellule 1-2 incorrecte");
+        $this->assertEquals($rowData[1][3], "607110", "Cellule 1-3 incorrecte");
+        $this->assertEquals($rowData[1][4], "", "Cellule 1-4 incorrecte");
+        $this->assertEquals($rowData[1][5], "D", "Cellule 1-5 incorrecte");
+        $this->assertEquals($rowData[1][6], "1528", "Cellule 1-6 incorrecte");
+        $this->assertEquals($rowData[1][7], "", "Cellule 1-7 incorrecte");
+        $this->assertEquals($rowData[1][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 1-8 incorrecte");
+        $this->assertEquals($rowData[1][9], "", "Cellule 1-9 incorrecte");
+
+        $this->assertEquals($rowData[2][0], "A1", "Cellule 2-0 incorrecte");
+        $this->assertEquals($rowData[2][1], " ".date("01mY"), "Cellule 2-1 incorrecte");
+        $this->assertEquals($rowData[2][2], "ACH", "Cellule 2-2 incorrecte");
+        $this->assertEquals($rowData[2][3], "607110", "Cellule 2-3 incorrecte");
+        $this->assertEquals($rowData[2][4], "", "Cellule 2-4 incorrecte");
+        $this->assertEquals($rowData[2][5], "D", "Cellule 2-5 incorrecte");
+        $this->assertEquals($rowData[2][6], "1528", "Cellule 2-6 incorrecte");
+        $this->assertEquals($rowData[2][7], "", "Cellule 2-7 incorrecte");
+        $this->assertEquals($rowData[2][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 2-8 incorrecte");
+        $this->assertEquals($rowData[2][9], "20".ATF::affaire()->select($id_affaire, "ref").ATF::societe()->select($this->id_societe, "code_client")."00", "Cellule 2-9 incorrecte");
+
+        $this->assertEquals($rowData[3][0], "G", "Cellule 3-0 incorrecte");
+        $this->assertEquals($rowData[3][1], " ".date("01mY"), "Cellule 3-1 incorrecte");
+        $this->assertEquals($rowData[3][2], "ACH", "Cellule 3-2 incorrecte");
+        $this->assertEquals($rowData[3][3], "445860", "Cellule 3-3 incorrecte");
+        $this->assertEquals($rowData[3][4], "", "Cellule 3-4 incorrecte");
+        $this->assertEquals($rowData[3][5], "D", "Cellule 3-5 incorrecte");
+        $this->assertEquals($rowData[3][6], "305.6", "Cellule 3-6 incorrecte");
+        $this->assertEquals($rowData[3][7], "", "Cellule 3-7 incorrecte");
+        $this->assertEquals($rowData[3][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 3-8 incorrecte");
+        $this->assertEquals($rowData[3][9], "", "Cellule 3-9 incorrecte");
+
+        $this->assertEquals($rowData[4][0], "G", "Cellule 4-0 incorrecte");
+        $this->assertEquals($rowData[4][1], " ".date("01mY"), "Cellule 4-1 incorrecte");
+        $this->assertEquals($rowData[4][2], "ACH", "Cellule 4-2 incorrecte");
+        $this->assertEquals($rowData[4][3], "408100", "Cellule 4-3 incorrecte");
+        $this->assertEquals($rowData[4][4], "", "Cellule 4-4 incorrecte");
+        $this->assertEquals($rowData[4][5], "C", "Cellule 4-5 incorrecte");
+        $this->assertEquals($rowData[4][6], "1833.6", "Cellule 4-6 incorrecte");
+        $this->assertEquals($rowData[4][7], "", "Cellule 4-7 incorrecte");
+        $this->assertEquals($rowData[4][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 4-8 incorrecte");
+        $this->assertEquals($rowData[4][9], "", "Cellule 4-9 incorrecte");
+    }
+
+    public function test_export_cegid2(){
+        // ========================================================================================================
+        //                              Création d'un refinancement par CLEODIS
+        //                              Avec etat de l'affaire en Avenant
+        // ========================================================================================================
+        $this->insertBdc();
+
+        $id_affaire = ATF::commande()->select($this->id_commande, "id_affaire");
+        ATF::commande()->updateDate(array("id_commande"=>$this->id_commande, "key"=>"date_debut", "value"=> date("Y-m-01")));
+
+        ATF::bon_de_commande()->createAllBDC(array("id_commande"=>$this->id_commande));
+        ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $id_affaire);
+
+        ATF::affaire()->u(array("id_affaire"=>$id_affaire, "nature"=>"avenant"));
+        ATF::demande_refi()->insert(array(  "date"=>date("Y-m-d"),
+                                            "id_contact"=>$this->id_contact,
+                                            "id_refinanceur"=>4,
+                                            "id_affaire"=>$id_affaire,
+                                            "id_societe"=>$this->id_societe,
+                                            "description"=>"Tu description",
+                                            "etat"=>"valide"));
+
+        ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire", $id_affaire);
+
+
+        ob_start();
+        ATF::bon_de_commande()->export_cegid(array("tu"=> true));
+        //récupération des infos
+        $fichier=ob_get_contents();
+        //suppression des éléments (dans tampon)
+        ob_end_clean();
+        //vérification des informations
+        $chem2=__TEMP_PATH__.ATF::$codename."/lol2.xls";
+        file_put_contents($chem2,$fichier);
+
+        //Use whatever path to an Excel file you need.
+        $inputFileName = $chem2;
+
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFileName);
+        } catch (Exception $e) {
+            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' .
+            $e->getMessage());
+        }
+
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $rowData = array();
+
+        for ($row = 1; $row <= $highestRow; $row++) {
+            $r = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, null, true, false);
+            $rowData[] = $r[$row-1];
+        }
+        unlink($chem);
+        unlink($chem2);
+
+        $this->assertEquals(count($rowData), 7, "Ligne manquante");
+
+        $header = array("TYPE", "DATE", "JOURNAL", "GENERAL", "AUXILIAIRE", "SENS", "MONTANT", "LIBELLE", "REFERENCE INTERNE" , "AXE1");
+        $this->assertEquals($rowData[0], $header, "Header incorrect");
+
+        $this->assertEquals($rowData[1][0], "G", "Cellule 1-0 incorrecte");
+        $this->assertEquals($rowData[1][1], " ".date("01mY"), "Cellule 1-1 incorrecte");
+        $this->assertEquals($rowData[1][2], "ACH", "Cellule 1-2 incorrecte");
+        $this->assertEquals($rowData[1][3], "218310", "Cellule 1-3 incorrecte");
+        $this->assertEquals($rowData[1][4], "", "Cellule 1-4 incorrecte");
+        $this->assertEquals($rowData[1][5], "D", "Cellule 1-5 incorrecte");
+        $this->assertEquals($rowData[1][6], "1528", "Cellule 1-6 incorrecte");
+        $this->assertEquals($rowData[1][7], "", "Cellule 1-7 incorrecte");
+        $this->assertEquals($rowData[1][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 1-8 incorrecte");
+        $this->assertEquals($rowData[1][9], "", "Cellule 1-9 incorrecte");
+
+        $this->assertEquals($rowData[2][0], "G", "Cellule 2-0 incorrecte");
+        $this->assertEquals($rowData[2][1], " ".date("01mY"), "Cellule 2-1 incorrecte");
+        $this->assertEquals($rowData[2][2], "ACH", "Cellule 2-2 incorrecte");
+        $this->assertEquals($rowData[2][3], "445860", "Cellule 2-3 incorrecte");
+        $this->assertEquals($rowData[2][4], "", "Cellule 2-4 incorrecte");
+        $this->assertEquals($rowData[2][5], "D", "Cellule 2-5 incorrecte");
+        $this->assertEquals($rowData[2][6], "305.6", "Cellule 2-6 incorrecte");
+        $this->assertEquals($rowData[2][7], "", "Cellule 2-7 incorrecte");
+        $this->assertEquals($rowData[2][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 2-8 incorrecte");
+        $this->assertEquals($rowData[2][9], "", "Cellule 2-9 incorrecte");
+
+        $this->assertEquals($rowData[3][0], "G", "Cellule 3-0 incorrecte");
+        $this->assertEquals($rowData[3][1], " ".date("01mY"), "Cellule 3-1 incorrecte");
+        $this->assertEquals($rowData[3][2], "ACH", "Cellule 3-2 incorrecte");
+        $this->assertEquals($rowData[3][3], "408100", "Cellule 3-3 incorrecte");
+        $this->assertEquals($rowData[3][4], "", "Cellule 3-4 incorrecte");
+        $this->assertEquals($rowData[3][5], "C", "Cellule 3-5 incorrecte");
+        $this->assertEquals($rowData[3][6], "1833.6", "Cellule 3-6 incorrecte");
+        $this->assertEquals($rowData[3][7], "", "Cellule 3-7 incorrecte");
+        $this->assertEquals($rowData[3][8], ATF::affaire()->select($id_affaire, "ref")." ", "Cellule 3-8 incorrecte");
+        $this->assertEquals($rowData[3][9], "", "Cellule 3-9 incorrecte");
+    }
+
+    public function test_export_servantissimmo(){
+        // ========================================================================================================
+        //                              Création d'un refinancement par CLEODIS
+        //                              Avec etat de l'affaire en Avenant
+        // ========================================================================================================
+        $id_affaires = array();
+
+        //Loyer Mensuel
+        $this->insertBdc();
+        $id_affaire = ATF::commande()->select($this->id_commande, "id_affaire");
+        $id_affaires[] = $id_affaire;
+
+        ATF::bon_de_commande()->createAllBDC(array("id_commande"=>$this->id_commande));
+
+        ATF::commande()->updateDate(array("id_commande"=>$this->id_commande, "key"=>"date_debut", "value"=> date("Y-m-01")));
+
+        ATF::affaire()->u(array("id_affaire"=>$id_affaire, "nature"=>"avenant"));
+        ATF::demande_refi()->insert(array(  "date"=>date("Y-m-d"),
+                                            "id_contact"=>$this->id_contact,
+                                            "id_refinanceur"=>4,
+                                            "id_affaire"=>$id_affaire,
+                                            "id_societe"=>$this->id_societe,
+                                            "description"=>"Tu description",
+                                            "etat"=>"valide"));
+        ATF::affaire()->u(array("id_affaire"=>$id_affaire, "nature"=>"avenant"));
+
+        $frequence = array("trimestre", "semestre", "an");
+
+        foreach ($frequence as $kf => $vf) {
+            $this->insertBdc();
+            $id_affaire = ATF::commande()->select($this->id_commande, "id_affaire");
+            $id_affaires[] = $id_affaire;
+
+            ATF::loyer()->q->reset()->where("id_affaire", $id_affaire);
+            foreach (ATF::loyer()->sa() as $key => $value) {
+                ATF::loyer()->u(array("id_loyer"=>$value["id_loyer"], "frequence_loyer"=> $vf));
+            }
+
+            ATF::bon_de_commande()->createAllBDC(array("id_commande"=>$this->id_commande));
+
+            ATF::commande()->updateDate(array("id_commande"=>$this->id_commande, "key"=>"date_debut", "value"=> date("Y-m-01")));
+            ATF::demande_refi()->insert(array(  "date"=>date("Y-m-d"),
+                                                "id_contact"=>$this->id_contact,
+                                                "id_refinanceur"=>4,
+                                                "id_affaire"=>$id_affaire,
+                                                "id_societe"=>$this->id_societe,
+                                                "description"=>"Tu description",
+                                                "etat"=>"valide"));
+        }
+
+        ATF::bon_de_commande()->q->reset();
+        foreach ($id_affaires as $key => $value) {
+            ATF::bon_de_commande()->q->where("bon_de_commande.id_affaire", $value, "OR");
+        }
+
+
+        ob_start();
+        ATF::bon_de_commande()->export_servantissimmo(array("tu"=> true, "force"=>true));
+        //récupération des infos
+        $fichier=ob_get_contents();
+        //suppression des éléments (dans tampon)
+        ob_end_clean();
+        //vérification des informations
+        $chem2=__TEMP_PATH__.ATF::$codename."/lol2.xls";
+        file_put_contents($chem2,$fichier);
+
+        //Use whatever path to an Excel file you need.
+        $inputFileName = $chem2;
+
+        try {
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFileName);
+        } catch (Exception $e) {
+            die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME) . '": ' .
+            $e->getMessage());
+        }
+
+        $sheet = $objPHPExcel->getSheet(0);
+        $highestRow = $sheet->getHighestRow();
+        $highestColumn = $sheet->getHighestColumn();
+        $rowData = array();
+
+        for ($row = 1; $row <= $highestRow; $row++) {
+            $r = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, null, true, false);
+            $rowData[] = $r[$row-1];
+        }
+        unlink($chem);
+        unlink($chem2);
+
+        $this->assertEquals(count($rowData), 9, "Ligne manquante");
+
+        $header = array('Compte','Date d\'entréee','Date de mise en service','Date de début d\'amortissement comptable','Date de début d\'amortissement fiscal','Référence','Libelle','Prix unitaire','Montant HT','Quantité','Montant TVA','Taux de TVA','Prorata','Montant TTC','Type de sortie','Date de sortie','Base comptable (=montant HT)','Méthode comptable','Durée comptable','Base fiscale','Méthode fiscale','Durée fiscale','Nature du bien','Type d\'entrée','Niveau de réalité','Totalcumulantérieur','Totalcumulantérieur fiscal','Critère 1','Réference 2','Compte fourn');
+        $this->assertEquals($rowData[0], $header, "Header incorrect");
+
+        $this->assertEquals($rowData[1][27], "20".substr(ATF::affaire()->select($id_affaires[0], "ref"),0 , 7).ATF::societe()->select($this->id_societe, "code_client")."AV", "Cellule 1-27 incorrecte");
+
+        log::logger($rowData[8], "mfleurquin");
+
+        $this->assertEquals($rowData[8][0], "218310", "Cellule 8-0 incorrecte");
+        $this->assertEquals($rowData[8][1], date("d/m/Y"), "Cellule 8-1 incorrecte");
+        $this->assertEquals($rowData[8][2], date("d/m/Y"), "Cellule 8-2 incorrecte");
+        $this->assertEquals($rowData[8][3], date("d/m/Y"), "Cellule 8-3 incorrecte");
+        $this->assertEquals($rowData[8][4], date("d/m/Y"), "Cellule 8-4 incorrecte");
+        $this->assertEquals($rowData[8][5], "", "Cellule 8-5 incorrecte");
+        $this->assertEquals($rowData[8][6], "AXXES ".ATF::affaire()->select($id_affaire, "ref")."-".ATF::societe()->select($this->id_societe, "code_client"), "Cellule 8-6 incorrecte");
+        $this->assertEquals($rowData[8][7], "", "Cellule 8-7 incorrecte");
+        $this->assertEquals($rowData[8][8], "3113", "Cellule 8-8 incorrecte");
+        $this->assertEquals($rowData[8][9], "1", "Cellule 8-9 incorrecte");
+        $this->assertEquals($rowData[8][10], "622.6", "Cellule 8-10 incorrecte");
+        $this->assertEquals($rowData[8][11], "20", "Cellule 8-11 incorrecte");
+        $this->assertEquals($rowData[8][12], "100", "Cellule 8-12 incorrecte");
+        $this->assertEquals($rowData[8][13], "3735.6", "Cellule 8-13 incorrecte");
+        $this->assertEquals($rowData[8][14], "00 ", "Cellule 8-14 incorrecte");
+        $this->assertEquals($rowData[8][15], "30/12/2099", "Cellule 8-15 incorrecte");
+        $this->assertEquals($rowData[8][16], "3113", "Cellule 8-16 incorrecte");
+        $this->assertEquals($rowData[8][17], "01 ", "Cellule 8-17 incorrecte");
+        $this->assertEquals($rowData[8][18], "1.167", "Cellule 8-18 incorrecte");
+        $this->assertEquals($rowData[8][19], "3113", "Cellule 8-19 incorrecte");
+        $this->assertEquals($rowData[8][20], "01", "Cellule 8-20 incorrecte");
+        $this->assertEquals($rowData[8][21], "14", "Cellule 8-21 incorrecte");
+        $this->assertEquals($rowData[8][22], "01", "Cellule 8-22 incorrecte");
+        $this->assertEquals($rowData[8][23], "01 ", "Cellule 8-23 incorrecte");
+        $this->assertEquals($rowData[8][24], "09 ", "Cellule 8-24 incorrecte");
+        $this->assertEquals($rowData[8][25], "09 ", "Cellule 8-25 incorrecte");
+        $this->assertEquals($rowData[8][26], "0 ", "Cellule 8-26 incorrecte");
+        $this->assertEquals($rowData[8][27], "20".ATF::affaire()->select($id_affaire, "ref").ATF::societe()->select($this->id_societe, "code_client")."00", "Cellule 8-27 incorrecte");
+        $this->assertEquals($rowData[8][28], "", "Cellule 8-28 incorrecte");
+        $this->assertEquals($rowData[8][29], "AUDIOPTIC TRADE SERVICES", "Cellule 8-29 incorrecte");
 
     }
 
@@ -885,7 +1256,7 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         //1er BDC
         $bon_de_commande["bon_de_commande"]=array(
-                                 "id_societe" => $this->id_societe
+                                "id_societe" => $this->id_societe
                                 ,"id_commande" => $this->id_commande
                                 ,"id_fournisseur" => 1351
                                 ,"id_affaire" => $this->devis_select["id_affaire"]
@@ -954,5 +1325,8 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
     }
+
+
+
 };
 ?>
