@@ -1207,11 +1207,11 @@ class bon_de_commande_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals($rowData[8][15], "30/12/2099", "Cellule 8-15 incorrecte");
         $this->assertEquals($rowData[8][16], "3113", "Cellule 8-16 incorrecte");
         $this->assertEquals($rowData[8][17], "01 ", "Cellule 8-17 incorrecte");
-        $this->assertEquals($rowData[8][18], "1.167", "Cellule 8-18 incorrecte");
+        $this->assertEquals($rowData[8][18], "14", "Cellule 8-18 incorrecte");
         $this->assertEquals($rowData[8][19], "3113", "Cellule 8-19 incorrecte");
-        $this->assertEquals($rowData[8][20], "01", "Cellule 8-20 incorrecte");
+        $this->assertEquals($rowData[8][20], "01 ", "Cellule 8-20 incorrecte");
         $this->assertEquals($rowData[8][21], "14", "Cellule 8-21 incorrecte");
-        $this->assertEquals($rowData[8][22], "01", "Cellule 8-22 incorrecte");
+        $this->assertEquals($rowData[8][22], "01 ", "Cellule 8-22 incorrecte");
         $this->assertEquals($rowData[8][23], "01 ", "Cellule 8-23 incorrecte");
         $this->assertEquals($rowData[8][24], "09 ", "Cellule 8-24 incorrecte");
         $this->assertEquals($rowData[8][25], "09 ", "Cellule 8-25 incorrecte");
