@@ -17,10 +17,170 @@ class societe_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$msg->getNotices();
 	}
 
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	private function beginTransaction($codename){
+		ATF::db()->select_db("optima_".$codename);
+    	ATF::$codename = $codename;
+    	ATF::db()->begin_transaction(true);
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	private function RollBackTransaction($codename){
+		ATF::$msg->getNotices();
+		ATF::db()->rollback_transaction(true);
+        ATF::$codename = "cleodis";
+        ATF::db()->select_db("optima_cleodis");
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_construct(){
+		$c = new societe_cleodis();
+		$this->assertTrue($c instanceOf societe_cleodis, "L'objet societe_cleodis n'est pas de bon type");
+
+		$this->beginTransaction("cleodisbe");
+		$c = new societe_cleodisbe();
+		$this->RollBackTransaction("cleodisbe");
+		$this->assertTrue($c instanceOf societe_cleodisbe, "L'objet societe_cleodisbe n'est pas de bon type");
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_ac(){
+		$this->initUser();
+		$res = $this->obj->_ac(array("q"=>"cleod"));
+
+		$this->assertEquals(count($res), 7, "Nouvelle société avec CLEOD ??");
+		$this->assertEquals($res[0]["id_societe"], 28970, "Erreur _ac 1 ??");
+		$this->assertEquals($res[0]["societe"], "CLEODIS", "Erreur _ac 2 ??");
+		$this->assertEquals($res[0]["ref"], "SLI18040024", "Erreur _ac 3 ??");
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	public function test_getOpca(){
 		$res = $this->obj->getOpca();
 		$this->assertNotNull($res, "Get Opca vide ??");
 	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_create_rum(){
+		//On réinit tout les RUM
+		ATF::societe()->q->reset()->whereIsNotNull("RUM");
+		foreach (ATF::societe()->sa() as $key => $value) {
+			ATF::societe()->u(array("id_societe"=>$value["id_societe"], "RUM"=>NULL));
+		}
+
+		$r = $this->obj->create_rum();
+		$this->assertEquals($r, "A000001");
+
+		$this->obj->u(array("id_societe"=>246, "RUM"=> "A000009"));
+		$r = $this->obj->create_rum();
+		$this->assertEquals($r, "A000010", "RUM généré incorrect 1 ?");
+
+		$this->obj->u(array("id_societe"=>246, "RUM"=> "A000099"));
+		$r = $this->obj->create_rum();
+		$this->assertEquals($r, "A000100", "RUM généré incorrect 2 ?");
+
+		$this->obj->u(array("id_societe"=>246, "RUM"=> "A000999"));
+		$r = $this->obj->create_rum();
+		$this->assertEquals($r, "A001000", "RUM généré incorrect 3 ?");
+
+		$this->obj->u(array("id_societe"=>246, "RUM"=> "A009999"));
+		$r = $this->obj->create_rum();
+		$this->assertEquals($r, "A010000", "RUM généré incorrect 4 ?");
+
+		$this->obj->u(array("id_societe"=>246, "RUM"=> "A099999"));
+		$r = $this->obj->create_rum();
+		$this->assertEquals($r, "A100000", "RUM généré incorrect 5 ?");
+
+
+		try{
+			$this->obj->u(array("id_societe"=>246, "RUM"=> "A999999"));
+			$r = $this->obj->create_rum();
+
+		}catch(errorATF $e){
+			$error = $e->getMessage();
+		}
+
+		$this->assertEquals($error, "RUM trop grand", "erreur non catché?");
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_checkIBAN(){
+	    try{
+	      $this->obj->checkIBAN();
+	    }catch(errorATF $e){
+	      $error = $e->getMessage();
+	    }
+	    $this->assertEquals($error, "IBAN vide", "Erreur non catchée");
+
+	    try{
+	      $this->obj->checkIBAN("123456");
+	    }catch(errorATF $e){
+	      $error = $e->getMessage();
+	    }
+	    $this->assertEquals($error, "IBAN incorrect", "Erreur 2 non catchée");
+
+	    $this->obj->checkIBAN("FR76 3000 4005 1600 0100 9101 841");
+	}
+
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_getUrlSign(){
+		$res = $this->obj->_getUrlSign(array("id_affaire"=>115734));
+		$this->assertEquals($res , "__SIGN_URL__#!cleodis?k=7339004c9f751ea6d4d427cadb573ac4", "URL Sign erreur");
+	}
+
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_create_ref(){
+		ATF::$usr->set('id_agence');
+		$ref = $this->obj->create_ref();
+		$this->assertEquals(substr($ref,0,7), "SLI".date("ym"), "Ref sans agence incorrect");
+
+		$id_agence = ATF::agence()->i(array("agence"=>"Test"));
+		ATF::$usr->set('id_agence', $id_agence);
+
+		$ref = $this->obj->create_ref();
+		$this->assertEquals($ref, "STE".date("ym")."0001", "Ref agence 1 incorrect");
+
+		ATF::societe()->u(array("id_societe"=>246,"ref"=>"STE".date("ym")."0009"));
+		$ref = $this->obj->create_ref();
+		$this->assertEquals($ref, "STE".date("ym")."0010", "Ref agence 2 incorrect");
+
+		ATF::societe()->u(array("id_societe"=>246,"ref"=>"STE".date("ym")."0099"));
+		$ref = $this->obj->create_ref();
+		$this->assertEquals($ref, "STE".date("ym")."0100", "Ref agence 3 incorrect");
+
+		ATF::societe()->u(array("id_societe"=>246,"ref"=>"STE".date("ym")."0999"));
+		$ref = $this->obj->create_ref();
+		$this->assertEquals($ref, "STE".date("ym")."1000", "Ref agence 4 incorrect");
+
+		ATF::societe()->u(array("id_societe"=>246,"ref"=>"STE".date("ym")."9999"));
+		try{
+			$this->obj->create_ref();
+		}catch(errorATF $e){
+			$erreur = $e->getMessage();
+		}
+		$this->assertEquals($erreur, "Vous ne pouvez plus insérer de societés ! La dernière référence a été utilisée. (ref = SXXAAMM9999)", "Erreur ref_too_high non catch");
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	public function test_update_gerant(){
+
+		$data = array("id_societe"=>246,
+					  "id_contact"=>0,
+					  "nom_gerant"=>"GERANT",
+					  "prenom_gerant"=>NULL,
+                       "gsm"=> NULL,
+                       "phone_gerant"=>NULL,
+                       "email"=> NULL,
+                       "email_gerant"=>NULL,
+                       "fonction"=> NULL,
+                       "fonction_gerant"=> NULL);
+
+		$this->obj->_updateGerant(array(), $data);
+
+	}
+
 
 	/*@author Yann GAUTHERON <ygautheron@absystech.fr>
 	  @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
