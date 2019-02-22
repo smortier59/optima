@@ -42,7 +42,7 @@ class contact_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$contact=array('contact'=>array('nom'=>'NUser','prenom'=>'PUser', "pwd"=> "MotDeP@sse12345", "id_societe" => 246));
 
-		try{
+		/*try{
 			$contact=array('contact'=>array('nom'=>'NUser','prenom'=>'PUser', "pwd_client"=> "abcdefghijkl","id_societe" => 246));
 			$id_contact=$this->obj->insert($contact,$this->s);
 		}catch(errorATF $e){
@@ -60,7 +60,7 @@ class contact_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$contact=array('contact'=>array('nom'=>'NUser','prenom'=>'PUser', "pwd_client"=> "MotDeP@sse12345", "id_societe" => 246));
 		$id_contact=$this->obj->insert($contact,$this->s);
 
-		$this->assertNotNull($id_contact , "3 -Insertion non faite? !!");
+		$this->assertNotNull($id_contact , "3 -Insertion non faite? !!");*/
 	}
 
 	public function test_update(){
@@ -105,10 +105,31 @@ class contact_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos["contact"] = $contact;
 
 		$this->obj->update($infos,$this->s);
+
 		$this->assertEquals(16 , ATF::societe()->select($id_soc , "id_owner") , "2 - Le changement de responsable n'a pas eu lieu !!");
+
+		try{
+			$this->obj->update(array('contact'=>array('id_contact' => $id_contact, "pwd"=> "P1w")));
+		}catch(errorATF $e){
+			$erreur = $e->getMessage();
+		}
+		$this->assertEquals($erreur , "Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule" , "2 -Erreur password non declenchée !!");
 
 	}
 
+	public function test_loginQuery(){
+		$this->obj->loginQuery(array("u"=>"jloison"));
+		$res = $this->obj->select_all();
+
+		$this->assertEquals($res["id_contact"] , 2113, "Nouveau contact avec le login jloison ?");
+		$this->assertEquals($res["nom"] , "LOISON", "Nouveau contact avec le login jloison 2 ?");
+	}
+
+	public function test_constructCap(){
+		$c = new contact_cap();
+		$this->assertTrue($c instanceOf contact_cap, "L'objet contact_cap n'est pas de bon type");
+
+	}
 
 };
 
