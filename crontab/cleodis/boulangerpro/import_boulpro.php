@@ -4,7 +4,7 @@ $_SERVER["argv"][1] = "cleodis";
 include(dirname(__FILE__)."/../../../global.inc.php");
 ATF::define("tracabilite",false);
 
-
+/*
 $type = array(
 	"Fixe"=>"fixe",
 	"portable"=>"portable",
@@ -187,7 +187,7 @@ function import_ligne($packs, $produits){
 			if (!$id_produit) {
 				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
 				$id_produit = $produit["id_produit"];
-//				continue;
+				//continue;
 			}
 
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
@@ -283,6 +283,9 @@ function get_sous_categorie($sous_categorie, $categorie){
 		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
+*/
+
+
 
 /*
 $fileProduit = "./produit.csv";
@@ -371,3 +374,47 @@ function get_sous_categorie($sous_categorie, $categorie){
 	}
 }
 */
+
+
+
+// MAJ DU TYPE UNIQUEMENT
+
+$type = array(
+	"Fixe"=>"fixe",
+	"portable"=>"portable",
+	"Portable"=>"portable",
+	"Sans objet"=>"sans_objet",
+	"Immateriel"=>"immateriel"
+);
+
+$fileProduit = "./produit.csv";
+$fpr = fopen($fileProduit, 'rb');
+$entete = fgetcsv($fpr);
+$produits = array();
+try {
+
+	while ($ligne = fgetcsv($fpr)) {
+		echo "======================================\n";
+		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+		ATF::produit()->q->reset()->where("ref", $ligne[0]);
+		$p = ATF::produit()->select_row();
+		if (!$p) {
+			echo "PRODUIT INTROUVABLE - REF = ".$ligne[0]."\n";
+			continue;
+		}
+		echo "TYPE du CSV : |".$ligne[5]."| - |".$type[$ligne[5]]."|\n";
+		$t = strtolower($type[$ligne[5]]);
+		if ($t=="sans objet") $t="sans_objet";
+
+		echo "TYPE = ".$t."\n";
+
+
+		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "type"=>$t));
+	}
+
+} catch (errorATF $e) {
+	ATF::db()->rollback_transaction();
+	//print_r($produit);
+	echo "Produit REF : ".$ligne[0]." ERREUR\n";
+	throw $e;
+}
