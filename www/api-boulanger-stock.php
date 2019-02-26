@@ -31,6 +31,7 @@
       $response = $api->get('quantity', [ 'reference' => $produit['ref'] ]);
 
       $content = $response->getContent();
+      $content["reference"] = $produit['ref'];
       $code = $response->getCode();
       echo "Réponse boulanger PRO<br>";
       echo "Code : ".$code."<br>";
