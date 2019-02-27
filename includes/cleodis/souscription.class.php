@@ -736,15 +736,7 @@ class souscription_cleodis extends souscription {
       ATF::db()->begin_transaction(true);
       try {
 
-        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur);
-
-        // ATF::produit()->q->where('id_produit', 21448);
-        // ATF::produit()->q->where('id_produit', 22021);
-        // ATF::produit()->q->where('id_produit', 22067);
-        // ATF::produit()->q->where('id_produit', 21227);
-        // ATF::produit()->q->where('id_produit', 21904);
-        // ATF::produit()->q->where('id_produit', 21905);
-
+        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat', 'actif');
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -884,7 +876,6 @@ class souscription_cleodis extends souscription {
         }
 
         log::logger("Envoi du mail","batch-majPrixCatalogueProduit");
-        log::logger($mail, "batch-majPrixCatalogueProduit");
         $mail->send();
       }
       log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
