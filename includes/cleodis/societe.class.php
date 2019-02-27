@@ -1657,19 +1657,11 @@ class societe_cleodis extends societe {
                 }
             }else {
                 $data_soc = $data;
-                log::logger("AVANT DE GERER LE APPORTEUR","qjanon");
-                log::logger($post,"qjanon");
                 if ($post['site_associe']=='boulangerpro') {
                   ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
-                  ATF::societe()->q->setToString();
-                  log::logger(ATF::societe()->select_cell(), "qjanon");
-                  ATF::societe()->q->unsetToString();
                   $id_apporteur = ATF::societe()->select_cell();
-                  log::logger($id_apporteur,"qjanon");
-
 
                   $data_soc['id_apporteur'] = $id_apporteur;
-                  log::logger($data_soc,"qjanon");
                 }
 
                 $data_soc["langue"] = $post["langue"];

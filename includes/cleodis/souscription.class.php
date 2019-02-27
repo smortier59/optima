@@ -738,6 +738,14 @@ class souscription_cleodis extends souscription {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur);
 
+        ATF::produit()->q->where('id_produit', 21448);
+        ATF::produit()->q->where('id_produit', 22021);
+        ATF::produit()->q->where('id_produit', 22067);
+        ATF::produit()->q->where('id_produit', 21227);
+        ATF::produit()->q->where('id_produit', 21904);
+        ATF::produit()->q->where('id_produit', 21905);
+
+
         $catalogueBoulProActif = ATF::produit()->sa();
 
         // echo "\n".count($catalogueBoulProActif). " produits à traiter";
@@ -827,7 +835,7 @@ class souscription_cleodis extends souscription {
       $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.net>";
       $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
       $infos_mail["recipient"] = "dev@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
-      // $infos_mail["recipient"] = "ygautheron@absystech.fr";
+      $infos_mail["recipient"] = "qjanon@absystech.fr";
 
       $infos_mail['body'] = '';
       $fpack = __TEMP_PATH__."packs_desactives.csv";
@@ -874,9 +882,11 @@ class souscription_cleodis extends souscription {
           $mail->addFile($fproduit, "Produits désactivés.csv");
           //unlink($fproduit);
         }
+
+        log::logger("Envoi du mail","batch-majPrixCatalogueProduit");
+        log::logger($mail, "batch-majPrixCatalogueProduit");
         $mail->send();
       }
-      log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
       log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
       log::logger("Produits désactivés","batch-majPrixCatalogueProduit");
       log::logger(count($produitDesactive),"batch-majPrixCatalogueProduit");
