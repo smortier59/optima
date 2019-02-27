@@ -722,7 +722,7 @@ class souscription_cleodis extends souscription {
   }
 
   public function _boulangerMajPrix($get, $post) {
-    $logFile = "batch-majPrixCatalogueProduit-".time();
+    $logFile = "batch-majPrixCatalogueProduit-".date("Ymd-HHiiss");
     $logFilePath = __ABSOLUTE_PATH__."log/".$logFile;
     try {
       require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
