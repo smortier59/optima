@@ -784,22 +784,28 @@ class souscription_cleodis extends souscription {
                 "taxe_ecomob"=>$p['ecomob']
               ));
 
-              // Produit inclus, on va désactiver tous les packs associés
-              if ($produit['max'] == $produit['min'] && $produit['max'] == $produit['defaut']) {
-                // echo "\n ----- Produit inclus - on désactive le pack, quantité min ".$produit['min'].", max ".$produit['max'].", defaut ".$produit['defaut'];
-                log::logger("----- Produit inclus - on désactive le pack, quantité min ".$produit['min'].", max ".$produit['max'].", defaut ".$produit['defaut'],"batch-majPrixCatalogueProduit");
-                $packs = ATF::produit()->getPacks($produit['id_produit']);
-                foreach ($packs as $pack) {
+
+              $packs = ATF::produit()->getPacks($produit['id_produit']);
+              foreach ($packs as $pack) {
+
+                $id_produit_principal = ATF::pack_produit()->getProduitPrincipal($pack['id_pack_produit']);
+                
+
+                if ($id_produit_principal == $produit['id_produit']) {
                   // echo "\n ----- Désactivation pack associé : ".$pack['id_pack_produit'];
-                  log::logger("----- Désactivation pack associé : ".$pack['id_pack_produit'],"batch-majPrixCatalogueProduit");
+                  log::logger("----- Produit ".$produit['ref']." est le produit principal du pack : ".$pack['id_pack_produit'],$logFile);
+                  log::logger("----- Du coup on désactive ce pack associé",$logFile);
 
                   ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
                   $packDesactive[] = $pack['id_pack_produit'];
+                } else {
+                  log::logger("----- Produit ".$produit['ref']." n'est PAS le produit principal du pack : ".$pack['id_pack_produit'],$logFile);
+                  log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
                 }
               }
               // Produit non inclus, on va désactiver uniquement le produit
               // echo "\n ----- On désactive le produit car il est non inclus";
-              log::logger("----- On désactive le produit aussi du coup","batch-majPrixCatalogueProduit");
+              log::logger("----- On désactive le produit",$logFile);
               ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
 
               $produitDesactive[] = $produit;
