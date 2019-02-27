@@ -723,6 +723,7 @@ class souscription_cleodis extends souscription {
 
   public function _boulangerMajPrix($get, $post) {
     $logFile = "batch-majPrixCatalogueProduit-".time();
+    $logFilePath = __ABSOLUTE_PATH__."log/".$logFile;
     try {
       require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
 
@@ -875,8 +876,8 @@ class souscription_cleodis extends souscription {
           $mail->addFile($fproduit, "Produits désactivés.csv");
           //unlink($fproduit);
         }
-        if (file_exists($logFile)) {
-          $mail->addFile($logFile, "Logs du script.txt");
+        if (file_exists($logFilePath)) {
+          $mail->addFile($logFilePath, "Logs du script.txt");
           //unlink($fproduit);
         }
 
