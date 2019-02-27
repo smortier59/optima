@@ -738,12 +738,12 @@ class souscription_cleodis extends souscription {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur);
 
-        ATF::produit()->q->where('id_produit', 21448);
-        ATF::produit()->q->where('id_produit', 22021);
-        ATF::produit()->q->where('id_produit', 22067);
-        ATF::produit()->q->where('id_produit', 21227);
-        ATF::produit()->q->where('id_produit', 21904);
-        ATF::produit()->q->where('id_produit', 21905);
+        // ATF::produit()->q->where('id_produit', 21448);
+        // ATF::produit()->q->where('id_produit', 22021);
+        // ATF::produit()->q->where('id_produit', 22067);
+        // ATF::produit()->q->where('id_produit', 21227);
+        // ATF::produit()->q->where('id_produit', 21904);
+        // ATF::produit()->q->where('id_produit', 21905);
 
 
         $catalogueBoulProActif = ATF::produit()->sa();
