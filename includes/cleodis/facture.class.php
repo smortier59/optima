@@ -2644,13 +2644,13 @@ class facture_cleodisbe extends facture_cleodis {
 
 
 				//Facture Cout copie
-				if($item["facture.type_facture"] == "cout_copie"){
+				if($item["facture.type_facture"] == "libre" && $item["facture.type_libre"] == "cout_copie"){
 					$compte1 = "411000";
 					$compte2 = "707230";
 					$compte3 = "707230";
 					$compte4 = "445710";
-				}else if($item["facture.type_facture"] == "refi"){ 		//Facture refinancement
-					//Vente de CONTRAT
+				}else if($item["facture.type_facture"] == "refi"){
+					//Facture refinancement
 					$compte1 = "411000";
 					$compte2 = "707110";
 					$compte3 = "707110";
