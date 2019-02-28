@@ -1393,6 +1393,8 @@ class facture_cleodis extends facture {
 				}
 
 
+
+
 				//exceptions
 				if($item['facture.type_facture']=='refi'){
 					$tiers = $refinanceur["code_refi"];
@@ -2641,9 +2643,13 @@ class facture_cleodisbe extends facture_cleodis {
 				$libelle = 'F'.$item['facture.id_facture'].'-'.$societe['code_client'].'/'.$societe['societe'];
 
 
-				//Facture refinancement
-
-				if($item["facture.type_facture"] == "refi"){
+				//Facture Cout copie
+				if($item["facture.type_facture"] == "cout_copie"){
+					$compte1 = "411000";
+					$compte2 = "707230";
+					$compte3 = "707230";
+					$compte4 = "445710";
+				}else if($item["facture.type_facture"] == "refi"){ 		//Facture refinancement
 					//Vente de CONTRAT
 					$compte1 = "411000";
 					$compte2 = "707110";
@@ -2651,15 +2657,19 @@ class facture_cleodisbe extends facture_cleodis {
 					$compte4 = "445710";
 					$dateDebut = "";
 					$dateFin = "";
-
+				}else if($refinancement == "BELFIUS LEASE SERVICES"){
+					$compte1 = "411300";
+					$compte2 = "707110";
+					$compte3 = "707110";
+					$compte4 = "445710";
 				}else if(strtotime($infos_commande['date_debut']) > strtotime($item['facture.date_periode_debut'])){
 
 					//Refinancé et autre CLEODIS BE
 					if($refinancement !== "" && $refinancement !== "CLEODIS BE"){
 						// Prorata sur contrat refinance
 						$compte1 = "411000";
-						$compte2 = "706400";
-						$compte3 = "706400";
+						$compte2 = "706300";
+						$compte3 = "706300";
 						$compte4 = "445710";
 					} else {
 						// Prorata sur contrat autoporte
