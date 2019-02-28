@@ -1,11 +1,14 @@
 <?
-
 define("__BYPASS__",true);
 $_SERVER["argv"][1] = "absystech";
 include(dirname(__FILE__)."/../../global.inc.php");
 
 ATF::define("tracabilite",false);
 
+ATF::$usr->set('id_user',72);
+ATF::$usr->set('id_agence',1);
+
+/*
 $q= "SELECT * FROM TABLE_160";
 $data = ATF::db()->sql2array($q);
 
@@ -49,11 +52,15 @@ foreach ($data as $key => $value) {
 			echo  $soc["societe"]." existe\n";
 		}
 	}
+}*/
+ATF::societe()->q->reset()->whereIsNull("ref");
+foreach (ATF::societe()->select_all() as $key => $value) {
+	$soc['ref']=ATF::societe()->create_ref($s);
+	$soc["divers_5"]=substr(md5(time()),0,4); // Mot de passe hotline
+	$soc["mdp_client"]=util::generateRandWord(9);
+	$soc["mdp_absystech"]=util::generateRandWord(9);
+	$soc["id_societe"] = $value["id_societe"];
 
-
-
-
-
-
-
+	ATF::societe()->u($soc);
 }
+
