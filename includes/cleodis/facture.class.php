@@ -1908,7 +1908,7 @@ class facture_cleodis extends facture {
 								$row_data["A"]='G';
 								$row_data["B"]=" ".$date;
 								$row_data["C"]='VEN';
-								$row_data["D"]="706200";
+								$row_data["D"]="706900";
 
 								if($item['facture.prix']<0){
 									$row_data["F"]='D';
@@ -1922,7 +1922,7 @@ class facture_cleodis extends facture {
 								$row_data["A"]='A1';
 								$row_data["B"]=" ".$date;
 								$row_data["C"]='VEN';
-								$row_data["D"]="706200";
+								$row_data["D"]="706900";
 
 
 
@@ -1940,15 +1940,17 @@ class facture_cleodis extends facture {
 									$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00";
 								}
 							}elseif($i==4){
-								$row_data["A"]='G';
-								$row_data["B"]=" ".$date;
-								$row_data["C"]='VEN';
-								$row_data["D"]='445712';
-								$row_data["E"]='';
-								$row_data["F"]='C';
-								$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']);
-								$row_data["H"]=$libelle;
-								$row_data["I"]=$reference;
+								if($item["facture.tva"] != 1){
+									$row_data["A"]='G';
+									$row_data["B"]=" ".$date;
+									$row_data["C"]='VEN';
+									$row_data["D"]='445712';
+									$row_data["E"]='';
+									$row_data["F"]='C';
+									$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']);
+									$row_data["H"]=$libelle;
+									$row_data["I"]=$reference;
+								}
 							}
 						}
 
