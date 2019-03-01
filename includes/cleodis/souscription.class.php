@@ -722,6 +722,8 @@ class souscription_cleodis extends souscription {
   }
 
   public function _boulangerMajPrix($get, $post) {
+    $logFile = "batch-majPrixCatalogueProduit-".date("Ymd-His");
+    $logFilePath = __ABSOLUTE_PATH__."log/".$logFile;
     try {
       require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
 
@@ -730,8 +732,8 @@ class souscription_cleodis extends souscription {
 
       $api = new ApiBoulangerProV2(__API_BOULANGER_CLIENT__,__API_BOULANGER_SECRET__,__API_BOULANGER_HOST__);
       // echo "\n========== DEBUT DU BATCH ==========";
-      log::logger("-----------------------------------------------------------------","batch-majPrixCatalogueProduit");
-      log::logger("==========DEBUT DU BATCH==========","batch-majPrixCatalogueProduit");
+      log::logger("-----------------------------------------------------------------",$logFile);
+      log::logger("==========DEBUT DU BATCH==========",$logFile);
 
       ATF::db()->begin_transaction(true);
       try {
@@ -741,7 +743,7 @@ class souscription_cleodis extends souscription {
         $catalogueBoulProActif = ATF::produit()->sa();
 
         // echo "\n".count($catalogueBoulProActif). " produits à traiter";
-        log::logger(count($catalogueBoulProActif). " produits à traiter","batch-majPrixCatalogueProduit");
+        log::logger(count($catalogueBoulProActif). " produits à traiter",$logFile);
 
 
         foreach ($catalogueBoulProActif as $k=>$produit) {
@@ -751,15 +753,15 @@ class souscription_cleodis extends souscription {
           log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
           log::logger($r, "batch-majPrixCatalogueProduit");
           if (!$r) {
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE","batch-majPrixCatalogueProduit");
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE",$logFile);
           } else if ($r['error_code']) {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],"batch-majPrixCatalogueProduit");
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],$logFile);
           } else {
             $p = $r[0];
             $prix_avec_taxe = number_format($p['price_tax_excl'],2)+number_format($p['ecotax'],2)+number_format($p['ecomob'],2);
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],"batch-majPrixCatalogueProduit");
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],$logFile);
             // Mise a jour des taxes du produit
 
 
@@ -774,7 +776,7 @@ class souscription_cleodis extends souscription {
 
             if (number_format($produit['prix_achat'],2) != number_format($produit["old_prix_achat"],2)) {
               // echo "\n ----- Prix modifié pour ce produit";
-              log::logger("----- Prix modifié pour ce produit","batch-majPrixCatalogueProduit");
+              log::logger("----- Prix modifié pour ce produit",$logFile);
 
               // MAJ nouveau prix sur le produit
               ATF::produit()->u(array(
@@ -796,7 +798,7 @@ class souscription_cleodis extends souscription {
                   // log::logger("----- Du coup on désactive ce pack associé",$logFile);
                 // 
                 if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['defaut']) {
-                  log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", defaut ".$ligne_de_pack['defaut'],"batch-majPrixCatalogueProduit");                  
+                  log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", defaut ".$ligne_de_pack['defaut'],$logFile);                  
 
                   ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
                   $packDesactive[] = $pack['id_pack_produit'];
@@ -813,7 +815,7 @@ class souscription_cleodis extends souscription {
               $produitDesactive[] = $produit;
             } else {
               // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
-              log::logger("----- Prix inchangé pour ce produit, on ne traite pas","batch-majPrixCatalogueProduit");
+              log::logger("----- Prix inchangé pour ce produit, on ne traite pas",$logFile);
             }
           }
 
@@ -840,7 +842,7 @@ class souscription_cleodis extends souscription {
       $infos_mail['body'] = '';
       $fpack = __TEMP_PATH__."packs_desactives.csv";
       @unlink($fpack);
-      log::logger($fpack,"batch-majPrixCatalogueProduit");
+      log::logger($fpack,$logFile);
       if (!empty($packDesactive)) {
         $filepack= fopen($fpack, "w+");
         $sendmail = true;
@@ -858,7 +860,7 @@ class souscription_cleodis extends souscription {
         fclose($filepack);
       }
       $fproduit = __TEMP_PATH__."produits_desactives.csv";
-      log::logger($fproduit,"batch-majPrixCatalogueProduit");
+      log::logger($fproduit,$logFile);
       @unlink($fproduit);
       if (!empty($produitDesactive)) {
         $fileproduit= fopen($fproduit, "w+");
@@ -884,11 +886,11 @@ class souscription_cleodis extends souscription {
         }
         $mail->send();
       }
-      log::logger("Packs désactivésn","batch-majPrixCatalogueProduit");
-      log::logger(count($packDesactive),"batch-majPrixCatalogueProduit");
-      log::logger("Produits désactivés","batch-majPrixCatalogueProduit");
-      log::logger(count($produitDesactive),"batch-majPrixCatalogueProduit");
-      log::logger("========== FIN  DU  BATCH ==========\n","batch-majPrixCatalogueProduit");
+      log::logger("Packs désactivésn",$logFile);
+      log::logger(count($packDesactive),$logFile);
+      log::logger("Produits désactivés",$logFile);
+      log::logger(count($produitDesactive),$logFile);
+      log::logger("========== FIN  DU  BATCH ==========\n",$logFile);
 
 
     } catch (errorATF $e) {
