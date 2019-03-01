@@ -750,7 +750,7 @@ class souscription_cleodis extends souscription {
           $response = $api->get('price/'.$produit['ref']);
 
           $r = $response->getContent();
-          log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
+          log::logger("REPONSE BOULPRO", $logFile);
           log::logger($r, $logFile);
           if (!$r) {
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE",$logFile);
