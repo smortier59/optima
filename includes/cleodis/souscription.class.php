@@ -787,14 +787,16 @@ class souscription_cleodis extends souscription {
 
               $packs = ATF::produit()->getPacks($produit['id_produit']);
               foreach ($packs as $pack) {
+                ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
+                $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
 
-                $id_produit_principal = ATF::pack_produit()->getProduitPrincipal($pack['id_pack_produit']);
-                
-
-                if ($id_produit_principal == $produit['id_produit']) {
-                  // echo "\n ----- Désactivation pack associé : ".$pack['id_pack_produit'];
-                  log::logger("----- Produit ".$produit['ref']." est le produit principal du pack : ".$pack['id_pack_produit'],$logFile);
-                  log::logger("----- Du coup on désactive ce pack associé",$logFile);
+                // $id_produit_principal = ATF::pack_produit()->getProduitPrincipal($pack['id_pack_produit']);
+                // if ($id_produit_principal == $produit['id_produit']) {
+                  // log::logger("----- Produit ".$produit['ref']." est le produit principal du pack : ".$pack['id_pack_produit'],$logFile);
+                  // log::logger("----- Du coup on désactive ce pack associé",$logFile);
+                // 
+                if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['defaut']) {
+                  log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", defaut ".$ligne_de_pack['defaut'],"batch-majPrixCatalogueProduit");                  
 
                   ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
                   $packDesactive[] = $pack['id_pack_produit'];
