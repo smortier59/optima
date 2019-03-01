@@ -751,7 +751,7 @@ class souscription_cleodis extends souscription {
 
           $r = $response->getContent();
           log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
-          log::logger($r, "batch-majPrixCatalogueProduit");
+          log::logger($r, $logFile);
           if (!$r) {
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE",$logFile);
           } else if ($r['error_code']) {
@@ -772,7 +772,7 @@ class souscription_cleodis extends souscription {
             $produit["prix_achat"] = $prix_avec_taxe;
             $produit["taxe_ecotaxe"] = $p['ecotax'];
             $produit["taxe_ecomob"] = $p['ecomob'];
-            log::logger($produit, "batch-majPrixCatalogueProduit");
+
 
             if (number_format($produit['prix_achat'],2) != number_format($produit["old_prix_achat"],2)) {
               // echo "\n ----- Prix modifié pour ce produit";
@@ -791,10 +791,10 @@ class souscription_cleodis extends souscription {
               foreach ($packs as $pack) {
                 ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
                 $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
-                log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", defaut ".$ligne_de_pack['defaut'],$logFile);                  
+                log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
 
-                if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['defaut']) {
-                  log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", defaut ".$ligne_de_pack['defaut'],$logFile);                  
+                if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
+                  log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
 
                   ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
                   $packDesactive[] = $pack['id_pack_produit'];
