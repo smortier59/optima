@@ -738,7 +738,7 @@ class souscription_cleodis extends souscription {
       ATF::db()->begin_transaction(true);
       try {
 
-        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur);
+        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -803,7 +803,7 @@ class souscription_cleodis extends souscription {
                   ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
                   $packDesactive[] = $pack['id_pack_produit'];
                 } else {
-                  log::logger("----- Produit ".$produit['ref']." n'est PAS le produit principal du pack : ".$pack['id_pack_produit'],$logFile);
+                  log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
                   log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
                 }
               }
