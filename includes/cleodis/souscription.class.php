@@ -750,7 +750,7 @@ class souscription_cleodis extends souscription {
           $response = $api->get('price/'.$produit['ref']);
 
           $r = $response->getContent();
-          log::logger("REPONSE BOULPRO", "batch-majPrixCatalogueProduit");
+          log::logger("REPONSE BOULPRO", $logFile);
           log::logger($r, $logFile);
           if (!$r) {
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE",$logFile);
@@ -788,6 +788,8 @@ class souscription_cleodis extends souscription {
 
 
               $packs = ATF::produit()->getPacks($produit['id_produit']);
+              log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
+              log::logger($packs,$logFile);
               foreach ($packs as $pack) {
                 ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
                 $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
