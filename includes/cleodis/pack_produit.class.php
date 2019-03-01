@@ -299,8 +299,8 @@ class pack_produit extends classes_optima {
 
 	/**
 	 * Retourne la durée du pack par rapport au produit principal
-	 * @author : Quentin JANON <qjanon@absystech.fr>
-	 * @param  Integer $id_pack_produit
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  [type] $id_pack_produit [description]
 	 * @return int  duree
 	 */
 	public function getDureePack($id_pack_produit){
@@ -310,7 +310,7 @@ class pack_produit extends classes_optima {
 		return ATF::produit()->select($princ["id_produit"], "duree");
 
 
-	}	
+	}
 
 	/**
 	 * Retourne le produit principal d'un pack
@@ -326,4 +326,6 @@ class pack_produit extends classes_optima {
 
 
 	}
+
+	
 }

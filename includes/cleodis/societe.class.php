@@ -1641,7 +1641,14 @@ class societe_cleodis extends societe {
         }
 
         $res = ATF::societe()->select_row();
+
         try {
+
+            if($post['site_associe']){
+              //Il faut générer le code client
+              $code_client = ATF::societe()->getCodeClient($post['site_associe'], ATF::souscription_cleodis()->getPrefixCodeClient($post['site_associe']));
+
+            }
 
             if($res){
                 $id_societe = $res["id_societe"];
@@ -1655,12 +1662,16 @@ class societe_cleodis extends societe {
                                           "ville"=>$data["ville"]
                                        ));
                 }
+                if(!$res["code_client"]) ATF::societe()->u(array("id_societe"=>$id_societe, "code_client" => $code_client));
+
+
             }else {
+                log::logger("ICI societe inexistante" , "creditsafe");
                 $data_soc = $data;
+
                 if ($post['site_associe']=='boulangerpro') {
                   ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
                   $id_apporteur = ATF::societe()->select_cell();
-
                   $data_soc['id_apporteur'] = $id_apporteur;
                 }
 
@@ -1669,6 +1680,7 @@ class societe_cleodis extends societe {
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
                 if($apporteur) $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
+                if($post["site_associe"]) $this->u(array("id_societe"=> $id_societe, "code_client" => $code_client));
             }
 
 
