@@ -2319,8 +2319,8 @@ class hotline extends classes_optima {
 	}
 
 	public function requetebyUserParMois($mois,$tu=false){
-		if(ATF::$codename == "att"){ $exclusion = array(34,40); }
-		else{ $exclusion = array(30,62,57,54); }
+		//if(ATF::$codename == "att"){ $exclusion = array(34,40); }
+		//else{ $exclusion = array(30,62,57,54); }
 
 		if($mois < 0){
 			$z = true;

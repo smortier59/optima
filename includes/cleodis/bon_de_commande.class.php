@@ -733,8 +733,10 @@ class bon_de_commande_cleodis extends bon_de_commande {
 				$commandes = "xnode";
 
 				foreach ($value as $kl => $vl) {
-					$commandes .= ",".$vl["id_commande_ligne"];
-					$bon_de_commande["prix"] += $vl["prix_achat"]*$vl["quantite"];
+					for($i=1;$i<=$vl["quantite"]; $i++){
+						$commandes .= ",".$vl["id_commande_ligne"];
+						$bon_de_commande["prix"] += $vl["prix_achat"];
+					}
 	 			}
 
 	 			$bdc["bon_de_commande"] = $bon_de_commande;
@@ -742,9 +744,9 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 	 			$bdc["bon_de_commande"]["prix_cleodis"] = $bdc["bon_de_commande"]["prix"];
 
-	 			if($bdc["bon_de_commande"]["prix"] && $bdc["bon_de_commande"]["prix"] > 0){
+
 	 				$this->insert($bdc, $s, NULL, $cadre_refreshed);
-	 			}
+
 			}
 
 			ATF::affaire()->redirection("select",$commande["id_affaire"]);
