@@ -105,7 +105,7 @@ class affaire_absystech extends affaire {
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
-			->addJointure("affaire","id_affaire","hotline","id_affaire")
+			//->addJointure("affaire","id_affaire","hotline","id_affaire")
 			//->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
 
 			->addGroup("affaire.id_affaire")
