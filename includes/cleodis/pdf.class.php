@@ -4230,7 +4230,9 @@ class pdf_cleodis extends pdf {
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$bdclignes = ATF::bon_de_commande_ligne()->sa();
 
-		$lignes = array();
+
+
+		$this->lignes = $lignes = array();
 		foreach($bdclignes as $k=>$i) {
 			if($lignes[$i["id_commande_ligne"]]){
 				$lignes[$i["id_commande_ligne"]]["quantite"] += $i["quantite"];
