@@ -15,7 +15,7 @@ class document_contrat extends classes_optima {
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"uploadFile")
 		);
 
-		$this->files["fichier_joint"] = array("type"=>"pdf","no_generate"=>true);
+		$this->files["fichier_joint"] = array("type"=>"pdf","no_generate"=>true,"obligatoire"=>true);
 
 		$this->fieldstructure();
 	}
