@@ -721,6 +721,12 @@ class souscription_cleodis extends souscription {
     return $r;
   }
 
+  // Scenario 1 : un produit dans un pack, pas de changement de prix
+  // Scenario 2 : Un produit dans un pack (non inclu), changement du prix
+  // Scenario 3 : un produit dans un pack (inclu), changement de prix
+  // Scenario 4 : un produit dans 2 packs (d'un côté inclus, de l'autre non inclus), changement de prix
+  // Scenario 5 : un produit dans 2 packs (inclus des deux côtés), changement de prix
+  // Scenario 6 : un produit dans 2 packs (non inclus des deux côtés), changement de prix du produit.
   public function _boulangerMajPrix($get, $post) {
     $logFile = "batch-majPrixCatalogueProduit-".date("Ymd-His");
     $logFilePath = __ABSOLUTE_PATH__."log/".$logFile;
