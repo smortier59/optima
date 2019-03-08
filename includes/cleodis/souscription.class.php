@@ -744,7 +744,7 @@ class souscription_cleodis extends souscription {
       ATF::db()->begin_transaction(true);
       try {
 
-        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
+        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)/*->where('etat','actif')*/;
 
         // ATF::produit()->q->where('ref',1069347); // Produit ref 1069347 - Lave linge hublot BOSCH EX WAN28150FF
 
