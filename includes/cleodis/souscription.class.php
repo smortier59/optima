@@ -746,6 +746,8 @@ class souscription_cleodis extends souscription {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
 
+        ATF::produit()->q->where('id_produit',1069347); // Produit ref 1069347 - Lave linge hublot BOSCH EX WAN28150FF
+
         $catalogueBoulProActif = ATF::produit()->sa();
 
         // echo "\n".count($catalogueBoulProActif). " produits à traiter";
@@ -767,7 +769,10 @@ class souscription_cleodis extends souscription {
             $p = $r[0];
             $prix_avec_taxe = number_format($p['price_tax_excl'],2)+number_format($p['ecotax'],2)+number_format($p['ecomob'],2);
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],$logFile);
+            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! ",$logFile);
+            log::logger("Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],$logFile);
+            log::logger("Taxe eco boulpro : ".number_format($p['ecotax'],2)." VS Taxe eco cléodis : ".number_format($produit['ecotax'],2),$logFile);
+            log::logger("Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],$logFile);
             // Mise a jour des taxes du produit
 
 
@@ -781,46 +786,29 @@ class souscription_cleodis extends souscription {
 
 
             if (number_format($produit['prix_achat'],2) != number_format($produit["old_prix_achat"],2)) {
-              // echo "\n ----- Prix modifié pour ce produit";
-              log::logger("----- Prix modifié pour ce produit",$logFile);
-
-              // MAJ nouveau prix sur le produit
-              ATF::produit()->u(array(
-                "id_produit"=>$produit['id_produit'],
-                "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
-                "taxe_ecotaxe"=>$p['ecotax'],
-                "taxe_ecomob"=>$p['ecomob']
-              ));
-
-
-              $packs = ATF::produit()->getPacks($produit['id_produit']);
-              log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
-              foreach ($packs as $pack) {
-                log::logger("------------ PACK ID ".$pack['id_pack_produit']."------------",$logFile);                
-                ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
-                $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
-                log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
-
-                if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
-                  log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
-
-                  ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
-                  $packDesactive[] = $pack['id_pack_produit'];
-                } else {
-                  log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
-                  log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
-                }
-              }
-              // Produit non inclus, on va désactiver uniquement le produit
-              // echo "\n ----- On désactive le produit car il est non inclus";
-              log::logger("----- On désactive le produit",$logFile);
-              ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
-
-              $produitDesactive[] = $produit;
+              log::logger("----- Prix CHANGÉ pour ce produit",$logFile);
+              self::manageProduitChanges($produit, $p, $packDesactive, $produitDesactive, $logFile);
             } else {
               // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
               log::logger("----- Prix inchangé pour ce produit, on ne traite pas",$logFile);
             }
+
+            if (number_format($produit['taxe_ecotaxe'],2) != number_format($produit["old_taxe_ecotaxe"],2)) {
+              log::logger("----- Tace éco CHANGÉ pour ce produit",$logFile);
+              self::manageProduitChanges($produit, $p, $packDesactive, $produitDesactive, $logFile);
+            } else {
+              // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
+              log::logger("----- Tace éco inchangé pour ce produit, on ne traite pas",$logFile);
+            }
+
+            if (number_format($produit['taxe_ecomob'],2) != number_format($produit["old_taxe_ecomob"],2)) {
+              log::logger("----- Tace éco MOB CHANGÉ pour ce produit",$logFile);
+              self::manageProduitChanges($produit, $p, $packDesactive, $produitDesactive, $logFile);
+            } else {
+              // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
+              log::logger("----- Tace éco MOB inchangé pour ce produit, on ne traite pas",$logFile);
+            }
+
           }
 
         }
@@ -904,5 +892,41 @@ class souscription_cleodis extends souscription {
     return true;
   }
 
+  private function manageProduitChanges ($produit, $p, &$packDesactive, &$produitDesactive, $logFile) {
+      // MAJ nouveau prix sur le produit
+      ATF::produit()->u(array(
+        "id_produit"=>$produit['id_produit'],
+        "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
+        "taxe_ecotaxe"=>$p['ecotax'],
+        "taxe_ecomob"=>$p['ecomob']
+      ));
+
+
+      $packs = ATF::produit()->getPacks($produit['id_produit']);
+      log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
+      foreach ($packs as $pack) {
+        log::logger("------------ PACK ID ".$pack['id_pack_produit']."------------",$logFile);                
+        ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
+        $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
+        log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
+
+        if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
+          log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
+
+          ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
+          $packDesactive[] = $pack['id_pack_produit'];
+        } else {
+          log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
+          log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
+        }
+      }
+      // Produit non inclus, on va désactiver uniquement le produit
+      // echo "\n ----- On désactive le produit car il est non inclus";
+      log::logger("----- On désactive le produit",$logFile);
+      ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
+
+      $produitDesactive[] = $produit;
+
+  }
 
 }
