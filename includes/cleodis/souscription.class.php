@@ -771,8 +771,8 @@ class souscription_cleodis extends souscription {
             // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! ",$logFile);
             log::logger("Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],$logFile);
-            log::logger("Taxe eco boulpro : ".number_format($p['ecotax'],2)." VS Taxe eco cléodis : ".number_format($produit['ecotax'],2),$logFile);
-            log::logger("Taxe eco MOB boulpro : ".number_format($p['ecomob'],2)." VS Taxe eco MOB cléodis : ".number_format($produit['ecomob'],2),$logFile);
+            log::logger("Taxe eco boulpro : ".number_format($p['ecotax'],2)." VS Taxe eco cléodis : ".number_format($produit['taxe_ecotaxe'],2),$logFile);
+            log::logger("Taxe eco MOB boulpro : ".number_format($p['ecomob'],2)." VS Taxe eco MOB cléodis : ".number_format($produit['taxe_ecomob'],2),$logFile);
             // Mise a jour des taxes du produit
 
 
