@@ -2306,7 +2306,7 @@ class hotline extends classes_optima {
 	}
 
 	public function _requetebyUserParMois($get,$post){
-		$moment = $get['moment'] == "now" ? date("Y-m") : -1;
+		$moment = $get['moment'] == "now" ? date("Y-m") : (strlen($get['moment'])==7 ? $get['moment'] : -1);
 		$at = $this->requetebyUserParMois($moment);
 		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
