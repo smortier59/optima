@@ -2306,7 +2306,7 @@ class hotline extends classes_optima {
 	}
 
 	public function _requetebyUserParMois($get,$post){
-		$moment = $get['moment'] == "now" ? date("Y-m") : -1;
+		$moment = $get['moment'] == "now" ? date("Y-m") : (strlen($get['moment'])==7 ? $get['moment'] : -1);
 		$at = $this->requetebyUserParMois($moment);
 		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
@@ -2332,7 +2332,7 @@ class hotline extends classes_optima {
 				$mois = $tu[0];
 				$mois_conges = $tu[1];
 			}
-			$mois_conges_fin = $mois_conges_fin = date('Y-m-d',strtotime($mois."-01 +1 month"));
+			$mois_conges_fin = date('Y-m-d',strtotime($mois."-01 +1 month"));
 
 		}else{
 			$mois_conges = date('Y-m',strtotime($mois."-01 -1 month"));
@@ -2342,7 +2342,7 @@ class hotline extends classes_optima {
 				$mois_conges = $tu[1];
 				$mois_conges_fin = date('Y-m-d',strtotime($mois_conges."-01 +1 month"));
 			}
-			$mois_conges_fin = date("Y-m-d");
+			$mois_conges_fin = date('Y-m-d',strtotime($mois."-01 +1 month"));
 
 		}
 

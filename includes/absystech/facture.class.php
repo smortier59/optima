@@ -1222,57 +1222,59 @@ class facture_absystech extends facture {
 				parent::delete($id,$s);
 
 				//On recupere les factures précédente pour récuperer la date de fin la plus proche
-				$this->q->reset()->where("facture.id_affaire", $facture["id_affaire"])->addField("facture.date_fin_periode");
-				$factures = $this->select_all();
+				if ($facture["id_affaire"]) {
+					$this->q->reset()->where("facture.id_affaire", $facture["id_affaire"])->addField("facture.date_fin_periode");
+					$factures = $this->select_all();
 
-				//Si pas d'autre facture la date de fin de période devient NULL
+					//Si pas d'autre facture la date de fin de période devient NULL
 
-				if(is_array($factures)){
-					$dateFin = "";
-					foreach($factures as $k=>$v){
-						if($v["facture.date_fin_periode"]){
-							$nbJours = ATF::facture_absystech()->date_diff($dateFin, $v["facture.date_fin_periode"]);
-							 if(($dateFin === "") || ($dateFin === NULL)){
-								$dateFin = $v["facture.date_fin_periode"];
-							}
-							else{
-								if($nbJours > 1){
+					if(is_array($factures)){
+						$dateFin = "";
+						foreach($factures as $k=>$v){
+							if($v["facture.date_fin_periode"]){
+								$nbJours = ATF::facture_absystech()->date_diff($dateFin, $v["facture.date_fin_periode"]);
+								 if(($dateFin === "") || ($dateFin === NULL)){
 									$dateFin = $v["facture.date_fin_periode"];
+								}
+								else{
+									if($nbJours > 1){
+										$dateFin = $v["facture.date_fin_periode"];
+									}
 								}
 							}
 						}
-					}
-					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => $dateFin));
-				}else{
-					ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => NULL));
-				}
-
-
-				//Affaire
-				$this->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
-				$autre_affaire=parent::sa();
-
-				//S'il n'y a pas d'autres factures pour cette affaire
-				if($autre_affaire["count"]==0){
-					$affaire["id_affaire"]=$facture["id_affaire"];
-					ATF::devis()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
-					$devis = ATF::devis()->sa();
-					ATF::commande()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
-					$commande=ATF::commande()->sa();
-
-					//S'il y a au moins une commande pour cette affaire
-					if($commande["count"]>0){
-						$affaire["etat"]="commande";
-						ATF::affaire()->u($affaire,$s);
-					//S'il y a au moins un devis
-					}elseif($devis["count"]>0){
-						$affaire["etat"]="devis";
-						$affaire["forecast"]="20";
-						ATF::affaire()->u($affaire,$s);
-					//Sinon on peut tout supprimer
+						ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => $dateFin));
 					}else{
-						ATF::affaire()->delete($affaire["id_affaire"],$s);
-						unset($facture["id_affaire"]);
+						ATF::affaire()->u(array("id_affaire" => $facture["id_affaire"], "date_fin_maintenance" => NULL));
+					}
+
+
+					//Affaire
+					$this->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
+					$autre_affaire=parent::sa();
+
+					//S'il n'y a pas d'autres factures pour cette affaire
+					if($autre_affaire["count"]==0){
+						$affaire["id_affaire"]=$facture["id_affaire"];
+						ATF::devis()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
+						$devis = ATF::devis()->sa();
+						ATF::commande()->q->reset()->addCondition("id_affaire",$facture["id_affaire"])->SetCount()->end();
+						$commande=ATF::commande()->sa();
+
+						//S'il y a au moins une commande pour cette affaire
+						if($commande["count"]>0){
+							$affaire["etat"]="commande";
+							ATF::affaire()->u($affaire,$s);
+						//S'il y a au moins un devis
+						}elseif($devis["count"]>0){
+							$affaire["etat"]="devis";
+							$affaire["forecast"]="20";
+							ATF::affaire()->u($affaire,$s);
+						//Sinon on peut tout supprimer
+						}else{
+							ATF::affaire()->delete($affaire["id_affaire"],$s);
+							unset($facture["id_affaire"]);
+						}
 					}
 				}
 

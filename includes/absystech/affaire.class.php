@@ -36,7 +36,7 @@ class affaire_absystech extends affaire {
 			,'affaire.date'
 			,'affaire.forecast'=>array("renderer"=>"progress","rowEditor"=>"forecastUpdate","width"=>100)
 			,'marge'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
-			,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
+			//,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
 			,'marge_commandee'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"money","type"=>"decimal","width"=>100)
 			,'pourcent'=>array("renderer"=>"percent","custom"=>true,"aggregate"=>array("avg","min","max"),"width"=>80)
 		);
@@ -105,18 +105,18 @@ class affaire_absystech extends affaire {
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
-			->addJointure("affaire","id_affaire","hotline","id_affaire")
-			->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
+			//->addJointure("affaire","id_affaire","hotline","id_affaire")
+			//->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
 
 			->addGroup("affaire.id_affaire")
 			->addField("(SUM(facture.prix)
 							 -IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
-			->addField("(SUM(facture.prix)
+			/*->addField("(SUM(facture.prix)
 						-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
 						-IF(COUNT(`hotline`.`id_hotline`)=0,
 							0,
 								(SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
-							)","margenette")
+							)","margenette")*/
 			->addField("IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, commande.prix-`commande`.`prix_achat`)","marge_commandee")
 			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
 			->setView(array("align"=>array("marge"=>"right","pourcent"=>"center")));
