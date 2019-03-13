@@ -557,7 +557,8 @@ class produit_cleodis extends produit {
 	*/
 	public function getPacks($id_produit) {
 		ATF::pack_produit_ligne()->q->reset()
-			->addField('id_pack_produit', 'etat')
+			->addField('id_pack_produit')
+			->addField('etat')
 			->where('id_produit', $id_produit);
 		return ATF::pack_produit_ligne()->sa();
 	}
