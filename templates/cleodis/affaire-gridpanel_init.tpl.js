@@ -18,3 +18,24 @@ ATF.renderer.etatAffaire=function(table,field) {
 		return '<div class="center" id="'+idDiv+'">'+html+'</div>';
 	}
 };
+
+
+ATF.renderer.fileRenderer = function(table, field){
+	return function(filetype, meta, record, rowIndex, colIndex, store) {
+		var idDiv = Ext.id();
+		var id = record.data[table+'__dot__id_'+table];
+		field = store.fields.keys[colIndex - 1];
+		var html = "";
+
+		if(record.json[field] == true){
+			html += '<a href="affaire-select-'+field+'-'+id+'.dl" target="_blank">';
+			html += '<img src="{ATF::$staticserver}images/icones/pdf.png" /></a>';
+		}else{
+			html = '<img src="{ATF::$staticserver}images/icones/no_2.png" />';
+		}
+
+		return '<div id="'+idDiv+'">'+html+'</div>';
+
+
+	}
+};
