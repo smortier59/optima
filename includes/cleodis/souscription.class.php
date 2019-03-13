@@ -905,10 +905,11 @@ class souscription_cleodis extends souscription {
       $packs = ATF::produit()->getPacks($produit['id_produit'], 'actif');
       log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
       foreach ($packs as $pack) {
-        log::logger($pack, 'qjanon');
         log::logger("------------ PACK ID ".$pack['id_pack_produit']."(".$pack['etat'].")------------",$logFile);      
 
-        if ($pack['etat']!='actif') {
+        $etat = ATF::pack_produit()->select($pack['id_pack_produit'], 'etat');
+
+        if ($etat!='actif') {
           log::logger("Pack non actif, on passe à la suite.",$logFile);      
         } else {
           ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
