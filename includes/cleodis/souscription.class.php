@@ -905,6 +905,7 @@ class souscription_cleodis extends souscription {
       $packs = ATF::produit()->getPacks($produit['id_produit'], 'actif');
       log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
       foreach ($packs as $pack) {
+        log::logger($pack, 'qjanon');
         log::logger("------------ PACK ID ".$pack['id_pack_produit']."(".$pack['etat'].")------------",$logFile);      
 
         if ($pack['etat']!='actif') {
