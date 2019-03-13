@@ -907,21 +907,25 @@ class souscription_cleodis extends souscription {
       foreach ($packs as $pack) {
         log::logger("------------ PACK ID ".$pack['id_pack_produit']."------------",$logFile);      
 
-
-
-        ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
-        $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
-        log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
-
-        if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
-          log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
-
-          ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
-          $packDesactive[$pack['id_pack_produit']] = $pack['id_pack_produit'];
+        if ($pack['etat']!='actif') {
+          log::logger("Pack non actif, on passe à la suite.",$logFile);      
         } else {
-          log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
-          log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
+          ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
+          $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
+          log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
+
+          if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
+            log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
+
+            ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
+            $packDesactive[$pack['id_pack_produit']] = $pack['id_pack_produit'];
+          } else {
+            log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
+            log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
+          }
+          
         }
+
       }
       // Produit non inclus, on va désactiver uniquement le produit
       // echo "\n ----- On désactive le produit car il est non inclus";
