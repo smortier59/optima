@@ -555,10 +555,11 @@ class produit_cleodis extends produit {
 	* Retour tous les packs où l'on trouve le produit
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
-	public function getPacks($id_produit) {
+	public function getPacks($id_produit, $etat = false) {
 		ATF::pack_produit_ligne()->q->reset()
 			->addField('id_pack_produit')
 			->where('id_produit', $id_produit);
+		if ($etat) ATF::pack_produit_ligne()->q->where('etat',$etat);
 		return ATF::pack_produit_ligne()->sa();
 	}
 

@@ -746,7 +746,7 @@ class souscription_cleodis extends souscription {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
 
-        // ATF::produit()->q->where('ref',1069347); // Produit ref 1069347 - Lave linge hublot BOSCH EX WAN28150FF
+        ATF::produit()->q->where('ref',1069347); // Produit ref 1069347 - Lave linge hublot BOSCH EX WAN28150FF
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -902,10 +902,13 @@ class souscription_cleodis extends souscription {
       ));
 
 
-      $packs = ATF::produit()->getPacks($produit['id_produit']);
+      $packs = ATF::produit()->getPacks($produit['id_produit'], 'actif');
       log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
       foreach ($packs as $pack) {
-        log::logger("------------ PACK ID ".$pack['id_pack_produit']."------------",$logFile);                
+        log::logger("------------ PACK ID ".$pack['id_pack_produit']."------------",$logFile);      
+
+
+
         ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
         $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
         log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
