@@ -24,7 +24,7 @@ ATF.renderer.fileRenderer = function(table, field){
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
 		var idDiv = Ext.id();
 		var id = record.data[table+'__dot__id_'+table];
-		field = store.fields.keys[colIndex - 1];
+		var field = store.fields.keys[colIndex - 1];
 		var html = "";
 
 		if(record.json[field] == true){
