@@ -4230,7 +4230,9 @@ class pdf_cleodis extends pdf {
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$bdclignes = ATF::bon_de_commande_ligne()->sa();
 
-		$lignes = array();
+
+
+		$this->lignes = $lignes = array();
 		foreach($bdclignes as $k=>$i) {
 			if($lignes[$i["id_commande_ligne"]]){
 				$lignes[$i["id_commande_ligne"]]["quantite"] += $i["quantite"];
@@ -4363,10 +4365,24 @@ class pdf_cleodis extends pdf {
 			$w = array(30,100,20,20,20);
 
 			foreach($this->lignes as $k=>$i) {
-				if ($i['id_produit']) $produit = ATF::produit()->select($i['id_produit']);
+				if (!$i['id_produit'] && $i["id_commande_ligne"]) {
+					$i['id_produit'] = ATF::commande_ligne()->select($i["id_commande_ligne"], "id_produit");
+				}
+
+				if($i["id_produit"]) $produit = ATF::produit()->select($i['id_produit']);
+
+				$designation = "";
+				if($produit && $produit["id_sous_categorie"]){
+					$designation .= ATF::sous_categorie()->select($produit["id_sous_categorie"] , "sous_categorie")." ";
+					if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
+					$designation .= "- ";
+				}
+				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
+				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
+
 				$data[] = array(
 					$i['ref']
-					,$produit['produit']?$produit['produit']:$i['produit']
+					,$designation
 					,round($i['quantite'])
 					,number_format($i['prix'],2,'.',' ')
 					,number_format($i['quantite']*$i['prix'],2,'.',' ')
@@ -10916,10 +10932,27 @@ class pdf_cleodisbe extends pdf_cleodis {
 				$head = array("Referentie","Omschrijving","Aantal","E.P","Totaal");
 				$w = array(30,100,20,20,20);
 				foreach($this->lignes as $k=>$i) {
-					if ($i['id_produit']) $produit = ATF::produit()->select($i['id_produit']);
+
+					if (!$i['id_produit'] && $i["id_commande_ligne"]) {
+						$i['id_produit'] = ATF::commande_ligne()->select($i["id_commande_ligne"], "id_produit");
+					}
+
+					if($i["id_produit"]) $produit = ATF::produit()->select($i['id_produit']);
+
+					$designation = "";
+					if($produit && $produit["id_sous_categorie"]){
+						$designation .= ATF::sous_categorie()->select($produit["id_sous_categorie"] , "sous_categorie")." ";
+						if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
+						$designation .= "- ";
+					}
+					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
+					if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
+
+
+
 					$data[] = array(
 						$i['ref']
-						,$produit['produit']?$produit['produit']:$i['produit']
+						,$designation
 						,round($i['quantite'])
 						,number_format($i['prix'],2,'.',' ')
 						,number_format($i['quantite']*$i['prix'],2,'.',' ')
