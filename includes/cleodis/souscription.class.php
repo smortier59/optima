@@ -102,8 +102,11 @@ class souscription_cleodis extends souscription {
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
         $id_affaire = ATF::devis()->select_cell();
 
-        $affaires[] = $id_affaire;
+        ATF::affaire()->q->reset()->addField('affaire.ref','ref')->where('affaire.id_affaire', $id_affaire);
+        $ref_affaire = ATF::affaire()->select_cell();
 
+        $affaires["ids"][] = $id_affaire;
+        $affaires["refs"][] = $ref_affaire;
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
           "id_affaire"=>$id_affaire,
