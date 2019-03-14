@@ -1485,7 +1485,7 @@ class facture_cleodis extends facture {
 					case 'refi_autre':
 						$libelle = $refinanceur["code_refi"]." ".$refinancement;
 						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-						$ligne[1]["H"] =  $h;
+						$ligne[1] = array("D"=> "411300" , "H"=> $h);
 						$ligne[2] = array("D"=> "707110" , "H"=> $h);
 						$ligne[3] = array("D"=> "707110" , "H"=> $h);
 					break;
