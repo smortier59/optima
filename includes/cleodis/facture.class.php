@@ -1430,7 +1430,7 @@ class facture_cleodis extends facture {
 								if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
 									$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
 								//Affaire en cours et refinancée par BMF
-								}elseif($ResRefinancement && $refinancement == "BMF" && $en_cours){
+								}elseif($ResRefinancement && $refinancement == "BMF"){
 									$choix = "affaire_en_cours_refi_bmf";
 								}elseif(($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE') && $en_cours){
 									$choix = "affaire_en_cours_refi_cleofi_sgef";
@@ -1465,7 +1465,7 @@ class facture_cleodis extends facture {
 					break;
 
 					case 'refi_refinanceur_SGEF':
-						$libelle = $refinanceur["code_refi"]." ".$refinancement;
+						$libelle = $refinanceur["code_refi"];
 						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
 						$ligne[1] = array("D"=> "411300" , "H"=> $h);
 						$ligne[2] = array("D"=> "707110" , "H"=> $h);
@@ -1474,16 +1474,16 @@ class facture_cleodis extends facture {
 					break;
 
 					case 'refi_refinanceur_CLEOFI':
-						$libelle = $refinanceur["code_refi"]." ".$refinancement;
+						$libelle = $refinanceur["code_refi"];
 						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-						$ligne[1] = array("D"=> "411300" , "H"=> $h);
+						$ligne[1] = array("D"=> "411200" , "H"=> $h);
 						$ligne[2] = array("D"=> "758100" , "H"=> $h);
-						$ligne[3] = array("D"=> "707110" , "H"=> $h);
+						$ligne[3] = array("D"=> "758100" , "H"=> $h);
 						$ligne[4]["H"] = $h;
 					break;
 
 					case 'refi_autre':
-						$libelle = $refinanceur["code_refi"]." ".$refinancement;
+						$libelle = $refinanceur["code_refi"];
 						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
 						$ligne[1] = array("D"=> "411300" , "H"=> $h);
 						$ligne[2] = array("D"=> "707110" , "H"=> $h);
@@ -1514,7 +1514,11 @@ class facture_cleodis extends facture {
 					break;
 
 					case 'affaire_en_cours_refi_cleofi_sgef':
-						$ligne[2]["D"] = "467800";
+						if($refinanceur['refinanceur']=='CLEOFI'){
+							$ligne[2]["D"] = "467500";
+						}else{
+							$ligne[2]["D"] = "467800";
+						}
 						unset($ligne[3]);
 						unset($ligne[4]);
 					break;
@@ -1528,12 +1532,9 @@ class facture_cleodis extends facture {
 					break;
 
 					case 'facture_sans_tva':
-						$ligne[2]["D"] = "706930";
-						$ligne[3]["D"] = "706930";
+						$ligne[2]["D"] = "706900";
+						$ligne[3]["D"] = "706900";
 						unset($ligne[4]);
-					break;
-					default:
-
 					break;
 				}
 
