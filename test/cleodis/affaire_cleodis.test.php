@@ -29,71 +29,6 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertTrue($c instanceOf affaire_cap, "L'objet affaire_cap n'est pas de bon type");
 	}
 
-	/**
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	 * @testdox Set Infos commentaire facture 1
-	 */
-	public function test__setInfosErreur(){
-		$data = ['commentaire_facture' => "Commentaire 1"];
-
-		$this->obj = ATF::affaire();
-		try{
-			ATF::affaire()->setInfos($data);
-		}catch(errorATF $e) {
-			$this->assertSame('[SQL Error] : 1064 : You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \')\' at line 1 [Query] : UPDATE `affaire` SET `id_affaire` = null,`commentaire_facture` = "Commentaire 1" WHERE (id_affaire =)', $e->getMessage());
-		}
-
-
-
-
-	}
-
-	/**
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	 * @testdox Set Infos commentaire facture 1
-	 */
-	public function test__setInfos(){
-		$data = ['id_affaire'=> "8657b31577e56fcff8664b356ff1d2c2",
-	 			 'commentaire_facture' => "Commentaire 1"];
-
-		$this->obj = ATF::affaire();
-		ATF::affaire()->setInfos($data);
-		ATF::affaire()->select($data["id_affaire"], "commentaire_facture");
-
-		$this->assertSame("Commentaire", ATF::affaire()->select($data["id_affaire"], "commentaire_facture"));
-	}
-
-
-	/**
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	 * @testdox Set Infos commentaire facture 1
-	 */
-	public function test__setInfos2(){
-		$data = ['id_affaire'=> "8657b31577e56fcff8664b356ff1d2c2",
-	 			 'commentaire_facture2' => "Commentaire 2"];
-
-		$this->obj = ATF::affaire();
-		ATF::affaire()->setInfos($data);
-
-		ATF::affaire()->select($data["id_affaire"], "commentaire_facture2");
-
-		$this->assertSame("Commentaire 2", ATF::affaire()->select($data["id_affaire"], "commentaire_facture2"));
-	}
-
-	/**
-	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	 * @testdox Set Infos commentaire facture 1
-	 */
-	public function test__setInfos3(){
-		$data = ['id_affaire'=> "8657b31577e56fcff8664b356ff1d2c2",
-	 			 'commentaire_facture3' => "Commentaire 3"];
-
-		$this->obj = ATF::affaire();
-		ATF::affaire()->setInfos($data);
-		ATF::affaire()->select($data["id_affaire"], "commentaire_facture3");
-
-		$this->assertSame("Commentaire 3", ATF::affaire()->select($data["id_affaire"], "commentaire_facture3"));
-	}
 
 
 
@@ -122,7 +57,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals(0,ATF::$html->getTemplateVars('vr'),"Valeur résiduelle incorrecte");
 		$loyer = json_decode(ATF::$html->getTemplateVars('loyerData'),true);
 		unset($loyer[0]["loyer.id_loyer"],$loyer[1]["loyer.id_loyer"]);
-		$this->assertEquals('[{"loyer":"233.00","duree":"34","assurance":"2.00","frais_de_gestion":"1.00","frequence_loyer":"mois","pv":9327.37},{"loyer":"666.00","duree":"6","assurance":"2.00","frais_de_gestion":"1.00","frequence_loyer":"trimestre","pv":3711.08}]',json_encode($loyer),"Loyers incorrects");
+		$this->assertEquals('[{"loyer":"233.0000","duree":"34","assurance":"2.0000","frais_de_gestion":"1.0000","frequence_loyer":"mois","pv":9327.37},{"loyer":"666.0000","duree":"6","assurance":"2.0000","frais_de_gestion":"1.0000","frequence_loyer":"trimestre","pv":3711.08}]',json_encode($loyer),"Loyers incorrects");
 		$this->assertNull(ATF::$html->getTemplateVars('resteAFacturer'),"Total restant à facturer incorrect");
 		$this->assertEquals(9324.37,ATF::$html->getTemplateVars('marge'),"Marge incorrecte");
 		$this->assertEquals(99.97,ATF::$html->getTemplateVars('margePourcent'),"% Marge incorrecte");
@@ -408,7 +343,10 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"date_garantie"=>NULL,
 									"ref"=>$this->obj->getRef(date("Y-m-d")),
 									'id_partenaire' => NULL,
-    								'langue' => NULL
+    								'langue' => NULL,
+    								'commentaire_facture' => null,
+									'commentaire_facture2' => null,
+									'commentaire_facture3' => null
 								),
 							$affaireFormateClassique,
 							"Le formateInsertUpdate ne renvoie pas le bon tab classique");
@@ -447,7 +385,10 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"ref"=>$this->obj->getRefAvenant(26),
 									"id_parent"=>26,
 									'id_partenaire' => NULL,
-    								'langue' => NULL
+    								'langue' => NULL,
+    								'commentaire_facture' => null,
+									'commentaire_facture2' => null,
+									'commentaire_facture3' => null
 								),
 							$affaireFormateAvenant,
 							"Le formateInsertUpdate ne renvoie pas le bon tab avenant");
@@ -486,7 +427,10 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 									"ref"=>$this->obj->getRef(date("Y-m-d")),
 									"id_parent"=>26,
 									'id_partenaire' => NULL,
-    								'langue' => NULL
+    								'langue' => NULL,
+    								'commentaire_facture' => null,
+									'commentaire_facture2' => null,
+									'commentaire_facture3' => null
 								),
 							$affaireFormateVente,
 							"Le formateInsertUpdate ne renvoie pas le bon tab vente");
@@ -1795,7 +1739,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 		copy($file, __ABSOLUTE_PATH__."../data/testsuite/commande/16462.retour");
-		$attendu["sign"] = true;
+		$attendu["sign"] = false;
 		$return = $this->obj->_repriseContratToshiba(array(),array("id_affaire"=>22170));
 		$this->assertEquals($attendu,$return,"Retour incorrect _repriseContratToshiba 2");
 
@@ -1822,6 +1766,41 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 
+	/**
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function test_setInfos(){
+		$this->obj = ATF::affaire();
+		$devis = unserialize(self::$devis);
+		ATF::$usr = new usr(16);
+		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
+
+		$id_affaire = ATF::devis()->select($id_devis, "id_affaire");
+
+
+		$this->obj->setInfos(array(
+			"commentaire_facture"=> "Commentaire facture 1",
+			"id_affaire" => $id_affaire
+		));
+		$res = ATF::affaire()->select($id_affaire);
+		$this->assertEquals( $res["commentaire_facture"] , "Commentaire facture 1", "Retour incorrect 1");
+
+		$this->obj->setInfos(array(
+			"commentaire_facture2"=> "Commentaire facture 2",
+			"id_affaire" => $id_affaire
+		));
+		$res = ATF::affaire()->select($id_affaire);
+		$this->assertEquals( $res["commentaire_facture2"] , "Commentaire facture 2", "Retour incorrect 2");
+
+
+		$this->obj->setInfos(array(
+			"commentaire_facture3"=> "Commentaire facture 3",
+			"id_affaire" => $id_affaire
+		));
+		$res = ATF::affaire()->select($id_affaire);
+		$this->assertEquals( $res["commentaire_facture3"] , "Commentaire facture 3", "Retour incorrect 3");
+
+	}
 
 
 
