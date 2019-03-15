@@ -97,7 +97,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals($infos["type"],ATF::$html->getTemplateVars('type'),"Manager : Type de compte en T incorrect");
 		$this->assertEquals(15,ATF::$html->getTemplateVars('vr'),"Valeur résiduelle incorrecte");
 		$this->assertEquals(0,ATF::$html->getTemplateVars('taux'),"Manager : Taux réel incorrect");
-		$this->assertEquals(11918,ATF::$html->getTemplateVars('resteAFacturer'),"Manager : Total restant à facturer incorrect");
+		$this->assertEquals(11685.00,ATF::$html->getTemplateVars('resteAFacturer'),"Manager : Total restant à facturer incorrect");
 		$this->assertEquals(10521,ATF::$html->getTemplateVars('marge'),"Manager : Marge incorrecte");
 		$this->assertEquals(87.29,ATF::$html->getTemplateVars('margePourcent'),"Manager : % Marge incorrecte");
 
@@ -733,7 +733,100 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("++RUM",$this->obj->select($id_affaire,"RUM"),'problème update sur RUM');
 
+
+		$infos["id_affaire"]=$id_affaire2;
+		$infos["field"]="RIB";
+		$infos["value"]="RIB TU";
+
+		$id_devis2 = classes::decryptId(ATF::devis()->insert($devis));
+		$id_affaire2 = ATF::devis()->select($id_devis, "id_affaire");
+		$this->obj->updateFacturation($infos);
+
+
+		$affaire2=$this->obj->select($id_affaire2);
+		/*$this->assertEquals(array(
+						array(
+							"msg" => "RUM_modifiee",
+							"title" => NULL,
+							"timer" => NULL,
+							"type" => "success"
+						)
+					),
+					ATF::$msg->getNotices(),
+					"Les notices ne sont pas cohérentes pas cohérente updateFacturation reference_refinanceur");*/
+
+		//$this->assertEquals("++RUM",$this->obj->select($id_affaire,"RUM"),'problème update sur RUM');
+
+
+
 	}
+
+		// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	private function beginTransaction($codename){
+		ATF::db()->select_db("optima_".$codename);
+    	ATF::$codename = $codename;
+    	ATF::db()->begin_transaction(true);
+	}
+
+	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	private function RollBackTransaction($codename){
+		ATF::$msg->getNotices();
+		ATF::db()->rollback_transaction(true);
+        ATF::$codename = "cleodis";
+        ATF::db()->select_db("optima_cleodis");
+	}
+
+
+
+	public function test_insert(){
+		$this->beginTransaction("cap");
+		$a = new affaire_cap();
+		$c = new audit();
+		$m = new mandat_cap();
+
+		$data = array("ref"=> "123456",
+					  "id_user"=> 1,
+					  "type"=>"gestion_poste",
+					  "id_societe"=>9969,
+					  "date"=>"2015-10-26"
+					 );
+
+		$id_audit = $c->insert(array("audit"=>$data, "tu"=>true));
+
+		$audit = $c->select($id_audit);
+
+
+
+		$mandat = array("ref"=>"123456",
+						"id_societe"=>9969,
+						"id_affaire"=>$audit["id_affaire"],
+						"date"=>date("Y-m-d"),
+						"id_audit"=>$id_audit,
+						"indemnite_retard"=>300,
+						"contact"=>array(9509,9510)
+					   );
+
+
+
+
+		$ret1 = $a->getMandat();
+
+		$ret2 = $a->getMandat($audit["id_affaire"]);
+
+		$id_mandat = $m->insert(array("mandat"=>$mandat, "preview"=>false, "tu"=>true));
+
+		$ret3 = $a->getMandat($audit["id_affaire"]);
+
+		$this->RollBackTransaction("cleodis");
+
+		$this->assertEquals(false, $ret1, "Erreur de retour Mandat 1");
+		$this->assertEquals(false, $ret2, "Erreur de retour Mandat 2");
+		$this->assertEquals($id_mandat, $ret3, "Erreur de retour Mandat 3");
+
+	}
+
+
+
 
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>  */
 	public function test_getMargeTotaleDepuisDebutAnnee(){
@@ -1745,6 +1838,7 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 		$this->obj->u(array("id_affaire"=>22170, "pieces"=>"OK"));
+		$attendu["sign"] = true;
 		$attendu["pieces"] = true;
 		$return = $this->obj->_repriseContratToshiba(array(),array("id_affaire"=>22170));
 		$this->assertEquals($attendu,$return,"Retour incorrect _repriseContratToshiba 3");
@@ -1803,82 +1897,27 @@ class affaire_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 
+	public function test_updateCommentaireFacture(){
+		$this->obj = ATF::affaire();
+		$devis = unserialize(self::$devis);
+		ATF::$usr = new usr(16);
+		$id_devis = classes::decryptId(ATF::devis()->insert($devis,$this->s));
 
+		$id_affaire = ATF::devis()->select($id_devis, "id_affaire");
 
+		try {
+			$this->obj->updateCommentaireFacture(array(
+				"field"=> "toto",
+				"value"=> "Commentaire facture 1",
+				"id_affaire" => $id_affaire
+			));
+			$res = ATF::affaire()->select($id_affaire);
+		} catch (errorATF $e) {
+			$erreur = $e->getMessage();
+		}
 
-
-
-
-
-
-
-
-
-
-		// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	private function beginTransaction($codename){
-		ATF::db()->select_db("optima_".$codename);
-    	ATF::$codename = $codename;
-    	ATF::db()->begin_transaction(true);
+		$this->assertEquals($erreur, '[SQL Error] : 1054 : Unknown column \'toto\' in \'field list\' [Query] : UPDATE `affaire` SET `toto` = "Commentaire facture 1" WHERE (id_affaire = \''.$id_affaire.'\')', "Erreur non catché");
 	}
-
-	// @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	private function RollBackTransaction($codename){
-		ATF::$msg->getNotices();
-		ATF::db()->rollback_transaction(true);
-        ATF::$codename = "cleodis";
-        ATF::db()->select_db("optima_cleodis");
-	}
-
-
-
-	public function test_insert(){
-		$this->beginTransaction("cap");
-		$a = new affaire_cap();
-		$c = new audit();
-		$m = new mandat_cap();
-
-		$data = array("ref"=> "123456",
-					  "id_user"=> 1,
-					  "type"=>"gestion_poste",
-					  "id_societe"=>9969,
-					  "date"=>"2015-10-26"
-					 );
-
-		$id_audit = $c->insert(array("audit"=>$data, "tu"=>true));
-
-		$audit = $c->select($id_audit);
-
-
-
-		$mandat = array("ref"=>"123456",
-						"id_societe"=>9969,
-						"id_affaire"=>$audit["id_affaire"],
-						"date"=>date("Y-m-d"),
-						"id_audit"=>$id_audit,
-						"indemnite_retard"=>300,
-						"contact"=>array(9509,9510)
-					   );
-
-
-
-
-		$ret1 = $a->getMandat();
-
-		$ret2 = $a->getMandat($audit["id_affaire"]);
-
-		$id_mandat = $m->insert(array("mandat"=>$mandat, "preview"=>false, "tu"=>true));
-
-		$ret3 = $a->getMandat($audit["id_affaire"]);
-
-		$this->RollBackTransaction("cleodis");
-
-		$this->assertEquals(false, $ret1, "Erreur de retour Mandat 1");
-		$this->assertEquals(false, $ret2, "Erreur de retour Mandat 2");
-		$this->assertEquals($id_mandat, $ret3, "Erreur de retour Mandat 3");
-
-	}
-
 
 
 
