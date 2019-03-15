@@ -1644,12 +1644,6 @@ class societe_cleodis extends societe {
 
         try {
 
-            if($post['site_associe']){
-              //Il faut générer le code client
-              $code_client = ATF::societe()->getCodeClient($post['site_associe'], ATF::souscription_cleodis()->getPrefixCodeClient($post['site_associe']));
-
-            }
-
             if($res){
                 $id_societe = $res["id_societe"];
 
@@ -1662,7 +1656,7 @@ class societe_cleodis extends societe {
                                           "ville"=>$data["ville"]
                                        ));
                 }
-                if(!$res["code_client"]) ATF::societe()->u(array("id_societe"=>$id_societe, "code_client" => $code_client));
+
 
 
             }else {
