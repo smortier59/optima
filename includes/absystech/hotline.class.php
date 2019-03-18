@@ -1034,6 +1034,27 @@ class hotline extends classes_optima {
 		$contact = ATF::contact()->select($infos['id_contact']);
 		$hotline = ATF::hotline()->select($id_hotline);
 
+// Envoi sur mattermost
+if ($template=="newRequest") {
+$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+$login = ATF::user()->select($id_owner,"login");
+$logins = array(
+"tpruvost"=>"thibaut",
+"jluillier"=>"jacques",
+"smortier"=>"sol-r",
+"gdamecourt"=>"gauthier"
+);
+if ($logins[$login]) $login = $logins[$login];
+$cmd = "curl -i -X POST -H 'Content-Type: application/json' -d '";
+$data = array();
+$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+$data["username"] = $societe["societe"];
+$data["channel"] = "Hotline";
+$cmd .= json_encode($data);
+$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+$result = `$cmd`;
+}
+
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
 		$mail_data["ip"] = $_SERVER["REMOTE_ADDR"];
