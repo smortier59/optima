@@ -1051,6 +1051,7 @@ $data["username"] = $societe["societe"];
 $data["channel"] = "Hotline";
 $cmd .= json_encode($data);
 $cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+log::logger($cmd,'mm');
 $result = `$cmd`;
 
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
