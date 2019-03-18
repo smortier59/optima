@@ -1035,7 +1035,6 @@ class hotline extends classes_optima {
 		$hotline = ATF::hotline()->select($id_hotline);
 
 // Envoi sur mattermost
-if ($template=="newRequest") {
 $id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
 $login = ATF::user()->select($id_owner,"login");
 $logins = array(
@@ -1053,7 +1052,6 @@ $data["channel"] = "Hotline";
 $cmd .= json_encode($data);
 $cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
 $result = `$cmd`;
-}
 
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
