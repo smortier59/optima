@@ -53,47 +53,41 @@ class conge extends classes_optima {
 					conge.periode='pm' OR conge.periode='am'
 					,0.5
 					,(@d:=DATEDIFF(conge.date_fin,conge.date_debut)+IF(WEEKDAY(conge.date_fin)<5,1,0))
-					"./* Soustraire les dimanche (pas les samedis car on compte les jours ouvrables et pas ouvrées) */"
+					"./* Soustraire les samedi/dimanche */"
 					-
 					IF(
 						@d<7
 						,IF(
 							WEEKDAY(conge.date_debut)>WEEKDAY(conge.date_fin)
-							,1"./* Congé de - d'une semaine mais se terminant un jour de la semaine qui suit */"
+							,2"./* Congé de - d'une semaine mais se terminant un jour de la semaine qui suit */"
 							,0
 						)
 						,IF(
 							@d<14
 							,IF(
 								WEEKDAY(conge.date_debut)>WEEKDAY(conge.date_fin)
-								,2"./* Congé de - de 2 semaines mais se terminant un jour de la semaine qui suit */"
-								,1
+								,4"./* Congé de - de 2 semaines mais se terminant un jour de la semaine qui suit */"
+								,2
 							)
 							,IF(
 								@d<21
 								,IF(
 									WEEKDAY(conge.date_debut)>WEEKDAY(conge.date_fin)
-									,3"./* Congé de - de 3 semaines mais se terminant un jour de la semaine qui suit */"
-									,2
+									,6"./* Congé de - de 3 semaines mais se terminant un jour de la semaine qui suit */"
+									,4
 								)
 								,IF(
 									@d<28
 									,IF(
 										WEEKDAY(conge.date_debut)>WEEKDAY(conge.date_fin)
-										,4"./* Congé de - de 4 semaines mais se terminant un jour de la semaine qui suit */"
-										,3
+										,8"./* Congé de - de 4 semaines mais se terminant un jour de la semaine qui suit */"
+										,6
 									)
 									,0"./* En supposant que personne prendra + */"
 								)
 							)
 						)
 					)
-				)
-				"./* Ajouter les vendredi qui comptent double (car on compte les jours ouvrables et pas ouvrées) */"
-				+IF(
-					WEEKDAY(conge.date_fin)=4 AND conge.periode!='am'
-					,1
-					,0
 				)
 			,1)","duree");
 		
