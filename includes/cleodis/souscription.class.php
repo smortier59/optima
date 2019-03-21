@@ -13,6 +13,8 @@ class souscription_cleodis extends souscription {
 
   public $id_partenaire = NULL;
 
+  public $id_refinanceur_cleodis = 4;
+
 
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
@@ -158,45 +160,12 @@ class souscription_cleodis extends souscription {
         }
 
          if($post["site_associe"] === "boulangerpro"){
-          //On crée le comité
-          $comite = array  (
-              "id_societe" => $societe["id_societe"],
-              "id_affaire" => $id_affaire,
-              "id_contact" => ATF::societe()->select($societe["id_societe"], "id_contact_signataire"),
-              "etat"=>"accepte",
-              "decisionComite"=> "Accepté automatiquement",
-              "activite" => $societe["activite"],
-              "reponse" => date("Y-m-d"),
-              "validite_accord" => date("Y-m-d"),
-              "id_refinanceur" => 4,
-              "date_creation" => $societe["date_creation"],
-              "date_compte" => $societe["lastaccountdate"],
-              "capitaux_propres" => $societe["capitaux_propres"],
-              "note" => $societe["cs_score"],
-              "dettes_financieres" => $societe["dettes_financieres"],
-              "limite" => $societe["cs_avis_credit"],
-              "ca" => $societe["ca"],
-              "capital_social" => $societe["capital_social"],
-              "resultat_exploitation" => $societe["resultat_exploitation"],
-              "date" => date("d-m-Y"),
-              "description" => "Comite CreditSafe",
-              "suivi_notifie"=>array(0=>"")
-          );
-          ATF::comite()->insert(array("comite"=>$comite));
-
-          ATF::affaire()->u(array("id_affaire"=>$id_affaire, "etat_comite"=>"accepte"));
-          // ainsi que la table affaire etat pour la timeline
-          ATF::affaire_etat()->insert(array(
-              "id_affaire"=>$id_affaire,
-              "etat"=> "comite_cleodis_valide",
-              "id_user"=>ATF::$usr->get('id_user')
-          ));
+          $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
+          $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
         }
 
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
-
-        // Mise à jour du panier avec l'ID affaire et le statut 'affaire'
       }
 
     } catch (errorATF $e) {
@@ -955,6 +924,44 @@ class souscription_cleodis extends souscription {
 
       $produitDesactive[$produit['id_produit']] = $produit;
 
+  }
+
+  /**
+   * Création d'un comité dans une affaire
+   * @param  Integer $id_affaire      ID de l'affaire
+   * @param  Array $societe         Infos de la société
+   * @param  Enum $etat            en_cours|accepte|refuse : Etat du comité insérer
+   * @param  Text $desc            Description associé au comité
+   * @param  Date $reponse         Date de la réponse
+   * @param  Date $validite_accord Date de validité de l'accord
+   * @return Integer                  ID du comité créé
+   */
+  public function createComite($id_affaire, $societe, $etat, $desc, $reponse=NULL, $validite_accord=NULL) {
+    //On crée le comité
+    $comite = array  (
+        "id_societe" => $societe["id_societe"],
+        "id_affaire" => $id_affaire,
+        "id_contact" => ATF::societe()->select($societe["id_societe"], "id_contact_signataire"),
+        "etat"=>$etat,
+        "decisionComite"=> $etat == 'accepte' ? "Accepté automatiquement" : '',
+        "activite" => $societe["activite"],
+        "reponse" => $reponse,
+        "validite_accord" => $validite_accord,
+        "id_refinanceur" => $this->id_refinanceur_cleodis,
+        "date_creation" => $societe["date_creation"],
+        "date_compte" => $societe["lastaccountdate"],
+        "capitaux_propres" => $societe["capitaux_propres"],
+        "note" => $societe["cs_score"],
+        "dettes_financieres" => $societe["dettes_financieres"],
+        "limite" => $societe["cs_avis_credit"],
+        "ca" => $societe["ca"],
+        "capital_social" => $societe["capital_social"],
+        "resultat_exploitation" => $societe["resultat_exploitation"],
+        "date" => date("d-m-Y"),
+        "description" => $desc,
+        "suivi_notifie"=>array(0=>"")
+    );
+    return ATF::comite()->insert(array("comite"=>$comite));    
   }
 
 }
