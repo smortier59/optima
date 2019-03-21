@@ -670,7 +670,6 @@ class souscription_cleodis extends souscription {
   * @param array $post["id_affaire"]
   */
   public function _storeSignedDocuments($post){
-
     switch ($post['type']) {
       case 'mandatSellAndSign': // Contrat signé
       case 'mandatSellAndSign.pdf': // Contrat signé
@@ -692,12 +691,34 @@ class souscription_cleodis extends souscription {
         $id = $post['id_affaire'];
         $type = 'retourNoticeAssurance';
       break;
+      case 'cga': // Notice d'assurance
+      case 'cga.pdf': // Notice d'assurance
+
+        $module = "affaire";
+        $id = $post['id_affaire'];
+        $type = 'cga';
+      break;
     }
 
     if (!$id) throw new Exception('Il manque l\'identifiant', 500);
     if (!$module) throw new Exception('Il manque le module', 500);
 
-    $file = ATF::getClass($module)->filepath($id, $type, null, 'cleodis');
+    if ($type == 'cga') {
+      // Ici on va traiter les documents annexe DGS/CGA, ces document doivent se retrouvé dans la GED de l'affaire et non sur l'affaire elle même
+      $data = $post['data'];
+      unset($post['data']);
+      log::logger($post, "qjanon");
+      $post['data'] = $data;
+
+      $id_pdf_affaire = ATF::pdf_affaire()->insert(array(
+        "id_affaire"=>$id, 
+        "provenance"=>"CGA retour : ".ATF::affaire()->select($id, "ref")
+      ));
+      $file = ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint", null, 'cleodis');
+      
+    } else {
+      $file = ATF::getClass($module)->filepath($id, $type, null, 'cleodis');
+    }
 
     try {
       util::file_put_contents($file,base64_decode($post['data']));
