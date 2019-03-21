@@ -705,11 +705,6 @@ class souscription_cleodis extends souscription {
 
     if ($type == 'cga') {
       // Ici on va traiter les documents annexe DGS/CGA, ces document doivent se retrouvé dans la GED de l'affaire et non sur l'affaire elle même
-      $data = $post['data'];
-      unset($post['data']);
-      log::logger($post, "qjanon");
-      $post['data'] = $data;
-
       $id_pdf_affaire = ATF::pdf_affaire()->insert(array(
         "id_affaire"=>$id, 
         "provenance"=>"CGA retour : ".ATF::affaire()->select($id, "ref")
