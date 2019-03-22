@@ -50,7 +50,7 @@ foreach ($bases as $k => $i) {
 }
 foreach ($db_to_send as $k => $i) {
 	echo "\nEXECUTION : ".$cmd['sender']." ".$k." ".floor(50/count($db_to_send))."\n";
-	system($cmd['sender']." ".$k." ".floor(500/count($db_to_send)));
+	system($cmd['sender']." ".$k." ".floor(50/count($db_to_send)));
 }
 
 /* FIN SECTION CRITIQUE */
