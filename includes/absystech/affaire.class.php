@@ -1431,6 +1431,7 @@ class affaire_telescope extends affaire_absystech {
 			"affaire.etat"=>array(),
 			"affaire.id_societe"=>array("visible"=>false),
 			"affaire.affaire"=>array(),
+			"affaire.nature"=>array(),
 			"societe.societe"=>array()
 		);
 

@@ -945,7 +945,7 @@ $logins = array(
 "gdamecourt"=>"gauthier"
 );
 if ($logins[$login]) $login = $logins[$login];
-$cmd = "curl -i -X POST -H 'Content-Type: application/json' -d '";
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
 $data = array();
 $data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
 $data["username"] = $societe["societe"];
@@ -953,7 +953,7 @@ $data["channel"] = "Hotline";
 $cmd .= json_encode($data);
 $cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
 log::logger($cmd,'mm');
-$result = `$cmd`;
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
@@ -1075,7 +1075,7 @@ $data["channel"] = "Hotline";
 $cmd .= json_encode($data);
 $cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
 log::logger($cmd,'mm');
-$result = `$cmd`;
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
@@ -2632,11 +2632,11 @@ $result = `$cmd`;
 
 	public function getTauxHorraire($id_affaire){
 		$marge_brute = 0;
-		ATF::facture()->q->reset()->where("id_affaire",$id_affaire);
+		ATF::facture()->q->reset()->where("facture.id_affaire",$id_affaire);
 		$res = ATF::facture()->select_all();
 		//Si j'ai des factures
 		if($res){
-			ATF::bon_de_commande()->q->reset()->where("id_affaire",$id_affaire);
+			ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire",$id_affaire);
 			$bdcs = ATF::bon_de_commande()->select_all();
 			$pbdc = 0;
 			foreach ($bdcs as $k => $v) {
@@ -2649,7 +2649,7 @@ $result = `$cmd`;
 			$marge_brute = round(($marge_brute - $pbdc),2);
 		}else{
 			//Si j'ai pas de factures
-			ATF::devis()->q->reset()->where("id_affaire", $id_affaire)
+			ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire)
 									->addOrder("revision","desc");
 			$devis = ATF::devis()->select_row();
 

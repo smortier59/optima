@@ -139,10 +139,10 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertFalse($r[1]["allowValid"],"Le allowValid devrait être a FALSE sur l'enregistrement 1.");
 		$this->assertFalse($r[1]["allowRefus"],"Le allowValid devrait être a FALSE sur l'enregistrement 1.");
 
-		$this->assertEquals('2.0',$r[0]["duree"],"Conges 1 non corrects");
+		$this->assertEquals('1.0',$r[0]["duree"],"Conges 1 non corrects");
 		$this->assertEquals('0.0',$r[0]["dureeCetteAnnee"],"Conges 2 non corrects");
 		//+2 car on tombera toujours sur 2 weekend, et on bosse le samedi (donc 2 samedis à ajouter)
-		$this->assertEquals('15.0',$r[1]["duree"],"Conges 3 non corrects");
+		$this->assertEquals('12.0',$r[1]["duree"],"Conges 3 non corrects");
 		$this->assertEquals('0.0',$r[1]["dureeCetteAnnee"],"Conges 4 non corrects");
 
 		$infos=array(
@@ -284,7 +284,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$msg->getNotices();
 
 		if(date('w') != "5"){
-			$this->assertEquals(7, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
+			$this->assertEquals(6, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
 		}else{
 			$this->assertEquals(8, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
 		}
