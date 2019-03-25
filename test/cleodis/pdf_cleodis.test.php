@@ -42,6 +42,9 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 	* @date 21-01-11r
 	*/
 	public function setUp(){
+		ATF::db()->select_db("optima_cleodis");
+	    ATF::$codename = "cleodis";
+
 		//Suppression des fichiers qui sont daté de plus de 7 jours
 		$this->dirSavedPDF .= "cleodis/";
 		$list = scandir($this->dirSavedPDF);
@@ -87,6 +90,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 		system("rm ".str_replace(".pdf","",$this->tmpFile).".* 2>&1");
 		ob_end_clean();
 	}
+
 
 	/*
 	* Méthode qui permet de créer les enregistrements utiles aux TU
@@ -640,6 +644,21 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 
+	private function setSocieteParticulier(){
+
+        ATF::societe()->u(array("id_societe"=> $this->id_societe,
+        				        "id_famille"=>9,
+        				        "societe" => "Nom particulier Prénom particulier",
+        				        "particulier_civilite"=>"M",
+        				        "particulier_nom" => "Nom particulier",
+        				        "particulier_prenom" => "Préom particulier",
+        				        "particulier_portable" => "06 01 02 03 04",
+        				        "particulier_fixe" => "03 01 02 03 04",
+        				        "particulier_fax" => "04 01 02 03 04",
+        				        "particulier_email" => "email@particulier.fr"
+    					));
+	}
+
 	private function beginTransaction($codename, $begin, $commit){
 		if($begin){
 			ATF::db()->select_db("optima_".$codename);
@@ -655,14 +674,371 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 	}
 
-	/*
+
+	// @author Quentin JANON <qjanon@absystech.fr>
+    // @author Yann GAUTHERON <ygautheron@absystech.fr>
+    public function test_factureSimple() {
+        $this->create("commande");
+        $this->create("demande_refi");
+        $this->create("factureNormale");
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+
+        $this->assertNotNull($this->obj->facture ,"Erreur : le facture n'est pas initialisé");
+        $this->assertNotNull($this->obj->lignes,"Erreur : le lignes n'est pas initialisé");
+        $this->assertNotNull($this->obj->client ,"Erreur : le client n'est pas initialisé");
+        $this->assertNotNull($this->obj->affaire ,"Erreur : le affaire n'est pas initialisé");
+        $this->assertNotNull($this->obj->devis,"Erreur : le devis n'est pas initialisé");
+        $this->assertNotNull($this->obj->user,"Erreur : le user n'est pas initialisé");
+        $this->assertNotNull($this->obj->agence ,"Erreur : le agence n'est pas initialisé");
+        $this->assertNotNull($this->obj->societe,"Erreur : le societe n'est pas initialisé");
+        $this->assertNotNull($this->obj->contrat  ,"Erreur : le contrat n'est pas initialisé");
+
+        $this->assertNotNull($this->obj->colsProduit  ,"Erreur : le colsProduit n'est pas initialisé");
+        $this->assertNotNull($this->obj->colsProduitAlignLeft ,"Erreur : le colsProduitAlignLeft n'est pas initialisé");
+        $this->assertNotNull($this->obj->styleDetailsProduit ,"Erreur : le styleDetailsProduit n'est pas initialisé");
+
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureSimple-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("1a814260bfd2b550fdceea287c728ed2",$md5,"Erreur de génération de la facture");
+
+
+        $this->facture['prix'] = -10;
+        ATF::facture()->u($this->facture);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureAvoir-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("0e0224582c3418d3c492d0e89773a500",$md5,"Erreur de génération de la facture AVOIR");
+
+        $this->affaire['nature'] = "vente";
+        ATF::affaire()->u($this->affaire);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureVente-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("f7edcec480addae6ab2dfc2981806a1c",$md5,"Erreur de génération de la facture VENTE");
+
+
+    	$this->facture["type_libre"] = "normale";
+        $this->facture['mode_paiement'] = "cheque";
+        $this->facture['prix'] = 100;
+        ATF::facture()->u($this->facture);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureVenteCheque-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("3ddaedb2f82777c825bbcca1e1454c73",$md5,"Erreur de génération de la facture AVOIR cheque");
+
+        $this->facture['mode_paiement'] = "virement";
+        $this->facture['prix'] = 100;
+        ATF::facture()->u($this->facture);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureVenteVirement-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("6175b026db08a9524b77e30d2fb3e1fe",$md5,"Erreur de génération de la facture AVOIR Virement");
+
+
+
+
+        ATF::refinanceur()->u(array("id_refinanceur"=>2, "code_refi"=>"REFACTURATION"));
+        $this->create("demande_refi");
+        $this->demande_refi["etat"] = "valide";
+        ATF::demande_refi()->u($this->demande_refi);
+        $this->affaire["commentaire_facture"] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        ATF::affaire()->u($this->affaire);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureAvecCommentaire-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("b9d849fb4421664ecf35e05045ea16ac",$md5,"Erreur de génération de la factureAvecCommentaire");
+    }
+
+
+    public function factureSimpleModePaiement(){
+    	$this->create("commande");
+        $this->create("demande_refi");
+        $this->create("factureNormale");
+
+    	$this->facture['mode_paiement'] = "pre-paiement";
+        $this->facture['prix'] = 100;
+        ATF::facture()->u($this->facture);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureVentePrePaiement-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("54f955f46c026fa218fdb4e68e7e418b",$md5,"Erreur de génération de la factureVentePrePaiement");
+
+
+        $this->facture["type_libre"] = "liberatoire";
+        $this->facture['mode_paiement'] = "cb";
+        $this->facture['prix'] = 100;
+        ATF::facture()->u($this->facture);
+
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureLiberatoireCB-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("ed58c9b4b00e07d05c847aecaf1a91b4",$md5,"Erreur de génération de la factureLiberatoireCB");
+    }
+
+	public function test_contratA4Particulier() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $this->setSocieteParticulier();
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4Particulier-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("bfb683fee118ca3e6a8a755767e2aaf5",$md5,"Erreur de génération de la commande");
+    }
+
+    public function test_contratA4Particulier2SI() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $id_affaire = ATF::commande()->select($this->commande['id_commande'], "id_affaire");
+        ATF::affaire()->u(array("id_affaire"=> $id_affaire, "type_affaire"=> "2SI"));
+
+        $id_societe = ATF::commande()->select($this->commande['id_commande'], "id_societe");
+        ATF::societe()->u(array("id_societe"=> $id_societe,
+                                "id_famille"=>9,
+                                "societe" => "Nom particulier Prénom particulier",
+                                "particulier_civilite"=>"M",
+                                "particulier_nom" => "Nom particulier",
+                                "particulier_prenom" => "Prénom particulier",
+                                "particulier_portable" => "06 01 02 03 04",
+                                "particulier_fixe" => "03 01 02 03 04",
+                                "particulier_fax" => "04 01 02 03 04",
+                                "particulier_email" => "email@particulier.fr"
+                        ));
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4Particulier2SI-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("a68048f2a7b7e8451da11ea12aa972a9",$md5,"Erreur de génération de la commande");
+    }
+
+
+     /*
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @date 25-02-2011
+    */
+    public function test_contratA4ParticulierPresta() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+        ATF::devis()->u(array("id_devis"=>$this->devis['id_devis'], "type_contrat"=>"presta"));
+
+        $societe = ATF::societe()->select($this->id_societe);
+
+        $id_societe = ATF::commande()->select($this->commande['id_commande'], "id_societe");
+        ATF::societe()->u(array("id_societe"=> $id_societe,
+                                "id_famille"=>9,
+                                "societe" => "Nom particulier Prénom particulier",
+                                "particulier_civilite"=>"M",
+                                "particulier_nom" => "Nom particulier",
+                                "particulier_prenom" => "Préom particulier",
+                                "particulier_portable" => "06 01 02 03 04",
+                                "particulier_fixe" => "03 01 02 03 04",
+                                "particulier_fax" => "04 01 02 03 04",
+                                "particulier_email" => "email@particulier.fr",
+                                'siren' => "SIRENTU"
+                        ));
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierPresta-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("5da5af60af354b2458705b8497ddf5da",$md5,"Erreur de génération de la commande");
+    }
+ /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4ParticulierAR() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        $affaire = array(
+            "id_affaire"=>$id_affaire
+            ,"id_fille"=>$this->affaire['id_affaire']
+        );
+        ATF::affaire()->u($affaire);
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "AR";
+        ATF::affaire()->u($this->affaire);
+
+        $this->societe['id_pays'] = "BE";
+        ATF::societe()->u($this->societe);
+
+        $this->setSocieteParticulier();
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierAR-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("5acb04598d93b2f3712622264ac186bf",$md5,"Erreur de génération de la commande");
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4ParticulierAvenant() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $this->setSocieteParticulier();
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "avenant";
+        $this->affaire['id_parent'] = $id_affaire;
+        ATF::affaire()->u($this->affaire);
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierAvenant-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("140d1e7f2dc9658522e0f79d88e344b2",$md5,"Erreur de génération de la commande");
+    }
+
+    public function test_contratA42SI() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $id_affaire = ATF::commande()->select($this->commande['id_commande'], "id_affaire");
+        ATF::affaire()->u(array("id_affaire"=> $id_affaire, "type_affaire"=> "2SI"));
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA42SI-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("2b93920e47d280d84f8c6d43ac610bde",$md5,"Erreur de génération de la commande");
+    }
+
+    /*
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     * @date 29/11/2016
     */
-	public function test_mandatSellAndSign(){
-		$this->create("commande");
+    public function test_mandatSellAndSign(){
+        $this->create("commande");
 
-		$this->obj->generic("mandatSellAndSign",$this->affaire['id_affaire'],$this->tmpFile,$s);
+
+
+        $this->obj->generic("mandatSellAndSign",$this->affaire['id_affaire'],$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-mandatSellAndSign-".$this->dateSave.".pdf");
         ob_start();
@@ -671,94 +1047,29 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b3fdb0208f7bfea7454fd1c92efbec43",$md5,"Erreur de génération du mandatSellAndSign");
+        $this->assertEquals("f5f6a0905659ef3b4fcbd8ccb9b4e2c7",$md5,"Erreur de génération du mandatSellAndSign");
     }
 
-	/*
-    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-    * @date 28-02-2011
-    */
-    public function test_factureRefiCleodisBE() {
-    	$this->beginTransaction("cleodisbe", true, false);
 
-    	$c = new pdf_cleodisbe();
 
-    	$this->insertSociete();
-		$this->societe = ATF::societe()->select($this->id_societe);
-		$this->insertContact();
-		$this->contact = ATF::contact()->select($this->id_contact);
-
-		$this->create("user");
-		$this->create("affaire");
-		$this->create("devis");
-		$this->create("loyer");
-
-        $this->create("commande");
-        $this->create("demande_refi");
-        $this->create("factureRefi");
-
-        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
-
-        $this->assertNotNull($c->demandeRefi ,"Erreur : le demandeRefi n'est pas initialisé");
-        $this->assertNotNull($c->refinanceur ,"Erreur : le refinanceur n'est pas initialisé");
-
-        $c->Close();
-        $c->Output($this->dirSavedPDF."-factureRefiCleodisBE-".$this->dateSave.".pdf");
+    public function test_noticeAssurance(){
+    	$this->obj->generic("noticeAssurance",null,$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-noticeAssurance-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-
-        $this->beginTransaction("cleodisbe", false, true);
-
-        $this->assertEquals("163327913936d2657d66b989dc1483ea",$md5,"Erreur de génération de la facture");
-
-
+        $this->assertEquals("f095533731958f1e4b3a1d30109116d4",$md5,"PDF de notice assurance a changé ?");
     }
 
 
 
-    // @author Quentin JANON <qjanon@absystech.fr>
-    // @author Yann GAUTHERON <ygautheron@absystech.fr>
-    public function test_factureSimpleCleodisBE() {
-    	$this->beginTransaction("cleodisbe", true, false);
-
-        $c = new pdf_cleodisbe();
-
-    	$this->insertSociete();
-		$this->societe = ATF::societe()->select($this->id_societe);
-		$this->insertContact();
-		$this->contact = ATF::contact()->select($this->id_contact);
-
-		$this->create("user");
-		$this->create("affaire");
-		$this->create("devis");
-		$this->create("loyer");
-        $this->create("commande");
-        $this->create("demande_refi");
-        $this->create("factureNormale");
-
-        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
 
 
-        $c->Close();
-        $c->Output($this->dirSavedPDF."-factureSimpleCleodisBE-".$this->dateSave.".pdf");
-        ob_start();
-        // Commande SHELL pour générer le fichier
-        system($this->GScmd);
-        $md5 = system($this->MD5cmd);
-        $md5 = substr($md5,0,32);
-        ob_get_clean();
-
-        $this->beginTransaction("cleodisbe", false, true);
-
-        $this->assertEquals("2cf6b979e767206dc28c01e9c004a14e",$md5,"Erreur de génération de la facture");
-    }
-
-
-	 /*
+     /*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
     */
@@ -785,7 +1096,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     }
 
     public function test_FooterA4_cleodisBE(){
-    	$this->beginTransaction("cleodisbe", true, false);
+        $this->beginTransaction("cleodisbe", true, false);
 
         $c = new pdf_cleodisbe();
         $c->societe = $this->societe;
@@ -801,10 +1112,13 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = substr($md5,0,32);
         ob_get_clean();
 
- 		$this->beginTransaction("cleodisbe", false, true);
+        $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("5bd2632cd9a05ff905744d76e6da0166",$md5,"Erreur de génération du Footer A4 Cléodis BE, auraient-ils été modifié ?");
+        $this->assertEquals("bb866c64f72d997e1e3b1155aef24b4f",$md5,"Erreur de génération du Footer A4 Cléodis BE, auraient-ils été modifié ?");
     }
+
+
+
 
     /*
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -844,8 +1158,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     * @date 17-11-2016
     */
     public function test_footerA3_cleodisBE(){
-    	$this->beginTransaction("cleodisbe", true, false);
-    	$format=array(841.89,1190.55);
+        $this->beginTransaction("cleodisbe", true, false);
+        $format=array(841.89,1190.55);
         $c = new pdf_cleodisbe();
         $c->fwPt=$format[0];
         $c->fhPt=$format[1];
@@ -871,12 +1185,13 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = substr($md5,0,32);
         ob_get_clean();
 
- 		$this->beginTransaction("cleodisbe", false, true);
+        $this->beginTransaction("cleodisbe", false, true);
 
         $this->assertEquals("55aaa62cd0678cc046bbf68294500692",$md5,"Erreur de génération du Footer A3 Cléodis BE, auraient-ils été modifié ?");
     }
 
-    /*
+
+   /*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
     */
@@ -897,7 +1212,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("afc1550abd47e20e357eae11a668c056",$md5,"Erreur de génération du Header A4 Cléodis, auraient-ils été modifié ?");
+        $this->assertEquals("5f07ac3f95ef60482880815cbe57b04e",$md5,"Erreur de génération du Header A4 Cléodis, auraient-ils été modifié ?");
+
 
 
        $this->beginTransaction("cleodisbe", true, false);
@@ -920,12 +1236,67 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = substr($md5,0,32);
         ob_get_clean();
 
- 		$this->beginTransaction("cleodisbe", false, true);
+        $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("060bf05fbe996c1bfcc2f3ff5be1cea7",$md5,"Erreur de génération du Header A4 Cléodis BE, auraient-ils été modifié ?");
+        $this->assertEquals("a64b4c70406c7a439421ddbe9317566f",$md5,"Erreur de génération du Header A4 Cléodis BE, auraient-ils été modifié ?");
 
 
     }
+
+    public function test_HeaderA42Si(){
+
+        $this->obj->relance = true;
+        $this->obj->logo = "cleodis/2SI_CLEODIS.jpg";
+
+        $this->obj->unsetFooter();
+        $this->obj->unsetHeader();
+        $this->assertFalse($this->obj->Header(),"Erreur, le Header est unsetté donc ca doit retourner FALSE");
+        $this->obj->setHeader();
+
+        $this->obj->addpage();
+
+
+
+        $this->obj->setFont('arial','',10);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."HeaderA42SI-".$this->dateSave.".pdf");
+        $this->obj->Output($this->tmpFile);
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("2596a9fa8c39d39b24a82a91125ad622",$md5,"Erreur de génération du Header A4 Cléodis 2SI?");
+    }
+
+
+     public function test_HeaderA4Devis() {
+
+        $this->obj->pdf_devis = true;
+
+        $this->obj->unsetFooter();
+        $this->obj->unsetHeader();
+        $this->assertFalse($this->obj->Header(),"Erreur, le Header est unsetté donc ca doit retourner FALSE");
+        $this->obj->setHeader();
+
+        $this->obj->addpage();
+        $this->obj->setFont('arial','',10);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."HeaderA4Devis-".$this->dateSave.".pdf");
+        $this->obj->Output($this->tmpFile);
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("d2ae636262e04761765cd4e8950408ee",$md5,"Erreur de génération du Header A4 Cléodis, auraient-ils été modifié ?");
+
+    }
+
+
+
 
     /*
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -955,7 +1326,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b2efed6c2e82c976b1a1d471badf718c",$md5,"Erreur de génération du Header A3 Cléodis, auraient-ils été modifié ?");
+        $this->assertEquals("00b3147ab9e30c2e0d449dc0417e4b57",$md5,"Erreur de génération du Header A3 Cléodis, auraient-ils été modifié ?");
 
     }
 
@@ -965,7 +1336,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
     */
-	 public function test_FooterPrevisu() {
+     public function test_FooterPrevisu() {
         $this->obj->setFooter();
         $this->obj->previsu = true;
         $this->obj->societe = true;
@@ -979,7 +1350,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("759c1fbde2dd77af028e29f97f951536",$md5,"Erreur de génération du Footer PREVISU Cléodis");
+        $this->assertEquals("2cd9e58683e39d3898fe95ef6cf1af41",$md5,"Erreur de génération du Footer PREVISU Cléodis");
 
     }
 
@@ -1007,7 +1378,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("acf5157031db928bf8bc8e6cd9b50c36",$md5,"Erreur de génération des articles Cléodis");
     }
 
-    /*
+
+   /*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
     */
@@ -1034,12 +1406,12 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     * @date 24-02-2011
     */
     public function test_devisSimple() {
-    	ATF::loyer()->q->reset()->where("id_affaire", $this->devis['id_affaire']);
-    	$loyers = ATF::loyer()->select_all();
+        ATF::loyer()->q->reset()->where("id_affaire", $this->devis['id_affaire']);
+        $loyers = ATF::loyer()->select_all();
 
-    	ATF::loyer()->d($loyers[4]["id_loyer"]);
-    	ATF::loyer()->d($loyers[3]["id_loyer"]);
-    	ATF::loyer()->u(array("id_loyer"=>$loyers[2]["id_loyer"] , "duree"=> 24));
+        ATF::loyer()->d($loyers[4]["id_loyer"]);
+        ATF::loyer()->d($loyers[3]["id_loyer"]);
+        ATF::loyer()->u(array("id_loyer"=>$loyers[2]["id_loyer"] , "duree"=> 24));
 
         $this->obj->generic("devis",$this->devis['id_devis'],$this->tmpFile,$s);
         $this->obj->Close();
@@ -1050,7 +1422,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3e76fa49aeef50c3810b6acd1c5153aa",$md5,"Erreur de génération du devis");
+        $this->assertEquals("d30114cf091ba9a60bbb7f1ad17590e3",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1058,7 +1430,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     * @date 29-04-2014
     */
    public function test_devis_optic2000_avenant() {
-    	$this->create("devis_optic2000_avenant");
+        $this->create("devis_optic2000_avenant");
         $this->obj->generic("devis",$this->devis_optic2000_avenant['id_devis'],$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-devis_optic2000_avenant-".$this->dateSave.".pdf");
@@ -1068,7 +1440,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a27cec86e9c00556de8d91f5c3d4dd37",$md5,"Erreur de génération du devis optic 2000 Avenant");
+        $this->assertEquals("2c8a7f4d2721288f7bc151bf6ee888db",$md5,"Erreur de génération du devis optic 2000 Avenant");
     }
 
      /*
@@ -1076,7 +1448,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     * @date 29-04-2014
     */
     public function test_devis_optic2000_AR() {
-    	$this->create("devis_optic2000_AR");
+        $this->create("devis_optic2000_AR");
         $this->obj->generic("devis",$this->devis_optic2000_AR['id_devis'],$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-devis_optic2000_AR-".$this->dateSave.".pdf");
@@ -1086,10 +1458,10 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("bc58c78a2868300f9d7237b71adb234a",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("ed084c06cf447969d15b2a04d5f7fe09",$md5,"Erreur de génération du devis optic 2000 AR");
     }
     public function test_devis_optic2000_AR_mensuel() {
-    	$this->create("devis_optic2000_AR");
+        $this->create("devis_optic2000_AR");
         //Loyer mensuel
         ATF::loyer()->u(array("id_loyer"=>$this->loyer[0]['id_loyer'], "frequence_loyer" => "mois"));
         $this->obj->generic("devis",$this->devis_optic2000_AR['id_devis'],$this->tmpFile,$s);
@@ -1101,10 +1473,10 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("2cabc82fa1b5b55b19ff12fe5f5fa41e",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("29d5deed86918082106a4cbb773d9ac6",$md5,"Erreur de génération du devis optic 2000 AR");
        }
- 	public function test_devis_optic2000_AR_trimestriel() {
- 		$this->create("devis_optic2000_AR");
+    public function test_devis_optic2000_AR_trimestriel() {
+        $this->create("devis_optic2000_AR");
         //Loyer trimestriel
         ATF::loyer()->u(array("id_loyer"=>$this->loyer[0]['id_loyer'], "frequence_loyer" => "trimestre"));
         $this->obj->generic("devis",$this->devis_optic2000_AR['id_devis'],$this->tmpFile,$s);
@@ -1116,11 +1488,11 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1323247546bcad99fa3c0648a13ee643",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("49d07ea9cd99c7aed7ee990d0811565d",$md5,"Erreur de génération du devis optic 2000 AR");
     }
 
     public function test_devis_optic2000_AR_semestriel() {
- 		$this->create("devis_optic2000_AR");
+        $this->create("devis_optic2000_AR");
         //Loyer trimestriel
         ATF::loyer()->u(array("id_loyer"=>$this->loyer[0]['id_loyer'], "frequence_loyer" => "semestre"));
         $this->obj->generic("devis",$this->devis_optic2000_AR['id_devis'],$this->tmpFile,$s);
@@ -1132,7 +1504,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0dee4d6633125422090d7a3ba1ed0caa",$md5,"Erreur de génération du devis optic 2000 AR");
+        $this->assertEquals("383cb10c47af2f90e3f86381043659b7",$md5,"Erreur de génération du devis optic 2000 AR");
     }
 
 
@@ -1154,7 +1526,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3f8b2a4662dbf945faf218da4b7b2301",$md5,"Erreur de génération du devis");
+        $this->assertEquals("c7f5cd0bcdba789c5455f20874439abd",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1171,7 +1543,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneDevis as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::devis_ligne()->u($i);
             }
         }
@@ -1188,10 +1560,290 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("fc2aa90d82bf54e822b5ade732227690",$md5,"Erreur de génération du devis");
+        $this->assertEquals("875984ae75ef37ad65293a0f592de7a2",$md5,"Erreur de génération du devis");
+    }
+
+
+
+
+
+
+
+
+  /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4ParticulierAffaireVente() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $this->setSocieteParticulier();
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "vente";
+        $this->affaire['id_parent'] = $id_affaire;
+        ATF::affaire()->u($this->affaire);
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierAffaireVente-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("b96cd2f67235d1c3acb5ec8a3a97ff29",$md5,"Erreur de génération de la commande");
+    }
+  /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4ParticulierAvecAnnexe() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $this->setSocieteParticulier();
+
+        for ($c=0;$c<10;$c++) {
+            foreach ($this->ligneCommande as $k=>$i) {
+                unset($i['id_commande_ligne']);
+                ATF::commande_ligne()->i($i);
+            }
+        }
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierAvecAnnexe-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("3a200331904d05de6619567850bbc285",$md5,"Erreur de génération de la commande");
+    }
+
+      /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4ParticulierLoyerUnique() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $this->devis['loyer_unique'] = "oui";
+        ATF::devis()->u($this->devis);
+
+        $this->setSocieteParticulier();
+
+        foreach ($this->loyer as $k=>$i) {
+            if (!$k) continue;
+            ATF::loyer()->delete($i['id_loyer']);
+        }
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierLoyerUnique-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("bd452d9eb78b6480ff7ccf8cc23e326f",$md5,"Erreur de génération de la commande");
+
+        foreach ($this->loyer as $k=>$i) {
+            if (!$k){
+                $i["loyer"]="0";
+                $i["assurance"]=NULL;
+                $i["frais_de_gestion"]=NULL;
+                ATF::loyer()->u($i);
+            }
+        }
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ParticulierLoyerUniqueZ-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("3cd643a439337463633ebc406f64ebc6",$md5,"Erreur de génération de la commande 2" );
+
+    }
+
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratParticulierPVAR() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        $affaire = array(
+            "id_affaire"=>$id_affaire
+            ,"id_fille"=>$this->affaire['id_affaire']
+        );
+        ATF::affaire()->u($affaire);
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "AR";
+        ATF::affaire()->u($this->affaire);
+
+        $this->setSocieteParticulier();
+
+        $this->obj->generic("contratPV",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratParticulierPVAR-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("a6adce88de3b5dfec197ecbc9d800240",$md5,"Erreur de génération de la commande");
     }
 
     /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratParticulierPVARANNEXES() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+        $this->setSocieteParticulier();
+
+        for ($c=0;$c<40;$c++) {
+            foreach ($this->ligneCommande as $k=>$i) {
+                unset($i['id_commande_ligne']);
+                ATF::commande_ligne()->i($i);
+            }
+        }
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        $affaire = array(
+            "id_affaire"=>$id_affaire
+            ,"id_fille"=>$this->affaire['id_affaire']
+        );
+        ATF::affaire()->u($affaire);
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "AR";
+        ATF::affaire()->u($this->affaire);
+
+        $this->obj->generic("contratPV",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratParticulierPVARANNEXES-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("df31bc3ddcc068df17da66452edcf32d",$md5,"Erreur de génération de la contratPVARANNEXES");
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratParticulierPVAvenant() {
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+        $this->setSocieteParticulier();
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "avenant";
+        $this->affaire['id_parent'] = $id_affaire;
+        ATF::affaire()->u($this->affaire);
+
+        $this->obj->generic("contratPV",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratParticulierPVAvenant-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("d5d76293e6bf81a95c4e8ecaa3bdfe38",$md5,"Erreur de génération de la commande");
+
+
+        $this->obj->generic("contratPVSignature",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratParticulierPVSignatureAvenant-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("7fd8e8fbfdea796ef61628eb0c2b19a5",$md5,"Erreur de génération de la commande");
+
+
+    }
+
+
+ /*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
     */
@@ -1205,17 +1857,17 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
         foreach ($loyer as $key => $value) {
-        	if($key == 0){
-        		ATF::loyer()->u(array("id_loyer"=>$value["id_loyer"] , "duree"=> 39, "frequence_loyer"=>"mois"));
-        	}else{
-        		ATF::loyer()->d($value["id_loyer"]);
-        	}
+            if($key == 0){
+                ATF::loyer()->u(array("id_loyer"=>$value["id_loyer"] , "duree"=> 39, "frequence_loyer"=>"mois"));
+            }else{
+                ATF::loyer()->d($value["id_loyer"]);
+            }
         }
 
         foreach ($this->ligneDevis as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::devis_ligne()->u($i);
             }
         }
@@ -1232,7 +1884,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("958342c1030400d6f13e466258261b07",$md5,"Erreur de génération du devis");
+        $this->assertEquals("7ba77fa0a1773457a2142fc939b52a2e",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1250,7 +1902,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1267,7 +1919,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1640e335e123e07ac107036fef2c6cfc",$md5,"Erreur de génération du devis");
+        $this->assertEquals("32d904a0c96221c4c6c7f216fd1abee2",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1285,7 +1937,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1305,7 +1957,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6488cb6ed5be554355dc9b09f73190ca",$md5,"Erreur de génération du devis");
+        $this->assertEquals("0d1d8d80a34908ac9102cf4c0fbc849a",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1323,7 +1975,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1343,7 +1995,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b04d6832a354f9fa7420eef4213a9264",$md5,"Erreur de génération du devis");
+        $this->assertEquals("dd9f35e7f050d8ac3cf75d572e104d1f",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1361,7 +2013,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1381,7 +2033,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("ebda8246bba49578e3e7ecb1783db63c",$md5,"Erreur de génération du devis");
+        $this->assertEquals("5372de84a24b71c583c7b8a3fbbb34f2",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1399,7 +2051,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1411,7 +2063,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             foreach ($this->ligneDevis as $k=>$i) {
                 if (!$c) {
                     $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 }
                 unset($i['id_devis_ligne']);
                 ATF::devis_ligne()->i($i);
@@ -1427,7 +2079,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("eb5c35abd7ea966abbd1254086080c3a",$md5,"Erreur de génération du devis");
+        $this->assertEquals("ef06e2db8f90262346893b7c099ad3d7",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1444,7 +2096,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneDevis as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::devis_ligne()->u($i);
             }
         }
@@ -1461,7 +2113,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b1b97bfdc3d330c54ed2480e91d416fe",$md5,"Erreur de génération du devis");
+        $this->assertEquals("0e78e9643f10b69efb5e4519e8f60a74",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1479,7 +2131,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1496,7 +2148,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3b4d4e3dca1adad3eb1f827c48070b3d",$md5,"Erreur de génération du devis");
+        $this->assertEquals("94187024b1bc8e8914d4055704c7d070",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1513,7 +2165,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneDevis as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::devis_ligne()->u($i);
             }
         }
@@ -1530,7 +2182,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("fa68b42e68a8ef3324d366cde74585b2",$md5,"Erreur de génération du devis");
+        $this->assertEquals("78fc0bd2a9a049786e6e6e0b42d69175",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1548,7 +2200,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             $i['visibilite_prix'] = "invisible";
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
             }
             ATF::devis_ligne()->u($i);
         }
@@ -1565,7 +2217,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a1a95de11676a8096f8cfbd9505e7d27",$md5,"Erreur de génération du devis");
+        $this->assertEquals("29a54f19db7921576189033360d246ae",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1585,7 +2237,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("173ddf0064b0a4e0551855febf548a9e",$md5,"Erreur de génération du devis");
+        $this->assertEquals("74894ce8effec3c6754505a434e1b22f",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1605,7 +2257,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("148fe7025d89d0d727e85f71084a6afc",$md5,"Erreur de génération du devis");
+        $this->assertEquals("1987fbb2d71605d2028b4dacd4761b03",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1625,10 +2277,10 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("70a6490cb865a748832299cbc4bb6438",$md5,"Erreur de génération du devis");
+        $this->assertEquals("d1171b1afde1b8d0b720d8ecb3087a73",$md5,"Erreur de génération du devis");
     }
 
-    /*
+/*
     * @author Quentin JANON <qjanon@absystech.fr>
     * @date 24-02-2011
     */
@@ -1640,7 +2292,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             foreach ($this->ligneDevis as $k=>$i) {
                 if (!$c) {
                     $i['id_affaire_provenance'] = $id_affaire;
-					$i["neuf"] = "non";
+                    $i["neuf"] = "non";
                 }
                 unset($i['id_devis_ligne']);
                 ATF::devis_ligne()->i($i);
@@ -1659,7 +2311,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("04376c7657b59d04e665b3b905a6ec6c",$md5,"Erreur de génération du devis");
+        $this->assertEquals("82d2a5507e4b2cef77cbb2b79c2a34a6",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1667,7 +2319,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     * @date 08-10-2015
     */
     public function test_detailsProduit(){
-    	$this->assertEquals("Commentaire : Commentaire sup - Deuxième, troisième ou quatrième bac supérieur à 530 feuilles - Meuble cabinet roulette",$this->obj->detailsProduit(10055,NULL,"Commentaire sup"),"Detail Produit Incorrect");
+        $this->assertEquals("Commentaire : Commentaire sup - Deuxième, troisième ou quatrième bac supérieur à 530 feuilles - Meuble cabinet roulette",$this->obj->detailsProduit(10055,NULL,"Commentaire sup"),"Detail Produit Incorrect");
     }
 
     /*
@@ -1687,7 +2339,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("ed6cfe4d084b6859d538e606b839eb65",$md5,"Erreur de génération du devis");
+        $this->assertEquals("0f57950969a98514b3c2b618499f8450",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1702,7 +2354,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             foreach ($this->ligneDevis as $k=>$i) {
                 if (!$c) {
                     $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 }
                 unset($i['id_devis_ligne']);
                 ATF::devis_ligne()->i($i);
@@ -1712,7 +2364,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->affaire['nature'] = "AR";
         ATF::affaire()->u($this->affaire);
 
-		$this->devis['prix'] = 1800.45;
+        $this->devis['prix'] = 1800.45;
         $this->devis['type_contrat'] = "vente";
         $this->devis['tva'] = 1;
         ATF::devis()->u($this->devis);
@@ -1726,7 +2378,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("539d1ec5a6a2e3e877b9980721f901f2",$md5,"Erreur de génération du devis");
+        $this->assertEquals("2826893027bd7f8c911ff8f73cc2be39",$md5,"Erreur de génération du devis");
     }
 
     /*
@@ -1800,7 +2452,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("eed88aee45bbd17547ccaa51d4492379",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("630f8e8715bdea3b815e3ed718ac19e2",$md5,"Erreur de génération de la commande");
     }
 
      /*
@@ -1826,7 +2478,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("5bca5709820bbc8f080b49410908dd25",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("4a5c49a81fd06b3ae74bed202e8946a7",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -1845,7 +2497,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
             foreach ($this->ligneCommande as $k=>$i) {
                 if (!$c) {
                     $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 }
                 unset($i['id_commande_ligne']);
                 ATF::commande_ligne()->i($i);
@@ -1862,7 +2514,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("518cd016d390193dc0ad01c7031e2110",$md5,"Erreur de génération de la contratA3AvecAnnexes");
+        $this->assertEquals("64cb978b2ecb668ccac99ed885e1a772",$md5,"Erreur de génération de la contratA3AvecAnnexes");
     }
 
     /*
@@ -1895,7 +2547,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("108682ed3c7d04b8cfeaf145d893d3b2",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("cd66c62fe60b63707476b1a83c729f00",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -1917,7 +2569,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -1934,7 +2586,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("2fde08d0cadfd2777f0d0ecdc2a7c9a2",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("2c54ffd61b9f00bc728715408927f17f",$md5,"Erreur de génération de la commande");
 
         $this->devis['loyer_unique'] = "oui";
         ATF::devis()->u($this->devis);
@@ -1948,7 +2600,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a1e56de771421cb262e5b8cc84d217d5",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("ddc58fff285ae1589ba1f539d697a498",$md5,"Erreur de génération de la commande");
 
     }
 
@@ -1975,7 +2627,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -1992,7 +2644,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("dad2561af4560a53d80be5ff7169b68a",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("5f2493628689eb7bf6489390e71ed3e2",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2018,7 +2670,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2035,7 +2687,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3a70a5b4d298780dc9506fd79a231568",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("7c4a45bf332110e0f6f4bf6f51072a97",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2057,8 +2709,9 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("651f1532114971ef2a6a289cf631e1a6",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("d50bea1daf7b937c28597094bfd7b1fb",$md5,"Erreur de génération de la commande");
     }
+
 
      /*
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -2083,7 +2736,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3edeaaf725aa932ab65ab0025f106685",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("3cb4b400489bf6c19eb3ac8f8b487de2",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2108,7 +2761,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d1a7196109dbf8c9a9fa45eeb7542d49",$md5,"Erreur de génération de la contratA4ClauseVente");
+        $this->assertEquals("41c15403b5d770452b68f302bdbda7e7",$md5,"Erreur de génération de la contratA4ClauseVente");
     }
 
 
@@ -2135,7 +2788,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2155,7 +2808,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e121e2e4e248475df184816d3c5c2c6b",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("47ae20aa5dc7bc9454c051afffaab5d4",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2176,7 +2829,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2194,7 +2847,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("fb26ad5b69e56de417dd1b80f0e269f3",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("4616392fa071f6bf19a081cbe2a887e8",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2215,7 +2868,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2233,7 +2886,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f02ec853360f798891c606ceed4cf72a",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("c2fbe8192059621d367dcb613b8869fa",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2262,7 +2915,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("154dc18a5a578f5201be7309b35e2ee1",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("175e0a4e444e0aed4608d0d108669bc9",$md5,"Erreur de génération de la commande");
 
         foreach ($this->loyer as $k=>$i) {
             if (!$k){
@@ -2281,7 +2934,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7c96017defc78512b851c9648bb79fd0",$md5,"Erreur de génération de la commande 2" );
+        $this->assertEquals("6901c361e69d23d380a36267e2d1e8af",$md5,"Erreur de génération de la commande 2" );
 
     }
 
@@ -2310,7 +2963,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e797ba692338ddd5fb5fd4a96e6b1e5f",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("750db78430519f454435be1955674e46",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2336,7 +2989,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2353,7 +3006,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6628bc24480670a04e7ce936418ff6b7",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("e69eae4afa49d86b363e02a4adeb403d",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2386,7 +3039,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2403,7 +3056,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("51c8b5d8f2433f380fea5865b55d6926",$md5,"Erreur de génération de la contratPVARANNEXES");
+        $this->assertEquals("783d90d81be09a35575b7e4aa3ce7e95",$md5,"Erreur de génération de la contratPVARANNEXES");
     }
 
     /*
@@ -2424,7 +3077,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         foreach ($this->ligneCommande as $k=>$i) {
             if ($k) {
                 $i['id_affaire_provenance'] = $id_affaire;
-				$i["neuf"] = "non";
+                $i["neuf"] = "non";
                 ATF::commande_ligne()->u($i);
             }
         }
@@ -2442,7 +3095,33 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("ee119f496518ac69cb141c32d3f569ce",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("316d60099a45083504310ed6f0bdc9d0",$md5,"Erreur de génération de la commande");
+
+
+        $this->obj->generic("contratPVSignature",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratPVSignatureAvenant-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("316d60099a45083504310ed6f0bdc9d0",$md5,"Erreur de génération de la commande");
+
+
+        $this->affaire['type_affaire'] = "2SI";
+        ATF::affaire()->u($this->affaire);
+        $this->obj->generic("contratPV",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratPV2SIAvenant-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("2f31edaf5721f8133db18f05f69325c1",$md5,"Erreur de génération de la commande");
     }
 
     /*
@@ -2463,12 +3142,12 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e49a04baeddcd91076e03a0ce5e087f5",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("0dae519d12aebbc4fe7e1b6e441164f4",$md5,"Erreur de génération de la commande");
     }
 
 
     public function test_lettreSGEF(){
-    	$this->obj->generic("lettreSGEF",320,$this->tmpFile,$s);
+        $this->obj->generic("lettreSGEF",320,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-lettreSGEF-".$this->dateSave.".pdf");
         ob_start();
@@ -2478,15 +3157,33 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = substr($md5,0,32);
         ob_get_clean();
 
-    	$this->assertEquals("1c1784ca5f4f33c1066bb515c1898d5f",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("4876f0b5e39680f990fb82b9a176654f",$md5,"Erreur de génération de la commande");
+
+        $id_affaire = ATF::commande()->select(320, "id_affaire");
+        ATF::loyer()->q->reset()->where("id_affaire", $id_affaire);
+        $loyer = ATF::loyer()->select_all();
+        ATF::loyer()->u(array("id_loyer"=> $loyer[0]["id_loyer"], "frequence_loyer" => "semestre"));
+
+        $this->obj->generic("lettreSGEF",320,$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-lettreSGEF2-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_3 = system($this->MD5cmd);
+        $md5_3 = substr($md5_3,0,32);
+        ob_get_clean();
+        $this->assertEquals("90bf9a97bbf4e62a536cedbf779d0854",$md5_3,"Erreur de génération de la lettreSGEF 2 CLEODIS");
+
+
     }
 
     public function test_lettreBelfius(){
-    	$this->beginTransaction("cleodisbe",true,false);
+        $this->beginTransaction("cleodisbe",true,false);
 
-    	ATF::_r("tu", "OK");
+        ATF::_r("tu", "OK");
 
-    	$this->obj->generic("lettreBelfius",2208,$this->tmpFile,$s);
+        $this->obj->generic("lettreBelfius",2208,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-lettreBelfius-".$this->dateSave.".pdf");
         ob_start();
@@ -2508,9 +3205,9 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md52 = substr($md52,0,32);
         ob_get_clean();
 
-    	$this->beginTransaction("cleodis",false,true);
-    	$this->assertEquals("fe5d054baa00beaf9baa105be20d85f9",$md5,"Erreur de génération de la lettre belfius");
-    	$this->assertEquals("fe5d054baa00beaf9baa105be20d85f9",$md52,"Erreur de génération de la lettre belfius sans siege");
+        $this->beginTransaction("cleodis",false,true);
+        $this->assertEquals("fe5d054baa00beaf9baa105be20d85f9",$md5,"Erreur de génération de la lettre belfius");
+        $this->assertEquals("fe5d054baa00beaf9baa105be20d85f9",$md52,"Erreur de génération de la lettre belfius sans siege");
     }
 
 
@@ -2551,9 +3248,9 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->create("commande");
         $this->create("bdc");
         ATF::bon_de_commande()->u(array("id_bon_de_commande"=> $this->bdc['id_bdc'] ,
-        								"commentaire" => "Zone de commentaire pour le bon de commande",
-        								'date_livraison_demande' => "2015-02-02",
-        								"date_installation_demande"=>"2015-02-10"));
+                                        "commentaire" => "Zone de commentaire pour le bon de commande",
+                                        'date_livraison_demande' => "2015-02-02",
+                                        "date_installation_demande"=>"2015-02-10"));
 
         $this->obj->generic("bon_de_commande",$this->bdc['id_bdc'],$this->tmpFile,$s);
         $this->obj->Close();
@@ -2564,7 +3261,23 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e459e2a63af21ecc61c1e64600c612be",$md5,"Erreur de génération de la BDC");
+        $this->assertEquals("17e592a7095bc337d96588cc1d43c6e5",$md5,"Erreur de génération de la BDC");
+
+
+
+        ATF::affaire()->u(array("id_affaire"=>$this->affaire["id_affaire"], "type_affaire"=> "2SI"));
+        $this->obj->generic("bon_de_commande",$this->bdc['id_bdc'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-BDC2SI-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5_2,0,32);
+        ob_get_clean();
+        $this->assertEquals("ff9b1fa2651f0f8bd4d3542c9a0f7347",$md5_2,"Erreur de génération de la BDC");
+
+
     }
 
     /*
@@ -2591,7 +3304,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("eee283621651c8a1e2bc004e61665caa",$md5,"Erreur de génération de la BDCAvecAnnexe");
+        $this->assertEquals("3c053696e7a54cf81dfd9317a51ba00c",$md5,"Erreur de génération de la BDCAvecAnnexe");
     }
 
     /*
@@ -2668,98 +3381,88 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->assertEquals("a9777503784c7101fb7165430cc933b5",$md5,"Erreur de génération de la demande_refiBNP");
     }
 
+
+
+
+
     // @author Quentin JANON <qjanon@absystech.fr>
     // @author Yann GAUTHERON <ygautheron@absystech.fr>
-    public function test_factureSimple() {
+    public function test_factureSimpleCleodisBE() {
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->insertSociete();
+        $this->societe = ATF::societe()->select($this->id_societe);
+        $this->insertContact();
+        $this->contact = ATF::contact()->select($this->id_contact);
+
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
         $this->create("commande");
         $this->create("demande_refi");
         $this->create("factureNormale");
 
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
 
-        $this->assertNotNull($this->obj->facture ,"Erreur : le facture n'est pas initialisé");
-        $this->assertNotNull($this->obj->lignes,"Erreur : le lignes n'est pas initialisé");
-        $this->assertNotNull($this->obj->client ,"Erreur : le client n'est pas initialisé");
-        $this->assertNotNull($this->obj->affaire ,"Erreur : le affaire n'est pas initialisé");
-        $this->assertNotNull($this->obj->devis,"Erreur : le devis n'est pas initialisé");
-//      $this->assertNotNull($this->obj->contact,"Erreur : le contact n'est pas initialisé");
-        $this->assertNotNull($this->obj->user,"Erreur : le user n'est pas initialisé");
-        $this->assertNotNull($this->obj->agence ,"Erreur : le agence n'est pas initialisé");
-        $this->assertNotNull($this->obj->societe,"Erreur : le societe n'est pas initialisé");
-        $this->assertNotNull($this->obj->contrat  ,"Erreur : le contrat n'est pas initialisé");
 
-        $this->assertNotNull($this->obj->colsProduit  ,"Erreur : le colsProduit n'est pas initialisé");
-        $this->assertNotNull($this->obj->colsProduitAlignLeft ,"Erreur : le colsProduitAlignLeft n'est pas initialisé");
-        $this->assertNotNull($this->obj->styleDetailsProduit ,"Erreur : le styleDetailsProduit n'est pas initialisé");
-
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureSimple-".$this->dateSave.".pdf");
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-factureSimpleCleodisBE-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3e8640e7ad202d05432ac66ebaac29ec",$md5,"Erreur de génération de la facture");
 
+        $this->beginTransaction("cleodisbe", false, true);
 
-        $this->facture['prix'] = 0;
-        ATF::facture()->u($this->facture);
+        $this->assertEquals("7a3ce1828d38edab47e235c7a89f9185",$md5,"Erreur de génération de la facture");
+    }
 
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureAvoir-".$this->dateSave.".pdf");
+    /*
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_factureRefiCleodisBE() {
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->insertSociete();
+        $this->societe = ATF::societe()->select($this->id_societe);
+        $this->insertContact();
+        $this->contact = ATF::contact()->select($this->id_contact);
+
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("demande_refi");
+        $this->create("factureRefi");
+
+        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+
+        $this->assertNotNull($c->demandeRefi ,"Erreur : le demandeRefi n'est pas initialisé");
+        $this->assertNotNull($c->refinanceur ,"Erreur : le refinanceur n'est pas initialisé");
+
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-factureRefiCleodisBE-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f109daffb2594aa24e8353db55a0beba",$md5,"Erreur de génération de la facture AVOIR");
 
-        $this->affaire['nature'] = "vente";
-        ATF::affaire()->u($this->affaire);
+        $this->beginTransaction("cleodisbe", false, true);
 
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureVente-".$this->dateSave.".pdf");
-        ob_start();
-        // Commande SHELL pour générer le fichier
-        system($this->GScmd);
-        $md5 = system($this->MD5cmd);
-        $md5 = substr($md5,0,32);
-        ob_get_clean();
-        $this->assertEquals("d070a21e9b96d7a460fd8cfec5570b54",$md5,"Erreur de génération de la facture VENTE");
+        $this->assertEquals("b46ae132000b0bbdb0a5a1dc953198dd",$md5,"Erreur de génération de la facture");
 
-        $this->facture['mode_paiement'] = "cheque";
-        $this->facture['prix'] = 100;
-        ATF::facture()->u($this->facture);
 
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureVenteCheque-".$this->dateSave.".pdf");
-        ob_start();
-        // Commande SHELL pour générer le fichier
-        system($this->GScmd);
-        $md5 = system($this->MD5cmd);
-        $md5 = substr($md5,0,32);
-        ob_get_clean();
-        $this->assertEquals("c822c327355f24a49dea7b3bc30a40b2",$md5,"Erreur de génération de la facture AVOIR cheque");
-
-        $this->facture['mode_paiement'] = "virement";
-        $this->facture['prix'] = 100;
-        ATF::facture()->u($this->facture);
-
-        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
-        $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-factureVenteVirement-".$this->dateSave.".pdf");
-        ob_start();
-        // Commande SHELL pour générer le fichier
-        system($this->GScmd);
-        $md5 = system($this->MD5cmd);
-        $md5 = substr($md5,0,32);
-        ob_get_clean();
-        $this->assertEquals("94a12a84f6501d9773c7643bd9333cd5",$md5,"Erreur de génération de la facture AVOIR Virement");
     }
 
     /*
@@ -2784,7 +3487,60 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("83163dee18cf24b5d503864553ce6046",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("1f3a497cc5918edfeae9c0ed48f5007f",$md5,"Erreur de génération de la facture");
+
+
+        $this->affaire["type_affaire"] = "2SI";
+        $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-factureRefi2SI-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("1f3a497cc5918edfeae9c0ed48f5007f",$md5,"Erreur de génération de la factureRefi2SI");
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("commande");
+        $this->create("demande_refi");
+        $this->create("factureRefi");
+
+        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-factureRefiCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5_2,0,32);
+        ob_get_clean();
+
+
+        ATF::affaire()->u(array("id_affaire"=>$this->affaire["id_affaire"], "type_affaire"=>"2SI"));
+        $c->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-factureRefi2SICleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_3 = system($this->MD5cmd);
+        $md5_3 = substr($md5_3,0,32);
+        ob_get_clean();
+
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("3decb22c8a8ab505127651569c983d79",$md5_2,"Erreur de génération de la factureRefi CLEODIS BE");
+        $this->assertEquals("3decb22c8a8ab505127651569c983d79",$md5_3,"Erreur de génération de la factureRefi2SICleodisBE CLEODIS BE");
     }
 
 
@@ -2833,7 +3589,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d9b04caf5b8d5ae8a01fad940d1b37b5",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("a62222ef2eb84012d431deeb15102edd",$md5,"Erreur de génération de la facture");
     }
 
     /*
@@ -2875,7 +3631,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("08b46a639ce2464459439713aad7962e",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("6dcf25cec8a752692c049e0a9f4b459a",$md5,"Erreur de génération de la facture");
     }
 
     /*
@@ -2917,7 +3673,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("28859d23446a038177ada337e7e83f6c",$md5,"Erreur de génération de la facture");
+        $this->assertEquals("a445ebaf8c87d9ee74a3f4c0296eb830",$md5,"Erreur de génération de la facture");
     }
 
     /*
@@ -2958,7 +3714,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("24550ba4067af42c8c56975cc3ebab0b",$md5,"Erreur de génération de la facture Refi d'Avoir");
+        $this->assertEquals("009fcac65ee8eb71aa95e828a8da69cd",$md5,"Erreur de génération de la facture Refi d'Avoir");
     }
 
 //  /*
@@ -3063,7 +3819,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a900bb22f615dffc26287bcaccbfcbf9",$md5,"Erreur de génération de la echeancierFacturationProlongation");
+        $this->assertEquals("f4726fef0d1790e28cd509a92ad190c3",$md5,"Erreur de génération de la echeancierFacturationProlongation");
 
     }
 
@@ -3093,7 +3849,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("963c1df3de68a81bea5474cf14ea58ab",$md5,"Erreur de génération de la echeancierFacturationContrat");
+        $this->assertEquals("a6ffa84a8779148668ff7000cddabde0",$md5,"Erreur de génération de la echeancierFacturationContrat");
 
     }
 
@@ -3142,7 +3898,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1c979e861d39bea3ab08a9153ad1dbb3",$md5,"Erreur de génération de la global_prolongation_et_facture");
+        $this->assertEquals("d2ae70c01908ebe578b4407a6c7fb7d2",$md5,"Erreur de génération de la global_prolongation_et_facture");
 
         //***********Societe**************/
         $this->obj->generic("global_prolongationSociete",$ids,$this->tmpFile,$s);
@@ -3239,7 +3995,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("36e9060f34035934585f9d381d9b8e0d",$md5,"Erreur de génération de la grille_client");
+        $this->assertEquals("7346d1ce8abb19fcf29990412286ca3a",$md5,"Erreur de génération de la grille_client");
 
         //***********Societe**************/
             //Envoye*/
@@ -3254,7 +4010,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 $md51 = system($this->MD5cmd);
                 $md51 = substr($md51,0,32);
                 ob_get_clean();
-                $this->assertEquals("36e9060f34035934585f9d381d9b8e0d",$md51,"Erreur de génération de la grille_contratclientSociete");
+                $this->assertEquals("7346d1ce8abb19fcf29990412286ca3a",$md51,"Erreur de génération de la grille_contratclientSociete");
 
                 //Prolongation*/
                 $this->obj->generic("grille_prolongationclientSociete",$this->lignesFacturation,$this->tmpFile,$s);
@@ -3266,7 +4022,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 $md52 = system($this->MD5cmd);
                 $md52 = substr($md52,0,32);
                 ob_get_clean();
-                $this->assertEquals("94a724792286d3cadb88e4792faa9da8",$md52,"Erreur de génération de la grille_prolongationclientSociete");
+                $this->assertEquals("d547996f3191cbb9f059a166118b3bd6",$md52,"Erreur de génération de la grille_prolongationclientSociete");
 
             //Non envoye*/
 
@@ -3280,7 +4036,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 $md53 = system($this->MD5cmd);
                 $md53 = substr($md53,0,32);
                 ob_get_clean();
-                $this->assertEquals("856e3771c99808dcd7d55db7ae18347e",$md53,"Erreur de génération de la grille_contratclient_non_envoyeSociete");
+                $this->assertEquals("58a5adc6143a23d02718c8af9ee25764",$md53,"Erreur de génération de la grille_contratclient_non_envoyeSociete");
 
                 //Prolongation*/
                 $this->obj->generic("grille_prolongationclient_non_envoyeSociete",$this->lignesFacturation,$this->tmpFile,$s);
@@ -3292,7 +4048,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
                 $md54 = system($this->MD5cmd);
                 $md54 = substr($md54,0,32);
                 ob_get_clean();
-                $this->assertEquals("0c963a904f7f6bcbfe0c84b6a2c4376c",$md54,"Erreur de génération de la grille_prolongationclient_non_envoyeSociete");
+                $this->assertEquals("044fdb0b99abb1a58bb7eea95aad0c20",$md54,"Erreur de génération de la grille_prolongationclient_non_envoyeSociete");
 
 
         //***********Code**************/
@@ -3409,13 +4165,13 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $this->create("factureLibre");
 
         ATF::societe()->u(array("id_societe"=>$this->id_societe,
-        						"facturation_adresse"=>ATF::societe()->select($this->id_societe, "adresse"),
-        						"facturation_adresse_2"=>ATF::societe()->select($this->id_societe, "adresse_2"),
-        						"facturation_adresse_3"=>ATF::societe()->select($this->id_societe, "adresse_3"),
-        						"facturation_cp"=>ATF::societe()->select($this->id_societe, "cp"),
-        						"facturation_ville"=>ATF::societe()->select($this->id_societe, "ville")
-        						)
-        				);
+                                "facturation_adresse"=>ATF::societe()->select($this->id_societe, "adresse"),
+                                "facturation_adresse_2"=>ATF::societe()->select($this->id_societe, "adresse_2"),
+                                "facturation_adresse_3"=>ATF::societe()->select($this->id_societe, "adresse_3"),
+                                "facturation_cp"=>ATF::societe()->select($this->id_societe, "cp"),
+                                "facturation_ville"=>ATF::societe()->select($this->id_societe, "ville")
+                                )
+                        );
 
 
         $this->obj->generic("facture",$this->facture['id_facture'],$this->tmpFile,$s);
@@ -3441,7 +4197,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("c515997528351cef048932603994f5e3",$md5,"Erreur de génération de la facture libre Retard");
+        $this->assertEquals("6ad5c54fe7b72ad96813be4693d606c0",$md5,"Erreur de génération de la facture libre Retard");
 
 
         //--------------------------------------------------------------------------------------------------
@@ -3461,7 +4217,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("c515997528351cef048932603994f5e3",$md5,"Erreur de génération de la facture libre Contentieux");
+        $this->assertEquals("6ad5c54fe7b72ad96813be4693d606c0",$md5,"Erreur de génération de la facture libre Contentieux");
 
         //--------------------------------------------------------------------------------------------------
         //          Facture Libre Normale
@@ -3482,7 +4238,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("73a576120ac11546167fa3da9bb17d5c",$md5,"Erreur de génération de la facture libre Normale Affaire");
+        $this->assertEquals("71ecad4a849c2ff533167475b41ecd92",$md5,"Erreur de génération de la facture libre Normale Affaire");
 
         //Affaire Vente
         $this->affaire['nature'] = "vente";
@@ -3497,7 +4253,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("4bb5206fee3c3a2f577b86a6c9683813",$md5,"Erreur de génération de la facture libre Normale Vente");
+        $this->assertEquals("47d2f8052e76fc1a1120bd0c8104a53c",$md5,"Erreur de génération de la facture libre Normale Vente");
 
     }
 
@@ -3519,7 +4275,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8cd177a5714e3b6e917c9e513d11a1fc",$md5,"Erreur de génération de la facture Midas");
+        $this->assertEquals("10071903f1a38ba2b2b308f6ab6fc648",$md5,"Erreur de génération de la facture Midas");
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -3539,7 +4295,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("cdd9230f00c4b05fe51aba7e55f411bb",$md5,"Erreur de génération de la relance 1");
+        $this->assertEquals("db043784581795141c476eacbfaa66db",$md5,"Erreur de génération de la relance 1");
 
         $this->create("factureNormale");
         ATF::relance_facture()->insert(array("id_facture" => $this->facture['id_facture'] , "id_relance"=> $relance1));
@@ -3552,7 +4308,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6b2e1f868a3a783d5df6b1ba64070505",$md5,"Erreur de génération de la relance 1 BIS");
+        $this->assertEquals("a05ebe7b7bd8632a2330dfecf8cc4514",$md5,"Erreur de génération de la relance 1 BIS");
 
 
     }
@@ -3574,7 +4330,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("5f70fbccfb01c17e6ab607c45032e79b",$md5,"Erreur de génération de la relance 2");
+        $this->assertEquals("cc9c61fa32da8ca0b97e5807343485b9",$md5,"Erreur de génération de la relance 2");
 
 
         $this->create("factureNormale");
@@ -3588,7 +4344,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f90aeac96d4ecb0f1a330c8267f0bbb0",$md5,"Erreur de génération de la relance 2 BIS");
+        $this->assertEquals("582ff5571a9f0640628566718fc711c6",$md5,"Erreur de génération de la relance 2 BIS");
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -3608,7 +4364,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8a26bacdce79d0421571022987acc490",$md5,"Erreur de génération de la relance 3");
+        $this->assertEquals("ae0539ffe1687fc6e2252680bfe4a77d",$md5,"Erreur de génération de la relance 3");
 
 
         $this->create("factureNormale");
@@ -3622,7 +4378,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("22ec25728236b878125d8a5f7b67df59",$md5,"Erreur de génération de la relance 3 BIS");
+        $this->assertEquals("ba0a636d91bdaa353e1d70a6a6f6b141",$md5,"Erreur de génération de la relance 3 BIS");
 
     }
 
@@ -3647,7 +4403,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("2e0cfb94fcf33477db1d31a1d6013428",$md5,"Erreur de génération de la envoiContratEtBilan");
+        $this->assertEquals("92ec4bb37278e7002aabb15aceb3c105",$md5,"Erreur de génération de la envoiContratEtBilan");
 
     }
 
@@ -3672,7 +4428,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("8b2215f2dc86db9943021ec8e55515cd",$md5,"Erreur de génération de la envoiContratEtBilanAR");
+        $this->assertEquals("c4217558a4d173441a4a201387d22bb3",$md5,"Erreur de génération de la envoiContratEtBilanAR");
 
     }
 
@@ -3695,7 +4451,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7cdd17b9393f85485b19609535b7c3a3",$md5,"Erreur de génération de la envoiContratSsBilan");
+        $this->assertEquals("84cdbef0b595dd55253afd661d3ebf05",$md5,"Erreur de génération de la envoiContratSsBilan");
 
     }
 
@@ -3720,9 +4476,36 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("44d9e5aaed2d97eb49d1f00aec196c41",$md5,"Erreur de génération de la envoiContratSsBilanAR");
+        $this->assertEquals("1f2b61d813c2bbd08f86d821ae1fe502",$md5,"Erreur de génération de la envoiContratSsBilanAR");
+
 
     }
+
+    public function test_documents() {
+    	$this->create("contact");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+        $this->create("bdc");
+
+        ATF::$usr->set('contact', $this->contact);
+
+
+        ATF::affaire()->u(array("id_affaire"=>$this->affaire['id_affaire'] , "id_partenaire"=> $this->contact["id_societe"]));
+
+        $res = $this->obj->_documents(array("id_affaire"=> $this->affaire['id_affaire'] , "document"=>"bon_de_commande"));
+        $this->assertNotNull($res , "retour 2 vide?");
+
+        $res = $this->obj->_documents(array("id_affaire"=> $this->affaire['id_affaire'] , "document"=>"contratA3"));
+        $this->assertEquals($res, false , "CONTRAT A3 	autorisé?");
+
+        $res = $this->obj->_documents(array("id_affaire"=> $this->affaire['id_affaire'] , "document"=>"contratA4"));
+        $this->assertNotNull($res , "retour vide?");
+
+
+
+    }
+
 
     /*
      * @author Quentin JANON <qjanon@absystech.fr>
@@ -3744,7 +4527,39 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3c12ff8870925a7748b927f2baa2f7e4",$md5,"Erreur de génération de la envoiAvenant");
+        $this->assertEquals("58e795e329ae5aa43def61e13d6c3c62",$md5,"Erreur de génération de la envoiAvenant");
+
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+
+        $s['date'] = "2013-01-01";
+        $s['bdc'] = "REFBDC!!";
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("envoiAvenant",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-cCRenvoiAvenantCleodisBE".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("58e795e329ae5aa43def61e13d6c3c62",$md5_2,"Erreur de génération de la envoiAvenant CLEODIS BE");
+
 
     }
 
@@ -3762,14 +4577,44 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->generic("contratTransfert",$this->commande['id_commande'],$this->tmpFile,$s);
         $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-CRcontratTransfert-".$this->dateSave.".pdf");
+        $this->obj->Output($this->dirSavedPDF."-contratTransfert-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b359cf2cac1bd2595bd98426dd564298",$md5,"Erreur de génération de la contratTransfert");
+        $this->assertEquals("617da5a5a43b18af2d2fee1de9f709a5",$md5,"Erreur de génération de la contratTransfert");
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+
+        $s['date'] = "2013-01-01";
+        $s['bdc'] = "REFBDC!!";
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("contratTransfert",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratTransfertCleodisBE".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("617da5a5a43b18af2d2fee1de9f709a5",$md5_2,"Erreur de génération de la contratTransfert CLEODIS BE");
 
     }
 
@@ -3785,14 +4630,43 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->generic("ctSigne",$this->commande['id_commande'],$this->tmpFile,$s);
         $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-CRctSigne -".$this->dateSave.".pdf");
+        $this->obj->Output($this->dirSavedPDF."-ctSigne -".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("19ca84ecd45bcde68d8e09f03513efa6",$md5,"Erreur de génération de la ctSigne ");
+        $this->assertEquals("1ebe352b831ce23ae5e805cbe312d1c8",$md5,"Erreur de génération de la ctSigne ");
+
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("ctSigne",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-ctSigneCleodisBE".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("1ebe352b831ce23ae5e805cbe312d1c8",$md5_2,"Erreur de génération de la ctSigne CLEODIS BE");
+
 
     }
 
@@ -3811,14 +4685,42 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->generic("CourrierRestitution",$this->commande['id_commande'],$this->tmpFile,$s);
         $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-CRCourrierRestitution -".$this->dateSave.".pdf");
+        $this->obj->Output($this->dirSavedPDF."-courrierRestitution -".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("c366682984d8e3dc116f0fb8badf305b",$md5,"Erreur de génération de la CourrierRestitution ");
+        $this->assertEquals("b0ed719ee4ac007a826c54d63623a766",$md5,"Erreur de génération de la CourrierRestitution ");
+
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("CourrierRestitution",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-CourrierRestitutionCleodisBE".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("b0ed719ee4ac007a826c54d63623a766",$md5_2,"Erreur de génération de la CourrierRestitution CLEODIS BE");
 
     }
 
@@ -3836,14 +4738,40 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->generic("envoiCourrierClassique",$this->commande['id_commande'],$this->tmpFile,$s);
         $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-CRenvoiCourrierClassique-".$this->dateSave.".pdf");
+        $this->obj->Output($this->dirSavedPDF."-envoiCourrierClassique-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("c3a80cea3b5aee46b5da5b5bbf42a1ea",$md5,"Erreur de génération de la envoiCourrierClassique");
+        $this->assertEquals("ce74fff0292131e31a7ac8696058360a",$md5,"Erreur de génération de la envoiCourrierClassique");
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("envoiCourrierClassique",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-envoiCourrierClassiqueCleodisBE".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("ce74fff0292131e31a7ac8696058360a",$md5_2,"Erreur de génération de la envoiCourrierClassique CLEODIS BE");
 
     }
 
@@ -3861,14 +4789,14 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->obj->generic("envoiCourrierClassique",$this->commande['id_commande'],$this->tmpFile,$s);
         $this->obj->Close();
-        $this->obj->Output($this->dirSavedPDF."-CRenvoiCourrierClassiqueAR-".$this->dateSave.".pdf");
+        $this->obj->Output($this->dirSavedPDF."-envoiCourrierClassiqueAR-".$this->dateSave.".pdf");
         ob_start();
         // Commande SHELL pour générer le fichier
         system($this->GScmd);
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3b70e84ca832a2bd3d2167ca70bd7525",$md5,"Erreur de génération de la envoiCourrierClassiqueAR");
+        $this->assertEquals("bf15b860a83e3aa37db83b27d0374042",$md5,"Erreur de génération de la envoiCourrierClassiqueAR");
 
     }
 
@@ -3886,7 +4814,48 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("cbd71b646315cfa9a306db379ad0d407",$md5,"Erreur de génération du Mandat Sepa");
+        $this->assertEquals("b8a93ba234cc5ad41affe9e706ebe57e",$md5,"Erreur de génération du Mandat Sepa");
+
+
+        ATF::affaire()->u(array("id_affaire"=>$this->affaire["id_affaire"], "RUM"=>null));
+
+        $this->obj->generic("mandatSepa",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-MandatSepa-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("539414f21102307b4a041366c7cfb7ee",$md5,"Erreur de génération du Mandat Sepa Sans RUL");
+
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("mandatSepa",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-mandatSepaCleodisBE".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("539414f21102307b4a041366c7cfb7ee",$md5_2,"Erreur de génération de la mandatSepa CLEODIS BE");
     }
 
 
@@ -3894,41 +4863,41 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_formation_devis(){
-    	$this->environnementFormation();
-		$infos = array(  "numero_dossier" => "123456789"
-						,"thematique" => "La thématique de la formation"
-						,"date" => "2015-03-13"
-						,"nb_heure" => "20"
-						,"acompte"=>200
-						,"prix" => "50"
-						,"id_owner"=>97
-						,"id_contact"=>81
-						,"remuneration_of"=>"20"
-						,"id_societe" => $this->id_societe
-						,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
-						,"type"=>"normal"
-				 );
-		$dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
-																				"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30",
-																				"formation_devis_ligne__dot__date_deb_am"=> "14h",
-																				"formation_devis_ligne__dot__date_fin_am"=> "18h"),
-																		  array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
-																		  		"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30")
-																		)
-																),
-						"formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
-																				 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
-																				array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
-																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
-																				)
-																		)
-					);
-		$this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
-		ATF::formation_devis()->u(array("id_formation_devis"=> $this->id_devis_formation, "numero_dossier"=>"FCL20150002"));
+        $this->environnementFormation();
+        $infos = array(  "numero_dossier" => "123456789"
+                        ,"thematique" => "La thématique de la formation"
+                        ,"date" => "2015-03-13"
+                        ,"nb_heure" => "20"
+                        ,"acompte"=>200
+                        ,"prix" => "50"
+                        ,"id_owner"=>97
+                        ,"id_contact"=>81
+                        ,"remuneration_of"=>"20"
+                        ,"id_societe" => $this->id_societe
+                        ,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
+                        ,"type"=>"normal"
+                 );
+        $dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30",
+                                                                                "formation_devis_ligne__dot__date_deb_am"=> "14h",
+                                                                                "formation_devis_ligne__dot__date_fin_am"=> "18h"),
+                                                                          array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30")
+                                                                        )
+                                                                ),
+                        "formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
+                                                                                 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
+                                                                                array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
+                                                                                      "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
+                                                                                )
+                                                                        )
+                    );
+        $this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
+        ATF::formation_devis()->u(array("id_formation_devis"=> $this->id_devis_formation, "numero_dossier"=>"FCL20150002"));
 
-		$this->obj->generic("formation_devis",$this->id_devis_formation,$this->tmpFile,$s);
+        $this->obj->generic("formation_devis",$this->id_devis_formation,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-formation_devis-".$this->dateSave.".pdf");
         ob_start();
@@ -3937,48 +4906,48 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("5f0c7720f0915146e53cc737d6c20776",$md5,"Erreur de génération du test_formation_devis");
+        $this->assertEquals("82f83eb1fa9ae71fcee3c90ad4623a08",$md5,"Erreur de génération du test_formation_devis");
 
 
     }
 
 
     public function test_formation_devis_light(){
-    	$this->environnementFormation();
-		$infos = array(  "numero_dossier" => "123456789"
-						,"thematique" => "La thématique de la formation; La thématique 2 de la formation"
-						,"date" => "2015-03-13"
-						,"nb_heure" => "20"
-						,"acompte"=>200
-						,"prix" => "50"
-						,"id_owner"=>97
-						,"id_contact"=>81
-						,"remuneration_of"=>"20"
-						,"id_societe" => $this->id_societe
-						,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
-						,"type"=>"light"
-				 );
-		$dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
-																				"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30",
-																				"formation_devis_ligne__dot__date_deb_am"=> "14h",
-																				"formation_devis_ligne__dot__date_fin_am"=> "18h"),
-																		  array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
-																		  		"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30")
-																		)
-																),
-						"formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
-																				 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
-																				array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
-																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
-																				)
-																		)
-					);
-		$this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
-		ATF::formation_devis()->u(array("id_formation_devis"=> $this->id_devis_formation, "opca"=>"246|253|254" , "numero_dossier"=>"FCL20150002"));
+        $this->environnementFormation();
+        $infos = array(  "numero_dossier" => "123456789"
+                        ,"thematique" => "La thématique de la formation; La thématique 2 de la formation"
+                        ,"date" => "2015-03-13"
+                        ,"nb_heure" => "20"
+                        ,"acompte"=>200
+                        ,"prix" => "50"
+                        ,"id_owner"=>97
+                        ,"id_contact"=>81
+                        ,"remuneration_of"=>"20"
+                        ,"id_societe" => $this->id_societe
+                        ,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
+                        ,"type"=>"light"
+                 );
+        $dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30",
+                                                                                "formation_devis_ligne__dot__date_deb_am"=> "14h",
+                                                                                "formation_devis_ligne__dot__date_fin_am"=> "18h"),
+                                                                          array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30")
+                                                                        )
+                                                                ),
+                        "formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
+                                                                                 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
+                                                                                array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
+                                                                                      "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
+                                                                                )
+                                                                        )
+                    );
+        $this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
+        ATF::formation_devis()->u(array("id_formation_devis"=> $this->id_devis_formation, "opca"=>"246|253|254" , "numero_dossier"=>"FCL20150002"));
 
-		$this->obj->generic("formation_devis",$this->id_devis_formation,$this->tmpFile,$s);
+        $this->obj->generic("formation_devis",$this->id_devis_formation,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-formation_devis_light-".$this->dateSave.".pdf");
         ob_start();
@@ -3987,7 +4956,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0659ce0559051d7f6bcb3bc6abc5da8d",$md5,"Erreur de génération du test_formation_devis_light");
+        $this->assertEquals("e123130aa5421545fd9f17e91e8b9cc5",$md5,"Erreur de génération du test_formation_devis_light");
 
 
     }
@@ -3995,42 +4964,42 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_formation_commande(){
-    	$this->environnementFormation();
-		$infos = array(  "numero_dossier" => "123456789"
-						,"thematique" => "La thématique de la formation"
-						,"date" => "2015-03-13"
-						,"nb_heure" => "20"
-						,"prix" => "50"
-						,"id_owner"=>97
-						,"id_contact"=>81
-						,"id_societe" => $this->id_societe
-						,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
-						,"type"=>"normal"
-						);
-		$dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
-																				"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30",
-																				"formation_devis_ligne__dot__date_deb_am"=> "14h",
-																				"formation_devis_ligne__dot__date_fin_am"=> "18h"),
-																		  array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
-																		  		"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30")
-																		)
-																),
-						"formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
-																				 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
-																				array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
-																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
-																				)
-																		)
-					);
-		$this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
-		$this->id_commande_formation = ATF::formation_commande()->i(array(	"id_formation_devis" => $this->id_devis_formation, "ref"=>"FCL20150001", "date" => "2015-03-13","objectif"=>"Les objectifs sont les suivants :<br><ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li><li>Etiam dignissim massa vel arcu fermentum, ac ornare libero tempor.</li><li>Aenean id tortor nec erat viverra iaculis.</li><li>Pellentesque vehicula nulla eu tortor vehicula, et placerat magna posuere.</li><li>Phasellus tincidunt urna venenatis, egestas massa at, varius quam.</li><li>Suspendisse mollis ex eu mi fermentum, ac posuere enim cursus.</li></ul>"
-				  ));
+        $this->environnementFormation();
+        $infos = array(  "numero_dossier" => "123456789"
+                        ,"thematique" => "La thématique de la formation"
+                        ,"date" => "2015-03-13"
+                        ,"nb_heure" => "20"
+                        ,"prix" => "50"
+                        ,"id_owner"=>97
+                        ,"id_contact"=>81
+                        ,"id_societe" => $this->id_societe
+                        ,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
+                        ,"type"=>"normal"
+                        );
+        $dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30",
+                                                                                "formation_devis_ligne__dot__date_deb_am"=> "14h",
+                                                                                "formation_devis_ligne__dot__date_fin_am"=> "18h"),
+                                                                          array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30")
+                                                                        )
+                                                                ),
+                        "formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
+                                                                                 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
+                                                                                array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
+                                                                                      "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
+                                                                                )
+                                                                        )
+                    );
+        $this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
+        $this->id_commande_formation = ATF::formation_commande()->i(array(  "id_formation_devis" => $this->id_devis_formation, "ref"=>"FCL20150001", "date" => "2015-03-13","objectif"=>"Les objectifs sont les suivants :<br><ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li><li>Etiam dignissim massa vel arcu fermentum, ac ornare libero tempor.</li><li>Aenean id tortor nec erat viverra iaculis.</li><li>Pellentesque vehicula nulla eu tortor vehicula, et placerat magna posuere.</li><li>Phasellus tincidunt urna venenatis, egestas massa at, varius quam.</li><li>Suspendisse mollis ex eu mi fermentum, ac posuere enim cursus.</li></ul>"
+                  ));
 
 
 
-		$this->obj->generic("formation_commande",$this->id_commande_formation,$this->tmpFile,$s);
+        $this->obj->generic("formation_commande",$this->id_commande_formation,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-formation_commande-".$this->dateSave.".pdf");
         ob_start();
@@ -4039,7 +5008,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d2b98bad2c2fd943604a6dd73668fd69",$md5,"Erreur de génération du test_formation_commande");
+        $this->assertEquals("8f9ba46080d9cacfa162864f4a7c17b2",$md5,"Erreur de génération du test_formation_commande");
 
 
         /*
@@ -4057,47 +5026,47 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("9f14d3e8fa5d51e932f8aee2c9103c8a",$md5,"Erreur de génération du test_formation_commande avec acompte");
+        $this->assertEquals("451489ad0cdec9e36502c3da2e31f805",$md5,"Erreur de génération du test_formation_commande avec acompte");
 
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_formation_commande_fournisseur(){
-    	$this->environnementFormation();
-		$infos = array(  "numero_dossier" => "123456789"
-						,"thematique" => "La thématique de la formation"
-						,"date" => "2015-03-13"
-						,"nb_heure" => "20"
-						,"prix" => "50"
-						,"id_owner"=>97
-						,"id_contact"=>81
-						,"id_societe" => $this->id_societe
-						,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
-						,"type"=>"normal"
-				 );
-		$dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
-																				"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30",
-																				"formation_devis_ligne__dot__date_deb_am"=> "14h",
-																				"formation_devis_ligne__dot__date_fin_am"=> "18h"),
-																		  array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
-																		  		"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30")
-																		)
-																),
-						"formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
-																				 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
-																				array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
-																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
-																				)
-																		)
-					);
-		$this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
-		$this->id_commande_formation = ATF::formation_commande()->i(array(	"id_formation_devis" => $this->id_devis_formation, "ref"=>"FCL20150001", "date" => "2015-03-13" ));
+        $this->environnementFormation();
+        $infos = array(  "numero_dossier" => "123456789"
+                        ,"thematique" => "La thématique de la formation"
+                        ,"date" => "2015-03-13"
+                        ,"nb_heure" => "20"
+                        ,"prix" => "50"
+                        ,"id_owner"=>97
+                        ,"id_contact"=>81
+                        ,"id_societe" => $this->id_societe
+                        ,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
+                        ,"type"=>"normal"
+                 );
+        $dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30",
+                                                                                "formation_devis_ligne__dot__date_deb_am"=> "14h",
+                                                                                "formation_devis_ligne__dot__date_fin_am"=> "18h"),
+                                                                          array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30")
+                                                                        )
+                                                                ),
+                        "formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
+                                                                                 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
+                                                                                array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
+                                                                                      "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
+                                                                                )
+                                                                        )
+                    );
+        $this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
+        $this->id_commande_formation = ATF::formation_commande()->i(array(  "id_formation_devis" => $this->id_devis_formation, "ref"=>"FCL20150001", "date" => "2015-03-13" ));
 
-		$this->formation_commande_fournisseur = ATF::formation_commande_fournisseur()->i(array("id_formation_devis" => $this->id_devis_formation , "id_formation_commande" => $this->id_commande_formation ,"objectif" => "L'objectif de la formation", "id_user"=>97 ));
+        $this->formation_commande_fournisseur = ATF::formation_commande_fournisseur()->i(array("id_formation_devis" => $this->id_devis_formation , "id_formation_commande" => $this->id_commande_formation ,"objectif" => "L'objectif de la formation", "id_user"=>97 ));
 
-		$this->obj->generic("formation_commande_fournisseur",$this->formation_commande_fournisseur,$this->tmpFile,$s);
+        $this->obj->generic("formation_commande_fournisseur",$this->formation_commande_fournisseur,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-formation_commande_fournisseur-".$this->dateSave.".pdf");
         ob_start();
@@ -4106,7 +5075,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d189604168f9479e8afe9f10713a0f24",$md5,"Erreur de génération du test_formation_commande_fournisseur");
+        $this->assertEquals("38b6f992c1091d7ae6273ba64944afdf",$md5,"Erreur de génération du test_formation_commande_fournisseur");
     }
 
 
@@ -4157,7 +5126,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("9098ed569ac05da6c155e621beaf7cc5",$md5,"Erreur de génération du test_formation_attestation_presence");
+        $this->assertEquals("4c9a857f2a01f1fe1e290df05b1c364b",$md5,"Erreur de génération du test_formation_attestation_presence");
     }
 
 
@@ -4219,17 +5188,17 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("f6049ebaaa2fd6932f53eccf6e59d319",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur");
+        $this->assertEquals("7bc504bc578ca05ae365d9fffa1c60cd",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur");
 
 
 
         ATF::formation_priseEnCharge()->insert(array("id_formation_devis"=>$this->id_devis_formation,
-												"opca"=>6491,
-												"etat"=>"attente_element",
-												"montant_demande"=>3500,
-												"date_envoi"=>date("Y-m-d"),
-												"subro_client"=>"oui"
-											));
+                                                "opca"=>6491,
+                                                "etat"=>"attente_element",
+                                                "montant_demande"=>3500,
+                                                "date_envoi"=>date("Y-m-d"),
+                                                "subro_client"=>"oui"
+                                            ));
 
         $this->obj->generic("formation_bon_de_commande_fournisseur",$id_formation_bon_de_commande_fournisseur,$this->tmpFile,$s);
         $this->obj->Close();
@@ -4240,55 +5209,55 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("207d2b0c70671f293b09d0ec4e79298d",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur avec acompte");
+        $this->assertEquals("9ed6ede0ea23616a75ee9827ee938c52",$md5,"Erreur de génération du formation_bon_de_commande_fournisseur avec acompte");
 
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_formation_facture(){
-    	$this->environnementFormation();
-		$infos = array(  "numero_dossier" => "123456789"
-						,"thematique" => "La thématique de la formation"
-						,"date" => "2015-03-13"
-						,"nb_heure" => "20"
-						,"prix" => "50"
-						,"id_owner"=>97
-						,"id_contact"=>81
-						,"id_societe" => $this->id_societe
-						,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
-						,"type"=>"normal"
-				 );
-		$dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
-																				"formation_devis_ligne__dot__date_deb_am"=> "14h",
-																				"formation_devis_ligne__dot__date_fin_am"=> "18h"),
-																		  array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
-																		  		"formation_devis_ligne__dot__date_deb_matin"=> "8h",
-																				"formation_devis_ligne__dot__date_fin_matin"=> "12h30")
-																		)
-																),
-						"formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
-																				 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
-																				array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
-																					  "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
-																				)
-																		)
-					);
-		$this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
+        $this->environnementFormation();
+        $infos = array(  "numero_dossier" => "123456789"
+                        ,"thematique" => "La thématique de la formation"
+                        ,"date" => "2015-03-13"
+                        ,"nb_heure" => "20"
+                        ,"prix" => "50"
+                        ,"id_owner"=>97
+                        ,"id_contact"=>81
+                        ,"id_societe" => $this->id_societe
+                        ,"contact" => array($this->id_contact1, $this->id_contact2, $this->id_contact3)
+                        ,"type"=>"normal"
+                 );
+        $dates = array("formation_devis_ligne" => json_encode(array(array("formation_devis_ligne__dot__date"=>"2015-01-31T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_am"=> "14h",
+                                                                                "formation_devis_ligne__dot__date_fin_am"=> "18h"),
+                                                                          array("formation_devis_ligne__dot__date"=>"2015-01-29T00:00:00",
+                                                                                "formation_devis_ligne__dot__date_deb_matin"=> "8h",
+                                                                                "formation_devis_ligne__dot__date_fin_matin"=> "12h30")
+                                                                        )
+                                                                ),
+                        "formation_devis_fournisseur" => json_encode(array(array("formation_devis_fournisseur__dot__id_societe_fk"=>"1606",
+                                                                                 "formation_devis_fournisseur__dot__type"=>"lieu_formation"),
+                                                                                array("formation_devis_fournisseur__dot__id_societe_fk"=>"246",
+                                                                                      "formation_devis_fournisseur__dot__type"=>"apporteur_affaire")
+                                                                                )
+                                                                        )
+                    );
+        $this->id_devis_formation = ATF::formation_devis()->insert(array("formation_devis" => $infos , "values_formation_devis" => $dates));
 
-		$this->id_commande_formation = ATF::formation_commande()->insert(array(	"id_formation_devis" => $this->id_devis_formation, "ref"=>"FCL20150001", "date" => "2015-03-13" ));
+        $this->id_commande_formation = ATF::formation_commande()->insert(array( "id_formation_devis" => $this->id_devis_formation, "ref"=>"FCL20150001", "date" => "2015-03-13" ));
 
-		$infos = array("id_formation_devis" => $this->id_devis_formation ,
-					  "id_societe" => $this->id_societe ,
-					  "type"=>"normale",
-					  "ref" => "La ref de facture",
-					  "prix"=> "2500",
-					  "num_dossier"=> "Le num de dossier",
-					  "date"=>"2015-03-13");
+        $infos = array("id_formation_devis" => $this->id_devis_formation ,
+                      "id_societe" => $this->id_societe ,
+                      "type"=>"normale",
+                      "ref" => "La ref de facture",
+                      "prix"=> "2500",
+                      "num_dossier"=> "Le num de dossier",
+                      "date"=>"2015-03-13");
 
 
-		$this->id_formation_facture = ATF::formation_facture()->insert(array("formation_facture" => $infos));
+        $this->id_formation_facture = ATF::formation_facture()->insert(array("formation_facture" => $infos));
 
-		$this->obj->generic("formation_facture",$this->id_formation_facture,$this->tmpFile,$s);
+        $this->obj->generic("formation_facture",$this->id_formation_facture,$this->tmpFile,$s);
         $this->obj->Close();
         $this->obj->Output($this->dirSavedPDF."-formation_facture-".$this->dateSave.".pdf");
         ob_start();
@@ -4297,7 +5266,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("90fd215482f9f62e5d4022b80cacfd45",$md5,"Erreur de génération du formation_facture");
+        $this->assertEquals("4557d92826aa943d71a828822f4b5a2b",$md5,"Erreur de génération du formation_facture");
     }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -4352,8 +5321,585 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6f11cf7b0e05af851bdb9213f132363a",$md5,"Erreur de génération de formation_facture_acompte");
+        $this->assertEquals("9fa688930cef8bb09c8188f7935ce532",$md5,"Erreur de génération de formation_facture_acompte");
     }
+
+    public function test_comite() {
+
+    	$this->comite = array(
+    			'date' => '2019-03-25',
+		    	'id_refinanceur' => 4,
+		    	'id_contact' => $this->contact["id_contact"],
+		    	'id_affaire' => $this->affaire["id_affaire"],
+		    	'id_societe' => $this->societe["id_societe"],
+		    	'activite' => "Commerce de gros (commerce interentreprises) de bois et de matériaux de construction",
+		    	'prix' => 0.00,
+		    	'valeur_residuelle' => 0.00,
+		    	'pourcentage_materiel' => 0.00,
+		    	'pourcentage_logiciel' => 0.00,
+		    	'description' => 'Comité CLEODIS',
+		    	'marque_materiel' => NULL,
+		    	'reponse' => NULL,
+		    	'etat' => 'en_attente',
+		    	'taux' => NULL ,
+		    	'coefficient' => NULL ,
+		    	'encours' => NULL ,
+		    	'frais_de_gestion' => NULL ,
+		    	'validite_accord' => NULL ,
+		    	'observations' => NULL ,
+		    	'loyer_actualise' => NULL ,
+		    	'date_cession' => NULL ,
+		    	'duree_refinancement' => NULL ,
+		    	'note' => NULL ,
+		    	'limite' => NULL ,
+		    	'ca' => NULL ,
+		    	'resultat_exploitation' => NULL ,
+		    	'capital_social' => NULL ,
+		    	'capitaux_propres' => NULL ,
+		    	'dettes_financieres' => NULL ,
+		    	'maison_mere1' => NULL ,
+		    	'maison_mere2' => NULL ,
+		    	'maison_mere3' => NULL ,
+		    	'maison_mere4' => NULL ,
+		    	'date_compte' => '30/04/2018' ,
+		    	'commentaire' => NULL ,
+		    	'date_creation' => date('Y-m-d'),
+		    	'decisionComite' => NULL ,
+		    	'notifie_utilisateur' => NULL ,
+		    	'destinataire' => 'jerome.loison@cleodis.com' );
+
+    	$this->comite["id_comite"] = ATF::comite()->i( $this->comite );
+
+    	$this->obj->generic("comite",$this->comite["id_comite"],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-comiteAllUncheck-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("359c761f446a805b525eb6b6baf39024",$md5,"Erreur de génération de comite ALL UNCHECK");
+
+
+        $this->comite["date_creation"] = "2002-01-01";
+        $this->comite["capital_social"] = 12000;
+        $this->comite["dettes_financieres"] = 5000;
+        $this->comite["capitaux_propres"] = 15000;
+        $this->comite["ca"] = 200000;
+        $this->comite["note"] = 60;
+        ATF::comite()->u($this->comite);
+        $this->obj->generic("comite",$this->comite["id_comite"],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-comiteAllCheck-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->assertEquals("d150a979cdb1d0445e6a176fd5266051",$md5,"Erreur de génération de comite AL CHECK");
+
+
+
+
+
+
+    }
+
+
+
+    public function test_contratA4CleodisBE() {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4CleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+
+        ATF::commande()->u(array("id_commande"=> $this->commande['id_commande'], "clause_logicielle"=> "oui"));
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4ClauseLogicielleCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_3 = system($this->MD5cmd);
+        $md5_3 = substr($md5,0,32);
+        ob_get_clean();
+
+
+
+        $c->generic("contratA4NL",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4NLCleodisBEAvecFiligramme-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+
+
+
+
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("05d135f89cd5f9ebfc56f285e1be2bd9",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("05d135f89cd5f9ebfc56f285e1be2bd9",$md5_3,"Erreur de génération de la commande 2");
+        $this->assertEquals("05d135f89cd5f9ebfc56f285e1be2bd9",$md5_2,"Erreur de génération de la commande 3");
+    }
+
+
+    /*
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    * @date 25-02-2011
+    */
+    public function test_contratA4PrestaCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::devis()->u(array("id_devis"=>$this->devis['id_devis'], "type_contrat"=>"presta"));
+
+        $societe = ATF::societe()->select($this->id_societe);
+        $societe['siren'] = "SIRENTU";
+        ATF::societe()->u($societe);
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4PrestaCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+        $this->beginTransaction("cleodisbe", false, true);
+
+        $this->assertEquals("e3f339a0d8270c7863bd91bc6d98c594",$md5,"Erreur de génération de la commande");
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 25-02-2011
+    */
+    public function test_contratA4ClauseVenteCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        // Ajout de la clause logicielle
+        $this->commande['clause_logicielle'] = "oui";
+        ATF::commande()->u($this->commande);
+
+        $this->obj->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $this->obj->Close();
+        $this->obj->Output($this->dirSavedPDF."-contratA4ClauseVenteCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("e2353f57b997cb508a650318f59dfac3",$md5,"Erreur de génération de la contratA4ClauseVente");
+    }
+
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4ARCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        $affaire = array(
+            "id_affaire"=>$id_affaire
+            ,"id_fille"=>$this->affaire['id_affaire']
+        );
+        ATF::affaire()->u($affaire);
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "AR";
+        ATF::affaire()->u($this->affaire);
+
+
+        ATF::societe()->u(array("id_societe"=>$this->societe['id_societe'] , "id_pays"=>"BE"));
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4ARCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("38ef744c307c6016af8f769550828e0e",$md5,"Erreur de génération de la commande");
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4AvenantCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "avenant";
+        $this->affaire['id_parent'] = $id_affaire;
+        ATF::affaire()->u($this->affaire);
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4AvenantCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+
+
+        ATF::devis()->u(array("id_devis"=>$this->devis['id_devis'], "type_contrat"=>"presta"));
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4AvenantPrestaCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5_2,0,32);
+        ob_get_clean();
+
+
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("b384573d1904a6a4e9eb68c3e558c0ba",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("c73178d00c23a8520f6dec2c13aed26d",$md5_2,"Erreur de génération de la commande 2");
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4AffaireVenteCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::affaire()->q->reset()
+                                ->addField("id_affaire")
+                                ->setLimit(1)
+                                ->setDimension('cell');
+        $id_affaire = ATF::affaire()->sa();
+        $this->assertNotNull($id_affaire,"Pas d'ID affaire pour changer la provenance...");
+        foreach ($this->ligneCommande as $k=>$i) {
+            if ($k) {
+                $i['id_affaire_provenance'] = $id_affaire;
+                $i["neuf"] = "non";
+                ATF::commande_ligne()->u($i);
+            }
+        }
+
+        $this->affaire['nature'] = "vente";
+        $this->affaire['id_parent'] = $id_affaire;
+        ATF::affaire()->u($this->affaire);
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4AffaireVenteCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("8c76763557558231b38b56c3f11f7830",$md5,"Erreur de génération de la commande");
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4LoyerUniqueCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        $this->devis['loyer_unique'] = "oui";
+        ATF::devis()->u($this->devis);
+
+        foreach ($this->loyer as $k=>$i) {
+            if (!$k) continue;
+            ATF::loyer()->delete($i['id_loyer']);
+        }
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4LoyerUniqueCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+        foreach ($this->loyer as $k=>$i) {
+            if (!$k){
+                $i["loyer"]="0";
+                $i["assurance"]=NULL;
+                $i["frais_de_gestion"]=NULL;
+                ATF::loyer()->u($i);
+            }
+        }
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4LoyerUniqueCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5_2,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("08654a9ded583c2ca7c420e88f519bb2",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("2205c7db68dc5b14ebc7b2c37d415450",$md5_2,"Erreur de génération de la commande 2" );
+
+    }
+
+    /*
+    * @author Quentin JANON <qjanon@absystech.fr>
+    * @date 28-02-2011
+    */
+    public function test_contratA4AvecAnnexeCleodisBE () {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        for ($a=0;$a<10;$a++) {
+            foreach ($this->ligneCommande as $k=>$i) {
+                unset($i['id_commande_ligne']);
+                ATF::commande_ligne()->i($i);
+            }
+        }
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4AvecAnnexeCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+        $this->beginTransaction("cleodisbe", false, true);
+        $this->assertEquals("d7983779eb54ed285bf0afe7f4bcbd88",$md5,"Erreur de génération de la commande");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public function test_contratA4NLCleodisBE() {
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+        $this->create("commande");
+        $this->create("produitsCommande");
+        $this->create("produitAvecDetail");
+
+        ATF::affaire()->u(array("id_affaire"=>$this->affaire["id_affaire"], "langue"=>"NL"));
+
+        $c->generic("contratA4NL",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4NLCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+        $c->generic("contratA4",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-contratA4CleodisBEAvecFiligramme-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5_2 = system($this->MD5cmd);
+        $md5_2 = substr($md5,0,32);
+        ob_get_clean();
+
+        $this->beginTransaction("cleodisbe", false, true);
+
+
+        $this->assertEquals("26e4d68e349dbb34ec8617939220ac85",$md5,"Erreur de génération de la commande");
+        $this->assertEquals("26e4d68e349dbb34ec8617939220ac85",$md5_2,"Erreur de génération de la commande 2 ");
+    }
+
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_conditionsGeneralesDeLocationA3_cleodisbe(){
@@ -4388,7 +5934,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("d480f7a6c0366a5d0a0de7c0db534843",$md5,"Erreur de génération de la commande BE");
+        $this->assertEquals("84af45bc64b8514f42c41b127d2c76f3",$md5,"Erreur de génération de la commande BE");
 
 
     }
@@ -4396,7 +5942,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_conditionsGeneralesDeLocationA4_cleodisbe(){
         ATF::unsetSingleton("pdf");
-       $this->beginTransaction("cleodisbe", true, false);
+        $this->beginTransaction("cleodisbe", true, false);
 
         $c = new pdf_cleodisbe();
 
@@ -4426,10 +5972,89 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cleodisbe", false, true);
 
-        $this->assertEquals("a5840f2c1869603e9d5c2313f533464d",$md5,"Erreur de génération de la commande BE");
+        $this->assertEquals("05d135f89cd5f9ebfc56f285e1be2bd9",$md5,"Erreur de génération de la commande BE");
 
 
     }
+
+
+    /*
+     * @author Quentin JANON <qjanon@absystech.fr>
+     */
+    public function test_envoiContratEtBilanCleodisBE(){
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+
+        $s['date'] = "2013-01-01";
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("envoiContratEtBilan",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-CRenvoiContratEtBilanCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+        $this->beginTransaction("cleodisbe", false, true);
+
+        $this->assertEquals("139086a9b2f7d08f5c44a71fb19d6148",$md5,"Erreur de génération de la envoiContratEtBilanCleodisBE");
+
+    }
+
+
+     /*
+     * @author Quentin JANON <qjanon@absystech.fr>
+     */
+    public function test_envoiContratSsBilanCleodisBE(){
+
+        ATF::unsetSingleton("pdf");
+        $this->beginTransaction("cleodisbe", true, false);
+
+        $c = new pdf_cleodisbe();
+        $this->id_societe = 4225;
+        $this->id_contact = 3878;
+        $this->create("user");
+        $this->create("affaire");
+        $this->create("devis");
+        $this->create("loyer");
+
+        $s['date'] = "2013-01-01";
+        $this->create("contact");
+        $devis = array("id_devis"=>$this->devis['id_devis'],"id_contact"=>$this->contact['id_contact']);
+        ATF::devis()->u($devis);
+        $this->create("commande");
+
+        $c->generic("envoiContratSsBilan",$this->commande['id_commande'],$this->tmpFile,$s);
+        $c->Close();
+        $c->Output($this->dirSavedPDF."-CRenvoiContratSsBilanCleodisBE-".$this->dateSave.".pdf");
+        ob_start();
+        // Commande SHELL pour générer le fichier
+        system($this->GScmd);
+        $md5 = system($this->MD5cmd);
+        $md5 = substr($md5,0,32);
+        ob_get_clean();
+
+        $this->beginTransaction("cleodisbe", false, true);
+
+        $this->assertEquals("72e5dbf381540187d4badc995ea28026",$md5,"Erreur de génération de la envoiContratSsBilanCleodisBE");
+
+    }
+
 
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -4441,12 +6066,12 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         ATF::$usr->set('id_user', 14);
         $audit = array("id_societe"=>1,
-        			   "id_user"=>14,
-        			   "date"=>"2015-10-24",
-        			   "ref"=>"123456789",
-        			   "type"=>"gestion_poste");
+                       "id_user"=>14,
+                       "date"=>"2015-10-24",
+                       "ref"=>"123456789",
+                       "type"=>"gestion_poste");
 
-     	$id_audit = ATF::audit()->i($audit);
+        $id_audit = ATF::audit()->i($audit);
 
 
 
@@ -4462,8 +6087,8 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
         $this->beginTransaction("cap", false, true);
 
-        $this->assertEquals("33bb9e35abad8fda4bd86eedd7177ef4",$md5,"Erreur de génération de l'audit CAP");
-	}
+        $this->assertEquals("536ce67d4e50217a5907991213930124",$md5,"Erreur de génération de l'audit CAP");
+    }
 
     //@author Morgan FLEURQUIN <mfleurquin@absystech.fr>
     public function test_mandat_modifiable_cap(){
@@ -4476,7 +6101,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 
-     	$id_societe = 2;
+        $id_societe = 2;
 
         $c->generic("mandat",$id_societe,$this->tmpFile,$s);
         $c->Close();
@@ -4487,7 +6112,7 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("65d0cf7eefb736beac96118cc8306dd8",$md5,"Erreur de génération du mandat CAP");
+        $this->assertEquals("0998f465cac6e9e0ea24f7ec01af45e6",$md5,"Erreur de génération du mandat CAP");
 
 
 
@@ -4505,9 +6130,11 @@ class pdf_cleodis_test extends ATF_PHPUnit_Framework_TestCase {
         ob_get_clean();
         $this->assertEquals("ddf66b29bce860534df66f6690b41b73",$md5,"Erreur de génération du mandat CAP SANS SIREN");
 
-		*/
+        */
         ATF::db()->select_db("optima_cleodis");
     }
+
+
 
 
 
