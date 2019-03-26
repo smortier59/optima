@@ -73,7 +73,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			$erreur_trouvee1 = $e->getCode();
 		}
 
-		$this->assertEquals(602,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (contact non insere)");
+		$this->assertEquals(102,$erreur_trouvee1,"ERREUR 1 NON ATTRAPPEE (contact non insere)");
 
 		$devis["devis"]["id_contact"]=$this->id_contact;
 
@@ -293,6 +293,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Insertion
 		unset($commande["commande"]["id_contact"]);
 		unset($commande["commande"]["validite"]);
+		unset($commande["commande"]["etat"]);		
 		$id_commande = ATF::commande()->insert($commande,$this->s);
 
 
@@ -320,6 +321,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Insertion
 		unset($commande["commande"]["id_contact"]);
 		unset($commande["commande"]["validite"]);
+		unset($commande["commande"]["etat"]);
 
 		$id_commande = ATF::commande()->insert($commande,$this->s);
 
@@ -358,6 +360,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Insertion
 		unset($commande["commande"]["id_contact"]);
 		unset($commande["commande"]["validite"]);
+		unset($commande["commande"]["etat"]);
 		$id_commande = ATF::commande()->insert($commande,$this->s);
 
 		$devis = $this->obj->select($this->id_devis);
