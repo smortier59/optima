@@ -21,6 +21,7 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 	
 	//méthode pour créer le suivi bidon avec tous les éléments nécessaire
 	public function ajoutSuivi(){
+		ATF::$msg->getNotices();
 		$this->initUserOnly(false);
 		
 		$this->creerSocCon();
@@ -307,6 +308,9 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 												"type"=>"tel",
 												"date"=>$tab[0]["date"],
 												"texte"=>"suivi 1",
+										        'id_opportunite' => null,
+										        'temps_passe' => '00:00:00',
+										        'ponderation' => '0'
 											),
 									1=>array(
 												"id_suivi"=>$id_suivi1,
@@ -316,6 +320,9 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 												"type"=>"tel",
 												"date"=>$tab[1]["date"],
 												"texte"=>"suivi 1",
+										        'id_opportunite' => null,
+										        'temps_passe' => '00:00:00',
+										        'ponderation' => '0'
 											),
 									2=>array(
 												"id_suivi"=>$id_suivi2,
@@ -325,6 +332,9 @@ class suivi_test extends ATF_PHPUnit_Framework_TestCase {
 												"type"=>"tel",
 												"date"=>$tab[2]["date"],
 												"texte"=>"suivi 2",
+										        'id_opportunite' => null,
+										        'temps_passe' => '00:00:00',
+										        'ponderation' => '0'
 											),
 								)
 							,$tab

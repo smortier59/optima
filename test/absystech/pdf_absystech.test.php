@@ -223,7 +223,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("73eafc252ef4795a57ccd7b2569d0609",$md5,"Erreur de génération des étiquettes");
+        $this->assertEquals("d9d2d8955a3e5cca3a8d4c373af86138",$md5,"Erreur de génération des étiquettes");
     }
     
     /* @author Quentin JANON <qjanon@absystech.fr> 
@@ -249,7 +249,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("7a6b4d80a99c991739b9b514418b1ccb",$md5,"Erreur de génération de la facture d'intérêt n°1");
+        $this->assertEquals("71a05afb19343f3e88961f311e550e43",$md5,"Erreur de génération de la facture d'intérêt n°1");
     }   
     
     /* @author Quentin JANON <qjanon@absystech.fr> 
@@ -293,7 +293,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("ac6c2b68646be9af99ad10f71e165836",$md5,"Erreur de génération de la facture d'intérêt n°2");
+        $this->assertEquals("377b35cb0a66c6c61346b492c73f2e30",$md5,"Erreur de génération de la facture d'intérêt n°2");
     }   
     
     /* @author Quentin JANON <qjanon@absystech.fr> 
@@ -332,7 +332,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("dd475258b6e37e2febe9d2ac46f39c80",$md5,"Erreur de génération de la facture d'intérêt n°3");
+        $this->assertEquals("55a56124291aa2b06a33d274b002e254",$md5,"Erreur de génération de la facture d'intérêt n°3");
     }   
     
     /* @author Quentin JANON <qjanon@absystech.fr> */
@@ -384,7 +384,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6fb2a939290e5e8340ecf03ac49c6cba",$md5,"Erreur de génération du bon de livraison");
+        $this->assertEquals("dc264509c13e4b26269b200fc1ec0768",$md5,"Erreur de génération du bon de livraison");
     }   
     
     /* @author Quentin JANON <qjanon@absystech.fr> */
@@ -436,7 +436,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("9f4aa595e279178fa8075b6a9409e19f",$md5,"Erreur de génération du bon de livraison");
+        $this->assertEquals("7b708cabb7211f3766d8982e8be928cd",$md5,"Erreur de génération du bon de livraison");
     }   
     
     /** 
@@ -466,7 +466,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("a7886cc70a4759318cb84d5f25575761",$md5,"Erreur de génération de la 1ere relance, probablement parce que la société avec le plus d'intérêt n'est plus Ergos Nord (30 000€).");
+        $this->assertEquals("e6f84ee871831ca74d851a96330e4c09",$md5,"Erreur de génération de la 1ere relance, probablement parce que la société avec le plus d'intérêt n'est plus Ergos Nord (30 000€).");
         
     }
     
@@ -497,7 +497,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("3b38e7192374c6b856802a40f2ccdb3f",$md5,"Erreur de génération de la 2eme relance");
+        $this->assertEquals("7e5c52ffb2ca427a4661642586e9e7ad",$md5,"Erreur de génération de la 2eme relance");
         
     }
     
@@ -529,7 +529,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("fbaff7f6b7633d5c5dc95c3ec54ccac1",$md5,"Erreur de génération de la 3eme relance");
+        $this->assertEquals("b086cd198d1f0e0255dd3dd9f5bb2e9a",$md5,"Erreur de génération de la 3eme relance");
         
     }
 
@@ -548,7 +548,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("e7bfabe392e9e0c06517673f4fe2a8c2",$md5,"Erreur de génération de l'ExonerationTVAFacture");
+        $this->assertEquals("f1d03c0342f926ed7cc47925157f56a0",$md5,"Erreur de génération de l'ExonerationTVAFacture");
     } 
 
     /* @author Quentin JANON <qjanon@absystech.fr> 
@@ -568,7 +568,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("975bed1c4f049737ba97a1712e822b24",$md5,"Erreur de génération de l'ExonerationTVAFactureAvoir");
+        $this->assertEquals("9a7594d892069a38093cf901014e665e",$md5,"Erreur de génération de l'ExonerationTVAFactureAvoir");
     } 
     
     /** 
@@ -618,7 +618,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("953e4c243eba868c7fe77b9b1227d736",$md5,"Erreur de génération de l'bon_de_pret");
+        $this->assertEquals("70e0b21942f872c0d1c5c32813f85b85",$md5,"Erreur de génération de l'bon_de_pret");
     }   
     
     /*
@@ -687,7 +687,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("555467f576a010a3f64cbd8a7b0e0f9c",$md5,"Erreur de génération d'une facture Mensuelle");
+        $this->assertEquals("daded04444b348227b25bad37df91c1c",$md5,"Erreur de génération d'une facture Mensuelle");
         
     }
 
@@ -710,7 +710,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("c2e591dba0cb7d6bb5a9f0d5d4277723",$md5,"Erreur de génération d'une facture Mensuelle");
+        $this->assertEquals("983326d6874c7b22c2806d04536404fe",$md5,"Erreur de génération d'une facture Mensuelle");
         
     }
     
@@ -733,7 +733,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("675eb93b106e29f2a7b7f76ab11b5142",$md5,"Erreur de génération d'une facture Annuelle");
+        $this->assertEquals("2b7caa7a25e06733240cadc84f133908",$md5,"Erreur de génération d'une facture Annuelle");
         
     }
     
@@ -756,7 +756,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("4f4046f593cd2c5a3d66bde68d53eb59",$md5,"Erreur de génération d'une facture trimestrielle 1");
+        $this->assertEquals("79333fef2441a4bf78dd3ddfc4e47b22",$md5,"Erreur de génération d'une facture trimestrielle 1");
         
     }
     
@@ -779,7 +779,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("63d830d250e129ccf3a0a064258f1cfe",$md5,"Erreur de génération d'une facture trimestrielle 2");
+        $this->assertEquals("d8fddfbca183c3e0401eb1d340a63c74",$md5,"Erreur de génération d'une facture trimestrielle 2");
         
     }
     
@@ -802,7 +802,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("28989996347314ba89255a3e0a028560",$md5,"Erreur de génération d'une facture trimestrielle 3");
+        $this->assertEquals("fa719d7d43f8c175ac711fd3e1bdbafa",$md5,"Erreur de génération d'une facture trimestrielle 3");
         
     }
     
@@ -825,7 +825,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("106581201a303f0757aaf04cda0555a3",$md5,"Erreur de génération d'une facture trimestrielle 4");
+        $this->assertEquals("c65768db0b9dbfaf74c5bc1f9b6cd9ef",$md5,"Erreur de génération d'une facture trimestrielle 4");
         
     }
     
@@ -849,7 +849,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("2219f26d93e9dc5d45b72d6e33cba67b",$md5,"Erreur de génération d'une facture trimestrielle 4");
+        $this->assertEquals("2f1ca30b473f6ae2278a3b608a48bbe5",$md5,"Erreur de génération d'une facture trimestrielle 4");
         
     }
     
@@ -873,7 +873,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("2810204c20a0f670ea5ddf1b46e9515e",$md5,"Erreur de génération d'une facture trimestrielle 4");
+        $this->assertEquals("0562475fad93e1334f71ad193a3a34ae",$md5,"Erreur de génération d'une facture trimestrielle 4");
         
     }
     
@@ -894,7 +894,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("403f8cfad7802e8bcfbad46942bf0b32",$md5,"Erreur de génération de l'lettre_de_change");
+        $this->assertEquals("189fc7624e4451be15e9ee0a995f0f58",$md5,"Erreur de génération de l'lettre_de_change");
         
     }
 
@@ -927,7 +927,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("d5f3d9250280c6a014ca144fc4d9188f",$md5,"Erreur de génération de l'odm 1");
+        $this->assertEquals("fd3a9e7f43facd308ccafa659394f535",$md5,"Erreur de génération de l'odm 1");
     } 
     
     /** 
@@ -967,7 +967,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("0f3f83d02f74464c45742d0c747ccbd3",$md5,"Erreur de génération du HeaderLivraison");
+        $this->assertEquals("f775c20ab93d0c21793a248f1a1e990b",$md5,"Erreur de génération du HeaderLivraison");
         
     }
     
@@ -994,7 +994,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("da3944a56384f2f4ebc63eef61fd701b",$md5,"Erreur de génération du Footer AT");
+        $this->assertEquals("4ede6e418f0db10b5cb6746c0992e269",$md5,"Erreur de génération du Footer AT");
         
     }
     
@@ -1013,7 +1013,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("9717d6df6e490a15f4c114f2fc51e4d4",$md5,"Erreur de génération des CGV AT, auraient-elles été modifié ?");
+        $this->assertEquals("44517bc44c0dd979fe4d8f5de0d10a77",$md5,"Erreur de génération des CGV AT, auraient-elles été modifié ?");
     
     } 
     
@@ -1034,7 +1034,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("43a05ca286486c1380931afc5373fd13",$md5,"Erreur de génération d'une facture classique");
+        $this->assertEquals("290a739045b1d4f89057a4ef5408d573",$md5,"Erreur de génération d'une facture classique");
     }
     
     
@@ -1085,7 +1085,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("ff611dbf3d585bc26a4349682d02239b",$md5,"Erreur de génération d'une facture accompte");
+        $this->assertEquals("4e2d0b3429c7273fada20a4e768e3a51",$md5,"Erreur de génération d'une facture accompte");
     }    
     
     /*
@@ -1134,7 +1134,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean(); 
-        $this->assertEquals("772597f6a3837b090066a141a59c1ffe",$md5,"Erreur de génération d'une facture exonerationTVA");
+        $this->assertEquals("630d2de3577ab1190dd941f3e9b829b6",$md5,"Erreur de génération d'une facture exonerationTVA");
     }
     
     
@@ -1171,7 +1171,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("21ccd29f3350eee82e6ba3a75f038941",$md5,"Erreur de génération d'une facture avoir");
+        $this->assertEquals("aa5beab74e856fcbbea587b0f3816acc",$md5,"Erreur de génération d'une facture avoir");
         
     }
     
@@ -1230,7 +1230,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("6ebd089e3e72d749385ca7787fb62926",$md5,"Erreur de génération d'une facture solde");
+        $this->assertEquals("f1d7e70ff23e91663304023863fa8184",$md5,"Erreur de génération d'une facture solde");
         
     }
     
@@ -1277,7 +1277,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("070ea2e7a2f4be410375354c480984be",$md5,"Erreur de génération du devis 1");
+        $this->assertEquals("f2324443b4df5e91ead15411902a11cb",$md5,"Erreur de génération du devis 1");
         
 
     }
@@ -1312,7 +1312,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("93a2c6a485317ed99129cdc51d0f2542",$md5,"Erreur de génération du devis 1");
+        $this->assertEquals("1efe82b41d6f4d98d6a76d2e3159966f",$md5,"Erreur de génération du devis 1");
         
 
     }
@@ -1362,7 +1362,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("273defbe999d442ca40ccef8a3289923",$md5,"Erreur de génération du devis devisAvecFinancement");
+        $this->assertEquals("68e23d1a6c81888ff103b7966dd20a4d",$md5,"Erreur de génération du devis devisAvecFinancement");
     }
     
     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
@@ -1409,7 +1409,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("5a99388db956cae620a6ed991bec8318",$md5,"Erreur de génération du devis devisAvecFinancement");
+        $this->assertEquals("8024bf3e09fde9ed9094d371c00fbe11",$md5,"Erreur de génération du devis devisAvecFinancement");
     }
     
     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
@@ -1456,7 +1456,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("b5650952b3d9ad52e770860494c0c7f4",$md5,"Erreur de génération du devis devisAvecFinancement");
+        $this->assertEquals("8024bf3e09fde9ed9094d371c00fbe11",$md5,"Erreur de génération du devis devisAvecFinancement");
     }
 
     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
@@ -1503,7 +1503,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("72709dc371376a47fccbec40b936b7ec",$md5,"Erreur de génération du devis devisAvecFinancement");
+        $this->assertEquals("8024bf3e09fde9ed9094d371c00fbe11",$md5,"Erreur de génération du devis devisAvecFinancement");
     }
 
     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
@@ -1550,7 +1550,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("741d7f6e3797f2d3fe9f14962ba8a058",$md5,"Erreur de génération du devis devisAvecFinancement");
+        $this->assertEquals("8024bf3e09fde9ed9094d371c00fbe11",$md5,"Erreur de génération du devis devisAvecFinancement");
     }    
 
     /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
@@ -1593,7 +1593,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("06292c6cff470559ee301653b0e95160",$md5,"Erreur de génération du devis devisPeriodique");
+        $this->assertEquals("1efe82b41d6f4d98d6a76d2e3159966f",$md5,"Erreur de génération du devis devisPeriodique");
     }
      /* @author Morgan FLEURQUIN <mfleurquin@absystech.fr> */
      public function test_devis_Periodique2(){
@@ -1635,7 +1635,7 @@ class pdf_absystech_test extends ATF_PHPUnit_Framework_TestCase {
         $md5 = system($this->MD5cmd);
         $md5 = substr($md5,0,32);
         ob_get_clean();
-        $this->assertEquals("1dadf4666e4e926cce36791c5759aeb9",$md5,"Erreur de génération du devis devisPeriodique");
+        $this->assertEquals("1efe82b41d6f4d98d6a76d2e3159966f",$md5,"Erreur de génération du devis devisPeriodique");
     }
     
     

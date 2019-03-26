@@ -43,7 +43,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 
 
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
-	public function testAutocompleteConditions(){
+	public function test_AutocompleteConditions(){
 		$this->assertEquals(
 			array("condition_field"=>array("contact.id_societe","contact.truc"),"condition_value"=>array(3,2)),
 			$this->obj->autocompleteConditions(ATF::contact(),array("devis"=>array("id_societe"=>3)),"truc",2),
@@ -52,7 +52,7 @@ class devis_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 	/*@author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr> */
-	function testInsert(){
+	function test_Insert(){
 		$devis["devis"]["date"]=date('Y-m-d');
 		$devis["devis"]["id_contact"]="A";
 		$devis["devis"]['resume']='Tu_devis';

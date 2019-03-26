@@ -143,18 +143,18 @@ class print_etat_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertTrue($ret['result'],"probleme d'insertion via POST");
 		$etat = ATF::print_etat()->select_all();
 
-		$this->assertEquals($this->id_stock,$etat[0]['id_stock'],'Probleme id_stock insérée');
-		$this->assertEquals('color',$etat[0]['name'],'Probleme name insérée');
-		$this->assertEquals('copie_couleur',$etat[0]['type'],'Probleme type inséré');
+		$this->assertEquals($this->id_stock,$etat["data"][0]['id_stock'],'Probleme id_stock insérée'.print_r($etat,true));
+		$this->assertEquals('color',$etat["data"][0]['name'],'Probleme name insérée');
+		$this->assertEquals('copie_couleur',$etat["data"][0]['type'],'Probleme type inséré');
 
-		$this->assertEquals($this->id_stock,$etat[1]['id_stock'],'Probleme id_stock insérée');
-		$this->assertEquals('mono',$etat[1]['name'],'Probleme name insérée');
-		$this->assertEquals('copie_noir',$etat[1]['type'],'Probleme type inséré');
+		$this->assertEquals($this->id_stock,$etat["data"][1]['id_stock'],'Probleme id_stock insérée');
+		$this->assertEquals('mono',$etat["data"][1]['name'],'Probleme name insérée');
+		$this->assertEquals('copie_noir',$etat["data"][1]['type'],'Probleme type inséré');
 
 
-		$this->assertEquals($this->id_stock,$etat[2]['id_stock'],'Probleme id_stock insérée');
-		$this->assertEquals('Cartouche Test post',$etat[2]['name'],'Probleme name insérée');
-		$this->assertEquals('toner',$etat[2]['type'],'Probleme type inséré');
+		$this->assertEquals($this->id_stock,$etat["data"][2]['id_stock'],'Probleme id_stock insérée');
+		$this->assertEquals('Cartouche Test post',$etat["data"][2]['name'],'Probleme name insérée');
+		$this->assertEquals('toner',$etat["data"][2]['type'],'Probleme type inséré');
 	}
 	public function test_POSTError(){
 		$this->environnement_test();	

@@ -431,7 +431,7 @@ class note_de_frais_test extends ATF_PHPUnit_Framework_TestCase {
 	* @date 23-03-2011
 	*/
 	public function test_getJourLimit() {
-		$this->assertEquals(25,$this->obj->getJourLimit(),"Erreur !?");
+		$this->assertEquals(26,$this->obj->getJourLimit(),"Erreur !?");
 	}
 	
 	/**
