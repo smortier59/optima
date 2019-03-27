@@ -1829,6 +1829,9 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 	}
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _graph_tickets_hotline($get, $post){
 		/*
 		$at = $this->stats(true);
@@ -1843,6 +1846,9 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		return 'un test';
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _stats($get, $post){
 		$at = $this->stats(true);
 		ATF::define_db("db","optima_att");
@@ -1862,6 +1868,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 	* @param array session
 	* @param bool $widget
 	* @param string $type Type de stats
+	* @codeCoverageIgnore
 	* return enregistrements
 	*/
 	public function stats($widget=false,$type=NULL,$tu=NULL){
@@ -2348,6 +2355,9 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		return $nb_jours+1;
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _requetebyUserParMois($get,$post){
 		$moment = $get['moment'] == "now" ? date("Y-m") : (strlen($get['moment'])==7 ? $get['moment'] : -1);
 		$at = $this->requetebyUserParMois($moment);
@@ -2361,6 +2371,9 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function requetebyUserParMois($mois,$tu=false){
 		//if(ATF::$codename == "att"){ $exclusion = array(34,40); }
 		//else{ $exclusion = array(30,62,57,54); }
@@ -2512,6 +2525,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 	/*
 	* Permet l'affichage sur le graphe marge réelle sur tickets
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function graph_tarif_horaire($mois_deb,$mois_fin){
 
@@ -2597,8 +2611,10 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 
 
-
-	//Simple function to sort an array by a specific key. Maintains index association.
+	/*
+	* Simple function to sort an array by a specific key. Maintains index association.
+	* @codeCoverageIgnore
+	*/
 	function array_sort($array, $on, $order=SORT_ASC){
 		$new_array = array();
 		$sortable_array = array();
@@ -2630,6 +2646,9 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		return $new_array;
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function getTauxHorraire($id_affaire){
 		$marge_brute = 0;
 		ATF::facture()->q->reset()->where("facture.id_affaire",$id_affaire);
@@ -2682,6 +2701,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 	/**
 	* Lorsque l'on clique sur un graphe, on redirige vers le resultat qu'on souhaite sur le select_all filtré par la barre sur laquelle on a cliqué
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function statsFiltrage(){
 		/* nom du filtre */
@@ -2826,6 +2846,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 	/**
 	* Retourne les hotlines ayant eu lieues depuis la dernière activité
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @codeCoverageIgnore
 	* @return array
 	*/
 	public function getRecentForMobile($countUnseenOnly=false,$limit=42){
@@ -2910,6 +2931,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 	/** Récupère les éléments nécessaires à l'affichage de graphe de temps (de prise en charge et de cloture)
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function statsTps($widget=false,$par_user=false,$cloture=false,$count=false){
 		$this->q->reset()
