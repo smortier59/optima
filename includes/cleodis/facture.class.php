@@ -695,7 +695,7 @@ class facture_cleodis extends facture {
 			//Calcul des bonnes periodes (date_debut date_fin) par rapport aux periodes
 			//Ajout des assurance .... sur le prix prix_libre
 			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
-			$total = $loyerAuJour * $nbJProRata;
+			$total = $loyerAuJour * ($nbJProRata +1);
 
 			if($nbJProRata > 0 && $total != 0){
 				$facture["facture"] = array(
