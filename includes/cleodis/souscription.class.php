@@ -280,9 +280,11 @@ class souscription_cleodis extends souscription {
 
         }
 
+        // On force le prix d'achat en provenance des produit et non des lignes !
+        $packProduitLigne['prix_achat'] = $produitLoyer['prix_achat'];
+
         $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
         $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
-
 
         if ($toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]) {
           $toInsertProduitDevis[$produit['id_produit'].'-'.$produit['serial']]['devis_ligne__dot__quantite'] += $produit['quantite'];
