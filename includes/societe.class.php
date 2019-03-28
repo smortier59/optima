@@ -335,8 +335,6 @@ class societe extends classes_optima {
 		//--Set de l'id Owner (créateur de l'entité)--
 		if(!$infos['id_owner']) $infos['id_owner']=ATF::$usr->getID();
 
-		if(!$infos['id_commercial']) $infos['id_commercial']=$infos['id_owner'];
-
 		//--Insertion en base de données--
 		$retour=false;
 
