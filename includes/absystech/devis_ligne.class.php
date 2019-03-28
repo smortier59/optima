@@ -64,8 +64,8 @@ class devis_ligne_absystech extends devis_ligne {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all){
 			foreach($select_all["data"] as $key=>$item){
-				$select_all["data"][$key]["devis_ligne.marge"]=(($select_all["data"][$key]["devis_ligne.prix"]-$select_all["data"][$key]["devis_ligne.prix_achat"])/$select_all["data"][$key]["devis_ligne.prix"])*100;
-				$select_all["data"][$key]["devis_ligne.marge_absolue"]=($select_all["data"][$key]["devis_ligne.prix"]*$select_all["data"][$key]["devis_ligne.quantite"])-($select_all["data"][$key]["devis_ligne.prix_achat"]*$select_all["data"][$key]["devis_ligne.quantite"]);
+				$select_all["data"][$key]["devis_ligne.marge"]=max(0,(($select_all["data"][$key]["devis_ligne.prix"]-$select_all["data"][$key]["devis_ligne.prix_achat"])/$select_all["data"][$key]["devis_ligne.prix"])*100);
+				$select_all["data"][$key]["devis_ligne.marge_absolue"]=max(0,($select_all["data"][$key]["devis_ligne.prix"]*$select_all["data"][$key]["devis_ligne.quantite"])-($select_all["data"][$key]["devis_ligne.prix_achat"]*$select_all["data"][$key]["devis_ligne.quantite"]));
 			}
 		}
 		return $select_all;
