@@ -1067,7 +1067,7 @@ $logins = array(
 "gdamecourt"=>"gauthier"
 );
 if ($logins[$login]) $login = $logins[$login];
-$cmd = "curl -i -X POST -H 'Content-Type: application/json' -d '";
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
 $data = array();
 $data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
 $data["username"] = $societe["societe"];
