@@ -88,11 +88,6 @@ class affaire_cleodis extends affaire {
 		);
 		$this->panels['infos_signature_contrat'] = array("visible"=>false);
 
-
-
-
-
-
 		$this->colonnes['panel']['chiffres'] = array(
 			'total_depense'
 			,'total_recette'
