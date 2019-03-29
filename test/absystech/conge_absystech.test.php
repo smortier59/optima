@@ -283,12 +283,7 @@ class conge_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$msg->getWarnings();
 		ATF::$msg->getNotices();
 
-		if(date('w') != "5"){
-			$this->assertEquals(6, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
-		}else{
-			$this->assertEquals(8, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
-		}
-
+		$this->assertEquals(6, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
 	}
 };
 
