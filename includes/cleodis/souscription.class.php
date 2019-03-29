@@ -264,11 +264,6 @@ class souscription_cleodis extends souscription {
           $packProduitLigne = ATF::pack_produit_ligne()->select_row();
           $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
 
-        } else if ($produit['id_pack_produit_ligne']) {
-          ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit_ligne", $produit['id_pack_produit_ligne']);
-          $packProduitLigne = ATF::pack_produit_ligne()->select_row();
-          $id_pack = $packProduitLigne['id_pack_produit'];
-
         }
 
         $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
