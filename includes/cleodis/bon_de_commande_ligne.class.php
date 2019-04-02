@@ -49,9 +49,21 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 	* @return array
 	*/
   	function toFacture_fournisseurLigne() {
+
+
+
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(array_keys($this->colonnes['ligne']))->setCount()->setLimit(100000);
+		$this->q->addField("id_commande_ligne");
 		if ($sa = $this->select_all()) {
+			$data = array();
+			foreach ($sa["data"] as $key => $value) {
+				if($data[$value["id_commande_ligne"]]){
+					$data[$value["id_commande_ligne"]]["bon_de_commande_ligne.quantite"] += $value["bon_de_commande_ligne.quantite"];
+				}else{
+					$data[$value["id_commande_ligne"]] = $value;
+				}
+			}
 			// Maquillage des devis_ligne en commande_ligne
 			$k=0;
 			foreach ($sa["data"] as $kRow => $row) {
@@ -64,6 +76,9 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 
 				ATF::facture_fournisseur_ligne()->q->reset()->addCondition("id_bon_de_commande_ligne",$return[$k]["facture_fournisseur_ligne.id_facture_fournisseur_ligne"])->setCount();
 				$facture_fournisseur=ATF::facture_fournisseur_ligne()->sa();
+
+
+
 				if($return[$k]["facture_fournisseur_ligne.quantite"]>1){
 					if($commande_ligne["serial"]){
 						$tabSerial=explode(" ",$commande_ligne["serial"]);
