@@ -289,10 +289,10 @@ class facturation extends classes_optima {
 					//Pour chacune des périodes
 					foreach ($loyer as $key=>$item){
 						if($item["frequence_loyer"]=="an"){
-							$frequence=13;
-						}elseif($item["frequence_loyer"]=="semestre"){  $frequence=7;
+							$frequence=12;
+						}elseif($item["frequence_loyer"]=="semestre"){  $frequence=6;
 						}elseif($item["frequence_loyer"]=="trimestre"){
-							$frequence=4;
+							$frequence=3;
 						}else{
 							$frequence=1;
 						}

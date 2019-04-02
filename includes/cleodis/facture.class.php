@@ -658,6 +658,7 @@ class facture_cleodis extends facture {
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
 				$nbJProRata = 30 - date("d", strtotime($infos["date_installation_reel"]));
+				$dateFinPeriode = date("t-m-Y", strtotime($infos["date_installation_reel"]));
 
 			}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
 				$nbDInPeriode = 90;
@@ -670,6 +671,17 @@ class facture_cleodis extends facture {
 				$days_difference = 90 - (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
 				$nbJProRata = $days_difference;
 
+				if(date("m", strtotime($infos["date_installation_reel"])) <4){
+					$dateFinPeriode = date("31-03-Y", strtotime($infos["date_installation_reel"]));
+				}elseif(date("m", strtotime($infos["date_installation_reel"])) <7){
+					$dateFinPeriode = date("30-06-Y", strtotime($infos["date_installation_reel"]));
+				}elseif(date("m", strtotime($infos["date_installation_reel"])) <10){
+					$dateFinPeriode = date("30-09-Y", strtotime($infos["date_installation_reel"]));
+				}else{
+					$dateFinPeriode = date("31-12-Y", strtotime($infos["date_installation_reel"]));
+				}
+
+
 			}elseif($loyers[0]["frequence_loyer"] == "semestre"){
 				// Pas de loyer semestriel pour le moment coté cleodis
 				// Partie non testée
@@ -680,8 +692,13 @@ class facture_cleodis extends facture {
 				$start_year = date('Y', $start_date);
 				$start_timestamp = mktime(0, 0, 0, $start_month, 1, $start_year);
 				$days_difference = (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
-
 				$nbJProRata = $days_difference;
+
+				if(date("m", strtotime($infos["date_installation_reel"])) <7){
+					$dateFinPeriode = date("30-06-Y", strtotime($infos["date_installation_reel"]));
+				}else{
+					$dateFinPeriode = date("31-12-Y", strtotime($infos["date_installation_reel"]));
+				}
 			}else{
 				// Pas de loyer semestriel pour le moment coté cleodis
 				// Partie non testée
@@ -689,6 +706,7 @@ class facture_cleodis extends facture {
 				$nbDInPeriode = 365;
 				$dateYear = strtotime('first day of January '.date('Y'));
 				$days_difference = (strtotime($infos["date_installation_reel"])- $dateYear)/24/3600;
+				$dateFinPeriode = date("31-12-Y", strtotime($infos["date_installation_reel"]));
 
 			}
 			//Calcul du bon prix par rapport à la frequence
@@ -708,10 +726,10 @@ class facture_cleodis extends facture {
 		            "id_commande" => $commande["id_commande"],
 		            "date_previsionnelle" => date("d-m-Y"),
 		            "date_periode_debut" => $infos["date_installation_reel"],
-		            "date_periode_fin" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
+		            "date_periode_fin" => $dateFinPeriode,
 		            "prix" => round($total, 2),
 		            "date_periode_debut_libre" => $infos["date_installation_reel"],
-		            "date_periode_fin_libre" => date("t-m-Y", strtotime($infos["date_installation_reel"])),
+		            "date_periode_fin_libre" => $dateFinPeriode,
 		            "prix_libre" => round($total, 2),
 		            "nature" => "prorata"
 		        );
@@ -774,6 +792,27 @@ class facture_cleodis extends facture {
 
 		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
 
+		if($loyers[0]["frequence_loyer"] == "mois"){
+			$dateFinPeriode = date("Y-m", strtotime($infos["date_debut_contrat"]))."-".$nbDInMonth;
+		}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
+			if(date("m", strtotime($infos["date_debut_contrat"])) == 1){
+				$dateFinPeriode = date("31-03-Y", strtotime($infos["date_debut_contrat"]));
+			}elseif(date("m", strtotime($infos["date_debut_contrat"])) == 4){
+				$dateFinPeriode = date("30-06-Y", strtotime($infos["date_debut_contrat"]));
+			}elseif(date("m", strtotime($infos["date_debut_contrat"])) == 7){
+				$dateFinPeriode = date("31-09-Y", strtotime($infos["date_debut_contrat"]));
+			}else{
+				$dateFinPeriode = date("31-12-Y", strtotime($infos["date_debut_contrat"]));
+			}
+		}elseif($loyers[0]["frequence_loyer"] == "semestre"){
+			if(date("m", strtotime($infos["date_debut_contrat"])) <= 6){
+				$dateFinPeriode = date("30-06-Y", strtotime($infos["date_debut_contrat"]));
+			}else{
+				$dateFinPeriode = date("31-12-Y", strtotime($infos["date_debut_contrat"]));
+			}
+		}else{
+			$dateFinPeriode = date("31-12-Y", strtotime($infos["date_debut_contrat"]));
+		}
 
 
 		if($totalLoyer != 0){
@@ -791,9 +830,9 @@ class facture_cleodis extends facture {
 	            "id_commande" => $commande["id_commande"],
 	            "date_previsionnelle" => $date_previsionnelle,
 	            "date_periode_debut" => date("Y-m-d", strtotime($infos["date_debut_contrat"])),
-	            "date_periode_fin" => date("Y-m", strtotime($infos["date_debut_contrat"]))."-".$nbDInMonth,
+	            "date_periode_fin" => $dateFinPeriode,
 	            "date_periode_debut_libre" => date("Y-m-d", strtotime($infos["date_debut_contrat"])),
-				"date_periode_fin_libre" => date("Y-m", strtotime($infos["date_debut_contrat"]))."-".$nbDInMonth,
+				"date_periode_fin_libre" => $dateFinPeriode,
 	            "prix_libre" => round($totalLoyer, 2),
 	            "prix" => round($totalLoyer, 2),
 	            "nature" => "engagement"
