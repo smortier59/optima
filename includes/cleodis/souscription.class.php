@@ -659,7 +659,7 @@ class souscription_cleodis extends souscription {
       case 'notice_assurance.pdf': // Notice d'assurance
         $module = "affaire";
         $id = $post['id_affaire'];
-        $type = 'retourNoticeAssurance';
+        $type = 'others';
       break;
       case 'others':
         $module = "affaire";
@@ -670,7 +670,8 @@ class souscription_cleodis extends souscription {
 
     if (!$id) throw new Exception('Il manque l\'identifiant', 500);
     if (!$module) throw new Exception('Il manque le module', 500);
-
+    log::logger($type, "qjanon");
+    log::logger($post['type'], "qjanon");
     if ($type == 'others') {
       // Ici on va traiter les documents annexe DGS/CGA, ces document doivent se retrouvé dans la GED de l'affaire et non sur l'affaire elle même
       $id_pdf_affaire = ATF::pdf_affaire()->insert(array(
