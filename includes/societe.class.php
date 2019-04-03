@@ -335,8 +335,6 @@ class societe extends classes_optima {
 		//--Set de l'id Owner (créateur de l'entité)--
 		if(!$infos['id_owner']) $infos['id_owner']=ATF::$usr->getID();
 
-		if(!$infos['id_commercial']) $infos['id_commercial']=$infos['id_owner'];
-
 		//--Insertion en base de données--
 		$retour=false;
 
@@ -895,9 +893,16 @@ class societe extends classes_optima {
 
 		    $response = $this->processCSRequest($url, $params);
 
-		    if(__PRE__ === true){
+
+
+		    if(__DEV__ === true){
+		    	log::logger("Dev" , "mfleurquin");
+		    	file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
+		    }elseif(__PRE__ === true){
+		    	log::logger("Pre" , "mfleurquin");
 				file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafe.xml",$response);
 			}else{
+				log::logger("Prod" , "mfleurquin");
 				file_put_contents("/home/absystech/optima/core/log/creditsafe.xml",$response);
 			}
 
@@ -924,6 +929,7 @@ class societe extends classes_optima {
 	*/
 	public function cleanGGSResponse($r) {
 		$xml = $r;
+
 		$item = $xml->RetrieveCompanyOnlineReportResult->Reports->Report;
 		$company = $item->CompanyIdentification;
 
@@ -1135,6 +1141,8 @@ class societe extends classes_optima {
 
 		// Activite de société
 		$return['reference_tva'] = (string)$bi->vatnumber;
+
+		$return['ville_rcs'] =  (string)$s->courtregistrydescription;
 
 		// NB employé de société
 		$return['nb_employe'] = (string)$bi->companyworkforce;
