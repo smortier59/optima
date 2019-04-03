@@ -2782,10 +2782,13 @@ class affaire_cleodis extends affaire {
 			$id_user = 113;  //Benjamin Tronquit
 		}
 
+		$affaire = ATF::affaire()->select($id_affaire);
+		$societe = ATF::societe()->select($affaire["id_societe"]);
+
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter ",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." provenant de ".$affaire["provenance"]." du site ".$affaire["site_associe"].". \nDonnées de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
