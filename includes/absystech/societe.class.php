@@ -161,6 +161,9 @@ class societe_absystech extends societe {
 		ATF::db($this->db)->begin_transaction();
 
 		try {
+
+			if(!$infos['id_commercial']) $infos['id_commercial'] = ATF::$usr->getID();
+
 			//Unset du crédit pour les duplicates
 			unset($infos["credits"]);
 			$id_societe = parent::insert($infos,$s,$files,$cadre_refreshed);
