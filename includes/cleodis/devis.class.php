@@ -1050,6 +1050,8 @@ class devis_cleodis extends devis {
 				case "commentaire_facture3":
 					return $affaire["commentaire_facture3"];
 					break;
+				case "type_affaire":
+					return $affaire["type_affaire"];
 			}
 		}else{
 			switch ($field) {
@@ -1093,6 +1095,8 @@ class devis_cleodis extends devis {
 						$return="";
 					}
 					return $return;
+				case "type_affaire":
+					return "normal";
 			}
 		}
 
