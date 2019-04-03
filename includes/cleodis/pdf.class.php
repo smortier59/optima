@@ -7097,7 +7097,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
-		$this->cell(0,5,"Numéro du Contrat de Financement ".$s["num_contrat"],0,1);
+		$this->cell(0,5,"Numéro du Contrat de Financement ".$this->affaire["ref"],0,1);
 		$this->multicell(0,4,"Désignation du Client : ".$this->client["societe"].", ".$this->client["structure"]." au capital de ".$this->client["capital"]." Euros – ".$this->client["siren"]." R.C.S. ".$this->client["ville_rcs"],0);
 
 
@@ -7162,10 +7162,13 @@ class pdf_cleodis extends pdf {
 		$date_revente = date("Y-m-01", strtotime($this->commande["date_evolution"]));
 		$date_revente = date("01 / m / Y", strtotime("+1 month", strtotime($date_revente)));
 
+
+		$date = date("Y-m-d");
+
 		$this->cell(0,4,"Date de la revente : ".$date_revente,0,1);
 		$this->cell(0,4,"Prix de Revente 15 euros H.T. à majorer de la TVA en vigueur.",0,1);
 		$this->ln(5);
-		$this->cell(0,4,"Fait en deux (2) exemplaires, à Rueil-Malmaison, le ".date("d / m / Y", strtotime($this->demande_refi["date"])),0,1);
+		$this->cell(0,4,"Fait en deux (2) exemplaires, à Rueil-Malmaison, le ".date("d / m / Y", strtotime($date)),0,1);
 		$this->ln(5);
 		$this->setfont('arial',"B",8);
 		$this->cell(90,6,"Pour FRANFINANCE LOCATION",0,0,"C");
@@ -7181,7 +7184,7 @@ class pdf_cleodis extends pdf {
 		$this->cell(90,6,"Qualité :",0,1);
 
 		$this->cell(90,6,"____________________________________________",0,0);
-		$this->cell(90,6,"____________________________________________",0,1);
+		$this->cell(90,6,"PRESIDENT",0,1);
 	}
 
 
