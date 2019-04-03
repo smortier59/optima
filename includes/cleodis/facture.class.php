@@ -655,6 +655,9 @@ class facture_cleodis extends facture {
 									->addOrder("id_loyer", "ASC");
 			$loyers = ATF::loyer()->select_all();
 
+			$dateTimeDebContrat = new DateTime(date("Y-m-d", strtotime($infos["date_debut_contrat"])));
+			$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
+
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
 				$nbJProRata = 30 - date("d", strtotime($infos["date_installation_reel"]));
@@ -671,15 +674,7 @@ class facture_cleodis extends facture {
 				$days_difference = 90 - (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
 				$nbJProRata = $days_difference;
 
-				if(date("m", strtotime($infos["date_installation_reel"])) <4){
-					$dateFinPeriode = date("31-03-Y", strtotime($infos["date_installation_reel"]));
-				}elseif(date("m", strtotime($infos["date_installation_reel"])) <7){
-					$dateFinPeriode = date("30-06-Y", strtotime($infos["date_installation_reel"]));
-				}elseif(date("m", strtotime($infos["date_installation_reel"])) <10){
-					$dateFinPeriode = date("30-09-Y", strtotime($infos["date_installation_reel"]));
-				}else{
-					$dateFinPeriode = date("31-12-Y", strtotime($infos["date_installation_reel"]));
-				}
+
 
 
 			}elseif($loyers[0]["frequence_loyer"] == "semestre"){
@@ -694,11 +689,6 @@ class facture_cleodis extends facture {
 				$days_difference = (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
 				$nbJProRata = $days_difference;
 
-				if(date("m", strtotime($infos["date_installation_reel"])) <7){
-					$dateFinPeriode = date("30-06-Y", strtotime($infos["date_installation_reel"]));
-				}else{
-					$dateFinPeriode = date("31-12-Y", strtotime($infos["date_installation_reel"]));
-				}
 			}else{
 				// Pas de loyer semestriel pour le moment coté cleodis
 				// Partie non testée
@@ -706,7 +696,6 @@ class facture_cleodis extends facture {
 				$nbDInPeriode = 365;
 				$dateYear = strtotime('first day of January '.date('Y'));
 				$days_difference = (strtotime($infos["date_installation_reel"])- $dateYear)/24/3600;
-				$dateFinPeriode = date("31-12-Y", strtotime($infos["date_installation_reel"]));
 
 			}
 			//Calcul du bon prix par rapport à la frequence
@@ -714,6 +703,11 @@ class facture_cleodis extends facture {
 			//Ajout des assurance .... sur le prix prix_libre
 			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
 			$total = $loyerAuJour * $nbJProRata;
+
+			$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
+
+
+
 
 			if($nbJProRata > 0 && $total != 0){
 				$facture["facture"] = array(
@@ -733,6 +727,7 @@ class facture_cleodis extends facture {
 		            "prix_libre" => round($total, 2),
 		            "nature" => "prorata"
 		        );
+
 
 
 
@@ -786,34 +781,22 @@ class facture_cleodis extends facture {
 			$date_previsionnelle = date("Y-m-d");
 		}
 
-		$nbDInMonth = cal_days_in_month(CAL_GREGORIAN,
-											date("m", strtotime($infos["date_debut_contrat"])),
-											date("Y", strtotime($infos["date_debut_contrat"])));
+		$dateTimeDebContrat = new DateTime(date("Y-m-d", strtotime($infos["date_debut_contrat"])));
 
 		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
 
 		if($loyers[0]["frequence_loyer"] == "mois"){
-			$dateFinPeriode = date("Y-m", strtotime($infos["date_debut_contrat"]))."-".$nbDInMonth;
+			$dateFinPeriode = date_add($dateTimeDebContrat, date_interval_create_from_date_string('1 months'));
 		}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
-			if(date("m", strtotime($infos["date_debut_contrat"])) == 1){
-				$dateFinPeriode = date("31-03-Y", strtotime($infos["date_debut_contrat"]));
-			}elseif(date("m", strtotime($infos["date_debut_contrat"])) == 4){
-				$dateFinPeriode = date("30-06-Y", strtotime($infos["date_debut_contrat"]));
-			}elseif(date("m", strtotime($infos["date_debut_contrat"])) == 7){
-				$dateFinPeriode = date("31-09-Y", strtotime($infos["date_debut_contrat"]));
-			}else{
-				$dateFinPeriode = date("31-12-Y", strtotime($infos["date_debut_contrat"]));
-			}
+			$dateFinPeriode = date_add($dateTimeDebContrat, date_interval_create_from_date_string('3 months'));
 		}elseif($loyers[0]["frequence_loyer"] == "semestre"){
-			if(date("m", strtotime($infos["date_debut_contrat"])) <= 6){
-				$dateFinPeriode = date("30-06-Y", strtotime($infos["date_debut_contrat"]));
-			}else{
-				$dateFinPeriode = date("31-12-Y", strtotime($infos["date_debut_contrat"]));
-			}
+			$dateFinPeriode = date_add($dateTimeDebContrat, date_interval_create_from_date_string('6 months'));
 		}else{
-			$dateFinPeriode = date("31-12-Y", strtotime($infos["date_debut_contrat"]));
+			$dateFinPeriode = date_add($dateTimeDebContrat, date_interval_create_from_date_string('1 year'));
 		}
 
+		$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
+		$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
 
 		if($totalLoyer != 0){
 			$mode_paiement = "prelevement";
