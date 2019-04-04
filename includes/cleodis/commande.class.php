@@ -407,6 +407,10 @@ class commande_cleodis extends commande {
 		ATF::db($this->db)->begin_transaction();
 
 		//*****************************Transaction********************************
+		if(ATF::affaire()->select($devis["id_affaire"], "site_associe")){
+			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
+		}
+
 
 		$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
 									   "id_user"=>$infos["id_user"],
