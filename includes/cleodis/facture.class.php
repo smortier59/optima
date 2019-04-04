@@ -657,44 +657,20 @@ class facture_cleodis extends facture {
 
 			$dateTimeDebContrat = new DateTime(date("Y-m-d", strtotime($infos["date_debut_contrat"])));
 			$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
+			$dateInstall = new DateTime($infos["date_installation_reel"]);
+
+
+			$nbJProRata = $dateInstall->diff($dateTimeDebContrat)->format("%a") +1;
 
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
 				$nbJProRata = 30 - date("d", strtotime($infos["date_installation_reel"]));
 			}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
 				$nbDInPeriode = 90;
-				// récupérer la date de début du trimestre pour déduire les jours écoulés
-				$start_date = strtotime('3 months ago');
-				$start_quarter = ceil(date('m', $start_date) / 3);
-				$start_month = ($start_quarter * 3) - 2;
-				$start_year = date('Y', $start_date);
-				$start_timestamp = mktime(0, 0, 0, $start_month, 1, $start_year);
-				$days_difference = 90 - (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
-				$nbJProRata = $days_difference;
-
-
-
-
 			}elseif($loyers[0]["frequence_loyer"] == "semestre"){
-				// Pas de loyer semestriel pour le moment coté cleodis
-				// Partie non testée
 				$nbDInPeriode = 180;
-				$start_date = strtotime('6 months ago');
-				$start_semestre = ceil(date('m', $start_date) / 6);
-				$start_month = ($start_quarter * 6) - 5;
-				$start_year = date('Y', $start_date);
-				$start_timestamp = mktime(0, 0, 0, $start_month, 1, $start_year);
-				$days_difference = (strtotime($infos["date_installation_reel"])- $start_timestamp)/24/3600;
-				$nbJProRata = $days_difference;
-
 			}else{
-				// Pas de loyer semestriel pour le moment coté cleodis
-				// Partie non testée
-				// a voir avec cleodis BE
 				$nbDInPeriode = 365;
-				$dateYear = strtotime('first day of January '.date('Y'));
-				$days_difference = (strtotime($infos["date_installation_reel"])- $dateYear)/24/3600;
-
 			}
 			//Calcul du bon prix par rapport à la frequence
 			//Calcul des bonnes periodes (date_debut date_fin) par rapport aux periodes
@@ -703,9 +679,6 @@ class facture_cleodis extends facture {
 			$total = $loyerAuJour * $nbJProRata;
 
 			$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
-
-
-
 
 			if($nbJProRata > 0 && $total != 0){
 				$facture["facture"] = array(
@@ -750,7 +723,7 @@ class facture_cleodis extends facture {
 
 				$facture["values_facture"]["produits"] = json_encode($facture["values_facture"]["produits"]);
 
-		        $this->insert($facture);
+		       	$this->insert($facture);
 			}
 
 
