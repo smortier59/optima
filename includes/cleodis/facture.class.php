@@ -661,8 +661,6 @@ class facture_cleodis extends facture {
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
 				$nbJProRata = 30 - date("d", strtotime($infos["date_installation_reel"]));
-				$dateFinPeriode = date("t-m-Y", strtotime($infos["date_installation_reel"]));
-
 			}elseif($loyers[0]["frequence_loyer"] == "trimestre"){
 				$nbDInPeriode = 90;
 				// récupérer la date de début du trimestre pour déduire les jours écoulés
