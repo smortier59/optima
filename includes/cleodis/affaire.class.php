@@ -2773,11 +2773,11 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		$dest = array("21","112", "103");  //Allison, Severine, Emily
+		$dest = array("18", "21","112", "103");  //Pierre, Allison, Severine, Emily
 		$id_user = 116; //Benjamin Tronquit
 
 		if(ATF::$codename === "cleodisbe"){
-			$dest = array("21", "104");  //Allison, Severine
+			$dest = array("18", "21", "104");  //Pierre, Allison, Severine
 			$id_user = 113;  //Benjamin Tronquit
 		}
 
