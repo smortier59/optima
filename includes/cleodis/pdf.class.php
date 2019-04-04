@@ -7097,7 +7097,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
-		$this->cell(0,5,"Numéro du Contrat de Financement ".$this->affaire["ref"],0,1);
+		$this->cell(0,5,"Numéro du Contrat de Financement ".$this->affaire["ref"]."-".$this->client["code_client"],0,1);
 		$this->multicell(0,4,"Désignation du Client : ".$this->client["societe"].", ".$this->client["structure"]." au capital de ".$this->client["capital"]." Euros – ".$this->client["siren"]." R.C.S. ".$this->client["ville_rcs"],0);
 
 
@@ -7148,7 +7148,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setleftMargin(10);
 		$this->setfont('arial',"",8);
-		$this->multicell(0,5,"Désignation de l’Equipement : ".$s["equipement"]."\nPrix de Vente : ".number_format($this->demande_refi["loyer_actualise"], 2, " ", "," )." euros H.T. à majorer de la TVA au taux en vigueur.");
+		$this->multicell(0,5,"Désignation de l’Equipement : ".$this->affaire["affaire"]."\nPrix de Vente : ".number_format($this->demande_refi["loyer_actualise"], 2, " ", "," )." euros H.T. à majorer de la TVA au taux en vigueur.");
 		$this->ln(5);
 
 		$this->setfont('arial',"B",8);
