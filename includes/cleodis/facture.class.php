@@ -662,6 +662,8 @@ class facture_cleodis extends facture {
 
 			$nbJProRata = $dateInstall->diff($dateTimeDebContrat)->format("%a") +1;
 
+			log::logger($nbJProRata , "mfleurquin");
+
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
 				$nbJProRata = 30 - date("d", strtotime($infos["date_installation_reel"]));
