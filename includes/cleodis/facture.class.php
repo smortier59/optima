@@ -662,7 +662,7 @@ class facture_cleodis extends facture {
 
 			$nbJProRata = $dateInstall->diff($dateTimeDebContrat)->format("%a") +1;
 
-			log::logger($nbJProRata , "mfleurquin");
+
 
 			if($loyers[0]["frequence_loyer"] == "mois"){
 				$nbDInPeriode = 30;
@@ -679,6 +679,13 @@ class facture_cleodis extends facture {
 			//Ajout des assurance .... sur le prix prix_libre
 			$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
 			$total = $loyerAuJour * $nbJProRata;
+
+
+
+			log::logger("NB J Pro rata : ".$nbJProRata , "mfleurquin");
+			log::logger("NB J Periode : ".$nbDInPeriode , "mfleurquin");
+			log::logger("Loyer : ".($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"]) , "mfleurquin");
+			log::logger("Loyer au jour : ".$loyerAuJour , "mfleurquin");
 
 			$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
 
