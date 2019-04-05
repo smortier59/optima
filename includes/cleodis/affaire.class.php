@@ -186,6 +186,19 @@ class affaire_cleodis extends affaire {
 
 	}
 
+
+	public function comiteAccepte($id_affaire){
+
+		ATF::comite()->q->reset()->where("id_affaire", $id_affaire)->where("etat","accepte")->setCount();
+		$data = ATF::comite()->sa();
+		if($data["count"]){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+
 	public function updateCommentaireFacture($infos){
 		$id_affaire = $this->decryptId($infos["id_affaire"]);
 
