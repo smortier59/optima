@@ -660,7 +660,7 @@ class facture_cleodis extends facture {
 			$dateInstall = new DateTime($infos["date_installation_reel"]);
 
 
-			$nbJProRata = $dateInstall->diff($dateTimeDebContrat)->format("%a") +1;
+			$nbJProRata = $dateInstall->diff($dateTimeDebContrat)->format("%a");
 
 
 
