@@ -63,8 +63,16 @@ class commande_ligne_absystech extends commande_ligne {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all["count"]>0){
 			foreach($select_all["data"] as $key=>$item){
-				$select_all["data"][$key]["commande_ligne.marge"]=max(0,(($select_all["data"][$key]["commande_ligne.prix"]-$select_all["data"][$key]["commande_ligne.prix_achat"])/$select_all["data"][$key]["commande_ligne.prix"])*100);
-				$select_all["data"][$key]["commande_ligne.marge_absolue"]=max(0,($select_all["data"][$key]["commande_ligne.prix"]*$select_all["data"][$key]["commande_ligne.quantite"])-($select_all["data"][$key]["commande_ligne.prix_achat"]*$select_all["data"][$key]["commande_ligne.quantite"]));
+				if (!$item["commande_ligne.prix"] || !$item["commande_ligne.prix_achat"]) {
+					$select_all["data"][$key]["commande_ligne.marge"] = 0;
+					$select_all["data"][$key]["commande_ligne.marge_absolue"] = 0;
+				} else {
+					$marge = (($item["commande_ligne.prix"]-$item["commande_ligne.prix_achat"])/$item["commande_ligne.prix"])*100;
+					$select_all["data"][$key]["commande_ligne.marge"] = max(0,$marge);
+
+					$marge_absolue = ($item["commande_ligne.prix"]*$item["commande_ligne.quantite"])-($item["commande_ligne.prix_achat"]*$item["commande_ligne.quantite"]);
+					$select_all["data"][$key]["commande_ligne.marge_absolue"]=max(0,$marge_absolue);
+				}
 			}
 		}
 		return $select_all;

@@ -64,8 +64,17 @@ class devis_ligne_absystech extends devis_ligne {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all){
 			foreach($select_all["data"] as $key=>$item){
-				$select_all["data"][$key]["devis_ligne.marge"]=max(0,(($select_all["data"][$key]["devis_ligne.prix"]-$select_all["data"][$key]["devis_ligne.prix_achat"])/$select_all["data"][$key]["devis_ligne.prix"])*100);
-				$select_all["data"][$key]["devis_ligne.marge_absolue"]=max(0,($select_all["data"][$key]["devis_ligne.prix"]*$select_all["data"][$key]["devis_ligne.quantite"])-($select_all["data"][$key]["devis_ligne.prix_achat"]*$select_all["data"][$key]["devis_ligne.quantite"]));
+				if (!$item["devis_ligne.prix"] || !$item["devis_ligne.prix_achat"]) {
+					$select_all["data"][$key]["devis_ligne.marge"] = 0;
+					$select_all["data"][$key]["devis_ligne.marge_absolue"] = 0;
+				} else {
+					$marge = (($item["devis_ligne.prix"]-$item["devis_ligne.prix_achat"])/$item["devis_ligne.prix"])*100;
+					$select_all["data"][$key]["devis_ligne.marge"] = max(0,$marge);
+
+					$marge_absolue = ($item["devis_ligne.prix"]*$item["devis_ligne.quantite"])-($item["devis_ligne.prix_achat"]*$item["devis_ligne.quantite"]);
+					$select_all["data"][$key]["devis_ligne.marge_absolue"]=max(0,$marge_absolue);
+				}
+				
 			}
 		}
 		return $select_all;
@@ -80,13 +89,20 @@ class devis_ligne_absystech extends devis_ligne {
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(util::keysOrValues($this->colonnes['ligne']))->reset('limit,page');
 		if ($res = $this->select_all()) {
+
 			// Maquillage des devis_ligne en commande_ligne
 			foreach ($res["data"] as $kRow => $row) {
 				foreach ($row as $kCol => $value) {
 					$return[$kRow][str_replace("devis_ligne","commande_ligne",$kCol)]=$value;
 				}
-				$return[$kRow]["commande_ligne.marge"]=
-				round((($return[$kRow]["commande_ligne.prix"]-$return[$kRow]["commande_ligne.prix_achat"])/$return[$kRow]["commande_ligne.prix"])*100,2);
+
+				if ($return[$kRow]["commande_ligne.prix"] && $return[$kRow]["commande_ligne.prix"] != 0.00) {
+					$marge = (($return[$kRow]["commande_ligne.prix"]-$return[$kRow]["commande_ligne.prix_achat"])/$return[$kRow]["commande_ligne.prix"])*100;
+					$return[$kRow]["commande_ligne.marge"] = round($marge,2);
+				} else {
+					$return[$kRow]["commande_ligne.prix"] = 0;
+					$return[$kRow]["commande_ligne.marge"] = 0;
+				}
 			}
 			$res["data"] = $return;
 		}		
