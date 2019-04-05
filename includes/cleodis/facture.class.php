@@ -681,11 +681,6 @@ class facture_cleodis extends facture {
 
 
 
-			log::logger("NB J Pro rata : ".$nbJProRata , "mfleurquin");
-			log::logger("NB J Periode : ".$nbDInPeriode , "mfleurquin");
-			log::logger("Loyer : ".($loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"]) , "mfleurquin");
-			log::logger("Loyer au jour : ".$loyerAuJour , "mfleurquin");
-
 			$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
 
 			if($nbJProRata > 0 && $total != 0){
