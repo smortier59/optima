@@ -1541,7 +1541,7 @@ class societe_cleodis extends societe {
 
           $creation = new DateTime( $data["date_creation"] );
           $creation = $creation->format("Ymd");
-          $past2Years = new DateTime( date("Y-m-d", strtotime("-5 years")) );
+          $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
           $past2Years = $past2Years->format("Ymd");
 
           if($data["cs_score"] > 50 && $creation < $past2Years ){
@@ -1549,7 +1549,7 @@ class societe_cleodis extends societe {
             $comite["decisionComite"] = "Accepté automatiquement";
           }else{
             $comite["etat"] = "refuse";
-            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 5ans";
+            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
           }
 
           $comite["reponse"] = date("Y-m-d");
