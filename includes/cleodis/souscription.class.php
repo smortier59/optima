@@ -127,7 +127,7 @@ class souscription_cleodis extends souscription {
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
           "IBAN"=>$societe["IBAN"],
-          "RUM"=>$societe["RUM"],
+          //"RUM"=>$societe["RUM"], //Inutile le travail est fait dans devis->insert()
           "BIC"=>$societe["BIC"],
           "id_magasin"=>$post["id_magasin"]
         );
@@ -146,7 +146,7 @@ class souscription_cleodis extends souscription {
         }
 
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
-        if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"];
+        //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
 
 
