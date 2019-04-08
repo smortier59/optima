@@ -1,7 +1,8 @@
 <?
-class accueil_test extends ATF_PHPUnit_Framework_TestCase {
+class accueil_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Yann GAUTHERON <ygautheron@absystech.fr>
 	public function test_table(){
+		$this->obj = new accueil_absystech();
 		$this->assertEquals("accueil",$this->obj->name(),"Probleme de nom de classe accueil");
 	}
 

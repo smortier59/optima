@@ -1,6 +1,6 @@
 <?
 /* @author Nicolas BERTEMONT <nbertemont@absystech.fr> */
-class conge_test extends ATF_PHPUnit_Framework_TestCase {
+class conge_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 	public function setUp(){
 		ATF::db()->begin_transaction(true);
 		$this->initUserOnly(false);
@@ -20,7 +20,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 	}
 
 	public function testConstruct(){
-		$c_conge=new conge();
+		$c_conge=new conge_absystech();
 		$this->assertTrue(isset($c_conge->colonnes['fields_column']),"Il n'y a plus de fields_column dans conge");
 		$this->assertTrue(isset($c_conge->colonnes['primary']),"Il n'y a plus de primary dans conge");
 		$this->assertTrue(isset($c_conge->colonnes['bloquees']),"Il n'y a plus de colonnes bloquées sur conge");
@@ -58,7 +58,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->obj->delete_zimbra_conge($infos);
 	}
 
-	public function testStoreIcal(){
+	/*public function testStoreIcal(){
 		//le but ici n'est pas de tester curl, donc on regarde juste si on récupère les notices, et que l'on passe aux bons endroits
 		//case autre
 		ATF::setSingleton("curl", new mockObjectCurl());
@@ -93,7 +93,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::unsetSingleton("curl");
 		$this->assertTrue(is_array($notices_jour),"La notice 'jour' n a pas ete executee");
 		$this->assertEquals($notices_jour[0]['msg'],ATF::$usr->trans("ajout_agenda","conge"),"Le contenu de la notice 'jour' n est pas bonne");
-	}
+	}*/
 
 	/* @author Yann GAUTHERON <ygautheron@absystech.fr>, Nicolas BERTEMONT <nbertemont@absystech.fr> */
 	public function testSelectAll(){
@@ -139,10 +139,10 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertFalse($r[1]["allowValid"],"Le allowValid devrait être a FALSE sur l'enregistrement 1.");
 		$this->assertFalse($r[1]["allowRefus"],"Le allowValid devrait être a FALSE sur l'enregistrement 1.");
 
-		$this->assertEquals('2.0',$r[0]["duree"],"Conges 1 non corrects");
+		$this->assertEquals('1.0',$r[0]["duree"],"Conges 1 non corrects");
 		$this->assertEquals('0.0',$r[0]["dureeCetteAnnee"],"Conges 2 non corrects");
 		//+2 car on tombera toujours sur 2 weekend, et on bosse le samedi (donc 2 samedis à ajouter)
-		$this->assertEquals('15.0',$r[1]["duree"],"Conges 3 non corrects");
+		$this->assertEquals('12.0',$r[1]["duree"],"Conges 3 non corrects");
 		$this->assertEquals('0.0',$r[1]["dureeCetteAnnee"],"Conges 4 non corrects");
 
 		$infos=array(
@@ -283,12 +283,7 @@ class conge_test extends ATF_PHPUnit_Framework_TestCase {
 		ATF::$msg->getWarnings();
 		ATF::$msg->getNotices();
 
-		if(date('w') != "5"){
-			$this->assertEquals(7, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
-		}else{
-			$this->assertEquals(8, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
-		}
-
+		$this->assertEquals(6, $this->obj->CongesDispo(array("id_conge" =>$this->id_conge, "id_user"=>$this->id_user)), "Conges Dispo retour incorrect");
 	}
 };
 

@@ -50,6 +50,19 @@ class pdf_cleodis extends pdf {
 	}
 
 
+	/* Ecrit un titre d'article pour les CGV
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 13-01-2011
+	* @param int $id Id du devis
+	*/
+	function article($x,$y,$num,$titre,$police,$h=3,$w=0){
+		$this->setxy($x,$y);
+		$this->setfont('arial','BI',$police);
+		$this->multicell($w,$h,"Article ".$num." : ".$titre,0,'L');
+		$this->ln($h);
+		if ($police != 8)	$this->setfont('arial','',8);
+	}
+
 	/* Génère le pied de page des PDF Cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 25-01-2011
@@ -168,18 +181,7 @@ class pdf_cleodis extends pdf {
 	}
   }
 
-	/* Ecrit un titre d'article pour les CGV
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @date 13-01-2011
-	* @param int $id Id du devis
-	*/
-	function article($x,$y,$num,$titre,$police,$h=3,$w=0){
-		$this->setxy($x,$y);
-		$this->setfont('arial','BI',$police);
-		$this->multicell($w,$h,"Article ".$num." : ".$titre,0,'L');
-		$this->ln($h);
-		if ($police != 8)	$this->setfont('arial','',8);
-	}
+
 
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
@@ -189,6 +191,8 @@ class pdf_cleodis extends pdf {
 
 		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
 		$this->contrat = ATF::commande()->select_row();
+
+
 
 		$this->adresseClient = $this->client["adresse"];
 		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
@@ -276,7 +280,7 @@ class pdf_cleodis extends pdf {
 		$this->setLeftMargin(5);
 		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
 		$this->ln(4);
-		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y"),0,1);
+		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y", strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))),0,1);
 
 		$this->ln(4);
 		$this->setfont('arial','',7);
@@ -311,7 +315,7 @@ class pdf_cleodis extends pdf {
 
 
 			$this->SetXY(120,248);
-			$this->multicell(100,6,"Lille\n".date('d/m/Y'));
+			$this->multicell(100,6,"Lille\n".date('d/m/Y', strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))));
 
 		}
 
@@ -360,26 +364,7 @@ class pdf_cleodis extends pdf {
 
 	}
 
-	/*public function get_CGS($id_doc) {
-		$this->Open();
-	    $this->unsetHeader();
-	    $this->unsetFooter();
 
-	    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
-	    log::logger($filepath , "mfleurquin");
-	    log::logger(__PDF_PATH__."cleodis/notice_assurance.pdf" , "mfleurquin");
-	    //$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/notice_assurance.pdf");
-	    $pageCount = $this->setSourceFile($filepath);
-
-	    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-	      $tplIdx = $this->importPage($pageNo);
-
-	      // add a page
-	      $this->AddPage();
-	      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-	    }
-
-	}*/
 
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -453,91 +438,6 @@ class pdf_cleodis extends pdf {
 		return true;
 
 	}
-
-
-	public function devis_new($id,$s) {
-		$this->devis = ATF::devis()->select($id);
-		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
-
-		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
-		if(ATF::$codename == "cleodis") ATF::devis_ligne()->q->where("visible_pdf","oui");
-		$this->lignes = ATF::devis_ligne()->sa();
-
-		$this->user = ATF::user()->select($this->devis['id_user']);
-		$this->societe = ATF::societe()->select($this->user['id_societe']);
-		$this->client = ATF::societe()->select($this->devis['id_societe']);
-		$this->contact = ATF::contact()->select($this->devis['id_contact']);
-		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
-		$this->agence = ATF::agence()->select($this->user['id_agence']);
-
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
-
-		if($this->devis["type_devis"] === "optic_2000"){
-			$this->devisoptic_2000($id);
-		}else{
-			$this->pdf_devis = true;
-			/* PAGE 1 */
-			//$this->unsetHeader();
-			$this->Addpage();
-			$this->setHeader();
-			$this->SetLeftMargin(15);
-
-			$this->sety(30);
-			$this->setfont('arial','B',18);
-			$this->multicell(0,7,"PAYEZ A L’USAGE VOS SOLUTIONS\nINFORMATIQUES ET DIGITALES",0,'C');
-
-			$this->image(__PDF_PATH__."cleodis/page1_devis.jpg",20,60,160);
-
-			$this->setY(200);
-
-			$this->setfont('arial','',12);
-
-			$this->cell(36,5,"Livraison",1,0,'C');
-			$this->cell(36,5,"Connexion",1,0,'C');
-			$this->cell(36,5,"Maintenance",1,0,'C');
-			$this->cell(36,5,"Evolution",1,0,'C');
-			$this->cell(36,5,"Récupération",1,1,'C');
-			$this->ln(8);
-			$this->setfont('arial','B',18);
-
-			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
-
-			$this->setfont('arial','',8);
-			$this->ln(5);
-			$y = $this->getY();
-
-
-			$this->multicell(85,5,"Votre Interlocuteur CLEODIS ");
-			$this->setfont('arial','IB',11);
-			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
-			$this->setfont('arial','',8);
-			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));
-			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));
-			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
-
-			$this->setY($y);
-			$this->setleftmargin(110);
-			$this->setfont('arial','IB',11);
-			$this->multicell(85,10,$this->client['societe']);
-			$this->setfont('arial','',8);
-			$this->multicell(85,5,$this->client['adresse']);
-			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);
-			$this->setfont('arial','B',11);
-			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
-			$this->setfont('arial','',8);
-			$this->setleftmargin(15);
-
-			if($this->devis['type_contrat'] =='vente'){
-				$this->devisVente();
-			}elseif($this->affaire['nature'] =='avenant'){
-				$this->devisAvenant();
-			}else{
-				$this->devisClassique();
-			}
-		}
-		return true;
-	}
-
 
 
 	/* Génère le PDF d'un devis de vente
@@ -768,451 +668,6 @@ class pdf_cleodis extends pdf {
 			$this->tableau(false,$totalTable['data'],$totalTable['w'],5,$totalTable['styles']);
 		}
 	}
-
-	/* Génère le PDF d'un devis Classique V2
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @date 23-09-2016
-	*/
-	public function devisClassique_new() {
-		if (!$this->devis) return false;
-
-		/* PAGE 2 */
-		$this->setHeader();
-		$this->setTopMargin(30);
-		$this->addpage();
-
-		$this->setfont('arial','B',16);
-		$this->setTextColor("48","154","40");
-		$this->multicell(0,7,"1 – Cléodis, partenaire des entreprises & réseaux de franchises");
-		$this->setTextColor("black");
-		$this->ln(10);
-
-		$this->setfont('arial','',12);
-		$this->multicell(0,7,"Groupe indépendant, présent dans près de 4 000 entreprises, partenaires de 25 enseignes de franchises sur l’ensemble du territoire français, nous intervenons en partenariat avec notre réseau de prestataires :");
-		$this->ln(10);
-		$this->setLeftMargin(50);
-		$y = $this->getY();
-		$this->cell(50,7,"- constructeurs",0,1);
-		$this->cell(50,7,"- éditeurs",0,1);
-		$this->cell(50,7,"- intégrateurs",0,1);
-
-		$this->setY($y);
-		$this->setLeftMargin(120);
-		$this->cell(50,7,"- SSII",0,1);
-		$this->cell(50,7,"- distributeurs",0,1);
-		$this->cell(50,7,"- mainteneurs",0,1);
-		$this->ln(10);
-		$this->setLeftMargin(15);
-		$this->multicell(0,7,"afin de vous apporter des solutions complètes et proches de chez vous.");
-		$this->ln(10);
-
-
-		$this->setfont('arial','B',16);
-		$this->setTextColor("48","154","40");
-		$this->multicell(0,7,"2 – Cléodis, spécialiste des réseaux & franchises : ");
-		$this->setTextColor("black");
-		$this->ln(10);
-
-		$this->setfont('arial','',12);
-		$this->multicell(0,7,"Cléodis a développé une approche spécifique pour les réseaux d'entreprises : franchises, coopératives, etc.");
-		$this->ln(10);
-		$this->setLeftMargin(35);
-		$this->cell(0,7," >  approche individualisée par entreprise",0,1);
-		$this->cell(0,7," >  accompagnement au cas par cas lors des créations ",0,1);
-		$this->cell(0,7," >  gestion des évolutions informatiques et logicielles sur l'ensemble du réseau",0,1);
-		$this->cell(0,7," >  gestion centralisée et surpervision globale",0,1);
-		$this->cell(0,7," >  suivi et maintenance du parc avec reporting centralisé",0,1);
-
-		$this->ln(10);
-		$this->setLeftMargin(15);
-
-		$this->setfont('arial','B',16);
-		$this->setTextColor("48","154","40");
-		$this->multicell(0,7,"Notre vocation : vous faire profiter de la technologie en vous apportant SIMPLICITE, TRANQUILLITE et LIBERTE.");
-		$this->setTextColor("black");
-		$this->ln(10);
-
-
-
-		/* PAGE 3 */
-		$this->AddPage();
-
-		$this->setfont('arial','B',16);
-		$this->setTextColor("48","154","40");
-		$this->multicell(0,7,"3 – Nos domaines d’intervention");
-		$this->setTextColor("black");
-		$this->ln(5);
-		$this->setfont('arial','B',11);
-		$this->multicell(0,7,"Cléodis intervient sur les composants du système d’information de l’entreprise :");
-
-
-		$head = NULL;
-		$width = array(60,120);
-		$data = array();
-		$style = array(
-			"col1"=>array("size"=>12,"decoration"=>"B","align"=>"C")
-		);
-
-		$data[] = array("\n\nPostes informatiques & bureautiques","\n\n\n\n\n\n\n");
-		$s[][0] = $style["col1"];
-		$data[] = array("Systèmes d'encaissement","\n\n\n\n\n\n\n");
-		$s[][0] = $style["col1"];
-		$data[] = array("Solutions d'impression","\n\n\n\n\n\n\n");
-		$s[][0] = $style["col1"];
-		$data[] = array("\n\nRéseau : LAN/WAN, wifi\nsupervision","\n\n\n\n\n\n\n");
-		$s[][0] = $style["col1"];
-		$data[] = array("Digital & Multimédia","\n\n\n\n\n\n\n");
-		$s[][0] = $style["col1"];
-		$data[] = array("Téléphonie","\n\n\n\n\n\n\n");
-		$s[][0] = $style["col1"];
-		$this->tableau($head,$data,$width,7,$s,260);
-
-
-		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne1.jpg",85,60,90);
-		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne2.jpg",85,90,90);
-		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne3.jpg",85,125,105);
-		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne4.jpg",85,160,105);
-		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne5.jpg",85,195,105);
-		$this->image(__PDF_PATH__."cleodis/pdf_devis_ligne6.jpg",85,230,105);
-
-
-		/*	PAGE 4	*/
-		$this->AddPage();
-
-		$this->sety(30);
-		$this->setfont('arial','B',16);
-		$this->setTextColor("48","154","40");
-		$this->multicell(0,7,"4 – L’infogérance  de votre système d’information par Cléodis");
-		$this->setTextColor("black");
-		$this->ln(10);
-
-		$this->setfont('arial','B',12);
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Conseil","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Analyse","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Gestion de","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Projet","align"=>"C","size"=>14);
-		$this->cadre(15,50,50,50,$cadre);
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Analyse","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"des","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Utilisateurs","align"=>"C","size"=>14);
-		$this->cadre(70,50,50,50,$cadre);
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Management","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"des","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Evolutions","align"=>"C","size"=>14);
-		$this->cadre(125,50,50,50,$cadre);
-
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Commandes","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Installation","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Coordination","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"technique","align"=>"C","size"=>14);
-		$this->cadre(15,110,50,50,$cadre);
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Assistance","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Technique","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Maintenance","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"&","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"hotline","align"=>"C","size"=>14);
-		$this->cadre(70,110,50,50,$cadre);
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Simulations","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Financières","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"&","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Techniques","align"=>"C","size"=>14);
-		$this->cadre(125,110,50,50,$cadre);
-
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Gestion Locative","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Facturation","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Multisite","align"=>"C","size"=>14);
-		$this->cadre(15,170,50,50,$cadre);
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Assurance","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Remplacement","align"=>"C","size"=>14);
-		$this->cadre(70,170,50,50,$cadre);
-
-		$cadre = array();
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Reprise","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"-","align"=>"C","size"=>14);
-		$cadre[] = array("txt"=>"Recyclage","align"=>"C","size"=>14);
-		$this->cadre(125,170,50,50,$cadre);
-
-		$this->setY(230);
-		$this->multicell(0,5,"Choisissez votre niveau d'externalisation",0,"C");
-
-
-
-		/* PAGE 5 */
-		$this->AddPage();
-
-		if($this->devis["commentaire_offre_partenaire"]){
-			$this->setfont('arial','',10);
-			$this->multicell(0,5,str_replace("&nbsp;", " ", strip_tags($this->devis["commentaire_offre_partenaire"],'')) ,1);
-			$this->ln(5);
-		}
-
-		$this->setfont('arial','BU',14);
-		$this->multicell(0,7,"Synthèse de l'offre ".($this->devis["offre_partenaire"]?strtoupper($this->devis["offre_partenaire"]):"")." :");
-		$this->ln(5);
-
-		$head = NULL;
-		$width = array(100,40);
-		$data = array();
-
-		$inclus = $options = $s = array();
-		if ($this->lignes) {
-			foreach ($this->lignes as $key => $value) {
-				if($value["options"] == "oui"){
-					$options[] = $value;
-				}else{
-					$inclus[] = $value;
-				}
-			}
-
-			foreach ($inclus as $key => $value) {
-				$data[] = array($value["produit"] , " €");
-				$s[] = array(array("size"=>10,"decoration"=>"","align"=>"L") , array("size"=>10,"decoration"=>"","align"=>"R"));
-				$totalInclus = 0;
-			}
-			$data[] = array("Total hors Options" , $totalInclus." €");
-			$s[] = array(array("size"=>10,"decoration"=>"B","align"=>"L", "bgcolor"=>"309A28", "fill"=>1) ,
-						 array("size"=>10,"decoration"=>"B","align"=>"R", "bgcolor"=>"309A28", "fill"=>1));
-
-			if($options){
-				$data[] = array("OPTIONS" , "");
-				$s[] = array(array("size"=>10,"align"=>"L", "bgcolor"=>"BEBEBE", "fill"=>1),array("bgcolor"=>"BEBEBE", "fill"=>1));
-
-				foreach ($options as $key => $value) {
-					$data[] = array($value["produit"] , " €");
-					$s[] = array(array("size"=>10,"align"=>"L") , array("size"=>10,"align"=>"R"));
-					$totalInclus = $totalInclus+0;
-				}
-				$data[] = array("Total avec Options" , $totalInclus." €");
-				$s[] = array(array("size"=>10,"decoration"=>"B","align"=>"L", "bgcolor"=>"309A28", "fill"=>1) ,
-							 array("size"=>10,"decoration"=>"B","align"=>"R", "bgcolor"=>"309A28", "fill"=>1));
-			}
-		}
-		$this->tableau($head,$data,$width,7,$s,260);
-
-
-		/*	PAGE 6	*/
-		$this->AddPage();
-
-		if(ATF::$codename == "cleodis"){
-			$this->setTextColor("48","154","40");
-			$this->setfont('arial','B',14);
-
-			$this->multicell(0,6,"Proposition locative CLEODIS pour ".$this->client['societe'],0,'C');
-			if($this->affaire['nature']=="avenant"){
-				$this->multicell(0,6,"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'),0,'C');
-			}
-			$this->multicell(0,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
-			$this->setTextColor("0","0","0");
-			$this->ln(10);
-		}
-
-
-		$options = array("frais_de_gestion"=> 0,
-						 "assurance"=> 0,
-						 "serenite"=> 0,
-						 "maintenance"=> 0,
-						 "hotline"=> 0,
-						 "supervision"=> 0,
-						 "support"=> 0
-					);
-		$option_presente = false;
-
-
-		$style = array(
-			"col1"=>array("size"=>11,"decoration"=>"B","align"=>"L"),
-			"prix"=>array("size"=>11,"decoration"=>"","align"=>"R"),
-			"col_detail"=>array("size"=>8,"decoration"=>"","color"=>"000000","align"=>"L"),
-			"col1_blue"=>array("size"=>11,"decoration"=>"B","color"=>"0000FF","align"=>"L"),
-			"prix_blue"=>array("size"=>11,"decoration"=>"B","color"=>"0000FF","align"=>"R"),
-		);
-
-
-		$head = array("Proposition Locative LRP");
-		$width = array(100);
-
-		$data = $s = array();
-
-		foreach ($this->loyer as $key => $value) {
-			$texteHead = $value["duree"]." ".$value["frequence_loyer"];
-			if($value["avec_option"] == "oui"){	$texteHead .= "\n avec option(s)";
-			}else{	$texteHead .= "\n sans option";	}
-			$head[] = $texteHead;
-			$width[] = round(80/count($this->loyer),0);
-
-			foreach ($options as $kopt => $vopt) {
-				if($value[$kopt]) $options[$kopt] = 1;
-			}
-		}
-
-
-
-		$data[0][] = "Mise à disposition mensuelle HT";
-		$s[0][] = $style["col1"];
-		foreach ($this->loyer as $key => $value) {
-			$data[0][] = $value["loyer"]." €";
-			$s[0][] = $style["prix"];
-		}
-
-
-		$ligne = 1;
-		foreach ($options as $kopt => $vopt) {
-			if($vopt){
-
-				switch ($kopt) {
-					case 'frais_de_gestion':
-						$data[$ligne][] = "Gestion du contrat mensuelle HT";
-					break;
-					case 'assurance':
-						$data[$ligne][] = "Service de Remplacement en cas de sinistre";
-					break;
-					case 'serenite':
-						$data[$ligne][] = "Service Sérénité – en cas de panne bloquante supérieure à 48h : prêt de machine ";
-					break;
-					case 'maintenance':
-						$option_presente = true;
-						$data[$ligne][] = "Service Maintenance";
-					break;
-					case 'hotline':
-						$option_presente = true;
-						$data[$ligne][] = "Service Hotline";
-					break;
-					case 'supervision':
-						$option_presente = true;
-						$data[$ligne][] = "Service Supervision";
-					break;
-					case 'support':
-						$option_presente = true;
-						$data[$ligne][] = "Support";
-					break;
-				}
-
-
-				$s[$ligne][] = $style["col1"];
-
-				foreach ($this->loyer as $key => $value) {
-					$data[$ligne][] = $value[$kopt]." €";
-					$s[$ligne][] = $style["prix"];
-				}
-				$ligne ++;
-
-
-				switch ($kopt) {
-					case 'frais_de_gestion':
-						$data[$ligne][] = "-	Suivi de la facturation, Gestion de parc,\n-	Evolution, récupération des équipements,\n-	Valorisation ou recyclage des matériels,\n-	Formatage niveau 1 des disques durs,\n-	Simulation d’évolution en cours de contrat";
-
-						$s[$ligne][] = $style["col_detail"];
-						foreach ($this->loyer as $key => $value) {
-							$data[$ligne][] = "";
-							$s[$ligne][] = $style["prix_detail"];
-						}
-						$ligne ++;
-
-						$data[$ligne][] = "Redevance Mensuelle HT";
-						$s[$ligne][] = $style["col1_blue"];
-						foreach ($this->loyer as $key => $value) {
-							$data[$ligne][] = number_format(($value["loyer"]+$value["frais_de_gestion"]),2," ",",")." €";;
-							$s[$ligne][] = $style["prix_blue"];
-						}
-						$ligne ++;
-					break;
-
-					case 'assurance':
-						$data[$ligne][] = "En cas de vol avec effraction, incendie, dégât des eaux :\nRemplacement des équipements à l’équivalent ou annulation du contrat et renouvellement global dans le cadre d’un nouveau contrat";
-						$s[$ligne][] = $style["col_detail"];
-						foreach ($this->loyer as $key => $value) {
-							$data[$ligne][] = "";
-							$s[$ligne][] = $style["prix_detail"];
-						}
-						$ligne ++;
-					break;
-				}
-
-			}
-
-
-
-		}
-
-		if($option_presente){
-			$data[$ligne][] = "Redevance Mensuelle option(s) comprise";
-			$s[$ligne][] = $style["col1_blue"];
-			foreach ($this->loyer as $key => $value) {
-				$total = $value["loyer"];
-				foreach ($options as $kopt => $vopt) {
-					$total += $value[$kopt];
-				}
-
-				$data[$ligne][] = number_format($total,2," ",",")." €";
-				$s[$ligne][] = $style["prix_blue"];
-			}
-			$ligne ++;
-		}
-
-
-		$this->tableau($head,$data,$width,7,$s,260);
-
-
-
-
-
-		$this->setfont('arial','',8);
-		$this->SetTextColor(0,0,0);
-		$this->cell(0,5,"",0,1,'C');
-
-		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Cléodis s'engage à vous fournir : ");
-		$this->setfont('arial','',9);
-		$this->cell(15,5,"",0,0);
-		$this->cell(0,5,"=>Un conseil indépendant en renouvellement de matériels",0,1);
-		$this->cell(15,5,"",0,0);
-		$this->cell(0,5,"=>La possibilité d'évoluer à tout moment, et d'incorporer des budgets non prévus tout en lissant la charge budgétaire",0,1);
-		$this->cell(15,5,"",0,0);
-		$this->cell(0,5,"=>Un service de reprise des équipements au terme ou en cours de contrat",0,1);
-		$this->cell(15,5,"",0,0);
-		$this->cell(0,5,"=>La gestion de parc des matériels loués",0,1);
-
-		$this->ln(10);
-		$this->setfont('arial','B',10);
-		$this->multicell(0,5,"Cette offre, valable jusqu'au ".ATF::$usr->trans($this->devis['validite']).", reste soumise à notre comité des engagements.",0);
-
-	}
-
 
 	/* Génère le PDF d'un devis Classique
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -2250,14 +1705,12 @@ class pdf_cleodis extends pdf {
 			$cadreLocataire[] = array("txt"=>$this->client['adresse_3'],"align"=>"C","h"=>4);
 		}
 		$cadreLocataire[] = array("txt"=>$this->client['cp']." ".$this->client['ville'],"align"=>"C","h"=>4);
-		if(ATF::$codename == "cleodisbe"){
-			$cadreLocataire[] = array("txt"=>"NUMERO DE TVA ".$this->societe['reference_tva'],"align"=>"C");
-		}else{
-			$siren = $this->client['siren']?"SIREN ".$this->client['siren']:NULL;
-			if ($siren) {
-				$cadreLocataire[] = array("txt"=>$siren,"align"=>"C","h"=>4);
-			}
+
+		$siren = $this->client['siren']?"SIREN ".$this->client['siren']:NULL;
+		if ($siren) {
+			$cadreLocataire[] = array("txt"=>$siren,"align"=>"C","h"=>4);
 		}
+
 
 
 		$this->cadre(235,35,70,35,$cadreLocataire,$locataire);
@@ -2390,332 +1843,6 @@ class pdf_cleodis extends pdf {
 		}
 
 	}
-
-	/*
-	public function conditionsGeneralesDeLocationA3()  {
-		$this->unsetHeader();
-		$this->AddPage();
-		$this->SetLeftMargin(10);
-
-		//page gauche
-		$this->setfont('arial','BI',8);
-		$this->sety(5);
-		$this->multicell(190,5,"CONDITIONS GENERALES DE LOCATION",1,'C');
-
-		$this->SetLeftMargin(10);
-		$this->article(15,15,'1','DEFINITIONS',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(90,2,"Le présent contrat utilise les termes suivants ayant le sens qui leur est donné ci-dessous :",0,'L');
-		$this->multicell(90,2,"Locataire : entité juridique au bénéfice de laquelle les Equipements sont loués et les services assurés.");
-		$this->multicell(90,2,"Loueur : CLEODIS ou Cessionnaire");
-		$this->multicell(90,2,"Fournisseur : entité juridique autre que CLEODIS désigné par le Locataire pour fournir les Equipements et/ou réaliser certains services associés à la location desdits équipements. Cessionnaire : établissement financier ou de crédit agréé en qualité de société financière ou société de location");
-		$this->multicell(90,2,"Cessionnaire : établissement financier ou de crédit agréé en qualité de société financière ou société de location.");
-		$this->multicell(90,2,"Services : prestation de service fournie par le Loueur et/ou le Fournisseur tel que prévu dans le présent contrat");
-		$this->multicell(90,2,"Equipements : tout équipement et notamment équipements informatiques, bureautiques et de télécommunications y compris l’ensemble des droits d’utilisations des logiciels d’exploitation et d’application qui y sont associés.");
-
-		$this->article(15,58,'2','OBJET & VALIDITE',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(90,2,"2.1 L’objet du présent contrat consiste en la location d’Equipements à laquelle des Services sont associés, l’ensemble étant détaillé dans les Conditions Particulières.");
-		$this->multicell(90,2,"2.2 La signature du Contrat constitue un engagement ferme et définitif de la part du Locataire et annule et remplace tous accords antérieurs, écrits et verbaux, se rapportant aux dits Equipements");
-		$this->multicell(90,2,"2.3 Les parties reconnaissent que les Equipements loués ayant un rapport direct avec l’activité professionnelle du Locataire, le code de la consommation ne s’applique pas");
-		$this->multicell(90,2,"2.4 Le Loueur dispose d’un mois à compter de la réception par lui du présent contrat pour signifier son accord au Locataire. Passé ce délai, le Locataire pourra se rétracter sans aucune indemnité due de part et d’autre");
-		$this->multicell(90,2,"2.5 Au cas où le Loueur prendrait connaissance, après la conclusion du contrat mais avant la livraison des Equipements, de faits concernant la solvabilité du Locataire pouvant laisser craindre de sa part une incapacité à exécuter tout ou partie de ses obligations contractuelles, le Contrat serait alors résolu de plein droit à l’initiative du Loueur sans qu’aucune indemnité ne soit due de part et d’autre");
-		$this->multicell(90,2,"2.6 Toute modification des clauses et conditions du présent contrat sera réputée nulle et non avenue sauf à résulter d’un avenant écrit et signé par CLEODIS et validé par le Cessionnaire.");
-
-		$this->article(15,109,'3','CHOIX DES EQUIPEMENTS',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(90,2,"3.1 Le Locataire reconnaît avoir choisi librement, en toute indépendance et sous sa seule responsabilité, les Equipements loués, ainsi que les Fournisseurs, constructeurs et éditeurs qui participent à la fabrication, l’assemblage, la livraison et l’installation des Equipements et de leurs composants. Il reconnaît avoir pris connaissance des spécifications techniques et des modalités d’exploitation préalablement à la location. En conséquence, le Loueur ne saurait en aucun cas être recherché par le Locataire à raison de dommages causés par, ou à ces Equipements et résultant d’un vice de construction. Le Loueur ne saurait être tenu ni à une obligation de résultat, ni pour responsable de toute inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des Equipements entre eux. Il en sera également ainsi si des mises au point sont rendues nécessaires pour leur fonctionnement ou si des évolutions techniques modifient leur compatibilité.");
-		$this->multicell(90,2,"3.2 Le Locataire reconnaît avoir été mis en garde par le Loueur du fait que certains Equipements peuvent présenter des disfonctionnements. Il incombe au Locataire de vérifier auprès de ses Fournisseurs de la qualité de ses Equipements, y compris lorsque ceux-ci sont incorporés dans un système informatique préexistant. N’étant ni fabricant de matériels ni concepteur de logiciels, Le loueur ne saurait être tenu pour responsable de tout disfonctionnement des Equipements; elle ne saurait donc être recherchée par le Locataire à raison de surcoûts ou dommages consécutifs à ces disfonctionnements");
-		$this->multicell(90,2,"3.3 Les logiciels sont livrés selon les modalités directement convenues par le Locataire aveccl'éditeur. Le Locataire reconnaît avoir régularisé avec l'éditeur, en tant que mandataire ducLoueur, la licence d'utilisation des logiciels et faire son affaire directement avec l'éditeur ducrespect des clauses y figurant. La présente location étant conclue \"intuitu personae\" avec lecLocataire, les licences ne pourront être ni cédées, ni faire l'objet d'une sous-licence au profitcd'un tiers quel qu'il soit, sans accord préalable.");
-
-
-		$this->article(15,176,'4','LIVRAISON DES EQUIPEMENTS',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(90,2,"4.1 Le Locataire prendra livraison des Equipements sous son unique responsabilité, à ses frais et risques, sans que la présence du Loueur ne soit requise. Lors de la réception des Equipements, le Locataire remettra au Loueur un procès-verbal de livraison signé constatant la conformité et le bon fonctionnement. Il s’interdit de refuser les Equipements pour tout motif autre qu’une non-conformité ou un mauvais fonctionnement, auxquels cas, il garantit le Loueur de toutes les condamnations qui pourraient être prononcées contre lui à raison des droits et recours du Fournisseur. S’il y a lieu il devra notifier au transporteur toutes les réserves utiles, les confirmer dans les délais légaux et informer immédiatement le Loueur par lettre recommandée avec accusé de réception.");
-
-		$this->multicell(90,2,"4.2 Le procès verbal de livraison vaut autorisation de paiement du Loueur au Fournisseur. Si le Locataire transmet ce procès verbal sans avoir reçu les Equipements ou sans vérifier leur conformité et l’absence de vices ou défauts, il engage sa responsabilité et devra au Loueur réparation du préjudice subi par ce dernier.");
-		$this->multicell(90,2,"4.3 Le Loueur transmet au Locataire l’ensemble des recours contre le Fournisseur y compris l’action en résolution de la vente pour vices rédhibitoires pour laquelle le Loueur lui donne en tant que de besoin mandat d’ester, sous réserve d’être mis en cause. Le Locataire renonce ainsi à tout recours contre le Loueur en cas de défaillance ou de vices cachés affectant les Equipements ou dans l’exécution des prestations et garanties. Si la résolution judiciaire de la vente est prononcée, le Contrat est résilié à la date du prononcé. Le Locataire s’engage alors à restituer les Equipements à ses frais au Fournisseur et se porte garant solidaire de ce dernier pour rembourser les sommes versées par le Loueur.4.4 Le Locataire dispose d’un délai de six mois à compter de la signature du Contrat pour faire procéder à la livraison des Equipements. Passé ce délai, le Contrat sera résilié aux torts du Locataire et ce dernier sera redevable d’une indemnité égale à la totalité des sommes réglées par le Loueur au titre du Contrat augmentée d’une pénalité équivalente à douze loyers.");
-		$this->multicell(90,2,"4.5 Le contrat ne peut être interprété comme transférant un quelconque droit de propriété ou tout autre droit du locataire sur les éventuels produits sous licence. Le locataire s’engage à considérer les produits sous licence comme des informations confidentielles du titulaire des droits de propriété intellectuelle, à observer les restrictions de droits d’auteur et à ne pas reproduire ni vendre les produits sous licence. Tout litige lié au fonctionnement ou à l’utilisation du produit sous licence devra être réglé entre le titulaire des droits et le locataire. À cet effet, le Locataire dégage le Loueur de toute obligation de garantie d’éventuels vices ou défauts relatifs à la conformité, au fonctionnement et aux performances du produit sous licence, même si ces vices et défauts sont découverts au cours de la location. Le Locataire ne pourra invoquer un tel litige pour ne pas honorer ses engagements résultant du Contrat. De manière générale, le Locataire s’engage à respecter l’intégralité des droits du titulaire des droits sur le produit sous licence fourni pendant la durée de la location.");
-
-		$this->setxy(105,15);
-		$this->setleftmargin(105);
-
-		$this->multicell(95,2," Le Locataire renonce expressément à se prévaloir à l’encontre du Loueur de quelque exception que ce soit qu’il pourrait faire valoir contre le titulaire des droits du produit sous licence. Le Locataire garantit le Loueur et ses ayants droit contre tous recours du titulaire des droits ou de tout autre tiers et l’indemnisera, le cas échéant, de toutes conséquences dommageables de pareils recours.");
-
-		$this->article(105,26,'5',"DATE D’EFFET & DUREE DE LOCATION",8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"5.1 La période initiale de location prévue aux Conditions Particulières prend effet au plus tard le premier jour du mois ou du trimestre civils suivant celui au cours duquel s’effectue la livraison de la totalité des Equipements dans les locaux désignés par le Locataire constatée par le procès verbal de livraison. Cette disposition ne fait pas obstacle à l’application de l’article 6.3 alinéa 2. ");
-		$this->multicell(95,2,"5.2 La durée de la location est fixée par les Conditions Particulières, en nombre entier de mois ou de trimestres, ceci sans préjudice de l’application des dispositions de l’art. 6. Elle ne peut en aucun cas être réduite par la seule volonté du locataire.");
-
-		$this->article(105,51,'6',"REDEVANCES & PAIEMENT",8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"6.1 Le montant des loyers est fixé dans les Conditions Particulières. Si le prix des Equipements à payer au Fournisseur ou le taux de référence venait à augmenter entre la date de signature et la date de livraison, le montant du loyer serait ajusté proportionnellement. Il est rappelé que le taux de référence est la moyenne des derniers taux connus et publiés au jour du contrat de l'EURIBOR 12 mois et du TEC 5. (EURIBOR 12 mois : taux interbancaire offert en euro publié chaque jour par la Fédération Bancaire de l'Union Européenne et TEC 5 : Taux des échéances constantes à 5 ans, publié chaque jour par la Caisse des Dépôts et Consignations).");
-		$this->multicell(95,2,"6.2 Les modalités de règlements des loyers sont précisées aux Conditions Particulières. Ils sont portables et non quérables, comme le sont les redevances éventuelles de mise à disposition prévues ci-après.");
-		$this->multicell(95,2,"6.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers proportionnellement au prix d’achat figurant sur le devis du Fournisseur au jour de la signature du contrat. Si la prise d’effet telle que définie à l’article 5 intervient après le premier jour du mois ou du trimestre civils, le Locataire payera au Loueur, pour lesdits mois ou trimestre en cours, une redevance de mise à disposition calculée prorata temporis au trentième ou au quatre-vingt dixième, sur la base du montant du loyer");
-		$this->multicell(95,2,"6.4 Le premier loyer est exigible à la date prévue à l’article 5.1 ; il ne doit pas être confondu avec les redevances de mise à disposition.");
-		$this->multicell(95,2,"6.5 Les prix mentionnés aux Conditions Particulières sont hors taxes. Tous droits, impôts et taxes liés aux Equipements sont à la charge du Locataire et lui sont facturés. Toute modification légale de ces droits, impôts et taxes s’applique de plein droit et sans avis.");
-		$this->multicell(95,2,"6.6 Les loyers (".$this->texteTTC.") et les redevances de mise à disposition (".$this->texteTTC.") non payés à leur échéance porteront intérêt au profit du Loueur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux refi de la Banque Centrale Européenne majoré de 10 points, conformément à l’article L 441-6 du Code de commerce.");
-		$this->multicell(95,2,"6.7 Le Locataire autorise expressément le Loueur à recouvrer le montant des loyers et les redevances de mise à disposition, par l’intermédiaire de l’établissement bancaire de son choix, par prélèvements SEPA sur le compte bancaire indiqué par le Locataire. A cette fin, le Locataire remettra à CLEODIS un mandat de prélèvement SEPA au profit de CLEODIS et du Cessionnaire dans les conditions prévues à l’article 9.");
-		$this->multicell(95,2,"6.8 Déchéance du terme : toute facture non payée à l’échéance entraîne immédiatement et de plein droit l’exigibilité des sommes facturées non échues");
-		$this->multicell(95,2,"6.9 A titre de clause pénale, toute somme impayée à l’échéance entraînera l’exigibilité d’une pénalité fixée à 15 % du montant des factures impayées, avec un minimum de 80 euros.");
-		$this->multicell(95,2,"6.10 Conformément à l’article L 441-6 du Code de commerce, toute facture impayée entraîne aussi de plein droit l’exigibilité d’une indemnité forfaitaire de recouvrement de 40 euros.");
-		$this->article(105,150,'7',"AUTRES PRESTATIONS – MANDATS DONNES AU LOUEUR",8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"Si le Locataire a conclu avec un Fournisseur un contrat de prestations autre que la location, le Loueur peut intervenir pour le compte du prestataire après avoir reçu mandat d’encaisser les redevances du contrat de service en même temps que les loyers. Le Loueur procède à la facturation pour compte du prestataire et reverse les redevances audit prestataire. Le Loueur n’assume aucune responsabilité quant à l’exécution desdites prestations et ne garantit donc pas les obligations des contractants à cet égard. Le Locataire s’interdit donc de refuser le paiement des loyers du contrat pour quelque motif que ce soit. La révocation du mandat peut être opéré à tout moment par un prestataire ou par le Loueur, à sa convenance et notamment en cas de contestation quelconque ou d’incident de paiement. Toute prestation non prévue dans le contrat et facturée directement par le prestataire n’est pas incluse dans le mandat précité ; il en est de même pour tout droit à remboursement pour le Locataire au titre de prestations non effectuées ou non satisfaisantes. Le Locataire reconnaît que le contrat de location qu'il a signé est indépendant du contrat de prestation ou de service qu'il a signé avec le prestataire");
-
-		$this->article(105,189,'8','ENTRETIEN – REPARATION – EXPLOITATION',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"8.1 Le Locataire étant responsable des Equipements, il s’engage à les utiliser suivant les spécifications du constructeur, dans un local permettant leur bon fonctionnement et leurentretien, ce afin de les maintenir en parfait état pendant toute la durée de la location. Par dérogation aux articles 1719 et suivants du code civil, le Locataire prend à sa charge l’ensemble des frais relatifs à l’utilisation, l’entretien et la réparation des Equipements. Par dérogation aux articles 1722 et 1724 du Code Civil, le Locataire ne pourra prétendre à aucune indemnité, aucun différé ni diminution de loyer s’il devait être privé de la jouissance des Equipements. En cas d’indisponibilité des Equipements et ce quelque ’en soit la raison, le Loueur aura la faculté de proposer au Locataire des équipements aux caractéristiques équivalentes afin de pallier cette indisponibilité. Le locataire renonce à son droit de résilier le contrat en cas d’indisponibilité des biens si la durée d’indisponibilité n’excède pas 6 mois et s’il n’a pas bénéficié d’équipements de remplacement tel qu’évoqué précédemment",0,'L');
-
-		$this->multicell(95,2,"8.2 Le Locataire s’interdit toute modification des Equipements loués sans l’accord préalable du Loueur. La propriété de toute pièce remplacée, de tout accessoire incorporé ou de toute adjonction dans les Equipements pendant la location sera acquise aussitôt et sans récompense au Loueur.");
-		$this->multicell(95,2,"8.3 Le Loueur ne pourra être tenu pour responsable en cas de détérioration, de mauvais fonctionnement ou de dommages causés par les Equipements");
-		$this->multicell(95,2,"8.4 Le déplacement des Equipements s’effectue sous l’entière responsabilité du Locataire, notamment pour les matériels dits portables. En cas de déménagement, les loyers restent dus quelle qu’en soit la durée.");
-
-		$this->article(105,244,'9','SOUS LOCATION – CESSION – DELEGATION – NANTISSEMENT',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"9.1 Le Locataire ne pourra ni sous-louer, ni prêter, mettre à disposition de quiconque à quelque titre et sous quelque forme que ce soit, tout ou partie des Equipements sans l’accord écrit du Loueur.");
-		$this->multicell(95,2,"9.2 Le Locataire reconnaît que le Loueur l’a tenu informé de l’éventualité d’une cession, d’un nantissement ou d’une délégation, des Equipements ou des créances, au profit du Cessionnaire de son choix, pour une durée n’excédant pas la période initiale de location. Le Cessionnaire sera alors lié par les termes et conditions du contrat, ce que le Locataire accepte dès à présent et sans réserve. En cas d’acceptation par le Cessionnaire, celui-ci se substitue alors à CLEODIS sachant que l’obligation du Cessionnaire se limite à laisser au Locataire la libre disposition des Equipements, les autres obligations restant à la charge de CLEODIS.");
-
-		//page droite
-		$this->setautopagebreak('disabled',10);
-		$this->SetLeftMargin(210);
-
-		$this->setfont('arial','BI',8);
-		$this->setxy(210,5);
-		$this->multicell(195,5,"CONDITIONS GENERALES DE LOCATION",1,'C');
-
-		$this->setY(15);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"Le Locataire a alors l’obligation de payer au Cessionnaire les loyers ainsi que toute somme éventuellement due au titre du contrat, sans pouvoir opposer au Cessionnaire aucune compensation ou exception qu’il pourrait faire valoir vis à vis de CLEODIS.");
-
-		$this->multicell(95,2,"9.3 Le Locataire s’interdit de céder et/ou de se dessaisir de tout ou partie des Equipements, à quelque titre que ce soit et pour quelque motif que ce soit, même au profit du Loueur sans l’accord écrit du Cessionnaire. La cession des Equipements et des créances de loyer n’emporte pas novation du Contrat et CLEODIS se substituera au Cessionnaire au terme de la période initiale de location. Tout autre accord contractuel intervenu entre CLEODIS et le Locataire n’est pas opposable au Cessionnaire. Le Locataire sera informé de la cession par tout moyen et notamment par le libellé de l'avis de prélèvement, de la facture de loyer ou de l’échéancier qui seront émis. Le locataire dispense le Cessionnaire de la signification prévue par l'article 1690 du Code Civil.");
-
-		$this->article(215,44,'10','ASSURANCE – SINISTRES',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"Le Locataire est gardien responsable du matériel qu'il détient. Dès sa mise à disposition et jusqu'à la restitution effective de celui-ci et tant que le matériel reste sous sa garde, le Locataire assume tous les risques de détérioration et de perte, même en cas fortuit. Il est responsable de tout dommage causé par le matériel dans toutes circonstances. Il s'oblige en conséquence à souscrire une assurance couvrant sa responsabilité civile ainsi que celle du Loueur, et couvrant tous les risques de dommages ou de vol subis par les matériels loués avec une clause de délégation d'indemnités au profit du Loueur et une clause renonciation aux recours contre ce dernier. Le Locataire doit informer sans délai le Loueur de tout sinistre en précisant ses circonstances et ses conséquences. En cas de sinistre total ou de vol, couvert ou non par l'assurance, le contrat est résilié. Le Locataire doit au Loueur une indemnisation pour la perte du matériel et pour l'interruption prématurée du contrat calculée et exigible à la date de résiliation. Le montant global de cette indemnisation est égal aux loyers restant à échoir jusqu'à l'issue de la période de location, augmentés de la valeur estimée du matériel détruit ou volé au terme de cette période ou si une expertise est nécessaire, de sa valeur à dire d'expert au jour du sinistre. Les indemnités d'assurances, éventuellement perçues par le Loueur s'imputent en premier lieu sur l'indemnisation de la perte du matériel et ensuite sur l'indemnisation de l'interruption prématurée. Pour un sinistre partiel, en cas d'insuffisance de l'indemnité reçue de la Compagnie d'assurance, le Locataire est tenu de parfaire la remise en état complète des Equipements à ses frais");
-
-		$this->article(215,96,'11','EVOLUTION DES EQUIPEMENTS',8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"Le Locataire pourra demander à CLEODIS, au cours de la période de validité du présentccontrat, la modification des Equipements loués, sous réserve de l’accord du LOUEUR ; lescmodifications éventuelles du contrat seront déterminées par l’accord écrit des parties.");
-
-		$this->article(215,112,'12',"ANNULATION & RESILIATION",8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"12.1 En cas d’annulation de son engagement avant l’expiration du délai d’un mois donné au Loueur pour faire connaître son accord, comme il est dit à l’article 2.4 ci-dessus, le Locataire sera redevable envers le Loueur d’une indemnité d’annulation égale aux six premiers mois de loyers prévus au contrat. L’annulation ne sera reconnue effective qu’à la date de règlement de l’indemnité définie ci-dessus.");
-
-
-		$this->multicell(95,2,"Le contrat est résilié de plein droit dès restitution du matériel loué. Le contrat est également résilié de plein droit si les deux conditions ci-après se trouvent réunies :");
-		$this->multicell(95,2,"1er condition : Etre dans un des cas suivants :");
-		$this->multicell(95,2,"1/ non respect de l'un des engagements pris au présent contrat et notamment le défaut de paiement d'une échéance ou de toute somme due en vertu du contrat, dans les 8 jours qui suivent une mise en demeure restée infructueuse;");
-		$this->multicell(95,2,"2/ modification de la situation du Locataire et notamment décès, redressement judiciaire, liquidation amiable ou judiciaire, cessation d'activité, cession du fonds de commerce, de parts ou d'actions du Locataire, changement de forme sociale;");
-		$this->multicell(95,2,"3/ modification concernant le matériel loué et notamment détérioration, destruction ou aliénation du matériel loué (apport en société, fusion absorption, scission, ...), ou perte ou diminution des garanties fournies.");
-
-		$this->multicell(95,2,"2ème condition :");
-		$this->multicell(95,2,"mise en demeure de restituer le matériel loué restée infructueuse dans les 8 jours de son envoi par lettre recommandée avec accusé de réception. Après mise en demeure de restituer, le Locataire ou ses ayants droits sont tenus de remettre immédiatement le matériel à disposition du Loueur dans les conditions prévues à l'article 14 traitant de la restitution du matériel. La résiliation entraîne de plein droit, au profit du Loueur, le paiement par le Locataire ou ses ayants droit, en réparation du préjudice subi en sus des loyers impayés et de leurs accessoires, d'une indemnité égale aux loyers restant à échoir au jour de la résiliation. Cette indemnité sera majorée d'une somme forfaitaire égale à 10 % de ladite indemnité à titre de clause pénale. Si le contrat est résilié pour l'un des motifs visés au présent article, tous les autres contrats qui auraient pu être conclus entre le Locataire aux présentes, le Loueur ou l'une des Sociétés de son Groupe (art. 145 du C.G.I.) sont, si le Loueur y a convenance, résiliés de plein droit.");
-
-		$this->multicell(95,2,"12.2 La durée du contrat est ferme : il ne sera toléré aucune résiliation anticipée.");
-		$this->multicell(95,2,"12.3 Le contrat pourra être résilié de plein droit par le LOUEUR, aux torts exclusifs du LOCATAIRE, si ce dernier ne respecte pas une obligation contractuelle. LE LOUEUR qui souhaite résilier en cas de faute du LOCATAIRE, telle par exemple le non-paiement des factures de location, devra préalablement mettre en demeure par LRAR ce dernier d’exécuter l’obligation concernée. Ce n’est qu’après cette mise en demeure restée infructueuse pendant une période de huit jours que la résiliation pourra être constatée aux torts exclusifs du LOCATAIRE. Le LOUEUR aura l’opportunité de solliciter le paiement de l’intégralité des loyers restants à courir jusque le terme du contrat, sans préjudice des indemnités évoqués à l’article 12.5.");
-		$this->multicell(95,2,"12.4 Après mise en demeure de restituer, le Locataire ou ses ayants droits sont tenus de remettre immédiatement le matériel à disposition du Loueur dans les conditions prévues à l'article 14 traitant de la restitution du matériel.");
-
-		$this->multicell(95,2,"12.5 La résiliation entraîne de plein droit, au profit du Loueur, le paiement par le Locataire ou ses ayants droit, en réparation du préjudice subi en sus des loyers impayés et de leurs accessoires, d'une indemnité égale aux loyers restant à échoir au jour de la résiliation. Cette indemnité sera majorée d'une somme forfaitaire égale à 10 % de ladite indemnité à titre de clause pénale. Si le contrat est résilié pour l'un des motifs visés au présent article, tous les autres contrats qui auraient pu être conclus entre le Locataire aux présentes et le Loueur sont, si le Loueur y a convenance, résiliés de plein droit. Celle-ci sera effective dès restitution du matériel loué.");
-
-		$this->multicell(95,2,"12.6 Si après la résiliation le Locataire conserve pendant un certain temps la jouissance des Equipements, le Loueur est autorisé à mettre en recouvrement des redevances de mise à disposition de même montant que les loyers conventionnels, sans que le paiement de ces redevances puissent diminuer l’indemnité de résiliation telle que définie à l’article 12.5.");
-
-		$this->multicell(95,2,"12.7 Les dispositions de l’article 12.6 sont applicables dans leur intégralité auxdites redevances de mise à disposition de l’article 6.");
-		$this->multicell(95,2,"12.8 Les clauses ci-dessus relatives à une résiliation de plein droit, ne privent pas le LOUEUR de sa faculté d’exiger l’exécution pure et simple du contrat jusqu’à son terme, conformément à l’article 1184 du Code Civil.");
-		$this->multicell(95,2,"12.9 Ce contrat est intuitu personae. En cas de cession de fonds de commerce, le LOCATAIRE devra informer le LOUEUR au moins 1 mois à l’avance, ce afin que le LOUEUR puisse statuer sur la poursuite ou l’arrêt du contrat en cours. Le transfert de contrat n'est jamais automatique et ne constitue pas un droit du Locataire. Il est soumis à l'accord du Loueur qui peut le refuser et exiger l'exécution du contrat jusqu'à son terme ou le paiement de la totalité des loyers restants dus.« La résiliation peut également intervenir, à la demande du Bailleur, en cas de décès du Locataire, de cessation de son activité pendant plus de trois (3) mois, de dissolution ou de cession de la société Locataire, de changement d’actionnariat, ainsi que dans les cas prévus par la réglementation en vigueur applicable aux entreprises en difficultés. »");
-		$this->sety(15);
-		$this->setleftmargin(315);
-
-		$this->article(315,15,'13',"PROPRIETE",8);
-		$this->ln(-2);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"13.1 CLEODIS conserve la propriété des Equipements loués sauf en cas d’application de l’article 9.2. Dans tous les cas CLEODIS conserve les relations commerciales avec le Locataire.");
-		$this->multicell(95,2,"13.2 Le Locataire s’engage à apposer sur les Equipements pour toute la durée de la location, une étiquette de propriété. ");
-		$this->multicell(95,2,"13.3 Le Locataire est tenu d’aviser immédiatement le Loueur par lettre recommandé avec accusé de réception en cas de tentative de saisie ou de toute autre intervention sur les Equipements et il devra élever toute protestation et prendre toute mesure pour faire reconnaître les droits du Loueur. Si la saisie a eu lieu, le Locataire devra faire diligence, à ses frais, pour en obtenir la mainlevée.");
-		$this->multicell(95,2,"13.4 Le Locataire ne bénéficie en vertu du contrat d’aucun droit d’acquisition des Equipements pendant ou au terme de la location.");
-
-		$this->article(315,50,'14',"RESTITUTION DES EQUIPEMENTS",8);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"14.1 Au delà de la durée initiale prévue aux Conditions Particulières, sauf pour l’une des parties à notifier à l’autre par lettre recommandée avec accusé de réception en respectant un préavis de six mois, son intention de ne pas reconduire le contrat, ce dernier est prolongé par tacite reconduction par période d’un an minimum aux mêmes conditions et sur la base du dernier loyer, sous réserve qu’il ait respecté l’intégralité de ses obligations contractuelles");
-		$this->multicell(95,2,"14.2 Le Locataire doit, en fin de période de location, restituer au Loueur au lieu désigné par celui-ci, les Equipements en parfait état d’entretien et de fonctionnement, les frais de transport et de déconnexion incombant au Locataire. Le Locataire doit aussi restituer tout matériel endommagé ou hors d’état de fonctionnement, à ses frais et au lieu désigné par le Loueur. Tout frais éventuel de remise en état, destruction ou recyclage, sera à la charge du Locataire et les Equipements manquants lui seront facturés selon la valeur de marché à la date de la reprise.");
-		$this->multicell(95,2,"14.3 Si le Locataire ne restitue pas immédiatement et de son propre chef les Equipements au Loueur à l’expiration du contrat, il est redevable d’une indemnité égale aux loyers jusqu’à leur restitution effective.");
-
-		$this->article(315,94,'15',"ATTRIBUTION DE JURIDICTION",8);
-		$this->ln(-2);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"Le Loueur et le Locataire contractant en qualité de commerçant attribuent compétence, même en cas de pluralité de défendeurs ou d'appel en garantie, au Tribunal de commerce de CLEODIS ou du Cessionnaire. Pour les Locataires non commerçants, tout litige auquel peut donner lieu l'exécution des présentes est de la compétence du Tribunal de Commerce du domicile du défendeur, conformément aux conditions de l'article 42 du Nouveau Code de Procédure Civile. La loi française est applicable à tout litige né du présent contrat ou de ses suites.");
-
-		$this->article(315,116,'16',"INFORMATIQUE & LIBERTE",8);
-		$this->ln(-2);
-		$this->setfont('arial','I',7);
-		$this->multicell(95,2,"Les informations nominatives recueillies dans le cadre du Contrat sont obligatoires pour le traitement de votre demande. Elles sont destinées, de même que celles qui seront recueillies ultérieurement, au LOUEUR pour les besoins de la gestion des opérations de location consenties aux entreprises. Elles pourront, de convention expresse, être communiquées par le LOUEUR à ses sous-traitants, partenaires, courtiers et assureurs, ainsi qu’aux personnes morales du groupe du LOUEUR, à des fins de gestion ou de prospection commerciale. Vous pouvez, pour des motifs légitimes, vous opposer à ce que ces données fassent l’objet d’un traitement. Vous pouvez également vous opposer, sans frais, à ce qu’elles soient utilisées à des fins de prospection, notamment commerciale. Vos droits d’accès, de rectification et d’opposition peuvent être exercés auprès de la Direction de la communication du LOUEUR. Le responsable du traitement est le Directeur de Communication.");
-		$this->setY(200);
-		$this->setfont('arial','I',8);
-		$this->multicell(95,3,"CGL CLEODIS V09-14",0,"R");
-
-		if($this->affaire["type_affaire"] == "2SI"){
-			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",330,200,35);
-		} else{
-			$this->image(__PDF_PATH__.$this->logo,330,200,35);
-		}
-	}
-	public function conditionsGeneralesDeLocationA4($type)  {
-		$this->unsetHeader();
-		$this->AddPage();
-		$this->SetLeftMargin(10);
-		$this->setAutoPageBreak(false);
-		//page gauche
-		$this->setfont('arial','BI',8);
-		$this->setxy(5,5);
-		$this->multicell(200,5,"CONDITIONS GENERALES DE ".($type=="vente"?"VENTE":"LOCATION"),1,'C');
-
-		$this->SetLeftMargin(5);
-		$this->article(5,10,'1','DEFINITIONS',6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"Le présent contrat utilise les termes suivants ayant le sens qui leur est donné ci-dessous :",0,'L');
-		$this->multicell(50,2,"Locataire : entité juridique au bénéfice de laquelle les Equipements sont loués et les services assurés",0,'L');
-		$this->multicell(50,2,"Loueur : CLEODIS ou Cessionnaire",0,'L');
-		$this->multicell(50,2,"Fournisseur : entité juridique autre que CLEODIS désigné par le Locataire pour fournir les Equipements et/ou réaliser certains services associés à la location desdits équipements.",0,'L');
-		$this->multicell(50,2,"Cessionnaire : établissement financier ou de crédit agréé en qualité de société financière ou société de location.",0,'L');
-		$this->multicell(50,2,"Services : prestation de service fournie par le Loueur et/ou le Fournisseur tel que prévu dans le présent contrat.",0,'L');
-		$this->multicell(50,2,"Equipements : tout équipement et notamment équipements informatiques, bureautiques et de télécommunications y compris l’ensemble des droits d’utilisations des logiciels d’exploitation et d’application qui y sont associés.",0,'L');
-
-		$this->article(5,51,'2','OBJET & VALIDITE',6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"2.1 L’objet du présent contrat consiste en la location d’Equipements à laquelle des Services sont associés, l’ensemble étant détaillé dans les Conditions Particulières.",0,'L');
-		$this->multicell(50,2,"2.2 La signature du Contrat constitue un engagement ferme et définitif de la part du Locataire et annule et remplace tous accords antérieurs, écrits et verbaux, se rapportant aux dits Equipements.",0,'L');
-		$this->multicell(50,2,"2.3 Les parties reconnaissent que les Equipements loués ayant un rapport direct avec l’activité professionnelle du Locataire, le code de la consommation ne s’applique pas.",0,'L');
-		$this->multicell(50,2,"2.4 Le Loueur dispose d’un mois à compter de la réception par lui du présent contrat pour signifier son accord au Locataire. Passé ce délai, le Locataire pourra se rétracter sans aucune indemnité due de part et d’autre.",0,'L');
-		$this->multicell(50,2,"2.5 Au cas où le Loueur prendrait connaissance, après la conclusion du contrat mais avant la livraison des Equipements, de faits concernant la solvabilité du Locataire pouvant laisser craindre de sa part une incapacité à exécuter tout ou partie de ses obligations contractuelles, le Contrat serait alors résolu de plein droit à l’initiative du Loueur sans qu’aucune indemnité ne soit due de part et d’autre.",0,'L');
-		$this->multicell(50,2,"2.6 Toute modification des clauses et conditions du présent contrat sera réputée nulle et non avenue sauf à résulter d’un avenant écrit et signé par CLEODIS et validé par le Cessionnaire.",0,'L');
-
-		$this->article(5,112,'3','CHOIX DES EQUIPEMENTS',6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"3.1 Le Locataire reconnaît avoir choisi librement, en toute indépendance et sous sa seule responsabilité, les Equipements loués, ainsi que les Fournisseurs, constructeurs et éditeurs qui participent à la fabrication, l’assemblage, la livraison et l’installation des Equipements et de leurs composants. Il reconnaît avoir pris connaissance des spécifications techniques et des modalités d’exploitation préalablement à la location. En conséquence, le Loueur ne saurait en aucun cas être recherché par le Locataire à raison de dommages causés par, ou à ces Equipements et résultant d’un vice de construction. Le Loueur ne saurait être tenu ni à une obligation de résultat, ni pour responsable de toute inadaptation des Equipements aux besoins du Locataire, de toute insuffisance de performance ou de tout manque de compatibilité des Equipements entre eux. Il en sera également ainsi si des mises au point sont rendues nécessaires pour leur fonctionnement ou si des évolutions techniques modifient leur compatibilité.",0,'L');
-		$this->multicell(50,2,"3.2 Le Locataire reconnaît avoir été mis en garde par le Loueur du fait que certains Equipements peuvent présenter des disfonctionnements. Il incombe au Locataire de vérifier auprès de ses Fournisseurs de la qualité de ses Equipements, y compris lorsque ceux-ci sont incorporés dans un système informatique préexistant. N’étant ni fabricant de matériels ni concepteur de logiciels, Le loueur ne saurait être tenu pour responsable de tout disfonctionnement des Equipements; elle ne saurait donc être recherchée par le Locataire à raison de surcoûts ou dommages consécutifs à ces disfonctionnements.",0,'L');
-		$this->multicell(50,2,"3.3 Les logiciels sont livrés selon les modalités directement convenues par le Locataire avec l'éditeur. Le Locataire reconnaît avoir régularisé avec l'éditeur, en tant que mandataire du Loueur, la licence d'utilisation des logiciels et faire son affaire directement avec l'éditeur du respect des clauses y figurant. La présente location étant conclue \"intuitu personae\" avec le Locataire, les licences ne pourront être ni cédées, ni faire l'objet d'une sous-licence au profit d'un tiers quel qu'il soit, sans accord préalable.",0,'L');
-
-
-		$this->article(5,196,'4','LIVRAISON DES EQUIPEMENTS',6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"4.1 Le Locataire prendra livraison des Equipements sous son unique responsabilité, à ses frais et risques, sans que la présence du Loueur ne soit requise. Lors de la réception des Equipements, le Locataire remettra au Loueur un procès-verbal de livraison signé constatant la conformité et le bon fonctionnement. Il s’interdit de refuser les Equipements pour tout motif autre qu’une non-conformité ou un mauvais fonctionnement, auxquels cas, il garantit le Loueur de toutes les condamnations qui pourraient être prononcées contre lui à raison des droits et recours du Fournisseur. S’il y a lieu il devra notifier au transporteur toutes les réserves utiles, les confirmer dans les délais légaux et informer immédiatement le Loueur par lettre recommandée avec accusé de réception.",0,'L');
-		$this->multicell(50,2,"4.2 Le procès verbal de livraison vaut autorisation de paiement du Loueur au Fournisseur. Si le Locataire transmet ce procès verbal sans avoir reçu les Equipements ou sans vérifier leur conformité et l’absence de vices ou défauts, il engage sa responsabilité et devra au Loueur réparation du préjudice subi par ce dernier.",0,'L');
-
-		$this->multicell(50,2,"4.3 Le Loueur transmet au Locataire l’ensemble des recours contre le Fournisseur y compris l’action en résolution de la vente pour vices rédhibitoires pour laquelle le Loueur lui donne en tant que de besoin mandat d’ester, sous réserve d’être mis en cause. Le Locataire renonce ainsi à tout recours contre le Loueur en cas de défaillance ou de vices cachés affectant les Equipements ou dans l’exécution des prestations et garanties. Si la résolution judiciaire de la vente est prononcée, le Contrat est résilié à la date du prononcé. Le Locataire s’engage alors à restituer les Equipements à ses frais au Fournisseur et se porte garant solidaire de ce dernier pour rembourser les sommes versées par le Loueur.",0,'L');
-		$this->multicell(50,2,"Le Locataire dispose d’un délai de six mois à compter de la signature du Contrat pour faire procéder à la livraison des Equipements. Passé ce délai, le Contrat sera résilié aux torts du Locataire et ce dernier sera redevable d’une indemnité égale à la totalité des sommes réglées par le Loueur au titre du Contrat augmentée d’une pénalité équivalente à douze loyers.",0,'L');
-		$this->setleftmargin(55);
-		$this->sety(10);
-		$this->multicell(50,2,"4.5 Le contrat ne peut être interprété comme transférant un quelconque droit de propriété ou tout autre droit du locataire sur les éventuels produits sous licence. Le locataire s’engage à considérer les produits sous licence comme des informations confidentielles du titulaire des droits de propriété intellectuelle, à observer les restrictions de droits d’auteur et à ne pas reproduire ni vendre les produits sous licence. Tout litige lié au fonctionnement ou à l’utilisation du produit sous licence devra être réglé entre le titulaire des droits et le locataire. À cet effet, le Locataire dégage le Loueur de toute obligation de garantie d’éventuels vices ou défauts relatifs à la conformité, au fonctionnement et aux performances du produit sous licence, même si ces vices et défauts sont découverts au cours de la location. Le Locataire ne pourra invoquer un tel litige pour ne pas honorer ses engagements résultant du Contrat. De manière générale, le Locataire s’engage à respecter l’intégralité des droits du titulaire des droits sur le produit sous licence fourni pendant la durée de la location. Le Locataire renonce expressément à se prévaloir à l’encontre du Loueur de quelque exception que ce soit qu’il pourrait faire valoir contre le titulaire des droits du produit sous licence. Le Locataire garantit le Loueur et ses ayants droit contre tous recours du titulaire des droits ou de tout autre tiers et l’indemnisera, le cas échéant, de toutes conséquences dommageables de pareils recours.",0,'L');
-
-
-		$this->article(55,64,'5',"DATE D'EFFET & DUREE DE \nLOCATION",6,2);
-		$this->ln(-2);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"5.1 La période initiale de location prévue aux Conditions Particulières prend effet au plus tard le premier jour du mois ou du trimestre civils suivant celui au cours duquel s’effectue la livraison de la totalité des Equipements dans les locaux désignés par le Locataire constatée par le procès verbal de livraison. Cette disposition ne fait pas obstacle à l’application de l’article 6.3 alinéa 2",0,'L');
-		$this->multicell(50,2,"5.2 La durée de la location est fixée par les Conditions Particulières, en nombre entier de mois ou de trimestres, ceci sans préjudice de l’application des dispositions de l’art. 6. Elle ne peut en aucun cas être réduite par la seule volonté du locataire.",0,'L');
-
-		$this->article(55,92,'6',"REDEVANCES",6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"6.1 Le montant des loyers est fixé dans les Conditions Particulières. Si le prix des Equipements à payer au Fournisseur ou le taux de référence venait à augmenter entre la date de signature et la date de livraison, le montant du loyer serait ajusté proportionnellement. Il est rappelé que le taux de référence est la moyenne des derniers taux connus et publiés au jour du contrat de l'EURIBOR 12 mois et du TEC 5. (EURIBOR 12 mois : taux interbancaire offert en euro publié chaque jour par la Fédération Bancaire de l'Union Européenne et TEC 5 : Taux des échéances constantes à 5 ans, publié chaque jour par la Caisse des Dépôts et Consignations).",0,'L');
-		$this->multicell(50,2,"6.2 Les modalités de règlements des loyers sont précisées aux Conditions Particulières. Ils sont portables et non quérables, comme le sont les redevances éventuelles de mise à disposition prévues ci-après.",0,'L');
-		$this->multicell(50,2,"6.3 En cas de livraisons partielles, une redevance de mise à disposition sera facturée au fur et à mesure de la livraison sur la base de la valeur des loyers proportionnellement au prix d’achat figurant sur le devis du Fournisseur au jour de la signature du contrat. Si la prise d’effet telle que définie à l’article 5 intervient après le premier jour du mois ou du trimestre civils, le Locataire payera au Loueur, pour lesdits mois ou trimestre en cours, une redevance de mise à disposition calculée prorata temporis au trentième ou au quatre-vingt dixième, sur la base du montant du loyer.",0,'L');
-		$this->multicell(50,2,"6.4 Le premier loyer est exigible à la date prévue à l’article 5.1 ; il ne doit pas être confondu avec les redevances de mise à disposition.",0,'L');
-		$this->multicell(50,2,"6.5 Les prix mentionnés aux Conditions Particulières sont hors taxes. Tous droits, impôts et taxes liés aux Equipements sont à la charge du Locataire et lui sont facturés. Toute modification légale de ces droits, impôts et taxes s’applique de plein droit et sans avis.",0,'L');
-		$this->multicell(50,2,"6.6 Les loyers (".$this->texteTTC.") et les redevances de mise à disposition (".$this->texteTTC.") non payés à leur échéance porteront intérêt au profit du Loueur, de plein droit et sans qu’il soit besoin d’une quelconque mise en demeure, au taux refi de la Banque Centrale Européenne majoré de 10 points, conformément à l’article L 441-6 du Code de commerce.",0,'L');
-		$this->multicell(50,2,"6.7 Le Locataire autorise expressément le Loueur à recouvrer le montant des loyers et les redevances de mise à disposition, par l’intermédiaire de l’établissement bancaire de son choix, par prélèvements SEPA sur le compte bancaire indiqué par le Locataire. A cette fin, le Locataire remettra à CLEODIS un mandat de prélèvement SEPA au profit de CLEODIS et du Cessionnaire dans les conditions prévues à l’article 9.",0,'L');
-		$this->multicell(50,2,"6.8 Déchéance du terme : toute facture non payée à l’échéance entraîne immédiatement et de plein droit l’exigibilité des sommes facturées non échues.",0,'L');
-		$this->multicell(50,2,"6.9 A titre de clause pénale, toute somme impayée à l’échéance entraînera l’exigibilité d’une pénalité fixée à 15 % du montant des factures impayées, avec un minimum de 80 euros.",0,'L');
-		$this->multicell(50,2,"6.10 Conformément à l’article L 441-6 du Code de commerce, toute facture impayée entraîne aussi de plein droit l’exigibilité d’une indemnité forfaitaire de recouvrement de 40 euros.",0,'L');
-
-		$this->article(55,217,'7',"AUTRES PRESTATIONS - MANDATS\nDONNES AU LOUEUR",6,2);
-		$this->ln(-2);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"Si le Locataire a conclu avec un Fournisseur un contrat de prestations autre que la location, le Loueur peut intervenir pour le compte du prestataire après avoir reçu mandat d’encaisser les redevances du contrat de service en même temps que les loyers. Le Loueur procède à la facturation pour compte du prestataire et reverse les redevances audit prestataire. Le Loueur n’assume aucune responsabilité quant à l’exécution desdites prestations et ne garantit donc pas les obligations des contractants à cet égard. Le Locataire s’interdit donc de refuser le paiement des loyers du contrat pour quelque motif que ce soit. La révocation du mandat peut être opéré à tout moment par un prestataire ou par le Loueur, à sa convenance et notamment en cas de contestation quelconque ou d’incident de paiement. Toute prestation non prévue dans le contrat et facturée directement par le prestataire n’est pas incluse dans le mandat précité ; il en est de même pour tout droit à remboursement pour le Locataire au titre de prestations non effectuées ou non satisfaisantes. Le Locataire reconnaît que le contrat de location qu'il a signé est indépendant du contrat de prestation ou de service qu'il a signé avec le prestataire",0,'L');
-
-		$this->article(55,267,'8',"ENTRETIEN – REPARATION – \nEXPLOITATION",6,2);
-		$this->ln(-2);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"8.1 Le Locataire étant responsable des Equipements, il s’engage à les utiliser suivant les spécifications du constructeur, dans un local permettant leur bon fonctionnement et leur entretien, ce afin de les maintenir en parfait état pendant toute la durée de la location. Par dérogation aux articles 1719 et suivants du code",0,'L');
-
-		$this->setleftmargin(105);
-		$this->sety(10);
-
-		$this->multicell(50,2,"civil, le Locataire prend à sa charge l’ensemble des frais relatifs à l’utilisation, l’entretien et la réparation des Equipements. Par dérogation aux articles 1722 et 1724 du Code Civil, le Locataire ne pourra prétendre à aucune indemnité, aucun différé ni diminution de loyer s’il devait être privé de la jouissance des Equipements. En cas d’indisponibilité des Equipements et ce quelque ’en soit la raison, le Loueur aura la faculté de proposer au Locataire des équipements aux caractéristiques équivalentes afin de pallier cette indisponibilité. Le locataire renonce à son droit de résilier le contrat en cas d’indisponibilité des biens si la durée d’indisponibilité n’excède pas 6 mois et s’il n’a pas bénéficié d’équipements de remplacement tel qu’évoqué précédemment.",0,'L');
-		$this->multicell(50,2,"8.2 Le Locataire s’interdit toute modification des Equipements loués sans l’accord préalable du Loueur. La propriété de toute pièce remplacée, de tout accessoire incorporé ou de toute adjonction dans les Equipements pendant la location sera acquise aussitôt et sans récompense au Loueur.",0,'L');
-		$this->multicell(50,2,"8.3 Le Loueur ne pourra être tenu pour responsable en cas de détérioration, de mauvais fonctionnement ou de dommages causés par les Equipements.",0,'L');
-		$this->multicell(50,2,"8.4 Le déplacement des Equipements s’effectue sous l’entière responsabilité du Locataire, notamment pour les matériels dits portables. En cas de déménagement, les loyers restent dus quelle qu’en soit la durée.",0,'L');
-
-
-		$this->article(105,66,'9',"SOUS LOCATION – CESSION – \nDELEGATION – NANTISSEMENT",6,2);
-		$this->ln(-2);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"9.1 Le Locataire ne pourra ni sous-louer, ni prêter, mettre à disposition de quiconque à quelque titre et sous quelque forme que ce soit, tout ou partie des Equipements sans l’accord écrit du Loueur.",0,'L');
-		$this->multicell(50,2,"9.2 Le Locataire reconnaît que le Loueur l’a tenu informé de l’éventualité d’une cession, d’un nantissement ou d’une délégation, des Equipements ou des créances, au profit du Cessionnaire de son choix, pour une durée n’excédant pas la période initiale de location. Le Cessionnaire sera alors lié par les termes et conditions du contrat, ce que le Locataire accepte dès à présent et sans réserve. En cas d’acceptation par le Cessionnaire, celui-ci se substitue alors à CLEODIS sachant que l’obligation du Cessionnaire se limite à laisser au Locataire la libre disposition des Equipements, les autres obligations restant à la charge de CLEODIS. Le Locataire a alors l’obligation de payer au Cessionnaire les loyers ainsi que toute somme éventuellement due au titre du contrat, sans pouvoir opposer au Cessionnaire aucune compensation ou exception qu’il pourrait faire valoir vis à vis de CLEODIS",0,'L');
-		$this->multicell(50,2,"dessaisir de tout ou partie des Equipements, à quelque titre que ce soit et pour quelque motif que ce soit, même au profit du Loueur sans l’accord écrit du Cessionnaire. La cession des Equipements et des créances de loyer n’emporte pas novation du Contrat et CLEODIS se substituera au Cessionnaire au terme de la période initiale de location. Tout autre accord contractuel intervenu entre CLEODIS et le Locataire n’est pas opposable au Cessionnaire. Le Locataire sera informé de la cession par tout moyen et notamment par le libellé de l'avis de prélèvement, de la facture de loyer ou de l’échéancier qui seront émis. Le locataire dispense le Cessionnaire de la signification prévue par l'article 1690 du Code Civil.",0,'L');
-		$this->article(105,140,'10','ASSURANCES – SINISTRES',6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"Le Locataire est gardien responsable du matériel qu'il détient. Dès sa mise à disposition et jusqu'à la restitution effective de celui-ci et tant que le matériel reste sous sa garde, le Locataire assume tous les risques de détérioration et de perte, même en cas fortuit. Il est responsable de tout dommage causé par le matériel dans toutes circonstances. Il s'oblige en conséquence à souscrire une assurance couvrant sa responsabilité civile ainsi que celle du Loueur, et couvrant tous les risques de dommages ou de vol subis par les matériels loués avec une clause de délégation d'indemnités au profit du Loueur et une clause renonciation aux recours contre ce dernier. Le Locataire doit informer sans délai le Loueur de tout sinistre en précisant ses circonstances et ses conséquences. En cas de sinistre total ou de vol, couvert ou non par l'assurance, le contrat est résilié. Le Locataire doit au Loueur une indemnisation pour la perte du matériel et pour l'interruption prématurée du contrat calculée et exigible à la date de résiliation. Le montant global de cette indemnisation est égal aux loyers restant à échoir jusqu'à l'issue de la période de location, augmentés de la valeur estimée du matériel détruit ou volé au terme de cette période ou si une expertise est nécessaire, de sa valeur à dire d'expert au jour du sinistre. Les indemnités d'assurances, éventuellement perçues par le Loueur s'imputent en premier lieu sur l'indemnisation de la perte du matériel et ensuite sur l'indemnisation de l'interruption prématurée. Pour un sinistre partiel, en cas d'insuffisance de l'indemnité reçue de la Compagnie d'assurance, le Locataire est tenu de parfaire la remise en état complète des Equipements à ses frais.",0,'L');
-		$this->article(105,205,'11','EVOLUTION DES EQUIPEMENTS',6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"Le Locataire pourra demander à CLEODIS, au cours de la période de validité du présent contrat, la modification des Equipements loués, sous réserve de l’accord du LOUEUR ; les modifications éventuelles du contrat seront déterminées par l’accord écrit des parties.",0,'L');
-
-		$this->article(105,218,'12',"ANNULATION & RESILIATION",6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"12.1 En cas d’annulation de son engagement avant l’expiration du délai d’un mois donné au Loueur pour faire connaître son accord, comme il est dit à l’article 2.4 ci-dessus, le Locataire sera redevable envers le Loueur d’une indemnité d’annulation égale aux six premiers mois de loyers prévus au contrat. L’annulation ne sera reconnue effective qu’à la date de règlement de l’indemnité définie ci-dessus. ",0,'L');
-		$this->multicell(50,2,"12.2 La durée du contrat est ferme : il ne sera toléré aucune résiliation anticipée.",0,'L');
-		$this->multicell(50,2,"12.3 Le contrat pourra être résilié de plein droit par le LOUEUR, aux torts exclusifs du LOCATAIRE, si ce dernier ne respecte pas une obligation contractuelle. LE LOUEUR qui souhaite résilier en cas de faute du LOCATAIRE, telle par exemple le non-paiement des factures de location, devra préalablement mettre en demeure par LRAR ce dernier d’exécuter l’obligation concernée. Ce n’est qu’après cette mise en demeure restée infructueuse pendant une période de huit jours que la résiliation pourra être constatée aux torts exclusifs du LOCATAIRE. Le LOUEUR aura l’opportunité de solliciter le paiement de l’intégralité des loyers restants à courir jusque le terme du contrat, sans préjudice des indemnités évoqués à l’article 12.5.",0,'L');
-		$this->multicell(50,2,"12.4 Après mise en demeure de restituer, le Locataire 1/ non respect de l'un des engagements pris au présent contrat et notamment le défaut de paiement d'une échéance ou de toute somme due en vertu du contrat, dans les 8 jours qui suivent une mise en demeure restée infructueuse;",0,'L');
-		$this->sety(10);
-		$this->setleftmargin(155);
-
-		$this->multicell(50,2,"12.5 La résiliation entraîne de plein droit, au profit du Loueur, le paiement par le Locataire ou ses ayants droit, en réparation du préjudice subi en sus des loyers impayés et de leurs accessoires, d'une indemnité égale aux loyers restant à échoir au jour de la résiliation. Cette indemnité sera majorée d'une somme forfaitaire égale à 10 % de ladite indemnité à titre de clause pénale. Si le contrat est résilié pour l'un des motifs visés au présent article, tous les autres contrats qui auraient pu être conclus entre le Locataire aux présentes et le Loueur sont, si le Loueur y a convenance, résiliés de plein droit. Celle-ci sera effective dès restitution du matériel loué",0,'L');
-		$this->multicell(50,2,"12.6 Si après la résiliation le Locataire conserve pendant un certain temps la jouissance des Equipements, le Loueur est autorisé à mettre en recouvrement des redevances de mise à disposition de même montant que les loyers conventionnels, sans que le paiement de ces redevances puissent diminuer l’indemnité de résiliation telle que définie à l’article 12.5.",0,'L');
-
-		$this->multicell(50,2,"12.7 Les dispositions de l’article 12.6 sont applicables dans leur intégralité auxdites redevances de mise à disposition de l’article 6.",0,'L');
-
-		$this->multicell(50,2,"12.8 Les clauses ci-dessus relatives à une résiliation de plein droit, ne privent pas le LOUEUR de sa faculté d’exiger l’exécution pure et simple du contrat jusqu’à son terme, conformément à l’article 1184 du Code Civil.",0,'L');
-		$this->multicell(50,2,"12.9 Ce contrat est intuitu personae. En cas de cession de fonds de commerce, le LOCATAIRE devra informer le LOUEUR au moins 1 mois à l’avance, ce afin que le LOUEUR puisse statuer sur la poursuite ou l’arrêt du contrat en cours. Le transfert de contrat n'est jamais automatique et ne constitue pas un droit du Locataire. Il est soumis à l'accord du Loueur qui peut le refuser et exiger l'exécution du contrat jusqu'à son terme ou le paiement de la totalité des loyers restants dus.« La résiliation peut également intervenir, à la demande du Bailleur, en cas de décès du Locataire, de cessation de son activité pendant plus de trois (3) mois, de dissolution ou de cession de la société Locataire, de changement d’actionnariat, ainsi que dans les cas prévus par la réglementation en vigueur applicable aux entreprises en difficultés. »",0,'L');
-
-
-		$this->article(155,96,'13',"PROPRIETE",6);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"13.1 CLEODIS conserve la propriété des Equipements loués sauf en cas d’application de l’article 9.2. Dans tous les cas CLEODIS conserve les relations commerciales avec le Locataire.",0,'L');
-		$this->multicell(50,2,"13.2 Le Locataire s’engage à apposer sur les Equipements pour toute la durée de la location, une étiquette de propriété.",0,'L');
-		$this->multicell(50,2,"13.3 Le Locataire est tenu d’aviser immédiatement le Loueur par lettre recommandé avec accusé de réception en cas de tentative de saisie ou de toute autre intervention sur les Equipements et il devra élever toute protestation et prendre toute mesure pour faire reconnaître les droits du Loueur. Si la saisie a eu lieu, le Locataire devra faire diligence, à ses frais, pour en obtenir la mainlevée.",0,'L');
-		$this->multicell(50,2,"13.4 Le Locataire ne bénéficie en vertu du contrat d’aucun droit d’acquisition des Equipements pendant ou au terme de la location.",0,'L');
-
-		$this->article(155,134,'14',"RESTITUTION DES EQUIPEMENTS",6,3,50);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"14.1 Au delà de la durée initiale prévue aux Conditions Particulières, sauf pour l’une des parties à notifier à l’autre par lettre recommandée avec accusé de réception en respectant un préavis de six mois, son intention de ne pas reconduire le contrat, ce dernier est prolongé par tacite reconduction par période d’un an minimum aux mêmes conditions et sur la base du dernier loyer, sous réserve qu’il ait respecté l’intégralité de ses obligations contractuelles.",0,'L');
-		$this->multicell(50,2,"14.2 Le Locataire doit, en fin de période de location, restituer au Loueur au lieu désigné par celui-ci, les Equipements en parfait état d’entretien et de fonctionnement, les frais de transport et de déconnexion incombant au Locataire. Le Locataire doit aussi restituer tout matériel endommagé ou hors d’état de fonctionnement, à ses frais et au lieu désigné par le Loueur. Tout frais éventuel de remise en état, destruction ou recyclage, sera à la charge du Locataire et les Equipements manquants lui seront facturés selon la valeur de marché à la date de la reprise.",0,'L');
-		$this->multicell(50,2,"14.3 Si le Locataire ne restitue pas immédiatement et de son propre chef les Equipements au Loueur à l’expiration du contrat, il est redevable d’une indemnité égale aux loyers jusqu’à leur restitution effective.",0,'L');
-
-		$this->article(155,188,'15',"ATTRIBUTION DE JURIDICTION",6,3,50);
-		$this->ln(-3);
-		$this->setfont('arial','I',5);
-		$this->multicell(52,2,"Le Loueur et le Locataire contractant en qualité de commerçant attribuent compétence, même en cas de pluralité de défendeurs ou d'appel en garantie, au Tribunal de commerce de CLEODIS ou du Cessionnaire. Pour les Locataires non commerçants, tout litige auquel peut donner lieu l'exécution des présentes est de la compétence du Tribunal de Commerce du domicile du défendeur, conformément aux conditions de l'article 42 du Nouveau Code de Procédure Civile. La loi française est applicable à tout litige né du présent contrat ou de ses suites.",0,'L');
-
-		$this->article(155,215,'16',"INFORMATIQUE & LIBERTE",6);
-		$this->ln(-3.5);
-		$this->setfont('arial','I',5);
-		$this->multicell(50,2,"Les informations nominatives recueillies dans le cadre du Contrat sont obligatoires pour le traitement de votre demande. Elles sont destinées, de même que celles qui seront recueillies ultérieurement, au LOUEUR pour les besoins de la gestion des opérations de location consenties aux entreprises. Elles pourront, de convention expresse, être communiquées par le LOUEUR à ses sous-traitants, partenaires, courtiers et assureurs, ainsi qu’aux personnes morales du groupe du LOUEUR, à des fins de gestion ou de prospection commerciale. Vous pouvez, pour des motifs légitimes, vous opposer à ce que ces données fassent l’objet d’un traitement. Vous pouvez également vous opposer, sans frais, à ce qu’elles soient utilisées à des fins de prospection, notamment commerciale. Vos droits d’accès, de rectification et d’opposition peuvent être exercés auprès de la Direction de la communication du LOUEUR. Le responsable du traitement est le Directeur de Communication.",0,'L');
-
-		$this->sety(280);
-		$this->setleftmargin(15);
-		$this->setfont('arial','BI',8);
-		$this->multicell(0,3,"CGL CLEODIS V09-14",0,"R");
-		$this->setAutoPageBreak(true);
-	}*/
 
 	/** CGL d'un PDF d'un contrat en A3
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
@@ -2858,14 +1985,11 @@ class pdf_cleodis extends pdf {
 	$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
 	$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
 
-	if(ATF::$codename == "cleodisbe"){
-	  $this->multicell(0,3,"NUMERO DE TVA : ".$this->client['reference_tva']." Tél : ".$this->client['tel'],0);
-	}else{
-	  if($this->client['id_pays'] =='FR'){
+
+	if($this->client['id_pays'] =='FR'){
 		$this->multicell(0,3,"SIRET : ".$this->client['siret']." Tél : ".$this->client['tel'],0);
-	  }else{
+	}else{
 		$this->multicell(0,3,"NUMERO DE TVA : ".($this->client['siret']?$this->client['siret']:"-")." Tél : ".$this->client['tel'],0);
-	  }
 	}
 
 
@@ -3238,11 +2362,6 @@ class pdf_cleodis extends pdf {
 	$this->setfont('arial','B',7);
 	$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
 	$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
-	if($this->societe['id_pays'] =='FR'){
-	  $this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 7739Z N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"],0);
-	}else{
-	  $this->multicell(0,3,"Numéro de TVA  ".$this->societe['siret'],0);
-	}
 	$this->setLeftMargin(15);
 	$this->ln(5);
 	$this->setfont('arial','B',10);
@@ -3516,48 +2635,29 @@ class pdf_cleodis extends pdf {
 
 
 
-	if(!$signature){
-	  $cadre = array(
+
+	$cadre = array(
 		"Fait à : "
 		,"Le : "
 		,"Nom : "
 		,array("txt"=>"Signature : ","fill"=>1,"w"=>$this->GetStringWidth("Signature")+10,"bgColor"=>"ffff00")
-	  );
-	}else{
-	  $cadre = array(
-		" ",
-		"[SignatureContractant]",
-		" ",
-		" ",
-		" ",
-		"[/SignatureContractant]"
-	  );
-	}
+	);
+
 
 
 	$y = $this->gety()+2;
 	$t = "L'abonné";
 
 	$this->cadre(20,$y,80,48,$cadre,$t);
-	if(!$signature){
-	  $cadre = array(
+
+	$cadre = array(
 		"Fait à : "
 		,"Le : "
 		,"Nom : "
 		,"Qualité : "
 		,"Signature et cachet commercial : "
-	  );
-	}else{
-	  $cadre = array(
-		" ",
-		"[SignatureFournisseur]",
-		" ",
-		" ",
-		" ",
-		"[/SignatureFournisseur]"
-	  );
+	);
 
-	}
 
 
 	if ($this->affaire['nature']=="vente") {
@@ -3657,7 +2757,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"IL EST EXPOSE ET CONVENU CE QUI SUIT :");
 		$this->setfont('arial','',8);
-		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du ".date("d/m/Y").", le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
+		$this->multicell(0,5,"Suivant le contrat sous-seing privé N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL)." en date du ".date("d/m/Y", strtotime($this->commande["date"])).", le Loueur a loué à l'Abonné ci-dessus désigné les équipements suivants :");
 
 		$this->setfont('arial','',8);
 		//$this->ln(5);
@@ -3828,7 +2928,7 @@ class pdf_cleodis extends pdf {
 			,1
 		);
 		$this->cell(30,12,"LE LOCATAIRE",1,0,'C');
-		if(ATF::$codename == "cleodisbe"){
+		/*if(ATF::$codename == "cleodisbe"){
 			$this->multicell(
 				0,4,
 				$this->client['societe'].($this->client["tel"]?" - Tél : ".$this->client["tel"]:"").($this->client["fax"]?" – Fax : ".$this->client["fax"]:"")."\n".
@@ -3836,7 +2936,7 @@ class pdf_cleodis extends pdf {
 				($this->client['id_pays']=='FR'?"SIREN : ".$this->client['siren'].($this->client['structure']?" - ".$this->client['structure']:"").($this->client['capital']?" au capital de ".number_format($this->client["capital"],2,'.',' ')." €":"")."\n":"NUMERO DE TVA : ".$this->client['reference_tva'].($this->client['structure']?" - ".$this->client['structure']:"").($this->client['capital']?" au capital de ".number_format($this->client["capital"],2,'.',' ')." €":"")."\n")
 				,1
 			);
-		}else{
+		}else{*/
 
 			$this->multicell(
 				0,4,
@@ -3845,7 +2945,7 @@ class pdf_cleodis extends pdf {
 				($this->client['id_pays']=='FR'?"SIREN : ".$this->client['siren'].($this->client['structure']?" - ".$this->client['structure']:"").($this->client['capital']?" au capital de ".number_format($this->client["capital"],2,'.',' ')." €":"")."\n":"NUMERO DE TVA : ".$this->client['siret'].($this->client['structure']?" - ".$this->client['structure']:"").($this->client['capital']?" au capital de ".number_format($this->client["capital"],2,'.',' ')." €":"")."\n")
 				,1
 			);
-		}
+		//}
 
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"PROCES-VERBAL DE LIVRAISON AVEC CESSION DU MATERIEL ET DU CONTRAT DE LOCATION N°".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:""),1,'C');
@@ -4569,7 +3669,7 @@ class pdf_cleodis extends pdf {
 		$date = explode("-", $this->comite["date_creation"]);
 
 
-		if( (date("Y") - $date[1] ) >= 2 ){
+		if( (date("Y") - $date[0] ) >= 2 ){
 			$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
 		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Ancienneté > à 2 ans ( ".$date[0]." )",0,1,"L");
@@ -4620,18 +3720,6 @@ class pdf_cleodis extends pdf {
 		if( $this->comite["note"] > 50 ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
 		}else{	$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5); }
 		$this->cell(0,5,"Note CréditSafe > 50 ( ".$this->comite["note"]." )",0,1,"L");
-
-
-		$this->ln(5);
-		$y = $this->getY();
-		ATF::demande_refi()->q->reset()->addCondition("etat","perdu","AND")
-									   ->addCondition("id_societe",$this->comite["id_societe"],"AND")
-									   ->addCondition("date",date("Y-m-d",strtotime(date("Y-m-d")." - 6 month")),"AND",false,">");
-
-
-		if(! ATF::demande_refi()->select_all() ) {	$this->image(__PDF_PATH__.'cleodis/check.jpg',20,$y,5);
-		}else{		$this->image(__PDF_PATH__.'cleodis/uncheck.jpg',20,$y,5);	}
-		$this->cell(0,5,"Pas de refus refi récent ",0,1,"L");
 
 		$this->ln(5);
 		$y = $this->getY();
@@ -6592,7 +5680,12 @@ class pdf_cleodis extends pdf {
 	*/
 	public function envoiContratEtBilan($id,$s){
 
-		if(ATF::$codename == "cleodis") { $this->societe = ATF::societe()->select(246); }elseif(ATF::$codename == "cleodisbe"){ $this->societe = ATF::societe()->select(4225); $this->pdfEnveloppe = true; }elseif(ATF::$codename == "cap"){ $this->societe = ATF::societe()->select(1); }
+		if(ATF::$codename == "cleodis") {
+			$this->societe = ATF::societe()->select(246);
+		}elseif(ATF::$codename == "cleodisbe"){
+			$this->societe = ATF::societe()->select(4225);
+			$this->pdfEnveloppe = true;
+		}
 
 		$this->facturePDF = true;
 		$this->envoiContrat = true;
@@ -7460,11 +6553,9 @@ Les champs marqués sont obligatoires (*) _ Ne compléter que les champs incorre
 		$this->multicell(100,5, "VILLE *       ".$this->client["ville"] ,0, "L");
 		$this->multicell(0,5, "PAYS*       ".strtoupper(ATF::pays()->select($this->client["id_pays"], "pays")) ,0, "L");
 		$this->multicell(0,5, "E-mail       ".$this->client["email"] ,0, "L");
-		if(ATF::$codename == "cleodisbe"){
-			$this->multicell(0,5, "N° d'entreprise  ".$this->client["num_ident"] ,0, "L");
-		}else{
-			$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
-		}
+
+		$this->multicell(0,5, "SIREN / SIRET       ".$point ,0, "L");
+
 
 
 		$this->Ln(5);

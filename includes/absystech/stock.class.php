@@ -754,7 +754,8 @@ class stock_absystech extends stock {
 	*/
 	
 	public function getDataFromIcecat($marque,$ref,$id_stock) {
-				
+return; // disabled
+
 		// URL ICE CAT VERS LA FICHE TECHNIQUE DU PRODUIT
 		$urls = "http://prf.icecat.biz/?shopname=openIcecat-url;smi=product;vendor=".urlencode($marque).';prod_id='.urlencode($ref).";lang=fr";
 
@@ -854,6 +855,8 @@ class stock_absystech extends stock {
 	*/
 
 	public function sendToMagento($infos,$behavior="append"){ 
+return; // disabled
+		
 		$qte = $this->getQuantity($infos['ref'],$infos['to_magento']);
 		if ($behavior=="replace") {
 			$qte = $this->getQuantity($infos['ref'],"oui");

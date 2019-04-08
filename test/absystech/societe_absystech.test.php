@@ -222,15 +222,98 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$donnees[5]["detail"] = "Mar. 23 aoû. 09:51 c unitaire c unitaire";
 		$donnees[6]["detail"] = "Mar. 23 aoû. 09:51 c unitaire c unitaire";
 		$donnees[7]["detail"] = "Mar. 23 aoû. 09:51 c unitaire c unitaire";
-		$this->assertEquals('[{"detail":"Adresse","text":"139 rue des arts   59100 Roubaix France","group":"1societe","groupTitle":"TestTU","type":"address"}'.
-			',{"detail":"T\u00e9l\u00e9phone","text":"123","group":"1societe","groupTitle":"TestTU","type":"phone","id_societe":"'.$this->id_societe.'"}'.
-			',{"group":"2M contact test2 unitaire2","groupTitle":"M contact test2 unitaire2","etat":"actif","detail":"Adresse postale","text":"Adresse bidon     France","type":"address"}'.
-			',{"group":"2M contact test2 unitaire2","groupTitle":"M contact test2 unitaire2","etat":"actif","detail":"T\u00e9l\u00e9phone","text":"123","type":"phone","id_contact":"'.$id_contact2.'"}'.
-			',{"group":"2M contact test unitaire","groupTitle":"M contact test unitaire","etat":"actif","detail":"T\u00e9l\u00e9phone","text":"123","type":"phone","id_contact":"'.$this->id_contact.'"}'.
-			',{"group":"0suivis","groupTitle":"Suivis","detail":"Mar. 23 ao\u00fb. 09:51 c unitaire c unitaire","text":"TU suivi3","id_suivi":"","type":"suivi","intervenant_societe":"c unitaire","contact":"c unitaire","notifie":" ","texte":"TU suivi3","societe":"TestTU"}'.
-			',{"group":"0suivis","groupTitle":"Suivis","detail":"Mar. 23 ao\u00fb. 09:51 c unitaire c unitaire","text":"TU suivi2","id_suivi":"","type":"suivi","intervenant_societe":"c unitaire","contact":"c unitaire","notifie":" ","texte":"TU suivi2","societe":"TestTU"}'.
-			',{"group":"0suivis","groupTitle":"Suivis","detail":"Mar. 23 ao\u00fb. 09:51 c unitaire c unitaire","text":"TU suivi","id_suivi":"","type":"suivi","intervenant_societe":"c unitaire","contact":"c unitaire","notifie":" ","texte":"TU suivi","societe":"TestTU"}]'
-			,json_encode($donnees),"Les contacts sont mauvais");
+		$this->assertEquals(
+array (
+  0 => 
+  array (
+    'detail' => 'Adresse',
+    'text' => '139 rue des arts   59100 Roubaix France',
+    'group' => '1societe',
+    'groupTitle' => 'TestTU',
+    'type' => 'address',
+  ),
+  1 => 
+  array (
+    'detail' => 'Téléphone',
+    'text' => '123',
+    'group' => '1societe',
+    'groupTitle' => 'TestTU',
+    'type' => 'phone',
+    'id_societe' => $this->id_societe,
+  ),
+  2 => 
+  array (
+    'group' => '2contact test2 unitaire2',
+    'groupTitle' => 'contact test2 unitaire2',
+    'etat' => 'actif',
+    'detail' => 'Adresse postale',
+    'text' => 'Adresse bidon     France',
+    'type' => 'address',
+  ),
+  3 => 
+  array (
+    'group' => '2contact test2 unitaire2',
+    'groupTitle' => 'contact test2 unitaire2',
+    'etat' => 'actif',
+    'detail' => 'Téléphone',
+    'text' => '123',
+    'type' => 'phone',
+    'id_contact' => $id_contact2,
+  ),
+  4 => 
+  array (
+    'group' => '2contact test unitaire',
+    'groupTitle' => 'contact test unitaire',
+    'etat' => 'actif',
+    'detail' => 'Téléphone',
+    'text' => '123',
+    'type' => 'phone',
+    'id_contact' => $this->id_contact,
+  ),
+  5 => 
+  array (
+    'group' => '0suivis',
+    'groupTitle' => 'Suivis',
+    'detail' => 'Mar. 23 aoû. 09:51 c unitaire c unitaire',
+    'text' => 'TU suivi3',
+    'id_suivi' => '',
+    'type' => 'suivi',
+    'intervenant_societe' => 'c unitaire',
+    'contact' => 'c unitaire',
+    'notifie' => ' ',
+    'texte' => 'TU suivi3',
+    'societe' => 'TestTU',
+  ),
+  6 => 
+  array (
+    'group' => '0suivis',
+    'groupTitle' => 'Suivis',
+    'detail' => 'Mar. 23 aoû. 09:51 c unitaire c unitaire',
+    'text' => 'TU suivi2',
+    'id_suivi' => '',
+    'type' => 'suivi',
+    'intervenant_societe' => 'c unitaire',
+    'contact' => 'c unitaire',
+    'notifie' => ' ',
+    'texte' => 'TU suivi2',
+    'societe' => 'TestTU',
+  ),
+  7 => 
+  array (
+    'group' => '0suivis',
+    'groupTitle' => 'Suivis',
+    'detail' => 'Mar. 23 aoû. 09:51 c unitaire c unitaire',
+    'text' => 'TU suivi',
+    'id_suivi' => '',
+    'type' => 'suivi',
+    'intervenant_societe' => 'c unitaire',
+    'contact' => 'c unitaire',
+    'notifie' => ' ',
+    'texte' => 'TU suivi',
+    'societe' => 'TestTU',
+  ),
+)			
+			,$donnees,"Les contacts sont mauvais");
 		
 		// Société en plus client pour tester la prospection
 		$societe = array(
@@ -464,7 +547,9 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 								"forecast"=>"0",
 								"description"=>NULL,
 								"cle_externe"=>$societe["cle_externe"],
-								"disponibilite"=>NULL
+								"disponibilite"=>NULL,
+								"login"=>NULL,
+								"pwd"=>NULL
 							)
 							,$contact
 							,'contact mal insérée');
@@ -509,7 +594,7 @@ class societe_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		//Test de la méthode
 		$infos=array('id_societe'=>$this->id_societe,'credits'=>10,'libelle'=>'test_libelle');
 		$this->obj->add_ticket($infos,$this->s);
-		$this->assertEquals(array(0=>array("msg"=>"Ajout des tickets effectué !","title"=>"","timer"=>"")),ATF::$msg->getNotices(),"3 La notice d'annulation fonctionne bien");
+		$this->assertEquals(array(0=>array("msg"=>"Ajout des tickets effectué !","title"=>"","timer"=>"","type"=>"success")),ATF::$msg->getNotices(),"3 La notice d'annulation fonctionne bien");
 	
 		//Lecture du nombre de tickets
 		$nb_credits=$this->obj->getSolde($this->id_societe);

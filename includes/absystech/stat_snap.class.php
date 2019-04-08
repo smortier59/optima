@@ -5,6 +5,7 @@
 * @class stat_snap
 * @package Optima
 * @subpackage AbsysTech
+* @codeCoverageIgnore
 */
 class stat_snap extends classes_optima {
 	public function __construct(){

@@ -4,6 +4,9 @@
 * @package Optima
 */
 require_once dirname(__FILE__)."/../pointage.class.php";
+/**
+ * @codeCoverageIgnore
+ */
 class pointage_absystech extends pointage {
 	/**
 	* Contructeur

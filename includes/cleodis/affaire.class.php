@@ -3015,9 +3015,8 @@ class affaire_cap extends affaire {
 	* @return commande_cleodis
 	*/
 	function getMandat($id_affaire=NULL){
-		if (!$id_affaire && $this->infos["id_affaire"]) {
-			$id_affaire = $this->infos["id_affaire"];
-		}
+		if (!$id_affaire && $this->infos["id_affaire"])	$id_affaire = $this->infos["id_affaire"];
+
 		if($id_affaire){
 			ATF::mandat()->q->reset()->setStrict()->addField('mandat.id_mandat')->addCondition("mandat.id_affaire",$id_affaire)->setDimension("cell");
 			if($id_mandat = ATF::mandat()->sa()) {

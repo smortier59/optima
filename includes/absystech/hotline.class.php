@@ -931,6 +931,29 @@ class hotline extends classes_optima {
 		//Fin de transaction
 		ATF::db($this->db)->commit_transaction();
 
+$societe = ATF::societe()->select($infos['id_societe']);
+$contact = ATF::contact()->select($infos['id_contact']);
+$hotline = ATF::hotline()->select($id_hotline);
+
+// Envoi sur mattermost
+$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+$login = ATF::user()->select($id_owner,"login");
+$logins = array(
+"tpruvost"=>"thibaut",
+"jluillier"=>"jacques",
+"smortier"=>"sol-r",
+"gdamecourt"=>"gauthier"
+);
+if ($logins[$login]) $login = $logins[$login];
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
+$data = array();
+$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+$data["username"] = $societe["societe"];
+$data["channel"] = "Hotline";
+$cmd .= json_encode($data);
+$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+log::logger($cmd,'mm');
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
@@ -1033,6 +1056,26 @@ class hotline extends classes_optima {
 		$societe = ATF::societe()->select($infos['id_societe']);
 		$contact = ATF::contact()->select($infos['id_contact']);
 		$hotline = ATF::hotline()->select($id_hotline);
+
+// Envoi sur mattermost
+$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+$login = ATF::user()->select($id_owner,"login");
+$logins = array(
+"tpruvost"=>"thibaut",
+"jluillier"=>"jacques",
+"smortier"=>"sol-r",
+"gdamecourt"=>"gauthier"
+);
+if ($logins[$login]) $login = $logins[$login];
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
+$data = array();
+$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+$data["username"] = $societe["societe"];
+$data["channel"] = "Hotline";
+$cmd .= json_encode($data);
+$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+log::logger($cmd,'mm');
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
@@ -1786,6 +1829,9 @@ class hotline extends classes_optima {
 	}
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _graph_tickets_hotline($get, $post){
 		/*
 		$at = $this->stats(true);
@@ -1800,6 +1846,9 @@ class hotline extends classes_optima {
 		return 'un test';
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _stats($get, $post){
 		$at = $this->stats(true);
 		ATF::define_db("db","optima_att");
@@ -1819,6 +1868,7 @@ class hotline extends classes_optima {
 	* @param array session
 	* @param bool $widget
 	* @param string $type Type de stats
+	* @codeCoverageIgnore
 	* return enregistrements
 	*/
 	public function stats($widget=false,$type=NULL,$tu=NULL){
@@ -2305,6 +2355,9 @@ class hotline extends classes_optima {
 		return $nb_jours+1;
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _requetebyUserParMois($get,$post){
 		$moment = $get['moment'] == "now" ? date("Y-m") : (strlen($get['moment'])==7 ? $get['moment'] : -1);
 		$at = $this->requetebyUserParMois($moment);
@@ -2318,6 +2371,9 @@ class hotline extends classes_optima {
 
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function requetebyUserParMois($mois,$tu=false){
 		//if(ATF::$codename == "att"){ $exclusion = array(34,40); }
 		//else{ $exclusion = array(30,62,57,54); }
@@ -2469,6 +2525,7 @@ class hotline extends classes_optima {
 	/*
 	* Permet l'affichage sur le graphe marge réelle sur tickets
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function graph_tarif_horaire($mois_deb,$mois_fin){
 
@@ -2554,8 +2611,10 @@ class hotline extends classes_optima {
 
 
 
-
-	//Simple function to sort an array by a specific key. Maintains index association.
+	/*
+	* Simple function to sort an array by a specific key. Maintains index association.
+	* @codeCoverageIgnore
+	*/
 	function array_sort($array, $on, $order=SORT_ASC){
 		$new_array = array();
 		$sortable_array = array();
@@ -2587,13 +2646,16 @@ class hotline extends classes_optima {
 		return $new_array;
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function getTauxHorraire($id_affaire){
 		$marge_brute = 0;
-		ATF::facture()->q->reset()->where("id_affaire",$id_affaire);
+		ATF::facture()->q->reset()->where("facture.id_affaire",$id_affaire);
 		$res = ATF::facture()->select_all();
 		//Si j'ai des factures
 		if($res){
-			ATF::bon_de_commande()->q->reset()->where("id_affaire",$id_affaire);
+			ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire",$id_affaire);
 			$bdcs = ATF::bon_de_commande()->select_all();
 			$pbdc = 0;
 			foreach ($bdcs as $k => $v) {
@@ -2606,7 +2668,7 @@ class hotline extends classes_optima {
 			$marge_brute = round(($marge_brute - $pbdc),2);
 		}else{
 			//Si j'ai pas de factures
-			ATF::devis()->q->reset()->where("id_affaire", $id_affaire)
+			ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire)
 									->addOrder("revision","desc");
 			$devis = ATF::devis()->select_row();
 
@@ -2639,6 +2701,7 @@ class hotline extends classes_optima {
 	/**
 	* Lorsque l'on clique sur un graphe, on redirige vers le resultat qu'on souhaite sur le select_all filtré par la barre sur laquelle on a cliqué
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function statsFiltrage(){
 		/* nom du filtre */
@@ -2783,6 +2846,7 @@ class hotline extends classes_optima {
 	/**
 	* Retourne les hotlines ayant eu lieues depuis la dernière activité
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @codeCoverageIgnore
 	* @return array
 	*/
 	public function getRecentForMobile($countUnseenOnly=false,$limit=42){
@@ -2867,6 +2931,7 @@ class hotline extends classes_optima {
 
 	/** Récupère les éléments nécessaires à l'affichage de graphe de temps (de prise en charge et de cloture)
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function statsTps($widget=false,$par_user=false,$cloture=false,$count=false){
 		$this->q->reset()

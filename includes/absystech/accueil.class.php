@@ -1,9 +1,5 @@
 <?
 require_once dirname(__FILE__)."/../accueil.class.php";
-/** Classe accueil - Gestion de l'accueil
- * @package Optima
- * @subpackage AbsysTech
- */
 class accueil_absystech extends accueil { 
 	protected $targetGlobalSearch = array("societe","contact","affaire","hotline","devis","commande","facture");// La recherche globale se fait sur ces modules
 

@@ -598,6 +598,7 @@ class societe_cleodis extends societe {
   * @param boolean $reset VRAI si on reset lme querier, FAUX si on a initialisé qqch de précis avant...
   * @return string HTML de retour
   */
+
   public function autocompleteFournisseursDeCommande($infos,$reset=true) {
     if ($reset) {
       $this->q->reset();
@@ -846,6 +847,8 @@ class societe_cleodis extends societe {
     return $return;
   }
 
+  /*
+  Fonction non utilisée dans OPTIMA
 
   public function autocompleteFournisseurPrePaiement($infos,$reset=true,$count=false){
     if($reset){
@@ -866,7 +869,7 @@ class societe_cleodis extends societe {
     }
 
     return $return;
-  }
+  }*/
 
 
 
@@ -1927,33 +1930,28 @@ class societe_cleodis extends societe {
       ATF::agence()->q->reset()->addField('id_agence')->addOrder('id_agence','asc')->setLimit(1);
       $id_agence = ATF::agence()->select_cell();
     }
+    //Recherche agence + date
+    $ref.=strtoupper(
+      substr(
+        ATF::agence()->select($id_agence,'agence'),0,2)
+      ).date('ym');
 
-
-    if($id_agence){
-      //Recherche agence + date
-      $ref.=strtoupper(
-        substr(
-          ATF::agence()->select($id_agence,'agence'),0,2)
-        ).date('ym');
-
-      //Recherche du maximum
-      $max=$this->get_max_ref($ref);
-      if($max<10){
-        $ref.='000'.$max;
-      }elseif($max<100){
-        $ref.='00'.$max;
-      }elseif($max<1000){
-        $ref.='0'.$max;
-      }elseif($max<10000){
-        $ref.=$max;
-      }else{
-        throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
-      }
-
-      return $ref;
+    //Recherche du maximum
+    $max=$this->get_max_ref($ref);
+    if($max<10){
+      $ref.='000'.$max;
+    }elseif($max<100){
+      $ref.='00'.$max;
+    }elseif($max<1000){
+      $ref.='0'.$max;
+    }elseif($max<10000){
+      $ref.=$max;
     }else{
-      throw new errorATF(ATF::$usr->trans('societe_agence_user_false'),80846);
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
     }
+
+    return $ref;
+
   }
 
 

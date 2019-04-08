@@ -589,7 +589,9 @@ class hotline_interaction extends classes_optima {
 		return $temps;
 	}
 
-
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function getCreditV2($id_hotline_interaction){
 		$id_hotline = $this->select($id_hotline_interaction , "id_hotline");
 
@@ -623,6 +625,7 @@ class hotline_interaction extends classes_optima {
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
 	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	* @codeCoverageIgnore
 	*/
 	public function getBillingTime($id_hotline_interaction){
 		return $this->getTime($id_hotline_interaction,"temps");
@@ -633,6 +636,7 @@ class hotline_interaction extends classes_optima {
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
 	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	* @codeCoverageIgnore
 	*/
 	public function getTotalTime($id_hotline_interaction){
 		return $this->getTime($id_hotline_interaction,"temps_passe");
@@ -750,6 +754,7 @@ class hotline_interaction extends classes_optima {
 	* @param string pole
 	* @param string id_user
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function stats_special($annee,$id_societe=NULL,$id_user=NULL,$groupe){
 		$this->q->reset();
@@ -977,6 +982,7 @@ class hotline_interaction extends classes_optima {
 	* @param array session
 	* @param date date_fin : date a laquelle les données ne doivent pas dépassées
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function statsChargeParUser($date_fin){
 		$this->q->reset()
@@ -1044,6 +1050,7 @@ class hotline_interaction extends classes_optima {
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param string annee
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function statsProduction($annee){
 		$this->q->reset();
@@ -2614,6 +2621,9 @@ class hotline_interaction extends classes_optima {
 
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _indicateurs($get, $post){
 
 		$workedDay = (ATF::hotline()->getJoursOuvres(date("Y-m-01"), date("Y-m-d")))*ATF::user()->select(ATF::$usr->getID(), "temps_partiel");
@@ -2643,6 +2653,9 @@ class hotline_interaction extends classes_optima {
 	}
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _getMoyennePointage($get, $post){
 		$date = date('Y-m');
 

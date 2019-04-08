@@ -2455,8 +2455,6 @@ class commande_cleodis extends commande {
 
 					$result= parent::select_all();
 
-					$this->q->setToString();
-					log::logger(parent::select_all() , "mfleurquin");
 
 
 					$annee = $date-3;
@@ -2471,6 +2469,63 @@ class commande_cleodis extends commande {
 												->addOrder("year")->addOrder("month")
 												->where("stat_concerne", "mep-".$type);
 					$res = ATF::stat_snap()->select_all();
+
+					/*$annee = $date-3;
+					for($a=$annee; $a<$date;$a++){
+						for($m=1;$m<=12;$m++){
+
+							ATF::commande()->q->reset()
+								->addField("COUNT(*)","nb")
+								->setStrict()
+								->addJointure("commande","id_societe","societe","id_societe")
+								->addJointure("commande","id_affaire","affaire","id_affaire")
+								->addJointure("societe","id_owner","user","id_user")
+								->where("user.id_agence",$id_agence)
+
+								->addCondition("commande.etat","prolongation" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","AR" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","arreter" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","vente" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","restitution" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","mis_loyer_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+
+								//->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+								->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+
+								->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+
+								->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%Y')","year")
+								->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%m')","month")
+
+								->addGroup("year")->addGroup("month")
+								->addOrder("year")->addOrder("month")
+
+								->addCondition("`commande`.`mise_en_place`",$a."-".$m."-01","AND",false,">=")
+								->addCondition("`commande`.`mise_en_place`",$a."-".$m."-31","AND",false,"<");
+
+
+							if($type == "reseau"){
+								ATF::commande()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+									    		->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
+							}else{
+								ATF::commande()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
+									    		->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
+							}
+							$r[$a][$m] = ATF::commande()->select_row();
+						}
+					}
+
+					foreach ($r as $ky => $value) {
+						foreach ($value as $k => $v) {
+							$res[] = array(
+										"nb"=> $v["nb"],
+										"year"=> $v["year"],
+										"month"=> $v["month"]
+									);
+						}
+					}*/
 				}
 
 

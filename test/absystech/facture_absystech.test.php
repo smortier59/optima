@@ -425,13 +425,15 @@ class facture_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$facture2["facture"]["dematerialisation"]=3;
 		$facture2["preview"]=true;
 		ATF::$usr->set('id_profil',3);
+		ATF::$msg->getNotices();
 		$id_facture2=$this->obj->insert($facture2,$this->s);
 		ATF::$usr->set('id_profil',1);
 		$this->assertEquals(array(
 									0=>array(
-										"msg"=>"Seul le profil Associé permet de modifier la TVA. La TVA de cette facture sera donc de 1.2",
+										"msg"=>"error_403_facture_tva",
 										"title"=>"Droits d'accès requis pour cette opération ! ",
-										"timer"=>null
+										"timer"=>null,
+										"type"=>"success"
 										)
 							),ATF::$msg->getNotices(),"La notice de TVA ne se fait pas");
 

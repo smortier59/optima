@@ -1510,25 +1510,6 @@ class devis_cleodis extends devis {
 							->addJointure("societe","id_owner","user","id_user")
 							->where("user.id_agence",$id_agence);
 
-					/*if($type == "o2m"){
-						$this->q->addCondition("societe.code_client",'%M%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%C%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%BK%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%F%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%Y%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%H%',"OR","nonFinie","LIKE");
-					}elseif($type == "autre"){
-						$this->q->addCondition("societe.code_client",'%M%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%C%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%BK%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%F%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%Y%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%H%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE");
-					}else{
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE");
-					}*/
 
 					if($type == "reseau"){
 						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
@@ -1563,8 +1544,6 @@ class devis_cleodis extends devis {
 
 
 					$annee = $date-3;
-					if($date <2017) $id_agence = 1;
-
 					ATF::stat_snap()->q->reset()->addField("stat_snap.nb","nb")
 												->addField("DATE_FORMAT(`stat_snap`.`date`,'%Y')","year")
 												->addField("DATE_FORMAT(`stat_snap`.`date`,'%m')","month")
@@ -1575,7 +1554,62 @@ class devis_cleodis extends devis {
 												->addOrder("year")->addOrder("month")
 												->where("stat_concerne", "devis-".$type);
 					$res = ATF::stat_snap()->select_all();
+
+					/*for($a=$annee; $a<$date;$a++){
+						for($m=1;$m<=12;$m++){
+							//Resultat precedent
+							ATF::devis()->q->reset()
+								->addField("COUNT(*)","nb")
+								->setStrict()
+								->addJointure("devis","id_societe","societe","id_societe")
+								->addJointure("devis","id_affaire","affaire","id_affaire")
+								->addJointure("societe","id_owner","user","id_user")
+								->where("user.id_agence",$id_agence)
+								->addCondition("devis.devis","%lcd%" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%avenant%","AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%vente%","AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%AVT%","AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%MIPOS%","AND", "conditiondevis", "NOT LIKE")
+
+								->addCondition("devis.type_contrat","vente","AND", "conditiondevis", "!=")
+								->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+
+								->addCondition("devis.etat",'gagne',"AND","conditiondevis","=")
+								->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+								->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+
+								->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%Y')","year")
+								->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%m')","month")
+
+								->addGroup("year")->addGroup("month")
+								->addOrder("year")->addOrder("month")
+
+								->addCondition("`devis`.`first_date_accord`",$a."-".$m."-01","AND",false,">=")
+								->addCondition("`devis`.`first_date_accord`",$a."-".$m."-31","AND",false,"<");
+
+							if($type == "reseau"){
+								ATF::devis()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+										    ->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
+							}else{
+								ATF::devis()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
+										    ->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
+							}
+							$r[$a][$m] = ATF::devis()->select_row();
+						}
+					}
+
+					foreach ($r as $ky => $value) {
+						foreach ($value as $k => $v) {
+							$res[] = array(
+										"nb"=> $v["nb"],
+										"year"=> $v["year"],
+										"month"=> $v["month"]
+									);
+						}
+					}*/
 				}
+
+
 
 
 				if($widget){

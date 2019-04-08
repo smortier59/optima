@@ -14,7 +14,7 @@ class news_test extends ATF_PHPUnit_Framework_TestCase {
 	// @author Cyril Charlier <ccharlier@absystech.fr>
 	public function testGetConseils() {
 		$ret = ATF::news()->GetConseils();
-		$this->assertEquals("Un conseil de test ",$ret, "Mauvais conseil retourné");
+		$this->assertEquals("conseil de test",substr(trim($ret),-strlen("conseil de test")), "Mauvais conseil retourné");
 	}
 
 };

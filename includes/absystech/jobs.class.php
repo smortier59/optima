@@ -3,6 +3,7 @@
 * Classe jobs (offre d'emploi)
 * @package Optima
 * @subpackage AbsysTech
+* @codeCoverageIgnore	
 */
 class jobs extends classes_optima {
 	/**

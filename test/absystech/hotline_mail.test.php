@@ -178,7 +178,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
 		$nb = ATF::$msg->getNotices();
 	}
 
-	/* @author Morgan Fleurquin <mfleurquin@absystech.fr> */
+	/* @author Morgan Fleurquin <mfleurquin@absystech.fr>
 	public function test_createMailInteractionInternal(){
 		ATF::$usr->set("id_user" , NULL);
 		$id_hotline_interaction = 57162;
@@ -186,7 +186,7 @@ class hotline_mail_test extends ATF_PHPUnit_Framework_TestCase {
 		$to = "tu@absystech.net";
 		$this->obj->createMailInteractionInternal($to,$id_hotline,$id_hotline_interaction);
 
-	}
+	} */
 	
     
     
