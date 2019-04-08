@@ -311,4 +311,21 @@ class pack_produit extends classes_optima {
 
 
 	}
+
+	/**
+	 * Retourne le produit principal d'un pack
+	 * @author : Quentin JANON <qjanon@absystech.fr>
+	 * @param  Integer $id_pack_produit
+	 * @return int id produit
+	 */
+	public function getProduitPrincipal($id_pack_produit){
+		ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)->addOrder("ordre","ASC")->setLimit(1);
+		$princ = ATF::pack_produit_ligne()->select_row();
+
+		return $princ["id_produit"];
+
+
+	}
+
+	
 }

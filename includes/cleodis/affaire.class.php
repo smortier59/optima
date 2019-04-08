@@ -23,10 +23,10 @@ class affaire_cleodis extends affaire {
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,'mail_signature'
 			,'mail_document'
-			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
-			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
-			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
-			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file")
+			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
+			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
+			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
+			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
 			,'validateOrder'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"validateOrderRenderer")
 
 
@@ -88,11 +88,6 @@ class affaire_cleodis extends affaire {
 		);
 		$this->panels['infos_signature_contrat'] = array("visible"=>false);
 
-
-
-
-
-
 		$this->colonnes['panel']['chiffres'] = array(
 			'total_depense'
 			,'total_recette'
@@ -135,9 +130,9 @@ class affaire_cleodis extends affaire {
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
-		$this->files["cni"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
+		$this->files["cni"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
 		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
@@ -1105,6 +1100,10 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["ref_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "ref_externe");
 			$return['data'][$k]["etat_cmd_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "etat_cmd_externe");
 
+			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? true : false;
+			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? true : false;
+			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? true : false;
+
 			if ($i['affaire.nature'] == 'AR') {
 				foreach ($a->getParentAR($i['affaire.id_affaire']) as $k_=>$i_) {
 					$return['data'][$k]['parentes'] .= '<a href="#affaire-select-'.$a->cryptId($i_['id_affaire']).'.html">'.$i_['ref'].'</a>, ';
@@ -1116,6 +1115,7 @@ class affaire_cleodis extends affaire {
 			} else {
 				$return['data'][$k]['parentes'] = "";
 			}
+
 
 		}
 		return $return;
@@ -1593,6 +1593,9 @@ class affaire_cleodis extends affaire {
 
 				$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 				$data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
+
+
+
 				$data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
 				if($loyer = $this->getLoyers($value['affaire.id_affaire_fk'])){
 						$data['data'][$key]["loyer"] = $loyer; // on recupere tous les loyers
@@ -2413,6 +2416,7 @@ class affaire_cleodis extends affaire {
 
 			$devis = ATF::devis()->select($id_devis);
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
+			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);

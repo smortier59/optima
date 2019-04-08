@@ -1544,7 +1544,7 @@ class societe_cleodis extends societe {
 
           $creation = new DateTime( $data["date_creation"] );
           $creation = $creation->format("Ymd");
-          $past2Years = new DateTime( date("Y-m-d", strtotime("-5 years")) );
+          $past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
           $past2Years = $past2Years->format("Ymd");
 
           if($data["cs_score"] > 50 && $creation < $past2Years ){
@@ -1552,7 +1552,7 @@ class societe_cleodis extends societe {
             $comite["decisionComite"] = "Accepté automatiquement";
           }else{
             $comite["etat"] = "refuse";
-            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 5ans";
+            $comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
           }
 
           $comite["reponse"] = date("Y-m-d");
@@ -1644,6 +1644,7 @@ class societe_cleodis extends societe {
         }
 
         $res = ATF::societe()->select_row();
+
         try {
 
             if($res){
@@ -1658,14 +1659,25 @@ class societe_cleodis extends societe {
                                           "ville"=>$data["ville"]
                                        ));
                 }
+
+
+
             }else {
+                log::logger("ICI societe inexistante" , "creditsafe");
                 $data_soc = $data;
+
+                if ($post['site_associe']=='boulangerpro') {
+                  ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
+                  $id_apporteur = ATF::societe()->select_cell();
+                  $data_soc['id_apporteur'] = $id_apporteur;
+                }
 
                 $data_soc["langue"] = $post["langue"];
 
                 unset($data_soc["nb_employe"],$data_soc["resultat_exploitation"],$data_soc["capitaux_propres"],$data_soc["dettes_financieres"],$data_soc["capital_social"], $data_soc["gerant"]);
                 $id_societe = $this->insert($data_soc);
                 if($apporteur) $this->u(array("id_societe"=> $id_societe, "id_apporteur" => $apporteur, "id_fournisseur" => $apporteur));
+                if($post["site_associe"]) $this->u(array("id_societe"=> $id_societe, "code_client" => $code_client));
             }
 
 

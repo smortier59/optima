@@ -64,6 +64,8 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 					$data[$value["id_commande_ligne"]] = $value;
 				}
 			}
+
+			$sa["data"] = $data;
 			// Maquillage des devis_ligne en commande_ligne
 			$k=0;
 			foreach ($sa["data"] as $kRow => $row) {
