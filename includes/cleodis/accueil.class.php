@@ -59,3 +59,8 @@ class accueil_cap extends accueil_cleodis {
 		"societe"=>array("opened"=>true)
 	);
 };
+
+
+class accueil_bdomplus extends accueil_cleodis { };
+class accueil_bdom extends accueil_cleodis { };
+class accueil_boulanger extends accueil_cleodis { };

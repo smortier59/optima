@@ -2097,4 +2097,7 @@ class societe_midas extends societe_cleodis {
 };
 
 
-?>
+
+class societe_bdomplus extends societe_cleodis { };
+class societe_bdom extends societe_cleodis { };
+class societe_boulanger extends societe_cleodis { };

@@ -32,4 +32,7 @@ class fabriquant_cleodis extends fabriquant {
 
 class fabriquant_cleodisbe extends fabriquant_cleodis { };
 class fabriquant_cap extends fabriquant_cleodis { };
-?>
+
+class fabriquant_bdomplus extends fabriquant_cleodis { };
+class fabriquant_bdom extends fabriquant_cleodis { };
+class fabriquant_boulanger extends fabriquant_cleodis { };

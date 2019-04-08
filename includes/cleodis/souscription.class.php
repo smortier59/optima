@@ -847,6 +847,8 @@ class souscription_cleodis extends souscription {
 
     return true;
   }
-
-
 }
+
+class souscription_bdomplus extends souscription_cleodis { };
+class souscription_bdom extends souscription_cleodis { };
+class souscription_boulanger extends souscription_cleodis { };

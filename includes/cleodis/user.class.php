@@ -457,4 +457,7 @@ class user_cap extends user_cleodis {
 
 }
 
-?>
+
+class user_bdomplus extends user_cleodis { };
+class user_bdom extends user_cleodis { };
+class user_boulanger extends user_cleodis { };

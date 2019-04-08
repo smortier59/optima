@@ -957,8 +957,3 @@ class facture_fournisseur extends classes_optima {
 	}
 
 };
-
-class facture_fournisseur_cleodisbe extends facture_fournisseur { };
-class facture_fournisseur_cap extends facture_fournisseur { };
-class facture_fournisseur_exactitude extends facture_fournisseur { };
-?>

@@ -87,4 +87,7 @@ class commande_ligne_midas extends commande_ligne_cleodis {
 class commande_ligne_cleodisbe extends commande_ligne_cleodis { };
 class commande_ligne_cap extends commande_ligne_cleodis { };
 
-?>
+
+class commande_ligne_bdomplus extends commande_ligne_cleodis { };
+class commande_ligne_bdom extends commande_ligne_cleodis { };
+class commande_ligne_boulanger extends commande_ligne_cleodis { };

@@ -1748,5 +1748,6 @@ class devis_midas extends devis_cleodis {
 
 class devis_cleodisbe extends devis_cleodis { };
 
-
-?>
+class devis_bdomplus extends devis_cleodis { };
+class devis_bdom extends devis_cleodis { };
+class devis_boulanger extends devis_cleodis { };

@@ -39,7 +39,3 @@ class opportunite_cleodis extends opportunite {
 		$this->foreign_key['id_target'] =  "user";
 	}
 };
-
-class opportunite_cleodisbe extends opportunite { };
-class opportunite_cap extends opportunite { };
-?>

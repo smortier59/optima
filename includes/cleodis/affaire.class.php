@@ -3023,4 +3023,7 @@ class affaire_cap extends affaire {
 
 };
 
-?>
+
+class affaire_bdomplus extends affaire_cleodis { };
+class affaire_bdom extends affaire_cleodis { };
+class affaire_boulanger extends affaire_cleodis { };

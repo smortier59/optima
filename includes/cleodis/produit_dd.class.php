@@ -38,7 +38,3 @@ class produit_dd extends classes_optima {
 	}
 
 };
-
-class produit_dd_cleodisbe extends produit_dd { };
-class produit_dd_cap extends produit_dd { };
-?>

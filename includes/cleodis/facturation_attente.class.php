@@ -47,7 +47,3 @@ class facturation_attente extends classes_optima {
 		}
 	}
 };
-
-class facturation_attente_cleodisbe extends facturation_attente { };
-class facturation_attente_cap extends facturation_attente { };
-?>

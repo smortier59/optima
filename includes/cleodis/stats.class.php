@@ -20,4 +20,7 @@ class stats_cleodis extends stats {
 
 class stats_cleodisbe extends stats_cleodis { };
 class stats_cap extends stats_cleodis { };
-?>
+
+class stats_bdomplus extends stats_cleodis { };
+class stats_bdom extends stats_cleodis { };
+class stats_boulanger extends stats_cleodis { };
