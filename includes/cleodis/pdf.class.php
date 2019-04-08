@@ -5140,14 +5140,18 @@ class pdf_cleodis extends pdf {
 
 				$this->tableauBigHead($head,$data,$w,5,$styles,265);
 
-
 				//Si on a un commentaire et qu'on est sur le dernier tableau de produits
-				if ($this->facture['commentaire'] && $k == count($lignes)-1) {
+				if ($this->facture['commentaire']) {
 					$com = array(array("Commentaire : ".$this->facture['commentaire']));
 					$sCom = array(array($this->styleDetailsProduit));
 					$this->tableau(false,$com,185,5,$sCom);
 				}
 			}
+
+
+
+
+
 			$this->ln(5);
 			$total = $this->facture['prix'];
 			$totalTTC = $total*$this->facture['tva'];
