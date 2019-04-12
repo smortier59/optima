@@ -63,6 +63,8 @@ class commande_ligne_absystech extends commande_ligne {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all["count"]>0){
 			foreach($select_all["data"] as $key=>$item){
+				$item["commande_ligne.prix"] = (float)$item["commande_ligne.prix"];
+				$item["commande_ligne.prix_achat"] = (float)$item["commande_ligne.prix_achat"];
 				if (!$item["commande_ligne.prix"] || !$item["commande_ligne.prix_achat"]) {
 					$select_all["data"][$key]["commande_ligne.marge"] = 0;
 					$select_all["data"][$key]["commande_ligne.marge_absolue"] = 0;
