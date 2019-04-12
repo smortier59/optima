@@ -64,6 +64,8 @@ class devis_ligne_absystech extends devis_ligne {
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
 		if($select_all){
 			foreach($select_all["data"] as $key=>$item){
+				$item["devis_ligne.prix"] = (float)$item["devis_ligne.prix"];
+				$item["devis_ligne.prix_achat"] = (float)$item["devis_ligne.prix_achat"];
 				if (!$item["devis_ligne.prix"] || !$item["devis_ligne.prix_achat"]) {
 					$select_all["data"][$key]["devis_ligne.marge"] = 0;
 					$select_all["data"][$key]["devis_ligne.marge_absolue"] = 0;
@@ -77,6 +79,7 @@ class devis_ligne_absystech extends devis_ligne {
 				
 			}
 		}
+
 		return $select_all;
 	}
 
@@ -96,7 +99,10 @@ class devis_ligne_absystech extends devis_ligne {
 					$return[$kRow][str_replace("devis_ligne","commande_ligne",$kCol)]=$value;
 				}
 
-				if ($return[$kRow]["commande_ligne.prix"] && $return[$kRow]["commande_ligne.prix"] != 0.00) {
+				$return[$kRow]["commande_ligne.prix"] = (float)$return[$kRow]["commande_ligne.prix"];
+				$return[$kRow]["commande_ligne.prix_achat"] = (float)$return[$kRow]["commande_ligne.prix_achat"];
+
+				if ($return[$kRow]["commande_ligne.prix"] && $return[$kRow]["commande_ligne.prix"]) {
 					$marge = (($return[$kRow]["commande_ligne.prix"]-$return[$kRow]["commande_ligne.prix_achat"])/$return[$kRow]["commande_ligne.prix"])*100;
 					$return[$kRow]["commande_ligne.marge"] = round($marge,2);
 				} else {
