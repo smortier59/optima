@@ -1580,6 +1580,6 @@ class facturation extends classes_optima {
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
 
-class fabrication_bdomplus extends fabrication_cleodis { };
-class fabrication_bdom extends fabrication_cleodis { };
-class fabrication_boulanger extends fabrication_cleodis { };
+class facturation_bdomplus extends facturation { };
+class facturation_bdom extends facturation { };
+class facturation_boulanger extends facturation { };
