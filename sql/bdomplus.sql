@@ -1,0 +1,1 @@
+ALTER TABLE `pack_produit` ADD `prolongation` ENUM('oui','non') NOT NULL DEFAULT 'non' AFTER `id_document_contrat`;
