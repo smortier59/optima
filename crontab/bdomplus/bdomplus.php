@@ -118,7 +118,6 @@ function import_pack(){
 	$packs = array();
 
 	try {
-
 		while ($ligne = fgetcsv($fpr,0 ,";")) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
@@ -217,11 +216,9 @@ function import_ligne($packs, $produits){
 				"visible_sur_pdf"=> $ligne[10]
 			);
 
-			log::logger($pack_produit_ligne , "mfleurquin");
-
 			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
 			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
-/*
+
 			if($l){
 				$pack_produit_ligne["id_pack_produit_ligne"] = $l["id_pack_produit_ligne"];
 				ATF::pack_produit_ligne()->u($pack_produit_ligne);
@@ -229,7 +226,7 @@ function import_ligne($packs, $produits){
 			}else{
 				ATF::pack_produit_ligne()->i($pack_produit_ligne);
 				echo "Ligne inserée \n";
-			}*/
+			}
 
 		}
 	} catch (errorATF $e) {
