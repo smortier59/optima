@@ -210,7 +210,7 @@ function import_ligne($packs, $produits){
 				"max"=>$ligne[4],
 				"option_incluse"=>$ligne[5],
 				"option_incluse_obligatoire"=>$ligne[6],
-				"afficher_sur_site"=> $ligne[7],
+
 				"ordre" => $ligne[8],
 				"visible"=> $ligne[9],
 				"visible_sur_pdf"=> $ligne[10]
