@@ -45,6 +45,10 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = 29109; // ID de la société DECATHLON BTWIN (same in RCT - PROD - DEV)
       break;
 
+      case 'bdomplus':
+        $this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+      break;
+
     }
 
     $this->checkIBAN($post['iban']);
@@ -93,6 +97,7 @@ class souscription_cleodis extends souscription {
         foreach ($value as $k => $v) {
           $post['id_pack_produit'][] = $v["id_pack_produit"];
         }
+
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
@@ -149,7 +154,6 @@ class souscription_cleodis extends souscription {
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
 
-
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
         }
@@ -159,7 +163,7 @@ class souscription_cleodis extends souscription {
           ATF::affaire()->store($s, $id_affaire, "noticeAssurance", $noticeAssurance);
         }
 
-         if($post["site_associe"] === "boulangerpro"){
+        if($post["site_associe"] === "boulangerpro" || $post["site_associe"] === "bdomplus"){
           $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
           $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
         }
@@ -174,6 +178,7 @@ class souscription_cleodis extends souscription {
         throw $e;
     }
     ATF::db($this->db)->commit_transaction();
+
     return $affaires;
   }
 
@@ -195,12 +200,17 @@ class souscription_cleodis extends souscription {
 
       $suffix = ATF::pack_produit()->select_cell();
     }
+
     switch ($site_associe) {
       case "btwin":
         $r = "BTWIN - Location ".$suffix;
       break;
       case "boulangerpro":
         $r = "BOULANGER PRO - Location ".$suffix;
+      break;
+
+      case "bdomplus":
+        $r = "BDOM - Location ".$suffix;
       break;
     }
 
@@ -250,6 +260,9 @@ class souscription_cleodis extends souscription {
         "loyer__dot__support"=>"",
         "loyer__dot__avec_option"=>"non"
     );
+
+
+
 
     foreach ($produits as $k=>$produit) {
         ATF::produit()->q->reset()
@@ -340,7 +353,6 @@ class souscription_cleodis extends souscription {
    * @return Integer             ID du contrat généré
    */
   private function createContrat($post, $libelle, $id_devis, $id_affaire) {
-
     ATF::devis_ligne()->q->reset()->where('id_devis', $id_devis);
     $lignesDevis = ATF::devis_ligne()->select_all();
 
@@ -389,6 +401,29 @@ class souscription_cleodis extends souscription {
   }
 
 
+  public function _getContratA4($post, $get){
+    log::logger("=============================","souscription");
+    log::logger("Get Contrat A4","souscription");
+    log::logger($post,"souscription");
+
+    $id_societe = ATF::affaire()->select($post["id_affaire"], "id_societe");
+    $refSociete = ATF::societe()->select($id_societe, "ref");
+    if (!$refSociete) {
+      // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
+      $refSociete = ATF::societe()->create_ref($societe);
+      ATF::societe()->u(array("id_societe"=> $id_societe, "ref"=> $refSociete));
+    }
+
+    if(!$post["id_affaire"]){
+      throw new Exception('Aucune affaire.', 500);
+    }
+
+    ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
+    $commande = ATF::commande()->select_row();
+
+    $pdf = ATF::pdf()->generic('contratA4',$commande["commande.id_commande"],true);
+    return base64_encode($pdf);
+  }
 
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
@@ -452,13 +487,17 @@ class souscription_cleodis extends souscription {
     if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500);
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
-    log::logger('GET CONTACT',"souscription");
-    log::logger($contact,"souscription");
 
-    log::logger('CHECK IBAN',"souscription");
-    log::logger($iban,"souscription");
+    if(!$post["no_check_iban"]){
+      log::logger('GET CONTACT',"souscription");
+      log::logger($contact,"souscription");
 
-    $this->checkIBAN($iban);
+      log::logger('CHECK IBAN',"souscription");
+      log::logger($iban,"souscription");
+
+      $this->checkIBAN($iban);
+    }
+
 
     log::logger('UPDATE CONTACT',"souscription");
     log::logger(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel),"souscription");
@@ -490,6 +529,7 @@ class souscription_cleodis extends souscription {
           "notice_assurance.pdf"=> base64_encode($noticeAssurance) // base64
         );
       break;
+
       case 'boulangerpro':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
@@ -670,11 +710,11 @@ class souscription_cleodis extends souscription {
     if ($type == 'others') {
       // Ici on va traiter les documents annexe DGS/CGA, ces document doivent se retrouvé dans la GED de l'affaire et non sur l'affaire elle même
       $id_pdf_affaire = ATF::pdf_affaire()->insert(array(
-        "id_affaire"=>$id, 
+        "id_affaire"=>$id,
         "provenance"=>"Retour autre document : ".ATF::affaire()->select($id, "ref")
       ));
       $file = ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint", null, 'cleodis');
-      
+
     } else {
       $file = ATF::getClass($module)->filepath($id, $type, null, 'cleodis');
     }
@@ -696,6 +736,9 @@ class souscription_cleodis extends souscription {
       break;
       case "btwin":
         $r = "BT";
+      break;
+      case "bdomplus":
+        $r = "BD";
       break;
       default:
         $r = "";
@@ -874,7 +917,7 @@ class souscription_cleodis extends souscription {
 
     return true;
   }
-}
+
 
   private function manageProduitChanges ($produit, $p, &$packDesactive, &$produitDesactive, $logFile) {
       // MAJ nouveau prix sur le produit
@@ -889,19 +932,19 @@ class souscription_cleodis extends souscription {
       $packs = ATF::produit()->getPacks($produit['id_produit'], 'actif');
       log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
       foreach ($packs as $pack) {
-        log::logger("------------ PACK ID ".$pack['id_pack_produit']."(".$pack['etat'].")------------",$logFile);      
+        log::logger("------------ PACK ID ".$pack['id_pack_produit']."(".$pack['etat'].")------------",$logFile);
 
         $etat = ATF::pack_produit()->select($pack['id_pack_produit'], 'etat');
 
         if ($etat!='actif') {
-          log::logger("Pack non actif, on passe à la suite.",$logFile);      
+          log::logger("Pack non actif, on passe à la suite.",$logFile);
         } else {
           ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
           $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
-          log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
+          log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);
 
           if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
-            log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);                  
+            log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);
 
             ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
             $packDesactive[$pack['id_pack_produit']] = $pack['id_pack_produit'];
@@ -909,7 +952,7 @@ class souscription_cleodis extends souscription {
             log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
             log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
           }
-          
+
         }
 
       }
@@ -957,7 +1000,7 @@ class souscription_cleodis extends souscription {
         "description" => $desc,
         "suivi_notifie"=>array(0=>"")
     );
-    return ATF::comite()->insert(array("comite"=>$comite));    
+    return ATF::comite()->insert(array("comite"=>$comite));
   }
 
 }

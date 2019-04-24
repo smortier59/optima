@@ -433,6 +433,7 @@ class commande_cleodis extends commande {
 
 		// Mise à jour du forecast
 		if(ATF::$codename == "cleodisbe") $affaire = new affaire_cleodisbe($infos['id_affaire']);
+		elseif(ATF::$codename == "bdomplus") $affaire = new affaire_bdomplus($infos['id_affaire']);
 		else $affaire = new affaire_cleodis($infos['id_affaire']);
 
 		$affaire->majForecastProcess();
