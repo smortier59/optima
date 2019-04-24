@@ -874,7 +874,6 @@ class souscription_cleodis extends souscription {
 
     return true;
   }
-}
 
   private function manageProduitChanges ($produit, $p, &$packDesactive, &$produitDesactive, $logFile) {
       // MAJ nouveau prix sur le produit
