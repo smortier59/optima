@@ -400,31 +400,6 @@ class souscription_cleodis extends souscription {
     return $id_commande;
   }
 
-
-  public function _getContratA4($post, $get){
-    log::logger("=============================","souscription");
-    log::logger("Get Contrat A4","souscription");
-    log::logger($post,"souscription");
-
-    $id_societe = ATF::affaire()->select($post["id_affaire"], "id_societe");
-    $refSociete = ATF::societe()->select($id_societe, "ref");
-    if (!$refSociete) {
-      // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
-      $refSociete = ATF::societe()->create_ref($societe);
-      ATF::societe()->u(array("id_societe"=> $id_societe, "ref"=> $refSociete));
-    }
-
-    if(!$post["id_affaire"]){
-      throw new Exception('Aucune affaire.', 500);
-    }
-
-    ATF::commande()->q->reset()->where("commande.id_affaire", $post["id_affaire"]);
-    $commande = ATF::commande()->select_row();
-
-    $pdf = ATF::pdf()->generic('contratA4',$commande["commande.id_commande"],true);
-    return base64_encode($pdf);
-  }
-
   /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -433,6 +408,7 @@ class souscription_cleodis extends souscription {
   public function _signAndGetPDF($post,$get) {
     log::logger("=============================","souscription");
     log::logger($post,"souscription");
+    log::logger($get,"souscription");
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
@@ -450,8 +426,14 @@ class souscription_cleodis extends souscription {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
 
+
+
     if (!$post['type']) {
       throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
+    }
+
+    if(!$tel){
+      if($post['type'] == "particulier") $tel = ATF::societe()->select($id_societe, "particulier_portable");
     }
 
     $societe = ATF::societe()->select($id_societe);
@@ -530,6 +512,14 @@ class souscription_cleodis extends souscription {
         );
       break;
 
+      case 'bdomplus':
+        $contrat = ATF::pdf()->generic('contratA4',$contrat["commande.id_commande"],true);
+
+        $f =  array(
+          "contrat.pdf" => base64_encode($contrat)
+        );
+      break;
+
       case 'boulangerpro':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
@@ -579,7 +569,8 @@ class souscription_cleodis extends souscription {
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
-      "files2sign"=>$f
+      "files2sign"=>$f,
+      "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref")
     );
 
     if ($post['type'] == 'particulier') {
@@ -589,8 +580,7 @@ class souscription_cleodis extends souscription {
     } else {
       $return['email'] = $societe["particulier_email"];
     }
-    // log::logger("RETOUR","souscription");
-    // log::logger($return,"souscription");
+
     return $return;
   }
 
