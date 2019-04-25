@@ -343,6 +343,16 @@ ATF.buildGridEditor({
 			}
 			{if $current_class->table=="pack_produit_ligne"}
 				, {
+					header: 'Produit principal ?',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__principal',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
+					{/if}
+				}
+			{/if}
+			{if $current_class->table=="pack_produit_ligne"}
+				, {
 					header: 'Min',
 					width:20,
 					dataIndex: '{$current_class->table}__dot__min',
