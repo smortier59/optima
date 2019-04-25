@@ -3,7 +3,7 @@ ALTER TABLE `pack_produit` ADD `prolongation` ENUM('oui','non') NOT NULL DEFAULT
 ALTER TABLE `affaire`
 ADD `ref_sign` VARCHAR(50) NULL DEFAULT NULL COMMENT 'Reference de signature chez le prestataire de signature' AFTER `snapshot_pack_produit`,
 ADD `ref_mandate` VARCHAR(50) NULL DEFAULT NULL COMMENT 'Reference du mandat chez le prestataire de signature' AFTER `ref_sign`,
-ADD `subscriber_reference` VARCHAR(80) NULL DEFAULT NULL COMMENT 'Reference du client chez le prestataire de signature' AFTER `ref_mandate`
+ADD `subscriber_reference` VARCHAR(80) NULL DEFAULT NULL COMMENT 'Reference du client chez le prestataire de signature' AFTER `ref_mandate`,
 ADD `prestataire_signature` ENUM('sellandsign','slimpay') NULL DEFAULT NULL COMMENT 'Permet d\'identifier quel prestataire de signature est utilisé pour cette affaire' AFTER `subscriber_reference`;
 
 
