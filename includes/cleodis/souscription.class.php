@@ -993,6 +993,82 @@ class souscription_cleodis extends souscription {
     return ATF::comite()->insert(array("comite"=>$comite));
   }
 
+  public function _startOrCancelAffaire($get, $post){
+    log::logger($post, "mfleurquin");
+
+    if($post["order"]){
+      $order = $post["order"];
+      $ref = $order["id"];
+      $state = $order["state"];
+      ATF::affaire()->q->reset()->addAllFields("affaire")->where("affaire.ref_sign", $ref);
+      $affaire = ATF::affaire()->select_row();
+
+
+      if($affaire){
+        ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
+        $commande = ATF::commande()->select_row();
+
+        switch ($state) {
+          case "closed.completed" :
+            if($affaire["commande.etat"] == "non_loyer"){
+
+              #On démarre le contrat avec envoi les licences
+              if($commande && $commande["commande.etat"] == "non_loyer"){
+                $infos = array(
+                  "id_commande" => $commande["commande.id_commande_fk"],
+                  "value" => date("Y-m-01"),
+                  "key" => "date_debut"
+                );
+                ATF::commande()->updateDate($infos);
+
+                //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
+              }
+            }
+          break;
+
+          case "closed" :
+          case "closed.aborted" :
+          case "closed.aborted.aborted_byclient" :
+          case "closed.aborted.aborted_byserver" :
+          case "open.not_running" :
+          case "open.running" :
+          case "open.not_running.suspended" :
+          case "open.not_running.suspended.awaiting_input" :
+          case "open.not_running.suspended.awaiting_validation" :
+          case "open.not_running.not_started" :
+            if($affaire["affaire.etat"] !== "perdue"){
+              ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
+              $devis = ATF::devis()->select_row();
+
+              //On passe le devis en attente pour pouvoir annuler l'affaire
+              ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
+
+              //On supprime le contrat également
+              if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
+
+
+              $infos = array(
+                "id_devis" => $devis["id_devis"],
+                "raison_refus"=> json_encode( $order )
+              );
+              ATF::devis()->perdu($infos);
+            }
+          break;
+        }
+
+
+      }else{
+        return array("error"=>true, "data"=>"Pas d'affaire trouvée pour la ref_sign ".$ref);
+      }
+
+
+
+
+      return $post["order"];
+    }
+    return false;
+  }
+
 }
 class souscription_bdomplus extends souscription_cleodis { };
 class souscription_bdom extends souscription_cleodis { };
