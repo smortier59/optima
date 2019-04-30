@@ -1054,13 +1054,13 @@ class souscription_bdomplus extends souscription_cleodis {
                   //On envoi les licences
                   ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
                                                    ->from("commande_ligne", "id_produit", "produit", "id_produit")
-                                                   ->whereIsNotNull("produit.type_licence");
+                                                   ->whereIsNotNull("produit.id_licence_type");
                   $lignes = ATF::commande_ligne()->select_all();
 
                   $licence_a_envoyer = array();
 
                   foreach ($lignes as $key => $value) {
-                      ATF::licence()->q->reset()->where("type_licence", $value["type_licence"],"AND")
+                      ATF::licence()->q->reset()->where("id_licence_type", $value["id_licence_type"],"AND")
                                                 ->whereIsNull("licence.id_commande_ligne","AND")
                                                 ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
                       $licence = ATF::licence()->sa();
