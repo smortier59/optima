@@ -33,6 +33,10 @@ class pdf_cleodis extends pdf {
 	public $Gentete = 193;
 	public $Bentete = 31;
 
+	public $bgcolorTableau = "95C11F";
+	public $txtcolorTableau = "000000";
+
+
 	public function filigramme(){
 		$this->setX(40);
 		$this->setY(20);
@@ -4032,7 +4036,7 @@ class pdf_cleodis extends pdf {
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
 		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
-		else $this->logo = 'cleodis/logo.jpg';
+
 
 		//Styles utilisés
 
@@ -5473,11 +5477,12 @@ class pdf_cleodis extends pdf {
 		$save = $this->headStyle;
 		$newStyleHead = array(
 			"size" => 10
-			,"color" => 000000
+			,"color" => $this->txtcolorTableau
+
 			,"font" => "arial"
 			,"border" => 1
 			,"align" => "J"
-			,"bgcolor" => "95C11F"
+			,"bgcolor" => $this->bgcolorTableau
 		);
 
 		$this->headStyle[0] = $newStyleHead;
@@ -13450,6 +13455,9 @@ class pdf_bdomplus extends pdf_cleodis {
 	public $Gentete = 20;
 	public $Bentete = 93;
 
+	public $bgcolorTableau = "16145d";
+	public $txtcolorTableau = "ffffff";
+
 	public $REnteteTextColor = 255;
 	public $VEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
@@ -13552,27 +13560,9 @@ class pdf_bdomplus extends pdf_cleodis {
 			}
 			$this->setLeftMargin(15);
 		}else{
-			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,230,5,35);
-				$this->setLeftMargin(275);
-			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,15,40);
-				$this->setLeftMargin(60);
-			}
+			$this->image(__PDF_PATH__.$this->logo,80,5,35);
+			$this->setLeftMargin(60);
 
-			$this->setfont('arial','',12);
-			$cadre = array(
-				array("txt"=>$this->client['societe'],"size"=>12,"bold"=>true)
-				,array("txt"=>$adresse,"size"=>10)
-			);
-			if ($adresse2) $cadre[] = array("txt"=>$adresse2,"size"=>10);
-			if ($adresse3) $cadre[] = array("txt"=>$adresse3,"size"=>10);
-			$cadre[] = array("txt"=>$cp." ".$ville,"size"=>10);
-			$this->cadre(100,45,95,40,$cadre);
-
-			$this->setfont('arial','',12);
-
-			$this->setMargins(15,50);
 		}
 	}
 
@@ -13894,6 +13884,273 @@ class pdf_bdomplus extends pdf_cleodis {
 		*/
 
   }
+
+
+  	/** PDF d'une facture Classique aussi dit 'Autre Facture' - POUR LE BtoC
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @date 03-07-2018
+	*/
+	public function factureClassiqueParticulier($global=false){
+		if(!$global){
+			$this->open();
+		}
+		$this->facturePDF = true;
+
+		$this->setHeader();
+		$this->addpage();
+		$this->setMargins(15,30);
+		$this->sety(40);
+
+
+
+		$this->setfont('arial','B',11);
+		$this->cell(35,5,"N° de facture :",0, 0);
+		$this->setfont('arial','',11);
+		$this->cell(50,5,$this->facture['ref'] ,0 ,1);
+
+		$this->setfont('arial','B',11);
+		$this->cell(35,5,"Date :",0, 0);
+		$this->setfont('arial','',11);
+		$this->cell(50,5,date("d/m/Y",strtotime($this->facture['date'])) ,0 ,1);
+
+		//CADRE Client
+		if($this->client['facturation_adresse']){
+			$cadre = array(
+				 $this->client['societe'],
+				 $this->client['facturation_adresse']
+				,$this->client['facturation_adresse_2']
+				,$this->client['facturation_adresse_3']
+				,$this->client['facturation_cp']." ".$this->client['facturation_ville']
+				,"Tel : ".$this->client['tel']
+			);
+		}else{
+			$cadre = array(
+				 $this->client['societe'],
+				 $this->client['adresse']
+				,$this->client['adresse_2']
+				,$this->client['adresse_3']
+				,$this->client['cp']." ".$this->client['ville']
+				,"Tel : ".$this->client['tel']
+			);
+		}
+		$this->cadre(110,35,80,35,$cadre);
+
+
+
+		$this->ln(5);
+
+		$this->settextcolor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->setfont('arial','B',20);
+		$this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+		$this->setfont('arial','I',11);
+		$this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C');
+		//$this->cell(0,7,"Ce présent document est une facture dont le règlement est en attente",0, 1, 'C');
+		$this->settextcolor(0,0,0);
+
+
+
+
+
+		if ($this->lignes) {
+
+			$head = array("Quantité","Désignation","Montant");
+			$w = array(20,120,40);
+			$data = $styles = array();
+			//Quantite
+			$data[0][0] = "1";
+			if($this->facture['type_facture'] !== "libre") {
+				//Désignation L1
+				if($this->affaire['nature']=="vente"){
+					$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+				}else{
+					if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+					}else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+				}
+				//Désignation L2
+				if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+					$data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+				}
+			}else{
+				if($this->facture['type_libre'] === "normale"){
+					//Désignation L1
+					if($this->affaire['nature']=="vente"){
+						$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+					}else{
+						if($this->facture["redevance"] === "oui"){
+							if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
+							}else{	$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+						}
+					}
+					//Désignation L2
+					if($this->facture["redevance"] === "oui"){
+						if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+							$data[0][1] .= "\nPour la période allant du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+						}
+					}
+				}
+			}
+			//Désignation L3
+			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+			//Désignation L4
+			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+			// Montant Facture
+			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+			if($this->facture['type_facture'] !== "libre"){
+				//Préparation du détail
+				if($this->affaire['nature']=="vente"){
+					$data[0]['details'] = "Equipements objets de la vente";
+				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
+				}else{	$data[0]['details'] = "Matériels objets de la location"; }
+				foreach ($this->lignes as $k => $i) {
+					$produit = ATF::produit()->select($i["id_produit"]);
+		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+		        	$detail = "\n".round($i['quantite'])." ";
+		        	if($sous_categorie) $detail .= $sous_categorie." ";
+		        	if($fabriquant) $detail .= $fabriquant." ";
+		        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+		          	$data[0]['details'] .= $detail;
+				}
+				$styles[0] = array(
+					""
+					,$this->colsProduitAlignLeft
+					,""
+					,"details"=>$this->styleDetailsProduit
+				);
+			}else{
+				if($this->facture['type_libre'] === "normale"){
+					//Préparation du détail
+					if($this->affaire['nature']=="vente"){
+						$data[0]['details'] = "Equipements objets de la vente";
+					}else{
+						$data[0]['details'] = "Matériels objets de la location";
+					}
+					foreach ($this->lignes as $k => $i) {
+						$produit = ATF::produit()->select($i["id_produit"]);
+			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+			        	$detail = "\n".round($i['quantite'])." ";
+			        	if($sous_categorie) $detail .= $sous_categorie." ";
+			        	if($fabriquant) $detail .= $fabriquant." ";
+			        	$detail .= " ".$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:"");
+
+			          	$data[0]['details'] .= $detail;
+					}
+					$styles[0] = array(
+						""
+						,$this->colsProduitAlignLeft
+						,""
+						,"details"=>$this->styleDetailsProduit
+					);
+				}
+			}
+
+			$this->tableauBigHead($head,$data,$w,5,$styles);
+
+			if ($this->facture['commentaire']) {
+				$com = array(array("Commentaire : ".$this->facture['commentaire']));
+				$sCom = array(array($this->styleDetailsProduit));
+				$this->tableau(false,$com,180,5,$sCom);
+			}
+
+			if($this->facture['type_facture'] === "libre"){
+				if($this->facture['type_libre'] !== "normale"){
+					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
+					$sInfosTVA = array(array($this->styleDetailsProduit));
+					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
+				}
+			}
+
+			$this->ln(5);
+			$total = $this->facture['prix'];
+			$totalTTC = $total*$this->facture['tva'];
+			if($this->facture['type_facture'] === "libre"){
+				if($this->facture['type_libre'] === "normale"){
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+					$data = array(
+						array(
+							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+							,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+							,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+							,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+						)
+					);
+				}else{
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
+					$data = array(
+						array(
+							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+							,number_format(abs((1-1)*100),2,'.',' ')."%"
+							,number_format(abs(round(($this->facture["prix"]*0),2)),2,'.',' ')." €"
+							,number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+						)
+					);
+				}
+			}else{
+				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+					$data = array(
+						array(
+							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+							,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+							,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+							,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+						)
+					);
+			}
+
+
+
+			$this->tableau($head,$data);
+
+		}
+
+
+
+		$this->ln(10);
+		$y = $this->getY();
+		$this->setfont('arial','U',8);
+		$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
+		$this->setfont('arial','',8);
+		if($this->facture["prix"]>0){
+			if($this->facture['mode_paiement']){
+				if ($this->facture['mode_paiement']=="pre-paiement") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cb") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cheque") {
+					$this->cell(0,5,"A réception de facture",0,1);
+				} elseif ($this->facture['mode_paiement']=="virement") {
+					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
+				} elseif($this->facture['mode_paiement'] !="mandat") {
+					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
+				}
+			}
+		}else{
+			$this->cell(0,5,"Par remboursement ou compensation",0,1);
+		}
+
+		if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
+			if(ATF::$codename !== "cleodisbe"){
+		      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		    }
+		}
+
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
+			$cadre = array();
+			$cadre[] = $this->societe["nom_banque"];
+			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
+			$cadre[] = "IBAN : ".$this->societe["IBAN"];
+			$cadre[] = "BIC : ".$this->societe["BIC"];
+			$this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
+		}
+	}
+
 
 
 };
