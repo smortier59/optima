@@ -27,3 +27,46 @@ ALTER TABLE `licence`
 ALTER TABLE `licence`
   ADD CONSTRAINT `licence_ibfk_1` FOREIGN KEY (`id_commande_ligne`) REFERENCES `commande_ligne` (`id_commande_ligne`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
+
+
+ALTER TABLE `licence` CHANGE `id_licence` `id_licence` MEDIUMINT(9) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','top office','burger king','flunch','toshiba','btwin','boulangerpro','bdomplus','sans') CHARACTER SET utf8 COLLATE utf8_general_ci NULL;
+
+
+
+CREATE TABLE `licence_type` (
+  `id_licence_type` mediumint(8) UNSIGNED NOT NULL,
+  `licence_type` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+INSERT INTO `licence_type` (`id_licence_type`, `licence_type`) VALUES
+(1, 'Office 365 Personnel'),
+(2, 'Office 365 Famille'),
+(3, 'Norton Sécurity Platinium'),
+(4, 'Norton Sécurity Standard');
+
+
+ALTER TABLE `licence_type` ADD PRIMARY KEY (`id_licence_type`);
+ALTER TABLE `licence_type` MODIFY `id_licence_type` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+COMMIT;
+
+
+ALTER TABLE `licence` ADD `id_licence_type` MEDIUMINT UNSIGNED NOT NULL AFTER `part_2`, ADD INDEX (`id_licence_type`);
+ALTER TABLE `licence` ADD  FOREIGN KEY (`id_licence_type`) REFERENCES `licence_type`(`id_licence_type`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+ALTER TABLE `produit` ADD `id_licence_type` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `id_document_contrat`, ADD INDEX (`id_licence_type`);
+ALTER TABLE `produit` ADD FOREIGN KEY (`id_licence_type`) REFERENCES `licence_type`(`id_licence_type`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+UPDATE produit SET id_licence_type = 4 WHERE produit = "Norton Security standard";
+UPDATE produit SET id_licence_type = 3 WHERE produit = "Norton Platinium";
+UPDATE produit SET id_licence_type = 1 WHERE produit = "Office 365 Personnel";
+
+
+
+
+
+
