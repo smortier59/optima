@@ -51,7 +51,10 @@ class souscription_cleodis extends souscription {
 
     }
 
-    $this->checkIBAN($post['iban']);
+    if(!$post["no_iban"]){
+      $this->checkIBAN($post['iban']);
+    }
+
 
     ATF::db($this->db)->begin_transaction();
     try {
@@ -470,7 +473,7 @@ class souscription_cleodis extends souscription {
 
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
-    if(!$post["no_check_iban"]){
+    if(!$post["no_check_iban"] || $post["iban"]){
       log::logger('GET CONTACT',"souscription");
       log::logger($contact,"souscription");
 
@@ -728,7 +731,7 @@ class souscription_cleodis extends souscription {
         $r = "BT";
       break;
       case "bdomplus":
-        $r = "BD";
+        $r = "BP";
       break;
       default:
         $r = "";
@@ -993,9 +996,22 @@ class souscription_cleodis extends souscription {
     return ATF::comite()->insert(array("comite"=>$comite));
   }
 
-  public function _startOrCancelAffaire($get, $post){
-    log::logger($post, "mfleurquin");
 
+
+}
+class souscription_bdomplus extends souscription_cleodis {
+
+  /**
+   * Démarrage du contrat ou annulation de l'affaire selon le retour order SLIMPAY
+   * @param  Integer $id_affaire      ID de l'affaire
+   * @param  Array $societe         Infos de la société
+   * @param  Enum $etat            en_cours|accepte|refuse : Etat du comité insérer
+   * @param  Text $desc            Description associé au comité
+   * @param  Date $reponse         Date de la réponse
+   * @param  Date $validite_accord Date de validité de l'accord
+   * @return Integer                  ID du comité créé
+   */
+  public function _startOrCancelAffaire($get, $post){
     if($post["order"]){
       $order = $post["order"];
       $ref = $order["id"];
@@ -1011,17 +1027,82 @@ class souscription_cleodis extends souscription {
         switch ($state) {
           case "closed.completed" :
             if($affaire["commande.etat"] == "non_loyer"){
+              ATF::db($this->db)->begin_transaction();
 
-              #On démarre le contrat avec envoi les licences
-              if($commande && $commande["commande.etat"] == "non_loyer"){
-                $infos = array(
-                  "id_commande" => $commande["commande.id_commande_fk"],
-                  "value" => date("Y-m-01"),
-                  "key" => "date_debut"
-                );
-                ATF::commande()->updateDate($infos);
+              try{
+                #On démarre le contrat avec envoi les licences
+                if($commande && $commande["commande.etat"] == "non_loyer"){
+                  $infos = array(
+                    "id_commande" => $commande["commande.id_commande_fk"],
+                    "value" => date("Y-m-01"),
+                    "key" => "date_debut"
+                  );
 
-                //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
+                  ATF::commande()->updateDate($infos);
+                  //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
+                  ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
+                                            ->addOrder("facture.id_facture", "ASC");
+                  $facture = ATF::facture()->select_row();
+
+                  if($facture){
+                    ATF::facture()->u(array("id_facture" => $facture["facture.id_facture"],
+                                             "mode_paiement"=> "cb",
+                                             "etat"=>"payee",
+                                             "date_paiement"=>date("Y-m-d")));
+                  }
+
+                  //On envoi les licences
+                  ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
+                                                   ->from("commande_ligne", "id_produit", "produit", "id_produit")
+                                                   ->whereIsNotNull("produit.type_licence");
+                  $lignes = ATF::commande_ligne()->select_all();
+
+                  $licence_a_envoyer = array();
+
+                  foreach ($lignes as $key => $value) {
+                      ATF::licence()->q->reset()->where("type_licence", $value["type_licence"],"AND")
+                                                ->whereIsNull("licence.id_commande_ligne","AND")
+                                                ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
+                      $licence = ATF::licence()->sa();
+
+                      if(count($licence)){
+                        foreach ($licence as $kl => $vl) {
+                          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
+                          $licence_a_envoyer[$value["id_produit"]][] = $vl;
+                        }
+                      }else{
+                        ATF::db($this->db)->rollback_transaction();
+                        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["type_licence"], 500);
+                      }
+                  }
+
+
+
+                  if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
+                    $email = $email_pro;
+                  }else{
+                    $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
+                  }
+
+                  ATF::db($this->db)->commit_transaction();
+
+                  $info_mail["recipient"] = $email;
+                  $info_mail["html"] = true;
+                  $info_mail["template"] = "envoi_licence";
+
+                  $info_mail["objet"] = "Vos clés de licences suite à votre souscription";
+
+                  $info_mail["licences"] = $licence_a_envoyer;
+
+                  $mail = new mail($info_mail);
+
+                  $mail->send();
+
+                }
+
+              }catch(errorATF $e){
+                ATF::db($this->db)->rollback_transaction();
+                throw $e;
               }
             }
           break;
@@ -1069,7 +1150,6 @@ class souscription_cleodis extends souscription {
     return false;
   }
 
-}
-class souscription_bdomplus extends souscription_cleodis { };
+};
 class souscription_bdom extends souscription_cleodis { };
 class souscription_boulanger extends souscription_cleodis { };
