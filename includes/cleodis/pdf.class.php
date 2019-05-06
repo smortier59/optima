@@ -5478,7 +5478,6 @@ class pdf_cleodis extends pdf {
 		$newStyleHead = array(
 			"size" => 10
 			,"color" => $this->txtcolorTableau
-
 			,"font" => "arial"
 			,"border" => 1
 			,"align" => "J"
