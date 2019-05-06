@@ -21,7 +21,7 @@ class licence extends classes_optima {
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 
 
-		$this->q->reset()->addField("UPPER(CONCAT('****************************',`licence`.`part_2`))","licence.licence")
+		$this->q->addField("UPPER(CONCAT('****************************',`licence`.`part_2`))","licence.licence")
 						 ->addField("UPPER(`licence`.`part_1`)","licence.part_1")
 						 ->addField("UPPER(`licence`.`part_2`)","licence.part_2");
 

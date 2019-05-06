@@ -8,6 +8,8 @@ class licence_type extends classes_optima {
 			'licence_type.licence_type'
 		);
 		$this->fieldstructure();
+
+		$this->field_nom="licence_type";
 	}
 
 
