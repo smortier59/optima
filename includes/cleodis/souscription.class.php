@@ -29,6 +29,9 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
+
+
+
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
@@ -48,7 +51,6 @@ class souscription_cleodis extends souscription {
       case 'bdomplus':
         $this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
       break;
-
     }
 
     if(!$post["no_iban"]){
@@ -1072,7 +1074,7 @@ class souscription_bdomplus extends souscription_cleodis {
                         }
                       }else{
                         ATF::db($this->db)->rollback_transaction();
-                        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["type_licence"], 500);
+                        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
                       }
                   }
 
@@ -1139,15 +1141,15 @@ class souscription_bdomplus extends souscription_cleodis {
 
 
       }else{
-        return array("error"=>true, "data"=>"Pas d'affaire trouvée pour la ref_sign ".$ref);
+        throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref, 500);
       }
 
-
-
-
-      return $post["order"];
+      return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
+                   "id_magasin" => ATF::affaire()->select($affaire["affaire.id_affaire_fk"], "id_magasin"),
+                   "order" => $post["order"]
+              );
     }
-    return false;
+    throw new errorATF("Data manquante en paramètre d'entrée", 500);
   }
 
 };
