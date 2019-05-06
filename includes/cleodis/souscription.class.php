@@ -30,6 +30,8 @@ class souscription_cleodis extends souscription {
    */
   public function _devis($get, $post) {
 
+    log::logger($get, "mfleurquin");
+    log::logger($post, "mfleurquin");
 
 
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
