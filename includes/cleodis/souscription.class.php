@@ -286,6 +286,9 @@ class souscription_cleodis extends souscription {
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
 
+          if($post["site_associe"] == "bdomplus")  $toInsertLoyer[0]["loyer__dot__frequence_loyer"] = ATF::pack_produit()->select($id_pack, "frequence");
+
+
           //Il faut récupérer l'affichage sur PDF
           ATF::pack_produit_ligne()->q->reset()
                                    ->where("id_pack_produit", $produit['id_pack_produit'])
@@ -337,6 +340,7 @@ class souscription_cleodis extends souscription {
 
         $toInsertLoyer[0]["loyer__dot__loyer"] += $produitLoyer["loyer"] * $produit['quantite'];
         $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
+
 
     }
 
@@ -525,6 +529,18 @@ class souscription_cleodis extends souscription {
         $f =  array(
           "contrat.pdf" => base64_encode($contrat)
         );
+
+        if(ATF::affaire()->select($id_affaire, "id_magasin")){
+          $passage_slimpay = array('documents'=> true);
+
+          ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
+          $loyer = ATF::loyer()->select_row();
+          if($loyer["frequence_loyer"] != "an") $passage_slimpay["mandate"] = true;
+
+        }else{
+          $passage_slimpay = array('mandate'=> true, 'payment'=> true, 'documents'=> true);
+        }
+
       break;
 
       case 'boulangerpro':
@@ -579,6 +595,9 @@ class souscription_cleodis extends souscription {
       "files2sign"=>$f,
       "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref")
     );
+
+    if($passage_slimpay)  $return["passage_slimpay"] = $passage_slimpay;
+
 
     if ($post['type'] == 'particulier') {
       $return["email"]=$societe["particulier_email"];
@@ -1146,8 +1165,13 @@ class souscription_bdomplus extends souscription_cleodis {
         throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref, 500);
       }
 
+      ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
+      $loyer = ATF::loyer()->select_row();
+      log::logger($loyer , "mfleurquin");
+
       return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
                    "id_magasin" => ATF::affaire()->select($affaire["affaire.id_affaire_fk"], "id_magasin"),
+                   "frequence_loyer"=> $loyer["frequence_loyer"],
                    "order" => $post["order"]
               );
     }

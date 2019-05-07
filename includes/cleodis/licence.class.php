@@ -8,11 +8,13 @@ class licence extends classes_optima {
 			'licence.licence' =>array("custom"=>true,"nosort"=>true,"align"=>"left"),
 			/*'licence.part_1',
 			'licence.part_2'*/
-			'licence.id_licence_type'
+			'licence.id_licence_type',
+			'licence.id_commande_ligne'
 		);
 		$this->fieldstructure();
 
 		$this->foreign_key['id_licence_type'] =  "licence_type";
+		$this->foreign_key['id_commande_ligne'] =  "commande_ligne";
 
 		$this->colonnes['bloquees']['select'] = array("part_1", "part_2");
 	}
@@ -22,8 +24,8 @@ class licence extends classes_optima {
 
 
 		$this->q->addField("UPPER(CONCAT('****************************',`licence`.`part_2`))","licence.licence")
-						 ->addField("UPPER(`licence`.`part_1`)","licence.part_1")
-						 ->addField("UPPER(`licence`.`part_2`)","licence.part_2");
+				->addField("UPPER(`licence`.`part_1`)","licence.part_1")
+				->addField("UPPER(`licence`.`part_2`)","licence.part_2");
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
 
