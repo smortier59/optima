@@ -327,5 +327,17 @@ class pack_produit extends classes_optima {
 
 	}
 
+	/**
+	 * Retourne tous les ID packs où le produit est présent
+	 * @author : Quentin JANON <qjanon@absystech.fr>
+	 * @param  Integer $id_pack_produit
+	 * @return string ID des packs séparé par virgule
+	 */
+	public function getIdPackFromProduit($id_produit){
+		ATF::pack_produit_ligne()->q->reset()->addField('GROUP_CONCAT(id_pack_produit)','id_pack_produit')->where("id_produit", $id_produit);
+		$r = ATF::pack_produit_ligne()->select_row();
+		return $r["id_pack_produit"];
+	}
+
 	
 }
