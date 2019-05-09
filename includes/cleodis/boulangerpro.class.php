@@ -26,7 +26,7 @@ class boulangerpro extends classes_optima {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
 
-        ATF::produit()->q->where('ref',842769); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
+        // ATF::produit()->q->where('ref',842769); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -100,9 +100,6 @@ class boulangerpro extends classes_optima {
           }
 
 
-          // On récupère la sous catégorie du produit
-          $scat == ATF::sous_categorie()->nom($produit['id_sous_categorie']);
-          log::logger("Sous catégorie du produit : |".$scat."|",$this->logFile);
           ATF::pack_produit_ligne()->q->reset()
             ->where('id_produit', $produit['id_produit'])
             ->where('principal', 'oui');
@@ -399,10 +396,10 @@ class boulangerpro extends classes_optima {
       log::logger($r,$this->logFile);
     }
 
-    if ($ref == "842769") {
-      $r[0]["services"][0] = $r[0]["services"][1];
-      unset($r[0]["services"][1]);
-    }
+    // if ($ref == "842769") {
+    //   $r[0]["services"][0] = $r[0]["services"][1];
+    //   unset($r[0]["services"][1]);
+    // }
 
     return $r;
 
