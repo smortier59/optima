@@ -26,7 +26,7 @@ class boulangerpro extends classes_optima {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
 
-        // ATF::produit()->q->where('ref',842769); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
+        ATF::produit()->q->where('ref',842769); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
