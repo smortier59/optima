@@ -9,7 +9,7 @@ class boulangerpro extends classes_optima {
 
   public function _boulangerMajPrix($get, $post) {
     $this->logFile = "batch-majPrixCatalogueProduit-".date("Ymd-His");
-    $this->logFile = "qjanon";
+    // $this->logFile = "qjanon";
     try {
       // require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
 
@@ -40,7 +40,8 @@ class boulangerpro extends classes_optima {
           $prix_livraison = 0;          
           $r = self::APIBoulPROlivraison($produit['ref']);
 
-          log::logger("---- Appel boulpro API livraison",$r);
+          log::logger("---- Appel boulpro API livraison",$this->logFile);
+          log::logger($r,$this->logFile);
           if (!$r) {
             log::logger("Introuvable chez Boulanger PRO : AUCUNE REPONSE",$this->logFile);
             continue;
