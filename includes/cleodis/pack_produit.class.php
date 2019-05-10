@@ -333,8 +333,12 @@ class pack_produit extends classes_optima {
 	 * @param  Integer $id_pack_produit
 	 * @return string ID des packs séparé par virgule
 	 */
-	public function getIdPackFromProduit($id_produit){
-		ATF::pack_produit_ligne()->q->reset()->addField('GROUP_CONCAT(id_pack_produit)','id_pack_produit')->where("id_produit", $id_produit);
+	public function getIdPackFromProduit($id_produit, $etat = false){
+		ATF::pack_produit_ligne()->q->reset()->addField('GROUP_CONCAT(pack_produit_ligne.id_pack_produit)','id_pack_produit')->where("id_produit", $id_produit)->addGroup('pack_produit_ligne.id_pack_produit');
+		if ($etat) {
+			ATF::pack_produit_ligne()->q->from("pack_produit_ligne","id_pack_produit",'pack_produit',"id_pack_produit");
+			ATF::pack_produit_ligne()->q->where('pack_produit.etat',$etat);
+		}
 		$r = ATF::pack_produit_ligne()->select_row();
 		return $r["id_pack_produit"];
 	}

@@ -26,8 +26,15 @@ class boulangerpro extends classes_optima {
 
         ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
 
-        ATF::produit()->q->where('ref',842769); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
-        ATF::produit()->q->where('ref',1016843); // Produit demander paar Benjamin sur skype le 9/5/19 à 17h18
+        ATF::produit()->q->where('ref',842769, "OR", "ref_produit", "LIKE"); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
+        // Produits demandés par Benjamin sur skype le 9/5/19 à 17h18
+        ATF::produit()->q->where('ref',1016843, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1119534, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',"BPLivrMeSGEODI100a125EUR60mois", "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',"Frais60", "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1119576, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1114199, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE"); 
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -109,7 +116,7 @@ class boulangerpro extends classes_optima {
           log::logger("\nLe produit est principal dans ".$countPP." packs",$this->logFile);
           if ($countPP) {
             log::logger("\n---- Appel boulpro API service",$this->logFile);
-            $r = self::APIBoulPROService($produit['ref']);
+            $r = self::APIBoulPROService($produit['ref'],$this->logFile);
             $s = $r[0]['services'][0];
 
             if (count($r) != 1) {
@@ -127,8 +134,9 @@ class boulangerpro extends classes_optima {
               log::logger("Produit ".$produit['produit']." (".$produit['ref'].") : Mise à jour de la ref garantie : ".$ref_garantie,$this->logFile);
               ATF::produit()->u(array("id_produit"=>$produit['id_produit'], "ref_garantie"=>$ref_garantie));
 
-              $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit']);
+              $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit'], 'actif');
               foreach (explode(",", $r) as $id_pack) {
+                if (!$id_pack) continue;
                 ATF::pack_produit_ligne()->q->reset()
                   ->from('pack_produit_ligne','id_produit','produit','id_produit')
                   ->where('pack_produit_ligne.id_pack_produit', $id_pack)
@@ -159,6 +167,7 @@ class boulangerpro extends classes_optima {
           log::logger(($produit['duree']*$produit['loyer'])." < ".$produit['prix_achat'],$this->logFile);
           $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit']);
           foreach (explode(",", $r) as $id_pack) {
+            if (!$id_pack) continue;
             log::logger("Pack associé n°".$id_pack." désactivé cause Garantie non trouvée",$this->logFile);
             ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
             $packDesactive[] = array(
@@ -268,13 +277,17 @@ class boulangerpro extends classes_optima {
    * @param  Array &$produitDesactive Pointeur vers le tableau contenant les produits désactivés
    */
   private function manageProduitPrixChanges ($produit, $p, &$packDesactive, &$produitDesactive) {
-      // MAJ nouveau prix sur le produit
-      ATF::produit()->u(array(
+      $p = [
         "id_produit"=>$produit['id_produit'],
         "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
         "taxe_ecotaxe"=>$p['ecotax'],
-        "taxe_ecomob"=>$p['ecomob']
-      ));
+        "taxe_ecomob"=>$p['ecomob'],
+        "loyer"=>$produit['loyer']
+      ];
+      log::logger("Maj du produit",$this->logFile);
+      log::logger($p,$this->logFile);
+      // MAJ nouveau prix sur le produit
+      ATF::produit()->u($p);
 
   }
 
@@ -300,6 +313,25 @@ class boulangerpro extends classes_optima {
     }
 
     if ($fabriquant) {
+      log::logger("Fabriquant trouvé depuis le retour boulpro : ".$fabriquant['fabriquant']." (".$fabriquant['id_fabriquant'].")",$this->logFile);
+      log::logger("Fabriquant du produit : ".$produit['id_fabriquant'],$this->logFile);
+
+      if ($produit['id_fabriquant'] != $fabriquant['id_fabriquant']) {
+        $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit'], 'actif');
+        foreach (explode(",", $r) as $id_pack) {
+          if (!$id_pack) continue;
+          log::logger("Pack associé n°".$id_pack." désactivé cause livreur qui ne match pas",$this->logFile);
+          ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
+          $packDesactive[] = array(
+            'id' => $id_pack,
+            'raison' => "Désactivation cause Livraison"
+          );
+        }            
+      } else {
+        log::logger("Rien à faire, les infos matchs",$this->logFile);
+      }
+
+      log::logger("Mise à jour du produit avec les nouvelles infos de fabriquant",$this->logFile);
       // MAJ nouveau prix sur le produit
       ATF::produit()->u(array(
         "id_produit"=>$produit['id_produit'],
@@ -307,34 +339,6 @@ class boulangerpro extends classes_optima {
         "frais_livraison"=>$l['price']
       ));
 
-      // Pour chaque ligne de pack avec ce produit, on va vérifier le fabriquant
-      $q = ATF::pack_produit_ligne()->q->reset()->where('id_produit', $produit['id_produit']);
-      $ppls = ATF::pack_produit_ligne()->select_all();
-      log::logger(count($ppls)." lignes de packs trouvés pour ce produit.",$this->logFile);
-      foreach ($ppls as $ppl) {
-        log::logger("Ligne de packs n°".$ppl['id_pack_produit_ligne'],$this->logFile);
-        log::logger("PPL FRS = ".$ppl['id_fournisseur']." VS Fabriquant = ".$fabriquant['id_fabriquant'],$this->logFile);
-
-        // Check du fournisseur de la ligne
-        if ($ppl['id_fournisseur'] != $fabriquant['id_fabriquant']) {
-          $etat = ATF::pack_produit()->select($ppl['id_pack_produit'], 'etat');
-          if ($etat!='actif') {
-            log::logger("Pack non actif, on passe à la suite.",$this->logFile);      
-          } else {
-
-            ATF::pack_produit()->u(array("id_pack_produit"=>$ppl['id_pack_produit'],"etat"=>"inactif"));
-            $packDesactive[] = array(
-              'id' => $ppl['id_pack_produit'],
-              'raison' => "Désactivation cause livraison"
-            );     
-            log::logger("Pack associé n°".$ppl['id_pack_produit']." désactivé cause livraison",$this->logFile);
-
-          }
-
-        } else {
-          log::logger("Rien à faire, les infos matchs",$this->logFile);
-        }
-      }
     }
   }
 
