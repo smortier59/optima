@@ -3840,6 +3840,11 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
+		// Profil développeur extérieur (PATCH DEGUEU EN MODE BRICOLE)
+		if (ATF::$usr->get('id_profil') == 16) {
+			$this->q->where("gep_projet.id_societe", 513); // Cléodis
+		}
+
 		// $this->q->setToString();
 		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
 		// $this->q->unsetToString();
