@@ -2864,8 +2864,6 @@ class facture_bdomplus extends facture_cleodis {
 			}
 		}
 
-		log::logger($string , "mfleurquin");
-
     	header("Content-type: text/csv");
     	header("Content-Transfer-Encoding: UTF-8");
 		header("Content-Disposition: attachment; filename=bdomplus".date("Ymd").".csv");
