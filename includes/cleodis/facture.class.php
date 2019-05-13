@@ -2759,6 +2759,12 @@ class facture_cap extends facture_cleodis { };
 
 class facture_bdomplus extends facture_cleodis {
 
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+		$this->fieldstructure();
+		$this->addPrivilege("export_bdomplus");
+	}
+
 	public function getRefExterne(){
 		$prefix = "F930C";
 
@@ -2789,6 +2795,83 @@ class facture_bdomplus extends facture_cleodis {
 			$suffix="000001";
 		}
 		return $prefix.$suffix;
+
+	}
+
+
+	public function export_bdomplus(&$infos){
+		$infos["display"] = true;
+
+		$q = "SELECT facture.*
+		 	  FROM facture
+			  WHERE `id_facture` NOT IN (SELECT id_facture FROM export_facture WHERE `fichier_export` = 'flux_vente')";
+
+		$data = ATF::db()->sql2array($q);
+
+		foreach ($data as $key => $value) {
+
+			$client = ATF::societe()->select($value["id_societe"]);
+
+
+			$donnees[$key][$i][1] = substr($value["ref_externe"], 4);
+	    	$donnees[$key][$i][2] = substr($value["ref_externe"], 0, 4);
+	    	$donnees[$key][$i][3] = $client["particulier_nom"];
+	    	$donnees[$key][$i][4] = $client["particulier_prenom"];
+	    	$donnees[$key][$i][5] = "";
+	    	$donnees[$key][$i][6] = "";
+	    	$donnees[$key][$i][7] = "";
+	    	$donnees[$key][$i][8] = "";
+	    	$donnees[$key][$i][9] = $client["particulier_email"];
+	    	$donnees[$key][$i][10] = "";
+	    	$donnees[$key][$i][11] = "";
+	    	$donnees[$key][$i][12] = number_format($value["prix"] * $value["tva"], 2 , ",", "");
+	    	$donnees[$key][$i][13] = "";
+			$donnees[$key][$i][14] = date("Ymd", strtotime($value["date"]));
+			$donnees[$key][$i][15] = "";
+	    	$donnees[$key][$i][16] = "";
+	    	$donnees[$key][$i][17] = "";
+	    	$donnees[$key][$i][18] = "";
+	    	$donnees[$key][$i][19] = "";
+			$donnees[$key][$i][20] = "";
+			$donnees[$key][$i][21] = "";
+	    	$donnees[$key][$i][22] = "";
+			$donnees[$key][$i][23] = "";
+			$donnees[$key][$i][24] = "";
+			$donnees[$key][$i][25] = "";
+			$donnees[$key][$i][26] = "";
+			$donnees[$key][$i][27] = "";
+			$donnees[$key][$i][28] = "";
+			$donnees[$key][$i][29] = "";
+			$donnees[$key][$i][30] = "";
+		}
+
+		$string = "";
+
+
+        $filename = 'CLEODIS_VT.csv';
+
+        foreach ($donnees as $key => $value) {
+			foreach ($value as $k => $v) {
+				for($i=1;$i<=30;$i++){
+					if(isset($v[$i])){
+						$string .= $v[$i];
+						if($i!=30) $string .= ";";
+					}else{
+						if($i!=30) $string .= ";";
+					}
+				}
+				$string .= "\n";
+			}
+		}
+
+		log::logger($string , "mfleurquin");
+
+    	header("Content-type: text/csv");
+    	header("Content-Transfer-Encoding: UTF-8");
+		header("Content-Disposition: attachment; filename=bdomplus".date("Ymd").".csv");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+        echo $string;
 
 	}
 
