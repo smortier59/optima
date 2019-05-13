@@ -13592,6 +13592,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->setfont('arial','B',7);
 		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
 		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
+		$this->multicell(0,3,"RCS LILLE B ".$this->societe['siren']." – APE 4799A N° de TVA intracommunautaire : FR45 ".$this->societe["siren"],0);
 		$this->setLeftMargin(15);
 		$this->ln(5);
 		$this->setfont('arial','B',10);
@@ -13642,7 +13643,7 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		$w = array(20,30,30,105);
 
-		$eq = "EQUIPEMENT(S)";
+		$eq = "EQUIPEMENT(S) / SERVICE(S)";
 
 		if ($this->lignes) {
 		  $this->setFillColor(239,239,239);
@@ -13653,7 +13654,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->setfont('arial','B',10);
 			if (!$k) {
 			  if($this->devis["type_contrat"] == "presta"){ $title = "NOUVELLE(S) PRESTATION(S)"; }
-			  else{ $title = "NOUVEAU(X) EQUIPEMENT(S)"; }
+			  else{ $title = "NOUVEAU(X) EQUIPEMENT(S) / SERVICE(S)"; }
 
 			} else {
 			  $affaire_provenance=ATF::affaire()->select($k);
