@@ -962,19 +962,8 @@ class facture_cleodis extends facture {
 			$infos["tva"]= "1.2";
 		}
 
+		if(ATF::$codename == "bdomplus") $infos["ref_externe"] = $this->getRefExterne();
 
-
-		//Si on a une TVA 19.6 et qu'on est en 2014 ---> TVA passe à 20% !!
-		/*if($infos["type_facture"]=="refi"){
-			if((date("Y" , strtotime($infos["date"])) >= 2014) || (date("Y" , strtotime($infos["date_previsionnelle"])) >= 2014)){
-				$infos["tva"]= "1.2";
-			}
-		}else{
-			$infos["tva"]= "1.2";
-			/*if($infos["tva"]== "1.196" && date("Y" , strtotime($infos["date_periode_debut"])) >= 2014){
-				$infos["tva"]= "1.2";
-			}
-		}*/
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -2768,6 +2757,41 @@ class facture_cleodisbe extends facture_cleodis {
 };
 class facture_cap extends facture_cleodis { };
 
-class facture_bdomplus extends facture_cleodis { };
+class facture_bdomplus extends facture_cleodis {
+
+	public function getRefExterne(){
+		$prefix = "F930C";
+
+		$this->q->reset()
+				->addCondition("ref",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`ref_externe`,5)+1',"max_ref")
+				->addOrder('ref_externe',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+
+		$nb=$this->sa();
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="00000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="000001";
+		}
+		return $prefix.$suffix;
+
+	}
+
+};
 class facture_bdom extends facture_cleodis { };
 class facture_boulanger extends facture_cleodis { };

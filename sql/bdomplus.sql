@@ -67,6 +67,7 @@ UPDATE produit SET id_licence_type = 1 WHERE produit = "Office 365 Personnel";
 
 
 
+ALTER TABLE `facture` ADD `ref_externe` VARCHAR(11) NOT NULL AFTER `ref`;
 
 
-
+UPDATE `licence` SET `id_commande_ligne` = NULL;

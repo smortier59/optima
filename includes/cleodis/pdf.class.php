@@ -4096,7 +4096,10 @@ class pdf_cleodis extends pdf {
 
 		$this->SetXY(10,-30);
 		$this->setfont('arial','',7);
-		$this->multicell(200,2,"Conformément à l’article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance.\nCette indemnité compensatoire sera complétée d’une indemnité moratoire correspondant au Taux BCE à sa dernière opération de refinancement majorée de 10 points, sans qu’une mise en demeure ne soit nécessaire, et ce sous toute réserve d’actions complémentaires en réparation du préjudice financier subit.");
+		if(ATF::$codename != "bdomplus"){
+			$this->multicell(200,2,"Conformément à l’article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance.\nCette indemnité compensatoire sera complétée d’une indemnité moratoire correspondant au Taux BCE à sa dernière opération de refinancement majorée de 10 points, sans qu’une mise en demeure ne soit nécessaire, et ce sous toute réserve d’actions complémentaires en réparation du préjudice financier subit.");
+		}
+
 	}
 
 	/** PDF d'une facture refinanceur
@@ -13566,6 +13569,17 @@ class pdf_bdomplus extends pdf_cleodis {
 	}
 
 
+	public function Footer() {
+		if($this->facturePDF){
+			$this->setfont('arial','B',9);
+			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
+		}
+
+		parent::Footer();
+
+	}
+
+
 
 	public function contratA4Particulier($id, $signature,$sellsign) {
 
@@ -13920,7 +13934,6 @@ class pdf_bdomplus extends pdf_cleodis {
 				,$this->client['facturation_adresse_2']
 				,$this->client['facturation_adresse_3']
 				,$this->client['facturation_cp']." ".$this->client['facturation_ville']
-				,"Tel : ".$this->client['tel']
 			);
 		}else{
 			$cadre = array(
@@ -13929,7 +13942,6 @@ class pdf_bdomplus extends pdf_cleodis {
 				,$this->client['adresse_2']
 				,$this->client['adresse_3']
 				,$this->client['cp']." ".$this->client['ville']
-				,"Tel : ".$this->client['tel']
 			);
 		}
 		$this->cadre(110,35,80,35,$cadre);
@@ -13952,7 +13964,7 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		if ($this->lignes) {
 
-			$head = array("Quantité","Désignation","Montant");
+			$head = array("Quantité","Désignation","Montant HT");
 			$w = array(20,120,40);
 			$data = $styles = array();
 			//Quantite
@@ -13999,9 +14011,9 @@ class pdf_bdomplus extends pdf_cleodis {
 			if($this->facture['type_facture'] !== "libre"){
 				//Préparation du détail
 				if($this->affaire['nature']=="vente"){
-					$data[0]['details'] = "Equipements objets de la vente";
+					$data[0]['details'] = "Matériels et services objets de la vente";
 				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-				}else{	$data[0]['details'] = "Matériels objets de la location"; }
+				}else{	$data[0]['details'] = "Matériels et services objets de la location"; }
 				foreach ($this->lignes as $k => $i) {
 					$produit = ATF::produit()->select($i["id_produit"]);
 		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
@@ -14024,9 +14036,9 @@ class pdf_bdomplus extends pdf_cleodis {
 				if($this->facture['type_libre'] === "normale"){
 					//Préparation du détail
 					if($this->affaire['nature']=="vente"){
-						$data[0]['details'] = "Equipements objets de la vente";
+						$data[0]['details'] = "Matériels et services objets de la vente";
 					}else{
-						$data[0]['details'] = "Matériels objets de la location";
+						$data[0]['details'] = "Matériels et services objets du contrat";
 					}
 					foreach ($this->lignes as $k => $i) {
 						$produit = ATF::produit()->select($i["id_produit"]);
