@@ -962,19 +962,8 @@ class facture_cleodis extends facture {
 			$infos["tva"]= "1.2";
 		}
 
+		if(ATF::$codename == "bdomplus") $infos["ref_externe"] = $this->getRefExterne();
 
-
-		//Si on a une TVA 19.6 et qu'on est en 2014 ---> TVA passe à 20% !!
-		/*if($infos["type_facture"]=="refi"){
-			if((date("Y" , strtotime($infos["date"])) >= 2014) || (date("Y" , strtotime($infos["date_previsionnelle"])) >= 2014)){
-				$infos["tva"]= "1.2";
-			}
-		}else{
-			$infos["tva"]= "1.2";
-			/*if($infos["tva"]== "1.196" && date("Y" , strtotime($infos["date_periode_debut"])) >= 2014){
-				$infos["tva"]= "1.2";
-			}
-		}*/
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -2768,6 +2757,122 @@ class facture_cleodisbe extends facture_cleodis {
 };
 class facture_cap extends facture_cleodis { };
 
-class facture_bdomplus extends facture_cleodis { };
+class facture_bdomplus extends facture_cleodis {
+
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+		$this->fieldstructure();
+		$this->addPrivilege("export_bdomplus");
+	}
+
+	public function getRefExterne(){
+		$prefix = "F930C";
+
+		$this->q->reset()
+				->addCondition("ref",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`ref_externe`,5)+1',"max_ref")
+				->addOrder('ref_externe',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+
+		$nb=$this->sa();
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="00000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="000001";
+		}
+		return $prefix.$suffix;
+
+	}
+
+
+	public function export_bdomplus(&$infos){
+		$infos["display"] = true;
+
+		$q = "SELECT facture.*
+		 	  FROM facture
+			  WHERE `id_facture` NOT IN (SELECT id_facture FROM export_facture WHERE `fichier_export` = 'flux_vente')";
+
+		$data = ATF::db()->sql2array($q);
+
+		foreach ($data as $key => $value) {
+
+			$client = ATF::societe()->select($value["id_societe"]);
+
+
+			$donnees[$key][$i][1] = substr($value["ref_externe"], 4);
+	    	$donnees[$key][$i][2] = substr($value["ref_externe"], 0, 4);
+	    	$donnees[$key][$i][3] = $client["particulier_nom"];
+	    	$donnees[$key][$i][4] = $client["particulier_prenom"];
+	    	$donnees[$key][$i][5] = "";
+	    	$donnees[$key][$i][6] = "";
+	    	$donnees[$key][$i][7] = "";
+	    	$donnees[$key][$i][8] = "";
+	    	$donnees[$key][$i][9] = $client["particulier_email"];
+	    	$donnees[$key][$i][10] = "";
+	    	$donnees[$key][$i][11] = "";
+	    	$donnees[$key][$i][12] = number_format($value["prix"] * $value["tva"], 2 , ",", "");
+	    	$donnees[$key][$i][13] = "";
+			$donnees[$key][$i][14] = date("Ymd", strtotime($value["date"]));
+			$donnees[$key][$i][15] = "";
+	    	$donnees[$key][$i][16] = "";
+	    	$donnees[$key][$i][17] = "";
+	    	$donnees[$key][$i][18] = "";
+	    	$donnees[$key][$i][19] = "";
+			$donnees[$key][$i][20] = "";
+			$donnees[$key][$i][21] = "";
+	    	$donnees[$key][$i][22] = "";
+			$donnees[$key][$i][23] = "";
+			$donnees[$key][$i][24] = "";
+			$donnees[$key][$i][25] = "";
+			$donnees[$key][$i][26] = "";
+			$donnees[$key][$i][27] = "";
+			$donnees[$key][$i][28] = "";
+			$donnees[$key][$i][29] = "";
+			$donnees[$key][$i][30] = "";
+		}
+
+		$string = "";
+
+
+        $filename = 'CLEODIS_VT.csv';
+
+        foreach ($donnees as $key => $value) {
+			foreach ($value as $k => $v) {
+				for($i=1;$i<=30;$i++){
+					if(isset($v[$i])){
+						$string .= $v[$i];
+						if($i!=30) $string .= ";";
+					}else{
+						if($i!=30) $string .= ";";
+					}
+				}
+				$string .= "\n";
+			}
+		}
+
+    	header("Content-type: text/csv");
+    	header("Content-Transfer-Encoding: UTF-8");
+		header("Content-Disposition: attachment; filename=bdomplus".date("Ymd").".csv");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+        echo $string;
+
+	}
+
+};
 class facture_bdom extends facture_cleodis { };
 class facture_boulanger extends facture_cleodis { };

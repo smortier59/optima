@@ -2110,6 +2110,44 @@ class societe_midas extends societe_cleodis {
 
 
 
-class societe_bdomplus extends societe_cleodis { };
+class societe_bdomplus extends societe_cleodis {
+
+  public function getCodeClient($site_associe, $prefixe = "TO"){
+    //Recherche du max en base
+    $this->q->reset()
+      ->addField('MAX(SUBSTRING(code_client FROM -8))','max')
+      ->addCondition('code_client',$prefixe.'%','OR',false,'LIKE');
+    $result=$this->sa();
+
+    if(isset($result[0]['max'])){
+      $max = intval($result[0]['max'])+1;
+    }else{
+      $max = 1;
+    }
+
+    if($max<10){
+      $ref.='0000000'.$max;
+    }elseif($max<100){
+      $ref.='000000'.$max;
+    }elseif($max<1000){
+      $ref.='00000'.$max;
+    }elseif($max<10000){
+      $ref.='0000'.$max;
+    }elseif($max<100000){
+      $ref.='0000'.$max;
+    }elseif($max<1000000){
+      $ref.='00'.$max;
+    }elseif($max<10000000){
+      $ref.='0'.$max;
+    }elseif($max<100000000){
+      $ref.=$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $prefixe.$ref;
+
+  }
+
+};
 class societe_bdom extends societe_cleodis { };
 class societe_boulanger extends societe_cleodis { };

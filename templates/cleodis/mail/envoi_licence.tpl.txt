@@ -1,0 +1,8 @@
+Voici vos clés de licence <br />
+
+{foreach from=$infos.licences item=licences key=id_produit}
+	{ATF::produit()->select($id_produit, "produit")}
+	{foreach from=$licences item=data}
+		{$data["part_1"]}{$data["part_2"]}
+	{/foreach}
+{/foreach}
