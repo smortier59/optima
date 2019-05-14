@@ -49,8 +49,8 @@ INSERT INTO `licence_type` (`id_licence_type`, `licence_type`) VALUES
 
 ALTER TABLE `licence_type` ADD PRIMARY KEY (`id_licence_type`);
 ALTER TABLE `licence_type` MODIFY `id_licence_type` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `licence_type` ADD `url_telechargement` VARCHAR(500) NOT NULL AFTER `licence_type`;
 COMMIT;
-
 
 ALTER TABLE `licence` ADD `id_licence_type` MEDIUMINT UNSIGNED NOT NULL AFTER `part_2`, ADD INDEX (`id_licence_type`);
 ALTER TABLE `licence` ADD  FOREIGN KEY (`id_licence_type`) REFERENCES `licence_type`(`id_licence_type`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -59,6 +59,9 @@ ALTER TABLE `licence` ADD  FOREIGN KEY (`id_licence_type`) REFERENCES `licence_t
 ALTER TABLE `produit` ADD `id_licence_type` MEDIUMINT UNSIGNED NULL DEFAULT NULL AFTER `id_document_contrat`, ADD INDEX (`id_licence_type`);
 ALTER TABLE `produit` ADD FOREIGN KEY (`id_licence_type`) REFERENCES `licence_type`(`id_licence_type`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+UPDATE licence_type SET url_telechargement = "https://my.norton.com/home/setup?inid=nortoncom_nav_setup_products-services:home" WHERE id_licence_type = 4;
+UPDATE licence_type SET url_telechargement = "https://my.norton.com/home/setup?inid=nortoncom_nav_setup_products-services:home" WHERE id_licence_type = 3;
+UPDATE licence_type SET url_telechargement = "https://setup.office.com/downloadoffice/" WHERE id_licence_type = 1;
 
 
 UPDATE produit SET id_licence_type = 4 WHERE produit = "Norton Security standard";
@@ -71,3 +74,4 @@ ALTER TABLE `facture` ADD `ref_externe` VARCHAR(11) NOT NULL AFTER `ref`;
 
 
 UPDATE `licence` SET `id_commande_ligne` = NULL;
+

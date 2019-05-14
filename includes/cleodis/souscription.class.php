@@ -1091,6 +1091,7 @@ class souscription_bdomplus extends souscription_cleodis {
                       if(count($licence)){
                         foreach ($licence as $kl => $vl) {
                           ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
+                          $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
                           $licence_a_envoyer[$value["id_produit"]][] = $vl;
                         }
                       }else{
@@ -1115,6 +1116,7 @@ class souscription_bdomplus extends souscription_cleodis {
                   if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
 
                   $info_mail["licences"] = $licence_a_envoyer;
+                  $info_mail["client"] = ATF::societe()->select($affaire["affaire.id_societe_fk"]);
 
                   $mail = new mail($info_mail);
 
