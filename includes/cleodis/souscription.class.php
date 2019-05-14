@@ -1119,6 +1119,8 @@ class souscription_bdomplus extends souscription_cleodis {
                   $info_mail["licences"] = $licence_a_envoyer;
                   $info_mail["client"] = ATF::societe()->select($affaire["affaire.id_societe_fk"]);
 
+                  log::logger($infos_mail , "mfleurquin");
+
                   $mail = new mail($info_mail);
 
                   $mail->send();
