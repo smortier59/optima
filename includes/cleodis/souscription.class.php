@@ -1110,6 +1110,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
                   ATF::db($this->db)->commit_transaction();
 
+                  $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
                   $info_mail["recipient"] = $email;
                   $info_mail["html"] = true;
                   $info_mail["template"] = "envoi_licence";
