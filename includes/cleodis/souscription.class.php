@@ -217,7 +217,7 @@ class souscription_cleodis extends souscription {
       break;
 
       case "bdomplus":
-        $r = "BDOM - Location ".$suffix;
+        $r = "BDOM + : Abonnement Zen ".$suffix;
       break;
     }
 
@@ -1112,8 +1112,7 @@ class souscription_bdomplus extends souscription_cleodis {
                   $info_mail["recipient"] = $email;
                   $info_mail["html"] = true;
                   $info_mail["template"] = "envoi_licence";
-
-                  $info_mail["objet"] = "Vos clés de licences suite à votre souscription";
+                  if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
 
                   $info_mail["licences"] = $licence_a_envoyer;
 
