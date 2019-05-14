@@ -347,7 +347,7 @@ ATF.buildGridEditor({
 					width:20,
 					dataIndex: '{$current_class->table}__dot__principal',
 					{if !$no_update}
-						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=principal value="non" function=null}
 					{/if}
 				}
 			{/if}
