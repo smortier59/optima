@@ -49,7 +49,3 @@ if($typeLicence == 3 || $typeLicence == 4){
 		ATF::licence()->i($to_insert);
 	}
 }
-
-/*
-licence Office 2-2-2-2-5car
-Norton 25 car*/
