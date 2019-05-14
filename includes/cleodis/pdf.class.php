@@ -13976,7 +13976,7 @@ class pdf_bdomplus extends pdf_cleodis {
 					$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
 				}else{
 					if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat de prestation n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-					}else{$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+					}else{$data[0][1] = "Loyer correspondant au contrat  n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
 				}
 				//Désignation L2
 				if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
@@ -13990,7 +13990,7 @@ class pdf_bdomplus extends pdf_cleodis {
 					}else{
 						if($this->facture["redevance"] === "oui"){
 							if($this->devis['type_contrat']=="presta"){ $data[0][1] = "Redevance du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
-							}else{	$data[0][1] = "Redevance de mise à disposition du contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
+							}else{	$data[0][1] = "Loyer correspondant au contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL); }
 						}
 					}
 					//Désignation L2
@@ -14012,9 +14012,9 @@ class pdf_bdomplus extends pdf_cleodis {
 			if($this->facture['type_facture'] !== "libre"){
 				//Préparation du détail
 				if($this->affaire['nature']=="vente"){
-					$data[0]['details'] = "Matériels et services objets de la vente";
+					$data[0]['details'] = "Matériels/services objets de la vente";
 				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
-				}else{	$data[0]['details'] = "Matériels et services objets de la location"; }
+				}else{	$data[0]['details'] = "Matériels/services objets de la location"; }
 				foreach ($this->lignes as $k => $i) {
 					$produit = ATF::produit()->select($i["id_produit"]);
 		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
@@ -14037,9 +14037,9 @@ class pdf_bdomplus extends pdf_cleodis {
 				if($this->facture['type_libre'] === "normale"){
 					//Préparation du détail
 					if($this->affaire['nature']=="vente"){
-						$data[0]['details'] = "Matériels et services objets de la vente";
+						$data[0]['details'] = "Matériels/services objets de la vente";
 					}else{
-						$data[0]['details'] = "Matériels et services objets du contrat";
+						$data[0]['details'] = "Matériels/services objets du contrat";
 					}
 					foreach ($this->lignes as $k => $i) {
 						$produit = ATF::produit()->select($i["id_produit"]);
