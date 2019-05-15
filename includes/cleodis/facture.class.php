@@ -2771,13 +2771,13 @@ class facture_bdomplus extends facture_cleodis {
 		$prefix = "F930C";
 
 		$this->q->reset()
-				->addCondition("ref",$prefix."%","AND",false,"LIKE")
-				->addField('SUBSTRING(`ref_externe`,5)+1',"max_ref")
+				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`ref_externe`,6)+1',"max_ref")
 				->addOrder('ref_externe',"DESC")
 				->setDimension("row")
 				->setLimit(1);
-
 		$nb=$this->sa();
+
 
 		if($nb["max_ref"]){
 			if($nb["max_ref"]<10){
