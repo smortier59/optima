@@ -3,14 +3,19 @@
 
 
 
-{if $id_user == 16
- || $id_user == 17
- || $id_user == 18
- || $id_user == 93
- || $id_user == 35
- || $id_user == 21
- || (ATF::$codename == "cleodisbe" &&$id_user == 104) || (ATF::$codename == "cleodis" &&$id_user == 103)
- || (ATF::$codename == "cleodisbe" &&$id_user == 113) || (ATF::$codename == "cleodis" &&$id_user == 116) }
+{if ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 16)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 17)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 18)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 93)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 35)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 21)
+ || (ATF::$codename == "cleodisbe" && $id_user == 104) || (ATF::$codename == "cleodis" &&$id_user == 103)
+ || (ATF::$codename == "cleodisbe" && $id_user == 113) || (ATF::$codename == "cleodis" &&$id_user == 116)
+
+ || (ATF::$codename == "bdomplus" && ($id_user ==  16 || $id_user == 116 ))
+
+
+  }
 	ATF.renderer.comiteDecision=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {
 			var idDiv = Ext.id();

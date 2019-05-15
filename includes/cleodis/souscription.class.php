@@ -170,10 +170,21 @@ class souscription_cleodis extends souscription {
           ATF::affaire()->store($s, $id_affaire, "noticeAssurance", $noticeAssurance);
         }
 
-        if($post["site_associe"] === "boulangerpro" || $post["site_associe"] === "bdomplus"){
-          $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
-          $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
+
+        switch ($post["site_associe"]) {
+          case 'boulangerpro':
+            $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
+            $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
+          break;
+
+          case 'bdomplus':
+            $this->createComite($id_affaire, $societe, "accepte", "Comité CLEODIS", date("Y-m-d"), date("Y-m-d"));
+          break;
+
+          default:
+          break;
         }
+
 
         // Création du contrat
         $id_contrat = $this->createContrat($post, $libelle, $id_devis, $id_affaire);
@@ -328,7 +339,6 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__sous_categorie"=>ATF::sous_categorie()->nom($produitLoyer['id_sous_categorie']),
             "devis_ligne__dot__pack_produit"=>ATF::pack_produit()->nom($id_pack),
             "devis_ligne__dot__ean"=>$produitLoyer['ean'],
-
             "devis_ligne__dot__id_categorie"=>$souscategorie['id_categorie'],
             "devis_ligne__dot__categorie"=>ATF::categorie()->nom($souscategorie['id_categorie']),
             "devis_ligne__dot__commentaire_produit"=>$produitLoyer['commentaire'],
