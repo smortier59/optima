@@ -6,3 +6,5 @@ CREATE TABLE `export_facture` ( `id_export_facture` mediumint(8) UNSIGNED NOT NU
 								 `fichier_export` enum('flux_vente') NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ALTER TABLE `export_facture` ADD PRIMARY KEY (`id_export_facture`), ADD KEY `id_facture` (`id_facture`);
 ALTER TABLE `export_facture` MODIFY `id_export_facture` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `facture_non_parvenue` CHANGE `ref` `ref` VARCHAR(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;

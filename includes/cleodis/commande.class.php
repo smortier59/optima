@@ -1385,11 +1385,20 @@ class commande_cleodis extends commande {
 				$return['data'][$k]['demandeRefiExist'] = false;
 			}
 			//Check affichage de création de facture
-			if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
-				$return['data'][$k]['factureAllow'] = true;
-			} else {
-				$return['data'][$k]['factureAllow'] = false;
+			if(ATF::$codename == "bdomplus"){
+				if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist']) {
+					$return['data'][$k]['factureAllow'] = true;
+				} else {
+					$return['data'][$k]['factureAllow'] = false;
+				}
+			}else{
+				if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
+					$return['data'][$k]['factureAllow'] = true;
+				} else {
+					$return['data'][$k]['factureAllow'] = false;
+				}
 			}
+
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
 
             // check des fichiers courriers types
