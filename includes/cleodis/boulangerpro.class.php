@@ -78,13 +78,13 @@ class boulangerpro extends classes_optima {
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - erreur chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],$this->logFile);
           } else {
             $p = $r[0];
-            $prix_avec_taxe = number_format($p['price_tax_excl'],2)+number_format($p['ecotax'],2)+number_format($p['ecomob'],2);
+            $prix_avec_taxe = round($p['price_tax_excl'],2)+round($p['ecotax'],2)+round($p['ecomob'],2);
             $prix_final_calcule = $prix_avec_taxe + $prix_livraison;
-            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
+
             log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! ",$this->logFile);
             log::logger("Prix boulpro : ".$prix_final_calcule." VS Prix cléodis : ".$produit['prix_achat'],$this->logFile);
-            log::logger("Taxe eco boulpro : ".number_format($p['ecotax'],2)." VS Taxe eco cléodis : ".number_format($produit['taxe_ecotaxe'],2),$this->logFile);
-            log::logger("Taxe eco MOB boulpro : ".number_format($p['ecomob'],2)." VS Taxe eco MOB cléodis : ".number_format($produit['taxe_ecomob'],2),$this->logFile);
+            log::logger("Taxe eco boulpro : ".round($p['ecotax'],2)." VS Taxe eco cléodis : ".round($produit['taxe_ecotaxe'],2),$this->logFile);
+            log::logger("Taxe eco MOB boulpro : ".round($p['ecomob'],2)." VS Taxe eco MOB cléodis : ".round($produit['taxe_ecomob'],2),$this->logFile);
             // Mise a jour des taxes du produit
             // On sauve les old pour l'export excel
             $produit["old_prix_achat"] = $produit["prix_achat"];
