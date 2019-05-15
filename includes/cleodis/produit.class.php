@@ -101,6 +101,7 @@ class produit_cleodis extends produit {
 		$this->foreign_key['id_produit_garantie_uc'] =  "produit_garantie";
 		$this->foreign_key['id_produit_garantie_ecran'] =  "produit_garantie";
 		$this->foreign_key['id_produit_garantie_imprimante'] =  "produit_garantie";
+		$this->foreign_key['livreur'] =  "fabriquant";
 
 		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 		$this->files["photo1"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
@@ -675,4 +676,7 @@ class produit_cap extends produit {
 
 class produit_bdomplus extends produit_cleodis { };
 class produit_bdom extends produit_cleodis { };
-class produit_boulanger extends produit_cleodis { };
+class produit_boulanger extends produit_cleodis {
+
+
+ };

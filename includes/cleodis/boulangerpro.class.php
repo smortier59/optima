@@ -35,6 +35,9 @@ class boulangerpro extends classes_optima {
         ATF::produit()->q->where('ref',1119576, "OR", "ref_produit", "LIKE"); 
         ATF::produit()->q->where('ref',1114199, "OR", "ref_produit", "LIKE"); 
         ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1021609, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',104718, "OR", "ref_produit", "LIKE"); 
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
@@ -314,21 +317,41 @@ class boulangerpro extends classes_optima {
 
     if ($fabriquant) {
       log::logger("Fabriquant trouvé depuis le retour boulpro : ".$fabriquant['fabriquant']." (".$fabriquant['id_fabriquant'].")",$this->logFile);
-      log::logger("Fabriquant du produit : ".$produit['id_fabriquant'],$this->logFile);
 
-      if ($produit['id_fabriquant'] != $fabriquant['id_fabriquant']) {
-        $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit'], 'actif');
-        foreach (explode(",", $r) as $id_pack) {
-          if (!$id_pack) continue;
-          log::logger("Pack associé n°".$id_pack." désactivé cause livreur qui ne match pas",$this->logFile);
-          ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
-          $packDesactive[] = array(
-            'id' => $id_pack,
-            'raison' => "Désactivation cause Livraison"
-          );
+      $packsDuProduit = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit'], "actif", true);
+
+      if (!count($packsDuProduit)) {
+        log::logger("AUCUN Packs liés où le produit est principal : On ne fait rien",$this->logFile);
+      } else {      
+        log::logger("Packs liés où le produit est principal : ".$packsDuProduit,$this->logFile);
+        foreach (explode(",", $packsDuProduit) as $id_pack) {
+          $produits = ATF::pack_produit()->getProduitFromPack($id_pack, 'actif');
+          if (!count($produits)) {
+            log::logger("Aucun Produit actif pour le pack",$this->logFile);
+          } else {
+            log::logger("Produits actif du pack ".$id_pack.": ".count($produits),$this->logFile);
+            $fabriquantFound = false;
+            foreach ($produits as $p) {
+              log::logger("Compare fabriquant product with boulpro ".$p['produit']." (".$p['id_produit']."): ".$p['id_fabriquant']." == ".$fabriquant['id_fabriquant'],$this->logFile);
+              if ($p['id_fabriquant'] == $fabriquant['id_fabriquant']) {
+                $fabriquantFound = true;
+              }
+            }
+
+            if ($fabriquantFound) {
+              log::logger("Rien à faire, on a retrouvé le fabriquant dans un des produits du pack",$this->logFile);
+            } else {
+              log::logger("Pack associé n°".$id_pack." désactivé cause livreur qui ne match pas",$this->logFile);
+              ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
+              $packDesactive[] = array(
+                'id' => $id_pack,
+                'raison' => "Désactivation cause Livraison"
+              );            
+            }
+
+          }
+
         }            
-      } else {
-        log::logger("Rien à faire, les infos matchs",$this->logFile);
       }
 
       log::logger("Mise à jour du produit avec les nouvelles infos de fabriquant",$this->logFile);
@@ -432,8 +455,8 @@ class boulangerpro extends classes_optima {
    * @return float       Valeur tu taux
    */
   public function getTaux($prix){
-    if ($prix < 500) $taux = 9.5/100;
-    else if ($prix < 1500) $taux = 12/100;
+    if ($prix < 500) $taux = 12/100;
+    else if ($prix < 1500) $taux = 9.5/100;
     else if ($prix < 3000) $taux = 9/100;
     else $taux = 8/100;
 

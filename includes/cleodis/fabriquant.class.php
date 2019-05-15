@@ -25,6 +25,7 @@ class fabriquant_cleodis extends fabriquant {
 			'fabriquant'
 		);
 
+		$this->field_nom="fabriquant";
 		$this->fieldstructure();
 		$this->controlled_by = "produit";
 	}
