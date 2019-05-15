@@ -743,7 +743,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	 			$bdc["bon_de_commande"]["prix_cleodis"] = $bdc["bon_de_commande"]["prix"];
 
 
-	 				$this->insert($bdc, $s, NULL, $cadre_refreshed);
+	 			$this->insert($bdc, $s, NULL, $cadre_refreshed);
 
 			}
 

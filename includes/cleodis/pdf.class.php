@@ -14003,8 +14003,6 @@ class pdf_bdomplus extends pdf_cleodis {
 				}
 			}else{
 				if($this->facture['type_libre'] === "normale"){
-					log::logger("ICI" , "mfleurquin");
-
 					//Désignation L1
 					if($this->affaire['nature']=="vente"){
 						$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);

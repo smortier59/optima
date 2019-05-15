@@ -1107,6 +1107,11 @@ class souscription_bdomplus extends souscription_cleodis {
                   }
 
 
+                  //On crée tout les bons de commande de l'affaire
+                  ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
+                  ATF::bon_de_commande()->createAllBDC(array("id_commande"=> $commande["commande.id_commande_fk"]));
+
+
 
                   if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
                     $email = $email_pro;
@@ -1125,7 +1130,7 @@ class souscription_bdomplus extends souscription_cleodis {
                   $info_mail["licences"] = $licence_a_envoyer;
                   $info_mail["client"] = ATF::societe()->select($affaire["affaire.id_societe_fk"]);
 
-                  log::logger($infos_mail , "mfleurquin");
+
 
                   $mail = new mail($info_mail);
 
@@ -1135,6 +1140,8 @@ class souscription_bdomplus extends souscription_cleodis {
 
               }catch(errorATF $e){
                 ATF::db($this->db)->rollback_transaction();
+                log::logger($e->getmessage(
+                ) , "mfleurquin");
                 throw $e;
               }
             }
