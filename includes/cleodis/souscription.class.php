@@ -29,11 +29,6 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
-
-    log::logger($get, "mfleurquin");
-    log::logger($post, "mfleurquin");
-
-
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["email"];
@@ -342,6 +337,7 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__id_categorie"=>$souscategorie['id_categorie'],
             "devis_ligne__dot__categorie"=>ATF::categorie()->nom($souscategorie['id_categorie']),
             "devis_ligne__dot__commentaire_produit"=>$produitLoyer['commentaire'],
+            "devis_ligne__dot__visible"=>$packProduitLigne['visible'],
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
             "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_sur_pdf'],
             "devis_ligne__dot__ordre"=>$produitLoyer['ordre']

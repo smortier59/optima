@@ -528,31 +528,33 @@ class pdf_cleodis extends pdf {
 				$w = array(40,93,12,20,20);
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
-					if ($i_['visibilite_prix']=="visible") {
-						$flagOnlyPrixInvisible = false;
+					if($i_["visible_pdf"]){
+						if ($i_['visibilite_prix']=="visible") {
+							$flagOnlyPrixInvisible = false;
+						}
+						$etat = "";
+						if($i_["neuf"] == "non"){
+							$etat = "( OCCASION )";
+						}
+
+						//Si c'est une prestation, on affiche pas l'etat
+						if(($produit["type"] == "sans_objet") || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){  $etat = ""; }
+
+						if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+						$produit = ATF::produit()->select($i_['id_produit']);
+						$marque =  ATF::fabriquant()->nom($produit['id_fabriquant']);
+						$sous_type =  ATF::sous_categorie()->nom($produit['id_sous_categorie']);
+						$data[] = array(
+							$i_['ref']
+							,$i_['produit']." ".$etat
+							,round($i_['quantite'],0)
+							,($i_['visibilite_prix']=="visible")?number_format($i_['prix_achat'],2,","," ")." €":"NC"
+							,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
+						);
+
+						//$total+=($i_['quantite']*$i_['prix_achat']);
 					}
-					$etat = "";
-					if($i_["neuf"] == "non"){
-						$etat = "( OCCASION )";
-					}
-
-					//Si c'est une prestation, on affiche pas l'etat
-					if(($produit["type"] == "sans_objet") || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){  $etat = ""; }
-
-					if(ATF::$codename == "cleodisbe"){ $etat = ""; }
-
-					$produit = ATF::produit()->select($i_['id_produit']);
-					$marque =  ATF::fabriquant()->nom($produit['id_fabriquant']);
-					$sous_type =  ATF::sous_categorie()->nom($produit['id_sous_categorie']);
-					$data[] = array(
-						$i_['ref']
-						,$i_['produit']." ".$etat
-						,round($i_['quantite'],0)
-						,($i_['visibilite_prix']=="visible")?number_format($i_['prix_achat'],2,","," ")." €":"NC"
-						,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
-					);
-
-					//$total+=($i_['quantite']*$i_['prix_achat']);
 				}
 				$tableau[$k] = array(
 					"head"=>$head
@@ -922,32 +924,35 @@ class pdf_cleodis extends pdf {
 				$w = array(12,40,111,22);
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
-					if ($i_['visibilite_prix']=="visible") {
-						$flagOnlyPrixInvisible = false;
+					if($i_["visible_pdf"] == "oui"){
+						if ($i_['visibilite_prix']=="visible") {
+							$flagOnlyPrixInvisible = false;
+						}
+						$produit = ATF::produit()->select($i_['id_produit']);
+						//On prépare le détail de la ligne
+						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+						if ($details == "") unset($details);
+
+						$etat = "";
+						if($i_["neuf"] == "non"){
+							$etat = "( OCCASION )";
+						}
+
+						//Si c'est une prestation, on affiche pas l'etat
+						if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){	$etat = "";		}
+
+						if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+						$data[] = array(
+							round($i_['quantite'])
+							,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
+							,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat
+							,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
+						);
 					}
-					$produit = ATF::produit()->select($i_['id_produit']);
-					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
-					if ($details == "") unset($details);
-
-					$etat = "";
-					if($i_["neuf"] == "non"){
-						$etat = "( OCCASION )";
-					}
-
-					//Si c'est une prestation, on affiche pas l'etat
-					if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){	$etat = "";		}
-
-					if(ATF::$codename == "cleodisbe"){ $etat = ""; }
-
-					$data[] = array(
-						round($i_['quantite'])
-						,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
-						,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat
-						,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
-					);
 				}
 				$tableau[$k] = array(
 					"head"=>$head
@@ -13562,15 +13567,22 @@ class pdf_bdomplus extends pdf_cleodis {
 			}
 			$this->setLeftMargin(15);
 		}else{
-			$this->image(__PDF_PATH__.$this->logo,80,5,35);
-			$this->setLeftMargin(60);
+			if($this->envoiContrat){
+				$this->image(__PDF_PATH__.$this->logo,15,15,35);
+				$this->setLeftMargin(10);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,80,5,35);
+				$this->setLeftMargin(60);
+			}
+
+
 
 		}
 	}
 
 
 	public function Footer() {
-		if($this->facturePDF){
+		if($this->facturePDF && !$this->envoiContrat){
 			$this->setfont('arial','B',9);
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
@@ -13668,43 +13680,45 @@ class pdf_bdomplus extends pdf_cleodis {
 			}
 			unset($data,$st);
 			foreach ($i as $k_ => $i_) {
-			  $produit = ATF::produit()->select($i_['id_produit']);
-			  $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
-			  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
-			  //On prépare le détail de la ligne
-			  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-			  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+			  if($i_["visible_pdf"] == "oui"){
+			  	$produit = ATF::produit()->select($i_['id_produit']);
+				  $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
+				  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
+				  //On prépare le détail de la ligne
+				  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+				  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+				  log::logger($i_ , "mfleurquin");
+
+				  $etat = "( NEUF )";
+				  if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
+					if($i_["neuf"] == "non"){
+						$etat = "( OCCASION )";
+					}
+				  }
 
 
-			  $etat = "( NEUF )";
-			  if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
-				if($i_["neuf"] == "non"){
-					$etat = "( OCCASION )";
-				}
-			  }
+				  //Si c'est une prestation, on affiche pas l'etat
+				  if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
 
+				  if ($details == "") unset($details);
+				  $data[] = array(
+					round($i_['quantite'])
+					,$ssCat
+					,$fab
+					,$i_['produit'].$etat
+					,"details"=>$details
+				  );
 
-			  //Si c'est une prestation, on affiche pas l'etat
-			  if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)) { $etat = "";   }
+				  $st[] = array(
+					($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
+					,($details?$this->colsProduitAvecDetail:$this->colsProduit)
+					,($details?$this->colsProduitAvecDetail:$this->colsProduit)
 
-			  if ($details == "") unset($details);
-			  $data[] = array(
-				round($i_['quantite'])
-				,$ssCat
-				,$fab
-				,$i_['produit'].$etat
-				,"details"=>$details
-			  );
-
-			  $st[] = array(
-				($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
-				,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-				,($details?$this->colsProduitAvecDetail:$this->colsProduit)
-
-				,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
-				,"details"=>$this->styleDetailsProduit
-			  );
-
+					,($details?$this->colsProduitAvecDetailLast:$this->colsProduitLast)
+					,"details"=>$this->styleDetailsProduit
+				  );
+			  	}
 			}
 			$tableau[$k] = array(
 			  "head"=>$head
