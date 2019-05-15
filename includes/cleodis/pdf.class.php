@@ -3389,7 +3389,12 @@ class pdf_cleodis extends pdf {
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
 		} else{
-			$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
+			if(ATF::$codename != "bdomplus"){
+				$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
+			}else{
+				$this->image(__PDF_PATH__.$this->logo,80,20,35);
+			}
+
 		}
 
 
@@ -13934,7 +13939,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->setfont('arial','B',11);
 		$this->cell(35,5,"N° de facture :",0, 0);
 		$this->setfont('arial','',11);
-		$this->cell(50,5,$this->facture['ref'] ,0 ,1);
+		$this->cell(50,5,$this->facture['ref_externe'] ,0 ,1);
 
 		$this->setfont('arial','B',11);
 		$this->cell(35,5,"Date :",0, 0);
@@ -13998,6 +14003,8 @@ class pdf_bdomplus extends pdf_cleodis {
 				}
 			}else{
 				if($this->facture['type_libre'] === "normale"){
+					log::logger("ICI" , "mfleurquin");
+
 					//Désignation L1
 					if($this->affaire['nature']=="vente"){
 						$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
