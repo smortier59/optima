@@ -537,14 +537,14 @@ class souscription_cleodis extends souscription {
         );
 
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
-          $passage_slimpay = array('documents'=> true);
+          $passage_slimpay = array();
 
           ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
           $loyer = ATF::loyer()->select_row();
           if($loyer["frequence_loyer"] != "an") $passage_slimpay["mandate"] = true;
 
         }else{
-          $passage_slimpay = array('mandate'=> true, 'payment'=> true, 'documents'=> true);
+          $passage_slimpay = array('mandate'=> true, 'payment'=> true);
         }
 
       break;
