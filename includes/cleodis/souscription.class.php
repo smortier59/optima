@@ -537,9 +537,10 @@ class souscription_cleodis extends souscription {
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
           $passage_slimpay = array();
 
-          ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
+          /*ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
           $loyer = ATF::loyer()->select_row();
-          if($loyer["frequence_loyer"] != "an") $passage_slimpay["mandate"] = true;
+          if($loyer["frequence_loyer"] != "an") */
+          $passage_slimpay["mandate"] = true;
 
         }else{
           $passage_slimpay = array('mandate'=> true, 'payment'=> true);
@@ -597,7 +598,9 @@ class souscription_cleodis extends souscription {
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>$f,
-      "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref")
+      "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref"),
+      "bic"=> $bic,
+      "iban"=>$iban
     );
 
     if($passage_slimpay)  $return["passage_slimpay"] = $passage_slimpay;
