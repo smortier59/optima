@@ -541,25 +541,28 @@ class devis_cleodis extends devis {
 		}
 
 //*****************************************************************************
-		if($preview){
-			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
-			ATF::db($this->db)->rollback_transaction();
-			return $this->cryptId($last_id);
-		}else{
-			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
+		if(ATF::$codename !== "bdomplus"){
+			if($preview){
+				$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
+				ATF::db($this->db)->rollback_transaction();
+				return $this->cryptId($last_id);
+			}else{
+				$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
 
-			if(ATF::societe()->select($societe["id_societe"] , "relation") == "suspect"){
-				ATF::societe()->u(array("id_societe"=> $societe["id_societe"] , "relation"=>"prospect"));
-			}
+				if(ATF::societe()->select($societe["id_societe"] , "relation") == "suspect"){
+					ATF::societe()->u(array("id_societe"=> $societe["id_societe"] , "relation"=>"prospect"));
+				}
 
-			/* MAIL */
-			//Seulement si le profil le permet
-			if($email){
-				$path=array("devis"=>"fichier_joint");
-				ATF::affaire()->mailContact($email,$last_id,"devis",$path);
+				/* MAIL */
+				//Seulement si le profil le permet
+				if($email){
+					$path=array("devis"=>"fichier_joint");
+					ATF::affaire()->mailContact($email,$last_id,"devis",$path);
+				}
+				ATF::db($this->db)->commit_transaction();
 			}
-			ATF::db($this->db)->commit_transaction();
 		}
+
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
@@ -1748,6 +1751,19 @@ class devis_midas extends devis_cleodis {
 
 class devis_cleodisbe extends devis_cleodis { };
 
-class devis_bdomplus extends devis_cleodis { };
+class devis_bdomplus extends devis_cleodis {
+
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+
+		unset($this->colonnes['fields_column']["fichier_joint"]);
+		unset($this->colonnes['fields_column']["retourBPA"]);
+		unset($this->files["fichier_joint"]);
+		unset($this->files["retourBPA"]);
+
+		$this->fieldstructure();
+
+	}
+};
 class devis_bdom extends devis_cleodis { };
 class devis_boulanger extends devis_cleodis { };
