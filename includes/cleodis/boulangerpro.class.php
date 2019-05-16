@@ -37,7 +37,7 @@ class boulangerpro extends classes_optima {
         ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE"); 
         ATF::produit()->q->where('ref',1021609, "OR", "ref_produit", "LIKE"); 
         ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE"); 
-        ATF::produit()->q->where('ref',104718, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1047180, "OR", "ref_produit", "LIKE"); 
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
