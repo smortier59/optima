@@ -636,15 +636,18 @@ class bon_de_commande_cleodis extends bon_de_commande {
 				$prix_total=$infos["prix"];
 			}
 		}
-
-		// Ajout de la facture non parvenue globale du bon de commande
-		ATF::facture_non_parvenue()->i(array(
+		$fnp = array(
 			'ref'=>$infos['ref']."-FNP"
 			,'prix'=>$prix_total // Valeur positive
 			,'id_affaire'=>$infos["id_affaire"]
 			,'tva'=>$infos["tva"]
 			,'id_bon_de_commande'=>$last_id
-		));
+		);
+
+		if($fnp["prix"] == 0) $fnp["facturation_terminee"] = "oui";
+
+		// Ajout de la facture non parvenue globale du bon de commande
+		ATF::facture_non_parvenue()->i($fnp);
 
 //*****************************************************************************
 		if($preview){

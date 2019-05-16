@@ -1081,68 +1081,24 @@ class souscription_bdomplus extends souscription_cleodis {
                                              "date_paiement"=>date("Y-m-d")));
                   }
 
-                  //On envoi les licences
-                  ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
-                                                   ->from("commande_ligne", "id_produit", "produit", "id_produit")
-                                                   ->whereIsNotNull("produit.id_licence_type");
-                  $lignes = ATF::commande_ligne()->select_all();
-
-                  $licence_a_envoyer = array();
-
-                  foreach ($lignes as $key => $value) {
-                      ATF::licence()->q->reset()->where("id_licence_type", $value["id_licence_type"],"AND")
-                                                ->whereIsNull("licence.id_commande_ligne","AND")
-                                                ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
-                      $licence = ATF::licence()->sa();
-
-                      if(count($licence)){
-                        foreach ($licence as $kl => $vl) {
-                          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
-                          $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
-                          $licence_a_envoyer[$value["id_produit"]][] = $vl;
-                        }
-                      }else{
-                        ATF::db($this->db)->rollback_transaction();
-                        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
-                      }
-                  }
+                  $licence_a_envoyer = $this->envoi_licence($commande["commande.id_commande_fk"]);
 
 
                   //On crée tout les bons de commande de l'affaire
                   ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
                   ATF::bon_de_commande()->createAllBDC(array("id_commande"=> $commande["commande.id_commande_fk"]));
 
-
-
-                  if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
-                    $email = $email_pro;
-                  }else{
-                    $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
-                  }
-
                   ATF::db($this->db)->commit_transaction();
 
-                  $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
-                  $info_mail["recipient"] = $email;
-                  $info_mail["html"] = true;
-                  $info_mail["template"] = "envoi_licence";
-                  if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
+                  $this->envoiMailLicence($affaire["affaire.id_societe_fk"], $licence_a_envoyer);
 
-                  $info_mail["licences"] = $licence_a_envoyer;
-                  $info_mail["client"] = ATF::societe()->select($affaire["affaire.id_societe_fk"]);
-
-
-
-                  $mail = new mail($info_mail);
-
-                  $mail->send();
+                  //Installation à domicile
+                  $this->envoiMailInstallationZen($affaire, $commande);
 
                 }
 
               }catch(errorATF $e){
                 ATF::db($this->db)->rollback_transaction();
-                log::logger($e->getmessage(
-                ) , "mfleurquin");
                 throw $e;
               }
             }
@@ -1185,7 +1141,6 @@ class souscription_bdomplus extends souscription_cleodis {
 
       ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
       $loyer = ATF::loyer()->select_row();
-      log::logger($loyer , "mfleurquin");
 
       return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
                    "id_magasin" => ATF::affaire()->select($affaire["affaire.id_affaire_fk"], "id_magasin"),
@@ -1194,6 +1149,91 @@ class souscription_bdomplus extends souscription_cleodis {
               );
     }
     throw new errorATF("Data manquante en paramètre d'entrée", 500);
+  }
+
+
+  public function envoi_licence($id_commande){
+    //On envoi les licences
+    ATF::commande_ligne()->q->reset()->where("id_commande", $id_commande)
+                                     ->from("commande_ligne", "id_produit", "produit", "id_produit")
+                                     ->whereIsNotNull("produit.id_licence_type");
+    $lignes = ATF::commande_ligne()->select_all();
+
+    $licence_a_envoyer = array();
+
+    foreach ($lignes as $key => $value) {
+      ATF::licence()->q->reset()->where("id_licence_type", $value["id_licence_type"],"AND")
+                                ->whereIsNull("licence.id_commande_ligne","AND")
+                                ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
+      $licence = ATF::licence()->sa();
+
+      if(count($licence)){
+        foreach ($licence as $kl => $vl) {
+          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
+          $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
+          $licence_a_envoyer[$value["id_produit"]][] = $vl;
+        }
+        return $licence_a_envoyer;
+      }else{
+        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
+      }
+    }
+  }
+
+  public function envoiMailLicence($id_societe, $licence_a_envoyer){
+    if($email_pro = ATF::societe()->select($id_societe, "email")){
+      $email = $email_pro;
+    }else{
+      $email = ATF::societe()->select($id_societe, "  particulier_email");
+    }
+
+    $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+    $info_mail["recipient"] = $email;
+    $info_mail["html"] = true;
+    $info_mail["template"] = "envoi_licence";
+    if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
+
+    $info_mail["licences"] = $licence_a_envoyer;
+    $info_mail["client"] = ATF::societe()->select($id_societe);
+
+    $mail = new mail($info_mail);
+
+    $mail->send();
+  }
+
+  public function envoiMailInstallationZen($affaire, $commande){
+
+    ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
+                                     ->from("commande_ligne", "id_produit", "produit", "id_produit")
+                                     ->where("produit.produit", "Installation à domicile");
+    $lignes = ATF::commande_ligne()->select_all();
+
+
+
+    if($lignes){
+      log::logger("Produit Installation inclus, on envoi le mail" , "souscription");
+      if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
+        $email = $email_pro;
+      }else{
+        $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
+      }
+
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["recipient"] = $email;
+      $info_mail["html"] = true;
+      $info_mail["template"] = "installation_domicile";
+      if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Installation à domicile";
+
+
+      $mail = new mail($info_mail);
+
+      $mail->send();
+    }else{
+      log::logger("Pas d'Installation inclus dans l'offre" , "souscription");
+    }
+
+
+
   }
 
 };
