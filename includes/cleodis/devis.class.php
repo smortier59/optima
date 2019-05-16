@@ -561,6 +561,11 @@ class devis_cleodis extends devis {
 				}
 				ATF::db($this->db)->commit_transaction();
 			}
+		}else{
+			if(ATF::societe()->select($societe["id_societe"] , "relation") == "suspect"){
+					ATF::societe()->u(array("id_societe"=> $societe["id_societe"] , "relation"=>"prospect"));
+				}
+			ATF::db($this->db)->commit_transaction();
 		}
 
 		if(is_array($cadre_refreshed)){

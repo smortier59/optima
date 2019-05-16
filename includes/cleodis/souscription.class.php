@@ -431,8 +431,6 @@ class souscription_cleodis extends souscription {
     $iban = $post["iban"];
     $id_affaire = $post["id"];
 
-
-
     log::logger("ID Affaire --> " , "souscription");
     log::logger($id_affaire , "souscription");
     $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
@@ -530,10 +528,10 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'bdomplus':
-        $contrat = ATF::pdf()->generic('contratA4',$contrat["commande.id_commande"],true);
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
         $f =  array(
-          "contrat.pdf" => base64_encode($contrat)
+          "mandatSellAndSign.pdf" => base64_encode($pdf_mandat)
         );
 
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
