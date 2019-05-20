@@ -418,6 +418,48 @@ class souscription_cleodis extends souscription {
   }
 
   /**
+   * Retourne les differentes étapes SLIMPAY
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  array $infos Simple dimension des champs à insérer
+   * @return [type]       [description]
+
+  public function _getSlimpaySteps($post, $get){
+    log::logger("=============================","souscription");
+    log::logger($post,"souscription");
+    log::logger($get,"souscription");
+
+    $id_affaire = $post["id"];
+
+    log::logger("ID Affaire --> " , "souscription");
+    log::logger($id_affaire , "souscription");
+    $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
+    log::logger("ID Societe : " , "souscription");
+    log::logger($id_societe , "souscription");
+
+    if (!$id_societe) {
+      throw new Exception('Aucune information pour cet identifiant.', 500);
+    }
+
+    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],"souscription");
+    switch ($post['site_associe']) {
+      case 'bdomplus':
+        if(ATF::affaire()->select($id_affaire, "id_magasin")){
+          $passage_slimpay = array();
+
+          ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
+          $loyer = ATF::loyer()->select_row();
+          if($loyer["frequence_loyer"] != "an")
+          $passage_slimpay["findOrCreateMandate"] = true;
+
+        }else{
+          $passage_slimpay = array('findOrCreateMandate'=> true, 'createOrder'=> true);
+        }
+      break;
+    }
+    return array("passage_slimpay" => $passage_slimpay);
+  }*/
+
+  /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
@@ -440,8 +482,6 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-
-
 
     if (!$post['type']) {
       throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
@@ -540,10 +580,10 @@ class souscription_cleodis extends souscription {
           /*ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
           $loyer = ATF::loyer()->select_row();
           if($loyer["frequence_loyer"] != "an") */
-          $passage_slimpay["mandate"] = true;
+          $passage_slimpay["findOrCreateMandate"] = true;
 
         }else{
-          $passage_slimpay = array('mandate'=> true, 'payment'=> true);
+          $passage_slimpay = array('findOrCreateMandate'=> true, 'payment'=> true);
         }
 
       break;
@@ -599,8 +639,9 @@ class souscription_cleodis extends souscription {
       "cell_phone"=>$tel,
       "files2sign"=>$f,
       "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref"),
+      "rum"=> ATF::affaire()->select($id_affaire, "RUM"),
       "bic"=> $bic,
-      "iban"=>$iban
+      "iban"=> $iban
     );
 
     if($passage_slimpay)  $return["passage_slimpay"] = $passage_slimpay;
@@ -1042,6 +1083,9 @@ class souscription_bdomplus extends souscription_cleodis {
    * @return Integer                  ID du comité créé
    */
   public function _startOrCancelAffaire($get, $post){
+    log::logger("Dans Optima", "souscription");
+
+
     if($post["order"]){
       $order = $post["order"];
       $ref = $order["id"];
@@ -1053,6 +1097,8 @@ class souscription_bdomplus extends souscription_cleodis {
       if($affaire){
         ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
         $commande = ATF::commande()->select_row();
+
+
 
         switch ($state) {
           case "closed.completed" :
@@ -1142,11 +1188,13 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
       $loyer = ATF::loyer()->select_row();
 
-      return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
+      $retour = array("id_affaire" => $affaire["affaire.id_affaire_fk"],
                    "id_magasin" => ATF::affaire()->select($affaire["affaire.id_affaire_fk"], "id_magasin"),
                    "frequence_loyer"=> $loyer["frequence_loyer"],
                    "order" => $post["order"]
               );
+
+      return $retour;
     }
     throw new errorATF("Data manquante en paramètre d'entrée", 500);
   }
@@ -1221,6 +1269,7 @@ class souscription_bdomplus extends souscription_cleodis {
       $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
       $info_mail["recipient"] = $email;
       $info_mail["html"] = true;
+      $info_mail["mail_to_client"] = "oui";
       $info_mail["template"] = "installation_domicile";
       if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Installation à domicile";
 
@@ -1228,6 +1277,32 @@ class souscription_bdomplus extends souscription_cleodis {
       $mail = new mail($info_mail);
 
       $mail->send();
+
+
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["html"] = true;
+      $info_mail["template"] = "installation_domicile";
+      $client =  ATF::societe()->select($affaire["affaire.id_societe_fk"]);
+
+      $info_mail["client"] = $client["societe"];
+      $info_mail["adresse"] = $client["adresse"];
+      if($client["adresse_2"]) $info_mail["adresse"] .= " - ".$client["adresse_2"];
+      $info_mail["adresse"] .= " - ".$client["cp"]." ".$client["ville"];
+      $info_mail["tel"] = $client["tel"];
+      $info_mail["email"] = $email;
+      $info_mail["mail_to_client"] = "non";
+
+      if(ATF::$codename == "bdomplus"){
+        $info_mail["recipient"] = "infos-bdom@bdom.fr";
+        $info_mail["objet"] = "Mail Automatique - Installation Offre ZEN à effectuer";
+      }
+
+
+      $mail2 = new mail($info_mail);
+
+      $mail2->send();
+
+
     }else{
       log::logger("Pas d'Installation inclus dans l'offre" , "souscription");
     }
