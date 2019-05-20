@@ -11,13 +11,10 @@ class boulangerpro extends classes_optima {
     $this->logFile = "batch-majPrixCatalogueProduit-".date("Ymd-His");
     // $this->logFile = "qjanon";
     try {
-      // require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
 
       ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
       $id_fournisseur = ATF::societe()->select_cell();
 
-      // $api = new ApiBoulangerProV2(__API_BOULANGER_CLIENT__,__API_BOULANGER_SECRET__,__API_BOULANGER_HOST__);
-      // echo "\n========== DEBUT DU BATCH ==========";
       log::logger("-----------------------------------------------------------------",$this->logFile);
       log::logger("==========DEBUT DU BATCH==========",$this->logFile);
 
@@ -116,9 +113,9 @@ class boulangerpro extends classes_optima {
             ->where('principal', 'oui');
           $produit_principal_ligne_de_pack = ATF::pack_produit_ligne()->select_cell();
           $countPP = count($produit_principal_ligne_de_pack);
-          log::logger("\nLe produit est principal dans ".$countPP." packs",$this->logFile);
+          log::logger("Le produit est principal dans ".$countPP." packs",$this->logFile);
           if ($countPP) {
-            log::logger("\n---- Appel boulpro API service",$this->logFile);
+            log::logger("---- Appel boulpro API service",$this->logFile);
             $r = self::APIBoulPROService($produit['ref'],$this->logFile);
             $s = $r[0]['services'][0];
 
@@ -184,6 +181,8 @@ class boulangerpro extends classes_optima {
 
       } catch (errorATF $e) {
         ATF::db()->rollback_transaction(true);
+        log::logger("ERREUR DE TRAITEMENT",$this->logFile);
+        log::logger($e->getMessage(),$this->logFile);
         throw $e;
       }
       ATF::db()->commit_transaction(true);
@@ -266,6 +265,8 @@ class boulangerpro extends classes_optima {
 
 
     } catch (errorATF $e) {
+      log::logger("ERREUR DE TRAITEMENT DU MAIL",$this->logFile);
+      log::logger($e->getMessage(),$this->logFile);
       throw $e;
     }
 
@@ -379,7 +380,6 @@ class boulangerpro extends classes_optima {
     $r = $response->getContent();
     if ($logFile) {
       log::logger("---- REPONSE LIVRAISON",$this->logFile);
-      log::logger($response,$this->logFile);
       log::logger($r,$this->logFile);
     }
     return $r;
@@ -399,7 +399,6 @@ class boulangerpro extends classes_optima {
 
     if ($logFile) {
       log::logger("---- REPONSE PRICE",$this->logFile);
-      log::logger($response,$this->logFile);
       log::logger($r,$this->logFile);
     }
 
@@ -420,15 +419,8 @@ class boulangerpro extends classes_optima {
 
     if ($logFile) {
       log::logger("---- REPONSE SERVICES",$this->logFile);
-      log::logger($response,$this->logFile);
       log::logger($r,$this->logFile);
     }
-
-    // if ($ref == "842769") {
-    //   $r[0]["services"][0] = $r[0]["services"][1];
-    //   unset($r[0]["services"][1]);
-    // }
-
     return $r;
 
   }
