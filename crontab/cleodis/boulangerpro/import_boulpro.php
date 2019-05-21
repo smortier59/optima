@@ -207,9 +207,6 @@ function import_pack(){
  */
 function import_ligne($packs, $produits){
 	
-	log::logger($produit, 'yphilippe');
-	die('shut the fuck up');
-
 	$filePackLigne = "./ligne.csv";
 	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
