@@ -78,9 +78,15 @@ function import_produit(string $path = ''){
 			ATF::produit()->q->reset()->where("ean", $ean);
 			$alreadyExistsFromEan = ATF::produit()->select_row();
 
-			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				echo 'Skipping : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
+			if ($alreadyExistsFromRef && $alreadyExistsFromEan) {
+				echo 'Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
 				continue;
+			} else if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
+				echo 'Couple Ref/Ean non identique !';
+				var_dump($ligne);
+				var_dump($alreadyExistsFromRef);
+				var_dump($alreadyExistsFromEan);								
+				echo 'Du coup on cree qd meme le produit !';
 			}
 
 			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
