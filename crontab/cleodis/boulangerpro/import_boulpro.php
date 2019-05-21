@@ -78,7 +78,7 @@ function import_produit(string $path = ''){
 			$alreadyExistsFromEan = ATF::produit()->select_row();
 
 			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				echo 'Skipping : ' . $alreadyExistsFromRef ." || ". $alreadyExistsFromEan;
+				echo 'Skipping : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
 				continue;
 			}
 			
