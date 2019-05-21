@@ -9,70 +9,104 @@ ATF::define("tracabilite",false);
 
 // Matrice de type
 $type = array(
-	"Fixe"=>"fixe",
-	"portable"=>"portable",
-	"Sans objet"=>"sans_objet",
-	"Immateriel"=>"immateriel"
+	"fixe" => "fixe",
+	"portable" => "portable",
+	"fans objet" => "sans_objet",
+	"immateriel" => "immateriel"
 );
 
 $produits = $packs = array();
-
 
 // Début de transaction SQL
 ATF::db()->begin_transaction();
 // Gestion des produits
 $produits = import_produit();
+
 // Gestion des packs
 $packs = import_pack();
+
 // Ajout des liaison entre les deux
 import_ligne($packs, $produits);
 
 // Rollback la transaction
 //ATF::db()->rollback_transaction();
 // Valide la trnasaction
-//ATF::db()->commit_transaction();
+ATF::db()->commit_transaction();
 
 /**
  * Importe des produits depuis un fichier excel
  * @return array Produits insérés
  */
-function import_produit(){
-	$fileProduit = "./produit.csv";
+
+function import_produit(string $path = ''){
+	// If path is not supplied, then get default path
+	$fileProduit = $path == '' ? "./produit.csv" : $path;
 	$fpr = fopen($fileProduit, 'rb');
 	$entete = fgetcsv($fpr);
 	$produits = array();
+	
 	try {
 
-		while ($ligne = fgetcsv($fpr)) {
+		$lines_count = 0;
+		$processed_lines = 0;
+
+		while ($ligne = fgetcsv($fpr, 0, ';')) {
+			
+			$lines_count++;
+
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+			
+			$ean = $ligne[16];
+			$ref = $ligne[1];
+			$product = $ligne[2];
+			$rawType = $ligne[8];
+			$raw_Fournisseur = $ligne[9];
+			$raw_vendor = $ligne[10];
+			$buying_price = $ligne[5];
+			$state = $ligne[3];
+			$category = get_categorie($ligne[11]);
+			$sub_category = $ligne[12];
+			$description = $ligne[4];
+			$rate = $ligne[13];
+			$term = $ligne[14];
 
-			$ean = $ligne[13];
+			// Check if a given product ref already exists in database
+			ATF::produit()->q->reset()->where("ref", $ref);
+			$alreadyExistsFromRef = ATF::produit()->select_row();
+			// Check if a given product ean already exists in database
+			ATF::produit()->q->reset()->where("ean", $ean);
+			$alreadyExistsFromEan = ATF::produit()->select_row();
 
-			if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
-			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
+				log::logger('skipping', 'yphilippe');
+				continue;
+			};
+			
+			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
+			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ref);
 
 			$p = ATF::produit()->select_row();
-
+			
 			// Référence;Désignation;Etat;Commentaire;Prix d'achat;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;TYPE
 
 			$produit = array(
-				"produit"=>$ligne[1],
-				"type"=>strtolower($type[$ligne[5]]),
-				"ref"=>$ligne[0],
-				"ean"=>$ean,
-				"id_fournisseur"=> get_fournisseur($ligne[6]),
-				"prix_achat"=>$ligne[4],
-				"etat"=>$ligne[2],
-				"id_fabriquant"=>get_fabriquant($ligne[7]),
-				//"id_categorie"=>get_categorie($ligne[8]),
-				"id_sous_categorie"=>get_sous_categorie($ligne[9], get_categorie($ligne[8])),
-				"description"=>$ligne[14],
-				"loyer"=>$ligne[10],
-				"duree"=>$ligne[11],
-				"visible_sur_site"=>"oui"
+				"site_associe" => 'boulangerpro',
+				"produit"=> $product,
+				"type"=> mb_strtolower($rawType, 'UTF-8'),
+				"ref"=> $ref,
+				"ean"=> $ean,
+				"id_fournisseur"=> get_fournisseur($raw_Fournisseur),
+				"prix_achat"=> $buying_price,
+				"etat"=> $state,
+				"id_fabriquant"=> get_fabriquant($raw_vendor),
+				"id_sous_categorie"=> get_sous_categorie($sub_category, $category),
+				"description"=> $description,
+				"loyer"=> $rate,
+				"duree"=> $term,
+				"visible_sur_site"=> "oui"
 			);
 
-			if ($produit['type']=="sans objet") $produit['type']="sans_objet";
+			if ($produit['type']== "sans objet") $produit['type']= "sans_objet";
 
 			// Image spécifique
 			$folder_cleodis = "/home/data/cleodis/";
@@ -95,9 +129,15 @@ function import_produit(){
 				echo "Produit mis à jour (ref : ".$ligne[0].") \n";
 			}else{
 				$produits[$ligne[0]] = ATF::produit()->i($produit);
-				echo "Produit inseré (ref : ".$ligne[0].", type: ".$produit['type'].") \n";
+				echo "Produit inseré (name : ".$product.", type: ".$produit['type'].") \n";
 			}
 
+			$processed_lines++;
+
+			log::logger(array(
+				"count" => $lines_count,
+				"processed" => $processed_lines,
+			), "boulangerpro_migration");
 
 		}
 
@@ -122,20 +162,24 @@ function import_pack(){
 
 	try {
 
-		while ($ligne = fgetcsv($fpr)) {
+		while ($ligne = fgetcsv($fpr, 0 ,';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
+			
+			$nom = $ligne[5];
+			$etat = $ligne[2];
+			$associated_site = $ligne[3];
+			$publicly_visible = $ligne[4];
+			$description = $ligne[1];
 
-
-			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($ligne[2]));
+			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($nom));
 			$p = ATF::pack_produit()->select_row();
-
-
+			
 			$pack = array(
-				"nom"=>$ligne[2],
-				"etat"=>strtolower($ligne[3]),
-				"site_associe"=>$ligne[4],
-				"visible_sur_site"=>strtolower($ligne[5]),
-				"description"=>$ligne[6]
+				"nom"=>$nom,
+				"etat"=>strtolower($etat),
+				"site_associe"=>$associated_site,
+				"visible_sur_site"=>strtolower($publicly_visible),
+				"description"=>$description,
 			);
 
 			if($p){
@@ -162,25 +206,43 @@ function import_pack(){
  * @return array Packs insérés
  */
 function import_ligne($packs, $produits){
+	
+	log::logger($produit, 'yphilippe');
+	die('shut the fuck up');
+
 	$filePackLigne = "./ligne.csv";
 	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
 	$entete = fgetcsv($fppa);
 	try {
-		while ($ligne = fgetcsv($fppa)) {
+		while ($ligne = fgetcsv($fppa, 0, ';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			$id_pack_produit = $packs[$ligne[0]]["id_pack_produit"];
+			$id = $ligne[1];
+			$reference = $ligne[2];
+			$main_product = $ligne[3];
+			$quantity = $ligne[4];
+			$min = $ligne[5];
+			$max = $ligne[6];
+			$are_options_included = $ligne[7];
+			$are_options_included_mandatory = $ligne[8];
+			$publicly_visible = $ligne[9];
+			$order = $ligne[10];
+			$product_line_visible = $ligne[11];
+			$visible_on_pdf_file = $ligne[12];
+			$buying_price = $ligne[13];
+
+			$id_pack_produit = $packs[$id]["id_pack_produit"];
 			$id_produit = $produits[$ligne[1]];
 
 			ATF::produit()->q->reset()
 				->select('id_produit')
 				->select('id_fournisseur')
-				->where("ref", ATF::db()->real_escape_string($ligne[1]));
+				->where("ref", ATF::db()->real_escape_string($reference));
 			$produit = ATF::produit()->select_row();
 
 			if (!$id_produit) {
-				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
+				echo "Produit non trouve ! " . $id." => Pack n°".$ligne[0]." abandonné\n";
 				$id_produit = $produit["id_produit"];
 				//continue;
 			}
@@ -194,19 +256,19 @@ function import_ligne($packs, $produits){
 				"id_pack_produit"=>$id_pack_produit,
 				"id_produit"=>$id_produit,
 				"produit"=>ATF::produit()->select($id_produit , "produit"),
-				"quantite"=>$ligne[2],
-				"min"=>$ligne[3],
-				"max"=>$ligne[4],
-				"option_incluse"=>$ligne[5],
-				"option_incluse_obligatoire"=>$ligne[6],
-				"ref"=>$ligne[1],
-				"prix_achat"=> $ligne[10],
+				"quantite"=>$quantity,
+				"min"=>$min,
+				"max"=>$max,
+				"option_incluse"=>$are_options_included,
+				"option_incluse_obligatoire"=>$are_options_included_mandatory,
+				"ref"=>$ref,
+				"prix_achat"=> $buying_price,
 				"id_fournisseur"=> $produit["id_fournisseur"],
-				"visible"=> $ligne[9],
-				"visible_sur_pdf"=> $ligne[11],
-				"ordre" => $ligne[8]
+				"visible"=> $publicly_visible,
+				"visible_sur_pdf"=> $visible_on_pdf_file,
+				"ordre" => $order
 			);
-
+			
 			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
 			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
 
