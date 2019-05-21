@@ -7,6 +7,6 @@ ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_fournisseur`) REFERENCES `
 ALTER TABLE `produit` DROP FOREIGN KEY `produit_ibfk_41`; ALTER TABLE `produit` ADD CONSTRAINT `produit_ibfk_41` FOREIGN KEY (`livreur`) REFERENCES `fabriquant`(`id_fabriquant`) ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE `produit` ADD `ref_garantie` VARCHAR(15) NULL DEFAULT NULL AFTER `frais_livraison`;
 ALTER TABLE `pack_produit_ligne` ADD FOREIGN KEY (`id_produit`) REFERENCES `produit`(`id_produit`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
+ALTER TABLE `pack_produit` CHANGE nom VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
 
 ALTER TABLE `produit` ADD `url_image` VARCHAR(500) NULL AFTER `id_document_contrat`;
