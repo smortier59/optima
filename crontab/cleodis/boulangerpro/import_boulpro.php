@@ -78,9 +78,9 @@ function import_produit(string $path = ''){
 			$alreadyExistsFromEan = ATF::produit()->select_row();
 
 			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				log::logger('skipping', 'yphilippe');
+				echo 'Skipping : ' . $alreadyExistsFromRef ." || ". $alreadyExistsFromEan;
 				continue;
-			};
+			}
 			
 			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
 			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ref);
