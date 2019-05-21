@@ -1,3 +1,4 @@
+
 <?php
 define("__BYPASS__",true);
 // Définition du codename
@@ -44,18 +45,18 @@ function import_produit(string $path = ''){
 	$fpr = fopen($fileProduit, 'rb');
 	$entete = fgetcsv($fpr);
 	$produits = array();
-	
+
 	try {
 
 		$lines_count = 0;
 		$processed_lines = 0;
 
 		while ($ligne = fgetcsv($fpr, 0, ';')) {
-			
+
 			$lines_count++;
 
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-			
+
 			$ean = $ligne[16];
 			$ref = $ligne[1];
 			$product = $ligne[2];
@@ -81,12 +82,12 @@ function import_produit(string $path = ''){
 				echo 'Skipping : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
 				continue;
 			}
-			
+
 			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
 			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ref);
 
 			$p = ATF::produit()->select_row();
-			
+
 			// Référence;Désignation;Etat;Commentaire;Prix d'achat;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;TYPE
 
 			$produit = array(
@@ -111,25 +112,25 @@ function import_produit(string $path = ''){
 			// Image spécifique
 			$folder_cleodis = "/home/data/cleodis/";
 			if ($ligne[15] == "Livraison") {
-		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$ligne[0].".jpg")){
-		            echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
-		        }
+			if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$ligne[0].".jpg")){
+			    echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
+			}
 			}
 
 			if ($ligne[15] == "Garantie") {
-		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$ligne[0].".jpg")){
-		            echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
-		        }
+			if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$ligne[0].".jpg")){
+			    echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
+			}
 			}
 
 			if($p){
 				$produit["id_produit"] = $p["id_produit"];
 				ATF::produit()->u($produit);
 				$produits[$ligne[0]] = $p["id_produit"];
-				echo "Produit mis à jour (ref : ".$ligne[0].") \n";
+				echo "Produit mis a jour (ref : ".$ligne[0].") \n";
 			}else{
 				$produits[$ligne[0]] = ATF::produit()->i($produit);
-				echo "Produit inseré (name : ".$product.", type: ".$produit['type'].") \n";
+				echo "Produit insert (name : ".$product.", type: ".$produit['type'].", ref:".$ref.") \n";
 			}
 
 			$processed_lines++;
@@ -164,7 +165,7 @@ function import_pack(){
 
 		while ($ligne = fgetcsv($fpr, 0 ,';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-			
+
 			$nom = $ligne[5];
 			$etat = $ligne[2];
 			$associated_site = $ligne[3];
@@ -173,7 +174,7 @@ function import_pack(){
 
 			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($nom));
 			$p = ATF::pack_produit()->select_row();
-			
+
 			$pack = array(
 				"nom"=>$nom,
 				"etat"=>strtolower($etat),
@@ -206,7 +207,7 @@ function import_pack(){
  * @return array Packs insérés
  */
 function import_ligne($packs, $produits){
-	
+
 	$filePackLigne = "./ligne.csv";
 	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
@@ -238,6 +239,12 @@ function import_ligne($packs, $produits){
 				->where("ref", ATF::db()->real_escape_string($reference));
 			$produit = ATF::produit()->select_row();
 
+			if (!$produit) {
+				var_dump($ligne);
+				var_dump($produit);
+				throw new errorATF("Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n");
+			}
+
 			if (!$id_produit) {
 				echo "Produit non trouve ! " . $id." => Pack n°".$ligne[0]." abandonné\n";
 				$id_produit = $produit["id_produit"];
@@ -265,7 +272,7 @@ function import_ligne($packs, $produits){
 				"visible_sur_pdf"=> $visible_on_pdf_file,
 				"ordre" => $order
 			);
-			
+
 			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
 			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
 
@@ -356,4 +363,3 @@ function get_sous_categorie($sous_categorie, $categorie){
 		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
 }
-
