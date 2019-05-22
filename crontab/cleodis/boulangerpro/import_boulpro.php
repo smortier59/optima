@@ -216,6 +216,7 @@ function import_ligne($packs, $produits){
 		while ($ligne = fgetcsv($fppa, 0, ';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
+			$principal = $ligne[0]=="PRODUIT PRINCIPAL" ? "oui" : "non";
 			$id = $ligne[1];
 			$reference = $ligne[2];
 			$main_product = $ligne[3];
@@ -248,8 +249,8 @@ function import_ligne($packs, $produits){
 			}
 
 			if (!$id_produit) {
-				echo "Produit non trouve ! " . $id." => Pack n°".$ligne[0]." abandonné\n";
 				$id_produit = $produit["id_produit"];
+				echo "Produit non trouve ! " . $id." => Pack n°".$ligne[0].", du coup on prend le id_produit=".$id_produit."\n";
 				//continue;
 			}
 
@@ -259,6 +260,7 @@ function import_ligne($packs, $produits){
 
 			// N° Pack;Réf Produit;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Visible;Px achat
 			$pack_produit_ligne = array(
+				"principal"=>$principal,
 				"id_pack_produit"=>$id_pack_produit,
 				"id_produit"=>$id_produit,
 				"produit"=>ATF::produit()->select($id_produit , "produit"),
