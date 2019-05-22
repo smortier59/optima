@@ -139,6 +139,8 @@ class souscription_cleodis extends souscription {
           "id_magasin"=>$post["id_magasin"]
         );
 
+        if($post["facture"]) ATF::facture_magasin()->i(array("id_affaire"=> $id_affaire, "ref_facture"=> $post["facture"]));
+
         // On stock le JSON du pack complet au cas où.
         if ($post['id_pack_produit']) {
           foreach ($post['id_pack_produit'] as $id_pack_produit) {
@@ -418,6 +420,48 @@ class souscription_cleodis extends souscription {
   }
 
   /**
+   * Retourne les differentes étapes SLIMPAY
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  array $infos Simple dimension des champs à insérer
+   * @return [type]       [description]
+
+  public function _getSlimpaySteps($post, $get){
+    log::logger("=============================","souscription");
+    log::logger($post,"souscription");
+    log::logger($get,"souscription");
+
+    $id_affaire = $post["id"];
+
+    log::logger("ID Affaire --> " , "souscription");
+    log::logger($id_affaire , "souscription");
+    $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
+    log::logger("ID Societe : " , "souscription");
+    log::logger($id_societe , "souscription");
+
+    if (!$id_societe) {
+      throw new Exception('Aucune information pour cet identifiant.', 500);
+    }
+
+    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],"souscription");
+    switch ($post['site_associe']) {
+      case 'bdomplus':
+        if(ATF::affaire()->select($id_affaire, "id_magasin")){
+          $passage_slimpay = array();
+
+          ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
+          $loyer = ATF::loyer()->select_row();
+          if($loyer["frequence_loyer"] != "an")
+          $passage_slimpay["findOrCreateMandate"] = true;
+
+        }else{
+          $passage_slimpay = array('findOrCreateMandate'=> true, 'createOrder'=> true);
+        }
+      break;
+    }
+    return array("passage_slimpay" => $passage_slimpay);
+  }*/
+
+  /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
@@ -431,8 +475,6 @@ class souscription_cleodis extends souscription {
     $iban = $post["iban"];
     $id_affaire = $post["id"];
 
-
-
     log::logger("ID Affaire --> " , "souscription");
     log::logger($id_affaire , "souscription");
     $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
@@ -442,8 +484,6 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-
-
 
     if (!$post['type']) {
       throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
@@ -530,21 +570,22 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'bdomplus':
-        $contrat = ATF::pdf()->generic('contratA4',$contrat["commande.id_commande"],true);
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
 
         $f =  array(
-          "contrat.pdf" => base64_encode($contrat)
+          "mandatSellAndSign.pdf" => base64_encode($pdf_mandat)
         );
 
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
-          $passage_slimpay = array('documents'=> true);
+          $passage_slimpay = array();
 
-          ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
+          /*ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
           $loyer = ATF::loyer()->select_row();
-          if($loyer["frequence_loyer"] != "an") $passage_slimpay["mandate"] = true;
+          if($loyer["frequence_loyer"] != "an") */
+          $passage_slimpay["findOrCreateMandate"] = true;
 
         }else{
-          $passage_slimpay = array('mandate'=> true, 'payment'=> true, 'documents'=> true);
+          $passage_slimpay = array('findOrCreateMandate'=> true, 'payment'=> true);
         }
 
       break;
@@ -599,7 +640,10 @@ class souscription_cleodis extends souscription {
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
       "files2sign"=>$f,
-      "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref")
+      "ref_affaire"=> ATF::affaire()->select($id_affaire, "ref"),
+      "rum"=> ATF::affaire()->select($id_affaire, "RUM"),
+      "bic"=> $bic,
+      "iban"=> $iban
     );
 
     if($passage_slimpay)  $return["passage_slimpay"] = $passage_slimpay;
@@ -1030,6 +1074,7 @@ class souscription_cleodis extends souscription {
 }
 class souscription_bdomplus extends souscription_cleodis {
 
+  public $id_user = 116;
   /**
    * Démarrage du contrat ou annulation de l'affaire selon le retour order SLIMPAY
    * @param  Integer $id_affaire      ID de l'affaire
@@ -1041,110 +1086,45 @@ class souscription_bdomplus extends souscription_cleodis {
    * @return Integer                  ID du comité créé
    */
   public function _startOrCancelAffaire($get, $post){
-    if($post["order"]){
+    if($post["order"]["id"]){
       $order = $post["order"];
       $ref = $order["id"];
       $state = $order["state"];
-      ATF::affaire()->q->reset()->addAllFields("affaire")->where("affaire.ref_sign", $ref);
+      ATF::affaire()->q->reset()
+        ->addAllFields("affaire")
+        ->where("affaire.ref_sign", $ref);
       $affaire = ATF::affaire()->select_row();
+      return $this->controle_affaire($affaire, $post["order"]);
+
+    }elseif($post["order"]["affaires"]){
+      ATF::affaire()->q->reset()
+        ->addAllFields("affaire")
+        ->where("affaire.id_affaire", $post["order"]["affaires"][0]);
+      $affaires = ATF::affaire()->select_all();
+
+      foreach ($affaires as $key => $affaire) {
+        $return["order"] =  $this->controle_affaire($affaire);
+      }
+      return $return;
+    }else{
+      throw new errorATF("Data manquante en paramètre d'entrée", 500);
+    }
+
+  }
+
+  public function controle_affaire($affaire, $order=null){
+    if($affaire){
+      ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
+      $commande = ATF::commande()->select_row();
+
+      ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
+      $loyer = ATF::loyer()->select_row();
 
 
-      if($affaire){
-        ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
-        $commande = ATF::commande()->select_row();
-
-        switch ($state) {
+      if(!$affaire["affaire.id_magasin"] && ($order && $order["state"])){
+        switch ($order["state"]) {
           case "closed.completed" :
-            if($affaire["commande.etat"] == "non_loyer"){
-              ATF::db($this->db)->begin_transaction();
-
-              try{
-                #On démarre le contrat avec envoi les licences
-                if($commande && $commande["commande.etat"] == "non_loyer"){
-                  $infos = array(
-                    "id_commande" => $commande["commande.id_commande_fk"],
-                    "value" => date("Y-m-01"),
-                    "key" => "date_debut"
-                  );
-
-                  ATF::commande()->updateDate($infos);
-                  //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
-                  ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
-                                            ->addOrder("facture.id_facture", "ASC");
-                  $facture = ATF::facture()->select_row();
-
-                  if($facture){
-                    ATF::facture()->u(array("id_facture" => $facture["facture.id_facture"],
-                                             "mode_paiement"=> "cb",
-                                             "etat"=>"payee",
-                                             "date_paiement"=>date("Y-m-d")));
-                  }
-
-                  //On envoi les licences
-                  ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
-                                                   ->from("commande_ligne", "id_produit", "produit", "id_produit")
-                                                   ->whereIsNotNull("produit.id_licence_type");
-                  $lignes = ATF::commande_ligne()->select_all();
-
-                  $licence_a_envoyer = array();
-
-                  foreach ($lignes as $key => $value) {
-                      ATF::licence()->q->reset()->where("id_licence_type", $value["id_licence_type"],"AND")
-                                                ->whereIsNull("licence.id_commande_ligne","AND")
-                                                ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
-                      $licence = ATF::licence()->sa();
-
-                      if(count($licence)){
-                        foreach ($licence as $kl => $vl) {
-                          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
-                          $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
-                          $licence_a_envoyer[$value["id_produit"]][] = $vl;
-                        }
-                      }else{
-                        ATF::db($this->db)->rollback_transaction();
-                        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
-                      }
-                  }
-
-
-                  //On crée tout les bons de commande de l'affaire
-                  ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
-                  ATF::bon_de_commande()->createAllBDC(array("id_commande"=> $commande["commande.id_commande_fk"]));
-
-
-
-                  if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
-                    $email = $email_pro;
-                  }else{
-                    $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
-                  }
-
-                  ATF::db($this->db)->commit_transaction();
-
-                  $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
-                  $info_mail["recipient"] = $email;
-                  $info_mail["html"] = true;
-                  $info_mail["template"] = "envoi_licence";
-                  if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
-
-                  $info_mail["licences"] = $licence_a_envoyer;
-                  $info_mail["client"] = ATF::societe()->select($affaire["affaire.id_societe_fk"]);
-
-
-
-                  $mail = new mail($info_mail);
-
-                  $mail->send();
-
-                }
-
-              }catch(errorATF $e){
-                ATF::db($this->db)->rollback_transaction();
-                log::logger($e->getmessage(
-                ) , "mfleurquin");
-                throw $e;
-              }
-            }
+            $this->demarrageContrat($affaire,$commande);
           break;
 
           case "closed" :
@@ -1157,42 +1137,261 @@ class souscription_bdomplus extends souscription_cleodis {
           case "open.not_running.suspended.awaiting_input" :
           case "open.not_running.suspended.awaiting_validation" :
           case "open.not_running.not_started" :
-            if($affaire["affaire.etat"] !== "perdue"){
-              ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
-              $devis = ATF::devis()->select_row();
-
-              //On passe le devis en attente pour pouvoir annuler l'affaire
-              ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
-
-              //On supprime le contrat également
-              if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
-
-
-              $infos = array(
-                "id_devis" => $devis["id_devis"],
-                "raison_refus"=> json_encode( $order )
-              );
-              ATF::devis()->perdu($infos);
-            }
+            $this->annuleContrat($affaire,$commande, json_encode( $order ));
           break;
         }
-
-
-      }else{
-        throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref, 500);
       }
 
-      ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
-      $loyer = ATF::loyer()->select_row();
-      log::logger($loyer , "mfleurquin");
+      if($affaire["affaire.id_magasin"]){
+        if($loyer["frequence_loyer"] == "mois"){
+          $this->demarrageContrat($affaire,$commande);
 
-      return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
-                   "id_magasin" => ATF::affaire()->select($affaire["affaire.id_affaire_fk"], "id_magasin"),
-                   "frequence_loyer"=> $loyer["frequence_loyer"],
-                   "order" => $post["order"]
+          // Si on est à J+1 et la facture pas payée on envoi un mail au client pour 1er loyer en prelevement + tache à Benjamin pour prelever
+          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) == date("Y-m-d")){
+
+            ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
+            $facture_magasin = ATF::facture_magasin()->select_row();
+            if($facture_magasin["etat"] == "non_recu"){
+
+              $this->envoiMailFactureMagNonPayee($affaire["affaire.id_societe_fk"]);
+
+              $tache = array("tache"=>array(
+                      "id_societe"=>$affaire["affaire.id_societe_fk"],
+                       "id_user"=>$infos["id_user"],
+                       "origine"=>"societe_commande",
+                       "tache"=>"la facture magasin n'a pas été recu, il faut prélever le client",
+                       "id_affaire"=>$affaire["affaire.id_affaire_fk"],
+                       "type_tache"=>"creation_contrat",
+                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+                       "no_redirect"=>"true"
+                      ),
+                "dest"=>array()
               );
+              ATF::tache()->insert($tache);
+            }
+          }
+
+        }else{
+
+          // Si on est à J+1
+          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) == date("Y-m-d")){
+
+            ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
+            $facture_magasin = ATF::facture_magasin()->select_row();
+
+            //Si on a la facture de payée (retourné par Boulanger)
+            if($facture_magasin["etat"] == "non_recu"){
+              $this->annuleContrat($affaire,$commande, "Facture magasin ".$facture_magasin["ref_facture"]." non reçu");
+            }else{
+              $this->demarrageContrat($affaire,$commande);
+
+              ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
+                                      ->addOrder("facture.id_facture", "ASC");
+              $facture = ATF::facture()->select_row();
+              if($facture)  ATF::facture()->u(array("id_facture" => $facture["facture.id_facture"], "ref_magasin"=> $facture_magasin["ref_facture"]));
+            }
+          }
+        }
+      }
+    }else{
+      throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref, 500);
     }
-    throw new errorATF("Data manquante en paramètre d'entrée", 500);
+
+    return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
+                 "id_magasin" => $affaire["affaire.id_magasin"],
+                 "frequence_loyer"=> $loyer["frequence_loyer"],
+                 "order" => $order
+            );
+  }
+
+  public function demarrageContrat($affaire,$commande){
+     if($affaire["commande.etat"] == "non_loyer"){
+        ATF::db($this->db)->begin_transaction();
+
+        try{
+          #On démarre le contrat avec envoi les licences
+          if($commande && $commande["commande.etat"] == "non_loyer"){
+            $infos = array(
+              "id_commande" => $commande["commande.id_commande_fk"],
+              "value" => date("Y-m-01"),
+              "key" => "date_debut"
+            );
+
+            ATF::commande()->updateDate($infos);
+            //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
+            ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
+                                      ->addOrder("facture.id_facture", "ASC");
+            $facture = ATF::facture()->select_row();
+
+            if($facture){
+              $f = array("id_facture" => $facture["facture.id_facture"],
+                                       "mode_paiement"=> "cb",
+                                       "etat"=>"payee",
+                                       "date_paiement"=>date("Y-m-d"));
+              if($affaire["affaire.id_magasin"]){
+                $f["mode_paiement"] = "pre-paiement";
+                $f["etat"] = "impayee";
+              }
+              ATF::facture()->u($f);
+            }
+
+            $licence_a_envoyer = $this->envoi_licence($commande["commande.id_commande_fk"]);
+
+
+            //On crée tout les bons de commande de l'affaire
+            ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
+            ATF::bon_de_commande()->createAllBDC(array("id_commande"=> $commande["commande.id_commande_fk"]));
+
+            ATF::db($this->db)->commit_transaction();
+
+            $this->envoiMailLicence($affaire["affaire.id_societe_fk"], $licence_a_envoyer);
+
+            //Installation à domicile
+            $this->envoiMailInstallationZen($affaire, $commande);
+
+          }
+
+        }catch(errorATF $e){
+          ATF::db($this->db)->rollback_transaction();
+          throw $e;
+        }
+      }
+  }
+
+  public function annuleContrat($affaire,$commande, $raison){
+    if($affaire["affaire.etat"] !== "perdue"){
+      ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
+      $devis = ATF::devis()->select_row();
+
+      //On passe le devis en attente pour pouvoir annuler l'affaire
+      ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
+
+      //On supprime le contrat également
+      if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
+
+
+      $infos = array(
+        "id_devis" => $devis["id_devis"],
+        "raison_refus"=> $raison
+      );
+      ATF::devis()->perdu($infos);
+    }
+  }
+
+  public function envoi_licence($id_commande){
+    //On envoi les licences
+    ATF::commande_ligne()->q->reset()->where("id_commande", $id_commande)
+                                     ->from("commande_ligne", "id_produit", "produit", "id_produit")
+                                     ->whereIsNotNull("produit.id_licence_type");
+    $lignes = ATF::commande_ligne()->select_all();
+
+    $licence_a_envoyer = array();
+
+    foreach ($lignes as $key => $value) {
+      ATF::licence()->q->reset()->where("id_licence_type", $value["id_licence_type"],"AND")
+                                ->whereIsNull("licence.id_commande_ligne","AND")
+                                ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
+      $licence = ATF::licence()->sa();
+
+      if(count($licence)){
+        foreach ($licence as $kl => $vl) {
+          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
+          $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
+          $licence_a_envoyer[$value["id_produit"]][] = $vl;
+        }
+        return $licence_a_envoyer;
+      }else{
+        throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
+      }
+    }
+  }
+
+
+  public function envoiMailFactureMagNonPayee($id_societe){
+
+  }
+
+  public function envoiMailLicence($id_societe, $licence_a_envoyer){
+    if($email_pro = ATF::societe()->select($id_societe, "email")){
+      $email = $email_pro;
+    }else{
+      $email = ATF::societe()->select($id_societe, "  particulier_email");
+    }
+
+    $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+    $info_mail["recipient"] = $email;
+    $info_mail["html"] = true;
+    $info_mail["template"] = "envoi_licence";
+    if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
+
+    $info_mail["licences"] = $licence_a_envoyer;
+    $info_mail["client"] = ATF::societe()->select($id_societe);
+
+    $mail = new mail($info_mail);
+
+    $mail->send();
+  }
+
+  public function envoiMailInstallationZen($affaire, $commande){
+
+    ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
+                                     ->from("commande_ligne", "id_produit", "produit", "id_produit")
+                                     ->where("produit.produit", "Installation à domicile");
+    $lignes = ATF::commande_ligne()->select_all();
+
+
+
+    if($lignes){
+      log::logger("Produit Installation inclus, on envoi le mail" , "souscription");
+      if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
+        $email = $email_pro;
+      }else{
+        $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
+      }
+
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["recipient"] = $email;
+      $info_mail["html"] = true;
+      $info_mail["mail_to_client"] = "oui";
+      $info_mail["template"] = "installation_domicile";
+      if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Installation à domicile";
+
+
+      $mail = new mail($info_mail);
+
+      $mail->send();
+
+
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["html"] = true;
+      $info_mail["template"] = "installation_domicile";
+      $client =  ATF::societe()->select($affaire["affaire.id_societe_fk"]);
+
+      $info_mail["client"] = $client["societe"];
+      $info_mail["adresse"] = $client["adresse"];
+      if($client["adresse_2"]) $info_mail["adresse"] .= " - ".$client["adresse_2"];
+      $info_mail["adresse"] .= " - ".$client["cp"]." ".$client["ville"];
+      $info_mail["tel"] = $client["tel"];
+      $info_mail["email"] = $email;
+      $info_mail["mail_to_client"] = "non";
+
+      if(ATF::$codename == "bdomplus"){
+        $info_mail["recipient"] = "infos-bdom@bdom.fr";
+        $info_mail["objet"] = "Mail Automatique - Installation Offre ZEN à effectuer";
+      }
+
+
+      $mail2 = new mail($info_mail);
+
+      $mail2->send();
+
+
+    }else{
+      log::logger("Pas d'Installation inclus dans l'offre" , "souscription");
+    }
+
+
+
   }
 
 };
