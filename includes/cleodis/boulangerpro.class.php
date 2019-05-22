@@ -36,6 +36,12 @@ class boulangerpro extends classes_optima {
         ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE"); 
         ATF::produit()->q->where('ref',1047180, "OR", "ref_produit", "LIKE"); 
 
+        // Produits demandés par Vincent /Benjamin, mail du mardi 21/05/19 à 15h50
+        ATF::produit()->q->where('ref',280814, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',146031, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',151577, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1022585, "OR", "ref_produit", "LIKE"); 
+
         $catalogueBoulProActif = ATF::produit()->sa();
 
         // echo "\n".count($catalogueBoulProActif). " produits à traiter";
