@@ -1087,7 +1087,6 @@ class souscription_bdomplus extends souscription_cleodis {
    */
   public function _startOrCancelAffaire($get, $post){
     if($post["order"]["id"]){
-      log::logger("1", "mfleurquin");
       $order = $post["order"];
       $ref = $order["id"];
       $state = $order["state"];
@@ -1095,7 +1094,8 @@ class souscription_bdomplus extends souscription_cleodis {
         ->addAllFields("affaire")
         ->where("affaire.ref_sign", $ref);
       $affaire = ATF::affaire()->select_row();
-      return $this->controle_affaire($affaire);
+      return $this->controle_affaire($affaire, $post["order"]);
+
     }elseif($post["order"]["affaires"]){
       ATF::affaire()->q->reset()
         ->addAllFields("affaire")
@@ -1112,7 +1112,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
   }
 
-  public function controle_affaire($affaire){
+  public function controle_affaire($affaire, $order=null){
     if($affaire){
       ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
       $commande = ATF::commande()->select_row();
@@ -1120,8 +1120,9 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
       $loyer = ATF::loyer()->select_row();
 
-      if(!$affaire["affaire.id_magasin"] && $state){
-        switch ($state) {
+
+      if(!$affaire["affaire.id_magasin"] && ($order && $order["state"])){
+        switch ($order["state"]) {
           case "closed.completed" :
             $this->demarrageContrat($affaire,$commande);
           break;
@@ -1199,7 +1200,7 @@ class souscription_bdomplus extends souscription_cleodis {
     return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
                  "id_magasin" => $affaire["affaire.id_magasin"],
                  "frequence_loyer"=> $loyer["frequence_loyer"],
-                 "order" => $post["order"]
+                 "order" => $order
             );
   }
 
