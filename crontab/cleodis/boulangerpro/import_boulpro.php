@@ -78,15 +78,9 @@ function import_produit(string $path = ''){
 			ATF::produit()->q->reset()->where("ean", $ean);
 			$alreadyExistsFromEan = ATF::produit()->select_row();
 
-			if ($alreadyExistsFromRef && $alreadyExistsFromEan) {
+			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
 				echo 'Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
 				continue;
-			} else if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				echo 'Couple Ref/Ean non identique !';
-				var_dump($ligne);
-				var_dump($alreadyExistsFromRef);
-				var_dump($alreadyExistsFromEan);								
-				echo 'Du coup on cree qd meme le produit !';
 			}
 
 			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
@@ -248,7 +242,9 @@ function import_ligne($packs, $produits){
 			if (!$produit) {
 				var_dump($ligne);
 				var_dump($produit);
-				throw new errorATF("Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n");
+				echo "Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n";
+				continue;
+				//throw new errorATF("Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n");
 			}
 
 			if (!$id_produit) {
