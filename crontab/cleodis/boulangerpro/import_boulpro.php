@@ -57,7 +57,6 @@ function import_produit(string $path = ''){
 
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			$ean = $ligne[16];
 			$ref = $ligne[1];
 			$product = $ligne[2];
 			$rawType = $ligne[8];
@@ -70,6 +69,8 @@ function import_produit(string $path = ''){
 			$description = $ligne[4];
 			$rate = $ligne[13];
 			$term = $ligne[14];
+			$ean = $ligne[16];
+			$url_image = $ligne[19];
 
 			// Check if a given product ref already exists in database
 			ATF::produit()->q->reset()->where("ref", $ref);
@@ -104,6 +105,7 @@ function import_produit(string $path = ''){
 				"description"=> $description,
 				"loyer"=> $rate,
 				"duree"=> $term,
+				"url_image"=> $url_image,
 				"visible_sur_site"=> "oui"
 			);
 
