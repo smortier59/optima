@@ -143,24 +143,38 @@ class boulangerpro extends classes_optima {
               $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit'], 'actif');
               foreach (explode(",", $r) as $id_pack) {
                 if (!$id_pack) continue;
-                ATF::pack_produit_ligne()->q->reset()
-                  ->from('pack_produit_ligne','id_produit','produit','id_produit')
-                  ->where('pack_produit_ligne.id_pack_produit', $id_pack)
-                  ->where('produit.ref',$ref_garantie)
-                  ->setLimit(1);
-                $r = ATF::pack_produit_ligne()->select_row();
 
-                if ($r) {
-                  log::logger("Garantie trouvée ! Rien ne se passe",$this->logFile);
+                if (!$ref_garantie) {
+                    // On désactive le pack associé
+                    log::logger("Pack associé n°".$id_pack." désactivé cause Aucune Garantie chez Boul PRO",$this->logFile);
+                    ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
+                    $packDesactive[] = array(
+                      'id' => $id_pack,
+                      'raison' => "Désactivation cause Garantie"
+                    );
                 } else {
-                  // On désactive le pack associé
-                  log::logger("Pack associé n°".$id_pack." désactivé cause Garantie non trouvée",$this->logFile);
-                  ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
-                  $packDesactive[] = array(
-                    'id' => $id_pack,
-                    'raison' => "Désactivation cause Garantie"
-                  );
+                  ATF::pack_produit_ligne()->q->reset()
+                    ->from('pack_produit_ligne','id_produit','produit','id_produit')
+                    ->where('pack_produit_ligne.id_pack_produit', $id_pack)
+                    ->where('produit.ref',$ref_garantie)
+                    ->setLimit(1);
+                  $r = ATF::pack_produit_ligne()->select_row();
+
+                  if ($r) {
+                    log::logger("Garantie trouvée ! Rien ne se passe",$this->logFile);
+                  } else {
+                    // On désactive le pack associé
+                    log::logger("Pack associé n°".$id_pack." désactivé cause Garantie non trouvée",$this->logFile);
+                    ATF::pack_produit()->u(array("id_pack_produit"=>$id_pack,"etat"=>"inactif"));
+                    $packDesactive[] = array(
+                      'id' => $id_pack,
+                      'raison' => "Désactivation cause Garantie"
+                    );
+                  }
+
                 }
+
+
               }
 
             }
