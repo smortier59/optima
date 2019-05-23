@@ -77,6 +77,8 @@ function import_produit(string $path = ''){
 			$url_image = $ligne[19];
 			$eco_tax = $ligne[6];
 			$eco_mob = $ligne[7];
+			$document_contrat = $ligne[18];
+
 
 			// Check if a given product ref already exists in database
 			ATF::produit()->q->reset()->where("ref", $ref);
@@ -121,6 +123,15 @@ function import_produit(string $path = ''){
 				$produit['description'] = NULL;
 			}
 
+			if ($document_contrat) {
+				ATF::document_contrat()->q->reset()->where("document_contrat", $document_contrat, false, "LIKE");
+				if ($r = ATF::document_contrat()->select_row()) {
+					$produit['id_document_contrat'] = $r['id_document_contrat'];
+				} else {
+					echo "Produit - document contrat (ref : ".$ref.") NON TROUVE : ".$document_contrat." \n";
+				}
+			}
+
 			if($p){
 				$produit["id_produit"] = $p["id_produit"];
 				ATF::produit()->u($produit);
@@ -134,9 +145,9 @@ function import_produit(string $path = ''){
 
 			// Image spécifique
 			if (strtolower($ligne[0]) == "livraison") {
-				util::copy(__DIR__."/Livraison01.png", ATF::produit()->filepath($produit["id_produit"],"photo");
+				util::copy(__DIR__."/Livraison01.png", ATF::produit()->filepath($produit["id_produit"],"photo"));
 			} else if (strtolower($ligne[0]) == "garantie") {
-				util::copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo");
+				util::copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo"));
 			}
 			$processed_lines++;
 
