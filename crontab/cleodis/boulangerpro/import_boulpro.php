@@ -57,6 +57,9 @@ function import_produit(string $path = ''){
 
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
+			// TYPE;Référence;Désignation;Etat;Commentaire;Prix d'achat dont ecotaxe;EcoTaxe;Eco Mobilier;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;id_document_contrat :;url image
+
+
 			$ref = $ligne[1];
 			$product = $ligne[2];
 			$rawType = $ligne[8];
@@ -71,6 +74,8 @@ function import_produit(string $path = ''){
 			$term = $ligne[14];
 			$ean = $ligne[16];
 			$url_image = $ligne[19];
+			$eco_tax = $ligne[6];
+			$eco_mob = $ligne[7];
 
 			// Check if a given product ref already exists in database
 			ATF::produit()->q->reset()->where("ref", $ref);
@@ -89,8 +94,6 @@ function import_produit(string $path = ''){
 
 			$p = ATF::produit()->select_row();
 
-			// Référence;Désignation;Etat;Commentaire;Prix d'achat;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;TYPE
-
 			$produit = array(
 				"site_associe" => 'boulangerpro',
 				"produit"=> $product,
@@ -99,6 +102,8 @@ function import_produit(string $path = ''){
 				"ean"=> $ean,
 				"id_fournisseur"=> get_fournisseur($raw_Fournisseur),
 				"prix_achat"=> $buying_price,
+				"taxe_ecotaxe"=> $eco_tax,
+				"taxe_ecomob"=> $eco_mob,
 				"etat"=> $state,
 				"id_fabriquant"=> get_fabriquant($raw_vendor),
 				"id_sous_categorie"=> get_sous_categorie($sub_category, $category),
