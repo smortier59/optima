@@ -1086,6 +1086,8 @@ class souscription_bdomplus extends souscription_cleodis {
    * @return Integer                  ID du comité créé
    */
   public function _startOrCancelAffaire($get, $post){
+    log::logger($post , "mfleurquin");
+
     if($post["order"]["id"]){
       $order = $post["order"];
       $ref = $order["id"];
@@ -1100,11 +1102,8 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::affaire()->q->reset()
         ->addAllFields("affaire")
         ->where("affaire.id_affaire", $post["order"]["affaires"][0]);
-      $affaires = ATF::affaire()->select_row();
-
-      foreach ($affaires as $key => $affaire) {
-        $return["order"] =  $this->controle_affaire($affaire);
-      }
+      $affaire = ATF::affaire()->select_row();
+      $return["order"] =  $this->controle_affaire($affaire);
       return $return;
     }else{
       throw new errorATF("Data manquante en paramètre d'entrée", 500);
@@ -1114,7 +1113,6 @@ class souscription_bdomplus extends souscription_cleodis {
 
   public function controle_affaire($affaire, $order=null){
     if($affaire){
-
 
       ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
       $commande = ATF::commande()->select_row();
