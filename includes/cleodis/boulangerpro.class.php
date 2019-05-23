@@ -141,6 +141,7 @@ class boulangerpro extends classes_optima {
               ATF::produit()->u(array("id_produit"=>$produit['id_produit'], "ref_garantie"=>$ref_garantie));
 
               $r = ATF::pack_produit()->getIdPackFromProduit($produit['id_produit'], 'actif');
+              if (!count($r)) log::logger("Aucun packs associé ACTIF, donc on traite pas le reste.",$this->logFile);
               foreach (explode(",", $r) as $id_pack) {
                 if (!$id_pack) continue;
 
