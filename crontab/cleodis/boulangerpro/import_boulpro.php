@@ -8,6 +8,7 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 // Désactivation de la traçabilité
 ATF::define("tracabilite",false);
 
+
 // Matrice de type
 $type = array(
 	"fixe" => "fixe",
@@ -24,10 +25,10 @@ ATF::db()->begin_transaction();
 $produits = import_produit();
 
 // Gestion des packs
-$packs = import_pack();
+// $packs = import_pack();
 
-// Ajout des liaison entre les deux
-import_ligne($packs, $produits);
+// // Ajout des liaison entre les deux
+// import_ligne($packs, $produits);
 
 // Rollback la transaction
 //ATF::db()->rollback_transaction();
@@ -76,7 +77,7 @@ function import_produit(string $path = ''){
 			$url_image = $ligne[19];
 			$eco_tax = $ligne[6];
 			$eco_mob = $ligne[7];
-
+			if ($ref != "1126594") continue;
 			// Check if a given product ref already exists in database
 			ATF::produit()->q->reset()->where("ref", $ref);
 			$alreadyExistsFromRef = ATF::produit()->select_row();
@@ -116,19 +117,12 @@ function import_produit(string $path = ''){
 
 			if ($produit['type']== "sans objet") $produit['type']= "sans_objet";
 
-			// Image spécifique
-			$folder_cleodis = "/home/data/cleodis/";
-			if ($ligne[15] == "Livraison") {
-			if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$ligne[0].".jpg")){
-			    echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
-			}
+
+
+			if ($ligne[0] == "GARANTIE") {
+				$produit['description'] = NULL;
 			}
 
-			if ($ligne[15] == "Garantie") {
-			if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$ligne[0].".jpg")){
-			    echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
-			}
-			}
 
 			if($p){
 				$produit["id_produit"] = $p["id_produit"];
@@ -136,10 +130,24 @@ function import_produit(string $path = ''){
 				$produits[$ligne[0]] = $p["id_produit"];
 				echo "Produit mis a jour (ref : ".$ligne[0].") \n";
 			}else{
-				$produits[$ligne[0]] = ATF::produit()->i($produit);
+				$produit["id_produit"] = ATF::produit()->i($produit);
+				$produits[$ligne[0]] = $produit["id_produit"];
 				echo "Produit insert (name : ".$product.", type: ".$produit['type'].", ref:".$ref.") \n";
 			}
 
+			// Image spécifique
+			if ($ligne[15] == "Livraison") {
+				ATF::produit()->store(ATF::_s(),$produit["id_produit"],'photo',file_get_contents(__DIR__."/Livraison01.png"));
+			}
+
+			if (strtolower($ligne[0]) == "garantie") {
+				echo "ON TRAITE LIMAGE ".__DIR__."/Garantie01.png || ".ATF::produit()->filepath($produit["id_produit"],"photo")."\n";
+				if (!copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo"))) {
+					echo "ERREUR DE COPIE DE FICHER\n";
+					$errors= error_get_last();
+					print_r($errors);
+				}
+			}
 			$processed_lines++;
 
 			log::logger(array(
