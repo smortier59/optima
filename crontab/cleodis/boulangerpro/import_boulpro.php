@@ -276,7 +276,7 @@ function import_ligne($packs, $produits){
 				"max"=>$max,
 				"option_incluse"=>$are_options_included,
 				"option_incluse_obligatoire"=>$are_options_included_mandatory,
-				"ref"=>$ref,
+				"ref"=>$reference,
 				"prix_achat"=> $buying_price,
 				"id_fournisseur"=> $produit["id_fournisseur"],
 				"visible"=> $publicly_visible,
