@@ -25,10 +25,10 @@ ATF::db()->begin_transaction();
 $produits = import_produit();
 
 // Gestion des packs
-// $packs = import_pack();
+$packs = import_pack();
 
-// // Ajout des liaison entre les deux
-// import_ligne($packs, $produits);
+// Ajout des liaison entre les deux
+import_ligne($packs, $produits);
 
 // Rollback la transaction
 //ATF::db()->rollback_transaction();
