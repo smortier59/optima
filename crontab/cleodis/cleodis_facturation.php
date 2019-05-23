@@ -6,6 +6,6 @@ if(exec('whoami')!="apache"){
 }
 
 ATF::facturation()->facturationMensuelle();
-ATF::facturation()->facturationMensuelleRestitution();
+if($_SERVER["argv"][1] !== "bdomplus") ATF::facturation()->facturationMensuelleRestitution();
 
 ?>
