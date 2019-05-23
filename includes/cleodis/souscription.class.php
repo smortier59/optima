@@ -1100,7 +1100,7 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::affaire()->q->reset()
         ->addAllFields("affaire")
         ->where("affaire.id_affaire", $post["order"]["affaires"][0]);
-      $affaires = ATF::affaire()->select_all();
+      $affaires = ATF::affaire()->select_row();
 
       foreach ($affaires as $key => $affaire) {
         $return["order"] =  $this->controle_affaire($affaire);
@@ -1114,6 +1114,8 @@ class souscription_bdomplus extends souscription_cleodis {
 
   public function controle_affaire($affaire, $order=null){
     if($affaire){
+
+
       ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
       $commande = ATF::commande()->select_row();
 
@@ -1143,23 +1145,27 @@ class souscription_bdomplus extends souscription_cleodis {
       }
 
       if($affaire["affaire.id_magasin"]){
+        log::logger("Affaire Magasin ".$affaire["affaire.ref"], "controle_affaire");
         if($loyer["frequence_loyer"] == "mois"){
+          log::logger("Affaire Magasin Mensuelle ".$affaire["affaire.ref"], "controle_affaire");
           $this->demarrageContrat($affaire,$commande);
 
           // Si on est à J+1 et la facture pas payée on envoi un mail au client pour 1er loyer en prelevement + tache à Benjamin pour prelever
           if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) == date("Y-m-d")){
+            log::logger("On est à J+1 ", "controle_affaire");
 
             ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
             $facture_magasin = ATF::facture_magasin()->select_row();
-            if($facture_magasin["etat"] == "non_recu"){
+            if(!$facture_magasin || $facture_magasin["etat"] == "non_recu"){
+              log::logger("Facture Magasin non recu, on crée la tache + envoi du mail au client ", "controle_affaire");
 
-              $this->envoiMailFactureMagNonPayee($affaire["affaire.id_societe_fk"]);
+              $this->envoiMailFactureMagNonPayee($affaire,$loyer,$facture_magasin);
 
               $tache = array("tache"=>array(
                       "id_societe"=>$affaire["affaire.id_societe_fk"],
                        "id_user"=>$infos["id_user"],
                        "origine"=>"societe_commande",
-                       "tache"=>"la facture magasin n'a pas été recu, il faut prélever le client",
+                       "tache"=>"la facture Magasin n'a pas été recu, il faut prélever le client",
                        "id_affaire"=>$affaire["affaire.id_affaire_fk"],
                        "type_tache"=>"creation_contrat",
                        "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
@@ -1173,16 +1179,19 @@ class souscription_bdomplus extends souscription_cleodis {
 
         }else{
 
+          log::logger("Affaire Magasin Annuelle ".$affaire["affaire.ref"], "controle_affaire");
           // Si on est à J+1
-          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) == date("Y-m-d")){
+          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) <= date("Y-m-d")){
 
             ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
             $facture_magasin = ATF::facture_magasin()->select_row();
 
             //Si on a la facture de payée (retourné par Boulanger)
-            if($facture_magasin["etat"] == "non_recu"){
+            if(!$facture_magasin || $facture_magasin["etat"] == "non_recu"){
+              log::logger("Annulation de l'affaire car pas de facture magasin ou facture non recue ", "controle_affaire");
               $this->annuleContrat($affaire,$commande, "Facture magasin ".$facture_magasin["ref_facture"]." non reçu");
             }else{
+              log::logger("Facture magasin recu, on demarre le contrat ".$affaire["affaire.ref"], "controle_affaire");
               $this->demarrageContrat($affaire,$commande);
 
               ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
@@ -1194,7 +1203,7 @@ class souscription_bdomplus extends souscription_cleodis {
         }
       }
     }else{
-      throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref, 500);
+      throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref." ou l'id ".$affaire["affaire.id_affaire_fk"], 500);
     }
 
     return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
@@ -1204,6 +1213,10 @@ class souscription_bdomplus extends souscription_cleodis {
             );
   }
 
+  /**
+   * Démarre une affaire (Démarrage du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function demarrageContrat($affaire,$commande){
      if($affaire["commande.etat"] == "non_loyer"){
         ATF::db($this->db)->begin_transaction();
@@ -1258,6 +1271,11 @@ class souscription_bdomplus extends souscription_cleodis {
       }
   }
 
+
+  /**
+   * Annule une affaire (Passage de l'affaire en annulée, suppression du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function annuleContrat($affaire,$commande, $raison){
     if($affaire["affaire.etat"] !== "perdue"){
       ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
@@ -1278,6 +1296,10 @@ class souscription_bdomplus extends souscription_cleodis {
     }
   }
 
+  /**
+   * Récupération des numéros de licences
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function envoi_licence($id_commande){
     //On envoi les licences
     ATF::commande_ligne()->q->reset()->where("id_commande", $id_commande)
@@ -1306,11 +1328,37 @@ class souscription_bdomplus extends souscription_cleodis {
     }
   }
 
+  /**
+   * Envoi du mail au client pour l'avertir que la facture magasin n"a pas été faite
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function envoiMailFactureMagNonPayee($affaire, $loyer, $facture_magasin){
 
-  public function envoiMailFactureMagNonPayee($id_societe){
+    if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
+      $email = $email_pro;
+    }else{
+      $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
+    }
+
+    $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+    $info_mail["recipient"] = $email;
+    $info_mail["html"] = true;
+    $info_mail["template"] = "facture_magasin_non_reglee";
+    if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Paiement de la première facture";
+
+    $info_mail["date_signature"] = date("d/m/Y", strtotime($affaire["affaire.date"]));
+    $info_mail["facture_magasin"] = $facture_magasin["ref_facture"];
+
+    $mail = new mail($info_mail);
+
+    $mail->send();
 
   }
 
+  /**
+   * Envoi du mail au client avec les licences
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function envoiMailLicence($id_societe, $licence_a_envoyer){
     if($email_pro = ATF::societe()->select($id_societe, "email")){
       $email = $email_pro;
@@ -1332,6 +1380,10 @@ class souscription_bdomplus extends souscription_cleodis {
     $mail->send();
   }
 
+  /**
+   * Envoi du mail à BDOM et au client pour les prevenir d'une installation de leur produit
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function envoiMailInstallationZen($affaire, $commande){
 
     ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
@@ -1389,9 +1441,34 @@ class souscription_bdomplus extends souscription_cleodis {
     }else{
       log::logger("Pas d'Installation inclus dans l'offre" , "souscription");
     }
+  }
 
+  /**
+   * Permet de demarrer ou arreter une affaire magasin créée à J-1 selon si la facture magasin a été recu ou non
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function check_affaires_magasin(){
+    ATF::affaire()->q->reset()
+      ->whereIsNotNull("id_magasin")
+      ->where("affaire.date", date("Y-m-d", strtotime("-1 days")), "AND", NULL, "<=");
 
+    $affaireshier = ATF::affaire()->select_all();
 
+    if($affaireshier){
+      foreach ($affaireshier as $key => $value) {
+        ATF::affaire()->q->reset()->addAllFields("affaire")
+          ->where("affaire.id_affaire", $value["affaire.id_affaire"])
+          ->whereIsNotNull("affaire.id_magasin");
+        $affaire = ATF::affaire()->select_row();
+        log::logger("=====================", "controle_affaire");
+        try{
+          $this->controle_affaire($affaire);
+        }catch(errorATF $e){
+          log::logger($e->getMessage(), "controle_affaire");
+        }
+
+      }
+    }
   }
 
 };

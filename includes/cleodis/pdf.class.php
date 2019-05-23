@@ -14183,6 +14183,187 @@ class pdf_bdomplus extends pdf_cleodis {
 	}
 
 
+	public function mandatSellAndSign($id_affaire, $concat=false){
+
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
+		$this->affaire = ATF::affaire()->select($id_affaire);
+		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+		$this->contrat = ATF::commande()->select_row();
+
+
+
+		$this->adresseClient = $this->client["adresse"];
+		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
+		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
+		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+
+
+		$this->unsetHeader();
+		$this->AddPage();
+
+
+
+		$this->setfillcolor(208,255,208);
+
+
+		//HEADER
+		$this->image(__PDF_PATH__.$this->logo,15,5,15);
+
+		$this->setMargins(5);
+		$this->setfont('arial','',9);
+		$this->setLeftMargin(60);
+		$this->cell(20,4,"Créancier :");
+		$this->multicell(70,4,"BDOM PLUS\nAVENUE DE LA MOTTE \n59810 LESQUIN - France");
+		$this->setLeftMargin(5);
+		$this->line(5,$this->gety()+2,232,$this->gety()+2);
+
+		//Page Centrale
+		//Gauche
+		$this->setY(27);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, "Mandat",0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "de prélèvement SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Coordonnées",0,1);
+		$this->cell(55, 4, "bancaires",0,1);
+
+		$this->ln(4);
+
+		$this->cell(55, 4, "Nom :",0,1);
+		$this->cell(55, 4, "Adresse :",0,1);
+		$this->ln(4);
+		$this->cell(55, 4, "Numéro de mobile :",0,1);
+
+		//Milieu
+		$this->setY(27);
+		$this->setLeftMargin(60);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, __ICS__,0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Identifiant créancier SEPA",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["BIC"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "BIC",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["societe"],0,1);
+		$this->multicell(120, 4, $this->adresseClient,0,1);
+		$this->cell(55, 4, $this->client["tel"],0,1);
+
+		//Droite
+		$this->setY(27);
+		$this->setLeftMargin(125);
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->affaire["RUM"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "Référence unique du mandat",0,1);
+
+		$this->ln(4);
+
+		$this->setfont('arial','B',9);
+		$this->cell(55, 4, $this->client["IBAN"],0,1);
+		$this->setfont('arial','',9);
+		$this->cell(55, 4, "IBAN",0,1);
+
+		$this->setY(70);
+		$this->setLeftMargin(5);
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) BDOM PLUS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de BDOM PLUS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->ln(4);
+		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y", strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))),0,1);
+
+		$this->ln(4);
+		$this->setfont('arial','',7);
+		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+
+		$this->setleftMargin(50);
+		$this->multicell(60,5,"\n\n\n[sc_sceaudeconfiance/]");
+		$this->setleftMargin(130);
+		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+
+
+		if(ATF::$codename === "cleodis" && $this->client['id_famille'] != 9){
+			$this->line(5,160,205,160);
+
+			//Mandat de prelevement
+			$this->image(__PDF_PATH__.'cleodis/mandat-prel.jpg',5,170,200);
+
+			$this->setfont('arial','',11);
+
+			$this->setLeftMargin(45);
+			$this->SetY(195);
+			$this->cell(150,5,$this->client["structure"]." ".$this->client["societe"],0,1);
+
+			$this->multicell(150,4,$this->adresseClient);
+
+			$this->cell(150,5,$this->client["siret"],0,1);
+			$this->cell(150,5,$this->client["BIC"],0,1);
+			$this->cell(150,5,$this->client["IBAN"],0,1);
+
+			$this->SetXY(40,247);
+			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+
+
+			$this->SetXY(120,248);
+			$this->multicell(100,6,"Lille\n".date('d/m/Y', strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))));
+
+		}
+
+
+		$this->setleftMargin(15);
+		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
+
+		$this->setfont('arial','B',9);
+		$this->setY(275.9);
+
+		/*
+		//On récupère les documents du/des produits de cette affaire
+        ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
+        $lignes = ATF::commande_ligne()->sa();
+
+        foreach ($lignes as $key => $value) {
+			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
+			if($id_doc){
+	            $doc = ATF::document_contrat()->select($id_doc);
+	            if($doc["etat"] == "actif" && $doc["type_signature"] == "commune_avec_contrat"){
+
+				    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
+				    if (file_exists($filepath)){
+				    	try {
+						    $pageCount = $this->setSourceFile($filepath);
+
+						    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						      $tplIdx = $this->importPage($pageNo);
+
+						      // add a page
+						      $this->unsetHeader();
+					    	  $this->unsetFooter();
+						      $this->AddPage();
+						      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+						    }
+						} catch (Exception $e) {
+  							log::logger('filepath CGS = '.$filepath,"qjanon");
+							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
+							log::logger($e->getMessage(),"qjanon");
+							continue;
+						}
+					}
+				}
+			}
+		}*/
+
+	}
+
 
 };
 class pdf_bdom extends pdf_cleodis { };
