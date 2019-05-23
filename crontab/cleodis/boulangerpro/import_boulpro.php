@@ -89,6 +89,7 @@ function import_produit(string $path = ''){
 
 			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
 				echo 'Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
+				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_boulangerpro_escape_product");
 				continue;
 			}
 
