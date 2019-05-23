@@ -77,7 +77,7 @@ function import_produit(string $path = ''){
 			$url_image = $ligne[19];
 			$eco_tax = $ligne[6];
 			$eco_mob = $ligne[7];
-			if ($ref != "1126594") continue;
+
 			// Check if a given product ref already exists in database
 			ATF::produit()->q->reset()->where("ref", $ref);
 			$alreadyExistsFromRef = ATF::produit()->select_row();
@@ -117,12 +117,9 @@ function import_produit(string $path = ''){
 
 			if ($produit['type']== "sans objet") $produit['type']= "sans_objet";
 
-
-
 			if ($ligne[0] == "GARANTIE") {
 				$produit['description'] = NULL;
 			}
-
 
 			if($p){
 				$produit["id_produit"] = $p["id_produit"];
@@ -136,17 +133,10 @@ function import_produit(string $path = ''){
 			}
 
 			// Image spécifique
-			if ($ligne[15] == "Livraison") {
-				ATF::produit()->store(ATF::_s(),$produit["id_produit"],'photo',file_get_contents(__DIR__."/Livraison01.png"));
-			}
-
-			if (strtolower($ligne[0]) == "garantie") {
-				echo "ON TRAITE LIMAGE ".__DIR__."/Garantie01.png || ".ATF::produit()->filepath($produit["id_produit"],"photo")."\n";
-				if (!copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo"))) {
-					echo "ERREUR DE COPIE DE FICHER\n";
-					$errors= error_get_last();
-					print_r($errors);
-				}
+			if (strtolower($ligne[0]) == "livraison") {
+				util::copy(__DIR__."/Livraison01.png", ATF::produit()->filepath($produit["id_produit"],"photo");
+			} else if (strtolower($ligne[0]) == "garantie") {
+				util::copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo");
 			}
 			$processed_lines++;
 
