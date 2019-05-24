@@ -267,22 +267,27 @@ class boulangerpro extends classes_optima {
         }
         fclose($fileproduit);
       }
+      log::logger(count($packDesactive)." packs désactivés",$this->logFile);
+      log::logger(count($produitDesactive)." produits désactivés",$this->logFile);
+      log::logger("========== FIN  DU  BATCH ==========\n",$this->logFile);
 
       if ($sendmail) {
         $mail = new mail($infos_mail);
         if (file_exists($fpack)) {
           $mail->addFile($fpack, "Packs désactivés.csv");
-          //unlink($fpack);
+          // unlink($fpack);
         }
         if (file_exists($fproduit)) {
           $mail->addFile($fproduit, "Produits désactivés.csv");
+          // unlink($fproduit);
+        }
+        $logFilePath = __ABSOLUTE_PATH__.'log/'.$this->logFile;
+        if (file_exists($logFilePath)) {
+          $mail->addFile($logFilePath, "Log du script ".$this->logFile);
           //unlink($fproduit);
         }
         $mail->send();
       }
-      log::logger(count($packDesactive)." packs désactivés",$this->logFile);
-      log::logger(count($produitDesactive)." produits désactivés",$this->logFile);
-      log::logger("========== FIN  DU  BATCH ==========\n",$this->logFile);
 
 
     } catch (errorATF $e) {
