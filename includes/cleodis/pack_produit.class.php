@@ -327,5 +327,54 @@ class pack_produit extends classes_optima {
 
 	}
 
+	/**
+	 * Retourne tous les ID packs où le produit est présent
+	 * @author : Quentin JANON <qjanon@absystech.fr>
+	 * @param  Integer $id_pack_produit
+	 * @return string ID des packs séparé par virgule
+	 */
+	public function getIdPackFromProduit($id_produit, $etat = false, $principal = false){
+		ATF::pack_produit_ligne()->q->reset()
+			->addField('GROUP_CONCAT(pack_produit_ligne.id_pack_produit)','id_pack_produit')
+			->where("id_produit", $id_produit);
+
+		if ($etat) {
+			ATF::pack_produit_ligne()->q->from("pack_produit_ligne","id_pack_produit",'pack_produit',"id_pack_produit");
+			ATF::pack_produit_ligne()->q->where('pack_produit.etat',$etat);
+		}
+		if ($principal) {
+			ATF::pack_produit_ligne()->q->where('pack_produit_ligne.principal',"oui");
+		}
+		$r = ATF::pack_produit_ligne()->select_row();
+		return $r["id_pack_produit"];
+	}
+
+	/**
+	 * Retourne tous les produits actif d'un pack
+	 * @author : Quentin JANON <qjanon@absystech.fr>
+	 * @param  Integer $id_pack
+	 * @return Array Liste des produits du pack
+	 */
+	public function getProduitFromPack($id_pack, $etat = false){
+		ATF::pack_produit_ligne()->q->reset()
+			->addField('produit.id_produit', 'id_produit')
+			->addField('produit.produit', 'produit')
+			->addField('produit.id_fabriquant', 'id_fabriquant')
+			->addField('pack_produit_ligne.id_pack_produit', 'id_pack_produit')
+			->addField('pack_produit_ligne.id_pack_produit_ligne', 'id_pack_produit_ligne')
+			->from("pack_produit_ligne","id_produit","produit","id_produit")
+			->where("pack_produit_ligne.id_pack_produit", $id_pack)
+			->where("produit.etat", "actif")
+			->addGroup('pack_produit_ligne.id_produit')
+			->setStrict();
+		if ($etat) {
+			ATF::pack_produit_ligne()->q->from("pack_produit_ligne","id_pack_produit",'pack_produit',"id_pack_produit");
+			ATF::pack_produit_ligne()->q->where('pack_produit.etat',$etat);
+		}
+		$r = ATF::pack_produit_ligne()->select_all();
+		return $r;
+	}
+
+
 	
 }

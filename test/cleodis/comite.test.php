@@ -249,11 +249,4 @@ class comite_test extends ATF_PHPUnit_Framework_TestCase {
 
 };
 
-
-class mock_mail extends mail {
-
-	public function send(){
-		return true;
-	}
-};
 ?>

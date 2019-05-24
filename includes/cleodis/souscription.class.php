@@ -813,224 +813,6 @@ class souscription_cleodis extends souscription {
     return $r;
   }
 
-  // Scenario 1 : un produit dans un pack, pas de changement de prix
-  // Scenario 2 : Un produit dans un pack (non inclu), changement du prix
-  // Scenario 3 : un produit dans un pack (inclu), changement de prix
-  // Scenario 4 : un produit dans 2 packs (d'un côté inclus, de l'autre non inclus), changement de prix
-  // Scenario 5 : un produit dans 2 packs (inclus des deux côtés), changement de prix
-  // Scenario 6 : un produit dans 2 packs (non inclus des deux côtés), changement de prix du produit.
-  public function _boulangerMajPrix($get, $post) {
-    $logFile = "batch-majPrixCatalogueProduit-".date("Ymd-His");
-    $logFilePath = __ABSOLUTE_PATH__."log/".$logFile;
-    try {
-      require __ABSOLUTE_PATH__.'includes/cleodis/boulangerpro/ApiBoulangerProV2.php';
-
-      ATF::societe()->q->reset()->where("societe", "BOULANGER PRO", "AND", false, "LIKE");
-      $id_fournisseur = ATF::societe()->select_cell();
-
-      $api = new ApiBoulangerProV2(__API_BOULANGER_CLIENT__,__API_BOULANGER_SECRET__,__API_BOULANGER_HOST__);
-      // echo "\n========== DEBUT DU BATCH ==========";
-      log::logger("-----------------------------------------------------------------",$logFile);
-      log::logger("==========DEBUT DU BATCH==========",$logFile);
-
-      ATF::db()->begin_transaction(true);
-      try {
-
-        ATF::produit()->q->reset()->where('id_fournisseur', $id_fournisseur)->where('etat','actif');
-
-        // ATF::produit()->q->where('ref',1069347); // Produit ref 1069347 - Lave linge hublot BOSCH EX WAN28150FF
-
-        $catalogueBoulProActif = ATF::produit()->sa();
-
-        // echo "\n".count($catalogueBoulProActif). " produits à traiter";
-        log::logger(count($catalogueBoulProActif). " produits à traiter",$logFile);
-
-
-        foreach ($catalogueBoulProActif as $k=>$produit) {
-          $response = $api->get('price/'.$produit['ref']);
-
-          $r = $response->getContent();
-          log::logger("REPONSE BOULPRO", $logFile);
-          log::logger($r, $logFile);
-          if (!$r) {
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : AUCUNE REPONSE",$logFile);
-          } else if ($r['error_code']) {
-            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - introuvable chez Boulanger PRO : ".$r['error_code']." - ".$r['message'],$logFile);
-          } else {
-            $p = $r[0];
-            $prix_avec_taxe = number_format($p['price_tax_excl'],2)+number_format($p['ecotax'],2)+number_format($p['ecomob'],2);
-            // echo "\n>Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! Prix boulpro : ".$p['price_tax_excl']." VS Prix cléodis : ".$produit['prix_achat'];
-            log::logger("Produit ref ".$produit['ref']." - ".$produit['produit']." - trouvé chez Boulanger PRO ! ",$logFile);
-            log::logger("Prix boulpro : ".$prix_avec_taxe." VS Prix cléodis : ".$produit['prix_achat'],$logFile);
-            log::logger("Taxe eco boulpro : ".number_format($p['ecotax'],2)." VS Taxe eco cléodis : ".number_format($produit['taxe_ecotaxe'],2),$logFile);
-            log::logger("Taxe eco MOB boulpro : ".number_format($p['ecomob'],2)." VS Taxe eco MOB cléodis : ".number_format($produit['taxe_ecomob'],2),$logFile);
-            // Mise a jour des taxes du produit
-
-
-            // On sauve les old pour l'export excel
-            $produit["old_prix_achat"] = $produit["prix_achat"];
-            $produit["old_taxe_ecotaxe"] = $produit["taxe_ecotaxe"];
-            $produit["old_taxe_ecomob"] = $produit["taxe_ecomob"];
-            $produit["prix_achat"] = $prix_avec_taxe;
-            $produit["taxe_ecotaxe"] = $p['ecotax'];
-            $produit["taxe_ecomob"] = $p['ecomob'];
-
-
-            if (number_format($produit['prix_achat'],2) != number_format($produit["old_prix_achat"],2)) {
-              log::logger("\n----- Prix CHANGÉ pour ce produit",$logFile);
-              self::manageProduitChanges($produit, $p, $packDesactive, $produitDesactive, $logFile);
-            } else {
-              // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
-              log::logger("----- Prix inchangé pour ce produit, on ne traite pas",$logFile);
-            }
-
-            if (number_format($produit['taxe_ecotaxe'],2) != number_format($produit["old_taxe_ecotaxe"],2)) {
-              log::logger("\n----- Tace éco CHANGÉ pour ce produit",$logFile);
-              self::manageProduitChanges($produit, $p, $packDesactive, $produitDesactive, $logFile);
-            } else {
-              // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
-              log::logger("----- Tace éco inchangé pour ce produit, on ne traite pas",$logFile);
-            }
-
-            if (number_format($produit['taxe_ecomob'],2) != number_format($produit["old_taxe_ecomob"],2)) {
-              log::logger("\n----- Tace éco MOB CHANGÉ pour ce produit",$logFile);
-              self::manageProduitChanges($produit, $p, $packDesactive, $produitDesactive, $logFile);
-            } else {
-              // echo "\n ----- Prix inchangé pour ce produit, on ne traite pas";
-              log::logger("----- Tace éco MOB inchangé pour ce produit, on ne traite pas",$logFile);
-            }
-
-          }
-
-        }
-
-
-      } catch (errorATF $e) {
-        ATF::db()->rollback_transaction(true);
-        throw $e;
-      }
-      ATF::db()->commit_transaction(true);
-
-      // echo "\n========== FIN  DU  BATCH ==========";
-      // echo "\nPacks désactivésn\n";
-      // print_r($packDesactive);
-      // echo "\nProduits désactivés";
-      // print_r($produitDesactive);
-      $sendmail = false;
-      $infos_mail["from"] = "Support AbsysTech <no-reply@absystech.net>";
-      $infos_mail["objet"] = "[BOULANGER PRO] Batch prix - packs et produits désactivés";
-      $infos_mail["recipient"] = "dev@absystech.fr,benjamin.tronquit@cleodis.com,jerome.loison@cleodis.com";
-      // $infos_mail["recipient"] = "ygautheron@absystech.fr";
-
-      $infos_mail['body'] = '';
-      $fpack = __TEMP_PATH__."packs_desactives.csv";
-      @unlink($fpack);
-      log::logger($fpack,$logFile);
-      if (!empty($packDesactive)) {
-        $filepack= fopen($fpack, "w+");
-        $sendmail = true;
-        foreach ($packDesactive as $k=>$id_pack) {
-          ATF::pack_produit()->q->reset()->addAllFields('pack_produit')->where("pack_produit.id_pack_produit",$id_pack)->setLimit(1);
-          $p = ATF::pack_produit()->select_row();
-          if ($k == 0) {
-            foreach (array_keys($p) as $col=>$i) $entetes[str_replace('pack_produit.','',$col)] = $i;
-            fputcsv($filepack, $entetes);
-            fputs("\n");
-          }
-          fputcsv($filepack, $p);
-          fputs("\n");
-        }
-        fclose($filepack);
-      }
-      $fproduit = __TEMP_PATH__."produits_desactives.csv";
-      log::logger($fproduit,$logFile);
-      @unlink($fproduit);
-      if (!empty($produitDesactive)) {
-        $fileproduit= fopen($fproduit, "w+");
-        fputcsv($fileproduit, array_keys($produitDesactive[0]));
-        fputs("\n");
-        $sendmail = true;
-        foreach ($produitDesactive as $line) {
-          fputcsv($fileproduit, $line);
-          fputs("\n");
-        }
-        fclose($fileproduit);
-      }
-
-      if ($sendmail) {
-        $mail = new mail($infos_mail);
-        if (file_exists($fpack)) {
-          $mail->addFile($fpack, "Packs désactivés.csv");
-          //unlink($fpack);
-        }
-        if (file_exists($fproduit)) {
-          $mail->addFile($fproduit, "Produits désactivés.csv");
-          //unlink($fproduit);
-        }
-        $mail->send();
-      }
-      log::logger("Packs désactivésn",$logFile);
-      log::logger(count($packDesactive),$logFile);
-      log::logger("Produits désactivés",$logFile);
-      log::logger(count($produitDesactive),$logFile);
-      log::logger("========== FIN  DU  BATCH ==========\n",$logFile);
-
-
-    } catch (errorATF $e) {
-      throw $e;
-    }
-
-    return true;
-  }
-
-
-  private function manageProduitChanges ($produit, $p, &$packDesactive, &$produitDesactive, $logFile) {
-      // MAJ nouveau prix sur le produit
-      ATF::produit()->u(array(
-        "id_produit"=>$produit['id_produit'],
-        "prix_achat"=>$p['price_tax_excl']+$p['ecotax']+$p['ecomob'],
-        "taxe_ecotaxe"=>$p['ecotax'],
-        "taxe_ecomob"=>$p['ecomob']
-      ));
-
-
-      $packs = ATF::produit()->getPacks($produit['id_produit'], 'actif');
-      log::logger(count($packs)." packs trouvés pour ce produit.",$logFile);
-      foreach ($packs as $pack) {
-        log::logger("------------ PACK ID ".$pack['id_pack_produit']."(".$pack['etat'].")------------",$logFile);
-
-        $etat = ATF::pack_produit()->select($pack['id_pack_produit'], 'etat');
-
-        if ($etat!='actif') {
-          log::logger("Pack non actif, on passe à la suite.",$logFile);
-        } else {
-          ATF::pack_produit_ligne()->q->reset()->where('id_pack_produit', $pack['id_pack_produit'])->where('id_produit',$produit['id_produit']);
-          $ligne_de_pack = ATF::pack_produit_ligne()->select_row();
-          log::logger("----- Ligne de Produit associé, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);
-
-          if ($ligne_de_pack['max'] == $ligne_de_pack['min'] && $ligne_de_pack['max'] == $ligne_de_pack['quantite']) {
-            log::logger("----- Produit inclus - on désactive le pack, quantité min ".$ligne_de_pack['min'].", max ".$ligne_de_pack['max'].", quantite ".$ligne_de_pack['quantite'],$logFile);
-
-            ATF::pack_produit()->u(array("id_pack_produit"=>$pack['id_pack_produit'],"etat"=>"inactif"));
-            $packDesactive[$pack['id_pack_produit']] = $pack['id_pack_produit'];
-          } else {
-            log::logger("----- Produit ".$produit['ref']." non inclus dans le pack : ".$pack['id_pack_produit'],$logFile);
-            log::logger("----- ON NE DESACTIVE PAS LE PACK",$logFile);
-          }
-
-        }
-
-      }
-      // Produit non inclus, on va désactiver uniquement le produit
-      // echo "\n ----- On désactive le produit car il est non inclus";
-      log::logger("----- On désactive le produit",$logFile);
-      ATF::produit()->u(array("id_produit"=>$produit['id_produit'],"etat"=>"inactif"));
-
-      $produitDesactive[$produit['id_produit']] = $produit;
-
-  }
-
   /**
    * Création d'un comité dans une affaire
    * @param  Integer $id_affaire      ID de l'affaire
@@ -1070,7 +852,6 @@ class souscription_cleodis extends souscription {
   }
 
 
-
 }
 class souscription_bdomplus extends souscription_cleodis {
 
@@ -1086,6 +867,8 @@ class souscription_bdomplus extends souscription_cleodis {
    * @return Integer                  ID du comité créé
    */
   public function _startOrCancelAffaire($get, $post){
+    log::logger($post , "mfleurquin");
+
     if($post["order"]["id"]){
       $order = $post["order"];
       $ref = $order["id"];
@@ -1100,11 +883,8 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::affaire()->q->reset()
         ->addAllFields("affaire")
         ->where("affaire.id_affaire", $post["order"]["affaires"][0]);
-      $affaires = ATF::affaire()->select_all();
-
-      foreach ($affaires as $key => $affaire) {
-        $return["order"] =  $this->controle_affaire($affaire);
-      }
+      $affaire = ATF::affaire()->select_row();
+      $return["order"] =  $this->controle_affaire($affaire);
       return $return;
     }else{
       throw new errorATF("Data manquante en paramètre d'entrée", 500);
@@ -1114,6 +894,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
   public function controle_affaire($affaire, $order=null){
     if($affaire){
+
       ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
       $commande = ATF::commande()->select_row();
 
@@ -1143,23 +924,27 @@ class souscription_bdomplus extends souscription_cleodis {
       }
 
       if($affaire["affaire.id_magasin"]){
+        log::logger("Affaire Magasin ".$affaire["affaire.ref"], "controle_affaire");
         if($loyer["frequence_loyer"] == "mois"){
+          log::logger("Affaire Magasin Mensuelle ".$affaire["affaire.ref"], "controle_affaire");
           $this->demarrageContrat($affaire,$commande);
 
           // Si on est à J+1 et la facture pas payée on envoi un mail au client pour 1er loyer en prelevement + tache à Benjamin pour prelever
           if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) == date("Y-m-d")){
+            log::logger("On est à J+1 ", "controle_affaire");
 
             ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
             $facture_magasin = ATF::facture_magasin()->select_row();
-            if($facture_magasin["etat"] == "non_recu"){
+            if(!$facture_magasin || $facture_magasin["etat"] == "non_recu"){
+              log::logger("Facture Magasin non recu, on crée la tache + envoi du mail au client ", "controle_affaire");
 
-              $this->envoiMailFactureMagNonPayee($affaire["affaire.id_societe_fk"]);
+              $this->envoiMailFactureMagNonPayee($affaire,$loyer,$facture_magasin);
 
               $tache = array("tache"=>array(
                       "id_societe"=>$affaire["affaire.id_societe_fk"],
                        "id_user"=>$infos["id_user"],
                        "origine"=>"societe_commande",
-                       "tache"=>"la facture magasin n'a pas été recu, il faut prélever le client",
+                       "tache"=>"la facture Magasin n'a pas été recu, il faut prélever le client",
                        "id_affaire"=>$affaire["affaire.id_affaire_fk"],
                        "type_tache"=>"creation_contrat",
                        "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
@@ -1173,16 +958,19 @@ class souscription_bdomplus extends souscription_cleodis {
 
         }else{
 
+          log::logger("Affaire Magasin Annuelle ".$affaire["affaire.ref"], "controle_affaire");
           // Si on est à J+1
-          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) == date("Y-m-d")){
+          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) <= date("Y-m-d")){
 
             ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
             $facture_magasin = ATF::facture_magasin()->select_row();
 
             //Si on a la facture de payée (retourné par Boulanger)
-            if($facture_magasin["etat"] == "non_recu"){
+            if(!$facture_magasin || $facture_magasin["etat"] == "non_recu"){
+              log::logger("Annulation de l'affaire car pas de facture magasin ou facture non recue ", "controle_affaire");
               $this->annuleContrat($affaire,$commande, "Facture magasin ".$facture_magasin["ref_facture"]." non reçu");
             }else{
+              log::logger("Facture magasin recu, on demarre le contrat ".$affaire["affaire.ref"], "controle_affaire");
               $this->demarrageContrat($affaire,$commande);
 
               ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
@@ -1194,7 +982,7 @@ class souscription_bdomplus extends souscription_cleodis {
         }
       }
     }else{
-      throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref, 500);
+      throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref." ou l'id ".$affaire["affaire.id_affaire_fk"], 500);
     }
 
     return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
@@ -1204,6 +992,10 @@ class souscription_bdomplus extends souscription_cleodis {
             );
   }
 
+  /**
+   * Démarre une affaire (Démarrage du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function demarrageContrat($affaire,$commande){
      if($affaire["commande.etat"] == "non_loyer"){
         ATF::db($this->db)->begin_transaction();
@@ -1258,6 +1050,11 @@ class souscription_bdomplus extends souscription_cleodis {
       }
   }
 
+
+  /**
+   * Annule une affaire (Passage de l'affaire en annulée, suppression du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function annuleContrat($affaire,$commande, $raison){
     if($affaire["affaire.etat"] !== "perdue"){
       ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
@@ -1278,6 +1075,10 @@ class souscription_bdomplus extends souscription_cleodis {
     }
   }
 
+  /**
+   * Récupération des numéros de licences
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function envoi_licence($id_commande){
     //On envoi les licences
     ATF::commande_ligne()->q->reset()->where("id_commande", $id_commande)
@@ -1306,11 +1107,37 @@ class souscription_bdomplus extends souscription_cleodis {
     }
   }
 
+  /**
+   * Envoi du mail au client pour l'avertir que la facture magasin n"a pas été faite
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function envoiMailFactureMagNonPayee($affaire, $loyer, $facture_magasin){
 
-  public function envoiMailFactureMagNonPayee($id_societe){
+    if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
+      $email = $email_pro;
+    }else{
+      $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
+    }
+
+    $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+    $info_mail["recipient"] = $email;
+    $info_mail["html"] = true;
+    $info_mail["template"] = "facture_magasin_non_reglee";
+    if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Paiement de la première facture";
+
+    $info_mail["date_signature"] = date("d/m/Y", strtotime($affaire["affaire.date"]));
+    $info_mail["facture_magasin"] = $facture_magasin["ref_facture"];
+
+    $mail = new mail($info_mail);
+
+    $mail->send();
 
   }
 
+  /**
+   * Envoi du mail au client avec les licences
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function envoiMailLicence($id_societe, $licence_a_envoyer){
     if($email_pro = ATF::societe()->select($id_societe, "email")){
       $email = $email_pro;
@@ -1332,6 +1159,10 @@ class souscription_bdomplus extends souscription_cleodis {
     $mail->send();
   }
 
+  /**
+   * Envoi du mail à BDOM et au client pour les prevenir d'une installation de leur produit
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
   public function envoiMailInstallationZen($affaire, $commande){
 
     ATF::commande_ligne()->q->reset()->where("id_commande", $commande["commande.id_commande_fk"])
@@ -1389,9 +1220,34 @@ class souscription_bdomplus extends souscription_cleodis {
     }else{
       log::logger("Pas d'Installation inclus dans l'offre" , "souscription");
     }
+  }
 
+  /**
+   * Permet de demarrer ou arreter une affaire magasin créée à J-1 selon si la facture magasin a été recu ou non
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function check_affaires_magasin(){
+    ATF::affaire()->q->reset()
+      ->whereIsNotNull("id_magasin")
+      ->where("affaire.date", date("Y-m-d", strtotime("-1 days")), "AND", NULL, "<=");
 
+    $affaireshier = ATF::affaire()->select_all();
 
+    if($affaireshier){
+      foreach ($affaireshier as $key => $value) {
+        ATF::affaire()->q->reset()->addAllFields("affaire")
+          ->where("affaire.id_affaire", $value["affaire.id_affaire"])
+          ->whereIsNotNull("affaire.id_magasin");
+        $affaire = ATF::affaire()->select_row();
+        log::logger("=====================", "controle_affaire");
+        try{
+          $this->controle_affaire($affaire);
+        }catch(errorATF $e){
+          log::logger($e->getMessage(), "controle_affaire");
+        }
+
+      }
+    }
   }
 
 };
