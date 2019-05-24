@@ -5097,7 +5097,15 @@ class pdf_cleodis extends pdf {
 		$this->addpage();
 
 		$this->setfont('arial','B',10);
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,18,55);
+
+		if(ATF::$codename == "bdomplus"){
+			$this->image(__PDF_PATH__."/".$this->logo,5,5,45);
+		}else{
+			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,5,45);
+
+		}
+
+
 
 		$this->setxy(100,10);
 		$this->cell(0,5,"LE LOUEUR",0,1,'L');
