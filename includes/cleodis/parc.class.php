@@ -434,6 +434,7 @@ class parc_cleodis extends classes_optima {
 
 };
 
+class parc_cleodisbe extends parc_cleodis { };
 class parc_bdomplus extends parc_cleodis { };
 
 class parc_midas extends parc_cleodis {
