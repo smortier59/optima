@@ -1,116 +1,161 @@
+
 <?php
 define("__BYPASS__",true);
+// Définition du codename
 $_SERVER["argv"][1] = "cleodis";
+// Import du fichier de config d'Optima
 include(dirname(__FILE__)."/../../../global.inc.php");
+// Désactivation de la traçabilité
 ATF::define("tracabilite",false);
 
-/*
+
+// Matrice de type
 $type = array(
-	"Fixe"=>"fixe",
-	"portable"=>"portable",
-	"Sans objet"=>"sans_objet",
-	"Immateriel"=>"immateriel"
+	"fixe" => "fixe",
+	"portable" => "portable",
+	"fans objet" => "sans_objet",
+	"immateriel" => "immateriel"
 );
 
 $produits = $packs = array();
 
-
-
+// Début de transaction SQL
 ATF::db()->begin_transaction();
-	$produits = import_produit();
-	$packs = import_pack();
-	import_ligne($packs, $produits);
+// Gestion des produits
+$produits = import_produit();
 
-//ATF::db()->commit_transaction();
+// Gestion des packs
+$packs = import_pack();
 
+// Ajout des liaison entre les deux
+import_ligne($packs, $produits);
 
-$directory = dirname(__FILE__)."/";
-$folder_cleodis = "/home/data/cleodis/";
+// Rollback la transaction
+//ATF::db()->rollback_transaction();
+// Valide la trnasaction
+ATF::db()->commit_transaction();
 
-//Copie des images de produit
-foreach ($produits as $key => $value) {
-	echo "produit image : ".$directory . "/produit/".$key.".*\n";
-    $images = glob($directory . "/produit/".$key.".*");
-    if($images[0]){
-        if( !copy($images[0], $folder_cleodis."produit/".$value.".photo")){
-            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."produit/".$value.".photo\n";
-        } else $folder_cleodis."produit/".$value.".photo OK\n";
-    }
-}
+/**
+ * Importe des produits depuis un fichier excel
+ * @return array Produits insérés
+ */
 
-//Copie des images de pack
-foreach ($packs as $key => $value) {
-	echo "pack image : ".$directory . "/produit/".$key.".*\n";
-    $images = glob($directory . "/produit/".$value["raw"][1].".*");
-    if($images[0]){
-        if (!copy($images[0], $folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo")) {
-            echo "Echec de copy de l'image du produit ".$key." ".$folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo\n";
-        } else echo $folder_cleodis."pack_produit/".$value["id_pack_produit"].".photo OK\n";
-    }
-}
-
-function import_produit(){
-	$fileProduit = "./produit.csv";
+function import_produit(string $path = ''){
+	// If path is not supplied, then get default path
+	$fileProduit = $path == '' ? "./produit.csv" : $path;
 	$fpr = fopen($fileProduit, 'rb');
 	$entete = fgetcsv($fpr);
 	$produits = array();
+
 	try {
 
-		while ($ligne = fgetcsv($fpr)) {
+		$lines_count = 0;
+		$processed_lines = 0;
+
+		while ($ligne = fgetcsv($fpr, 0, ';')) {
+
+			$lines_count++;
+
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			$ean = $ligne[13];
+			// TYPE;Référence;Désignation;Etat;Commentaire;Prix d'achat dont ecotaxe;EcoTaxe;Eco Mobilier;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;id_document_contrat :;url image
 
-			if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
-			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
+
+			$ref = $ligne[1];
+			$product = $ligne[2];
+			$rawType = $ligne[8];
+			$raw_Fournisseur = $ligne[9];
+			$raw_vendor = $ligne[10];
+			$buying_price = $ligne[5];
+			$state = $ligne[3];
+			$category = get_categorie($ligne[11]);
+			$sub_category = $ligne[12];
+			$description = $ligne[4];
+			$rate = $ligne[13];
+			$term = $ligne[14];
+			$ean = $ligne[16];
+			$url_image = $ligne[19];
+			$eco_tax = $ligne[6];
+			$eco_mob = $ligne[7];
+			$document_contrat = $ligne[18];
+
+
+			// Check if a given product ref already exists in database
+			ATF::produit()->q->reset()->where("ref", $ref);
+			$alreadyExistsFromRef = ATF::produit()->select_row();
+			// Check if a given product ean already exists in database
+			ATF::produit()->q->reset()->where("ean", $ean);
+			$alreadyExistsFromEan = ATF::produit()->select_row();
+
+			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
+				echo 'Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
+				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_boulangerpro_escape_product");
+				continue;
+			}
+
+			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
+			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ref);
 
 			$p = ATF::produit()->select_row();
 
-			// Référence;Désignation;Etat;Commentaire;Prix d'achat;Type;Fournisseur;Fabriquant;Catégorie;Sous Catégorie;Loyer;Durée;Visible sur le site;EAN;Description;TYPE
-
 			$produit = array(
-				"produit"=>$ligne[1],
-				"type"=>strtolower($type[$ligne[5]]),
-				"ref"=>$ligne[0],
-				"ean"=>$ean,
-				"id_fournisseur"=> get_fournisseur($ligne[6]),
-				"prix_achat"=>$ligne[4],
-				"etat"=>$ligne[2],
-				"id_fabriquant"=>get_fabriquant($ligne[7]),
-				//"id_categorie"=>get_categorie($ligne[8]),
-				"id_sous_categorie"=>get_sous_categorie($ligne[9], get_categorie($ligne[8])),
-				"description"=>$ligne[14],
-				"loyer"=>$ligne[10],
-				"duree"=>$ligne[11],
-				"visible_sur_site"=>"oui"
+				"site_associe" => 'boulangerpro',
+				"produit"=> $product,
+				"type"=> mb_strtolower($rawType, 'UTF-8'),
+				"ref"=> $ref,
+				"ean"=> $ean,
+				"id_fournisseur"=> get_fournisseur($raw_Fournisseur),
+				"prix_achat"=> $buying_price,
+				"taxe_ecotaxe"=> $eco_tax,
+				"taxe_ecomob"=> $eco_mob,
+				"etat"=> $state,
+				"id_fabriquant"=> get_fabriquant($raw_vendor),
+				"id_sous_categorie"=> get_sous_categorie($sub_category, $category),
+				"description"=> $description,
+				"loyer"=> $rate,
+				"duree"=> $term,
+				"url_image"=> $url_image,
+				"visible_sur_site"=> "oui"
 			);
 
-			if ($produit['type']=="sans objet") $produit['type']="sans_objet";
+			if ($produit['type']== "sans objet") $produit['type']= "sans_objet";
 
-			// Image spécifique
-			$folder_cleodis = "/home/data/cleodis/";
-			if ($ligne[15] == "Livraison") {
-		        if( !copy(__DIR__."/Livraison01.png", __DIR__."/produit/".$ligne[0].".jpg")){
-		            echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
-		        }
+			if ($ligne[0] == "GARANTIE") {
+				$produit['description'] = NULL;
 			}
 
-			if ($ligne[15] == "Garantie") {
-		        if( !copy(__DIR__."/Garantie01.png", __DIR__."/produit/".$ligne[0].".jpg")){
-		            echo "Echec de copy de l'image garantie du produit ".$ligne[0]."\n";
-		        }
+			if ($document_contrat) {
+				ATF::document_contrat()->q->reset()->where("document_contrat", $document_contrat, false, "LIKE");
+				if ($r = ATF::document_contrat()->select_row()) {
+					$produit['id_document_contrat'] = $r['id_document_contrat'];
+				} else {
+					echo "Produit - document contrat (ref : ".$ref.") NON TROUVE : ".$document_contrat." \n";
+				}
 			}
 
 			if($p){
 				$produit["id_produit"] = $p["id_produit"];
 				ATF::produit()->u($produit);
 				$produits[$ligne[0]] = $p["id_produit"];
-				echo "Produit mis à jour (ref : ".$ligne[0].") \n";
+				echo "Produit mis a jour (ref : ".$ligne[0].") \n";
 			}else{
-				$produits[$ligne[0]] = ATF::produit()->i($produit);
-				echo "Produit inseré (ref : ".$ligne[0].", type: ".$produit['type'].") \n";
+				$produit["id_produit"] = ATF::produit()->i($produit);
+				$produits[$ligne[0]] = $produit["id_produit"];
+				echo "Produit insert (name : ".$product.", type: ".$produit['type'].", ref:".$ref.") \n";
 			}
 
+			// Image spécifique
+			if (strtolower($ligne[0]) == "livraison") {
+				util::copy(__DIR__."/Livraison01.png", ATF::produit()->filepath($produit["id_produit"],"photo"));
+			} else if (strtolower($ligne[0]) == "garantie") {
+				util::copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo"));
+			}
+			$processed_lines++;
+
+			log::logger(array(
+				"count" => $lines_count,
+				"processed" => $processed_lines,
+			), "boulangerpro_migration");
 
 		}
 
@@ -123,6 +168,10 @@ function import_produit(){
 	}
 }
 
+/**
+ * Importe des packs depuis un fichier excel
+ * @return array Packs insérés
+ */
 function import_pack(){
 	$fileProduit = "./pack.csv";
 	$fpr = fopen($fileProduit, 'rb');
@@ -131,20 +180,24 @@ function import_pack(){
 
 	try {
 
-		while ($ligne = fgetcsv($fpr)) {
+		while ($ligne = fgetcsv($fpr, 0 ,';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
+			$nom = $ligne[5];
+			$etat = $ligne[2];
+			$associated_site = $ligne[3];
+			$publicly_visible = $ligne[4];
+			$description = $ligne[1];
 
-			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($ligne[2]));
+			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($nom));
 			$p = ATF::pack_produit()->select_row();
 
-
 			$pack = array(
-				"nom"=>$ligne[2],
-				"etat"=>strtolower($ligne[3]),
-				"site_associe"=>$ligne[4],
-				"visible_sur_site"=>strtolower($ligne[5]),
-				"description"=>$ligne[6]
+				"nom"=>$nom,
+				"etat"=>strtolower($etat),
+				"site_associe"=>$associated_site,
+				"visible_sur_site"=>strtolower($publicly_visible),
+				"description"=>$description,
 			);
 
 			if($p){
@@ -166,27 +219,55 @@ function import_pack(){
 	}
 }
 
+/**
+ * Importe les liaisons entre les packs et les produits depuis un fichier excel
+ * @return array Packs insérés
+ */
 function import_ligne($packs, $produits){
+
 	$filePackLigne = "./ligne.csv";
 	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
 	$entete = fgetcsv($fppa);
 	try {
-		while ($ligne = fgetcsv($fppa)) {
+		while ($ligne = fgetcsv($fppa, 0, ';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			$id_pack_produit = $packs[$ligne[0]]["id_pack_produit"];
+			$principal = $ligne[0]=="PRODUIT PRINCIPAL" ? "oui" : "non";
+			$id = $ligne[1];
+			$reference = $ligne[2];
+			$main_product = $ligne[3];
+			$quantity = $ligne[4];
+			$min = $ligne[5];
+			$max = $ligne[6];
+			$are_options_included = $ligne[7];
+			$are_options_included_mandatory = $ligne[8];
+			$publicly_visible = $ligne[9];
+			$order = $ligne[10];
+			$product_line_visible = $ligne[11];
+			$visible_on_pdf_file = $ligne[12];
+			$buying_price = $ligne[13];
+
+			$id_pack_produit = $packs[$id]["id_pack_produit"];
 			$id_produit = $produits[$ligne[1]];
 
 			ATF::produit()->q->reset()
 				->select('id_produit')
 				->select('id_fournisseur')
-				->where("ref", ATF::db()->real_escape_string($ligne[1]));
+				->where("ref", ATF::db()->real_escape_string($reference));
 			$produit = ATF::produit()->select_row();
 
+			if (!$produit) {
+				var_dump($ligne);
+				var_dump($produit);
+				echo "Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n";
+				continue;
+				//throw new errorATF("Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n");
+			}
+
 			if (!$id_produit) {
-				echo "Produit non trouve ! " . $ligne[1]." => Pack n°".$ligne[0]." abandonné\n";
 				$id_produit = $produit["id_produit"];
+				echo "Produit non trouve ! " . $id." => Pack n°".$ligne[0].", du coup on prend le id_produit=".$id_produit."\n";
 				//continue;
 			}
 
@@ -196,20 +277,21 @@ function import_ligne($packs, $produits){
 
 			// N° Pack;Réf Produit;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Visible;Px achat
 			$pack_produit_ligne = array(
+				"principal"=>$principal,
 				"id_pack_produit"=>$id_pack_produit,
 				"id_produit"=>$id_produit,
 				"produit"=>ATF::produit()->select($id_produit , "produit"),
-				"quantite"=>$ligne[2],
-				"min"=>$ligne[3],
-				"max"=>$ligne[4],
-				"option_incluse"=>$ligne[5],
-				"option_incluse_obligatoire"=>$ligne[6],
-				"ref"=>$ligne[1],
-				"prix_achat"=> $ligne[10],
+				"quantite"=>$quantity,
+				"min"=>$min,
+				"max"=>$max,
+				"option_incluse"=>$are_options_included,
+				"option_incluse_obligatoire"=>$are_options_included_mandatory,
+				"ref"=>$reference,
+				"prix_achat"=> $buying_price,
 				"id_fournisseur"=> $produit["id_fournisseur"],
-				"visible"=> $ligne[9],
-				"visible_sur_pdf"=> $ligne[11],
-				"ordre" => $ligne[8]
+				"visible"=> $publicly_visible,
+				"visible_sur_pdf"=> $visible_on_pdf_file,
+				"ordre" => $order
 			);
 
 			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
@@ -236,8 +318,11 @@ function import_ligne($packs, $produits){
 
 }
 
-
-
+/**
+ * Récupère le fournisseur depuis un nom
+ * @param  String $fournisseur Nom du fournisseur
+ * @return Integer|String              ID du fournisseur si existant où un message d'information
+ */
 function get_fournisseur($fournisseur){
 	ATF::societe()->q->reset()->where("societe", ATF::db()->real_escape_string($fournisseur), "AND", false, "LIKE");
 	$f = ATF::societe()->select_row();
@@ -248,6 +333,12 @@ function get_fournisseur($fournisseur){
 		echo "Il faut créer le fournisseur ".$fournisseur."\n";
 	}
 }
+
+/**
+ * Récupère le fabriquant depuis un nom
+ * @param  String $fabriquant Nom du fabriquant
+ * @return Integer|String              ID du fabriquant si existant où un message d'information
+ */
 
 function get_fabriquant($fabriquant){
 	ATF::fabriquant()->q->reset()->where("fabriquant", ATF::db()->real_escape_string($fabriquant), "AND", false, "LIKE");
@@ -260,6 +351,11 @@ function get_fabriquant($fabriquant){
 	}
 }
 
+/**
+ * Récupère le categorie depuis un nom
+ * @param  String $categorie Nom du categorie
+ * @return Integer|String              ID du categorie si existant où un message d'information
+ */
 function get_categorie($categorie){
 	ATF::categorie()->q->reset()->where("categorie", ATF::db()->real_escape_string($categorie), "AND", false, "LIKE");
 	$f = ATF::categorie()->select_row();
@@ -271,6 +367,11 @@ function get_categorie($categorie){
 	}
 }
 
+/**
+ * Récupère le sous catégorie depuis un nom
+ * @param  String $sous catégorie Nom du sous catégorie
+ * @return Integer|String              ID du sous catégorie si existant où un message d'information
+ */
 function get_sous_categorie($sous_categorie, $categorie){
 	ATF::sous_categorie()->q->reset()->where("sous_categorie", ATF::db()->real_escape_string($sous_categorie), "AND", false, "LIKE")
 									 ->where("id_categorie", ATF::db()->real_escape_string($categorie), "AND", false);
@@ -282,139 +383,4 @@ function get_sous_categorie($sous_categorie, $categorie){
 		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
 		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
 	}
-}
-*/
-
-
-
-/*
-$fileProduit = "./produit.csv";
-$fpr = fopen($fileProduit, 'rb');
-$entete = fgetcsv($fpr);
-$produits = array();
-try {
-
-	while ($ligne = fgetcsv($fpr)) {
-		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-
-		$ean = $ligne[13];
-
-		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
-		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
-
-		$p = ATF::produit()->select_row();
-
-		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "commentaire"=>$ligne[3]));
-
-	}
-
-} catch (errorATF $e) {
-	ATF::db()->rollback_transaction();
-	//print_r($produit);
-	echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
-	throw $e;
-}
-
-
-
-$fileProduit = "./produit.csv";
-$fpr = fopen($fileProduit, 'rb');
-$entete = fgetcsv($fpr);
-$produits = array();
-try {
-
-	while ($ligne = fgetcsv($fpr)) {
-		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-
-		$ean = $ligne[13];
-
-		if($ean === "") ATF::produit()->q->reset()->where("ref", $ligne[0]);
-		else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ligne[0]);
-		$p = ATF::produit()->select_row();
-
-		$id_categorie = get_categorie($ligne[8]);
-		$id_sous_categorie = get_sous_categorie($ligne[9], $id_categorie);
-
-		$produit = array("id_produit"=>$p["id_produit"],
-						 "id_sous_categorie"=>$id_sous_categorie);
-
-		ATF::produit()->u($produit);
-
-	}
-
-} catch (errorATF $e) {
-	print_r($produit);
-	echo "Produit EAN : ".$ligne[0]." ERREUR\n";
-	print_r($e);
-	throw $e;
-}
-
-
-function get_categorie($categorie){
-	ATF::categorie()->q->reset()->where("categorie", ATF::db()->real_escape_string($categorie), "AND", false, "LIKE");
-	$f = ATF::categorie()->select_row();
-
-	if($f){
-		return $f["id_categorie"];
-	}else{
-		return ATF::categorie()->i(array("categorie"=>ATF::db()->real_escape_string($categorie)));
-	}
-}
-
-function get_sous_categorie($sous_categorie, $categorie){
-	ATF::sous_categorie()->q->reset()->where("sous_categorie", ATF::db()->real_escape_string($sous_categorie), "AND", false, "LIKE")
-									 ->where("id_categorie", ATF::db()->real_escape_string($categorie), "AND", false);
-	$f = ATF::sous_categorie()->select_row();
-
-	if($f){
-		return $f["id_sous_categorie"];
-	}else{
-		print_r(array("sous_categorie"=>$sous_categorie, "id_categorie"=>$categorie));
-		return ATF::sous_categorie()->i(array("sous_categorie"=>ATF::db()->real_escape_string($sous_categorie), "id_categorie"=>$categorie));
-	}
-}
-*/
-
-
-
-// MAJ DU TYPE UNIQUEMENT
-
-$type = array(
-	"Fixe"=>"fixe",
-	"portable"=>"portable",
-	"Portable"=>"portable",
-	"Sans objet"=>"sans_objet",
-	"Immateriel"=>"immateriel"
-);
-
-$fileProduit = "./produit.csv";
-$fpr = fopen($fileProduit, 'rb');
-$entete = fgetcsv($fpr);
-$produits = array();
-try {
-
-	while ($ligne = fgetcsv($fpr)) {
-		echo "======================================\n";
-		if (!$ligne[0]) continue; // pas d'ID pas de chocolat
-		ATF::produit()->q->reset()->where("ref", $ligne[0]);
-		$p = ATF::produit()->select_row();
-		if (!$p) {
-			echo "PRODUIT INTROUVABLE - REF = ".$ligne[0]."\n";
-			continue;
-		}
-		echo "TYPE du CSV : |".$ligne[5]."| - |".$type[$ligne[5]]."|\n";
-		$t = strtolower($type[$ligne[5]]);
-		if ($t=="sans objet") $t="sans_objet";
-
-		echo "TYPE = ".$t."\n";
-
-
-		ATF::produit()->u(array("id_produit"=>$p["id_produit"], "type"=>$t));
-	}
-
-} catch (errorATF $e) {
-	ATF::db()->rollback_transaction();
-	//print_r($produit);
-	echo "Produit REF : ".$ligne[0]." ERREUR\n";
-	throw $e;
 }
