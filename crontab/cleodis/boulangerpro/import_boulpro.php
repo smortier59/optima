@@ -78,6 +78,7 @@ function import_produit(string $path = ''){
 			$eco_tax = $ligne[6];
 			$eco_mob = $ligne[7];
 			$document_contrat = $ligne[18];
+			$visible = strtolower($ligne[15]);
 
 
 			// Check if a given product ref already exists in database
@@ -115,7 +116,7 @@ function import_produit(string $path = ''){
 				"loyer"=> $rate,
 				"duree"=> $term,
 				"url_image"=> $url_image,
-				"visible_sur_site"=> "oui"
+				"visible_sur_site"=> $visible
 			);
 
 			if ($produit['type']== "sans objet") $produit['type']= "sans_objet";
