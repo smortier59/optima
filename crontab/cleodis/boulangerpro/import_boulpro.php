@@ -183,11 +183,11 @@ function import_pack(){
 		while ($ligne = fgetcsv($fpr, 0 ,';')) {
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			$nom = $ligne[5];
+			$nom = $ligne[1];
 			$etat = $ligne[2];
 			$associated_site = $ligne[3];
 			$publicly_visible = $ligne[4];
-			$description = $ligne[1];
+			$description = $ligne[5];
 
 			ATF::pack_produit()->q->reset()->where("nom", ATF::db()->real_escape_string($nom));
 			$p = ATF::pack_produit()->select_row();
