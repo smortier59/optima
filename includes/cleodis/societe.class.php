@@ -34,6 +34,10 @@ class societe_cleodis extends societe {
       ,"ref"
       ,"id_famille"=>array("listeners"=>array("change"=>"ATF.changeFamille"))
       ,"code_client_partenaire"
+      ,"nom"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+        "societe"
+        ,"nom_commercial"
+      ))
     );
 
     //Reinitialise les panels poru remettre dans l'ordre
@@ -42,11 +46,7 @@ class societe_cleodis extends societe {
 
 
     $this->colonnes['panel']['societe_fs'] = array(
-      "nom"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
-        "societe"
-        ,"nom_commercial"
-      ))
-      ,"sirens"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
+      "sirens"=>array("custom"=>true,'null'=>true,'xtype'=>'compositefield','fields'=>array(
         "siren"
         ,"siret"
       ))
