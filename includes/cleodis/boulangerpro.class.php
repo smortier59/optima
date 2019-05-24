@@ -283,7 +283,7 @@ class boulangerpro extends classes_optima {
         }
         $logFilePath = __ABSOLUTE_PATH__.'log/'.$this->logFile;
         if (file_exists($logFilePath)) {
-          $mail->addFile($logFilePath, "Log du script ".$this->logFile);
+          $mail->addFile($logFilePath, "Log du script ".$this->logFile.".txt");
           //unlink($fproduit);
         }
         $mail->send();
