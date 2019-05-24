@@ -270,7 +270,7 @@ class boulangerpro extends classes_optima {
       log::logger(count($packDesactive)." packs désactivés",$this->logFile);
       log::logger(count($produitDesactive)." produits désactivés",$this->logFile);
       log::logger("========== FIN  DU  BATCH ==========\n",$this->logFile);
-
+      $sendmail = true;
       if ($sendmail) {
         $mail = new mail($infos_mail);
         if (file_exists($fpack)) {
