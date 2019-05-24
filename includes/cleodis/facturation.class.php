@@ -5,6 +5,9 @@
 * @subpackage Cléodis
 */
 class facturation extends classes_optima {
+
+	public $user_facturation = array(16,91);
+
 	function __construct() {
 		$this->table="facturation";
 		parent::__construct();
@@ -836,7 +839,9 @@ class facturation extends classes_optima {
 		}
 //$this->q->addCondition("`societe`.`id_societe`",1499);
 
+
 		$facturation=$this->sa();
+
 		//Pour chacune des facturations on envoi un mail au client concerné
 		foreach ($facturation as $key=>$item) {
 			ATF::facture()->q->reset()->addCondition("type_facture","refi")
@@ -874,7 +879,7 @@ class facturation extends classes_optima {
 							}
 						}else{
 							//Enlever les factures envoyées par mail
-							if(!$contact["email"]){
+							if(!$contact["email"] && !$contact["email_perso"]){
 								if($affaire["type_affaire"] == "2SI"){
 									$facture_contrat_2SI=$this->formateTabfacturer($facture_contrat_2SI,$item,"facture",$id_facture);
 								}else{
@@ -893,11 +898,16 @@ class facturation extends classes_optima {
 								$item["type"] = "contrat";
 							}
 
-							if($contact["email"]){
+							if($contact["email"] || $contact["email_perso"]){
 
 								$path=array("facture"=>"fichier_joint");
 
-								$email["email"]=$contact["email"];
+								if($contact["email"]) {
+									$email["email"]=$contact["email"];
+								}else{
+									$email["email"]=$contact["email_perso"];
+								}
+
 								$email["texte"]="Votre facture pour la période ".$item["date_periode_debut"]." - ".$item["date_periode_fin"];
 
 								//ATF::affaire()->mailContact($email,$id_facture,"facture",$path);
@@ -910,7 +920,7 @@ class facturation extends classes_optima {
 								ATF::facturation_attente()->insert($data_fact_attente);
 
 
-								$item["email"]=$contact["email"];
+								$item["email"]=$email["email"];
 								$item["envoye"]='non';
 								$facturer=$this->formateTabfacturer($facturer,$item,"client",false,$item["type"]);
 
@@ -1094,26 +1104,32 @@ class facturation extends classes_optima {
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye,"global_","Factures contrat envoyées",$s);
 
-		//Envoi d'un pdf contenant toutes les factures contrat
-		log::logger("Envoi d'un pdf contenant toutes les factures contrat...",__CLASS__);
-		$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures contrat 2SI",$s);
-
-		//Envoi d'un pdf contenant toutes les factures prolongation
-		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
-		$this->sendFactures($date_debut,$date_fin,$facture_prolongation_2SI,"global_","Factures prolongation 2SI",$s);
-
-		//Envoi d'un pdf contenant toutes les factures contrat
-		log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
-		$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye_2SI,"global_","Factures contrat envoyées 2SI",$s);
-
 		$return["facturer"]=$facturer;
 		$return["non_envoye"]=$non_envoye;
 		$return["facture_contrat"]=$facture_contrat;
 		$return["facture_contrat_envoye"]=$facture_contrat_envoye;
 		$return["facture_prolongation"]=$facture_prolongation;
-		$return["facture_contrat_2SI"]=$facture_contrat_2SI;
-		$return["facture_contrat_envoye_2SI"]=$facture_contrat_envoye_2SI;
-		$return["facture_prolongation_2SI"]=$facture_prolongation_2SI;
+
+		if(ATF::$codename != "bdomplus"){
+
+			//Envoi d'un pdf contenant toutes les factures contrat
+			log::logger("Envoi d'un pdf contenant toutes les factures contrat...",__CLASS__);
+			$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures contrat 2SI",$s);
+
+			//Envoi d'un pdf contenant toutes les factures prolongation
+			log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
+			$this->sendFactures($date_debut,$date_fin,$facture_prolongation_2SI,"global_","Factures prolongation 2SI",$s);
+
+			//Envoi d'un pdf contenant toutes les factures contrat
+			log::logger("Envoi d'un pdf contenant toutes les factures contrat qui seront envoyées...",__CLASS__);
+			$this->sendFactures($date_debut,$date_fin,$facture_contrat_envoye_2SI,"global_","Factures contrat envoyées 2SI",$s);
+
+			$return["facture_contrat_2SI"]=$facture_contrat_2SI;
+			$return["facture_contrat_envoye_2SI"]=$facture_contrat_envoye_2SI;
+			$return["facture_prolongation_2SI"]=$facture_prolongation_2SI;
+		}
+
+
 		$return["date_debut"]=$date_debut;
 		$return["date_fin"]=$date_fin;
 
@@ -1421,7 +1437,11 @@ class facturation extends classes_optima {
 
 	public function sendFactures($date_debut,$date_fin,$facture_contrat,$type,$texte,$s){
 		//$emailGlobalFacture["email"]=ATF::societe()->select(246,"email");
-		$emailGlobalFacture["email"] =ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
+		foreach ($this->user_facturation as $key => $value) {
+			$emailGlobalFacture["email"] .= ATF::user()->select($value, "email").",";
+		}
+		$emailGlobalFacture["email"] = substr($emailGlobalFacture["email"], 0, -1);
+
 		$emailGlobalFacture["texte"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		$emailGlobalFacture["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		foreach($facture_contrat as $key => $item){
@@ -1436,7 +1456,10 @@ class facturation extends classes_optima {
 
 	public function sendGrille($facturer,$fc,$fp,$date_debut,$date_fin,$type,$texte,$s){
 		//$emailGrille["email"]=ATF::societe()->select(246,"email");
-		$emailGrille["email"] = ATF::user()->select(16, "email").",".ATF::user()->select(91, "email");
+		foreach ($this->user_facturation as $key => $value) {
+			$emailGrille["email"] .= ATF::user()->select($value, "email").",";
+		}
+		$emailGrille["email"] = substr($emailGrille["email"], 0, -1);
 		$emailGrille["texte"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 		$emailGrille["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 
@@ -1521,6 +1544,8 @@ class facturation extends classes_optima {
 						"nature"=> $facturation["type"]
 					);
 
+					if(ATF::$codename == "bdomplus") $facture["ref_externe"] = ATF::facture()->getRefExterne();
+
 					if($facturation["type"] == "liberatoire"){
 						$facture["type_libre"] = "liberatoire";
 					}
@@ -1580,6 +1605,8 @@ class facturation extends classes_optima {
 class facturation_cleodisbe extends facturation { };
 class facturation_cap extends facturation { };
 
-class facturation_bdomplus extends facturation { };
+class facturation_bdomplus extends facturation {
+	public $user_facturation = array(16,116);
+};
 class facturation_bdom extends facturation { };
 class facturation_boulanger extends facturation { };

@@ -5299,7 +5299,9 @@ class pdf_cleodis extends pdf {
 
 
 	function grille_client($facturer,$s,$nf=false,$prol=false) {
-		$this->logo = 'cleodis/logo.jpg';
+		$this->tMargin = 30;
+		//$this->logo = 'cleodis/logo.jpg';
+		$this->grille_client = true;
 		$this->open();
 		$this->addpage();
 		$this->setfont('arial','B',15);
@@ -13481,6 +13483,9 @@ class pdf_bdomplus extends pdf_cleodis {
 	*/
 	public function Header() {
 
+
+
+
 		$this->societe = ATF::societe()->select(31458);
 
 		if($this->showFiligramme) $this->filigramme();
@@ -13575,19 +13580,20 @@ class pdf_bdomplus extends pdf_cleodis {
 			if($this->envoiContrat){
 				$this->image(__PDF_PATH__.$this->logo,15,15,35);
 				$this->setLeftMargin(10);
+			}elseif($this->grille_client){
+				$this->image(__PDF_PATH__.$this->logo,15,5,20);
+				$this->setLeftMargin(10);
+
 			}else{
 				$this->image(__PDF_PATH__.$this->logo,80,5,35);
-				$this->setLeftMargin(60);
+				$this->SetMargins(10,36);
 			}
-
-
-
 		}
 	}
 
 
 	public function Footer() {
-		if($this->facturePDF && !$this->envoiContrat){
+		if($this->facturePDF && !$this->envoiContrat && !$this->grille_client){
 			$this->setfont('arial','B',9);
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
@@ -13693,7 +13699,7 @@ class pdf_bdomplus extends pdf_cleodis {
 				  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
 				  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
-				  log::logger($i_ , "mfleurquin");
+
 
 				  $etat = "( NEUF )";
 				  if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
