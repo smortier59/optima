@@ -25,22 +25,22 @@ class boulangerpro extends classes_optima {
 
         ATF::produit()->q->where('ref',842769, "OR", "ref_produit", "LIKE"); // Produit id 21330 - Lave linge hublot BOSCH EX WAN28150FF
         // Produits demandés par Benjamin sur skype le 9/5/19 à 17h18
-        // ATF::produit()->q->where('ref',1016843, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1119534, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',"BPLivrMeSGEODI100a125EUR60mois", "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',"Frais60", "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1119576, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1114199, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1021609, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1047180, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1016843, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1119534, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',"BPLivrMeSGEODI100a125EUR60mois", "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',"Frais60", "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1119576, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1114199, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',"BPLivrMeSGEODI50a75EUR60mois", "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1021609, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',264570, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1047180, "OR", "ref_produit", "LIKE"); 
 
         // Produits demandés par Vincent /Benjamin, mail du mardi 21/05/19 à 15h50
-        // ATF::produit()->q->where('ref',280814, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',146031, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',151577, "OR", "ref_produit", "LIKE"); 
-        // ATF::produit()->q->where('ref',1022585, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',280814, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',146031, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',151577, "OR", "ref_produit", "LIKE"); 
+        ATF::produit()->q->where('ref',1022585, "OR", "ref_produit", "LIKE"); 
 
         $catalogueBoulProActif = ATF::produit()->sa();
 
