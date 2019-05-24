@@ -3105,56 +3105,68 @@ class affaire_bdomplus extends affaire_cleodis {
 	* @return boolean
 	*/
 	public function mailContact($email,$last_id,$table,$paths){
-		$enregistrement = ATF::$table()->select($last_id);
-		if($email["email"]){
-			$recipient = $email["email"];
-		}elseif($enregistrement["id_contact"]){
-			if(!ATF::contact()->select($enregistrement["id_contact"],"email")){
-				ATF::db($this->db)->rollback_transaction();
-				throw new errorATF("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
+		if($table == "facture"){
+			$enregistrement = ATF::$table()->select($last_id);
+			if($email["email"]){
+				$recipient = $email["email"];
+			}elseif($enregistrement["id_contact"]){
+				if(!ATF::contact()->select($enregistrement["id_contact"],"email")){
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
+				}else{
+					$recipient = ATF::contact()->select($enregistrement["id_contact"],"email");
+				}
 			}else{
-				$recipient = ATF::contact()->select($enregistrement["id_contact"],"email");
+				ATF::db($this->db)->rollback_transaction();
+				throw new errorATF("Il n'y a pas d'email",350);
 			}
-		}else{
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF("Il n'y a pas d'email",350);
-		}
 
-		if(ATF::$usr->getID()){
-			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
-		}else{
-			$societe = ATF::societe()->select(246);
-			$from = $societe["societe"]." <".$societe["email"].">";
-		}
+			if(ATF::$usr->getID()){
+				$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
+			}else{
+				$societe = ATF::societe()->select(246);
+				$from = $societe["societe"]." <".$societe["email"].">";
+			}
 
-		$info_mail["from"] = $from;
-		$info_mail["recipient"] = $recipient;
-		$info_mail["return_path"] = "ludivine.bowe@cleodis.com";
-		$info_mail["template"] = "bdomplus-".$table;
-		$info_mail["html"] = true;
-		$info_mail["objet"] = "Les solutions Zen – Votre facture référence n° ".$enregistrement["ref_externe"];
-		$info_mail["client"] = ATF::societe()->select(ATF::facture()->select($last_id, "id_societe"));
-		$info_mail["facture"] = $enregistrement;
+			if(!$email["objet"]){
+				$info_mail["objet"] = "Les solutions Zen – Votre facture référence n° ".$enregistrement["ref_externe"];
+			}else{
+				$info_mail["objet"] = $email["objet"];
+			}
+
+			$info_mail["from"] = $from;
+			$info_mail["recipient"] = $recipient;
+			$info_mail["return_path"] = "ludivine.bowe@cleodis.com";
+			$info_mail["template"] = "bdomplus-".$table;
+			$info_mail["html"] = true;
+
+			$info_mail["client"] = ATF::societe()->select(ATF::facture()->select($last_id, "id_societe"));
+			$info_mail["facture"] = $enregistrement;
 
 
 
-		$mail = new mail($info_mail);
-		foreach($paths as $key=>$item){
-			$path = ATF::$table()->filepath($last_id,$item);
-			$mail->addFile($path,$key.$enregistrement["ref_externe"].".pdf",true);
-		}
-		$mail->send();
-
-		if($email["emailCopie"]){
-			$info_mail["recipient"] = $email["emailCopie"];
-			$copy_mail = new mail($info_mail);
+			$mail = new mail($info_mail);
 			foreach($paths as $key=>$item){
 				$path = ATF::$table()->filepath($last_id,$item);
-				$copy_mail->addFile($path,$key.$enregistrement["ref_externe"].".pdf",true);
+				$mail->addFile($path,$key.$enregistrement["ref_externe"].".pdf",true);
 			}
-			$copy_mail->send();
+			$mail->send();
+
+			if($email["emailCopie"]){
+				$info_mail["recipient"] = $email["emailCopie"];
+				$copy_mail = new mail($info_mail);
+				foreach($paths as $key=>$item){
+					$path = ATF::$table()->filepath($last_id,$item);
+					$copy_mail->addFile($path,$key.$enregistrement["ref_externe"].".pdf",true);
+				}
+				$copy_mail->send();
+			}
+			return true;
+		}else{
+			return parent::mailContact($email,$last_id,$table,$paths);
 		}
-		return true;
+
+
 	}
 
 };
