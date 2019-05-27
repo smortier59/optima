@@ -408,7 +408,8 @@ class commande_cleodis extends commande {
 
 		//*****************************Transaction********************************
 
-		$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
+		if(ATF::$codename != "bdomplus"){
+			$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
 									   "id_user"=>$infos["id_user"],
 									   "origine"=>"societe_commande",
 									   "tache"=>"Relancer le contrat ",
@@ -419,7 +420,10 @@ class commande_cleodis extends commande {
 									  ),
 						"dest"=>$dest
 					  );
-		$id_tache = ATF::tache()->insert($tache);
+			$id_tache = ATF::tache()->insert($tache);
+
+		}
+
 
 		unset($infos["marge"],$infos["marge_absolue"]);
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);

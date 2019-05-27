@@ -129,9 +129,11 @@ class facture_cleodis extends facture {
 		$this->foreign_key["id_fournisseur_prepaiement"] = "societe";
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true);
 		$this->selectAllExtjs=true;
+
+
 	}
 
-		/**
+	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
     * @author Quentin JANON <qjanon@absystech.fr>
 	* @param string $field
@@ -243,6 +245,9 @@ class facture_cleodis extends facture {
 
 		return parent::default_value($field,$s,$request);
 	}
+
+
+
 
 	function getRef($id_affaire,$type="facture"){
 		$affaire=ATF::affaire()->select($id_affaire);
@@ -2780,6 +2785,9 @@ class facture_bdomplus extends facture_cleodis {
 		parent::__construct($table_or_id);
 		$this->fieldstructure();
 		$this->addPrivilege("export_bdomplus");
+
+		$this->addPrivilege("aPrelever");
+		$this->addPrivilege("massPrelevementSlimpay");
 	}
 
 	public function getRefExterne(){
@@ -2864,6 +2872,7 @@ class facture_bdomplus extends facture_cleodis {
 				$donnees[$key][$i][28] = "";
 				$donnees[$key][$i][29] = "";
 				$donnees[$key][$i][30] = "";
+				$donnees[$key][$i][31] = $value["ref_magasin"]; // Ref de la facture magasin
 
 				ATF::export_facture()->i(array("id_facture" => $value["id_facture"], "fichier_export"=> "flux_vente"));
 			}
@@ -2875,12 +2884,12 @@ class facture_bdomplus extends facture_cleodis {
 
 	        foreach ($donnees as $key => $value) {
 				foreach ($value as $k => $v) {
-					for($i=1;$i<=30;$i++){
+					for($i=1;$i<=31;$i++){
 						if(isset($v[$i])){
 							$string .= $v[$i];
-							if($i!=30) $string .= ";";
+							if($i!=31) $string .= ";";
 						}else{
-							if($i!=30) $string .= ";";
+							if($i!=31) $string .= ";";
 						}
 					}
 					$string .= "\n";
@@ -2900,6 +2909,105 @@ class facture_bdomplus extends facture_cleodis {
 		header("Expires: 0");
         echo $string;
 
+	}
+
+	/**
+	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function aPrelever($infos){
+		$q = "SELECT facture.*
+		 	  FROM facture
+			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
+			  AND etat = 'impayee'
+			  ORDER BY `facture`.`id_societe`, `facture`.`id_affaire`";
+
+		$return = ATF::db()->sql2array($q);
+
+		foreach ($return as $key => $value) {
+			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
+			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
+			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
+		}
+
+		return $return;
+	}
+
+	/**
+	* Retourne le mandat SLIMPAY d'une affaire passée en parametre
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function getMandatSlimpay($id_affaire){
+		if($mandatSlimpay = ATF::affaire()->select($id_affaire , "RUM")){
+			return $mandatSlimpay;
+		}else{
+			if($id_parent = ATF::affaire()->select($id_affaire , "id_parent")){
+				return $this->getMandatSlimpay($id_parent);
+			}else{
+				throw new errorATF("Error Processing Request", 1);
+
+			}
+		}
+	}
+
+	public function getAffaireMere($id_affaire){
+		if(ATF::affaire()->select($f["id_affaire"], "nature") == "avenant"){
+			ATF::affaire()->q->reset()->where("id_affaire", $id_affaire);
+			$aff = ATF::affaire()->select_row();
+			return $this->getAffaireMere($aff["id_affaire"]);
+		}else{
+			return $id_affaire;
+		}
+	}
+
+	/**
+	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function massPrelevementSlimpay($infos){
+		$data = array();
+
+		if($infos["factures"]){
+			foreach ($infos["factures"] as $key => $value) {
+				$f = ATF::facture()->select($key);
+				$mandat_slimpay = $this->getMandatSlimpay($f["id_affaire"]);
+
+				$data[$mandat_slimpay]["libelle"] .= $f["ref"]." ";
+
+				if($data[$mandat_slimpay]["paymentReference"]){
+					$data[$mandat_slimpay]["prix"] = number_format($data[$mandat_slimpay]["prix"] + ($f["prix"]*__TVA__),2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+
+					$id_affaire = $this->getAffaireMere($f["id_affaire"]);
+					$d = str_replace(ATF::affaire()->select($id_affaire, "ref"), "", $f["ref"]);
+
+					$data[$mandat_slimpay]["paymentReference"] .= "/".$d;
+				}else{
+					$data[$mandat_slimpay]["prix"] = number_format(($f["prix"]*__TVA__),2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+					$data[$mandat_slimpay]["paymentReference"] = $f["ref"];
+				}
+			}
+
+			foreach ($data as $key => $value) {
+				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+				foreach ($value["id_facture"] as $kfacture => $vfacture) {
+					$this->u(array("id_facture"=>$vfacture,
+								   "id_slimpay"=>$status["id"],
+								   "executionStatus"=>$status["executionStatus"],
+								   "executionDate"=>$status["executionDate"],
+								  )
+							);
+				}
+			}
+		}
+		return true;
 	}
 
 };
