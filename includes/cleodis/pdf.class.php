@@ -13606,6 +13606,8 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
 
+		$this->societe = ATF::societe()->select(31458);
+
 		parent::Footer();
 
 	}
