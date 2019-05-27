@@ -2872,6 +2872,7 @@ class facture_bdomplus extends facture_cleodis {
 				$donnees[$key][$i][28] = "";
 				$donnees[$key][$i][29] = "";
 				$donnees[$key][$i][30] = "";
+				$donnees[$key][$i][31] = $value["ref_magasin"]; // Ref de la facture magasin
 
 				ATF::export_facture()->i(array("id_facture" => $value["id_facture"], "fichier_export"=> "flux_vente"));
 			}
@@ -2883,12 +2884,12 @@ class facture_bdomplus extends facture_cleodis {
 
 	        foreach ($donnees as $key => $value) {
 				foreach ($value as $k => $v) {
-					for($i=1;$i<=30;$i++){
+					for($i=1;$i<=31;$i++){
 						if(isset($v[$i])){
 							$string .= $v[$i];
-							if($i!=30) $string .= ";";
+							if($i!=31) $string .= ";";
 						}else{
-							if($i!=30) $string .= ";";
+							if($i!=31) $string .= ";";
 						}
 					}
 					$string .= "\n";
