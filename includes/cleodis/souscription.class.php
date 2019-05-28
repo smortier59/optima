@@ -576,6 +576,14 @@ class souscription_cleodis extends souscription {
           "mandatSellAndSign.pdf" => base64_encode($pdf_mandat)
         );
 
+        if($post["send_file_mail"]){
+
+          $mail_files = array("Contrat"=> ATF::commande()->filepath($contrat['commande.id_commande'],"contratA4") );
+
+          //On envoi le mail au client avec le contrat qu'il va signer
+          $this->sendContrat($id_affaire, $mail_files, $contact);
+        }
+
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
           $passage_slimpay = array();
 
@@ -1308,6 +1316,7 @@ class souscription_bdomplus extends souscription_cleodis {
     $licence_a_envoyer = array();
 
     foreach ($lignes as $key => $value) {
+
       ATF::licence()->q->reset()->where("id_licence_type", $value["id_licence_type"],"AND")
                                 ->whereIsNull("licence.id_commande_ligne","AND")
                                 ->addOrder("id_licence", "ASC")->setLimit($value["quantite"]);
@@ -1315,15 +1324,39 @@ class souscription_bdomplus extends souscription_cleodis {
 
       if(count($licence)){
         foreach ($licence as $kl => $vl) {
+
+
           ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
           $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
           $licence_a_envoyer[$value["id_produit"]][] = $vl;
         }
-        return $licence_a_envoyer;
+
       }else{
         throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
       }
     }
+    return $licence_a_envoyer;
+  }
+
+  public function sendContrat($affaire, $paths, $contact){
+
+    if($contact["email"] || $contact["email_perso"]){
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
+      $info_mail["html"] = true;
+      $info_mail["template"] = "mail_contrat_a_signer";
+      $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
+
+      $mail = new mail($info_mail);
+
+      foreach ($paths as $key => $path) {
+        $mail->addFile($path,$key.".pdf",true);
+      }
+
+      $mail->send();
+    }
+
+
   }
 
   /**
