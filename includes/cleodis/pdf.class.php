@@ -3394,7 +3394,6 @@ class pdf_cleodis extends pdf {
 			}else{
 				$this->image(__PDF_PATH__.$this->logo,80,20,35);
 			}
-
 		}
 
 
