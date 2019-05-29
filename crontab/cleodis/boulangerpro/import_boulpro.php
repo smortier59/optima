@@ -8,6 +8,7 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 // Désactivation de la traçabilité
 ATF::define("tracabilite",false);
 
+echo "========= DEBUT DE SCRIPT =========\n";
 
 // Matrice de type
 $type = array(
@@ -34,6 +35,7 @@ import_ligne($packs, $produits);
 //ATF::db()->rollback_transaction();
 // Valide la trnasaction
 ATF::db()->commit_transaction();
+echo "========= FIN DE SCRIPT =========\n";
 
 /**
  * Importe des produits depuis un fichier excel
