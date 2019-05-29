@@ -154,13 +154,12 @@ function import_produit(string $path = ''){
 				util::copy(__DIR__."/Garantie01.png", ATF::produit()->filepath($produit["id_produit"],"photo"));
 			}
 			$processed_lines++;
-
-			log::logger(array(
-				"count" => $lines_count,
-				"processed" => $processed_lines,
-			), "boulangerpro_migration");
-
 		}
+
+		
+		log::logger("#####Produits imports",  "boulangerpro_migration");
+		log::logger("total: $lines_count",  "boulangerpro_migration");
+		log::logger("imported: $processed_lines",  "boulangerpro_migration");
 
 		return $produits;
 	} catch (errorATF $e) {
@@ -180,9 +179,14 @@ function import_pack(){
 	$entete = fgetcsv($fpr);
 	$packs = array();
 
+	$lines_count = 0;
+	$processed_lines = 0;
+	
 	try {
 
 		while ($ligne = fgetcsv($fpr, 0 ,';')) {
+			$lines_count++;
+			
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 			$nom = $ligne[1];
@@ -211,7 +215,14 @@ function import_pack(){
 				$packs[$ligne[0]] = array("id_pack_produit"=>ATF::pack_produit()->i($pack), "raw"=>$ligne);
 				echo "Pack inseré (N° : ".$ligne[0].") \n";
 			}
+
+			$processed_lines++;
 		}
+
+		log::logger("#####Packs imports",  "boulangerpro_migration");
+		log::logger("total: $lines_count",  "boulangerpro_migration");
+		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+
 		return $packs;
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
@@ -232,8 +243,16 @@ function import_ligne($packs, $produits){
 	$pack_produit_ligne = array();
 	$fppa = fopen($filePackLigne, 'rb');
 	$entete = fgetcsv($fppa);
+
 	try {
+
+		$lines_count = 0;
+		$processed_lines = 0;
+
 		while ($ligne = fgetcsv($fppa, 0, ';')) {
+			
+			$lines_count++;
+
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 			$principal = $ligne[0]=="PRODUIT PRINCIPAL" ? "oui" : "non";
@@ -309,7 +328,13 @@ function import_ligne($packs, $produits){
 				echo "Ligne inserée \n";
 			}
 
+			$processed_lines++;
 		}
+
+		log::logger("#####Lignes imports",  "boulangerpro_migration");
+		log::logger("total: $lines_count",  "boulangerpro_migration");
+		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
 		print_r($pack);
