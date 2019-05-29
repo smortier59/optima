@@ -5107,7 +5107,12 @@ class pdf_cleodis extends pdf {
 
 
 		$this->setxy(100,10);
-		$this->cell(0,5,"LE LOUEUR",0,1,'L');
+		if(ATF::$codename = "bdomplus") {
+			$this->cell(0,5,"LA SOCIETE",0,1,'L');
+		}else{
+			$this->cell(0,5,"LE LOUEUR",0,1,'L');
+		}
+
 		$this->setLeftMargin(65);
 		$this->setfont('arial','B',7);
 		$this->cell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0,1);
@@ -5120,32 +5125,58 @@ class pdf_cleodis extends pdf {
 
 		$this->setfont('arial','B',10);
 		$this->setxy(100,28);
-		$this->cell(0,6,"LE LOCATAIRE",0,1,'L');
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',10);
-		$this->cell(30,5,"Raison sociale : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(0,5,$this->client['societe'],0,1);
-		$this->setfont('arial','B',10);
-		$this->cell(20,5,"Adresse : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(0,5,$this->client['adresse'],0,1);
-		$this->setfont('arial','B',10);
-		$this->cell(25,5,"Code Postal : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(15,5,$this->client['cp'],0,0);
-		$this->setfont('arial','B',10);
-		$this->cell(15,5,"Ville : ",0,0);
-		$this->setfont('arial','',10);
-		$this->cell(40,5,$this->client['ville'],0,1);
-		$this->setfont('arial','B',10);
-		if($this->client['id_pays'] =='FR'){
-			$this->cell(15,5,"SIRET : ",0,0);
+		if($this->client["id_famille"] != 9){
+			$this->cell(0,6,"LE LOCATAIRE",0,1,'L');
 		}else{
-			$this->cell(35,5,"NUMERO DE TVA : ",0,0);
+			$this->cell(0,6,"L'ABONNE",0,1,'L');
 		}
-		$this->setfont('arial','',10);
-		$this->cell(30,5,$this->client['siret'],0,0);
+
+		$this->setLeftMargin(65);
+
+		if($this->client["id_famille"] != 9){
+			$this->setfont('arial','B',10);
+			$this->cell(30,5,"Raison sociale : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['societe'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(20,5,"Adresse : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['adresse'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(25,5,"Code Postal : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(15,5,$this->client['cp'],0,0);
+			$this->setfont('arial','B',10);
+			$this->cell(15,5,"Ville : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(40,5,$this->client['ville'],0,1);
+			$this->setfont('arial','B',10);
+			if($this->client['id_pays'] =='FR'){
+				$this->cell(15,5,"SIRET : ",0,0);
+			}else{
+				$this->cell(35,5,"NUMERO DE TVA : ",0,0);
+			}
+			$this->setfont('arial','',10);
+			$this->cell(30,5,$this->client['siret'],0,0);
+		}else{
+
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['societe'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(20,5,"Adresse : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(0,5,$this->client['adresse'],0,1);
+			$this->setfont('arial','B',10);
+			$this->cell(25,5,"Code Postal : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(15,5,$this->client['cp'],0,0);
+			$this->setfont('arial','B',10);
+			$this->cell(15,5,"Ville : ",0,0);
+			$this->setfont('arial','',10);
+			$this->cell(40,5,$this->client['ville'],0,1);
+		}
+
+
 		$this->setfont('arial','B',10);
 		$this->cell(10,5,"Tél. : ",0,0);
 		$this->setfont('arial','',10);
@@ -5159,7 +5190,7 @@ class pdf_cleodis extends pdf {
 		$this->sety(62);
 
 		$this->setfont('arial','B',10);
-		$this->cell(45,5,"Contrat de ".($this->devis['type_contrat']=="vente"?"vente":"location")." : ",0,0);
+		$this->cell(45,5,"Contrat ".(($this->client["id_famille"]==9)?"d'abonnement":(($this->devis['type_contrat']=="vente"?"de vente":"de location")))." : ",0,0);
 		$this->setfont('arial','',10);
 		$this->cell(80,5,$this->devis['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,0);
 		$this->setfont('arial','B',10);
@@ -5198,14 +5229,21 @@ class pdf_cleodis extends pdf {
 		$this->sety(62);
 
 		$this->sety(95);
-
 		$this->setdrawcolor(0,0,0);
 		$this->SetFillColor(200,200,200);
 		$this->SetLineWidth(0.2);
 
-		$this->cell(190,10,"CET ÉCHÉANCIER VAUT FACTURE (MONTANTS EN EUROS)",1,0,'C',true);
+		if($this->client["id_famille"] != 9){
 
-		$this->sety(110);
+
+
+
+			$this->cell(190,10,"CET ÉCHÉANCIER VAUT FACTURE (MONTANTS EN EUROS)",1,0,'C',true);
+
+			$this->sety(110);
+
+		}
+
 
 
 		$this->setfont('arial','',8);
@@ -5248,11 +5286,14 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',10);
 		$this->cell(45,5,"(1) Taux de TVA (loyers) :",0,0);
 		$this->cell(10,5,(($this->commande['tva']-1)*100)." %",0,1);
-		$this->cell(10,5,"(2) Exonération de TVA article 261 C2 du CGI",0,1);
+		if($this->client["id_famille"]!=9){
+			$this->cell(10,5,"(2) Exonération de TVA article 261 C2 du CGI",0,1);
 
-		$this->ln(5);
-		$this->cell(192,5,"Sans escompte, règlement comptant. En cas de retard de paiement, des intérêts de retard seront calculés aux taux de 1 %",0,1);
-		$this->cell(192,5,"par mois de retard sans préjudice des conditions générales du contrat.",0,1);
+
+			$this->ln(5);
+			$this->cell(192,5,"Sans escompte, règlement comptant. En cas de retard de paiement, des intérêts de retard seront calculés aux taux de 1 %",0,1);
+			$this->cell(192,5,"par mois de retard sans préjudice des conditions générales du contrat.",0,1);
+		}
 
 	}
 
