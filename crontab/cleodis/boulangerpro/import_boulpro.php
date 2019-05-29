@@ -90,7 +90,7 @@ function import_produit(string $path = ''){
 			$alreadyExistsFromEan = ATF::produit()->select_row();
 
 			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				echo 'Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true);
+				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true), "import_boulangerpro_escape_product");
 				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_boulangerpro_escape_product");
 				continue;
 			}
@@ -165,7 +165,6 @@ function import_produit(string $path = ''){
 		return $produits;
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
-		//print_r($produit);
 		echo "Produit EAN : ".$produit['ean']."/".$ligne[0]." ERREUR\n";
 		throw $e;
 	}
@@ -217,6 +216,7 @@ function import_pack(){
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
 		print_r($pack);
+		log::logger($pack, "import_boulangerpro");
 		echo "Pack N° : ".$ligne[0]." ERREUR\n";
 		throw $e;
 	}
@@ -316,6 +316,7 @@ function import_ligne($packs, $produits){
 		echo "Ligne Pack N° : ".$ligne[0]." ERREUR\n";
 		print_r($ligne);
 		print_r($pack_produit_ligne);
+		log::logger($e, "import_boulangerpro");
 		throw $e;
 	}
 
