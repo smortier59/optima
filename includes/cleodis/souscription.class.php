@@ -638,6 +638,7 @@ class souscription_cleodis extends souscription {
 
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
+      "id_societe"=> ATF::affaire()->select($this->decryptId($id_affaire), "id_societe"),
       "civility"=>$contact["civilite"],
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
@@ -1096,7 +1097,6 @@ class souscription_bdomplus extends souscription_cleodis {
    * @return Integer                  ID du comité créé
    */
   public function _startOrCancelAffaire($get, $post){
-    log::logger($post , "mfleurquin");
 
     if($post["order"]["id"]){
       $order = $post["order"];
@@ -1106,6 +1106,16 @@ class souscription_bdomplus extends souscription_cleodis {
         ->addAllFields("affaire")
         ->where("affaire.ref_sign", $ref);
       $affaire = ATF::affaire()->select_row();
+
+      $suivi = array(
+        "id_societe" => $affaire["affaire.id_societe_fk"],
+        "id_affaire" => $affaire["affaire.id_affaire_fk"],
+        "type"=> "note",
+        "type_suivi"=> "Contrat",
+        "texte" => "Retour Order SLIMPAY : ".json_encode($order)
+      );
+      ATF::suivi()->i($suivi);
+
       return $this->controle_affaire($affaire, $post["order"]);
 
     }elseif($post["order"]["affaires"]){
