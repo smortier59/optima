@@ -121,7 +121,7 @@ function import_produit(string $path = ''){
 				"duree"=> $term,
 				"url_image"=> $url_image,
 				"visible_sur_site"=> $visible
-			);
+			); 
 
 			if ($produit['type']== "sans objet") $produit['type']= "sans_objet";
 
