@@ -13965,7 +13965,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->unsetHeader();
 		$this->unsetFooter();
 
-		/*
+
 		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
 
 		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
@@ -13975,7 +13975,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		  $this->AddPage();
 		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
 		}
-		*/
+
 
   }
 
