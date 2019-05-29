@@ -13942,6 +13942,11 @@ class pdf_bdomplus extends pdf_cleodis {
 			,"Le : "
 		);
 
+		$this->setY(240);
+		$this->setX(50);
+
+		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+
 
 
 		if ($this->affaire['nature']=="vente") {
@@ -13951,7 +13956,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		}
 		$this->cadre(110,$y,80,48,$cadre,$t);
 
-		//$this->Annot(110,$y,"SignatureDebtor");
+
 
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);

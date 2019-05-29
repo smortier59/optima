@@ -578,7 +578,9 @@ class souscription_cleodis extends souscription {
 
         if($post["send_file_mail"]){
 
-          $mail_files = array("Contrat"=> ATF::commande()->filepath($contrat['commande.id_commande'],"contratA4") );
+          $mail_files = array(
+            "contrat"=> array("function"=> "mandatSellAndSign", "value"=> $id_affaire)
+          );
 
           //On envoi le mail au client avec le contrat qu'il va signer
           $this->sendContrat($id_affaire, $mail_files, $contact);
@@ -1338,7 +1340,7 @@ class souscription_bdomplus extends souscription_cleodis {
     return $licence_a_envoyer;
   }
 
-  public function sendContrat($affaire, $paths, $contact){
+  public function sendContrat($affaire, $files, $contact){
 
     if($contact["email"] || $contact["email_perso"]){
       $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
@@ -1349,11 +1351,16 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $mail = new mail($info_mail);
 
-      foreach ($paths as $key => $path) {
-        $mail->addFile($path,$key.".pdf",true);
+
+      foreach ($files as $key => $infos) {
+        $fp = "/tmp/".$key.".pdf";
+        $data = ATF::pdf()->generic($infos["function"],$infos["value"],true);
+        if (file_put_contents($fp,$data)) {
+          $mail->addFile($fp,$key.".pdf",true);
+        }
       }
 
-      $mail->send();
+      log::logger($mail->send() , "mfleurquin");
     }
 
 
