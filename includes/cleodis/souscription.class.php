@@ -1254,6 +1254,7 @@ class souscription_bdomplus extends souscription_cleodis {
                 $f["etat"] = "impayee";
               }
               ATF::facture()->u($f);
+              ATF::facture()->generatePDF(array("id"=>$f["id_facture"]));
             }
 
             $licence_a_envoyer = $this->envoi_licence($commande["commande.id_commande_fk"]);
@@ -1265,7 +1266,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
             ATF::db($this->db)->commit_transaction();
 
-            $this->envoiMailLicence($affaire["affaire.id_societe_fk"], $licence_a_envoyer);
+            $this->envoiMailLicence($affaire["affaire.id_affaire_fk"], $affaire["affaire.id_societe_fk"], $licence_a_envoyer);
 
             //Installation à domicile
             $this->envoiMailInstallationZen($affaire, $commande);
@@ -1276,7 +1277,7 @@ class souscription_bdomplus extends souscription_cleodis {
           ATF::db($this->db)->rollback_transaction();
           throw $e;
         }
-      }
+     }
   }
 
 
@@ -1351,7 +1352,6 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $mail = new mail($info_mail);
 
-
       foreach ($files as $key => $infos) {
         $fp = "/tmp/".$key.".pdf";
         $data = ATF::pdf()->generic($infos["function"],$infos["value"],true);
@@ -1360,7 +1360,24 @@ class souscription_bdomplus extends souscription_cleodis {
         }
       }
 
-      log::logger($mail->send() , "mfleurquin");
+      $send = $mail->send();
+
+      $suivi = array(
+        "id_contact" => $contact["id_contact"],
+        "id_societe" => ATF::affaire()->select($affaire , "id_societe"),
+        "id_affaire" => $affaire,
+        "type"=> "note",
+        "type_suivi"=> "Contrat",
+        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+
+      );
+
+      if($send){
+        $suivi["texte"] =  "Envoi du mail au client contenant le contrat avant la signature\n".$suivi["texte"];
+      }else{
+        $suivi["texte"] =  "Probleme lors de l'envoi du mail au client contenant le contrat avant la signature";
+      }
+      ATF::suivi()->i($suivi);
     }
 
 
@@ -1389,7 +1406,24 @@ class souscription_bdomplus extends souscription_cleodis {
 
     $mail = new mail($info_mail);
 
-    $mail->send();
+    $send = $mail->send();
+
+    $suivi = array(
+      "id_contact" => $contact["id_contact"],
+      "id_societe" => ATF::affaire()->select($affaire["affaire.id_affaire_fk"] , "id_societe"),
+      "id_affaire" => $affaire["affaire.id_affaire_fk"],
+      "type"=> "note",
+      "type_suivi"=> "Contrat",
+      "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+
+    );
+
+    if($send){
+      $suivi["texte"] =  "Envoi du mail au client pour le prevenir de la non reception de la facture magasin et paiement de la 1ere facture par prelevement\n".$suivi["texte"];
+    }else{
+      $suivi["texte"] =  "Probleme lors de l'envoi du mail au client pour le prevenir de la non reception de la facture magasin et paiement de la 1ere facture par prelevement";
+    }
+    ATF::suivi()->i($suivi);
 
   }
 
@@ -1397,7 +1431,7 @@ class souscription_bdomplus extends souscription_cleodis {
    * Envoi du mail au client avec les licences
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
-  public function envoiMailLicence($id_societe, $licence_a_envoyer){
+  public function envoiMailLicence($id_affaire, $id_societe, $licence_a_envoyer){
     if($email_pro = ATF::societe()->select($id_societe, "email")){
       $email = $email_pro;
     }else{
@@ -1415,7 +1449,24 @@ class souscription_bdomplus extends souscription_cleodis {
 
     $mail = new mail($info_mail);
 
-    $mail->send();
+    $send = $mail->send();
+
+    $suivi = array(
+      "id_contact" => $contact["id_contact"],
+      "id_societe" => ATF::affaire()->select($id_affaire , "id_societe"),
+      "id_affaire" => $id_affaire,
+      "type"=> "note",
+      "type_suivi"=> "Contrat",
+      "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+
+    );
+
+    if($send){
+      $suivi["texte"] =  "Envoi du mail au client contenant les licences\n".$suivi["texte"];
+    }else{
+      $suivi["texte"] =  "Probleme lors de l'envoi du mail au client contenant les licences";
+    }
+    ATF::suivi()->i($suivi);
   }
 
   /**
@@ -1449,7 +1500,23 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $mail = new mail($info_mail);
 
-      $mail->send();
+      $send = $mail->send();
+
+      $suivi = array(
+        "id_contact" => $contact["id_contact"],
+        "id_societe" => $affaire["affaire.id_societe_fk"],
+        "id_affaire" => $affaire["affaire.id_affaire_fk"],
+        "type"=> "note",
+        "type_suivi"=> "Contrat",
+        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+      );
+
+      if($send){
+        $suivi["texte"] =  "Envoi du mail au client pour la prise de rendez-vous pour l'installation\n".$suivi["texte"];
+      }else{
+        $suivi["texte"] =  "Probleme lors de l'envoi du mail au client pour la prise de rendez-vous pour l'installation";
+      }
+      ATF::suivi()->i($suivi);
 
 
       $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
@@ -1473,7 +1540,23 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $mail2 = new mail($info_mail);
 
-      $mail2->send();
+      $send = $mail2->send();
+
+      $suivi = array(
+        "id_contact" => $contact["id_contact"],
+        "id_societe" => $affaire["affaire.id_societe_fk"],
+        "id_affaire" => $affaire["affaire.id_affaire_fk"],
+        "type"=> "note",
+        "type_suivi"=> "Contrat",
+        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+      );
+
+      if($send){
+        $suivi["texte"] =  "Envoi du mail à BDOM pour la prise de rendez-vous pour l'installation\n".$suivi["texte"];
+      }else{
+        $suivi["texte"] =  "Probleme lors de l'envoi du mail à BDOM pour la prise de rendez-vous pour l'installation";
+      }
+      ATF::suivi()->i($suivi);
 
 
     }else{
