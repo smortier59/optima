@@ -1355,6 +1355,7 @@ class souscription_bdomplus extends souscription_cleodis {
           "texte" => "Impossible de démarrer le contrat\nIl n'y a plus assez de clé de licences pour ".$value["id_licence_type"]
 
         );
+        ATF::suivi()->i($suivi);
         throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
       }
     }
