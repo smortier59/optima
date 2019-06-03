@@ -1179,6 +1179,8 @@ class souscription_bdomplus extends souscription_cleodis {
 
               $this->envoiMailFactureMagNonPayee($affaire,$loyer,$facture_magasin);
 
+              //Passer la facture en impayée + retirer la date de paiement
+
               $tache = array("tache"=>array(
                       "id_societe"=>$affaire["affaire.id_societe_fk"],
                        "id_user"=>$infos["id_user"],
@@ -1189,7 +1191,7 @@ class souscription_bdomplus extends souscription_cleodis {
                        "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
                        "no_redirect"=>"true"
                       ),
-                "dest"=>array()
+                "dest"=>array($this->id_user)
               );
               ATF::tache()->insert($tache);
             }
@@ -1199,7 +1201,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
           log::logger("Affaire Magasin Annuelle ".$affaire["affaire.ref"], "controle_affaire");
           // Si on est à J+1
-          if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 1 days')) <= date("Y-m-d")){
+          if(date("Ymd", strtotime($affaire["affaire.date"]. ' + 1 days')) <= date("Ymd")){
 
             ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
             $facture_magasin = ATF::facture_magasin()->select_row();
@@ -1579,11 +1581,17 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function check_affaires_magasin(){
+    log::logger("=====================", "controle_affaire");
+
     ATF::affaire()->q->reset()
       ->whereIsNotNull("id_magasin")
       ->where("affaire.date", date("Y-m-d", strtotime("-1 days")), "AND", NULL, "<=");
 
     $affaireshier = ATF::affaire()->select_all();
+
+    ATF::affaire()->setToString();
+    log::logger(ATF::affaire()->select_all() , "controle_affaire");
+
 
     if($affaireshier){
       foreach ($affaireshier as $key => $value) {
@@ -1591,7 +1599,7 @@ class souscription_bdomplus extends souscription_cleodis {
           ->where("affaire.id_affaire", $value["affaire.id_affaire"])
           ->whereIsNotNull("affaire.id_magasin");
         $affaire = ATF::affaire()->select_row();
-        log::logger("=====================", "controle_affaire");
+
         try{
           $this->controle_affaire($affaire);
         }catch(errorATF $e){
@@ -1599,6 +1607,8 @@ class souscription_bdomplus extends souscription_cleodis {
         }
 
       }
+    } else {
+      log::logger("Aucune affaire hier", "controle_affaire");
     }
   }
 
