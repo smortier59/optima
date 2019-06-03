@@ -1589,7 +1589,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
     $affaireshier = ATF::affaire()->select_all();
 
-    ATF::affaire()->setToString();
+    ATF::affaire()->q->setToString();
     log::logger(ATF::affaire()->select_all() , "controle_affaire");
 
 
