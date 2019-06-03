@@ -1180,6 +1180,10 @@ class souscription_bdomplus extends souscription_cleodis {
               $this->envoiMailFactureMagNonPayee($affaire,$loyer,$facture_magasin);
 
               //Passer la facture en impayée + retirer la date de paiement
+              ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
+                                      ->addOrder("facture.id_facture", "ASC");
+              $facture = ATF::facture()->select_row();
+              if($facture)  ATF::facture()->u(array("id_facture" => $facture["facture.id_facture"], "etat"=>"impayee", "date_paiement"=> NULL));
 
               $tache = array("tache"=>array(
                       "id_societe"=>$affaire["affaire.id_societe_fk"],
@@ -1339,23 +1343,12 @@ class souscription_bdomplus extends souscription_cleodis {
 
       if(count($licence)){
         foreach ($licence as $kl => $vl) {
-
-
           ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
           $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
           $licence_a_envoyer[$value["id_produit"]][] = $vl;
         }
 
       }else{
-        $suivi = array(
-          "id_societe" => ATF::commande()->select($id_commande , "id_societe"),
-          "id_affaire" => ATF::commande()->select($id_commande , "id_affaire"),
-          "type"=> "note",
-          "type_suivi"=> "Contrat",
-          "texte" => "Impossible de démarrer le contrat\nIl n'y a plus assez de clé de licences pour ".$value["id_licence_type"]
-
-        );
-        ATF::suivi()->i($suivi);
         throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
       }
     }
