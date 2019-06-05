@@ -11,6 +11,8 @@ class souscription_cleodis extends souscription {
   public $id_agence = 1; // ID De l'agence qui sera attaché aux éléments
   public $fournisseur = 246; // ID Du fournisseur par défaut qui sera attaché aux éléments DEFAULT : cléodis
 
+  public $codename = "cleodis"; // Utile pour le stockage des fichiers lors de la récuperation des fichiers signés
+
   public $id_partenaire = NULL;
 
   public $id_refinanceur_cleodis = 4;
@@ -752,6 +754,7 @@ class souscription_cleodis extends souscription {
   * @param array $post["id_affaire"]
   */
   public function _storeSignedDocuments($post){
+
     switch ($post['type']) {
       case 'mandatSellAndSign': // Contrat signé
       case 'mandatSellAndSign.pdf': // Contrat signé
@@ -790,10 +793,18 @@ class souscription_cleodis extends souscription {
         "id_affaire"=>$id,
         "provenance"=>"Retour autre document : ".ATF::affaire()->select($id, "ref")
       ));
-      $file = ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint", null, 'cleodis');
+      $file = ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint", null, $this->codename);
 
     } else {
-      $file = ATF::getClass($module)->filepath($id, $type, null, 'cleodis');
+      $file = ATF::getClass($module)->filepath($id, $type, null, $this->codename);
+
+      // Si c'est le module commande, on met à jour les dates de retour
+      if($module == "commande"){
+        if ($type == "retour") $champs = "retour_contrat";
+        if ($type == "retourPV") $champs = "retour_pv";
+        if($champs) ATF::commande()->u(array("id_commande"=> $id, $champs => date("Y-m-d")));
+      }
+
     }
 
     try {
@@ -1086,6 +1097,8 @@ class souscription_cleodis extends souscription {
 class souscription_bdomplus extends souscription_cleodis {
 
   public $id_user = 116;
+  public $codename = "bdomplus";
+
   /**
    * Démarrage du contrat ou annulation de l'affaire selon le retour order SLIMPAY
    * @param  Integer $id_affaire      ID de l'affaire
