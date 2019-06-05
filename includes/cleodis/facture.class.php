@@ -2094,16 +2094,13 @@ class facture_cleodis extends facture {
 					if($finContratDansMois && $finContratDansMois < $InOneMonth){	$afficher = FALSE; }
 				}
 
-
-
-//log::logger($afficher,ygautheron);
 				if($afficher){
 					$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);
 					$societe = ATF::societe()->select($item['facture.id_societe_fk']);
 					ATF::loyer()->q->reset()->where("loyer.id_affaire",$item["facture.id_affaire_fk"]);
 					$loyers = ATF::loyer()->select_all();
-//log::logger("===================".$item["facture.id_affaire_fk"]."==========\n",ygautheron);
-//log::logger($loyer,ygautheron);
+
+
 					foreach($loyers as $k=>$loyer){
 
 						//Ne pas afficher les contrats ou il n'y a qu'un seul loyer
@@ -2125,12 +2122,17 @@ class facture_cleodis extends facture {
 								$Achat["TTC"] = $Achat["TTC"] + ($v["prix"] * $v["tva"]) ;
 							}
 
+
+
 							ATF::commande()->q->reset()->where("commande.id_affaire", $item["facture.id_affaire_fk"]);
 							$commande = ATF::commande()->select_row();
 							ATF::facturation()->q->reset()->where("facturation.id_affaire", $item["facture.id_affaire_fk"])
 														  ->where("facturation.date_periode_debut", $commande["commande.date_debut"], "AND", false, ">=")
 														  ->addOrder("date_periode_debut", "asc");
 							$echeancierTmp = ATF::facturation()->select_all();
+
+							//On reinitialise l'array echeancier pour ne pas avoir des données d'avant
+							$echeancier = array();
 
 							//HotFix pour BTWIN
 							// On a toujours 2 lignes d'echeance pour la 1er periode
@@ -2204,6 +2206,7 @@ class facture_cleodis extends facture {
 										}
 									}
 									$date = date("Y-m", strtotime($date));
+
 									//$date = $date."-".$jour[2];
 									$dateCol = new DateTime($date."-".$jour[2]);
 									$dateColFin = new DateTime($date."-31");
@@ -2212,9 +2215,11 @@ class facture_cleodis extends facture {
 
 
 
-									if(($dateCol->getTimestamp()  <= $dateDeb->getTimestamp() && $dateColFin->getTimestamp() >= $dateDeb->getTimestamp()))
-								    {
+									if(($dateCol->getTimestamp()  <= $dateDeb->getTimestamp() && $dateColFin->getTimestamp() >= $dateDeb->getTimestamp())){
+
+
 										if((($echeancier[$fact]["montant"]+$echeancier[$fact]["assurance"]+$echeancier[$fact]["frais_de_gestion"]) == ($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"])) || (($echeancier[$fact]["montant"]) == ($loyer["loyer"]+$loyer["assurance"]+$loyer["frais_de_gestion"]))){
+
 											$row_data[$char] =  array(($echeancier[$fact]["montant"]+$echeancier[$fact]["assurance"]+$echeancier[$fact]["frais_de_gestion"]),"cel_right");
 										}
 							    		$fact++;
