@@ -22,3 +22,4 @@ ALTER TABLE `magasin` ADD `statut` ENUM('ouvert','ferme') NOT NULL DEFAULT 'ouve
 
 
 
+ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif','comite_cleodis_valide','comite_cleodis_refuse','refus_administratif','autre','envoi_mail_relance','signature_document','signature_document_ok','finalisation_souscription') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
