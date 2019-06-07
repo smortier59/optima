@@ -315,7 +315,7 @@ class pdf_cleodis extends pdf {
 			$this->cell(150,5,$this->client["IBAN"],0,1);
 
 			$this->SetXY(40,247);
-			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+			$this->multicell(100,5,"[ImageContractant1/]");
 
 
 			$this->SetXY(120,248);
@@ -11908,7 +11908,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
 
 		$this->setleftMargin(130);
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->multicell(100,5,"[ImageContractant/]");
 		$this->setleftMargin(15);
 
 		$this->mandatSignature($this->mandat["id_mandat"]);
@@ -13940,12 +13940,13 @@ class pdf_bdomplus extends pdf_cleodis {
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
+			,"[sc_user.signature/]"
 		);
 
 		$this->setY(240);
-		$this->setX(50);
+		$this->setX(45);
 
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->multicell(100,5,"[sc_sign1.signature/]");
 
 
 
@@ -13955,6 +13956,9 @@ class pdf_bdomplus extends pdf_cleodis {
 		  $t = "La Société";
 		}
 		$this->cadre(110,$y,80,48,$cadre,$t);
+
+
+
 
 
 
@@ -14350,7 +14354,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->setleftMargin(50);
 		$this->multicell(60,5,"\n\n\n[sc_sceaudeconfiance/]");
 		$this->setleftMargin(130);
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->multicell(100,5,"[ImageContractant1/]");
 
 
 		if(ATF::$codename === "cleodis" && $this->client['id_famille'] != 9){
@@ -14372,7 +14376,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->cell(150,5,$this->client["IBAN"],0,1);
 
 			$this->SetXY(40,247);
-			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+			$this->multicell(100,5,"[ImageContractant1/]");
 
 
 			$this->SetXY(120,248);
