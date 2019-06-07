@@ -1362,7 +1362,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
       if(count($licence)){
         foreach ($licence as $kl => $vl) {
-          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
+          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"], "date_envoi"=>date("Y-m-d")));
           $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
           $licence_a_envoyer[$value["id_produit"]][] = $vl;
         }
