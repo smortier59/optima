@@ -237,6 +237,62 @@ class devis_cleodis extends devis {
 		}
 	}
 
+	public function recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos){
+		$RUM = "";
+		/*if($affaire["RIB"]){
+			if($infos_AR){
+				foreach ($infos_AR["affaire"] as $key => $value) {
+					$RIB = ATF::affaire()->select($value, "RIB");
+					if(ATF::affaire()->select($value, "RUM")){
+						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
+						$RIB  = str_replace(" ", "", $RIB );
+						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value, "RUM");
+					}
+				}
+			}elseif ($infos_avenant){
+				foreach ($infos_avenant["affaire"] as $key => $value) {
+					$RIB = ATF::affaire()->select($value, "RIB");
+					if(ATF::affaire()->select($value, "RUM")){
+						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
+						$RIB  = str_replace(" ", "", $RIB );
+
+						if($RIB == $affaire["RIB"])	$RUM =  ATF::affaire()->select($value, "RUM");
+					}
+				}
+			}else{
+				ATF::affaire()->q->reset()->where("affaire.id_societe" , $infos['id_societe']);
+				$lesAffaires = ATF::affaire()->select_all();
+
+				foreach ($lesAffaires as $key => $value) {
+					$RIB = ATF::affaire()->select($value, "RIB");
+					if(ATF::affaire()->select($value["affaire.id_affaire"], "RUM")){
+						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
+						$RIB  = str_replace(" ", "", $infos["RIB"] );
+
+						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
+					}
+				}
+			}
+		}*/
+		if($affaire["IBAN"] && $affaire["BIC"]){
+			ATF::affaire()->q->reset()->where("IBAN", $affaire["IBAN"], "AND")
+								 ->where("BIC", $affaire["BIC"], "AND")
+								 ->where("affaire.id_societe", $infos["id_societe"], "AND");
+
+			$affaire_trouve = ATF::affaire()->select_row();
+
+			log::logger($affaire_trouve, "mfleurquin");
+
+			if($affaire_trouve){
+				$RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
+			}
+		}
+
+
+		return $RUM;
+
+	}
+
 	/**
 	* Surcharge de l'insert afin d'insérer les lignes de devis de créer l'affaire si elle n'existe pas
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -341,48 +397,27 @@ class devis_cleodis extends devis {
 		ATF::db($this->db)->begin_transaction();
 //*****************************Transaction********************************
 
+		if($infos["IBAN"]){
+			$affaire["IBAN"] = $infos["IBAN"];
+			unset($infos["IBAN"]);
+		}
+
+		if($infos["BIC"]){
+			$affaire["BIC"] = $infos["BIC"];
+			unset($infos["BIC"]);
+		}
+
+
+
 		$RUM = "";
 		if($infos["type_affaire"]) $affaire["type_affaire"] = $infos["type_affaire"];
-		if($affaire["RIB"]){
-			if($infos_AR){
 
-				foreach ($infos_AR["affaire"] as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value, "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $RIB );
+		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
-						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value, "RUM");
-					}
-				}
-			}elseif ($infos_avenant){
-				foreach ($infos_avenant["affaire"] as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value, "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $RIB );
-
-						if($RIB == $affaire["RIB"])	$RUM =  ATF::affaire()->select($value, "RUM");
-					}
-
-				}
-			}else{
-				ATF::affaire()->q->reset()->where("affaire.id_societe" , $infos['id_societe']);
-				$lesAffaires = ATF::affaire()->select_all();
-
-				foreach ($lesAffaires as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value["affaire.id_affaire"], "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $infos["RIB"] );
-
-						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
-					}
-				}
-			}
-		}
 		if(!$RUM){
-			if(ATF::societe()->select($infos['id_societe'], 'RUM')){
+			if(    ATF::societe()->select($infos['id_societe'], 'RUM')
+				&& ATF::societe()->select($infos['id_societe'], 'IBAN') == $affaire["BIC"]
+				&& ATF::societe()->select($infos['id_societe'], 'BIC') == $affaire["IBAN"]){
 				$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
 			}else{
 				//Si il n'y a pas de RUM, on en ajoute un pour cette société
@@ -408,6 +443,8 @@ class devis_cleodis extends devis {
 
 
 			    ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+			    if($affaire["IBAN"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "IBAN"=>$affaire["IBAN"]));
+			    if($affaire["BIC"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "BIC"=>$affaire["BIC"]));
 			}
 		}
 		$affaire["RUM"] = $RUM;
@@ -1769,6 +1806,7 @@ class devis_bdomplus extends devis_cleodis {
 		$this->fieldstructure();
 
 	}
+
 };
 class devis_bdom extends devis_cleodis { };
 class devis_boulanger extends devis_cleodis { };

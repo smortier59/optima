@@ -135,9 +135,9 @@ class souscription_cleodis extends souscription {
           "adresse_facturation_2"=>$post['facturation']['adresse_2'],
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
-          "IBAN"=>$societe["IBAN"],
+          //"IBAN"=>$societe["IBAN"], //Inutile le travail est fait dans devis->insert()
           //"RUM"=>$societe["RUM"], //Inutile le travail est fait dans devis->insert()
-          "BIC"=>$societe["BIC"],
+          //"BIC"=>$societe["BIC"], //Inutile le travail est fait dans devis->insert()
           "id_magasin"=>$post["id_magasin"]
         );
 
@@ -253,7 +253,9 @@ class souscription_cleodis extends souscription {
         "type_devis" => "normal",
         "id_contact" => $post["id_contact"],
         "prix_achat"=>0,
-        "type_affaire" => "normal"
+        "type_affaire" => "normal",
+        "IBAN"=> $post["iban"],
+        "BIC"=> $post["bic"]
     );
 
     // COnstruction des lignes de devis a partir des produits en JSON
