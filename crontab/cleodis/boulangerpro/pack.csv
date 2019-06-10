@@ -1,4 +1,5 @@
 N°;Nom;Etat;Site associé;Visible sur le site;Description
+<<<<<<< crontab/cleodis/boulangerpro/pack.csv
 1;Bridge SONY DSC-HX400V;Actif;boulangerpro;Oui;Un bridge ultra performant
 2;GPS TOMTOM GO Professional 6200;Actif;boulangerpro;Oui;GPS TOMTOM GO Professional 6200
 3;GPS TOMTOM GO Camper Monde connecté;Actif;boulangerpro;Oui;GPS TOMTOM GO Camper Monde connecté
@@ -42,3 +43,88 @@ N°;Nom;Etat;Site associé;Visible sur le site;Description
 41;Portable MACBOOK Pro New 15 Touch Bar I9 512 Argent;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 15 Touch Bar I9 512 Argent
 42;Portable MACBOOK Pro New 15 Touch Bar I9 512 Gris Sidéral;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 15 Touch Bar I9 512 Gris Sidéral
 43;TV SONY KD65AG9;Actif;boulangerpro;Oui;TV SONY KD65AG9
+=======
+1;Chromebook ACER R13 CB5-312T-K2L7;Actif;boulangerpro;Oui;Chromebook ACER R13 CB5-312T-K2L7
+2;Micro-ondes encastrable SAMSUNG FG87SST;Actif;boulangerpro;Oui;Micro-ondes encastrable SAMSUNG FG87SST
+3;Hotte décorative ELICA STRIPE BL/A/60/LX;Actif;boulangerpro;Oui;Hotte décorative ELICA STRIPE BL/A/60/LX
+4;Hotte décorative BOSCH DWB96IM50;Actif;boulangerpro;Oui;Hotte décorative BOSCH DWB96IM50
+5;Micro-ondes encastrable HOTPOINT MN613IX HA;Actif;boulangerpro;Oui;Micro-ondes encastrable HOTPOINT MN613IX HA
+6;Micro-ondes encastrable SIEMENS BF555LMW0;Actif;boulangerpro;Oui;Micro-ondes encastrable SIEMENS BF555LMW0
+7;Centrale vapeur LAURASTAR LIFT Plus Pinky Pop;Actif;boulangerpro;Oui;Une nouvelle façon de repasser
+8;Tablette HUAWEI M5 10.8'' 32Go;Actif;boulangerpro;Oui;Tablette HUAWEI M5 10.8'' 32Go
+9;Lave vaisselle intégrable 60cm HOTPOINT HBO3T21W;Actif;boulangerpro;Oui;Lave vaisselle intégrable 60cm HOTPOINT HBO3T21W
+10;Réfrigérateur 2 portes Vent BEKO RDSE450K20W;Actif;boulangerpro;Oui;Réfrigérateur 2 portes Vent BEKO RDSE450K20W
+11;Hotte décorative BOSCH DWQ96DM50;Actif;boulangerpro;Oui;Hotte décorative BOSCH DWQ96DM50
+12;Micro-ondes encastrable SAUTER SMS4340X;Actif;boulangerpro;Oui;Micro-ondes encastrable SAUTER SMS4340X
+13;Tablette HUAWEI Pack M5 10'' 32Go + carte 128Go;Actif;boulangerpro;Oui;Tablette HUAWEI Pack M5 10'' 32Go + carte 128Go
+14;Réfrigérateur 2 portes Vent BEKO RDSE450K20S;Actif;boulangerpro;Oui;Réfrigérateur 2 portes Vent BEKO RDSE450K20S
+15;Ecran LED ACER Predator XB271HAbmiprzx;Actif;boulangerpro;Oui;Ecran LED ACER Predator XB271HAbmiprzx
+16;Aspirateur traineau MIELE Blizzard CX1 Comfort Ecoline;Actif;boulangerpro;Oui;Aspirateur traineau MIELE Blizzard CX1 Comfort Ecoline
+17;Paire d'enceintes TRIANGLE LN01A ELARA NOIR MAT X2;Actif;boulangerpro;Oui;Paire d'enceintes TRIANGLE LN01A ELARA NOIR MAT X2
+18;Paire d'enceintes TRIANGLE LN01A ELARA BLANC MAT X2;Actif;boulangerpro;Oui;Paire d'enceintes TRIANGLE LN01A ELARA BLANC MAT X2
+19;Hotte décorative DE DIETRICH DHR7941B;Actif;boulangerpro;Oui;Hotte décorative DE DIETRICH DHR7941B
+20;Hotte décorative DE DIETRICH DHR7941X;Actif;boulangerpro;Oui;Hotte décorative DE DIETRICH DHR7941X
+21;Table cuisson gaz ELECTROLUX EGH6349GOX;Actif;boulangerpro;Oui;Table cuisson gaz ELECTROLUX EGH6349GOX
+22;Montre connectée sport SUUNTO SPARTAN SPORT WRIST HR ALL NOIRE;Actif;boulangerpro;Oui;Montre connectée sport SUUNTO SPARTAN SPORT WRIST HR ALL NOIRE
+23;Robot KITCHENAID mini 5KSM3311XECA Pomme d'amour;Actif;boulangerpro;Oui;Robot KITCHENAID mini 5KSM3311XECA Pomme d'amour
+24;Reflex NIKON D5600 + 18-140mm VR;Actif;boulangerpro;Oui;NIKON D5600 + AF-S DX 18-140 f/3.5-5.6G ED VR GARANTI 3 ans
+25;TV HISENSE H65U7B;Actif;boulangerpro;Oui;TV HISENSE H65U7B
+26;Portable ASUS TUF705GD-EW081T;Actif;boulangerpro;Oui;Portable ASUS TUF705GD-EW081T
+27;Caméra 360° RICOH THETA Z1;Actif;boulangerpro;Oui;Caméra 360° RICOH THETA Z1
+28;Portable SAMSUNG Galaxy Book 12.0 i5 4Go 128Go;Actif;boulangerpro;Oui;Portable SAMSUNG Galaxy Book 12.0 i5 4Go 128Go
+29;TV SONY KD65XG7096;Actif;boulangerpro;Oui;TV SONY KD65XG7096
+30;Expresso broyeur KRUPS Barista YY4195FD;Actif;boulangerpro;Oui;Expresso broyeur KRUPS Barista YY4195FD
+31;Table cuisson gaz ASKO HG1935AB;Actif;boulangerpro;Oui;Table cuisson gaz ASKO HG1935AB
+32;Ordinateur ACER Predator PO9-900-024;Actif;boulangerpro;Oui;Ordinateur ACER Predator PO9-900-024
+33;Four pyrolyse BEKO BIET21300XP;Actif;boulangerpro;Oui;Four pyrolyse BEKO BIET21300XP
+34;Lave linge hublot LG F74J53WH;Actif;boulangerpro;Oui;Moteur induction direct sans courroie : silencieux et robuste!
+35;Console SONY PS4 1To Crash Team Racing + 2ème Manette;Actif;boulangerpro;Oui;Console SONY PS4 1To Crash Team Racing + 2ème Manette
+36;Hotte FABER STEELMAX 800 NOIR/INOX;Actif;boulangerpro;Oui;Hotte FABER STEELMAX 800 NOIR/INOX
+37;Lave vaisselle intégrable 60cm HOTPOINT HBO3T21WB;Actif;boulangerpro;Oui;Lave vaisselle intégrable 60cm HOTPOINT HBO3T21WB
+38;Appareil photo numérique CANON PowerShot SX740 HS Argent+Trepied+Housse;Actif;boulangerpro;Oui;Appareil photo numérique CANON PowerShot SX740 HS Argent+Trepied+Housse
+39;Expresso broyeur MELITTA Purista Argent F230-101;Actif;boulangerpro;Oui;Expresso broyeur MELITTA Purista Argent F230-101
+40;Vidéoprojecteur KODAK Luma 350;Actif;boulangerpro;Oui;Vidéoprojecteur KODAK Luma 350
+41;Hotte décorative DE DIETRICH DHR7941W;Actif;boulangerpro;Oui;Hotte décorative DE DIETRICH DHR7941W
+42;Portable HP 17-ca0005nf;Actif;boulangerpro;Oui;Portable HP 17-ca0005nf
+43;Four BOSCH HBA553BR0;Actif;boulangerpro;Oui;Four BOSCH HBA553BR0
+44;Aspirateur traineau Balai DYSON V8 Parquet;Actif;boulangerpro;Oui;Aspirateur traineau Balai DYSON V8 Parquet
+45;Ampli-Tuner HARMAN KARDON HK3700;Actif;boulangerpro;Oui;Le son ancienne école rencontre la connectivité du monde actuel !
+46;Ordinateur HP 22-c0072nf;Actif;boulangerpro;Oui;Ordinateur HP 22-c0072nf
+47;Micro-ondes grill WHIRLPOOL W6MD440BSS W COLLECTION;Actif;boulangerpro;Oui;Micro-ondes grill WHIRLPOOL W6MD440BSS W COLLECTION
+48;Four pyrolyse BOSCH Série 8 HBG672BS1F;Actif;boulangerpro;Oui;Four pyrolyse BOSCH Série 8 HBG672BS1F
+49;Ordinateur ASUS V222UAK-WA125T;Actif;boulangerpro;Oui;Ordinateur ASUS V222UAK-WA125T
+50;Table Mixte AEG HD634170NB;Actif;boulangerpro;Oui;Table Mixte AEG HD634170NB
+51;Piano cuisson ESSENTIELB EMCG 916n;Actif;boulangerpro;Oui;Piano cuisson ESSENTIELB EMCG 916n
+52;Piano cuisson ESSENTIELB EMCG 916i;Actif;boulangerpro;Oui;Piano cuisson ESSENTIELB EMCG 916i
+53;Piano cuisson ESSENTIELB EMCG 916r;Actif;boulangerpro;Oui;Piano cuisson ESSENTIELB EMCG 916r
+54;Portable ASUS S530UA-BQ095T;Actif;boulangerpro;Oui;Portable ASUS S530UA-BQ095T
+55;Ordinateur ASUS V241FAK-WA076T;Actif;boulangerpro;Oui;Ordinateur ASUS V241FAK-WA076T
+56;Expresso broyeur JURA D4 Platine Pianoblack;Actif;boulangerpro;Oui;Expresso broyeur JURA D4 Platine Pianoblack
+57;Four pyrolyse MIELE H 2265-1 BP;Actif;boulangerpro;Oui;Four pyrolyse MIELE H 2265-1 BP
+58;Ordinateur HP 24-f0109nf;Actif;boulangerpro;Oui;Ordinateur HP 24-f0109nf
+59;Sèche-linge hublot MIELE TDB 230 WP;Actif;boulangerpro;Oui;Eclairage Power LED du tambour pour une meilleur visibilité!
+60;Expresso broyeur KRUPS EVIDENCE PLUS TITANE ET POT A LAIT INOX;Actif;boulangerpro;Oui;Expresso broyeur KRUPS EVIDENCE PLUS TITANE ET POT A LAIT INOX
+61;Four pyrolyse MIELE H 2268-1 BP;Actif;boulangerpro;Oui;Four pyrolyse MIELE H 2268-1 BP
+62;Combiné HAIER A3FE737CMJ;Actif;boulangerpro;Oui;Combiné HAIER A3FE737CMJ
+63;Four pyrolyse MIELE H 2760 BP;Actif;boulangerpro;Oui;Four pyrolyse MIELE H 2760 BP
+64;Ordinateur HP Pavilion 27-xa0066nf;Actif;boulangerpro;Oui;Ordinateur HP Pavilion 27-xa0066nf
+65;Portable ASUS Vivobook S712FA-AU167T;Actif;boulangerpro;Oui;Portable ASUS Vivobook S712FA-AU167T
+66;Réfrigérateur multi-portes DAEWOO RFN-L475B0S;Actif;boulangerpro;Oui;Froid total No-frost
+67;Expresso broyeur JURA E8 PianoWhite;Actif;boulangerpro;Oui;Expresso broyeur JURA E8 PianoWhite
+68;Réfrigérateur multi-portes SCHNEIDER SFD416IX;Actif;boulangerpro;Oui;Réfrigérateur multi-portes SCHNEIDER SFD416IX
+69;Combiné Intég LIEBHERR SICN3386;Actif;boulangerpro;Oui;Combiné Intég LIEBHERR SICN3386
+70;Ordinateur ASUS G12-FR068T;Actif;boulangerpro;Oui;Ordinateur ASUS G12-FR068T
+71;Ordinateur ASUS GS10CS-FR285T;Actif;boulangerpro;Oui;Ordinateur ASUS GS10CS-FR285T
+72;Ordinateur ASUS GS10CS-FR282T;Actif;boulangerpro;Oui;Ordinateur ASUS GS10CS-FR282T
+73;Ordinateur HP Pavilion 27-xa0999nf;Actif;boulangerpro;Oui;Ordinateur HP Pavilion 27-xa0999nf
+74;Vidéoprojecteur OPTOMA UHL55;Actif;boulangerpro;Oui;Vidéoprojecteur OPTOMA UHL55
+75;Micro-ondes four KITCHENAID KMQCXB45600;Actif;boulangerpro;Oui;Micro-ondes four KITCHENAID KMQCXB45600
+76;Four pyrolyse KITCHENAID KOASPB60600;Actif;boulangerpro;Oui;Four pyrolyse KITCHENAID KOASPB60600
+77;Ordinateur ASUS GS10CS-FR242T;Actif;boulangerpro;Oui;Ordinateur ASUS GS10CS-FR242T
+78;Piano cuisson SMEG C92IPBL9;Actif;boulangerpro;Oui;Piano cuisson SMEG C92IPBL9
+79;Table cuisson gaz ASKO HG1145AB;Actif;boulangerpro;Oui;Table cuisson gaz ASKO HG1145AB
+80;Ordinateur ASUS G21CX-FR008T;Actif;boulangerpro;Oui;Ordinateur ASUS G21CX-FR008T
+81;Ordinateur HP Omen 880-559nf;Actif;boulangerpro;Oui;Ordinateur HP Omen 880-559nf
+82;Ordinateur ASUS G21CX-FR021T;Actif;boulangerpro;Oui;Ordinateur ASUS G21CX-FR021T
+83;Ordinateur ASUS G12CX-FR054T;Actif;boulangerpro;Oui;Ordinateur ASUS G12CX-FR054T
+>>>>>>> crontab/cleodis/boulangerpro/pack.csv
