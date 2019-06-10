@@ -315,7 +315,7 @@ class pdf_cleodis extends pdf {
 			$this->cell(150,5,$this->client["IBAN"],0,1);
 
 			$this->SetXY(40,247);
-			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+			$this->multicell(100,5,"[ImageContractant1/]");
 
 
 			$this->SetXY(120,248);
@@ -11908,7 +11908,7 @@ class pdf_cap extends pdf_cleodis {
 		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
 
 		$this->setleftMargin(130);
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->multicell(100,5,"[ImageContractant/]");
 		$this->setleftMargin(15);
 
 		$this->mandatSignature($this->mandat["id_mandat"]);
@@ -13940,12 +13940,13 @@ class pdf_bdomplus extends pdf_cleodis {
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
+			,"[sc_user.signature/]"
 		);
 
 		$this->setY(240);
-		$this->setX(50);
+		$this->setX(45);
 
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->multicell(100,5,"[sc_sign1.signature/]");
 
 
 
@@ -13958,6 +13959,9 @@ class pdf_bdomplus extends pdf_cleodis {
 
 
 
+
+
+
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
 		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES CI APRES",0,'C');
@@ -13966,7 +13970,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->unsetFooter();
 
 
-		$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
+		/*$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
 
 		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 		  $tplIdx = $this->importPage($pageNo);
@@ -13974,7 +13978,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		  // add a page
 		  $this->AddPage();
 		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-		}
+		}*/
 
 
   }
@@ -14350,7 +14354,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->setleftMargin(50);
 		$this->multicell(60,5,"\n\n\n[sc_sceaudeconfiance/]");
 		$this->setleftMargin(130);
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
+		$this->multicell(100,5,"[ImageContractant1/]");
 
 
 		if(ATF::$codename === "cleodis" && $this->client['id_famille'] != 9){
@@ -14372,7 +14376,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->cell(150,5,$this->client["IBAN"],0,1);
 
 			$this->SetXY(40,247);
-			$this->multicell(100,5,"[ImageContractant1]\n\n[/ImageContractant1]");
+			$this->multicell(100,5,"[ImageContractant1/]");
 
 
 			$this->SetXY(120,248);

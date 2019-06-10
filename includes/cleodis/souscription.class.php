@@ -135,9 +135,9 @@ class souscription_cleodis extends souscription {
           "adresse_facturation_2"=>$post['facturation']['adresse_2'],
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
-          "IBAN"=>$societe["IBAN"],
+          //"IBAN"=>$societe["IBAN"], //Inutile le travail est fait dans devis->insert()
           //"RUM"=>$societe["RUM"], //Inutile le travail est fait dans devis->insert()
-          "BIC"=>$societe["BIC"],
+          //"BIC"=>$societe["BIC"], //Inutile le travail est fait dans devis->insert()
           "id_magasin"=>$post["id_magasin"]
         );
 
@@ -253,7 +253,9 @@ class souscription_cleodis extends souscription {
         "type_devis" => "normal",
         "id_contact" => $post["id_contact"],
         "prix_achat"=>0,
-        "type_affaire" => "normal"
+        "type_affaire" => "normal",
+        "IBAN"=> $post["iban"],
+        "BIC"=> $post["bic"]
     );
 
     // COnstruction des lignes de devis a partir des produits en JSON
@@ -887,7 +889,6 @@ class souscription_bdomplus extends souscription_cleodis {
    * @param  Text $desc            Description associé au comité
    * @param  Date $reponse         Date de la réponse
    * @param  Date $validite_accord Date de validité de l'accord
-   * @return Integer                  ID du comité créé
    */
   public function _startOrCancelAffaire($get, $post){
 
@@ -908,7 +909,7 @@ class souscription_bdomplus extends souscription_cleodis {
         "texte" => "Retour Order SLIMPAY : ".json_encode($order)
       );
       ATF::suivi()->i($suivi);
-      return $this->controle_affaire($affaire, $post["order"]);
+      $return = $this->controle_affaire($affaire, $post["order"]);
 
     }elseif($post["order"]["affaires"]){
       ATF::affaire()->q->reset()
@@ -917,10 +918,13 @@ class souscription_bdomplus extends souscription_cleodis {
       $affaire = ATF::affaire()->select_row();
       ATF::affaire_etat()->i(array("id_affaire"=> $affaire["affaire.id_affaire_fk"], "etat"=> "finalisation_souscription"));
       $return["order"] =  $this->controle_affaire($affaire);
-      return $return;
+
     }else{
       throw new errorATF("Data manquante en paramètre d'entrée", 500);
     }
+    log::logger($return , "mfleurquin");
+
+    return $return;
 
   }
 
@@ -1030,11 +1034,12 @@ class souscription_bdomplus extends souscription_cleodis {
       throw new errorATF("Pas d'affaire trouvée pour la ref_sign ".$ref." ou l'id ".$affaire["affaire.id_affaire_fk"], 500);
     }
 
-    return array("id_affaire" => $affaire["affaire.id_affaire_fk"],
-                 "id_magasin" => $affaire["affaire.id_magasin"],
-                 "frequence_loyer"=> $loyer["frequence_loyer"],
-                 "order" => $order
-            );
+    $order["id_affaire"] = $affaire["affaire.id_affaire_fk"];
+    $order["id_societe"] = $affaire["affaire.id_societe_fk"];
+    $order["id_magasin"] = $affaire["affaire.id_magasin"];
+    $order["frequence_loyer"] = $loyer["frequence_loyer"];
+
+    return array("order" => $order);
   }
 
   /**
@@ -1143,7 +1148,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
       if(count($licence)){
         foreach ($licence as $kl => $vl) {
-          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"]));
+          ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"], "date_envoi"=>date("Y-m-d")));
           $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
           $licence_a_envoyer[$value["id_produit"]][] = $vl;
         }

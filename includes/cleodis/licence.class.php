@@ -31,7 +31,7 @@ class licence extends classes_optima {
 
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		foreach ($return["data"] as $key => $value) {
-			if($value["licence.id_commande_ligne_fk"]){
+			if($value["licence.id_commande_ligne"]){
 				$return["data"][$key]["deja_pris"] = true;
 			}else{
 				$return["data"][$key]["deja_pris"] = false;

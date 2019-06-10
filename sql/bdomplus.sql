@@ -23,3 +23,10 @@ ALTER TABLE `magasin` ADD `statut` ENUM('ouvert','ferme') NOT NULL DEFAULT 'ouve
 
 
 ALTER TABLE `affaire_etat` CHANGE `etat` `etat` ENUM('reception_demande','reception_pj','preparation_commande','refus_dossier','expedition_en_cours','colis_recu','valide_administratif','comite_cleodis_valide','comite_cleodis_refuse','refus_administratif','autre','envoi_mail_relance','signature_document','signature_document_ok','finalisation_souscription') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+
+ALTER TABLE `affaire` CHANGE `mail_signature` `mail_signature` ENUM('oui','non') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'non' COMMENT 'Mail signataire',
+					  CHANGE `date_signature` `date_signature` DATETIME NULL DEFAULT NULL COMMENT 'Date de la demande de signature',
+					  CHANGE `tel_signature` `tel_signature` VARCHAR(20) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'Téléphone signataire';
+
+
+
