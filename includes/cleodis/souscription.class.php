@@ -1154,6 +1154,10 @@ class souscription_bdomplus extends souscription_cleodis {
         }
 
       }else{
+        /*ATF::suivi()->i(array("id_affaire"=>ATF::commande()->select($id_commande , "id_affaire") ,
+                              "id_societe"=> ATF::commande()->select($id_commande , "id_societe") ,
+                              "texte"=> "Il n'y a plus assez de clé de licences pour ".ATF::licence_type()->select($value["id_licence_type"], "licence_type")));*/
+
         throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
       }
     }
