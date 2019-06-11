@@ -9,6 +9,7 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 // Désactivation de la traçabilité
 ATF::define("tracabilite",false);
 
+$GLOBALS['logFile'] = "maj-garantie-batch";
 
 // MARK: STRUCTS
 class ServiceEntity {
@@ -28,20 +29,20 @@ class ServiceEntity {
         $this->name = $args[0]["name"];
         $this->type = $args[0]["type"];
         $this->nb_years = $args[0]["nb_years"];
-        log::logger("====== Garantie ======", 'warranty_migration');
-        log::logger("price_tax_incl: $price_tax_incl", 'warranty_migration');
-        log::logger("price_tax_excl: $price_tax_excl", 'warranty_migration');
-        log::logger("nb_years: $nb_years", 'warranty_migration');
+        log::logger("====== Garantie ======", $GLOBALS['logFile']);
+        log::logger("price_tax_incl: $price_tax_incl", $GLOBALS['logFile']);
+        log::logger("price_tax_excl: $price_tax_excl", $GLOBALS['logFile']);
+        log::logger("nb_years: $nb_years", $GLOBALS['logFile']);
     }
 
     public function set_rate(float $rate):ServiceEntity {
-        log::logger("Taux calcule: $rate", 'warranty_migration');
+        log::logger("Taux calcule: $rate", $GLOBALS['logFile']);
         $this->rate = $rate;
         return $this;
     }
 
     public function set_rent(float $rent):ServiceEntity {
-        log::logger("Loyer calcule: $rent", 'warranty_migration');
+        log::logger("Loyer calcule: $rent", $GLOBALS['logFile']);
         $this->rent = $rent;
         return $this;
     }
@@ -65,26 +66,18 @@ class MappedResponse {
     }
 }
 
-log::logger("========= DEBUT DE SCRIPT =========", 'warranty_migration');
 
-// Début de transaction SQL
-ATF::db()->begin_transaction(true);
 
-// Rollback la transaction
-//ATF::db()->rollback_transaction();
-// Valide la trnasaction
-// ATF::db()->commit_transaction();
 
 function get_all_products(): Array {
     ATF::produit()->q
         ->reset()
         ->from("produit","id_sous_categorie", "sous_categorie","id_sous_categorie")
-        ->where("sous_categorie.sous_categorie", "%Extension de garantie%", "OR", false, "LIKE")
-        ->where("produit.ref", 656709);     
+        ->where("sous_categorie.sous_categorie", "%Extension de garantie%", "OR", false, "LIKE");     
     $items = ATF::produit()->sa();
     
     $total_of_products = count($items);
-    log::logger("Total of products: $total_of_products", 'warranty_migration');
+    log::logger("Total of products: $total_of_products", $GLOBALS['logFile']);
 
     return ($total_of_products > 0 ? $items : Array());
 }
@@ -95,7 +88,7 @@ function does_product_by_ref_exist($reference): bool{
         ->where("ref", $reference);     
     $items = ATF::produit()->sa();
     $doesIsExist = isset($items) ? true : false;
-    log::logger("Warranty ref# $reference does exist = $doesIsExist", 'warranty_migration');
+    log::logger("Warranty ref# $reference does exist = $doesIsExist", $GLOBALS['logFile']);
     
     return $doesIsExist;
 }
@@ -113,7 +106,7 @@ function update_warranty_financial_attributes(string $product_id, ServiceEntity 
 
     ATF::db()->commit_transaction();
 
-    log::logger("Warranty id# $product_id updated", 'warranty_migration');
+    log::logger("Warranty id# $product_id updated", $GLOBALS['logFile']);
 }
 
 function main() {
@@ -121,22 +114,24 @@ function main() {
     $pack_produit = ATF::pack_produit();
 
     foreach (get_all_products() as $product) {
+        log::logger("-- Produit : ".$product['ref'].' : '.$product['produit'], $GLOBALS['logFile']);
         $pack_ids_list = explode(",", $pack_produit->getIdPackFromProduit($product['id_produit']));
-        $pack_ids_list_count = count($pack_ids_list);
-        log::logger("getIdPackFromProduit count: $pack_ids_list_count", 'warranty_migration');
+
+        log::logger("--- Packs associé : ".implode(", ", $pack_ids_list), $GLOBALS['logFile']);
 
         foreach ($pack_ids_list as $key => $pack_ids_list_item) {
             $product_id = $pack_produit->getProduitPrincipal($pack_ids_list_item);
-            log::logger("getProduitPrincipalt: $product_id", 'warranty_migration');
+            log::logger("---- Produit principal du pack ".$pack_ids_list_item." : ".$product_id, $GLOBALS['logFile']);
 
             $product_id_buffer = $product['id_produit'];
 
             if(isset($product_id)){
                 $product = ATF::produit()->select($product_id);
-                $responses_from_boulanger_api = $boulanger->APIBoulPROservice($product['ref'], 'warranty_migration');
+                log::logger('---- '.$product['ref'].' : '.$product['produit'], $GLOBALS['logFile']);
+                $responses_from_boulanger_api = $boulanger->APIBoulPROservice($product['ref'], $GLOBALS['logFile']);
                 foreach ($responses_from_boulanger_api as $response) {
                     if($response == 'unfound_product') {
-                        log::logger("$response" .$product_id."", 'warranty_migration');
+                        log::logger("NON TROUVE CHEZ BOULANGER PRO ".$response, $GLOBALS['logFile']);
                         break;
                     }
 
@@ -148,16 +143,16 @@ function main() {
                         if(does_product_by_ref_exist($service->reference)) {
                            try {
                             update_warranty_financial_attributes($product_id_buffer, $service);
-                            log::logger("====== PRODUIT ======", 'warranty_migration');
-                            log::logger("Reference" .$product["ref"]."", 'warranty_migration');
-                            log::logger("Nom" .$product["produit"]."", 'warranty_migration');
-                            log::logger("via pack id#" .$pack_ids_list_item."", 'warranty_migration');
+                            log::logger("====== PRODUIT ======", $GLOBALS['logFile']);
+                            log::logger("Reference" .$product["ref"]."", $GLOBALS['logFile']);
+                            log::logger("Nom" .$product["produit"]."", $GLOBALS['logFile']);
+                            log::logger("via pack id#" .$pack_ids_list_item."", $GLOBALS['logFile']);
                             
                            } catch (Exception $e) {
                             $error_type = get_class($e);
                             $error_message = $e->getMessage();
-                            log::logger("$error_type", 'warranty_migration');
-                            log::logger("$error_message", 'warranty_migration');
+                            log::logger("$error_type", $GLOBALS['logFile']);
+                            log::logger("$error_message", $GLOBALS['logFile']);
                            }
                         }
                     }
@@ -167,6 +162,14 @@ function main() {
     }
 }
 
-log::logger("========= FIN DE SCRIPT =========", 'warranty_migration');
 
+log::logger("========= DEBUT DE SCRIPT =========", $GLOBALS['logFile']);
+// Début de transaction SQL
+ATF::db()->begin_transaction(true);
 main();
+// Rollback la transaction
+//ATF::db()->rollback_transaction();
+// Valide la trnasaction
+ATF::db()->commit_transaction();
+log::logger("========= FIN DE SCRIPT =========", $GLOBALS['logFile']);
+
