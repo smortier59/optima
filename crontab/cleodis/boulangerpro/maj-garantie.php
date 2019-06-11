@@ -135,7 +135,7 @@ function main() {
                         break;
                     }
                     log::logger('----- Boulanger PRO renvoi : ', $GLOBALS['logFile']);
-                    log::logger('----- '.$response, $GLOBALS['logFile']);
+                    log::logger($response, $GLOBALS['logFile']);
                     $mapped = new MappedResponse($response);
                     foreach($mapped->services as $service) {
                         $service->set_rate($boulanger->getTaux($service->price_tax_incl))
