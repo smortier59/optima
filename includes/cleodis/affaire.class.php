@@ -3032,6 +3032,36 @@ class affaire_cap extends affaire {
 class affaire_bdomplus extends affaire_cleodis {
 
 
+	function __construct($table_or_id=NULL) {
+		$this->table = "affaire";
+		parent::__construct($table_or_id);
+
+		$this->onglets = array(
+			'affaire_etat',
+			'loyer'
+			,'devis'=>array('opened'=>true)
+			,'comite'=>array('opened'=>true)
+			,'commande'=>array('opened'=>true)
+			,'prolongation'
+			,'loyer_prolongation'
+			,'bon_de_commande'
+			,'demande_refi'
+			,'facture'=>array('opened'=>true)
+			,'facture_fournisseur'
+			,'facture_non_parvenue'
+			,'facturation'
+			,'intervention'
+			,'parc'
+			,'livraison'
+			,'suivi'
+			,'tache'
+			,"pdf_affaire"
+		);
+
+		$this->fieldstructure();
+	}
+
+
 	/**
 	* Retourne la ref d'un avenant
 	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
