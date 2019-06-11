@@ -30,9 +30,9 @@ class ServiceEntity {
         $this->type = $args[0]["type"];
         $this->nb_years = $args[0]["nb_years"];
         log::logger("====== Garantie ======", $GLOBALS['logFile']);
-        log::logger("price_tax_incl: $price_tax_incl", $GLOBALS['logFile']);
-        log::logger("price_tax_excl: $price_tax_excl", $GLOBALS['logFile']);
-        log::logger("nb_years: $nb_years", $GLOBALS['logFile']);
+        log::logger("price_tax_incl: ".$this->price_tax_incl, $GLOBALS['logFile']);
+        log::logger("price_tax_excl: ".$this->price_tax_excl, $GLOBALS['logFile']);
+        log::logger("nb_years: ".$this->nb_years, $GLOBALS['logFile']);
     }
 
     public function set_rate(float $rate):ServiceEntity {
@@ -134,7 +134,8 @@ function main() {
                         log::logger("NON TROUVE CHEZ BOULANGER PRO ".$response, $GLOBALS['logFile']);
                         break;
                     }
-
+                    log::logger('----- Boulanger PRO renvoi '.count($response[0]['services']).' services : ', $GLOBALS['logFile']);
+                    log::logger('----- '.$response[0]['services'], $GLOBALS['logFile']);
                     $mapped = new MappedResponse($response);
                     foreach($mapped->services as $service) {
                         $service->set_rate($boulanger->getTaux($service->price_tax_incl))
