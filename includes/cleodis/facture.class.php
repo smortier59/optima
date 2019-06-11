@@ -2846,10 +2846,10 @@ class facture_bdomplus extends facture_cleodis {
 		    	$donnees[$key][$i][2] = substr($value["ref_externe"], 0, 4);
 		    	$donnees[$key][$i][3] = $client["particulier_nom"];
 		    	$donnees[$key][$i][4] = $client["particulier_prenom"];
-		    	$donnees[$key][$i][5] = "";
-		    	$donnees[$key][$i][6] = "";
+		    	$donnees[$key][$i][5] = $client["cp"]; // Code postal factuation
+		    	$donnees[$key][$i][6] = $client["ville"];; //Ville facturation
 		    	$donnees[$key][$i][7] = "";
-		    	$donnees[$key][$i][8] = "";
+		    	$donnees[$key][$i][8] = $client["particulier_portable"]; // Telephone portable
 		    	$donnees[$key][$i][9] = $client["particulier_email"];
 		    	$donnees[$key][$i][10] = "";
 		    	$donnees[$key][$i][11] = "";
@@ -2866,12 +2866,12 @@ class facture_bdomplus extends facture_cleodis {
 		    	$donnees[$key][$i][22] = "";
 				$donnees[$key][$i][23] = "";
 				$donnees[$key][$i][24] = "";
-				$donnees[$key][$i][25] = "";
-				$donnees[$key][$i][26] = "";
-				$donnees[$key][$i][27] = "";
+				$donnees[$key][$i][25] = $client["adresse"]; //Adresse facturation
+				$donnees[$key][$i][26] = $client["adresse_2"]; //Adresse facturation 2
+				$donnees[$key][$i][27] = $client["adresse_3"];
 				$donnees[$key][$i][28] = "";
 				$donnees[$key][$i][29] = "";
-				$donnees[$key][$i][30] = "";
+				$donnees[$key][$i][30] = "FRA";
 				$donnees[$key][$i][31] = $value["ref_magasin"]; // Ref de la facture magasin
 
 				ATF::export_facture()->i(array("id_facture" => $value["id_facture"], "fichier_export"=> "flux_vente"));
