@@ -114,22 +114,24 @@ function main() {
     $pack_produit = ATF::pack_produit();
 
     foreach (get_all_products() as $product) {
+        log::logger("-- Produit : ".$product['ref'].' : '.$product['produit'], $GLOBALS['logFile']);
         $pack_ids_list = explode(",", $pack_produit->getIdPackFromProduit($product['id_produit']));
-        $pack_ids_list_count = count($pack_ids_list);
-        log::logger("getIdPackFromProduit count: $pack_ids_list_count", $GLOBALS['logFile']);
+
+        log::logger("--- Packs associé : ".implode(", ", $pack_ids_list), $GLOBALS['logFile']);
 
         foreach ($pack_ids_list as $key => $pack_ids_list_item) {
             $product_id = $pack_produit->getProduitPrincipal($pack_ids_list_item);
-            log::logger("getProduitPrincipalt: $product_id", $GLOBALS['logFile']);
+            log::logger("---- Produit principal du pack ".$pack_ids_list_item." : ".$product_id, $GLOBALS['logFile']);
 
             $product_id_buffer = $product['id_produit'];
 
             if(isset($product_id)){
                 $product = ATF::produit()->select($product_id);
+                log::logger('---- '.$product['ref'].' : '.$product['produit'], $GLOBALS['logFile']);
                 $responses_from_boulanger_api = $boulanger->APIBoulPROservice($product['ref'], $GLOBALS['logFile']);
                 foreach ($responses_from_boulanger_api as $response) {
                     if($response == 'unfound_product') {
-                        log::logger("$response" .$product_id."", $GLOBALS['logFile']);
+                        log::logger("NON TROUVE CHEZ BOULANGER PRO ".$response, $GLOBALS['logFile']);
                         break;
                     }
 
