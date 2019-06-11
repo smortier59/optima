@@ -88,7 +88,7 @@ function does_product_by_ref_exist($reference): bool{
         ->where("ref", $reference);     
     $items = ATF::produit()->sa();
     $doesIsExist = isset($items) ? true : false;
-    log::logger("Warranty ref# $reference does exist = $doesIsExist", $GLOBALS['logFile']);
+    log::logger("Garantie ref# ".$reference." existante = ".$doesIsExist, $GLOBALS['logFile']);
     
     return $doesIsExist;
 }
@@ -134,8 +134,8 @@ function main() {
                         log::logger("NON TROUVE CHEZ BOULANGER PRO ".$response, $GLOBALS['logFile']);
                         break;
                     }
-                    log::logger('----- Boulanger PRO renvoi '.count($response[0]['services']).' services : ', $GLOBALS['logFile']);
-                    log::logger('----- '.$response[0]['services'], $GLOBALS['logFile']);
+                    log::logger('----- Boulanger PRO renvoi : ', $GLOBALS['logFile']);
+                    log::logger('----- '.$response, $GLOBALS['logFile']);
                     $mapped = new MappedResponse($response);
                     foreach($mapped->services as $service) {
                         $service->set_rate($boulanger->getTaux($service->price_tax_incl))
