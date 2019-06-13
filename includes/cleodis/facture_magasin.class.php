@@ -39,6 +39,14 @@ class facture_magasin extends classes_optima {
 			if($facture_magasin){
 				$this->u(array("id_facture_magasin" => $facture_magasin["id_facture_magasin"], "etat"=> "paye"));
 				ATF::facture_magasin_recu()->u(array("id_facture_magasin_recu"=> $value["id_facture_magasin_recu"], "statut"=> "traitee"));
+
+
+				ATF::facture()->q->reset()->where("facture.id_affaire", $facture_magasin["id_affaire"])->addOrder("facture.id_facture", "ASC");
+				$facture = ATF::facture()->select_row();
+				if($facture) ATF::facture()->u(array("id_facture"=> $facture["facture.id_facture"], "ref_magasin"=> $facture_magasin["ref_facture"]));
+
+
+
 			}
        }
     }
