@@ -28,6 +28,11 @@ class pdf_cleodis extends pdf {
 	public $headerAdresseFacturation = false;
 
 
+	public $facturePDF = false;
+	public $relance = false;
+	public $envoiContrat = false;
+	public $pdf_devis = false;
+
 	//Couleur CLEODIS
 	public $Rentete = 149;
 	public $Gentete = 193;
@@ -13642,6 +13647,11 @@ class pdf_bdomplus extends pdf_cleodis {
 
 	public function Footer() {
 		if($this->facturePDF && !$this->envoiContrat && !$this->grille_client){
+
+			log::logger('FacturePDF -> '.$this->facturePDF , "mfleurquin");
+			log::logger('envoiContrat -> '.$this->envoiContrat , "mfleurquin");
+			log::logger('grille_client -> '.$this->grille_client , "mfleurquin");
+
 			$this->setfont('arial','B',9);
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
