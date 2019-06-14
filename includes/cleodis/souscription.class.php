@@ -282,7 +282,6 @@ class souscription_cleodis extends souscription {
 
 
 
-
     foreach ($produits as $k=>$produit) {
         ATF::produit()->q->reset()
           ->addField("loyer")
@@ -298,7 +297,18 @@ class souscription_cleodis extends souscription {
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
 
-          if($post["site_associe"] == "bdomplus")  $toInsertLoyer[0]["loyer__dot__frequence_loyer"] = ATF::pack_produit()->select($id_pack, "frequence");
+          if($post["site_associe"] == "bdomplus"){
+            $toInsertLoyer[0]["loyer__dot__frequence_loyer"] = ATF::pack_produit()->select($id_pack, "frequence");
+
+            switch ($toInsertLoyer[0]["loyer__dot__frequence_loyer"]) {
+              case 'mois':
+                $devis["devis"] = $libelle." Mensuel";
+              break;
+               case 'an':
+                 $devis["devis"] = $libelle." Annuel";
+              break;
+            }
+          }
 
 
           //Il faut récupérer l'affichage sur PDF
