@@ -2889,7 +2889,7 @@ class facture_bdomplus extends facture_cleodis {
 				$donnees[$key][$i][30] = "FRA";
 				$donnees[$key][$i][31] = $value["ref_magasin"]; // Ref de la facture magasin
 
-				//ATF::export_facture()->i(array("id_facture" => $value["id_facture"], "fichier_export"=> "flux_vente"));
+				ATF::export_facture()->i(array("id_facture" => $value["id_facture"], "fichier_export"=> "flux_vente"));
 			}
 
 			$string = "";
