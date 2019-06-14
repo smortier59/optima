@@ -153,7 +153,7 @@ class souscription_cleodis extends souscription {
               $pack_produit['lignes'][$k]['produit'] = ATF::produit()->select($ligne['id_produit']);
             }
           }
-          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit);
+          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
         }
 
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
