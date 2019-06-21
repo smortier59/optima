@@ -1176,12 +1176,13 @@ class souscription_bdomplus extends souscription_cleodis {
       $mail = new mail($info_mail);
 
       foreach ($files as $key => $infos) {
-        $fp = "/tmp/".$key.".pdf";
+        $fp = "/tmp/".$infos["function"]."-".$infos["value"].".pdf";
         $data = ATF::pdf()->generic($infos["function"],$infos["value"],true);
         if (file_put_contents($fp,$data)) {
           $mail->addFile($fp,$key.".pdf",true);
         }
       }
+
 
       $send = $mail->send();
 
