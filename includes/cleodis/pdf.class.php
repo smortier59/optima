@@ -13551,7 +13551,7 @@ class pdf_bdomplus extends pdf_cleodis {
 	public $txtcolorTableau = "ffffff";
 
 	public $REnteteTextColor = 255;
-	public $GEnteteTextColor = 255;
+	public $VEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
 
 
@@ -13888,6 +13888,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			else{
 				$this->multicell(0,3,"L'abonnement pour une durée de ".ATF::loyer()->dureeTotalBrut($this->devis['id_affaire'])." ".$this->loyer[0]['frequence_loyer']." est ferme et définitif et ne pourra être résilié avant son échéance. Le client a la possibilité de mettre fin à son abonnement à la fin de la première année et à la fin de chaque échéance annuelle sous réserve de respecter un préavis d'un mois avant la date d'échéance.");
 			}
+
 		  }
 		  $this->ln(2);
 
@@ -13973,14 +13974,13 @@ class pdf_bdomplus extends pdf_cleodis {
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
-			,array("txt"=>"[sc_user.signature/]","color"=>"white")
+			,"[sc_user.signature/]"
 		);
 
 		$this->setY(240);
 		$this->setX(45);
-		$this->setTextColor("white");
+
 		$this->multicell(100,5,"[sc_sign1.signature/]");
-		$this->setTextColor("black");
 
 
 
