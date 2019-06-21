@@ -13858,7 +13858,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			  $texte .= date("d/m/Y",strtotime($this->commande['date_debut'])).".";
 			}
 			$this->multicell(0,3,$texte);
-		  }else{
+		  }else{ 
 			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
 			else{ 
 				$this->multicell(0,3,"L'abonnement pour une durée de ".ATF::loyer()->dureeTotalBrut($this->devis['id_affaire'])." ".$this->loyer[0]['frequence_loyer']." est ferme et définitif et ne pourra être résilié avant son échéance. Le client a la possibilité de mettre fin à son abonnement à la fin de la première année et à la fin de chaque échéance annuelle sous réserve de respecter un préavis d'un mois avant la date d'échéance."); 
