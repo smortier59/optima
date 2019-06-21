@@ -13521,7 +13521,7 @@ class pdf_bdomplus extends pdf_cleodis {
 	public $txtcolorTableau = "ffffff";
 
 	public $REnteteTextColor = 255;
-	public $VEnteteTextColor = 255;
+	public $GEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
 
 
@@ -13851,9 +13851,8 @@ class pdf_bdomplus extends pdf_cleodis {
 		  }else{ 
 			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
 			else{ 
-				$this->multicell(0,3,"L'abonnement pour une durée de ".$duree." ".$this->loyer[0]['frequence_loyer']." est ferme et définitif et ne pourra être résilié avant son échéance. Le client a la possibilité de mettre fin à son abonnement à la fin de la première année et à la fin de chaque échéance annuelle sous réserve de respecter un préavis d'un mois avant la date d'échéance."); 
+				$this->multicell(0,3,"L'abonnement pour une durée de ".ATF::loyer()->dureeTotalBrut($this->devis['id_affaire'])." ".$this->loyer[0]['frequence_loyer']." est ferme et définitif et ne pourra être résilié avant son échéance. Le client a la possibilité de mettre fin à son abonnement à la fin de la première année et à la fin de chaque échéance annuelle sous réserve de respecter un préavis d'un mois avant la date d'échéance."); 
 			}
-
 		  }
 		  $this->ln(2);
 
@@ -13875,7 +13874,16 @@ class pdf_bdomplus extends pdf_cleodis {
 			if ($this->affaire['nature']=="avenant"){
 			  $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
 			}else{
-			  $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de l'abonnement.");
+			  switch ($this->loyer[0]['frequence_loyer']) {
+			  	case "an": $tradFreq = "annuels"; break;
+			  	case "mois": $tradFreq = "mensuels"; break;
+			  	case "bimestre": $tradFreq = "bimestriels"; break;
+			  	case "trimestre": $tradFreq = "trimestriels"; break;
+			  	case "quadrimestre": $tradFreq = "quadrimestriels"; break;
+			  	case "semestre": $tradFreq = "semestriels"; break;
+
+			  }
+			  $this->multicell(0,3,"Les loyers ".$tradFreq." sont fixes et non révisables pendant toute la durée de l'abonnement.");
 			  $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue le jour de la prise de commande.");
 			}
 			if($duree){
@@ -13939,13 +13947,14 @@ class pdf_bdomplus extends pdf_cleodis {
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
-			,"[sc_user.signature/]"
+			,array("txt"=>"[sc_user.signature/]","color"=>"white")
 		);
 
 		$this->setY(240);
 		$this->setX(45);
-
+		$this->setTextColor("white");
 		$this->multicell(100,5,"[sc_sign1.signature/]");
+		$this->setTextColor("black");
 
 
 
