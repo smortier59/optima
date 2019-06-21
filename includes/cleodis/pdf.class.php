@@ -4049,7 +4049,8 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI"){ $this->logo = 'cleodis/2SI_CLEODIS.jpg'; }
+		else{  $this->logo = 'cleodis/logo.jpg'; }
 
 
 		//Styles utilisés
@@ -5039,6 +5040,14 @@ class pdf_cleodis extends pdf {
 		$this->lignes = ATF::facturation()->sa();
 	}
 
+	function global_facture ($facture,$s){
+		$this->open();
+		foreach ($facture as $key => $item) {
+
+			$this->facture($item,$s,true) ;
+		}
+	}
+
 	function global_prolongation ($facture,$s){
 		$this->global_facture($facture,$s);
 	}
@@ -5055,6 +5064,38 @@ class pdf_cleodis extends pdf {
 		$this->global_facture($facture,$s);
 	}
 
+	function global_prolongation_envoye($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongation_envoyeSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongation_envoyeCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongation_envoyeDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+
+
+
+	function global_factureSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+
 	function global_facture_contrat_envoye($facture,$s){
 		$this->global_facture($facture,$s);
 	}
@@ -5069,26 +5110,6 @@ class pdf_cleodis extends pdf {
 
 	function global_facture_contrat_envoyeDate ($facture,$s){
 		$this->global_facture($facture,$s);
-	}
-
-	function global_factureSociete ($facture,$s){
-		$this->global_facture($facture,$s);
-	}
-
-	function global_factureCode ($facture,$s){
-		$this->global_facture($facture,$s);
-	}
-
-	function global_factureDate ($facture,$s){
-		$this->global_facture($facture,$s);
-	}
-
-	function global_facture ($facture,$s){
-		$this->open();
-		foreach ($facture as $key => $item) {
-
-			$this->facture($item,$s,true) ;
-		}
 	}
 
 	/** PDF de l'échéancier d'une affaire
@@ -5112,7 +5133,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->setxy(100,10);
-		if(ATF::$codename = "bdomplus") {
+		if(ATF::$codename == "bdomplus") {
 			$this->cell(0,5,"LA SOCIETE",0,1,'L');
 		}else{
 			$this->cell(0,5,"LE LOUEUR",0,1,'L');
@@ -5314,17 +5335,6 @@ class pdf_cleodis extends pdf {
 		$this->grille_client($non_facturerDate,$s,true,true);
 	}
 
-	function grille_contratclient_non_envoyeSociete($non_facturerSociete,$s) {
-		$this->grille_client($non_facturerSociete,$s,true);
-	}
-
-	function grille_contratclient_non_envoyeCode($non_facturerCode,$s) {
-		$this->grille_client($non_facturerCode,$s,true);
-	}
-
-	function grille_contratclient_non_envoyeDate($non_facturerDate,$s) {
-		$this->grille_client($non_facturerDate,$s,true);
-	}
 
 	function grille_prolongationclientSociete($facturerSociete,$s) {
 		$this->grille_client($facturerSociete,$s,false,true);
@@ -5336,6 +5346,21 @@ class pdf_cleodis extends pdf {
 
 	function grille_prolongationclientDate($facturerDate,$s) {
 		$this->grille_client($facturerDate,$s,false,true);
+	}
+
+
+
+
+	function grille_contratclient_non_envoyeSociete($non_facturerSociete,$s) {
+		$this->grille_client($non_facturerSociete,$s,true);
+	}
+
+	function grille_contratclient_non_envoyeCode($non_facturerCode,$s) {
+		$this->grille_client($non_facturerCode,$s,true);
+	}
+
+	function grille_contratclient_non_envoyeDate($non_facturerDate,$s) {
+		$this->grille_client($non_facturerDate,$s,true);
 	}
 
 	function grille_contratclientSociete($facturerSociete,$s) {
@@ -13526,7 +13551,7 @@ class pdf_bdomplus extends pdf_cleodis {
 	public $txtcolorTableau = "ffffff";
 
 	public $REnteteTextColor = 255;
-	public $VEnteteTextColor = 255;
+	public $GEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
 
 
@@ -13860,7 +13885,9 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->multicell(0,3,$texte);
 		  }else{
 			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
-			else{ $this->multicell(0,3,"La durée de l'abonnement est fixée à ".$duree." mois."); }
+			else{
+				$this->multicell(0,3,"L'abonnement pour une durée de ".ATF::loyer()->dureeTotalBrut($this->devis['id_affaire'])." ".$this->loyer[0]['frequence_loyer']." est ferme et définitif et ne pourra être résilié avant son échéance. Le client a la possibilité de mettre fin à son abonnement à la fin de la première année et à la fin de chaque échéance annuelle sous réserve de respecter un préavis d'un mois avant la date d'échéance.");
+			}
 
 		  }
 		  $this->ln(2);
@@ -13883,8 +13910,8 @@ class pdf_bdomplus extends pdf_cleodis {
 			if ($this->affaire['nature']=="avenant"){
 			  $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
 			}else{
-			  $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de l'abonnement.");
-			  $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue par carte bancaire, le jour de la prise de commande.");
+			  $this->multicell(0,3,"Les loyers sont fixes et non révisables pendant toute la durée de l'abonnement.");
+			  $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue le jour de la prise de commande.");
 			}
 			if($duree){
 			  $donnee = array();
@@ -13919,9 +13946,6 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->line(0,$this->gety(),238,$this->gety());
 		$this->SetTextColor(22,20,93);
 		$this->setfont('arial','B',10);
-		if(!$sellsign){
-		  $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
-		}
 
 		$this->SetDrawColor(0,0,0);
 
@@ -13950,13 +13974,14 @@ class pdf_bdomplus extends pdf_cleodis {
 		$cadre = array(
 			"Fait à : "
 			,"Le : "
-			,"[sc_user.signature/]"
+			,array("txt"=>"[sc_user.signature/]","color"=>"white")
 		);
 
 		$this->setY(240);
 		$this->setX(45);
-
+		$this->setTextColor("white");
 		$this->multicell(100,5,"[sc_sign1.signature/]");
+		$this->setTextColor("black");
 
 
 
@@ -13974,13 +13999,13 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
-		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES CI APRES",0,'C');
+		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS PARTICULIERES ET GENERALES CI APRES",0,'C');
 
 		$this->unsetHeader();
 		$this->unsetFooter();
 
 
-		/*$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
+		$pageCount = $this->setSourceFile(__PDF_PATH__."bdomplus/BDOM-CP-CG.pdf");
 
 		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 		  $tplIdx = $this->importPage($pageNo);
@@ -13988,7 +14013,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		  // add a page
 		  $this->AddPage();
 		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-		}*/
+		}
 
 
   }

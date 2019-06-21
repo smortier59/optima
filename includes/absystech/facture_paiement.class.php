@@ -281,7 +281,7 @@ class facture_paiement extends classes_optima {
 		ATF::facture()->u(array("id_facture"=>$id_facture,"date_effective"=>NULL,"etat"=>"impayee","date_modification"=>date("Y-m-d H:i:s")));
 		//L'état de la facture passe en facturée
 		$facture=ATF::facture()->select($id_facture);
-		ATF::affaire()->u(array("id_affaire"=>$facture["id_affaire"],"etat"=>"facture"));
+		if($facture["id_affaire"]) ATF::affaire()->u(array("id_affaire"=>$facture["id_affaire"],"etat"=>"facture"));
 		return true;
 	}
 
