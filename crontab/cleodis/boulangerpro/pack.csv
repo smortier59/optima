@@ -1,49 +1,4 @@
 N°;Nom;Etat;Site associé;Visible sur le site;Description
-<<<<<<< crontab/cleodis/boulangerpro/pack.csv
-1;Bridge SONY DSC-HX400V;Actif;boulangerpro;Oui;Un bridge ultra performant
-2;GPS TOMTOM GO Professional 6200;Actif;boulangerpro;Oui;GPS TOMTOM GO Professional 6200
-3;GPS TOMTOM GO Camper Monde connecté;Actif;boulangerpro;Oui;GPS TOMTOM GO Camper Monde connecté
-4;Hotte décorative SAMSUNG NK36M5070BS;Actif;boulangerpro;Oui;Hotte décorative SAMSUNG NK36M5070BS
-5;Paire d'enceintes BOSE FreeSpace 251 Noir;Actif;boulangerpro;Oui;Entendez votre zone d'écoute !
-6;Station BOSE WAVE MUSIC SYSTEM IV DAB SYLVER;Actif;boulangerpro;Oui;Station BOSE WAVE MUSIC SYSTEM IV DAB SYLVER
-7;Station BOSE WAVE MUSIC SYSTEM IV DAB BLACK;Actif;boulangerpro;Oui;Station BOSE WAVE MUSIC SYSTEM IV DAB BLACK
-8;Robot lave vitres ECOVACS W950;Actif;boulangerpro;Oui;Système d'accroche ingénieux et silencieux
-9;TV THOMSON 43UE6400W;Actif;boulangerpro;Oui;TV THOMSON 43UE6400W
-10;Lave vaisselle 60cm BRANDT DFH 12227W;Actif;boulangerpro;Oui;Lave vaisselle 60cm BRANDT DFH 12227W
-11;Réfrigérateur 1 porte MIELE K 12012 S-2;Actif;boulangerpro;Oui;Réfrigérateur 1 porte MIELE K 12012 S-2
-12;Hotte ROBLIN BALTIC INOX A90;Actif;boulangerpro;Oui;Hotte ROBLIN BALTIC INOX A90
-13;TV TCL 43EP662;Actif;boulangerpro;Oui;TV TCL 43EP662
-14;GPS TOMTOM GO Professionnel 6250;Actif;boulangerpro;Oui;GPS TOMTOM GO Professionnel 6250
-15;Enceinte BST DSP12A;Actif;boulangerpro;Oui;Enceinte BST DSP12A
-16;Enceinte BST FIRST-SA15DSP2;Actif;boulangerpro;Oui;Enceinte BST FIRST-SA15DSP2
-17;Lave vaisselle intégrable 60cm SIEMENS SN536S02IE;Actif;boulangerpro;Oui;Lave vaisselle intégrable 60cm SIEMENS SN536S02IE
-18;Lave vaisselle 60cm WHIRLPOOL WFO3033DLX;Actif;boulangerpro;Oui;Plus d'espace pour votre vaisselle
-19;Réfrigérateur 1 porte MIELE K 34222 i;Actif;boulangerpro;Oui;Réfrigérateur 1 porte MIELE K 34222 i
-20;Robot MOULINEX COMPANION XL SILVER HF806E10;Actif;boulangerpro;Oui;Robot MOULINEX COMPANION XL SILVER HF806E10
-21;Portable HP Envy x360 15-ds0004nf;Actif;boulangerpro;Oui;Portable HP Envy x360 15-ds0004nf
-22;Sèche-linge hublot MIELE TCH 620 WP;Actif;boulangerpro;Oui;Sèche-linge hublot MIELE TCH 620 WP
-23;Réfrigérateur 2 portes FRIGIDAIRE FFR32GFERT;Actif;boulangerpro;Oui;Réfrigérateur 2 portes FRIGIDAIRE FFR32GFERT
-24;Réfrigérateur 1 porte FRIGIDAIRE FGR33GFELT;Actif;boulangerpro;Oui;Réfrigérateur 1 porte FRIGIDAIRE FGR33GFELT
-25;Réfrigérateur 1 porte FRIGIDAIRE FGR33GFERT;Actif;boulangerpro;Oui;Réfrigérateur 1 porte FRIGIDAIRE FGR33GFERT
-26;Réfrigérateur 1 porte FRIGIDAIRE FGR33GFEMT;Actif;boulangerpro;Oui;Réfrigérateur 1 porte FRIGIDAIRE FGR33GFEMT
-27;Réfrigérateur 2 portes FRIGIDAIRE FFR32GFEMT;Actif;boulangerpro;Oui;Réfrigérateur 2 portes FRIGIDAIRE FFR32GFEMT
-28;Réfrigérateur 2 portes FRIGIDAIRE FFR32GFELT;Actif;boulangerpro;Oui;Réfrigérateur 2 portes FRIGIDAIRE FFR32GFELT
-29;Réfrigérateur combiné FRIGIDAIRE FKB34GFELT;Actif;boulangerpro;Oui;Réfrigérateur combiné FRIGIDAIRE FKB34GFELT
-30;Réfrigérateur combiné FRIGIDAIRE FKB34GFERT;Actif;boulangerpro;Oui;Réfrigérateur combiné FRIGIDAIRE FKB34GFERT
-31;Réfrigérateur combiné FRIGIDAIRE FKB34GFEMT;Actif;boulangerpro;Oui;Réfrigérateur combiné FRIGIDAIRE FKB34GFEMT
-32;Four pyrolyse KITCHENAID KOASP60602;Actif;boulangerpro;Oui;Four pyrolyse KITCHENAID KOASP60602
-33;Portable MACBOOK Pro New 13 Touch Bar I5 256 Argent;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 13 Touch Bar I5 256 Argent
-34;Portable MACBOOK Pro New 13 Touch Bar I5 256 Gris Sidéral;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 13 Touch Bar I5 256 Gris Sidéral
-35;Réfrigérateur multi-portes SMEG FQ60N2PE1;Actif;boulangerpro;Oui;Réfrigérateur multi-portes SMEG FQ60N2PE1
-36;Portable MACBOOK Pro New 13 Touch Bar I5 512 Argent;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 13 Touch Bar I5 512 Argent
-37;Portable MACBOOK Pro New 13 Touch Bar I5 512 Gris Sidéral;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 13 Touch Bar I5 512 Gris Sidéral
-38;Portable MACBOOK CTO Pro 13' i7 2.5ghz 16go 512Go Gris S.;Actif;boulangerpro;Oui;Portable MACBOOK CTO Pro 13' i7 2.5ghz 16go 512Go Gris S.
-39;Portable MACBOOK Pro New 15 Touch Bar I7 256 Gris Sidéral;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 15 Touch Bar I7 256 Gris Sidéral
-40;Portable MACBOOK Pro New 15 Touch Bar I7 256 Argent;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 15 Touch Bar I7 256 Argent
-41;Portable MACBOOK Pro New 15 Touch Bar I9 512 Argent;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 15 Touch Bar I9 512 Argent
-42;Portable MACBOOK Pro New 15 Touch Bar I9 512 Gris Sidéral;Actif;boulangerpro;Oui;Portable MACBOOK Pro New 15 Touch Bar I9 512 Gris Sidéral
-43;TV SONY KD65AG9;Actif;boulangerpro;Oui;TV SONY KD65AG9
-=======
 1;Chromebook ACER R13 CB5-312T-K2L7;Actif;boulangerpro;Oui;Chromebook ACER R13 CB5-312T-K2L7
 2;Micro-ondes encastrable SAMSUNG FG87SST;Actif;boulangerpro;Oui;Micro-ondes encastrable SAMSUNG FG87SST
 3;Hotte décorative ELICA STRIPE BL/A/60/LX;Actif;boulangerpro;Oui;Hotte décorative ELICA STRIPE BL/A/60/LX
@@ -127,4 +82,3 @@ N°;Nom;Etat;Site associé;Visible sur le site;Description
 81;Ordinateur HP Omen 880-559nf;Actif;boulangerpro;Oui;Ordinateur HP Omen 880-559nf
 82;Ordinateur ASUS G21CX-FR021T;Actif;boulangerpro;Oui;Ordinateur ASUS G21CX-FR021T
 83;Ordinateur ASUS G12CX-FR054T;Actif;boulangerpro;Oui;Ordinateur ASUS G12CX-FR054T
->>>>>>> crontab/cleodis/boulangerpro/pack.csv
