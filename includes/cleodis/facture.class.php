@@ -2789,6 +2789,9 @@ class facture_bdomplus extends facture_cleodis {
 	function __construct($table_or_id=NULL) {
 		parent::__construct($table_or_id);
 		$this->fieldstructure();
+
+		$this->onglets = array('facture_ligne','slimpay_transaction');
+
 		$this->addPrivilege("export_bdomplus");
 
 		$this->addPrivilege("aPrelever");
@@ -3017,13 +3020,18 @@ class facture_bdomplus extends facture_cleodis {
 			foreach ($data as $key => $value) {
 				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
 				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+
+				log::logger($status , "mfleurquin");
+
 				foreach ($value["id_facture"] as $kfacture => $vfacture) {
-					$this->u(array("id_facture"=>$vfacture,
-								   "id_slimpay"=>$status["id"],
-								   "executionStatus"=>$status["executionStatus"],
-								   "executionDate"=>$status["executionDate"],
-								  )
-							);
+					ATF::slimpay_transaction()->i(array(
+													"id_facture"=> $vfacture,
+													"ref_slimpay" => $status["id"],
+												    "executionStatus"=>$status["executionStatus"],
+												    "date_execution"=>$status["executionDate"],
+												    "retour"=> json_encode($status)
+												   	)
+											 	);
 				}
 			}
 		}
