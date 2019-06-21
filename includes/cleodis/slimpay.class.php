@@ -89,6 +89,8 @@ class slimpay {
         ]);
         $res = $hapiClient->sendFollow($follow);
 
+        log::logger($res , "mfleurquin");
+
         // The Resource's state
         $state = $res->getState();
         return $state;
