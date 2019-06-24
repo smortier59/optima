@@ -153,7 +153,7 @@ class souscription_cleodis extends souscription {
               $pack_produit['lignes'][$k]['produit'] = ATF::produit()->select($ligne['id_produit']);
             }
           }
-          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit);
+          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
         }
 
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
@@ -282,7 +282,6 @@ class souscription_cleodis extends souscription {
 
 
 
-
     foreach ($produits as $k=>$produit) {
         ATF::produit()->q->reset()
           ->addField("loyer")
@@ -298,7 +297,18 @@ class souscription_cleodis extends souscription {
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
 
-          if($post["site_associe"] == "bdomplus")  $toInsertLoyer[0]["loyer__dot__frequence_loyer"] = ATF::pack_produit()->select($id_pack, "frequence");
+          if($post["site_associe"] == "bdomplus"){
+            $toInsertLoyer[0]["loyer__dot__frequence_loyer"] = ATF::pack_produit()->select($id_pack, "frequence");
+
+            switch ($toInsertLoyer[0]["loyer__dot__frequence_loyer"]) {
+              case 'mois':
+                $devis["devis"] = $libelle." Mensuel";
+              break;
+               case 'an':
+                 $devis["devis"] = $libelle." Annuel";
+              break;
+            }
+          }
 
 
           //Il faut récupérer l'affichage sur PDF
@@ -1176,12 +1186,13 @@ class souscription_bdomplus extends souscription_cleodis {
       $mail = new mail($info_mail);
 
       foreach ($files as $key => $infos) {
-        $fp = "/tmp/".$key.".pdf";
+        $fp = "/tmp/".$infos["function"]."-".$infos["value"].".pdf";
         $data = ATF::pdf()->generic($infos["function"],$infos["value"],true);
         if (file_put_contents($fp,$data)) {
           $mail->addFile($fp,$key.".pdf",true);
         }
       }
+
 
       $send = $mail->send();
 

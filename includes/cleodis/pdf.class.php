@@ -28,6 +28,11 @@ class pdf_cleodis extends pdf {
 	public $headerAdresseFacturation = false;
 
 
+	public $facturePDF = false;
+	public $relance = false;
+	public $envoiContrat = false;
+	public $pdf_devis = false;
+
 	//Couleur CLEODIS
 	public $Rentete = 149;
 	public $Gentete = 193;
@@ -13642,6 +13647,11 @@ class pdf_bdomplus extends pdf_cleodis {
 
 	public function Footer() {
 		if($this->facturePDF && !$this->envoiContrat && !$this->grille_client){
+
+			log::logger('FacturePDF -> '.$this->facturePDF , "mfleurquin");
+			log::logger('envoiContrat -> '.$this->envoiContrat , "mfleurquin");
+			log::logger('grille_client -> '.$this->grille_client , "mfleurquin");
+
 			$this->setfont('arial','B',9);
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
@@ -13850,7 +13860,9 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->multicell(0,3,$texte);
 		  }else{
 			if($this->devis["type_contrat"] == "presta"){ $this->multicell(0,3,"La durée est fixée à ".$duree." mois."); }
-			else{ $this->multicell(0,3,"La durée de l'abonnement est fixée à ".$duree." mois."); }
+			else{ 
+				$this->multicell(0,3,"L'abonnement pour une durée de ".$duree." ".$this->loyer[0]['frequence_loyer']." est ferme et définitif et ne pourra être résilié avant son échéance. Le client a la possibilité de mettre fin à son abonnement à la fin de la première année et à la fin de chaque échéance annuelle sous réserve de respecter un préavis d'un mois avant la date d'échéance."); 
+			}
 
 		  }
 		  $this->ln(2);
@@ -13874,7 +13886,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			  $this->multicell(0,3,"Les loyers de l'avenant sont définis ainsi : ");
 			}else{
 			  $this->multicell(0,3,"Les loyers mensuels sont fixes et non révisables pendant toute la durée de l'abonnement.");
-			  $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue par carte bancaire, le jour de la prise de commande.");
+			  $this->multicell(0,3,"Ils sont payables terme à échoir par prélèvement automatique, excepté le premier loyer dont le règlement s'effectue le jour de la prise de commande.");
 			}
 			if($duree){
 			  $donnee = array();
@@ -13909,9 +13921,6 @@ class pdf_bdomplus extends pdf_cleodis {
 		$this->line(0,$this->gety(),238,$this->gety());
 		$this->SetTextColor(22,20,93);
 		$this->setfont('arial','B',10);
-		if(!$sellsign){
-		  $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
-		}
 
 		$this->SetDrawColor(0,0,0);
 
@@ -13964,13 +13973,13 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		$this->setfont('arial','B',9);
 		$this->setY(275.9);
-		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS GENERALES CI APRES",0,'C');
+		$this->multicell(0,1,"POUR ACCEPTATION DES CONDITIONS PARTICULIERES ET GENERALES CI APRES",0,'C');
 
 		$this->unsetHeader();
 		$this->unsetFooter();
 
 
-		/*$pageCount = $this->setSourceFile(__PDF_PATH__."cleodis/cga-contratA4.pdf");
+		$pageCount = $this->setSourceFile(__PDF_PATH__."bdomplus/BDOM-CP-CG.pdf");
 
 		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 		  $tplIdx = $this->importPage($pageNo);
@@ -13978,7 +13987,7 @@ class pdf_bdomplus extends pdf_cleodis {
 		  // add a page
 		  $this->AddPage();
 		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-		}*/
+		}
 
 
   }
