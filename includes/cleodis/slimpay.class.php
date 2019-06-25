@@ -74,6 +74,37 @@ class slimpay {
     }
 
 
+    public function getPaymentIssue(){
+        log::logger("Payment Issue" , "mfleurquin");
+
+        $hapiClient = self::connection();
+        log::logger("--HAPI Client","slimpay.log");
+        log::logger($hapiClient,"slimpay.log");
+
+        // The Relations Namespace
+        $relNs = self::getRelationNamespace();
+
+        $rel = new Hal\CustomRel($relNs . 'search-payment-issues');
+
+        $follow = new Http\Follow(new Hal\CustomRel($rel), 'GET', [
+            'creditorReference' => __CREDITOR_REFERENCE__,
+            'scheme' => 'SEPA.DIRECT_DEBIT.CORE'
+        ]);
+        $collection = $hapiClient->sendFollow($follow);
+
+        log::logger($collection , "mfleurquin");
+
+
+        foreach ($collection->getEmbeddedResources('paymentIssues') as $issue) {
+            $issueState = $issue->getState();
+            log::logger($issueState, "mfleurquin");
+        }
+
+
+
+    }
+
+
     public function getStatutDebit($id_slimpay){
         $hapiClient = self::connection();
         log::logger("--HAPI Client","slimpay.log");
