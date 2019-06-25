@@ -584,7 +584,10 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'bdomplus':
+
+        $pathMandat = "/tmp/".$infos["function"]."-".$infos["value"].".pdf";
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+        file_put_contents($pathMandat,$pdf_mandat);
 
         $f =  array(
           "mandatSellAndSign.pdf" => base64_encode($pdf_mandat)
@@ -592,7 +595,7 @@ class souscription_cleodis extends souscription {
 
         if($post["send_file_mail"]){
           $mail_files = array(
-            "contrat"=> array("function"=> "mandatSellAndSign", "value"=> $id_affaire)
+            "contrat"=> $pathMandat
           );
 
           //On envoi le mail au client avec le contrat qu'il va signer
@@ -1186,11 +1189,7 @@ class souscription_bdomplus extends souscription_cleodis {
       $mail = new mail($info_mail);
 
       foreach ($files as $key => $infos) {
-        $fp = "/tmp/".$infos["function"]."-".$infos["value"].".pdf";
-        $data = ATF::pdf()->generic($infos["function"],$infos["value"],true);
-        if (file_put_contents($fp,$data)) {
-          $mail->addFile($fp,$key.".pdf",true);
-        }
+          $mail->addFile($infos,$key.".pdf",true);
       }
 
 
