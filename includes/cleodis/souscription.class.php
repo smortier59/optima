@@ -162,7 +162,6 @@ class souscription_cleodis extends souscription {
 
         if ($post['vendeur'] && $post['site_associe'] == 'bdomplus') {
           $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
-
         }
 
         if ($post['id_panier']) {
