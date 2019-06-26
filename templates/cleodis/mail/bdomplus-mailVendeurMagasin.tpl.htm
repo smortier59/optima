@@ -1,0 +1,11 @@
+{$infos["texte"]}
+<br>
+{foreach $infos["vendeur"][0] as $k=>$i}
+	<p>{$k} : {$i}</p>
+{/foreach}
+<br>
+Pour la/les affairs suivantes : 
+<br>
+{foreach $infos["affaires"] as $k=>$i}
+	<p>{$k} : {$i|implode:", "}</p>
+{/foreach}

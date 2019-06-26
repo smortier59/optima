@@ -160,6 +160,11 @@ class souscription_cleodis extends souscription {
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
 
+        if ($post['vendeur'] && $post['site_associe'] == 'bdomplus') {
+          $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
+
+        }
+
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
         }
@@ -1212,6 +1217,41 @@ class souscription_bdomplus extends souscription_cleodis {
       }
       ATF::suivi()->i($suivi);
     }
+
+
+  }
+
+  public function envoiMailVendeurABenjamin($affaires, $vendeur){
+    log::logger("=================envoiMailVendeurABenjamin================", "souscription");
+    log::logger($affaires, "souscription");
+
+    if ($vendeur && $affaires) {
+      $vendeur = json_decode($vendeur, true);
+      log::logger($vendeur, "souscription");
+
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["recipient"] = "benjamin.tronquit@cleodis.com,BDOMPlusLicence@absystech.fr";
+      $info_mail["html"] = true;
+      $info_mail["template"] = "bdomplus-mailVendeurMagasin";
+      $info_mail["texte"] = "Souscription magasin par le vendeur suivant ";
+      $info_mail["vendeur"] = $vendeur;
+      $info_mail["affaires"] = $affaires;
+
+      $info_mail["objet"] = "Souscription BDOM par un vendeur en magasin";
+
+      $mail = new mail($info_mail);
+      log::logger($mail, "souscription");
+
+
+      $send = $mail->send();
+      log::logger($send, "souscription");
+    } else {
+      log::logger("Il manque le vendeur ou les références affaires, on envoi pas le mail a Benjamin." , "souscription");
+      log::logger($affaires , "souscription");
+      log::logger($vendeur , "souscription");
+    }
+
+    log::logger("=================FIN envoiMailVendeurABenjamin================", "souscription");
 
 
   }
