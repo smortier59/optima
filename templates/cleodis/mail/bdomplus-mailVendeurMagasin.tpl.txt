@@ -1,6 +1,6 @@
 {$infos["texte"]}
 
-{foreach $infos["vendeur"][0] as $k=>$i}
+{foreach $infos["vendeur"] as $k=>$i}
 	{$k} : {$i}
 {/foreach}
 
