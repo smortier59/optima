@@ -5034,6 +5034,14 @@ class pdf_cleodis extends pdf {
 		$this->lignes = ATF::facturation()->sa();
 	}
 
+	function global_facture ($facture,$s){
+		$this->open();
+		foreach ($facture as $key => $item) {
+
+			$this->facture($item,$s,true) ;
+		}
+	}
+
 	function global_prolongation ($facture,$s){
 		$this->global_facture($facture,$s);
 	}
@@ -5050,6 +5058,38 @@ class pdf_cleodis extends pdf {
 		$this->global_facture($facture,$s);
 	}
 
+	function global_prolongation_envoye($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongation_envoyeSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongation_envoyeCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_prolongation_envoyeDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+
+
+
+	function global_factureSociete ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureCode ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+	function global_factureDate ($facture,$s){
+		$this->global_facture($facture,$s);
+	}
+
+
 	function global_facture_contrat_envoye($facture,$s){
 		$this->global_facture($facture,$s);
 	}
@@ -5064,26 +5104,6 @@ class pdf_cleodis extends pdf {
 
 	function global_facture_contrat_envoyeDate ($facture,$s){
 		$this->global_facture($facture,$s);
-	}
-
-	function global_factureSociete ($facture,$s){
-		$this->global_facture($facture,$s);
-	}
-
-	function global_factureCode ($facture,$s){
-		$this->global_facture($facture,$s);
-	}
-
-	function global_factureDate ($facture,$s){
-		$this->global_facture($facture,$s);
-	}
-
-	function global_facture ($facture,$s){
-		$this->open();
-		foreach ($facture as $key => $item) {
-
-			$this->facture($item,$s,true) ;
-		}
 	}
 
 	/** PDF de l'échéancier d'une affaire
@@ -5309,17 +5329,6 @@ class pdf_cleodis extends pdf {
 		$this->grille_client($non_facturerDate,$s,true,true);
 	}
 
-	function grille_contratclient_non_envoyeSociete($non_facturerSociete,$s) {
-		$this->grille_client($non_facturerSociete,$s,true);
-	}
-
-	function grille_contratclient_non_envoyeCode($non_facturerCode,$s) {
-		$this->grille_client($non_facturerCode,$s,true);
-	}
-
-	function grille_contratclient_non_envoyeDate($non_facturerDate,$s) {
-		$this->grille_client($non_facturerDate,$s,true);
-	}
 
 	function grille_prolongationclientSociete($facturerSociete,$s) {
 		$this->grille_client($facturerSociete,$s,false,true);
@@ -5331,6 +5340,21 @@ class pdf_cleodis extends pdf {
 
 	function grille_prolongationclientDate($facturerDate,$s) {
 		$this->grille_client($facturerDate,$s,false,true);
+	}
+
+
+
+
+	function grille_contratclient_non_envoyeSociete($non_facturerSociete,$s) {
+		$this->grille_client($non_facturerSociete,$s,true);
+	}
+
+	function grille_contratclient_non_envoyeCode($non_facturerCode,$s) {
+		$this->grille_client($non_facturerCode,$s,true);
+	}
+
+	function grille_contratclient_non_envoyeDate($non_facturerDate,$s) {
+		$this->grille_client($non_facturerDate,$s,true);
 	}
 
 	function grille_contratclientSociete($facturerSociete,$s) {
