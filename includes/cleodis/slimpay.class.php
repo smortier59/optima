@@ -94,10 +94,11 @@ class slimpay {
 
         log::logger($collection , "mfleurquin");
 
-
-        foreach ($collection->getEmbeddedResources('paymentIssues') as $issue) {
-            $issueState = $issue->getState();
-            log::logger($issueState, "mfleurquin");
+        while ($collection->getState()['page']['totalElements'] > 0) {
+            foreach ($collection->getEmbeddedResources('paymentIssues') as $issue) {
+                $issueState = $issue->getState();
+                log::logger($issueState, "mfleurquin");
+            }
         }
 
 
