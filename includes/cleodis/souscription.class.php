@@ -117,6 +117,10 @@ class souscription_cleodis extends souscription {
         $ref_affaire = ATF::affaire()->select_cell();
 
 
+
+        $affaires["ids"][] = $id_affaire;
+        $affaires["refs"][] = $ref_affaire;
+
         if ($post['vendeur'] && $post['site_associe'] == 'bdomplus') {
           $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
           // Sélection d'un magasin au hasard
@@ -126,9 +130,6 @@ class souscription_cleodis extends souscription {
 
         }
 
-
-        $affaires["ids"][] = $id_affaire;
-        $affaires["refs"][] = $ref_affaire;
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
           "id_affaire"=>$id_affaire,
