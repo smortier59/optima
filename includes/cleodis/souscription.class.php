@@ -116,6 +116,17 @@ class souscription_cleodis extends souscription {
         ATF::affaire()->q->reset()->addField('affaire.ref','ref')->where('affaire.id_affaire', $id_affaire);
         $ref_affaire = ATF::affaire()->select_cell();
 
+
+        if ($post['vendeur'] && $post['site_associe'] == 'bdomplus') {
+          $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
+          // Sélection d'un magasin au hasard
+          ATF::magasin()->q->reset()->setLimit(1);
+          $magasin = ATF::magasin()->select_row();
+          $post['id_magasin'] = $magasin['id_magasin'];
+
+        }
+
+
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
@@ -160,9 +171,6 @@ class souscription_cleodis extends souscription {
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
 
-        if ($post['vendeur'] && $post['site_associe'] == 'bdomplus') {
-          $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
-        }
 
         if ($post['id_panier']) {
           ATF::panier()->u(array("id_panier"=>$post['id_panier'],"id_affaire"=>$id_affaire));
