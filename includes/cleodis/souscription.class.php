@@ -121,10 +121,10 @@ class souscription_cleodis extends souscription {
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
 
-        if ($post['vendeur'] && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
+        // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)
+        if ($post['vendeur'] && $post['vendeur']!="null" && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
           log::logger("A priori on aurait un vendeur magasin BDOM !", "souscription");
           log::logger($post['vendeur'], "souscription");
-          log::logger($post['vendeur']['nameid'], "souscription");
           $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
           // Sélection d'un magasin au hasard
           ATF::magasin()->q->reset()->setLimit(1);
