@@ -121,7 +121,7 @@ class souscription_cleodis extends souscription {
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
 
-        if ($post['vendeur'] && $post['site_associe'] == 'bdomplus') {
+        if ($post['vendeur'] && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
           $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
           // Sélection d'un magasin au hasard
           ATF::magasin()->q->reset()->setLimit(1);
