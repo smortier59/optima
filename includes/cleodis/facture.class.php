@@ -2840,9 +2840,24 @@ class facture_bdomplus extends facture_cleodis {
 
 		ATF::db()->begin_transaction();
 		try{
-
-
 			foreach ($data as $key => $value) {
+
+				$snapshot = ATF::affaire()->select($value["id_affaire"], "snapshot_pack_produit");
+
+				$json=json_decode($snapshot,true);
+
+				$principal = array("produit"=>"", "ref"=>"");
+
+				if($json){
+					foreach ($json["lignes"] as $kl => $vl) {
+						if($vl["principal"] == "oui"){
+							$principal["produit"] = $vl["produit"]["produit"];
+							$principal["ref"] = $vl["produit"]["ref"];
+						}
+					}
+				}
+
+
 
 				$client = ATF::societe()->select($value["id_societe"]);
 
@@ -2856,8 +2871,8 @@ class facture_bdomplus extends facture_cleodis {
 		    	$donnees[$key][$i][7] = "";
 		    	$donnees[$key][$i][8] = $client["particulier_portable"]; // Telephone portable
 		    	$donnees[$key][$i][9] = $client["particulier_email"];
-		    	$donnees[$key][$i][10] = "";
-		    	$donnees[$key][$i][11] = "";
+		    	$donnees[$key][$i][10] = $principal["ref"];
+		    	$donnees[$key][$i][11] = $principal["produit"];
 		    	$donnees[$key][$i][12] = number_format($value["prix"] * $value["tva"], 2 , ",", "");
 		    	$donnees[$key][$i][13] = "";
 				$donnees[$key][$i][14] = date("Ymd", strtotime($value["date"]));
