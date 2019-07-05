@@ -1,4 +1,4 @@
-<?	
+<?
 /** Classe devis
 * @package Optima
 * @subpackage Absystech
@@ -6,9 +6,9 @@
 require_once dirname(__FILE__)."/../devis_ligne.class.php";
 class devis_ligne_absystech extends devis_ligne {
 	function __construct() {
-		parent::__construct(); 
+		parent::__construct();
 		$this->table = "devis_ligne";
-		$this->colonnes['fields_column'] = array( 
+		$this->colonnes['fields_column'] = array(
 			 'devis_ligne.produit'
 			,'devis_ligne.quantite'=>array("width"=>50,"align"=>"center")
 			,'devis_ligne.ref'=>array("width"=>100,"align"=>"center")
@@ -26,9 +26,9 @@ class devis_ligne_absystech extends devis_ligne {
 			,"id_compte_absystech"
 			,"periode"
 		);
-		
+
 		$this->colonnes['bloquees']['insert'] =  array('id_devis_ligne','id_devis');
-		$this->colonnes['ligne'] =  array( 	
+		$this->colonnes['ligne'] =  array(
 			"devis_ligne.id_produit"=>array("hidden"=>true)
 			,"devis_ligne.produit"
 			,"devis_ligne.quantite"
@@ -47,18 +47,18 @@ class devis_ligne_absystech extends devis_ligne {
 			,"devis_ligne.index_couleur"
 			,"devis_ligne.visible"
 		);
-		
-		$this->fieldstructure();	
+
+		$this->fieldstructure();
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->field_nom = "produit";
 		$this->colonnes['bloquees']['export'] = array("id_produit");
-		
+
 	}
 
 	/**
     * Permet d'avoir les lignes de devis dans l'ordre d'insertion
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    */ 
+    */
 	function select_all($order_by=false,$asc='desc',$page=false,$count=false,$parent=false){
 		$asc="asc";
 		$select_all=parent::select_all($order_by,$asc,$page,$count);
@@ -76,19 +76,24 @@ class devis_ligne_absystech extends devis_ligne {
 					$marge_absolue = ($item["devis_ligne.prix"]*$item["devis_ligne.quantite"])-($item["devis_ligne.prix_achat"]*$item["devis_ligne.quantite"]);
 					$select_all["data"][$key]["devis_ligne.marge_absolue"]=max(0,$marge_absolue);
 				}
-				
 			}
 		}
 
 		return $select_all;
 	}
 
+	public function extJSgsa(&$post,&$s=NULL){
+		$post["limit"] = 300;
+		$return =  parent::extJSgsa($post,$s);
+		return $return;
+	}
+
   	/**
 	* Retourne les lignes d'un devis pour le grid des commande ligne
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param array $infos
-	*/	
-  	function toCommandeLigne() {  		
+	*/
+  	function toCommandeLigne() {
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(util::keysOrValues($this->colonnes['ligne']))->reset('limit,page');
 		if ($res = $this->select_all()) {
@@ -111,7 +116,7 @@ class devis_ligne_absystech extends devis_ligne {
 				}
 			}
 			$res["data"] = $return;
-		}		
+		}
 		return $res;
 	}
 };
