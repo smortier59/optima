@@ -1103,6 +1103,7 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? true : false;
 			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? true : false;
 			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? true : false;
+			$return['data'][$k]["dossier_preuve_sell_sign"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"dossier_preuve_sell_sign")) ? true : false;
 
 			if ($i['affaire.nature'] == 'AR') {
 				foreach ($a->getParentAR($i['affaire.id_affaire']) as $k_=>$i_) {
@@ -3037,8 +3038,9 @@ class affaire_bdomplus extends affaire_cleodis {
 		parent::__construct($table_or_id);
 
 		$this->onglets = array(
-			'affaire_etat',
-			'loyer'
+			'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)
