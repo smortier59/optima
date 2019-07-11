@@ -12,6 +12,22 @@ class sell_and_sign extends classes_optima {
 		parent::__construct();
 		$this->controlled_by = 'affaire';
 		$this->table = "sell_and_sign";
+
+		$this->colonnes['fields_column'] = array(
+			"sell_and_sign.sell_and_sign"
+			,"sell_and_sign.date"
+			,"sell_and_sign.id_affaire"
+			,"sell_and_sign.dataCustomer_number"
+			,"sell_and_sign.contractor_id"
+			,"sell_and_sign.contract_id"
+			,"sell_and_sign.document_id"
+			,"sell_and_sign.contractorTo_id"
+			,"sell_and_sign.bundle_id"
+
+		);
+
+
+
 		$this->colonnes['primary'] = array(
 			"sell_and_sign"
 			,"date"

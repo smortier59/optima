@@ -36,6 +36,7 @@ class souscription_cleodis extends souscription {
     $email = $post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
+
     switch ($post['site_associe']) {
       case 'boulangerpro':
         ATF::societe()->q->reset()->where("siret", "45122067700087");
@@ -127,8 +128,23 @@ class souscription_cleodis extends souscription {
           log::logger($post['vendeur'], "souscription");
           $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
           // Sélection d'un magasin au hasard
-          ATF::magasin()->q->reset()->setLimit(1);
+          $vendeur = json_decode($post['vendeur'], true);
+          ATF::magasin()->q->reset()->where('code', 'F'.$vendeur['siteId'])->setLimit(1);
           $magasin = ATF::magasin()->select_row();
+
+          if (!$magasin) {
+            log::logger("MAGASIN !!NON!! IDENTIFIE avec le siteId / code : ".$vendeur['siteId'].", il faut le créer.", "souscription");
+            $id_magasin = ATF::magasin()->i(array(
+              "magasin"=>$vendeur['siteName'],
+              "code"=>'F'.$vendeur['siteId'],
+              "site_associe"=>$post['site_associe']
+            ));
+            $magasin = ATF::magasin()->select($id_magasin);
+
+          } else {
+            log::logger("MAGASIN IDENTIFIE avec le siteId / code : ".$vendeur['siteId'], "souscription");
+          }
+          log::logger($magasin['magasin']."(".$magasin['id_magasin'].")", "souscription");
           $post['id_magasin'] = $magasin['id_magasin'];
 
         }
