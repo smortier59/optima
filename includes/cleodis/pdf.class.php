@@ -4049,7 +4049,8 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "2SI"){ $this->logo = 'cleodis/2SI_CLEODIS.jpg'; }
+		else{  $this->logo = 'cleodis/logo.jpg'; }
 
 
 		//Styles utilisés
