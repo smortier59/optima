@@ -135,7 +135,6 @@ class affaire_cleodis extends affaire {
 		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-		$this->files["dossier_preuve_sell_sign"] = array("type"=>"zip","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
