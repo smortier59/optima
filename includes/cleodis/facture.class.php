@@ -2956,7 +2956,15 @@ class facture_bdomplus extends facture_cleodis {
 			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
 		}
 
-		return $return;
+		$libelle = "Abonnement BDOM+ ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+
+		$result = array(
+						"libelle"=> $libelle,
+						"date_prelevement"=> date("Y-m-01", strtotime("+1 month")),
+						"lignes" => $return
+					   );
+
+		return $result;
 	}
 
 	/**
