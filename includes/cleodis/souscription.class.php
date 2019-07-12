@@ -121,7 +121,7 @@ class souscription_cleodis extends souscription {
 
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
-
+        $nameVendeur = false;
         // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)
         if ($post['vendeur'] && $post['vendeur']!="null" && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
           log::logger("A priori on aurait un vendeur magasin BDOM !", "souscription");
@@ -131,7 +131,7 @@ class souscription_cleodis extends souscription {
           $vendeur = json_decode($post['vendeur'], true);
           ATF::magasin()->q->reset()->where('code', 'F'.$vendeur['siteId'])->setLimit(1);
           $magasin = ATF::magasin()->select_row();
-
+          $nameVendeur = $vendeur['displayName'];
           if (!$magasin) {
             log::logger("MAGASIN !!NON!! IDENTIFIE avec le siteId / code : ".$vendeur['siteId'].", il faut le créer.", "souscription");
             $id_magasin = ATF::magasin()->i(array(
@@ -166,11 +166,13 @@ class souscription_cleodis extends souscription {
           "adresse_facturation_2"=>$post['facturation']['adresse_2'],
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
-          //"IBAN"=>$societe["IBAN"], //Inutile le travail est fait dans devis->insert()
-          //"RUM"=>$societe["RUM"], //Inutile le travail est fait dans devis->insert()
-          //"BIC"=>$societe["BIC"], //Inutile le travail est fait dans devis->insert()
           "id_magasin"=>$post["id_magasin"]
         );
+        // ajout du vendeur pour bdomplus
+        if ($post['site_associe'] == 'bdomplus' && $nameVendeur) {
+          $affToUpdate['vendeur'] = $nameVendeur;
+        }
+
 
         if($post["facture"]) ATF::facture_magasin()->i(array("id_affaire"=> $id_affaire, "ref_facture"=> $post["facture"]));
 
