@@ -21,8 +21,8 @@ class affaire_cleodis extends affaire {
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
 			,'commande.etat'=>array("width"=>30,"renderer"=>"etat")
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
-			,'mail_signature'
-			,'mail_document'
+			,'affaire.mail_signature'
+			,'affaire.mail_document'
 			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
 			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
