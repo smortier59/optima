@@ -508,8 +508,13 @@ class devis_cleodis extends devis {
 						            'devis_ligne__dot__neuf' => 'oui',
 						            'devis_ligne__dot__id_produit_fk' => $p['id_produit'],
 						            'devis_ligne__dot__id_fournisseur_fk' => $p['id_fournisseur'],
-						         	'devis_ligne__dot__visible'=> 'non');
+						         	'devis_ligne__dot__visible'=> 'non',
+						         	'devis_ligne_dot_visible_pdf'=> 'non');
+
+
 		}
+
+		log::logger($infos_ligne , "mfleurquin");
 
 		//Lignes
 		if($infos_ligne){

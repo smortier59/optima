@@ -454,6 +454,7 @@ class commande_cleodis extends commande {
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["commande_ligne__dot__visible"]="non";
+				$infos_ligne_non_visible[$key]["commande_ligne__dot__visible_pdf"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
 			}
 		}
