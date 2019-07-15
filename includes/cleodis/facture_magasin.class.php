@@ -35,15 +35,15 @@ class facture_magasin extends classes_optima {
 
 
 				log::logger("Traitement de la facture ".strtoupper($ref), "controle_affaire_magasin_facture");
-
 				$this->q->reset()->where("ref_facture", strtoupper($ref));
 				$facture_magasin = $this->select_row();
 				if($facture_magasin){
-					log::logger("-- Reference de facture magasin trouvée chez nous facture : ".$facture_magasin["ref"], "controle_affaire_magasin_facture");
+
+					log::logger("-- Reference de facture magasin trouvée chez nous", "controle_affaire_magasin_facture");
 
 					$this->u(array("id_facture_magasin" => $facture_magasin["id_facture_magasin"], "etat"=> "paye"));
 					log::logger("-- Mise à jour de l'état de la facture en payée", "controle_affaire_magasin_facture");
-					ATF::facture_magasin_recu()->u(array("id_facture_magasin_recu"=> $value["id_facture_magasin_recu"], "statut"=> "traitee"));
+					//ATF::facture_magasin_recu()->u(array("id_facture_magasin_recu"=> $value["id_facture_magasin_recu"], "statut"=> "traitee"));
 					log::logger("-- Passage du statut de la facture magasin recu en traitée", "controle_affaire_magasin_facture");
 
 
@@ -51,8 +51,10 @@ class facture_magasin extends classes_optima {
 					$facture = ATF::facture()->select_row();
 					if($facture){
 						ATF::facture()->u(array("id_facture"=> $facture["facture.id_facture"], "ref_magasin"=> strtoupper($facture_magasin["ref_facture"])));
-						log::logger("-- Mise à jour de la ref magasin ".strtoupper($facture_magasin["ref_facture"])."de la facture sur la facture ref ".$facture["ref"], "controle_affaire_magasin_facture");
+						log::logger("-- Mise à jour de la ref magasin ".strtoupper($facture_magasin["ref_facture"])." de la facture sur la facture ref ".ATF::facture()->select($facture["facture.id_facture"], "ref"), "controle_affaire_magasin_facture");
 					}
+				}else{
+					log::logger("-- Reference de facture magasin non trouvée chez nous", "controle_affaire_magasin_facture");
 				}
 			}
 		} catch (errorATF $e) {
