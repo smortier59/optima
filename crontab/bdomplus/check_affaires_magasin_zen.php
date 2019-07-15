@@ -23,10 +23,8 @@ try{
 	echo "Mise à jour des affaires par rapport au factures magasins recues\n";
 	echo "-----------------------------------------------------------------\n";
 
-	if($_SERVER["argv"][2]) $day = $_SERVER["argv"][2];
-	else $day = 1;
 
-	ATF::souscription()->check_affaires_magasin($day);
+	ATF::souscription()->check_affaires_magasin();
 
 	echo "-----------------------------------------------------------------\n";
 	echo "Fin du script\n";

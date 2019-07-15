@@ -1468,21 +1468,16 @@ class souscription_bdomplus extends souscription_cleodis {
   /**
    * Permet de demarrer ou arreter une affaire magasin créée à J-1 selon si la facture magasin a été recu ou non
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-   * @param int $day Nombre de jour d'ancienneté de l'affaire
    */
   public function check_affaires_magasin($day){
     log::logger("=====================", "controle_affaire_magasin_facture");
 
     ATF::affaire()->q->reset()
       ->whereIsNotNull("id_magasin","AND", "affaire")
-      ->where("affaire.date", date("Y-m-d", strtotime("-".$day." days")), "AND", "affaire", "=");
+      ->where("affaire.date", date("Y-m-d", strtotime("-1 days")), "AND", "affaire", "=");
       //->where("affaire.date", date("Y-m-d"), "AND", "affaire");
 
     $affaireshier = ATF::affaire()->select_all();
-
-    ATF::affaire()->q->setToString();
-    log::logger(ATF::affaire()->select_all() , "controle_affaire_magasin_facture");
-
 
     if($affaireshier){
       foreach ($affaireshier as $key => $value) {
@@ -1499,7 +1494,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
       }
     } else {
-      log::logger("Aucune affaire hier", "controle_affaire_magasin_facture");
+      log::logger("Aucune affaire créée le ".date("d M Y", strtotime("-".$day." days")), "controle_affaire_magasin_facture");
     }
   }
 
