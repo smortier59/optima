@@ -259,7 +259,7 @@ class souscription_cleodis extends souscription {
       break;
 
       case "bdomplus":
-        $r = "BDOM + : Abonnement Zen ".$suffix;
+        $r = "Abonnement Zen ".$suffix;
       break;
     }
 
