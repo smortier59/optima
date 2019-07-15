@@ -172,7 +172,7 @@ class souscription_cleodis extends souscription {
           "id_magasin"=>$post["id_magasin"]
         );
 
-        if($post["facture"]) ATF::facture_magasin()->i(array("id_affaire"=> $id_affaire, "ref_facture"=> $post["facture"]));
+        if($post["facture"]) ATF::facture_magasin()->i(array("id_affaire"=> $id_affaire, "ref_facture"=> strtoupper($post["facture"])));
 
         // On stock le JSON du pack complet au cas où.
         if ($post['id_pack_produit']) {
