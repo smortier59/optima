@@ -104,8 +104,8 @@ class pdf_absystech extends pdf {
 								  ->addField("hotline.hotline","Résumé")
 								  ->addField("gestion_ticket.date","Date")
 								  ->addField("facture.ref","Facture")
-								  ->addField("hotline.id_contact","Contact")
-								  ->addField("hotline.id_user","Contact Absystech")
+								  ->addField("CONCAT(contact.prenom,' ',contact.nom)","Contact")
+								  ->addField("CONCAT(user.prenom,' ',user.nom)","Contact Absystech")
 								  ->addField("gestion_ticket.nbre_tickets","Crédits")
 								  ->addField("gestion_ticket.solde","Solde")
 								  ->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($id))
@@ -113,6 +113,8 @@ class pdf_absystech extends pdf {
 								  ->addCondition("gestion_ticket.date",$date_debut,"AND",false,">=")
 								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
 								  ->addJointure("gestion_ticket","id_facture","facture","id_facture")
+								  ->addJointure("hotline","id_contact","contact","id_contact")
+								  ->addJointure("hotline","id_user","user","id_user")
 								  ->setStrict()
 								  ->addOrder("gestion_ticket.date");
 		// ATF::gestion_ticket()->q->setToString();
