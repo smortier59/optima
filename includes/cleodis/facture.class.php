@@ -2944,6 +2944,7 @@ class facture_bdomplus extends facture_cleodis {
 		 	  FROM facture
 			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
 			  AND etat = 'impayee'
+			  AND date_paiement IS NULL
 			  ORDER BY `facture`.`id_societe`, `facture`.`id_affaire`";
 
 		$return = ATF::db()->sql2array($q);
