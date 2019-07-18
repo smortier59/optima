@@ -3156,7 +3156,6 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 						$this->q->reset()->where("id_hotline",$id_hotline);
 						$res = $this->select_row();
 
-						log::logger("Le ticket ".$id_hotline.",n'existe plus sur ".ATF::$codename , "hotline-checkmail");
 
 						//Si le ticket hotline existe
 						if(is_array($res)){
@@ -3244,6 +3243,8 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 								log::logger($body , "hotline-checkmail");
 								log::logger("------------------------------------" , "hotline-checkmail");
 							}
+						}else{
+							log::logger("Le ticket ".$id_hotline.",n'existe plus sur ".ATF::$codename , "hotline-checkmail");
 						}
 
 					}else{
