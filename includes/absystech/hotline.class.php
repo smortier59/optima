@@ -3113,6 +3113,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 		$mails = ATF::imap()->imap_fetch_overview('1:*');
 
+
 		if (is_array($mails)) {
 			foreach ($mails as $val) {
 
@@ -3127,7 +3128,13 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 						$idhotline = $ids[2];
 						$idcontact = $ids[3];
 
+
+						log::logger($codename , "hotline-checkmail");
+						log::logger($idhotline , "hotline-checkmail");
+						log::logger($idcontact , "hotline-checkmail");
+
 						$id_hotline = ATF::hotline()->decryptId($idhotline);
+
 
 						$from = explode("<",$val->from);
 						if($from[1]){ $from = substr($from[1], 0, -1);	}
@@ -3172,6 +3179,8 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 								if(($res["etat"] == "payee") || ($res["etat"] == "annulee")){
 
+									log::logger("Requete ".$id_hotline." payee ou annulée" , "hotline-checkmail");
+
 									//Requête cloturée ou annulée donc pas d'interaction !!
 									$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
 									$info_mail["from"] = "optima-hotline@absystech.net";
@@ -3186,7 +3195,10 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 									ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
 
+
 								}else{
+
+									log::logger("Requete ".$id_hotline." Ok on insere l'interaction" , "hotline-checkmail");
 
 									$interaction = array("id_hotline" =>  $id_hotline,
 														 "date" => $date,
