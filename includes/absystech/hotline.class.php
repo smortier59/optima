@@ -3156,10 +3156,12 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 						$this->q->reset()->where("id_hotline",$id_hotline);
 						$res = $this->select_row();
 
-
+						log::logger("Le ticket ".$id_hotline.",n'existe plus sur ".ATF::$codename , "hotline-checkmail");
 
 						//Si le ticket hotline existe
 						if(is_array($res)){
+							log::logger("Le ticket ".$id_hotline.",existe sur ".ATF::$codename , "hotline-checkmail");
+
 							$date = date("Y-m-d H:i", strtotime($val->date));
 							$body =  ATF::imap()->returnBody($val->uid);
 
@@ -3170,6 +3172,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 							//$message = False;
 							if($message){
+								log::logger("On a bien trouvé le message dans le body" , "hotline-checkmail");
 								if($id_user = $user["id_user"]){
 									$usr=ATF::$usr;
 									ATF::$usr=new usr($user["id_user"]);
@@ -3236,6 +3239,10 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 									$usr=ATF::$usr;
 									ATF::$usr=new usr();
 								}
+							}else{
+								log::logger("On n'a pas réussi à trouver le message dans body" , "hotline-checkmail");
+								log::logger($body , "hotline-checkmail");
+								log::logger("------------------------------------" , "hotline-checkmail");
 							}
 						}
 
