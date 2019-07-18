@@ -1976,7 +1976,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 						$this->q->reset()->where("id_societe" , 513)
 										 ->addField("id_hotline")
 										 ->where("facturation_ticket", "oui")
-										 ->where("id_affaire",NULL,"AND","maintenance","IS NULL")
+										 ->whereIsNull("id_affaire","AND")
 										 ->where("etat" , "done" , "OR" )
 										 ->where("etat" , "payee" , "OR")
 										 ->where("pole_concerne" , "dev")
@@ -1984,17 +1984,15 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 										 ->where("date_debut",$date[$i]["fin"],"AND",false,"<=");
 						$lesRequetes[1] = $this->sa();
 
-
-
 						$this->q->reset()->where("id_societe" , 513)
-										 ->addField("id_hotline")
-										 ->where("facturation_ticket", "non")
-										 ->where("id_affaire",$affaire_maintenance["affaire.id_affaire"],"AND","maintenance","=")
-										 ->where("etat" , "done" , "OR" )
-										 ->where("etat" , "payee" , "OR")
-										 ->where("pole_concerne" , "dev")
-										 ->where("date_debut",$date[$i]["debut"],"AND",false,">=")
-										 ->where("date_debut",$date[$i]["fin"],"AND",false,"<=");
+									 ->addField("id_hotline")
+									 ->where("facturation_ticket", "non")
+									 ->whereIsNotNull("id_affaire","AND")
+									 ->where("etat" , "done" , "OR" )
+									 ->where("etat" , "payee" , "OR")
+									 ->where("pole_concerne" , "dev")
+									 ->where("date_debut",$date[$i]["debut"],"AND",false,">=")
+									 ->where("date_debut",$date[$i]["fin"],"AND",false,"<=");
 						$lesRequetes[2] = $this->sa();
 						$temps = 0;
 
@@ -2002,7 +2000,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 						$this->q->reset()->where("id_societe" , 513)
 										 ->addField("id_hotline")
 										 ->where("facturation_ticket", "non")
-										 ->where("id_affaire",NULL,"AND","maintenance","IS NULL")
+										 ->whereIsNull("id_affaire","AND")
 										 ->where("etat" , "done" , "OR" )
 										 ->where("etat" , "payee" , "OR")
 										 ->where("pole_concerne" , "dev")
@@ -2012,7 +2010,10 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 						$temps = 0;
 
-						$titre = array("Garantie" ,"Facture" , "CM" );
+
+
+
+						$titre = array("Garantie" ,"Facture" , "CM/Régie" );
 						for($j=0;$j<3;$j++){
 							$temps = 0;
 							foreach($lesRequetes[$j] as $k=>$v){
@@ -2023,20 +2024,24 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 										$time = explode(":" , $value["temps_passe"] );
 										$h = $time[0];
 										$m = $time[1];
-
-
+										$temps = $temps + (($h*60) + $m);
+									}elseif($value["duree_presta"] !== "00:00:00"){
+										$time = explode(":" , $value["duree_presta"] );
+										$h = $time[0];
+										$m = $time[1];
 										$temps = $temps + (($h*60) + $m);
 									}
 								}
 							}
-							if($temps != 0){
-								$result[$titre[$j]][$i] = array("semestre" => $date[$i]["debut"]." au ".$date[$i]["fin"], "duree" => $temps, "dureeH" => number_format($temps/60,2));
-							}
+
+							$result[$titre[$j]][$i] = array("semestre" => $date[$i]["debut"]." au ".$date[$i]["fin"], "duree" => $temps, "dureeH" => number_format($temps/60,2, ".",""));
+
 						}
 				}
 				$result["titre"]= "Stats CLEODIS";
 				$result["categories"]= $titre;
 				$result["semestres"] = $date;
+				log::logger($result , "mfleurquin");
 				return $result;
 			break;
 
