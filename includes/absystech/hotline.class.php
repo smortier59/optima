@@ -3240,7 +3240,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 								}
 							}else{
 								log::logger("On n'a pas réussi à trouver le message dans body" , "hotline-checkmail");
-								log::logger($body , "hotline-checkmail");
+								log::logger($$val , "hotline-checkmail");
 								log::logger("------------------------------------" , "hotline-checkmail");
 							}
 						}else{
