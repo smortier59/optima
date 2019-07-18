@@ -3116,114 +3116,120 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		if (is_array($mails)) {
 			foreach ($mails as $val) {
 
-				$pattern = "/optima-hotline-([a-z]*)-([0-9a-f]{32})-([0-9a-f]{32})@absystech-speedmail.com/";
+				try {
 
-				if (strpos(str_replace(" ","",$val->to),"optima-hotline-".ATF::$codename."-")!==false){
-					preg_match($pattern , $val->to, $ids);
+					$pattern = "/optima-hotline-([a-z]*)-([0-9a-f]{32})-([0-9a-f]{32})@absystech-speedmail.com/";
 
-					$codename = $ids[1];
-					$idhotline = $ids[2];
-					$idcontact = $ids[3];
+					if (strpos(str_replace(" ","",$val->to),"optima-hotline-".ATF::$codename."-")!==false){
+						preg_match($pattern , $val->to, $ids);
 
-					$id_hotline = ATF::hotline()->decryptId($idhotline);
+						$codename = $ids[1];
+						$idhotline = $ids[2];
+						$idcontact = $ids[3];
 
+						$id_hotline = ATF::hotline()->decryptId($idhotline);
 
-					$from = explode("<",$val->from);
-					if($from[1]){ $from = substr($from[1], 0, -1);	}
-					else{ $from = $from[0]; }
-
-
-					ATF::user()->q->reset()->where("email",$from);
-					$user = ATF::user()->select_row();
-
-					if(is_array($user)){
-						$id_user = $user["id_user"];
-					}else{
-						$id_user = NULL;
-					}
+						$from = explode("<",$val->from);
+						if($from[1]){ $from = substr($from[1], 0, -1);	}
+						else{ $from = $from[0]; }
 
 
-					$id_contact = ATF::contact()->decryptId($idcontact);
+						ATF::user()->q->reset()->where("email",$from);
+						$user = ATF::user()->select_row();
 
-					$this->q->reset()->where("id_hotline",$id_hotline);
-					$res = $this->select_row();
-
-					//Si le ticket hotline existe
-					if(is_array($res)){
-						$date = date("Y-m-d H:i", strtotime($val->date));
-						$body =  ATF::imap()->returnBody($val->uid);
-
-						//$position = strpos($body, utf8_encode("<---- Pour répondre par email, écrire au-dessus de cette ligne ---->"));
-						//$message = substr($body, 0, $position);
-
-						$message = substr($body, 0, 512);
-
-						//$message = False;
-						if($message){
-							if($id_user = $user["id_user"]){
-								$usr=ATF::$usr;
-								ATF::$usr=new usr($user["id_user"]);
-								$id_contact = NULL;
-							}
+						if(is_array($user)){
+							$id_user = $user["id_user"];
+						}else{
+							$id_user = NULL;
+						}
 
 
-							if(($res["etat"] == "payee") || ($res["etat"] == "annulee")){
+						$id_contact = ATF::contact()->decryptId($idcontact);
 
-								//Requête cloturée ou annulée donc pas d'interaction !!
-								$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
-								$info_mail["from"] = "optima-hotline@absystech.net";
-								$info_mail["html"] = false;
-								$info_mail["template"] = 'hotline_deja_cloture';
-								$info_mail["text"] = $id_hotline;
-								$info_mail["recipient"] = $from;
+						$this->q->reset()->where("id_hotline",$id_hotline);
+						$res = $this->select_row();
 
 
-								$this->facture_mail = new mail($info_mail);
-								$this->facture_mail->send();
 
-								ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
+						//Si le ticket hotline existe
+						if(is_array($res)){
+							$date = date("Y-m-d H:i", strtotime($val->date));
+							$body =  ATF::imap()->returnBody($val->uid);
 
+							//$position = strpos($body, utf8_encode("<---- Pour répondre par email, écrire au-dessus de cette ligne ---->"));
+							//$message = substr($body, 0, $position);
 
-							}else{
+							$message = substr($body, 0, 512);
 
-
-								$interaction = array("id_hotline" =>  $id_hotline,
-													 "date" => $date,
-													 "duree_presta" => "00:00",
-													 'no_test_credit'=>true,
-													 'heure_debut_presta'=>date("H:i"),
-													 'heure_fin_presta'=>date("H:i"),
-													 "detail" => $message,
-													 "id_user" => $id_user,
-													 "id_contact" => $id_contact,
-													 "id_ordre_de_mission" => NULL,
-													 "visible" => "oui");
-
-								$id = ATF::hotline_interaction()->insert($interaction);
-
-								$mail = ATF::imap()->returnmail($val->uid);
-								file_put_contents(ATF::hotline_interaction()->filepath($id,".eml",true), $mail);
-
-								$zip = new ZipArchive();
-								$zipFileName = ATF::hotline_interaction()->filepath($id,"fichier_joint");
-								if (!file_exists($zipFileName)) {
-									util::file_put_contents($zipFileName,""); // Nécessaire pour créer le fichier avant de l'open
+							//$message = False;
+							if($message){
+								if($id_user = $user["id_user"]){
+									$usr=ATF::$usr;
+									ATF::$usr=new usr($user["id_user"]);
+									$id_contact = NULL;
 								}
 
-								$zip->open($zipFileName);
-								$zip->addFile(ATF::hotline_interaction()->filepath($id,".eml",true),"mail.eml");
-								$zip->close();
-							}
 
-							ATF::imap()->imap_delete($val->uid);
+								if(($res["etat"] == "payee") || ($res["etat"] == "annulee")){
 
-							if($id_user = $user["id_user"]){
-								$usr=ATF::$usr;
-								ATF::$usr=new usr();
+									//Requête cloturée ou annulée donc pas d'interaction !!
+									$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
+									$info_mail["from"] = "optima-hotline@absystech.net";
+									$info_mail["html"] = false;
+									$info_mail["template"] = 'hotline_deja_cloture';
+									$info_mail["text"] = $id_hotline;
+									$info_mail["recipient"] = $from;
+
+
+									$this->facture_mail = new mail($info_mail);
+									$this->facture_mail->send();
+
+									ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
+
+								}else{
+
+									$interaction = array("id_hotline" =>  $id_hotline,
+														 "date" => $date,
+														 "duree_presta" => "00:00",
+														 'no_test_credit'=>true,
+														 'heure_debut_presta'=>date("H:i"),
+														 'heure_fin_presta'=>date("H:i"),
+														 "detail" => $message,
+														 "id_user" => $id_user,
+														 "id_contact" => $id_contact,
+														 "id_ordre_de_mission" => NULL,
+														 "visible" => "oui");
+
+
+
+									$id = ATF::hotline_interaction()->insert($interaction);
+
+									$mail = ATF::imap()->returnmail($val->uid);
+									file_put_contents(ATF::hotline_interaction()->filepath($id,".eml",true), $mail);
+
+									$zip = new ZipArchive();
+									$zipFileName = ATF::hotline_interaction()->filepath($id,"fichier_joint");
+									if (!file_exists($zipFileName)) {
+										util::file_put_contents($zipFileName,""); // Nécessaire pour créer le fichier avant de l'open
+									}
+
+									$zip->open($zipFileName);
+									$zip->addFile(ATF::hotline_interaction()->filepath($id,".eml",true),"mail.eml");
+									$zip->close();
+								}
+
+								ATF::imap()->imap_delete($val->uid);
+
+								if($id_user = $user["id_user"]){
+									$usr=ATF::$usr;
+									ATF::$usr=new usr();
+								}
 							}
 						}
-					}
 
+					}
+				} catch (errorATF $e) {
+					log::logger($e , "parseMailErreur");
 				}
 			}
 		}
