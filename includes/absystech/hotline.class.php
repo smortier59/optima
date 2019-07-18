@@ -3239,6 +3239,11 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 							}
 						}
 
+					}else{
+						log::logger("Mail non traité car ne correspond pas à la pattern" , "hotline-checkmail");
+						log::logger($val , "hotline-checkmail");
+						log::logger("--------------------" , "hotline-checkmail");
+
 					}
 				} catch (errorATF $e) {
 					log::logger($e , "parseMailErreur");
