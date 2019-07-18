@@ -3243,6 +3243,8 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 						log::logger("Mail non traité car ne correspond pas à la pattern" , "hotline-checkmail");
 						log::logger("Codename --> ".ATF::$codename , "hotline-checkmail");
 						log::logger("To --> ".$val->to , "hotline-checkmail");
+						log::logger("From --> ".$val->from , "hotline-checkmail");
+						log::logger("Sujet --> ".$val->subject , "hotline-checkmail");
 						log::logger("--------------------" , "hotline-checkmail");
 
 					}
