@@ -51,6 +51,14 @@ class souscription_cleodis extends souscription {
       case 'bdomplus':
         $this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
       break;
+
+      case 'boulanger-cafe':
+        $this->id_partenaire = 31456; // ID de la société BoulangerS (same in RCT - PROD - DEV)
+      break;
+
+      default:
+        throw new errorATF("Site associe incorrect", 500);
+      break;
     }
 
     if(!$post["no_iban"]){
@@ -263,6 +271,10 @@ class souscription_cleodis extends souscription {
       case "bdomplus":
         $r = "Abonnement Zen ".$suffix;
       break;
+
+      case "boulanger-cafe":
+        $r = "BOULANGER : Abonnement Café ".$suffix;
+      break;
     }
 
     return $r;
@@ -405,6 +417,7 @@ class souscription_cleodis extends souscription {
 
     $values_devis = array("loyer"=>json_encode($toInsertLoyer), "produits"=>json_encode($toInsertProduitDevis));
     $toDevis = array("devis"=>$devis, "values_devis"=>$values_devis);
+
     $id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
 
     return $id_devis;
@@ -681,6 +694,14 @@ class souscription_cleodis extends souscription {
           }
         }
       break;
+
+      case 'boulanger-cafe':
+        $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
+         $f = array(
+          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+        );
+      break;
+
       default:
         throw new errorATF("SITE ASSOCIE INCONNU : '".$post['site_associe']."', aucun document a générer.", 500);
       break;
@@ -969,7 +990,6 @@ class souscription_bdomplus extends souscription_cleodis {
     }else{
       throw new errorATF("Data manquante en paramètre d'entrée", 500);
     }
-    log::logger($return , "mfleurquin");
 
     return $return;
 
