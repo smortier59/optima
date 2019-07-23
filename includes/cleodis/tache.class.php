@@ -6,15 +6,15 @@
 require_once dirname(__FILE__)."/../tache.class.php";
 class tache_cleodis extends tache {
 	function __construct() {
-		$this->table = "tache"; 
+		$this->table = "tache";
 		parent::__construct();
 		$this->colonnes['fields_column']["actions"] = array("width"=>50,"custom"=>true,"nosort"=>true,"renderer"=>"actionsTachesCleodis");
 
-		
+
 		$this->colonnes['fields_column']["tache.type_tache"];
 		$this->colonnes['fields_column']["tache.decision_comite"];
 
-		$this->colonnes['panel']["infos_tache"] =	array("type_tache" => array("custom"=>true) , 
+		$this->colonnes['panel']["infos_tache"] =	array("type_tache" => array("custom"=>true) ,
 										          		  "decision_comite"=> array("custom"=>true)
 										);
 		$this->panels['infos_tache'] = array('nbCols'=>2,'visible'=>true);
@@ -24,11 +24,11 @@ class tache_cleodis extends tache {
 		$this->foreign_key['id_user_valid_2'] = "user";
 
 
-		$this->colonnes['bloquees']['insert'] = 
-		$this->colonnes['bloquees']['cloner'] = 
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] =
 		$this->colonnes['bloquees']['update'] = array('id_user_valid_1','id_user_valid_2','validation_1','validation_2');
 	}
-	
+
 	/**
     * Surcharge d'insertion pour la redirection
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -37,8 +37,9 @@ class tache_cleodis extends tache {
 	* @param array $files $_FILES
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	* @return int id_tache
-    */ 	
+    */
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$no_mail=false){
+
 		if($infos["tache"]["id_suivi"] && !$infos["tache"]["id_affaire"]) $infos["tache"]["id_affaire"] = ATF::suivi()->select($infos["tache"]["id_suivi"] , "id_affaire");
 
 		if($infos["tache"]["type_tache"] == "demande_comite"){
@@ -52,9 +53,9 @@ class tache_cleodis extends tache {
 			//si un suivi est précisé et que la socité ne l'est pas, on prends l'id_societe du suivi pour le rattacher a la tache
 			if($infos['id_suivi'] && !$infos['id_societe'])$infos['id_societe']=ATF::suivi()->select($infos['id_suivi'],'id_societe');
 			$infos['id_societe']=ATF::societe()->decryptId($infos['id_societe']);
-			
+
 			ATF::db($this->db)->begin_transaction();
-			
+
 			$infos['id_'.$this->table]=parent::insert($infos,$s);
 			//on met le créateur de la tâche dans les mails
 			if ($emailUser = ATF::user()->select($infos["id_user"],'email')) {
@@ -71,7 +72,7 @@ class tache_cleodis extends tache {
 				}
 				$tab_dest[]=array('id_tache'=>$infos['id_'.$this->table],'id_user'=>$id_util);
 			}
-			
+
 			//ajout des concernés
 			if($tab_dest){
 				try{
@@ -90,7 +91,7 @@ class tache_cleodis extends tache {
 				}
 				parent::u($tache);
 			}
-			
+
 			//dans le cas où l'on a un tache.class dans un autre projet qui appel cette méthode
 			if(!$no_mail){
 				$entete = "Demande comité";
@@ -99,14 +100,14 @@ class tache_cleodis extends tache {
 						case 'accord_portage':  $entete = "Accord portage";
 						case 'accord_reserve_cession':  $entete = "Accord sous réserve de cession";
 						case 'accord_cession_portage':  $entete = "Accord cession ou portage";
-						case 'attente_retour':  $entete = "Attente retour comité";		
+						case 'attente_retour':  $entete = "Attente retour comité";
 						case 'refus_comite':  $entete = "Refus comité";
-					}					
+					}
 				}
 
-				//envoi des mails aux concernés (si il y a au moins le mail du 
+				//envoi des mails aux concernés (si il y a au moins le mail du
 				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
-					$mail = new mail(array( "recipient"=>implode(',',$liste_email), 
+					$mail = new mail(array( "recipient"=>implode(',',$liste_email),
 								"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
 								"objet"=>"[".$entete."]Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
 								"template"=>"tache_insert",
@@ -123,26 +124,26 @@ class tache_cleodis extends tache {
 								,'public'=>'oui'
 								,'id_contact'=>NULL
 								,'suivi_societe'=>array(0=>ATF::$usr->getID())
-							);													
+							);
 							ATF::suivi()->insert($suivi);
 						}
 						ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
 					}
 				}else{	ATF::$msg->addNotice("Aucune adresse mail disponible");	}
-			}			
+			}
 			ATF::db($this->db)->commit_transaction();
 			if($infos['id_suivi']){	ATF::suivi()->redirection("select",$infos['id_suivi']);	}
-			else{	$this->redirection("select",$infos['id_tache']);	}			
+			else{	$this->redirection("select",$infos['id_tache']);	}
 			return $infos['id_'.$this->table];
 		}else{
 			$infos['id_tache'] = parent::insert($infos,$s,$files,$cadre_refreshed,$no_mail);
 			//$this->redirection("select",$infos['id_tache']);
 			return $infos['id_tache'];
-		}	
+		}
 	}
 
-		
-	
+
+
 	/**
     * Valide une tache
     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
@@ -158,12 +159,12 @@ class tache_cleodis extends tache {
 		$tache = $this->select($infos["id_tache"]);
 		$termine = true;
 
-		if($tache["type_tache"] == "demande_comite"){		
+		if($tache["type_tache"] == "demande_comite"){
 			$data["id_tache"] = $infos["id_tache"];
 
 			if($tache["id_user_valid_1"] == ATF::$usr->getID()){
 				$data["validation_1"] = 1;
-				$data["decision_1"] = $infos["comboDisplay"];			
+				$data["decision_1"] = $infos["comboDisplay"];
 			}
 
 			if($tache["id_user_valid_2"] == ATF::$usr->getID()){
@@ -182,11 +183,11 @@ class tache_cleodis extends tache {
 					,'public'=>'oui'
 					,'id_contact'=>NULL
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
-				);													
+				);
 			ATF::suivi()->insert($suivi);
 
 			$tache = $this->select($infos["id_tache"]);
-			
+
 
 			if($tache["id_user_valid_1"] && !$tache["validation_1"]) $termine = false;
 			if($tache["id_user_valid_2"] && !$tache["validation_2"]) $termine = false;
@@ -201,33 +202,33 @@ class tache_cleodis extends tache {
 							"complete"=>100,
 							"id_tache"=>$infos["id_tache"])
 						)
-			){	
+			){
 				if ($email_envoye=$this->envoyer_mail($infos["id_tache"],"tache_valid")) {
 					ATF::$msg->addNotice(ATF::$usr->trans("email_envoye"));
 				}
 				$return = $email_envoye;
 			}
-			
+
 		}
-		return $return;		
+		return $return;
 	}
 
-	
-	
+
+
 	/*
 	 * Annule une tâche
  	 * @author Quentin JANON <qjanon@absystech.fr>
  	 * @param id
 	 * @return TRUE si vrai, sinon FALSE
-	 */	
+	 */
 	function cancel($infos) {
 		if (!$infos['id']) return false;
 		$d = array("id_tache"=>$this->decryptId($infos['id']),"etat"=>"annule");
 		return parent::u($d);
 	}
-	
-	
-	/** Selectionne les taches correspondant à une date et au user connecté 
+
+
+	/** Selectionne les taches correspondant à une date et au user connecté
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @param date $date
@@ -248,17 +249,17 @@ class tache_cleodis extends tache {
 				->addCondition('tache.etat','en_cours')
 				->addCondition('tache_user.id_user',ATF::$usr->getID())
 				->addOrder("date","asc");
-				
+
 		foreach(parent::select_all() as $key=>$item){
 			$lignes[$item['date']][]=$item;
-		}		
-		return $lignes;	
+		}
+		return $lignes;
 	}
 
 
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		if($infos["tache"]["type_tache"] == "demande_comite"){
-			
+
 			if(isset($infos['dest'])) {
 			    $liste_destinataire= is_array($infos['dest'])?$infos['dest']:explode(",",$infos['dest']);
 	        }
@@ -274,16 +275,16 @@ class tache_cleodis extends tache {
 			}
 
 			$entete = "Demande comité";
-			if($infos["tache"]["decision_comite"]){				
+			if($infos["tache"]["decision_comite"]){
 					switch ($infos["decision_comite"]) {
 						case 'accord_portage':  $entete = "Accord portage";
 						case 'accord_reserve_cession':  $entete = "Accord sous réserve de cession";
 						case 'accord_cession_portage':  $entete = "Accord cession ou portage";
-						case 'attente_retour':  $entete = "Attente retour comité";		
-						case 'refus_comite':  $entete = "Refus comité";		
-										
-					}					
-				
+						case 'attente_retour':  $entete = "Attente retour comité";
+						case 'refus_comite':  $entete = "Refus comité";
+
+					}
+
 
 				$suivi = array(
 					 "id_user"=>ATF::$usr->get('id_user')
@@ -294,20 +295,20 @@ class tache_cleodis extends tache {
 					,'public'=>'oui'
 					,'id_contact'=>NULL
 					,'suivi_societe'=>array(0=>ATF::$usr->getID())
-				);						
+				);
 				ATF::suivi()->insert($suivi);
 
-				if(count($liste_email)>=1 || $liste_email[ATF::$usr->getID()]){					
+				if(count($liste_email)>=1 || $liste_email[ATF::$usr->getID()]){
 
-					$mail = new mail(array( "recipient"=>implode(',',$liste_email), 
+					$mail = new mail(array( "recipient"=>implode(',',$liste_email),
 								"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos["tache"]['id_'.$this->table])),
 								"objet"=>"[".$entete."]Mise à jour d'une tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
 								"template"=>"tache_insert",
 								"donnees"=>$infos["tache"],
-								"from"=>ATF::$usr->get('email')));				
-					
+								"from"=>ATF::$usr->get('email')));
+
 					if($mail->send()){
-						ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));	
+						ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
 					}
 				}else{ ATF::$msg->addNotice("Aucune adresse mail disponible"); }
 			}
@@ -322,14 +323,18 @@ class tache_cleodis extends tache {
     * On surcharge le select_all pour permettre le tri sur certains champs et de pouvoir les préfixer, et de filtrer les informations sur ce que l'on souhaite voir
     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @return liste des tâches filtrées
-    */ 
-	public function select_all() {		
+    */
+	public function select_all() {
 		$this->q->addField("type_tache");
 		return parent::select_all();
 	}
-		
-		
+
+
 };
 
 class tache_cleodisbe extends tache_cleodis { };
 class tache_cap extends tache_cleodis { };
+
+class tache_bdomplus extends tache_cleodis { };
+class tache_bdom extends tache_cleodis { };
+class tache_boulanger extends tache_cleodis { };

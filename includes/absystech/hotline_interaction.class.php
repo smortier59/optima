@@ -50,6 +50,7 @@ class hotline_interaction extends classes_optima {
 			,"duree_dep"=>array("disabled"=>true, "min"=>"00:00")
 			,"credit_dep"=>array("listeners"=>array("change"=>"ATF.changeCreditDep"))
 			,"matos"=>array("xtype"=>"switchbutton","default"=>"non")
+			,"teamviewer"=>array("xtype"=>"switchbutton","default"=>"non")
 			,"champ_alerte"=>array("custom"=>true, "xtype"=>"textarea","targetCols"=>1,"hidden"=>true)
 		);
 		$this->panels['duree_credit_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
@@ -356,6 +357,7 @@ class hotline_interaction extends classes_optima {
 			,"id_hotline"=>$infos["id_hotline"]
 			,"visible"=>$infos["visible"]
 			,"nature"=>$infos["nature"]
+			,"teamviewer"=>$infos["teamviewer"]
 			,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 		);
 
@@ -587,7 +589,9 @@ class hotline_interaction extends classes_optima {
 		return $temps;
 	}
 
-
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function getCreditV2($id_hotline_interaction){
 		$id_hotline = $this->select($id_hotline_interaction , "id_hotline");
 
@@ -621,6 +625,7 @@ class hotline_interaction extends classes_optima {
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
 	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	* @codeCoverageIgnore
 	*/
 	public function getBillingTime($id_hotline_interaction){
 		return $this->getTime($id_hotline_interaction,"temps");
@@ -631,6 +636,7 @@ class hotline_interaction extends classes_optima {
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
 	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
 	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	* @codeCoverageIgnore
 	*/
 	public function getTotalTime($id_hotline_interaction){
 		return $this->getTime($id_hotline_interaction,"temps_passe");
@@ -748,6 +754,7 @@ class hotline_interaction extends classes_optima {
 	* @param string pole
 	* @param string id_user
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function stats_special($annee,$id_societe=NULL,$id_user=NULL,$groupe){
 		$this->q->reset();
@@ -975,6 +982,7 @@ class hotline_interaction extends classes_optima {
 	* @param array session
 	* @param date date_fin : date a laquelle les données ne doivent pas dépassées
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function statsChargeParUser($date_fin){
 		$this->q->reset()
@@ -1042,6 +1050,7 @@ class hotline_interaction extends classes_optima {
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param string annee
 	* return enregistrements
+	* @codeCoverageIgnore
 	*/
 	public function statsProduction($annee){
 		$this->q->reset();
@@ -1971,6 +1980,7 @@ class hotline_interaction extends classes_optima {
 	* @return boolean|integer Renvoi l'id de l'enregitrement inséré ou false si une erreur est survenu.
 	*/
 	public function _POST($get,$post) {
+		log::logger($post , "mfleurquin");
 
 		$return = array();
 
@@ -2013,6 +2023,9 @@ class hotline_interaction extends classes_optima {
 
 			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
 			else $post['send_mail'] = "non";
+
+			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
+			else $post['teamviewer'] = "non";
 
 			// Calcul du nombre de crédit
 			if (!$post['credit_presta']) {
@@ -2060,7 +2073,7 @@ class hotline_interaction extends classes_optima {
 	* @param boolean $pointage True si on désire créer le pointage
 	* @return boolean true
 	*/
-	public function insertTS($infos,$mail = true) {
+	public function insertTS($infos,$mail = true, $files) {
 
 		$recipient = array();
 		//Ajout des actifs selectionné
@@ -2095,6 +2108,7 @@ class hotline_interaction extends classes_optima {
 				,"visible"=>$infos["visible"]
 				,"recipient"=> $res
 				,"nature"=>"internal"
+				,"teamviewer"=>$infos["teamviewer"]
 			);
 			log::logger($data,"hotline");
 			return parent::insert($data,$s,$files);
@@ -2263,6 +2277,7 @@ class hotline_interaction extends classes_optima {
 				,"nature"=>$infos["nature"]
 				,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
 				,'recipient'=>$res
+				,"teamviewer"=>$infos["teamviewer"]
 			);
 
 
@@ -2402,9 +2417,9 @@ class hotline_interaction extends classes_optima {
 
 				ATF::hotline_mail()->createMailInteraction($hotline["id_hotline"],$id_hotline_interaction,$infos["filestoattach"]["fichier_joint"],$infos["anotherNotify"],$infos['mep_mail']);
 
-				if($infos["filestoattach"]["fichier_joint"]){
+				$path = $this->filepath($id_hotline_interaction,"fichier_joint");
+				if(file_exists($path)){
 					//Ajout du fichier joint
-					$path = $this->filepath($id_hotline_interaction,"fichier_joint");
 					if ($mail=ATF::hotline_mail()->getCurrentMail()) {
 						$mail->addFile($path,"fichier_joint.zip",true);
 					}
@@ -2529,6 +2544,9 @@ class hotline_interaction extends classes_optima {
 			if ($post['send_mail']=="on") $post['send_mail'] = "oui";
 			else $post['send_mail'] = "non";
 
+			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
+			else $post['teamviewer'] = "non";
+
 			// Calcul du nombre de crédit
 			if (!$post['credit_presta']) {
 				$tmp = explode(":", $post['temps_passe']);
@@ -2603,6 +2621,9 @@ class hotline_interaction extends classes_optima {
 
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _indicateurs($get, $post){
 
 		$workedDay = (ATF::hotline()->getJoursOuvres(date("Y-m-01"), date("Y-m-d")))*ATF::user()->select(ATF::$usr->getID(), "temps_partiel");
@@ -2632,6 +2653,9 @@ class hotline_interaction extends classes_optima {
 	}
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _getMoyennePointage($get, $post){
 		$date = date('Y-m');
 

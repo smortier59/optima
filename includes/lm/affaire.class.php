@@ -13,7 +13,7 @@ class affaire_lm extends affaire {
 		$this->colonnes['fields_column'] = array(
 			'affaire.ref'
 			,'affaire.date'
-			,'affaire.affaire'
+			,'affaire.affaire'=>array("rowEditor"=>"setInfos")
 			,'affaire.id_societe'
 			,'ref_client'=>array("custom"=>true)
 			,'email_client'=>array("custom"=>true)
@@ -127,6 +127,7 @@ class affaire_lm extends affaire {
 		$this->foreign_key['pays_livraison'] =  "pays";
 		$this->foreign_key['pays_facturation'] =  "pays";
 
+
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
@@ -138,6 +139,8 @@ class affaire_lm extends affaire {
 		$this->no_update = true;
 		$this->no_insert = true;
 		$this->can_insert_from = array("societe");
+
+		$this->addPrivilege("export_opteven");
 	}
 
 
@@ -241,6 +244,7 @@ class affaire_lm extends affaire {
 
 		if($affaire["nature"]=="avenant"){
 			$affaire["date_garantie"]=$this->select($infos["id_parent"],"date_garantie");
+			$affaire["subscriber_reference"] = $infos["subscriber_reference"];
 			if (!$affaire["ref"] || !(strstr($affaire["ref"],"AVT"))) {
 				$affaire["ref"]=$this->getRefAvenant($infos["id_parent"]);
 			}
@@ -1209,8 +1213,10 @@ class affaire_lm extends affaire {
 						preg_match_all($pattern_num_expedition , $body, $ids);
 						$num_expedition = $ids[1][0];
 
-						$pattern_ref_colissimo = "/<strong>Colis n=C2=B0= ([a-zA-Z0-9]*)<\/strong>/";
+						$pattern_ref_colissimo = "/Colis n=C2=B0 ([a-zA-Z0-9]*)</";
 						preg_match_all($pattern_ref_colissimo , $body, $ids_colissimo);
+
+
 						$ref_colissimo = $ids_colissimo[1][0];
 						$lien_colissimo = "http://www.colissimo.fr/portail_colissimo/suivre.do?colispart=".$ref_colissimo;
 
@@ -1268,6 +1274,217 @@ class affaire_lm extends affaire {
 		return true;
 
 
+	}
+
+
+
+
+
+
+	/**
+    * Permet l'export CSV des données OPTEVEN
+    * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+    */
+	public function export_opteven($toCSV){
+
+
+		if($toCSV !== false){
+			$filename = "LeroyMerlin" . date("Ymd") . ".csv";
+			// output headers so that the file is downloaded rather than displayed
+			header('Content-type: text/csv');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+
+			// do not cache the file
+			header('Pragma: no-cache');
+			header('Expires: 0');
+
+			// create a file pointer connected to the output stream
+			$file = fopen('php://output', 'w');
+		}else{
+			if (!$file = fopen('php://temp', 'w+')) return FALSE;
+		}
+
+		ATF::societe()->q->reset()->where("societe", "Opteven");
+		$OPTEVEN = ATF::societe()->select_row();
+
+
+		ATF::affaire()->q->reset()  ->select("affaire.id_societe,adresse_livraison")
+									->from("affaire","id_affaire" , "commande","id_affaire")
+									->from("commande","id_commande" , "commande_ligne","id_commande")
+									->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
+									->where("commande.etat", "vente", 'AND', 'commandeEtat', "!=")
+									->where("commande.etat", "pending", 'AND', 'commandeEtat', "!=")
+									->where("commande.etat", "abandon", 'AND', 'commandeEtat', "!=")
+									->where("commande_ligne.id_fournisseur", $OPTEVEN["id_societe"])
+									->where("affaire.etat",'commande', 'OR', 'statuAffaire')
+							  		->where("affaire.etat",'facture', 'OR', 'statuAffaire')
+							  		->addGroup("adresse_livraison,affaire.id_societe");
+
+		$affaires = ATF::affaire()->sa();
+
+
+		$affaire_ok = array();
+		foreach ($affaires as $key => $value) {
+			$affaire_societe = array();
+
+
+			$ref_affaire = ATF::affaire()->select($value["affaire.id_affaire"], "ref");
+			$ref_affaire = substr($ref_affaire , 0, 8);
+
+			//On recupere les affaires parentes et filles par rapport à la ref
+			ATF::affaire()->q->reset()->where("id_societe", $value["affaire.id_societe_fk"])
+									  ->where("ref", $ref_affaire."%", "AND", false, "LIKE");
+			$affs = ATF::affaire()->sa();
+
+			foreach ($affs as $k => $v) {
+				ATF::comite()->q->reset()->where("reponse", date("Y-m-d"), 'AND', false, '<=')
+									 ->where("etat", "accepte", 'AND')
+									 ->where("id_affaire", $v["id_affaire"], 'AND');
+				$comite = ATF::comite()->select_row();
+
+				if($comite){
+					$adresse = ATF::affaire()->select($v["id_affaire"], "adresse_livraison");
+					$affaire_ok[$value["affaire.id_societe_fk"]][$adresse][] = array("id_affaire" =>$v["id_affaire"]);
+				}
+			}
+		}
+
+
+		foreach ($affaire_ok as $ksoc => $vsoc) {
+			$i = 0;
+			foreach ($vsoc as $key => $affs) {
+				if($i == 0){
+					$a = ATF::affaire()->select($affs[0]["id_affaire"]);
+					$adresse_livraison = strtolower($a["adresse_livraison"].$a["adresse_livraison_2"].$a["adresse_livraison_3"].$a["cp_adresse_livraison"].$a["ville_adresse_livraison"]);
+					$adresse_livraison = str_replace(" ", "", $adresse_livraison);
+					$adresse_livraison = str_replace("'", "", $adresse_livraison);
+					$adresse_livraison = base64_encode($adresse_livraison);
+				}
+				foreach ($affs as $kaff => $v) {
+
+					ATF::commande()->q->reset()->where("commande.id_affaire", $v["id_affaire"], 'AND')
+										   ->where("commande.etat", "arreter", 'AND', 'commandeEtat', "!=")
+										   ->where("commande.etat", "vente", 'AND', 'commandeEtat', "!=")
+										   ->where("commande.etat", "pending", 'AND', 'commandeEtat', "!=")
+										   ->where("commande.etat", "abandon", 'AND', 'commandeEtat', "!=");
+					$contrat = ATF::commande()->select_row();
+
+					if($contrat){
+						ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")
+														 ->where("id_affaire", $v["id_affaire"]);
+						if(ATF::commande_ligne()->sa()){
+
+							$affaire_ok[$ksoc][$key][$kaff]["adresse"] = $adresse_livraison;
+
+						}
+					}else{
+						unset($affaire_ok[$ksoc][$key][$kaff]);
+					}
+				}
+			}
+		}
+
+
+		$data = array();
+		$data[0] = array("ContratProduit", "ContratNum", "ContratDateDebut", "ClientLMANum", "BeneficiaireNom", "BeneficiairePrenom", "BeneficiaireTitre", "BeneficiaireDateNaissance", "BeneficiaireAdresse1", "BeneficiaireAdresse2","BeneficiaireCP", "BeneficiaireVille", utf8_decode("Produits loués"));
+
+
+		$i = 1;
+		foreach($affaire_ok as $ksoc => $vsoc){
+			$client = ATF::societe()->select($ksoc);
+
+			foreach ($vsoc as $key => $affaire_adresse) {
+				$ligne = array();
+
+
+				$produits = array();
+				ATF::commande_ligne()->q->reset()->from("commande_ligne","id_commande","commande","id_commande")
+										->addOrder("commande_ligne.produit", "ASC");
+				foreach ($affaire_adresse as $kl => $vl) {
+					ATF::commande_ligne()->q->where("commande.id_affaire", $vl["id_affaire"], "OR", "id_affaire", "=");
+				}
+				$lignes_commande = ATF::commande_ligne()->select_all();
+
+
+				foreach ($lignes_commande as $klc => $vlc) {
+					$produits[$vlc["id_produit"]]["produit"] = $vlc["produit"];
+					$produits[$vlc["id_produit"]]["quantite"] += $vlc["quantite"];
+					$produits[$vlc["id_produit"]]["id_fournisseur"] = $vlc["id_fournisseur"];
+				}
+
+				$produits_opteven = "";
+				$produits_affaire = "";
+				foreach ($produits as $kp => $vp) {
+					//Tout les produits dont le fournisseur est Opteven
+					if($vp["id_fournisseur"] ==  $OPTEVEN["id_societe"] && $vp["quantite"] > 0){
+
+						$ref_four = ATF::produit()->select($kp, "ref_fournisseur");
+						if($ref_four){
+							$produits_opteven .= utf8_decode($ref_four);
+						}else{
+							$produits_opteven .= utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+						}
+					}
+
+					if(ATF::produit()->select($kp, "nature") == "produit"){
+						if($produits_affaire){
+							$produits_affaire .= "$".$vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+						}else{
+							$produits_affaire = $vp["quantite"]." ".utf8_decode(str_replace("&nbsp;", "", str_replace("&nbsp;>", "", $vp["produit"])));
+						}
+					}
+				}
+
+				if($produits_opteven){
+
+					$first = reset($affaire_adresse);
+					if($first["id_affaire"]){
+						$data_aff = ATF::affaire()->select($first["id_affaire"]);
+
+						ATF::comite()->q->reset()->where("id_affaire", $first["id_affaire"])->where("comite.etat", "accepte");
+						$comite = ATF::comite()->select_row();
+
+						$data[$i][0] = $produits_opteven;
+						$data[$i][1] = $data_aff["ref"];
+						$data[$i][2] = date("dmY", strtotime($comite["date"]));
+						$data[$i][3] = strtoupper($client["ref"]);
+						$data[$i][4] = strtoupper(utf8_decode($client["nom"]));
+						$data[$i][5] = strtoupper(utf8_decode($client["prenom"]));
+						$data[$i][6] = $client["civilite"];
+						$data[$i][7] = date("dmY", strtotime($client["date_naissance"]));
+						$data[$i][8] = strtoupper(utf8_decode($data_aff["adresse_livraison"]));
+						$data[$i][9] = strtoupper(utf8_decode($data_aff["adresse_livraison_2"]." ".$data_aff["adresse_livraison_3"]));
+						$data[$i][10] = strtoupper($data_aff["cp_adresse_livraison"]);
+						$data[$i][11] = strtoupper(utf8_decode($data_aff["ville_adresse_livraison"]));
+						$data[$i][12] = $produits_affaire;
+
+						$i++;
+					}
+
+
+				}
+
+
+
+
+			}
+
+		}
+
+		// output each row of the data
+		foreach ($data as $row){
+			fputcsv($file, $row, ';', '"');
+		}
+
+		if($toCSV !== false){
+			exit();
+		}else{
+			// Place stream pointer at beginning
+		    rewind($file);
+
+		    // Return the data
+			return stream_get_contents($file);
+		}
 	}
 
 

@@ -26,5 +26,3 @@ class site_offre extends classes_optima {
 
 
 };
-class site_offre_cap extends site_offre { };
-?>

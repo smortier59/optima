@@ -1,5 +1,5 @@
 <?
-class article extends classes_optima {
+class article_boisethome extends classes_optima {
 	// Mapping prévu pour un autocomplete sur article
 	public static $autocompleteMapping = array(
 		array('name'=> 'article', 'mapping'=> 0)

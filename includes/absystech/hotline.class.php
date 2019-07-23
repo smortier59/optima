@@ -931,6 +931,29 @@ class hotline extends classes_optima {
 		//Fin de transaction
 		ATF::db($this->db)->commit_transaction();
 
+$societe = ATF::societe()->select($infos['id_societe']);
+$contact = ATF::contact()->select($infos['id_contact']);
+$hotline = ATF::hotline()->select($id_hotline);
+
+// Envoi sur mattermost
+$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+$login = ATF::user()->select($id_owner,"login");
+$logins = array(
+"tpruvost"=>"thibaut",
+"jluillier"=>"jacques",
+"smortier"=>"sol-r",
+"gdamecourt"=>"gauthier"
+);
+if ($logins[$login]) $login = $logins[$login];
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
+$data = array();
+$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+$data["username"] = $societe["societe"];
+$data["channel"] = "Hotline";
+$cmd .= json_encode($data);
+$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+log::logger($cmd,'mm');
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
@@ -1033,6 +1056,26 @@ class hotline extends classes_optima {
 		$societe = ATF::societe()->select($infos['id_societe']);
 		$contact = ATF::contact()->select($infos['id_contact']);
 		$hotline = ATF::hotline()->select($id_hotline);
+
+// Envoi sur mattermost
+$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+$login = ATF::user()->select($id_owner,"login");
+$logins = array(
+"tpruvost"=>"thibaut",
+"jluillier"=>"jacques",
+"smortier"=>"sol-r",
+"gdamecourt"=>"gauthier"
+);
+if ($logins[$login]) $login = $logins[$login];
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
+$data = array();
+$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+$data["username"] = $societe["societe"];
+$data["channel"] = "Hotline";
+$cmd .= json_encode($data);
+$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+log::logger($cmd,'mm');
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
@@ -1786,13 +1829,16 @@ class hotline extends classes_optima {
 	}
 
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _graph_tickets_hotline($get, $post){
 		/*
 		$at = $this->stats(true);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->stats(true);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
@@ -1800,12 +1846,15 @@ class hotline extends classes_optima {
 		return 'un test';
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _stats($get, $post){
 		$at = $this->stats(true);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->stats(true);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"charge actuelle"));
@@ -1819,6 +1868,7 @@ class hotline extends classes_optima {
 	* @param array session
 	* @param bool $widget
 	* @param string $type Type de stats
+	* @codeCoverageIgnore
 	* return enregistrements
 	*/
 	public function stats($widget=false,$type=NULL,$tu=NULL){
@@ -1926,7 +1976,7 @@ class hotline extends classes_optima {
 						$this->q->reset()->where("id_societe" , 513)
 										 ->addField("id_hotline")
 										 ->where("facturation_ticket", "oui")
-										 ->where("id_affaire",NULL,"AND","maintenance","IS NULL")
+										 ->whereIsNull("id_affaire","AND")
 										 ->where("etat" , "done" , "OR" )
 										 ->where("etat" , "payee" , "OR")
 										 ->where("pole_concerne" , "dev")
@@ -1934,17 +1984,15 @@ class hotline extends classes_optima {
 										 ->where("date_debut",$date[$i]["fin"],"AND",false,"<=");
 						$lesRequetes[1] = $this->sa();
 
-
-
 						$this->q->reset()->where("id_societe" , 513)
-										 ->addField("id_hotline")
-										 ->where("facturation_ticket", "non")
-										 ->where("id_affaire",$affaire_maintenance["affaire.id_affaire"],"AND","maintenance","=")
-										 ->where("etat" , "done" , "OR" )
-										 ->where("etat" , "payee" , "OR")
-										 ->where("pole_concerne" , "dev")
-										 ->where("date_debut",$date[$i]["debut"],"AND",false,">=")
-										 ->where("date_debut",$date[$i]["fin"],"AND",false,"<=");
+									 ->addField("id_hotline")
+									 ->where("facturation_ticket", "non")
+									 ->whereIsNotNull("id_affaire","AND")
+									 ->where("etat" , "done" , "OR" )
+									 ->where("etat" , "payee" , "OR")
+									 ->where("pole_concerne" , "dev")
+									 ->where("date_debut",$date[$i]["debut"],"AND",false,">=")
+									 ->where("date_debut",$date[$i]["fin"],"AND",false,"<=");
 						$lesRequetes[2] = $this->sa();
 						$temps = 0;
 
@@ -1952,7 +2000,7 @@ class hotline extends classes_optima {
 						$this->q->reset()->where("id_societe" , 513)
 										 ->addField("id_hotline")
 										 ->where("facturation_ticket", "non")
-										 ->where("id_affaire",NULL,"AND","maintenance","IS NULL")
+										 ->whereIsNull("id_affaire","AND")
 										 ->where("etat" , "done" , "OR" )
 										 ->where("etat" , "payee" , "OR")
 										 ->where("pole_concerne" , "dev")
@@ -1962,7 +2010,10 @@ class hotline extends classes_optima {
 
 						$temps = 0;
 
-						$titre = array("Garantie" ,"Facture" , "CM" );
+
+
+
+						$titre = array("Garantie" ,"Facture" , "CM/Régie" );
 						for($j=0;$j<3;$j++){
 							$temps = 0;
 							foreach($lesRequetes[$j] as $k=>$v){
@@ -1973,20 +2024,24 @@ class hotline extends classes_optima {
 										$time = explode(":" , $value["temps_passe"] );
 										$h = $time[0];
 										$m = $time[1];
-
-
+										$temps = $temps + (($h*60) + $m);
+									}elseif($value["duree_presta"] !== "00:00:00"){
+										$time = explode(":" , $value["duree_presta"] );
+										$h = $time[0];
+										$m = $time[1];
 										$temps = $temps + (($h*60) + $m);
 									}
 								}
 							}
-							if($temps != 0){
-								$result[$titre[$j]][$i] = array("semestre" => $date[$i]["debut"]." au ".$date[$i]["fin"], "duree" => $temps, "dureeH" => number_format($temps/60,2));
-							}
+
+							$result[$titre[$j]][$i] = array("semestre" => $date[$i]["debut"]." au ".$date[$i]["fin"], "duree" => $temps, "dureeH" => number_format($temps/60,2, ".",""));
+
 						}
 				}
 				$result["titre"]= "Stats CLEODIS";
 				$result["categories"]= $titre;
 				$result["semestres"] = $date;
+				log::logger($result , "mfleurquin");
 				return $result;
 			break;
 
@@ -2305,22 +2360,28 @@ class hotline extends classes_optima {
 		return $nb_jours+1;
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function _requetebyUserParMois($get,$post){
-		$moment = $get['moment'] == "now" ? date("Y-m") : -1;
+		$moment = $get['moment'] == "now" ? date("Y-m") : (strlen($get['moment'])==7 ? $get['moment'] : -1);
 		$at = $this->requetebyUserParMois($moment);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->requetebyUserParMois($moment);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"requetebyUserParMois"));
 
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function requetebyUserParMois($mois,$tu=false){
-		if(ATF::$codename == "att"){ $exclusion = array(34,40); }
-		else{ $exclusion = array(30,62,57,54); }
+		//if(ATF::$codename == "att"){ $exclusion = array(34,40); }
+		//else{ $exclusion = array(30,62,57,54); }
 
 		if($mois < 0){
 			$z = true;
@@ -2332,7 +2393,7 @@ class hotline extends classes_optima {
 				$mois = $tu[0];
 				$mois_conges = $tu[1];
 			}
-			$mois_conges_fin = $mois_conges_fin = date('Y-m-d',strtotime($mois."-01 +1 month"));
+			$mois_conges_fin = date('Y-m-d',strtotime($mois."-01 +1 month"));
 
 		}else{
 			$mois_conges = date('Y-m',strtotime($mois."-01 -1 month"));
@@ -2342,7 +2403,7 @@ class hotline extends classes_optima {
 				$mois_conges = $tu[1];
 				$mois_conges_fin = date('Y-m-d',strtotime($mois_conges."-01 +1 month"));
 			}
-			$mois_conges_fin = date("Y-m-d");
+			$mois_conges_fin = date('Y-m-d',strtotime($mois."-01 +1 month"));
 
 		}
 
@@ -2469,6 +2530,7 @@ class hotline extends classes_optima {
 	/*
 	* Permet l'affichage sur le graphe marge réelle sur tickets
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function graph_tarif_horaire($mois_deb,$mois_fin){
 
@@ -2554,8 +2616,10 @@ class hotline extends classes_optima {
 
 
 
-
-	//Simple function to sort an array by a specific key. Maintains index association.
+	/*
+	* Simple function to sort an array by a specific key. Maintains index association.
+	* @codeCoverageIgnore
+	*/
 	function array_sort($array, $on, $order=SORT_ASC){
 		$new_array = array();
 		$sortable_array = array();
@@ -2587,13 +2651,16 @@ class hotline extends classes_optima {
 		return $new_array;
 	}
 
+	/*
+	* @codeCoverageIgnore
+	*/
 	public function getTauxHorraire($id_affaire){
 		$marge_brute = 0;
-		ATF::facture()->q->reset()->where("id_affaire",$id_affaire);
+		ATF::facture()->q->reset()->where("facture.id_affaire",$id_affaire);
 		$res = ATF::facture()->select_all();
 		//Si j'ai des factures
 		if($res){
-			ATF::bon_de_commande()->q->reset()->where("id_affaire",$id_affaire);
+			ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire",$id_affaire);
 			$bdcs = ATF::bon_de_commande()->select_all();
 			$pbdc = 0;
 			foreach ($bdcs as $k => $v) {
@@ -2606,7 +2673,7 @@ class hotline extends classes_optima {
 			$marge_brute = round(($marge_brute - $pbdc),2);
 		}else{
 			//Si j'ai pas de factures
-			ATF::devis()->q->reset()->where("id_affaire", $id_affaire)
+			ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire)
 									->addOrder("revision","desc");
 			$devis = ATF::devis()->select_row();
 
@@ -2639,6 +2706,7 @@ class hotline extends classes_optima {
 	/**
 	* Lorsque l'on clique sur un graphe, on redirige vers le resultat qu'on souhaite sur le select_all filtré par la barre sur laquelle on a cliqué
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function statsFiltrage(){
 		/* nom du filtre */
@@ -2783,6 +2851,7 @@ class hotline extends classes_optima {
 	/**
 	* Retourne les hotlines ayant eu lieues depuis la dernière activité
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @codeCoverageIgnore
 	* @return array
 	*/
 	public function getRecentForMobile($countUnseenOnly=false,$limit=42){
@@ -2867,6 +2936,7 @@ class hotline extends classes_optima {
 
 	/** Récupère les éléments nécessaires à l'affichage de graphe de temps (de prise en charge et de cloture)
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function statsTps($widget=false,$par_user=false,$cloture=false,$count=false){
 		$this->q->reset()
@@ -3048,117 +3118,151 @@ class hotline extends classes_optima {
 		}
 		$mails = ATF::imap()->imap_fetch_overview('1:*');
 
+
 		if (is_array($mails)) {
 			foreach ($mails as $val) {
 
-				$pattern = "/optima-hotline-([a-z]*)-([0-9a-f]{32})-([0-9a-f]{32})@absystech-speedmail.com/";
+				try {
 
-				if (strpos(str_replace(" ","",$val->to),"optima-hotline-".ATF::$codename."-")!==false){
-					preg_match($pattern , $val->to, $ids);
+					$pattern = "/optima-hotline-([a-z]*)-([0-9a-f]{32})-([0-9a-f]{32})@absystech-speedmail.com/";
 
-					$codename = $ids[1];
-					$idhotline = $ids[2];
-					$idcontact = $ids[3];
+					if (strpos(str_replace(" ","",$val->to),"optima-hotline-".ATF::$codename."-")!==false){
+						preg_match($pattern , $val->to, $ids);
 
-					$id_hotline = ATF::hotline()->decryptId($idhotline);
-
-
-					$from = explode("<",$val->from);
-					if($from[1]){ $from = substr($from[1], 0, -1);	}
-					else{ $from = $from[0]; }
+						$codename = $ids[1];
+						$idhotline = $ids[2];
+						$idcontact = $ids[3];
 
 
-					ATF::user()->q->reset()->where("email",$from);
-					$user = ATF::user()->select_row();
+						log::logger($codename , "hotline-checkmail");
+						log::logger($idhotline , "hotline-checkmail");
+						log::logger($idcontact , "hotline-checkmail");
 
-					if(is_array($user)){
-						$id_user = $user["id_user"];
-					}else{
-						$id_user = NULL;
-					}
+						$id_hotline = ATF::hotline()->decryptId($idhotline);
 
 
-					$id_contact = ATF::contact()->decryptId($idcontact);
-
-					$this->q->reset()->where("id_hotline",$id_hotline);
-					$res = $this->select_row();
-
-					//Si le ticket hotline existe
-					if(is_array($res)){
-						$date = date("Y-m-d H:i", strtotime($val->date));
-						$body =  ATF::imap()->returnBody($val->uid);
-
-						//$position = strpos($body, utf8_encode("<---- Pour répondre par email, écrire au-dessus de cette ligne ---->"));
-						//$message = substr($body, 0, $position);
-
-						$message = substr($body, 0, 512);
-
-						//$message = False;
-						if($message){
-							if($id_user = $user["id_user"]){
-								$usr=ATF::$usr;
-								ATF::$usr=new usr($user["id_user"]);
-								$id_contact = NULL;
-							}
+						$from = explode("<",$val->from);
+						if($from[1]){ $from = substr($from[1], 0, -1);	}
+						else{ $from = $from[0]; }
 
 
-							if(($res["etat"] == "payee") || ($res["etat"] == "annulee")){
+						ATF::user()->q->reset()->where("email",$from);
+						$user = ATF::user()->select_row();
 
-								//Requête cloturée ou annulée donc pas d'interaction !!
-								$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
-								$info_mail["from"] = "optima-hotline@absystech.net";
-								$info_mail["html"] = false;
-								$info_mail["template"] = 'hotline_deja_cloture';
-								$info_mail["text"] = $id_hotline;
-								$info_mail["recipient"] = $from;
-
-
-								$this->facture_mail = new mail($info_mail);
-								$this->facture_mail->send();
-
-								ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
+						if(is_array($user)){
+							$id_user = $user["id_user"];
+						}else{
+							$id_user = NULL;
+						}
 
 
-							}else{
+						$id_contact = ATF::contact()->decryptId($idcontact);
+
+						$this->q->reset()->where("id_hotline",$id_hotline);
+						$res = $this->select_row();
 
 
-								$interaction = array("id_hotline" =>  $id_hotline,
-													 "date" => $date,
-													 "duree_presta" => "00:00",
-													 'no_test_credit'=>true,
-													 'heure_debut_presta'=>date("H:i"),
-													 'heure_fin_presta'=>date("H:i"),
-													 "detail" => $message,
-													 "id_user" => $id_user,
-													 "id_contact" => $id_contact,
-													 "id_ordre_de_mission" => NULL,
-													 "visible" => "oui");
+						//Si le ticket hotline existe
+						if(is_array($res)){
+							log::logger("Le ticket ".$id_hotline.",existe sur ".ATF::$codename , "hotline-checkmail");
 
-								$id = ATF::hotline_interaction()->insert($interaction);
+							$date = date("Y-m-d H:i", strtotime($val->date));
+							$body =  ATF::imap()->returnBody($val->uid);
 
-								$mail = ATF::imap()->returnmail($val->uid);
-								file_put_contents(ATF::hotline_interaction()->filepath($id,".eml",true), $mail);
+							//$position = strpos($body, utf8_encode("<---- Pour répondre par email, écrire au-dessus de cette ligne ---->"));
+							//$message = substr($body, 0, $position);
 
-								$zip = new ZipArchive();
-								$zipFileName = ATF::hotline_interaction()->filepath($id,"fichier_joint");
-								if (!file_exists($zipFileName)) {
-									util::file_put_contents($zipFileName,""); // Nécessaire pour créer le fichier avant de l'open
+							$message = substr($body, 0, 512);
+
+							//$message = False;
+							if($message){
+								log::logger("On a bien trouvé le message dans le body" , "hotline-checkmail");
+								if($id_user = $user["id_user"]){
+									$usr=ATF::$usr;
+									ATF::$usr=new usr($user["id_user"]);
+									$id_contact = NULL;
 								}
 
-								$zip->open($zipFileName);
-								$zip->addFile(ATF::hotline_interaction()->filepath($id,".eml",true),"mail.eml");
-								$zip->close();
-							}
 
-							ATF::imap()->imap_delete($val->uid);
+								if(($res["etat"] == "payee") || ($res["etat"] == "annulee")){
 
-							if($id_user = $user["id_user"]){
-								$usr=ATF::$usr;
-								ATF::$usr=new usr();
+									log::logger("Requete ".$id_hotline." payee ou annulée" , "hotline-checkmail");
+
+									//Requête cloturée ou annulée donc pas d'interaction !!
+									$info_mail["objet"] = "Requête ".$id_hotline." déja cloturée ";
+									$info_mail["from"] = "optima-hotline@absystech.net";
+									$info_mail["html"] = false;
+									$info_mail["template"] = 'hotline_deja_cloture';
+									$info_mail["text"] = $id_hotline;
+									$info_mail["recipient"] = $from;
+
+
+									$this->facture_mail = new mail($info_mail);
+									$this->facture_mail->send();
+
+									ATF::imap()->imap_mail_move( $val->uid, "Cloture" );
+
+
+								}else{
+
+									log::logger("Requete ".$id_hotline." Ok on insere l'interaction" , "hotline-checkmail");
+
+									$interaction = array("id_hotline" =>  $id_hotline,
+														 "date" => $date,
+														 "duree_presta" => "00:00",
+														 'no_test_credit'=>true,
+														 'heure_debut_presta'=>date("H:i"),
+														 'heure_fin_presta'=>date("H:i"),
+														 "detail" => $message,
+														 "id_user" => $id_user,
+														 "id_contact" => $id_contact,
+														 "id_ordre_de_mission" => NULL,
+														 "visible" => "oui");
+
+
+
+									$id = ATF::hotline_interaction()->insert($interaction);
+
+									$mail = ATF::imap()->returnmail($val->uid);
+									file_put_contents(ATF::hotline_interaction()->filepath($id,".eml",true), $mail);
+
+									$zip = new ZipArchive();
+									$zipFileName = ATF::hotline_interaction()->filepath($id,"fichier_joint");
+									if (!file_exists($zipFileName)) {
+										util::file_put_contents($zipFileName,""); // Nécessaire pour créer le fichier avant de l'open
+									}
+
+									$zip->open($zipFileName);
+									$zip->addFile(ATF::hotline_interaction()->filepath($id,".eml",true),"mail.eml");
+									$zip->close();
+								}
+
+								ATF::imap()->imap_delete($val->uid);
+
+								if($id_user = $user["id_user"]){
+									$usr=ATF::$usr;
+									ATF::$usr=new usr();
+								}
+							}else{
+								log::logger("On n'a pas réussi à trouver le message dans body" , "hotline-checkmail");
+								log::logger($val , "hotline-checkmail");
+								log::logger("------------------------------------" , "hotline-checkmail");
 							}
+						}else{
+							log::logger("Le ticket ".$id_hotline.",n'existe plus sur ".ATF::$codename , "hotline-checkmail");
 						}
-					}
 
+					}else{
+						log::logger("Mail non traité car ne correspond pas à la pattern" , "hotline-checkmail");
+						log::logger("Codename --> ".ATF::$codename , "hotline-checkmail");
+						log::logger("To --> ".$val->to , "hotline-checkmail");
+						log::logger("From --> ".$val->from , "hotline-checkmail");
+						log::logger("Sujet --> ".$val->subject , "hotline-checkmail");
+						log::logger("--------------------" , "hotline-checkmail");
+
+					}
+				} catch (errorATF $e) {
+					log::logger($e , "parseMailErreur");
 				}
 			}
 		}
@@ -3744,6 +3848,15 @@ class hotline extends classes_optima {
 			}
 
 
+			if ($get['filters']['custom']) {
+				foreach ($get['filters']['custom'] as $key => $value) {
+					$this->q->where("hotline.id_".$key, $value);
+					//log::logger($key, "alahlah");
+					//log::logger($value, "alahlah");
+				}
+			}
+
+
 			// TRI
 			switch ($get['tri']) {
 				case 'id_societe':
@@ -3765,6 +3878,11 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_user","user","id_user");
 		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
+
+		// Profil développeur extérieur (PATCH DEGUEU EN MODE BRICOLE)
+		if (ATF::$usr->get('id_profil') == 16) {
+			$this->q->where("gep_projet.id_societe", 513); // Cléodis
+		}
 
 		// $this->q->setToString();
 		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
@@ -4196,10 +4314,10 @@ class hotline extends classes_optima {
 		log::logger($post , "mfleurquin");
 
 		$at = $this->stats(true,"partTicket");
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->stats(true,"partTicket");
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		$res = array();

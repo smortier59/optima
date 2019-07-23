@@ -403,7 +403,7 @@ class emailing_projet extends emailing {
 		$projet = $mail->getInfos("projet");
 		if ($projet['embed_image']=='non') return true;
                
-        if (preg_match_all("/src=\"http\:\/\/[a-zA-Z].[a-zA-Z0-9=.\-\_\/]*\"/",$projet['corps'],$resultSRC)) {
+        if (preg_match_all("/src=\"https?\:\/\/[a-zA-Z].[a-zA-Z0-9=.\-\_\/]*\"/",$projet['corps'],$resultSRC)) {
             foreach ($resultSRC[0] as $k=>$i) {
                 $url = str_replace("\"","",substr($i,4));
                 $projet['corps'] = str_replace($url,$mail->addEmbeddedImage($url),$projet['corps']);

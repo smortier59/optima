@@ -74,6 +74,19 @@ class loyer extends classes_optima {
 	}
 
 	/**
+    * Renvoi la durée total d'un devis
+    * @author Quentin JANON <qjanon@absystech.fr>
+	* @param array $l Tableau contenant tous les loyers du devis
+	* @return Durée totale de la location pour un devis
+    */ 
+	public function dureeTotalBrut($id_affaire) {
+		foreach($this->ss("id_affaire",$id_affaire) as $key=>$item){
+			$duree += $item["duree"];
+		}
+		return $duree;
+	}
+
+	/**
     * Renvoi le prix total pour une affaire
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @date 13-01-2011
@@ -89,7 +102,3 @@ class loyer extends classes_optima {
 	}
 	
 };
-
-class loyer_cleodisbe extends loyer { };
-class loyer_cap extends loyer { };
-?>

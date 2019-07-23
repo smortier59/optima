@@ -93,6 +93,3 @@ class formation_priseEnCharge extends classes_optima {
 	
 
 };
-
-class formation_priseEnCharge_cleodisbe extends formation_priseEnCharge { };
-class formation_priseEnCharge_cap extends formation_priseEnCharge { };

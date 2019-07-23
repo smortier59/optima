@@ -87,7 +87,7 @@ class societe extends classes_optima {
 				,"longitude"
 			))
 		);
-		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
+		$this->panels['coordonnees_supplementaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true);
 
 		// Informations supplémentaires de facturation
 		$this->colonnes['panel']['facturation_fs'] = array(
@@ -121,8 +121,8 @@ class societe extends classes_optima {
 		// Panel prinicpal des coordonnées
 		$this->colonnes['panel']['coordonnees'] = array(
 			"adresse_complete"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'adresse_complete_fs')
-			,"adresse_facturation_complete"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'adresse_facturation_complete_fs')
 			,"coordonnees_supplementaires"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'coordonnees_supplementaires_fs')
+			,"adresse_facturation_complete"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'adresse_facturation_complete_fs')
 			,"facturation"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'facturation_fs')
 			,"codes"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'codes_fs')
 		);
@@ -893,9 +893,16 @@ class societe extends classes_optima {
 
 		    $response = $this->processCSRequest($url, $params);
 
-		    if(__PRE__ === true){
+
+
+		    if(__DEV__ === true){
+		    	log::logger("Dev" , "mfleurquin");
+		    	file_put_contents("/home/optima/core/log/creditsafe.xml",$response);
+		    }elseif(__PRE__ === true){
+		    	log::logger("Pre" , "mfleurquin");
 				file_put_contents("/home/absystech/optima.absystech.net-pre/pre/log/creditsafe.xml",$response);
 			}else{
+				log::logger("Prod" , "mfleurquin");
 				file_put_contents("/home/absystech/optima/core/log/creditsafe.xml",$response);
 			}
 
@@ -912,6 +919,7 @@ class societe extends classes_optima {
 				$data = $this->cleanCSResponse($response);
 			}
 		}
+
 		return $data;
 	}
 
@@ -1133,6 +1141,8 @@ class societe extends classes_optima {
 
 		// Activite de société
 		$return['reference_tva'] = (string)$bi->vatnumber;
+
+		$return['ville_rcs'] =  (string)$s->courtregistrydescription;
 
 		// NB employé de société
 		$return['nb_employe'] = (string)$bi->companyworkforce;

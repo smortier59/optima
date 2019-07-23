@@ -7,7 +7,7 @@ require_once dirname(__FILE__)."/../bon_de_commande.class.php";
 class bon_de_commande_cleodis extends bon_de_commande {
 	function __construct() {
 		parent::__construct();
-		$this->table = "bon_de_commande"; 
+		$this->table = "bon_de_commande";
 
 		$this->colonnes['fields_column'] = array(
 			"bon_de_commande.ref"
@@ -30,7 +30,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->colonnes["bloquees"]["insert"] =
 		$this->colonnes["bloquees"]["update"] = array("ref","id_user","date_livraison_prevision","date_installation_prevision","date_reception_prevision","livraison_partielle","date_reception_fournisseur","date_livraison","date_installation","date_pv_install","factureFournisseur",'date_livraison_estime','date_livraison_prevue','date_livraison_reelle','date_installation_prevue','date_installation_reele','date_limite_rav');
 		$this->colonnes["bloquees"]["update"][] = "date";
-		
+
 		$this->colonnes['primary'] = array(
 			"ref"
 			,"id_societe"=>array("disabled"=>true)
@@ -68,15 +68,15 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->colonnes['panel']['commande_lignes'] = array(
 			"commandes"=>array("custom"=>true)
 		);
-	
+
 		$this->colonnes['panel']['total'] = array(
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			"prix"=>array("custom"=>true,/*"readonly"=>true,*/"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
-		
+
 		$this->colonnes['panel']['total_cleodis'] = array(
 			"prix_cleodis"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
-						
+
 		// Blocs montant/état/dates
 		$this->colonnes['panel']['statut'] = array(
 			"montant"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'montant_fs')
@@ -160,12 +160,17 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->colonnes['bloquees']['select'] =  array_merge(
 			array_keys($this->colonnes['panel']['commande_lignes']),
 			array_keys($this->colonnes['panel']['courriel'])
-		);	
-					
+		);
+
 		$this->fieldstructure();
 
 		$this->addPrivilege("updateDate");
-		
+		$this->addPrivilege("createAllBDC");
+
+		$this->addPrivilege("export_cegid");
+		$this->addPrivilege("export_servantissimmo");
+
+
 		$this->noTruncateSA = true;
 		$this->no_insert = true;
 		$this->no_update = true;
@@ -176,18 +181,18 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>true);
 		$this->files["pdf"] = array("type"=>"pdf","no_upload"=>true,"no_generate"=>true);
 		$this->can_insert_from = array("commande");
-		$this->selectAllExtjs=true; 
+		$this->selectAllExtjs=true;
 	}
-	
+
 	public function uploadFileFromSA(&$infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
 		$infos['display'] = true;
 		$class = ATF::getClass($infos['extAction']);
 		if (!$class) return false;
 		if (!$infos['id']) return false;
 		if (!$files) return false;
-		
+
 		$id = $class->decryptID($infos['id']);
-		
+
 		$id_affaire = $class->select($id, "id_affaire");
 
 		foreach ($files as $k=>$i) {
@@ -195,13 +200,13 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			$id_pdf_affaire = ATF::pdf_affaire()->insert(array("id_affaire"=>$id_affaire, "provenance"=>ATF::$usr->trans($class->name(), "module")." ".$k." ref : ".$infos['extAction']." ".$class->select($id, "ref")));
 			$this->store($s,$id,$k,$i);
 
-			copy($class->filepath($id,$k), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));			
+			copy($class->filepath($id,$k), ATF::pdf_affaire()->filepath($id_pdf_affaire,"fichier_joint"));
 		}
 		ATF::$cr->block('generationTime');
 		ATF::$cr->block('top');
-		
-		
-		
+
+
+
 		$o = array ('success' => true );
 		return json_encode($o);
 	}
@@ -214,32 +219,32 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return bool
-    */   	
+    */
 	public function updateDate($infos,&$s,&$request){
 
 		if (!$infos['id_bon_de_commande']) return false;
 
 		$infos["id_bon_de_commande"] = $this->decryptId($infos["id_bon_de_commande"]);
 
-		if ($infos['value'] == "undefined") $infos["value"] = "";		
+		if ($infos['value'] == "undefined") $infos["value"] = "";
 		switch ($infos['key']) {
-			// Sécurité, n'exécuter une action que pour ces champs	
-			case "date_livraison_prevue":	
-			case "date_livraison_reelle":												
+			// Sécurité, n'exécuter une action que pour ces champs
+			case "date_livraison_prevue":
+			case "date_livraison_reelle":
 				ATF::db($this->db)->begin_transaction();
-				try {					
-										
+				try {
+
 					$cmd = $this->select($infos['id_bon_de_commande']);
-					if($infos['value']){		
+					if($infos['value']){
 							$nbj_installation = ATF::societe()->select($cmd["id_fournisseur"], "fournisseur_nbj_installation");
 
 							$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
 								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)
 								   ,"date_installation_prevue" => date("Y-m-d", strtotime("+".$nbj_installation." days", strtotime($infos["value"])))
-								   );							
-							$this->u($d);						
+								   );
+							$this->u($d);
 					}
-				} catch(errorATF $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}				
+				} catch(errorATF $e) {ATF::db($this->db)->rollback_transaction();		throw $e;	}
 				//On commit le tout
 				ATF::db($this->db)->commit_transaction();
 
@@ -251,14 +256,14 @@ class bon_de_commande_cleodis extends bon_de_commande {
 
 			default:
 				$d = array("id_bon_de_commande"=>$infos['id_bon_de_commande']
-					   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)					   
-					);				
+					   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL)
+					);
 				$this->u($d);
 			break;
 		}
-		
-		
-		
+
+
+
 		return true;
 	}
 
@@ -288,19 +293,19 @@ class bon_de_commande_cleodis extends bon_de_commande {
 													)"
 													,"solde_ht")
 			->addGroup("bon_de_commande.id_bon_de_commande");
-			
+
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		foreach ($return['data'] as $k=>$i) {
 			if ($i["solde_ht"]>0 || !$i["solde_ht"]) {
-				$return['data'][$k]['factureFournisseurAllow'] = true;	
+				$return['data'][$k]['factureFournisseurAllow'] = true;
 			}
 			if (ATF::parc()->parcByBdc($i['bon_de_commande.id_bon_de_commande'])) {
-				$return['data'][$k]['parcInsertionAllow'] = true;	
+				$return['data'][$k]['parcInsertionAllow'] = true;
 			}
 		}
 		return $return;
 	}
-	
+
 	/**
     * Permet de mettre a jour une date en ajax
     * @author Quentin JANON <qjanon@absystech.fr>
@@ -309,14 +314,14 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return bool
-    */   	
+    */
 	/*public function updateDate($infos,&$s,&$request){
 		if (!$infos['id_bon_de_commande']) return false;
 
-		if ($infos['value'] == "undefined") $infos["value"] = "";		
-		switch ($infos['key']) {			
-			case "date_debut":		
-				
+		if ($infos['value'] == "undefined") $infos["value"] = "";
+		switch ($infos['key']) {
+			case "date_debut":
+
 					ATF::$msg->addNotice(loc::mt(
 						ATF::$usr->trans("dates_modifiee",$this->table)
 						,array("date"=>ATF::$usr->trans($infos['key'],$this->table))
@@ -336,16 +341,21 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	}*/
 
 
-	/** 
+	/**
 	* Impossible de supprimer un bon de commande qui a une facture fournisseur
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function can_delete($id){
 		$bdc=$this->select($id);
-		$affaire = new affaire_cleodis($bdc['id_affaire']);
-		
+		if(ATF::$codename == "cleodisbe"){
+			$affaire = new affaire_cleodisbe($bdc['id_affaire']);
+		}else{
+			$affaire = new affaire_cleodis($bdc['id_affaire']);
+		}
+
+
 		//On ne doit pas pouvoir modifier une affaire Annulée et remplacée
 		ATF::commande()->checkUpdateAR($affaire);
 
@@ -355,7 +365,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		if($affaireEnfant){
 			ATF::commande()->checkUpdateAVT($affaireEnfant);
 		}
-		
+
 		ATF::facture_fournisseur()->q->reset()->addCondition("id_bon_de_commande",$id)->setCount();
 		$count=ATF::facture_fournisseur()->sa();
 		if($count["count"]>0){
@@ -364,11 +374,11 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			return true;
 		}
 	}
-	
+
 	public function can_update($id,$infos=false){
 		return $this->can_delete($id);
 	}
-	
+
 	/**
     * Retourne la valeur par défaut spécifique aux données des formulaires
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -376,12 +386,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	* @param array &$s La session
 	* @param array &$request Paramètres disponibles (clés étrangères)
 	* @return string
-    */   	
+    */
 	public function default_value($field,&$s,&$request){
 		if ($id_commande = ATF::_r('id_commande')) {
 			$commande=ATF::commande()->select($id_commande);
 		}
-		
+
 		switch ($field) {
 			case "id_societe":
 				return $commande[$field];
@@ -426,16 +436,16 @@ class bon_de_commande_cleodis extends bon_de_commande {
 				return ATF::societe()->select($commande['id_societe'],$field);
 				break;
 			}
-	
+
 		return parent::default_value($field,$s,$request);
-	}	
+	}
 
 	/**
     * Retourne la valeur du texte d'email, appelé en Ajax
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
 	* @return string texte du mail
-    */   	
+    */
 	public function majMail($id_societe){
 		return nl2br("Bonjour,\n\nCi-joint le bon de commande pour la société ".ATF::societe()->nom($id_societe).".\nBon de commande effectué le ".date("d/m/Y").".\n");
 	}
@@ -457,16 +467,16 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}
 
 		$prefix=$code_four."-".ATF::affaire()->select($id_affaire,"ref")."-";
-		
+
 		$this->q->reset()
 			->addField("ROUND(SUBSTRING(`ref`,".(strlen($prefix)+1)."))","ref_reel")
 			->addCondition("ref",$prefix."%","AND",false,"LIKE")
 			->addOrder('ref_reel',"DESC")
 			->setDimension("row")
 			->setLimit(1);
-		
+
 		$nb=$this->sa();
-	
+
 		if($nb["ref_reel"]){
 			$suffix=$nb["ref_reel"]+1;
 		}else{
@@ -477,7 +487,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	}
 
 	/**
-	* Ajoute 
+	* Ajoute
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	* @param string classes_optima $class Classe des enregistrements affichés dans l'autocomplète
 	* @param array $infos ($requests habituellement attendu)
@@ -513,7 +523,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 //				$return["affaire"][]=$affaire;
 //			}
 //		}
-//		
+//
 //		//Si aucune affaire sélectionné
 //		if(!$affaire){
 //			throw new errorATF(ATF::$usr->trans("parc_sans_".$type),879);
@@ -525,8 +535,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 //		}
 //	}
 //
-	
-	/** 
+
+	/**
 	* Surcharge de l'insert afin d'insérer les lignes du bon de commande et d'nvoyer un mail
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -551,10 +561,9 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}else{
 			throw new errorATF("Il faut sélectionner des lignes de bon de commande.",875);
 		}
-
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
-		
+
 		//Gestion mail
 		if($envoyerEmail){
 			$email["email"]=$infos["email"];
@@ -569,10 +578,10 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		$societe=ATF::societe()->select($infos["id_societe"]);
 		$infos["id_societe"] = $societe["id_societe"];
 		$infos["id_fournisseur"] = ATF::societe()->decryptId($infos["id_fournisseur"]);
-		
+
 		//Cleodis & Cleofi ont la possibilité de choisir le prix
 		$societe=ATF::societe()->nom($infos["id_fournisseur"]);
-		if($societe=="CLEODIS" || $societe=="CLEOFI") $infos["prix"]=$infos["prix_cleodis"]; 
+		if($societe=="CLEODIS" || $societe=="CLEOFI") $infos["prix"]=$infos["prix_cleodis"];
 		unset($infos["prix_cleodis"]);
 		$infos["ref"] = $this->getRef($infos["id_affaire"],$infos["id_fournisseur"]);
 		//$infos["date"] = date("Y-m-d");
@@ -580,17 +589,17 @@ class bon_de_commande_cleodis extends bon_de_commande {
 //		ATF::facture()->q->reset()
 //						 ->addCondition($infos["id_affaire"],"id_affaire")
 //						 ->setCountOnly();
-//		
+//
 //		//s'il y a une facture pour cette affaire alors etat=>fnp sinon etat=>envoyee
 //		if(ATF::facture()->sa()>0){
-//			$infos['etat'] = 'fnp';	
+//			$infos['etat'] = 'fnp';
 //		}else{
-		$infos['etat'] = 'envoyee';	
+		$infos['etat'] = 'envoyee';
 //		}
-		
+
 		//Vérification du bon de commande
 		$this->check_field($infos);
-	
+
 		ATF::db($this->db)->begin_transaction();
 
 //*****************************Transaction********************************
@@ -606,8 +615,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			$fournisseur_delai_rav = ATF::societe()->select($infos["id_fournisseur"], "fournisseur_delai_rav");
 			$infos["date_limite_rav"] = date("Y-m-d", strtotime($fournisseur_delai_rav." days", strtotime(ATF::affaire()->select($infos["id_affaire"], "date_ouverture"))));
 		}
-		
-		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);	
+
+		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		$prix_total = 0;
 		foreach($infos_bon_de_commande_ligne as $key=>$item){
@@ -616,26 +625,29 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			$bon_de_commande_ligne["id_bon_de_commande"]=$last_id;
 			$bon_de_commande_ligne["ref"]=$commande_ligne["ref"];
 			$bon_de_commande_ligne["produit"]=$commande_ligne["produit"];
-			$bon_de_commande_ligne["quantite"]=$commande_ligne["quantite"];
+			$bon_de_commande_ligne["quantite"]=1;
 			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"];
 			$prix_total += $bon_de_commande_ligne["prix"]*$bon_de_commande_ligne["quantite"];
 			ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne);
 		}
-		
+
 		if($societe=="CLEODIS" || $societe=="CLEOFI"){
 			if($prix_total != $infos["prix"]){
-				$prix_total=$infos["prix"];	
+				$prix_total=$infos["prix"];
 			}
 		}
-
-		// Ajout de la facture non parvenue globale du bon de commande
-		ATF::facture_non_parvenue()->i(array(
+		$fnp = array(
 			'ref'=>$infos['ref']."-FNP"
 			,'prix'=>$prix_total // Valeur positive
 			,'id_affaire'=>$infos["id_affaire"]
 			,'tva'=>$infos["tva"]
 			,'id_bon_de_commande'=>$last_id
-		));
+		);
+
+		if($fnp["prix"] == 0) $fnp["facturation_terminee"] = "oui";
+
+		// Ajout de la facture non parvenue globale du bon de commande
+		ATF::facture_non_parvenue()->i($fnp);
 
 //*****************************************************************************
 		if($preview){
@@ -653,17 +665,105 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			}
 			ATF::db($this->db)->commit_transaction();
 		}
-		
+
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
 		return $last_id;
 
 	}
-	
-		
-	/** 
-	* Surcharge de delete 
+
+
+	/**
+	 * Pouvoir générer tout les BDC d'une affaire d'un coup
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array $infos [id_commande]
+	 */
+	public function createAllBDC($infos){
+
+
+		if(!$infos["id_commande"]) return false;
+
+		$cadre_refreshed = NULL;
+
+		$id_commande = ATF::commande()->decryptId($infos["id_commande"]);
+		$commande =  ATF::commande()->select($id_commande);
+		$client = ATF::societe()->select($commande["id_societe"]);
+
+		ATF::commande_ligne()->q->reset()->where("commande_ligne.id_commande", $id_commande);
+		$lignes = ATF::commande_ligne()->sa();
+
+
+		$groupByFournisseur = array();
+		//On regroupe les lignes par fournisseurs
+		foreach ($lignes as $key => $value) {
+			$groupByFournisseur[$value["id_fournisseur"]][] = $value;
+		}
+
+		try{
+			ATF::db($this->db)->begin_transaction();
+
+			foreach ($groupByFournisseur as $key => $value) {
+				$id_fournisseur = $key;
+				$bdc = $bon_de_commande = array();
+
+				$bon_de_commande["id_societe"] = $commande["id_societe"];
+				$bon_de_commande["id_commande"] = $id_commande;
+				$bon_de_commande["id_fournisseur"] = $id_fournisseur;
+				$bon_de_commande["commentaire"] = "";
+				$bon_de_commande["id_affaire"] = $commande["id_affaire"];
+				$bon_de_commande["bon_de_commande"] = ATF::affaire()->select($commande["id_affaire"], "affaire");
+
+				$bon_de_commande["id_contact"] = "";
+
+				$bon_de_commande["destinataire"] = $client["societe"];
+				$bon_de_commande["adresse"] = $client["adresse"];
+				$bon_de_commande["adresse_2"] = $client["adresse_2"];
+				$bon_de_commande["adresse_3"] = $client["adresse_3"];
+				$bon_de_commande["cp"] = $client["cp"];
+				$bon_de_commande["ville"] = $client["ville"];
+				$bon_de_commande["id_pays"] = $client["id_pays"];
+
+
+
+
+				$bon_de_commande["tva"] = 1.2;
+				$bon_de_commande["payee"] = "non";
+				$bon_de_commande["date"] = date("Y-m-d");
+
+				$commandes = "xnode";
+
+				foreach ($value as $kl => $vl) {
+					for($i=1;$i<=$vl["quantite"]; $i++){
+						$commandes .= ",".$vl["id_commande_ligne"];
+						$bon_de_commande["prix"] += $vl["prix_achat"];
+					}
+	 			}
+
+	 			$bdc["bon_de_commande"] = $bon_de_commande;
+	 			$bdc["commandes"] = $commandes;
+
+	 			$bdc["bon_de_commande"]["prix_cleodis"] = $bdc["bon_de_commande"]["prix"];
+
+
+	 			$this->insert($bdc, $s, NULL, $cadre_refreshed);
+
+			}
+
+			ATF::affaire()->redirection("select",$commande["id_affaire"]);
+			ATF::db($this->db)->commit_transaction();
+			return true;
+		}catch(errorATF $e){
+			ATF::db($this->db)->rollback_transaction();
+			throw new ErrorATF($e->getMessage(), 1);
+		}
+
+
+	}
+
+
+	/**
+	* Surcharge de delete
 	* @author mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $infos le ou les identificateurs de l'élément que l'on désire inséré
 	* @param array &$s La session
@@ -679,17 +779,17 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			if($bon_de_commande){
 //*****************************Transaction********************************
 				ATF::db($this->db)->begin_transaction();
-	
+
 				ATF::facture_non_parvenue()->q->reset()->addCondition("id_bon_de_commande",$bon_de_commande["id_bon_de_commande"]);
 				$facture_non_parvenue=ATF::facture_non_parvenue()->sa();
-				
+
 				foreach($facture_non_parvenue as $key=>$item){
 					ATF::facture_non_parvenue()->d($item["id_facture_non_parvenue"]);
 				}
 
 				ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_bon_de_commande",$bon_de_commande["id_bon_de_commande"]);
 				$bon_de_commande_ligne=ATF::bon_de_commande_ligne()->sa();
-			
+
 				foreach($bon_de_commande_ligne as $key=>$item){
 					$commande_ligne=ATF::commande_ligne()->select($item["id_commande_ligne"]);
 					if($commande_ligne["serial"] && !$commande_ligne["id_affaire_provenance"]){
@@ -704,16 +804,16 @@ class bon_de_commande_cleodis extends bon_de_commande {
 						}
 					}
 				}
-				
+
 				parent::delete($id,$s);
-	
-					
+
+
 				ATF::db($this->db)->commit_transaction();
 	//*****************************************************************************
-				
+
 				ATF::affaire()->redirection("select",$bon_de_commande["id_affaire"]);
-				
-				return true; 
+
+				return true;
 			}
 		} elseif (is_array($infos) && $infos) {
 
@@ -723,12 +823,12 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}
 	}
 
-	
-	/** 
+
+	/**
 	* Permet de savoir si toutes les lignes d'une commande sont passées en bon de commande
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id
-	* @return boolean 
+	* @return boolean
 	*/
 	public function bdcByAffaire($id_commande){
 		ATF::commande_ligne()->q->reset()->addCondition("id_commande",$id_commande);
@@ -740,7 +840,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 				$nb_commande_ligne++;
 			}
 		}
-		
+
 		if($nb_commande_ligne==count($commande_ligne)){
 			return true;
 		}else{
@@ -748,12 +848,409 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}
 	}
 
+
+	/** Export CEGID
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	public function export_cegid($infos){
+		if(!$infos["tu"]){ $this->q->reset(); $this->setQuerier(ATF::_s("pager")->create($infos['onglet']));}
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        $infos = $this->sa();
+
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('IMPORT CEGID');
+		$sheets=array("auto"=>$worksheet_auto);
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$header = array('TYPE',
+						'DATE',
+						'JOURNAL',
+						'GENERAL',
+						'AUXILIAIRE',
+						'SENS',
+						'MONTANT',
+						'LIBELLE',
+						'REFERENCE INTERNE',
+						'AXE1');
+
+		$i = 65; //Caractere A
+
+		foreach ($header as $key => $value) {
+			$row_data[chr($i)] = $value;
+			$i++;
+		}
+
+		foreach($sheets as $nom=>$onglet){
+           	foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre);
+				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        }
+
+        if($infos){
+			$row_auto=1;
+			foreach ($infos as $key => $value) {
+				if(!$value["bon_de_commande.export_cegid"]){
+					$refinancement = "";
+					ATF::demande_refi()->q->reset()->where("id_affaire",$value['bon_de_commande.id_affaire_fk'],"AND")
+												   ->where("etat","valide");
+					$ResRefinancement = ATF::demande_refi()->select_row();
+
+					if($ResRefinancement){
+						$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
+					}
+
+					ATF::commande()->q->reset()->addAllFields('commande')->where("commande.id_affaire", $value['bon_de_commande.id_affaire_fk']);
+					$contrat = ATF::commande()->select_row();
+
+
+
+					if($contrat["commande.date_debut"]){
+						$date = date("dmY", strtotime($contrat["commande.date_debut"]));
+
+						for ($l=1; $l <= 4; $l++) {
+							$row_data=array();
+							$ref_affaire = ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref");
+
+							$code_client = str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client"));
+							$code_client = str_replace('EX-', '',$code_client);
+
+
+							if(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "nature") == "avenant" ){
+								$axe1 ="20".
+										substr(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref"),0 , 7).
+										$code_client.
+										"AV";
+							}else{
+								$axe1 ="20".
+										ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref").
+										$code_client.
+										"00";
+							}
+
+
+
+
+
+							//HT
+							if($l == 1){
+								$row_data["A"]='G';
+								$row_data["B"]=" ".$date;
+								$row_data["C"]='ACH';
+
+								if($refinancement === "CLEODIS"){
+									$row_data["D"]='218310';
+								}else{
+									$row_data["D"]='607110';
+								}
+
+								$row_data["E"] = "";
+								$row_data["F"]='D';
+								$row_data["G"]=number_format($value["bon_de_commande.prix"]  , 2, '.','');
+								$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
+								$row_data["I"]=$ref_affaire." ";
+								$row_data["J"]="";
+
+							//HT
+							}elseif($l == 2){
+								if($refinancement !== "CLEODIS"){
+									$row_data["A"]='A1';
+									$row_data["B"]=" ".$date;
+									$row_data["C"]='ACH';
+									$row_data["D"]='607110';
+									$row_data["E"]='';
+									$row_data["F"]='D';
+									$row_data["G"]=number_format($value["bon_de_commande.prix"] , 2, '.','');
+									$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
+									$row_data["I"]=$ref_affaire." ";
+									$row_data["J"]=$axe1;
+								}
+							//TVA
+							}elseif($l == 3){
+								$row_data["A"]='G';
+								$row_data["B"]=" ".$date;
+								$row_data["C"]='ACH';
+								$row_data["D"]='445860';
+								//$row_data["E"]=ATF::societe()->select($value['bon_de_commande.id_fournisseur_fk'], 'code_fournisseur');
+								$row_data["E"]="";
+								$row_data["F"]='D';
+								$row_data["G"]=number_format(($value["bon_de_commande.prix"]*__TVA__) - $value["bon_de_commande.prix"]  , 2, '.','');
+								$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
+								$row_data["I"]=$ref_affaire." ";
+								$row_data["J"]="";
+
+							//TTC
+							}elseif($l == 4){
+								$row_data["A"]='G';
+								$row_data["B"]=" ".$date;
+								$row_data["C"]='ACH';
+								$row_data["D"]='408100';
+								$row_data["E"]="";
+								$row_data["F"]='C';
+								$row_data["G"]=number_format($value["bon_de_commande.prix"]*__TVA__  , 2, '.','');
+								$row_data["H"]=$value["bon_de_commande.id_bon_de_commande"];
+								$row_data["I"]=$ref_affaire." ";
+								$row_data["J"]="";
+							}
+
+
+
+							if($row_data){
+								$row_auto++;
+								foreach($row_data as $col=>$valeur){
+									$sheets['auto']->write($col.$row_auto, $valeur);
+								}
+							}
+						}
+
+						$this->u(array("id_bon_de_commande"=>$value["bon_de_commande.id_bon_de_commande_fk"],
+									   "export_cegid"=>date("Y-m-d H:i:s")
+									  ));
+					}
+
+				}
+			}
+		}
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:attachment;filename=export_cegid.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
+
+	/** Export Servantissimmmo
+	 * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient le nom de l'onglet
+     */
+	public function export_servantissimmo($infos){
+
+		$force = false;
+		if($infos["force"]){	$force = true; }
+		if(!$infos["tu"]){ $this->q->reset(); $this->setQuerier(ATF::_s("pager")->create($infos['onglet']));}
+
+        $this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+        $infos = $this->sa();
+
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
+		//premier onglet
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+		$worksheet_auto->sheet->setTitle('IMPORT SERVANTISSIMMO');
+		$sheets=array("auto"=>$worksheet_auto);
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$header = array('Compte',
+						'Date d\'entréee',
+						'Date de mise en service',
+						'Date de début d\'amortissement comptable',
+						'Date de début d\'amortissement fiscal',
+						'Référence',
+						'Libelle',
+						'Prix unitaire',
+						'Montant HT',
+						'Quantité',
+						'Montant TVA',
+						'Taux de TVA',
+						'Prorata',
+						'Montant TTC',
+						'Type de sortie',
+						'Date de sortie',
+						'Base comptable (=montant HT)',
+						'Méthode comptable',
+						'Durée comptable',
+						'Base fiscale',
+						'Méthode fiscale',
+						'Durée fiscale',
+						'Nature du bien',
+						'Type d\'entrée',
+						'Niveau de réalité',
+						'Totalcumulantérieur',
+						'Totalcumulantérieur fiscal',
+						'Critère 1',
+						'Réference 2',
+						'Compte fourn');
+
+		$i = 65; //Caractere A
+		$j = 0;
+
+		foreach ($header as $key => $value) {
+			if(!$j){
+				$row_data[chr($i)] = $value;
+				if($i < 90){ $i++; }
+				else{ $i = 65; $j = 65;}
+			}else{
+				$row_data[chr($i).chr($j)] = $value;
+				if($j < 90) { $j++; }
+				else{ $i++; $j = 65;}
+			}
+		}
+		foreach($sheets as $nom=>$onglet){
+           	foreach($row_data as $col=>$titre){
+				  $sheets[$nom]->write($col.'1',$titre);
+				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+        }
+
+        if($infos){
+			$row_auto=1;
+			foreach ($infos as $key => $value) {
+
+				if(!$value["bon_de_commande.export_servantissimmo"] || $force){
+					$data = array();
+
+					$refinancement = NULL;
+					ATF::demande_refi()->q->reset()->where("id_affaire",$value['bon_de_commande.id_affaire_fk'],"AND")
+												   ->where("etat","valide");
+					$ResRefinancement = ATF::demande_refi()->select_row();
+
+					if($ResRefinancement){
+						$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
+					}
+
+					if($refinancement && $refinancement === "CLEODIS"){
+
+						ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $value["bon_de_commande.id_affaire_fk"]);
+						$contrat = ATF::commande()->select_row();
+
+						ATF::loyer()->q->reset()->where("loyer.id_affaire", $value["bon_de_commande.id_affaire_fk"]);
+						$loyers = ATF::loyer()->sa();
+						$duree = 0;
+						foreach ($loyers as $kl => $vl) {
+							if($vl["frequence_loyer"] === "mois"){
+								$duree += $vl["duree"];
+							}elseif($vl["frequence_loyer"] === "trimestre"){
+								$duree += $vl["duree"]*4;
+							}elseif($vl["frequence_loyer"] === "semestre"){
+								$duree += $vl["duree"]*6;
+							}elseif($vl["frequence_loyer"] === "an"){
+								$duree += $vl["duree"]*12;
+							}
+						}
+						$duree = $duree/12;
+
+
+						$client = ATF::societe()->select($value["bon_de_commande.id_societe_fk"]);
+
+						$code_client = str_replace('Ex-', '',ATF::societe()->select($value["bon_de_commande.id_societe_fk"],"code_client"));
+						$code_client = str_replace('EX-', '',$code_client);
+
+
+						if(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "nature") == "avenant" ){
+							$axe1 ="20".
+									substr(ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref"),0 , 7).
+									$code_client.
+									"AV";
+						}else{
+							$axe1 ="20".
+									ATF::affaire()->select($value["bon_de_commande.id_affaire_fk"], "ref").
+									$code_client.
+									"00";
+						}
+
+
+						$data = array(	'218310',
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										date("d/m/Y", strtotime($contrat["commande.mise_en_place"])),
+										'',
+										$client["societe"]." ".$contrat["commande.ref"]."-".$client["code_client"],
+										'',
+										number_format($value["bon_de_commande.prix"] , 2, '.',''),
+										'1',
+										number_format($value["bon_de_commande.prix"]*(__TVA__ -1) , 2, '.',''),
+										(__TVA__ -1)*100,
+										'100',
+										number_format($value["bon_de_commande.prix"]*__TVA__ , 2, '.',''),
+										'00 ',
+										'30/12/2099',
+										number_format($value["bon_de_commande.prix"] , 2, '.',''),
+										'01 ',
+										number_format($duree, 3, '.',''),
+										$value["bon_de_commande.prix"],
+										'01 ',
+										number_format($duree, 3, '.',''),
+										'01 ',
+										'01 ',
+										'09 ',
+										'09 ',
+										'0 ',
+										$axe1,
+										$value["bon_de_commande.id_bon_de_commande"],
+										$value["bon_de_commande.id_fournisseur"]);
+
+
+						$row_auto++;
+
+						$i = 65;
+						$j = 0;
+
+						foreach ($data as $k => $v) {
+							if(!$j){
+								$row_data[chr($i)] = $v;
+								if($i < 90){ $i++; }
+								else{ $i = 65; $j = 65;}
+							}else{
+								$row_data[chr($i).chr($j)] = $v;
+								if($j < 90) { $j++; }
+								else{ $i++; $j = 65;}
+							}
+						}
+
+
+
+						foreach($row_data as $col=>$valeur){
+							$sheets['auto']->write($col.$row_auto, $valeur);
+						}
+						if(!$value["bon_de_commande.export_servantissimmo"]){
+							$this->u(array("id_bon_de_commande"=>$value["bon_de_commande.id_bon_de_commande_fk"],
+									   	   "export_servantissimmo"=>date("Y-m-d H:i:s")
+									  ));
+						}
+
+					}
+				}
+
+
+			}
+		}
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:attachment;filename=export_servantissimo.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
 };
 
 class bon_de_commande_midas extends bon_de_commande_cleodis {
 	function __construct() {
 		parent::__construct();
-		$this->table = "bon_de_commande"; 
+		$this->table = "bon_de_commande";
 
 		$this->colonnes['fields_column'] = array(
 			"bon_de_commande.ref"
@@ -766,7 +1263,7 @@ class bon_de_commande_midas extends bon_de_commande_cleodis {
 		);
 		$this->fieldstructure();
 	}
-	
+
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 		$this->q->addJointure("bon_de_commande","id_fournisseur","societe","id_societe")
 				->addCondition("societe.code_client","M%","OR",false,"LIKE")
@@ -774,10 +1271,10 @@ class bon_de_commande_midas extends bon_de_commande_cleodis {
 		return parent::select_all($order_by,$asc,$page,$count);
 	}
 };
-class bon_de_commande_cleodisbe extends bon_de_commande_cleodis { 
+class bon_de_commande_cleodisbe extends bon_de_commande_cleodis {
 	function __construct() {
 		parent::__construct();
-		$this->table = "bon_de_commande";	
+		$this->table = "bon_de_commande";
 
 		unset($this->colonnes['fields_column']["bon_de_commande.date_livraison_estime"]
 			 ,$this->colonnes['fields_column']["bon_de_commande.date_livraison_prevue"]
@@ -793,10 +1290,10 @@ class bon_de_commande_cleodisbe extends bon_de_commande_cleodis {
 };
 
 
-class bon_de_commande_cap extends bon_de_commande_cleodis { 
+class bon_de_commande_cap extends bon_de_commande_cleodis {
 	function __construct() {
 		parent::__construct();
-		$this->table = "bon_de_commande";	
+		$this->table = "bon_de_commande";
 
 		unset($this->colonnes['fields_column']["bon_de_commande.date_livraison_estime"]
 			 ,$this->colonnes['fields_column']["bon_de_commande.date_livraison_prevue"]
@@ -805,8 +1302,12 @@ class bon_de_commande_cap extends bon_de_commande_cleodis {
 			 ,$this->colonnes['fields_column']["bon_de_commande.date_installation_reele"]
 			 ,$this->colonnes['fields_column']["bon_de_commande.date_limite_rav"] );
 
-		
+
 		$this->fieldstructure();
 	}
 };
-?>
+
+
+class bon_de_commande_bdomplus extends bon_de_commande_cleodis { };
+class bon_de_commande_bdom extends bon_de_commande_cleodis { };
+class bon_de_commande_boulanger extends bon_de_commande_cleodis { };

@@ -12,6 +12,41 @@ class contact_cleodis extends contact {
 	public function __construct() {
 		parent::__construct();
 		$this->table = "contact";
+
+
+		unset($this->colonnes['panel']['adresse_complete_fs']['tel_complet'],
+			  $this->colonnes['panel']['adresse_complete_fs']['email']);
+
+		$this->colonnes['panel']['pro_fs'] = array(
+			'tel'=>array("quick_update"=>true,"custom"=>true,"tel"=>true),
+			'gsm'=>array("custom"=>true,"tel"=>true),
+			'fax',
+			'email'=>array("quick_update"=>true)
+		);
+
+		$this->colonnes['panel']['perso_fs'] = array(
+			'tel_perso'=>array("quick_update"=>true,"custom"=>true,"tel"=>true),
+			'gsm_perso'=>array("custom"=>true,"tel"=>true),
+			'email_perso'=>array("quick_update"=>true)
+		);
+
+
+		$this->colonnes['panel']['espace_perso'] = array(
+			'login',
+			'pwd',
+			'pwd_client'
+		);
+
+
+		$this->panels['pro_fs'] = array('nbCols'=>1, 'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+		$this->panels['perso_fs'] = array('nbCols'=>1, 'isSubPanel'=>true,'collapsible'=>true,'visible'=>true);
+		$this->panels['espace_perso'] = array('nbCols'=>2,'collapsible'=>true);
+
+		$this->colonnes['panel']['coordonnees']["pro"]  = array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'pro_fs');
+		$this->colonnes['panel']['coordonnees']["perso"]  = array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'perso_fs');
+
+
+		$this->fieldstructure();
 	}
 
 
@@ -35,6 +70,20 @@ class contact_cleodis extends contact {
 			}
 		}
 
+		if(strlen($infos["contact"]["pwd_client"]) != 64) {
+			if($infos["contact"]["pwd_client"] !== "" && $infos["contact"]["pwd_client"] !== NULL){
+				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd_client"]) == 0){
+					throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				} else {
+					if(strlen($infos["contact"]["pwd_client"]) < 6){
+						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+					}
+				}
+
+				$infos["contact"]["pwd_client"] = hash('sha256',$infos["contact"]["pwd_client"]);
+			}
+		}
+
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
 
@@ -55,9 +104,22 @@ class contact_cleodis extends contact {
 					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 				} else {
 					if(strlen($infos["contact"]["pwd"]) < 6){
-						throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
 					}
 				}
+			}
+		}
+
+		if(strlen($infos["contact"]["pwd_client"]) != 64) {
+			if($infos["contact"]["pwd_client"] !== "" && $infos["contact"]["pwd_client"] !== NULL){
+				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd_client"]) == 0){
+					throw new errorATF("Le mot de passe doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+				} else {
+					if(strlen($infos["contact"]["pwd_client"]) < 6){
+						throw new errorATF("Le mot de passe client doit contenir 6 caractères dont au moins 1 chiffre et 1 majuscule",500);
+					}
+				}
+				$infos["contact"]["pwd_client"] = hash('sha256',$infos["contact"]["pwd_client"]);
 			}
 		}
 
@@ -132,7 +194,16 @@ class contact_cleodis extends contact {
 };
 
 class contact_cleodisbe extends contact_cleodis { };
-class contact_cap extends contact_cleodis { };
+class contact_cap extends contact_cleodis {
+	public function __construct() {
+		parent::__construct();
+		$this->table = "contact";
+
+		unset($this->colonnes['panel']['espace_perso']);
+
+		$this->fieldstructure();
+	}
+};
 
 class contact_midas extends contact_cleodis {
 	public function __construct() {
@@ -164,4 +235,8 @@ class contact_midas extends contact_cleodis {
 	}
 
 };
-?>
+
+
+class contact_bdomplus extends contact_cleodis { };
+class contact_bdom extends contact_cleodis { };
+class contact_boulanger extends contact_cleodis { };

@@ -4,6 +4,7 @@
 * @package Optima
 * @subpackage Absystech
 * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+* @codeCoverageIgnore	
 */
 class html2pdf_att extends html2pdf_optima {
 	/**

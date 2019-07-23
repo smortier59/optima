@@ -1,5 +1,5 @@
 <?
-class stock extends classes_optima {
+class stock_boisethome extends classes_optima {
 	public function __construct() {
 		parent::__construct();
 		$this->colonnes['fields_column'] = array(
@@ -16,7 +16,7 @@ class stock extends classes_optima {
 			,'stock.prix_achat'=>array("aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money")
 			,'total'=>array("custom"=>true,"aggregate"=>array("min","avg","max","sum"),"align"=>"right","renderer"=>"money")
 		);
-		$this->table = __CLASS__;
+		$this->table = "stock";
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->fieldstructure();
 	}

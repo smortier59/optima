@@ -263,4 +263,7 @@ class suivi_cleodis extends suivi {
 
 class suivi_cleodisbe extends suivi_cleodis { };
 class suivi_cap extends suivi_cleodis { };
-?>
+
+class suivi_bdomplus extends suivi_cleodis { };
+class suivi_bdom extends suivi_cleodis { };
+class suivi_boulanger extends suivi_cleodis { };

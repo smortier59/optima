@@ -26,6 +26,3 @@ class formation_devis_fournisseur extends classes_optima {
 		$this->no_update = true;					
 	}
 };
-
-class formation_devis_fournisseur_cleodisbe extends formation_devis_fournisseur { };
-class formation_devis_fournisseur_cap extends formation_devis_fournisseur { };

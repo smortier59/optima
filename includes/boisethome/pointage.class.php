@@ -1,5 +1,5 @@
 <?
-class pointage extends classes_optima {
+class pointage_boisethome extends classes_optima {
 	public function __construct() {
 		parent::__construct();
 		$this->colonnes['fields_column'] = array(
@@ -10,7 +10,7 @@ class pointage extends classes_optima {
 			,'pointage.id_user'
 			,'pointage.id_devis_lot'
 		);
-		$this->table = __CLASS__;
+		$this->table = "pointage";
 		$this->fieldstructure();
 	}
 

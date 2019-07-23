@@ -245,10 +245,10 @@ class devis_absystech extends devis {
 
 	public function _devis_prix($get, $post){
 		$at = $this->devis_prix(true);
-		ATF::define_db("db","extranet_v3_att");
+		ATF::define_db("db","optima_att");
 		ATF::$codename = "att";
 		$att = $this->devis_prix(true);
-		ATF::define_db("db","extranet_v3_absystech");
+		ATF::define_db("db","optima_absystech");
 		ATF::$codename = "absystech";
 
 		return array("at"=>$at, "att"=>$att, "infos"=>array("graph"=>"marge"));

@@ -237,6 +237,62 @@ class devis_cleodis extends devis {
 		}
 	}
 
+	public function recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos){
+		$RUM = "";
+		/*if($affaire["RIB"]){
+			if($infos_AR){
+				foreach ($infos_AR["affaire"] as $key => $value) {
+					$RIB = ATF::affaire()->select($value, "RIB");
+					if(ATF::affaire()->select($value, "RUM")){
+						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
+						$RIB  = str_replace(" ", "", $RIB );
+						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value, "RUM");
+					}
+				}
+			}elseif ($infos_avenant){
+				foreach ($infos_avenant["affaire"] as $key => $value) {
+					$RIB = ATF::affaire()->select($value, "RIB");
+					if(ATF::affaire()->select($value, "RUM")){
+						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
+						$RIB  = str_replace(" ", "", $RIB );
+
+						if($RIB == $affaire["RIB"])	$RUM =  ATF::affaire()->select($value, "RUM");
+					}
+				}
+			}else{
+				ATF::affaire()->q->reset()->where("affaire.id_societe" , $infos['id_societe']);
+				$lesAffaires = ATF::affaire()->select_all();
+
+				foreach ($lesAffaires as $key => $value) {
+					$RIB = ATF::affaire()->select($value, "RIB");
+					if(ATF::affaire()->select($value["affaire.id_affaire"], "RUM")){
+						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
+						$RIB  = str_replace(" ", "", $infos["RIB"] );
+
+						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
+					}
+				}
+			}
+		}*/
+		if($affaire["IBAN"] && $affaire["BIC"]){
+			ATF::affaire()->q->reset()->where("IBAN", $affaire["IBAN"], "AND")
+								 ->where("BIC", $affaire["BIC"], "AND")
+								 ->where("affaire.id_societe", $infos["id_societe"], "AND");
+
+			$affaire_trouve = ATF::affaire()->select_row();
+
+			log::logger($affaire_trouve, "mfleurquin");
+
+			if($affaire_trouve){
+				$RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
+			}
+		}
+
+
+		return $RUM;
+
+	}
+
 	/**
 	* Surcharge de l'insert afin d'insérer les lignes de devis de créer l'affaire si elle n'existe pas
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -341,48 +397,57 @@ class devis_cleodis extends devis {
 		ATF::db($this->db)->begin_transaction();
 //*****************************Transaction********************************
 
+		if($infos["IBAN"]){
+			$affaire["IBAN"] = $infos["IBAN"];
+			unset($infos["IBAN"]);
+		}
+
+		if($infos["BIC"]){
+			$affaire["BIC"] = $infos["BIC"];
+			unset($infos["BIC"]);
+		}
+
+
+
 		$RUM = "";
 		if($infos["type_affaire"]) $affaire["type_affaire"] = $infos["type_affaire"];
-		if($affaire["RIB"]){
-			if($infos_AR){
 
-				foreach ($infos_AR["affaire"] as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value, "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $RIB );
+		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
-						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value, "RUM");
-					}
-				}
-			}elseif ($infos_avenant){
-				foreach ($infos_avenant["affaire"] as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value, "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $RIB );
-
-						if($RIB == $affaire["RIB"])	$RUM =  ATF::affaire()->select($value, "RUM");
-					}
-
-				}
+		if(!$RUM){
+			if(    ATF::societe()->select($infos['id_societe'], 'RUM')
+				&& ATF::societe()->select($infos['id_societe'], 'IBAN') == $affaire["BIC"]
+				&& ATF::societe()->select($infos['id_societe'], 'BIC') == $affaire["IBAN"]){
+				$RUM = ATF::societe()->select($infos['id_societe'], 'RUM');
 			}else{
-				ATF::affaire()->q->reset()->where("affaire.id_societe" , $infos['id_societe']);
-				$lesAffaires = ATF::affaire()->select_all();
+				//Si il n'y a pas de RUM, on en ajoute un pour cette société
+			    $RUM = ATF::societe()->create_rum();
 
-				foreach ($lesAffaires as $key => $value) {
-					$RIB = ATF::affaire()->select($value, "RIB");
-					if(ATF::affaire()->select($value["affaire.id_affaire"], "RUM")){
-						$affaire["RIB"] = str_replace(" ", "", $affaire["RIB"]);
-						$RIB  = str_replace(" ", "", $infos["RIB"] );
+			    $societe = ATF::societe()->select($infos['id_societe']);
 
-						if($RIB  == $affaire["RIB"]) $RUM =  ATF::affaire()->select($value["affaire.id_affaire"], "RUM");
+				if($societe['code_client']){
+
+					if(strlen($societe['code_client']) === 6){
+						$RUM .= $societe['code_client'];
+					}elseif(strlen($societe['code_client']) > 6){
+						$RUM .= substr($societe['code_client'], -6);
+					}else{
+						for ($i=0; $i < 6 - strlen($societe['code_client']); $i++) {
+							$RUM .= '0';
+						}
+						$RUM .= $societe['code_client'];
 					}
+				}else{
+					$RUM .= '000000';
 				}
+
+
+			    ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "RUM"=>$RUM));
+			    if($affaire["IBAN"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "IBAN"=>$affaire["IBAN"]));
+			    if($affaire["BIC"]) ATF::societe()->u(array("id_societe"=>$infos['id_societe'] , "BIC"=>$affaire["BIC"]));
 			}
 		}
 		$affaire["RUM"] = $RUM;
-
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
@@ -407,13 +472,49 @@ class devis_cleodis extends devis {
 			}
 		}
 
+		if(ATF::$codename === 'cleodis' && $societe['id_famille'] != 9 && $infos["type_contrat"]!=="vente" && !$infos_avenant){
+			//17492 - Frais de dossiers et frais de cession SGEF et BNP - ajouter en produits non visibles
+			$produitSGEFBNP = array('REFI-CESSION-SGEF' ,'REFI-CESSION-BNP', 'REFI-ETUDE-SGEF', 'REFI-ETUDE-BNP');
+		}else{
+			$produitSGEFBNP = array();
+		}
+
+
 		//Lignes non visibles
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["devis_ligne__dot__visible"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
+				foreach ($produitSGEFBNP as $kpsb => $vpsb) {
+					if($infos_ligne_non_visible[$key]["devis_ligne__dot__ref"] === $vpsb){
+						unset($produitSGEFBNP[$kpsb]);
+					}
+				}
 			}
 		}
+
+		foreach ($produitSGEFBNP as $kpsb => $vpsb) {
+			ATF::produit()->q->reset()->where("ref",$vpsb);
+			$p = ATF::produit()->select_row();
+
+            $infos_ligne[] = array( 'devis_ligne__dot__produit' => $p['produit'],
+						            'devis_ligne__dot__quantite' => '1',
+						            'devis_ligne__dot__type' => $p['type'],
+						            'devis_ligne__dot__ref' => $p['ref'],
+						            'devis_ligne__dot__prix_achat' => $p['prix_achat'],
+						            'devis_ligne__dot__id_produit' => $p['id_produit'],
+						            'devis_ligne__dot__id_fournisseur' => ATF::societe()->select($p['id_fournisseur'], 'societe'),
+						            'devis_ligne__dot__visibilite_prix' => 'invisible',
+						            'devis_ligne__dot__neuf' => 'oui',
+						            'devis_ligne__dot__id_produit_fk' => $p['id_produit'],
+						            'devis_ligne__dot__id_fournisseur_fk' => $p['id_fournisseur'],
+						         	'devis_ligne__dot__visible'=> 'non',
+						         	'devis_ligne_dot_visible_pdf'=> 'non');
+
+
+		}
+
+		log::logger($infos_ligne , "mfleurquin");
 
 		//Lignes
 		if($infos_ligne){
@@ -482,25 +583,33 @@ class devis_cleodis extends devis {
 		}
 
 //*****************************************************************************
-		if($preview){
-			$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
-			ATF::db($this->db)->rollback_transaction();
-			return $this->cryptId($last_id);
+		if(ATF::$codename !== "bdomplus"){
+			if($preview){
+				$this->move_files($last_id,$s,true,$infos["filestoattach"]); // Génération du PDF de preview
+				ATF::db($this->db)->rollback_transaction();
+				return $this->cryptId($last_id);
+			}else{
+				$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
+
+				if(ATF::societe()->select($societe["id_societe"] , "relation") == "suspect"){
+					ATF::societe()->u(array("id_societe"=> $societe["id_societe"] , "relation"=>"prospect"));
+				}
+
+				/* MAIL */
+				//Seulement si le profil le permet
+				if($email){
+					$path=array("devis"=>"fichier_joint");
+					ATF::affaire()->mailContact($email,$last_id,"devis",$path);
+				}
+				ATF::db($this->db)->commit_transaction();
+			}
 		}else{
-			$this->move_files($last_id,$s,false,$infos["filestoattach"]); // Génération du PDF avec les lignes dans la base
-
 			if(ATF::societe()->select($societe["id_societe"] , "relation") == "suspect"){
-				ATF::societe()->u(array("id_societe"=> $societe["id_societe"] , "relation"=>"prospect"));
-			}
-
-			/* MAIL */
-			//Seulement si le profil le permet
-			if($email){
-				$path=array("devis"=>"fichier_joint");
-				ATF::affaire()->mailContact($email,$last_id,"devis",$path);
-			}
+					ATF::societe()->u(array("id_societe"=> $societe["id_societe"] , "relation"=>"prospect"));
+				}
 			ATF::db($this->db)->commit_transaction();
 		}
+
 		if(is_array($cadre_refreshed)){
 			ATF::affaire()->redirection("select",$infos["id_affaire"]);
 		}
@@ -1451,25 +1560,6 @@ class devis_cleodis extends devis {
 							->addJointure("societe","id_owner","user","id_user")
 							->where("user.id_agence",$id_agence);
 
-					/*if($type == "o2m"){
-						$this->q->addCondition("societe.code_client",'%M%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%C%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%BK%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%F%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%Y%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%H%',"OR","nonFinie","LIKE");
-					}elseif($type == "autre"){
-						$this->q->addCondition("societe.code_client",'%M%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%C%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%BK%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%F%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%Y%',"AND","nonFinie","NOT LIKE")
-								->addCondition("societe.code_client",'%H%',"OR","nonFinie","LIKE")
-								->addCondition("societe.code_client",'%S%',"OR","nonFinie","NOT LIKE");
-					}else{
-						$this->q->addCondition("societe.code_client",'%S%',"OR","nonFinie","LIKE");
-					}*/
 
 					if($type == "reseau"){
 						$this->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
@@ -1504,8 +1594,6 @@ class devis_cleodis extends devis {
 
 
 					$annee = $date-3;
-					if($date <2017) $id_agence = 1;
-
 					ATF::stat_snap()->q->reset()->addField("stat_snap.nb","nb")
 												->addField("DATE_FORMAT(`stat_snap`.`date`,'%Y')","year")
 												->addField("DATE_FORMAT(`stat_snap`.`date`,'%m')","month")
@@ -1516,7 +1604,62 @@ class devis_cleodis extends devis {
 												->addOrder("year")->addOrder("month")
 												->where("stat_concerne", "devis-".$type);
 					$res = ATF::stat_snap()->select_all();
+
+					/*for($a=$annee; $a<$date;$a++){
+						for($m=1;$m<=12;$m++){
+							//Resultat precedent
+							ATF::devis()->q->reset()
+								->addField("COUNT(*)","nb")
+								->setStrict()
+								->addJointure("devis","id_societe","societe","id_societe")
+								->addJointure("devis","id_affaire","affaire","id_affaire")
+								->addJointure("societe","id_owner","user","id_user")
+								->where("user.id_agence",$id_agence)
+								->addCondition("devis.devis","%lcd%" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%avenant%","AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%vente%","AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%AVT%","AND", "conditiondevis", "NOT LIKE")
+								->addCondition("devis.devis","%MIPOS%","AND", "conditiondevis", "NOT LIKE")
+
+								->addCondition("devis.type_contrat","vente","AND", "conditiondevis", "!=")
+								->addCondition("devis.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+
+								->addCondition("devis.etat",'gagne',"AND","conditiondevis","=")
+								->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+								->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+
+								->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%Y')","year")
+								->addField("DATE_FORMAT(`devis`.`first_date_accord`,'%m')","month")
+
+								->addGroup("year")->addGroup("month")
+								->addOrder("year")->addOrder("month")
+
+								->addCondition("`devis`.`first_date_accord`",$a."-".$m."-01","AND",false,">=")
+								->addCondition("`devis`.`first_date_accord`",$a."-".$m."-31","AND",false,"<");
+
+							if($type == "reseau"){
+								ATF::devis()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+										    ->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
+							}else{
+								ATF::devis()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
+										    ->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
+							}
+							$r[$a][$m] = ATF::devis()->select_row();
+						}
+					}
+
+					foreach ($r as $ky => $value) {
+						foreach ($value as $k => $v) {
+							$res[] = array(
+										"nb"=> $v["nb"],
+										"year"=> $v["year"],
+										"month"=> $v["month"]
+									);
+						}
+					}*/
 				}
+
+
 
 
 				if($widget){
@@ -1569,7 +1712,7 @@ class devis_cleodis extends devis {
 					}
 
 					$totalPrec = 0;
-					if($type == "o2m"){	$objectif = $agence["objectif_devis_reseaux"]; }
+					if($type == "o2m" ||$type == 'reseau'){	$objectif = $agence["objectif_devis_reseaux"]; }
 					else{ 	$objectif = $agence["objectif_devis_autre"]; }
 
 					foreach ($avg as $key => $value) {
@@ -1655,5 +1798,20 @@ class devis_midas extends devis_cleodis {
 
 class devis_cleodisbe extends devis_cleodis { };
 
+class devis_bdomplus extends devis_cleodis {
 
-?>
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+
+		unset($this->colonnes['fields_column']["fichier_joint"]);
+		unset($this->colonnes['fields_column']["retourBPA"]);
+		unset($this->files["fichier_joint"]);
+		unset($this->files["retourBPA"]);
+
+		$this->fieldstructure();
+
+	}
+
+};
+class devis_bdom extends devis_cleodis { };
+class devis_boulanger extends devis_cleodis { };

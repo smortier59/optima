@@ -91,6 +91,61 @@ class pdf_absystech extends pdf {
 		$r = $this->useTemplate($tplIdx, -5, -10, 220, 0, true);
 	}
 
+	/**
+	* Echéancier des tickets hotline par mois
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function hotline_echeancier($id){
+		$date_debut = ATF::_r("date_debut") ? ATF::_r("date_debut") : date('Y-m-01');
+		
+		$date_fin = ATF::_r("date_fin") ? ATF::_r("date_fin") : date("Y-m-d");
+				
+		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","N°")
+								  ->addField("hotline.hotline","Résumé")
+								  ->addField("gestion_ticket.date","Date")
+								  ->addField("facture.ref","Facture")
+								  ->addField("CONCAT(contact.prenom,' ',contact.nom)","Contact")
+								  ->addField("CONCAT(user.prenom,' ',user.nom)","Contact Absystech")
+								  ->addField("gestion_ticket.nbre_tickets","Crédits")
+								  ->addField("gestion_ticket.solde","Solde")
+								  ->addCondition("gestion_ticket.id_societe",ATF::societe()->decryptId($id))
+								  ->addCondition("gestion_ticket.date",$date_fin,"AND",false,"<=")
+								  ->addCondition("gestion_ticket.date",$date_debut,"AND",false,">=")
+								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
+								  ->addJointure("gestion_ticket","id_facture","facture","id_facture")
+								  ->addJointure("hotline","id_contact","contact","id_contact")
+								  ->addJointure("hotline","id_user","user","id_user")
+								  ->setStrict()
+								  ->addOrder("gestion_ticket.date");
+		// ATF::gestion_ticket()->q->setToString();
+		// log::logger(ATF::gestion_ticket()->sa(), "qjanon");
+		// ATF::gestion_ticket()->q->unsetToString();
+
+		$tickets = ATF::gestion_ticket()->sa();
+		$id_societe = $id;
+
+		$this->Open();
+		$this->Addpage();
+		$this->setleftmargin(10);
+		$this->setrightmargin(15);
+		$this->setfont('arial','',15);
+
+		$this->multicell(0,5,"RECAPITULATIF HOTLINE ".ATF::societe()->nom($id)." du ".$date_debut." au ".$date_fin,0, "C");
+		$this->ln(10);
+		$this->setfont('arial','',10);
+
+		$this->multicell(0,5,count($tickets)." occurences trouvées");
+		$this->ln(5);
+
+		foreach ($tickets as $k=>$i) {
+			$data[] = array_values($i);
+		}
+
+		$head = array_keys($tickets[0]);
+
+		$this->tableau($head,$data,array(10,50,30,20,25,25,15,15));
+	}
+
 
 	public function facture($id,&$s) {
 		$id = ATF::facture()->decryptId($id);
@@ -583,6 +638,10 @@ class pdf_absystech extends pdf {
 		}
 	}
 
+	// Retourne TRUE si on ne doit pas signer avec le nom/prenom
+	public function nePasSignerMonNom($id_user) {
+		return in_array(ATF::user()->select($id_user,'login'),array("aduquesne","rviseux","psorriaux","ppersyn"));
+	}
 
 	public function devis_normal($id){
 		$infos_devis = ATF::devis()->select($id);
@@ -762,7 +821,11 @@ class pdf_absystech extends pdf {
 		$this->ln(5);
 		$this->setx(15);
 		$this->multicell(0,5,ATF::politesse()->nom($infos_devis['id_politesse_post']));
-		$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
+			$this->multicell(0,5,"",0,'R');
+		} else {
+			$this->multicell(0,5,$infos_user['civilite'].". ".$infos_user['nom']." ".$infos_user['prenom'],0,'R');
+		}
 
 		$this->pied($infos_societe);
 
@@ -794,7 +857,11 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT COMMERCIAL :",0,1);
 		$this->setfont('arial','',10);
-		$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+		if ($this->nePasSignerMonNom($infos_user["id_user"])) {
+			$this->cell(0,5,"",0,1);
+		} else {
+			$this->cell(0,5,ATF::user()->nom($infos_user["id_user"]),0,1);
+		}
 		$this->ln(5);
 		$this->setfont('arial','U',10);
 		$this->cell(60,5,"CONTACT TECHNIQUE :",0,1);

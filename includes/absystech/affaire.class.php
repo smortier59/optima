@@ -36,7 +36,7 @@ class affaire_absystech extends affaire {
 			,'affaire.date'
 			,'affaire.forecast'=>array("renderer"=>"progress","rowEditor"=>"forecastUpdate","width"=>100)
 			,'marge'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
-			,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
+			//,'margenette'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"margeBrute","type"=>"decimal","width"=>100)
 			,'marge_commandee'=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"/*,"stddev","variance"*/),"align"=>"right","renderer"=>"money","type"=>"decimal","width"=>100)
 			,'pourcent'=>array("renderer"=>"percent","custom"=>true,"aggregate"=>array("avg","min","max"),"width"=>80)
 		);
@@ -105,18 +105,18 @@ class affaire_absystech extends affaire {
 		$this->q
 			->addJointure("affaire","id_affaire","commande","id_affaire")
 			->addJointure("affaire","id_affaire","facture","id_affaire")
-			->addJointure("affaire","id_affaire","hotline","id_affaire")
-			->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
+			//->addJointure("affaire","id_affaire","hotline","id_affaire")
+			//->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
 
 			->addGroup("affaire.id_affaire")
 			->addField("(SUM(facture.prix)
 							 -IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`))","marge")
-			->addField("(SUM(facture.prix)
+			/*->addField("(SUM(facture.prix)
 						-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)
 						-IF(COUNT(`hotline`.`id_hotline`)=0,
 							0,
 								(SUM(`hotline_interaction`.`credit_presta`)+SUM(`hotline_interaction`.`credit_dep`))*".__COUT_HORAIRE_TECH__.")
-							)","margenette")
+							)","margenette")*/
 			->addField("IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, commande.prix-`commande`.`prix_achat`)","marge_commandee")
 			->addField("(SUM(facture.prix)-IF(`commande`.`prix_achat` IS NULL OR `commande`.`etat` = 'annulee', 0, `commande`.`prix_achat`)) / SUM(facture.prix)","pourcent")
 			->setView(array("align"=>array("marge"=>"right","pourcent"=>"center")));
@@ -596,6 +596,7 @@ class affaire_absystech extends affaire {
 
 	/** Recupere les devis des 30 derniers jours pour l'afficher sur le graph en page d'accueil
 	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+	* @codeCoverageIgnore
 	*/
 	public function widget_marge_nette(){
 		$this->q->reset()
@@ -807,6 +808,7 @@ class affaire_absystech extends affaire {
 	* @param $get array contient le tri, page limit et potentiellement un id.
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
+	* @codeCoverageIgnore	
 	*/
 	public function _GET($get,$post) {
 		if ($c = ATF::$usr->get('contact')) {
@@ -817,18 +819,27 @@ class affaire_absystech extends affaire {
 		return $return;
 	}
 
+	/**
+	* @codeCoverageIgnore	
+	*/
 	public function _getJalons($get) {
 		if ($c = ATF::$usr->get('contact')) {
 			return ATF::affaire_partenaire()->getJalons($get);
 		}
 	}
 
+	/**
+	* @codeCoverageIgnore	
+	*/
 	public function _getJalonsHistory($get) {
 		if ($c = ATF::$usr->get('contact')) {
 			return ATF::affaire_partenaire()->getJalonsHistory($get['id']);
 		}
 	}
 
+	/**
+	* @codeCoverageIgnore	
+	*/
 	public function _addJalon($get, $post) {
 		if ($c = ATF::$usr->get('contact')) {
 			return ATF::affaire_partenaire()->addJalon($post);
@@ -1013,6 +1024,9 @@ class affaire_att extends affaire_absystech {
 class affaire_wapp6 extends affaire_absystech { };
 class affaire_demo extends affaire_absystech { };
 
+/**
+* @codeCoverageIgnore	
+*/
 class affaire_partenaire extends affaire {
 	public $table = "affaire";
 	/**
@@ -1054,7 +1068,7 @@ class affaire_partenaire extends affaire {
 			"affaire.etat"=>array(),
 			"affaire.id_societe"=>array(),
 			"affaire.date_fin"=>array(),
-			"devis.id_devis"=>array(),
+			"MAX(devis.id_devis)"=>array("alias"=>"id_devis"),
 			"devis.id_contact"=>array(),
 			'contact.fonction'=>array(),
 			'contact.tel'=>array(),
@@ -1153,10 +1167,6 @@ class affaire_partenaire extends affaire {
 			$this->q->addGroup('affaire.id_affaire');
 		}
 
-		$this->q->setToString();
-		log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true), 'qjanon');
-		$this->q->unsetToString();
-
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 
 		foreach ($data["data"] as $k=>$lines) {
@@ -1179,7 +1189,7 @@ class affaire_partenaire extends affaire {
 			$return = $data['data'][0];
 
 			// On récupère le devis et surtout les lignes
-			$return['materiel'] = ATF::devis_ligne()->ss('id_devis', $return['id_devis_fk']);
+			$return['materiel'] = ATF::devis_ligne()->ss('id_devis', $return['id_devis']);
 
 		}else{
 			header("ts-total-row: ".$data['count']);
@@ -1355,13 +1365,14 @@ class affaire_partenaire extends affaire {
 		$id = ATF::affaire_etat()->insert($toInsert);
 		$id_societe = ATF::affaire()->select($post['id_affaire'], "id_societe");
 		$societe = ATF::societe()->nom($id_societe);
+		$cat = ATF::jalon()->select($post['jalon'], 'category');
 
 		if ($post['sendmail']) {
 			$settings = ATF::settings()->select($post['sendmail']);
 			if ($settings) {
 				if (ATF::mail()->check_mail($settings["mail_to"])) {
 					$mail = array(
-						"objet"=>utf8_decode("Changement d'état de l'installation pour ".$societe)
+						"objet"=>"[".strtoupper($cat)."] Changement d'état de l'installation pour ".$societe
 						,"from"=>"Espace client Absystech <no-reply@absystech.fr>"
 						,"html"=>true
 						,"template"=>'jalon'
@@ -1434,6 +1445,7 @@ class affaire_telescope extends affaire_absystech {
 			"affaire.etat"=>array(),
 			"affaire.id_societe"=>array("visible"=>false),
 			"affaire.affaire"=>array(),
+			"affaire.nature"=>array(),
 			"societe.societe"=>array()
 		);
 

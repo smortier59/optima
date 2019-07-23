@@ -360,6 +360,3 @@ class prolongation extends classes_optima {
 		return true;
 	}
 };
-
-class prolongation_cleodisbe extends prolongation { };
-?>

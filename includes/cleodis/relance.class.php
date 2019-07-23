@@ -140,5 +140,7 @@ class relance_cleodis extends relance {
 
 class relance_cleodisbe extends relance_cleodis { };
 class relance_cap extends relance_cleodis { };
-class relance_exactitude extends relance_cleodis { };
-?>
+
+class relance_bdomplus extends relance_cleodis { };
+class relance_bdom extends relance_cleodis { };
+class relance_boulanger extends relance_cleodis { };

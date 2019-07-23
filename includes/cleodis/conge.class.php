@@ -306,4 +306,8 @@ class conge_cleodis extends conge {
 
 class conge_cleodisbe extends conge_cleodis { };
 class conge_cap extends conge_cleodis { };
-?>
+
+
+class conge_bdomplus extends conge_cleodis { };
+class conge_bdom extends conge_cleodis { };
+class conge_boulanger extends conge_cleodis { };

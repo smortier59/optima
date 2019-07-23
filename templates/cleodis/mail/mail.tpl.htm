@@ -1,72 +1,127 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{ATF::$usr->trans("id_language")}">
-    <head>
-        <!--STYLE DU TEMPLATE-->
-        <style type="text/css">
-        html, body, div { margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; }
-        table td { font-size:14px; }
-        tr.titre > td { font-weight:bold; }
-        </style>
-    </head>
-    <body>
+{if ATF::$codename !="bdomplus"}
+    <?xml version="1.0" encoding="utf-8"?>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{ATF::$usr->trans("id_language")}">
+        <head>
+            <!--STYLE DU TEMPLATE-->
+            <style type="text/css">
+            html, body, div { margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:12px; }
+            table td { font-size:14px; }
+            tr.titre > td { font-weight:bold; }
+            </style>
+        </head>
+        <body>
 
 
 
-        <table cellspacing="0" cellpadding="0" border="0">
-            <tbody>
-                {if ATF::$codename == "cleodisbe"}
-                    {if $infos.template !== "demande_refi"}
-                        <td valign="top" style="width:640px;">
-                            <center>
-                                <img style="width:200px;" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodisbe/belgique.gif")}"/>
-                            </center>
-                        </td>
+            <table cellspacing="0" cellpadding="0" border="0">
+                <tbody>
+                    {if ATF::$codename == "cleodisbe"}
+                        {if $infos.template !== "demande_refi"}
+                            <td valign="top" style="width:640px;">
+                                <center>
+                                    <img style="width:200px;" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodisbe/belgique.gif")}"/>
+                                </center>
+                            </td>
+                        {/if}
                     {/if}
-                {/if}
 
-                <tr>
-                    <!--TEXTE DU TEMPLATE-->
-                    <td align="left" valign="top" style="width:640px;">
-                        <!--SI TEMPLATE SPECIFIQUE EXISTE-->
-                        {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
-                            <br />{include file="mail/{$infos.template}.tpl.htm"}
-                        <!--SINON PAR DEFAUT ON MET LE CONTENUE DE 'texte'-->
-                        {else}
-                            {$infos["texte"]}
-                        {/if}
-                    </td>
-                </tr>
-                {if $infos.template !== "demande_refi"}
-                <tr>
-                    <!--ICI SIGNATURE DE L'UTILISATEUR-->
-                    <td align="left" valign="top" style="width:640px;">
-                        <br />Cordialement {ATF::user()->nom(ATF::$usr->getId())}.
-                    </td>
-                </tr>
-               <tr>
-                    <!--LOGO DE LA SOCIETE-->
-                    <td align="left">
-                        <br />
-                        {if ATF::$codename == "cap"}
-                            {$societe=ATF::societe()->select(1)}
-                            <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}"/>
-                        {else}
-                            {$societe=ATF::societe()->select(246)}
-                            <img src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodis/bottom_new.jpg")}"/>
-                        {/if}
-                        <br /><br />
-                    </td>
-                </tr>
-                <tr>
-                    <!--INFO DE LA SOCIETE-->
-                    <td align="left">
-                        {$societe.adresse} - {$societe.cp} {$societe.ville} - {ATF::pays()->nom($societe.id_pays)}<br />
-                        Tél : {$societe.tel} - Fax : {$societe.fax}
-                    </td>
-                </tr>
-                {/if}
-            </tbody>
-        </table>
-    </body>
-</html>
+                    <tr>
+                        <!--TEXTE DU TEMPLATE-->
+                        <td align="left" valign="top" style="width:640px;">
+                            <!--SI TEMPLATE SPECIFIQUE EXISTE-->
+                            {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
+                                <br />{include file="mail/{$infos.template}.tpl.htm"}
+                            <!--SINON PAR DEFAUT ON MET LE CONTENUE DE 'texte'-->
+                            {else}
+                                {$infos["texte"]}
+                            {/if}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td width="165" style="width:112.5pt;padding:7.5pt 7.5pt 7.5pt 7.5pt">
+                            <p style="line-height:105%">
+                                {if ATF::$codename == "cap"}
+                                    {$societe=ATF::societe()->select(1)}
+                                     <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cap/cap.png")}" alt="CAP Recouvrement">
+                                {else}
+                                    {$societe=ATF::societe()->select(246)}
+                                    <a href="http://cleodis.com/">
+                                        <span style="color:blue; text-decoration:none">
+                                            <img border="0" width="145" height="145" src="{$emailObj->addEmbeddedImage("{ATF::$staticserver}images/design/mail/cleodis/cleodis_v3.png")}" alt="Cleodis">
+                                        </span>
+                                    </a>
+                                {/if}
+                            </p>
+                        </td>
+                        <td style="padding:1.5pt 1.5pt 1.5pt 1.5pt">
+                            <p  style="line-height:105%">
+                                <b>
+                                    <span style="font-size:10.5pt;line-height:105%;color:#073851;">
+                                        {ATF::user()->nom(ATF::$usr->getId())}
+                                    </span>
+                                </b>
+                            </p>
+
+                            <p  style="line-height:105%">
+                                <b><span style="font-size:8.5pt;line-height:105%;color:#073851;">&nbsp;<br>
+                                Bureau / </span></b>
+                                <b>
+                                    <span style="font-size:8.5pt;line-height:105%;color:#073851;">
+                                        {$societe.tel}
+                                    </span>
+                                </b>
+                            </p>
+                            <p style="line-height:105%">
+                                {$user = ATF::user()->select(ATF::$usr->getId())}
+                                <b>
+                                    <span style="font-size:8.5pt;line-height:105%;color:#5CB000;">
+                                        <span style="color:#073851;text-decoration:none">
+                                            {$user["email"]}
+                                        </span>
+                                    </span>
+                                </b>
+                                <b>
+                                    <span style="font-size:8.5pt;line-height:105%;color:#5CB000;">
+                                    <br>
+                                    <br>
+                                    </span>
+                                </b>
+                                <b>
+                                    <span style="font-size:8.5pt;line-height:105%;color:#5CB000;">
+                                        <a href="{{$societe.web}}">
+                                            <span style="color:#5CB000;text-decoration:none">
+                                                {{$societe.web}}
+                                            </span>
+                                        </a>
+                                    </span>
+                                </b>
+                            </p>
+                            <p  style="line-height:105%">
+                                <span style="font-size:8.5pt;line-height:105%;color:#073851;">
+                                    {$societe.adresse} - {$societe.cp} {$societe.ville} - {ATF::pays()->nom($societe.id_pays)}
+                                </span>
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </body>
+    </html>
+{else}
+    {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
+        {include file="mail/bdom/header.tpl.htm"}
+        {include file="mail/{$infos.template}.tpl.htm"}
+        {include file="mail/bdom/footer.tpl.htm"}
+    {else}
+        {$infos["texte"]}
+    {/if}
+{/if}
+

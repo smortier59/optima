@@ -35,8 +35,8 @@ class produit_cleodis extends produit {
 	function __construct() {
 		parent::__construct();
 		$this->table = "produit";
-		$this->colonnes['fields_column'] = array('produit.produit','produit.type','produit.ref','produit.id_fournisseur','produit.prix_achat'=>array("width"=>80,"rowEditor"=>"setInfos"),'produit.etat');
-		$this->colonnes['primary']=array('ref','produit','etat','commentaire');
+		$this->colonnes['fields_column'] = array('produit.produit','produit.type','produit.ref','produit.id_fournisseur','produit.prix_achat'=>array("width"=>80,"rowEditor"=>"setInfos"),'produit.etat','produit.id_document_contrat');
+		$this->colonnes['primary']=array('ref','produit','etat','commentaire','id_document_contrat');
 		$this->colonnes['panel']['caracteristiques']=array('prix_achat','id_fabriquant','type','id_sous_categorie','id_fournisseur','obsolete');
 		$this->colonnes['panel']['uc']=array('id_produit_besoins','id_produit_type','id_processeur','id_produit_puissance','id_produit_ram','id_produit_dd','id_produit_lecteur','id_produit_lan','id_produit_OS','id_produit_garantie_uc');
 		$this->colonnes['panel']['ecran']=array('id_produit_typeecran','id_produit_viewable','id_produit_garantie_ecran');
@@ -101,6 +101,7 @@ class produit_cleodis extends produit {
 		$this->foreign_key['id_produit_garantie_uc'] =  "produit_garantie";
 		$this->foreign_key['id_produit_garantie_ecran'] =  "produit_garantie";
 		$this->foreign_key['id_produit_garantie_imprimante'] =  "produit_garantie";
+		$this->foreign_key['livreur'] =  "fabriquant";
 
 		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 		$this->files["photo1"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
@@ -551,6 +552,19 @@ class produit_cleodis extends produit {
 		return $this->select_all();
 	}
 
+	/**
+	* Retour tous les packs où l'on trouve le produit
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*/
+	public function getPacks($id_produit) {
+		ATF::pack_produit_ligne()->q->reset()
+			->addField('id_pack_produit')
+			->where('id_produit', $id_produit);
+		return ATF::pack_produit_ligne()->sa();
+	}
+
+
+
 };
 
 class produit_cleodisbe extends produit_cleodis { };
@@ -660,108 +674,9 @@ class produit_cap extends produit {
 
 };
 
-class produit_exactitude extends produit {
-
-	// Mapping prévu pour un autocomplete sur produit
-	public static $autocompleteMapping = array(
-		array("name"=>'produit', "mapping"=>0),
-		array("name"=>'ref', "mapping"=>1),
-		array("name"=>'prix_achat', "mapping"=>2),
-		array("name"=>'prix', "mapping"=>3),
-		array("name"=>'id', "mapping"=>4)
-	);
-
-	function __construct() {
-		parent::__construct();
-		$this->table = "produit";
-		$this->colonnes['fields_column'] = array('produit.produit','produit.ref','produit.prix_achat','produit.etat');
-		$this->colonnes['primary']=array('ref','produit','commentaire');
-		$this->colonnes['panel']['caracteristiques']=array('prix_achat');
-		$this->colonnes['panel']['site_web']=array('description', 'avis_expert', 'type_offre','visible_sur_site',"prix");
+class produit_bdomplus extends produit_cleodis { };
+class produit_bdom extends produit_cleodis { };
+class produit_boulanger extends produit_cleodis {
 
 
-		$this->autocomplete = array(
-			"field"=>array("produit","ref")
-			,"show"=>array("produit","ref")
-			,"popup"=>array("produit","ref")
-		);
-		$this->colonnes["speed_insert"] = array('ref');
-		$this->colonnes["speed_insert1"] = array(
-			 'produit'
-			,'prix_achat'
-			,'commentaire'
-			,"prix"
-		);
-
-		$this->panels['caracteristiques'] = array('nbCols'=>2,'visible'=>true);
-		$this->panels['site_web'] = array('nbCols'=>2,'visible'=>true);
-
-		$this->fieldstructure();
-		$this->files["photo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
-	}
-
-	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-		$this->infoCollapse($infos);
-		$this->q->reset()->addCondition("ref",$infos["ref"])->setCount();
-		$count=$this->sa();
-
-		$infos["url"] = util::mod_rewrite($infos["produit"]);
-
-		if($count["count"]>0) throw new errorATF("Cette Ref existe déjà !",987);
-		return parent::insert($infos,$s,$files,$cadre_refreshed,$nolog);
-	}
-
-	/**
-    * Surcharge de la méthode autocomplete pour faire apparaître les produits déjà insérés par l'utilisateur
-    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $infos
-    * @return int  id si enregistrement ok
-    */
-	function autocomplete($infos) {
-		// Récupérer les produits
-		$this->q->reset()
-			->addField("produit.produit")
-			->addField("produit.ref","ref")
-			->addField("produit.prix_achat","prix_achat")
-			->addField("produit.prix","prix")
-			->addField("produit.id_produit","id")
-			->addField("produit.id_produit","id_produit_fk");
-		return parent::autocomplete($infos,false);
-	}
-
-	public function speed_insert_template(&$infos){
-		if($infos["id_produit"] && $infos["id_produit"]!="undefined"){
-			$produit=$this->select($infos["id_produit"]);
-			foreach($produit as $key=>$item){
-				ATF::_r($key,$item);
-			}
-		}
-		return parent::speed_insert_template($infos);
-	}
-
-	/**
-	* Surcharge du speed_insert pour pouvoir renvoyer les champs voulus
-	* Utilisation d'un querier d'insertion
-	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-	* @param array $infos Simple dimension des champs à insérer, multiple dimension avec au moins un $infos[$this->table]
-	* @param array &$s La session
-	* @param array $files $_FILES
-	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
-	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
-	* @version 3
-	* @return boolean TRUE si cela s'est correctement passé
-	*/
-	public function speed_insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL,$nolog=false) {
-		$last_id = $this->insert($infos,$s,$files,$cadre_refreshed,$nolog);
-		$result["nom"]=$this->nom($last_id);
-		$result["id"]=$last_id;
-		$this->q->reset()
-				->addCondition("id_".$this->table,$last_id)
-				->setDimension("row");
-
-		$result["data"]=$this->sa();
-		return $result;
-	}
-
-};
-?>
+ };

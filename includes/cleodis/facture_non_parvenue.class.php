@@ -39,7 +39,3 @@ class facture_non_parvenue extends classes_optima {
     }
 
 };
-
-class facture_non_parvenue_cleodisbe extends facture_non_parvenue { };
-class facture_non_parvenue_cap extends facture_non_parvenue { };
-?>

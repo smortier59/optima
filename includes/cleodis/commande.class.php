@@ -17,7 +17,7 @@ class commande_cleodis extends commande {
 			,'specificDate'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommande","width"=>330)
 //			,'specificDateRestitution'=>array("custom"=>true,"nosort"=>true,"renderer"=>"dateCleCommandeRestitution","width"=>290)
 			,'commande.id_affaire'
-			,'commande.id_societe'
+			,'code_client'=>array("custom"=>true)
 			//,'commande.etat'=>array("renderer"=>"etat","width"=>40)
 			,'commande.etat'
 			,'files'=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfCommande","width"=>90) //PDF en Fraçcais
@@ -152,6 +152,11 @@ class commande_cleodis extends commande {
 	 */
 	public function _contratPartenaire($get,$post) {
 		if ($apporteur = ATF::$usr->get("contact")) {
+
+			// Gestion du tri
+			if (!$get['tri'] || $get['tri'] == 'action') $get['tri'] = "commande.ref";
+			if (!$get['trid']) $get['trid'] = "desc";
+
 			ATF::commande()->q->reset()
 				//->addField('affaire.*, loyer.*')
 				->addJointure("commande","id_societe","societe","id_societe")
@@ -186,7 +191,7 @@ class commande_cleodis extends commande {
 				ATF::commande()->q->where("commande.date_arret", $get["filters"]["enddate"]);
 			}
 
-			if($commande = ATF::commande()->sa()){
+			if($commande = ATF::commande()->sa($get['tri'],$get['trid'])){
 				$limitTime = date("Y-m-d", strtotime("-13 month", time())); // date du jour - 13 mois
 				foreach ($commande as $key => $cmd) {
 					$commande[$key]["solde_renouvelant"] = new DateTime($limitTime) < new DateTime($cmd["date_debut"]) ? "Non" : "Oui";
@@ -403,7 +408,8 @@ class commande_cleodis extends commande {
 
 		//*****************************Transaction********************************
 
-		$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
+		if(ATF::$codename != "bdomplus"){
+			$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
 									   "id_user"=>$infos["id_user"],
 									   "origine"=>"societe_commande",
 									   "tache"=>"Relancer le contrat ",
@@ -414,7 +420,10 @@ class commande_cleodis extends commande {
 									  ),
 						"dest"=>$dest
 					  );
-		$id_tache = ATF::tache()->insert($tache);
+			$id_tache = ATF::tache()->insert($tache);
+
+		}
+
 
 		unset($infos["marge"],$infos["marge_absolue"]);
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
@@ -428,6 +437,7 @@ class commande_cleodis extends commande {
 
 		// Mise à jour du forecast
 		if(ATF::$codename == "cleodisbe") $affaire = new affaire_cleodisbe($infos['id_affaire']);
+		elseif(ATF::$codename == "bdomplus") $affaire = new affaire_bdomplus($infos['id_affaire']);
 		else $affaire = new affaire_cleodis($infos['id_affaire']);
 
 		$affaire->majForecastProcess();
@@ -444,6 +454,7 @@ class commande_cleodis extends commande {
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["commande_ligne__dot__visible"]="non";
+				$infos_ligne_non_visible[$key]["commande_ligne__dot__visible_pdf"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
 			}
 		}
@@ -1334,6 +1345,7 @@ class commande_cleodis extends commande {
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
 		$this->q
 			->addField("commande.id_affaire")
+			->addField("societe.code_client","code_client")
 			->addField("commande.date_debut")
 			->addField("commande.date_evolution")
 			->addField("commande.retour_contrat")
@@ -1372,17 +1384,26 @@ class commande_cleodis extends commande {
 				$return['data'][$k]['bdcExist'] = false;
 			}
 			//Check l'existence de création de demande refi
-			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"]) || $affaire['nature']=="vente") {
+			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false) || $affaire['nature']=="vente") {
 				$return['data'][$k]['demandeRefiExist'] = true;
 			} else {
 				$return['data'][$k]['demandeRefiExist'] = false;
 			}
 			//Check affichage de création de facture
-			if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
-				$return['data'][$k]['factureAllow'] = true;
-			} else {
-				$return['data'][$k]['factureAllow'] = false;
+			if(ATF::$codename == "bdomplus"){
+				if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist']) {
+					$return['data'][$k]['factureAllow'] = true;
+				} else {
+					$return['data'][$k]['factureAllow'] = false;
+				}
+			}else{
+				if (($i["commande.date_debut"] || $affaire['nature']=="vente") && $return['data'][$k]['bdcExist'] && $return['data'][$k]['demandeRefiExist']) {
+					$return['data'][$k]['factureAllow'] = true;
+				} else {
+					$return['data'][$k]['factureAllow'] = false;
+				}
 			}
+
 			$return['data'][$k]['id_affaireCrypt'] = ATF::affaire()->cryptId($i['commande.id_affaire_fk']);
 
             // check des fichiers courriers types
@@ -1446,17 +1467,68 @@ class commande_cleodis extends commande {
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande_fk"]);
 						unset($ligne_commande);
+						$cle=0;
 						foreach($commande_ligne as $k=>$i){
-							$ligne_commande[]=array(
-												"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id"=>$i["id_commande_ligne"]
+
+							if($i["quantite"] > 1){
+								$n = 1;
+								for($n=1; $n<=$i["quantite"];$n++){
+									$cle++;
+									$ligne_commande[]=array(
+												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
+												,"leaf"=>true
+												,"prix"=>$i["prix_achat"]
+												,"quantite"=>1
+												,"icon"=>ATF::$staticserver."images/blank.gif"
+												,"checked"=>false
+										);
+								}
+							}else{
+								$cle++;
+								$ligne_commande[]=array(
+												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+												,"id_commande_ligne"=>$i["id_commande_ligne"]
+												,"id"=>$cle
 												,"leaf"=>true
 												,"prix"=>$i["prix_achat"]
 												,"quantite"=>$i["quantite"]
 												,"icon"=>ATF::$staticserver."images/blank.gif"
 												,"checked"=>false
 										);
+							}
+
+
 						}
+
+
+
+
+						/*foreach($commande_ligne as $k=>$i){
+							$ligne_commande[]=array(
+									"text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+									,"id"=>$i["id_commande_ligne"]
+									,"leaf"=>true
+									,"prix"=>$i["prix_achat"]
+									,"quantite"=>$i["quantite"]
+									,"icon"=>ATF::$staticserver."images/blank.gif"
+									,"checked"=>false
+							);
+
+							/*for($n=1;$n<=$i["quantite"]; $n++){
+								$ligne_commande[]=array(
+										"text"=>$i["produit"]." ".$i["ref"]." (1)"
+										,"id"=>$i["id_commande_ligne"]
+										,"leaf"=>true
+										,"prix"=>$i["prix_achat"]
+										,"quantite"=>1
+										,"icon"=>ATF::$staticserver."images/blank.gif"
+										,"checked"=>false
+								);
+							}*/
+
+						//}
 
 						if ($ligne_commande) {
 							$commande[]=array(
@@ -2398,8 +2470,6 @@ class commande_cleodis extends commande {
 
 					$result= parent::select_all();
 
-					$this->q->setToString();
-					log::logger(parent::select_all() , "mfleurquin");
 
 
 					$annee = $date-3;
@@ -2414,6 +2484,63 @@ class commande_cleodis extends commande {
 												->addOrder("year")->addOrder("month")
 												->where("stat_concerne", "mep-".$type);
 					$res = ATF::stat_snap()->select_all();
+
+					/*$annee = $date-3;
+					for($a=$annee; $a<$date;$a++){
+						for($m=1;$m<=12;$m++){
+
+							ATF::commande()->q->reset()
+								->addField("COUNT(*)","nb")
+								->setStrict()
+								->addJointure("commande","id_societe","societe","id_societe")
+								->addJointure("commande","id_affaire","affaire","id_affaire")
+								->addJointure("societe","id_owner","user","id_user")
+								->where("user.id_agence",$id_agence)
+
+								->addCondition("commande.etat","prolongation" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","AR" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","arreter" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","vente" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","restitution" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","mis_loyer_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","prolongation_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+								->addCondition("commande.etat","restitution_contentieux" ,"AND", "conditiondevis", "NOT LIKE")
+
+								//->addCondition("affaire.etat","terminee","AND","conditiondevis","!=")
+								->addCondition("affaire.etat","perdue","AND","conditiondevis","!=")
+
+								->addCondition("commande.ref","%avt%","AND", "conditiondevis", "NOT LIKE")
+
+								->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%Y')","year")
+								->addField("DATE_FORMAT(`commande`.`mise_en_place`,'%m')","month")
+
+								->addGroup("year")->addGroup("month")
+								->addOrder("year")->addOrder("month")
+
+								->addCondition("`commande`.`mise_en_place`",$a."-".$m."-01","AND",false,">=")
+								->addCondition("`commande`.`mise_en_place`",$a."-".$m."-31","AND",false,"<");
+
+
+							if($type == "reseau"){
+								ATF::commande()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","NOT LIKE")
+									    		->addCondition("societe.code_client",NULL,"AND","nonFinie","IS NOT NULL");
+							}else{
+								ATF::commande()->q->addCondition("societe.code_client",'%S%',"AND","nonFinie","LIKE")
+									    		->addCondition("societe.code_client",NULL,"OR","nonFinie","IS NULL");
+							}
+							$r[$a][$m] = ATF::commande()->select_row();
+						}
+					}
+
+					foreach ($r as $ky => $value) {
+						foreach ($value as $k => $v) {
+							$res[] = array(
+										"nb"=> $v["nb"],
+										"year"=> $v["year"],
+										"month"=> $v["month"]
+									);
+						}
+					}*/
 				}
 
 
@@ -2471,7 +2598,7 @@ class commande_cleodis extends commande {
 					}
 
 					$totalPrec = 0;
-					if($type == "o2m"){	$objectif = $agence["objectif_devis_reseaux"]; }
+					if($type == "o2m" ||$type== 'reseau'){	$objectif = $agence["objectif_devis_reseaux"]; }
 					else{ 	$objectif = $agence["objectif_devis_autre"]; }
 
 					foreach ($avg as $key => $value) {
@@ -2775,4 +2902,8 @@ class commande_cap extends commande_cleodis {
 
 
 };
-?>
+
+
+class commande_bdomplus extends commande_cleodis { };
+class commande_bdom extends commande_cleodis { };
+class commande_boulanger extends commande_cleodis { };

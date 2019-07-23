@@ -32,7 +32,7 @@ class produit_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertEquals("TU",$produit[0][5],"autocomplete ne renvoie pas le bon produit avec query");
 
 		$produit=$this->obj->autocomplete(array("query"=>"SUPPORT10","limit"=>10,"start"=>0));
-		$this->assertEquals("680.00",$produit[0][2],"autocomplete ne renvoie pas le bon prix sans query");
+		$this->assertEquals("690.00",$produit[0][2],"autocomplete ne renvoie pas le bon prix sans query");
 		$this->assertEquals("SUPPORT10",$produit[0][5],"autocomplete ne renvoie pas le bon produit sans query");
 	}
 

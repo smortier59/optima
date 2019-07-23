@@ -123,9 +123,9 @@ class contact_test extends ATF_PHPUnit_Framework_TestCase {
 		$infos=array("condition_field"=>"contact.id_societe","condition_value"=>ATF::user()->cryptId($this->id_societe));
 		$retour=$this->obj->autocomplete($infos);
 		$this->assertTrue(is_array($retour[0]));
-		$this->assertEquals($retour[0][1],"M contact test unitaire");
+		$this->assertEquals($retour[0][1],"contact test unitaire");
 		$this->assertEquals($retour[0][2],"TestTU");
-		$this->assertEquals($retour[0]["raw_1"],"M contact test unitaire");
+		$this->assertEquals($retour[0]["raw_1"],"contact test unitaire");
 		$this->assertEquals($retour[0]["raw_2"],"TestTU");
 	}	
 	
@@ -135,9 +135,9 @@ class contact_test extends ATF_PHPUnit_Framework_TestCase {
 		$retour=$this->obj->autocompleteAvecMail($infos);
 		$this->assertTrue(is_array($retour[0]));
 		$this->assertEquals($retour[0][0],"debug@absystech.fr","autocompleteAvecMail ne renvoie pas le bon mail");
-		$this->assertEquals($retour[0][2],"M contact test unitaire","autocompleteAvecMail ne renvoie pas le bon nom");
+		$this->assertEquals($retour[0][2],"contact test unitaire","autocompleteAvecMail ne renvoie pas le bon nom");
 		$this->assertEquals($retour[0][3],"TestTU","autocompleteAvecMail ne renvoie pas le bon test");
-		$this->assertEquals($retour[0]["raw_2"],"M contact test unitaire","autocompleteAvecMail ne renvoie pas le bon nom");
+		$this->assertEquals($retour[0]["raw_2"],"contact test unitaire","autocompleteAvecMail ne renvoie pas le bon nom");
 		$this->assertEquals($retour[0]["raw_3"],"TestTU","autocompleteAvecMail ne renvoie pas le bon test");
 	}	
 
@@ -198,7 +198,7 @@ class contact_test extends ATF_PHPUnit_Framework_TestCase {
 		$this->assertFileExists($r,"Le fichcier vcard ne s'est pas créer...");
 
 		$r = $this->obj->createVcard($contact['id_contact'],true,false);
-		$this->assertEquals("0d8a379cd3db0e5a26a8e03915cdffbe",md5(file_get_contents($r)),"Le contenu de la VCARD est vraqué ??! WTF !");
+		$this->assertEquals("5eaacb1b88ff38323130c3af0707dc20",md5(file_get_contents($r)),"Le contenu de la VCARD est vraqué ??! WTF !");
 	}
 
 	/*

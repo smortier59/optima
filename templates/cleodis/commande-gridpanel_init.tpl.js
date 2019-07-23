@@ -341,6 +341,13 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += ATF.usr.trans('creerBDC','commande');
 				html += '</a>&nbsp;&nbsp;&nbsp;';
 				html += '</p>';
+
+				html += '<p>';
+				html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'bon_de_commande,createAllBDC.ajax\',\'id_commande='+id+'\');">';
+				html += '<img src="{ATF::$staticserver}images/module/16/bon_de_commande.png" />';
+				html += ATF.usr.trans('creerAllBDC','commande');
+				html += '</a>&nbsp;&nbsp;&nbsp;';
+				html += '</p>';
 			}
 
 			/* Demande refi Expand */
@@ -438,9 +445,9 @@ ATF.renderer.pdfCourriers=function(table,field) {
                         				Ext.getCmp("type_devis"+id).setVisible(false);
                         				Ext.getCmp("date_echeance"+id).setVisible(false);
                         				Ext.getCmp("rar"+id).setVisible(false);
-                        				Ext.getCmp("num_contrat"+id).setVisible(true);
+                        				Ext.getCmp("num_contrat"+id).setVisible(false);
                         				Ext.getCmp("date_signature"+id).setVisible(true);
-                        				Ext.getCmp("equipement"+id).setVisible(true);
+                        				Ext.getCmp("equipement"+id).setVisible(false);
                         			}else if(field.value =="lettreBelfius"){
                         				Ext.getCmp("bdc"+id).setVisible(false);
                         				Ext.getCmp("reprise_magasin"+id).setVisible(false);

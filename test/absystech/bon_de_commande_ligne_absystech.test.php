@@ -179,7 +179,7 @@ class bon_de_commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCas
 		}catch(errorATF $e){
 			$erreur = $e->getCode();
 		}
-		$this->assertEquals(600,$erreur,"ERREUR NON ATTRAPPEE 1");
+		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 1");
 		$bon_de_commande_ligne["quantite"] = 4;
 		//test ref
 		try{
@@ -188,7 +188,7 @@ class bon_de_commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCas
 		}catch(errorATF $e){
 			$erreur = $e->getCode();
 		}
-		$this->assertEquals(600,$erreur,"ERREUR NON ATTRAPPEE 2");
+		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 2");
 		$bon_de_commande_ligne["ref"] = "REF_bon_de_commande";
 		try{
 			$this->obj->insert($bon_de_commande_ligne,$this->s);
@@ -196,7 +196,7 @@ class bon_de_commande_ligne_absystech_test extends ATF_PHPUnit_Framework_TestCas
 		}catch(errorATF $e){
 			$erreur = $e->getCode();
 		}
-		$this->assertEquals(600,$erreur,"ERREUR NON ATTRAPPEE 3");
+		$this->assertEquals(12,$erreur,"ERREUR NON ATTRAPPEE 3");
 		///renseignier le prix
 		$bon_de_commande_ligne["prix"] = 200;
 		//insertion apres les tests

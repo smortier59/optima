@@ -431,12 +431,14 @@ class livraison_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			array(
 				"msg"=>"Ancien BL envoyé par email...",
 				"title"=>"",
-				"timer"=>""
+				"timer"=>"",
+				"type"=>"success"
 			),
 			array(
 				"msg"=>"BL regénéré avec succès !",
 				"title"=>"",
-				"timer"=>""
+				"timer"=>"",
+				"type"=>"success"
 			)
 		);
 
@@ -450,7 +452,8 @@ class livraison_absystech_test extends ATF_PHPUnit_Framework_TestCase {
 			array(
 				"msg"=>"L'ancien fichier pdf du BL n'existait pas !",
 				"title"=>"",
-				"timer"=>""
+				"timer"=>"",
+				"type"=>"warning"
 			)
 		);
 		$this->assertEquals($warning,ATF::$msg->getWarnings(),"La warning ne se fait pas");

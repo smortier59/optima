@@ -9,6 +9,10 @@ class tache_lm extends tache {
 		$this->table = "tache";
 		parent::__construct();
 
+		$this->colonnes['primary'][] = "id_affaire";
+
+		$this->fieldstructure();
+
 		$this->addPrivilege("valid");
 	}
 

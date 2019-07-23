@@ -27,20 +27,21 @@ ATF::constante()->setValue("__LAST_SPEEDMAIL_SENDER__",date("Y-m-d H:i:s",time()
 
 /* DEBUT SECTION CRITIQUE */
 $_GET["debug"]=1;
-// Séléction de toute les BDD extranet_v3_*
-$bases = ATF::db()->sql2array("SHOW DATABASES WHERE `Database` LIKE 'extranet_v3_%'");
+// Séléction de toute les BDD optima_*
+$bases = ATF::db()->sql2array("SHOW DATABASES WHERE `Database` LIKE 'optima_%'");
 
 // Commende de lancement du script d'envoi de mail
-$cmd['sender'] = "/usr/bin/php speedmail_sender.php";
+$cmd['sender'] = "/usr/bin/php ".__DIR__."/speedmail_sender.php";
 $db_to_send = NULL;
 foreach ($bases as $k => $i) {
 	if ($tableExist = ATF::db()->sql2array("SHOW TABLES FROM `".$i['Database']."` LIKE 'emailing_%'")) {
-		$strCmd = $cmd['sender']." ".substr($i['Database'],12)." toSent";
+		$db = explode("optima_",$i['Database']); $db=$db[1];
+		$strCmd = $cmd['sender']." ".$db." toSent";
 		echo "\nExecution de la commande : ".$strCmd." ";
 	    $r = `$strCmd`;
 		if (is_numeric($r)) {
 			echo $r." mail(s) a envoyer sur ".$i['Database']."\n";
-			$db_to_send[substr($i['Database'],12)]=$r;
+			$db_to_send[$db]=$r;
 		} else {
 		    echo $r;
 		}
@@ -48,8 +49,8 @@ foreach ($bases as $k => $i) {
 	}
 }
 foreach ($db_to_send as $k => $i) {
-	echo "\nEXECUTION : ".$cmd['sender']." ".$k." ".floor(500/count($db_to_send))."\n";
-	system($cmd['sender']." ".$k." ".floor(500/count($db_to_send)));
+	echo "\nEXECUTION : ".$cmd['sender']." ".$k." ".floor(50/count($db_to_send))."\n";
+	system($cmd['sender']." ".$k." ".floor(50/count($db_to_send)));
 }
 
 /* FIN SECTION CRITIQUE */

@@ -9,9 +9,13 @@ ATF::_s("user",ATF::$usr);
 
 $panier = $_POST["panier"];
 $infos = $_POST["infos"];
+$vente = $_POST["vente"];
 
-if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && $infos["ville"]  &&  $infos["civilite"] && $infos["nom"] && $infos["prenom"] &&  $infos["email"] &&  $infos["tel"]){
 
+log::logger($_POST , "devis_cleodis_insert");
+
+if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && $infos["ville"]  &&  $infos["civilite"] && $infos["nom"] && $infos["prenom"] &&  $infos["email"] &&  $infos["mobile"]){
+    log::logger("Ok", "devis_cleodis_insert");
     try{
         ATF::societe()->q->reset()->where("siret",$infos['siret']);
         $soc = ATF::societe()->select_row();
@@ -94,6 +98,7 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
             unset($value["loyer"]);
 
             foreach ($value as $k => $v) {
+
                 if($v["produit"]){
                     $prod = ATF::produit()->select($v["produit"]);
 
@@ -123,26 +128,30 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
                     $produits_pack = ATF::pack_produit_ligne()->select_all();
 
                     foreach ($produits_pack as $kpp => $vpp) {
-                        $prod = ATF::produit()->select($vpp["id_produit"]);
 
-                        $produits[] = array("devis_ligne__dot__produit"=>$prod["produit"],
-                                            "devis_ligne__dot__quantite"=>$v["quantite"]*$vpp["quantite"],
-                                            "devis_ligne__dot__type"=>$prod["type"],
-                                            "devis_ligne__dot__ref"=>$prod["ref"],
-                                            "devis_ligne__dot__prix_achat"=>$prod["prix_achat"],
-                                            "devis_ligne__dot__id_produit"=>$prod["id_produit"],
-                                            "devis_ligne__dot__id_fournisseur"=>"1FOTEAM",
-                                            "devis_ligne__dot__visibilite_prix"=>$vpp["visibilite_prix"],
-                                            "devis_ligne__dot__visible"=>$vpp["visible"],
-                                            "devis_ligne__dot__date_achat"=>"",
-                                            "devis_ligne__dot__commentaire"=>$prod["commentaire"],
-                                            "devis_ligne__dot__neuf"=>"oui",
-                                            "devis_ligne__dot__id_produit_fk"=>$prod["id_produit"],
-                                            "devis_ligne__dot__id_fournisseur_fk"=>$vpp["id_fournisseur"]);
-                        $prix_achat +=  $vpp["prix_achat"]*($v["quantite"]*$vpp["quantite"]);
+                        if($vpp["id_produit"]){
+                             $prod = ATF::produit()->select($vpp["id_produit"]);
+
+                            $produits[] = array("devis_ligne__dot__produit"=>$prod["produit"],
+                                                "devis_ligne__dot__quantite"=>$v["quantite"]*$vpp["quantite"],
+                                                "devis_ligne__dot__type"=>$prod["type"],
+                                                "devis_ligne__dot__ref"=>$prod["ref"],
+                                                "devis_ligne__dot__prix_achat"=>$prod["prix_achat"],
+                                                "devis_ligne__dot__id_produit"=>$prod["id_produit"],
+                                                "devis_ligne__dot__id_fournisseur"=>"1FOTEAM",
+                                                "devis_ligne__dot__visibilite_prix"=>$vpp["visibilite_prix"],
+                                                "devis_ligne__dot__visible"=>$vpp["visible"],
+                                                "devis_ligne__dot__date_achat"=>"",
+                                                "devis_ligne__dot__commentaire"=>$prod["commentaire"],
+                                                "devis_ligne__dot__neuf"=>"oui",
+                                                "devis_ligne__dot__id_produit_fk"=>$prod["id_produit"],
+                                                "devis_ligne__dot__id_fournisseur_fk"=>$vpp["id_fournisseur"]);
+                            $prix_achat +=  $vpp["prix_achat"]*($v["quantite"]*$vpp["quantite"]);
+                        }
                     }
                 }
             }
+
 
             $devis["prix_achat"] = $prix_achat;
             $devis["prix"] = $prix;
@@ -155,16 +164,40 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
             $data = array("devis"=>$devis, "values_devis"=>$values_devis);
 
 
-            ATF::devis()->insert($data);
+            $id_devis = ATF::devis()->insert($data);
+
+
+            if($vente){
+
+                $tache['tache'] = array(
+                    "tache" => 'Demande de devis de vente par le client',
+                    "id_societe" => $id_societe,
+                    "type_tache" => 'creation_contrat',
+                    "horaire_fin" => date("Y-m-d H:i:s", strtotime("+7 jours")),
+                    "etat" => 'en_cours',
+                    "type" => 'vtodo',
+                    "id_affaire" => ATF::devis()->select($id_devis, "id_affaire")
+                );
+                $tache["no_redirect"] = true;
+                $tache["dest"]=  array(112);
+
+                $id_tache = ATF::tache()->insert($tache);
+                log::logger($id_tache , "devis_cleodis_insert");
+            }
+            $id_affaire = ATF::devis()->select($id_devis, "id_affaire");
+            ATF::affaire()->u(array("id_affaire"=>$id_affaire, "site_associe"=>"location_evolutive","provenance"=>"cleodis"));
+            ATF::affaire()->createTacheAffaireFromSite($id_affaire);
+
         }
 
         return true;
     }catch(errorATF $e){
         print_r($e);
-        die();
+        log::logger($e->getMessage(), "devis_cleodis_insert");
         return $e->getMessage();
     }
 }else{
+    log::logger("Fuck", "devis_cleodis_insert");
     return false;
 }
 
