@@ -910,6 +910,9 @@ class souscription_bdomplus extends souscription_cleodis {
   public $id_user = 116;
   public $codename = "bdomplus";
 
+  public $nb_day = 10; // Nombre de jour pour le decalage des check affaire magasin mensuel
+  public $log_file = "bdomplus/controle_affaire_magasin_facture"; // Fichier de log pour la crontab des controles des statuts facture & affaires magasin
+
   /**
    * Démarrage du contrat ou annulation de l'affaire selon le retour order SLIMPAY
    * @param  Integer $id_affaire      ID de l'affaire
@@ -990,7 +993,7 @@ class souscription_bdomplus extends souscription_cleodis {
       }
 
       if($affaire["affaire.id_magasin"]){
-        log::logger("Affaire Magasin ".$affaire["affaire.ref"], "controle_affaire");
+        log::logger("Affaire Magasin ".$affaire["affaire.ref"], $this->log_file.date("Ymd"));
 
         ATF::affaire_etat()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"])
                                        ->where("etat", "signature_document_ok", "OR")
@@ -1005,17 +1008,17 @@ class souscription_bdomplus extends souscription_cleodis {
 
         if($etats["signature_document_ok"] && $etats["finalisation_souscription"] ){
           if($loyer["frequence_loyer"] == "mois"){
-            log::logger("Affaire Magasin Mensuelle ".$affaire["affaire.ref"], "controle_affaire");
+            log::logger("Affaire Magasin Mensuelle ".$affaire["affaire.ref"], $this->log_file.date("Ymd"));
             $this->demarrageContrat($affaire,$commande);
 
             // Si on est à J+1 et la facture pas payée on envoi un mail au client pour 1er loyer en prelevement + tache à Benjamin pour prelever
-            if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' + 5 days')) == date("Y-m-d")){
-              log::logger("On est à J+1 ", "controle_affaire");
+            if(date("Y-m-d", strtotime($affaire["affaire.date"]. ' +'.$this->nb_day.' days')) == date("Y-m-d")){
+              log::logger("On est à J+".$this->nb_day, $this->log_file.date("Ymd"));
 
               ATF::facture_magasin()->q->reset()->where("id_affaire", $affaire["affaire.id_affaire_fk"]);
               $facture_magasin = ATF::facture_magasin()->select_row();
               if(!$facture_magasin || $facture_magasin["etat"] == "non_recu"){
-                log::logger("Facture Magasin non recu, on crée la tache + envoi du mail au client ", "controle_affaire");
+                log::logger("Facture Magasin non recu, on crée la tache + envoi du mail au client ", $this->log_file.date("Ymd"));
 
                 $this->envoiMailFactureMagNonPayee($affaire,$loyer,$facture_magasin);
 
@@ -1029,7 +1032,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
           }else{
 
-            log::logger("Affaire Magasin Annuelle ".$affaire["affaire.ref"], "controle_affaire");
+            log::logger("Affaire Magasin Annuelle ".$affaire["affaire.ref"], $this->log_file.date("Ymd"));
             // Si on est à J+1
             //if(date("Ymd", strtotime($affaire["affaire.date"]. ' + 1 days')) <= date("Ymd")){
 
@@ -1038,11 +1041,11 @@ class souscription_bdomplus extends souscription_cleodis {
 
               //Si on a la facture de payée (retourné par Boulanger)
               if(!$facture_magasin || $facture_magasin["etat"] == "non_recu"){
-                log::logger("Pas de facture magasin ou facture non recue ", "controle_affaire");
-                //log::logger("Annulation de l'affaire car pas de facture magasin ou facture non recue ", "controle_affaire");
+                log::logger("Pas de facture magasin ou facture non recue ", $this->log_file.date("Ymd"));
+                //log::logger("Annulation de l'affaire car pas de facture magasin ou facture non recue ", $this->log_file.date("Ymd"));
                 //$this->annuleContrat($affaire,$commande, "Facture magasin ".$facture_magasin["ref_facture"]." non reçu");
               }else{
-                log::logger("Facture magasin recu, on demarre le contrat ".$affaire["affaire.ref"], "controle_affaire");
+                log::logger("Facture magasin recu, on demarre le contrat ".$affaire["affaire.ref"]." à la date du ".date("Y-m-01"), $this->log_file.date("Ymd"));
                 $this->demarrageContrat($affaire,$commande);
 
                 ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
@@ -1055,8 +1058,9 @@ class souscription_bdomplus extends souscription_cleodis {
         }else{
           $raison = "La souscription pour cette affaire n'a pas été terminée, voici les étapes : ";
           foreach ($etats as $k_etat => $v_etat) {
-            $raison .= "\n".$k_etat." -> ".(($v_etat == 1) ? "Oui" : "Non") . "\n";
+            $raison .= "\n".$k_etat." -> ".(($v_etat == 1) ? "Oui" : "Non");
           }
+          log::logger($raison, $this->log_file.date("Ymd"));
           //$this->annuleContrat($affaire, $commande, $raison);
         }
       }
@@ -1097,12 +1101,12 @@ class souscription_bdomplus extends souscription_cleodis {
 
             if($facture){
               $f = array("id_facture" => $facture["facture.id_facture"],
-                                       "mode_paiement"=> "cb",
-                                       "etat"=>"payee",
-                                       "date_paiement"=>date("Y-m-d"));
+                         "mode_paiement"=> "cb",
+                         "etat"=>"payee",
+                         "date_paiement"=>date("Y-m-d"));
+
               if($affaire["affaire.id_magasin"]){
                 $f["mode_paiement"] = "pre-paiement";
-                $f["etat"] = "impayee";
               }
               ATF::facture()->u($f);
               ATF::facture()->generatePDF(array("id"=>$f["id_facture"]));
@@ -1454,18 +1458,16 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function check_affaires_magasin(){
-    log::logger("=====================", "controle_affaire");
+    log::logger("=====================", $this->log_file.date("Ymd"));
 
     ATF::affaire()->q->reset()
       ->whereIsNotNull("id_magasin","AND", "affaire")
-      ->where("affaire.etat","commande","AND");
+      ->where("affaire.etat","commande","AND")
+      ->where("affaire.site_associe","bdomplus","AND");
       //->where("affaire.date", date("Y-m-d", strtotime("-1 days")), "AND", "affaire", "=");
       //->where("affaire.date", date("Y-m-d"), "AND", "affaire");
 
     $affaireshier = ATF::affaire()->select_all();
-
-    ATF::affaire()->q->setToString();
-    log::logger(ATF::affaire()->select_all() , "controle_affaire");
 
 
     if($affaireshier){
@@ -1476,14 +1478,18 @@ class souscription_bdomplus extends souscription_cleodis {
         $affaire = ATF::affaire()->select_row();
 
         try{
+          log::logger("---------------------------", $this->log_file.date("Ymd"));
+          log::logger("--Controle de l'affaire ".$affaire["affaire.ref"], $this->log_file.date("Ymd"));
+
           $this->controle_affaire($affaire);
+
         }catch(errorATF $e){
-          log::logger($e->getMessage(), "controle_affaire");
+          log::logger($e->getMessage(), $this->log_file.date("Ymd"));
         }
 
       }
     } else {
-      log::logger("Aucune affaire hier", "controle_affaire");
+      log::logger("Aucune affaire magasin en attente", $this->log_file.date("Ymd"));
     }
   }
 
