@@ -402,7 +402,8 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__visible"=>$packProduitLigne['visible'],
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
             "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_sur_pdf'],
-            "devis_ligne__dot__ordre"=>$produitLoyer['ordre']
+            "devis_ligne__dot__ordre"=>$produitLoyer['ordre'],
+            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur']
           );
         }
 
@@ -697,7 +698,7 @@ class souscription_cleodis extends souscription {
 
       case 'boulanger-cafe':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-         $f = array(
+        $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
         );
       break;

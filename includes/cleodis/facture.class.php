@@ -704,7 +704,7 @@ class facture_cleodis extends facture {
 			$infos["tva"]= "1.2";
 		}
 
-		if(ATF::$codename == "bdomplus") $infos["ref_externe"] = $this->getRefExterne();
+		if(ATF::$codename == "bdomplus" || ATF::$codename = "boulanger") $infos["ref_externe"] = $this->getRefExterne();
 
 
 		ATF::db($this->db)->begin_transaction();

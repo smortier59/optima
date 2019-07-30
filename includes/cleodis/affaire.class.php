@@ -3193,7 +3193,7 @@ class affaire_boulanger extends affaire_cleodis {
 		parent::__construct($table_or_id);
 
 		$this->onglets = array(
-			'affaire_etat'
+			 'affaire_etat'
 			,"sell_and_sign"
 			,'loyer'
 			,'devis'=>array('opened'=>true)
@@ -3207,6 +3207,7 @@ class affaire_boulanger extends affaire_cleodis {
 			,'facture_fournisseur'
 			,'facture_non_parvenue'
 			,'facturation'
+			,'facturation_fournisseur'
 			,'intervention'
 			,'parc'
 			,'livraison'
@@ -3404,5 +3405,5 @@ class affaire_boulanger extends affaire_cleodis {
 		}else{
 			return parent::mailContact($email,$last_id,$table,$paths);
 		}
-	}	
+	}
 };

@@ -65,3 +65,67 @@ ALTER TABLE `tache` ADD FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_soci
 ALTER TABLE `tache` ADD FOREIGN KEY (`id_suivi`) REFERENCES `suivi`(`id_suivi`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ALTER TABLE `tache` ADD FOREIGN KEY (`id_user`) REFERENCES `user`(`id_user`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
+
+
+
+
+################################################################################################################################################
+########                                                                                                                                ########
+########                                              Début Facture fournisseur recurente                                               ########
+########                                                                                                                                ########
+################################################################################################################################################
+CREATE TABLE `facturation_fournisseur` (
+  `id_facturation_fournisseur` mediumint(8) UNSIGNED NOT NULL,
+  `id_affaire` mediumint(8) UNSIGNED NOT NULL,
+  `id_societe` mediumint(8) UNSIGNED NOT NULL,
+  `montant` float(8,2) NOT NULL,
+  `date_debut_periode` date NOT NULL,
+  `date_fin_periode` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `facturation_fournisseur` CHANGE `id_facture_fournisseur` `id_bon_de_commande` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL;
+
+ALTER TABLE `pack_produit_ligne`
+  CHANGE `frequence_fournisseur` `frequence_fournisseur`
+  ENUM('sans','mois','bimestre','trimestre','quadrimestre','semestre','an')
+CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT 'sans' COMMENT 'Frequence ';
+
+ALTER TABLE `devis_ligne` ADD `frequence_fournisseur` ENUM('sans','mois','bimestre','trimestre','quadrimestre','semestre','an') NOT NULL DEFAULT 'sans' COMMENT 'Récurrence des commande fournisseur pour ce produit' AFTER `ordre`;
+ALTER TABLE `commande_ligne` ADD `frequence_fournisseur` ENUM('sans','mois','bimestre','trimestre','quadrimestre','semestre','an') NOT NULL DEFAULT 'sans' COMMENT 'Frequence des commandes fournisseurs' AFTER `ordre`;
+
+
+ALTER TABLE `facturation_fournisseur`
+  ADD PRIMARY KEY (`id_facturation_fournisseur`),
+  ADD KEY `id_affaire` (`id_affaire`),
+  ADD KEY `id_societe` (`id_societe`),
+  ADD KEY `id_bon_de_commande` (`id_bon_de_commande`);
+
+
+ALTER TABLE `pack_produit_fournisseur`
+  ADD PRIMARY KEY (`id_pack_produit_fournisseur`),
+  ADD KEY `id_pack_produit` (`id_pack_produit`),
+  ADD KEY `id_produit` (`id_produit`),
+  ADD KEY `id_fournisseur` (`id_fournisseur`);
+
+ALTER TABLE `pack_produit_fournisseur` MODIFY `id_pack_produit_fournisseur` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `facturation_fournisseur`
+  ADD CONSTRAINT `facturation_fournisseur_ibfk_1` FOREIGN KEY (`id_affaire`) REFERENCES `affaire` (`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `facturation_fournisseur_ibfk_3` FOREIGN KEY (`id_societe`) REFERENCES `societe` (`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `facturation_fournisseur_ibfk_4` FOREIGN KEY (`id_bon_de_commande`) REFERENCES `bon_de_commande` (`id_bon_de_commande`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `facturation_fournisseur` DROP FOREIGN KEY `facturation_fournisseur_ibfk_4`; ALTER TABLE `facturation_fournisseur` ADD CONSTRAINT `facturation_fournisseur_ibfk_4` FOREIGN KEY (`id_bon_de_commande`) REFERENCES `bon_de_commande`(`id_bon_de_commande`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+
+ALTER TABLE `pack_produit_fournisseur`
+  ADD CONSTRAINT `pack_produit_fournisseur_ibfk_1` FOREIGN KEY (`id_pack_produit`) REFERENCES `pack_produit` (`id_pack_produit`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `pack_produit_fournisseur_ibfk_2` FOREIGN KEY (`id_produit`) REFERENCES `produit` (`id_produit`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `pack_produit_fournisseur_ibfk_3` FOREIGN KEY (`id_fournisseur`) REFERENCES `societe` (`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+################################################################################################################################################
+########                                                                                                                                ########
+########                                              Début Facture fournisseur recurente                                               ########
+########                                                                                                                                ########
+################################################################################################################################################

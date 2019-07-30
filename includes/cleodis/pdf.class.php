@@ -5566,6 +5566,44 @@ class pdf_cleodis extends pdf {
 	}
 	*/
 
+
+	// POUR LES FACTURATON FOURNISSEUR
+	/*function grille_BDCSociete($bdcSociete,$s) {
+		$this->grille_client_bon_de_commande($bdcSociete,$s);
+	}
+
+	function grille_BDCCode($bdcCode,$s) {
+		$this->grille_client_bon_de_commande($bdcCode,$s);
+	}
+
+	function grille_BDCDate($bdcDate,$s) {
+		$this->grille_client_bon_de_commande($bdcDate,$s);
+	}
+
+	function grille_client_bon_de_commande($bdc,$s) {
+		log::logger("ICI" , "mfleurquin");
+
+
+		$this->tMargin = 30;
+		//$this->logo = 'cleodis/logo.jpg';
+		$this->grille_client = true;
+		$this->open();
+		$this->addpage();
+		$this->setfont('arial','B',15);
+
+		$this->sety(10);
+
+		$titre="GRILLE DE FACTURATION FOURNISSEUR";
+		$this->multicell(0,10,$titre,0,'C');
+
+
+	}*/
+
+
+
+
+
+
 	public function tableauBigHead($head,$data,$width=false,$c_height=5,$style=false,$limitBottomMargin=270) {
 		$save = $this->headStyle;
 		$newStyleHead = array(
