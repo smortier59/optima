@@ -2340,6 +2340,7 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+		$utilisateur  = ATF::$usr->get("contact");
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2468,6 +2469,20 @@ class affaire_cleodis extends affaire {
 
 			$comite["reponse"] = date("Y-m-d");
 			$comite["validite_accord"] = date("Y-m-d");
+
+
+			$suivi = array(
+				 "id_societe"=>$id_societe
+				,"id_affaire"=>$devis["id_affaire"]
+				,"id_contact"=>$utilisateur["id_contact"]
+				,"type_suivi"=>'devis'
+				,"texte"=>"Création de l'affaire par :\n".$utilisateur["prenom"]." ".$utilisateur["nom"]."\nSociete ".ATF::societe()->select($utilisateur["id_societe"], "societe")
+				,'public'=>'oui'
+				,'suivi_societe'=>NULL
+				,'suivi_notifie'=>NULL
+			);
+			$suivi["no_redirect"] = true;
+			ATF::suivi()->insert($suivi);
 
 
 
