@@ -3040,6 +3040,7 @@ class affaire_bdomplus extends affaire_cleodis {
 		$this->onglets = array(
 			'affaire_etat'
 			,"sell_and_sign"
+			,"facture_magasin"
 			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
@@ -3205,7 +3206,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	// 	$affaire=parent::select($id,$field);
 	// 	// $affaire['licence'] = [];
 	// 	log::logger($id, "qjanon");
-		
+
 	// 	ATF::commande()->q->reset()->where('commande.id_affaire', $id)->setStrict();
 	// 	$commande = ATF::commande()->select_row();
 	// 	log::logger($commande,'qjanon');
@@ -3215,7 +3216,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	// 	if (!$commande_lignes) return $affaire;
 	// 	foreach ($commande_lignes as $k=>$cmdl) {
 	// 		$licence = ATF::licence()->ss("licence.id_commande_ligne", $cmdl['id_commande_ligne']);
-	// 		if ($licence) { 
+	// 		if ($licence) {
 	// 			$affaire['affaire.licence'] = $licence[0]['licence.licence'].", ";
 	// 		}
 	// 	}
