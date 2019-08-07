@@ -17,6 +17,7 @@ class souscription_cleodis extends souscription {
 
   public $id_refinanceur_cleodis = 4;
 
+  public $logFileSouscription = "qjanon";
 
   /*--------------------------------------------------------------*/
   /*                   Constructeurs                              */
@@ -126,36 +127,48 @@ class souscription_cleodis extends souscription {
         $ref_affaire = ATF::affaire()->select_cell();
 
 
-
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
-        $nameVendeur = false;
-        // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)
-        if ($post['vendeur'] && $post['vendeur']!="null" && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
-          log::logger("A priori on aurait un vendeur magasin BDOM !", "souscription");
-          log::logger($post['vendeur'], "souscription");
-          $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
-          // Sélection d'un magasin au hasard
-          $vendeur = json_decode($post['vendeur'], true);
-          ATF::magasin()->q->reset()->where('code', 'F'.$vendeur['siteId'])->setLimit(1);
-          $magasin = ATF::magasin()->select_row();
-          $nameVendeur = $vendeur['displayName'];
-          if (!$magasin) {
-            log::logger("MAGASIN !!NON!! IDENTIFIE avec le siteId / code : ".$vendeur['siteId'].", il faut le créer.", "souscription");
-            $id_magasin = ATF::magasin()->i(array(
-              "magasin"=>$vendeur['siteName'],
-              "code"=>'F'.$vendeur['siteId'],
-              "site_associe"=>$post['site_associe']
-            ));
-            $magasin = ATF::magasin()->select($id_magasin);
+        
+        if ($post['site_associe'] == 'bdomplus' || $post['site_associe'] == 'boulanger') {
+
+          $nameVendeur = false;
+          // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)    
+          if ($post['vendeur'] && $post['vendeur']!="null" && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
+            log::logger("A priori on aurait un vendeur magasin BDOM !", $this->logFileSouscription);
+            log::logger($post['vendeur'], $this->logFileSouscription);
+            $this->envoiMailVendeurABenjamin($affaires, $post['vendeur']);
+            // Sélection d'un magasin au hasard
+            $vendeur = json_decode($post['vendeur'], true);
+            ATF::magasin()->q->reset()->where('code', 'F'.$vendeur['siteId'])->setLimit(1);
+            $magasin = ATF::magasin()->select_row();
+            $nameVendeur = $vendeur['displayName'];
+            if (!$magasin) {
+              log::logger("MAGASIN !!NON!! IDENTIFIE avec le siteId / code : ".$vendeur['siteId'].", il faut le créer.", $this->logFileSouscription);
+              $id_magasin = ATF::magasin()->i(array(
+                "magasin"=>$vendeur['siteName'],
+                "code"=>'F'.$vendeur['siteId'],
+                "site_associe"=>$post['site_associe']
+              ));
+              $magasin = ATF::magasin()->select($id_magasin);
+
+            } else {
+              log::logger("MAGASIN IDENTIFIE avec le siteId / code : ".$vendeur['siteId'], $this->logFileSouscription);
+            }
+            log::logger($magasin['magasin']."(".$magasin['id_magasin'].")", $this->logFileSouscription);
+            $post['id_magasin'] = $magasin['id_magasin'];
 
           } else {
-            log::logger("MAGASIN IDENTIFIE avec le siteId / code : ".$vendeur['siteId'], "souscription");
-          }
-          log::logger($magasin['magasin']."(".$magasin['id_magasin'].")", "souscription");
-          $post['id_magasin'] = $magasin['id_magasin'];
+            log::logger("PAS DE MAGASIN DANS LE POST - ou alors le système n'est pas activé !", $this->logFileSouscription);
+            log::logger($post['vendeur'], $this->logFileSouscription);
+            unset($post['id_magasin']);
 
+          }
+        } else {
+          log::logger("Gestionnaire de reconnaissance du magasin via le SSO non activé sur le site associé suivant : ".$post['site_associe'], $this->logFileSouscription);
+          log::logger($post['vendeur'], $this->logFileSouscription);
         }
+
 
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
@@ -194,12 +207,13 @@ class souscription_cleodis extends souscription {
               $pack_produit['lignes'][$k]['produit'] = ATF::produit()->select($ligne['id_produit']);
             }
           }
-          $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+          // $affToUpdate['snapshot_pack_produit'] = json_encode($pack_produit, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
         }
 
         //Il ne faut pas écraser le RUM si il n'y en a pas sur le client (arrive lors de la 1ere affaire pour ce client)
         //if($societe["RUM"]) $affToUpdate["RUM"]=$societe["RUM"]; //Inutile le travail est fait dans devis->insert()
         ATF::affaire()->u($affToUpdate);
+
 
 
         if ($post['id_panier']) {
@@ -488,23 +502,23 @@ class souscription_cleodis extends souscription {
    * @return [type]       [description]
 
   public function _getSlimpaySteps($post, $get){
-    log::logger("=============================","souscription");
-    log::logger($post,"souscription");
-    log::logger($get,"souscription");
+    log::logger("=============================",$this->logFileSouscription);
+    log::logger($post,$this->logFileSouscription);
+    log::logger($get,$this->logFileSouscription);
 
     $id_affaire = $post["id"];
 
-    log::logger("ID Affaire --> " , "souscription");
-    log::logger($id_affaire , "souscription");
+    log::logger("ID Affaire --> " , $this->logFileSouscription);
+    log::logger($id_affaire , $this->logFileSouscription);
     $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
-    log::logger("ID Societe : " , "souscription");
-    log::logger($id_societe , "souscription");
+    log::logger("ID Societe : " , $this->logFileSouscription);
+    log::logger($id_societe , $this->logFileSouscription);
 
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
 
-    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],"souscription");
+    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],$this->logFileSouscription);
     switch ($post['site_associe']) {
       case 'bdomplus':
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
@@ -529,19 +543,19 @@ class souscription_cleodis extends souscription {
   * @param array $infos Simple dimension des champs à insérer
   */
   public function _signAndGetPDF($post,$get) {
-    log::logger("=============================","souscription");
-    log::logger($post,"souscription");
-    log::logger($get,"souscription");
+    log::logger("=============================",$this->logFileSouscription);
+    log::logger($post,$this->logFileSouscription);
+    log::logger($get,$this->logFileSouscription);
     $tel  = $post["tel"];
     $bic  = $post["bic"];
     $iban = $post["iban"];
     $id_affaire = $post["id"];
 
-    log::logger("ID Affaire --> " , "souscription");
-    log::logger($id_affaire , "souscription");
+    log::logger("ID Affaire --> " , $this->logFileSouscription);
+    log::logger($id_affaire , $this->logFileSouscription);
     $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
-    log::logger("ID Societe : " , "souscription");
-    log::logger($id_societe , "souscription");
+    log::logger("ID Societe : " , $this->logFileSouscription);
+    log::logger($id_societe , $this->logFileSouscription);
 
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
@@ -569,20 +583,20 @@ class souscription_cleodis extends souscription {
     // Gestion du code client
     $codeClient = $societe['code_client'];
 
-    log::logger('CODE CLIENT = '.$codeClient,"souscription");
+    log::logger('CODE CLIENT = '.$codeClient,$this->logFileSouscription);
     if (!$codeClient) {
       // Modification de la société pour lui générer sa ref si elle n'est pas déjà setté
       $codeClient = ATF::societe()->getCodeClient($societe, $post['site_associe']);
       $toUpdate['code_client'] = $codeClient;
-      log::logger('CODE CLIENT = '.$codeClient,"souscription");
+      log::logger('CODE CLIENT = '.$codeClient,$this->logFileSouscription);
     }
     //Si il n'y a pas de num telephone sur la société, on enregistre ce numéro
     if($societe["tel"] === NULL) {
       $toUpdate['tel'] = $tel;
     }
 
-    log::logger('UPDATE SOCIETE',"souscription");
-    log::logger($toUpdate,"souscription");
+    log::logger('UPDATE SOCIETE',$this->logFileSouscription);
+    log::logger($toUpdate,$this->logFileSouscription);
     ATF::societe()->u($toUpdate);
 
     if (!$societe["id_contact_signataire"]) throw new errorATF("Aucun signataire au niveau de la société", 500);
@@ -590,23 +604,23 @@ class souscription_cleodis extends souscription {
     $contact = ATF::contact()->select($societe["id_contact_signataire"]);
 
     if(!$post["no_check_iban"] || $post["iban"]){
-      log::logger('GET CONTACT',"souscription");
-      log::logger($contact,"souscription");
+      log::logger('GET CONTACT',$this->logFileSouscription);
+      log::logger($contact,$this->logFileSouscription);
 
-      log::logger('CHECK IBAN',"souscription");
-      log::logger($iban,"souscription");
+      log::logger('CHECK IBAN',$this->logFileSouscription);
+      log::logger($iban,$this->logFileSouscription);
 
       $this->checkIBAN($iban);
     }
 
 
-    log::logger('UPDATE CONTACT',"souscription");
-    log::logger(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel),"souscription");
+    log::logger('UPDATE CONTACT',$this->logFileSouscription);
+    log::logger(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel),$this->logFileSouscription);
 
     ATF::contact()->u(array("id_contact"=>$societe["id_contact_signataire"], "gsm"=>$tel));
 
     //On stocke les infos de signature sur l'affaire
-    log::logger('UPDATE AFFAIRE '.$id_affaire,"souscription");
+    log::logger('UPDATE AFFAIRE '.$id_affaire,$this->logFileSouscription);
     ATF::affaire()->u(array('id_affaire'=>$id_affaire,
                             'tel_signature'=> $tel,
                             'mail_signataire'=> $contact["email"],
@@ -618,7 +632,7 @@ class souscription_cleodis extends souscription {
     ATF::commande()->q->reset()->where('commande.id_affaire', $id_affaire);
     $contrat = ATF::commande()->select_row();
 
-    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],"souscription");
+    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],$this->logFileSouscription);
     switch ($post['site_associe']) {
       case 'btwin':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
@@ -855,8 +869,6 @@ class souscription_cleodis extends souscription {
 
     if (!$id) throw new Exception('Il manque l\'identifiant', 500);
     if (!$module) throw new Exception('Il manque le module', 500);
-    log::logger($type, "qjanon");
-    log::logger($post['type'], "qjanon");
     if ($type == 'others') {
       // Ici on va traiter les documents annexe DGS/CGA, ces document doivent se retrouvé dans la GED de l'affaire et non sur l'affaire elle même
       $id_pdf_affaire = ATF::pdf_affaire()->insert(array(
@@ -1277,12 +1289,12 @@ class souscription_bdomplus extends souscription_cleodis {
   }
 
   public function envoiMailVendeurABenjamin($affaires, $vendeur){
-    log::logger("=================envoiMailVendeurABenjamin================", "souscription");
-    log::logger($affaires, "souscription");
+    log::logger("=================envoiMailVendeurABenjamin================", $this->logFileSouscription);
+    log::logger($affaires, $this->logFileSouscription);
 
     if ($vendeur && $affaires) {
       $vendeur = json_decode($vendeur, true);
-      log::logger($vendeur, "souscription");
+      log::logger($vendeur, $this->logFileSouscription);
 
       $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
       $info_mail["recipient"] = "benjamin.tronquit@cleodis.com,BDOMPlusLicence@absystech.fr";
@@ -1295,18 +1307,18 @@ class souscription_bdomplus extends souscription_cleodis {
       $info_mail["objet"] = "Souscription BDOM par un vendeur en magasin";
 
       $mail = new mail($info_mail);
-      log::logger($mail, "souscription");
+      log::logger($mail, $this->logFileSouscription);
 
 
       $send = $mail->send();
-      log::logger($send, "souscription");
+      log::logger($send, $this->logFileSouscription);
     } else {
-      log::logger("Il manque le vendeur ou les références affaires, on envoi pas le mail a Benjamin." , "souscription");
-      log::logger($affaires , "souscription");
-      log::logger($vendeur , "souscription");
+      log::logger("Il manque le vendeur ou les références affaires, on envoi pas le mail a Benjamin." , $this->logFileSouscription);
+      log::logger($affaires , $this->logFileSouscription);
+      log::logger($vendeur , $this->logFileSouscription);
     }
 
-    log::logger("=================FIN envoiMailVendeurABenjamin================", "souscription");
+    log::logger("=================FIN envoiMailVendeurABenjamin================", $this->logFileSouscription);
 
 
   }
@@ -1411,7 +1423,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
 
     if($lignes){
-      log::logger("Produit Installation inclus, on envoi le mail" , "souscription");
+      log::logger("Produit Installation inclus, on envoi le mail" , $this->logFileSouscription);
       if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
         $email = $email_pro;
       }else{
@@ -1488,7 +1500,7 @@ class souscription_bdomplus extends souscription_cleodis {
 
 
     }else{
-      log::logger("Pas d'Installation inclus dans l'offre" , "souscription");
+      log::logger("Pas d'Installation inclus dans l'offre" , $this->logFileSouscription);
     }
   }
 
@@ -1534,4 +1546,9 @@ class souscription_bdomplus extends souscription_cleodis {
 
 };
 class souscription_bdom extends souscription_cleodis { };
-class souscription_boulanger extends souscription_cleodis { };
+class souscription_boulanger extends souscription_cleodis {
+  public $id_user = 116;
+  public $codename = "boulanger";
+
+
+};
