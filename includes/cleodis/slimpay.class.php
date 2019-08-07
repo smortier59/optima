@@ -74,6 +74,73 @@ class slimpay {
     }
 
 
+
+    public function getPaymentIssue(){
+        log::logger("Payment Issue" , "mfleurquin");
+
+        $hapiClient = self::connection();
+        log::logger("--HAPI Client","slimpay.log");
+        log::logger($hapiClient,"slimpay.log");
+
+        // The Relations Namespace
+        $relNs = self::getRelationNamespace();
+
+        $rel = new Hal\CustomRel($relNs . 'search-payment-issues');
+
+        $follow = new Http\Follow(new Hal\CustomRel($rel), 'GET', [
+            'creditorReference' => __CREDITOR_REFERENCE__,
+            'scheme' => 'SEPA.DIRECT_DEBIT.CORE'
+        ]);
+        $collection = $hapiClient->sendFollow($follow);
+
+
+        while ($collection->getState()['page']['totalElements'] > 0) {
+            foreach ($collection->getEmbeddedResources('paymentIssues') as $issue) {
+                log::logger($issue , "mfleurquin");
+
+
+                $issueState = $issue->getState();
+                log::logger('Issue: ' , "mfleurquin");
+                log::logger($issueState , "mfleurquin");
+
+                $id = $issueState['id'];
+                $rejectAmount = $issueState['rejectAmount'];
+                $currency = $issueState['currency'];
+                $returnReasonCode = $issueState['returnReasonCode'];
+
+                // You may need the initial payment which caused the issue
+                $rel = new Hal\CustomRel($relNs . 'get-payment');
+                $follow = new Http\Follow(new Hal\CustomRel($rel), 'GET');
+                $initialPayment = $hapiClient->sendFollow($follow, $issue);
+                $initialPaymentState = $initialPayment->getState();
+                log::logger('Initial payment:' , "mfleurquin");
+                log::logger( $initialPaymentState , "mfleurquin");
+
+                // You may also need the subscriber related to it
+                $rel = new Hal\CustomRel($relNs . 'get-subscriber');
+                $follow = new Http\Follow(new Hal\CustomRel($rel), 'GET');
+                $subscriber = $hapiClient->sendFollow($follow, $initialPayment);
+                $subscriberReference = $subscriber->getState()['reference'];
+                log::logger('Subscriber reference: ' , "mfleurquin");
+                log::logger($subscriberReference , "mfleurquin");
+
+                // Trigger some action regarding this issue
+                // ...
+
+                // Then tell us that you acknowledged this issue so it doesn't show in the search again
+                $rel = new Hal\CustomRel($relNs . 'ack-payment-issue');
+                $follow = new Http\Follow(new Hal\CustomRel($rel), 'POST');
+                $hapiClient->sendFollow($follow, $issue);
+                log::logger("Issue $id of $rejectAmount $currency for reason $returnReasonCode has been acknowledged.", "mfleurquin");
+                log::logger("=========================================.", "mfleurquin");
+            }
+            // Follow the 'self' link to get a fresh list of issues
+            $collection = $hapiClient->refresh($collection);
+        }
+
+    }
+
+
     public function getStatutDebit($id_slimpay){
         $hapiClient = self::connection();
         log::logger("--HAPI Client","slimpay.log");
@@ -96,6 +163,8 @@ class slimpay {
 
 
     public function simulateIssue($mandate, $montant){
+        log::logger("Simulate ISSUE" , "mfleurquin");
+
         $hapiClient = self::connection();
         // The Relations Namespace
         $relNs = self::getRelationNamespace();
@@ -114,9 +183,14 @@ class slimpay {
             ]
         ]
         ));
-        $payment = $hapiClient->sendFollow($follow);
+        //$payment = $hapiClient->sendFollow($follow);
 
+        for ($i = 1; $i <= 14; $i++) {
+            $payment = $hapiClient->sendFollow($follow);
+            log::logger($i." Payment " . $payment->getState()['id'] . ' created.' , "mfleurquin");
+        }
     }
 
 }
 ?>
+

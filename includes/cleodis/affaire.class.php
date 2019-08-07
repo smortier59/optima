@@ -21,8 +21,8 @@ class affaire_cleodis extends affaire {
 			,'affaire.etat'=>array("renderer"=>"etatAffaire","width"=>30)
 			,'commande.etat'=>array("width"=>30,"renderer"=>"etat")
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
-			,'mail_signature'
-			,'mail_document'
+			,'affaire.mail_signature'
+			,'affaire.mail_document'
 			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
 			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
 			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
@@ -1103,6 +1103,7 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? true : false;
 			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? true : false;
 			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? true : false;
+			$return['data'][$k]["dossier_preuve_sell_sign"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"dossier_preuve_sell_sign")) ? true : false;
 
 			if ($i['affaire.nature'] == 'AR') {
 				foreach ($a->getParentAR($i['affaire.id_affaire']) as $k_=>$i_) {
@@ -3052,8 +3053,9 @@ class affaire_bdomplus extends affaire_cleodis {
 		parent::__construct($table_or_id);
 
 		$this->onglets = array(
-			'affaire_etat',
-			'loyer'
+			'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)
@@ -3073,6 +3075,7 @@ class affaire_bdomplus extends affaire_cleodis {
 			,"pdf_affaire"
 		);
 
+		$this->colonnes['primary']['licence'] = array("custom"=>true);
 		$this->fieldstructure();
 	}
 
@@ -3210,10 +3213,30 @@ class affaire_bdomplus extends affaire_cleodis {
 		}else{
 			return parent::mailContact($email,$last_id,$table,$paths);
 		}
-
-
 	}
 
+	// public function select($id,$field=NULL) {
+	// 	if (!$id) return false;
+	// 	$affaire=parent::select($id,$field);
+	// 	// $affaire['licence'] = [];
+	// 	log::logger($id, "qjanon");
+		
+	// 	ATF::commande()->q->reset()->where('commande.id_affaire', $id)->setStrict();
+	// 	$commande = ATF::commande()->select_row();
+	// 	log::logger($commande,'qjanon');
+	// 	if (!$commande['commande.id_commande']) return $affaire;
+	// 	$commande_lignes = ATF::commande_ligne()->ss('commande_ligne.id_commande',$commande[0]['commande.id_commande']);
+
+	// 	if (!$commande_lignes) return $affaire;
+	// 	foreach ($commande_lignes as $k=>$cmdl) {
+	// 		$licence = ATF::licence()->ss("licence.id_commande_ligne", $cmdl['id_commande_ligne']);
+	// 		if ($licence) { 
+	// 			$affaire['affaire.licence'] = $licence[0]['licence.licence'].", ";
+	// 		}
+	// 	}
+
+	// 	return $affaire;
+	// }
 };
 class affaire_bdom extends affaire_cleodis { };
 class affaire_boulanger extends affaire_cleodis { };

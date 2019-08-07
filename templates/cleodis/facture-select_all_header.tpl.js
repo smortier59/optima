@@ -25,7 +25,8 @@
 							  		xtype: 'textfield',
 							        name: 'libelle',
 							        fieldLabel: 'Libellé',
-							        allowBlank: true
+							        allowBlank: true,
+							        value: r.result.libelle
 							  	};
 							  	el.add(cb);
 
@@ -35,7 +36,8 @@
 							        fieldLabel: 'Date de Prélèvement',
 							        name: 'date',
 							        format: 'Y-m-d',
-							        minValue: new Date()
+							        minValue: new Date(),
+							        value: r.result.date_prelevement
 							  	};
 							  	el.add(cb);
 
@@ -58,7 +60,7 @@
 							  	};
 							  	el.add(cb);
 
-								Ext.iterate(r.result, function(key, value) {
+								Ext.iterate(r.result.lignes, function(key, value) {
 									var cb = {
 								  		xtype: "checkbox"
 								  		,boxLabel: "["+key.ref+"]["+key.date+"] "+key.client+" "+key.prix_ttc+" € ("+key.date_periode_debut+" au "+key.date_periode_fin+")"

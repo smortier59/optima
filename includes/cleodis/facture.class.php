@@ -2789,6 +2789,9 @@ class facture_bdomplus extends facture_cleodis {
 	function __construct($table_or_id=NULL) {
 		parent::__construct($table_or_id);
 		$this->fieldstructure();
+
+		$this->onglets = array('facture_ligne','slimpay_transaction');
+
 		$this->addPrivilege("export_bdomplus");
 
 		$this->addPrivilege("aPrelever");
@@ -2941,6 +2944,7 @@ class facture_bdomplus extends facture_cleodis {
 		 	  FROM facture
 			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
 			  AND etat = 'impayee'
+			  AND date_paiement IS NULL
 			  ORDER BY `facture`.`id_societe`, `facture`.`id_affaire`";
 
 		$return = ATF::db()->sql2array($q);
@@ -2953,7 +2957,15 @@ class facture_bdomplus extends facture_cleodis {
 			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
 		}
 
-		return $return;
+		$libelle = "Abonnement BDOM+ ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+
+		$result = array(
+						"libelle"=> $libelle,
+						"date_prelevement"=> date("Y-m-01", strtotime("+1 month")),
+						"lignes" => $return
+					   );
+
+		return $result;
 	}
 
 	/**
@@ -3017,17 +3029,187 @@ class facture_bdomplus extends facture_cleodis {
 			foreach ($data as $key => $value) {
 				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
 				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+
+				log::logger($status , "mfleurquin");
+
 				foreach ($value["id_facture"] as $kfacture => $vfacture) {
-					$this->u(array("id_facture"=>$vfacture,
-								   "id_slimpay"=>$status["id"],
-								   "executionStatus"=>$status["executionStatus"],
-								   "executionDate"=>$status["executionDate"],
-								  )
-							);
+					ATF::slimpay_transaction()->i(array(
+													"id_facture"=> $vfacture,
+													"ref_slimpay" => $status["id"],
+												    "executionStatus"=>$status["executionStatus"],
+												    "date_execution"=>$status["executionDate"],
+												    "retour"=> json_encode($status)
+												   	)
+											 	);
 				}
 			}
 		}
 		return true;
+	}
+
+	/**
+	* Recupere le status SLIMPAY d'une demande de prélèvement et met à jour le status si celui ci à changé
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function statusDebitEnCours(){
+
+		$this->q->reset()->where("facture.date", date("Y-m-d", strtotime("-1 year")), "AND", null, ">=");
+		if($factures = $this->select_all()){
+			foreach ($factures as $kfacture => $vfacture) {
+
+				//On récupère la derniere transaction
+				ATF::slimpay_transaction()->q->reset()->where("id_facture", $vfacture["facture.id_facture"])->addOrder("id_slimpay_transaction", "DESC");
+				$transaction = ATF::slimpay_transaction()->select_all();
+				if($transaction){
+
+					//On récupère la derniere transaction connue (en BDD) pour cette facture
+					$state = ATF::slimpay()->getStatutDebit($transaction[0]["ref_slimpay"]);
+
+					log::logger("Count ".(count($transaction)-1), "mfleurquin");
+					log::logger($state , "mfleurquin");
+
+					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
+					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
+						ATF::slimpay_transaction()->u(array("id_slimpay_transaction"=> $transaction[0]["id_slimpay_transaction"],
+															"executionStatus"=>$state["executionStatus"],
+															"retour"=>json_encode($state)
+													  ));
+
+						//Si le statut de la transaction est rejected, il faut allez rechercher la Transaction rejouée
+						if($state["executionStatus"] === "rejected") {
+							//un suivi sans destinataire "Facture xxxx impayée"
+							$suivis = array("suivi"=> array(
+													"id_societe" => $this->select($vfacture["facture.id_facture"] , "id_societe"),
+													"type" => "note",
+													"date" => date("Y-m-d H:i:s"),
+													"texte" => "Facture ".$this->select($vfacture["facture.id_facture"] , "ref")." impayée",
+													"id_affaire" => $this->select($vfacture["facture.id_facture"] , "id_affaire"),
+													"type_suivi" => "Contrat",
+													"no_redirect" => true,
+													"suivi_notifie"=>array(116)
+											  	)
+											);
+
+							ATF::suivi()->insert($suivis);
+
+						}else{
+							//si le nouveau statut est différent de rejected, on crée une tâche à destination de Benjamin Tronquit "Changement de statut de la facture XXXX. Merci de vérifier".
+							//Ne pas créer de tache si la facture passe en processed
+							if($status["executionStatus"] !== "processed"){
+								$tache = array("tache"=>array(
+											   "id_societe"=> $this->select($vfacture["facture.id_facture"] , "id_societe"),
+		                                       "tache"=>"Changement de statut de la facture ".$this->select($vfacture["facture.id_facture"] , "ref").". Merci de vérifier",
+		                                       "id_affaire"=>$this->select($vfacture["facture.id_facture"] , "id_affaire"),
+		                                       "type_tache"=>"note",
+		                                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+		                                       "no_redirect"=>"true"
+		                                     ),
+					                        "dest"=>array(116)
+		                    			);
+	        					$id_tache = ATF::tache()->insert($tache);
+							}
+
+						}
+
+
+					}
+
+
+
+
+					if($state["replayCount"] == 0) log::logger("Transaction Initiale" , "mfleurquin");
+					if($state["replayCount"] == 1) log::logger("Transaction rejouée 1 fois" , "mfleurquin");
+					if($state["replayCount"] == 2) log::logger("Transaction rejouée 2 fois" , "mfleurquin");
+				}
+
+			}
+		}
+
+
+
+		/*$this->q->reset()->whereIsNotNull("id_slimpay");
+
+		if($factures = $this->select_all()){
+			foreach ($factures as $key => $value) {
+
+				$facture = $this->select($value["facture.id_facture"]);
+
+				$status = ATF::slimpay()->getStatutDebit($facture["id_slimpay"]);
+
+
+				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> " , "StatutDebitSlimpay");
+				log::logger($status , "StatutDebitSlimpay");
+
+				if($facture["executionStatus"] !== $status["executionStatus"]){
+					$this->u(array("id_facture"=>$facture["id_facture"],
+								   "executionStatus"=>$status["executionStatus"]
+								  )
+							);
+
+					if($status["executionStatus"] === "processed") {
+						$this->u(array("id_facture"=>$facture["id_facture"],
+										"etat"=> "payee",
+										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
+									));
+					}
+
+					if($status["executionStatus"] === "rejected") {
+						$this->u(array("id_facture"=>$facture["id_facture"],
+										// "rejet"=>"non_preleve",
+										"date_rejet"=>date("Y-m-d")
+									));
+					}
+
+					if($status["executionStatus"] === "contested") {
+						$this->u(array("id_facture"=>$facture["id_facture"],
+										"rejet"=>"contestation_debiteur",
+										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
+										"etat"=>"impayee",
+										"date_paiement"=> NULL
+									));
+					}
+
+					if($status["executionStatus"] === "rejected") {
+						//un suivi sans destinataire "Facture xxxx impayée"
+						$suivis = array("suivi"=> array(
+												"id_societe" => $this->select($facture["id_facture"] , "id_societe"),
+												"type" => "note",
+												"date" => date("Y-m-d H:i:s"),
+												"texte" => "Facture ".$this->select($facture["id_facture"] , "ref")." impayée",
+												"id_affaire" => $this->select($facture["id_facture"] , "id_affaire"),
+												"type_suivi" => "Contrat",
+												"no_redirect" => true,
+												"suivi_notifie"=>array(18,26)
+										  	)
+										);
+
+						ATF::suivi()->insert($suivis);
+
+					}else{
+						//si le nouveau statut est différent de rejected, on crée une tâche à destination de Benjamin Tronquit et Estelle Tampigny "Changement de statut de la facture XXXX. Merci de vérifier".
+						//Ne pas créer de tache si la facture passe en processed
+						if($status["executionStatus"] !== "processed"){
+							$tache = array("tache"=>array(
+										   "id_societe"=> $this->select($facture["id_facture"] , "id_societe"),
+	                                       "tache"=>"Changement de statut de la facture ".$this->select($facture["id_facture"] , "ref").". Merci de vérifier",
+	                                       "id_affaire"=>$this->select($facture["id_facture"] , "id_affaire"),
+	                                       "type_tache"=>"note",
+	                                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+	                                       "no_redirect"=>"true"
+	                                     ),
+				                        "dest"=>array(18,26)
+	                    			);
+        					$id_tache = ATF::tache()->insert($tache);
+						}
+
+					}
+
+				}
+
+			}
+
+		}*/
+
 	}
 
 };
