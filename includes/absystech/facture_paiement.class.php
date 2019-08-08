@@ -71,7 +71,7 @@ class facture_paiement extends classes_optima {
 			$prix_avoir = abs($avoir["prix"]*$avoir["tva"]);
 			$prix_facture = $facture['prix']*$facture['tva'];
 
-			if ($prix_facture!=$prix_avoir) throw new errorATF("Impossible d'effectuer ce mode de paiement, car le montant (".$prix_facture.") est différend de celui de l'avoir (".$prix_avoir.")");
+			//if ($prix_facture!=$prix_avoir) throw new errorATF("Impossible d'effectuer ce mode de paiement, car le montant (".$prix_facture.") est différend de celui de l'avoir (".$prix_avoir.")");
 
 			$infos['montant'] = $prix_avoir;
 
