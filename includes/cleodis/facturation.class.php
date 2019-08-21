@@ -1023,6 +1023,9 @@ class facturation extends classes_optima {
 				$facturation["ltrimsociete"]=$item["ltrimsociete"];
 				$facturation["ltrimcode_client"]=$item["ltrimcode_client"];
 				$affaire = ATF::affaire()->select($item["id_affaire"]);
+
+				$contact = NULL;
+
 				if($id_facture=$this->insert_facture($affaire,$facturation)){
 					$facturation["id_facture"]=$id_facture;
 					if($id_facture!="montant_zero"){
