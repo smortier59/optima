@@ -72,7 +72,7 @@ class readsoft {
 			foreach($bdc as $c) {
 				array_walk($c,'htmlspecialchars');
 				$xml .= "\n".'<PurchaseOrder>';
-				$xml .= "\n".'<OrderNumber>'.$c['id_'.__FUNCTION__].'</OrderNumber>';
+				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
 				$xml .= "\n".'<SupplierNumber>'.$c['id_fournisseur'].'</SupplierNumber>';
 				$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
 				if ($c['date_reception_fournisseur'])
