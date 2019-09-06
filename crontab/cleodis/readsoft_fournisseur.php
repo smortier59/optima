@@ -132,8 +132,11 @@ class readsoft {
 
 }
 $rs = new readsoft();
-file_put_contents(__DIR__.'/Fournisseurs.xml',$rs->fournisseur());
-file_put_contents(__DIR__.'/Purchaseorders.xml',$rs->bon_de_commande());
+file_put_contents(__DIR__.'../../www/readsoft/Fournisseurs.xml',$rs->fournisseur());
+file_put_contents(__DIR__.'../../www/readsoft/Purchaseorders.xml',$rs->bon_de_commande());
+
+
+
 
 /*
 <xml>
