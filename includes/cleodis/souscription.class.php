@@ -169,7 +169,6 @@ class souscription_cleodis extends souscription {
           log::logger($post['vendeur'], $this->logFileSouscription);
         }
 
-
         // MAJ de l'affaire avec les bons site_associé et le bon etat comité
         $affToUpdate = array(
           "id_affaire"=>$id_affaire,
