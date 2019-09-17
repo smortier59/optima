@@ -4,11 +4,12 @@
 *}
 {$module=hotline}
 {$type = statCleodis}
-<div id="{$module}_statCleodis" class="widget">     
+<div id="{$module}_statCleodis" class="widget">
 </div>
 
 <script type="text/javascript">
 {$data = ATF::hotline()->stats(true,$type)}
+
 
 Ext.onReady(function(){
     var chart = new Highcharts.Chart({
@@ -17,7 +18,7 @@ Ext.onReady(function(){
             type: 'column'
         },
         title: {
-            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+            text: 'Stats CLEODIS'
             ,style :{
                 fontSize: '12px'
             }
@@ -26,16 +27,16 @@ Ext.onReady(function(){
             '#19FF30',
             '#FFCF23',
             '#FF0004'
-            
-                        
+
+
         ],
-       
-        xAxis: {            
+
+        xAxis: {
             categories: [   "{$data['semestres']['semestre'][0]}",
-                            "{$data['semestres']['semestre'][1]}" , 
+                            "{$data['semestres']['semestre'][1]}" ,
                             "{$data['semestres']['semestre'][2]}" ]
         },
-        tooltip: {           
+        tooltip: {
             shared: true
         },
         plotOptions: {
@@ -49,17 +50,20 @@ Ext.onReady(function(){
             }
         },
         series: [
-               {foreach $data["categories"] as $key=>$value}    
-               {       
+               {foreach $data["categories"] as $key=>$value}
+               {
                    type: 'column'
-                   ,name: "{$value}"                   
-                   ,data: [   {$data[$value][0]["dureeH"]} , {$data[$value][1]["dureeH"]} , {$data[$value][2]["dureeH"]}
-                           
-                          ]
-                   
+                   ,name: "{$value}"
+                    {if $data[$value]}
+                        ,data: [  {$data[$value][0]["dureeH"]} , {$data[$value][1]["dureeH"]} , {$data[$value][2]["dureeH"]} ]
+                    {else}
+                        ,data: [ 0 , 0 , 0 ]
+                    {/if}
+
+
                } {if !$key@last},{/if}
-             {/foreach}           
-           ]       
+             {/foreach}
+           ]
     });
 });
 

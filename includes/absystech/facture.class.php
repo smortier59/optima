@@ -465,11 +465,11 @@ class facture_absystech extends facture {
 				throw new errorATF("Pour un avoir, il est obligatoire de renseigner la facture parente",170);
 			}
 
-			$parent = $this->select($infos["id_facture_parente"]);
-			unset($parent['ref']);
+			//$parent = $this->select($infos["id_facture_parente"]);
+			//unset($parent['ref']);
 			//$infos = $parent;
 			$infos["type_facture"]="avoir";
-			$infos['prix'] = 0-$parent["prix"];
+			//$infos['prix'] = 0-$parent["prix"];
 
 			// ATF::commande_facture()->q->reset()->addCondition('id_facture',$infos['id_facture_parente'])->end();
 			// if($id_commande_factures=ATF::commande_facture()->select_all()){
@@ -498,11 +498,13 @@ class facture_absystech extends facture {
 		//*****************************Transaction********************************
 
 			// Affaire
-			$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
-			if ($etat_affaire=="devis" || $etat_affaire=="commande") {
-				$affaire["id_affaire"]=$infos["id_affaire"];
-				$affaire["etat"]="facture";
-				ATF::affaire()->u($affaire,$s);
+			if($infos["id_affaire"]){
+				$etat_affaire=ATF::affaire()->select($infos["id_affaire"],"etat");
+				if ($etat_affaire=="devis" || $etat_affaire=="commande") {
+					$affaire["id_affaire"]=$infos["id_affaire"];
+					$affaire["etat"]="facture";
+					ATF::affaire()->u($affaire,$s);
+				}
 			}
 			unset($infos["affaire_sans_devis_libelle"]);
 

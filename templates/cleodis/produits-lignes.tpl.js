@@ -380,7 +380,6 @@ ATF.buildGridEditor({
 						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse value="non" function=null}
 					{/if}
 				}
-
 				, {
 					header: 'Option Incluse Obligatoire',
 					width:20,
@@ -389,7 +388,6 @@ ATF.buildGridEditor({
 						editor: {include file="generic-gridpanel-combo.tpl.js" key=option_incluse_obligatoire value="oui" function=null}
 					{/if}
 				}
-
 				,{
 					header: 'Afficher sur PDF',
 					width:20,
@@ -401,6 +399,16 @@ ATF.buildGridEditor({
 
 			{/if}
 
+			{if ATF::$codename=="boulanger" && $current_class->table=="pack_produit_ligne"}
+				, {
+					header: 'Récurence fournisseur',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__frequence_fournisseur',
+					{if !$no_update}
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=frequence_fournisseur function=null}
+					{/if}
+				}
+			{/if}
 
 
 			{if $current_class->table=="devis_ligne" && ATF::$codename != "exactitude"}
@@ -420,12 +428,15 @@ ATF.buildGridEditor({
 					})
 				}
 			{/if}
+
+
 			, {
 				header: 'Référence',
 				dataIndex: '{$current_class->table}__dot__ref',
 				width:30,
+			}
 			{if ATF::$codename == "exactitude"}
-				}, {
+				, {
 					header: 'Prix',
 					width:20,
 					dataIndex: '{$current_class->table}__dot__prix',
@@ -441,7 +452,7 @@ ATF.buildGridEditor({
 				}
 			{else}
 				{if $current_class->table==facture_fournisseur_ligne ||  $current_class->table==parc}
-					}, {
+					, {
 						header: 'Prix',
 						width:20,
 						dataIndex: '{$current_class->table}__dot__prix',
@@ -457,7 +468,7 @@ ATF.buildGridEditor({
 						{/if}
 					}
 				{else}
-					}, {
+					, {
 						header: 'Fournisseur',
 						width:50,
 						dataIndex: '{$current_class->table}__dot__id_fournisseur',
@@ -486,36 +497,44 @@ ATF.buildGridEditor({
 					}, {
 						hidden:true,
 						dataIndex: '{$current_class->table}__dot__id_{$current_class->table}'
-					}, {
-						header: 'Px Achat',
-						width:20,
-						dataIndex: '{$current_class->table}__dot__prix_achat',
-						renderer: 'money',
-						{if !$no_update  || $id=='commande[produits_repris]'}
-							editor: new Ext.form.TextField({
-								value:0
-							})
-						{/if}
+					}
+
+					{if $current_class->table != "pack_produit_fournisseur"}
+						, {
+							header: 'Px Achat',
+							width:20,
+							dataIndex: '{$current_class->table}__dot__prix_achat',
+							renderer: 'money',
+							{if !$no_update  || $id=='commande[produits_repris]'}
+								editor: new Ext.form.TextField({
+									value:0
+								})
+							{/if}
+						}
+					{/if}
+
 					{if $current_class->table =='facture_ligne' && ($id == "facture[produits_repris]" || $id== "facture[produits]")}
-						}, {
+						, {
 							header: 'Afficher sur le pdf',
 							width:20,
 							dataIndex: '{$current_class->table}__dot__afficher',
 							editor: {include file="generic-gridpanel-combo.tpl.js" key=afficher function=null}
+						}
 
 					{/if}
 					{if $current_class->table=='devis_ligne' || $current_class->table=='pack_produit_ligne'}
-						}, {
+						, {
 							header: 'Visibilité Prix',
 							width:20,
 							dataIndex: '{$current_class->table}__dot__visibilite_prix',
 							{if !$no_update}
 								editor: {include file="generic-gridpanel-combo.tpl.js" key=visibilite_prix value="oui" function=null}
 							{/if}
+						}
 					{/if}
 
 					{if $current_class->table=='devis_ligne' && !$repris}
-						}, {
+						, {
 							header: 'Neuf',
 							width:20,
 							dataIndex: '{$current_class->table}__dot__neuf',
@@ -538,8 +557,9 @@ ATF.buildGridEditor({
 						}, {
 							hidden:true,
 							dataIndex: '{$current_class->table}__dot__id_affaire_provenance'
+						}
 					{/if}
-					}
+
 					{if $current_class->table=="devis_ligne" || $current_class->table=="commande_ligne"}
 						, {
 							header: 'Commentaire produit',
