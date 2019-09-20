@@ -5,7 +5,7 @@ include(dirname(__FILE__)."/../../global.inc.php");
 	print_r("************************Penser à vérifier les droits de TEMP***********************************");
 }
 */
-		function clean($s){ return str_replace("&","",$s); }
+function clean($s){ return str_replace("&","",$s); }
 
 class readsoft {
 	const HEAD = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -39,13 +39,13 @@ class readsoft {
 		$xml = '<Suppliers>';
 		if ($fournisseurs = ATF::societe()->select_all()) {
 			foreach($fournisseurs as $i) {
-				array_walk($i,'htmlspecialchars');
 				array_walk($i,'clean');
+				array_walk($i,'htmlspecialchars');
 				$xml .= "\n".'<Supplier>';
 				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($i['id_'.__FUNCTION__],'code_fournisseur').'</SupplierNumber>'; // Identifiant du fournisseur dans l’ERP ';
-				$xml .= "\n".'<Name>'.$i['societe'].'</Name>'; // Nom du fournisseur ';
+				$xml .= "\n".'<Name>'.str_replace("&","",$i['societe']).'</Name>'; // Nom du fournisseur ';
 				$xml .= "\n".'<OrganizationNumber>001</OrganizationNumber>'; // Identifiant de la société acheteuse dans l’ERP';
-				$xml .= "\n".'<Street>'.htmlspecialchars($i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : '')).'</Street>'; // Adresse ';
+				$xml .= "\n".'<Street>'.htmlspecialchars(str_replace("&","",$i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : ''))).'</Street>'; // Adresse ';
 				$xml .= "\n".'<PostalCode>'.$i['cp'].'</PostalCode>'; // Code postal';
 				$xml .= "\n".'<City>'.$i['ville'].'</City>'; // Ville';
 				$xml .= "\n".'<CountryName>'.$i['id_pays'].'</CountryName>'; // Code du pays sur 2 caractères (ex. : FR)';
@@ -75,8 +75,8 @@ class readsoft {
 		if ($bdc = ATF::bon_de_commande()->sa()) {
 			foreach($bdc as $c) {
 				if (!$c['id_fournisseur']) continue; // Si aucun fournisseur, READSOFT ne veut pas qu'on exporte la commande
-				array_walk($c,'htmlspecialchars');
 				array_walk($c,'clean');
+				array_walk($c,'htmlspecialchars');
 				$xml .= "\n".'<PurchaseOrder>';
 				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
 				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($c['id_fournisseur'],'code_fournisseur').'</SupplierNumber>';
@@ -90,13 +90,13 @@ class readsoft {
 				if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
 					$xml .= "\n".'<Lines>';
 					foreach($bdcl as $l) {
-						array_walk($l,'htmlspecialchars');
 						array_walk($l,'clean');
+						array_walk($l,'htmlspecialchars');
 						$xml .= "\n".'<PurchaseOrderLine>';
 						$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
 						$xml .= "\n".'<ArticleNumber>'.htmlspecialchars($l['ref']).'</ArticleNumber>';
-						$xml .= "\n".'<SupplierArticleNumber>'.htmlspecialchars($l['ref']).'</SupplierArticleNumber>';
-						$xml .= "\n".'<ArticleDescription>'.htmlspecialchars($l['produit']).'</ArticleDescription>';
+						$xml .= "\n".'<SupplierArticleNumber>'.htmlspecialchars(str_replace("&","",$l['ref'])).'</SupplierArticleNumber>';
+						$xml .= "\n".'<ArticleDescription>'.htmlspecialchars(str_replace("&","",$l['produit'])).'</ArticleDescription>';
 						$cl = ATF::commande_ligne()->select($l['id_commande_ligne']);
 						$p = ATF::produit()->select($cl['id_produit']);
 						$scat = ATF::sous_categorie()->select($p['id_sous_categorie']);
