@@ -33,10 +33,13 @@ class readsoft {
 		ATF::societe()->q->reset()->where("fournisseur","oui")
 //->setLimit(200)
 ;
+		function clean($s){ return str_replace("&","",$s); }
+
 		$xml = '<Suppliers>';
 		if ($fournisseurs = ATF::societe()->select_all()) {
 			foreach($fournisseurs as $i) {
 				array_walk($i,'htmlspecialchars');
+				array_walk($i,'clean');
 				$xml .= "\n".'<Supplier>';
 				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($i['id_'.__FUNCTION__],'code_fournisseur').'</SupplierNumber>'; // Identifiant du fournisseur dans l’ERP ';
 				$xml .= "\n".'<Name>'.$i['societe'].'</Name>'; // Nom du fournisseur ';
@@ -66,12 +69,14 @@ class readsoft {
 //->setLimit(200)
 ;
 		self::setupLast(__FUNCTION__); // Ne pas extraire les données déjà extraites précédemment
+		function clean($s){ return str_replace("&","",$s); }
 
 		$xml = '<PurchaseOrders>';
 		if ($bdc = ATF::bon_de_commande()->sa()) {
 			foreach($bdc as $c) {
 				if (!$c['id_fournisseur']) continue; // Si aucun fournisseur, READSOFT ne veut pas qu'on exporte la commande
 				array_walk($c,'htmlspecialchars');
+				array_walk($c,'clean');
 				$xml .= "\n".'<PurchaseOrder>';
 				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
 				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($c['id_fournisseur'],'code_fournisseur').'</SupplierNumber>';
@@ -85,6 +90,8 @@ class readsoft {
 				if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
 					$xml .= "\n".'<Lines>';
 					foreach($bdcl as $l) {
+						array_walk($l,'htmlspecialchars');
+						array_walk($l,'clean');
 						$xml .= "\n".'<PurchaseOrderLine>';
 						$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
 						$xml .= "\n".'<ArticleNumber>'.htmlspecialchars($l['ref']).'</ArticleNumber>';
