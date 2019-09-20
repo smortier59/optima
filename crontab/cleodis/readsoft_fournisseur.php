@@ -5,6 +5,8 @@ include(dirname(__FILE__)."/../../global.inc.php");
 	print_r("************************Penser à vérifier les droits de TEMP***********************************");
 }
 */
+		function clean($s){ return str_replace("&","",$s); }
+
 class readsoft {
 	const HEAD = '<?xml version="1.0" encoding="UTF-8"?>';
 
@@ -33,7 +35,6 @@ class readsoft {
 		ATF::societe()->q->reset()->where("fournisseur","oui")
 //->setLimit(200)
 ;
-		function clean($s){ return str_replace("&","",$s); }
 
 		$xml = '<Suppliers>';
 		if ($fournisseurs = ATF::societe()->select_all()) {
@@ -69,7 +70,6 @@ class readsoft {
 //->setLimit(200)
 ;
 		self::setupLast(__FUNCTION__); // Ne pas extraire les données déjà extraites précédemment
-		function clean($s){ return str_replace("&","",$s); }
 
 		$xml = '<PurchaseOrders>';
 		if ($bdc = ATF::bon_de_commande()->sa()) {
