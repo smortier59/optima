@@ -41,7 +41,7 @@ class readsoft {
 				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($i['id_'.__FUNCTION__],'code_fournisseur').'</SupplierNumber>'; // Identifiant du fournisseur dans l’ERP ';
 				$xml .= "\n".'<Name>'.$i['societe'].'</Name>'; // Nom du fournisseur ';
 				$xml .= "\n".'<OrganizationNumber>001</OrganizationNumber>'; // Identifiant de la société acheteuse dans l’ERP';
-				$xml .= "\n".'<Street>'.$i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : '').'</Street>'; // Adresse ';
+				$xml .= "\n".'<Street>'.htmlspecialchars($i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : '')).'</Street>'; // Adresse ';
 				$xml .= "\n".'<PostalCode>'.$i['cp'].'</PostalCode>'; // Code postal';
 				$xml .= "\n".'<City>'.$i['ville'].'</City>'; // Ville';
 				$xml .= "\n".'<CountryName>'.$i['id_pays'].'</CountryName>'; // Code du pays sur 2 caractères (ex. : FR)';
@@ -87,8 +87,8 @@ class readsoft {
 					foreach($bdcl as $l) {
 						$xml .= "\n".'<PurchaseOrderLine>';
 						$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
-						$xml .= "\n".'<ArticleNumber>'.$l['ref'].'</ArticleNumber>';
-						$xml .= "\n".'<SupplierArticleNumber>'.$l['ref'].'</SupplierArticleNumber>';
+						$xml .= "\n".'<ArticleNumber>'.htmlspecialchars($l['ref']).'</ArticleNumber>';
+						$xml .= "\n".'<SupplierArticleNumber>'.htmlspecialchars($l['ref']).'</SupplierArticleNumber>';
 						$xml .= "\n".'<ArticleDescription>'.htmlspecialchars($l['produit']).'</ArticleDescription>';
 						$cl = ATF::commande_ligne()->select($l['id_commande_ligne']);
 						$p = ATF::produit()->select($cl['id_produit']);
@@ -133,8 +133,8 @@ class readsoft {
 
 }
 $rs = new readsoft();
-file_put_contents(__DIR__.'../../www/readsoft/Fournisseurs.xml',$rs->fournisseur());
-file_put_contents(__DIR__.'../../www/readsoft/Purchaseorders.xml',$rs->bon_de_commande());
+file_put_contents(__DIR__.'/../../www/readsoft/Fournisseurs.xml',$rs->fournisseur());
+file_put_contents(__DIR__.'/../../www/readsoft/Purchaseorders.xml',$rs->bon_de_commande());
 
 
 
