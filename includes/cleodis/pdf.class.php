@@ -1950,20 +1950,19 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
+		$this->noPageNo = true;
+		$this->unsetHeader();
+		if(!$signature)	$this->Open();
+		$this->AddPage();
 		$this->commandeInit($id,$s,$previsu);
-			$this->noPageNo = true;
-			$this->unsetHeader();
-			$this->commandeInit($id);
-			if(!$signature)		$this->Open();
-			$this->AddPage();
-			$this->A3 = false;
-			$this->A4 = true;
+		$this->A3 = false;
+		$this->A4 = true;
 
 
-			$this->setfont('arial','B',10);
+		$this->setfont('arial','B',10);
 
 		if ($this->client['id_famille'] == 9) {
-		  $this->contratA4Particulier($id, $signature,$sellsign);
+			  $this->contratA4Particulier($id, $signature,$sellsign);
 		} else {
 		  $this->contratA4Societe($id, $signature,$sellsign);
 		}
@@ -13568,11 +13567,6 @@ class pdf_cap extends pdf_cleodis {
 		for($i=0;$i<$n;$i++) $points .= ".";
 		return $points;
 	}
-
-
-
-
-
 };
 
 
@@ -14647,7 +14641,6 @@ class pdf_boulanger extends pdf_cleodis {
 
 		$this->image(__PDF_PATH__.$this->logo,10,10,40);
 
-
 		$this->sety(10);
 		$this->multicell(0,5,"LA SOCIETE",0,'C');
 		$this->setLeftMargin(65);
@@ -14958,16 +14951,16 @@ class pdf_boulanger extends pdf_cleodis {
 		$this->unsetHeader();
 		$this->unsetFooter();
 
-		$fp = __PDF_PATH__."boulanger/CP-CG.pdf";
-		if (file_exists($fp)) $pageCount = $this->setSourceFile(__PDF_PATH__."boulanger/CP-CG.pdf");
+		// $fp = __PDF_PATH__."boulanger/CP-CG.pdf";
+		// if (file_exists($fp)) $pageCount = $this->setSourceFile(__PDF_PATH__."boulanger/CP-CG.pdf");
 
-		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-		  $tplIdx = $this->importPage($pageNo);
+		// for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+		//   $tplIdx = $this->importPage($pageNo);
 
-		  // add a page
-		  $this->AddPage();
-		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-		}
+		//   // add a page
+		//   $this->AddPage();
+		//   $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		// }
 
 
   }
@@ -15268,7 +15261,7 @@ class pdf_boulanger extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"BDOM PLUS\nAVENUE DE LA MOTTE \n59810 LESQUIN - France");
+		$this->multicell(70,4,"BOULANGER\n18 AVENUE DE LA MOTTE \n59810 LESQUIN - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -15331,7 +15324,7 @@ class pdf_boulanger extends pdf_cleodis {
 
 		$this->setY(70);
 		$this->setLeftMargin(5);
-		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) BDOM PLUS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de BDOM PLUS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) BOULANGER à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de BOULANGER.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
 		$this->ln(4);
 		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y", strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))),0,1);
 
