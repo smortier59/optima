@@ -2706,10 +2706,10 @@ class pdf_cleodis extends pdf {
 	* @date 11-02-2011
 	*/
 	public function contratPV($id,$s,$previsu) {
-		$this->commandeInit($id,$s,$previsu);
 		$this->unsetHeader();
 		$this->Open();
 		$this->AddPage();
+		$this->commandeInit($id,$s,$previsu);
 		if ($this->client['id_famille'] == 9) { // Document spécial pour les particuliers
 			$this->contratPVParticulier($id);
 		} else {
@@ -2737,28 +2737,32 @@ class pdf_cleodis extends pdf {
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	*/
 	public function contratPVParticulier($id,$signature=false) {
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+		if (ATF::$codename == "boulanger") {
+			$this->image(__PDF_PATH__.$this->logo,10,10,25);
+		} else {
+			$this->image(__PDF_PATH__.$this->logo,10,10,35);
+		}
 
 		$this->setfont('arial','I',8);
 		//Cadre du haut avec Loueur et Locataire
 		$this->sety(5);
 		$this->setleftMargin(40);
-		$this->cell(30,12,"LE LOUEUR",1,0,'C');
+		$this->cell(30,12,"LE LOUEUR",0,0,'C');
 		$this->multicell(
 			0,4,
 			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
 			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
 			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
-			,1
 		);
-		$this->cell(30,12,"L'ABONNÉ",1,0,'C');
+		$this->cell(30,12,"L'ABONNÉ",'T',0,'C');
 		$this->multicell(
 			0,4,
 			$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["particulier_email"]?"Email: ".$this->client["particulier_email"]:"")."\n".
 			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]
+			,'T'
 		);
 
-		$this->ln(10);
+		$this->sety(40);
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"",0,'C');
 		$this->setleftMargin(15);
