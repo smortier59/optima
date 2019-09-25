@@ -96,6 +96,7 @@ class pdf_cleodis extends pdf {
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
 		} else {
+
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
@@ -4053,7 +4054,6 @@ class pdf_cleodis extends pdf {
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
 		if($this->affaire["type_affaire"] == "2SI"){ $this->logo = 'cleodis/2SI_CLEODIS.jpg'; }
-		else{  $this->logo = 'cleodis/logo.jpg'; }
 
 
 		//Styles utilisés
@@ -14512,15 +14512,14 @@ class pdf_boulanger extends pdf_cleodis {
 	public $GEnteteTextColor = 0;
 	public $BEnteteTextColor = 0;
 
+	public $idSociete = 31456;
+
 
 	/* Header spécifique aux documents cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 12-09-2016
 	*/
 	public function Header() {
-
-
-
 
 		$this->societe = ATF::societe()->select(31458);
 
@@ -14635,7 +14634,7 @@ class pdf_boulanger extends pdf_cleodis {
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe Boulanger vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
 
-		$this->societe = ATF::societe()->select(31458);
+		$this->societe = ATF::societe()->select($this->idSociete);
 
 		parent::Footer();
 
@@ -14969,6 +14968,7 @@ class pdf_boulanger extends pdf_cleodis {
 
   }
 
+
   	/** PDF d'une facture Classique aussi dit 'Autre Facture' - POUR LE BtoC
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 03-07-2018
@@ -14978,16 +14978,13 @@ class pdf_boulanger extends pdf_cleodis {
 			$this->open();
 		}
 		$this->facturePDF = true;
-
 		$this->setHeader();
 		$this->addpage();
 		$this->setMargins(15,30);
 		$this->sety(40);
 
-
-
 		$this->setfont('arial','B',11);
-		$this->cell(35,5,"N° de facture :",0, 0);
+		$this->cell(35,5,"N° de factu".$this->getFooter()."re :",0, 0);
 		$this->setfont('arial','',11);
 		$this->cell(50,5,$this->facture['ref_externe'] ,0 ,1);
 
@@ -15022,15 +15019,11 @@ class pdf_boulanger extends pdf_cleodis {
 
 		$this->settextcolor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',20);
-		$this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+		$this->cell(0,7,"Votre facture Boulanger",0, 1, 'C');
 		$this->setfont('arial','I',11);
 		$this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C');
 		//$this->cell(0,7,"Ce présent document est une facture dont le règlement est en attente",0, 1, 'C');
 		$this->settextcolor(0,0,0);
-
-
-
-
 
 		if ($this->lignes) {
 
@@ -15040,7 +15033,7 @@ class pdf_boulanger extends pdf_cleodis {
 			//Quantite
 			$data[0][0] = "1";
 			if($this->facture['type_facture'] !== "libre") {
-				//Désignation L1
+				// Désignation L1
 				if($this->affaire['nature']=="vente"){
 					$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
 				}else{
@@ -15131,7 +15124,7 @@ class pdf_boulanger extends pdf_cleodis {
 				}
 			}
 
-			$this->tableauBigHead($head,$data,$w,5,$styles);
+			$this->tableau($head,$data,$w,5,$styles);
 
 			if ($this->facture['commentaire']) {
 				$com = array(array("Commentaire : ".$this->facture['commentaire']));
@@ -15230,6 +15223,7 @@ class pdf_boulanger extends pdf_cleodis {
 			$cadre[] = "BIC : ".$this->societe["BIC"];
 			$this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
 		}
+
 	}
 
 
