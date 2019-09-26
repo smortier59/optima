@@ -485,6 +485,7 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__commentaire_produit"=>$value['commentaire'],
           "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
           "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
+          "commande_ligne__dot__frequence_fournisseur"=>$value['frequence_fournisseur'],
           "commande_ligne__dot__ordre"=>$value['ordre']
       );
     }
