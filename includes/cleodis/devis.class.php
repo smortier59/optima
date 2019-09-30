@@ -484,6 +484,7 @@ class devis_cleodis extends devis {
 		if($infos_ligne_non_visible){
 			foreach($infos_ligne_non_visible as $key=>$item){
 				$infos_ligne_non_visible[$key]["devis_ligne__dot__visible"]="non";
+				$infos_ligne_non_visible[$key]["devis_ligne__dot__visible_pdf"]="non";
 				$infos_ligne[]=$infos_ligne_non_visible[$key];
 				foreach ($produitSGEFBNP as $kpsb => $vpsb) {
 					if($infos_ligne_non_visible[$key]["devis_ligne__dot__ref"] === $vpsb){
@@ -510,12 +511,9 @@ class devis_cleodis extends devis {
 						            'devis_ligne__dot__id_fournisseur_fk' => $p['id_fournisseur'],
 						         	'devis_ligne__dot__visible'=> 'non',
 						         	'devis_ligne_dot_visible_pdf'=> 'non');
-
-
 		}
 
-		log::logger($infos_ligne , "mfleurquin");
-
+		log::logger($infos_ligne , "ligne_devis");
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
@@ -526,6 +524,9 @@ class devis_cleodis extends devis {
 					throw new errorATF("Ligne de devis sans fournisseur",882);
 				}
 				unset($item["id_parc"]);
+
+				log::logger($item , "ligne_devis");
+
 				ATF::devis_ligne()->i($item);
 			}
 		}else{
