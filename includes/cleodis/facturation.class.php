@@ -854,14 +854,20 @@ class facturation extends classes_optima {
 
 		//Pour chacune des facturations on envoi un mail au client concerné
 		foreach ($facturation as $key=>$item) {
+			$code_refi = NULL;
 			ATF::facture()->q->reset()->addCondition("type_facture","refi")
 									  ->addCondition("id_affaire",$item["id_affaire"]);
 			$facture_refi = ATF::facture()->sa();
-			if($facture_refi){
-				$code_refi=ATF::refinanceur()->select($facture_refi[0]["id_refinanceur"],"code_refi");
-			}
+
 			//Il faut aussi vérifier que l'affaire ne va pas être céder
 			$demande_refi=ATF::demande_refi()->existDemandeRefi($item["id_affaire"]);
+			if($facture_refi){
+				$code_refi=ATF::refinanceur()->select($facture_refi[0]["id_refinanceur"],"code_refi");
+			}else{
+				if($demande_refi) $code_refi=ATF::refinanceur()->select($demande_refi[0]["id_refinanceur"],"code_refi");
+			}
+
+
 			$contact = NULL;
 
 			if(!$demande_refi || ($demande_refi[0]["date_cession"] && ($demande_refi[0]["date_cession"]>$date_debut)) || $code_refi=="REFACTURATION" || $item["type"]=="prolongation"){
