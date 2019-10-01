@@ -341,6 +341,9 @@ ATF.buildGridEditor({
 					})
 				{/if}
 			}
+
+
+
 			{if $current_class->table=="pack_produit_ligne"}
 				, {
 					header: 'Produit principal ?',
@@ -418,6 +421,8 @@ ATF.buildGridEditor({
 					dataIndex: '{$current_class->table}__dot__type',
 				}
 			{/if}
+
+
 			{if $current_class->table=="pack_produit_ligne"}
 				, {
 					header: 'Ordre',
