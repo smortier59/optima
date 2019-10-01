@@ -9,15 +9,14 @@ class facture_magasin extends classes_optima {
 		$this->table = "facture_magasin";
 
 		$this->colonnes['fields_column'] = array(
-			"facture_non_parvenue.ref_facture"
-			,"facture_non_parvenue.id_affaire"
-			,"facture_non_parvenue.etat"
+			"facture_magasin.ref_facture"
+			,"facture_magasin.id_affaire"
+			,"facture_magasin.etat"
 		);
 
 		$this->fieldstructure();
 
 		$this->no_insert = true;
-		$this->no_update = true;
 		$this->no_delete = true;
 		$this->field_nom = "ref_facture";
 		$this->selectAllExtjs=true;

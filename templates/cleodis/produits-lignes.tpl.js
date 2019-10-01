@@ -341,6 +341,9 @@ ATF.buildGridEditor({
 					})
 				{/if}
 			}
+
+
+
 			{if $current_class->table=="pack_produit_ligne"}
 				, {
 					header: 'Produit principal ?',
@@ -418,6 +421,8 @@ ATF.buildGridEditor({
 					dataIndex: '{$current_class->table}__dot__type',
 				}
 			{/if}
+
+
 			{if $current_class->table=="pack_produit_ligne"}
 				, {
 					header: 'Ordre',
@@ -430,171 +435,157 @@ ATF.buildGridEditor({
 			{/if}
 
 
-			, {
+			,{
 				header: 'Référence',
 				dataIndex: '{$current_class->table}__dot__ref',
 				width:30,
 			}
-			{if ATF::$codename == "exactitude"}
+
+			{if $current_class->table==facture_fournisseur_ligne ||  $current_class->table==parc}
 				, {
 					header: 'Prix',
 					width:20,
 					dataIndex: '{$current_class->table}__dot__prix',
 					renderer: 'money',
-					editor: new Ext.form.TextField({ })
-				}, {
-					header: 'Commentaire produit',
-					width:50,
-					dataIndex: '{$current_class->table}__dot__commentaire',
-					editor: new Ext.form.TextField({
-						value:""
-					})
+					}, {
+					header: 'Serial',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__serial',
+					{if $current_class->table==parc}
+						editor: new Ext.form.TextField({
+							value:0
+						})
+					{/if}
 				}
 			{else}
-				{if $current_class->table==facture_fournisseur_ligne ||  $current_class->table==parc}
+				,{
+					header: 'Fournisseur',
+					width:50,
+					dataIndex: '{$current_class->table}__dot__id_fournisseur',
+					renderer: function (value, metaData, record, rowIndex, colIndex, store){
+						if (value) {
+							var a = value.split(ATF.extJSGridComboboxSeparator);
+							if (a[1]) {
+								record.set('{$current_class->table}__dot__id_fournisseur_fk',a[1]);
+							}
+							{if $id=='devis[produits_repris]'}
+								if(rowIndex===0){
+									Ext.ComponentMgr.get('{$id}').fourniRepris(a[0],a[1]);
+								}
+							{/if}
+							return a[0];
+						}
+					},
+					{if !$no_update}
+						editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_fournisseur function=autocompleteFournisseurs  forceId="id_fournisseur{$id}" extJSGridComboboxSeparator=true},{
+							listWidth:200
+						})
+					{/if}
+				}, {
+					hidden:true,
+					dataIndex: '{$current_class->table}__dot__id_fournisseur_fk'
+				}, {
+					hidden:true,
+					dataIndex: '{$current_class->table}__dot__id_{$current_class->table}'
+				}
+
+				{if $current_class->table != "pack_produit_fournisseur"}
 					, {
-						header: 'Prix',
+						header: 'Px Achat',
 						width:20,
-						dataIndex: '{$current_class->table}__dot__prix',
+						dataIndex: '{$current_class->table}__dot__prix_achat',
 						renderer: 'money',
-						}, {
-						header: 'Serial',
-						width:20,
-						dataIndex: '{$current_class->table}__dot__serial',
-						{if $current_class->table==parc}
+						{if !$no_update  || $id=='commande[produits_repris]'}
 							editor: new Ext.form.TextField({
 								value:0
 							})
 						{/if}
 					}
-				{else}
+				{/if}
+
+				{if $current_class->table =='facture_ligne' && ($id == "facture[produits_repris]" || $id== "facture[produits]")}
 					, {
-						header: 'Fournisseur',
+						header: 'Afficher sur le pdf',
+						width:20,
+						dataIndex: '{$current_class->table}__dot__afficher',
+						editor: {include file="generic-gridpanel-combo.tpl.js" key=afficher function=null}
+					}
+
+				{/if}
+				{if $current_class->table=='devis_ligne' || $current_class->table=='pack_produit_ligne'}
+					, {
+						header: 'Visibilité Prix',
+						width:20,
+						dataIndex: '{$current_class->table}__dot__visibilite_prix',
+						{if !$no_update}
+							editor: {include file="generic-gridpanel-combo.tpl.js" key=visibilite_prix value="oui" function=null}
+						{/if}
+					}
+				{/if}
+
+				{if $current_class->table=='devis_ligne' && !$repris}
+					,{
+						header: 'Neuf',
+						width:20,
+						dataIndex: '{$current_class->table}__dot__neuf',
+						{if !$no_update}
+							editor: {include file="generic-gridpanel-combo.tpl.js" key=neuf function=null}
+						{/if}
+					}, {
+						header: 'Ref SIMAG',
+						width:20,
+						dataIndex: '{$current_class->table}__dot__ref_simag',
+						editor: new Ext.form.TextField({
+							value:""
+						})
+					}
+				{/if}
+
+				{if $repris}
+					, {
+						hidden:true,
+						dataIndex: '{$current_class->table}__dot__id_parc'
+					}, {
+						hidden:true,
+						dataIndex: '{$current_class->table}__dot__id_affaire_provenance'
+					}
+				{/if}
+
+				{if $current_class->table=="devis_ligne" || $current_class->table=="commande_ligne"}
+					, {
+						header: 'Commentaire produit',
 						width:50,
-						dataIndex: '{$current_class->table}__dot__id_fournisseur',
+						dataIndex: '{$current_class->table}__dot__commentaire',
+						editor: new Ext.form.TextField({
+							value:""
+						})
+					}
+				{/if}
+
+				{if $pager=="ProduitsUpdateOptionPartenaire"}
+					, {
+						header: 'Partenaire',
+						dataIndex: '{$current_class->table}__dot__id_partenaire',
 						renderer: function (value, metaData, record, rowIndex, colIndex, store){
 							if (value) {
 								var a = value.split(ATF.extJSGridComboboxSeparator);
 								if (a[1]) {
-									record.set('{$current_class->table}__dot__id_fournisseur_fk',a[1]);
+									record.set('{$current_class->table}__dot__id_partenaire_fk',a[1]);
 								}
-								{if $id=='devis[produits_repris]'}
-									if(rowIndex===0){
-										Ext.ComponentMgr.get('{$id}').fourniRepris(a[0],a[1]);
-									}
-								{/if}
 								return a[0];
 							}
 						},
-						{if !$no_update}
-							editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_fournisseur function=autocompleteFournisseurs  forceId="id_fournisseur{$id}" extJSGridComboboxSeparator=true},{
+						editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_partenaire function=null  forceId="id_partenaire{$id}" extJSGridComboboxSeparator=true},{
 								listWidth:200
-							})
-						{/if}
-					}, {
-						hidden:true,
-						dataIndex: '{$current_class->table}__dot__id_fournisseur_fk'
-					}, {
-						hidden:true,
-						dataIndex: '{$current_class->table}__dot__id_{$current_class->table}'
+						})
 					}
-
-					{if $current_class->table != "pack_produit_fournisseur"}
-						, {
-							header: 'Px Achat',
-							width:20,
-							dataIndex: '{$current_class->table}__dot__prix_achat',
-							renderer: 'money',
-							{if !$no_update  || $id=='commande[produits_repris]'}
-								editor: new Ext.form.TextField({
-									value:0
-								})
-							{/if}
-						}
-					{/if}
-
-					{if $current_class->table =='facture_ligne' && ($id == "facture[produits_repris]" || $id== "facture[produits]")}
-						, {
-							header: 'Afficher sur le pdf',
-							width:20,
-							dataIndex: '{$current_class->table}__dot__afficher',
-							editor: {include file="generic-gridpanel-combo.tpl.js" key=afficher function=null}
-						}
-
-					{/if}
-					{if $current_class->table=='devis_ligne' || $current_class->table=='pack_produit_ligne'}
-						, {
-							header: 'Visibilité Prix',
-							width:20,
-							dataIndex: '{$current_class->table}__dot__visibilite_prix',
-							{if !$no_update}
-								editor: {include file="generic-gridpanel-combo.tpl.js" key=visibilite_prix value="oui" function=null}
-							{/if}
-						}
-					{/if}
-
-					{if $current_class->table=='devis_ligne' && !$repris}
-						, {
-							header: 'Neuf',
-							width:20,
-							dataIndex: '{$current_class->table}__dot__neuf',
-							{if !$no_update}
-								editor: {include file="generic-gridpanel-combo.tpl.js" key=neuf function=null}
-							{/if}
-						}, {
-							header: 'Ref SIMAG',
-							width:20,
-							dataIndex: '{$current_class->table}__dot__ref_simag',
-							editor: new Ext.form.TextField({
-								value:""
-							})
-					{/if}
-
-					{if $repris}
-						}, {
-							hidden:true,
-							dataIndex: '{$current_class->table}__dot__id_parc'
-						}, {
-							hidden:true,
-							dataIndex: '{$current_class->table}__dot__id_affaire_provenance'
-						}
-					{/if}
-
-					{if $current_class->table=="devis_ligne" || $current_class->table=="commande_ligne"}
-						, {
-							header: 'Commentaire produit',
-							width:50,
-							dataIndex: '{$current_class->table}__dot__commentaire',
-							editor: new Ext.form.TextField({
-								value:""
-							})
-						}
-					{/if}
-
-					{if $pager=="ProduitsUpdateOptionPartenaire"}
-						, {
-							header: 'Partenaire',
-							dataIndex: '{$current_class->table}__dot__id_partenaire',
-							renderer: function (value, metaData, record, rowIndex, colIndex, store){
-								if (value) {
-									var a = value.split(ATF.extJSGridComboboxSeparator);
-									if (a[1]) {
-										record.set('{$current_class->table}__dot__id_partenaire_fk',a[1]);
-									}
-									return a[0];
-								}
-							},
-							editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_partenaire function=null  forceId="id_partenaire{$id}" extJSGridComboboxSeparator=true},{
-									listWidth:200
-							})
-						}
-						,{
-							hidden:true,
-							dataIndex: '{$current_class->table}__dot__id_partenaire_fk'
-						}
-					{/if}
+					,{
+						hidden:true,
+						dataIndex: '{$current_class->table}__dot__id_partenaire_fk'
+					}
 				{/if}
 			{/if}
+
 		]
 	}),
 	store:new Ext.data.JsonStore({

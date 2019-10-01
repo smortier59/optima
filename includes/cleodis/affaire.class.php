@@ -3038,6 +3038,7 @@ class affaire_bdomplus extends affaire_cleodis {
 		$this->onglets = array(
 			'affaire_etat'
 			,"sell_and_sign"
+			,"facture_magasin"
 			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)

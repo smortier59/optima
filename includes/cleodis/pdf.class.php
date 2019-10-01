@@ -96,6 +96,7 @@ class pdf_cleodis extends pdf {
 			$this->ln(-3);
 			$this->SetLeftMargin($savelMargin);
 		} else {
+
 			//Numéro de page centré
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
@@ -1950,20 +1951,19 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
+		$this->noPageNo = true;
+		$this->unsetHeader();
+		if(!$signature)	$this->Open();
+		$this->AddPage();
 		$this->commandeInit($id,$s,$previsu);
-			$this->noPageNo = true;
-			$this->unsetHeader();
-			$this->commandeInit($id);
-			if(!$signature)		$this->Open();
-			$this->AddPage();
-			$this->A3 = false;
-			$this->A4 = true;
+		$this->A3 = false;
+		$this->A4 = true;
 
 
-			$this->setfont('arial','B',10);
+		$this->setfont('arial','B',10);
 
 		if ($this->client['id_famille'] == 9) {
-		  $this->contratA4Particulier($id, $signature,$sellsign);
+			  $this->contratA4Particulier($id, $signature,$sellsign);
 		} else {
 		  $this->contratA4Societe($id, $signature,$sellsign);
 		}
@@ -2707,10 +2707,10 @@ class pdf_cleodis extends pdf {
 	* @date 11-02-2011
 	*/
 	public function contratPV($id,$s,$previsu) {
-		$this->commandeInit($id,$s,$previsu);
 		$this->unsetHeader();
 		$this->Open();
 		$this->AddPage();
+		$this->commandeInit($id,$s,$previsu);
 		if ($this->client['id_famille'] == 9) { // Document spécial pour les particuliers
 			$this->contratPVParticulier($id);
 		} else {
@@ -2738,28 +2738,32 @@ class pdf_cleodis extends pdf {
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 	*/
 	public function contratPVParticulier($id,$signature=false) {
-		$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
+		if (ATF::$codename == "boulanger") {
+			$this->image(__PDF_PATH__.$this->logo,10,10,25);
+		} else {
+			$this->image(__PDF_PATH__.$this->logo,10,10,35);
+		}
 
 		$this->setfont('arial','I',8);
 		//Cadre du haut avec Loueur et Locataire
 		$this->sety(5);
 		$this->setleftMargin(40);
-		$this->cell(30,12,"LE LOUEUR",1,0,'C');
+		$this->cell(30,12,"LE LOUEUR",0,0,'C');
 		$this->multicell(
 			0,4,
 			$this->societe['societe']."\n".$this->societe['adresse']." – ".$this->societe['cp']." ".$this->societe['ville'].($this->societe['tel']?" – Tél : ".$this->societe['tel']:"").($this->societe['fax']?" – Fax : ".$this->societe['fax']:"")."\n".
 			($this->societe['id_pays']=='FR'?$this->societe['structure']." AU CAPITAL DE ".number_format($this->societe["capital"],2,'.',' ')." € - RCS LILLE B ".$this->societe['siren']." – APE ".$this->societe['naf']."\n":"").
 			($this->societe['id_pays']=='FR'?"N° de TVA intracommunautaire : FR 91 ".$this->societe["siren"]."\n":$this->societe['structure']."N° DE TVA ".$this->societe['siret']."\n")
-			,1
 		);
-		$this->cell(30,12,"L'ABONNÉ",1,0,'C');
+		$this->cell(30,12,"L'ABONNÉ",'T',0,'C');
 		$this->multicell(
 			0,4,
 			$this->client['societe']." - ".($this->client["tel"]?"Tél : ".$this->client["tel"]:"")." – ".($this->client["particulier_email"]?"Email: ".$this->client["particulier_email"]:"")."\n".
 			$this->client["adresse"]." - ".$this->client["cp"]." ".$this->client["ville"]
+			,'T'
 		);
 
-		$this->ln(10);
+		$this->sety(40);
 		$this->setfont('arial','B',8);
 		$this->multicell(0,5,"",0,'C');
 		$this->setleftMargin(15);
@@ -3393,12 +3397,10 @@ class pdf_cleodis extends pdf {
 
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
-		} else{
-			if(ATF::$codename != "bdomplus"){
-				$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
-			}else{
-				$this->image(__PDF_PATH__.$this->logo,80,20,35);
-			}
+		} else if(ATF::$codename != "cleodis"){
+			$this->image(__PDF_PATH__.$this->logo,80,20,40);
+		}else{
+			$this->image(__PDF_PATH__.$this->logo,80,20,35);
 		}
 
 
@@ -4050,7 +4052,6 @@ class pdf_cleodis extends pdf {
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
 		if($this->affaire["type_affaire"] == "2SI"){ $this->logo = 'cleodis/2SI_CLEODIS.jpg'; }
-		else{  $this->logo = 'cleodis/logo.jpg'; }
 
 
 		//Styles utilisés
@@ -13568,11 +13569,6 @@ class pdf_cap extends pdf_cleodis {
 		for($i=0;$i<$n;$i++) $points .= ".";
 		return $points;
 	}
-
-
-
-
-
 };
 
 
@@ -14507,12 +14503,14 @@ class pdf_boulanger extends pdf_cleodis {
 	public $Gentete = 127;
 	public $Bentete = 29;
 
-	public $bgcolorTableau = "16145d";
-	public $txtcolorTableau = "ffffff";
+	public $bgcolorTableau = "f17f1d";
+	public $txtcolorTableau = "000000";
 
 	public $REnteteTextColor = 0;
 	public $GEnteteTextColor = 0;
 	public $BEnteteTextColor = 0;
+
+	public $idSociete = 31456;
 
 
 	/* Header spécifique aux documents cléodis
@@ -14520,9 +14518,6 @@ class pdf_boulanger extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function Header() {
-
-
-
 
 		$this->societe = ATF::societe()->select(31458);
 
@@ -14637,7 +14632,7 @@ class pdf_boulanger extends pdf_cleodis {
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe Boulanger vous remercie de la confiance que vous lui avez accordée",0,'C');
 		}
 
-		$this->societe = ATF::societe()->select(31458);
+		$this->societe = ATF::societe()->select($this->idSociete);
 
 		parent::Footer();
 
@@ -14646,7 +14641,6 @@ class pdf_boulanger extends pdf_cleodis {
 	public function contratA4Particulier($id, $signature,$sellsign) {
 
 		$this->image(__PDF_PATH__.$this->logo,10,10,40);
-
 
 		$this->sety(10);
 		$this->multicell(0,5,"LA SOCIETE",0,'C');
@@ -14958,19 +14952,20 @@ class pdf_boulanger extends pdf_cleodis {
 		$this->unsetHeader();
 		$this->unsetFooter();
 
-		$fp = __PDF_PATH__."boulanger/CP-CG.pdf";
-		if (file_exists($fp)) $pageCount = $this->setSourceFile(__PDF_PATH__."boulanger/CP-CG.pdf");
+		// $fp = __PDF_PATH__."boulanger/CP-CG.pdf";
+		// if (file_exists($fp)) $pageCount = $this->setSourceFile(__PDF_PATH__."boulanger/CP-CG.pdf");
 
-		for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-		  $tplIdx = $this->importPage($pageNo);
+		// for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+		//   $tplIdx = $this->importPage($pageNo);
 
-		  // add a page
-		  $this->AddPage();
-		  $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-		}
+		//   // add a page
+		//   $this->AddPage();
+		//   $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+		// }
 
 
   }
+
 
   	/** PDF d'une facture Classique aussi dit 'Autre Facture' - POUR LE BtoC
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -14981,16 +14976,13 @@ class pdf_boulanger extends pdf_cleodis {
 			$this->open();
 		}
 		$this->facturePDF = true;
-
 		$this->setHeader();
 		$this->addpage();
 		$this->setMargins(15,30);
 		$this->sety(40);
 
-
-
 		$this->setfont('arial','B',11);
-		$this->cell(35,5,"N° de facture :",0, 0);
+		$this->cell(35,5,"N° de factu".$this->getFooter()."re :",0, 0);
 		$this->setfont('arial','',11);
 		$this->cell(50,5,$this->facture['ref_externe'] ,0 ,1);
 
@@ -15025,15 +15017,11 @@ class pdf_boulanger extends pdf_cleodis {
 
 		$this->settextcolor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',20);
-		$this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+		$this->cell(0,7,"Votre facture Boulanger",0, 1, 'C');
 		$this->setfont('arial','I',11);
 		$this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C');
 		//$this->cell(0,7,"Ce présent document est une facture dont le règlement est en attente",0, 1, 'C');
 		$this->settextcolor(0,0,0);
-
-
-
-
 
 		if ($this->lignes) {
 
@@ -15043,7 +15031,7 @@ class pdf_boulanger extends pdf_cleodis {
 			//Quantite
 			$data[0][0] = "1";
 			if($this->facture['type_facture'] !== "libre") {
-				//Désignation L1
+				// Désignation L1
 				if($this->affaire['nature']=="vente"){
 					$data[0][1] = "Vente pour le contrat n°".$this->affaire['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL);
 				}else{
@@ -15134,7 +15122,7 @@ class pdf_boulanger extends pdf_cleodis {
 				}
 			}
 
-			$this->tableauBigHead($head,$data,$w,5,$styles);
+			$this->tableau($head,$data,$w,5,$styles);
 
 			if ($this->facture['commentaire']) {
 				$com = array(array("Commentaire : ".$this->facture['commentaire']));
@@ -15233,6 +15221,7 @@ class pdf_boulanger extends pdf_cleodis {
 			$cadre[] = "BIC : ".$this->societe["BIC"];
 			$this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
 		}
+
 	}
 
 
@@ -15268,7 +15257,7 @@ class pdf_boulanger extends pdf_cleodis {
 		$this->setfont('arial','',9);
 		$this->setLeftMargin(60);
 		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"BDOM PLUS\nAVENUE DE LA MOTTE \n59810 LESQUIN - France");
+		$this->multicell(70,4,"BOULANGER\n18 AVENUE DE LA MOTTE \n59810 LESQUIN - France");
 		$this->setLeftMargin(5);
 		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
@@ -15331,7 +15320,7 @@ class pdf_boulanger extends pdf_cleodis {
 
 		$this->setY(70);
 		$this->setLeftMargin(5);
-		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) BDOM PLUS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de BDOM PLUS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
+		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) BOULANGER à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de BOULANGER.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
 		$this->ln(4);
 		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y", strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))),0,1);
 
