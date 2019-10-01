@@ -2191,7 +2191,7 @@ class facture_cleodis extends facture {
 							//A =65 Z=90
 							$lettre2 = 77;
 							$lettre1 = 64;
-							for($an=2006; $an<=2020; $an++){
+							for($an=2006; $an<=2024; $an++){
 							 	for($mois=1;$mois<=12; $mois++){
 							 		if($mois <10){ $mois = "0".$mois;}
 							 		$date = $an."-".$mois."-"."01";
