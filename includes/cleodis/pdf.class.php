@@ -3397,12 +3397,10 @@ class pdf_cleodis extends pdf {
 
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
-		} else{
-			if(ATF::$codename != "bdomplus"){
-				$this->image(__PDF_PATH__."/cleodis/logo.jpg",80,20,40);
-			}else{
-				$this->image(__PDF_PATH__.$this->logo,80,20,35);
-			}
+		} else if(ATF::$codename != "cleodis"){
+			$this->image(__PDF_PATH__.$this->logo,80,20,40);
+		}else{
+			$this->image(__PDF_PATH__.$this->logo,80,20,35);
 		}
 
 
