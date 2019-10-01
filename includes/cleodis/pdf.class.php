@@ -14503,8 +14503,8 @@ class pdf_boulanger extends pdf_cleodis {
 	public $Gentete = 127;
 	public $Bentete = 29;
 
-	public $bgcolorTableau = "16145d";
-	public $txtcolorTableau = "ffffff";
+	public $bgcolorTableau = "f17f1d";
+	public $txtcolorTableau = "000000";
 
 	public $REnteteTextColor = 0;
 	public $GEnteteTextColor = 0;
