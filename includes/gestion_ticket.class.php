@@ -1,5 +1,5 @@
 <?
-/**  
+/**
 * Classe gestion_ticket
 * Cet objet permet de gérer les tickets sur les entités
 * @package Optima
@@ -23,7 +23,7 @@ class gestion_ticket extends classes_optima {
 			,'gestion_ticket.id_hotline'
 			,'gestion_ticket.id_facture'
 		);
-		
+
 		//Colonnes principales
 		$this->colonnes['primary'] = array(
 											"date"
@@ -32,21 +32,21 @@ class gestion_ticket extends classes_optima {
 											,"id_societe"
 											,"id_hotline"
 										);
-										
+
 		$this->fieldstructure();
-		$this->no_delete = $this->no_update = $this->no_insert = true;
+		$this->no_delete = $this->no_update  = true;
 		$this->field_nom = " %gestion_ticket.type% - %gestion_ticket.date%";
 	}
-	
+
 	/**
     * Méthode d'ajout des tickets !
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	* @param array $infos $infos['id_societe'] et $infos['credits']
-	* @param array $s 
+	* @param array $s
 	* @param file $files
 	* @param array $cadre_refreshed
-    * @return boolean true 
-    */   	
+    * @return boolean true
+    */
 	public function add_ticket($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		//Test du paramètre crédits
 		if(!is_numeric($infos["credits"])){
@@ -55,17 +55,17 @@ class gestion_ticket extends classes_optima {
 		if($infos["credits"]<=0){
 			throw new errorATF(ATF::$usr->trans("gestion_ticket_not_positif",$this->table));
 		}
-		
+
 		// Test de la présence de la facture ou du libellé
 		if(!$infos["id_facture"] && !$infos["libelle"]){
 			throw new errorATF(ATF::$usr->trans("libelle_or_id_facture",$this->table));
 		}
-		
+
 		//Recherche du crédit précédent
 		$credits=ATF::societe()->getSolde($infos['id_societe']);
-		
+
 		ATF::db($this->db)->begin_transaction();
-		
+
 		//Insertion d'un nouveau ticket
 		$nouveau_solde=$credits+$infos["credits"];
 		$infos_ticket["operation"]=$this->getLastOp($infos['id_societe'])+1;
@@ -82,41 +82,41 @@ class gestion_ticket extends classes_optima {
 											,"operation"=>$operation
 											))
 										,$s);
-		
+
 		ATF::db()->commit_transaction();
-		
+
 		// Cadre refresh
 		if(is_array($cadre_refreshed)){
 			ATF::societe()->redirection("select",$infos["id_societe"]);
 		}
-			
+
 		//Notice
 		ATF::$msg->addNotice(ATF::$usr->trans("gestion_ticket_add",$this->table));
-		
+
 		return $id_gestion_ticket;
 	}
-	
+
     /**
     * Débite les tickets en fonction des requêtes hotline ! Chaque débit correspond à une requête hotline
     * @author QJ <qjanon@absystech.fr>
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
-    * @param int $id_societe 
+    * @param int $id_societe
     * @param int $id_hotline
     * @param boolean $envoi_mail
-	* @param array $s 
+	* @param array $s
     * @return float le nombre de tickets
-    */    
+    */
 	public function remove_ticket($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
 		// Recherche du crédit précédent
 		$credits=ATF::societe()->getSolde($infos['id_societe']);
-		
+
 		// Recherche du nombre d'heures facturés (en base 10)
 		$duree=ATF::hotline()->getCreditUtilises($infos['id_hotline']);
-		
+
 		// Transactionnel
 		ATF::db($this->db)->begin_transaction();
-				
+
 		// historique du retrait de ticket pr facturation
 		$infos_ticket['id_societe']=$infos['id_societe'];
 		$infos_ticket['type']='retrait';
@@ -126,13 +126,13 @@ class gestion_ticket extends classes_optima {
 		$infos_ticket['solde']=$credits-$duree;
 		$infos_ticket["operation"]=$this->getLastOp($infos['id_societe'])+1;
 		$this->insert($infos_ticket,$s,NULL,$cadre_refreshed);
-				
+
 		// Commit !
 		ATF::db()->commit_transaction();
-		
+
 		return $duree;
 	}
-	
+
 //	/**
 //	* Traitement du solde de chaque enregistrement de gestion ticket
 //	* @param array $s La session
@@ -147,10 +147,10 @@ class gestion_ticket extends classes_optima {
 //		foreach($data as $societe){
 //			$id_societe=$societe["id_societe"];
 //			//if($id_societe!=666) continue;
-//			
+//
 //			echo "------------------------------------------------------\n";
 //			echo "Traitement societe ".ATF::societe()->select($id_societe,"societe")." - ".$id_societe."\n";
-//			
+//
 //			//Calcul du solde avant réajustement
 //			echo "----------Calcul des soldes avant reajustement------------\n";
 //			//Suppression du ticket d'init éventuel
@@ -160,7 +160,7 @@ class gestion_ticket extends classes_optima {
 //				$this->delete($ticket_init);
 //			}
 //			$this->ss_traitement_solde($id_societe);
-//			
+//
 //			//Vérification du solde société
 //			$solde_societe=ATF::societe()->select($id_societe,"credits");
 //			echo "Ancien Solde : ".$solde_societe."\n";
@@ -171,7 +171,7 @@ class gestion_ticket extends classes_optima {
 //			//Solde actuel
 //			$soldenv=ATF::societe()->getSolde($id_societe);
 //			echo "Nouveau Solde actuel : ".$soldenv."\n";
-//		
+//
 //			//Calcul de la différence
 //			$diff=0;
 //			if($solde!=$solde_societe){
@@ -179,8 +179,8 @@ class gestion_ticket extends classes_optima {
 //				$somme+=$diff;
 //				echo "Différence = ".$diff."\n";
 //			}
-//			
-//			// Solde initial				
+//
+//			// Solde initial
 //			$solde=0;
 //			$gestion_ticket=array();
 //			$gestion_ticket["operation"]=1;
@@ -195,18 +195,18 @@ class gestion_ticket extends classes_optima {
 //			$this->insert($gestion_ticket);
 //			$operation=2;
 //
-//									
+//
 //			//Calcul du solde avant réajustement
 //			echo "----------Calcul des soldes après reajustement------------\n";
 //			$total=0;
 //			$total=$this->ss_traitement_solde($id_societe);
 //			echo "SOLDE FINAL = ".$total."\n";
-//			
+//
 //		}
 //		echo "------------------------------------------------------\n";
 //		echo "Somme des diff : ".$somme."\n";
 //	}
-//	
+//
 //	/**
 //	* Sous traitement solde
 //	* @param int $id_societe
@@ -221,7 +221,7 @@ class gestion_ticket extends classes_optima {
 //		foreach($data as $enregistrement){
 //			//Calcul du solde
 //			$solde+=$enregistrement["nbre_tickets"];
-//			
+//
 //			//On saute le ticket d'init
 //			if($enregistrement["libelle"]=="Solde initial"){
 //				continue;
@@ -230,13 +230,13 @@ class gestion_ticket extends classes_optima {
 //			//maj du solde
 //			echo "Date : ".$enregistrement["date"]." Op : ".$operation." - Societe : ".$id_societe." - Mv Tickets : ".$enregistrement["nbre_tickets"]." - Solde : ".$solde."\n";
 //			$this->update(array("id_gestion_ticket"=>$enregistrement["id_gestion_ticket"],"solde"=>$solde,"operation"=>$operation));
-//			
+//
 //			//Incrémentation du numéro d'opération
 //			$operation++;
 //		}
 //		return $solde;
 //	}
-	
+
 	/**
 	* Donne Le numéro de la dernière opération effectuée
 	* @param int $id_societe L'identifiant de la société
@@ -248,7 +248,7 @@ class gestion_ticket extends classes_optima {
 		$retour=$this->sa();
 		return $retour[0]["MAX(operation)"];
 	}
-	
+
 	/**
 	 * Retourne un tableau pour les graphes d'affaires, dans statistique
 	 * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
@@ -262,7 +262,7 @@ class gestion_ticket extends classes_optima {
 		if(!$month)$month=date('m');
 		if(!$year)$year=date('Y');
 		$id_societe=ATF::societe()->decryptId($id_societe);
-		if($widget){	
+		if($widget){
 			$mois=util::month();
 			for($m=$month+1;$m<=12;$m++){
 				$stats['categories']["category"][$m]=array("label"=>substr($mois[(strlen($m)<2?"0".$m:$m)],0,1).substr($year-1,-2));
@@ -270,7 +270,7 @@ class gestion_ticket extends classes_optima {
 			for($m=1;$m<=$month;$m++){
 				$stats['categories']["category"][$m]=array("label"=>substr($mois[(strlen($m)<2?"0".$m:$m)],0,1).substr($year,-2));
 			}
-			
+
 			//si il s'agit du graphe d'une société
 			if($id_societe){
 				$this->ajoutDonneesStats($stats,$id_societe,$month,$year);
@@ -282,13 +282,13 @@ class gestion_ticket extends classes_optima {
 				//si il s'agit du graphe de toutes les sociétés, vu qu'il y a pas mal de mois non renseigné, on fait un système spécial
 				$this->ajoutDonneesStatsSansSoc($stats['DATA'],$stats['categories']["category"]);
 			}
-		
+
 			return parent::stats($stats,$type,$widget,false);
 		}else{
 			return parent::stats($stats,$type,$widget,false);
 		}
 	}
-	
+
 	/** Récupération des données dans un intervalle d'un an glissant
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array $stats : contient les données du graphe
@@ -313,7 +313,7 @@ class gestion_ticket extends classes_optima {
 		$this->q->setArrayKeyIndex("month",false);
 		$stats['DATA'] = $this->sa("no_order");
 	}
-	
+
 	/** Récupération des données dans un intervalle d'un an glissant pour chaques sociétés présentes dans la table et étant active
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array $data : contient les données du graphe
@@ -344,7 +344,7 @@ class gestion_ticket extends classes_optima {
 			$data[$mois]['month']=$mois;
 		}
 	}
-	
+
 	/** Récupération des données dans un intervalle d'un an glissant pour chaques sociétés présentes dans la table et étant active
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array $data : contient les données du graphe
@@ -378,8 +378,8 @@ class gestion_ticket extends classes_optima {
 										->setStrict()
 										->addField("gestion_ticket.solde","nb")
 										->addField("societe.societe","label")
-										->addJointure("gestion_ticket","id_societe","societe","id_societe");		
-					
+										->addJointure("gestion_ticket","id_societe","societe","id_societe");
+
 					//si la donnée n'est pas présente, on récupère le dernier solde présent dans la base, dont la date est juste antérieure à l'actuelle
 					if($solde=$this->sa("no_order")){
 						$data[$mois]=array("nb"=>$solde[0]['nb'],"month"=>$mois,"label"=>$solde[0]["label"]);
@@ -391,21 +391,21 @@ class gestion_ticket extends classes_optima {
 											->setStrict()->setLimit(1)
 											->addField("gestion_ticket.solde","nb")
 											->addField("societe.societe","label")
-											->addJointure("gestion_ticket","id_societe","societe","id_societe");		
+											->addJointure("gestion_ticket","id_societe","societe","id_societe");
 
 						if($solde=$this->sa("no_order")) $data[$mois]=array("nb"=>$solde[0]['nb'],"month"=>$mois,"label"=>$solde[0]["label"]);
-					}	
+					}
 				}
 			}
 		}
 	}
-	
+
 	/** Initialisation des abscisses du graphe (commence par le mois+1 (annee courante-1) et fini par le mois courant (annee courante)
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array graph : contient les données concernant le graphe
 	* @param string intitule : nom de l'abscisse
 	*/
-	public function initGraphe(&$graph,$intitule,$month=NULL){	
+	public function initGraphe(&$graph,$intitule,$month=NULL){
 		if(!$month)$month=date('m');
 		for($m=$month+1;$m<=12;$m++){
 			$graph['dataset'][$intitule]['set'][strlen($m)<2?"0".$m:$m] = array("value"=>0,"alpha"=>100,"titre"=>$intitule." : 0");
@@ -414,7 +414,7 @@ class gestion_ticket extends classes_optima {
 			$graph['dataset'][$intitule]['set'][strlen($m)<2?"0".$m:$m] = array("value"=>0,"alpha"=>100,"titre"=>$intitule." : 0");
 		}
 	}
-	
+
 	/** Retourne la liste des sociétés formatés pour une liste déroulante
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @return array
@@ -427,13 +427,13 @@ class gestion_ticket extends classes_optima {
 				->addCondition("YEAR( gestion_ticket.date )",date('Y'))
 				->addGroup("id")
 				->addOrder("societe")
-				->addOrder("id");		
-		
+				->addOrder("id");
+
 		foreach(parent::select_all() as $tab){
 			$r[$tab['id']] = $tab['societe'];
 		}
 		return $r;
 	}
-	
-};	
+
+};
 ?>
