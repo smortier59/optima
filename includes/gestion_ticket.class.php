@@ -34,7 +34,7 @@ class gestion_ticket extends classes_optima {
 										);
 
 		$this->fieldstructure();
-		$this->no_delete = $this->no_update  = true;
+		$this->no_delete = $this->no_update = $this->no_insert = true;
 		$this->field_nom = " %gestion_ticket.type% - %gestion_ticket.date%";
 	}
 
@@ -52,9 +52,11 @@ class gestion_ticket extends classes_optima {
 		if(!is_numeric($infos["credits"])){
 			throw new errorATF(ATF::$usr->trans("gestion_ticket_not_numeric",$this->table));
 		}
-		if($infos["credits"]<=0){
+		/*if($infos["credits"]<=0){
 			throw new errorATF(ATF::$usr->trans("gestion_ticket_not_positif",$this->table));
-		}
+		}*/
+		$type= "ajout";
+		if($infos["credits"]<=0) $type= "retrait";
 
 		// Test de la présence de la facture ou du libellé
 		if(!$infos["id_facture"] && !$infos["libelle"]){
@@ -75,7 +77,7 @@ class gestion_ticket extends classes_optima {
 											"id_societe"=>$infos["id_societe"]
 											,"date"=>date("Y-m-d H:i:s")
 											,"nbre_tickets"=>$infos["credits"]
-											,"type"=>"ajout"
+											,"type"=>$type
 											,"solde"=>$nouveau_solde
 											,"id_facture"=>$infos["id_facture"]
 											,"libelle"=>$infos["libelle"]
