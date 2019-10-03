@@ -1,0 +1,73 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline_interaction}
+
+<div id="container" class="widget"></div>
+<script type="text/javascript">
+{$data = ATF::getClass($module)->stats30(false,true)} 
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: 'container',
+            type: 'spline'
+        },
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+        },
+        colors :[   
+            '#FFCF23', /*Orange*/
+            '#19FF30', /*Vert */            
+            '#FF0004' /*Rouge */         
+        ],
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+         legend: {
+            itemStyle: {
+                fontSize:'9px'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: null
+            }
+        },
+        plotOptions: {
+                spline: {
+                    lineWidth: 2,
+                    states: {
+                        hover: {
+                            lineWidth: 3
+                        }
+                    },
+                    marker: {
+                        enabled: false
+                    }                    
+                }
+            },
+        series: [
+           {foreach $data["dataset"] as $data2}          
+               {
+                    name: '{$data2["params"]["seriesname"]}'                    
+                   ,data: [
+                            {foreach $data["categories"]["category"] as $cat}
+                                {$data2["set"][$cat["label"]]["value"]|number_format:2:'.'}                                
+                                {if !$cat@last},{/if}
+                            {/foreach}    
+                          ]
+               }
+                {if !$data2@last},{/if}
+            {/foreach}            
+           ]        
+    });
+});
+    
+</script>
+{/strip}
