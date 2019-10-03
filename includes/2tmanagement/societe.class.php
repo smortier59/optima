@@ -4,7 +4,7 @@ require_once dirname(__FILE__)."/../societe.class.php";
 * @package Optima
 * @subpackage AbsysTech
 */
-class societe_2tmangement extends societe {
+class societe_2tmanagement extends societe {
 	/**
 	* Constructeur par défaut
 	*/
@@ -85,6 +85,40 @@ class societe_2tmangement extends societe {
 		$this->colonnes['bloquees']['select'] =   array("divers_5");
 
 		$this->selectExtjs=true;
+
+		$this->addPrivilege("autocompleteOnlyActive");
+	}
+
+
+	public function autocompleteOnlyActive($infos,$reset=true) {
+		if ($reset) {
+			$this->q->reset();
+		}
+		$this->q->where("societe.etat", "actif");
+		// Entourloupe habituelle à l'autojoin
+		return parent::autocomplete($infos,false);
+	}
+
+	/**
+	* Donne le solde en fonction des gestion_ticket
+	* @param int $id_societe L'identifiant de la societé désirée
+	* @param string $dateMax la dernière date désirée
+	*/
+	public function getSolde($id_societe,$dateMax=NULL){
+		$id_societe=$this->decryptId($id_societe);
+		//Recherche de la dernière opération
+		ATF::gestion_ticket()->q->reset()->addField("MAX(operation)")->addCondition("id_societe",$id_societe)->setDimension("cell");
+		if($dateMax){
+			ATF::gestion_ticket()->q->addCondition("date",$dateMax,"AND",false,"<");
+		}
+		$operation=ATF::gestion_ticket()->sa();
+		if($operation){
+			//Recherche du solde
+			ATF::gestion_ticket()->q->reset()->addField("solde")->addCondition("id_societe",$id_societe)->addCondition("operation",$operation)->setDimension("cell");
+			return ATF::gestion_ticket()->sa();
+		}else{
+			return 0;
+		}
 	}
 };
 

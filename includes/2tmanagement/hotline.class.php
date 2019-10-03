@@ -2,807 +2,156 @@
 /**
 * Classe Hotline
 * @package Optima
-* @subpackage 2tManagement
+* @subpackage AbsysTech
 */
-class hotline_interaction extends classes_optima {
+class hotline extends classes_optima {
 	/**
-	* Contructeur par défaut !
+	* Constructeur hotline - Créé le singleton d'accès au module hotline
 	*/
 	public function __construct() {
 		parent::__construct();
 		$this->table = __CLASS__;
 
 		//Colonnes SELECT ALL
-		$this->colonnes['fields_column'] =array(
-			'hotline_interaction.date'=>array("width"=>100,"align"=>"center")
-			//,'hotline_interaction.temps'=>array("width"=>100,"align"=>"center")
-			//,'hotline_interaction.temps_passe'=>array("width"=>100,"align"=>"center")
-			,"hotline_interaction.credit_presta"=>array("align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","width"=>80)
-			,"hotline_interaction.credit_dep"=>array("align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","width"=>80)
-			,"duree_presta"=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>120)
-			,"duree_pause"=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>120)
-			,"duree_dep"=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>120)
-			,'hotline_interaction.detail'=>array("truncate"=>false)
-			,'hotline_interaction.id_user'=>array("width"=>150)
-			,'hotline_interaction.id_ordre_de_mission'=>array("width"=>150)
-			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","width"=>50,"align"=>"center")
+		$this->colonnes['fields_column'] = array(
+			"id_hotline"=>array("custom"=>true,"width"=>50,"fixedWidth"=>true) // Obligé de faire un alias différent de hotline.id_hotline parce que sinon problème des id_hotline trouvé sur "la loupe" des listings
+			,'date_last_interaction'=>array("custom"=>true,"renderer"=>"datefield","width"=>100,"fixedWidth"=>true)
+			,'hotline.id_societe'
+			,'hotline.id_contact'
+			,'hotline.id_user'
+			,'hotline.hotline'=>array("truncate"=>false)
+			,'credit_total'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","width"=>80)
+			,'temps_estime'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			//,'temps_total'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'temps_facture_calcule'=>array("custom"=>true,"align"=>"right","width"=>80)
+			//,'temps'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'duree_work'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'duree_presta'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'duree_dep'=>array("custom"=>true,"align"=>"right","aggregate"=>array("avg","min","max","sum"),"type"=>"decimal","renderer"=>"temps","width"=>80)
+			,'dead_line'=>array("custom"=>true,"width"=>90,"fixedWidth"=>true)
+			,'hotline.priorite'=>array("custom"=>true,"renderer"=>"priorite","rowEditor"=>"prioriteUpdate","width"=>150)
+			,"ratio"=>array("custom"=>true,"aggregate"=>array("avg","min","max","sum"),"type"=>"decimal")
 		);
 
+		//Colonnes principales
 		$this->colonnes['primary'] = array(
-			"detail"=>array("editor"=>"simpleEditor")
-		);
-		$this->panels['primary'] = array('nbCols'=>1);
-
-
-		$this->colonnes['panel']['horaires_fs'] = array(
-			 "heure_depart_dep"=>array("listeners"=>array("change"=>"ATF.changeHeureDep","select"=>"ATF.selectHeureDep"))
-			,"heure_debut_presta"=>array("listeners"=>array("change"=>"ATF.changeHeurePresta","select"=>"ATF.selectHeurePresta"))
-			,"duree_pause"=>array("listeners"=>array("change"=>"ATF.changeDureePause","select"=>"ATF.selectDureePause"), "min"=>"00:00")
-			,"heure_fin_presta"=>array("listeners"=>array("change"=>"ATF.changeHeurePresta","select"=>"ATF.selectHeurePresta"))
-			,"heure_arrive_dep"=>array("listeners"=>array("change"=>"ATF.changeHeureDep","select"=>"ATF.selectHeureDep"))
-		);
-		$this->panels['horaires_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
-
-
-		$this->colonnes['panel']['duree_credit_fs'] = array(
-			 "duree_presta"=>array("listeners"=>array("change"=>"ATF.changeDureePresta","select"=>"ATF.selectDureePresta"), "min"=>"00:00")
-			,"credit_presta"=>array("listeners"=>array("change"=>"ATF.changeCreditPresta"))
-			,"duree_dep"=>array("disabled"=>true, "min"=>"00:00")
-			,"credit_dep"=>array("listeners"=>array("change"=>"ATF.changeCreditDep"))
-			,"matos"=>array("xtype"=>"switchbutton","default"=>"non")
-			,"teamviewer"=>array("xtype"=>"switchbutton","default"=>"non")
-			,"champ_alerte"=>array("custom"=>true, "xtype"=>"textarea","targetCols"=>1,"hidden"=>true)
-		);
-		$this->panels['duree_credit_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
-
-		// Sous panel de temps
-		$this->colonnes['panel']['temps_fs'] = array(
-			"nature"=>array("data"=>array("internal", 'relation_client', 'interaction'),"xtype"=>"combo", "listeners"=>array("select"=>"ATF.selectNature"))
-			,"date"
-			,"deplacements"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'horaires_fs')
-			,"prestations"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'duree_credit_fs')
-		);
-		$this->panels['temps_fs'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
-
-
-
-		// Sous panel de paramétrage
-		$this->colonnes['panel']['options_fs'] = array(
-			"etat_wait"=>array("xtype"=>"switchbutton","default"=>"non")
-			,"send_mail"=>array("xtype"=>"switchbutton","null"=>true)
-			,"mep_mail"=>array("xtype"=>"switchbutton","default"=>"non")
-			,"visible"=>array("xtype"=>"switchbutton")
+			"id_societe"=>array("autocomplete"=>array("function"=>"autocompleteOnlyActive"))
+			,"pole_concerne"
 			,"id_contact"
-			,"id_user"=>array("custom"=>true)
-			,"id_ordre_de_mission"
-			,"sp_transfert"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'transfert_fs')
-			,"notifications"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'notifications_fs')
+			,"id_gep_projet"
+			,"hotline"
+			,"id_user"
+			,"detail"
+			,"visible"
+			,"estimation"=>array("targetCols"=>2)
+			,"date_terminee"
+			,"urgence"=>array("targetCols"=>2)
 		);
-		$this->panels['options_fs'] = array('nbCols'=>2,'isSubPanel'=>true,'collapsible'=>false,'visible'=>true);
 
-		// Sous panel de paramétrage
-		$this->colonnes['panel']['notifications_fs'] = array(
-			"anotherNotify"=>array("custom"=>true)
-			,"actifNotify"=>array("custom"=>true)
+		//Autocomplete
+		$this->affaireAutocompleteMapping=array(
+			array("name"=>'id', "mapping"=>0),
+			array("name"=>'nom', "mapping"=>1),
+			array("name"=>'date', "mapping"=>2),
+			array("name"=>'etat', "mapping"=>3)
 		);
-		$this->panels['notifications_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
 
-		// Sous panel de paramétrage
-		$this->colonnes['panel']['transfert_fs'] = array(
-			"transfert"=>array("custom"=>true)
-			,"transfert_pole"=>array("custom"=>true)
-		);
-		$this->panels['transfert_fs'] = array('nbCols'=>1,'isSubPanel'=>true,'collapsible'=>true,'visible'=>false);
-
-		// Panel qui contient tous les sous panel
-		$this->colonnes['panel']['parametre'] = array(
-			"sp_temps"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'temps_fs'),
-			"options"=>array("custom"=>true,'xtype'=>'fieldset','panel_key'=>'options_fs')
-		);
-		$this->panels['parametre'] = array("visible"=>true);
-
-
+		//IMPORTANT, complète le tableau de colonnes avec les infos MYSQL des colonnes
 		$this->fieldstructure();
 
+		$this->panels['primary'] = array("nbCols"=>2,"collapsible"=>false,"columnsWidth"=>array("0.6","0.4"));
 
-		$this->color["etat"]["done"] = "#AAAAAA";
-		$this->colonnes['bloquees']['insert'] = array("etat","id_hotline","id_ordre_de_mission","temps_passe","temps");
-		$this->colonnes['bloquees']['update'] = array("etat","id_hotline","transfert","transfert_pole","etat_wait","send_mail","avancement","anotherNotify","actifNotify","temps_passe","temps");
-		$this->colonnes['bloquees']['select'] = array("transfert","transfert_pole","etat_wait","send_mail","avancement","temps_passe","temps");
-		$this->field_nom = "%hotline_interaction.detail%";
-		//$this->no_update = true;
-		$this->pole_concerne=array('dev'=>1,'system'=>0,'telecom'=>0);
-		$this->facturation_ticket=array('oui'=>1,'non'=>1);
-		$this->stats_filtre=array('pole_concerne','facturation_ticket','etat');
-		$this->liste_user=$this->getUserActif();
-		$this->etat=$this->listingEtat();
+		$this->colonnes['bloquees']['select'] = array("send_mail","type_requete","ok_facturation","priorite","avancement","mono_interaction");
+		$this->colonnes['bloquees']['insert'] =
+		$this->colonnes['bloquees']['cloner'] = array("id_hotline","etat","date_debut","date_fin","date","commentaire","temps","wait_mep","facturation_ticket","ok_facturation","indice_satisfaction","avancement","date_modification","coordonnees_rapides","temps_passe","temps","id_affaire","priorite","charge");
+		$this->colonnes['bloquees']['update'] = array("send_mail","type_requete","id_hotline","etat","date_debut","date_fin","date","ok_facturation","commentaire","temps","facturation_ticket","wait_mep","avancement","date_modification","coordonnees_rapides","indice_satisfaction","charge","temps_passe","temps","mono_interaction");
+		$this->field_nom = "%hotline.hotline%";
 		$this->files["fichier_joint"] = array("multiUpload"=>true);
-
-		// Quick_action
-		$this->quick_action['select'] = array('update','delete','print');
-		$this->addPrivilege("changeUser");
-
-	}
-
-	/**
-	* Mise à jour spécifique
-	*/
-	public function delete($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true){
-
-		foreach ($infos['id'] as $id) {
-			$id_ODM = $this->select($id,"id_ordre_de_mission");
-			if ($id_ODM) {
-				$odm = array("id_ordre_de_mission"=>$id_ODM,"etat"=>"en_cours");
-				ATF::ordre_de_mission()->u($odm);
-				ATF::hotline()->createNotice("odm_retour_a_en_cours");
-			}
-		}
-
-		parent::delete($infos,$s,$files,$cadre_refreshed,$mail,$pointage);
-
-		api::sendUDP(array("data"=>array("type"=>"interaction")));
-	}
-
-	/**
-	* Mise à jour spécifique
-	*/
-	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true){
-		$this->infoCollapse($infos);
-		$infos["update"]=true;
-		$this->insert($infos,$s,$files,$cadre_refreshed,$mail,$pointage);
-	}
-
-	/**
-	* INSERTION d'une interaction de hotline
-	* @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @param array $infos Les informations de l'interaction
-	* @param array $s La session
-	* @param array $files Les fichiers uploadés
-	* @param boolean $mail True si on désire
-	* @param boolean $pointage True si on désire créer le pointage
-	* @return boolean true
-	*/
-	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true) {
-
-		$this->infoCollapse($infos);
-
-		/*---------------Fonctionnalité de trace hotline----------------------*/
-		if($infos["internal"]){
-			$data = array(
-				 "duree_presta"=>$infos["duree_presta"]?$infos["duree_presta"]:"00:00"
-				,"heure_debut_presta"=>date("h:i")
-				,"heure_fin_presta"=>date("h:i")
-				,"detail"=>$infos["detail"]
-				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
-				,"id_hotline"=>$infos["id_hotline"]
-				,"visible"=>$infos["visible"]
-				,"nature"=>"internal"
-			);
-			return parent::insert($data,$s,$files);
-		}
-
-		$no_test_credit = true;
-		if(!isset($infos["no_test_credit"])){
-			$no_test_credit = false;
-		}
-		unset($infos["no_test_credit"]);
-
-		// Début de transaction
-		ATF::db($this->db)->begin_transaction();
-
-		/*---------------Vérification des informations passées----------------------*/
-		if(!$infos){
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
-		}
-
-		if(!$infos["heure_depart_dep"])  $infos["heure_depart_dep"] = $infos["heure_debut_presta"];
-		if(!$infos["heure_arrive_dep"])  $infos["heure_arrive_dep"] = $infos["heure_fin_presta"];
-
-		$spdebutpresta = explode(":", $infos["heure_debut_presta"]);
-		$spfinpresta = explode(":" , $infos["heure_fin_presta"]);
-		$debut_presta = intval($spdebutpresta[0])*60 + intval($spdebutpresta[1]);
-		$fin_presta = intval($spfinpresta[0])*60 + intval($spfinpresta[1]);
-
-		$spdebut_dep = explode(":", $infos["heure_depart_dep"]);
-		$spfin_dep = explode(":" , $infos["heure_arrive_dep"]);
-		$debut_dep = intval($spdebut_dep[0])*60 + intval($spdebut_dep[1]);
-		$fin_dep = intval($spfin_dep[0])*60 + intval($spfin_dep[1]);
-
-		if($debut_dep > $debut_presta){
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF(ATF::$usr->trans("L'heure de début de mission est superieure à l'heure de début de prestation !",$this->table));
-		}
-
-		if($fin_presta > $fin_dep){
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF(ATF::$usr->trans("L'heure de fin de mission est inferieure à l'heure de fin de prestation !",$this->table));
-		}
-
-
-		//Test de présence d'un texte
-		if (!$infos["detail"]){
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF(ATF::$usr->trans("joindre_un_texte_explicatif_a_l_interaction",$this->table));
-		}
-
-		$hotline = ATF::hotline()->select($infos["id_hotline"]);
-		/*---------------Gestion du temps----------------------*/
-		if((!$infos["duree_presta"] || $infos["duree_presta"] =="00:00" || $infos["duree_presta"] =="0:00") && !$no_test_credit){
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF(ATF::$usr->trans("duree_presta_non_renseigne",$this->table));
-		}
-
-
-		$duree_pause = 0;
-
-		if($infos["duree_pause"]){
-			$spdureepause = explode(":", $infos["duree_pause"]);
-			$duree_pause = intval($spdureepause[0])*60 + intval($spdureepause[1]);
-
-			$duree_presta = $fin_presta - $debut_presta;
-			if($duree_presta < $duree_pause){
-				ATF::db($this->db)->rollback_transaction();
-				throw new errorATF(ATF::$usr->trans("La durée de pause est superieure à la durée de prestation !",$this->table));
-			}
-
-		}
-
-
-
-		$duree_presta = $fin_presta - $debut_presta - $duree_pause;
-		$p = array('tps'=>$duree_presta);
-		$ticket_presta = $this->_credit($p);
-
-
-		if($duree_presta < 0){
-			ATF::db($this->db)->rollback_transaction();
-			throw new errorATF("L'heure du début de la prestation est supérieure à l'heure de fin !");
-		}
-
-		$ticket_presta = number_format(($duree_presta)/60 , 2);
-
-		$id_societe = ATF::hotline()->select($infos["id_hotline"], "id_societe");
-
-
-		$duree_dep = 0;
-		if($infos["duree_dep"] && ($infos["duree_dep"] !=="00:00" && $infos["duree_dep"] !=="0:00" && $infos["duree_dep"] !=="00:00:00")){
-
-			/*if($fin_dep - $debut_dep < 0){
-				ATF::db($this->db)->rollback_transaction();
-				throw new errorATF("[DEPLACEMENT] L'heure du départ déplacement est supérieure à l'heure d'arrivée !");
-			}*/
-
-			$duree_dep =  explode(":", $infos["duree_dep"]);
-			$duree_dep = 60*intval($duree_dep[0]) + intval($duree_dep[1]);
-
-
-			// if(ATF::societe()->select($id_societe, "forfait_dep") == 0.00){
-			// 	$ticket_dep =  explode(":", $infos["duree_dep"]);
-			// 	$ticket_dep = number_format((60*intval($ticket_dep[0]) + intval($ticket_dep[1]))/60 , 2);
-			// }else{
-			// 	$ticket_dep = ATF::societe()->select($id_societe, "forfait_dep");
-			// }
-		}
-
-		$p = array('tps'=>$duree_dep,"field"=>"credit_dep");
-		$ticket_dep = $this->_credit($p);
-
-
-		$infos["duree_presta"]=$infos["duree_presta"].":00";
-		$infos["duree_dep"]=$infos["duree_dep"].":00";
-
-		$temps = $duree_presta + $duree_dep;
-		$temps = gmdate("H:i:s", $temps*60);
-
-
-
-		/*---------------Gestion de l'ordre de mission----------------------*/
-		if($infos["id_ordre_de_mission"]) ATF::ordre_de_mission()->update(array("id_ordre_de_mission"=>$infos["id_ordre_de_mission"],"etat"=>"termine"));
-
-		/*---------------Gestion de l'état de la requête----------------------*/
-		// 1ère contrainte : Changement de l'état suite à la mise en attente du client ($infos["etat_wait"]=true)
-		// 2ème contrainte : Requête en état wait/fixing uniquement (les requêtes terminées ou non prises en charge ne peuvent pas avoir de changement d'état)
-		// 3ème contrainte : Les requêtes en état wait passent en état fixing lors d'une interaction
-		// 4ème contrainte : Seulement si la facturation est validée ou qu'il n'y a pas de facturation
-		if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){
-			if($infos["etat_wait"]=="oui" || ($hotline["facturation_ticket"]=="oui" && !$hotline["ok_facturation"]) || ($hotline["facturation_ticket"]=="oui" && $hotline["ok_facturation"]=="non")){
-				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
-			}else{
-				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
-			}
-			/*---------------Gestion de la mise en attente de MEP one shot----------------------*/
-			if ($infos['mep_mail']=="oui") {
-				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"wait_mep"=>"oui","etat"=>"fixing","disabledInternalInteraction"=>true));
-			}
-		}
-
-
-		/*---------------Cas de le requête non encore validée----------------------*/
-		// Lorsque la requête n'est pas encore validée il ne faut pas passer celle-ci en fixing !
-		if($hotline["facturation_ticket"]=="oui" && !$hotline["ok_facturation"] || $hotline["facturation_ticket"]=="oui" && $hotline["ok_facturation"]=="non"){
-			ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
-		}
-
-		/*---------------Insertion/Maj de l'interaction----------------------*/
-		$hotline = ATF::hotline()->select($infos["id_hotline"]);
-		//Patch pour bloquer les interactions en mode non-visible
-		if($hotline["visible"]=="non")  $infos["visible"]="non";
-		$id_hotline_interaction=NULL;
-		$data = array(
-			// "temps_passe"=>$infos["temps_passe"]
-			//,"temps"=>$infos["temps"]
-			 "heure_debut_presta"=>$infos["heure_debut_presta"]
-			,"heure_fin_presta"=>$infos["heure_fin_presta"]
-			,"duree_presta"=>$infos["duree_presta"]
-			,"duree_pause"=>$infos["duree_pause"]
-			,"heure_depart_dep"=>$infos["heure_depart_dep"]
-			,"heure_arrive_dep"=>$infos["heure_arrive_dep"]
-			,"duree_dep"=>$infos["duree_dep"]
-			,"credit_dep"=>$infos["credit_dep"]
-			,"credit_presta"=>$infos["credit_presta"]
-			,"date"=>$infos["date"]
-			,"detail"=>$infos["detail"]
-			,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
-			,"id_contact"=>$infos["id_contact"]
-			,"id_hotline"=>$infos["id_hotline"]
-			,"visible"=>$infos["visible"]
-			,"nature"=>$infos["nature"]
-			,"teamviewer"=>$infos["teamviewer"]
-			,"id_ordre_de_mission"=>((isset($infos["id_ordre_de_mission"]))?$infos["id_ordre_de_mission"]:NULL)
+		$this->onglets = array(
+			'hotline_interaction'=>array("opened"=>true)
+			,'ordre_de_mission'=>array("opened"=>true)
 		);
 
+		// Blocage de l'insertion
+		$this->no_insert = false;
 
-		// Pas de file si pas de files !
-		if($infos["filestoattach"]) $data["filestoattach"]=$infos["filestoattach"];
-
-		//Petit message pour le transfert
-		if($infos["transfert"]){
-			$data["detail"]="Requête transférée par ".ATF::user()->nom($infos["id_user"])." à ".ATF::user()->nom($infos["transfert"])."<br />".$data["detail"];
-		}elseif($infos['transfert_pole']){
-			$data["detail"]="Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".$infos["transfert_pole"]."<br />".$data["detail"];
-		}
-
-		//Gestion de la mise à jour (update)
-		if($infos["update"]){
-			$id_hotline_interaction=$this->decryptId($infos["id_hotline_interaction"]);
-			$data["id_hotline_interaction"]=$id_hotline_interaction;
-			$hotline["id_hotline"]
-				=$infos["id_hotline"]
-				=$data["id_hotline"]
-				=$this->select($data["id_hotline_interaction"],"id_hotline");
-			parent::update($data,$s,$files);
-		}else{
-			$id_hotline_interaction = parent::insert($data,$s,$files);
-		}
-
-		$interaction=$this->select($id_hotline_interaction);
+		$this->addPrivilege("setBillingMode","update");
+		$this->addPrivilege("setbillingModeNew","update");
+		$this->addPrivilege("takeRequest","update");
+		$this->addPrivilege("resolveRequest","update");
+		$this->addPrivilege("cancelRequest","update");
+		$this->addPrivilege("boostBilling","update");
+		$this->addPrivilege("fixingRequest","update");
+		$this->addPrivilege("setWaitMep","update");
+		$this->addPrivilege("setMep","update");
+		$this->addPrivilege("cancelMep","update");
+		$this->addPrivilege("setPriorite","update");
+		$this->addPrivilege("setWait","update");
+		$this->addPrivilege("selectForDashBoard");
+		$this->addPrivilege("getFormBillingMode");
+		$this->addPrivilege("listeHotline");
+		$this->addPrivilege("getMEPTicket");
+		$this->addPrivilege("massValidMEP","update");
+		$this->addPrivilege("getModeFacturation");
+		$this->addPrivilege("estAuForfait");
 
 
-		/*---------------Transfert à l'utilisateur----------------------*/
-		if ($infos["transfert"]) {
-			//Récupération du pôle de l'utilisateur
-			$pole=explode(",",ATF::user()->select($infos["transfert"],"pole"));
-			ATF::hotline()->update(
-				array(
-					"id_hotline"=>$infos["id_hotline"]
-					,"id_user"=>$infos["transfert"]
-					,"pole_concerne"=>((is_array($pole) && isset($pole[0]) && !empty($pole[0]))?$pole[0]:"dev")
-					,"disabledInternalInteraction"=>true)
-			);
-			//Mise à jour de l'état
-			ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
-			//Récupération de l'email du nouvel utilisateur en charge
-			$email=ATF::user()->select($infos["transfert"],"email");
-
-			ATF::hotline_mail()->createMailUserTransfert($hotline["id_hotline"],$id_hotline_interaction,$email);
-			ATF::hotline_mail()->sendMail();
-
-			//Notice
-			ATF::hotline()->createMailNotice("hotline_transfert_user");
-		}
-
-		/*---------------Transfert de Pôle----------------------*/
-		if($infos['transfert_pole']){
-			ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"pole_concerne"=>$infos["transfert_pole"],"disabledInternalInteraction"=>true,"id_user"=>$infos["transfert"]?$infos["transfert"]:NULL));
-			//Récupération de l'email du nouveau utilisateur en charge
-			$email="hotline.".$infos["transfert_pole"]."@absystech.fr";
-
-			ATF::hotline_mail()->createMailPoleTransfert($hotline["id_hotline"],$id_hotline_interaction,$email);
-			ATF::hotline_mail()->sendMail();
-
-			//Notice
-			ATF::hotline()->createMailNotice("hotline_transfert_pole");
-		}
-
-		/*---------------Gestion de l'envoi de mail----------------------*/
-		//Mail au client
-		if($mail && $infos["send_mail"]=="oui" && $interaction["visible"]=="oui"){
-
-			try{
-				ATF::hotline_mail()->createMailInteraction($hotline["id_hotline"],$id_hotline_interaction,$infos["filestoattach"]["fichier_joint"],$infos["anotherNotify"],$infos['mep_mail']);
-
-				if($infos["filestoattach"]["fichier_joint"]){
-					//Ajout du fichier joint
-					$path = $this->filepath($id_hotline_interaction,"fichier_joint");
-					$mail=ATF::hotline_mail()->getCurrentMail();
-					$mail->addFile($path,"fichier_joint.zip",true);
-				}
-
-				ATF::hotline_mail()->sendMail();
-				//Notice
-				ATF::hotline()->createMailNotice("hotline_interaction_mail_to_contact");
-			}catch(errorATF $e){
-				//Notice
-				//ATF::hotline()->createNotice("hotline_interaction_no_mail_to_contact");
-			}
-		}
-
-		//Envoi d'un mail en interne
-		//Recherche des intervenant ayant travaillé sur la hotline
-		$inters=$this->ss("id_hotline",$infos["id_hotline"],"id_user");
-		$team=array();
-		foreach($inters as $inter){
-			if(!empty($inter["id_user"]) && ATF::$usr->getId()!=$inter["id_user"] && !in_array($inter["id_user"])){
-				array_push($team,ATF::user()->select($inter["id_user"],"email"));
-			}
-		}
-
-		//Ajout des actifs selectionné
-		$lesactifs = is_array($infos["actifNotify"])?$infos["actifNotify"]:explode(",",$infos["actifNotify"]);
-		foreach($lesactifs as $actif){
-			if (!empty($actif)) {
-				array_push($team,ATF::user()->select($actif,"email"));
-			}
-		}
-
-		if(count($team)>0){
-			$team = array_flip(array_flip($team)); // Suppression des doublons
-
-			ATF::hotline_mail()->createMailInteractionInternal(implode(",",$team),$hotline["id_hotline"],$id_hotline_interaction,$infos["filestoattach"]["fichier_joint"]);
-			if($infos["filestoattach"]["fichier_joint"]){
-				//Ajout du fichier joint
-				$path = $this->filepath($id_hotline_interaction,"fichier_joint");
-				$mail=ATF::hotline_mail()->getCurrentMail();
-				$mail->addFile($path,"fichier_joint.zip",true);
-			}
-			ATF::hotline_mail()->sendMail();
-			//Notice
-			ATF::hotline()->createMailNotice("hotline_interaction_mail_to_users");
-		}
-
-		/*---------------Mise à jour de la date de modification hotline----------------------*/
-		ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"date_modification"=>date("Y-m-d H:i:s"),"disabledInternalInteraction"=>true));
-
-		/*---------------Redirection + Notice----------------------*/
-		ATF::hotline()->redirection("select",$infos["id_hotline"],"hotline-select-".$this->cryptId($infos["id_hotline"]).".html");
-		ATF::hotline()->createNotice("hotline_interaction_done");
-
-		if(ATF::db($this->db)->commit_transaction()){
-
-			api::sendUDP(array("data"=>array("type"=>"interaction")));
-		}
 
 
-		return $id_hotline_interaction;
+		// Mobile
+		$this->addPrivilege("rpcGetRecentForMobile","select");
+		$this->addPrivilege("rpcGetInteractionsForMobile","select");
+
+		//Redirection par défaut
+		$this->defaultRedirect["insert"]="select";
+		$this->defaultRedirect["update"]="select";
+		$this->defaultRedirect["cloner"]="select";
+		$this->formExt=true;
+
+		$this->defaultRedirect["insert"]="select";
+
+		$this->autocomplete["view"] = array(
+			"ROUND(hotline.id_hotline)"=>array("alias"=>"id")
+			// "hotline.hotline"=>array("alias"=>"nom"),
+			// "societe.id_societe"=>array("alias"=>"d1"),
+			// "contact.id_contact"=>array("alias"=>"d2"),
+			// "hotline.etat"=>array("alias"=>"d3")
+		);
+
+		$this->liste_user=$this->getUserActif();
+		$this->addPrivilege("changeUser");
+
+		$this->selectExtjs=true;
+		$this->noCollapse = true;
 	}
 
 	/**
-	* Retourne la valeur par défaut spécifique aux données passées en paramètres
-	* @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
-	* @param string $field
-	* @param array &$s La session
-	* @param array &$request Paramètres disponibles (clés étrangères)
+	* Surcharge de la méthode nom à cause du problème d'affichage du nom sur fiche select
+	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
+	* @param int $id
 	* @return string
 	*/
-	public function default_value($field,&$s,&$request){
-		switch ($field) {
-			case "id_user":
-				return ATF::$usr->getID();
-				break;
-			case "detail":
-				if(ATF::_r('id_ordre_de_mission')){
-					return ATF::$usr->trans("hotline_odm_detail");
-				}
-				break;
-			case "visible":
-					//Recherche de la hotline
-					if(strlen($request["id_hotline"])==32){
-						$hotline_visible=ATF::hotline()->select($this->decryptId($request["id_hotline"]),"visible");
-					}
-					if($hotline_visible){
-						return $hotline_visible;
-					}else{
-						return parent::default_value($field);
-					}
-				break;
-			case "rappel-hotline":
-				return ATF::hotline()->nom(ATF::_r('id_hotline'));
-				break;
-			case "rappelDetail-hotline":
-				return nl2br(ATF::hotline()->select(ATF::_r('id_hotline'),"detail"));
-				break;
-			default:
-				return parent::default_value($field);
-		}
-	}
-
-	/**
-	* Donne le temps de presta+deplacement sur une interaction
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
-	* @return int le temps total travaillé en base 10. 1 = 1 heure
-	*/
-	public function getBillingTimeV2($id_hotline_interaction){
-		$tps_presta = $this->getTime($id_hotline_interaction,"duree_presta");
-		$tps_pause = $this->getTime($id_hotline_interaction,"duree_pause");
-		$tps_dep = $this->getTime($id_hotline_interaction,"duree_dep");
-
-		$temps = ($tps_presta + $tps_dep) - $tps_pause;
-
-		return $temps;
-	}
-
-	/*
-	* @codeCoverageIgnore
-	*/
-	public function getCreditV2($id_hotline_interaction){
-		$id_hotline = $this->select($id_hotline_interaction , "id_hotline");
-
-		if(ATF::hotline()->select($id_hotline, "facturation_ticket") == "non"){
-			$nb = 0.00;
-		}else{
-			$credit = $this->getTime($id_hotline_interaction,"credit");
-
-			$credit = explode(".", strval($credit));
-
-			if($credit[1] > 0){
-				if($credit[1] <= 250){
-					$nb = 0.25;
-				}elseif($credit[1] <= 500){
-					$nb = 0.50;
-				}elseif($credit[1] <= 750){
-					$nb = 0.75;
-				}else{
-					$nb = 1;
-				}
-			}
-			$nb = $nb + $credit[0];
-		}
-
-		return $nb;
-	}
-
-
-	/**
-	* Donne le temps FACTURE sur une interaction
-	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
-	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
-	* @return int le temps total travaillé en base 10. 1 = 1 heure
-	* @codeCoverageIgnore
-	*/
-	public function getBillingTime($id_hotline_interaction){
-		return $this->getTime($id_hotline_interaction,"temps");
-	}
-
-	/**
-	* Donne le temps PASSE sur une interactiion
-	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
-	* @param int $id_hotline_interaction l'id hotline_interaction correspondant
-	* @return int le temps total travaillé en base 10. 1 = 1 heure
-	* @codeCoverageIgnore
-	*/
-	public function getTotalTime($id_hotline_interaction){
-		return $this->getTime($id_hotline_interaction,"temps_passe");
-	}
-
-	/**
-	* Retourne le temps passé ou facturé sur une interaction bien formatté
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
-	* @param int $id L'identifiant de l'interaction
-	* @return int le temps en base 10 (1 = 1h)
-	*/
-	private function getTime($id_hotline_interaction,$temps) {
-		if($temps == "credit"){
-			$this->q->reset()
-				->addField("(`credit_presta`+`credit_dep`)","credit")
-				->addCondition('id_hotline_interaction',$id_hotline_interaction)
-				->setDimension('cell');
-		}else{
-			$this->q->reset()
-				->addField("ROUND(TIME_TO_SEC(".$temps.")/3600,2)","temps")
-				->addCondition('id_hotline_interaction',$id_hotline_interaction)
-				->setDimension('cell');
-		}
-
-
-		return $this->sa();
-	}
-
-	/*
-	* Permet de récupérer les différents états d'une requête hotline
-	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	*/
-	public function listingEtat(){
-		//on récupère les etats formaté tel : enum('free','fixing','wait','done','payee','annulee')
-		preg_match_all("`'([[:alpha:]]*)'`",ATF::hotline()->desc['etat']['Type'],$liste);
-		//et on le mets sous forme array('free'=>1,'fixing'=>1,'wait'=>1,'done'=>1,'payee'=>1,'annulee'=>1)
-		foreach($liste[1] as $key=>$nom){
-			$etat[$nom]=1;
-		}
-		return $etat;
-	}
-
-
-	//************************STATS*****************************/
-
-	/**
-	* Retourne les années pour lesquelles la hotline a été utilisée
-	*		pour une société donnée si elle est en param
-	* @author Maïté Glinkowski <mglinkowski@absystech.fr>
-	* @author Fanny DECLERCK<fdeclerck@absystech.fr>
-	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	* @param int id_societe
-	* @return array key =year item=year
-	*/
-	public function get_years($id_societe=NULL){
-		$this->q->reset()
-				->addField("YEAR( hotline_interaction.date )","year")
-				->addJointure($this->table,"id_hotline","hotline","id_hotline",NULL,NULL,NULL,NULL,"inner")
-				->addJointure("hotline","id_societe","societe","id_societe",NULL,NULL,NULL,NULL,"inner")
-				->addCondition("hotline.pole_concerne",NULL,NULL,false,"IS NOT NULL")
-				->addGroup("year")
-				->addOrder("year");
-
-		if($id_societe){
-			$this->q->addCondition("hotline.id_societe",$id_societe);
-		}
-
-		foreach(parent::select_all() AS $tab){
-			$r[$tab['year']] = $tab['year'];
-		}
-		return $r;
-	}
-
-	/**
-	* Renvoi les societes concernées par la hotline,
-	*		en fonction de l'année et en fonction du pole concerne,
-	*		sous forme d'un tableau pour l'affichage du graphe des statistiques
-	* @author Maïté Glinkowski <mglinkowski@absystech.fr>
-	* @author Fanny DECLERCK<fdeclerck@absystech.fr>
-	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	* @param int annee
-	* @return array key =id_societe item=societe
-	*/
-	public function societe_options($annee){
-		$this->q->reset()
-				->addField("societe.id_societe","id")
-				->addField("societe.societe","societe")
-				->addJointure($this->table,"id_hotline","hotline","id_hotline",NULL,NULL,NULL,NULL,"inner")
-				->addJointure("hotline","id_societe","societe","id_societe",NULL,NULL,NULL,NULL,"inner")
-				->addCondition("YEAR( hotline_interaction.date )",$annee)
-				->addGroup("id")
-				->addOrder("societe")
-				->addOrder("id");
-
-
-		foreach($this->stats_filtre as $name){
-			foreach($this->$name as $valeur=>$check){
-				if($check)$this->q->addCondition("hotline.$name",$valeur,"OR","hotline.$name");
-			}
-		}
-
-		foreach(parent::select_all() as $tab){
-			$r[$tab['id']] = $tab['societe'];
-		}
-		return $r;
-	}
-
-
-
-
-
-
-	/**
-	* Retourne les users qui ont créé des hotline_interaction
-	*	sous forme d'un tableau  key =id_user item=nom
-	* @author Maïté Glinkowski <mglinkowski@absystech.fr>
-	* @author Fanny DECLERCK<fdeclerck@absystech.fr>
-	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	* @return array
-	*/
-	public function get_user(){
-		ATF::user()->q->reset()
-			->addField("user.id_user","id")
-			->addField("CONCAT(`user`.`civilite`,' ',`user`.`prenom`,' ',`user`.`nom`)","nom")
-			->setStrict()
-			->addJointure("user","id_user","hotline_interaction","id_user",NULL,NULL,NULL,NULL,"inner")
-			->addGroup('id');
-
-		foreach(ATF::user()->sa() AS $tab){
-			$r[$tab['id']]  = $tab['nom'];
-		}
-		return $r;
-	}
-
-	/**
-	* Retourne les users qui ont créé des hotline_interaction, seulement ceux qui ont un profil et actif
-	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	* @return array
-	*/
-	public function getUserActif(){
-		ATF::user()->q->reset()
-			->addField("user.id_user","id")
-			->addField("CONCAT(`user`.`civilite`,' ',`user`.`prenom`,' ',`user`.`nom`)","nom")
-			->setStrict()
-			->addJointure("user","id_user","hotline_interaction","id_user",NULL,NULL,NULL,NULL,"inner")
-			->addCondition('etat','normal')
-			->addConditionNotNull('id_profil')
-			->addGroup('id');
-
-		foreach(ATF::user()->sa() AS $tab){
-			$r[$tab['id']]  = 1;
-		}
-		return $r;
-	}
-
-	/**
-	* Retourne les interactions ayant eu lieues depuis la dernière activité
-	* @author Yann GAUTHERON <ygautheron@absystech.fr>
-	* @return array
-	*/
-	public function getRecentForMobile($countUnseenOnly=false){
-		$this->q->reset()
-			->addField("hotline_interaction.date","date")
-			->addField("hotline_interaction.id_user")
-			->addField("hotline_interaction.id_contact")
-			->addField("hotline_interaction.detail","detail")
-			->addField("hotline_interaction.id_hotline","id")
-
-			// Ces dernières 72h
-			->andWhere("hotline_interaction.date",date("Y-m-d H:i:s",time()-86400*3),"date",">");
-
-		if ($countUnseenOnly) {
-			$this->q->setCountOnly()
-				->andWhere("hotline_interaction.date",ATF::$usr->last_activity,"date",">");
-			return parent::select_all();
+	public function nom($id) {
+		if ($this->memory_optimisation_select && isset($this->cache[__FUNCTION__][$id])) {
+			return $this->cache[__FUNCTION__][$id];
 		} else {
-			$return = parent::select_all();
-			foreach ($return as $k=>$i) {
-				$return[$k]["user"] = $return[$k]["hotline_interaction.id_user"];
-				$return[$k]["contact"] = $return[$k]["hotline_interaction.id_contact"];
+			if (!$id) return;
+			$id = $this->decryptId($id); // On sait jamais s'il s'agit d'un md5
 
-				$return[$k]["humanDate"] = ATF::$usr->date_trans($return[$k]["date"],true,false,true);
+			$this->q
+				->reset()
+				->addCondition($this->table.".id_".$this->table,$id)
+				->setDimension("cell")
+				->addField($this->table.".id_".$this->table);
+			$nom = $this->sa();
 
-				if ($return[$k]["date"]>ATF::$usr->last_activity) {
-					$return[$k]["date"] = "=> ".ATF::$usr->trans("unseen");
-				}
-
+			if ($this->memory_optimisation_select) {
+				$this->cache[__FUNCTION__][$id] = $nom;
+				return $this->cache[__FUNCTION__][$id];
+			} else {
+				return $nom;
 			}
-			return $return;
-		}
-	}
-
-	/**
-	* Retourne Vrai si l'intervenant est deja intervenu sur l'id_hotline
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	* @param $id_intervenant l'id de l'intervenant
-	* @param $id_hotline l'id de la requete hotline
-	* @return boolean Vrai si l'intervenant est deja intervenu sur la requete
-	*/
-	public function isIntervenant($id_intervenant, $id_hotline){
-		$id_hotline = ATF::hotline()->decryptId($id_hotline);
-		$id_intervenant = ATF::user()->decryptId($id_intervenant);
-
-		$this->q->reset()->where("id_hotline", $id_hotline)
-						 ->where("id_user",$id_intervenant);
-		$res = $this->select_all();
-		if(is_array($res)){
-			return true;
-		}else{
-			return false;
 		}
 	}
 
@@ -826,40 +175,2032 @@ class hotline_interaction extends classes_optima {
 	* Surcharge du select-All
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
+	public function saExport(){
+		return $this->saCustom();
+	}
+
+	/**
+	* Surcharge du select-All
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	*/
 	public function saCustom(){
 		if ($this->q->count!==false && $this->q->count!==1){
 			$this->q->setCount();
 		}
-		$this->q
-			->addField("hotline_interaction.visible")
-			->addField("TIME_TO_SEC(hotline_interaction.duree_dep)/3600","duree_dep")
-			->addField("TIME_TO_SEC(hotline_interaction.duree_presta)/3600","duree_presta")
-			->addField("TIME_TO_SEC(hotline_interaction.duree_pause)/3600","duree_pause");
+		$this->q->addJointure("hotline","id_hotline","hotline_interaction","id_hotline")
+			->addGroup("hotline.id_hotline")
+			->addField("ROUND(hotline.id_hotline)","id_hotline")
+			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.temps))/3600*4)/4,2)","temps")
+			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600*4)/4,2)","duree_dep")
+			->addField("IF(hotline.facturation_ticket = 'oui' AND hotline.charge = 'intervention',SUM(hotline_interaction.credit_presta + hotline_interaction.credit_dep),0)","credit_total")
+			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600*4)/4,2)","duree_presta")
+			->addField("ROUND(CEIL(SUM(TIME_TO_SEC(hotline_interaction.duree_presta)-TIME_TO_SEC(IF(hotline_interaction.duree_pause IS NULL,0,hotline_interaction.duree_pause)))/3600*4)/4,2)","duree_work")
+			->addField("hotline.id_affaire","hotline.id_affaire_fk")
+			->addField("hotline.urgence")
+			->addField("hotline.etat")
+			->addField("hotline.visible")
+			->addField("hotline.wait_mep")
+			->addField("hotline.avancement")
+			->addField("hotline.estimation")
+			->addField("hotline.date_terminee")
+			->addField("hotline.id_user")
+			->addField("hotline.id_affaire")
+			->addField("ROUND(TIME_TO_SEC(hotline.estimation)/3600,2)","temps_estime")
+			->addField("ROUND(SUM(TIME_TO_SEC(hotline_interaction.temps_passe))/3600,2)","temps_total")
+			->addField("hotline.priorite")
+			->addField("IF(hotline.facturation_ticket = 'oui' AND hotline.charge = 'intervention' AND SUM(TIME_TO_SEC(hotline_interaction.duree_presta))>0,
+							ROUND(
+							(CASE
+								WHEN (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) > 0.75 THEN FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep))+1
 
-		$return = 	$this->select_all();
-		return $return;
-	}
+								WHEN (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) > 0.50 && (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) < 0.75
+								THEN FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep))+0.75
 
-	public function getInteractionIntoDate($date_deb, $date_fin){
-		ATF::hotline_interaction()->q->reset()
-									->setStrict()
-									->where("hotline_interaction.date", $date_deb." 00:00:00' AND '".$date_fin." 23:59:59","AND",false,"BETWEEN")
-									->where("hotline_interaction.duree_presta","00:00:00","AND",false,"!=")
-									->whereIsNotNull("hotline_interaction.id_user");
-		if(ATF::$codename == "absystech"){
-			ATF::hotline_interaction()->q->where("hotline_interaction.id_user",30,"AND","usr","!=") //Guirec
-										 ->where("hotline_interaction.id_user",62,"AND","usr","!=") // Laurent Hubau
-										 ->where("hotline_interaction.id_user",57,"AND","usr","!=") // Gauthier
-										 ->where("hotline_interaction.id_user",3,"AND","usr","!=") // Sebasien
-										 ->where("hotline_interaction.id_user",64,"AND","usr","!=") // Thibaut
-										 ->where("hotline_interaction.id_user",54,"AND","usr","!="); // Emma
+
+								WHEN (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) > 0.25 && (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) < 0.50
+								THEN FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) + 0.50
+
+								WHEN (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) < 0.25 && (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) > 0.00
+								THEN FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) +0.25
+
+								WHEN (SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) - FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep)) = 0.00
+								THEN FLOOR(SUM(hotline_interaction.credit_presta)+ SUM(hotline_interaction.credit_dep))
+
+							END)
+							/((SUM(TIME_TO_SEC(hotline_interaction.duree_dep))/3600)+(SUM(TIME_TO_SEC(hotline_interaction.duree_presta))/3600)),2),
+							NULL)", "ratio");
+
+		// Derrnier crédit restant basé sur gestion_ticket
+		$hi = new hotline_interaction();
+		$id_sub = "hi";
+		$hi->q->setAlias("hiSub")->addField("MAX(hiSub.id_hotline_interaction)","id")->orWhere("hiSub.id_hotline","hotline.id_hotline",false,"=",true,true)->setStrict()->setToString();
+		$this->q->orWhere("hi.id_hotline_interaction","(".$hi->sa().")","hiSubWhere","=",true,true)
+			->addField("hi.date","date_last_interaction")
+			->from("hotline","id_hotline","hotline_interaction","id_hotline","hi",NULL,NULL,"hiSubWhere");
+
+		/*$this->q
+			->addOrder("date_last_interaction","desc")
+			->addOrder("hotline.priorite","desc")
+			->addOrder("hotline.date","asc");*/
+		$sa=$this->select_all();
+
+		// Trier par défaut dans l'ordre d'urgence (priorité)
+		// On ajoute sur la première page le calcul de la deadline en fonction de la priorité, des jours ouvrés, du temps estimé et du travail déjà effectué.
+
+		//--Calcul de la deadline
+		//Calcul uniquement pour la première ligne
+		if($this->q->getPage()==0){
+			//date_cursors permet de gérer la dead_line par utilisateur
+			$date_cursor=strtotime("now");
+			$date_cursors=array();
+			$cursor=&$date_cursor;
+			$reste=0;
+
+			foreach($sa["data"] as $number=>$line){
+				$sa["data"][$number]["temps_facture_calcule"] = $this->getTimeFactureCalcule($line);
+
+				//Si pas d'estimation nc
+				if(!$line["temps_estime"]||$line["temps_estime"]==0.00||$line["hotline.etat"]=="payee"||$line["hotline.etat"]=="annulee"||$line["hotline.etat"]=="done"){
+					$sa["data"][$number]["dead_line"]="-";
+				}else{
+					//Recherche de l'utilisateur et de sa dead_line
+					if($sa["data"][$number]["hotline.id_user"]){
+						$cursor=&$date_cursors[$sa["data"][$number]["hotline.id_user"]];
+						if(!$cursor){
+							$cursor=strtotime("now");
+						}
+					}else{
+						$cursor=&$date_cursor;
+					}
+					//On calcule la différence entre l'estimation et le temps total
+					$total=$line["temps_estime"]-$line["temps_total"];
+					if($total>=0){
+						//On détermine le jour ou on devra finir (dead_line)
+						//--D'abords le nombre de jours
+						$total=$total+$reste;//On ajoute le reste
+						$nb_jours=(int)($total/7);
+						$reste=$total-$nb_jours*7;//On calcule le reste
+						//On doit finir aujour'hui
+						if($nb_jours==0){
+							$sa["data"][$number]["dead_line"]=ATF::$usr->date_trans(date("Y-m-d",$date_cursor),false);
+							if($cursor==strtotime("now")){
+								$sa["data"][$number]["urgent"]="now";
+							}
+						}else{
+							//Il faut trouver un autre jour Mais un jour OUVRE !
+							while($nb_jours>0){
+								$cursor=strtotime("+1 day",$cursor);
+								if(!util::testJour(date("Y-m-d",$cursor))){
+									$nb_jours--;
+								}
+							}
+							/*if($reste>0){
+								do{
+									$date_cursor=strtotime("+1 day",$date_cursor);
+								}while(util::testJour(date("Y-m-d",$date_cursor)));
+							}*/
+							$sa["data"][$number]["dead_line"]=ATF::$usr->date_trans(date("Y-m-d",$cursor),false);
+						}
+					}else{
+						//On dépasse ! Il faut terminer le boulot aujourd'hui
+						if($date_cursor==strtotime("now")){
+							$sa["data"][$number]["dead_line"]=ATF::$usr->date_trans(date("Y-m-d"),false);
+						}else{
+							$sa["data"][$number]["dead_line"]=ATF::$usr->date_trans(date("Y-m-d",$cursor),false);
+						}
+						$sa["data"][$number]["urgent"]="outdated";
+					}
+				}
+			}
+		//Pour les autres lignes : nc
 		}else{
-			ATF::hotline_interaction()->q->where("hotline_interaction.id_user",33,"OR","usr","=") // Guirec
-										 ->where("hotline_interaction.id_user",47,"OR","usr","="); //Laurent
+			foreach($sa["data"] as $number=>$line){
+				$sa["data"][$number]["dead_line"]="-";
+				$sa["data"][$number]["temps_facture_calcule"] = $this->getTimeFactureCalcule($line);			}
 		}
-		return ATF::hotline_interaction()->sa();
+		return $sa;
 	}
 
+	public function getTimeFactureCalcule($line){
+		if($line["hotline.id_affaire_fk"]){
+			ATF::devis()->q->reset()->where("devis.id_affaire", $line["hotline.id_affaire_fk"])
+									->where("devis.etat","gagne","OR","condEtatDevis","=")
+									->where("devis.etat","attente","OR","condEtatDevis","=")
+									->where("devis.etat","bloque","OR","condEtatDevis","=");
+
+			$devis = ATF::devis()->select_row();
+
+			$jours = $heures= $minutes = 0;
+
+			$duree=(($devis["prix"]-$devis["prix_achat"])/69); // Nombre heure
+
+			$jours = intval($duree /7);
+			$heures=intval($duree - ($jours*7));
+			$minutes=intval( ($duree -(($jours*7) + $heures))*60  );
+
+			return $jours."j ".$heures."h".$minutes;
+		}else{
+			return "-";
+		}
+	}
+
+
+
+	/**
+	* Donne le temps FACTURE sur une requête. C'est le temps correspondant au champ "temps" sur les interactions.
+	* Le temps est arrondi au quart d'heure.
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline l'id hotline correspondant
+	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	*/
+	public function getBillingTime($id_hotline){
+		//return $this->getTime($id_hotline,"temps");
+
+		return $this->getTotalTime($id_hotline,"presta");
+	}
+
+
+	public function getCreditUtilises($id_hotline){
+		if($this->select($id_hotline, "facturation_ticket") == "non"){
+			$nb = 0.00;
+		}else{
+			$credit = $this->getTime($id_hotline,"credit");
+
+			$credit = explode(".", strval($credit));
+
+			if($credit[1] > 0){
+				if($credit[1] <= 250){
+					$nb = 0.25;
+				}elseif($credit[1] <= 500){
+					$nb = 0.50;
+				}elseif($credit[1] <= 750){
+					$nb = 0.75;
+				}else{
+					$nb = 1;
+				}
+			}
+			$nb = $nb + $credit[0];
+		}
+
+		return $nb;
+
+
+	}
+
+	/**
+	* Donne le temps PASSE sur une requête. C'est le temps correspondant au champ "temps_passe" sur les interactions.
+	* C'est le temps de travail réél
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline l'id hotline correspondant
+	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	*/
+	public function getTotalTime($id_hotline, $type="temps_passe"){
+		if($type == "temps_passe") return $this->getTime($id_hotline,$type);
+		else {
+			$sec = $this->getTime($id_hotline,$type);
+			$heures = intval($sec/3600);
+			if($heures < 10) $heures = "0".$heures;
+			$minutes = ($sec-($heures*3600))/60;
+			if($minutes < 10) $minutes = "0".$minutes;
+			return $heures."H".$minutes;
+		}
+	}
+
+	/**
+	* Donne le temps ESTIME sur une requête. C'est le temps correspondant au champ "estimation" sur la hotline.
+	* C'est le temps de travail estimé.
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline l'id hotline correspondant
+	* @return int le temps estimé en base 10. 1 = 1 heure
+	*/
+	public function getEstimatedTime($id_hotline){
+		return $this->getTime($id_hotline,"estimation");
+	}
+
+	/**
+	* Calcul le temps de travail facturé ou passé pour un billet hotline donnée
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Fanny DECLERCK <fdeclerck@absystech.fr>
+	* @author QJ <qjanon@absystech.fr>
+	* @param int $id_hotline l'id hotline correspondant
+	* @param string $temps "temps_passe" ou "temps"
+	* @return int le temps total travaillé en base 10. 1 = 1 heure
+	*/
+	private function getTime($id_hotline,$temps){
+		$this->q->reset();
+
+		if($temps=="temps_passe"){
+			//Pour le temps passé on effectue juste une somme du temps passé
+			$this->q->addField(array(
+				"ROUND(
+					SUM(
+						TIME_TO_SEC(temps_passe)
+						)
+					/3600,2)
+				")
+			);
+		}elseif($temps=="presta"){
+			//Pour le temps passé on effectue juste une somme du temps passé
+			$this->q->addField(array(
+				"SUM(
+					TIME_TO_SEC(duree_presta)
+				)-
+				SUM(
+					TIME_TO_SEC(duree_pause)
+				)")
+			);
+		}elseif($temps=="dep"){
+			//Pour le temps passé on effectue juste une somme du temps passé
+			$this->q->addField(array(
+				"SUM(
+					TIME_TO_SEC(duree_dep)
+				)")
+			);
+		}elseif($temps=="credit"){
+			//Pour le temps passé on effectue juste une somme du temps passé
+			$this->q->addField(array("SUM(credit_presta)+SUM(credit_dep)"));
+		}elseif($temps=="estimation"){
+			$this->q->addField(array("
+				ROUND(
+					TIME_TO_SEC(estimation)
+				/3600,2)
+				")
+			);
+		}elseif($temps == "prestaTicket"){
+			$this->q->addField(array(
+				"SUM(
+					TIME_TO_SEC(duree_presta)
+				)-
+				SUM(
+					TIME_TO_SEC(duree_pause)
+				)")
+			)
+				->where("hotline_interaction.nature","interaction");
+
+		}else{
+			//Pour le temps facturé on arrondi au quart d'heure supérieur
+			$this->q->addField(array(
+				"ROUND(
+					CEIL(
+						SUM(
+							TIME_TO_SEC(temps)
+							)
+						/3600*4)
+					/4,2)
+				")
+			);
+		}
+
+		$this->q->addJointure($this->table,"id_hotline","hotline_interaction","id_hotline")
+			->addCondition('hotline.id_hotline',$this->decryptId($id_hotline))
+			->setDimension("cell");
+		return $this->sa();
+	}
+
+//	/**
+//	* Retourne uniquement les informations nécessaires à la création d'un menu déroulant standard
+//    * @author QJ <qjanon@absystech.fr>
+//    * @return array societe
+//    */
+//	public function pole_options() {
+//		foreach($this->enum2array("pole_concerne")  as $key => $item) {
+//			$return[$item] = ATF::$usr->trans($item,$this->table);
+//		}
+//		return $return;
+//	}
+
+	/**
+	* Prend en charge la requête
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return boolean true
+	*/
+	public function takeRequest($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		$this->infoCollapse($infos);
+
+		//Mode transactionel
+		ATF::db($this->db)->begin_transaction();
+		/* Mise à jour de la requête en cours*/
+		$infos_hotline=array();
+		$infos_hotline["id_hotline"]=$infos["id_hotline"];
+		$infos_hotline["id_user"]=((isset($infos["id_user"]))?$infos["id_user"]:ATF::$usr->getID());
+		$infos_hotline["date_debut"]=date("Y-m-d H:i:s",time());
+		if($this->select($infos["id_hotline"],"facturation_ticket")!=="oui"){
+			$infos_hotline["etat"]="fixing";
+		}
+		parent::update($infos_hotline);
+
+		//Recherche de la hotline
+		$hotline=$this->select($infos["id_hotline"]);
+
+		//Mise à jour de l'avancement
+		$this->setPrioriteByUrgence($hotline["id_hotline"],$hotline["urgence"]);
+
+		//Insère une interaction d'information
+		$this->createInternalInteraction($infos["id_hotline"],"Requête prise en charge par ".ATF::user()->nom(((isset($infos['id_user']))?$infos['id_user']:ATF::$usr->getID())),"oui");
+
+		//Partie mail
+		if ($infos["send_mail"]=="true" && $hotline["visible"]=="oui") {
+			try{
+				//Mail contact
+				ATF::hotline_mail()->createMailTakeCustomer($hotline["id_hotline"]);
+				ATF::hotline_mail()->sendMail();
+				//Notice mail envoyé
+				$this->createMailNotice("hotline_mail_prise_en_charge_contact");
+			}catch(errorATF $e){
+				//$this->createMailNotice("hotline_no_mail_prise_en_charge_contact");
+			}
+		}
+		/* Mail d'information au pôle concerné */
+		ATF::hotline_mail()->createMailTakeAT($hotline["id_hotline"]);
+		ATF::hotline_mail()->sendMail();
+		//Notice mail envoyé
+		$this->createMailNotice("hotline_mail_prise_en_charge_pole");
+
+
+		//On commit le tout
+		ATF::db($this->db)->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_prise_en_charge");
+
+		return true;
+	}
+
+	/**
+	* Génère le formulaire de choix de facturation
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	*/
+	public function getFormBillingMode($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
+		$this->infoCollapse($infos);
+
+		//Récupération des infos hotline
+		if(!$infos["id_hotline"]) throw new errorATF("null_id_hotline");
+		$hotline=$this->select($infos["id_hotline"]);
+
+		//Détermination du type de la requête
+		$type_requete="";
+		if($hotline["facturation_ticket"]=="oui"){
+			$type_requete="charge_client";
+		}elseif($hotline["id_affaire"]){
+			$type_requete="affaire";
+		}else{
+			$type_requete="charge_absystech";
+		}
+
+		//Création de l'affichage
+		ATF::$cr->add("main","hotline-billingMode");
+		$var=array("current_class"=>$this
+					,"id_hotline"=>$infos["id_hotline"]
+					,"charge"=>$hotline["charge"]
+					,"type_requete"=>$type_requete
+					,"id_affaire"=>$hotline["id_affaire"]
+					,"id_societe"=>$hotline["id_societe"]
+					,"send_mail"=>$infos["send_mail"]);
+		ATF::$cr->add("mainScript","hotline-billingMode.tpl.js",$var);
+		ATF::$cr->block("top");
+	}
+
+	/**
+	* Relance la facturation
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	*/
+	public function boostBilling($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
+		$this->infoCollapse($infos);
+		if(!$infos["id_hotline"]) throw new errorATF("null_id_hotline");
+		$infos=$this->select($infos["id_hotline"]);
+		$infos["relance"]=true;
+		$infos["send_mail"]=true;
+		$this->setBillingMode($infos,$s,$files,$cadre_refreshed);
+		$this->redirection("select",$infos["id_hotline"]);
+
+		//Trace dans les interactions
+		$this->createInternalInteraction($infos["id_hotline"],"Relance de la facturation par ".ATF::user()->nom(ATF::$usr->getId()));
+	}
+
+	/**
+	* Choix du mode de facturation en fonction de deux paramètres : type de requête et charge de la requête
+	* Type de requête : R&D, Maintenance, Intervention
+	* Charge de la reuqête : Par rapport à une affaire, tickets ou à la charge d'AbsysTech
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return boolean true
+	*/
+	public function setBillingMode($infos,&$s,$files=NULL,&$cadre_refreshed=NULL){
+		$this->infoCollapse($infos);
+
+		// Mode transactionel
+		ATF::db($this->db)->begin_transaction();
+
+		/* Mise à jour hotline */
+		if($infos["relance"]===true){
+			$hotline = array(
+				"id_hotline"=>$this->decryptId($infos["id_hotline"])
+				,"etat"=>"wait"
+			);
+		}else{
+			$hotline = array(
+				"id_hotline"=>$this->decryptId($infos["id_hotline"])
+				,"charge"=>$infos["charge"]
+			);
+		}
+
+		//Est-ce qu'il y a un utilisateur en charge ?
+		$id_user = $this->select($this->decryptId($infos["id_hotline"]),"id_user");
+
+		switch($infos["type_requete"]){
+			case "charge_absystech":
+				$hotline["facturation_ticket"]="non";
+				if($id_user) $hotline["etat"]="fixing";
+				$hotline["ok_facturation"]=NULL;
+				$hotline["id_affaire"]=NULL;
+				$chargeText="Charge AbsysTech";
+				break;
+			case "charge_client":
+				$hotline["facturation_ticket"]="oui";
+				$hotline["etat"]="wait";
+				$hotline["ok_facturation"]=NULL;
+				$hotline["id_affaire"]=NULL;
+				$chargeText="Charge Client";
+				break;
+			case "affaire":
+				if(!$infos["id_affaire"]) throw new errorATF('null_id_affaire');
+				$hotline["facturation_ticket"]="non";
+				if($id_user) $hotline["etat"]="fixing";
+				$hotline["ok_facturation"]=NULL;
+				$hotline["id_affaire"]=$this->decryptId($infos["id_affaire"]);
+				$chargeText="Sur une affaire";
+				break;
+		}
+
+		parent::update($hotline,$s);
+
+		$hotline = $this->select($infos["id_hotline"]);
+
+		/*Envoi du mail*/
+		if (($infos["send_mail"]=="true" || $infos["relance"]) && $hotline["visible"]=="oui"){
+			ATF::hotline_mail()->createMailBilling($hotline["id_hotline"]);
+			ATF::hotline_mail()->sendMail();
+
+			//Notice mail envoyé
+			if($infos['relance']){
+				$this->createMailNotice("hotline_relance_facturation");
+			}else{
+				$this->createMailNotice("hotline_mail_facturation");
+			}
+		}
+
+		//Insère une interaction d'information
+		if(!$infos["relance"] && !$infos["disabledInternalInteraction"]){
+			//Trace dans les interactions
+			$this->createInternalInteraction($infos["id_hotline"],"Choix de la facturation \"".$chargeText."\" par ".ATF::user()->nom(ATF::$usr->getId()));
+		}
+
+		//Notice
+		$this->createNotice("hotline_billing_set");
+
+		//Commit !
+		ATF::db($this->db)->commit_transaction();
+
+		//Raffraichissement
+		if(is_array($cadre_refresh) || isset($infos["refresh"])){
+			ATF::$cr->block("top");
+			$this->redirection("select",$hotline["id_hotline"]);
+		}
+
+		return true;
+	}
+
+	/**
+	* Résoudre le ticket hotline - Passe le ticket en etat résolu
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Fanny DECLERCK <fdeclerck@absystech.fr>
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return bool true si le ticket est résolu
+	*/
+	public function resolveRequest($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		$this->infoCollapse($infos);
+
+		//Vérification de l'état
+		if($this->select($infos["id_hotline"],"wait_mep")=="oui") throw new errorATF(ATF::$usr->trans("wait_mep_not_valid",$this->table));
+
+		//Vérification du travail
+		if(!$this->getTotalTime($infos["id_hotline"])) throw new errorATF(ATF::$usr->trans("travail_null",$this->table));
+
+		//Vérification des ordres de missions
+		ATF::ordre_de_mission()->q->reset()->addField("etat")->addCondition("id_hotline",$this->decryptId($infos['id_hotline']));
+		$odms=ATF::ordre_de_mission()->sa();
+		foreach($odms as $odm){
+			if($odm["etat"]=="en_cours"){
+				throw new errorATF(ATF::$usr->trans("odm_en_cours",$this->table));
+			}
+		}
+
+		//Mise à jour de la requête en cours
+		$hotline = array(
+			"id_hotline"=>$infos["id_hotline"]
+			,"etat"=>"done"
+			,"date_fin"=>date("Y-m-d H:i:s")
+			,"priorite"=>0
+		);
+
+		parent::update($hotline,$s);
+
+		//Insère une interaction d'information
+		$inter=array("id_hotline"=>$this->decryptId($infos["id_hotline"])
+					,"detail"=>"Requête résolue par ".ATF::user()->nom(ATF::$usr->getId())
+					,"id_user"=>ATF::$usr->getId()
+					,"visible"=>"non"
+					,"internal"=>true
+					);
+		ATF::hotline_interaction()->insert($inter);
+
+		//Envoi du mail
+		$hotline = $this->select($infos["id_hotline"]);
+		if ($infos["send_mail"]=="true" && $hotline["visible"]=="oui") {
+			try{
+				//Mail contact
+				ATF::hotline_mail()->createMailResolve($hotline["id_hotline"]);
+				ATF::hotline_mail()->sendMail();
+				//Notice mail envoyé
+				$this->createMailNotice("hotline_mail_resolu_client");
+			}catch(errorATF $e){
+			}
+		}
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_resolu");
+
+		return true;
+	}
+
+	/**
+	* Création d'une nouvelle requête hotline sur la partie Optima
+	* @author QJ <qjanon@absystech.fr>
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	*/
+	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
+
+
+		$this->infoCollapse($infos);
+
+
+		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
+			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
+		}
+
+
+		//Vérification des informations
+		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
+
+
+		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
+
+		//Construction de la hotline
+		$detail=$infos["detail"];
+		$infos["detail"]="Requête mise en ligne par ".ATF::user()->nom(ATF::$usr->getID())."\n\n".$infos["detail"];
+
+		$send_mail = false;
+		//Gestion de l'envoi de mail
+		if($infos["send_mail"]){
+			$send_mail = true;
+		}
+		unset($infos["send_mail"]);
+
+		// Gestion de l'urgence selon la priorité choisi
+		if($infos['priorite']){
+			if ($infos['priorite']>=15) {
+				$infos['urgence'] = "bloquant";
+			} elseif ($infos['priorite']>=5) {
+				$infos['urgence'] = "genant";
+			} else {
+				$infos['urgence'] = "detail";
+			}
+		}
+
+		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
+
+
+		//Date de création de la requête
+		$infos["date"]=date('Y-m-d H:i:s');
+
+
+		// Auto affectation a charge Absystech si client Absystech
+		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
+		if ($id_societe==1) {
+			$infos['type_requete'] = "charge_absystech";
+		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
+			$infos["id_affaire"] = $id_affaire_projet;
+		}
+
+		//Insertion de la requête
+		$type_requete=$infos["type_requete"];
+		unset($infos["type_requete"]);
+
+		ATF::db($this->db)->begin_transaction();
+
+		$id_hotline = parent::insert($infos,$s,$files);
+
+		$hotline = $this->select($id_hotline);
+		//Notice
+		$this->createNotice("hotline_insert");
+
+
+		//Gestion de la prise en charge de l'utilisateur
+		if($infos["id_user"]){
+			//Mise à jour de la hotline
+			$infos_hotline['id_hotline']=$id_hotline;
+			$infos_hotline["id_user"]=$infos['id_user'];
+			$infos_hotline['date_debut']=date("Y-m-d H:i:s",time());
+			$infos_hotline['etat']="fixing";
+			parent::update($infos_hotline);
+		}
+
+
+		//Sélection du mode de facturation
+		$infos["type_requete"]=$type_requete;
+		$infos["id_hotline"]=$id_hotline;
+		$infos["send_mail"]=$send_mail;
+		$infos["disabledInternalInteraction"]=true;
+		if ($infos["type_requete"]) {
+			$this->setBillingMode($infos,$s,$files);
+		}
+
+
+		//Correction de l'état de la requête
+		$hotline = $this->select($id_hotline);
+		if(!$hotline["id_user"] && !$hotline["facturation_ticket"]=="oui"){
+			$this->update(array("id_hotline"=>$id_hotline,"etat"=>"free","disabledInternalInteraction"=>true));
+		}
+
+
+		//Gestion de l'envoi de mail
+		ATF::hotline_mail()->createMailInsert($id_hotline,$infos["filestoattach"]["fichier_joint"],$infos["id_user"]);
+
+
+		//Fichier joint
+		if($infos["filestoattach"]["fichier_joint"]){
+			//Ajout du fichier joint
+			$path = $this->filepath($id_hotline,"fichier_joint");
+			$mail=ATF::hotline_mail()->getCurrentMail();
+			$mail->addFile($path,"fichier_joint.zip",true);
+		}
+
+		ATF::hotline_mail()->sendMail();
+
+
+		if((ATF::societe()->decryptId($infos["id_societe"]) != "1") && (ATF::societe()->decryptId($infos["id_societe"]) != "1154") && ($infos["visible"] == "oui") && $send_mail){
+			$mail = ATF::hotline_mail()->getCurrentMail();
+			if(ATF::contact()->select(ATF::contact()->decryptId($infos["id_contact"]) , "email")){
+				ATF::hotline_mail()->createMailForCustomers($id_hotline, "Nouvelle requete", ATF::contact()->select(ATF::contact()->decryptId($infos["id_contact"]) , "email"), "hotline_insert_client");
+				ATF::hotline_mail()->sendMail();
+			}
+		}
+
+
+
+		//Notice mail envoyé
+		$this->createMailNotice("hotline_mail_insert");
+
+		//Trace dans les interactions
+		$this->createInternalInteraction($id_hotline,"Requête créée par ".ATF::user()->nom(ATF::$usr->getId()));
+
+
+		//Fin de transaction
+		ATF::db($this->db)->commit_transaction();
+
+		$societe = ATF::societe()->select($infos['id_societe']);
+		$contact = ATF::contact()->select($infos['id_contact']);
+		$hotline = ATF::hotline()->select($id_hotline);
+
+
+		//cadre refresh
+		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
+
+
+		return $id_hotline;
+	}
+
+	/**
+	* Création d'une nouvelle requête hotline sur la partie Optima
+	* @author QJ <qjanon@absystech.fr>
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	*/
+	public function NEW_insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
+
+
+		$this->infoCollapse($infos);
+
+		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
+			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
+		}
+
+		//Vérification des informations
+		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
+
+		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
+		//Construction de la hotline
+		$detail=$infos["detail"];
+		$infos["detail"]="Requête mise en ligne par ".ATF::user()->nom(ATF::$usr->getID())."\n\n".$infos["detail"];
+
+		$send_mail = false;
+		//Gestion de l'envoi de mail
+		if($infos["send_mail"]){
+			$send_mail = true;
+		}
+		unset($infos["send_mail"]);
+
+		// Gestion de l'urgence selon la priorité choisi
+		if($infos['priorite']){
+			if ($infos['priorite']>=15) {
+				$infos['urgence'] = "bloquant";
+			} elseif ($infos['priorite']>=5) {
+				$infos['urgence'] = "genant";
+			} else {
+				$infos['urgence'] = "detail";
+			}
+		}
+
+		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
+
+
+		//Date de création de la requête
+		$infos["date"]=date('Y-m-d H:i:s');
+
+		// Auto affectation a charge Absystech si client Absystech
+		//$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
+		if (ATF::societe()->decryptId($infos['id_societe'])==1) {
+			$infos['type_requete'] = "charge_absystech";
+		}
+
+		//Insertion de la requête
+		$type_requete=$infos["type_requete"];
+		unset($infos["type_requete"]);
+
+		ATF::db($this->db)->begin_transaction();
+
+		//Gestion de la prise en charge de l'utilisateur
+		if($infos["id_user"]){
+			//Mise à jour de la hotline
+			$infos["id_user"]=$infos['id_user'];
+			$infos['date_debut']=date("Y-m-d H:i:s",time());
+			$infos['etat']="fixing";
+		}
+
+		$id_hotline = parent::insert($infos,$s,$files);
+		//Notice
+		$this->createNotice("hotline_insert");
+
+		//Gestion de l'envoi de mail
+		if(!$id_hotline) throw new errorATF(ATF::$usr->trans("null_id_hotline"));
+
+		// Envoi du mail de création de hotline
+		$contactn = ATF::contact()->nom($infos['id_contact']);
+		$societen = ATF::societe()->nom($infos['id_societe']);
+
+
+		$obj = "[#".$id_hotline;
+		if ($infos['urgence']) $obj .= " - ".strtoupper($infos['urgence']);
+		$obj .= "]";
+		$obj .= "NOUVELLE REQUÊTE";
+		if ($infos["id_user"]) $obj .= "pour ".ATF::user()->nom($infos["id_user"]);
+		$obj .= " de ".$contactn;
+		$obj .= "(".$societen.")";
+
+		$to="hotline.".$infos['pole_concerne']."@absystech.fr";
+		$template="hotline_insert";
+		$from="Hotline AbsysTech <optima-hotline-".ATF::$codename."-".ATF::hotline()->cryptId($id_hotline)."-".ATF::contact()->cryptId($infos["id_contact"])."@absystech-speedmail.com>";
+
+		$societe = ATF::societe()->select($infos['id_societe']);
+		$contact = ATF::contact()->select($infos['id_contact']);
+		$hotline = ATF::hotline()->select($id_hotline);
+
+// Envoi sur mattermost
+$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+$login = ATF::user()->select($id_owner,"login");
+$logins = array(
+"tpruvost"=>"thibaut",
+"jluillier"=>"jacques",
+"smortier"=>"sol-r",
+"gdamecourt"=>"gauthier"
+);
+if ($logins[$login]) $login = $logins[$login];
+$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
+$data = array();
+$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+$data["username"] = $societe["societe"];
+$data["channel"] = "Hotline";
+$cmd .= json_encode($data);
+$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+log::logger($cmd,'mm');
+if (!ATF::isTestUnitaire()) $result = `$cmd`;
+
+		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
+		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
+		$mail_data["ip"] = $_SERVER["REMOTE_ADDR"];
+		$mail_data["contact"] = $contactn;
+		$mail_data["societe"] = $societen;
+		$mail_data["hotline"] = $hotline;
+		$mail_data["recipient"] = $to;
+		$mail_data["from"] = $from;
+		$mail_data["objet"] = $obj;
+		$mail_data["template"] = $template;
+		$mail_data["fichier"] = $pj;
+
+		$mail = new mail($mail_data);
+		//Fichier joint
+		if($infos["filestoattach"]["fichier_joint"]){
+			//Ajout du fichier joint
+			$path = $this->filepath($id_hotline,"fichier_joint");
+			$mail->addFile($path,"fichier_joint.zip",true);
+		}
+
+		$mail->send();
+
+
+		// if((ATF::societe()->decryptId($infos["id_societe"]) != "1") // AT
+		// 	&& (ATF::societe()->decryptId($infos["id_societe"]) != "1154") // ATT
+		// 	&& ($infos["visible"] == "oui")
+		// 	&& $send_mail){
+		// 	$mail = ATF::hotline_mail()->getCurrentMail();
+		// 	if(ATF::contact()->select($infos["id_contact"], "email")){
+		// 		ATF::hotline_mail()->createMailForCustomers(
+		// 			$id_hotline,
+		// 			"Nouvelle requete",
+		// 			ATF::contact()->select($infos["id_contact"], "email"),
+		// 			"hotline_insert_client"
+		// 		);
+		// 		ATF::hotline_mail()->sendMail();
+		// 	}
+		// }
+
+		//Notice mail envoyé
+		$this->createMailNotice("hotline_mail_insert");
+
+		//Trace dans les interactions
+		//$this->createInternalInteraction($id_hotline,"Requête créée par ".ATF::user()->nom(ATF::$usr->getId()));
+
+
+		//Fin de transaction
+		ATF::db($this->db)->commit_transaction();
+
+		api::sendUDP(array("data"=>array("type"=>"interaction")));
+		return $id_hotline;
+	}
+
+	/**
+	* Mise à jour de la requête
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	*/
+	public function update($infos,&$s,$files=NULL,&$cadre_refreshed){
+		$this->infoCollapse($infos);
+
+		//Vérification des informations
+		//if(!$infos["id_contact"]) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
+
+		if(isset($infos["send_mail"])){
+			unset($infos["send_mail"]);
+		}
+
+		//Désactivation de la trace hotline
+		if($infos["disabledInternalInteraction"]){
+			$disabledInternalInteraction=true;
+			unset($infos["disabledInternalInteraction"]);
+		}
+		$retour=parent::update($infos,$s,$files,$cadre_refreshed);
+
+		//Trace dans les interactions
+		if(!$disabledInternalInteraction){
+			$this->createInternalInteraction($infos["id_hotline"],"Requête mise à jour par ".ATF::user()->nom(ATF::$usr->getId()));
+		}
+
+		api::sendUDP(array("data"=>array("type"=>"interaction")));
+
+		return $retour;
+	}
+
+	/**
+	* Annule une requête hotline
+	* @author QJ <qjanon@absystech.fr>
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	*/
+	public function cancelRequest($infos,&$s,$files=NULL,&$cadre_refreshed) {
+		$this->infoCollapse($infos);
+
+		//Mode transactionel
+		ATF::db($this->db)->begin_transaction();
+
+		//Mise à jour de la requête
+		$hotline="";
+		$hotline = $this->select($infos["id_hotline"]);
+		$hotline["etat"]="annulee";
+		$hotline["priorite"]=0;
+		$hotline["wait_mep"]='0';
+		parent::update($hotline);
+
+		if ($infos["send_mail"]=="true" && $hotline["visible"]=="oui") {
+			try{
+				//Mail contact
+				ATF::hotline_mail()->createMailCancel($hotline["id_hotline"]);
+				ATF::hotline_mail()->sendMail();
+				//Notice mail envoyé
+				$this->createMailNotice("hotline_mail_cancel_client");
+			}catch(errorATF $e){
+			}
+		}
+
+		//Trace dans les interactions
+		$this->createInternalInteraction($infos["id_hotline"],"Requête annulée par ".ATF::user()->nom(ATF::$usr->getId()));
+
+		//Commit !
+		ATF::db($this->db)->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_annulee");
+
+		return true;
+	}
+
+	/**
+	* Passage d'une requête wait en fixing
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return boolean true
+	*/
+	public function fixingRequest($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		$this->infoCollapse($infos);
+
+		//Debut de la transaction
+		ATF::db($this->db)->begin_transaction();
+
+		/*Mise à jour de la requête en cours*/
+		$hotline["id_hotline"]=$infos["id_hotline"];
+		$hotline["etat"]="fixing";
+		parent::update($hotline,$s);
+
+		//Trace dans les interactions
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Passage en état 'en cours' par ".ATF::user()->nom($u));
+
+		//commit
+		ATF::db()->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_force_fixing");
+
+		return true;
+	}
+
+	/**
+	* Passage d'une requête en etat Wait
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return boolean true
+	*/
+	public function setWait($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		$this->infoCollapse($infos);
+
+		//Debut de la transaction
+		ATF::db($this->db)->begin_transaction();
+
+		/*Mise à jour de la requête en cours*/
+		$hotline['id_hotline']=$infos['id_hotline'];
+		$hotline['etat']="wait";
+		parent::update($hotline,$s);
+
+		//Trace dans les interactions
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Passage en état 'en attente' par ".ATF::user()->nom($u));
+
+		//commit
+		ATF::db()->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_force_wait");
+
+		return true;
+	}
+
+
+	/**
+	* Retourne la valeur par défaut spécifique aux données passées en paramètres
+	* @author Jérémie GWIAZDOWSKI <jgwiazdowski@absystech.fr>
+	* @param string $field
+	* @param array &$s La session
+	* @param array &$request Paramètres disponibles (clés étrangères)
+	* @return string
+	*/
+	public function default_value($field){
+		switch ($field) {
+			case "pole_concerne":
+				$pole=ATF::user()->select(ATF::$usr->getID(),"pole");
+				if($pos=strpos($pole,",")){
+					$pole=substr($pole,0,$pos);
+				}
+				return $pole;
+			break;
+			case "estimation":
+				return "00:00";
+			break;
+			default:
+				return parent::default_value($field);
+		}
+	}
+
+	/**
+	* Passe un ticket en attente de Mise en production
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return bool true si le ticket est résolu
+	*/
+	public function setWaitMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		//Vérification des infos
+		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
+
+		//Mode transactionel
+		ATF::db($this->db)->begin_transaction();
+
+		/*Mise à jour de la requête en cours*/
+		$hotline = array(
+			"id_hotline"=>$infos["id_hotline"]
+			,"wait_mep"=>"oui"
+		);
+
+		parent::update($hotline,$s);
+
+		//Envoi d'un mail au chef de projet !
+		ATF::hotline_mail()->createMailWaitMep($infos["id_hotline"]);
+		ATF::hotline_mail()->sendMail();
+
+		//Notice mail envoyé
+		$this->createMailNotice("hotline_mail_wait_mise_prod");
+
+		//Trace dans les interactions
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Demande de Mise en prod par ".ATF::user()->nom($u));
+
+		//Commit
+		ATF::db($this->db)->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_wait_mise_prod");
+
+		return true;
+	}
+
+	/**
+	* Passe un ticket en mise en prod OK
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return bool true si le ticket est résolu
+	*/
+	public function setMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		//Vérification des infos
+		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
+
+		//Mode transactionel
+		ATF::db($this->db)->begin_transaction();
+
+		/*	Mise à jour de la requête en cours*/
+		$hotline = array(
+			"id_hotline"=>$infos["id_hotline"]
+			,"wait_mep"=>"non"
+		);
+
+		parent::update($hotline,$s);
+
+		//Envoi d'un mail au chef de projet !
+		ATF::hotline_mail()->createMailMep($infos["id_hotline"]);
+		ATF::hotline_mail()->sendMail();
+
+		//Notice mail envoyé
+		$this->createMailNotice("hotline_mail_mise_prod");
+
+		//Trace dans les interactions
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Mis en prod par ".ATF::user()->nom($u));
+
+		//Commit
+		ATF::db($this->db)->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_mise_prod");
+
+		return true;
+	}
+
+	/**
+	* Annule une mise en pré-prod
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos
+	* @param array $s
+	* @param array $files
+	* @return bool true si le ticket est résolu
+	*/
+	public function cancelMep($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+		//Vérification des infos
+		if(!$infos || !$infos["id_hotline"]) throw new errorATF(ATF::$usr->trans("aucunes_infos",$this->table));
+
+		//Mode transactionel
+		ATF::db($this->db)->begin_transaction();
+
+		/*	Mise à jour de la requête en cours*/
+		$hotline = array(
+			"id_hotline"=>$infos["id_hotline"]
+			,"wait_mep"=>"non"
+		);
+
+		parent::update($hotline,$s);
+
+		//Trace dans les interactions
+		$u = $infos['id_user']?$infos['id_user']:ATF::$usr->getId();
+		$this->createInternalInteraction($infos["id_hotline"],"Demande de MEP annulé par ".ATF::user()->nom($u));
+
+		//Commit
+		ATF::db($this->db)->commit_transaction();
+
+		//Cadre refresh
+		$this->redirection("select",$hotline["id_hotline"]);
+
+		//Notice
+		$this->createNotice("hotline_cancel_mise_prod");
+
+		return true;
+	}
+
+//	/**
+//	* Création de l'URL Optima avec encryption en AES
+//	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+//	* @param int $id_hotline L'identifiant hotline
+//	* @return string l'url
+//	*/
+//	public function createOptimaURL($id_hotline){
+//		$aes_tmp=new aes();
+//		$id = $aes_tmp->crypt($id_hotline);
+//		$url = __MANUAL_WEB_PATH__.'?url='.base64_encode('table=hotline&event=select&id_hotline='.$id.'&seed='.$aes_tmp->getIV().$aes_tmp->getKey());
+//		$aes_tmp->endCrypt();
+//		return $url;
+//	}
+
+	/**
+	* Création de l'URL pour le portail Hotline
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param string $login Le Login du portail hotline
+	* @param string $passwd Le mot de passe du portail hotline
+	* @param int $id_contact Le contact associé à la requête
+	* @param int $id_hotline L'identifiant hotline
+	* @return string l'url
+	*/
+	public function createPortailHotlineURL($login,$passwd,$id_hotline,$id_contact,$event="select"){
+		$url=__HOTLINE_URL__."login.php?login=".base64_encode($login)."&password=".base64_encode($passwd)."&contact=".base64_encode($id_contact)."&url=";
+		$url.=base64_encode(__HOTLINE_URL__."hotline.php?table=hotline&event=".$event."&id_hotline=".$id_hotline);
+		$url.= "&schema=".base64_encode(ATF::$codename);
+		return $url;
+	}
+
+	/**
+	* Donne la priorité : rouge, orange ou vert (bloquant, génant ou détail)
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @param string $etat l'état de la requête
+	* @param int $priorite la priorite de la requête
+	* @param string $mep oui|non
+	* @return array 1er élément : string progressRed pour rouge, progressOrange pour orange et progressGreen pour vert, 2ème élément :string  le texte, 3ème élément la priorite
+	*/
+	public function getSimplePriorite($etat,$priorite,$mep){
+		//$requete=$this->select($id_hotline);
+		if ($mep=="oui") {
+			return array(
+				"progressBar"=>"progressGreen"
+				,"text"=>ATF::$usr->trans("MEP_prevue",$this->table)
+				,"priority"=>$priorite
+			);
+		} else {
+			switch($etat){
+				case "free":
+					$pBar="progressRed";
+					break;
+				case "done":
+				case "payee":
+				case "annulee":
+					$pBar="progressGrey";
+					break;
+				default:
+					if($priorite<10){
+						$pBar="progressGreen";
+					}elseif($priorite<15){
+						$pBar="progressOrange";
+					}else{
+						$pBar="progressRed";
+					}
+			}
+			return array(
+				"progressBar"=>$pBar
+				,"text"=>ATF::$usr->trans($etat,$this->table)
+				,"priority"=>$priorite
+			);
+		}
+	}
+
+	/**
+	* Met à jour la priorité
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param array $infos "id_hotline" int l'id hotline et "priorite" int la priorité
+	*/
+	public function setPriorite($infos){
+		if($infos["priorite"]>20||$infos["priorite"]<0){
+			throw new errorATF(ATF::$usr->trans("invalid_range"));
+		}
+
+		$this->update(array("id_hotline"=>$infos["id_hotline"],"priorite"=>$infos["priorite"],"disabledInternalInteraction"=>true));
+
+		if($infos["hotline_select"]){
+			//Cadre refresh
+			$this->redirection("select",$infos["id_hotline"]);
+
+			//Notice
+			$this->createNotice("update_priorite_select");
+		}else{
+			//Cadre refresh
+			/*$var = array(
+				"current_class"=>$this
+			);
+			ATF::$cr->add("main","generic-select_all.tpl.htm",$var);		*/			//Notice
+			$this->createNotice("Mise a jour de la priorité réussie");
+		}
+	}
+
+	/**
+	* Met à jour la priorité par rapport à l'urgence
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline L'identifiant de la hotline
+	* @param string $urgence l'urgence de la requête
+	*/
+	public function setPrioriteByUrgence($id_hotline,$urgence){
+		switch($urgence){
+			case "detail":
+				$priorite=5;
+				break;
+			case "genant":
+				$priorite=10;
+				break;
+			case "bloquant":
+				$priorite=15;
+				break;
+		}
+		return $this->update(array("id_hotline"=>$id_hotline,"priorite"=>$priorite,"disabledInternalInteraction"=>true));
+	}
+
+	/**
+	* Donne l'avancement d'une requête
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param string $etat l'état de la requête
+	* @return string $avancement l'avancement de la requête
+	*/
+	public function getAvancement($etat,$avancement,$complet=true){
+		if(!$complet){
+			return $avancement;
+		}
+		//$requete=$this->select($id_hotline);
+		switch($etat){
+			case "free":
+				return 0;
+			case "fixing":
+			case "wait":
+				return 20+0.6*$avancement;
+			case "done":
+				return 90;
+			case "payee":
+				return 100;
+			case "annulee":
+				return 100;
+		}
+
+		return false;
+	}
+
+	/**
+	* Ajuste l'avancement d'une requête hotline
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline L'identifiant de la hotline
+	* @param int $nb l'avancement
+	*/
+
+	public function setAvancement($id_hotline,$avancement){
+		if($avancement>100||$avancement<0){
+			throw new errorATF(ATF::$usr->trans("invalid_range"));
+		}
+		return $this->update(array("id_hotline"=>$id_hotline,"avancement"=>$avancement,"disabledInternalInteraction"=>true));
+	}
+
+	/**
+	* Retourne le temps total passé sur les tickets non résolus (en cours)
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @param boolean $useForecast Si VRAI alors on pondère le CA par le pourcentage de forecast
+	* @return int
+	*/
+	public function getTempsTotalNonResolu(){
+		$this->q->reset()
+			->setDimension('cell')
+			->addField("SUM(TIME_TO_SEC(temps))")
+			->addCondition("etat","done","AND",false,"!=")
+			->addCondition("etat","payee","AND",false,"!=")
+			->addCondition("etat","annulee","AND",false,"!=")
+			->addJointure($this->table,"id_hotline","hotline_interaction","id_hotline");
+		return parent::select_all()/3600/7;
+	}
+
+	/**
+	* Retourne true si la requete est déjà payée et a été facturée
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @param id_hotline
+	* @return boolean
+	*/
+	public function alreadyBilled($id){
+		return $this->select($id,"facturation_ticket")=="oui" && in_array($this->select($id,"etat"),array("done","annulee","payee"));
+	}
+
+	/**
+	* Select all des tickets hotlines pour le dashBoard
+	* @author QJ <qjanon@absystech.fr>
+	* @param array $params
+	*/
+	public function selectForDashBoard($params) {
+		$this->q->reset()
+				->addField("hotline.id_hotline","id")
+				->addField("hotline.id_societe","id_societe")
+				->addField("societe.societe","societe")
+				->addField("hotline.hotline","hotline")
+				->addField("hotline.etat","etat")
+				->addField("hotline.priorite","priorite")
+				->addField("hotline.avancement","avancement")
+				->addJointure("hotline","id_societe","societe","id_societe")
+				->addCondition('hotline.etat','fixing')
+				->addCondition('hotline.etat','wait')
+				->addCondition('hotline.id_user',ATF::$usr->getID())
+				->setLimit($params["limit"])
+				->setPage($params["start"]/$params["limit"])
+				->setCount()
+				->addOrder("hotline.date","desc");
+
+		$result = parent::select_all();
+		ATF::$json->add("totalCount",$result["count"]);
+		return $result['data'];
+	}
+
+	//************************CRONTAB*****************************/
+
+	/**
+	* Sous-routine de traitement de la facturation
+	* Evite de dupliquer les lignes de code pour changer le paramèter de facturation...
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	* @param string $facturation_ticket oui ou non
+	*/
+	public function ss_traitement_facturation($facturation_ticket='oui'){
+		//Debut de la transaction
+		ATF::db($this->db)->begin_transaction();
+		/*-------------Requêtes Facturées----------------------*/
+		$this->q->reset()
+				->addCondition('etat','done',NULL,1)
+				->addCondition('facturation_ticket',$facturation_ticket,'AND',1)
+				->addCondition('indice_satisfaction',NULL,'AND',1,'IS NOT NULL')
+				;
+
+		//Iteration 2
+		//Construction du time
+		$nb_days=__NB_DAYS_FACTURATION__;
+		$date_dead_line=date('Y-m-d',strtotime("-".(($nb_days)?$nb_days:"7")." days"));
+
+		$this->q->addCondition('etat','done',NULL,2)
+			   ->addCondition('facturation_ticket',$facturation_ticket,'AND',2)
+			   ->addCondition('date_fin',$date_dead_line,'AND',2,'<')
+			   ->addSuperCondition('1,2');
+
+		$donnees=$this->sa();
+
+		echo 'nb_requetes-facturation='.$facturation_ticket.':';print_r(count($donnees));echo "\n";
+		$compteur=0;
+		$count_tickets=0;
+		foreach($donnees as $req){
+			$compteur++;
+			if($facturation_ticket=='oui'){
+				echo '['.$compteur.']Traitement de la requete '.$req['id_hotline']." - ".ATF::societe()->nom($req['id_societe'])." - debit de ";
+
+				$nb_tickets=ATF::gestion_ticket()->remove_ticket(array(
+					'id_societe'=>$req['id_societe']
+					,'id_hotline'=>$req['id_hotline']
+				),$s);
+
+				$count_tickets+=$nb_tickets;
+
+				echo $nb_tickets." ticket(s) \n";
+			}else{
+				echo '['.$compteur.']Traitement de la requete '.$req['id_hotline']." - ".ATF::societe()->nom($req['id_societe'])."\n";
+			}
+
+			parent::update(array(
+				'id_hotline'=>$req['id_hotline']
+				,'etat'=>"payee"
+				,'priorite'=>0
+			),$s);
+		}
+
+		if($facturation_ticket=='oui'){
+			//Total des tickets débités :
+			echo "Total tickets de la journée : -".$count_tickets."\n";
+
+			//Total de tout les tickets négatifs
+			echo "Total de tout les tickets négatifs restants : ".ATF::societe()->getSoldeSNegatives()."\n";
+
+			//Total de tout les tickets
+			echo "Total de tout les tickets restants (négatifs + positifs) : ".ATF::societe()->getSoldeS()."\n";
+
+		}
+
+		//Commit !
+		ATF::db()->commit_transaction();
+	}
+
+	/**
+	* Effectue la facturation des tickets
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	* @param array $s la session
+	* @param boolean $force_done Force les requêtes non terminées
+	*/
+	public function traitement_facturation(&$s){
+		//Temporisation de sortie
+		ob_start();
+		echo "[Debut Facturation]\n";
+
+		//Debut de la transaction
+		ATF::db($this->db)->begin_transaction();
+
+		/*-------------Requêtes Non Facturées----------------------*/
+		$this->ss_traitement_facturation('non');
+
+		/*-------------Requêtes Facturées----------------------*/
+		$this->ss_traitement_facturation('oui');
+
+		//commit
+		ATF::db()->commit_transaction();
+
+		echo "[Fin facturation]\n";
+
+		//Envoie d'un mail de rapport
+		$mail=new mail(array('recipient'=>'smortier@absystech.fr','objet'=>'[Facturation Hotline - Optima '.ATF::$codename.'] Résultats batch','body'=>ob_get_contents()));
+		$mail->send();
+
+		//Affichage du résultat
+		ob_end_flush();
+	}
+
+	/**
+	* Met à jour la priorité
+	* Règle actuelle : - +1 pour des requêtes 0<r<19 tous les 3 jours
+	*                  - Requête en Etat fixing uniquement
+	* La méthode incrémente juste. La fréquence (tous les 2 jours) est à régler dans la crontab.
+	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+	*/
+	public function upgradePriorite(){
+		//Debut de la transaction
+		ATF::db($this->db)->begin_transaction();
+
+		$this->q->reset()->addCondition("etat","fixing")
+						->addCondition("priorite","0","AND",false,">")
+						->addCondition("priorite","19","AND",false,"<");
+		$elements=$this->sa();
+
+		//Temporisation de sortie
+		echo "[Debut Upgrade Priorite]\n";
+		try{
+		foreach($elements as $element){
+			$nouvelle_priorite=$element["priorite"]+1;
+			$this->update(array("id_hotline"=>$element["id_hotline"],"priorite"=>$nouvelle_priorite,"disabledInternalInteraction"=>true));
+			echo "Maj requête n° ".$element["id_hotline"]." Ancienne priorite=".$element["priorite"]." Nouvelle priorite=".$nouvelle_priorite."\n";
+		}
+		}catch(errorATF $e){
+			ATF::db()->rollback_transaction();
+			echo "Erreur : ".$e->getMessage()."\n";
+			return false;
+		}
+		echo "[Debut Fin Priorite]\n";
+		//commit
+		ATF::db()->commit_transaction();
+	}
+
+
+	public function getSemestre($MonthActu , $YearActu){
+		$Y = $YearActu;
+		$Y1 = $Y-1;
+		if($MonthActu < 7){
+			$date[0]["debut"] = date($Y1."-01-01");
+			$date[1]["debut"] = date($Y1."-07-01");
+			$date[2]["debut"] = date($Y."-01-01");
+			$date[0]["fin"] = date($Y1."-06-30");
+			$date[1]["fin"] = date($Y1."-12-31");
+			$date[2]["fin"] = date($Y."-06-30");
+			$date["semestre"][0] = "S1 ".$Y1;
+			$date["semestre"][1] = "S2 ".$Y1;
+			$date["semestre"][2] = "S1 ".$Y;
+		}else{
+			$date[0]["debut"] = date($Y1."-07-01");
+			$date[1]["debut"] = date($Y."-01-01" );
+			$date[2]["debut"] = date($Y."-07-01");
+			$date[0]["fin"] = date($Y1."-12-31");
+			$date[1]["fin"] = date($Y."-06-30");
+			$date[2]["fin"] = date($Y."-12-31");
+			$date["semestre"][0] = "S2 ".$Y1;
+			$date["semestre"][1] = "S1 ".$Y;
+			$date["semestre"][2] = "S2 ".$Y;
+		}
+		return $date;
+	}
+
+	public function statNbCloture(){
+		$this->q->reset()
+				->setStrict()
+				->addCondition("hotline.id_societe","1","AND",false,"!=")
+				->addCondition("hotline.id_societe","1154","AND",false,"!=")
+				->addJointure("hotline","id_user","user","id_user")
+				->addCondition("user.etat","normal")
+				->addOrder("dif",'desc')
+				->addCondition("DATE_ADD(hotline.date, INTERVAL 30 DAY)","'".date("Y-m-d 00:00:00")."'",NULL,false,">=",false,false,true)
+				->addField('count(*)','dif')
+				->addCondition("hotline.etat","done")
+				->addCondition("hotline.etat","payee")
+				->addField("user.nom","user")
+				->addField("user.id_user","id_user")
+				->addGroup("hotline.id_user");
+		$result=parent::sa();
+
+		$this->q->reset()
+				->setStrict()
+				->addCondition("hotline.id_societe","1")
+				->addCondition("hotline.id_societe","1154")
+				->addJointure("hotline","id_user","user","id_user")
+				->addCondition("user.etat","normal")
+				->addOrder("dif",'desc')
+				->addCondition("DATE_ADD(hotline.date, INTERVAL 30 DAY)","'".date("Y-m-d 00:00:00")."'",NULL,false,">=",false,false,true)
+				->addField('count(*)','dif')
+				->addCondition("hotline.etat","done")
+				->addCondition("hotline.etat","payee")
+				->addField("user.nom","user")
+				->addField("user.id_user","id_user")
+				->addGroup("hotline.id_user");
+		$resultAT=parent::sa();
+
+		foreach ($result as $i) {
+			$nom=ATF::user()->select($i["id_user"]);
+			$graph['categories']["category"][$i['user']] = array("label"=>substr($nom['prenom'],0,1).substr($nom['nom'],0,1));
+		}
+		$graph['params']['showLegend'] = "0";
+		$graph['params']['bgAlpha'] = "0";
+		$graph['categories']['params']["fontSize"] = "12";
+
+		$this->paramGraphe($dataset_params,$graph);
+
+		foreach ($result as $val_) {
+			if (!$graph['dataset']['dif']) {
+				$graph['dataset']['dif']["params"] = array_merge($dataset_params,array(
+					"seriesname"=>'dif'
+					,"color"=>($cloture?"fbb632":"ff3636")
+				));
+
+				foreach ($result as $val_2) {
+					if($val_['user']==$val_2['user'])$graph['dataset']['dif']['set'][$val_2['user']] = array("value"=>0,"value2"=>0,"alpha"=>100,"titre"=>$val_2['user']." : 0");
+				}
+			}
+			$graph['dataset']['dif']['set'][$val_['user']] = array("value"=>$val_['dif'], "value2"=>0,"alpha"=>($val_['user']==ATF::$usr->get('nom')?100:50),"titre"=>$val_['user']." : ".$val_['dif']);
+			foreach ($resultAT as $k=>$_) {
+				if($_["user"] == $val_['user']){
+					$graph['dataset']['dif']['set'][$val_['user']]["value2"] = $_["dif"];
+				}
+			}
+
+		}
+		return $graph;
+	}
+
+	public function getSecond($time){
+		$timeArr = array_reverse(explode(":", $time));
+		$seconds = 0;
+		foreach ($timeArr as $key => $value)
+		{
+			if ($key > 2) break;
+			$seconds += pow(60, $key) * $value;
+		}
+		return $seconds;
+
+	}
+
+
+	//Retourne le nbre de jours ouvrés entre 2 dates
+	function getJoursOuvres($datedeb,$datefin){
+		$nb_jours=0;
+		$dated=explode('-',$datedeb);
+		$datef=explode('-',$datefin);
+		$timestampcurr=mktime(0,0,0,$dated[1],$dated[2],$dated[0]);
+		$timestampf=mktime(0,0,0,$datef[1],$datef[2],$datef[0]);
+		while($timestampcurr<$timestampf){
+
+				  if((date('w',$timestampcurr)!=0)&&(date('w',$timestampcurr)!=6)){
+					$nb_jours++;
+				  }
+			$timestampcurr=mktime(0,0,0,date('m',$timestampcurr),(date('d',$timestampcurr)+1)   ,date('Y',$timestampcurr));
+
+		}
+		return $nb_jours+1;
+	}
+
+
+
+	/*
+	* Simple function to sort an array by a specific key. Maintains index association.
+	* @codeCoverageIgnore
+	*/
+	function array_sort($array, $on, $order=SORT_ASC){
+		$new_array = array();
+		$sortable_array = array();
+
+		if (count($array) > 0) {
+			foreach ($array as $k => $v) {
+				if (is_array($v)) {
+					foreach ($v as $k2 => $v2) {
+						if ($k2 == $on) {
+							$sortable_array[$k] = $v2;
+						}
+					}
+				} else {
+					$sortable_array[$k] = $v;
+				}
+			}
+			switch ($order) {
+				case SORT_ASC:  asort($sortable_array);
+				break;
+				case SORT_DESC: arsort($sortable_array);
+				break;
+			}
+
+			foreach ($sortable_array as $k => $v) {
+				$new_array[$k] = $array[$k];
+			}
+		}
+
+		return $new_array;
+	}
+
+	/*
+	* @codeCoverageIgnore
+	*/
+	public function getTauxHorraire($id_affaire){
+		$marge_brute = 0;
+		ATF::facture()->q->reset()->where("facture.id_affaire",$id_affaire);
+		$res = ATF::facture()->select_all();
+		//Si j'ai des factures
+		if($res){
+			ATF::bon_de_commande()->q->reset()->where("bon_de_commande.id_affaire",$id_affaire);
+			$bdcs = ATF::bon_de_commande()->select_all();
+			$pbdc = 0;
+			foreach ($bdcs as $k => $v) {
+				$pbdc+=$v["prix"];
+			}
+
+			foreach ($res as $key => $value) {
+				$marge_brute += $value["facture.prix"];
+			}
+			$marge_brute = round(($marge_brute - $pbdc),2);
+		}else{
+			//Si j'ai pas de factures
+			ATF::devis()->q->reset()->where("devis.id_affaire", $id_affaire)
+									->addOrder("revision","desc");
+			$devis = ATF::devis()->select_row();
+
+			$marge_brute = round(($devis["prix"] - $devis["prix_achat"]),2);
+		}
+
+		ATF::hotline_interaction()->q->reset()
+				->setStrict()
+				->whereIsNotNull("hotline_interaction.id_user")
+				->from("hotline_interaction",'id_hotline',"hotline","id_hotline")
+				->where("hotline.id_affaire",$id_affaire);
+
+		$res=ATF::hotline_interaction()->select_all();
+
+		$tps = $temps_passe = 0;
+
+		foreach ($res as $k => $v) {
+			$temps_passe = round($this->getSecond($v["duree_presta"])/3600,2)
+						  +round($this->getSecond($v["duree_dep"])/3600,2)
+						  -round($this->getSecond($v["duree_pause"])/3600,2);
+			if($temps_passe != 0){
+				$tps += $temps_passe;
+			}
+		}
+
+		return  round($marge_brute/$tps,2);
+
+	}
+
+
+	//************************MAILS*****************************/
+
+	/**
+	* Créé une notice classique
+	* La méthode s'occupe de tout ! il suffit de mettre l'expression non traduite
+	* @param strin $msg l'expression non traduite
+	*/
+	public function createNotice($msg){
+		$notice=ATF::$usr->trans($msg,$this->table);
+		ATF::$msg->addNotice($notice);
+	}
+
+	/**
+	* Crée une notice pour les mails
+	* La méthode s'occupe de tout ! il suffit de mettre l'expression non traduite
+	* @param strin $msg l'expression non traduite
+	*/
+	public function createMailNotice($msg){
+		$notice='<img src="'.ATF::$staticserver.'images/icones/email.png" height="16" width="16" alt="" />';
+		$notice.="&nbsp;";
+		$notice.=ATF::$usr->trans($msg,$this->table);
+		ATF::$msg->addNotice($notice);
+	}
+
+	//************************DIVERS*****************************/
+
+	/**
+	* Créé une interaction pour des mouvements de hotline donné. Cela peut servir à tracer les modifications sur la hotline dans le fil des interactions.
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline l'identifiant de la hotline
+	* @param string $msg Le message de l'interaction
+	*/
+	private function createInternalInteraction($id_hotline,$msg,$visible="non"){
+		//Insère une interaction d'information
+		//internal permet de bypassé la restriction de temps sur hotline_interaction
+		$inter=array("id_hotline"=>$this->decryptId($id_hotline)
+					,"detail"=>$msg
+					,"id_user"=>ATF::$usr->getId()
+					,"visible"=>$visible
+					,"internal"=>true
+					);
+		return ATF::hotline_interaction()->insert($inter);
+	}
+
+	/** Liste les hotlines selon la priorité passée en paramètre (et éventuellement un user)
+	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	*/
+	public function listeHotline($infos){
+		$this->q->reset()->addField("count(*)","nbr_hotline")
+						->addField("priorite")
+						->addCondition("priorite",$infos["priorite"]-2)
+						->addCondition("priorite",$infos["priorite"]-1)
+						->addCondition("priorite",$infos["priorite"])
+						->addCondition("priorite",$infos["priorite"]+1)
+						->addCondition("priorite",$infos["priorite"]+2)
+						->addCondition("hotline.etat",'payee',"AND","nonFinie","!=")
+						->addCondition("hotline.etat",'annulee',"AND","nonFinie","!=")
+						->addCondition("hotline.etat",'done',"AND","nonFinie","!=")
+						->addGroup('priorite')
+						->addOrder('priorite','asc');
+
+		if($infos['user']){
+			$this->q->addCondition("id_user",ATF::user()->decryptId($infos['user']));
+		}
+
+		//on liste les hotlines en fonction des priorités à + ou - 2 de celle passée en paramètre
+		$liste_date=array(
+							$infos['priorite']-2=>0
+							,$infos['priorite']-1=>0
+							,$infos['priorite']=>0
+							,$infos['priorite']+1=>0
+							,$infos['priorite']+2=>0
+		);
+
+		foreach(parent::select_all() as $key=>$item){
+			$liste_date[$item["priorite"]]=$item['nbr_hotline'];
+		}
+
+		$liste[]=$liste_date;
+
+		return $liste;
+	}
+
+	/**
+	* Méthode ajax pour appeler les hotlines
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return array
+	*/
+	public function rpcGetRecentForMobile($infos){
+		ATF::$cr->block("top");
+		if ($infos["limit"]) {
+			return $this->getRecentForMobile($infos["countUnseenOnly"],$infos["limit"]);
+		}
+		return $this->getRecentForMobile($infos["countUnseenOnly"]);
+	}
+
+	/**
+	* Retourne les hotlines ayant eu lieues depuis la dernière activité
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @codeCoverageIgnore
+	* @return array
+	*/
+	public function getRecentForMobile($countUnseenOnly=false,$limit=42){
+		$this->q->reset()
+			->setLimit($limit)
+			->unsetCount()
+			->addField('hotline.hotline')
+			->addField('hotline.pole_concerne')
+			->addField('hotline.id_societe')
+			->addField('hotline_interaction.id_user','intervenant_user')
+			->addField('hotline_interaction.id_contact','intervenant_contact')
+		;
+
+		// Ne voir que les ticket des poles qui concernent l'utilisateur
+		foreach (explode(",",ATF::$usr->get('pole')) as $pole) {
+			$this->q->where("pole_concerne",$pole,"OR","pole");
+		}
+
+		if ($countUnseenOnly) {
+			$this->q->setCountOnly()
+				->andWhere("hotline_interaction.date",ATF::$usr->last_activity,"date",">");
+			return $this->saCustom();
+		} else {
+
+			$return = $this->saCustom();
+			foreach ($return as $k=>$i) {
+				if ($return[$k]["intervenant_user"]) {
+					$return[$k]["intervenant"] = ATF::user()->nom($return[$k]["intervenant_user"]);
+				} else {
+					$return[$k]["intervenant"] = ATF::contact()->nom($return[$k]["intervenant_contact"]);
+				}
+				$return[$k]["contact"] = ATF::contact()->nom($return[$k]["id_contact"]);
+				$return[$k]["humanDate"] = ATF::$usr->date_trans(substr($return[$k]["date_last_interaction"],0,10),true,false,true);
+				$return[$k]["heure"] = date("H\hi",strtotime($return[$k]["date_last_interaction"]));
+				$return[$k]["indexSectionDate"] = date("y-m-d",strtotime($return[$k]["date_last_interaction"]));
+				if (!ATF::$usr->last_activity || $return[$k]["date_last_interaction"] > ATF::$usr->last_activity) {
+					$return[$k]["indexSectionDate"] = "";
+					$return[$k]["humanDate"] = "=> ".ATF::$usr->trans("unseen");
+				}
+			}
+
+			return util::cleanForMobile($return);
+		}
+	}
+
+	/**
+	* Méthode ajax pour récupérer des interactions
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return array
+	*/
+	public function rpcGetInteractionsForMobile($infos){
+		ATF::$cr->block("top");
+		if ($infos["id"]) {
+			$this->q->reset();
+			return $this->getInteractionsForMobile($infos["id"]);
+		}
+	}
+
+	/**
+	* Retourne les hotlines ayant eu lieues depuis la dernière activité
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return array
+	*/
+	public function getInteractionsForMobile($id_hotline){
+		ATF::hotline_interaction()->q->reset()
+//			->addField('id_user')
+//			->addField('id_contact')
+//			->addField('date')
+//			->addField('detail')
+			->where("id_hotline",$id_hotline);
+		$return=ATF::hotline_interaction()->select_all();
+		foreach ($return as $k=>$i) {
+			$return[$k]["user"] = ATF::user()->nom($return[$k]["id_user"]);
+			$return[$k]["contact"] = ATF::contact()->nom($return[$k]["id_contact"]);
+			$return[$k]["humanDate"] = ATF::$usr->date_trans(substr($return[$k]["date"],0,10),true,false,true);
+			$return[$k]["indexSectionDate"] = date("y-m-d",strtotime($return[$k]["date"]));
+			$return[$k] = array_map("strip_tags",$return[$k]);
+			$return[$k] = array_map("html_entity_decode",$return[$k]);
+		}
+		return util::cleanForMobile($return);
+	}
+
+
+
+	/**
+	* Permet de sauvegarder la liste des users sur lesquelles afficher la charge
+	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	*/
+	public function changeUser($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
+		$dif=array_diff_key($this->liste_user,array_flip($infos['tabuser']));
+
+		foreach($this->liste_user as $key=>$item){
+			if(isset($dif[$key]))$this->liste_user[$key]=0;
+			else $this->liste_user[$key]=1;
+		}
+
+		$infos['current_class']=ATF::stats();
+		ATF::$cr->add('main','stats_menu.tpl.htm',$infos);
+	}
+
+	/**
+	* Retourne les users qui ont créé des hotline_interaction, seulement ceux qui ont un profil et actif
+	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
+	* @return array
+	*/
+	public function getUserActif(){
+		ATF::user()->q->reset()
+			->addField("user.id_user","id")
+			->addField("CONCAT(`user`.`civilite`,' ',`user`.`prenom`,' ',`user`.`nom`)","nom")
+			->setStrict()
+			->addJointure("user","id_user","hotline","id_user",NULL,NULL,NULL,NULL,"inner")
+			->addCondition('user.etat','normal')
+			->addConditionNotNull('id_profil')
+			->addGroup('id');
+
+		foreach(ATF::user()->sa() AS $tab){
+			$r[$tab['id']]  = 1;
+		}
+		return $r;
+	}
 
 
 	/**
@@ -1152,41 +2493,6 @@ class hotline_interaction extends classes_optima {
 		return $this->sa();
 	}
 
-	/**
-	* Valide massivement les MEP des tickets hotlines
-	* @author Quentin JANON <qjanon@absystech.fr>
-	*
-	*/
-	public function massValidMEP($infos) {
-
-		//Commit
-		ATF::db($this->db)->begin_transaction();
-
-		foreach ($infos['th'] as $k=>$i) {
-			$hotline = array(
-				"id_hotline"=>$k
-				,"wait_mep"=>"non"
-			);
-
-			parent::update($hotline,$s);
-			//Envoi d'un mail au chef de projet !
-			ATF::hotline_mail()->createMailMep($k);
-			ATF::hotline_mail()->sendMail();
-
-			//Notice mail envoyé
-			$this->createMailNotice("hotline_mail_mise_prod");
-
-			//Trace dans les interactions
-			$this->createInternalInteraction($k,"Mis en prod par ".ATF::user()->nom(ATF::$usr->getId()));
-
-		}
-
-		//Commit
-		ATF::db($this->db)->commit_transaction();
-
-		$this->redirection("select_all");
-		return true;
-	}
 
 	/**
 	* Accepte automatiquement la facturation
@@ -1308,32 +2614,84 @@ class hotline_interaction extends classes_optima {
 	}
 
 
+	private function forward($infos) {
+
+		ATF::db($this->db)->begin_transaction();
+
+		try {
+			if ($infos['type'] == 'pole') {
+				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
+					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".ATF::$usr->trans($infos['val'],"hotline_pole_concerne"),
+					"internal"=>true,
+					"visible"=>"oui",
+					"duree_presta"=>"00:05",
+					"id_user"=>$infos["id_user"],
+					"id_hotline"=>$infos['id_hotline']
+				));
+				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
 
 
-	/**
-	* Permet de virer tous les tags vide d'une chaine de caractère, et virer les multiple BR qui s'enchaine.
-	* @package Telescope
-	* @author Quentin JANON <qjanon@absystech.fr>
-	* @param $str string Chaine a traitée
-	* @param $repto string replacementstring chaine modifié.
-	*/
-	public function remove_empty_tags_recursive ($str, $repto = NULL){
-		//** Return if string not given or empty.
-		if (!is_string ($str) || trim ($str) == '') return $str;
-		//** Recursive empty HTML tags.
-		$str = preg_replace(
-			//** Pattern written by Junaid Atari.
-			'/<([^<\/>]*)>([\s]*?|(?R))<\/\1>/imsU',
-			//** Replace with nothing if string empty.
-			!is_string ($repto) ? '' : $repto,
-			//** Source string
-			$str
-		);
+				ATF::hotline()->update(array(
+					"id_hotline"=>$infos["id_hotline"],
+					"pole_concerne"=>$infos["val"],
+					"disabledInternalInteraction"=>true
+				));
 
-		// ENleve les multiple BR
-		$str = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $str);
-		return $str;
+				//Récupération de l'email du nouveau utilisateur en charge
+				$email="hotline.".$infos["val"]."@absystech.fr";
+
+				ATF::hotline_mail()->createMailPoleTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
+				ATF::hotline_mail()->sendMail();
+
+				//Notice
+				$this->createMailNotice("hotline_transfert_pole");
+
+			} else if ($infos['type'] == 'user') {
+				$id_hotline_interaction = ATF::hotline_interaction()->insert(array(
+					"detail"=>"Requête transférée par ".ATF::user()->nom($infos["id_user"])." à ".ATF::user()->nom($infos['val']),
+					"internal"=>true,
+					"visible"=>"oui",
+					"duree_presta"=>"00:05",
+					"id_user"=>$infos["id_user"],
+					"id_hotline"=>$infos['id_hotline']
+				));
+				$return['interaction'] = ATF::hotline_interaction()->select($id_hotline_interaction);
+				$return['new_user'] = ATF::user()->nom($infos['val']);
+
+				//Récupération du pôle de l'utilisateur
+				$pole=explode(",",ATF::user()->select($infos["val"],"pole"));
+				$return['new_pole'] = ((is_array($pole) && isset($pole[0]) && !empty($pole[0]))?$pole[0]:"dev");
+
+
+				ATF::hotline()->update(
+					array(
+						"id_hotline"=>$infos["id_hotline"]
+						,"id_user"=>$infos["val"]
+						,"pole_concerne"=>$return['new_pole']
+						,"disabledInternalInteraction"=>true)
+				);
+
+				//Mise à jour de l'état
+				ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
+				//Récupération de l'email du nouvel utilisateur en charge
+				$email=ATF::user()->select($infos["val"],"email");
+
+				ATF::hotline_mail()->createMailUserTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
+				ATF::hotline_mail()->sendMail();
+
+				//Notice
+				ATF::hotline()->createMailNotice("hotline_transfert_user");
+			}
+		} catch (errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
+
+		$return['notices'] = ATF::$msg->getNotices();
+		$return['result'] = true;
+		ATF::db($this->db)->commit_transaction();
+		return $return;
 	}
-};
 
+};
 ?>
