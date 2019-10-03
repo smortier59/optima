@@ -1,1 +1,1 @@
-<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("solution_sage_x3"=>"Solution Sage X"));?>
+<?php $GLOBALS["language"]["fr"] = array_merge($GLOBALS["language"]["fr"],array("hotline_pole_concerne_solution_sage_x3"=>"Solution Sage X3"));?>
