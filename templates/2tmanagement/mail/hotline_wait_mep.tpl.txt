@@ -1,0 +1,9 @@
+En attente de mise en production
+
+Rendez-vous sur Optima pour consulter la requête ({$infos.optima_url})
+
+Requête de {$infos.contact} société {$infos.societe}
+
+Titre : {$infos.hotline}
+
+{$infos.detail|strip_tags:true|html_entity_decode:$smarty.const.ENT_QUOTES:"UTF-8"}

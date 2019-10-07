@@ -189,7 +189,7 @@ class hotline_interaction_2tmanagement extends hotline_interaction {
 				,"visible"=>$infos["visible"]
 				,"nature"=>"internal"
 			);
-			return parent::insert($data,$s,$files);
+			return $this->i($data,$s,$files);
 		}
 
 		$no_test_credit = true;

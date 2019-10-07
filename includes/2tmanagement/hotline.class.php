@@ -679,6 +679,12 @@ class hotline extends classes_optima {
 				$hotline["id_affaire"]=$this->decryptId($infos["id_affaire"]);
 				$chargeText="Sur une affaire";
 				break;
+			case "maintenance":
+				$hotline["facturation_ticket"]="non";
+				if($id_user) $hotline["etat"]="fixing";
+				$hotline["ok_facturation"]=NULL;
+				$chargeText="Contrat de maintenance";
+				break;
 		}
 
 		parent::update($hotline,$s);
@@ -1023,9 +1029,9 @@ class hotline extends classes_optima {
 		$obj .= " de ".$contactn;
 		$obj .= "(".$societen.")";
 
-		$to="Hotline 2T Management <hotline@2tmanagement.support>";
+		$to="hotline@2tmanagement.support";
 		$template="hotline_insert";
-		$from="Hotline 2T Management <hotline@2tmanagement.support>";
+		$from="hotline@2tmanagement.support";
 
 		$societe = ATF::societe()->select($infos['id_societe']);
 		$contact = ATF::contact()->select($infos['id_contact']);
@@ -1706,7 +1712,7 @@ class hotline extends classes_optima {
 		echo "[Fin facturation]\n";
 
 		//Envoie d'un mail de rapport
-		$mail=new mail(array('recipient'=>'Hotline 2T Management <hotline@2tmanagement.support>','objet'=>'[Facturation Hotline - Optima '.ATF::$codename.'] Résultats batch','body'=>ob_get_contents()));
+		$mail=new mail(array('recipient'=>'hotline@2tmanagement.support','objet'=>'[Facturation Hotline - Optima '.ATF::$codename.'] Résultats batch','body'=>ob_get_contents()));
 		$mail->send();
 
 		//Affichage du résultat
@@ -2225,6 +2231,12 @@ class hotline extends classes_optima {
 				$hotline["id_affaire"]=$this->decryptId($infos["id_affaire"]);
 				$chargeText="Sur une affaire";
 				break;
+			case "maintenance":
+				$hotline["facturation_ticket"]="non";
+				if($id_user) $hotline["etat"]="fixing";
+				$hotline["ok_facturation"]=NULL;
+				$chargeText="Contrat de maintenance";
+				break;
 		}
 
 		parent::update($hotline,$s);
@@ -2618,7 +2630,7 @@ class hotline extends classes_optima {
 				));
 
 				//Récupération de l'email du nouveau utilisateur en charge
-				$email="Hotline 2T Management <hotline@2tmanagement.support>";
+				$email="hotline@2tmanagement.support";
 
 				ATF::hotline_mail()->createMailPoleTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
 				ATF::hotline_mail()->sendMail();
