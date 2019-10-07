@@ -453,8 +453,7 @@ class hotline_interaction_2tmanagement extends hotline_interaction {
 		if($infos['transfert_pole']){
 			ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"pole_concerne"=>$infos["transfert_pole"],"disabledInternalInteraction"=>true,"id_user"=>$infos["transfert"]?$infos["transfert"]:NULL));
 			//Récupération de l'email du nouveau utilisateur en charge
-			$email="hotline.".$infos["transfert_pole"]."@absystech.fr";
-
+			$email="hotline@2tmanagement.support";
 			ATF::hotline_mail()->createMailPoleTransfert($hotline["id_hotline"],$id_hotline_interaction,$email);
 			ATF::hotline_mail()->sendMail();
 
