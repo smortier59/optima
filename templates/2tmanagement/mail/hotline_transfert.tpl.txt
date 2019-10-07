@@ -1,0 +1,13 @@
+{ATF::user()->nom(ATF::$usr->getID())} vous a transférer la requête n°{$infos.ref} - {$infos.hotline}. Voici le commentaire de l'intervenant :
+
+{$infos.interaction.detail}
+
+Rappel de la requête de {$infos.contact} de la societe {$infos.societe}
+
+{$infos.hotline_detail.detail|stripslashes|nl2br}
+
+Pour voir la requête vous pouvez aller sur ce lien : {$infos.optima_url}
+
+{if $infos.fichier}
+Un fichier est joint à la requête hotline, si vous ne le voyez pas rendez-vous sur Optima pour le télécharger
+{/if}

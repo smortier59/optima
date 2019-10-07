@@ -189,7 +189,7 @@ class hotline_mail {
 	private function createMailForAT($id_hotline,$obj,$to,$template,$id_hotline_interaction=NULL,$pj=false){
 		ATF::hotline()->q->reset()->where("id_hotline", $id_hotline);
 		$id_contact = ATF::hotline()->select_row();
-		$from="Hotline AbsysTech <optima-hotline-".ATF::$codename."-".ATF::hotline()->cryptId($id_hotline)."-".ATF::user()->cryptId($id_contact["id_contact"])."@absystech-speedmail.com>";
+		$from="hotline@2tmanagement.support";
 		$this->createMail($id_hotline,$obj,$from,$to,$template,$id_hotline_interaction,$pj);
 	}
 
@@ -213,7 +213,7 @@ class hotline_mail {
 		}else{
 			ATF::hotline()->q->reset()->where("id_hotline", $id_hotline);
 			$id_contact = ATF::hotline()->select_row();
-			$from="Hotline AbsysTech <optima-hotline-".ATF::$codename."-".ATF::hotline()->cryptId($id_hotline)."-".ATF::user()->cryptId($id_contact["id_contact"])."@absystech-speedmail.com>";
+			$from="hotline@2tmanagement.support";
 
 			$this->createMail($id_hotline,$obj,$from,$to,$template,$id_hotline_interaction,$pj,$mep);
 			return true;
@@ -251,7 +251,7 @@ class hotline_mail {
 		//Paramètres du mail
 		$id_hotline=ATF::hotline()->decryptId($id_hotline);
 		$obj='[#'.$id_hotline.' - Priorite : '.ATF::hotline()->select($id_hotline,"priorite").' ] NOUVELLE REQUETE '.($id_user?'pour '.ATF::user()->nom($id_user).' ':'').'de '.ATF::contact()->nom(ATF::hotline()->decryptId(ATF::hotline()->select($id_hotline,"id_contact"))).' de la societe '.ATF::societe()->nom(ATF::hotline()->decryptId(ATF::hotline()->select($id_hotline,"id_societe")));
-		$to="hotline.".ATF::hotline()->select($id_hotline,"pole_concerne")."@absystech.fr";
+		$to="hotline@2tmanagement.support";
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_pole"));
 		$template="hotline_insert";
 		$this->setCurrentMail("mail_insert");
@@ -268,7 +268,7 @@ class hotline_mail {
 		//Paramètres du mail
 		$id_hotline=ATF::hotline()->decryptId($id_hotline);
 		$obj='[#'.$id_hotline.'] '.ATF::$usr->trans("hotline_prise_charge").' '.ATF::user()->nom(ATF::hotline()->select($id_hotline,"id_user"));
-		$to="hotline.".ATF::hotline()->select($id_hotline,"pole_concerne")."@absystech.fr";
+		$to="hotline@2tmanagement.support";
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_pole"));
 		$template="hotline_prise_en_charge_hotline";
 		$this->setCurrentMail("mail_prise_en_charge_hotline");
@@ -336,7 +336,7 @@ class hotline_mail {
 		//Paramètres du mail
 		$id_hotline=ATF::hotline()->decryptId($id_hotline);
 		$obj=ATF::$project." - ".ATF::$codename." - Attente de mise en prod !";
-		$to="dev@absystech.fr";
+		$to="hotline@2tmanagement.support";
 		if(!$to) throw new errorATF(ATF::$usr->trans("null_mail_dev"));
 		$template="hotline_wait_mep";
 		$this->setCurrentMail("mail_wait_mep");

@@ -103,6 +103,12 @@
 					ATF.loadMask.show();
 					ATF.tpl2div("hotline,setbillingModeNew.ajax","charge=rd&type_requete=charge_absystech&id_hotline={$id_crypted}&send_mail="+Ext.getCmp('btnHotlineSendMail').pressed,{ onComplete: function() { ATF.loadMask.hide(); }});
 				}
+			},{
+				text:"Contrat de maintenance",
+				handler: function (el,ev) {
+					ATF.loadMask.show();
+					ATF.tpl2div("hotline,setbillingModeNew.ajax","charge=maintenance&type_requete=maintenance&id_hotline={$id_crypted}&send_mail="+Ext.getCmp('btnHotlineSendMail').pressed,{ onComplete: function() { ATF.loadMask.hide(); }});
+				}
 			}]
 		}
 	}

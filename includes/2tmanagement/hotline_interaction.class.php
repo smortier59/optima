@@ -2,15 +2,17 @@
 /**
 * Classe Hotline
 * @package Optima
-* @subpackage AbsysTech
+* @subpackage 2T Management
 */
-class hotline_interaction extends classes_optima {
+require_once dirname(__FILE__)."/../absystech/hotline_interaction.class.php";
+
+class hotline_interaction_2tmanagement extends hotline_interaction {
 	/**
 	* Contructeur par défaut !
 	*/
 	public function __construct() {
 		parent::__construct();
-		$this->table = __CLASS__;
+		$this->table = "hotline_interaction";
 
 		//Colonnes SELECT ALL
 		$this->colonnes['fields_column'] =array(
@@ -187,7 +189,7 @@ class hotline_interaction extends classes_optima {
 				,"visible"=>$infos["visible"]
 				,"nature"=>"internal"
 			);
-			return parent::insert($data,$s,$files);
+			return $this->i($data,$s,$files);
 		}
 
 		$no_test_credit = true;
@@ -227,7 +229,6 @@ class hotline_interaction extends classes_optima {
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF(ATF::$usr->trans("L'heure de fin de mission est inferieure à l'heure de fin de prestation !",$this->table));
 		}
-
 
 		//Test de présence d'un texte
 		if (!$infos["detail"]){
@@ -452,8 +453,7 @@ class hotline_interaction extends classes_optima {
 		if($infos['transfert_pole']){
 			ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"pole_concerne"=>$infos["transfert_pole"],"disabledInternalInteraction"=>true,"id_user"=>$infos["transfert"]?$infos["transfert"]:NULL));
 			//Récupération de l'email du nouveau utilisateur en charge
-			$email="hotline.".$infos["transfert_pole"]."@absystech.fr";
-
+			$email="hotline@2tmanagement.support";
 			ATF::hotline_mail()->createMailPoleTransfert($hotline["id_hotline"],$id_hotline_interaction,$email);
 			ATF::hotline_mail()->sendMail();
 
@@ -1158,5 +1158,6 @@ class hotline_interaction extends classes_optima {
 		$str = preg_replace("/(<br\s*\/?>\s*)+/", "<br/>", $str);
 		return $str;
 	}
+
 
 }
