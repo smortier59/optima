@@ -662,7 +662,7 @@ class hotline extends classes_optima {
 				if($id_user) $hotline["etat"]="fixing";
 				$hotline["ok_facturation"]=NULL;
 				$hotline["id_affaire"]=NULL;
-				$chargeText="Charge AbsysTech";
+				$chargeText="Charge 2T Management";
 				break;
 			case "charge_client":
 				$hotline["facturation_ticket"]="oui";
@@ -1023,33 +1023,13 @@ class hotline extends classes_optima {
 		$obj .= " de ".$contactn;
 		$obj .= "(".$societen.")";
 
-		$to="hotline.".$infos['pole_concerne']."@absystech.fr";
+		$to="Hotline 2T Management <hotline@2tmanagement.support>";
 		$template="hotline_insert";
-		$from="Hotline AbsysTech <optima-hotline-".ATF::$codename."-".ATF::hotline()->cryptId($id_hotline)."-".ATF::contact()->cryptId($infos["id_contact"])."@absystech-speedmail.com>";
+		$from="Hotline 2T Management <hotline@2tmanagement.support>";
 
 		$societe = ATF::societe()->select($infos['id_societe']);
 		$contact = ATF::contact()->select($infos['id_contact']);
 		$hotline = ATF::hotline()->select($id_hotline);
-
-// Envoi sur mattermost
-$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
-$login = ATF::user()->select($id_owner,"login");
-$logins = array(
-"tpruvost"=>"thibaut",
-"jluillier"=>"jacques",
-"smortier"=>"sol-r",
-"gdamecourt"=>"gauthier"
-);
-if ($logins[$login]) $login = $logins[$login];
-$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
-$data = array();
-$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
-$data["username"] = $societe["societe"];
-$data["channel"] = "Hotline";
-$cmd .= json_encode($data);
-$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
-log::logger($cmd,'mm');
-if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		$mail_data["optima_url"]= ATF::permalink()->getURL(ATF::hotline()->createPermalink($id_hotline));
 		$mail_data["portail_hotline_url"]=$this->createPortailHotlineURL($societe["ref"],$societe["divers_5"],$infos["id_hotline"],$infos["id_contact"],"validation");
@@ -1726,7 +1706,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		echo "[Fin facturation]\n";
 
 		//Envoie d'un mail de rapport
-		$mail=new mail(array('recipient'=>'smortier@absystech.fr','objet'=>'[Facturation Hotline - Optima '.ATF::$codename.'] Résultats batch','body'=>ob_get_contents()));
+		$mail=new mail(array('recipient'=>'Hotline 2T Management <hotline@2tmanagement.support>','objet'=>'[Facturation Hotline - Optima '.ATF::$codename.'] Résultats batch','body'=>ob_get_contents()));
 		$mail->send();
 
 		//Affichage du résultat
@@ -2228,7 +2208,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 				if($id_user) $hotline["etat"]="fixing";
 				$hotline["ok_facturation"]=NULL;
 				$hotline["id_affaire"]=NULL;
-				$chargeText="Charge AbsysTech";
+				$chargeText="Charge 2T Management";
 				break;
 			case "charge_client":
 				$hotline["facturation_ticket"]="oui";
@@ -2638,7 +2618,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 				));
 
 				//Récupération de l'email du nouveau utilisateur en charge
-				$email="hotline.".$infos["val"]."@absystech.fr";
+				$email="Hotline 2T Management <hotline@2tmanagement.support>";
 
 				ATF::hotline_mail()->createMailPoleTransfert($infos["id_hotline"],$id_hotline_interaction,$email);
 				ATF::hotline_mail()->sendMail();
