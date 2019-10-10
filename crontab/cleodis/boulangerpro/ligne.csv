@@ -1,191 +1,616 @@
-TYPE;N°;Ref Produit;Produit principal;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Lignes de produits visible;visible_sur_pdf;Prix d'achat dont ecotaxe
-PRODUIT PRINCIPAL;1;1120298;oui;1;1;1;non;non;oui;10;oui;oui;311,35
-PRODUIT PRINCIPAL;2;1129289;oui;1;1;1;non;non;oui;10;oui;oui;323,66
-PRODUIT PRINCIPAL;3;1129287;oui;1;1;1;non;non;oui;10;oui;oui;358,09
-PRODUIT PRINCIPAL;4;1128380;oui;1;1;1;non;non;oui;10;oui;oui;441,16
-PRODUIT PRINCIPAL;5;1094200;oui;1;1;1;non;non;oui;10;oui;oui;549,37
-PRODUIT PRINCIPAL;6;1131243;oui;1;1;1;non;non;oui;10;oui;oui;797,19
-PRODUIT PRINCIPAL;7;1129938;oui;1;1;1;non;non;oui;10;oui;oui;1121,56
-PRODUIT PRINCIPAL;8;1036836;oui;1;1;1;non;non;oui;10;oui;oui;308,57
-PRODUIT PRINCIPAL;9;1074175;oui;1;1;1;non;non;oui;10;oui;oui;323,24
-PRODUIT PRINCIPAL;10;1133881;oui;1;1;1;non;non;oui;10;oui;oui;312,5
-PRODUIT PRINCIPAL;11;1037531;oui;1;1;1;non;non;oui;10;oui;oui;320,55
-PRODUIT PRINCIPAL;12;1128970;oui;1;1;1;non;non;oui;10;oui;oui;350,66
-PRODUIT PRINCIPAL;13;1128964;oui;1;1;1;non;non;oui;10;oui;oui;359,24
-PRODUIT PRINCIPAL;14;1133644;oui;1;1;1;non;non;oui;10;oui;oui;367,76
-PRODUIT PRINCIPAL;15;1131981;oui;1;1;1;non;non;oui;10;oui;oui;373,53
-PRODUIT PRINCIPAL;16;1131323;oui;1;1;1;non;non;oui;10;oui;oui;437,38
-PRODUIT PRINCIPAL;17;1037537;oui;1;1;1;non;non;oui;10;oui;oui;560,91
-PRODUIT PRINCIPAL;18;1128719;oui;1;1;1;non;non;oui;10;oui;oui;595,81
-PRODUIT PRINCIPAL;19;1130389;oui;1;1;1;non;non;oui;10;oui;oui;598,38
-PRODUIT PRINCIPAL;20;1096915;oui;1;1;1;non;non;oui;10;oui;oui;689,97
-PRODUIT PRINCIPAL;21;1107657;oui;1;1;1;non;non;oui;10;oui;oui;743,75
-PRODUIT PRINCIPAL;22;1130488;oui;1;1;1;non;non;oui;10;oui;oui;751,63
-PRODUIT PRINCIPAL;23;1127004;oui;1;1;1;non;non;oui;10;oui;oui;785,93
-PRODUIT PRINCIPAL;24;1120857;oui;1;1;1;non;non;oui;10;oui;oui;813,49
-PRODUIT PRINCIPAL;25;1112368;oui;1;1;1;non;non;oui;10;oui;oui;856,36
-PRODUIT PRINCIPAL;26;1133762;oui;1;1;1;non;non;oui;10;oui;oui;1021,39
-PRODUIT PRINCIPAL;27;1133763;oui;1;1;1;non;non;oui;10;oui;oui;1099,96
-PRODUIT PRINCIPAL;28;1129939;oui;1;1;1;non;non;oui;10;oui;oui;1121,56
-PRODUIT PRINCIPAL;29;1130388;oui;1;1;1;non;non;oui;10;oui;oui;1193,65
-PRODUIT PRINCIPAL;30;1036021;oui;1;1;1;non;non;oui;10;oui;oui;1230,46
-PRODUIT PRINCIPAL;31;1127987;oui;1;1;1;non;non;oui;10;oui;oui;1491,45
-PRODUIT PRINCIPAL;32;140331;oui;1;1;1;non;non;oui;10;oui;oui;2008,63
-PRODUIT PRINCIPAL;33;1126131;oui;1;1;1;non;non;oui;10;oui;oui;2069,18
-PRODUIT PRINCIPAL;34;669143;oui;1;1;1;non;non;oui;10;oui;oui;2188,26
-PRODUIT PRINCIPAL;35;1133809;oui;1;1;1;non;non;oui;10;oui;oui;2249,63
-PRODUIT PRINCIPAL;36;1133858;oui;1;1;1;non;non;oui;10;oui;oui;2530,72
-PRODUIT PRINCIPAL;37;1133782;oui;1;1;1;non;non;oui;10;oui;oui;2685,93
-PRODUIT PRINCIPAL;38;1125521;oui;1;1;1;non;non;oui;10;oui;oui;4170,68
-GARANTIE;1;1119560;non;1;1;1;non;non;oui;20;oui;oui;119
-GARANTIE;2;1126593;non;1;1;1;non;non;oui;20;oui;oui;82,5
-GARANTIE;3;1126594;non;1;1;1;non;non;oui;20;oui;oui;103,33
-GARANTIE;4;1126595;non;1;1;1;non;non;oui;20;oui;oui;124,17
-GARANTIE;5;1126596;non;1;1;1;non;non;oui;20;oui;oui;145
-GARANTIE;6;1119551;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;7;1126603;non;1;1;1;non;non;oui;20;oui;oui;290,83
-GARANTIE;8;1126593;non;1;1;1;non;non;oui;20;oui;oui;82,5
-GARANTIE;9;1119551;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;10;1119544;non;1;1;1;non;non;oui;20;oui;oui;82,5
-GARANTIE;11;1126593;non;1;1;1;non;non;oui;20;oui;oui;82,5
-GARANTIE;12;1119534;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;13;1119536;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;14;1119599;non;1;1;1;non;non;oui;20;oui;oui;74
-GARANTIE;15;1119545;non;1;1;1;non;non;oui;20;oui;oui;104
-GARANTIE;16;1126595;non;1;1;1;non;non;oui;20;oui;oui;124,17
-GARANTIE;17;1126596;non;1;1;1;non;non;oui;20;oui;oui;145
-GARANTIE;18;1119552;non;1;1;1;non;non;oui;20;oui;oui;199
-GARANTIE;19;1119534;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;20;1119531;non;1;1;1;non;non;oui;20;oui;oui;149
-GARANTIE;21;1119531;non;1;1;1;non;non;oui;20;oui;oui;149
-GARANTIE;22;1119538;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;23;1119540;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;24;1119537;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;25;1119537;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;26;1126602;non;1;1;1;non;non;oui;20;oui;oui;270
-GARANTIE;27;1126603;non;1;1;1;non;non;oui;20;oui;oui;290,83
-GARANTIE;28;1126603;non;1;1;1;non;non;oui;20;oui;oui;290,83
-GARANTIE;29;1119536;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;30;1119540;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;31;1119590;non;1;1;1;non;non;oui;20;oui;oui;364
-GARANTIE;32;1119507;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;33;1119507;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;34;1119507;non;1;1;1;non;non;oui;20;oui;oui;169
-GARANTIE;35;1119574;non;1;1;1;non;non;oui;20;oui;oui;409
-GARANTIE;36;1119624;non;1;1;1;non;non;oui;20;oui;oui;549
-GARANTIE;37;1119624;non;1;1;1;non;non;oui;20;oui;oui;549
-GARANTIE;38;1119507;non;1;1;1;non;non;oui;20;oui;oui;169
-LIVRAISON;1;BPLivrMeSGEODI50a75EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;75
-LIVRAISON;2;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;3;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;4;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;5;BPLivrCHRON15a17,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;17,5
-LIVRAISON;6;BPLivrMeSGEODI100a125EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;125
-LIVRAISON;7;BPLivrCHRON12,5a15EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;15
-LIVRAISON;8;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;9;BPLivrMeSGEODI50a75EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;75
-LIVRAISON;10;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;11;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;12;BPLivrMeSGEODI100a125EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;125
-LIVRAISON;13;BPLivrMeSGEODI75a100EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;100
-LIVRAISON;14;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;15;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;16;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;17;BPLivrCHRON12,5a15EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;15
-LIVRAISON;18;BPLivrMeSGEODI125a150EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;150
-LIVRAISON;19;BPLivrMeSGEODI100a125EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;125
-LIVRAISON;20;BPLivrMeSGEODI50a75EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;75
-LIVRAISON;21;BPLivrMeSGEODI50a75EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;75
-LIVRAISON;22;BPLivrMeSGEODI75a100EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;100
-LIVRAISON;23;BPLivrMeSGEODI50a75EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;75
-LIVRAISON;24;BPLivrMeSGEODI75a100EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;100
-LIVRAISON;25;BPLivrMeSGEODI75a100EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;100
-LIVRAISON;26;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;27;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;28;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;29;BPLivrMeSGEODI100a125EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;125
-LIVRAISON;30;BPLivrMeSGEODI75a100EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;100
-LIVRAISON;31;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;32;BPLivrMeSGEODI150a175EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;175
-LIVRAISON;33;BPLivrMeSGEODI100a125EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;125
-LIVRAISON;34;BPLivrMeSGEODI150a175EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;175
-LIVRAISON;35;BPLivrMeSGEODI50a75EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;75
-LIVRAISON;36;BPLivrCHRON7,5a10EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;10
-LIVRAISON;37;BPLivrCHRON10a12,5EUR36mois;non;1;1;1;non;non;oui;30;oui;oui;12,5
-LIVRAISON;38;BPLivrMeSGEODI75a100EUR60mois;non;1;1;1;non;non;oui;30;oui;oui;100
-COMMISSION;1;BProComm60m015;non;1;1;1;non;non;non;9998;non;non;12,14
-COMMISSION;2;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;10,42
-COMMISSION;3;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;11,82
-COMMISSION;4;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;14,43
-COMMISSION;5;BProComm36m020;non;1;1;1;non;non;non;9998;non;non;17,75
-COMMISSION;6;BProComm60m030;non;1;1;1;non;non;non;9998;non;non;26,92
-COMMISSION;7;BProComm36m040;non;1;1;1;non;non;non;9998;non;non;35,67
-COMMISSION;8;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;10,06
-COMMISSION;9;BProComm60m015;non;1;1;1;non;non;non;9998;non;non;14,14
-COMMISSION;10;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;10,08
-COMMISSION;11;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;10,37
-COMMISSION;12;BProComm60m020;non;1;1;1;non;non;non;9998;non;non;15,75
-COMMISSION;13;BProComm60m020;non;1;1;1;non;non;non;9998;non;non;15,76
-COMMISSION;14;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;11,31
-COMMISSION;15;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;12,18
-COMMISSION;16;BProComm36m015;non;1;1;1;non;non;non;9998;non;non;14,25
-COMMISSION;17;BProComm36m020;non;1;1;1;non;non;non;9998;non;non;17,97
-COMMISSION;18;BProComm60m025;non;1;1;1;non;non;non;9998;non;non;23,45
-COMMISSION;19;BProComm60m025;non;1;1;1;non;non;non;9998;non;non;22,46
-COMMISSION;20;BProComm60m025;non;1;1;1;non;non;non;9998;non;non;22,81
-COMMISSION;21;BProComm60m025;non;1;1;1;non;non;non;9998;non;non;24,15
-COMMISSION;22;BProComm60m030;non;1;1;1;non;non;non;9998;non;non;25,38
-COMMISSION;23;BProComm60m030;non;1;1;1;non;non;non;9998;non;non;25,7
-COMMISSION;24;BProComm60m030;non;1;1;1;non;non;non;9998;non;non;26,92
-COMMISSION;25;BProComm60m030;non;1;1;1;non;non;non;9998;non;non;28,19
-COMMISSION;26;BProComm36m035;non;1;1;1;non;non;non;9998;non;non;32,5
-COMMISSION;27;BProComm36m035;non;1;1;1;non;non;non;9998;non;non;34,98
-COMMISSION;28;BProComm36m040;non;1;1;1;non;non;non;9998;non;non;35,62
-COMMISSION;29;BProComm60m040;non;1;1;1;non;non;non;9998;non;non;37,35
-COMMISSION;30;BProComm60m040;non;1;1;1;non;non;non;9998;non;non;37,29
-COMMISSION;31;BProComm36m050;non;1;1;1;non;non;non;9998;non;non;46,62
-COMMISSION;32;BProComm60m060;non;1;1;1;non;non;non;9998;non;non;58,69
-COMMISSION;33;BProComm60m060;non;1;1;1;non;non;non;9998;non;non;58,98
-COMMISSION;34;BProComm60m070;non;1;1;1;non;non;non;9998;non;non;63,19
-COMMISSION;35;BProComm60m070;non;1;1;1;non;non;non;9998;non;non;67,95
-COMMISSION;36;BProComm36m080;non;1;1;1;non;non;non;9998;non;non;77,21
-COMMISSION;37;BProComm36m090;non;1;1;1;non;non;non;9998;non;non;81,16
-COMMISSION;38;BProComm60m125;non;1;1;1;non;non;non;9998;non;non;110,8
-FRAIS;1;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;2;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;3;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;4;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;5;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;6;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;7;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;8;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;9;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;10;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;11;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;12;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;13;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;14;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;15;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;16;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;17;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;18;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;19;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;20;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;21;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;22;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;23;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;24;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;25;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;26;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;27;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;28;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;29;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;30;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;31;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;32;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;33;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;34;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;35;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;36;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;37;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS;38;Frais60;non;1;1;1;non;non;non;9999;non;non;35
+"TYPE";"N°";"Ref Produit";"Produit principal";"Quantité";"Min";"Max";"option_incluse";"option_incluse_obligatoire";"Afficher sur le site";"Ordre";"Lignes de produits visible";"visible_sur_pdf";"Prix d'achat dont ecotaxe"
+"PRODUIT PRINCIPAL";1;1134750;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";317,68
+"PRODUIT PRINCIPAL";2;1134802;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";317,68
+"PRODUIT PRINCIPAL";3;1134801;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";317,68
+"PRODUIT PRINCIPAL";4;838899;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";354,74
+"PRODUIT PRINCIPAL";5;1135683;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";359,43
+"PRODUIT PRINCIPAL";6;1128690;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";381,37
+"PRODUIT PRINCIPAL";7;1135700;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";392,7
+"PRODUIT PRINCIPAL";8;1131259;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";402,1
+"PRODUIT PRINCIPAL";9;1134804;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";399,32
+"PRODUIT PRINCIPAL";10;1134803;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";399,32
+"PRODUIT PRINCIPAL";11;1134805;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";399,32
+"PRODUIT PRINCIPAL";12;1093031;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";435,96
+"PRODUIT PRINCIPAL";13;1134806;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";431,67
+"PRODUIT PRINCIPAL";14;1134807;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";431,67
+"PRODUIT PRINCIPAL";15;1134952;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";431,67
+"PRODUIT PRINCIPAL";16;1135537;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";439,16
+"PRODUIT PRINCIPAL";17;1134433;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";472,1
+"PRODUIT PRINCIPAL";18;1134954;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";513,32
+"PRODUIT PRINCIPAL";19;1134953;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";513,32
+"PRODUIT PRINCIPAL";20;1134955;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";513,32
+"PRODUIT PRINCIPAL";21;1130209;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";612,78
+"PRODUIT PRINCIPAL";22;1053441;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";619,12
+"PRODUIT PRINCIPAL";23;1120484;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";636,71
+"PRODUIT PRINCIPAL";24;1086083;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";645,29
+"PRODUIT PRINCIPAL";25;1135024;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";656,68
+"PRODUIT PRINCIPAL";26;1135685;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";687,22
+"PRODUIT PRINCIPAL";27;1046158;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";714,48
+"PRODUIT PRINCIPAL";28;1131255;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";714,5
+"PRODUIT PRINCIPAL";29;1130218;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";725,73
+"PRODUIT PRINCIPAL";30;1133892;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";726,37
+"PRODUIT PRINCIPAL";31;1130265;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";889,12
+"PRODUIT PRINCIPAL";32;1110877;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1075
+"PRODUIT PRINCIPAL";33;1130263;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1162,58
+"PRODUIT PRINCIPAL";34;1130217;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1215,63
+"PRODUIT PRINCIPAL";35;1135067;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1207,1
+"PRODUIT PRINCIPAL";36;1135253;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1257,63
+"PRODUIT PRINCIPAL";37;1135597;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1441,9
+"PRODUIT PRINCIPAL";38;1133873;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1425,97
+"PRODUIT PRINCIPAL";39;1134974;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";320,9
+"PRODUIT PRINCIPAL";40;1135487;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";319,5
+"PRODUIT PRINCIPAL";41;1107070;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";321,02
+"PRODUIT PRINCIPAL";42;1037518;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";322,88
+"PRODUIT PRINCIPAL";43;1134326;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";347,07
+"PRODUIT PRINCIPAL";44;1136124;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";374,15
+"PRODUIT PRINCIPAL";45;1113296;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";371,23
+"PRODUIT PRINCIPAL";46;8007019;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";374,99
+"PRODUIT PRINCIPAL";47;1135951;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";391,66
+"PRODUIT PRINCIPAL";48;1135910;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";406,34
+"PRODUIT PRINCIPAL";49;1135751;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";408,28
+"PRODUIT PRINCIPAL";50;8007754;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";416,66
+"PRODUIT PRINCIPAL";51;1134325;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";474,68
+"PRODUIT PRINCIPAL";52;1071107;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";493,86
+"PRODUIT PRINCIPAL";53;8007753;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";499,99
+"PRODUIT PRINCIPAL";54;1136051;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,76
+"PRODUIT PRINCIPAL";55;1135911;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";514,07
+"PRODUIT PRINCIPAL";56;1025545;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";530,26
+"PRODUIT PRINCIPAL";57;1134065;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";526,15
+"PRODUIT PRINCIPAL";58;1079705;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";538,93
+"PRODUIT PRINCIPAL";59;1133880;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";530,98
+"PRODUIT PRINCIPAL";60;1136186;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";544,35
+"PRODUIT PRINCIPAL";61;1134093;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";549,36
+"PRODUIT PRINCIPAL";62;1134994;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";578,55
+"PRODUIT PRINCIPAL";63;1003549;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";582,62
+"PRODUIT PRINCIPAL";64;1136078;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";602,04
+"PRODUIT PRINCIPAL";65;1130525;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";616,82
+"PRODUIT PRINCIPAL";66;1130177;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";626,93
+"PRODUIT PRINCIPAL";67;1136394;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";644,8
+"PRODUIT PRINCIPAL";68;1130529;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";645,31
+"PRODUIT PRINCIPAL";69;1130528;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";645,31
+"PRODUIT PRINCIPAL";70;1130527;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";645,31
+"PRODUIT PRINCIPAL";71;1130526;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";645,31
+"PRODUIT PRINCIPAL";72;1130530;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";661,14
+"PRODUIT PRINCIPAL";73;1131654;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";721,4
+"PRODUIT PRINCIPAL";74;1106552;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";707,23
+"PRODUIT PRINCIPAL";75;1135075;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";715,11
+"PRODUIT PRINCIPAL";76;1136079;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";754,06
+"PRODUIT PRINCIPAL";77;1087692;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";764,56
+"PRODUIT PRINCIPAL";78;1134095;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";774,43
+"PRODUIT PRINCIPAL";79;1135077;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";829,11
+"PRODUIT PRINCIPAL";80;1135085;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";895,57
+"PRODUIT PRINCIPAL";81;1134100;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";907,92
+"PRODUIT PRINCIPAL";82;1136146;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";914,69
+"PRODUIT PRINCIPAL";83;867036;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";940,4
+"PRODUIT PRINCIPAL";84;1113295;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";953,9
+"PRODUIT PRINCIPAL";85;1134998;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";959,07
+"PRODUIT PRINCIPAL";86;1134997;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1024,93
+"PRODUIT PRINCIPAL";87;1135110;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1055,13
+"PRODUIT PRINCIPAL";88;1135079;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1068,42
+"PRODUIT PRINCIPAL";89;1135078;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1068,42
+"PRODUIT PRINCIPAL";90;1135090;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1134,16
+"PRODUIT PRINCIPAL";91;1135087;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1134,16
+"PRODUIT PRINCIPAL";92;1135086;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1134,16
+"PRODUIT PRINCIPAL";93;1135088;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1134,16
+"PRODUIT PRINCIPAL";94;1136147;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1147,6
+"PRODUIT PRINCIPAL";95;1135954;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1194,96
+"PRODUIT PRINCIPAL";96;1135081;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1289,89
+"PRODUIT PRINCIPAL";97;1135112;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1290,31
+"PRODUIT PRINCIPAL";98;1135111;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1290,31
+"PRODUIT PRINCIPAL";99;1135082;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1290,36
+"PRODUIT PRINCIPAL";100;1136148;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1290,36
+"PRODUIT PRINCIPAL";101;1119073;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1374,67
+"PRODUIT PRINCIPAL";102;1135600;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1496,5
+"PRODUIT PRINCIPAL";103;1135955;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1623,63
+"PRODUIT PRINCIPAL";104;1135080;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1632,58
+"PRODUIT PRINCIPAL";105;1135076;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1634,5
+"PRODUIT PRINCIPAL";106;1136080;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1776,35
+"PRODUIT PRINCIPAL";107;239506;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1888,75
+"PRODUIT PRINCIPAL";108;1135070;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2675,17
+"PRODUIT PRINCIPAL";109;1135069;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2675,17
+"PRODUIT PRINCIPAL";110;1135068;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2675,17
+"PRODUIT PRINCIPAL";111;1135066;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2675,17
+"PRODUIT PRINCIPAL";112;1135113;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3119,31
+"PRODUIT PRINCIPAL";113;1135115;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3119,31
+"PRODUIT PRINCIPAL";114;1135114;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3119,31
+"PRODUIT PRINCIPAL";115;1135117;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3119,31
+"PRODUIT PRINCIPAL";116;1135116;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3119,31
+"PRODUIT PRINCIPAL";117;1135072;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3182,75
+"PRODUIT PRINCIPAL";118;1135106;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3182,75
+"PRODUIT PRINCIPAL";119;1135108;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3182,75
+"PRODUIT PRINCIPAL";120;1135107;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3182,75
+"PRODUIT PRINCIPAL";121;1135109;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3182,75
+"PRODUIT PRINCIPAL";122;1135131;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3753,79
+"PRODUIT PRINCIPAL";123;1135132;"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3753,79
+"GARANTIE";1;1119544;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";2;1119544;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";3;1119544;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";4;1126594;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";5;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";6;1119537;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";7;1119599;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";69
+"GARANTIE";8;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";9;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";10;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";11;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";12;1119537;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";13;1119547;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";119
+"GARANTIE";14;1119547;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";119
+"GARANTIE";15;1119547;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";119
+"GARANTIE";16;1119547;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";119
+"GARANTIE";17;1119547;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";119
+"GARANTIE";18;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";19;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";20;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";21;1119540;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";22;1119533;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";129
+"GARANTIE";23;1119549;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";159
+"GARANTIE";24;1119531;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";25;1119549;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";159
+"GARANTIE";26;1126598;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";27;1119531;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";28;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";29;1119540;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";30;1119550;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";31;1119540;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";32;1119570;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";189
+"GARANTIE";33;1119540;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";34;1119540;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";35;1131954;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";36;1119552;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";199
+"GARANTIE";37;1119554;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";189
+"GARANTIE";38;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";39;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";40;1119537;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";41;1119510;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";42;1126593;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";43;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";44;1119531;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";45;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";46;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";47;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";48;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";49;1119545;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";50;1119560;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";51;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";52;1119531;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";53;1119563;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";129
+"GARANTIE";54;1119531;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";55;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";56;1119554;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";189
+"GARANTIE";57;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";58;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";59;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";60;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";61;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";62;1119548;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";63;1119631;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";99
+"GARANTIE";64;1119567;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";159
+"GARANTIE";65;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";66;1119649;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";119
+"GARANTIE";67;1119531;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";68;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";69;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";70;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";71;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";72;1119539;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";73;1119540;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";74;1119671;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";129
+"GARANTIE";75;1119550;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";76;1119567;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";159
+"GARANTIE";77;1119534;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";78;1119582;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";199
+"GARANTIE";79;1119582;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";199
+"GARANTIE";80;1119584;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";209
+"GARANTIE";81;1119584;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";209
+"GARANTIE";82;1119584;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";209
+"GARANTIE";83;1119508;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";149
+"GARANTIE";84;1119585;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";239
+"GARANTIE";85;1119585;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";239
+"GARANTIE";86;1119586;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";269
+"GARANTIE";87;1119586;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";269
+"GARANTIE";88;1119586;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";269
+"GARANTIE";89;1119586;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";269
+"GARANTIE";90;1119588;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";289
+"GARANTIE";91;1119588;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";289
+"GARANTIE";92;1119588;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";289
+"GARANTIE";93;1119588;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";289
+"GARANTIE";94;1119588;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";289
+"GARANTIE";95;1119571;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";199
+"GARANTIE";96;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";97;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";98;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";99;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";100;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";101;1131955;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";279
+"GARANTIE";102;1119554;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";189
+"GARANTIE";103;1119572;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";239
+"GARANTIE";104;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";105;1119590;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";349
+"GARANTIE";106;1119573;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";289
+"GARANTIE";107;1119538;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";108;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";109;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";110;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";111;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";112;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";113;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";114;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";115;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";116;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";117;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";118;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";119;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";120;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";121;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";122;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"GARANTIE";123;1119507;"non";1;1;1;"non";"non";"oui";20;"oui";"oui";169
+"LIVRAISON";1;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";2;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";3;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";4;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";5;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";6;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";7;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";8;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";9;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";10;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";11;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";12;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";13;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";14;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";15;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";16;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";17;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";18;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";19;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";20;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";21;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";22;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";23;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";24;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";25;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";26;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";27;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";28;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";29;"BPLivrMeSGEODI100a125EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";125
+"LIVRAISON";30;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";31;"BPLivrMeSGEODI100a125EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";125
+"LIVRAISON";32;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";33;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";34;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";35;"BPLivrCHRON10a12,5EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";36;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";37;"BPLivrMeSGEODI100a125EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";125
+"LIVRAISON";38;"BPLivrCHRON12,5a15EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";15
+"LIVRAISON";39;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";40;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";41;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";42;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";43;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";44;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";45;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";46;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";47;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";48;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";49;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";50;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";51;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";52;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";53;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";54;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";55;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";56;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";57;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";58;"BPLivrMeSGEODI100a125EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";125
+"LIVRAISON";59;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";60;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";61;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";62;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";63;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";64;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";65;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";66;"BPLivrCHRON12,5a15EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";15
+"LIVRAISON";67;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";68;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";69;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";70;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";71;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";72;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";73;"BPLivrMeSGEODI100a125EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";125
+"LIVRAISON";74;"BPLivrCHRON17,5a20EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";20
+"LIVRAISON";75;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";76;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";77;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";78;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";79;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";80;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";81;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";82;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";83;"BPLivrCHRON10a12,5EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";84;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";85;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";86;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";87;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";88;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";89;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";90;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";91;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";92;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";93;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";94;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";95;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";96;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";97;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";98;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";99;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";100;"BPLivrCHRON10a12,5EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";101;"BPLivrCHRON10a12,5EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";12,5
+"LIVRAISON";102;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";103;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";104;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";105;"BPLivrCHRON7,5a10EUR36mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";10
+"LIVRAISON";106;"BPLivrMeSGEODI50a75EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";75
+"LIVRAISON";107;"BPLivrMeSGEODI75a100EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";100
+"LIVRAISON";108;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";109;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";110;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";111;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";112;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";113;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";114;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";115;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";116;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";117;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";118;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";119;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";120;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";121;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";122;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"LIVRAISON";123;"BPLivrMeSGEODI125a150EUR60mois";"non";1;1;1;"non";"non";"oui";30;"oui";"oui";150
+"COMMISSION";1;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";10,13
+"COMMISSION";2;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";10,13
+"COMMISSION";3;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";10,13
+"COMMISSION";4;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";11,63
+"COMMISSION";5;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";11,69
+"COMMISSION";6;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";15,74
+"COMMISSION";7;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";11,81
+"COMMISSION";8;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";15,66
+"COMMISSION";9;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,67
+"COMMISSION";10;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,67
+"COMMISSION";11;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,67
+"COMMISSION";12;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";17,48
+"COMMISSION";13;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";13,98
+"COMMISSION";14;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";13,98
+"COMMISSION";15;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";13,98
+"COMMISSION";16;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";14,18
+"COMMISSION";17;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";15,06
+"COMMISSION";18;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";16,52
+"COMMISSION";19;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";16,52
+"COMMISSION";20;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";16,52
+"COMMISSION";21;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,65
+"COMMISSION";22;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";20,18
+"COMMISSION";23;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";20,12
+"COMMISSION";24;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,59
+"COMMISSION";25;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";20,64
+"COMMISSION";26;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,69
+"COMMISSION";27;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";23,7
+"COMMISSION";28;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";24,65
+"COMMISSION";29;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";24,88
+"COMMISSION";30;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";22,92
+"COMMISSION";31;"BProComm60m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";29,48
+"COMMISSION";32;"BProComm60m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";33,08
+"COMMISSION";33;"BProComm60m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";36,87
+"COMMISSION";34;"BProComm60m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";38,2
+"COMMISSION";35;"BProComm60m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";36,69
+"COMMISSION";36;"BProComm60m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";40
+"COMMISSION";37;"BProComm60m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";43,54
+"COMMISSION";38;"BProComm36m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";44,73
+"COMMISSION";39;"BProComm60m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";14,56
+"COMMISSION";40;"BProComm60m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";14,19
+"COMMISSION";41;"BProComm60m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";13,13
+"COMMISSION";42;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";10,35
+"COMMISSION";43;"BProComm60m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";14,98
+"COMMISSION";44;"BProComm60m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";14,91
+"COMMISSION";45;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,01
+"COMMISSION";46;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,13
+"COMMISSION";47;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,5
+"COMMISSION";48;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";16,46
+"COMMISSION";49;"BProComm36m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";12,98
+"COMMISSION";50;"BProComm60m015";"non";1;1;1;"non";"non";"non";9998;"non";"non";14,28
+"COMMISSION";51;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";18,45
+"COMMISSION";52;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";17,9
+"COMMISSION";53;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";17,11
+"COMMISSION";54;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";18,35
+"COMMISSION";55;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";19,16
+"COMMISSION";56;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,56
+"COMMISSION";57;"BProComm60m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";19,46
+"COMMISSION";58;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";20,46
+"COMMISSION";59;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";16,96
+"COMMISSION";60;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";17,31
+"COMMISSION";61;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";17,49
+"COMMISSION";62;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";18,17
+"COMMISSION";63;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";17,34
+"COMMISSION";64;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";20,51
+"COMMISSION";65;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,13
+"COMMISSION";66;"BProComm36m020";"non";1;1;1;"non";"non";"non";9998;"non";"non";19,01
+"COMMISSION";67;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,68
+"COMMISSION";68;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,84
+"COMMISSION";69;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,84
+"COMMISSION";70;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,84
+"COMMISSION";71;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,84
+"COMMISSION";72;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";22,23
+"COMMISSION";73;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";24,77
+"COMMISSION";74;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";21,38
+"COMMISSION";75;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";22,57
+"COMMISSION";76;"BProComm60m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";24,56
+"COMMISSION";77;"BProComm60m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";27,17
+"COMMISSION";78;"BProComm36m025";"non";1;1;1;"non";"non";"non";9998;"non";"non";24,63
+"COMMISSION";79;"BProComm36m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";25,92
+"COMMISSION";80;"BProComm36m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";27,83
+"COMMISSION";81;"BProComm36m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";28,23
+"COMMISSION";82;"BProComm36m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";28,38
+"COMMISSION";83;"BProComm60m030";"non";1;1;1;"non";"non";"non";9998;"non";"non";27,53
+"COMMISSION";84;"BProComm36m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";30,12
+"COMMISSION";85;"BProComm36m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";30,2
+"COMMISSION";86;"BProComm36m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";32,59
+"COMMISSION";87;"BProComm36m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";33,32
+"COMMISSION";88;"BProComm36m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";33,65
+"COMMISSION";89;"BProComm36m035";"non";1;1;1;"non";"non";"non";9998;"non";"non";33,65
+"COMMISSION";90;"BProComm36m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";35,79
+"COMMISSION";91;"BProComm36m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";35,79
+"COMMISSION";92;"BProComm36m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";35,79
+"COMMISSION";93;"BProComm36m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";35,79
+"COMMISSION";94;"BProComm36m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";36,2
+"COMMISSION";95;"BProComm60m040";"non";1;1;1;"non";"non";"non";9998;"non";"non";36,33
+"COMMISSION";96;"BProComm36m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";41,19
+"COMMISSION";97;"BProComm36m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";41,2
+"COMMISSION";98;"BProComm36m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";41,2
+"COMMISSION";99;"BProComm36m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";41,2
+"COMMISSION";100;"BProComm36m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";41,27
+"COMMISSION";101;"BProComm60m045";"non";1;1;1;"non";"non";"non";9998;"non";"non";41,64
+"COMMISSION";102;"BProComm60m050";"non";1;1;1;"non";"non";"non";9998;"non";"non";45,72
+"COMMISSION";103;"BProComm60m050";"non";1;1;1;"non";"non";"non";9998;"non";"non";48,05
+"COMMISSION";104;"BProComm36m050";"non";1;1;1;"non";"non";"non";9998;"non";"non";49,75
+"COMMISSION";105;"BProComm36m050";"non";1;1;1;"non";"non";"non";9998;"non";"non";49,8
+"COMMISSION";106;"BProComm60m060";"non";1;1;1;"non";"non";"non";9998;"non";"non";53,11
+"COMMISSION";107;"BProComm60m060";"non";1;1;1;"non";"non";"non";9998;"non";"non";53,8
+"COMMISSION";108;"BProComm60m080";"non";1;1;1;"non";"non";"non";9998;"non";"non";74,69
+"COMMISSION";109;"BProComm60m080";"non";1;1;1;"non";"non";"non";9998;"non";"non";74,69
+"COMMISSION";110;"BProComm60m080";"non";1;1;1;"non";"non";"non";9998;"non";"non";74,69
+"COMMISSION";111;"BProComm60m080";"non";1;1;1;"non";"non";"non";9998;"non";"non";74,69
+"COMMISSION";112;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";85,79
+"COMMISSION";113;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";85,79
+"COMMISSION";114;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";85,79
+"COMMISSION";115;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";85,79
+"COMMISSION";116;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";85,79
+"COMMISSION";117;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";87,38
+"COMMISSION";118;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";87,38
+"COMMISSION";119;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";87,38
+"COMMISSION";120;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";87,38
+"COMMISSION";121;"BProComm60m090";"non";1;1;1;"non";"non";"non";9998;"non";"non";87,38
+"COMMISSION";122;"BProComm60m125";"non";1;1;1;"non";"non";"non";9998;"non";"non";101,65
+"COMMISSION";123;"BProComm60m125";"non";1;1;1;"non";"non";"non";9998;"non";"non";101,65
+"FRAIS";1;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";2;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";3;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";4;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";5;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";6;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";7;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";8;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";9;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";10;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";11;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";12;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";13;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";14;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";15;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";16;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";17;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";18;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";19;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";20;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";21;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";22;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";23;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";24;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";25;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";26;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";27;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";28;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";29;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";30;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";31;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";32;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";33;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";34;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";35;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";36;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";37;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";38;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";39;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";40;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";41;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";42;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";43;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";44;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";45;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";46;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";47;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";48;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";49;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";50;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";51;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";52;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";53;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";54;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";55;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";56;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";57;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";58;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";59;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";60;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";61;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";62;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";63;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";64;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";65;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";66;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";67;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";68;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";69;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";70;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";71;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";72;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";73;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";74;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";75;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";76;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";77;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";78;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";79;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";80;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";81;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";82;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";83;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";84;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";85;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";86;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";87;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";88;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";89;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";90;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";91;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";92;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";93;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";94;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";95;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";96;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";97;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";98;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";99;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";100;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";101;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";102;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";103;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";104;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";105;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";106;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";107;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";108;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";109;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";110;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";111;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";112;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";113;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";114;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";115;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";116;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";117;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";118;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";119;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";120;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";121;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";122;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS";123;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
