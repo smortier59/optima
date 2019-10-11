@@ -1,0 +1,103 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline}
+{$type = requetebyUserParMois}
+<div id="{$module}_grapherequetebyUserParMois2" class="widget"></div>
+
+{$nbjOuvres = ATF::hotline()->getJoursOuvres(date("Y-m-01" , strtotime("-1 month", strtotime(date("Y-m-01")))), date("Y-m-d", strtotime("-1 day", strtotime(date("Y-m-01")))))}
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->requetebyUserParMois(-1)}
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_grapherequetebyUserParMois2',
+            type: 'spline'
+        },
+        title: {
+           text: '{$data["params"]["titre"]}'
+        },
+        colors :[
+            '#737373',
+            '#FF0004',
+            '#19FF30',
+            '#FFCF23'
+        ],
+        xAxis: {
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+            column: {
+                stacking: 'normal'
+            }
+        },
+        yAxis: {
+            title: {
+                text: null
+            }
+        },
+        tooltip: {
+            shared: true
+        },
+        series: [
+               {
+                   type: 'column'
+                   ,name: "Congés"
+                   ,data: [
+                          {foreach $data["categories"]["category"] as $key => $cat}
+                              [
+                                 {$data["dataset"]["conges"]["set"][$key]["value"]}
+                                 {if !$key@last},{/if}
+                              ]
+                              {if !$key@last},{/if}
+                         {/foreach}
+                         ]
+              }, {
+                   type: 'column'
+                   ,name: "Tps non facturé"
+                   ,data: [
+                          {foreach $data["categories"]["category"] as $key => $cat}
+                                                    [
+                                {$data["dataset"]["non"]["set"][$key]["value"]}
+
+                          ]
+                          {if !$key@last},{/if}
+                          {/foreach}
+                        ]
+              }  ,
+              {
+                   type: 'column'
+                   ,name: "Tps facturé"
+                   ,data: [
+                          {foreach $data["categories"]["category"] as $key => $cat}
+                              [
+                                 {$data["dataset"]["oui"]["set"][$key]["value"]}
+                                 {if !$key@last},{/if}
+                              ]
+                              {if !$key@last},{/if}
+                         {/foreach}
+                         ]
+              },  {
+                        type: 'spline',
+                        name: 'Objectif',
+                        data: [
+                                {foreach $data["categories"]["category"] as $key => $cat}
+                                      {$nbjOuvres}*6
+                                      {if !$key@last},{/if}
+                                {/foreach}
+                            ]
+                        ,marker: {
+                             enabled: false
+                          }
+                    }
+           ]
+    });
+});
+</script>
+{/strip}
