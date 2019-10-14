@@ -381,9 +381,9 @@ class hotline_interaction_2tmanagement extends hotline_interaction {
 				=$infos["id_hotline"]
 				=$data["id_hotline"]
 				=$this->select($data["id_hotline_interaction"],"id_hotline");
-			parent::update($data,$s,$files);
+			ATF::classes_optima()::update($data,$s,$files);
 		}else{
-			$id_hotline_interaction = parent::insert($data,$s,$files);
+			$id_hotline_interaction = ATF::classes_optima()::insert($data,$s,$files);
 		}
 
 		// GESTION DES ALERTES
