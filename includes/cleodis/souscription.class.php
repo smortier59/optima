@@ -129,11 +129,11 @@ class souscription_cleodis extends souscription {
 
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
-        
+
         if ($post['site_associe'] == 'bdomplus' || $post['site_associe'] == 'boulanger') {
 
           $nameVendeur = false;
-          // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)    
+          // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)
           if ($post['vendeur'] && $post['vendeur']!="null" && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
             log::logger("A priori on aurait un vendeur magasin BDOM !", $this->logFileSouscription);
             log::logger($post['vendeur'], $this->logFileSouscription);
@@ -661,7 +661,7 @@ class souscription_cleodis extends souscription {
           );
 
           //On envoi le mail au client avec le contrat qu'il va signer
-          $this->sendContrat($id_affaire, $mail_files, $contact);
+          $this->sendContrat($id_affaire, $mail_files, $contact, "bdomplus");
         }
 
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
@@ -677,6 +677,7 @@ class souscription_cleodis extends souscription {
         }
 
       break;
+
 
       case 'boulangerpro':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
@@ -711,10 +712,25 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'boulanger-cafe':
+        $pathMandat = "/tmp/".$infos["function"]."-".$infos["value"].".pdf";
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-        $f = array(
-          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+        file_put_contents($pathMandat,$pdf_mandat);
+
+        $f =  array(
+          "mandatSellAndSign.pdf" => base64_encode($pdf_mandat)
         );
+
+        if($post["send_file_mail"]){
+          $mail_files = array(
+            "contrat"=> $pathMandat
+          );
+
+
+
+          //On envoi le mail au client avec le contrat qu'il va signer
+          $this->sendContrat($id_affaire, $mail_files, $contact, "boulanger-cafe");
+        }
+
       break;
 
       default:
@@ -953,6 +969,56 @@ class souscription_cleodis extends souscription {
         "suivi_notifie"=>array(0=>"")
     );
     return ATF::comite()->insert(array("comite"=>$comite));
+  }
+
+
+
+  /**
+   * Envoi le PDF du mandat que le client va signer par mail avant signature sur le front
+   * @param  Integer $affaire      ID de l'affaire
+   * @param  Array $files          Les fichiers a envoyer
+   * @param  Array $contact        Les données du contact
+   */
+  public function sendContrat($affaire, $files, $contact, $codename){
+
+    if($contact["email"] || $contact["email_perso"]){
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
+      $info_mail["html"] = true;
+      $info_mail["template"] = "mail_contrat_a_signer";
+
+      if($codename == "bdomplus") $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
+      if($codename == "boulanger-cafe") $info_mail["objet"] = "Abonnement Boulanger Café - Votre contrat à signer";
+
+
+
+      $mail = new mail($info_mail);
+
+      foreach ($files as $key => $infos) {
+          $mail->addFile($infos,$key.".pdf",true);
+      }
+
+
+      $send = $mail->send();
+
+      $suivi = array(
+        "id_contact" => $contact["id_contact"],
+        "id_societe" => ATF::affaire()->select($affaire , "id_societe"),
+        "id_affaire" => $affaire,
+        "type"=> "note",
+        "type_suivi"=> "Contrat",
+        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+      );
+
+      if($send){
+        $suivi["texte"] =  "Envoi du mail au client contenant le contrat avant la signature\n".$suivi["texte"];
+      }else{
+        $suivi["texte"] =  "Probleme lors de l'envoi du mail au client contenant le contrat avant la signature";
+      }
+      ATF::suivi()->i($suivi);
+    }
+
+
   }
 
 
@@ -1247,45 +1313,6 @@ class souscription_bdomplus extends souscription_cleodis {
       }
     }
     return $licence_a_envoyer;
-  }
-
-  public function sendContrat($affaire, $files, $contact){
-
-    if($contact["email"] || $contact["email_perso"]){
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
-      $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
-      $info_mail["html"] = true;
-      $info_mail["template"] = "mail_contrat_a_signer";
-      $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
-
-      $mail = new mail($info_mail);
-
-      foreach ($files as $key => $infos) {
-          $mail->addFile($infos,$key.".pdf",true);
-      }
-
-
-      $send = $mail->send();
-
-      $suivi = array(
-        "id_contact" => $contact["id_contact"],
-        "id_societe" => ATF::affaire()->select($affaire , "id_societe"),
-        "id_affaire" => $affaire,
-        "type"=> "note",
-        "type_suivi"=> "Contrat",
-        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
-
-      );
-
-      if($send){
-        $suivi["texte"] =  "Envoi du mail au client contenant le contrat avant la signature\n".$suivi["texte"];
-      }else{
-        $suivi["texte"] =  "Probleme lors de l'envoi du mail au client contenant le contrat avant la signature";
-      }
-      ATF::suivi()->i($suivi);
-    }
-
-
   }
 
   public function envoiMailVendeurABenjamin($affaires, $vendeur){
