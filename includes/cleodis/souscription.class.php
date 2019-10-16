@@ -1022,6 +1022,31 @@ class souscription_cleodis extends souscription {
   }
 
 
+  /**
+   * Annule une affaire (Passage de l'affaire en annulée, suppression du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function annuleContrat($affaire,$commande, $raison){
+    if($affaire["affaire.etat"] !== "perdue"){
+      ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
+      $devis = ATF::devis()->select_row();
+
+      //On passe le devis en attente pour pouvoir annuler l'affaire
+      ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
+
+      //On supprime le contrat également
+      if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
+
+
+      $infos = array(
+        "id_devis" => $devis["id_devis"],
+        "raison_refus"=> $raison
+      );
+      ATF::devis()->perdu($infos);
+    }
+  }
+
+
 }
 class souscription_bdomplus extends souscription_cleodis {
 
@@ -1253,29 +1278,7 @@ class souscription_bdomplus extends souscription_cleodis {
   }
 
 
-  /**
-   * Annule une affaire (Passage de l'affaire en annulée, suppression du contrat)
-   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-   */
-  public function annuleContrat($affaire,$commande, $raison){
-    if($affaire["affaire.etat"] !== "perdue"){
-      ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
-      $devis = ATF::devis()->select_row();
 
-      //On passe le devis en attente pour pouvoir annuler l'affaire
-      ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
-
-      //On supprime le contrat également
-      if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
-
-
-      $infos = array(
-        "id_devis" => $devis["id_devis"],
-        "raison_refus"=> $raison
-      );
-      ATF::devis()->perdu($infos);
-    }
-  }
 
   /**
    * Récupération des numéros de licences
@@ -1577,5 +1580,93 @@ class souscription_boulanger extends souscription_cleodis {
   public $id_user = 116;
   public $codename = "boulanger";
 
+
+  /**
+   * Démarrage du contrat ou annulation de l'affaire
+   * @param  Integer $id_affaire      ID de l'affaire
+   */
+  public function _startOrCancelAffaire($get, $post){
+    if($post["id_affaire"] && $post["toDo"]){
+
+      $affaire = ATF::affaire()->select($post["id_affaire"]);
+      $affaire["affaire.id_affaire_fk"] = $post["id_affaire"];
+
+      ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
+      $commande = ATF::commande()->select_row();
+      $commande["commande.id_commande_fk"] = $commande["commande.id_commande"];
+
+      switch($post["toDo"]) {
+        case 'start':
+          $this->demarrageContrat($affaire, $commande);
+          log::logger("Demmarage terminé" , "mfleurquin");
+        break;
+
+        case 'cancel':
+          $this->annuleContrat($affaire,$commande, $raison);
+        break;
+      }
+
+    }else{
+      throw new errorATF("Data manquante en paramètre d'entrée Boulanger", 500);
+    }
+
+    return true;
+
+  }
+
+
+   /**
+   * Démarre une affaire (Démarrage du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function demarrageContrat($affaire,$commande){
+    log::logger("Dans démarrage contrat Boulanger" , "mfleurquin");
+
+
+     $affaire["commande.etat"] = $commande["commande.etat"] = ATF::commande()->select($commande["commande.id_commande_fk"], "etat");
+
+
+     if($affaire["commande.etat"] == "non_loyer"){
+        ATF::db($this->db)->begin_transaction();
+
+        try{
+          #On démarre le contrat
+
+
+          if($commande && $commande["commande.etat"] == "non_loyer"){
+            $infos = array(
+              "id_commande" => $commande["commande.id_commande_fk"],
+              "value" => date("Y-m-01", strtotime("+1 month")),
+              "key" => "date_debut"
+            );
+            ATF::commande()->updateDate($infos);
+
+            //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
+            ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
+                                      ->addOrder("facture.id_facture", "ASC");
+            $facture = ATF::facture()->select_row();
+
+            if($facture){
+              $f = array("id_facture" => $facture["facture.id_facture"],
+                         "mode_paiement"=> "cb",
+                         "etat"=>"payee",
+                         "date_paiement"=>date("Y-m-d"));
+
+              if($affaire["affaire.id_magasin"]){
+                $f["mode_paiement"] = "pre-paiement";
+              }
+              ATF::facture()->u($f);
+            }
+
+            ATF::db($this->db)->commit_transaction();
+            return true;
+          }
+
+        }catch(errorATF $e){
+          ATF::db($this->db)->rollback_transaction();
+          throw $e;
+        }
+     }
+  }
 
 };
