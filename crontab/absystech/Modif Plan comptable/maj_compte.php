@@ -52,15 +52,14 @@ function maj_ligne_facture(string $path = ''){
 
 
 			if(get_compte_absystech($ligne[5], "id_compte_absystech") != get_compte_absystech($ligne[6], "id_compte_absystech")){
-				//echo $ligne[5]." != ".$ligne[6]."\n";
 
 				if($ligne[6]){
 
 					$traitement = array("id_facture_ligne" => $ligne[10], "id_compte_absystech"=> get_compte_absystech($ligne[6], "id_compte_absystech") );
 					if(!$traitement["id_compte_absystech"]){
-						log::logger("|".$ligne[6]."| non trouvé en base" , "mfleurquin");
+						log::logger("|".$ligne[6]."| non trouvé en base" , "erreur_maj_compte_".$_SERVER["argv"][1]);
 					}else{
-						log::logger($traitement , "mfleurquin");
+						log::logger($traitement , "erreur_maj_compte_".$_SERVER["argv"][1]);
 
 						ATF::facture_ligne()->u($traitement);
 
