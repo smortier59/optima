@@ -32,7 +32,7 @@ class readsoft {
 		return self::societe();
 	}
 	private function societe(){
-		ATF::societe()->q->reset()->where("fournisseur","oui")
+		ATF::societe()->q->reset()->where("fournisseur","oui")->whereIsNotNull("code_fournisseur")
 //->setLimit(200)
 ;
 
@@ -75,11 +75,13 @@ class readsoft {
 		if ($bdc = ATF::bon_de_commande()->sa()) {
 			foreach($bdc as $c) {
 				if (!$c['id_fournisseur']) continue; // Si aucun fournisseur, READSOFT ne veut pas qu'on exporte la commande
+				$code_fournisseur = ATF::societe()->select($c['id_fournisseur'],'code_fournisseur');
+				if (!$code_fournisseur) continue; // Si aucun code de fournisseur, READSOFT ne veut pas qu'on exporte la commande
 				array_walk($c,'clean');
 				array_walk($c,'htmlspecialchars');
 				$xml .= "\n".'<PurchaseOrder>';
 				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
-				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($c['id_fournisseur'],'code_fournisseur').'</SupplierNumber>';
+				$xml .= "\n".'<SupplierNumber>'.$code_fournisseur.'</SupplierNumber>';
 				$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
 				if ($c['date_reception_fournisseur'])
 					$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
