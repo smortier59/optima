@@ -2685,5 +2685,43 @@ class hotline extends classes_optima {
 		return $return;
 	}
 
+
+
+	/**
+	* Valide massivement les MEP des tickets hotlines
+	* @author Quentin JANON <qjanon@absystech.fr>
+	*
+	*/
+	public function massValidMEP($infos) {
+
+		//Commit
+		ATF::db($this->db)->begin_transaction();
+
+		foreach ($infos['th'] as $k=>$i) {
+			$hotline = array(
+				"id_hotline"=>$k
+				,"wait_mep"=>"non"
+			);
+
+			parent::update($hotline,$s);
+			//Envoi d'un mail au chef de projet !
+			ATF::hotline_mail()->createMailMep($k);
+			ATF::hotline_mail()->sendMail();
+
+			//Notice mail envoyé
+			$this->createMailNotice("hotline_mail_mise_prod");
+
+			//Trace dans les interactions
+			$this->createInternalInteraction($k,"Mis en prod par ".ATF::user()->nom(ATF::$usr->getId()));
+
+		}
+
+		//Commit
+		ATF::db($this->db)->commit_transaction();
+
+		$this->redirection("select_all");
+		return true;
+	}
+
 };
 ?>
