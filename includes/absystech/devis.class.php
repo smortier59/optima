@@ -574,6 +574,9 @@ class devis_absystech extends devis {
 		$infos[$this->table]["ref"]=$devis["ref"];
 		$infos[$this->table]["id_affaire"]=$devis["id_affaire"];
 		$infos[$this->table]["revision"]=chr(ord($devis["revision"])+1);
+
+		$forecast =ATF::affaire()->select($devis["id_affaire"], "forecast");
+
 		unset($infos[$this->table]["id_devis"]);
 
 		ATF::db($this->db)->begin_transaction();
@@ -595,6 +598,7 @@ class devis_absystech extends devis {
 		if($preview){
 			ATF::db($this->db)->rollback_transaction();
 		}else{
+			ATF::affaire()->u(array("id_affaire"=> $devis["id_affaire"], "forecast"=> $forecast));
 			ATF::db($this->db)->commit_transaction();
 			ATF::affaire()->redirection("select",$devis["id_affaire"]);
 		}
@@ -745,7 +749,9 @@ class devis_absystech extends devis {
 		$affaire["affaire"]=$infos["resume"];
 		$affaire["date"]=$infos["date"];
 		$affaire["id_termes"]=$infos["id_termes"];
+
 		$affaire["forecast"]=20;
+
 		$affaire["id_commercial"]=$infos["id_user"];
 		if ($infos["type_devis"] == "consommable") $affaire["nature"]="consommable";
 
