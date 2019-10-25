@@ -66,13 +66,29 @@ class readsoft {
 	 * Extraction XML des lignes de commandes
 	 */
 	function bon_de_commande(){
-		ATF::bon_de_commande()->q->reset()->setStrict()->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC')
+
+		ATF::bon_de_commande()->q->reset()->setStrict()
+														->from("bon_de_commande","id_affaire", "commande","id_affaire")
+														->where("commande.etat", "mis_loyer", "OR", "statut_contrat", "=")
+														->where("commande.etat", "prolongation", "OR", "statut_contrat", "=")
+														->where("commande.etat", "restitution", "OR", "statut_contrat", "=")
+														->where("commande.etat", "mis_loyer_contentieux", "OR", "statut_contrat", "=")
+														->where("commande.etat", "prolongation_contentieux", "OR", "statut_contrat", "=")
+														->where("commande.etat", "restitution_contentieux", "OR", "statut_contrat", "=")
+														->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC');
+
+		//ATF::bon_de_commande()->q->reset()->setStrict()->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC')
 //->setLimit(200)
-;
+
 		self::setupLast(__FUNCTION__); // Ne pas extraire les données déjà extraites précédemment
+
 
 		$xml = '<PurchaseOrders>';
 		if ($bdc = ATF::bon_de_commande()->sa()) {
+
+			ATF::bon_de_commande()->setToString();
+			log::logger(ATF::bon_de_commande()->sa() , "mfleurquin");
+
 			foreach($bdc as $c) {
 				if (!$c['id_fournisseur']) continue; // Si aucun fournisseur, READSOFT ne veut pas qu'on exporte la commande
 				$code_fournisseur = ATF::societe()->select($c['id_fournisseur'],'code_fournisseur');
@@ -120,7 +136,7 @@ class readsoft {
 				}
 				$xml .= "\n".'</PurchaseOrder>';
 			}
-			self::setupLast(__FUNCTION__,$lastID); // Mémoriser le dernier ID exporté
+			//self::setupLast(__FUNCTION__,$lastID); // Mémoriser le dernier ID exporté
 		}
 		$xml .= "\n".'</PurchaseOrders>';
 		return self::HEAD . $xml;
@@ -132,10 +148,10 @@ class readsoft {
 	function compte(){
 		$xml = '<GeneralLedgerAccounts>';
 		$xml .= "\n".'<GeneralLedgerAccount>';
-		$xml .= "\n".'<Code>'.$i[''].'</Code>'; // Code comptable 
+		$xml .= "\n".'<Code>'.$i[''].'</Code>'; // Code comptable
 		$xml .= "\n".'<Group>'.$i[''].'</Group>';
-		$xml .= "\n".'<Description>'.$i[''].'</Description>'; // Libellé du compte 
-		$xml .= "\n".'<Active>'.$i[''].'</Active>'; // « true » ou « false » 
+		$xml .= "\n".'<Description>'.$i[''].'</Description>'; // Libellé du compte
+		$xml .= "\n".'<Active>'.$i[''].'</Active>'; // « true » ou « false »
 		$xml .= "\n".'</GeneralLedgerAccount>';
 		$xml .= "\n".'</GeneralLedgerAccounts>';
 	}
@@ -152,19 +168,19 @@ file_put_contents(__DIR__.'/../../www/readsoft/Purchaseorders.xml',$rs->bon_de_c
 <xml>
 <Suppliers>
 <Supplier>A répéter pour chaque fournisseur
-<SupplierNumber>Identifiant du fournisseur dans l’ERP 
-<Name>Nom du fournisseur 
+<SupplierNumber>Identifiant du fournisseur dans l’ERP
+<Name>Nom du fournisseur
 <OrganizationNumber>Identifiant de la société acheteuse dans l’ERP
-<Street>Adresse 
+<Street>Adresse
 <PostalCode>Code postal
 <City>Ville
 <CountryName>Code du pays sur 2 caractères (ex. : FR)
 <Blocked>
 0 : fournisseur actif
 1 : fournisseur bloqué
-<TaxCode>SIRET du fournisseur 
-<TelephoneNumber>Téléphone (facultatif) 
-<FaxNumber>Fax (facultatif) 
+<TaxCode>SIRET du fournisseur
+<TelephoneNumber>Téléphone (facultatif)
+<FaxNumber>Fax (facultatif)
 </Supplier>
-</Suppliers> 
+</Suppliers>
 */
