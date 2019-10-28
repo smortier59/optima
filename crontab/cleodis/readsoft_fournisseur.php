@@ -70,6 +70,9 @@ class readsoft {
 		ATF::bon_de_commande()->q->reset()->setStrict()
 														->from("bon_de_commande","id_affaire", "commande","id_affaire")
 														->where("commande.etat", "mis_loyer", "OR", "statut_contrat", "=")
+														->where("commande.etat", "non_loyer", "OR", "statut_contrat", "=")
+														->where("commande.etat", "AR", "OR", "statut_contrat", "=")
+														->where("commande.etat", "vente", "OR", "statut_contrat", "=")
 														->where("commande.etat", "prolongation", "OR", "statut_contrat", "=")
 														->where("commande.etat", "restitution", "OR", "statut_contrat", "=")
 														->where("commande.etat", "mis_loyer_contentieux", "OR", "statut_contrat", "=")
@@ -95,46 +98,53 @@ class readsoft {
 				if (!$code_fournisseur) continue; // Si aucun code de fournisseur, READSOFT ne veut pas qu'on exporte la commande
 				array_walk($c,'clean');
 				array_walk($c,'htmlspecialchars');
-				$xml .= "\n".'<PurchaseOrder>';
-				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
-				$xml .= "\n".'<SupplierNumber>'.$code_fournisseur.'</SupplierNumber>';
-				$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
-				if ($c['date_reception_fournisseur'])
-					$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
-				$xml .= "\n".'<ContactName>'.htmlspecialchars(ATF::contact()->nom($c['id_contact'])).'</ContactName>';
-				$xml .= "\n".'<Description>'.$c['bom_de_commande'].'</Description>';
-				$xml .= "\n".'<StatusText>'.$c['etat'].'</StatusText>';
-				ATF::bon_de_commande_ligne()->q->reset()->where('bon_de_commande_ligne.id_'.__FUNCTION__,$c['id_'.__FUNCTION__]);
-				if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
-					$xml .= "\n".'<Lines>';
-					foreach($bdcl as $l) {
-						array_walk($l,'clean');
-						array_walk($l,'htmlspecialchars');
-						$xml .= "\n".'<PurchaseOrderLine>';
-						$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
-						$xml .= "\n".'<ArticleNumber>'.htmlspecialchars($l['ref']).'</ArticleNumber>';
-						$xml .= "\n".'<SupplierArticleNumber>'.htmlspecialchars(str_replace("&","",$l['ref'])).'</SupplierArticleNumber>';
-						$xml .= "\n".'<ArticleDescription>'.htmlspecialchars(str_replace("&","",$l['produit'])).'</ArticleDescription>';
-						$cl = ATF::commande_ligne()->select($l['id_commande_ligne']);
-						$p = ATF::produit()->select($cl['id_produit']);
-						$scat = ATF::sous_categorie()->select($p['id_sous_categorie']);
-						$cat = ATF::categorie()->select($scat['id_categorie']);
-						$xml .= "\n".'<CategoryNumber>'.$p['id_sous_categorie'].'</CategoryNumber>';
-						$xml .= "\n".'<CategoryDescription>'.htmlspecialchars($scat['sous_categorie'].' ('.$cat['categorie'].')').'</CategoryDescription>';
-						$xml .= "\n".'<Quantity>'.$l['quantite'].'</Quantity>';
-						$xml .= "\n".'<Unit>'.$l['quantite'].'</Unit>';
-						$xml .= "\n".'<UnitPrice>'.$l['prix'].'</UnitPrice>';
-						$xml .= "\n".'<RowTotalAmountVatExcluded>'.($l['quantite']*$l['prix']).'</RowTotalAmountVatExcluded>';
-						$xml .= "\n".'<StatusText>'.$l[''].'</StatusText>';
-						$xml .= "\n".'<InvoicedQuantity>'.$l['quantite'].'</InvoicedQuantity>';
-						$xml .= "\n".'<DeliveredQuantity>'.$l['quantite'].'</DeliveredQuantity>';
-						$xml .= "\n".'<IsDeliveryRequired>false</IsDeliveryRequired>';
-						$xml .= "\n".'<PriceUnit>'.$l['prix'].'</PriceUnit>';
-						$xml .= "\n".'</PurchaseOrderLine>';
+
+
+				if( substr($code_fournisseur, 0 , 5) !== "FCLEO"
+				 && substr($code_fournisseur, 0 , 4) !== "FBNP"
+				 && substr($code_fournisseur, 0 , 6) !== "FFRANF"  ){
+					$xml .= "\n".'<PurchaseOrder>';
+					$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
+					$xml .= "\n".'<SupplierNumber>'.$code_fournisseur.'</SupplierNumber>';
+					$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
+					if ($c['date_reception_fournisseur'])
+						$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
+					$xml .= "\n".'<ContactName>'.htmlspecialchars(ATF::contact()->nom($c['id_contact'])).'</ContactName>';
+					$xml .= "\n".'<Description>'.$c['bom_de_commande'].'</Description>';
+					$xml .= "\n".'<StatusText>'.$c['etat'].'</StatusText>';
+					ATF::bon_de_commande_ligne()->q->reset()->where('bon_de_commande_ligne.id_'.__FUNCTION__,$c['id_'.__FUNCTION__]);
+					if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
+						$xml .= "\n".'<Lines>';
+						foreach($bdcl as $l) {
+							if($l["prix"] && $l["prix"] != 0){
+								array_walk($l,'clean');
+								array_walk($l,'htmlspecialchars');
+								$xml .= "\n".'<PurchaseOrderLine>';
+								$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
+								$xml .= "\n".'<ArticleNumber>'.htmlspecialchars($l['ref']).'</ArticleNumber>';
+								$xml .= "\n".'<SupplierArticleNumber>'.htmlspecialchars(str_replace("&","",$l['ref'])).'</SupplierArticleNumber>';
+								$xml .= "\n".'<ArticleDescription>'.htmlspecialchars(str_replace("&","",$l['produit'])).'</ArticleDescription>';
+
+								$cat = ATF::categorie()->select($scat['id_categorie']);
+								$xml .= "\n".'<CategoryNumber>'.$p['id_sous_categorie'].'</CategoryNumber>';
+								$xml .= "\n".'<CategoryDescription>'.htmlspecialchars($scat['sous_categorie'].' ('.$cat['categorie'].')').'</CategoryDescription>';
+								$xml .= "\n".'<Quantity>'.$l['quantite'].'</Quantity>';
+								$xml .= "\n".'<Unit>'.$l['quantite'].'</Unit>';
+								$xml .= "\n".'<UnitPrice>'.$l['prix'].'</UnitPrice>';
+								$xml .= "\n".'<RowTotalAmountVatExcluded>'.($l['quantite']*$l['prix']).'</RowTotalAmountVatExcluded>';
+								$xml .= "\n".'<StatusText>'.$l[''].'</StatusText>';
+								$xml .= "\n".'<InvoicedQuantity>'.$l['quantite'].'</InvoicedQuantity>';
+								$xml .= "\n".'<DeliveredQuantity>'.$l['quantite'].'</DeliveredQuantity>';
+								$xml .= "\n".'<IsDeliveryRequired>false</IsDeliveryRequired>';
+								$xml .= "\n".'<PriceUnit>'.$l['prix'].'</PriceUnit>';
+								$xml .= "\n".'</PurchaseOrderLine>';
+							}
+						}
+						$xml .= "\n".'</Lines>';
 					}
-					$xml .= "\n".'</Lines>';
+					$xml .= "\n".'</PurchaseOrder>';
 				}
-				$xml .= "\n".'</PurchaseOrder>';
+
 			}
 			//self::setupLast(__FUNCTION__,$lastID); // Mémoriser le dernier ID exporté
 		}
