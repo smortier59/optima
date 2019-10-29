@@ -89,7 +89,7 @@ class readsoft {
 		$xml = '<PurchaseOrders>';
 		if ($bdc = ATF::bon_de_commande()->sa()) {
 
-			ATF::bon_de_commande()->setToString();
+			ATF::bon_de_commande()->q->setToString();
 			log::logger(ATF::bon_de_commande()->sa() , "mfleurquin");
 
 			foreach($bdc as $c) {
@@ -102,7 +102,8 @@ class readsoft {
 
 				if( substr($code_fournisseur, 0 , 5) !== "FCLEO"
 				 && substr($code_fournisseur, 0 , 4) !== "FBNP"
-				 && substr($code_fournisseur, 0 , 6) !== "FFRANF"  ){
+				 && substr($code_fournisseur, 0 , 6) !== "FFRANF"
+				 && date("ymd", strtotime($c["date"])) >= date("Ymd", strtotime("- 1 years"))){
 					$xml .= "\n".'<PurchaseOrder>';
 					$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
 					$xml .= "\n".'<SupplierNumber>'.$code_fournisseur.'</SupplierNumber>';
@@ -110,7 +111,7 @@ class readsoft {
 					if ($c['date_reception_fournisseur'])
 						$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
 					$xml .= "\n".'<ContactName>'.htmlspecialchars(ATF::contact()->nom($c['id_contact'])).'</ContactName>';
-					$xml .= "\n".'<Description>'.$c['bom_de_commande'].'</Description>';
+					$xml .= "\n".'<Description>'.$c['bon_de_commande'].'</Description>';
 					$xml .= "\n".'<StatusText>'.$c['etat'].'</StatusText>';
 					ATF::bon_de_commande_ligne()->q->reset()->where('bon_de_commande_ligne.id_'.__FUNCTION__,$c['id_'.__FUNCTION__]);
 					if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
