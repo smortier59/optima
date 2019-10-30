@@ -111,7 +111,7 @@ class readsoft {
 					if ($c['date_reception_fournisseur'])
 						$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
 					$xml .= "\n".'<ContactName>'.htmlspecialchars(ATF::contact()->nom($c['id_contact'])).'</ContactName>';
-					$xml .= "\n".'<Description>'.$c['bon_de_commande'].'</Description>';
+					$xml .= "\n".'<Description>'.htmlspecialchars(str_replace("&","",$c['bon_de_commande'])).'</Description>';
 					$xml .= "\n".'<StatusText>'.$c['etat'].'</StatusText>';
 					ATF::bon_de_commande_ligne()->q->reset()->where('bon_de_commande_ligne.id_'.__FUNCTION__,$c['id_'.__FUNCTION__]);
 					if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
