@@ -179,8 +179,6 @@ class devis_absystech extends devis {
 		$this->addPrivilege("unlock","update");
 		$this->addPrivilege("sendMailDevis","update");
 		$this->addPrivilege("annulation","update");
-//				$this->addPrivilege("perdu","update");
-//				$this->addPrivilege("annule","update");
 
 	}
 
@@ -1085,18 +1083,6 @@ class devis_absystech extends devis {
 			ATF::db($this->db)->begin_transaction();
 			//Dans le cas d'une révision, le devis précédent passe en attente
 			if($devis["revision"]!="A"){
-//				$revision=chr(ord($devis["revision"])-1);
-//				$this->q->reset()
-//				->addCondition("revision",$revision)
-//				->addCondition("commande.id_affaire",$devis["id_affaire"])
-//				->setDimension("row");
-//
-//				$anc_devis=$this->sa();
-//				$this->u(array(
-//					"id_devis"=>$anc_devis["id_devis"],
-//					"etat"=>"attente",
-//					"date_modification"=>date("Y-m-d H:i:s")
-//				));
 
 				$this->q->reset()
 				->addCondition("devis.id_devis",$devis["id_devis"],false,false,'!=')
@@ -1747,5 +1733,6 @@ class devis_absystech extends devis {
 
 class devis_att extends devis_absystech { };
 class devis_wapp6 extends devis_absystech { };
+class devis_atoutcoms extends devis_absystech { };
 class devis_demo extends devis_absystech { };
 ?>

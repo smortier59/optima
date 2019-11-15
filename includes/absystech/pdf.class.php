@@ -2563,4 +2563,5 @@ class pdf_aewd extends pdf_absystech {
 	}
 }
 class pdf_wapp6 extends pdf_absystech { }
+class pdf_atoutcoms extends pdf_absystech { }
 ?>

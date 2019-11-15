@@ -56,4 +56,5 @@ class html2pdf_absystech extends html2pdf_optima {
 	}
 };
 class html2pdf_demo extends html2pdf_absystech { };
+class html2pdf_atoutcoms extends html2pdf_absystech { };
 ?>

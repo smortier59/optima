@@ -64,4 +64,5 @@ class conge_absystech extends conge {
 };
 
 class conge_att extends conge_absystech { };
+class conge_atoutcoms extends conge_absystech { };
 ?>

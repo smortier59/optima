@@ -503,18 +503,6 @@ class hotline extends classes_optima {
 		return $this->sa();
 	}
 
-//	/**
-//	* Retourne uniquement les informations nécessaires à la création d'un menu déroulant standard
-//    * @author QJ <qjanon@absystech.fr>
-//    * @return array societe
-//    */
-//	public function pole_options() {
-//		foreach($this->enum2array("pole_concerne")  as $key => $item) {
-//			$return[$item] = ATF::$usr->trans($item,$this->table);
-//		}
-//		return $return;
-//	}
-
 	/**
 	* Prend en charge la requête
 	* @author Quentin JANON <qjanon@absystech.fr>
