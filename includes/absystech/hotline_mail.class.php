@@ -448,4 +448,10 @@ class hotline_mail {
 		$this->createMailForAT($id_hotline,$obj,$to,$template,$id_hotline_interaction);
 	}
 };
+
+class hotline_mail_atoutcoms extends hotline_mail{
+	private function createMail($id_hotline,$obj,$from,$to,$template,$id_hotline_interaction=NULL,$pj=false,$mep=false){
+		return true;
+	}
+}
 ?>
