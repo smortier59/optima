@@ -236,39 +236,6 @@ class facture_fournisseur extends classes_optima {
 		}
 		return $return;
 	}
-/*
-	public function getAll(){
-		$return = $this->select_all();
-		foreach ($return as $key => $value) {
-			$id_facture = $value["id_facture_fournisseur"];
-			$return[$key]["id_crypt"] = $this->cryptId($id_facture);
-
-			$return[$key]["html"] = "Societe : <a href=\'societe-select-".ATF::societe()->cryptId($value["id_societe"]).".html\' target=\'blank\'>".ATF::societe()->nom($value["id_societe"]).
-									"</a><br />Date : ".$value["date"].
-									"<br />Achat : ".$value["achat"].
-								    "<br />Fourniture : ".$value["fourniture"].
-								    "<br />Immobilisation : ".$value["immo"].
-								    "<br />Frais generaux : ".$value["frais_generaux"].
-								    "<br />Montant HT : ".$value["montant_ht"]." €".
-								    "<br />Statut : ".$value["statut"];
-
-
-			if ($this->imageExist($id_facture)){
-				$retour = $this->getUrlImagePDF($id_facture);
-			}else{
-				//Si déja pas de fichier PDF pour cette facture on ne regénère pas!
-				if($this->getFichierJoint($id_facture)){
-					$retour = $this->dynamicPicture($id_facture);
-				}
-			}
-			if($retour){
-				$return[$key]["urlPDF"] = $retour["URL"]."_0-800-300.png";
-				$return[$key]["url"] = $retour["URL"]."_0-400-150.png";
-			}else{ $return[$key]["url"] = ""; }
-		}
-		return $return;
-	}
-*/
 	public function setInfos($infos){
 		$res = $this->update(array("id_facture_fournisseur"=> $this->decryptId($infos["id_facture_fournisseur"]),
 						  $infos["field"] => $infos["value"])

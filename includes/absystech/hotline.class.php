@@ -503,18 +503,6 @@ class hotline extends classes_optima {
 		return $this->sa();
 	}
 
-//	/**
-//	* Retourne uniquement les informations nécessaires à la création d'un menu déroulant standard
-//    * @author QJ <qjanon@absystech.fr>
-//    * @return array societe
-//    */
-//	public function pole_options() {
-//		foreach($this->enum2array("pole_concerne")  as $key => $item) {
-//			$return[$item] = ATF::$usr->trans($item,$this->table);
-//		}
-//		return $return;
-//	}
-
 	/**
 	* Prend en charge la requête
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -931,29 +919,38 @@ class hotline extends classes_optima {
 		//Fin de transaction
 		ATF::db($this->db)->commit_transaction();
 
-$societe = ATF::societe()->select($infos['id_societe']);
-$contact = ATF::contact()->select($infos['id_contact']);
-$hotline = ATF::hotline()->select($id_hotline);
+		$societe = ATF::societe()->select($infos['id_societe']);
+		$contact = ATF::contact()->select($infos['id_contact']);
+		$hotline = ATF::hotline()->select($id_hotline);
 
-// Envoi sur mattermost
-$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
-$login = ATF::user()->select($id_owner,"login");
-$logins = array(
-"tpruvost"=>"thibaut",
-"jluillier"=>"jacques",
-"smortier"=>"sol-r",
-"gdamecourt"=>"gauthier"
-);
-if ($logins[$login]) $login = $logins[$login];
-$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
-$data = array();
-$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
-$data["username"] = $societe["societe"];
-$data["channel"] = "Hotline";
-$cmd .= json_encode($data);
-$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
-log::logger($cmd,'mm');
-if (!ATF::isTestUnitaire()) $result = `$cmd`;
+		// Envoi sur mattermost
+		$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
+		$login = ATF::user()->select($id_owner,"login");
+		$logins = array(
+		"tpruvost"=>"thibaut",
+		"jluillier"=>"jacques",
+		"smortier"=>"sol-r",
+		"gdamecourt"=>"gauthier"
+		);
+		if ($logins[$login]) $login = $logins[$login];
+		$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
+		$data = array();
+		$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+		if(ATF::$codename == "atoutcoms"){
+			$data["username"] = $societe["societe"];
+			$data["channel"] = "hhotline-atoutcoms";
+			$cmd .= json_encode($data);
+			$cmd .= "' https://mm.absystech.net/hooks/pcjzu5fri7rnubzaawrn687ffe";
+		}else{
+			$data["username"] = $societe["societe"];
+			$data["channel"] = "Hotline";
+			$cmd .= json_encode($data);
+			$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+
+		}
+		log::logger($cmd,'mm');
+		if (!ATF::isTestUnitaire()) $result = `$cmd`;
+
 
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");

@@ -28,7 +28,6 @@ class pointage_absystech extends pointage {
 	* @param string $infos : Arguments postés en ajax
 	*/
 	public function pointages(&$infos){
-//		$infos['display'] = true;
 		// On récupère tous le pointage de l'utilisateur
 		$this->q->reset()->where('id_user',ATF::$usr->getId())->addOrder("date","desc");
 		$sa = $this->sa();
@@ -383,5 +382,6 @@ class pointage_absystech extends pointage {
 class pointage_att extends pointage_absystech {
 };
 class pointage_demo extends pointage_absystech { };
+class pointage_atoutcoms extends pointage_absystech { };
 
 ?>

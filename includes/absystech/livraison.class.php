@@ -60,8 +60,6 @@ class livraison_absystech extends livraison {
 													 //,'id_societe'
 													 ,'etat'
 													 ,'livraison'
-//													 ,'bon_de_livraison'
-//													 ,'bon_de_livraison_signe'
 													 ,'regenerate'
 												  );
 												  
@@ -272,7 +270,6 @@ class livraison_absystech extends livraison {
 		}
 		
 		$id = $infos["id_".$this->table];
-//		parent::update(array("id_livraison"=>$id,"etat"=>"termine"));
 		
 		if ($this->files && ($insert_files || $this->files["preview"])){
 			if(is_array($insert_files)){
@@ -367,5 +364,6 @@ class livraison_absystech extends livraison {
 }
 class livraison_att extends livraison_absystech { };
 class livraison_wapp6 extends livraison_absystech { };
+class livraison_atoutcoms extends livraison_absystech { };
 class livraison_demo extends livraison_absystech { };
 ?>

@@ -326,5 +326,6 @@ class facture_paiement extends classes_optima {
 
 class facture_paiement_att extends facture_paiement { };
 class facture_paiement_wapp6 extends facture_paiement { };
+class facture_paiement_atoutcoms extends facture_paiement { };
 class facture_paiement_demo extends facture_paiement { };
 ?>

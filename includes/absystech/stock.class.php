@@ -55,7 +55,6 @@ class stock_absystech extends stock {
 			,"date_fin_immo"
 			//,"date"=>array("custom"=>true,"xtype"=>"datefield")
 			// Commenté car pour moi ça ne veut rien dire... déjà hidden n'est pas un xtype, et le default a true... est ce paske c'est une checkbox solo ? Je n'ai pas le temps de regarder là donc je commente.
-//			,"formulaire"=>array("custom"=>true,"xtype"=>"hidden","default"=>true)
 			,"date_achat"
 			,"date_fin_immo"
 			,'commentaire'=>array("custom"=> true, "null"=> true)
@@ -271,8 +270,6 @@ class stock_absystech extends stock {
 		unset($infos["redirection_custom"]);
 		//--------------------------------------------------//
 		//--------------ID_GROUP-----------------//
-//		$id_group=$this->get_last_id_group();
-//		$infos["id_group"]=$id_group+1;
 		//----------------------------------------//		
 		//--------------QUANTITE-----------------//
 		$qte= $infos["quantite"];
@@ -431,11 +428,7 @@ class stock_absystech extends stock {
 		
 		//Redirection 
 		if(is_array($cadre_refreshed)){
-//			if($redirection){
-//				ATF::affaire()->redirection("select",$this->cryptId($infos["id_affaire"]));
-//			}else{
 				$this->redirection("select_all");
-//			}
 		}
 		
 		//Return id
@@ -525,8 +518,6 @@ class stock_absystech extends stock {
 		$s_etat = new stock_etat();
 		$s_etat->q
 			  ->setAlias("seSub")
-//			  ->addField("MAX(seSub.id_stock_etat)","id")
-//			  ->orWhere("seSub.id_stock","stock.id_stock",false,"=",false,true)
 			  ->addField("seSub.id_stock_etat","id")
 			  ->orWhere("seSub.id_stock","stock.id_stock",false,"=",false,true)
 			  ->setLimit(1)
@@ -761,7 +752,6 @@ return; // disabled
 
 		$ch = curl_init($urls); 
 		curl_setopt($ch, CURLOPT_COOKIEFILE, realpath('cookie.txt'));
-//		curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$html = curl_exec($ch);
 		$html = mb_convert_encoding($html, "UTF-8"); 
@@ -1196,5 +1186,6 @@ class errorStock extends errorATF {};
 
 class stock_att extends stock_absystech { };
 class stock_wapp6 extends stock_absystech { };
+class stock_atoutcoms extends stock_absystech { };
 class stock_demo extends stock_absystech { };
 ?>
