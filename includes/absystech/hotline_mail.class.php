@@ -450,8 +450,11 @@ class hotline_mail {
 };
 
 class hotline_mail_atoutcoms extends hotline_mail{
-	private function createMail($id_hotline,$obj,$from,$to,$template,$id_hotline_interaction=NULL,$pj=false,$mep=false){
-		return true;
+	public function sendMail(){
+		ATF::$msg->addWarning(ATF::$usr->trans("Mail non envoyé pour ATOUTCOMS"));
+
 	}
+
+
 }
 ?>
