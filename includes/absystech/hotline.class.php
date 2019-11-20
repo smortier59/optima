@@ -938,7 +938,7 @@ class hotline extends classes_optima {
 		$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
 		if(ATF::$codename == "atoutcoms"){
 			$data["username"] = $societe["societe"];
-			$data["channel"] = "hhotline-atoutcoms";
+			$data["channel"] = "hotline-atoutcoms";
 			$cmd .= json_encode($data);
 			$cmd .= "' https://mm.absystech.net/hooks/pcjzu5fri7rnubzaawrn687ffe";
 		}else{
