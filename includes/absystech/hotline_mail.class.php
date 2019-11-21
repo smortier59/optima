@@ -452,7 +452,6 @@ class hotline_mail {
 class hotline_mail_atoutcoms extends hotline_mail{
 	public function sendMail(){
 		ATF::$msg->addWarning(ATF::$usr->trans("Mail non envoyé pour ATOUTCOMS"));
-
 	}
 
 
