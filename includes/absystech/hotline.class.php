@@ -927,10 +927,15 @@ class hotline extends classes_optima {
 		$id_owner = ATF::societe()->select($infos['id_societe'],"id_owner");
 		$login = ATF::user()->select($id_owner,"login");
 		$logins = array(
-		"tpruvost"=>"thibaut",
-		"jluillier"=>"jacques",
-		"smortier"=>"sol-r",
-		"gdamecourt"=>"gauthier"
+			"tpruvost"=>"thibaut",
+			"jluillier"=>"jacques",
+			"smortier"=>"sol-r",
+			"gdamecourt"=>"gauthier",
+			"lroels" => "lea",
+			"qjanon"=>"zorian",
+			"ckupiec"=> "kingkuku",
+			"jdelaporte"=>"julie.delaporte",
+			"yphilippe"=>"yanphilippe"
 		);
 		if ($logins[$login]) $login = $logins[$login];
 		$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
@@ -938,7 +943,7 @@ class hotline extends classes_optima {
 		$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
 		if(ATF::$codename == "atoutcoms"){
 			$data["username"] = $societe["societe"];
-			$data["channel"] = "hhotline-atoutcoms";
+			$data["channel"] = "hotline-atoutcoms";
 			$cmd .= json_encode($data);
 			$cmd .= "' https://mm.absystech.net/hooks/pcjzu5fri7rnubzaawrn687ffe";
 		}else{
