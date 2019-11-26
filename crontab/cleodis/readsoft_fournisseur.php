@@ -103,7 +103,7 @@ class readsoft {
 				if( substr($code_fournisseur, 0 , 5) !== "FCLEO"
 				 && substr($code_fournisseur, 0 , 4) !== "FBNP"
 				 && substr($code_fournisseur, 0 , 6) !== "FFRANF"
-				 && date("Ymd", strtotime($c["date"])) >= date("Ymd", strtotime("- 1 years"))){
+				 && date("Ymd", strtotime($c["date"])) >= date("Ymd", strtotime("- 3 years"))){
 					$xml .= "\n".'<PurchaseOrder>';
 					$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
 					$xml .= "\n".'<SupplierNumber>'.$code_fournisseur.'</SupplierNumber>';
