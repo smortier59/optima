@@ -31,14 +31,14 @@ class readsoft {
 	}
 	private function societe(){
 		ATF::societe()->q->reset()->where("fournisseur","oui")
-->setLimit(200)
+//->setLimit(200)
 ;
 		$xml = '<Suppliers>';
 		if ($fournisseurs = ATF::societe()->select_all()) {
-			foreach($fournisseurs as $i) {		
+			foreach($fournisseurs as $i) {
 				array_walk($i,'htmlspecialchars');
 				$xml .= "\n".'<Supplier>';
-				$xml .= "\n".'<SupplierNumber>'.$i['id_'.__FUNCTION__].'</SupplierNumber>'; // Identifiant du fournisseur dans l’ERP ';
+				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($i['id_'.__FUNCTION__],'code_fournisseur').'</SupplierNumber>'; // Identifiant du fournisseur dans l’ERP ';
 				$xml .= "\n".'<Name>'.$i['societe'].'</Name>'; // Nom du fournisseur ';
 				$xml .= "\n".'<OrganizationNumber>001</OrganizationNumber>'; // Identifiant de la société acheteuse dans l’ERP';
 				$xml .= "\n".'<Street>'.$i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : '').'</Street>'; // Adresse ';
@@ -63,17 +63,18 @@ class readsoft {
 	 */
 	function bon_de_commande(){
 		ATF::bon_de_commande()->q->reset()->setStrict()->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC')
-->setLimit(200)
+//->setLimit(200)
 ;
 		self::setupLast(__FUNCTION__); // Ne pas extraire les données déjà extraites précédemment
 
 		$xml = '<PurchaseOrders>';
 		if ($bdc = ATF::bon_de_commande()->sa()) {
 			foreach($bdc as $c) {
+				if (!$c['id_fournisseur']) continue; // Si aucun fournisseur, READSOFT ne veut pas qu'on exporte la commande
 				array_walk($c,'htmlspecialchars');
 				$xml .= "\n".'<PurchaseOrder>';
 				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
-				$xml .= "\n".'<SupplierNumber>'.$c['id_fournisseur'].'</SupplierNumber>';
+				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($c['id_fournisseur'],'code_fournisseur').'</SupplierNumber>';
 				$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
 				if ($c['date_reception_fournisseur'])
 					$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
@@ -132,8 +133,11 @@ class readsoft {
 
 }
 $rs = new readsoft();
-file_put_contents(__DIR__.'/Fournisseurs.xml',$rs->fournisseur());
-file_put_contents(__DIR__.'/Purchaseorders.xml',$rs->bon_de_commande());
+file_put_contents(__DIR__.'../../www/readsoft/Fournisseurs.xml',$rs->fournisseur());
+file_put_contents(__DIR__.'../../www/readsoft/Purchaseorders.xml',$rs->bon_de_commande());
+
+
+
 
 /*
 <xml>

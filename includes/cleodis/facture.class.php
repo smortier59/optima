@@ -2954,6 +2954,10 @@ class facture_boulanger extends facture_cleodis {
 		parent::__construct($table_or_id);
 		$this->fieldstructure();
 
+
+
+		unset($this->files["fichier_joint"], $this->colonnes['fields_column']["fichier_joint"]);
+
 	}
 
 	public function getRefExterne(){
