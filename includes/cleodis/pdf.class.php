@@ -3390,6 +3390,8 @@ class pdf_cleodis extends pdf {
 	*/
 	public function bon_de_commande($id,$s) {
 
+		$this->facturePDF = false;
+
 		$this->initBDC($id,$s,$previsu);
 		$this->unsetHeader();
 		$this->open();
