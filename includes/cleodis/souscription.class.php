@@ -1327,7 +1327,7 @@ class souscription_bdomplus extends souscription_cleodis {
       log::logger($vendeur, $this->logFileSouscription);
 
       $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
-      $info_mail["recipient"] = "benjamin.tronquit@cleodis.com,BDOMPlusLicence@absystech.fr";
+      $info_mail["recipient"] = "benjamin.tronquit@cleodis.com";
       $info_mail["html"] = true;
       $info_mail["template"] = "bdomplus-mailVendeurMagasin";
       $info_mail["texte"] = "Souscription magasin par le vendeur suivant ";
