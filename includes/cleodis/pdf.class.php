@@ -142,7 +142,7 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
+			if($this->logo == "cleodis/2SI_CLEODIS.jpg" || $this->logo == "cleodis/OLISYS.jpg"){
 				$this->image(__PDF_PATH__.$this->logo,75,10,40);
 			}else{
 				$this->image(__PDF_PATH__.$this->logo,10,10,40);
@@ -399,6 +399,7 @@ class pdf_cleodis extends pdf {
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
 
 		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		if($this->affaire["type_affaire"] == "Olisys") $this->logo = 'cleodis/OLISYS.jpg';
 
 
 		if($this->devis["type_devis"] === "optic_2000"){
@@ -1971,7 +1972,9 @@ class pdf_cleodis extends pdf {
 
   public function contratA4Societe($id, $signature,$sellsign) {
 	if($this->affaire["type_affaire"] == "2SI"){
-	  $this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
+		$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
+	} elseif($this->affaire["type_affaire"] == "Olisys"){
+		$this->image(__PDF_PATH__."cleodis/OLISYS.jpg",5,8,55);
 	} else{
 	  $this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
 	}
@@ -4054,6 +4057,9 @@ class pdf_cleodis extends pdf {
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
 		if($this->affaire["type_affaire"] == "2SI"){ $this->logo = 'cleodis/2SI_CLEODIS.jpg'; }
+		elseif($this->affaire["type_affaire"] == "Olisys"){
+			$this->logo = 'cleodis/OLISYS.jpg';
+		}else{  $this->logo = 'cleodis/logo.jpg'; }
 
 
 		//Styles utilisés
