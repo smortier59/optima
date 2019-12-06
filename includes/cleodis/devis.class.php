@@ -64,7 +64,7 @@ class devis_cleodis extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
-			,"type_affaire"=>array("custom"=>true,"data"=>array("normal","2SI"),"xtype"=>"combo")
+			,"type_affaire"=>array("custom"=>true,"data"=>array("normal","2SI","Olisys"),"xtype"=>"combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
 
 		);
