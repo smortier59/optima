@@ -1,0 +1,36 @@
+{strip}
+{$solde_total=$current_class->solde_total($id)}
+{$chiffre_par_an=$current_class->chiffre_par_an($id)} 
+{$affaire_perdu=$current_class->affaire_perdu($id)}
+{$datediff=$current_class->datediff($id)}
+
+<p> 
+	{if $solde_total}
+		<b>{ATF::$usr->trans('solde_total',societe)}</b> :
+		{if $solde_total>0}
+			<span style='color:red;font-weight:bold;'>{$solde_total|number_format:0:".":" "} &euro;</span> 
+		{else}
+			<span style='color:green;font-weight:bold;'>{ATF::$usr->trans('solde_total_bon')}</span> 
+		{/if}
+		<br>
+	{/if}
+	<b>{ATF::$usr->trans('affaire_perdu',societe)}</b> : {$affaire_perdu.affaire_perdu} ({$affaire_perdu.affaire_perdu_pourcent|number_format:0:',':' '}%)<br>
+	<b>{ATF::$usr->trans('devis_perdu',societe)}</b> : {$affaire_perdu.devis_perdu} ({$affaire_perdu.devis_perdu_pourcent|number_format:0:',':' '}%)<br>
+</p>
+<br>
+<p>
+	{foreach from=$chiffre_par_an key=key item=item}
+		<b>{$item.annee}</b> : {$item.marge|number_format:0:".":" "} &euro; / {$item.ca|number_format:0:".":" "} &euro; ({$item.pourcent|number_format:0:',':' '}%)<br>
+	{/foreach}
+</p>
+<br>
+<p>
+	<b>{ATF::$usr->trans('datediff',societe)}</b> :
+	{if $datediff>0}
+		<span style='color:red;font-weight:bold;'>{$datediff} Jours</span> 
+	{else}
+		<span style='color:green;font-weight:bold;'>{$datediff} Jours</span>
+	{/if}
+</p>
+
+{/strip}

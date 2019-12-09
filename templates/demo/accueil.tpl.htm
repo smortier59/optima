@@ -1,51 +1,520 @@
-{* Experimental *}
-<div id="widgets" style="padding-left:2em"></div>
+<div id="accueil" style="padding-left:2em;"></div>
 
-{$colspan=4}
-{$widgets=ATF::$usr->getWidgets()}
+{assign var="date" value=$smarty.now|date_format:"%Y-%m-%d"}
+
 <script type="text/javascript">/*<![CDATA[*/
 Ext.onReady(function(){	
 	try {
-		new Ext.Panel({ 
-			renderTo:'widgets',
-			title: 'Bonjour et bienvenue sur Optima, {ATF::user()->nom(ATF::$usr->getID())}.',
-			layout:'column',
-			items:[
-				{for $colNumber=0; $colNumber<$colspan; $colNumber++}  
-					{if $colNumber},{/if}
-					{
-						columnWidth:{1/$colspan},
-						layout: 'form',
-						bodyStyle:'padding:5px 15px 5px 15px',
-						border: false,
-						autoWidth:true,
-						items: [ 
-							{foreach from=$widgets key=key item=item}
-								{if ($item@index%$colspan)===$colNumber}
-									{if $item@index>=$colspan}
-									,
-									{/if}
-									{
-										xtype:'panel',
-										autoWidth:true,
-										bodyStyle:'margin:10px 0 5px 0',
-										items: [
-											{
-												xtype: 'panel', 
-												title: '{ATF::$usr->trans(widget,$item.module, $item.type)|escape:javascript}',
-												frame: true,
-												border: false,
-												autoWidth:true,
-												autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}', scripts:true }
-											}
-										]
+		var widgets = [
+			{foreach from=ATF::$usr->getWidgets() key=key item=item}
+				{
+					xtype:'panel',
+					id:'widget_{$item.module}_{$item.type}',
+					width: 305, 
+					style: {
+						float: 'left',
+						marginBottom: '5px'
+					},
+					border: false,
+					layout: 'column',
+					items: [
+						{											    
+							xtype: 'panel', 
+							height:250,
+							border: true,
+							autoLoad:{ url: '{$item.module},widget.ajax{if $item.type},type={$item.type}{/if}', scripts:true }
+						}
+					]
 
+				}{if !$key@last},{/if}
+				
+			{/foreach}
+		 ];
+		
+	} catch(e) {
+		console.log("ERREUR WIDGET !");
+		console.log(e); 
+	}
+	
+	try {
+		var today = new Date();
+		var nbTache = 0;
+		
+		ATF.validTache = function(id) {
+
+			ATF.ajax('tache,valid.ajax','id_tache='+id,{ onComplete: function (e) { 
+				if (e.result) {
+					var line = Ext.get("line"+id);
+					line.fadeOut({ easing: 'easeOut', duration: 1, remove: false, useDisplay: true }); 
+					setTimeout(function() { line.removeClass("en_cours"); },1000);
+					setTimeout(function() { line.addClass("fini"); },1000);
+				}
+
+			}});
+		};
+		
+		ATF.cancelTache = function(id) {
+			ATF.ajax('tache,cancel.ajax','id_tache='+id,{ onComplete: function (e) { 
+				if (e.result) {
+					var line = Ext.get("line"+id);
+					line.fadeOut({ easing: 'easeOut', duration: 1, remove: true, useDisplay: true }); 
+				}
+			}});
+		};
+		
+		ATF.giveUpTache = function (id) {
+			ATF.ajax('tache,giveUp.ajax','id_tache='+id,{ onComplete: function (e) { 
+				if (e.result) {
+					var line = Ext.get("line"+id);
+					line.fadeOut({ easing: 'easeOut', duration: 1, remove: true, useDisplay: true }); 
+				}
+			}});
+		};
+		
+		ATF.postponeTache = function(id) {
+			new Ext.Window({
+				title: '{ATF::$usr->trans("postpone_title","tache_accueil")}',
+				id:'mywindow'+id,
+				width: 310,
+				items: [
+					new Ext.FormPanel({
+						frame:true,
+						autoHeight:true,
+						id:'myForm'+id,
+						name:'myFormName'+id,
+						labelWidth:140,
+						items: [{
+							html:'{ATF::$usr->trans("decalage","tache_postpone")} <b>{ATF::$usr->trans("or")|strtoupper}</b> {ATF::$usr->trans("new_date","tache_postpone")}',
+							height:30
+						},{
+							xtype:"combo",
+							typeAhead: true,
+							triggerAction: 'all',
+							width:130,
+							id:'postponeValue'+id,
+							lazyRender:true,
+							fieldLabel:'{ATF::$usr->trans("nb_jour_postpone","tache_accueil")}',
+							mode: 'local',
+							store: new Ext.data.ArrayStore({
+								fields: ['myId','displayText'],
+								data: [[1, '1 jour'], [2, '2 jour'], [3, '3 jour'], [4, '4 jour'], [5, '5 jour']]
+							}),
+							valueField: 'myId',
+							displayField: 'displayText'
+						},{
+							xtype:"datefield",
+							name:'postponeValue2'+id,
+							id:'postponeValue2'+id,
+							width:130,
+							fieldLabel:'{ATF::$usr->trans("date_postpone","tache_accueil")}',
+							format: "d-m-Y",
+						}],
+						buttons: [{
+							text: 'Ok',
+							handler: function(){
+							ATF.log(Ext.getCmp('postponeValue2'+id));
+								ATF.ajax('tache,postpone.ajax','id_tache='+id+'&postponeValue='+Ext.getCmp('postponeValue'+id).getValue()+'&postponeValue2='+Ext.getCmp('postponeValue2'+id).getRawValue(),{ onComplete: function (e) { 
+									if (e.result) {
+										var line = Ext.get("line"+id);
+										line.fadeOut({ easing: 'easeOut', duration: 1, remove: false, useDisplay: true }); 
 									}
-								{/if}
-							{/foreach}
-						 ]
+								}});
+								Ext.getCmp('myForm'+id).destroy();
+								Ext.getCmp('mywindow'+id).hide();
+							}
+						},{
+							text: 'Annuler',
+							handler: function(){
+								Ext.getCmp('myForm'+id).destroy();
+								Ext.getCmp('mywindow'+id).hide();
+							}
+						}]
+						
+					})
+				]
+			}).show();
+		};
+		
+		ATF.initTacheImminente = function(divID,date,time) {
+			var m = ATF.createLoadMask(Ext.select("#"+divID));
+			var p = "";
+			if (date) {
+				var d = new Date(date);
+				p = "date="+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+			}
+			if (time) {
+				p += " "+time;
+			}
+			m.show();
+			ATF.ajax(
+				"tache,tachesImminentes.ajax",
+				p,
+				{
+					onComplete : function (e) {
+						nbTache += e.result.count;
+						tplTacheImminente.overwrite(Ext.getCmp(divID).body,e.result);
+						m.hide();
+
+						if (!nbTache) {
+							Ext.getCmp('tachesImminentesAndLatePanel').collapse(true);
+						}
+
 					}
-				{/for}
+				}
+			);		
+		};
+		var tplTacheImminente = new Ext.XTemplate(
+			'<div class="tache_accueil">',
+				'<tpl if="count&gt;0">',
+					'<tpl for="lignes">',
+						'<div>',
+							'<div class="head w52">{literal}{libelle} ({count}{/literal})</div>',
+							'<div class="head w20">{ATF::$usr->trans(id_societe,tache)|escape:"javascript"}</div>',
+							'<div class="head w20">{ATF::$usr->trans(de,tache)|escape:"javascript"}</div>',
+							'<div class="head w8">{ATF::$usr->trans(actions,tache)|escape:"javascript"}</div>', 
+							'<div style="clear:both"></div>', 
+						'</div>',
+						'<tpl if="count&gt;0">',
+							'<tpl for="data">',
+								'<div class="dataR {literal}{etat}{/literal}" id="line{literal}{id_tache}{/literal}">', 
+									'<div class="dataC w52">', 
+										'<div class="lightCB">', 
+											'<tpl if="etat==\'en_cours\'">',
+												'<input type="checkbox" onclick="ATF.validTache(this.id);" value="{literal}{id_tache}{/literal}" id="{literal}{id_tache}{/literal}" name="tache{literal}{id_tache}{/literal}" />',
+												'<label for="{literal}{id_tache}{/literal}" ext:qtip="{ATF::$usr->trans(click2valid,qtip)|escape:"javascript"}"></label>',
+											'</tpl>',
+											'<tpl if="etat==\'fini\'">',
+												'<input type="checkbox" onclick="ATF.validTache(this.id);" value="{literal}{id_tache}{/literal}" id="{literal}{id_tache}{/literal}" name="tache{literal}{id_tache}{/literal}" disabled=disabled checked=checked />',
+												'<label for="{literal}{id_tache}{/literal}"</label>',
+											'</tpl>',
+										'</div>',
+										'{literal}{urgenceFlag}{/literal}', 
+										'{literal}{tache}{/literal}',
+									'</div>', 
+									'<div class="dataC w20"><tpl if="id_societe_crypted"><a href="societe-select-{literal}{id_societe_crypted}{/literal}.html">{literal}{societe}{/literal}</tpl></a>&nbsp;</div>',
+									'<div class="dataC w20">{literal}{createur}{/literal} / {literal}{concerne}{/literal}&nbsp;</div>',
+									'<div class="dataC w8">',
+										'<tpl if="etat==\'en_cours\'">',
+											'<a href="javascript:;" onclick="ATF.postponeTache({literal}{id_tache}{/literal});">',
+										'</tpl>',
+										'<img src="{ATF::$staticserver}images/icones/postpone.png" ext:qtip="{ATF::$usr->trans(postpone,qtip)|escape:"javascript"}" />',
+										'<tpl if="etat==\'en_cours\'">',
+											'</a>',
+										'</tpl>',
+										'&nbsp;',
+										'<a href="javascript:;" onclick="ATF.goTo(\'tache-select-{literal}{id_tache_crypted}{/literal}.html\');return false;">',
+											'<img src="{ATF::$staticserver}images/icones/link.png" ext:qtip="{ATF::$usr->trans(acceder_a_la_fiche,qtip)|escape:"javascript"}" />',
+										'</a>',
+										'&nbsp;',
+										'<tpl if="nbConcerne&gt;1">',
+											'<tpl if="etat==\'en_cours\'">',
+												'<a href="javascript:;" onclick="ATF.giveUpTache({literal}{id_tache}{/literal});">',
+											'</tpl>',
+											'<img src="{ATF::$staticserver}images/user-remove.png" ext:qtip="{ATF::$usr->trans(give_up,qtip)|escape:"javascript"}" width="14" height="14" />',
+											'<tpl if="etat==\'en_cours\'">',
+												'</a>',
+											'</tpl>',
+										'</tpl>',
+										'<tpl if="nbConcerne==1">',
+											'<tpl if="etat==\'en_cours\'">',
+												'<a href="javascript:;" onclick="ATF.cancelTache({literal}{id_tache}{/literal});">',
+											'</tpl>',
+											'<img src="{ATF::$staticserver}images/icones/cancel.png" ext:qtip="{ATF::$usr->trans(cancel,qtip)|escape:"javascript"}" width="14" height="14" />',
+											'<tpl if="etat==\'en_cours\'">',
+												'</a>',
+											'</tpl>',
+										'</tpl>',
+									'</div>',
+									'<div style="clear:both"></div>', 
+								'</div>', 
+							'</tpl>',
+						'</tpl>',
+					'</tpl>',
+				'</tpl>',
+				'<tpl if="count==0">',
+					'<div style="text-align:center; color: #686868;line-height: 50px">{ATF::$usr->trans(aucunes_taches_imminentes,tache)|escape:"javascript"}</div>',
+				'</tpl>',
+			'</div>'
+		);
+		
+		ATF.initTacheLate = function(divID) {
+			ATF.ajax(
+				"tache,tacheLate.ajax",
+				"",
+				{
+					onComplete : function (e) {
+						if (e.result.count!=0) {
+							nbTache += e.result.count;
+							tplTacheLate.overwrite(Ext.getCmp(divID).body,e.result);
+						}
+					}
+				}
+			);		
+		};
+		var tplTacheLate = new Ext.XTemplate(
+			'<div class="tache_accueil">',
+				'<div class="late">',
+					'<div class="head w52 red bold">{ATF::$usr->trans(taches_en_retard,tache)|escape:"javascript"} ({literal}{count}{/literal})</div>',
+					'<div class="head w20">{ATF::$usr->trans(id_societe,tache)|escape:"javascript"}</div>',
+					'<div class="head w20">{ATF::$usr->trans(de,tache)|escape:"javascript"}</div>',
+					'<div class="head w8">{ATF::$usr->trans(actions,tache)|escape:"javascript"}</div>', 
+					'<div style="clear:both"></div>', 
+				'</div>',
+				'<tpl for="data">',
+					'<div class="dataR {literal}{etat}{/literal} late" id="line{literal}{id_tache}{/literal}">', 
+						'<div class="dataC w52">', 
+							'<div class="lightCB">',  
+									'<tpl if="etat==\'en_cours\'">',
+										'<input type="checkbox" onclick="ATF.validTache(this.id);" value="{literal}{id_tache}{/literal}" id="{literal}{id_tache}{/literal}" name="tache{literal}{id_tache}{/literal}" />',
+										'<label for="{literal}{id_tache}{/literal}" ext:qtip="{ATF::$usr->trans(click2valid,qtip)|escape:"javascript"}"></label>',
+									'</tpl>',
+									'<tpl if="etat==\'fini\'">',
+										'<input type="checkbox" onclick="ATF.validTache(this.id);" value="{literal}{id_tache}{/literal}" id="{literal}{id_tache}{/literal}" name="tache{literal}{id_tache}{/literal}" disabled=disabled checked=checked />',
+										'<label for="{literal}{id_tache}{/literal}"</label>',
+									'</tpl>',
+							'</div>',
+							'<span class="red bold italic">{literal}{tpsRetard}{/literal} j </span>- ',
+							'{literal}{tache}{/literal}',
+						'</div>', 
+						'<div class="dataC w20"><a href="societe-select-{literal}{id_societe_crypted}{/literal}.html">{literal}{societe}{/literal}</a>&nbsp;</div>',
+							'<div class="dataC w20">{literal}{createur}{/literal} / {literal}{concerne}{/literal}&nbsp;</div>',
+						'<div class="dataC w8">',
+							'<tpl if="etat==\'en_cours\'">',
+								'<a href="javascript:;" onclick="ATF.postponeTache({literal}{id_tache}{/literal});">',
+							'</tpl>',
+							'<img src="{ATF::$staticserver}images/icones/postpone.png" ext:qtip="{ATF::$usr->trans(postpone,qtip)|escape:"javascript"}" />',
+							'<tpl if="etat==\'en_cours\'">',
+								'</a>',
+							'</tpl>',
+							'&nbsp;',
+							'<a href="javascript:;" onclick="ATF.goTo(\'tache-select-{literal}{id_tache_crypted}{/literal}.html\');return false;">',
+								'<img src="{ATF::$staticserver}images/icones/link.png" ext:qtip="{ATF::$usr->trans(acceder_a_la_fiche,qtip)|escape:"javascript"}" />',
+							'</a>',
+							'&nbsp;',
+							'<tpl if="nbConcerne&gt;1">',
+								'<tpl if="etat==\'en_cours\'">',
+									'<a href="javascript:;" onclick="ATF.giveUpTache({literal}{id_tache}{/literal});">',
+								'</tpl>',
+								'<img src="{ATF::$staticserver}images/user-remove.png" ext:qtip="{ATF::$usr->trans(give_up,qtip)|escape:"javascript"}" width="14" height="14" />',
+								'<tpl if="etat==\'en_cours\'">',
+									'</a>',
+								'</tpl>',
+							'</tpl>',
+							'<tpl if="nbConcerne==1">',
+								'<tpl if="etat==\'en_cours\'">',
+									'<a href="javascript:;" onclick="ATF.cancelTache({literal}{id_tache}{/literal});">',
+								'</tpl>',
+								'<img src="{ATF::$staticserver}images/icones/cancel.png" ext:qtip="{ATF::$usr->trans(cancel,qtip)|escape:"javascript"}" width="14" height="14" />',
+								'<tpl if="etat==\'en_cours\'">',
+									'</a>',
+								'</tpl>',
+							'</tpl>',
+						'</div>',
+						'<div style="clear:both"></div>', 
+					'</div>', 
+				'</tpl>',
+			'</div>'
+		);
+
+		var taches = [
+			{
+				xtype:'panel',
+				layout: 'column',
+				border:false,
+				listeners: {
+					"beforeRender": function (e) {
+						ATF.initTacheLate("contentTacheLate");
+						ATF.initTacheImminente("contentTacheImminente");
+					}
+				},
+				items: [
+					{
+						columnWidth: .7,
+						border: false,
+						style: {
+							paddingRight: '5px'
+						},
+						items: [{
+							border: false,
+							id:'contentTacheLate'
+							
+						},{
+							border: false,
+							id:'contentTacheImminente'
+						}]
+						
+						
+					},
+					{
+						border: false,
+						columnWidth: .3,
+						style: {
+							paddingLeft: '5px',
+							textAlign: 'right'
+						},
+						layout: 'column',
+						
+						items: [
+							{
+								border: false,
+								columnWidth: .5,
+								items: [{
+									html:'{ATF::$usr->trans(date_depart,tache_accueil)}&nbsp;&nbsp;&nbsp;',
+									border: false,
+									style: {
+										lineHeight: '25px',
+										fontWeight: 'bold'
+									},
+									
+								},{
+									html:'{ATF::$usr->trans(time_depart,tache_accueil)}&nbsp;&nbsp;&nbsp;',
+									border: false,
+									style: {
+										lineHeight: '25px',
+										fontWeight: 'bold'
+									},
+									
+								},{
+									html:'{ATF::$usr->trans(afficher_les_taches_finies,tache_accueil)}&nbsp;&nbsp;&nbsp;',
+									border: false,
+									style: {
+										lineHeight: '20px',
+										fontWeight: 'bold'
+									},
+								},{
+									html:'{ATF::$usr->trans(afficher_les_taches_en_retard,tache_accueil)}&nbsp;&nbsp;&nbsp;',
+									border: false,
+									style: {
+										lineHeight: '20px',
+										fontWeight: 'bold'
+									},									
+								},{
+									html:'<a href="tache-insert.html">Ajouter une tache</a>',
+									border: false,
+									style: {
+										lineHeight: '20px',
+										fontWeight: 'bold'
+									},
+								}]
+
+								
+							},{
+								border: false,
+								columnWidth: .5,
+								style: {
+									textAlign: 'left',
+									verticalAlign: 'top',
+									lineHeight: '25px',
+								},
+								items: [{
+									xtype: 'datefield',
+									name: 'date_depart',
+									cls:'x-border-box, x-border-box',
+									id: 'date_depart',
+									padding: 5,
+									width: 150,
+									style: {
+										verticalAlign: 'top',
+									},
+									value: today,
+									maxValue: "",
+									time: true,
+									format: "d-m-Y",
+									listeners: {
+										"select": function (el,newV,oldV) {
+											ATF.initTacheImminente("contentTacheImminente",newV,Ext.getCmp("time_depart").getValue());
+										}
+									}
+								},
+								{
+									xtype: 'timefield',
+									name: 'time_depart',
+									id: 'time_depart',
+									padding: 5,
+									maxValue: "",
+									width:100,
+									time: true,
+									format: "H:i",
+									style: {
+										verticalAlign: 'top',
+									},
+
+									value:'{$value|default:$smarty.now|date_format:"%H:%M"}',
+									minValue: '0:00',
+									maxValue: '23:45',
+									increment: 15,
+									listeners: {
+										"change": function (el,newV,oldV) {
+											ATF.initTacheImminente("contentTacheImminente",Ext.getCmp("date_depart").getValue(),newV);
+										}
+									}
+								},
+								{
+									xtype: 'checkbox',
+									name: 'afficher_tout',
+									id: 'afficher_tout',
+									checked: false,
+									listeners: {
+										'check': function(el, v){
+											var els = Ext.select(".fini");
+											if (v) {
+												els.fadeIn({ easing: 'easeIn', duration: 1, useDisplay: true }); 
+											} else {
+												els.fadeOut({ easing: 'easeOut', duration: 1, remove: false, useDisplay: true }); 
+											}
+										}
+									},
+									
+								},
+								{
+									xtype: 'checkbox',
+									name: 'afficher_late',
+									id: 'afficher_late',
+									checked: true,
+									listeners: {
+										'check': function(el, v){
+											var els = Ext.select(".late");
+											if (v) {
+												els.fadeIn({ easing: 'easeIn', duration: 1, useDisplay: true }); 
+											} else {
+												els.fadeOut({ easing: 'easeOut', duration: 1, remove: false, useDisplay: true }); 
+											}
+											
+										}
+									},
+									
+								}]
+							},
+						
+						
+						]
+					}
+				]
+			}
+			
+		];
+		
+	} catch(e) {
+		console.log("ERREUR TACHES !");
+		console.log(e); 
+	}
+	
+	try {
+		new Ext.Panel({ 
+			renderTo:'accueil',
+			layout:'anchor',
+			border: false,
+			monitorResize:true,
+			items: [
+				new Ext.Panel({
+					title:'{ATF::$usr->trans("tacheImminenteTitle")|escape:"javascript"}',
+					bodyStyle: 'padding:5px;',
+					id:'tachesImminentesAndLatePanel',
+					autoWidth: true,
+					collapsible: false,
+					border: false, 
+					items: taches
+				})
 			]
 		});
 		
@@ -64,273 +533,4 @@ Ext.onReady(function(){
 	<script type="text/javascript">/*<![CDATA[*/
 		{include file="generic-news.tpl.js"}
 	/*]]>*/</script>
-{else}
-
-	<div id="newsBoard">
-		<div id="news"></div>
-	</div>
-
-    <div id="demoBoardContent" class="x-hide-display" style="padding:10px; font-size:12px">
-        <img src="{ATF::$staticserver}images/logos/optima.png" style="float:left" />
-        <span>
-        	Bienvenue sur <span style="font-weight:bold">la plateforme de démonstration d'optima</span>,<br /><br />
-        	Vous pouvez utiliser cette plateforme comme bon vous semble afin de vous faire une idée des possibilités offertes par l'outil.
-            Vous avez donc avec ce compte de démonstration <span style="font-weight:bold">accès a 90% des modules</span>, et pour chacun d'entre eux vous possedez les droits <span style="font-weight:bold">d'insertion, de modification et de suppression</span>.<br /><br />
-            
-            Voici quelques liens rapides pour accéder à :<br /><br />
-            
-            <ul style="margin-left:0px;padding: 0;	list-style-type: none; line-height: 20px; ">
-            	<li style="background:url('{ATF::$staticserver}images/module/48/my.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
-                	<span style="font-weight:bold; font-size:14px;">Votre Société</span><br />
-                	<span style="font-style:italic; font-size:12px;">Gérer vos demande de congés, votre feuille de pointage, vos note de frais, votre messagerie, votre agenda, etc....</span><br />
-                	<span style="font-style:italic; font-size:12px;">
-                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('my.html');">
-                        	Cliquez ICI
-                        </a>
-                    </span>
-                    <br />
-                </li>
-            	<li style="background:url('{ATF::$staticserver}images/module/48/crm.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
-                	<span style="font-weight:bold; font-size:14px;">La CRM</span><br />
-                	<span style="font-style:italic; font-size:12px;">Gérer vos sociétés, contacts et organisez votre travail avec les Suivis et les tâches.</span><br />
-                	<span style="font-style:italic; font-size:12px;">
-                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('crm.html');">
-                        	Cliquez ICI
-                        </a>
-                    </span>
-                    <br />
-                </li>
-            	<li style="background:url('{ATF::$staticserver}images/module/48/commerce.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
-                	<span style="font-weight:bold; font-size:14px;">La Gestion commerciale</span><br />
-                	<span style="font-style:italic; font-size:12px;">Créer vos affaires en passant par les modules opportunités, devis, commande client et fournisseur, facture... </span><br />
-                	<span style="font-style:italic; font-size:12px;">
-                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('commerce.html');">
-                        	Cliquez ICI
-                        </a>
-                    </span>
-                    <br />
-                </li>
-            	<li style="background:url('{ATF::$staticserver}images/module/48/drh.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
-                	<span style="font-weight:bold; font-size:14px;">La partie DRH</span><br />
-                	<span style="font-style:italic; font-size:12px;">Gérer vos offres d'emploi et vos candidatures.</span><br />
-                	<span style="font-style:italic; font-size:12px;">
-                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('drh.html');">
-                        	Cliquez ICI
-                        </a>
-                    </span>
-                    <br />
-                </li>
-            	<li style="background:url('{ATF::$staticserver}images/module/48/emailing.png') no-repeat 0 5px; margin: 0; padding: 0 0 0 60px;">
-                	<span style="font-weight:bold; font-size:14px;">SpeedMail</span><br />
-                	<span style="font-style:italic; font-size:12px;">Créer des projets d'emailing, et diffusez les comme bon vous semble a vos liste de diffusion grâce aux jobs programmés..</span><br />
-                	<span style="font-style:italic; font-size:12px;">
-                    	<a href="javascript:;" onclick="ATF.spot.hide(); ATF.goTo('emailing.html');">
-                        	Cliquez ICI
-                        </a>
-                    </span>
-                    <br />
-                </li>
-            	
-            </ul><br />
-            <div style="font-style:italic; font-weight:bold; font-size:14px; text-align:center; width:100%">
-            	*** L'équipe d'AbsysTech vous souhaite une bonne navigation ***
-            </div>
-        </span>
-    </div>
-
-<script type="text/javascript">
-	/*!
-	 * Ext JS Library 3.1.0
-	 * Copyright(c) 2006-2009 Ext JS, LLC
-	 * licensing@extjs.com
-	 * http://www.extjs.com/license
-	 */
-	Ext.ux.Spotlight = function(config){
-		Ext.apply(this, config);
-	}
-	Ext.ux.Spotlight.prototype = {
-		active : false,
-		animate : true,
-		duration: .25,
-		easing:'easeNone',
-		// private
-		animated : false,
-	
-		createElements : function(){
-			var bd = Ext.getBody();
-	
-			this.right = bd.createChild({ cls:'x-spotlight' });
-			this.left = bd.createChild({ cls:'x-spotlight' });
-			this.top = bd.createChild({ cls:'x-spotlight' });
-			this.bottom = bd.createChild({ cls:'x-spotlight' });
-	
-			this.all = new Ext.CompositeElement([this.right, this.left, this.top, this.bottom]);
-		},
-	
-		show : function(el, callback, scope){
-			if(this.animated){
-				this.show.defer(50, this, [el, callback, scope]);
-				return;
-			}
-			this.el = Ext.get(el);
-			if(!this.right){
-				this.createElements();
-			}
-			if(!this.active){
-				this.all.setDisplayed('');
-				this.applyBounds(true, false);
-				this.active = true;
-				Ext.EventManager.onWindowResize(this.syncSize, this);
-				this.applyBounds(false, this.animate, false, callback, scope);
-			}else{
-				this.applyBounds(false, false, false, callback, scope); // all these booleans look hideous
-			}
-		},
-	
-		hide : function(callback, scope){
-			if(this.animated){
-				this.hide.defer(50, this, [callback, scope]);
-				return;
-			}
-			Ext.EventManager.removeResizeListener(this.syncSize, this);
-			this.applyBounds(true, this.animate, true, callback, scope);
-		},
-	
-		doHide : function(){
-			this.active = false;
-			this.all.setDisplayed(false);
-		},
-	
-		syncSize : function(){
-			this.applyBounds(false, false);
-		},
-	
-		applyBounds : function(basePts, anim, doHide, callback, scope){
-	
-			var rg = this.el.getRegion();
-	
-			var dw = Ext.lib.Dom.getViewWidth(true);
-			var dh = Ext.lib.Dom.getViewHeight(true);
-	
-			var c = 0, cb = false;
-			if(anim){
-				cb = {
-					callback: function(){
-						c++;
-						if(c == 4){
-							this.animated = false;
-							if(doHide){
-								this.doHide();
-							}
-							Ext.callback(callback, scope, [this]);
-						}
-					},
-					scope: this,
-					duration: this.duration,
-					easing: this.easing
-				};
-				this.animated = true;
-			}
-			
-			this.right.setBounds(
-					rg.right,
-					basePts ? dh : rg.top,
-					dw - rg.right-10,
-					basePts ? 0 : (dh - rg.top),
-					cb);
-	
-			this.left.setBounds(
-					0,
-					0,
-					rg.left,
-					basePts ? 0 : rg.bottom,
-					cb);
-	
-			this.top.setBounds(
-					basePts ? dw : rg.left,
-					0,
-					basePts ? 0 : dw - rg.left,
-					rg.top,
-					cb);
-	
-			this.bottom.setBounds(
-					0,
-					rg.bottom,
-					basePts ? 0 : rg.right,
-					dh - rg.bottom,
-					cb);
-	
-			if(!anim){
-				if(doHide){
-					this.doHide();
-				}
-				if(callback){
-					Ext.callback(callback, scope, [this]);
-				}
-			}
-		},
-	
-		destroy : function(){
-			this.doHide();
-			Ext.destroy(
-				this.right,
-				this.left,
-				this.top,
-				this.bottom);
-			delete this.el;
-			delete this.all;
-		}
-	};
-	//backwards compat
-	Ext.Spotlight = Ext.ux.Spotlight;
-	
-	Ext.onReady(function(){
-	
-		ATF.spot = new Ext.ux.Spotlight({
-			easing: 'easeOut',
-			duration: .5
-		});
-		
-		var updateSpot = function(id){
-			if (typeof id == 'string') {
-				ATF.spot.show(id);
-			}
-			else 
-				if (!id && ATF.spot.active) {
-					ATF.spot.hide();
-			}
-		};
-		
-		new Ext.Panel({
-			renderTo: 'news',
-			id:'newsPanel',
-			border: false,
-			items: [
-				{
-					id: 'panel1',
-					xtype:'panel',
-					title: "Bienvenue sur la plateforme de Démo d'Optima",
-					autoScroll:true,
-					width:'auto',
-					height: 565,
-					contentEl:'demoBoardContent',
-					buttons: [{
-						text: 'Fermer la fenêtre',
-						handler: function() {
-							updateSpot();
-							Ext.ComponentMgr.get('newsPanel').destroy();
-							$('#newsBoard').css({
-								visibility:'hidden',
-								display:'none'
-							});
-						}
-					}]
-				}
-			]
-		});
-		
-		ATF.spot.show('panel1');
-	});
-	</script>
-
 {/if}
