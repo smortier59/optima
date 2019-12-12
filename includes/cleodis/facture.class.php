@@ -1505,13 +1505,18 @@ class facture_cleodis extends facture {
 
 					case 'affaire_en_cours_refi_cleofi_sgef':
 						if($refinanceur['refinanceur']=='CLEOFI'){
-							$ligne[2]["D"] = "467500";
+							$ligne[2]["D"] = "706200";
+							$ligne[3]["D"] = "706200";
+							$ligne[4]["D"] = "445712";
+
 						}else{
 							$ligne[2]["D"] = "467800";
+							unset($ligne[3]);
+							unset($ligne[4]);
+							$ligne[2]["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						}
-						$ligne[2]["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
-						unset($ligne[3]);
-						unset($ligne[4]);
+
+
 					break;
 
 					case 'affaire_en_cours_refi_bmf':
