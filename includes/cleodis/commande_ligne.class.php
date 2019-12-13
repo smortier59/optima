@@ -14,6 +14,7 @@ class commande_ligne_cleodis extends commande_ligne {
 			,'commande_ligne.quantite'
 			,'commande_ligne.ref'
 			,'commande_ligne.neuf'
+			,"commande_ligne.frequence_fournisseur"
 			,'commande_ligne.prix_achat'=>array("renderer"=>"money")
 		);
 
@@ -35,6 +36,7 @@ class commande_ligne_cleodis extends commande_ligne {
 			,"commande_ligne.prix_achat"
 			,"commande_ligne.serial"
 			,"commande_ligne.neuf"
+			,"commande_ligne.frequence_fournisseur"
 		);
 
 		$this->fieldstructure();

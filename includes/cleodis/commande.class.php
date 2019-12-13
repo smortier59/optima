@@ -827,6 +827,11 @@ class commande_cleodis extends commande {
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
 
+					if(ATF::$codename == "boulanger"){
+						/*Il faut également généré l'echéancier de facturation fournisseur */
+						ATF::facturation_fournisseur()->generate_echeancier($commande,$affaire,$affaires_parentes,$devis);
+					}
+
 
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
 					if($commande->get("etat")=="prolongation"){
@@ -886,6 +891,11 @@ class commande_cleodis extends commande {
 
 					//Mise à jour des facturations
 					ATF::facturation()->delete_special($commande->get("id_affaire"));
+
+					if(ATF::$codename == "boulanger"){
+						//Mise à jour des facturations fournisseur
+						ATF::facturation_fournisseur()->delete_special($commande->get("id_affaire"));
+					}
 
 					//Mise à jour des prolongations (supprimer les dates)
 					ATF::prolongation()->unsetDate($commande->get("id_affaire"));

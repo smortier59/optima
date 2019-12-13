@@ -1,4 +1,4 @@
-{if ATF::$codename !="bdomplus"}
+{if ATF::$codename !="bdomplus"  && ATF::$codename !="boulanger" }
     <?xml version="1.0" encoding="utf-8"?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "xhtml11.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{ATF::$usr->trans("id_language")}">
@@ -117,9 +117,9 @@
     </html>
 {else}
     {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
-        {include file="mail/bdom/header.tpl.htm"}
+        {include file="mail/{ATF::$codename}/header.tpl.htm"}
         {include file="mail/{$infos.template}.tpl.htm"}
-        {include file="mail/bdom/footer.tpl.htm"}
+        {include file="mail/{ATF::$codename}/footer.tpl.htm"}
     {else}
         {$infos["texte"]}
     {/if}

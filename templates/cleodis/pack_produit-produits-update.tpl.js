@@ -16,6 +16,7 @@
 	, "{$current_class->table}.code"
 	, "{$current_class->table}.id_produit"
 	, "{$current_class->table}.id_fournisseur"
+	, "{$current_class->table}.frequence_fournisseur"
 	, "{$current_class->table}.visibilite_prix"
 	, "{$current_class->table}.date_achat"
 	, "{$current_class->table}.commentaire"
