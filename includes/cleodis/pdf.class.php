@@ -19,6 +19,7 @@ class pdf_cleodis extends pdf {
 	public $site_web = false;
 	public $logo = 'cleodis/logo.jpg';
 	public $logo_site = 'cleodis/formation.png';
+	public $cleodis = 'CLEODIS';
 
 	public $texteHT = "HT";
 	public $texteTTC = "TTC";
@@ -142,11 +143,33 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-			if($this->logo == "cleodis/2SI_CLEODIS.jpg" || $this->logo == "cleodis/OLISYS.jpg"){
-				$this->image(__PDF_PATH__.$this->logo,75,10,40);
-			}else{
-				$this->image(__PDF_PATH__.$this->logo,10,10,40);
+
+			switch ($this->logo) {
+				case 'cleodis/2SI_CLEODIS.jpg' :
+					$this->image(__PDF_PATH__."/".$this->logo,75,10,40);
+				break;
+
+				case 'cleodis/boulangerpro.jpg' :
+				case 'cleodis/consommables.jpg':
+				case 'cleodis/dib.jpg':
+				case 'cleodis/dyadem.jpg':
+				case 'cleodis/flexfuel.jpg':
+				case 'cleodis/instoresolution.jpg':
+				case 'cleodis/lafi.jpg':
+				case 'cleodis/Manganelli.jpg':
+				case 'cleodis/nrc.jpg' :
+				case 'cleodis/olisys.jpg':
+				case 'cleodis/proxi-pause.jpg' :
+				case 'cleodis/trekk.jpg':
+				case 'cleodis/zenconnectzenpack.jpg' :
+					$this->image(__PDF_PATH__."/".$this->logo,75,10,40);
+				break;
+
+				default:
+					$this->image(__PDF_PATH__.$this->logo,10,10,40);
+				break;
 			}
+
 			$this->setfont('arial','',11);
 			if ($this->client) {
 				$cadre = array(
@@ -162,11 +185,64 @@ class pdf_cleodis extends pdf {
 			$this->setfont('arial','',12);
 		} else {
 			if($this->pdf_devis){
-				$this->image(__PDF_PATH__.$this->logo,10,10,35);
+				switch ($this->logo) {
+					case 'cleodis/2SI_CLEODIS.jpg' :
+						$this->image(__PDF_PATH__.$this->logo,10,10,35);
+					break;
+
+					case 'cleodis/boulangerpro.jpg' :
+					case 'cleodis/consommables.jpg':
+					case 'cleodis/dib.jpg':
+					case 'cleodis/dyadem.jpg':
+					case 'cleodis/flexfuel.jpg':
+					case 'cleodis/instoresolution.jpg':
+					case 'cleodis/lafi.jpg':
+					case 'cleodis/Manganelli.jpg':
+					case 'cleodis/nrc.jpg' :
+					case 'cleodis/olisys.jpg':
+					case 'cleodis/proxi-pause.jpg' :
+					case 'cleodis/trekk.jpg':
+					case 'cleodis/zenconnectzenpack.jpg' :
+						$this->image(__PDF_PATH__.$this->logo,10,10,80);
+					break;
+
+					default:
+						$this->image(__PDF_PATH__.$this->logo,10,10,35);
+					break;
+				}
+
 				$this->image(__PDF_PATH__."cleodis/pdf_devis_entete.jpg",65,7,120);
 				$this->sety(20);
 			}else{
-				if($this->site_web){ $this->unsetHeader(); }else{ $this->image(__PDF_PATH__.$this->logo,170,5,20); }
+				if($this->site_web){
+					$this->unsetHeader();
+				}else{
+					switch ($this->logo) {
+						case 'cleodis/2SI_CLEODIS.jpg' :
+							 $this->image(__PDF_PATH__.$this->logo,170,5,20);
+						break;
+
+						case 'cleodis/boulangerpro.jpg' :
+						case 'cleodis/consommables.jpg':
+						case 'cleodis/dib.jpg':
+						case 'cleodis/dyadem.jpg':
+						case 'cleodis/flexfuel.jpg':
+						case 'cleodis/instoresolution.jpg':
+						case 'cleodis/lafi.jpg':
+						case 'cleodis/Manganelli.jpg':
+						case 'cleodis/nrc.jpg' :
+						case 'cleodis/olisys.jpg':
+						case 'cleodis/proxi-pause.jpg' :
+						case 'cleodis/trekk.jpg':
+						case 'cleodis/zenconnectzenpack.jpg' :
+							 $this->image(__PDF_PATH__.$this->logo,170,5,30);
+						break;
+
+						default:
+							 $this->image(__PDF_PATH__.$this->logo,170,5,20);
+						break;
+					}
+				}
 
 				$this->sety(20);
 			}
@@ -398,8 +474,84 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
-		if($this->affaire["type_affaire"] == "Olisys") $this->logo = 'cleodis/OLISYS.jpg';
+		switch ($this->affaire["type_affaire"]) {
+			case '2SI' :
+				$this->cleodis = "2SI Lease by CLEODIS";
+				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
+			break;
+
+			case 'Boulanger Pro' :
+				$this->cleodis = "Boulanger Pro";
+				$this->logo = 'cleodis/boulangerpro.jpg';
+			break;
+
+			case 'Consommables_com' :
+				$this->cleodis = "consommables.com";
+				$this->logo = 'cleodis/consommables.jpg';
+			break;
+
+			case 'DIB' :
+				$this->cleodis = "DIB france";
+				$this->logo = 'cleodis/dib.jpg';
+			break;
+
+			case 'Dyadem' :
+				$this->cleodis = "Dyadem";
+				$this->logo = 'cleodis/dyadem.jpg';
+			break;
+
+			case 'FLEXFUEL' :
+				$this->cleodis = "FlexFuel";
+				$this->logo = 'cleodis/flexfuel.jpg';
+			break;
+
+			case 'Instore' :
+				$this->cleodis = "Instore Solutions";
+				$this->logo = 'cleodis/instoresolution.jpg';
+			break;
+
+			case 'LAFI' :
+				$this->cleodis = "LAFI";
+				$this->logo = 'cleodis/lafi.jpg';
+			break;
+
+			case 'Manganelli' :
+				$this->cleodis = "MANGANELLI";
+				$this->logo = 'cleodis/Manganelli.jpg';
+			break;
+
+			case 'NRC' :
+				$this->cleodis = "NRC";
+				$this->logo = 'cleodis/nrc.jpg';
+			break;
+
+			case 'OLISYS - Ma Solution IT' :
+				$this->cleodis = "OLISYS";
+				$this->logo = 'cleodis/olisys.jpg';
+			break;
+
+			case 'Proxi Pause' :
+				$this->cleodis = "Proxi Pause";
+				$this->logo = 'cleodis/proxi-pause.jpg';
+			break;
+
+			case 'Trekk' :
+				$this->cleodis = "Trekk";
+				$this->logo = 'cleodis/trekk.jpg';
+			break;
+
+			case 'ZENCONNECT – ZEN PACK' :
+				$this->cleodis = "ZenPack";
+				$this->logo = 'cleodis/zenconnectzenpack.jpg';
+
+			break;
+
+			default:
+				$this->logo = 'cleodis/logo.jpg';
+				$this->cleodis = "CLEODIS";
+			break;
+		}
+
 
 
 		if($this->devis["type_devis"] === "optic_2000"){
@@ -411,7 +563,7 @@ class pdf_cleodis extends pdf {
 			$this->SetLeftMargin(15);
 
 			$this->RoundedRect(15,50,180,70,5);
-			$this->image(__PDF_PATH__.$this->logo,90,55,35);
+			$this->image(__PDF_PATH__.$this->logo,85,55,45);
 			$this->sety(90);
 			$this->setfont('arial','B',12);
 			$this->multicell(0,5,/*$this->societe['societe']*/"",0,'C');
@@ -689,16 +841,13 @@ class pdf_cleodis extends pdf {
 	public function devisClassique() {
 		if (!$this->devis) return false;
 
-		if($this->affaire["type_affaire"] == "2SI") $cleodis = "2SI Lease by CLEODIS";
-		else $cleodis = "CLEODIS";
-
 		/* PAGE 2 */
 		$this->setHeader();
 		$this->setTopMargin(30);
 		$this->addpage();
 
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"1 – La ".ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." ".$cleodis);
+		$this->multicell(0,5,"1 – La ".ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." ".$this->cleodis);
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -716,14 +865,14 @@ class pdf_cleodis extends pdf {
 
 		$this->ln(10);
 		$this->setfont('arial','U',10);
-		$this->multicell(0,5,"La réponse de ".$cleodis);
+		$this->multicell(0,5,"La réponse de ".$this->cleodis);
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
-		$this->multicell(0,5,"L'objectif de ".$cleodis." est la mise à disposition de matériels adaptés aux besoins de chaque utilisateur en recherchant la plus grande homogénéité du parc tout en optimisant les coûts liés à la gestion et l'évolution des systèmes d'information.");
-		$this->multicell(0,5,"Pour ce faire ".$cleodis." s'appuie sur un contrat de location, support financier idéal par sa souplesse, sa capacité à évoluer à tout moment et à intégrer des services de gestion quotidienne du parc. Ainsi, il permet une mise à jour régulière de l'adéquation entre les besoins techniques et les ressources financières.");
+		$this->multicell(0,5,"L'objectif de ".$this->cleodis." est la mise à disposition de matériels adaptés aux besoins de chaque utilisateur en recherchant la plus grande homogénéité du parc tout en optimisant les coûts liés à la gestion et l'évolution des systèmes d'information.");
+		$this->multicell(0,5,"Pour ce faire ".$this->cleodis." s'appuie sur un contrat de location, support financier idéal par sa souplesse, sa capacité à évoluer à tout moment et à intégrer des services de gestion quotidienne du parc. Ainsi, il permet une mise à jour régulière de l'adéquation entre les besoins techniques et les ressources financières.");
 
-		$this->multicell(0,5,"Schéma comparatif LLD ".$cleodis." / ACHAT ou CREDIT-BAIL :");
+		$this->multicell(0,5,"Schéma comparatif LLD ".$this->cleodis." / ACHAT ou CREDIT-BAIL :");
 		$this->image(__PDF_PATH__.'cleodis/graph.jpg',50,155,100);
 
 		$this->sety(240);
@@ -732,11 +881,11 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
-		$this->multicell(0,5,"Créée par des professionnels de la location évolutive, ".$cleodis." s'appuie sur un réseau d'établissements financiers partenaires - filiales spécialisées des grandes banques françaises et européennes - pour mettre en place ses contrats de location.");
+		$this->multicell(0,5,"Créée par des professionnels de la location évolutive, ".$this->cleodis." s'appuie sur un réseau d'établissements financiers partenaires - filiales spécialisées des grandes banques françaises et européennes - pour mettre en place ses contrats de location.");
 		$this->ln(5);
 		$this->setfont('arial','I',8);
 		$this->RoundedRect(15,$this->gety(),180,10,3);
-		$this->multicell(0,5,"Réduire les coûts  de détention du parc informatique de ses clients, liés à l'utilisation de leur système d'information, tel est l'objectif de l'équipe de proximité, professionnelle et réactive de ".$cleodis.".",0,'C');
+		$this->multicell(0,5,"Réduire les coûts  de détention du parc informatique de ses clients, liés à l'utilisation de leur système d'information, tel est l'objectif de l'équipe de proximité, professionnelle et réactive de ".$this->cleodis.".",0,'C');
 		$this->setfont('arial','',8);
 
 		/* PAGE 3 */
@@ -755,14 +904,14 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"> Communication – Multimédia : borne interactive, écrans plats...");
 		$this->SetLeftMargin(15);
 
-		$this->multicell(0,5,"L'objectif de ".$cleodis." est de proposer à ses clients des solutions pertinentes et cohérentes en rapport avec leur envergure et leur budget.");
-		$this->multicell(0,5,"Afin de toujours proposer les meilleures offres, ".$cleodis." travaille en partenariat avec des distributeurs, éditeurs et SSII locales et nationales, validés pour leurs compétences et leur professionnalisme,  capables d'appréhender toute problématique autour du système d'information.");
+		$this->multicell(0,5,"L'objectif de ".$this->cleodis." est de proposer à ses clients des solutions pertinentes et cohérentes en rapport avec leur envergure et leur budget.");
+		$this->multicell(0,5,"Afin de toujours proposer les meilleures offres, ".$this->cleodis." travaille en partenariat avec des distributeurs, éditeurs et SSII locales et nationales, validés pour leurs compétences et leur professionnalisme,  capables d'appréhender toute problématique autour du système d'information.");
 
 		$this->image(__PDF_PATH__.'cleodis/domaine.jpg',60,85,81);
 
 		$this->sety(160);
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"2 – La Location Longue Durée selon ".$cleodis."");
+		$this->multicell(0,5,"2 – La Location Longue Durée selon ".$this->cleodis."");
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -800,7 +949,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"=> La location évolutive, un moyen efficace");
 		$this->unsetFontDecoration();
 		$this->ln(8);
-		$this->multicell(0,5,"En dehors des services ".$cleodis." qui facilitent la gestion quotidienne et optimisent les coûts de détention de votre parc, le contrat de location constitue intrinsèquement la solution à ces problématiques d'évolution :");
+		$this->multicell(0,5,"En dehors des services ".$this->cleodis." qui facilitent la gestion quotidienne et optimisent les coûts de détention de votre parc, le contrat de location constitue intrinsèquement la solution à ces problématiques d'évolution :");
 		$this->setFontDecoration('B');
 		$this->setx(35);
 		$this->multicell(0,5,"Une charge inscrite au compte de résultat n'obérant pas la capacité d'investissement ;");
@@ -812,21 +961,21 @@ class pdf_cleodis extends pdf {
 
 		$this->ln(3);
 		$this->setfont('arial','U',10);
-		$this->multicell(0,5,"La location selon ".$cleodis.", une valeur ajoutée clairement exprimée");
+		$this->multicell(0,5,"La location selon ".$this->cleodis.", une valeur ajoutée clairement exprimée");
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Conseil");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Forte de l'expérience de ses collaborateurs dans le monde informatique, ".$cleodis." est à même de vous conseiller sur les orientations stratégiques de votre système d'information : tant sur le plan Matériel que Logiciel.");
-		$this->multicell(0,5,"CLEODIS intervient sur tout type de logiciel et de plate formes : INTEL, AS400, UNIX mais également Télécom et réseau. ".$cleodis." vous conseille et vous accompagne dans l'étude et la mise en place de vos projets informatiques.");
-		$this->multicell(0,5,"Pour une refonte complète de votre système d'information, ".$cleodis." peut faire appel à des consultants externes qu'elle missionne pour votre compte.");
+		$this->multicell(0,5,"Forte de l'expérience de ses collaborateurs dans le monde informatique, ".$this->cleodis." est à même de vous conseiller sur les orientations stratégiques de votre système d'information : tant sur le plan Matériel que Logiciel.");
+		$this->multicell(0,5,"CLEODIS intervient sur tout type de logiciel et de plate formes : INTEL, AS400, UNIX mais également Télécom et réseau. ".$this->cleodis." vous conseille et vous accompagne dans l'étude et la mise en place de vos projets informatiques.");
+		$this->multicell(0,5,"Pour une refonte complète de votre système d'information, ".$this->cleodis." peut faire appel à des consultants externes qu'elle missionne pour votre compte.");
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Mise en relation");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"CLEODIS n'a pas pour objectif de réaliser des prestations techniques ou même de vous distribuer des matériels, ".$cleodis." souhaite vous faciliter le montage du projet en vous mettant en relation avec des SSII, VAR ou éditeur après avoir qualifié ensemble votre projet.");
-		$this->multicell(0,5,"Ces sociétés sont référencées par ".$cleodis." en fonction d'un certain nombre de critères :");
+		$this->multicell(0,5,"CLEODIS n'a pas pour objectif de réaliser des prestations techniques ou même de vous distribuer des matériels, ".$this->cleodis." souhaite vous faciliter le montage du projet en vous mettant en relation avec des SSII, VAR ou éditeur après avoir qualifié ensemble votre projet.");
+		$this->multicell(0,5,"Ces sociétés sont référencées par ".$this->cleodis." en fonction d'un certain nombre de critères :");
 		$this->setx(40);
 		$this->multicell(0,5,"- compétences spécifiques");
 		$this->setx(40);
@@ -836,11 +985,11 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Suivi de projet, maîtrise d'ouvrage");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Au-delà du montage du dossier locatif, ".$cleodis." vous accompagne dans la mise en oeuvre de votre projet jusqu'à sa complète réalisation.");
+		$this->multicell(0,5,"Au-delà du montage du dossier locatif, ".$this->cleodis." vous accompagne dans la mise en oeuvre de votre projet jusqu'à sa complète réalisation.");
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,">Mise en location");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Conjointement à la remise des devis établis en fonction du cahier des charges défini ensemble, ".$cleodis." vous remettra une proposition locative intégrant :");
+		$this->multicell(0,5,"Conjointement à la remise des devis établis en fonction du cahier des charges défini ensemble, ".$this->cleodis." vous remettra une proposition locative intégrant :");
 		$this->setx(40);
 		$this->cell(90,5,"- Montant de l'investissement avec répartition HW et SW");
 		$this->setx(120);
@@ -855,22 +1004,22 @@ class pdf_cleodis extends pdf {
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Gestion de parc");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"Pour vous faciliter la gestion quotidienne de votre parc, ".$cleodis." vous donne accès via son site Web à la base de donnée reprenant tous les équipements intégrés au contrat de location. Vous y trouverez toutes les informations concernant vos contrats, les données techniques des matériels et logiciels.");
+		$this->multicell(0,5,"Pour vous faciliter la gestion quotidienne de votre parc, ".$this->cleodis." vous donne accès via son site Web à la base de donnée reprenant tous les équipements intégrés au contrat de location. Vous y trouverez toutes les informations concernant vos contrats, les données techniques des matériels et logiciels.");
 		$this->ln(3);
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Assurance remplacement");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,$cleodis." vous propose d'intégrer au contrat une assurance remplacement (et non remboursement à la valeur vénale) du matériel en cas de sinistre partiel ou total lors d'un vol avec effraction, un incendie ou un dégât des eaux.");
+		$this->multicell(0,5,$this->cleodis." vous propose d'intégrer au contrat une assurance remplacement (et non remboursement à la valeur vénale) du matériel en cas de sinistre partiel ou total lors d'un vol avec effraction, un incendie ou un dégât des eaux.");
 		$this->ln(3);
 		$this->setFontDecoration('I');
 		$this->multicell(0,5,"=>Brokerage – Matériel de seconde main");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,$cleodis." a la possibilité de vous fournir des matériels de seconde main, ou  de reprendre vos équipements en fin de vie en vue de les revendre sur le marché de l'occasion ou de les recycler dans le respect des normes environnementales.");
+		$this->multicell(0,5,$this->cleodis." a la possibilité de vous fournir des matériels de seconde main, ou  de reprendre vos équipements en fin de vie en vue de les revendre sur le marché de l'occasion ou de les recycler dans le respect des normes environnementales.");
 		$this->ln(4);
 		$this->setFontDecoration('I');
 		$this->multicell(0,4,"=>Formatage des disques durs / effacement des données utilisateurs");
 		$this->unsetFontDecoration();
-		$this->multicell(0,4,"Lors de la reprise de vos unités centrales à l'issue de votre contrat, ".$cleodis." se charge d'effacer les données utilisateurs présentes sur les disques durs. Un formatage bas niveau est systématiquement inclus dans nos offres avec la possibilité - en option - de procéder à un formatage niveau 7 qui vous garantit l'impossibilité de récupérer vos données.");
+		$this->multicell(0,4,"Lors de la reprise de vos unités centrales à l'issue de votre contrat, ".$this->cleodis." se charge d'effacer les données utilisateurs présentes sur les disques durs. Un formatage bas niveau est systématiquement inclus dans nos offres avec la possibilité - en option - de procéder à un formatage niveau 7 qui vous garantit l'impossibilité de récupérer vos données.");
 
 		/*	PAGE 5	*/
 		$this->AddPage();
@@ -879,7 +1028,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,7,"=>L'évolution et le suivi du contrat de location");
 		$this->unsetFontDecoration();
 		$this->ln(6);
-		$this->multicell(0,5,"La possibilité d'évoluer à tout moment sur tout ou partie des matériels passe par la capacité de ".$cleodis." à savoir re-commercialiser l'ensemble des équipements nécessitant une évolution. Cette valorisation viendra en déduction du nouvel investissement.");
+		$this->multicell(0,5,"La possibilité d'évoluer à tout moment sur tout ou partie des matériels passe par la capacité de ".$this->cleodis." à savoir re-commercialiser l'ensemble des équipements nécessitant une évolution. Cette valorisation viendra en déduction du nouvel investissement.");
 
 		$this->ln(5);
 		$this->setfont('arial','U',10);
@@ -887,21 +1036,21 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$this->setfont('arial','',8);
 
-		$this->multicell(0,5,"Afin de toujours mieux répondre aux demandes du marché, ".$cleodis." propose le Contrat de Mise à Disposition de Logiciels.");
+		$this->multicell(0,5,"Afin de toujours mieux répondre aux demandes du marché, ".$this->cleodis." propose le Contrat de Mise à Disposition de Logiciels.");
 		$this->multicell(0,5,"Semblable à un contrat de location classique, celui-ci permet le financement d'offres composées à 100% de logiciels, et ce quel que soit le montant.");
 		$this->multicell(0,5,"Le coût de la mise à disposition est comparable à celui d'une location classique d'équipements informatiques.");
 		$this->multicell(0,5,"Ce contrat permet l'acquisition de licences logicielles en diminuant sensiblement les contraintes budgétaires puisque le coût des licences est étalé dans le temps.");
 		$this->setFontDecoration('B');
 		$this->multicell(0,5,"L'entreprise n'est alors plus contrainte d'utiliser ses fonds propres pour acquérir un logiciel et n'est plus tenue de l'amortir sur 1 an ; elle peut désormais répartir la charge sur la période d'utilisation et budgétiser ainsi le coût de ce logiciel ainsi que celui de ses mises à jours.");
 		$this->unsetFontDecoration();
-		$this->multicell(0,5,"En outre, le contrat étant évolutif, il permet d'incorporer au fur et à mesure des besoins, de nouveaux modules ou versions de logiciel au travers d'un budget mensuel. Le travail de ".$cleodis." consistant à vous conseiller pour gérer avec vous le contrat et proposer les évolutions aux meilleurs moments afin de vous maintenir un budget constant.");
+		$this->multicell(0,5,"En outre, le contrat étant évolutif, il permet d'incorporer au fur et à mesure des besoins, de nouveaux modules ou versions de logiciel au travers d'un budget mensuel. Le travail de ".$this->cleodis." consistant à vous conseiller pour gérer avec vous le contrat et proposer les évolutions aux meilleurs moments afin de vous maintenir un budget constant.");
 		$this->ln(5);
 		$this->RoundedRect(15,$this->gety(),180,15,3);
-		$this->multicell(0,5,"La solution locative de ".$cleodis.", avantageuse d'un point de vue comptable et opérationnel, vous assure la possibilité de mettre en adéquation vos besoins d'évolution technique avec  vos contraintes budgétaires. L'équipe ".$cleodis." est également présente tout au long du contrat pour vous accompagner dans vos choix d'évolution.");
+		$this->multicell(0,5,"La solution locative de ".$this->cleodis.", avantageuse d'un point de vue comptable et opérationnel, vous assure la possibilité de mettre en adéquation vos besoins d'évolution technique avec  vos contraintes budgétaires. L'équipe ".$this->cleodis." est également présente tout au long du contrat pour vous accompagner dans vos choix d'évolution.");
 
 		$this->ln(5);
 		$this->setfont('arial','BU',14);
-		$this->multicell(0,5,"3 – Proposition commerciale ".$cleodis." pour ".$this->client['societe']);
+		$this->multicell(0,5,"3 – Proposition commerciale ".$this->cleodis." pour ".$this->client['societe']);
 		$this->ln(5);
 
 		$this->setfont('arial','U',10);
@@ -1047,7 +1196,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','B',14);
 		if(ATF::$codename == "cleodis"){
 			$this->RoundedRect(15,10,140,25,5);
-			$this->multicell(140,6,"Proposition locative ".$cleodis,0,'C');
+			$this->multicell(140,6,"Proposition locative ".$this->cleodis,0,'C');
 			$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
 			$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
 			$this->multicell(140,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
@@ -1538,6 +1687,95 @@ class pdf_cleodis extends pdf {
 		$this->commandeInit($id);
 		$this->A3 = true;
 
+		switch ($this->affaire["type_affaire"]) {
+			case '2SI' :
+				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
+			case 'Boulanger Pro' :
+				$this->logo = 'cleodis/boulangerpro.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Consommables_com' :
+				$this->logo = 'cleodis/consommables.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
+			case 'DIB' :
+				$this->logo = 'cleodis/dib.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Dyadem' :
+				$this->logo = 'cleodis/dyadem.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'FLEXFUEL' :
+				$this->logo = 'cleodis/flexfuel.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Instore' :
+				$this->logo = 'cleodis/instoresolution.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'LAFI' :
+				$this->logo = 'cleodis/lafi.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Manganelli' :
+				$this->logo = 'cleodis/Manganelli.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'NRC' :
+				$this->logo = 'cleodis/nrc.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'OLISYS - Ma Solution IT' :
+				$this->logo = 'cleodis/olisys.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
+			case 'Proxi Pause' :
+				$this->logo = 'cleodis/proxi-pause.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Trekk' :
+				$this->logo = 'cleodis/trekk.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'ZENCONNECT – ZEN PACK' :
+				$this->logo = 'cleodis/zenconnectzenpack.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+
+			break;
+
+			default:
+				$this->logo = 'cleodis/logo.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
+			break;
+		}
+
 		$this->Open();
 		$this->AddPage();
 
@@ -1960,6 +2198,94 @@ class pdf_cleodis extends pdf {
 		$this->A3 = false;
 		$this->A4 = true;
 
+		switch ($this->affaire["type_affaire"]) {
+			case '2SI' :
+				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
+			case 'Boulanger Pro' :
+				$this->logo = 'cleodis/boulangerpro.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Consommables_com' :
+				$this->logo = 'cleodis/consommables.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
+			case 'DIB' :
+				$this->logo = 'cleodis/dib.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Dyadem' :
+				$this->logo = 'cleodis/dyadem.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'FLEXFUEL' :
+				$this->logo = 'cleodis/flexfuel.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Instore' :
+				$this->logo = 'cleodis/instoresolution.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'LAFI' :
+				$this->logo = 'cleodis/lafi.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Manganelli' :
+				$this->logo = 'cleodis/Manganelli.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'NRC' :
+				$this->logo = 'cleodis/nrc.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'OLISYS - Ma Solution IT' :
+				$this->logo = 'cleodis/olisys.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
+			case 'Proxi Pause' :
+				$this->logo = 'cleodis/proxi-pause.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Trekk' :
+				$this->logo = 'cleodis/trekk.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'ZENCONNECT – ZEN PACK' :
+				$this->logo = 'cleodis/zenconnectzenpack.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+
+			break;
+
+			default:
+				$this->logo = 'cleodis/logo.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
+			break;
+		}
 
 		$this->setfont('arial','B',10);
 
@@ -1971,15 +2297,6 @@ class pdf_cleodis extends pdf {
 	}
 
   public function contratA4Societe($id, $signature,$sellsign) {
-	if($this->affaire["type_affaire"] == "2SI"){
-		$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
-	} elseif($this->affaire["type_affaire"] == "Olisys"){
-		$this->image(__PDF_PATH__."cleodis/OLISYS.jpg",5,8,55);
-	} else{
-	  $this->image(__PDF_PATH__."/cleodis/logo.jpg",10,10,40);
-	}
-
-
 
 	$this->sety(10);
 	$this->multicell(0,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
@@ -4056,10 +4373,94 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
-		if($this->affaire["type_affaire"] == "2SI"){ $this->logo = 'cleodis/2SI_CLEODIS.jpg'; }
-		elseif($this->affaire["type_affaire"] == "Olisys"){
-			$this->logo = 'cleodis/OLISYS.jpg';
-		}else{  $this->logo = 'cleodis/logo.jpg'; }
+		switch ($this->affaire["type_affaire"]) {
+		case '2SI' :
+			$this->logo = 'cleodis/2SI_CLEODIS.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+		break;
+
+		case 'Boulanger Pro' :
+			$this->logo = 'cleodis/boulangerpro.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'Consommables_com' :
+			$this->logo = 'cleodis/consommables.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+		break;
+
+		case 'DIB' :
+			$this->logo = 'cleodis/dib.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'Dyadem' :
+			$this->logo = 'cleodis/dyadem.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'FLEXFUEL' :
+			$this->logo = 'cleodis/flexfuel.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'Instore' :
+			$this->logo = 'cleodis/instoresolution.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'LAFI' :
+			$this->logo = 'cleodis/lafi.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'Manganelli' :
+			$this->logo = 'cleodis/Manganelli.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'NRC' :
+			$this->logo = 'cleodis/nrc.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'OLISYS - Ma Solution IT' :
+			$this->logo = 'cleodis/olisys.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+		break;
+
+		case 'Proxi Pause' :
+			$this->logo = 'cleodis/proxi-pause.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'Trekk' :
+			$this->logo = 'cleodis/trekk.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'ZENCONNECT – ZEN PACK' :
+			$this->logo = 'cleodis/zenconnectzenpack.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+
+		break;
+
+		default:
+			$this->logo = 'cleodis/logo.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
+		break;
+	}
 
 
 		//Styles utilisés
