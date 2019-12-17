@@ -158,7 +158,7 @@ class pdf_cleodis extends pdf {
 				case 'cleodis/lafi.jpg':
 				case 'cleodis/Manganelli.jpg':
 				case 'cleodis/nrc.jpg' :
-				case 'cleodis/olisys.jpg':
+				case 'cleodis/OLISYS.jpg':
 				case 'cleodis/proxi-pause.jpg' :
 				case 'cleodis/trekk.jpg':
 				case 'cleodis/zenconnectzenpack.jpg' :
@@ -199,7 +199,7 @@ class pdf_cleodis extends pdf {
 					case 'cleodis/lafi.jpg':
 					case 'cleodis/Manganelli.jpg':
 					case 'cleodis/nrc.jpg' :
-					case 'cleodis/olisys.jpg':
+					case 'cleodis/OLISYS.jpg':
 					case 'cleodis/proxi-pause.jpg' :
 					case 'cleodis/trekk.jpg':
 					case 'cleodis/zenconnectzenpack.jpg' :
@@ -231,7 +231,7 @@ class pdf_cleodis extends pdf {
 						case 'cleodis/lafi.jpg':
 						case 'cleodis/Manganelli.jpg':
 						case 'cleodis/nrc.jpg' :
-						case 'cleodis/olisys.jpg':
+						case 'cleodis/OLISYS.jpg':
 						case 'cleodis/proxi-pause.jpg' :
 						case 'cleodis/trekk.jpg':
 						case 'cleodis/zenconnectzenpack.jpg' :
@@ -527,7 +527,7 @@ class pdf_cleodis extends pdf {
 
 			case 'OLISYS - Ma Solution IT' :
 				$this->cleodis = "OLISYS";
-				$this->logo = 'cleodis/olisys.jpg';
+				$this->logo = 'cleodis/OLISYS.jpg';
 			break;
 
 			case 'Proxi Pause' :
@@ -1747,7 +1747,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			case 'OLISYS - Ma Solution IT' :
-				$this->logo = 'cleodis/olisys.jpg';
+				$this->logo = 'cleodis/OLISYS.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 			break;
 
@@ -2258,7 +2258,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			case 'OLISYS - Ma Solution IT' :
-				$this->logo = 'cleodis/olisys.jpg';
+				$this->logo = 'cleodis/OLISYS.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 			break;
 
@@ -4433,7 +4433,7 @@ class pdf_cleodis extends pdf {
 		break;
 
 		case 'OLISYS - Ma Solution IT' :
-			$this->logo = 'cleodis/olisys.jpg';
+			$this->logo = 'cleodis/OLISYS.jpg';
 			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 		break;
 
