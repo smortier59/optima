@@ -68,7 +68,6 @@ class facture_fournisseur extends classes_optima {
 		$this->field_nom = "ref";
 		$this->foreign_key['id_fournisseur'] =  "societe";
 		$this->onglets = array('facture_fournisseur_ligne','facture_non_parvenue');
-		$this->files["fichier_joint"] = array("obligatoire"=>true);
 		$this->can_insert_from = array("bon_de_commande");
 		$this->no_insert = true;
 		$this->selectAllExtjs=true;
@@ -151,10 +150,13 @@ class facture_fournisseur extends classes_optima {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+		if($infos["import_readsoft"]) $from_readsoft = true;
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$this->infoCollapse($infos);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
 
+
+		if(!$from_readsoft && empty($infos["filestoattach"])) throw new errorATF("Documents joints manquants",877);
 
 
 //*****************************Transaction********************************
