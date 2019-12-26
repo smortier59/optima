@@ -139,7 +139,7 @@ class affaire_cleodis extends affaire {
 		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
-		$this->field_nom="ref";
+		$this->field_nom="%ref%";
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
