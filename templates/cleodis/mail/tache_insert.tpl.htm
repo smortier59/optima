@@ -1,0 +1,30 @@
+<div style="text-align:left;">
+
+<p>{ATF::$usr->trans('bonjour',mail)},</p>
+
+<p>{ATF::$usr->trans('creation_tache','mail')} :</p>
+
+
+{if ATF::$codename == 'bdomplus'}
+	<p>
+		<span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span>
+		{ATF::societe()->select($infos.donnees.id_societe, ref)} - {ATF::societe()->select($infos.donnees.id_societe, code_client)}
+	</p>
+	{if $infos.donnees.id_affaire}<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->select($infos.donnees.id_affaire, ref)}</p>{/if}
+
+	{if $infos.donnees.tache}<p><span style="font-weight:bold;">{ATF::$usr->trans('tache','tache')}</span> : {$infos.donnees.tache}</p>{/if}
+
+{else}
+	<p><span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->select($infos.donnees.id_societe, ref)} - {ATF::societe()->nom($infos.donnees.id_societe)}</p>
+	{if $infos.donnees.id_affaire}<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->select($infos.donnees.id_affaire, ref)} - {ATF::affaire()->select($infos.donnees.id_affaire, "affaire")}</p>{/if}
+	{if $infos.donnees.id_contact}<p><span style="font-weight:bold;">{ATF::$usr->trans('contact',mail)}</span> {ATF::contact()->select($infos.donnees.id_contact, "nom")} {ATF::contact()->select($infos.donnees.id_contact, "prenom")}</p>{/if}
+	<p><span style="font-weight:bold;">{ATF::$usr->trans('tache','tache')}</span> : {$infos.donnees.tache}</p>
+{/if}
+
+<p><span style="font-weight:bold;">{ATF::$usr->trans('horaire_fin','tache')}</span> : {ATF::$usr->date_trans($infos.donnees.horaire_fin)}</p>
+
+<p><a href="{$infos.optima_url}">{ATF::$usr->trans('permalink')}</a></p>
+
+<p>{ATF::$usr->trans('remerciement_tache',mail)}.</p>
+
+</div>
