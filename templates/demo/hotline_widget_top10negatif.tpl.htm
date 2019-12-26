@@ -1,0 +1,70 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=hotline}
+{$type=top10negatif}
+<div id="{$module}_graphe_{$type}" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->stats(true,$type)} 
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_graphe_{$type}',
+            type: 'column'
+        },
+        colors: [
+            '#FF0004'
+        ],
+        title: {
+            text: '{ATF::$usr->trans(widget,$module, $type)|escape:javascript}'
+             ,style :{
+                fontSize: '14px'
+            }
+        },
+        xAxis: {
+            labels:{
+                 enabled :false
+            },
+            categories: [
+                  {foreach $data["dataset"]["solde"]["set"] as $key => $cat}                  
+                     "{$cat['titre']}"
+                     {if !$cat@last},{/if}
+                  {/foreach}  
+                ]
+                
+        },
+        yAxis: {           
+            title: {
+                text: null
+            }
+        },
+        legend: {
+                enabled: false
+            },
+        series: [           
+               {
+                   type: 'column'
+                   ,name: "solde"                   
+                   ,data: [
+                          {foreach $data["dataset"]["solde"]["set"] as $key => $cat}
+                             {$cat["value"]}
+                             {if !$key@last},{/if}
+                          {/foreach} 
+                        ]
+               }
+                           
+           ]        
+    });
+});
+    
+</script>
+
+
+<div>
+	<div>Solde débiteur : <span style="font-weight:bold">{ATF::societe()->getSoldeSNegatives()|number_format:0:".":" "} tickets</span></div>
+    <div>Solde réel : <span style="font-weight:bold">{ATF::societe()->getSoldeS()|number_format:0:".":" "} tickets</span></div>
+</div>
+{/strip}

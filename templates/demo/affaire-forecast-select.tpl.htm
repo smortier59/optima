@@ -1,0 +1,18 @@
+{$id=$requests[$current_class->name()].id_affaire|default:$smarty.request.id_affaire|default:$value}
+{$affaire=ATF::affaire()->select($id)}
+{$devis=ATF::devis()->ss("id_affaire",$affaire.id_affaire)}
+
+<td class="field">
+	{ATF::$usr->trans($alias|default:$key,$current_class->table)} 
+</td>
+{$info=ATF::$usr->trans("`$key`_info",null,null,true)|default:ATF::$usr->trans($key,$current_class->table,info,true)}
+<td class="value inputField" {if $info && !$item.color}{tip text=$info caption=ATF::$usr->trans("Details")}{/if}>
+   {if $devis[0].etat=='attente' && $devis['forecast']!='0'}
+        {$onchange="ATF.tpl2div('{$current_class->table},update_forecast.ajax','id_affaire={$id}&forecast='+this.value);"}
+        {include file="generic_field_input.tpl.htm" width=$width onchange=$onchange}
+    {elseif $affaire['forecast']}
+        {$affaire['forecast']}%
+    {else}
+        -
+    {/if}
+</td>

@@ -466,7 +466,6 @@ class commande_absystech extends commande {
 			,ATF::$usr->trans("notice_success_title")
 			);
 
-//			ATF::affaire()->redirection("select",$commande["id_affaire"]);
 
 			return true;
 		}else{
@@ -643,5 +642,6 @@ class commande_absystech extends commande {
 
 class commande_att extends commande_absystech { };
 class commande_wapp6 extends commande_absystech { };
+class commande_atoutcoms extends commande_absystech { };
 class commande_demo extends commande_absystech { };
 ?>

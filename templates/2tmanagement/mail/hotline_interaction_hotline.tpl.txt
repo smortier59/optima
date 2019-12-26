@@ -1,0 +1,27 @@
+{**
+* Mail de nouvelle interaction interne
+* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+* @param array $infos les infos !
+*}
+<---- Pour répondre par email, écrire au-dessus de cette ligne ---->
+
+{$temps_estime=ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}
+Titre Requête {$infos.ref} : {$infos.hotline}
+
+{$infos.interaction.detail}
+
+{ATF::user()->nom($infos.interaction.id_user)} est intervenu sur la requête.
+
+{if $infos.hotline_detail.etat =='wait'}
+Cette interaction met le ticket en attente de réponse du client
+{/if}
+
+
+Le temps estimé est de {util::hoursToString($temps_estime)}
+
+
+Rappel de la requête {$infos.hotline} de {$infos.contact} de la societe {$infos.societe}
+
+{$infos.detail|stripslashes|nl2br}
+
+Vous pouvez également aider le technicien hotline en interagissant sur la requête. Rendez-vous sur Optima : {$infos.optima_url}

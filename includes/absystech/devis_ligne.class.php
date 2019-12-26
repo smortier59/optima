@@ -123,5 +123,6 @@ class devis_ligne_absystech extends devis_ligne {
 
 class devis_ligne_att extends devis_ligne_absystech { };
 class devis_ligne_wapp6 extends devis_ligne_absystech { };
+class devis_ligne_atoutcoms extends devis_ligne_absystech { };
 class devis_ligne_demo extends devis_ligne_absystech { };
 ?>
