@@ -63,7 +63,7 @@ class commande_cleodis extends commande {
 		);
 
 		$this->colonnes['panel']['total'] = array(
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			 "prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
@@ -2303,6 +2303,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Durée", "size"=>15),
 								array("title"=> "Fréquence du loyer", "size"=>15),
 								array("title"=> "Total", "size"=>15),
+								array("title"=> "Achat", "size"=>15),
 								array("title"=> "Refinanceur", "size"=>30),
 								array("title"=> "Comité", "size"=>15),
 								array("title"=> "Décision Comité", "size"=>15),
@@ -2352,7 +2353,7 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $value["loyer.duree"];
 			$row_data[$key][] = $value["loyer.frequence_loyer"];
 			$row_data[$key][] = ($value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"]) * $value["loyer.duree"];
-
+			$row_data[$key][] = $value["commande.prix_achat"];
 
 			ATF::demande_refi()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"],"AND")
 									   ->where("etat", "valide");
