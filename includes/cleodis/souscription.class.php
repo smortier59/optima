@@ -355,6 +355,8 @@ class souscription_cleodis extends souscription {
 
         // On force le prix d'achat en provenance des produit et non des lignes !
         $packProduitLigne['prix_achat'] = $produitLoyer['prix_achat'];
+        $devis["prix_achat"] += ($produitLoyer['prix_achat'] * $produit['quantite']);
+
 
         $produitLoyer = array_merge($produitLoyer,$packProduitLigne);
         $souscategorie = ATF::sous_categorie()->select($produitLoyer['id_sous_categorie']);
@@ -429,8 +431,11 @@ class souscription_cleodis extends souscription {
         "id_societe" => $post["id_societe"],
         "date" => date("d-m-Y"),
         "id_affaire" => $id_affaire,
-        "id_devis" => $id_devis
+        "id_devis" => $id_devis,
+        "prix_achat" =>0
     );
+
+    $total_achat = 0;
 
     $toInsertProduitContrat = array();
     foreach ($lignesDevis as $key => $value) {
@@ -460,7 +465,9 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
           "commande_ligne__dot__ordre"=>$value['ordre']
       );
+      $commande["prix_achat"] += ($value["prix_achat"] * $value["quantite"]);
     }
+
     $values_commande = array( "produits" => json_encode($toInsertProduitContrat));
 
     $id_commande = ATF::commande()->insert(array("commande"=>$commande , "values_commande"=>$values_commande));
