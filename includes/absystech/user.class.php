@@ -80,4 +80,5 @@ class user_att extends user_absystech {
 	}
 };
 class user_demo extends user_absystech { };
+class user_atoutcoms extends user_absystech { };
 ?>

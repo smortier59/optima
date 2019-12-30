@@ -73,12 +73,12 @@ ATF.buildGridEditor({
 				{/foreach}
 			});
 			grid.stopEditing();
-			
+
 			var idx = 0; // Numéro de ligne par défaut
 			var index = grid.getSelectionModel().getSelectedCell();
 			if (index) {
 				idx = index[0]+1; // Numéro de ligne sélectionné
-			}			
+			}
 			store.insert(idx, p);
 			grid.startEditing(idx, 0);
 
@@ -97,7 +97,7 @@ ATF.buildGridEditor({
 			var rec = grid.store.getAt(index[0]);
 			grid.store.remove(rec);
 			grid.refreshHiddenValues();
-			
+
 			var records = Ext.ComponentMgr.get('{$id}').store.getRange();
 			var sous_total = 0;
 			var poids = 0;
@@ -106,59 +106,59 @@ ATF.buildGridEditor({
 			var prix = 0;
 			var marge = 0;
 			var marge_absolue = 0;
-			var maintenance = 0;		
+			var maintenance = 0;
 
 			for (var i = 0; i < Ext.ComponentMgr.get('{$parent_class->table}[produits]').store.getRange().length; i++) {
-				sous_total+=parseFloat(records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite); 
-				prix_achat+=parseFloat(records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite); 
+				sous_total+=parseFloat(records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite);
+				prix_achat+=parseFloat(records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite);
 				{if $parent_class->table==devis}
-					poids+=parseFloat(records[i].data.{$current_class->table}__dot__poids*records[i].data.{$current_class->table}__dot__quantite); 
+					poids+=parseFloat(records[i].data.{$current_class->table}__dot__poids*records[i].data.{$current_class->table}__dot__quantite);
 				{/if}
 			}
 
 			Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));
-			
-			
+
+
 			{if $parent_class->table==devis}
-				ATF.ajax('societe_frais_port,frais_port.ajax','poids='+poids,{ 
+				ATF.ajax('societe_frais_port,frais_port.ajax','poids='+poids,{
 					onComplete:function(obj){
 						frais_de_port+=parseFloat(obj.result);
 						prix+=sous_total+frais_de_port;
-						Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port)); 
+						Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port));
 						Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
-					
+
 						if(Ext.getCmp('devis[cout_total_financement]').value){
-							var prix_vente = parseFloat(Ext.getCmp('devis[cout_total_financement]').value.replace(" ", "")); 
+							var prix_vente = parseFloat(Ext.getCmp('devis[cout_total_financement]').value.replace(" ", ""));
 							var pa = parseFloat(Ext.getCmp('devis[prix_achat]').value.replace(" ", ""));
-														
-							var mb = (1 - (pa/prix_vente)) * 100;	
+
+							var mb = (1 - (pa/prix_vente)) * 100;
 							Ext.getCmp('devis[marge_financement]').setValue(ATF.formatNumeric(parseFloat(mb)));
 						}
-											
+
 						{*
 							var total = 0;
-							
-							if(Ext.getCmp('devis[duree_financement]').value 
-							&& Ext.getCmp('devis[marge_financement]').value 
+
+							if(Ext.getCmp('devis[duree_financement]').value
+							&& Ext.getCmp('devis[marge_financement]').value
 							&& Ext.getCmp('devis[prix]').value){
 								var duree = Ext.getCmp('devis[duree_financement]').value;
 								var margeFin = Ext.getCmp('devis[marge_financement]').value;
-								var prixFin = prix;	
+								var prixFin = prix;
 								if(Ext.getCmp('devis[maintenance_financement]').value){
 									maintenance = Ext.getCmp('devis[maintenance_financement]').value  + parseFloat(maintenance) ;
 								}
-								
+
 								total = parseFloat(((prix * (margeFin/100)  ) + parseFloat(prixFin))/ duree) ;
 							}
-						
+
 							Ext.getCmp('devis[financement_mois]').setValue(ATF.formatNumeric(parseFloat(total)));
 						*}
-					} 
+					}
 				});
 			{else}
 				frais_de_port=parseFloat(Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').getValue());
 				prix+=sous_total+frais_de_port;
-				Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port)); 
+				Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port));
 				Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
 
 			{/if}
@@ -183,74 +183,74 @@ ATF.buildGridEditor({
 			var prix = 0;
 			var marge = 0;
 			var marge_absolue = 0;
-			var maintenance = 0;		
+			var maintenance = 0;
 
 			for (var i = 0; i < this.store.getRange().length; i++) {
 				if(records[i].data.{$current_class->table}__dot__visible == "oui"){
-					sous_total+=parseFloat(records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite); 
-					prix_achat+=parseFloat(records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite); 
+					sous_total+=parseFloat(records[i].data.{$current_class->table}__dot__prix*records[i].data.{$current_class->table}__dot__quantite);
+					prix_achat+=parseFloat(records[i].data.{$current_class->table}__dot__prix_achat*records[i].data.{$current_class->table}__dot__quantite);
 					{if $parent_class->table==devis}
-						poids+=parseFloat(records[i].data.{$current_class->table}__dot__poids*records[i].data.{$current_class->table}__dot__quantite); 
+						poids+=parseFloat(records[i].data.{$current_class->table}__dot__poids*records[i].data.{$current_class->table}__dot__quantite);
 					{/if}
 				} else {
 					records[i].data.{$current_class->table}__dot__quantite = 1;
 					records[i].data.{$current_class->table}__dot__prix = 0;
 					records[i].data.{$current_class->table}__dot__marge = 100;
-				}		
+				}
 			}
 
 			var r = Ext.ComponentMgr.get('{$id}').getStore().getRange(field.row,field.row);
 			marge = parseFloat((r[0].data.{$current_class->table}__dot__prix-r[0].data.{$current_class->table}__dot__prix_achat)/r[0].data.{$current_class->table}__dot__prix)*100;
-			
-			
+
+
 			r[0].set('{$current_class->table}__dot__marge',marge);
 			marge_absolue = parseFloat((r[0].data.{$current_class->table}__dot__prix*r[0].data.{$current_class->table}__dot__quantite)-(r[0].data.{$current_class->table}__dot__prix_achat*r[0].data.{$current_class->table}__dot__quantite));
 			r[0].set('{$current_class->table}__dot__marge_absolue',marge_absolue);
 
-			Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));				
-			
+			Ext.ComponentMgr.get('{$parent_class->table}[prix_achat]').setValue(ATF.formatNumeric(prix_achat));
+
 			{if $parent_class->table==devis}
-				ATF.ajax('societe_frais_port,frais_port.ajax','poids='+poids,{ 
+				ATF.ajax('societe_frais_port,frais_port.ajax','poids='+poids,{
 					onComplete:function(obj){
 						frais_de_port+=parseFloat(obj.result);
 						prix+=sous_total+frais_de_port;
-						Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port)); 
+						Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port));
 						Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
-						
+
 						if(Ext.getCmp('devis[cout_total_financement]').value){
-							var prix_vente = parseFloat(Ext.getCmp('devis[cout_total_financement]').value.replace(" ", "")); 
+							var prix_vente = parseFloat(Ext.getCmp('devis[cout_total_financement]').value.replace(" ", ""));
 							var pa = parseFloat(Ext.getCmp('devis[prix_achat]').value.replace(" ", ""));
-							
-							var mb = (1 - (pa/prix_vente)) * 100;	
+
+							var mb = (1 - (pa/prix_vente)) * 100;
 							Ext.getCmp('devis[marge_financement]').setValue(ATF.formatNumeric(parseFloat(mb)));
 						}
-						
+
 						{*
 							var total = 0;
-							
-							if(Ext.getCmp('devis[duree_financement]').value 
-							&& Ext.getCmp('devis[marge_financement]').value 
+
+							if(Ext.getCmp('devis[duree_financement]').value
+							&& Ext.getCmp('devis[marge_financement]').value
 							&& Ext.getCmp('devis[prix]').value){
 								var duree = Ext.getCmp('devis[duree_financement]').value;
 								var margeFin = Ext.getCmp('devis[marge_financement]').value;
-								var prixFin = prix;	
+								var prixFin = prix;
 								if(Ext.getCmp('devis[maintenance_financement]').value){
 									maintenance = Ext.getCmp('devis[maintenance_financement]').value  + parseFloat(maintenance) ;
 								}
-								
+
 								total = parseFloat(((prix * (margeFin/100)  ) + parseFloat(prixFin))/ duree) ;
 							}
-						
+
 							Ext.getCmp('devis[financement_mois]').setValue(ATF.formatNumeric(parseFloat(total)));
 						*}
-						
-						
-					} 
+
+
+					}
 				});
 			{else}
 				frais_de_port=parseFloat(Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').getValue());
 				prix+=sous_total+frais_de_port;
-				Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port)); 
+				Ext.ComponentMgr.get('{$parent_class->table}[frais_de_port]').setValue(ATF.formatNumeric(frais_de_port));
 				Ext.ComponentMgr.get('{$parent_class->table}[prix]').setValue(ATF.formatNumeric(prix));
 			{/if}
 			Ext.ComponentMgr.get('{$parent_class->table}[sous_total]').setValue(ATF.formatNumeric(sous_total));
@@ -261,7 +261,7 @@ ATF.buildGridEditor({
 			{if $current_class->table == "devis_ligne"}
 				val = Ext.getCmp("combodevis[type_devis]").value;
 
-				Ext.getCmp("panel_financement").show();			
+				Ext.getCmp("panel_financement").show();
 				Ext.getCmp("panel_total").show();
 				Ext.getCmp("panel_courriel").show();
 				Ext.getCmp("panel_redaction").show();
@@ -278,17 +278,17 @@ ATF.buildGridEditor({
 					Ext.getCmp("panel_location").hide();
 					Ext.getCmp("panel_lignes").hide();
 
-					Ext.getCmp("panel_financement").hide();				
+					Ext.getCmp("panel_financement").hide();
 					Ext.getCmp("panel_total").hide();
 					Ext.getCmp("panel_courriel").hide();
 					Ext.getCmp("panel_redaction").hide();
 					Ext.getCmp("panel_lignes_consommable").show();
 					Ext.getCmp("panel_lignes_consommable").expand();
-				}	
+				}
 			{/if}
 		}
 	},
-	
+
 	cm:new Ext.grid.ColumnModel({
 		/*defaults: {
 			sortable: true
@@ -337,16 +337,16 @@ ATF.buildGridEditor({
 			},{
 				header: 'Periode',
 				width:40,
-				dataIndex: 'devis_ligne__dot__periode',	
+				dataIndex: 'devis_ligne__dot__periode',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store){
-					if (value) {						
+					if (value) {
 						var a = value.split(ATF.extJSGridComboboxSeparator);
 						if (a[1]) {
 							record.set('{$current_class->table}__dot__periode',a[1]);
 						}
 						return a[0];
 					}
-				},					
+				},
 				editor : new Ext.form.ComboBox({
 					    typeAhead: true,
 					    triggerAction: 'all',
@@ -364,7 +364,7 @@ ATF.buildGridEditor({
 					    displayField: 'value'
 					})
 
-			{/if}	
+			{/if}
 			}, {
 				header: 'Px Achat',
 				width:20,
@@ -405,7 +405,7 @@ ATF.buildGridEditor({
 						return a[0];
 					}
 				},
-				editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_compte_absystech function=null extJSGridComboboxSeparator=true},{
+				editor: jQuery.extend({include file="generic-gridpanel-combo.tpl.js" key=id_compte_absystech function=getCompteActif extJSGridComboboxSeparator=true},{
 					listWidth:200
 				})
 			}, {
@@ -425,7 +425,7 @@ ATF.buildGridEditor({
 				header: 'Visible',
 				width:20,
 				dataIndex: '{$current_class->table}__dot__visible',
-				editor: {include file="generic-gridpanel-combo.tpl.js" key=visible value="oui" function=null}				
+				editor: {include file="generic-gridpanel-combo.tpl.js" key=visible value="oui" function=null}
 			}
 		]
 	}),
@@ -433,9 +433,9 @@ ATF.buildGridEditor({
 		root: 'result',
 		totalProperty: 'totalCount',
 		idProperty: 'id',
-		remoteSort: true,	
+		remoteSort: true,
 		fields: ATF.extParseFields({util::getExtJSGridMappingFields($q->getView(),["{$current_class->table}.id_fournisseur_fk","{$current_class->table}.id_compte_absystech_fk","{$current_class->table}.marge","{$current_class->table}.marge_absolue"])}),
-		baseParams:{ 
+		baseParams:{
 			'pager':'{$pager}'
 			{foreach from=$baseParams key=kParam item=iParam}
 				,'{$kParam}':'{$iParam}'

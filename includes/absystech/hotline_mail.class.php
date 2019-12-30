@@ -448,4 +448,12 @@ class hotline_mail {
 		$this->createMailForAT($id_hotline,$obj,$to,$template,$id_hotline_interaction);
 	}
 };
+
+class hotline_mail_atoutcoms extends hotline_mail{
+	public function sendMail(){
+		ATF::$msg->addWarning(ATF::$usr->trans("Mail non envoyé pour ATOUTCOMS"));
+	}
+
+
+}
 ?>

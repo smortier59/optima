@@ -1,0 +1,30 @@
+<p style="font-weight:bold;">Ref Requête : {$infos.ref}</p>
+
+<p>Bonjour {$infos.contact},</p>
+
+<p style="text-indent:30px;">
+{if $infos.hotline_detail.facturation_ticket=="oui"}
+	Votre requête a été étudiée et ne fait <strong>PAS</strong> l'objet d'une garantie ou d'un contrat de maintenance. <br />
+	Par conséquent, le travail effectué pour honorer votre demande vous sera facturé au nombre d'heures passées.<br />
+	<b>Bien entendu la facturation prendra effet une fois le problème résolu.</b><br />
+    <p style="color:red;">Afin de nous permettre d'intervenir au plus vite, nous vous remercions de valider dès maintenant ces conditions (ou au contraire de refuser et d'annuler votre demande)  <a href="{$infos.portail_hotline_url}">en cliquant ICI</a> </p>
+    <p>Sans réponse de votre part dans les 5 jours, le principe de facturation sera accepté automatiquement.</p>
+{else}
+	{if $infos.hotline_detail.charge=="maintenance"}
+		Votre requête a été étudiée et fait l'objet d'une garantie ou d'un contrat de maintenance.<br />
+	{else}
+		Votre requête est prise en charge.<br />
+	{/if}
+{/if}
+</p>
+
+
+<p><span style="text-decoration:underline;">Rappel de votre requête <strong>{$infos.hotline}</strong> :</span></p>
+
+<p style="font-size:13px; font-style:italic; color:grey; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</p>
+
+<p>N'hésitez pas à consulter l'avancement de vos requêtes sur le <a href="{$infos.portail_hotline_url}">portail hotline</a></p>
+
+<p>Cordialement,<br /></p>
+
+<p style="margin-left:50px;">L'équipe 2T Management</p>

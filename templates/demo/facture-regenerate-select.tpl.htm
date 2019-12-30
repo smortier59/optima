@@ -1,0 +1,6 @@
+<td class="field select">
+	{ATF::$usr->trans("regenerate_facture",$current_class->table)} :
+</td>
+<td class="value">
+	<a onclick="if (confirm('{ATF::$usr->trans(Etes_vous_sur_generate_facture)}')) ATF.tpl2div('facture,generatePDF.ajax','id={$requests[$current_class->table]["id_{$current_class->table}"]}');" href="javascript:;" {tip text=ATF::$usr->trans("regenerate_facture",$current_class->table)}><img src="{ATF::$staticserver}images/icones/expand.png" /></a>
+</td>

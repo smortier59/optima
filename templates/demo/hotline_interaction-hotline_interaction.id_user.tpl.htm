@@ -1,0 +1,21 @@
+{if $item["hotline_interaction.id_user_fk"]}
+ {include file="href.tpl.htm" 
+    linkmode="href" 
+    link=$current_class->fk_from($field)
+    text=$item[$field]
+    id=$item["{$field}_fk"]|default:$item["{$current_class->table}.id_{$current_class->table}"] 
+    table=ATF::getClass($current_class->fk_from($field,false,true))->name() 
+    truncate=30}
+{else} 
+	{$id_contact = ATF::hotline_interaction()->select($item["hotline_interaction.id_hotline_interaction"],'id_contact')}
+	<span style="color:red;"><strong>
+    	{ATF::$usr->trans('rep_hotline',$current_class->table)}<br />
+         {include file="href.tpl.htm" 
+            linkmode="href" 
+            link=$current_class->fk_from($field)
+            text=ATF::contact()->nom($id_contact) 
+            id=$id_contact
+            table=ATF::contact()->name() 
+            truncate=30}
+    </strong></strong>
+{/if}

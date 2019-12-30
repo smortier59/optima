@@ -40,5 +40,6 @@ class livraison_ligne_absystech extends classes_optima {
 };
 class livraison_ligne_att extends livraison_ligne_absystech { };
 class livraison_ligne_wapp6 extends livraison_ligne_absystech { };
+class livraison_ligne_atoutcoms extends livraison_ligne_absystech { };
 class livraison_ligne_demo extends livraison_ligne_absystech { };
 ?>

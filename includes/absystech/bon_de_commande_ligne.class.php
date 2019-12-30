@@ -89,12 +89,12 @@ class bon_de_commande_ligne_absystech extends classes_optima{
 			$res["data"] = $return;
 		}
 		
-//log::logger($res , "mfleurquin");
 		return $res;
 	}
 };
 
 class bon_de_commande_ligne_att extends bon_de_commande_ligne_absystech { };
 class bon_de_commande_ligne_wapp6 extends bon_de_commande_ligne_absystech { };
+class bon_de_commande_ligne_atoutcoms extends bon_de_commande_ligne_absystech { };
 class bon_de_commande_ligne_demo extends bon_de_commande_ligne_absystech { };
 ?>

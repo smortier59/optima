@@ -81,5 +81,6 @@ class opportunite_absystech extends opportunite {
 
 
 class opportunite_att extends opportunite_absystech { }
+class opportunite_atoutcoms extends opportunite_absystech { }
 
 ?>
