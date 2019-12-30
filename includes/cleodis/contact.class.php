@@ -84,7 +84,8 @@ class contact_cleodis extends contact {
 			}
 		}
 
-		return parent::insert($infos,$s,$files,$cadre_refreshed);
+		ATF::societe()->redirection("select", $infos["contact"]["id_societe"]);
+		return parent::insert($infos,$s,$files);
 	}
 
 
@@ -98,6 +99,8 @@ class contact_cleodis extends contact {
 	* @param array $infos
 	*/
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL) {
+
+
 		if(strlen($infos["contact"]["pwd"]) != 64) {
 			if($infos["contact"]["pwd"] !== "" && $infos["contact"]["pwd"] !== NULL){
 				if(preg_match("/^(?=.*[A-Z])(?=.*[0-9]).{6,}$/", $infos["contact"]["pwd"]) == 0){
@@ -123,9 +126,7 @@ class contact_cleodis extends contact {
 			}
 		}
 
-		$return = parent::update($infos,$s,$files,$cadre_refreshed);
-
-
+		$return = parent::update($infos,$s,$files);
 
 
 		if($infos["contact"]["etat"] === "inactif"){
@@ -167,6 +168,9 @@ class contact_cleodis extends contact {
 				}
 			}
 		}
+
+		ATF::societe()->redirection("select", $infos["contact"]["id_societe"]);
+
 		return $return;
 
 	}
