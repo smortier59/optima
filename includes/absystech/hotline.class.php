@@ -951,9 +951,8 @@ class hotline extends classes_optima {
 			$data["channel"] = "Hotline";
 			$cmd .= json_encode($data);
 			$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
-
 		}
-		log::logger($cmd,'mm');
+
 		if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 
