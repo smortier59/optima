@@ -1486,7 +1486,7 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__visible"=>$visible
                                 );
 
-              $devis["prix_achat"] += $ligne["prix_achat"];
+              $devis["prix_achat"] += ($ligne["prix_achat"] * $qte);
 
             }
           }
@@ -1827,7 +1827,8 @@ class societe_cleodis extends societe {
             "id_societe" => $devis["id_societe"],
             "date" => date("d-m-Y"),
             "id_affaire" => $id_affaire,
-            "id_devis" => $devis["id_devis"]
+            "id_devis" => $devis["id_devis"],
+            "prix_achat" => $devis["prix_achat"]
         );
 
     $produits = array();
