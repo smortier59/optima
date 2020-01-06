@@ -3057,6 +3057,7 @@ class affaire_bdomplus extends affaire_cleodis {
 			,'suivi'
 			,'tache'
 			,"pdf_affaire"
+			,"licence"
 		);
 
 		$this->colonnes['primary']['licence'] = array("custom"=>true);

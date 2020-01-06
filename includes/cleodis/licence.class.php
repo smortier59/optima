@@ -29,6 +29,17 @@ class licence extends classes_optima {
 				//->from("licence","id_commande_ligne", "commande_ligne", "id_commande_ligne")
 				//->from("commande_ligne","id_commande", "commande", "id_commande");
 
+		if (ATF::_r('id_affaire')) {
+			// Permet d'éviter le where id_affaire sur la requête.
+			$this->q->reset("where");
+			$this->q->addJointure("licence","id_commande_ligne","commande_ligne","id_commande_ligne");
+			$this->q->addJointure("commande_ligne","id_commande","commande","id_commande");
+
+			$this->q->where("commande.id_affaire",ATF::affaire()->decryptID(ATF::_r('id_affaire')));	
+			ATF::_r('id_affaire', null);
+		}
+
+
 		$return = parent::select_all($order_by,$asc,$page,$count);
 		foreach ($return["data"] as $key => $value) {
 			if($value["licence.id_commande_ligne"]){
