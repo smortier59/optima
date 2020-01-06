@@ -31,7 +31,7 @@
                             <input tabindex="1" type="text" value="{$smarty.cookies.optima.societe|default:$smarty.get.societe}"{if $__c.optima.societe || $smarty.get.societe} class="invisible" onfocus="this.className='';"{/if} name="schema" id="schema" />
                         {/if}
                     </div>
-                    {if !$smarty.get.regenerate} <!-- Affiche la mire de connexion -->
+                    {if !$smarty.get.regenerate} <!-- #Affiche la mire de connexion -->
                     <div style="width:150px;">Nom d'utilisateur :</div>
                     <div style="width:200px;"><input tabindex="2" type="text" value="{$smarty.cookies.l}" name="login" id="login" /></div>
                     <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
