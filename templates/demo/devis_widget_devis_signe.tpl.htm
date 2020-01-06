@@ -1,0 +1,68 @@
+{strip}
+{*
+@param string $module
+*}
+{$module=devis}
+{$type = devis_signe}
+<div id="{$module}_devis_signe" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->devis_signe()}
+
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_devis_signe',
+            type: 'column'
+        },
+        title: {            
+            text: "Nombre de devis des 30 derniers jours"
+            ,style :{
+                fontSize: '10px'
+            }
+        },
+        colors :[
+            "#FF0033",
+            "#FFCF23",
+            "#19FF30"
+        ],
+        xAxis: {            
+            categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+        yAxis: {
+            title: {
+                text: null
+            }
+        },
+        series: [
+               {foreach $data["dataset"] as $key=>$value}    
+               {                   
+                   type: 'column'
+                   ,name: "{$key}"                   
+                   ,data: [                           
+                           {foreach $value["set"] as $k=>$v}                           
+                                {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]
+               } {if !$key@last},{/if}
+             {/foreach}              
+           ]        
+    });
+});    
+    
+</script>
+
+<div>
+   
+</div>
+{/strip}

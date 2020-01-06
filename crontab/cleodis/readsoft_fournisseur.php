@@ -5,6 +5,8 @@ include(dirname(__FILE__)."/../../global.inc.php");
 	print_r("************************Penser à vérifier les droits de TEMP***********************************");
 }
 */
+function clean($s){ return str_replace("&","",$s); }
+
 class readsoft {
 	const HEAD = '<?xml version="1.0" encoding="UTF-8"?>';
 
@@ -30,18 +32,20 @@ class readsoft {
 		return self::societe();
 	}
 	private function societe(){
-		ATF::societe()->q->reset()->where("fournisseur","oui")
+		ATF::societe()->q->reset()->where("fournisseur","oui")->whereIsNotNull("code_fournisseur")
 //->setLimit(200)
 ;
+
 		$xml = '<Suppliers>';
 		if ($fournisseurs = ATF::societe()->select_all()) {
 			foreach($fournisseurs as $i) {
+				array_walk($i,'clean');
 				array_walk($i,'htmlspecialchars');
 				$xml .= "\n".'<Supplier>';
 				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($i['id_'.__FUNCTION__],'code_fournisseur').'</SupplierNumber>'; // Identifiant du fournisseur dans l’ERP ';
-				$xml .= "\n".'<Name>'.$i['societe'].'</Name>'; // Nom du fournisseur ';
+				$xml .= "\n".'<Name>'.str_replace("&","",$i['societe']).'</Name>'; // Nom du fournisseur ';
 				$xml .= "\n".'<OrganizationNumber>001</OrganizationNumber>'; // Identifiant de la société acheteuse dans l’ERP';
-				$xml .= "\n".'<Street>'.$i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : '').'</Street>'; // Adresse ';
+				$xml .= "\n".'<Street>'.htmlspecialchars(str_replace("&","",$i['adresse'].($i['adresse_2'] ? $i['adresse_2'] : '').($i['adresse_3'] ? $i['adresse_3'] : ''))).'</Street>'; // Adresse ';
 				$xml .= "\n".'<PostalCode>'.$i['cp'].'</PostalCode>'; // Code postal';
 				$xml .= "\n".'<City>'.$i['ville'].'</City>'; // Ville';
 				$xml .= "\n".'<CountryName>'.$i['id_pays'].'</CountryName>'; // Code du pays sur 2 caractères (ex. : FR)';
@@ -62,56 +66,88 @@ class readsoft {
 	 * Extraction XML des lignes de commandes
 	 */
 	function bon_de_commande(){
-		ATF::bon_de_commande()->q->reset()->setStrict()->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC')
+
+		ATF::bon_de_commande()->q->reset()->setStrict()
+														->from("bon_de_commande","id_affaire", "commande","id_affaire")
+														->where("commande.etat", "mis_loyer", "OR", "statut_contrat", "=")
+														->where("commande.etat", "non_loyer", "OR", "statut_contrat", "=")
+														->where("commande.etat", "AR", "OR", "statut_contrat", "=")
+														->where("commande.etat", "vente", "OR", "statut_contrat", "=")
+														->where("commande.etat", "prolongation", "OR", "statut_contrat", "=")
+														->where("commande.etat", "restitution", "OR", "statut_contrat", "=")
+														->where("commande.etat", "mis_loyer_contentieux", "OR", "statut_contrat", "=")
+														->where("commande.etat", "prolongation_contentieux", "OR", "statut_contrat", "=")
+														->where("commande.etat", "restitution_contentieux", "OR", "statut_contrat", "=")
+														->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC');
+
+		//ATF::bon_de_commande()->q->reset()->setStrict()->addOrder('bon_de_commande.id_'.__FUNCTION__,'ASC')
 //->setLimit(200)
-;
+
 		self::setupLast(__FUNCTION__); // Ne pas extraire les données déjà extraites précédemment
+
 
 		$xml = '<PurchaseOrders>';
 		if ($bdc = ATF::bon_de_commande()->sa()) {
+
+			ATF::bon_de_commande()->q->setToString();
+			log::logger(ATF::bon_de_commande()->sa() , "mfleurquin");
+
 			foreach($bdc as $c) {
 				if (!$c['id_fournisseur']) continue; // Si aucun fournisseur, READSOFT ne veut pas qu'on exporte la commande
+				$code_fournisseur = ATF::societe()->select($c['id_fournisseur'],'code_fournisseur');
+				if (!$code_fournisseur) continue; // Si aucun code de fournisseur, READSOFT ne veut pas qu'on exporte la commande
+				array_walk($c,'clean');
 				array_walk($c,'htmlspecialchars');
-				$xml .= "\n".'<PurchaseOrder>';
-				$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
-				$xml .= "\n".'<SupplierNumber>'.ATF::societe()->select($c['id_fournisseur'],'code_fournisseur').'</SupplierNumber>';
-				$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
-				if ($c['date_reception_fournisseur'])
-					$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
-				$xml .= "\n".'<ContactName>'.htmlspecialchars(ATF::contact()->nom($c['id_contact'])).'</ContactName>';
-				$xml .= "\n".'<Description>'.$c['bom_de_commande'].'</Description>';
-				$xml .= "\n".'<StatusText>'.$c['etat'].'</StatusText>';
-				ATF::bon_de_commande_ligne()->q->reset()->where('bon_de_commande_ligne.id_'.__FUNCTION__,$c['id_'.__FUNCTION__]);
-				if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
-					$xml .= "\n".'<Lines>';
-					foreach($bdcl as $l) {
-						$xml .= "\n".'<PurchaseOrderLine>';
-						$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
-						$xml .= "\n".'<ArticleNumber>'.$l['ref'].'</ArticleNumber>';
-						$xml .= "\n".'<SupplierArticleNumber>'.$l['ref'].'</SupplierArticleNumber>';
-						$xml .= "\n".'<ArticleDescription>'.htmlspecialchars($l['produit']).'</ArticleDescription>';
-						$cl = ATF::commande_ligne()->select($l['id_commande_ligne']);
-						$p = ATF::produit()->select($cl['id_produit']);
-						$scat = ATF::sous_categorie()->select($p['id_sous_categorie']);
-						$cat = ATF::categorie()->select($scat['id_categorie']);
-						$xml .= "\n".'<CategoryNumber>'.$p['id_sous_categorie'].'</CategoryNumber>';
-						$xml .= "\n".'<CategoryDescription>'.htmlspecialchars($scat['sous_categorie'].' ('.$cat['categorie'].')').'</CategoryDescription>';
-						$xml .= "\n".'<Quantity>'.$l['quantite'].'</Quantity>';
-						$xml .= "\n".'<Unit>'.$l['quantite'].'</Unit>';
-						$xml .= "\n".'<UnitPrice>'.$l['prix'].'</UnitPrice>';
-						$xml .= "\n".'<RowTotalAmountVatExcluded>'.($l['quantite']*$l['prix']).'</RowTotalAmountVatExcluded>';
-						$xml .= "\n".'<StatusText>'.$l[''].'</StatusText>';
-						$xml .= "\n".'<InvoicedQuantity>'.$l['quantite'].'</InvoicedQuantity>';
-						$xml .= "\n".'<DeliveredQuantity>'.$l['quantite'].'</DeliveredQuantity>';
-						$xml .= "\n".'<IsDeliveryRequired>false</IsDeliveryRequired>';
-						$xml .= "\n".'<PriceUnit>'.$l['prix'].'</PriceUnit>';
-						$xml .= "\n".'</PurchaseOrderLine>';
+
+
+				if( substr($code_fournisseur, 0 , 5) !== "FCLEO"
+				 && substr($code_fournisseur, 0 , 4) !== "FBNP"
+				 && substr($code_fournisseur, 0 , 6) !== "FFRANF"
+				 && date("Ymd", strtotime($c["date"])) >= date("Ymd", strtotime("- 3 years"))){
+					$xml .= "\n".'<PurchaseOrder>';
+					$xml .= "\n".'<OrderNumber>'.$c['ref'].'</OrderNumber>';
+					$xml .= "\n".'<SupplierNumber>'.$code_fournisseur.'</SupplierNumber>';
+					$xml .= "\n".'<CurrencyCode>EUR</CurrencyCode>';
+					if ($c['date_reception_fournisseur'])
+						$xml .= "\n".'<DateCreated>'.$c['date_reception_fournisseur'].'T00:00:00</DateCreated>';
+					$xml .= "\n".'<ContactName>'.htmlspecialchars(ATF::contact()->nom($c['id_contact'])).'</ContactName>';
+					$xml .= "\n".'<Description>'.htmlspecialchars(str_replace("&","",$c['bon_de_commande'])).'</Description>';
+					$xml .= "\n".'<StatusText>'.$c['etat'].'</StatusText>';
+					ATF::bon_de_commande_ligne()->q->reset()->where('bon_de_commande_ligne.id_'.__FUNCTION__,$c['id_'.__FUNCTION__]);
+					if ($bdcl = ATF::bon_de_commande_ligne()->sa()) {
+						$xml .= "\n".'<Lines>';
+						foreach($bdcl as $l) {
+							if($l["prix"] && $l["prix"] != 0){
+								array_walk($l,'clean');
+								array_walk($l,'htmlspecialchars');
+								$xml .= "\n".'<PurchaseOrderLine>';
+								$xml .= "\n".'<OrderLineNumber>'.$l['id_'.__FUNCTION__.'_ligne'].'</OrderLineNumber>';
+								$xml .= "\n".'<ArticleNumber>'.htmlspecialchars($l['ref']).'</ArticleNumber>';
+								$xml .= "\n".'<SupplierArticleNumber>'.htmlspecialchars(str_replace("&","",$l['ref'])).'</SupplierArticleNumber>';
+								$xml .= "\n".'<ArticleDescription>'.htmlspecialchars(str_replace("&","",$l['produit'])).'</ArticleDescription>';
+
+								$cat = ATF::categorie()->select($scat['id_categorie']);
+								$xml .= "\n".'<CategoryNumber>'.$p['id_sous_categorie'].'</CategoryNumber>';
+								$xml .= "\n".'<CategoryDescription>'.htmlspecialchars($scat['sous_categorie'].' ('.$cat['categorie'].')').'</CategoryDescription>';
+								$xml .= "\n".'<Quantity>'.$l['quantite'].'</Quantity>';
+								$xml .= "\n".'<Unit>'.$l['quantite'].'</Unit>';
+								$xml .= "\n".'<UnitPrice>'.$l['prix'].'</UnitPrice>';
+								$xml .= "\n".'<RowTotalAmountVatExcluded>'.($l['quantite']*$l['prix']).'</RowTotalAmountVatExcluded>';
+								$xml .= "\n".'<StatusText>'.$l[''].'</StatusText>';
+								$xml .= "\n".'<InvoicedQuantity>'.$l['quantite'].'</InvoicedQuantity>';
+								$xml .= "\n".'<DeliveredQuantity>'.$l['quantite'].'</DeliveredQuantity>';
+								$xml .= "\n".'<IsDeliveryRequired>false</IsDeliveryRequired>';
+								$xml .= "\n".'<PriceUnit>'.$l['prix'].'</PriceUnit>';
+								$xml .= "\n".'</PurchaseOrderLine>';
+							}
+						}
+						$xml .= "\n".'</Lines>';
 					}
-					$xml .= "\n".'</Lines>';
+					$xml .= "\n".'</PurchaseOrder>';
 				}
-				$xml .= "\n".'</PurchaseOrder>';
+
 			}
-			self::setupLast(__FUNCTION__,$lastID); // Mémoriser le dernier ID exporté
+			//self::setupLast(__FUNCTION__,$lastID); // Mémoriser le dernier ID exporté
 		}
 		$xml .= "\n".'</PurchaseOrders>';
 		return self::HEAD . $xml;
@@ -123,18 +159,18 @@ class readsoft {
 	function compte(){
 		$xml = '<GeneralLedgerAccounts>';
 		$xml .= "\n".'<GeneralLedgerAccount>';
-		$xml .= "\n".'<Code>'.$i[''].'</Code>'; // Code comptable 
+		$xml .= "\n".'<Code>'.$i[''].'</Code>'; // Code comptable
 		$xml .= "\n".'<Group>'.$i[''].'</Group>';
-		$xml .= "\n".'<Description>'.$i[''].'</Description>'; // Libellé du compte 
-		$xml .= "\n".'<Active>'.$i[''].'</Active>'; // « true » ou « false » 
+		$xml .= "\n".'<Description>'.$i[''].'</Description>'; // Libellé du compte
+		$xml .= "\n".'<Active>'.$i[''].'</Active>'; // « true » ou « false »
 		$xml .= "\n".'</GeneralLedgerAccount>';
 		$xml .= "\n".'</GeneralLedgerAccounts>';
 	}
 
 }
 $rs = new readsoft();
-file_put_contents(__DIR__.'../../www/readsoft/Fournisseurs.xml',$rs->fournisseur());
-file_put_contents(__DIR__.'../../www/readsoft/Purchaseorders.xml',$rs->bon_de_commande());
+file_put_contents(__DIR__.'/../../www/readsoft/Fournisseurs.xml',$rs->fournisseur());
+file_put_contents(__DIR__.'/../../www/readsoft/Purchaseorders.xml',$rs->bon_de_commande());
 
 
 
@@ -143,19 +179,19 @@ file_put_contents(__DIR__.'../../www/readsoft/Purchaseorders.xml',$rs->bon_de_co
 <xml>
 <Suppliers>
 <Supplier>A répéter pour chaque fournisseur
-<SupplierNumber>Identifiant du fournisseur dans l’ERP 
-<Name>Nom du fournisseur 
+<SupplierNumber>Identifiant du fournisseur dans l’ERP
+<Name>Nom du fournisseur
 <OrganizationNumber>Identifiant de la société acheteuse dans l’ERP
-<Street>Adresse 
+<Street>Adresse
 <PostalCode>Code postal
 <City>Ville
 <CountryName>Code du pays sur 2 caractères (ex. : FR)
 <Blocked>
 0 : fournisseur actif
 1 : fournisseur bloqué
-<TaxCode>SIRET du fournisseur 
-<TelephoneNumber>Téléphone (facultatif) 
-<FaxNumber>Fax (facultatif) 
+<TaxCode>SIRET du fournisseur
+<TelephoneNumber>Téléphone (facultatif)
+<FaxNumber>Fax (facultatif)
 </Supplier>
-</Suppliers> 
+</Suppliers>
 */

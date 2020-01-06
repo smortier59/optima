@@ -15,7 +15,7 @@
     <td class="value">
         <select multiple='multiple' name="suivi_societe[]" size='5'>
             {ATF::user()->q->reset()->addOrder("user.nom")->addCondition(etat,normal)->end()}
-            {html_options options=ATF::user()->options(null,null,false) selected=$requests[$current_class->table].suivi_societe|default:ATF::$usr->getID()}
+            {html_options options=ATF::user()->options(null,null,false) selected=$requests[$current_class->table].suivi_societe}
         </select>
     </td>
 </tr>
@@ -25,7 +25,7 @@
     </td>
     <td class="value">
         <select multiple='multiple' name="suivi_notifie[]" size='5'>
-            {html_options options=ATF::user()->options(null,null,false) selected=$requests[$current_class->table].suivi_notifie|default:ATF::$usr->getID()}
+            {html_options options=ATF::user()->options(null,null,false) selected=$requests[$current_class->table].suivi_notifie}
         </select>
     </td>
 </tr>

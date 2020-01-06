@@ -179,6 +179,7 @@ class produit_absystech extends produit {
 
 class produit_att extends produit_absystech { };
 class produit_wapp6 extends produit_absystech { };
+class produit_atoutcoms extends produit_absystech { };
 class produit_demo extends produit_absystech { };
 
 ?>

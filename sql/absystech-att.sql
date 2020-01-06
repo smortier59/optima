@@ -1,0 +1,1 @@
+ALTER TABLE `compte_absystech` ADD `etat` ENUM('actif','inactif') NOT NULL DEFAULT 'actif' AFTER `type`;

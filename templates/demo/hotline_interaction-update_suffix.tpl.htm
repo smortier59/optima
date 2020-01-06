@@ -1,0 +1,58 @@
+<tr>
+    <td class="field">{ATF::$usr->trans('transfert',$current_class->table)} :</td>
+    <td class="value">
+        <select name="hotline_interaction[transfert]" id="hotline_interaction[transfert]" {if $style} style="{$style}"{/if}>
+            <option value="">{ATF::$usr->trans('no_transfert',$current_class->table)}</option>
+            {html_options options=ATF::user()->options_transfert() selected=$requests[$current_class->table][transfert]|default:$item.default}
+        </select>
+    </td>    
+</tr>
+<tr>
+    <td class="field">{ATF::$usr->trans('transfert_pole',$current_class->table)} :</td>
+    <td class="value">
+        <select name="hotline_interaction[transfert_pole]" id="hotline_interaction[transfert_pole]" {if $style} style="{$style}"{/if}>
+            <option value="">{ATF::$usr->trans('no_transfert',$current_class->table)}</option>
+            {html_options options=ATF::hotline()->pole_options($smarty.session) selected=$requests[$current_class->table][transfert_pole]}
+        </select>
+    </td>    
+</tr>
+<tr>
+    <td class="field">{ATF::$usr->trans('attente_client',$current_class->table)}</td>
+    <td class="value"> <input type="checkbox" name="hotline_interaction[etat_wait]" id="hotline_interaction[etat_wait]" value="oui" style="width:20px" />Oui</td>
+</tr>
+<tr>
+    <td class="field">{ATF::$usr->trans('send_mail',$current_class->table)}</td>
+    <td class="value"> <input type="checkbox" name="hotline_interaction[send_mail]" name="hotline_interaction[send_mail]" value="oui" style="width:20px" checked="checked" />Oui</td>
+</tr>
+<tr>
+    <td class="field">
+		{ATF::$usr->trans('avancement',$current_class->table)}
+	</td>
+	<td class="value">
+    	<div style="width:400px;">
+			{* Calcul de l'avancement *} 
+			{$avancement=ATF::hotline()->select(ATF::hotline()->decryptId($requests.id_hotline),"avancement")}
+			<div style="width:30px;float:left;">
+				<button type="button" id="moins-avc-hotline" style="border:none;background-color:transparent;color:blue;text-decoration:underline;cursor:pointer;"><img src="{ATF::$staticserver}images/icones/remove.png" height="16" width="16" alt="" /></button>
+			</div>
+			<div id="avc-hotline" style="width:200px;"></div>
+			<input type="hidden" name="hotline_interaction[avancement]" id="hotline_interaction[avancement]" value="{$avancement}" />
+			{* Hidden ODM - Je ne sais pas ou le mettre !*}
+			{if $smarty.request.id_ordre_de_mission}
+				<input type="hidden" name="hotline_interaction[id_ordre_de_mission]" id="hotline_interaction[id_ordre_de_mission]" value="{$smarty.request.id_ordre_de_mission}" />
+			{/if}
+			<div style="width:25px;float:left;">
+				<button type="button" id="plus-avc-hotline" style="border:none;background-color:transparent;color:blue;text-decoration:underline;cursor:pointer;"><img src="{ATF::$staticserver}images/icones/add.png" height="16" width="16" alt="" /></button>
+			</div>
+			
+			<script type="text/javascript">/*<![CDATA[*/
+				 function callback(value)
+				 {
+				 	//console.log(value);
+				 	$('#hotline_interaction[avancement]').val(value);
+				 }
+				 ATF.progressBar('avc-hotline','x-progress',false,'{$avancement}',true,200,callback);		
+			/*]]>*/</script>
+		</div>
+	</td>
+</tr>  

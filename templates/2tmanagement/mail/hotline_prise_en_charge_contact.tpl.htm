@@ -1,0 +1,17 @@
+<p style="font-weight:bold;">Ref Requête : {$infos.ref}</p>
+
+<p>Bonjour {$infos.contact},</p>
+
+<p style="text-indent:30px;">Merci d'avoir utilisé notre portail, votre requête a bien été prise en charge par <strong>{ATF::user()->nom($infos.hotline_detail.id_user)}.</strong></p>
+
+<p><span style=" font-style:italic; text-decoration:underline;">Rappel de votre requête <span style="color:#990033; font-weight:bold">{$infos.hotline}</span> :</span></p>
+
+<p style="font-size:13px; font-style:italic; color:grey; margin-left:20px;">
+	{$infos.detail|stripslashes|nl2br}
+</p>
+
+
+<p>N'hésitez pas à consulter l'avancement de vos requêtes sur le <a href="{$infos.portail_hotline_url}">Portail Hotline</a></p>
+
+<p>Cordialement,<br /></p>
+<p style="margin-left:50px;">L'équipe 2T Management</p>

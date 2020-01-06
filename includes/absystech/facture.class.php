@@ -1428,7 +1428,6 @@ class facture_absystech extends facture {
 
 				$this->q->addField("YEAR(`date`)","year")
 						->addField("MONTH(`date`)","month")
-//						->addField("FLOOR(MONTH(`date`)/3)*3","month")
 						->addField("SUM(`prix`)","nb")
 						->addCondition("etat","impayee")
 						->addGroup("year")
@@ -1439,21 +1438,12 @@ class facture_absystech extends facture {
 				$this->q->addField("DISTINCT YEAR(`date`)","year");
 				$stats['YEARS'] =parent::select_all();
 
-//				foreach (util::month() as $k => $i) {
-//					if (((int)($k)-1)%3==0) {
-//						$Q = floor(((int)($k))/3)+1;
-//						$stats['categories']["category"][] = array("label"=>"Q".$Q,"hoverText"=>$i);
-//					}
-//				}
 				return parent::stats($stats,$type,$widget);
 
 			case "top10negatif":
 				$result=ATF::societe()->solde_total_global();
 				foreach ($result as $i) {
 					$graph['categories']["category"][] = array("label"=>"");
-//					if (count($graph['categories']["category"])==10) {
-//						break; // Pas plus de 10 sur le widget
-//					}
 				}
 				$graph['params']['showLegend'] = "0";
 				$graph['params']['bgAlpha'] = "0";
@@ -1471,9 +1461,6 @@ class facture_absystech extends facture {
 						,"color"=>$i["credits"]<-100?"FF0033":($i["soldeTotal"]<-10?"FF6600":"FFFF00")
 						,"link"=>urlencode("societe-select-".classes::cryptId($i["id_societe"]).".html")
 					);
-//					if (count($graph['dataset']["solde"]['set'])==10) {
-//						break; // Pas plus de 10 sur le widget
-//					}
 				}
 				return $graph;
 
@@ -1635,23 +1622,6 @@ class facture_absystech extends facture {
 		}
 	}
 
-//	/**
-//	* Donne le mail actuel
-//	* @return mixed
-//	*/
-//	public function getCurrentMail(){
-//		//Current mail
-//		if(!$this->current_mail) throw new errorATF(ATF::$usr->trans("null_current_mail",$this->table));
-//		return $this->current_mail;
-//	}
-//
-//	/**
-//	* Initialise le mail courant
-//	* @param string $mail le nom du mail courant
-//	*/
-//	public function setCurrentMail($mail){
-//		$this->current_mail=&$this->$mail;
-//	}
 
 	/**
     * Select classique qui ne prend pas en compte certaines données lors du cloner
@@ -1774,7 +1744,6 @@ class facture_absystech extends facture {
 				 ->reset()
 				 ->addCondition("id_societe",$values["id_societe"])
 				 ->addCondition("prix",($montant+2),false,false,"<=")
-//				 ->addCondition("etat","impayee")
 				 ->addOrder("prix");
 
 			$dataToutes=parent::sa();
@@ -2487,5 +2456,6 @@ class facture_att extends facture_absystech {
 
 };
 class facture_wapp6 extends facture_absystech { };
+class facture_atoutcoms extends facture_absystech { };
 class facture_demo extends facture_absystech { };
 ?>

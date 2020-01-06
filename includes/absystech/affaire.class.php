@@ -321,7 +321,6 @@ class affaire_absystech extends affaire {
 		->addField("date")
 		->addField("-SUM(prix_achat)","prix")
 		->setStrict()
-//		->addCondition("YEAR(date)",date('Y'))
 		->addGroup("year")
 		->addGroup("month");
 		ATF::stats()->conditionYearSimple(ATF::commande()->q,"date",($annee?$annee:date('Y')));
@@ -333,7 +332,6 @@ class affaire_absystech extends affaire {
 		->addField("date")
 		->addField("SUM(prix)","prix")
 		->setStrict()
-//		->addCondition("YEAR(date)",date('Y'))
 		->addGroup("year")
 		->addGroup("month");
 		ATF::stats()->conditionYearSimple(ATF::facture()->q,"date",($annee?$annee:date('Y')));
@@ -355,7 +353,6 @@ class affaire_absystech extends affaire {
 		->addField("SUM(uni.prix)","prix")
 		->setStrict()
 		->setSubQuery($subQuery,'uni')
-//		->addCondition("YEAR(uni.date)",date('Y'))
 		->addGroup("year")
 		->addGroup("month");
 		ATF::stats()->conditionYearSimple($this->q,"uni.date",($annee?$annee:date('Y')));
@@ -1022,6 +1019,7 @@ class affaire_att extends affaire_absystech {
 };
 
 class affaire_wapp6 extends affaire_absystech { };
+class affaire_atoutcoms extends affaire_absystech { };
 class affaire_demo extends affaire_absystech { };
 
 /**
@@ -1543,3 +1541,4 @@ class affaire_telescope extends affaire_absystech {
 		return $return;
 	}
 };
+

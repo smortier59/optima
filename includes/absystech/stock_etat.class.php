@@ -148,4 +148,5 @@ class stock_etat_absystech extends stock_etat {
 
 class stock_etat_att extends stock_etat_absystech {};
 class stock_etat_demo extends stock_etat_absystech {};
+class stock_etat_atoutcoms extends stock_etat_absystech {};
 ?>

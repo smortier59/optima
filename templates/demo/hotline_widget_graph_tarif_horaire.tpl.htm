@@ -1,0 +1,89 @@
+{strip}
+
+{$module=hotline}
+{$type = graph_tarif_horaire}
+<div id="{$module}_graph_tarif_horaire" class="widget"></div>
+
+<script type="text/javascript">
+{$data = ATF::getClass($module)->graph_tarif_horaire(date("Y-01-01"),date("Y-m-d"))}
+
+
+Ext.onReady(function(){
+    var chart = new Highcharts.Chart({
+        chart: {
+            renderTo: '{$module}_graph_tarif_horaire',
+            type: 'column'
+        }        
+        , title: {
+           text: '{$data["params"]["titre"]}'
+        },        
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -45,
+                style: {
+                    fontSize: '13px',
+                    fontFamily: 'Verdana, sans-serif'
+                }
+            },categories: [
+                {foreach $data["categories"]["category"] as $cat}                    
+                    '{$cat["label"]}' {if !$cat@last},{/if}
+                {/foreach}
+                ]
+        },
+        yAxis: {
+            title: {
+                text: 'Marge nette (€uros)'
+            }
+        } ,plotOptions: {
+            column: {
+                stacking: 'normal'
+            }
+        }, tooltip: {
+            shared: true
+        }        
+        ,series: [                 
+               {                   
+                   type: 'column'
+                   ,name: "Ticket"                   
+                   ,data: [                           
+                           {foreach $data["dataset"]["set"]["ticket"] as $k=>$v}
+                              {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]                    
+               } ,
+               {                   
+                   type: 'column'
+                   ,name: "Affaire"                   
+                   ,data: [                           
+                           {foreach $data["dataset"]["set"]["affaire"] as $k=>$v}
+                              {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]                    
+               },
+               {                   
+                   type: 'column'
+                   ,name: "Non pointé"                   
+                   ,data: [                           
+                           {foreach $data["dataset"]["set"]["non_pointe"] as $k=>$v}
+                              {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                          ]                    
+               },
+               {
+                  name: 'Total',
+                  type: 'spline',
+                  data: [
+                         {foreach $data["dataset"]["set"]["total"] as $k=>$v}
+                              {$v["value"]} {if !$k@last},{/if}
+                           {/foreach}
+                        ]                 
+               }
+               
+             
+          ]        
+    });
+});
+    
+</script>
+{/strip}

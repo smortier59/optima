@@ -60,5 +60,6 @@ class accueil_demo extends accueil_absystech {
 	protected $targetGlobalSearch = array("societe","contact","affaire","devis","commande","facture");// La recherche globale se fait sur ces modules
 }
 class accueil_att extends accueil_absystech { }
-class accueil_wapp6 extends accueil_absystech { }
+class accueil_wapp6 extends accueil_absystech { } 
+class accueil_atoutcoms extends accueil_absystech { }
 ?>

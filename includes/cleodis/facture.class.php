@@ -636,7 +636,7 @@ class facture_cleodis extends facture {
 			$infos["prix"]=$infos["prix_libre"];
 			$infos["date_periode_debut"]=$infos["date_periode_debut_libre"];
 			$infos["date_periode_fin"]=$infos["date_periode_fin_libre"];
-			if($infos["type_libre"] !== "normale" ){
+			if($infos["type_libre"] !== "contentieux" ){
 				$infos["tva"]=1;
 			}
 		}elseif($infos["type_facture"]=="midas"){
@@ -1167,13 +1167,14 @@ class facture_cleodis extends facture {
 					}
 				}
 
-				log::logger($item['facture.ref'] ." --> ".$choix, "export_comptable");
 
+				$h = $item['facture.id_facture']."-".$societe['code_client'];
 
-				$ligne[1] = array("D"=> "411000" , "H"=> $societe["code_client"]);
-				$ligne[2] = array("D"=> "706400" , "H"=> "");
-				$ligne[3] = array("D"=> "706400" , "H"=> "");
-				$ligne[4] = array("D"=> "445710" , "H"=> "");
+				//$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
+				$ligne[1] = array("D"=> "411000" , "H"=> $h);
+				$ligne[2] = array("D"=> "706400" , "H"=> $h);
+				$ligne[3] = array("D"=> "706400" , "H"=> $h);
+				$ligne[4] = array("D"=> "445710" , "H"=> $h);
 				$libelle = $societe['code_client'];
 
 
@@ -1193,28 +1194,25 @@ class facture_cleodis extends facture {
 
 					case 'refi_refinanceur_SGEF':
 						$libelle = $refinanceur["code_refi"];
-						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-						$ligne[1] = array("D"=> "411300" , "H"=> $h);
-						$ligne[2] = array("D"=> "707110" , "H"=> $h);
-						$ligne[3] = array("D"=> "707110" , "H"=> $h);
+						$ligne[1]["D"] =  "411300";
+						$ligne[2]["D"] =  "707110";
+						$ligne[3]["D"] =  "707110";
 						$ligne[4]["H"] = $h;
 					break;
 
 					case 'refi_refinanceur_CLEOFI':
 						$libelle = $refinanceur["code_refi"];
-						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-						$ligne[1] = array("D"=> "411200" , "H"=> $h);
-						$ligne[2] = array("D"=> "758100" , "H"=> $h);
-						$ligne[3] = array("D"=> "758100" , "H"=> $h);
+						$ligne[1]["D"] =  "411200";
+						$ligne[2]["D"] =  "758100";
+						$ligne[3]["D"] =  "758100";
 						$ligne[4]["H"] = $h;
 					break;
 
 					case 'refi_autre':
 						$libelle = $refinanceur["code_refi"];
-						$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
-						$ligne[1] = array("D"=> "411300" , "H"=> $h);
-						$ligne[2] = array("D"=> "707110" , "H"=> $h);
-						$ligne[3] = array("D"=> "707110" , "H"=> $h);
+						$ligne[1]["D"] =  "411300";
+						$ligne[2]["D"] =  "707110";
+						$ligne[3]["D"] =  "707110";
 					break;
 
 					case 'affaire_vente':
@@ -1242,12 +1240,18 @@ class facture_cleodis extends facture {
 
 					case 'affaire_en_cours_refi_cleofi_sgef':
 						if($refinanceur['refinanceur']=='CLEOFI'){
-							$ligne[2]["D"] = "467500";
+							$ligne[2]["D"] = "706200";
+							$ligne[3]["D"] = "706200";
+							$ligne[4]["D"] = "445712";
+
 						}else{
 							$ligne[2]["D"] = "467800";
+							unset($ligne[3]);
+							unset($ligne[4]);
+							$ligne[2]["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						}
-						unset($ligne[3]);
-						unset($ligne[4]);
+
+
 					break;
 
 					case 'affaire_en_cours_refi_bmf':
@@ -1280,7 +1284,7 @@ class facture_cleodis extends facture {
 						}else{
 							$row_data["F"] = 'D';
 						}
-						$row_data["G"] =  round(abs($item['facture.prix']*$devis[0]["tva"]),2);
+						$row_data["G"] = round(abs($item['facture.prix']*$item['facture.tva']),2);
 						$row_data["H"] = $ligne[$i]["H"];
 						$row_data["I"] = $reference;
 						$row_data["J"] = "";
@@ -1299,7 +1303,7 @@ class facture_cleodis extends facture {
 						}else{
 							$row_data["F"] = 'C';
 						}
-						$row_data["G"] = abs($item['facture.prix']);
+						$row_data["G"] = $ligne[$i]["G"] ? $ligne[$i]["G"] : abs($item['facture.prix']);
 						$row_data["H"] = $ligne[$i]["H"];
 						$row_data["I"] = $reference;
 						$row_data["J"] = "";
@@ -1758,7 +1762,7 @@ class facture_cleodis extends facture {
 		//A =65 Z=90
 		 $lettre2 = 77;
 		 $lettre1 = 64;
-		 for($an=2006; $an<=2024; $an++){
+		 for($an=2015; $an<=2030; $an++){
 		 	for($mois=1;$mois<=12; $mois++){
 		 		if($mois <10){ $mois = "0".$mois;}
 		 		$date = $an."-".$mois."-"."01";
@@ -1926,7 +1930,7 @@ class facture_cleodis extends facture {
 							//A =65 Z=90
 							$lettre2 = 77;
 							$lettre1 = 64;
-							for($an=2006; $an<=2020; $an++){
+							for($an=2015; $an<=2030; $an++){
 							 	for($mois=1;$mois<=12; $mois++){
 							 		if($mois <10){ $mois = "0".$mois;}
 							 		$date = $an."-".$mois."-"."01";

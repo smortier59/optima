@@ -1,0 +1,15 @@
+<p><strong>{ATF::user()->nom(ATF::$usr->getID())}</strong> vous a transférer la requête n°{$infos.ref} - {$infos.hotline}. Voici le commentaire de l'intervenant : </p>
+
+<div style="font-size:13px; font-style:italic; margin-left:20px;">{$infos.interaction.detail}</div>
+
+<p style="text-decoration:underline;">Rappel de la requête de <strong>{$infos.contact}</strong> de la societe <strong>{$infos.societe}</strong></p>
+
+<div style="font-size:13px; font-style:italic; color:grey; margin-left:20px;">{$infos.hotline_detail.detail|stripslashes|nl2br}</div>
+
+<p>Pour voir la requête <a href="{$infos.optima_url}" title="Se rendre sur Optima !">cliquez ici</a></p>
+
+{if $infos.fichier}
+	<p style="font-style:italic; color:red;">
+		Un fichier est joint à la requête hotline, si vous ne le voyez pas rendez-vous sur Optima pour le télécharger
+    </p>
+{/if}

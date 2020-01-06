@@ -1,0 +1,9 @@
+{foreach from=$smarty.session['commande'] key=key item=item}
+	<div id="total">
+		<span>
+            {ATF::$usr->trans($key)}
+        </span>
+        <input type="text" {if $key=='frais_de_port'} onchange="ATF.tpl2div('{$current_class->table},update_ligne.ajax','div=generic_ligne-total&key={$key}&index={$i@index}&value='+this.value+'&template={$current_class->table}-total&table={$table}');" {else} disabled="disabled" {/if} id="{$key}" name="{$key}"  value="{$item|string_format:"%.2f"} €" />
+	</div>
+    <div class="ClearRight"></div>
+{/foreach}

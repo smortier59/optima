@@ -1,0 +1,42 @@
+{**
+* Mail de nouvelle interaction au contact
+* @author Jérémie Gwiazdowski <jgw@absystech.fr>
+* @param array $infos les infos !
+*}
+<p>
+Titre Requête {$infos.ref} : {$infos.hotline}
+</p>
+
+<div style="font-size:15px; font-style:italic; font-weight:bold; margin-left:20px;">{$infos.interaction.detail}</div>
+
+<p>{ATF::user()->nom($infos.interaction.id_user)} est intervenu sur votre requête pendant <strong>{util::hoursToString(ATF::hotline_interaction()->getBillingTimeV2($infos.interaction.id_hotline_interaction))}</strong> pour un total de {ATF::hotline_interaction()->getCreditV2($infos.interaction.id_hotline_interaction)} crédit(s)</p>
+
+{if $infos.hotline_detail.etat =='wait'}
+<p><span style="color: #FF0000; font-weight:bold;">Cette interaction nécessite une reponse de votre part pour continuer le travail.</span></p>
+{/if}
+
+{if $infos.hotline_detail.wait_mep=="oui"}
+<p><span style="color: #FF0000; font-weight:bold;">Ce ticket est maintenant en attente de mise en production, vous serez informé lorsque celle ci sera effective.</span></p>
+{/if}
+
+<p>
+Pour information, la requête a nécessité au total <strong>{util::hoursToString(ATF::hotline()->getBillingTime($infos.hotline_detail.id_hotline))}</strong> de travail.
+</p>
+<p>
+{if $infos.hotline_detail.facturation_ticket=="oui"}
+Le temps passé sur cette requête est à <strong>votre</strong> charge.
+{else}
+Le temps passé sur cette requête est à <strong>notre</strong> charge.
+{/if}
+</p>
+<p>Vous pouvez consulter l'avancement de votre requête en <a href="{$infos.portail_hotline_url}">cliquant ici</a></p>
+
+<p>Cordialement,</p>
+
+<p style="margin-left:50px;">L'équipe 2T Management</p>
+
+{if $infos.fichier}
+	<p style="font-style:italic; color:red;">
+		Un fichier est joint au mail, si vous ne le voyez pas rendez-vous votre portail pour le télécharger !
+    </p>
+{/if}

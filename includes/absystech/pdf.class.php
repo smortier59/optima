@@ -74,7 +74,7 @@ class pdf_absystech extends pdf {
 		$this->SetXY(10,-10);
 		$this->setfont('arial','I',8);
 		$this->multicell(0,3,strtoupper($this->societe["societe"])." - ".$this->societe['structure'].($this->societe["capital"] ? " au capital de ".number_format($this->societe["capital"],2,',','.')." EUR" : NULL).($this->societe["siret"] ? " SIRET : ".$this->societe["siret"] : NULL),0,'C');
-		$this->multicell(0,3,"Siège social : ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".ATF::pays()->select($this->societe['id_pays'],"pays")." - ".$this->societe['email']." - Tél : ".$this->societe['tel'].($this->societe['fax'] ? " - Fax : ".$this->societe['fax'] : NULL),0,'C');
+		$this->multicell(0,3,"Siège social : ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".ATF::pays()->select($this->societe['id_pays'],"pays")." - ".$this->societe['email'].($this->societe['tel'] ? " - Tél : ".$this->societe['tel']." ": NULL).($this->societe['fax'] ? " - Fax : ".$this->societe['fax'] : NULL),0,'C');
 		if (!$this->noPageNo) {
 			$this->ln(-3);
 			$this->Cell(0,3,$this->noPageNo.'Page '.$this->PageNo(),0,0,'R');
@@ -97,9 +97,9 @@ class pdf_absystech extends pdf {
 	*/
 	public function hotline_echeancier($id){
 		$date_debut = ATF::_r("date_debut") ? ATF::_r("date_debut") : date('Y-m-01');
-		
+
 		$date_fin = ATF::_r("date_fin") ? ATF::_r("date_fin") : date("Y-m-d");
-				
+
 		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","N°")
 								  ->addField("hotline.hotline","Résumé")
 								  ->addField("gestion_ticket.date","Date")
@@ -995,11 +995,14 @@ class pdf_absystech extends pdf {
 			$this->setfont('arial','',10);
 			$this->ln(5);
 		} else {
-			$this->ln(20);
+			$this->ln(15);
 		}
 
 		$this->setfont('arial','U',10);
-		$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
+		$this->cell(100,5,"TERMES DE PAIEMENT",0,0);
+		$this->settextcolor('white');
+		$this->cell(0,5,"[Sceau/]",0,1);
+		$this->settextcolor('black');
 		$this->setfont('arial','',10);
 		$this->cell(0,5,ATF::termes()->nom($infos_affaire['id_termes']),0,1);
 		if($infos_devis["acompte"]){
@@ -1017,9 +1020,18 @@ class pdf_absystech extends pdf {
 		$this->setfont('arial','',10);
 		$this->cell(0,5,ATF::delai_de_realisation()->nom($infos_devis['id_delai_de_realisation']),0,1);
 
-		$this->cadre(20,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),array('txt'=>"\n\n\n\n\n\n\n\nLa signature vaut pour acceptation de nos conditions générales de vente", 'align'=>"C","size"=>6,'italic'=>true)),"Partie réservée au client");
+		$this->cadre(20,220,80,60,array(
+			array('txt'=>"Date / Cachet / Visa",'align'=>"C"),
+			array('txt'=>"[Signature/]",'align'=>"L","color"=>"white"),
+			array('txt'=>"\n\n\n\n\n\n\n\nLa signature vaut pour acceptation de nos conditions générales de vente", 'align'=>"C","size"=>6,'italic'=>true))
+		,"Partie réservée au client");
+
 		$this->setfont('arial','',10);
-		$this->cadre(110,220,80,60,array(array('txt'=>"Date / Cachet / Visa",'align'=>"C"),"","","","","",""),"Partie réservée à Absystech");
+		$this->cadre(110,220,80,60,array(
+			array('txt'=>"Date / Cachet / Visa",'align'=>"C"),
+			array('txt'=>"[SignatureFournisseur/]","color"=>"white"),
+			"","","","",""
+		),"Partie réservée à Absystech");
 
 
 		$this->pied($infos_societe);
@@ -1281,9 +1293,14 @@ class pdf_absystech extends pdf {
 		$this->setx(60);
 		$this->Cell(135,4,ATF::societe()->maSociete['email'],0,1,'R');
 		$this->setx(60);
-		$this->Cell(135,4,"Tel : ".ATF::societe()->maSociete['tel'],0,1,'R');
-		$this->setx(60);
-		$this->Cell(135,4,"Fax : ".ATF::societe()->maSociete['fax'],0,1,'R');
+		if(ATF::societe()->maSociete['tel']){
+			$this->Cell(135,4,"Tel : ".ATF::societe()->maSociete['tel'],0,1,'R');
+			$this->setx(60);
+		}
+
+		if(ATF::societe()->maSociete['fax']){
+			$this->Cell(135,4,"Fax : ".ATF::societe()->maSociete['fax'],0,1,'R');
+		}
 
 		$this->setfont('arial','B',11);
 		$this->cadre(75,30,60,5,NULL,"ORDRE DE MISSION",2,true);
@@ -2551,4 +2568,16 @@ class pdf_aewd extends pdf_absystech {
 	}
 }
 class pdf_wapp6 extends pdf_absystech { }
+class pdf_atoutcoms extends pdf_absystech {
+
+	//Couleur CLEODIS
+	public $Rentete = 251;
+	public $Gentete = 109;
+	public $Bentete = 43;
+
+	public $bgcolorTableau = "fb6d2b";
+	public $txtcolorTableau = "000000";
+
+
+}
 ?>
