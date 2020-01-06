@@ -1023,12 +1023,21 @@ class devis_cleodis extends devis {
 	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
+
 		if($this->select($id,"etat")=="attente"){
-			return true;
+			if(ATF::affaire()->select($this->select($id,"id_affaire"), "site_associe") == "boulangerpro"){
+				throw new errorATF("Il n'est pas possible de modifier ce devis car il s'agit d'un devis automatique. Vous pouvez l'annuler et en créer un autre. Merci",892);
+				return false;
+			}else{
+				return true;
+			}
 		}else{
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false;
 		}
+
+
+
 	}
 
 	/**
