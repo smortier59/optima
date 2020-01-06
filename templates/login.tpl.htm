@@ -31,17 +31,23 @@
                             <input tabindex="1" type="text" value="{$smarty.cookies.optima.societe|default:$smarty.get.societe}"{if $__c.optima.societe || $smarty.get.societe} class="invisible" onfocus="this.className='';"{/if} name="schema" id="schema" />
                         {/if}
                     </div>
+                    {if !$smarty.get.regenerate} <!-- Affiche la mire de connexion -->
                     <div style="width:150px;">Nom d'utilisateur :</div>
                     <div style="width:200px;"><input tabindex="2" type="text" value="{$smarty.cookies.l}" name="login" id="login" /></div>
                     <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
                     <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="go">Accéder à mon compte</button></div>
                     <div style="width:150px;">Mot de passe :</div>
                     <div><input tabindex="3" type="password" name="password" id="password" /></div>
-
-                    {if $smarty.get.recovery==sent}
+                    {else} <!-- Affiche la mire de changement de mdp -->
+                    <div style="width:150px;">Nouveau mdp :</div>
+                    <div style="width:200px;"><input tabindex="2" type="password" name="new_password" id="new_password"/></div>
+                    <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
+                    <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="generateNewPassword">Changer mot de passe</button></div>
+                    <div style="width:150px;">Confirmation :</div>
+                    <div><input tabindex="3" type="password" name="new_password_cnf" id="new_password_cnf"/></div>
+                    {/if}
+                    {if $smarty.get.recovery}
                         <div style="font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em; color:red">Un email vous a été envoyé avec votre nouveau mot de passe.</div>
-
-                    {else}
                         <div style="clear:both; font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em;"> <a href="javascript:;" id="recovery" onclick="$('.emailRecovery').show();">Mot de passe oublié</a></div>
                         <div class="emailRecovery" style="display:none; clear:both; width:150px;">Email</div>
                         <div class="emailRecovery" style="display:none"><input type="email" value="" name="email" id="email" /> <button type="button" id="goRecovery">Ok</button></div>
