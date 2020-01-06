@@ -546,7 +546,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			default:
-				$this->logo = 'cleodis/logo.jpg';
+				// $this->logo = 'cleodis/logo.jpg';
 				$this->cleodis = "CLEODIS";
 			break;
 		}
@@ -1770,7 +1770,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			default:
-				$this->logo = 'cleodis/logo.jpg';
+				// $this->logo = 'cleodis/logo.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
 			break;
 		}
@@ -2282,7 +2282,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			default:
-				$this->logo = 'cleodis/logo.jpg';
+				// $this->logo = 'cleodis/logo.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
 			break;
 		}
@@ -4453,7 +4453,7 @@ class pdf_cleodis extends pdf {
 		break;
 
 		default:
-			$this->logo = 'cleodis/logo.jpg';
+			// $this->logo = 'cleodis/logo.jpg';
 			$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
 		break;
 	}
@@ -13967,7 +13967,7 @@ class pdf_bdomplus extends pdf_cleodis {
 	*/
 	public function Header() {
 
-
+		die('fuck '.$this->logo);
 
 
 		$this->societe = ATF::societe()->select(31458);
