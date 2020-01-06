@@ -13967,9 +13967,6 @@ class pdf_bdomplus extends pdf_cleodis {
 	*/
 	public function Header() {
 
-		die('fuck '.$this->logo);
-
-
 		$this->societe = ATF::societe()->select(31458);
 
 		if($this->showFiligramme) $this->filigramme();
