@@ -3390,6 +3390,8 @@ class pdf_cleodis extends pdf {
 	*/
 	public function bon_de_commande($id,$s) {
 
+		$this->facturePDF = false;
+
 		$this->initBDC($id,$s,$previsu);
 		$this->unsetHeader();
 		$this->open();
@@ -13705,7 +13707,7 @@ class pdf_bdomplus extends pdf_cleodis {
 
 
 	public function Footer() {
-		if($this->facturePDF && !$this->envoiContrat && !$this->grille_client){
+		if(($this->facturePDF && $this->facture["prix"] > 0) && !$this->envoiContrat && !$this->grille_client){
 
 			$this->setfont('arial','B',9);
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
@@ -14099,10 +14101,15 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		$this->settextcolor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',20);
-		$this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+		if($this->facture["prix"] < 0){
+            $this->cell(0,7,"Votre avoir B'dom+",0, 1, 'C');
+        }else{
+            $this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+        }
 		$this->setfont('arial','I',11);
-		$this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C');
-		//$this->cell(0,7,"Ce présent document est une facture dont le règlement est en attente",0, 1, 'C');
+		if($this->facture["prix"] > 0){ 
+            $this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C'); 
+        }
 		$this->settextcolor(0,0,0);
 
 
