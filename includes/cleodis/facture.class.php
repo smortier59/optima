@@ -2831,26 +2831,7 @@ class facture_bdomplus extends facture_cleodis {
 
 							ATF::suivi()->insert($suivis);
 
-						}else{
-							//si le nouveau statut est différent de rejected, on crée une tâche à destination de Benjamin Tronquit "Changement de statut de la facture XXXX. Merci de vérifier".
-							//Ne pas créer de tache si la facture passe en processed
-							if($status["executionStatus"] !== "processed"){
-								$tache = array("tache"=>array(
-											   "id_societe"=> $this->select($vfacture["facture.id_facture"] , "id_societe"),
-		                                       "tache"=>"Changement de statut de la facture ".$this->select($vfacture["facture.id_facture"] , "ref").". Merci de vérifier",
-		                                       "id_affaire"=>$this->select($vfacture["facture.id_facture"] , "id_affaire"),
-		                                       "type_tache"=>"note",
-		                                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
-		                                       "no_redirect"=>"true"
-		                                     ),
-					                        "dest"=>array(116)
-		                    			);
-	        					$id_tache = ATF::tache()->insert($tache);
-							}
-
 						}
-
-
 					}
 
 
