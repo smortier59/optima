@@ -13617,7 +13617,7 @@ class pdf_bdomplus extends pdf_cleodis {
 				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				$this->image(__PDF_PATH__.$this->logo,15,5,30);		
 				$this->setLeftMargin(70);
 
 			}
@@ -13703,7 +13703,11 @@ class pdf_bdomplus extends pdf_cleodis {
 				$this->setLeftMargin(10);
 
 			}elseif($this->facturePDF){
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				if ($this->client['id_famille'] == 9) {
+					$this->image(__PDF_PATH__.$this->logo,85,5,30);
+				} else {
+					$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				}
 				$this->SetMargins(10,36);
 			}else{
 				$this->image(__PDF_PATH__.$this->logo,80,5,30);
