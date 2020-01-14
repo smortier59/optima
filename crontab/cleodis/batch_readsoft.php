@@ -19,14 +19,14 @@ log::logger("======= Début de la récuperation des fichiers via FTP", "readsoft
 
 
 // Mise en place d'une connexion basique
-$conn_id  = ftp_connect(__READSOFT_FTP_HOST__ );
+$conn_id  = ftp_connect(__READSOFT_FTP_HOST__,  __READSOFT_FTP_PORT__);
 // Identification avec un nom d'utilisateur et un mot de passe
 $login = ftp_login($conn_id ,__READSOFT_FTP_LOGIN__,__READSOFT_FTP_PASS__);
 $mode = ftp_pasv($conn_id, TRUE);
 
 // Ouverture du fichier pour écriture
 
-$remote_file = __READSOFT_FTP_FOLDER__.'/FG ACHATS';
+$remote_file = __READSOFT_FTP_FOLDER__."CLEODIS FG";
 
 if ((!$conn_id ) || (!$login)) {
 	log::logger('Echec de connection FTP sur '. __READSOFT_FTP_HOST__ . ' pour utilisateur '.__READSOFT_FTP_LOGIN__.'.', "readsoft");
@@ -36,13 +36,13 @@ if ((!$conn_id ) || (!$login)) {
 	log::logger("Lecture du repertoire ".$remote_file , "readsoft");
 	log::logger($fichiers_ftp_readsoft , "readsoft");
 
-	if (!in_array(__READSOFT_FTP_FOLDER__.'/move', ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
-		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."/move n'existe pas, on le crée", "readsoft");
-		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."/move");
+	if (!in_array(__READSOFT_FTP_FOLDER__.'move', ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
+		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."move n'existe pas, on le crée", "readsoft");
+		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."move");
 	}
-	if (!in_array(__READSOFT_FTP_FOLDER__.'/erreur', ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
-		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."/erreur n'existe pas, on le crée", "readsoft");
-		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."/erreur");
+	if (!in_array(__READSOFT_FTP_FOLDER__.'erreur', ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
+		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."erreur n'existe pas, on le crée", "readsoft");
+		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."erreur");
 	}
 
 
@@ -64,20 +64,20 @@ if ((!$conn_id ) || (!$login)) {
 				}
 
 				// Tentative de renommage de fichier sur le FTP
-				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."/move".str_replace($remote_file, "", $value))) {
-					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."/move".str_replace($remote_file, "", $value)." réussie", "readsoft");
+				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."move".str_replace($remote_file, "", $value))) {
+					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."move".str_replace($remote_file, "", $value)." réussie", "readsoft");
 				} else {
-					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."/move".str_replace($remote_file, "", $value), "readsoft");
+					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."move".str_replace($remote_file, "", $value), "readsoft");
 				}
 
 			} else {
 				// Tentative de renommage de $old_file en $new_file
-				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."/erreur".str_replace($remote_file, "", $value))) {
-					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."/erreur".str_replace($remote_file, "", $value)." réussie", "readsoft");
+				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value))) {
+					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value)." réussie", "readsoft");
 				} else {
-					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."/erreur".str_replace($remote_file, "", $value), "readsoft");
+					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value), "readsoft");
 				}
-				log::logger("Il y a un problème lors du téléchargement du fichier ".$value." vers ".__READSOFT_FTP_FOLDER__."/erreur".str_replace($remote_file, "", $value), "readsoft");
+				log::logger("Il y a un problème lors du téléchargement du fichier ".$value." vers ".__READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value), "readsoft");
 				$files_recup["error"] ++;
 
 			}
