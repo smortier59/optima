@@ -1,26 +1,48 @@
-"N°";"Nom";"Etat";"Site associé";"Visible sur le site";"Description"
-1;"Robot KITCHENAID 5KSM125EAC ARTISAN Crème";"actif";"boulangerpro";"Oui";"Le design Kitchenaid chez vous !"
-2;"Machine ILLY X1 Iperespresso Rouge";"actif";"boulangerpro";"Oui";"Machine ILLY X1 Iperespresso Rouge"
-3;"Robot KITCHENAID 5KSM185PSEPP Artisan vert sapin";"actif";"boulangerpro";"Oui";"Robot KITCHENAID 5KSM185PSEPP Artisan vert sapin"
-4;"Lave vaisselle 60cm BEKO AutoDose DEN48420WDOS";"actif";"boulangerpro";"Oui";"Lave vaisselle 60cm BEKO AutoDose DEN48420WDOS"
-5;"Vidéoprojecteur ACER X1323WHP";"actif";"boulangerpro";"Oui";"Vidéoprojecteur ACER X1323WHP"
-6;"Barbecue gaz CAMPINGAZ 4 SERIES Classic LXS";"actif";"boulangerpro";"Oui";"Barbecue gaz CAMPINGAZ 4 SERIES Classic LXS"
-7;"Cave à vin ELECTROLUX ERW0673AOA";"actif";"boulangerpro";"Oui";"Cave à vin ELECTROLUX ERW0673AOA"
-8;"Table cuisson induction KITCHENAID KHID465510";"actif";"boulangerpro";"Oui";"Table cuisson induction KITCHENAID KHID465510"
-9;"Portable HP X360 14-da0000nf";"actif";"boulangerpro";"Oui";"Portable HP X360 14-da0000nf"
-10;"Table cuisson induction KITCHENAID KHIP390400";"actif";"boulangerpro";"Oui";"Table cuisson induction KITCHENAID KHIP390400"
-11;"Ordinateur ACER Nitro N50-600-246";"actif";"boulangerpro";"Oui";"Ordinateur ACER Nitro N50-600-246"
-12;"Réfrigérateur 1 porte SMEG FAB10HRRD2";"actif";"boulangerpro";"Oui";"Réfrigérateur 1 porte SMEG FAB10HRRD2"
-13;"Réfrigérateur 1 porte SMEG FAB10HRDIT2";"actif";"boulangerpro";"Oui";"Réfrigérateur 1 porte SMEG FAB10HRDIT2"
-14;"Table cuisson induction SMEG SI1F7955B";"actif";"boulangerpro";"Oui";"Table cuisson induction SMEG SI1F7955B"
-15;"Réfrigérateur 1 porte SMEG FAB10HRPK2";"actif";"boulangerpro";"Oui";"Réfrigérateur 1 porte SMEG FAB10HRPK2"
-16;"Réfrigérateur 1 porte SMEG FAB10HLBL2";"actif";"boulangerpro";"Oui";"Réfrigérateur 1 porte SMEG FAB10HLBL2"
-17;"Ordinateur ACER Nitro N50-600-919";"actif";"boulangerpro";"Oui";"Ordinateur ACER Nitro N50-600-919"
-18;"Ordinateur ACER Predator PO3-600-700";"actif";"boulangerpro";"Oui";"Ordinateur ACER Predator PO3-600-700"
-19;"Micro-ondes encastrable SMEG SF4604MCNR";"actif";"boulangerpro";"Oui";"Micro-ondes encastrable SMEG SF4604MCNR"
-20;"Lave vaisselle 60cm SMEG LVFABPK";"actif";"boulangerpro";"Oui";"Lave vaisselle 60cm SMEG LVFABPK"
-21;"Ordinateur ACER Predator PO3-600-390";"actif";"boulangerpro";"Oui";"Ordinateur ACER Predator PO3-600-390"
-22;"Combiné SMEG FA490RAN";"actif";"boulangerpro";"Oui";"Combiné SMEG FA490RAN"
-23;"Barbecue WEBER SUMMIT E470 noir intense";"actif";"boulangerpro";"Oui";"Barbecue WEBER SUMMIT E470 noir intense"
-24;"Combiné SMEG FAB38RRD";"actif";"boulangerpro";"Oui";"Combiné SMEG FAB38RRD"
-25;"Ordinateur IMAC CTO 27 Retina 5K i5 3.1Ghz 8Go 1To+VESA";"actif";"boulangerpro";"Oui";"Ordinateur IMAC CTO 27 Retina 5K i5 3.1Ghz 8Go 1To+VESA"
+N°;Nom;Etat;Site associé;Visible sur le site;Description
+1;Micro-ondes encastrable BOSCH BEL524MS0;actif;boulangerpro;Oui;Micro-ondes encastrable BOSCH BEL524MS0
+2;Robot SMEG SMF03BLEU Noir;actif;boulangerpro;Oui;Robot SMEG SMF03BLEU Noir
+3;Enceinte colonne DAVIS MIA 60 dark ASH x1;actif;boulangerpro;Oui;Enceinte colonne DAVIS MIA 60 dark ASH x1
+4;Lave vaisselle tout-intégrable 60cm NEFF S713P60X3E;actif;boulangerpro;Oui;Lave vaisselle tout-intégrable 60cm NEFF S713P60X3E
+5;Barbecue WEBER SPIRIT ORIGINAL E-320 GBS Black-gaz nat;actif;boulangerpro;Oui;Barbecue WEBER SPIRIT ORIGINAL E-320 GBS Black-gaz nat
+6;Paire d'enceintes DEFINITIVE TECHNOLOG Demand D9 Blanche;actif;boulangerpro;Oui;Paire d'enceintes DEFINITIVE TECHNOLOG Demand D9 Blanche
+7;Paire d'enceintes DEFINITIVE TECHNOLOG Demand D11 Noire;actif;boulangerpro;Oui;Paire d'enceintes DEFINITIVE TECHNOLOG Demand D11 Noire
+8;Four combiné GAGGENAU BSP250110;actif;boulangerpro;Oui;Four combiné GAGGENAU BSP250110
+9;Ordinateur HP 32-a0014nf-937;actif;boulangerpro;Oui;Ordinateur HP 32-a0014nf-937
+10;Ordinateur HP 32-a0028nf-513;actif;boulangerpro;Oui;Ordinateur HP 32-a0028nf-513
+11;Ecran ASUS VG279QM;actif;boulangerpro;Oui;Ecran ASUS VG279QM
+12;Ecran ASUS VG289Q;actif;boulangerpro;Oui;Ecran ASUS VG289Q
+13;Micro-ondes encastrable WHIRLPOOL AMW 812 IX;actif;boulangerpro;Oui;Micro-ondes encastrable WHIRLPOOL AMW 812 IX
+14;Table cuisson induction HOTPOINT HS 5160C NE;actif;boulangerpro;Oui;Table cuisson induction HOTPOINT HS 5160C NE
+15;Ecran DELL S2719DGF;actif;boulangerpro;Oui;Ecran DELL S2719DGF
+16;Hotte décorative SAMSUNG NK36M7070VB;actif;boulangerpro;Oui;Hotte décorative SAMSUNG NK36M7070VB
+17;Ecran DELL S2719DC;actif;boulangerpro;Oui;Ecran DELL S2719DC
+18;Lave vaisselle tout-intégrable 60cm DE DIETRICH DV91538J;actif;boulangerpro;Oui;Lave vaisselle tout-intégrable 60cm DE DIETRICH DV91538J
+19;Lave vaisselle tout-intégrable 60cm DE DIETRICH DV91538X;actif;boulangerpro;Oui;Lave vaisselle tout-intégrable 60cm DE DIETRICH DV91538X
+20;Ecran DELL S3220DGF;actif;boulangerpro;Oui;Ecran DELL S3220DGF
+21;Ecran DELL AW2720HF;actif;boulangerpro;Oui;Ecran DELL AW2720HF
+22;Lave linge hublot SMEG WHT814EIN;actif;boulangerpro;Oui;Lave linge hublot SMEG WHT814EIN
+23;Ecran DELL AW2518H;actif;boulangerpro;Oui;Ecran DELL AW2518H
+24;Hotte décorative FALCON 90 PLUS NOIR LAITON;actif;boulangerpro;Oui;Hotte décorative FALCON 90 PLUS NOIR LAITON
+25;Ecran ASUS CG32UQ;actif;boulangerpro;Oui;Ecran ASUS CG32UQ
+26;Bridge NIKON P950;actif;boulangerpro;Oui;Bridge NIKON P950
+27;Portable ACER Swift SF314-57-74J9 Gris;actif;boulangerpro;Oui;Portable ACER Swift SF314-57-74J9 Gris
+28;Portable ACER Swift SF314-57-71F6 Rose;actif;boulangerpro;Oui;Portable ACER Swift SF314-57-71F6 Rose
+29;Ordinateur HP 27-dp0009nf;actif;boulangerpro;Oui;Ordinateur HP 27-dp0009nf
+30;Ecran ASUS XG43VQ;actif;boulangerpro;Oui;Ecran ASUS XG43VQ
+31;Ordinateur ASUS GL10DH-FR044T;actif;boulangerpro;Oui;Ordinateur ASUS GL10DH-FR044T
+32;Cuisinière SMEG C7GPX9;actif;boulangerpro;Oui;Cuisinière SMEG C7GPX9
+33;Vidéoprojecteur ACER PL1520i;actif;boulangerpro;Oui;Vidéoprojecteur ACER PL1520i
+34;Ecran DELL AW3420DW;actif;boulangerpro;Oui;Ecran DELL AW3420DW
+35;Portable LENOVO Yoga C740-15IML-453;actif;boulangerpro;Oui;Portable LENOVO Yoga C740-15IML-453
+36;Ordinateur HP Pavilion Gaming TE01-0038nf;actif;boulangerpro;Oui;Ordinateur HP Pavilion Gaming TE01-0038nf
+37;Ordinateur ASUS GL10DH-FR017T;actif;boulangerpro;Oui;Ordinateur ASUS GL10DH-FR017T
+38;Ordinateur HP 875-0301nf;actif;boulangerpro;Oui;Ordinateur HP 875-0301nf
+39;Ordinateur ASUS G15DH-FR037T;actif;boulangerpro;Oui;Ordinateur ASUS G15DH-FR037T
+40;Ordinateur ASUS GL10CS-FR380T;actif;boulangerpro;Oui;Ordinateur ASUS GL10CS-FR380T
+41;Cuisinière DELONGHI DLMCV965TAX;actif;boulangerpro;Oui;Cuisinière DELONGHI DLMCV965TAX
+42;Ordinateur ACER Predator Orion 5000 PO5-605s;actif;boulangerpro;Oui;Ordinateur ACER Predator Orion 5000 PO5-605s
+43;Ordinateur ASUS ROG G35DX;actif;boulangerpro;Oui;Ordinateur ASUS ROG G35DX
+44;Ordinateur IMAC CTO 27 Retina 5K i9 16Go 1To SSD Rad580X;actif;boulangerpro;Oui;Ordinateur IMAC CTO 27 Retina 5K i9 16Go 1To SSD Rad580X
+45;Ecran DELL AW5520QF;actif;boulangerpro;Oui;Ecran DELL AW5520QF
+46;Ordinateur ACER Predator PO9-600_RGB;actif;boulangerpro;Oui;Ordinateur ACER Predator PO9-600_RGB
+47;Ordinateur IMAC CTO 27'' Retina 5K i9 3.6 16Go 2To SSD;actif;boulangerpro;Oui;Ordinateur IMAC CTO 27'' Retina 5K i9 3.6 16Go 2To SSD
