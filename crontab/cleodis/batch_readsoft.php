@@ -26,7 +26,7 @@ $mode = ftp_pasv($conn_id, TRUE);
 
 // Ouverture du fichier pour écriture
 
-$remote_file = __READSOFT_FTP_FOLDER__."CLEODIS FG";
+$remote_file = __READSOFT_FTP_FOLDER__."CLEODIS ACHAT";
 
 if ((!$conn_id ) || (!$login)) {
 	log::logger('Echec de connection FTP sur '. __READSOFT_FTP_HOST__ . ' pour utilisateur '.__READSOFT_FTP_LOGIN__.'.', "readsoft");
