@@ -1377,12 +1377,24 @@ class commande_cleodis extends commande {
 			} else {
 				$return['data'][$k]['prolongationAllow'] = false;
 			}
-			//Check l'existence de création de BDC
-			if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
-				$return['data'][$k]['bdcExist'] = true;
-			} else {
-				$return['data'][$k]['bdcExist'] = false;
+
+			//Check l'existence d'un comité accepte
+			if(ATF::affaire()->comiteAccepte($i["commande.id_affaire_fk"])){
+				$return['data'][$k]['allowBDCCreate'] = true;
+
+				//Check l'existence de création de BDC
+				if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
+					$return['data'][$k]['bdcExist'] = true;
+				} else {
+					$return['data'][$k]['bdcExist'] = false;
+				}
+
+			}else{
+				$return['data'][$k]['allowBDCCreate'] = false;
 			}
+
+
+
 			//Check l'existence de création de demande refi
 			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false) || $affaire['nature']=="vente") {
 				$return['data'][$k]['demandeRefiExist'] = true;
