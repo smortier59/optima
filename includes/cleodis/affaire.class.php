@@ -2418,6 +2418,7 @@ class affaire_cleodis extends affaire {
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
+			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
 			// une fois l'id affaire connue on peut ajouter le devis
@@ -2791,18 +2792,21 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		$dest = array("21","112", "103");  //Allison, Severine, Emily
+		$dest = array("18", "21","112", "103");  //Pierre, Allison, Severine, Emily
 		$id_user = 116; //Benjamin Tronquit
 
 		if(ATF::$codename === "cleodisbe"){
-			$dest = array("21", "104");  //Allison, Severine
+			$dest = array("18", "21", "104");  //Pierre, Allison, Severine
 			$id_user = 113;  //Benjamin Tronquit
 		}
+
+		$affaire = ATF::affaire()->select($id_affaire);
+		$societe = ATF::societe()->select($affaire["id_societe"]);
 
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter ",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." provenant de ".$affaire["provenance"]." du site ".$affaire["site_associe"].". \nDonnées de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
