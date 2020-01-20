@@ -407,6 +407,11 @@ class commande_cleodis extends commande {
 		ATF::db($this->db)->begin_transaction();
 
 		//*****************************Transaction********************************
+		if((ATF::affaire()->select($devis["id_affaire"], "site_associe") || ATF::affaire()->select($devis["id_affaire"], "provenance")) && ATF::affaire()->select($devis["id_affaire"], "provenance") != "partenaire"){
+			//On ne crée pas la tache pour les affaires du portail partenaire, car elle est crée lors de la création de l'affaire
+			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
+		}
+
 
 		if(ATF::$codename != "bdomplus"){
 			$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],

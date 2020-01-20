@@ -63,6 +63,11 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
 
         $devis = array();
 
+        if($soc){
+            $devis["IBAN"] =$soc["IBAN"];
+            $devis["BIC"] = $soc["BIC"];
+        }
+
         foreach ($panier as $key => $value) {
             $devis[$value["duree"]][]=$value;
             $devis[$value["duree"]]["loyer"]= $devis[$value["duree"]]["loyer"] + ($value["loyer"]*$value["quantite"]);
