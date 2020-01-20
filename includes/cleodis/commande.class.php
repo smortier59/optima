@@ -1379,7 +1379,7 @@ class commande_cleodis extends commande {
 			}
 
 			//Check l'existence d'un comité accepte
-			if(ATF::affaire()->comiteAccepte($i["commande.id_affaire"])){
+			if(ATF::affaire()->comiteAccepte($i["commande.id_affaire_fk"])){
 				$return['data'][$k]['allowBDCCreate'] = true;
 
 				//Check l'existence de création de BDC
