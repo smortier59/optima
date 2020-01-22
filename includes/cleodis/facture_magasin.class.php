@@ -35,26 +35,27 @@ class facture_magasin extends classes_optima {
 				log::logger("--------------------------------------------", $logfile);
 				log::logger("Traitement de la facture ".strtoupper($ref)." trouvée dans la table facture_magasin_recu (fichier envoyé par Boulanger et importé sur Optima)", $logfile);
 
-				$this->q->reset()->where("ref_facture", strtoupper($ref));
+				$this->q->reset()->where("ref_facture", strtoupper($ref),"AND")
+								 ->where("etat", "non_recu");
 				$facture_magasins = $this->select_all();
 				if(!empty($facture_magasins)){
-					foreach ($facture_magasins as $key => $facture_magasin) {
+					$facture_magasin = $facture_magasins[0];
 
-						log::logger("-- Reference de facture_magasin trouvée chez nous facture : ".$facture_magasin["ref_facture"], $logfile);
+					log::logger("-- Reference de facture_magasin trouvée chez nous facture : ".$facture_magasin["ref_facture"], $logfile);
 
-						$this->u(array("id_facture_magasin" => $facture_magasin["id_facture_magasin"], "etat"=> "paye"));
-						log::logger("-- Mise à jour de l'état de la facture_magasin en payée", $logfile);
-						ATF::facture_magasin_recu()->u(array("id_facture_magasin_recu"=> $value["id_facture_magasin_recu"], "statut"=> "traitee"));
-						log::logger("-- Passage du statut de la facture magasin recu en traitée", $logfile);
+					$this->u(array("id_facture_magasin" => $facture_magasin["id_facture_magasin"], "etat"=> "paye"));
+					log::logger("-- Mise à jour de l'état de la facture_magasin en payée", $logfile);
+					ATF::facture_magasin_recu()->u(array("id_facture_magasin_recu"=> $value["id_facture_magasin_recu"], "statut"=> "traitee"));
+					log::logger("-- Passage du statut de la facture magasin recu en traitée", $logfile);
 
 
-						ATF::facture()->q->reset()->where("facture.id_affaire", $facture_magasin["id_affaire"])->addOrder("facture.id_facture", "ASC");
-						$facture = ATF::facture()->select_row();
-						if($facture){
-							ATF::facture()->u(array("id_facture"=> $facture["facture.id_facture"], "ref_magasin"=> strtoupper($facture_magasin["ref_facture"])));
-							log::logger("-- Mise à jour de la ref magasin sur la facture client (facture) ".strtoupper($facture_magasin["ref_facture"])."de la facture sur la facture ref ".$facture["ref_facture"], $logfile);
-						}
+					ATF::facture()->q->reset()->where("facture.id_affaire", $facture_magasin["id_affaire"])->addOrder("facture.id_facture", "ASC");
+					$facture = ATF::facture()->select_row();
+					if($facture){
+						ATF::facture()->u(array("id_facture"=> $facture["facture.id_facture"], "ref_magasin"=> strtoupper($facture_magasin["ref_facture"])));
+						log::logger("-- Mise à jour de la ref magasin sur la facture client (facture) ".strtoupper($facture_magasin["ref_facture"])."de la facture sur la facture ref ".$facture["ref_facture"], $logfile);
 					}
+
 				}else{
 					log::logger("Pas de correspondance de facture vendeur (table facture_magasin) pour la ref ".strtoupper($ref), $logfile);
 				}
@@ -63,9 +64,5 @@ class facture_magasin extends classes_optima {
 			throw new errorATF("probleme dans check_statut_facture",856);
 
 		}
-
-
-
-
     }
 };
