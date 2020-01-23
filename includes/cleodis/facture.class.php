@@ -2806,6 +2806,7 @@ class facture_bdomplus extends facture_cleodis {
 
 					log::logger("Count ".(count($transaction)-1), "mfleurquin");
 					log::logger($state , "mfleurquin");
+					log::logger($transaction , "mfleurquin");
 
 					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
 					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
