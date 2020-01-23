@@ -2816,7 +2816,7 @@ class facture_bdomplus extends facture_cleodis {
 													  ));
 
 						//Si le statut de la transaction est rejected, il faut allez rechercher la Transaction rejouée
-						if($state["executionStatus"] === "rejected") {
+						if($state["executionStatus"] == "rejected") {
 							//un suivi sans destinataire "Facture xxxx impayée"
 							$suivis = array("suivi"=> array(
 													"id_societe" => $this->select($vfacture["facture.id_facture"] , "id_societe"),
@@ -2831,6 +2831,8 @@ class facture_bdomplus extends facture_cleodis {
 											);
 
 							ATF::suivi()->insert($suivis);
+
+							ATF::facture()->u(array('id_facture'=> $vfacture["facture.id_facture"], "etat"=>"impayee"));
 
 						}
 					}
