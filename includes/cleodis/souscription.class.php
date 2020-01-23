@@ -1223,7 +1223,43 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function demarrageContrat($affaire,$commande){
+
+   ATF::constante()->q->reset()->where("constante" ,"__MAX_SOUSCRIPTION__");
+   $max_souscription = ATF::constante()->select_row();
+   $max_souscription = $max_souscription["valeur"];
+
      if($affaire["commande.etat"] == "non_loyer"){
+        //Limite appliquée seulement pour les souscriptions web et non pas magasin
+        if($max_souscription && !$affaire["affaire.id_magasin"]){
+          ATF::affaire()->q->reset()->where("affaire.etat", "facture", "AND")
+                                  ->where("affaire.site_associe", "bdomplus")
+                                  ->where("affaire.date", date("Y-m-d"))
+                                  ->whereIsNull("affaire.id_magasin");
+          $total_affaire = count(ATF::affaire()->select_all());
+
+          if($total_affaire > $max_souscription){
+            //On crée une tache pour alerter qu'on a pas démarré le contrat car  suspicion de fraude
+
+
+
+            $tache = array("tache"=>array("id_societe"=> $affaire["affaire.id_societe_fk"],
+                     "id_user"=>$this->id_user,
+                     "origine"=>"societe_commande",
+                     "tache"=>"Nous n'avons pas démarré ce contrat car suspicion de fraude. ".$total_affaire."/".$max_souscription." (Nombre d'affaire web du jour/max d'affaire autorisée)",
+                     "id_affaire"=>$affaire["affaire.id_affaire_fk"]  ,
+                     "type_tache"=>"creation_contrat",
+                     "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+                     "no_redirect"=>"true"
+                    ),
+                    "dest"=>$this->id_user
+            );
+            $id_tache = ATF::tache()->insert($tache);
+
+            throw new errorATF("Nombre d'affaire web max atteint");
+          }
+        }
+
+
         ATF::db($this->db)->begin_transaction();
 
         try{
