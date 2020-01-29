@@ -184,7 +184,7 @@ class affaire_cleodis extends affaire {
 
 	public function comiteAccepte($id_affaire){
 
-		ATF::comite()->q->reset()->where("id_affaire", $id_affaire)->where("etat","accepte")->setCount();
+		ATF::comite()->q->reset()->where("id_affaire",ATF::affaire()->decryptId($id_affaire))->where("etat","accepte")->setCount();
 		$data = ATF::comite()->sa();
 		if($data["count"]){
 			return true;
@@ -3237,7 +3237,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	// 	$affaire=parent::select($id,$field);
 	// 	// $affaire['licence'] = [];
 	// 	log::logger($id, "qjanon");
-		
+
 	// 	ATF::commande()->q->reset()->where('commande.id_affaire', $id)->setStrict();
 	// 	$commande = ATF::commande()->select_row();
 	// 	log::logger($commande,'qjanon');
@@ -3247,7 +3247,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	// 	if (!$commande_lignes) return $affaire;
 	// 	foreach ($commande_lignes as $k=>$cmdl) {
 	// 		$licence = ATF::licence()->ss("licence.id_commande_ligne", $cmdl['id_commande_ligne']);
-	// 		if ($licence) { 
+	// 		if ($licence) {
 	// 			$affaire['affaire.licence'] = $licence[0]['licence.licence'].", ";
 	// 		}
 	// 	}
