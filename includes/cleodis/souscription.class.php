@@ -1237,15 +1237,18 @@ class souscription_bdomplus extends souscription_cleodis {
                                   ->whereIsNull("affaire.id_magasin");
           $total_affaire = count(ATF::affaire()->select_all());
 
+          log::logger("######## CHECK BLOCAGE  ########" , "souscription");
+          log::logger("Nombre d'affaire du jour ".$total_affaire , "souscription");
+          log::logger("Nombre d'affaire du jour ".$max_souscription , "souscription");
+          log::logger("########                ########" , "souscription");
+
           if($total_affaire > $max_souscription){
             //On crée une tache pour alerter qu'on a pas démarré le contrat car  suspicion de fraude
-
-
 
             $tache = array("tache"=>array("id_societe"=> $affaire["affaire.id_societe_fk"],
                      "id_user"=>$this->id_user,
                      "origine"=>"societe_commande",
-                     "tache"=>"Nous n'avons pas démarré ce contrat car suspicion de fraude. ".$total_affaire."/".$max_souscription." (Nombre d'affaire web du jour/max d'affaire autorisée)",
+                     "tache"=>"Nous n'avons pas démarré ce contrat car le nombre de contrats souscris sur Internet dépasse le nombre de dossiers autorisés aujourd'hui sur le web (".$total_affaire."/".$max_souscription.")",
                      "id_affaire"=>$affaire["affaire.id_affaire_fk"]  ,
                      "type_tache"=>"creation_contrat",
                      "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
