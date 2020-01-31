@@ -1238,11 +1238,11 @@ class souscription_bdomplus extends souscription_cleodis {
           $total_affaire = count(ATF::affaire()->select_all());
 
           log::logger("######## CHECK BLOCAGE  ########" , "souscription");
-          log::logger("Nombre d'affaire du jour ".$total_affaire , "souscription");
-          log::logger("Nombre d'affaire du jour ".$max_souscription , "souscription");
+          log::logger("Nombre d'affaire déja démarrée ce jour ".$total_affaire , "souscription");
+          log::logger("Nombre d'affaire max à démarrer ".$max_souscription , "souscription");
           log::logger("########                ########" , "souscription");
 
-          if($total_affaire > $max_souscription){
+          if($total_affaire >= $max_souscription){
             //On crée une tache pour alerter qu'on a pas démarré le contrat car  suspicion de fraude
 
             $tache = array("tache"=>array("id_societe"=> $affaire["affaire.id_societe_fk"],
