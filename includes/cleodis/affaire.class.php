@@ -2796,7 +2796,7 @@ class affaire_cleodis extends affaire {
 		$id_user = 116; //Benjamin Tronquit
 
 		if(ATF::$codename === "cleodisbe"){
-			$dest = array("18", "21", "104","124");  //Pierre, Allison, Severine,  Jeanne
+			$dest = array("18", "21", "104");  //Pierre, Allison, Severine,  Jeanne
 			$id_user = 113;  //Benjamin Tronquit
 		}
 
