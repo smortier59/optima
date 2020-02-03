@@ -7,10 +7,12 @@
 
 {if ATF::$codename == 'bdomplus'}
 	<p>
-		<span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> 
+		<span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span>
 		{ATF::societe()->select($infos.donnees.id_societe, ref)} - {ATF::societe()->select($infos.donnees.id_societe, code_client)}
 	</p>
 	{if $infos.donnees.id_affaire}<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->select($infos.donnees.id_affaire, ref)}</p>{/if}
+
+	{if $infos.donnees.tache}<p><span style="font-weight:bold;">{ATF::$usr->trans('tache','tache')}</span> : {$infos.donnees.tache}</p>{/if}
 
 {else}
 	<p><span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->select($infos.donnees.id_societe, ref)} - {ATF::societe()->nom($infos.donnees.id_societe)}</p>
