@@ -1071,12 +1071,6 @@ class facture_cleodis extends facture {
 
 		if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")){
 			$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
-			if($infos["key"] == "date_rejet"){
-				if(ATF::facture()->select($infos["id_facture"], "date_rejet") != NULL){
-					throw new errorATF("Impossible de modifier une date de rejet car elle est déja renseignée",877);
-					return true;
-				}
-			}
 
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
