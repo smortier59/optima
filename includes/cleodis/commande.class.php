@@ -969,9 +969,12 @@ class commande_cleodis extends commande {
 							,'suivi_notifie'=>$notifie
 						);
 						ATF::suivi()->insert($suivi);
+					}else{
+						$this->checkEtat($commande);
 					}
 				}else{
-					throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
+					//throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
+					$this->checkEtat($commande);
 				}
 				//}
 			break;
