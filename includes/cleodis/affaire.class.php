@@ -23,10 +23,11 @@ class affaire_cleodis extends affaire {
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,'affaire.mail_signature'
 			,'affaire.mail_document'
-			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
-			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
-			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
-			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
+			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile")
+			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile")
+			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile")
+			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile")
+			,'facture_fournisseur'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile")
 			,'validateOrder'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"validateOrderRenderer")
 
 
