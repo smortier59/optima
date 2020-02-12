@@ -13583,6 +13583,8 @@ class pdf_bdomplus extends pdf_cleodis {
 	public $Gentete = 20;
 	public $Bentete = 93;
 
+	public $id_societe = 31458;
+
 	public $bgcolorTableau = "16145d";
 	public $txtcolorTableau = "ffffff";
 
@@ -13731,9 +13733,9 @@ class pdf_bdomplus extends pdf_cleodis {
 	}
 
 	public function contratA4Particulier($id, $signature,$sellsign) {
+		$this->societe = ATF::societe()->select($this->id_societe);
 
 		$this->image(__PDF_PATH__."/bdomplus/logo.jpg",10,10,40);
-
 
 		$this->sety(10);
 		$this->multicell(0,5,"LA SOCIETE",0,'C');
