@@ -37,7 +37,6 @@ class souscription_cleodis extends souscription {
     $email = $post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
-
     switch ($post['site_associe']) {
       case 'boulangerpro':
         ATF::societe()->q->reset()->where("siret", "45122067700087");
@@ -64,6 +63,18 @@ class souscription_cleodis extends souscription {
 
     if(!$post["no_iban"]){
       $this->checkIBAN($post['iban']);
+    }
+
+
+    try {
+
+      if($post["particulier_email"]){
+        mail::check_mail($post["particulier_email"]);
+      }else{
+        mail::check_mail($post["email"]);
+      }
+    } catch (errorATF $e) {
+      throw new errorATF("Invalid domaine",500);
     }
 
 
@@ -561,6 +572,9 @@ class souscription_cleodis extends souscription {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
 
+
+
+
     if (!$post['type']) {
       throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
     }
@@ -570,6 +584,8 @@ class souscription_cleodis extends souscription {
     }
 
     $societe = ATF::societe()->select($id_societe);
+
+
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
     // Gestion de la reference société
     $refSociete = $societe['ref'];
