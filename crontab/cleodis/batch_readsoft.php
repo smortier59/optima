@@ -36,13 +36,13 @@ if ((!$conn_id ) || (!$login)) {
 	log::logger("Lecture du repertoire ".$remote_file , "readsoft");
 	log::logger($fichiers_ftp_readsoft , "readsoft");
 
-	if (!in_array(__READSOFT_FTP_FOLDER__.'move', ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
-		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."move n'existe pas, on le crée", "readsoft");
-		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."move");
+	if (!in_array(__READSOFT_FTP_FOLDER__.'move/'.date("Y-m-d"), ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
+		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."move/".date("Y-m-d")." n'existe pas, on le crée", "readsoft");
+		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."move/".date("Y-m-d"));
 	}
-	if (!in_array(__READSOFT_FTP_FOLDER__.'erreur', ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
-		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."erreur n'existe pas, on le crée", "readsoft");
-		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."erreur");
+	if (!in_array(__READSOFT_FTP_FOLDER__.'erreur/'.date("Y-m-d"), ftp_nlist($conn_id, __READSOFT_FTP_FOLDER__)) ) {
+		log::logger('Le dossier '.__READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d")." n'existe pas, on le crée", "readsoft");
+		ftp_mkdir($conn_id, __READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d"));
 	}
 
 
@@ -53,7 +53,7 @@ if ((!$conn_id ) || (!$login)) {
 
 			$handle = fopen($dir."pending".str_replace($remote_file, "", $value), 'w');
 			// Tente de téléchargement le fichier $remote_file et de le sauvegarder dans repertoire local
-			if (ftp_fget($conn_id, $handle, $value, FTP_ASCII, 0)) {
+			if (ftp_fget($conn_id, $handle, $value, FTP_BINARY, 0)) {
 				log::logger("Copie du fichier vers ".$dir."pending".str_replace($remote_file, "", $value)." réussie", "readsoft");
 				if( preg_match('/(\w*)\.(xml|XML)/', $value)){
 					$files_recup["xml"] ++;
@@ -64,20 +64,20 @@ if ((!$conn_id ) || (!$login)) {
 				}
 
 				// Tentative de renommage de fichier sur le FTP
-				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."move".str_replace($remote_file, "", $value))) {
-					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."move".str_replace($remote_file, "", $value)." réussie", "readsoft");
+				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."move/".date("Y-m-d").str_replace($remote_file, "", $value))) {
+					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."move/".date("Y-m-d").str_replace($remote_file, "", $value)." réussie", "readsoft");
 				} else {
-					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."move".str_replace($remote_file, "", $value), "readsoft");
+					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."move/".date("Y-m-d").str_replace($remote_file, "", $value), "readsoft");
 				}
 
 			} else {
 				// Tentative de renommage de $old_file en $new_file
-				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value))) {
-					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value)." réussie", "readsoft");
+				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d").str_replace($remote_file, "", $value))) {
+					log::logger("Copie du fichier sur FTP vers ".__READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d").str_replace($remote_file, "", $value)." réussie", "readsoft");
 				} else {
-					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value), "readsoft");
+					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d").str_replace($remote_file, "", $value), "readsoft");
 				}
-				log::logger("Il y a un problème lors du téléchargement du fichier ".$value." vers ".__READSOFT_FTP_FOLDER__."erreur".str_replace($remote_file, "", $value), "readsoft");
+				log::logger("Il y a un problème lors du téléchargement du fichier ".$value." vers ".__READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d").str_replace($remote_file, "", $value), "readsoft");
 				$files_recup["error"] ++;
 
 			}
@@ -111,6 +111,9 @@ log::logger("======= Analyse du dossier pending ".$dir."pending/", "readsoft");
 
 $files = scandir($dir."pending/");
 
+
+mkdir($dir."treated/".date("Y-m-d"));
+mkdir($dir."error/".date("Y-m-d"));
 
 log::logger("======= Analyse des fichiers", "readsoft");
 log::logger("== ".count($files)." fichiers présent dans pending", "readsoft");
@@ -217,7 +220,7 @@ if(!empty($files)){
 
 								log::logger("Facture fournisseur créée ".$di_ff , $id_doc.".log");
 
-								$dir_to = "treated";
+								$dir_to = "treated/".date("Y-m-d");
 
 								log::logger('Création du ZIP', $id_doc.".log");
 								$zip = new ZipArchive();
@@ -239,19 +242,19 @@ if(!empty($files)){
 
 								log::logger($e->getmessage(), $id_doc.".log");
 								log::logger($infos, $id_doc.".log");
-								$dir_to = "error";
+								$dir_to = "error/".date("Y-m-d");
 								$report[$dir_to] += 1;
 							}
 
 						}else{
 							log::logger("Facture fournisseur déja existante pour ref ".$header["invoicenumber"]." - ID Affaire ".$cm["id_affaire"]." - BDC ".$kcf ,$id_doc.".log");
-							$dir_to = "error";
+							$dir_to = "error/".date("Y-m-d");
 							$report["ff_deja_present"] += 1;
 						}
 					}else{
 						$report["bdc_nofind"] += 1;
 						log::logger("Bon de commande non trouvé pour ref ".$kcf,$id_doc.".log");
-						$dir_to = "error";
+						$dir_to = "error/".date("Y-m-d");
 					}
 					$report[$dir_to] += 1;
 					$files_to_move[$dir_to][$id_doc] = true;
@@ -260,7 +263,7 @@ if(!empty($files)){
 				log::logger("Pas de commande fournisseur concernée",$id_doc.".log");
 				log::logger($lines,$id_doc.".log");
 				log::logger("Pas de commande fournisseur concernée ".$id_doc, "readsoft");
-				$dir_to = "error";
+				$dir_to = "error/".date("Y-m-d");
 				$report[$dir_to] += 1;
 				$files_to_move[$dir_to][$id_doc] = true;
 			}
