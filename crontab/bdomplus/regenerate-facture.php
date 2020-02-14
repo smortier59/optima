@@ -11,9 +11,9 @@ log::logger("================DEBUT DE BATCH================", $logFile);
 ATF::facture()->q->reset();
 // ATF::facture()->where("date", "2019-12-01", "AND", null, "<");
 // Uniquement les avoirs
-ATF::facture()->where("prix", "0", "AND", null, "<");
+ATF::facture()->q->where("prix", "0", "AND", null, "<");
 // Facture avec un taux de TVA a 1
-ATF::facture()->where("tva", "1.000");
+ATF::facture()->q->where("tva", "1.000");
 ATF::facture()->q->setToString();
 log::logger(ATF::facture()->sa(), $logFile);
 ATF::facture()->q->unsetToString();
