@@ -32,14 +32,14 @@ foreach ($factures as $facture) {
 	if (file_exists($path)) {
 		log::logger("====== -------> ALREADY EXIST ", $logFile);
 		log::logger("copy ".$path." into ".$path."_copy", $logFile);
-		// $r = util::rename($path, $path."_copy");
+		$r = util::rename($path, $path."_copy");
 		log::logger("result ".$r, $logFile);
 	} else {
 		log::logger("====== -------> DON'T EXIST ", $logFile);
 	}
 	log::logger("====== MOVE FILES ", $logFile);
-	// $data = ATF::pdf()->generic("facture",$facture["id_facture"],true,$s,false);
-	// ATF::facture()->store($s,$facture["id_facture"],"fichier_joint",$data,false);
+	$data = ATF::pdf()->generic("facture",$facture["id_facture"],true,$s,false);
+	ATF::facture()->store($s,$facture["id_facture"],"fichier_joint",$data,false);
 	
 }
 
