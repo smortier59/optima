@@ -19,9 +19,14 @@ log::logger(ATF::facture()->sa(), $logFile);
 ATF::facture()->q->unsetToString();
 $factures = ATF::facture()->sa();
 
+log::logger("====== Nombre de factures à traiter : ".count($factures), $logFile);
+
 foreach ($factures as $facture) {
 	log::logger("====== Facture REF ".$facture['ref']." en cours de traitement", $logFile);
-	
+	if ($facture['prix'] <= 0) log::logger("====== Facture AVOIR, montant négatif", $logFile);
+	if ($facture['tva'] == '1.000') log::logger("====== Facture avec taux de TVA à 1", $logFile);
+
+
 	$path = ATF::facture()->filepath($facture["id_facture"],"fichier_joint");
 	log::logger("====== PATH ".$path, $logFile);
 	if (file_exists($path)) {
