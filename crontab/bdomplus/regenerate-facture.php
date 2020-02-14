@@ -5,10 +5,15 @@ include(dirname(__FILE__)."/../../global.inc.php");
 
 echo "Include global : ".dirname(__FILE__)."/../../global.inc.php \n";
 
-$logFile = "bdomplus-regenerate-facture";
+$logFile = "bdomplus-regenerate-facture-2002-003";
 
 log::logger("================DEBUT DE BATCH================", $logFile);
-ATF::facture()->q->reset()->where("date", "2019-12-01", "AND", null, "<");
+ATF::facture()->q->reset();
+// ATF::facture()->where("date", "2019-12-01", "AND", null, "<");
+// Uniquement les avoirs
+ATF::facture()->where("prix", "0", "AND", null, "<");
+// Facture avec un taux de TVA a 1
+ATF::facture()->where("tva", "1.000");
 ATF::facture()->q->setToString();
 log::logger(ATF::facture()->sa(), $logFile);
 ATF::facture()->q->unsetToString();
@@ -22,14 +27,14 @@ foreach ($factures as $facture) {
 	if (file_exists($path)) {
 		log::logger("====== -------> ALREADY EXIST ", $logFile);
 		log::logger("copy ".$path." into ".$path."_copy", $logFile);
-		$r = util::rename($path, $path."_copy");
+		// $r = util::rename($path, $path."_copy");
 		log::logger("result ".$r, $logFile);
 	} else {
 		log::logger("====== -------> DON'T EXIST ", $logFile);
 	}
 	log::logger("====== MOVE FILES ", $logFile);
-	$data = ATF::pdf()->generic("facture",$facture["id_facture"],true,$s,false);
-	ATF::facture()->store($s,$facture["id_facture"],"fichier_joint",$data,false);
+	// $data = ATF::pdf()->generic("facture",$facture["id_facture"],true,$s,false);
+	// ATF::facture()->store($s,$facture["id_facture"],"fichier_joint",$data,false);
 	
 }
 
