@@ -982,7 +982,7 @@ class souscription_cleodis extends souscription {
   public function sendContrat($affaire, $files, $contact, $codename){
 
     if($contact["email"] || $contact["email_perso"]){
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
       $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
       $info_mail["html"] = true;
       $info_mail["template"] = "mail_contrat_a_signer";
