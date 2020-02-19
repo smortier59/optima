@@ -426,6 +426,9 @@ class souscription_cleodis extends souscription {
         $toInsertLoyer[0]["loyer__dot__duree"] = $produitLoyer["duree"];
 
 
+        $devis["prix"] = $toInsertLoyer[0]["loyer__dot__loyer"] * $toInsertLoyer[0]["loyer__dot__duree"];
+
+
     }
 
     // Faire sauter les index
