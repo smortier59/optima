@@ -13590,6 +13590,10 @@ class pdf_bdomplus extends pdf_cleodis {
 	public $GEnteteTextColor = 255;
 	public $BEnteteTextColor = 255;
 
+	public function facture($id,$s,$global=false){
+		$this->facturePDF=true;
+		parent::facture($id,$s,$global);
+	}
 
 	/* Header spécifique aux documents cléodis
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -13613,7 +13617,7 @@ class pdf_bdomplus extends pdf_cleodis {
 				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				$this->image(__PDF_PATH__.$this->logo,15,5,30);		
 				$this->setLeftMargin(70);
 
 			}
@@ -13698,8 +13702,15 @@ class pdf_bdomplus extends pdf_cleodis {
 				$this->image(__PDF_PATH__.$this->logo,15,5,20);
 				$this->setLeftMargin(10);
 
+			}elseif($this->facturePDF){
+				if ($this->client['id_famille'] == 9) {
+					$this->image(__PDF_PATH__.$this->logo,85,5,30);
+				} else {
+					$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				}
+				$this->SetMargins(10,36);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,80,5,35);
+				$this->image(__PDF_PATH__.$this->logo,80,5,30);
 				$this->SetMargins(10,36);
 			}
 		}
@@ -13707,7 +13718,7 @@ class pdf_bdomplus extends pdf_cleodis {
 
 
 	public function Footer() {
-		if($this->facturePDF && !$this->envoiContrat && !$this->grille_client){
+		if(($this->facturePDF && $this->facture["prix"] > 0) && !$this->envoiContrat && !$this->grille_client){
 
 			$this->setfont('arial','B',9);
 			$this->multicell(0,4,"Cette facture est à conserver precieusement !\n L'équipe BDOM + vous remercie de la confiance que vous lui avez accordée",0,'C');
@@ -14101,10 +14112,15 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		$this->settextcolor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',20);
-		$this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+		if($this->facture["prix"] < 0){
+            $this->cell(0,7,"Votre avoir B'dom+",0, 1, 'C');
+        }else{
+            $this->cell(0,7,"Votre facture B'dom+",0, 1, 'C');
+        }
 		$this->setfont('arial','I',11);
-		$this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C');
-		//$this->cell(0,7,"Ce présent document est une facture dont le règlement est en attente",0, 1, 'C');
+		if($this->facture["prix"] > 0){
+            $this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C'); 
+        }
 		$this->settextcolor(0,0,0);
 
 

@@ -37,7 +37,6 @@ class souscription_cleodis extends souscription {
     $email = $post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
-
     switch ($post['site_associe']) {
       case 'boulangerpro':
         ATF::societe()->q->reset()->where("siret", "45122067700087");
@@ -64,6 +63,18 @@ class souscription_cleodis extends souscription {
 
     if(!$post["no_iban"]){
       $this->checkIBAN($post['iban']);
+    }
+
+
+    try {
+
+      if($post["particulier_email"]){
+        mail::check_mail($post["particulier_email"]);
+      }else{
+        mail::check_mail($post["email"]);
+      }
+    } catch (errorATF $e) {
+      throw new errorATF("Invalid domaine",500);
     }
 
 
@@ -129,11 +140,11 @@ class souscription_cleodis extends souscription {
 
         $affaires["ids"][] = $id_affaire;
         $affaires["refs"][] = $ref_affaire;
-        
+
         if ($post['site_associe'] == 'bdomplus' || $post['site_associe'] == 'boulanger') {
 
           $nameVendeur = false;
-          // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)    
+          // Il faut absolument laissé le  && $post['vendeur']!="null", sinon on va péter BDOM ;)
           if ($post['vendeur'] && $post['vendeur']!="null" && $post['vendeur']['nameid'] && $post['site_associe'] == 'bdomplus') {
             log::logger("A priori on aurait un vendeur magasin BDOM !", $this->logFileSouscription);
             log::logger($post['vendeur'], $this->logFileSouscription);
@@ -561,6 +572,9 @@ class souscription_cleodis extends souscription {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
 
+
+
+
     if (!$post['type']) {
       throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
     }
@@ -570,6 +584,8 @@ class souscription_cleodis extends souscription {
     }
 
     $societe = ATF::societe()->select($id_societe);
+
+
     $toUpdate = array("id_societe"=>$id_societe, "BIC"=>$bic , "IBAN"=>$iban);
     // Gestion de la reference société
     $refSociete = $societe['ref'];
@@ -661,7 +677,7 @@ class souscription_cleodis extends souscription {
           );
 
           //On envoi le mail au client avec le contrat qu'il va signer
-          $this->sendContrat($id_affaire, $mail_files, $contact);
+          $this->sendContrat($id_affaire, $mail_files, $contact, "bdomplus");
         }
 
         if(ATF::affaire()->select($id_affaire, "id_magasin")){
@@ -677,6 +693,7 @@ class souscription_cleodis extends souscription {
         }
 
       break;
+
 
       case 'boulangerpro':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
@@ -711,10 +728,25 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'boulanger-cafe':
+        $pathMandat = "/tmp/".$infos["function"]."-".$infos["value"].".pdf";
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
-        $f = array(
-          "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat), // base64
+        file_put_contents($pathMandat,$pdf_mandat);
+
+        $f =  array(
+          "mandatSellAndSign.pdf" => base64_encode($pdf_mandat)
         );
+
+        if($post["send_file_mail"]){
+          $mail_files = array(
+            "contrat"=> $pathMandat
+          );
+
+
+
+          //On envoi le mail au client avec le contrat qu'il va signer
+          $this->sendContrat($id_affaire, $mail_files, $contact, "boulanger-cafe");
+        }
+
       break;
 
       default:
@@ -956,6 +988,81 @@ class souscription_cleodis extends souscription {
   }
 
 
+
+  /**
+   * Envoi le PDF du mandat que le client va signer par mail avant signature sur le front
+   * @param  Integer $affaire      ID de l'affaire
+   * @param  Array $files          Les fichiers a envoyer
+   * @param  Array $contact        Les données du contact
+   */
+  public function sendContrat($affaire, $files, $contact, $codename){
+
+    if($contact["email"] || $contact["email_perso"]){
+      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
+      $info_mail["html"] = true;
+      $info_mail["template"] = "mail_contrat_a_signer";
+
+      if($codename == "bdomplus") $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
+      if($codename == "boulanger-cafe") $info_mail["objet"] = "Abonnement Boulanger Café - Votre contrat à signer";
+
+
+
+      $mail = new mail($info_mail);
+
+      foreach ($files as $key => $infos) {
+          $mail->addFile($infos,$key.".pdf",true);
+      }
+
+
+      $send = $mail->send();
+
+      $suivi = array(
+        "id_contact" => $contact["id_contact"],
+        "id_societe" => ATF::affaire()->select($affaire , "id_societe"),
+        "id_affaire" => $affaire,
+        "type"=> "note",
+        "type_suivi"=> "Contrat",
+        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
+      );
+
+      if($send){
+        $suivi["texte"] =  "Envoi du mail au client contenant le contrat avant la signature\n".$suivi["texte"];
+      }else{
+        $suivi["texte"] =  "Probleme lors de l'envoi du mail au client contenant le contrat avant la signature";
+      }
+      ATF::suivi()->i($suivi);
+    }
+
+
+  }
+
+
+  /**
+   * Annule une affaire (Passage de l'affaire en annulée, suppression du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function annuleContrat($affaire,$commande, $raison){
+    if($affaire["affaire.etat"] !== "perdue"){
+      ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
+      $devis = ATF::devis()->select_row();
+
+      //On passe le devis en attente pour pouvoir annuler l'affaire
+      ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
+
+      //On supprime le contrat également
+      if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
+
+
+      $infos = array(
+        "id_devis" => $devis["id_devis"],
+        "raison_refus"=> $raison
+      );
+      ATF::devis()->perdu($infos);
+    }
+  }
+
+
 }
 class souscription_bdomplus extends souscription_cleodis {
 
@@ -1132,7 +1239,57 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function demarrageContrat($affaire,$commande){
+
+   ATF::constante()->q->reset()->where("constante" ,"__MAX_SOUSCRIPTION__");
+   $max_souscription = ATF::constante()->select_row();
+   $max_souscription = $max_souscription["valeur"];
+
      if($affaire["commande.etat"] == "non_loyer"){
+        //Limite appliquée seulement pour les souscriptions web et non pas magasin
+        if($max_souscription && !$affaire["affaire.id_magasin"]){
+          ATF::affaire()->q->reset()->where("affaire.etat", "facture", "AND")
+                                  ->where("affaire.site_associe", "bdomplus")
+                                  ->where("affaire.date", date("Y-m-d"))
+                                  ->whereIsNull("affaire.id_magasin");
+          $total_affaire = count(ATF::affaire()->select_all());
+
+          log::logger("######## CHECK BLOCAGE  ########" , "souscription");
+          log::logger("Nombre d'affaire déja démarrée ce jour ".$total_affaire , "souscription");
+          log::logger("Nombre d'affaire max à démarrer ".$max_souscription , "souscription");
+          log::logger("########                ########" , "souscription");
+
+          if($total_affaire >= $max_souscription){
+            //On crée une tache pour alerter qu'on a pas démarré le contrat car  suspicion de fraude
+
+
+
+            $tache = array(
+                    "tache"=> array(
+                       "id_societe"=> $affaire["affaire.id_societe_fk"],
+                       "id_user"=>$this->id_user,
+                       "origine"=>"societe_commande",
+                       "tache"=>"Nous n'avons pas démarré ce contrat car le nombre de contrats souscris sur Internet dépasse le nombre de dossiers autorisés aujourd'hui sur le web (".$total_affaire."/".$max_souscription.")",
+                       "id_affaire"=>$affaire["affaire.id_affaire_fk"]  ,
+                       "type_tache"=>"creation_contrat",
+                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
+                       "no_redirect"=>"true"
+                      ),
+                    "dest"=>$this->id_user
+            );
+            $id_tache = ATF::tache()->insert($tache);
+
+            $mail = new mail(array( "recipient"=>ATF::user()->select($this->id_user, "email"),
+                "optima_url"=>ATF::permalink()->getURL(ATF::tache()->createPermalink($id_tache)),
+                "objet"=>"[Blocage de souscription]Nouvelle tâche de la part de ".ATF::user()->nom($this->id_user),
+                "template"=>"tache_insert",
+                "donnees"=>$tache["tache"],
+                "from"=>ATF::user()->select($this->id_user, "email")));
+            $mail->send();
+            throw new errorATF("Nombre d'affaire web max atteint");
+          }
+        }
+
+
         ATF::db($this->db)->begin_transaction();
 
         try{
@@ -1187,29 +1344,7 @@ class souscription_bdomplus extends souscription_cleodis {
   }
 
 
-  /**
-   * Annule une affaire (Passage de l'affaire en annulée, suppression du contrat)
-   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-   */
-  public function annuleContrat($affaire,$commande, $raison){
-    if($affaire["affaire.etat"] !== "perdue"){
-      ATF::devis()->q->reset()->where("devis.id_affaire", $affaire["affaire.id_affaire_fk"]);
-      $devis = ATF::devis()->select_row();
 
-      //On passe le devis en attente pour pouvoir annuler l'affaire
-      ATF::devis()->u(array("id_devis" => $devis["id_devis"], "etat"=> "attente"));
-
-      //On supprime le contrat également
-      if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
-
-
-      $infos = array(
-        "id_devis" => $devis["id_devis"],
-        "raison_refus"=> $raison
-      );
-      ATF::devis()->perdu($infos);
-    }
-  }
 
   /**
    * Récupération des numéros de licences
@@ -1249,45 +1384,6 @@ class souscription_bdomplus extends souscription_cleodis {
     return $licence_a_envoyer;
   }
 
-  public function sendContrat($affaire, $files, $contact){
-
-    if($contact["email"] || $contact["email_perso"]){
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
-      $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
-      $info_mail["html"] = true;
-      $info_mail["template"] = "mail_contrat_a_signer";
-      $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
-
-      $mail = new mail($info_mail);
-
-      foreach ($files as $key => $infos) {
-          $mail->addFile($infos,$key.".pdf",true);
-      }
-
-
-      $send = $mail->send();
-
-      $suivi = array(
-        "id_contact" => $contact["id_contact"],
-        "id_societe" => ATF::affaire()->select($affaire , "id_societe"),
-        "id_affaire" => $affaire,
-        "type"=> "note",
-        "type_suivi"=> "Contrat",
-        "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
-
-      );
-
-      if($send){
-        $suivi["texte"] =  "Envoi du mail au client contenant le contrat avant la signature\n".$suivi["texte"];
-      }else{
-        $suivi["texte"] =  "Probleme lors de l'envoi du mail au client contenant le contrat avant la signature";
-      }
-      ATF::suivi()->i($suivi);
-    }
-
-
-  }
-
   public function envoiMailVendeurABenjamin($affaires, $vendeur){
     log::logger("=================envoiMailVendeurABenjamin================", $this->logFileSouscription);
     log::logger($affaires, $this->logFileSouscription);
@@ -1297,7 +1393,7 @@ class souscription_bdomplus extends souscription_cleodis {
       log::logger($vendeur, $this->logFileSouscription);
 
       $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
-      $info_mail["recipient"] = "benjamin.tronquit@cleodis.com,BDOMPlusLicence@absystech.fr";
+      $info_mail["recipient"] = "benjamin.tronquit@cleodis.com";
       $info_mail["html"] = true;
       $info_mail["template"] = "bdomplus-mailVendeurMagasin";
       $info_mail["texte"] = "Souscription magasin par le vendeur suivant ";
@@ -1550,5 +1646,93 @@ class souscription_boulanger extends souscription_cleodis {
   public $id_user = 116;
   public $codename = "boulanger";
 
+
+  /**
+   * Démarrage du contrat ou annulation de l'affaire
+   * @param  Integer $id_affaire      ID de l'affaire
+   */
+  public function _startOrCancelAffaire($get, $post){
+    if($post["id_affaire"] && $post["toDo"]){
+
+      $affaire = ATF::affaire()->select($post["id_affaire"]);
+      $affaire["affaire.id_affaire_fk"] = $post["id_affaire"];
+
+      ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
+      $commande = ATF::commande()->select_row();
+      $commande["commande.id_commande_fk"] = $commande["commande.id_commande"];
+
+      switch($post["toDo"]) {
+        case 'start':
+          $this->demarrageContrat($affaire, $commande);
+          log::logger("Demmarage terminé" , "mfleurquin");
+        break;
+
+        case 'cancel':
+          $this->annuleContrat($affaire,$commande, $raison);
+        break;
+      }
+
+    }else{
+      throw new errorATF("Data manquante en paramètre d'entrée Boulanger", 500);
+    }
+
+    return true;
+
+  }
+
+
+   /**
+   * Démarre une affaire (Démarrage du contrat)
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   */
+  public function demarrageContrat($affaire,$commande){
+    log::logger("Dans démarrage contrat Boulanger" , "mfleurquin");
+
+
+     $affaire["commande.etat"] = $commande["commande.etat"] = ATF::commande()->select($commande["commande.id_commande_fk"], "etat");
+
+
+     if($affaire["commande.etat"] == "non_loyer"){
+        ATF::db($this->db)->begin_transaction();
+
+        try{
+          #On démarre le contrat
+
+
+          if($commande && $commande["commande.etat"] == "non_loyer"){
+            $infos = array(
+              "id_commande" => $commande["commande.id_commande_fk"],
+              "value" => date("Y-m-01", strtotime("+1 month")),
+              "key" => "date_debut"
+            );
+            ATF::commande()->updateDate($infos);
+
+            //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
+            ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
+                                      ->addOrder("facture.id_facture", "ASC");
+            $facture = ATF::facture()->select_row();
+
+            if($facture){
+              $f = array("id_facture" => $facture["facture.id_facture"],
+                         "mode_paiement"=> "cb",
+                         "etat"=>"payee",
+                         "date_paiement"=>date("Y-m-d"));
+
+              if($affaire["affaire.id_magasin"]){
+                $f["mode_paiement"] = "pre-paiement";
+              }
+              ATF::facture()->u($f);
+            }
+
+            ATF::db($this->db)->commit_transaction();
+            return true;
+          }
+
+        }catch(errorATF $e){
+          ATF::db($this->db)->rollback_transaction();
+          throw $e;
+        }
+     }
+  }
 
 };
