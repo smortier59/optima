@@ -11,21 +11,13 @@
                 <form method="post" action="">
                     {if $smarty.get.unknownUser}
                         <div style="font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em; color:red">Votre utilisateur n'est pas connu, veuillez recommencez ou contacter le support.</div>
-                        <a href="/login.html">Retour au login</a> 
-                    {elseif $smarty.get.setNewPassword}
-                        
-                        <div style="width:150px;">Nom d'utilisateur :</div>
-                        <div style="width:200px;"><input tabindex="2" type="text" value="{$smarty.cookies.l}" name="login" id="login" /></div>
-                        <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
-                        <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="go">Accéder à mon compte</button></div>
-                        <div style="width:150px;">Mot de passe :</div>
-                        <div><input tabindex="3" type="password" name="password" id="password" /></div>
-                    {else} <!-- Affiche la mire de changement de mdp -->
+                        <a href="/login.html">Retour au login</a>
+                    {else}
                         <input type="hidden" value="{$k|default:""}" name="url" id="url" />
                         <div style="width:150px;">Société :</div>
                         <div style="width:450px;">
-                        	{if $smarty.server.HTTP_HOST=="midas.cleodis.fr" || $smarty.server.HTTP_HOST=="dev.midas.optima.absystech.net"}
-                            	Midas
+                            {if $smarty.server.HTTP_HOST=="midas.cleodis.fr" || $smarty.server.HTTP_HOST=="dev.midas.optima.absystech.net"}
+                                Midas
                                 <input type="hidden" value="midas" name="schema" id="schema" />
                             {elseif $smarty.server.HTTP_HOST=="optima.absystech-telecom.fr"}
                                 AbsysTech Telecom
@@ -33,34 +25,52 @@
                             {elseif strpos($smarty.server.HTTP_HOST,"lma")!==false}
                                 Leroy Merlin Abonnement
                                 <input type="hidden" value="lm" name="schema" id="schema" />
-                        	{elseif $smarty.server.HTTP_HOST=="optima.boisethome.fr"}
-                            	Bois &amp; Home
+                            {elseif $smarty.server.HTTP_HOST=="optima.boisethome.fr"}
+                                Bois &amp; Home
                                 <input type="hidden" value="boisethome" name="schema" id="schema" />
                             {elseif $schema}
-                            	{$schema|ucfirst}
+                                {$schema|ucfirst}
                                 <input type="hidden" value="{$schema}" name="schema" id="schema" />
                             {else}
                                 <input tabindex="1" type="text" value="{$smarty.cookies.optima.societe|default:$smarty.get.societe}"{if $__c.optima.societe || $smarty.get.societe} class="invisible" onfocus="this.className='';"{/if} name="schema" id="schema" />
                             {/if}
                         </div>
 
+                        {if $smarty.get.setNewPassword}
+                            <!-- Affiche la mire de changement de mdp -->
+                            <div style="width:150px;">Nouveau mdp :</div>
+                            <div style="width:200px;"><input tabindex="2" type="password" name="new_password" id="new_password"/></div>
+                            <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
+                            <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="generateNewPassword">Changer mot de passe</button></div>
+                            <div style="width:150px;">Confirmation :</div>
+                            <div><input tabindex="3" type="password" name="new_password_cnf" id="new_password_cnf"/></div>
+                            <div><input type="text" name="k" id="k" value="{$smarty.get.k}"></div>
+                            <div id="errorUpdatePassword" style="font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em; color:red"></div>
+                        {else}
+                            <div style="width:150px;">Nom d'utilisateur :</div>
+                            <div style="width:200px;"><input tabindex="2" type="text" value="{$smarty.cookies.l}" name="login" id="login" /></div>
+                            <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
+                            <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="go">Accéder à mon compte</button></div>
+                            <div style="width:150px;">Mot de passe :</div>
+                            <div><input tabindex="3" type="password" name="password" id="password" /></div>
+                            <div style="clear:both; font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em;">
+                                <a href="javascript:;" id="recovery" onclick="$('.emailRecovery').show();">Mot de passe oublié</a>
+                            </div>
+                            <div class="emailRecovery" style="display:none; clear:both; width:150px;">Email</div>
+                            <div class="emailRecovery" style="display:none"><input type="email" value="" name="email" id="email" /> <button type="button" id="goRecovery">Ok</button></div>
 
 
 
+                        {/if}
+                        {if $smarty.get.recovery}
+                            <div style="font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em; color:red">Un email vous a été envoyé avec votre nouveau mot de passe.</div>
+                        {/if}
 
-                        <div style="width:150px;">Nouveau mdp :</div>
-                        <div style="width:200px;"><input tabindex="2" type="password" name="new_password" id="new_password"/></div>
-                        <div id="loadingAnim" style="width:250px;display:none;"><img src="{ATF::$staticserver}images/loading/loading.gif" alt="load" /></div>
-                        <div id="submitButton" style="width:250px;"><button tabindex="4" type="button" id="generateNewPassword">Changer mot de passe</button></div>
-                        <div style="width:150px;">Confirmation :</div>
-                        <div><input tabindex="3" type="password" name="new_password_cnf" id="new_password_cnf"/></div>
+
                     {/if}
-                    {if $smarty.get.recovery}
-                        <div style="font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em; color:red">Un email vous a été envoyé avec votre nouveau mot de passe.</div>
-                        <div style="clear:both; font-size:10px; font-family:Arial, Helvetica, sans-serif; margin-left:2em;"> <a href="javascript:;" id="recovery" onclick="$('.emailRecovery').show();">Mot de passe oublié</a></div>
-                        <div class="emailRecovery" style="display:none; clear:both; width:150px;">Email</div>
-                        <div class="emailRecovery" style="display:none"><input type="email" value="" name="email" id="email" /> <button type="button" id="goRecovery">Ok</button></div>
-                    {/if}
+
+
+
                 </form>
             </div>
             <div id="loginVirgule"></div>
