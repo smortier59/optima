@@ -132,11 +132,11 @@ class affaire_cleodis extends affaire {
 		);
 
 		$this->files["cni"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
@@ -1097,11 +1097,11 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["ref_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "ref_externe");
 			$return['data'][$k]["etat_cmd_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "etat_cmd_externe");
 
-			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? true : false;
-			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? true : false;
-			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? true : false;
-			$return['data'][$k]["contrat_signe"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"contrat_signe")) ? true : false;
-			$return['data'][$k]["facture_fournisseur"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"facture_fournisseur")) ? true : false;
+			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? $this->files['cni']['type'] : false;
+			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? $this->files['cniVerso']['type'] : false;
+			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? $this->files['pouvoir']['type'] : false;
+			$return['data'][$k]["contrat_signe"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"contrat_signe")) ? $this->files['contrat_signe']['type'] : false;
+			$return['data'][$k]["facture_fournisseur"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"facture_fournisseur")) ? $this->files['facture_fournisseur']['type'] : false;
 
 
 			$return['data'][$k]["dossier_preuve_sell_sign"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"dossier_preuve_sell_sign")) ? true : false;
