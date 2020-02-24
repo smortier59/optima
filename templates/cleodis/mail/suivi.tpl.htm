@@ -1,11 +1,5 @@
-{assign var=infos_suivi value=ATF::suivi()->select($infos.id_suivi)}
-{if $infos.champsComplementaire=='date_debut' || $infos.champsComplementaire=='date_evolution'}
-	{$type = 'CONTRAT'}
-{elseif $infos.champsComplementaire=='retour_prel'}
-	{$type = 'AP'}
-{elseif $infos.champsComplementaire=='retour_pv'}
-	{$type = 'PV'}
-{/if}
+{assign var=infos_suivi value=ATF::suivi()->select($infos.id_suivi)} {if $infos.champsComplementaire=='date_debut' || $infos.champsComplementaire=='date_evolution'} {$type = 'CONTRAT'} {elseif $infos.champsComplementaire=='retour_prel'} {$type = 'AP'}
+{elseif $infos.champsComplementaire=='retour_pv'} {$type = 'PV'} {/if}
 <p><span style="font-weight:bold;">{$type}</span></p>
 
 
@@ -16,8 +10,9 @@
 <p>{ATF::$usr->trans('bonjour',mail)}</p>
 <p>{ATF::$usr->trans('reception_suivi',mail)}</p>
 <p><span style="font-weight:bold;">{ATF::$usr->trans('de',mail)}</span> {ATF::user()->nom($infos.id_user)}</p>
-<p><span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->select($infos_suivi.id_societe, ref)} - {ATF::societe()->nom($infos_suivi.id_societe)}</p>
-{if $infos.id_affaire}<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->select($infos.id_affaire, ref)} - {ATF::affaire()->select($infos.id_affaire, "affaire")}</p>{/if}
+<p><span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->select($infos_suivi.id_societe, code_client)} - {ATF::societe()->nom($infos_suivi.id_societe)}</p>
+{if $infos.id_affaire}
+<p><span style="font-weight:bold;">{ATF::$usr->trans('affaire',mail)}</span> {ATF::affaire()->select($infos.id_affaire, ref)} - {ATF::affaire()->select($infos.id_affaire, "affaire")}</p>{/if}
 
 <p><span style="font-weight:bold;">{ATF::$usr->trans('concerne',mail)}</span> {foreach name=for_suivi_notifie from=$infos_suivi.suivi_notifie key=key__ item=item__}{ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_notifie.last}, {/if}{/foreach}</p>
 <p><span style="font-weight:bold;">{ATF::$usr->trans('intervenant_client',mail)}</span> {foreach name=for_suivi_contact from=$infos_suivi.suivi_contact key=key__ item=item__}{ATF::contact()->nom($item__)}{if !$smarty.foreach.for_suivi_contact.last}, {/if}{/foreach}</p>
