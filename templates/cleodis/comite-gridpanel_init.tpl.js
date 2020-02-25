@@ -26,11 +26,7 @@
 
 			var ok = true;
 
-			{if $id_user == 21}
-				if(record.data.reseau == false){
-					ok = false;
-				}
-			{/if}
+
 
 			if (record.data.comite__dot__etat=="en_attente" && ok==true) {
 				var btndecision = {
