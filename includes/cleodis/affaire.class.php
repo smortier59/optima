@@ -107,7 +107,9 @@ class affaire_cleodis extends affaire {
 		$this->colonnes['bloquees']['select'] = array('id_parent','data','RIB','BIC','IBAN','RUM','nom_banque','ville_banque','date_previsionnelle','commentaire_facture','commentaire_facture2','commentaire_facture3');
 
 		$this->onglets = array(
-			'loyer'
+			'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)
