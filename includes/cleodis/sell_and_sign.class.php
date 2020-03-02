@@ -41,7 +41,7 @@ class sell_and_sign extends classes_optima {
 		);
 		$this->fieldstructure();
 		$this->files["dossier_preuve"] = array("type"=>"zip","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["certificat_preuve"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		$this->files["certificat_preuve"] = array("type"=>"zip","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 	}	
 };
 
