@@ -7,7 +7,7 @@ ATF::define("tracabilite",false);
 
 $files_recup = array("xml"=>0 , "pdf"=>0 , "autre"=>0, "error"=>0);
 $files_to_move = array();
-$report = array("fichier_lu"=>0, "bdc_find"=>0, "bdc_nofind"=>0, "ff_deja_present"=>0, "ff_insert"=>0, "try"=>0, "treated"=>0, "error"=>0);
+$report = array("fichier_lu"=>0, "bdc_find"=>0, "bdc_nofind"=>0, "montant_incorrect"=>0, "ff_deja_present"=>0, "ff_insert"=>0, "try"=>0, "treated"=>0, "error"=>0);
 $dir = __ABSOLUTE_PATH__."www/readsoft/".$_SERVER["argv"][1]."/";
 
 
@@ -69,7 +69,6 @@ if ((!$conn_id ) || (!$login)) {
 				} else {
 					log::logger("Problème lors du Copie de ".$value." en ".__READSOFT_FTP_FOLDER__."move/".date("Y-m-d").str_replace($remote_file, "", $value), "readsoft");
 				}
-
 			} else {
 				// Tentative de renommage de $old_file en $new_file
 				if (ftp_rename($conn_id, $value, __READSOFT_FTP_FOLDER__."erreur/".date("Y-m-d").str_replace($remote_file, "", $value))) {
@@ -86,8 +85,8 @@ if ((!$conn_id ) || (!$login)) {
 	}else{
 		$total = 0;
 	}
-
 }
+
 // Fermeture de la connexion et du pointeur de fichier
 ftp_close($conn_id);
 
@@ -99,9 +98,6 @@ log::logger("##  SUCCES : ".($files_recup["xml"] + $files_recup["pdf"] + $files_
 log::logger("##  ERREUR : ".$files_recup["error"], "readsoft");
 log::logger("##  TOTAL : ".$total,  "readsoft");
 log::logger("####################", "readsoft");
-
-
-
 
 log::logger("======= Fin de la récuperation des fichiers via FTP", "readsoft");
 
@@ -157,6 +153,7 @@ if(!empty($files)){
 				}
 			}
 
+
 			log::logger($commande_fournisseur_concernee,$id_doc.".log");
 			if(!empty($commande_fournisseur_concernee)){
 				foreach ($commande_fournisseur_concernee as $kcf => $vcf) {
@@ -171,6 +168,8 @@ if(!empty($files)){
 						ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande", $cm["bon_de_commande.id_bon_de_commande"]);
 						$ligne_facture_fournisseur = ATF::bon_de_commande_ligne()->toFacture_fournisseurLigne();
 
+						log::logger($ligne_facture_fournisseur , $id_doc.".log");
+
 						$cm = ATF::bon_de_commande()->select($cm["bon_de_commande.id_bon_de_commande"]);
 
 						log::logger("Commande fournisseur ".$header["invoicenumber"]." trouvée" , $id_doc.".log");
@@ -179,77 +178,86 @@ if(!empty($files)){
 															  ->where("facture_fournisseur.ref", $header["invoicenumber"]);
 						$ff_exist = ATF::facture_fournisseur()->select_all();
 
-						if(sizeof($ff_exist) == 0){
-							$report["try"] += 1;
+						log::logger($cm, "mfleurquin");
 
-							log::logger("Il n'y a pas encore de facture fournisseur existante avec la ref ".$header["invoicenumber"]." pour l'affaire ".$cm["id_affaire"] , $id_doc.".log");
+						if($cm['prix'] == $header["invoicetotalvatexcludedamount"]){
 
-							$infos = array("extAction" => "facture_fournisseur",
-										   "extMethod" => "insert",
-										   "import_readsoft" => true);
+							if(sizeof($ff_exist) == 0){
+								$report["try"] += 1;
 
-							$prix = 0;
-							foreach ($vcf["lines"] as $kp => $vp) {
-								$prix += $vp["VatExcludedAmount"];
-							}
-							try {
-								$infos["facture_fournisseur"] = array(
-															"ref" => $header["invoicenumber"],
-															"id_bon_de_commande" => $cm["id_bon_de_commande"],
-															"type" => "achat",
-															"id_affaire" =>  $cm["id_affaire"],
-															"id_fournisseur" =>  $cm["id_fournisseur"],
-															"periodicite" => null,
-															"prix" => $prix,
-															"etat" => "impayee",
-															"tva" => $cm["tva"],
-															"date" => $header["invoicedate"],
-															"date_echeance" => $header["invoiceduedate"],
-															"deja_exporte_cegid" => "non"
-														);
-								$values_facture_fournisseur = array();
-								foreach ($ligne_facture_fournisseur["data"] as $kbdcl => $vbdcl) {
-									foreach ($vbdcl as $k => $v) {
-										$values_facture_fournisseur[$kbdcl][str_replace(".", "__dot__", $k)] = $v;
+								log::logger("Il n'y a pas encore de facture fournisseur existante avec la ref ".$header["invoicenumber"]." pour l'affaire ".$cm["id_affaire"] , $id_doc.".log");
+
+								$infos = array("extAction" => "facture_fournisseur",
+											   "extMethod" => "insert",
+											   "import_readsoft" => true);
+
+								$prix = 0;
+								foreach ($vcf["lines"] as $kp => $vp) {
+									$prix += $vp["VatExcludedAmount"];
+								}
+								try {
+									$infos["facture_fournisseur"] = array(
+																"ref" => $header["invoicenumber"],
+																"id_bon_de_commande" => $cm["id_bon_de_commande"],
+																"type" => "achat",
+																"id_affaire" =>  $cm["id_affaire"],
+																"id_fournisseur" =>  $cm["id_fournisseur"],
+																"periodicite" => null,
+																"prix" => $prix,
+																"etat" => "impayee",
+																"tva" => $cm["tva"],
+																"date" => $header["invoicedate"],
+																"date_echeance" => $header["invoiceduedate"],
+																"deja_exporte_cegid" => "non"
+															);
+									$values_facture_fournisseur = array();
+									foreach ($ligne_facture_fournisseur["data"] as $kbdcl => $vbdcl) {
+										foreach ($vbdcl as $k => $v) {
+											$values_facture_fournisseur[$kbdcl][str_replace(".", "__dot__", $k)] = $v;
+										}
 									}
+									$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
+
+									$id_ff = ATF::facture_fournisseur()->insert($infos);
+									$report["ff_insert"] += 1;
+
+									log::logger("Facture fournisseur créée ".$di_ff , $id_doc.".log");
+
+									$dir_to = "treated/".date("Y-m-d");
+
+									log::logger('Création du ZIP', $id_doc.".log");
+									$zip = new ZipArchive();
+									if($zip->open($dir."pending/".$id_doc.'.zip', ZipArchive::CREATE) === true){
+										// Ajout d’un fichier.
+										$zip->addFile($dir."pending/".$id_doc.".pdf", $id_doc.".pdf");
+
+										// Et on referme l'archive.
+										$zip->close();
+										rename($dir."pending/".$id_doc.".zip", __DATA_PATH__.$_SERVER["argv"][1]."/facture_fournisseur/".$id_ff.".fichier_joint");
+										log::logger('Enregistrement du ZIP en fichier joint sur la facture fournisseur créée ID '.$id_ff.".fichier_joint" , $id_doc.".log");
+										unlink($dir."pending/".$id_doc.".zip");
+									}else{
+										log::logger('Impossible d\'ouvrir &quot'.$dir."pending/".$id_doc.'.zip', $id_doc.".log");
+									}
+								} catch (Exception $e) {
+									log::logger("---- Erreur sur le fichier ".$id_doc, "readsoft");
+									log::logger($e->getmessage(), "readsoft");
+
+									log::logger($e->getmessage(), $id_doc.".log");
+									log::logger($infos, $id_doc.".log");
+									$dir_to = "error/".date("Y-m-d");
+									$report[$dir_to] += 1;
 								}
-								$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
 
-								$id_ff = ATF::facture_fournisseur()->insert($infos);
-								$report["ff_insert"] += 1;
-
-								log::logger("Facture fournisseur créée ".$di_ff , $id_doc.".log");
-
-								$dir_to = "treated/".date("Y-m-d");
-
-								log::logger('Création du ZIP', $id_doc.".log");
-								$zip = new ZipArchive();
-								if($zip->open($dir."pending/".$id_doc.'.zip', ZipArchive::CREATE) === true){
-									// Ajout d’un fichier.
-									$zip->addFile($dir."pending/".$id_doc.".pdf", $id_doc.".pdf");
-
-									// Et on referme l'archive.
-									$zip->close();
-									rename($dir."pending/".$id_doc.".zip", __DATA_PATH__.$_SERVER["argv"][1]."/facture_fournisseur/".$id_ff.".fichier_joint");
-									log::logger('Enregistrement du ZIP en fichier joint sur la facture fournisseur créée ID '.$id_ff.".fichier_joint" , $id_doc.".log");
-									unlink($dir."pending/".$id_doc.".zip");
-								}else{
-									log::logger('Impossible d\'ouvrir &quot'.$dir."pending/".$id_doc.'.zip', $id_doc.".log");
-								}
-							} catch (Exception $e) {
-								log::logger("---- Erreur sur le fichier ".$id_doc, "readsoft");
-								log::logger($e->getmessage(), "readsoft");
-
-								log::logger($e->getmessage(), $id_doc.".log");
-								log::logger($infos, $id_doc.".log");
+							}else{
+								log::logger("Facture fournisseur déja existante pour ref ".$header["invoicenumber"]." - ID Affaire ".$cm["id_affaire"]." - BDC ".$kcf ,$id_doc.".log");
 								$dir_to = "error/".date("Y-m-d");
-								$report[$dir_to] += 1;
+								$report["ff_deja_present"] += 1;
 							}
-
 						}else{
-							log::logger("Facture fournisseur déja existante pour ref ".$header["invoicenumber"]." - ID Affaire ".$cm["id_affaire"]." - BDC ".$kcf ,$id_doc.".log");
+							$report["montant_incorrect"] += 1;
+							log::logger("Montant Optima (".$cm['prix'].") - Readsoft (".$header["invoicetotalvatexcludedamount"].") different ".$kcf,$id_doc.".log");
 							$dir_to = "error/".date("Y-m-d");
-							$report["ff_deja_present"] += 1;
 						}
 					}else{
 						$report["bdc_nofind"] += 1;
@@ -301,8 +309,9 @@ if(!empty($files)){
 	log::logger("##  Succes ".$report["treated"], "readsoft");
 	log::logger("##  Error ".$report["error"], "readsoft");
 	log::logger("#### Commandes fournisseur introuvables ".$report["bdc_nofind"], "readsoft");
+	log::logger("#### Montant incorrect ".$report["montant_incorrect"], "readsoft");
 	log::logger("#### Facture Fournisseur déja existante ".$report["ff_deja_present"], "readsoft");
-	$autre = $report["error"] - ($report["bdc_nofind"] + $report["ff_deja_present"]);
+	$autre = $report["error"] - ($report["bdc_nofind"] + $report["ff_deja_present"] + $report["montant_incorrect"]);
 	log::logger("#### Autre ".$autre, "readsoft");
 
 }
