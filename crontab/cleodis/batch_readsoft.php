@@ -141,6 +141,7 @@ if(!empty($files)){
 			log::logger("####################################",$id_doc.".log");
 			log::logger("LINES",$id_doc.".log");
 
+			$prix_ligne = 0;
 			foreach ($lines as $kl => $vl) {
 				foreach ($vl->TableRow as $ki => $vi) {
 					$item = array();
@@ -148,40 +149,36 @@ if(!empty($files)){
 					foreach ($vi->ItemFields->ItemField as $kif => $vif) {
 						$item[str_replace("LIT_", "", $vif->Type[0])] = (string)$vif->Text[0];
 					}
-
 					$commande_fournisseur_concernee[$item["OrderNumber"]]["lines"][] = $item;
+					$prix_ligne += $item["VatExcludedAmount"];
 				}
 			}
 
+			if($header["invoicetotalvatexcludedamount"] == $prix_ligne){
 
-			log::logger($commande_fournisseur_concernee,$id_doc.".log");
-			if(!empty($commande_fournisseur_concernee)){
-				foreach ($commande_fournisseur_concernee as $kcf => $vcf) {
-					ATF::bon_de_commande()->q->reset()->where("bon_de_commande.ref", $kcf);
-					$cm = ATF::bon_de_commande()->select_row();
+				log::logger($commande_fournisseur_concernee,$id_doc.".log");
+				if(!empty($commande_fournisseur_concernee)){
+					foreach ($commande_fournisseur_concernee as $kcf => $vcf) {
+						ATF::bon_de_commande()->q->reset()->where("bon_de_commande.ref", $kcf);
+						$cm = ATF::bon_de_commande()->select_row();
 
-					log::logger("====================================" , $id_doc.".log");
+						log::logger("====================================" , $id_doc.".log");
 
-					if($cm["bon_de_commande.id_bon_de_commande"]){
-						$report["bdc_find"] += 1;
+						if($cm["bon_de_commande.id_bon_de_commande"]){
+							$report["bdc_find"] += 1;
 
-						ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande", $cm["bon_de_commande.id_bon_de_commande"]);
-						$ligne_facture_fournisseur = ATF::bon_de_commande_ligne()->toFacture_fournisseurLigne();
+							ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande", $cm["bon_de_commande.id_bon_de_commande"]);
+							$ligne_facture_fournisseur = ATF::bon_de_commande_ligne()->toFacture_fournisseurLigne();
 
-						log::logger($ligne_facture_fournisseur , $id_doc.".log");
+							log::logger($ligne_facture_fournisseur , $id_doc.".log");
 
-						$cm = ATF::bon_de_commande()->select($cm["bon_de_commande.id_bon_de_commande"]);
+							$cm = ATF::bon_de_commande()->select($cm["bon_de_commande.id_bon_de_commande"]);
 
-						log::logger("Commande fournisseur ".$header["invoicenumber"]." trouvée" , $id_doc.".log");
+							log::logger("Commande fournisseur ".$header["invoicenumber"]." trouvée" , $id_doc.".log");
 
-						ATF::facture_fournisseur()->q->reset()->where("id_affaire",  $cm["id_affaire"],"AND")
-															  ->where("facture_fournisseur.ref", $header["invoicenumber"]);
-						$ff_exist = ATF::facture_fournisseur()->select_all();
-
-						log::logger($cm, "mfleurquin");
-
-						if($cm['prix'] == $header["invoicetotalvatexcludedamount"]){
-
+							ATF::facture_fournisseur()->q->reset()->where("id_affaire",  $cm["id_affaire"],"AND")
+																  ->where("facture_fournisseur.ref", $header["invoicenumber"]);
+							$ff_exist = ATF::facture_fournisseur()->select_all();
 							if(sizeof($ff_exist) == 0){
 								$report["try"] += 1;
 
@@ -191,7 +188,7 @@ if(!empty($files)){
 											   "extMethod" => "insert",
 											   "import_readsoft" => true);
 
-								$prix = 0;
+								$prix =  0;
 								foreach ($vcf["lines"] as $kp => $vp) {
 									$prix += $vp["VatExcludedAmount"];
 								}
@@ -214,9 +211,11 @@ if(!empty($files)){
 									foreach ($ligne_facture_fournisseur["data"] as $kbdcl => $vbdcl) {
 										foreach ($vbdcl as $k => $v) {
 											$values_facture_fournisseur[$kbdcl][str_replace(".", "__dot__", $k)] = $v;
+
 										}
 									}
 									$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
+
 
 									$id_ff = ATF::facture_fournisseur()->insert($infos);
 									$report["ff_insert"] += 1;
@@ -239,6 +238,7 @@ if(!empty($files)){
 									}else{
 										log::logger('Impossible d\'ouvrir &quot'.$dir."pending/".$id_doc.'.zip', $id_doc.".log");
 									}
+
 								} catch (Exception $e) {
 									log::logger("---- Erreur sur le fichier ".$id_doc, "readsoft");
 									log::logger($e->getmessage(), "readsoft");
@@ -254,28 +254,30 @@ if(!empty($files)){
 								$dir_to = "error/".date("Y-m-d");
 								$report["ff_deja_present"] += 1;
 							}
+
 						}else{
-							$report["montant_incorrect"] += 1;
-							log::logger("Montant Optima (".$cm['prix'].") - Readsoft (".$header["invoicetotalvatexcludedamount"].") different ".$kcf,$id_doc.".log");
+							$report["bdc_nofind"] += 1;
+							log::logger("Bon de commande non trouvé pour ref ".$kcf,$id_doc.".log");
 							$dir_to = "error/".date("Y-m-d");
 						}
-					}else{
-						$report["bdc_nofind"] += 1;
-						log::logger("Bon de commande non trouvé pour ref ".$kcf,$id_doc.".log");
-						$dir_to = "error/".date("Y-m-d");
+						$report[$dir_to] += 1;
+						$files_to_move[$dir_to][$id_doc] = true;
 					}
+				}else{
+					log::logger("Pas de commande fournisseur concernée",$id_doc.".log");
+					log::logger($lines,$id_doc.".log");
+					log::logger("Pas de commande fournisseur concernée ".$id_doc, "readsoft");
+					$dir_to = "error/".date("Y-m-d");
 					$report[$dir_to] += 1;
 					$files_to_move[$dir_to][$id_doc] = true;
 				}
-			}else{
-				log::logger("Pas de commande fournisseur concernée",$id_doc.".log");
-				log::logger($lines,$id_doc.".log");
-				log::logger("Pas de commande fournisseur concernée ".$id_doc, "readsoft");
-				$dir_to = "error/".date("Y-m-d");
-				$report[$dir_to] += 1;
-				$files_to_move[$dir_to][$id_doc] = true;
-			}
 
+
+			}else{
+				$report["montant_incorrect"] += 1;
+				log::logger("Montant facture (".$header["invoicetotalvatexcludedamount"].") - Lignes (".$prix_ligne.") different ".$kcf,$id_doc.".log");
+				$dir_to = "error/".date("Y-m-d");
+			}
 
 			log::logger("####################################",$id_doc.".log");
 		}
