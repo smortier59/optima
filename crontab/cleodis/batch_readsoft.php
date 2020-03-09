@@ -154,7 +154,7 @@ if(!empty($files)){
 				}
 			}
 
-			if($header["invoicetotalvatexcludedamount"] == $prix_ligne){
+			if(number_format($header["invoicetotalvatexcludedamount"]) == number_format($prix_ligne)){
 
 				log::logger($commande_fournisseur_concernee,$id_doc.".log");
 				if(!empty($commande_fournisseur_concernee)){
