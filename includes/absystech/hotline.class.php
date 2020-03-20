@@ -3882,7 +3882,7 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		// Profil développeur extérieur (PATCH DEGUEU EN MODE BRICOLE)
 		if (ATF::$usr->get('id_profil') == 16) {
-			$this->q->where("gep_projet.id_societe", 513); // Cléodis
+			$this->q->where("gep_projet.id_societe", 513, "OR"); // Cléodis
 			$this->q->where("gep_projet.id_gep_projet", 202); // AirFrance
 		}
 
