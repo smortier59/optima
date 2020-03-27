@@ -12,13 +12,13 @@ class agence_cleodis extends agence {
 
 
 
-	public function export_agence_infos($infos){		 
-		
-        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php"; 
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";  
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());        
-		$workbook = new PHPExcel;        
-           
+	public function export_agence_infos($infos){
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+		$workbook = new PHPExcel;
+
 		$feuilles = array("Devis gagnés",
 						  "Devis en attente",
 						  "Devis perdus",
@@ -29,48 +29,48 @@ class agence_cleodis extends agence {
 
 
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		
 
-		foreach ($feuilles as $key => $value) {			
-			if ($premfeuille){	
-				$workbook->setActiveSheetIndex($key);	
-			    $sheet = $workbook->getActiveSheet();				
+
+		foreach ($feuilles as $key => $value) {
+			if ($premfeuille){
+				$workbook->setActiveSheetIndex($key);
+			    $sheet = $workbook->getActiveSheet();
 			    $sheet->setTitle($value);
-			    $this->ajoutTitreExport($sheet); 			    
+			    $this->ajoutTitreExport($sheet);
 			    $premfeuille = false;
 			}else{
 				$sheet = $workbook->createSheet($key);
-				$workbook->setActiveSheetIndex($key);	
+				$workbook->setActiveSheetIndex($key);
 				$sheet = $workbook->getActiveSheet();
 				$sheet ->setTitle($value);
 			}
 			$this->ajoutTitreExport($sheet, $value);
 			$this->ajoutDataExport($sheet, $value,$infos);
-		}  
-		
+		}
+
 		$writer = new PHPExcel_Writer_Excel5($workbook);
-		
-		$writer->save($fname);           
+
+		$writer->save($fname);
 		header('Content-type: application/vnd.ms-excel');
-		header('Content-Disposition:inline;filename=export suivis commerce.xls');			
+		header('Content-Disposition:inline;filename=export suivis commerce.xls');
 		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");         
-		fpassthru($fh);   
-		unlink($fname);   
-		PHPExcel_Calculation::getInstance()->__destruct(); 
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
 
 	}
 
 
-	/** Mise en place des titres         
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
-     */     
-    public function ajoutTitreExport(&$sheet, $titre){    	
+	/** Mise en place des titres
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     */
+    public function ajoutTitreExport(&$sheet, $titre){
     	switch ($titre) {
     		case "Devis gagnés" :
 			case "Devis en attente" :
 			case "Devis perdus":
-    			$row_data = array(        	
+    			$row_data = array(
 		        	 "A"=>array('ENTITE',30)
 		        	,"B"=>array("RESPONSABLE", 30)
 					,"C"=>array("REDACTEUR",30)
@@ -81,10 +81,10 @@ class agence_cleodis extends agence {
 					,"H"=>array('PREMIERE DATE D\'ACCORD',30)
 					,"I"=>array('DERNIERE DATE D\'ACCORD',30)
 					,"J"=>array('TYPE DE CONTRAT',30)
-					,"K"=>array('DATE INSTALLATION PREVUE',30)				
-					,"L"=>array('LOYER 1',30)			
+					,"K"=>array('DATE INSTALLATION PREVUE',30)
+					,"L"=>array('LOYER 1',30)
 					,"M"=>array('DUREE 1',30)
-					,"N"=>array('FREQUENCE 1',30)			
+					,"N"=>array('FREQUENCE 1',30)
 					,"O"=>array('LOYER 2',30)
 					,"P"=>array('DUREE 2',30)
 					,"Q"=>array('FREQUENCE 2',30)
@@ -97,12 +97,12 @@ class agence_cleodis extends agence {
 					,"X"=>array('ACHAT',30)
 					,"Y"=>array('LOYER x DUREE',30)
 					,"Z"=>array('PROSPECTION',30)
-				); 		    
-       	
+				);
+
     		break;
-    			
+
     		case "MEL" :
-    			$row_data = array(        	
+    			$row_data = array(
 		        	 "A"=>array('ENTITE',30)
 		        	,"B"=>array("RESPONSABLE", 30)
 					,"C"=>array("CODE CLIENT",15)
@@ -116,8 +116,8 @@ class agence_cleodis extends agence {
 					,"J"=>array('DEBUT ',15)
 					,"K"=>array('FIN',15)
 					,"L"=>array('LOYER',15)
-					,"M"=>array('DUREE',15)				
-					,"N"=>array('ASSURANCE',15)			
+					,"M"=>array('DUREE',15)
+					,"N"=>array('ASSURANCE',15)
 					,"O"=>array('FRAIS DE GESTION',15)
 					,"P"=>array('FREQUENCE',15)
 					,"Q"=>array('TOTAL',15)
@@ -125,26 +125,26 @@ class agence_cleodis extends agence {
 					,"S"=>array('PROSPECTION',30));
 
     		break;
-    		
+
     	}
     	$i=0;
     	foreach($row_data as $col=>$titre){
 			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
-			$sheet->getColumnDimension($col)->setWidth($titre[1]);  
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
 			$i++;
         }
-        
-    }  
 
-    /** Mise en place des titres         
-     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr> 
-     */     
-    public function ajoutDataExport(&$sheet, $titre, $infos){ 
+    }
+
+    /** Mise en place des titres
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     */
+    public function ajoutDataExport(&$sheet, $titre, $infos){
     	$id_agence = $this->decryptId($infos["id_agence"]);
 
     	ATF::user()->q->reset()->where("user.id_agence", $id_agence)->where("user.etat", "normal");
     	$users = ATF::user()->select_all();
-   	
+
 
     	$user_actif_agence = "";
 
@@ -163,7 +163,7 @@ class agence_cleodis extends agence {
     		case "Devis gagnés" :
 			case "Devis en attente" :
 			case "Devis perdus":
-				ATF::devis()->q->reset()->from("devis","id_societe","societe","id_societe")										
+				ATF::devis()->q->reset()->from("devis","id_societe","societe","id_societe")
 										->addOrder("devis.date");
 
 				foreach ($users as $key => $value) {
@@ -180,13 +180,13 @@ class agence_cleodis extends agence {
 					ATF::devis()->q->where("devis.date", "2015-06-01","AND","user_filtre",">=")->where("devis.date", "2015-09-07","AND","user_filtre","<=");
 				}
 
-				$res = ATF::devis()->sa();				
+				$res = ATF::devis()->sa();
 				foreach ($res as $k => $v) {
 
 					ATF::loyer()->q->reset()->where("loyer.id_affaire",$v["id_affaire"]);
 					$loyers = ATF::loyer()->sa();
 
-					$row_data[$k] = array(        	
+					$row_data[$k] = array(
 			        	 "A"=>array(ATF::societe()->nom($v["id_societe"]))
 			        	,"B"=>array(ATF::user()->nom(ATF::societe()->select($v["id_societe"], "id_owner")))
 						,"C"=>array(ATF::user()->nom($v["id_user"]))
@@ -201,25 +201,25 @@ class agence_cleodis extends agence {
 						,"L"=>array("")	,"M"=>array(""),"N"=>array(""),"O"=>array(""),"P"=>array(""),"Q"=>array(""),"R"=>array(""),"S"=>array(""),"T"=>array(""),"U"=>array("")
 						,"V"=>array(""),"W"=>array(""),"X"=>array(""),"Y"=>array("")
 						,"Z"=>array(ATF::contact()->nom(ATF::societe()->select($v["id_societe"], "id_prospection")) )
-					); 
+					);
 					//A =65 Z=90
-				    $lettre = 76;				   
+				    $lettre = 76;
 				    $totalLoyer = 0;
-						
+
 
 					foreach ($loyers as $keyLoyer => $valueLoyer) {
 						$totalLoyer = $totalLoyer + ($valueLoyer["loyer"]+$valueLoyer["assurance"]+$valueLoyer["frais_de_gestion"])*$valueLoyer["duree"];
 						$char = chr($lettre);
 						$row_data[$k][$char] = array($valueLoyer["loyer"]);
 						$lettre++;
-						$char = chr($lettre);						
+						$char = chr($lettre);
 						$row_data[$k][$char] = array($valueLoyer["duree"]);
 						$lettre++;
 						$char = chr($lettre);
-						$row_data[$k][$char] = array($valueLoyer["frequence_loyer"]);	
+						$row_data[$k][$char] = array($valueLoyer["frequence_loyer"]);
 						$lettre++;
 						$char = chr($lettre);
-					}				
+					}
 					$row_data[$k]["Y"]= array($totalLoyer);
 
 
@@ -229,13 +229,13 @@ class agence_cleodis extends agence {
 					foreach ($devis_lignes as $dlk => $dlv) {	$achat = $achat + ($dlv["prix_achat"]*$dlv["quantite"] );	}
 					$row_data[$k]["X"]= array($achat);
 				}
-    				    
-       	
-    		break;  
+
+
+    		break;
 
 
     		case "MEL" :
-    			ATF::commande()->q->reset()->from("commande","id_societe","societe","id_societe")											
+    			ATF::commande()->q->reset()->from("commande","id_societe","societe","id_societe")
 											->whereIsNotNull("commande.date_debut","AND")
 											->where("commande.etat", "non_loyer","OR")
 											->where("commande.etat", "mis_loyer","OR");
@@ -247,13 +247,13 @@ class agence_cleodis extends agence {
 				}
 				$res = ATF::commande()->sa();
 
-				$row_auto=1;  
+				$row_auto=1;
 				foreach ($res as $k => $v) {
 					$loyer = $duree= $assurance = $frais = $frequence =  $total = $refi = "";
 
 					ATF::loyer()->q->reset()->where("loyer.id_affaire",$v["id_affaire"]);
 					$loyers = ATF::loyer()->sa();
-					
+
 					foreach ($loyers as $keyLoyer => $valueLoyer) {
 						if($loyer == ""){
 							$loyer = $valueLoyer["loyer"];
@@ -276,10 +276,10 @@ class agence_cleodis extends agence {
 										   ->where("etat", "valide");
 					$refi = ATF::demande_refi()->select_row();
 					if($refi){	$refi = ATF::refinanceur()->select($refi["id_refinanceur"] , "refinanceur"); }
-					
 
 
-					$row_data[$k] = array(        	
+
+					$row_data[$k] = array(
 			        	 "A"=>array(ATF::societe()->nom($v["id_societe"]))
 			        	,"B"=>array(ATF::user()->nom(ATF::societe()->select($v["id_societe"], "id_owner")))
 						,"C"=>array(ATF::societe()->select($v["id_societe"], "code_client"))
@@ -293,25 +293,25 @@ class agence_cleodis extends agence {
 						,"J"=>array(ATF::commande()->select($v["id_commande"], "date_debut"))
 						,"K"=>array(ATF::commande()->select($v["id_commande"], "date_evolution"))
 						,"L"=>array($loyer)
-						,"M"=>array($duree)				
-						,"N"=>array($assuranc)			
+						,"M"=>array($duree)
+						,"N"=>array($assuranc)
 						,"O"=>array($frais)
 						,"P"=>array($frequence)
 						,"Q"=>array($total)
 						,"R"=>array($refi0)
 						,"S"=>array(ATF::contact()->nom(ATF::societe()->select($v["id_societe"], "id_prospection")) )
-					);				 
+					);
 				}
 
-    		break;    		
-    		
+    		break;
+
     	}
     	$i=0;
     	$j=2;
     	foreach ($row_data as $ligne => $value){
 	    	foreach($value as $col=>$titre){
-				$sheet->setCellValueByColumnAndRow($i , $j, $titre[0]);		
-				$i++;				
+				$sheet->setCellValueByColumnAndRow($i , $j, $titre[0]);
+				$i++;
 	        }
 	        $i=0;
 	        $j++;
@@ -325,5 +325,5 @@ class agence_cleodisbe extends agence_cleodis { };
 
 
 class agence_bdomplus extends agence_cleodis { };
-class agence_bdom extends agence_cleodis { };
 class agence_boulanger extends agence_cleodis { };
+class agence_assets extends agence_cleodis { };

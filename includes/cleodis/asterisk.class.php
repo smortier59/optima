@@ -1,10 +1,10 @@
 <?
-/** 
+/**
 * @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
 * @package Optima
 */
 require_once dirname(__FILE__)."/../asterisk.class.php";
-class asterisk_cleodis extends asterisk {	
+class asterisk_cleodis extends asterisk {
 	/**
 	* Retourne le numéro de téléphone du destinataire en fonction du callerId
 	* @author Yann-Gaël GAUTHERON <ygautheron@absystech.fr>
@@ -18,15 +18,15 @@ class asterisk_cleodis extends asterisk {
 				$id_societe = $contact["id_societe"];
 			} elseif ($id_societe = $this->getSocieteFromCallerId($callerId,true)) {
 				// Soit c'est un numéro d'une société
-	
+
 			}
 			if ($id_societe) {
 				$code_client = ATF::societe()->select($id_societe,'code_client');
 			}
 			switch(substr($code_client,0,1)) {
-				case "C": 
+				case "C":
 				case "M":
-					// Séverine MAZARS 
+					// Séverine MAZARS
 					return 201;
 			}
 		}
@@ -35,4 +35,7 @@ class asterisk_cleodis extends asterisk {
 
 class asterisk_cleodisbe extends asterisk_cleodis { };
 class asterisk_cap extends asterisk_cleodis { };
+class asterisk_bdomplus extends asterisk_cleodis { };
+class asterisk_boulanger extends asterisk_cleodis { };
+class asterisk_assets extends asterisk_cleodis { };
 ?>

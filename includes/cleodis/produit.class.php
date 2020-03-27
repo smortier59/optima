@@ -675,8 +675,10 @@ class produit_cap extends produit {
 };
 
 class produit_bdomplus extends produit_cleodis { };
-class produit_bdom extends produit_cleodis { };
+
 class produit_boulanger extends produit_cleodis {
 
 
  };
+
+ class produit_assets extends produit_cleodis { };

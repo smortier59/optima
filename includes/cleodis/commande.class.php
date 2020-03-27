@@ -2926,5 +2926,6 @@ class commande_cap extends commande_cleodis {
 
 
 class commande_bdomplus extends commande_cleodis { };
-class commande_bdom extends commande_cleodis { };
 class commande_boulanger extends commande_cleodis { };
+
+class commande_assets extends commande_cleodis { };
