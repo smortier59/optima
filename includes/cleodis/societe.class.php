@@ -2161,7 +2161,7 @@ class societe_assets extends societe_cleodis {
   */
   public function create_ref(&$s){
 
-    $ref = "DIV";
+    $ref = "DI";
 
     //Recherche du maximum
     $max=$this->get_max_ref($ref);
