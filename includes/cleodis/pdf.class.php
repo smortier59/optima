@@ -160,7 +160,7 @@ class pdf_cleodis extends pdf {
 				case 'cleodis/OLISYS.jpg':
 				case 'cleodis/proxi-pause.jpg' :
 				case 'cleodis/trekk.jpg':
-				case 'cleodis/zenconnectzenpack.jpg' :
+				case 'cleodis/zen.jpg' :
 					$this->image(__PDF_PATH__."/".$this->logo,75,10,40);
 				break;
 
@@ -201,7 +201,7 @@ class pdf_cleodis extends pdf {
 					case 'cleodis/OLISYS.jpg':
 					case 'cleodis/proxi-pause.jpg' :
 					case 'cleodis/trekk.jpg':
-					case 'cleodis/zenconnectzenpack.jpg' :
+					case 'cleodis/zen.jpg' :
 						$this->image(__PDF_PATH__.$this->logo,10,10,80);
 					break;
 
@@ -233,7 +233,7 @@ class pdf_cleodis extends pdf {
 						case 'cleodis/OLISYS.jpg':
 						case 'cleodis/proxi-pause.jpg' :
 						case 'cleodis/trekk.jpg':
-						case 'cleodis/zenconnectzenpack.jpg' :
+						case 'cleodis/zen.jpg' :
 							 $this->image(__PDF_PATH__.$this->logo,170,5,30);
 						break;
 
@@ -541,7 +541,7 @@ class pdf_cleodis extends pdf {
 
 			case 'ZENCONNECT – ZEN PACK' :
 				$this->cleodis = "ZenPack";
-				$this->logo = 'cleodis/zenconnectzenpack.jpg';
+				$this->logo = 'cleodis/zen.jpg';
 
 			break;
 
@@ -1763,7 +1763,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			case 'ZENCONNECT – ZEN PACK' :
-				$this->logo = 'cleodis/zenconnectzenpack.jpg';
+				$this->logo = 'cleodis/zen.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 
@@ -2275,7 +2275,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			case 'ZENCONNECT – ZEN PACK' :
-				$this->logo = 'cleodis/zenconnectzenpack.jpg';
+				$this->logo = 'cleodis/zen.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 
@@ -4446,7 +4446,7 @@ class pdf_cleodis extends pdf {
 		break;
 
 		case 'ZENCONNECT – ZEN PACK' :
-			$this->logo = 'cleodis/zenconnectzenpack.jpg';
+			$this->logo = 'cleodis/zen.jpg';
 			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 
