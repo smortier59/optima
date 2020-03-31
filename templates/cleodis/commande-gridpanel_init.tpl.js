@@ -30,6 +30,7 @@
 {util::push($fieldsKeys,"contratTransfertExists")}
 {util::push($fieldsKeys,"ctSigneExists")}
 {util::push($fieldsKeys,"CourrierRestitutionExists")}
+{util::push($fieldsKeys,"allowBDCCreate")}
 {if ATF::$codename == "cleodis"} {util::push($fieldsKeys,"ctSGEFExists")} {/if}
 {if ATF::$codename == "cleodisbe"}{util::push($fieldsKeys,"ctlettreBelfiusExists")} {/if}
 
@@ -334,21 +335,24 @@ ATF.renderer.pdfCourriers=function(table,field) {
 			}
 			/* BDC Expand */
 			/* if !ATF::bon_de_commande()->bdcByAffaire($id_commande) */
-			if (!record.data.bdcExist) {
-				html += '<p>';
-				html += '<a href="#bon_de_commande-insert.html,id_commande='+id+'">';
-				html += '<img src="{ATF::$staticserver}images/module/16/bon_de_commande.png" />';
-				html += ATF.usr.trans('creerBDC','commande');
-				html += '</a>&nbsp;&nbsp;&nbsp;';
-				html += '</p>';
+			if(record.data.allowBDCCreate){
+				if (!record.data.bdcExist) {
+					html += '<p>';
+					html += '<a href="#bon_de_commande-insert.html,id_commande='+id+'">';
+					html += '<img src="{ATF::$staticserver}images/module/16/bon_de_commande.png" />';
+					html += ATF.usr.trans('creerBDC','commande');
+					html += '</a>&nbsp;&nbsp;&nbsp;';
+					html += '</p>';
 
-				html += '<p>';
-				html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'bon_de_commande,createAllBDC.ajax\',\'id_commande='+id+'\');">';
-				html += '<img src="{ATF::$staticserver}images/module/16/bon_de_commande.png" />';
-				html += ATF.usr.trans('creerAllBDC','commande');
-				html += '</a>&nbsp;&nbsp;&nbsp;';
-				html += '</p>';
+					html += '<p>';
+					html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'bon_de_commande,createAllBDC.ajax\',\'id_commande='+id+'\');">';
+					html += '<img src="{ATF::$staticserver}images/module/16/bon_de_commande.png" />';
+					html += ATF.usr.trans('creerAllBDC','commande');
+					html += '</a>&nbsp;&nbsp;&nbsp;';
+					html += '</p>';
+				}
 			}
+
 
 			/* Demande refi Expand */
 			if (!record.data.demandeRefiExist) {

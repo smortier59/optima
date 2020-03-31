@@ -64,7 +64,25 @@ class devis_cleodis extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
-			,"type_affaire"=>array("custom"=>true,"data"=>array("normal","2SI"),"xtype"=>"combo")
+			,"type_affaire"=>array("custom"=>true,
+								  "data"=>array(
+								  	'normal',
+								  	'2SI',
+								  	'Boulanger Pro',
+									'Consommables_com',
+									'DIB',
+									'Dyadem',
+									'FLEXFUEL',
+									'Instore',
+									'LAFI',
+									'Manganelli',
+									'NRC',
+									'OLISYS - Ma Solution IT',
+									'Proxi Pause',
+									'Trekk',
+									'ZENCONNECT – ZEN PACK'
+								  ),
+								  "xtype"=>"combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
 
 		);
@@ -1023,12 +1041,21 @@ class devis_cleodis extends devis {
 	* @return boolean
 	*/
 	public function can_update($id,$infos=false){
+
 		if($this->select($id,"etat")=="attente"){
-			return true;
+			if(ATF::affaire()->select($this->select($id,"id_affaire"), "site_associe") == "boulangerpro"){
+				throw new errorATF("Il n'est pas possible de modifier ce devis car il s'agit d'un devis automatique. Vous pouvez l'annuler et en créer un autre. Merci",892);
+				return false;
+			}else{
+				return true;
+			}
 		}else{
 			throw new errorATF("Impossible de modifier/supprimer ce ".ATF::$usr->trans($this->table)." car il n'est plus en '".ATF::$usr->trans("attente")."'",892);
 			return false;
 		}
+
+
+
 	}
 
 	/**
@@ -1101,6 +1128,8 @@ class devis_cleodis extends devis {
 				case "commentaire_facture3":
 					return $affaire["commentaire_facture3"];
 					break;
+				case "type_affaire":
+					return $affaire["type_affaire"];
 			}
 		}else{
 			switch ($field) {
@@ -1144,6 +1173,8 @@ class devis_cleodis extends devis {
 						$return="";
 					}
 					return $return;
+				case "type_affaire":
+					return "normal";
 			}
 		}
 

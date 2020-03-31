@@ -636,9 +636,9 @@ class facture_cleodis extends facture {
 			$infos["prix"]=$infos["prix_libre"];
 			$infos["date_periode_debut"]=$infos["date_periode_debut_libre"];
 			$infos["date_periode_fin"]=$infos["date_periode_fin_libre"];
-			if($infos["type_libre"] !== "contentieux" ){
+			/*if($infos["type_libre"] !== "contentieux" ){
 				$infos["tva"]=1;
-			}
+			}*/
 		}elseif($infos["type_facture"]=="midas"){
 			unset($infos_ligne_repris , $infos_ligne_non_visible , $infos_ligne);
 			$infos["prix"]=$infos["prix_midas"];
@@ -806,12 +806,6 @@ class facture_cleodis extends facture {
 
 		if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")){
 			$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
-			if($infos["key"] == "date_rejet"){
-				if(ATF::facture()->select($infos["id_facture"], "date_rejet") != NULL){
-					throw new errorATF("Impossible de modifier une date de rejet car elle est déja renseignée",877);
-					return true;
-				}
-			}
 
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);

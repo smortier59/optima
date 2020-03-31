@@ -407,6 +407,11 @@ class commande_cleodis extends commande {
 		ATF::db($this->db)->begin_transaction();
 
 		//*****************************Transaction********************************
+		if((ATF::affaire()->select($devis["id_affaire"], "site_associe") || ATF::affaire()->select($devis["id_affaire"], "provenance")) && ATF::affaire()->select($devis["id_affaire"], "provenance") != "partenaire"){
+			//On ne crée pas la tache pour les affaires du portail partenaire, car elle est crée lors de la création de l'affaire
+			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
+		}
+
 
 		if(ATF::$codename != "bdomplus"){
 			$tache = array("tache"=>array("id_societe"=> $devis["id_societe"],
@@ -964,9 +969,12 @@ class commande_cleodis extends commande {
 							,'suivi_notifie'=>$notifie
 						);
 						ATF::suivi()->insert($suivi);
+					}else{
+						$this->checkEtat($commande);
 					}
 				}else{
-					throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
+					//throw new errorATF("Il est impossible d'inserer une date de restitution effective nulle");
+					$this->checkEtat($commande);
 				}
 				//}
 			break;
@@ -1387,12 +1395,24 @@ class commande_cleodis extends commande {
 			} else {
 				$return['data'][$k]['prolongationAllow'] = false;
 			}
-			//Check l'existence de création de BDC
-			if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
-				$return['data'][$k]['bdcExist'] = true;
-			} else {
-				$return['data'][$k]['bdcExist'] = false;
+
+			//Check l'existence d'un comité accepte
+			if(ATF::affaire()->comiteAccepte($i["commande.id_affaire_fk"])){
+				$return['data'][$k]['allowBDCCreate'] = true;
+
+				//Check l'existence de création de BDC
+				if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
+					$return['data'][$k]['bdcExist'] = true;
+				} else {
+					$return['data'][$k]['bdcExist'] = false;
+				}
+
+			}else{
+				$return['data'][$k]['allowBDCCreate'] = false;
 			}
+
+
+
 			//Check l'existence de création de demande refi
 			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false) || $affaire['nature']=="vente") {
 				$return['data'][$k]['demandeRefiExist'] = true;

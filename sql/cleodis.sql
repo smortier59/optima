@@ -1,3 +1,20 @@
+ALTER TABLE `affaire` CHANGE `type_affaire` `type_affaire` ENUM('normal','2SI','Boulanger Pro',
+'Consommables_com',
+'DIB',
+'Dyadem',
+'FLEXFUEL',
+'Instore',
+'LAFI',
+'Manganelli',
+'NRC',
+'OLISYS - Ma Solution IT',
+'Proxi Pause',
+'Trekk',
+'ZENCONNECT – ZEN PACK') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'normal';
+
+
+
+
 # Création des vues pour l'espace CLIENT pro CLEODIS
 CREATE VIEW coordonnees_client AS SELECT id_societe, ref, societe, famille.famille as type_client,  nom_commercial, adresse, adresse_2, adresse_3, cp, ville, facturation_adresse, facturation_adresse_2, facturation_adresse_3, facturation_cp, facturation_ville, livraison_adresse, livraison_adresse_2, livraison_adresse_3, livraison_cp, livraison_ville, email, tel,particulier_civilite, particulier_nom, particulier_prenom, particulier_portable, num_carte_fidelite, particulier_fixe, particulier_email
 FROM societe

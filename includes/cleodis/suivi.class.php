@@ -6,9 +6,9 @@
 require_once dirname(__FILE__)."/../suivi.class.php";
 class suivi_cleodis extends suivi {
 	function __construct() {
-		$this->table = "suivi"; 
+		$this->table = "suivi";
 		parent::__construct();
-		$this->colonnes["fields_column"] = array(	
+		$this->colonnes["fields_column"] = array(
 			'suivi.id_user'
 			,'suivi.id_societe'
 			,'suivi.date'=>array("width"=>100,"align"=>"center")
@@ -19,7 +19,7 @@ class suivi_cleodis extends suivi {
 			,'suivi.notifie'=>array("custom"=>true,"nosort"=>true)
 			,'fichier_joint'=>array("width"=>50,"custom"=>true,"nosort"=>true,"type"=>"file")
 		);
-		
+
 		//Autocomplete
 		$this->affaireAutocompleteMapping=array(
 			array("name"=>'id', "mapping"=>0),
@@ -27,7 +27,7 @@ class suivi_cleodis extends suivi {
 			array("name"=>'date', "mapping"=>2),
 			array("name"=>'etat', "mapping"=>3)
 		);
-		
+
 		$this->colonnes['primary'] = array(
 			"id_societe"
 			,"id_affaire"=>array("autocomplete"=>array(
@@ -41,7 +41,7 @@ class suivi_cleodis extends suivi {
 		$this->colonnes['panel']['formation'] = array(
 			"id_formation_devis"=>array("custom"=>true)
 		);
-		
+
 		$this->colonnes['panel']['texteSuivi'] = array(
 			"texte"=>array("xtype"=>"textarea","height"=>300)
 		);
@@ -57,7 +57,7 @@ class suivi_cleodis extends suivi {
 		$this->colonnes['panel']['notification'] = array(
 			"suivi_notifie"=>array("custom"=>true)
 		);
-		
+
 		$this->stats_types = array("user","users");
 		$this->fieldstructure();
 		$this->panels['primary'] = array("nbCols"=>2);
@@ -70,35 +70,42 @@ class suivi_cleodis extends suivi {
 		$this->suivi_type=array('note'=>1,'fichier'=>1,'RDV'=>1,'appel'=>1,'courrier'=>1);
 		$this->stats_filtre=array('suivi_type');
 
-		
+
 		$this->colonnes["bloquees"]["insert"]=
 		$this->colonnes["bloquees"]["update"]=array("origine","public","id_contact");
 		$this->colonnes["bloquees"]["select"]=array("origine","public");
 	}
 
-	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){		
+	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
 		if(!$infos["suivi"]){
 			$infos["suivi"] = $infos;
-		}		
+		}
 		$infos["objet"] = "Suivi ".$infos["suivi"]['type_suivi']." de la part de ".ATF::user()->nom(ATF::$usr->getID());
 		$infos["champsComplementaire"] = $infos["suivi"]["champsComplementaire"];
 		$infos["attente_reponse"] = $infos["suivi"]["attente_reponse"];
 		unset($infos["suivi"]["champsComplementaire"]);
-		
+
+		if($infos["suivi"]["type_suivi"] == "Contentieux" && ATF::$codename == "cleodis"){
+			$infos["suivi"]["suivi_notifie"][] = 127;
+			//127
+		}
+
+
+
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
 
-	public function update($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){		
+	public function update($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
 
 		if(!$infos["suivi"]){
 			$infos["suivi"] = $infos;
 		}
 
 		if(!$infos["suivi"]["attente_reponse"]){	$infos["attente_reponse"]= $this->select($infos["suivi"]["id_suivi"], "attente_reponse");
-		}else{	$infos["attente_reponse"]= $infos["suivi"]["attente_reponse"];	} 
+		}else{	$infos["attente_reponse"]= $infos["suivi"]["attente_reponse"];	}
 
-		$infos["objet"] = "Modification du suivi ".$infos["suivi"]['type_suivi']." de la part de ".ATF::user()->nom(ATF::$usr->getID());		
-		
+		$infos["objet"] = "Modification du suivi ".$infos["suivi"]['type_suivi']." de la part de ".ATF::user()->nom(ATF::$usr->getID());
+
 
 		return parent::update($infos,$s,$files,$cadre_refreshed);
 	}
@@ -111,14 +118,14 @@ class suivi_cleodis extends suivi {
 	**								STATS
 	********************************************************************************/
 
-	
+
 	/**
-	* Statistiques 
+	* Statistiques
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param tab session
 	* @param string annee
 	* @param string id_societe
-	* @param string pole 
+	* @param string pole
 	* @param string id_user
 	* return enregistrements
 	*/
@@ -127,8 +134,8 @@ class suivi_cleodis extends suivi {
 		$this->q->addField("CONCAT(`user`.`prenom`,' ',`user`.`nom`)","label")
 				->addField("suivi.id_user","ident")
 				->addField("COUNT(suivi.id_suivi)","nb");
-			
-		
+
+
 		if($id_user){
 			$this->q->addCondition("suivi.id_user",$id_user,false,"hot_id_user");
 		}
@@ -140,13 +147,13 @@ class suivi_cleodis extends suivi {
 				//if($check)$this->q->addCondition("hotline.$name",$valeur,"OR","hotline.$name");
 				if($name == "suivi_type"){
 					if($check)$this->q->addCondition("suivi.type",$valeur,"OR","suivi.type");
-				}else{ if($check)$this->q->addCondition("suivi.$name",$valeur,"OR","suivi.$name");	}				
+				}else{ if($check)$this->q->addCondition("suivi.$name",$valeur,"OR","suivi.$name");	}
 			}
 		}
-		
-		
+
+
 		$this->q->addField("DATE_FORMAT(`".$this->table."`.`date`,'%Y')","y")
-				->addField("DATE_FORMAT(`".$this->table."`.`date`,'%m')","mois")				
+				->addField("DATE_FORMAT(`".$this->table."`.`date`,'%m')","mois")
 				->setStrict()
 				->addJointure($this->table,"id_user","user","id_user")
 				->addCondition("YEAR( suivi.date )",$annee)
@@ -160,13 +167,13 @@ class suivi_cleodis extends suivi {
 		foreach (util::month() as $k=>$i) {
 			$graph['categories']["category"][$k] = array("label"=>substr($i,0,4));
 		}
-	
+
 		$graph['params']['caption'] = "Nombre de suivis";
 		$graph['params']['yaxisname'] = "Total";
-	
-		/*parametres graphe*/		
+
+		/*parametres graphe*/
 		$this->paramGraphe($dataset_params,$graph);
-		
+
 		foreach ($result as $val_) {
 			$val_["mois"] = strlen($val_["mois"])<2?"0".$val_["mois"]:$val_["mois"];
 			if (!$graph['dataset'][$val_["ident"]]) {
@@ -174,21 +181,21 @@ class suivi_cleodis extends suivi {
 					"seriesname"=>preg_replace("`('|&)`","",$val_["label"])
 					,"color"=>dechex(rand(0,16777216))
 				));
-				
+
 				for ($m=1;$m<13;$m++) { /* Initialisation de tous les set à 0 */
 					$graph['dataset'][$val_["ident"]]['set'][strlen($m)<2?"0".$m:$m] = array("value"=>0,"alpha"=>100,"titre"=>preg_replace("`('|&)`","",$val_["label"])." : 0");
 				}
 			}
-			
+
 			$graph['dataset'][$val_["ident"]]['set'][$val_["mois"]] = array("value"=>$val_['nb'],"alpha"=>100,"titre"=>preg_replace("`('|&)`","",$val_["label"])." : ".$val_['nb']);
-		
+
 		}
 		return $graph;
 	}
-	
 
-	
-	
+
+
+
 	/**
 	* Permet de sauvegarder la liste des users sur lesquelles afficher la charge
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
@@ -231,7 +238,7 @@ class suivi_cleodis extends suivi {
 			->addCondition('etat','normal')
 			->addConditionNotNull('id_profil')
 			->addGroup('id');
-		
+
 		foreach(ATF::user()->sa() AS $tab){
 			$r[$tab['id']]  = $tab['nom'];
 		}
@@ -241,7 +248,7 @@ class suivi_cleodis extends suivi {
 
 	/**
 	* Retourne les années pour lesquelles la hotline a été utilisée
-	*		pour une société donnée si elle est en param	
+	*		pour une société donnée si elle est en param
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	* @param int id_societe
 	* @return array key =year item=year
@@ -249,10 +256,10 @@ class suivi_cleodis extends suivi {
 	public function get_annee(){
 		$this->q->reset()
 				->addField("YEAR( suivi.date )","year")
-				->addJointure($this->table,"id_suivi","suivi","id_suivi",NULL,NULL,NULL,NULL,"inner")				
+				->addJointure($this->table,"id_suivi","suivi","id_suivi",NULL,NULL,NULL,NULL,"inner")
 				->addGroup("year")
-				->addOrder("year");	
-		
+				->addOrder("year");
+
 		foreach(parent::select_all() AS $tab){
 			$r[$tab['year']] = $tab['year'];
 		}

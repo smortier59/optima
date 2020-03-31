@@ -23,12 +23,12 @@ class affaire_cleodis extends affaire {
 			,'parentes'=>array("custom"=>true,"nosort"=>true)
 			,'affaire.mail_signature'
 			,'affaire.mail_document'
-			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
-			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
-			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
-			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"fileRenderer")
+			,'cni'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
+			,'cniVerso'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
+			,'contrat_signe'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
+			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
+			,'facture_fournisseur'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'validateOrder'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"validateOrderRenderer")
-
 
 			,"affaire.commentaire_facture"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture2"=>array("rowEditor"=>"setInfos")
@@ -130,13 +130,14 @@ class affaire_cleodis extends affaire {
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
-		$this->files["cni"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
-		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>true,"no_upload"=>false,"no_generate"=>true);
-		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		$this->files["cni"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="%ref%";
@@ -180,6 +181,19 @@ class affaire_cleodis extends affaire {
 		$this->updateCommentaireFacture($infos);
 
 	}
+
+
+	public function comiteAccepte($id_affaire){
+
+		ATF::comite()->q->reset()->where("id_affaire",ATF::affaire()->decryptId($id_affaire))->where("etat","accepte")->setCount();
+		$data = ATF::comite()->sa();
+		if($data["count"]){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 
 	public function updateCommentaireFacture($infos){
 		$id_affaire = $this->decryptId($infos["id_affaire"]);
@@ -1083,9 +1097,13 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["ref_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "ref_externe");
 			$return['data'][$k]["etat_cmd_externe"] = ATF::affaire()->select($i['affaire.id_affaire'], "etat_cmd_externe");
 
-			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? true : false;
-			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? true : false;
-			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? true : false;
+			$return['data'][$k]["cni"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cni"))? $this->files['cni']['type'] : false;
+			$return['data'][$k]["cniVerso"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"cniVerso")) ? $this->files['cniVerso']['type'] : false;
+			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? $this->files['pouvoir']['type'] : false;
+			$return['data'][$k]["contrat_signe"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"contrat_signe")) ? $this->files['contrat_signe']['type'] : false;
+			$return['data'][$k]["facture_fournisseur"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"facture_fournisseur")) ? $this->files['facture_fournisseur']['type'] : false;
+
+
 			$return['data'][$k]["dossier_preuve_sell_sign"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"dossier_preuve_sell_sign")) ? true : false;
 
 			if ($i['affaire.nature'] == 'AR') {
@@ -1578,6 +1596,11 @@ class affaire_cleodis extends affaire {
 
 				$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 				$data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
+				$data['data'][$key]["contrat_signe"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"contrat_signe")) ? true : false;
+				$data['data'][$key]["facture_fournisseur"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"facture_fournisseur")) ? true : false;
+
+
+
 
 
 
@@ -1616,6 +1639,12 @@ class affaire_cleodis extends affaire {
 				$data['data'][$key]["file_cni"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"cni"));
 				$data['data'][$key]["file_cniVerso"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"cniVerso"));
 				$data['data'][$key]["file_pouvoir"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"pouvoir"));
+				$data['data'][$key]["file_contrat_signe"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"contrat_signe"));
+				$data['data'][$key]["file_facture_fournisseur"] = file_exists(ATF::affaire()->filepath($data['data'][$key]['id_affaire_fk'],"facture_fournisseur"));
+
+
+
+
 
 				ATF::bon_de_commande()->q->reset()
 			       ->addField("id_bon_de_commande")
@@ -1816,6 +1845,13 @@ class affaire_cleodis extends affaire {
 		  $data["file_facture_fournisseur"] = file_exists($this->filepath($get["id_affaire"],"facture_fournisseur"));
 		  $data["file_cniVerso"] = file_exists($this->filepath($get["id_affaire"],"cniVerso"));
 		  $data["file_pouvoir"] = file_exists($this->filepath($get["id_affaire"],"pouvoir"));
+		  $data["file_contrat_signe"] = file_exists($this->filepath($get["id_affaire"],"contrat_signe"));
+		  $data["file_facture_fournisseur"] = file_exists($this->filepath($get["id_affaire"],"facture_fournisseur"));
+
+
+
+
+
 		  $data["file_devis_partenaire"] = file_exists($this->filepath($get["id_affaire"],"devis_partenaire"));
 
 		  foreach ($data["comites"] as $key => $value) {
@@ -2220,6 +2256,12 @@ class affaire_cleodis extends affaire {
 
 				$data['data'][$key]["contact"] = ATF::contact()->select($value['societe.id_contact_signataire']);
 				$data['data'][$key]["cni"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"cni")) ? true : false;
+				$data['data'][$key]["contrat_signe"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"contrat_signe")) ? true : false;
+				$data['data'][$key]["facture_fournisseur"] = file_exists($this->filepath($value['affaire.id_affaire_fk'],"facture_fournisseur")) ? true : false;
+
+
+
+
 				$data['data'][$key]["idcrypted"] = $this->cryptId($value['affaire.id_affaire_fk']);
 
 				ATF::commande()->q->reset()->where("commande.id_affaire",$value['affaire.id_affaire_fk']);
@@ -2405,6 +2447,7 @@ class affaire_cleodis extends affaire {
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
+			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
 			// une fois l'id affaire connue on peut ajouter le devis
@@ -2778,18 +2821,21 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		$dest = array("21","112", "103");  //Allison, Severine, Emily
+		$dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
 		$id_user = 116; //Benjamin Tronquit
 
 		if(ATF::$codename === "cleodisbe"){
-			$dest = array("21", "104");  //Allison, Severine
+			$dest = array("18", "21", "104");  //Pierre, Allison, Severine,  Jeanne
 			$id_user = 113;  //Benjamin Tronquit
 		}
+
+		$affaire = ATF::affaire()->select($id_affaire);
+		$societe = ATF::societe()->select($affaire["id_societe"]);
 
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter ",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." provenant de ".$affaire["provenance"]." du site ".$affaire["site_associe"].". \nDonnées de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),

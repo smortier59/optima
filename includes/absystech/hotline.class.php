@@ -951,9 +951,8 @@ class hotline extends classes_optima {
 			$data["channel"] = "Hotline";
 			$cmd .= json_encode($data);
 			$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
-
 		}
-		log::logger($cmd,'mm');
+
 		if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 
@@ -3883,7 +3882,8 @@ if (!ATF::isTestUnitaire()) $result = `$cmd`;
 
 		// Profil développeur extérieur (PATCH DEGUEU EN MODE BRICOLE)
 		if (ATF::$usr->get('id_profil') == 16) {
-			$this->q->where("gep_projet.id_societe", 513); // Cléodis
+			$this->q->where("gep_projet.id_societe", 513, "OR", "projets"); // Cléodis
+			$this->q->where("gep_projet.id_gep_projet", 202, "OR", "projets"); // AirFrance
 		}
 
 		// $this->q->setToString();

@@ -1486,7 +1486,7 @@ class societe_cleodis extends societe {
                                   "devis_ligne__dot__visible"=>$visible
                                 );
 
-              $devis["prix_achat"] += $ligne["prix_achat"];
+              $devis["prix_achat"] += ($ligne["prix_achat"] * $qte);
 
             }
           }
@@ -1497,8 +1497,6 @@ class societe_cleodis extends societe {
             throw new errorATF($e ,500);
           }
           $devis = ATF::devis()->select($id_devis);
-
-          ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
           switch ($post["provenance"]) {
             case 'd023ef3680189f828a53810e3eda0ecc':
@@ -1513,8 +1511,6 @@ class societe_cleodis extends societe {
               ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"], "site_associe"=>"toshiba","provenance"=>"cleodis"));
             break;
           }
-
-
           ATF::affaire_etat()->insert(array(
                                         "id_affaire"=>$devis["id_affaire"],
                                         "etat"=>"reception_demande"
@@ -1827,7 +1823,8 @@ class societe_cleodis extends societe {
             "id_societe" => $devis["id_societe"],
             "date" => date("d-m-Y"),
             "id_affaire" => $id_affaire,
-            "id_devis" => $devis["id_devis"]
+            "id_devis" => $devis["id_devis"],
+            "prix_achat" => $devis["prix_achat"]
         );
 
     $produits = array();

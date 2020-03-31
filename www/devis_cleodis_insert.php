@@ -155,6 +155,12 @@ if($infos["societe"] && $infos["siret"] && $infos["adresse"] && $infos["cp"] && 
 
             $devis["prix_achat"] = $prix_achat;
             $devis["prix"] = $prix;
+
+            if($soc){
+                $devis["IBAN"] =$soc["IBAN"];
+                $devis["BIC"] = $soc["BIC"];
+            }
+
             if($_POST["codename"] == "cleodis"){ $devis["marge"] = $prix - $prix_achat;  }
             //$devis["marge_absolue"] = 0;
 
