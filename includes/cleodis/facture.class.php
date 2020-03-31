@@ -797,7 +797,13 @@ class facture_cleodis extends facture {
     * @param array $infos date garantie
     * @param type pour savoir si l'on cherche une affaire qui annule  et remplace ($type=='new') ou une affaire qui EST annulée et remplacée ($type=='old')
     * @return boolean à true si la transaction c'est bien passé
-    */
+	*/
+	
+	// Expose updateDate function
+	public function _updateDate($infos) {
+		$this->updateDate($infos);
+	}
+
 	public function updateDate($infos){
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
