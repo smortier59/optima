@@ -789,6 +789,14 @@ class facture_cleodis extends facture {
 	}
 
 	/**
+    * Exposition de la fonction updateDate via l'API de'Optima
+    * @author Quentin JANON <qjanon@absystech.fr>
+    */
+	public function _updateDate($infos) {
+		$this->updateDate($infos);
+	}
+
+	/**
     * Fonction qui permet de mettre à jour la date
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     * @param array $infos date garantie
