@@ -69,6 +69,8 @@ ALTER TABLE `pack_produit_ligne` ADD `val_modifiable` ENUM('oui','non') NOT NULL
 ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `produit` ADD `id_licence_type` MEDIUMINT(8) UNSIGNED NULL DEFAULT NULL AFTER `ref_garantie`, ADD `increment` INT(10) NOT NULL AFTER `id_licence_type`, ADD INDEX (`id_licence_type`);
 ALTER TABLE `produit` ADD FOREIGN KEY (`id_licence_type`) REFERENCES `licence_type`(`id_licence_type`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `pack_produit_ligne` CHANGE `valeur` `valeur` INT(10) UNSIGNED NULL COMMENT 'Nombre de point pour ce produit';
+
 SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
