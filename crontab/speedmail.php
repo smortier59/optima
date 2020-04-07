@@ -4,13 +4,13 @@
 * @author Quentin JANON <qjanon@absystech.fr>
 * @date 03-11-2010
 */
+
+define("__BYPASS__",true);
+include(dirname(__FILE__)."/../global.inc.php");
 if ($_SERVER["argv"][1]==="-force") {
 	unset($_SERVER["argv"][1]);
 	$force = true;
 }
-
-define("__BYPASS__",true);
-include(dirname(__FILE__)."/../global.inc.php");
 
 /* Check si un job est en cours d'envoi */
 if (ATF::constante()->getValue("__LAST_SPEEDMAIL_SENDER__")!="" && !$_SERVER["argv"][2]) {
