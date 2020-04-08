@@ -15,7 +15,7 @@ CREATE TABLE `facturation_fournisseur` (
   `date_debut_periode` date NOT NULL,
   `date_fin_periode` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
+ 
 -- --------------------------------------------------------
 
 --
