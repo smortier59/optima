@@ -1008,7 +1008,7 @@ class souscription_cleodis extends souscription {
   public function sendContrat($affaire, $files, $contact, $codename){
 
     if($contact["email"] || $contact["email_perso"]){
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
       $info_mail["recipient"] = ($contact["email"]) ? $contact["email"] : $contact["email_perso"];
       $info_mail["html"] = true;
       $info_mail["template"] = "mail_contrat_a_signer";
@@ -1402,7 +1402,7 @@ class souscription_bdomplus extends souscription_cleodis {
       $vendeur = json_decode($vendeur, true);
       log::logger($vendeur, $this->logFileSouscription);
 
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
       $info_mail["recipient"] = "benjamin.tronquit@cleodis.com";
       $info_mail["html"] = true;
       $info_mail["template"] = "bdomplus-mailVendeurMagasin";
@@ -1441,7 +1441,7 @@ class souscription_bdomplus extends souscription_cleodis {
       $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
     }
 
-    $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
     $info_mail["recipient"] = $email;
     $info_mail["html"] = true;
     $info_mail["template"] = "facture_magasin_non_reglee";
@@ -1484,7 +1484,7 @@ class souscription_bdomplus extends souscription_cleodis {
       $email = ATF::societe()->select($id_societe, "  particulier_email");
     }
 
-    $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
     $info_mail["recipient"] = $email;
     $info_mail["html"] = true;
     $info_mail["template"] = "envoi_licence";
@@ -1536,7 +1536,7 @@ class souscription_bdomplus extends souscription_cleodis {
         $email = ATF::societe()->select($affaire["affaire.id_societe_fk"], "  particulier_email");
       }
 
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
       $info_mail["recipient"] = $email;
       $info_mail["html"] = true;
       $info_mail["mail_to_client"] = "oui";
@@ -1565,7 +1565,7 @@ class souscription_bdomplus extends souscription_cleodis {
       ATF::suivi()->i($suivi);
 
 
-      $info_mail["from"] = "L'équipe Cléodis (ne pas répondre) <no-reply@cleodis.com>";
+      $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
       $info_mail["html"] = true;
       $info_mail["template"] = "installation_domicile";
       $client =  ATF::societe()->select($affaire["affaire.id_societe_fk"]);
