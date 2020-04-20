@@ -107,7 +107,9 @@ class affaire_cleodis extends affaire {
 		$this->colonnes['bloquees']['select'] = array('id_parent','data','RIB','BIC','IBAN','RUM','nom_banque','ville_banque','date_previsionnelle','commentaire_facture','commentaire_facture2','commentaire_facture3');
 
 		$this->onglets = array(
-			'loyer'
+			'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
 			,'commande'=>array('opened'=>true)
@@ -140,7 +142,7 @@ class affaire_cleodis extends affaire {
 
 
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
-		$this->field_nom="ref";
+		$this->field_nom="%ref%";
 		$this->foreign_key['id_fille'] =  "affaire";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
@@ -1007,13 +1009,11 @@ class affaire_cleodis extends affaire {
 
 		// Librairie externe Finance
 		require_once 'finance.class.php';
-//log::logger($loyers,ygautheron);
 
 		// Baser les calculs sur la valeur résiduelle de la demande de refi acceptée
 		if ($demandeRefi = $this->getDemandeRefiValidee()) {
 			$vr = $demandeRefi->get("valeur_residuelle");
 		}
-//log::logger("valeur_residuelle_demande_refi => ".$vr,ygautheron);
 
 		$f = new Financial;
 		$freq = array("mois"=>12,"trimestre"=>4,"semestre"=>2,"an"=>1);
@@ -1022,7 +1022,6 @@ class affaire_cleodis extends affaire {
 			if ($pv) {
 				$vr2 = $pv;
 			}
-//log::logger("f->PV(".$taux."/".$freq[$loyer["frequence_loyer"]]."/100, ".$loyer["duree"].", ".$loyer["loyer"].", ".$vr." , 1);",ygautheron);
 			$pv = -$f->PV($taux/$freq[$loyer["frequence_loyer"]]/100, $loyer["duree"], ($loyer["loyer"]+$loyer["frais_de_gestion"]+$loyer["assurance"]), $vr2 , 1);
 			$loyers[$i]["pv"] = round($pv,2);
 		}
@@ -1041,13 +1040,11 @@ class affaire_cleodis extends affaire {
 	*/
 	public function getCompteTLoyerActualise(&$infos) {
 		$a = new affaire_cleodis($infos["id_affaire"]);
-//log::logger($infos,ygautheron);
 		if ($c = $a->getCommande()) {
 			$date_debut = $c->get("date_debut");
 		}
 
 		if ($date_debut && $infos["date_cession"]) {
-//log::logger("date_cession=".$infos["date_cession"],ygautheron);
 			$date1 = new DateTime(substr($infos["date_cession"],0,8).'01');
 
 			if(date("m",strtotime($infos["date_cession"])) != "12"){
@@ -1057,11 +1054,7 @@ class affaire_cleodis extends affaire {
 
 
 
-//log::logger("date_cession=".$date1->format('Y-m-d'),mfleurquin);
-//log::logger("date_debut=".$date_debut,mfleurquin);
 			$date2 = new DateTime($date_debut);
-//log::logger($date1->diff($date2),mfleurquin);
-//log::logger("diff=".$date1->diff($date2)->format('%m'),mfleurquin);
 			$duree_ecoulee_restante = $duree_ecoulee = $date1->diff($date2)->format('%y')*12 + $date1->diff($date2)->format('%m');
 
 			if($date1->diff($date2)->format('%d')){
@@ -1069,33 +1062,25 @@ class affaire_cleodis extends affaire {
 			}
 
 
-//log::logger("duree_ecoulee=".$duree_ecoulee,mfleurquin);
-//log::logger(DateTime::getLasterrorATFs(),ygautheron);
 
 			// On "rogne" les mois deja écoulé jusqu'àla date de cession
 			$frequence_loyer=array("mois"=>1,"trimestre"=>3,"semestre"=>6,"an"=>12);
 			$loyers = $this->getLoyers($infos["id_affaire"]);
 			$loyers = array_reverse($loyers);
 			foreach ($loyers as $k => $loyer) {
-//log::logger("duree_ecoulee_restante=".$duree_ecoulee_restante,ygautheron);
 				if ($duree_ecoulee_restante>0) { // Tant qu'il reste de la durée à rogner
 					$duree = ceil($loyer["duree"]*$frequence_loyer[$loyer["frequence_loyer"]]);
-//log::logger("duree=".$duree,ygautheron);
 					$duree_max_pouvant_etre_retiree_de_ce_loyer = min($duree,$duree_ecoulee_restante);
-//log::logger("duree_max_pouvant_etre_retiree_de_ce_loyer=".$duree_max_pouvant_etre_retiree_de_ce_loyer,ygautheron);
 					$loyer["duree"] -= $duree_max_pouvant_etre_retiree_de_ce_loyer / $frequence_loyer[$loyer["frequence_loyer"]];
 					$duree_ecoulee_restante -= $duree_max_pouvant_etre_retiree_de_ce_loyer;
-//log::logger("duree_ecoulee_restante=".$duree_ecoulee_restante,mfleurquin);
 					$loyers[$k] = $loyer;
 				}
 			}
 
 			$loyers = array_reverse($loyers);
 		}
-//log::logger($loyers,mfleurquin);
 
 		$loyers = $a->getCompteTLoyersActualises($infos["taux"],$infos["vr"],$loyers);
-//log::logger($loyers,ygautheron);
 		//date_default_timezone_set($fuseau);	// Fin du truc chelou	: https://bugs.php.net/bug.php?id=52480
 		return $loyers[0]["pv"];
 	}
@@ -3101,6 +3086,7 @@ class affaire_bdomplus extends affaire_cleodis {
 		$this->onglets = array(
 			'affaire_etat'
 			,"sell_and_sign"
+			,"facture_magasin"
 			,'loyer'
 			,'devis'=>array('opened'=>true)
 			,'comite'=>array('opened'=>true)
@@ -3119,6 +3105,7 @@ class affaire_bdomplus extends affaire_cleodis {
 			,'suivi'
 			,'tache'
 			,"pdf_affaire"
+			,"licence"
 		);
 
 		$this->colonnes['primary']['licence'] = array("custom"=>true);
@@ -3261,28 +3248,227 @@ class affaire_bdomplus extends affaire_cleodis {
 		}
 	}
 
-	// public function select($id,$field=NULL) {
-	// 	if (!$id) return false;
-	// 	$affaire=parent::select($id,$field);
-	// 	// $affaire['licence'] = [];
-	// 	log::logger($id, "qjanon");
 
-	// 	ATF::commande()->q->reset()->where('commande.id_affaire', $id)->setStrict();
-	// 	$commande = ATF::commande()->select_row();
-	// 	log::logger($commande,'qjanon');
-	// 	if (!$commande['commande.id_commande']) return $affaire;
-	// 	$commande_lignes = ATF::commande_ligne()->ss('commande_ligne.id_commande',$commande[0]['commande.id_commande']);
-
-	// 	if (!$commande_lignes) return $affaire;
-	// 	foreach ($commande_lignes as $k=>$cmdl) {
-	// 		$licence = ATF::licence()->ss("licence.id_commande_ligne", $cmdl['id_commande_ligne']);
-	// 		if ($licence) {
-	// 			$affaire['affaire.licence'] = $licence[0]['licence.licence'].", ";
-	// 		}
-	// 	}
-
-	// 	return $affaire;
-	// }
 };
 class affaire_bdom extends affaire_cleodis { };
-class affaire_boulanger extends affaire_cleodis { };
+class affaire_boulanger extends affaire_cleodis {
+
+	function __construct($table_or_id=NULL) {
+		$this->table = "affaire";
+		parent::__construct($table_or_id);
+
+		$this->onglets = array(
+			 'affaire_etat'
+			,"sell_and_sign"
+			,'loyer'
+			,'devis'=>array('opened'=>true)
+			,'comite'=>array('opened'=>true)
+			,'commande'=>array('opened'=>true)
+			,'prolongation'
+			,'loyer_prolongation'
+			,'bon_de_commande'
+			,'demande_refi'
+			,'facture'=>array('opened'=>true)
+			,'facture_fournisseur'
+			,'facture_non_parvenue'
+			,'facturation'
+			,'facturation_fournisseur'
+			,'intervention'
+			,'parc'
+			,'livraison'
+			,'suivi'
+			,'tache'
+			,"pdf_affaire"
+		);
+
+		$this->colonnes['primary']['licence'] = array("custom"=>true);
+		$this->fieldstructure();
+		$this->addPrivilege("export_boulanger_commande_client");
+	}
+
+	public function export_boulanger_commande_client(&$infos){
+		$infos["display"] = true;
+
+		ATF::commande()->q->reset()
+						  ->addField("societe.particulier_nom","Nom client")
+						  ->addField("societe.particulier_prenom","Prénom client")
+						  ->addField("societe.code_client","Code client")
+						  ->addField("societe.particulier_portable","Téléphone client")
+						  ->addField("societe.particulier_email","Email client")
+						  ->addField("societe.adresse","Adresse client")
+						  ->addField("societe.adresse_2","Adresse 2 client")
+						  ->addField("societe.adresse_3","Adresse 3 client")
+						  ->addField("societe.cp","Code postal client")
+						  ->addField("societe.ville","Ville client")
+						  ->addField("commande.ref","Réf commande")
+						  ->addField("commande_ligne.ref","Réf produit")
+						  ->addField("commande_ligne.produit","Libellé produit")
+						  ->addField("commande_ligne.quantite","Quantité")
+						  ->from("commande","id_commande","commande_ligne","id_commande")
+						  ->from("commande","id_societe","societe","id_societe");
+
+		$data = ATF::commande()->sa();
+		log::logger($data, "qjanon");
+		ATF::db()->begin_transaction();
+		try{
+			$fn = "export_boulanger_commande_client.csv";
+	        $filepath = '/tmp/'.$fn;
+	        $fp = fopen($filepath, 'w');
+			fputcsv($fp, array_keys($data[0]));
+	        foreach ($data as $line) {
+				fputcsv($fp, array_values($line));
+			}
+			fclose($fp);
+			ATF::db()->commit_transaction();
+		}catch(errorATF $e){
+			ATF::db()->rollback_transaction();
+			throw new errorATF("Erreur lors de la génération du fichier");
+		}
+
+    	header("Content-type: text/csv");
+    	header("Content-Transfer-Encoding: UTF-8");
+		header("Content-Disposition: attachment; filename=".$fn);
+		header("Pragma: no-cache");
+		header("Expires: 0");
+        echo readfile($filepath);
+
+	}
+
+	/**
+	* Retourne la ref d'un avenant
+	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+	* @param int $id_parent
+	* @return string ref
+	*/
+	function getRefAvenant($id_parent){
+		//Récup du dernier avenant de cette affaire
+		$ref=substr($this->select($id_parent,"ref"),0,7);
+		$this->q->reset()
+		   ->addField('MAX(`ref`)','max')
+		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
+		   ->setStrict()
+		   ->setDimension("row");
+
+		$ref_avenant=$this->sa();
+		$nb_avenant=1;
+		//S'il y a déjà un avenant alors on incrémente
+		if($ref_avenant["max"]){
+			$nb_avenant=substr($ref_avenant["max"],-1) +1;
+		}
+
+		return $ref."AVT".$nb_avenant;
+	}
+
+	/**
+	* Retourne la ref d'une affaire autre qu'avenant
+	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+	* @param int $id_parent
+	* @return string ref
+	*/
+	function getRef($date){
+
+		$prefix=date("ym",strtotime($date));
+		$this->q->reset()
+				->addCondition("ref",$prefix."%","AND",false,"LIKE")
+				->addCondition("LENGTH(`ref`)",5,"AND",false,">")
+				->addCondition("ref","%AVT%","AND",false,"NOT LIKE")
+				->addField('SUBSTRING(`ref`,5)+1',"max_ref")
+				->addOrder('ref',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+		$this->q->setToString();
+		log::logger($this->sa(), "qjanon");
+		$this->q->unsetToString();
+		$nb=$this->sa();
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="00001";
+		}
+		log::logger($suffix, "qjanon");
+		return $prefix.$suffix;
+	}
+
+	/**
+	* Vérification et structuration de l'envoi des mails
+	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
+	* @param array $email du client
+	* 		$last_id int de l'enregistrement du module concerné
+	*		$table table du module
+	*		$path chemin du fichier concerné
+	* @return boolean
+	*/
+	public function mailContact($email,$last_id,$table,$paths){
+		if($table == "facture"){
+			$enregistrement = ATF::$table()->select($last_id);
+			if($email["email"]){
+				$recipient = $email["email"];
+			}elseif($enregistrement["id_contact"]){
+				if(!ATF::contact()->select($enregistrement["id_contact"],"email")){
+					ATF::db($this->db)->rollback_transaction();
+					throw new errorATF("Il n'y a pas d'email pour le contact ".ATF::contact()->nom($enregistrement["id_contact"]),349);
+				}else{
+					$recipient = ATF::contact()->select($enregistrement["id_contact"],"email");
+				}
+			}else{
+				ATF::db($this->db)->rollback_transaction();
+				throw new errorATF("Il n'y a pas d'email",350);
+			}
+
+			if(ATF::$usr->getID()){
+				$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
+			}else{
+				$societe = ATF::societe()->select(246);
+				$from = $societe["societe"]." <".$societe["email"].">";
+			}
+
+			if(!$email["objet"]){
+				$info_mail["objet"] = "Les solutions Zen – Votre facture référence n° ".$enregistrement["ref_externe"];
+			}else{
+				$info_mail["objet"] = $email["objet"];
+			}
+
+			$info_mail["from"] = $from;
+			$info_mail["recipient"] = $recipient;
+			$info_mail["return_path"] = "ludivine.bowe@cleodis.com";
+			$info_mail["template"] = "bdomplus-".$table;
+			$info_mail["html"] = true;
+
+			$info_mail["client"] = ATF::societe()->select(ATF::facture()->select($last_id, "id_societe"));
+			$info_mail["facture"] = $enregistrement;
+
+
+
+			$mail = new mail($info_mail);
+			foreach($paths as $key=>$item){
+				$path = ATF::$table()->filepath($last_id,$item);
+				$mail->addFile($path,$key.$enregistrement["ref_externe"].".pdf",true);
+			}
+			$mail->send();
+
+			if($email["emailCopie"]){
+				$info_mail["recipient"] = $email["emailCopie"];
+				$copy_mail = new mail($info_mail);
+				foreach($paths as $key=>$item){
+					$path = ATF::$table()->filepath($last_id,$item);
+					$copy_mail->addFile($path,$key.$enregistrement["ref_externe"].".pdf",true);
+				}
+				$copy_mail->send();
+			}
+			return true;
+		}else{
+			return parent::mailContact($email,$last_id,$table,$paths);
+		}
+	}
+};

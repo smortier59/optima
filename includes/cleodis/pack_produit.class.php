@@ -49,8 +49,8 @@ class pack_produit extends classes_optima {
 			"produits_non_visible"=>array("custom"=>true)
 		);
 
-		// Propriété des panels
 
+		// Propriété des panels
 		$this->panels['lignes'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['lignes_option_partenaire'] = array("visible"=>true, 'nbCols'=>1);
 		$this->panels['lignes_non_visible'] = array("visible"=>true, 'nbCols'=>1);
@@ -134,9 +134,6 @@ class pack_produit extends classes_optima {
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne_option_partenaire = json_decode($infos["values_".$this->table]["produits_option_partenaire"],true);
-
-
-
 
 		$this->infoCollapse($infos);
 
@@ -229,7 +226,6 @@ class pack_produit extends classes_optima {
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne_option_partenaire = json_decode($infos["values_".$this->table]["produits_option_partenaire"],true);
-
 		$this->infoCollapse($infos);
 
 
@@ -249,6 +245,8 @@ class pack_produit extends classes_optima {
 		foreach ($lignes as $key => $value) {
 			ATF::pack_produit_ligne()->d($value["id_pack_produit_ligne"]);
 		}
+
+
 
 		parent::update($infos,$s,$files,$cadre_refreshed,$nolog);
 
@@ -376,5 +374,8 @@ class pack_produit extends classes_optima {
 	}
 
 
-	
+
 }
+
+
+class pack_produit_boulanger extends pack_produit{ }
