@@ -1489,47 +1489,100 @@ class commande_cleodis extends commande {
 			foreach($commandes as $key=>$item){
 					//Ligne de la commande pour le fournisseur il ne faut pas que ces lignes soient présentes dans un autre bon de commande
 					ATF::commande_ligne()->q->reset()->addOrder("commande_ligne.id_commande_ligne","asc")
-													 ->from("commande_ligne","id_commande_ligne","bon_de_commande_ligne","id_commande_ligne")
 													 ->where("id_commande",$item["id_commande"])
-													 ->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
+													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
 													 ->where("id_fournisseur",$id_fournisseur);
 					$commande_ligne=ATF::commande_ligne()->sa();
+
+
+					//On recupere les lignes déja commandées
+					ATF::bon_de_commande_ligne()->q->reset()
+													 ->from("bon_de_commande_ligne","id_bon_de_commande","bon_de_commande","id_bon_de_commande")
+													 ->where("bon_de_commande.id_commande",$item["id_commande"])
+													 //->whereIsNull("bon_de_commande_ligne.id_commande_ligne")
+													 ->where("bon_de_commande.id_fournisseur",$id_fournisseur);
+
+					foreach ($commande_ligne as $kl => $vl) {
+						ATF::bon_de_commande_ligne()->q->where("bon_de_commande_ligne.id_commande_ligne", $vl["id_commande_ligne"], "OR", "commande");
+					}
+					ATF::bon_de_commande_ligne()->q->unsetToString();
+					$lignes_bdc=ATF::bon_de_commande_ligne()->sa();
+
+					$temp = $lignes_bdc;
+					$lignes_bdc = array();
+					foreach ($temp as $kt => $vt) {
+						$lignes_bdc[$vt["id_commande_ligne"]] += $vt["quantite"];
+					}
+
+
 					if($commande_ligne){
 						$id_commande=$this->cryptId($item["id_commande_fk"]);
 						unset($ligne_commande);
 						$cle=0;
-						foreach($commande_ligne as $k=>$i){
 
-							if($i["quantite"] > 1){
-								$n = 1;
-								for($n=1; $n<=$i["quantite"];$n++){
+						foreach($commande_ligne as $k=>$i){
+							if(!$lignes_bdc[$i["id_commande_ligne"]]){
+								if($i["quantite"] > 1){
+									$n = 1;
+									for($n=1; $n<=$i["quantite"];$n++){
+										$cle++;
+										$ligne_commande[]=array(
+													 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+													,"id_commande_ligne"=>$i["id_commande_ligne"]
+													,"id"=>$cle
+													,"leaf"=>true
+													,"prix"=>$i["prix_achat"]
+													,"quantite"=>1
+													,"icon"=>ATF::$staticserver."images/blank.gif"
+													,"checked"=>false
+											);
+									}
+								}else{
 									$cle++;
 									$ligne_commande[]=array(
-												 "text"=>$i["produit"]." ".$i["ref"]." (1)"
-												,"id_commande_ligne"=>$i["id_commande_ligne"]
-												,"id"=>$cle
-												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
-												,"quantite"=>1
-												,"icon"=>ATF::$staticserver."images/blank.gif"
-												,"checked"=>false
-										);
+													 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+													,"id_commande_ligne"=>$i["id_commande_ligne"]
+													,"id"=>$cle
+													,"leaf"=>true
+													,"prix"=>$i["prix_achat"]
+													,"quantite"=>$i["quantite"]
+													,"icon"=>ATF::$staticserver."images/blank.gif"
+													,"checked"=>false
+											);
 								}
 							}else{
-								$cle++;
-								$ligne_commande[]=array(
-												 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
-												,"id_commande_ligne"=>$i["id_commande_ligne"]
-												,"id"=>$cle
-												,"leaf"=>true
-												,"prix"=>$i["prix_achat"]
-												,"quantite"=>$i["quantite"]
-												,"icon"=>ATF::$staticserver."images/blank.gif"
-												,"checked"=>false
-										);
+								$quantite_restant= $i["quantite"] - $lignes_bdc[$i["id_commande_ligne"]];
+								if($quantite_restant > 0 ){
+									if($quantite_restant > 1){
+										$n = 1;
+										for($n=1; $n<=$quantite_restant;$n++){
+											$cle++;
+											$ligne_commande[]=array(
+														 "text"=>$i["produit"]." ".$i["ref"]." (1)"
+														,"id_commande_ligne"=>$i["id_commande_ligne"]
+														,"id"=>$cle
+														,"leaf"=>true
+														,"prix"=>$i["prix_achat"]
+														,"quantite"=>1
+														,"icon"=>ATF::$staticserver."images/blank.gif"
+														,"checked"=>false
+												);
+										}
+									}else{
+										$cle++;
+										$ligne_commande[]=array(
+														 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+														,"id_commande_ligne"=>$i["id_commande_ligne"]
+														,"id"=>$cle
+														,"leaf"=>true
+														,"prix"=>$i["prix_achat"]
+														,"quantite"=>$i["quantite"]
+														,"icon"=>ATF::$staticserver."images/blank.gif"
+														,"checked"=>false
+												);
+									}
+								}
 							}
-
-
 						}
 
 
