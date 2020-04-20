@@ -2300,6 +2300,7 @@ class facture_cleodis extends facture {
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
 	}
+
 };
 
 class facture_cleodisbe extends facture_cleodis {
@@ -2853,90 +2854,6 @@ class facture_bdomplus extends facture_cleodis {
 			}
 		}
 
-
-
-		/*$this->q->reset()->whereIsNotNull("id_slimpay");
-
-		if($factures = $this->select_all()){
-			foreach ($factures as $key => $value) {
-
-				$facture = $this->select($value["facture.id_facture"]);
-
-				$status = ATF::slimpay()->getStatutDebit($facture["id_slimpay"]);
-
-
-				log::logger("Paiement : ".$facture["id_slimpay"]."  ---> " , "StatutDebitSlimpay");
-				log::logger($status , "StatutDebitSlimpay");
-
-				if($facture["executionStatus"] !== $status["executionStatus"]){
-					$this->u(array("id_facture"=>$facture["id_facture"],
-								   "executionStatus"=>$status["executionStatus"]
-								  )
-							);
-
-					if($status["executionStatus"] === "processed") {
-						$this->u(array("id_facture"=>$facture["id_facture"],
-										"etat"=> "payee",
-										"date_paiement"=>date("Y-m-d", strtotime($status["executionDate"]))
-									));
-					}
-
-					if($status["executionStatus"] === "rejected") {
-						$this->u(array("id_facture"=>$facture["id_facture"],
-										// "rejet"=>"non_preleve",
-										"date_rejet"=>date("Y-m-d")
-									));
-					}
-
-					if($status["executionStatus"] === "contested") {
-						$this->u(array("id_facture"=>$facture["id_facture"],
-										"rejet"=>"contestation_debiteur",
-										"date_rejet"=>date("Y-m-d", strtotime($status["executionDate"])),
-										"etat"=>"impayee",
-										"date_paiement"=> NULL
-									));
-					}
-
-					if($status["executionStatus"] === "rejected") {
-						//un suivi sans destinataire "Facture xxxx impayée"
-						$suivis = array("suivi"=> array(
-												"id_societe" => $this->select($facture["id_facture"] , "id_societe"),
-												"type" => "note",
-												"date" => date("Y-m-d H:i:s"),
-												"texte" => "Facture ".$this->select($facture["id_facture"] , "ref")." impayée",
-												"id_affaire" => $this->select($facture["id_facture"] , "id_affaire"),
-												"type_suivi" => "Contrat",
-												"no_redirect" => true,
-												"suivi_notifie"=>array(18,26)
-										  	)
-										);
-
-						ATF::suivi()->insert($suivis);
-
-					}else{
-						//si le nouveau statut est différent de rejected, on crée une tâche à destination de Benjamin Tronquit et Estelle Tampigny "Changement de statut de la facture XXXX. Merci de vérifier".
-						//Ne pas créer de tache si la facture passe en processed
-						if($status["executionStatus"] !== "processed"){
-							$tache = array("tache"=>array(
-										   "id_societe"=> $this->select($facture["id_facture"] , "id_societe"),
-	                                       "tache"=>"Changement de statut de la facture ".$this->select($facture["id_facture"] , "ref").". Merci de vérifier",
-	                                       "id_affaire"=>$this->select($facture["id_facture"] , "id_affaire"),
-	                                       "type_tache"=>"note",
-	                                       "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
-	                                       "no_redirect"=>"true"
-	                                     ),
-				                        "dest"=>array(18,26)
-	                    			);
-        					$id_tache = ATF::tache()->insert($tache);
-						}
-
-					}
-
-				}
-
-			}
-
-		}*/
 
 	}
 
