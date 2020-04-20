@@ -49,5 +49,7 @@ class categorie_cleodis extends categorie {
 };
 
 class categorie_cleodisbe extends categorie_cleodis {}
+class categorie_bdomplus extends categorie_cleodis {}
+class categorie_boulanger extends categorie_cleodis {}
 
 ?>

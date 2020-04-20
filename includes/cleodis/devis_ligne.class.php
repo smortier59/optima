@@ -1,4 +1,4 @@
-<?	
+<?
 /** Classe devis_ligne
 * @package Optima
 * @subpackage Cleodis
@@ -6,16 +6,17 @@
 require_once dirname(__FILE__)."/../devis_ligne.class.php";
 class devis_ligne_cleodis extends devis_ligne {
 	function __construct() {
-		parent::__construct(); 
+		parent::__construct();
 		$this->table = "devis_ligne";
 		$this->controlled_by = "devis";
-		$this->colonnes['fields_column'] = array( 
+		$this->colonnes['fields_column'] = array(
 			 'devis_ligne.produit'
 			,'devis_ligne.quantite'
 			,'devis_ligne.type'
 			,'devis_ligne.ref'
 			,'devis_ligne.id_fournisseur'
 			,'devis_ligne.neuf'
+			,"devis_ligne.frequence_fournisseur"
 			,'devis_ligne.prix_achat'=>array("renderer"=>"money")
 		);
 
@@ -26,9 +27,9 @@ class devis_ligne_cleodis extends devis_ligne {
 			))
 			,"id_fournisseur"
 		);
-		
+
 		$this->colonnes['bloquees']['insert'] =  array('id_devis_ligne','id_devis')	;
-		$this->colonnes['ligne'] =  array( 	
+		$this->colonnes['ligne'] =  array(
 			"devis_ligne.id_produit"=>array("hidden"=>true)
 			,"devis_ligne.produit"
 			,"devis_ligne.quantite"
@@ -37,22 +38,23 @@ class devis_ligne_cleodis extends devis_ligne {
 			,"devis_ligne.id_fournisseur"
 			,"devis_ligne.prix_achat"
 			,'devis_ligne.neuf'
+			,"devis_ligne.frequence_fournisseur"
 			,'devis_ligne.commentaire'
 		);
 
 		$this->no_insert=true;
 		$this->no_update=true;
 		$this->no_delete=true;
-	
-		$this->fieldstructure();	
+
+		$this->fieldstructure();
 		$this->addPrivilege("toCommandeLigne");
 		$this->foreign_key['id_fournisseur'] =  "societe";
 	}
 
-	/** 
+	/**
 	* Retourne les fournisseurs d'un devis.
 	* @author Quentin JANON <qjanon@absystech.fr>
-	* @param id_devis ID d'un devis 
+	* @param id_devis ID d'un devis
 	* @param string pour contrôler le retour, soit en string soit en array
 	*/
 	function getFournisseurs($id_devis) {
@@ -68,7 +70,7 @@ class devis_ligne_cleodis extends devis_ligne {
 	* Retourne les lignes d'un devis pour le grid des commande ligne
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	* @param array $infos
-	*/	
+	*/
   	function toCommandeLigne() {
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(util::keysOrValues($this->colonnes['ligne']))->setLimit(-1);
@@ -85,27 +87,27 @@ class devis_ligne_cleodis extends devis_ligne {
 	}
 
 	public function extJSgsa(&$post,&$s=NULL){
-		$post["limit"] = 300;	
+		$post["limit"] = 300;
 		$return =  parent::extJSgsa($post,$s);
 		return $return;
 
 
 	}
-	
+
 };
 
 class devis_ligne_midas extends devis_ligne_cleodis {
 	function __construct() {
 		parent::__construct();
 		$this->table = "devis_ligne";
-		$this->colonnes['fields_column'] = array( 
+		$this->colonnes['fields_column'] = array(
 			 'devis_ligne.produit'
 			,'devis_ligne.quantite'
 			,'devis_ligne.type'
 			,'devis_ligne.ref'
 			,'devis_ligne.id_fournisseur'
 		);
-												
+
 		$this->fieldstructure();
 	}
 

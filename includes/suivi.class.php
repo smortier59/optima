@@ -121,7 +121,7 @@ class suivi extends classes_optima {
 
 		$infos['id_'.$this->table]=parent::insert($infos,$s,$files);
 
-		//if(!$link){	$link = ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table]));	}
+		if(!$link){	$link = ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table]));	}
 
 		//pour chaque personnes concernées (notifiés, intervenant_societe, intervenant_client)
 		$array=array('suivi_contact'=>'id_contact','suivi_societe'=>'id_user','suivi_notifie'=>'id_user');
