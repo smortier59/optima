@@ -1309,5 +1309,6 @@ class bon_de_commande_cap extends bon_de_commande_cleodis {
 
 
 class bon_de_commande_bdomplus extends bon_de_commande_cleodis { };
-class bon_de_commande_bdom extends bon_de_commande_cleodis { };
 class bon_de_commande_boulanger extends bon_de_commande_cleodis { };
+
+class bon_de_commande_assets extends bon_de_commande_cleodis { };

@@ -214,5 +214,6 @@ class bon_de_commande_ligne_cap extends bon_de_commande_ligne_cleodis { };
 
 
 class bon_de_commande_ligne_bdomplus extends bon_de_commande_ligne_cleodis { };
-class bon_de_commande_ligne_bdom extends bon_de_commande_ligne_cleodis { };
 class bon_de_commande_ligne_boulanger extends bon_de_commande_ligne_cleodis { };
+
+class bon_de_commande_ligne_assets extends bon_de_commande_ligne_cleodis { };

@@ -2905,3 +2905,7 @@ class facture_boulanger extends facture_cleodis {
 
 
 };
+
+class facture_boulanger extends facture_cleodis { };
+
+class facture_assets extends facture_cleodis { };

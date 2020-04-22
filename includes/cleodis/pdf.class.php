@@ -15798,3 +15798,4 @@ class pdf_boulanger extends pdf_cleodis {
 
 
 };
+class pdf_assets extends pdf_cleodis { };
