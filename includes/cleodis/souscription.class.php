@@ -74,7 +74,7 @@ class souscription_cleodis extends souscription {
         mail::check_mail($post["email"]);
       }
     } catch (errorATF $e) {
-      throw new errorATF("Invalid domaine",500);
+      throw new errorATF("Invalid domaine : ".($post["particulier_email"]?$post["particulier_email"]:$post["email"]),500);
     }
 
 
