@@ -2823,6 +2823,8 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
+		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe') return;
+
 		$dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
 		$id_user = 116; //Benjamin Tronquit
 

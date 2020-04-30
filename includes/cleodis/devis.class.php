@@ -333,7 +333,7 @@ class devis_cleodis extends devis {
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		$infos_loyer = json_decode($infos["values_".$this->table]["loyer"],true);
-		log::logger($infos_ligne, "ligne_devis");
+
 		//Gestion AR/Avenant : soit l'un soit l'autre
 		if($infos["panel_AR-checkbox"]){
 			$infos_AR=$this->getArrayAvenantARVente($infos["AR"],"AR");
@@ -531,13 +531,10 @@ class devis_cleodis extends devis {
 						         	'devis_ligne_dot_visible_pdf'=> 'non');
 		}
 
-		log::logger("INFOS LIGNE" , "ligne_devis");
 		log::logger($infos_ligne , "ligne_devis");
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
-			log::logger("APRES le unescape ", "ligne_devis");
-			log::logger($infos_ligne , "ligne_devis");
 			foreach($infos_ligne as $key=>$item){
 				$item["id_devis"]=$last_id;
 				if(!$item["id_fournisseur"]){
