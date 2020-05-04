@@ -3061,7 +3061,7 @@ class pdf_cleodis extends pdf {
 		if (ATF::$codename == "boulanger") {
 			$this->image(__PDF_PATH__.$this->logo,10,10,25);
 		} else {
-			$this->image(__PDF_PATH__.$this->logo,10,10,35);
+			$this->image(__PDF_PATH__.$this->logo,5,5,35);
 		}
 
 		$this->setfont('arial','I',8);
