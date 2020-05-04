@@ -34,7 +34,7 @@ class souscription_cleodis extends souscription {
   public function _devis($get, $post) {
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
-    $email = $post["email"];
+    $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
     $societe = ATF::societe()->select($post["id_societe"]);
 
     switch ($post['site_associe']) {
@@ -67,14 +67,9 @@ class souscription_cleodis extends souscription {
 
 
     try {
-
-      if($post["particulier_email"]){
-        mail::check_mail($post["particulier_email"]);
-      }else{
-        mail::check_mail($post["email"]);
-      }
+      mail::check_mail($email);
     } catch (errorATF $e) {
-      throw new errorATF("Invalid domaine",500);
+      throw new errorATF("Invalid domaine : ".($post["particulier_email"]?$post["particulier_email"]:$post["email"]),500);
     }
 
 

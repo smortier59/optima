@@ -833,15 +833,22 @@ class bon_de_commande_cleodis extends bon_de_commande {
 	public function bdcByAffaire($id_commande){
 		ATF::commande_ligne()->q->reset()->addCondition("id_commande",$id_commande);
 		$commande_ligne=ATF::commande_ligne()->sa();
-		$nb_commande_ligne=0;
+		$nb_commande_ligne=$count_commande_ligne=0;
+
+		foreach ($commande_ligne as $key => $value) {
+			$count_commande_ligne += $value["quantite"];
+		}
+
 		foreach($commande_ligne as $key=>$item){
 			ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_commande_ligne",$item["id_commande_ligne"]);
 			if($bon_de_commande_ligne=ATF::bon_de_commande_ligne()->sa()){
-				$nb_commande_ligne++;
+				foreach ($bon_de_commande_ligne as $kbdc => $vbdc) {
+					$nb_commande_ligne++;
+				}
 			}
 		}
 
-		if($nb_commande_ligne==count($commande_ligne)){
+		if($nb_commande_ligne==$count_commande_ligne){
 			return true;
 		}else{
 			return false;

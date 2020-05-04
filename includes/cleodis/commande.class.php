@@ -1571,12 +1571,12 @@ class commande_cleodis extends commande {
 									}else{
 										$cle++;
 										$ligne_commande[]=array(
-														 "text"=>$i["produit"]." ".$i["ref"]." (".$i["quantite"].")"
+														 "text"=>$i["produit"]." ".$i["ref"]." (1)"
 														,"id_commande_ligne"=>$i["id_commande_ligne"]
 														,"id"=>$cle
 														,"leaf"=>true
 														,"prix"=>$i["prix_achat"]
-														,"quantite"=>$i["quantite"]
+														,"quantite"=>1
 														,"icon"=>ATF::$staticserver."images/blank.gif"
 														,"checked"=>false
 												);
