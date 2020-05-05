@@ -294,6 +294,10 @@ class souscription_cleodis extends souscription {
       case "boulanger-cafe":
         $r = "BOULANGER : Abonnement Café ".$suffix;
       break;
+
+       case "hexamed":
+        $r = "HEXAMED : Location ".$suffix;
+      break;
     }
 
     return $r;
