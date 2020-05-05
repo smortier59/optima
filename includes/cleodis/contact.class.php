@@ -242,5 +242,7 @@ class contact_midas extends contact_cleodis {
 
 
 class contact_bdomplus extends contact_cleodis { };
-class contact_bdom extends contact_cleodis { };
+
 class contact_boulanger extends contact_cleodis { };
+
+class contact_assets extends contact_cleodis { };

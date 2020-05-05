@@ -124,5 +124,7 @@ class licence_bdomplus extends licence {
 		log::logger("============================================" , "controle_licence_bdomplus");
 	}
 };
-class licence_bdom extends licence { };
+
 class licence_boulanger extends licence { };
+
+class licence_assets extends licence { };

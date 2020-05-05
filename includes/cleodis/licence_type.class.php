@@ -19,5 +19,6 @@ class licence_type_midas extends licence_type { };
 class licence_type_cleodisbe extends licence_type { };
 class licence_type_cap extends licence_type { };
 class licence_type_bdomplus extends licence_type { };
-class licence_type_bdom extends licence_type { };
+
 class licence_type_boulanger extends licence_type { };
+class licence_type_assets extends licence_type { };

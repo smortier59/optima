@@ -117,5 +117,7 @@ class devis_ligne_cleodisbe extends devis_ligne_cleodis { };
 class devis_ligne_cap extends devis_ligne_cleodis { };
 
 class devis_ligne_bdomplus extends devis_ligne_cleodis { };
-class devis_ligne_bdom extends devis_ligne_cleodis { };
 class devis_ligne_boulanger extends devis_ligne_cleodis { };
+
+
+class devis_ligne_assets extends devis_ligne_cleodis { };

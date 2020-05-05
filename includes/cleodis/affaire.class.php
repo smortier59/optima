@@ -3474,3 +3474,70 @@ class affaire_boulanger extends affaire_cleodis {
 		}
 	}
 };
+class affaire_boulanger extends affaire_cleodis { };
+class affaire_assets extends affaire_cleodis {
+
+	/**
+	* Retourne la ref d'un avenant
+	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+	* @param int $id_parent
+	* @return string ref
+	*/
+	function getRefAvenant($id_parent){
+		//Récup du dernier avenant de cette affaire
+		$ref=substr($this->select($id_parent,"ref"),0,7);
+		$this->q->reset()
+		   ->addField('MAX(`ref`)','max')
+		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
+		   ->setStrict()
+		   ->setDimension("row");
+
+		$ref_avenant=$this->sa();
+		$nb_avenant=1;
+		//S'il y a déjà un avenant alors on incrémente
+		if($ref_avenant["max"]){
+			$nb_avenant=substr($ref_avenant["max"],-1) +1;
+		}
+
+		return $ref."AVT".$nb_avenant;
+	}
+
+	/**
+	* Retourne la ref d'une affaire autre qu'avenant
+	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+	* @param int $id_parent
+	* @return string ref
+	*/
+	function getRef($date){
+
+		$prefix=date("ym",strtotime($date));
+		$this->q->reset()
+				->addCondition("ref",$prefix."%","AND",false,"LIKE")
+				->addCondition("LENGTH(`ref`)",5,"AND",false,">")
+				->addCondition("ref","%AVT%","AND",false,"NOT LIKE")
+				->addField('SUBSTRING(`ref`,5)+1',"max_ref")
+				->addOrder('ref',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+
+		$nb=$this->sa();
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="00001";
+		}
+		return $prefix.$suffix;
+	}
+
+};

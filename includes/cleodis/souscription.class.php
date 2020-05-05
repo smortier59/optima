@@ -56,6 +56,12 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = 31456; // ID de la société BoulangerS (same in RCT - PROD - DEV)
       break;
 
+      case 'hexamed':
+        ATF::societe()->q->reset()->where("siret", "51028155300030");
+        $hexamed = ATF::societe()->select_row();
+        $this->id_partenaire = $hexamed["id_societe"];
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -293,6 +299,10 @@ class souscription_cleodis extends souscription {
 
       case "boulanger-cafe":
         $r = "BOULANGER : Abonnement Café ".$suffix;
+      break;
+
+       case "hexamed":
+        $r = "HEXAMED : Location ".$suffix;
       break;
     }
 

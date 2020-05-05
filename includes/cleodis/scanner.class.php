@@ -1,5 +1,5 @@
 <?
-/** 
+/**
 * Classe scanner
 * @package Optima
 */
@@ -9,7 +9,7 @@ class scanner_cleodis extends scanner {
 	* Constructeur
 	*/
 	function __construct() {
-		
+
 		$this->colonnes['fields_column'] = array(
 			"date"
 			,"nbpages"
@@ -17,20 +17,22 @@ class scanner_cleodis extends scanner {
 			//,'scanner'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>100)
 			,"scanner"=>array("custom"=>true,"nosort"=>true,"renderer"=>"pdfScanner","width"=>100)
 			,"action"=>array("custom"=>true,"nosort"=>true,"renderer"=>"transfertFile","width"=>80)
-			,"transfert"  
+			,"transfert"
 		);
-				
-		parent::__construct();		
-		
+
+		parent::__construct();
+
 	}
-	
-	
-	
+
+
+
 };
 
 class scanner_cleodisbe extends scanner_cleodis { };
 class scanner_cap extends scanner_cleodis { };
 
 class scanner_bdomplus extends scanner_cleodis { };
-class scanner_bdom extends scanner_cleodis { };
+
 class scanner_boulanger extends scanner_cleodis { };
+
+class scanner_assets extends scanner_cleodis { };

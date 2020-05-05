@@ -1845,5 +1845,7 @@ class devis_bdomplus extends devis_cleodis {
 	}
 
 };
-class devis_bdom extends devis_cleodis { };
+
 class devis_boulanger extends devis_cleodis { };
+
+class devis_assets extends devis_cleodis { };

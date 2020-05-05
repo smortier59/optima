@@ -336,5 +336,7 @@ class tache_cleodisbe extends tache_cleodis { };
 class tache_cap extends tache_cleodis { };
 
 class tache_bdomplus extends tache_cleodis { };
-class tache_bdom extends tache_cleodis { };
+
 class tache_boulanger extends tache_cleodis { };
+
+class tache_assets extends tache_cleodis { };

@@ -62,5 +62,7 @@ class accueil_cap extends accueil_cleodis {
 
 
 class accueil_bdomplus extends accueil_cleodis { };
-class accueil_bdom extends accueil_cleodis { };
 class accueil_boulanger extends accueil_cleodis { };
+
+
+class accueil_assets extends accueil_cleodis { };
