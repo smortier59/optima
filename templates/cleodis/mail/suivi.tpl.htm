@@ -20,7 +20,7 @@
   <p><span style="font-weight:bold;">{ATF::$usr->trans('de',mail)}</span> {ATF::user()->nom($infos.id_user)}</p>
   {if ATF::$codename == 'bdomplus'}
     <p>
-      <span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->select($infos_suivi.id_societe, ref)} - {ATF::societe()->select($infos_suivi.id_societe, code_client)}
+      <span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span>{ATF::societe()->select($infos_suivi.id_societe, code_client)} | {ATF::societe()->select($infos_suivi.id_societe, ref)} - {ATF::societe()->select($infos_suivi.id_societe, code_client)}
     </p>
     {if $infos.id_affaire}
       <p>
@@ -29,7 +29,7 @@
     {/if}
 
     <p>
-      <span style="font-weight:bold;">Contact: </span> 
+      <span style="font-weight:bold;">Contact: </span>
       {$infos_suivi.suivi_contact|count} contact(s) de l'entitée
 
     </p>
@@ -43,7 +43,8 @@
   {else}
 
     <p>
-      <span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span> {ATF::societe()->select($infos_suivi.id_societe, ref)} - {ATF::societe()->nom($infos_suivi.id_societe)}
+      <span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span>
+      {ATF::societe()->select($infos_suivi.id_societe, code_client)} | {ATF::societe()->select($infos_suivi.id_societe, ref)} - {ATF::societe()->nom($infos_suivi.id_societe)}
     </p>
     {if $infos.id_affaire}
       <p>
@@ -52,21 +53,21 @@
     {/if}
 
     <p>
-      <span style="font-weight:bold;">{ATF::$usr->trans('concerne',mail)}</span> 
+      <span style="font-weight:bold;">{ATF::$usr->trans('concerne',mail)}</span>
       {foreach name=for_suivi_notifie from=$infos_suivi.suivi_notifie key=key__ item=item__}
         {ATF::user()->nom($item__)}
         {if !$smarty.foreach.for_suivi_notifie.last}, {/if}
       {/foreach}
     </p>
     <p>
-      <span style="font-weight:bold;">{ATF::$usr->trans('intervenant_client',mail)}</span> 
+      <span style="font-weight:bold;">{ATF::$usr->trans('intervenant_client',mail)}</span>
       {foreach name=for_suivi_contact from=$infos_suivi.suivi_contact key=key__ item=item__}
         {ATF::contact()->nom($item__)}
         {if !$smarty.foreach.for_suivi_contact.last}, {/if}
       {/foreach}
     </p>
     <p>
-      <span style="font-weight:bold;">{ATF::$usr->trans('intervenant_societe',mail)}</span> 
+      <span style="font-weight:bold;">{ATF::$usr->trans('intervenant_societe',mail)}</span>
       {foreach name=for_suivi_societe from=$infos_suivi.suivi_societe key=key__ item=item__}
         {ATF::user()->nom($item__)}{if !$smarty.foreach.for_suivi_societe.last}, {/if}
       {/foreach}

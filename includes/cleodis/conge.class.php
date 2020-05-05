@@ -7,9 +7,9 @@ require_once dirname(__FILE__)."/../conge.class.php";
 class conge_cleodis extends conge {
 	public function __construct() {
 		parent::__construct();
-		$this->table = "conge"; 	
+		$this->table = "conge";
 	}
-	
+
 	/**
     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
     * @author Morgan FLEURQUIN  <mfleurquin@absystech.fr>
@@ -75,7 +75,7 @@ class conge_cleodis extends conge {
 					)
 				)
 			,1)","duree");
-		
+
 		$this->q->addField("ROUND(
 				IF(
 					conge.date_debut>'".$annee_debut."-06-01' AND conge.date_fin<='".($annee_debut+1)."-06-01' AND conge.etat='ok' AND conge.type='paye'
@@ -83,7 +83,7 @@ class conge_cleodis extends conge {
 					,0"./* Ces congés ne sont pas dans l'annuité courante, car avant juin de l'année précédente */"
 				)
 			,1)","dureeCetteAnnee");
-		
+
 		// Sert pour le rendu de la colonne état
 		$this->q
 			->from("conge","id_user","user","id_user")
@@ -96,7 +96,7 @@ class conge_cleodis extends conge {
 			//si il s'agit du supérieur direct ou du supérieur placé plus en amont
 			if(($i['conge.etat']=="en_cours" || $i['conge.etat']=="attente_jerome" || $i['conge.etat']=="attente_christophe")&& (ATF::$usr->getID() == 17 || ATF::$usr->getID() == 16)){
 				if(($i["id_user"] == 16 && ATF::$usr->getID() == 16)){
-					$return['data'][$k]['allowValid'] = false;	
+					$return['data'][$k]['allowValid'] = false;
 					$return['data'][$k]['allowRefus'] = false;
 				}else{
 					if((ATF::$usr->getID() == 16 && ($i['conge.etat']=="en_cours" || $i['conge.etat']=="attente_jerome"))
@@ -107,12 +107,12 @@ class conge_cleodis extends conge {
 						$return['data'][$k]['allowValid'] = false;
 						$return['data'][$k]['allowRefus'] = false;
 					}
-				}				
+				}
 			} else {
-				$return['data'][$k]['allowValid'] = false;	
+				$return['data'][$k]['allowValid'] = false;
 				$return['data'][$k]['allowRefus'] = false;
 			}
-			
+
 			//tout le monde peut envoyer une demande d'annulation de son congé, quelque soit la date et l'état de ce dernier
 			//strpos, pour éviter de recliquer sur le bouton, si un premier envoie a deja été réalisé
 			if(ATF::$usr->getID()==$i["id_user"] && (!$i["conge.raison"] || !is_integer(strpos($i["conge.raison"],"->"))) && $i["conge.etat"]!="annule"){
@@ -120,17 +120,17 @@ class conge_cleodis extends conge {
 			}
 
 			//On check les jours feriés
-			foreach ($jours_ferie as $i => $j) {				
+			foreach ($jours_ferie as $i => $j) {
 				if( $j > $return['data'][$k]['conge.date_debut']  	&&  $j < $return['data'][$k]['conge.date_fin'] 	&& date("N", strtotime($j)) != 6 /*Pas un samedi*/ 	&& date("N", strtotime($j)) != 7 /*Pas un dimanche*/){		$return['data'][$k]['duree'] =  $return['data'][$k]['duree'] -1;		}
 			}
 		}
 
-		
-		
-		
+
+
+
 		return $return;
 	}
-	
+
 	/** Détermine si la personne connectée est la supérieure directe ou indirecte de la personne qui a créé le congé
     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param int $id_user : utilisateur connecté
@@ -168,9 +168,9 @@ class conge_cleodis extends conge {
 										->addSuperCondition("AB,C","OR")
 										->setLimit(1);
 				if($sup["id_superieur"])ATF::user()->q->addCondition("id_superieur",$sup["id_superieur"]);
-				else ATF::user()->q->addConditionNull("id_superieur");					
+				else ATF::user()->q->addConditionNull("id_superieur");
 				if($id_new_sup=ATF::user()->select_cell()){
-					return true;			
+					return true;
 				}
 			}elseif($id_sup=ATF::user()->select($id_superieur,'id_superieur')){
 				//sinon on autorise le supérieur du supérieur à valider
@@ -179,7 +179,7 @@ class conge_cleodis extends conge {
 		}
 		return false;
 	}
-	
+
 	/**
     * Méthode permettant de valider ou refusé un congé, et envoi d'un mail d'information
     * @author Morgan FLEURQUIN  <mfleurquin@absystech.fr>
@@ -204,29 +204,29 @@ class conge_cleodis extends conge {
 					}
 				}
 			}
-			
+
 		}
 
-		parent::u($infos);	
+		parent::u($infos);
 		$infos_conge=$this->select($infos['id_conge']);
 
 		$objet = ATF::$usr->trans("accepte",'conge');
 		if($infos["etat"] == "nok"){ $objet = ATF::$usr->trans("refuse",'conge'); }
 		else{ $objet = ATF::$usr->trans($infos["etat"] ,'conge'); }
-		
+
 		$mail = new mail(array(
 			"recipient"=>$recipient
 			,"objet"=>$objet
 			,"template"=>"conge_validation"
 			,"conge"=>$infos_conge
 			,"from"=>ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),'email').">"));
-		
-		
-		ATF::$msg->addNotice(ATF::$usr->trans("email_envoye"));	
-		return $mail->send();			
+
+
+		ATF::$msg->addNotice(ATF::$usr->trans("email_envoye"));
+		return $mail->send();
 
 	}
-	
+
 	/**
     * Méthode d'insertion
     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
@@ -235,21 +235,21 @@ class conge_cleodis extends conge {
 	* @param array $files $_FILES
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	* @return int id_conge
-    */ 	
+    */
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed){
 		$infos = $infos[$this->table];
 		if($infos['periode']!=="autre")$infos['date_fin']=$infos['date_debut'];
 		if(strtotime($infos['date_fin'])<strtotime($infos['date_debut'])){
 			throw new errorATF(ATF::$usr->trans("fin_inf_deb",$this->table));
 		}
-		if(!$infos["id_user"])$infos["id_user"]=ATF::$usr->getID();		
+		if(!$infos["id_user"])$infos["id_user"]=ATF::$usr->getID();
 
 		$id_conge=parent::i($infos,$s,NULL,$cadre_refreshed);
-		
+
 		//on ne peut pas se fier sur la session car dans le cas d'un rollback, ce n'est pas le user de la session
 		//donc on récupère les informations de l'utilisateur
 		$infos_user = ATF::user()->select($infos["id_user"]);
-		
+
 		//si il a un supérieur on lui envoie un mail
 		if($infos_user['id_superieur']){
 			//sauf dans le cas où ce dernier est en congé
@@ -279,14 +279,14 @@ class conge_cleodis extends conge {
 										->addSuperCondition("AB,C","OR")
 										->setLimit(1);
 				if($sup["id_superieur"])ATF::user()->q->addCondition("id_superieur",$sup["id_superieur"]);
-				else ATF::user()->q->addConditionNull("id_superieur");	
+				else ATF::user()->q->addConditionNull("id_superieur");
 				if($id_new_sup=ATF::user()->select_cell()){
-					$infos_user['id_superieur']=$id_new_sup;					
+					$infos_user['id_superieur']=$id_new_sup;
 				}elseif($id_sup=$sup["id_superieur"]){
 					//sinon on autorise le supérieur du supérieur à valider
 					$infos_user['id_superieur']=$id_sup;
 				}
-			}	
+			}
 			$infos['id_superieur']=$infos_user['id_superieur'];
 			$infos['nom']=ATF::user()->nom($infos["id_user"]);
 			$mail = new mail(array(
@@ -298,7 +298,7 @@ class conge_cleodis extends conge {
 					,"from"=>$infos['nom']." <".$infos_user["email"].">"));
 			$mail->send();
 		}
-		
+
 		return $id_conge;
 	}
 
@@ -309,5 +309,6 @@ class conge_cap extends conge_cleodis { };
 
 
 class conge_bdomplus extends conge_cleodis { };
-class conge_bdom extends conge_cleodis { };
 class conge_boulanger extends conge_cleodis { };
+
+class conge_assets extends conge_cleodis { };
