@@ -72,6 +72,7 @@ class pack_produit extends classes_optima {
 
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("EtatUpdate");
+		$this->addPrivilege("export_middleware");
 	}
 
 	/**
@@ -373,6 +374,242 @@ class pack_produit extends classes_optima {
 		return $r;
 	}
 
+    /** Export des produits pour le middleware
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient tous les enregistrements
+     */
+    public function export_middleware($infos,&$s){
+		$this->setQuerier($s["pager"]->create($infos['onglet']));
+		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
+		$this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+		$data = $this->select_data($s,"saExport");
+		if (count($data) > 500) {
+			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
+		}
+
+		$packs = [];
+		$lignes = [];
+		$produits = [];
+		foreach ($data as $pack) {
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit()->q->reset()
+	        				->addField('id_pack_produit')
+	        				->addField('nom')
+	        				->addField('etat')
+	        				->addField('site_associe')
+	        				->addField('visible_sur_site')
+	        				->addField('description')
+	        				->where('id_pack_produit', $pack['pack_produit.id_pack_produit_fk'])
+	        				->setStrict()
+	        				->addOrder('id_pack_produit', 'DESC');
+	        $packs[] = ATF::pack_produit()->select_row();
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit_ligne()->q->reset()
+	        				 ->addField('type')
+	        				 ->addField('id_pack_produit')
+	        				 ->addField('id_produit')
+	        				 ->addField('principal')
+	        				 ->addField('quantite')
+	        				 ->addField('min')
+	        				 ->addField('max')
+	        				 ->addField('option_incluse')
+	        				 ->addField('option_incluse_obligatoire')
+	        				 ->addField('visible')
+	        				 ->addField('ordre')
+	        				 ->addField('visibilite_prix')
+	        				 ->addField('visible_sur_pdf')
+	        				 ->addField('prix_achat')
+	        				 ->where('id_pack_produit',$pack['pack_produit.id_pack_produit_fk'])
+	        				 ->setStrict();
+	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
+	        	array_push($lignes, $l);
+	        }
+
+
+		}
+		// Et maintenant les produits
+		foreach ($lignes as $l) {
+	        ATF::produit()->q->reset()
+	        				 ->addField('id_produit')
+	        				 ->addField('ref')
+	        				 ->addField('produit')
+	        				 ->addField('etat')
+	        				 ->addField('commentaire')
+	        				 ->addField('prix_achat')
+	        				 ->addField('taxe_ecotaxe')
+	        				 ->addField('taxe_ecomob')
+	        				 ->addField('type')
+	        				 ->addField('id_fournisseur')
+	        				 ->addField('id_fabriquant')
+	        				 ->addField('url_produit') // FAKE column, remplacer par la catégorie plus bas
+	        				 ->addField('id_sous_categorie')
+	        				 ->addField('loyer')
+	        				 ->addField('duree')
+	        				 ->addField('visible_sur_site')
+	        				 ->addField('ean')
+	        				 ->addField('description')
+	        				 ->addField('id_document_contrat')
+	        				 ->addField('url')
+	        				 ->where('id_produit',$l['id_produit'])
+	        				 ->setStrict();
+
+	        foreach (ATF::produit()->select_all() as $p) {
+	        	array_push($produits, $p);
+	        }
+		}
+
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
+		$workbook = new PHPExcel;
+
+		$sheets = array("Packs","Packs-Produits","Produits");		
+
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+
+
+        // Premier onglet
+        $sheet = $workbook->getActiveSheet();
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Produits");
+
+		//mise en place des titres
+		$entetes = array(
+        	 "A"=>array('Type de produit',20)
+        	,"B"=>array('Référence du produit',20)
+			,"C"=>array('Désignation',20)
+			,"D"=>array('Etat',20)
+			,"E"=>array('Commentaire',20)
+			,"F"=>array('Prix d\'achat dont ecotaxe',20)
+			,"G"=>array('EcoTaxe',20)
+			,"H"=>array('Eco Mobilier',20)
+			,"I"=>array('Type',20)
+			,"J"=>array('Fournisseur',20)
+			,"K"=>array('Fabriquant',20)
+			,"L"=>array('Catégorie',20)
+			,"M"=>array('Sous Catégorie',20)
+			,"N"=>array('Loyer',20)
+			,"O"=>array('Durée',20)
+			,"P"=>array('Visible sur le site',20)
+			,"Q"=>array('EAN',20)
+			,"R"=>array('Description',20)
+			,"S"=>array('id_document_contrat',20)
+			,"T"=>array('URL Image',20)
+		);
+    	$i=0;
+    	foreach($entetes as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
+			$i++;
+        }
+
+    	$i=0;
+    	$j=2;
+		foreach ($produits as $k=>$v) {
+			foreach ($v as $col => $value) {
+				switch($col) {
+					case 'id_produit': $value = ''; break;
+					case 'prix_achat': $value = $v['prix_achat']+$v['taxe_ecotaxe']; break;
+					case 'id_fournisseur': $value = ATF::societe()->nom($value); break;
+					case 'id_fabriquant': $value = ATF::fabriquant()->nom($value); break;
+					case 'url_produit': $value = ATF::categorie()->nom(ATF::sous_categorie()->select($v['id_sous_categorie'],'id_categorie')); break;
+					case 'id_sous_categorie': $value = ATF::sous_categorie()->nom($value); break;
+				}
+				$sheet->setCellValueByColumnAndRow($i , $j, $value);
+				$i++;
+			}
+	        $i=0;
+	        $j++;
+		}
+
+        // Second onglet
+        $sheet = $workbook->createSheet(1);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Packs");
+		//mise en place des titres
+		$entetes = array(
+        	 "A"=>array('N°',20)
+        	,"B"=>array('Nom',20)
+			,"C"=>array('Etat',20)
+			,"D"=>array('Site associé',20)
+			,"E"=>array('Visible sur le site',20)
+			,"F"=>array('Description',20)
+		);
+    	$i=0;
+    	foreach($entetes as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
+			$i++;
+        }		 
+    	$i=0;
+    	$j=2;
+		foreach ($packs as $k=>$v) {
+			foreach ($v as $col => $value) {
+				$sheet->setCellValueByColumnAndRow($i , $j, $value);
+				$i++;
+			}
+	        $i=0;
+	        $j++;
+		}
+
+        // Troisième onglet
+        $sheet = $workbook->createSheet(2);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Packs-Produits");
+		//mise en place des titres
+		$entetes = array(
+        	 "A"=>array('Type',20)
+        	,"B"=>array('N°',20)
+			,"C"=>array('Ref',20)
+			,"D"=>array('Produit principal ?',20)
+			,"E"=>array('Quantité',20)
+			,"F"=>array('Min',20)
+			,"G"=>array('Max',20)
+			,"H"=>array('Option incluse',20)
+			,"I"=>array('Option incluse obligatoire',20)
+			,"J"=>array('Afficher sur le site',20)
+			,"K"=>array('Ordre',20)
+			,"L"=>array('Ligne de produit visible',20)
+			,"M"=>array('Visible sur PDF',20)
+			,"N"=>array('Prix d\'achat dont ecotax',20)
+		);
+    	foreach($entetes as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
+			$i++;
+        }
+
+    	$i=0;
+    	$j=2;
+		foreach ($lignes as $k=>$v) {
+			foreach ($v as $col => $value) {
+				switch($col) {
+					case 'type': $value = ''; break;
+					case 'id_produit': ATF::produit()->select($value, 'ref'); break;
+				}
+				$sheet->setCellValueByColumnAndRow($i , $j, $value);
+				$i++;
+			}
+	        $i=0;
+	        $j++;
+		}		    		
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_middleware-'.date("YmdHis").'.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+
+	}
 
 
 }
