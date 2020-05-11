@@ -381,7 +381,7 @@ class pack_produit extends classes_optima {
     public function export_middleware($infos,&$s){
 		$this->setQuerier($s["pager"]->create($infos['onglet']));
 		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
-		$this->q->addAllFields($this->table)->setLimit(-1)->unsetCount();
+		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
 		$data = $this->select_data($s,"saExport");
 		if (count($data) > 500) {
 			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
@@ -399,7 +399,7 @@ class pack_produit extends classes_optima {
 	        				->addField('site_associe')
 	        				->addField('visible_sur_site')
 	        				->addField('description')
-	        				->where('id_pack_produit', $pack['pack_produit.id_pack_produit_fk'])
+	        				->where('id_pack_produit', $pack['id_pack_produit'])
 	        				->setStrict()
 	        				->addOrder('id_pack_produit', 'DESC');
 	        $packs[] = ATF::pack_produit()->select_row();
@@ -420,7 +420,7 @@ class pack_produit extends classes_optima {
 	        				 ->addField('visibilite_prix')
 	        				 ->addField('visible_sur_pdf')
 	        				 ->addField('prix_achat')
-	        				 ->where('id_pack_produit',$pack['pack_produit.id_pack_produit_fk'])
+	        				 ->where('id_pack_produit',$pack['id_pack_produit'])
 	        				 ->setStrict();
 	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
 	        	array_push($lignes, $l);
