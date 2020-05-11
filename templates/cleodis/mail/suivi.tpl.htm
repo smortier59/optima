@@ -20,7 +20,7 @@
   <p><span style="font-weight:bold;">{ATF::$usr->trans('de',mail)}</span> {ATF::user()->nom($infos.id_user)}</p>
   {if ATF::$codename == 'bdomplus'}
     <p>
-      <span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span>{ATF::societe()->select($infos_suivi.id_societe, code_client)} | {ATF::societe()->select($infos_suivi.id_societe, ref)} - {ATF::societe()->select($infos_suivi.id_societe, code_client)}
+      <span style="font-weight:bold;">{ATF::$usr->trans('client',mail)}</span>{ATF::societe()->select($infos_suivi.id_societe, code_client)} | {ATF::societe()->select($infos_suivi.id_societe, ref)}
     </p>
     {if $infos.id_affaire}
       <p>
