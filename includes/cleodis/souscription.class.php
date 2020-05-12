@@ -953,22 +953,7 @@ class souscription_cleodis extends souscription {
     return $return;
   }
 
-  public function Ajouter dans le enum type_affaire de la table affaire l'entrée qui va bien. Exemple pour hexamed : 'Hexamed Leasing'
-	=> Exemple pour l'ajout de Hexamed : ALTER TABLE `affaire` CHANGE `type_affaire` `type_affaire` ENUM('normal','2SI','Boulanger Pro','Consommables_com','DIB','Dyadem','FLEXFUEL','Instore','LAFI','Manganelli','NRC','OLISYS - Ma Solution IT','Proxi Pause','Trekk','ZENCONNECT – ZEN PACK','Hexamed Leasing') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'normal';
-	=> Bien conserver le SQL, merci bonsoir.
-
-Dans le pdf.class.php, fonction devis, il y a un switch sur le type_affaire pour déterminer le logo et le nom a afficher, ajouter le case pour le nouveau site.
-Dans le pdf.class.php, fonction contratA4, il y a un switch sur le type_affaire pour déterminer le logo et sonpositonnement, ajouter le case pour le nouveau site.
-Dans le pdf.class.php, fonction contratA3, il y a un switch sur le type_affaire pour déterminer le logo et sonpositonnement, ajouter le case pour le nouveau site.
-
-Dans souscription.class.php, fonction _devis, il faut  
-	- Dans le premier switch sur le site_associe, ajouter le bon $this->id_partenaire pour le nouveau site_associé. Pour être au top, il faut faire une recherche sur les sociétés avec le SIRET du nouveau partenaire. Ca permet de retrouver l'id_societe qui correspond au bon partenaire, et ce peu improte l'environnement.
-	- Dans le second switch sur le site_associé qui gère la création des comité, il faut ajouter unc ase au même niveau que Boulanger Pro afin de faire le même traitement (création de deux comité, un creditSafe accepté, et un Cléodis en attente)
-Toujours dans souscription.class.php, dans la fonction createDevis cette fois ci, il faut ajouter une condition afin d'ajuster le type_affaire en fonction du site associé.
-	=> exemple pour Hexamed : if($post['site_associe'] == "hexamed") $devis["type_affaire"] = 'Hexamed Leasing';
-
-Il faut ajouter le logo du nouveau partenaire sur Optima : Dossier Optima\core\www\images_pdf\cleodis\, poser le logo ici. IL DOIT ÊTRE AU FORMAT JPG, surtout pas de PNG.
-($site_associe) {
+  public function getPrefixCodeClient($site_associe) {
     switch ($site_associe) {
       case 'boulangerpro':
         $r = "BG";
