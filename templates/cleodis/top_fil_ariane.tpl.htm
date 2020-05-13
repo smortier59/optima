@@ -1,14 +1,14 @@
-{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap"}
+{if ATF::$codename=="cleodis" || ATF::$codename=="cleodisbe" || ATF::$codename=="cap" || ATF::$codename=="assets"}
 	<div id="switchCodenameButton">
 		<script type="text/javascript">
 				function switchCodename(el) {
 					ATF.ajax(
 						'usr,switchCodename.ajax',
-						'codename='+el.value, 
-						{ 
+						'codename='+el.value,
+						{
 							onComplete: function () {
 								document.location.href="/";
-							} 
+							}
 						}
 					);
 				}
@@ -24,12 +24,20 @@
 							,value:"cleodis"
 							,handler: switchCodename
 						},
-						{/if}	
+						{/if}
 						{if ATF::$codename!=="cleodisbe"}
 						{
 							text:"Cléodis BE"
 							,icon: "{ATF::$staticserver}images/logos/cleodisbe.png"
 							,value:"cleodisbe"
+							,handler: switchCodename
+						},
+						{/if}
+						{if ATF::$codename!=="assets"}
+						{
+							text:"Assets"
+							,icon: "{ATF::$staticserver}images/logos/assets.png"
+							,value:"assets"
 							,handler: switchCodename
 						},
 						{/if}
@@ -41,12 +49,13 @@
 							,handler: switchCodename
 						},
 						{/if}
-										
+
+
 						]
 					}
 				});
 		</script>
-		
+
 	</div>
 {/if}
 
