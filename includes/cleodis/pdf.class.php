@@ -485,6 +485,11 @@ class pdf_cleodis extends pdf {
 				$this->logo = 'cleodis/boulangerpro.jpg';
 			break;
 
+			case 'Hexamed Leasing' :
+				$this->cleodis = "Hexamed Leasing";
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+			break;
+
 			case 'Consommables_com' :
 				$this->cleodis = "consommables.com";
 				$this->logo = 'cleodis/consommables.jpg';
@@ -551,8 +556,6 @@ class pdf_cleodis extends pdf {
 				$this->cleodis = "CLEODIS";
 			break;
 		}
-
-
 
 		if($this->devis["type_devis"] === "optic_2000"){
 			$this->devisoptic_2000($id);
@@ -1699,6 +1702,11 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'Hexamed Leasing' :
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
 			case 'Consommables_com' :
 				$this->logo = 'cleodis/consommables.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
@@ -2206,6 +2214,12 @@ class pdf_cleodis extends pdf {
 
 			case 'Boulanger Pro' :
 				$this->logo = 'cleodis/boulangerpro.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'Hexamed Leasing' :
+				$this->logo = 'cleodis/hexamed-logo.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 			break;
