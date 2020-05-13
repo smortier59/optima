@@ -59,6 +59,7 @@ class souscription_cleodis extends souscription {
       case 'hexamed':
         ATF::societe()->q->reset()->where("siret", "51028155300030");
         $hexamed = ATF::societe()->select_row();
+
         $this->id_partenaire = $hexamed["id_societe"];
       break;
 
@@ -713,6 +714,7 @@ class souscription_cleodis extends souscription {
       break;
 
 
+      case 'hexamed':
       case 'boulangerpro':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
