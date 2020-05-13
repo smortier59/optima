@@ -3,15 +3,15 @@
 
 
 
-{if ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 16)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 17)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 18)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 93)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 35)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe") && $id_user == 21)
- || (ATF::$codename == "cleodisbe" && $id_user == 104) || (ATF::$codename == "cleodis" &&$id_user == 103)
- || (ATF::$codename == "cleodisbe" && $id_user == 113) || (ATF::$codename == "cleodis" &&$id_user == 116)
- || (ATF::$codename == "cleodisbe" && $id_user == 116) || (ATF::$codename == "cleodis" &&$id_user == 124)
+{if ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 16)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 17)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 18)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 93)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" ) && $id_user == 35)
+ || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 21)
+ || (ATF::$codename == "cleodisbe" && $id_user == 104) || ((ATF::$codename == "cleodis" || ATF::$codename == "assets") && $id_user == 103)
+ || (ATF::$codename == "cleodisbe" && $id_user == 113) || ((ATF::$codename == "cleodis" || ATF::$codename == "assets") && $id_user == 116)
+ || (ATF::$codename == "cleodisbe" && $id_user == 116) || ((ATF::$codename == "cleodis" || ATF::$codename == "assets") && $id_user == 124)
 
  || (ATF::$codename == "bdomplus" && ($id_user ==  16 || $id_user == 116 ))
 
