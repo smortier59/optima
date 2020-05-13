@@ -377,7 +377,6 @@ class pack_produit extends classes_optima {
     /** Export des produits pour le middleware
      * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      * @param array $infos : contient tous les enregistrements
-     */
     public function export_middleware($infos,&$s){
 		$this->setQuerier($s["pager"]->create($infos['onglet']));
 		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
@@ -597,6 +596,134 @@ class pack_produit extends classes_optima {
 	        $i=0;
 	        $j++;
 		}		    		
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_middleware-'.date("YmdHis").'.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+
+	}
+     */
+
+    /** Export des produits pour le middleware
+     * @author Quentin JANON <qjanon@absystech.fr>
+     * @param array $infos : contient éventuellement un pager(onglet) qui permet d'exporter uniquement la sélection
+     */
+    public function export_middleware($infos,&$s){
+    	ob_get_flush();
+		$this->setQuerier($s["pager"]->create($infos['onglet']));
+		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
+		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
+		$data = $this->select_data($s,"saExport");
+		if (count($data) > 500) {
+			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
+		}
+
+		$packs = [];
+		$lignes = [];
+		$produits = [];
+		foreach ($data as $pack) {
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit()->q->reset()
+	        				->addAllFields('pack_produit')
+	        				->where('id_pack_produit', $pack['id_pack_produit'])
+	        				->setStrict()
+	        				->addOrder('id_pack_produit', 'DESC');
+	        $packs[] = ATF::pack_produit()->select_row();
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit_ligne()->q->reset()
+	        				->addAllFields('pack_produit_ligne')
+	        				->where('id_pack_produit',$pack['pack_produit.id_pack_produit'])
+	        				->setStrict();
+	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
+	        	array_push($lignes, $l);
+	        }
+
+
+		}
+		// Et maintenant les produits
+		foreach ($lignes as $l) {
+	        ATF::produit()->q->reset()
+	        				->addAllFields('produit')
+	        				->where('id_produit',$l['pack_produit_ligne.id_produit'])
+	        				->setStrict();
+
+	        foreach (ATF::produit()->select_all() as $p) {
+	        	array_push($produits, $p);
+	        }
+		}
+	    // die('fuck it baby');
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
+		$workbook = new PHPExcel;
+
+		$sheets = array("Packs","Packs-Produits","Produits");		
+
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+
+
+        // Premier onglet
+        $sheet = $workbook->getActiveSheet();
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Produits");
+
+	    $entetes = array_keys($produits[0]);
+	    $entetes = array_map(function ($el) {
+	    	return str_replace("produit.","",$el);
+	    }, $entetes);
+	    $sheet->fromArray($entetes, NULL, 'A1');
+		$sheet->fromArray($produits, NULL, 'A2');
+
+        // Second onglet
+        $sheet = $workbook->createSheet(1);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Packs");
+
+	    $entetes = array_keys($packs[0]);
+	    $entetes = array_map(function ($el) {
+	    	return str_replace("pack_produit.","",$el);
+	    }, $entetes);
+	    $sheet->fromArray($entetes, NULL, 'A1');
+		$sheet->fromArray($packs, NULL, 'A2');
+
+        // Troisième onglet
+        $sheet = $workbook->createSheet(2);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Lignes");
+
+	    $entetes = array_keys($lignes[0]);
+	    $entetes = array_map(function ($el) {
+	    	return str_replace("pack_produit_ligne.","",$el);
+	    }, $entetes);
+	    $sheet->fromArray($entetes, NULL, 'A1');
+		$sheet->fromArray($lignes, NULL, 'A2');
+
+
+		foreach ($workbook->getWorksheetIterator() as $worksheet) {
+
+		    $workbook->setActiveSheetIndex($workbook->getIndex($worksheet));
+
+		    $sheet = $workbook->getActiveSheet();
+		    $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
+		    $cellIterator->setIterateOnlyExistingCells(true);
+		    /** @var PHPExcel_Cell $cell */
+		    foreach ($cellIterator as $cell) {
+		        $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+		    }
+		}
+
+
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
 
