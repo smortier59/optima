@@ -645,8 +645,6 @@ class pack_produit extends classes_optima {
 	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
 	        	array_push($lignes, $l);
 	        }
-
-
 		}
 		// Et maintenant les produits
 		foreach ($lignes as $l) {
@@ -659,6 +657,7 @@ class pack_produit extends classes_optima {
 	        	array_push($produits, $p);
 	        }
 		}
+
 	    // die('fuck it baby');
 
         require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
@@ -682,6 +681,12 @@ class pack_produit extends classes_optima {
 	    $entetes = array_map(function ($el) {
 	    	return str_replace("produit.","",$el);
 	    }, $entetes);
+
+		$produitDedoublonne = [];
+		foreach ($produits as $p) { $produitDedoublonne[$p['produit.id_produit']] = $p; }
+		$produits = $produitDedoublonne;
+
+
 	    $sheet->fromArray($entetes, NULL, 'A1');
 		$sheet->fromArray($produits, NULL, 'A2');
 
