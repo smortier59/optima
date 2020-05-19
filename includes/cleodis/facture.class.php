@@ -793,6 +793,12 @@ class facture_cleodis extends facture {
     * @author Quentin JANON <qjanon@absystech.fr>
     */
 	public function _updateDate($infos) {
+
+		if(ATF::facture()->select($infos["id_facture"], "date_rejet")){
+			$infos["key"] = "date_regularisation";
+		}
+
+
 		$this->updateDate($infos);
 	}
 
