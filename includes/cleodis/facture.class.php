@@ -821,19 +821,16 @@ class facture_cleodis extends facture {
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
 
-				$infosMaj["etat"] = "payee";
 
+				$query = "UPDATE `facture` SET `etat`='payee' WHERE `id_facture`=".$infos["id_facture"];
+				if(ATF::db($this->db)->query($query)){
+					ATF::$msg->addNotice(
+						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+						,ATF::$usr->trans("notice_success_title")
+					);
+				}
 			}
-			$infosMaj["id_facture"] = $infos["id_facture"];
 
-			$query = "UPDATE `facture` SET `".$infos["key"]."`='".ATF::db($this->db)->real_escape_string($infos["value"])."' WHERE `id_facture`=".$infosMaj["id_facture"];
-
-			if(ATF::db($this->db)->query($query)){
-				ATF::$msg->addNotice(
-					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-					,ATF::$usr->trans("notice_success_title")
-				);
-			}
 			return true;
 		}else{
 			if($infosMaj[$infos["key"]]){
