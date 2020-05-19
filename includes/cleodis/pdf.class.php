@@ -222,6 +222,9 @@ class pdf_cleodis extends pdf {
 							 $this->image(__PDF_PATH__.$this->logo,170,5,20);
 						break;
 
+						case 'cleodis/hexamed-logo.jpg' :
+							$this->image(__PDF_PATH__."/".$this->logo,160,10,35);
+						break;
 						case 'cleodis/boulangerpro.jpg' :
 						case 'cleodis/consommables.jpg':
 						case 'cleodis/dib.jpg':
@@ -4399,6 +4402,13 @@ class pdf_cleodis extends pdf {
 
 		break;
 
+		case 'Hexamed Leasing' :
+			$this->logo = 'cleodis/hexamed-logo.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+
+		break;
+
 		case 'Consommables_com' :
 			$this->logo = 'cleodis/consommables.jpg';
 			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
@@ -4815,6 +4825,7 @@ class pdf_cleodis extends pdf {
 	if ($this->client['id_famille'] == 9) {
 	  $this->factureClassiqueParticulier($global);
 	} else {
+
 	  $this->factureClassiqueSociete($global);
 	}
   }

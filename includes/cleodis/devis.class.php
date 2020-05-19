@@ -69,6 +69,7 @@ class devis_cleodis extends devis {
 								  	'normal',
 								  	'2SI',
 								  	'Boulanger Pro',
+								  	'Hexamed Leasing',
 									'Consommables_com',
 									'DIB',
 									'Dyadem',
