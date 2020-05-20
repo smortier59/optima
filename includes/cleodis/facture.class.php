@@ -897,6 +897,9 @@ class facture_cleodis extends facture {
 			$infosMaj[$infos["key"]]=$infos["value"];
 
 			$query = "UPDATE `facture` SET `".$infos["key"]."`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$infosMaj["id_".$this->table];
+
+			log::logger($query , "mfleurquin");
+
 			if(ATF::db($this->db)->query($query)){
 				ATF::$msg->addNotice(
 					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
