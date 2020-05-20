@@ -796,6 +796,12 @@ class facture_cleodis extends facture {
 
 		if(ATF::facture()->select($infos["id_facture"], "date_rejet")){
 			$infos["key"] = "date_regularisation";
+
+			if(!ATF::facture()->select($infos["id_facture"], "date_paiement")){
+				$query = "UPDATE `facture` SET `date_paiement`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$this->decryptId($infos["id_facture"]);
+				ATF::db($this->db)->query($query);
+			}
+
 		}
 
 
@@ -904,6 +910,8 @@ class facture_cleodis extends facture {
 						,ATF::$usr->trans("notice_success_title")
 					);
 				}
+			}else{
+				$this->u($infosMaj);
 			}
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
