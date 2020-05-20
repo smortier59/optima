@@ -830,8 +830,7 @@ class facture_cleodis extends facture {
 					);
 				}
 			}else{
-
-
+				$this->updateEnumRejet($infos);
 			}
 
 			return true;
@@ -865,6 +864,7 @@ class facture_cleodis extends facture {
     * @return boolean à true si la transaction c'est bien passé
     */
 	public function updateEnumRejet($infos){
+
 		if($this->select($infos["id_".$this->table],"etat")=="impayee"){
 			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
 			ATF::commande()->q->reset()->where("commande.id_commande",$commande)->addField("commande.etat" , "etat");
@@ -896,15 +896,14 @@ class facture_cleodis extends facture {
 			$infosMaj["id_".$this->table]=$infos["id_".$this->table];
 			$infosMaj[$infos["key"]]=$infos["value"];
 
-			$query = "UPDATE `facture` SET `".$infos["key"]."`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$infosMaj["id_".$this->table];
-
-			log::logger($query , "mfleurquin");
-
-			if(ATF::db($this->db)->query($query)){
-				ATF::$msg->addNotice(
-					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-					,ATF::$usr->trans("notice_success_title")
-				);
+			if($infos["key"] != "rejet"){
+				$query = "UPDATE `facture` SET `".$infos["key"]."`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$infosMaj["id_".$this->table];
+				if(ATF::db($this->db)->query($query)){
+					ATF::$msg->addNotice(
+						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+						,ATF::$usr->trans("notice_success_title")
+					);
+				}
 			}
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
