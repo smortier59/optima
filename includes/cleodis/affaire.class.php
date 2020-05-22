@@ -1517,7 +1517,7 @@ class affaire_cleodis extends affaire {
 					->where("affaire.etat", "devis","OR","affaire_demande","=")
 					->where("commande.etat", "non_loyer","OR","affaire_demande","=")
 
-					->where("id_partenaire", $apporteur)
+					->where("affaire.id_partenaire", $apporteur)
 					->addGroup("affaire.id_affaire");
 
 			if($get["search"]){
