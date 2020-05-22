@@ -136,6 +136,27 @@ class affaire_cleodis extends affaire {
 		$this->files["cni"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["devis_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["devis_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
+		$this->files["rib_client"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["kbis_client"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
+
+		$this->files["facture_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["facture_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["facture_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
+		$this->files["bon_livraison_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["bon_livraison_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["bon_livraison_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
+		$this->files["pv_livraison_cleodis_signe_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
+		$this->files["autre_document_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["autre_document_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["autre_document_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["facture_fournisseur"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
@@ -1305,6 +1326,7 @@ class affaire_cleodis extends affaire {
 	*/
 	public function _affairePartenaire($get,$post) {
 
+		log::logger($get , "mfleurquin");
 
 		$utilisateur  = ATF::$usr->get("contact");
 		$apporteur = $utilisateur["id_societe"];
@@ -1353,10 +1375,15 @@ class affaire_cleodis extends affaire {
 					//->where("provenance",'partenaire')
 					->where("id_partenaire", $apporteur)
 
-					->where("affaire.etat", "devis","OR","affaire_demande","=")
-					->where("commande.etat", "non_loyer","OR","affaire_demande","=")
-
 					->addGroup("affaire.id_affaire");
+
+
+			if ($get['filters']['sans-suite'] == "on"){
+				$this->q->where("affaire.etat","perdue", "OR", "affaire_demande");
+			} else {
+				$this->q->where("affaire.etat", "devis","OR","affaire_demande","=")
+					->where("commande.etat", "non_loyer","OR","affaire_demande","=");
+			}
 
 
 			if($get["search"]){
@@ -1368,6 +1395,29 @@ class affaire_cleodis extends affaire {
 
 			foreach ($retour as $key => $value) {
 				$retour[$key]["date_paiement"] = NULL;
+				$retour[$key]["date_max_validite"] = NULL;
+				$retour[$key]["date_retour_pv"] = NULL;
+				$retour[$key]["date_debut_contrat"] = NULL;
+
+				ATF::commande()->q->reset()->where("commande.id_affaire", $value['id_affaire_fk']);
+				$contrat = ATF::commande()->select_row();
+				if($contrat){
+					$retour[$key]["date_retour_pv"] = $contrat["retour_pv"];
+					$retour[$key]["date_debut_contrat"] = $contrat["date_debut"];
+				}
+
+				ATF::comite()->q->reset()->where("comite.id_affaire", $value['id_affaire_fk']);
+				$comites = ATF::comite()->sa();
+
+				foreach ($comites as $k_comite => $vcomite) {
+					if($retour[$key]["date_max_validite"] == NULL ){
+						$retour[$key]["date_max_validite"] = $vcomite["validite_accord"];
+					}elseif(str_replace("-", "", $retour[$key]["date_max_validite"]) <= str_replace("-", "",$vcomite["validite_accord"]) ){
+						$retour[$key]["date_max_validite"] = $vcomite["validite_accord"];
+					}
+				}
+
+				/*$retour[$key]["date_paiement"] = NULL;
 
 				if($value["bon_de_commande"] === true){
 					ATF::bon_de_commande()->q->reset()
@@ -1388,7 +1438,14 @@ class affaire_cleodis extends affaire {
 				    		}
 				    	}
 				    }
-				}
+				}*/
+
+
+
+
+
+
+
 			}
 
 			return $retour;
@@ -1565,6 +1622,7 @@ class affaire_cleodis extends affaire {
 			if ($get['filters']['refuse'] == "on") $this->q->where("affaire.etat_comite","refuse","OR","etatComite");
 			if ($get['filters']['attente'] == "on") $this->q->where("affaire.etat_comite","attente","OR","etatComite");
 
+
 			if ($get['filters']['startdate']) {
 				$this->q
 				->where("affaire.date", $get['filters']['startdate'], "AND", false, ">=");
@@ -1579,6 +1637,7 @@ class affaire_cleodis extends affaire {
 				if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
 			}
+
 
 			foreach ($data['data'] as $key => $value) {
 				foreach ($value as $k_=>$val) {
@@ -3474,7 +3533,6 @@ class affaire_boulanger extends affaire_cleodis {
 		}
 	}
 };
-class affaire_boulanger extends affaire_cleodis { };
 class affaire_assets extends affaire_cleodis {
 
 	/**
