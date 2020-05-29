@@ -792,7 +792,10 @@ class facture_cleodis extends facture {
     * Exposition de la fonction updateDate via l'API de'Optima
     * @author Quentin JANON <qjanon@absystech.fr>
     */
-	public function _updateDate($infos) {
+	public function _updateDate ($infos) {
+
+		ATF::$usr->set('id_user',16);
+		ATF::$usr->set('id_agence',1);
 
 		if(ATF::facture()->select($infos["id_facture"], "date_rejet")){
 			$infos["key"] = "date_regularisation";
@@ -808,13 +811,6 @@ class facture_cleodis extends facture {
 		$this->updateDate($infos);
 	}
 
-	/**
-    * Fonction qui permet de mettre à jour la date
-    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    * @param array $infos date garantie
-    * @param type pour savoir si l'on cherche une affaire qui annule  et remplace ($type=='new') ou une affaire qui EST annulée et remplacée ($type=='old')
-    * @return boolean à true si la transaction c'est bien passé
-	*/
 	public function updateDate($infos){
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
@@ -827,18 +823,17 @@ class facture_cleodis extends facture {
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
 
-
-				$query = "UPDATE `facture` SET `etat`='payee' WHERE `id_facture`=".$infos["id_facture"];
-				if(ATF::db($this->db)->query($query)){
-					ATF::$msg->addNotice(
-						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-						,ATF::$usr->trans("notice_success_title")
-					);
-				}
-			}else{
-				$this->updateEnumRejet($infos);
+				$infosMaj["etat"] = "payee";
 			}
 
+			$infosMaj["id_facture"] = $infos["id_facture"];
+
+			if($this->u($infosMaj)){
+				ATF::$msg->addNotice(
+					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+					,ATF::$usr->trans("notice_success_title")
+				);
+			}
 			return true;
 		}else{
 			if($infosMaj[$infos["key"]]){
@@ -870,7 +865,6 @@ class facture_cleodis extends facture {
     * @return boolean à true si la transaction c'est bien passé
     */
 	public function updateEnumRejet($infos){
-
 		if($this->select($infos["id_".$this->table],"etat")=="impayee"){
 			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
 			ATF::commande()->q->reset()->where("commande.id_commande",$commande)->addField("commande.etat" , "etat");
@@ -894,24 +888,18 @@ class facture_cleodis extends facture {
 					}
 				}
 			}
-			$query = "UPDATE `commande` SET `etat`='".ATF::db($this->db)->real_escape_string($etatCommande)."' WHERE `id_commande`=".$commande;
-            ATF::db($this->db)->query($query);
+			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));
 
 			if ($infos['value'] == "undefined") $infos["value"] = "";
 			$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
 			$infosMaj["id_".$this->table]=$infos["id_".$this->table];
 			$infosMaj[$infos["key"]]=$infos["value"];
 
-			if($infos["key"] != "rejet"){
-				$query = "UPDATE `facture` SET `".$infos["key"]."`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$infosMaj["id_".$this->table];
-				if(ATF::db($this->db)->query($query)){
-					ATF::$msg->addNotice(
-						loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-						,ATF::$usr->trans("notice_success_title")
-					);
-				}
-			}else{
-				$this->u($infosMaj);
+			if($this->u($infosMaj)){
+				ATF::$msg->addNotice(
+					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+					,ATF::$usr->trans("notice_success_title")
+				);
 			}
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
@@ -919,6 +907,7 @@ class facture_cleodis extends facture {
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
 	}
+
 
 	public function contientFactureRejetee($id_commande, $FactureEnCours){
 		$idFactEnCours = $this->decryptId($FactureEnCours);
