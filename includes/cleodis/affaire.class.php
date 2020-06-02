@@ -136,7 +136,7 @@ class affaire_cleodis extends affaire {
 		$this->files["cni"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["cniVerso"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["devis_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		/*$this->files["devis_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
+		$this->files["devis_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["devis_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 		$this->files["rib_client"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
@@ -155,7 +155,7 @@ class affaire_cleodis extends affaire {
 
 		$this->files["autre_document_partenaire"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["autre_document_partenaire_2"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
-		$this->files["autre_document_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);*/
+		$this->files["autre_document_partenaire_3"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 
 		$this->files["contrat_signe"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
 		$this->files["pouvoir"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"no_generate"=>true);
