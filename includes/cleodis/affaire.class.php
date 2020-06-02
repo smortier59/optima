@@ -3490,7 +3490,7 @@ class affaire_boulanger extends affaire_cleodis {
 		}
 	}
 };
-class affaire_boulanger extends affaire_cleodis { };
+
 class affaire_assets extends affaire_cleodis {
 
 	/**

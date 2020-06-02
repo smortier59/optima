@@ -72,6 +72,7 @@ class pack_produit extends classes_optima {
 
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("EtatUpdate");
+		$this->addPrivilege("export_middleware");
 	}
 
 	/**
@@ -373,6 +374,494 @@ class pack_produit extends classes_optima {
 		return $r;
 	}
 
+    /** Export des produits pour le middleware
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @param array $infos : contient tous les enregistrements
+    public function export_middleware($infos,&$s){
+		$this->setQuerier($s["pager"]->create($infos['onglet']));
+		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
+		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
+		$data = $this->select_data($s,"saExport");
+		if (count($data) > 500) {
+			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
+		}
+
+		$packs = [];
+		$lignes = [];
+		$produits = [];
+		foreach ($data as $pack) {
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit()->q->reset()
+	        				->addField('id_pack_produit')
+	        				->addField('nom')
+	        				->addField('etat')
+	        				->addField('site_associe')
+	        				->addField('visible_sur_site')
+	        				->addField('description')
+	        				->where('id_pack_produit', $pack['id_pack_produit'])
+	        				->setStrict()
+	        				->addOrder('id_pack_produit', 'DESC');
+	        $packs[] = ATF::pack_produit()->select_row();
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit_ligne()->q->reset()
+	        				 ->addField('type')
+	        				 ->addField('id_pack_produit')
+	        				 ->addField('id_produit')
+	        				 ->addField('principal')
+	        				 ->addField('quantite')
+	        				 ->addField('min')
+	        				 ->addField('max')
+	        				 ->addField('option_incluse')
+	        				 ->addField('option_incluse_obligatoire')
+	        				 ->addField('visible')
+	        				 ->addField('ordre')
+	        				 ->addField('visibilite_prix')
+	        				 ->addField('visible_sur_pdf')
+	        				 ->addField('prix_achat')
+	        				 ->where('id_pack_produit',$pack['id_pack_produit'])
+	        				 ->setStrict();
+	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
+	        	array_push($lignes, $l);
+	        }
+
+
+		}
+		// Et maintenant les produits
+		foreach ($lignes as $l) {
+	        ATF::produit()->q->reset()
+	        				 ->addField('id_produit')
+	        				 ->addField('ref')
+	        				 ->addField('produit')
+	        				 ->addField('etat')
+	        				 ->addField('commentaire')
+	        				 ->addField('prix_achat')
+	        				 ->addField('taxe_ecotaxe')
+	        				 ->addField('taxe_ecomob')
+	        				 ->addField('type')
+	        				 ->addField('id_fournisseur')
+	        				 ->addField('id_fabriquant')
+	        				 ->addField('url_produit') // FAKE column, remplacer par la catégorie plus bas
+	        				 ->addField('id_sous_categorie')
+	        				 ->addField('loyer')
+	        				 ->addField('duree')
+	        				 ->addField('visible_sur_site')
+	        				 ->addField('ean')
+	        				 ->addField('description')
+	        				 ->addField('id_document_contrat')
+	        				 ->addField('url')
+	        				 ->where('id_produit',$l['id_produit'])
+	        				 ->setStrict();
+
+	        foreach (ATF::produit()->select_all() as $p) {
+	        	array_push($produits, $p);
+	        }
+		}
+
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
+		$workbook = new PHPExcel;
+
+		$sheets = array("Packs","Packs-Produits","Produits");		
+
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+
+
+        // Premier onglet
+        $sheet = $workbook->getActiveSheet();
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Produits");
+
+		//mise en place des titres
+		$entetes = array(
+        	 "A"=>array('Type de produit',20)
+        	,"B"=>array('Référence du produit',20)
+			,"C"=>array('Désignation',20)
+			,"D"=>array('Etat',20)
+			,"E"=>array('Commentaire',20)
+			,"F"=>array('Prix d\'achat dont ecotaxe',20)
+			,"G"=>array('EcoTaxe',20)
+			,"H"=>array('Eco Mobilier',20)
+			,"I"=>array('Type',20)
+			,"J"=>array('Fournisseur',20)
+			,"K"=>array('Fabriquant',20)
+			,"L"=>array('Catégorie',20)
+			,"M"=>array('Sous Catégorie',20)
+			,"N"=>array('Loyer',20)
+			,"O"=>array('Durée',20)
+			,"P"=>array('Visible sur le site',20)
+			,"Q"=>array('EAN',20)
+			,"R"=>array('Description',20)
+			,"S"=>array('id_document_contrat',20)
+			,"T"=>array('URL Image',20)
+		);
+    	$i=0;
+    	foreach($entetes as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
+			$i++;
+        }
+
+    	$i=0;
+    	$j=2;
+		foreach ($produits as $k=>$v) {
+			foreach ($v as $col => $value) {
+				switch($col) {
+					case 'id_produit': $value = ''; break;
+					case 'prix_achat': $value = $v['prix_achat']+$v['taxe_ecotaxe']; break;
+					case 'id_fournisseur': $value = ATF::societe()->nom($value); break;
+					case 'id_fabriquant': $value = ATF::fabriquant()->nom($value); break;
+					case 'url_produit': $value = ATF::categorie()->nom(ATF::sous_categorie()->select($v['id_sous_categorie'],'id_categorie')); break;
+					case 'id_sous_categorie': $value = ATF::sous_categorie()->nom($value); break;
+				}
+				$sheet->setCellValueByColumnAndRow($i , $j, $value);
+				$i++;
+			}
+	        $i=0;
+	        $j++;
+		}
+
+        // Second onglet
+        $sheet = $workbook->createSheet(1);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Packs");
+		//mise en place des titres
+		$entetes = array(
+        	 "A"=>array('N°',20)
+        	,"B"=>array('Nom',20)
+			,"C"=>array('Etat',20)
+			,"D"=>array('Site associé',20)
+			,"E"=>array('Visible sur le site',20)
+			,"F"=>array('Description',20)
+		);
+    	$i=0;
+    	foreach($entetes as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
+			$i++;
+        }		 
+    	$i=0;
+    	$j=2;
+		foreach ($packs as $k=>$v) {
+			foreach ($v as $col => $value) {
+				$sheet->setCellValueByColumnAndRow($i , $j, $value);
+				$i++;
+			}
+	        $i=0;
+	        $j++;
+		}
+
+        // Troisième onglet
+        $sheet = $workbook->createSheet(2);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Packs-Produits");
+		//mise en place des titres
+		$entetes = array(
+        	 "A"=>array('Type',20)
+        	,"B"=>array('N°',20)
+			,"C"=>array('Ref',20)
+			,"D"=>array('Produit principal ?',20)
+			,"E"=>array('Quantité',20)
+			,"F"=>array('Min',20)
+			,"G"=>array('Max',20)
+			,"H"=>array('Option incluse',20)
+			,"I"=>array('Option incluse obligatoire',20)
+			,"J"=>array('Afficher sur le site',20)
+			,"K"=>array('Ordre',20)
+			,"L"=>array('Ligne de produit visible',20)
+			,"M"=>array('Visible sur PDF',20)
+			,"N"=>array('Prix d\'achat dont ecotax',20)
+		);
+    	foreach($entetes as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
+			$sheet->getColumnDimension($col)->setWidth($titre[1]);
+			$i++;
+        }
+
+    	$i=0;
+    	$j=2;
+		foreach ($lignes as $k=>$v) {
+			foreach ($v as $col => $value) {
+				switch($col) {
+					case 'type': $value = ''; break;
+					case 'id_produit': ATF::produit()->select($value, 'ref'); break;
+				}
+				$sheet->setCellValueByColumnAndRow($i , $j, $value);
+				$i++;
+			}
+	        $i=0;
+	        $j++;
+		}		    		
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_middleware-'.date("YmdHis").'.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+
+	}
+     */
+
+    /** Export des produits pour le middleware
+     * @author Quentin JANON <qjanon@absystech.fr>
+     * @param array $infos : contient éventuellement un pager(onglet) qui permet d'exporter uniquement la sélection
+     */
+    public function export_middleware($infos,&$s){
+    	ob_get_flush();
+		$this->setQuerier($s["pager"]->create($infos['onglet']));
+		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
+		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
+		$data = $this->select_data($s,"saExport");
+		if (count($data) > 500) {
+			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
+		}
+
+		$packs = [];
+		$lignes = [];
+		$produits = [];
+		foreach ($data as $pack) {
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit()->q->reset()
+				->addField("pack_produit.nom")
+				->addField("pack_produit.site_associe")
+				->addField("pack_produit.type_offre")
+				->addField("pack_produit.loyer")
+				->addField("pack_produit.duree")
+				->addField("pack_produit.frequence")
+				->addField("pack_produit.etat")
+				->addField("pack_produit.specifique_partenaire")
+				->addField("pack_produit.visible_sur_site")
+				->addField("pack_produit.id_pack_produit_besoin")
+				->addField("pack_produit.id_pack_produit_produit")
+				->addField("pack_produit.url")
+				->addField("pack_produit.description")
+				->addField("pack_produit.avis_expert")
+				->addField("pack_produit.popup")
+				->addField("pack_produit.id_document_contrat")
+				->addField("pack_produit.prolongation")
+				->addField("pack_produit.val_plancher")
+				->addField("pack_produit.val_plafond")
+				->addField("pack_produit.max_qte")       				
+				->where('id_pack_produit', $pack['id_pack_produit'])
+				->addOrder('id_pack_produit', 'DESC');
+	        $packs[] = ATF::pack_produit()->select_row();
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit_ligne()->q->reset()
+				->addField("pack_produit_ligne.id_pack_produit_ligne")
+				->addField("pack_produit_ligne.type")
+				->addField("pack_produit_ligne.id_pack_produit")
+				->addField("pack_produit_ligne.id_produit")
+				->addField("pack_produit_ligne.ref")
+				->addField("pack_produit_ligne.produit")
+				->addField("pack_produit_ligne.quantite")
+				->addField("pack_produit_ligne.min")
+				->addField("pack_produit_ligne.max")
+				->addField("pack_produit_ligne.option_incluse")
+				->addField("pack_produit_ligne.option_incluse_obligatoire")
+				->addField("pack_produit_ligne.id_fournisseur")
+				->addfield('fournisseur.societe','Fournisseur')
+				->addField("pack_produit_ligne.frequence_fournisseur")
+				->addField("pack_produit_ligne.id_partenaire")
+				->addfield('partenaire.societe','Partenaire')
+				->addField("pack_produit_ligne.prix_achat")
+				->addField("pack_produit_ligne.code")
+				->addField("pack_produit_ligne.serial")
+				->addField("pack_produit_ligne.visible")
+				->addField("pack_produit_ligne.visible_sur_pdf")
+				->addField("pack_produit_ligne.visibilite_prix")
+				->addField("pack_produit_ligne.neuf")
+				->addField("pack_produit_ligne.date_achat")
+				->addField("pack_produit_ligne.ref_simag")
+				->addField("pack_produit_ligne.commentaire")
+				->addField("pack_produit_ligne.ordre")
+				->addField("pack_produit_ligne.principal")
+				->addField("pack_produit_ligne.val_modifiable")
+				->addField("pack_produit_ligne.valeur")
+				->from('pack_produit_ligne','id_fournisseur','societe','id_societe','fournisseur')
+				->from('pack_produit_ligne','id_partenaire','societe','id_societe','partenaire')
+				->where('id_pack_produit',$pack['pack_produit.id_pack_produit'])
+				->setStrict();
+	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
+	        	array_push($lignes, $l);
+	        }
+		}
+		// Et maintenant les produits
+		foreach ($lignes as $l) {
+
+
+	        ATF::produit()->q->reset()
+				->addField("produit.id_produit")
+				->addField("produit.ref")
+				->addField("produit.produit")
+				->addField("produit.prix_achat")
+				->addField("produit.taxe_ecotaxe")
+				->addField("produit.taxe_ecomob")
+				->addField("produit.url_produit")
+				->addField("produit.id_fabriquant")
+				->addField("fabriquant.fabriquant", "Fabriquant")
+				->addField("sous_categorie.id_categorie", 'id_categorie')
+				->addField("categorie.categorie", "Catégorie")
+				->addField("produit.id_sous_categorie")
+				->addField("sous_categorie.sous_categorie", "Sous categorie")
+				->addField("produit.type")
+				->addField("produit.id_fournisseur")
+				->addField("fournisseur.societe", 'Fournisseur')
+				->addField("produit.code")
+				->addField("produit.obsolete")
+				->addField("produit.id_produit_dd")
+				->addField("produit.id_produit_dotpitch")
+				->addField("produit.id_produit_format")
+				->addField("produit.id_produit_garantie_uc")
+				->addField("produit.id_produit_garantie_ecran")
+				->addField("produit.id_produit_garantie_imprimante")
+				->addField("produit.id_produit_lan")
+				->addField("produit.id_produit_lecteur")
+				->addField("produit.id_produit_OS")
+				->addField("produit.id_produit_puissance")
+				->addField("produit.id_produit_ram")
+				->addField("produit.id_produit_technique")
+				->addField("produit.id_produit_type")
+				->addField("produit.id_produit_typeecran")
+				->addField("produit.id_produit_viewable")
+				->addField("produit.id_processeur")
+				->addField("produit.etat")
+				->addField("produit.commentaire")
+				->addField("produit.type_offre")
+				->addField("produit.description")
+				->addField("produit.site_associe")
+				->addField("produit.loyer")
+				->addField("produit.duree")
+				->addField("produit.loyer1")
+				->addField("produit.duree2")
+				->addField("produit.duree1")
+				->addField("produit.loyer2")
+				->addField("produit.visible_sur_site")
+				->addField("produit.avis_expert")
+				->addField("produit.services")
+				->addField("produit.id_produit_env")
+				->addField("produit.id_produit_besoins")
+				->addField("produit.id_produit_tel_produit")
+				->addField("produit.id_produit_tel_type")
+				->addField("produit.url")
+				->addField("produit.ean")
+				->addField("produit.id_document_contrat")
+				->addField("document_contrat.document_contrat", "Document contrat")
+				->addField("produit.url_image")
+				->addField("produit.livreur")
+				->addField("produit.frais_livraison")
+				->addField("produit.ref_garantie")
+				->addField("produit.id_licence_type")
+				->addField("licence_type.licence_type", "Licence type")
+				->addField("produit.increment")
+				->from('produit','id_fournisseur','societe','id_societe','fournisseur')
+				->from('produit','id_fabriquant','fabriquant','id_fabriquant','fabriquant')
+				->from('produit','id_sous_categorie','sous_categorie','id_sous_categorie')
+				->from('sous_categorie','id_categorie','categorie','id_categorie')
+				->from('produit','id_document_contrat','document_contrat','id_document_contrat')
+				->from('produit','id_licence_type','licence_type','id_licence_type')
+				->where('id_produit',$l['pack_produit_ligne.id_produit'])
+				->setStrict();
+
+	        foreach (ATF::produit()->select_all() as $p) {
+	        	array_push($produits, $p);
+	        }
+		}
+
+	    // die('fuck it baby');
+
+        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+
+		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
+		$workbook = new PHPExcel;
+
+		$sheets = array("Packs","Packs-Produits","Produits");		
+
+		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+
+
+        // Premier onglet
+        $sheet = $workbook->getActiveSheet();
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Produits");
+
+	    $entetes = array_keys($produits[0]);
+	    $entetes = array_map(function ($el) {
+	    	return str_replace("produit.","",$el);
+	    }, $entetes);
+
+		$produitDedoublonne = [];
+		foreach ($produits as $p) { $produitDedoublonne[$p['produit.id_produit']] = $p; }
+		$produits = $produitDedoublonne;
+
+
+	    $sheet->fromArray($entetes, NULL, 'A1');
+		$sheet->fromArray($produits, NULL, 'A2');
+
+        // Second onglet
+        $sheet = $workbook->createSheet(1);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Packs");
+
+	    $entetes = array_keys($packs[0]);
+	    $entetes = array_map(function ($el) {
+	    	return str_replace("pack_produit.","",$el);
+	    }, $entetes);
+	    $sheet->fromArray($entetes, NULL, 'A1');
+		$sheet->fromArray($packs, NULL, 'A2');
+
+        // Troisième onglet
+        $sheet = $workbook->createSheet(2);
+		$workbook->setActiveSheetIndex($key);
+	    $sheet->setTitle("Lignes");
+
+	    $entetes = array_keys($lignes[0]);
+	    $entetes = array_map(function ($el) {
+	    	return str_replace("pack_produit_ligne.","",$el);
+	    }, $entetes);
+	    $sheet->fromArray($entetes, NULL, 'A1');
+		$sheet->fromArray($lignes, NULL, 'A2');
+
+
+		foreach ($workbook->getWorksheetIterator() as $worksheet) {
+
+		    $workbook->setActiveSheetIndex($workbook->getIndex($worksheet));
+
+		    $sheet = $workbook->getActiveSheet();
+		    $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
+		    $cellIterator->setIterateOnlyExistingCells(true);
+		    /** @var PHPExcel_Cell $cell */
+		    foreach ($cellIterator as $cell) {
+		        $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+		    }
+		}
+
+
+
+		$writer = new PHPExcel_Writer_Excel5($workbook);
+
+		$writer->save($fname);
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=export_middleware-'.date("YmdHis").'.xls');
+		header("Cache-Control: private");
+		$fh=fopen($fname, "rb");
+		fpassthru($fh);
+		unlink($fname);
+		PHPExcel_Calculation::getInstance()->__destruct();
+
+	}
 
 
 }
