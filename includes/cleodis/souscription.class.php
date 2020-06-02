@@ -240,6 +240,7 @@ class souscription_cleodis extends souscription {
 
         switch ($post["site_associe"]) {
           case 'boulangerpro':
+          case 'hexamed':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -336,6 +337,7 @@ class souscription_cleodis extends souscription {
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
     if($post['site_associe'] == "boulangerpro") $devis["type_affaire"] = 'Boulanger Pro';
+    if($post['site_associe'] == "hexamed") $devis["type_affaire"] = 'Hexamed Leasing';
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -962,8 +964,11 @@ class souscription_cleodis extends souscription {
       case "bdomplus":
         $r = "BP";
       break;
+      case "hexamed":
+        $r = "HX";
+      break;
       default:
-        $r = "";
+        $r = substr($site_associe, 0, 2);
       break;
     }
     return $r;

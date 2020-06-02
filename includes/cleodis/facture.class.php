@@ -792,17 +792,25 @@ class facture_cleodis extends facture {
     * Exposition de la fonction updateDate via l'API de'Optima
     * @author Quentin JANON <qjanon@absystech.fr>
     */
-	public function _updateDate($infos) {
+	public function _updateDate ($infos) {
+
+		ATF::$usr->set('id_user',16);
+		ATF::$usr->set('id_agence',1);
+
+		if(ATF::facture()->select($infos["id_facture"], "date_rejet")){
+			$infos["key"] = "date_regularisation";
+
+			if(!ATF::facture()->select($infos["id_facture"], "date_paiement")){
+				$query = "UPDATE `facture` SET `date_paiement`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$this->decryptId($infos["id_facture"]);
+				ATF::db($this->db)->query($query);
+			}
+
+		}
+
+
 		$this->updateDate($infos);
 	}
 
-	/**
-    * Fonction qui permet de mettre à jour la date
-    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-    * @param array $infos date garantie
-    * @param type pour savoir si l'on cherche une affaire qui annule  et remplace ($type=='new') ou une affaire qui EST annulée et remplacée ($type=='old')
-    * @return boolean à true si la transaction c'est bien passé
-	*/
 	public function updateDate($infos){
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
@@ -814,6 +822,8 @@ class facture_cleodis extends facture {
 
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
+
+				$infosMaj["etat"] = "payee";
 			}
 
 			$infosMaj["id_facture"] = $infos["id_facture"];
@@ -897,6 +907,7 @@ class facture_cleodis extends facture {
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
 	}
+
 
 	public function contientFactureRejetee($id_commande, $FactureEnCours){
 		$idFactEnCours = $this->decryptId($FactureEnCours);
@@ -2899,7 +2910,5 @@ class facture_boulanger extends facture_cleodis {
 
 
 };
-
-class facture_boulanger extends facture_cleodis { };
 
 class facture_assets extends facture_cleodis { };

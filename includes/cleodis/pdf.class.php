@@ -156,6 +156,7 @@ class pdf_cleodis extends pdf {
 				case 'cleodis/flexfuel.jpg':
 				case 'cleodis/instoresolution.jpg':
 				case 'cleodis/lafi.jpg':
+				case 'cleodis/LFS.jpg':
 				case 'cleodis/Manganelli.jpg':
 				case 'cleodis/nrc.jpg' :
 				case 'cleodis/OLISYS.jpg':
@@ -197,6 +198,7 @@ class pdf_cleodis extends pdf {
 					case 'cleodis/flexfuel.jpg':
 					case 'cleodis/instoresolution.jpg':
 					case 'cleodis/lafi.jpg':
+					case 'cleodis/LFS.jpg':
 					case 'cleodis/Manganelli.jpg':
 					case 'cleodis/nrc.jpg' :
 					case 'cleodis/OLISYS.jpg':
@@ -222,6 +224,9 @@ class pdf_cleodis extends pdf {
 							 $this->image(__PDF_PATH__.$this->logo,170,5,20);
 						break;
 
+						case 'cleodis/hexamed-logo.jpg' :
+							$this->image(__PDF_PATH__."/".$this->logo,160,10,35);
+						break;
 						case 'cleodis/boulangerpro.jpg' :
 						case 'cleodis/consommables.jpg':
 						case 'cleodis/dib.jpg':
@@ -229,6 +234,7 @@ class pdf_cleodis extends pdf {
 						case 'cleodis/flexfuel.jpg':
 						case 'cleodis/instoresolution.jpg':
 						case 'cleodis/lafi.jpg':
+						case 'cleodis/LFS.jpg':
 						case 'cleodis/Manganelli.jpg':
 						case 'cleodis/nrc.jpg' :
 						case 'cleodis/OLISYS.jpg':
@@ -485,6 +491,11 @@ class pdf_cleodis extends pdf {
 				$this->logo = 'cleodis/boulangerpro.jpg';
 			break;
 
+			case 'Hexamed Leasing' :
+				$this->cleodis = "Hexamed Leasing";
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+			break;
+
 			case 'Consommables_com' :
 				$this->cleodis = "consommables.com";
 				$this->logo = 'cleodis/consommables.jpg';
@@ -513,6 +524,11 @@ class pdf_cleodis extends pdf {
 			case 'LAFI' :
 				$this->cleodis = "LAFI";
 				$this->logo = 'cleodis/lafi.jpg';
+			break;
+
+			case 'LFS' :
+				$this->cleodis = "LFS";
+				$this->logo = 'cleodis/LFS.jpg';
 			break;
 
 			case 'Manganelli' :
@@ -551,8 +567,6 @@ class pdf_cleodis extends pdf {
 				$this->cleodis = "CLEODIS";
 			break;
 		}
-
-
 
 		if($this->devis["type_devis"] === "optic_2000"){
 			$this->devisoptic_2000($id);
@@ -1699,6 +1713,11 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'Hexamed Leasing' :
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+			break;
+
 			case 'Consommables_com' :
 				$this->logo = 'cleodis/consommables.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
@@ -1730,6 +1749,12 @@ class pdf_cleodis extends pdf {
 
 			case 'LAFI' :
 				$this->logo = 'cleodis/lafi.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+			case 'LFS' :
+				$this->logo = 'cleodis/LFS.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 			break;
@@ -2210,6 +2235,12 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'Hexamed Leasing' :
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
 			case 'Consommables_com' :
 				$this->logo = 'cleodis/consommables.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
@@ -2244,6 +2275,14 @@ class pdf_cleodis extends pdf {
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 			break;
+
+			case 'LFS' :
+				$this->logo = 'cleodis/LFS.jpg';
+				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+			break;
+
+
 
 			case 'Manganelli' :
 				$this->logo = 'cleodis/Manganelli.jpg';
@@ -4385,6 +4424,13 @@ class pdf_cleodis extends pdf {
 
 		break;
 
+		case 'Hexamed Leasing' :
+			$this->logo = 'cleodis/hexamed-logo.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+
+		break;
+
 		case 'Consommables_com' :
 			$this->logo = 'cleodis/consommables.jpg';
 			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
@@ -4416,6 +4462,12 @@ class pdf_cleodis extends pdf {
 
 		case 'LAFI' :
 			$this->logo = 'cleodis/lafi.jpg';
+			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+
+		break;
+
+		case 'LFS' :
+			$this->logo = 'cleodis/LFS.jpg';
 			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 		break;
@@ -4801,6 +4853,7 @@ class pdf_cleodis extends pdf {
 	if ($this->client['id_famille'] == 9) {
 	  $this->factureClassiqueParticulier($global);
 	} else {
+
 	  $this->factureClassiqueSociete($global);
 	}
   }
@@ -14023,7 +14076,7 @@ class pdf_bdomplus extends pdf_cleodis {
 				$this->image(__PDF_PATH__.$this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);		
+				$this->image(__PDF_PATH__.$this->logo,15,5,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -14525,7 +14578,7 @@ class pdf_bdomplus extends pdf_cleodis {
         }
 		$this->setfont('arial','I',11);
 		if($this->facture["prix"] > 0){
-            $this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C'); 
+            $this->cell(0,7,"fait office de garantie et est à conserver précieusement",0, 1, 'C');
         }
 		$this->settextcolor(0,0,0);
 
