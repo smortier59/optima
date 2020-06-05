@@ -54,12 +54,8 @@ class sell_and_sign extends classes_optima {
 			"contractor_id" =>  $post["dataSellAndSign"]["contractor_id"],
 			"contract_id" => $post["dataSellAndSign"]["contract_id"],
 			"document_id" => $post["dataSellAndSign"]["document_id"],
-			"contractorTo_id" => $post["dataSellAndSign"]["contractorTo_id"],
-			"bundle_id" => 1
+			"contractorTo_id" => $post["dataSellAndSign"]["contractorTo_id"]
 		));
-
-
-
 		return true;
 
 	}
