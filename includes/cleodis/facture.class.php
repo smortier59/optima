@@ -823,7 +823,7 @@ class facture_cleodis extends facture {
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
 
-				$infosMaj["etat"] = "payee";
+				//$infosMaj["etat"] = "payee";
 			}
 
 			$infosMaj["id_facture"] = $infos["id_facture"];

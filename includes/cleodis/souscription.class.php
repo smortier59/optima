@@ -32,6 +32,7 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
+
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -79,7 +80,6 @@ class souscription_cleodis extends souscription {
       throw new errorATF("Invalid domaine : ".($post["particulier_email"]?$post["particulier_email"]:$post["email"]),500);
     }
 
-
     ATF::db($this->db)->begin_transaction();
     try {
       // Gestion du code client
@@ -109,7 +109,6 @@ class souscription_cleodis extends souscription {
       //On check les durées sur chaque pack pour regrouper/affaire
       $lignes = json_decode($post["produits"], true);
       $post["produits"] = $affaires = $lignes_par_duree = array();
-
 
       foreach ($lignes as $key => $value) {
         $duree = ATF::pack_produit()->getDureePack($value["id_pack_produit"]);
@@ -936,9 +935,12 @@ class souscription_cleodis extends souscription {
 
       // Si c'est le module commande, on met à jour les dates de retour
       if($module == "commande"){
-        if ($type == "retour") $champs = "retour_contrat";
-        if ($type == "retourPV") $champs = "retour_pv";
-        if($champs) ATF::commande()->u(array("id_commande"=> $id, $champs => date("Y-m-d")));
+        if ($type == "retour") {
+          ATF::commande()->u(array("id_commande"=> $id, "retour_contrat" => date("Y-m-d"), "retour_prel" => date("Y-m-d")));
+        }
+        if ($type == "retourPV") {
+          ATF::commande()->u(array("id_commande"=> $id, "retour_pv" => date("Y-m-d")));
+        }
       }
 
     }
