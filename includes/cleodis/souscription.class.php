@@ -32,6 +32,7 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
+
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -59,6 +60,7 @@ class souscription_cleodis extends souscription {
       case 'hexamed':
         ATF::societe()->q->reset()->where("siret", "51028155300030");
         $hexamed = ATF::societe()->select_row();
+
         $this->id_partenaire = $hexamed["id_societe"];
       break;
 
@@ -77,7 +79,6 @@ class souscription_cleodis extends souscription {
     } catch (errorATF $e) {
       throw new errorATF("Invalid domaine : ".($post["particulier_email"]?$post["particulier_email"]:$post["email"]),500);
     }
-
 
     ATF::db($this->db)->begin_transaction();
     try {
@@ -108,7 +109,6 @@ class souscription_cleodis extends souscription {
       //On check les durées sur chaque pack pour regrouper/affaire
       $lignes = json_decode($post["produits"], true);
       $post["produits"] = $affaires = $lignes_par_duree = array();
-
 
       foreach ($lignes as $key => $value) {
         $duree = ATF::pack_produit()->getDureePack($value["id_pack_produit"]);
@@ -239,6 +239,7 @@ class souscription_cleodis extends souscription {
 
         switch ($post["site_associe"]) {
           case 'boulangerpro':
+          case 'hexamed':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -335,6 +336,7 @@ class souscription_cleodis extends souscription {
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
     if($post['site_associe'] == "boulangerpro") $devis["type_affaire"] = 'Boulanger Pro';
+    if($post['site_associe'] == "hexamed") $devis["type_affaire"] = 'Hexamed Leasing';
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -713,6 +715,7 @@ class souscription_cleodis extends souscription {
       break;
 
 
+      case 'hexamed':
       case 'boulangerpro':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
@@ -932,9 +935,12 @@ class souscription_cleodis extends souscription {
 
       // Si c'est le module commande, on met à jour les dates de retour
       if($module == "commande"){
-        if ($type == "retour") $champs = "retour_contrat";
-        if ($type == "retourPV") $champs = "retour_pv";
-        if($champs) ATF::commande()->u(array("id_commande"=> $id, $champs => date("Y-m-d")));
+        if ($type == "retour") {
+          ATF::commande()->u(array("id_commande"=> $id, "retour_contrat" => date("Y-m-d"), "retour_prel" => date("Y-m-d")));
+        }
+        if ($type == "retourPV") {
+          ATF::commande()->u(array("id_commande"=> $id, "retour_pv" => date("Y-m-d")));
+        }
       }
 
     }
@@ -960,8 +966,11 @@ class souscription_cleodis extends souscription {
       case "bdomplus":
         $r = "BP";
       break;
+      case "hexamed":
+        $r = "HX";
+      break;
       default:
-        $r = "";
+        $r = substr($site_associe, 0, 2);
       break;
     }
     return $r;
