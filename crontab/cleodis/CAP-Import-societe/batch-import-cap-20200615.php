@@ -7,9 +7,9 @@ $_SERVER["argv"][1] = "cap";
 include(dirname(__FILE__)."/../../../global.inc.php");
 // Désactivation de la traçabilité
 ATF::define("tracabilite",false);
-
-ATF::$usr->set('id_user',1);
-ATF::$usr->set('id_agence',1);
+/*
+ATF::$usr->set('id_user',15);
+ATF::$usr->set('id_agence',1);*/
 
 echo "========= DEBUT DE SCRIPT =========\n";
 
@@ -62,10 +62,12 @@ while ($ligne = fgetcsv($fpr, 0, ';')) {
 
 				case 'id_fournisseur':
 				case 'id_apporteur':
-					ATF::societe()->q->reset()->where("societe", $value, "OR");
+					ATF::societe()->q->reset()->where("societe", $value, "AND", false, "LIKE");
 					if($societe = ATF::societe()->select_row()){
 						$data[$entete[$key]] = $societe["id_societe"];
 					}else{
+						ATF::societe()->q->setToString();
+						echo ATF::societe()->select_row()."\n";
 						throw new errorATF($entete[$key]." ".$value." non trouvée");
 					}
 				break;
@@ -174,7 +176,7 @@ while ($ligne = fgetcsv($fpr, 0, ';')) {
 		}
 	}
 
-	$data = gererateSLI($data);
+	//$data = gererateSLI($data);
 	try{
 		update($data);
 	} catch (errorATF $e) {
@@ -186,9 +188,9 @@ while ($ligne = fgetcsv($fpr, 0, ';')) {
 		if($soc = ATF::societe()->select_row()){
 			if($soc["id_societe"] !== $data["id_societe"]){
 				$data["id_societe"] = $soc["id_societe"];
-				$data = gererateSLI($data);
+				//$data = gererateSLI($data);
 				try{
-					$data = gererateSLI($data);
+					//$data = gererateSLI($data);
 					update($data);
 				}catch(errorATF $e){
 					$err++;
