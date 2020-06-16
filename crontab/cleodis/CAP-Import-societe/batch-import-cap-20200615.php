@@ -8,6 +8,9 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 // Désactivation de la traçabilité
 ATF::define("tracabilite",false);
 
+ATF::$usr->set('id_user',1);
+ATF::$usr->set('id_agence',1);
+
 echo "========= DEBUT DE SCRIPT =========\n";
 
 // Début de transaction SQL
@@ -120,7 +123,6 @@ while ($ligne = fgetcsv($fpr, 0, ';')) {
 				case 'id_contact_signataire':
 				case 'id_prospection':
 					if($value !== " "){
-
 						ATF::contact()->q->reset()
 							->where("nom", "%".ATF::db()->real_escape_string($value)."%","OR","findContact", "LIKE")
 							->where("prenom", "%".ATF::db()->real_escape_string($value)."%","OR","findContact", "LIKE")
@@ -161,7 +163,6 @@ while ($ligne = fgetcsv($fpr, 0, ';')) {
 							throw new errorATF($entete[$key]." ".$value." non trouvée");
 						}
 					}
-
 					$data[$entete[$key]] = $devises[$value];
 
 				break;
@@ -173,17 +174,21 @@ while ($ligne = fgetcsv($fpr, 0, ';')) {
 		}
 	}
 
-
+	$data = gererateSLI($data);
 	try{
 		update($data);
 	} catch (errorATF $e) {
+
+
 		//L'id donné ne doit pas etre correct, on check pour recuperer le bon ID par rapport à societe et adresse et on retente l'insert
 		ATF::societe()->q->reset()->where("societe", ATF::db()->real_escape_string($data["societe"]))
 								  ->where("adresse", ATF::db()->real_escape_string($data["adresse"]));
 		if($soc = ATF::societe()->select_row()){
 			if($soc["id_societe"] !== $data["id_societe"]){
 				$data["id_societe"] = $soc["id_societe"];
+				$data = gererateSLI($data);
 				try{
+					$data = gererateSLI($data);
 					update($data);
 				}catch(errorATF $e){
 					$err++;
@@ -217,5 +222,14 @@ function update($data){
 
 	//log::logger($data , $log_import);
 	ATF::societe()->u($data);
+}
 
+function gererateSLI($data){
+	if(!ATF::societe()->select($data["id_societe"], "ref")){
+		$data["ref"] = ATF::societe()->create_ref();
+		return $data;
+	}else{
+		$data["ref"] = ATF::societe()->select($data["id_societe"], "ref");
+		return $data;
+	}
 }
