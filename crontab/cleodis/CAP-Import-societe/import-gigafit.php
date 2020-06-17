@@ -177,7 +177,7 @@ echo "Erreur --> ".$err;
 
 
 // Rollback la transaction
-ATF::db()->rollback_transaction();
+//ATF::db()->rollback_transaction();
 // Valide la trnasaction
-//ATF::db()->commit_transaction();
+ATF::db()->commit_transaction();
 echo "========= FIN DE SCRIPT =========\n";
