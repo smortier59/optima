@@ -807,7 +807,7 @@ class facture_cleodis extends facture {
 		}
 
 		$this->updateDate($infos);
-		$this->update(array("id_facture"=> $infos["id_".$this->table], "etat"=>"payee"));
+		ATF::facture()->u(array("id_facture"=> $this->decryptId($infos["id_facture"]), "etat"=>"payee"));
 
 	}
 
