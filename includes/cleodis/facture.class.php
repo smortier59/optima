@@ -804,11 +804,11 @@ class facture_cleodis extends facture {
 				$query = "UPDATE `facture` SET `date_paiement`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$this->decryptId($infos["id_facture"]);
 				ATF::db($this->db)->query($query);
 			}
-
 		}
 
-
 		$this->updateDate($infos);
+		ATF::facture()->u(array("id_facture"=> $this->decryptId($infos["id_facture"]), "etat"=>"payee"));
+
 	}
 
 	public function updateDate($infos){
@@ -822,7 +822,6 @@ class facture_cleodis extends facture {
 
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
-
 				//$infosMaj["etat"] = "payee";
 			}
 
@@ -865,16 +864,20 @@ class facture_cleodis extends facture {
     * @return boolean à true si la transaction c'est bien passé
     */
 	public function updateEnumRejet($infos){
-		if($this->select($infos["id_".$this->table],"etat")=="impayee"){
+		if($this->select($infos["id_".$this->table],"etat")=="impayee" || $infos["key"] == "rejet"){
 			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
 			ATF::commande()->q->reset()->where("commande.id_commande",$commande)->addField("commande.etat" , "etat");
 			$etatCommande = ATF::commande()->select_row();
 			$etatCommande = $etatCommande["etat"];
 
 			if((($infos["value"] != "non_rejet") && ($infos["value"] != "non_preleve_mandat")) && (($infos["key"] != "date_regularisation" && $infos["value"] != "")) ){
+				$this->u(array("id_facture"=>$infos["id_facture"], "etat"=>"impayee"));
+
 				if(!stripos($etatCommande, "contentieux")){
 					if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution"){
 						$etatCommande = $etatCommande."_contentieux";
+
+
 					}
 				}
 			}else{
