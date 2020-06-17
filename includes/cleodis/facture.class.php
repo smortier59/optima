@@ -804,11 +804,11 @@ class facture_cleodis extends facture {
 				$query = "UPDATE `facture` SET `date_paiement`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$this->decryptId($infos["id_facture"]);
 				ATF::db($this->db)->query($query);
 			}
-
 		}
 
-
 		$this->updateDate($infos);
+		$this->update(array("id_facture"=> $infos["id_".$this->table], "etat"=>"payee"));
+
 	}
 
 	public function updateDate($infos){
@@ -822,7 +822,7 @@ class facture_cleodis extends facture {
 
 			if($infos["key"] == "date_regularisation"){
 				$this->updateEnumRejet($infos);
-				$infosMaj["etat"] = "payee";
+				//$infosMaj["etat"] = "payee";
 			}
 
 			$infosMaj["id_facture"] = $infos["id_facture"];
