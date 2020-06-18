@@ -2825,13 +2825,29 @@ class affaire_cleodis extends affaire {
 	public function createTacheAffaireFromSite($id_affaire){
 		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe') return;
 
-		$dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
-		$id_user = 116; //Benjamin Tronquit
+		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
+								->where("login", "abowe", "OR", "filles")
+								->where("login", "egerard", "OR", "filles")
+								->where("login", "bbocquillon", "OR", "filles")
+								->where("login", "btronquit", "OR", "filles")
+								->where("login", "pcaminel", "OR", "filles")
+								->where("login", "smazars", "OR", "filles");
+	 
+		
+		$filles = ATF::user()->sa(); 
+        $dest = array(); 
+        foreach ($filles as $key => $value) { 
+        	$dest[] = $value["id_user"]; 
+     	}
 
-		if(ATF::$codename === "cleodisbe"){
-			$dest = array("18", "21", "104");  //Pierre, Allison, Severine,  Jeanne
-			$id_user = 113;  //Benjamin Tronquit
-		}
+
+		// $dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
+		// $id_user = 116; //Benjamin Tronquit
+
+		// if(ATF::$codename === "cleodisbe"){
+		// 	$dest = array("18", "21", "104", "124");  //Pierre, Allison, Severine,  Jeanne
+		// 	$id_user = 113;  //Benjamin Tronquit
+		// }
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
@@ -2839,7 +2855,7 @@ class affaire_cleodis extends affaire {
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." provenant de ".$affaire["provenance"]." du site ".$affaire["site_associe"].". \nDonnées de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." \n provenant de ".$affaire["provenance"]." \n Site ".$affaire["site_associe"].".\n Partenaire ".$societe["partenaire"]" \n Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
@@ -2847,7 +2863,7 @@ class affaire_cleodis extends affaire {
 									  ),
 						"dest"=>$dest
 					  );
-		$id_tache = ATF::tache()->insert($tache);
+		ATF::tache()->insert($tache);
 	}
 
 	public function validateOrderPartenaire($infos,&$s,$files=NULL,&$cadre_refreshed){
