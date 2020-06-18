@@ -455,3 +455,10 @@ ALTER TABLE `parc` ADD `id_bon_de_commande` MEDIUMINT(8) UNSIGNED NULL DEFAULT N
 ALTER TABLE `parc` ADD CONSTRAINT `parc_ibfk_1` FOREIGN KEY (`id_societe`) REFERENCES `societe`(`id_societe`) ON DELETE CASCADE ON UPDATE CASCADE; ALTER TABLE `parc` ADD CONSTRAINT `parc_ibfk_3` FOREIGN KEY (`id_affaire`) REFERENCES `affaire`(`id_affaire`) ON DELETE CASCADE ON UPDATE CASCADE; ALTER TABLE `parc` ADD CONSTRAINT `parc_ibfk_6` FOREIGN KEY (`id_bon_de_commande`) REFERENCES `bon_de_commande`(`id_bon_de_commande`) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE `pdf_societe` ADD `date_expiration` DATE NULL DEFAULT NULL AFTER `nom_document`;
 ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+
+
+
+
+--- Arreter Contentieux
+ALTER TABLE `commande` CHANGE `etat` `etat` ENUM('non_loyer','mis_loyer','prolongation','AR','arreter','vente','restitution','mis_loyer_contentieu','prolongation_contentieux','restitution_contentieux','arreter_contentieux') CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'non_loyer';
