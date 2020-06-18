@@ -164,3 +164,10 @@ ALTER TABLE `pack_produit` CHANGE `val_plancher` `val_plancher` INT(10) UNSIGNED
 ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','toshiba','btwin','boulangerpro','boulanger-cafe') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 
 ALTER TABLE `produit` ADD `increment` INT(11) NULL DEFAULT NULL AFTER `id_licence_type`;
+
+
+-- REF avenant
+ALTER TABLE `affaire` CHANGE `ref` `ref` VARCHAR(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+ALTER TABLE `bon_de_commande` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `facture_fournisseur` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `facture_non_parvenue` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
