@@ -3016,12 +3016,12 @@ class affaire_cleodis extends affaire {
 								->where("login", "btronquit", "OR", "filles")
 								->where("login", "pcaminel", "OR", "filles")
 								->where("login", "smazars", "OR", "filles");
-	 
-		
-		$filles = ATF::user()->sa(); 
-        $dest = array(); 
-        foreach ($filles as $key => $value) { 
-        	$dest[] = $value["id_user"]; 
+
+
+		$filles = ATF::user()->sa();
+        $dest = array();
+        foreach ($filles as $key => $value) {
+        	$dest[] = $value["id_user"];
      	}
 
 
@@ -3039,7 +3039,7 @@ class affaire_cleodis extends affaire {
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." \n provenant de ".$affaire["provenance"]." \n Site ".$affaire["site_associe"].".\n Partenaire ".$societe["partenaire"]" \n Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." \n provenant de ".$affaire["provenance"]." \n Site ".$affaire["site_associe"].".\n Partenaire ".$societe["partenaire"]." \n Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
