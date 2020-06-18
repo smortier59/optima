@@ -1013,14 +1013,14 @@ class commande_cleodis extends commande {
 				$commande->set("etat","non_loyer");
 			}
 		//Si la commande est une vente, si elle est AR ou si elle est terminée, il ne faut pas modifier son état
-		}elseif($commande->get("etat")!="arreter"){
+		}elseif($commande->get("etat")!="arreter" || $commande->get("etat")!="arreter_contentieux"){
 			if($affaireFillesAR){
 				ATF::commande()->q->reset()->addCondition("id_affaire",$affaireFillesAR["id_affaire"])->setDimension("row");
 				$commandeFilleAR=ATF::commande()->sa();
 			}
 			// Si on est dans la période du contrat
 			if ($commande->estEnCours()) {
-				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
+				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter" || $commandeFilleAR["etat"]=="arreter_contentieux")){
 					$commande->set("etat","AR");
 				}else{
 					//if($commande->dateEvolutionDepassee()){
@@ -1064,12 +1064,17 @@ class commande_cleodis extends commande {
 				}
 			// Sinon Si la période du contrat est dépassé
 			} elseif($commande->dateEvolutionDepassee()){
-				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter")){
+				if($commandeFilleAR && ($commandeFilleAR["etat"]=="mis_loyer" || $commandeFilleAR["etat"]=="mis_loyer_contentieux" || $commandeFilleAR["etat"]=="prolongation" || $commandeFilleAR["etat"]=="prolongation_contentieux" || $commandeFilleAR["etat"]=="restitution" || $commandeFilleAR["etat"]=="restitution_contentieux" || $commandeFilleAR["etat"]=="AR" || $commandeFilleAR["etat"]=="arreter" || $commandeFilleAR["etat"]=="arreter_contentieux")){
 					$commande->set("etat","AR");
 				}else{
 					//Si il y a une date de restitution et qu'elle est dépassée OU que la date evolution est depassée et pas de date resti
 					if($commande->dateRestitutionEffectiveDepassee()){
-						$commande->set("etat","arreter");
+						if(strpos( $commande->get("etat"), "contentieux")){
+							$commande->set("etat","arreter_contentieux");
+						}else{
+							$commande->set("etat","arreter");
+						}
+
 						$comm = ATF::commande()->select($commande->get("id_commande"));
 
 						$notifie = array(21);
@@ -1123,6 +1128,8 @@ class commande_cleodis extends commande {
 	function getAffaire(){
 		$this->notSingleton();
 		if(ATF::$codename == "cleodisbe") return new affaire_cleodisbe($this->infos['id_affaire']);
+		if(ATF::$codename == "assets") return new affaire_assets($this->infos['id_affaire']);
+		if(ATF::$codename == "bdomplus") return new affaire_bdomplus($this->infos['id_affaire']);
 		return new affaire_cleodis($this->infos['id_affaire']);
 	}
 
@@ -1266,11 +1273,31 @@ class commande_cleodis extends commande {
 							,"ref"=>$this->get("ref")
 						)
 					));
-					if ($value=="arreter") {
-						if(ATF::$codename == "cleodisbe") $a = new affaire_cleodisbe($this->get('id_affaire'));
-						else $a = new affaire_cleodis($this->get('id_affaire'));
 
-						$a->set('etat','terminee');
+					if(ATF::$codename == "cleodisbe") $a = new affaire_cleodisbe($this->get('id_affaire'));
+					elseif(ATF::$codename == "assets") $a = new affaire_assets($this->get('id_affaire'));
+					elseif(ATF::$codename == "bdomplus") $a = new affaire_bdomplus($this->get('id_affaire'));
+					else $a = new affaire_cleodis($this->get('id_affaire'));
+
+					switch ($value) {
+						case 'arreter':
+						case 'arreter_contentieux' :
+							if($value == "arreter") $a->set('etat','terminee');
+							else $a->set('etat','terminee_contentieux');
+						break;
+
+						case 'non_loyer' :
+						case 'non_loyer_contentieux' :
+							$a->set('etat', 'commande');
+						break;
+
+						case 'vente' :
+							$a->set('etat', 'facture');
+						break;
+
+						default:
+							$a->set('etat', 'facture');
+						break;
 					}
 			}
 		}
@@ -1725,11 +1752,19 @@ class commande_cleodis extends commande {
     */
 	public function stopCommande($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
+		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
 		if ($commande) {
 
-			$commande->set('etat','arreter');
+			$arret = "arreter";
+
+			if(strpos( $commande->get("etat"), "contentieux")){
+				$arret = "arreter_contentieux";
+			}
+
+			$commande->set('etat',$arret);
 			$commande->set('date_arret',date("Y-m-d"));
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
@@ -1743,7 +1778,7 @@ class commande_cleodis extends commande {
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
 							,"type_suivi"=>'Contrat'
-							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en arrêté "
+							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en ".$etat
 							,'public'=>'oui'
 							,'suivi_societe'=>ATF::$usr->getID()
 							,'suivi_notifie'=>$notifie
@@ -1757,6 +1792,8 @@ class commande_cleodis extends commande {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
+					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
@@ -1776,10 +1813,17 @@ class commande_cleodis extends commande {
     */
 	public function reactiveCommande($infos){
 		if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($infos['id_commande']);
+		elseif(ATF::$codename == "assets") $commande = new commande_assets($infos['id_commande']);
+		elseif(ATF::$codename == "bdomplus") $commande = new commande_bdomplus($infos['id_commande']);
 		else $commande = new commande_cleodis($infos['id_commande']);
 
 		if ($commande) {
-			$commande->set('etat','non_loyer');
+			if(strpos( $commande->get("etat"), "contentieux")){
+				$commande->set('etat','non_loyer_contentieux');
+			}else{
+				$commande->set('etat','non_loyer');
+			}
+
 			$commande->set('date_arret',NULL);
 			$affaire = $commande->getAffaire();
 
@@ -1796,6 +1840,8 @@ class commande_cleodis extends commande {
 				// Parfois l'affaire a plusieurs parents car elle annule et remplace plusieurs autres affaires
 				foreach ($ap as $a) {
 					if(ATF::$codename == "cleodisbe") $affaires_parentes[] = new affaire_cleodisbe($a["id_affaire"]);
+					elseif(ATF::$codename == "assets") $affaires_parentes[] = new affaire_assets($a["id_affaire"]);
+					elseif(ATF::$codename == "bdomplus") $affaires_parentes[] = new affaire_bdomplus($a["id_affaire"]);
 					else $affaires_parentes[] = new affaire_cleodis($a["id_affaire"]);
 				}
 			} elseif ($affaire->get('id_parent')) {
