@@ -15,7 +15,7 @@ CREATE TABLE `facturation_fournisseur` (
   `date_debut_periode` date NOT NULL,
   `date_fin_periode` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
- 
+
 -- --------------------------------------------------------
 
 --
@@ -139,3 +139,12 @@ ALTER TABLE `pack_produit_ligne` ADD `val_modifiable` ENUM('oui','non') NOT NULL
 ALTER TABLE `produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','toshiba','btwin','boulangerpro','boulanger-cafe') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 
 ALTER TABLE `produit` ADD `increment` INT(11) NOT NULL AFTER `id_licence_type`;
+
+
+
+
+-- Probleme numerotation avenant BDOM
+ALTER TABLE `affaire` CHANGE `ref` `ref` VARCHAR(16) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
+ALTER TABLE `bon_de_commande` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `facture_fournisseur` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+ALTER TABLE `facture_non_parvenue` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
