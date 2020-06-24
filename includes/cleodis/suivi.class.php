@@ -85,12 +85,16 @@ class suivi_cleodis extends suivi {
 		$infos["attente_reponse"] = $infos["suivi"]["attente_reponse"];
 		unset($infos["suivi"]["champsComplementaire"]);
 
+
+
 		if($infos["suivi"]["type_suivi"] == "Contentieux" && ATF::$codename == "cleodis"){
-			$infos["suivi"]["suivi_notifie"][] = 127;
+			if(strlen($infos["suivi"]["suivi_notifie"]) > 0){
+				$infos["suivi"]["suivi_notifie"] .= ',127';
+			}else{
+				$infos["suivi"]["suivi_notifie"] = ',127';
+			}
 			//127
 		}
-
-
 
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
