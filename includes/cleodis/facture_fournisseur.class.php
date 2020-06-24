@@ -67,6 +67,7 @@ class facture_fournisseur extends classes_optima {
 
 		$this->field_nom = "ref";
 		$this->foreign_key['id_fournisseur'] =  "societe";
+		$this->files["fichier_joint"] = array("obligatoire"=>true);
 		$this->onglets = array('facture_fournisseur_ligne','facture_non_parvenue');
 		$this->can_insert_from = array("bon_de_commande");
 		$this->no_insert = true;
