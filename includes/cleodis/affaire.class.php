@@ -3025,7 +3025,7 @@ class affaire_cleodis extends affaire {
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter<br />Affaire ".$affaire["ref"]."<br />Provenance : ".$affaire["provenance"]."<br />Site ".$affaire["site_associe"].". <br />Partenaire:".($affaire["partenaire"]?"oui":"non")."<br />Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter<br />Affaire : ".$affaire["ref"]."<br />Provenance : ".$affaire["provenance"]."<br />Site : ".$affaire["site_associe"].". <br />Partenaire : ".($affaire["partenaire"]?"oui":"non")."<br />Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
