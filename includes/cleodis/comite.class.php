@@ -515,11 +515,11 @@ class comite extends classes_optima {
 		$devis = ATF::devis()->select_row();
 
 
-		//Utilisateurs notifié de validation de comité -> Jerome, Alison et Severine
+		//Utilisateurs notifié de validation de comité -> Jerome, Alison, Severine et Jeanne
 		if(ATF::$codename == "cleodis"){
-			$notifie_suivi = array(16, 21, 103);
+			$notifie_suivi = array(16, 21, 103, 124);
 		}else{
-			$notifie_suivi = array(16, 21,104);
+			$notifie_suivi = array(16, 21,104, 124);
 		}
 
 
