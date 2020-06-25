@@ -2687,13 +2687,15 @@ class affaire_cleodis extends affaire {
 				"id_user"=>ATF::$usr->getID(),
 				"origine"=>"societe_commande",
 				"tache"=>"Nouvelle demande du partenaire.",
-				"id_affaire"=>$affaire["id_affaire"],
+				"id_affaire"=>$devis["id_affaire"],
 				"type_tache"=>"creation_contrat",
 				"horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
 				"no_redirect"=>"true"
 			),
 			"dest"=>$dest
 			);
+
+
 			ATF::tache()->insert($tache);
 
 
@@ -3039,7 +3041,7 @@ class affaire_cleodis extends affaire {
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire crée. Merci de traiter\n Affaire ".$affaire["ref"]." \n provenant de ".$affaire["provenance"]." \n Site ".$affaire["site_associe"].".\n Partenaire ".$societe["partenaire"]." \n Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
+									   "tache"=>"Nouvelle affaire crée. Merci de traiter<br />Affaire ".$affaire["ref"]."<br />Provenance : ".$affaire["provenance"]."<br />Site ".$affaire["site_associe"].". <br />Partenaire:".($affaire["partenaire"]?"oui":"non")."<br />Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
