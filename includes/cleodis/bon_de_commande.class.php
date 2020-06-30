@@ -848,6 +848,9 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			}
 		}
 
+		log::logger($nb_commande_ligne , "mfleurquin");
+		log::logger($count_commande_ligne , "mfleurquin");
+
 		if($nb_commande_ligne==$count_commande_ligne){
 			return true;
 		}else{

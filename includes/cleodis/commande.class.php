@@ -1299,11 +1299,12 @@ class commande_cleodis extends commande {
 							$a->set('etat', 'facture');
 						break;
 					}
-
-
-					ATF::societe()->checkMauvaisPayeur($a->get("id_societe"));
+				break;
 			}
 		}
+
+		ATF::societe()->checkMauvaisPayeur($a->get("id_societe"));
+
 	}
 
 	/**

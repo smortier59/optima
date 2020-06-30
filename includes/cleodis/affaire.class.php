@@ -3251,6 +3251,181 @@ class affaire_bdomplus extends affaire_cleodis {
 	}
 
 
+	/*
+	* Pour toutes les affaires dont la date de debut = M+11 et qu'il n'y a pas de condition de prolongation
+	* On envoi un mail au client pour l'avertir du renouvellement et on crée un suivi
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function process_envoi_mail_information_renouvellement(){
+		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "vente", "AND", false, "!=")
+								   ->where("etat", "non_loyer", "AND", false, "!=")
+								   ->where("etat", "AR", "AND", false, "!=");
+
+		$contrats_en_cours = ATF::commande()->sa();
+
+		ATF::constante()->q->reset()->where("constante", "__URL_SITE_SOUSCRIPTION__", "OR")
+									->where("constante", "__URL_ESPACE_CLIENT__", "OR");
+		$constantes = ATF::constante()->sa();
+
+		foreach ($contrats_en_cours as $key => $value) {
+ 			$a_renouveller = false;
+
+			if(date("Y-m") == date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) ){
+				ATF::prolongation()->q->reset()->where("id_affaire", $value["id_affaire"]);
+				$prolongation = ATF::prolongation()->sa();
+
+				if(!$prolongation) $a_renouveller = true;
+				if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+			}
+
+			if($a_renouveller){
+
+				//log::logger($value , "mfleurquin");
+				$affaire = ATF::affaire()->select($value["id_affaire"]);
+
+
+				if($email_pro = ATF::societe()->select($value["id_societe"], "email")){
+			      $email = $email_pro;
+			    }else{
+			      $email = ATF::societe()->select($value["id_societe"], "  particulier_email");
+			    }
+
+			    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
+			    $info_mail["recipient"] = $email;
+			    $info_mail["html"] = true;
+			    $info_mail["template"] = "mail_information_renouvellement";
+			    $info_mail["objet"] = "Votre abonnement ".$affaire["ref"]." ".$affaire["affaire"]." : Information importante sur votre renouvellement";
+
+			    $info_mail["client"] = ATF::societe()->select($value["id_societe"]);
+			    $info_mail["date_mise_place"] = date("d/m/Y", strtotime($value["mise_en_place"]));
+			    $info_mail["affaire"] = $affaire;
+
+			    //log::logger($info_mail , "mfleurquin");
+
+			    $mail = new mail($info_mail);
+
+			    $send = $mail->send();
+
+			    ATF::contact()->q->reset()->where("id_societe", $value["id_societe"])->where("email", $email);
+			    $contact = ATF::contact()->select_row();
+
+			    $texte_suivi =  "Mail d'information sur le renouvellement envoyé à ".$info_mail["recipient"].".<br /><br />";
+			    $texte_suivi .= "Le client a jusqu’au 25 pour résilier dans son espace client.<br /><br />";
+			    $texte_suivi .= "Sinon, le client s’engage pour une nouvelle année et recevra ses nouvelles clés en fin de mois.";
+
+			    $suivi = array(
+			      "id_contact" => $contact["id_contact"],
+			      "id_societe" => $value["id_societe"],
+			      "id_affaire" => $affaire["id_affaire"],
+			      "type"=> "note",
+			      "type_suivi"=> "Contrat",
+			      "texte" => $texte_suivi
+			    );
+
+			    if($send){
+			      $suivi["texte"] =  "Envoi du ".$suivi["texte"];
+			    }else{
+			      $suivi["texte"] =  "Probleme lors de l'envoi du ".$suivi["texte"];
+			    }
+			    ATF::suivi()->i($suivi);
+			}
+		}
+
+	}
+
+
+	/*
+	* Pour toutes les affaires dont la date de debut = M+11 et qu'il n'y a pas de condition de prolongation
+	* On envoi un mail au client pour l'avertir du renouvellement et on crée un suivi
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function process_envoi_mail_non_renouvellement_client_contentieux(){
+		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "vente", "AND", false, "!=")
+								   ->where("etat", "non_loyer", "AND", false, "!=")
+								   ->where("etat", "AR", "AND", false, "!=");
+								   //->where("etat", "%contentieux", "AND", false, "LIKE");
+
+		$contrats_en_cours = ATF::commande()->sa();
+
+
+		foreach ($contrats_en_cours as $key => $value) {
+ 			$a_renouveller = false;
+
+			if(date("Y-m") == date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) ){
+				ATF::prolongation()->q->reset()->where("id_affaire", $value["id_affaire"]);
+				$prolongation = ATF::prolongation()->sa();
+
+				if(!$prolongation) $a_renouveller = true;
+				if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+			}
+
+			if($a_renouveller && $client["mauvais_payeur"] == "oui"){
+
+				//log::logger($value , "mfleurquin");
+				$affaire = ATF::affaire()->select($value["id_affaire"]);
+
+
+				if($email_pro = ATF::societe()->select($value["id_societe"], "email")){
+			      $email = $email_pro;
+			    }else{
+			      $email = ATF::societe()->select($value["id_societe"], "  particulier_email");
+			    }
+
+			    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
+			    $info_mail["recipient"] = $email;
+			    $info_mail["html"] = true;
+			    $info_mail["template"] = "mail_information_client_contentieux";
+			    $info_mail["objet"] = "Votre abonnement ".$affaire["ref"]." ".$affaire["affaire"]." : Votre renouvellement ne pourra avoir lieu";
+
+			    $info_mail["client"] = ATF::societe()->select($value["id_societe"]);
+			    $info_mail["date_signature"] = date("d/m/Y", strtotime($value["mise_en_place"]));
+			    $info_mail["affaire"] = $affaire;
+
+			    log::logger($info_mail , "mfleurquin");
+
+			    $mail = new mail($info_mail);
+
+			    $send = $mail->send();
+
+			    ATF::contact()->q->reset()->where("id_societe", $value["id_societe"])->where("email", $email);
+			    $contact = ATF::contact()->select_row();
+
+			    $texte_suivi =  "Mail d’information sur le renouvellement IMPOSSIBLE envoyé à ".$info_mail["recipient"].".<br /><br />";
+			    $texte_suivi .= "Le client est au contentieux.<br /><br />";
+			    $texte_suivi .= "Sans régularisation d’ici le 25, le contrat s’arrêtera et il ne pourra pas y avoir de renouvellement.";
+
+			    $suivi = array(
+			      "id_contact" => $contact["id_contact"],
+			      "id_societe" => $value["id_societe"],
+			      "id_affaire" => $affaire["id_affaire"],
+			      "type"=> "note",
+			      "type_suivi"=> "Contrat",
+			      "texte" => $texte_suivi
+			    );
+
+			    if($send){
+			      $suivi["texte"] =  "Envoi du ".$suivi["texte"];
+			    }else{
+			      $suivi["texte"] =  "Probleme lors de l'envoi du ".$suivi["texte"];
+			    }
+			    ATF::suivi()->i($suivi);
+			}
+		}
+
+	}
+
+	/*
+	* Pour toutes les affaires dont la date de debut = M+11 et qu'il n'y a pas de condition de prolongation
+	* Si le client est en contentieux
+	* On envoi un mail au client pour l'avertir du renouvellement et on crée un suivi
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*/
+	public function process_arret_et_renouvellement(){
+
+	}
+
 };
 class affaire_bdom extends affaire_cleodis { };
 class affaire_boulanger extends affaire_cleodis {

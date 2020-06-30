@@ -2000,6 +2000,35 @@ class societe_cleodis extends societe {
   }
 
 
+  /**
+   * Permet de mettre à jour le statut mauvais payeur du client et le contentieux depuis
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  int $id_societe [description]
+   */
+  public function check_statut_contentieux($id_societe){
+    $mauvais_payeur = "non";
+    $contentieux_depuis = NULL;
+
+    ATF::commande()->q->reset()->where("id_societe", $id_societe);
+
+    foreach(ATF::commande()->sa() as $kc => $vc){
+      if(strpos($vc["etat"], "contentieux") != false) $mauvais_payeur = "oui";
+    }
+
+    if($mauvais_payeur == "oui"){
+      log::logger($id_societe , "mfleurquin");
+      ATF::facture()->q->reset()->where("id_societe", $id_societe, "AND")
+                                ->where("etat", "impayee", "AND");
+      foreach (ATF::facture()->sa() as $kf => $vf) {
+        log::logger($vf , "mfleurquin");
+      }
+
+    }
+
+    ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=>$mauvais_payeur, "contentieux_depuis"=>$contentieux_depuis));
+  }
+
+
 };
 
 class societe_cleodisbe extends societe_cleodis {
