@@ -1,0 +1,1 @@
+jQuery.extend(ATF.loc,{"hotline_pole_concerne_solution_sage_x3":"Solution Sage X3"});
