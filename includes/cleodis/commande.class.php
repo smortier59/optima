@@ -1303,7 +1303,7 @@ class commande_cleodis extends commande {
 			}
 		}
 
-		ATF::societe()->checkMauvaisPayeur($a->get("id_societe"));
+		ATF::societe()->checkMauvaisPayeur($this->get("id_societe"));
 
 	}
 
@@ -1782,7 +1782,7 @@ class commande_cleodis extends commande {
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
 							,"type_suivi"=>'Contrat'
-							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en ".$etat
+							,"texte"=>"L'affaire ".$affaire->get("ref")." est passée en ".$arret
 							,'public'=>'oui'
 							,'suivi_societe'=>ATF::$usr->getID()
 							,'suivi_notifie'=>$notifie

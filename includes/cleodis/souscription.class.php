@@ -32,7 +32,6 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
-
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -1265,15 +1264,19 @@ class souscription_bdomplus extends souscription_cleodis {
    * Démarre une affaire (Démarrage du contrat)
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
-  public function demarrageContrat($affaire,$commande){
+  public function demarrageContrat($affaire,$commande,$renouvellement = false){
 
-   ATF::constante()->q->reset()->where("constante" ,"__MAX_SOUSCRIPTION__");
-   $max_souscription = ATF::constante()->select_row();
-   $max_souscription = $max_souscription["valeur"];
+    if(!$renouvellement){
+      //Il ne faut pas comptabiliser le renouvellement dans les souscription
+      ATF::constante()->q->reset()->where("constante" ,"__MAX_SOUSCRIPTION__");
+      $max_souscription = ATF::constante()->select_row();
+      $max_souscription = $max_souscription["valeur"];
+    }
+
 
      if($affaire["commande.etat"] == "non_loyer"){
         //Limite appliquée seulement pour les souscriptions web et non pas magasin
-        if($max_souscription && !$affaire["affaire.id_magasin"]){
+        if($max_souscription && !$affaire["affaire.id_magasin"] && !$renouvellement){
           ATF::affaire()->q->reset()->where("affaire.etat", "facture", "AND")
                                   ->where("affaire.site_associe", "bdomplus")
                                   ->where("affaire.date", date("Y-m-d"))
@@ -1327,6 +1330,9 @@ class souscription_bdomplus extends souscription_cleodis {
               "value" => date("Y-m-01"),
               "key" => "date_debut"
             );
+            if($renouvellement){
+              $infos["value"] = date("Y-m-01", strtotime("+1 month"));
+            }
 
             ATF::commande()->updateDate($infos);
             //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
@@ -1343,6 +1349,14 @@ class souscription_bdomplus extends souscription_cleodis {
               if($affaire["affaire.id_magasin"]){
                 $f["mode_paiement"] = "pre-paiement";
               }
+
+              if($renouvellement){
+                $f["mode_paiement"] = "prelevement";
+                $f["date_paiement"] = NULL;
+                $f["etat"] = "impayee";
+              }
+
+
               ATF::facture()->u($f);
               ATF::facture()->generatePDF(array("id"=>$f["id_facture"]));
             }
@@ -1356,10 +1370,13 @@ class souscription_bdomplus extends souscription_cleodis {
 
             ATF::db($this->db)->commit_transaction();
 
-            $this->envoiMailLicence($affaire["affaire.id_affaire_fk"], $affaire["affaire.id_societe_fk"], $licence_a_envoyer);
 
-            //Installation à domicile
-            $this->envoiMailInstallationZen($affaire, $commande);
+            $this->envoiMailLicence($affaire["affaire.id_affaire_fk"], $affaire["affaire.id_societe_fk"], $licence_a_envoyer, $renouvellement);
+
+            if(!$renouvellement){
+              //Installation à domicile
+              $this->envoiMailInstallationZen($affaire, $commande);
+            }
 
           }
 
@@ -1494,7 +1511,7 @@ class souscription_bdomplus extends souscription_cleodis {
    * Envoi du mail au client avec les licences
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
-  public function envoiMailLicence($id_affaire, $id_societe, $licence_a_envoyer){
+  public function envoiMailLicence($id_affaire, $id_societe, $licence_a_envoyer,$renouvellement =false){
     if($email_pro = ATF::societe()->select($id_societe, "email")){
       $email = $email_pro;
     }else{
@@ -1505,10 +1522,28 @@ class souscription_bdomplus extends souscription_cleodis {
     $info_mail["recipient"] = $email;
     $info_mail["html"] = true;
     $info_mail["template"] = "envoi_licence";
-    if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
+    if(ATF::$codename == "bdomplus") {
+      if($renouvellement){
+        $affaire_depart = ATF::affaire()->getAffaireDepart($id_affaire);
+        $info_mail["affaireDepart"] = $affaire_depart;
+
+        ATF::commande()->q->reset()->where("commande.id_affaire", $affaire_depart);
+        $commande = ATF::commande()->select_row();
+
+        $info_mail["date_mep"] = date("d/m/Y", strtotime(ATF::commande()->select($commande["commande.id_commande"], "mise_en_place")));
+        $info_mail["date_affaire"] = date("d/m/Y", strtotime(ATF::affaire()->select($affaire_depart, "date")));
+
+        $info_mail["objet"] = "BDOM+ et Boulanger : Votre abonnement ".ATF::affaire()->select($affaire_depart, "ref")." ".ATF::affaire()->select($affaire_depart, "affaire")." : Renouvellement automatique";
+
+      } else{
+        $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
+      }
+    }
 
     $info_mail["licences"] = $licence_a_envoyer;
     $info_mail["client"] = ATF::societe()->select($id_societe);
+    $info_mail["renouvellement"] = $renouvellement;
+
 
     $mail = new mail($info_mail);
 

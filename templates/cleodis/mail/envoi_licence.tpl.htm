@@ -31,9 +31,18 @@
                                       <div style="font-size: 12px; line-height: 14px; font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; color: #000000;">
                                         <p style="font-size: 14px; line-height: 16px; text-align: left; margin: 0;">Bonjour, {$infos.client["particulier_civilite"]} {$infos.client["particulier_prenom"]} {$infos.client["particulier_nom"]},
                                           <br/>
-                                          <br/> Vous venez de valider votre souscription à une Solution ZEN chez Boulanger.
-                                          <br/>
-                                          <br/>Voici le numéro de votre licence :
+                                          {if $infos.renouvellement}
+                                            Le {$infos.date_mep}, vous aviez reçu vos clés de licences pour votre contrat {ATF::affaire()->select($infos.affaireDepart, ref)} {ATF::affaire()->select($infos.affaireDepart, affaire)} souscrit le {$infos.date_affaire}.
+                                            <br /><br />Nous venons de renouveler votre contrat.
+                                            <br /><br />Pour rappel, votre abonnement renouvelé pour une durée de 12 mois est ferme et définitif. Il ne pourra être résilié avant son
+                                            échéance.
+                                            <br /><br />Voici vos nouvelles clés de licences :
+                                          {else}
+                                            <br/> Vous venez de valider votre souscription à une Solution ZEN chez Boulanger.
+                                            <br/>
+                                            <br/>Voici le numéro de votre licence :
+                                          {/if}
+
                                         </p>
                                       </div>
                                     </div>
@@ -452,7 +461,12 @@
                                     <![endif]-->
                                     <div style="color:#000000;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:120%;padding-top:10px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
                                       <div style="font-size: 12px; line-height: 14px; font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; color: #000000;">
-                                        <p style="font-size: 14px; line-height: 16px; text-align: left; margin: 0;">Nous vous remercions de votre confiance.
+                                        <p style="font-size: 14px; line-height: 16px; text-align: left; margin: 0;">
+                                          {if $infos.renouvellement}
+                                            Merci de votre confiance,
+                                          {else}
+                                            Nous vous remercions de votre confiance.
+                                          {/if}
                                           <br/>
                                           <br/>Les équipes B’dom+ et Boulanger
                                         </p>

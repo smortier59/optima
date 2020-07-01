@@ -5,6 +5,6 @@ ATF::define("tracabilite",false);
 
 ATF::societe()->q->reset();
 foreach(ATF::societe()->select_all() as $k => $v){
-	ATF::societe()->check_statut_contentieux($v["id_societe"]);
+	ATF::societe()->checkMauvaisPayeur($v["id_societe"]);
 }
 
