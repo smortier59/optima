@@ -843,7 +843,7 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			ATF::bon_de_commande_ligne()->q->reset()->addCondition("id_commande_ligne",$item["id_commande_ligne"]);
 			if($bon_de_commande_ligne=ATF::bon_de_commande_ligne()->sa()){
 				foreach ($bon_de_commande_ligne as $kbdc => $vbdc) {
-					$nb_commande_ligne++;
+					$nb_commande_ligne += $vbdc["quantite"];;
 				}
 			}
 		}
