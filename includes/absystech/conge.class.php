@@ -1,5 +1,5 @@
 <?
-/** 
+/**
 * @package Optima
 */
 require_once dirname(__FILE__)."/../conge.class.php";
@@ -13,20 +13,20 @@ class conge_absystech extends conge {
 	* @param array $files $_FILES
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	* @return int id_conge
-    */ 	
+    */
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed){
-		$id_conge=parent::insert($infos,$s,NULL,$cadre_refreshed);		
-		
+		$id_conge=parent::insert($infos,$s,NULL,$cadre_refreshed);
+
 		$infos = $infos[$this->table];
 		if($infos['periode']!=="autre")$infos['date_fin']=$infos['date_debut'];
 
-		if(!$infos["id_user"])$infos["id_user"]=ATF::$usr->getID();		
-				
+		if(!$infos["id_user"])$infos["id_user"]=ATF::$usr->getID();
+
 		ATF::user()->q->reset()->where("login","egremy");
 		$emma = ATF::user()->select_row();
-	
+
 		$infos_user = ATF::user()->select($infos["id_user"]);
-		
+
 		if($emma){
 			$infos['id_superieur']=$emma['id_user'];
 			$infos['nom']=ATF::user()->nom($infos["id_user"]);
@@ -38,8 +38,8 @@ class conge_absystech extends conge {
 					,"conge"=>$infos
 					,"from"=>$infos['nom']." <".$infos_user["email"].">"));
 			$mail->send();
-		}		
-		
+		}
+
 		return $id_conge;
 	}
 
@@ -53,7 +53,7 @@ class conge_absystech extends conge {
 			foreach ($return["data"] as $key => $value) {
 				if($value["conge.etat"] == "en_cours" && ($value["id_user"] !== $emma["id_user"])){
 					$return["data"][$key]["allowValid"] = true;
-					$return["data"][$key]["allowRefus"] = true;				
+					$return["data"][$key]["allowRefus"] = true;
 				}
 			}
 		}
@@ -65,4 +65,5 @@ class conge_absystech extends conge {
 
 class conge_att extends conge_absystech { };
 class conge_atoutcoms extends conge_absystech { };
+class conge_nco extends conge_absystech { };
 ?>

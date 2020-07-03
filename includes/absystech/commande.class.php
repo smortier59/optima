@@ -644,4 +644,5 @@ class commande_att extends commande_absystech { };
 class commande_wapp6 extends commande_absystech { };
 class commande_atoutcoms extends commande_absystech { };
 class commande_demo extends commande_absystech { };
+class commande_nco extends commande_absystech { };
 ?>

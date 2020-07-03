@@ -1735,4 +1735,5 @@ class devis_att extends devis_absystech { };
 class devis_wapp6 extends devis_absystech { };
 class devis_atoutcoms extends devis_absystech { };
 class devis_demo extends devis_absystech { };
+class devis_nco extends devis_absystech { };
 ?>
