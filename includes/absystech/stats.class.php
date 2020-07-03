@@ -1,6 +1,6 @@
 <?
 require_once dirname(__FILE__)."/../stats.class.php";
-/**  
+/**
 * @package Optima
 * @subpackage AbsysTech
 */
@@ -28,10 +28,10 @@ class stats_absystech extends stats {
 		));
 		$this->stats["stats"]=array("taille"=>"250px","couleur"=>"violet");
 		$this->liste_annees = $this->initialisation();
-	}	
+	}
 };
 
-class stats_att extends stats_absystech { 
+class stats_att extends stats_absystech {
 	/** Transforme la condition sur l'année, en condition sur un intervalle de temps (entre juillet et juin)
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param object $q : querier courant
@@ -42,7 +42,7 @@ class stats_att extends stats_absystech {
 		$q->addCondition($nom,$valeur."-07-01","AND","annee_".$valeur,">=");
 		$q->addCondition($nom,($valeur+1)."-06-30","AND","annee_".$valeur,"<=");
 	}
-	
+
 	/** Transforme la condition sur l'année, en condition sur un intervalle de temps (entre juillet et juin) mais avec une concaténation des conditions en OR et non AND (comme c'est de base)
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array $liste_annees : liste des années cochées
@@ -79,13 +79,13 @@ class stats_att extends stats_absystech {
 				$intitule=$year."/".($year+1);
 			}elseif($month>=1 && $month<=6){
 				$intitule=($year-1)."/".$year;
-			}	
+			}
 			$libelle=$year."-".$month;
 			return array("int"=>$intitule,"lib"=>$libelle,"lab"=>$lab);
 		}
 		return array("int"=>$lab,"lib"=>$lab,"lab"=>$lab);
 	}
-	
+
 	/** Contrairement à l'année civile d'AT, l'année fiscale d'ATT va de Juillet de l'année en cours à Juin de l'année suivante
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param string $type : type du graphe
@@ -102,7 +102,7 @@ class stats_att extends stats_absystech {
 				$liste[$cle]=$mois;
 			}
 			ksort($liste);
-			
+
 			$mois_inverse=array_flip(util::month());
 			foreach($liste as $item){
 				$liste2[$mois_inverse[$item]]=$item;
@@ -112,17 +112,17 @@ class stats_att extends stats_absystech {
 			return parent::recupMois($type);
 		}
 	}
-	
+
 	/** Initalisation de tous les set à 0, mais en commençant par le mois de juillet
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	* @param array $graph : contient toutes les données nécessaires à l'affichage du graphe
 	* @param string $intitule : nom à afficher en label des données
 	* @param string $type : type du graphe
 	*/
-	public function initGraphe(&$graph,$intitule,$type){		
+	public function initGraphe(&$graph,$intitule,$type){
 		if($type!="users"){
-			// /!\ laissez les deux for de cette manière pour avoir le mois de juillet en premier dans le tableau			
-			for ($m=7;$m<13;$m++) { 
+			// /!\ laissez les deux for de cette manière pour avoir le mois de juillet en premier dans le tableau
+			for ($m=7;$m<13;$m++) {
 				$m2=strlen($m)<2?"0".$m:$m;
 				$graph['dataset'][$intitule]['set'][$m2] = array("value"=>0,"alpha"=>100,"titre"=>$intitule." : 0");
 			}
@@ -134,7 +134,7 @@ class stats_att extends stats_absystech {
 			parent::initGraphe($graph,$intitule,$type);
 		}
 	}
-	
+
 	/** On change les catégories du graphe dans le cas où la donnée est 0, il ne faut pas affiché l'année en question, mais celle correspondant à la partie de l'année fiscale
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
@@ -155,4 +155,6 @@ class stats_att extends stats_absystech {
 class stats_demo extends stats_absystech { }
 class stats_wapp6 extends stats_absystech { }
 class stats_atoutcoms extends stats_absystech { }
+
+class stats_nco extends stats_absystech { }
 ?>

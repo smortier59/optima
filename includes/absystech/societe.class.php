@@ -1437,4 +1437,6 @@ class societe_atoutcoms extends societe_absystech {
 		return "CS";
 	}
 }
+
+class societe_nco extends societe_absystech { }
 ?>
