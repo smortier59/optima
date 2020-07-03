@@ -386,7 +386,7 @@ class hotline_mail_atoutcoms extends hotline_mail{
 class hotline_mail_nco extends hotline_mail{
 
 	public function sendMail(){
-		ATF::$msg->addWarning(ATF::$usr->trans("Mail non envoyé pour ATOUTCOMS"));
+		ATF::$msg->addWarning(ATF::$usr->trans("Mail non envoyé pour NCO"));
 	}
 }
 ?>
