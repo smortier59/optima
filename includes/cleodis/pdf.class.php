@@ -562,6 +562,12 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'LocEvo' :
+				$this->cleodis = "Cléodis";
+				$this->logo = 'cleodis/cleodis.jpg';
+
+			break;
+
 			default:
 				// $this->logo = 'cleodis/logo.jpg';
 				$this->cleodis = "CLEODIS";
