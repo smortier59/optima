@@ -277,6 +277,8 @@ if(!empty($files)){
 				$report["montant_incorrect"] += 1;
 				log::logger("Montant facture (".$header["invoicetotalvatexcludedamount"].") - Lignes (".$prix_ligne.") different ".$kcf,$id_doc.".log");
 				$dir_to = "error/".date("Y-m-d");
+				$report[$dir_to] += 1;
+				$files_to_move[$dir_to][$id_doc] = true;
 			}
 
 			log::logger("####################################",$id_doc.".log");
