@@ -805,7 +805,7 @@ class affaire_absystech extends affaire {
 	* @param $get array contient le tri, page limit et potentiellement un id.
 	* @param $post array Argument obligatoire mais inutilisé ici.
 	* @return array un tableau avec les données
-	* @codeCoverageIgnore	
+	* @codeCoverageIgnore
 	*/
 	public function _GET($get,$post) {
 		if ($c = ATF::$usr->get('contact')) {
@@ -817,7 +817,7 @@ class affaire_absystech extends affaire {
 	}
 
 	/**
-	* @codeCoverageIgnore	
+	* @codeCoverageIgnore
 	*/
 	public function _getJalons($get) {
 		if ($c = ATF::$usr->get('contact')) {
@@ -826,7 +826,7 @@ class affaire_absystech extends affaire {
 	}
 
 	/**
-	* @codeCoverageIgnore	
+	* @codeCoverageIgnore
 	*/
 	public function _getJalonsHistory($get) {
 		if ($c = ATF::$usr->get('contact')) {
@@ -835,7 +835,7 @@ class affaire_absystech extends affaire {
 	}
 
 	/**
-	* @codeCoverageIgnore	
+	* @codeCoverageIgnore
 	*/
 	public function _addJalon($get, $post) {
 		if ($c = ATF::$usr->get('contact')) {
@@ -1021,9 +1021,10 @@ class affaire_att extends affaire_absystech {
 class affaire_wapp6 extends affaire_absystech { };
 class affaire_atoutcoms extends affaire_absystech { };
 class affaire_demo extends affaire_absystech { };
+class affaire_nco extends affaire_absystech { };
 
 /**
-* @codeCoverageIgnore	
+* @codeCoverageIgnore
 */
 class affaire_partenaire extends affaire {
 	public $table = "affaire";

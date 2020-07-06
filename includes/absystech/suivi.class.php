@@ -127,4 +127,5 @@ class suivi_absystech extends suivi {
 
 class suivi_att extends suivi_absystech { };
 class suivi_atoutcoms extends suivi_absystech { };
+class suivi_nco extends suivi_absystech { };
 ?>

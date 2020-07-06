@@ -8,79 +8,6 @@
 */
 class hotline_mail {
 	/**
-	* Mail facturation
-	* Il y a un attribut par mail pour pouvoir faire les Tu et gérer chaque mail séparément
-	* @var mixed
-	*/
-	private $mail_billing=NULL;
-
-	/*
-	* Mail de notification nouveau mail
-	* @var mixed
-	*/
-	private $mail_insert=NULL;
-
-	/**
-	* Mail notification de prise en charge envoyé au contact
-	* @var mixed
-	*/
-	private $mail_prise_en_charge_contact=NULL;
-
-	/**
-	* Mail notification de prise en charge envoyé à la hotline
-	* @var mixed
-	*/
-	private $mail_prise_en_charge_hotline=NULL;
-
-	/**
-	* Mail notification de fin de requête
-	* @var mixed
-	*/
-	private $mail_resolve=NULL;
-
-	/**
-	* Mail notification d'annulation de requête
-	* @var mixed
-	*/
-	private $mail_cancel=NULL;
-
-	/**
-	* Mail notification d'attente de mise en prod
-	* @var mixed
-	*/
-	private $mail_wait_mep=NULL;
-
-	/**
-	* Mail notification de validation mep
-	* @var mixed
-	*/
-	private $mail_mep=NULL;
-
-	/**
-	* Crée un mail d'interaction
-	* @var mixed
-	*/
-	private $mail_interaction=NULL;
-
-	/**
-	* Mail notification de transfert à un utilisateur
-	* @var mixed
-	*/
-	private $mail_user_transfert=NULL;
-
-	/**
-	* Mail notification de transfert au pole
-	* @var mixed
-	*/
-	private $mail_pole_transfert=NULL;
-
-	/**
-	* Mail actuel
-	* @var mixed
-	*/
-	private $current_mail=NULL;
-
-	/**
 	* Crée un nouveau mail Hotline
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	* @param int $id_hotline
@@ -455,5 +382,11 @@ class hotline_mail_atoutcoms extends hotline_mail{
 	}
 
 
+}
+class hotline_mail_nco extends hotline_mail{
+
+	public function sendMail(){
+		ATF::$msg->addWarning(ATF::$usr->trans("Mail non envoyé pour NCO"));
+	}
 }
 ?>

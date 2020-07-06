@@ -1,5 +1,5 @@
 <?php
-/** 
+/**
 * Classe stock_etat
 * @author Mouad elhizabri
 * @package Optima
@@ -8,8 +8,8 @@
 require_once dirname(__FILE__)."/../stock_etat.class.php";
 
 class stock_etat_absystech extends stock_etat {
-	/** 
-	* constructeur de stock_etat 
+	/**
+	* constructeur de stock_etat
 	*/
 	public function __construct() {
 		parent::__construct();
@@ -20,7 +20,7 @@ class stock_etat_absystech extends stock_etat {
 			,'stock_etat.date'=>array("width"=>100,"align"=>"center")
 			,'stock_etat.commentaire'
 		);
-	
+
 		$this->colonnes['primary'] = array(
 			"date"
 			,"etat"
@@ -33,12 +33,12 @@ class stock_etat_absystech extends stock_etat {
 		$this->fieldProcess = array("commentaire"=>"aes_encrypte");
 		$this->addPrivilege("checkEtatInventaire");
 	}
-	
+
 	/**
 	* etat actuel du stock
 	* @author MOUAD EL HIZABRI
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
-	* @param int $id_stock identifiant du stock 
+	* @param int $id_stock identifiant du stock
 	* @return string $etat dernier etat du stock
 	**/
 	public function getEtat($id_stock){
@@ -53,7 +53,7 @@ class stock_etat_absystech extends stock_etat {
 			 ->setLimit(1);
 		return $this->select_all();
 	}
-	
+
 	/**
 	* Empêcher d'ajouter un stock_etat plus ancien que le plus récent
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -91,7 +91,7 @@ class stock_etat_absystech extends stock_etat {
 		}
 		return $result;
 	}
-	
+
 	/**
 	* Empêcher de modifier la date d'un stock_etat plus ancien que le plus récent
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
@@ -111,9 +111,9 @@ class stock_etat_absystech extends stock_etat {
 		if ($infos["date"] && $dateLastEtat && strtotime($infos["date"]) < strtotime($dateLastEtat)) {
 			throw new errorATF("Impossible de modifier un état de stock antérieur au dernier état connu !",20974);
 		}
-		return parent::update($infos,$s,$files,$cadre_refreshed);	
+		return parent::update($infos,$s,$files,$cadre_refreshed);
 	}
-	
+
 	/**
 	* nombre d'etat d'un stock
 	* @author MOUAD EL HIZABRI
@@ -128,25 +128,26 @@ class stock_etat_absystech extends stock_etat {
 			 ->orWhere("stock_etat.etat","stock")
 			 ->where("stock_etat.id_stock",$stock)
 			 ->setStrict();
-			 
+
 		$nb_etat = $this->select_all();
 		return $nb_etat[0]['nb_ligne'];
 	}
 
-	
+
 	public function checkEtatInventaire($infos){
 		$data["stock_etat"] = array("date" => date("Y-m-d H:i:s"),
 									"id_stock" => ATF::stock()->decryptId($infos["id_stock"]),
 									"etat" => "stock",
-									"commentaire" => "Check Inventaire du ".date("d/m/Y")						
+									"commentaire" => "Check Inventaire du ".date("d/m/Y")
 								   );
 		$this->insert($data);
-		ATF::$msg->addNotice(ATF::$usr->trans("check_inventaire",$this->table));				
+		ATF::$msg->addNotice(ATF::$usr->trans("check_inventaire",$this->table));
 	}
-		
+
 };
 
 class stock_etat_att extends stock_etat_absystech {};
 class stock_etat_demo extends stock_etat_absystech {};
 class stock_etat_atoutcoms extends stock_etat_absystech {};
+class stock_etat_nco extends stock_etat_absystech {};
 ?>

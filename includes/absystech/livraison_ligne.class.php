@@ -12,15 +12,15 @@ class livraison_ligne_absystech extends classes_optima {
 	*/
 	public function __construct() {
 		parent::__construct();
-		$this->table = "livraison_ligne"; 
+		$this->table = "livraison_ligne";
 		$this->colonnes['fields_column'] = array(
 			'livraison_ligne.id_livraison'
 			,'livraison_ligne.id_stock'
 			,'livraison_ligne.etat'=>array("width"=>40,"renderer"=>"etat")
-		);	
-        $this->fieldstructure();		
+		);
+        $this->fieldstructure();
 	}
-	
+
     /**
 	* @author MOUAD EL HIZABRI
 	* Vérifie si les lignes de livraison sont en etat en_cours_de_livraison
@@ -32,14 +32,16 @@ class livraison_ligne_absystech extends classes_optima {
 		     ->reset()
 			 ->where('id_livraison',$id_livraison)
 			 ->where('etat','en_cours_de_livraison');
-			 
+
 		$les_lignes=$this->select_all();
 		return count($les_lignes);
 	}
-	
+
 };
 class livraison_ligne_att extends livraison_ligne_absystech { };
 class livraison_ligne_wapp6 extends livraison_ligne_absystech { };
 class livraison_ligne_atoutcoms extends livraison_ligne_absystech { };
 class livraison_ligne_demo extends livraison_ligne_absystech { };
+
+class livraison_ligne_nco extends livraison_ligne_absystech { };
 ?>

@@ -1437,4 +1437,15 @@ class societe_atoutcoms extends societe_absystech {
 		return "CS";
 	}
 }
+
+class societe_nco extends societe_absystech {
+	/**
+	* Retourne le prfixe utilis, peut tre surcharg
+	* @author Yann GAUTHERON <ygautheron@absystech.fr>
+	* @return string $prefix
+	*/
+	public function create_ref_prefix(){
+		return "N";
+	}
+}
 ?>

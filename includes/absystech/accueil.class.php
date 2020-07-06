@@ -1,10 +1,10 @@
 <?
 require_once dirname(__FILE__)."/../accueil.class.php";
-class accueil_absystech extends accueil { 
+class accueil_absystech extends accueil {
 	protected $targetGlobalSearch = array("societe","contact","affaire","hotline","devis","commande","facture");// La recherche globale se fait sur ces modules
 
 	/**
-	 * Constructeur 
+	 * Constructeur
 	 */
 	public function __construct(){
 		//Nouveau suivi
@@ -60,6 +60,8 @@ class accueil_demo extends accueil_absystech {
 	protected $targetGlobalSearch = array("societe","contact","affaire","devis","commande","facture");// La recherche globale se fait sur ces modules
 }
 class accueil_att extends accueil_absystech { }
-class accueil_wapp6 extends accueil_absystech { } 
+class accueil_wapp6 extends accueil_absystech { }
 class accueil_atoutcoms extends accueil_absystech { }
+
+class accueil_nco extends accueil_absystech { }
 ?>
