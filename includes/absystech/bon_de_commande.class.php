@@ -468,4 +468,8 @@ class bon_de_commande_att extends bon_de_commande_absystech { };
 class bon_de_commande_wapp6 extends bon_de_commande_absystech { };
 class bon_de_commande_atoutcoms extends bon_de_commande_absystech { };
 class bon_de_commande_demo extends bon_de_commande_absystech { };
+
+class bon_de_commande_nco extends bon_de_commande_absystech { };
+
+
 ?>

@@ -12,7 +12,7 @@ class html2pdf_absystech extends html2pdf_optima {
 	public function __construct(){
 		parent::__construct();
 	}
-	
+
 	/**
 	* Echéancier des tickets hotline par mois
 	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
@@ -23,13 +23,13 @@ class html2pdf_absystech extends html2pdf_optima {
 		}else{
 			$date_debut="01-".date("m-Y");
 		}
-		
+
 		if(ATF::_r("date_fin")){
 			$date_fin=ATF::_r("date_fin");
 		}else{
 			$date_fin=date("t-m-Y");
 		}
-				
+
 		ATF::gestion_ticket()->q->reset()->addField("hotline.id_hotline","id_hotline")
 								  ->addField("gestion_ticket.solde","solde")
 								  ->addField("gestion_ticket.id_facture","id_facture")
@@ -47,14 +47,16 @@ class html2pdf_absystech extends html2pdf_optima {
 								  ->addCondition("gestion_ticket.date",util::formatDate($date_debut),"AND",false,">=")
 								  ->addJointure("gestion_ticket","id_hotline","hotline","id_hotline")
 								  ->addOrder("gestion_ticket.date");
-		
+
 		ATF::$html->assign("tickets",ATF::gestion_ticket()->sa());
 		ATF::$html->assign("id_societe",$id);
 		ATF::$html->assign("date_debut",$date_debut);
 		ATF::$html->assign("date_fin",$date_fin);
-		return " --encoding utf-8";	
+		return " --encoding utf-8";
 	}
 };
 class html2pdf_demo extends html2pdf_absystech { };
 class html2pdf_atoutcoms extends html2pdf_absystech { };
+
+class html2pdf_nco extends html2pdf_absystech { };
 ?>
