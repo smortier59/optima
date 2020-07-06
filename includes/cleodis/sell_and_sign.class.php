@@ -42,7 +42,23 @@ class sell_and_sign extends classes_optima {
 		$this->fieldstructure();
 		$this->files["dossier_preuve"] = array("type"=>"zip","preview"=>false,"no_upload"=>false,"no_generate"=>true);
 		$this->files["certificat_preuve"] = array("type"=>"zip","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-	}	
+	}
+
+
+	public function _dataSellAndSign($get, $post){
+
+		$this->insert(array(
+			"sell_and_sign" => $post["dataSellAndSign"]["sell_and_sign"],
+			"id_affaire" => ATF::affaire()->decryptId($post["id"]),
+			"dataCustomer_number" => $post["dataSellAndSign"]["dataCustomer_number"],
+			"contractor_id" =>  $post["dataSellAndSign"]["contractor_id"],
+			"contract_id" => $post["dataSellAndSign"]["contract_id"],
+			"document_id" => $post["dataSellAndSign"]["document_id"],
+			"contractorTo_id" => $post["dataSellAndSign"]["contractorTo_id"]
+		));
+		return true;
+
+	}
 };
 
 class sell_and_sign_cleodisbe extends sell_and_sign { };
