@@ -1619,8 +1619,17 @@ class affaire_cleodis extends affaire {
 				ATF::devis_ligne()->q->reset()->from("devis_ligne","id_devis","devis","id_devis")
 											  ->where("devis.id_affaire", $value['affaire.id_affaire_fk']);
 				$devis_ligne = ATF::devis_ligne()->sa();
+
+				$utilisateur  = ATF::$usr->get("contact");
+				$apporteur = $utilisateur["id_societe"];
+
 				foreach ($devis_ligne as $k => $v) {
-					$data['data'][$key]["montant"] += $v["prix_achat"];
+					// Il ne faut prendre que les lignes ou le partenaire est le fourisseur
+
+					if($apporteur && $apporteur == $v["id_fournisseur"]){
+						$data['data'][$key]["montant"] += ($v["quantite"] * $v["prix_achat"]);
+					}
+
 				}
 
 
