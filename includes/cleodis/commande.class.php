@@ -2438,17 +2438,9 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = ($value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"]) * $value["loyer.duree"];
 			$row_data[$key][] = $value["commande.prix_achat"];
 
-			ATF::demande_refi()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"],"AND")
-									   ->where("etat", "valide");
-
-			$refi = ATF::demande_refi()->select_row();
-			if($refi)	$row_data[$key][] = ATF::refinanceur()->select($refi["id_refinanceur"] , "refinanceur");
-			else $row_data[$key][] = "";
-
 
 			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
 			$comites = ATF::comite()->select_all();
-
 			if($comites){
 				$commentaire = $decision = $observations = "";
 				foreach ($comites as $k => $v) {
@@ -2460,6 +2452,7 @@ class commande_cleodis extends commande {
 						$observations 	  = $observations."\n".$v["observations"];
 
 					}else{
+						$row_data[$key][] = ATF::refinanceur()->select($v["id_refinanceur"] , "refinanceur");
 						$decisiondate = $v["date"];
 						$commentaire  = $v["commentaire"];
 						$decision 	  = $v["decisionComite"];
@@ -2468,15 +2461,18 @@ class commande_cleodis extends commande {
 					}
 				}
 
+
+
 				$row_data[$key][] = $decisiondate;
 				$row_data[$key][] = $decision;
 				$row_data[$key][] = $date_accord;
 				$row_data[$key][] = $commentaire;
 				$row_data[$key][] = $observations;
 
-				
+
 
 			} else {
+				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
