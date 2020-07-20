@@ -1703,8 +1703,17 @@ class affaire_cleodis extends affaire {
 				ATF::devis_ligne()->q->reset()->from("devis_ligne","id_devis","devis","id_devis")
 											  ->where("devis.id_affaire", $value['affaire.id_affaire_fk']);
 				$devis_ligne = ATF::devis_ligne()->sa();
+
+				$utilisateur  = ATF::$usr->get("contact");
+				$apporteur = $utilisateur["id_societe"];
+
 				foreach ($devis_ligne as $k => $v) {
-					$data['data'][$key]["montant"] += $v["prix_achat"];
+					// Il ne faut prendre que les lignes ou le partenaire est le fourisseur
+
+					if($apporteur && $apporteur == $v["id_fournisseur"]){
+						$data['data'][$key]["montant"] += ($v["quantite"] * $v["prix_achat"]);
+					}
+
 				}
 
 
@@ -3038,10 +3047,14 @@ class affaire_cleodis extends affaire {
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
 
+		$partenaire = "";
+
+		if($affaire["id_partenaire"]) $partenaire = ATF::societe()->select($affaire["id_partenaire"] , "societe");
+
 		$tache = array("tache"=>array("id_societe"=> ATF::affaire()->select($id_affaire, "id_societe"),
 									   "id_user"=>$id_user,
 									   "origine"=>"societe_commande",
-									   "tache"=>"Nouvelle affaire créée. Merci de traiter<br />Affaire : ".$affaire["ref"]."<br />Provenance : ".$affaire["provenance"]."<br />Site : ".$affaire["site_associe"].". <br />Partenaire : ".($affaire["partenaire"]?"oui":"non")."<br />Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
+									   "tache"=>"Nouvelle affaire créée. Merci de traiter<br />Affaire : ".$affaire["ref"]."<br />Provenance : ".$affaire["provenance"]."<br />Site : ".$affaire["site_associe"].". <br />Partenaire : ".$partenaire."<br />Données de l'entité : Score : ".$societe["cs_score"].", création : ".$societe["date_creation"].".",
 									   "id_affaire"=>$id_affaire,
 									   "type_tache"=>"creation_contrat",
 									   "horaire_fin"=>date('Y-m-d h:i:s', strtotime('+3 day')),
