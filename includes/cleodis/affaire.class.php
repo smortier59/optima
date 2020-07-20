@@ -3349,7 +3349,9 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	function getRefAvenant($id_parent){
 		//Récup du dernier avenant de cette affaire
-		$ref=substr($this->select($id_parent,"ref"),0,7);
+
+		$ref=substr($this->select($id_parent,"ref"),0,9);
+
 		$this->q->reset()
 		   ->addField('MAX(`ref`)','max')
 		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
@@ -3362,6 +3364,7 @@ class affaire_bdomplus extends affaire_cleodis {
 		if($ref_avenant["max"]){
 			$nb_avenant=substr($ref_avenant["max"],-1) +1;
 		}
+
 
 		return $ref."AVT".$nb_avenant;
 	}
@@ -3908,7 +3911,7 @@ class affaire_boulanger extends affaire_cleodis {
 	*/
 	function getRefAvenant($id_parent){
 		//Récup du dernier avenant de cette affaire
-		$ref=substr($this->select($id_parent,"ref"),0,7);
+		$ref=substr($this->select($id_parent,"ref"),0,9);
 		$this->q->reset()
 		   ->addField('MAX(`ref`)','max')
 		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
@@ -4048,7 +4051,7 @@ class affaire_assets extends affaire_cleodis {
 	*/
 	function getRefAvenant($id_parent){
 		//Récup du dernier avenant de cette affaire
-		$ref=substr($this->select($id_parent,"ref"),0,7);
+		$ref=substr($this->select($id_parent,"ref"),0,9);
 		$this->q->reset()
 		   ->addField('MAX(`ref`)','max')
 		   ->addCondition("ref",$ref."AVT%",NULL,false,"LIKE")
