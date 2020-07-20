@@ -2313,7 +2313,8 @@ class commande_cleodis extends commande {
 						  array("title"=> "Pas MEP B", "code_client"=> "B"),
 						  array("title"=> "Pas MEP S", "code_client"=> "S"),
 						  array("title"=> "Pas MEP ATOL", "code_client"=> ""),
-						  array("title"=> "Pas MEP non repertorié")
+						  array("title"=> "Pas MEP non repertorié"),
+						  array("title"=> "Tous")
 						);
 
 		$data = array();
@@ -2328,7 +2329,7 @@ class commande_cleodis extends commande {
 				$esp = 0;
 
 				foreach ($feuilles as $kf => $vf) {
-					if($esp ===0 && $kf === count($feuilles)-1) {
+					if($esp ===0 && $kf === count($feuilles)-2) {
 						$data[$kf][] = $value;
 					}else{
 						if($esp === 0){
@@ -2341,7 +2342,12 @@ class commande_cleodis extends commande {
 							}
 						}
 					}
+
+					if($kf === count($feuilles)-1) {
+						$data[$kf][] = $value;
+					}
 				}
+
 			}
 		}
 
@@ -2369,6 +2375,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Contrat", "size"=>60),
 								array("title"=> "Code client", "size"=>15),
 								array("title"=> "Installation prévue", "size"=>15),
+								array("title"=>"Installation réelle", "size"=>15),
 								array("title"=> "Retour (AP)", "size"=>15),
 								array("title"=> "Retour (PV)", "size"=>15),
 								array("title"=> "Retour", "size"=>15),
@@ -2382,7 +2389,9 @@ class commande_cleodis extends commande {
 								array("title"=> "Décision Comité", "size"=>15),
 								array("title"=> "Validité de l'accord", "size"=>15),
 								array("title"=> "Commentaire", "size"=>60),
-								array("title"=> "Observations", "size"=>60));
+								array("title"=> "Observations", "size"=>60),
+								array("title"=> "CNI présente", "size"=>15)
+							);
 
 			$i=0;
 	    	foreach($cols as $col=>$titre){
@@ -2419,6 +2428,7 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $value["affaire.affaire"];
 			$row_data[$key][] = $value["code_client"];
 			$row_data[$key][] = $value["affaire.date_installation_prevu"];
+			$row_data[$key][] = $value["affaire.date_installation_reel"];
 			$row_data[$key][] = $value["commande.retour_prel"];
 			$row_data[$key][] = $value["commande.retour_pv"];
 			$row_data[$key][] = $value["commande.retour_contrat"];
@@ -2428,17 +2438,9 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = ($value["loyer.loyer"] +  $value["loyer.assurance"] +  $value["loyer.frais_de_gestion"]) * $value["loyer.duree"];
 			$row_data[$key][] = $value["commande.prix_achat"];
 
-			ATF::demande_refi()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"],"AND")
-									   ->where("etat", "valide");
-
-			$refi = ATF::demande_refi()->select_row();
-			if($refi)	$row_data[$key][] = ATF::refinanceur()->select($refi["id_refinanceur"] , "refinanceur");
-			else $row_data[$key][] = "";
-
 
 			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
 			$comites = ATF::comite()->select_all();
-
 			if($comites){
 				$commentaire = $decision = $observations = "";
 				foreach ($comites as $k => $v) {
@@ -2450,6 +2452,7 @@ class commande_cleodis extends commande {
 						$observations 	  = $observations."\n".$v["observations"];
 
 					}else{
+						$row_data[$key][] = ATF::refinanceur()->select($v["id_refinanceur"] , "refinanceur");
 						$decisiondate = $v["date"];
 						$commentaire  = $v["commentaire"];
 						$decision 	  = $v["decisionComite"];
@@ -2458,11 +2461,15 @@ class commande_cleodis extends commande {
 					}
 				}
 
+
+
 				$row_data[$key][] = $decisiondate;
 				$row_data[$key][] = $decision;
 				$row_data[$key][] = $date_accord;
 				$row_data[$key][] = $commentaire;
 				$row_data[$key][] = $observations;
+
+
 
 			} else {
 				$row_data[$key][] = "";
@@ -2470,7 +2477,10 @@ class commande_cleodis extends commande {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
+				$row_data[$key][] = "";
 			}
+
+			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"cni"))? "oui": "non";
 
 
     	}
