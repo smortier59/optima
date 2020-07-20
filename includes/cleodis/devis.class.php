@@ -77,6 +77,7 @@ class devis_cleodis extends devis {
 									'Instore',
 									'LAFI',
 									'LFS',
+									'LocEvo',
 									'Manganelli',
 									'NRC',
 									'OLISYS - Ma Solution IT',

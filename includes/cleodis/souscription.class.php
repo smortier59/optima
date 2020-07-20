@@ -63,6 +63,20 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = $hexamed["id_societe"];
       break;
 
+      case 'locevo':
+        ATF::societe()->q->reset()->where("siret", "45307981600048");
+        $cleodis = ATF::societe()->select_row();
+
+        $this->id_partenaire = $cleodis["id_societe"];
+      break;
+
+      case 'dib':
+        ATF::societe()->q->reset()->where("siret", "45307981600048");
+        $cleodis = ATF::societe()->select_row();
+
+        $this->id_partenaire = $cleodis["id_societe"];
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -239,6 +253,8 @@ class souscription_cleodis extends souscription {
         switch ($post["site_associe"]) {
           case 'boulangerpro':
           case 'hexamed':
+          case 'locevo':
+          case 'dib':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -301,8 +317,16 @@ class souscription_cleodis extends souscription {
         $r = "BOULANGER : Abonnement Café ".$suffix;
       break;
 
-       case "hexamed":
+      case "hexamed":
         $r = "HEXAMED : Location ".$suffix;
+      break;
+
+      case "dib":
+        $r = "DIB : Location ".$suffix;
+      break;
+      
+      case "locevo":
+        $r = "LOCEVO : Location ".$suffix;
       break;
     }
 
@@ -336,6 +360,8 @@ class souscription_cleodis extends souscription {
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
     if($post['site_associe'] == "boulangerpro") $devis["type_affaire"] = 'Boulanger Pro';
     if($post['site_associe'] == "hexamed") $devis["type_affaire"] = 'Hexamed Leasing';
+    if($post['site_associe'] == "locevo") $devis["type_affaire"] = 'LocEvo';
+    if($post['site_associe'] == "dib") $devis["type_affaire"] = 'DIB';
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -716,6 +742,8 @@ class souscription_cleodis extends souscription {
 
       case 'hexamed':
       case 'boulangerpro':
+      case 'locevo':
+      case 'dib':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -967,6 +995,12 @@ class souscription_cleodis extends souscription {
       break;
       case "hexamed":
         $r = "HX";
+      break;
+      case "locevo":
+        $r = "LE";
+      break;
+      case "dib":
+        $r = "DI";
       break;
       default:
         $r = substr($site_associe, 0, 2);
