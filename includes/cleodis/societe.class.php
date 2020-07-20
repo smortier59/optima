@@ -1953,7 +1953,8 @@ class societe_cleodis extends societe {
    * @param  int $id_societe ID de la société
    */
   public function checkMauvaisPayeur($id_societe){
-    log::logger("--> Dans Mauvais payeur" , "mfleurquin");
+    log::logger("##########################" , "mauvais_payeur");
+    log::logger("### ID SOCIETE -> ".$id_societe , "mauvais_payeur");
 
     $contentieux_depuis = null;
 
@@ -1977,28 +1978,26 @@ class societe_cleodis extends societe {
 
 
       if((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 1 ){
-        log::logger("1 mois ou moins" , "mauvais_payeur");
+        log::logger("### 1 mois ou moins" , "mauvais_payeur");
         $contentieux_depuis = "1_mois";
       }elseif((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 2 ){
-        log::logger("Entre 1 et 2 mois" , "mauvais_payeur");
+        log::logger("### Entre 1 et 2 mois" , "mauvais_payeur");
         $contentieux_depuis = "2_mois";
       }else{
-        log::logger("Plus de 3 mois" , "mauvais_payeur");
+        log::logger("### Plus de 3 mois" , "mauvais_payeur");
         $contentieux_depuis = "plus_3_mois";
       }
 
-      log::logger(date("Ym") , "mauvais_payeur");
-      log::logger(date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
-      log::logger(date("Ym") - date("Ym", strtotime($date_max_impayee)), "mauvais_payeur");
+      log::logger("### ".date("Ym") , "mauvais_payeur");
+      log::logger("### ".date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
+      log::logger("### ".(date("Ym") - date("Ym", strtotime($date_max_impayee))), "mauvais_payeur");
 
       ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "oui", "contentieux_depuis"=> $contentieux_depuis));
     }else{
-      log::logger("--> pas de contentieux" , "mauvais_payeur");
+      log::logger("### pas de contentieux" , "mauvais_payeur");
       ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "non", "contentieux_depuis"=> $contentieux_depuis));
     }
-
   }
-
 
 };
 

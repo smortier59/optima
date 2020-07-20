@@ -15,7 +15,7 @@ CREATE TABLE `facturation_fournisseur` (
   `date_debut_periode` date NOT NULL,
   `date_fin_periode` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
- 
+
 -- --------------------------------------------------------
 
 --
@@ -153,3 +153,8 @@ ALTER TABLE `facture_non_parvenue` CHANGE `ref` `ref` VARCHAR(60) CHARACTER SET 
 -- Gestion des contentieux clients
 ALTER TABLE `societe` ADD `mauvais_payeur` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Permet de savoir si le client a des contrats en contentieux' AFTER `force_acceptation`,
                       ADD `contentieux_depuis` ENUM('1_mois','2_mois','plus_3_mois') NULL DEFAULT NULL COMMENT 'Permet de savoir depuis combien de temps le client est mauvais payeur (Date max impayée)' AFTER `mauvais_payeur`;
+
+-- Renouvellement BDOM +
+INSERT INTO `constante` (`id_constante`, `constante`, `valeur`) VALUES
+(NULL, '__URL_SITE_SOUSCRIPTION__', 'https://bdom-front.local'),
+(NULL, '__URL_ESPACE_CLIENT__', 'https://rct-bdomplus-espaceclient.cleodis.test');
