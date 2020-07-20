@@ -853,6 +853,11 @@ class facture_cleodis extends facture {
 	//			ATF::affaire()->redirection("select",$id_affaire);
 			}
 		}
+		log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
+		ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
+
+
+
 		return true;
 	}
 
@@ -906,6 +911,11 @@ class facture_cleodis extends facture {
 			}
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
+
+
+			log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
+			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
+
 		}else{
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
@@ -2782,8 +2792,6 @@ class facture_bdomplus extends facture_cleodis {
 			foreach ($data as $key => $value) {
 				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
 				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
-
-				log::logger($status , "mfleurquin");
 
 				foreach ($value["id_facture"] as $kfacture => $vfacture) {
 					ATF::slimpay_transaction()->i(array(

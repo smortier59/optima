@@ -384,7 +384,7 @@ ATF.renderer.pdfCourriers=function(table,field) {
 				html += '</p>';
 			}
 
-			if (etat=='arreter' ) {
+			if (etat=='arreter' || etat=='arreter_contentieux' ) {
 				/* Reactive CMD */
 				html += '<p>';
 				html += '<a href="javascript:;" onclick="if (confirm(\''+ATF.usr.trans('Etes_vous_sur')+'\')) ATF.ajax(\'commande,reactiveCommande.ajax\',\'id_commande='+id+'\');">';

@@ -562,6 +562,12 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'LocEvo' :
+				$this->cleodis = "Cléodis";
+				$this->logo = 'cleodis/cleodis.jpg';
+
+			break;
+
 			default:
 				// $this->logo = 'cleodis/logo.jpg';
 				$this->cleodis = "CLEODIS";
@@ -3949,7 +3955,10 @@ class pdf_cleodis extends pdf {
 		$this->cadre(130,10,70,30,$cadre,"A l'attention de");
 		//CADRE ADRESSE DE LIVRAISON
 		$cadre = array(
-			$this->bdc['destinataire']
+			$this->client['code_client_partenaire']?
+			
+			$this->bdc['destinataire']." (".
+			$this->client['code_client_partenaire'].")":$this->bdc['destinataire']
 			,$this->bdc['adresse']
 			,$this->bdc['adresse_2']?$this->bdc['adresse_2']:""
 			,$this->bdc['adresse_3']?$this->bdc['adresse_3']:""
