@@ -562,6 +562,12 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'LocEvo' :
+				$this->cleodis = "Cléodis";
+				$this->logo = 'cleodis/cleodis.jpg';
+
+			break;
+
 			default:
 				// $this->logo = 'cleodis/logo.jpg';
 				$this->cleodis = "CLEODIS";
@@ -3066,10 +3072,82 @@ class pdf_cleodis extends pdf {
 	* @date 11-02-2011
 	*/
 	public function contratPV($id,$s,$previsu) {
+		$this->commandeInit($id,$s,$previsu);
+
+		switch ($this->affaire["type_affaire"]) {
+			case '2SI' :
+				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
+			break;
+			case 'Boulanger Pro' :
+				$this->logo = 'cleodis/boulangerpro.jpg';
+			break;
+
+			case 'Hexamed Leasing' :
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+			break;
+
+			case 'Consommables_com' :
+				$this->logo = 'cleodis/consommables.jpg';
+			break;
+
+			case 'DIB' :
+				$this->logo = 'cleodis/dib.jpg';
+			break;
+
+			case 'Dyadem' :
+				$this->logo = 'cleodis/dyadem.jpg';
+			break;
+
+			case 'FLEXFUEL' :
+				$this->logo = 'cleodis/flexfuel.jpg';
+			break;
+
+			case 'Instore' :
+				$this->logo = 'cleodis/instoresolution.jpg';
+			break;
+
+			case 'LAFI' :
+				$this->logo = 'cleodis/lafi.jpg';
+			break;
+
+			case 'LFS' :
+				$this->logo = 'cleodis/LFS.jpg';
+			break;
+
+			case 'Manganelli' :
+				$this->logo = 'cleodis/Manganelli.jpg';
+			break;
+
+			case 'NRC' :
+				$this->logo = 'cleodis/nrc.jpg';
+			break;
+
+			case 'OLISYS - Ma Solution IT' :
+				$this->logo = 'cleodis/OLISYS.jpg';
+			break;
+
+			case 'Proxi Pause' :
+				$this->logo = 'cleodis/proxi-pause.jpg';
+			break;
+
+			case 'Trekk' :
+				$this->logo = 'cleodis/trekk.jpg';
+			break;
+
+			case 'ZENCONNECT – ZEN PACK' :
+				$this->logo = 'cleodis/zen.jpg';
+
+			break;
+
+			default:
+				$this->logo = 'cleodis/logo.jpg';
+			break;
+		}
+
 		$this->unsetHeader();
 		$this->Open();
 		$this->AddPage();
-		$this->commandeInit($id,$s,$previsu);
+
 		if ($this->client['id_famille'] == 9) { // Document spécial pour les particuliers
 			$this->contratPVParticulier($id);
 		} else {
@@ -3083,6 +3161,76 @@ class pdf_cleodis extends pdf {
 	*/
 	public function contratPVSignature($id,$s,$previsu) {
 		$this->commandeInit($id,$s,$previsu);
+		switch ($this->affaire["type_affaire"]) {
+			case '2SI' :
+				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
+			break;
+			case 'Boulanger Pro' :
+				$this->logo = 'cleodis/boulangerpro.jpg';
+			break;
+
+			case 'Hexamed Leasing' :
+				$this->logo = 'cleodis/hexamed-logo.jpg';
+			break;
+
+			case 'Consommables_com' :
+				$this->logo = 'cleodis/consommables.jpg';
+			break;
+
+			case 'DIB' :
+				$this->logo = 'cleodis/dib.jpg';
+			break;
+
+			case 'Dyadem' :
+				$this->logo = 'cleodis/dyadem.jpg';
+			break;
+
+			case 'FLEXFUEL' :
+				$this->logo = 'cleodis/flexfuel.jpg';
+			break;
+
+			case 'Instore' :
+				$this->logo = 'cleodis/instoresolution.jpg';
+			break;
+
+			case 'LAFI' :
+				$this->logo = 'cleodis/lafi.jpg';
+			break;
+
+			case 'LFS' :
+				$this->logo = 'cleodis/LFS.jpg';
+			break;
+
+			case 'Manganelli' :
+				$this->logo = 'cleodis/Manganelli.jpg';
+			break;
+
+			case 'NRC' :
+				$this->logo = 'cleodis/nrc.jpg';
+			break;
+
+			case 'OLISYS - Ma Solution IT' :
+				$this->logo = 'cleodis/OLISYS.jpg';
+			break;
+
+			case 'Proxi Pause' :
+				$this->logo = 'cleodis/proxi-pause.jpg';
+			break;
+
+			case 'Trekk' :
+				$this->logo = 'cleodis/trekk.jpg';
+			break;
+
+			case 'ZENCONNECT – ZEN PACK' :
+				$this->logo = 'cleodis/zen.jpg';
+
+			break;
+
+			default:
+				$this->logo = 'cleodis/logo.jpg';
+			break;
+		}
+
 		$this->unsetHeader();
 		$this->Open();
 		$this->AddPage();
@@ -3285,12 +3433,8 @@ class pdf_cleodis extends pdf {
 	* @date 11-02-2011
 	*/
 	public function contratPVSociete($id,$signature=false) {
-		if($this->affaire["type_affaire"] == "2SI"){
-			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",4,5,35);
-		} else{
-			$this->image(__PDF_PATH__."/cleodis/logo.jpg",4,5,35);
-		}
 
+		$this->image(__PDF_PATH__."/".$this->logo,4,5,35);
 
 		$this->setfont('arial','I',8);
 		//Cadre du haut avec Loueur et Locataire
@@ -3811,7 +3955,10 @@ class pdf_cleodis extends pdf {
 		$this->cadre(130,10,70,30,$cadre,"A l'attention de");
 		//CADRE ADRESSE DE LIVRAISON
 		$cadre = array(
-			$this->bdc['destinataire']
+			$this->client['code_client_partenaire']?
+			
+			$this->bdc['destinataire']." (".
+			$this->client['code_client_partenaire'].")":$this->bdc['destinataire']
 			,$this->bdc['adresse']
 			,$this->bdc['adresse_2']?$this->bdc['adresse_2']:""
 			,$this->bdc['adresse_3']?$this->bdc['adresse_3']:""

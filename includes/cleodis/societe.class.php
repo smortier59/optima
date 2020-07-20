@@ -38,6 +38,8 @@ class societe_cleodis extends societe {
         "societe"
         ,"nom_commercial"
       ))
+      ,'mauvais_payeur'
+      ,'contentieux_depuis'
     );
 
     //Reinitialise les panels poru remettre dans l'ordre
@@ -1945,6 +1947,57 @@ class societe_cleodis extends societe {
 
   }
 
+  /**
+   * Recherche pour une société si il y a des contrats en contentieux et met à jour le champs mauvais payeur et contentieux depuis sur sa fiche
+   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+   * @param  int $id_societe ID de la société
+   */
+  public function checkMauvaisPayeur($id_societe){
+    log::logger("##########################" , "mauvais_payeur");
+    log::logger("### ID SOCIETE -> ".$id_societe , "mauvais_payeur");
+
+    $contentieux_depuis = null;
+
+    ATF::commande()->q->reset()->where("id_societe", $id_societe, "AND")
+                               ->where("etat", "%contentieux%", "AND", false, "LIKE");
+
+    if($contentieux = ATF::commande()->sa()){
+      ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "oui"));
+
+      ATF::facture()->q->reset()->where("id_societe", $id_societe)
+                                ->where("etat", "impayee", "AND", "impayee")
+                                ->whereIsNotNull("date_rejet", "AND", "impayee");
+      $date_max_impayee = NULL;
+
+      foreach (ATF::facture()->sa() as $key => $value) {
+        if($date_max_impayee == NULL || str_replace("-", "", $date_max_impayee) > str_replace("-", "", $value["date_rejet"])){
+          $date_max_impayee = $value["date_rejet"];
+        }
+      }
+
+
+
+      if((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 1 ){
+        log::logger("### 1 mois ou moins" , "mauvais_payeur");
+        $contentieux_depuis = "1_mois";
+      }elseif((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 2 ){
+        log::logger("### Entre 1 et 2 mois" , "mauvais_payeur");
+        $contentieux_depuis = "2_mois";
+      }else{
+        log::logger("### Plus de 3 mois" , "mauvais_payeur");
+        $contentieux_depuis = "plus_3_mois";
+      }
+
+      log::logger("### ".date("Ym") , "mauvais_payeur");
+      log::logger("### ".date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
+      log::logger("### ".(date("Ym") - date("Ym", strtotime($date_max_impayee))), "mauvais_payeur");
+
+      ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "oui", "contentieux_depuis"=> $contentieux_depuis));
+    }else{
+      log::logger("### pas de contentieux" , "mauvais_payeur");
+      ATF::societe()->u(array("id_societe"=> $id_societe, "mauvais_payeur"=> "non", "contentieux_depuis"=> $contentieux_depuis));
+    }
+  }
 
 };
 
