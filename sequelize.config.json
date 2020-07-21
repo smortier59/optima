@@ -1,0 +1,6 @@
+{
+  "dialect": "mysql",
+  "additional" : {
+    "timestamps" : false
+  }
+}
