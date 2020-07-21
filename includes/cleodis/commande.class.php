@@ -1749,6 +1749,26 @@ class commande_cleodis extends commande {
 	}
 
 	/**
+    * Appel stopCommande depuis l'espace client / Conseiller
+	* @author Moran FLEURQUN <mfleurquin@absystech.fr>
+	* @param int $id_societe
+	* @return string texte du mail
+    */
+	public function _stopCommande($infos){
+		ATF::$usr->set('id_user',16);
+		ATF::$usr->set('id_agence',1);
+		try{
+			$this->stopCommande($infos);
+			$aff = $this->select($infos["id_commande"], "id_affaire");
+			$affaireDepart = ATF::affaire()->select(ATF::affaire()->getAffaireDepart($aff));
+
+			return array("affaireDepart"=> $affaireDepart);
+		}catch(errorATF $e){
+			return false;
+		}
+	}
+
+	/**
     * Met à jour létat de la comande en 'arreter'
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
 	* @param int $id_societe
