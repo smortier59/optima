@@ -798,17 +798,16 @@ class facture_cleodis extends facture {
 		ATF::$usr->set('id_agence',1);
 
 		if(ATF::facture()->select($infos["id_facture"], "date_rejet")){
-			$infos["key"] = "date_regularisation";
+            $infos["key"] = "date_regularisation";
+            $this->updateDate($infos);
 
-			if(!ATF::facture()->select($infos["id_facture"], "date_paiement")){
-				$query = "UPDATE `facture` SET `date_paiement`='".date("Y-m-d", strtotime(ATF::db($this->db)->real_escape_string($infos["value"])))."' WHERE `id_facture`=".$this->decryptId($infos["id_facture"]);
-				ATF::db($this->db)->query($query);
-			}
-		}
+            if(!ATF::facture()->select($infos["id_facture"], "date_paiement")){
+                $this->updateDate(array("id_facture" => $infos["id_facture"],"key"=> "date_paiement", "value" => $infos["value"]));
+            }
 
-		$this->updateDate($infos);
-		ATF::facture()->u(array("id_facture"=> $this->decryptId($infos["id_facture"]), "etat"=>"payee"));
-
+        }else{
+            $this->updateDate($infos);
+        }
 	}
 
 	public function updateDate($infos){
