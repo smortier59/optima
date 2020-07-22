@@ -1,0 +1,19 @@
+"TYPE";"N°";"Ref Produit";"Produit principal";"Quantité";"Min";"Max";"option_incluse";"option_incluse_obligatoire";"Afficher sur le site";"Ordre";"Lignes de produits visible";"visible_sur_pdf";"Prix d'achat dont ecotaxe"
+"PRODUIT PRINCIPAL";1;"36S0410";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1
+"PRODUIT PRINCIPAL";2;"50G0220";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2
+"PRODUIT PRINCIPAL";3;"36S0910";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3
+"PRODUIT PRINCIPAL";4;"25B0201";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";4
+"PRODUIT PRINCIPAL";5;"25B2010";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";5
+"PRODUIT PRINCIPAL";6;"40C9136";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";6
+"PRODUIT PRINCIPAL";7;"40C9036";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";7
+"PRODUIT PRINCIPAL";8;"40C9554";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";8
+"PRODUIT PRINCIPAL";9;"32C0230";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";9
+"FRAIS DE DOSSIERS";1;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";2;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";3;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";4;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";5;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";6;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";7;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";8;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";9;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
