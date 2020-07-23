@@ -73,6 +73,7 @@ class devis_cleodis extends devis {
 									'DIB',
 									'Dyadem',
 									'FLEXFUEL',
+									"haccp",
 									'Hexamed Leasing',
 									'Instore',
 									'LAFI',
@@ -84,6 +85,7 @@ class devis_cleodis extends devis {
 									'Proxi Pause',
 									'Trekk',
 									'ZENCONNECT – ZEN PACK'
+
 								  ),
 								  "xtype"=>"combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
