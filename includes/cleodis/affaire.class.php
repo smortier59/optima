@@ -3023,7 +3023,6 @@ class affaire_cleodis extends affaire {
 		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
 								->where("login", "abowe", "OR", "filles")
 								->where("login", "egerard", "OR", "filles")
-								->where("login", "bbocquillon", "OR", "filles")
 								->where("login", "btronquit", "OR", "filles")
 								->where("login", "pcaminel", "OR", "filles")
 								->where("login", "smazars", "OR", "filles");
