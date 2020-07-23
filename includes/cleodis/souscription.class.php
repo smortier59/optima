@@ -336,6 +336,10 @@ class souscription_cleodis extends souscription {
       case "locevo":
         $r = "LOCEVO : Location ".$suffix;
       break;
+
+      case "haccp":
+        $r = "HACCP : Location ".$suffix;
+      break;
     }
 
     return $r;
