@@ -1726,8 +1726,8 @@ class affaire_cleodis extends affaire {
 					$data['data'][$key]["contratExist"] = false;
 				}
 
-				if($commande && $commande["retour_contrat"]){
-				  	$data['data'][$key]["date_signature"] = $commande["retour_contrat"];
+				if($commande && $commande["commande.retour_contrat"]){
+				  	$data['data'][$key]["date_signature"] = $commande["commande.retour_contrat"];
 				}
 
 				$data['data'][$key]["retourPV"] = false;
