@@ -1346,7 +1346,6 @@ class affaire_cleodis extends affaire {
 				"affaire.etat",
 				'affaire.date',
 				'affaire.ref',
-				'affaire.date_signature',
 				'affaire.etat_comite',
 				'affaire.id_societe',
 				'affaire.pieces',
@@ -1726,6 +1725,7 @@ class affaire_cleodis extends affaire {
 					$data['data'][$key]["contratExist"] = false;
 				}
 
+				$data['data'][$key]["date_signature"] = NULL;
 				if($commande && $commande["commande.retour_contrat"]){
 				  	$data['data'][$key]["date_signature"] = $commande["commande.retour_contrat"];
 				}
