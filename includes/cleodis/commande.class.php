@@ -1430,6 +1430,16 @@ class commande_cleodis extends commande {
 			//Check l'existence d'un comité accepte
 			if(ATF::affaire()->comiteAccepte($i["commande.id_affaire_fk"])){
 				$return['data'][$k]['allowBDCCreate'] = true;
+				$return['data'][$k]['allowAllBDCCreate'] = false;
+
+				ATF::bon_de_commande()->q->reset()->where("id_affaire", $i['commande.id_affaire_fk']);
+				$bdc=ATF::bon_de_commande()->sa();
+
+				log::logger($bdc , "jdelaporte");
+
+				if(count($bdc)==0){
+					$return['data'][$k]['allowAllBDCCreate'] = true;
+				}
 
 				//Check l'existence de création de BDC
 				if (ATF::bon_de_commande()->bdcByAffaire($i['commande.id_commande'])) {
@@ -1440,6 +1450,7 @@ class commande_cleodis extends commande {
 
 			}else{
 				$return['data'][$k]['allowBDCCreate'] = false;
+				$return['data'][$k]['allowAllBDCCreate'] = false;
 			}
 
 
