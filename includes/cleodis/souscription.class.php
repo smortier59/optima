@@ -274,6 +274,7 @@ class souscription_cleodis extends souscription {
 
     } catch (errorATF $e) {
         ATF::db($this->db)->rollback_transaction();
+        log::logger($e->getMessage() , "mfleurquin");
 
         throw $e;
     }
@@ -324,7 +325,7 @@ class souscription_cleodis extends souscription {
       case "dib":
         $r = "DIB : Location ".$suffix;
       break;
-      
+
       case "locevo":
         $r = "LOCEVO : Location ".$suffix;
       break;
