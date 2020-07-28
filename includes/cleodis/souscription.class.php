@@ -143,6 +143,10 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
 
+        log::logger($post , "mfleurquin");
+        log::logger($libelle , "mfleurquin");
+
+
         $id_devis = $this->createDevis($post, $libelle);
 
         ATF::devis()->q->reset()->addField('devis.id_affaire','id_affaire')->where('devis.id_devis', $id_devis);
