@@ -5,6 +5,7 @@
 */
 require_once dirname(__FILE__)."/../affaire.class.php";
 class affaire_cleodis extends affaire {
+	
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
@@ -129,6 +130,7 @@ class affaire_cleodis extends affaire {
 			,"pdf_affaire"
 		);
 
+		
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
@@ -165,6 +167,7 @@ class affaire_cleodis extends affaire {
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="%ref%";
 		$this->foreign_key['id_fille'] =  "affaire";
+		$this->foreign_key['apporteur'] =  "societe";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
@@ -2592,6 +2595,14 @@ class affaire_cleodis extends affaire {
 			$devis = ATF::devis()->select($id_devis);
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
+			
+			//Recupere Apporteur de ta société
+            $apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
+
+			if ($apporteur){
+				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
+			}
+			
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 
@@ -3184,7 +3195,7 @@ class affaire_midas extends affaire_cleodis {
 	/** On affiche que les sociétés midas
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
 		ATF::loyer()->q->reset()->setToString();
 		$subquery=ATF::loyer()->sa("loyer.id_loyer","desc");
 
