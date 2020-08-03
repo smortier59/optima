@@ -168,6 +168,7 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
+		$this->foreign_key['id_apporteur'] =  "societe";
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
@@ -2592,6 +2593,18 @@ class affaire_cleodis extends affaire {
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+
+
+			//Recupere Apporteur de ta société
+            $apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
+
+			if ($apporteur){
+				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
+			}
+
+			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],
+									"provenance"=>"partenaire",
+								    'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
