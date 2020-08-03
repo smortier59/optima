@@ -1346,7 +1346,6 @@ class affaire_cleodis extends affaire {
 				"affaire.etat",
 				'affaire.date',
 				'affaire.ref',
-				'affaire.date_signature',
 				'affaire.etat_comite',
 				'affaire.id_societe',
 				'affaire.pieces',
@@ -1726,8 +1725,9 @@ class affaire_cleodis extends affaire {
 					$data['data'][$key]["contratExist"] = false;
 				}
 
-				if($commande && $commande["retour_contrat"]){
-				  	$data['data'][$key]["date_signature"] = $commande["retour_contrat"];
+				$data['data'][$key]["date_signature"] = NULL;
+				if($commande && $commande["commande.retour_contrat"]){
+				  	$data['data'][$key]["date_signature"] = $commande["commande.retour_contrat"];
 				}
 
 				$data['data'][$key]["retourPV"] = false;
@@ -3023,7 +3023,6 @@ class affaire_cleodis extends affaire {
 		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
 								->where("login", "abowe", "OR", "filles")
 								->where("login", "egerard", "OR", "filles")
-								->where("login", "bbocquillon", "OR", "filles")
 								->where("login", "btronquit", "OR", "filles")
 								->where("login", "pcaminel", "OR", "filles")
 								->where("login", "smazars", "OR", "filles");
