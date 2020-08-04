@@ -1158,6 +1158,19 @@ class souscription_cleodis extends souscription {
   }
 
 
+  /**
+   * Appel la fonction pour vérifier la validité du domaine d'un email
+   * @author Quentin JANON <qjanon@absystech.fr>
+   */
+  public function _checkDomainEmail($get) {
+    try {
+      mail::check_mail($get['email']);
+    } catch (errorATF $e) {
+      throw new errorATF("INVALID DOMAIN",500);
+    }
+    return true;
+  }
+
 }
 class souscription_bdomplus extends souscription_cleodis {
 
