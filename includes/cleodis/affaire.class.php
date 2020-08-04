@@ -2500,6 +2500,15 @@ class affaire_cleodis extends affaire {
 			$comite["validite_accord"] = date("Y-m-d");
 
 
+			ATF::user()->q->reset()->where("nom", "delattre");
+			$users = ATF::user()->select_all();
+
+			$notifie = array();
+			foreach ($users as $key => $value) {
+				$notifie[] = $value["id_user"];
+			}
+
+
 			$suivi = array(
 				 "id_societe"=>$id_societe
 				,"id_affaire"=>$devis["id_affaire"]
@@ -2508,7 +2517,7 @@ class affaire_cleodis extends affaire {
 				,"texte"=>"Création de l'affaire par :\n".$utilisateur["prenom"]." ".$utilisateur["nom"]."\nSociete ".ATF::societe()->select($utilisateur["id_societe"], "societe")
 				,'public'=>'oui'
 				,'suivi_societe'=>NULL
-				,'suivi_notifie'=>NULL
+				,'suivi_notifie'=>$notifie
 			);
 			$suivi["no_redirect"] = true;
 			ATF::suivi()->insert($suivi);
