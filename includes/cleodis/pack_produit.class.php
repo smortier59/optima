@@ -73,6 +73,7 @@ class pack_produit extends classes_optima {
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("EtatUpdate");
 		$this->addPrivilege("export_middleware");
+		$this->addPrivilege("csv_middleware");
 	}
 
 	/**
@@ -466,7 +467,7 @@ class pack_produit extends classes_optima {
 
 		$workbook = new PHPExcel;
 
-		$sheets = array("Packs","Packs-Produits","Produits");		
+		$sheets = array("Packs","Packs-Produits","Produits");
 
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
 
@@ -543,7 +544,7 @@ class pack_produit extends classes_optima {
 			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
 			$sheet->getColumnDimension($col)->setWidth($titre[1]);
 			$i++;
-        }		 
+        }
     	$i=0;
     	$j=2;
 		foreach ($packs as $k=>$v) {
@@ -595,7 +596,7 @@ class pack_produit extends classes_optima {
 			}
 	        $i=0;
 	        $j++;
-		}		    		
+		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
 
@@ -617,13 +618,25 @@ class pack_produit extends classes_optima {
      */
     public function export_middleware($infos,&$s){
     	ob_get_flush();
-		$this->setQuerier($s["pager"]->create($infos['onglet']));
+
+    	if($infos["onglet"] && str_replace("gsa_pack_produit_pack_produit", "", $infos["onglet"]) !== "") {
+    		$this->setQuerier($s["pager"]->create($infos['onglet']));
+    	}else{
+
+    		ATF::site_associe()->q->reset()->where("export_middleware", "oui");
+    		$site_associe_export = ATF::site_associe()->sa();
+    		$this->q->reset();
+    		foreach ($site_associe_export as $key => $value) {
+    			$this->q->where("site_associe", $value["site_associe"], "OR", "site_associe");
+    		}
+    	}
 		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
 		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
 		$data = $this->select_data($s,"saExport");
-		if (count($data) > 500) {
+		/*if (count($data) > 500) {
 			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
-		}
+		}*/
+
 
 		$packs = [];
 		$lignes = [];
@@ -651,7 +664,7 @@ class pack_produit extends classes_optima {
 				->addField("pack_produit.prolongation")
 				->addField("pack_produit.val_plancher")
 				->addField("pack_produit.val_plafond")
-				->addField("pack_produit.max_qte")       				
+				->addField("pack_produit.max_qte")
 				->where('id_pack_produit', $pack['id_pack_produit'])
 				->addOrder('id_pack_produit', 'DESC');
 	        $packs[] = ATF::pack_produit()->select_row();
@@ -698,8 +711,6 @@ class pack_produit extends classes_optima {
 		}
 		// Et maintenant les produits
 		foreach ($lignes as $l) {
-
-
 	        ATF::produit()->q->reset()
 				->addField("produit.id_produit")
 				->addField("produit.ref")
@@ -778,91 +789,146 @@ class pack_produit extends classes_optima {
 	        }
 		}
 
-	    // die('fuck it baby');
+		$site_associe = array();
 
-        require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
-		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
-
-		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
-
-		$workbook = new PHPExcel;
-
-		$sheets = array("Packs","Packs-Produits","Produits");		
-
-		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-
-
-        // Premier onglet
-        $sheet = $workbook->getActiveSheet();
-		$workbook->setActiveSheetIndex($key);
-	    $sheet->setTitle("Produits");
-
-	    $entetes = array_keys($produits[0]);
-	    $entetes = array_map(function ($el) {
-	    	return str_replace("produit.","",$el);
-	    }, $entetes);
-
-		$produitDedoublonne = [];
-		foreach ($produits as $p) { $produitDedoublonne[$p['produit.id_produit']] = $p; }
-		$produits = $produitDedoublonne;
-
-
-	    $sheet->fromArray($entetes, NULL, 'A1');
-		$sheet->fromArray($produits, NULL, 'A2');
-
-        // Second onglet
-        $sheet = $workbook->createSheet(1);
-		$workbook->setActiveSheetIndex($key);
-	    $sheet->setTitle("Packs");
-
-	    $entetes = array_keys($packs[0]);
-	    $entetes = array_map(function ($el) {
-	    	return str_replace("pack_produit.","",$el);
-	    }, $entetes);
-	    $sheet->fromArray($entetes, NULL, 'A1');
-		$sheet->fromArray($packs, NULL, 'A2');
-
-        // Troisième onglet
-        $sheet = $workbook->createSheet(2);
-		$workbook->setActiveSheetIndex($key);
-	    $sheet->setTitle("Lignes");
-
-	    $entetes = array_keys($lignes[0]);
-	    $entetes = array_map(function ($el) {
-	    	return str_replace("pack_produit_ligne.","",$el);
-	    }, $entetes);
-	    $sheet->fromArray($entetes, NULL, 'A1');
-		$sheet->fromArray($lignes, NULL, 'A2');
-
-
-		foreach ($workbook->getWorksheetIterator() as $worksheet) {
-
-		    $workbook->setActiveSheetIndex($workbook->getIndex($worksheet));
-
-		    $sheet = $workbook->getActiveSheet();
-		    $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
-		    $cellIterator->setIterateOnlyExistingCells(true);
-		    /** @var PHPExcel_Cell $cell */
-		    foreach ($cellIterator as $cell) {
-		        $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
-		    }
+		foreach ($packs as $key => $value) {
+			$site_associe[$value["pack_produit.site_associe"]][$value["pack_produit.id_pack_produit"]] = true ;
 		}
 
 
 
-		$writer = new PHPExcel_Writer_Excel5($workbook);
+		$zipname = 'middleware' . date("Ymd-Hi") . '.zip';
+		$zip = new ZipArchive;
+		$zip->open($zipname, ZipArchive::CREATE);
 
-		$writer->save($fname);
-		header('Content-type: application/vnd.ms-excel');
-		header('Content-Disposition:inline;filename=export_middleware-'.date("YmdHis").'.xls');
-		header("Cache-Control: private");
-		$fh=fopen($fname, "rb");
-		fpassthru($fh);
-		unlink($fname);
-		PHPExcel_Calculation::getInstance()->__destruct();
+		foreach ($site_associe as $key => $value) {
+			$file = $this->csv_middleware("Packs", $packs, $key, $site_associe);
+			$zip->addFile($file);
+			$this->csv_middleware_to_ftp($file);
+
+			$file = $this->csv_middleware("Produits", $produits, $key, $site_associe);
+			$zip->addFile($file);
+			$this->csv_middleware_to_ftp($file);
+
+			$file = $this->csv_middleware("Lignes", $lignes, $key, $site_associe);
+			$zip->addFile($file);
+			$this->csv_middleware_to_ftp($file);
+		}
+
+
+		$zip->close();
+
+		if($infos["export_from_batch"]){
+
+			return true;
+		}else{
+			header('Content-Type: application/zip');
+			header('Content-disposition: attachment; filename='.$zipname);
+			header('Content-Length: ' . filesize($zipname));
+			readfile($zipname);
+		}
+
+
 
 	}
 
+	public function csv_middleware($titre, $data, $site_associe, $pack_par_site_associe){
+
+
+		$fn = $titre . "-" . $site_associe . "-" . date("Ymd-Hi") . ".csv";
+        $fp = fopen($fn, 'w');
+
+		switch ($titre) {
+			case 'Produits':
+				$entetes = array_keys($data[0]);
+				$entetes = array_map(function ($el) {
+			    	return str_replace("produit.","",$el);
+			    }, $entetes);
+			    $produitDedoublonne = [];
+			    foreach ($data as $p) {
+			    	if($site_associe == $p["produit.site_associe"]){
+			    		$produitDedoublonne[$p['produit.id_produit']] = $p;
+			    	}
+			    }
+				$data = $produitDedoublonne;
+			break;
+
+			case 'Packs':
+				$entetes = array_keys($data[0]);
+			    $entetes = array_map(function ($el) {
+			    	return str_replace("pack_produit.","",$el);
+			    }, $entetes);
+
+			    $packs = [];
+
+			    foreach ($data as $key => $value) {
+			    	if($pack_par_site_associe[$site_associe][$value["pack_produit.id_pack_produit"]]){
+			    		$packs[] = $value;
+			    	}
+			    }
+			    $data = $packs;
+			break;
+
+
+			case 'Lignes':
+				$entetes = array_keys($data[0]);
+			    $entetes = array_map(function ($el) {
+			    	return str_replace("pack_produit_ligne.","",$el);
+			    }, $entetes);
+
+			    $lignes = [];
+			    foreach ($data as $key => $value) {
+			    	if($pack_par_site_associe[$site_associe][$value["pack_produit_ligne.id_pack_produit"]]){
+			    		$lignes[] = $value;
+			    	}
+			    }
+			    $data = $lignes;
+			break;
+		}
+
+		$entete_format = array();
+		$entete_format[0] = $entetes;
+
+		$data = array_merge($entete_format , $data);
+
+
+		foreach ($data as $fields => $value) {
+		    fputcsv($fp, $value, ";", '"');
+		}
+
+		fclose($fp);
+
+		return $fn;
+	}
+
+
+	public function csv_middleware_to_ftp($file){
+
+		// Mise en place d'une connexion basique
+		$conn_id  = ftp_connect(__MIDDLEWARE_FTP_HOST__,  __MIDDLEWARE_FTP_PORT__);
+
+
+		// Identification avec un nom d'utilisateur et un mot de passe
+		$login = ftp_login($conn_id ,__MIDDLEWARE_FTP_LOGIN__,__MIDDLEWARE_FTP_PASS__);
+
+		$mode = ftp_pasv($conn_id, TRUE);
+		if ((!$conn_id ) || (!$login)) {
+			log::logger('Echec de connection FTP sur '. __MIDDLEWARE_FTP_HOST__ . ' pour utilisateur '.__MIDDLEWARE_FTP_LOGIN__.'.', "upload_middleware");
+		}else{
+			log::logger('Connection FTP réussie.', "upload_middleware");
+			// Charge un fichier
+			if (ftp_put($conn_id, __MIDDLEWARE_FTP_FOLDER__.$file, $file, FTP_ASCII)) {
+				log::logger("Le fichier ". __MIDDLEWARE_FTP_FOLDER__.$file ." a été chargé avec succès", "upload_middleware");
+			} else {
+				log::logger("Il y a eu un problème lors du chargement du fichier ". $file, "upload_middleware");
+			}
+		}
+
+		// Fermeture de la connexion et du pointeur de fichier
+		ftp_close($conn_id);
+
+
+	}
 
 }
 
