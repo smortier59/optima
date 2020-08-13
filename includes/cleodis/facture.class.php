@@ -640,8 +640,7 @@ class facture_cleodis extends facture {
 			$infos["date_periode_debut"]=$infos["date_periode_debut_libre"];
 			$infos["date_periode_fin"]=$infos["date_periode_fin_libre"];
 
-
-
+			if($infos["type_libre"] == "contentieux") $infos["tva"] = 1;
 
 		}elseif($infos["type_facture"]=="midas"){
 			unset($infos_ligne_repris , $infos_ligne_non_visible , $infos_ligne);
