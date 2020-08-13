@@ -129,4 +129,88 @@
 
 	}
 
+},
+
+
+
+{
+	text: '{ATF::$usr->trans(import_facture_libre,facture)|escape:javascript}',
+	disabled: false,
+	handler: function(btn, ev) {
+		ATF.panelImport = new Ext.FormPanel({
+			frame: true,
+			width: 500,
+			fileUpload: true,
+			id: 'formImportFactureLibre',
+			items: [
+				{
+					xtype: "fileuploadfield",
+					fieldLabel: "Fichier d'import",
+					name: "file",
+					id: "file"
+				},{
+					xtype: 'panel',
+					id:'resultDiv'
+				}
+			],
+
+			buttons:[{
+				text : "Importer",
+				handler : function(){
+					Ext.getCmp('formImportFactureLibre').getForm().submit({
+						submitEmptyText:false,
+						method  : 'post',
+						waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
+						waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
+						url     : 'extjs.ajax',
+						params: {
+							'extAction':'facture'
+							,'extMethod':'import_facture_libre'
+						},
+						waitTitle:'Veuillez patienter',
+						waitMsg: 'Chargement ...',
+						timeout: 3600
+						, success:function(form, action) {
+							var r = Ext.util.JSON.decode(action.response.responseText);
+
+							var html = "";
+							if (r.warnings) {
+								html += "Certaines erreurs non bloquantes ont été détecté, le détail ci dessous : <br><br><ul>";
+								for (var d in r.warnings) {
+									html += "<li><b>Ligne(s) "+r.warnings[d]+"</b> : "+d+"</li>";
+								}
+								html += "</ul><br><br>";
+							}
+							html += "<b>L'export s'est bien déroulé, "+r.factureInserted+" factures insérées.</b>";
+							$('#resultDiv').html(html);
+
+						}
+						, failure:function(form, action) {
+							var r = Ext.util.JSON.decode(action.response.responseText);
+							var html = "Certaines erreurs ont rendu impossible l'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br><ul>";
+							for (var d in r.errors) {
+								html += "<li><b>Ligne(s) "+r.errors[d]+"</b> : "+d+"</li>";
+							}
+							html += "</ul><br><br>";
+
+							$('#resultDiv').html(html);
+						}
+					});
+				}
+			}]
+		});
+
+		ATF.unsetFormIsActive();
+
+		ATF.ImportWindow = new Ext.Window({
+			title: 'Import de facture libre',
+			id:'mymodalimport',
+			width: 510,
+			buttonAlign:'center',
+			autoScroll:false,
+			closable:true,
+			items: ATF.panelImport
+		}).show();
+
+	}
 }
