@@ -123,6 +123,9 @@ class facture_cleodis extends facture {
 		$this->addPrivilege("export_cegid");
 		$this->addPrivilege("export_cleofi");
 
+		$this->addPrivilege("import_facture_libre");
+
+
 
 
 		$this->field_nom="ref";
@@ -636,6 +639,10 @@ class facture_cleodis extends facture {
 			$infos["prix"]=$infos["prix_libre"];
 			$infos["date_periode_debut"]=$infos["date_periode_debut_libre"];
 			$infos["date_periode_fin"]=$infos["date_periode_fin_libre"];
+
+
+
+
 		}elseif($infos["type_facture"]=="midas"){
 			unset($infos_ligne_repris , $infos_ligne_non_visible , $infos_ligne);
 			$infos["prix"]=$infos["prix_midas"];
@@ -2316,6 +2323,259 @@ class facture_cleodis extends facture {
 		fpassthru($fh);
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
+
+
+	public function import_facture_libre(&$infos,&$s,$files=NULL) {
+
+
+		$infos['display'] = true;
+		$path = $files['file']['tmp_name'];
+
+		$facture_insert = 0;
+		$erreurs = array();
+		$warnings["150 - Enregistrement(s) déjà existant(s)"].", ";
+
+		$f = fopen($path,"r");
+
+	    // Vérification des colonnes
+	    $cols = fgetcsv($f, 1, ";");
+
+		ATF::db($this->db)->begin_transaction();
+
+		$lineCompteur = 0;
+    	while (($data = fgetcsv($f, 10000, ";")) !== FALSE) {
+			$lineCompteur++;
+			if ($lineCompteur==1) {
+				$entetes = $data;
+				continue;
+
+			}
+
+			if( !$data[2] ) continue;
+
+			$data = array_map("utf8_encode",$data);
+
+			try {
+
+				$col_ref_affaire = array_keys($entetes , "ef_affaire");
+
+				ATF::affaire()->q->reset()->addField("affaire.id_societe")->where("affaire.ref", $data[$col_ref_affaire[0]]);
+				$affaire = ATF::affaire()->select_row();
+
+
+				if($affaire){
+					ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire"]);
+					$commande = ATF::commande()->select_row();
+
+
+					$facture = array(
+						"type_facture" => "libre",
+						"id_societe" => $affaire["affaire.id_societe_fk"],
+						"id_affaire" => $affaire["affaire.id_affaire"],
+						"id_commande" => $commande["commande.id_commande"],
+					);
+
+
+					foreach ($data as $key => $value) {
+
+						switch ($entetes[$key]) {
+
+							case 'commentaire' :
+							case 'nature' :
+							case 'redevance' :
+							case 'ref_externe' :
+								$facture[$entetes[$key]] = $value;
+							break;
+
+							case 'type_libre' :
+								$facture[$entetes[$key]] = $value;
+							break;
+
+							case 'ef_affaire' :
+							break;
+
+							case 'mode de paiement' :
+								$facture["mode_paiement"] = $value;
+							break;
+
+							case 'periode_debut' :
+							case 'date' :
+							case 'periode_fin' :
+								if(strpos($value , "/")){
+									$date = explode("/" , $value);
+									$date = $date[2]."-".$date[1]."-".$date[0];
+								}else{
+									$date = $value;
+								}
+
+								if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
+								if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
+								if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+							break;
+
+
+							case 'total_ht' :
+								$facture["prix_libre"] = $value;
+							break;
+
+							default:
+							break;
+						}
+
+
+
+					}
+
+					$fields=[
+						  "produit"
+						, "quantite"
+						, "ref"
+						, "id_fournisseur"
+						, "prix_achat"
+						, "code"
+						, "id_produit"
+						, "serial"
+					];
+
+					ATF::commande_ligne()->q->reset()
+								->addField(util::keysOrValues($fields))
+								->where("id_commande", $commande["commande.id_commande"])
+								->where("id_affaire_provenance",null,null,false,"IS NULL")
+								->where("visible_pdf","oui");
+
+					$return = array();
+					if ($ligneVisible = ATF::commande_ligne()->select_all() ) {
+
+						foreach ($ligneVisible as $kRow => $row) {
+							foreach ($row as $kCol => $value) {
+								if($kCol != "commande_ligne.id_commande_ligne"){
+									if(strpos($kCol, "id_") !== false){
+										$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+										$return[$kRow]["facture_ligne.".$kCol]=$value;
+									}else{
+										$return[$kRow]["facture_ligne.".$kCol]=$value;
+									}
+								}
+							}
+							$return[$kRow]["facture_ligne.afficher"]="oui";
+						}
+						$ligneVisible = $return;
+					}
+
+					ATF::commande_ligne()->q->reset()
+								->addField(util::keysOrValues($fields))
+								->where("id_commande", $commande["commande.id_commande"])
+								->where("id_affaire_provenance",null,null,false,"IS NOT NULL")->setView(["order"=>$fields]);
+					$return = array();
+					if ($ligneRepris = ATF::commande_ligne()->select_all() ) {
+						foreach ($ligneRepris as $kRow => $row) {
+							foreach ($row as $kCol => $value) {
+								if($kCol != "commande_ligne.id_commande_ligne"){
+									if(strpos($kCol, "id_") !== false){
+										$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+										$return[$kRow]["facture_ligne.".$kCol]=$value;
+									}else{
+										$return[$kRow]["facture_ligne.".$kCol]=$value;
+									}
+								}
+							}
+							$return[$kRow]["facture_ligne.afficher"]="oui";
+						}
+						$ligneRepris = $return;
+					}
+
+					ATF::commande_ligne()->q->reset()
+								->addField(util::keysOrValues($fields))
+								->where("id_commande", $commande["commande.id_commande"])
+								->where("id_affaire_provenance",null,null,false,"IS NULL")
+								->where("visible_pdf","non")->setView(["order"=>$fields]);
+					$return = array();
+					if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
+						foreach ($ligneNonVisible as $kRow => $row) {
+							if($kCol != "commande_ligne.id_commande_ligne"){
+								if(strpos($kCol, "id_")  !== false ){
+									$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+									$return[$kRow]["facture_ligne.".$kCol]=$value;
+								}else{
+									$return[$kRow]["facture_ligne.".$kCol]=$value;
+								}
+							}
+							$return[$kRow]["facture_ligne.afficher"]="oui";
+						}
+						$ligneNonVisible = $return;
+					}
+
+					$this->insert(array("facture"=> $facture,
+										"values_facture" =>
+											array(
+												"produits_repris" => json_encode($ligneRepris) ,
+												"produits" => json_encode($ligneVisible) ,
+												"produits_non_visible" => json_encode($ligneNonVisible) ,
+											)
+										)
+								);
+					$facture_insert ++;
+
+				}else{
+					$erreurs["Affaire non trouvée (".$data[$col_ref_affaire[0]].")"] .= $lineCompteur.", ";
+				}
+
+				/*[values_facture] => Array
+				        (
+				            [loyer] => [{"loyer__dot__loyer":"250.00","loyer__dot__duree":"10","loyer__dot__type":"engagement","loyer__dot__assurance":null,"loyer__dot__frais_de_gestion":null,"loyer__dot__frequence_loyer":"mois","loyer__dot__serenite":"0.00","loyer__dot__maintenance":"0.00","loyer__dot__hotline":"0.00","loyer__dot__supervision":"0.00","loyer__dot__support":"0.00","loyer__dot__avec_option":"non"}]
+				            [produits_repris] =>
+				            [produits] => [{"facture_ligne__dot__produit":"MAC BOOK PRO 2.16GHZ","facture_ligne__dot__quantite":"1","facture_ligne__dot__ref":"APP-POR-MCBO","facture_ligne__dot__id_fournisseur":"EXTREMIT","facture_ligne__dot__id_fournisseur_fk":"3491f516a08e6386988a51b4e7cc3903","facture_ligne__dot__prix_achat":"1694.00","facture_ligne__dot__id_produit":"MAC BOOK PRO 2.16GHZ","facture_ligne__dot__id_produit_fk":"098d535710b71ad1486089e5e4075bc2","facture_ligne__dot__serial":null,"facture_ligne__dot__afficher":"oui","facture_ligne__dot__id_facture_ligne":"60ba8ed058966b5e52381fd8cb8ab209"}]
+				            [produits_non_visible] => [{"facture_ligne__dot__produit":"Cession fin de contrat","facture_ligne__dot__quantite":"1","facture_ligne__dot__ref":"REFI-CESSION-SGEF","facture_ligne__dot__id_fournisseur":"FRANFINANCE LOCATION","facture_ligne__dot__id_fournisseur_fk":"398978d69cb9f0319c9cccc51d984c1e","facture_ligne__dot__prix_achat":"0.00","facture_ligne__dot__id_produit":"Cession fin de contrat","facture_ligne__dot__id_produit_fk":"ec7b3d52cc6c347790d5fec5c8e13629","facture_ligne__dot__serial":null,"facture_ligne__dot__id_facture_ligne":"3a6b9cb76b7abbe928c5b8e807ecd42c"},{"facture_ligne__dot__produit":"Cession fin de contrat","facture_ligne__dot__quantite":"1","facture_ligne__dot__ref":"REFI-CESSION-BNP","facture_ligne__dot__id_fournisseur":"BNP PARIBAS LEASE GROUP","facture_ligne__dot__id_fournisseur_fk":"d41f3766b12964983c4bda8826033139","facture_ligne__dot__prix_achat":"0.00","facture_ligne__dot__id_produit":"Cession fin de contrat","facture_ligne__dot__id_produit_fk":"6a8d1e5c4857e388b363911dbcec305d","facture_ligne__dot__serial":null,"facture_ligne__dot__id_facture_ligne":"8a97eea404964a988ec447019e18a9cb"},{"facture_ligne__dot__produit":"Frais de dossier","facture_ligne__dot__quantite":"1","facture_ligne__dot__ref":"REFI-ETUDE-SGEF","facture_ligne__dot__id_fournisseur":"FRANFINANCE LOCATION","facture_ligne__dot__id_fournisseur_fk":"398978d69cb9f0319c9cccc51d984c1e","facture_ligne__dot__prix_achat":"0.00","facture_ligne__dot__id_produit":"Frais de dossier","facture_ligne__dot__id_produit_fk":"f172d1466b52c154fd29049750ff36bc","facture_ligne__dot__serial":null,"facture_ligne__dot__id_facture_ligne":"f6ba24cb827bdaf293e5b6952b116441"},{"facture_ligne__dot__produit":"Frais d'étude","facture_ligne__dot__quantite":"1","facture_ligne__dot__ref":"REFI-ETUDE-BNP","facture_ligne__dot__id_fournisseur":"BNP PARIBAS LEASE GROUP","facture_ligne__dot__id_fournisseur_fk":"d41f3766b12964983c4bda8826033139","facture_ligne__dot__prix_achat":"0.00","facture_ligne__dot__id_produit":"Frais d'étude","facture_ligne__dot__id_produit_fk":"bb2b11d502e015aef8e76f253646015c","facture_ligne__dot__serial":null,"facture_ligne__dot__id_facture_ligne":"0edae9747a0b611ebea68b901ff3a432"}]
+				        )*/
+
+
+
+
+
+			} catch (errorATF $e) {
+
+				$msg = $e->getMessage();
+
+				if (preg_match("/generic message : /",$msg)) {
+				  $tmp = json_decode(str_replace("generic message : ","",$msg),true);
+				  $msg = $tmp['text'];
+				}
+
+		        if ($e->getErrno()==1062) {
+		          if ($infos['ignore']) {
+		              $warnings[$e->getErrno()." - Enregistrement(s) déjà existant(s)"] .= $lineCompteur.", ";
+		          } else {
+		              $erreurs[$e->getErrno()." - Enregistrement(s) déjà existant(s)"] .= $lineCompteur.", ";
+		          }
+		        } else {
+		            $erreurs[$e->getErrno()." - ".$msg] .= $lineCompteur.", ";
+		        }
+			}
+
+
+	    }
+
+    	fclose($handle);
+
+
+		if (!empty($erreurs)) {
+	      $return['errors'] = $erreurs;
+	      $return['success'] = false;
+	      ATF::db($this->db)->rollback_transaction();
+	    } else {
+	      $return['warnings'] = $warnings;
+
+	      $return['success'] = true;
+	      $return["factureInserted"] = $facture_insert;
+	      //ATF::db($this->db)->rollback_transaction();
+
+	      ATF::db($this->db)->commit_transaction();
+	    }
+
+
+		return json_encode($return);
 	}
 
 };
