@@ -15,7 +15,9 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 			,'bon_de_commande_ligne.ref'
 			,'bon_de_commande_ligne.produit'
 			,'bon_de_commande_ligne.quantite'
-			,'bon_de_commande_ligne.prix'=>array("renderer"=>"money")
+			,'bon_de_commande_ligne.prix'=>array("renderer"=>"money"),
+			'bon_de_commande_ligne.caracteristique'
+
 		);
 
 		$this->colonnes['primary'] = array(
@@ -24,6 +26,7 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 			,'produit'
 			,'quantite'
 			,'prix'
+			,'caracteristique'
 		);
 
 		$this->colonnes['ligne'] =  array(
@@ -31,6 +34,7 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 			,"bon_de_commande_ligne.quantite"
 			,"bon_de_commande_ligne.ref"
 			,"bon_de_commande_ligne.prix"
+			,"bon_de_commande_ligne.caracteristique"
 		);
 
 		$this->controlled_by = "bon_de_commande";
@@ -141,6 +145,7 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 			foreach ($sa["data"] as $kRow => $row) {
 				$id_commande_ligne=$this->select($row["bon_de_commande_ligne.id_bon_de_commande_ligne"],"id_commande_ligne");
 				$commande_ligne=ATF::commande_ligne()->select($id_commande_ligne);
+				
 				$type=ATF::produit()->select($commande_ligne["id_produit"],"type");
 				if((!$commande_ligne["id_affaire_provenance"] && $type!="sans_objet") && $commande_ligne){
 
@@ -201,6 +206,7 @@ class bon_de_commande_ligne_midas extends bon_de_commande_ligne_cleodis {
 			,'bon_de_commande_ligne.produit'
 			,'bon_de_commande_ligne.quantite'
 			,'bon_de_commande_ligne.prix'=>array("renderer"=>"money")
+			,'bon_de_commande_ligne.caracteristique'
 		);
 
 		$this->fieldstructure();
