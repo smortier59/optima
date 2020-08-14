@@ -208,8 +208,9 @@ class parc_cleodis extends classes_optima {
 	* @param array $commande_ligne
 	*/
 	public function insertParcSerial($item,$commande_ligne){
+		
 		$type=ATF::produit()->select($item["id_produit"],"type");
-
+		
 		if(!$item["serial"]){
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Il faut un serial pour le produit ".$item["produit"],883);
@@ -218,6 +219,7 @@ class parc_cleodis extends classes_optima {
 		//Parcs, insertion des parcs uniquement s'ils ne proviennent pas d'une affaire (car déjà présent)
 		$affaire=ATF::affaire()->select(ATF::commande()->select($commande_ligne["id_commande"],"id_affaire"));
 
+		
 		if(!$affaire["date_garantie"]){
 			ATF::db($this->db)->rollback_transaction();
 			throw new errorATF("Il n'y a pas de date de garantie pour cette affaire",880);
@@ -231,6 +233,8 @@ class parc_cleodis extends classes_optima {
 			throw new errorATF("Le serial ".$item["serial"]." n'est pas valide car il est déjà utilisé par le parc '".$countParc["data"][0]["libelle"]."' de l'affaire '".ATF::affaire()->nom($countParc["data"][0]["id_affaire"])."'",881);
 		}
 
+		
+
 		$serial["id_societe"]=$affaire["id_societe"];
 		$serial["id_affaire"]=$affaire["id_affaire"];
 		if($affaire["nature"]=="vente"){
@@ -238,13 +242,19 @@ class parc_cleodis extends classes_optima {
 		}else{
 			$serial["etat"]="loue";
 		}
+
+		
 		$serial["date_garantie"]=$affaire["date_garantie"];
 		$serial["serial"]=$item["serial"];
 		$serial["libelle"]=$item["produit"];
 		$serial["ref"]=$item["ref"];
+		$serial["caracteristique"]=$item["caracteristique"];
+		
 		$serial["id_produit"]=$item["id_produit"];
 		$serial["existence"]="actif";
-
+		 
+	   
+		
 		// On met à jour le serial de contrat ssi il n'est pas encore présent dedans
 		if (!(strpos($commande_ligne["serial"], $item["serial"]) !== false)) {
 			$commande_ligne["serial"].=" ".$item["serial"];
@@ -321,7 +331,9 @@ class parc_cleodis extends classes_optima {
 	* @param array $cadre_refreshed Eventuellement des cadres HTML div à rafraichir...
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
+		
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
+	
 		$this->infoCollapse($infos);
 
 		$id_affaire=ATF::bon_de_commande()->select($infos["id_bon_de_commande"],"id_affaire");
@@ -338,6 +350,7 @@ class parc_cleodis extends classes_optima {
 				$item["id_bon_de_commande_ligne"]=$item["id_parc"];
 				$item["index"]=util::extJSEscapeDot($key);
 				$bon_de_commande_ligne=ATF::bon_de_commande_ligne()->select($item["id_bon_de_commande_ligne"]);
+				$item['caracteristique'] = $bon_de_commande_ligne['caracteristique'];
 				$commande_ligne=ATF::commande_ligne()->select($bon_de_commande_ligne["id_commande_ligne"]);
 				$item["id_produit"]=ATF::commande_ligne()->select($bon_de_commande_ligne["id_commande_ligne"],"id_produit");
 				unset($item["id_facture_fournisseur_ligne"]);

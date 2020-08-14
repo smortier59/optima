@@ -12,6 +12,7 @@ class commande_ligne_cleodis extends commande_ligne {
 		$this->colonnes['fields_column'] = array(
 			 'commande_ligne.produit'
 			,'commande_ligne.quantite'
+			,'commande_ligne.caracteristique'
 			,'commande_ligne.ref'
 			,'commande_ligne.neuf'
 			,"commande_ligne.frequence_fournisseur"
@@ -31,6 +32,7 @@ class commande_ligne_cleodis extends commande_ligne {
 			"commande_ligne.id_produit"=>array("hidden"=>true)
 			,"commande_ligne.produit"
 			,"commande_ligne.quantite"
+			,'commande_ligne.caracteristique'
 			,"commande_ligne.ref"
 			,"commande_ligne.id_fournisseur"
 			,"commande_ligne.prix_achat"
@@ -78,6 +80,7 @@ class commande_ligne_midas extends commande_ligne_cleodis {
 		$this->colonnes['fields_column'] = array(
 			 'commande_ligne.produit'
 			,'commande_ligne.quantite'
+			,'commande_ligne.caracteristique'
 			,'commande_ligne.ref'
 		);
 
