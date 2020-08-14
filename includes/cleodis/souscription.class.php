@@ -150,9 +150,7 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
 
-        log::logger($post , "mfleurquin");
-        log::logger($libelle , "mfleurquin");
-
+        
 
         $id_devis = $this->createDevis($post, $libelle);
 
@@ -371,7 +369,9 @@ class souscription_cleodis extends souscription {
         "prix_achat"=>0,
         "type_affaire" => "normal",
         "IBAN"=> $post["iban"],
-        "BIC"=> $post["bic"]
+        "BIC"=> $post["bic"],
+        "commentaire" =>$post['commentaire']
+
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
@@ -406,6 +406,7 @@ class souscription_cleodis extends souscription {
 
 
     foreach ($produits as $k=>$produit) {
+        
         ATF::produit()->q->reset()
           ->addField("loyer")
           ->addField("duree")
@@ -415,8 +416,10 @@ class souscription_cleodis extends souscription {
           ->addField("prix_achat")
           ->addField("id_fournisseur")
           ->where("id_produit", $produit['id_produit']);
+          
         $produitLoyer = ATF::produit()->select_row();
 
+         
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
 
@@ -482,7 +485,8 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
             "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_sur_pdf'],
             "devis_ligne__dot__ordre"=>$produitLoyer['ordre'],
-            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur']
+            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur'],
+            "devis_ligne__dot__caracteristique"=>$produit['caracteristique']
           );
         }
 
@@ -518,6 +522,8 @@ class souscription_cleodis extends souscription {
   private function createContrat($post, $libelle, $id_devis, $id_affaire) {
     ATF::devis_ligne()->q->reset()->where('id_devis', $id_devis);
     $lignesDevis = ATF::devis_ligne()->select_all();
+
+    log::logger($lignesDevis,"dsarr");
 
     $commande =array(
         "commande" => $libelle,
@@ -558,7 +564,8 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
           "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
           "commande_ligne__dot__frequence_fournisseur"=>$value['frequence_fournisseur'],
-          "commande_ligne__dot__ordre"=>$value['ordre']
+          "commande_ligne__dot__ordre"=>$value['ordre'],
+          "commande_ligne__dot__caracteristique"=>$value['caracteristique']
       );
       $commande["prix_achat"] += ($value["prix_achat"] * $value["quantite"]);
     }

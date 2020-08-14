@@ -617,6 +617,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}
 
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
+		
+		
 
 		$prix_total = 0;
 		foreach($infos_bon_de_commande_ligne as $key=>$item){
@@ -626,6 +628,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 			$bon_de_commande_ligne["ref"]=$commande_ligne["ref"];
 			$bon_de_commande_ligne["produit"]=$commande_ligne["produit"];
 			$bon_de_commande_ligne["quantite"]=1;
+			$bon_de_commande_ligne["caracteristique"]=$commande_ligne["caracteristique"];
+			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"];
 			$bon_de_commande_ligne["prix"]=$commande_ligne["prix_achat"];
 			$prix_total += $bon_de_commande_ligne["prix"]*$bon_de_commande_ligne["quantite"];
 			ATF::bon_de_commande_ligne()->i($bon_de_commande_ligne);
