@@ -523,8 +523,6 @@ class souscription_cleodis extends souscription {
     ATF::devis_ligne()->q->reset()->where('id_devis', $id_devis);
     $lignesDevis = ATF::devis_ligne()->select_all();
 
-    log::logger($lignesDevis,"dsarr");
-
     $commande =array(
         "commande" => $libelle,
         "type" => "prelevement",
