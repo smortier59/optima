@@ -173,6 +173,8 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
 		$this->foreign_key['id_apporteur'] =  "societe";
+		// $this->foreign_key['id_type_affaire'] = "type_affaire_params";
+		// $this->foreign_key['id_societe'] = "type_affaire_params";
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
@@ -2523,6 +2525,11 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+        
+		ATF::type_affaire()->q->reset()->where('type_affaire',"LAFI");
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
 		$utilisateur  = ATF::$usr->get("contact");
 
 		ATF::db($this->db)->begin_transaction();
@@ -2554,9 +2561,14 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>ATF::$usr->getID(),
-			  "type_affaire" => "normal",
-			  "langue"=>ATF::societe()->select($id_societe, "langue")
+			  "type_affaire" =>$type_affaire['type_affaire'],
+		      "id_type_affaire"=>$type_affaire['id_type_affaire'],
+			  "langue"=>ATF::societe()->select($id_societe, "langue"),
+			  
 			);
+			unset($devis['id_type_affaire']);
+
+			
 
 			$values_devis =array();
 
@@ -2605,7 +2617,35 @@ class affaire_cleodis extends affaire {
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-          
+			
+			//log::logger($devis['id_affaire'],"dsarr");
+			
+			//recuperation de l'id de la societe 
+			$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+
+            //insertion des id societet et id_type_affaire à voir si cette requete d'insertion est necessaire
+			// ATF::type_affaire_params()->insert(array(
+			// 	"id_type_affaire"=>$post["id_type_affaire"],
+			// 	"id_societe"=>$id_societe
+			// ));
+
+			//recuperation de type_affaire_params
+			//$type_affaire_params = type_affaire_params()->q->reset()->where('id_societe',$id_societe);
+
+			//recuperation du nouveau type d'affaire
+			//$type_affaire = ATF::type_affaire()->q->reset()->addField("type_affaire")
+									   //->where('type_affaire.id_type_affaire',$type_affaire_params['id_type_affaire']);
+
+			//log::logger($type_affaire,"dsarr");
+			//mise à jour de la table affaire , en modifiant le type d'affaire
+
+			// if($type_affaire){
+			// 	ATF::affaire()->u(array('id_type_affaire'=>$type_affaire['id_type_affaire'],'id_partenaire'=>$id_societe,'type_affaire'=>$type_affaire['type_affaire']))->where('id_affaire',$devis['id_affaire']);
+			// }
+
+			
+
+			//log::logger(ATF::affaire()->q->reset()->where('id_type_affaire',$type_affaire['id_type_affaire']));
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2618,16 +2658,12 @@ class affaire_cleodis extends affaire {
 				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
 			}
 
-			log::logger("test d\affichage du code client partenaire"." ".$code_client_partenaire,'code_client');
 			
-			
-
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client'); 
-
+			
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
           
 			//Envoi du mail
