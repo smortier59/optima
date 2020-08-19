@@ -45,6 +45,7 @@ class pdf_cleodis extends pdf {
 
 
 	public function initLogo($type_affaire){
+		log::logger($type_affaire,"dsarr");
 		switch ($type_affaire) {
 			case '2SI' :
 				$this->cleodis = "2SI Lease by CLEODIS";
@@ -576,10 +577,11 @@ class pdf_cleodis extends pdf {
 	* @param int $id Id du devis
 	*/
 	public function devis($id,$s) {
-
+        
 		$this->devis = ATF::devis()->select($id);
+		log::logger('je suis dans devis','dsarr');
 		$this->loyer = ATF::loyer()->ss('id_affaire',$this->devis['id_affaire']);
-
+		
 		ATF::devis_ligne()->q->reset()->where("visible","oui")->where("id_devis",$this->devis['id_devis']);
 		if(ATF::$codename == "cleodis") ATF::devis_ligne()->q->where("visible_pdf","oui");
 
@@ -590,9 +592,19 @@ class pdf_cleodis extends pdf {
 		$this->client = ATF::societe()->select($this->devis['id_societe']);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
+		
+        ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		
+		//log::logger($this->type_affaire,"dsarr");
+
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
 
-		$this->initLogo($this->affaire["type_affaire"]);
+		//$this->initLogo($this->affaire["type_affaire"]);
+
+		$this->initLogo($type_affaire['type_affaire']);
 
 
 		if($this->devis["type_devis"] === "optic_2000"){
@@ -1423,7 +1435,12 @@ class pdf_cleodis extends pdf {
 		$this->sety(10);
 		$this->setfont('arial','B',14);
 		$this->RoundedRect(15,10,140,25,5);
-		if($this->affaire["type_affaire"] == "2SI") $this->multicell(140,6,"Proposition locative 2SI Lease by CLEODIS",0,'C');
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+		if($type_affaire["type_affaire"] == "2SI") $this->multicell(140,6,"Proposition locative 2SI Lease by CLEODIS",0,'C');
 		else $this->multicell(140,6,"Proposition locative CLEODIS",0,'C');
 		$this->multicell(140,6,"pour ".$this->client['societe'],0,'C');
 		$this->multicell(140,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
@@ -1652,8 +1669,14 @@ class pdf_cleodis extends pdf {
 		if ($this->affaire['nature']=="AR") {
 			$this->AR = ATF::affaire()->getParentAR($this->affaire['id_affaire']);
 		}
+		
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		$type_affaire = ATF::type_affaire()->select_row();
+		
+		//ancienne code $this->affaire['type_affaire']
+
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 	}
 
 	/** Renvoi le detail d'un produit par rapport a ses informations
@@ -1747,11 +1770,16 @@ class pdf_cleodis extends pdf {
 
 		$this->commandeInit($id);
 		$this->A3 = true;
+		
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		$type_affaire = ATF::type_affaire()->select_row();
+		//$this->initLogo($this->affaire["type_affaire"]);
 
-		$this->initLogo($this->affaire["type_affaire"]);
+		$this->initLogo($this->type_affaire["type_affaire"]);
 
-		if($this->affaire["type_affaire"] == "normal"){
+		//if($this->affaire['type_affaire']);
+		if($this->type_affaire["type_affaire"] == "normal"){
 			$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
 		}else{
 			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
@@ -2181,7 +2209,7 @@ class pdf_cleodis extends pdf {
 		$this->A3 = false;
 		$this->A4 = true;
 
-		$this->initLogo($this->affaire["type_affaire"]);
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
 
 		$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
@@ -2585,10 +2613,16 @@ class pdf_cleodis extends pdf {
   }
 
   public function contratA4Particulier($id, $signature,$sellsign) {
+	
+	ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+    $type_affaire = ATF::type_affaire()->select_row();
 
-  	$this->initLogo($this->affaire["type_affaire"]);
+	//$this->initLogo($this->affaire["type_affaire"]);
+	  $this->initLogo($this->type_affaire["type_affaire"]);
 
-	if($this->affaire["type_affaire"] == "2SI"){
+	//$this->affaire['type_affaire'];
+
+	if($type_affaire["type_affaire"] == "2SI"){
 	  $this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",5,8,55);
 	} else{
 	  $this->image(__PDF_PATH__."/".$this->logo,10,10,40);
@@ -2936,7 +2970,15 @@ class pdf_cleodis extends pdf {
 	public function contratPV($id,$s,$previsu) {
 		$this->commandeInit($id,$s,$previsu);
 
-		switch ($this->affaire["type_affaire"]) {
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+		$type_affaire = ATF::type_affaire()->select_row();
+		
+		log::logger($type_affaire,"dsarr");
+		log::logger($type_affaire['type_affaire'],"dsarr");
+
+		//switch $this->affaire['type_affaire']
+		
+		switch ($type_affaire["type_affaire"]) {
 			case '2SI' :
 				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
 			break;
@@ -3023,7 +3065,15 @@ class pdf_cleodis extends pdf {
 	*/
 	public function contratPVSignature($id,$s,$previsu) {
 		$this->commandeInit($id,$s,$previsu);
-		switch ($this->affaire["type_affaire"]) {
+
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+		$type_affaire = ATF::type_affaire()->select_row();
+		
+		log::logger($type_affaire,"dsarr");
+		log::logger($type_affaire['type_affaire'],"dsarr");
+
+		//switch via $this->affaire l'ancien code
+		switch ($type_affaire["type_affaire"]) {
 			case '2SI' :
 				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
 			break;
@@ -3295,8 +3345,12 @@ class pdf_cleodis extends pdf {
 	* @date 11-02-2011
 	*/
 	public function contratPVSociete($id,$signature=false) {
+        ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
-		$this->initLogo($this->affaire["type_affaire"]);
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire] comme argument de la fonction
+		$this->initLogo($type_affaire["type_affaire"]);
 
 		$this->image(__PDF_PATH__."/".$this->logo,4,5,35);
 
@@ -3763,6 +3817,15 @@ class pdf_cleodis extends pdf {
 		$this->open();
 		$this->addpage();
 
+		log::logger($this->affaire,"dsarr");
+
+        ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		log::logger($type_affaire,'dsarr');
+		log::logger($type_affaire['type_affaire'],'dsarr');
+		
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
 		} else if(ATF::$codename != "cleodis"){
@@ -6037,7 +6100,12 @@ class pdf_cleodis extends pdf {
 		ATF::relance_facture()->q->reset()->where('id_relance',$this->relance['id_relance'])->setCount();
 		$this->factures = ATF::relance_facture()->sa();
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+		
+		//ancienne code $this->affaire['type_affaire']
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6226,8 +6294,13 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6317,7 +6390,12 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6399,7 +6477,12 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6460,7 +6543,12 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6540,7 +6628,12 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire]
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6591,8 +6684,13 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
+		
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -6671,7 +6769,13 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		ATF::loyer()->q->reset()->where("id_affaire", $this->devis['id_affaire']);
 		$this->loyer = ATF::loyer()->select_all();
@@ -7023,8 +7127,13 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
 
@@ -7174,8 +7283,13 @@ class pdf_cleodis extends pdf {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+   
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
-		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->open();
 		$this->addpage();
@@ -10871,8 +10985,12 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->devis = ATF::devis()->select($this->commande["id_devis"]);
 		$this->affaire = ATF::affaire()->select($this->devis["id_affaire"]);
 		$this->contact = ATF::contact()->select($this->devis['id_contact']);
+		
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		$type_affaire = ATF::type_affaire()->select_row();
 
+		//ancienne code $this->affaire['type_affaire]
 		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
