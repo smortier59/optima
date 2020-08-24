@@ -878,7 +878,7 @@ class facture_cleodis extends facture {
 				$this->u(array("id_facture"=>$infos["id_facture"], "etat"=>"impayee"));
 
 				if(!stripos($etatCommande, "contentieux")){
-					if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution"){
+					if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution" || $etatCommande === "arreter"){
 						$etatCommande = $etatCommande."_contentieux";
 
 
@@ -892,6 +892,8 @@ class facture_cleodis extends facture {
 						$etatCommande = "prolongation";
 					}elseif( $etatCommande === "restitution_contentieux"){
 						$etatCommande = "restitution";
+					}elseif( $etatCommande === "arreter_contentieux"){
+						$etatCommande = "arreter";
 					}
 				}
 			}
