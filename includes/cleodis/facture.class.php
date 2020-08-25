@@ -910,6 +910,10 @@ class facture_cleodis extends facture {
 					,ATF::$usr->trans("notice_success_title")
 				);
 			}
+
+			log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
+			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_".$this->table]) , "id_societe"));
+
 			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
 
@@ -920,6 +924,7 @@ class facture_cleodis extends facture {
 		}else{
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
+
 	}
 
 
