@@ -3,6 +3,12 @@
 * @package Optima
 * @subpackage Cléodis
 */
+require __ABSOLUTE_PATH__ . 'libs/ATF/libs/phpseclib/vendor/autoload.php';
+use phpseclib\Net\SFTP as SFTP;
+
+
+
+
 class pack_produit extends classes_optima {
 	// Mapping prévu pour un autocomplete sur produit
 	public static $autocompleteMapping = array(
@@ -1166,30 +1172,34 @@ class pack_produit extends classes_optima {
 
 
 	public function csv_middleware_to_ftp($file){
+		try{
+			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__);
+			//log::logger($sftp , "upload_middleware");
 
-		// Mise en place d'une connexion basique
-		$conn_id  = ftp_connect(__MIDDLEWARE_FTP_HOST__,  __MIDDLEWARE_FTP_PORT__);
+			/*log::logger(__MIDDLEWARE_FTP_HOST__ , "upload_middleware");
+			log::logger(__MIDDLEWARE_FTP_PORT__ , "upload_middleware");
 
+			log::logger(__MIDDLEWARE_FTP_LOGIN__ , "upload_middleware");
+			log::logger(__MIDDLEWARE_FTP_PASS__ , "upload_middleware");*/
 
-		// Identification avec un nom d'utilisateur et un mot de passe
-		$login = ftp_login($conn_id ,__MIDDLEWARE_FTP_LOGIN__,__MIDDLEWARE_FTP_PASS__);
-
-		$mode = ftp_pasv($conn_id, TRUE);
-		if ((!$conn_id ) || (!$login)) {
-			log::logger('Echec de connection FTP sur '. __MIDDLEWARE_FTP_HOST__ . ' pour utilisateur '.__MIDDLEWARE_FTP_LOGIN__.'.', "upload_middleware");
-		}else{
-			log::logger('Connection FTP réussie.', "upload_middleware");
-			// Charge un fichier
-			if (ftp_put($conn_id, __MIDDLEWARE_FTP_FOLDER__.$file, $file, FTP_ASCII)) {
-				log::logger("Le fichier ". __MIDDLEWARE_FTP_FOLDER__.$file ." a été chargé avec succès", "upload_middleware");
-			} else {
-				log::logger("Il y a eu un problème lors du chargement du fichier ". $file, "upload_middleware");
+			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__, __MIDDLEWARE_FTP_PORT__);
+			if (!$sftp->login(__MIDDLEWARE_FTP_LOGIN__, __MIDDLEWARE_FTP_PASS__)) {
+			    log::logger("Login failed" , "upload_middleware");
+			}else{
+				log::logger("Login success" , "upload_middleware");
 			}
+
+			log::logger("File remote" , "upload_middleware");
+			log::logger(__MIDDLEWARE_FTP_FOLDER__.$file , "upload_middleware");
+
+			log::logger("File local" , "upload_middleware");
+			log::logger($file , "upload_middleware");
+
+			$sftp->put(__MIDDLEWARE_FTP_FOLDER__.$file, $file);
+
+		}catch(Exception $e){
+			log::logger($e->getMessage() , "upload_middleware");
 		}
-
-		// Fermeture de la connexion et du pointeur de fichier
-		ftp_close($conn_id);
-
 
 	}
 
