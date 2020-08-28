@@ -83,7 +83,6 @@ class demande_refi extends classes_optima {
 			"description"
 			,"marque_materiel"
 			,"observations"
-			,"commentaire"
 		);
 
 		$this->colonnes['panel']['notifie'] = array(

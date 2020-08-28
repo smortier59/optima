@@ -2148,11 +2148,9 @@ class pdf_cleodis extends pdf {
 
 		$this->initLogo($this->affaire["type_affaire"]);
 
-		if($this->affaire["type_affaire"] == "normal"){
-			$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
-		}else{
-			$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-		}
+
+		$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
+
 
 		$this->setfont('arial','B',10);
 
