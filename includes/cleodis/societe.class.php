@@ -1975,6 +1975,10 @@ class societe_cleodis extends societe {
         }
       }
 
+      log::logger("###Max date => ".$date_max_impayee , "mauvais_payeur");
+      log::logger("###Max date => ".date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
+
+
 
 
       if((date("Ym") - date("Ym", strtotime($date_max_impayee))) <= 1 ){
