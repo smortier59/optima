@@ -90,13 +90,9 @@ class suivi_cleodis extends suivi {
 			$notifie_contentieux = ATF::user()->select_all();
 
 			foreach ($notifie_contentieux as $ksn => $vsn) {
-
-
 				$infos["suivi"]["suivi_notifie"][] = $vsn["id_user"];
 			}
 		}
-
-		log::logger($infos["suivi"] , "mfleurquin");
 
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
