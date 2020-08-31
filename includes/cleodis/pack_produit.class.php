@@ -1096,11 +1096,17 @@ class pack_produit extends classes_optima {
 			header('Content-Length: ' . filesize($zipname));
 			readfile($zipname);
 		}
-
-
-
 	}
 
+	/**
+	 * Création des fichiers CSV pour le middleware
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  String $titre                 Type de fichier (Packs / Produits / Lignes)
+	 * @param  array  $data                  Données des packs
+	 * @param  String $site_associe          Site associé
+	 * @param  Array  $pack_par_site_associe Données des packs, par site associé
+	 * @return String File                   Nom du fichier
+	 */
 	public function csv_middleware($titre, $data, $site_associe, $pack_par_site_associe){
 
 
@@ -1161,7 +1167,9 @@ class pack_produit extends classes_optima {
 		$data = array_merge($entete_format , $data);
 
 
+
 		foreach ($data as $fields => $value) {
+
 		    fputcsv($fp, $value, ";", '"');
 		}
 
@@ -1170,17 +1178,14 @@ class pack_produit extends classes_optima {
 		return $fn;
 	}
 
-
+	/**
+	 * Envoi par SFTP des fichiers CSV middleware
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  String $file
+	 */
 	public function csv_middleware_to_ftp($file){
 		try{
 			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__);
-			//log::logger($sftp , "upload_middleware");
-
-			/*log::logger(__MIDDLEWARE_FTP_HOST__ , "upload_middleware");
-			log::logger(__MIDDLEWARE_FTP_PORT__ , "upload_middleware");
-
-			log::logger(__MIDDLEWARE_FTP_LOGIN__ , "upload_middleware");
-			log::logger(__MIDDLEWARE_FTP_PASS__ , "upload_middleware");*/
 
 			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__, __MIDDLEWARE_FTP_PORT__);
 			if (!$sftp->login(__MIDDLEWARE_FTP_LOGIN__, __MIDDLEWARE_FTP_PASS__)) {
@@ -1189,18 +1194,11 @@ class pack_produit extends classes_optima {
 				log::logger("Login success" , "upload_middleware");
 			}
 
-			log::logger("File remote" , "upload_middleware");
-			log::logger(__MIDDLEWARE_FTP_FOLDER__.$file , "upload_middleware");
-
-			log::logger("File local" , "upload_middleware");
-			log::logger($file , "upload_middleware");
-
-			$sftp->put(__MIDDLEWARE_FTP_FOLDER__.$file, $file);
+			$sftp->put(__MIDDLEWARE_FTP_FOLDER__.$file, $file, SFTP::SOURCE_LOCAL_FILE);
 
 		}catch(Exception $e){
 			log::logger($e->getMessage() , "upload_middleware");
 		}
-
 	}
 
 }
