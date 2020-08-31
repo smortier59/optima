@@ -4403,8 +4403,6 @@ class pdf_cleodis extends pdf {
 			case 'Hexamed Leasing' :
 				$this->logo = 'cleodis/hexamed-logo.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
-
 			break;
 
 			case 'Consommables_com' :
@@ -4421,43 +4419,36 @@ class pdf_cleodis extends pdf {
 			case 'Dyadem' :
 				$this->logo = 'cleodis/dyadem.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'FLEXFUEL' :
 				$this->logo = 'cleodis/flexfuel.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'Instore' :
 				$this->logo = 'cleodis/instoresolution.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'LAFI' :
 				$this->logo = 'cleodis/lafi.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'LFS' :
 				$this->logo = 'cleodis/LFS.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'Manganelli' :
 				$this->logo = 'cleodis/Manganelli.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'NRC' :
 				$this->logo = 'cleodis/nrc.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'OLISYS - Ma Solution IT' :
@@ -4468,20 +4459,16 @@ class pdf_cleodis extends pdf {
 			case 'Proxi Pause' :
 				$this->logo = 'cleodis/proxi-pause.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'Trekk' :
 				$this->logo = 'cleodis/trekk.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
 			break;
 
 			case 'ZENCONNECT – ZEN PACK' :
 				$this->logo = 'cleodis/zen.jpg';
 				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
-
 			break;
 
 			case 'haccp' :
