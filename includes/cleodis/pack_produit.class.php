@@ -1082,6 +1082,9 @@ class pack_produit extends classes_optima {
 			$file = $this->csv_middleware("Lignes", $lignes, $key, $site_associe);
 			$zip->addFile($file);
 			$this->csv_middleware_to_ftp($file);
+
+
+			//$this->csv_middleware_to_ftp($file);
 		}
 
 
@@ -1110,7 +1113,7 @@ class pack_produit extends classes_optima {
 	public function csv_middleware($titre, $data, $site_associe, $pack_par_site_associe){
 
 
-		$fn = $titre . "-" . $site_associe . "-" . date("Ymd-Hi") . ".csv";
+		$fn = $titre . "-" . $site_associe . ".csv";
         $fp = fopen($fn, 'w');
 
 		switch ($titre) {
