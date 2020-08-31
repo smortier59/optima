@@ -1387,7 +1387,7 @@ class souscription_bdomplus extends souscription_cleodis {
               "key" => "date_debut"
             );
             if($renouvellement){
-              $infos["value"] = date("Y-m-01", strtotime("+1 month"));
+              $infos["value"] = date("Y-m-01", strtotime(date("Y-m-01")." +1 month"));
             }
 
             ATF::commande()->updateDate($infos);
