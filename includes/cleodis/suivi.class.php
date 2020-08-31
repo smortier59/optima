@@ -85,8 +85,6 @@ class suivi_cleodis extends suivi {
 		$infos["attente_reponse"] = $infos["suivi"]["attente_reponse"];
 		unset($infos["suivi"]["champsComplementaire"]);
 
-		log::logger($infos["suivi"] , "mfleurquin");
-
 		if($infos["suivi"]["type_suivi"] == "Contentieux" && ATF::$codename == "cleodis"){
 			ATF::user()->q->reset()->where("login", "gsmit");
 			$notifie_contentieux = ATF::user()->select_all();
