@@ -96,7 +96,7 @@ class affaire_cleodis extends affaire {
 			,'assurance_portable'
 			,'valeur_residuelle'
 			,'taux_refi_reel'
-			,'apporteur'
+			,'id_apporteur'
 		);
 		$this->panels['chiffres'] = array("visible"=>true, 'nbCols'=>1);
 

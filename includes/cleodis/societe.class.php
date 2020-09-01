@@ -1970,10 +1970,20 @@ class societe_cleodis extends societe {
       $date_max_impayee = NULL;
 
       foreach (ATF::facture()->sa() as $key => $value) {
-        if($date_max_impayee == NULL || str_replace("-", "", $date_max_impayee) > str_replace("-", "", $value["date_rejet"])){
-          $date_max_impayee = $value["date_rejet"];
+        if($value["date_periode_debut"]){
+          if($date_max_impayee == NULL || str_replace("-", "", $date_max_impayee) > str_replace("-", "", $value["date_periode_debut"])){
+            $date_max_impayee = $value["date_periode_debut"];
+          }
+        }else{
+          if($date_max_impayee == NULL || str_replace("-", "", $date_max_impayee) > str_replace("-", "", $value["date"])){
+            $date_max_impayee = $value["date"];
+          }
         }
       }
+
+      log::logger("###Max date => ".$date_max_impayee , "mauvais_payeur");
+      log::logger("###Max date => ".date("Ym", strtotime($date_max_impayee)) , "mauvais_payeur");
+
 
 
 
