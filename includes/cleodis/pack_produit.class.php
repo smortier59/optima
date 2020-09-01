@@ -1083,8 +1083,8 @@ class pack_produit extends classes_optima {
 			$zip->addFile($file);
 			$this->csv_middleware_to_ftp($file);
 
-
-			//$this->csv_middleware_to_ftp($file);
+			file_put_contents($key.".txt", "ok");
+			$this->csv_middleware_to_ftp($key.".txt");
 		}
 
 
@@ -1124,9 +1124,9 @@ class pack_produit extends classes_optima {
 			    }, $entetes);
 			    $produitDedoublonne = [];
 			    foreach ($data as $p) {
-			    	if($site_associe == $p["produit.site_associe"]){
+			    	//if($site_associe == $p["produit.site_associe"]){
 			    		$produitDedoublonne[$p['produit.id_produit']] = $p;
-			    	}
+			    	//}
 			    }
 				$data = $produitDedoublonne;
 			break;
