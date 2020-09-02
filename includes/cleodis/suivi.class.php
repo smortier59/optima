@@ -92,6 +92,7 @@ class suivi_cleodis extends suivi {
 			foreach ($notifie_contentieux as $ksn => $vsn) {
 				$infos["suivi"]["suivi_notifie"][] = $vsn["id_user"];
 			}
+			$infos["suivi"]["suivi_notifie"] = array_unique($infos["suivi"]["suivi_notifie"]);
 		}
 
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
