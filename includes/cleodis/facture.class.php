@@ -856,6 +856,10 @@ class facture_cleodis extends facture {
 	//			ATF::affaire()->redirection("select",$id_affaire);
 			}
 		}
+
+		$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+		ATF::commande()->checkEtatContentieux($commande);
+
 		log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
 		ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
 		return true;
@@ -870,7 +874,7 @@ class facture_cleodis extends facture {
     */
 	public function updateEnumRejet($infos){
 		if($this->select($infos["id_".$this->table],"etat")=="impayee" || $infos["key"] == "rejet"){
-			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+			/*$commande = $this->select($infos["id_facture"] , "facture.id_commande");
 			ATF::commande()->q->reset()->where("commande.id_commande",$commande)->addField("commande.etat" , "etat");
 			$etatCommande = ATF::commande()->select_row();
 			$etatCommande = $etatCommande["etat"];
@@ -898,7 +902,7 @@ class facture_cleodis extends facture {
 					}
 				}
 			}
-			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));
+			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));*/
 
 			if ($infos['value'] == "undefined") $infos["value"] = "";
 			$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
