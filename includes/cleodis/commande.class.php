@@ -1120,6 +1120,57 @@ class commande_cleodis extends commande {
 		}
 	}
 
+
+
+	/**
+	 * Permet de mettre à jour le statut d'un contrat selon si il a des factures rejetée ou non
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  Number $id_commande
+	 */
+	function checkEtatContentieux($id_commande){
+
+		ATF::facture()->q->reset()->where("facture.id_commande", $id_commande)
+								  ->addField("facture.rejet")
+								  ->addField("facture.date_regularisation");
+		$res = ATF::facture()->select_all();
+
+		$contientFactureRejet = false;
+
+		foreach($res as $k=>$v){
+			if(($v["facture.rejet"] != "non_rejet") && ($v["facture.rejet"] != "non_preleve_mandat") && (!$v["facture.date_regularisation"])){
+				$contientFactureRejet = true;
+			}
+		}
+
+		ATF::commande()->q->reset()->where("commande.id_commande",$id_commande)->addField("commande.etat" , "etat");
+		$etatCommande = ATF::commande()->select_row();
+		$etatCommande = $etatCommande["etat"];
+
+		if($contientFactureRejet){
+			if($etatCommande === "mis_loyer"){
+				$etatCommande = "mis_loyer_contentieux";
+			}elseif( $etatCommande === "prolongation"){
+				$etatCommande = "prolongation_contentieux";
+			}elseif( $etatCommande === "restitution"){
+				$etatCommande = "restitution_contentieux";
+			}elseif( $etatCommande === "arreter"){
+				$etatCommande = "arreter_contentieux";
+			}
+		}else{
+			if($etatCommande === "mis_loyer_contentieux"){
+				$etatCommande = "mis_loyer";
+			}elseif( $etatCommande === "prolongation_contentieux"){
+				$etatCommande = "prolongation";
+			}elseif( $etatCommande === "restitution_contentieux"){
+				$etatCommande = "restitution";
+			}elseif( $etatCommande === "arreter_contentieux"){
+				$etatCommande = "arreter";
+			}
+		}
+		ATF::commande()->u(array("id_commande" => $id_commande , "etat" => $etatCommande));
+
+	}
+
 	/**
 	* Retourne l'objet affaire associé à la commande passée en paramètre, méthode d'objet et non de singleton
     * @author Yann GAUTHERON <ygautheron@absystech.fr>
