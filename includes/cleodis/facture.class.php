@@ -919,7 +919,7 @@ class facture_cleodis extends facture {
 				);
 			}
 
-			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
+			//ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
 
 		}else{
