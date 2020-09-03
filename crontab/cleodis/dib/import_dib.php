@@ -32,9 +32,9 @@ $packs = import_pack();
 import_ligne($packs, $produits);
 
 // Rollback la transaction
-//ATF::db()->rollback_transaction();
+ATF::db()->rollback_transaction();
 // Valide la trnasaction
-ATF::db()->commit_transaction();
+//ATF::db()->commit_transaction();
 echo "========= FIN DE SCRIPT =========\n";
 
 /**
@@ -318,8 +318,12 @@ function import_ligne($packs, $produits){
 				"ordre" => $order
 			);
 
+
+
 			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
 			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
+
+			log::logger($pack_produit_ligne , "dib_migration");
 
 			if($l){
 				$pack_produit_ligne["id_pack_produit_ligne"] = $l["id_pack_produit_ligne"];
