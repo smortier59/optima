@@ -3840,7 +3840,8 @@ class affaire_bdomplus extends affaire_cleodis {
 		    "produits" => json_encode($prods),
 		    "id_pack_produit" => array (
 		        "0" => $snap->id_pack_produit
-		    )
+		    ),
+		    "renouvellement" => true
 		);
 		$affaires = ATF::souscription()->_devis(array(), $post);
 
@@ -3858,6 +3859,17 @@ class affaire_bdomplus extends affaire_cleodis {
 			$new_affaire = ATF::affaire()->select_row();
 			$new_affaire["affaire.id_affaire_fk"] = $value;
 			$new_affaire["affaire.id_societe_fk"] = $affaire["id_societe"];
+
+
+			$suivi = array(
+		        "id_societe" => $affaire["id_societe"],
+		        "id_affaire" => $value,
+		        "type"=> "note",
+		        "type_suivi"=> "Contrat",
+		        "texte" => "Il s'agit de l'affaire de renouvellement de l'affaire ".$this->select($id_affaire , "ref")
+		    );
+			ATF::suivi()->i($suivi);
+
 
 			ATF::commande()->q->reset()->where("affaire.id_affaire", $value);
 			$commande = ATF::commande()->select_row();
