@@ -148,7 +148,7 @@ class souscription_cleodis extends souscription {
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
 
         log::logger($post , "mfleurquin");
         log::logger($libelle , "mfleurquin");
@@ -301,7 +301,7 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $renouvellement=false) {
     if ($id_pack_produits) {
       ATF::pack_produit()->q->reset()
           ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
@@ -345,6 +345,10 @@ class souscription_cleodis extends souscription {
       case "haccp":
         $r = "HACCP : Location ".$suffix;
       break;
+    }
+
+    if($renouvellement){
+      $r = "Renouvellement - ".$r;
     }
 
     return $r;
