@@ -32,7 +32,7 @@ $packs = import_pack();
 import_ligne($packs, $produits);
 
 // Rollback la transaction
-ATF::db()->rollback_transaction();
+ATF::db()->commit_transaction();
 // Valide la trnasaction
 //ATF::db()->commit_transaction();
 echo "========= FIN DE SCRIPT =========\n";
