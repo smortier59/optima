@@ -134,7 +134,7 @@ class pdf_cleodis extends pdf {
 			break;
 
 			default:
-				// $this->logo = 'cleodis/logo.jpg';
+				$this->logo = 'cleodis/logo.jpg';
 				$this->cleodis = "CLEODIS";
 			break;
 		}
@@ -4388,100 +4388,8 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
-		switch ($this->affaire["type_affaire"]) {
-			case '2SI' :
-				$this->logo = 'cleodis/2SI_CLEODIS.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'Boulanger Pro' :
-				$this->logo = 'cleodis/boulangerpro.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
-			break;
-
-			case 'Hexamed Leasing' :
-				$this->logo = 'cleodis/hexamed-logo.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'Consommables_com' :
-				$this->logo = 'cleodis/consommables.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'DIB' :
-				$this->logo = 'cleodis/dib.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-
-			break;
-
-			case 'Dyadem' :
-				$this->logo = 'cleodis/dyadem.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'FLEXFUEL' :
-				$this->logo = 'cleodis/flexfuel.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'Instore' :
-				$this->logo = 'cleodis/instoresolution.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'LAFI' :
-				$this->logo = 'cleodis/lafi.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'LFS' :
-				$this->logo = 'cleodis/LFS.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'Manganelli' :
-				$this->logo = 'cleodis/Manganelli.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'NRC' :
-				$this->logo = 'cleodis/nrc.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'OLISYS - Ma Solution IT' :
-				$this->logo = 'cleodis/OLISYS.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'Proxi Pause' :
-				$this->logo = 'cleodis/proxi-pause.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'Trekk' :
-				$this->logo = 'cleodis/trekk.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'ZENCONNECT – ZEN PACK' :
-				$this->logo = 'cleodis/zen.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			case 'haccp' :
-				$this->logo = 'cleodis/haccp.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
-			break;
-
-			default:
-				// $this->logo = 'cleodis/logo.jpg';
-				$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
-			break;
-		}
-
+		$this->initLogo($this->affaire["type_affaire"]);
+		$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
 
 		//Styles utilisés
 

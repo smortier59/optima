@@ -833,6 +833,9 @@ class facture_cleodis extends facture {
 				);
 			}
 
+			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+			ATF::commande()->checkEtatContentieux($commande);
+
 			log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
 			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
 
@@ -916,7 +919,7 @@ class facture_cleodis extends facture {
 				);
 			}
 
-			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
+			//ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
 
 		}else{
