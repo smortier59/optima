@@ -1395,6 +1395,8 @@ class affaire_cleodis extends affaire {
 
 			$retour =  $this->returnGetPortail($get, $post);
 
+		
+
 			foreach ($retour as $key => $value) {
 				$retour[$key]["date_paiement"] = NULL;
 				$retour[$key]["date_max_validite"] = NULL;
@@ -1669,16 +1671,26 @@ class affaire_cleodis extends affaire {
 				}
 
 
+				$secondeLine = "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.";
 
+				$thirdLine = "La procédure est relativement simple car tout se fait directement en ligne.";
+				 
+			    $content = "Il vous suffit de cliquer sur ce lien ci-dessus et de suivre le processus qui ne prendra que quelques secondes :%0D%0A%0D%0A
+				1. Validez vos coordonnées.%0D%0A%0D%0A2. Validez vos coordonnées bancaire préremplies(sur la base de votre RIB). %0D%0A%0D%0A
+				3. A la dernière étape, les documents se chargent.%0D%0A%0D%0A
+				Cliquer sur le Bouton  « signer », un code de validation vous est envoyé par SMS.%0D%0A%0D%0A
+				4. Insérez ce code sur le site : votre contrat de location est signé !%0D%0A%0D%0A
+				Vous recevez directement une copie par mail.%0D%0A%0D%0A
+				En restant à votre disposition,%0D%0A%0D%0A
+				Bien cordialement,
+				";
 
 				$data['data'][$key]["sign_url"] = "mailto:".
 					ATF::contact()->select(ATF::societe()->select($value['affaire.id_societe_fk'],'id_contact_signataire') , "email").
-					"?subject=Votre lien de signature de contrat&body=".
-					ATF::societe()->getUrlSign($value['affaire.id_affaire_fk']);
-
-
-
-
+					"?subject=Votre lien de signature de contrat&body=Bonjour Madame,Monsieur,%0D%0A%0D%0A".$secondeLine.
+					"%0D%0AContrat Signer ici : ".ATF::societe()->getUrlSign($value['affaire.id_affaire_fk'])."%0D%0A".$thirdLine."%0D%0A".$content;
+					
+		
 				// pour chaque affaire on recupere ses comites
 				foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
 					if($comite['description']=== 'Comité CLEODIS'){
