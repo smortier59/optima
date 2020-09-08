@@ -832,6 +832,13 @@ class facture_cleodis extends facture {
 					,ATF::$usr->trans("notice_success_title")
 				);
 			}
+
+			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+			ATF::commande()->checkEtatContentieux($commande);
+
+			log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
+			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
+
 			return true;
 		}else{
 			if($infosMaj[$infos["key"]]){
@@ -852,11 +859,12 @@ class facture_cleodis extends facture {
 	//			ATF::affaire()->redirection("select",$id_affaire);
 			}
 		}
+
+		$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+		ATF::commande()->checkEtatContentieux($commande);
+
 		log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
 		ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
-
-
-
 		return true;
 	}
 
@@ -869,7 +877,7 @@ class facture_cleodis extends facture {
     */
 	public function updateEnumRejet($infos){
 		if($this->select($infos["id_".$this->table],"etat")=="impayee" || $infos["key"] == "rejet"){
-			$commande = $this->select($infos["id_facture"] , "facture.id_commande");
+			/*$commande = $this->select($infos["id_facture"] , "facture.id_commande");
 			ATF::commande()->q->reset()->where("commande.id_commande",$commande)->addField("commande.etat" , "etat");
 			$etatCommande = ATF::commande()->select_row();
 			$etatCommande = $etatCommande["etat"];
@@ -878,7 +886,7 @@ class facture_cleodis extends facture {
 				$this->u(array("id_facture"=>$infos["id_facture"], "etat"=>"impayee"));
 
 				if(!stripos($etatCommande, "contentieux")){
-					if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution"){
+					if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution" || $etatCommande === "arreter"){
 						$etatCommande = $etatCommande."_contentieux";
 
 
@@ -892,10 +900,12 @@ class facture_cleodis extends facture {
 						$etatCommande = "prolongation";
 					}elseif( $etatCommande === "restitution_contentieux"){
 						$etatCommande = "restitution";
+					}elseif( $etatCommande === "arreter_contentieux"){
+						$etatCommande = "arreter";
 					}
 				}
 			}
-			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));
+			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));*/
 
 			if ($infos['value'] == "undefined") $infos["value"] = "";
 			$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
@@ -908,16 +918,17 @@ class facture_cleodis extends facture {
 					,ATF::$usr->trans("notice_success_title")
 				);
 			}
-			ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
+
+			//ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
-
-
-			log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
-			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
 
 		}else{
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
+
+		log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
+		ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_".$this->table]) , "id_societe"));
+
 	}
 
 

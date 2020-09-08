@@ -97,7 +97,7 @@ class affaire_cleodis extends affaire {
 			,'assurance_portable'
 			,'valeur_residuelle'
 			,'taux_refi_reel'
-			,'apporteur'
+			,'id_apporteur'
 		);
 		$this->panels['chiffres'] = array("visible"=>true, 'nbCols'=>1);
 
@@ -2681,6 +2681,15 @@ class affaire_cleodis extends affaire {
 			$comite["validite_accord"] = date("Y-m-d");
 
 
+			ATF::user()->q->reset()->where("nom", "delattre");
+			$users = ATF::user()->select_all();
+
+			$notifie = array();
+			foreach ($users as $key => $value) {
+				$notifie[] = $value["id_user"];
+			}
+
+
 			$suivi = array(
 				 "id_societe"=>$id_societe
 				,"id_affaire"=>$devis["id_affaire"]
@@ -2689,7 +2698,7 @@ class affaire_cleodis extends affaire {
 				,"texte"=>"Création de l'affaire par :\n".$utilisateur["prenom"]." ".$utilisateur["nom"]."\nSociete ".ATF::societe()->select($utilisateur["id_societe"], "societe")
 				,'public'=>'oui'
 				,'suivi_societe'=>NULL
-				,'suivi_notifie'=>NULL
+				,'suivi_notifie'=>$notifie
 			);
 			$suivi["no_redirect"] = true;
 			ATF::suivi()->insert($suivi);
@@ -3824,7 +3833,8 @@ class affaire_bdomplus extends affaire_cleodis {
 		    "produits" => json_encode($prods),
 		    "id_pack_produit" => array (
 		        "0" => $snap->id_pack_produit
-		    )
+		    ),
+		    "renouvellement" => true
 		);
 		$affaires = ATF::souscription()->_devis(array(), $post);
 
@@ -3842,6 +3852,17 @@ class affaire_bdomplus extends affaire_cleodis {
 			$new_affaire = ATF::affaire()->select_row();
 			$new_affaire["affaire.id_affaire_fk"] = $value;
 			$new_affaire["affaire.id_societe_fk"] = $affaire["id_societe"];
+
+
+			$suivi = array(
+		        "id_societe" => $affaire["id_societe"],
+		        "id_affaire" => $value,
+		        "type"=> "note",
+		        "type_suivi"=> "Contrat",
+		        "texte" => "Il s'agit de l'affaire de renouvellement de l'affaire ".$this->select($id_affaire , "ref")
+		    );
+			ATF::suivi()->i($suivi);
+
 
 			ATF::commande()->q->reset()->where("affaire.id_affaire", $value);
 			$commande = ATF::commande()->select_row();
