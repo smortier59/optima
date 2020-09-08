@@ -4951,7 +4951,7 @@ class pdf_cleodis extends pdf {
 	  $total = $this->facture['prix'];
 	  $totalTTC = $total*$this->facture['tva'];
 	  if($this->facture['type_facture'] === "libre"){
-		if($this->facture['type_libre'] === "normale"){
+		if($this->facture['tva'] !== 1){
 		  $head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 		  $data = array(
 			array(
@@ -5245,7 +5245,7 @@ class pdf_cleodis extends pdf {
 			$total = $this->facture['prix'];
 			$totalTTC = $total*$this->facture['tva'];
 			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] === "normale"){
+				if($this->facture['type_libre'] !== 1){
 					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 					$data = array(
 						array(
@@ -10332,7 +10332,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			$total = $this->facture['prix'];
 			$totalTTC = $total*$this->facture['tva'];
 			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] === "normale"){
+				if($this->facture['type_libre'] !== 1){
 					$head = array("Totaal zonder btw ".$this->texteHT,"Rentevoet","BTW (".(($this->facture['tva']-1)*100)."%)","Totaal btw incl. ".$this->texteTTC);
 					$data = array(
 						array(
