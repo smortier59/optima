@@ -584,6 +584,51 @@ class pdf_cleodis extends pdf {
 
 		$this->initLogo($this->affaire["type_affaire"]);
 
+		if($this->devis["type_affaire"] === "lfs"){
+			$this->devislfs();
+		}else{
+			/* PAGE 1 */
+			$this->unsetHeader();
+			$this->Addpage();
+			$this->SetLeftMargin(15);
+
+			$this->RoundedRect(15,50,180,70,5);
+			$this->image(__PDF_PATH__.$this->logo,85,55,45);
+			$this->sety(90);
+			$this->setfont('arial','B',12);
+			$this->multicell(0,5,/*$this->societe['societe']*/"",0,'C');
+			$this->ln(10);
+			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+
+			$this->setfont('arial','',8);
+			$this->RoundedRect(15,140,85,70,5);
+			$this->setxy(15,145);
+			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
+			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));
+			$this->multicell(85,5,"GSM : ".($this->user['gsm']?$this->user['gsm']:$this->societe['gsm']));
+			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));
+			$this->ln(5);
+			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
+
+			$this->RoundedRect(110,140,85,70,5);
+			$this->sety(145);
+			$this->setleftmargin(110);
+			$this->multicell(85,10,$this->client['societe']);
+			$this->multicell(85,5,$this->client['adresse']);
+			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);
+			$this->ln(5);
+			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
+			$this->setleftmargin(15);
+			
+			if($this->devis['type_contrat'] =='vente'){
+				$this->devisVente();
+			}elseif($this->affaire['nature'] =='avenant'){
+				$this->devisAvenant();
+			}else{
+				$this->devisLfs();
+			}
+		}
+		return true;
 
 		if($this->devis["type_devis"] === "optic_2000"){
 			$this->devisoptic_2000($id);
@@ -632,8 +677,6 @@ class pdf_cleodis extends pdf {
 		return true;
 
 	}
-
-
 	/* Génère le PDF d'un devis de vente
 	* @author Quentin JANON <qjanon@absystech.fr>
 	* @date 13-01-2011
@@ -876,7 +919,7 @@ class pdf_cleodis extends pdf {
 		$this->setHeader();
 		$this->setTopMargin(30);
 		$this->addpage();
-
+		
 		$this->setfont('arial','BU',14);
 		$this->multicell(0,5,"1 – La ".ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." ".$this->cleodis);
 		$this->ln(5);
@@ -1319,6 +1362,177 @@ class pdf_cleodis extends pdf {
 			$this->annexes($annexes);
 		}
 	}
+
+	/* Génère le PDF d'un devis lfs
+	* @author Julie DELAPORTE <jdelaporte@absystech.fr>
+	* @date 08-09-2020
+	*/
+	public function devisLfs() {
+		if (!$this->devis) return false;
+
+		/* PAGE 2 */
+		$this->setTopMargin(30);
+		$this->AddPage();
+		$this->image(__PDF_PATH__.$this->logo,5,10,35);
+		log::logger(logo, "jdelaporte");
+		$this->sety(10);
+		$this->setfont('arial','B',14);
+		if(ATF::$codename == "cleodis"){
+			$this->RoundedRect(60,10,135,30,5);
+			$this->multicell(220,6,"Proposition locative ".$this->cleodis,0,'C');
+			$this->multicell(220,6,"pour ".$this->client['societe'],0,'C');
+			$this->multicell(220,6,($this->affaire['nature']=="avenant"?"Avenant au contrat ".ATF::affaire()->select($this->affaire['id_parent'],'ref'):""),0,'C');
+		$this->setfont('arial','B',8);
+		if($this->societe['id_pays'] =='FR'){
+			$this->multicell(220,0,"SIRET: ".$this->societe['siret'],0,'C');
+		}
+			$this->multicell(220,6," Le ".date("d/m/Y",strtotime($this->devis['date'])),0,'C');
+		}
+		$this->sety(50);
+
+		$this->setfont('arial','',8);
+
+		$logoPartenaire = ATF::societe()->filepath($this->logo);
+		if(file_exists($logoPartenaire)){
+			log::logger($logoPartenaire, "jdelaporte"); 
+			log::logger('le logo existe', "jdelaporte"); 
+			$this->cell(0,5,"Selon Devis : ");
+			$this->image($logoPartenaire,40,40,15,'jpg');
+		}else{
+			log::logger('le logo existe pas', "jdelaporte");
+			$this->cell(0,5,"Selon Devis : ");
+		}
+		
+		$this->sety(50);
+	
+		$this->sety(60);
+		$this->cell(0,5,"N° d'affaire : ".$this->affaire["ref"],0,1);
+		$societe = ATF::societe()->select($this->devis['id_societe']);
+		if($societe["code_client"]){$this->cell(0,5,"Code client : ".$societe["code_client"],0,1); }
+
+		if ($this->lignes) {
+			// Groupe les lignes par affaire
+			$lignes=$this->groupByAffaire($this->lignes);
+			// Flag pour savoir si le tableau part en annexe ou pas
+			$flagOnlyPrixInvisible = true;
+			foreach ($lignes as $k => $i) {
+				if (!$k) {
+					$title = "NOUVEAU(X) EQUIPEMENT(S)";
+				} else {
+					$affaire_provenance=ATF::affaire()->select($k);
+					$title = "EQUIPEMENT(S) RETIRE(S) DE L'AFFAIRE ".$affaire_provenance["ref"]." - ".ATF::societe()->select($affaire_provenance['id_societe'],'code_client');
+				}
+
+				$head = array("Qté","Fournisseur","Désignation","Prix ".$this->texteHT);
+				$w = array(12,40,111,22);
+				unset($data,$st);
+				foreach ($i as $k_ => $i_) {
+					$etat = "";
+					if($i_["neuf"] == "non"){
+						$etat = "( OCCASION )";
+					}
+
+					//Si c'est une prestation, on affiche pas l'etat
+					if($produit["type"] == "sans_objet" || ($produit['id_sous_categorie'] == 16) || ($produit['id_sous_categorie'] == 114)){	$etat = "";		}
+
+					if(ATF::$codename == "cleodisbe"){ $etat = ""; }
+
+					if ($i_['visibilite_prix']=="visible") {
+						$flagOnlyPrixInvisible = false;
+					}
+					$produit = ATF::produit()->select($i_['id_produit']);
+					//On prépare le détail de la ligne
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+					if ($details == "") unset($details);
+
+					$data[] = array(
+						round($i_['quantite'])
+						,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
+						,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat
+						,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
+					);
+				}
+				$tableau[$k] = array(
+					"head"=>$head
+					,"data"=>$data
+					,"w"=>$w
+					,"styles"=>$st
+					,"title"=>$title
+				);
+			}
+
+			$h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
+			foreach ($tableau as $k=>$i) {
+				if ($i['head']) $h += 5;
+				$h += $this->getHeightTableau($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+
+			unset($data,$st);
+		}
+
+		$duree = ATF::loyer()->dureeTotal($this->devis['id_affaire']);
+		$frequence=ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer");
+		if($this->devis['loyer_unique']=='oui'){
+			$this->setfont('arial','B',12);
+			$this->multicell(0,10,"La durée de la location est identique à celle du contrat principal.",0,'L');
+		}elseif($this->devis['type_contrat'] == 'lrp') {
+			if ($duree==39 || $duree==27 || $duree==51) {
+				$this->multicell(0,5,ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." sur ".($duree-3)." (+3) ".$frequence,0,'L');
+			} else {
+				$this->multicell(0,5,ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." sur ".($duree)."  ".$frequence,0,'L');
+			}
+		}
+		$this->setfont('arial','',10);
+		$this->sety(80);
+		$this->multicell(0,5,"TABLEAU DE SYNTHESE DE L'OFFRE : MATERIEL / LOGICIEL / PRESTATION",0,'C');
+
+		foreach ($tableau as $k=>$i) {
+			$this->setFillColor(239,239,239);
+			$this->setfont('arial','B',10);
+			$this->multicell(0,5,$i['title'],1,'C',1);
+			$this->setfont('arial','',8);
+			if ($flagOnlyPrixInvisible) {
+				array_pop($i['head']);
+				$i['w'][1] += array_pop($i['w']);
+				array_pop($i['styles']);
+				foreach ($i['data'] as $k_=>$i_) {
+					array_pop($i['data'][$k_]);
+				}
+			}
+			if ($h>$this->heightLimitTableDevisClassique) {
+				$this->multicellAnnexe();
+				$annexes[$k] = $i;
+			} else {
+				$this->tableauBigHead($i['head'],$i['data'],$i['w'],5,$i['styles']);
+			}
+		}
+		
+		$this->sety(180);
+		if($this->devis['loyer_unique']=='non'){
+			$this->tableauLoyer();
+		}
+
+		
+
+		$this->sety(235);
+		$this->cell(0,40,"",1,1);
+		$this->sety(235);
+
+		$this->setfont('arial','',8);
+		$this->multicell(0,5,"« Bon pour accord »",0,'C');
+		$this->multicell(0,5,"Cachet commercial+ Signature",0,'C');
+
+		$this->setfont('arial','I',6);
+		$this->sety(270);
+		$this->multicell(0,5,"Cette offre, valable 15 jours, reste soumise à notre comité des engagements de notre partenaire CLEODIS.",0,'C');
+		if ($annexes) {
+			$this->annexes($annexes);
+		}
+	}
+
+	
 
 	/* Génère le PDF d'un devis Avenant
 	* @author Quentin JANON <qjanon@absystech.fr>
