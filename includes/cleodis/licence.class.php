@@ -1,4 +1,5 @@
 <?
+die('toto');
 class licence extends classes_optima {
 
 	public function __construct() {
@@ -10,8 +11,10 @@ class licence extends classes_optima {
 			//'licence.part_2',
 			'licence.id_licence_type',
 			'licence.id_commande_ligne',
-			'licence.deja_pris' => array("custom"=> true, "renderer"=>"licence_prise")
+			'licence.deja_pris' => array("custom"=> true, "renderer"=>"licence_prise"),
+			'licence.date_envoi'=>array("renderer"=>"updateDate","width"=>170)
 		);
+		$this->colonnes['update'] = array('date_envoi');
 		$this->fieldstructure();
 
 		$this->foreign_key['id_licence_type'] =  "licence_type";
@@ -50,6 +53,21 @@ class licence extends classes_optima {
 		}
 		return $return;
 	}
+	
+	
+	/**
+    * Exposition de la fonction updateDate via l'API de'Optima
+    * @author Julie Delaporte <jdelaporte@absystech.fr>
+	*/
+	public function _updateDate ($infos) {
+		$infos["key"] = "date_envoi";
+		if(!ATF::licence()->select($infos["id_licence"], "date_envoi")){
+			$this->updateDate(array("id_licence" => $infos["id_licence"],"key"=> "date_envoi", "value" => $infos["value"]));
+		}
+		}else{
+			$this->updateDate($infos);
+			log::logger($info, "jdelaporte")
+		}
 
 
 };
@@ -123,6 +141,7 @@ class licence_bdomplus extends licence {
 		log::logger("Fin du controle du stock" , "controle_licence_bdomplus");
 		log::logger("============================================" , "controle_licence_bdomplus");
 	}
+
 };
 
 class licence_boulanger extends licence { };
