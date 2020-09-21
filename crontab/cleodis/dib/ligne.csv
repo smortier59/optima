@@ -1,0 +1,24 @@
+"TYPE";"N°";"Ref Produit";"Produit principal";"Quantité";"Min";"Max";"option_incluse";"option_incluse_obligatoire";"Afficher sur le site";"Ordre";"Lignes de produits visible";"visible_sur_pdf";"Prix d'achat dont ecotaxe"
+"PRODUIT PRINCIPAL";1;"8DZ12EA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";882,3
+"PRODUIT PRINCIPAL";2;"7PH81EA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";643,822222222222
+"PRODUIT PRINCIPAL";3;"7KP17EA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1036,17777777778
+"PRODUIT PRINCIPAL";4;"9VZ31EA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";656,855555555556
+"PRODUIT PRINCIPAL";5;"9WA26EA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1666,66666666667
+"PRODUIT PRINCIPAL";6;"1FH46AA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";157,6
+"PRODUIT PRINCIPAL";7;"D9Y32ET";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";121,11
+"PRODUIT PRINCIPAL";8;"5TW13AA";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";210,32
+"PRODUIT PRINCIPAL";9;"2MW62ET";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";13,39
+"GARANTIE";1;"U6578E";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";40
+"GARANTIE";2;"U6578E";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";40
+"GARANTIE";3;"UA6A1E";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";118,144444444444
+"GARANTIE";4;"UK703E";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";72,2222222222222
+"GARANTIE";5;"UB0E0E";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";104,311111111111
+"FRAIS DE DOSSIERS";1;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";2;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";3;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";4;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";5;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";6;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";7;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";8;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";9;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35

@@ -1043,6 +1043,7 @@ class facture_cleodis extends facture {
 		header('Content-Disposition:inline;filename=export_comptable.xls');
 		header("Cache-Control: private");
 		$fh=fopen($fname, "rb");
+		ob_end_clean();
 		fpassthru($fh);
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
