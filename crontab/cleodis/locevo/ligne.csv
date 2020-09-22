@@ -1,360 +1,360 @@
-﻿TYPE;N°;Ref Produit;Produit principal;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Lignes de produits visible;visible_sur_pdf;Prix d'achat dont ecotaxe
-PRODUIT PRINCIPAL;1;36S0410;oui;1;1;1;non;non;oui;10;oui;oui;473,48
-PRODUIT PRINCIPAL;2;50G0220;oui;1;1;1;non;non;oui;10;oui;oui;653,38
-PRODUIT PRINCIPAL;3;36S0910;oui;1;1;1;non;non;oui;10;oui;oui;997,02
-PRODUIT PRINCIPAL;4;25B0201;oui;1;1;1;non;non;oui;10;oui;oui;1852,37
-PRODUIT PRINCIPAL;5;25B2010;oui;1;1;1;non;non;oui;10;oui;oui;2011,44
-PRODUIT PRINCIPAL;6;40C9136;oui;1;1;1;non;non;oui;10;oui;oui;1
-PRODUIT PRINCIPAL;7;40C9036;oui;1;1;1;non;non;oui;10;oui;oui;1
-PRODUIT PRINCIPAL;8;40C9554;oui;1;1;1;non;non;oui;10;oui;oui;1
-PRODUIT PRINCIPAL;9;32C0230;oui;1;1;1;non;non;oui;10;oui;oui;3385,38
-PRODUIT PRINCIPAL;10;APPLE-Ref01;oui;1;1;1;non;non;oui;10;oui;oui;899,24
-PRODUIT PRINCIPAL;11;APPLE-Ref02;oui;1;1;1;non;non;oui;10;oui;oui;996,36
-PRODUIT PRINCIPAL;12;APPLE-Ref03;oui;1;1;1;non;non;oui;10;oui;oui;1082,5
-PRODUIT PRINCIPAL;13;APPLE-Ref04;oui;1;1;1;non;non;oui;10;oui;oui;1233,07
-PRODUIT PRINCIPAL;14;APPLE-Ref05;oui;1;1;1;non;non;oui;10;oui;oui;1149,38
-PRODUIT PRINCIPAL;15;APPLE-Ref06;oui;1;1;1;non;non;oui;10;oui;oui;1302,39
-PRODUIT PRINCIPAL;16;APPLE-Ref07;oui;1;1;1;non;non;oui;10;oui;oui;1587,87
-PRODUIT PRINCIPAL;17;APPLE-Ref08;oui;1;1;1;non;non;oui;10;oui;oui;1608,46
-PRODUIT PRINCIPAL;18;APPLE-Ref09;oui;1;1;1;non;non;oui;10;oui;oui;1761,47
-PRODUIT PRINCIPAL;19;APPLE-Ref10;oui;1;1;1;non;non;oui;10;oui;oui;1991,01
-PRODUIT PRINCIPAL;20;APPLE-Ref11;oui;1;1;1;non;non;oui;10;oui;oui;722,22
-PRODUIT PRINCIPAL;21;APPLE-Ref12;oui;1;1;1;non;non;oui;10;oui;oui;993,51
-PRODUIT PRINCIPAL;22;APPLE-Ref13;oui;1;1;1;non;non;oui;10;oui;oui;2614,99
-PRODUIT PRINCIPAL;23;APPLE-Ref14;oui;1;1;1;non;non;oui;10;oui;oui;1200,06
-PRODUIT PRINCIPAL;24;APPLE-Ref15;oui;1;1;1;non;non;oui;10;oui;oui;953,32
-PRODUIT PRINCIPAL;25;APPLE-Ref16;oui;1;1;1;non;non;oui;10;oui;oui;895,27
-PRODUIT PRINCIPAL;26;APPLE-Ref17;oui;1;1;1;non;non;oui;10;oui;oui;900,61
-PRODUIT PRINCIPAL;27;APPLE-Ref18;oui;1;1;1;non;non;oui;10;oui;oui;895,27
-PRODUIT PRINCIPAL;28;APPLE-Ref19;oui;1;1;1;non;non;oui;10;oui;oui;1118,83
-PRODUIT PRINCIPAL;29;APPLE-Ref20;oui;1;1;1;non;non;oui;10;oui;oui;1118,83
-PRODUIT PRINCIPAL;30;APPLE-Ref21;oui;1;1;1;non;non;oui;10;oui;oui;1118,83
-PRODUIT PRINCIPAL;31;APPLE-Ref22;oui;1;1;1;non;non;oui;10;oui;oui;1160,65
-PRODUIT PRINCIPAL;32;APPLE-Ref23;oui;1;1;1;non;non;oui;10;oui;oui;1160,65
-PRODUIT PRINCIPAL;33;APPLE-Ref24;oui;1;1;1;non;non;oui;10;oui;oui;1353,96
-PRODUIT PRINCIPAL;34;APPLE-Ref25;oui;1;1;1;non;non;oui;10;oui;oui;1353,96
-PRODUIT PRINCIPAL;35;APPLE-Ref26;oui;1;1;1;non;non;oui;10;oui;oui;1818,66
-PRODUIT PRINCIPAL;36;APPLE-Ref27;oui;1;1;1;non;non;oui;10;oui;oui;1785,26
-PRODUIT PRINCIPAL;37;APPLE-Ref28;oui;1;1;1;non;non;oui;10;oui;oui;1597,28
-PRODUIT PRINCIPAL;38;APPLE-Ref29;oui;1;1;1;non;non;oui;10;oui;oui;1597,28
-PRODUIT PRINCIPAL;39;APPLE-Ref30;oui;1;1;1;non;non;oui;10;oui;oui;2032,51
-PRODUIT PRINCIPAL;40;APPLE-Ref31;oui;1;1;1;non;non;oui;10;oui;oui;2032,51
-PRODUIT PRINCIPAL;41;APPLE-Ref32;oui;1;1;1;non;non;oui;10;oui;oui;2391,06
-PRODUIT PRINCIPAL;42;APPLE-Ref33;oui;1;1;1;non;non;oui;10;oui;oui;2391,06
-PRODUIT PRINCIPAL;43;APPLE-Ref34;oui;1;1;1;non;non;oui;10;oui;oui;397,76
-PRODUIT PRINCIPAL;44;APPLE-Ref35;oui;1;1;1;non;non;oui;10;oui;oui;511,29
-PRODUIT PRINCIPAL;45;APPLE-Ref36;oui;1;1;1;non;non;oui;10;oui;oui;397,76
-PRODUIT PRINCIPAL;46;APPLE-Ref37;oui;1;1;1;non;non;oui;10;oui;oui;511,29
-PRODUIT PRINCIPAL;47;APPLE-Ref38;oui;1;1;1;non;non;oui;10;oui;oui;397,76
-PRODUIT PRINCIPAL;48;APPLE-Ref39;oui;1;1;1;non;non;oui;10;oui;oui;511,29
-PRODUIT PRINCIPAL;49;APPLE-Ref40;oui;1;1;1;non;non;oui;10;oui;oui;316,42
-PRODUIT PRINCIPAL;50;APPLE-Ref41;oui;1;1;1;non;non;oui;10;oui;oui;429,95
-PRODUIT PRINCIPAL;51;APPLE-Ref42;oui;1;1;1;non;non;oui;10;oui;oui;316,42
-PRODUIT PRINCIPAL;52;APPLE-Ref43;oui;1;1;1;non;non;oui;10;oui;oui;429,95
-PRODUIT PRINCIPAL;53;APPLE-Ref44;oui;1;1;1;non;non;oui;10;oui;oui;316,42
-PRODUIT PRINCIPAL;54;APPLE-Ref45;oui;1;1;1;non;non;oui;10;oui;oui;429,95
-PRODUIT PRINCIPAL;55;APPLE-Ref46;oui;1;1;1;non;non;oui;10;oui;oui;600,5
-PRODUIT PRINCIPAL;56;APPLE-Ref47;oui;1;1;1;non;non;oui;10;oui;oui;714,03
-PRODUIT PRINCIPAL;57;APPLE-Ref48;oui;1;1;1;non;non;oui;10;oui;oui;714,03
-PRODUIT PRINCIPAL;58;APPLE-Ref49;oui;1;1;1;non;non;oui;10;oui;oui;714,03
-PRODUIT PRINCIPAL;59;APPLE-Ref50;oui;1;1;1;non;non;oui;10;oui;oui;600,5
-PRODUIT PRINCIPAL;60;APPLE-Ref51;oui;1;1;1;non;non;oui;10;oui;oui;600,37
-PRODUIT PRINCIPAL;61;APPLE-Ref52;oui;1;1;1;non;non;oui;10;oui;oui;462,52
-PRODUIT PRINCIPAL;62;APPLE-Ref53;oui;1;1;1;non;non;oui;10;oui;oui;576,05
-PRODUIT PRINCIPAL;63;APPLE-Ref54;oui;1;1;1;non;non;oui;10;oui;oui;576,05
-PRODUIT PRINCIPAL;64;APPLE-Ref55;oui;1;1;1;non;non;oui;10;oui;oui;576,05
-PRODUIT PRINCIPAL;65;APPLE-Ref56;oui;1;1;1;non;non;oui;10;oui;oui;462,52
-PRODUIT PRINCIPAL;66;APPLE-Ref57;oui;1;1;1;non;non;oui;10;oui;oui;462,52
-PRODUIT PRINCIPAL;67;APPLE-Ref58;oui;1;1;1;non;non;oui;10;oui;oui;511,29
-PRODUIT PRINCIPAL;68;APPLE-Ref59;oui;1;1;1;non;non;oui;10;oui;oui;511,29
-PRODUIT PRINCIPAL;69;APPLE-Ref60;oui;1;1;1;non;non;oui;10;oui;oui;624,82
-PRODUIT PRINCIPAL;70;APPLE-Ref61;oui;1;1;1;non;non;oui;10;oui;oui;624,82
-PRODUIT PRINCIPAL;71;APPLE-Ref62;oui;1;1;1;non;non;oui;10;oui;oui;624,82
-PRODUIT PRINCIPAL;72;APPLE-Ref63;oui;1;1;1;non;non;oui;10;oui;oui;511,29
-PRODUIT PRINCIPAL;73;APPLE-Ref64;oui;1;1;1;non;non;oui;10;oui;oui;373,31
-PRODUIT PRINCIPAL;74;APPLE-Ref65;oui;1;1;1;non;non;oui;10;oui;oui;486,84
-PRODUIT PRINCIPAL;75;APPLE-Ref66;oui;1;1;1;non;non;oui;10;oui;oui;486,84
-PRODUIT PRINCIPAL;76;APPLE-Ref67;oui;1;1;1;non;non;oui;10;oui;oui;486,84
-PRODUIT PRINCIPAL;77;APPLE-Ref68;oui;1;1;1;non;non;oui;10;oui;oui;373,31
-PRODUIT PRINCIPAL;78;APPLE-Ref69;oui;1;1;1;non;non;oui;10;oui;oui;373,31
-PRODUIT PRINCIPAL;79;APPLE-Ref70;oui;1;1;1;non;non;oui;10;oui;oui;730,25
-PRODUIT PRINCIPAL;80;APPLE-Ref71;oui;1;1;1;non;non;oui;10;oui;oui;730,25
-PRODUIT PRINCIPAL;81;APPLE-Ref72;oui;1;1;1;non;non;oui;10;oui;oui;1176,29
-PRODUIT PRINCIPAL;82;APPLE-Ref73;oui;1;1;1;non;non;oui;10;oui;oui;1176,29
-PRODUIT PRINCIPAL;83;APPLE-Ref74;oui;1;1;1;non;non;oui;10;oui;oui;819,46
-PRODUIT PRINCIPAL;84;APPLE-Ref75;oui;1;1;1;non;non;oui;10;oui;oui;819,46
-PRODUIT PRINCIPAL;85;APPLE-Ref76;oui;1;1;1;non;non;oui;10;oui;oui;997,88
-PRODUIT PRINCIPAL;86;APPLE-Ref77;oui;1;1;1;non;non;oui;10;oui;oui;997,88
-PRODUIT PRINCIPAL;87;APPLE-Ref78;oui;1;1;1;non;non;oui;10;oui;oui;868,12
-PRODUIT PRINCIPAL;88;APPLE-Ref79;oui;1;1;1;non;non;oui;10;oui;oui;868,12
-PRODUIT PRINCIPAL;89;APPLE-Ref80;oui;1;1;1;non;non;oui;10;oui;oui;1314,16
-PRODUIT PRINCIPAL;90;APPLE-Ref81;oui;1;1;1;non;non;oui;10;oui;oui;1314,16
-PRODUIT PRINCIPAL;91;APPLE-Ref82;oui;1;1;1;non;non;oui;10;oui;oui;957,33
-PRODUIT PRINCIPAL;92;APPLE-Ref83;oui;1;1;1;non;non;oui;10;oui;oui;957,33
-PRODUIT PRINCIPAL;93;APPLE-Ref84;oui;1;1;1;non;non;oui;10;oui;oui;1135,74
-PRODUIT PRINCIPAL;94;APPLE-Ref85;oui;1;1;1;non;non;oui;10;oui;oui;1135,74
-PRODUIT PRINCIPAL;95;APPLE-Ref86;oui;1;1;1;non;non;oui;10;oui;oui;908,67
-PRODUIT PRINCIPAL;96;APPLE-Ref87;oui;1;1;1;non;non;oui;10;oui;oui;909,36
-PRODUIT PRINCIPAL;97;APPLE-Ref88;oui;1;1;1;non;non;oui;10;oui;oui;1355,4
-PRODUIT PRINCIPAL;98;APPLE-Ref89;oui;1;1;1;non;non;oui;10;oui;oui;1354,7
-PRODUIT PRINCIPAL;99;APPLE-Ref90;oui;1;1;1;non;non;oui;10;oui;oui;997,88
-PRODUIT PRINCIPAL;100;APPLE-Ref91;oui;1;1;1;non;non;oui;10;oui;oui;998,57
-PRODUIT PRINCIPAL;101;APPLE-Ref92;oui;1;1;1;non;non;oui;10;oui;oui;1176,29
-PRODUIT PRINCIPAL;102;APPLE-Ref93;oui;1;1;1;non;non;oui;10;oui;oui;1176,29
-PRODUIT PRINCIPAL;103;APPLE-Ref94;oui;1;1;1;non;non;oui;10;oui;oui;1046,53
-PRODUIT PRINCIPAL;104;APPLE-Ref95;oui;1;1;1;non;non;oui;10;oui;oui;1047,23
-PRODUIT PRINCIPAL;105;APPLE-Ref96;oui;1;1;1;non;non;oui;10;oui;oui;1492,57
-PRODUIT PRINCIPAL;106;APPLE-Ref97;oui;1;1;1;non;non;oui;10;oui;oui;1492,57
-PRODUIT PRINCIPAL;107;APPLE-Ref98;oui;1;1;1;non;non;oui;10;oui;oui;1135,74
-PRODUIT PRINCIPAL;108;APPLE-Ref99;oui;1;1;1;non;non;oui;10;oui;oui;1135,74
-PRODUIT PRINCIPAL;109;APPLE-Ref100;oui;1;1;1;non;non;oui;10;oui;oui;1314,16
-PRODUIT PRINCIPAL;110;APPLE-Ref101;oui;1;1;1;non;non;oui;10;oui;oui;1314,85
-PRODUIT PRINCIPAL;111;Carrefour-Ref01;oui;1;1;1;non;non;oui;10;oui;oui;404
-PRODUIT PRINCIPAL;112;Carrefour-Ref02;oui;1;1;1;non;non;oui;10;oui;oui;404
-PRODUIT PRINCIPAL;113;Carrefour-Ref03;oui;1;1;1;non;non;oui;10;oui;oui;950
-PRODUIT PRINCIPAL;114;Carrefour-Ref04;oui;1;1;1;non;non;oui;10;oui;oui;950
-GARANTIE;10;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;11;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;12;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;13;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;14;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;15;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;16;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;17;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;18;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;19;APPLECARE-iMac-01;non;1;1;1;non;non;oui;20;oui;oui;179
-GARANTIE;20;APPLECARE-Macmini-01;non;1;1;1;non;non;oui;20;oui;oui;89
-GARANTIE;21;APPLECARE-Macmini-01;non;1;1;1;non;non;oui;20;oui;oui;89
-GARANTIE;22;APPLECARE-MacPro-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;23;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;24;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;25;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;26;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;27;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;28;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;29;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;30;APPLECARE-MacbookAir-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;31;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;32;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;33;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;34;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;35;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;36;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;37;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;38;APPLECARE-MacbookPro13-01;non;1;1;1;non;non;oui;20;oui;oui;249
-GARANTIE;39;APPLECARE-MacbookPro16-01;non;1;1;1;non;non;oui;20;oui;oui;499
-GARANTIE;40;APPLECARE-MacbookPro16-01;non;1;1;1;non;non;oui;20;oui;oui;499
-GARANTIE;41;APPLECARE-MacbookPro16-01;non;1;1;1;non;non;oui;20;oui;oui;499
-GARANTIE;42;APPLECARE-MacbookPro16-01;non;1;1;1;non;non;oui;20;oui;oui;499
-GARANTIE;43;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;44;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;45;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;46;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;47;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;48;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;49;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;50;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;51;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;52;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;53;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;54;APPLECARE-iPad-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;55;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;56;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;57;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;58;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;59;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;60;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;61;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;62;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;63;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;64;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;65;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;66;APPLECARE-iPadAir-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;67;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;68;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;69;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;70;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;71;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;72;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;73;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;74;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;75;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;76;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;77;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;78;APPLECARE-iPadmini-01;non;1;1;1;non;non;oui;20;oui;oui;79
-GARANTIE;79;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;80;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;81;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;82;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;83;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;84;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;85;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;86;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;87;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;88;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;89;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;90;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;91;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;92;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;93;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;94;APPLECARE-iPadPro11-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;95;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;96;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;97;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;98;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;99;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;100;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;101;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;102;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;103;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;104;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;105;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;106;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;107;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;108;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;109;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;110;APPLECARE-iPadPro12,9-01;non;1;1;1;non;non;oui;20;oui;oui;139
-GARANTIE;111;Carrefour_Gar01;non;1;1;1;non;non;oui;20;oui;oui;272
-GARANTIE;112;Carrefour_Gar02;non;1;1;1;non;non;oui;20;oui;oui;520
-GARANTIE;113;Carrefour_Gar03;non;1;1;1;non;non;oui;20;oui;oui;557
-GARANTIE;114;Carrefour_Gar04;non;1;1;1;non;non;oui;20;oui;oui;1060
-LIVRAISON;111;Carrefour_Livr01;non;0;0;1;non;non;oui;40;oui;oui;149
-LIVRAISON;112;Carrefour_Livr02;non;0;0;1;non;non;oui;40;oui;oui;149
-LIVRAISON;113;Carrefour_Livr01;non;0;0;1;non;non;oui;40;oui;oui;149
-LIVRAISON;114;Carrefour_Livr02;non;0;0;1;non;non;oui;40;oui;oui;149
-FRAIS DE DOSSIERS;1;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;2;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;3;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;4;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;5;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;6;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;7;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;8;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;9;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;10;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;11;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;12;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;13;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;14;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;15;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;16;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;17;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;18;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;19;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;20;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;21;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;22;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;23;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;24;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;25;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;26;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;27;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;28;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;29;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;30;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;31;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;32;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;33;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;34;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;35;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;36;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;37;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;38;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;39;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;40;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;41;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;42;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;43;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;44;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;45;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;46;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;47;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;48;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;49;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;50;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;51;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;52;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;53;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;54;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;55;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;56;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;57;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;58;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;59;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;60;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;61;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;62;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;63;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;64;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;65;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;66;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;67;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;68;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;69;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;70;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;71;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;72;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;73;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;74;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;75;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;76;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;77;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;78;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;79;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;80;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;81;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;82;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;83;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;84;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;85;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;86;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;87;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;88;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;89;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;90;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;91;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;92;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;93;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;94;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;95;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;96;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;97;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;98;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;99;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;100;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;101;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;102;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;103;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;104;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;105;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;106;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;107;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;108;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;109;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;110;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;111;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;112;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;113;Frais36;non;1;1;1;non;non;non;9999;non;non;35
-FRAIS DE DOSSIERS;114;Frais60;non;1;1;1;non;non;non;9999;non;non;35
-OPTION;111;Carrefour_Pret01;non;0;0;1;non;non;oui;50;oui;oui;1
-OPTION;112;Carrefour_Pret02;non;0;0;1;non;non;oui;50;oui;oui;1
-OPTION;113;Carrefour_Pret03;non;0;0;1;non;non;oui;50;oui;oui;1
-OPTION;114;Carrefour_Pret04;non;0;0;1;non;non;oui;50;oui;oui;1
-OPTION;111;Carrefour_Pret05;non;0;0;1;non;non;oui;60;oui;oui;8
-OPTION;112;Carrefour_Pret06;non;0;0;1;non;non;oui;60;oui;oui;13
-OPTION;113;Carrefour_Pret07;non;0;0;1;non;non;oui;60;oui;oui;16
-OPTION;114;Carrefour_Pret08;non;0;0;1;non;non;oui;60;oui;oui;27
-OPTION;113;Carrefour_Pret09;non;0;0;1;non;non;oui;70;oui;oui;110
-OPTION;114;Carrefour_Pret10;non;0;0;1;non;non;oui;70;oui;oui;110
-OPTION;111;Carrefour_Pret11;non;0;0;1;non;non;oui;70;oui;oui;127
-OPTION;112;Carrefour_Pret12;non;0;0;1;non;non;oui;70;oui;oui;127
-OPTION;113;Carrefour_Pret13;non;0;0;1;non;non;oui;80;oui;oui;141
-OPTION;114;Carrefour_Pret14;non;0;0;1;non;non;oui;80;oui;oui;141
-OPTION;111;Carrefour_Pret15;non;0;0;1;non;non;oui;80;oui;oui;1
-OPTION;112;Carrefour_Pret16;non;0;0;1;non;non;oui;80;oui;oui;1
-OPTION;113;Carrefour_Pret17;non;0;0;1;non;non;oui;90;oui;oui;1
-OPTION;114;Carrefour_Pret18;non;0;0;1;non;non;oui;90;oui;oui;1
-OPTION;111;Carrefour_Pret19;non;0;0;1;non;non;oui;90;oui;oui;1
-OPTION;112;Carrefour_Pret20;non;0;0;1;non;non;oui;90;oui;oui;1
-OPTION;113;Carrefour_Pret21;non;0;0;1;non;non;oui;100;oui;oui;1
-OPTION;114;Carrefour_Pret22;non;0;0;1;non;non;oui;100;oui;oui;1
+"TYPE";"N°";"Ref Produit";"Produit principal";"Quantité";"Min";"Max";"option_incluse";"option_incluse_obligatoire";"Afficher sur le site";"Ordre";"Lignes de produits visible";"visible_sur_pdf";"Prix d'achat dont ecotaxe"
+"PRODUIT PRINCIPAL";1;"36S0410";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";473,48
+"PRODUIT PRINCIPAL";2;"50G0220";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";653,38
+"PRODUIT PRINCIPAL";3;"36S0910";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";997,02
+"PRODUIT PRINCIPAL";4;"25B0201";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1852,37
+"PRODUIT PRINCIPAL";5;"25B2010";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2011,44
+"PRODUIT PRINCIPAL";6;"40C9136";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1
+"PRODUIT PRINCIPAL";7;"40C9036";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1
+"PRODUIT PRINCIPAL";8;"40C9554";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1
+"PRODUIT PRINCIPAL";9;"32C0230";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";3385,38
+"PRODUIT PRINCIPAL";10;"APPLE-Ref01";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";899,24
+"PRODUIT PRINCIPAL";11;"APPLE-Ref02";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";996,36
+"PRODUIT PRINCIPAL";12;"APPLE-Ref03";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1082,5
+"PRODUIT PRINCIPAL";13;"APPLE-Ref04";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1233,07
+"PRODUIT PRINCIPAL";14;"APPLE-Ref05";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1149,38
+"PRODUIT PRINCIPAL";15;"APPLE-Ref06";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1302,39
+"PRODUIT PRINCIPAL";16;"APPLE-Ref07";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1587,87
+"PRODUIT PRINCIPAL";17;"APPLE-Ref08";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1608,46
+"PRODUIT PRINCIPAL";18;"APPLE-Ref09";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1761,47
+"PRODUIT PRINCIPAL";19;"APPLE-Ref10";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1991,01
+"PRODUIT PRINCIPAL";20;"APPLE-Ref11";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";722,22
+"PRODUIT PRINCIPAL";21;"APPLE-Ref12";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";993,51
+"PRODUIT PRINCIPAL";22;"APPLE-Ref13";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2614,99
+"PRODUIT PRINCIPAL";23;"APPLE-Ref14";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1200,06
+"PRODUIT PRINCIPAL";24;"APPLE-Ref15";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";953,32
+"PRODUIT PRINCIPAL";25;"APPLE-Ref16";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";895,27
+"PRODUIT PRINCIPAL";26;"APPLE-Ref17";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";900,61
+"PRODUIT PRINCIPAL";27;"APPLE-Ref18";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";895,27
+"PRODUIT PRINCIPAL";28;"APPLE-Ref19";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1118,83
+"PRODUIT PRINCIPAL";29;"APPLE-Ref20";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1118,83
+"PRODUIT PRINCIPAL";30;"APPLE-Ref21";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1118,83
+"PRODUIT PRINCIPAL";31;"APPLE-Ref22";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1160,65
+"PRODUIT PRINCIPAL";32;"APPLE-Ref23";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1160,65
+"PRODUIT PRINCIPAL";33;"APPLE-Ref24";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1353,96
+"PRODUIT PRINCIPAL";34;"APPLE-Ref25";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1353,96
+"PRODUIT PRINCIPAL";35;"APPLE-Ref26";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1818,66
+"PRODUIT PRINCIPAL";36;"APPLE-Ref27";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1785,26
+"PRODUIT PRINCIPAL";37;"APPLE-Ref28";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1597,28
+"PRODUIT PRINCIPAL";38;"APPLE-Ref29";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1597,28
+"PRODUIT PRINCIPAL";39;"APPLE-Ref30";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2032,51
+"PRODUIT PRINCIPAL";40;"APPLE-Ref31";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2032,51
+"PRODUIT PRINCIPAL";41;"APPLE-Ref32";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2391,06
+"PRODUIT PRINCIPAL";42;"APPLE-Ref33";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";2391,06
+"PRODUIT PRINCIPAL";43;"APPLE-Ref34";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";397,76
+"PRODUIT PRINCIPAL";44;"APPLE-Ref35";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,29
+"PRODUIT PRINCIPAL";45;"APPLE-Ref36";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";397,76
+"PRODUIT PRINCIPAL";46;"APPLE-Ref37";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,29
+"PRODUIT PRINCIPAL";47;"APPLE-Ref38";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";397,76
+"PRODUIT PRINCIPAL";48;"APPLE-Ref39";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,29
+"PRODUIT PRINCIPAL";49;"APPLE-Ref40";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";316,42
+"PRODUIT PRINCIPAL";50;"APPLE-Ref41";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";429,95
+"PRODUIT PRINCIPAL";51;"APPLE-Ref42";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";316,42
+"PRODUIT PRINCIPAL";52;"APPLE-Ref43";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";429,95
+"PRODUIT PRINCIPAL";53;"APPLE-Ref44";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";316,42
+"PRODUIT PRINCIPAL";54;"APPLE-Ref45";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";429,95
+"PRODUIT PRINCIPAL";55;"APPLE-Ref46";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";600,5
+"PRODUIT PRINCIPAL";56;"APPLE-Ref47";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";714,03
+"PRODUIT PRINCIPAL";57;"APPLE-Ref48";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";714,03
+"PRODUIT PRINCIPAL";58;"APPLE-Ref49";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";714,03
+"PRODUIT PRINCIPAL";59;"APPLE-Ref50";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";600,5
+"PRODUIT PRINCIPAL";60;"APPLE-Ref51";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";600,37
+"PRODUIT PRINCIPAL";61;"APPLE-Ref52";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";462,52
+"PRODUIT PRINCIPAL";62;"APPLE-Ref53";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";576,05
+"PRODUIT PRINCIPAL";63;"APPLE-Ref54";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";576,05
+"PRODUIT PRINCIPAL";64;"APPLE-Ref55";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";576,05
+"PRODUIT PRINCIPAL";65;"APPLE-Ref56";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";462,52
+"PRODUIT PRINCIPAL";66;"APPLE-Ref57";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";462,52
+"PRODUIT PRINCIPAL";67;"APPLE-Ref58";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,29
+"PRODUIT PRINCIPAL";68;"APPLE-Ref59";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,29
+"PRODUIT PRINCIPAL";69;"APPLE-Ref60";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";624,82
+"PRODUIT PRINCIPAL";70;"APPLE-Ref61";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";624,82
+"PRODUIT PRINCIPAL";71;"APPLE-Ref62";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";624,82
+"PRODUIT PRINCIPAL";72;"APPLE-Ref63";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";511,29
+"PRODUIT PRINCIPAL";73;"APPLE-Ref64";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";373,31
+"PRODUIT PRINCIPAL";74;"APPLE-Ref65";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";486,84
+"PRODUIT PRINCIPAL";75;"APPLE-Ref66";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";486,84
+"PRODUIT PRINCIPAL";76;"APPLE-Ref67";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";486,84
+"PRODUIT PRINCIPAL";77;"APPLE-Ref68";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";373,31
+"PRODUIT PRINCIPAL";78;"APPLE-Ref69";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";373,31
+"PRODUIT PRINCIPAL";79;"APPLE-Ref70";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";730,25
+"PRODUIT PRINCIPAL";80;"APPLE-Ref71";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";730,25
+"PRODUIT PRINCIPAL";81;"APPLE-Ref72";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1176,29
+"PRODUIT PRINCIPAL";82;"APPLE-Ref73";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1176,29
+"PRODUIT PRINCIPAL";83;"APPLE-Ref74";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";819,46
+"PRODUIT PRINCIPAL";84;"APPLE-Ref75";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";819,46
+"PRODUIT PRINCIPAL";85;"APPLE-Ref76";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";997,88
+"PRODUIT PRINCIPAL";86;"APPLE-Ref77";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";997,88
+"PRODUIT PRINCIPAL";87;"APPLE-Ref78";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";868,12
+"PRODUIT PRINCIPAL";88;"APPLE-Ref79";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";868,12
+"PRODUIT PRINCIPAL";89;"APPLE-Ref80";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1314,16
+"PRODUIT PRINCIPAL";90;"APPLE-Ref81";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1314,16
+"PRODUIT PRINCIPAL";91;"APPLE-Ref82";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";957,33
+"PRODUIT PRINCIPAL";92;"APPLE-Ref83";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";957,33
+"PRODUIT PRINCIPAL";93;"APPLE-Ref84";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1135,74
+"PRODUIT PRINCIPAL";94;"APPLE-Ref85";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1135,74
+"PRODUIT PRINCIPAL";95;"APPLE-Ref86";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";908,67
+"PRODUIT PRINCIPAL";96;"APPLE-Ref87";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";909,36
+"PRODUIT PRINCIPAL";97;"APPLE-Ref88";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1355,4
+"PRODUIT PRINCIPAL";98;"APPLE-Ref89";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1354,7
+"PRODUIT PRINCIPAL";99;"APPLE-Ref90";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";997,88
+"PRODUIT PRINCIPAL";100;"APPLE-Ref91";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";998,57
+"PRODUIT PRINCIPAL";101;"APPLE-Ref92";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1176,29
+"PRODUIT PRINCIPAL";102;"APPLE-Ref93";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1176,29
+"PRODUIT PRINCIPAL";103;"APPLE-Ref94";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1046,53
+"PRODUIT PRINCIPAL";104;"APPLE-Ref95";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1047,23
+"PRODUIT PRINCIPAL";105;"APPLE-Ref96";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1492,57
+"PRODUIT PRINCIPAL";106;"APPLE-Ref97";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1492,57
+"PRODUIT PRINCIPAL";107;"APPLE-Ref98";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1135,74
+"PRODUIT PRINCIPAL";108;"APPLE-Ref99";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1135,74
+"PRODUIT PRINCIPAL";109;"APPLE-Ref100";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1314,16
+"PRODUIT PRINCIPAL";110;"APPLE-Ref101";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";1314,85
+"PRODUIT PRINCIPAL";111;"Carrefour-Ref01";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";404
+"PRODUIT PRINCIPAL";112;"Carrefour-Ref02";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";404
+"PRODUIT PRINCIPAL";113;"Carrefour-Ref03";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";950
+"PRODUIT PRINCIPAL";114;"Carrefour-Ref04";"oui";1;1;1;"non";"non";"oui";10;"oui";"oui";950
+"GARANTIE";10;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";11;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";12;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";13;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";14;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";15;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";16;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";17;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";18;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";19;"APPLECARE-iMac-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";179
+"GARANTIE";20;"APPLECARE-Macmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";89
+"GARANTIE";21;"APPLECARE-Macmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";89
+"GARANTIE";22;"APPLECARE-MacPro-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";23;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";24;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";25;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";26;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";27;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";28;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";29;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";30;"APPLECARE-MacbookAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";31;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";32;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";33;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";34;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";35;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";36;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";37;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";38;"APPLECARE-MacbookPro13-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";249
+"GARANTIE";39;"APPLECARE-MacbookPro16-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";499
+"GARANTIE";40;"APPLECARE-MacbookPro16-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";499
+"GARANTIE";41;"APPLECARE-MacbookPro16-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";499
+"GARANTIE";42;"APPLECARE-MacbookPro16-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";499
+"GARANTIE";43;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";44;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";45;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";46;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";47;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";48;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";49;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";50;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";51;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";52;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";53;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";54;"APPLECARE-iPad-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";55;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";56;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";57;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";58;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";59;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";60;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";61;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";62;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";63;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";64;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";65;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";66;"APPLECARE-iPadAir-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";67;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";68;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";69;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";70;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";71;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";72;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";73;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";74;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";75;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";76;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";77;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";78;"APPLECARE-iPadmini-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";79
+"GARANTIE";79;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";80;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";81;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";82;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";83;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";84;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";85;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";86;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";87;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";88;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";89;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";90;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";91;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";92;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";93;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";94;"APPLECARE-iPadPro11-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";95;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";96;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";97;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";98;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";99;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";100;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";101;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";102;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";103;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";104;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";105;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";106;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";107;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";108;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";109;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";110;"APPLECARE-iPadPro12,9-01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";139
+"GARANTIE";111;"Carrefour_Gar01";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";272
+"GARANTIE";112;"Carrefour_Gar02";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";520
+"GARANTIE";113;"Carrefour_Gar03";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";557
+"GARANTIE";114;"Carrefour_Gar04";"non";1;1;1;"non";"non";"oui";20;"oui";"oui";1060
+"LIVRAISON";111;"Carrefour_Livr01";"non";0;0;1;"non";"non";"oui";40;"oui";"oui";149
+"LIVRAISON";112;"Carrefour_Livr02";"non";0;0;1;"non";"non";"oui";40;"oui";"oui";149
+"LIVRAISON";113;"Carrefour_Livr01";"non";0;0;1;"non";"non";"oui";40;"oui";"oui";149
+"LIVRAISON";114;"Carrefour_Livr02";"non";0;0;1;"non";"non";"oui";40;"oui";"oui";149
+"FRAIS DE DOSSIERS";1;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";2;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";3;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";4;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";5;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";6;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";7;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";8;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";9;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";10;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";11;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";12;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";13;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";14;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";15;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";16;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";17;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";18;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";19;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";20;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";21;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";22;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";23;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";24;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";25;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";26;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";27;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";28;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";29;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";30;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";31;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";32;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";33;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";34;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";35;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";36;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";37;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";38;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";39;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";40;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";41;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";42;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";43;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";44;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";45;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";46;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";47;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";48;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";49;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";50;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";51;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";52;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";53;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";54;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";55;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";56;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";57;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";58;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";59;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";60;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";61;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";62;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";63;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";64;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";65;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";66;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";67;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";68;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";69;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";70;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";71;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";72;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";73;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";74;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";75;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";76;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";77;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";78;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";79;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";80;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";81;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";82;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";83;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";84;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";85;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";86;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";87;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";88;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";89;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";90;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";91;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";92;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";93;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";94;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";95;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";96;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";97;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";98;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";99;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";100;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";101;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";102;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";103;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";104;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";105;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";106;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";107;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";108;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";109;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";110;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";111;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";112;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";113;"Frais36";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"FRAIS DE DOSSIERS";114;"Frais60";"non";1;1;1;"non";"non";"non";9999;"non";"non";35
+"OPTION";111;"Carrefour_Pret01";"non";0;0;1;"non";"non";"oui";50;"oui";"oui";1
+"OPTION";112;"Carrefour_Pret02";"non";0;0;1;"non";"non";"oui";50;"oui";"oui";1
+"OPTION";113;"Carrefour_Pret03";"non";0;0;1;"non";"non";"oui";50;"oui";"oui";1
+"OPTION";114;"Carrefour_Pret04";"non";0;0;1;"non";"non";"oui";50;"oui";"oui";1
+"OPTION";111;"Carrefour_Pret05";"non";0;0;1;"non";"non";"oui";60;"oui";"oui";8
+"OPTION";112;"Carrefour_Pret06";"non";0;0;1;"non";"non";"oui";60;"oui";"oui";13
+"OPTION";113;"Carrefour_Pret07";"non";0;0;1;"non";"non";"oui";60;"oui";"oui";16
+"OPTION";114;"Carrefour_Pret08";"non";0;0;1;"non";"non";"oui";60;"oui";"oui";27
+"OPTION";113;"Carrefour_Pret09";"non";0;0;1;"non";"non";"oui";70;"oui";"oui";110
+"OPTION";114;"Carrefour_Pret10";"non";0;0;1;"non";"non";"oui";70;"oui";"oui";110
+"OPTION";111;"Carrefour_Pret11";"non";0;0;1;"non";"non";"oui";70;"oui";"oui";127
+"OPTION";112;"Carrefour_Pret12";"non";0;0;1;"non";"non";"oui";70;"oui";"oui";127
+"OPTION";113;"Carrefour_Pret13";"non";0;0;1;"non";"non";"oui";80;"oui";"oui";141
+"OPTION";114;"Carrefour_Pret14";"non";0;0;1;"non";"non";"oui";80;"oui";"oui";141
+"OPTION";111;"Carrefour_Pret15";"non";0;0;1;"non";"non";"oui";80;"oui";"oui";1
+"OPTION";112;"Carrefour_Pret16";"non";0;0;1;"non";"non";"oui";80;"oui";"oui";1
+"OPTION";113;"Carrefour_Pret17";"non";0;0;1;"non";"non";"oui";90;"oui";"oui";1
+"OPTION";114;"Carrefour_Pret18";"non";0;0;1;"non";"non";"oui";90;"oui";"oui";1
+"OPTION";111;"Carrefour_Pret19";"non";0;0;1;"non";"non";"oui";90;"oui";"oui";1
+"OPTION";112;"Carrefour_Pret20";"non";0;0;1;"non";"non";"oui";90;"oui";"oui";1
+"OPTION";113;"Carrefour_Pret21";"non";0;0;1;"non";"non";"oui";100;"oui";"oui";1
+"OPTION";114;"Carrefour_Pret22";"non";0;0;1;"non";"non";"oui";100;"oui";"oui";1
