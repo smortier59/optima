@@ -373,8 +373,7 @@ class souscription_cleodis extends souscription {
         "prix_achat"=>0,
         "type_affaire" => "normal",
         "IBAN"=> $post["iban"],
-        "BIC"=> $post["bic"],
-        "commentaire" =>$post['commentaire']
+        "BIC"=> $post["bic"]
 
     );
 
