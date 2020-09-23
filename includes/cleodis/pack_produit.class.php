@@ -3,6 +3,12 @@
 * @package Optima
 * @subpackage Cléodis
 */
+require __ABSOLUTE_PATH__ . 'libs/ATF/libs/phpseclib/vendor/autoload.php';
+use phpseclib\Net\SFTP as SFTP;
+
+
+
+
 class pack_produit extends classes_optima {
 	// Mapping prévu pour un autocomplete sur produit
 	public static $autocompleteMapping = array(
@@ -73,6 +79,9 @@ class pack_produit extends classes_optima {
 		$this->addPrivilege("setInfos","update");
 		$this->addPrivilege("EtatUpdate");
 		$this->addPrivilege("export_middleware");
+		$this->addPrivilege("export_middleware_xls");
+
+		$this->addPrivilege("csv_middleware");
 	}
 
 	/**
@@ -466,7 +475,7 @@ class pack_produit extends classes_optima {
 
 		$workbook = new PHPExcel;
 
-		$sheets = array("Packs","Packs-Produits","Produits");		
+		$sheets = array("Packs","Packs-Produits","Produits");
 
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
 
@@ -543,7 +552,7 @@ class pack_produit extends classes_optima {
 			$sheet->setCellValueByColumnAndRow($i , 1, $titre[0]);
 			$sheet->getColumnDimension($col)->setWidth($titre[1]);
 			$i++;
-        }		 
+        }
     	$i=0;
     	$j=2;
 		foreach ($packs as $k=>$v) {
@@ -595,7 +604,7 @@ class pack_produit extends classes_optima {
 			}
 	        $i=0;
 	        $j++;
-		}		    		
+		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
 
@@ -611,19 +620,25 @@ class pack_produit extends classes_optima {
 	}
      */
 
-    /** Export des produits pour le middleware
-     * @author Quentin JANON <qjanon@absystech.fr>
-     * @param array $infos : contient éventuellement un pager(onglet) qui permet d'exporter uniquement la sélection
-     */
-    public function export_middleware($infos,&$s){
-    	ob_get_flush();
-		$this->setQuerier($s["pager"]->create($infos['onglet']));
+
+
+	public function export_middleware_xls($infos, &$s){
+		ob_get_flush();
+
+		if($infos["onglet"] && str_replace("gsa_pack_produit_pack_produit", "", $infos["onglet"]) !== "") {
+    		$this->setQuerier($s["pager"]->create($infos['onglet']));
+    	}else{
+    		ATF::site_associe()->q->reset()->where("export_middleware", "oui");
+    		$site_associe_export = ATF::site_associe()->sa();
+    		$this->q->reset();
+    		foreach ($site_associe_export as $key => $value) {
+    			$this->q->where("site_associe", $value["site_associe"], "OR", "site_associe");
+    		}
+    	}
 		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
 		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
 		$data = $this->select_data($s,"saExport");
-		if (count($data) > 500) {
-			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
-		}
+
 
 		$packs = [];
 		$lignes = [];
@@ -651,7 +666,7 @@ class pack_produit extends classes_optima {
 				->addField("pack_produit.prolongation")
 				->addField("pack_produit.val_plancher")
 				->addField("pack_produit.val_plafond")
-				->addField("pack_produit.max_qte")       				
+				->addField("pack_produit.max_qte")
 				->where('id_pack_produit', $pack['id_pack_produit'])
 				->addOrder('id_pack_produit', 'DESC');
 	        $packs[] = ATF::pack_produit()->select_row();
@@ -787,14 +802,14 @@ class pack_produit extends classes_optima {
 
 		$workbook = new PHPExcel;
 
-		$sheets = array("Packs","Packs-Produits","Produits");		
+		$sheets = array("Packs","Packs-Produits","Produits");
 
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
 
 
         // Premier onglet
         $sheet = $workbook->getActiveSheet();
-		$workbook->setActiveSheetIndex($key);
+		$workbook->setActiveSheetIndex(0);
 	    $sheet->setTitle("Produits");
 
 	    $entetes = array_keys($produits[0]);
@@ -812,7 +827,7 @@ class pack_produit extends classes_optima {
 
         // Second onglet
         $sheet = $workbook->createSheet(1);
-		$workbook->setActiveSheetIndex($key);
+		$workbook->setActiveSheetIndex(1);
 	    $sheet->setTitle("Packs");
 
 	    $entetes = array_keys($packs[0]);
@@ -824,7 +839,7 @@ class pack_produit extends classes_optima {
 
         // Troisième onglet
         $sheet = $workbook->createSheet(2);
-		$workbook->setActiveSheetIndex($key);
+		$workbook->setActiveSheetIndex(2);
 	    $sheet->setTitle("Lignes");
 
 	    $entetes = array_keys($lignes[0]);
@@ -861,8 +876,333 @@ class pack_produit extends classes_optima {
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
 
+
 	}
 
+
+
+    /** Export des produits pour le middleware
+     * @author Quentin JANON <qjanon@absystech.fr>
+     * @param array $infos : contient éventuellement un pager(onglet) qui permet d'exporter uniquement la sélection
+     */
+    public function export_middleware($infos,&$s){
+    	ob_get_flush();
+
+    	if($infos["onglet"] && str_replace("gsa_pack_produit_pack_produit", "", $infos["onglet"]) !== "") {
+    		$this->setQuerier($s["pager"]->create($infos['onglet']));
+    	}else{
+
+    		ATF::site_associe()->q->reset()->where("export_middleware", "oui");
+    		$site_associe_export = ATF::site_associe()->sa();
+    		$this->q->reset();
+    		foreach ($site_associe_export as $key => $value) {
+    			$this->q->where("site_associe", $value["site_associe"], "OR", "site_associe");
+    		}
+    	}
+		//on retiens le where dans le cas d'un onglet pour filtrer les donnéees
+		$this->q->addField("id_pack_produit")->setLimit(-1)->unsetCount();
+		$data = $this->select_data($s,"saExport");
+		/*if (count($data) > 500) {
+			die("Trop de résultat pour générer l'export, cliquez sur le bouton RETOUR de votre navigateur et affiner votre filtrage.");
+		}*/
+
+
+		$packs = [];
+		$lignes = [];
+		$produits = [];
+		foreach ($data as $pack) {
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit()->q->reset()
+				->addField("pack_produit.nom")
+				->addField("pack_produit.site_associe")
+				->addField("pack_produit.type_offre")
+				->addField("pack_produit.loyer")
+				->addField("pack_produit.duree")
+				->addField("pack_produit.frequence")
+				->addField("pack_produit.etat")
+				->addField("pack_produit.specifique_partenaire")
+				->addField("pack_produit.visible_sur_site")
+				->addField("pack_produit.id_pack_produit_besoin")
+				->addField("pack_produit.id_pack_produit_produit")
+				->addField("pack_produit.url")
+				->addField("pack_produit.description")
+				->addField("pack_produit.avis_expert")
+				->addField("pack_produit.popup")
+				->addField("pack_produit.id_document_contrat")
+				->addField("pack_produit.prolongation")
+				->addField("pack_produit.val_plancher")
+				->addField("pack_produit.val_plafond")
+				->addField("pack_produit.max_qte")
+				->where('id_pack_produit', $pack['id_pack_produit'])
+				->addOrder('id_pack_produit', 'DESC');
+	        $packs[] = ATF::pack_produit()->select_row();
+
+			// On récupère les packs avec les bonnes colonnes
+	        ATF::pack_produit_ligne()->q->reset()
+				->addField("pack_produit_ligne.id_pack_produit_ligne")
+				->addField("pack_produit_ligne.type")
+				->addField("pack_produit_ligne.id_pack_produit")
+				->addField("pack_produit_ligne.id_produit")
+				->addField("pack_produit_ligne.ref")
+				->addField("pack_produit_ligne.produit")
+				->addField("pack_produit_ligne.quantite")
+				->addField("pack_produit_ligne.min")
+				->addField("pack_produit_ligne.max")
+				->addField("pack_produit_ligne.option_incluse")
+				->addField("pack_produit_ligne.option_incluse_obligatoire")
+				->addField("pack_produit_ligne.id_fournisseur")
+				->addfield('fournisseur.societe','Fournisseur')
+				->addField("pack_produit_ligne.frequence_fournisseur")
+				->addField("pack_produit_ligne.id_partenaire")
+				->addfield('partenaire.societe','Partenaire')
+				->addField("pack_produit_ligne.prix_achat")
+				->addField("pack_produit_ligne.code")
+				->addField("pack_produit_ligne.serial")
+				->addField("pack_produit_ligne.visible")
+				->addField("pack_produit_ligne.visible_sur_pdf")
+				->addField("pack_produit_ligne.visibilite_prix")
+				->addField("pack_produit_ligne.neuf")
+				->addField("pack_produit_ligne.date_achat")
+				->addField("pack_produit_ligne.ref_simag")
+				->addField("pack_produit_ligne.commentaire")
+				->addField("pack_produit_ligne.ordre")
+				->addField("pack_produit_ligne.principal")
+				->addField("pack_produit_ligne.val_modifiable")
+				->addField("pack_produit_ligne.valeur")
+				->from('pack_produit_ligne','id_fournisseur','societe','id_societe','fournisseur')
+				->from('pack_produit_ligne','id_partenaire','societe','id_societe','partenaire')
+				->where('id_pack_produit',$pack['pack_produit.id_pack_produit'])
+				->setStrict();
+	        foreach (ATF::pack_produit_ligne()->select_all() as $l) {
+	        	array_push($lignes, $l);
+	        }
+		}
+		// Et maintenant les produits
+		foreach ($lignes as $l) {
+	        ATF::produit()->q->reset()
+				->addField("produit.id_produit")
+				->addField("produit.ref")
+				->addField("produit.produit")
+				->addField("produit.prix_achat")
+				->addField("produit.taxe_ecotaxe")
+				->addField("produit.taxe_ecomob")
+				->addField("produit.url_produit")
+				->addField("produit.id_fabriquant")
+				->addField("fabriquant.fabriquant", "Fabriquant")
+				->addField("sous_categorie.id_categorie", 'id_categorie')
+				->addField("categorie.categorie", "Catégorie")
+				->addField("produit.id_sous_categorie")
+				->addField("sous_categorie.sous_categorie", "Sous categorie")
+				->addField("produit.type")
+				->addField("produit.id_fournisseur")
+				->addField("fournisseur.societe", 'Fournisseur')
+				->addField("produit.code")
+				->addField("produit.obsolete")
+				->addField("produit.id_produit_dd")
+				->addField("produit.id_produit_dotpitch")
+				->addField("produit.id_produit_format")
+				->addField("produit.id_produit_garantie_uc")
+				->addField("produit.id_produit_garantie_ecran")
+				->addField("produit.id_produit_garantie_imprimante")
+				->addField("produit.id_produit_lan")
+				->addField("produit.id_produit_lecteur")
+				->addField("produit.id_produit_OS")
+				->addField("produit.id_produit_puissance")
+				->addField("produit.id_produit_ram")
+				->addField("produit.id_produit_technique")
+				->addField("produit.id_produit_type")
+				->addField("produit.id_produit_typeecran")
+				->addField("produit.id_produit_viewable")
+				->addField("produit.id_processeur")
+				->addField("produit.etat")
+				->addField("produit.commentaire")
+				->addField("produit.type_offre")
+				->addField("produit.description")
+				->addField("produit.site_associe")
+				->addField("produit.loyer")
+				->addField("produit.duree")
+				->addField("produit.loyer1")
+				->addField("produit.duree2")
+				->addField("produit.duree1")
+				->addField("produit.loyer2")
+				->addField("produit.visible_sur_site")
+				->addField("produit.avis_expert")
+				->addField("produit.services")
+				->addField("produit.id_produit_env")
+				->addField("produit.id_produit_besoins")
+				->addField("produit.id_produit_tel_produit")
+				->addField("produit.id_produit_tel_type")
+				->addField("produit.url")
+				->addField("produit.ean")
+				->addField("produit.id_document_contrat")
+				->addField("document_contrat.document_contrat", "Document contrat")
+				->addField("produit.url_image")
+				->addField("produit.livreur")
+				->addField("produit.frais_livraison")
+				->addField("produit.ref_garantie")
+				->addField("produit.id_licence_type")
+				->addField("licence_type.licence_type", "Licence type")
+				->addField("produit.increment")
+				->from('produit','id_fournisseur','societe','id_societe','fournisseur')
+				->from('produit','id_fabriquant','fabriquant','id_fabriquant','fabriquant')
+				->from('produit','id_sous_categorie','sous_categorie','id_sous_categorie')
+				->from('sous_categorie','id_categorie','categorie','id_categorie')
+				->from('produit','id_document_contrat','document_contrat','id_document_contrat')
+				->from('produit','id_licence_type','licence_type','id_licence_type')
+				->where('id_produit',$l['pack_produit_ligne.id_produit'])
+				->setStrict();
+
+	        foreach (ATF::produit()->select_all() as $p) {
+	        	array_push($produits, $p);
+	        }
+		}
+
+		$site_associe = array();
+
+		foreach ($packs as $key => $value) {
+			$site_associe[$value["pack_produit.site_associe"]][$value["pack_produit.id_pack_produit"]] = true ;
+		}
+
+
+
+		$zipname = 'middleware' . date("Ymd-Hi") . '.zip';
+		$zip = new ZipArchive;
+		$zip->open($zipname, ZipArchive::CREATE);
+
+		foreach ($site_associe as $key => $value) {
+			$file = $this->csv_middleware("Packs", $packs, $key, $site_associe);
+			$zip->addFile($file);
+			$this->csv_middleware_to_ftp($file);
+
+			$file = $this->csv_middleware("Produits", $produits, $key, $site_associe);
+			$zip->addFile($file);
+			$this->csv_middleware_to_ftp($file);
+
+			$file = $this->csv_middleware("Lignes", $lignes, $key, $site_associe);
+			$zip->addFile($file);
+			$this->csv_middleware_to_ftp($file);
+
+			file_put_contents($key.".txt", "ok");
+			$this->csv_middleware_to_ftp($key.".txt");
+		}
+
+
+		$zip->close();
+
+		if($infos["export_from_batch"]){
+
+			return true;
+		}else{
+			header('Content-Type: application/zip');
+			header('Content-disposition: attachment; filename='.$zipname);
+			header('Content-Length: ' . filesize($zipname));
+			readfile($zipname);
+		}
+	}
+
+	/**
+	 * Création des fichiers CSV pour le middleware
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  String $titre                 Type de fichier (Packs / Produits / Lignes)
+	 * @param  array  $data                  Données des packs
+	 * @param  String $site_associe          Site associé
+	 * @param  Array  $pack_par_site_associe Données des packs, par site associé
+	 * @return String File                   Nom du fichier
+	 */
+	public function csv_middleware($titre, $data, $site_associe, $pack_par_site_associe){
+
+
+		$fn = $titre . "-" . $site_associe . ".csv";
+        $fp = fopen($fn, 'w');
+
+		switch ($titre) {
+			case 'Produits':
+				$entetes = array_keys($data[0]);
+				$entetes = array_map(function ($el) {
+			    	return str_replace("produit.","",$el);
+			    }, $entetes);
+			    $produitDedoublonne = [];
+			    foreach ($data as $p) {
+			    	//if($site_associe == $p["produit.site_associe"]){
+			    		$produitDedoublonne[$p['produit.id_produit']] = $p;
+			    	//}
+			    }
+				$data = $produitDedoublonne;
+			break;
+
+			case 'Packs':
+				$entetes = array_keys($data[0]);
+			    $entetes = array_map(function ($el) {
+			    	return str_replace("pack_produit.","",$el);
+			    }, $entetes);
+
+			    $packs = [];
+
+			    foreach ($data as $key => $value) {
+			    	if($pack_par_site_associe[$site_associe][$value["pack_produit.id_pack_produit"]]){
+			    		$packs[] = $value;
+			    	}
+			    }
+			    $data = $packs;
+			break;
+
+
+			case 'Lignes':
+				$entetes = array_keys($data[0]);
+			    $entetes = array_map(function ($el) {
+			    	return str_replace("pack_produit_ligne.","",$el);
+			    }, $entetes);
+
+			    $lignes = [];
+			    foreach ($data as $key => $value) {
+			    	if($pack_par_site_associe[$site_associe][$value["pack_produit_ligne.id_pack_produit"]]){
+			    		$lignes[] = $value;
+			    	}
+			    }
+			    $data = $lignes;
+			break;
+		}
+
+		$entete_format = array();
+		$entete_format[0] = $entetes;
+
+		$data = array_merge($entete_format , $data);
+
+
+
+		foreach ($data as $fields => $value) {
+
+		    fputcsv($fp, $value, ";", '"');
+		}
+
+		fclose($fp);
+
+		return $fn;
+	}
+
+	/**
+	 * Envoi par SFTP des fichiers CSV middleware
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  String $file
+	 */
+	public function csv_middleware_to_ftp($file){
+		try{
+			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__);
+
+			$sftp = new SFTP(__MIDDLEWARE_FTP_HOST__, __MIDDLEWARE_FTP_PORT__);
+			if (!$sftp->login(__MIDDLEWARE_FTP_LOGIN__, __MIDDLEWARE_FTP_PASS__)) {
+			    log::logger("Login failed" , "upload_middleware");
+			}else{
+				log::logger("Login success" , "upload_middleware");
+			}
+
+			$sftp->put(__MIDDLEWARE_FTP_FOLDER__.$file, $file, SFTP::SOURCE_LOCAL_FILE);
+
+		}catch(Exception $e){
+			log::logger($e->getMessage() , "upload_middleware");
+		}
+	}
 
 }
 
