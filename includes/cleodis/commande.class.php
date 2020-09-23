@@ -1770,9 +1770,16 @@ class commande_cleodis extends commande {
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
     */
 	public function cleodisStatut(){
-		$this->q->setCount()->addOrder("id_commande","DESC");
+		$this->q->setCount()
+							/*->where("ref", "2007073", "OR")
+							->where("ref", "0709050", "OR")
+							->where("ref", "0709038", "OR")
+							->where("ref", "0711065", "OR")*/
+
+							->addOrder("id_commande","DESC");
 		$commandeSa=$this->sa();
 		$i=1;
+		$commandeMAJ = array();
 		ATF::db($this->db)->begin_transaction();
 		foreach($commandeSa["data"] as $key=>$item){
 			unset($affaires_parentes);
@@ -1803,11 +1810,30 @@ class commande_cleodis extends commande {
 			$etat_modifie=$commande->get("etat");
 			if($etat!=$etat_modifie){
 				log::logger($commande->get("ref")."         ".$etat."!=".$etat_modifie,'cleodis_statut.log');
+				$commandeMAJ[] = array("ref"=>$commande->get("ref"),
+									   "id_commande"=>$commande->get("id_commande"),
+									   "ancien_etat" => $etat,
+									   "nouvel_etat" => $etat_modifie,
+									   "client" => $commande->get("id_societe")
+				 					   );
 			}
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			$i++;
 		}
-		ATF::db($this->db)->commit_transaction();
+		ATF::db($this->db)->rollback_transaction();
+
+
+		if($commandeMAJ){
+			$infos_mail["from"] = "NO REPLY <no-reply@cleodis.com>";
+		    $infos_mail["recipient"] = "jerome.loison@cleodis.com";
+		    $infos_mail["html"] = true;
+		    $infos_mail["template"] = "mail_recap_update_statut_contrat";
+			$infos_mail["objet"] = "[".ATF::$codename."] - Recapitulatif des contrat ayant changé de statut";
+			$infos_mail["commande"] = $commandeMAJ;
+			$mail = new mail($infos_mail);
+			$send = $mail->send();
+		}
+
 	}
 
 	/**
@@ -1852,6 +1878,7 @@ class commande_cleodis extends commande {
 
 			$commande->set('etat',$arret);
 			$commande->set('date_arret',date("Y-m-d"));
+			$commande->set('date_restitution_effective',date("Y-m-d"));
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
@@ -1911,6 +1938,7 @@ class commande_cleodis extends commande {
 			}
 
 			$commande->set('date_arret',NULL);
+			$commande->set('date_restitution_effective',NULL);
 			$affaire = $commande->getAffaire();
 
 			$comm = ATF::commande()->select($infos['id_commande']);
