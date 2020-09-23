@@ -1820,7 +1820,7 @@ class commande_cleodis extends commande {
 			ATF::parc()->updateExistenz($commande,$affaire,$affaire_parente,$affaires_parentes);
 			$i++;
 		}
-		ATF::db($this->db)->rollback_transaction();
+		ATF::db($this->db)->commit_transaction();
 
 
 		if($commandeMAJ){
