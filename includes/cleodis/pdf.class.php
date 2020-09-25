@@ -101,6 +101,11 @@ class pdf_cleodis extends pdf {
 				$this->logo = 'cleodis/Manganelli.jpg';
 			break;
 
+			case 'Mariton' :
+				$this->cleodis = "Mariton";
+				$this->logo = 'cleodis/mariton.jpg';
+			break;
+
 			case 'NRC' :
 				$this->cleodis = "NRC";
 				$this->logo = 'cleodis/nrc.jpg';
