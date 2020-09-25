@@ -134,8 +134,8 @@ class pdf_cleodis extends pdf {
 			break;
 
 			default:
-				$this->logo = 'cleodis/logo.jpg';
-				$this->cleodis = "CLEODIS";
+				$this->logo = ATF::$codename.'/logo.jpg';
+				$this->cleodis = $this->cleodis;
 			break;
 		}
 	}
