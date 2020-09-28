@@ -260,7 +260,7 @@ class facturation extends classes_optima {
 	function insert_facturations($commande,$affaire,$affaires_parentes=false,$devis,$type) {
 		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"));
 		$loyer = ATF::loyer()->sa();
-		if($commande->get("etat")!="arreter" && $commande->get("etat")!="vente" && $commande->get("etat")!="restitution" && $commande->get("etat")!="restitution_contentieux" && !$commande->isAR() && $loyer){
+		if($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux" && $commande->get("etat")!="vente" && $commande->get("etat")!="restitution" && $commande->get("etat")!="restitution_contentieux" && !$commande->isAR() && $loyer){
 
 			//***************FACTURATION************************
 			$this->delete_special($commande->get("id_affaire"));
@@ -374,7 +374,7 @@ class facturation extends classes_optima {
 	function insert_facturation($commande,$affaire) {
 		ATF::loyer()->q->reset()->Where("id_affaire",$affaire->get("id_affaire"));
 		$loyer = ATF::loyer()->sa();
-		if($commande->get("etat")!="arreter" && $commande->get("etat")!="vente" && ($commande->get("etat")!="restitution" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && ($commande->get("etat")!="restitution_contentieux" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && !$commande->isAR() && $loyer){
+		if($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux" && $commande->get("etat")!="vente" && ($commande->get("etat")!="restitution" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && ($commande->get("etat")!="restitution_contentieux" || $commande->get("date_prevision_restitution") > date("Y-m-d")) && !$commande->isAR() && $loyer){
 			//***************PROLONGATION************************
 
 			$date_debut_periode = date("Y-m-d",mktime(0,0,0,date("m"),01,date("Y")));
@@ -834,13 +834,13 @@ class facturation extends classes_optima {
 				->addCondition("`facturation`.`id_facture`",NULL,"AND",false,"IS NULL")
 				->addCondition("`affaire`.`etat`","perdue","AND",false,"<>")
 				->addCondition("`commande`.`etat`","arreter","AND",false,"<>")
+				->addCondition("`commande`.`etat`","arreter_contentieux","AND",false,"<>")
 				->addCondition("commande.date_prevision_restitution",NULL,"AND","date_prevision","IS NULL")
 					->addCondition("commande.date_prevision_restitution", date("Y-m-d",strtotime(date("Y-m-01")."+1 month")), "OR", "date_prevision", ">=")
 				->addCondition("`commande`.`etat`","restitution","AND","restidate","<>")
 					->addCondition("commande.date_prevision_restitution", date("Y-m-d",strtotime(date("Y-m-01")."+1 month")), "OR", "restidate", ">=")
 				->addCondition("`commande`.`etat`","restitution_contentieux","AND","restidatecontentieux","<>")
 					->addCondition("commande.date_prevision_restitution", date("Y-m-d",strtotime(date("Y-m-01")."+1 month")), "OR", "restidatecontentieux", ">=")
-				->addCondition("`commande`.`etat`","arreter","AND",false,"<>")
 				->addCondition("`commande`.`etat`","AR","AND",false,"<>")
 				->addCondition("`affaire`.`nature`","vente","AND",false,"<>");
 
@@ -975,6 +975,7 @@ class facturation extends classes_optima {
 					OR  `prolongation`.`date_arret` <  '".$date_fin."'
 				)
 				AND `commande`.`etat` != 'arreter'
+				AND `commande`.`etat` != 'arreter_contentieux'
 				AND `commande`.`etat` != 'AR'
 				AND (
 				        commande.date_prevision_restitution IS NULL
@@ -1212,6 +1213,7 @@ class facturation extends classes_optima {
 				AND `commande`.`etat` != 'prolongation'
 				AND `commande`.`etat` != 'AR'
 				AND `commande`.`etat` != 'arreter'
+				AND `commande`.`etat` != 'arreter_contentieux'
 				AND `commande`.`etat` != 'vente'
 				AND `commande`.`etat` != 'mis_loyer_contentieux'
 				AND `commande`.`etat` != 'prolongation_contentieux'
