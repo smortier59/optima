@@ -11,20 +11,24 @@ class licence extends classes_optima {
 			'licence.id_licence_type',
 			'licence.id_commande_ligne',
 			'licence.deja_pris' => array("custom"=> true, "renderer"=>"licence_prise"),
-			'licence.date_envoi'=>array("renderer"=>"updateDate","width"=>170)
+			'delete_date_envoi'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"deleteDateEnvoi","width"=>50),
+			'licence.date_envoi'
+
 		);
-		$this->colonnes['bloquees']['update'] = array('date_envoi');
-
-		$this->colonnes['update'] = array('date_envoi');
 		$this->fieldstructure();
-
-		$this->no_update = true;
 
 		$this->foreign_key['id_licence_type'] =  "licence_type";
 		$this->foreign_key['id_commande_ligne'] =  "commande_ligne";
 
 		$this->colonnes['bloquees']['select'] = array("part_1", "part_2");
+
+		$this->addPrivilege("deleteDateEnvoi");
+
 	}
+
+
+
+
 
 
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
@@ -41,7 +45,7 @@ class licence extends classes_optima {
 			$this->q->addJointure("licence","id_commande_ligne","commande_ligne","id_commande_ligne");
 			$this->q->addJointure("commande_ligne","id_commande","commande","id_commande");
 
-			$this->q->where("commande.id_affaire",ATF::affaire()->decryptID(ATF::_r('id_affaire')));	
+			$this->q->where("commande.id_affaire",ATF::affaire()->decryptID(ATF::_r('id_affaire')));
 			ATF::_r('id_affaire', null);
 		}
 
@@ -56,44 +60,47 @@ class licence extends classes_optima {
 		}
 		return $return;
 	}
-	
-	
-	/**
-    * Exposition de la fonction updateDate via l'API de'Optima
-    * @author Julie Delaporte <jdelaporte@absystech.fr>
-	*/
-	public function _updateDate ($infos) {
-		$infos["key"] = "date_envoi";
-		$this->updateDate($infos);
-		if(!ATF::licence()->select($infos["id_licence"], "date_envoi")){
-			$this->updateDate(array("id_licence" => $infos["id_licence"],"key"=> "date_envoi", "value" => $infos["value"]));
-		}else{
-			$this->updateDate($infos);
+
+	public function deleteDateEnvoi($data){
+		log::logger($data , "mfleurquin");
+
+		if($data["id_licence"]){
+			$id_licence = ATF::licence()->decryptID($data["id_licence"]);
+
+			if(ATF::licence()->u(array("id_licence"=> $id_licence , "date_envoi"=>NULL))) {
+				ATF::$msg->addNotice(
+					loc::mt(ATF::$usr->trans("suppression_date_envoi_reussie")) ,ATF::$usr->trans("notice_success_title")
+				);
+			}
+			$this->redirection("select_all",NULL,"licence.html");
 		}
+
+		return true;
+
 	}
 
+	/**
+	 * Mise à jour de la date sur listing
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
 	public function updateDate($infos){
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
 		$infosMaj["id_".$this->table]=$infos["id_".$this->table];
 		$infosMaj[$infos["key"]]=$infos["value"];
 
-		if($infos["key"] == "date_envoi"){
-			$infos["id_licence"] = ATF::facture()->decryptId($infos["id_licence"]);
-
-			$infosMaj["id_licence"] = $infos["id_licence"];
-
-			if($this->u($infosMaj)){
-				ATF::$msg->addNotice(
-					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
-					,ATF::$usr->trans("notice_success_title")
-				);
-			}
+		if($this->u($infosMaj)){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+				,ATF::$usr->trans("notice_success_title")
+			);
 		}
+
+		return true;
 	}
 
-}
 
+};
 class licence_midas extends licence { };
 class licence_cleodisbe extends licence { };
 class licence_cap extends licence { };
@@ -164,7 +171,6 @@ class licence_bdomplus extends licence {
 		log::logger("Fin du controle du stock" , "controle_licence_bdomplus");
 		log::logger("============================================" , "controle_licence_bdomplus");
 	}
-
 };
 
 class licence_boulanger extends licence { };
