@@ -1,5 +1,4 @@
 <?
-die('toto');
 class licence extends classes_optima {
 
 	public function __construct() {
@@ -14,8 +13,12 @@ class licence extends classes_optima {
 			'licence.deja_pris' => array("custom"=> true, "renderer"=>"licence_prise"),
 			'licence.date_envoi'=>array("renderer"=>"updateDate","width"=>170)
 		);
+		$this->colonnes['bloquees']['update'] = array('date_envoi');
+
 		$this->colonnes['update'] = array('date_envoi');
 		$this->fieldstructure();
+
+		$this->no_update = true;
 
 		$this->foreign_key['id_licence_type'] =  "licence_type";
 		$this->foreign_key['id_commande_ligne'] =  "commande_ligne";
@@ -61,16 +64,36 @@ class licence extends classes_optima {
 	*/
 	public function _updateDate ($infos) {
 		$infos["key"] = "date_envoi";
+		$this->updateDate($infos);
 		if(!ATF::licence()->select($infos["id_licence"], "date_envoi")){
 			$this->updateDate(array("id_licence" => $infos["id_licence"],"key"=> "date_envoi", "value" => $infos["value"]));
-		}
 		}else{
 			$this->updateDate($infos);
-			log::logger($info, "jdelaporte")
 		}
+	}
 
+	public function updateDate($infos){
+		if ($infos['value'] == "undefined") $infos["value"] = "";
+		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
+		$infosMaj["id_".$this->table]=$infos["id_".$this->table];
+		$infosMaj[$infos["key"]]=$infos["value"];
 
-};
+		if($infos["key"] == "date_envoi"){
+			$infos["id_licence"] = ATF::facture()->decryptId($infos["id_licence"]);
+
+			$infosMaj["id_licence"] = $infos["id_licence"];
+
+			if($this->u($infosMaj)){
+				ATF::$msg->addNotice(
+					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+					,ATF::$usr->trans("notice_success_title")
+				);
+			}
+		}
+	}
+
+}
+
 class licence_midas extends licence { };
 class licence_cleodisbe extends licence { };
 class licence_cap extends licence { };
