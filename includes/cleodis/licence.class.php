@@ -62,7 +62,6 @@ class licence extends classes_optima {
 	}
 
 	public function deleteDateEnvoi($data){
-		log::logger($data , "mfleurquin");
 
 		if($data["id_licence"]){
 			$id_licence = ATF::licence()->decryptID($data["id_licence"]);
