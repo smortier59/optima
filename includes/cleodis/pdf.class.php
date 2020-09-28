@@ -590,51 +590,6 @@ class pdf_cleodis extends pdf {
 
 		$this->initLogo($this->affaire["type_affaire"]);
 
-		if($this->devis["type_affaire"] === "LFS"){
-			$this->devislfs();
-		}else{
-			/* PAGE 1 */
-			$this->unsetHeader();
-			$this->Addpage();
-			$this->SetLeftMargin(15);
-
-			$this->RoundedRect(15,50,180,70,5);
-			$this->image(__PDF_PATH__.$this->logo,85,55,45);
-			$this->sety(90);
-			$this->setfont('arial','B',12);
-			$this->multicell(0,5,/*$this->societe['societe']*/"",0,'C');
-			$this->ln(10);
-			$this->multicell(0,5,date("d/m/Y",strtotime($this->devis['date'])),0,'C');
-
-			$this->setfont('arial','',8);
-			$this->RoundedRect(15,140,85,70,5);
-			$this->setxy(15,145);
-			$this->multicell(85,10,ATF::user()->nom($this->user['id_user']));
-			$this->multicell(85,5,"Tél : ".($this->user['tel']?$this->user['tel']:$this->societe['tel']));
-			$this->multicell(85,5,"GSM : ".($this->user['gsm']?$this->user['gsm']:$this->societe['gsm']));
-			$this->multicell(85,5,"Fax : ".($this->user['fax']?$this->user['fax']:$this->societe['fax']));
-			$this->ln(5);
-			$this->multicell(85,5,($this->user['email']?$this->user['email']:$this->societe['email']));
-
-			$this->RoundedRect(110,140,85,70,5);
-			$this->sety(145);
-			$this->setleftmargin(110);
-			$this->multicell(85,10,$this->client['societe']);
-			$this->multicell(85,5,$this->client['adresse']);
-			$this->multicell(85,5,$this->client['cp']." ".$this->client['ville']);
-			$this->ln(5);
-			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
-			$this->setleftmargin(15);
-
-			if($this->devis['type_contrat'] =='vente'){
-				$this->devisVente();
-			}elseif($this->affaire['nature'] =='avenant'){
-				$this->devisAvenant();
-			}else{
-				$this->devisLfs();
-			}
-		}
-		return true;
 
 		if($this->devis["type_devis"] === "optic_2000"){
 			$this->devisoptic_2000($id);
@@ -676,6 +631,8 @@ class pdf_cleodis extends pdf {
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){
 				$this->devisAvenant();
+			}elseif($this->devis["type_affaire"] === "LFS"){
+				$this->devisLfs();
 			}else{
 				$this->devisClassique();
 			}
