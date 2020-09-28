@@ -200,9 +200,15 @@ class pdf_cleodis extends pdf {
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
 
+			if($this->affaire["type_affaire"] == "LFS"){
+				$this->multicell(0,3,$this->societe['societe']." pour LENOVO FINANCIAL SERVICES  ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
+			}else{
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
+			}
 
-				$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
+
+
+			$this->multicell(0,3,$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville']." - ".strtoupper(ATF::pays()->nom($this->societe['id_pays']))." - Tél : ".$this->societe['tel']." - Fax : ".$this->societe['fax'],0,'C');
 
 			$this->SetX(10);
 			if (!$this->noPageNo) {
@@ -584,7 +590,7 @@ class pdf_cleodis extends pdf {
 
 		$this->initLogo($this->affaire["type_affaire"]);
 
-		if($this->devis["type_affaire"] === "lfs"){
+		if($this->devis["type_affaire"] === "LFS"){
 			$this->devislfs();
 		}else{
 			/* PAGE 1 */
@@ -619,7 +625,7 @@ class pdf_cleodis extends pdf {
 			$this->ln(5);
 			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
 			$this->setleftmargin(15);
-			
+
 			if($this->devis['type_contrat'] =='vente'){
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){
@@ -919,7 +925,7 @@ class pdf_cleodis extends pdf {
 		$this->setHeader();
 		$this->setTopMargin(30);
 		$this->addpage();
-		
+
 		$this->setfont('arial','BU',14);
 		$this->multicell(0,5,"1 – La ".ATF::$usr->trans($this->devis['type_contrat'],'devis_type_contrat')." ".$this->cleodis);
 		$this->ln(5);
@@ -1374,7 +1380,7 @@ class pdf_cleodis extends pdf {
 		$this->setTopMargin(30);
 		$this->AddPage();
 		$this->image(__PDF_PATH__.$this->logo,5,10,35);
-		log::logger(logo, "jdelaporte");
+
 		$this->sety(10);
 		$this->setfont('arial','B',14);
 		if(ATF::$codename == "cleodis"){
@@ -1392,19 +1398,19 @@ class pdf_cleodis extends pdf {
 
 		$this->setfont('arial','',8);
 
-		$logoPartenaire = ATF::societe()->filepath($this->logo);
+
+
+		$logoPartenaire = ATF::societe()->filepath($this->affaire["id_partenaire"], "logo");
+
 		if(file_exists($logoPartenaire)){
-			log::logger($logoPartenaire, "jdelaporte"); 
-			log::logger('le logo existe', "jdelaporte"); 
 			$this->cell(0,5,"Selon Devis : ");
-			$this->image($logoPartenaire,40,40,15,'jpg');
-		}else{
-			log::logger('le logo existe pas', "jdelaporte");
-			$this->cell(0,5,"Selon Devis : ");
+			copy($logoPartenaire,str_replace("logo","jpg",$logoPartenaire));
+	   		$this->image(str_replace("logo","jpg",$logoPartenaire),35,$this->getY()-5,15);
+	   		util::rm(str_replace("logo","jpg",$logoPartenaire));
 		}
-		
+
 		$this->sety(50);
-	
+
 		$this->sety(60);
 		$this->cell(0,5,"N° d'affaire : ".$this->affaire["ref"],0,1);
 		$societe = ATF::societe()->select($this->devis['id_societe']);
@@ -1508,31 +1514,40 @@ class pdf_cleodis extends pdf {
 				$this->tableauBigHead($i['head'],$i['data'],$i['w'],5,$i['styles']);
 			}
 		}
-		
+
 		$this->sety(180);
 		if($this->devis['loyer_unique']=='non'){
 			$this->tableauLoyer();
 		}
 
-		
 
-		$this->sety(235);
-		$this->cell(0,40,"",1,1);
-		$this->sety(235);
+		if($this->getY()>235){
+			$this->addPage();
+			$this->sety(30);
+			$this->cell(0,40,"",1,1);
+			$this->sety(30);
+			$y = 65;
+		}else{
+			$this->sety(235);
+			$this->cell(0,40,"",1,1);
+			$this->sety(235);
+			$y = 270;
+		}
+
 
 		$this->setfont('arial','',8);
 		$this->multicell(0,5,"« Bon pour accord »",0,'C');
 		$this->multicell(0,5,"Cachet commercial+ Signature",0,'C');
 
 		$this->setfont('arial','I',6);
-		$this->sety(270);
+		$this->sety($y);
 		$this->multicell(0,5,"Cette offre, valable 15 jours, reste soumise à notre comité des engagements de notre partenaire CLEODIS.",0,'C');
 		if ($annexes) {
 			$this->annexes($annexes);
 		}
 	}
 
-	
+
 
 	/* Génère le PDF d'un devis Avenant
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -1745,14 +1760,14 @@ class pdf_cleodis extends pdf {
 		}
 		//Création des données
 		//Ligne 1
-		$data[0][] = "> Mise a Disposition ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT;
+		$data[0][] = "> Mise à Disposition ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT;
 		$s[0][] = $style["col1"];
 		foreach ($this->loyer as $k=>$i) {
 			$data[0][] = number_format($i['loyer'],2,"."," ")." €/".substr($i['frequence_loyer'],0,1);
 			$s[0][] = $style["loyer"];
 		}
 		//Ligne 2
-		$data[1][] = "Mise a disposition des Equipements";
+		$data[1][] = "Mise à disposition des Equipements";
 		$s[1][] = $style["col1bis"];
 		foreach ($this->loyer as $k=>$i) {
 			$data[1][] = "";
@@ -1785,7 +1800,12 @@ class pdf_cleodis extends pdf {
 		}
 		if ($this->totalAssurance) {
 			// Ligne 6 Assurance
-			$data[5][] = "> Option Assurance Remplacement *";
+			if($this->affaire["type_affaire"] == "LFS"){
+				$data[5][] = "> Option Service Remplacement en cas de sinistre *";
+			}else{
+				$data[5][] = "> Option Assurance Remplacement *";
+			}
+
 			$s[5][] = $style["col1"];
 			foreach ($this->loyer as $k=>$i) {
 				$data[5][] = $i['assurance']?$i['assurance']." €/".substr($i['frequence_loyer'],0,1):"-";
@@ -1799,7 +1819,12 @@ class pdf_cleodis extends pdf {
 				$s[6][] = $style["col1bis"];
 			}
 			//Ligne 8
-			$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Assurance :";
+			if($this->affaire["type_affaire"] == "LFS"){
+				$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Service Remplacement en cas de sinistre :";
+			}else{
+				$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Assurance :";
+			}
+
 			$s[7][] = $style["col1"];
 			foreach ($this->loyer as $k=>$i) {
 				$data[7][] = number_format($i['frais_de_gestion']+$i['loyer']+$i['assurance'],2,"."," ")." €/".substr($i['frequence_loyer'],0,1);
