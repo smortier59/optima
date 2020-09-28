@@ -13,7 +13,7 @@ $dir = __ABSOLUTE_PATH__."www/readsoft/".$_SERVER["argv"][1]."/";
 echo "--------  Batch import READSOFT -------\n";
 echo "Le rapport est disponible dans /log/readsoft.log\n";
 
-//ATF::readsoft()->readsoftFileToCleodis($dir, $files_recup);
+ATF::readsoft()->readsoftFileToCleodis($dir, $files_recup);
 
 
 log::logger("======= Analyse du dossier pending ".$dir."pending/", "readsoft");
