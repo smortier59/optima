@@ -1047,7 +1047,7 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'axa':
-        $r = "AX";
+        $r = "X0";
       break;
       default:
         $r = substr($site_associe, 0, 2);
