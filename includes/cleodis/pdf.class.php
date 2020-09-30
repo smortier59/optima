@@ -138,6 +138,12 @@ class pdf_cleodis extends pdf {
 
 			break;
 
+			case 'Axa' :
+				$this->cleodis = "Axa";
+				$this->logo = 'cleodis/axa.jpg';
+
+			break;
+
 			default:
 				$this->logo = ATF::$codename.'/logo.jpg';
 				$this->cleodis = $this->cleodis;

@@ -84,6 +84,13 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = $cleodis["id_societe"];
       break;
 
+      case 'axa':
+        ATF::societe()->q->reset()->where("siret", "34020062500036");
+        $cleodis = ATF::societe()->select_row();
+
+        $this->id_partenaire = $cleodis["id_societe"];
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -150,7 +157,6 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
 
-        
 
         $id_devis = $this->createDevis($post, $libelle);
 
@@ -265,6 +271,7 @@ class souscription_cleodis extends souscription {
           case 'locevo':
           case 'dib':
           case 'haccp':
+          case 'axa':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -343,6 +350,10 @@ class souscription_cleodis extends souscription {
       case "haccp":
         $r = "HACCP : Location ".$suffix;
       break;
+
+      case "axa":
+        $r = "AXA : Location ".$suffix;
+      break;
     }
 
     if($renouvellement){
@@ -383,6 +394,7 @@ class souscription_cleodis extends souscription {
     if($post['site_associe'] == "locevo") $devis["type_affaire"] = 'LocEvo';
     if($post['site_associe'] == "dib") $devis["type_affaire"] = 'DIB';
     if($post['site_associe'] == "haccp") $devis["type_affaire"] = 'haccp';
+    if($post['site_associe'] == "axa") $devis["type_affaire"] = 'Axa';
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -771,6 +783,7 @@ class souscription_cleodis extends souscription {
       case 'locevo':
       case 'dib':
       case 'haccp':
+      case 'axa':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1031,6 +1044,10 @@ class souscription_cleodis extends souscription {
       break;
       case 'haccp':
         $r = "HA";
+      break;
+
+      case 'axa':
+        $r = "AX";
       break;
       default:
         $r = substr($site_associe, 0, 2);
