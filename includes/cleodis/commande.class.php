@@ -1013,7 +1013,7 @@ class commande_cleodis extends commande {
 				$commande->set("etat","non_loyer");
 			}
 		//Si la commande est une vente, si elle est AR ou si elle est terminée, il ne faut pas modifier son état
-		}elseif($commande->get("etat")!="arreter" || $commande->get("etat")!="arreter_contentieux"){
+		}elseif($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux"){
 			if($affaireFillesAR){
 				ATF::commande()->q->reset()->addCondition("id_affaire",$affaireFillesAR["id_affaire"])->setDimension("row");
 				$commandeFilleAR=ATF::commande()->sa();
