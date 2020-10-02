@@ -1084,6 +1084,7 @@ class commande_cleodis extends commande {
 						$suivi = array(
 							"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
+							,"id_affaire"=>$comm['id_affaire']
 							,"type_suivi"=>'Contrat'
 							,"texte"=>"L'affaire est passée en arrêté car la date de restitution effective est dépassée ou date Evolution dépassée sans date de restitution"
 							,'public'=>'oui'
