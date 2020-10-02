@@ -1013,7 +1013,7 @@ class commande_cleodis extends commande {
 				$commande->set("etat","non_loyer");
 			}
 		//Si la commande est une vente, si elle est AR ou si elle est terminée, il ne faut pas modifier son état
-		}elseif($commande->get("etat")!="arreter" || $commande->get("etat")!="arreter_contentieux"){
+		}elseif($commande->get("etat")!="arreter" && $commande->get("etat")!="arreter_contentieux"){
 			if($affaireFillesAR){
 				ATF::commande()->q->reset()->addCondition("id_affaire",$affaireFillesAR["id_affaire"])->setDimension("row");
 				$commandeFilleAR=ATF::commande()->sa();
@@ -1084,6 +1084,7 @@ class commande_cleodis extends commande {
 						$suivi = array(
 							"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
+							,"id_affaire"=>$comm['id_affaire']
 							,"type_suivi"=>'Contrat'
 							,"texte"=>"L'affaire est passée en arrêté car la date de restitution effective est dépassée ou date Evolution dépassée sans date de restitution"
 							,'public'=>'oui'
