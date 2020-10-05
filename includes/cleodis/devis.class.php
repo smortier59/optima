@@ -68,6 +68,7 @@ class devis_cleodis extends devis {
 								  "data"=>array(
 								  	'normal',
 								  	'2SI',
+								  	'Axa',
 								  	'Boulanger Pro',
 									'Consommables_com',
 									'DIB',
