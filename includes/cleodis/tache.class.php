@@ -13,7 +13,10 @@ class tache_cleodis extends tache {
 
 		$this->colonnes['fields_column']["tache.type_tache"];
 		$this->colonnes['fields_column']["tache.decision_comite"];
+		$this->colonnes['fields_column']["tache.id_affaire"];
 
+
+		$this->colonnes['primary'][] = "id_affaire";
 		$this->colonnes['panel']["infos_tache"] =	array("type_tache" => array("custom"=>true) ,
 										          		  "decision_comite"=> array("custom"=>true)
 										);
@@ -318,6 +321,39 @@ class tache_cleodis extends tache {
 		}
 	}
 
+
+	/**
+    * Retourne la valeur par défaut spécifique aux données des formulaires
+    * @author Quentin JANON <qjanon@absystech.fr>
+	* @param string $field
+	* @param array &$s La session
+	* @param array &$request Paramètres disponibles (clés étrangères)
+	* @return string
+    */
+	public function default_value($field,&$s,&$request){
+
+		if ($id_affaire = ATF::_r('id_affaire')) {
+			$affaire=ATF::affaire()->select($id_affaire);
+			$id_societe=$affaire["id_societe"];
+		}elseif(ATF::_r("id_societe")){
+			$id_societe = ATF::_r("id_societe");
+			$id_affaire = NULL;
+		}
+
+		if($id_affaire){
+			switch ($field) {
+				case "id_societe":
+					return $id_societe;
+				break;
+
+				case "id_affaire":
+					return $id_affaire;
+				break;
+			}
+		}
+
+		return parent::default_value($field,$s,$request);
+	}
 
 	/**
     * On surcharge le select_all pour permettre le tri sur certains champs et de pouvoir les préfixer, et de filtrer les informations sur ce que l'on souhaite voir
