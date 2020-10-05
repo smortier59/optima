@@ -157,7 +157,7 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
 
-        
+
 
         $id_devis = $this->createDevis($post, $libelle);
 
@@ -422,7 +422,7 @@ class souscription_cleodis extends souscription {
 
 
     foreach ($produits as $k=>$produit) {
-        
+
         ATF::produit()->q->reset()
           ->addField("loyer")
           ->addField("duree")
@@ -432,10 +432,10 @@ class souscription_cleodis extends souscription {
           ->addField("prix_achat")
           ->addField("id_fournisseur")
           ->where("id_produit", $produit['id_produit']);
-          
+
         $produitLoyer = ATF::produit()->select_row();
 
-         
+
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
 
@@ -1168,19 +1168,6 @@ class souscription_cleodis extends souscription {
       );
       ATF::devis()->perdu($infos);
     }
-  }
-
-  /**
-   * Appel la fonction pour vérifier la validité du domaine d'un email
-   * @author Quentin JANON <qjanon@absystech.fr>
-   */
-  public function _checkDomainEmail($get) {
-    try {
-      mail::check_mail($get['email']);
-    } catch (errorATF $e) {
-      throw new errorATF("INVALID DOMAIN",500);
-    }
-    return true;
   }
 
 
