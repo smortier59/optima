@@ -3564,7 +3564,7 @@ class affaire_bdomplus extends affaire_cleodis {
 			    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
 			    $info_mail["recipient"] = $email;
 			    $info_mail["html"] = true;
-			    $info_mail["template"] = "mail_information_renouvellement";
+			    $info_mail["template"] = "mail_information_renouvellement_tel";
 			    $info_mail["objet"] = "Votre abonnement ".$affaire["ref"]." ".$affaire["affaire"]." : Information importante sur votre renouvellement";
 
 			    $info_mail["client"] = ATF::societe()->select($value["id_societe"]);
