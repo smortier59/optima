@@ -252,7 +252,6 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-
 			switch ($this->logo) {
 				case 'cleodis/2SI_CLEODIS.jpg' :
 					$this->image(__PDF_PATH__."/".$this->logo,75,10,40);
@@ -4416,6 +4415,8 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant Facture
 	*/
 	public function facture($id,$s,$global=false) {
+		$this->pdf_facture = true;
+
 		$this->facture = ATF::facture()->select($id);
 		ATF::facture_ligne()->q->reset()->where("visible","oui")->where("afficher","oui")->where("id_facture",$this->facture['id_facture']);
 		$this->lignes = ATF::facture_ligne()->sa();
@@ -4428,8 +4429,11 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
+
 		$this->initLogo($this->affaire["type_affaire"]);
-		$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+		$this->image(__PDF_PATH__."/".$this->logo,5,8,40);
+
+
 
 		//Styles utilisés
 
@@ -5420,9 +5424,20 @@ class pdf_cleodis extends pdf {
 	}
 
 	function global_facture ($facture,$s){
-		$this->open();
-		foreach ($facture as $key => $item) {
 
+		$this->unsetHeader();
+		$this->unsetFooter();
+		$this->open();
+
+		/*foreach ($facture as $key => $item) {
+			$pageCount = $this->setSourceFile(ATF::facture()->filepath($item,"fichier_joint"));
+	        for ($i = 1; $i <= $pageCount; $i++) {
+	            $tplIdx = $this->importPage($i);
+	            $this->AddPage();
+	            $this->useTemplate($tplIdx);
+	        }
+		}*/
+		foreach ($facture as $key => $item) {
 			$this->facture($item,$s,true) ;
 		}
 	}
@@ -5756,6 +5771,7 @@ class pdf_cleodis extends pdf {
 
 
 	function grille_client($facturer,$s,$nf=false,$prol=false) {
+
 		$this->tMargin = 30;
 		//$this->logo = 'cleodis/logo.jpg';
 		$this->grille_client = true;
