@@ -81,12 +81,12 @@ class devis_cleodis extends devis {
 									'LFS',
 									'LocEvo',
 									'Manganelli',
+									'Mariton',
 									'NRC',
 									'OLISYS - Ma Solution IT',
 									'Proxi Pause',
 									'Trekk',
 									'ZENCONNECT – ZEN PACK'
-
 								  ),
 								  "xtype"=>"combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
