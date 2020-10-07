@@ -844,6 +844,7 @@ class souscription_cleodis extends souscription {
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
       "company_name"=>$societe["societe"],
+      "code_client"=>$codeClient,
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
@@ -1610,6 +1611,7 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function envoiMailLicence($id_affaire, $id_societe, $licence_a_envoyer,$renouvellement =false){
+    
     if($email_pro = ATF::societe()->select($id_societe, "email")){
       $email = $email_pro;
     }else{
