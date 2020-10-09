@@ -64,32 +64,6 @@ class devis_cleodis extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
-			/*,"type_affaire"=>array("custom"=>true,
-								  "data"=>array(
-								  	'normal',
-								  	'2SI',
-								  	'Axa',
-								  	'Boulanger Pro',
-									'Consommables_com',
-									'DIB',
-									'Dyadem',
-									'FLEXFUEL',
-									"haccp",
-									'Hexamed Leasing',
-									'Instore',
-									'LAFI',
-									'LFS',
-									'LocEvo',
-									'Manganelli',
-									'Mariton',
-									'NRC',
-									'OLISYS - Ma Solution IT',
-									'Proxi Pause',
-									'Trekk',
-									'ZENCONNECT – ZEN PACK'
-								  ),
-								  "xtype"=>"combo")*/
-
 			,'id_type_affaire'=>array("custom"=>true, "xtype"=> "combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
 
@@ -444,8 +418,7 @@ class devis_cleodis extends devis {
 
 
 
-		/*if($infos["type_affaire"]) $affaire["type_affaire"] = $type_affaire["type_affaire"];
-		$affaire["id_type_affaire"] = $type_affaire['id_type_affaire'];*/
+
 
 
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
@@ -1146,8 +1119,8 @@ class devis_cleodis extends devis {
 				case "commentaire_facture3":
 					return $affaire["commentaire_facture3"];
 					break;
-				case "type_affaire":
-					return $affaire["type_affaire"];
+				case "id_type_affaire":
+					return $affaire["id_type_affaire"];
 			}
 		}else{
 			switch ($field) {
@@ -1191,8 +1164,12 @@ class devis_cleodis extends devis {
 						$return="";
 					}
 					return $return;
-				case "type_affaire":
-					return "normal";
+				case "id_type_affaire":
+					ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+					$type_affaire =ATF::type_affaire()->select_row();
+					return $type_affaire["id_type_affaire"];
+
+
 			}
 		}
 

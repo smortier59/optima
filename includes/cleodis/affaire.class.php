@@ -58,7 +58,7 @@ class affaire_cleodis extends affaire {
 			,'ville_banque'
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
-			,"type_affaire"
+			,"id_type_affaire"
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -173,8 +173,8 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
 		$this->foreign_key['id_apporteur'] =  "societe";
-		// $this->foreign_key['id_type_affaire'] = "type_affaire_params";
-		// $this->foreign_key['id_societe'] = "type_affaire_params";
+		$this->foreign_key['id_type_affaire'] = "type_affaire";
+
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");

@@ -1983,7 +1983,7 @@ class commande_cleodis extends commande {
         if (!$infos['id_commande'] || !$infos['pdf']) return false;;
         $commande = $this->select($infos['id_commande']);
 
-        if(ATF::affaire()->select($commande["id_affaire"], "type_affaire") === "NL"){
+        if(ATF::affaire()->select($commande["id_affaire"], "langue") === "NL"){
         	$data = ATF::pdf()->generic($infos['pdf']."NL",$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
         }else{
         	$data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);

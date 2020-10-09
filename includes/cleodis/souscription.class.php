@@ -372,6 +372,10 @@ class souscription_cleodis extends souscription {
    * @return [type]          [description]
    */
   private function createDevis ($post, $libelle, $fournisseur) {
+
+    ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+    $type_affaireNormal = ATF::type_affaire()->select_row();
+
     // Construction du devis
     $devis = array(
         "id_societe" => $post['id_societe'],
@@ -383,19 +387,46 @@ class souscription_cleodis extends souscription {
         "type_devis" => "normal",
         "id_contact" => $post["id_contact"],
         "prix_achat"=>0,
-        "type_affaire" => "normal",
+        "id_type_affaire" => $type_affaireNormal["id_type_affaire"],
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
 
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-    if($post['site_associe'] == "boulangerpro") $devis["type_affaire"] = 'Boulanger Pro';
-    if($post['site_associe'] == "hexamed") $devis["type_affaire"] = 'Hexamed Leasing';
-    if($post['site_associe'] == "locevo") $devis["type_affaire"] = 'LocEvo';
-    if($post['site_associe'] == "dib") $devis["type_affaire"] = 'DIB';
-    if($post['site_associe'] == "haccp") $devis["type_affaire"] = 'haccp';
-    if($post['site_associe'] == "axa") $devis["type_affaire"] = 'Axa';
+
+
+
+    if($post['site_associe'] == "boulangerpro"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Boulanger Pro");
+      $type_affaire = ATF::type_affaire()->select_row();
+      $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
+    }
+    if($post['site_associe'] == "hexamed"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Hexamed Leasing");
+      $type_affaire = ATF::type_affaire()->select_row();
+      $devis["type_affaire"] = 'Hexamed Leasing';
+    }
+    if($post['site_associe'] == "locevo"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "LocEvo");
+      $type_affaire = ATF::type_affaire()->select_row();
+       $devis["type_affaire"] = 'LocEvo';
+    }
+    if($post['site_associe'] == "dib"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "DIB");
+      $type_affaire = ATF::type_affaire()->select_row();
+      $devis["type_affaire"] = 'DIB';
+    }
+    if($post['site_associe'] == "haccp"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "haccp");
+      $type_affaire = ATF::type_affaire()->select_row();
+      $devis["type_affaire"] = 'haccp';
+    }
+    if($post['site_associe'] == "axa"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Axa");
+      $type_affaire = ATF::type_affaire()->select_row();
+      $devis["type_affaire"] = 'Axa';
+    }
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();

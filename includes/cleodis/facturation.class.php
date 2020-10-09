@@ -818,6 +818,11 @@ class facturation extends classes_optima {
 		$facturer = array();
 		$non_envoye = array();
 
+		ATF::type_affaire()->q->reset()->where("type_affaire", "2SI");
+		$type_affaire2SI = ATF::type_affaire()->select_row();
+
+
+
 		$cleodis=ATF::societe()->select(246);
 
 		$this->q->reset()
@@ -891,13 +896,13 @@ class facturation extends classes_optima {
 						if($item["type"]!="prolongation"){
 							//Enlever les factures envoyées par mail
 							if(!$contact["email"] && !$contact["email_perso"]){
-								if($affaire["type_affaire"] == "2SI"){
+								if($affaire["id_type_affaire"] == $type_affaire2SI){
 									$facture_contrat_2SI=$this->formateTabfacturer($facture_contrat_2SI,$item,"facture",$id_facture);
 								}else{
 									$facture_contrat=$this->formateTabfacturer($facture_contrat,$item,"facture",$id_facture);
 								}
 							}else{
-								if($affaire["type_affaire"] == "2SI"){
+								if($affaire["id_type_affaire"] == $type_affaire2SI){
 									$facture_contrat_envoye_2SI=$this->formateTabfacturer($facture_contrat_envoye_2SI,$item,"facture_contrat_envoye",$id_facture);
 								}else{
 									$facture_contrat_envoye=$this->formateTabfacturer($facture_contrat_envoye,$item,"facture_contrat_envoye",$id_facture);
@@ -1043,13 +1048,13 @@ class facturation extends classes_optima {
 
 						//Enlever les factures envoyées par mail
 						if(!$contact || (!$contact["email"] && !$contact["email_perso"])){
-							if($affaire["type_affaire"] == "2SI"){
+							if($affaire["id_type_affaire"] == $type_affaire2SI){
 								$facture_prolongation_2SI=$this->formateTabfacturer($facture_prolongation_2SI,$facturation,"prolongation",$id_facture);
 							}else{
 								$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$facturation,"prolongation",$id_facture);
 							}
 						}else{
-							if($affaire["type_affaire"] == "2SI"){
+							if($affaire["id_type_affaire"] == $type_affaire2SI){
 								$facture_prolongation_envoye_2SI=$this->formateTabfacturer($facture_prolongation_envoye_2SI,$item,"prolongation_envoye",$id_facture);
 							}else{
 								$facture_prolongation_envoye=$this->formateTabfacturer($facture_prolongation_envoye,$item,"prolongation_envoye",$id_facture);
@@ -1196,6 +1201,9 @@ class facturation extends classes_optima {
 		$non_envoye = array();
 
 		$cleodis=ATF::societe()->select(246);
+
+		ATF::type_affaire()->q->reset()->where("type_affaire", "2SI");
+		$type_affaire2SI = ATF::type_affaire()->select_row();
 
 		/*
 		 * RESTITUTION
@@ -1360,7 +1368,7 @@ class facturation extends classes_optima {
 								if($societe["id_contact_facturation"]){
 									$contact= ATF::contact()->select($societe["id_contact_facturation"]);
 								}
-								if($affaire["type_affaire"] == "2SI"){
+								if($affaire["id_type_affaire"] == $type_affaire2SI){
 									$facture_prolongation_2SI=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
 								}else{
 									$facture_prolongation=$this->formateTabfacturer($facture_prolongation,$item,"prolongation",$id_facture);
