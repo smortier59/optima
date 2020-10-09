@@ -44,6 +44,18 @@ class pdf_cleodis extends pdf {
 
 
 
+	public function initLogo($id_type_affaire){
+
+		$this->cleodis = ATF::type_affaire()->select($id_type_affaire, "libelle_pdf");
+		$logo_filepath = ATF::type_affaire()->filepath($id_type_affaire,"logo");
+		if (file_exists($logo_filepath)){
+			copy($logo_filepath,str_replace("logo","jpg",$logo_filepath));
+			$this->logo = str_replace("logo","jpg",$logo_filepath);
+		}else{
+            $this->logo = 'cleodis/logo.jpg';
+		}
+
+        /*
 	public function initLogo($type_affaire){
 		log::logger($type_affaire,"dsarr");
 		switch ($type_affaire) {
@@ -149,7 +161,7 @@ class pdf_cleodis extends pdf {
 				$this->logo = ATF::$codename.'/logo.jpg';
 				$this->cleodis = $this->cleodis;
 			break;
-		}
+		}*/
 	}
 
 
@@ -250,7 +262,7 @@ class pdf_cleodis extends pdf {
 	public function Header() {
 		if ($this->getHeader()) return false;
 		if ($this->A3) {
-			$this->image(__PDF_PATH__.$this->logo,300,10,20);
+			$this->image($this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
 			switch ($this->logo) {
@@ -277,7 +289,7 @@ class pdf_cleodis extends pdf {
 				break;
 
 				default:
-					$this->image(__PDF_PATH__.$this->logo,10,10,40);
+					$this->image($this->logo,10,10,40);
 				break;
 			}
 
@@ -298,7 +310,7 @@ class pdf_cleodis extends pdf {
 			if($this->pdf_devis){
 				switch ($this->logo) {
 					case 'cleodis/2SI_CLEODIS.jpg' :
-						$this->image(__PDF_PATH__.$this->logo,10,10,35);
+						$this->image($this->logo,10,10,35);
 					break;
 
 					case 'cleodis/boulangerpro.jpg' :
@@ -321,7 +333,7 @@ class pdf_cleodis extends pdf {
 					break;
 
 					default:
-						$this->image(__PDF_PATH__.$this->logo,10,10,35);
+						$this->image($this->logo,10,10,35);
 					break;
 				}
 
@@ -333,7 +345,7 @@ class pdf_cleodis extends pdf {
 				}else{
 					switch ($this->logo) {
 						case 'cleodis/2SI_CLEODIS.jpg' :
-							 $this->image(__PDF_PATH__.$this->logo,170,5,20);
+							 $this->image($this->logo,170,5,20);
 						break;
 
 						case 'cleodis/hexamed-logo.jpg' :
@@ -358,7 +370,7 @@ class pdf_cleodis extends pdf {
 						break;
 
 						default:
-							 $this->image(__PDF_PATH__.$this->logo,170,5,20);
+							 $this->image($this->logo,170,5,20);
 						break;
 					}
 				}
@@ -414,7 +426,7 @@ class pdf_cleodis extends pdf {
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,15,5,15);
+		$this->image($this->logo,15,5,15);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -604,6 +616,7 @@ class pdf_cleodis extends pdf {
 
 		//$this->initLogo($this->affaire["type_affaire"]);
 
+		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->initLogo($type_affaire['type_affaire']);
 
 
@@ -616,7 +629,7 @@ class pdf_cleodis extends pdf {
 			$this->SetLeftMargin(15);
 
 			$this->RoundedRect(15,50,180,70,5);
-			$this->image(__PDF_PATH__.$this->logo,85,55,45);
+			$this->image($this->logo,85,55,45);
 			$this->sety(90);
 			$this->setfont('arial','B',12);
 			$this->multicell(0,5,/*$this->societe['societe']*/"",0,'C');
@@ -1139,7 +1152,7 @@ class pdf_cleodis extends pdf {
 						}
 						$produit = ATF::produit()->select($i_['id_produit']);
 
-						
+
 						//On prépare le détail de la ligne
 
 						//ici si on surcharge les details il y'aura une duplicata des commentaires alors que la fonction detailProduct le fait
@@ -1147,9 +1160,9 @@ class pdf_cleodis extends pdf {
 
 						$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 
-					
+
 						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
-						
+
 
 						if ($details == "") unset($details);
 
@@ -1168,10 +1181,10 @@ class pdf_cleodis extends pdf {
 							,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
 							,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat.$details
 							,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
-							
+
 						);
-						
-						
+
+
 					}
 
 				}
@@ -1183,8 +1196,8 @@ class pdf_cleodis extends pdf {
 					,"title"=>$title
 				);
 
-				
-				
+
+
 			}
 
 			$h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
@@ -1672,6 +1685,13 @@ class pdf_cleodis extends pdf {
 		
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 		$type_affaire = ATF::type_affaire()->select_row();
 		
 		//ancienne code $this->affaire['type_affaire']
@@ -1686,7 +1706,7 @@ class pdf_cleodis extends pdf {
 	*/
 	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
 		$produit=ATF::produit()->select($id_produit);
-		
+
 
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
@@ -1720,8 +1740,8 @@ class pdf_cleodis extends pdf {
 		}
 
 		if ($caracteristique) $d5 .= "Caractéristiques spécifiques : ".$caracteristique;
-		
-	
+
+
 		$details = $d1.$d2.$d3.$d4.$d5;
 
 		return $details;
@@ -1773,11 +1793,18 @@ class pdf_cleodis extends pdf {
 		
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
 		//$this->initLogo($this->affaire["type_affaire"]);
 
+		$type_affaire = ATF::type_affaire()->select_row();
+		//$this->initLogo($this->affaire["type_affaire"]);
 		$this->initLogo($this->type_affaire["type_affaire"]);
 
+		$this->initLogo($this->type_affaire["type_affaire"]);
+
+		//if($this->affaire['type_affaire']);
+		if($this->type_affaire["type_affaire"] == "normal"){
 		//if($this->affaire['type_affaire']);
 		if($this->type_affaire["type_affaire"] == "normal"){
 			$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
@@ -2211,6 +2238,8 @@ class pdf_cleodis extends pdf {
 
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		$type_affaire = ATF::type_affaire()->select_row();
+		$this->initLogo($this->type_affaire["type_affaire"]);
 
 		$this->image(__PDF_PATH__."/".$this->logo,10,10,40);
 
@@ -2617,9 +2646,17 @@ class pdf_cleodis extends pdf {
 	ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
     $type_affaire = ATF::type_affaire()->select_row();
 
+	ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+    $type_affaire = ATF::type_affaire()->select_row();
 	//$this->initLogo($this->affaire["type_affaire"]);
 	  $this->initLogo($this->type_affaire["type_affaire"]);
 
+	//$this->initLogo($this->affaire["type_affaire"]);
+	  $this->initLogo($this->type_affaire["type_affaire"]);
+
+	//$this->affaire['type_affaire'];
+
+	if($type_affaire["type_affaire"] == "2SI"){
 	//$this->affaire['type_affaire'];
 
 	if($type_affaire["type_affaire"] == "2SI"){
@@ -2739,7 +2776,7 @@ class pdf_cleodis extends pdf {
 			,"details"=>$details
 		  );
 
-		 
+
 
 		  $st[] = array(
 			($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
@@ -2972,6 +3009,15 @@ class pdf_cleodis extends pdf {
 
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
+
+		log::logger($type_affaire,"dsarr");
+		log::logger($type_affaire['type_affaire'],"dsarr");
+
+		//switch $this->affaire['type_affaire']
+
+		switch ($type_affaire["type_affaire"]) {
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+		$type_affaire = ATF::type_affaire()->select_row();
 		
 		log::logger($type_affaire,"dsarr");
 		log::logger($type_affaire['type_affaire'],"dsarr");
@@ -3068,6 +3114,15 @@ class pdf_cleodis extends pdf {
 
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
+
+		log::logger($type_affaire,"dsarr");
+		log::logger($type_affaire['type_affaire'],"dsarr");
+
+		//switch via $this->affaire l'ancien code
+		switch ($type_affaire["type_affaire"]) {
+
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+		$type_affaire = ATF::type_affaire()->select_row();
 		
 		log::logger($type_affaire,"dsarr");
 		log::logger($type_affaire['type_affaire'],"dsarr");
@@ -3158,9 +3213,9 @@ class pdf_cleodis extends pdf {
 	*/
 	public function contratPVParticulier($id,$signature=false) {
 		if (ATF::$codename == "boulanger") {
-			$this->image(__PDF_PATH__.$this->logo,10,10,25);
+			$this->image($this->logo,10,10,25);
 		} else {
-			$this->image(__PDF_PATH__.$this->logo,5,5,35);
+			$this->image($this->logo,5,5,35);
 		}
 
 		$this->setfont('arial','I',8);
@@ -3768,8 +3823,8 @@ class pdf_cleodis extends pdf {
 		$this->bdc = ATF::bon_de_commande()->select($id);
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$bdclignes = ATF::bon_de_commande_ligne()->sa();
-		
-		
+
+
 		$this->lignes = $lignes = array();
 		foreach($bdclignes as $k=>$i) {
 			if($lignes[$i["id_commande_ligne"]]){
@@ -3809,7 +3864,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant bon de commande
 	*/
 	public function bon_de_commande($id,$s) {
-      
+
 		$this->facturePDF = false;
 
 		$this->initBDC($id,$s,$previsu);
@@ -3825,13 +3880,22 @@ class pdf_cleodis extends pdf {
 
 		log::logger($type_affaire,'dsarr');
 		log::logger($type_affaire['type_affaire'],'dsarr');
+
+		log::logger($this->affaire,"dsarr");
+
+        ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		log::logger($type_affaire,'dsarr');
+		log::logger($type_affaire['type_affaire'],'dsarr');
 		
 		if($this->affaire["type_affaire"] == "2SI"){
 			$this->image(__PDF_PATH__."/cleodis/2SI_CLEODIS.jpg",80,20,40);
 		} else if(ATF::$codename != "cleodis"){
-			$this->image(__PDF_PATH__.$this->logo,80,20,40);
+			$this->image($this->logo,80,20,40);
 		}else{
-			$this->image(__PDF_PATH__.$this->logo,80,20,35);
+			$this->image($this->logo,80,20,35);
 		}
 
 
@@ -3915,7 +3979,7 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',10);
 
 		if ($this->lignes) {
-			
+
 
 			$head = array("Référence","Désignation","Quantité","P.U","Total");
 			$w = array(30,100,20,20,20);
@@ -3926,7 +3990,7 @@ class pdf_cleodis extends pdf {
 				}
 
 				if($i["id_produit"]) $produit = ATF::produit()->select($i['id_produit']);
-			   
+
 				$designation = "";
 				if($produit && $produit["id_sous_categorie"]){
 					$designation .= ATF::sous_categorie()->select($produit["id_sous_categorie"] , "sous_categorie")." ";
@@ -3934,7 +3998,7 @@ class pdf_cleodis extends pdf {
 					$designation .= "- ";
 				}
 				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-				
+
 				$details = $this->detailsProduit($i['id_produit'],$k,$i['caracteristique']);
 
 				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
@@ -4492,6 +4556,9 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
+
+		$type_affaire = ATF::type_affaire()->select_row();
 
 		$this->initLogo($this->affaire["type_affaire"]);
 		$this->image(__PDF_PATH__."/".$this->logo,5,8,40);
@@ -4578,9 +4645,9 @@ class pdf_cleodis extends pdf {
 
 		if(ATF::$codename == "cleodisbe"){
 			if($this->logo == "cleodis/2SI_CLEODIS.jpg"){
-				$this->image(__PDF_PATH__.$this->logo,15,10,55);
+				$this->image($this->logo,15,10,55);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,15,5,20);
+				$this->image($this->logo,15,5,20);
 			}
 		}
 
@@ -6103,6 +6170,7 @@ class pdf_cleodis extends pdf {
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
 		$type_affaire = ATF::type_affaire()->select_row();
+		$type_affaire = ATF::type_affaire()->select_row();
 		
 		//ancienne code $this->affaire['type_affaire']
 		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
@@ -6297,7 +6365,13 @@ class pdf_cleodis extends pdf {
 		
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		//ancienne code $this->affaire
 		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
@@ -6687,7 +6761,13 @@ class pdf_cleodis extends pdf {
 		
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		//ancienne code $this->affaire['type_affaire']
 		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
@@ -7130,14 +7210,20 @@ class pdf_cleodis extends pdf {
 		
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		//ancienne code $this->affaire
 		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,90,5,20);
+		$this->image($this->logo,90,5,20);
 		$this->ln(10);
 
 		$this->setfont('arial',"",8);
@@ -7286,7 +7372,13 @@ class pdf_cleodis extends pdf {
    
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
+
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire']
+		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		//ancienne code $this->affaire['type_affaire']
 		if($type_affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
@@ -7613,7 +7705,7 @@ class pdf_cleodis extends pdf {
 		$this->open();
 		$this->addpage();
 		$this->SetLeftMargin(10);
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 		$this->sety(30);
 
 		$this->setfont('arial','',10);
@@ -7734,7 +7826,7 @@ class pdf_cleodis extends pdf {
 
 		$this->AddPage();
 		$this->SetLeftMargin(15);
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 		$this->sety(30);
 
 		$this->setfont('arial','',16);
@@ -7858,7 +7950,7 @@ class pdf_cleodis extends pdf {
 		**********************************************************************************************************************/
 
 		$this->AddPage();
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 		$this->sety(30);
 
 		$this->setfont('arial','BU',14);
@@ -7925,7 +8017,7 @@ class pdf_cleodis extends pdf {
 		**********************************************************************************************************************/
 
 		$this->AddPage();
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 		$this->sety(40);
 
 		$this->setfont('arial','BU',14);
@@ -7987,7 +8079,7 @@ class pdf_cleodis extends pdf {
 		$this->open();
 		$this->addpage();
 		$this->SetLeftMargin(15);
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 		$this->sety(30);
 
 		$this->setfont('arial','',16);
@@ -8087,7 +8179,7 @@ class pdf_cleodis extends pdf {
 		$this->open();
 		$this->addpage();
 		$this->SetLeftMargin(15);
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 		$this->sety(30);
 
 		$this->setfont('arial','',16);
@@ -8596,10 +8688,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		if(!$this->facturePDF){
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,230,5,35);
+				$this->image($this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				$this->image($this->logo,15,5,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -8702,10 +8794,10 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}else{
 
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,230,5,35);
+				$this->image($this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,15,40);
+				$this->image($this->logo,15,15,40);
 				$this->setLeftMargin(60);
 
 			}
@@ -8885,7 +8977,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,5,5,40);
+		$this->image($this->logo,5,5,40);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -9123,7 +9215,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					//On prépare le détail de la ligne
 					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
 					//$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
-					
+
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
@@ -9148,7 +9240,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 						,"details"=>$details
 					);
 
-					
+
 
 					$st[] = array(
 						($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
@@ -10694,7 +10786,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-					
+
 					if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"].$details;
 
 
@@ -10707,7 +10799,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 						,number_format($i['quantite']*$i['prix'],2,'.',' ')
 					);
 
-					
+
 
 					$styles[] = array();
 					$total += $i['quantite']*$i['prix'];
@@ -10988,14 +11080,18 @@ class pdf_cleodisbe extends pdf_cleodis {
 		
 		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 
+		ATF::type_affaire()->q->reset()->where('id_type_affaire',$this->affaire['id_type_affaire']);
 		$type_affaire = ATF::type_affaire()->select_row();
 
+		$type_affaire = ATF::type_affaire()->select_row();
+
+		//ancienne code $this->affaire['type_affaire]
 		//ancienne code $this->affaire['type_affaire]
 		if($this->affaire["type_affaire"] == "2SI") $this->logo = 'cleodis/2SI_CLEODIS.jpg';
 
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,15,5,35);
+		$this->image($this->logo,15,5,35);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"MANDAT DE PRELEVEMENT SEPA",0,0,"C");
@@ -11138,7 +11234,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	public function datamandatSepaNL(){
 		$this->addpage();
 
-		$this->image(__PDF_PATH__.$this->logo,10,5,30);
+		$this->image($this->logo,10,5,30);
 
 		$this->setFont("arial","B","14");
 		$this->cell(0,5,"EUROPEES DOMICILIERINGSMANDAAT",0,0,"C");
@@ -12421,7 +12517,7 @@ class pdf_cap extends pdf_cleodis {
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,5,-6,40);
+		$this->image($this->logo,5,-6,40);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -14133,10 +14229,10 @@ class pdf_bdomplus extends pdf_cleodis {
 
 		if(!$this->facturePDF){
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,230,5,35);
+				$this->image($this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				$this->image($this->logo,15,5,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -14215,21 +14311,21 @@ class pdf_bdomplus extends pdf_cleodis {
 			$this->setLeftMargin(15);
 		}else{
 			if($this->envoiContrat){
-				$this->image(__PDF_PATH__.$this->logo,15,15,35);
+				$this->image($this->logo,15,15,35);
 				$this->setLeftMargin(10);
 			}elseif($this->grille_client){
-				$this->image(__PDF_PATH__.$this->logo,15,5,20);
+				$this->image($this->logo,15,5,20);
 				$this->setLeftMargin(10);
 
 			}elseif($this->facturePDF){
 				if ($this->client['id_famille'] == 9) {
-					$this->image(__PDF_PATH__.$this->logo,85,5,30);
+					$this->image($this->logo,85,5,30);
 				} else {
-					$this->image(__PDF_PATH__.$this->logo,15,5,30);
+					$this->image($this->logo,15,5,30);
 				}
 				$this->SetMargins(10,36);
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,80,5,30);
+				$this->image($this->logo,80,5,30);
 				$this->SetMargins(10,36);
 			}
 		}
@@ -14873,7 +14969,7 @@ class pdf_bdomplus extends pdf_cleodis {
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,15,5,15);
+		$this->image($this->logo,15,5,15);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
@@ -15066,10 +15162,10 @@ class pdf_boulanger extends pdf_cleodis {
 
 		if(!$this->facturePDF){
 			if ($this->A3) {
-				$this->image(__PDF_PATH__.$this->logo,230,5,35);
+				$this->image($this->logo,230,5,35);
 				$this->setLeftMargin(275);
 			} else {
-				$this->image(__PDF_PATH__.$this->logo,15,5,30);
+				$this->image($this->logo,15,5,30);
 				$this->setLeftMargin(70);
 
 			}
@@ -15148,14 +15244,14 @@ class pdf_boulanger extends pdf_cleodis {
 			$this->setLeftMargin(15);
 		}else{
 			if($this->envoiContrat){
-				$this->image(__PDF_PATH__.$this->logo,15,15,35);
+				$this->image($this->logo,15,15,35);
 				$this->setLeftMargin(10);
 			}elseif($this->grille_client){
-				$this->image(__PDF_PATH__.$this->logo,15,5,20);
+				$this->image($this->logo,15,5,20);
 				$this->setLeftMargin(10);
 
 			}else{
-				$this->image(__PDF_PATH__.$this->logo,80,5,35);
+				$this->image($this->logo,80,5,35);
 				$this->SetMargins(10,36);
 			}
 		}
@@ -15177,7 +15273,7 @@ class pdf_boulanger extends pdf_cleodis {
 
 	public function contratA4Particulier($id, $signature,$sellsign) {
 
-		$this->image(__PDF_PATH__.$this->logo,10,10,40);
+		$this->image($this->logo,10,10,40);
 
 		$this->sety(10);
 		$this->multicell(0,5,"LA SOCIETE",0,'C');
@@ -15789,7 +15885,7 @@ class pdf_boulanger extends pdf_cleodis {
 
 
 		//HEADER
-		$this->image(__PDF_PATH__.$this->logo,15,5,15);
+		$this->image($this->logo,15,5,15);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
