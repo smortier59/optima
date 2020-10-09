@@ -64,7 +64,7 @@ class devis_cleodis extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
-			,"type_affaire"=>array("custom"=>true,
+			/*,"type_affaire"=>array("custom"=>true,
 								  "data"=>array(
 								  	'normal',
 								  	'2SI',
@@ -88,9 +88,9 @@ class devis_cleodis extends devis {
 									'Trekk',
 									'ZENCONNECT – ZEN PACK'
 								  ),
-								  "xtype"=>"combo")
-			
-			// ,'id_type_affaire'=>array("custom"=>true, "xtype"=> "combo")
+								  "xtype"=>"combo")*/
+
+			,'id_type_affaire'=>array("custom"=>true, "xtype"=> "combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
 
 		);
@@ -211,7 +211,7 @@ class devis_cleodis extends devis {
 		$this->foreign_key["id_filiale"] = "societe";
 		$this->foreign_key["AR_societe"] = "societe";
 		$this->foreign_key["vente_societe"] = "societe";
-		$this->foreign_key["id_type_affaire"]="affaire";
+		$this->foreign_key["id_type_affaire"]="type_affaire";
 
 		$this->onglets = array('devis_ligne');
 		$this->sans_partage = true; /* Evite de se voir jeté à cause d'un droit de partage pour ce module */
@@ -331,8 +331,6 @@ class devis_cleodis extends devis {
 	* @param array $nolog True si on ne désire par voir de logs générés par la méthode
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
-	   
-		log::logger('je suis dans devis insert',"dsarr");
 
 		if(isset($infos["preview"])){
 			$preview=$infos["preview"];
@@ -423,6 +421,8 @@ class devis_cleodis extends devis {
 
 		$affaire=ATF::affaire()->formateInsertUpdate($infos);
 
+		log::logger($affaire , "mfleurquin");
+
 
 		ATF::db($this->db)->begin_transaction();
 //*****************************Transaction********************************
@@ -441,18 +441,13 @@ class devis_cleodis extends devis {
 
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
-		log::logger($id_societe,"dsarr");
 
-		ATF::type_affaire()->q->reset()->where('type_affaire',"2SI");
 
-		$type_affaire = ATF::type_affaire()->select_row();
-		
-		
 
-		if($infos["type_affaire"]) $affaire["type_affaire"] = $type_affaire["type_affaire"];
-		   $affaire["id_type_affaire"] = $type_affaire['id_type_affaire'];
+		/*if($infos["type_affaire"]) $affaire["type_affaire"] = $type_affaire["type_affaire"];
+		$affaire["id_type_affaire"] = $type_affaire['id_type_affaire'];*/
 
-		
+
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
 		if(!$RUM){
@@ -498,7 +493,7 @@ class devis_cleodis extends devis {
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
 
 		////////////////Devis
-		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
+		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast

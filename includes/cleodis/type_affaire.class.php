@@ -29,9 +29,3 @@ class type_affaire extends classes_optima {
   }
 
 }
-
-
-
-
-
-

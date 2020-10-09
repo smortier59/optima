@@ -21,4 +21,22 @@ class type_affaire_params extends classes_optima {
     	$this->fieldstructure();
 	}
 
+
+
+	public function get_type_affaire_by_societe($id_societe){
+
+		$this->q->reset()->where("id_societe", $id_societe);
+		$type_affaire = $this->select_row();
+
+		if($type_affaire){
+			return $type_affaire["id_type_affaire"];
+		}else{
+
+			ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+			$type_affaire = ATF::type_affaire()->select_row();
+			return $type_affaire["id_type_affaire"];
+
+		}
+
+	}
 }

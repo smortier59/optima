@@ -5,7 +5,7 @@
 */
 require_once dirname(__FILE__)."/../affaire.class.php";
 class affaire_cleodis extends affaire {
-	
+
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
@@ -131,7 +131,7 @@ class affaire_cleodis extends affaire {
 			,"pdf_affaire"
 		);
 
-		
+
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
@@ -250,7 +250,7 @@ class affaire_cleodis extends affaire {
 	* @return array
 	*/
 	public function formateInsertUpdate($infos){
-	
+
 		$affaire["id_societe"]=$infos["id_societe"];
 		$affaire["nature"]=$infos["nature"];
 		$affaire["affaire"]=$infos["devis"];
@@ -263,12 +263,13 @@ class affaire_cleodis extends affaire {
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
 		$affaire["langue"]=$infos["langue"];
+		$affaire["id_type_affaire"]=$infos["id_type_affaire"];
 		$affaire["commentaire"] = $infos["commentaire"];
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
-		
-		
+
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -2525,12 +2526,11 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
-        
-		ATF::type_affaire()->q->reset()->where('type_affaire',"LAFI");
-
-		$type_affaire = ATF::type_affaire()->select_row();
 
 		$utilisateur  = ATF::$usr->get("contact");
+
+		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
+
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2561,14 +2561,10 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>ATF::$usr->getID(),
-			  "type_affaire" =>$type_affaire['type_affaire'],
-		      "id_type_affaire"=>$type_affaire['id_type_affaire'],
+		      "id_type_affaire"=>$id_type_affaire,
 			  "langue"=>ATF::societe()->select($id_societe, "langue"),
-			  
 			);
-			unset($devis['id_type_affaire']);
 
-			
 
 			$values_devis =array();
 
@@ -2617,35 +2613,10 @@ class affaire_cleodis extends affaire {
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-			
-			//log::logger($devis['id_affaire'],"dsarr");
-			
-			//recuperation de l'id de la societe 
+
+			//recuperation de l'id de la societe
 			$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
 
-            //insertion des id societet et id_type_affaire à voir si cette requete d'insertion est necessaire
-			// ATF::type_affaire_params()->insert(array(
-			// 	"id_type_affaire"=>$post["id_type_affaire"],
-			// 	"id_societe"=>$id_societe
-			// ));
-
-			//recuperation de type_affaire_params
-			//$type_affaire_params = type_affaire_params()->q->reset()->where('id_societe',$id_societe);
-
-			//recuperation du nouveau type d'affaire
-			//$type_affaire = ATF::type_affaire()->q->reset()->addField("type_affaire")
-									   //->where('type_affaire.id_type_affaire',$type_affaire_params['id_type_affaire']);
-
-			//log::logger($type_affaire,"dsarr");
-			//mise à jour de la table affaire , en modifiant le type d'affaire
-
-			// if($type_affaire){
-			// 	ATF::affaire()->u(array('id_type_affaire'=>$type_affaire['id_type_affaire'],'id_partenaire'=>$id_societe,'type_affaire'=>$type_affaire['type_affaire']))->where('id_affaire',$devis['id_affaire']);
-			// }
-
-			
-
-			//log::logger(ATF::affaire()->q->reset()->where('id_type_affaire',$type_affaire['id_type_affaire']));
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2658,14 +2629,14 @@ class affaire_cleodis extends affaire {
 				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
 			}
 
-			
+
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			
+
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-          
+
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
@@ -3244,7 +3215,7 @@ class affaire_midas extends affaire_cleodis {
 	/** On affiche que les sociétés midas
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 		ATF::loyer()->q->reset()->setToString();
 		$subquery=ATF::loyer()->sa("loyer.id_loyer","desc");
 
