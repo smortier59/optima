@@ -1840,6 +1840,7 @@ class affaire_cleodis extends affaire {
 			"affaire.etat",
 			'affaire.provenance',
 			'affaire.id_partenaire',
+			'affaire.id_apporteur',
 			'affaire.date',
 			"affaire.site_associe",
 			'affaire.ref',
