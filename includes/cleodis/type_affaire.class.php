@@ -7,7 +7,6 @@
 class type_affaire extends classes_optima {
 	public function __construct() {
 		parent::__construct();
-    $this->table = "type_affaire";
 
     //table type_affaire et ajout de logo
 		$this->table = "type_affaire";

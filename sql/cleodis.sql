@@ -30,3 +30,58 @@ ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','
 ALTER TABLE `affaire` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','dib','locevo','haccp','axa','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `affaire` CHANGE `type_affaire` `type_affaire` ENUM('normal','2SI','Boulanger Pro','Consommables_com','DIB','Dyadem','FLEXFUEL','Instore','LAFI','Manganelli','NRC','OLISYS - Ma Solution IT','Proxi Pause','Trekk','ZENCONNECT – ZEN PACK','Hexamed Leasing','LFS','LocEvo','haccp','Mariton','Axa') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'normal';
 ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo','haccp','axa') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+
+-- Type affaire
+CREATE TABLE `type_affaire` (
+  `id_type_affaire` int(11) NOT NULL,
+  `type_affaire` varchar(255) NOT NULL,
+  `libelle_pdf` varchar(255) NOT NULL DEFAULT 'Cléodis'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+INSERT INTO `type_affaire` (`id_type_affaire`, `type_affaire`, `libelle_pdf`) VALUES
+(3, 'Boulanger Pro', 'Boulanger Pro'),
+(5, '2SI', 'Cléodis'),
+(6, 'Consommables.com', 'Cléodis'),
+(7, 'DIB', 'DIB France'),
+(8, 'Dyadem', 'Cléodis'),
+(9, 'FLEXFUEL', 'Cléodis'),
+(10, 'haccp', 'Cléodis'),
+(11, 'Hexamed Leasing', 'Cléodis'),
+(12, 'Instore', 'Cléodis'),
+(13, 'LAFI', 'Cléodis'),
+(14, 'LFS', 'Cléodis'),
+(15, 'LocEvo', 'Cléodis'),
+(16, 'Manganelli', 'Cléodis'),
+(17, 'NRC', 'Cléodis'),
+(18, 'OLISYS - Ma Solution IT', 'Cléodis'),
+(19, 'Proxi Pause', 'Cléodis'),
+(20, 'ZENCONNECT - ZEN PACK', 'Cléodis'),
+(21, 'normal', 'Cléodis'),
+(22, 'Trekk', 'Cléodis'),
+(23, 'Axa', 'Cléodis'),
+(24, 'Mariton', 'Mariton');
+
+
+
+CREATE TABLE `type_affaire_params` (
+  `id_type_affaire_params` int(11) NOT NULL,
+  `id_societe` int(11) NOT NULL,
+  `id_type_affaire` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+ALTER TABLE `type_affaire`  ADD PRIMARY KEY (`id_type_affaire`);
+ALTER TABLE `type_affaire_params`  ADD PRIMARY KEY (`id_type_affaire_params`);
+ALTER TABLE `type_affaire`  MODIFY `id_type_affaire` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+ALTER TABLE `type_affaire_params`
+  MODIFY `id_type_affaire_params` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+COMMIT;
+
+ALTER TABLE `affaire` ADD INDEX(`id_type_affaire`);
+ALTER TABLE `affaire` ADD  FOREIGN KEY (`id_type_affaire`) REFERENCES `type_affaire`(`id_type_affaire`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+UPDATE affaire SET id_type_affaire = (SELECT id_type_affaire FROM type_affaire WHERE type_affaire.type_affaire = affaire.type_affaire);
+

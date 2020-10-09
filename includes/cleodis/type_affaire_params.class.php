@@ -9,16 +9,15 @@ class type_affaire_params extends classes_optima {
 
 		$this->table = "type_affaire_params";
 		$this->colonnes["fields_column"] = array(
-            "id_type_affaire"
-			,"id_societe"
-		);
-
-		$this->colonnes["fields_column"] = array(
-            "id_type_affaire"
-            ,"id_societe"
+            "type_affaire_params.id_type_affaire"
+			,"type_affaire_params.id_societe"
 		);
 
     	$this->fieldstructure();
+
+
+    	$this->foreign_key["id_societe"] = "societe";
+		$this->foreign_key["id_type_affaire"]="type_affaire";
 	}
 
 
