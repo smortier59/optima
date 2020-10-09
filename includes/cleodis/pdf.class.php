@@ -1689,7 +1689,7 @@ class pdf_cleodis extends pdf {
 		if ($caracteristique) $d5 .= "Caractéristiques spécifiques : ".$caracteristique;
 		
 	
-		$details = $d1.$d2.$d3.$d4.$d5;
+		$details = $d1.$d2.$d3.$d4."-Caracteristique:".$d5;
 
 		return $details;
 	}
