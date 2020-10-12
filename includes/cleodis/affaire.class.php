@@ -3682,7 +3682,7 @@ class affaire_bdomplus extends affaire_cleodis {
 			try {
 				ATF::db()->begin_transaction();
 				$a_renouveller = false;
-				$spy =0;
+
 
 				if(date("Y-m") == date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) ){
 					ATF::prolongation()->q->reset()->where("id_affaire", $value["id_affaire"]);
@@ -3693,7 +3693,6 @@ class affaire_bdomplus extends affaire_cleodis {
 				}
 
 				if($a_renouveller){
-					if($spy == 0){
 					$affaire = ATF::affaire()->select($value["id_affaire"]);
 
 					if($email_pro = ATF::societe()->select($value["id_societe"], "email")){
@@ -3745,8 +3744,7 @@ class affaire_bdomplus extends affaire_cleodis {
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
 						$this->creationAffaireRenouvellement($value["id_affaire"]);
 					}
-					$spy++;
-				}
+
 
 				}
 				ATF::db()->commit_transaction();
