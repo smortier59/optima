@@ -326,7 +326,7 @@ ATF.buildGridEditor({
 				{/if}
 			},
 
-			{if $current_class->table=="devis_ligne" || $current_class->table=="commande_ligne"}
+			{if $current_class->table=="devis_ligne" || $current_class->table=="commande_ligne"  || $current_class->table=="parc"}
 				{
 					header: 'Caracteristique',
 					width:20,

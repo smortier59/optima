@@ -145,7 +145,7 @@ class bon_de_commande_ligne_cleodis extends bon_de_commande_ligne {
 			foreach ($sa["data"] as $kRow => $row) {
 				$id_commande_ligne=$this->select($row["bon_de_commande_ligne.id_bon_de_commande_ligne"],"id_commande_ligne");
 				$commande_ligne=ATF::commande_ligne()->select($id_commande_ligne);
-				
+
 				$type=ATF::produit()->select($commande_ligne["id_produit"],"type");
 				if((!$commande_ligne["id_affaire_provenance"] && $type!="sans_objet") && $commande_ligne){
 
