@@ -1341,8 +1341,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function devisAvenant() {
 
-		log::logger('je suis devis avenant','dsarr');
-
 		if (!$this->devis) return false;
 
 		/* PAGE 2 */
@@ -1656,13 +1654,8 @@ class pdf_cleodis extends pdf {
 	*/
 	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
 
-
-		log::logger($caracteristique,'dsarr');
-
-
 		$produit=ATF::produit()->select($id_produit);
 		
-
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
 		if ($produit['id_produit_puissance']) $d1 .= ATF::produit_puissance()->nom($produit['id_produit_puissance']).", ";
@@ -1694,15 +1687,9 @@ class pdf_cleodis extends pdf {
 			}
 		}
 
-		if ($caracteristique) $d5 .= " - Caractéristiques : ".$caracteristique;
-
-
-
-
-
+		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
 
 		$details = $d1.$d2.$d3.$d4.$d5;
-
 
 		return $details;
 	}
@@ -1733,7 +1720,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function contratA3($id) {
 
-		log::logger('je suis dans contratA3','dsarr');
 		/* Passage en A3 */
 		$format=array(841.89,1190.55);
 		$this->fwPt=$format[0];
@@ -1780,7 +1766,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Left() {
-		log::logger('je suis dans contratA3left','dsarr');
+		
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -1910,7 +1896,6 @@ class pdf_cleodis extends pdf {
 	*/
 	public function contratA3Right() {
 
-		log::logger('je suis dans contratA3Right','dsarr');
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";
@@ -2172,7 +2157,7 @@ class pdf_cleodis extends pdf {
 
 
 	public function contratA4Signature($id){
-		log::logger('contraA4 signature','dsarr');
+		
 		$this->contratA4($id,true,true);
 	}
 
@@ -2182,7 +2167,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
-		log::logger('je suis dans contratA4 globale','dsarr');
+		
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
@@ -2208,7 +2193,6 @@ class pdf_cleodis extends pdf {
 
   	public function contratA4Societe($id, $signature,$sellsign) {
 
-    log::logger("je suis dans contratA4 societe","dsarr");
 	$this->sety(10);
 	$this->multicell(0,5,$this->affaire['nature']=="vente"?"LE VENDEUR":"LE LOUEUR",0,'C');
 	$this->setLeftMargin(65);
@@ -8828,7 +8812,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function contratA4Signature($id){
-		log::logger('contratA4Signature','dsarr');
+		
 		if($this->affaire["langue"] === "NL"){
 			$this->contratA4NL($id,true,true);
 		}else{
@@ -8996,7 +8980,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
-         log::logger('je suis dans contratA4','dsarr');
+         
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
@@ -9094,9 +9078,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 				foreach ($i as $k_ => $i_) {
 					$produit = ATF::produit()->select($i_['id_produit']);
 
-					log::logger('produit','dsarr');
-					log::logger($produit,'dsarr');
-
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
@@ -9104,7 +9085,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
-
 
 					$etat = "( NEUF )";
 					if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
@@ -10565,7 +10545,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @param int $id Identifiant bon de commande
 	*/
 	public function bon_de_commande($id,$s) {
-         log::logger('jai été appelé dans bon de commande','dsarr');
+        
 		if($this->affaire["langue"] !== "NL"){
 			parent::bon_de_commande($id, $s);
 
