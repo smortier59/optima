@@ -74,6 +74,9 @@ class devis_ligne_cleodis extends devis_ligne {
 	* @param array $infos
 	*/
   	function toCommandeLigne() {
+
+  		log::logger($this->colonnes['ligne'] , "mfleurquin");
+
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(util::keysOrValues($this->colonnes['ligne']))->setLimit(-1);
 		if ($res = $this->select_all()) {
