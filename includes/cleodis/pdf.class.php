@@ -10654,8 +10654,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
 					
-					#if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"].$details;
-
 					if($produit && $produit["commentaire"]) $designation .= "\nCaracteristique : ".$produit["commentaire"].$details;
 
 					$data[] = array(
