@@ -2837,6 +2837,7 @@ class affaire_cleodis extends affaire {
 											   ->where("commande.etat", "non_loyer","AND", false, "!=")
 											   ->where("commande.etat", "AR","AND", false, "!=")
 											   ->where("commande.etat", "arreter","AND", false, "!=")
+											   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
 											   ->where("commande.etat", "vente","AND", false, "!=");
 					$contrat = ATF::commande()->select_row();
 
@@ -3533,6 +3534,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	public function process_envoi_mail_information_renouvellement(){
 		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "arreter_contentieux","AND", false, "!=")
 								   ->where("etat", "vente", "AND", false, "!=")
 								   ->where("etat", "non_loyer", "AND", false, "!=")
 								   ->where("etat", "AR", "AND", false, "!=");
@@ -3613,6 +3615,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	public function process_envoi_mail_non_renouvellement_client_contentieux(){
 		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "arreter_contentieux","AND", false, "!=")
 								   ->where("etat", "vente", "AND", false, "!=")
 								   ->where("etat", "non_loyer", "AND", false, "!=")
 								   ->where("etat", "AR", "AND", false, "!=");
@@ -3693,6 +3696,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	public function process_arret_et_renouvellement(){
 		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "arreter_contentieux","AND", false, "!=")
 								   ->where("etat", "vente", "AND", false, "!=")
 								   ->where("etat", "non_loyer", "AND", false, "!=")
 								   ->where("etat", "AR", "AND", false, "!=");
@@ -3703,6 +3707,7 @@ class affaire_bdomplus extends affaire_cleodis {
 			try {
 				ATF::db()->begin_transaction();
 				$a_renouveller = false;
+
 
 				if(date("Y-m") == date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) ){
 					ATF::prolongation()->q->reset()->where("id_affaire", $value["id_affaire"]);
@@ -3763,9 +3768,8 @@ class affaire_bdomplus extends affaire_cleodis {
 					}else{
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
 						$this->creationAffaireRenouvellement($value["id_affaire"]);
-
-
 					}
+
 
 				}
 				ATF::db()->commit_transaction();
@@ -3829,6 +3833,7 @@ class affaire_bdomplus extends affaire_cleodis {
 		    "facture" => NULL,
 		    "iban" => $affaire["IBAN"],
 		    "bic" => $affaire["BIC"],
+		    "RUM" => $affaire["RUM"],
 		    "id_contact" => $societe["id_contact_signataire"],
 		    "id_societe" => $affaire["id_societe"],
 		    "produits" => json_encode($prods),
