@@ -89,11 +89,29 @@ class suivi_cleodis extends suivi {
 			ATF::user()->q->reset()->where("login", "gsmit");
 			$notifie_contentieux = ATF::user()->select_all();
 
-			foreach ($notifie_contentieux as $ksn => $vsn) {
-				$infos["suivi"]["suivi_notifie"][] = $vsn["id_user"];
+
+			if(is_string($infos["suivi"]["suivi_notifie"])){
+				foreach ($notifie_contentieux as $ksn => $vsn) {
+					if($infos["suivi"]["suivi_notifie"] == ""){
+						$infos["suivi"]["suivi_notifie"] = $vsn["id_user"];
+					}else{
+						$infos["suivi"]["suivi_notifie"] .= ",".$vsn["id_user"];
+					}
+				}
 			}
-			$infos["suivi"]["suivi_notifie"] = array_unique($infos["suivi"]["suivi_notifie"]);
+
+			if(is_array($infos["suivi"]["suivi_notifie"])){
+				foreach ($notifie_contentieux as $ksn => $vsn) {
+					$infos["suivi"]["suivi_notifie"][] = $vsn["id_user"];
+				}
+				$infos["suivi"]["suivi_notifie"] = array_unique($infos["suivi"]["suivi_notifie"]);
+			}
+
+
+
 		}
+
+
 
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}
