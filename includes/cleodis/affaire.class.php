@@ -2816,6 +2816,7 @@ class affaire_cleodis extends affaire {
 											   ->where("commande.etat", "non_loyer","AND", false, "!=")
 											   ->where("commande.etat", "AR","AND", false, "!=")
 											   ->where("commande.etat", "arreter","AND", false, "!=")
+											   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
 											   ->where("commande.etat", "vente","AND", false, "!=");
 					$contrat = ATF::commande()->select_row();
 
@@ -3512,6 +3513,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	public function process_envoi_mail_information_renouvellement(){
 		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "arreter_contentieux","AND", false, "!=")
 								   ->where("etat", "vente", "AND", false, "!=")
 								   ->where("etat", "non_loyer", "AND", false, "!=")
 								   ->where("etat", "AR", "AND", false, "!=");
@@ -3592,6 +3594,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	public function process_envoi_mail_non_renouvellement_client_contentieux(){
 		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "arreter_contentieux","AND", false, "!=")
 								   ->where("etat", "vente", "AND", false, "!=")
 								   ->where("etat", "non_loyer", "AND", false, "!=")
 								   ->where("etat", "AR", "AND", false, "!=");
@@ -3672,6 +3675,7 @@ class affaire_bdomplus extends affaire_cleodis {
 	*/
 	public function process_arret_et_renouvellement(){
 		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
+								   ->where("etat", "arreter_contentieux","AND", false, "!=")
 								   ->where("etat", "vente", "AND", false, "!=")
 								   ->where("etat", "non_loyer", "AND", false, "!=")
 								   ->where("etat", "AR", "AND", false, "!=");
