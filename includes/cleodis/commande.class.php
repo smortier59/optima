@@ -539,6 +539,7 @@ class commande_cleodis extends commande {
 			case "date_demande_resiliation":
 			case "date_prevision_restitution":
 			case "date_restitution_effective":
+			case "date_demande_reprise_broker":
 
 				//Il ne faut pas que la date début soit un 29 30 ou 31 car sinon cela pause problème lors de la création de l'échéancier
 				if($infos['key']=="date_debut"){
@@ -554,6 +555,19 @@ class commande_cleodis extends commande {
 					if(ATF::societe()->select($id_societe, "relation") !== "client"){ ATF::societe()->u(array("id_societe"=> $id_societe, "relation"=>"client")); }
 
 				}
+
+				//si la date de demande de reprise au broker est envoyé alors il faut check si il y a une date de restitution effective
+				if($infos['key']=="date_demande_reprise_broker"){
+					if($infos['value'] ==($commande["date_restitution_effective"] || $commande["date_demande_reprise_broker"])){
+						throw new errorATF("Il n'y a pas de date de restitution effective",880);
+					}
+					ATF::devis()->u(array("id_devis"=> $this->select($infos['id_commande'] , "id_devis"), "date_demande_reprise_broker"=>date("Y-m-d")));
+
+					ATF::commande()->q->reset()->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
+														  ->where("date_demande_reprise_broker");
+				}
+
+
 				//Mode transactionel
 				ATF::db($this->db)->begin_transaction();
 				try {
