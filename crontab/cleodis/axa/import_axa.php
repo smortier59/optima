@@ -92,8 +92,8 @@ function import_produit(string $path = ''){
 			$alreadyExistsFromEan = ATF::produit()->select_row();*/
 
 			if ($alreadyExistsFromRef /*|| $alreadyExistsFromEan*/) {
-				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) /*." || ". print_r($alreadyExistsFromEan,true)*/, "import_dib_escape_product");
-				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_dib_escape_product");
+				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) /*." || ". print_r($alreadyExistsFromEan,true)*/, "import_axa_escape_product");
+				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_axa_escape_product");
 				continue;
 			}
 
@@ -103,7 +103,7 @@ function import_produit(string $path = ''){
 			$p = ATF::produit()->select_row();
 
 			$produit = array(
-				"site_associe" => 'dib',
+				"site_associe" => 'axa',
 				"produit"=> $product,
 				"type"=> mb_strtolower($rawType, 'UTF-8'),
 				"ref"=> $ref,
@@ -159,9 +159,9 @@ function import_produit(string $path = ''){
 		}
 
 
-		log::logger("#####Produits imports",  "dib_migration");
-		log::logger("total: $lines_count",  "dib_migration");
-		log::logger("imported: $processed_lines",  "dib_migration");
+		log::logger("#####Produits imports",  "axa_migration");
+		log::logger("total: $lines_count",  "axa_migration");
+		log::logger("imported: $processed_lines",  "axa_migration");
 
 		return $produits;
 	} catch (errorATF $e) {
@@ -221,9 +221,9 @@ function import_pack(){
 			$processed_lines++;
 		}
 
-		log::logger("#####Packs imports",  "dib_migration");
-		log::logger("total: $lines_count",  "dib_migration");
-		log::logger("imported: $processed_lines",  "dib_migration");
+		log::logger("#####Packs imports",  "axa_migration");
+		log::logger("total: $lines_count",  "axa_migration");
+		log::logger("imported: $processed_lines",  "axa_migration");
 
 		return $packs;
 	} catch (errorATF $e) {
@@ -335,9 +335,9 @@ function import_ligne($packs, $produits){
 			$processed_lines++;
 		}
 
-		log::logger("#####Lignes imports",  "dib_migration");
-		log::logger("total: $lines_count",  "dib_migration");
-		log::logger("imported: $processed_lines",  "dib_migration");
+		log::logger("#####Lignes imports",  "axa_migration");
+		log::logger("total: $lines_count",  "axa_migration");
+		log::logger("imported: $processed_lines",  "axa_migration");
 
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
