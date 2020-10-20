@@ -32,6 +32,8 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
+    log::logger('je suis dans devis','dsarr');
+
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -227,7 +229,8 @@ class souscription_cleodis extends souscription {
           "adresse_facturation_2"=>$post['facturation']['adresse_2'],
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
-          "id_magasin"=>$post["id_magasin"]
+          "id_magasin"=>$post["id_magasin"],
+          "commentaire"=>$post["commentaire"],
         );
         // ajout du vendeur pour bdomplus
         if ($post['site_associe'] == 'bdomplus' && $nameVendeur) {
