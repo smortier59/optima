@@ -617,8 +617,8 @@ class bon_de_commande_cleodis extends bon_de_commande {
 		}
 
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
-		
-		
+
+
 
 		$prix_total = 0;
 		foreach($infos_bon_de_commande_ligne as $key=>$item){

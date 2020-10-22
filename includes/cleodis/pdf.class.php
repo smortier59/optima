@@ -1131,9 +1131,9 @@ class pdf_cleodis extends pdf {
 						//On prépare le détail de la ligne
 
 						//ici si on surcharge les details il y'aura une duplicata des commentaires alors que la fonction detailProduct le fait
-						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 
-						$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
+
 
 
 						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
@@ -1350,6 +1350,7 @@ class pdf_cleodis extends pdf {
 	* @date 13-01-2011
 	*/
 	public function devisAvenant() {
+
 		if (!$this->devis) return false;
 
 		/* PAGE 2 */
@@ -1662,9 +1663,9 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant produit
 	*/
 	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
+
 		$produit=ATF::produit()->select($id_produit);
-
-
+		
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
 		if ($produit['id_produit_puissance']) $d1 .= ATF::produit_puissance()->nom($produit['id_produit_puissance']).", ";
@@ -1696,8 +1697,7 @@ class pdf_cleodis extends pdf {
 			}
 		}
 
-		if ($caracteristique) $d5 .= "Caractéristiques spécifiques : ".$caracteristique;
-
+		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
 
 		$details = $d1.$d2.$d3.$d4.$d5;
 
@@ -1729,6 +1729,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA3($id) {
+
 		/* Passage en A3 */
 		$format=array(841.89,1190.55);
 		$this->fwPt=$format[0];
@@ -1775,6 +1776,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Left() {
+		
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -1903,6 +1905,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Right() {
+
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";
@@ -2009,8 +2012,8 @@ class pdf_cleodis extends pdf {
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-					$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					$etat = "( NEUF )";
@@ -2164,6 +2167,7 @@ class pdf_cleodis extends pdf {
 
 
 	public function contratA4Signature($id){
+		
 		$this->contratA4($id,true,true);
 	}
 
@@ -2173,6 +2177,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
+		
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
@@ -2326,8 +2331,8 @@ class pdf_cleodis extends pdf {
 		  $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 		  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 		  //On prépare le détail de la ligne
-		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-		  $details .=$this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
+		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+		  #$details .=$this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 		  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
@@ -3720,6 +3725,7 @@ class pdf_cleodis extends pdf {
 		foreach($bdclignes as $k=>$i) {
 			if($lignes[$i["id_commande_ligne"]]){
 				$lignes[$i["id_commande_ligne"]]["quantite"] += $i["quantite"];
+				$lignes[$i["id_commande_ligne"]]["caracteristique"] += $i["caracteristique"];
 				$lignes[$i["id_commande_ligne"]]["prix"] = $i["prix"];
 				$lignes[$i["id_commande_ligne"]]["prix_ttc"] = $i["prix_ttc"];
 			}else{
@@ -3872,13 +3878,14 @@ class pdf_cleodis extends pdf {
 				}
 				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
 
-				$details = $this->detailsProduit($i['id_produit'],$k,$i['caracteristique']);
+				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
+				$designation .= $details;
 
-				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
+				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"].$details;
 
 				$data[] = array(
 					$i['ref']
-					,$details
+					,$designation
 					,round($i['quantite'])
 					,number_format($i['prix'],2,'.',' ')
 					,number_format($i['quantite']*$i['prix'],2,'.',' ')
@@ -8740,6 +8747,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function contratA4Signature($id){
+		
 		if($this->affaire["langue"] === "NL"){
 			$this->contratA4NL($id,true,true);
 		}else{
@@ -8907,7 +8915,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
-
+         
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
@@ -9004,14 +9012,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
 					$produit = ATF::produit()->select($i_['id_produit']);
+
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-					//$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
+
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
-
 
 					$etat = "( NEUF )";
 					if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
@@ -9842,7 +9850,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					$etat = "( NEUF )";
@@ -10472,7 +10480,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @param int $id Identifiant bon de commande
 	*/
 	public function bon_de_commande($id,$s) {
-
+        
 		if($this->affaire["langue"] !== "NL"){
 			parent::bon_de_commande($id, $s);
 
@@ -10578,19 +10586,17 @@ class pdf_cleodisbe extends pdf_cleodis {
 						$designation .= "- ";
 					}
 
-					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
+					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-
-					if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"].$details;
-
-
+					
+					if($produit && $produit["commentaire"]) $designation .= "\nCaracteristique : ".$produit["commentaire"].$details;
 
 					$data[] = array(
 						$i['ref']
-						,$designation
 						,round($i['quantite'])
 						,number_format($i['prix'],2,'.',' ')
 						,number_format($i['quantite']*$i['prix'],2,'.',' ')
+						,$designation
 					);
 
 
@@ -11578,6 +11584,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 13-01-2011
 	*/
 	public function devisClassique() {
+		log::logger('je suis dans devisClassique','dsarr');
 		if (!$this->devis) return false;
 
 		if($this->affaire["langue"] == 'FR') parent::devisClassique();
@@ -11610,7 +11617,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					}
 					$produit = ATF::produit()->select($i_['id_produit']);
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					if ($details == "") unset($details);
