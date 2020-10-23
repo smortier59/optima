@@ -1869,10 +1869,10 @@ class affaire_cleodis extends affaire {
 		}else if ($get['site_associe'] && $get['site_associe'] === 'btwin'){
 			$this->q->where("site_associe",'btwin')
 				->addGroup("affaire.id_affaire");
-		}else if ($get['site_associe'] && $get['site_associe'] === 'cleodis'){
-			$this->q->whereIsNull("site_associe")
-					->orWhere("site_associe",'')
-				->addGroup("affaire.id_affaire");
+		}else if ( $get['site_associe'] && $get['site_associe'] === 'cleodis'){
+				$this->q->orWhere("site_associe",'"btwin", "toshiba"',"subquery", "NOT IN",false, true)
+						->orWhere("site_associe", NULL, "subquery", "IS NULL")
+						->addGroup("affaire.id_affaire");
 		}else if ($get['provenance'] && $get['provenance'] === 'true' && !$get['site_associe']){
 			$this->q->where("provenance",'partenaire')
 				->whereIsNotNull('affaire.id_partenaire')
