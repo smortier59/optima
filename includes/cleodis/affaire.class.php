@@ -3681,6 +3681,9 @@ class affaire_bdomplus extends affaire_cleodis {
 
 
 		foreach ($contrats_en_cours as $key => $value) {
+			log::logger("############################################" , "renouvellement");
+			log::logger($value , "renouvellement");
+
 			try {
 				ATF::db()->begin_transaction();
 				$a_renouveller = false;
@@ -3692,6 +3695,10 @@ class affaire_bdomplus extends affaire_cleodis {
 
 					if(!$prolongation) $a_renouveller = true;
 					if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+					log::logger("On renouvelle --> ".$a_renouveller , "renouvellement");
+
+				}else{
+					log::logger(date("Y-m") . " != ". date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) , "renouvellement");
 				}
 
 				if($a_renouveller){
@@ -3748,6 +3755,8 @@ class affaire_bdomplus extends affaire_cleodis {
 					}
 
 
+				}else{
+					log::logger("Non renouvellée" , "renouvellement");
 				}
 				ATF::db()->commit_transaction();
 			} catch (errorATF $e) {
