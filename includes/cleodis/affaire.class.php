@@ -3704,6 +3704,9 @@ class affaire_bdomplus extends affaire_cleodis {
 				if($a_renouveller){
 					$affaire = ATF::affaire()->select($value["id_affaire"]);
 
+					log::logger("////////////////////////////////////////" , "renouvellement_ok");
+					log::logger($affaire , "renouvellement_ok");
+
 					if($email_pro = ATF::societe()->select($value["id_societe"], "email")){
 				      $email = $email_pro;
 				    }else{
@@ -3712,9 +3715,13 @@ class affaire_bdomplus extends affaire_cleodis {
 				    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
 			   		$info_mail["recipient"] = $email;
 
+			   		log::logger("STOP COMMANDE " , "renouvellement_ok");
+			   		log::logger(array("id_commande"=>$value["id_commande"]) , "renouvellement_ok");
+
 			   		ATF::commande()->stopCommande(array("id_commande"=>$value["id_commande"]));
 
 					if(ATF::societe()->select($value["id_societe"], "mauvais_payeur") == "oui"){
+						log::logger("MAUVAIS PAYEUR" , "renouvellement_ok");
 						//Client en contentieux, on arrete le contrat et basta
 
 
@@ -3750,6 +3757,7 @@ class affaire_bdomplus extends affaire_cleodis {
 					    }
 					    ATF::suivi()->i($suivi);
 					}else{
+						log::logger("BON PAYEUR" , "renouvellement_ok");
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
 						$this->creationAffaireRenouvellement($value["id_affaire"]);
 					}
