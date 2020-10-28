@@ -3826,7 +3826,6 @@ class pdf_cleodis extends pdf {
 					$i['id_produit'] = ATF::commande_ligne()->select($i["id_commande_ligne"], "id_produit");
 				}
 
-				log::logger($i , "mfleurquin");
 
 				if($i["id_produit"]) $produit = ATF::produit()->select($i['id_produit']);
 
