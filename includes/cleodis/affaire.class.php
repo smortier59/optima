@@ -3758,6 +3758,7 @@ class affaire_bdomplus extends affaire_cleodis {
 					    ATF::suivi()->i($suivi);
 					}else{
 						log::logger("BON PAYEUR" , "renouvellement_ok");
+						log::logger($value["id_affaire"] , "renouvellement_ok");
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
 						$this->creationAffaireRenouvellement($value["id_affaire"]);
 					}
@@ -3782,6 +3783,8 @@ class affaire_bdomplus extends affaire_cleodis {
 	 * @param  int $id_affaire ID affaire de l'affaire à renouveller
 	 */
 	public function creationAffaireRenouvellement($id_affaire){
+
+		log::logger("--- Creation affaire Renouvellement" , "renouvellement_ok");
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
@@ -3848,8 +3851,9 @@ class affaire_bdomplus extends affaire_cleodis {
 		        "0" => $id_pack
 		    )
 		);
-
+		log::logger($post , "renouvellement_ok");
 		$affaires = ATF::souscription()->_devis(array(), $post);
+		log::logger($affaires , "renouvellement_ok");
 
 		foreach ($affaires["ids"] as $key => $value) {
 			ATF::affaire()->u(
