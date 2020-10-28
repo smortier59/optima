@@ -3800,7 +3800,7 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		$ligne_actuelle = array();
 
-
+		log::logger($devis_ligne , "renouvellement_ok");
 		//Recuperation du bon pack de l'affaire, id_pack sur ligne devis, foiré pour certaines affaires
 		$id_pack = NULL;
 		foreach( $devis_ligne  as $key => $value) {
@@ -3810,6 +3810,8 @@ class affaire_bdomplus extends affaire_cleodis {
 				$id_pack = $lignes[0]["id_pack_produit"];
 			}
 		}
+
+		log::logger($id_pack , "renouvellement_ok");
 
 		foreach ($devis_ligne as $key => $value) {
 
