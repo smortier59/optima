@@ -3524,7 +3524,7 @@ class affaire_bdomplus extends affaire_cleodis {
 				$prolongation = ATF::prolongation()->sa();
 
 				if(!$prolongation) $a_renouveller = true;
-				if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+				//if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
 			}
 
 			if($a_renouveller){
@@ -3607,7 +3607,7 @@ class affaire_bdomplus extends affaire_cleodis {
 				$prolongation = ATF::prolongation()->sa();
 
 				if(!$prolongation) $a_renouveller = true;
-				if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+				//if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
 			}
 
 			if($a_renouveller && ATF::societe()->select($value["id_societe"], "mauvais_payeur") == "oui"){
