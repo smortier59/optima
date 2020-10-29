@@ -3694,7 +3694,7 @@ class affaire_bdomplus extends affaire_cleodis {
 					$prolongation = ATF::prolongation()->sa();
 
 					if(!$prolongation) $a_renouveller = true;
-					if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+					//if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
 					log::logger("On renouvelle --> ".$a_renouveller , "renouvellement");
 
 				}else{
