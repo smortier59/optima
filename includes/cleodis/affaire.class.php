@@ -3524,7 +3524,7 @@ class affaire_bdomplus extends affaire_cleodis {
 				$prolongation = ATF::prolongation()->sa();
 
 				if(!$prolongation) $a_renouveller = true;
-				if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+				//if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
 			}
 
 			if($a_renouveller){
@@ -3607,7 +3607,7 @@ class affaire_bdomplus extends affaire_cleodis {
 				$prolongation = ATF::prolongation()->sa();
 
 				if(!$prolongation) $a_renouveller = true;
-				if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+				//if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
 			}
 
 			if($a_renouveller && ATF::societe()->select($value["id_societe"], "mauvais_payeur") == "oui"){
@@ -3678,21 +3678,34 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		$contrats_en_cours = ATF::commande()->sa();
 
+
+
 		foreach ($contrats_en_cours as $key => $value) {
+			log::logger("############################################" , "renouvellement");
+			log::logger($value , "renouvellement");
+
 			try {
 				ATF::db()->begin_transaction();
 				$a_renouveller = false;
 
 				if(date("Y-m") == date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) ){
+
 					ATF::prolongation()->q->reset()->where("id_affaire", $value["id_affaire"]);
 					$prolongation = ATF::prolongation()->sa();
 
 					if(!$prolongation) $a_renouveller = true;
-					if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+					//if($prolongation && $prolongation[0]["duree"] == 0) $a_renouveller = true;
+					log::logger("On renouvelle --> ".$a_renouveller , "renouvellement");
+
+				}else{
+					log::logger(date("Y-m") . " != ". date("Y-m", strtotime("+11 month", strtotime($value["date_debut"]))) , "renouvellement");
 				}
 
 				if($a_renouveller){
 					$affaire = ATF::affaire()->select($value["id_affaire"]);
+
+					log::logger("////////////////////////////////////////" , "renouvellement_ok");
+					log::logger($affaire , "renouvellement_ok");
 
 					if($email_pro = ATF::societe()->select($value["id_societe"], "email")){
 				      $email = $email_pro;
@@ -3702,9 +3715,13 @@ class affaire_bdomplus extends affaire_cleodis {
 				    $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
 			   		$info_mail["recipient"] = $email;
 
+			   		log::logger("STOP COMMANDE " , "renouvellement_ok");
+			   		log::logger(array("id_commande"=>$value["id_commande"]) , "renouvellement_ok");
+
 			   		ATF::commande()->stopCommande(array("id_commande"=>$value["id_commande"]));
 
 					if(ATF::societe()->select($value["id_societe"], "mauvais_payeur") == "oui"){
+						log::logger("MAUVAIS PAYEUR" , "renouvellement_ok");
 						//Client en contentieux, on arrete le contrat et basta
 
 
@@ -3740,12 +3757,15 @@ class affaire_bdomplus extends affaire_cleodis {
 					    }
 					    ATF::suivi()->i($suivi);
 					}else{
+						log::logger("BON PAYEUR" , "renouvellement_ok");
+						log::logger($value["id_affaire"] , "renouvellement_ok");
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
 						$this->creationAffaireRenouvellement($value["id_affaire"]);
-
-
 					}
 
+
+				}else{
+					log::logger("Non renouvellée" , "renouvellement");
 				}
 				ATF::db()->commit_transaction();
 			} catch (errorATF $e) {
@@ -3764,6 +3784,8 @@ class affaire_bdomplus extends affaire_cleodis {
 	 */
 	public function creationAffaireRenouvellement($id_affaire){
 
+		log::logger("--- Creation affaire Renouvellement" , "renouvellement_ok");
+
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
 
@@ -3774,16 +3796,31 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		ATF::devis_ligne()->q->reset()->from("devis_ligne","id_devis","devis","id_devis")
 									  ->where("id_affaire", $id_affaire);
+		$devis_ligne = ATF::devis_ligne()->sa();
 
 		$ligne_actuelle = array();
 
-		foreach (ATF::devis_ligne()->sa() as $key => $value) {
-			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $value["id_pack_produit"])
+		log::logger($devis_ligne , "renouvellement_ok");
+		//Recuperation du bon pack de l'affaire, id_pack sur ligne devis, foiré pour certaines affaires
+		$id_pack = NULL;
+		foreach( $devis_ligne  as $key => $value) {
+			ATF::pack_produit_ligne()->q->reset()->where("id_produit", $value["id_produit"]);
+			$lignes = ATF::pack_produit_ligne()->sa();
+			if(count($lignes) == 1){
+				$id_pack = $lignes[0]["id_pack_produit"];
+			}
+		}
+
+		log::logger($id_pack , "renouvellement_ok");
+
+		foreach ($devis_ligne as $key => $value) {
+
+			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack)
 												 ->where("id_produit", $value["id_produit"]);
 			$l = ATF::pack_produit_ligne()->select_row();
 
 			$p = array(
-				"id_pack_produit" => $value["id_pack_produit"],
+				"id_pack_produit" => $id_pack,
 				"id_pack_produit_ligne" => $l["id_pack_produit_ligne"],
 				"id_produit" => $value["id_produit"],
 				"ref" => $value["ref"],
@@ -3808,14 +3845,17 @@ class affaire_bdomplus extends affaire_cleodis {
 		    "facture" => NULL,
 		    "iban" => $affaire["IBAN"],
 		    "bic" => $affaire["BIC"],
+		    "RUM" => $affaire["RUM"],
 		    "id_contact" => $societe["id_contact_signataire"],
 		    "id_societe" => $affaire["id_societe"],
 		    "produits" => json_encode($prods),
 		    "id_pack_produit" => array (
-		        "0" => $snap->id_pack_produit
+		        "0" => $id_pack
 		    )
 		);
+		log::logger($post , "renouvellement_ok");
 		$affaires = ATF::souscription()->_devis(array(), $post);
+		log::logger($affaires , "renouvellement_ok");
 
 		foreach ($affaires["ids"] as $key => $value) {
 			ATF::affaire()->u(
@@ -3838,6 +3878,22 @@ class affaire_bdomplus extends affaire_cleodis {
 			$commande["commande.etat"] = ATF::commande()->select($commande["commande.id_commande"], "etat");
 
 			ATF::souscription()->demarrageContrat($new_affaire, $commande, true);
+
+
+
+			if(ATF::affaire()->select($id_affaire, "affaire") != "BDOM + : ".ATF::affaire()->select($value, "affaire")){
+				log::logger("##############################################", "mfleurquin");
+				log::logger("Parent -->", "mfleurquin");
+				log::logger(ATF::affaire()->select($id_affaire, "ref"), "mfleurquin");
+				log::logger(ATF::affaire()->select($id_affaire, "affaire"), "mfleurquin");
+
+
+				log::logger("Fille -->", "mfleurquin");
+				log::logger(ATF::affaire()->select($value, "ref"), "mfleurquin");
+				log::logger(ATF::affaire()->select($value, "affaire"), "mfleurquin");
+			}
+
+
 		}
 
 	}
@@ -3902,7 +3958,7 @@ class affaire_boulanger extends affaire_cleodis {
 						  ->from("commande","id_societe","societe","id_societe");
 
 		$data = ATF::commande()->sa();
-		log::logger($data, "qjanon");
+		//log::logger($data, "qjanon");
 		ATF::db()->begin_transaction();
 		try{
 			$fn = "export_boulanger_commande_client.csv";
@@ -3971,7 +4027,7 @@ class affaire_boulanger extends affaire_cleodis {
 				->setDimension("row")
 				->setLimit(1);
 		$this->q->setToString();
-		log::logger($this->sa(), "qjanon");
+		//log::logger($this->sa(), "qjanon");
 		$this->q->unsetToString();
 		$nb=$this->sa();
 
@@ -3990,7 +4046,7 @@ class affaire_boulanger extends affaire_cleodis {
 		}else{
 			$suffix="00001";
 		}
-		log::logger($suffix, "qjanon");
+		//log::logger($suffix, "qjanon");
 		return $prefix.$suffix;
 	}
 

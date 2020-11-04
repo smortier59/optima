@@ -1487,8 +1487,6 @@ class commande_cleodis extends commande {
 				ATF::bon_de_commande()->q->reset()->where("id_affaire", $i['commande.id_affaire_fk']);
 				$bdc=ATF::bon_de_commande()->sa();
 
-				log::logger($bdc , "jdelaporte");
-
 				if(count($bdc)==0){
 					$return['data'][$k]['allowAllBDCCreate'] = true;
 				}
@@ -1508,7 +1506,7 @@ class commande_cleodis extends commande {
 
 
 			//Check l'existence de création de demande refi
-			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false) || $affaire['nature']=="vente") {
+			if (ATF::demande_refi()->existDemandeRefi($i["commande.id_affaire_fk"], false, false) || $affaire['nature']=="vente") {
 				$return['data'][$k]['demandeRefiExist'] = true;
 			} else {
 				$return['data'][$k]['demandeRefiExist'] = false;
