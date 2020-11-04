@@ -76,6 +76,23 @@ class suivi_cleodis extends suivi {
 		$this->colonnes["bloquees"]["select"]=array("origine","public");
 	}
 
+
+	/**
+	 * Fonction insert exposé pour l'insertion de suivi depuis tunnel & Espace client/conseillé
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array() $get  Vide car doit etre appelé en POST
+	 * @param  array() $post Data à inséré dans le suivi
+	 * @return id_suiv       Retourne l'id du suivi si tout c'est bien passé
+	 * @return errorATF si il y a une erreur
+	 */
+	public function _insertSuivi($get, $post){
+		log::logger("Passage dans insert Suivi", "mfleurquin");
+		log::logger($post , "mfleurquin");
+		if(!$post) throw new errorATF("DATA_MANQUANTE");
+		return $this->insert($post);
+	}
+
+
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
 		if(!$infos["suivi"]){
 			$infos["suivi"] = $infos;
