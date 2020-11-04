@@ -438,14 +438,15 @@ class demande_refi extends classes_optima {
     * @param int $id_affaire
     * @return boolean à true s'il y en a une
     */
-	public function existDemandeRefi($id_affaire, $all = true){
+	public function existDemandeRefi($id_affaire, $all = true, $factu_mensuelle = true){
 		$this->q->reset()->addCondition("id_affaire",$this->decryptId($id_affaire))
 						 ->addCondition("etat","valide")
 						 ->setCount();
 
-
-		if(ATF::$codename == "cleodis"){
-			$this->q->addCondition("demande_refi.id_refinanceur", 17, "AND", false, "!=");
+		if($factu_mensuelle){
+			if(ATF::$codename == "cleodis"){
+				$this->q->addCondition("demande_refi.id_refinanceur", 17, "AND", false, "!=");
+			}
 		}
 
 		if($all){
