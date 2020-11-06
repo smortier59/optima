@@ -85,11 +85,27 @@ class suivi_cleodis extends suivi {
 	 * @return id_suiv       Retourne l'id du suivi si tout c'est bien passé
 	 * @return errorATF si il y a une erreur
 	 */
-	public function _insertSuivi($get, $post){
-		log::logger("Passage dans insert Suivi", "mfleurquin");
-		log::logger($post , "mfleurquin");
-		if(!$post) throw new errorATF("DATA_MANQUANTE");
-		return $this->insert($post);
+	public function _insert($get, $post){
+		if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
+
+
+		$cols = $this->table_structure();
+
+		$suivi_notifie = "";
+		if($post["suivi_notifie"]) $suivi_notifie = $post["suivi_notifie"];
+
+		$infos = array();
+
+		foreach ($post as $key => $value) {
+			if(!array_key_exists("suivi.".$key , $cols)){
+				unset($post[$key]);
+			}
+		}
+		unset($post["date"]);
+		$suivi = $post;
+		$suivi["suivi_notifie"] = $suivi_notifie;
+
+		return $this->insert($suivi);
 	}
 
 
@@ -125,10 +141,7 @@ class suivi_cleodis extends suivi {
 			}
 
 
-
 		}
-
-
 
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}

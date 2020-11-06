@@ -32,6 +32,44 @@ class tache_cleodis extends tache {
 		$this->colonnes['bloquees']['update'] = array('id_user_valid_1','id_user_valid_2','validation_1','validation_2');
 	}
 
+
+	/**
+	 * Fonction insert exposé pour l'insertion de suivi depuis tunnel & Espace client/conseillé
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array() $get  Vide car doit etre appelé en POST
+	 * @param  array() $post Data à inséré dans le suivi
+	 * @return id_suiv       Retourne l'id du suivi si tout c'est bien passé
+	 * @return errorATF si il y a une erreur
+	 */
+	public function _insert($get, $post){
+		if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
+
+
+		$cols = $this->table_structure();
+
+		$tache_notifie = "";
+		if($post["dest"]) $tache_notifie = $post["dest"];
+
+		$infos = array();
+
+		foreach ($post as $key => $value) {
+			if(!array_key_exists("tache.".$key , $cols)){
+				unset($post[$key]);
+			}
+		}
+		unset($post["date"]);
+		$tache = $post;
+
+		$tache["no_redirect"] = true;
+
+
+		$tache['horaire_debut']=date("Y-m-d H:i:s");
+		$tache['horaire_fin'] = date("Y-m-d H:i:s", strtotime("+3 days"));
+
+		return $this->insert(array("tache"=>$tache, "dest"=> $tache_notifie));
+	}
+
+
 	/**
     * Surcharge d'insertion pour la redirection
     * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -107,6 +145,8 @@ class tache_cleodis extends tache {
 						case 'refus_comite':  $entete = "Refus comité";
 					}
 				}
+
+
 
 				//envoi des mails aux concernés (si il y a au moins le mail du
 				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
