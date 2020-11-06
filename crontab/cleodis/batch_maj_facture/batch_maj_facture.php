@@ -8,20 +8,31 @@ ATF::define("tracabilite",false);
 error_reporting(E_ALL);
 
 $logFile = 'cleodis-batch-maj-facture';
-$path = './test.csv';
+$pathFactureImpayes = './test.csv';
 
 	
 log::logger('==================================Initialisation du batch=================================', $logFile);
 	
 
-//script de sauvegarde facture 
+// FIRST STEP : script de sauvegarde facture 
+sauvegardeFacture($logFile);
 
-//sauvegardeFacture();
+// SECOND STEP : Import du fichier des factures impayées, ce fichier est fourni par le client
+check_csv_impayee($pathFactureImpayes, $logFile);
 
-function sauvegardeFacture(){
+
+
+
+
+/**
+ * Sauvegarde la table facture dans un fichier csv : sauvegarde_facture.csv, dans le dossier courant
+ * @param  string $logFile Fichier de log
+ */
+function sauvegardeFacture($logFile){
+  log::logger('==================================Début de sauvegarde de la table =================================', $logFile);
 	// $file = './sauvegarde_facture_'.date('YmdHis').'.csv';
 	$file = './sauvegarde_facture.csv';
-    echo "script de sauvegarde de la table facture\n\r";
+  log::logger("script de sauvegarde de la table facture", $logFile;
 	touch($file);
 	$fp = fopen($file,'w+');
 	if (!$fp) {
@@ -50,10 +61,10 @@ function sauvegardeFacture(){
 		fclose($fp);
 		
 	}
+  log::logger('==================================Fin de sauvegarde de la table =================================', $logFile);
 
 }
 
-log::logger('==================================Fin du script de sauvegarde de la table =================================', $logFile);
 
 
 // /*
@@ -62,21 +73,19 @@ log::logger('==================================Fin du script de sauvegarde de la
 // */
 
 
-$fichier_impayees = "./test.csv";
-
-log::logger('Fichier a traiter : '.$fichier_impayees, $logFile);
-
-//import_csv_impayee($fichier_impayees, $logFile);
-
-function import_csv_impayee(string $path = '', $logFile){
+/**
+ * Check et mise à jour des factures (etat, date rejet, date regul, date paiement), fait un checkEtatContentieux puis un checkMauvaisPayeur
+ * @param  string $path Filepath vers le fichier CSV fourni par le client
+ * @param  string $logFile Path pour le fichier de log
+ */
+function check_csv_impayee(string $path = '', $logFile){
+  log::logger("==================================Début de check des impayées   =================================", $logFile);
 	 
 	try {
 
 		log::logger("FOPEN du fichier ".$path, $logFile);
 		
 		$fileFactureImpayee = fopen($path, 'rb');
-   
-    
     if(!$fileFactureImpayee) {
       echo "Ouverture du fichier ".$fichier_impayees." impossible\n\r";
     }else{
@@ -123,15 +132,12 @@ function import_csv_impayee(string $path = '', $logFile){
     }
 		
 	} catch (errorATF $e) {
-		ATF::db()->rollback_transaction();
-		
 		throw $e;
 	}
 
-   
+  log::logger("==================================Fin de check des impayées   =================================", $logFile);
 }
 
-log::logger("==================================Fin du script import d\'un fichier CSV UTF-8  des impayées   =================================", $logFile);
 
 
 // comparaison fichier XLS et table facture
