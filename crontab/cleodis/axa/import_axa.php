@@ -32,9 +32,9 @@ $packs = import_pack();
 import_ligne($packs, $produits);
 
 // Rollback la transaction
-//ATF::db()->rollback_transaction();
-// Valide la trnasaction
 ATF::db()->commit_transaction();
+// Valide la trnasaction
+//ATF::db()->commit_transaction();
 echo "========= FIN DE SCRIPT =========\n";
 
 /**
@@ -72,11 +72,11 @@ function import_produit(string $path = ''){
 			$state = $ligne[3];
 			$category = get_categorie($ligne[11]);
 			$sub_category = $ligne[12];
-			$commentaire = $ligne[4];
+			$commentaire = mb_strimwidth($ligne[4],0 , 500, "...");
 			$description = $ligne[17];
 			$rate = $ligne[13];
 			$term = $ligne[14];
-			$ean = $ligne[16];
+			$ean = /*$ligne[16]*/ NULL;
 			$url_image = $ligne[19];
 			$eco_tax = $ligne[6];
 			$eco_mob = $ligne[7];
@@ -88,22 +88,22 @@ function import_produit(string $path = ''){
 			ATF::produit()->q->reset()->where("ref", $ref);
 			$alreadyExistsFromRef = ATF::produit()->select_row();
 			// Check if a given product ean already exists in database
-			ATF::produit()->q->reset()->where("ean", $ean);
-			$alreadyExistsFromEan = ATF::produit()->select_row();
+			/*ATF::produit()->q->reset()->where("ean", $ean);
+			$alreadyExistsFromEan = ATF::produit()->select_row();*/
 
-			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true), "import_boulangerpro_escape_product");
-				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_boulangerpro_escape_product");
+			if ($alreadyExistsFromRef /*|| $alreadyExistsFromEan*/) {
+				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) /*." || ". print_r($alreadyExistsFromEan,true)*/, "import_axa_escape_product");
+				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_axa_escape_product");
 				continue;
 			}
 
-			if($ean === "") ATF::produit()->q->reset()->where("ref", $ref);
+			if($ean === NULL || $ean === "") ATF::produit()->q->reset()->where("ref", $ref);
 			else ATF::produit()->q->reset()->where("ean", $ean,"AND")->where("ref", $ref);
 
 			$p = ATF::produit()->select_row();
 
 			$produit = array(
-				"site_associe" => 'locevo',
+				"site_associe" => 'axa',
 				"produit"=> $product,
 				"type"=> mb_strtolower($rawType, 'UTF-8'),
 				"ref"=> $ref,
@@ -159,9 +159,9 @@ function import_produit(string $path = ''){
 		}
 
 
-		log::logger("#####Produits imports",  "boulangerpro_migration");
-		log::logger("total: $lines_count",  "boulangerpro_migration");
-		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+		log::logger("#####Produits imports",  "axa_migration");
+		log::logger("total: $lines_count",  "axa_migration");
+		log::logger("imported: $processed_lines",  "axa_migration");
 
 		return $produits;
 	} catch (errorATF $e) {
@@ -221,9 +221,9 @@ function import_pack(){
 			$processed_lines++;
 		}
 
-		log::logger("#####Packs imports",  "boulangerpro_migration");
-		log::logger("total: $lines_count",  "boulangerpro_migration");
-		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+		log::logger("#####Packs imports",  "axa_migration");
+		log::logger("total: $lines_count",  "axa_migration");
+		log::logger("imported: $processed_lines",  "axa_migration");
 
 		return $packs;
 	} catch (errorATF $e) {
@@ -284,14 +284,14 @@ function import_ligne($packs, $produits){
 			if (!$produit) {
 				var_dump($ligne);
 				var_dump($produit);
-				echo "Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n";
+				echo "Produit non trouve non plus dans \$produit ! " . $reference." => Pack n  ".$ligne[1]." abandonn  \n";
 				continue;
 				//throw new errorATF("Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n");
 			}
 
 			if (!$id_produit) {
 				$id_produit = $produit["id_produit"];
-				echo "Produit non trouve ! " . $id." => Pack n°".$ligne[0].", du coup on prend le id_produit=".$id_produit."\n";
+				echo "Produit non trouve ! " . $reference." => Pack n°".$ligne[1].", du coup on prend le id_produit=".$id_produit."\n";
 				//continue;
 			}
 
@@ -318,6 +318,8 @@ function import_ligne($packs, $produits){
 				"ordre" => $order
 			);
 
+
+
 			if ($pack_produit_ligne['visible']=="Lignes de produits") $pack_produit_ligne['visible']="oui";
 			if ($pack_produit_ligne['visible']=="Lignes de produits non visible") $pack_produit_ligne['visible']="non";
 
@@ -333,9 +335,9 @@ function import_ligne($packs, $produits){
 			$processed_lines++;
 		}
 
-		log::logger("#####Lignes imports",  "boulangerpro_migration");
-		log::logger("total: $lines_count",  "boulangerpro_migration");
-		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+		log::logger("#####Lignes imports",  "axa_migration");
+		log::logger("total: $lines_count",  "axa_migration");
+		log::logger("imported: $processed_lines",  "axa_migration");
 
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();

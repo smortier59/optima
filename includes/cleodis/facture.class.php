@@ -123,6 +123,9 @@ class facture_cleodis extends facture {
 		$this->addPrivilege("export_cegid");
 		$this->addPrivilege("export_cleofi");
 
+		$this->addPrivilege("import_facture_libre");
+
+
 
 
 		$this->field_nom="ref";
@@ -2331,6 +2334,276 @@ class facture_cleodis extends facture {
 		fpassthru($fh);
 		unlink($fname);
 		PHPExcel_Calculation::getInstance()->__destruct();
+	}
+
+
+
+	public function import_facture_libre(&$infos,&$s,$files=NULL) {
+
+
+		$infos['display'] = true;
+		$path = $files['file']['tmp_name'];
+
+		$facture_insert = 0;
+		$erreurs = array();
+		$warnings["150 - Enregistrement(s) déjà existant(s)"].", ";
+
+		$f = fopen($path,"r");
+
+	    // Vérification des colonnes
+	    $cols = fgetcsv($f, 1, ";");
+
+		ATF::db($this->db)->begin_transaction();
+
+
+		$data = fgetcsv($f, 10000, ";");
+
+		$entetes = $data;
+
+		$entetes_necessaire = array(
+			"commentaire" => false,
+			"nature" => false,
+			"redevance" => false,
+			"ref_externe" => false,
+			"type_libre" => false,
+			"ef_affaire" => false,
+			"mode de paiement" => false,
+			"periode_debut" => false,
+			"date" => false,
+			"periode_fin" => false,
+			"total_ht" => false
+		);
+
+		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
+
+
+		$nb_entete_manquant = 0;
+		foreach ($entetes_necessaire as $key => $value) {
+			if($value ==false){
+				$erreurs["Entete manquante (".$key.")"] .= $lineCompteur.", ";
+				$nb_entete_manquant ++;
+			}
+		}
+
+
+
+		if($nb_entete_manquant == 0){
+			$lineCompteur = 0;
+			while (($data = fgetcsv($f, 10000, ";")) !== FALSE) {
+				$lineCompteur++;
+
+				if($lineCompteur>11 && !$data[2] ) continue;
+
+				$data = array_map("utf8_encode",$data);
+
+				try {
+
+					$col_ref_affaire = array_keys($entetes , "ef_affaire");
+
+					ATF::affaire()->q->reset()->addField("affaire.id_societe")->where("affaire.ref", $data[$col_ref_affaire[0]]);
+					$affaire = ATF::affaire()->select_row();
+
+
+					if($affaire){
+						ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire"]);
+						$commande = ATF::commande()->select_row();
+
+
+						$facture = array(
+							"type_facture" => "libre",
+							"id_societe" => $affaire["affaire.id_societe_fk"],
+							"id_affaire" => $affaire["affaire.id_affaire"],
+							"id_commande" => $commande["commande.id_commande"],
+						);
+
+
+						foreach ($data as $key => $value) {
+
+							switch ($entetes[$key]) {
+
+								case 'commentaire' :
+								case 'nature' :
+								case 'redevance' :
+								case 'ref_externe' :
+									$facture[$entetes[$key]] = $value;
+								break;
+
+								case 'type_libre' :
+									$facture[$entetes[$key]] = $value;
+								break;
+
+								case 'ef_affaire' :
+								break;
+
+								case 'mode de paiement' :
+									$facture["mode_paiement"] = $value;
+								break;
+
+								case 'periode_debut' :
+								case 'date' :
+								case 'periode_fin' :
+									if(strpos($value , "/")){
+										$date = explode("/" , $value);
+										$date = $date[2]."-".$date[1]."-".$date[0];
+									}else{
+										$date = $value;
+									}
+
+									if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
+									if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
+									if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+								break;
+
+
+								case 'total_ht' :
+									$facture["prix_libre"] = $value;
+								break;
+
+								default:
+								break;
+							}
+
+
+
+						}
+
+						$fields=[
+							  "produit"
+							, "quantite"
+							, "ref"
+							, "id_fournisseur"
+							, "prix_achat"
+							, "code"
+							, "id_produit"
+							, "serial"
+						];
+
+						ATF::commande_ligne()->q->reset()
+									->addField(util::keysOrValues($fields))
+									->where("id_commande", $commande["commande.id_commande"])
+									->where("id_affaire_provenance",null,null,false,"IS NULL")
+									->where("visible_pdf","oui");
+
+						$return = array();
+						if ($ligneVisible = ATF::commande_ligne()->select_all() ) {
+
+							foreach ($ligneVisible as $kRow => $row) {
+								foreach ($row as $kCol => $value) {
+									if($kCol != "commande_ligne.id_commande_ligne"){
+										if(strpos($kCol, "id_") !== false){
+											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}else{
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}
+									}
+								}
+								$return[$kRow]["facture_ligne.afficher"]="oui";
+							}
+							$ligneVisible = $return;
+						}
+
+						ATF::commande_ligne()->q->reset()
+									->addField(util::keysOrValues($fields))
+									->where("id_commande", $commande["commande.id_commande"])
+									->where("id_affaire_provenance",null,null,false,"IS NOT NULL")->setView(["order"=>$fields]);
+						$return = array();
+						if ($ligneRepris = ATF::commande_ligne()->select_all() ) {
+							foreach ($ligneRepris as $kRow => $row) {
+								foreach ($row as $kCol => $value) {
+									if($kCol != "commande_ligne.id_commande_ligne"){
+										if(strpos($kCol, "id_") !== false){
+											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}else{
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}
+									}
+								}
+								$return[$kRow]["facture_ligne.afficher"]="oui";
+							}
+							$ligneRepris = $return;
+						}
+
+						ATF::commande_ligne()->q->reset()
+									->addField(util::keysOrValues($fields))
+									->where("id_commande", $commande["commande.id_commande"])
+									->where("id_affaire_provenance",null,null,false,"IS NULL")
+									->where("visible_pdf","non")->setView(["order"=>$fields]);
+						$return = array();
+						if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
+							foreach ($ligneNonVisible as $kRow => $row) {
+								if($kCol != "commande_ligne.id_commande_ligne"){
+									if(strpos($kCol, "id_")  !== false ){
+										$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+										$return[$kRow]["facture_ligne.".$kCol]=$value;
+									}else{
+										$return[$kRow]["facture_ligne.".$kCol]=$value;
+									}
+								}
+								$return[$kRow]["facture_ligne.afficher"]="oui";
+							}
+							$ligneNonVisible = $return;
+						}
+
+						$this->insert(array("facture"=> $facture,
+											"values_facture" =>
+												array(
+													"produits_repris" => json_encode($ligneRepris) ,
+													"produits" => json_encode($ligneVisible) ,
+													"produits_non_visible" => json_encode($ligneNonVisible) ,
+												)
+											)
+									);
+						$facture_insert ++;
+
+					}else{
+						$erreurs["Affaire non trouvée (".$data[$col_ref_affaire[0]].")"] .= $lineCompteur.", ";
+					}
+				} catch (errorATF $e) {
+
+					$msg = $e->getMessage();
+
+					if (preg_match("/generic message : /",$msg)) {
+					  $tmp = json_decode(str_replace("generic message : ","",$msg),true);
+					  $msg = $tmp['text'];
+					}
+
+			        if ($e->getErrno()==1062) {
+			          if ($infos['ignore']) {
+			              $warnings[$e->getErrno()." - Enregistrement(s) déjà existant(s)"] .= $lineCompteur.", ";
+			          } else {
+			              $erreurs[$e->getErrno()." - Enregistrement(s) déjà existant(s)"] .= $lineCompteur.", ";
+			          }
+			        } else {
+			            $erreurs[$e->getErrno()." - ".$msg] .= $lineCompteur.", ";
+			        }
+				}
+
+
+		    }
+		}
+
+
+    	fclose($handle);
+
+
+		if (!empty($erreurs)) {
+	      $return['errors'] = $erreurs;
+	      $return['success'] = false;
+	      ATF::db($this->db)->rollback_transaction();
+	    } else {
+	      $return['warnings'] = $warnings;
+
+	      $return['success'] = true;
+	      $return["factureInserted"] = $facture_insert;
+	      //ATF::db($this->db)->rollback_transaction();
+
+	      ATF::db($this->db)->commit_transaction();
+	    }
+
+
+		return json_encode($return);
 	}
 
 };

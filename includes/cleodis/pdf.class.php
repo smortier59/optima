@@ -101,6 +101,11 @@ class pdf_cleodis extends pdf {
 				$this->logo = 'cleodis/Manganelli.jpg';
 			break;
 
+			case 'Mariton' :
+				$this->cleodis = "Mariton";
+				$this->logo = 'cleodis/mariton.jpg';
+			break;
+
 			case 'NRC' :
 				$this->cleodis = "NRC";
 				$this->logo = 'cleodis/nrc.jpg';
@@ -130,6 +135,12 @@ class pdf_cleodis extends pdf {
 			case 'haccp' :
 				$this->cleodis = "HACCP";
 				$this->logo = 'cleodis/haccp.jpg';
+
+			break;
+
+			case 'Axa' :
+				$this->cleodis = "Axa";
+				$this->logo = 'cleodis/axa.jpg';
 
 			break;
 
@@ -247,7 +258,6 @@ class pdf_cleodis extends pdf {
 			$this->image(__PDF_PATH__.$this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-
 			switch ($this->logo) {
 				case 'cleodis/2SI_CLEODIS.jpg' :
 					$this->image(__PDF_PATH__."/".$this->logo,75,10,40);
@@ -1122,9 +1132,18 @@ class pdf_cleodis extends pdf {
 							$flagOnlyPrixInvisible = false;
 						}
 						$produit = ATF::produit()->select($i_['id_produit']);
+
+
 						//On prépare le détail de la ligne
-						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+
+						//ici si on surcharge les details il y'aura une duplicata des commentaires alors que la fonction detailProduct le fait
+						$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+
+
+
+
 						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
 
 						if ($details == "") unset($details);
 
@@ -1141,9 +1160,12 @@ class pdf_cleodis extends pdf {
 						$data[] = array(
 							round($i_['quantite'])
 							,$i_['id_fournisseur'] ?ATF::societe()->nom($i_['id_fournisseur']) : "-"
-							,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat
+							,$i_['produit']." - ".ATF::fabriquant()->nom($produit['id_fabriquant'])." ".$etat.$details
 							,($i_['visibilite_prix']=="visible")?number_format($i_['quantite']*$i_['prix_achat'],2,","," ")." €":"NC"
+
 						);
+
+
 					}
 
 				}
@@ -1154,6 +1176,9 @@ class pdf_cleodis extends pdf {
 					,"styles"=>$st
 					,"title"=>$title
 				);
+
+
+
 			}
 
 			$h = count($tableau)*5; //Ajout dans le calcul des titres de tableau mis a la main
@@ -1511,6 +1536,7 @@ class pdf_cleodis extends pdf {
 	* @date 13-01-2011
 	*/
 	public function devisAvenant() {
+
 		if (!$this->devis) return false;
 
 		/* PAGE 2 */
@@ -1832,8 +1858,10 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	* @param int $id Identifiant produit
 	*/
-	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL){
+	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
+
 		$produit=ATF::produit()->select($id_produit);
+		
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
 		if ($produit['id_produit_puissance']) $d1 .= ATF::produit_puissance()->nom($produit['id_produit_puissance']).", ";
@@ -1865,7 +1893,9 @@ class pdf_cleodis extends pdf {
 			}
 		}
 
-		$details = $d1.$d2.$d3.$d4;
+		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
+
+		$details = $d1.$d2.$d3.$d4.$d5;
 
 		return $details;
 	}
@@ -1895,6 +1925,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA3($id) {
+
 		/* Passage en A3 */
 		$format=array(841.89,1190.55);
 		$this->fwPt=$format[0];
@@ -1941,6 +1972,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Left() {
+		
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -2069,6 +2101,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Right() {
+
 		if($this->devis["type_contrat"]=="vente"){
 			$locationmaj="VENTE";
 			$location="vente";
@@ -2175,7 +2208,8 @@ class pdf_cleodis extends pdf {
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					$etat = "( NEUF )";
@@ -2329,6 +2363,7 @@ class pdf_cleodis extends pdf {
 
 
 	public function contratA4Signature($id){
+		
 		$this->contratA4($id,true,true);
 	}
 
@@ -2338,6 +2373,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
+		
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
@@ -2491,7 +2527,8 @@ class pdf_cleodis extends pdf {
 		  $ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 		  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 		  //On prépare le détail de la ligne
-		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+		  #$details .=$this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 		  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
@@ -2844,6 +2881,7 @@ class pdf_cleodis extends pdf {
 		  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 		  //On prépare le détail de la ligne
 		  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+		  //$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 		  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
@@ -2867,6 +2905,8 @@ class pdf_cleodis extends pdf {
 			,$i_['produit'].$etat
 			,"details"=>$details
 		  );
+
+
 
 		  $st[] = array(
 			($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
@@ -3877,11 +3917,11 @@ class pdf_cleodis extends pdf {
 		$bdclignes = ATF::bon_de_commande_ligne()->sa();
 
 
-
 		$this->lignes = $lignes = array();
 		foreach($bdclignes as $k=>$i) {
 			if($lignes[$i["id_commande_ligne"]]){
 				$lignes[$i["id_commande_ligne"]]["quantite"] += $i["quantite"];
+				$lignes[$i["id_commande_ligne"]]["caracteristique"] += $i["caracteristique"];
 				$lignes[$i["id_commande_ligne"]]["prix"] = $i["prix"];
 				$lignes[$i["id_commande_ligne"]]["prix_ttc"] = $i["prix_ttc"];
 			}else{
@@ -4014,6 +4054,8 @@ class pdf_cleodis extends pdf {
 		$this->setfont('arial','',10);
 
 		if ($this->lignes) {
+
+
 			$head = array("Référence","Désignation","Quantité","P.U","Total");
 			$w = array(30,100,20,20,20);
 
@@ -4031,7 +4073,11 @@ class pdf_cleodis extends pdf {
 					$designation .= "- ";
 				}
 				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
+
+				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
+				$designation .= $details;
+
+				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"].$details;
 
 				$data[] = array(
 					$i['ref']
@@ -4572,6 +4618,8 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant Facture
 	*/
 	public function facture($id,$s,$global=false) {
+		$this->pdf_facture = true;
+
 		$this->facture = ATF::facture()->select($id);
 		ATF::facture_ligne()->q->reset()->where("visible","oui")->where("afficher","oui")->where("id_facture",$this->facture['id_facture']);
 		$this->lignes = ATF::facture_ligne()->sa();
@@ -4584,8 +4632,11 @@ class pdf_cleodis extends pdf {
 		$this->societe = ATF::societe()->select($this->affaire['id_filiale']);
 		$this->contrat = ATF::affaire()->getCommande($this->affaire['id_affaire'])->infos;
 
+
 		$this->initLogo($this->affaire["type_affaire"]);
-		$this->image(__PDF_PATH__."/".$this->logo,5,8,55);
+		$this->image(__PDF_PATH__."/".$this->logo,5,8,40);
+
+
 
 		//Styles utilisés
 
@@ -5136,7 +5187,7 @@ class pdf_cleodis extends pdf {
 	  }
 
 	  if($this->facture['type_facture'] === "libre"){
-		if($this->facture['type_libre'] !== "normale"){
+		if($this->facture['type_libre'] == "contentieux"){
 		  $InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
 		  $sInfosTVA = array(array($this->styleDetailsProduit));
 		  $this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
@@ -5430,7 +5481,7 @@ class pdf_cleodis extends pdf {
 			}
 
 			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] !== "normale"){
+				if($this->facture['type_libre'] == "contentieux"){
 					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
 					$sInfosTVA = array(array($this->styleDetailsProduit));
 					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
@@ -5576,9 +5627,20 @@ class pdf_cleodis extends pdf {
 	}
 
 	function global_facture ($facture,$s){
-		$this->open();
-		foreach ($facture as $key => $item) {
 
+		$this->unsetHeader();
+		$this->unsetFooter();
+		$this->open();
+
+		/*foreach ($facture as $key => $item) {
+			$pageCount = $this->setSourceFile(ATF::facture()->filepath($item,"fichier_joint"));
+	        for ($i = 1; $i <= $pageCount; $i++) {
+	            $tplIdx = $this->importPage($i);
+	            $this->AddPage();
+	            $this->useTemplate($tplIdx);
+	        }
+		}*/
+		foreach ($facture as $key => $item) {
 			$this->facture($item,$s,true) ;
 		}
 	}
@@ -5912,6 +5974,7 @@ class pdf_cleodis extends pdf {
 
 
 	function grille_client($facturer,$s,$nf=false,$prol=false) {
+
 		$this->tMargin = 30;
 		//$this->logo = 'cleodis/logo.jpg';
 		$this->grille_client = true;
@@ -8880,6 +8943,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function contratA4Signature($id){
+		
 		if($this->affaire["langue"] === "NL"){
 			$this->contratA4NL($id,true,true);
 		}else{
@@ -9047,7 +9111,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
-
+         
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
@@ -9144,12 +9208,14 @@ class pdf_cleodisbe extends pdf_cleodis {
 				unset($data,$st);
 				foreach ($i as $k_ => $i_) {
 					$produit = ATF::produit()->select($i_['id_produit']);
+
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
-					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
+
+					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					$etat = "( NEUF )";
 					if($i_["id_affaire_provenance"] || $i_["neuf"]== "non" ){
@@ -9171,6 +9237,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 						,$i_['produit'].$etat
 						,"details"=>$details
 					);
+
+
 
 					$st[] = array(
 						($details?$this->colsProduitAvecDetailFirst:$this->colsProduitFirst)
@@ -9978,7 +10046,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					$ssCat = ATF::sous_categorie()->nom($produit['id_sous_categorie'])?ATF::sous_categorie()->nom($produit['id_sous_categorie']):"-";
 					$fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					$etat = "( NEUF )";
@@ -10277,7 +10345,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 			}
 
 			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] !== "normale"){
+				if($this->facture['type_libre'] == "contentieux"){
 					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
 					$sInfosTVA = array(array($this->styleDetailsProduit));
 					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
@@ -10608,7 +10676,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @param int $id Identifiant bon de commande
 	*/
 	public function bon_de_commande($id,$s) {
-
+        
 		if($this->affaire["langue"] !== "NL"){
 			parent::bon_de_commande($id, $s);
 
@@ -10713,18 +10781,22 @@ class pdf_cleodisbe extends pdf_cleodis {
 						if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
 						$designation .= "- ";
 					}
+
+					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-					if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
-
-
+					
+					if($produit && $produit["commentaire"]) $designation .= "\nCaracteristique : ".$produit["commentaire"].$details;
 
 					$data[] = array(
 						$i['ref']
-						,$designation
 						,round($i['quantite'])
 						,number_format($i['prix'],2,'.',' ')
 						,number_format($i['quantite']*$i['prix'],2,'.',' ')
+						,$designation
 					);
+
+
+
 					$styles[] = array();
 					$total += $i['quantite']*$i['prix'];
 				}
@@ -11708,6 +11780,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 13-01-2011
 	*/
 	public function devisClassique() {
+		log::logger('je suis dans devisClassique','dsarr');
 		if (!$this->devis) return false;
 
 		if($this->affaire["langue"] == 'FR') parent::devisClassique();
@@ -11740,7 +11813,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 					}
 					$produit = ATF::produit()->select($i_['id_produit']);
 					//On prépare le détail de la ligne
-					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+					$details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 					if ($details == "") unset($details);
@@ -14766,7 +14839,7 @@ class pdf_bdomplus extends pdf_cleodis {
 			}
 
 			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] !== "normale"){
+				if($this->facture['type_libre'] == "contentieux"){
 					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
 					$sInfosTVA = array(array($this->styleDetailsProduit));
 					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
@@ -15279,6 +15352,7 @@ class pdf_boulanger extends pdf_cleodis {
 				  $fab = ATF::fabriquant()->nom($produit['id_fabriquant'])?ATF::fabriquant()->nom($produit['id_fabriquant']):"-";
 				  //On prépare le détail de la ligne
 				  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire']);
+				  //$details .= $this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 				  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
@@ -15680,7 +15754,7 @@ class pdf_boulanger extends pdf_cleodis {
 			}
 
 			if($this->facture['type_facture'] === "libre"){
-				if($this->facture['type_libre'] !== "normale"){
+				if($this->facture['type_libre'] == "contentieux"){
 					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
 					$sInfosTVA = array(array($this->styleDetailsProduit));
 					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);

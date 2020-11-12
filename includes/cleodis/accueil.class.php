@@ -20,6 +20,7 @@ class accueil_cleodis extends accueil {
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
 	public function getWidgets($id_agence){
+		
 		$w = array();
 
 

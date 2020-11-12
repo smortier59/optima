@@ -92,8 +92,8 @@ function import_produit(string $path = ''){
 			$alreadyExistsFromEan = ATF::produit()->select_row();
 
 			if ($alreadyExistsFromRef || $alreadyExistsFromEan) {
-				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true), "import_boulangerpro_escape_product");
-				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_boulangerpro_escape_product");
+				log::logger('Skipping EAN/REF found : ' . print_r($alreadyExistsFromRef,true) ." || ". print_r($alreadyExistsFromEan,true), "import_hexamed_escape_product");
+				log::logger("Produit ".$ref."/".$ean." non traité car déjà présent dans la BDD.", "import_hexamed_escape_product");
 				continue;
 			}
 
@@ -103,7 +103,7 @@ function import_produit(string $path = ''){
 			$p = ATF::produit()->select_row();
 
 			$produit = array(
-				"site_associe" => 'locevo',
+				"site_associe" => 'hexamed',
 				"produit"=> $product,
 				"type"=> mb_strtolower($rawType, 'UTF-8'),
 				"ref"=> $ref,
@@ -159,9 +159,9 @@ function import_produit(string $path = ''){
 		}
 
 
-		log::logger("#####Produits imports",  "boulangerpro_migration");
-		log::logger("total: $lines_count",  "boulangerpro_migration");
-		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+		log::logger("#####Produits imports",  "hexamed_migration");
+		log::logger("total: $lines_count",  "hexamed_migration");
+		log::logger("imported: $processed_lines",  "hexamed_migration");
 
 		return $produits;
 	} catch (errorATF $e) {
@@ -221,15 +221,15 @@ function import_pack(){
 			$processed_lines++;
 		}
 
-		log::logger("#####Packs imports",  "boulangerpro_migration");
-		log::logger("total: $lines_count",  "boulangerpro_migration");
-		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+		log::logger("#####Packs imports",  "hexamed_migration");
+		log::logger("total: $lines_count",  "hexamed_migration");
+		log::logger("imported: $processed_lines",  "hexamed_migration");
 
 		return $packs;
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
 		print_r($pack);
-		log::logger($pack, "import_boulangerpro");
+		log::logger($pack, "import_hexamed");
 		echo "Pack N° : ".$ligne[0]." ERREUR\n";
 		throw $e;
 	}
@@ -333,9 +333,9 @@ function import_ligne($packs, $produits){
 			$processed_lines++;
 		}
 
-		log::logger("#####Lignes imports",  "boulangerpro_migration");
-		log::logger("total: $lines_count",  "boulangerpro_migration");
-		log::logger("imported: $processed_lines",  "boulangerpro_migration");
+		log::logger("#####Lignes imports",  "hexamed_migration");
+		log::logger("total: $lines_count",  "hexamed_migration");
+		log::logger("imported: $processed_lines",  "hexamed_migration");
 
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
@@ -343,7 +343,7 @@ function import_ligne($packs, $produits){
 		echo "Ligne Pack N° : ".$ligne[0]." ERREUR\n";
 		print_r($ligne);
 		print_r($pack_produit_ligne);
-		log::logger($e, "import_boulangerpro");
+		log::logger($e, "import_hexamed");
 		throw $e;
 	}
 

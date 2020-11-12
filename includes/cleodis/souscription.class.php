@@ -32,6 +32,7 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
+
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -79,6 +80,13 @@ class souscription_cleodis extends souscription {
 
       case 'haccp':
         ATF::societe()->q->reset()->where("siret", "45307981600048");
+        $cleodis = ATF::societe()->select_row();
+
+        $this->id_partenaire = $cleodis["id_societe"];
+      break;
+
+      case 'axa':
+        ATF::societe()->q->reset()->where("siret", "34020062500036");
         $cleodis = ATF::societe()->select_row();
 
         $this->id_partenaire = $cleodis["id_societe"];
@@ -148,10 +156,8 @@ class souscription_cleodis extends souscription {
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
 
-        log::logger($post , "mfleurquin");
-        log::logger($libelle , "mfleurquin");
 
 
         $id_devis = $this->createDevis($post, $libelle);
@@ -222,7 +228,8 @@ class souscription_cleodis extends souscription {
           "adresse_facturation_2"=>$post['facturation']['adresse_2'],
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
-          "id_magasin"=>$post["id_magasin"]
+          "id_magasin"=>$post["id_magasin"],
+          "commentaire"=>$post["commentaire"],
         );
         // ajout du vendeur pour bdomplus
         if ($post['site_associe'] == 'bdomplus' && $nameVendeur) {
@@ -267,6 +274,7 @@ class souscription_cleodis extends souscription {
           case 'locevo':
           case 'dib':
           case 'haccp':
+          case 'axa':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -301,7 +309,7 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $renouvellement=false) {
     if ($id_pack_produits) {
       ATF::pack_produit()->q->reset()
           ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
@@ -345,6 +353,14 @@ class souscription_cleodis extends souscription {
       case "haccp":
         $r = "HACCP : Location ".$suffix;
       break;
+
+      case "axa":
+        $r = "AXA : Location ".$suffix;
+      break;
+    }
+
+    if($renouvellement){
+      $r = "Renouvellement - ".$r;
     }
 
     return $r;
@@ -372,6 +388,7 @@ class souscription_cleodis extends souscription {
         "type_affaire" => "normal",
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
+
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
@@ -380,6 +397,7 @@ class souscription_cleodis extends souscription {
     if($post['site_associe'] == "locevo") $devis["type_affaire"] = 'LocEvo';
     if($post['site_associe'] == "dib") $devis["type_affaire"] = 'DIB';
     if($post['site_associe'] == "haccp") $devis["type_affaire"] = 'haccp';
+    if($post['site_associe'] == "axa") $devis["type_affaire"] = 'Axa';
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -406,6 +424,7 @@ class souscription_cleodis extends souscription {
 
 
     foreach ($produits as $k=>$produit) {
+
         ATF::produit()->q->reset()
           ->addField("loyer")
           ->addField("duree")
@@ -415,7 +434,9 @@ class souscription_cleodis extends souscription {
           ->addField("prix_achat")
           ->addField("id_fournisseur")
           ->where("id_produit", $produit['id_produit']);
+
         $produitLoyer = ATF::produit()->select_row();
+
 
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
@@ -482,7 +503,8 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
             "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_sur_pdf'],
             "devis_ligne__dot__ordre"=>$produitLoyer['ordre'],
-            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur']
+            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur'],
+            "devis_ligne__dot__caracteristique"=>$produit['caracteristique']
           );
         }
 
@@ -558,7 +580,8 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
           "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
           "commande_ligne__dot__frequence_fournisseur"=>$value['frequence_fournisseur'],
-          "commande_ligne__dot__ordre"=>$value['ordre']
+          "commande_ligne__dot__ordre"=>$value['ordre'],
+          "commande_ligne__dot__caracteristique"=>$value['caracteristique']
       );
       $commande["prix_achat"] += ($value["prix_achat"] * $value["quantite"]);
     }
@@ -763,6 +786,7 @@ class souscription_cleodis extends souscription {
       case 'locevo':
       case 'dib':
       case 'haccp':
+      case 'axa':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1024,6 +1048,10 @@ class souscription_cleodis extends souscription {
       case 'haccp':
         $r = "HA";
       break;
+
+      case 'axa':
+        $r = "X0";
+      break;
       default:
         $r = substr($site_associe, 0, 2);
       break;
@@ -1142,19 +1170,6 @@ class souscription_cleodis extends souscription {
       );
       ATF::devis()->perdu($infos);
     }
-  }
-
-  /**
-   * Appel la fonction pour vérifier la validité du domaine d'un email
-   * @author Quentin JANON <qjanon@absystech.fr>
-   */
-  public function _checkDomainEmail($get) {
-    try {
-      mail::check_mail($get['email']);
-    } catch (errorATF $e) {
-      throw new errorATF("INVALID DOMAIN",500);
-    }
-    return true;
   }
 
 

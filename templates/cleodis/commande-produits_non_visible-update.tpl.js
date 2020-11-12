@@ -6,6 +6,7 @@
 {$q=ATF::_s(pager)->getAndPrepare($pager)}
 {$fields=[
 	"{$current_class->table}.produit"
+	,"{$current_class->table}.caracteristique"
 	, "{$current_class->table}.quantite"
 	, "{$current_class->table}.ref"
 	, "{$current_class->table}.id_fournisseur"
@@ -24,4 +25,4 @@
 {else}
 	{$q->reset()->addCondition("id_commande",0)->addCondition("visible","non","AND")->addCondition("id_affaire_provenance",null,null,false,"IS NULL")->setView([order=>$fields])->end()}
 	{include file="produits-update.tpl.js"}
-{/if}	
+{/if}
