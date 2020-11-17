@@ -147,15 +147,22 @@ class souscription_cleodis extends souscription {
 
         //On récupère les id pack de chaque ligne pour le libelle de l'affaire
         $post['id_pack_produit'] = array();
+        $post['pack_quantite'] = array();
         foreach ($value as $k => $v) {
           $post['id_pack_produit'][] = $v["id_pack_produit"];
+
+          if($post["pack_quantite"][$v["id_pack_produit"]]){
+            $post["pack_quantite"][$v["id_pack_produit"]] += $v["quantite"];
+          }else{
+            $post["pack_quantite"][$v["id_pack_produit"]] = $v["quantite"];
+          }
         }
 
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"]);
 
         $libelle = substr($libelle, 0, 250);
 
@@ -308,10 +315,14 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite) {
     $suffix = "";
+    log::logger($pack_quantite , "mfleurquin");
     if ($id_pack_produits) {
       foreach ($id_pack_produits as $id_pack) {
+
+        log::logger("ID PACK -> ".$id_pack , "mfleurquin");
+        log::logger("Qté -> ".$pack_quantite[$id_pack] , "mfleurquin");
 
         ATF::pack_produit()->q
                           ->reset()
@@ -320,9 +331,9 @@ class souscription_cleodis extends souscription {
 
 
         if($suffix == ""){
-          $suffix = substr(ATF::pack_produit()->select_cell(), 0, 60);
+          $suffix = $pack_quantite[$id_pack]." ".substr(ATF::pack_produit()->select_cell(), 0, 60);
         }else{
-          $suffix .= " + ".substr(ATF::pack_produit()->select_cell(), 0, 60);
+          $suffix .= " + ".$pack_quantite[$id_pack]." ".substr(ATF::pack_produit()->select_cell(), 0, 60);
         }
       }
     }
