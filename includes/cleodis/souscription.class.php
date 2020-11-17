@@ -157,6 +157,7 @@ class souscription_cleodis extends souscription {
         // On génère le libellé du devis a partir des pack produit
         $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
 
+        $libelle = substr($libelle, 0, 250);
 
 
         $id_devis = $this->createDevis($post, $libelle);
@@ -308,16 +309,22 @@ class souscription_cleodis extends souscription {
    * @return String                   Libellé de l'affaire
    */
   private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+    $suffix = "";
     if ($id_pack_produits) {
-      ATF::pack_produit()->q->reset()
-          ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
-          ->setStrict()
-          ->setLimit(1);
       foreach ($id_pack_produits as $id_pack) {
-          ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
-      }
 
-      $suffix = ATF::pack_produit()->select_cell();
+        ATF::pack_produit()->q
+                          ->reset()
+                          ->addField("pack_produit.nom")
+                          ->where("id_pack_produit", $id_pack);
+
+
+        if($suffix == ""){
+          $suffix = substr(ATF::pack_produit()->select_cell(), 0, 60);
+        }else{
+          $suffix .= " + ".substr(ATF::pack_produit()->select_cell(), 0, 60);
+        }
+      }
     }
 
     switch ($site_associe) {
