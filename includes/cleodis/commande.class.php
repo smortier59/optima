@@ -576,7 +576,7 @@ class commande_cleodis extends commande {
 					//si la date de demande de reprise au broker est envoyé alors il faut check si il y a une date de restitution effective
 					if ($infos['key']=="date_restitution_effective" && $infos['value']!= NULL)){
 						if ($cmdBefore["date_demande_reprise_broker"] == NULL){
-							$d['date_demande_reprise_broker'] = $d['date_restition_effective'];
+							$d['date_demande_reprise_broker'] = $d['date_restitution_effective'];
 						}
 					}
 
