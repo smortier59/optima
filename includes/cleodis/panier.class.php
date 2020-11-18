@@ -44,16 +44,10 @@ class panier extends classes_optima{
     }
 
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
-
-       
+        
         $this->q->addField("CONCAT(site_associe.url_front,'/',panier.panier)","url_direct_souscription")
-            
+
                 ->addJointure("panier","id_client","site_associe","id_client");
-                
-               
-        // $this->q->setToString();
-        // log::logger(parent::select_all($order_by,$asc,$page,$count), "dsarr");
-        // $this->q->unsetToString();
 
         return parent::select_all($order_by,$asc,$page,$count);
 	}

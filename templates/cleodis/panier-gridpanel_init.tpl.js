@@ -2,18 +2,8 @@
 
 ATF.renderer.duplicate=function(table,field) {
 	return function(filetype, meta, record, rowIndex, colIndex, store) {
-		
-		console.log('record',record.data);
-
         var idDiv = Ext.id();
-		
 		var idPanier = record.data.panier__dot__id_panier;
-
-		console.log('id_panier',idPanier);
-
-
-		console.log('id',id);
-
 		var btnDuplicate = {
 			xtype:'button',
 			id:"duplicate"+id,
@@ -58,27 +48,5 @@ ATF.renderer.duplicate=function(table,field) {
 		}).defer(25);
 	
 		return '<div class="left" id="'+idDiv+'"></div>';
-	}
-};
-
-
-
-ATF.renderer.url_direct_souscription = function(table, field){
-	return function(filetype, meta, record, rowIndex, colIndex, store) {
-		
-		console.log ('records',record.data);
-
-		var idDiv = Ext.id();
-		var id = record.data[table+'__dot__id_'+table];
-		
-		var html = "";
-
-		
-			html += 'test url souscription direct';
-			
-	
-		return '<div id="'+idDiv+'">'+html+'</div>';
-
-
 	}
 };
