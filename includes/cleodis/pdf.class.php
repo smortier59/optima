@@ -4064,6 +4064,7 @@ class pdf_cleodis extends pdf {
 					$i['id_produit'] = ATF::commande_ligne()->select($i["id_commande_ligne"], "id_produit");
 				}
 
+
 				if($i["id_produit"]) $produit = ATF::produit()->select($i['id_produit']);
 
 				$designation = "";
@@ -4072,7 +4073,8 @@ class pdf_cleodis extends pdf {
 					if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
 					$designation .= "- ";
 				}
-				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
+				$designation .= $i['produit']?$i['produit']:$produit['produit'];
+				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
 
 				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
 				$designation .= $details;
@@ -10781,10 +10783,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 						if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
 						$designation .= "- ";
 					}
-
 					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
-					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-					
+					$designation .= $i['produit']?$i['produit']:$produit['produit'];
 					if($produit && $produit["commentaire"]) $designation .= "\nCaracteristique : ".$produit["commentaire"].$details;
 
 					$data[] = array(
