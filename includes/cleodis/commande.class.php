@@ -556,18 +556,6 @@ class commande_cleodis extends commande {
 
 				}
 
-				//si la date de demande de reprise au broker est envoyé alors il faut check si il y a une date de restitution effective
-				if($infos['key']=="date_demande_reprise_broker"){
-					if($infos['value'] ==($commande["date_restitution_effective"] || $commande["date_demande_reprise_broker"])){
-						throw new errorATF("Il n'y a pas de date de restitution effective",880);
-					}
-					ATF::devis()->u(array("id_devis"=> $this->select($infos['id_commande'] , "id_devis"), "date_demande_reprise_broker"=>date("Y-m-d")));
-
-					ATF::commande()->q->reset()->where("id_affaire", $this->select($infos['id_commande'] , "id_affaire"), "AND")
-														  ->where("date_demande_reprise_broker");
-				}
-
-
 				//Mode transactionel
 				ATF::db($this->db)->begin_transaction();
 				try {
@@ -583,6 +571,13 @@ class commande_cleodis extends commande {
 					}else{
 						$d = array("id_commande"=>$infos['id_commande']
 								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL));
+					}
+
+					//si la date de demande de reprise au broker est envoyé alors il faut check si il y a une date de restitution effective
+					if ($infos['key']=="date_restitution_effective" && $infos['value']!= NULL)){
+						if ($cmdBefore["date_demande_reprise_broker"] == NULL){
+							$d['date_demande_reprise_broker'] = $d['date_restition_effective'];
+						}
 					}
 
 					$this->u($d);
