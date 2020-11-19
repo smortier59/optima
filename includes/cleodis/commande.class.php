@@ -2543,7 +2543,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Contrat", "size"=>60),
 								array("title"=> "Code client", "size"=>15),
 								array("title"=> "Installation prévue", "size"=>15),
-								array("title"=>"Installation réelle", "size"=>15),
+								array("title"=> "Installation réelle", "size"=>15),
 								array("title"=> "Retour (AP)", "size"=>15),
 								array("title"=> "Retour (PV)", "size"=>15),
 								array("title"=> "Retour", "size"=>15),
@@ -2552,6 +2552,9 @@ class commande_cleodis extends commande {
 								array("title"=> "Fréquence du loyer", "size"=>15),
 								array("title"=> "Total", "size"=>15),
 								array("title"=> "Achat", "size"=>15),
+								array("title"=> "Date blocage", "size"=>15),
+								array("title"=> "Description blocage", "size"=>30),
+								array("title"=> "RIB", "size"=>15),
 								array("title"=> "Refinanceur", "size"=>30),
 								array("title"=> "Comité", "size"=>15),
 								array("title"=> "Décision Comité", "size"=>15),
@@ -2607,38 +2610,35 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $value["commande.prix_achat"];
 
 
-			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
-			$comites = ATF::comite()->select_all();
-			if($comites){
-				$commentaire = $decision = $observations = "";
+			/*Ajout valeur date et description du suivi de type blocage ici*/
+			ATF::suivi()->q->reset()
+							->addField('suivi.date')
+							->addField('suivi.texte')
+							->addField('suivi.type_suivi')
+							->addCondition("suivi.type_suivi",'Blocage', "AND")
+							->where("id_affaire", $value["affaire.id_affaire_fk"]);
+			$suivis = ATF::suivi()->select_all();
+
+			if($suivis){
 				foreach ($comites as $k => $v) {
-					if($k !== 0){
-						$decisiondate = $decisiondate."\n". $v["date"];
-						$commentaire = $commentaire."\n".$v["commentaire"];
-						$decision = $decision."\n".$v["decisionComite"];
-						$date_accord = $date_accord."\n".$v["validite_accord"];
-						$observations 	  = $observations."\n".$v["observations"];
-
-					}else{
-						$row_data[$key][] = ATF::refinanceur()->select($v["id_refinanceur"] , "refinanceur");
-						$decisiondate = $v["date"];
-						$commentaire  = $v["commentaire"];
-						$decision 	  = $v["decisionComite"];
-						$date_accord =  $v["validite_accord"];
-						$observations  = $v["observations"];
-					}
+					$suivi_date = $v["suivi.date"];
+					$suivi_description = $v["suivi.texte"];
 				}
+			}
 
+			$row_data[$key][] = $suivi_date;
+			$row_data[$key][] = $suivi_description;
+ 			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"rib_client"))? "oui": "non";;
 
-
-				$row_data[$key][] = $decisiondate;
-				$row_data[$key][] = $decision;
-				$row_data[$key][] = $date_accord;
-				$row_data[$key][] = $commentaire;
-				$row_data[$key][] = $observations;
-
-
-
+			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"])->addOrder("date", 'DESC');
+			$comite = ATF::comite()->select_row();
+			if($comite){
+				$row_data[$key][] = ATF::refinanceur()->select($v["id_refinanceur"] , "refinanceur");
+				$row_data[$key][] = $v["date"];
+				$row_data[$key][] = $v["commentaire"];
+				$row_data[$key][] = $v["decisionComite"];
+				$row_data[$key][] = $v["validite_accord"];
+				$row_data[$key][] = $v["observations"];
 			} else {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
@@ -2647,10 +2647,7 @@ class commande_cleodis extends commande {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 			}
-
 			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"cni"))? "oui": "non";
-
-
     	}
 
 
