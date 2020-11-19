@@ -2617,7 +2617,14 @@ class affaire_cleodis extends affaire {
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
+			
+			//Recupere Apporteur de ta société
+            $apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
 
+			if ($apporteur){
+				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
+			}
+			
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 

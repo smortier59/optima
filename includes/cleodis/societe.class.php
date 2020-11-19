@@ -1179,6 +1179,8 @@ class societe_cleodis extends societe {
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "civility"=>$contact["civilite"],
+      "id_contact"=> $societe["id_contact_signataire"],
+      "fonction"=> $contact["fonction"],
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
       "address_1"=>$societe["adresse"],
