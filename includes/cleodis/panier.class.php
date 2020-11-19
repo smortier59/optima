@@ -40,23 +40,50 @@ class panier extends classes_optima{
         );
 
         $this->fieldstructure();
+        $this->addPrivilege("duplicatePanier");
 
     }
 
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
-
-       
+        
         $this->q->addField("CONCAT(site_associe.url_front,'/',panier.panier)","url_direct_souscription")
-            
+
                 ->addJointure("panier","id_client","site_associe","id_client");
-                
-               
-        // $this->q->setToString();
-        // log::logger(parent::select_all($order_by,$asc,$page,$count), "dsarr");
-        // $this->q->unsetToString();
 
         return parent::select_all($order_by,$asc,$page,$count);
+    }
+    
+
+    public function duplicatePanier($infos){
+		$panier = ATF::panier()->select($this->decryptId($infos['id_panier']));
+		$duplicatePanier = array(
+		'panier'=>$panier['panier']
+		,'date'=>date('Y-m-d h:i:s')
+		,'id_client'=>$panier['id_client']
+        ,'num_client'=>$panier['num_client']
+		,'content'=>$panier['content']
+		,'url_retour_success'=>$panier['url_retour_success']
+		,'url_retour_error'=>$panier['url_retour_error']
+		,'livraison'=>$panier['livraison']
+		,'facturation'=>$panier['facturation']
+		,'statut'=>'en_cours'
+		,'commentaire'=>$panier['commentaire']
+		,'permalien'=>$panier['permalien']
+		,'expire_permalien'=>$panier['expire_permalien']
+		,'id_affaire'=>NULL
+		,'siret'=>$panier['siret']
+		,'email'=>$panier['email']
+		,'meelo_record_id'=>$panier['meelo_record_id']
+		,'meelo_record_url'=>$panier['meelo_record_url']
+
+		);
+
+		ATF::panier()->i($duplicatePanier);
+
+		return true;
+
 	}
+
 
 
 }
