@@ -1135,6 +1135,7 @@ class pdf_cleodis extends pdf {
 
 
 
+
 						//Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
 
 
@@ -1664,8 +1665,7 @@ class pdf_cleodis extends pdf {
 	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
 
 		$produit=ATF::produit()->select($id_produit);
-
-
+		
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
 		if ($produit['id_produit_puissance']) $d1 .= ATF::produit_puissance()->nom($produit['id_produit_puissance']).", ";
@@ -1698,7 +1698,6 @@ class pdf_cleodis extends pdf {
 		}
 
 		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
-
 
 		$details = $d1.$d2.$d3.$d4.$d5;
 

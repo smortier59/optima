@@ -32,7 +32,6 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
-    log::logger('je suis dans devis','dsarr');
 
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
@@ -849,9 +848,11 @@ class souscription_cleodis extends souscription {
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "id_societe"=> ATF::affaire()->select($this->decryptId($id_affaire), "id_societe"),
+      "id_contact"=> $societe["id_contact_signataire"],
       "civility"=>$contact["civilite"],
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
+      "fonction"=>$contact["fonction"],
       "address_1"=>$societe["adresse"],
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
