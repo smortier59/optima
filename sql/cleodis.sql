@@ -36,6 +36,7 @@ ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis',
 
 -- Date retour broker
 ALTER TABLE `commande` ADD `date_demande_reprise_broker` DATE NULL DEFAULT NULL COMMENT 'date de demande reprise au broker' AFTER `date_restitution_effective`;
+UPDATE `commande` SET `date_demande_reprise_broker`= `date_restitution_effective`;
 
 -- Novembre - Export contrat pas MEP
 ALTER TABLE `suivi` CHANGE `type_suivi` `type_suivi` ENUM('Devis','Contrat','Refinancement','Comptabilité','Broke','Contentieux','Mis en place','Restitution','Autre','Prolongation','Resiliation','Sinistre','Transfert','Fournisseur','Requête','BDC','Flottes','Installation','Passage_comite','demande_comite','Audit en cours','Assurance','Formation','Maintenance','Livraison','Blocage') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
