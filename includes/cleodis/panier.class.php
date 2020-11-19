@@ -55,14 +55,7 @@ class panier extends classes_optima{
     
 
     public function duplicatePanier($infos){
-		
-		log::logger($this->decryptId($id_panier),'dsarr');
-
-		//ATF::panier()->q->reset()->where('id_panier',$id_panier['id']);
-
 		$panier = ATF::panier()->select($this->decryptId($infos['id_panier']));
-
-		//creation du contenu du nouveau panier
 		$duplicatePanier = array(
 		'panier'=>$panier['panier']
 		,'date'=>date('Y-m-d h:i:s')
@@ -85,8 +78,6 @@ class panier extends classes_optima{
 
 		);
 
-		//insertion du nouveau panier
-		
 		ATF::panier()->i($duplicatePanier);
 
 		return true;
