@@ -5,7 +5,7 @@
 */
 require_once dirname(__FILE__)."/../affaire.class.php";
 class affaire_cleodis extends affaire {
-	
+
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
@@ -34,6 +34,7 @@ class affaire_cleodis extends affaire {
 			,"affaire.commentaire_facture"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture2"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture3"=>array("rowEditor"=>"setInfos")
+			,'rib_client'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 
 
 		);
@@ -131,7 +132,7 @@ class affaire_cleodis extends affaire {
 			,"pdf_affaire"
 		);
 
-		
+
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
@@ -248,7 +249,7 @@ class affaire_cleodis extends affaire {
 	* @return array
 	*/
 	public function formateInsertUpdate($infos){
-	
+
 		$affaire["id_societe"]=$infos["id_societe"];
 		$affaire["nature"]=$infos["nature"];
 		$affaire["affaire"]=$infos["devis"];
@@ -265,8 +266,8 @@ class affaire_cleodis extends affaire {
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
-		
-		
+
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -1401,7 +1402,7 @@ class affaire_cleodis extends affaire {
 
 			$retour =  $this->returnGetPortail($get, $post);
 
-		
+
 
 			foreach ($retour as $key => $value) {
 				$retour[$key]["date_paiement"] = NULL;
@@ -1681,7 +1682,7 @@ class affaire_cleodis extends affaire {
 				$secondeLine = "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.";
 
 				$thirdLine = "La procédure est relativement simple car tout se fait directement en ligne.";
-				 
+
 			    $content = "Il vous suffit de cliquer sur ce lien ci-dessus et de suivre le processus qui ne prendra que quelques secondes :%0D%0A%0D%0A
 				1. Validez vos coordonnées.%0D%0A%0D%0A2. Validez vos coordonnées bancaire préremplies(sur la base de votre RIB). %0D%0A%0D%0A
 				3. A la dernière étape, les documents se chargent.%0D%0A%0D%0A
@@ -1696,8 +1697,8 @@ class affaire_cleodis extends affaire {
 					ATF::contact()->select(ATF::societe()->select($value['affaire.id_societe_fk'],'id_contact_signataire') , "email").
 					"?subject=Votre lien de signature de contrat&body=Bonjour Madame,Monsieur,%0D%0A%0D%0A".$secondeLine.
 					"%0D%0AContrat Signer ici : ".ATF::societe()->getUrlSign($value['affaire.id_affaire_fk'])."%0D%0A".$thirdLine."%0D%0A".$content;
-					
-		
+
+
 				// pour chaque affaire on recupere ses comites
 				foreach ($this->getComite($data['data'][$key]["id_affaire_fk"]) as $k => $comite) {
 					if($comite['description']=== 'Comité CLEODIS'){
@@ -2618,7 +2619,7 @@ class affaire_cleodis extends affaire {
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-          
+
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2632,17 +2633,17 @@ class affaire_cleodis extends affaire {
 			}
 
 			log::logger("test d\affichage du code client partenaire"." ".$code_client_partenaire,'code_client');
-			
-			
+
+
 
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client'); 
+			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client');
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-          
+
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
@@ -3222,7 +3223,7 @@ class affaire_midas extends affaire_cleodis {
 	/** On affiche que les sociétés midas
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 		ATF::loyer()->q->reset()->setToString();
 		$subquery=ATF::loyer()->sa("loyer.id_loyer","desc");
 
