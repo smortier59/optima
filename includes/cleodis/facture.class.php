@@ -1121,7 +1121,7 @@ class facture_cleodis extends facture {
 			if($item){
 				//initialisation des données
 				$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);
-				$infos_commande=ATF::commande()->select($item['facture.id_commande_fk']);
+				$infos_commande=ATF::commande()->select($this->select($item['facture.id_facture_fk'], "id_commande"));
 				$societe = ATF::societe()->select($item['facture.id_societe_fk']);
 				if($id_refinanceur = ATF::demande_refi()->id_refinanceur($item['facture.id_affaire_fk'])){
 					$refinanceur=ATF::refinanceur()->select($id_refinanceur);
@@ -1184,9 +1184,8 @@ class facture_cleodis extends facture {
 						}else{
 
 							if($item['facture.date_periode_debut']){
-								$commande = ATF::commande()->select($item['facture.id_commande_fk']);
 								//Si le contrat est en cours pendant la période de la facture, pas d'analytique
-								if(strtotime($commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) && strtotime($commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
+								if(strtotime($infos_commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) && strtotime($infos_commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
 								   	$en_cours = true;
 								}else{ $en_cours = false; }
 
@@ -2389,7 +2388,7 @@ class facture_cleodisbe extends facture_cleodis {
 				$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
 
 
-				$infos_commande = ATF::commande()->select($item['facture.id_commande_fk']);
+				$infos_commande = ATF::commande()->select($this->select($item['facture.id_facture_fk'] , "id_commande"));
 
 
 				$libelle = 'F'.$item['facture.id_facture'].'-'.$societe['code_client'].'/'.$societe['societe'];
