@@ -143,6 +143,7 @@ class readsoft {
 					log::logger("LINES","cr-readsoft-".$id_doc.".log");
 
 					$prix_ligne = 0;
+					//On groupe les lignes par commande fournisseur array(REF-BDC => Array (Line => array( 0=>dataLigne1, 1=>dataLigne2, ...)))
 					foreach ($lines as $kl => $vl) {
 						foreach ($vl->TableRow as $ki => $vi) {
 							$item = array();
@@ -159,6 +160,7 @@ class readsoft {
 
 						log::logger($commande_fournisseur_concernee,"cr-readsoft-".$id_doc.".log");
 						if(!empty($commande_fournisseur_concernee)){
+							//Traitement de chaque commande fournisseur
 							foreach ($commande_fournisseur_concernee as $kcf => $vcf) {
 								ATF::bon_de_commande()->q->reset()->where("bon_de_commande.ref", $kcf);
 								$cm = ATF::bon_de_commande()->select_row();
@@ -168,6 +170,7 @@ class readsoft {
 								if($cm["bon_de_commande.id_bon_de_commande"]){
 									$report["bdc_find"] += 1;
 
+									// On recupere les lignes du BDC existant dans Optima
 									ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande", $cm["bon_de_commande.id_bon_de_commande"]);
 									$ligne_facture_fournisseur = ATF::bon_de_commande_ligne()->toFacture_fournisseurLigne();
 
@@ -177,6 +180,7 @@ class readsoft {
 
 									log::logger("Commande fournisseur ".$header["invoicenumber"]." trouvée" , "cr-readsoft-".$id_doc.".log");
 
+									// On check que la facture qu'on essaie d'inserer n'est pas présente pour cette affaire et BDC associé
 									ATF::facture_fournisseur()->q->reset()->where("id_affaire",  $cm["id_affaire"],"AND")
 																		  ->where("id_bon_de_commande",  $cm["id_bon_de_commande"],"AND")
 																		  ->where("facture_fournisseur.ref", $header["invoicenumber"]);
@@ -216,10 +220,22 @@ class readsoft {
 
 												}
 											}
-											$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
+
+											// On check pour chaque ligne si il y a un serial a rapporter dans Optima
+											foreach ($vcf["lines"] as $kligneff => $vligneff) {
+												if($vligneff["NumSerie"] != ""){
+													//Il faut mettre à jour le serial sur le contrat
+													self::updateSerial($id_doc, $values_facture_fournisseur[$kbdcl], $vligneff);
+												}
+											}
 
 
-											$id_ff = ATF::facture_fournisseur()->insert($infos);
+											//$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
+
+
+
+
+											//$id_ff = ATF::facture_fournisseur()->insert($infos);
 											$report["ff_insert"] += 1;
 
 											log::logger("Facture fournisseur créée ".$di_ff , "cr-readsoft-".$id_doc.".log");
@@ -344,4 +360,39 @@ class readsoft {
 		}
 	}
 
+
+
+	public function updateSerial($id_doc, $ligne_facture_fournisseur, $ligne_readsoft){
+
+		log::logger("########################## Mise à jour de sérial" , "mfleurquin");
+		log::logger("---------------- Serial detecté pour le produit ".$ligne_readsoft["ArticleIdentifier"],"cr-readsoft-".$id_doc.".log");
+
+		$ligne_commande = ATF::commande_ligne()->select($ligne_facture_fournisseur["id_commande_ligne"]);
+		log::logger($ligne_commande , "mfleurquin");
+
+
+		if($ligne_commande["serial"] == ""){
+			log::logger("---- La ligne du contrat n'a pas encore de serial, on update direct la ligne de commande ".$ligne_facture_fournisseur["id_commande_ligne"],"cr-readsoft-".$id_doc.".log");
+			ATF::commande_ligne()->u(array("id_commande_ligne"=> $ligne_commande["id_commande_ligne"],
+										   "serial" => $ligne_readsoft["NumSerie"]
+										  )
+									);
+		}else{
+			log::logger("---- La ligne du contrat a déja un serial, pour la ligne ".$ligne_facture_fournisseur["id_commande_ligne"]." (".$ligne_commande["serial"].")","cr-readsoft-".$id_doc.".log");
+
+			// Le serial est il déja présent ?
+			if (in_array($ligne_readsoft["NumSerie"], explode(" ", $ligne_commande["serial"]))) {
+				log::logger("---- le serial ".$ligne_readsoft["NumSerie"]." est déja présent, on ne fait rien","cr-readsoft-".$id_doc.".log");
+			}else{
+				log::logger("---- le serial ".$ligne_readsoft["NumSerie"]." n'est pas présent, on update la ligne ".$ligne_facture_fournisseur["id_commande_ligne"],"cr-readsoft-".$id_doc.".log");
+				ATF::commande_ligne()->u(array("id_commande_ligne"=> $ligne_commande["id_commande_ligne"],
+										   	  "serial" => $ligne_commande["serial"]." ".$ligne_readsoft["NumSerie"]
+										  )
+									);
+			}
+
+		}
+
+
+	}
 }
