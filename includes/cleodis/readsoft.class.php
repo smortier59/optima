@@ -230,12 +230,12 @@ class readsoft {
 											}
 
 
-											//$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
+											$infos["values_facture_fournisseur"]["produits"] = json_encode( $values_facture_fournisseur );
 
 
 
 
-											//$id_ff = ATF::facture_fournisseur()->insert($infos);
+											$id_ff = ATF::facture_fournisseur()->insert($infos);
 											$report["ff_insert"] += 1;
 
 											log::logger("Facture fournisseur créée ".$di_ff , "cr-readsoft-".$id_doc.".log");
