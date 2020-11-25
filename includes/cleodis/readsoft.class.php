@@ -364,11 +364,11 @@ class readsoft {
 
 	public function updateSerial($id_doc, $ligne_facture_fournisseur, $ligne_readsoft){
 
-		log::logger("########################## Mise à jour de sérial" , "mfleurquin");
+		log::logger("########################## Mise à jour de sérial" , "cr-readsoft-".$id_doc.".log");
 		log::logger("---------------- Serial detecté pour le produit ".$ligne_readsoft["ArticleIdentifier"],"cr-readsoft-".$id_doc.".log");
 
 		$ligne_commande = ATF::commande_ligne()->select($ligne_facture_fournisseur["id_commande_ligne"]);
-		log::logger($ligne_commande , "mfleurquin");
+
 
 
 		if($ligne_commande["serial"] == ""){
