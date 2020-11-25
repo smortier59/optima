@@ -178,6 +178,7 @@ class readsoft {
 									log::logger("Commande fournisseur ".$header["invoicenumber"]." trouvée" , "cr-readsoft-".$id_doc.".log");
 
 									ATF::facture_fournisseur()->q->reset()->where("id_affaire",  $cm["id_affaire"],"AND")
+																		  ->where("id_bon_de_commande",  $cm["id_bon_de_commande"],"AND")
 																		  ->where("facture_fournisseur.ref", $header["invoicenumber"]);
 									$ff_exist = ATF::facture_fournisseur()->select_all();
 									if(sizeof($ff_exist) == 0){
