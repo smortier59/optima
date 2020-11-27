@@ -3866,7 +3866,8 @@ class affaire_bdomplus extends affaire_cleodis {
 				array(
 					"id_affaire"=>$value,
 					"nature"=>"AR",
-					"id_parent" => $id_affaire
+					"id_parent" => $id_affaire,
+					"RUM" => $affaire["RUM"]
 				)
 			);
 			ATF::affaire()->u(array("id_affaire"=>$id_affaire , "id_fille"=> $value));
