@@ -1367,6 +1367,7 @@ class souscription_bdomplus extends souscription_cleodis {
           ATF::affaire()->q->reset()->where("affaire.etat", "facture", "AND")
                                   ->where("affaire.site_associe", "bdomplus")
                                   ->where("affaire.date", date("Y-m-d"))
+                                  ->where("affaire.nature", "affaire") // On ne prend que les affaires qui ne sont pas AR, Avenant etc
                                   ->whereIsNull("affaire.id_magasin");
           $total_affaire = count(ATF::affaire()->select_all());
 
