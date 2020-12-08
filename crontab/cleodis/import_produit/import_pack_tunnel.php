@@ -42,7 +42,7 @@ echo "========= DEBUT DE SCRIPT =========\n";
 	$packs = import_pack($data["packs_ok"]);
 
 // Ajout des liaison entre les deux
-	//import_ligne($packs, $produits);
+	import_ligne($data["lignes_ok"], $packs, $produits);
 
 // Rollback la transaction
 //ATF::db()->rollback_transaction();
@@ -56,6 +56,7 @@ echo "========= FIN DE SCRIPT =========\n";
  */
 
 function import_produit($data){
+	$produits = array();
 	try {
 		$lines_count = 0;
 		$processed_lines = 0;
@@ -152,20 +153,14 @@ function import_produit($data){
  * @return array Packs insérés
  */
 function import_pack($data){
-	$fileProduit = "./pack.csv";
-	$fpr = fopen($fileProduit, 'rb');
-	$entete = fgetcsv($fpr);
 	$packs = array();
-
 	$lines_count = 0;
 	$processed_lines = 0;
 
 	try {
 
-		while ($ligne = fgetcsv($fpr, 0 ,';')) {
+		foreach ($data as $k => $ligne) {
 			$lines_count++;
-
-			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 			$nom = $ligne[1];
 			$etat = $ligne[2];
@@ -197,15 +192,14 @@ function import_pack($data){
 			$processed_lines++;
 		}
 
-		log::logger("#####Packs imports",  "locevo_migration");
-		log::logger("total: $lines_count",  "locevo_migration");
-		log::logger("imported: $processed_lines",  "locevo_migration");
+		log::logger("#####Packs imports",  $_SERVER["argv"][2]."_migration");
+		log::logger("total: $lines_count",  $_SERVER["argv"][2]."_migration");
+		log::logger("imported: $processed_lines",  $_SERVER["argv"][2]."_migration");
 
 		return $packs;
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
-		print_r($pack);
-		log::logger($pack, "import_boulangerpro");
+		log::logger($pack, "import_".$_SERVER["argv"][2]);
 		echo "Pack N° : ".$ligne[0]." ERREUR\n";
 		throw $e;
 	}
@@ -215,23 +209,16 @@ function import_pack($data){
  * Importe les liaisons entre les packs et les produits depuis un fichier excel
  * @return array Packs insérés
  */
-function import_ligne($packs, $produits){
-
-	$filePackLigne = "./ligne.csv";
+function import_ligne($lignes_ok, $packs, $produits){
 	$pack_produit_ligne = array();
-	$fppa = fopen($filePackLigne, 'rb');
-	$entete = fgetcsv($fppa);
-
 	try {
 
 		$lines_count = 0;
 		$processed_lines = 0;
 
-		while ($ligne = fgetcsv($fppa, 0, ';')) {
+		foreach ($lignes_ok as $k => $ligne) {
 
 			$lines_count++;
-
-			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
 			//$principal = $ligne[0]=="PRODUIT PRINCIPAL" ? "oui" : "non";
 			$id = $ligne[1];
@@ -247,6 +234,7 @@ function import_ligne($packs, $produits){
 			$product_line_visible = $ligne[11];
 			$visible_on_pdf_file = $ligne[12];
 			$buying_price = $ligne[13];
+			$fournisseur = $ligne[14];
 
 			$id_pack_produit = $packs[$id]["id_pack_produit"];
 			$id_produit = $produits[$ligne[1]];
@@ -254,7 +242,8 @@ function import_ligne($packs, $produits){
 			ATF::produit()->q->reset()
 				->select('id_produit')
 				->select('id_fournisseur')
-				->where("ref", ATF::db()->real_escape_string($reference));
+				->where("ref", ATF::db()->real_escape_string($reference))
+				->where("id_fournisseur", get_fournisseur($fournisseur));
 			$produit = ATF::produit()->select_row();
 
 			if (!$produit) {
@@ -272,7 +261,8 @@ function import_ligne($packs, $produits){
 			}
 
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
-												 ->where("id_produit", $id_produit);
+												 ->where("id_produit", $id_produit)
+												 ->where("id_fournisseur", $produit["id_fournisseur"]);
 			$l = ATF::pack_produit_ligne()->select_row();
 
 			// N° Pack;Réf Produit;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Visible;Px achat
@@ -309,9 +299,9 @@ function import_ligne($packs, $produits){
 			$processed_lines++;
 		}
 
-		log::logger("#####Lignes imports",  "locevo_migration");
-		log::logger("total: $lines_count",  "locevo_migration");
-		log::logger("imported: $processed_lines",  "locevo_migration");
+		log::logger("#####Lignes imports",   $_SERVER["argv"][2]."_migration");
+		log::logger("total: $lines_count",   $_SERVER["argv"][2]."_migration");
+		log::logger("imported: $processed_lines",   $_SERVER["argv"][2]."_migration");
 
 	} catch (errorATF $e) {
 		ATF::db()->rollback_transaction();
@@ -319,7 +309,7 @@ function import_ligne($packs, $produits){
 		echo "Ligne Pack N° : ".$ligne[0]." ERREUR\n";
 		print_r($ligne);
 		print_r($pack_produit_ligne);
-		log::logger($e, "import_boulangerpro");
+		log::logger($e, "import_".$_SERVER["argv"][2]);
 		throw $e;
 	}
 
