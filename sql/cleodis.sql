@@ -15,6 +15,8 @@ ALTER TABLE document_revendeur MODIFY COLUMN site_associe enum('cleodis','locati
 ALTER TABLE affaire MODIFY COLUMN provenance enum('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo') CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;
 
 
+# Type affaire Mariton
+ALTER TABLE `affaire` CHANGE `type_affaire` `type_affaire` ENUM('normal','2SI','Boulanger Pro','Consommables_com','DIB','Dyadem','FLEXFUEL','Instore','LAFI','Manganelli','NRC','OLISYS - Ma Solution IT','Proxi Pause','Trekk','ZENCONNECT – ZEN PACK','Hexamed Leasing','LFS','LocEvo','haccp','Mariton') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'normal';
 
 
 
