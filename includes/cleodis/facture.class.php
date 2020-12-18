@@ -2409,11 +2409,12 @@ class facture_cleodis extends facture {
 			$lineCompteur = 0;
 			while (($data = fgetcsv($handle, 10000, ";")) !== FALSE) {
 				$lineCompteur++;
+				$row++;
 
 				log::logger($row , "mfleurquin");
 				log::logger($data , "mfleurquin");
 
-				if($row == 0) continue;
+				if($row == 1) continue;
 
 				if($lineCompteur>11 && !$data[2] ) continue;
 
@@ -2622,7 +2623,7 @@ class facture_cleodis extends facture {
 			        }
 				}
 
-				$row++;
+
 
 		    }
 		}
