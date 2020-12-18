@@ -2350,7 +2350,7 @@ class facture_cleodis extends facture {
 		$f = fopen($path,"r");
 
 	    // Vérification des colonnes
-	    $cols = fgetcsv($f, 1, ";");
+	    $cols = fgetcsv($f, 0, ";");
 
 		ATF::db($this->db)->begin_transaction();
 
