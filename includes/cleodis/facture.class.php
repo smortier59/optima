@@ -2396,7 +2396,12 @@ class facture_cleodis extends facture {
 
 
 
+
+
 		if($nb_entete_manquant == 0){
+
+			log::logger("Toute les entetes sont présentes" , "mfleurquin");
+
 			$lineCompteur = 0;
 			while (($data = fgetcsv($f, 0, ";")) !== FALSE) {
 				$lineCompteur++;
@@ -2407,16 +2412,25 @@ class facture_cleodis extends facture {
 
 				try {
 
+
 					$col_ref_affaire = array_keys($entetes , "ref_affaire");
+
+					log::logger("Ref affaire --> ".$col_ref_affaire, "mfleurquin");
 
 					ATF::affaire()->q->reset()->addField("affaire.id_societe")->where("affaire.ref", $data[$col_ref_affaire[0]]);
 					$affaire = ATF::affaire()->select_row();
 
 
+
 					if($affaire){
+
+						log::logger("Affaire trouvée  ", "mfleurquin");
+
 						ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire"]);
 						$commande = ATF::commande()->select_row();
 
+						log::logger("commande trouvée  ", "mfleurquin");
+						log::logger($commande, "mfleurquin");
 
 						$facture = array(
 							"type_facture" => "libre",
@@ -2554,6 +2568,16 @@ class facture_cleodis extends facture {
 							}
 							$ligneNonVisible = $return;
 						}
+
+						log::logger("Insertion de la facture", "mfleurquin");
+						log::logger(array("facture"=> $facture,
+											"values_facture" =>
+												array(
+													"produits_repris" => json_encode($ligneRepris) ,
+													"produits" => json_encode($ligneVisible) ,
+													"produits_non_visible" => json_encode($ligneNonVisible) ,
+												)
+											), "mfleurquin");
 
 						$this->insert(array("facture"=> $facture,
 											"values_facture" =>
