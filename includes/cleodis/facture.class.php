@@ -2359,6 +2359,8 @@ class facture_cleodis extends facture {
 
 		$entetes = $data;
 
+		log::logger($entetes , "mfleurquin");
+
 		$entetes_necessaire = array(
 			"commentaire" => false,
 			"nature" => false,
@@ -2375,6 +2377,7 @@ class facture_cleodis extends facture {
 
 		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
 
+		log::logger($entetes_necessaire , "mfleurquin");
 
 		$nb_entete_manquant = 0;
 		foreach ($entetes_necessaire as $key => $value) {
@@ -2431,7 +2434,7 @@ class facture_cleodis extends facture {
 									$facture[$entetes[$key]] = $value;
 								break;
 
-								case 'ef_affaire' :
+								case 'ref_affaire' :
 								break;
 
 								case 'mode de paiement' :
