@@ -2362,7 +2362,7 @@ class facture_cleodis extends facture {
 		log::logger("Data +-->" , "mfleurquin");
 		log::logger($data , "mfleurquin");
 
-		$entetes = $data;
+		$entetes = $cols;
 
 		log::logger("Entetes +-->" , "mfleurquin");
 		log::logger($entetes , "mfleurquin");
