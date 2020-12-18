@@ -2565,15 +2565,16 @@ class facture_cleodis extends facture {
 									->where("visible_pdf","non")->setView(["order"=>$fields]);
 						$return = array();
 						if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
-							log::logger("Ligne non visible -->", "mfleurquin");
-							log::logger($ligneNonVisible , "mfleurquin");
+
 							foreach ($ligneNonVisible as $kRow => $row) {
-								if($kCol != "commande_ligne.id_commande_ligne"){
-									if(strpos($kCol, "id_")  !== false ){
-										$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
-										$return[$kRow]["facture_ligne.".$kCol]=$value;
-									}else{
-										$return[$kRow]["facture_ligne.".$kCol]=$value;
+								foreach ($row as $kCol => $value) {
+									if($kCol != "commande_ligne.id_commande_ligne"){
+										if(strpos($kCol, "id_")  !== false ){
+											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}else{
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}
 									}
 								}
 								$return[$kRow]["facture_ligne.afficher"]="oui";
