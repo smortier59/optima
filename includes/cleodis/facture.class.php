@@ -2353,22 +2353,13 @@ class facture_cleodis extends facture {
 	    $cols = fgetcsv($f, 0, ";");
 	    fclose($f);
 
-	    log::logger("COLS +-->" , "mfleurquin");
-	    log::logger($cols , "mfleurquin");
 
 		ATF::db($this->db)->begin_transaction();
 
 		$f = fopen($path,"r");
 		$data = fgetcsv($f, 0, ";");
 		fclose($f);
-		log::logger("Data +-->" , "mfleurquin");
-		log::logger($data , "mfleurquin");
-
 		$entetes = $cols;
-
-		log::logger("Entetes +-->" , "mfleurquin");
-		log::logger($entetes , "mfleurquin");
-
 		$entetes_necessaire = array(
 			"commentaire" => false,
 			"nature" => false,
@@ -2385,8 +2376,6 @@ class facture_cleodis extends facture {
 
 		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
 
-		log::logger("entetes_necessaire +-->" , "mfleurquin");
-		log::logger($entetes_necessaire , "mfleurquin");
 
 		$nb_entete_manquant = 0;
 		foreach ($entetes_necessaire as $key => $value) {
@@ -2402,7 +2391,6 @@ class facture_cleodis extends facture {
 
 		if($nb_entete_manquant == 0){
 
-			log::logger("Toute les entetes sont présentes" , "mfleurquin");
 
 
 			$row = 0;
@@ -2410,9 +2398,6 @@ class facture_cleodis extends facture {
 			while (($data = fgetcsv($handle, 10000, ";")) !== FALSE) {
 				$lineCompteur++;
 				$row++;
-
-				log::logger($row , "mfleurquin");
-				log::logger($data , "mfleurquin");
 
 				if($row == 1) continue;
 
@@ -2425,8 +2410,6 @@ class facture_cleodis extends facture {
 
 					$col_ref_affaire = array_keys($entetes , "ref_affaire");
 
-					log::logger("Ref affaire --> ".$col_ref_affaire, "mfleurquin");
-
 					ATF::affaire()->q->reset()->addField("affaire.id_societe")->where("affaire.ref", $data[$col_ref_affaire[0]]);
 					$affaire = ATF::affaire()->select_row();
 
@@ -2434,13 +2417,9 @@ class facture_cleodis extends facture {
 
 					if($affaire){
 
-						log::logger("Affaire trouvée  ", "mfleurquin");
-
 						ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire"]);
 						$commande = ATF::commande()->select_row();
 
-						log::logger("commande trouvée  ", "mfleurquin");
-						log::logger($commande, "mfleurquin");
 
 						$facture = array(
 							"type_facture" => "libre",
@@ -2565,7 +2544,6 @@ class facture_cleodis extends facture {
 									->where("visible_pdf","non")->setView(["order"=>$fields]);
 						$return = array();
 						if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
-
 							foreach ($ligneNonVisible as $kRow => $row) {
 								foreach ($row as $kCol => $value) {
 									if($kCol != "commande_ligne.id_commande_ligne"){
@@ -2581,16 +2559,6 @@ class facture_cleodis extends facture {
 							}
 							$ligneNonVisible = $return;
 						}
-
-						log::logger("Insertion de la facture", "mfleurquin");
-						log::logger(array("facture"=> $facture,
-											"values_facture" =>
-												array(
-													"produits_repris" => json_encode($ligneRepris) ,
-													"produits" => json_encode($ligneVisible) ,
-													"produits_non_visible" => json_encode($ligneNonVisible) ,
-												)
-											), "mfleurquin");
 
 						$this->insert(array("facture"=> $facture,
 											"values_facture" =>
@@ -2608,10 +2576,7 @@ class facture_cleodis extends facture {
 					}
 				} catch (errorATF $e) {
 
-
-
 					$msg = $e->getMessage();
-					log::logger($msg , "mfleurquin");
 
 					if (preg_match("/generic message : /",$msg)) {
 					  $tmp = json_decode(str_replace("generic message : ","",$msg),true);
