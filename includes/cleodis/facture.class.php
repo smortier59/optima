@@ -2365,7 +2365,7 @@ class facture_cleodis extends facture {
 			"redevance" => false,
 			"ref_externe" => false,
 			"type_libre" => false,
-			"ef_affaire" => false,
+			"ref_affaire" => false,
 			"mode de paiement" => false,
 			"periode_debut" => false,
 			"date" => false,
@@ -2397,7 +2397,7 @@ class facture_cleodis extends facture {
 
 				try {
 
-					$col_ref_affaire = array_keys($entetes , "ef_affaire");
+					$col_ref_affaire = array_keys($entetes , "ref_affaire");
 
 					ATF::affaire()->q->reset()->addField("affaire.id_societe")->where("affaire.ref", $data[$col_ref_affaire[0]]);
 					$affaire = ATF::affaire()->select_row();
