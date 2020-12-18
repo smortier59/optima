@@ -2403,7 +2403,7 @@ class facture_cleodis extends facture {
 			log::logger("Toute les entetes sont présentes" , "mfleurquin");
 
 			log::logger(fgetcsv($f, 0, ";") , "mfleurquin");
-			log::logger("----------------", "mfleurquin")
+			log::logger("----------------", "mfleurquin");
 			log::logger(fgetcsv($f, 10000, ";") , "mfleurquin");
 
 			$lineCompteur = 0;
