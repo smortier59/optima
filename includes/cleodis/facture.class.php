@@ -2605,6 +2605,8 @@ class facture_cleodis extends facture {
 					}
 				} catch (errorATF $e) {
 
+					log::logger($e , "mfleurquin");
+
 					$msg = $e->getMessage();
 
 					if (preg_match("/generic message : /",$msg)) {
