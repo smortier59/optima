@@ -2351,14 +2351,16 @@ class facture_cleodis extends facture {
 
 	    // Vérification des colonnes
 	    $cols = fgetcsv($f, 0, ";");
+	    fclose($f);
 
 	    log::logger("COLS +-->" , "mfleurquin");
 	    log::logger($cols , "mfleurquin");
 
 		ATF::db($this->db)->begin_transaction();
 
-
+		$f = fopen($path,"r");
 		$data = fgetcsv($f, 0, ";");
+		fclose($f);
 		log::logger("Data +-->" , "mfleurquin");
 		log::logger($data , "mfleurquin");
 
@@ -2396,18 +2398,15 @@ class facture_cleodis extends facture {
 
 
 
-
+		$handle = fopen($path,"r");
 
 		if($nb_entete_manquant == 0){
 
 			log::logger("Toute les entetes sont présentes" , "mfleurquin");
 
-			log::logger(fgetcsv($f, 0, ";") , "mfleurquin");
-			log::logger("----------------", "mfleurquin");
-			log::logger(fgetcsv($f, 10000, ";") , "mfleurquin");
 
 			$lineCompteur = 0;
-			while (($data = fgetcsv($f, 10000, ";")) !== FALSE) {
+			while (($data = fgetcsv($handle, 10000, ";")) !== FALSE) {
 				$lineCompteur++;
 
 				if($lineCompteur>11 && !$data[2] ) continue;
