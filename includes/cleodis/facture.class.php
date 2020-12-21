@@ -2371,7 +2371,8 @@ class facture_cleodis extends facture {
 			"periode_debut" => false,
 			"date" => false,
 			"periode_fin" => false,
-			"total_ht" => false
+			"total_ht" => false,
+			"date_previsionnelle"=>false
 		);
 
 		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
@@ -2454,16 +2455,21 @@ class facture_cleodis extends facture {
 								case 'periode_debut' :
 								case 'date' :
 								case 'periode_fin' :
+								case 'date_previsionnelle':
 									if(strpos($value , "/")){
 										$date = explode("/" , $value);
 										$date = $date[2]."-".$date[1]."-".$date[0];
 									}else{
 										$date = $value;
 									}
-
-									if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
-									if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
-									if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+									if($date){
+										if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
+										if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
+										if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+										if($entetes[$key] == "date_previsionnelle") $facture["date_previsionnelle"] = date("Y-m-d", strtotime($date));
+									}else{
+										$entetes[$key] = NULL;
+									}
 								break;
 
 
@@ -2560,6 +2566,8 @@ class facture_cleodis extends facture {
 							$ligneNonVisible = $return;
 						}
 
+						//log::logger($facture , "mfleurquin");
+
 						$this->insert(array("facture"=> $facture,
 											"values_facture" =>
 												array(
@@ -2612,8 +2620,6 @@ class facture_cleodis extends facture {
 
 	      $return['success'] = true;
 	      $return["factureInserted"] = $facture_insert;
-	      //ATF::db($this->db)->rollback_transaction();
-
 	      ATF::db($this->db)->commit_transaction();
 	    }
 
