@@ -50,7 +50,8 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'bdomplus':
-        $this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+        //$this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+        $this->id_partenaire = 31456;
       break;
 
       case 'boulanger-cafe':
