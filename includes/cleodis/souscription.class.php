@@ -848,9 +848,11 @@ class souscription_cleodis extends souscription {
     $return = array(
       "id_affaire"=>$this->decryptId($id_affaire),
       "id_societe"=> ATF::affaire()->select($this->decryptId($id_affaire), "id_societe"),
+      "id_contact"=> $societe["id_contact_signataire"],
       "civility"=>$contact["civilite"],
       "firstname"=>$contact["prenom"],
       "lastname"=>$contact["nom"],
+      "fonction"=>$contact["fonction"],
       "address_1"=>$societe["adresse"],
       "address_2"=>$societe["adresse_2"]." ".$societe["adresse_3"],
       "postal_code"=>$societe["cp"],
