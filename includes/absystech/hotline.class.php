@@ -792,7 +792,6 @@ class hotline extends classes_optima {
 
 		$this->infoCollapse($infos);
 
-
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
 			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
 		}
@@ -827,6 +826,26 @@ class hotline extends classes_optima {
 		}
 
 		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
+
+
+		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
+		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
+		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+		switch ($infos["urgence"]) {
+			case 'detail':
+				$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+			break;
+
+			case 'genant':
+				$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+			break;
+
+			case 'bloquant':
+				$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+			break;
+		}
+
+		log::logger($infos , "mfleurquin");
 
 
 		//Date de création de la requête
@@ -1162,6 +1181,28 @@ class hotline extends classes_optima {
 			$disabledInternalInteraction=true;
 			unset($infos["disabledInternalInteraction"]);
 		}
+
+		/*if($infos["hotline"]){
+			$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
+			$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
+			$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+			switch ($infos["urgence"]) {
+				case 'detail':
+					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				break;
+
+				case 'genant':
+					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				break;
+
+				case 'bloquant':
+					$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+				break;
+			}
+		}*/
+
+
+
 		$retour=parent::update($infos,$s,$files,$cadre_refreshed);
 
 		//Trace dans les interactions
@@ -2140,11 +2181,13 @@ class hotline extends classes_optima {
 				if ($widget) {
 					foreach ($result as $i) {
 						if ($i["id_user"]) {
-							$nom = substr(ATF::user()->select($i["id_user"],'prenom'),0,1).substr(ATF::user()->select($i["id_user"],'nom'),0,1);
+							$nom = ATF::user()->select($i["id_user"],'prenom')." ".ATF::user()->select($i["id_user"],'nom');
+							$label = substr(ATF::user()->select($i["id_user"],'prenom'),0,1).substr(ATF::user()->select($i["id_user"],'nom'),0,1);
 						} else {
 							$nom = "?";
+							$label = "?";
 						}
-						$graph['categories']["category"][$i["id_user"]] = array("label" => $nom);
+						$graph['categories']["category"][$i["id_user"]] = array("label" => $label, "nom"=> $nom);
 					}
 
 					$graph['params']['showLegend'] = "0";
