@@ -50,7 +50,8 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'bdomplus':
-        $this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+        //$this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+        $this->id_partenaire = 31456;
       break;
 
       case 'boulanger-cafe':
@@ -1379,6 +1380,7 @@ class souscription_bdomplus extends souscription_cleodis {
           ATF::affaire()->q->reset()->where("affaire.etat", "facture", "AND")
                                   ->where("affaire.site_associe", "bdomplus")
                                   ->where("affaire.date", date("Y-m-d"))
+                                  ->where("affaire.nature", "affaire") // On ne prend que les affaires qui ne sont pas AR, Avenant etc
                                   ->whereIsNull("affaire.id_magasin");
           $total_affaire = count(ATF::affaire()->select_all());
 

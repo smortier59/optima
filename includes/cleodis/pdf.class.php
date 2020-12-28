@@ -1884,10 +1884,10 @@ class pdf_cleodis extends pdf {
 		if ($d3 && $d3 !="") $d3 .="\n";
 
 
-		if ($commentaire) $d4 .= "Commentaire : ".$commentaire;
+		if ($commentaire) $d4 .= "\nCommentaire : ".$commentaire;
 		if ($produit['commentaire']){
 			if($commentaire !== $produit['commentaire']){
-				if (!$commentaire) $d4 .= "Commentaire : ";
+				if (!$commentaire) $d4 .= "\nCommentaire : ";
 				else $d4 .= " - ";
 				$d4 .= $produit['commentaire'];
 			}
@@ -4073,11 +4073,8 @@ class pdf_cleodis extends pdf {
 					$designation .= "- ";
 				}
 				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-
-				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
-				$designation .= $details;
-
-				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"].$details;
+				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']); 
+                $designation .= $details; 
 
 				$data[] = array(
 					$i['ref']

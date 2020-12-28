@@ -2350,27 +2350,29 @@ class facture_cleodis extends facture {
 		$f = fopen($path,"r");
 
 	    // Vérification des colonnes
-	    $cols = fgetcsv($f, 1, ";");
+	    $cols = fgetcsv($f, 0, ";");
+	    fclose($f);
+
 
 		ATF::db($this->db)->begin_transaction();
 
-
-		$data = fgetcsv($f, 10000, ";");
-
-		$entetes = $data;
-
+		$f = fopen($path,"r");
+		$data = fgetcsv($f, 0, ";");
+		fclose($f);
+		$entetes = $cols;
 		$entetes_necessaire = array(
 			"commentaire" => false,
 			"nature" => false,
 			"redevance" => false,
 			"ref_externe" => false,
 			"type_libre" => false,
-			"ef_affaire" => false,
+			"ref_affaire" => false,
 			"mode de paiement" => false,
 			"periode_debut" => false,
 			"date" => false,
 			"periode_fin" => false,
-			"total_ht" => false
+			"total_ht" => false,
+			"date_previsionnelle"=>false
 		);
 
 		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
@@ -2386,10 +2388,19 @@ class facture_cleodis extends facture {
 
 
 
+		$handle = fopen($path,"r");
+
 		if($nb_entete_manquant == 0){
+
+
+
+			$row = 0;
 			$lineCompteur = 0;
-			while (($data = fgetcsv($f, 10000, ";")) !== FALSE) {
+			while (($data = fgetcsv($handle, 10000, ";")) !== FALSE) {
 				$lineCompteur++;
+				$row++;
+
+				if($row == 1) continue;
 
 				if($lineCompteur>11 && !$data[2] ) continue;
 
@@ -2397,13 +2408,16 @@ class facture_cleodis extends facture {
 
 				try {
 
-					$col_ref_affaire = array_keys($entetes , "ef_affaire");
+
+					$col_ref_affaire = array_keys($entetes , "ref_affaire");
 
 					ATF::affaire()->q->reset()->addField("affaire.id_societe")->where("affaire.ref", $data[$col_ref_affaire[0]]);
 					$affaire = ATF::affaire()->select_row();
 
 
+
 					if($affaire){
+
 						ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire"]);
 						$commande = ATF::commande()->select_row();
 
@@ -2431,7 +2445,7 @@ class facture_cleodis extends facture {
 									$facture[$entetes[$key]] = $value;
 								break;
 
-								case 'ef_affaire' :
+								case 'ref_affaire' :
 								break;
 
 								case 'mode de paiement' :
@@ -2441,16 +2455,21 @@ class facture_cleodis extends facture {
 								case 'periode_debut' :
 								case 'date' :
 								case 'periode_fin' :
+								case 'date_previsionnelle':
 									if(strpos($value , "/")){
 										$date = explode("/" , $value);
 										$date = $date[2]."-".$date[1]."-".$date[0];
 									}else{
 										$date = $value;
 									}
-
-									if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
-									if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
-									if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+									if($date){
+										if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
+										if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
+										if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+										if($entetes[$key] == "date_previsionnelle") $facture["date_previsionnelle"] = date("Y-m-d", strtotime($date));
+									}else{
+										$entetes[$key] = NULL;
+									}
 								break;
 
 
@@ -2532,18 +2551,22 @@ class facture_cleodis extends facture {
 						$return = array();
 						if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
 							foreach ($ligneNonVisible as $kRow => $row) {
-								if($kCol != "commande_ligne.id_commande_ligne"){
-									if(strpos($kCol, "id_")  !== false ){
-										$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
-										$return[$kRow]["facture_ligne.".$kCol]=$value;
-									}else{
-										$return[$kRow]["facture_ligne.".$kCol]=$value;
+								foreach ($row as $kCol => $value) {
+									if($kCol != "commande_ligne.id_commande_ligne"){
+										if(strpos($kCol, "id_")  !== false ){
+											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}else{
+											$return[$kRow]["facture_ligne.".$kCol]=$value;
+										}
 									}
 								}
 								$return[$kRow]["facture_ligne.afficher"]="oui";
 							}
 							$ligneNonVisible = $return;
 						}
+
+						//log::logger($facture , "mfleurquin");
 
 						$this->insert(array("facture"=> $facture,
 											"values_facture" =>
@@ -2580,6 +2603,7 @@ class facture_cleodis extends facture {
 				}
 
 
+
 		    }
 		}
 
@@ -2596,8 +2620,6 @@ class facture_cleodis extends facture {
 
 	      $return['success'] = true;
 	      $return["factureInserted"] = $facture_insert;
-	      //ATF::db($this->db)->rollback_transaction();
-
 	      ATF::db($this->db)->commit_transaction();
 	    }
 
