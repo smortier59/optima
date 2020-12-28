@@ -310,6 +310,10 @@ class societe_absystech extends societe {
 		return ATF::gestion_ticket()->add_ticket($infos,$s,$files,$cadre_refreshed);
 	}
 
+	public function _add_ticket($get,$post){
+		return $this->add_ticket($post);
+	}
+
 	/**
 		* Redirection vers le portail hotline
 		* @author Fanny DECLERCK <fdeclerck@absystech.fr>
@@ -327,6 +331,12 @@ class societe_absystech extends societe {
 		return $this->redirect_hotline($post["ref"],$post["divers_5"]);
 
 	}
+
+
+	public function _send_identifiants_hotline($get, $post){
+		return $this->send_identifiants_hotline($post);
+	}
+
 
 	/**
 	* Envoi les identifiants hotline par mail via le contact concerné
