@@ -41,7 +41,7 @@ class tache_cleodis extends tache {
 	 * @return id_suiv       Retourne l'id du suivi si tout c'est bien passé
 	 * @return errorATF si il y a une erreur
 	 */
-	public function _insert($get, $post){
+	public function _POST($get, $post){
 		if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
 
 
