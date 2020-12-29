@@ -641,7 +641,7 @@ class pdf_cleodis extends pdf {
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){
 				$this->devisAvenant();
-			}elseif($this->devis["type_affaire"] === "LFS"){
+			}elseif($this->affaire["type_affaire"] == "LFS"){
 				$this->devisLfs();
 			}else{
 				$this->devisClassique();
