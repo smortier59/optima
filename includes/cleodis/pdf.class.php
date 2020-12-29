@@ -636,7 +636,6 @@ class pdf_cleodis extends pdf {
 			$this->ln(5);
 			$this->multicell(85,5,"A l'attention de ".ATF::contact()->nom($this->contact['id_contact']));
 			$this->setleftmargin(15);
-
 			if($this->devis['type_contrat'] =='vente'){
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){

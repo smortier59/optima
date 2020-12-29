@@ -11,27 +11,28 @@ ATF.renderer.duplicate=function(table,field) {
 			buttonOnly: true,
 			iconCls: 'iconMailOK',
 			cls:'floatLeft',
-			tooltip: 'DUpliquer',
+			tooltip: 'Dupliquer',
 			tooltipType:'title',
 			listeners: {
 				'click': function(fb, v){
-					console.log('button clicked');
+					ATF.loadMask.show()
 					Ext.Ajax.request({
-						url: 'panier,duplicate.ajax',
-						method:"POST",
-						params:{
-						   'id_panier':idPanier,
+						url     : 'extjs.ajax',
+						params: {
+							'extAction':'panier'
+							,'extMethod':'duplicatePanier'
+						    ,'id_panier':idPanier
 						},
-						success: function (response, opts) {
-							location.reload();
-							ATF.ajax_refresh(opts.result,true);
-							ATF.extRefresh(opts);
+						method:"POST",
+						waitMsg: '{ATF::$usr->trans(loading_new_page)|escape:javascript}',
+                        waitTitle: '{ATF::$usr->trans(loading)|escape:javascript}',
+						success: function (r, action) {
+							res = {}
+							res.response = r;
+							ATF.extRefresh(res);
 							store.reload();
-						 },
-
-						failure: function(response, opts) {
-							console.log('faillure' + response.status)
-						}
+							ATF.loadMask.hide()
+						 }
 
 					});
 				}
