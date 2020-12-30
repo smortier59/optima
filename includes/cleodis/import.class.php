@@ -12,16 +12,32 @@ class import extends classes_optima{
 
 
 	public function _POST($get,$post, $files){
-		log::logger($get , "mfleurquin");
 
-		log::logger($post , "mfleurquin");
-		log::logger($files , "mfleurquin");
+		if($post["fonction_import"]){
+			$class = ATF::getClass("import");
+			$function = $post["fonction_import"];
 
-		if ($content_file = file_get_contents($files['devis_file']['tmp_name'])) {
+			if (method_exists($class,$function)) {
+                return $class->$function($get,$post,$files);
+			} else {
+                log::logger($data,"error");
+        		header("X-Error-Reason: "."Process not found import/".$function." (".ATF::$codename.")");
+        		$data = false;
+				header("Content-type: application/json; charset=utf-8");
+        		return false;
+            }
+		}else{
+			throw new errorATF("FUNCTION_IMPORT_MISSING", 500);
+
+		}
+
+
+
+		/*if ($content_file = file_get_contents($files['devis_file']['tmp_name'])) {
 			$this->store(ATF::_s(),$devis["id_affaire"],'devis_partenaire',$content_file);
 		}
 
-		return true;
+		return true;*/
 	}
 
 
@@ -31,10 +47,17 @@ class import extends classes_optima{
 	 * @param  file $file  Fichier CSV contenant les données
 	 * @return array        Retourne un tableau avec succes, error, resume
 	 */
-	public function maj_infos_produit($file){
+	public function maj_infos_produit($get,$post,$file){
 		$resume = $success = $error = null;
+		$success = true;
 
 		$resume[] = "========= DEBUT DE SCRIPT =========";
+
+
+		log::logger($file , "mfleurquin");
+		if($file["fichier-import"]){
+			$file = $file["fichier-import"]["tmp_name"];
+		}
 
 
 		$fileProduit = $file;
@@ -87,7 +110,6 @@ class import extends classes_optima{
 							"description" => utf8_encode($ligne[$entetes_key["description"]]),
 							"url_image" => $ligne[$entetes_key["url_image"]]
 						);
-						log::logger($prod , "mfleurquin");
 
 						try{
 							ATF::produit()->u($prod);
