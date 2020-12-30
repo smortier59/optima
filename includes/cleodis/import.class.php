@@ -35,7 +35,7 @@ class import extends classes_optima{
 		$resume = $success = $error = null;
 
 		$resume[] = "========= DEBUT DE SCRIPT =========";
-		ATF::db()->begin_transaction();
+
 
 		$fileProduit = $file;
 		$fpr = fopen($fileProduit, 'rb');
@@ -58,6 +58,7 @@ class import extends classes_optima{
 			}
 
 			while ($ligne = fgetcsv($fpr, 0, ';')) {
+
 				if (!$ligne[1]) continue; // pas d'ID pas de chocolat
 
 				$lines_count ++;
@@ -68,10 +69,7 @@ class import extends classes_optima{
 					$error["data"][] = "Fournisseur inconnu ".$ligne[$entetes_key["fournisseur"]];
 				}
 
-				if($this->get_site_associe($ligne[$entetes_key["site_associe"]]) == null){
-					$error["data"][] = "Site associe inconnu ".$ligne[$entetes_key["site_associe"]];
-					$erreur_get = true;
-				}
+
 
 
 				if(!$erreur_get){
@@ -81,18 +79,20 @@ class import extends classes_optima{
 					if($p){
 						$prod = array(
 							"id_produit" => $p["id_produit"],
-							"site_associe" => $this->get_site_associe($ligne[$entetes_key["site_associe"]]),
+							"site_associe" => $ligne[$entetes_key["site_associe"]],
 							"id_fournisseur" => $this->get_fournisseur($ligne[$entetes_key["fournisseur"]]),
-							"produit" => $ligne[$entetes_key["designation"]],
+							"produit" => utf8_encode($ligne[$entetes_key["designation"]]),
 							"prix_achat" => $ligne[$entetes_key["Prix achat dont ecotaxe"]],
 							"loyer" => $ligne[$entetes_key["loyer"]],
-							"description" => $ligne[$entetes_key["description"]],
+							"description" => utf8_encode($ligne[$entetes_key["description"]]),
 							"url_image" => $ligne[$entetes_key["url_image"]]
 						);
+						log::logger($prod , "mfleurquin");
 
 						try{
 							ATF::produit()->u($prod);
 							$processed_lines++;
+
 						} catch (errorATF $e) {
 							$error["data"][] = "Erreur lors de la mise à jour du produit (".$ligne[$entetes_key["ref"]]."/".$ligne[$entetes_key["fournisseur"]]." Erreur : ".$e->getMessage();
 						}
@@ -108,7 +108,7 @@ class import extends classes_optima{
 		$resume[] = "total ligne: $lines_count";
 		$resume[] = "Ligne mise à jour: $processed_lines";
 
-		ATF::db()->commit_transaction();
+
 		$resume[] ="========= FIN DE SCRIPT =========";
 
 		return array("success"=>$success, "error"=> $error, "resume" => $resume);
@@ -140,7 +140,7 @@ class import extends classes_optima{
 	 * @param  String $fournisseur Nom du site associe
 	 * @return Integer|String              ID du site associe si existant où un message d'information
 	 */
-	private function get_site_assoce($site_associe){
+	private function get_site_associe($site_associe){
 		ATF::site_associe()->q->reset()->where("site_associe", ATF::db()->real_escape_string($site_associe), "AND", false, "LIKE");
 		$f = ATF::site_associe()->select_row();
 
