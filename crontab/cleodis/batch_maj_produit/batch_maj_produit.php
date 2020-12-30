@@ -7,7 +7,7 @@ include(dirname(__FILE__)."/../../../global.inc.php");
 // Désactivation de la traçabilité
 ATF::define("tracabilite",false);
 
-$return = ATF::import()->maj_infos_produit("./maj_produit.csv");
+$return = ATF::import()->maj_infos_produit(array(), array(), "./maj_produit.csv");
 log::logger($return , "mfleurquin");
 
 
