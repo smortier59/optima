@@ -623,10 +623,6 @@ class facture_cleodis extends facture {
 			throw new errorATF("Il faut un type de facture libre",351);
 		}
 
-		if(($infos["type_facture"] === "libre") && (!$infos["nature"])){
-			throw new errorATF("Il faut une nature pour la facture libre",351);
-		}
-
 		if($infos["type_facture"]=="refi"){
 			if(!$infos["id_demande_refi"]){
 				throw new errorATF("Il n'y a pas de demande de refinancement valide pour cette affaire !",347);
@@ -2377,6 +2373,10 @@ class facture_cleodis extends facture {
 
 		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
 
+		log::logger($entetes , "mfleurquin");
+
+
+
 
 		$nb_entete_manquant = 0;
 		foreach ($entetes_necessaire as $key => $value) {
@@ -2415,170 +2415,170 @@ class facture_cleodis extends facture {
 					$affaire = ATF::affaire()->select_row();
 
 
-
 					if($affaire){
 
 						ATF::commande()->q->reset()->where("commande.id_affaire", $affaire["affaire.id_affaire"]);
 						$commande = ATF::commande()->select_row();
 
+						if($commande){
 
-						$facture = array(
-							"type_facture" => "libre",
-							"id_societe" => $affaire["affaire.id_societe_fk"],
-							"id_affaire" => $affaire["affaire.id_affaire"],
-							"id_commande" => $commande["commande.id_commande"],
-						);
+							$facture = array(
+								"type_facture" => "libre",
+								"id_societe" => $affaire["affaire.id_societe_fk"],
+								"id_affaire" => $affaire["affaire.id_affaire"],
+								"id_commande" => $commande["commande.id_commande"],
+							);
+
+							foreach ($data as $key => $value) {
+								switch ($entetes[$key]) {
+									case 'commentaire' :
+									case 'nature' :
+									case 'redevance' :
+									case 'ref_externe' :
+										$facture[$entetes[$key]] = $value;
+									break;
+
+									case 'type_libre' :
+										$facture[$entetes[$key]] = $value;
+									break;
+
+									case 'ref_affaire' :
+									break;
+
+									case 'mode de paiement' :
+										$facture["mode_paiement"] = $value;
+									break;
+
+									case 'periode_debut' :
+									case 'date' :
+									case 'periode_fin' :
+									case 'date_previsionnelle':
+
+										if(strpos($value , "/")){
+											$date = explode("/" , $value);
+											$date = $date[2]."-".$date[1]."-".$date[0];
+										}else{
+											$date = $value;
+										}
+										if($date){
+											if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
+											if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
+											if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
+											if($entetes[$key] == "date_previsionnelle") $facture["date_previsionnelle"] = date("Y-m-d", strtotime($date));
+										}else{
+											if($entetes[$key] == "date") $facture["date"] = NULL;
+											if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = NULL;
+											if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = NULL;
+											if($entetes[$key] == "date_previsionnelle") $facture["date_previsionnelle"] = NULL;
+										}
+									break;
 
 
-						foreach ($data as $key => $value) {
+									case 'total_ht' :
+										$facture["prix_libre"] = $value;
+									break;
 
-							switch ($entetes[$key]) {
-
-								case 'commentaire' :
-								case 'nature' :
-								case 'redevance' :
-								case 'ref_externe' :
-									$facture[$entetes[$key]] = $value;
-								break;
-
-								case 'type_libre' :
-									$facture[$entetes[$key]] = $value;
-								break;
-
-								case 'ref_affaire' :
-								break;
-
-								case 'mode de paiement' :
-									$facture["mode_paiement"] = $value;
-								break;
-
-								case 'periode_debut' :
-								case 'date' :
-								case 'periode_fin' :
-								case 'date_previsionnelle':
-									if(strpos($value , "/")){
-										$date = explode("/" , $value);
-										$date = $date[2]."-".$date[1]."-".$date[0];
-									}else{
-										$date = $value;
-									}
-									if($date){
-										if($entetes[$key] == "date") $facture["date"] = date("Y-m-d", strtotime($date));
-										if($entetes[$key] == "periode_debut") $facture["date_periode_debut_libre"] = date("Y-m-d", strtotime($date));
-										if($entetes[$key] == "periode_fin") $facture["date_periode_fin_libre"] = date("Y-m-d", strtotime($date));
-										if($entetes[$key] == "date_previsionnelle") $facture["date_previsionnelle"] = date("Y-m-d", strtotime($date));
-									}else{
-										$entetes[$key] = NULL;
-									}
-								break;
-
-
-								case 'total_ht' :
-									$facture["prix_libre"] = $value;
-								break;
-
-								default:
-								break;
+									default:
+									break;
+								}
 							}
 
+							$fields=[
+								  "produit"
+								, "quantite"
+								, "ref"
+								, "id_fournisseur"
+								, "prix_achat"
+								, "code"
+								, "id_produit"
+								, "serial"
+							];
 
+							ATF::commande_ligne()->q->reset()
+										->addField(util::keysOrValues($fields))
+										->where("id_commande", $commande["commande.id_commande"])
+										->where("id_affaire_provenance",null,null,false,"IS NULL")
+										->where("visible_pdf","oui");
 
-						}
+							$return = array();
+							if ($ligneVisible = ATF::commande_ligne()->select_all() ) {
 
-						$fields=[
-							  "produit"
-							, "quantite"
-							, "ref"
-							, "id_fournisseur"
-							, "prix_achat"
-							, "code"
-							, "id_produit"
-							, "serial"
-						];
-
-						ATF::commande_ligne()->q->reset()
-									->addField(util::keysOrValues($fields))
-									->where("id_commande", $commande["commande.id_commande"])
-									->where("id_affaire_provenance",null,null,false,"IS NULL")
-									->where("visible_pdf","oui");
-
-						$return = array();
-						if ($ligneVisible = ATF::commande_ligne()->select_all() ) {
-
-							foreach ($ligneVisible as $kRow => $row) {
-								foreach ($row as $kCol => $value) {
-									if($kCol != "commande_ligne.id_commande_ligne"){
-										if(strpos($kCol, "id_") !== false){
-											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
-											$return[$kRow]["facture_ligne.".$kCol]=$value;
-										}else{
-											$return[$kRow]["facture_ligne.".$kCol]=$value;
+								foreach ($ligneVisible as $kRow => $row) {
+									foreach ($row as $kCol => $value) {
+										if($kCol != "commande_ligne.id_commande_ligne"){
+											if(strpos($kCol, "id_") !== false){
+												$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+												$return[$kRow]["facture_ligne.".$kCol]=$value;
+											}else{
+												$return[$kRow]["facture_ligne.".$kCol]=$value;
+											}
 										}
 									}
+									$return[$kRow]["facture_ligne.afficher"]="oui";
 								}
-								$return[$kRow]["facture_ligne.afficher"]="oui";
+								$ligneVisible = $return;
 							}
-							$ligneVisible = $return;
-						}
 
-						ATF::commande_ligne()->q->reset()
-									->addField(util::keysOrValues($fields))
-									->where("id_commande", $commande["commande.id_commande"])
-									->where("id_affaire_provenance",null,null,false,"IS NOT NULL")->setView(["order"=>$fields]);
-						$return = array();
-						if ($ligneRepris = ATF::commande_ligne()->select_all() ) {
-							foreach ($ligneRepris as $kRow => $row) {
-								foreach ($row as $kCol => $value) {
-									if($kCol != "commande_ligne.id_commande_ligne"){
-										if(strpos($kCol, "id_") !== false){
-											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
-											$return[$kRow]["facture_ligne.".$kCol]=$value;
-										}else{
-											$return[$kRow]["facture_ligne.".$kCol]=$value;
+							ATF::commande_ligne()->q->reset()
+										->addField(util::keysOrValues($fields))
+										->where("id_commande", $commande["commande.id_commande"])
+										->where("id_affaire_provenance",null,null,false,"IS NOT NULL")->setView(["order"=>$fields]);
+							$return = array();
+							if ($ligneRepris = ATF::commande_ligne()->select_all() ) {
+								foreach ($ligneRepris as $kRow => $row) {
+									foreach ($row as $kCol => $value) {
+										if($kCol != "commande_ligne.id_commande_ligne"){
+											if(strpos($kCol, "id_") !== false){
+												$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+												$return[$kRow]["facture_ligne.".$kCol]=$value;
+											}else{
+												$return[$kRow]["facture_ligne.".$kCol]=$value;
+											}
 										}
 									}
+									$return[$kRow]["facture_ligne.afficher"]="oui";
 								}
-								$return[$kRow]["facture_ligne.afficher"]="oui";
+								$ligneRepris = $return;
 							}
-							$ligneRepris = $return;
-						}
 
-						ATF::commande_ligne()->q->reset()
-									->addField(util::keysOrValues($fields))
-									->where("id_commande", $commande["commande.id_commande"])
-									->where("id_affaire_provenance",null,null,false,"IS NULL")
-									->where("visible_pdf","non")->setView(["order"=>$fields]);
-						$return = array();
-						if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
-							foreach ($ligneNonVisible as $kRow => $row) {
-								foreach ($row as $kCol => $value) {
-									if($kCol != "commande_ligne.id_commande_ligne"){
-										if(strpos($kCol, "id_")  !== false ){
-											$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
-											$return[$kRow]["facture_ligne.".$kCol]=$value;
-										}else{
-											$return[$kRow]["facture_ligne.".$kCol]=$value;
+							ATF::commande_ligne()->q->reset()
+										->addField(util::keysOrValues($fields))
+										->where("id_commande", $commande["commande.id_commande"])
+										->where("id_affaire_provenance",null,null,false,"IS NULL")
+										->where("visible_pdf","non")->setView(["order"=>$fields]);
+							$return = array();
+							if ($ligneNonVisible = ATF::commande_ligne()->select_all() ) {
+								foreach ($ligneNonVisible as $kRow => $row) {
+									foreach ($row as $kCol => $value) {
+										if($kCol != "commande_ligne.id_commande_ligne"){
+											if(strpos($kCol, "id_")  !== false ){
+												$return[$kRow]["facture_ligne.".$kCol."_fk"]=$value;
+												$return[$kRow]["facture_ligne.".$kCol]=$value;
+											}else{
+												$return[$kRow]["facture_ligne.".$kCol]=$value;
+											}
 										}
 									}
+									$return[$kRow]["facture_ligne.afficher"]="oui";
 								}
-								$return[$kRow]["facture_ligne.afficher"]="oui";
+								$ligneNonVisible = $return;
 							}
-							$ligneNonVisible = $return;
-						}
 
-						//log::logger($facture , "mfleurquin");
+							log::logger($facture , "mfleurquin");
 
-						$this->insert(array("facture"=> $facture,
-											"values_facture" =>
-												array(
-													"produits_repris" => json_encode($ligneRepris) ,
-													"produits" => json_encode($ligneVisible) ,
-													"produits_non_visible" => json_encode($ligneNonVisible) ,
+							$this->insert(array("facture"=> $facture,
+												"values_facture" =>
+													array(
+														"produits_repris" => json_encode($ligneRepris) ,
+														"produits" => json_encode($ligneVisible) ,
+														"produits_non_visible" => json_encode($ligneNonVisible) ,
+													)
 												)
-											)
-									);
-						$facture_insert ++;
-
+										);
+							$facture_insert ++;
+						}else{
+							$erreurs["Contrat non trouvé (".$data[$col_ref_affaire[0]].")"] .= $lineCompteur.", ";
+						}
 					}else{
 						$erreurs["Affaire non trouvée (".$data[$col_ref_affaire[0]].")"] .= $lineCompteur.", ";
 					}
