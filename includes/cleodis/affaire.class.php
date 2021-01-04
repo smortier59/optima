@@ -5,7 +5,7 @@
 */
 require_once dirname(__FILE__)."/../affaire.class.php";
 class affaire_cleodis extends affaire {
-	
+
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
@@ -131,7 +131,7 @@ class affaire_cleodis extends affaire {
 			,"pdf_affaire"
 		);
 
-		
+
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
@@ -248,7 +248,7 @@ class affaire_cleodis extends affaire {
 	* @return array
 	*/
 	public function formateInsertUpdate($infos){
-	
+
 		$affaire["id_societe"]=$infos["id_societe"];
 		$affaire["nature"]=$infos["nature"];
 		$affaire["affaire"]=$infos["devis"];
@@ -265,8 +265,8 @@ class affaire_cleodis extends affaire {
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
-		
-		
+
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -2604,16 +2604,7 @@ class affaire_cleodis extends affaire {
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
-			
-			//Recupere Apporteur de ta société
-            $apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
 
-			if ($apporteur){
-				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
-			}
-			
-			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-          
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2627,17 +2618,17 @@ class affaire_cleodis extends affaire {
 			}
 
 			log::logger("test d\affichage du code client partenaire"." ".$code_client_partenaire,'code_client');
-			
-			
+
+
 
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client'); 
+			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client');
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
-          
+
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
 
@@ -3217,7 +3208,7 @@ class affaire_midas extends affaire_cleodis {
 	/** On affiche que les sociétés midas
 	* @author Nicolas BERTEMONT <nbertemont@absystech.fr>
 	*/
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 		ATF::loyer()->q->reset()->setToString();
 		$subquery=ATF::loyer()->sa("loyer.id_loyer","desc");
 
