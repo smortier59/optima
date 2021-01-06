@@ -5,19 +5,18 @@ ATF::define("tracabilite",false);
 
 $dataPath = __DATA_PATH__."cleodis/";
 
-$q = 'SELECT DISTINCT(id_agence) FROM `user` WHERE `etat` = "normal"';
+$q = 'SELECT DISTINCT(id_agence) FROM `user` WHERE `etat` = "normal" AND id_agence IS NOT NULL';
+$agences = ATF::db()->sql2array($q);
 
 
-$agence = ATF::db()->sql2array($q);
-
-
-
-
-foreach ($agence as $key => $value) {
+foreach ($agences as $key => $value) {
 	$date = date("Y-m-01");
 	$dateMoisPrec = date("Y-m-01" , strtotime($date." -1 month"));
 
-	ATF::devis()->q->reset()
+	ATF::db()->begin_transaction();
+	try{
+
+		ATF::devis()->q->reset()
 							->addField("COUNT(*)","nb")
 							->setStrict()
 							->addJointure("devis","id_societe","societe","id_societe")
@@ -48,12 +47,25 @@ foreach ($agence as $key => $value) {
 							->addCondition("`devis`.`first_date_accord`",$dateMoisPrec,"AND",false,">=")
 							->addCondition("`devis`.`first_date_accord`",$date,"AND",false,"<");
 
-	$result= ATF::devis()->select_row();
+		$result= ATF::devis()->select_row();
 
-	ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"devis-reseau", "id_agence"=>$value["id_agence"]));
+		if(empty($result)){
+			$result["nb"] = 0;
+		}
+
+		ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"devis-reseau", "id_agence"=>$value["id_agence"]));
+
+		ATF::db()->commit_transaction();
+
+	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
+		echo $e->getMessage();
+	}
 
 
-	ATF::devis()->q->reset()
+	ATF::db()->begin_transaction();
+	try{
+		ATF::devis()->q->reset()
 			->addField("COUNT(*)","nb")
 			->setStrict()
 			->addJointure("devis","id_societe","societe","id_societe")
@@ -84,12 +96,25 @@ foreach ($agence as $key => $value) {
 			->addCondition("`devis`.`first_date_accord`",$dateMoisPrec,"AND",false,">=")
 			->addCondition("`devis`.`first_date_accord`",$date,"AND",false,"<");
 
-	$result= ATF::devis()->select_row();
+		$result= ATF::devis()->select_row();
 
-	ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"devis-autre", "id_agence"=>$value["id_agence"]));
+		if(empty($result)){
+			$result["nb"] = 0;
+		}
+		ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"devis-autre", "id_agence"=>$value["id_agence"]));
 
 
-	ATF::commande()->q->reset()
+		ATF::db()->commit_transaction();
+	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
+		echo $e->getMessage();
+	}
+
+
+	ATF::db()->begin_transaction();
+	try{
+
+		ATF::commande()->q->reset()
 			->addField("COUNT(*)","nb")
 			->setStrict()
 			->addJointure("commande","id_societe","societe","id_societe")
@@ -124,13 +149,24 @@ foreach ($agence as $key => $value) {
 			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=");
 
 
-	$result= ATF::commande()->select_row();
-	ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"mep-reseau", "id_agence"=>$value["id_agence"]));
+		$result= ATF::commande()->select_row();
+
+		if(empty($result)){
+			$result["nb"] = 0;
+		}
+
+		ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"mep-reseau", "id_agence"=>$value["id_agence"]));
+
+		ATF::db()->commit_transaction();
+	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
+		echo $e->getMessage();
+	}
 
 
-
-
-	ATF::commande()->q->reset()
+	ATF::db()->begin_transaction();
+	try{
+		ATF::commande()->q->reset()
 			->addField("COUNT(*)","nb")
 			->setStrict()
 			->addJointure("commande","id_societe","societe","id_societe")
@@ -164,8 +200,17 @@ foreach ($agence as $key => $value) {
 			->addCondition("`commande`.`mise_en_place`",$date."-01-01","AND",false,">")
 			->addCondition("`commande`.`mise_en_place`",$dateMoisPrec,"AND",false,">=");
 
-	$result= ATF::commande()->select_row();
-	ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"mep-autre", "id_agence"=>$value["id_agence"]));
+		$result= ATF::commande()->select_row();
+		if(empty($result)){
+			$result["nb"] = 0;
+		}
+		ATF::stat_snap()->i(array("date"=>$dateMoisPrec, "nb"=>$result["nb"], "stat_concerne"=>"mep-autre", "id_agence"=>$value["id_agence"]));
+
+		ATF::db()->commit_transaction();
+	} catch (errorATF $e) {
+		ATF::db()->rollback_transaction();
+		echo $e->getMessage();
+	}
 }
 
 
