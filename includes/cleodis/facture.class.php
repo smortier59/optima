@@ -1142,7 +1142,13 @@ class facture_cleodis extends facture {
 				// Récupération de : Date de debut, de fin et de prélèvement
 				$dateDebut = ($item['facture.date_periode_debut']) ? " ".date("d/m/y",strtotime($item['facture.date_periode_debut'])) : " ";
 				$dateFin = ($item['facture.date_periode_fin']) ? " ".date("d/m/y",strtotime($item['facture.date_periode_fin'])) : " ";
-				$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
+
+				if($affaire["date_previsionnelle"] < 0){
+					$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." ".$affaire['date_previsionnelle']." DAY"));
+				}else{
+					$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
+				}
+
 
 				$refinancement = "";
 
