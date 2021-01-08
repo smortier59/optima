@@ -3836,7 +3836,8 @@ class hotline extends classes_optima {
 			"hotline.wait_mep"=>array(),
 			"societe.latitude"=>array(),
 			"societe.longitude"=>array(),
-			"societe.solde"=>array()
+			"societe.solde"=>array(),
+			"societe.liens"=>array()
 		);
 
 
