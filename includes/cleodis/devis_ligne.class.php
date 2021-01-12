@@ -12,6 +12,7 @@ class devis_ligne_cleodis extends devis_ligne {
 		$this->colonnes['fields_column'] = array(
 			 'devis_ligne.produit'
 			,'devis_ligne.quantite'
+			,'devis_ligne.caracteristique'
 			,'devis_ligne.type'
 			,'devis_ligne.ref'
 			,'devis_ligne.id_fournisseur'
@@ -33,6 +34,7 @@ class devis_ligne_cleodis extends devis_ligne {
 			"devis_ligne.id_produit"=>array("hidden"=>true)
 			,"devis_ligne.produit"
 			,"devis_ligne.quantite"
+			,'devis_ligne.caracteristique'
 			,"devis_ligne.type"
 			,"devis_ligne.ref"
 			,"devis_ligne.id_fournisseur"
@@ -72,6 +74,9 @@ class devis_ligne_cleodis extends devis_ligne {
 	* @param array $infos
 	*/
   	function toCommandeLigne() {
+
+  		log::logger($this->colonnes['ligne'] , "mfleurquin");
+
 		// Le pager a normalement été préparé dans le template de commande
 		$this->q->reset('field')->addField(util::keysOrValues($this->colonnes['ligne']))->setLimit(-1);
 		if ($res = $this->select_all()) {
@@ -103,6 +108,7 @@ class devis_ligne_midas extends devis_ligne_cleodis {
 		$this->colonnes['fields_column'] = array(
 			 'devis_ligne.produit'
 			,'devis_ligne.quantite'
+			,'devis_ligne.caracteristique'
 			,'devis_ligne.type'
 			,'devis_ligne.ref'
 			,'devis_ligne.id_fournisseur'

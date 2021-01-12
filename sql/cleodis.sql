@@ -15,6 +15,8 @@ ALTER TABLE document_revendeur MODIFY COLUMN site_associe enum('cleodis','locati
 ALTER TABLE affaire MODIFY COLUMN provenance enum('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo') CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL NULL;
 
 
+# Type affaire Mariton
+ALTER TABLE `affaire` CHANGE `type_affaire` `type_affaire` ENUM('normal','2SI','Boulanger Pro','Consommables_com','DIB','Dyadem','FLEXFUEL','Instore','LAFI','Manganelli','NRC','OLISYS - Ma Solution IT','Proxi Pause','Trekk','ZENCONNECT – ZEN PACK','Hexamed Leasing','LFS','LocEvo','haccp','Mariton') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'normal';
 
 
 
@@ -28,3 +30,13 @@ ALTER TABLE `pack_produit` CHANGE `site_associe` `site_associe` ENUM('cleodis','
 ALTER TABLE `affaire` CHANGE `site_associe` `site_associe` ENUM('cleodis','location_evolutive','toshiba','btwin','boulangerpro','bdomplus','boulanger-cafe','hexamed','top office','burger king','flunch','dib','locevo','haccp','axa','sans') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `affaire` CHANGE `type_affaire` `type_affaire` ENUM('normal','2SI','Boulanger Pro','Consommables_com','DIB','Dyadem','FLEXFUEL','Instore','LAFI','Manganelli','NRC','OLISYS - Ma Solution IT','Proxi Pause','Trekk','ZENCONNECT – ZEN PACK','Hexamed Leasing','LFS','LocEvo','haccp','Mariton','Axa') CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'normal';
 ALTER TABLE `affaire` CHANGE `provenance` `provenance` ENUM('toshiba','cleodis','vendeur','partenaire','la_poste','btwin','boulangerpro','hexamed','dib','locevo','haccp','axa') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+
+
+
+-- Date retour broker
+ALTER TABLE `commande` ADD `date_demande_reprise_broker` DATE NULL DEFAULT NULL COMMENT 'date de demande reprise au broker' AFTER `date_restitution_effective`;
+UPDATE `commande` SET `date_demande_reprise_broker`= `date_restitution_effective`;
+
+-- Novembre - Export contrat pas MEP
+ALTER TABLE `suivi` CHANGE `type_suivi` `type_suivi` ENUM('Devis','Contrat','Refinancement','Comptabilité','Broke','Contentieux','Mis en place','Restitution','Autre','Prolongation','Resiliation','Sinistre','Transfert','Fournisseur','Requête','BDC','Flottes','Installation','Passage_comite','demande_comite','Audit en cours','Assurance','Formation','Maintenance','Livraison','Blocage') CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;

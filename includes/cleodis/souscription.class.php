@@ -32,6 +32,7 @@ class souscription_cleodis extends souscription {
    * @author Quentin JANON <qjanon@absystech.fr>
    */
   public function _devis($get, $post) {
+
     ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
     ATF::$usr->set('id_agence',$post['id_agence'] ? $post['id_agence'] : $this->id_agence);
     $email = $post["particulier_email"]?$post["particulier_email"]:$post["email"];
@@ -49,7 +50,8 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'bdomplus':
-        $this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+        //$this->id_partenaire = 31458; // ID de la société BDOM PLUS (same in RCT - PROD - DEV)
+        $this->id_partenaire = 31456;
       break;
 
       case 'boulanger-cafe':
@@ -155,7 +157,7 @@ class souscription_cleodis extends souscription {
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe']);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
 
 
 
@@ -227,7 +229,8 @@ class souscription_cleodis extends souscription {
           "adresse_facturation_2"=>$post['facturation']['adresse_2'],
           "cp_adresse_facturation"=>$post['facturation']['cp'],
           "ville_adresse_facturation"=>$post['facturation']['ville'],
-          "id_magasin"=>$post["id_magasin"]
+          "id_magasin"=>$post["id_magasin"],
+          "commentaire"=>$post["commentaire"],
         );
         // ajout du vendeur pour bdomplus
         if ($post['site_associe'] == 'bdomplus' && $nameVendeur) {
@@ -307,7 +310,7 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $renouvellement=false) {
     if ($id_pack_produits) {
       ATF::pack_produit()->q->reset()
           ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
@@ -357,6 +360,10 @@ class souscription_cleodis extends souscription {
       break;
     }
 
+    if($renouvellement){
+      $r = "Renouvellement - ".$r;
+    }
+
     return $r;
   }
 
@@ -382,6 +389,7 @@ class souscription_cleodis extends souscription {
         "type_affaire" => "normal",
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
+
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
@@ -417,6 +425,7 @@ class souscription_cleodis extends souscription {
 
 
     foreach ($produits as $k=>$produit) {
+
         ATF::produit()->q->reset()
           ->addField("loyer")
           ->addField("duree")
@@ -426,7 +435,9 @@ class souscription_cleodis extends souscription {
           ->addField("prix_achat")
           ->addField("id_fournisseur")
           ->where("id_produit", $produit['id_produit']);
+
         $produitLoyer = ATF::produit()->select_row();
+
 
         if ($produit['id_pack_produit']) {
           $id_pack = $produit['id_pack_produit'];
@@ -493,7 +504,8 @@ class souscription_cleodis extends souscription {
             "devis_ligne__dot__visible_sur_site"=>$produitLoyer['visible_sur_site'],
             "devis_ligne__dot__visible_pdf"=>$produitLoyer['visible_sur_pdf'],
             "devis_ligne__dot__ordre"=>$produitLoyer['ordre'],
-            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur']
+            "devis_ligne__dot__frequence_fournisseur"=>$produitLoyer['frequence_fournisseur'],
+            "devis_ligne__dot__caracteristique"=>$produit['caracteristique']
           );
         }
 
@@ -569,7 +581,8 @@ class souscription_cleodis extends souscription {
           "commande_ligne__dot__visible_sur_site"=>$value['visible_sur_site'],
           "commande_ligne__dot__visible_pdf"=>$value['visible_pdf'],
           "commande_ligne__dot__frequence_fournisseur"=>$value['frequence_fournisseur'],
-          "commande_ligne__dot__ordre"=>$value['ordre']
+          "commande_ligne__dot__ordre"=>$value['ordre'],
+          "commande_ligne__dot__caracteristique"=>$value['caracteristique']
       );
       $commande["prix_achat"] += ($value["prix_achat"] * $value["quantite"]);
     }
@@ -1161,19 +1174,6 @@ class souscription_cleodis extends souscription {
       );
       ATF::devis()->perdu($infos);
     }
-  }
-
-  /**
-   * Appel la fonction pour vérifier la validité du domaine d'un email
-   * @author Quentin JANON <qjanon@absystech.fr>
-   */
-  public function _checkDomainEmail($get) {
-    try {
-      mail::check_mail($get['email']);
-    } catch (errorATF $e) {
-      throw new errorATF("INVALID DOMAIN",500);
-    }
-    return true;
   }
 
 

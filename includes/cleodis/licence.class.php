@@ -10,7 +10,10 @@ class licence extends classes_optima {
 			//'licence.part_2',
 			'licence.id_licence_type',
 			'licence.id_commande_ligne',
-			'licence.deja_pris' => array("custom"=> true, "renderer"=>"licence_prise")
+			'licence.deja_pris' => array("custom"=> true, "renderer"=>"licence_prise"),
+			'delete_date_envoi'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"deleteDateEnvoi","width"=>50),
+			'licence.date_envoi'
+
 		);
 		$this->fieldstructure();
 
@@ -18,7 +21,14 @@ class licence extends classes_optima {
 		$this->foreign_key['id_commande_ligne'] =  "commande_ligne";
 
 		$this->colonnes['bloquees']['select'] = array("part_1", "part_2");
+
+		$this->addPrivilege("deleteDateEnvoi");
+
 	}
+
+
+
+
 
 
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false){
@@ -35,7 +45,7 @@ class licence extends classes_optima {
 			$this->q->addJointure("licence","id_commande_ligne","commande_ligne","id_commande_ligne");
 			$this->q->addJointure("commande_ligne","id_commande","commande","id_commande");
 
-			$this->q->where("commande.id_affaire",ATF::affaire()->decryptID(ATF::_r('id_affaire')));	
+			$this->q->where("commande.id_affaire",ATF::affaire()->decryptID(ATF::_r('id_affaire')));
 			ATF::_r('id_affaire', null);
 		}
 
@@ -49,6 +59,43 @@ class licence extends classes_optima {
 			}
 		}
 		return $return;
+	}
+
+	public function deleteDateEnvoi($data){
+
+		if($data["id_licence"]){
+			$id_licence = ATF::licence()->decryptID($data["id_licence"]);
+
+			if(ATF::licence()->u(array("id_licence"=> $id_licence , "date_envoi"=>NULL))) {
+				ATF::$msg->addNotice(
+					loc::mt(ATF::$usr->trans("suppression_date_envoi_reussie")) ,ATF::$usr->trans("notice_success_title")
+				);
+			}
+			$this->redirection("select_all",NULL,"licence.html");
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Mise à jour de la date sur listing
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 */
+	public function updateDate($infos){
+		if ($infos['value'] == "undefined") $infos["value"] = "";
+		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
+		$infosMaj["id_".$this->table]=$infos["id_".$this->table];
+		$infosMaj[$infos["key"]]=$infos["value"];
+
+		if($this->u($infosMaj)){
+			ATF::$msg->addNotice(
+				loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
+				,ATF::$usr->trans("notice_success_title")
+			);
+		}
+
+		return true;
 	}
 
 
