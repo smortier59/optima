@@ -800,7 +800,7 @@ class hotline extends classes_optima {
 		//Vérification des informations
 		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 
-		
+
 		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
 
 		//Construction de la hotline
@@ -3840,7 +3840,7 @@ class hotline extends classes_optima {
 			"societe.liens"=>array(),
 			"contact.email"=>array(),
 			"contact.tel"=>array(),
-			
+
 		);
 
 		$this->q->reset();
@@ -3939,7 +3939,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_user","user","id_user");
 		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
-		
+
 
 		// Profil développeur extérieur (PATCH DEGUEU EN MODE BRICOLE)
 		if (ATF::$usr->get('id_profil') == 16) {
@@ -3952,7 +3952,7 @@ class hotline extends classes_optima {
 		// $this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-		
+
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
 				if (strpos($k_,".")) {
@@ -3982,10 +3982,10 @@ class hotline extends classes_optima {
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
 
-		 
+
 		  $return = $data['data'];
-		  
-		  
+
+
 		}
 
 		return $return;
@@ -4326,7 +4326,10 @@ class hotline extends classes_optima {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 
 		$h = $this->select($get['id']);
-		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])->where("etat","terminee","AND","cle1","!=")->where("etat","perdue","AND","cle1","!=");
+		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])
+								  ->where("etat","terminee","AND","cle1","!=")
+								  ->where("etat","perdue","AND","cle1","!=")
+								  ->addOrder("affaire.date","DESC");
 
 		return ATF::affaire()->sa();
 	}
