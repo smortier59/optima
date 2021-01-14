@@ -845,9 +845,6 @@ class hotline extends classes_optima {
 			break;
 		}
 
-		log::logger($infos , "mfleurquin");
-
-
 		//Date de création de la requête
 		$infos["date"]=date('Y-m-d H:i:s');
 
