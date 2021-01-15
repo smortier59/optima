@@ -3851,8 +3851,8 @@ class hotline extends classes_optima {
 			$this->q->where("id_hotline",$get['id'])->setLimit(1);
 		} elseif ($get['id_societe']) {
 			$this->q->where("hotline.id_societe",$get['id_societe']);
-			$this->q->where("hotline.id_contact",$get['email']);
-			$this->q->where("hotline.id_contact",$get['tel']);
+			if($get["email"]) $this->q->where("hotline.id_contact",$get['email']);
+			if($get["tel"]) $this->q->where("hotline.id_contact",$get['tel']);
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			// Filtre ticket actif
 			if ($get['filters']['fixing'] == "on") {
