@@ -59,7 +59,7 @@ class affaire_cleodis extends affaire {
 			,'ville_banque'
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
-			,"type_affaire"
+			,"id_type_affaire"
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -174,6 +174,8 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
 		$this->foreign_key['id_apporteur'] =  "societe";
+		$this->foreign_key['id_type_affaire'] = "type_affaire";
+
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
@@ -262,6 +264,7 @@ class affaire_cleodis extends affaire {
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
 		$affaire["langue"]=$infos["langue"];
+		$affaire["id_type_affaire"]=$infos["id_type_affaire"];
 		$affaire["commentaire"] = $infos["commentaire"];
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
@@ -2536,7 +2539,11 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+
 		$utilisateur  = ATF::$usr->get("contact");
+
+		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
+
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2567,9 +2574,10 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>ATF::$usr->getID(),
-			  "type_affaire" => "normal",
-			  "langue"=>ATF::societe()->select($id_societe, "langue")
+		      "id_type_affaire"=>$id_type_affaire,
+			  "langue"=>ATF::societe()->select($id_societe, "langue"),
 			);
+
 
 			$values_devis =array();
 
@@ -2623,6 +2631,9 @@ class affaire_cleodis extends affaire {
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
+			//recuperation de l'id de la societe
+			$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2635,7 +2646,6 @@ class affaire_cleodis extends affaire {
 				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
 			}
 
-			log::logger("test d\affichage du code client partenaire"." ".$code_client_partenaire,'code_client');
 
 
 
@@ -2643,7 +2653,6 @@ class affaire_cleodis extends affaire {
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client');
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
