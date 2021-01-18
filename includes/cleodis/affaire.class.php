@@ -1682,18 +1682,18 @@ class affaire_cleodis extends affaire {
 				}
 
 
-				$texte  = "Bonjour Madame, Monsieur,\n\n";
-				$texte .= "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.\n";
-				$texte .= "Contrat : ".ATF::societe()->getUrlSign($value['affaire.id_affaire_fk'])."\n";
-				$texte .= "La procédure est relativement simple car tout se fait directement en ligne.\n\n";
-				$texte .= "Il vous suffit de cliquer sur ce lien ci-dessus et de suivre le processus qui ne prendra que quelques secondes :\n
-				1. Validez vos coordonnées.\n
-				2. Validez vos coordonnées bancaire préremplies(sur la base de votre RIB). \n
-				3. A la dernière étape, les documents se chargent.\n
-				Cliquer sur le lien  « signer », un code de validation vous est envoyé par SMS.\n
-				4. Insérez ce code sur le site : votre contrat de location est signé !\n";
-				$texte .= "Vous recevez directement une copie par mail.\n\n";
-				$texte .= "En restant à votre disposition,\n\n";
+				$texte  = "Bonjour Madame, Monsieur,%0D%0A%0D%0A";
+				$texte .= "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.%0D%0A";
+				$texte .= "Contrat : ".ATF::societe()->getUrlSign($value['affaire.id_affaire_fk'])."%0D%0A";
+				$texte .= "La procédure est relativement simple car tout se fait directement en ligne.%0D%0A%0D%0A";
+				$texte .= "Il vous suffit de cliquer sur ce lien ci-dessus et de suivre le processus qui ne prendra que quelques secondes :%0D%0A
+				%09 1. Validez vos coordonnées.%0D%0A
+				%09 2. Validez vos coordonnées bancaire préremplies(sur la base de votre RIB). %0D%0A
+				%09 3. A la dernière étape, les documents se chargent.%0D%0A
+				%09 Cliquer sur le lien  « signer », un code de validation vous est envoyé par SMS.%0D%0A
+				%09 4. Insérez ce code sur le site : votre contrat de location est signé !%0D%0A";
+				$texte .= "Vous recevez directement une copie par mail.%0D%0A%0D%0A";
+				$texte .= "En restant à votre disposition,%0D%0A%0D%0A";
 				$texte .= "Bien cordialement,";
 
 				$data['data'][$key]["sign_url"] = "mailto:".
