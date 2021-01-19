@@ -1,17 +1,17 @@
-{ strip } 
+{ strip }
 
-{ * Ajout du champ nécessaire pour ce renderer * } 
+{ * Ajout du champ nécessaire pour ce renderer * }
 {util::push($fieldsKeys, "commande.etat")}
 /* Pour les dates ! */
-{util::push($fieldsKeys, "commande.date_debut")} 
-{util::push($fieldsKeys, "commande.date_evolution")} 
-{util::push($fieldsKeys, "commande.retour_contrat")} 
-{util::push($fieldsKeys, "commande.retour_prel")} 
+{util::push($fieldsKeys, "commande.date_debut")}
+{util::push($fieldsKeys, "commande.date_evolution")}
+{util::push($fieldsKeys, "commande.retour_contrat")}
+{util::push($fieldsKeys, "commande.retour_prel")}
 {util::push($fieldsKeys, "commande.retour_pv")}
 
-{util::push($fieldsKeys, "commande.date_demande_resiliation")} 
-{util::push($fieldsKeys, "commande.date_prevision_restitution")} 
-{util::push($fieldsKeys, "commande.date_restitution_effective")} 
+{util::push($fieldsKeys, "commande.date_demande_resiliation")}
+{util::push($fieldsKeys, "commande.date_prevision_restitution")}
+{util::push($fieldsKeys, "commande.date_restitution_effective")}
 {util::push($fieldsKeys, "commande.date_demande_reprise_broker")}
 
 /* Pour les prolongations */
@@ -25,19 +25,19 @@
 /* Pour les Ventes */
 {util::push($fieldsKeys, "vente")}
 /* Pour les Fichiers */
-{util::push($fieldsKeys, "envoiContratEtBilanExists")} 
-{util::push($fieldsKeys, "envoiContratSsBilanExists")} 
-{util::push($fieldsKeys, "envoiAvenantExists")} 
-{util::push($fieldsKeys, "contratTransfertExists")} 
-{util::push($fieldsKeys, "ctSigneExists")} 
-{util::push($fieldsKeys, "CourrierRestitutionExists")} 
-{util::push($fieldsKeys, "allowBDCCreate")} 
-{util::push($fieldsKeys, "allowAllBDCCreate")} 
-{if ATF::$codename == "cleodis"} 
-    {util::push($fieldsKeys, "ctSGEFExists")} 
-{/if} 
-{if ATF::$codename == "cleodisbe"} 
-    {util::push($fieldsKeys, "ctlettreBelfiusExists")} 
+{util::push($fieldsKeys, "envoiContratEtBilanExists")}
+{util::push($fieldsKeys, "envoiContratSsBilanExists")}
+{util::push($fieldsKeys, "envoiAvenantExists")}
+{util::push($fieldsKeys, "contratTransfertExists")}
+{util::push($fieldsKeys, "ctSigneExists")}
+{util::push($fieldsKeys, "CourrierRestitutionExists")}
+{util::push($fieldsKeys, "allowBDCCreate")}
+{util::push($fieldsKeys, "allowAllBDCCreate")}
+{if ATF::$codename == "cleodis"}
+    {util::push($fieldsKeys, "ctSGEFExists")}
+{/if}
+{if ATF::$codename == "cleodisbe"}
+    {util::push($fieldsKeys, "ctlettreBelfiusExists")}
 {/if}
 
 {util::push($fieldsKeys, "envoiCourrierClassiqueExists")}
@@ -56,9 +56,8 @@ ATF.renderer.dateCleCommande = function(table, field) {
                             xtype: 'datefield',
                             format: 'd-m-Y',
                             width: 150,
-                            labelStyle: 'width:125px;' { if ATF::$codename == "midas" },
-                            disabled: true {
-                                /if}
+                            labelStyle: 'width:125px;'
+                            {if ATF::$codename == "midas"},disabled: true {/if}
                             },
                             items: [{
                                 id: "date_debut" + id,
@@ -198,7 +197,7 @@ ATF.renderer.dateCleCommande = function(table, field) {
 
                 html += '<a href="contratPV-' + id + '.pdf" target="_blank">';
                 html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('contratPV', 'commande');
-                html += '</a><br /><hr>'; 
+                html += '</a><br /><hr>';
             {/if}
             return '<div id="' + idDiv + '">' + html + '</div>';
         }
@@ -224,7 +223,7 @@ ATF.renderer.dateCleCommande = function(table, field) {
             {if ATF::$codename != "midas"}
                 html += '<a href="contratPV' + langue + '-' + id + '.pdf" target="_blank">';
                 html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('contratPV', 'commande') + ' (' + langue + ')';
-                html += '</a><br /><hr>'; 
+                html += '</a><br /><hr>';
             {/if}
             return '<div id="' + idDiv + '">' + html + '</div>';
         };
@@ -290,20 +289,20 @@ ATF.renderer.dateCleCommande = function(table, field) {
                     html += '<a href="commande-select-lettreSGEF-' + id + '.dl" target="_blank">';
                     html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('Contrat vente SGEF', 'commande');
                     html += '</a><br /><hr>';
-                } 
-                {util::push($fieldsKeys, "")} 
-            {/if} 
+                }
+                {util::push($fieldsKeys, "")}
+            {/if}
             {if ATF::$codename == "cleodisbe"}
                 if (record.data.ctlettreBelfiusExists == true) {
                     html += '<a href="commande-select-lettreBelfius-' + id + '.dl" target="_blank">';
                     html += '<img src="{ATF::$staticserver}images/icones/pdf.png" />' + ATF.usr.trans('Contrat vente Belfius', 'commande');
                     html += '</a><br /><hr>';
-                } 
+                }
             {/if}
 
 
             return '<div id="' + idDiv + '">' + html + '</div>';
-            
+
         }
     };
 
@@ -418,9 +417,9 @@ ATF.renderer.dateCleCommande = function(table, field) {
                                                 ['ctSigne', 'Contrat signé'],
                                                 ['CourrierRestitution', 'Courrier de restitution'],
                                                 { if ATF::$codename == "cleodis" }
-                                                    ['lettreSGEF', 'Contrat vente SGEF'] 
-                                                {/if} 
-                                                {if ATF::$codename == "cleodisbe"} 
+                                                    ['lettreSGEF', 'Contrat vente SGEF']
+                                                {/if}
+                                                {if ATF::$codename == "cleodisbe"}
                                                     ['lettreBelfius', 'Contrat vente Belfius']
                                                 {/if}
                                             ]
