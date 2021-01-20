@@ -2,12 +2,12 @@
 
 class site_associe extends classes_optima{
 
-    public function __construct() { 
+    public function __construct() {
         parent::__construct();
         $this->table = "site_associe";
 
         $this->colonnes['fields_column'] = array(
-           
+
             'site_associe.site_associe'
             ,'site_associe.code'
             ,'site_associe.steps_tunnel'
@@ -21,7 +21,8 @@ class site_associe extends classes_optima{
             ,'site_associe.color_footer'
             ,'site_associe.color_links'
             ,'site_associe.color_titles'
-           
+            ,'site_associe.id_societe_footer_mail'
+
         );
 
         $this->colonnes['primary'] = array(
@@ -38,15 +39,18 @@ class site_associe extends classes_optima{
             ,'color_footer'
             ,'color_links'
             ,'color_titles'
-		);
+            ,'id_societe_footer_mail'
+        );
+
+        $this->foreign_key['id_societe_footer_mail'] =  "societe";
 
         $this->fieldstructure();
 
     }
 
 
-   
-  
 
-	
+
+
+
 }
