@@ -46,7 +46,9 @@ class panier extends classes_optima{
 
 	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 
-		$this->q->addField("CONCAT(site_associe.url_front,'/',panier.panier)","url_direct_souscription")
+		$condition_select = "CASE RIGHT(site_associe.url_front,1) WHEN '/'  THEN  CONCAT(site_associe.url_front,panier.panier) ELSE CONCAT(site_associe.url_front,'/',panier.panier) END";
+
+		$this->q->addField($condition_select,"url_direct_souscription")
 				->addJointure("panier","id_client","site_associe","id_client");
 
 		return parent::select_all($order_by,$asc,$page,$count);
