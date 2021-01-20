@@ -2,8 +2,8 @@
 
 class panier extends classes_optima{
 
-	function __construct($table_or_id) { 
-		
+	function __construct($table_or_id) {
+
 		$this->table = "panier";
 
 		parent::__construct($table_or_id);
@@ -44,20 +44,19 @@ class panier extends classes_optima{
 
 	}
 
-	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) { 
-		
-		$this->q->addField("CONCAT(site_associe.url_front,'/',panier.panier)","url_direct_souscription")
+	public function select_all($order_by=false,$asc='desc',$page=false,$count=false) {
 
+		$this->q->addField("CONCAT(site_associe.url_front,'/',panier.panier)","url_direct_souscription")
 				->addJointure("panier","id_client","site_associe","id_client");
 
 		return parent::select_all($order_by,$asc,$page,$count);
 	}
-	
+
 
 	public function duplicatePanier($infos){
 		$panier = ATF::panier()->select($this->decryptId($infos['id_panier']));
 		$duplicatePanier = array(
-			'panier'=>$panier['panier']
+			'panier' => "Hashenattente"
 			,'date'=>date('Y-m-d h:i:s')
 			,'id_client'=>$panier['id_client']
 			,'num_client'=>$panier['num_client']
@@ -76,7 +75,8 @@ class panier extends classes_optima{
 			,'meelo_record_id'=>$panier['meelo_record_id']
 			,'meelo_record_url'=>$panier['meelo_record_url']
 		);
-		ATF::panier()->i($duplicatePanier);
+		$id = ATF::panier()->i($duplicatePanier);
+		ATF::panier()->u(array("id_panier"=> $id, "panier"=> $this->cryptId($id)));
 		ATF::$msg->addNotice('Panier '.$this->decryptId($infos['id_panier']).' dupliqué !');
 		return true;
 	}
