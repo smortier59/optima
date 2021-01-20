@@ -2630,15 +2630,17 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $suivi_description;
  			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"rib_client"))? "oui": "non";;
 
+
+
 			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"])->addOrder("date", 'DESC');
 			$comite = ATF::comite()->select_row();
 			if($comite){
-				$row_data[$key][] = ATF::refinanceur()->select($v["id_refinanceur"] , "refinanceur");
-				$row_data[$key][] = $v["date"];
-				$row_data[$key][] = $v["commentaire"];
-				$row_data[$key][] = $v["decisionComite"];
-				$row_data[$key][] = $v["validite_accord"];
-				$row_data[$key][] = $v["observations"];
+				$row_data[$key][] = ATF::refinanceur()->select($comite["id_refinanceur"] , "refinanceur");
+				$row_data[$key][] = $comite["date"];
+				$row_data[$key][] = $comite["commentaire"];
+				$row_data[$key][] = $comite["decisionComite"];
+				$row_data[$key][] = $comite["validite_accord"];
+				$row_data[$key][] = $comite["observations"];
 			} else {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
