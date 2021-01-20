@@ -1774,7 +1774,7 @@ class pdf_cleodis extends pdf {
 	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
 
 		$produit=ATF::produit()->select($id_produit);
-		
+
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
 		if ($produit['id_produit_puissance']) $d1 .= ATF::produit_puissance()->nom($produit['id_produit_puissance']).", ";
@@ -1881,7 +1881,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Left() {
-		
+
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -2272,7 +2272,7 @@ class pdf_cleodis extends pdf {
 
 
 	public function contratA4Signature($id){
-		
+
 		$this->contratA4($id,true,true);
 	}
 
@@ -2282,7 +2282,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
-		
+
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
@@ -3842,8 +3842,8 @@ class pdf_cleodis extends pdf {
 				}
 				$designation .= $i['produit']?$i['produit']:$produit['produit'];
 				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
-				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']); 
-                $designation .= $details; 
+				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
+                $designation .= $details;
 
 				$data[] = array(
 					$i['ref']
@@ -5485,9 +5485,8 @@ class pdf_cleodis extends pdf {
 		$this->addpage();
 
 		$this->setfont('arial','B',10);
-
 		if(ATF::$codename == "bdomplus"){
-			$this->image($this->logo,5,5,45);
+			$this->image(__PDF_PATH__."/".$this->logo,5,5,45);
 		}else{
 			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,5,45);
 
@@ -8715,7 +8714,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function contratA4Signature($id){
-		
+
 		if($this->affaire["langue"] === "NL"){
 			$this->contratA4NL($id,true,true);
 		}else{
@@ -8883,7 +8882,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
-         
+
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
@@ -10448,7 +10447,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @param int $id Identifiant bon de commande
 	*/
 	public function bon_de_commande($id,$s) {
-        
+
 		if($this->affaire["langue"] !== "NL"){
 			parent::bon_de_commande($id, $s);
 
