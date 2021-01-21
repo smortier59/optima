@@ -73,14 +73,14 @@ class souscription_cleodis extends souscription {
       break;
 
       case 'dib':
-        ATF::societe()->q->reset()->where("siret", "45307981600048");
+        ATF::societe()->q->reset()->where("siret", "42268731900059");
         $cleodis = ATF::societe()->select_row();
 
         $this->id_partenaire = $cleodis["id_societe"];
       break;
 
       case 'haccp':
-        ATF::societe()->q->reset()->where("siret", "45307981600048");
+        ATF::societe()->q->reset()->where("siret", "31007041200062");
         $cleodis = ATF::societe()->select_row();
 
         $this->id_partenaire = $cleodis["id_societe"];
