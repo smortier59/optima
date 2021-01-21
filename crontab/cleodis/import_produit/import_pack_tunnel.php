@@ -45,9 +45,9 @@ echo "========= DEBUT DE SCRIPT =========\n";
 	import_ligne($data["lignes_ok"], $packs, $produits);
 
 // Rollback la transaction
-ATF::db()->rollback_transaction();
+//ATF::db()->rollback_transaction();
 // Valide la trnasaction
-//ATF::db()->commit_transaction();
+ATF::db()->commit_transaction();
 echo "========= FIN DE SCRIPT =========\n";
 
 /**
@@ -122,7 +122,8 @@ function import_produit($data){
 				}
 
 				$produit["id_produit"] = ATF::produit()->i($produit);
-				$produits[$ligne[0]] = $produit["id_produit"];
+				$ligne[0] = $produit["id_produit"];
+				$produits[] = $ligne;
 				echo "Produit insert (name : ".$product.", type: ".$produit['type'].", ref:".$ref.", fournisseur:".$raw_Fournisseur.") \n";
 
 				if (strtolower($ligne[0]) == "livraison") {
@@ -237,7 +238,7 @@ function import_ligne($lignes_ok, $packs, $produits){
 			$fournisseur = $ligne[14];
 
 			$id_pack_produit = $packs[$id]["id_pack_produit"];
-			$id_produit = $produits[$ligne[1]];
+			//$id_produit = $produits[$ligne[1]];
 
 			ATF::produit()->q->reset()
 				->select('id_produit')
@@ -246,22 +247,24 @@ function import_ligne($lignes_ok, $packs, $produits){
 				->where("id_fournisseur", get_fournisseur($fournisseur));
 			$produit = ATF::produit()->select_row();
 
+
+
+
 			if (!$produit) {
 				var_dump($ligne);
 				var_dump($produit);
 				echo "Produit non trouve non plus dans \$produit ! " . $reference." => Pack n  ".$ligne[1]." abandonn  \n";
+
+				ATF::produit()->q->setToString();
+				echo ATF::produit()->select_row();
+
 				continue;
 				//throw new errorATF("Produit non trouve non plus dans \$produit ! " . $id." => Pack n  ".$ligne[0]." abandonn  \n");
 			}
 
-			if (!$id_produit) {
-				$id_produit = $produit["id_produit"];
-				echo "Produit non trouve ! " . $reference." => Pack n°".$ligne[1].", du coup on prend le id_produit=".$id_produit."\n";
-				//continue;
-			}
 
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
-												 ->where("id_produit", $id_produit)
+												 ->where("id_produit", $produit["id_produit"])
 												 ->where("id_fournisseur", $produit["id_fournisseur"]);
 			$l = ATF::pack_produit_ligne()->select_row();
 
@@ -269,8 +272,8 @@ function import_ligne($lignes_ok, $packs, $produits){
 			$pack_produit_ligne = array(
 				"principal"=>$principal,
 				"id_pack_produit"=>$id_pack_produit,
-				"id_produit"=>$id_produit,
-				"produit"=>ATF::produit()->select($id_produit , "produit"),
+				"id_produit"=> $produit["id_produit"],
+				"produit"=>ATF::produit()->select($produit["id_produit"] , "produit"),
 				"quantite"=>$quantity,
 				"min"=>$min,
 				"max"=>$max,
@@ -490,9 +493,6 @@ function nettoyage_pack_produit_ligne($path){
 
 
 	$pack_to_exclude = pack_to_exclude($path."/ligne.csv", $produits_ok_nok);
-
-	log::logger("Pack to exclude", "mfleurquin");
-	log::logger($pack_to_exclude, "mfleurquin");
 
 	$lignes_ok = clean_ligne($path."/ligne.csv" , $pack_to_exclude);
 	$packs_ok = clean_pack($path."/pack.csv" , $pack_to_exclude);
