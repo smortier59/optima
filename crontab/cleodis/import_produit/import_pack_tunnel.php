@@ -41,13 +41,13 @@ echo "========= DEBUT DE SCRIPT =========\n";
 // Gestion des packs
 	$packs = import_pack($data["packs_ok"]);
 
-// Ajout des liaison entre les deux
+	// Ajout des liaison entre les deux
 	import_ligne($data["lignes_ok"], $packs, $produits);
 
 // Rollback la transaction
-//ATF::db()->rollback_transaction();
-// Valide la trnasaction
 ATF::db()->rollback_transaction();
+// Valide la trnasaction
+//ATF::db()->commit_transaction();
 echo "========= FIN DE SCRIPT =========\n";
 
 /**
@@ -488,7 +488,12 @@ function nettoyage_pack_produit_ligne($path){
 
 	$produits_ok_nok = clean_produit_existant($path."/produit.csv");
 
+
 	$pack_to_exclude = pack_to_exclude($path."/ligne.csv", $produits_ok_nok);
+
+	log::logger("Pack to exclude", "mfleurquin");
+	log::logger($pack_to_exclude, "mfleurquin");
+
 	$lignes_ok = clean_ligne($path."/ligne.csv" , $pack_to_exclude);
 	$packs_ok = clean_pack($path."/pack.csv" , $pack_to_exclude);
 
@@ -538,9 +543,14 @@ function clean_ligne($path, $pack_to_exclude){
 			$lines_count++;
 			if (!$ligne[0]) continue; // pas d'ID pas de chocolat
 
-			if(!array_key_exists($ligne[1], $pack_to_exclude )){
-				$packs_ok[] = $ligne;
+			if(!empty($pack_to_exclude)){
+				if (!array_key_exists($ligne[1], $pack_to_exclude)) {
+					$lignes_ok[] = $ligne;
+				}
+			}else {
+				$lignes_ok[] = $ligne;
 			}
+
 
 
 		}
