@@ -213,7 +213,7 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
 
-    $this->files["logo"] = array("type"=>"png","no_upload"=>false,"no_generate"=>true);
+    $this->files["logo"] = array("type"=>"jpg","no_upload"=>false,"no_generate"=>true);
 
 
 
@@ -247,7 +247,6 @@ class societe_cleodis extends societe {
 
 
   }
-
 
 
   /** Fonction qui génère les résultat pour les champs d'auto complétion société pour CLEOSCOPE
