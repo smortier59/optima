@@ -1,139 +1,181 @@
-"N°";"Nom";"Etat";"Site associé";"Visible sur le site";"Description"
-<<<<<<< HEAD
-1;"Aspirateur traineau Laveur THOMAS Parkett Master XT";"actif";"boulangerpro";"Oui";"Aspirateur traineau Laveur THOMAS Parkett Master XT"
-2;"Plancha ENO Oceane 65 3 feux";"actif";"boulangerpro";"Oui";"Plancha ENO Oceane 65 3 feux"
-3;"Tablette CROSSCALL CORE T4";"actif";"boulangerpro";"Oui";"Tablette CROSSCALL CORE T4"
-4;"Plancha ENO Chambord 60 2 feux";"actif";"boulangerpro";"Oui";"Plancha ENO Chambord 60 2 feux"
-5;"Expresso broyeur NIVONA NICR680 Cafe aromatica";"actif";"boulangerpro";"Oui";"Expresso broyeur NIVONA NICR680 Cafe aromatica"
-6;"Expresso broyeur NIVONA NICR759 Cafe aromatica";"actif";"boulangerpro";"Oui";"Expresso broyeur NIVONA NICR759 Cafe aromatica"
-7;"Ecran VIEWSONIC VX3258-2KPC-MHD";"actif";"boulangerpro";"Oui";"Ecran VIEWSONIC VX3258-2KPC-MHD"
-8;"Table cuisson induction SMEG SI2741D";"actif";"boulangerpro";"Oui";"Table cuisson induction SMEG SI2741D"
-9;"Expresso broyeur NIVONA NICR520 Cafe aromatica";"actif";"boulangerpro";"Oui";"Expresso broyeur NIVONA NICR520 Cafe aromatica"
-10;"TV ESSENTIELB 50UHD-1291-Smart";"actif";"boulangerpro";"Oui";"TV ESSENTIELB 50UHD-1291-Smart"
-11;"Cuisinière mixte SAUTER SCG1553W";"actif";"boulangerpro";"Oui";"Cuisinière mixte SAUTER SCG1553W"
-12;"Four pyrolyse SMEG SFP6401TVN1";"actif";"boulangerpro";"Oui";"Four pyrolyse SMEG SFP6401TVN1"
-13;"Four pyrolyse SMEG SFP6401TVX1";"actif";"boulangerpro";"Oui";"Four pyrolyse SMEG SFP6401TVX1"
-14;"Lave vaisselle intégrable 60cm BOSCH SMI46AW04E";"actif";"boulangerpro";"Oui";"Lave vaisselle intégrable 60cm BOSCH SMI46AW04E"
-15;"Lave vaisselle intégrable 60cm BOSCH SMI46AS04E";"actif";"boulangerpro";"Oui";"Lave vaisselle intégrable 60cm BOSCH SMI46AS04E"
-16;"Vidéoprojecteur NEBULA Apollo";"actif";"boulangerpro";"Oui";"Vidéoprojecteur NEBULA Apollo"
-17;"Lave vaisselle tout-intégrable 45cm ELECTROLUX ESL4510LO";"actif";"boulangerpro";"Oui";"Lave vaisselle tout-intégrable 45cm ELECTROLUX ESL4510LO"
-18;"Ecran VIEWSONIC XG270";"actif";"boulangerpro";"Oui";"Ecran VIEWSONIC XG270"
-19;"Portable ACER Aspire A315-54K-5516 Rouge";"actif";"boulangerpro";"Oui";"Portable ACER Aspire A315-54K-5516 Rouge"
-20;"Hotte décorative FALMEC VERSO1220";"actif";"boulangerpro";"Oui";"Hotte décorative FALMEC VERSO1220"
-21;"Ordinateur LENOVO ideacentre 510A-15ARR 847";"actif";"boulangerpro";"Oui";"Ordinateur LENOVO ideacentre 510A-15ARR 847"
-22;"Table cuisson induction SMEG SIM1643DS";"actif";"boulangerpro";"Oui";"Table cuisson induction SMEG SIM1643DS"
-23;"Vidéoprojecteur NEBULA MARS II Pro";"actif";"boulangerpro";"Oui";"Vidéoprojecteur NEBULA MARS II Pro"
-24;"Caméra 360° INSTA360 INS-ONE-R-1INCH";"actif";"boulangerpro";"Oui";"Caméra 360° INSTA360 INS-ONE-R-1INCH"
-25;"Lave linge hublot SAMSUNG WW90K5410UX/EF";"actif";"boulangerpro";"Oui";"Lave linge hublot SAMSUNG WW90K5410UX/EF"
-26;"Lave vaisselle tout-intégrable 60cm KITCHENAID KDSCM82140";"actif";"boulangerpro";"Oui";"Lave vaisselle tout-intégrable 60cm KITCHENAID KDSCM82140"
-27;"Lave linge hublot INDESIT BIWMWG91484FR";"actif";"boulangerpro";"Oui";"Lave linge hublot INDESIT BIWMWG91484FR"
-28;"Lave vaisselle tout-intégrable 60cm ELECTROLUX EEC767305L Comfortlift";"actif";"boulangerpro";"Oui";"Lave vaisselle tout-intégrable 60cm ELECTROLUX EEC767305L Comfortlift"
-29;"TV SONY KD43XH8096";"actif";"boulangerpro";"Oui";"TV SONY KD43XH8096"
-30;"Cuisinière SMEG CO68GMA8";"actif";"boulangerpro";"Oui";"Cuisinière SMEG CO68GMA8"
-31;"Ecran VIEWSONIC XG270QG";"actif";"boulangerpro";"Oui";"Ecran VIEWSONIC XG270QG"
-32;"Four pyrolyse ROSIERES RFDP0507PNI";"actif";"boulangerpro";"Oui";"Four pyrolyse ROSIERES RFDP0507PNI"
-33;"TV SONY KD49XH8096";"actif";"boulangerpro";"Oui";"TV SONY KD49XH8096"
-34;"Four Vapeur ROSIERES RFZP0X976IN";"actif";"boulangerpro";"Oui";"Four Vapeur ROSIERES RFZP0X976IN"
-35;"Vidéoprojecteur OPTOMA HD29HLV";"actif";"boulangerpro";"Oui";"Vidéoprojecteur OPTOMA HD29HLV"
-36;"TV SONY KD55XH8096";"actif";"boulangerpro";"Oui";"TV SONY KD55XH8096"
-37;"Table cuisson induction SMEG SIM1963DS";"actif";"boulangerpro";"Oui";"Table cuisson induction SMEG SIM1963DS"
-38;"LV FULL INT 90 ASKO DFI644GXXL";"actif";"boulangerpro";"Oui";"LV FULL INT 90 ASKO DFI644GXXL"
-39;"Vidéoprojecteur OPTOMA HD29HST";"actif";"boulangerpro";"Oui";"Vidéoprojecteur OPTOMA HD29HST"
-40;"Vidéoprojecteur EPSON EF-100WATV";"actif";"boulangerpro";"Oui";"Vidéoprojecteur EPSON EF-100WATV"
-41;"Combiné LIEBHERR CBN4835-20";"actif";"boulangerpro";"Oui";"Combiné LIEBHERR CBN4835-20"
-42;"Hotte décorative FALMEC PLANE2430";"actif";"boulangerpro";"Oui";"Hotte décorative FALMEC PLANE2430"
-43;"Vidéoprojecteur LG HU70LS";"actif";"boulangerpro";"Oui";"Vidéoprojecteur LG HU70LS"
-44;"Combiné SMEG FAB38RBL";"actif";"boulangerpro";"Oui";"Combiné SMEG FAB38RBL"
-45;"Combiné SMEG FAB38LCR";"actif";"boulangerpro";"Oui";"Combiné SMEG FAB38LCR"
-46;"Vidéoprojecteur LG HU80KS";"actif";"boulangerpro";"Oui";"Vidéoprojecteur LG HU80KS"
-47;"Portable MACBOOK CTO Pro 16' i7 2.6ghz 16go 1To SSD Gris";"actif";"boulangerpro";"Oui";"Portable MACBOOK CTO Pro 16' i7 2.6ghz 16go 1To SSD Gris"
-48;"Portable MACBOOK CTO Pro 16' i9 2.4ghz 32go 1To SSD Gris";"actif";"boulangerpro";"Oui";"Portable MACBOOK CTO Pro 16' i9 2.4ghz 32go 1To SSD Gris"
-49;"Vidéoprojecteur LG HU85LS";"actif";"boulangerpro";"Oui";"Vidéoprojecteur LG HU85LS"
-=======
-1;"Réfrigérateur 2 portes Vent HISENSE RT417N4DC1";"actif";"boulangerpro";"Oui";"Sa fabrique de glaçons pratique en été"
-2;"Portable ACER Aspire A315-54K-35BP";"actif";"boulangerpro";"Oui";"Portable ACER Aspire A315-54K-35BP"
-3;"Portable HP 15-db0121nf Noir";"actif";"boulangerpro";"Oui";"Portable HP 15-db0121nf Noir"
-4;"Combiné GORENJE NRK11PWJ";"actif";"boulangerpro";"Oui";"IonAir avec MultiFlow 360° : un microclimat idéal sur chaque clayette"
-5;"Ecran IIYAMA XUB2792UHSU-B1";"actif";"boulangerpro";"Oui";"Ecran IIYAMA XUB2792UHSU-B1"
-6;"Portable LENOVO Ideapad 330-17AST-751";"actif";"boulangerpro";"Oui";"Portable LENOVO Ideapad 330-17AST-751"
-7;"Portable ACER Aspire A315-34-P4Q6  Noir";"actif";"boulangerpro";"Oui";"Portable ACER Aspire A315-34-P4Q6  Noir"
-8;"Portable HP 14s-dq0001nf";"actif";"boulangerpro";"Oui";"Portable HP 14s-dq0001nf"
-9;"Portable HP 15-dw0009nf";"actif";"boulangerpro";"Oui";"Portable HP 15-dw0009nf"
-10;"Portable ORDISSIMO Julia 2 ART0405";"actif";"boulangerpro";"Oui";"Portable ORDISSIMO Julia 2 ART0405"
-11;"Combiné LG GBP31SWLZN";"actif";"boulangerpro";"Oui";"Combiné LG GBP31SWLZN"
-12;"Portable HP 17-ca0000nf";"actif";"boulangerpro";"Oui";"Portable HP 17-ca0000nf"
-13;"Combiné LG GBP30DSLZN";"actif";"boulangerpro";"Oui";"Combiné LG GBP30DSLZN"
-14;"Robot KITCHENAID 5KSM175PSEGA Vert Pomme";"actif";"boulangerpro";"Oui";"La qualité Kitchenaid à votre service !"
-15;"Réfrigérateur 2 portes Vent HOTPOINT ENXTM 18221 F";"actif";"boulangerpro";"Oui";"Réfrigérateur 2 portes Vent HOTPOINT ENXTM 18221 F"
-16;"Lave linge hublot DAEWOO DWD PSB2232";"actif";"boulangerpro";"Oui";"Lave linge hublot DAEWOO DWD PSB2232"
-17;"Four pyrolyse SIEMENS HB675G0S1";"actif";"boulangerpro";"Oui";"Four pyrolyse SIEMENS HB675G0S1"
-18;"Portable LENOVO Ideapad S145-15API-221";"actif";"boulangerpro";"Oui";"Portable LENOVO Ideapad S145-15API-221"
-19;"Portable HP Pavilion 15-bc501nf";"actif";"boulangerpro";"Oui";"Portable HP Pavilion 15-bc501nf"
-20;"Plancha LE MARQUIER Exception Pakita 4105 Inox";"actif";"boulangerpro";"Oui";"Plancha LE MARQUIER Exception Pakita 4105 Inox"
-21;"Ordinateur ORDISSIMO Tout en un 20' tactile a";"actif";"boulangerpro";"Oui";"Ordinateur ORDISSIMO Tout en un 20' tactile a"
-22;"Réfrigérateur américain SAMSUNG RS68N86F0S9";"actif";"boulangerpro";"Oui";"Réfrigérateur américain SAMSUNG RS68N86F0S9"
-23;"Aspirateur balai MIELE Triflex HX1 gris";"actif";"boulangerpro";"Oui";"Aspirateur balai MIELE Triflex HX1 gris"
-24;"Plancha ESSENTIELB EPGZ1 à poser";"actif";"boulangerpro";"Oui";"Performance de la fonte émaillée, combinée aux bruleurs en ""U"". Confort du capot inclus et de la grande surface de cuisson"
-25;"Four SMEG SF64M3DX";"actif";"boulangerpro";"Oui";"Four SMEG SF64M3DX"
-26;"Lave linge hublot HISENSE WFER1014VA";"actif";"boulangerpro";"Oui";"Lave linge hublot HISENSE WFER1014VA"
-27;"Lave linge hublot INDESIT BIWMIL91484EU";"actif";"boulangerpro";"Oui";"Lave linge hublot INDESIT BIWMIL91484EU"
-28;"Table cuisson induction GORENJE IS846BG";"actif";"boulangerpro";"Oui";"Table cuisson induction GORENJE IS846BG"
-29;"Lave vaisselle tout-intégrable 60cm BOSCH SMV46NX03E";"actif";"boulangerpro";"Oui";"Lave vaisselle tout-intégrable 60cm BOSCH SMV46NX03E"
-30;"Lave vaisselle intégrable 60cm GORENJE GV66167";"actif";"boulangerpro";"Oui";"Lave vaisselle intégrable 60cm GORENJE GV66167"
-31;"Disque SAMSUNG Portable T7 Touch 2To Silver";"actif";"boulangerpro";"Oui";"Disque SAMSUNG Portable T7 Touch 2To Silver"
-32;"Disque SAMSUNG Portable T7 Touch 2To Noir";"actif";"boulangerpro";"Oui";"Disque SAMSUNG Portable T7 Touch 2To Noir"
-33;"TV SAMSUNG UE50TU7125";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE50TU7125"
-34;"Aspirateur balai MIELE Triflex HX1 Performance";"actif";"boulangerpro";"Oui";"Aspirateur balai MIELE Triflex HX1 Performance"
-35;"TV SAMSUNG UE43TU8005";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE43TU8005"
-36;"Caméra 360° INSTA360 INS-ONE-R-TWIN";"actif";"boulangerpro";"Oui";"Caméra 360° INSTA360 INS-ONE-R-TWIN"
-37;"Robot MOULINEX Companion XL gris 1550W HF80CB10";"actif";"boulangerpro";"Oui";"Robot MOULINEX Companion XL gris 1550W HF80CB10"
-38;"TV SONY KD43X7056";"actif";"boulangerpro";"Oui";"TV SONY KD43X7056"
-39;"TV SAMSUNG UE50TU8005";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE50TU8005"
-40;"TV SAMSUNG UE55TU7125";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE55TU7125"
-41;"TV SAMSUNG UE55TU8005";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE55TU8005"
-42;"Micro-ondes encastrable GORENJE BCM598S18X";"actif";"boulangerpro";"Oui";"Micro-ondes encastrable GORENJE BCM598S18X"
-43;"TV SONY KD49X7056";"actif";"boulangerpro";"Oui";"TV SONY KD49X7056"
-44;"Sèche-linge hublot SAMSUNG DV90M52001W";"actif";"boulangerpro";"Oui";"Sèche-linge hublot SAMSUNG DV90M52001W"
-45;"Expresso broyeur DELONGHI ESAM 420.80.TB";"actif";"boulangerpro";"Oui";"Expresso broyeur DELONGHI ESAM 420.80.TB"
-46;"Réfrigérateur intégrable TU LIEBHERR IK2710-001";"actif";"boulangerpro";"Oui";"Réfrigérateur intégrable TU LIEBHERR IK2710-001"
-47;"Lave linge séchant hublot SAMSUNG WD90K5B10OW";"actif";"boulangerpro";"Oui";"Lave linge séchant hublot SAMSUNG WD90K5B10OW"
-48;"Four Vapeur GORENJE BCS798S24X";"actif";"boulangerpro";"Oui";"Four Vapeur GORENJE BCS798S24X"
-49;"TV SAMSUNG QE43Q60T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE43Q60T"
-50;"TV SONY KD55X7056";"actif";"boulangerpro";"Oui";"TV SONY KD55X7056"
-51;"Robot MOULINEX connect I-Companion XL YY4418FD";"actif";"boulangerpro";"Oui";"Robot MOULINEX connect I-Companion XL YY4418FD"
-52;"TV SAMSUNG UE65TU7125";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE65TU7125"
-53;"TV SAMSUNG QE50Q60T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE50Q60T"
-54;"Micro-ondes encastrable GORENJE BCMS598S19X";"actif";"boulangerpro";"Oui";"Micro-ondes encastrable GORENJE BCMS598S19X"
-55;"TV SONY KD65X7056";"actif";"boulangerpro";"Oui";"TV SONY KD65X7056"
-56;"TV SAMSUNG UE65TU8005";"actif";"boulangerpro";"Oui";"TV SAMSUNG UE65TU8005"
-57;"TV SAMSUNG THE FRAME QE43LS03T 2020";"actif";"boulangerpro";"Oui";"TV SAMSUNG THE FRAME QE43LS03T 2020"
-58;"Robot MOULINEX I Companion XL TOUCH HF938E00";"actif";"boulangerpro";"Oui";"Robot MOULINEX I Companion XL TOUCH HF938E00"
-59;"TV SAMSUNG QE55Q75T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE55Q75T"
-60;"TV SAMSUNG The Serif QE43LS01 Bleu";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Serif QE43LS01 Bleu"
-61;"TV SAMSUNG The Serif QE43LS01 Blanc";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Serif QE43LS01 Blanc"
-62;"Combiné BOSCH KGN86Ai4P";"actif";"boulangerpro";"Oui";"Combiné BOSCH KGN86Ai4P"
-63;"Four SMEG SF4920VCN1";"actif";"boulangerpro";"Oui";"Four SMEG SF4920VCN1"
-64;"TV SAMSUNG The Serif QE49LS01T Blanc";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Serif QE49LS01T Blanc"
-65;"TV SAMSUNG The Serif QE49LS01T Bleu";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Serif QE49LS01T Bleu"
-66;"TV SAMSUNG The Frame QE50LS03T 2020";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Frame QE50LS03T 2020"
-67;"Four SMEG SF4102VCS";"actif";"boulangerpro";"Oui";"Four SMEG SF4102VCS"
-68;"Four SMEG SF4104VCN";"actif";"boulangerpro";"Oui";"Four SMEG SF4104VCN"
-69;"Table cuisson gaz SMEG PXL675L";"actif";"boulangerpro";"Oui";"Table cuisson gaz SMEG PXL675L"
-70;"TV SAMSUNG QE49Q80T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE49Q80T"
-71;"TV SAMSUNG The Frame 2020 QE55LS03T";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Frame 2020 QE55LS03T"
-72;"TV SAMSUNG The Serif QE55LS01T Blanc";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Serif QE55LS01T Blanc"
-73;"TV SAMSUNG The Serif QE55LS01T Bleu";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Serif QE55LS01T Bleu"
-74;"TV SAMSUNG QE55Q80T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE55Q80T"
-75;"Combiné LIEBHERR CNef5735-20";"actif";"boulangerpro";"Oui";"Combiné LIEBHERR CNef5735-20"
-76;"Four pyrolyse SMEG SFP6104SPS";"actif";"boulangerpro";"Oui";"Four pyrolyse SMEG SFP6104SPS"
-77;"TV SAMSUNG QE65Q75T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE65Q75T"
-78;"Hotte décorative FALMEC MATERIA2510";"actif";"boulangerpro";"Oui";"Hotte décorative FALMEC MATERIA2510"
-79;"TV SAMSUNG QE55Q95T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE55Q95T"
-80;"TV SAMSUNG The Frame 2020 QE65LS03T";"actif";"boulangerpro";"Oui";"TV SAMSUNG The Frame 2020 QE65LS03T"
-81;"TV SAMSUNG QE65Q80T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE65Q80T"
-82;"Four SMEG SF4106WVCPS";"actif";"boulangerpro";"Oui";"Four SMEG SF4106WVCPS"
-83;"Four SMEG SF4604PVCNR1";"actif";"boulangerpro";"Oui";"Four SMEG SF4604PVCNR1"
-84;"TV SAMSUNG QE65Q95T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE65Q95T"
-85;"TV SAMSUNG QE65Q800T 8K";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE65Q800T 8K"
-86;"TV SAMSUNG QE65Q950T";"actif";"boulangerpro";"Oui";"TV SAMSUNG QE65Q950T"
->>>>>>> import-2020-03-05-ok
+﻿N°;Nom;Etat;Site associé;Visible sur le site;Description
+1;Imprimante Laser Mono Lexmark MS621dn;actif;locevo;Oui;"<p><strong>Fonction</strong>: Laser monochrome, &Eacute;cran LCD couleur de 2,4 pouces (60 mm)</p>
+<p><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche Return Programme 6 000* pages</p>
+<p><strong>Processeur:</strong> Dual Core, 1.0 MHz</p>
+<p><strong>Impression recto-verso:</strong> Duplex Int&eacute;gr&eacute;</p>
+<p><strong>Disque Dur:</strong> non disponible</p>
+<p><strong>Direct USB:</strong> Oui</p>
+<p><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 47 pages par minute&nbsp;1)</p>
+<p><strong>Temps de sortie de la premi&egrave;re page (noir): </strong>Inf&eacute;rieur &agrave; 6 secondes&nbsp;<sup>1)</sup></p>
+<p><strong>M&eacute;moire, standard:</strong> 512 Mo</p>
+<p><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 175000 Impressions par mois (volume maximum en utilisation ponctuelle)&nbsp;<sup>2)</sup></p>
+<p><strong>Volume mensuel de pages recommand&eacute;:</strong> 2000 - 20000 pages&nbsp;<sup>2)</sup></p>
+<p><strong>Ecran tactile:</strong> Non</p>
+<p><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 650 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le """"Cycle de service mensuel maximal"""" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. """"Volume mensuel recommand&eacute;"""" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. """"Maximum Monthly Duty Cycle"""" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. """"Recommended Monthly Page Volume"""" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>
+<p>&nbsp;</p>"
+2;Imprimante Laser Mono Lexmark MS823dn;actif;locevo;Oui;"<p><strong>Fonction:</strong> Laser monochrome, &Eacute;cran LCD couleur de 2,4 pouces (60 mm)</p>
+<p><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche de toner &agrave; programme de retour Starter de 11 000 * pages</p>
+<p><strong>Processeur:</strong> Dual Core, 1.0 MHz</p>
+<p><strong>Impression recto-verso:</strong> Duplex Int&eacute;gr&eacute;</p>
+<p><strong>Disque Dur:</strong> Option disponible</p>
+<p><strong>Direct USB:</strong> Oui</p>
+<p><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 61 pages par minute&nbsp;<sup>1)</sup></p>
+<p><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 4.2 secondes&nbsp;1)</p>
+<p><strong>M&eacute;moire, standard:</strong> 512 Mo</p>
+<p><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 300000 Impressions par mois (volume maximum en utilisation ponctuelle)&nbsp;<sup>2)</sup></p>
+<p><strong>Volume mensuel de pages recommand&eacute;:</strong> 5000 - 75000 pages&nbsp;<sup>2)</sup></p>
+<p><strong>Ecran tactile:</strong> Non</p>
+<p><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 650 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>
+<p>&nbsp;</p>"
+3;Imprimante Laser Couleur Lexmark MX622ade;actif;locevo;Oui;"<p><strong>Fonction:</strong> Laser monochrome, &Eacute;cran couleur tactile ""e-Task"" 17,8 cm de Lexmark, Impression, Num&eacute;risation r&eacute;seau, Envoi de fax, Copier, Num&eacute;risation couleur<br /><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche Return Programme 6 000* pages<br /><strong>Processeur:</strong> Quad Core, 1.2 MHz<br /><strong>Impression recto-verso:</strong> Duplex Int&eacute;gr&eacute;<br /><strong>Disque Dur:</strong> Option disponible<br /><strong>Direct USB:</strong> Oui<br /><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 47 pages par minute&nbsp;<sup>1)</sup><br /><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 6 secondes&nbsp;<sup>1)</sup><br /><strong>M&eacute;moire, standard:</strong> 2048 Mo<br /><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 175000 Impressions par mois (volume maximum en utilisation ponctuelle)&nbsp;2)<br /><strong>Volume mensuel de pages recommand&eacute;:</strong> 2000 - 20000 pages&nbsp;<sup>2)</sup><br /><strong>Ecran tactile:</strong> Oui<br /><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 650 feuilles (75 g/m&sup2;)</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+4;Imprimante Laser Couleur Lexmark MX722ade;actif;locevo;Oui;"<p><strong>Fonction:</strong> Laser monochrome, &Eacute;cran couleur tactile ""e-Task"" 17,8 cm de Lexmark, Impression, Num&eacute;risation r&eacute;seau, Envoi de fax, Copier, Num&eacute;risation couleur</p>
+<p><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche de toner &agrave; programme de retour Starter de 11 000 * pages</p>
+<p><strong>Processeur: </strong>Quad Core, 1.2 MHz</p>
+<p><strong>Impression recto-verso: </strong>Duplex Int&eacute;gr&eacute;</p>
+<p><strong>Disque Dur:</strong> Option disponible</p>
+<p><strong>Direct USB:</strong> Oui</p>
+<p><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 66 pages par minute&nbsp;<sup>1)</sup></p>
+<p><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 4.0 secondes&nbsp;<sup>1)</sup></p>
+<p><strong>M&eacute;moire, standard:</strong> 2048 Mo</p>
+<p><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 350000 Impressions par mois (volume maximum en utilisation ponctuelle)&nbsp;2)</p>
+<p><strong>Volume mensuel de pages recommand&eacute;:</strong> 5000 - 100000 pages&nbsp;<sup>2)</sup></p>
+<p><strong>Ecran tactile:</strong> Oui</p>
+<p><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 650 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+5;Multifonction Laser Mono Lexmark MX822ade;actif;locevo;Oui;"<p><strong>Fonction: </strong>Laser monochrome, Ecran tactile couleur Lexmark e-Task de 10 pouces (25 cm), Impression, Num&eacute;risation r&eacute;seau, Envoi de fax, Copier, Num&eacute;risation couleur<br /><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche de toner &agrave; programme de retour Starter de 11 000 * pages<br /><strong>Processeur:</strong> Quad Core, 1.2 MHz<br /><strong>Impression recto-verso: </strong>Duplex Int&eacute;gr&eacute;<br /><strong>Disque Dur:</strong> Compris dans la configuration<br /><strong>Direct USB:</strong> Oui<br /><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 52 pages par minute <sup>1)</sup><br /><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 4.5 secondes <sup>1)</sup><br /><strong>M&eacute;moire, standard:</strong> 2048 Mo<br /><strong>Cycle d'utilisation mensuel maximum :&nbsp;</strong> jusqu'&agrave; 300000 Impressions par mois (volume maximum en utilisation ponctuelle) <sup>2)</sup><br /><strong>Volume mensuel de pages recommand&eacute;:</strong> 3000 - 50000 pages <sup>2)</sup><br /><strong>Ecran tactile:</strong> Oui<br /><strong>Capacit&eacute; de chargement papier, standard:&nbsp;</strong> Jusqu'&agrave; 1200 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+6;Multifonction Laser Mono Lexmark CS720de;actif;locevo;Oui;"<p><strong>Fonction:</strong> Laser monochrome, Ecran tactile couleur Lexmark e-Task de 10&nbsp;pouces (25&nbsp;cm), Impression, Num&eacute;risation r&eacute;seau, Envoi de fax, Copier, Num&eacute;risation couleur</p>
+<p><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche de toner &agrave; programme de retour Starter de 11 000 * pages</p>
+<p><strong>Processeur:</strong> Quad Core, 1.2 MHz - Impression recto-verso: Duplex Int&eacute;gr&eacute;</p>
+<p><strong>Disque Dur:</strong> Compris dans la configuration</p>
+<p><strong>Direct USB:</strong> Oui</p>
+<p><strong>Vitesse d'impression (A4, noir):&nbsp;</strong> Jusqu'&agrave; 52 pages par minute&nbsp;<sup>1)</sup></p>
+<p><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 4.5 secondes&nbsp;<sup>1)</sup></p>
+<p><strong>M&eacute;moire, standard:</strong> 2048 Mo</p>
+<p><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 300000 Impressions par mois (volume maximum en utilisation ponctuelle)&nbsp;<sup>2)</sup></p>
+<p><strong>Volume mensuel de pages recommand&eacute;:</strong> 3000 - 50000 pages&nbsp;<sup>2)</sup></p>
+<p><strong>Ecran tactile: </strong>Oui</p>
+<p><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 1200 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+7;Multifonction Laser Mono Lexmark CS725de;actif;locevo;Oui;"<p><strong>Fonction:</strong> Laser Couleur, &Eacute;cran couleur tactile ""e-Task"" 10,9 cm de Lexmark, Impression couleur<br /><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouches Return Programme noir et couleur 7 000* pages<br /><strong>Impression recto-verso:</strong> Duplex Int&eacute;gr&eacute;<br /><strong>Disque Dur:</strong> Option disponible<br /><strong>Direct USB:</strong> Oui<br /><strong>Vitesse d'impression (A4, noir):&nbsp;</strong> Jusqu'&agrave; 47 pages par minute <sup>1)</sup><br /><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 5.0 secondes <sup>1)</sup><br /><strong>Vitesse d'impression (A4, couleur):</strong>&nbsp; Jusqu'&agrave; 47 pages par minute <sup>1)</sup><br /><strong>M&eacute;moire, standard:</strong> 1024 Mo<br /><strong>Cycle d'utilisation mensuel maximum :&nbsp;</strong> jusqu'&agrave; 150000 Impressions par mois (volume maximum en utilisation ponctuelle) <sup>2)</sup><br /><strong>Volume mensuel de pages recommand&eacute;:</strong> 2000 - 20000 pages <sup>2)</sup><br /><strong>Ecran tactile:</strong> Oui<br /><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 650 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+8;Multifunction Laser Couleur Lexmark CX725de;actif;locevo;Oui;"<p><strong>Fonction:</strong> Laser Couleur, &Eacute;cran couleur tactile ""e-Task"" 17,8 cm de Lexmark, Num&eacute;risation couleur, Num&eacute;risation r&eacute;seau couleur, Impression couleur, Fax couleur, Copie couleur<br /><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouches Return Programme noir et couleur 7 000* pages<br /><strong>Impression recto-verso:</strong> Duplex Int&eacute;gr&eacute;<br /><strong>Disque Dur:</strong> Option disponible<br /><strong>Direct USB:</strong> Oui<br /><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 47 pages par minute <sup>1)</sup><br /><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 5.0 secondes <sup>1)</sup><br /><strong>Vitesse d'impression (A4, couleur):</strong>&nbsp; Jusqu'&agrave; 47 pages par minute <sup>1)</sup><br /><strong>M&eacute;moire, standard:</strong> 2048 Mo<br /><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 150000 Impressions par mois (volume maximum en utilisation ponctuelle) <sup>2)</sup><br /><strong>Volume mensuel de pages recommand&eacute;:</strong> 2000 - 20000 pages <sup>2)</sup><br /><strong>Ecran tactile:</strong> Oui<br /><strong>Capacit&eacute; de chargement papier, standard:</strong>&nbsp; Jusqu'&agrave; 650 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+9;Multifunction Laser Couleur Lexmark CX921de;actif;locevo;Oui;"<p><strong>Fonction:</strong> Ecran tactile couleur Lexmark e-Task de 10 pouces (25 cm), Laser Couleur, Num&eacute;risation couleur, Num&eacute;risation r&eacute;seau couleur, Impression couleur, Fax couleur, Copie couleur<br /><strong>Cartouche(s) livr&eacute;e(s) avec l'imprimante:</strong> Cartouche Noir 5000* pages, Cartouches couleur (CMY) 6000* pages<br /><strong>Impression recto-verso:</strong> Duplex Int&eacute;gr&eacute;<br /><strong>Disque Dur:</strong> Compris dans la configuration<br /><strong>Direct USB:</strong> Oui<br /><strong>Vitesse d'impression (A4, noir):</strong>&nbsp; Jusqu'&agrave; 35 pages par minute <sup>1)</sup><br /><strong>Temps de sortie de la premi&egrave;re page (noir) Inf&eacute;rieur &agrave;:</strong> 7 secondes <sup>1)</sup><br /><strong>Vitesse d'impression (A4, couleur):</strong>&nbsp; Jusqu'&agrave; 35 pages par minute <sup>1)</sup><br /><strong>M&eacute;moire, standard:</strong> 2048 Mo<br /><strong>Cycle d'utilisation mensuel maximum :</strong>&nbsp; jusqu'&agrave; 200000 Impressions par mois (volume maximum en utilisation ponctuelle) <sup>2)</sup><br /><strong>Volume mensuel de pages recommand&eacute;:</strong> 4000 - 20000 pages <sup>2)</sup><br /><strong>Ecran tactile:</strong> Oui<br /><strong>Capacit&eacute; de chargement papier, standard:&nbsp; </strong>Jusqu'&agrave; 1150 feuilles (75 g/m&sup2;)</p>
+<p>&nbsp;</p>
+<p><em>1) &nbsp;&nbsp;&nbsp; Les vitesses d'impression et de copie sont mesur&eacute;es conform&eacute;ment aux normes ISO / IEC 24734 et ISO / IEC 24735 respectivement (ESAT). Pour plus d'informations, voir: www.lexmark.com/ISOspeeds. Print and copy speeds measured in accordance with ISO/IEC 24734 and ISO/IEC 24735 respectively (ESAT). For more information see: www.lexmark.com/ISOspeeds.<br />2) &nbsp;&nbsp;&nbsp; Le ""Cycle de service mensuel maximal"" est d&eacute;fini comme le nombre maximal de pages qu'un p&eacute;riph&eacute;rique peut fournir en un mois &agrave; l'aide d'une op&eacute;ration multi- s&eacute;lections. Cette m&eacute;trique fournit une comparaison de la robustesse par rapport aux autres imprimantes et imprimantes multifonctions Lexmark. ""Volume mensuel recommand&eacute;"" est une s&eacute;rie de pages qui aident les clients &agrave; &eacute;valuer les offres de produits de Lexmark en fonction du nombre moyen de pages que les clients pr&eacute;voient d&rsquo;imprimer chaque mois. Lexmark recommande que le nombre de pages par mois se situe dans la plage indiqu&eacute;e pour optimiser les performances du p&eacute;riph&eacute;rique, en fonction de facteurs tels que: les intervalles de remplacement des consommables, les intervalles de chargement du papier, la vitesse et l'utilisation type du client. ""Maximum Monthly Duty Cycle"" is defined as the maximum number of pages a device could deliver in a month using a multishift operation. This metric provides a comparison of robustness in relation to other Lexmark printers and MFPs. ""Recommended Monthly Page Volume"" is a range of pages that helps customers evaluate Lexmark&rsquo;s product offerings based on the average number of pages customers plan to print on the device each month. Lexmark recommends that the number of pages per month be within the stated range for optimum device performance, based on factors including: supplies replacement intervals, paper loading intervals, speed, and typical customer usage.</em></p>"
+10;Ordinateur IMAC 21.5'' i5 2.3GHZ 8Go 1To;actif;locevo;Oui;Ordinateur IMAC 21.5'' i5 2.3GHZ 8Go 1To
+11;Ordinateur IMAC 21.5 i5 2.3Ghz 8Go 256SSD;actif;locevo;Oui;Ordinateur IMAC 21.5 i5 2.3Ghz 8Go 256SSD
+12;Ordinateur IMAC 21.5'' Retina 4K 3.6Ghz 4core 1To;actif;locevo;Oui;Ordinateur IMAC 21.5'' Retina 4K 3.6Ghz 4core 1To
+13;Ordinateur IMAC 21.5'' Retina 4K 3Ghz 6core 1To;actif;locevo;Oui;Ordinateur IMAC 21.5'' Retina 4K 3Ghz 6core 1To
+14;Ordinateur IMAC 21.5 Retina 4K i3 3.6Ghz 8Go 256SSD;actif;locevo;Oui;Ordinateur IMAC 21.5 Retina 4K i3 3.6Ghz 8Go 256SSD
+15;Ordinateur IMAC 21.5 Retina 4K i5 3Ghz 8Go 256SSD;actif;locevo;Oui;Ordinateur IMAC 21.5 Retina 4K i5 3Ghz 8Go 256SSD
+16;Ordinateur IMAC 27 Retina 5K 3.0Ghz 6core 1To;actif;locevo;Oui;Ordinateur IMAC 27 Retina 5K 3.0Ghz 6core 1To
+17;Ordinateur IMAC 27 Retina 5K i5 3.1Ghz 8Go 256SSD;actif;locevo;Oui;Ordinateur IMAC 27 Retina 5K i5 3.1Ghz 8Go 256SSD
+18;Ordinateur IMAC 27 Retina 5K i5 3.3Ghz 8Go 512SSD;actif;locevo;Oui;Ordinateur IMAC 27 Retina 5K i5 3.3Ghz 8Go 512SSD
+19;Ordinateur IMAC 27 Retina 5K i7 3.8Ghz 8Go 512SSD;actif;locevo;Oui;Ordinateur IMAC 27 Retina 5K i7 3.8Ghz 8Go 512SSD
+20;Ordinateur MAC Mini 3.3Ghz quad core I3 8Go 256SSD;actif;locevo;Oui;Ordinateur MAC Mini 3.3Ghz quad core I3 8Go 256SSD
+21;Ordinateur MAC Mini 3Ghz hexa core I5 8Go 512SSD;actif;locevo;Oui;Ordinateur MAC Mini 3Ghz hexa core I5 8Go 512SSD
+22;Ordinateur MAC Pro Hexacoeur;actif;locevo;Oui;Ordinateur MAC Pro Hexacoeur
+23;Portable MACBOOK AIR Exclusif i7 8Go 512Go Gris Sidéral;actif;locevo;Oui;Portable MACBOOK AIR Exclusif i7 8Go 512Go Gris Sidéral
+24;Portable MACBOOK AIR I5 8Go 256Go Gris Sidéral;actif;locevo;Oui;Portable MACBOOK AIR I5 8Go 256Go Gris Sidéral
+25;Portable MACBOOK AIR New I3 8 256 Argent;actif;locevo;Oui;Portable MACBOOK AIR New I3 8 256 Argent
+26;Portable MACBOOK AIR New I3 8 256 Gris Sidéral;actif;locevo;Oui;Portable MACBOOK AIR New I3 8 256 Gris Sidéral
+27;Portable MACBOOK AIR New I3 8 256 Or;actif;locevo;Oui;Portable MACBOOK AIR New I3 8 256 Or
+28;Portable MACBOOK AIR New I5 8 512 Argent;actif;locevo;Oui;Portable MACBOOK AIR New I5 8 512 Argent
+29;Portable MACBOOK AIR New I5 8 512 Gris Sidéral;actif;locevo;Oui;Portable MACBOOK AIR New I5 8 512 Gris Sidéral
+30;Portable MACBOOK AIR New I5 8 512 Or;actif;locevo;Oui;Portable MACBOOK AIR New I5 8 512 Or
+31;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 256 Argent;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 256 Argent
+32;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 256 Gris;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 256 Gris
+33;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 512 Argent;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 512 Argent
+34;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 512 Gris;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 1.4Ghz 512 Gris
+35;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 1To Argent;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 1To Argent
+36;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 1To Gris;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 1To Gris
+37;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 512 Argent;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 512 Argent
+38;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 512 Gris;actif;locevo;Oui;Portable MACBOOK Pro 13 Touch Bar I5 2Ghz 16go 512 Gris
+39;Portable MACBOOK Pro 16 Touch Bar I7 512 Argent;actif;locevo;Oui;Portable MACBOOK Pro 16 Touch Bar I7 512 Argent
+40;Portable MACBOOK Pro 16 Touch Bar I7 512 Gris Sidéral;actif;locevo;Oui;Portable MACBOOK Pro 16 Touch Bar I7 512 Gris Sidéral
+41;Portable MACBOOK Pro 16 Touch Bar I9 1To Argent;actif;locevo;Oui;Portable MACBOOK Pro 16 Touch Bar I9 1To Argent
+42;Portable MACBOOK Pro 16 Touch Bar I9 1To Gris Sidéral;actif;locevo;Oui;Portable MACBOOK Pro 16 Touch Bar I9 1To Gris Sidéral
+43;Tablette IPAD 10.2 128Go Argent;actif;locevo;Oui;Tablette IPAD 10.2 128Go Argent
+44;Tablette IPAD 10.2 128Go Argent Cellular;actif;locevo;Oui;Tablette IPAD 10.2 128Go Argent Cellular
+45;Tablette IPAD 10.2 128Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD 10.2 128Go Gris Sidéral
+46;Tablette IPAD 10.2 128Go Gris Sidéral Cellular;actif;locevo;Oui;Tablette IPAD 10.2 128Go Gris Sidéral Cellular
+47;Tablette IPAD 10.2 128Go Or;actif;locevo;Oui;Tablette IPAD 10.2 128Go Or
+48;Tablette IPAD 10.2 128Go Or Cellular;actif;locevo;Oui;Tablette IPAD 10.2 128Go Or Cellular
+49;Tablette IPAD 10.2 32Go Argent;actif;locevo;Oui;Tablette IPAD 10.2 32Go Argent
+50;Tablette IPAD 10.2 32Go Argent Cellular;actif;locevo;Oui;Tablette IPAD 10.2 32Go Argent Cellular
+51;Tablette IPAD 10.2 32Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD 10.2 32Go Gris Sidéral
+52;Tablette IPAD 10.2 32Go Gris Sidéral Cellular;actif;locevo;Oui;Tablette IPAD 10.2 32Go Gris Sidéral Cellular
+53;Tablette IPAD 10.2 32Go Or;actif;locevo;Oui;Tablette IPAD 10.2 32Go Or
+54;Tablette IPAD 10.2 32Go Or Cellular;actif;locevo;Oui;Tablette IPAD 10.2 32Go Or Cellular
+55;Tablette IPAD Air 10.5'' 256Go Argent;actif;locevo;Oui;Tablette IPAD Air 10.5'' 256Go Argent
+56;Tablette IPAD Air 10.5 256Go Cel Gris sidéral;actif;locevo;Oui;Tablette IPAD Air 10.5 256Go Cel Gris sidéral
+57;Tablette IPAD Air 10.5'' 256Go Cell Argent;actif;locevo;Oui;Tablette IPAD Air 10.5'' 256Go Cell Argent
+58;Tablette IPAD Air 10.5'' 256Go Cell Or;actif;locevo;Oui;Tablette IPAD Air 10.5'' 256Go Cell Or
+59;Tablette IPAD Air 10.5'' 256Go Gris sidéral;actif;locevo;Oui;Tablette IPAD Air 10.5'' 256Go Gris sidéral
+60;Tablette IPAD Air 10.5'' 256Go Or;actif;locevo;Oui;Tablette IPAD Air 10.5'' 256Go Or
+61;Tablette IPAD Air 10.5'' 64Go Argent;actif;locevo;Oui;Tablette IPAD Air 10.5'' 64Go Argent
+62;Tablette IPAD Air 10.5'' 64Go Cell Argent;actif;locevo;Oui;Tablette IPAD Air 10.5'' 64Go Cell Argent
+63;Tablette IPAD Air 10.5'' 64Go Cell Gris sidéral;actif;locevo;Oui;Tablette IPAD Air 10.5'' 64Go Cell Gris sidéral
+64;Tablette IPAD Air 10.5'' 64Go Cell Or;actif;locevo;Oui;Tablette IPAD Air 10.5'' 64Go Cell Or
+65;Tablette IPAD Air 10.5'' 64Go Gris sidéral;actif;locevo;Oui;Tablette IPAD Air 10.5'' 64Go Gris sidéral
+66;Tablette IPAD Air 10.5'' 64Go Or;actif;locevo;Oui;Tablette IPAD Air 10.5'' 64Go Or
+67;Tablette IPAD Mini 7.9 '' 256Go Or;actif;locevo;Oui;Tablette IPAD Mini 7.9 '' 256Go Or
+68;Tablette IPAD Mini 7.9'' 256Go Argent;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 256Go Argent
+69;Tablette IPAD Mini 7.9'' 256Go Cell Argent;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 256Go Cell Argent
+70;Tablette IPAD Mini 7.9'' 256Go Cell Gris Sidéral;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 256Go Cell Gris Sidéral
+71;Tablette IPAD Mini 7.9'' 256Go Cell Or;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 256Go Cell Or
+72;Tablette IPAD Mini 7.9'' 256Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 256Go Gris Sidéral
+73;Tablette IPAD Mini 7.9'' 64Go Argent;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 64Go Argent
+74;Tablette IPAD Mini 7.9'' 64Go Cell Argent;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 64Go Cell Argent
+75;Tablette IPAD Mini 7.9'' 64Go Cell Gris Sidéral;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 64Go Cell Gris Sidéral
+76;Tablette IPAD Mini 7.9'' 64Go Cell Or;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 64Go Cell Or
+77;Tablette IPAD Mini 7.9'' 64Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 64Go Gris Sidéral
+78;Tablette IPAD Mini 7.9'' 64Go Or;actif;locevo;Oui;Tablette IPAD Mini 7.9'' 64Go Or
+79;Tablette IPAD Pro 11 128Go Argent;actif;locevo;Oui;Tablette IPAD Pro 11 128Go Argent
+80;Tablette IPAD Pro 11 128Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 128Go Gris Sidéral
+81;Tablette IPAD Pro 11 1To Argent;actif;locevo;Oui;Tablette IPAD Pro 11 1To Argent
+82;Tablette IPAD Pro 11 1To Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 1To Gris Sidéral
+83;Tablette IPAD Pro 11 256Go Argent;actif;locevo;Oui;Tablette IPAD Pro 11 256Go Argent
+84;Tablette IPAD Pro 11 256Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 256Go Gris Sidéral
+85;Tablette IPAD Pro 11 512Go Argent;actif;locevo;Oui;Tablette IPAD Pro 11 512Go Argent
+86;Tablette IPAD Pro 11 512Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 512Go Gris Sidéral
+87;Tablette IPAD Pro 11 Cell 128Go Argent;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 128Go Argent
+88;Tablette IPAD Pro 11 Cell 128Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 128Go Gris Sidéral
+89;Tablette IPAD Pro 11' Cell 1To Argent;actif;locevo;Oui;Tablette IPAD Pro 11' Cell 1To Argent
+90;Tablette IPAD Pro 11 Cell 1To Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 1To Gris Sidéral
+91;Tablette IPAD Pro 11 Cell 256Go Argent;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 256Go Argent
+92;Tablette IPAD Pro 11 Cell 256Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 256Go Gris Sidéral
+93;Tablette IPAD Pro 11 Cell 512Go Argent;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 512Go Argent
+94;Tablette IPAD Pro 11 Cell 512Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 11 Cell 512Go Gris Sidéral
+95;Tablette IPAD Pro 12.9 128Go Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 128Go Argent
+96;Tablette IPAD Pro 12.9 128Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 128Go Gris Sidéral
+97;Tablette IPAD Pro 12.9 1To Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 1To Argent
+98;Tablette IPAD Pro 12.9 1To Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 1To Gris Sidéral
+99;Tablette IPAD Pro 12.9 256Go Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 256Go Argent
+100;Tablette IPAD Pro 12.9 256Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 256Go Gris Sidéral
+101;Tablette IPAD Pro 12.9 512Go Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 512Go Argent
+102;Tablette IPAD Pro 12.9 512Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 512Go Gris Sidéral
+103;Tablette IPAD Pro 12.9 Cell 128Go Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 128Go Argent
+104;Tablette IPAD Pro 12.9 Cell 128Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 128Go Gris Sidéral
+105;Tablette IPAD Pro 12.9 Cell 1To Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 1To Argent
+106;Tablette IPAD Pro 12.9 Cell 1To Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 1To Gris Sidéral
+107;Tablette IPAD Pro 12.9 Cell 256Go Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 256Go Argent
+108;Tablette IPAD Pro 12.9 Cell 256Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 256Go Gris Sidéral
+109;Tablette IPAD Pro 12.9 Cell 512Go Argent;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 512Go Argent
+110;Tablette IPAD Pro 12.9 Cell 512Go Gris Sidéral;actif;locevo;Oui;Tablette IPAD Pro 12.9 Cell 512Go Gris Sidéral
+111;HP Pagewide 477dw - 36 mois;actif;locevo;Oui;HP Pagewide 477dw - 36 mois
+112;HP Pagewide 477dw - 60 mois;actif;locevo;Oui;HP Pagewide 477dw - 60 mois
+113;HP Pagewide 774dn - 36 mois;actif;locevo;Oui;HP Pagewide 774dn - 36 mois
+114;HP Pagewide 774dn - 60 mois;actif;locevo;Oui;HP Pagewide 774dn - 60 mois

@@ -324,7 +324,9 @@ ATF.buildGridEditor({
 						listWidth:400
 					})
 				{/if}
-			}, {
+			},
+
+			{
 				hidden:true,
 				dataIndex: '{$current_class->table}__dot__serial'
 			}, {
@@ -560,7 +562,18 @@ ATF.buildGridEditor({
 							value:""
 						})
 					}
-				{/if}
+				{/if} 
+
+				{if $current_class->table=="devis_ligne" || $current_class->table=="commande_ligne"  || $current_class->table=="parc"}
+				,{
+					header: 'Caracteristique',
+					width:20,
+					dataIndex: '{$current_class->table}__dot__caracteristique',
+					editor: new Ext.form.TextField({
+						value: ""
+					})
+				}
+			{/if}
 
 				{if $pager=="ProduitsUpdateOptionPartenaire"}
 					, {
