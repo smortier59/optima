@@ -5,6 +5,7 @@
 */
 require_once dirname(__FILE__)."/../affaire.class.php";
 class affaire_cleodis extends affaire {
+
 	function __construct($table_or_id=NULL) {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
@@ -29,7 +30,7 @@ class affaire_cleodis extends affaire {
 			,'pouvoir'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'facture_fournisseur'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 			,'validateOrder'=>array("custom"=>true,"nosort"=>true,"align"=>"center","renderer"=>"validateOrderRenderer")
-
+            ,"affaire.commentaire"
 			,"affaire.commentaire_facture"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture2"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture3"=>array("rowEditor"=>"setInfos")
@@ -53,6 +54,7 @@ class affaire_cleodis extends affaire {
 			,'BIC'
 			,'RUM'
 			,'nom_banque'
+			,'commentaire'
 			,'ville_banque'
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
@@ -129,6 +131,7 @@ class affaire_cleodis extends affaire {
 			,"pdf_affaire"
 		);
 
+
 		$this->autocomplete = array(
 			"view"=>array("affaire.id_affaire","societe.societe")
 		);
@@ -165,6 +168,7 @@ class affaire_cleodis extends affaire {
 		$this->files["facturation"] = array("type"=>"pdf","preview"=>false,"no_upload"=>true,"force_generate"=>true);
 		$this->field_nom="%ref%";
 		$this->foreign_key['id_fille'] =  "affaire";
+		$this->foreign_key['id_apporteur'] =  "societe";
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
@@ -244,6 +248,7 @@ class affaire_cleodis extends affaire {
 	* @return array
 	*/
 	public function formateInsertUpdate($infos){
+
 		$affaire["id_societe"]=$infos["id_societe"];
 		$affaire["nature"]=$infos["nature"];
 		$affaire["affaire"]=$infos["devis"];
@@ -256,9 +261,12 @@ class affaire_cleodis extends affaire {
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
 		$affaire["langue"]=$infos["langue"];
+		$affaire["commentaire"] = $infos["commentaire"];
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
+
+
 
 		// On passe les date d'installation et de livraison sur l'affaire puisque l'opportunité va passer en état fini.
 		if ($infos["id_opportunite"]) {
@@ -1351,6 +1359,7 @@ class affaire_cleodis extends affaire {
 				'affaire.id_societe',
 				'affaire.pieces',
 				'societe.societe',
+				'societe.code_client_partenaire',
 				'societe.id_contact_signataire',
 				'loyer.loyer');
 			$this->q->reset();
@@ -1653,6 +1662,7 @@ class affaire_cleodis extends affaire {
 			if(!$data){
 				if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 				$data = $this->sa($get['tri'],$get['trid'],$get['page'],true);
+
 			}
 
 
@@ -1830,6 +1840,7 @@ class affaire_cleodis extends affaire {
 			"affaire.etat",
 			'affaire.provenance',
 			'affaire.id_partenaire',
+			'affaire.id_apporteur',
 			'affaire.date',
 			"affaire.site_associe",
 			'affaire.ref',
@@ -2591,20 +2602,32 @@ class affaire_cleodis extends affaire {
 
 			$devis = ATF::devis()->select($id_devis);
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
+
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
-			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 
 			//Recupere Apporteur de ta société
-            $apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
+			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
+
+			//Recuperation du code client Partenaire
+			$code_client_partenaire = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'code_client_partenaire');
+
+			//si le code_client_partenaire n'est pas vide alors je mets à jour la table société
+			if($post["code_client_partenaire"] && !empty($post["code_client_partenaire"])){
+				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
+			}
+
+			log::logger("test d\affichage du code client partenaire"." ".$code_client_partenaire,'code_client');
+
+
 
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],
-									"provenance"=>"partenaire",
-								    'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client');
+
+			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
@@ -3850,8 +3873,9 @@ class affaire_bdomplus extends affaire_cleodis {
 		    "id_societe" => $affaire["id_societe"],
 		    "produits" => json_encode($prods),
 		    "id_pack_produit" => array (
-		        "0" => $id_pack
-		    )
+		        "0" => $snap->id_pack_produit
+		    ),
+		    "renouvellement" => true
 		);
 		log::logger($post , "renouvellement_ok");
 		$affaires = ATF::souscription()->_devis(array(), $post);
@@ -3872,6 +3896,17 @@ class affaire_bdomplus extends affaire_cleodis {
 			$new_affaire = ATF::affaire()->select_row();
 			$new_affaire["affaire.id_affaire_fk"] = $value;
 			$new_affaire["affaire.id_societe_fk"] = $affaire["id_societe"];
+
+
+			$suivi = array(
+		        "id_societe" => $affaire["id_societe"],
+		        "id_affaire" => $value,
+		        "type"=> "note",
+		        "type_suivi"=> "Contrat",
+		        "texte" => "Il s'agit de l'affaire de renouvellement de l'affaire ".$this->select($id_affaire , "ref")
+		    );
+			ATF::suivi()->i($suivi);
+
 
 			ATF::commande()->q->reset()->where("affaire.id_affaire", $value);
 			$commande = ATF::commande()->select_row();

@@ -103,7 +103,7 @@ function import_produit(string $path = ''){
 			$p = ATF::produit()->select_row();
 
 			$produit = array(
-				"site_associe" => 'boulangerpro',
+				"site_associe" => 'locevo',
 				"produit"=> $product,
 				"type"=> mb_strtolower($rawType, 'UTF-8'),
 				"ref"=> $ref,
