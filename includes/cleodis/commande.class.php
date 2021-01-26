@@ -672,57 +672,11 @@ class commande_cleodis extends commande {
 				throw new errorATF("date_invalide",987);
 		}
 
-		if($infos["table"]!="commande"){
-//			ATF::commande()->redirection("select_all",NULL,"commande.html");
-//		}else{
+		if($infos["table"]!="commande" && $infos['key'] === "date_debut"){
 			ATF::affaire()->redirection("select",$cmd["id_affaire"]);
 		}
 		return true;
 	}
-
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	  * @param array $infos
-//    */
-//	public function updateDateResiliation($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		//Il faut une date de de résiliation pour insérer une date de restitution
-//		if($infos['value'] == 'undefined' && ($commande["date_restitution"] || $commande["date_restitution_effective"])){
-//			throw new errorATF("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
-//		}else{
-//			return parent::updateDate($infos);
-//		}
-//	}
-//
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos
-//    */
-//	public function updateDateRestitution($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		//Il faut une date de de résiliation pour insérer une date de restitution
-//		if($infos['value'] != 'undefined' && !$commande["date_resiliation"]){
-//			throw new errorATF("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
-//		}elseif($infos['value'] == 'undefined' && $commande["date_restitution_effective"]){
-//			throw new errorATF("Impossible de supprimer la date de résiliation si la restitution est effective",883);
-//		}else{
-//			return parent::updateDate($infos);
-//		}
-//	}
-//
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos
-//    */
-//	public function updateDateRestitution_effective($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		parent::updateDate($infos);
-//		$commande = new commande_cleodis($infos['id_commande']);
-//		$this->checkEtat($commande);
-//	}
 
 	/**
     * Vérification si on peut modifier/supprimer une commande
@@ -1000,11 +954,11 @@ class commande_cleodis extends commande {
 		}
 		$affaire->majForecastProcess();
 
-		if($infos["field"] !== "date_prevision_restitution" || $reload){
-			if($commande->get("id_affaire")){
-				ATF::affaire()->redirection("select",$commande->get("id_affaire"));
-			}
-		}
+		// if($infos["field"] !== "date_prevision_restitution" || $reload){
+		// 	if($commande->get("id_affaire")){
+		// 		ATF::affaire()->redirection("select",$commande->get("id_affaire"));
+		// 	}
+		// }
 
 
 	}
@@ -1464,6 +1418,7 @@ class commande_cleodis extends commande {
 			->addField("commande.date_demande_resiliation")
 			->addField("commande.date_prevision_restitution")
 			->addField("commande.date_restitution_effective")
+			->addField("commande.date_demande_reprise_broker")
 			->from("commande","id_societe","societe","id_societe")
 			->from("commande","id_affaire","affaire","id_affaire");
 		$return = parent::select_all($order_by,$asc,$page,$count);

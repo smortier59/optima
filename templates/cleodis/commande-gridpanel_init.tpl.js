@@ -35,8 +35,6 @@
 {if ATF::$codename == "cleodisbe"} {util::push($fieldsKeys, "ctlettreBelfiusExists")}{/if}
 {util::push($fieldsKeys, "envoiCourrierClassiqueExists")}
 
-
-
 ATF.renderer.dateCleCommande = function(table, field) {
     return function(filetype, meta, record, rowIndex, colIndex, store) {
         var idDiv = Ext.id();
@@ -131,6 +129,24 @@ ATF.renderer.dateCleCommande = function(table, field) {
                                 }
                             }
                         }, {
+                            id: "date_demande_reprise_broker" + id,
+                            name: "date_demande_reprise_broker",
+                            fieldLabel: "{ATF::$usr->trans('date_demande_reprise_broker','commande')}",
+                            value: record.data.commande__dot__date_demande_reprise_broker,
+                            listeners: {
+                                'select': function(fb, v) {
+                                    ATF.ajax(
+                                        "commande,updateDate.ajax", 
+                                        "id_commande=" + id + "&table={ATF::_r('parent_name')|default:ATF::_r('table')}&key=date_demande_reprise_broker&value=" + fb.value,
+                                        { 
+                                            onComplete: function (result) { 
+                                                store.reload();
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                        }, {
                             id: "date_restitution_effective" + id,
                             name: "date_restitution_effective",
                             fieldLabel: "{ATF::$usr->trans('date_restitution_effective','commande')}",
@@ -138,17 +154,6 @@ ATF.renderer.dateCleCommande = function(table, field) {
                             listeners: {
                                 'select': function(fb, v) {
                                     ATF.ajax("commande,updateDate.ajax", "id_commande=" + id + "&table={ATF::_r('parent_name')|default:ATF::_r('table')}&key=date_restitution_effective&value=" + fb.value);
-                                    store.reload();
-                                }
-                            }
-                        }, {
-                            id: "date_demande_reprise_broker" + id,
-                            name: "date_demande_reprise_broker",
-                            fieldLabel: "{ATF::$usr->trans('date_demande_reprise_broker','commande')}",
-                            value: record.data.commande__dot__date_demande_reprise_broker,
-                            listeners: {
-                                'select': function(fb, v) {
-                                    ATF.ajax("commande,updateDate.ajax", "id_commande=" + id + "&table={ATF::_r('parent_name')|default:ATF::_r('table')}&key=date_demande_reprise_broker&value=" + fb.value);
                                     store.reload();
                                 }
                             }
