@@ -13948,7 +13948,8 @@ class pdf_cap extends pdf_cleodis {
 
 
 class pdf_bdomplus extends pdf_cleodis {
-	public $logo = 'bdomplus/logo.jpg';
+	public $logo = __PDF_PATH__."/".'bdomplus/logo.jpg';
+	// public $logo = 'bdomplus/logo.jpg';
 	public $heightLimitTableContratPV = 70;
 	public $langue = "FR";
 
