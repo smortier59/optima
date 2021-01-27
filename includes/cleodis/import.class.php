@@ -70,6 +70,7 @@ class import extends classes_optima{
 		$lines_count = 0;
 		$processed_lines = 0;
 
+		log::logger($entetes , "mfleurquin");
 
 		if($entetes !== array("ref", "fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image")){
 			$success = false;
