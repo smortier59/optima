@@ -73,7 +73,7 @@ class import extends classes_optima{
 		log::logger($entetes , "mfleurquin");
 		log::logger(array("ref", "fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image") , "mfleurquin");
 
-		if($entetes !== array("ref", "fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image")){
+		if($entetes != array("ref", "fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image")){
 			$success = false;
 			$error["alertes"][] = "Entetes de fichier incorrecte, entetes attendues : ref, fournisseur, site_associe, designation, Prix achat dont ecotaxe, loyer, description, url_image";
 		}else{
