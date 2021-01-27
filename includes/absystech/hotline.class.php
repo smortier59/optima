@@ -792,7 +792,6 @@ class hotline extends classes_optima {
 
 		$this->infoCollapse($infos);
 
-
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
 			throw new errorATF(ATF::$usr->trans("Impossible d'ajouter une requête car la société est inactive"));
 		}
@@ -828,6 +827,23 @@ class hotline extends classes_optima {
 
 		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
 
+
+		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
+		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
+		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+		switch ($infos["urgence"]) {
+			case 'detail':
+				$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+			break;
+
+			case 'genant':
+				$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+			break;
+
+			case 'bloquant':
+				$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+			break;
+		}
 
 		//Date de création de la requête
 		$infos["date"]=date('Y-m-d H:i:s');
@@ -1162,6 +1178,28 @@ class hotline extends classes_optima {
 			$disabledInternalInteraction=true;
 			unset($infos["disabledInternalInteraction"]);
 		}
+
+		/*if($infos["hotline"]){
+			$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
+			$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
+			$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+			switch ($infos["urgence"]) {
+				case 'detail':
+					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				break;
+
+				case 'genant':
+					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				break;
+
+				case 'bloquant':
+					$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+				break;
+			}
+		}*/
+
+
+
 		$retour=parent::update($infos,$s,$files,$cadre_refreshed);
 
 		//Trace dans les interactions
@@ -2140,11 +2178,13 @@ class hotline extends classes_optima {
 				if ($widget) {
 					foreach ($result as $i) {
 						if ($i["id_user"]) {
-							$nom = substr(ATF::user()->select($i["id_user"],'prenom'),0,1).substr(ATF::user()->select($i["id_user"],'nom'),0,1);
+							$nom = ATF::user()->select($i["id_user"],'prenom')." ".ATF::user()->select($i["id_user"],'nom');
+							$label = substr(ATF::user()->select($i["id_user"],'prenom'),0,1).substr(ATF::user()->select($i["id_user"],'nom'),0,1);
 						} else {
 							$nom = "?";
+							$label = "?";
 						}
-						$graph['categories']["category"][$i["id_user"]] = array("label" => $nom);
+						$graph['categories']["category"][$i["id_user"]] = array("label" => $label, "nom"=> $nom);
 					}
 
 					$graph['params']['showLegend'] = "0";
@@ -3793,9 +3833,12 @@ class hotline extends classes_optima {
 			"hotline.wait_mep"=>array(),
 			"societe.latitude"=>array(),
 			"societe.longitude"=>array(),
-			"societe.solde"=>array()
-		);
+			"societe.solde"=>array(),
+			"societe.liens"=>array(),
+			"contact.email"=>array(),
+			"contact.tel"=>array(),
 
+		);
 
 		$this->q->reset();
 
@@ -3808,6 +3851,8 @@ class hotline extends classes_optima {
 			$this->q->where("id_hotline",$get['id'])->setLimit(1);
 		} elseif ($get['id_societe']) {
 			$this->q->where("hotline.id_societe",$get['id_societe']);
+			if($get["email"]) $this->q->where("hotline.id_contact",$get['email']);
+			if($get["tel"]) $this->q->where("hotline.id_contact",$get['tel']);
 			if (!$get['no-limit']) $this->q->setLimit($get['limit']);
 			// Filtre ticket actif
 			if ($get['filters']['fixing'] == "on") {
@@ -3892,6 +3937,7 @@ class hotline extends classes_optima {
 		$this->q->from("hotline","id_gep_projet","gep_projet","id_gep_projet");
 		$this->q->from("hotline","id_affaire","affaire","id_affaire");
 
+
 		// Profil développeur extérieur (PATCH DEGUEU EN MODE BRICOLE)
 		if (ATF::$usr->get('id_profil') == 16) {
 			$this->q->where("gep_projet.id_societe", 513, "OR", "projets"); // Cléodis
@@ -3916,7 +3962,6 @@ class hotline extends classes_optima {
 
 		if ($get['id']) {
 			$data['data'][0]['facturation-indicateur'] = $this->getBillingMode($get['id'],true);
-
 			$return = $data['data'][0];
 
 			// SPécial patch pour éviter que les balises html flingue le formattage
@@ -3934,7 +3979,10 @@ class hotline extends classes_optima {
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
 
-	  	$return = $data['data'];
+
+		  $return = $data['data'];
+
+
 		}
 
 		return $return;
@@ -4275,7 +4323,10 @@ class hotline extends classes_optima {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 
 		$h = $this->select($get['id']);
-		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])->where("etat","terminee","AND","cle1","!=")->where("etat","perdue","AND","cle1","!=");
+		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])
+								  ->where("etat","terminee","AND","cle1","!=")
+								  ->where("etat","perdue","AND","cle1","!=")
+								  ->addOrder("affaire.date","DESC");
 
 		return ATF::affaire()->sa();
 	}
