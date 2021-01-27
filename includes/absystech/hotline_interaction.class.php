@@ -372,6 +372,9 @@ class hotline_interaction extends classes_optima {
 			$data["detail"]="Requête transférée par ".ATF::user()->nom($infos["id_user"])." au pôle ".$infos["transfert_pole"]."<br />".$data["detail"];
 		}
 
+
+
+
 		//Gestion de la mise à jour (update)
 		if($infos["update"]){
 			$id_hotline_interaction=$this->decryptId($infos["id_hotline_interaction"]);
@@ -2028,12 +2031,16 @@ class hotline_interaction extends classes_optima {
 			else $post['teamviewer'] = "non";
 
 			// Calcul du nombre de crédit
-			if (!$post['credit_presta']) {
-				$tmp = explode(":", $post['temps_passe']);
+			if (!$post['credit_presta'] && $post["nature"] == "interaction") {
+				//Si on ne donne pas de raison on force le calcul normal
+				if(!$post["champ_alerte"]){
+					$tmp = explode(":", $post['temps_passe']);
 
-				$creditMin = $tmp[1]/60;
+					$creditMin = $tmp[1]/60;
 
-				$post['credit_presta'] = round($creditMin + $tmp[0],2);
+					$post['credit_presta'] = round($creditMin + $tmp[0],2);
+				}
+
 			}
 
 			if (!$post['id_user']) {
