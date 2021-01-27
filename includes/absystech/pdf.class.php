@@ -960,15 +960,32 @@ class pdf_absystech extends pdf {
 			if($infos_devis["financement_cleodis"] == "oui"){
 				if($total > 1500 && !$infos_devis["duree_financement"]){
 					$this->ln(2);
-					if($total <= 7500){
-						$coeffCleodis = 0.03378;
-					}elseif($total <= 15000){
-						$coeffCleodis = 0.03244;
-					}elseif($total <= 30000){
-						$coeffCleodis = 0.03070;
-					}elseif($total > 30000){
-						$coeffCleodis = 0.02985;
+
+
+					if(ATF::$codename == "atoutcoms"){
+						if($total <= 7500){
+							$coeffCleodis = 0.0198;
+						}elseif($total <= 15000){
+							$coeffCleodis = 0.0191;
+						}elseif($total <= 30000){
+							$coeffCleodis = 0.0189;
+						}elseif($total > 30000){
+							$coeffCleodis = 0.0187;
+						}
+					}else{
+						if($total <= 7500){
+							$coeffCleodis = 0.0310;
+						}elseif($total <= 15000){
+							$coeffCleodis = 0.0300;
+						}elseif($total <= 30000){
+							$coeffCleodis = 0.0290;
+						}elseif($total > 30000){
+							$coeffCleodis = 0.0280;
+						}
 					}
+
+
+
 
 					$total = ($total*$coeffCleodis);
 
@@ -977,7 +994,11 @@ class pdf_absystech extends pdf {
 					$this->setx(15);
 					$this->multicell(0,5,"Pensez «Location Evolutive» avec notre partenaire");
 					$this->image(__PDF_PATH__.ATF::$codename."/cleodis.jpg",100,$this->gety()-9,20);
-					$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 36 (+3) mois.*");
+					if(ATF::$codename == "atoutcoms"){
+						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 36 (+3) mois.*");
+					}else{
+						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 63 mois.*");
+					}
 					$this->ln(5);
 					$this->multicell(0,5,"Si vous êtes intéressé  par ce mode de financement, merci de cocher la case");
 					$this->setxy(140,$this->gety()-5);
