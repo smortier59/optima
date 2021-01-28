@@ -65,6 +65,7 @@ class tache_cleodis extends tache {
 
 		$tache['horaire_debut']=date("Y-m-d H:i:s");
 		$tache['horaire_fin'] = date("Y-m-d H:i:s", strtotime("+3 days"));
+		$tache['type_tache'] = "demande_comite";
 
 		return $this->insert(array("tache"=>$tache, "dest"=> $tache_notifie));
 	}
@@ -149,7 +150,7 @@ class tache_cleodis extends tache {
 
 
 				//envoi des mails aux concernés (si il y a au moins le mail du
-				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
+				if(count($liste_email)>1 || count($liste_email)>=1 || $liste_email[ATF::$usr->getID()]){
 					$mail = new mail(array( "recipient"=>implode(',',$liste_email),
 								"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
 								"objet"=>"[".$entete."]Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
