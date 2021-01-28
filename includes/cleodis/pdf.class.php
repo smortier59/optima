@@ -1269,7 +1269,7 @@ class pdf_cleodis extends pdf {
 		/* PAGE 2 */
 		$this->setTopMargin(30);
 		$this->AddPage();
-		$this->image(__PDF_PATH__.$this->logo,5,10,35);
+		$this->image($this->logo,5,10,35);
 
 		$this->sety(10);
 		$this->setfont('arial','B',14);
@@ -5486,7 +5486,7 @@ class pdf_cleodis extends pdf {
 
 		$this->setfont('arial','B',10);
 		if(ATF::$codename == "bdomplus"){
-			$this->image(__PDF_PATH__."/".$this->logo,5,5,45);
+			$this->image($this->logo,5,5,45);
 		}else{
 			$this->image(__PDF_PATH__."/cleodis/logo.jpg",5,5,45);
 
@@ -8436,7 +8436,7 @@ class pdf_cleodis extends pdf {
 };
 
 class pdf_cleodisbe extends pdf_cleodis {
-	public $logo = 'cleodisbe/logo.jpg';
+	public $logo =  __PDF_PATH__."/".'cleodisbe/logo.jpg';
 	public $texteHT = "HTVA";
 	public $texteTTC = "TVAC";
 	public $heightLimitTableContratPV = 70;
@@ -11861,7 +11861,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 class pdf_midas extends pdf_cleodis {};
 
 class pdf_cap extends pdf_cleodis {
-	public $logo = 'cap/cap.jpg';
+	public $logo = __PDF_PATH__."/".'cap/cap.jpg';
 
 	public function courrierSociete() {
 		if (!ATF::_s('ids') || !ATF::_s('societe_source')) {
@@ -14886,7 +14886,7 @@ class pdf_bdomplus extends pdf_cleodis {
 };
 class pdf_bdom extends pdf_cleodis { };
 class pdf_boulanger extends pdf_cleodis {
-	public $logo = 'boulanger/logo.png';
+	public $logo = __PDF_PATH__."/".'boulanger/logo.png';
 	public $heightLimitTableContratPV = 70;
 	public $langue = "FR";
 
