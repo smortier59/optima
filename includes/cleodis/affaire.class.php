@@ -1138,7 +1138,7 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? $this->files['pouvoir']['type'] : false;
 			$return['data'][$k]["contrat_signe"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"contrat_signe")) ? $this->files['contrat_signe']['type'] : false;
 			$return['data'][$k]["facture_fournisseur"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"facture_fournisseur")) ? $this->files['facture_fournisseur']['type'] : false;
-
+			$return['data'][$k]["rib_client"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"rib_client")) ? $this->files['rib_client']['type'] : false;
 
 			$return['data'][$k]["dossier_preuve_sell_sign"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"dossier_preuve_sell_sign")) ? true : false;
 
