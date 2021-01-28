@@ -149,16 +149,24 @@ class souscription_cleodis extends souscription {
 
         //On récupère les id pack de chaque ligne pour le libelle de l'affaire
         $post['id_pack_produit'] = array();
+        $post['pack_quantite'] = array();
         foreach ($value as $k => $v) {
           $post['id_pack_produit'][] = $v["id_pack_produit"];
+
+          if($post["pack_quantite"][$v["id_pack_produit"]]){
+            $post["pack_quantite"][$v["id_pack_produit"]] += $v["quantite"];
+          }else{
+            $post["pack_quantite"][$v["id_pack_produit"]] = $v["quantite"];
+          }
         }
 
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"],  $post["renouvellement"]);
 
+        $libelle = substr($libelle, 0, 250);
 
 
         $id_devis = $this->createDevis($post, $libelle);
@@ -310,17 +318,27 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe, $renouvellement=false) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false) {
+    $suffix = "";
+    log::logger($pack_quantite , "mfleurquin");
     if ($id_pack_produits) {
-      ATF::pack_produit()->q->reset()
-          ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
-          ->setStrict()
-          ->setLimit(1);
       foreach ($id_pack_produits as $id_pack) {
-          ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
-      }
 
-      $suffix = ATF::pack_produit()->select_cell();
+        log::logger("ID PACK -> ".$id_pack , "mfleurquin");
+        log::logger("Qté -> ".$pack_quantite[$id_pack] , "mfleurquin");
+
+        ATF::pack_produit()->q
+                          ->reset()
+                          ->addField("pack_produit.nom")
+                          ->where("id_pack_produit", $id_pack);
+
+
+        if($suffix == ""){
+          $suffix = $pack_quantite[$id_pack]." ".substr(ATF::pack_produit()->select_cell(), 0, 60);
+        }else{
+          $suffix .= " + ".$pack_quantite[$id_pack]." ".substr(ATF::pack_produit()->select_cell(), 0, 60);
+        }
+      }
     }
 
     switch ($site_associe) {
