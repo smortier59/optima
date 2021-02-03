@@ -929,8 +929,6 @@ class souscription_cleodis extends souscription {
       $return['email'] = $societe["particulier_email"];
     }
 
-    log::logger($return , "qjanon");
-
     return $return;
   }
 
