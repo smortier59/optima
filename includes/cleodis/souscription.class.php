@@ -147,18 +147,41 @@ class souscription_cleodis extends souscription {
       foreach ($lignes_par_duree as $key => $value) {
         $post["produits"] = json_encode($value);
 
+        log::logger($post , "mfleurquin");
+
+
         //On récupère les id pack de chaque ligne pour le libelle de l'affaire
         $post['id_pack_produit'] = array();
         $post['pack_quantite'] = array();
+
         foreach ($value as $k => $v) {
           $post['id_pack_produit'][] = $v["id_pack_produit"];
 
-          if($post["pack_quantite"][$v["id_pack_produit"]]){
-            $post["pack_quantite"][$v["id_pack_produit"]] += $v["quantite"];
+          // Pour chaque pack, on recupere le produit principal
+          ATF::pack_produit_ligne()->q->where("id_pack_produit", $v["id_pack_produit"])
+                                      ->where("principal", "oui");
+
+          $produit_principal_pack = ATF::pack_produit_ligne()->select_row();
+
+
+          log::logger("Produit Principal -->" , "mfleurquin");
+          log::logger($produit_principal_pack , "mfleurquin");
+
+          if($produit_principal_pack){
+            // Si $v[id_pack_produit_ligne] == Le produit principal
+            if($v["id_pack_produit_ligne"] == $produit_principal_pack["id_pack_produit_ligne"]){
+              // On compare la quantité du produit principal par rapport à la quantité par défaut
+              $post["pack_quantite"][$v["id_pack_produit"]] = ($v["quantite"] /  $produit_principal_pack["quantite"]);
+            }
           }else{
-            $post["pack_quantite"][$v["id_pack_produit"]] = $v["quantite"];
+            $post["pack_quantite"][$v["id_pack_produit"]] = "?";
           }
+
         }
+
+
+
+
 
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
