@@ -165,17 +165,26 @@ class souscription_cleodis extends souscription {
 
 
           log::logger("Produit Principal -->" , "mfleurquin");
-          log::logger($produit_principal_pack , "mfleurquin");
+          log::logger($produit_principal_pack["id_pack_produit_ligne"] , "mfleurquin");
+          log::logger($produit_principal_pack["quantite"] , "mfleurquin");
 
           if($produit_principal_pack){
             // Si $v[id_pack_produit_ligne] == Le produit principal
             if($v["id_pack_produit_ligne"] == $produit_principal_pack["id_pack_produit_ligne"]){
+              log::logger("On est sur le produit principal, on check les quantité" , "mfleurquin");
+
+              log::logger($v, "mfleurquin");
+              log::logger($v["quantite"], "mfleurquin");
+              log::logger($v["quantite"] /  $produit_principal_pack["quantite"], "mfleurquin");
+
               // On compare la quantité du produit principal par rapport à la quantité par défaut
               $post["pack_quantite"][$v["id_pack_produit"]] = ($v["quantite"] /  $produit_principal_pack["quantite"]);
             }
           }else{
             $post["pack_quantite"][$v["id_pack_produit"]] = "?";
           }
+
+          log::logger("------------------" , "mfleurquin");
 
         }
 
