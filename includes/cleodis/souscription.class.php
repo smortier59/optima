@@ -147,14 +147,11 @@ class souscription_cleodis extends souscription {
       foreach ($lignes_par_duree as $key => $value) {
         $post["produits"] = json_encode($value);
 
-        log::logger($post , "mfleurquin");
-
-
         //On récupère les id pack de chaque ligne pour le libelle de l'affaire
         $post['id_pack_produit'] = array();
         $post['pack_quantite'] = array();
 
-        foreach ($value as $k => $v) {
+        foreach ($post["produits"] as $k => $v) {
           $post['id_pack_produit'][] = $v["id_pack_produit"];
 
           // Pour chaque pack, on recupere le produit principal
