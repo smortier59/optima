@@ -1192,21 +1192,13 @@ class souscription_cleodis extends souscription {
 
       $site_associe = ATF::site_associe()->select_row();
 
-			if ($site_associe['id_societe']){
-				ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
-        $footerData = ATF::societe()->select_row();
-
+      if ($site_associe['id_societe']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+        $partenaire = ATF::societe()->select_row();
       }
+			$logoBase = '/'.ATF::$codename.'.jpg';
 
-      $info_mail['structure'] = $footerData['structure'];
-      $info_mail['capital'] = $footerData['capital'];
-      $info_mail['reference_tva'] = $footerData['reference_tva'];
-      $info_mail['web'] = $footerData['web'];
-      $info_mail['naf'] = $footerData['naf'];
-      $info_mail['cp'] = $footerData['cp'];
-      $info_mail['siren'] = $footerData['siren'];
-      $info_mail['email'] = $footerData['email'];
-
+      $info_mail['partenaire'] =  $partenaire;
 
       if($codename == "bdomplus") $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
       if($codename == "boulanger-cafe") $info_mail["objet"] = "Abonnement Boulanger Café - Votre contrat à signer";
@@ -1721,33 +1713,24 @@ class souscription_bdomplus extends souscription_cleodis {
 
     $nom_site_associe = ATF::affaire()->select($id_affaire , "site_associe");
 
-    ATF::site_associe()->q->reset()->where('site_associe',$nom_site_associe);
-    $site_associe = ATF::site_associe()->select_row();
+    if ($site_associe['site_associe'] == "bdomplus"){
+      $logoSiteAssocie = '/bdomplus.jpg';
+    }else{
+      $logoSiteAssocie = '/boulanger.jpg';
+    }
 
     if ($site_associe['id_societe']){
       ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
-      $footerData = ATF::societe()->select_row();
-    }
-
-    if ($site_associe['site_associe'] == "bdomplus"){
-      $partenaire = 'BDOM+';
-      $logoSiteAssocie = '/bdomplus.jpg';
+      $partenaire = ATF::societe()->select_row();
     }else{
-      $partenaire = "Boulanger";
-      $logoSiteAssocie = '/boulanger.jpg';
+      ATF::societe()->q->reset()->where("siret", "52933929300043");
+      $partenaire = ATF::societe()->select_row();
     }
 
     $logoBase = '/'.ATF::$codename.'.jpg';
 
-    $info_mail['structure'] = $footerData['structure'];
-    $info_mail['capital'] = $footerData['capital'];
-    $info_mail['reference_tva'] = $footerData['reference_tva'];
-    $info_mail['web'] = $footerData['web'];
-    $info_mail['naf'] = $footerData['naf'];
-    $info_mail['cp'] = $footerData['cp'];
-    $info_mail['siren'] = $footerData['siren'];
-    $info_mail['email'] = $footerData['email'];
-    $info_mail['societe'] = $footerData['societe'];
+
+    $info_mail['partenaire'] =  $partenaire;
     $info_mail['logo'] = $logoBase;
     $info_mail['logoSiteAssocie'] = $logoSiteAssocie;
 
@@ -1833,30 +1816,24 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $site_associe = ATF::site_associe()->select_row();
 
-			if ($site_associe['id_societe']){
-				ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
-				$footerData = ATF::societe()->select_row();
-			}
-
-			if ($site_associe['site_associe'] == "bdomplus"){
-				$partenaire = 'BDOM+';
-				$logoSiteAssocie = '/bdomplus.jpg';
+      if($site_associe['site_associe'] == "bdomplus"){
+        $logoSiteAssocie = '/bdomplus.jpg';
       }else{
-				$partenaire = "Boulanger";
-				$logoSiteAssocie = '/boulanger.jpg';
+        $logoSiteAssocie = '/boulanger.jpg';
       }
+
+      if ($site_associe['id_societe']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+        $partenaire = ATF::societe()->select_row();
+      }else{
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+      }
+
 
 			$logoBase = '/'.ATF::$codename.'.jpg';
 
-      $info_mail['structure'] = $footerData['structure'];
-      $info_mail['capital'] = $footerData['capital'];
-      $info_mail['reference_tva'] = $footerData['reference_tva'];
-      $info_mail['web'] = $footerData['web'];
-      $info_mail['naf'] = $footerData['naf'];
-      $info_mail['cp'] = $footerData['cp'];
-      $info_mail['siren'] = $footerData['siren'];
-      $info_mail['email'] = $footerData['email'];
-      $info_mail['societe'] = $footerData['societe'];
+      $info_mail['partenaire'] =  $partenaire;
       $info_mail['logo'] = $logoBase;
       $info_mail['logoSiteAssocie'] = $logoSiteAssocie;
 
@@ -1904,30 +1881,24 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $site_associe = ATF::site_associe()->select_row();
 
-			if ($site_associe['id_societe']){
-				ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
-				$footerData = ATF::societe()->select_row();
-			}
-
-			if ($site_associe['site_associe'] == "bdomplus"){
-				$partenaire = 'BDOM+';
-				$logoSiteAssocie = '/bdomplus.jpg';
+			if($site_associe['site_associe'] == "bdomplus"){
+        $logoSiteAssocie = '/bdomplus.jpg';
       }else{
-				$partenaire = "Boulanger";
-				$logoSiteAssocie = '/boulanger.jpg';
+        $logoSiteAssocie = '/boulanger.jpg';
       }
+
+      if ($site_associe['id_societe']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+        $partenaire = ATF::societe()->select_row();
+      }else{
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+      }
+
 
 			$logoBase = '/'.ATF::$codename.'.jpg';
 
-      $info_mail['structure'] = $footerData['structure'];
-      $info_mail['capital'] = $footerData['capital'];
-      $info_mail['reference_tva'] = $footerData['reference_tva'];
-      $info_mail['web'] = $footerData['web'];
-      $info_mail['naf'] = $footerData['naf'];
-      $info_mail['cp'] = $footerData['cp'];
-      $info_mail['siren'] = $footerData['siren'];
-      $info_mail['email'] = $footerData['email'];
-      $info_mail['societe'] = $footerData['societe'];
+      $info_mail['partenaire'] =  $partenaire;
       $info_mail['logo'] = $logoBase;
       $info_mail['logoSiteAssocie'] = $logoSiteAssocie;
 
