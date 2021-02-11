@@ -212,20 +212,20 @@
 	}
 },
 {
-	text: '<img src="{ATF::$staticserver}images/icones/uploadFile.png" width="16"> Import du fichier des factures impayées',
+	text: '<img src="{ATF::$staticserver}images/icones/todoList.png" width="24"> Contrôle des statuts de facture',
 	disabled: false,
 	handler: function(btn, ev) {
-		ATF.panelImportImpayee = new Ext.FormPanel({
+		ATF.panelControleStatut = new Ext.FormPanel({
 			frame: true,
 			width: 500,
 			fileUpload: true,
-			id: 'formImportFactureImpayees',
+			id: 'formImportFactureControleStatut',
 			items: [
 				{
 					xtype: "fileuploadfield",
-					fieldLabel: "Fichier des impayés",
-					name: "file",
-					id: "file"
+					fieldLabel: "Fichier de statut",
+					name: "fileStatut",
+					id: "fileStatut"
 				},{
 					xtype: 'panel',
 					id:'resultDiv'
@@ -234,9 +234,9 @@
 
 			buttons:[{
 				text : "Importer",
-				id: "importImpayeeValidBtn",
+				id: "importControleStatutValidBtn",
 				handler : function(){
-					Ext.getCmp('formImportFactureImpayees').getForm().submit({
+					Ext.getCmp('formImportFactureControleStatut').getForm().submit({
 						submitEmptyText:false,
 						method  : 'post',
 						waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
@@ -244,7 +244,7 @@
 						url     : 'extjs.ajax',
 						params: {
 							'extAction':'facture'
-							,'extMethod':'import_facture_impayee'
+							,'extMethod':'import_facture_controle_statut'
 						},
 						waitTitle:'Veuillez patienter',
 						waitMsg: 'Chargement ...',
@@ -283,13 +283,13 @@
 		ATF.unsetFormIsActive();
 
 		ATF.ImportWindow = new Ext.Window({
-			title: 'Import de facture impayées',
-			id:'mymodalimportimpayee',
+			title: 'Contrôle des statuts de facture',
+			id:'mymodalControleStatut',
 			width: 510,
 			buttonAlign:'center',
 			autoScroll:false,
 			closable:true,
-			items: ATF.panelImportImpayee
+			items: ATF.panelControleStatut
 		}).show();
 
 	}

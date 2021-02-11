@@ -124,7 +124,7 @@ class facture_cleodis extends facture {
 		$this->addPrivilege("export_cleofi");
 
 		$this->addPrivilege("import_facture_libre");
-		$this->addPrivilege("import_facture_impayee");
+		$this->addPrivilege("import_facture_controle_statut");
 
 
 
@@ -2634,7 +2634,7 @@ class facture_cleodis extends facture {
 		return json_encode($return);
 	}
 
-	public function import_facture_impayee(&$infos,&$s,$files=NULL) {
+	public function import_facture_controle_statut(&$infos,&$s,$files=NULL) {
 		$infos['display'] = true;
 		$path = $files['file']['tmp_name'];
 
