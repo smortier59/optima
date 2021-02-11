@@ -124,6 +124,7 @@ class facture_cleodis extends facture {
 		$this->addPrivilege("export_cleofi");
 
 		$this->addPrivilege("import_facture_libre");
+		$this->addPrivilege("import_facture_impayee");
 
 
 
@@ -2629,6 +2630,56 @@ class facture_cleodis extends facture {
 	      ATF::db($this->db)->commit_transaction();
 	    }
 
+
+		return json_encode($return);
+	}
+
+	public function import_facture_impayee(&$infos,&$s,$files=NULL) {
+		$infos['display'] = true;
+		$path = $files['file']['tmp_name'];
+
+		$erreurs = array();
+		try {
+			$f = fopen($path,"r");
+
+		    // Vérification des colonnes
+		    $entetes = fgetcsv($f, 0, ",");
+		    if (count($entetes) != 4) {
+		    	throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 4");
+		    }
+
+			$expectedEntetes = array("ref_societe", "ref_facture", "date_rejet", "motif_rejet");
+			foreach ($entetes as $col => $name) {
+				log::logger($name." ==! ".$expectedEntetes[$col], "qjanon");
+				if($name != $expectedEntetes[$col]){
+					$erreurs[] = "Erreur entête colonne ".$col." : Valeur attendu : ".$expectedEntetes[$col]." / Valeur actuelle : ".$name;
+					$nb_entete_manquant++;
+				}
+			}
+
+			ATF::db($this->db)->begin_transaction();
+			
+
+			if (count($erreurs)) {
+				throw new errorATF(implode("<br>", $erreurs));
+			}
+
+	    	fclose($handle);
+
+    		$destination = ATF::facture()->filepath("gestion_impayee_csv","fichier_joint");
+
+			$r = util::rename($path, $destination);
+
+
+			$return['warnings'] = $warnings;
+			$return['success'] = true;
+			ATF::db($this->db)->commit_transaction();
+		} catch (errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			$return['errors'] = $e->getMessage();
+			
+			$return['success'] = false;
+		}
 
 		return json_encode($return);
 	}
