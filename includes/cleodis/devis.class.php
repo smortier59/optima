@@ -16,7 +16,7 @@ class devis_cleodis extends devis {
 			,'devis.devis'
 			,'devis.etat'=>array("renderer"=>"etat","width"=>30)
 			,'devis.type_contrat'
-            ,'devis.date'
+			,'devis.date'
             ,'devis.first_date_accord'
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>70)
 			,'retourBPA'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"uploadFile","width"=>70)
@@ -64,30 +64,7 @@ class devis_cleodis extends devis {
 			,"id_user"
 			,'devis_etendre'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
-			,"type_affaire"=>array("custom"=>true,
-								  "data"=>array(
-								  	'normal',
-								  	'2SI',
-								  	'Boulanger Pro',
-									'Consommables_com',
-									'DIB',
-									'Dyadem',
-									'FLEXFUEL',
-									"haccp",
-									'Hexamed Leasing',
-									'Instore',
-									'LAFI',
-									'LFS',
-									'LocEvo',
-									'Manganelli',
-									'NRC',
-									'OLISYS - Ma Solution IT',
-									'Proxi Pause',
-									'Trekk',
-									'ZENCONNECT – ZEN PACK'
-
-								  ),
-								  "xtype"=>"combo")
+			,'id_type_affaire'=>array("custom"=>true, "xtype"=> "combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
 
 		);
@@ -208,6 +185,7 @@ class devis_cleodis extends devis {
 		$this->foreign_key["id_filiale"] = "societe";
 		$this->foreign_key["AR_societe"] = "societe";
 		$this->foreign_key["vente_societe"] = "societe";
+		$this->foreign_key["id_type_affaire"]="type_affaire";
 
 		$this->onglets = array('devis_ligne');
 		$this->sans_partage = true; /* Evite de se voir jeté à cause d'un droit de partage pour ce module */
@@ -414,7 +392,10 @@ class devis_cleodis extends devis {
 		}else{
 			$infos["nature"]="affaire";
 		}
+
 		$affaire=ATF::affaire()->formateInsertUpdate($infos);
+
+		log::logger($affaire , "mfleurquin");
 
 
 		ATF::db($this->db)->begin_transaction();
@@ -433,7 +414,12 @@ class devis_cleodis extends devis {
 
 
 		$RUM = "";
-		if($infos["type_affaire"]) $affaire["type_affaire"] = $infos["type_affaire"];
+		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
+
+
+
+
+
 
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
@@ -480,7 +466,7 @@ class devis_cleodis extends devis {
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
 
 		////////////////Devis
-		unset($infos["marge"],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"],$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
+		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
 		$last_id=parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		// Mise à jour du forecast
@@ -1133,8 +1119,8 @@ class devis_cleodis extends devis {
 				case "commentaire_facture3":
 					return $affaire["commentaire_facture3"];
 					break;
-				case "type_affaire":
-					return $affaire["type_affaire"];
+				case "id_type_affaire":
+					return $affaire["id_type_affaire"];
 			}
 		}else{
 			switch ($field) {
@@ -1178,8 +1164,12 @@ class devis_cleodis extends devis {
 						$return="";
 					}
 					return $return;
-				case "type_affaire":
-					return "normal";
+				case "id_type_affaire":
+					ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+					$type_affaire =ATF::type_affaire()->select_row();
+					return $type_affaire["id_type_affaire"];
+
+
 			}
 		}
 

@@ -696,7 +696,7 @@ class facture_fournisseur extends classes_optima {
 				$facture_refi = ATF::facture()->sa();
 
 				//Il faut aussi vérifier que l'affaire ne va pas être céder
-				$demande_refi=ATF::demande_refi()->existDemandeRefi($value["facture_fournisseur.id_affaire_fk"]);
+				$demande_refi=ATF::demande_refi()->existDemandeRefi($value["facture_fournisseur.id_affaire_fk"], true, false);
 
 				if(!$facture_refi || ATF::refinanceur()->select($facture_refi[0]["id_refinanceur"],"code_refi")=="REFACTURATION"){
 
