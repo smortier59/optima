@@ -1,5 +1,6 @@
 /**
  * @author mfleurquin
+ * @author Quentin JANON (bien meilleur que le gars au dessus)
  */
 
 {
@@ -128,11 +129,7 @@
 		}).show();
 
 	}
-
 },
-
-
-
 {
 	text: '{ATF::$usr->trans(import_facture_libre,facture)|escape:javascript}',
 	disabled: false,
@@ -210,6 +207,96 @@
 			autoScroll:false,
 			closable:true,
 			items: ATF.panelImport
+		}).show();
+
+	}
+},
+{
+	text: '<img src="{ATF::$staticserver}images/icones/todoList.png" width="24"> Contrôle des statuts de facture',
+	disabled: false,
+	handler: function(btn, ev) {
+		ATF.panelControleStatut = new Ext.FormPanel({
+			frame: true,
+			width: 500,
+			fileUpload: true,
+			id: 'formImportFactureControleStatut',
+			items: [
+				{
+					xtype: "fileuploadfield",
+					fieldLabel: "Fichier de statut",
+					name: "fileStatut",
+					id: "fileStatut"
+				},{
+					xtype: 'panel',
+					id:'resultDiv'
+				}
+			],
+
+			buttons:[{
+				text : "Importer",
+				id: "importControleStatutValidBtn",
+				handler : function(){
+					$('#resultDiv').html("");
+					Ext.getCmp('formImportFactureControleStatut').getForm().submit({
+						submitEmptyText:false,
+						method  : 'post',
+						waitMsg : '{ATF::$usr->trans(submit)|escape:javascript}',
+						waitTitle : '{ATF::$usr->trans(loading)|escape:javascript}',
+						url     : 'extjs.ajax',
+						params: {
+							'extAction':'facture'
+							,'extMethod':'import_facture_controle_statut'
+						},
+						waitTitle:'Veuillez patienter',
+						waitMsg: 'Chargement ...',
+						timeout: 3600,
+						success:function(form, action) {
+							var html = '<div class="alert alert-success">C\'est tout bon !<br><br>';
+							html += '<ul style="text-align: left !important;">';
+							// var r = Ext.util.JSON.decode(action.response.responseText);
+
+							if (action.result && action.result.rapport) {
+								html += action.result.rapport;
+							}
+							if (action.result && action.result.fname) {
+								html += "<br>Cliquez ici pour télécharger le rapport XLS : ";
+								html += '<a href="facture,download_facture_controle_statut.ajax,fname=' + action.result.fname + '" target="_blank"><img src="{ATF::$staticserver}images/icones/xls.png" width="16"></a>';
+								html += "<br>";
+							} else {
+								html += "<br>Rapport XLS non disponible<br>";
+							}
+							html += "</div>";
+							$('#resultDiv').html(html);
+							ATF.loadMask.hide();
+						}, 
+						failure:function(form, action) {
+							var html = '<div class="alert alert-warning">Certaines erreurs ont rendu impossible l\'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br>';
+							html += '<ul style="text-align: left !important;">';
+							if (action.result && action.result.errors) {
+								html += "<li>" + action.result.errors + "</li>";
+							} else {
+								html += "<li>Erreur non identifiée</li>";
+							}
+							html += "</ul></div>";
+
+							$('#resultDiv').html(html);
+							ATF.loadMask.hide();						
+						}
+					});
+				}
+			}]
+		});
+
+		ATF.unsetFormIsActive();
+
+		ATF.ImportWindow = new Ext.Window({
+			title: 'Contrôle des statuts de facture',
+			id:'mymodalControleStatut',
+			width: 510,
+			buttonAlign:'center',
+			autoScroll:false,
+			closable:true,
+			items: ATF.panelControleStatut
 		}).show();
 
 	}

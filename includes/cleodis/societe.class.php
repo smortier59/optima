@@ -213,7 +213,7 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
 
-    $this->files["logo"] = array("type"=>"png","no_upload"=>false,"no_generate"=>true);
+    $this->files["logo"] = array("type"=>"jpg","no_upload"=>false,"no_generate"=>true);
 
 
 
@@ -247,7 +247,6 @@ class societe_cleodis extends societe {
 
 
   }
-
 
 
   /** Fonction qui génère les résultat pour les champs d'auto complétion société pour CLEOSCOPE
@@ -1272,6 +1271,10 @@ class societe_cleodis extends societe {
     $fournisseur = 6241;
     $data = self::getInfosFromCREDITSAFE($post);
 
+
+    ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+    $type_affaireNormal = ATF::type_affaire()->select_row();
+
     if($data){
       $gerants = $data["gerant"];
 
@@ -1379,7 +1382,7 @@ class societe_cleodis extends societe {
                   "type_devis" => "normal",
                   "id_contact" => $gerant[0]["id_contact"],
                   "prix_achat"=>0,
-                  "type_affaire" => "normal");
+                  "id_type_affaire" => $type_affaireNormal["id_type_affaire"]);
           $values_devis =array();
 
           $montantLoyer = $duree = 0;
