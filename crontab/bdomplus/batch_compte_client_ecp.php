@@ -15,38 +15,35 @@ $url_front_espace_client = ATF::constante()->select_row();
 if(!$url_front_espace_client){
     echo "Il n'y a pas de constante __URL_ESPACE_CLIENT__ pour l'url de l'espace client\n";
     return;
-}else{
-    $url_front_espace_client = $url_front_espace_client["valeur"];
 }
-log::logger($url_front_espace_client, "mfleurquin");
+$url_front_espace_client = $url_front_espace_client["valeur"];
 
 ATF::constante()->q->reset()->where("constante", "__URL_ESPACE_CLIENT_BACK__");
 $url_back_espace_client = ATF::constante()->select_row();
 if (!$url_back_espace_client) {
     echo "Il n'y a pas de constante __URL_ESPACE_CLIENT_BACK__ pour l'url de l'espace client\n";
     return;
-}else{
-    $url_back_espace_client = $url_back_espace_client["valeur"];
 }
-log::logger($url_back_espace_client, "mfleurquin");
-/*
-    $application = getApplicationByDomain($url_back_espace_client, $url_front_espace_client);
-    if(!$application) {
-        echo "Application ID non récupérée\n";
-        return;
-    }else{
+
+
+$url_back_espace_client = $url_back_espace_client["valeur"];
+$application = getApplicationByDomain($url_back_espace_client, $url_front_espace_client);
+if(!$application) {
+    echo "Application ID non récupérée\n";
+    return;
+}else{
     $application = json_decode($application);
     if(!$application->_id){
         echo "Application ID récupéré incorrect\n";
         echo "---". $application."\n";
         return;
     }
-    }
+}
 
     // $mongoConnection = new MongoClient("mongodb://172.16.255.211:27017");
 
     echo "Application ID --> ".$app->_id."\n";
-*/
+
 echo "Tout est OK, on commence le taff \n";
 
 //Recupere toute les affaires en cours donc on a pas encore envoyé de mail de création de compte au client
