@@ -125,6 +125,7 @@ class facture_cleodis extends facture {
 
 		$this->addPrivilege("import_facture_libre");
 		$this->addPrivilege("import_facture_controle_statut");
+		$this->addPrivilege("download_facture_controle_statut");
 
 
 
@@ -2635,8 +2636,11 @@ class facture_cleodis extends facture {
 	}
 
 	public function import_facture_controle_statut(&$infos,&$s,$files=NULL) {
+		$logFile = "controleFactureStatutCleodis";
+		log::logger("=================== Début de fonction import_facture_controle_statut", $logFile);
 		$infos['display'] = true;
-		$path = $files['file']['tmp_name'];
+		$path = $files['fileStatut']['tmp_name'];
+		log::logger("Début de fonction import_facture_controle_statut", $logFile);
 
 		$erreurs = array();
 		try {
@@ -2644,13 +2648,12 @@ class facture_cleodis extends facture {
 
 		    // Vérification des colonnes
 		    $entetes = fgetcsv($f, 0, ",");
-		    if (count($entetes) != 4) {
+			$expectedEntetes = array("ref_societe", "ref_facture", "statut");
+		    if (count($entetes) != count($expectedEntetes)) {
 		    	throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 4");
 		    }
 
-			$expectedEntetes = array("ref_societe", "ref_facture", "date_rejet", "motif_rejet");
 			foreach ($entetes as $col => $name) {
-				log::logger($name." ==! ".$expectedEntetes[$col], "qjanon");
 				if($name != $expectedEntetes[$col]){
 					$erreurs[] = "Erreur entête colonne ".$col." : Valeur attendu : ".$expectedEntetes[$col]." / Valeur actuelle : ".$name;
 					$nb_entete_manquant++;
@@ -2663,17 +2666,88 @@ class facture_cleodis extends facture {
 			if (count($erreurs)) {
 				throw new errorATF(implode("<br>", $erreurs));
 			}
+			$this->q->reset();
+			$allFactures = $this->sa();
+
+			$facturesNotFound = $facturesEtatDifferend = [];
+			$nbFactureCsv = 0;
+			while (($data = fgetcsv($f, 0, ",")) !== FALSE) {
+				$nbFactureCsv++;
+				$indexFound = array_search($data[1], array_column($allFactures, 'ref'));
+				log::logger("Recherche facture ".$data[1]." - Statut : ".$data[2]." - résultat ".$indexFound, $logFile);
+				if ($indexFound !== false && !empty($allFactures[$indexFound])) {
+					log::logger("Found", $logFile);
+					log::logger($allFactures[$indexFound], $logFile);
+					if ($allFactures[$indexFound]['etat'] != $data[2]) {
+						$facturesEtatDifferend[] = $data;
+						log::logger("Etat différend ! BDD: ".$allFactures[$indexFound]['etat']." / CSV: ".$data[2], $logFile);
+					} else {
+						log::logger("Etat IDEM - RAS", $logFile);
+
+					}
+				} else {
+					$facturesNotFound[] = $data;
+					log::logger("Not found ", $logFile);
+				}
+			}
+
 
 	    	fclose($handle);
 
-    		$destination = ATF::facture()->filepath("gestion_impayee_csv","fichier_joint");
-
-			$r = util::rename($path, $destination);
-
-
 			$return['warnings'] = $warnings;
+			$return['rapport'] = "Rapport : <br><br>";
+			$return['rapport'] .= "Nombre de facture dans le CSV : ".$nbFactureCsv."<br>";
+			$return['rapport'] .= "Nombre de facture avec un état différend en BDD : ".count($facturesEtatDifferend)."<br>";
+			$return['rapport'] .= "Nombre de facture non trouvées en BDD : ".count($facturesNotFound)."<br>";
 			$return['success'] = true;
 			ATF::db($this->db)->commit_transaction();
+
+
+			require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
+			require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
+			$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
+			$workbook = new PHPExcel;
+
+			$sheets = array("Etat différends","Non trouvées");
+
+			$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
+	        
+	        // Premier onglet
+	        $sheet = $workbook->getActiveSheet();
+			$workbook->setActiveSheetIndex(0);
+		    $sheet->setTitle("Etat différends");
+
+		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
+			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');        
+	        
+	        // Deuxième onglet
+        	$sheet = $workbook->createSheet(1);
+			$workbook->setActiveSheetIndex(1);
+		    $sheet->setTitle("Non trouvées");
+
+		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
+			$sheet->fromArray($facturesNotFound, NULL, 'A2');
+
+			foreach ($workbook->getWorksheetIterator() as $worksheet) {
+
+			    $workbook->setActiveSheetIndex($workbook->getIndex($worksheet));
+
+			    $sheet = $workbook->getActiveSheet();
+			    $cellIterator = $sheet->getRowIterator()->current()->getCellIterator();
+			    $cellIterator->setIterateOnlyExistingCells(true);
+			    /** @var PHPExcel_Cell $cell */
+			    foreach ($cellIterator as $cell) {
+			        $sheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
+			    }
+			}
+
+			$writer = new PHPExcel_Writer_Excel5($workbook);
+
+			$writer->save($fname);
+			PHPExcel_Calculation::getInstance()->__destruct();
+			$return['fname'] = $fname;
+
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			$return['errors'] = $e->getMessage();
@@ -2681,8 +2755,21 @@ class facture_cleodis extends facture {
 			$return['success'] = false;
 		}
 
+
+
 		return json_encode($return);
 	}
+
+	public function download_facture_controle_statut(&$infos,&$s,$files=NULL) {
+		$infos['display'] = true;
+		header('Content-type: application/vnd.ms-excel');
+		header('Content-Disposition:inline;filename=rapport_controle_facture-'.date("YmdHis").'.xls');
+		header("Cache-Control: private");
+		$fh=fopen($infos['fname'], "rb");
+		fpassthru($fh);
+		// unlink($fname);
+	}
+
 
 };
 

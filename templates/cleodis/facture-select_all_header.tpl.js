@@ -236,6 +236,7 @@
 				text : "Importer",
 				id: "importControleStatutValidBtn",
 				handler : function(){
+					$('#resultDiv').html("");
 					Ext.getCmp('formImportFactureControleStatut').getForm().submit({
 						submitEmptyText:false,
 						method  : 'post',
@@ -250,17 +251,23 @@
 						waitMsg: 'Chargement ...',
 						timeout: 3600,
 						success:function(form, action) {
+							var html = '<div class="alert alert-success">C\'est tout bon !<br><br>';
+							html += '<ul style="text-align: left !important;">';
 							// var r = Ext.util.JSON.decode(action.response.responseText);
-							console.log('SUCCESS');
-							// var html = "";
-							// if (r.warnings) {
-							// 	html += "Certaines erreurs non bloquantes ont été détecté, le détail ci dessous : <br><br><ul>";
-							// 	for (var d in r.warnings) {
-							// 		html += "<li><b>Ligne(s) "+r.warnings[d]+"</b> : "+d+"</li>";
-							// 	}
-							// }
-							// html += "</ul><br><br>";
-							// $('#resultDiv').html(html);
+
+							if (action.result && action.result.rapport) {
+								html += action.result.rapport;
+							}
+							if (action.result && action.result.fname) {
+								html += "<br>Cliquez ici pour télécharger le rapport XLS : ";
+								html += '<a href="facture,download_facture_controle_statut.ajax,fname=' + action.result.fname + '" target="_blank"><img src="{ATF::$staticserver}images/icones/xls.png" width="16"></a>';
+								html += "<br>";
+							} else {
+								html += "<br>Rapport XLS non disponible<br>";
+							}
+							html += "</div>";
+							$('#resultDiv').html(html);
+							ATF.loadMask.hide();
 						}, 
 						failure:function(form, action) {
 							var html = '<div class="alert alert-warning">Certaines erreurs ont rendu impossible l\'import du fichier, veuillez les corriger en suivant le détail ci dessous : <br><br>';

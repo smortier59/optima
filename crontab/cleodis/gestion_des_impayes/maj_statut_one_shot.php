@@ -29,8 +29,8 @@ try {
   ATF::db()->rollback_transaction();
   throw $e;
 }
-ATF::db()->rollback_transaction();
-// ATF::db()->commit_transaction();
+// ATF::db()->rollback_transaction();
+ATF::db()->commit_transaction();
 
 
 /**
