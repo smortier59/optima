@@ -136,7 +136,8 @@ class commande_ligne_absystech extends commande_ligne {
 
 		$q = ATF::_s("pager")->create($post["pager"],NULL,true);
 		$q->reset('where')
-			->where("commande_ligne.id_compte_absystech",1) // Vente de marchandise uniquement !
+			//->where("commande_ligne.id_compte_absystech",1) // Vente de marchandise uniquement !
+			->where("compte_absystech.type","marchandise")
 			->where("commande_ligne.id_commande",ATF::commande()->decryptId($post["id_commande"]))
 		/*if($post["id_fournisseur"]){
 			$fournisseurs = explode(",", $post["id_fournisseur"]);

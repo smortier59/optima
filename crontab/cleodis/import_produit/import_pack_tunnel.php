@@ -16,6 +16,7 @@ $path = dirname(__FILE__) . "/" . $_SERVER["argv"][2];
 
 
 
+
 // Matrice de type
 $type = array(
 	"Fixe" => "fixe",
@@ -47,7 +48,15 @@ import_ligne($data["lignes_ok"], $packs, $produits);
 // Rollback la transaction
 //ATF::db()->rollback_transaction();
 // Valide la trnasaction
-ATF::db()->commit_transaction();
+if(!$_SERVER["argv"][2] || $_SERVER["argv"][2] == "commit"){
+	echo "Commit des transactions";
+	ATF::db()->commit_transaction();
+}else{
+	echo "Rollback des transactions";
+	// Rollback la transaction
+	ATF::db()->rollback_transaction();
+}
+
 echo "========= FIN DE SCRIPT =========\n";
 
 /**
@@ -324,15 +333,15 @@ function import_ligne($lignes_ok, $packs, $produits)
  * @param  String $fournisseur Nom du fournisseur
  * @return Integer|String              ID du fournisseur si existant où un message d'information
  */
-function get_fournisseur($fournisseur)
+function get_fournisseur($ref_fournisseur)
 {
-	ATF::societe()->q->reset()->where("societe", ATF::db()->real_escape_string($fournisseur), "AND", false, "LIKE");
+	ATF::societe()->q->reset()->where("ref", ATF::db()->real_escape_string($ref_fournisseur), "AND");
 	$f = ATF::societe()->select_row();
 
 	if ($f) {
 		return $f["id_societe"];
 	} else {
-		echo "Il faut créer le fournisseur " . $fournisseur . "\n";
+		echo "Il faut créer le fournisseur pour la ref" . $ref_fournisseur . "\n";
 	}
 }
 

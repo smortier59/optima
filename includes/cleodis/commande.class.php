@@ -434,9 +434,21 @@ class commande_cleodis extends commande {
 		$last_id = parent::insert($infos,$s,NULL,$var=NULL,NULL,true);
 
 		$dest = NULL;
-		if($infos["id_user"] == 18) $dest = 21;
-		elseif($infos["id_user"] == 93) $dest = 103;
-		else $dest = ATF::$usr->getID();
+		// Pierre -> Destinataire Severine
+		// Terence --> Destinataire Alison
+		$createur = ATF::user()->select($infos["id_user"]);
+
+		if($createur === "pcaminel"){
+			ATF::user()->q->reset()->where("login", "smazars");
+			$desti = ATF::user()->select_row();
+			$dest = $desti["id_user"];
+		}elseif($createur === "tdelattre"){
+			ATF::user()->q->reset()->where("login", "mmysoet");
+			$desti = ATF::user()->select_row();
+			$dest = $desti["id_user"];
+		}else {
+			$dest = ATF::$usr->getID();
+		}
 
 
 
