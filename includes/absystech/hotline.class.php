@@ -4331,13 +4331,7 @@ class hotline extends classes_optima {
 								  ->where("affaire.etat","terminee","AND","cle1","!=")
 								  ->where("affaire.etat","perdue","AND","cle1","!=")
 								  ->addOrder("affaire.date","DESC");
-
-		$res = ATF::affaire()->sa();
-
-		ATF::affaire()->q->setToString();
-		log::logger(ATF::affaire()->sa() , "mfleurquin");
-
-		return $res;
+		return ATF::affaire()->sa();
 	}
 
 	/**
