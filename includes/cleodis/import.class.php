@@ -70,12 +70,11 @@ class import extends classes_optima{
 		$lines_count = 0;
 		$processed_lines = 0;
 
-		log::logger($entetes , "mfleurquin");
-		log::logger(array("ref", "fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image") , "mfleurquin");
+		log::logger(array("ref", "ref fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image") , "mfleurquin");
 
-		if($entetes != array("ref", "fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image")){
+		if($entetes != array("ref", "ref fournisseur", "site_associe", "designation", "Prix achat dont ecotaxe", "loyer", "description", "url_image")){
 			$success = false;
-			$error["alertes"][] = "Entetes de fichier incorrecte, entetes attendues : ref, fournisseur, site_associe, designation, Prix achat dont ecotaxe, loyer, description, url_image";
+			$error["alertes"][] = "Entetes de fichier incorrecte, entetes attendues : ref, ref fournisseur, site_associe, designation, Prix achat dont ecotaxe, loyer, description, url_image";
 		}else{
 
 			foreach ($entetes as $key => $value) {
@@ -145,11 +144,11 @@ class import extends classes_optima{
 
 	/**
 	 * Récupère le fournisseur depuis un nom
-	 * @param  String $fournisseur Nom du fournisseur
+	 * @param  String $fournisseur Ref du fournisseur
 	 * @return Integer|String              ID du fournisseur si existant où un message d'information
 	 */
 	private function get_fournisseur($fournisseur){
-		ATF::societe()->q->reset()->where("societe", ATF::db()->real_escape_string($fournisseur), "AND", false, "LIKE");
+		ATF::societe()->q->reset()->where("ref", ATF::db()->real_escape_string($fournisseur), "AND", false, "LIKE");
 		$f = ATF::societe()->select_row();
 
 		if($f){
