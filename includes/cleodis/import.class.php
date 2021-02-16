@@ -88,9 +88,9 @@ class import extends classes_optima{
 				$lines_count ++;
 
 				$erreur_get = false;
-				if($this->get_fournisseur($ligne[$entetes_key["fournisseur"]]) == null){
+				if($this->get_fournisseur($ligne[$entetes_key["ref fournisseur"]]) == null){
 					$erreur_get = true;
-					$error["data"][] = "Fournisseur inconnu ".$ligne[$entetes_key["fournisseur"]];
+					$error["data"][] = "Fournisseur inconnu ".$ligne[$entetes_key["ref fournisseur"]];
 				}
 
 
@@ -98,13 +98,13 @@ class import extends classes_optima{
 
 				if(!$erreur_get){
 					ATF::produit()->q->reset()->where("ref", $ligne[$entetes_key["ref"]], "AND")
-											  ->where("id_fournisseur", $this->get_fournisseur($ligne[$entetes_key["fournisseur"]]));
+											  ->where("id_fournisseur", $this->get_fournisseur($ligne[$entetes_key["ref fournisseur"]]));
 					$p = ATF::produit()->select_row();
 					if($p){
 						$prod = array(
 							"id_produit" => $p["id_produit"],
 							"site_associe" => $ligne[$entetes_key["site_associe"]],
-							"id_fournisseur" => $this->get_fournisseur($ligne[$entetes_key["fournisseur"]]),
+							"id_fournisseur" => $this->get_fournisseur($ligne[$entetes_key["ref fournisseur"]]),
 							"produit" => utf8_encode($ligne[$entetes_key["designation"]]),
 							"prix_achat" => $ligne[$entetes_key["Prix achat dont ecotaxe"]],
 							"loyer" => $ligne[$entetes_key["loyer"]],
@@ -117,10 +117,10 @@ class import extends classes_optima{
 							$processed_lines++;
 
 						} catch (errorATF $e) {
-							$error["data"][] = "Erreur lors de la mise à jour du produit (".$ligne[$entetes_key["ref"]]."/".$ligne[$entetes_key["fournisseur"]]." Erreur : ".$e->getMessage();
+							$error["data"][] = "Erreur lors de la mise à jour du produit (".$ligne[$entetes_key["ref"]]."/".$ligne[$entetes_key["ref fournisseur"]]." Erreur : ".$e->getMessage();
 						}
 					}else{
-						$error["data"][] = "Produit ref/fournisseur (".$ligne[$entetes_key["ref"]]."/".$ligne[$entetes_key["fournisseur"]]." non trouvé";
+						$error["data"][] = "Produit ref/fournisseur (".$ligne[$entetes_key["ref"]]."/".$ligne[$entetes_key["ref fournisseur"]]." non trouvé";
 					}
 				}
 
