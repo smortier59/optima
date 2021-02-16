@@ -2691,6 +2691,7 @@ class affaire_cleodis extends affaire {
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
 
+			log::logger($societe, "mfleurquin");
 			log::logger("Score --> ".$societe["cs_score"], "mfleurquin");
 			log::logger("Creation --> ".$creation, "mfleurquin");
 
