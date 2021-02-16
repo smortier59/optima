@@ -105,10 +105,10 @@ class import extends classes_optima{
 							"id_produit" => $p["id_produit"],
 							"site_associe" => $ligne[$entetes_key["site_associe"]],
 							"id_fournisseur" => $this->get_fournisseur($ligne[$entetes_key["ref fournisseur"]]),
-							"produit" => utf8_encode($ligne[$entetes_key["designation"]]),
+							"produit" => mb_convert_encoding($ligne[$entetes_key["designation"]], 'UTF-8'),
 							"prix_achat" => $ligne[$entetes_key["Prix achat dont ecotaxe"]],
 							"loyer" => $ligne[$entetes_key["loyer"]],
-							"description" => utf8_encode($ligne[$entetes_key["description"]]),
+							"description" => mb_convert_encoding($ligne[$entetes_key["description"]], 'UTF-8'),
 							"url_image" => $ligne[$entetes_key["url_image"]]
 						);
 
