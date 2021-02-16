@@ -2646,9 +2646,6 @@ class affaire_cleodis extends affaire {
 				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
 			}
 
-
-
-
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
@@ -2693,6 +2690,10 @@ class affaire_cleodis extends affaire {
 			$creation = $creation->format("Ymd");
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
+
+			log::logger("Score --> ".$societe["cs_score"], "mfleurquin");
+			log::logger("Creation --> ".$creation, "mfleurquin");
+
 
 			if(($societe["cs_score"] > 50 && $creation < $past2Years)){
 				$comite["etat"] = "accepte";
