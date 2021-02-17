@@ -70,6 +70,22 @@ class espace_client_conseiller {
         return $response;
     }
 
+    /**
+     * Interroge le back, afin de savoir si un compte existe pour
+     * @author Morgan Fleurquin <mfleurquin@absystech.fr>
+     * @param  string $url_back_espace_client
+     * @param string $applicationId
+     * @param array $clients
+     *          [
+     *              id_societe, --> ID du client
+     *              nom,        --> Nom du client
+     *              prenom,     --> Prenom du client
+     *              email,      --> Email du client (email à tester)
+     *              ref,        --> Ref affaire
+     *              affaire     --> ID affaire
+     *          ]
+     * @return array clients avec en plus un champs existe qui permet de saboir si un compte existe ou non
+     */
     public function checkAccountsExiste($url_back_espace_client, $applicationId, $clients) {
         $curl = curl_init();
 
@@ -101,46 +117,4 @@ class espace_client_conseiller {
 
 
     }
-
-    /**
-     * Interroge le back, afin de savoir si un compte existe pour un email et une application donnée
-     * @author Morgan Fleurquin <mfleurquin@absystech.fr>
-     * @param  string $url_back_espace_client
-     * @param string $ecmailClient
-     * @param string $applicationId
-     * @return void
-     */
-    public function accountExisteEcc($url_back_espace_client, $ecmailClient, $applicationId) {
-        $curl = curl_init();
-
-        echo "Check si le client à un compte : " . $url_back_espace_client . '/account/existAccountForOptima?email=' . $ecmailClient . '&applicationId=' . $applicationId."\n";
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url_back_espace_client.'/account/existAccountForOptima?email='. $ecmailClient .'&applicationId='. $applicationId,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: text/plain'
-            ),
-            CURLOPT_VERBOSE => true,
-        ));
-
-        $response = curl_exec($curl);
-        if($response === false) {
-            $error = curl_error($curl);
-            log::logger("Error ---> ", "mfleurquin");
-            log::logger($error, "mfleurquin");
-        }
-
-
-
-        curl_close($curl);
-        return $response;
-    }
-
 }
