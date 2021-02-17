@@ -665,6 +665,10 @@ class commande_cleodis extends commande {
 							ATF::suivi()->d($item["id_suivi"]);
 						}
 					}
+
+					if(ATF::$codename == "bdomplus" && $infos["key"] == "retour_contrat" && $infos["value"] != null){
+						ATF::societe()->demande_creation_compte_espace_client(null,null,$infos["id_commande"]);
+					}
 				} catch(errorATF $e) {
 					//On rollback le tout
 					ATF::db($this->db)->rollback_transaction();
