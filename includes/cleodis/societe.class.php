@@ -2234,10 +2234,11 @@ class societe_bdomplus extends societe_cleodis {
 
 
     if(!$url_front_espace_client) {
-      ATF::constante()->q->reset()->where("constante", "__URL_ESPACE_CLIENT__");
-      $url_front_espace_client = ATF::constante()->select_row();
-      if(!$url_front_espace_client) throw new errorATF("Constante URL ESPACE CLIENT inconnue");
-      $url_front_espace_client = $url_front_espace_client["valeur"];
+      try {
+        $url_front_espace_client = ATF::espace_client_conseiller()->getUrlFront();
+      } catch (errorATF $e) {
+        throw $e;
+      }
     }
 
     ATF::societe()->q->reset()->where("siret", "52933929300043");
