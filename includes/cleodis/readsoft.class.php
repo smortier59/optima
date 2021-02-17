@@ -223,7 +223,7 @@ class readsoft {
 
 											// On check pour chaque ligne si il y a un serial a rapporter dans Optima
 											foreach ($vcf["lines"] as $kligneff => $vligneff) {
-												if($vligneff["NumSerie"] != ""){
+												if($vligneff["LIT_NumSerie"] != ""){
 													//Il faut mettre à jour le serial sur le contrat
 													self::updateSerial($id_doc, $values_facture_fournisseur[$kbdcl], $vligneff);
 												}
@@ -374,7 +374,7 @@ class readsoft {
 		if($ligne_commande["serial"] == ""){
 			log::logger("---- La ligne du contrat n'a pas encore de serial, on update direct la ligne de commande ".$ligne_facture_fournisseur["id_commande_ligne"],"cr-readsoft-".$id_doc.".log");
 			ATF::commande_ligne()->u(array("id_commande_ligne"=> $ligne_commande["id_commande_ligne"],
-										   "serial" => $ligne_readsoft["NumSerie"]
+										   "serial" => $ligne_readsoft["LIT_NumSerie"]
 										  )
 									);
 		}else{
@@ -382,11 +382,11 @@ class readsoft {
 
 			// Le serial est il déja présent ?
 			if (in_array($ligne_readsoft["NumSerie"], explode(" ", $ligne_commande["serial"]))) {
-				log::logger("---- le serial ".$ligne_readsoft["NumSerie"]." est déja présent, on ne fait rien","cr-readsoft-".$id_doc.".log");
+				log::logger("---- le serial ".$ligne_readsoft["LIT_NumSerie"]." est déja présent, on ne fait rien","cr-readsoft-".$id_doc.".log");
 			}else{
-				log::logger("---- le serial ".$ligne_readsoft["NumSerie"]." n'est pas présent, on update la ligne ".$ligne_facture_fournisseur["id_commande_ligne"],"cr-readsoft-".$id_doc.".log");
+				log::logger("---- le serial ".$ligne_readsoft["LIT_NumSerie"]." n'est pas présent, on update la ligne ".$ligne_facture_fournisseur["id_commande_ligne"],"cr-readsoft-".$id_doc.".log");
 				ATF::commande_ligne()->u(array("id_commande_ligne"=> $ligne_commande["id_commande_ligne"],
-										   	  "serial" => $ligne_commande["serial"]." ".$ligne_readsoft["NumSerie"]
+										   	  "serial" => $ligne_commande["serial"]." ".$ligne_readsoft["LIT_NumSerie"]
 										  )
 									);
 			}
