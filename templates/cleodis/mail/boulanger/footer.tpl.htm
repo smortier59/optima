@@ -5,24 +5,24 @@
     <tr>
       <td align="center" height="165" style="height:165px;" valign="middle" width="600" >
         <p style="vertical-align:middle;margin-top: 25px; font-weight: 6px; line-height: 1em">
-          <strong style="text-align:left;">Merci de ne pas répondre à cet email. </strong> Pour nous contacter : <a href="mailto:{$infos.email}">{$infos.email}</a>
-          {if ATF::$codename == "bdomplus"} {$infos.societe} {/if} {if $infos.structure}{$infos.structure},{/if}  {if $infos.capital} Société au capital de {$infos.capital}€ {/if}
-          dont le siège social est {$infos.adresse} {if $infos.adresse_2}{$infos.adresse_2}, {/if} {if $infos.adresse_3}{$infos.adresse_3}, {/if},
-          {$infos.cp} {$infos.ville}. 
-          RCS n°{$infos.siren}{if $infos.ville_rcs} ({$infos.ville_rcs}){/if}, 
-          {if $infos.reference_tva}N° de TVA intracommunautaire {$infos.reference_tva}, {/if}
-          {if $infos.naf} Code APE: {$infos.naf}{/if}.
+          <strong style="text-align:left;">Merci de ne pas répondre à cet email. </strong> Pour nous contacter : <a href="mailto:{$infos.partenaire.email}">{$infos.partenaire.email}</a>
+          {if ATF::$codename == "bdomplus"} {$infos.partenaire.societe} {/if} {if $infos.partenaire.structure}{$infos.partenaire.structure},{/if}  {if $infos.partenaire.capital} Société au capital de {$infos.partenaire.capital}€ {/if}
+          dont le siège social est {$infos.partenaire.adresse} {if $infos.partenaire.adresse_2}{$infos.partenaire.adresse_2}, {/if} {if $infos.partenaire.adresse_3}{$infos.partenaire.adresse_3}, {/if},
+          {$infos.partenaire.cp} {$infos.partenaire.ville}.
+          RCS n°{$infos.partenaire.siren}{if $infos.partenaire.ville_rcs} ({$infos.partenaire.ville_rcs}){/if},
+          {if $infos.partenaire.reference_tva}N° de TVA intracommunautaire {$infos.partenaire.reference_tva}, {/if}
+          {if $infos.partenaire.naf} Code APE: {$infos.partenaire.naf}{/if}.
           Conformément à la Loi Informatique et Libertés du 6 janvier 1978, vous bénéficiez d'un droit d'accès, de rectification et d'opposition aux données vous concernant que vous pouvez exercer en écrivant à B’dom - CIL
-          {if $infos.adresse_2}{$infos.adresse_2}, {/if}
-          {if $infos.adresse_3}{$infos.adresse_3}, {/if}
-          {$infos.cp} {$infos.ville}
-          {if $infos.email} ou par email: {$infos.email} {/if} 
-          , en joignant une copie de votre pièce d'identité recto-verso. 
-          {if $infos.web} Pour en savoir plus, cliquez <a href="{$infos.web}">ici</a>{/if}.
+          {if $infos.partenaire.adresse_2}{$infos.partenaire.adresse_2}, {/if}
+          {if $infos.partenaire.adresse_3}{$infos.partenaire.adresse_3}, {/if}
+          {$infos.partenaire.cp} {$infos.partenaire.ville}
+          {if $infos.partenaire.email} ou par email: {$infos.partenaire.email} {/if}
+          , en joignant une copie de votre pièce d'identité recto-verso.
+          {if $infos.partenaire.web} Pour en savoir plus, cliquez <a href="{$infos.partenaire.web}">ici</a>{/if}.
         </p>
-  
+
       </td>
-      
+
     </tr>
   </tbody>
 </table>
