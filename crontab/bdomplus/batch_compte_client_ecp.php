@@ -38,7 +38,7 @@ if($url_back_espace_client &&  $url_front_espace_client){
     //Recupere toute les affaires en cours donc on a pas encore envoyé de mail de création de compte au client
     //Pour chaque affaire, on recupere le client
     $q =   "SELECT commande.ref AS ref_contrat,
-                commande.id_societe AS id_societe,
+                DISTINCT(commande.id_societe) AS id_societe,
                 societe.particulier_nom AS nom_client,
                 societe.particulier_prenom AS prenom_client,
                 societe.particulier_email AS email_client,
@@ -85,12 +85,23 @@ if($url_back_espace_client &&  $url_front_espace_client){
     //Si list, on envoi la liste des client à Benjamin
     if($type === "list") {
         echo "Envoi du mail contenant la liste des clients sans compte à benjamin.tronquit@cleodis.com\n";
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+
+
         $mail = new mail(
             array(
                 "recipient" => "benjamin.tronquit@cleodis.com",
                 "objet" => "Client sans compte",
                 "template" => "listing_client_sans_compte",
-                "clients" => $clientSansCompte
+                "clients" => $clientSansCompte,
+                "colors" => array(
+                    "dominant" => "#FD5300",
+                    "footer" => "#161C5F",
+                    "links" => "#161C5F",
+                    "titles" => "#161C5F"
+                ),
+                "partenaire"=> $partenaire
             )
         );
         $mail->send();

@@ -2631,10 +2631,6 @@ class affaire_cleodis extends affaire {
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
-			//recuperation de l'id de la societe
-			$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
-
-
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
 
@@ -2651,7 +2647,9 @@ class affaire_cleodis extends affaire {
 			}
 
 
-			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],
+									"provenance"=>"partenaire",
+									'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
@@ -2691,6 +2689,7 @@ class affaire_cleodis extends affaire {
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
 
+			log::logger($societe, "mfleurquin");
 			log::logger("Score --> ".$societe["cs_score"], "mfleurquin");
 			log::logger("Creation --> ".$creation, "mfleurquin");
 
