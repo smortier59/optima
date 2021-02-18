@@ -603,7 +603,7 @@ class pdf_cleodis extends pdf {
 
 		$this->image(__PDF_PATH__.'cleodis/domaine.jpg',60,160,81);
 
-	//BON POUR ACCORD, PAGE 4 DEVIS
+		//BON POUR ACCORD, PAGE 4 DEVIS
 
 		$this->Addpage();
 		$this->setfont('arial','BU',18);
