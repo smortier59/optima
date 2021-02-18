@@ -2685,7 +2685,7 @@ class facture_cleodis extends facture {
 					log::logger("Found", $logFile);
 					if ($facture['facture.etat'] != $data[2]) {
 						$facturesEtatDifferend[] = $data;
-						log::logger("Etat différend ! BDD: ".$facture['facture.etat']." / CSV: ".$data[2], $logFile);
+						log::logger("Etat différent ! BDD: ".$facture['facture.etat']." / CSV: ".$data[2], $logFile);
 					} else {
 						log::logger("Etat IDEM - RAS", $logFile);
 
@@ -2702,7 +2702,7 @@ class facture_cleodis extends facture {
 			$return['warnings'] = $warnings;
 			$return['rapport'] = "Rapport : <br><br>";
 			$return['rapport'] .= "Nombre de facture dans le CSV : ".$nbFactureCsv."<br>";
-			$return['rapport'] .= "Nombre de facture avec un état différend en BDD : ".count($facturesEtatDifferend)."<br>";
+			$return['rapport'] .= "Nombre de facture avec un état différent en BDD : ".count($facturesEtatDifferend)."<br>";
 			$return['rapport'] .= "Nombre de facture non trouvées en BDD : ".count($facturesNotFound)."<br>";
 			$return['success'] = true;
 			ATF::db($this->db)->commit_transaction();
@@ -2714,14 +2714,14 @@ class facture_cleodis extends facture {
 
 			$workbook = new PHPExcel;
 
-			$sheets = array("Etat différends","Non trouvées");
+			$sheets = array("Etat différents","Non trouvées");
 
 			$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
 	        
 	        // Premier onglet
 	        $sheet = $workbook->getActiveSheet();
 			$workbook->setActiveSheetIndex(0);
-		    $sheet->setTitle("Etat différends");
+		    $sheet->setTitle("Etat différents");
 
 		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');        
