@@ -92,6 +92,12 @@ class souscription_cleodis extends souscription {
 
         $this->id_partenaire = $cleodis["id_societe"];
       break;
+      case 'worldline':
+        ATF::societe()->q->reset()->where("siret", "37890194600574");
+        $cleodis = ATF::societe()->select_row();
+
+        $this->id_partenaire = $cleodis["id_societe"];
+      break;
 
       default:
         throw new errorATF("Site associe incorrect", 500);
@@ -302,6 +308,7 @@ class souscription_cleodis extends souscription {
           case 'dib':
           case 'haccp':
           case 'axa':
+          case 'worldline':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -439,33 +446,33 @@ class souscription_cleodis extends souscription {
     if($post['site_associe'] == "boulangerpro"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Boulanger Pro");
       $type_affaire = ATF::type_affaire()->select_row();
-      $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
     }
     if($post['site_associe'] == "hexamed"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Hexamed Leasing");
       $type_affaire = ATF::type_affaire()->select_row();
-      $devis["type_affaire"] = 'Hexamed Leasing';
     }
     if($post['site_associe'] == "locevo"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "LocEvo");
       $type_affaire = ATF::type_affaire()->select_row();
-       $devis["type_affaire"] = 'LocEvo';
     }
     if($post['site_associe'] == "dib"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "DIB");
       $type_affaire = ATF::type_affaire()->select_row();
-      $devis["type_affaire"] = 'DIB';
     }
     if($post['site_associe'] == "haccp"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "haccp");
       $type_affaire = ATF::type_affaire()->select_row();
-      $devis["type_affaire"] = 'haccp';
     }
     if($post['site_associe'] == "axa"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Axa");
       $type_affaire = ATF::type_affaire()->select_row();
-      $devis["type_affaire"] = 'Axa';
+    }    
+    if($post['site_associe'] == "worldline"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Worldline");
+      $type_affaire = ATF::type_affaire()->select_row();
     }
+
+    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -855,6 +862,7 @@ class souscription_cleodis extends souscription {
       case 'dib':
       case 'haccp':
       case 'axa':
+      case 'worldline':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1118,9 +1126,11 @@ class souscription_cleodis extends souscription {
       case 'haccp':
         $r = "HA";
       break;
-
       case 'axa':
         $r = "X0";
+      break;
+      case 'worldline':
+        $r = "WL";
       break;
       default:
         $r = substr($site_associe, 0, 2);
