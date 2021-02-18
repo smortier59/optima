@@ -92,6 +92,12 @@ class souscription_cleodis extends souscription {
 
         $this->id_partenaire = $cleodis["id_societe"];
       break;
+      case 'worldline':
+        ATF::societe()->q->reset()->where("siret", "37890194600574");
+        $cleodis = ATF::societe()->select_row();
+
+        $this->id_partenaire = $cleodis["id_societe"];
+      break;
 
       default:
         throw new errorATF("Site associe incorrect", 500);
@@ -149,16 +155,42 @@ class souscription_cleodis extends souscription {
 
         //On récupère les id pack de chaque ligne pour le libelle de l'affaire
         $post['id_pack_produit'] = array();
+        $post['pack_quantite'] = array();
+
         foreach ($value as $k => $v) {
+
+
           $post['id_pack_produit'][] = $v["id_pack_produit"];
+
+          // Pour chaque pack, on recupere le produit principal
+          ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $v["id_pack_produit"])
+                                      ->where("principal", "oui");
+
+          $produit_principal_pack = ATF::pack_produit_ligne()->select_row();
+
+
+          if($produit_principal_pack){
+            // Si $v[id_pack_produit_ligne] == Le produit principal
+            if($v["id_pack_produit_ligne"] == $produit_principal_pack["id_pack_produit_ligne"]){
+
+
+
+              // On compare la quantité du produit principal par rapport à la quantité par défaut
+              $post["pack_quantite"][$v["id_pack_produit"]] = ($v["quantite"] /  $produit_principal_pack["quantite"]);
+            }
+          }else{
+            $post["pack_quantite"][$v["id_pack_produit"]] = "?";
+          }
         }
+
 
         // On retire les doublons
         $post['id_pack_produit'] = array_unique($post['id_pack_produit']);
 
         // On génère le libellé du devis a partir des pack produit
-        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["renouvellement"]);
+        $libelle = $this->getLibelleAffaire($post['id_pack_produit'], $post['site_associe'], $post["pack_quantite"],  $post["renouvellement"]);
 
+        $libelle = substr($libelle, 0, 250);
 
 
         $id_devis = $this->createDevis($post, $libelle);
@@ -276,6 +308,7 @@ class souscription_cleodis extends souscription {
           case 'dib':
           case 'haccp':
           case 'axa':
+          case 'worldline':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -310,17 +343,27 @@ class souscription_cleodis extends souscription {
    * @param  array $id_pack_produits Ensemble des id_pack_produit
    * @return String                   Libellé de l'affaire
    */
-  private function getLibelleAffaire ($id_pack_produits, $site_associe, $renouvellement=false) {
+  private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false) {
+    $suffix = "";
+    log::logger($pack_quantite , "mfleurquin");
     if ($id_pack_produits) {
-      ATF::pack_produit()->q->reset()
-          ->addField("GROUP_CONCAT(pack_produit.nom SEPARATOR ' + ')")
-          ->setStrict()
-          ->setLimit(1);
       foreach ($id_pack_produits as $id_pack) {
-          ATF::pack_produit()->q->where("id_pack_produit", $id_pack);
-      }
 
-      $suffix = ATF::pack_produit()->select_cell();
+        log::logger("ID PACK -> ".$id_pack , "mfleurquin");
+        log::logger("Qté -> ".$pack_quantite[$id_pack] , "mfleurquin");
+
+        ATF::pack_produit()->q
+                          ->reset()
+                          ->addField("pack_produit.nom")
+                          ->where("id_pack_produit", $id_pack);
+
+
+        if($suffix == ""){
+          $suffix = $pack_quantite[$id_pack]." ".substr(ATF::pack_produit()->select_cell(), 0, 60);
+        }else{
+          $suffix .= " + ".$pack_quantite[$id_pack]." ".substr(ATF::pack_produit()->select_cell(), 0, 60);
+        }
+      }
     }
 
     switch ($site_associe) {
@@ -375,6 +418,10 @@ class souscription_cleodis extends souscription {
    * @return [type]          [description]
    */
   private function createDevis ($post, $libelle, $fournisseur) {
+
+    ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+    $type_affaireNormal = ATF::type_affaire()->select_row();
+
     // Construction du devis
     $devis = array(
         "id_societe" => $post['id_societe'],
@@ -386,19 +433,46 @@ class souscription_cleodis extends souscription {
         "type_devis" => "normal",
         "id_contact" => $post["id_contact"],
         "prix_achat"=>0,
-        "type_affaire" => "normal",
+        "id_type_affaire" => $type_affaireNormal["id_type_affaire"],
         "IBAN"=> $post["iban"],
         "BIC"=> $post["bic"]
 
     );
 
     // Si on est sur Boulanger PRO, il faut affecter le type d'affaire Boulanger Pro
-    if($post['site_associe'] == "boulangerpro") $devis["type_affaire"] = 'Boulanger Pro';
-    if($post['site_associe'] == "hexamed") $devis["type_affaire"] = 'Hexamed Leasing';
-    if($post['site_associe'] == "locevo") $devis["type_affaire"] = 'LocEvo';
-    if($post['site_associe'] == "dib") $devis["type_affaire"] = 'DIB';
-    if($post['site_associe'] == "haccp") $devis["type_affaire"] = 'haccp';
-    if($post['site_associe'] == "axa") $devis["type_affaire"] = 'Axa';
+
+
+
+    if($post['site_associe'] == "boulangerpro"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Boulanger Pro");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+    if($post['site_associe'] == "hexamed"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Hexamed Leasing");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+    if($post['site_associe'] == "locevo"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "LocEvo");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+    if($post['site_associe'] == "dib"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "DIB");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+    if($post['site_associe'] == "haccp"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "haccp");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+    if($post['site_associe'] == "axa"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Axa");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }    
+    if($post['site_associe'] == "worldline"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "Worldline");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+
+    if ($type_affaire["id_type_affaire"]) $devis["id_type_affaire"] = $type_affaire["id_type_affaire"];
 
     // COnstruction des lignes de devis a partir des produits en JSON
     $values_devis =array();
@@ -788,6 +862,7 @@ class souscription_cleodis extends souscription {
       case 'dib':
       case 'haccp':
       case 'axa':
+      case 'worldline':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1052,9 +1127,11 @@ class souscription_cleodis extends souscription {
       case 'haccp':
         $r = "HA";
       break;
-
       case 'axa':
         $r = "X0";
+      break;
+      case 'worldline':
+        $r = "WL";
       break;
       default:
         $r = substr($site_associe, 0, 2);
@@ -1117,17 +1194,31 @@ class souscription_cleodis extends souscription {
       $info_mail["html"] = true;
       $info_mail["template"] = "mail_contrat_a_signer";
 
+      //recuperation des infos qu'on doit injecter sur dans le footer du mail
+      $client =  ATF::societe()->select($affaire["affaire.id_societe_fk"]);
+
+      $nom_site_associe = ATF::affaire()->select($affaire , "site_associe");
+
+      ATF::site_associe()->q->reset()->where('site_associe',$nom_site_associe);
+
+      $site_associe = ATF::site_associe()->select_row();
+
+      if ($site_associe['id_societe']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+        $partenaire = ATF::societe()->select_row();
+      }
+			$logoBase = '/'.ATF::$codename.'.jpg';
+
+      $info_mail['partenaire'] =  $partenaire;
+
       if($codename == "bdomplus") $info_mail["objet"] = "Abonnement BDOM PLUS - Offre ZEN - Votre contrat à signer";
       if($codename == "boulanger-cafe") $info_mail["objet"] = "Abonnement Boulanger Café - Votre contrat à signer";
-
-
 
       $mail = new mail($info_mail);
 
       foreach ($files as $key => $infos) {
           $mail->addFile($infos,$key.".pdf",true);
       }
-
 
       $send = $mail->send();
 
@@ -1139,6 +1230,7 @@ class souscription_cleodis extends souscription {
         "type_suivi"=> "Contrat",
         "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
       );
+
 
       if($send){
         $suivi["texte"] =  "Envoi du mail au client contenant le contrat avant la signature\n".$suivi["texte"];
@@ -1166,7 +1258,6 @@ class souscription_cleodis extends souscription {
 
       //On supprime le contrat également
       if($commande) ATF::commande()->d($commande["commande.id_commande_fk"]);
-
 
       $infos = array(
         "id_devis" => $devis["id_devis"],
@@ -1209,7 +1300,6 @@ class souscription_bdomplus extends souscription_cleodis {
    * @param  Date $validite_accord Date de validité de l'accord
    */
   public function _startOrCancelAffaire($get, $post){
-
     if($post["order"]["id"]){
       $order = $post["order"];
       $ref = $order["id"];
@@ -1246,14 +1336,13 @@ class souscription_bdomplus extends souscription_cleodis {
   }
 
   public function controle_affaire($affaire, $order=null){
-    if($affaire){
 
+    if($affaire){
       ATF::commande()->q->reset()->addAllFields("commande")->where("commande.id_affaire", $affaire["affaire.id_affaire_fk"]);
       $commande = ATF::commande()->select_row();
 
       ATF::loyer()->q->reset()->where("loyer.id_affaire",$affaire["affaire.id_affaire_fk"]);
       $loyer = ATF::loyer()->select_row();
-
 
       if(!$affaire["affaire.id_magasin"] && ($order && $order["state"])){
         switch ($order["state"]) {
@@ -1366,7 +1455,6 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function demarrageContrat($affaire,$commande,$renouvellement = false){
-
     if(!$renouvellement){
       //Il ne faut pas comptabiliser le renouvellement dans les souscription
       ATF::constante()->q->reset()->where("constante" ,"__MAX_SOUSCRIPTION__");
@@ -1375,7 +1463,9 @@ class souscription_bdomplus extends souscription_cleodis {
     }
 
 
+
      if($affaire["commande.etat"] == "non_loyer"){
+
         //Limite appliquée seulement pour les souscriptions web et non pas magasin
         if($max_souscription && !$affaire["affaire.id_magasin"] && !$renouvellement){
           ATF::affaire()->q->reset()->where("affaire.etat", "facture", "AND")
@@ -1390,10 +1480,9 @@ class souscription_bdomplus extends souscription_cleodis {
           log::logger("Nombre d'affaire max à démarrer ".$max_souscription , "souscription");
           log::logger("########                ########" , "souscription");
 
+
           if($total_affaire >= $max_souscription){
             //On crée une tache pour alerter qu'on a pas démarré le contrat car  suspicion de fraude
-
-
 
             $tache = array(
                     "tache"=> array(
@@ -1420,29 +1509,33 @@ class souscription_bdomplus extends souscription_cleodis {
             throw new errorATF("Nombre d'affaire web max atteint");
           }
         }
-
-
         ATF::db($this->db)->begin_transaction();
 
         try{
+
           #On démarre le contrat avec envoi les licences
           if($commande && $commande["commande.etat"] == "non_loyer"){
+
             $infos = array(
               "id_commande" => $commande["commande.id_commande_fk"],
               "value" => date("Y-m-01"),
               "key" => "date_debut"
             );
+
             if($renouvellement){
               $infos["value"] = date("Y-m-01", strtotime(date("Y-m-01")." +1 month"));
             }
 
             ATF::commande()->updateDate($infos);
+
             //Contrat Démarré, il faut également mettre la 1ere facture en payé (Paiement CB)
             ATF::facture()->q->reset()->where("facture.id_affaire", $affaire["affaire.id_affaire_fk"])
                                       ->addOrder("facture.id_facture", "ASC");
             $facture = ATF::facture()->select_row();
 
+
             if($facture){
+
               $f = array("id_facture" => $facture["facture.id_facture"],
                          "mode_paiement"=> "cb",
                          "etat"=>"payee",
@@ -1465,17 +1558,16 @@ class souscription_bdomplus extends souscription_cleodis {
 
             $licence_a_envoyer = $this->envoi_licence($commande["commande.id_commande_fk"]);
 
-
             //On crée tout les bons de commande de l'affaire
             ATF::$usr->set('id_user',$post['id_user'] ? $post['id_user'] : $this->id_user);
             ATF::bon_de_commande()->createAllBDC(array("id_commande"=> $commande["commande.id_commande_fk"]));
 
             ATF::db($this->db)->commit_transaction();
 
-
             $this->envoiMailLicence($affaire["affaire.id_affaire_fk"], $affaire["affaire.id_societe_fk"], $licence_a_envoyer, $renouvellement);
 
             if(!$renouvellement){
+
               //Installation à domicile
               $this->envoiMailInstallationZen($affaire, $commande);
             }
@@ -1516,13 +1608,15 @@ class souscription_bdomplus extends souscription_cleodis {
         foreach ($licence as $kl => $vl) {
           ATF::licence()->u(array("id_licence" => $vl["id_licence"], "id_commande_ligne" => $value["id_commande_ligne"], "date_envoi"=>date("Y-m-d H:i:s")));
           $vl["url_telechargement"] = ATF::licence_type()->select($vl["id_licence_type"], "url_telechargement");
+          $vl["licence_type"] = ATF::licence_type()->select($vl['id_licence_type'],"licence_type");
           $licence_a_envoyer[$value["id_produit"]][] = $vl;
         }
 
+
       }else{
-        /*ATF::suivi()->i(array("id_affaire"=>ATF::commande()->select($id_commande , "id_affaire") ,
+        ATF::suivi()->i(array("id_affaire"=>ATF::commande()->select($id_commande , "id_affaire") ,
                               "id_societe"=> ATF::commande()->select($id_commande , "id_societe") ,
-                              "texte"=> "Il n'y a plus assez de clé de licences pour ".ATF::licence_type()->select($value["id_licence_type"], "licence_type")));*/
+                              "texte"=> "Il n'y a plus assez de clé de licences pour ".ATF::licence_type()->select($value["id_licence_type"], "licence_type")));
 
         throw new errorATF("Il n'y a plus assez de clé de licences pour ".$value["id_licence_type"], 500);
       }
@@ -1550,7 +1644,6 @@ class souscription_bdomplus extends souscription_cleodis {
 
       $mail = new mail($info_mail);
       log::logger($mail, $this->logFileSouscription);
-
 
       $send = $mail->send();
       log::logger($send, $this->logFileSouscription);
@@ -1614,20 +1707,49 @@ class souscription_bdomplus extends souscription_cleodis {
    * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
    */
   public function envoiMailLicence($id_affaire, $id_societe, $licence_a_envoyer,$renouvellement =false){
-    
+
     if($email_pro = ATF::societe()->select($id_societe, "email")){
       $email = $email_pro;
     }else{
       $email = ATF::societe()->select($id_societe, "  particulier_email");
+
     }
 
     $info_mail["from"] = "L'équipe BDOM+ <contact@abonnements.bdom.fr>";
     $info_mail["recipient"] = $email;
     $info_mail["html"] = true;
     $info_mail["template"] = "envoi_licence";
+
+    $client =  ATF::societe()->select($affaire["affaire.id_societe_fk"]);
+
+    $nom_site_associe = ATF::affaire()->select($id_affaire , "site_associe");
+
+    if ($site_associe['site_associe'] == "bdomplus"){
+      $logoSiteAssocie = '/bdomplus.jpg';
+    }else{
+      $logoSiteAssocie = '/boulanger.jpg';
+    }
+
+    if ($site_associe['id_societe']){
+      ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+      $partenaire = ATF::societe()->select_row();
+    }else{
+      ATF::societe()->q->reset()->where("siret", "52933929300043");
+      $partenaire = ATF::societe()->select_row();
+    }
+
+    $logoBase = '/'.ATF::$codename.'.jpg';
+
+
+    $info_mail['partenaire'] =  $partenaire;
+    $info_mail['logo'] = $logoBase;
+    $info_mail['logoSiteAssocie'] = $logoSiteAssocie;
+
+
     if(ATF::$codename == "bdomplus") {
       if($renouvellement){
         $affaire_depart = ATF::affaire()->getAffaireDepart($id_affaire);
+
         $info_mail["affaireDepart"] = $affaire_depart;
 
         ATF::commande()->q->reset()->where("commande.id_affaire", $affaire_depart);
@@ -1639,14 +1761,16 @@ class souscription_bdomplus extends souscription_cleodis {
         $info_mail["objet"] = "BDOM+ et Boulanger : Votre abonnement ".ATF::affaire()->select($affaire_depart, "ref")." ".ATF::affaire()->select($affaire_depart, "affaire")." : Renouvellement automatique";
 
       } else{
+
         $info_mail["objet"] = "Les solutions Zen – Information sur votre licence";
+
       }
     }
 
     $info_mail["licences"] = $licence_a_envoyer;
+
     $info_mail["client"] = ATF::societe()->select($id_societe);
     $info_mail["renouvellement"] = $renouvellement;
-
 
     $mail = new mail($info_mail);
 
@@ -1661,6 +1785,7 @@ class souscription_bdomplus extends souscription_cleodis {
       "texte" => "Objet : ".$info_mail["objet"]."\nDestinataire : ".$info_mail["recipient"]
 
     );
+
 
     if($send){
       $suivi["texte"] =  "Envoi du mail au client contenant les licences\n".$suivi["texte"];
@@ -1681,8 +1806,6 @@ class souscription_bdomplus extends souscription_cleodis {
                                      ->where("produit.produit", "Installation à domicile");
     $lignes = ATF::commande_ligne()->select_all();
 
-
-
     if($lignes){
       log::logger("Produit Installation inclus, on envoi le mail" , $this->logFileSouscription);
       if($email_pro = ATF::societe()->select($affaire["affaire.id_societe_fk"], "email")){
@@ -1696,8 +1819,37 @@ class souscription_bdomplus extends souscription_cleodis {
       $info_mail["html"] = true;
       $info_mail["mail_to_client"] = "oui";
       $info_mail["template"] = "installation_domicile";
-      if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Installation à domicile";
+      $client =  ATF::societe()->select($affaire["affaire.id_societe_fk"]);
 
+      $nom_site_associe = ATF::affaire()->select($affaire["affaire.id_affaire_fk"] , "site_associe");
+
+      ATF::site_associe()->q->reset()->where('site_associe',$nom_site_associe);
+
+      $site_associe = ATF::site_associe()->select_row();
+
+      if($site_associe['site_associe'] == "bdomplus"){
+        $logoSiteAssocie = '/bdomplus.jpg';
+      }else{
+        $logoSiteAssocie = '/boulanger.jpg';
+      }
+
+      if ($site_associe['id_societe']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+        $partenaire = ATF::societe()->select_row();
+      }else{
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+      }
+
+
+			$logoBase = '/'.ATF::$codename.'.jpg';
+
+      $info_mail['partenaire'] =  $partenaire;
+      $info_mail['logo'] = $logoBase;
+      $info_mail['logoSiteAssocie'] = $logoSiteAssocie;
+
+
+      if(ATF::$codename == "bdomplus") $info_mail["objet"] = "Les solutions Zen – Installation à domicile";
 
       $mail = new mail($info_mail);
 
@@ -1731,7 +1883,35 @@ class souscription_bdomplus extends souscription_cleodis {
       $info_mail["adresse"] .= " - ".$client["cp"]." ".$client["ville"];
       $info_mail["tel"] = $client["tel"];
       $info_mail["email"] = $email;
+
       $info_mail["mail_to_client"] = "non";
+
+      $nom_site_associe = ATF::affaire()->select($affaire["affaire.id_affaire_fk"] , "site_associe");
+
+      ATF::site_associe()->q->reset()->where('site_associe',$nom_site_associe);
+
+      $site_associe = ATF::site_associe()->select_row();
+
+			if($site_associe['site_associe'] == "bdomplus"){
+        $logoSiteAssocie = '/bdomplus.jpg';
+      }else{
+        $logoSiteAssocie = '/boulanger.jpg';
+      }
+
+      if ($site_associe['id_societe']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+        $partenaire = ATF::societe()->select_row();
+      }else{
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+      }
+
+
+			$logoBase = '/'.ATF::$codename.'.jpg';
+
+      $info_mail['partenaire'] =  $partenaire;
+      $info_mail['logo'] = $logoBase;
+      $info_mail['logoSiteAssocie'] = $logoSiteAssocie;
 
       if(ATF::$codename == "bdomplus"){
         $info_mail["recipient"] = "infos-bdom@bdom.fr";
@@ -1758,8 +1938,6 @@ class souscription_bdomplus extends souscription_cleodis {
         $suivi["texte"] =  "Probleme lors de l'envoi du mail à BDOM pour la prise de rendez-vous pour l'installation";
       }
       ATF::suivi()->i($suivi);
-
-
     }else{
       log::logger("Pas d'Installation inclus dans l'offre" , $this->logFileSouscription);
     }
@@ -1817,6 +1995,7 @@ class souscription_boulanger extends souscription_cleodis {
    * @param  Integer $id_affaire      ID de l'affaire
    */
   public function _startOrCancelAffaire($get, $post){
+
     if($post["id_affaire"] && $post["toDo"]){
 
       $affaire = ATF::affaire()->select($post["id_affaire"]);

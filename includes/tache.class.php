@@ -125,55 +125,60 @@ class tache extends classes_optima {
 		$infos['id_societe']=ATF::societe()->decryptId($infos['id_societe']);
 
 		ATF::db($this->db)->begin_transaction();
+		try{
 
-		$infos['id_'.$this->table]=parent::insert($infos,$s);
-		//on met le créateur de la tâche dans les mails
-		if ($emailUser = ATF::user()->select($infos["id_user"],'email')) {
-			$liste_email[$infos["id_user"]]=$emailUser;
-		}
-		//on relie les destinataires à la tâche
-		foreach($liste_destinataire as $key=>$id_user){
-			$id_util=ATF::user()->decryptId($id_user);
-			if(!$liste_email[$id_util]){
-				$email=ATF::user()->select($id_util,'email');
-				if($email){
-					$liste_email[$id_util]=$email;
+
+			$infos['id_'.$this->table]=parent::insert($infos,$s);
+			//on met le créateur de la tâche dans les mails
+			if ($emailUser = ATF::user()->select($infos["id_user"],'email')) {
+				$liste_email[$infos["id_user"]]=$emailUser;
+			}
+			//on relie les destinataires à la tâche
+			foreach($liste_destinataire as $key=>$id_user){
+				$id_util=ATF::user()->decryptId($id_user);
+				if(!$liste_email[$id_util]){
+					$email=ATF::user()->select($id_util,'email');
+					if($email){
+						$liste_email[$id_util]=$email;
+					}
+				}
+				$tab_dest[]=array('id_tache'=>$infos['id_'.$this->table],'id_user'=>$id_util);
+			}
+
+			//ajout des concernés
+			if($tab_dest){
+				try{
+					ATF::tache_user()->multi_insert($tab_dest);
+				} catch(errorATF $e) {
+					ATF::db($this->db)->rollback_transaction();
+					$e->setError();
+					throw new errorATF('Erreur Insert');
 				}
 			}
-			$tab_dest[]=array('id_tache'=>$infos['id_'.$this->table],'id_user'=>$id_util);
-		}
 
-		//ajout des concernés
-		if($tab_dest){
-			try{
-				ATF::tache_user()->multi_insert($tab_dest);
-			} catch(errorATF $e) {
-				ATF::db($this->db)->rollback_transaction();
-				$e->setError();
-				throw new errorATF('Erreur Insert');
-			}
-		}
-
-		//dans le cas où l'on a un tache.class dans un autre projet qui appel cette méthode
-		if(!$no_mail){
-			//envoi des mails aux concernés (si il y a au moins le mail du
-			if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
-				$mail = new mail(array( "recipient"=>implode(',',$liste_email),
-							"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
-							"objet"=>"Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
-							"template"=>"tache_insert",
-							"donnees"=>$infos,
-							"from"=>ATF::$usr->get('email')));
-				if($mail->send()){
-					ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
+			//dans le cas où l'on a un tache.class dans un autre projet qui appel cette méthode
+			if(!$no_mail){
+				//envoi des mails aux concernés (si il y a au moins le mail du
+				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
+					$mail = new mail(array( "recipient"=>implode(',',$liste_email),
+								"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
+								"objet"=>"Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
+								"template"=>"tache_insert",
+								"donnees"=>$infos,
+								"from"=>ATF::$usr->get('email')));
+					if($mail->send()){
+						ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
+					}
+				}else{
+					//si il n'y a pas d'email on l'affiche
+					ATF::$msg->addNotice("Aucune adresse mail disponible");
 				}
-			}else{
-				//si il n'y a pas d'email on l'affiche
-				ATF::$msg->addNotice("Aucune adresse mail disponible");
 			}
-		}
 
-		ATF::db($this->db)->commit_transaction();
+			ATF::db($this->db)->commit_transaction();
+		}catch(errorATF $e){
+			throw $e;
+		}
 
 		if (!$no_redirect) {
 			if($infos['id_suivi']){

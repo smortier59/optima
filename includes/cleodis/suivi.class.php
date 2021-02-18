@@ -34,7 +34,7 @@ class suivi_cleodis extends suivi {
 				"mapping"=>$this->affaireAutocompleteMapping
 			))
 			,"date"
-			,'type_suivi'=>array("obligatoire"=>true)
+			,'type_suivi'
 			,"attente_reponse"
 		);
 
@@ -76,11 +76,51 @@ class suivi_cleodis extends suivi {
 		$this->colonnes["bloquees"]["select"]=array("origine","public");
 	}
 
+
+	/**
+	 * Fonction insert exposé pour l'insertion de suivi depuis tunnel & Espace client/conseillé
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  array() $get  Vide car doit etre appelé en POST
+	 * @param  array() $post Data à inséré dans le suivi
+	 * @return id_suiv       Retourne l'id du suivi si tout c'est bien passé
+	 * @return errorATF si il y a une erreur
+	 */
+	public function _POST($get, $post){
+		$input = file_get_contents('php://input');
+		if (!empty($input)) parse_str($input,$post);
+		
+		if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
+
+		$cols = $this->table_structure();
+
+		$suivi_notifie = "";
+		if($post["suivi_notifie"]) $suivi_notifie = $post["suivi_notifie"];
+
+		$infos = array();
+		foreach ($post as $key => $value) {
+			if(!array_key_exists("suivi.".$key , $cols)){
+				unset($post[$key]);
+			}
+		}
+		unset($post["date"]);
+		$suivi = $post;
+		$suivi["suivi_notifie"] = $suivi_notifie;
+
+		return $this->insert($suivi);
+	}
+
+
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
 		if(!$infos["suivi"]){
-			$infos["suivi"] = $infos;
+			$nouveauTableau['suivi'] = $infos;
+			$infos = $nouveauTableau;
 		}
-		$infos["objet"] = "Suivi ".$infos["suivi"]['type_suivi']." de la part de ".ATF::user()->nom(ATF::$usr->getID());
+		$infos["objet"] = "Suivi ".$infos["suivi"]['type_suivi'];
+		if ($infos['origine'] == 'tunnel') {
+			$infos["objet"] .= " en provenance du tunnel";
+		} else if (ATF::$usr->getID()) {
+			$infos["objet"] .= " de la part de ".ATF::user()->nom(ATF::$usr->getID());
+		}
 		$infos["champsComplementaire"] = $infos["suivi"]["champsComplementaire"];
 		$infos["attente_reponse"] = $infos["suivi"]["attente_reponse"];
 		unset($infos["suivi"]["champsComplementaire"]);
@@ -108,10 +148,7 @@ class suivi_cleodis extends suivi {
 			}
 
 
-
 		}
-
-
 
 		return parent::insert($infos,$s,$files,$cadre_refreshed);
 	}

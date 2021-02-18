@@ -1271,6 +1271,10 @@ class societe_cleodis extends societe {
     $fournisseur = 6241;
     $data = self::getInfosFromCREDITSAFE($post);
 
+
+    ATF::type_affaire()->q->reset()->where("type_affaire", "normal");
+    $type_affaireNormal = ATF::type_affaire()->select_row();
+
     if($data){
       $gerants = $data["gerant"];
 
@@ -1378,7 +1382,7 @@ class societe_cleodis extends societe {
                   "type_devis" => "normal",
                   "id_contact" => $gerant[0]["id_contact"],
                   "prix_achat"=>0,
-                  "type_affaire" => "normal");
+                  "id_type_affaire" => $type_affaireNormal["id_type_affaire"]);
           $values_devis =array();
 
           $montantLoyer = $duree = 0;
@@ -2207,6 +2211,62 @@ class societe_bdomplus extends societe_cleodis {
     }
     return $prefixe.$ref;
 
+  }
+
+  public function demande_creation_compte_espace_client ($client, $url_front_espace_client, $id_commande=null){
+
+    if(!$client){
+      // On va chercher les infos clients à partir du contrat
+      if(!$id_commande) throw new errorATF("ID Commande manquante");
+
+      $id_commande = ATF::commande()->decryptId($id_commande);
+      $id_client = ATF::commande()->select($id_commande , "id_societe");
+      $client = ATF::societe()->select($id_client);
+
+      $client = array("id_societe" => $client["id_societe"],
+                    "nom" => $client["particulier_nom"],
+                    "prenom" => $client["particulier_prenom"],
+                    "email" => $client["particulier_email"],
+                    "ref" => ATF::commande()->select($id_commande , "ref"),
+                    "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+                );
+    }
+
+
+    if(!$url_front_espace_client) {
+      try {
+        $url_front_espace_client = ATF::espace_client_conseiller()->getUrlFront();
+      } catch (errorATF $e) {
+        throw $e;
+      }
+    }
+
+    ATF::societe()->q->reset()->where("siret", "52933929300043");
+    $partenaire = ATF::societe()->select_row();
+
+    $mail = new mail(
+        array(
+            "recipient" => $client["email"],
+            "objet" => "Création de votre compte espace client",
+            "template" => "demande_creation_compte_espace_client",
+            "client" => $client,
+            "lien_espace_client" => $url_front_espace_client . "/register",
+            "colors" => array(
+                "dominant" => "#FD5300",
+                "footer" => "#161C5F",
+                "links" => "#161C5F",
+                "titles" => "#161C5F"
+            ),
+            "partenaire"=> $partenaire
+        )
+    );
+    if($mail->send()){
+        ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
+    }else{
+        log::logger("------------------------------------------------------", "error_mail_creation_compte");
+        log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
+        log::logger($mail, "error_mail_creation_compte");
+    }
   }
 
 };

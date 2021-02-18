@@ -276,8 +276,8 @@ function import_ligne($lignes_ok, $packs, $produits)
 
 
 			ATF::pack_produit_ligne()->q->reset()->where("id_pack_produit", $id_pack_produit)
-				->where("id_produit", $produit["id_produit"])
-				->where("id_fournisseur", $produit["id_fournisseur"]);
+												 ->where("id_produit", $produit["id_produit"])
+												 ->where("id_fournisseur", $produit["id_fournisseur"]);
 			$l = ATF::pack_produit_ligne()->select_row();
 
 			// N° Pack;Réf Produit;Quantité;Min;Max;option_incluse;option_incluse_obligatoire;Afficher sur le site;Ordre;Visible;Px achat
@@ -507,6 +507,11 @@ function nettoyage_pack_produit_ligne($path)
 
 	$produits_ok_nok = clean_produit_existant($path . "/produit.csv");
 
+
+	$pack_to_exclude = pack_to_exclude($path."/ligne.csv", $produits_ok_nok);
+
+	$lignes_ok = clean_ligne($path."/ligne.csv" , $pack_to_exclude);
+	$packs_ok = clean_pack($path."/pack.csv" , $pack_to_exclude);
 
 	$pack_to_exclude = pack_to_exclude($path . "/ligne.csv", $produits_ok_nok);
 

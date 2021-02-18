@@ -516,13 +516,17 @@ class comite extends classes_optima {
 
 
 		//Utilisateurs notifié de validation de comité -> Jerome, Alison, Severine et Jeanne
-		if(ATF::$codename == "cleodis"){
-			$notifie_suivi = array(16, 21, 103, 124);
-		}else{
-			$notifie_suivi = array(16, 21,104, 124);
-		}
+		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
+								//->where("login", "abowe", "OR", "filles")
+								->where("login", "mmysoet", "OR", "filles")
+								->where("login", "jloison", "OR", "filles")
+								->where("login", "smazars", "OR", "filles");
 
 
+		$filles = ATF::user()->sa();
+		foreach ($filles as $key => $value) {
+        	$notifie_suivi[] = $value["id_user"];
+     	}
 
 		$notifie_suivi = array_unique($notifie_suivi);
 
