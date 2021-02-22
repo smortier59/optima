@@ -4416,6 +4416,25 @@ class hotline extends classes_optima {
 		return $to_return;
 	}
 
+	/**
+    * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur
+    * @author diame sarr <dsarr@absystech.fr>
+    * @param array $get['id_user]
+    * @return interger le nombre de ticket non traités
+    */
+	public function _totalHotlineNonTraite($get){
+
+		$poles=ATF::user()->select($get['id_user'],"pole");
+    	$pole = explode(',',$poles);
+		$this->q->reset()->setCount()->where("etat" , "free");
+		foreach($pole as $k =>$val){
+		$this->q->where("pole_concerne" , $val,"OR","pole","=");
+		}
+    	$result = $this->sa();
+		return $result['count'];
+
+	}
+
 
 };
 ?>
