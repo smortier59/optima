@@ -948,35 +948,32 @@ class hotline extends classes_optima {
 			$login = ATF::user()->select($id_owner,"login");
 		}
 
-
-		/*$logins = array(
-			"tpruvost"=>"thibaut",
-			"jluillier"=>"jacques",
-			"smortier"=>"sol-r",
-			"gdamecourt"=>"gauthier",
-			"lroels" => "lea",
-			"qjanon"=>"zorian",
-			"ckupiec"=> "kingkuku",
-			"jdelaporte"=>"julie.delaporte"
-		);*/
-
 		$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
 		$data = array();
-		$data["text"] = "@".$login." Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
-		if(ATF::$codename == "atoutcoms"){
+		$data["text"] = "@".$login." [". strtoupper(ATF::$codename) ."] Nouveau ticket #".$id_hotline." (".$hotline['pole_concerne'].") : ".$hotline["hotline"];
+
+		$url_mm = ATF::constante()->getConstante("__URL_MATTERMOST__");
+		$chan_mm = ATF::constante()->getConstante("__CHANNEL_MATTERMOST__");
+
+		if($chan_mm && $url_mm){
 			$data["username"] = $societe["societe"];
-			$data["channel"] = "hotline-atoutcoms";
+			$data["channel"] = ATF::constante()->select($chan_mm, "valeur");
 			$cmd .= json_encode($data);
-			$cmd .= "' https://mm.absystech.net/hooks/pcjzu5fri7rnubzaawrn687ffe";
-		}else{
+			$cmd .= "' ".ATF::constante()->select($url_mm, "valeur");
+
+			if (!ATF::isTestUnitaire()) $result = `$cmd`;
+		}
+
+
+		// On averti toujours sur le chan Hotline d'absystech
+		if(ATF::$codename !== "absystech" && ATF::$codename !== "att"){
+			$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
 			$data["username"] = $societe["societe"];
 			$data["channel"] = "Hotline";
 			$cmd .= json_encode($data);
 			$cmd .= "' https://mm.absystech.net/hooks/6xnsr64mtfgmbktxkwazmxuj6e";
+			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
-
-		if (!ATF::isTestUnitaire()) $result = `$cmd`;
-
 
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
@@ -4414,6 +4411,25 @@ class hotline extends classes_optima {
 		}
 
 		return $to_return;
+	}
+
+	/**
+    * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur
+    * @author diame sarr <dsarr@absystech.fr>
+    * @param array $get['id_user]
+    * @return interger le nombre de ticket non traités
+    */
+	public function _totalHotlineNonTraite($get){
+
+		$poles=ATF::user()->select($get['id_user'],"pole");
+    	$pole = explode(',',$poles);
+		$this->q->reset()->setCount()->where("etat" , "free");
+		foreach($pole as $k =>$val){
+		$this->q->where("pole_concerne" , $val,"OR","pole","=");
+		}
+    	$result = $this->sa();
+		return $result['count'];
+
 	}
 
 
