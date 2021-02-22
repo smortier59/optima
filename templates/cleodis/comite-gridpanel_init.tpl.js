@@ -1,22 +1,12 @@
 {$id_user = ATF::$usr->getID()}
+{$login = ATF::$usr->getLogin()}
 {util::push($fieldsKeys,"reseau")}
 
+{if (((ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets")
+	   && ($login == "jloison" || $login == "cloison" || $login == "pcaminel" || $login == "tdelattre" || $login == "smazars" || $login == "btronquit" || $login == "jvasut" || $login == "mmysoet"))
+  	|| (ATF::$codename == "bdomplus" && ($login == "btronquit" || $login == "jloison" )))
+}
 
-
-{if ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 16)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 17)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 18)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 93)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" ) && $id_user == 35)
- || ( (ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets") && $id_user == 21)
- || (ATF::$codename == "cleodisbe" && $id_user == 104) || ((ATF::$codename == "cleodis" || ATF::$codename == "assets") && $id_user == 103)
- || (ATF::$codename == "cleodisbe" && $id_user == 113) || ((ATF::$codename == "cleodis" || ATF::$codename == "assets") && $id_user == 116)
- || (ATF::$codename == "cleodisbe" && $id_user == 116) || ((ATF::$codename == "cleodis" || ATF::$codename == "assets") && $id_user == 124)
-
- || (ATF::$codename == "bdomplus" && ($id_user ==  16 || $id_user == 116 ))
-
-
-  }
 	ATF.renderer.comiteDecision=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {
 			var idDiv = Ext.id();
