@@ -385,9 +385,147 @@ class pdf_cleodis extends pdf {
 	}
   }
 
-
-
 	public function mandatSellAndSign($id_affaire, $concat=false){
+
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->templateMandat($id_affaire);
+		$this->ln(5);
+		$this->templateMandat($id_affaire);
+		$this->ln(5);
+		$this->templateMandat($id_affaire);
+
+		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
+
+		$this->setfont('arial','B',9);
+		$this->setY(275.9);
+
+
+		//On récupère les documents du/des produits de cette affaire
+    ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
+    $lignes = ATF::commande_ligne()->sa();
+
+    foreach ($lignes as $key => $value) {
+			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
+			if($id_doc){
+	            $doc = ATF::document_contrat()->select($id_doc);
+	            if($doc["etat"] == "actif" && $doc["type_signature"] == "commune_avec_contrat"){
+
+				    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
+				    if (file_exists($filepath)){
+				    	try {
+						    $pageCount = $this->setSourceFile($filepath);
+
+						    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+						      $tplIdx = $this->importPage($pageNo);
+
+						      // add a page
+						      $this->unsetHeader();
+					    	  $this->unsetFooter();
+						      $this->AddPage();
+						      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+						    }
+						} catch (Exception $e) {
+  							log::logger('filepath CGS = '.$filepath,"qjanon");
+							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
+							log::logger($e->getMessage(),"qjanon");
+							continue;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public function templateMandat($id_affaire){
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
+		$this->affaire = ATF::affaire()->select($id_affaire);
+		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+		ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
+		$this->devis = ATF::devis()->select_row();
+		$this->user = ATF::user()->select($this->devis['id_user']);
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
+
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+		$this->contrat = ATF::commande()->select_row();
+
+
+
+		$this->adresseClient = $this->client["adresse"];
+		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
+		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
+		$this->adresseClient .= " ".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+
+		$this->adresseLoueur = $this->societe["adresse"];
+		if($this->societe["adresse_2"]) $this->adresseLoueur .= " ".$this->societe["adresse_2"];
+		if($this->societe["adresse_3"]) $this->adresseLoueur .= " ".$this->societe["adresse_3"];
+		$this->adresseLoueur .= " ".$this->societe["cp"]." ".$this->societe["ville"]." - ".$this->societe["id_pays"];
+
+		$this->setfillcolor(180,198,231);
+
+		$this->setfont('arial','B',12);
+		$this->SetTextColor(46,116,181);
+
+		$y= $this->getY();
+		$this->MultiCell(110,10,'MANDAT DE PRELEVEMENT SEPA', 1, 'C',1, 1);
+
+		$this->setLeftMargin(119);
+		$this->setY($y);
+		$this->SetTextColor(0,0,0);
+		$this->setfont('arial','',9);
+		$this->MultiCell(81,5,"REFERENCE UNIQUE DE MANDAT\n".$this->affaire["RUM"],1,'C',0);
+		$this->setLeftMargin(10);
+
+		$this->setfont('arial','',7);
+		$this->MultiCell(190,3, "En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS. \nVous bénéficiez d'un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. \nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.",1);
+
+		$this->setfont('arial','B',8);
+		$this->Cell(190,5,"Vous",1,1,'C',1);
+		$this->setfont('arial','',8);
+
+
+		$this->Cell(60,4,"Votre Nom / dénomination",1,0);
+		$this->Cell(130,4,$this->client["societe"],1,1);
+
+		$this->Cell(60,4,"Adresse",1,0);
+		$this->Cell(130,4,$this->adresseClient,1,1);
+
+		$this->Cell(60,4,"Votre SIRET (pour les entreprises)",1,0);
+		$this->Cell(130,4,$this->client["siret"],1,1);
+
+
+		$this->Cell(190,5,"Les coordonnées bancaires du compte à débiter – BIC - IBAN",1,1,'C',1);
+		$this->Cell(60,4,$this->client["BIC"],1,0,'C');
+		$this->Cell(130,4,$this->client["IBAN"],1,1,'C');
+
+		$this->setfont('arial','B',8);
+		$this->Cell(190,5,"Le créancier",1,1,'C',1);
+		$this->setfont('arial','',8);
+
+		$this->Cell(60,4,"Nom",1,0);
+		$this->Cell(130,4,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - ".$this->societe["siren"]." RCS ".$this->societe["ville_rcs"],1,1);
+
+		$this->Cell(60,4,"Adresse",1,0);
+		$this->Cell(130,4,$this->adresseLoueur,1,1);
+
+		$this->Cell(60,4,"Identifiant Créancier SEPA",1,0);
+		$this->Cell(130,4,__ICS__,1,1);
+
+		$this->Cell(60,4,"Type de paiement",1,0);
+		$this->Cell(130,4,"Paiement récurrent / répétitif",1,1);
+
+		$y= $this->getY();
+		$this->MultiCell(60,4,"[ImageContractant1] \n \n[/ImageContractant1]",1,'C',0);
+
+		$this->setLeftMargin(70);
+		$this->setY($y);
+		$this->MultiCell(130,4,"Signé à : Lille\nLe : ".date("d/m/Y", strtotime($this->affaire["date"]))."\nPar : ".$this->affaire["signataire"],1,'L',0);
+		$this->setLeftMargin(10);
+
+		$this->Cell(190,4,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque",1,1);
+	}
+
+	public function mandatSellAndSignOld($id_affaire, $concat=false){
 
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
@@ -532,10 +670,10 @@ class pdf_cleodis extends pdf {
 
 
 		//On récupère les documents du/des produits de cette affaire
-        ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
-        $lignes = ATF::commande_ligne()->sa();
+    ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
+    $lignes = ATF::commande_ligne()->sa();
 
-        foreach ($lignes as $key => $value) {
+    foreach ($lignes as $key => $value) {
 			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
 			if($id_doc){
 	            $doc = ATF::document_contrat()->select($id_doc);
@@ -1665,7 +1803,7 @@ class pdf_cleodis extends pdf {
 	public function detailsProduit($id_produit,$provenance=NULL,$commentaire=NULL,$caracteristique=NULL){
 
 		$produit=ATF::produit()->select($id_produit);
-		
+
 		if ($produit['id_produit_type']) $d1 .= ATF::produit_type()->nom($produit['id_produit_type']).", ";
 		if ($produit['id_processeur']) $d1 .= ATF::processeur()->nom($produit['id_processeur']).", ";
 		if ($produit['id_produit_puissance']) $d1 .= ATF::produit_puissance()->nom($produit['id_produit_puissance']).", ";
@@ -1776,7 +1914,7 @@ class pdf_cleodis extends pdf {
 	* @date 25-01-2011
 	*/
 	public function contratA3Left() {
-		
+
 		$this->SetLeftMargin(15);
 
 		$this->setfont('arial','',8);
@@ -2167,7 +2305,7 @@ class pdf_cleodis extends pdf {
 
 
 	public function contratA4Signature($id){
-		
+
 		$this->contratA4($id,true,true);
 	}
 
@@ -2177,7 +2315,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
-		
+
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
@@ -2530,13 +2668,17 @@ class pdf_cleodis extends pdf {
 		,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 	  );
 	}else{
+
+
 	  $cadre = array(
 		" ",
 		"[SignatureContractant]",
 		" ",
 		" ",
 		" ",
-		"[/SignatureContractant]"
+		"[/SignatureContractant]",
+		" ",
+		$this->affaire['signataire']
 	  );
 	}
 
@@ -2563,7 +2705,9 @@ class pdf_cleodis extends pdf {
 		" ",
 		" ",
 		" ",
-		"[/SignatureFournisseur]"
+		"[/SignatureFournisseur]",
+		" ",
+		" "
 	  );
 
 	}
@@ -3877,8 +4021,8 @@ class pdf_cleodis extends pdf {
 					$designation .= "- ";
 				}
 				$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']); 
-                $designation .= $details; 
+				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
+                $designation .= $details;
 
 				$data[] = array(
 					$i['ref']
@@ -8744,7 +8888,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 */
 	public function contratA4Signature($id){
-		
+
 		if($this->affaire["langue"] === "NL"){
 			$this->contratA4NL($id,true,true);
 		}else{
@@ -8752,8 +8896,31 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 	}
 
+	public function mandatSellAndSign($id_affaire, $concat=false) {
+		$id_affaire = ATF::affaire()->decryptId($id_affaire);
+		$this->affaire = ATF::affaire()->select($id_affaire);
+		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
 
-	public function mandatSellAndSign($id_affaire, $concat=false){
+		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
+		$this->contrat = ATF::commande()->select_row();
+
+		$this->adresseClient = $this->client["adresse"];
+		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
+		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
+		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+
+		$this->unsetHeader();
+		$this->AddPage();
+
+		$this->setfillcolor(208,255,208);
+
+		$this->setMargins(5);
+		$this->setfont('arial','',9);
+
+
+	}
+
+	public function mandatSellAndSignOld($id_affaire, $concat=false){
 
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
@@ -8770,6 +8937,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 		$this->unsetHeader();
 		$this->AddPage();
+
+
 
 
 		$this->setfillcolor(208,255,208);
@@ -8912,7 +9081,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 12-09-2016
 	*/
 	public function contratA4($id) {
-         
+
 		//$this->pdfEnveloppe = true;
 		//$this->noPageNo = true;
 		$this->commandeInit($id);
@@ -10477,7 +10646,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @param int $id Identifiant bon de commande
 	*/
 	public function bon_de_commande($id,$s) {
-        
+
 		if($this->affaire["langue"] !== "NL"){
 			parent::bon_de_commande($id, $s);
 
@@ -10585,7 +10754,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
-					
+
 					if($produit && $produit["commentaire"]) $designation .= "\nCaracteristique : ".$produit["commentaire"].$details;
 
 					$data[] = array(
