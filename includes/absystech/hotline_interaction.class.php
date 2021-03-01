@@ -2555,7 +2555,7 @@ class hotline_interaction extends classes_optima {
 			else $post['teamviewer'] = "non";
 
 			// Calcul du nombre de crédit
-			if (!$post['credit_presta']) {
+			if (!$post['credit_presta'] && $post["nature"] == "interaction") {
 				$tmp = explode(":", $post['temps_passe']);
 
 				$creditMin = $tmp[1]/60;
