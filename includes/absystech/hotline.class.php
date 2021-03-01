@@ -4320,11 +4320,14 @@ class hotline extends classes_optima {
 		if (!$get['id']) throw new Exception("MISSING_ID",1000);
 
 		$h = $this->select($get['id']);
-		ATF::affaire()->q->reset()->where("id_societe",$h['id_societe'])
-								  ->where("etat","terminee","AND","cle1","!=")
-								  ->where("etat","perdue","AND","cle1","!=")
+		ATF::affaire()->q->reset()->addAllFields('affaire')
+								  ->addField("commande.ref","ref_commande")
+								  ->from("affaire","id_affaire","commande","id_affaire")
+								  ->where("affaire.id_societe",$h['id_societe'])
+								  ->where("affaire.etat","devis","AND","cle1","!=")
+								  ->where("affaire.etat","terminee","AND","cle1","!=")
+								  ->where("affaire.etat","perdue","AND","cle1","!=")
 								  ->addOrder("affaire.date","DESC");
-
 		return ATF::affaire()->sa();
 	}
 
