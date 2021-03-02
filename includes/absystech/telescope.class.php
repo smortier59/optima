@@ -31,12 +31,10 @@ class telescope extends classes_optima {
 	 *         			url -> URL du telescope
 	 * @return array    infos telescope
 	 */
-	public function _getTelescopeInfos($get) {
-
-		if(!$get["url"]) throw new errorATF("URL manquante");
-		ATF::telescope()->q->reset()->where("url", $get["url"]);
+	public function _getTelescopeInfos() {
+		log::logger(ATF::$codename , "mfleurquin");
+		ATF::telescope()->q->reset()->where("codename", ATF::$codename);
 		return ATF::telescope()->select_row();
-
 	}
 
 	public function _getTelescopesActif() {
