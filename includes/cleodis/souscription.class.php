@@ -401,6 +401,14 @@ class souscription_cleodis extends souscription {
       case "axa":
         $r = "AXA : Location ".$suffix;
       break;
+
+      case "worldline":
+        $r = "Worldline : Location ".$suffix;
+      break;
+      
+      default:
+        $r = ucfirst($site_associe)." : Location ".$suffix;
+      break;
     }
 
     if($renouvellement){
