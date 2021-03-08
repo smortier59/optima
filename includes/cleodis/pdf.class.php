@@ -426,7 +426,7 @@ class pdf_cleodis extends pdf {
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){
 				$this->devisAvenant();
-			}elseif(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template") !== 'defaut') {
+			}elseif(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template") !== 'devis') {
 				$template = ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template");
 				$this->$template(); // On appel la fonction du template stocké en BDD
 			}else{
