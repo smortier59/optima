@@ -116,7 +116,7 @@ class pdf_cleodis extends pdf {
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
 
-			if($this->affaire["type_affaire"] == "LFS"){
+			if(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "type_affaire") == "LFS"){
 				$this->multicell(0,3,$this->societe['societe']." pour LENOVO FINANCIAL SERVICES  ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 			}else{
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
@@ -163,33 +163,6 @@ class pdf_cleodis extends pdf {
 			$this->image($this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-			/*switch ($this->logo) {
-				case 'cleodis/2SI_CLEODIS.jpg' :
-					$this->image($this->logo,75,10,40);
-				break;
-
-				case 'cleodis/boulangerpro.jpg' :
-				case 'cleodis/consommables.jpg':
-				case 'cleodis/dib.jpg':
-				case 'cleodis/dyadem.jpg':
-				case 'cleodis/flexfuel.jpg':
-				case 'cleodis/instoresolution.jpg':
-				case 'cleodis/lafi.jpg':
-				case 'cleodis/LFS.jpg':
-				case 'cleodis/Manganelli.jpg':
-				case 'cleodis/nrc.jpg' :
-				case 'cleodis/OLISYS.jpg':
-				case 'cleodis/proxi-pause.jpg' :
-				case 'cleodis/trekk.jpg':
-				case 'cleodis/zen.jpg' :
-				case 'cleodis/haccp.jpg' :
-					$this->image($this->logo,75,10,40);
-				break;
-
-				default:
-					$this->image($this->logo,10,10,40);
-				break;
-			}*/
 
 			$this->image($this->logo,10,10,40);
 
@@ -208,34 +181,6 @@ class pdf_cleodis extends pdf {
 			$this->setfont('arial','',12);
 		} else {
 			if($this->pdf_devis){
-				/*switch ($this->logo) {
-					case 'cleodis/2SI_CLEODIS.jpg' :
-						$this->image($this->logo,10,10,35);
-					break;
-
-					case 'cleodis/boulangerpro.jpg' :
-					case 'cleodis/consommables.jpg':
-					case 'cleodis/dib.jpg':
-					case 'cleodis/dyadem.jpg':
-					case 'cleodis/flexfuel.jpg':
-					case 'cleodis/instoresolution.jpg':
-					case 'cleodis/lafi.jpg':
-					case 'cleodis/LFS.jpg':
-					case 'cleodis/Manganelli.jpg':
-					case 'cleodis/nrc.jpg' :
-					case 'cleodis/OLISYS.jpg':
-					case 'cleodis/proxi-pause.jpg' :
-					case 'cleodis/trekk.jpg':
-					case 'cleodis/zen.jpg' :
-					case 'cleodis/haccp.jpg' :
-					case 'cleodis/hexamed-logo.jpg' :
-						$this->image(__PDF_PATH__.$this->logo,10,10,80);
-					break;
-
-					default:
-						$this->image($this->logo,10,10,35);
-					break;
-				}*/
 
 				$this->image($this->logo,10,10,35);
 
@@ -245,36 +190,6 @@ class pdf_cleodis extends pdf {
 				if($this->site_web){
 					$this->unsetHeader();
 				}else{
-					/*switch ($this->logo) {
-						case 'cleodis/2SI_CLEODIS.jpg' :
-							 $this->image($this->logo,170,5,20);
-						break;
-
-						case 'cleodis/hexamed-logo.jpg' :
-							$this->image($this->logo,160,10,35);
-						break;
-						case 'cleodis/boulangerpro.jpg' :
-						case 'cleodis/consommables.jpg':
-						case 'cleodis/dib.jpg':
-						case 'cleodis/dyadem.jpg':
-						case 'cleodis/flexfuel.jpg':
-						case 'cleodis/instoresolution.jpg':
-						case 'cleodis/lafi.jpg':
-						case 'cleodis/LFS.jpg':
-						case 'cleodis/Manganelli.jpg':
-						case 'cleodis/nrc.jpg' :
-						case 'cleodis/OLISYS.jpg':
-						case 'cleodis/proxi-pause.jpg' :
-						case 'cleodis/trekk.jpg':
-						case 'cleodis/zen.jpg' :
-						case 'cleodis/haccp.jpg' :
-							 $this->image(__PDF_PATH__.$this->logo,170,5,30);
-						break;
-
-						default:
-							 $this->image($this->logo,170,5,20);
-						break;
-					}*/
 					$this->image($this->logo,170,5,20);
 				}
 
@@ -511,8 +426,9 @@ class pdf_cleodis extends pdf {
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){
 				$this->devisAvenant();
-			}elseif($this->affaire["type_affaire"] == "LFS"){
-				$this->devisLfs();
+			}elseif(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template") !== 'defaut') {
+				$template = ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template");
+				$this->$template(); // On appel la fonction du template stocké en BDD
 			}else{
 				$this->devisClassique();
 			}
@@ -1657,7 +1573,7 @@ class pdf_cleodis extends pdf {
 		}
 		if ($this->totalAssurance) {
 			// Ligne 6 Assurance
-			if($this->affaire["type_affaire"] == "LFS"){
+			if(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "type_affaire") == "LFS"){
 				$data[5][] = "> Option Service Remplacement en cas de sinistre *";
 			}else{
 				$data[5][] = "> Option Assurance Remplacement *";
@@ -1676,7 +1592,7 @@ class pdf_cleodis extends pdf {
 				$s[6][] = $style["col1bis"];
 			}
 			//Ligne 8
-			if($this->affaire["type_affaire"] == "LFS"){
+			if(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "type_affaire") == "LFS"){
 				$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Service Remplacement en cas de sinistre :";
 			}else{
 				$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Assurance :";
