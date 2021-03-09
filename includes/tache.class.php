@@ -133,6 +133,9 @@ class tache extends classes_optima {
 			if ($emailUser = ATF::user()->select($infos["id_user"],'email')) {
 				$liste_email[$infos["id_user"]]=$emailUser;
 			}
+
+
+
 			//on relie les destinataires à la tâche
 			foreach($liste_destinataire as $key=>$id_user){
 				$id_util=ATF::user()->decryptId($id_user);
@@ -142,7 +145,9 @@ class tache extends classes_optima {
 						$liste_email[$id_util]=$email;
 					}
 				}
-				$tab_dest[]=array('id_tache'=>$infos['id_'.$this->table],'id_user'=>$id_util);
+				if($infos['id_'.$this->table] && $id_util){
+					$tab_dest[]=array('id_tache'=>$infos['id_'.$this->table],'id_user'=>$id_util);
+				}
 			}
 
 			//ajout des concernés
