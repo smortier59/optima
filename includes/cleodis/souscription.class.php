@@ -99,6 +99,10 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = $cleodis["id_societe"];
       break;
 
+      case 'assets':
+        $this->id_partenaire = NULL;
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -317,6 +321,8 @@ class souscription_cleodis extends souscription {
             $this->createComite($id_affaire, $societe, "accepte", "Comité CLEODIS", date("Y-m-d"), date("Y-m-d"));
           break;
 
+          case 'assets':
+          break;
           default:
           break;
         }
@@ -400,6 +406,9 @@ class souscription_cleodis extends souscription {
 
       case "axa":
         $r = "AXA : Location ".$suffix;
+      break;
+      case "assets":
+        $r = "ASSETS : Location ".$suffix;
       break;
 
       case "worldline":
@@ -871,6 +880,7 @@ class souscription_cleodis extends souscription {
       case 'haccp':
       case 'axa':
       case 'worldline':
+      case 'assets':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -2088,3 +2098,5 @@ class souscription_boulanger extends souscription_cleodis {
   }
 
 };
+
+class souscription_assets extends souscription_cleodis { };
