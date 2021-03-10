@@ -908,8 +908,10 @@ class hotline extends classes_optima {
 		if($infos["filestoattach"]["fichier_joint"]){
 			//Ajout du fichier joint
 			$path = $this->filepath($id_hotline,"fichier_joint");
-			$mail=ATF::hotline_mail()->getCurrentMail();
-			$mail->addFile($path,"fichier_joint.zip",true);
+			if( file_exists($path)) {
+				$mail=ATF::hotline_mail()->getCurrentMail();
+				$mail->addFile($path,"fichier_joint.zip",true);
+			}
 		}
 
 		ATF::hotline_mail()->sendMail();
