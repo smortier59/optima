@@ -3373,17 +3373,19 @@ class hotline extends classes_optima {
 
 		/*Envoi du mail*/
 		if (($infos["send_mail"]=="true" || $infos["relance"]) && $hotline["visible"]=="oui"){
-			if (ATF::hotline_mail()->createMailBilling($hotline["id_hotline"])) {
-				ATF::hotline_mail()->sendMail();
 
-				//Notice mail envoyé
-				if($infos['relance']){
-					$this->createMailNotice("hotline_relance_facturation");
-				}else{
-					$this->createMailNotice("hotline_mail_facturation");
+			if($this->_mailContactHotline(array("id"=>$hotline["id_hotline"])) !== "contact_sans_mail") {
+				if (ATF::hotline_mail()->createMailBilling($hotline["id_hotline"])) {
+					ATF::hotline_mail()->sendMail();
+
+					//Notice mail envoyé
+					if($infos['relance']){
+						$this->createMailNotice("hotline_relance_facturation");
+					}else{
+						$this->createMailNotice("hotline_mail_facturation");
+					}
 				}
 			}
-
 		}
 
 		//Insère une interaction d'information
@@ -4309,6 +4311,22 @@ class hotline extends classes_optima {
 		if ($s['gsm']) $return['societe']["gsm"] = $s['gsm'];
 
 		return $return;
+	}
+
+	/**
+	* Récupère le mail du contact du ticket hotline
+	* @package Telescope
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param $get array contient l'id du ticket a l'index 'id'
+	* @return string|null retour le mail du contact du ticket hotline
+	*/
+	public function _mailContactHotline($get) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		$h = $this->select($get['id']);
+		$email = ATF::contact()->select($h['id_contact'], "email");
+		if($email) return $email;
+		return 'contact_sans_mail';
+
 	}
 
 	/**
