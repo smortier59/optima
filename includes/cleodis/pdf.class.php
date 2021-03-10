@@ -116,7 +116,7 @@ class pdf_cleodis extends pdf {
 			$this->ATFSetStyle($style);
 			$this->SetXY(10,-15);
 
-			if($this->affaire["type_affaire"] == "LFS"){
+			if(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "type_affaire") == "LFS"){
 				$this->multicell(0,3,$this->societe['societe']." pour LENOVO FINANCIAL SERVICES  ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
 			}else{
 				$this->multicell(0,3,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - SIREN ".$this->societe["siren"]." - ".$this->societe['web'],0,'C');
@@ -163,33 +163,6 @@ class pdf_cleodis extends pdf {
 			$this->image($this->logo,300,10,20);
 			$this->sety(20);
 		} elseif ($this->relance || $this->envoiContrat) {
-			/*switch ($this->logo) {
-				case 'cleodis/2SI_CLEODIS.jpg' :
-					$this->image($this->logo,75,10,40);
-				break;
-
-				case 'cleodis/boulangerpro.jpg' :
-				case 'cleodis/consommables.jpg':
-				case 'cleodis/dib.jpg':
-				case 'cleodis/dyadem.jpg':
-				case 'cleodis/flexfuel.jpg':
-				case 'cleodis/instoresolution.jpg':
-				case 'cleodis/lafi.jpg':
-				case 'cleodis/LFS.jpg':
-				case 'cleodis/Manganelli.jpg':
-				case 'cleodis/nrc.jpg' :
-				case 'cleodis/OLISYS.jpg':
-				case 'cleodis/proxi-pause.jpg' :
-				case 'cleodis/trekk.jpg':
-				case 'cleodis/zen.jpg' :
-				case 'cleodis/haccp.jpg' :
-					$this->image($this->logo,75,10,40);
-				break;
-
-				default:
-					$this->image($this->logo,10,10,40);
-				break;
-			}*/
 
 			$this->image($this->logo,10,10,40);
 
@@ -208,34 +181,6 @@ class pdf_cleodis extends pdf {
 			$this->setfont('arial','',12);
 		} else {
 			if($this->pdf_devis){
-				/*switch ($this->logo) {
-					case 'cleodis/2SI_CLEODIS.jpg' :
-						$this->image($this->logo,10,10,35);
-					break;
-
-					case 'cleodis/boulangerpro.jpg' :
-					case 'cleodis/consommables.jpg':
-					case 'cleodis/dib.jpg':
-					case 'cleodis/dyadem.jpg':
-					case 'cleodis/flexfuel.jpg':
-					case 'cleodis/instoresolution.jpg':
-					case 'cleodis/lafi.jpg':
-					case 'cleodis/LFS.jpg':
-					case 'cleodis/Manganelli.jpg':
-					case 'cleodis/nrc.jpg' :
-					case 'cleodis/OLISYS.jpg':
-					case 'cleodis/proxi-pause.jpg' :
-					case 'cleodis/trekk.jpg':
-					case 'cleodis/zen.jpg' :
-					case 'cleodis/haccp.jpg' :
-					case 'cleodis/hexamed-logo.jpg' :
-						$this->image(__PDF_PATH__.$this->logo,10,10,80);
-					break;
-
-					default:
-						$this->image($this->logo,10,10,35);
-					break;
-				}*/
 
 				$this->image($this->logo,10,10,35);
 
@@ -245,36 +190,6 @@ class pdf_cleodis extends pdf {
 				if($this->site_web){
 					$this->unsetHeader();
 				}else{
-					/*switch ($this->logo) {
-						case 'cleodis/2SI_CLEODIS.jpg' :
-							 $this->image($this->logo,170,5,20);
-						break;
-
-						case 'cleodis/hexamed-logo.jpg' :
-							$this->image($this->logo,160,10,35);
-						break;
-						case 'cleodis/boulangerpro.jpg' :
-						case 'cleodis/consommables.jpg':
-						case 'cleodis/dib.jpg':
-						case 'cleodis/dyadem.jpg':
-						case 'cleodis/flexfuel.jpg':
-						case 'cleodis/instoresolution.jpg':
-						case 'cleodis/lafi.jpg':
-						case 'cleodis/LFS.jpg':
-						case 'cleodis/Manganelli.jpg':
-						case 'cleodis/nrc.jpg' :
-						case 'cleodis/OLISYS.jpg':
-						case 'cleodis/proxi-pause.jpg' :
-						case 'cleodis/trekk.jpg':
-						case 'cleodis/zen.jpg' :
-						case 'cleodis/haccp.jpg' :
-							 $this->image(__PDF_PATH__.$this->logo,170,5,30);
-						break;
-
-						default:
-							 $this->image($this->logo,170,5,20);
-						break;
-					}*/
 					$this->image($this->logo,170,5,20);
 				}
 
@@ -301,13 +216,66 @@ class pdf_cleodis extends pdf {
 	}
   }
 
-
-
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
+		$this->unsetHeader();
+		$this->AddPage();
+		$this->templateMandat($id_affaire);
+		$this->ln(5);
+		$this->templateMandat($id_affaire);
+		$this->ln(5);
+		$this->templateMandat($id_affaire, true);
+
+		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
+
+		$this->setfont('arial','B',9);
+		$this->setY(275.9);
+
+
+		//On récupère les documents du/des produits de cette affaire
+		ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
+		$lignes = ATF::commande_ligne()->sa();
+
+		foreach ($lignes as $key => $value) {
+			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
+			if($id_doc){
+				$doc = ATF::document_contrat()->select($id_doc);
+				if($doc["etat"] == "actif" && $doc["type_signature"] == "commune_avec_contrat"){
+
+					$filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
+					if (file_exists($filepath)){
+						try {
+							$pageCount = $this->setSourceFile($filepath);
+
+							for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+							$tplIdx = $this->importPage($pageNo);
+
+							// add a page
+							$this->unsetHeader();
+							$this->unsetFooter();
+							$this->AddPage();
+							$this->useTemplate($tplIdx, 0, 0, 0, 0, true);
+							}
+						} catch (Exception $e) {
+							log::logger('filepath CGS = '.$filepath,"qjanon");
+							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
+							log::logger($e->getMessage(),"qjanon");
+							continue;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public function templateMandat($id_affaire, $last=false){
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
+		ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
+		$this->devis = ATF::devis()->select_row();
+		$this->user = ATF::user()->select($this->devis['id_user']);
+		$this->societe = ATF::societe()->select($this->user['id_societe']);
 
 		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
 		$this->contrat = ATF::commande()->select_row();
@@ -317,174 +285,82 @@ class pdf_cleodis extends pdf {
 		$this->adresseClient = $this->client["adresse"];
 		if($this->client["adresse_2"]) $this->adresseClient .= " ".$this->client["adresse_2"];
 		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
-		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
+		$this->adresseClient .= " ".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
 
+		$this->adresseLoueur = $this->societe["adresse"];
+		if($this->societe["adresse_2"]) $this->adresseLoueur .= " ".$this->societe["adresse_2"];
+		if($this->societe["adresse_3"]) $this->adresseLoueur .= " ".$this->societe["adresse_3"];
+		$this->adresseLoueur .= " ".$this->societe["cp"]." ".$this->societe["ville"]." - ".$this->societe["id_pays"];
 
-		$this->unsetHeader();
-		$this->AddPage();
+		$this->setfillcolor(180,198,231);
 
+		$this->setfont('arial','B',12);
+		$this->SetTextColor(46,116,181);
 
+		$y= $this->getY();
+		$this->MultiCell(110,10,'MANDAT DE PRELEVEMENT SEPA', 1, 'C',1, 1);
 
-		$this->setfillcolor(208,255,208);
-
-
-		//HEADER
-		$this->image($this->logo,15,5,15);
-
-		$this->setMargins(5);
+		$this->setLeftMargin(119);
+		$this->setY($y);
+		$this->SetTextColor(0,0,0);
 		$this->setfont('arial','',9);
-		$this->setLeftMargin(60);
-		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
-		$this->setLeftMargin(5);
-		$this->line(5,$this->gety()+2,232,$this->gety()+2);
+		$this->MultiCell(81,5,"REFERENCE UNIQUE DE MANDAT\n".$this->affaire["RUM"],1,'C',0);
+		$this->setLeftMargin(10);
 
-		//Page Centrale
-		//Gauche
-		$this->setY(27);
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, "Mandat",0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "de prélèvement SEPA",0,1);
-
-		$this->ln(4);
-
-		$this->cell(55, 4, "Coordonnées",0,1);
-		$this->cell(55, 4, "bancaires",0,1);
-
-		$this->ln(4);
-
-		$this->cell(55, 4, "Nom :",0,1);
-		$this->cell(55, 4, "Adresse :",0,1);
-		$this->ln(4);
-		$this->cell(55, 4, "Numéro de mobile :",0,1);
-
-		//Milieu
-		$this->setY(27);
-		$this->setLeftMargin(60);
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, __ICS__,0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "Identifiant créancier SEPA",0,1);
-
-		$this->ln(4);
-
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["BIC"],0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "BIC",0,1);
-
-		$this->ln(4);
-
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["societe"],0,1);
-		$this->multicell(120, 4, $this->adresseClient,0,1);
-		$this->cell(55, 4, $this->client["tel"],0,1);
-
-		//Droite
-		$this->setY(27);
-		$this->setLeftMargin(125);
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->affaire["RUM"],0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "Référence unique du mandat",0,1);
-
-		$this->ln(4);
-
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["IBAN"],0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "IBAN",0,1);
-
-		$this->setY(70);
-		$this->setLeftMargin(5);
-		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
-		$this->ln(4);
-		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y", strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))),0,1);
-
-		$this->ln(4);
 		$this->setfont('arial','',7);
-		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
+		$this->MultiCell(190,3, "En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS. \nVous bénéficiez d'un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. \nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.",1);
 
-		$this->setleftMargin(50);
-		$this->multicell(60,5,"\n\n\n[sc_sceaudeconfiance/]");
-		$this->setleftMargin(130);
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
-
-
-		if(ATF::$codename === "cleodis" && $this->client['id_famille'] != 9){
-			$this->line(5,160,205,160);
-
-			//Mandat de prelevement
-			$this->image(__PDF_PATH__.'cleodis/mandat-prel.jpg',5,170,200);
-
-			$this->setfont('arial','',11);
-
-			$this->setLeftMargin(45);
-			$this->SetY(195);
-			$this->cell(150,5,$this->client["structure"]." ".$this->client["societe"],0,1);
-
-			$this->multicell(150,4,$this->adresseClient);
-
-			$this->cell(150,5,$this->client["siret"],0,1);
-			$this->cell(150,5,$this->client["BIC"],0,1);
-			$this->cell(150,5,$this->client["IBAN"],0,1);
-
-			$this->SetXY(40,247);
-			$this->multicell(100,5,"[ImageContractant1/]");
+		$this->setfont('arial','B',8);
+		$this->Cell(190,5,"Vous",1,1,'C',1);
+		$this->setfont('arial','',8);
 
 
-			$this->SetXY(120,248);
-			$this->multicell(100,6,"Lille\n".date('d/m/Y', strtotime(ATF::commande()->select($this->contrat["commande.id_commande"], "date"))));
+		$this->Cell(60,4,"Votre Nom / dénomination",1,0);
+		$this->Cell(130,4,$this->client["societe"],1,1);
 
+		$this->Cell(60,4,"Adresse",1,0);
+		$this->Cell(130,4,$this->adresseClient,1,1);
+
+		$this->Cell(60,4,"Votre SIRET (pour les entreprises)",1,0);
+		$this->Cell(130,4,$this->client["siret"],1,1);
+
+
+		$this->Cell(190,5,"Les coordonnées bancaires du compte à débiter – BIC - IBAN",1,1,'C',1);
+		$this->Cell(60,4,$this->client["BIC"],1,0,'C');
+		$this->Cell(130,4,$this->client["IBAN"],1,1,'C');
+
+		$this->setfont('arial','B',8);
+		$this->Cell(190,5,"Le créancier",1,1,'C',1);
+		$this->setfont('arial','',8);
+
+		$this->Cell(60,4,"Nom",1,0);
+		$this->Cell(130,4,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - ".$this->societe["siren"]." RCS ".$this->societe["ville_rcs"],1,1);
+
+		$this->Cell(60,4,"Adresse",1,0);
+		$this->Cell(130,4,$this->adresseLoueur,1,1);
+
+		$this->Cell(60,4,"Identifiant Créancier SEPA",1,0);
+		$this->Cell(130,4,__ICS__,1,1);
+
+		$this->Cell(60,4,"Type de paiement",1,0);
+		$this->Cell(130,4,"Paiement récurrent / répétitif",1,1);
+		$this->Cell(190,4,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque",1,1);
+
+		if ($last) {
+			$y= $this->getY();
+			$this->multicell(60,5,"[sc_sceaudeconfiance/]");
+			$this->setY($y);
+			$this->setLeftMargin(70);
+			$this->MultiCell(60,4,"\n[ImageContractant1] \n \n[/ImageContractant1]\n ",1,'C',0);
+
+			$this->setLeftMargin(130);
+			$this->setY($y);
+			$this->MultiCell(70,4,"\nSigné à : Lille\nLe : ".date("d/m/Y", strtotime($this->affaire["date"]))."\nPar : ".$this->affaire["signataire"]."\n ",1,'L',0);
+			$this->setLeftMargin(10);
 		}
 
-
-		$this->setleftMargin(15);
-		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
-
-		$this->setfont('arial','B',9);
-		$this->setY(275.9);
-
-
-		//On récupère les documents du/des produits de cette affaire
-        ATF::commande_ligne()->q->reset()->where("id_commande", $this->contrat["commande.id_commande"] );
-        $lignes = ATF::commande_ligne()->sa();
-
-        foreach ($lignes as $key => $value) {
-			$id_doc = ATF::produit()->select($value["id_produit"], "id_document_contrat");
-			if($id_doc){
-	            $doc = ATF::document_contrat()->select($id_doc);
-	            if($doc["etat"] == "actif" && $doc["type_signature"] == "commune_avec_contrat"){
-
-				    $filepath = ATF::document_contrat()->filepath($id_doc,"fichier_joint");
-				    if (file_exists($filepath)){
-				    	try {
-						    $pageCount = $this->setSourceFile($filepath);
-
-						    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-						      $tplIdx = $this->importPage($pageNo);
-
-						      // add a page
-						      $this->unsetHeader();
-					    	  $this->unsetFooter();
-						      $this->AddPage();
-						      $this->useTemplate($tplIdx, 0, 0, 0, 0, true);
-						    }
-						} catch (Exception $e) {
-  							log::logger('filepath CGS = '.$filepath,"qjanon");
-							log::logger("ERREUR DE FPDI IMPORT PDF INTO PDF", "qjanon");
-							log::logger($e->getMessage(),"qjanon");
-							continue;
-						}
-					}
-				}
-			}
-		}
 
 	}
-
-
 
 	/* Initialise les données pour la génération d'un devis et redirige vers la bonne fonction.
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -550,8 +426,9 @@ class pdf_cleodis extends pdf {
 				$this->devisVente();
 			}elseif($this->affaire['nature'] =='avenant'){
 				$this->devisAvenant();
-			}elseif($this->affaire["type_affaire"] == "LFS"){
-				$this->devisLfs();
+			}elseif(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template") !== 'devis') {
+				$template = ATF::type_affaire()->select($this->affaire["id_type_affaire"], "devis_template");
+				$this->$template(); // On appel la fonction du template stocké en BDD
 			}else{
 				$this->devisClassique();
 			}
@@ -1696,7 +1573,7 @@ class pdf_cleodis extends pdf {
 		}
 		if ($this->totalAssurance) {
 			// Ligne 6 Assurance
-			if($this->affaire["type_affaire"] == "LFS"){
+			if(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "type_affaire") == "LFS"){
 				$data[5][] = "> Option Service Remplacement en cas de sinistre *";
 			}else{
 				$data[5][] = "> Option Assurance Remplacement *";
@@ -1715,7 +1592,7 @@ class pdf_cleodis extends pdf {
 				$s[6][] = $style["col1bis"];
 			}
 			//Ligne 8
-			if($this->affaire["type_affaire"] == "LFS"){
+			if(ATF::type_affaire()->select($this->affaire["id_type_affaire"], "type_affaire") == "LFS"){
 				$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Service Remplacement en cas de sinistre :";
 			}else{
 				$data[7][] = "Redevance ".ATF::$usr->trans($this->loyer[0]["frequence_loyer"],"loyer_frequence_loyer_feminin")." ".$this->texteHT." avec Assurance :";
@@ -2634,13 +2511,17 @@ class pdf_cleodis extends pdf {
 		,array("txt"=>"Signature et cachet commercial : ","fill"=>1,"w"=>$this->GetStringWidth("Signature et cachet commercial : ")+10,"bgColor"=>"ffff00")
 	  );
 	}else{
+
+
 	  $cadre = array(
 		" ",
 		"[SignatureContractant]",
 		" ",
 		" ",
 		" ",
-		"[/SignatureContractant]"
+		"[/SignatureContractant]",
+		" ",
+		$this->affaire['signataire']
 	  );
 	}
 
@@ -2667,7 +2548,9 @@ class pdf_cleodis extends pdf {
 		" ",
 		" ",
 		" ",
-		"[/SignatureFournisseur]"
+		"[/SignatureFournisseur]",
+		" ",
+		" "
 	  );
 
 	}
@@ -8722,9 +8605,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 	}
 
-
-	public function mandatSellAndSign($id_affaire, $concat=false){
-
+	public function mandatSellAndSign($id_affaire, $concat=false) {
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
@@ -8737,105 +8618,16 @@ class pdf_cleodisbe extends pdf_cleodis {
 		if($this->client["adresse_3"]) $this->adresseClient .= " ".$this->client["adresse_3"];
 		$this->adresseClient .= "\n".$this->client["cp"]." ".$this->client["ville"]." - ".$this->client["id_pays"];
 
-
 		$this->unsetHeader();
 		$this->AddPage();
 
-
 		$this->setfillcolor(208,255,208);
-
-
-		//HEADER
-		$this->image($this->logo,5,5,40);
 
 		$this->setMargins(5);
 		$this->setfont('arial','',9);
-		$this->setLeftMargin(60);
-		$this->cell(20,4,"Créancier :");
-		$this->multicell(70,4,"Cléodis\n45 rue Solferino\n59000 Lille - France");
-		$this->setLeftMargin(5);
-		$this->line(5,$this->gety()+2,232,$this->gety()+2);
 
-		//Page Centrale
-		//Gauche
-		$this->setY(27);
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, "Mandat",0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "de prélèvement SEPA",0,1);
-
-		$this->ln(4);
-
-		$this->cell(55, 4, "Coordonnées",0,1);
-		$this->cell(55, 4, "bancaires",0,1);
-
-		$this->ln(4);
-
-		$this->cell(55, 4, "Nom :",0,1);
-		$this->cell(55, 4, "Adresse :",0,1);
-		$this->ln(4);
-		$this->cell(55, 4, "Numéro de mobile :",0,1);
-
-		//Milieu
-		$this->setY(27);
-		$this->setLeftMargin(60);
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, __ICS__,0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "Identifiant créancier SEPA",0,1);
-
-		$this->ln(4);
-
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["BIC"],0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "BIC",0,1);
-
-		$this->ln(4);
-
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["societe"],0,1);
-		$this->multicell(120, 4, $this->adresseClient,0,1);
-		$this->cell(55, 4, $this->client["tel"],0,1);
-
-		//Droite
-		$this->setY(27);
-		$this->setLeftMargin(125);
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->affaire["RUM"],0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "Référence unique du mandat",0,1);
-
-		$this->ln(4);
-
-		$this->setfont('arial','B',9);
-		$this->cell(55, 4, $this->client["IBAN"],0,1);
-		$this->setfont('arial','',9);
-		$this->cell(55, 4, "IBAN",0,1);
-
-		$this->setY(70);
-		$this->setLeftMargin(5);
-		$this->multicell(0,4,"En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS.\nVous bénéficiez d’un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle.\nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.");
-		$this->ln(4);
-		$this->cell(55,4,"A ".$this->client["ville"]." le ".date("d/m/Y"),0,1);
-
-		$this->ln(4);
-		$this->setfont('arial','',7);
-		$this->multicell(80,3,"Note : Vos droits concernant le présent mandat sont expliqués dans un document que vous pouvez obtenir auprès de votre banque.");
-
-		$this->setleftMargin(50);
-		$this->multicell(60,5,"\n\n\n[sc_sceaudeconfiance/]");
-		$this->setleftMargin(130);
-		$this->multicell(100,5,"[ImageContractant1]\n\n\n\n[/ImageContractant1]");
-
-
-
-
-		$this->setleftMargin(15);
-		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
 	}
-
 
 
 	/** CGL d'un PDF d'un contrat en A3
@@ -10553,7 +10345,8 @@ class pdf_cleodisbe extends pdf_cleodis {
 						$designation .= "- ";
 					}
 					$details = $this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
-					$designation .= $i['produit']?$i['produit']:$produit['produit'];
+					$designation .= $produit['produit']?$produit['produit']:$i['produit'];
+
 					if($produit && $produit["commentaire"]) $designation .= "\nCaracteristique : ".$produit["commentaire"].$details;
 
 					$data[] = array(

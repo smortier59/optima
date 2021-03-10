@@ -401,6 +401,14 @@ class souscription_cleodis extends souscription {
       case "axa":
         $r = "AXA : Location ".$suffix;
       break;
+
+      case "worldline":
+        $r = "Worldline : Location ".$suffix;
+      break;
+      
+      default:
+        $r = ucfirst($site_associe)." : Location ".$suffix;
+      break;
     }
 
     if($renouvellement){
@@ -802,7 +810,7 @@ class souscription_cleodis extends souscription {
                             'tel_signature'=> $tel,
                             'mail_signataire'=> $contact["email"],
                             'date_signature'=> date('Y-m-d H:i:s'),
-                            'signataire'=> $contact["prenom"]." ".$contact["nom"]
+                            'signataire'=> $contact["prenom"]." ".$contact["nom"].", ".$contact["fonction"]
                             )
                       );
 
