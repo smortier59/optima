@@ -912,7 +912,6 @@ class hotline extends classes_optima {
 				$mail=ATF::hotline_mail()->getCurrentMail();
 				$mail->addFile($path,"fichier_joint.zip",true);
 			}
-
 		}
 
 		ATF::hotline_mail()->sendMail();
