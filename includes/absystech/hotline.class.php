@@ -1165,6 +1165,9 @@ class hotline extends classes_optima {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed){
 		$this->infoCollapse($infos);
 
+		if(array_key_exists('id_projet',$infos)){
+			unset($infos["id_projet"]);
+		}
 		//Vérification des informations
 		//if(!$infos["id_contact"]) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 
