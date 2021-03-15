@@ -220,11 +220,14 @@ class pdf_cleodis extends pdf {
 
 		$this->unsetHeader();
 		$this->AddPage();
-		$this->templateMandat($id_affaire);
+		$societe = "45307981600055";
+		$this->templateMandat($id_affaire, $societe);
 		$this->ln(5);
-		$this->templateMandat($id_affaire);
+		$societe = "31497580600063";
+		$this->templateMandat($id_affaire, $societe);
 		$this->ln(5);
-		$this->templateMandat($id_affaire, true);
+		$societe = "63201751302165";
+		$this->templateMandat($id_affaire, $societe, true);
 
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
@@ -268,14 +271,15 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function templateMandat($id_affaire, $last=false){
+	public function templateMandat($id_affaire, $siretSociete, $last=false){
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
 		ATF::devis()->q->reset()->where("id_affaire", $id_affaire);
 		$this->devis = ATF::devis()->select_row();
 		$this->user = ATF::user()->select($this->devis['id_user']);
-		$this->societe = ATF::societe()->select($this->user['id_societe']);
+		ATF::societe()->q->reset()->where("siret", $siretSociete);
+		$this->societe = ATF::societe()->select_row();
 
 		ATF::commande()->q->reset()->where("commande.id_affaire", $id_affaire);
 		$this->contrat = ATF::commande()->select_row();
@@ -308,7 +312,7 @@ class pdf_cleodis extends pdf {
 		$this->setLeftMargin(10);
 
 		$this->setfont('arial','',7);
-		$this->MultiCell(190,3, "En signant ce formulaire de mandat, vous autorisez (A) CLEODIS à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de CLEODIS. \nVous bénéficiez d'un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. \nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.",1);
+		$this->MultiCell(190,3, "En signant ce formulaire de mandat, vous autorisez (A) ". $this->societe['societe'] ." à envoyer des instructions à votre banque pour débiter votre compte, et (B) votre banque à débiter votre compte conformément aux instructions de ". $this->societe['societe'] .". \nVous bénéficiez d'un droit à remboursement par votre banque selon les conditions décrites dans la convention que vous avez passée avec elle. \nToute demande de remboursement doit être présentée dans les 8 semaines suivant la date de débit de votre compte.",1);
 
 		$this->setfont('arial','B',8);
 		$this->Cell(190,5,"Vous",1,1,'C',1);
@@ -333,14 +337,20 @@ class pdf_cleodis extends pdf {
 		$this->Cell(190,5,"Le créancier",1,1,'C',1);
 		$this->setfont('arial','',8);
 
-		$this->Cell(60,4,"Nom",1,0);
-		$this->Cell(130,4,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - ".$this->societe["siren"]." RCS ".$this->societe["ville_rcs"],1,1);
+		$y = $this->getY();
+		$this->setLeftMargin(70);
+		$this->MultiCell(130,4,$this->societe['societe']." ".$this->societe['structure']." au capital de ".number_format($this->societe["capital"],2,'.',' ')." € - ".$this->societe["siren"]." RCS ".$this->societe["ville_rcs"],1,1);
+		$y2 = $this->getY();
+
+		$this->setY($y);
+		$this->setLeftMargin(10);
+		$this->Cell(60,$y2-$y,"Nom",1,1);
 
 		$this->Cell(60,4,"Adresse",1,0);
 		$this->Cell(130,4,$this->adresseLoueur,1,1);
 
 		$this->Cell(60,4,"Identifiant Créancier SEPA",1,0);
-		$this->Cell(130,4,__ICS__,1,1);
+		$this->Cell(130,4,$this->societe["ics"],1,1);
 
 		$this->Cell(60,4,"Type de paiement",1,0);
 		$this->Cell(130,4,"Paiement récurrent / répétitif",1,1);
