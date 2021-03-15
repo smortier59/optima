@@ -304,8 +304,8 @@ class hotline_interaction extends classes_optima {
 		$temps = $duree_presta + $duree_dep;
 		$temps = gmdate("H:i:s", $temps*60);
 
-
-
+		
+		
 		/*---------------Gestion de l'ordre de mission----------------------*/
 		if($infos["id_ordre_de_mission"]) ATF::ordre_de_mission()->update(array("id_ordre_de_mission"=>$infos["id_ordre_de_mission"],"etat"=>"termine"));
 
@@ -2030,6 +2030,8 @@ class hotline_interaction extends classes_optima {
 			if ($post['teamviewer']=="on") $post['teamviewer'] = "oui";
 			else $post['teamviewer'] = "non";
 
+			if($post['en_attente']=="on") $post["etat_wait"] = "oui";
+
 			// Calcul du nombre de crédit
 			if (!$post['credit_presta'] && $post["nature"] == "interaction") {
 				//Si on ne donne pas de raison on force le calcul normal
@@ -2116,6 +2118,7 @@ class hotline_interaction extends classes_optima {
 				,"recipient"=> $res
 				,"nature"=>"internal"
 				,"teamviewer"=>$infos["teamviewer"]
+				,"etat_wait"=>$infos['etat_wait']
 			);
 			log::logger($data,"hotline");
 			return parent::insert($data,$s,$files);
