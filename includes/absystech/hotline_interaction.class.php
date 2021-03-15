@@ -174,7 +174,6 @@ class hotline_interaction extends classes_optima {
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true) {
 
 		$this->infoCollapse($infos);
-
 		/*---------------Fonctionnalité de trace hotline----------------------*/
 		if($infos["internal"]){
 			$data = array(
@@ -2083,7 +2082,6 @@ class hotline_interaction extends classes_optima {
 	* @return boolean true
 	*/
 	public function insertTS($infos,$mail = true, $files) {
-
 		$recipient = array();
 		//Ajout des actifs selectionné
 		$lesactifs = is_array($infos["actifNotify"])?$infos["actifNotify"]:explode(",",$infos["actifNotify"]);
@@ -2111,7 +2109,7 @@ class hotline_interaction extends classes_optima {
 				 "duree_presta"=>$infos["duree_presta"]?$infos["duree_presta"]:"00:00"
 				,"heure_debut_presta"=>date("h:i")
 				,"heure_fin_presta"=>date("h:i")
-				,"detail"=>$infos["detail"]
+				,"detail"=>addcslashes($infos["detail"],"\\")
 				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 				,"id_hotline"=>$infos["id_hotline"]
 				,"visible"=>$infos["visible"]
@@ -2279,7 +2277,7 @@ class hotline_interaction extends classes_optima {
 				,"credit_dep"=>$infos["credit_dep"]
 				,"credit_presta"=>$infos["credit_presta"]
 				,"date"=>$infos["date"]
-				,"detail"=>$infos["detail"]
+				,"detail"=>addcslashes($infos["detail"],"\\")
 				,"id_user"=>(($infos["id_user"])?$infos["id_user"]:ATF::$usr->getID())
 				,"id_contact"=>$infos["id_contact"]
 				,"id_hotline"=>$infos["id_hotline"]
