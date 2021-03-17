@@ -4446,7 +4446,7 @@ class hotline extends classes_optima {
 
 		$poles=ATF::user()->select($get['id_user'],"pole");
     	$pole = explode(',',$poles);
-		$this->q->reset()->setCount()->whereIsNull("id_user")
+		$this->q->reset()->setCount()->whereIsNull("id_user", 'AND')
 			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
