@@ -3863,7 +3863,10 @@ class hotline extends classes_optima {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
 			if ($get['filters']['free'] == "on") {
-				$this->q->whereIsNull("hotline.id_user");
+				$this->q->whereIsNull("hotline.id_user",'AND')
+						->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+						->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+						->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
 				// $this->q->where("hotline.etat","free");
 			} else {
 				// Filtre ticket actif
@@ -4443,7 +4446,10 @@ class hotline extends classes_optima {
 
 		$poles=ATF::user()->select($get['id_user'],"pole");
     	$pole = explode(',',$poles);
-		$this->q->reset()->setCount()->whereIsNull("id_user");
+		$this->q->reset()->setCount()->whereIsNull("id_user")
+			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
 			//->where("etat" , "free");
 		foreach($pole as $k =>$val){
 		$this->q->where("pole_concerne" , $val,"OR","pole","=");
