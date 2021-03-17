@@ -1165,9 +1165,6 @@ class hotline extends classes_optima {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed){
 		$this->infoCollapse($infos);
 
-		if(array_key_exists('id_projet',$infos)){
-			unset($infos["id_projet"]);
-		}
 		//Vérification des informations
 		//if(!$infos["id_contact"]) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 
@@ -4032,7 +4029,6 @@ class hotline extends classes_optima {
 
 			// Mapping pour BDD Optima
 			$post['pole_concerne'] = $post['pole']; unset($post['pole']);
-			$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
 			$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 			$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4150,10 +4146,7 @@ class hotline extends classes_optima {
 					$post['pole_concerne'] = $post['pole'];
 					unset($post['pole']);
 				}
-				if ($post['id_gep_projet']) {
-					$post['id_gep_projet'] = $post['id_projet'];
-					unset($post['id_projet']);
-				}
+
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
