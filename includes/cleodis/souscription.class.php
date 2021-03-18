@@ -910,6 +910,18 @@ class souscription_cleodis extends souscription {
             $f[$file] = base64_encode(file_get_contents($CG));
           }
         }
+
+        $configSiteAssocie = ATF::site_associe()->ss("site_associe",$post['site_associe']);
+        if ($configSiteAssocie[0] && strpos($configSiteAssocie[0][''], "COMPONENT_SLIMPAY") !== -1) {         
+          if(ATF::affaire()->select($id_affaire, "id_magasin")){
+            $passage_slimpay = array();
+            $passage_slimpay["findOrCreateMandate"] = true;
+
+          }else{
+            $passage_slimpay = array('findOrCreateMandate'=> true, 'payment'=> true);
+          }
+        }
+
       break;
 
       case 'boulanger-cafe':
