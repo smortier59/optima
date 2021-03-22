@@ -912,7 +912,7 @@ class souscription_cleodis extends souscription {
         }
 
         $configSiteAssocie = ATF::site_associe()->ss("site_associe",$post['site_associe']);
-        if ($configSiteAssocie[0] && strpos($configSiteAssocie[0][''], "COMPONENT_SLIMPAY") !== -1) {         
+        if ($configSiteAssocie[0] && strpos($configSiteAssocie[0][''], "COMPONENT_SLIMPAY") !== -1) {
           if(ATF::affaire()->select($id_affaire, "id_magasin")){
             $passage_slimpay = array();
             $passage_slimpay["findOrCreateMandate"] = true;
