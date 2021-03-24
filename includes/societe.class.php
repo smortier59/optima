@@ -867,6 +867,9 @@ class societe extends classes_optima {
 	* @author Quentin JANON <qjanon@absystech.fr>
 	*/
 	public function getInfosFromCREDITSAFE($infos) {
+		ATF::creditsafe()->getInfosCompanyBySiret(str_replace(" ","",$infos['siret']));
+
+
 		/*if(__DEV__ === true){
 			$response = file_get_contents("/home/optima/core/log/creditsafe.xml");
 			$xml = simplexml_load_string($response);
