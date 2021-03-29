@@ -3908,6 +3908,7 @@ class hotline extends classes_optima {
 				case 'id_user':
 				case 'id_contact':
 				case 'date':
+				case 'etat':
 					$get['tri'] = "hotline.".$get['tri'];
 				break;
 			}
@@ -3936,6 +3937,7 @@ class hotline extends classes_optima {
 		// $this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+		$realCount = $data['count'];
 
 		if ($get['filters']['free'] == "on") {
 			$this->q->reset("where");
@@ -3983,7 +3985,7 @@ class hotline extends classes_optima {
 
 		} else {
 			// Envoi des headers
-			header("ts-total-row: ".$data['count']);
+			header("ts-total-row: ".$realCount);
 			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
