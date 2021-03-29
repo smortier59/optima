@@ -12,8 +12,8 @@ class pdf_affaire extends classes_optima {
 		parent::__construct($table_or_id);
 		$this->table = __CLASS__;
 		$this->colonnes['fields_column'] = array(
-			 'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"scanner","width"=>200)
-			,'fichier_joint2'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
+			 'visuel'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","renderer"=>"scanner","width"=>200)
+			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","align"=>"center","width"=>50)
 			,'pdf_affaire.id_affaire'
 			,'pdf_affaire.provenance'	
 			,"action"=>array("custom"=>true,"nosort"=>true,"renderer"=>"transfertPDFAffaire","width"=>80)
@@ -79,7 +79,7 @@ class pdf_affaire extends classes_optima {
    		
    		for($i=0; $i<$page; $i++){
    			 //execute imageMagick's 'convert', setting the color space to RGB	    
-		    $cmd = "convert \"{$fn}[".$i."]\" -colorspace RGB -geometry 900 -quality 100 -flatten ".$previewFn."_".$i.".png";	   
+		    $cmd = "convert \"{$fn}[".$i."]\" -colorspace RGB -geometry 900 -quality 100 -flatten ".$previewFn."_".$i.".png";	 
 		    exec($cmd);
 		   
 		    // Renommer l'image créée par le convert pour lui soustraire son extension

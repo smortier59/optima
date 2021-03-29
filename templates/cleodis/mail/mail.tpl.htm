@@ -117,9 +117,10 @@
     </html>
 {else}
     {if ATF::$html->template_exists("mail/{$infos.template}.tpl.htm")}
-        {include file="mail/{ATF::$codename}/header.tpl.htm"}
+        {include file="mail/{ATF::$codename}/header.tpl.htm" infos=$infos}
+        {include file="mail/{ATF::$codename}/barre.tpl.htm"}
         {include file="mail/{$infos.template}.tpl.htm"}
-        {include file="mail/{ATF::$codename}/footer.tpl.htm"}
+        {include file="mail/{ATF::$codename}/footer.tpl.htm" infos=$infos}
     {else}
         {$infos["texte"]}
     {/if}

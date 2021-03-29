@@ -551,6 +551,7 @@ class commande_cleodis extends commande {
 			case "date_demande_resiliation":
 			case "date_prevision_restitution":
 			case "date_restitution_effective":
+			case "date_demande_reprise_broker":
 
 				//Il ne faut pas que la date début soit un 29 30 ou 31 car sinon cela pause problème lors de la création de l'échéancier
 				if($infos['key']=="date_debut"){
@@ -566,6 +567,7 @@ class commande_cleodis extends commande {
 					if(ATF::societe()->select($id_societe, "relation") !== "client"){ ATF::societe()->u(array("id_societe"=> $id_societe, "relation"=>"client")); }
 
 				}
+
 				//Mode transactionel
 				ATF::db($this->db)->begin_transaction();
 				try {
@@ -581,6 +583,13 @@ class commande_cleodis extends commande {
 					}else{
 						$d = array("id_commande"=>$infos['id_commande']
 								   ,$infos['key']=>($infos['value']?date("Y-m-d",strtotime($infos['value'])):NULL));
+					}
+
+					//si la date de demande de reprise au broker est envoyé alors il faut check si il y a une date de restitution effective
+					if ($infos['key']=="date_restitution_effective" && $infos['value']!= NULL){
+						if ($cmdBefore["date_demande_reprise_broker"] == NULL){
+							$d['date_demande_reprise_broker'] = $d['date_restitution_effective'];
+						}
 					}
 
 					$this->u($d);
@@ -656,6 +665,10 @@ class commande_cleodis extends commande {
 							ATF::suivi()->d($item["id_suivi"]);
 						}
 					}
+
+					if(ATF::$codename == "bdomplus" && $infos["key"] == "retour_contrat" && $infos["value"] != null){
+						ATF::societe()->demande_creation_compte_espace_client(null,null,$infos["id_commande"]);
+					}
 				} catch(errorATF $e) {
 					//On rollback le tout
 					ATF::db($this->db)->rollback_transaction();
@@ -675,57 +688,11 @@ class commande_cleodis extends commande {
 				throw new errorATF("date_invalide",987);
 		}
 
-		if($infos["table"]!="commande"){
-//			ATF::commande()->redirection("select_all",NULL,"commande.html");
-//		}else{
+		if($infos["table"]!="commande" && $infos['key'] === "date_debut"){
 			ATF::affaire()->redirection("select",$cmd["id_affaire"]);
 		}
 		return true;
 	}
-
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	  * @param array $infos
-//    */
-//	public function updateDateResiliation($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		//Il faut une date de de résiliation pour insérer une date de restitution
-//		if($infos['value'] == 'undefined' && ($commande["date_restitution"] || $commande["date_restitution_effective"])){
-//			throw new errorATF("Impossible de supprimer la date de résiliation si la date de restitution est renseignée",881);
-//		}else{
-//			return parent::updateDate($infos);
-//		}
-//	}
-//
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos
-//    */
-//	public function updateDateRestitution($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		//Il faut une date de de résiliation pour insérer une date de restitution
-//		if($infos['value'] != 'undefined' && !$commande["date_resiliation"]){
-//			throw new errorATF("Il faut une date de resiliation pour pouvoir renseigner la date de restitution",882);
-//		}elseif($infos['value'] == 'undefined' && $commande["date_restitution_effective"]){
-//			throw new errorATF("Impossible de supprimer la date de résiliation si la restitution est effective",883);
-//		}else{
-//			return parent::updateDate($infos);
-//		}
-//	}
-//
-//	/**
-//    * Permet de mettre a jour la date Resiliation en ajax
-//    * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-//	* @param array $infos
-//    */
-//	public function updateDateRestitution_effective($infos){
-//		$commande = $this->select($infos['id_commande']);
-//		parent::updateDate($infos);
-//		$commande = new commande_cleodis($infos['id_commande']);
-//		$this->checkEtat($commande);
-//	}
 
 	/**
     * Vérification si on peut modifier/supprimer une commande
@@ -1003,11 +970,11 @@ class commande_cleodis extends commande {
 		}
 		$affaire->majForecastProcess();
 
-		if($infos["field"] !== "date_prevision_restitution" || $reload){
-			if($commande->get("id_affaire")){
-				ATF::affaire()->redirection("select",$commande->get("id_affaire"));
-			}
-		}
+		// if($infos["field"] !== "date_prevision_restitution" || $reload){
+		// 	if($commande->get("id_affaire")){
+		// 		ATF::affaire()->redirection("select",$commande->get("id_affaire"));
+		// 	}
+		// }
 
 
 	}
@@ -1467,6 +1434,7 @@ class commande_cleodis extends commande {
 			->addField("commande.date_demande_resiliation")
 			->addField("commande.date_prevision_restitution")
 			->addField("commande.date_restitution_effective")
+			->addField("commande.date_demande_reprise_broker")
 			->from("commande","id_societe","societe","id_societe")
 			->from("commande","id_affaire","affaire","id_affaire");
 		$return = parent::select_all($order_by,$asc,$page,$count);
@@ -1993,7 +1961,7 @@ class commande_cleodis extends commande {
         if (!$infos['id_commande'] || !$infos['pdf']) return false;;
         $commande = $this->select($infos['id_commande']);
 
-        if(ATF::affaire()->select($commande["id_affaire"], "type_affaire") === "NL"){
+        if(ATF::affaire()->select($commande["id_affaire"], "langue") === "NL"){
         	$data = ATF::pdf()->generic($infos['pdf']."NL",$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
         }else{
         	$data = ATF::pdf()->generic($infos['pdf'],$infos['id_commande'],true,$infos,$infos["preview"]?true:false);
@@ -2546,7 +2514,7 @@ class commande_cleodis extends commande {
 								array("title"=> "Contrat", "size"=>60),
 								array("title"=> "Code client", "size"=>15),
 								array("title"=> "Installation prévue", "size"=>15),
-								array("title"=>"Installation réelle", "size"=>15),
+								array("title"=> "Installation réelle", "size"=>15),
 								array("title"=> "Retour (AP)", "size"=>15),
 								array("title"=> "Retour (PV)", "size"=>15),
 								array("title"=> "Retour", "size"=>15),
@@ -2555,6 +2523,9 @@ class commande_cleodis extends commande {
 								array("title"=> "Fréquence du loyer", "size"=>15),
 								array("title"=> "Total", "size"=>15),
 								array("title"=> "Achat", "size"=>15),
+								array("title"=> "Date blocage", "size"=>15),
+								array("title"=> "Description blocage", "size"=>30),
+								array("title"=> "RIB", "size"=>15),
 								array("title"=> "Refinanceur", "size"=>30),
 								array("title"=> "Comité", "size"=>15),
 								array("title"=> "Décision Comité", "size"=>15),
@@ -2610,38 +2581,37 @@ class commande_cleodis extends commande {
 			$row_data[$key][] = $value["commande.prix_achat"];
 
 
-			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"]);
-			$comites = ATF::comite()->select_all();
-			if($comites){
-				$commentaire = $decision = $observations = "";
+			/*Ajout valeur date et description du suivi de type blocage ici*/
+			ATF::suivi()->q->reset()
+							->addField('suivi.date')
+							->addField('suivi.texte')
+							->addField('suivi.type_suivi')
+							->addCondition("suivi.type_suivi",'Blocage', "AND")
+							->where("id_affaire", $value["affaire.id_affaire_fk"]);
+			$suivis = ATF::suivi()->select_all();
+
+			if($suivis){
 				foreach ($comites as $k => $v) {
-					if($k !== 0){
-						$decisiondate = $decisiondate."\n". $v["date"];
-						$commentaire = $commentaire."\n".$v["commentaire"];
-						$decision = $decision."\n".$v["decisionComite"];
-						$date_accord = $date_accord."\n".$v["validite_accord"];
-						$observations 	  = $observations."\n".$v["observations"];
-
-					}else{
-						$row_data[$key][] = ATF::refinanceur()->select($v["id_refinanceur"] , "refinanceur");
-						$decisiondate = $v["date"];
-						$commentaire  = $v["commentaire"];
-						$decision 	  = $v["decisionComite"];
-						$date_accord =  $v["validite_accord"];
-						$observations  = $v["observations"];
-					}
+					$suivi_date = $v["suivi.date"];
+					$suivi_description = $v["suivi.texte"];
 				}
+			}
+
+			$row_data[$key][] = $suivi_date;
+			$row_data[$key][] = $suivi_description;
+ 			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"rib_client"))? "oui": "non";;
 
 
 
-				$row_data[$key][] = $decisiondate;
-				$row_data[$key][] = $decision;
-				$row_data[$key][] = $date_accord;
-				$row_data[$key][] = $commentaire;
-				$row_data[$key][] = $observations;
-
-
-
+			ATF::comite()->q->reset()->where("id_affaire", $value["affaire.id_affaire_fk"])->addOrder("date", 'DESC');
+			$comite = ATF::comite()->select_row();
+			if($comite){
+				$row_data[$key][] = ATF::refinanceur()->select($comite["id_refinanceur"] , "refinanceur");
+				$row_data[$key][] = $comite["date"];
+				$row_data[$key][] = $comite["commentaire"];
+				$row_data[$key][] = $comite["decisionComite"];
+				$row_data[$key][] = $comite["validite_accord"];
+				$row_data[$key][] = $comite["observations"];
 			} else {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
@@ -2650,10 +2620,7 @@ class commande_cleodis extends commande {
 				$row_data[$key][] = "";
 				$row_data[$key][] = "";
 			}
-
 			$row_data[$key][] = file_exists(ATF::affaire()->filepath($value["affaire.id_affaire_fk"],"cni"))? "oui": "non";
-
-
     	}
 
 

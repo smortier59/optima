@@ -34,6 +34,7 @@ class affaire_cleodis extends affaire {
 			,"affaire.commentaire_facture"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture2"=>array("rowEditor"=>"setInfos")
 			,"affaire.commentaire_facture3"=>array("rowEditor"=>"setInfos")
+			,'rib_client'=>array("custom"=>true,"nosort"=>true,"type"=>"file","renderer"=>"uploadFile","width"=>50)
 
 
 		);
@@ -58,7 +59,7 @@ class affaire_cleodis extends affaire {
 			,'ville_banque'
 			,'date_previsionnelle'
 			,"compte_t"=>array("custom"=>true)
-			,"type_affaire"
+			,"id_type_affaire"
 		);
 
 		$this->colonnes['panel']['date_affaire'] = array(
@@ -173,6 +174,8 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
 		$this->foreign_key['id_apporteur'] =  "societe";
+		$this->foreign_key['id_type_affaire'] = "type_affaire";
+
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
 		$this->addPrivilege("updateFacturation","update");
@@ -261,6 +264,7 @@ class affaire_cleodis extends affaire {
 		$affaire["ref"]=$infos["ref"];
 		$affaire["id_partenaire"]=$infos["id_partenaire"];
 		$affaire["langue"]=$infos["langue"];
+		$affaire["id_type_affaire"]=$infos["id_type_affaire"];
 		$affaire["commentaire"] = $infos["commentaire"];
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
@@ -1134,7 +1138,7 @@ class affaire_cleodis extends affaire {
 			$return['data'][$k]["pouvoir"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"pouvoir")) ? $this->files['pouvoir']['type'] : false;
 			$return['data'][$k]["contrat_signe"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"contrat_signe")) ? $this->files['contrat_signe']['type'] : false;
 			$return['data'][$k]["facture_fournisseur"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"facture_fournisseur")) ? $this->files['facture_fournisseur']['type'] : false;
-
+			$return['data'][$k]["rib_client"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"rib_client")) ? $this->files['rib_client']['type'] : false;
 
 			$return['data'][$k]["dossier_preuve_sell_sign"] = file_exists(ATF::affaire()->filepath($i['affaire.id_affaire'],"dossier_preuve_sell_sign")) ? true : false;
 
@@ -1400,6 +1404,8 @@ class affaire_cleodis extends affaire {
 			}
 
 			$retour =  $this->returnGetPortail($get, $post);
+
+
 
 			foreach ($retour as $key => $value) {
 				$retour[$key]["date_paiement"] = NULL;
@@ -1676,14 +1682,23 @@ class affaire_cleodis extends affaire {
 				}
 
 
-
+				$texte  = "Bonjour Madame, Monsieur,%0D%0A%0D%0A";
+				$texte .= "Faisant suite à nos échanges, vous trouverez ci-dessous le lien de signature de votre contrat de location.%0D%0A";
+				$texte .= "Contrat : ".ATF::societe()->getUrlSign($value['affaire.id_affaire_fk'])."%0D%0A";
+				$texte .= "La procédure est relativement simple car tout se fait directement en ligne.%0D%0A%0D%0A";
+				$texte .= "Il vous suffit de cliquer sur ce lien ci-dessus et de suivre le processus qui ne prendra que quelques secondes :%0D%0A
+				%09 1. Validez vos coordonnées.%0D%0A
+				%09 2. Validez vos coordonnées bancaire préremplies(sur la base de votre RIB). %0D%0A
+				%09 3. A la dernière étape, les documents se chargent.%0D%0A
+				%09 Cliquer sur le lien  « signer », un code de validation vous est envoyé par SMS.%0D%0A
+				%09 4. Insérez ce code sur le site : votre contrat de location est signé !%0D%0A";
+				$texte .= "Vous recevez directement une copie par mail.%0D%0A%0D%0A";
+				$texte .= "En restant à votre disposition,%0D%0A%0D%0A";
+				$texte .= "Bien cordialement,";
 
 				$data['data'][$key]["sign_url"] = "mailto:".
 					ATF::contact()->select(ATF::societe()->select($value['affaire.id_societe_fk'],'id_contact_signataire') , "email").
-					"?subject=Votre lien de signature de contrat&body=".
-					ATF::societe()->getUrlSign($value['affaire.id_affaire_fk']);
-
-
+					"?subject=Votre lien de signature de contrat&body=".$texte;
 
 
 				// pour chaque affaire on recupere ses comites
@@ -2524,7 +2539,11 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+
 		$utilisateur  = ATF::$usr->get("contact");
+
+		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
+
 
 		ATF::db($this->db)->begin_transaction();
 		try {
@@ -2555,9 +2574,10 @@ class affaire_cleodis extends affaire {
 			  "type_devis" => "normal",
 			  "id_contact" => $id_contact,
 			  "id_user"=>ATF::$usr->getID(),
-			  "type_affaire" => "normal",
-			  "langue"=>ATF::societe()->select($id_societe, "langue")
+		      "id_type_affaire"=>$id_type_affaire,
+			  "langue"=>ATF::societe()->select($id_societe, "langue"),
 			);
+
 
 			$values_devis =array();
 
@@ -2605,6 +2625,11 @@ class affaire_cleodis extends affaire {
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
+			if ($apporteur){
+				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
+			}
+
+			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2617,17 +2642,14 @@ class affaire_cleodis extends affaire {
 				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
 			}
 
-			log::logger("test d\affichage du code client partenaire"." ".$code_client_partenaire,'code_client');
-
-
-
 			if ($apporteur){
 				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'id_apporteur'=>$apporteur));
 			}
 
-			log::logger("test d\affichage du code apporteur"." ".$apporteur,'code_client');
 
-			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],
+									"provenance"=>"partenaire",
+									'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
 			//Envoi du mail
 			ATF::affaire()->createTacheAffaireFromSite($devis["id_affaire"]);
@@ -2666,6 +2688,11 @@ class affaire_cleodis extends affaire {
 			$creation = $creation->format("Ymd");
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
+
+			log::logger($societe, "mfleurquin");
+			log::logger("Score --> ".$societe["cs_score"], "mfleurquin");
+			log::logger("Creation --> ".$creation, "mfleurquin");
+
 
 			if(($societe["cs_score"] > 50 && $creation < $past2Years)){
 				$comite["etat"] = "accepte";
