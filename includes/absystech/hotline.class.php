@@ -1165,9 +1165,6 @@ class hotline extends classes_optima {
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed){
 		$this->infoCollapse($infos);
 
-		if(array_key_exists('id_projet',$infos)){
-			unset($infos["id_projet"]);
-		}
 		//Vérification des informations
 		//if(!$infos["id_contact"]) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
 
@@ -3866,7 +3863,11 @@ class hotline extends classes_optima {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
 			if ($get['filters']['free'] == "on") {
-				$this->q->where("hotline.etat","free");
+				$this->q->whereIsNull("hotline.id_user",'AND')
+						->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+						->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+						->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
+				// $this->q->where("hotline.etat","free");
 			} else {
 				// Filtre ticket actif
 				if ($get['filters']['fixing'] == "on") {
@@ -4032,7 +4033,6 @@ class hotline extends classes_optima {
 
 			// Mapping pour BDD Optima
 			$post['pole_concerne'] = $post['pole']; unset($post['pole']);
-			$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
 			$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 			$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4150,10 +4150,7 @@ class hotline extends classes_optima {
 					$post['pole_concerne'] = $post['pole'];
 					unset($post['pole']);
 				}
-				if ($post['id_gep_projet']) {
-					$post['id_gep_projet'] = $post['id_projet'];
-					unset($post['id_projet']);
-				}
+
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4449,7 +4446,11 @@ class hotline extends classes_optima {
 
 		$poles=ATF::user()->select($get['id_user'],"pole");
     	$pole = explode(',',$poles);
-		$this->q->reset()->setCount()->where("etat" , "free");
+		$this->q->reset()->setCount()->whereIsNull("id_user", 'AND')
+			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
+			//->where("etat" , "free");
 		foreach($pole as $k =>$val){
 		$this->q->where("pole_concerne" , $val,"OR","pole","=");
 		}
