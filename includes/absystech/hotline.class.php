@@ -3862,19 +3862,13 @@ class hotline extends classes_optima {
 		} else {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
-			if ($get['filters']['free'] == "on") {
-				$this->q->whereIsNull("hotline.id_user",'AND','free')
-						->where("hotline.etat", "done", 'AND', 'free', "!=")
-						->where("hotline.etat", "payee", 'AND', 'free', "!=")
-						->where("hotline.etat", "annulee", 'AND', 'free', "!=");
-			}
 			// Filtre ticket actif
 			if ($get['filters']['fixing'] == "on") {
-				$this->q->where("hotline.etat","fixing");
+				$this->q->where("hotline.etat","fixing","OR","etat");
 			}
 			// Filtre ticket en attente
 			if ($get['filters']['wait'] == "on") {
-				$this->q->where("hotline.etat","wait");
+				$this->q->where("hotline.etat","wait","OR","etat");
 			}
 			// Filtre MES tickets
 			if ($get['filters']['mine'] == "on") {
@@ -3907,7 +3901,6 @@ class hotline extends classes_optima {
 					//log::logger($value, "alahlah");
 				}
 			}
-
 
 			// TRI
 			switch ($get['tri']) {
@@ -3943,6 +3936,28 @@ class hotline extends classes_optima {
 		// $this->q->unsetToString();
 
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+		if ($get['filters']['free'] == "on") {
+			$this->q->reset("where");
+			$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
+					->where("hotline.etat", "payee", 'AND', 'etat', "!=")
+					->where("hotline.etat", "annulee", 'AND', 'etat', "!=")
+					->whereIsNull("hotline.id_user",'AND','etat');
+
+			if ($get['filters']['dev'] == "on") {
+				$this->q->where("hotline.pole_concerne","dev","OR","pole");
+			}
+			if ($get['filters']['system'] == "on") {
+				$this->q->where("hotline.pole_concerne","system","OR","pole");
+			}
+			if ($get['filters']['telecom'] == "on") {
+				$this->q->where("hotline.pole_concerne","telecom","OR","pole");
+			}
+
+			$nonTraites = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+			$data["data"] = array_merge($data["data"], $nonTraites["data"]);
+			$data['count'] += $nonTraites['count'];
+		}
 
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
@@ -4433,17 +4448,17 @@ class hotline extends classes_optima {
     */
 	public function _totalHotlineNonTraite($get){
 
-		$poles=ATF::user()->select($get['id_user'],"pole");
-    	$pole = explode(',',$poles);
 		$this->q->reset()->setCount()->whereIsNull("id_user", 'AND')
 			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
 			//->where("etat" , "free");
+		$poles=ATF::user()->select($get['id_user'],"pole");
+		$pole = explode(',',$poles);
 		foreach($pole as $k =>$val){
-		$this->q->where("pole_concerne" , $val,"OR","pole","=");
+			$this->q->where("pole_concerne" , $val,"OR","pole","=");
 		}
-    	$result = $this->sa();
+		$result = $this->sa();
 		return $result['count'];
 
 	}
