@@ -3863,41 +3863,30 @@ class hotline extends classes_optima {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
 			if ($get['filters']['free'] == "on") {
-				$this->q->whereIsNull("hotline.id_user",'AND')
-						->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
-						->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
-						->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
-				// $this->q->where("hotline.etat","free");
-			} else {
-				// Filtre ticket actif
-				if ($get['filters']['fixing'] == "on") {
-					$this->q->where("hotline.etat","fixing");
-				}
-				// Filtre ticket en attente
-				if ($get['filters']['wait'] == "on") {
-					$this->q->where("hotline.etat","wait");
-				}
-				// Filtre MES tickets
-				if ($get['filters']['mine'] == "on") {
-					$this->q->where("hotline.id_user",ATF::$usr->getId());
-				}
-
-				// Filtre Facturé
-				if ($get['filters']['facture'] == "on") {
-					$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
-				}
-				// Filtre NON Facturé
-				if ($get['filters']['nfacture'] == "on") {
-					$this->q->where("hotline.facturation_ticket","non","OR","facturation");
-				}
-				$this->q->whereIsNull("hotline.facturation_ticket","OR","facturation");
-
-				// Filtre Sur affaire
-				if ($get['filters']['afffacture'] == "on") {
-					$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
-				} else {
-					$this->q->whereIsNull("hotline.id_affaire");
-				}
+				$this->q->whereIsNull("hotline.id_user",'AND','free')
+						->where("hotline.etat", "done", 'AND', 'free', "!=")
+						->where("hotline.etat", "payee", 'AND', 'free', "!=")
+						->where("hotline.etat", "annulee", 'AND', 'free', "!=");
+			}
+			// Filtre ticket actif
+			if ($get['filters']['fixing'] == "on") {
+				$this->q->where("hotline.etat","fixing");
+			}
+			// Filtre ticket en attente
+			if ($get['filters']['wait'] == "on") {
+				$this->q->where("hotline.etat","wait");
+			}
+			// Filtre MES tickets
+			if ($get['filters']['mine'] == "on") {
+				$this->q->where("hotline.id_user",ATF::$usr->getId());
+			}
+			// Filtre Facturé
+			if ($get['filters']['facture'] == "on") {
+				$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
+			}
+			// Filtre Sur affaire
+			if ($get['filters']['afffacture'] == "on") {
+				$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
 			}
 			// AUtre filtre - fitlres indépendant
 			if ($get['filters']['dev'] == "on") {
