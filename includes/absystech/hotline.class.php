@@ -908,8 +908,10 @@ class hotline extends classes_optima {
 		if($infos["filestoattach"]["fichier_joint"]){
 			//Ajout du fichier joint
 			$path = $this->filepath($id_hotline,"fichier_joint");
-			$mail=ATF::hotline_mail()->getCurrentMail();
-			$mail->addFile($path,"fichier_joint.zip",true);
+			if( file_exists($path)) {
+				$mail=ATF::hotline_mail()->getCurrentMail();
+				$mail->addFile($path,"fichier_joint.zip",true);
+			}
 		}
 
 		ATF::hotline_mail()->sendMail();
@@ -3371,17 +3373,19 @@ class hotline extends classes_optima {
 
 		/*Envoi du mail*/
 		if (($infos["send_mail"]=="true" || $infos["relance"]) && $hotline["visible"]=="oui"){
-			if (ATF::hotline_mail()->createMailBilling($hotline["id_hotline"])) {
-				ATF::hotline_mail()->sendMail();
 
-				//Notice mail envoyé
-				if($infos['relance']){
-					$this->createMailNotice("hotline_relance_facturation");
-				}else{
-					$this->createMailNotice("hotline_mail_facturation");
+			if($this->_mailContactHotline(array("id"=>$hotline["id_hotline"])) !== "contact_sans_mail") {
+				if (ATF::hotline_mail()->createMailBilling($hotline["id_hotline"])) {
+					ATF::hotline_mail()->sendMail();
+
+					//Notice mail envoyé
+					if($infos['relance']){
+						$this->createMailNotice("hotline_relance_facturation");
+					}else{
+						$this->createMailNotice("hotline_mail_facturation");
+					}
 				}
 			}
-
 		}
 
 		//Insère une interaction d'information
@@ -3859,7 +3863,11 @@ class hotline extends classes_optima {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
 			if ($get['filters']['free'] == "on") {
-				$this->q->where("hotline.etat","free");
+				$this->q->whereIsNull("hotline.id_user",'AND')
+						->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+						->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+						->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
+				// $this->q->where("hotline.etat","free");
 			} else {
 				// Filtre ticket actif
 				if ($get['filters']['fixing'] == "on") {
@@ -4025,7 +4033,6 @@ class hotline extends classes_optima {
 
 			// Mapping pour BDD Optima
 			$post['pole_concerne'] = $post['pole']; unset($post['pole']);
-			$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
 			$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 			$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4143,10 +4150,7 @@ class hotline extends classes_optima {
 					$post['pole_concerne'] = $post['pole'];
 					unset($post['pole']);
 				}
-				if ($post['id_gep_projet']) {
-					$post['id_gep_projet'] = $post['id_projet'];
-					unset($post['id_projet']);
-				}
+
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4310,6 +4314,22 @@ class hotline extends classes_optima {
 	}
 
 	/**
+	* Récupère le mail du contact du ticket hotline
+	* @package Telescope
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param $get array contient l'id du ticket a l'index 'id'
+	* @return string|null retour le mail du contact du ticket hotline
+	*/
+	public function _mailContactHotline($get) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		$h = $this->select($get['id']);
+		$email = ATF::contact()->select($h['id_contact'], "email");
+		if($email) return $email;
+		return 'contact_sans_mail';
+
+	}
+
+	/**
 	* Récupère la liste des affaires utiles
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -4426,7 +4446,11 @@ class hotline extends classes_optima {
 
 		$poles=ATF::user()->select($get['id_user'],"pole");
     	$pole = explode(',',$poles);
-		$this->q->reset()->setCount()->where("etat" , "free");
+		$this->q->reset()->setCount()->whereIsNull("id_user", 'AND')
+			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
+			//->where("etat" , "free");
 		foreach($pole as $k =>$val){
 		$this->q->where("pole_concerne" , $val,"OR","pole","=");
 		}
