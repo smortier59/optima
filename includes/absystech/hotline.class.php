@@ -955,7 +955,6 @@ class hotline extends classes_optima {
 			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 
-
 		// On averti toujours sur le chan Hotline d'absystech
 		if(ATF::$codename !== "absystech" && ATF::$codename !== "att"){
 			$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
@@ -966,11 +965,13 @@ class hotline extends classes_optima {
 			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 
+		//Fin de transaction
+		ATF::db($this->db)->commit_transaction();
+
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
 
-		//Fin de transaction
-		ATF::db($this->db)->commit_transaction();
+		
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
