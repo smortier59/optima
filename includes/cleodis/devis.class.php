@@ -720,7 +720,7 @@ class devis_cleodis extends devis {
 		$affaire["provenance"]  = $data_affaire["provenance"];
 		$affaire["pieces"]  = $data_affaire["pieces"];
 		$affaire["date_verification"]  = $data_affaire["date_verification"];
-		$affaire["id_partenaire"]  = $data_affaire["id_partenaire"];
+
 		//$affaire["commentaire_facture"]  = $data_affaire["commentaire_facture"];
 
 		// Déplacer toutes les pièces jointes anciennes vers le nouveau
@@ -733,6 +733,7 @@ class devis_cleodis extends devis {
 
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
 
+		$infos["id_partenaire"]  = $data_affaire["id_partenaire"];
 		$last_id = $this->insert($infos,$s,$files);
 
 		$id_affaire = $this->select($last_id,"id_affaire");
