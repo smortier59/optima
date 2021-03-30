@@ -261,6 +261,10 @@ class produit_cleodis extends produit {
 
 	public function update($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$nolog=false){
 		parent::update($infos,$s,$files);
+
+		$this->infoCollapse($infos);
+		if(is_array($cadre_refreshed)){	ATF::produit()->redirection("select",$infos['id_produit']); }
+		return $infos['id_produit'];
 	}
 
 	/**

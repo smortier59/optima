@@ -2576,6 +2576,7 @@ class affaire_cleodis extends affaire {
 			  "id_user"=>ATF::$usr->getID(),
 		      "id_type_affaire"=>$id_type_affaire,
 			  "langue"=>ATF::societe()->select($id_societe, "langue"),
+			  "id_partenaire"=>ATF::$usr->get('contact','id_societe')
 			);
 
 

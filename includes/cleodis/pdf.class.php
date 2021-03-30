@@ -1178,7 +1178,7 @@ class pdf_cleodis extends pdf {
 
 
 		$logoPartenaire = ATF::societe()->filepath($this->affaire["id_partenaire"], "logo");
-
+		log::logger("LOGO PARTENAIRE DEVIS LFS ID ".$logoPartenaire, "qjanon");
 		if(file_exists($logoPartenaire)){
 			$this->cell(0,5,"Selon Devis : ");
 			copy($logoPartenaire,str_replace("logo","jpg",$logoPartenaire));
