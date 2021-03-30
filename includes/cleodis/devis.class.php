@@ -733,7 +733,7 @@ class devis_cleodis extends devis {
 
 		ATF::affaire()->d($devis["id_affaire"],$s,$files);
 
-		$infos["id_partenaire"]  = $data_affaire["id_partenaire"];
+		$infos["devis"]["id_partenaire"]  = $data_affaire["id_partenaire"];
 		$last_id = $this->insert($infos,$s,$files);
 
 		$id_affaire = $this->select($last_id,"id_affaire");
