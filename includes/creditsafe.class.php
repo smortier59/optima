@@ -8,7 +8,6 @@ class creditsafe {
     public function curlCall($url, $token, $method='GET', $params = null){
 
         log::logger("-- URL : ".$url , "creditSafe");
-        log::logger("-- token : ".$token , "creditSafe");
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -99,7 +98,6 @@ class creditsafe {
             );
         }else{
             log::logger("ERROR Authenticate" , "creditSafe");
-            log::logger($response , "creditSafe");
             if ($response->details) {
                 throw new errorATF("CREDIT SAFE ERROR Authenticate : ".$response->message." ".$response->details);
             } else {
@@ -115,39 +113,130 @@ class creditsafe {
         try {
             log::logger("-- Récuperation du token" , "creditSafe");
             $dataAuth = $this->authenticate();
-            log::logger($dataAuth , "creditSafe");
 
             $token = $dataAuth["token"];
             $baseurl = $dataAuth["baseurl"];
 
             $pays = ATF::constante()->getConstante("__API_CREDIT_PAYS_RECHERCHE__");
-            if (!$pays) $pays = 'FR';
+            if (!$pays) {  $pays = 'FR'; }
+            else {  $pays = ATF::constante()->select($pays, "valeur"); }
 
-            $url = $baseurl.'/companies?countries=FR&regNo=33525999000034';
+
+            $url = $baseurl.'/companies?countries='.$pays.'&regNo='.$siret;
             log::logger("-- Recherche de la societe ".$url , "creditSafe");
             $res = $this->curlCall($url, $token);
             log::logger($res , "creditSafe");
 
-
             if ($res->totalSize >= 1){
                 $idCreditSafe = $res->companies[0]->id;
 
-                $url = $baseurl.'/companies/'.$idCreditSafe;
+                $url = $baseurl.'/companies/'.$idCreditSafe.'?language=fr';
                 log::logger("-- Récuperation du report de la societe ".$url , "creditSafe");
                 $societeData = $this->curlCall($url, $token);
                 log::logger($societeData , "creditSafe");
+                return $this->cleanDataForOptima($societeData);
             }else{
                 log::logger("Error 2" , "creditSafe");
                 log::logger("Aucune société trouvée pour ".$siret." dans les pays suivants ".$pays , "creditSafe");
                 throw new errorATF("Aucune société trouvée pour ".$siret." dans les pays suivants ".$pays);
             }
-
-
-
         } catch (errorATF $e) {
             log::logger("Error 1" , "creditSafe");
             throw $e;
         }
+
+    }
+
+
+    private function cleanDataForOptima($data) {
+        $return = array();
+
+        $directors = $data->report->directors->currentDirectors;
+        foreach ($directors as $key => $value) {
+            $director = $value->name;
+            if ($value->gender){
+                if ($value->gender == "Male") $director = str_replace('M ', '', $director);
+                if ($value->gender == "Female") $director = str_replace('Mme ', '', $director);
+            }
+
+            $explodeNom = explode(" ", $director);
+            $nom = $explodeNom[0];
+            $prenom = str_replace($nom.' ', '', $director);
+
+			$return['gerant'][] = array("nom"=>$nom,
+								        "prenom"=>$prenom,
+								        "fonction"=>$value->positions[0]->positionName);
+
+		}
+
+        $companySummary = $data->report->companySummary;
+        $companyIdentification = $data->report->companyIdentification;
+        $basicInfo = $data->report->companyIdentification->basicInformation;
+        $creditScore = $data->report->creditScore;
+
+
+        $return['societe'] = $companySummary->businessName;
+		$return['siret'] = $companySummary->companyRegistrationNumber;
+		$return['siren'] = substr($return['siret'],0,9);
+        $return['reference_tva'] = $companyIdentification->basicInformation->vatRegistrationNumber;
+        $return['naf'] = $companyIdentification->basicInformation->principalActivity->code;
+		$return['activite'] = $companyIdentification->basicInformation->principalActivity->description;
+		$return['structure'] = $companyIdentification->basicInformation->legalForm->description;
+        $return['ville_rcs'] = $companyIdentification->basicInformation->commercialCourt;
+
+
+        $dateparsee = explode('T',$basicInfo->companyRegistrationDate);
+		$return['date_creation'] = date("Y-m-d",strtotime($dateparsee[0]));
+
+		// $return['tel'] = str_replace("/","",(string)$company->BasicInformation->ContactTelephoneNumber);
+		$return['adresse'] = $basicInfo->contactAddress->street;
+		$return['cp'] = $basicInfo->contactAddress->postalCode;
+		$return['ville'] = $basicInfo->contactAddress->city;
+        $return['id_pays'] = $basicInfo->contactAddress->country;
+
+
+		$return['capital'] =  $data->report->shareCapitalStructure->nominalShareCapital->value;
+
+		$return['cs_score'] = $creditScore->currentCreditRating->providerValue->value;
+		$return['cs_avis_credit'] = $creditScore->currentCreditRating->creditLimit->value;
+
+        $dateparsee = explode("-",explode('T',$creditScore->latestRatingChangeDate)[0]);
+        $return['lastaccountdate'] = $dateparsee[2]."/".$dateparsee[1]."/".$dateparsee[0];
+
+        $financialStatement = $data->report->financialStatements[0];
+
+		$return['receivables'] = number_format(intval($financialStatement->balanceSheet->totalReceivables), 0, ",", "");
+		$return['securitieandcash'] = number_format(intval($financialStatement->balanceSheet->cash) , 0, ",", "");		// Produits d'exploitation
+
+		$return["capital_social"] = number_format(intval($data->report->shareCapitalStructure->nominalShareCapital->value) , 0, ",", "");
+		$return["capitaux_propres"] = number_format(intval($financialStatement->balanceSheet->totalShareholdersEquity) , 0, ",", "");
+		$return["dettes_financieres"] = number_format(intval($data->report->localFinancialStatements[0]->liabilities->financialLiabilities) , 0, ",", "");
+
+/*
+        $return['netturnover'] =  number_format(intval(Report->FinancialStatements->ProfitAndLoss->ProfitAfterTax->_) , 0, ",", "");
+		$return['operatingincome'] =  number_format(intval(Report->FinancialStatements->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
+        $return['operationgprofitless'] = number_format(intval(Report->FinancialStatements->ProfitAndLoss->OperatingProfit->_) , 0, ",", "");
+		$return['financialincome'] = number_format(intval((string)Report->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
+		$return['financialcharges'] = number_format(intval((string)Report->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", "");
+
+        $return['ca'] = $return['netturnover'];
+        $return['resultat_exploitation'] = $return['operationgprofitless'];
+*/
+
+		// ETAT
+		switch ($companySummary->companyStatus->CompanyStatus->status) {
+			case '':
+				$return['etat'] = "supprime";
+			break;
+			case 'Inactive':
+            case 'NonActive':
+				$return['etat'] = "inactif";
+			break;
+			case 'Active':
+				$return['etat'] = "actif";
+			break;
+		}
+        return $return;
 
     }
 
