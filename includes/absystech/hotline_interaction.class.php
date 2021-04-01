@@ -2247,8 +2247,7 @@ class hotline_interaction extends classes_optima {
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
 				}		
 				/*---------------Gestion de la mise en attente de MEP one shot----------------------*/
-				if ($infos['mep_mail']=="oui") {					log::logger('je suis dans le cas ou mep_mail = oui');
-					log::logger("TH mise en attente de MEP","hotline");
+				if ($infos['mep_mail']=="oui") {
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"wait_mep"=>"oui","etat"=>"fixing","disabledInternalInteraction"=>true));
 				}
 			}
