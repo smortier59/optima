@@ -2313,36 +2313,6 @@ class hotline_interaction extends classes_optima {
 				$id_hotline_interaction = parent::insert($data,$s,$files);
 			}
 
-			// GESTION DES ALERTES
-			/*log::logger($ticket_presta." > ".$infos["credit_presta"],"hotline");
-			log::logger($ticket_dep." > ".$infos["credit_dep"],"hotline");
-			if( ($ticket_presta > $infos["credit_presta"]) || ($ticket_dep > $infos["credit_dep"])){
-				log::logger("ALERTE POUR SOUS FACTURATION","hotline");
-
-				if(!$infos["champ_alerte"]){
-					ATF::db($this->db)->rollback_transaction();
-					throw new errorATF("Merci de saisir votre justification !",1020);
-				}
-				$alerte = array(
-					"alerte"=>$infos["champ_alerte"]
-					,"id_user"=>ATF::$usr->getID()
-					,"id_hotline"=>$infos["id_hotline"]
-					,"id_hotline_interaction"=>$id_hotline_interaction
-				);
-				if ($infos['id_alerte']) {
-					$alerte['id_alerte'] = $infos['id_alerte'];
-					log::logger("UPDATE ALERTE","hotline");
-					log::logger($alerte,"hotline");
-					ATF::alerte()->u($alerte);
-				} else {
-					log::logger("INSERT ALERTE","hotline");
-					log::logger($alerte,"hotline");
-					ATF::alerte()->i($alerte);
-				}
-
-			}*/
-
-
 			//L'interaction fait mention de materiel a facturer
 			//On notifie Emma
 			if($infos["matos"] == "oui") {
