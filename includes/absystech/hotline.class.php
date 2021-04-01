@@ -789,7 +789,6 @@ class hotline extends classes_optima {
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
 
-
 		$this->infoCollapse($infos);
 
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
@@ -799,7 +798,6 @@ class hotline extends classes_optima {
 
 		//Vérification des informations
 		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
-
 
 		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
 
@@ -848,7 +846,6 @@ class hotline extends classes_optima {
 		//Date de création de la requête
 		$infos["date"]=date('Y-m-d H:i:s');
 
-
 		// Auto affectation a charge Absystech si client Absystech
 		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
 		if ($id_societe==1) {
@@ -870,7 +867,6 @@ class hotline extends classes_optima {
 		$hotline = $this->select($id_hotline);
 		//Notice
 		$this->createNotice("hotline_insert");
-
 
 		//Gestion de la prise en charge de l'utilisateur
 		if($infos["id_user"]){
@@ -916,7 +912,6 @@ class hotline extends classes_optima {
 
 		ATF::hotline_mail()->sendMail();
 
-
 		if((ATF::societe()->decryptId($infos["id_societe"]) != "1") && (ATF::societe()->decryptId($infos["id_societe"]) != "1154") && ($infos["visible"] == "oui") && $send_mail){
 			$mail = ATF::hotline_mail()->getCurrentMail();
 			if(ATF::contact()->select(ATF::contact()->decryptId($infos["id_contact"]) , "email")){
@@ -932,10 +927,6 @@ class hotline extends classes_optima {
 
 		//Trace dans les interactions
 		$this->createInternalInteraction($id_hotline,"Requête créée par ".ATF::user()->nom(ATF::$usr->getId()));
-
-
-		//Fin de transaction
-		ATF::db($this->db)->commit_transaction();
 
 		$societe = ATF::societe()->select($infos['id_societe']);
 		$contact = ATF::contact()->select($infos['id_contact']);
@@ -966,7 +957,6 @@ class hotline extends classes_optima {
 			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 
-
 		// On averti toujours sur le chan Hotline d'absystech
 		if(ATF::$codename !== "absystech" && ATF::$codename !== "att"){
 			$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
@@ -977,9 +967,13 @@ class hotline extends classes_optima {
 			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 
+		//Fin de transaction
+		ATF::db($this->db)->commit_transaction();
+
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
 
+		
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
