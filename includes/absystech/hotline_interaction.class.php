@@ -172,7 +172,6 @@ class hotline_interaction extends classes_optima {
 	* @return boolean true
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed=NULL,$mail=true,$pointage=true) {
-
 		$this->infoCollapse($infos);
 
 		/*---------------Fonctionnalité de trace hotline----------------------*/
@@ -2032,6 +2031,8 @@ class hotline_interaction extends classes_optima {
 
 			if($post['en_attente']=="on") $post["etat_wait"] = "oui";
 
+			//if(!isset($post['en_attente'])) $post["etat_wait"] = "non";
+
 			// Calcul du nombre de crédit
 			if (!$post['credit_presta'] && $post["nature"] == "interaction") {
 				//Si on ne donne pas de raison on force le calcul normal
@@ -2240,16 +2241,13 @@ class hotline_interaction extends classes_optima {
 			// 2ème contrainte : Requête en état wait/fixing uniquement (les requêtes terminées ou non prises en charge ne peuvent pas avoir de changement d'état)
 			// 3ème contrainte : Les requêtes en état wait passent en état fixing lors d'une interaction
 			// 4ème contrainte : Seulement si la facturation est validée ou qu'il n'y a pas de facturation
-			if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){
+			if($hotline["etat"]=="fixing" || $hotline["etat"]=="wait"){				
 				if($infos["etat_wait"]=="oui" || ($hotline["facturation_ticket"]=="oui" && !$hotline["ok_facturation"]) || ($hotline["facturation_ticket"]=="oui" && $hotline["ok_facturation"]=="non")){
 					log::logger("TH mise en attente","hotline");
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"wait","disabledInternalInteraction"=>true));
-				}else{
-					log::logger("TH mise en fixing","hotline");
-					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"etat"=>"fixing","disabledInternalInteraction"=>true));
-				}
+				}		
 				/*---------------Gestion de la mise en attente de MEP one shot----------------------*/
-				if ($infos['mep_mail']=="oui") {
+				if ($infos['mep_mail']=="oui") {					log::logger('je suis dans le cas ou mep_mail = oui');
 					log::logger("TH mise en attente de MEP","hotline");
 					ATF::hotline()->update(array("id_hotline"=>$infos["id_hotline"],"wait_mep"=>"oui","etat"=>"fixing","disabledInternalInteraction"=>true));
 				}
