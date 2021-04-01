@@ -212,16 +212,15 @@ class creditsafe {
 		$return["capitaux_propres"] = number_format(intval($financialStatement->balanceSheet->totalShareholdersEquity) , 0, ",", "");
 		$return["dettes_financieres"] = number_format(intval($data->report->localFinancialStatements[0]->liabilities->financialLiabilities) , 0, ",", "");
 
-/*
-        $return['netturnover'] =  number_format(intval(Report->FinancialStatements->ProfitAndLoss->ProfitAfterTax->_) , 0, ",", "");
-		$return['operatingincome'] =  number_format(intval(Report->FinancialStatements->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
-        $return['operationgprofitless'] = number_format(intval(Report->FinancialStatements->ProfitAndLoss->OperatingProfit->_) , 0, ",", "");
-		$return['financialincome'] = number_format(intval((string)Report->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialIncome->_) , 0, ",", "");
-		$return['financialcharges'] = number_format(intval((string)Report->FinancialStatements->FinancialStatement->ProfitAndLoss->FinancialExpenses) , 0, ",", "");
+        $return['netturnover'] =  number_format(intval($data->report->localFinancialStatements[0]->ProfitAndLoss->netTurnover) , 0, ",", "");
+		$return['operatingincome'] =  number_format(intval($data->report->localFinancialStatements[0]->ProfitAndLoss->salesOfGoods) , 0, ",", "");
+        $return['operationgprofitless'] = number_format(intval($data->report->localFinancialStatements[0]->ProfitAndLoss->operatingProfit) , 0, ",", "");
+		$return['financialincome'] = number_format(intval((string)$data->report->localFinancialStatements[0]->ProfitAndLoss->financialIncome) , 0, ",", "");
+		$return['financialcharges'] = number_format(intval((string)$data->report->localFinancialStatements[0]->ProfitAndLoss->financialCharges) , 0, ",", "");
 
         $return['ca'] = $return['netturnover'];
         $return['resultat_exploitation'] = $return['operationgprofitless'];
-*/
+
 
 		// ETAT
 		switch ($companySummary->companyStatus->CompanyStatus->status) {
