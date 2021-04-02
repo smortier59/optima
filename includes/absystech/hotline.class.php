@@ -1127,23 +1127,6 @@ class hotline extends classes_optima {
 
 		$mail->send();
 
-
-		// if((ATF::societe()->decryptId($infos["id_societe"]) != "1") // AT
-		// 	&& (ATF::societe()->decryptId($infos["id_societe"]) != "1154") // ATT
-		// 	&& ($infos["visible"] == "oui")
-		// 	&& $send_mail){
-		// 	$mail = ATF::hotline_mail()->getCurrentMail();
-		// 	if(ATF::contact()->select($infos["id_contact"], "email")){
-		// 		ATF::hotline_mail()->createMailForCustomers(
-		// 			$id_hotline,
-		// 			"Nouvelle requete",
-		// 			ATF::contact()->select($infos["id_contact"], "email"),
-		// 			"hotline_insert_client"
-		// 		);
-		// 		ATF::hotline_mail()->sendMail();
-		// 	}
-		// }
-
 		//Notice mail envoyé
 		$this->createMailNotice("hotline_mail_insert");
 
@@ -2091,7 +2074,6 @@ class hotline extends classes_optima {
 				$result["titre"]= "Stats CLEODIS";
 				$result["categories"]= $titre;
 				$result["semestres"] = $date;
-				log::logger($result , "mfleurquin");
 				return $result;
 			break;
 
@@ -3185,11 +3167,6 @@ class hotline extends classes_optima {
 						$idhotline = $ids[2];
 						$idcontact = $ids[3];
 
-
-						log::logger($codename , "hotline-checkmail");
-						log::logger($idhotline , "hotline-checkmail");
-						log::logger($idcontact , "hotline-checkmail");
-
 						$id_hotline = ATF::hotline()->decryptId($idhotline);
 
 
@@ -3228,7 +3205,6 @@ class hotline extends classes_optima {
 
 							//$message = False;
 							if($message){
-								log::logger("On a bien trouvé le message dans le body" , "hotline-checkmail");
 								if($id_user = $user["id_user"]){
 									$usr=ATF::$usr;
 									ATF::$usr=new usr($user["id_user"]);
@@ -3801,7 +3777,6 @@ class hotline extends classes_optima {
 	* @apiSuccess {Array} hotline Echantillon de ticket hotline.
 	*/
 	public function _GET($get,$post) {
-
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "id_hotline";
 		if (!$get['trid']) $get['trid'] = "desc";
@@ -3897,8 +3872,6 @@ class hotline extends classes_optima {
 			if ($get['filters']['custom']) {
 				foreach ($get['filters']['custom'] as $key => $value) {
 					$this->q->where("hotline.id_".$key, $value);
-					//log::logger($key, "alahlah");
-					//log::logger($value, "alahlah");
 				}
 			}
 
@@ -3932,10 +3905,6 @@ class hotline extends classes_optima {
 			$this->q->where("gep_projet.id_gep_projet", 202, "OR", "projets"); // AirFrance
 		}
 
-		// $this->q->setToString();
-		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
-		// $this->q->unsetToString();
-
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
 		$realCount = $data['count'];
 
@@ -3944,6 +3913,9 @@ class hotline extends classes_optima {
 			$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
 					->where("hotline.etat", "payee", 'AND', 'etat', "!=")
 					->where("hotline.etat", "annulee", 'AND', 'etat', "!=")
+					->where("hotline.etat", "wait", 'AND', 'etat', "!=")
+					->where("hotline.etat", "fixing", 'AND', 'etat', "!=")
+					
 					->whereIsNull("hotline.id_user",'AND','etat');
 
 			if ($get['filters']['dev'] == "on") {
@@ -3957,10 +3929,20 @@ class hotline extends classes_optima {
 			}
 
 			$nonTraites = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
-			$data["data"] = array_merge($data["data"], $nonTraites["data"]);
-			$data['count'] += $nonTraites['count'];
-		}
 
+
+			if(!$get['filters']['wait'] && !$get['filters']['fixing'] && !$get['filters']['mine']){
+
+				$data["data"] = $nonTraites["data"];
+				$data['count'] = $nonTraites['count'];
+			}else{
+				$data["data"] = array_merge($data["data"], $nonTraites["data"]);
+				$data['count'] += $nonTraites['count'];
+			}
+
+
+		}
+		
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
 				if (strpos($k_,".")) {
@@ -3985,7 +3967,7 @@ class hotline extends classes_optima {
 
 		} else {
 			// Envoi des headers
-			header("ts-total-row: ".$realCount);
+			header("ts-total-row: ".$data['count']);
 			if ($get['limit']) header("ts-max-page: ".ceil($data['count']/$get['limit']));
 			if ($get['page']) header("ts-active-page: ".$get['page']);
 			if ($get['no-limit']) header("ts-no-limit: 1");
@@ -3995,6 +3977,8 @@ class hotline extends classes_optima {
 
 
 		}
+
+		
 
 		return $return;
 	}
@@ -4401,8 +4385,6 @@ class hotline extends classes_optima {
 
 
 	public function _partTicket($get,$post){
-		log::logger($get , "mfleurquin");
-		log::logger($post , "mfleurquin");
 
 		$at = $this->stats(true,"partTicket");
 		ATF::define_db("db","optima_att");
@@ -4449,11 +4431,13 @@ class hotline extends classes_optima {
     * @return interger le nombre de ticket non traités
     */
 	public function _totalHotlineNonTraite($get){
-
 		$this->q->reset()->setCount()->whereIsNull("id_user", 'AND')
 			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
 			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
-			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=");
+			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "wait", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "fixing", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "mine", 'AND', 'non_etat', "!=");
 			//->where("etat" , "free");
 		$poles=ATF::user()->select($get['id_user'],"pole");
 		$pole = explode(',',$poles);
