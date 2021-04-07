@@ -788,7 +788,9 @@ class hotline extends classes_optima {
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
-
+		if($infos['id_affaire']  && $infos['id_gep_projet']){
+			throw new errorATF("Incohérence ses deux données ne peuvent pas étre présente en méme temps");
+		}
 
 		$this->infoCollapse($infos);
 
@@ -859,13 +861,16 @@ class hotline extends classes_optima {
 			$infos["id_affaire"] = $id_affaire_projet;
 		}
 
+		if($infos['id_affaire']){
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
+		}
 		//Insertion de la requête
 		$type_requete=$infos["type_requete"];
 		unset($infos["type_requete"]);
 
 		ATF::db($this->db)->begin_transaction();
-
-		$id_hotline = parent::insert($infos,$s,$files);
+		$id_hotline = parent::insert($infos,$s,$files);	
 
 		$hotline = $this->select($id_hotline);
 		//Notice
@@ -903,9 +908,8 @@ class hotline extends classes_optima {
 		//Gestion de l'envoi de mail
 		ATF::hotline_mail()->createMailInsert($id_hotline,$infos["filestoattach"]["fichier_joint"],$infos["id_user"]);
 
-
 		//Fichier joint
-		if($infos["filestoattach"]["fichier_joint"]){
+		if($infos["filestoattach"]["fichier_joint"]){		
 			//Ajout du fichier joint
 			$path = $this->filepath($id_hotline,"fichier_joint");
 			$mail=ATF::hotline_mail()->getCurrentMail();
