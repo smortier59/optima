@@ -788,10 +788,7 @@ class hotline extends classes_optima {
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
-		if($infos['id_affaire']  && $infos['id_gep_projet']){
-			throw new errorATF("Incohérence ses deux données ne peuvent pas étre présente en méme temps");
-		}
-
+		
 		$this->infoCollapse($infos);
 
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
@@ -4016,9 +4013,14 @@ class hotline extends classes_optima {
 	* @apiSuccess (200) {Array} notices Notice lié a linsertion.
 	*/
 	public function _POST($get,$post,$files) {
+		log::logger($post,'dsarr');
 		$return = array();
 
 		try {
+			if($post['id_affaire']  && $post['id_projet']){
+				throw new Exception("DONNEES_INCOHERENTE",1025);
+			}
+
 			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 			// Check des champs obligatoire
 			if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
@@ -4032,7 +4034,7 @@ class hotline extends classes_optima {
 			$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
 			$post['visible'] = $post['visible']=='on'?"oui":"non";
 
-			$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
+			$post["filestoattach"]["fichier_joint"] = false; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
 
 			// Insertion
 			$return['id'] = self::insert($post);
