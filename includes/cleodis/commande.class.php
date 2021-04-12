@@ -2591,7 +2591,7 @@ class commande_cleodis extends commande {
 			$suivis = ATF::suivi()->select_all();
 
 			if($suivis){
-				foreach ($comites as $k => $v) {
+				foreach ($suivis as $k => $v) {
 					$suivi_date = $v["suivi.date"];
 					$suivi_description = $v["suivi.texte"];
 				}
