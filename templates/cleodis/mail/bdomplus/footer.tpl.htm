@@ -4,9 +4,9 @@
   <tbody>
     <tr>
       <td align="center" height="165" style="height:165px;" valign="middle" width="600" >
-        <p style="vertical-align:middle;margin-top: 25px; font-weight: 6px; line-height: 1em">
+        <p style="text-align:left;margin-top: 25px; font-weight: 6px; line-height: 1em; font-size:10px; font-family:Helvetica Neue,Helvetica,Arial,sans-serif;">
 
-          <strong style="text-align:left;">Merci de ne pas répondre à cet email. </strong> Pour nous contacter : <a href="mailto:{$infos.partenaire.email}">{$infos.partenaire.email}</a>
+          <strong style="text-align:left;">Merci de ne pas répondre à cet email. </strong> <br/>Pour nous contacter : <a href="mailto:{$infos.partenaire.email}">{$infos.partenaire.email}</a>
           {if ATF::$codename == "bdomplus"} {$infos.partenaire.societe} {/if} {if $infos.partenaire.structure}{$infos.partenaire.structure},{/if}  {if $infos.partenaire.capital} Société au capital de {$infos.partenaire.capital}€ {/if}
           dont le siège social est {$infos.partenaire.adresse} {if $infos.partenaire.adresse_2}{$infos.partenaire.adresse_2}, {/if} {if $infos.partenaire.adresse_3}{$infos.partenaire.adresse_3}, {/if},
           {$infos.partenaire.cp} {$infos.partenaire.ville}.
