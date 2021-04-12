@@ -2589,7 +2589,8 @@ class commande_cleodis extends commande {
 							->addCondition("suivi.type_suivi",'Blocage', "AND")
 							->where("id_affaire", $value["affaire.id_affaire_fk"]);
 			$suivis = ATF::suivi()->select_all();
-
+			$suivi_date = NULL;
+			$suivi_description = NULL;
 			if($suivis){
 				foreach ($suivis as $k => $v) {
 					$suivi_date = $v["suivi.date"];
