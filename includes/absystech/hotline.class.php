@@ -855,6 +855,10 @@ class hotline extends classes_optima {
 			$infos["charge"] = "intervention";
 			$infos["id_affaire"] = $id_affaire_projet;
 		} else if ($infos['id_affaire']) {
+			$id_societe_de_affaire = ATF::affaire()->select($infos['id_affaire'],'id_societe');
+			if($id_societe !== $id_societe_de_affaire){
+				throw new errorATF("DONNEES INCOHERENTE");
+			}
 			$infos["type_requete"] = "affaire";
 			$infos["charge"] = "intervention";
 		}
