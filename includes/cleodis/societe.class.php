@@ -54,6 +54,7 @@ class societe_cleodis extends societe {
       ))
       ,"avis_credit"
       ,"cs_avis_credit"
+      ,"lastScoreDate"
       ,"score"
       ,"cs_score"
       ,"contentieux"

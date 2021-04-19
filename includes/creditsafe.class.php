@@ -195,13 +195,21 @@ class creditsafe {
         $return['id_pays'] = $basicInfo->contactAddress->country;
 
 
+
+
 		$return['capital'] =  $data->report->shareCapitalStructure->nominalShareCapital->value;
 
 		$return['cs_score'] = $creditScore->currentCreditRating->providerValue->value;
 		$return['cs_avis_credit'] = $creditScore->currentCreditRating->creditLimit->value;
 
-        $dateparsee = explode("-",explode('T',$creditScore->latestRatingChangeDate)[0]);
-        $return['lastaccountdate'] = $dateparsee[2]."/".$dateparsee[1]."/".$dateparsee[0];
+        $latestRatingChangeDate = explode("-",explode('T',$creditScore->latestRatingChangeDate)[0]);
+        $return['lastScoreDate'] = $latestRatingChangeDate[2]."/".$latestRatingChangeDate[1]."/".$latestRatingChangeDate[0];
+        if ($return['lastScoreDate'] === "//") $return['lastScoreDate'] = null;
+
+        $lastaccountdate = explode("-",explode('T',$data->report->localFinancialStatements[0]->yearEndDate)[0]);
+        $return['lastaccountdate'] = $lastaccountdate[2]."/".$lastaccountdate[1]."/".$lastaccountdate[0];
+        if ($return['lastaccountdate'] === "//") $return['lastaccountdate'] = null;
+
 
         $financialStatement = $data->report->financialStatements[0];
 
