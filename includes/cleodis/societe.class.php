@@ -54,6 +54,7 @@ class societe_cleodis extends societe {
       ))
       ,"avis_credit"
       ,"cs_avis_credit"
+      ,"lastScoreDate"
       ,"score"
       ,"cs_score"
       ,"contentieux"
@@ -1618,15 +1619,11 @@ class societe_cleodis extends societe {
 
     if(ATF::$codename == "cleodisbe"){
       $post["num_ident"] = $post["siret"];
-      $data = ATF::societe_cleodisbe()->getInfosFromCREDITSAFE($post);
+    }
+    $data = self::getInfosFromCREDITSAFE($post);
 
-      if(!$data["societe"]){
-        throw new errorATF("erreurCS BELGIQUE",404);
-      }
-      //On ne recupere pas de dirigeant pour CLEODIS BE, on simule un retour vide dans ce cas
-      //$data["gerant"] = array();
-    }else{
-       $data = self::getInfosFromCREDITSAFE($post);
+    if(!$data["societe"]){
+      throw new errorATF("erreurCS",404);
     }
 
     log::logger($data, "creditsafe");
@@ -2027,73 +2024,6 @@ class societe_cleodisbe extends societe_cleodis {
 
 
     $this->fieldstructure();
-  }
-
-
-
-  /** Interroge Credit Safe pour récupérer les informations des sociétés.
-  * @author Quentin JANON <qjanon@absystech.fr>
-  * @author Cyril Charlier <ccharlier@absystech.fr>
-  */
-  public function getInfosFromCREDITSAFE($infos) {
-
-
-
-    $infos["num_ident"] = str_replace(" ", "", $infos["num_ident"]);
-    $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
-    $infos["num_ident"] = str_replace("BE", "", $infos["num_ident"]);
-
-
-    $client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3i/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
-
-    $params = (object)array
-    ( 'countries' => array ('BE'),
-      'searchCriteria' => (object) array
-      (
-        'RegistrationNumber' => $infos['num_ident'],
-      ),
-      'customData' => null,
-      'chargeReference' => 'example searchCriteria with name',
-    );
-
-
-    $response = $client->__soapCall('FindCompanies',array($params));
-
-     $xml = $response;
-
-    // response/Messages / Message type = error
-    $error = False;
-    $messageSociete =$xml->FindCompaniesResult->Messages->Message;
-    if($messageSociete && $messageSociete->Type == "Error"){
-      ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-      return $error = True;
-    }
-    if($error == False){
-      $param = (object)array
-      (
-        'companyId' => $xml->FindCompaniesResult->Companies->Company->Id,
-        'reportType' => 'Full',
-        'language' => 'FR',
-        'customData' => null,
-        'chargeReference' => 'example charge reference value',
-        'storeInReportbox' => false
-      );
-      $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
-
-      $messageReport =$res->FindCompaniesResult->Messages->Message;
-      if(!$messageReport){
-        $data = $this->cleanGGSResponse($res);
-      }else{
-        if($messageReport->Type == "Error"){
-          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"));
-          throw new errorATF((string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"),500);
-        }
-      }
-    }else{
-      throw new errorATF((string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"),500);
-
-    }
-    return $data;
   }
 };
 
