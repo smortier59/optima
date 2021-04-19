@@ -2,4 +2,13 @@ ALTER TABLE `print_consommable` CHANGE `couleur` `couleur` ENUM('noir','cyan','m
 -- Crée la régle de mot de passe
 INSERT INTO `constante` (`id_constante`, `constante`, `valeur`) VALUES (NULL, '__REGLE_MDP__', '(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(.{8,})*');
 -- Crée le système de status de compte de type ENUM
-ALTER TABLE `user` ADD `status` ENUM('blocked','active') NOT NULL DEFAULT 'active' AFTER `api_key`; 
+ALTER TABLE `user` ADD `status` ENUM('blocked','active') NOT NULL DEFAULT 'active' AFTER `api_key`;
+
+
+
+INSERT INTO `constante`
+    (`id_constante`, `constante`, `valeur`)
+VALUES
+    (NULL, '__API_CREDIT_SAFE_USERNAME__', NULL),
+    (NULL, '__API_CREDIT_SAFE_PASSWORD__', NULL),
+    (NULL, '__API_CREDIT_SAFE_BASEURL__', 'https://connect.sandbox.creditsafe.com/v1');
