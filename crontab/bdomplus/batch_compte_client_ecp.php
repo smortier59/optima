@@ -1,8 +1,15 @@
 <?php
 define("__BYPASS__", true);
-$_SERVER["argv"][1] = "bdomplus";
 include(dirname(__FILE__) . "/../../global.inc.php");
 ATF::define("tracabilite", false);
+
+
+if(!$_SERVER["argv"][1] ||
+ ($_SERVER["argv"][1] != "cleodis" ||  $_SERVER["argv"][1] != "cleodisbe" ||  $_SERVER["argv"][1] != "assets" ||  $_SERVER["argv"][1] != "bdomplus")){
+    echo "Paramètre 1 non envoyé ou incorrect (cleodis / cleodisbe / assets / bdomplus)\n";
+    return;
+}
+
 
 if(!$_SERVER["argv"][2] || ($_SERVER["argv"][2] != "list" && $_SERVER["argv"][2] != "envoi_client")){
     echo "Paramètre 2 non envoyé ou incorrect (list ou envoi_client)\n";
@@ -39,7 +46,7 @@ if($url_back_espace_client &&  $url_front_espace_client){
     //Pour chaque affaire, on recupere le client
     $q =   "SELECT DISTINCT(commande.id_societe) AS id_societe,
                 commande.ref AS ref_contrat,
-                societe.particulier_nom AS nom_client,
+                societe.id_societe AS id_societe,
                 societe.particulier_prenom AS prenom_client,
                 societe.particulier_email AS email_client,
                 commande.id_affaire AS id_affaire
@@ -48,7 +55,8 @@ if($url_back_espace_client &&  $url_front_espace_client){
             WHERE commande.etat != 'arreter'
             AND commande.etat != 'arreter_contentieux'
             AND commande.retour_contrat IS NOT NULL
-            AND societe.date_envoi_mail_creation_compte IS NULL";
+            AND societe.date_envoi_mail_creation_compte IS NULL
+            AND societe.id_famille = 9";
 
 
 
