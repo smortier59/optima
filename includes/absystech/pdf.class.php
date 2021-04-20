@@ -995,9 +995,9 @@ class pdf_absystech extends pdf {
 					$this->multicell(0,5,"Pensez «Location Evolutive» avec notre partenaire");
 					$this->image(__PDF_PATH__.ATF::$codename."/cleodis.jpg",100,$this->gety()-9,20);
 					if(ATF::$codename == "atoutcoms"){
-						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 36 (+3) mois.*");
-					}else{
 						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 63 mois.*");
+					}else{
+						$this->multicell(0,5,"Pour ce dossier, le loyer est estimé à ".number_format($total,2,',',' ')." € HT/mois sur 36 (+3) mois.*");
 					}
 					$this->ln(5);
 					$this->multicell(0,5,"Si vous êtes intéressé  par ce mode de financement, merci de cocher la case");

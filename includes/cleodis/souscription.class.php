@@ -964,6 +964,7 @@ class souscription_cleodis extends souscription {
       "postal_code"=>$societe["cp"],
       "city"=>$societe["ville"],
       "company_name"=>$societe["societe"],
+      "code_client"=>$codeClient,
       "ref"=>$refSociete,
       "country"=>$societe["id_pays"],
       "cell_phone"=>$tel,
