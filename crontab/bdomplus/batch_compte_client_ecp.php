@@ -3,9 +3,8 @@ define("__BYPASS__", true);
 include(dirname(__FILE__) . "/../../global.inc.php");
 ATF::define("tracabilite", false);
 
-
 if(!$_SERVER["argv"][1] ||
- ($_SERVER["argv"][1] != "cleodis" ||  $_SERVER["argv"][1] != "cleodisbe" ||  $_SERVER["argv"][1] != "assets" ||  $_SERVER["argv"][1] != "bdomplus")){
+ ($_SERVER["argv"][1] !== "cleodis" &&  $_SERVER["argv"][1] !== "cleodisbe" &&  $_SERVER["argv"][1] !== "assets" &&  $_SERVER["argv"][1] !== "bdomplus")){
     echo "Paramètre 1 non envoyé ou incorrect (cleodis / cleodisbe / assets / bdomplus)\n";
     return;
 }
@@ -39,7 +38,7 @@ if($url_back_espace_client &&  $url_front_espace_client){
         }
     }
 
-    echo "Application ID --> ".$app->_id."\n";
+    echo "Application ID --> ".$application->_id."\n";
     echo "Tout est OK, on commence le taff \n";
 
     //Recupere toute les affaires en cours donc on a pas encore envoyé de mail de création de compte au client
@@ -47,16 +46,13 @@ if($url_back_espace_client &&  $url_front_espace_client){
     $q =   "SELECT DISTINCT(commande.id_societe) AS id_societe,
                 commande.ref AS ref_contrat,
                 societe.id_societe AS id_societe,
-                societe.particulier_prenom AS prenom_client,
-                societe.particulier_email AS email_client,
                 commande.id_affaire AS id_affaire
             FROM commande
             LEFT JOIN societe ON commande.id_societe = societe.id_societe
             WHERE commande.etat != 'arreter'
             AND commande.etat != 'arreter_contentieux'
             AND commande.retour_contrat IS NOT NULL
-            AND societe.date_envoi_mail_creation_compte IS NULL
-            AND societe.id_famille = 9";
+            AND societe.date_envoi_mail_creation_compte IS NULL";
 
 
 
@@ -65,16 +61,35 @@ if($url_back_espace_client &&  $url_front_espace_client){
     $clientSansCompte = array();
     $clients = array();
     $i = 0;
-    foreach ($contratsEnCours as $key => $value) {
 
-        $client = array("id_societe" => $value["id_societe"],
-                        "nom" => $value["nom_client"],
-                        "prenom" => $value["prenom_client"],
-                        "email" => $value["email_client"],
-                        "ref" => $value["ref_contrat"],
-                        "affaire" => $value["id_affaire"]
-                    );
-        $clients[] = $client;
+    foreach ($contratsEnCours as $key => $value) {
+        if (ATF::societe()->select($value["id_societe"], "id_famille") === 9) {
+            $dataSociete = ATF::societe()->select($value["id_societe"]);
+            $client = array("id_societe" => $value["id_societe"],
+                            "nom" => $dataSociete["particulier_nom"],
+                            "prenom" => $dataSociete["particulier_prenom"],
+                            "email" => $dataSociete["particulier_email"],
+                            "ref" => $value["ref_contrat"],
+                            "affaire" => $value["id_affaire"]
+                        );
+
+            $clients[] = $client;
+        } else {
+            $dataSociete = ATF::societe()->select($value["id_societe"]);
+            if ($dataSociete["id_contact_signataire"]) {
+                $signataire = ATF::contact()->select($dataSociete["id_contact_signataire"]);
+                if ($signataire["email"]) {
+                    $client = array("id_societe" => $value["id_societe"],
+                            "nom" => $signataire["nom"],
+                            "prenom" => $signataire["prenom"],
+                            "email" => $signataire["email"],
+                            "ref" => $value["ref_contrat"],
+                            "affaire" => $value["id_affaire"]
+                        );
+                    $clients[] = $client;
+                }
+            }
+        }
     }
     $clients = ATF::espace_client_conseiller()->checkAccountsExiste($url_back_espace_client, $application->_id,  $clients );
     $clients = json_decode($clients, true);
