@@ -213,8 +213,6 @@ class creditsafe {
 
         $financialStatement = $data->report->financialStatements[0];
 
-        log::logger(gettype($financialStatement->balanceSheet->totalReceivables) , "gettype");
-
 		$return['receivables'] = number_format($financialStatement->balanceSheet->totalReceivables, 0, ",", " ");
 		$return['securitieandcash'] = number_format($financialStatement->balanceSheet->cash , 0, ",", " ");		// Produits d'exploitation
 
