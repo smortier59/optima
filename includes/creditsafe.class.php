@@ -213,18 +213,20 @@ class creditsafe {
 
         $financialStatement = $data->report->financialStatements[0];
 
-		$return['receivables'] = number_format(intval((string)$financialStatement->balanceSheet->totalReceivables), 0, ",", "");
-		$return['securitieandcash'] = number_format(intval((string)$financialStatement->balanceSheet->cash) , 0, ",", "");		// Produits d'exploitation
+        log::logger(gettype($financialStatement->balanceSheet->totalReceivables) , "gettype");
 
-		$return["capital_social"] = number_format(intval((string)$data->report->shareCapitalStructure->nominalShareCapital->value) , 0, ",", "");
-		$return["capitaux_propres"] = number_format(intval((string)$financialStatement->balanceSheet->totalShareholdersEquity) , 0, ",", "");
-		$return["dettes_financieres"] = number_format(intval((string)$data->report->localFinancialStatements[0]->liabilities->financialLiabilities) , 0, ",", "");
+		$return['receivables'] = number_format($financialStatement->balanceSheet->totalReceivables, 0, ",", " ");
+		$return['securitieandcash'] = number_format($financialStatement->balanceSheet->cash , 0, ",", " ");		// Produits d'exploitation
 
-        $return['netturnover'] =  number_format(intval((string)$data->report->localFinancialStatements[0]->profitAndLoss->netTurnover) , 0, ",", "");
-		$return['operatingincome'] =  number_format(intval((string)$data->report->localFinancialStatements[0]->profitAndLoss->salesOfGoods) , 0, ",", "");
-        $return['operationgprofitless'] = number_format(intval((string)$data->report->localFinancialStatements[0]->profitAndLoss->operatingProfit) , 0, ",", "");
-		$return['financialincome'] = number_format(intval((string)$data->report->localFinancialStatements[0]->profitAndLoss->financialIncome) , 0, ",", "");
-		$return['financialcharges'] = number_format(intval((string)$data->report->localFinancialStatements[0]->profitAndLoss->financialCharges) , 0, ",", "");
+		$return["capital_social"] = number_format($data->report->shareCapitalStructure->nominalShareCapital->value , 0, ",", " ");
+		$return["capitaux_propres"] = number_format($financialStatement->balanceSheet->totalShareholdersEquity , 0, ",", " ");
+		$return["dettes_financieres"] = number_format($data->report->localFinancialStatements[0]->liabilities->financialLiabilities , 0, ",", " ");
+
+        $return['netturnover'] =  number_format($data->report->localFinancialStatements[0]->profitAndLoss->netTurnover , 0, ",", " ");
+		$return['operatingincome'] =  number_format($data->report->localFinancialStatements[0]->profitAndLoss->salesOfGoods , 0, ",", " ");
+        $return['operationgprofitless'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->operatingProfit , 0, ",", " ");
+		$return['financialincome'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->financialIncome , 0, ",", " ");
+		$return['financialcharges'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->financialCharges , 0, ",", " ");
 
         $return['ca'] = $return['netturnover'];
         $return['resultat_exploitation'] = $return['operationgprofitless'];
