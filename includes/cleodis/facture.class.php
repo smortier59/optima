@@ -2723,7 +2723,7 @@ class facture_cleodis extends facture {
 			$workbook->setActiveSheetIndex(0);
 		    $sheet->setTitle("Etat différents");
 
-		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
+		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');
 
 	        // Deuxième onglet
@@ -2731,7 +2731,7 @@ class facture_cleodis extends facture {
 			$workbook->setActiveSheetIndex(1);
 		    $sheet->setTitle("Non trouvées");
 
-		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
+		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesNotFound, NULL, 'A2');
 
 			foreach ($workbook->getWorksheetIterator() as $worksheet) {
