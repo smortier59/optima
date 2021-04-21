@@ -100,7 +100,7 @@ class espace_client_conseiller {
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_VERBOSE => true,
+            CURLOPT_VERBOSE => false,
             CURLOPT_POSTFIELDS => array('applicationId' => $applicationId, 'clients' => json_encode($clients)),
         ));
 

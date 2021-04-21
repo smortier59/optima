@@ -93,12 +93,12 @@ if($url_back_espace_client &&  $url_front_espace_client){
     }
     $clients = ATF::espace_client_conseiller()->checkAccountsExiste($url_back_espace_client, $application->_id,  $clients );
     $clients = json_decode($clients, true);
-
+    //log::logger($clients , "mfleurquin");
 
     foreach ($clients["clients"] as $key => $value) {
        if(!$value["existe"]){
         $clientSansCompte[] = $value;
-       }else{
+       } else {
         log::logger("Client existant -->", "mfleurquin");
         log::logger($value, "mfleurquin");
        }
@@ -108,10 +108,13 @@ if($url_back_espace_client &&  $url_front_espace_client){
     //Si list, on envoi la liste des client à Benjamin
     if($type === "list") {
         echo "Envoi du mail contenant la liste des clients sans compte à benjamin.tronquit@cleodis.com\n";
-        ATF::societe()->q->reset()->where("siret", "52933929300043");
-        $partenaire = ATF::societe()->select_row();
-
-
+        if ($_SERVER["argv"][1] === "bdomplus") {
+            ATF::societe()->q->reset()->where("siret", "52933929300043");
+            $partenaire = ATF::societe()->select_row();
+        } else {
+            ATF::societe()->q->reset()->where("siret", "45307981600055");
+            $partenaire = ATF::societe()->select_row();
+        }
         $mail = new mail(
             array(
                 "recipient" => "benjamin.tronquit@cleodis.com",
@@ -133,13 +136,13 @@ if($url_back_espace_client &&  $url_front_espace_client){
     if($type === "envoi_client") {
         foreach ($clientSansCompte as $k => $client) {
             echo "Envoi du mail contenant la demande de création de compte à ".$client["email"]."\n";
-            ATF::societe()->demande_creation_compte_espace_client($client, $url_front_espace_client);
-
-
+            try{
+                ATF::societe()->demande_creation_compte_espace_client($client, $url_front_espace_client);
+            } catch(errorATF $e){
+                echo $e->getMessage()."\n";
+            }
         }
     }
-
-
 }
 
 
