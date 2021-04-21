@@ -827,21 +827,34 @@ class hotline extends classes_optima {
 
 		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
 
-
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+
 		switch ($infos["urgence"]) {
 			case 'detail':
-				$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],"[DOSSIER]", false) || $this->starts_with($infos['hotline'],"[MAINTENANCE]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[REGIE]", false)) {
+					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
+				
 			break;
 
 			case 'genant':
-				$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],"[DOSSIER]", false) || $this->starts_with($infos['hotline'],"[MAINTENANCE]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[REGIE]", false)) {
+					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'bloquant':
-				$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],"[DOSSIER]", false) || $this->starts_with($infos['hotline'],"[MAINTENANCE]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[REGIE]", false)) {
+					$infos["hotline"] = "[INCIDENT][URGENT]".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 		}
 
@@ -981,6 +994,14 @@ class hotline extends classes_optima {
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
+	}
+
+	function starts_with($haystack, $needle, $case_sensitive = true) {
+		if ($case_sensitive) {
+			return strpos($haystack, $needle) === 0;
+		} else {
+			return stripos($haystack, $needle) === 0;
+		}
 	}
 
 	/**
@@ -4415,6 +4436,8 @@ class hotline extends classes_optima {
 
 		return $to_return;
 	}
+
+	
 
 	/**
     * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur
