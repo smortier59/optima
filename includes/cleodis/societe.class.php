@@ -2083,7 +2083,6 @@ class societe_cleodis extends societe {
         "colors" => $colors,
         "partenaire"=> $partenaire
       );
-      log::logger($infos_mail, "mfleurquin");
 
       $mail = new mail( $infos_mail );
       if($mail->send()){
