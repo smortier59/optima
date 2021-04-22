@@ -830,19 +830,19 @@ class hotline extends classes_optima {
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+		$tag_recherche = ["[DOSSIER]","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
 
 		switch ($infos["urgence"]) {
 			case 'detail':
-				if($this->starts_with($infos['hotline'],"[DOSSIER]", false) || $this->starts_with($infos['hotline'],"[MAINTENANCE]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[REGIE]", false)) {
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
 					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
 				} else {
 					$infos["hotline"] = $infos["hotline"];
 				}
-				
 			break;
 
 			case 'genant':
-				if($this->starts_with($infos['hotline'],"[DOSSIER]", false) || $this->starts_with($infos['hotline'],"[MAINTENANCE]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[REGIE]", false)) {
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
 					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
 				} else {
 					$infos["hotline"] = $infos["hotline"];
@@ -850,7 +850,7 @@ class hotline extends classes_optima {
 			break;
 
 			case 'bloquant':
-				if($this->starts_with($infos['hotline'],"[DOSSIER]", false) || $this->starts_with($infos['hotline'],"[MAINTENANCE]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[DIVERS]", false) || $this->starts_with($infos['hotline'],"[REGIE]", false)) {
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
 					$infos["hotline"] = "[INCIDENT][URGENT]".$infos["hotline"];
 				} else {
 					$infos["hotline"] = $infos["hotline"];
@@ -996,11 +996,21 @@ class hotline extends classes_optima {
 		return $id_hotline;
 	}
 
-	function starts_with($haystack, $needle, $case_sensitive = true) {
+	/**
+	* Création d'une nouvelle fonction qui verifie le premier mot du titre tu ticket hotline et te retourne un boolean
+	* @author DS <dsarr@absystech.fr>
+	* @params titre du ticket hotline , un array de tags , boolean
+	*/
+	function starts_with($haystack, $needle ,$case_sensitive = true) {
 		if ($case_sensitive) {
-			return strpos($haystack, $needle) === 0;
+			foreach($needle as $item){
+				return strpos($haystack, $item) === 0;
+			}
 		} else {
-			return stripos($haystack, $needle) === 0;
+			
+			foreach($needle as $item){
+				return stripos($haystack, $item) === 0;
+			}
 		}
 	}
 
