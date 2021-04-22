@@ -190,6 +190,7 @@ class creditsafe {
 
 		// $return['tel'] = str_replace("/","",(string)$company->BasicInformation->ContactTelephoneNumber);
 		$return['adresse'] = $basicInfo->contactAddress->street;
+        $return['tel'] = str_replace(" ","",$data->report->contactInformation->mainAddress->telephone);
 		$return['cp'] = $basicInfo->contactAddress->postalCode;
 		$return['ville'] = $basicInfo->contactAddress->city;
         $return['id_pays'] = $basicInfo->contactAddress->country;
