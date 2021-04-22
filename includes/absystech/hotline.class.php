@@ -825,21 +825,34 @@ class hotline extends classes_optima {
 
 		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
 
-
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+		$tag_recherche = ["[DOSSIER]","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
+
 		switch ($infos["urgence"]) {
 			case 'detail':
-				$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'genant':
-				$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'bloquant':
-				$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[INCIDENT][URGENT]".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 		}
 
@@ -981,6 +994,24 @@ class hotline extends classes_optima {
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
+	}
+
+	/**
+	* Création d'une nouvelle fonction qui verifie le premier mot du titre tu ticket hotline et te retourne un boolean
+	* @author DS <dsarr@absystech.fr>
+	* @params titre du ticket hotline , un array de tags , boolean
+	*/
+	function starts_with($haystack, $needle ,$case_sensitive = true) {
+		if ($case_sensitive) {
+			foreach($needle as $item){
+				return strpos($haystack, $item) === 0;
+			}
+		} else {
+			
+			foreach($needle as $item){
+				return stripos($haystack, $item) === 0;
+			}
+		}
 	}
 
 	/**
@@ -4426,6 +4457,8 @@ class hotline extends classes_optima {
 
 		return $to_return;
 	}
+
+	
 
 	/**
     * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur
