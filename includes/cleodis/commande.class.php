@@ -2587,14 +2587,15 @@ class commande_cleodis extends commande {
 							->addField('suivi.texte')
 							->addField('suivi.type_suivi')
 							->addCondition("suivi.type_suivi",'Blocage', "AND")
-							->where("id_affaire", $value["affaire.id_affaire_fk"]);
-			$suivis = ATF::suivi()->select_all();
-
-			if($suivis){
-				foreach ($comites as $k => $v) {
-					$suivi_date = $v["suivi.date"];
-					$suivi_description = $v["suivi.texte"];
-				}
+							->where("id_affaire", $value["affaire.id_affaire_fk"])
+							->addOrder("suivi.date", "desc")
+							->setLimit(1);
+			$suivi = ATF::suivi()->select_row();
+			$suivi_date = NULL;
+			$suivi_description = NULL;
+			if($suivi){
+				$suivi_date = $suivi["suivi.date"];
+				$suivi_description = $suivi["suivi.texte"];
 			}
 
 			$row_data[$key][] = $suivi_date;

@@ -44,7 +44,11 @@
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                                                 <div style="font-family:helvetica;font-size:20px;line-height:1;text-align:left;color:#000000;">
-                                                    Les équipes B’dom+ et Boulanger sont heureux de vous compter parmi ses clients et de vous proposer un accès à votre espace clients Abonnements. <br/><br/>
+                                                    Les équipes
+                                                        {if ATF::$codename =="bdomplus" || ATF::$codename =="boulanger"}B’dom+ et Boulanger{/if}
+                                                        {if ATF::$codename =="cleodis" || ATF::$codename =="cleodisbe"}Cléodis{/if}
+                                                        {if ATF::$codename =="assets"}Assets{/if}
+                                                         sont heureux de vous compter parmi ses clients et de vous proposer un accès à votre espace clients Abonnements. <br/><br/>
                                                     Vous pouvez dès à présent créer votre espace client en cliquant sur le lien ci-dessous.<br/>
                                                     Vous aurez besoin de votre adresse mail ainsi que le numéro de votre dossier : {$infos.client.ref}.</div>
                                             </td>
@@ -116,7 +120,11 @@
                                         </tr>
                                         <tr>
                                             <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                                                <div style="font-family:helvetica;font-size:20px;line-height:1;text-align:left;color:#000000;">Les équipes B’dom+ et Boulanger</div>
+                                                <div style="font-family:helvetica;font-size:20px;line-height:1;text-align:left;color:#000000;">Les équipes
+                                                    {if ATF::$codename =="bdomplus" || ATF::$codename =="boulanger"}B’dom+ et Boulanger{/if}
+                                                    {if ATF::$codename =="cleodis" || ATF::$codename =="cleodisbe"}Cléodis{/if}
+                                                    {if ATF::$codename =="assets"}Assets{/if}
+                                                </div>
                                             </td>
                                         </tr>
                                         </table>

@@ -12,17 +12,17 @@ $logFile = 'cleodis-batch-maj-facture';
 $pathFactureImpayesOneShot = "./factureToUpdateFromBT.csv";
 // $pathFactureImpayes = ATF::facture()->filepath("gestion_impayee_csv","fichier_joint");
 
-	
+
 log::logger('==================================Initialisation du batch=================================', $logFile);
-	
+
 ATF::db()->begin_transaction();
 try {
-  // FIRST STEP : script de sauvegarde facture 
+  // FIRST STEP : script de sauvegarde facture
   sauvegardeFacture($logFile);
 
   // SECOND STEP : Modification statut
   statutPayeFacture($logFile);
-  
+
   // THIRD STEP : Sur base du fichier des impayées, on modifie les infos des factures
   statutImpayeFactureFromCsv($pathFactureImpayesOneShot, $logFile);
 } catch (errorATF $e) {
@@ -55,7 +55,7 @@ function sauvegardeFacture($logFile){
       ATF::facture()->q->setLimit(5);
     }
 		$factures = ATF::facture()->sa();
-		
+
 		if (count($factures)) {
       log::logger("Factures à sauvegarder : ".count($factures), $logFile);
 			$entetes = array_keys($factures[0]);
@@ -67,10 +67,10 @@ function sauvegardeFacture($logFile){
 			foreach ($factures as $facture) {
 				fputcsv($fp, $facture);
 			}
-		
+
 		}
 		fclose($fp);
-		
+
 	}
   log::logger('==================================Fin de sauvegarde de la table =================================', $logFile);
 
@@ -146,11 +146,11 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
 
     // Vérification des colonnes
     $entetes = fgetcsv($f, 0, ",");
-    if (count($entetes) != 4) {
-      throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 4");
+    if (count($entetes) != 3) {
+      throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 3");
     }
 
-    $expectedEntetes = array("ref_societe", "ref_facture", "date_rejet", "motif_rejet");
+    $expectedEntetes = array("ref_facture", "date_rejet", "motif_rejet");
     foreach ($entetes as $col => $name) {
       if($name != $expectedEntetes[$col]) {
         $erreurs[] = "Erreur entête colonne ".$col." : Valeur attendu : ".$expectedEntetes[$col]." / Valeur actuelle : ".$name;
@@ -163,17 +163,17 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
     }
 
     while (($data = fgetcsv($f, 0, ",")) !== FALSE) {
-      log::logger("Modification facture ".$data[1]." - Date rejet : ".$data[2]." / Motif rejet : ".$data[3]." / Etat : impayee", $logFile);
-      $facture = ATF::facture()->ss("facture.ref", $data[1]);
+      log::logger("Modification facture ".$data[0]." - Date rejet : ".$data[1]." / Motif rejet : ".$data[2]." / Etat : impayee", $logFile);
+      $facture = ATF::facture()->ss("facture.ref", $data[0]);
 
       ATF::facture()->u(array(
         "id_facture"=>$facture[0]['facture.id_facture'],
-        "date_rejet"=>$data[2],
-        "rejet"=>$data[3],
+        "date_rejet"=>$data[1],
+        "rejet"=>$data[2],
         "etat"=>"impayee"
       ));
     }
-    fclose($f);   
+    fclose($f);
   }
 
   log::logger('==================================Fin de modification de statut en impayée =================================', $logFile);

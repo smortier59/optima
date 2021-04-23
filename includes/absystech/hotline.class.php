@@ -788,8 +788,7 @@ class hotline extends classes_optima {
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
-
-
+		
 		$this->infoCollapse($infos);
 
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
@@ -799,7 +798,6 @@ class hotline extends classes_optima {
 
 		//Vérification des informations
 		if(!$infos["id_contact"] && $infos["id_contact"]!==false) throw new errorATF(ATF::$usr->trans("id_contact_null",$this->table));
-
 
 		if(!$infos["pole_concerne"]) throw new errorATF("Il faut selectionner un pole associé pour cette requete");
 
@@ -827,27 +825,39 @@ class hotline extends classes_optima {
 
 		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
 
-
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+		$tag_recherche = ["[DOSSIER]","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
+
 		switch ($infos["urgence"]) {
 			case 'detail':
-				$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'genant':
-				$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'bloquant':
-				$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[INCIDENT][URGENT]".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 		}
 
 		//Date de création de la requête
 		$infos["date"]=date('Y-m-d H:i:s');
-
 
 		// Auto affectation a charge Absystech si client Absystech
 		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
@@ -857,20 +867,24 @@ class hotline extends classes_optima {
 			$infos["type_requete"] = "affaire";
 			$infos["charge"] = "intervention";
 			$infos["id_affaire"] = $id_affaire_projet;
+		} else if ($infos['id_affaire']) {
+			$id_societe_de_affaire = ATF::affaire()->select($infos['id_affaire'],'id_societe');
+			if($id_societe !== $id_societe_de_affaire){
+				throw new errorATF("DONNEES INCOHERENTE");
+			}
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
 		}
-
 		//Insertion de la requête
 		$type_requete=$infos["type_requete"];
 		unset($infos["type_requete"]);
 
 		ATF::db($this->db)->begin_transaction();
-
-		$id_hotline = parent::insert($infos,$s,$files);
+		$id_hotline = parent::insert($infos,$s,$files);	
 
 		$hotline = $this->select($id_hotline);
 		//Notice
 		$this->createNotice("hotline_insert");
-
 
 		//Gestion de la prise en charge de l'utilisateur
 		if($infos["id_user"]){
@@ -903,17 +917,17 @@ class hotline extends classes_optima {
 		//Gestion de l'envoi de mail
 		ATF::hotline_mail()->createMailInsert($id_hotline,$infos["filestoattach"]["fichier_joint"],$infos["id_user"]);
 
-
 		//Fichier joint
-		if($infos["filestoattach"]["fichier_joint"]){
+		if($infos["filestoattach"]["fichier_joint"]){		
 			//Ajout du fichier joint
 			$path = $this->filepath($id_hotline,"fichier_joint");
-			$mail=ATF::hotline_mail()->getCurrentMail();
-			$mail->addFile($path,"fichier_joint.zip",true);
+			if( file_exists($path)) {
+				$mail=ATF::hotline_mail()->getCurrentMail();
+				$mail->addFile($path,"fichier_joint.zip",true);
+			}
 		}
 
 		ATF::hotline_mail()->sendMail();
-
 
 		if((ATF::societe()->decryptId($infos["id_societe"]) != "1") && (ATF::societe()->decryptId($infos["id_societe"]) != "1154") && ($infos["visible"] == "oui") && $send_mail){
 			$mail = ATF::hotline_mail()->getCurrentMail();
@@ -930,10 +944,6 @@ class hotline extends classes_optima {
 
 		//Trace dans les interactions
 		$this->createInternalInteraction($id_hotline,"Requête créée par ".ATF::user()->nom(ATF::$usr->getId()));
-
-
-		//Fin de transaction
-		ATF::db($this->db)->commit_transaction();
 
 		$societe = ATF::societe()->select($infos['id_societe']);
 		$contact = ATF::contact()->select($infos['id_contact']);
@@ -964,7 +974,6 @@ class hotline extends classes_optima {
 			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 
-
 		// On averti toujours sur le chan Hotline d'absystech
 		if(ATF::$codename !== "absystech" && ATF::$codename !== "att"){
 			$cmd = "curl -s -i -X POST -H 'Content-Type: application/json' -d '";
@@ -975,12 +984,34 @@ class hotline extends classes_optima {
 			if (!ATF::isTestUnitaire()) $result = `$cmd`;
 		}
 
+		//Fin de transaction
+		ATF::db($this->db)->commit_transaction();
+
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
 
+		
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
+	}
+
+	/**
+	* Création d'une nouvelle fonction qui verifie le premier mot du titre tu ticket hotline et te retourne un boolean
+	* @author DS <dsarr@absystech.fr>
+	* @params titre du ticket hotline , un array de tags , boolean
+	*/
+	function starts_with($haystack, $needle ,$case_sensitive = true) {
+		if ($case_sensitive) {
+			foreach($needle as $item){
+				return strpos($haystack, $item) === 0;
+			}
+		} else {
+			
+			foreach($needle as $item){
+				return stripos($haystack, $item) === 0;
+			}
+		}
 	}
 
 	/**
@@ -1124,23 +1155,6 @@ class hotline extends classes_optima {
 		}
 
 		$mail->send();
-
-
-		// if((ATF::societe()->decryptId($infos["id_societe"]) != "1") // AT
-		// 	&& (ATF::societe()->decryptId($infos["id_societe"]) != "1154") // ATT
-		// 	&& ($infos["visible"] == "oui")
-		// 	&& $send_mail){
-		// 	$mail = ATF::hotline_mail()->getCurrentMail();
-		// 	if(ATF::contact()->select($infos["id_contact"], "email")){
-		// 		ATF::hotline_mail()->createMailForCustomers(
-		// 			$id_hotline,
-		// 			"Nouvelle requete",
-		// 			ATF::contact()->select($infos["id_contact"], "email"),
-		// 			"hotline_insert_client"
-		// 		);
-		// 		ATF::hotline_mail()->sendMail();
-		// 	}
-		// }
 
 		//Notice mail envoyé
 		$this->createMailNotice("hotline_mail_insert");
@@ -2089,7 +2103,6 @@ class hotline extends classes_optima {
 				$result["titre"]= "Stats CLEODIS";
 				$result["categories"]= $titre;
 				$result["semestres"] = $date;
-				log::logger($result , "mfleurquin");
 				return $result;
 			break;
 
@@ -3183,11 +3196,6 @@ class hotline extends classes_optima {
 						$idhotline = $ids[2];
 						$idcontact = $ids[3];
 
-
-						log::logger($codename , "hotline-checkmail");
-						log::logger($idhotline , "hotline-checkmail");
-						log::logger($idcontact , "hotline-checkmail");
-
 						$id_hotline = ATF::hotline()->decryptId($idhotline);
 
 
@@ -3226,7 +3234,6 @@ class hotline extends classes_optima {
 
 							//$message = False;
 							if($message){
-								log::logger("On a bien trouvé le message dans le body" , "hotline-checkmail");
 								if($id_user = $user["id_user"]){
 									$usr=ATF::$usr;
 									ATF::$usr=new usr($user["id_user"]);
@@ -3371,17 +3378,19 @@ class hotline extends classes_optima {
 
 		/*Envoi du mail*/
 		if (($infos["send_mail"]=="true" || $infos["relance"]) && $hotline["visible"]=="oui"){
-			if (ATF::hotline_mail()->createMailBilling($hotline["id_hotline"])) {
-				ATF::hotline_mail()->sendMail();
 
-				//Notice mail envoyé
-				if($infos['relance']){
-					$this->createMailNotice("hotline_relance_facturation");
-				}else{
-					$this->createMailNotice("hotline_mail_facturation");
+			if($this->_mailContactHotline(array("id"=>$hotline["id_hotline"])) !== "contact_sans_mail") {
+				if (ATF::hotline_mail()->createMailBilling($hotline["id_hotline"])) {
+					ATF::hotline_mail()->sendMail();
+
+					//Notice mail envoyé
+					if($infos['relance']){
+						$this->createMailNotice("hotline_relance_facturation");
+					}else{
+						$this->createMailNotice("hotline_mail_facturation");
+					}
 				}
 			}
-
 		}
 
 		//Insère une interaction d'information
@@ -3797,7 +3806,6 @@ class hotline extends classes_optima {
 	* @apiSuccess {Array} hotline Echantillon de ticket hotline.
 	*/
 	public function _GET($get,$post) {
-
 		// Gestion du tri
 		if (!$get['tri']) $get['tri'] = "id_hotline";
 		if (!$get['trid']) $get['trid'] = "desc";
@@ -3858,38 +3866,25 @@ class hotline extends classes_optima {
 		} else {
 			// Filtre EXCLUSIF ET NON EXCLUSIF
 			// Filtre non traité
-			if ($get['filters']['free'] == "on") {
-				$this->q->where("hotline.etat","free");
-			} else {
-				// Filtre ticket actif
-				if ($get['filters']['fixing'] == "on") {
-					$this->q->where("hotline.etat","fixing");
-				}
-				// Filtre ticket en attente
-				if ($get['filters']['wait'] == "on") {
-					$this->q->where("hotline.etat","wait");
-				}
-				// Filtre MES tickets
-				if ($get['filters']['mine'] == "on") {
-					$this->q->where("hotline.id_user",ATF::$usr->getId());
-				}
-
-				// Filtre Facturé
-				if ($get['filters']['facture'] == "on") {
-					$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
-				}
-				// Filtre NON Facturé
-				if ($get['filters']['nfacture'] == "on") {
-					$this->q->where("hotline.facturation_ticket","non","OR","facturation");
-				}
-				$this->q->whereIsNull("hotline.facturation_ticket","OR","facturation");
-
-				// Filtre Sur affaire
-				if ($get['filters']['afffacture'] == "on") {
-					$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
-				} else {
-					$this->q->whereIsNull("hotline.id_affaire");
-				}
+			// Filtre ticket actif
+			if ($get['filters']['fixing'] == "on") {
+				$this->q->where("hotline.etat","fixing","OR","etat");
+			}
+			// Filtre ticket en attente
+			if ($get['filters']['wait'] == "on") {
+				$this->q->where("hotline.etat","wait","OR","etat");
+			}
+			// Filtre MES tickets
+			if ($get['filters']['mine'] == "on") {
+				$this->q->where("hotline.id_user",ATF::$usr->getId());
+			}
+			// Filtre Facturé
+			if ($get['filters']['facture'] == "on") {
+				$this->q->where("hotline.facturation_ticket","oui","OR","facturation");
+			}
+			// Filtre Sur affaire
+			if ($get['filters']['afffacture'] == "on") {
+				$this->q->whereIsNotNull("hotline.id_affaire","OR","facturation");
 			}
 			// AUtre filtre - fitlres indépendant
 			if ($get['filters']['dev'] == "on") {
@@ -3906,11 +3901,8 @@ class hotline extends classes_optima {
 			if ($get['filters']['custom']) {
 				foreach ($get['filters']['custom'] as $key => $value) {
 					$this->q->where("hotline.id_".$key, $value);
-					//log::logger($key, "alahlah");
-					//log::logger($value, "alahlah");
 				}
 			}
-
 
 			// TRI
 			switch ($get['tri']) {
@@ -3918,6 +3910,7 @@ class hotline extends classes_optima {
 				case 'id_user':
 				case 'id_contact':
 				case 'date':
+				case 'etat':
 					$get['tri'] = "hotline.".$get['tri'];
 				break;
 			}
@@ -3941,12 +3934,44 @@ class hotline extends classes_optima {
 			$this->q->where("gep_projet.id_gep_projet", 202, "OR", "projets"); // AirFrance
 		}
 
-		// $this->q->setToString();
-		// log::logger($this->select_all($get['tri'],$get['trid'],$get['page'],true),"qjanon");
-		// $this->q->unsetToString();
-
 		$data = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+		$realCount = $data['count'];
 
+		if ($get['filters']['free'] == "on") {
+			$this->q->reset("where");
+			$this->q->where("hotline.etat", "done", 'AND', 'etat', "!=")
+					->where("hotline.etat", "payee", 'AND', 'etat', "!=")
+					->where("hotline.etat", "annulee", 'AND', 'etat', "!=")
+					->where("hotline.etat", "wait", 'AND', 'etat', "!=")
+					->where("hotline.etat", "fixing", 'AND', 'etat', "!=")
+					
+					->whereIsNull("hotline.id_user",'AND','etat');
+
+			if ($get['filters']['dev'] == "on") {
+				$this->q->where("hotline.pole_concerne","dev","OR","pole");
+			}
+			if ($get['filters']['system'] == "on") {
+				$this->q->where("hotline.pole_concerne","system","OR","pole");
+			}
+			if ($get['filters']['telecom'] == "on") {
+				$this->q->where("hotline.pole_concerne","telecom","OR","pole");
+			}
+
+			$nonTraites = $this->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+
+			if(!$get['filters']['wait'] && !$get['filters']['fixing'] && !$get['filters']['mine']){
+
+				$data["data"] = $nonTraites["data"];
+				$data['count'] = $nonTraites['count'];
+			}else{
+				$data["data"] = array_merge($data["data"], $nonTraites["data"]);
+				$data['count'] += $nonTraites['count'];
+			}
+
+
+		}
+		
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
 				if (strpos($k_,".")) {
@@ -3982,6 +4007,8 @@ class hotline extends classes_optima {
 
 		}
 
+		
+
 		return $return;
 	}
 
@@ -4012,9 +4039,14 @@ class hotline extends classes_optima {
 	* @apiSuccess (200) {Array} notices Notice lié a linsertion.
 	*/
 	public function _POST($get,$post,$files) {
+
 		$return = array();
 
 		try {
+			if($post['id_affaire']  && $post['id_projet']){
+				throw new Exception("DONNEES_INCOHERENTE",1025);
+			}
+
 			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 			// Check des champs obligatoire
 			if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
@@ -4025,7 +4057,6 @@ class hotline extends classes_optima {
 
 			// Mapping pour BDD Optima
 			$post['pole_concerne'] = $post['pole']; unset($post['pole']);
-			$post['id_gep_projet'] = $post['id_projet']; unset($post['id_projet']);
 			$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 			$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4143,10 +4174,7 @@ class hotline extends classes_optima {
 					$post['pole_concerne'] = $post['pole'];
 					unset($post['pole']);
 				}
-				if ($post['id_gep_projet']) {
-					$post['id_gep_projet'] = $post['id_projet'];
-					unset($post['id_projet']);
-				}
+
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4310,6 +4338,22 @@ class hotline extends classes_optima {
 	}
 
 	/**
+	* Récupère le mail du contact du ticket hotline
+	* @package Telescope
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param $get array contient l'id du ticket a l'index 'id'
+	* @return string|null retour le mail du contact du ticket hotline
+	*/
+	public function _mailContactHotline($get) {
+		if (!$get['id']) throw new Exception("MISSING_ID",1000);
+		$h = $this->select($get['id']);
+		$email = ATF::contact()->select($h['id_contact'], "email");
+		if($email) return $email;
+		return 'contact_sans_mail';
+
+	}
+
+	/**
 	* Récupère la liste des affaires utiles
 	* @package Telescope
 	* @author Quentin JANON <qjanon@absystech.fr>
@@ -4375,8 +4419,6 @@ class hotline extends classes_optima {
 
 
 	public function _partTicket($get,$post){
-		log::logger($get , "mfleurquin");
-		log::logger($post , "mfleurquin");
 
 		$at = $this->stats(true,"partTicket");
 		ATF::define_db("db","optima_att");
@@ -4416,6 +4458,8 @@ class hotline extends classes_optima {
 		return $to_return;
 	}
 
+	
+
 	/**
     * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur
     * @author diame sarr <dsarr@absystech.fr>
@@ -4423,14 +4467,20 @@ class hotline extends classes_optima {
     * @return interger le nombre de ticket non traités
     */
 	public function _totalHotlineNonTraite($get){
-
+		$this->q->reset()->setCount()->whereIsNull("id_user", 'AND')
+			->where("hotline.etat", "done", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "payee", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "annulee", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "wait", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "fixing", 'AND', 'non_etat', "!=")
+			->where("hotline.etat", "mine", 'AND', 'non_etat', "!=");
+			//->where("etat" , "free");
 		$poles=ATF::user()->select($get['id_user'],"pole");
-    	$pole = explode(',',$poles);
-		$this->q->reset()->setCount()->where("etat" , "free");
+		$pole = explode(',',$poles);
 		foreach($pole as $k =>$val){
-		$this->q->where("pole_concerne" , $val,"OR","pole","=");
+			$this->q->where("pole_concerne" , $val,"OR","pole","=");
 		}
-    	$result = $this->sa();
+		$result = $this->sa();
 		return $result['count'];
 
 	}

@@ -2648,9 +2648,9 @@ class facture_cleodis extends facture {
 
 		    // Vérification des colonnes
 		    $entetes = fgetcsv($f, 0, ",");
-			$expectedEntetes = array("ref_societe", "ref_facture", "statut");
+			$expectedEntetes = array( "ref_facture", "statut");
 		    if (count($entetes) != count($expectedEntetes)) {
-		    	throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 4");
+		    	throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 2");
 		    }
 
 			foreach ($entetes as $col => $name) {
@@ -2661,7 +2661,7 @@ class facture_cleodis extends facture {
 			}
 
 			ATF::db($this->db)->begin_transaction();
-			
+
 
 			if (count($erreurs)) {
 				throw new errorATF(implode("<br>", $erreurs));
@@ -2678,14 +2678,14 @@ class facture_cleodis extends facture {
 				ATF::facture()->q->reset()->addAllFields("facture")->where("facture.ref", $data[1])->setLimit(1)->setStrict();
 				$facture = [];
 				$facture = ATF::facture()->select_row();
-				log::logger("Recherche facture ".$data[1]." - Statut : ".$data[2]." - résultat ", $logFile);
+				log::logger("Recherche facture ".$data[0]." - Statut : ".$data[1]." - résultat ", $logFile);
 				// log::logger($facture, $logFile);
 				// if ($indexFound !== false && !empty($allFactures[$indexFound])) {
 				if ($facture['facture.id_facture']) {
 					log::logger("Found", $logFile);
-					if ($facture['facture.etat'] != $data[2]) {
+					if ($facture['facture.etat'] != $data[1]) {
 						$facturesEtatDifferend[] = $data;
-						log::logger("Etat différent ! BDD: ".$facture['facture.etat']." / CSV: ".$data[2], $logFile);
+						log::logger("Etat différent ! BDD: ".$facture['facture.etat']." / CSV: ".$data[1], $logFile);
 					} else {
 						log::logger("Etat IDEM - RAS", $logFile);
 
@@ -2717,21 +2717,21 @@ class facture_cleodis extends facture {
 			$sheets = array("Etat différents","Non trouvées");
 
 			$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-	        
+
 	        // Premier onglet
 	        $sheet = $workbook->getActiveSheet();
 			$workbook->setActiveSheetIndex(0);
 		    $sheet->setTitle("Etat différents");
 
-		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
-			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');        
-	        
+		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
+			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');
+
 	        // Deuxième onglet
         	$sheet = $workbook->createSheet(1);
 			$workbook->setActiveSheetIndex(1);
 		    $sheet->setTitle("Non trouvées");
 
-		    $sheet->fromArray(array("Référence société","Référence facture","Etat"), NULL, 'A1');
+		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesNotFound, NULL, 'A2');
 
 			foreach ($workbook->getWorksheetIterator() as $worksheet) {
@@ -2756,7 +2756,7 @@ class facture_cleodis extends facture {
 		} catch (errorATF $e) {
 			ATF::db($this->db)->rollback_transaction();
 			$return['errors'] = $e->getMessage();
-			
+
 			$return['success'] = false;
 		}
 

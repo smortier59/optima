@@ -2783,9 +2783,9 @@ class affaire_cleodis extends affaire {
 
             if($post["commentaire"]){
             	//Creer un suivi pour alisson, Severine, jeanne
-            	ATF::user()->q->reset()->where("login", "smazars", "OR", "filles")
+            	ATF::user()->q->reset()->where("login", "tdelattre", "OR", "filles")
             						   ->where("login", "jvasut", "OR", "filles")
-            						   //->where("login", "abowe", "OR", "filles")
+            						   ->where("login", "egerard", "OR", "filles")
 									   ->where("login", "mmysoet", "OR", "filles");
             	$filles = ATF::user()->sa();
             	$notifie = array();
@@ -2799,7 +2799,7 @@ class affaire_cleodis extends affaire {
 					,"id_affaire"=>$devis["id_affaire"]
 					,"id_contact"=>$utilisateur["id_contact"]
 					,"type_suivi"=>'devis'
-					,"texte"=>"Commentaire depuis l'espace partenaire : <br />".$post["commentaire"]
+					,"texte"=>"Commentaire depuis l'espace partenaire : <br />".$post["commentaire"]."\n".$utilisateur["prenom"]." ".$utilisateur["nom"]."\nSociete ".ATF::societe()->select($utilisateur["id_societe"], "societe")
 					,'public'=>'oui'
 					,'suivi_societe'=>NULL
 					,'suivi_notifie'=>$notifie

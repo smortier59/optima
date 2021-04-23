@@ -54,6 +54,7 @@ class societe_cleodis extends societe {
       ))
       ,"avis_credit"
       ,"cs_avis_credit"
+      ,"lastScoreDate"
       ,"score"
       ,"cs_score"
       ,"contentieux"
@@ -1618,15 +1619,11 @@ class societe_cleodis extends societe {
 
     if(ATF::$codename == "cleodisbe"){
       $post["num_ident"] = $post["siret"];
-      $data = ATF::societe_cleodisbe()->getInfosFromCREDITSAFE($post);
+    }
+    $data = self::getInfosFromCREDITSAFE($post);
 
-      if(!$data["societe"]){
-        throw new errorATF("erreurCS BELGIQUE",404);
-      }
-      //On ne recupere pas de dirigeant pour CLEODIS BE, on simule un retour vide dans ce cas
-      //$data["gerant"] = array();
-    }else{
-       $data = self::getInfosFromCREDITSAFE($post);
+    if(!$data["societe"]){
+      throw new errorATF("erreurCS",404);
     }
 
     log::logger($data, "creditsafe");
@@ -2014,6 +2011,94 @@ class societe_cleodis extends societe {
     }
   }
 
+
+  public function demande_creation_compte_espace_client ($client, $url_front_espace_client, $id_commande=null){
+    try{
+      if(!$client){
+        // On va chercher les infos clients à partir du contrat
+        if(!$id_commande) throw new errorATF("ID Commande manquante");
+
+        $id_commande = ATF::commande()->decryptId($id_commande);
+        $id_client = ATF::commande()->select($id_commande , "id_societe");
+        $dataSociete = ATF::societe()->select($id_client);
+
+        if (ATF::societe()->select($value["id_societe"], "id_famille") === 9) {
+          $client = array("id_societe" => $dataSociete["id_societe"],
+                          "nom" => $dataSociete["particulier_nom"],
+                          "prenom" => $dataSociete["particulier_prenom"],
+                          "email" => $dataSociete["particulier_email"],
+                          "ref" => ATF::commande()->select($id_commande , "ref"),
+                          "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+                      );
+        } else {
+          if ($dataSociete["id_contact_signataire"]) {
+            $signataire = ATF::contact()->select($dataSociete["id_contact_signataire"]);
+            if ($signataire["email"]) {
+              $client = array("id_societe" => $value["id_societe"],
+                              "nom" => $signataire["nom"],
+                              "prenom" => $signataire["prenom"],
+                              "email" => $signataire["email"],
+                              "ref" => ATF::commande()->select($id_commande , "ref"),
+                              "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+                          );
+            }
+          }
+        }
+      }
+
+
+      if(!$url_front_espace_client) {
+        try {
+          $url_front_espace_client = ATF::espace_client_conseiller()->getUrlFront();
+        } catch (errorATF $e) {
+          throw $e;
+        }
+      }
+
+      if (ATF::$codename === "bdomplus") {
+        ATF::societe()->q->reset()->where("siret", "52933929300043");
+        $partenaire = ATF::societe()->select_row();
+        $colors = array(
+          "dominant" => "#FD5300",
+          "footer" => "#161C5F",
+          "links" => "#161C5F",
+          "titles" => "#161C5F"
+        );
+      } else {
+        ATF::societe()->q->reset()->where("siret", "45307981600055");
+        $partenaire = ATF::societe()->select_row();
+        $colors = array(
+          "dominant" => "#94c030",
+          "footer" => "#94c030",
+          "links" => "#23527c",
+          "titles" => "#23527c"
+        );
+      }
+      $infos_mail = array(
+        "recipient" => $client["email"],
+        "objet" => "Création de votre compte espace client",
+        "template" => "demande_creation_compte_espace_client",
+        "client" => $client,
+        "lien_espace_client" => $url_front_espace_client . "/register",
+        "colors" => $colors,
+        "partenaire"=> $partenaire
+      );
+
+      $mail = new mail( $infos_mail );
+      if($mail->send()){
+          ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
+      }else{
+          log::logger("------------------------------------------------------", "error_mail_creation_compte");
+          log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
+          log::logger($mail, "error_mail_creation_compte");
+      }
+
+    } catch(errorATF $e){
+        throw $e;
+    }
+  }
+
+
 };
 
 class societe_cleodisbe extends societe_cleodis {
@@ -2027,73 +2112,6 @@ class societe_cleodisbe extends societe_cleodis {
 
 
     $this->fieldstructure();
-  }
-
-
-
-  /** Interroge Credit Safe pour récupérer les informations des sociétés.
-  * @author Quentin JANON <qjanon@absystech.fr>
-  * @author Cyril Charlier <ccharlier@absystech.fr>
-  */
-  public function getInfosFromCREDITSAFE($infos) {
-
-
-
-    $infos["num_ident"] = str_replace(" ", "", $infos["num_ident"]);
-    $infos["num_ident"] = str_replace(".", "", $infos["num_ident"]);
-    $infos["num_ident"] = str_replace("BE", "", $infos["num_ident"]);
-
-
-    $client = new SoapClient("https://webservices.creditsafe.com/GlobalData/1.3i/MainServiceBasic.svc/meta?wsdl",array('login'=>__CREDIT_SAFE_LOGIN__,'password'=>__CREDIT_SAFE_PWD__));
-
-    $params = (object)array
-    ( 'countries' => array ('BE'),
-      'searchCriteria' => (object) array
-      (
-        'RegistrationNumber' => $infos['num_ident'],
-      ),
-      'customData' => null,
-      'chargeReference' => 'example searchCriteria with name',
-    );
-
-
-    $response = $client->__soapCall('FindCompanies',array($params));
-
-     $xml = $response;
-
-    // response/Messages / Message type = error
-    $error = False;
-    $messageSociete =$xml->FindCompaniesResult->Messages->Message;
-    if($messageSociete && $messageSociete->Type == "Error"){
-      ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"));
-      return $error = True;
-    }
-    if($error == False){
-      $param = (object)array
-      (
-        'companyId' => $xml->FindCompaniesResult->Companies->Company->Id,
-        'reportType' => 'Full',
-        'language' => 'FR',
-        'customData' => null,
-        'chargeReference' => 'example charge reference value',
-        'storeInReportbox' => false
-      );
-      $res =$client->__soapCall('RetrieveCompanyOnlineReport',array($param));
-
-      $messageReport =$res->FindCompaniesResult->Messages->Message;
-      if(!$messageReport){
-        $data = $this->cleanGGSResponse($res);
-      }else{
-        if($messageReport->Type == "Error"){
-          ATF::$msg->addWarning("Une erreur s'est produite pendant l'import crédit safe code erreur : ".(string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"));
-          throw new errorATF((string)$messageReport->Code.' - '.$messageReport->_,ATF::$usr->trans("notice_title"),500);
-        }
-      }
-    }else{
-      throw new errorATF((string)$msg->Code.' - '.$msg->_,ATF::$usr->trans("notice_title"),500);
-
-    }
-    return $data;
   }
 };
 
@@ -2211,62 +2229,6 @@ class societe_bdomplus extends societe_cleodis {
     }
     return $prefixe.$ref;
 
-  }
-
-  public function demande_creation_compte_espace_client ($client, $url_front_espace_client, $id_commande=null){
-
-    if(!$client){
-      // On va chercher les infos clients à partir du contrat
-      if(!$id_commande) throw new errorATF("ID Commande manquante");
-
-      $id_commande = ATF::commande()->decryptId($id_commande);
-      $id_client = ATF::commande()->select($id_commande , "id_societe");
-      $client = ATF::societe()->select($id_client);
-
-      $client = array("id_societe" => $client["id_societe"],
-                    "nom" => $client["particulier_nom"],
-                    "prenom" => $client["particulier_prenom"],
-                    "email" => $client["particulier_email"],
-                    "ref" => ATF::commande()->select($id_commande , "ref"),
-                    "affaire" => ATF::commande()->select($id_commande , "id_affaire")
-                );
-    }
-
-
-    if(!$url_front_espace_client) {
-      try {
-        $url_front_espace_client = ATF::espace_client_conseiller()->getUrlFront();
-      } catch (errorATF $e) {
-        throw $e;
-      }
-    }
-
-    ATF::societe()->q->reset()->where("siret", "52933929300043");
-    $partenaire = ATF::societe()->select_row();
-
-    $mail = new mail(
-        array(
-            "recipient" => $client["email"],
-            "objet" => "Création de votre compte espace client",
-            "template" => "demande_creation_compte_espace_client",
-            "client" => $client,
-            "lien_espace_client" => $url_front_espace_client . "/register",
-            "colors" => array(
-                "dominant" => "#FD5300",
-                "footer" => "#161C5F",
-                "links" => "#161C5F",
-                "titles" => "#161C5F"
-            ),
-            "partenaire"=> $partenaire
-        )
-    );
-    if($mail->send()){
-        ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
-    }else{
-        log::logger("------------------------------------------------------", "error_mail_creation_compte");
-        log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
-        log::logger($mail, "error_mail_creation_compte");
-    }
   }
 
 };

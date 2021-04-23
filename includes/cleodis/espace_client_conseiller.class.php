@@ -15,7 +15,7 @@ class espace_client_conseiller {
         ATF::constante()->q->reset()->where("constante", "__URL_ESPACE_CLIENT_BACK__");
         $url_back_espace_client = ATF::constante()->select_row();
         if (!$url_back_espace_client) {
-            throw new ATFError("Il n'y a pas de constante __URL_ESPACE_CLIENT_BACK__ pour l'url de l'espace client");
+            throw new errorATF("Il n'y a pas de constante __URL_ESPACE_CLIENT_BACK__ pour l'url de l'espace client");
         }
         return $url_back_espace_client["valeur"];
     }
@@ -29,7 +29,7 @@ class espace_client_conseiller {
         ATF::constante()->q->reset()->where("constante", "__URL_ESPACE_CLIENT__");
         $url_front_espace_client = ATF::constante()->select_row();
         if(!$url_front_espace_client) {
-            throw new ATFError("Il n'y a pas de constante __URL_ESPACE_CLIENT__ pour l'url de l'espace client");
+            throw new errorATF("Il n'y a pas de constante __URL_ESPACE_CLIENT__ pour l'url de l'espace client");
         }
         return $url_front_espace_client["valeur"];
     }
@@ -100,7 +100,7 @@ class espace_client_conseiller {
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_VERBOSE => true,
+            CURLOPT_VERBOSE => false,
             CURLOPT_POSTFIELDS => array('applicationId' => $applicationId, 'clients' => json_encode($clients)),
         ));
 
