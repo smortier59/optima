@@ -69,7 +69,12 @@ class tache_cleodis extends tache {
 
 		$tache["no_redirect"] = true;
 
-		if ($partenaire) $tache['partenaire'] = $partenaire;
+		if ($partenaire) {
+			$tache = [
+				"suivi"=>$tache,
+				"partenaire"=>$partenaire
+			];
+		}
 
 		$tache['horaire_debut']=date("Y-m-d H:i:s");
 		$tache['horaire_fin'] = date("Y-m-d H:i:s", strtotime("+3 days"));
