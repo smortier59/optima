@@ -179,6 +179,7 @@ class suivi extends classes_optima {
 							if ($partenaire) {
 								$infos_mail["partenaire"] = $partenaire;
 							}
+							log::logger($infos_mail,"error");
 							$mail = new mail(infos_mail);
 
 
