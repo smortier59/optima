@@ -166,9 +166,11 @@ class tache extends classes_optima {
 					throw new errorATF('Erreur Insert');
 				}
 			}
-
+			log::logger("no mail tache.class".$no_mail,"error");
 			//dans le cas où l'on a un tache.class dans un autre projet qui appel cette méthode
 			if(!$no_mail){
+				log::logger($liste_email,"error");
+				log::logger(ATF::$usr->getID(),"error");
 				//envoi des mails aux concernés (si il y a au moins le mail du
 				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
 					$infos_mail = array( 
@@ -182,6 +184,7 @@ class tache extends classes_optima {
 					if ($partenaire) {
 						$infos_mail["partenaire"] = $partenaire;
 					}
+					log::logger($infos_mail,"error");
 					$mail = new mail($infos_mail);
 
 
