@@ -96,6 +96,13 @@ class suivi_cleodis extends suivi {
 		$suivi_notifie = "";
 		if($post["suivi_notifie"]) $suivi_notifie = $post["suivi_notifie"];
 
+		if ($post['schema']) {
+			if ($post['schema'] == "bdomplus") { 
+				ATF::societe()->q->reset()->where("siret", "52933929300043");
+				$partenaire = ATF::societe()->select_row();
+			}
+		}
+
 		$infos = array();
 		foreach ($post as $key => $value) {
 			if(!array_key_exists("suivi.".$key , $cols)){
@@ -106,12 +113,7 @@ class suivi_cleodis extends suivi {
 		$suivi = $post;
 		$suivi["suivi_notifie"] = $suivi_notifie;
 
-		if ($infos['schema']) {
-			if ($infos['schema'] == "bdomplus") { 
-				ATF::societe()->q->reset()->where("siret", "52933929300043");
-				$suivi['partenaire'] = ATF::societe()->select_row();
-			}
-		}
+		if ($partenaire) $suivi['partenaire'] = $partenaire;
 
 		return $this->insert($suivi);
 	}
