@@ -113,7 +113,12 @@ class suivi_cleodis extends suivi {
 		$suivi = $post;
 		$suivi["suivi_notifie"] = $suivi_notifie;
 
-		if ($partenaire) $suivi['partenaire'] = $partenaire;
+		if ($partenaire) {
+			$suivi = [
+				"suivi"=>$suivi,
+				"partenaire"=>$partenaire
+			];
+		}
 
 		return $this->insert($suivi);
 	}
