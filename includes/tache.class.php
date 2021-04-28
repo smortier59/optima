@@ -111,6 +111,12 @@ class tache extends classes_optima {
 		    $liste_destinataire= is_array($infos['dest'])?$infos['dest']:explode(",",$infos['dest']);
 		    unset($infos['dest']);
         }
+
+		if ($infos['partenaire']) {
+			$partenaire = $infos["partenaire"];
+			unset($infos["partenaire"]);
+		}
+
 		$this->infoCollapse($infos);
 
 		if($infos["no_redirect"]){
@@ -171,6 +177,11 @@ class tache extends classes_optima {
 								"template"=>"tache_insert",
 								"donnees"=>$infos,
 								"from"=>ATF::$usr->get('email')));
+
+					if ($partenaire) {
+						$mail["partenaire"] = $partenaire;
+					}
+
 					if($mail->send()){
 						ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
 					}

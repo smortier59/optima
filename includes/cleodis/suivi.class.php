@@ -106,6 +106,13 @@ class suivi_cleodis extends suivi {
 		$suivi = $post;
 		$suivi["suivi_notifie"] = $suivi_notifie;
 
+		if ($infos['schema']) {
+			if ($infos['schema'] == "bdomplus") { 
+				ATF::societe()->q->reset()->where("siret", "52933929300043");
+				$suivi['partenaire'] = ATF::societe()->select_row();
+			}
+		}
+
 		return $this->insert($suivi);
 	}
 
