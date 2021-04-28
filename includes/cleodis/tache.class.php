@@ -71,7 +71,7 @@ class tache_cleodis extends tache {
 
 		if ($partenaire) {
 			$tache = [
-				"suivi"=>$tache,
+				"tache"=>$tache,
 				"partenaire"=>$partenaire
 			];
 		}
