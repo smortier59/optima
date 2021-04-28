@@ -95,6 +95,12 @@ class suivi extends classes_optima {
 		unset($infos["champsComplementaire"]);
 		$objet = $infos["objet"];
 		unset($infos["objet"]);
+
+		if ($infos['partenaire']) {
+			$partenaire = $infos["partenaire"];
+			unset($infos["partenaire"]);
+		}
+
 		$liste['suivi_contact'];
 		$this->infoCollapse($infos);
 
@@ -171,6 +177,9 @@ class suivi extends classes_optima {
 										"attente_reponse"=>$attente_reponse,
 										"from"=>ATF::$usr->get('email')));
 
+							if ($partenaire) {
+								$mail["partenaire"] = $partenaire;
+							}
 
 							if($mail->send()){
 								ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));

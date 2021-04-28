@@ -66,6 +66,13 @@ class tache_cleodis extends tache {
 		$tache['horaire_debut']=date("Y-m-d H:i:s");
 		$tache['horaire_fin'] = date("Y-m-d H:i:s", strtotime("+3 days"));
 
+		if ($infos['schema']) {
+			if ($infos['schema'] == "bdomplus") { 
+				ATF::societe()->q->reset()->where("siret", "52933929300043");
+				$suivi['partenaire'] = ATF::societe()->select_row();
+			}
+		}
+
 		return $this->insert(array("tache"=>$tache, "dest"=> $tache_notifie));
 	}
 
