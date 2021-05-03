@@ -169,6 +169,8 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
       ATF::facture()->u(array(
         "id_facture"=>$facture[0]['facture.id_facture'],
         "date_rejet"=>$data[1],
+        "date_paiement"=>NULL,
+        "date_regularisation"=>NULL,
         "rejet"=>$data[2],
         "etat"=>"impayee"
       ));
