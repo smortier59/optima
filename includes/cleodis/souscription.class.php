@@ -1670,6 +1670,10 @@ class souscription_bdomplus extends souscription_cleodis {
       $info_mail["vendeur"] = $vendeur;
       $info_mail["affaires"] = $affaires;
 
+      ATF::societe()->q->reset()->where("siret", "52933929300043");
+      $partenaire = ATF::societe()->select_row();
+      $info_mail["partenaire"] = $partenaire;
+
       $info_mail["objet"] = "Souscription BDOM par un vendeur en magasin";
 
       $mail = new mail($info_mail);
