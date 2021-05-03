@@ -214,7 +214,7 @@ class societe_cleodis extends societe {
     $this->foreign_key["id_assistante"] = "user";
     $this->foreign_key["id_owner"] = "user";
 
-    $this->files["logo"] = array("type"=>"jpg","no_upload"=>false,"no_generate"=>true);
+    $this->files["logo"] = array("type"=>"png","convert_from"=>array("jpg","png","gif"),"select"=>true);
 
 
 
