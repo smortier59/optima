@@ -213,13 +213,13 @@ class creditsafe {
         if ($return['lastaccountdate'] === "//") $return['lastaccountdate'] = null;
 
 
-        $financialStatement = $data->report->financialStatements[0];
+        $localfinancialStatement = $data->report->localFinancialStatements[0];
 
-		$return['receivables'] = number_format($financialStatement->balanceSheet->totalReceivables, 0, ",", " ");
-		$return['securitieandcash'] = number_format($financialStatement->balanceSheet->cash , 0, ",", " ");		// Produits d'exploitation
+		$return['receivables'] = number_format($localfinancialStatement->assets->receivables, 0, ",", " ");
+		$return['securitieandcash'] = number_format($localfinancialStatement->assets->securitiesAndCash , 0, ",", " ");		// Produits d'exploitation
 
 		$return["capital_social"] = number_format($data->report->shareCapitalStructure->nominalShareCapital->value , 0, ",", " ");
-		$return["capitaux_propres"] = number_format($financialStatement->balanceSheet->totalShareholdersEquity , 0, ",", " ");
+		$return["capitaux_propres"] = number_format($data->report->financialStatement[0]->balanceSheet->totalShareholdersEquity , 0, ",", " ");
 		$return["dettes_financieres"] = number_format($data->report->localFinancialStatements[0]->liabilities->financialLiabilities , 0, ",", " ");
 
         $return['netturnover'] =  number_format($data->report->localFinancialStatements[0]->profitAndLoss->netTurnover , 0, ",", " ");
