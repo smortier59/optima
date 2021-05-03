@@ -788,7 +788,7 @@ class hotline extends classes_optima {
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
-
+		
 		$this->infoCollapse($infos);
 
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
@@ -825,21 +825,34 @@ class hotline extends classes_optima {
 
 		if(!$infos["urgence"]) { $infos['urgence'] = "detail"; }
 
-
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
+		$tag_recherche = ["[DOSSIER]","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
+
 		switch ($infos["urgence"]) {
 			case 'detail':
-				$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'genant':
-				$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 
 			case 'bloquant':
-				$infos["hotline"] = "[INCIDENT][URGENT] ".$infos["hotline"];
+				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+					$infos["hotline"] = "[INCIDENT][URGENT]".$infos["hotline"];
+				} else {
+					$infos["hotline"] = $infos["hotline"];
+				}
 			break;
 		}
 
@@ -854,15 +867,20 @@ class hotline extends classes_optima {
 			$infos["type_requete"] = "affaire";
 			$infos["charge"] = "intervention";
 			$infos["id_affaire"] = $id_affaire_projet;
+		} else if ($infos['id_affaire']) {
+			$id_societe_de_affaire = ATF::affaire()->select($infos['id_affaire'],'id_societe');
+			if($id_societe !== $id_societe_de_affaire){
+				throw new errorATF("DONNEES INCOHERENTE");
+			}
+			$infos["type_requete"] = "affaire";
+			$infos["charge"] = "intervention";
 		}
-
 		//Insertion de la requête
 		$type_requete=$infos["type_requete"];
 		unset($infos["type_requete"]);
 
 		ATF::db($this->db)->begin_transaction();
-
-		$id_hotline = parent::insert($infos,$s,$files);
+		$id_hotline = parent::insert($infos,$s,$files);	
 
 		$hotline = $this->select($id_hotline);
 		//Notice
@@ -899,9 +917,8 @@ class hotline extends classes_optima {
 		//Gestion de l'envoi de mail
 		ATF::hotline_mail()->createMailInsert($id_hotline,$infos["filestoattach"]["fichier_joint"],$infos["id_user"]);
 
-
 		//Fichier joint
-		if($infos["filestoattach"]["fichier_joint"]){
+		if($infos["filestoattach"]["fichier_joint"]){		
 			//Ajout du fichier joint
 			$path = $this->filepath($id_hotline,"fichier_joint");
 			if( file_exists($path)) {
@@ -977,6 +994,24 @@ class hotline extends classes_optima {
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
+	}
+
+	/**
+	* Création d'une nouvelle fonction qui verifie le premier mot du titre tu ticket hotline et te retourne un boolean
+	* @author DS <dsarr@absystech.fr>
+	* @params titre du ticket hotline , un array de tags , boolean
+	*/
+	function starts_with($haystack, $needle ,$case_sensitive = true) {
+		if ($case_sensitive) {
+			foreach($needle as $item){
+				return strpos($haystack, $item) === 0;
+			}
+		} else {
+			
+			foreach($needle as $item){
+				return stripos($haystack, $item) === 0;
+			}
+		}
 	}
 
 	/**
@@ -4004,9 +4039,14 @@ class hotline extends classes_optima {
 	* @apiSuccess (200) {Array} notices Notice lié a linsertion.
 	*/
 	public function _POST($get,$post,$files) {
+
 		$return = array();
 
 		try {
+			if($post['id_affaire']  && $post['id_projet']){
+				throw new Exception("DONNEES_INCOHERENTE",1025);
+			}
+
 			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 			// Check des champs obligatoire
 			if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
@@ -4417,6 +4457,8 @@ class hotline extends classes_optima {
 
 		return $to_return;
 	}
+
+	
 
 	/**
     * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur

@@ -83,12 +83,9 @@ function sauvegardeFacture($logFile){
 function statutPayeFacture($logFile) {
   log::logger('==================================Début de modification de statut en payée =================================', $logFile);
 
-  $q = "SELECT * FROM facture f
-    WHERE
-      f.`date` = f.date_paiement
-      AND f.`date` = f.date_regularisation
-      AND f.etat = 'impayee'
-      AND f.date_rejet IS NOT NULL";
+  $q = "SELECT * FROM facture f 
+    WHERE f.etat = 'impayee'";
+     
   $factures = ATF::db()->sql2array($q);
 
   log::logger('Factures en prélèvement à traiter : '.count($factures), $logFile);
@@ -96,19 +93,37 @@ function statutPayeFacture($logFile) {
   if(count($factures)){
     foreach($factures as $f){
       log::logger('Passage en état payée de la facture : '.$f['ref'].' ('.$f['id_facture'].')', $logFile);
+      
+
       ATF::facture()->u(array(
         'id_facture'=>$f['id_facture'],
         'etat'=>'payee',
-        'date_paiement'=>$f['date']
       ));
 
-      log::logger('Appel au checkEtat sur commande '.$f['id_commande'], $logFile);
-      ATF::commande()->checkEtat($f['id_commande']);
+      if($f['date_paiement'] == NULL){
+        ATF::facture()->u(array(
+          'id_facture'=>$f['id_facture'],
+          'date_paiement'=>$f['date']
+        ));
+      }
 
-      log::logger("Appel du checkMauvaisPayeur sur société ".$f["id_societe"], $logFile);
-      ATF::societe()->checkMauvaisPayeur($f["id_societe"]);
+      if($f['date_rejet'] && $f['date_regularisation'] == NULL ){
+        ATF::facture()->u(array(
+          'id_facture'=>$f['id_facture'],
+          'date_regularisation'=>$f['date']
+        ));
+      }
 
+      if($f['id_commande']){
+        log::logger('Appel au checkEtat sur commande '.$f['id_commande'], $logFile);
+        $commande = new commande_cleodis($f['id_commande']);
+        ATF::commande()->checkEtat($commande);
 
+        log::logger("Appel du checkMauvaisPayeur sur société ".$f["id_societe"], $logFile);
+        ATF::societe()->checkMauvaisPayeur($f["id_societe"]);
+      }else{
+        echo "Facture ".$f['ref'] . " associé a aucune commande\n";
+      }
     }
   }
   log::logger('==================================Fin de modification de statut en payée =================================', $logFile);
@@ -154,6 +169,8 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
       ATF::facture()->u(array(
         "id_facture"=>$facture[0]['facture.id_facture'],
         "date_rejet"=>$data[1],
+        "date_paiement"=>NULL,
+        "date_regularisation"=>NULL,
         "rejet"=>$data[2],
         "etat"=>"impayee"
       ));
