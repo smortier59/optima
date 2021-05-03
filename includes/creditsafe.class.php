@@ -175,7 +175,9 @@ class creditsafe {
         $creditScore = $data->report->creditScore;
 
 
-        $return['societe'] = $companySummary->businessName;
+        $return['societe'] = $basicInfo->registeredCompanyName;
+        $return['nom_commercial'] = $basicInfo->businessName;
+
 		$return['siret'] = $companySummary->companyRegistrationNumber;
 		$return['siren'] = substr($return['siret'],0,9);
         $return['reference_tva'] = $companyIdentification->basicInformation->vatRegistrationNumber;
@@ -191,11 +193,10 @@ class creditsafe {
 		// $return['tel'] = str_replace("/","",(string)$company->BasicInformation->ContactTelephoneNumber);
 		$return['adresse'] = $basicInfo->contactAddress->street;
         $return['tel'] = str_replace(" ","",$data->report->contactInformation->mainAddress->telephone);
+        $return['fax'] = str_replace(" ", "", $data->report->additionalInformation->misc->faxNumber);
 		$return['cp'] = $basicInfo->contactAddress->postalCode;
 		$return['ville'] = $basicInfo->contactAddress->city;
         $return['id_pays'] = $basicInfo->contactAddress->country;
-
-
 
 
 		$return['capital'] =  $data->report->shareCapitalStructure->nominalShareCapital->value;
