@@ -146,7 +146,6 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
 
     // Vérification des colonnes
     $entetes = fgetcsv($f, 0, ",");
-
     if (count($entetes) != 3) {
       throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 3");
     }
