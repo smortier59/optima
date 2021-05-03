@@ -2013,7 +2013,7 @@ class societe_cleodis extends societe {
 
 
   public function demande_creation_compte_espace_client ($client, $url_front_espace_client, $id_commande=null){
-    try{
+    try{    
       if(!$client){
         // On va chercher les infos clients à partir du contrat
         if(!$id_commande) throw new errorATF("ID Commande manquante");
@@ -2022,7 +2022,7 @@ class societe_cleodis extends societe {
         $id_client = ATF::commande()->select($id_commande , "id_societe");
         $dataSociete = ATF::societe()->select($id_client);
 
-        if (ATF::societe()->select($value["id_societe"], "id_famille") === 9) {
+        if(ATF::societe()->select($id_client,"id_famille") == 9){ 
           $client = array("id_societe" => $dataSociete["id_societe"],
                           "nom" => $dataSociete["particulier_nom"],
                           "prenom" => $dataSociete["particulier_prenom"],
@@ -2034,7 +2034,7 @@ class societe_cleodis extends societe {
           if ($dataSociete["id_contact_signataire"]) {
             $signataire = ATF::contact()->select($dataSociete["id_contact_signataire"]);
             if ($signataire["email"]) {
-              $client = array("id_societe" => $value["id_societe"],
+              $client = array("id_societe" =>$dataSociete["id_societe"],
                               "nom" => $signataire["nom"],
                               "prenom" => $signataire["prenom"],
                               "email" => $signataire["email"],
@@ -2042,6 +2042,12 @@ class societe_cleodis extends societe {
                               "affaire" => ATF::commande()->select($id_commande , "id_affaire")
                           );
             }
+          } else if ($dataSociete['email']) {
+            $client = array("id_societe" => $dataSociete["id_societe"],
+            "email" => $dataSociete["email"],
+            "ref" => ATF::commande()->select($id_commande , "ref"),
+            "affaire" => ATF::commande()->select($id_commande , "id_affaire")
+            );
           }
         }
       }
@@ -2074,25 +2080,29 @@ class societe_cleodis extends societe {
           "titles" => "#23527c"
         );
       }
-      $infos_mail = array(
-        "recipient" => $client["email"],
-        "objet" => "Création de votre compte espace client",
-        "template" => "demande_creation_compte_espace_client",
-        "client" => $client,
-        "lien_espace_client" => $url_front_espace_client . "/register",
-        "colors" => $colors,
-        "partenaire"=> $partenaire
-      );
 
-      $mail = new mail( $infos_mail );
-      if($mail->send()){
-          ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
-      }else{
-          log::logger("------------------------------------------------------", "error_mail_creation_compte");
-          log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
-          log::logger($mail, "error_mail_creation_compte");
+      // Envoyer le mail uniquement si on a un email dans $client
+      if ($client['email']) {
+        $infos_mail = array(
+          "recipient" => $client["email"],
+          "objet" => "Création de votre compte espace client",
+          "template" => "demande_creation_compte_espace_client",
+          "client" => $client,
+          "lien_espace_client" => $url_front_espace_client . "/register",
+          "colors" => $colors,
+          "partenaire"=> $partenaire
+        );
+  
+        $mail = new mail( $infos_mail );
+        if($mail->send()){
+            ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
+        }else{
+            log::logger("------------------------------------------------------", "error_mail_creation_compte");
+            log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
+            log::logger($mail, "error_mail_creation_compte");
+        }
+
       }
-
     } catch(errorATF $e){
         throw $e;
     }

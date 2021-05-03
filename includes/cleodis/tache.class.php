@@ -52,6 +52,13 @@ class tache_cleodis extends tache {
 
 		$infos = array();
 
+		if ($post['schema']) {
+			if ($post['schema'] == "bdomplus") { 
+				ATF::societe()->q->reset()->where("siret", "52933929300043");
+				$partenaire = ATF::societe()->select_row();
+			}
+		}
+
 		foreach ($post as $key => $value) {
 			if(!array_key_exists("tache.".$key , $cols)){
 				unset($post[$key]);
@@ -62,11 +69,11 @@ class tache_cleodis extends tache {
 
 		$tache["no_redirect"] = true;
 
-
 		$tache['horaire_debut']=date("Y-m-d H:i:s");
 		$tache['horaire_fin'] = date("Y-m-d H:i:s", strtotime("+3 days"));
 
-		return $this->insert(array("tache"=>$tache, "dest"=> $tache_notifie));
+
+		return $this->insert(array("tache"=>$tache, "dest"=> $tache_notifie, "partenaire"=> $partenaire));
 	}
 
 

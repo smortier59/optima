@@ -95,6 +95,12 @@ class suivi extends classes_optima {
 		unset($infos["champsComplementaire"]);
 		$objet = $infos["objet"];
 		unset($infos["objet"]);
+
+		if ($infos['partenaire']) {
+			$partenaire = $infos["partenaire"];
+			unset($infos["partenaire"]);
+		}
+
 		$liste['suivi_contact'];
 		$this->infoCollapse($infos);
 
@@ -158,18 +164,22 @@ class suivi extends classes_optima {
 								$objet = "Nouveau suivi de la part de ".ATF::user()->nom(ATF::$usr->getID());
 							}
 
-
-							$mail = new mail(array(
-										"optima_url"=>$link,
-										"recipient"=>$liste_email,
-										"objet"=>$objet,
-										"template"=>"suivi",
-										"id_user"=>ATF::$usr->getID(),
-										"id_affaire"=>$infos['id_affaire'],
-										"id_suivi"=>$infos['id_'.$this->table],
-										"champsComplementaire"=>$champsComplementaire,
-										"attente_reponse"=>$attente_reponse,
-										"from"=>ATF::$usr->get('email')));
+							$infos_mail = array(
+								"optima_url"=>$link,
+								"recipient"=>$liste_email,
+								"objet"=>$objet,
+								"template"=>"suivi",
+								"id_user"=>ATF::$usr->getID(),
+								"id_affaire"=>$infos['id_affaire'],
+								"id_suivi"=>$infos['id_'.$this->table],
+								"champsComplementaire"=>$champsComplementaire,
+								"attente_reponse"=>$attente_reponse,
+								"from"=>ATF::$usr->get('email')
+							);
+							if ($partenaire) {
+								$infos_mail["partenaire"] = $partenaire;
+							}
+							$mail = new mail($infos_mail);
 
 
 							if($mail->send()){

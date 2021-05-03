@@ -111,6 +111,12 @@ class tache extends classes_optima {
 		    $liste_destinataire= is_array($infos['dest'])?$infos['dest']:explode(",",$infos['dest']);
 		    unset($infos['dest']);
         }
+
+		if ($infos['partenaire']) {
+			$partenaire = $infos["partenaire"];
+			unset($infos["partenaire"]);
+		}
+
 		$this->infoCollapse($infos);
 
 		if($infos["no_redirect"]){
@@ -160,17 +166,28 @@ class tache extends classes_optima {
 					throw new errorATF('Erreur Insert');
 				}
 			}
-
+			log::logger("no mail tache.class".$no_mail,"error");
 			//dans le cas où l'on a un tache.class dans un autre projet qui appel cette méthode
 			if(!$no_mail){
+				log::logger($liste_email,"error");
+				log::logger(ATF::$usr->getID(),"error");
 				//envoi des mails aux concernés (si il y a au moins le mail du
 				if(count($liste_email)>1 || $liste_email[ATF::$usr->getID()]){
-					$mail = new mail(array( "recipient"=>implode(',',$liste_email),
-								"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
-								"objet"=>"Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
-								"template"=>"tache_insert",
-								"donnees"=>$infos,
-								"from"=>ATF::$usr->get('email')));
+					$infos_mail = array( 
+						"recipient"=>implode(',',$liste_email),
+						"optima_url"=>ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table])),
+						"objet"=>"Nouvelle tâche de la part de ".ATF::user()->nom(ATF::$usr->getID()),
+						"template"=>"tache_insert",
+						"donnees"=>$infos,
+						"from"=>ATF::$usr->get('email')
+					);
+					if ($partenaire) {
+						$infos_mail["partenaire"] = $partenaire;
+					}
+					log::logger($infos_mail,"error");
+					$mail = new mail($infos_mail);
+
+
 					if($mail->send()){
 						ATF::$msg->addNotice(ATF::$usr->trans("email_envoye",$this->table));
 					}
