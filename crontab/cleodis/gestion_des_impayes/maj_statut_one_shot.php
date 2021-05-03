@@ -146,6 +146,7 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
 
     // Vérification des colonnes
     $entetes = fgetcsv($f, 0, ",");
+
     if (count($entetes) != 3) {
       throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 3");
     }
@@ -169,6 +170,8 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
       ATF::facture()->u(array(
         "id_facture"=>$facture[0]['facture.id_facture'],
         "date_rejet"=>$data[1],
+        "date_paiement"=>NULL,
+        "date_regularisation"=>NULL,
         "rejet"=>$data[2],
         "etat"=>"impayee"
       ));
