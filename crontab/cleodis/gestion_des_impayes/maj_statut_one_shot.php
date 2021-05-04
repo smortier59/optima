@@ -83,9 +83,9 @@ function sauvegardeFacture($logFile){
 function statutPayeFacture($logFile) {
   log::logger('==================================Début de modification de statut en payée =================================', $logFile);
 
-  $q = "SELECT * FROM facture f 
+  $q = "SELECT * FROM facture f
     WHERE f.etat = 'impayee'";
-     
+
   $factures = ATF::db()->sql2array($q);
 
   log::logger('Factures en prélèvement à traiter : '.count($factures), $logFile);
@@ -93,7 +93,7 @@ function statutPayeFacture($logFile) {
   if(count($factures)){
     foreach($factures as $f){
       log::logger('Passage en état payée de la facture : '.$f['ref'].' ('.$f['id_facture'].')', $logFile);
-      
+
 
       ATF::facture()->u(array(
         'id_facture'=>$f['id_facture'],
@@ -118,12 +118,17 @@ function statutPayeFacture($logFile) {
         log::logger('Appel au checkEtat sur commande '.$f['id_commande'], $logFile);
         $commande = new commande_cleodis($f['id_commande']);
         ATF::commande()->checkEtat($commande);
-
-        log::logger("Appel du checkMauvaisPayeur sur société ".$f["id_societe"], $logFile);
-        ATF::societe()->checkMauvaisPayeur($f["id_societe"]);
       }else{
         echo "Facture ".$f['ref'] . " associé a aucune commande\n";
       }
+
+      if($f['id_societe']){
+        log::logger("Appel du checkMauvaisPayeur sur société ".$f["id_societe"], $logFile);
+        ATF::societe()->checkMauvaisPayeur($f["id_societe"]);
+      }else{
+        echo "Facture ".$f['ref'] . " associé a aucun client\n";
+      }
+
     }
   }
   log::logger('==================================Fin de modification de statut en payée =================================', $logFile);
@@ -166,14 +171,37 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
       log::logger("Modification facture ".$data[0]." - Date rejet : ".$data[1]." / Motif rejet : ".$data[2]." / Etat : impayee", $logFile);
       $facture = ATF::facture()->ss("facture.ref", $data[0]);
 
+      ATF::facture()->q->reset()->where("facture.ref", $data[0]);
+      $facture = ATF::facture()->select_row();
+
+
+
       ATF::facture()->u(array(
-        "id_facture"=>$facture[0]['facture.id_facture'],
+        "id_facture"=>$facture['facture.id_facture'],
         "date_rejet"=>$data[1],
         "date_paiement"=>NULL,
         "date_regularisation"=>NULL,
         "rejet"=>$data[2],
         "etat"=>"impayee"
       ));
+
+      $id_commande = ATF::facture()->select($facture["facture.id_facture"], "id_commande");
+      $id_societe = ATF::facture()->select($facture["facture.id_facture"], "id_societe");
+
+      if($id_commande){
+        log::logger('Appel au checkEtat sur commande '.$id_commande, $logFile);
+        $commande = new commande_cleodis($id_commande);
+        ATF::commande()->checkEtat($commande);
+      }else{
+        echo "Facture ".$f['ref'] . " associé a aucune commande\n";
+      }
+
+      if($id_societe){
+        log::logger("Appel du checkMauvaisPayeur sur société ".$id_societe, $logFile);
+        ATF::societe()->checkMauvaisPayeur($id_societe);
+      }else{
+        echo "Facture ".$f['ref'] . " associé a aucun client\n";
+      }
     }
     fclose($f);
   }

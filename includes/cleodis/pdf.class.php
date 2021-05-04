@@ -393,7 +393,6 @@ class pdf_cleodis extends pdf {
 		$this->affaire = ATF::affaire()->select($this->devis['id_affaire']);
 		$this->agence = ATF::agence()->select($this->user['id_agence']);
 
-
        	$this->initLogo($this->affaire["id_type_affaire"]);
 
 
@@ -1181,9 +1180,9 @@ class pdf_cleodis extends pdf {
 		log::logger("LOGO PARTENAIRE DEVIS LFS ID ".$logoPartenaire, "qjanon");
 		if(file_exists($logoPartenaire)){
 			$this->cell(0,5,"Selon Devis : ");
-			copy($logoPartenaire,str_replace("logo","jpg",$logoPartenaire));
-	   		$this->image(str_replace("logo","jpg",$logoPartenaire),35,$this->getY()-5,15);
-	   		util::rm(str_replace("logo","jpg",$logoPartenaire));
+			copy($logoPartenaire,str_replace("logo","png",$logoPartenaire));
+	   		$this->image(str_replace("logo","png",$logoPartenaire),35,$this->getY()-5,15);
+	   		util::rm(str_replace("logo","png",$logoPartenaire));
 		}
 
 		$this->sety(50);

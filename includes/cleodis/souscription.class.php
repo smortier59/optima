@@ -1233,8 +1233,8 @@ class souscription_cleodis extends souscription {
 
       $site_associe = ATF::site_associe()->select_row();
 
-      if ($site_associe['id_societe']){
-        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+      if ($site_associe['id_societe_footer_mail']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe_footer_mail']);
         $partenaire = ATF::societe()->select_row();
       }
 			$logoBase = '/'.ATF::$codename.'.jpg';
@@ -1670,6 +1670,10 @@ class souscription_bdomplus extends souscription_cleodis {
       $info_mail["vendeur"] = $vendeur;
       $info_mail["affaires"] = $affaires;
 
+      ATF::societe()->q->reset()->where("siret", "52933929300043");
+      $partenaire = ATF::societe()->select_row();
+      $info_mail["partenaire"] = $partenaire;
+
       $info_mail["objet"] = "Souscription BDOM par un vendeur en magasin";
 
       $mail = new mail($info_mail);
@@ -1760,8 +1764,8 @@ class souscription_bdomplus extends souscription_cleodis {
       $logoSiteAssocie = '/boulanger.jpg';
     }
 
-    if ($site_associe['id_societe']){
-      ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+    if ($site_associe['id_societe_footer_mail']){
+      ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe_footer_mail']);
       $partenaire = ATF::societe()->select_row();
     }else{
       ATF::societe()->q->reset()->where("siret", "52933929300043");
@@ -1863,8 +1867,8 @@ class souscription_bdomplus extends souscription_cleodis {
         $logoSiteAssocie = '/boulanger.jpg';
       }
 
-      if ($site_associe['id_societe']){
-        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+      if ($site_associe['id_societe_footer_mail']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe_footer_mail']);
         $partenaire = ATF::societe()->select_row();
       }else{
         ATF::societe()->q->reset()->where("siret", "52933929300043");
@@ -1928,8 +1932,8 @@ class souscription_bdomplus extends souscription_cleodis {
         $logoSiteAssocie = '/boulanger.jpg';
       }
 
-      if ($site_associe['id_societe']){
-        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe']);
+      if ($site_associe['id_societe_footer_mail']){
+        ATF::societe()->q->reset()->where('id_societe',$site_associe['id_societe_footer_mail']);
         $partenaire = ATF::societe()->select_row();
       }else{
         ATF::societe()->q->reset()->where("siret", "52933929300043");
