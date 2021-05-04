@@ -116,8 +116,7 @@ function statutPayeFacture($logFile) {
 
       if($f['id_commande']){
         log::logger('Appel au checkEtat sur commande '.$f['id_commande'], $logFile);
-        $commande = new commande_cleodis($f['id_commande']);
-        ATF::commande()->checkEtat($commande);
+        ATF::commande()->checkEtatContentieux($f['id_commande']);
       }else{
         echo "Facture ".$f['ref'] . " associé a aucune commande\n";
       }
@@ -190,8 +189,7 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
 
       if($id_commande){
         log::logger('Appel au checkEtat sur commande '.$id_commande, $logFile);
-        $commande = new commande_cleodis($id_commande);
-        ATF::commande()->checkEtat($commande);
+        ATF::commande()->checkEtatContentieux($id_commande);
       }else{
         echo "Facture ".$f['ref'] . " associé a aucune commande\n";
       }
