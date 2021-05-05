@@ -84,7 +84,7 @@ function statutPayeFacture($logFile) {
   log::logger('==================================Début de modification de statut en payée =================================', $logFile);
 
   $q = "SELECT * FROM facture f
-    WHERE f.etat = 'impayee'";
+    	WHERE f.etat = 'impayee'";
 
   $factures = ATF::db()->sql2array($q);
 
@@ -107,7 +107,14 @@ function statutPayeFacture($logFile) {
         ));
       }
 
-      if($f['date_rejet'] && $f['date_regularisation'] == NULL ){
+      if($f['rejet'] != "non_rejet" && $f['date_rejet'] == NULL ){
+        ATF::facture()->u(array(
+          'id_facture'=>$f['id_facture'],
+          'date_rejet'=>$f['date']
+        ));
+      }
+
+      if($f['rejet'] != "non_rejet" && $f['date_regularisation'] == NULL ){
         ATF::facture()->u(array(
           'id_facture'=>$f['id_facture'],
           'date_regularisation'=>$f['date']

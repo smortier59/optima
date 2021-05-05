@@ -666,6 +666,8 @@ class commande_cleodis extends commande {
 						}
 					}
 
+					$this->checkEtatContentieux($infos["id_commande"]);
+
 					if(ATF::$codename == "bdomplus" && $infos["key"] == "retour_contrat" && $infos["value"] != null){
 						ATF::societe()->demande_creation_compte_espace_client(null,null,$infos["id_commande"]);
 					}
@@ -1135,6 +1137,7 @@ class commande_cleodis extends commande {
 				$etatCommande = "restitution_contentieux";
 			}elseif( $etatCommande === "arreter"){
 				$etatCommande = "arreter_contentieux";
+				ATF::affaire()->u(array("id_affaire" => ATF::commande()->select($id_commande, "id_affaire"), "etat" => "terminee_contentieux"));
 			}
 		}else{
 			if($etatCommande === "mis_loyer_contentieux"){
@@ -1145,6 +1148,7 @@ class commande_cleodis extends commande {
 				$etatCommande = "restitution";
 			}elseif( $etatCommande === "arreter_contentieux"){
 				$etatCommande = "arreter";
+				ATF::affaire()->u(array("id_affaire" => ATF::commande()->select($id_commande, "id_affaire"), "etat" => "terminee"));
 			}
 		}
 		ATF::commande()->u(array("id_commande" => $id_commande , "etat" => $etatCommande));
