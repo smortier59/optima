@@ -860,16 +860,16 @@ class hotline extends classes_optima {
 		$infos["date"]=date('Y-m-d H:i:s');
 
 		// Auto affectation a charge Absystech si client Absystech
-		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
+		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");	
 		if ($id_societe==1) {
 			$infos['type_requete'] = "charge_absystech";
-		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {
+		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {		
 			$infos["type_requete"] = "affaire";
 			$infos["charge"] = "intervention";
 			$infos["id_affaire"] = $id_affaire_projet;
 		} else if ($infos['id_affaire']) {
 			$id_societe_de_affaire = ATF::affaire()->select($infos['id_affaire'],'id_societe');
-			if($id_societe !== $id_societe_de_affaire){
+			if($id_societe != $id_societe_de_affaire){
 				throw new errorATF("DONNEES INCOHERENTE");
 			}
 			$infos["type_requete"] = "affaire";
@@ -4043,10 +4043,24 @@ class hotline extends classes_optima {
 		$return = array();
 
 		try {
+
+			if($post['id_projet']){
+				$post['id_gep_projet'] = $post['id_projet'];
+			}
+
+			if($post['id_gep_projet']){
+				$post['id_gep_projet'] = $post['id_gep_projet'];
+			}
+
 			if($post['id_affaire']  && $post['id_projet']){
 				throw new Exception("DONNEES_INCOHERENTE",1025);
 			}
 
+			if($post['id_affaire']  && $post['id_gep_projet']){
+				throw new Exception("DONNEES_INCOHERENTE",1026);
+			}
+
+			unset($post["id_projet"]);
 			if (!$post) throw new Exception("POST_DATA_MISSING",1000);
 			// Check des champs obligatoire
 			if (!$post['id_societe']) throw new Exception("ID_SOCIETE_MISSING",1020);
