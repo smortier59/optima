@@ -4048,10 +4048,6 @@ class hotline extends classes_optima {
 				$post['id_gep_projet'] = $post['id_projet'];
 			}
 
-			if($post['id_gep_projet']){
-				$post['id_gep_projet'] = $post['id_gep_projet'];
-			}
-
 			if($post['id_affaire']  && $post['id_projet']){
 				throw new Exception("DONNEES_INCOHERENTE",1025);
 			}
