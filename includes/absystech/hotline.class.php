@@ -828,29 +828,33 @@ class hotline extends classes_optima {
 		$infos["hotline"] = str_replace("[DEMANDE] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT] ", "", $infos["hotline"]);
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
-		$tag_recherche = ["[DOSSIER]","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
+		$tag_recherche = ["[DOSSIER","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
+
+		
 
 		switch ($infos["urgence"]) {
 			case 'detail':
-				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+				
+				if(!$this->startsWith($infos['hotline'],$tag_recherche)){
 					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
-				} else {
+				}else{
 					$infos["hotline"] = $infos["hotline"];
 				}
 			break;
 
 			case 'genant':
-				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+				if(!$this->startsWith($infos['hotline'],$tag_recherche)){
 					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
-				} else {
+					
+				}else{
 					$infos["hotline"] = $infos["hotline"];
 				}
 			break;
 
 			case 'bloquant':
-				if($this->starts_with($infos['hotline'],$tag_recherche,false)) {
+				if(!$this->startsWith($infos['hotline'],$tag_recherche)){
 					$infos["hotline"] = "[INCIDENT][URGENT]".$infos["hotline"];
-				} else {
+				}else{
 					$infos["hotline"] = $infos["hotline"];
 				}
 			break;
@@ -1001,18 +1005,18 @@ class hotline extends classes_optima {
 	* @author DS <dsarr@absystech.fr>
 	* @params titre du ticket hotline , un array de tags , boolean
 	*/
-	function starts_with($haystack, $needle ,$case_sensitive = true) {
-		if ($case_sensitive) {
-			foreach($needle as $item){
-				return strpos($haystack, $item) === 0;
-			}
-		} else {
-			
-			foreach($needle as $item){
-				return stripos($haystack, $item) === 0;
+	
+	public function startsWith($string, $startString) {
+		$espion =false;
+		for($i=0;$i<count($startString);$i++){
+			if (substr( $string, 0, strlen($startString[$i])) === $startString[$i]){
+				$espion = true;
 			}
 		}
-	}
+		return $espion;
+    }
+
+
 
 	/**
 	* Création d'une nouvelle requête hotline sur la partie Optima
