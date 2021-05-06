@@ -591,7 +591,6 @@ class commande_cleodis extends commande {
 							$d['date_demande_reprise_broker'] = $d['date_restitution_effective'];
 						}
 					}
-
 					$this->u($d);
 					$commande = $this->select($infos['id_commande']);
 
@@ -600,7 +599,6 @@ class commande_cleodis extends commande {
 						,"field"=>$infos['key']
 						,"date"=>$d[$infos['key']]
 					));
-
 					if($infos['key'] === "date_debut" && $infos['value']){
 						//Creation de la facture prorata si besoin
 						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
@@ -667,6 +665,8 @@ class commande_cleodis extends commande {
 					}
 
 					$this->checkEtatContentieux($infos["id_commande"]);
+
+
 
 					if(ATF::$codename == "bdomplus" && $infos["key"] == "retour_contrat" && $infos["value"] != null){
 						ATF::societe()->demande_creation_compte_espace_client(null,null,$infos["id_commande"]);
@@ -1110,7 +1110,7 @@ class commande_cleodis extends commande {
 	 * @param  Number $id_commande
 	 */
 	function checkEtatContentieux($id_commande){
-
+		$id_commande = $this->decryptId($id_commande);
 		ATF::facture()->q->reset()->where("facture.id_commande", $id_commande)
 								  ->addField("facture.rejet")
 								  ->addField("facture.date_regularisation");
@@ -1126,8 +1126,8 @@ class commande_cleodis extends commande {
 
 		ATF::commande()->q->reset()->where("commande.id_commande",$id_commande)->addField("commande.etat" , "etat");
 		$etatCommande = ATF::commande()->select_row();
-		$etatCommande = $etatCommande["etat"];
 
+		$etatCommande = $etatCommande["etat"];
 		if($contientFactureRejet){
 			if($etatCommande === "mis_loyer"){
 				$etatCommande = "mis_loyer_contentieux";
