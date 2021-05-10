@@ -2539,10 +2539,14 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
-
+		log::logger("Entrée dans le CreateAffairePartenaire d'Optima API", 'CreateAffairePartenaire');
 		$utilisateur  = ATF::$usr->get("contact");
+		log::logger("Contact / Utilisateur", 'CreateAffairePartenaire');
+		log::logger($utilisateur, 'CreateAffairePartenaire');
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
+		log::logger("Type_affaire", 'CreateAffairePartenaire');
+		log::logger($id_type_affaire, 'CreateAffairePartenaire');
 
 
 		ATF::db($this->db)->begin_transaction();
@@ -2619,7 +2623,10 @@ class affaire_cleodis extends affaire {
 			);
 			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
+			log::logger("Insert DEVIS", 'CreateAffairePartenaire');
+			log::logger($devis, 'CreateAffairePartenaire');
 			$id_devis = ATF::devis()->insert(array("devis"=>$devis, "values_devis"=>$values_devis));
+			log::logger("Insert DEVIS ---- OK", 'CreateAffairePartenaire');
 
 			$devis = ATF::devis()->select($id_devis);
 			// récupérer dans la session l'id societe partenaire qui crée le contrat
@@ -2631,6 +2638,7 @@ class affaire_cleodis extends affaire {
 			}
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
+			log::logger("Affaire update 3 fois", 'CreateAffairePartenaire');
 
 			//Recupere Apporteur de ta société
 			$apporteur = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_apporteur');
@@ -2640,6 +2648,7 @@ class affaire_cleodis extends affaire {
 
 			//si le code_client_partenaire n'est pas vide alors je mets à jour la table société
 			if($post["code_client_partenaire"] && !empty($post["code_client_partenaire"])){
+				log::logger("Societe update code_client_partenaire", 'CreateAffairePartenaire');
 				ATF::societe()->u(array('code_client_partenaire'=>$code_client_partenaire));
 			}
 
@@ -2664,6 +2673,7 @@ class affaire_cleodis extends affaire {
 				"id_affaire"=>$devis["id_affaire"],
 				"etat"=>"reception_demande"
 			));
+			log::logger("InsertAffaireEtat reception_demande", 'CreateAffairePartenaire');
 			$societe = ATF::societe()->select($id_societe);
 			$comite = array  (
 				"id_societe" => $id_societe,
@@ -2732,6 +2742,8 @@ class affaire_cleodis extends affaire {
 
 
 
+			log::logger("Insert comité", 'CreateAffairePartenaire');
+			log::logger($comite, 'CreateAffairePartenaire');
 			ATF::comite()->insert(array("comite"=>$comite));
 			if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
 				//Création du comité CLEODIS
@@ -2813,6 +2825,8 @@ class affaire_cleodis extends affaire {
 
 			ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
+			log::logger("Erreur", 'CreateAffairePartenaire');
+			log::logger($e, 'CreateAffairePartenaire');
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}
