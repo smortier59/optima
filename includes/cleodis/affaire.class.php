@@ -2539,7 +2539,6 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
-
 		$utilisateur  = ATF::$usr->get("contact");
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
@@ -2664,6 +2663,7 @@ class affaire_cleodis extends affaire {
 				"id_affaire"=>$devis["id_affaire"],
 				"etat"=>"reception_demande"
 			));
+
 			$societe = ATF::societe()->select($id_societe);
 			$comite = array  (
 				"id_societe" => $id_societe,
@@ -2690,11 +2690,6 @@ class affaire_cleodis extends affaire {
 			$past2Years = new DateTime( date("Y-m-d", strtotime("-2 years")) );
 			$past2Years = $past2Years->format("Ymd");
 
-			log::logger($societe, "mfleurquin");
-			log::logger("Score --> ".$societe["cs_score"], "mfleurquin");
-			log::logger("Creation --> ".$creation, "mfleurquin");
-
-
 			if(($societe["cs_score"] > 50 && $creation < $past2Years)){
 				$comite["etat"] = "accepte";
 				$comite["decisionComite"] = "Accepté automatiquement";
@@ -2702,7 +2697,6 @@ class affaire_cleodis extends affaire {
 				$comite["etat"] = "refuse";
 				$comite["decisionComite"] = "Refusé automatiquement (Note < 50, ou ancienneté < 2ans";
 			}
-
 
 			$comite["reponse"] = date("Y-m-d");
 			$comite["validite_accord"] = date("Y-m-d");
@@ -2716,7 +2710,6 @@ class affaire_cleodis extends affaire {
 				$notifie[] = $value["id_user"];
 			}
 
-
 			$suivi = array(
 				 "id_societe"=>$id_societe
 				,"id_affaire"=>$devis["id_affaire"]
@@ -2729,8 +2722,6 @@ class affaire_cleodis extends affaire {
 			);
 			$suivi["no_redirect"] = true;
 			ATF::suivi()->insert($suivi);
-
-
 
 			ATF::comite()->insert(array("comite"=>$comite));
 			if($comite["etat"]== "accepte" || ATF::$codename=='cleodisbe'){
@@ -2758,7 +2749,6 @@ class affaire_cleodis extends affaire {
                 $mail->send($info_mail["recipient"]);
             }
 
-
             $dest = array();
             if(ATF::societe()->select($id_societe , "id_owner")) $dest[] = ATF::societe()->select($id_societe , "id_owner");
             if(ATF::societe()->select($id_societe , "id_assistante")) $dest[] = ATF::societe()->select($id_societe , "id_assistante");
@@ -2777,9 +2767,7 @@ class affaire_cleodis extends affaire {
 			"dest"=>$dest
 			);
 
-
 			ATF::tache()->insert($tache);
-
 
             if($post["commentaire"]){
             	//Creer un suivi pour alisson, Severine, jeanne
@@ -2813,6 +2801,7 @@ class affaire_cleodis extends affaire {
 
 			ATF::db($this->db)->commit_transaction();
 		} catch (errorATF $e) {
+			log::logger($e, 'CreateAffairePartenaire');
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
 		}
