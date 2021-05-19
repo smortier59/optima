@@ -219,6 +219,8 @@ class pdf_cleodis extends pdf {
 	public function mandatSellAndSign($id_affaire, $concat=false){
 
 		$this->unsetHeader();
+		$this->unsetFooter();
+
 		$this->AddPage();
 		$societe = "45307981600055";
 		$this->templateMandat($id_affaire, $societe);
@@ -228,6 +230,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 		$societe = "63201751302165";
 		$this->templateMandat($id_affaire, $societe, true);
+
 
 		$this->contratA4Signature($this->contrat["commande.id_commande"] , true);
 
@@ -2168,11 +2171,11 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
-
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
 		$this->AddPage();
+		$this->setFooter();
 		$this->commandeInit($id,$s,$previsu);
 		$this->A3 = false;
 		$this->A4 = true;
