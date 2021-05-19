@@ -76,16 +76,15 @@ class suivi extends classes_optima {
 	* @return int id_suivi
     */
 	public function insert($infos,&$s=NULL,$files=NULL,&$cadre_refreshed=NULL){
+	
 		if($infos["suivi"]["id_affaire"]){
 			$liste["id_affaire"] = ATF::affaire()->decryptId($infos["suivi"]["id_affaire"]);
 		}
-
 
 		if($infos["suivi"]["no_redirect"]){
 			unset($infos["suivi"]["no_redirect"]);
 			$no_redirect = true;
 		}
-
 
 		$attente_reponse = NULL;
 		if(isset($infos["attente_reponse"]) && $infos["attente_reponse"] == "oui") $attente_reponse = true;
@@ -110,7 +109,6 @@ class suivi extends classes_optima {
 			unset($infos["permalink"]);
 		}
 
-
 		$liste['suivi_contact']=$infos['suivi_contact'];
 		$liste['suivi_societe']=$infos['suivi_societe'];
 		$liste['suivi_notifie']=$infos['suivi_notifie'];
@@ -125,8 +123,12 @@ class suivi extends classes_optima {
 
 		ATF::db($this->db)->begin_transaction();
 
-		$infos['id_'.$this->table]=parent::insert($infos,$s,$files);
-
+		try{
+			$infos['id_'.$this->table]=parent::insert($infos,$s,$files);
+		}catch(errorATF $e){
+			throw new errorATF("ERREUR DE SUIVI",988);
+		}
+		
 		if(!$link){	$link = ATF::permalink()->getURL($this->createPermalink($infos['id_'.$this->table]));	}
 
 		//pour chaque personnes concernées (notifiés, intervenant_societe, intervenant_client)
@@ -207,7 +209,6 @@ class suivi extends classes_optima {
 		}
 
 		ATF::db($this->db)->commit_transaction();
-
 
 		return $infos['id_'.$this->table];
 	}
@@ -677,6 +678,7 @@ class suivi extends classes_optima {
   */
 	public function _POST($get,$post){
     $input = file_get_contents('php://input');
+
     if (!empty($input)) parse_str($input,$post);
     $suivi=array(
     	'suivi'=>array(
