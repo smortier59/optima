@@ -1170,7 +1170,7 @@ class societe_cleodis extends societe {
                             'tel_signature'=> $tel,
                             'mail_signataire'=> $contact["email"],
                             'date_signature'=> date('Y-m-d H:i:s'),
-                            'signataire'=> $contact["prenom"]." ".$contact["nom"]
+                            'signataire'=> $contact["prenom"]." ".$contact["nom"].", ".$contact["fonction"]
                             )
                       );
 
