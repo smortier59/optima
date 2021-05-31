@@ -520,7 +520,8 @@ class comite extends classes_optima {
 								//->where("login", "abowe", "OR", "filles")
 								->where("login", "mmysoet", "OR", "filles")
 								->where("login", "jloison", "OR", "filles")
-								->where("login", "smazars", "OR", "filles");
+								//->where("login", "smazars", "OR", "filles")
+								->where("login", "lhochart", "OR", "filles");
 
 
 		$filles = ATF::user()->sa();

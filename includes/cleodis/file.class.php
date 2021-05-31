@@ -12,9 +12,11 @@ class file_cleodis extends file {
 
 		$return = parent::_POST($get,$post, $files);
 
-		ATF::user()->q->reset()->where("login", "smazars", "OR", "filles")
-    						   ->where("login", "jvasut", "OR", "filles")
-    						   ->where("login", "abowe", "OR", "filles");
+		ATF::user()->q->reset()->where("login", "lhochart", "OR", "filles")
+							   ->where("login", "mmysoet", "OR", "filles")
+    						   ->where("login", "jvasut", "OR", "filles");
+							   //->where("login", "smazars", "OR", "filles")
+    						   //->where("login", "abowe", "OR", "filles");
     	$filles = ATF::user()->sa();
 
     	$dest = array();

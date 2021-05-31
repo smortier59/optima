@@ -3090,7 +3090,8 @@ class affaire_cleodis extends affaire {
 								->where("login", "egerard", "OR", "filles")
 								->where("login", "btronquit", "OR", "filles")
 								->where("login", "pcaminel", "OR", "filles")
-								->where("login", "smazars", "OR", "filles");
+								//->where("login", "smazars", "OR", "filles")
+								->where("login", "lhochart", "OR", "filles");
 
 
 		$filles = ATF::user()->sa();

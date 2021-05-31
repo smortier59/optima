@@ -691,7 +691,19 @@ class societe_cleodis extends societe {
 
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
-    $notifie = "106,21"; // 106 Lesueur Jennifer et 21 Severine Mazars
+
+    ATF::user()->q->reset()->where("login", "lhochart", "OR", "filles")
+							   ->where("login", "jlesueur", "OR", "filles");
+    $filles = ATF::user()->sa();
+
+    $notifie = "";
+    // $notifie = "106,133"; // 106 Lesueur Jennifer et 21 Severine Mazars, 133 Laure Hochart
+		foreach ($filles as $key => $value) {
+      $notifie .= ','.$value["id_user"];
+    }
+    $notifie = substr($notifie, 1);
+
+
     if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
       $notifie .= ",".$this->select($infos["id_societe"],"id_owner");
     }
@@ -2013,7 +2025,7 @@ class societe_cleodis extends societe {
 
 
   public function demande_creation_compte_espace_client ($client, $url_front_espace_client, $id_commande=null){
-    try{    
+    try{
       if(!$client){
         // On va chercher les infos clients à partir du contrat
         if(!$id_commande) throw new errorATF("ID Commande manquante");
@@ -2022,7 +2034,7 @@ class societe_cleodis extends societe {
         $id_client = ATF::commande()->select($id_commande , "id_societe");
         $dataSociete = ATF::societe()->select($id_client);
 
-        if(ATF::societe()->select($id_client,"id_famille") == 9){ 
+        if(ATF::societe()->select($id_client,"id_famille") == 9){
           $client = array("id_societe" => $dataSociete["id_societe"],
                           "nom" => $dataSociete["particulier_nom"],
                           "prenom" => $dataSociete["particulier_prenom"],
@@ -2092,7 +2104,7 @@ class societe_cleodis extends societe {
           "colors" => $colors,
           "partenaire"=> $partenaire
         );
-  
+
         $mail = new mail( $infos_mail );
         if($mail->send()){
             ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
