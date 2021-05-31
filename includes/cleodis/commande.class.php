@@ -439,7 +439,8 @@ class commande_cleodis extends commande {
 		$createur = ATF::user()->select($infos["id_user"]);
 
 		if($createur === "pcaminel"){
-			ATF::user()->q->reset()->where("login", "smazars");
+			//ATF::user()->q->reset()->where("login", "smazars")
+			ATF::user()->q->reset()->where("login", "lhochart");
 			$desti = ATF::user()->select_row();
 			$dest = $desti["id_user"];
 		}elseif($createur === "tdelattre"){
@@ -935,9 +936,14 @@ class commande_cleodis extends commande {
 						$commande->set("etat","arreter");
 						$comm = ATF::commande()->select($infos["id_commande"]);
 
-						$notifie = array(21);
-						if(ATF::$usr->getID() !=21){
-							$notifie[] = ATF::$usr->getID();
+						ATF::user()->q->reset()->where("login", "lhochart");
+						$filles = ATF::user()->sa();
+
+						$notifie = array();
+						foreach ($filles as $key => $value) {
+							if(ATF::$usr->getID() != $value["id_user"]){
+								$notifie[] = $value["id_user"];
+							}
 						}
 
 						$suivi = array(
@@ -1058,10 +1064,16 @@ class commande_cleodis extends commande {
 
 						$comm = ATF::commande()->select($commande->get("id_commande"));
 
-						$notifie = array(21);
-						if(ATF::$usr->getID() !=21){
-							$notifie[] = ATF::$usr->getID();
+						ATF::user()->q->reset()->where("login", "lhochart");
+						$filles = ATF::user()->sa();
+
+						$notifie = array();
+						foreach ($filles as $key => $value) {
+							if(ATF::$usr->getID() != $value["id_user"]){
+								$notifie[] = $value["id_user"];
+							}
 						}
+
 						$suivi = array(
 							"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
