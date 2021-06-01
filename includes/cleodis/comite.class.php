@@ -410,41 +410,35 @@ class comite extends classes_optima {
 			$res = ATF::societe()->getInfosFromCREDITSAFE(array("num_ident"=>$num_ident, "returnxml"=>"oui"));
 		}else{
 			$siret = ATF::societe()->select($infos["societe"], "siret");
-			$res = ATF::societe()->getInfosFromCREDITSAFE(array("siret"=>$siret, "returnxml"=>"oui"));
+			$res = ATF::creditsafe()->getInfosCompanyBySiret(str_replace(" ","",$siret));
 		}
 
-		$xml = simplexml_load_string($res);
+		/*
+			foreach ($maison_meres->ultimateparent as $key => $value) {	$mm[] = (string)$value->name; }
 
-		$bi = $xml->xmlresponse->body->company->baseinformation;
-		$s = $xml->xmlresponse->body->company->summary;
-		$b = $xml->xmlresponse->body->company->balancesynthesis;
+			if($mm[0]){ $data["maison_mere1"] = $mm[0]; }
+			if($mm[1]){ $data["maison_mere2"] = $mm[1]; }
+			if($mm[2]){ $data["maison_mere3"] = $mm[2]; }
+			if($mm[3]){ $data["maison_mere4"] = $mm[3]; }
+		*/
 
-		$maison_meres = $s->ultimateparents;
+		$data["date_creation"] = $res["date_creation"];
+		$data["date_compte"] =   $res["lastScoreDate"];
 
-		foreach ($maison_meres->ultimateparent as $key => $value) {	$mm[] = (string)$value->name; }
+		$data["note"] = $res["cs_score"];
+		$data["limite"] = $res["cs_avis_credit"];
 
-		if($mm[0]){ $data["maison_mere1"] = $mm[0]; }
-		if($mm[1]){ $data["maison_mere2"] = $mm[1]; }
-		if($mm[2]){ $data["maison_mere3"] = $mm[2]; }
-		if($mm[3]){ $data["maison_mere4"] = $mm[3]; }
-
-		$data["date_creation"] = (string)$bi->formationdate;
-		$data["date_compte"] = (string)$bi->lastaccountdate;
-
-		$data["note"] = (string)$s->rating2013;
-		$data["limite"] = (string)$s->creditlimit2013;
-
-		$data["activite"] = (string)$bi->activitydescription;
+		$data["activite"] = $res["activite"];
 
 
 
-		$data['ca'] = (string)$s->financialsummary->tradingtodate[0]->turnover;
+		$data['ca'] = $res["ca"];
 
 
-		$data["resultat_exploitation"] = (string)$b->balancesheet->profitloss->operatingprofitloss;
-		$data["capital_social"] = (string)$bi->sharecapital;
-		$data["capitaux_propres"] = (string)$b->balancesheet->passiveaccount->shareholdersequity;
-		$data["dettes_financieres"] = (string)$b->balancesheet->passiveaccount->financialliabilities;
+		$data["resultat_exploitation"] = $res["resultat_exploitation"];
+		$data["capital_social"] = $res["capital_social"];
+		$data["capitaux_propres"] = $res["capitaux_propres"];
+		$data["dettes_financieres"] = $res["dettes_financieres"];
 
 		if(strpos($data["capital_social"], "Euros")){ $data["capital_social"] = str_replace(" Euros", "", $data["capital_social"]); }
 		return $data;
