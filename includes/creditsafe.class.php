@@ -314,21 +314,61 @@ class creditsafe extends classes_optima {
                 $url = $baseurl.'/access';
                 log::logger("-- Recherche des infos de solde ".$url , "creditSafe");
                 $res = $this->curlCall($url, $token);
-                log::logger($res , "creditSafe");
 
-                $data["date_interogation"] = date("d-m-Y H:i");
-                $data["data"] = $res->countryAccess->creditsafeConnectOnlineReports;
-                log::logger(json_encode($data, JSON_PRETTY_PRINT) , "creditSafe");
 
-                $folder_stat = dirname(__FILE__)."/../creditSafe/";
                 if (!file_exists($folder_stat)) {
                     mkdir($folder_stat, 0755, true);
                 }
+
+                if( ($res->countryAccess->creditsafeConnectOnlineReports->paid - $res->countryAccess->creditsafeConnectOnlineReports->used) < 60000){
+                    $send_email = true;
+
+                    // On lit le fichier déja créé pour voir si on a déja envoyé un mail depuis 48h
+                    if(file_exists($folder_stat.$fileData)){
+                        $infos = json_decode(file_get_contents($folder_stat.$fileData));
+
+
+                        if ( $infos->dernier_envoi_mail_alerte
+                            && date("YmdHi", strtotime($infos->dernier_envoi_mail_alerte)) > date("YmdHi", strtotime("-2 days"))
+                        ){
+                            $send_email = false;
+                        }
+                    }
+
+                    // Si pas de champs ou date envoi du precedent mail > 48h on envoi le mail d'avertissement
+                    if ($send_email){
+                        $data["email_envoye"] = date("d-m-Y H:i");
+
+                        $mail = new mail(
+                            array(
+                                "recipient"=>"jerome.loison@cleodis.com",
+								"objet"=>"Solde Ticket Credit Safe critique",
+								"template"=>"no_template",
+                                "texte" => "Votre solde de crédit ticket Credit Safe à atteint un seuil critique ".
+                                            (
+                                                $res->countryAccess->creditsafeConnectOnlineReports->paid
+                                                - $res->countryAccess->creditsafeConnectOnlineReports->used
+                                            )
+                                            ." crédits restant.",
+								"from"=>"noreply@cleodis.com"
+                            )
+                        );
+		                $mail->send();
+                        log::logger("Seuil crédit restant atteint, et envoi du mail", "creditSafe");
+                    }
+
+
+                }
+
+                $data["date_interogation"] = date("d-m-Y H:i");
+                $data["data"] = $res->countryAccess->creditsafeConnectOnlineReports;
+
+
+
+
                 file_put_contents($folder_stat.$fileData, json_encode($data, JSON_PRETTY_PRINT));
             } else {
-
                 $data = json_decode(file_get_contents($folder_stat.$fileData));
-                log::logger($data->date_interogation, "mfleurquin");
                 $return["title"] = "Solde Crédit Safe <br /> au ".date("d/m/Y à H:i", strtotime($data->date_interogation));
                 $return["serie"] = "CreditSafe Connect France";
                 $return["total"] = $data->data[0]->paid;
