@@ -3,8 +3,26 @@
 * Classe credit Safe Connect - API Credit Safe Connect 1.3
 * @package Optima
 */
-class creditsafe {
+class creditsafe extends classes_optima {
+	/**
+	* Constructeur
+	*/
+	function __construct() {
+		parent::__construct();
+		$this->table = "creditsafe";
+	}
 
+    /**
+     * Genere et execute un appel CURL
+     *
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     *
+     * @param  string $url
+     * @param  string $token
+     * @param  string $method (GET / POST)
+     * @param  array $params
+     * @return array response
+     */
     public function curlCall($url, $token, $method='GET', $params = null){
 
         log::logger("-- URL : ".$url , "creditSafe");
@@ -43,6 +61,7 @@ class creditsafe {
     /**
      * Recupere les constantes necessaires à l'API CREDIT SAFE
      * Si elles n'existe pas, on retourne une erreur ATF
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      *
      * @return array username, password, baseurl
      * @throws ErrorATF si une constante est manquante
@@ -65,6 +84,7 @@ class creditsafe {
 
     /**
      * Authentification à l'API Credit Safe
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      *
      * @return token
      * @throws ErrorATF si probleme de recuperation de token
@@ -108,6 +128,15 @@ class creditsafe {
 
     }
 
+    /**
+     * Authentification à l'API Credit Safe
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+
+     * @param  String $siret
+     * @return Array
+     * @throws ErrorATF si probleme de recuperation de token
+     *         ErrorATF si probleme de constante
+     */
     public function getInfosCompanyBySiret($siret){
 
         try {
@@ -147,7 +176,13 @@ class creditsafe {
 
     }
 
-
+    /**
+     * Transforme l'objet recuperé de CS pour le transformer et formatter avec les data necessaires pour OPTIMA
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     *
+     * @param  Object $data
+     * @return Array $return
+     */
     private function cleanDataForOptima($data) {
         $return = array();
 
@@ -247,6 +282,64 @@ class creditsafe {
 		}
         return $return;
 
+    }
+
+
+    /**
+     * Recupere les infos de soldes de Credit Safe
+     * Stocke les data dans un fichier JSON
+     *
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @return void
+     */
+    public function getSolde($call_curl = true) {
+        try {
+            $folder_stat = dirname(__FILE__)."/../creditSafe/";
+            $fileData = "soldeCS-".ATF::$codename.".json";
+            if ( $call_curl ) {
+                log::logger("-- Récuperation du token" , "creditSafe");
+                $dataAuth = $this->authenticate();
+
+                $token = $dataAuth["token"];
+                $baseurl = $dataAuth["baseurl"];
+
+                $pays = ATF::constante()->getConstante("__API_CREDIT_PAYS_RECHERCHE__");
+                if (!$pays) {
+                    $pays = 'FR';
+                } else {
+                    $pays = ATF::constante()->select($pays, "valeur");
+                }
+
+
+                $url = $baseurl.'/access';
+                log::logger("-- Recherche des infos de solde ".$url , "creditSafe");
+                $res = $this->curlCall($url, $token);
+                log::logger($res , "creditSafe");
+
+                $data["date_interogation"] = date("d-m-Y H:i");
+                $data["data"] = $res->countryAccess->creditsafeConnectOnlineReports;
+                log::logger(json_encode($data, JSON_PRETTY_PRINT) , "creditSafe");
+
+                $folder_stat = dirname(__FILE__)."/../creditSafe/";
+                if (!file_exists($folder_stat)) {
+                    mkdir($folder_stat, 0755, true);
+                }
+                file_put_contents($folder_stat.$fileData, json_encode($data, JSON_PRETTY_PRINT));
+            } else {
+
+                $data = json_decode(file_get_contents($folder_stat.$fileData));
+                log::logger($data->date_interogation, "mfleurquin");
+                $return["title"] = "Solde Crédit Safe <br /> au ".date("d/m/Y à H:i", strtotime($data->date_interogation));
+                $return["serie"] = "CreditSafe Connect France";
+                $return["total"] = $data->data[0]->paid;
+                $return["utilise"] = $data->data[0]->used;
+                return $return;
+            }
+
+        } catch (errorATF $e) {
+            log::logger("Error 1" , "creditSafe");
+            throw $e;
+        }
     }
 
 }
