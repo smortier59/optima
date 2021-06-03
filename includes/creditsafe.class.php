@@ -320,7 +320,7 @@ class creditsafe extends classes_optima {
                     mkdir($folder_stat, 0755, true);
                 }
 
-                if( ($res->countryAccess->creditsafeConnectOnlineReports->paid - $res->countryAccess->creditsafeConnectOnlineReports->used) < 60000){
+                if( ($res->countryAccess->creditsafeConnectOnlineReports->paid - $res->countryAccess->creditsafeConnectOnlineReports->used) < 200){
                     $send_email = true;
 
                     // On lit le fichier déja créé pour voir si on a déja envoyé un mail depuis 48h
