@@ -4048,7 +4048,7 @@ class hotline extends classes_optima {
 
 		try {
 			if($post['temps-estime']){
-				$post['estimation'] = $this->tempsestimeenjours($post['temps-estime']);
+				$post['estimation'] = $post['temps-estime'];
 				unset($post['temps-estime']);
 			}
 
@@ -4507,24 +4507,6 @@ class hotline extends classes_optima {
 		return $result['count'];
 
 	}
-
-	//fonction qui recupére l'heure et le transforme en jours 
-	public function tempsestimeenjours($temps){
-		$jour = 7; 
-		if($temps == $jour){
-			$day = 1;
-		}else{
-			$day = number_format($temps/$jour, 2, '.', '');
-		}
-		
-		$formatArray = explode(".", $day);
-
-		if($formatArray[1] == "00"){
-		  $day = $formatArray[0];
-		}
-		return $day;
-	}
-
 
 };
 ?>
