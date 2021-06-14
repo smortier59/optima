@@ -143,7 +143,7 @@ if($url_back_espace_client &&  $url_front_espace_client){
 				ATF::suivi()->insert(array(
 					"id_societe"=>$client["id_societe"],
 					"type"=>"email",
-					"texte"=>"Envoi du mail de création de compte sur l'espace client à ".$client["email"],
+					"texte"=>"Envoi du mail de création de compte client à ".$client["email"],
 				));
 			} catch(errorATF $e){
 				echo $e->getMessage()."\n";
