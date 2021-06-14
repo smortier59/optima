@@ -788,7 +788,6 @@ class hotline extends classes_optima {
 	* @author Jérémie Gwiazdowski <jgw@absystech.fr>
 	*/
 	public function insert($infos,&$s,$files=NULL,&$cadre_refreshed) {
-		
 		$this->infoCollapse($infos);
 
 		if(method_exists("estFermee",ATF::societe()) && ATF::societe()->estFermee($infos["id_societe"])){
@@ -3838,6 +3837,7 @@ class hotline extends classes_optima {
 			"hotline.id_affaire"=>array(),
 			"hotline.ok_facturation"=>array(),
 			"hotline.charge"=>array(),
+			"hotline.estimation"=>array(),
 			"hotline.facturation_ticket"=>array(),
 			"hotline.wait_mep"=>array(),
 			"societe.latitude"=>array(),
@@ -4047,6 +4047,10 @@ class hotline extends classes_optima {
 		$return = array();
 
 		try {
+			if($post['temps-estime']){
+				$post['estimation'] = $this->tempsestimeenjours($post['temps-estime']);
+				unset($post['temps-estime']);
+			}
 
 			if($post['id_projet']){
 				$post['id_gep_projet'] = $post['id_projet'];
@@ -4187,6 +4191,11 @@ class hotline extends classes_optima {
 				if ($post['pole']) {
 					$post['pole_concerne'] = $post['pole'];
 					unset($post['pole']);
+				}
+
+				if($post['temps-estime']){
+					$post['estimation'] = $this->tempsestimeenjours($post['temps-estime']);
+					unset($post['temps-estime']);
 				}
 
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
@@ -4497,6 +4506,23 @@ class hotline extends classes_optima {
 		$result = $this->sa();
 		return $result['count'];
 
+	}
+
+	//fonction qui recupére l'heure et le transforme en jours 
+	public function tempsestimeenjours($temps){
+		$jour = 7; 
+		if($temps == $jour){
+			$day = 1;
+		}else{
+			$day = number_format($temps/$jour, 2, '.', '');
+		}
+		
+		$formatArray = explode(".", $day);
+
+		if($formatArray[1] == "00"){
+		  $day = $formatArray[0];
+		}
+		return $day;
 	}
 
 
