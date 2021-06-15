@@ -336,17 +336,19 @@ class creditsafe extends classes_optima {
                     if(file_exists($folder_stat.$fileData)){
                         $infos = json_decode(file_get_contents($folder_stat.$fileData));
 
+                        log::logger("Dernier envoi du mail d'alerte : " . $infos->dernier_envoi_mail_alerte, "creditSafe");
 
-                        if ( $infos->dernier_envoi_mail_alerte
+                        if ($infos->dernier_envoi_mail_alerte
                             && date("YmdHi", strtotime($infos->dernier_envoi_mail_alerte)) > date("YmdHi", strtotime("-2 days"))
                         ){
+                            log::logger("Envoi d'un mail il y a moins de 2 jours, on ne renvoi pas le mail d'alerte" , "creditSafe");
                             $send_email = false;
                         }
                     }
 
                     // Si pas de champs ou date envoi du precedent mail > 48h on envoi le mail d'avertissement
                     if ($send_email){
-                        $data["email_envoye"] = date("d-m-Y H:i");
+                        $data["dernier_envoi_mail_alerte"] = date("d-m-Y H:i");
 
 
 
