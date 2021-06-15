@@ -20,10 +20,8 @@ class accueil_cleodis extends accueil {
 	* @author Yann GAUTHERON <ygautheron@absystech.fr>
 	*/
 	public function getWidgets($id_agence){
-		
+
 		$w = array();
-
-
 
 		if(ATF::user()->select(ATF::$usr->get('id_user'), "graphe_reseau") == "oui"){
 			if(ATF::agence()->select($id_agence , "objectif_devis_reseaux")>0) $w[] =  array('module'=>'devis','type'=>'reseau','id_agence'=>$id_agence);
@@ -36,6 +34,9 @@ class accueil_cleodis extends accueil {
 			if(ATF::agence()->select($id_agence , "objectif_devis_autre")>0) $w[] =  array('module'=>'commande','type'=>'autre','id_agence'=>$id_agence);
 			if(ATF::agence()->select($id_agence , "objectif_mep_autre")>0)   $w[] =  array('module'=>'devis','type'=>'autre','id_agence'=>$id_agence);
 		}
+
+		$w[] =  array('module'=>'creditsafe','type'=>'getSoldeCS','id_agence'=>$id_agence);
+
 		return $w;
 	}
 
@@ -44,9 +45,6 @@ class accueil_cleodis extends accueil {
 		$donnees[1]= str_replace("id_agence=", "", $donnees[1]);
 		return array("type"=> $donnees[0], "id_agence"=>$donnees[1]);
 	}
-
-
-
 };
 class accueil_midas extends accueil_cleodis { };
 class accueil_cleodisbe extends accueil_cleodis {
