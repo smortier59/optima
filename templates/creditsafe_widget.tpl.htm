@@ -11,7 +11,6 @@
 
     <script type="text/javascript">
         {$data = ATF::creditsafe()->getSolde(false)}
-        {log::logger($data , "mfleurquin")}
 
         Ext.onReady(function(){
             var chart = new Highcharts.Chart({
@@ -50,7 +49,7 @@
                         name: "{$data["serie"]}",
                         data: [
                             ['Utilisé',  {$data["utilise"]} ],
-                            ['Total',  {$data["total"]} ]
+                            ['Restant',  {$data["restant"]} ]
                         ]
                     }]
                 });

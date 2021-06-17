@@ -385,7 +385,7 @@ class creditsafe extends classes_optima {
                 $data = json_decode(file_get_contents($folder_stat.$fileData));
                 $return["title"] = "Solde Crédit Safe <br /> au ".date("d/m/Y à H:i", strtotime($data->date_interogation));
                 $return["serie"] = "CreditSafe Connect France";
-                $return["total"] = $data->data[0]->paid;
+                $return["restant"] = $data->data[0]->paid - $data->data[0]->used;
                 $return["utilise"] = $data->data[0]->used;
                 return $return;
             }
