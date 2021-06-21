@@ -12301,8 +12301,21 @@ class pdf_cap extends pdf_cleodis {
 		$this->setfont('arial','B',8);
 		$this->setFillColor(239,239,239);
 
-		$this->multicell(0,5,"Précisions complémentaires sur la tarification : \n\n\n",0,"L",1);
-		$this->ln(10);
+		if($mandat["precision_btob"]){
+			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,3,$mandat["precision_btob"],0,"L",1);
+			$this->ln(5);
+		}elseif($mandat["precision_btoc"]){
+			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,3,$mandat["precision_btoc"],0,"L",1);
+			$this->ln(5);
+		}else{
+			$this->multicell(0,5,"Précisions complémentaires sur la tarification : \n\n\n",0,"L",1);
+			$this->ln(10);
+		}
+
 
 
 		$y = $this->getY();
@@ -13441,6 +13454,11 @@ class pdf_cap extends pdf_cleodis {
 			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
 			$this->setfont('arial','',8);
 			$this->multicell(0,3,$mandat["precision_btob"],0,"L",1);
+			$this->ln(5);
+		}elseif($mandat["precision_btoc"]){
+			$this->multicell(0,5,"Précisions complémentaires sur la tarification : ",0,"L",1);
+			$this->setfont('arial','',8);
+			$this->multicell(0,3,$mandat["precision_btoc"],0,"L",1);
 			$this->ln(5);
 		}else{
 			$this->multicell(0,5,"Précisions complémentaires sur la tarification : \n\n\n",0,"L",1);
