@@ -263,7 +263,7 @@ class creditsafe extends classes_optima {
 		$return['financialincome'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->financialIncome , 0, ",", " ");
 		$return['financialcharges'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->financialCharges , 0, ",", " ");
 
-        $return['ca'] = $return['netturnover'];
+        $return['ca'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->netTurnover , 0, ",", "");
         $return['resultat_exploitation'] = $return['operationgprofitless'];
 
 
