@@ -412,6 +412,16 @@ class hotline extends classes_optima {
 		}
 	}
 
+	/**
+	* Donne le temps ESTIME sur une requête. C'est le temps correspondant au champ "estimation" sur la hotline.
+	* C'est le temps de travail estimé.
+	* @author Jérémie GWIAZDOWSKI <jgw@absystech.fr>
+	* @param int $id_hotline l'id hotline correspondant
+	* @return int le temps estimé en base 10. 1 = 1 heure
+	*/
+	public function getEstimatedTime($id_hotline){
+		return $this->select($id_hotline,"estimation")."j";
+	}
 
 	/**
 	* Calcul le temps de travail facturé ou passé pour un billet hotline donnée
@@ -1350,7 +1360,7 @@ class hotline extends classes_optima {
 				return $pole;
 			break;
 			case "estimation":
-				return "0.00";
+				return "00.00";
 			break;
 			default:
 				return parent::default_value($field);
