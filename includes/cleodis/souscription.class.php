@@ -103,6 +103,12 @@ class souscription_cleodis extends souscription {
         $this->id_partenaire = NULL;
       break;
 
+      case 'h2c':
+        ATF::societe()->q->reset()->where("siret", "43939846200044");
+        $sphinx = ATF::societe()->select_row();
+        $this->id_partenaire = $sphinx["id_societe"];
+      break;
+
       default:
         throw new errorATF("Site associe incorrect", 500);
       break;
@@ -313,6 +319,7 @@ class souscription_cleodis extends souscription {
           case 'haccp':
           case 'axa':
           case 'worldline':
+          case 'h2c':
             $this->createComite($id_affaire, $societe, "accepte", "Comité CreditSafe", date("Y-m-d"), date("Y-m-d"));
             $this->createComite($id_affaire, $societe, "en_attente", "Comité CLEODIS");
           break;
@@ -351,13 +358,8 @@ class souscription_cleodis extends souscription {
    */
   private function getLibelleAffaire ($id_pack_produits, $site_associe, $pack_quantite, $renouvellement=false) {
     $suffix = "";
-    log::logger($pack_quantite , "mfleurquin");
     if ($id_pack_produits) {
       foreach ($id_pack_produits as $id_pack) {
-
-        log::logger("ID PACK -> ".$id_pack , "mfleurquin");
-        log::logger("Qté -> ".$pack_quantite[$id_pack] , "mfleurquin");
-
         ATF::pack_produit()->q
                           ->reset()
                           ->addField("pack_produit.nom")
@@ -373,13 +375,6 @@ class souscription_cleodis extends souscription {
     }
 
     switch ($site_associe) {
-      case "btwin":
-        $r = "BTWIN - Location ".$suffix;
-      break;
-      case "boulangerpro":
-        $r = "BOULANGER PRO - Location ".$suffix;
-      break;
-
       case "bdomplus":
         $r = "Abonnement Zen ".$suffix;
       break;
@@ -387,36 +382,9 @@ class souscription_cleodis extends souscription {
       case "boulanger-cafe":
         $r = "BOULANGER : Abonnement Café ".$suffix;
       break;
-
-      case "hexamed":
-        $r = "HEXAMED : Location ".$suffix;
-      break;
-
-      case "dib":
-        $r = "DIB : Location ".$suffix;
-      break;
-
-      case "locevo":
-        $r = "LOCEVO : Location ".$suffix;
-      break;
-
-      case "haccp":
-        $r = "HACCP : Location ".$suffix;
-      break;
-
-      case "axa":
-        $r = "AXA : Location ".$suffix;
-      break;
-      case "assets":
-        $r = "ASSETS : Location ".$suffix;
-      break;
-
-      case "worldline":
-        $r = "Worldline : Location ".$suffix;
-      break;
       
       default:
-        $r = ucfirst($site_associe)." : Location ".$suffix;
+        $r = strtoupper($site_associe)." : Location ".$suffix;
       break;
     }
 
@@ -486,6 +454,10 @@ class souscription_cleodis extends souscription {
     }    
     if($post['site_associe'] == "worldline"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Worldline");
+      $type_affaire = ATF::type_affaire()->select_row();
+    }
+    if($post['site_associe'] == "h2c"){
+      ATF::type_affaire()->q->reset()->where("type_affaire", "H2C Leasing");
       $type_affaire = ATF::type_affaire()->select_row();
     }
 
@@ -685,48 +657,6 @@ class souscription_cleodis extends souscription {
   }
 
   /**
-   * Retourne les differentes étapes SLIMPAY
-   * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
-   * @param  array $infos Simple dimension des champs à insérer
-   * @return [type]       [description]
-
-  public function _getSlimpaySteps($post, $get){
-    log::logger("=============================",$this->logFileSouscription);
-    log::logger($post,$this->logFileSouscription);
-    log::logger($get,$this->logFileSouscription);
-
-    $id_affaire = $post["id"];
-
-    log::logger("ID Affaire --> " , $this->logFileSouscription);
-    log::logger($id_affaire , $this->logFileSouscription);
-    $id_societe = ATF::affaire()->select($id_affaire,"id_societe");
-    log::logger("ID Societe : " , $this->logFileSouscription);
-    log::logger($id_societe , $this->logFileSouscription);
-
-    if (!$id_societe) {
-      throw new Exception('Aucune information pour cet identifiant.', 500);
-    }
-
-    log::logger('SWITCH SITE ASSOCIE '.$post['site_associe'],$this->logFileSouscription);
-    switch ($post['site_associe']) {
-      case 'bdomplus':
-        if(ATF::affaire()->select($id_affaire, "id_magasin")){
-          $passage_slimpay = array();
-
-          ATF::loyer()->q->reset()->where("id_affaire", $id_affaire)->addOrder("id_loyer", "ASC");
-          $loyer = ATF::loyer()->select_row();
-          if($loyer["frequence_loyer"] != "an")
-          $passage_slimpay["findOrCreateMandate"] = true;
-
-        }else{
-          $passage_slimpay = array('findOrCreateMandate'=> true, 'createOrder'=> true);
-        }
-      break;
-    }
-    return array("passage_slimpay" => $passage_slimpay);
-  }*/
-
-  /**
   * Appel Sell & Sign, verification de l'IBAN, envoi du mandat SEPA PDF
   * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
   * @param array $infos Simple dimension des champs à insérer
@@ -749,9 +679,6 @@ class souscription_cleodis extends souscription {
     if (!$id_societe) {
       throw new Exception('Aucune information pour cet identifiant.', 500);
     }
-
-
-
 
     if (!$post['type']) {
       throw new errorATF("TYPE INCONNU : '".$post['type']."', ne peut pas faire de retour", 500);
@@ -881,6 +808,7 @@ class souscription_cleodis extends souscription {
       case 'axa':
       case 'assets':
       case 'worldline':
+      case 'h2c':
         $pdf_mandat = ATF::pdf()->generic('mandatSellAndSign',$id_affaire,true);
         $f = array(
           "mandatSellAndSign.pdf"=> base64_encode($pdf_mandat)
@@ -1162,6 +1090,9 @@ class souscription_cleodis extends souscription {
       break;
       case 'worldline':
         $r = "WL";
+      break;
+      case 'h2c':
+        $r = "H2";
       break;
       default:
         $r = substr($site_associe, 0, 2);
