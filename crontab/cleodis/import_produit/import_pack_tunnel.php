@@ -11,7 +11,6 @@ ATF::define("tracabilite", false);
 // On verifie que les parametres et environnements sont OK
 check_config();
 
-
 $path = dirname(__FILE__) . "/" . $_SERVER["argv"][2];
 
 
@@ -29,33 +28,29 @@ $produits = $packs = array();
 
 // Début de transaction SQL
 ATF::db()->begin_transaction();
+try {
 
-// On effectue le nettoyages des fichiers pour exclures les produits existants (clé ref et fournisseur déja présent)
-// Retirer les packs et lignes concernés par les produits déja existants
-$data = nettoyage_pack_produit_ligne($path);
+	// On effectue le nettoyages des fichiers pour exclures les produits existants (clé ref et fournisseur déja présent)
+	// Retirer les packs et lignes concernés par les produits déja existants
+	$data = nettoyage_pack_produit_ligne($path);
 
 
-echo "========= DEBUT DE SCRIPT =========\n";
-// Gestion des produits
-$produits = import_produit($data["produits_ok"]);
+	echo "========= DEBUT DE SCRIPT =========\n";
+	// Gestion des produits
+	$produits = import_produit($data["produits_ok"]);
 
-// Gestion des packs
-$packs = import_pack($data["packs_ok"]);
+	// Gestion des packs
+	$packs = import_pack($data["packs_ok"]);
 
-// Ajout des liaison entre les deux
-import_ligne($data["lignes_ok"], $packs, $produits);
-
-// Rollback la transaction
-//ATF::db()->rollback_transaction();
-// Valide la trnasaction
-if(!$_SERVER["argv"][2] || $_SERVER["argv"][2] == "commit"){
-	echo "Commit des transactions";
-	ATF::db()->commit_transaction();
-}else{
-	echo "Rollback des transactions";
-	// Rollback la transaction
+	// Ajout des liaison entre les deux
+	import_ligne($data["lignes_ok"], $packs, $produits);
+} catch (errorATF $e) {
 	ATF::db()->rollback_transaction();
+	throw $e;
 }
+ATF::db()->commit_transaction();
+
+
 
 echo "========= FIN DE SCRIPT =========\n";
 
@@ -100,9 +95,9 @@ function import_produit($data)
 				log::logger("Produit " . $ref . "/" . $raw_Fournisseur . " non traité car déjà présent dans la BDD.", "import_" . $_SERVER["argv"][2] . "_escape_product");
 			} else {
 				$produit = array(
-					"site_associe" => 'locevo',
+					"site_associe" => $_SERVER["argv"][2],
 					"produit" => $product,
-					"type" => mb_strtolower($rawType, 'UTF-8'),
+					"type"=> mapping_type_produit($rawType),
 					"ref" => $ref,
 					"ean" => $ean,
 					"id_fournisseur" => get_fournisseur($raw_Fournisseur),
@@ -176,7 +171,7 @@ function import_pack($data)
 
 			$nom = $ligne[1];
 			$etat = $ligne[2];
-			$associated_site = $ligne[3];
+			$associated_site = $_SERVER["argv"][2];
 			$publicly_visible = $ligne[4];
 			$description = $ligne[5];
 
@@ -326,6 +321,18 @@ function import_ligne($lignes_ok, $packs, $produits)
 		log::logger($e, "import_" . $_SERVER["argv"][2]);
 		throw $e;
 	}
+}
+
+/**
+ * Permet de gérer le mapping des types de produits, enlève notamment les accent et passe tout en minuscule pour coller aux possibilités de l'ENUM en BDD
+ * @param  String $rawType Valeur du type issu du CSV
+ * @return String Le type formaté.
+ */
+function mapping_type_produit($rawType)
+{
+	$code=htmlentities("$rawType");
+	$rawType = preg_replace('/&(.)(.*?);/', '$1', $code);
+	return mb_strtolower($rawType, 'UTF-8');
 }
 
 /**
