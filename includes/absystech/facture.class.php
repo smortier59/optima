@@ -2225,9 +2225,13 @@ class facture_absystech extends facture {
 				}
 
 				$prelevement = "";
+				$journalCode = "VT";
 				if ($facture['id_termes'] == 24 || $facture['id_termes'] == 25 || $facture['id_termes'] == 38 || $facture['id_termes'] == 31) {
 					$prelevement = utf8_decode("Prélévement");
+					$journalCode = "VT2";
+					log::logger("PRELEVEMENT IDENTIFIE","export-comptable");
 				}
+				log::logger("JournalCode = ".$journalCode,"export-comptable");
 
 				// Si on a la période, on utilise les debut/fin dans le libellé, sinon la date de facture
 				if ($facture['date_debut_periode']) {
@@ -2236,8 +2240,9 @@ class facture_absystech extends facture {
 					$date_ou_periodes = date("Y-m-d",strtotime($facture['date']));
 				}
 
+
 				$line = array(
-					"VT",
+					$journalCode,
 					date('d/m/Y',strtotime($facture['date'])),
 					$societe['ref_comptable'] ? $societe['ref_comptable'] : $post['ref_comptable'][$societe['id_societe']],
 					$societe['societe'],
@@ -2255,7 +2260,7 @@ class facture_absystech extends facture {
 			  	// Si c'est un accompte, alors on affiche juste le montant HT de la facture et la valeur de la TVA, mais pas la ventilation des lignes
 					$facture['prix'] = number_format($facture['prix'], 2, ".", "");
 					$line = array(
-						"VT",
+						$journalCode,
 						date('d/m/Y',strtotime($facture['date'])),
 						"419000",
 						$societe['societe'],
@@ -2288,7 +2293,7 @@ class facture_absystech extends facture {
 
 					  // LIGNES DE VENTILATION
 						$line = array(
-							"VT",
+							$journalCode,
 							date('d/m/Y',strtotime($facture['date'])),
 							ATF::compte_absystech()->select($id_compte,'code'),
 							$societe['societe'],
@@ -2309,7 +2314,7 @@ class facture_absystech extends facture {
   			  	foreach ($this->sa() as $acompte) {
 							$acompte['prix'] = number_format($acompte['prix'], 2, ".", "");
 							$line = array(
-								"VT",
+								$journalCode,
 								date('d/m/Y',strtotime($facture['date'])),
 								"419000",
 								$societe['societe'],
@@ -2329,7 +2334,7 @@ class facture_absystech extends facture {
 			  // Uniquement si présent, ou si facture type différend d'une facture d'acompte.
 			  if ($facture['frais_de_port'] > 0 && ($facture['type_facture']!='acompte' || $type_parent == 'acompte')) {
 					$line = array(
-						"VT",
+						$journalCode,
 						date('d/m/Y',strtotime($facture['date'])),
 						"708500",
 						$societe['societe'],
@@ -2352,7 +2357,7 @@ class facture_absystech extends facture {
 				}
 			  // LIGNES DE TVA
 				$line = array(
-					"VT",
+					$journalCode,
 					date('d/m/Y',strtotime($facture['date'])),
 					"445710",
 					$societe['societe'],
@@ -2368,6 +2373,7 @@ class facture_absystech extends facture {
 
 			}
 			fclose($file);
+
 		} catch (Exception $e) {
 			ATF::db($this->db)->rollback_transaction();
 			throw $e;
