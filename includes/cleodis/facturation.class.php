@@ -738,6 +738,7 @@ class facturation extends classes_optima {
 
 		//Suppression du fichier de facturation
 		ATF::affaire()->delete_file($id_affaire,"facturation");
+
 /**********************Fin Transaction**************************/
 
 		return true;

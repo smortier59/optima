@@ -3,8 +3,26 @@
 * Classe credit Safe Connect - API Credit Safe Connect 1.3
 * @package Optima
 */
-class creditsafe {
+class creditsafe extends classes_optima {
+	/**
+	* Constructeur
+	*/
+	function __construct() {
+		parent::__construct();
+		$this->table = "creditsafe";
+	}
 
+    /**
+     * Genere et execute un appel CURL
+     *
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     *
+     * @param  string $url
+     * @param  string $token
+     * @param  string $method (GET / POST)
+     * @param  array $params
+     * @return array response
+     */
     public function curlCall($url, $token, $method='GET', $params = null){
 
         log::logger("-- URL : ".$url , "creditSafe");
@@ -43,6 +61,7 @@ class creditsafe {
     /**
      * Recupere les constantes necessaires à l'API CREDIT SAFE
      * Si elles n'existe pas, on retourne une erreur ATF
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      *
      * @return array username, password, baseurl
      * @throws ErrorATF si une constante est manquante
@@ -65,6 +84,7 @@ class creditsafe {
 
     /**
      * Authentification à l'API Credit Safe
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
      *
      * @return token
      * @throws ErrorATF si probleme de recuperation de token
@@ -108,6 +128,15 @@ class creditsafe {
 
     }
 
+    /**
+     * Authentification à l'API Credit Safe
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+
+     * @param  String $siret
+     * @return Array
+     * @throws ErrorATF si probleme de recuperation de token
+     *         ErrorATF si probleme de constante
+     */
     public function getInfosCompanyBySiret($siret){
 
         try {
@@ -147,7 +176,13 @@ class creditsafe {
 
     }
 
-
+    /**
+     * Transforme l'objet recuperé de CS pour le transformer et formatter avec les data necessaires pour OPTIMA
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     *
+     * @param  Object $data
+     * @return Array $return
+     */
     private function cleanDataForOptima($data) {
         $return = array();
 
@@ -228,7 +263,7 @@ class creditsafe {
 		$return['financialincome'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->financialIncome , 0, ",", " ");
 		$return['financialcharges'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->financialCharges , 0, ",", " ");
 
-        $return['ca'] = $return['netturnover'];
+        $return['ca'] = number_format($data->report->localFinancialStatements[0]->profitAndLoss->netTurnover , 0, ",", "");
         $return['resultat_exploitation'] = $return['operationgprofitless'];
 
 
@@ -247,6 +282,118 @@ class creditsafe {
 		}
         return $return;
 
+    }
+
+
+    /**
+     * Recupere les infos de soldes de Credit Safe
+     * Stocke les data dans un fichier JSON
+     *
+     * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+     * @return void
+     */
+    public function getSolde($call_curl = true) {
+        try {
+            $folder_stat = dirname(__FILE__)."/../creditSafe/";
+            $fileData = "soldeCS-".ATF::$codename.".json";
+            if ( $call_curl ) {
+                log::logger("-- Récuperation du token" , "creditSafe");
+                $dataAuth = $this->authenticate();
+
+                $token = $dataAuth["token"];
+                $baseurl = $dataAuth["baseurl"];
+
+                $pays = ATF::constante()->getConstante("__API_CREDIT_PAYS_RECHERCHE__");
+                if (!$pays) {
+                    $pays = 'FR';
+                } else {
+                    $pays = ATF::constante()->select($pays, "valeur");
+                }
+
+
+                $url = $baseurl.'/access';
+                log::logger("-- Recherche des infos de solde ".$url , "creditSafe");
+                $res = $this->curlCall($url, $token);
+
+
+                if (!file_exists($folder_stat)) {
+                    mkdir($folder_stat, 0755, true);
+                }
+                $seuil = 200;
+
+                $constante_seuil = ATF::constante()->getConstante("__SEUIL_ALERTE_CREDIT_SAFE__");
+                if($constante_seuil){
+                    $seuil = ATF::constante()->select($constante_seuil, "valeur");
+                    log::logger("Constante __SEUIL_ALERTE_CREDIT_SAFE__ trouvée, on prend ce seuiil : ".$seuil , "creditSafe");
+                }else{
+                    log::logger("Il n'y a pas de constante __SEUIL_ALERTE_CREDIT_SAFE__ trouvée, on prend le seuil par défaut : ".$seuil , "creditSafe");
+                }
+
+                if( ($res->countryAccess->creditsafeConnectOnlineReports[0]->paid - $res->countryAccess->creditsafeConnectOnlineReports[0]->used) < $seuil){
+                    $send_email = true;
+
+                    // On lit le fichier déja créé pour voir si on a déja envoyé un mail depuis 48h
+                    if(file_exists($folder_stat.$fileData)){
+                        $infos = json_decode(file_get_contents($folder_stat.$fileData));
+
+                        log::logger("Dernier envoi du mail d'alerte : " . $infos->dernier_envoi_mail_alerte, "creditSafe");
+
+                        if ($infos->dernier_envoi_mail_alerte
+                            && date("YmdHi", strtotime($infos->dernier_envoi_mail_alerte)) > date("YmdHi", strtotime("-2 days"))
+                        ){
+                            log::logger("Envoi d'un mail il y a moins de 2 jours, on ne renvoi pas le mail d'alerte" , "creditSafe");
+                            $send_email = false;
+                        }
+                    }
+
+                    // Si pas de champs ou date envoi du precedent mail > 48h on envoi le mail d'avertissement
+                    if ($send_email){
+                        $data["dernier_envoi_mail_alerte"] = date("d-m-Y H:i");
+
+
+
+                        $mail = new mail(
+                            array(
+                                "recipient"=>"jerome.loison@cleodis.com",
+								"objet"=>"Solde Ticket Credit Safe critique",
+								"template"=>"empty",
+                                "texte" => "Votre solde de crédit ticket Credit Safe a atteint un seuil critique ".
+                                            (
+                                                $res->countryAccess->creditsafeConnectOnlineReports[0]->paid
+                                                - $res->countryAccess->creditsafeConnectOnlineReports[0]->used
+                                            )
+                                            ." crédits restant.",
+                                "html"=>true,
+								"from"=>"noreply@cleodis.com"
+                            )
+                        );
+		                $mail->send();
+                        log::logger("Seuil crédit restant atteint, et envoi du mail", "creditSafe");
+                    }
+
+
+                }
+
+                $data["date_interogation"] = date("d-m-Y H:i");
+                $data["data"] = $res->countryAccess->creditsafeConnectOnlineReports;
+
+
+
+
+                file_put_contents($folder_stat.$fileData, json_encode($data, JSON_PRETTY_PRINT));
+            } else {
+                $data = json_decode(file_get_contents($folder_stat.$fileData));
+                $return["title"] = "Solde Crédit Safe <br /> au ".date("d/m/Y à H:i", strtotime($data->date_interogation));
+                $return["serie"] = "CreditSafe Connect France";
+                $return["restant"] = $data->data[0]->paid - $data->data[0]->used;
+                $return["utilise"] = $data->data[0]->used;
+                return $return;
+            }
+
+        } catch (errorATF $e) {
+            log::logger("Error 1" , "creditSafe");
+            throw $e;
+        }
     }
 
 }

@@ -814,23 +814,54 @@ class facture_cleodis extends facture {
         }
 	}
 
+
+
+
+
 	public function updateDate($infos){
+		log::logger("INFOS -->", "updateDate");
+		log::logger($infos, "updateDate");
+
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
 		$infosMaj["id_".$this->table]=$infos["id_".$this->table];
 		$infosMaj[$infos["key"]]=$infos["value"];
 
-		if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")){
-			$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
+		$infos["id_facture"] = ATF::facture()->decryptId($infos["id_facture"]);
+		$facture = ATF::facture()->select($infos["id_facture"]);
 
-			if($infos["key"] == "date_regularisation"){
+		if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")) {
+
+			log::logger("Dans IF date_rejet ou date_regul", "updateDate");
+
+			if($infos["key"] == "date_regularisation") {
 				$this->updateEnumRejet($infos);
-				//$infosMaj["etat"] = "payee";
+
+				if ($infos["value"] != "" && $infos["value"] != NULL) {
+					if ($facture["date_paiement"] == NULL) {
+						$infosMaj["date_paiement"] = $infos["value"];
+					}
+				} else {
+					if ($facture["date_paiement"]) {
+						$infosMaj["date_paiement"] = NULL;
+					}
+				}
+			}
+
+			if ($infos["key"] == "date_rejet") {
+				if ($infos["value"] == "" || $infos["value"] == NULL) {
+					if ( $facture["date_regularisation"] ) {
+						$infosMaj["date_regularisation"] = NULL;
+					}
+				}
 			}
 
 			$infosMaj["id_facture"] = $infos["id_facture"];
 
-			if($this->u($infosMaj)){
+			log::logger("INFOS MAJ :", "updateDate");
+			log::logger($infosMaj, "updateDate");
+
+			if($this->u($infosMaj)) {
 				ATF::$msg->addNotice(
 					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
 					,ATF::$usr->trans("notice_success_title")
@@ -843,24 +874,45 @@ class facture_cleodis extends facture {
 			log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
 			ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
 
+			log::logger("################################# FIN", "updateDate");
 			return true;
-		}else{
-			if($infosMaj[$infos["key"]]){
-				$infosMaj["etat"]="payee";
-			}else{
-				$infosMaj["etat"]="impayee";
+		} else {
+			log::logger("Dans ELSE", "updateDate");
+
+			switch($infos["key"]) {
+				case "date_paiement" :
+					// SUPPRESSION DE LA DATE DE PAIEMENT
+					if ($infos["value"] == "" || $infos["value"] == NULL) {
+						if ($facture["date_rejet"] == NULL && $facture["rejet"] != "non_rejet") {
+							$infosMaj["date_rejet"] = date("Y-m-d", strtotime("-1 days"));
+						}
+						if($facture["date_regularisation"]) $infosMaj["date_regularisation"] = NULL;
+					} else {
+						if ($facture["date_rejet"] !== NULL && $facture["date_regularisation"] === NULL){
+							$infosMaj["date_regularisation"] = $infos["value"];
+						}
+					}
+				break;
+
 			}
 
 
 
-			if($this->u($infosMaj)){
+			if($infosMaj[$infos["key"]]) {
+				$infosMaj["etat"]="payee";
+			} else {
+				$infosMaj["etat"]="impayee";
+			}
+
+
+			log::logger("INFOS MAJ :", "updateDate");
+			log::logger($infosMaj, "updateDate");
+
+			if($this->u($infosMaj)) {
 				ATF::$msg->addNotice(
 					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
 					,ATF::$usr->trans("notice_success_title")
 				);
-
-	//			$id_affaire=$this->select($infosMaj["id_".$this->table],"id_affaire");
-	//			ATF::affaire()->redirection("select",$id_affaire);
 			}
 		}
 
@@ -869,6 +921,9 @@ class facture_cleodis extends facture {
 
 		log::logger("--> Appel Mauvais payeur" , "mauvais_payeur");
 		ATF::societe()->checkMauvaisPayeur($this->select($this->decryptId($infos["id_facture"]) , "id_societe"));
+
+		log::logger("################################# FIN", "updateDate");
+
 		return true;
 	}
 
@@ -879,37 +934,31 @@ class facture_cleodis extends facture {
     * @param type pour savoir si l'on cherche une affaire qui annule  et remplace ($type=='new') ou une affaire qui EST annulée et remplacée ($type=='old')
     * @return boolean à true si la transaction c'est bien passé
     */
-	public function updateEnumRejet($infos){
-		if($this->select($infos["id_".$this->table],"etat")=="impayee" || $infos["key"] == "rejet"){
-			/*$commande = $this->select($infos["id_facture"] , "facture.id_commande");
-			ATF::commande()->q->reset()->where("commande.id_commande",$commande)->addField("commande.etat" , "etat");
-			$etatCommande = ATF::commande()->select_row();
-			$etatCommande = $etatCommande["etat"];
+	public function updateEnumRejet($infos) {
 
-			if((($infos["value"] != "non_rejet") && ($infos["value"] != "non_preleve_mandat")) && (($infos["key"] != "date_regularisation" && $infos["value"] != "")) ){
-				$this->u(array("id_facture"=>$infos["id_facture"], "etat"=>"impayee"));
+		if($infos["key"] == "rejet") {
+			$infosMaj["id_".$this->table]=$infos["id_".$this->table];
+			$facture = $this->select($this->decryptId($infos["id_".$this->table]));
 
-				if(!stripos($etatCommande, "contentieux")){
-					if($etatCommande === "mis_loyer" || $etatCommande === "prolongation" || $etatCommande === "restitution" || $etatCommande === "arreter"){
-						$etatCommande = $etatCommande."_contentieux";
-
-
-					}
-				}
-			}else{
-				if(!$this->contientFactureRejetee($commande, $infos["id_facture"])){
-					if($etatCommande === "mis_loyer_contentieux"){
-						$etatCommande = "mis_loyer";
-					}elseif( $etatCommande === "prolongation_contentieux"){
-						$etatCommande = "prolongation";
-					}elseif( $etatCommande === "restitution_contentieux"){
-						$etatCommande = "restitution";
-					}elseif( $etatCommande === "arreter_contentieux"){
-						$etatCommande = "arreter";
-					}
+			if ($infos["value"] != "non_rejet") {
+				$this->updateDate(array(
+					"id_facture" => $this->decryptId($infos["id_".$this->table]),
+					"key" => "date_rejet",
+					"value" => date("Y-m-d", strtotime("-1 days"))
+				));
+			} else {
+				if ($facture["date_rejet"]) {
+					$this->updateDate(array(
+						"id_facture" => $this->decryptId($infos["id_".$this->table]),
+						"key" => "date_rejet",
+						"value" => ""
+					));
 				}
 			}
-			ATF::commande()->u(array("id_commande" => $commande , "etat" => $etatCommande));*/
+		}
+
+
+		if($this->select($infos["id_".$this->table],"etat")=="impayee" || $infos["key"] == "rejet") {
 
 			if ($infos['value'] == "undefined") $infos["value"] = "";
 			$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
@@ -922,11 +971,9 @@ class facture_cleodis extends facture {
 					,ATF::$usr->trans("notice_success_title")
 				);
 			}
-
-			//ATF::affaire()->redirection("select",ATF::affaire()->cryptId(ATF::commande()->select($commande, id_affaire)));
 			return true;
 
-		}else{
+		} else {
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
 
