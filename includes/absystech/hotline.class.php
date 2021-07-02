@@ -4049,8 +4049,8 @@ class hotline extends classes_optima {
 		try {
 			if($post['temps-estime']){
 				$post['estimation'] = $post['temps-estime'];
-				unset($post['temps-estime']);
 			}
+			unset($post['temps-estime']);
 
 			if($post['id_projet']){
 				$post['id_gep_projet'] = $post['id_projet'];
