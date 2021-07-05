@@ -4202,6 +4202,11 @@ class hotline extends classes_optima {
 
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
 
+				if($post['temps-estime']){
+					$post['estimation'] = $post['temps-estime'];
+				}
+				unset($post['temps-estime']);
+
 				// Insertion
 				$return['aff'] = self::update($post);
 				$return['result'] = true;
