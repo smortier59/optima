@@ -12,3 +12,18 @@ VALUES
     (NULL, '__API_CREDIT_SAFE_USERNAME__', NULL),
     (NULL, '__API_CREDIT_SAFE_PASSWORD__', NULL),
     (NULL, '__API_CREDIT_SAFE_BASEURL__', 'https://connect.sandbox.creditsafe.com/v1');
+
+
+
+ALTER TABLE `telescope` ADD `home_events` ENUM('oui','non') NOT NULL DEFAULT 'non' COMMENT 'Afficher le calendrier sur la page d\'accueil' AFTER `actif`;
+UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 1;
+UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 2;
+UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 3;
+UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 4;
+
+
+INSERT INTO `constante` (`id_constante`, `constante`, `valeur`)
+VALUES
+(NULL, '__MS_GRAPH_CLIENT_ID__', 'd1f6e0a0-a23c-4611-91b7-a9eff8385414'),
+(NULL, '__MS_GRAPH_CLIENT_SECRET__', '8SFGwR4K.k7qfB~l.T.5ItUBj44Uic02~5'),
+(NULL, '__MS_GRAPH_TENANT_ID__', '92435d98-99f6-449b-b313-528fba7ad851');

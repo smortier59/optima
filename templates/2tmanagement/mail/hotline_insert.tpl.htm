@@ -1,7 +1,7 @@
 <p style="font-style:italic">
     <a href="{$infos.optima_url}">Rendez-vous sur Optima pour prendre en charge la requête</a><br />
 </p>
-{$temps_estime=ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}
+
 <p>
 	<strong>Priorite : {$infos.hotline_detail.priorite}/20</strong>
 </p>
@@ -13,7 +13,7 @@
 <p><b>Titre : </b>{$infos.hotline}</p>
 <div style="font-size:13px; font-style:italic; margin-left:20px;">{$infos.detail|stripslashes|nl2br}</div>
 <p>
-Le temps estimé est de <strong>{util::hoursToString($temps_estime)}</strong>
+Le temps estimé est de <strong>{ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}</strong>
 </p>
 
 {if $infos.fichier}
