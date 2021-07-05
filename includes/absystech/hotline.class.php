@@ -4194,6 +4194,12 @@ class hotline extends classes_optima {
 				}
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
+
+				if($post['temps-estime']){
+					$post['estimation'] = $post['temps-estime'];
+				}
+				unset($post['temps-estime']);
+
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
 
 				// Insertion
