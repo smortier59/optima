@@ -17,7 +17,7 @@ class telescope extends classes_optima {
 			'telescope.codename',
 			'telescope.url',
 			'telescope.theme',
-			'telscope.actif'
+			'telescope.actif'
 		);
 
 		$this->fieldstructure();
@@ -32,7 +32,6 @@ class telescope extends classes_optima {
 	 * @return array    infos telescope
 	 */
 	public function _getTelescopeInfos() {
-		log::logger(ATF::$codename , "mfleurquin");
 		ATF::telescope()->q->reset()->where("codename", ATF::$codename);
 		return ATF::telescope()->select_row();
 	}

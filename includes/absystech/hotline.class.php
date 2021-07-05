@@ -420,7 +420,7 @@ class hotline extends classes_optima {
 	* @return int le temps estimé en base 10. 1 = 1 heure
 	*/
 	public function getEstimatedTime($id_hotline){
-		return $this->getTime($id_hotline,"estimation");
+		return $this->select($id_hotline,"estimation")."j";
 	}
 
 	/**
@@ -829,11 +829,11 @@ class hotline extends classes_optima {
 		$infos["hotline"] = str_replace("[INCIDENT][URGENT] ", "", $infos["hotline"]);
 		$tag_recherche = ["[DOSSIER","[MAINTENANCE]","[DIVERS]","[R&D]","[REGIE]"];
 
-		
+
 
 		switch ($infos["urgence"]) {
 			case 'detail':
-				
+
 				if(!$this->startsWith($infos['hotline'],$tag_recherche)){
 					$infos["hotline"] = "[DEMANDE] ".$infos["hotline"];
 				}else{
@@ -844,7 +844,7 @@ class hotline extends classes_optima {
 			case 'genant':
 				if(!$this->startsWith($infos['hotline'],$tag_recherche)){
 					$infos["hotline"] = "[INCIDENT] ".$infos["hotline"];
-					
+
 				}else{
 					$infos["hotline"] = $infos["hotline"];
 				}
@@ -863,10 +863,10 @@ class hotline extends classes_optima {
 		$infos["date"]=date('Y-m-d H:i:s');
 
 		// Auto affectation a charge Absystech si client Absystech
-		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");	
+		$id_societe = ATF::societe()->select($infos['id_societe'],"id_societe");
 		if ($id_societe==1) {
 			$infos['type_requete'] = "charge_absystech";
-		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {		
+		} else if ($infos['id_gep_projet'] && $id_affaire_projet = ATF::gep_projet()->select($infos['id_gep_projet'],"id_affaire")) {
 			$infos["type_requete"] = "affaire";
 			$infos["charge"] = "intervention";
 			$infos["id_affaire"] = $id_affaire_projet;
@@ -883,7 +883,7 @@ class hotline extends classes_optima {
 		unset($infos["type_requete"]);
 
 		ATF::db($this->db)->begin_transaction();
-		$id_hotline = parent::insert($infos,$s,$files);	
+		$id_hotline = parent::insert($infos,$s,$files);
 
 		$hotline = $this->select($id_hotline);
 		//Notice
@@ -921,7 +921,7 @@ class hotline extends classes_optima {
 		ATF::hotline_mail()->createMailInsert($id_hotline,$infos["filestoattach"]["fichier_joint"],$infos["id_user"]);
 
 		//Fichier joint
-		if($infos["filestoattach"]["fichier_joint"]){		
+		if($infos["filestoattach"]["fichier_joint"]){
 			//Ajout du fichier joint
 			$path = $this->filepath($id_hotline,"fichier_joint");
 			if( file_exists($path)) {
@@ -993,7 +993,7 @@ class hotline extends classes_optima {
 		//cadre refresh
 		$this->redirection("select",$id_hotline,"hotline-select-".$this->cryptId($id_hotline).".html");
 
-		
+
 
 		api::sendUDP(array("data"=>array("type"=>"interaction")));
 		return $id_hotline;
@@ -1004,7 +1004,7 @@ class hotline extends classes_optima {
 	* @author DS <dsarr@absystech.fr>
 	* @params titre du ticket hotline , un array de tags , boolean
 	*/
-	
+
 	public function startsWith($string, $startString) {
 		$espion =false;
 		for($i=0;$i<count($startString);$i++){
@@ -1360,7 +1360,7 @@ class hotline extends classes_optima {
 				return $pole;
 			break;
 			case "estimation":
-				return "00:00";
+				return "00.00";
 			break;
 			default:
 				return parent::default_value($field);
@@ -3948,7 +3948,7 @@ class hotline extends classes_optima {
 					->where("hotline.etat", "annulee", 'AND', 'etat', "!=")
 					->where("hotline.etat", "wait", 'AND', 'etat', "!=")
 					->where("hotline.etat", "fixing", 'AND', 'etat', "!=")
-					
+
 					->whereIsNull("hotline.id_user",'AND','etat');
 
 			if ($get['filters']['dev'] == "on") {
@@ -3975,7 +3975,7 @@ class hotline extends classes_optima {
 
 
 		}
-		
+
 		foreach ($data["data"] as $k=>$lines) {
 			foreach ($lines as $k_=>$val) {
 				if (strpos($k_,".")) {
@@ -4011,7 +4011,7 @@ class hotline extends classes_optima {
 
 		}
 
-		
+
 
 		return $return;
 	}
@@ -4048,9 +4048,9 @@ class hotline extends classes_optima {
 
 		try {
 			if($post['temps-estime']){
-				$post['estimation'] = $this->tempsestimeenjours($post['temps-estime']);
-				unset($post['temps-estime']);
+				$post['estimation'] = $post['temps-estime'];
 			}
+			unset($post['temps-estime']);
 
 			if($post['id_projet']){
 				$post['id_gep_projet'] = $post['id_projet'];
@@ -4192,12 +4192,6 @@ class hotline extends classes_optima {
 					$post['pole_concerne'] = $post['pole'];
 					unset($post['pole']);
 				}
-
-				if($post['temps-estime']){
-					$post['estimation'] = $this->tempsestimeenjours($post['temps-estime']);
-					unset($post['temps-estime']);
-				}
-
 				$post['visible'] = $post['visible']=='on'?"oui":"non";
 
 				$post["filestoattach"]["fichier_joint"] = true; // Paramètre Optima pour préciser de prendre en compte les fichier joint lors de l'insertion
@@ -4481,7 +4475,7 @@ class hotline extends classes_optima {
 		return $to_return;
 	}
 
-	
+
 
 	/**
     * Retourne le nombre de ticket hotline non traitées associé au pole de l'utilisateur
@@ -4507,24 +4501,6 @@ class hotline extends classes_optima {
 		return $result['count'];
 
 	}
-
-	//fonction qui recupére l'heure et le transforme en jours 
-	public function tempsestimeenjours($temps){
-		$jour = 7; 
-		if($temps == $jour){
-			$day = 1;
-		}else{
-			$day = number_format($temps/$jour, 2, '.', '');
-		}
-		
-		$formatArray = explode(".", $day);
-
-		if($formatArray[1] == "00"){
-		  $day = $formatArray[0];
-		}
-		return $day;
-	}
-
 
 };
 ?>

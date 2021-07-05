@@ -5,7 +5,6 @@
 *}
 <---- Pour répondre par email, écrire au-dessus de cette ligne ---->
 
-{$temps_estime=ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}
 Titre Requête {$infos.ref} : {$infos.hotline}
 
 {$infos.interaction.detail}
@@ -17,7 +16,7 @@ Cette interaction met le ticket en attente de réponse du client
 {/if}
 
 
-Le temps estimé est de {util::hoursToString($temps_estime)}
+Le temps estimé est de {ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}
 
 
 Rappel de la requête {$infos.hotline} de {$infos.contact} de la societe {$infos.societe}

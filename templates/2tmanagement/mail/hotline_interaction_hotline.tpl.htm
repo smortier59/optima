@@ -5,7 +5,6 @@
 *}
 <---- Pour répondre par email, écrire au-dessus de cette ligne ---->
 
-{$temps_estime=ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}
 <p>
 Titre Requête {$infos.ref} : {$infos.hotline}
 </p>
@@ -19,7 +18,7 @@ Titre Requête {$infos.ref} : {$infos.hotline}
 {/if}
 
 <p>
-Le temps estimé est de <strong>{util::hoursToString($temps_estime)}</strong>
+Le temps estimé est de <strong>{ATF::hotline()->getEstimatedTime($infos.hotline_detail.id_hotline)}</strong>
 </p>
 
 
