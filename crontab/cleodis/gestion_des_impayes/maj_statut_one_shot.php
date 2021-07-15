@@ -25,6 +25,10 @@ try {
 
   // THIRD STEP : Sur base du fichier des impayées, on modifie les infos des factures
   statutImpayeFactureFromCsv($pathFactureImpayesOneShot, $logFile);
+
+  // FOURTH STEP : MAJ Factures
+  updateFacturePayeeRejeteSansDateRejetNiRegul($logFile);
+
 } catch (errorATF $e) {
   ATF::db()->rollback_transaction();
   throw $e;
@@ -212,6 +216,47 @@ function statutImpayeFactureFromCsv($fp, $logFile) {
   }
 
   log::logger('==================================Fin de modification de statut en impayée =================================', $logFile);
+}
+
+function updateFacturePayeeRejeteSansDateRejetNiRegul($logFile){
+  log::logger('==================================Début de maj date Facture Payee avec Rejet sans date rejet ni date regul =================================', $logFile);
+
+  $q = "SELECT * FROM facture f
+    	WHERE f.etat = 'payee'
+      AND rejet != 'non_rejet'
+      AND (date_rejet IS NULL OR date_regularisation IS NULL)";
+
+  $factures = ATF::db()->sql2array($q);
+
+  foreach ($factures as $key => $f) {
+    if ($f["date_rejet"] === NULL){
+      ATF::facture()->u(array(
+        'id_facture'=>$f['id_facture'],
+        'date_rejet'=>$f["date"]
+      ));
+    }
+
+    if($f["date_paiement"] && $f["date_regularisation"] === NULL) {
+      ATF::facture()->u(array(
+        'id_facture'=>$f['id_facture'],
+        'date_rejet'=>$f["date_paiement"]
+      ));
+    }
+
+    if($f['id_commande']){
+      log::logger('Appel au checkEtat sur commande '.$f['id_commande'], $logFile);
+      ATF::commande()->checkEtatContentieux($f['id_commande']);
+    }else{
+      echo "Facture ".$f['ref'] . " associé a aucune commande\n";
+    }
+
+    if($f['id_societe']){
+      log::logger("Appel du checkMauvaisPayeur sur société ".$f["id_societe"], $logFile);
+      ATF::societe()->checkMauvaisPayeur($f["id_societe"]);
+    }else{
+      echo "Facture ".$f['ref'] . " associé a aucun client\n";
+    }
+  }
 }
 
 
