@@ -239,7 +239,7 @@ function updateFacturePayeeRejeteSansDateRejetNiRegul($logFile){
     if($f["date_paiement"] && $f["date_regularisation"] === NULL) {
       ATF::facture()->u(array(
         'id_facture'=>$f['id_facture'],
-        'date_rejet'=>$f["date_paiement"]
+        'date_regularisation'=>$f["date_paiement"]
       ));
     }
 
