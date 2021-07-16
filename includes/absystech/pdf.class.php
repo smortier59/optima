@@ -185,11 +185,9 @@ class pdf_absystech extends pdf {
 			$infos_societe = ATF::societe()->select($infos_user['id_societe']);
 			$this->societe = $infos_absystech = ATF::societe()->select(1);
 
-
+			$infos_contact = NULL;
 			if ($infos_client['id_contact_facturation']) {
 				$infos_contact = ATF::contact()->select($infos_client['id_contact_facturation']);
-			}elseif ($infos_devis['id_contact']) {
-				$infos_contact = ATF::contact()->select($infos_devis['id_contact']);
 			}
 
 			$this->Open();
