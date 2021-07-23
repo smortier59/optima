@@ -46,5 +46,17 @@ class facture extends classes_optima {
 		}
 	}
 
+	/**
+	* Renvoi une facture via sa référence
+	* @author Quentin JANON <qjanon@absystech.fr>
+	* @param string $ref
+	*/
+	public function getByRef($ref){
+		ATF::facture()->q->reset()->where('ref', $ref);
+		return ATF::facture()->select_row();
+	}
+
+
+
 };
 ?>
