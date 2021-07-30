@@ -3563,7 +3563,7 @@ class pdf_cleodis extends pdf {
 	*/
 	public function multicellAnnexe() {
 		$this->setfont('arial','BU',8);
-		$this->multicell(0,5,"Voir détails dans l'annexe de description des équipements",0,'C');
+		$this->multicell(0,5,"Voir détail dans l'annexe de description des équipements",0,'C');
 		$this->setfont('arial','',8);
 	}
 
@@ -3644,7 +3644,7 @@ class pdf_cleodis extends pdf {
 
 		//CADRE REFERENCE
 		$cadre = array($this->bdc["ref"]);
-		$this->cadre(10,10,60,15,$cadre,"REFERENCES A RAPPELER");
+		$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
 		//CADRE COMMANDE LE
 		$cadre = array(
 			$this->user["prenom"]." ".$this->user["nom"]
@@ -8589,7 +8589,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setTopMargin(30);
 		$this->addpage();
 		if ($this->A3) $this->setLeftMargin(220);
-		$this->title("ANNEXES DE DESCRIPTION DES EQUIPEMENTS","Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+		$this->title("ANNEXE DE DESCRIPTION DES EQUIPEMENTS","Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 		foreach ($tableau as $k=>$i) {
 			$this->setFillColor(239,239,239);
 			if ($i['title']) {
