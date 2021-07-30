@@ -3794,9 +3794,10 @@ class pdf_cleodis extends pdf {
 			array(
 				$this->societe['societe']."\n"
 				.($this->societe['facturation_adresse']?$this->societe['facturation_adresse']:$this->societe['adresse'])."\n"
-				.($this->societe['facturation_adresse_2']?$this->societe['facturation_adresse_2']:$this->societe['adresse_2'])."\n"
-				.($this->societe['facturation_adresse_3']?$this->societe['facturation_adresse_3']:$this->societe['adresse_3'])."\n"
+				.($this->societe['facturation_adresse_2']?$this->societe['facturation_adresse_2']."\n":$this->societe['adresse_2'])
+				.($this->societe['facturation_adresse_3']?$this->societe['facturation_adresse_3']."\n":$this->societe['adresse_3'])
 				.($this->societe['facturation_cp']?$this->societe['facturation_cp']:$this->societe['cp'])." ".($this->societe['facturation_ville']?$this->societe['facturation_ville']:$this->societe['ville'])."\n"
+				."compta@cleodis.com"
 				,"",""
 			)
 		);
@@ -3809,7 +3810,7 @@ class pdf_cleodis extends pdf {
 		*/
 		$data2 = array(
 			array(
-				"Facture à établir en 2 exemplaires.\n Joindre 1 exemplaire de commande à la facture"
+				"Référence commande à rappeler sur la facture.\n Joindre 1 exemplaire de commande à la facture"
 				,$this->societe['societe']
 				,$this->fournisseur['societe']
 			)
@@ -3824,7 +3825,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"N° de commande & identification du client");
 		$this->multicell(0,5,"· La signature par notre client du procès verbal de livraison ne comportant aucune réserve");
 		$this->multicell(0,5,"· L'indication par vos soins des n° de série des matériels sur les factures");
-		$this->multicell(0,5,"· Description et détail des modèles, marque, type dispositifs, prix unitaire, matériels, logiciels et prestation objets.");
+		$this->multicell(0,5,"· Description et détail des modèles, marques, types dispositifs, prix unitaires, matériels, logiciels et prestations objets.");
 
 		if ($annexes) {
 			$this->annexes($annexes);
