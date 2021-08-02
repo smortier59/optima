@@ -223,7 +223,7 @@ class pdf_cleodis extends pdf {
 
 		$this->AddPage();
 		$societe = "45307981600055";
-		$this->templateMandat($id_affaire, $societe);
+		$this->templateMandat($id_affaire, $societe, false, true);
 		$this->ln(5);
 		$societe = "31497580600063";
 		$this->templateMandat($id_affaire, $societe);
@@ -274,7 +274,7 @@ class pdf_cleodis extends pdf {
 		}
 	}
 
-	public function templateMandat($id_affaire, $siretSociete, $last=false){
+	public function templateMandat($id_affaire, $siretSociete, $last=false, $displayRUM = false){
 		$id_affaire = ATF::affaire()->decryptId($id_affaire);
 		$this->affaire = ATF::affaire()->select($id_affaire);
 		$this->client = ATF::societe()->select($this->affaire["id_societe"]);
@@ -311,7 +311,12 @@ class pdf_cleodis extends pdf {
 		$this->setY($y);
 		$this->SetTextColor(0,0,0);
 		$this->setfont('arial','',9);
-		$this->MultiCell(81,5,"REFERENCE UNIQUE DE MANDAT\n".$this->affaire["RUM"],1,'C',0);
+		if ($displayRUM) {
+			$this->MultiCell(81,5,"REFERENCE UNIQUE DE MANDAT\n".$this->affaire["RUM"],1,'C',0);
+		} else {
+			$this->MultiCell(81,5,"REFERENCE UNIQUE DE MANDAT\n                              ",1,'C',0);
+		}
+
 		$this->setLeftMargin(10);
 
 		$this->setfont('arial','',7);
