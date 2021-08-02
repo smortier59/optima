@@ -190,6 +190,18 @@ class pdf_cleodis extends pdf {
 				if($this->site_web){
 					$this->unsetHeader();
 				}else{
+
+					if ($this->bdcPdf && $this->bdc["ref"]) {
+						//CADRE REFERENCE
+						$this->setfont('arial','',10);
+						$cadre = array(
+							array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10), 
+							array("txt"=>date("d/m/Y", strtotime($this->bdc['date'])), "align"=> "C", "size"=> 10)
+						);
+						$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
+
+					}
+
 					$this->image($this->logo,170,5,20);
 				}
 
@@ -3542,6 +3554,8 @@ class pdf_cleodis extends pdf {
 		$this->setHeader();
 		$this->setTopMargin(30);
 		$this->addpage();
+
+
 		$this->setfont('arial','B',18);
 		$this->multicell(0,5,"ANNEXES DE DESCRIPTION DES EQUIPEMENTS",0,'C');
 		$this->setfont('arial','B',10);
@@ -3577,6 +3591,7 @@ class pdf_cleodis extends pdf {
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$bdclignes = ATF::bon_de_commande_ligne()->sa();
 
+		$this->bdcPdf = true;
 
 		$this->lignes = $lignes = array();
 		foreach($bdclignes as $k=>$i) {
@@ -3643,7 +3658,10 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,$this->societe['cp']." ".$this->societe['ville']);*/
 
 		//CADRE REFERENCE
-		$cadre = array($this->bdc["ref"]);
+		$cadre = array(
+			array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10), 
+			array("txt"=>date("d/m/Y", strtotime($this->bdc['date'])), "align"=> "C", "size"=> 10)
+		);
 		$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
 		//CADRE COMMANDE LE
 		$cadre = array(
