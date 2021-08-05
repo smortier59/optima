@@ -1877,11 +1877,14 @@ class commande_cleodis extends commande {
 			$comm = ATF::commande()->select($infos['id_commande']);
 			$affaire = $commande->getAffaire();
 
-			$notifie = array(21);
-			if(ATF::$usr->getID() !=21){
-				$notifie[] = ATF::$usr->getID();
-			}
 
+			ATF::user()->q->reset()->where("login", "lhochart", "OR", "filles");
+			$filles = ATF::user()->sa();
+			$notifie = array();
+
+			foreach ($filles as $key => $value) {
+				$notifie[] = $value["id_user"];
+			}
 
 			$suivi = array(	"id_user"=>ATF::$usr->get('id_user')
 							,"id_societe"=>$comm['id_societe']
