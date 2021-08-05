@@ -173,8 +173,8 @@ class affaire_cleodis extends affaire {
 		$this->foreign_key['id_parent'] =  "affaire";
 		$this->foreign_key['id_filiale'] =  "societe";
 		$this->foreign_key['id_partenaire'] =  "societe";
-		$this->foreign_key['id_apporteur'] =  "societe";
 		$this->foreign_key['id_type_affaire'] = "type_affaire";
+		$this->foreign_key['id_commercial'] =  "user";
 
 		$this->addPrivilege("updateDate","update");
 		$this->addPrivilege("update_forecast","update");
@@ -269,6 +269,8 @@ class affaire_cleodis extends affaire {
 		$affaire["commentaire_facture"]=$infos["commentaire_facture"];
 		$affaire["commentaire_facture2"]=$infos["commentaire_facture2"];
 		$affaire["commentaire_facture3"]=$infos["commentaire_facture3"];
+
+		$affaire["id_commercial"] = ATF::societe()->select($infos["id_societe"], "id_owner");
 
 
 
@@ -1856,6 +1858,7 @@ class affaire_cleodis extends affaire {
 			'affaire.provenance',
 			'affaire.id_partenaire',
 			'affaire.id_apporteur',
+			'affaire.id_commercial',
 			'affaire.date',
 			"affaire.site_associe",
 			'affaire.ref',
@@ -3070,6 +3073,28 @@ class affaire_cleodis extends affaire {
 
 		if( $this->u($toUpdate) ){
 			return array('id'=> $post['value'], "name"=> ATF::societe()->select($post["value"], "societe"));
+		}
+	}
+
+	public function _setCommercial($get, $post) {
+
+		$input = file_get_contents('php://input');
+
+		if (!empty($input)) parse_str($input,$post);
+	  	if (!$post['name']) throw new Exception("NAME_MISSING",1200);
+		if (!isset($post['value'])) throw new Exception("VALUE_MISSING",1201);
+		if (!$post['pk']) throw new Exception("IDENTIFIANT_MISSING",1202);
+
+		switch ($post['name']) {
+			default:
+				$toUpdate = array($post['name']=>$post['value']);
+			break;
+		}
+
+		$toUpdate['id_affaire'] = $post['pk'];
+
+		if( $this->u($toUpdate) ){
+			return array('id'=> $post['value'], "name"=> ATF::user()->select($post["value"], "nom")." ".ATF::user()->select($post["value"], "prenom"));
 		}
 	}
 

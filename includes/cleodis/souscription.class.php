@@ -1242,6 +1242,20 @@ class souscription_cleodis extends souscription {
     return true;
   }
 
+  /**
+   * Exposition API de la fonction updateDate des commandes
+   * @author Quentin JANON <qjanon@absystech.fr>
+   */
+  public function _updateDate($get) {
+    try {
+      ATF::commande()->updateDate($get);
+    } catch (errorATF $e) {
+      log::logger($e->getCode()." - ".$e->getMessage(), "qjanon");
+      throw new errorATF("BAD REQUEST",500);
+    }
+    return true;
+  }
+
 }
 class souscription_bdomplus extends souscription_cleodis {
 
@@ -1949,7 +1963,6 @@ class souscription_bdomplus extends souscription_cleodis {
   }
 
 };
-class souscription_bdom extends souscription_cleodis { };
 class souscription_boulanger extends souscription_cleodis {
   public $id_user = 116;
   public $codename = "boulanger";

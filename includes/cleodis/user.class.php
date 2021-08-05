@@ -443,6 +443,26 @@ class user_cleodis extends user {
 
     }
 
+	/** Fonction qui génère les résultat pour les champs d'auto complétion société pour CLEOSCOPE
+  * @authorMorgan FLEURQUIN <mfleurquin@absystech.fr>
+  */
+  public function _ac($get,$post) {
+    $this->q->reset()->setLimit(10);
+
+
+    // On ajoute les champs utiles pour l'autocomplete
+    $this->q->addField("id_user")->addField("nom")->addField("prenom");
+
+    if ($get['q']) {
+      $this->q->setSearch($get["q"]);
+    }
+
+    // Clause globale
+    $this->q->where("etat","normal");
+    $this->q->addOrder("nom","ASC");
+    return $this->select_all();
+  }
+
 };
 
 class user_cleodisbe extends user_cleodis { };

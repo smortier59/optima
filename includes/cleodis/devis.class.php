@@ -66,6 +66,8 @@ class devis_cleodis extends devis {
 			,'perdu'=>array("custom"=>true,"nosort"=>true,"align"=>"center")
 			,'id_type_affaire'=>array("custom"=>true, "xtype"=> "combo")
 			,"langue"=>array("custom"=>true,"data"=>array("FR","NL"),"xtype"=>"combo")
+			,"id_commercial"=>array("custom"=>true)
+			,"id_apporteur"=>array("custom"=>true)
 
 		);
 
@@ -181,6 +183,9 @@ class devis_cleodis extends devis {
 		$this->foreign_key["AR_societe"] = "societe";
 		$this->foreign_key["vente_societe"] = "societe";
 		$this->foreign_key["id_type_affaire"]="type_affaire";
+
+		$this->foreign_key["id_commercial"] = "user";
+
 
 		$this->onglets = array('devis_ligne');
 		$this->sans_partage = true; /* Evite de se voir jeté à cause d'un droit de partage pour ce module */
@@ -355,8 +360,6 @@ class devis_cleodis extends devis {
 
 		$affaire=ATF::affaire()->formateInsertUpdate($infos);
 
-		log::logger($affaire , "mfleurquin");
-
 
 		ATF::db($this->db)->begin_transaction();
 
@@ -416,6 +419,10 @@ class devis_cleodis extends devis {
 			}
 		}
 		$affaire["RUM"] = $RUM;
+
+		$affaire["id_commercial"] = $infos["id_commercial"];
+		$affaire["id_apporteur"]= $infos["id_apporteur"];
+		unset($infos["id_commercial"], $infos["id_apporteur"]);
 
 		$infos["id_affaire"]=ATF::affaire()->i($affaire,$s);
 		$affaire=ATF::affaire()->select($infos["id_affaire"]);
@@ -720,6 +727,9 @@ class devis_cleodis extends devis {
 		$affaire["provenance"]  = $data_affaire["provenance"];
 		$affaire["pieces"]  = $data_affaire["pieces"];
 		$affaire["date_verification"]  = $data_affaire["date_verification"];
+
+		// $affaire["id_commercial"] = $data_affaire["id_commercial"];
+		// $affaire["id_apporteur"] = $data_affaire["id_apporteur"];
 
 		//$affaire["commentaire_facture"]  = $data_affaire["commentaire_facture"];
 
@@ -1051,6 +1061,12 @@ class devis_cleodis extends devis {
 					break;
 				case "id_type_affaire":
 					return $affaire["id_type_affaire"];
+
+				case "id_apporteur":
+					return $affaire["id_apporteur"];
+
+				case "id_commercial":
+					return $affaire["id_commercial"];
 			}
 		}else{
 			switch ($field) {
@@ -1099,6 +1115,8 @@ class devis_cleodis extends devis {
 					$type_affaire =ATF::type_affaire()->select_row();
 					return $type_affaire["id_type_affaire"];
 
+				case "id_commercial":
+					return ATF::societe()->select(ATF::_r('id_societe'), "id_owner");
 
 			}
 		}
