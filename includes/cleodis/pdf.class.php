@@ -3562,7 +3562,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->setfont('arial','B',18);
-		$this->multicell(0,5,"ANNEXES DE DESCRIPTION DES EQUIPEMENTS",0,'C');
+		$this->multicell(0,5,"ANNEXE DE DESCRIPTION DES EQUIPEMENTS",0,'C');
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
 		$this->ln(5);
@@ -3728,7 +3728,7 @@ class pdf_cleodis extends pdf {
 		$this->setFont('arial','IB',6);
 		$this->setleftmargin(10);
 		$this->setrightmargin(5);
-		$this->multicell(0,5,"Toute clause de réserve de propriété insérée par nos fournisseurs dans leur documents (conditions générales de ventes, factures, etc...) sera réputée non écrite");
+		$this->multicell(0,5,"Toute clause de réserve de propriété insérée par nos fournisseurs dans leurs documents (conditions générales de ventes, factures, etc...) sera réputée non écrite");
 
 		$this->ln(5);
 		$this->setfont('arial','BI',12);
