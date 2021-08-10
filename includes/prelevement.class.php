@@ -21,66 +21,131 @@ class prelevement extends classes_optima{
     }
 
     public function _parseXML() {
-	
-        $filepath = $this->filepath(ATF::$usr->getID(), "fichier_joint", true);
+      $canPayment = false;
+      $filepath = $this->filepath(ATF::$usr->getID(), "fichier_joint", true);
+      if(file_exists($filepath) && filesize($filepath) !=0){
 
-        if(file_exists($filepath) && filesize($filepath) !=0){
-						$arr = array();
+        $content = file_get_contents($filepath);
+        if(ATF::$codename == "absystech"){
+          $pattern = '/ASLI[0-9]{8}/';
+          preg_match($pattern, $content, $matches);
+          if(count($matches)>0){
+            throw new errorATF('Votre fichier est non conforme pour absystech', 500);
+          }
 
-						$xmlData = json_decode(json_encode(simplexml_load_file($filepath)),true);
-            
-            if (count($xmlData) !=0 ) {
-                $i=0;
-                foreach ($xmlData['CstmrDrctDbtInitn']['PmtInf']['DrctDbtTxInf'] as $elem) {
-                  ATF::facture()->q->reset()->where("facture.ref", $elem['PmtId']['InstrId']);
-			            $facture = ATF::facture()->select_row();
-
-                  $id_societe = $facture["facture.id_societe_fk"];
-
-                  if(!empty($id_societe)){
-                    ATF::societe()->q->reset()->where("id_societe",$id_societe);
-                    $societe = ATF::societe()->select_row();
-                  }
-                  
-
-                  $ref_client = $societe["ref"];
-                  $name_societe = $societe["societe"];
-
-                  $arr[$i]['montant'] = $elem['InstdAmt'];
-                  $arr[$i]['date_facture'] = $elem['DrctDbtTx']['MndtRltdInf']['DtOfSgntr'];
-                  $arr[$i]['rum'] = $elem['DrctDbtTx']['MndtRltdInf']['MndtId'];
-                  $arr[$i]['id_facture'] = $elem['PmtId']['InstrId'];
-
-
-                  if($elem['PmtId']['InstrId'] == $facture["facture.ref"]){
-                    $arr[$i]['name_client'] = $name_societe;
-                    $arr[$i]['ref_client'] = $ref_client;
-                  }else{
-                    $arr[$i]['name_client'] = $elem['Dbtr']['Nm'];
-                  }
-                 
-                 ++$i;
-                }
-								return $arr ;
-            }else{
-              throw new errorATF('Votre fichier est vide', 500);
-						}
-        }else{
-					throw new errorATF("Le fichier n'existe pas", 500);
+        }elseif(ATF::$codename == "att"){
+          $pattern = '/[^A]SLI[0-9]{8}/';
+          preg_match($pattern, $content, $matches);
+          if(count($matches)>0){
+            throw new errorATF('Votre fichier est non conforme pour absystech telecom', 500);
+          }
         }
 
+        $arr = array();
+        $xmlData = json_decode(json_encode(simplexml_load_file($filepath)),true);
+        
+        $PmtInf = $xmlData['CstmrDrctDbtInitn']['PmtInf'];
+        $DrctDbtTxInf = [];
+        if (count($PmtInf) > 0 ) {
+          $pmt = $PmtInf;
+          if (array_key_exists("PmtInfId", $PmtInf)) {
+            $pmt = array();
+            $pmt[0] = $PmtInf;
+          }
+          foreach ($pmt as $k=>$i) {
+            if ($i['DrctDbtTxInf'] && is_array($i['DrctDbtTxInf'])) {
+              foreach ($i['DrctDbtTxInf'] as $k_=>$DrctDbtTxInfElem) {
+                $DrctDbtTxInf[] = $DrctDbtTxInfElem;
+              }
+            }
+          }
+  
+          foreach ($DrctDbtTxInf as $DrctDbtTxInfElem) {					
+            $rum = $DrctDbtTxInfElem['DrctDbtTx']['MndtRltdInf']['MndtId'];
+            $montant = $DrctDbtTxInfElem['InstdAmt'];
+            $date_facture = $DrctDbtTxInfElem['DrctDbtTx']['MndtRltdInf']['DtOfSgntr'];
+            $id_facture = $DrctDbtTxInfElem['PmtId']['InstrId'];
+  
+            // On éclate la RUM pour chopper le SLI de la société
+            if (ATF::$codename == "att") {
+              $pattern = '/ASLI[0-9]{8}/';
+            } else {
+              $pattern = '/SLI[0-9]{8}/';
+              
+            }
 
-        // Traiter le fichier XML
+            preg_match($pattern, $rum, $sli);
+            $m = preg_split($pattern, $rum);
+            $ref_client = $sli[0];
+            $name_societe = $m[0];
+
+            if ($ref_client) {
+              ATF::societe()->q->reset()->where('societe.ref',$ref_client);
+              $societe = ATF::societe()->select_row();
+
+              if($societe){
+                ATF::facture()->q->reset()
+                              ->where('facture.id_societe', $societe['id_societe'])
+                              ->where("facture.etat", "impayee")
+                              ->where('facture.id_termes',24)
+                              ->where('facture.id_termes',25)
+                              ->where('facture.id_termes',38)
+                              ->where('facture.id_termes',31);
+                
+                $factures = ATF::facture()->select_all();
+
+              }
+            }else{
+              $canPayment = false;
+            }
+            $arr[] = array(
+              'montant'=>$montant,
+              'date_facture'=>$date_facture,
+              'rum'=>$rum,
+              'id_facture'=>$id_facture,
+              'name_client'=>$name_societe,
+              'ref_client'=>$ref_client,
+              'canPayment'=>$canPayment
+            );
+          
+          }
+          return $arr ;
+        }else{
+          log::logger("Fichier vide", "qjanon");
+          throw new errorATF('Votre fichier est vide', 500);
+        }
+      }else{
+        log::logger("Fichier inexistant", "qjanon");
+        throw new errorATF("Le fichier n'existe pas", 500);
+      }
+  
     }
 
     public function _payments($get,$post){
-     if($post){
-      return true;
-     }
-
-    }
-    
-	
+      try {
+        if (!$post['refs_factures']) throw new errorATF("Aucune références de factures", 500);
+  
+        foreach ($post['refs_factures'] as $k=>$ref) {
+          // On retrouve la facture
+          $facture = ATF::facture()->getByRef($ref);
+          if (!$facture) throw new errorATF("Facture non trouvée", 500);
+  
+          $paiement = array(
+            "id_facture" => $facture['id_facture'],
+            "montant" => $facture['montant'],
+            "date" => date("Y-m-d H:i:s"),
+            "mode_paiement" => "prelevement"
+          );
+  
+          // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
+          $id = ATF::facture_paiement()->insert($paiement);
+          
+        }
+      } catch (errorATF $e){
+        throw $e;
+      }
+      }
+  
 };
 
 
