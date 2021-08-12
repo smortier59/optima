@@ -21,10 +21,8 @@ class prelevement extends classes_optima{
     }
 
     public function _parseXML() {
-      $canPayment = false;
       $filepath = $this->filepath(ATF::$usr->getID(), "fichier_joint", true);
       if(file_exists($filepath) && filesize($filepath) !=0){
-
         $content = file_get_contents($filepath);
         if(ATF::$codename == "absystech"){
           $pattern = '/ASLI[0-9]{8}/';
@@ -54,9 +52,16 @@ class prelevement extends classes_optima{
           }
           foreach ($pmt as $k=>$i) {
             if ($i['DrctDbtTxInf'] && is_array($i['DrctDbtTxInf'])) {
-              foreach ($i['DrctDbtTxInf'] as $k_=>$DrctDbtTxInfElem) {
+              $Drct = $i['DrctDbtTxInf'];
+              if (array_key_exists("PmtId", $Drct)) {
+                $Drct = array();
+                $Drct[0] = $i['DrctDbtTxInf'];
+              }
+              foreach ($Drct as $k_=>$DrctDbtTxInfElem) {
+                $DrctDbtTxInfElem['ReqdColltnDt'] = $i['ReqdColltnDt'];
                 $DrctDbtTxInf[] = $DrctDbtTxInfElem;
               }
+
             }
           }
   
@@ -64,7 +69,6 @@ class prelevement extends classes_optima{
             $rum = $DrctDbtTxInfElem['DrctDbtTx']['MndtRltdInf']['MndtId'];
             $montant = $DrctDbtTxInfElem['InstdAmt'];
             $date_facture = $DrctDbtTxInfElem['DrctDbtTx']['MndtRltdInf']['DtOfSgntr'];
-            $id_facture = $DrctDbtTxInfElem['PmtId']['InstrId'];
   
             // On éclate la RUM pour chopper le SLI de la société
             if (ATF::$codename == "att") {
@@ -79,6 +83,8 @@ class prelevement extends classes_optima{
             $ref_client = $sli[0];
             $name_societe = $m[0];
 
+            $canPayment = false;
+            $refs_facture = "";
             if ($ref_client) {
               ATF::societe()->q->reset()->where('societe.ref',$ref_client);
               $societe = ATF::societe()->select_row();
@@ -90,26 +96,47 @@ class prelevement extends classes_optima{
                               ->where('facture.id_termes',24)
                               ->where('facture.id_termes',25)
                               ->where('facture.id_termes',38)
-                              ->where('facture.id_termes',31);
+                              ->where('facture.id_termes',31)
+                              ->where('facture.date_previsionnelle',$DrctDbtTxInfElem['ReqdColltnDt']);
                 
                 $factures = ATF::facture()->select_all();
 
+                if($factures){
+                  //si on a une seule facture et que le montant est egale au montant du fichier.
+                  if(count($factures) == 1 && $factures[0]['prix_ttc'] == $montant){
+                    $canPayment = true;
+                    $refs_facture = $factures[0]['facture.ref'];
+                    // Mettre la réf facture dans une variable $refs_facture
+
+                  // Si on a plusieurs factures avec le montant = montant du fichier et que la date de prélèvement de la facture = date de prélèvement du fichier alors on affiche
+                  }elseif(count($factures) > 1){
+                    $sommeMontantFacture = 0;
+                    
+                    foreach($factures as $item){
+                      $sommeMontantFacture += $item['prix_ttc'];
+                      // Mettre les réfs facture, séparés par virgule, dans une variable $refs_facture
+                      $refs_facture .= $item['facture.ref'];
+                      if ($item != end($factures)) $refs_facture .= ',';
+                    }
+                    if($sommeMontantFacture == $montant){
+                      $canPayment = true;
+                    }
+                  }
+                }
               }
-            }else{
-              $canPayment = false;
             }
+            // Ajouter la variable $refs_facture dans le retour
             $arr[] = array(
               'montant'=>$montant,
               'date_facture'=>$date_facture,
               'rum'=>$rum,
-              'id_facture'=>$id_facture,
               'name_client'=>$name_societe,
               'ref_client'=>$ref_client,
-              'canPayment'=>$canPayment
+              'canPayment'=>$canPayment,
+              "refs_facture"=>$refs_facture,
             );
-          
           }
-          return $arr ;
+          return $arr;
         }else{
           log::logger("Fichier vide", "qjanon");
           throw new errorATF('Votre fichier est vide', 500);
@@ -118,33 +145,38 @@ class prelevement extends classes_optima{
         log::logger("Fichier inexistant", "qjanon");
         throw new errorATF("Le fichier n'existe pas", 500);
       }
+      
   
     }
+    
 
     public function _payments($get,$post){
       try {
-        if (!$post['refs_factures']) throw new errorATF("Aucune références de factures", 500);
-  
-        foreach ($post['refs_factures'] as $k=>$ref) {
-          // On retrouve la facture
-          $facture = ATF::facture()->getByRef($ref);
-          if (!$facture) throw new errorATF("Facture non trouvée", 500);
-  
-          $paiement = array(
-            "id_facture" => $facture['id_facture'],
-            "montant" => $facture['montant'],
-            "date" => date("Y-m-d H:i:s"),
-            "mode_paiement" => "prelevement"
-          );
-  
-          // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
-          $id = ATF::facture_paiement()->insert($paiement);
-          
+        ATF::db()->begin_transaction();
+        if (!$post['refs_facture']) throw new errorATF("Aucune références de factures", 500);
+        foreach ($post['refs_facture'] as $ref) {
+          $refs = explode(',',$ref);
+          foreach ($refs as $r) {
+            $facture = ATF::facture()->getByRef($r);
+            if (!$facture) throw new errorATF("Facture non trouvée", 500);
+            if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
+            $paiement = array(
+              "id_facture" => $facture['facture.id_facture'],
+              "montant" => $facture['prix_ttc'],
+              "date" => date("Y-m-d H:i:s"),
+              "mode_paiement" => "prelevement",
+              "remarques"=> "Rapprochement comptable via import Telescope"
+            );
+            // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
+            $id = ATF::facture_paiement()->insert($paiement);
+          }
         }
       } catch (errorATF $e){
+        ATF::db()->rollback_transaction();
         throw $e;
       }
-      }
+      ATF::db()->commit_transaction();
+    }
   
 };
 
