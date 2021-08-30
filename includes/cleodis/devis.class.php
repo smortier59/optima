@@ -420,7 +420,12 @@ class devis_cleodis extends devis {
 		}
 		$affaire["RUM"] = $RUM;
 
-		$affaire["id_commercial"] = $infos["id_commercial"];
+		if ($infos['id_commercial']) {
+			$affaire["id_commercial"] = $infos["id_commercial"];
+
+		} else {
+			$affaire["id_commercial"] = ATF::societe()->select($infos['id_societe'], "id_owner");
+		}
 		$affaire["id_apporteur"]= $infos["id_apporteur"];
 		unset($infos["id_commercial"], $infos["id_apporteur"]);
 
