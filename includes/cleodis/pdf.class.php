@@ -3671,7 +3671,7 @@ class pdf_cleodis extends pdf {
 			,$this->user["email"]
 		);
 
-		$this->cadre(10,28,60,25,$cadre,"Commandé le : ".date("d M Y",strtotime($this->bdc['date'])));
+		$this->cadre(10,28,60,25,$cadre,"Commandé le : ".date("d/m/Y",strtotime($this->bdc['date'])));
 
 
 		//CADRE DELAIS SOUHAITES
