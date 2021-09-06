@@ -1719,7 +1719,6 @@ class pdf_cleodis extends pdf {
 		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
 
 		$details = $d1.$d2.$d3.$d4.$d5;
-
 		return $details;
 	}
 
@@ -3778,10 +3777,11 @@ class pdf_cleodis extends pdf {
 					if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
 					$designation .= "- ";
 				}
+
 				$designation .= $i['produit']?$i['produit']:$produit['produit'];
 				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
-                $designation .= $details;
-
+				$designation .= $details;
+			
 				$data[] = array(
 					$i['ref']
 					,$designation
@@ -10418,7 +10418,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 						,number_format($i['quantite']*$i['prix'],2,'.',' ')
 						,$designation
 					);
-
 
 
 					$styles[] = array();
