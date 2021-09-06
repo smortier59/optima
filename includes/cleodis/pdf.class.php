@@ -3781,7 +3781,7 @@ class pdf_cleodis extends pdf {
 				$designation .= $i['produit']?$i['produit']:$produit['produit'];
 				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
 				$designation .= $details;
-
+			
 				$data[] = array(
 					$i['ref']
 					,$designation
