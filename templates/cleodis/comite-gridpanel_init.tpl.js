@@ -2,10 +2,7 @@
 {$login = ATF::$usr->getLogin()}
 {util::push($fieldsKeys,"reseau")}
 
-{if (((ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "assets")
-	   && ($login == "jloison" || $login == "cloison" || $login == "pcaminel" || $login == "tdelattre" || $login == "smazars" || $login == "btronquit" || $login == "jvasut" || $login == "mmysoet"))
-  	|| (ATF::$codename == "bdomplus" && ($login == "btronquit" || $login == "jloison" )))
-}
+{if ATF::comite()->canValidComite($login) }
 
 	ATF.renderer.comiteDecision=function(table,field) {
 		return function(filetype, meta, record, rowIndex, colIndex, store) {

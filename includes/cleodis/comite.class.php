@@ -399,6 +399,21 @@ class comite extends classes_optima {
 	}
 
 	/**
+	 * Permet de retourner si un user peut valider un comité, utilisé dans le template comite-gridpanel-init
+	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	 * @param  string $login
+	 */
+	public function canValidComite($login) {
+		ATF::constante()->q->reset()->where("constante", "__USER_VALIDATEUR_COMITE__");
+		$user_validateur_comite = ATF::constante()->select_row();
+		$canValidComite = $user_validateur_comite["valeur"];
+
+		$canValidComite = explode(',', $canValidComite);
+		return in_array($login, $canValidComite);
+
+	}
+
+	/**
 	 * Permet d'interoger Credit Safe et de récupérer les infos de la société
 	 * @author : Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	 * @param  array $infos
