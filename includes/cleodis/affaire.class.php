@@ -3937,7 +3937,12 @@ class affaire_bdomplus extends affaire_cleodis {
 			$affaire_parente = $id_affaire;
 			ATF::commande()->q->reset()->where("commande.id_affaire", $affaire_parente);
 			$commande_parente = ATF::commande()->select_row();
-			ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"], "retour_contrat" => ATF::commande()->select($commande_parente["commande.id_commande"], "retour_contrat")));
+			ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"],
+									 "retour_contrat" => ATF::commande()->select($commande_parente["commande.id_commande"], "retour_contrat"),
+									 "retour_pv" => ATF::commande()->select($commande_parente["commande.id_commande"], "retour_contrat"),
+									 "retour_prel" => ATF::commande()->select($commande_parente["commande.id_commande"], "retour_contrat")
+									)
+							);
 
 
 			ATF::souscription()->demarrageContrat($new_affaire, $commande, true);

@@ -16,8 +16,12 @@ foreach ($affaires_initiales as $key => $value) {
 
     $retour_contrat = $commande["commande.retour_contrat"];
 
-
-
+    if (!$commande["commande.retour_prel"]) {
+        ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"], "retour_prel" => $retour_contrat));
+    }
+    if (!$commande["commande.retour_pv"]) {
+        ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"], "retour_pv" => $retour_contrat));
+    }
 
     $fille = ATF::affaire()->select($value["affaire.id_affaire"] , "id_fille");
 
@@ -35,7 +39,17 @@ function update_recursif ($affaire_fille, $retour_contrat) {
     if($commande["commande.retour_contrat"]) {
         $retour_contrat = $commande["commande.retour_contrat"];
     } else {
-        ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"], "retour_contrat" => $retour_contrat));
+        ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"],
+                                 "retour_contrat" => $retour_contrat
+                                ));
+    }
+
+
+    if (!$commande["commande.retour_prel"]) {
+        ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"], "retour_prel" => $retour_contrat));
+    }
+    if (!$commande["commande.retour_pv"]) {
+        ATF::commande()->u(array("id_commande"=> $commande["commande.id_commande"], "retour_pv" => $retour_contrat));
     }
 
     $fille = ATF::affaire()->select($affaire_fille, "id_fille");
