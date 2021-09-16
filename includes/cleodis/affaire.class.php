@@ -3408,6 +3408,8 @@ class affaire_bdomplus extends affaire_cleodis {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
 
+		$this->colonnes['fields_column'][] = 'affaire.renouveller';
+
 		$this->onglets = array(
 			'affaire_etat'
 			,"sell_and_sign"
@@ -3435,6 +3437,9 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		$this->colonnes['primary']['licence'] = array("custom"=>true);
 		$this->fieldstructure();
+
+		$this->addPrivilege("activeDesactiveRenouvellement");
+
 	}
 
 
@@ -3996,6 +4001,49 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		}
 
+	}
+
+	/**
+	* Permet de mettre a jour une date en ajax
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos
+	* @return bool
+	*/
+	public function activeDesactiveRenouvellement($infos){
+		log::logger($infos , "mfleurquin");
+
+		if(!isset($infos["renouveller"])) throw new errorATF("MISSING DATA renouveller", 500);
+		if(!isset($infos["id_affaire"])) throw new errorATF("MISSING DATA ID AFFAIRE", 500);
+
+
+		if(isset($infos['renouveller']) && $infos['id_affaire']){
+			//Mode transactionel
+			ATF::db($this->db)->begin_transaction();
+
+			try {
+				$affaire = new affaire_bdomplus($infos['id_affaire']);
+				$affaire->set("renouveller",$infos['renouveller']);
+				//On commit le tout
+				ATF::db($this->db)->commit_transaction();
+
+				if ($infos["renouveller"] == "oui") {
+					ATF::$msg->addNotice("Votre demande de reactivation du renouvellement est bien prise en compte");
+				} else {
+					ATF::$msg->addNotice("Votre demande de desactivation du renouvellement est bien prise en compte");
+				}
+
+				$this->redirection("select",$infos['id_affaire']);
+
+				return true;
+
+			} catch(errorATF $e) {
+				//On commit le tout
+				ATF::db($this->db)->rollback_transaction();
+				throw $e;
+			}
+		}else{
+			return false;
+		}
 	}
 
 
