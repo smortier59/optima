@@ -2725,7 +2725,7 @@ class facture_cleodis extends facture {
 
 				$refInFile .= '"'.$data[0].'",';
 				// $indexFound = array_search($data[1], array_column($allFactures, 'ref'));
-				ATF::facture()->q->reset()->addAllFields("facture")->where("facture.ref", $data[1])->setLimit(1)->setStrict();
+				ATF::facture()->q->reset()->addAllFields("facture")->where("facture.ref", $data[0])->setLimit(1)->setStrict();
 				$facture = [];
 				$facture = ATF::facture()->select_row();
 				log::logger("Recherche facture ".$data[0]." - Statut : ".$data[1]." - résultat ", $logFile);
