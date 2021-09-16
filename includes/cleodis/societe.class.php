@@ -238,6 +238,7 @@ class societe_cleodis extends societe {
     $this->addPrivilege("autocompleteAvecFiliale");
     $this->addPrivilege("autocompleteFournisseurFormationDevis");
     $this->addPrivilege("importProspect","insert");
+    $this->addPrivilege("autocompleteSociete");
 
     $this->autocomplete = array(
       "field"=>array("societe.societe","societe.nom_commercial","societe.code_client")
@@ -300,6 +301,8 @@ class societe_cleodis extends societe {
     }
     parent::export($infos,$s);
   }
+
+
 
 
   /** Permet d'exporter les sociétés ATOL ayant au moins 1 bon de commande
@@ -587,6 +590,7 @@ class societe_cleodis extends societe {
 
     return json_encode($ligne_affaires);
   }
+
 
 
 
