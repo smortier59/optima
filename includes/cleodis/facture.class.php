@@ -1214,9 +1214,9 @@ class facture_cleodis extends facture {
 
 				$choix = "defaut";
 
-				if($item['facture.type_facture'] == "libre"){
+				if($item['facture.type_facture'] == "libre" && in_array($item["facture.type_libre"], ["cout_copie", "transfert"])){
 					if($item["facture.type_libre"] == "cout_copie") $choix = "libre_cout_copie";
-					if($$item["facture.type_libre"] == "transfert") $choix = "libre_transfert";
+					if($item["facture.type_libre"] == "transfert") $choix = "libre_transfert";
 				}elseif($item['facture.type_facture']=='refi'){
 					if($refinancement == "FRANFINANCE") $choix = "refi_refinanceur_SGEF";
 					elseif($refinancement == "CLEOFI") $choix = "refi_refinanceur_CLEOFI";
@@ -1226,18 +1226,39 @@ class facture_cleodis extends facture {
 				}else{
 					if($affaire['nature']=="vente"){
 						$choix = "affaire_vente";
+						// avoir sur affaire de vente
+						if( $item["facture.prix"] < 0 ) {
+							$choix = "avoir_affaire_vente";
+						}
 					}else{
+						// avoir
+						if( $item["facture.prix"] < 0 ) {
+							if ($item["facture.date_periode_debut"] && $item["facture.date_periode_fin"]) {
+								// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
+								ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
+														  ->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
+														  ->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
+								$facture_avoir = ATF::facture()->select_row();
+								if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
+									$choix = "avoir_sur_prolongation";
+								} elseif ( in_array($infos_commande['etat'], ['mis_loyer', 'mis_loyer_contentieux']) ) {
+									// Avoir sur un contrat en cours
+									$choix = "avoir_affaire_en_cours";
+								}
+							}
+						}
 						//Prolongation
-						if($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && $infos_commande['date_evolution']
+						elseif($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && $infos_commande['date_evolution']
 															   && ($item['facture.date_periode_debut']>$infos_commande['date_evolution'])){
 							$choix = "prolongation";
 						}
 						// Pro rata
-						elseif( $item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])){
+						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
+							  || ($item["facture.nature"] === "prorata")){
 							$choix = "pro_rata";
-						}else{
-
-							if($item['facture.date_periode_debut']){
+						}
+						else{
+							if($item['facture.date_periode_debut']) {
 								//Si le contrat est en cours pendant la période de la facture, pas d'analytique
 								if(strtotime($infos_commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) && strtotime($infos_commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
 								   	$en_cours = true;
@@ -1257,6 +1278,7 @@ class facture_cleodis extends facture {
 					}
 				}
 
+				log::logger($choix , "mfleurquin");
 
 				$h = $item['facture.id_facture']."-".$societe['code_client'];
 
@@ -1266,8 +1288,6 @@ class facture_cleodis extends facture {
 				$ligne[3] = array("D"=> "706400" , "H"=> $h);
 				$ligne[4] = array("D"=> "445710" , "H"=> $h);
 				$libelle = $societe['code_client'];
-
-
 
 				switch ($choix) {
 					case 'libre_cout_copie':
@@ -1310,10 +1330,31 @@ class facture_cleodis extends facture {
 						$ligne[3]["D"] = "707110";
 					break;
 
+					case 'avoir_affaire_vente':
+						$ligne[2]["D"] =  "707110";
+						$ligne[3]["D"] =  "707110";
+						$ligne[4]["F"] ="D";
+					break;
+
+					case 'avoir_affaire_en_cours':
+						$ligne[2]["D"] = "706200";
+						$ligne[3]["D"] = "706200";
+						$ligne[4]["D"] = "445712";
+						$ligne[4]["F"] ="D";
+					break;
+
 					case 'prolongation':
 						$ligne[2]["D"] = "706230";
 						$ligne[3]["D"] = "706230";
 						$ligne[4]["D"] = "445713";
+					break;
+
+					case 'avoir_sur_prolongation':
+						$ligne[1]["D"] ="411000";
+						$ligne[2]["D"] ="706230";
+						$ligne[3]["D"] ="706230";
+						$ligne[4]["D"] ="445713";
+						$ligne[4]["F"] ="D";
 					break;
 
 					case 'pro_rata':
@@ -1432,7 +1473,7 @@ class facture_cleodis extends facture {
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
-						$row_data["F"] = 'C';
+						$row_data["F"] = $ligne[$i]["F"] ? $ligne[$i]["F"] : 'C';
 						$row_data["G"] = round(abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']),2);
 						$row_data["H"] = $ligne[$i]["H"];
 						$row_data["I"] = $reference;
