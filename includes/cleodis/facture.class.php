@@ -2694,7 +2694,7 @@ class facture_cleodis extends facture {
 			$f = fopen($path,"r");
 
 		    // Vérification des colonnes
-		    $entetes = fgetcsv($f, 0, ",");
+		    $entetes = fgetcsv($f, 0, ";");
 			$expectedEntetes = array( "ref_facture", "statut");
 		    if (count($entetes) != count($expectedEntetes)) {
 		    	throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 2");
@@ -2719,7 +2719,7 @@ class facture_cleodis extends facture {
 			$facturesNotFound = $facturesEtatDifferend = $impayeesBDDNotInCSV = [];
 			$refInFile = '';
 			$nbFactureCsv = 0;
-			while (($data = fgetcsv($f, 0, ",")) !== FALSE) {
+			while (($data = fgetcsv($f, 0, ";")) !== FALSE) {
 
 				$nbFactureCsv++;
 
