@@ -2782,7 +2782,7 @@ class facture_cleodis extends facture {
 	        // Premier onglet
 	        $sheet = $workbook->getActiveSheet();
 			$workbook->setActiveSheetIndex(0);
-		    $sheet->setTitle("Etat différents");
+		    $sheet->setTitle("Fact OPTIMA avec etat diff XLS");
 
 		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');
@@ -2790,7 +2790,7 @@ class facture_cleodis extends facture {
 	        // Deuxième onglet
         	$sheet = $workbook->createSheet(1);
 			$workbook->setActiveSheetIndex(1);
-		    $sheet->setTitle("Non trouvées");
+		    $sheet->setTitle("Fact XLS absentes d OPTIMA");
 
 		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesNotFound, NULL, 'A2');
@@ -2798,7 +2798,7 @@ class facture_cleodis extends facture {
 			// Troisieme onglet
         	$sheet = $workbook->createSheet(2);
 			$workbook->setActiveSheetIndex(2);
-		    $sheet->setTitle("Impaye non présent dans fichier");
+		    $sheet->setTitle("Fact XLS avec etat diff OPTIMA");
 
 		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($impayeesBDDNotInCSV, NULL, 'A2');
