@@ -110,21 +110,25 @@ class prelevement extends classes_optima{
     }
 
     public function _payments($get,$post){
+
       try {
         ATF::db()->begin_transaction();
         if (!$post['refs_facture']) throw new errorATF("Aucune références de factures", 500);
         foreach ($post['refs_facture'] as $ref) {
-          $refs = explode(',',$ref);
+
+          $refs = explode(',',$ref['value']);
+
           foreach ($refs as $r) {
             $facture = ATF::facture()->getByRef($r);
             if (!$facture) throw new errorATF("Facture non trouvée", 500);
             if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
+
             $paiement = array(
               "id_facture" => $facture['facture.id_facture'],
               "montant" => $facture['prix_ttc'],
               "date" => date("Y-m-d H:i:s"),
               "mode_paiement" => "prelevement",
-              "remarques"=> "Rapprochement comptable via import Telescope"
+              "remarques"=> "Rapprochement comptable via import Telescope - ".number_format($post['total'],2, ',', ' ')." €",
             );
             // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
             $id = ATF::facture_paiement()->insert($paiement);
