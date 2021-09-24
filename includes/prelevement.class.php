@@ -13,7 +13,7 @@ class prelevement extends classes_optima{
     public function _uploadAndParseXml($get, $post, $files){
         try {
            $filepath = $this->filepath(ATF::$usr->getID(), "fichier_joint", true);
-           unlink($filepath);
+          //  unlink($filepath);
             $r = ATF::file()->_POST($get, $post, $files);
         } catch (Exception $e) {
             throw $e;
@@ -47,7 +47,7 @@ class prelevement extends classes_optima{
         {
           while (($data = fgetcsv($open, 1000, ";")) !== FALSE) 
           {
-              $array[$row]['date'] = $data[0];
+              $array[$row]['date'] = $data[8];
               $array[$row]['refs_facture'] = $data[2];
               $array[$row]['rum'] = $data[29];
               $array[$row]['montant'] = $data[4];
@@ -102,6 +102,8 @@ class prelevement extends classes_optima{
               }
           }
         }
+        unlink($filepath);
+        $this->facturesFile = $array;
         return $array;
       }else{
         log::logger("Fichier inexistant", "qjanon");
@@ -113,20 +115,18 @@ class prelevement extends classes_optima{
 
       try {
         ATF::db()->begin_transaction();
-        if (!$post['refs_facture']) throw new errorATF("Aucune références de factures", 500);
-        foreach ($post['refs_facture'] as $ref) {
-
-          $refs = explode(',',$ref['value']);
-
+        if (!$post['factureSelected']) throw new errorATF("Aucune références de factures", 500);
+        foreach ($post['factureSelected'] as $key=>$item) {
+          $refs = explode(',',$item['refs_facture']);
           foreach ($refs as $r) {
             $facture = ATF::facture()->getByRef($r);
             if (!$facture) throw new errorATF("Facture non trouvée", 500);
             if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
-
+            $dt = DateTime::createFromFormat('d/m/Y', $item['date']);
             $paiement = array(
               "id_facture" => $facture['facture.id_facture'],
               "montant" => $facture['prix_ttc'],
-              "date" => date("Y-m-d H:i:s"),
+              "date" => $dt->format('Y-m-d H:i:s'),
               "mode_paiement" => "prelevement",
               "remarques"=> "Rapprochement comptable via import Telescope - ".number_format($post['total'],2, ',', ' ')." €",
             );
