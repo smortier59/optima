@@ -1612,13 +1612,19 @@ class facturation extends classes_optima {
 
 
 					if($facture["mode_paiement"] == "prelevement"){
-						$facture["etat"] = "payee";
-						$facture["date_paiement"] = $facture["date"];
+						if(ATF::$codename != "bdomplus"){
+							$facture["etat"] = "payee";
+							$facture["date_paiement"] = $facture["date"];
+						}else{
+							$facture["etat"] = "impayee";
+							$facture["date_paiement"] = NULL;
+						}
 					}else{
 						$facture["etat"] = "impayee";
 						$facture["date_paiement"] = NULL;
 					}
 
+					if(ATF::$codename == "bdomplus") $facture["date_paiement"] = NULL;
 
 					$id_facture=ATF::facture()->i($facture);
 
