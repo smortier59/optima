@@ -3378,9 +3378,11 @@ class facture_bdomplus extends facture_cleodis {
 
 			foreach ($data as $key => $value) {
 				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				
 				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
 
 				foreach ($value["id_facture"] as $kfacture => $vfacture) {
+					
 					ATF::slimpay_transaction()->i(array(
 													"id_facture"=> $vfacture,
 													"ref_slimpay" => $status["id"],
@@ -3389,6 +3391,22 @@ class facture_bdomplus extends facture_cleodis {
 												    "retour"=> json_encode($status)
 												   	)
 											 	);
+
+					$suivis = array("suivi"=> array(
+					"id_societe" => $this->select($vfacture , "id_societe"),
+					"type" => "note",
+					"date" => date("Y-m-d H:i:s"),
+					"texte" => "Prélèvement envoyé à Slimpay pour les factures ".$this->select($vfacture , "ref").";prélévement prévu le ".$infos['date']." libellé envoyé :".$infos['libelle'],
+					"type_suivi" => "Comptabilité",
+					"no_redirect" => true,
+					
+						)
+					);
+
+					ATF::suivi()->insert($suivis);
+
+					ATF::facture()->u(array('id_facture'=> $vfacture, "date_paiement"=>$infos["date"]));
+
 				}
 			}
 		}
