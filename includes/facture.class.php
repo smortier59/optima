@@ -46,5 +46,12 @@ class facture extends classes_optima {
 		}
 	}
 
+
+	public function getByRef($ref){
+		ATF::facture()->q->reset()->where('facture.ref', $ref);
+		return ATF::facture()->select_row();
+	}
+
+
 };
 ?>
