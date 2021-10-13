@@ -44,4 +44,5 @@ class module_cap extends module_cleodis { };
 class module_bdomplus extends module_cleodis { };
 class module_boulanger extends module_cleodis { };
 class module_assets extends module_cleodis { };
+class module_goa_abonnement extends module_cleodis { };
 ?>

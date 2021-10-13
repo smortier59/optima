@@ -53,7 +53,7 @@ class tache_cleodis extends tache {
 		$infos = array();
 
 		if ($post['schema']) {
-			if ($post['schema'] == "bdomplus") { 
+			if ($post['schema'] == "bdomplus") {
 				ATF::societe()->q->reset()->where("siret", "52933929300043");
 				$partenaire = ATF::societe()->select_row();
 			}
@@ -423,3 +423,5 @@ class tache_bdomplus extends tache_cleodis { };
 class tache_boulanger extends tache_cleodis { };
 
 class tache_assets extends tache_cleodis { };
+
+class tache_goa_abonnement extends tache_cleodis { };

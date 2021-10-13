@@ -175,3 +175,5 @@ class licence_bdomplus extends licence {
 class licence_boulanger extends licence { };
 
 class licence_assets extends licence { };
+
+class licence_goa_abonnement extends licence { };

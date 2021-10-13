@@ -3157,3 +3157,5 @@ class commande_bdomplus extends commande_cleodis { };
 class commande_boulanger extends commande_cleodis { };
 
 class commande_assets extends commande_cleodis { };
+
+class commande_goa_abonnement extends commande_cleodis { };

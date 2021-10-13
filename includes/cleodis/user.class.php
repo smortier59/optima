@@ -463,3 +463,5 @@ class user_bdomplus extends user_cleodis { };
 class user_boulanger extends user_cleodis { };
 
 class user_assets extends user_cleodis { };
+
+class user_goa_abonnement extends user_cleodis { };
