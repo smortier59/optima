@@ -26,3 +26,4 @@ class stats_bdomplus extends stats_cleodis { };
 class stats_boulanger extends stats_cleodis { };
 
 class stats_assets extends stats_cleodis { };
+class stats_goa_abonnement extends stats_cleodis { };

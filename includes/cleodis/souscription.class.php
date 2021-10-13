@@ -382,7 +382,7 @@ class souscription_cleodis extends souscription {
       case "boulanger-cafe":
         $r = "BOULANGER : Abonnement Café ".$suffix;
       break;
-      
+
       default:
         $r = strtoupper($site_associe)." : Location ".$suffix;
       break;
@@ -451,7 +451,7 @@ class souscription_cleodis extends souscription {
     if($post['site_associe'] == "axa"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Axa");
       $type_affaire = ATF::type_affaire()->select_row();
-    }    
+    }
     if($post['site_associe'] == "worldline"){
       ATF::type_affaire()->q->reset()->where("type_affaire", "Worldline");
       $type_affaire = ATF::type_affaire()->select_row();
@@ -2060,3 +2060,5 @@ class souscription_boulanger extends souscription_cleodis {
 };
 
 class souscription_assets extends souscription_cleodis { };
+
+class souscription_goa_abonnement extends souscription_cleodis { };

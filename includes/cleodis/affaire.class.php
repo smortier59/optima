@@ -4281,3 +4281,7 @@ class affaire_assets extends affaire_cleodis {
 	}
 
 };
+
+class affaire_goa_abonnement extends affaire_cleodis {
+
+};

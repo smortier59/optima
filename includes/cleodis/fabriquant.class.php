@@ -38,3 +38,5 @@ class fabriquant_bdomplus extends fabriquant_cleodis { };
 class fabriquant_boulanger extends fabriquant_cleodis { };
 
 class fabriquant_assets extends fabriquant_cleodis { };
+
+class fabriquant_goa_abonnement extends fabriquant_cleodis { };

@@ -223,3 +223,5 @@ class bon_de_commande_ligne_bdomplus extends bon_de_commande_ligne_cleodis { };
 class bon_de_commande_ligne_boulanger extends bon_de_commande_ligne_cleodis { };
 
 class bon_de_commande_ligne_assets extends bon_de_commande_ligne_cleodis { };
+
+class bon_de_commande_ligne_goa_abonnement extends bon_de_commande_ligne_cleodis { };

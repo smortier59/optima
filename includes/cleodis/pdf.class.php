@@ -15616,3 +15616,5 @@ class pdf_boulanger extends pdf_cleodis {
 
 };
 class pdf_assets extends pdf_cleodis { };
+
+class pdf_goa_abonnement extends pdf_cleodis { };
