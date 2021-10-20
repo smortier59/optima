@@ -1893,7 +1893,7 @@ class pdf_cleodis extends pdf {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor(149,193,31);
+		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -1979,7 +1979,7 @@ class pdf_cleodis extends pdf {
 		$this->setEnteteBGColor("white");
 		$this->cadre(320,35,70,35,$cadreLoueur,$loueur);
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor(149,193,31);
+		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -2234,7 +2234,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(15);
 		$this->setfont('arial','B',10);
@@ -2265,7 +2265,7 @@ class pdf_cleodis extends pdf {
 		}
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,73,220,73);
 
 		$this->setxy(15,75);
@@ -2507,7 +2507,7 @@ class pdf_cleodis extends pdf {
 
 		$this->setY(219);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(149,193,31);
+		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',10);
 		if(!$sellsign){
 		  $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
@@ -2622,7 +2622,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(15);
 		$this->setfont('arial','B',10);
@@ -2635,7 +2635,7 @@ class pdf_cleodis extends pdf {
 		$this->ln(5);
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,73,220,73);
 
 		$this->setxy(15,75);
@@ -2869,7 +2869,7 @@ class pdf_cleodis extends pdf {
 
 		$this->setY(219);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(149,193,31);
+		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',10);
 		if(!$sellsign){
 		  $this->multicell(0,5,"Fait en trois exemplaires",0,'C');
@@ -5481,7 +5481,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
 		$this->sety(62);
@@ -5519,7 +5519,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
@@ -5671,7 +5671,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,10,$titre,0,'C');
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,35,220,35);
 		$this->setLeftMargin(10);
 		$this->sety(37);
@@ -5762,7 +5762,7 @@ class pdf_cleodis extends pdf {
 
 
 		$this->SetLineWidth(0.35);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,60,220,60);
 		$this->setLeftMargin(10);
 		$this->sety(62);
@@ -5886,6 +5886,8 @@ class pdf_cleodis extends pdf {
 			,"align" => "J"
 			,"bgcolor" => $this->bgcolorTableau
 		);
+
+		log::logger($newStyleHead , "mfleurquin");
 
 		$this->headStyle[0] = $newStyleHead;
 		foreach ($head as $k=>$i) {
@@ -8976,9 +8978,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 		}
 
 		$this->setY(219);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(149,193,31);
+		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Fait en trois exemplaires",0,'C');
 		$this->SetDrawColor(0,0,0);
@@ -9314,9 +9316,9 @@ class pdf_cleodisbe extends pdf_cleodis {
 
 
 		$this->setY(219);
-		$this->SetDrawColor(149,193,31);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->line(0,$this->gety(),238,$this->gety());
-		$this->SetTextColor(149,193,31);
+		$this->SetTextColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Opgesteld in drie exemplaren, één voor elk van de partijen.",0,'C');
 		$this->SetDrawColor(0,0,0);
@@ -9555,7 +9557,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->cadre(25,195,70,80,$cadre,$locataire);
 		$this->setEnteteBGColor("white");
 		$this->cadre(115,195,70,80,$cadre,$loueur);
-		$this->setEnteteBGColor(149,193,31);
+		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setFillColor(255,255,0);
 		$this->setxy(25,270);
 		$this->cell(10,4,"",0,0,'C',false);
@@ -9598,7 +9600,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setfont('arial','',8);
 
 		$this->setleftmargin(220);
-		$this->setEnteteBGColor(149,193,31);
+		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
 		//A refactorisé quand l'AR et l'avenant seront fonctionnels
 		$this->setfont('arial','BU',10);
 		$this->multicell(0,10,"DESCRIPTION DES EQUIPEMENTS ET PRESTATIONS OBJET DU CONTRAT DE ".$locationmaj." ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
@@ -15617,4 +15619,19 @@ class pdf_boulanger extends pdf_cleodis {
 };
 class pdf_assets extends pdf_cleodis { };
 
-class pdf_goa_abonnement extends pdf_cleodis { };
+class pdf_goa_abonnement extends pdf_cleodis {
+	public $logo = __PDF_PATH__."/".'bdomplus/logo.jpg';
+	// public $logo = 'bdomplus/logo.jpg';
+	public $heightLimitTableContratPV = 70;
+	public $langue = "FR";
+
+	public $Rentete = 186;
+	public $Gentete = 152;
+	public $Bentete = 86;
+
+	public $id_societe = 1;
+
+	public $bgcolorTableau = "ba9856";
+	public $txtcolorTableau = "000000";
+
+ };

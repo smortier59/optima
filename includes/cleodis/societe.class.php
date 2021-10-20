@@ -2298,4 +2298,36 @@ class societe_assets extends societe_cleodis {
 
 };
 
-class societe_goa_abonnement extends societe_cleodis {}
+class societe_goa_abonnement extends societe_cleodis {
+
+  /**
+  * Construit la référence de l'entité (spécifique à chaque Optima)
+  * @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+  * @param array $s La session
+  * @return string $ref la référence de l'entité
+  */
+  public function create_ref(&$s){
+
+    $ref = "GO";
+
+    //Recherche du maximum
+    $max=$this->get_max_ref($ref);
+
+    if($max<10){
+      $ref.='00000'.$max;
+    }elseif($max<100){
+      $ref.='0000'.$max;
+    }elseif($max<1000){
+      $ref.='000'.$max;
+    }elseif($max<10000){
+      $ref.='00'.$max;
+    }elseif($max<100000){
+      $ref.='0'.$max;
+    }else{
+      throw new errorATF(ATF::$usr->trans('ref_too_high'),80853);
+    }
+    return $ref;
+
+  }
+
+};
