@@ -4358,7 +4358,6 @@ class pdf_cleodis extends pdf {
 
 				$data[0][0] = $commentaire;
 				$styles[0][0] = $this->styleDetailsProduit;
-
 				$this->tableauBigHead($head,$data,$w,5,$styles);
 			}
 
@@ -5853,7 +5852,7 @@ class pdf_cleodis extends pdf {
 	}
 
 	function grille_client_bon_de_commande($bdc,$s) {
-		log::logger("ICI" , "mfleurquin");
+
 
 
 		$this->tMargin = 30;
@@ -5886,8 +5885,6 @@ class pdf_cleodis extends pdf {
 			,"align" => "J"
 			,"bgcolor" => $this->bgcolorTableau
 		);
-
-		log::logger($newStyleHead , "mfleurquin");
 
 		$this->headStyle[0] = $newStyleHead;
 		foreach ($head as $k=>$i) {
@@ -11369,7 +11366,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 	* @date 13-01-2011
 	*/
 	public function devisClassique() {
-		log::logger('je suis dans devisClassique','dsarr');
 		if (!$this->devis) return false;
 
 		if($this->affaire["langue"] == 'FR') parent::devisClassique();
@@ -15620,7 +15616,7 @@ class pdf_boulanger extends pdf_cleodis {
 class pdf_assets extends pdf_cleodis { };
 
 class pdf_goa_abonnement extends pdf_cleodis {
-	public $logo = __PDF_PATH__."/".'bdomplus/logo.jpg';
+	public $logo = __PDF_PATH__."/".'goa_abonnement/byMyCar.jpg';
 	// public $logo = 'bdomplus/logo.jpg';
 	public $heightLimitTableContratPV = 70;
 	public $langue = "FR";
