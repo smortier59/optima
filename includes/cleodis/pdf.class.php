@@ -195,7 +195,7 @@ class pdf_cleodis extends pdf {
 						//CADRE REFERENCE
 						$this->setfont('arial','',10);
 						$cadre = array(
-							array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10), 
+							array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10),
 							array("txt"=>date("d/m/Y", strtotime($this->bdc['date'])), "align"=> "C", "size"=> 10)
 						);
 						$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
@@ -1703,14 +1703,7 @@ class pdf_cleodis extends pdf {
 		if ($d3 && $d3 !="") $d3 .="\n";
 
 
-		if ($commentaire) $d4 .= "\nCommentaire : ".$commentaire;
-		if ($produit['commentaire']){
-			if($commentaire !== $produit['commentaire']){
-				if (!$commentaire) $d4 .= "\nCommentaire : ";
-				else $d4 .= " - ";
-				$d4 .= $produit['commentaire'];
-			}
-		}
+		if ($commentaire) $d4 .= "\nCommentaires : ".$commentaire;
 
 		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
 
@@ -3664,7 +3657,7 @@ class pdf_cleodis extends pdf {
 
 		//CADRE REFERENCE
 		$cadre = array(
-			array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10), 
+			array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10),
 			array("txt"=>date("d/m/Y", strtotime($this->bdc['date'])), "align"=> "C", "size"=> 10)
 		);
 		$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
