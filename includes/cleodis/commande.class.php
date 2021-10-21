@@ -1820,7 +1820,7 @@ class commande_cleodis extends commande {
 
 		if($commandeMAJ){
 			$infos_mail["from"] = "NO REPLY <no-reply@cleodis.com>";
-		    $infos_mail["recipient"] = "jerome.loison@cleodis.com";
+		    $infos_mail["recipient"] = "jerome.loison@cleodis.com,benjamin.tronquit@cleodis.com";
 		    $infos_mail["html"] = true;
 		    $infos_mail["template"] = "mail_recap_update_statut_contrat";
 			$infos_mail["objet"] = "[".ATF::$codename."] - Recapitulatif des contrat ayant changé de statut";
