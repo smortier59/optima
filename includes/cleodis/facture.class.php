@@ -2694,7 +2694,7 @@ class facture_cleodis extends facture {
 			$f = fopen($path,"r");
 
 		    // Vérification des colonnes
-		    $entetes = fgetcsv($f, 0, ",");
+		    $entetes = fgetcsv($f, 0, ";");
 			$expectedEntetes = array( "ref_facture", "statut");
 		    if (count($entetes) != count($expectedEntetes)) {
 		    	throw new errorATF("Le nombre de colonne est incorrect ".count($entetes)." au lieu de 2");
@@ -2716,13 +2716,16 @@ class facture_cleodis extends facture {
 			$this->q->reset();
 			// $allFactures = $this->sa(); // a remplacer par un IN basé sur le fichier
 
-			$facturesNotFound = $facturesEtatDifferend = [];
+			$facturesNotFound = $facturesEtatDifferend = $impayeesBDDNotInCSV = [];
+			$refInFile = '';
 			$nbFactureCsv = 0;
-			while (($data = fgetcsv($f, 0, ",")) !== FALSE) {
+			while (($data = fgetcsv($f, 0, ";")) !== FALSE) {
 
 				$nbFactureCsv++;
+
+				$refInFile .= '"'.$data[0].'",';
 				// $indexFound = array_search($data[1], array_column($allFactures, 'ref'));
-				ATF::facture()->q->reset()->addAllFields("facture")->where("facture.ref", $data[1])->setLimit(1)->setStrict();
+				ATF::facture()->q->reset()->addAllFields("facture")->where("facture.ref", $data[0])->setLimit(1)->setStrict();
 				$facture = [];
 				$facture = ATF::facture()->select_row();
 				log::logger("Recherche facture ".$data[0]." - Statut : ".$data[1]." - résultat ", $logFile);
@@ -2742,15 +2745,26 @@ class facture_cleodis extends facture {
 					log::logger("Not found ", $logFile);
 				}
 			}
-
-
 	    	fclose($handle);
+
+
+			$this->q->reset()->addField("facture.ref", "ref")
+							 ->addField("facture.etat", "etat")
+							->andWhere("facture.ref", substr($refInFile, 0, -1) ,"subquery", "NOT IN",false, true)
+							 ->where("facture.etat", "impayee");
+			$resImpayeesBDDNotInCSV = $this->select_all();
+
+			foreach($resImpayeesBDDNotInCSV as $key => $value) {
+				$impayeesBDDNotInCSV[] = array($value["ref"], $value["etat"]);
+			}
+
 
 			$return['warnings'] = $warnings;
 			$return['rapport'] = "Rapport : <br><br>";
 			$return['rapport'] .= "Nombre de facture dans le CSV : ".$nbFactureCsv."<br>";
 			$return['rapport'] .= "Nombre de facture avec un état différent en BDD : ".count($facturesEtatDifferend)."<br>";
 			$return['rapport'] .= "Nombre de facture non trouvées en BDD : ".count($facturesNotFound)."<br>";
+			$return['rapport'] .= "Nombre de facture impayée en BDD non présente dans le fichier : ".count($impayeesBDDNotInCSV)."<br>";
 			$return['success'] = true;
 			ATF::db($this->db)->commit_transaction();
 
@@ -2761,14 +2775,14 @@ class facture_cleodis extends facture {
 
 			$workbook = new PHPExcel;
 
-			$sheets = array("Etat différents","Non trouvées");
+			$sheets = array("Etat différents","Non trouvées", "Impaye non présent dans fichier");
 
 			$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
 
 	        // Premier onglet
 	        $sheet = $workbook->getActiveSheet();
 			$workbook->setActiveSheetIndex(0);
-		    $sheet->setTitle("Etat différents");
+		    $sheet->setTitle("Fact OPTIMA avec etat diff XLS");
 
 		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesEtatDifferend, NULL, 'A2');
@@ -2776,10 +2790,18 @@ class facture_cleodis extends facture {
 	        // Deuxième onglet
         	$sheet = $workbook->createSheet(1);
 			$workbook->setActiveSheetIndex(1);
-		    $sheet->setTitle("Non trouvées");
+		    $sheet->setTitle("Fact XLS absentes d OPTIMA");
 
 		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
 			$sheet->fromArray($facturesNotFound, NULL, 'A2');
+
+			// Troisieme onglet
+        	$sheet = $workbook->createSheet(2);
+			$workbook->setActiveSheetIndex(2);
+		    $sheet->setTitle("Fact XLS avec etat diff OPTIMA");
+
+		    $sheet->fromArray(array("Référence facture","Etat"), NULL, 'A1');
+			$sheet->fromArray($impayeesBDDNotInCSV, NULL, 'A2');
 
 			foreach ($workbook->getWorksheetIterator() as $worksheet) {
 

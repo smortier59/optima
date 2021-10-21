@@ -190,6 +190,18 @@ class pdf_cleodis extends pdf {
 				if($this->site_web){
 					$this->unsetHeader();
 				}else{
+
+					if ($this->bdcPdf && $this->bdc["ref"]) {
+						//CADRE REFERENCE
+						$this->setfont('arial','',10);
+						$cadre = array(
+							array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10), 
+							array("txt"=>date("d/m/Y", strtotime($this->bdc['date'])), "align"=> "C", "size"=> 10)
+						);
+						$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
+
+					}
+
 					$this->image($this->logo,170,5,20);
 				}
 
@@ -3547,8 +3559,10 @@ class pdf_cleodis extends pdf {
 		$this->setHeader();
 		$this->setTopMargin(30);
 		$this->addpage();
+
+
 		$this->setfont('arial','B',18);
-		$this->multicell(0,5,"ANNEXES DE DESCRIPTION DES EQUIPEMENTS",0,'C');
+		$this->multicell(0,5,"ANNEXE DE DESCRIPTION DES EQUIPEMENTS",0,'C');
 		$this->setfont('arial','B',10);
 		$this->multicell(0,5,"Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL),0,'C');
 		$this->ln(5);
@@ -3568,7 +3582,7 @@ class pdf_cleodis extends pdf {
 	*/
 	public function multicellAnnexe() {
 		$this->setfont('arial','BU',8);
-		$this->multicell(0,5,"Voir détails dans l'annexe de description des équipements",0,'C');
+		$this->multicell(0,5,"Voir détail dans l'annexe de description des équipements",0,'C');
 		$this->setfont('arial','',8);
 	}
 
@@ -3582,6 +3596,7 @@ class pdf_cleodis extends pdf {
 		ATF::bon_de_commande_ligne()->q->reset()->where("id_bon_de_commande",ATF::bon_de_commande_ligne()->decryptID($id));
 		$bdclignes = ATF::bon_de_commande_ligne()->sa();
 
+		$this->bdcPdf = true;
 
 		$this->lignes = $lignes = array();
 		foreach($bdclignes as $k=>$i) {
@@ -3648,8 +3663,11 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,$this->societe['cp']." ".$this->societe['ville']);*/
 
 		//CADRE REFERENCE
-		$cadre = array($this->bdc["ref"]);
-		$this->cadre(10,10,60,15,$cadre,"REFERENCES A RAPPELER");
+		$cadre = array(
+			array("txt"=>$this->bdc["ref"], "align"=> "C", "size"=> 10), 
+			array("txt"=>date("d/m/Y", strtotime($this->bdc['date'])), "align"=> "C", "size"=> 10)
+		);
+		$this->cadre(10,10,60,15,$cadre,"REFERENCE A RAPPELER");
 		//CADRE COMMANDE LE
 		$cadre = array(
 			$this->user["prenom"]." ".$this->user["nom"]
@@ -3658,7 +3676,7 @@ class pdf_cleodis extends pdf {
 			,$this->user["email"]
 		);
 
-		$this->cadre(10,28,60,25,$cadre,"Commandé le : ".date("d M Y",strtotime($this->bdc['date'])));
+		$this->cadre(10,28,60,25,$cadre,"Commandé le : ".date("d/m/Y",strtotime($this->bdc['date'])));
 
 
 		//CADRE DELAIS SOUHAITES
@@ -3710,7 +3728,7 @@ class pdf_cleodis extends pdf {
 		$this->setFont('arial','IB',6);
 		$this->setleftmargin(10);
 		$this->setrightmargin(5);
-		$this->multicell(0,5,"Toute clause de réserve de propriété insérée par nos fournisseurs dans leur documents (conditions générales de ventes, factures, etc...) sera réputée non écrite");
+		$this->multicell(0,5,"Toute clause de réserve de propriété insérée par nos fournisseurs dans leurs documents (conditions générales de ventes, factures, etc...) sera réputée non écrite");
 
 		$this->ln(5);
 		$this->setfont('arial','BI',12);
@@ -3799,9 +3817,10 @@ class pdf_cleodis extends pdf {
 			array(
 				$this->societe['societe']."\n"
 				.($this->societe['facturation_adresse']?$this->societe['facturation_adresse']:$this->societe['adresse'])."\n"
-				.($this->societe['facturation_adresse_2']?$this->societe['facturation_adresse_2']:$this->societe['adresse_2'])."\n"
-				.($this->societe['facturation_adresse_3']?$this->societe['facturation_adresse_3']:$this->societe['adresse_3'])."\n"
+				.($this->societe['facturation_adresse_2']?$this->societe['facturation_adresse_2']."\n":$this->societe['adresse_2'])
+				.($this->societe['facturation_adresse_3']?$this->societe['facturation_adresse_3']."\n":$this->societe['adresse_3'])
 				.($this->societe['facturation_cp']?$this->societe['facturation_cp']:$this->societe['cp'])." ".($this->societe['facturation_ville']?$this->societe['facturation_ville']:$this->societe['ville'])."\n"
+				."compta@cleodis.com"
 				,"",""
 			)
 		);
@@ -3814,7 +3833,7 @@ class pdf_cleodis extends pdf {
 		*/
 		$data2 = array(
 			array(
-				"Facture à établir en 2 exemplaires.\n Joindre 1 exemplaire de commande à la facture"
+				"Référence commande à rappeler sur la facture.\n Joindre 1 exemplaire de commande à la facture"
 				,$this->societe['societe']
 				,$this->fournisseur['societe']
 			)
@@ -3829,7 +3848,7 @@ class pdf_cleodis extends pdf {
 		$this->multicell(0,5,"N° de commande & identification du client");
 		$this->multicell(0,5,"· La signature par notre client du procès verbal de livraison ne comportant aucune réserve");
 		$this->multicell(0,5,"· L'indication par vos soins des n° de série des matériels sur les factures");
-		$this->multicell(0,5,"· Description et détail des modèles, marque, type dispositifs, prix unitaire, matériels, logiciels et prestation objets.");
+		$this->multicell(0,5,"· Description et détail des modèles, marques, types dispositifs, prix unitaires, matériels, logiciels et prestations objets.");
 
 		if ($annexes) {
 			$this->annexes($annexes);
@@ -8594,7 +8613,7 @@ class pdf_cleodisbe extends pdf_cleodis {
 		$this->setTopMargin(30);
 		$this->addpage();
 		if ($this->A3) $this->setLeftMargin(220);
-		$this->title("ANNEXES DE DESCRIPTION DES EQUIPEMENTS","Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
+		$this->title("ANNEXE DE DESCRIPTION DES EQUIPEMENTS","Contrat N° ".$this->commande['ref'].($this->client["code_client"]?"-".$this->client["code_client"]:NULL));
 		foreach ($tableau as $k=>$i) {
 			$this->setFillColor(239,239,239);
 			if ($i['title']) {
