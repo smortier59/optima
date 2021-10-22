@@ -722,3 +722,6 @@ class produit_boulanger extends produit_cleodis {
  };
 
  class produit_assets extends produit_cleodis { };
+
+
+ class produit_go_abonnement extends produit_cleodis { };

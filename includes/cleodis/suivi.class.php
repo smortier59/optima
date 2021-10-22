@@ -88,7 +88,7 @@ class suivi_cleodis extends suivi {
 	public function _POST($get, $post){
 		$input = file_get_contents('php://input');
 		if (!empty($input)) parse_str($input,$post);
-		
+
 		if(!$post) throw new errorATF("DATA_MANQUANTE", 500);
 
 		$cols = $this->table_structure();
@@ -97,7 +97,7 @@ class suivi_cleodis extends suivi {
 		if($post["suivi_notifie"]) $suivi_notifie = $post["suivi_notifie"];
 
 		if ($post['schema']) {
-			if ($post['schema'] == "bdomplus") { 
+			if ($post['schema'] == "bdomplus") {
 				ATF::societe()->q->reset()->where("siret", "52933929300043");
 				$partenaire = ATF::societe()->select_row();
 			}
@@ -348,3 +348,5 @@ class suivi_bdomplus extends suivi_cleodis { };
 class suivi_boulanger extends suivi_cleodis { };
 
 class suivi_assets extends suivi_cleodis { };
+
+class suivi_go_abonnement extends suivi_cleodis { };
