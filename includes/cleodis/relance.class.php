@@ -147,4 +147,4 @@ class relance_boulanger extends relance_cleodis { };
 
 class relance_assets extends relance_cleodis { };
 
-class relance_goa_abonnement extends relance_cleodis { };
+class relance_go_abonnement extends relance_cleodis { };

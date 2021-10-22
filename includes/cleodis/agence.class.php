@@ -328,4 +328,4 @@ class agence_bdomplus extends agence_cleodis { };
 class agence_boulanger extends agence_cleodis { };
 class agence_assets extends agence_cleodis { };
 
-class agence_goa_abonnement extends agence_cleodis { };
+class agence_go_abonnement extends agence_cleodis { };

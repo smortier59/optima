@@ -80,4 +80,4 @@ class sous_categorie_boulanger extends sous_categorie_cleodis { };
 
 class sous_categorie_assets extends sous_categorie_cleodis { };
 
-class sous_categorie_goa_abonnement extends sous_categorie_cleodis { };
+class sous_categorie_go_abonnement extends sous_categorie_cleodis { };

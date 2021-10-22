@@ -247,4 +247,4 @@ class contact_boulanger extends contact_cleodis { };
 
 class contact_assets extends contact_cleodis { };
 
-class contact_goa_abonnement extends contact_cleodis { };
+class contact_go_abonnement extends contact_cleodis { };

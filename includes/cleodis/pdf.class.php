@@ -15615,8 +15615,8 @@ class pdf_boulanger extends pdf_cleodis {
 };
 class pdf_assets extends pdf_cleodis { };
 
-class pdf_goa_abonnement extends pdf_cleodis {
-	public $logo = __PDF_PATH__."/".'goa_abonnement/byMyCar.jpg';
+class pdf_go_abonnement extends pdf_cleodis {
+	public $logo = __PDF_PATH__."/".'go_abonnement/byMyCar.jpg';
 	// public $logo = 'bdomplus/logo.jpg';
 	public $heightLimitTableContratPV = 70;
 	public $langue = "FR";

@@ -65,4 +65,4 @@ class accueil_boulanger extends accueil_cleodis { };
 
 
 class accueil_assets extends accueil_cleodis { };
-class accueil_goa_abonnement extends accueil_cleodis { };
+class accueil_go_abonnement extends accueil_cleodis { };

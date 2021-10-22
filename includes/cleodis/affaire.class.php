@@ -4282,7 +4282,7 @@ class affaire_assets extends affaire_cleodis {
 
 };
 
-class affaire_goa_abonnement extends affaire_cleodis {
+class affaire_go_abonnement extends affaire_cleodis {
 
 	/**
 	* Retourne la ref d'une affaire autre qu'avenant

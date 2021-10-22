@@ -2061,4 +2061,4 @@ class souscription_boulanger extends souscription_cleodis {
 
 class souscription_assets extends souscription_cleodis { };
 
-class souscription_goa_abonnement extends souscription_cleodis { };
+class souscription_go_abonnement extends souscription_cleodis { };

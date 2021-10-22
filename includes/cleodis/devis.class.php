@@ -1796,4 +1796,4 @@ class devis_boulanger extends devis_cleodis { };
 
 class devis_assets extends devis_cleodis { };
 
-class devis_goa_abonnement extends devis_cleodis { };
+class devis_go_abonnement extends devis_cleodis { };

@@ -312,4 +312,4 @@ class conge_bdomplus extends conge_cleodis { };
 class conge_boulanger extends conge_cleodis { };
 
 class conge_assets extends conge_cleodis { };
-class conge_goa_abonnement extends conge_cleodis { };
+class conge_go_abonnement extends conge_cleodis { };

@@ -127,4 +127,4 @@ class devis_ligne_boulanger extends devis_ligne_cleodis { };
 
 
 class devis_ligne_assets extends devis_ligne_cleodis { };
-class devis_ligne_goa_abonnement extends devis_ligne_cleodis { };
+class devis_ligne_go_abonnement extends devis_ligne_cleodis { };

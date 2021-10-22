@@ -349,4 +349,4 @@ class suivi_boulanger extends suivi_cleodis { };
 
 class suivi_assets extends suivi_cleodis { };
 
-class suivi_goa_abonnement extends suivi_cleodis { };
+class suivi_go_abonnement extends suivi_cleodis { };

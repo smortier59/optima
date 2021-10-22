@@ -2298,7 +2298,7 @@ class societe_assets extends societe_cleodis {
 
 };
 
-class societe_goa_abonnement extends societe_cleodis {
+class societe_go_abonnement extends societe_cleodis {
 
   /**
   * Construit la référence de l'entité (spécifique à chaque Optima)

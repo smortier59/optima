@@ -424,4 +424,4 @@ class tache_boulanger extends tache_cleodis { };
 
 class tache_assets extends tache_cleodis { };
 
-class tache_goa_abonnement extends tache_cleodis { };
+class tache_go_abonnement extends tache_cleodis { };
