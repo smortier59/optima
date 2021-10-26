@@ -25,3 +25,5 @@ class reglement_bdomplus extends reglement_cleodis { };
 class reglement_boulanger extends reglement_cleodis { };
 
 class reglement_assets extends reglement_cleodis { };
+
+class reglement_go_abonnement extends reglement_cleodis { };

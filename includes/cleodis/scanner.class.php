@@ -36,3 +36,5 @@ class scanner_bdomplus extends scanner_cleodis { };
 class scanner_boulanger extends scanner_cleodis { };
 
 class scanner_assets extends scanner_cleodis { };
+
+class scanner_go_abonnement extends scanner_cleodis { };
