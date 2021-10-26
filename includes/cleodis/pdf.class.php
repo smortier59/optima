@@ -1703,7 +1703,18 @@ class pdf_cleodis extends pdf {
 		if ($d3 && $d3 !="") $d3 .="\n";
 
 
+
 		if ($commentaire) $d4 .= "\nCommentaires : ".$commentaire;
+		if ($produit['commentaire']){
+			if($commentaire !==  $produit['commentaire']){
+				if (!$commentaire) {
+					$d4 .= "\nCommentaire : ";
+				} else {
+					$d4 .= " - ";
+				}
+				$d4 .= $produit['commentaire'];
+			}
+		}
 
 		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
 
@@ -1891,7 +1902,15 @@ class pdf_cleodis extends pdf {
 		);
 
 		$this->cadre(25,195,70,80,$cadre,$locataire);
+
+		$Rentete = $this->Rentete;
+		$Gentete = $this->Gentete;
+		$Bentete = $this->Bentete;
 		$this->setEnteteBGColor("white");
+		$this->Rentete = $Rentete;
+		$this->Gentete = $Gentete;
+		$this->Bentete = $Bentete;
+
 		$this->cadre(115,195,70,80,$cadre,$loueur);
 		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setFillColor(255,255,0);
@@ -1974,9 +1993,15 @@ class pdf_cleodis extends pdf {
 			$cadreLoueur[] = array("txt"=>"NUMERO DE TVA ".$this->societe['siret'],"align"=>"C");
 		}
 
-
-
+		$Rentete = $this->Rentete;
+		$Gentete = $this->Gentete;
+		$Bentete = $this->Bentete;
 		$this->setEnteteBGColor("white");
+		$this->Rentete = $Rentete;
+		$this->Gentete = $Gentete;
+		$this->Bentete = $Bentete;
+
+
 		$this->cadre(320,35,70,35,$cadreLoueur,$loueur);
 		$this->setleftmargin(220);
 		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
@@ -2181,6 +2206,7 @@ class pdf_cleodis extends pdf {
 	* @param int $id Identifiant commande
 	*/
 	public function contratA4($id, $signature=false,$sellsign=false) {
+
 		$this->noPageNo = true;
 		$this->unsetHeader();
 		if(!$signature)	$this->Open();
@@ -2200,6 +2226,8 @@ class pdf_cleodis extends pdf {
 	}
 
   	public function contratA4Societe($id, $signature,$sellsign) {
+
+
 
   		$this->initLogo($this->affaire["id_type_affaire"]);
 		$this->image($this->logo,10,10,40);
@@ -2335,6 +2363,8 @@ class pdf_cleodis extends pdf {
 			  $details=$this->detailsProduit($i_['id_produit'],$k,$i_['commentaire'],$i_['caracteristique']);
 			  #$details .=$this->detailsProduit($i_['id_produit'],$k,$i_['caracteristique']);
 			  //Ligne 1 "type","processeur","puissance" OU Infos UC ,  j'avoue que je capte pas bien
+
+
 
 
 			  $etat = "( NEUF )";
@@ -3749,7 +3779,6 @@ class pdf_cleodis extends pdf {
 					$designation .= "- ";
 				}
 				$designation .= $i['produit']?$i['produit']:$produit['produit'];
-				if($produit && $produit["commentaire"]) $designation .= "\nCommentaire : ".$produit["commentaire"];
 				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
                 $designation .= $details;
 
@@ -9552,7 +9581,15 @@ class pdf_cleodisbe extends pdf_cleodis {
 		);
 
 		$this->cadre(25,195,70,80,$cadre,$locataire);
+
+		$Rentete = $this->Rentete;
+		$Gentete = $this->Gentete;
+		$Bentete = $this->Bentete;
 		$this->setEnteteBGColor("white");
+		$this->Rentete = $Rentete;
+		$this->Gentete = $Gentete;
+		$this->Bentete = $Bentete;
+
 		$this->cadre(115,195,70,80,$cadre,$loueur);
 		$this->setEnteteBGColor($this->Rentete, $this->Gentete, $this->Bentete);
 		$this->setFillColor(255,255,0);
