@@ -20,6 +20,7 @@ class facture_cleodis extends facture {
 			,'facture.date_periode_debut'
 			,'facture.date_periode_fin'
 			,'facture.prix'=>array("aggregate"=>array("min","avg","max","sum"),"renderer"=>"money")
+			,'facture.prix_sans_tva'=>array("aggregate"=>array("min","avg","max","sum"),"renderer"=>"money")
 			,'fichier_joint'=>array("custom"=>true,"nosort"=>true,"type"=>"file","width"=>50,"align"=>"center")
             ,'facture.rejet'=>array("renderer"=>"updateEnumFactureRejetCledodis","width"=>200)
             ,'relance'=>array("custom"=>true,"nosort"=>true,"renderer"=>"relanceFacture","width"=>70)
@@ -56,7 +57,9 @@ class facture_cleodis extends facture {
 		$this->colonnes['panel']['dates_facture'] = array(
 			"date_periode_debut"=>array("readonly"=>true),
 			"date_periode_fin"=>array("readonly"=>true),
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
+			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield"),
+			"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
+
 		);
 
 		$this->colonnes['panel']['dates_facture_libre'] = array(
@@ -223,16 +226,52 @@ class facture_cleodis extends facture {
 				break;
 			case "prix":
 				if ($facture) {
-					if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-						$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
-					}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-						$prix=$facture["prix"];
+
+					$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
+
+					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
+						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+							$prix=($periode["montant"]+$periode["frais_de_gestion"]);
+						}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+							$prix=$facture["prix"];
+						}
+					} else {
+						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+							$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
+						}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+							$prix=$facture["prix"];
+						}
 					}
 				}
 				if($prix){
 					return $prix;
 				}
+
 				break;
+				case "prix_sans_tva":
+					if ($facture) {
+
+						$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
+						if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
+							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+								$prix_sans_tva=$periode["assurance"];
+							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+								$prix_sans_tva=$facture["prix_sans_tva"];
+							}
+						} else {
+							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+								$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
+							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+								$prix_sans_tva=$facture["prix_sans_tva"];
+							}
+						}
+					}
+					if($prix_sans_tva){
+						return $prix_sans_tva;
+					}
+					return 0;
+
+					break;
 			case "prix_refi":
 				if ($facture["id_affaire"]) {
 					$refi=ATF::affaire()->refiValid($facture["id_affaire"]);
@@ -425,10 +464,20 @@ class facture_cleodis extends facture {
 			$total = $loyerAuJour * ($nbJProRata +1);
 
 
+			$prix_sans_tva = 0;
+
+			if ($affaire["id_type_affaire"] && ATF::type_affaire()->select($affaire["id_type_affaire"], "assurance_sans_tva") === "oui") {
+				$loyerAuJour = ($loyers[0]["loyer"] + $loyers[0]["frais_de_gestion"] )/$nbDInPeriode;
+				$prix = $loyerAuJour * ($nbJProRata +1);
+				$prix_sans_tva = ($loyers[0]["assurance"]/$nbDInPeriode) * ($nbJProRata +1) ;
+			} else {
+				$prix = $total;
+			}
+
 
 			$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
 
-			if($nbJProRata > 0 && $total != 0){
+			if($nbJProRata > 0 && $prix != 0){
 				$facture["facture"] = array(
 		            "id_societe" => $affaire["id_societe"],
 		            "type_facture" => "libre",
@@ -440,10 +489,11 @@ class facture_cleodis extends facture {
 		            "date_previsionnelle" => date("d-m-Y"),
 		            "date_periode_debut" => $infos["date_installation_reel"],
 		            "date_periode_fin" => $dateFinPeriode,
-		            "prix" => round($total, 2),
+		            "prix" => round($prix, 2),
+					"prix_sans_tva" => round($prix_sans_tva, 2),
 		            "date_periode_debut_libre" => $infos["date_installation_reel"],
 		            "date_periode_fin_libre" => $dateFinPeriode,
-		            "prix_libre" => round($total, 2),
+		            "prix_libre" => round($prix, 2),
 		            "nature" => "prorata"
 		        );
 
@@ -503,7 +553,17 @@ class facture_cleodis extends facture {
 
 		$dateTimeDebContrat = new DateTime(date("Y-m-d", strtotime($infos["date_debut_contrat"])));
 
-		$totalLoyer = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
+
+		$prix_sans_tva = 0;
+
+		if ($affaire["id_type_affaire"] && ATF::type_affaire()->select($affaire["id_type_affaire"], "assurance_sans_tva") === "oui") {
+			$prix = $loyers[0]["loyer"] + $loyers[0]["frais_de_gestion"];
+			$prix_sans_tva = $loyers[0]["assurance"];
+		} else {
+			$prix = $loyers[0]["loyer"] + $loyers[0]["assurance"] + $loyers[0]["frais_de_gestion"];
+		}
+
+
 
 		if($loyers[0]["frequence_loyer"] == "mois"){
 			$dateFinPeriode = date_add($dateTimeDebContrat, date_interval_create_from_date_string('1 months'));
@@ -518,7 +578,7 @@ class facture_cleodis extends facture {
 		$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
 		$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
 
-		if($totalLoyer != 0){
+		if($prix != 0){
 			$mode_paiement = "prelevement";
 			if($affaire["site_associe"] === 'toshiba') $mode_paiement = "cb";
 			if($affaire["site_associe"] === 'btwin') $mode_paiement = "pre-paiement";
@@ -536,8 +596,9 @@ class facture_cleodis extends facture {
 	            "date_periode_fin" => $dateFinPeriode,
 	            "date_periode_debut_libre" => date("Y-m-d", strtotime($infos["date_debut_contrat"])),
 				"date_periode_fin_libre" => $dateFinPeriode,
-	            "prix_libre" => round($totalLoyer, 2),
-	            "prix" => round($totalLoyer, 2),
+	            "prix_libre" => round($prix, 2),
+	            "prix" => round($prix, 2),
+				"prix_sans_tva"=> round($prix_sans_tva, 2),
 	            "nature" => "engagement"
 	        );
 			if($affaire["site_associe"] === 'btwin') $facture["facture"]["id_fournisseur_prepaiement"] = "29109"; //Decathlon BTWIN
@@ -606,7 +667,6 @@ class facture_cleodis extends facture {
 		$infos_ligne_non_visible = json_decode($infos["values_".$this->table]["produits_non_visible"],true);
 		$infos_ligne = json_decode($infos["values_".$this->table]["produits"],true);
 		unset($infos["values_".$this->table]["produits"]);
-
 
 		$envoyerEmail = $infos["panel_courriel-checkbox"];
 		$this->infoCollapse($infos);
@@ -819,8 +879,6 @@ class facture_cleodis extends facture {
 
 
 	public function updateDate($infos){
-		log::logger("INFOS -->", "updateDate");
-		log::logger($infos, "updateDate");
 
 		if ($infos['value'] == "undefined") $infos["value"] = "";
 		$infos["key"]=str_replace($this->table.".",NULL,$infos["key"]);
@@ -831,8 +889,6 @@ class facture_cleodis extends facture {
 		$facture = ATF::facture()->select($infos["id_facture"]);
 
 		if(($infos["key"] == "date_rejet") || ($infos["key"] == "date_regularisation")) {
-
-			log::logger("Dans IF date_rejet ou date_regul", "updateDate");
 
 			if($infos["key"] == "date_regularisation") {
 				$this->updateEnumRejet($infos);
@@ -858,9 +914,6 @@ class facture_cleodis extends facture {
 
 			$infosMaj["id_facture"] = $infos["id_facture"];
 
-			log::logger("INFOS MAJ :", "updateDate");
-			log::logger($infosMaj, "updateDate");
-
 			if($this->u($infosMaj)) {
 				ATF::$msg->addNotice(
 					loc::mt(ATF::$usr->trans("notice_update_success_date"),array("record"=>$this->nom($infosMaj["id_".$this->table]),"date"=>$infos["key"]))
@@ -877,8 +930,6 @@ class facture_cleodis extends facture {
 			log::logger("################################# FIN", "updateDate");
 			return true;
 		} else {
-			log::logger("Dans ELSE", "updateDate");
-
 			switch($infos["key"]) {
 				case "date_paiement" :
 					// SUPPRESSION DE LA DATE DE PAIEMENT
@@ -904,9 +955,6 @@ class facture_cleodis extends facture {
 				$infosMaj["etat"]="impayee";
 			}
 
-
-			log::logger("INFOS MAJ :", "updateDate");
-			log::logger($infosMaj, "updateDate");
 
 			if($this->u($infosMaj)) {
 				ATF::$msg->addNotice(
@@ -2428,11 +2476,6 @@ class facture_cleodis extends facture {
 
 		foreach ($entetes as $key => $value) $entetes_necessaire[$value] = true;
 
-		log::logger($entetes , "mfleurquin");
-
-
-
-
 		$nb_entete_manquant = 0;
 		foreach ($entetes_necessaire as $key => $value) {
 			if($value ==false){
@@ -2618,8 +2661,6 @@ class facture_cleodis extends facture {
 								}
 								$ligneNonVisible = $return;
 							}
-
-							log::logger($facture , "mfleurquin");
 
 							$this->insert(array("facture"=> $facture,
 												"values_facture" =>
@@ -2843,6 +2884,36 @@ class facture_cleodis extends facture {
 		fpassthru($fh);
 		// unlink($fname);
 	}
+
+	public function getAffaireMere($id_affaire){
+		if(ATF::affaire()->select($f["id_affaire"], "nature") == "avenant"){
+			ATF::affaire()->q->reset()->where("id_affaire", $id_affaire);
+			$aff = ATF::affaire()->select_row();
+			return $this->getAffaireMere($aff["id_affaire"]);
+		}else{
+			return $id_affaire;
+		}
+	}
+
+
+	/**
+	* Retourne le mandat SLIMPAY d'une affaire passée en parametre
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function getMandatSlimpay($id_affaire){
+		if($mandatSlimpay = ATF::affaire()->select($id_affaire , "RUM")){
+			return $mandatSlimpay;
+		}else{
+			if($id_parent = ATF::affaire()->select($id_affaire , "id_parent")){
+				return $this->getMandatSlimpay($id_parent);
+			}else{
+				throw new errorATF("Error Processing Request", 1);
+
+			}
+		}
+	}
+
 
 
 };
@@ -3258,34 +3329,6 @@ class facture_bdomplus extends facture_cleodis {
 	}
 
 	/**
-	* Retourne le mandat SLIMPAY d'une affaire passée en parametre
-	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
-	*
-	*/
-	public function getMandatSlimpay($id_affaire){
-		if($mandatSlimpay = ATF::affaire()->select($id_affaire , "RUM")){
-			return $mandatSlimpay;
-		}else{
-			if($id_parent = ATF::affaire()->select($id_affaire , "id_parent")){
-				return $this->getMandatSlimpay($id_parent);
-			}else{
-				throw new errorATF("Error Processing Request", 1);
-
-			}
-		}
-	}
-
-	public function getAffaireMere($id_affaire){
-		if(ATF::affaire()->select($f["id_affaire"], "nature") == "avenant"){
-			ATF::affaire()->q->reset()->where("id_affaire", $id_affaire);
-			$aff = ATF::affaire()->select_row();
-			return $this->getAffaireMere($aff["id_affaire"]);
-		}else{
-			return $id_affaire;
-		}
-	}
-
-	/**
 	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*
@@ -3352,10 +3395,6 @@ class facture_bdomplus extends facture_cleodis {
 					//On récupère la derniere transaction connue (en BDD) pour cette facture
 					$state = ATF::slimpay()->getStatutDebit($transaction[0]["ref_slimpay"]);
 
-					log::logger("Count ".(count($transaction)-1), "mfleurquin");
-					log::logger($state , "mfleurquin");
-					log::logger($transaction , "mfleurquin");
-
 					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
 					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
 						ATF::slimpay_transaction()->u(array("id_slimpay_transaction"=> $transaction[0]["id_slimpay_transaction"],
@@ -3384,9 +3423,6 @@ class facture_bdomplus extends facture_cleodis {
 
 						}
 					}
-
-
-
 
 					if($state["replayCount"] == 0) log::logger("Transaction Initiale" , "mfleurquin");
 					if($state["replayCount"] == 1) log::logger("Transaction rejouée 1 fois" , "mfleurquin");
@@ -3442,7 +3478,6 @@ class facture_boulanger extends facture_cleodis {
 			$suffix="000001";
 		}
 		return $prefix.$suffix;
-
 	}
 
 
@@ -3450,4 +3485,124 @@ class facture_boulanger extends facture_cleodis {
 
 class facture_assets extends facture_cleodis { };
 
-class facture_go_abonnement extends facture_cleodis { };
+class facture_go_abonnement extends facture_cleodis {
+
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+		$this->fieldstructure();
+
+		$this->onglets = array('facture_ligne','slimpay_transaction');
+
+		$this->addPrivilege("aPrelever");
+		$this->addPrivilege("massPrelevementSlimpay");
+	}
+
+
+	/**
+	* Renvoi toutes les factures equi ne sont pas payé et qui n'ont pas au moins 1 transaction SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function aPrelever($infos){
+		$q = "SELECT facture.*
+		 	  FROM facture
+			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
+			  AND etat = 'impayee'
+			  AND date_paiement IS NULL
+			  ORDER BY `facture`.`id_societe`, `facture`.`id_affaire`";
+
+		$return = ATF::db()->sql2array($q);
+
+		foreach ($return as $key => $value) {
+			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
+			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
+			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+
+
+			$id_type_affaire = ATF::affaire()->select($value["id_affaire"], "id_type_affaire");
+
+			$ttc = 0;
+			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva")) {
+				$ttc = number_format(($value["prix"] * $value["tva"]), 2 , ".", "") + number_format($value["prix_sans_tva"] , 2 , ".", "");
+				$ttc = number_format($ttc, 2, '.', '');
+			} else {
+				$ttc = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
+			}
+
+			$return[$key]["prix_ttc"] = $ttc;
+		}
+
+		$libelle = "Abonnement GO Abonnement ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+
+		$result = array(
+						"libelle"=> $libelle,
+						"date_prelevement"=> date("Y-m-01", strtotime("+1 month")),
+						"lignes" => $return
+					   );
+
+		return $result;
+	}
+
+
+	/**
+	* Regrouper les factures du meme mandat SLIMPAY et envoyer le prélèvement SLIMPAY
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	*
+	*/
+	public function massPrelevementSlimpay($infos){
+		$data = array();
+
+		if($infos["factures"]){
+			foreach ($infos["factures"] as $key => $value) {
+				$f = ATF::facture()->select($key);
+				$mandat_slimpay = $this->getMandatSlimpay($f["id_affaire"]);
+
+				$data[$mandat_slimpay]["libelle"] .= $f["ref"]." ";
+
+				// Callcul du prix TTC pour la facture selon le type d'affaire
+				$id_type_affaire = ATF::affaire()->select($f["id_affaire"], "id_type_affaire");
+				$ttc = 0;
+				if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva")) {
+					$ttc = number_format(($f["prix"] * __TVA__), 2 , ".", "") + number_format($f["prix_sans_tva"] , 2 , ".", "");
+					$ttc = number_format($ttc, 2, '.', '');
+				} else {
+					$ttc = number_format(($f["prix"] * __TVA__), 2 , ".", "");
+				}
+
+
+				if($data[$mandat_slimpay]["paymentReference"]){
+					$data[$mandat_slimpay]["prix"] = number_format($data[$mandat_slimpay]["prix"] + $ttc ,2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+
+					$id_affaire = $this->getAffaireMere($f["id_affaire"]);
+					$d = str_replace(ATF::affaire()->select($id_affaire, "ref"), "", $f["ref"]);
+
+					$data[$mandat_slimpay]["paymentReference"] .= "/".$d;
+				}else{
+					$data[$mandat_slimpay]["prix"] = number_format($ttc ,2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+					$data[$mandat_slimpay]["paymentReference"] = $f["ref"];
+				}
+			}
+
+			foreach ($data as $key => $value) {
+				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+
+				foreach ($value["id_facture"] as $kfacture => $vfacture) {
+					ATF::slimpay_transaction()->i(array(
+													"id_facture"=> $vfacture,
+													"ref_slimpay" => $status["id"],
+												    "executionStatus"=>$status["executionStatus"],
+												    "date_execution"=>$status["executionDate"],
+												    "retour"=> json_encode($status)
+												   	)
+											 	);
+				}
+			}
+		}
+		return true;
+	}
+
+};
