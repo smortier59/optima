@@ -2603,6 +2603,13 @@ class affaire_cleodis extends affaire {
 				"loyer__dot__avec_option"=>"non"
 			);
 
+			ATF::societe()->q->reset()
+				->select("id_societe")
+				->addOrder('ref',"ASC")
+				->setDimension("row")
+				->setLimit(1);
+			$id_societe_codename = ATF::societe()->select_row();
+
 
 			$produits[0] = array(
 			  "devis_ligne__dot__produit"=> $post['libelle'],
@@ -2617,7 +2624,7 @@ class affaire_cleodis extends affaire {
 			  "devis_ligne__dot__commentaire"=>"",
 			  "devis_ligne__dot__neuf"=>"oui",
 			  "devis_ligne__dot__id_produit_fk"=>"",
-			  "devis_ligne__dot__id_fournisseur_fk"=>246
+			  "devis_ligne__dot__id_fournisseur_fk"=>$id_societe_codename["id_societe"]
 			);
 			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
@@ -4301,7 +4308,6 @@ class affaire_go_abonnement extends affaire_cleodis {
 				->addOrder('ref',"DESC")
 				->setDimension("row")
 				->setLimit(1);
-
 		$nb=$this->sa();
 
 		if($nb["max_ref"]){
