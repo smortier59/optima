@@ -77,8 +77,23 @@ class prelevement extends classes_optima{
         foreach ($array as $key=>$value) {
           $refs_facture = "";
 
+           //verifier si la ref n'existe pas dans le RUM au niveau du fichier si oui, on recupére le ref_client de la societe via la ref_factures
+          if(!$value['ref_client']){
+
+            ATF::facture()->q->reset()->where('facture.ref',$value['refs_facture']);
+            $factures = ATF::facture()->select_all();
+            foreach($factures as $facture){
+              ATF::societe()->q->reset()->where('societe.id_societe',$facture['facture.id_societe_fk']);
+              $societes = ATF::societe()->select_all();
+              foreach($societes as $item){
+                $array[$key]['ref_client'] = $item['ref'];
+              }
+            }
+
+          }
+
           // verifier si les factures si les sociétés existent en base
-          if ($value['ref_client']) {
+          if ($array[$key]['ref_client']) {
               ATF::societe()->q->reset()->where('societe.ref',$ref_client);
               $societe = ATF::societe()->select_row();
               if($societe){
@@ -88,7 +103,7 @@ class prelevement extends classes_optima{
                   if(count($factures) == 1 ){
                         foreach($factures as $item){
                           $refs_facture = $item['facture.ref'];
-                            if($item['facture.prix_ttc'] == $value['montant_ttc'] && $item['facture.etat'] == "impayee"){
+                            if($item['facture.prix'] == $value['montant'] && $item['facture.etat'] == "impayee"){
                                   $array[$key]['canPayment'] = true;
                                   // Mettre les réfs facture, séparés par virgule, dans une variable $refs_facture
                                   if ($item != end($factures)) $refs_facture .= ',';
