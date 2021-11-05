@@ -3582,17 +3582,19 @@ class affaire_bdomplus extends affaire_cleodis {
 	}
 
 
-	/*
+	/**
 	* Pour toutes les affaires dont la date de debut = M+11 et qu'il n'y a pas de condition de prolongation
 	* On envoi un mail au client pour l'avertir du renouvellement et on crée un suivi
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function process_envoi_mail_information_renouvellement(){
-		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
-								   ->where("etat", "arreter_contentieux","AND", false, "!=")
-								   ->where("etat", "vente", "AND", false, "!=")
-								   ->where("etat", "non_loyer", "AND", false, "!=")
-								   ->where("etat", "AR", "AND", false, "!=");
+		ATF::commande()->q->reset()->from("commande","id_affaire","affaire","id_affaire")
+								   ->where("commande.etat", "arreter", "AND", false, "!=")
+								   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+								   ->where("commande.etat", "vente", "AND", false, "!=")
+								   ->where("commande.etat", "non_loyer", "AND", false, "!=")
+								   ->where("commande.etat", "AR", "AND", false, "!=")
+								   ->where("affaire.renouveller", "oui", "AND");
 
 		$contrats_en_cours = ATF::commande()->sa();
 
@@ -3608,7 +3610,6 @@ class affaire_bdomplus extends affaire_cleodis {
 			}
 
 			if($a_renouveller){
-
 				//log::logger($value , "mfleurquin");
 				$affaire = ATF::affaire()->select($value["id_affaire"]);
 
@@ -3669,11 +3670,14 @@ class affaire_bdomplus extends affaire_cleodis {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function process_envoi_mail_non_renouvellement_client_contentieux(){
-		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
-								   ->where("etat", "arreter_contentieux","AND", false, "!=")
-								   ->where("etat", "vente", "AND", false, "!=")
-								   ->where("etat", "non_loyer", "AND", false, "!=")
-								   ->where("etat", "AR", "AND", false, "!=");
+
+		ATF::commande()->q->reset()->from("commande","id_affaire","affaire","id_affaire")
+								   ->where("commande.etat", "arreter", "AND", false, "!=")
+								   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+								   ->where("commande.etat", "vente", "AND", false, "!=")
+								   ->where("commande.etat", "non_loyer", "AND", false, "!=")
+								   ->where("commande.etat", "AR", "AND", false, "!=")
+								   ->where("affaire.renouveller", "oui", "AND");
 								   //->where("etat", "%contentieux", "AND", false, "LIKE");
 
 		$contrats_en_cours = ATF::commande()->sa();
@@ -3836,7 +3840,18 @@ class affaire_bdomplus extends affaire_cleodis {
 					      $suivi["texte"] =  "Probleme lors de l'envoi du ".$suivi["texte"];
 					    }
 					    ATF::suivi()->i($suivi);
-					}else{
+					} else if(ATF::affaire()->select($value["id_affaire"], "renouveller") === "non") {
+						log::logger("Non renouvellée car affaire ref: ".ATF::affaire()->select($value["id_affaire"], "ref")." à ne pas renouveller, on stop juste l'affaire" , "renouvellement_ok");
+						$suivi = array(
+							"id_contact" => $contact["id_contact"],
+							"id_societe" => $value["id_societe"],
+							"id_affaire" => $affaire["id_affaire"],
+							"type"=> "note",
+							"type_suivi"=> "Contrat",
+							"texte" => "Non renouvellement de l'affaire, car il a été demandé de ne pas renouveller cette affaire"
+						  );
+						  ATF::suivi()->i($suivi);
+					} else{
 						log::logger("BON PAYEUR" , "renouvellement_ok");
 						log::logger($value["id_affaire"] , "renouvellement_ok");
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
@@ -4010,8 +4025,6 @@ class affaire_bdomplus extends affaire_cleodis {
 	* @return bool
 	*/
 	public function activeDesactiveRenouvellement($infos){
-		log::logger($infos , "mfleurquin");
-
 		if(!isset($infos["renouveller"])) throw new errorATF("MISSING DATA renouveller", 500);
 		if(!isset($infos["id_affaire"])) throw new errorATF("MISSING DATA ID AFFAIRE", 500);
 
