@@ -47,7 +47,8 @@ class prelevement extends classes_optima{
         {
           while (($data = fgetcsv($open, 1000, ";")) !== FALSE) 
           {
-              $array[$row]['date'] = $data[8];
+              $dateInput = explode('/',$data[8]);
+              $array[$row]['date'] = $dateInput[2].'-'.$dateInput[1].'-'.$dateInput[0];
               $array[$row]['refs_facture'] = $data[2];
               $array[$row]['rum'] = $data[29];
               $array[$row]['montant'] = $data[4];
