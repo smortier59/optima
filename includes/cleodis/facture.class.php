@@ -1135,19 +1135,22 @@ class facture_cleodis extends facture {
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
 		$workbook = new PHPExcel;
 
-		//premier onglet
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle('Autoporté');
-		$sheets=array("auto"=>$worksheet_auto);
+		$workbook->setActiveSheetIndex(0);
+		$sheet = $workbook->getActiveSheet();
+		$sheet->setTitle('Autoporté');
 
 		//mise en place des titres
-		$this->ajoutTitre($sheets);
+		$this->ajoutTitre($sheet);
+
+
 
 		//ajout des donnÃ©es
 		if($infos){
-			 $this->ajoutDonnees($sheets,$infos);
+			 $this->ajoutDonnees($sheet,$infos);
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
@@ -1169,7 +1172,7 @@ class facture_cleodis extends facture {
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
      * @param array $sheets : contient les 5 onglets
      */
-     public function ajoutTitre(&$sheets){
+     public function ajoutTitre(&$sheet){
         $row_data = array(
         	"A"=>'Type'
         	,"B"=>'Date'
@@ -1187,12 +1190,11 @@ class facture_cleodis extends facture {
 			,"N"=>'Refinancement'
 		);
 
-         foreach($sheets as $nom=>$onglet){
-             foreach($row_data as $col=>$titre){
-				  $sheets[$nom]->write($col.'1',$titre);
-				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
-             }
-         }
+		 $i=0;
+		 foreach($row_data as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre);
+			$i++;
+        }
      }
 
  	/**
@@ -1229,7 +1231,7 @@ class facture_cleodis extends facture {
      * @param array $sheets : contient les 5 onglets
      * @param array $infos : contient tous les enregistrements
      */
-     public function ajoutDonnees(&$sheets,$infos){
+     public function ajoutDonnees(&$sheet,$infos){
 
 		$row_auto=1;
 		$increment=0;
@@ -1246,7 +1248,7 @@ class facture_cleodis extends facture {
 					$refinanceur=NULL;
 				}
 
-	 			$date=date("dmY",strtotime($item['facture.date']));
+	 			$date=date("Y-m-d",strtotime($item['facture.date']));
 				$affaire=ATF::affaire()->select($item['facture.id_affaire_fk']);
 
 				if($increment>999){
@@ -1264,9 +1266,9 @@ class facture_cleodis extends facture {
 				$dateFin = ($item['facture.date_periode_fin']) ? " ".date("d/m/y",strtotime($item['facture.date_periode_fin'])) : " ";
 
 				if($affaire["date_previsionnelle"] < 0){
-					$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." ".$affaire['date_previsionnelle']." DAY"));
+					$datePrelevement = date("Y-m-d",strtotime($item['facture.date_periode_debut']." ".$affaire['date_previsionnelle']." DAY"));
 				}else{
-					$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
+					$datePrelevement = date("Y-m-d",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
 				}
 
 
@@ -1346,8 +1348,6 @@ class facture_cleodis extends facture {
 						}
 					}
 				}
-
-				log::logger($choix , "mfleurquin");
 
 				$h = $item['facture.id_facture']."-".$societe['code_client'];
 
@@ -1475,7 +1475,7 @@ class facture_cleodis extends facture {
 
 					if($i == 1){
 						$row_data["A"] = 'G';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[1]["D"];
 						$row_data["E"] = $libelle;
@@ -1494,7 +1494,7 @@ class facture_cleodis extends facture {
 						$row_data["N"] = $refinancement;
 					}elseif($i==2){
 						$row_data["A"] = 'G';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
@@ -1513,7 +1513,7 @@ class facture_cleodis extends facture {
 						$row_data["N"] = $refinancement;
 					}elseif($i==3 && $ligne[3]){
 						$row_data["A"] = 'A1';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
@@ -1538,7 +1538,7 @@ class facture_cleodis extends facture {
 
 					}elseif($i==4 && $ligne[4]){
 						$row_data["A"] = 'G';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
@@ -1546,6 +1546,7 @@ class facture_cleodis extends facture {
 						$row_data["G"] = round(abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']),2);
 						$row_data["H"] = $ligne[$i]["H"];
 						$row_data["I"] = $reference;
+						$row_data["J"] = "";
 						$row_data["K"] = $dateDebut;
 						$row_data["L"] = $dateFin;
 						$row_data["M"] = $datePrelevement;
@@ -1589,17 +1590,36 @@ class facture_cleodis extends facture {
 					}
 
 					if($row_data){
+						log::logger($row_data , "mfleurquin");
+
+						$indexCol = 0;
 						if($infos["rejet"]){
 							if($row_data["G"] != 0){
 								$row_auto++;
 								foreach($row_data as $col=>$valeur){
-									$sheets['auto']->write($col.$row_auto, $valeur);
+									if (($col === "B" || $col === "M") && $valeur ) {
+										$dateTime = new DateTime($valeur);
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+										$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+									} else {
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+									}
+									$sheet->getColumnDimension($col)->setAutoSize(true);
+									$indexCol++;
 								}
 							}
 						}else{
 							$row_auto++;
 							foreach($row_data as $col=>$valeur){
-								$sheets['auto']->write($col.$row_auto, $valeur);
+								if (($col === "B" || $col === "M") && $valeur ) {
+									$dateTime = new DateTime($valeur);
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+									$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+								} else {
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+								}
+								$sheet->getColumnDimension($col)->setAutoSize(true);
+								$indexCol++;
 							}
 						}
 					}
