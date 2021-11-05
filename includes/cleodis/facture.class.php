@@ -995,9 +995,6 @@ class facture_cleodis extends facture {
 		} else {
 			throw new errorATF("Impossible de modifier ce ".ATF::$usr->trans($this->table)." car elle est en '".ATF::$usr->trans("payee")."'",877);
 		}
-
-		log::logger($infos , "mfleurquin");
-
 		$commande = $this->select($infos["id_facture"] , "facture.id_commande");
 		ATF::commande()->checkEtatContentieux($commande);
 
