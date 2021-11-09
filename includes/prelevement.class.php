@@ -138,11 +138,10 @@ class prelevement extends classes_optima{
             $facture = ATF::facture()->getByRef($r);
             if (!$facture) throw new errorATF("Facture non trouvée", 500);
             if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
-            $dt = DateTime::createFromFormat('d/m/Y', $item['date']);
             $paiement = array(
               "id_facture" => $facture['facture.id_facture'],
               "montant" => $facture['prix_ttc'],
-              "date" => $dt->format('Y-m-d H:i:s'),
+              "date" => $item['date'],
               "mode_paiement" => "prelevement",
               "remarques"=> "Rapprochement comptable via import Telescope - ".number_format($post['total'],2, ',', ' ')." €",
             );
