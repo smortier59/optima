@@ -1114,19 +1114,22 @@ class facture_cleodis extends facture {
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
+
 		$workbook = new PHPExcel;
 
-		//premier onglet
 		$worksheet_auto = new PHPEXCEL_ATF($workbook,0);
-		$worksheet_auto->sheet->setTitle('Autoporté');
-		$sheets=array("auto"=>$worksheet_auto);
+		$workbook->setActiveSheetIndex(0);
+		$sheet = $workbook->getActiveSheet();
+		$sheet->setTitle('Autoporté');
 
 		//mise en place des titres
-		$this->ajoutTitre($sheets);
+		$this->ajoutTitre($sheet);
+
+
 
 		//ajout des donnÃ©es
 		if($infos){
-			 $this->ajoutDonnees($sheets,$infos);
+			 $this->ajoutDonnees($sheet,$infos);
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
@@ -1148,7 +1151,7 @@ class facture_cleodis extends facture {
 	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
      * @param array $sheets : contient les 5 onglets
      */
-     public function ajoutTitre(&$sheets){
+     public function ajoutTitre(&$sheet){
         $row_data = array(
         	"A"=>'Type'
         	,"B"=>'Date'
@@ -1166,12 +1169,11 @@ class facture_cleodis extends facture {
 			,"N"=>'Refinancement'
 		);
 
-         foreach($sheets as $nom=>$onglet){
-             foreach($row_data as $col=>$titre){
-				  $sheets[$nom]->write($col.'1',$titre);
-				  $sheets[$nom]->sheet->getColumnDimension($col)->setAutoSize(true);
-             }
-         }
+		 $i=0;
+		 foreach($row_data as $col=>$titre){
+			$sheet->setCellValueByColumnAndRow($i , 1, $titre);
+			$i++;
+        }
      }
 
  	/**
@@ -1208,7 +1210,7 @@ class facture_cleodis extends facture {
      * @param array $sheets : contient les 5 onglets
      * @param array $infos : contient tous les enregistrements
      */
-     public function ajoutDonnees(&$sheets,$infos){
+     public function ajoutDonnees(&$sheet,$infos){
 
 		$row_auto=1;
 		$increment=0;
@@ -1225,7 +1227,7 @@ class facture_cleodis extends facture {
 					$refinanceur=NULL;
 				}
 
-	 			$date=date("dmY",strtotime($item['facture.date']));
+	 			$date=date("Y-m-d",strtotime($item['facture.date']));
 				$affaire=ATF::affaire()->select($item['facture.id_affaire_fk']);
 
 				if($increment>999){
@@ -1243,9 +1245,9 @@ class facture_cleodis extends facture {
 				$dateFin = ($item['facture.date_periode_fin']) ? " ".date("d/m/y",strtotime($item['facture.date_periode_fin'])) : " ";
 
 				if($affaire["date_previsionnelle"] < 0){
-					$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." ".$affaire['date_previsionnelle']." DAY"));
+					$datePrelevement = date("Y-m-d",strtotime($item['facture.date_periode_debut']." ".$affaire['date_previsionnelle']." DAY"));
 				}else{
-					$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
+					$datePrelevement = date("Y-m-d",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
 				}
 
 
@@ -1262,9 +1264,9 @@ class facture_cleodis extends facture {
 
 				$choix = "defaut";
 
-				if($item['facture.type_facture'] == "libre"){
+				if($item['facture.type_facture'] == "libre" && in_array($item["facture.type_libre"], ["cout_copie", "transfert"])){
 					if($item["facture.type_libre"] == "cout_copie") $choix = "libre_cout_copie";
-					if($$item["facture.type_libre"] == "transfert") $choix = "libre_transfert";
+					if($item["facture.type_libre"] == "transfert") $choix = "libre_transfert";
 				}elseif($item['facture.type_facture']=='refi'){
 					if($refinancement == "FRANFINANCE") $choix = "refi_refinanceur_SGEF";
 					elseif($refinancement == "CLEOFI") $choix = "refi_refinanceur_CLEOFI";
@@ -1274,18 +1276,39 @@ class facture_cleodis extends facture {
 				}else{
 					if($affaire['nature']=="vente"){
 						$choix = "affaire_vente";
+						// avoir sur affaire de vente
+						if( $item["facture.prix"] < 0 ) {
+							$choix = "avoir_affaire_vente";
+						}
 					}else{
+						// avoir
+						if( $item["facture.prix"] < 0 ) {
+							if ($item["facture.date_periode_debut"] && $item["facture.date_periode_fin"]) {
+								// On recherce si il y a une facture sur la meme periode, avoir qui annule cette facture
+								ATF::facture()->q->reset()->where("facture.date_periode_debut", $item["facture.date_periode_debut"], "AND")
+														  ->where("facture.date_periode_fin", $item["facture.date_periode_fin"], "AND")
+														  ->where("facture.ref", $item["facture.id_facture"], "AND", null, '!=');
+								$facture_avoir = ATF::facture()->select_row();
+								if ($facture_avoir && ATF::facture()->select($facture_avoir["facture.id_facture"], "nature") === 'prolongation') {
+									$choix = "avoir_sur_prolongation";
+								} elseif ( in_array($infos_commande['etat'], ['mis_loyer', 'mis_loyer_contentieux']) ) {
+									// Avoir sur un contrat en cours
+									$choix = "avoir_affaire_en_cours";
+								}
+							}
+						}
 						//Prolongation
-						if($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && $infos_commande['date_evolution']
+						elseif($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && $infos_commande['date_evolution']
 															   && ($item['facture.date_periode_debut']>$infos_commande['date_evolution'])){
 							$choix = "prolongation";
 						}
 						// Pro rata
-						elseif( $item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut'])){
+						elseif( ($item['facture.date_periode_debut'] && $infos_commande['date_debut'] && ($item['facture.date_periode_debut']<$infos_commande['date_debut']))
+							  || ($item["facture.nature"] === "prorata")){
 							$choix = "pro_rata";
-						}else{
-
-							if($item['facture.date_periode_debut']){
+						}
+						else{
+							if($item['facture.date_periode_debut']) {
 								//Si le contrat est en cours pendant la période de la facture, pas d'analytique
 								if(strtotime($infos_commande["date_debut"]) <= strtotime($item['facture.date_periode_debut']) && strtotime($infos_commande["date_evolution"]) >=  strtotime($item['facture.date_periode_fin'])){
 								   	$en_cours = true;
@@ -1305,7 +1328,6 @@ class facture_cleodis extends facture {
 					}
 				}
 
-
 				$h = $item['facture.id_facture']."-".$societe['code_client'];
 
 				//$h = 'F'.$affaire['ref'].'-'.$societe['code_client'].'/'.$societe['societe'];
@@ -1314,8 +1336,6 @@ class facture_cleodis extends facture {
 				$ligne[3] = array("D"=> "706400" , "H"=> $h);
 				$ligne[4] = array("D"=> "445710" , "H"=> $h);
 				$libelle = $societe['code_client'];
-
-
 
 				switch ($choix) {
 					case 'libre_cout_copie':
@@ -1358,10 +1378,31 @@ class facture_cleodis extends facture {
 						$ligne[3]["D"] = "707110";
 					break;
 
+					case 'avoir_affaire_vente':
+						$ligne[2]["D"] =  "707110";
+						$ligne[3]["D"] =  "707110";
+						$ligne[4]["F"] ="D";
+					break;
+
+					case 'avoir_affaire_en_cours':
+						$ligne[2]["D"] = "706200";
+						$ligne[3]["D"] = "706200";
+						$ligne[4]["D"] = "445712";
+						$ligne[4]["F"] ="D";
+					break;
+
 					case 'prolongation':
 						$ligne[2]["D"] = "706230";
 						$ligne[3]["D"] = "706230";
 						$ligne[4]["D"] = "445713";
+					break;
+
+					case 'avoir_sur_prolongation':
+						$ligne[1]["D"] ="411000";
+						$ligne[2]["D"] ="706230";
+						$ligne[3]["D"] ="706230";
+						$ligne[4]["D"] ="445713";
+						$ligne[4]["F"] ="D";
 					break;
 
 					case 'pro_rata':
@@ -1413,7 +1454,7 @@ class facture_cleodis extends facture {
 
 					if($i == 1){
 						$row_data["A"] = 'G';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[1]["D"];
 						$row_data["E"] = $libelle;
@@ -1432,7 +1473,7 @@ class facture_cleodis extends facture {
 						$row_data["N"] = $refinancement;
 					}elseif($i==2){
 						$row_data["A"] = 'G';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
@@ -1451,7 +1492,7 @@ class facture_cleodis extends facture {
 						$row_data["N"] = $refinancement;
 					}elseif($i==3 && $ligne[3]){
 						$row_data["A"] = 'A1';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
@@ -1476,14 +1517,15 @@ class facture_cleodis extends facture {
 
 					}elseif($i==4 && $ligne[4]){
 						$row_data["A"] = 'G';
-						$row_data["B"] = " ".$date;
+						$row_data["B"] = $date;
 						$row_data["C"] = 'VEN';
 						$row_data["D"] = $ligne[$i]["D"];
 						$row_data["E"] = "";
-						$row_data["F"] = 'C';
+						$row_data["F"] = $ligne[$i]["F"] ? $ligne[$i]["F"] : 'C';
 						$row_data["G"] = round(abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']),2);
 						$row_data["H"] = $ligne[$i]["H"];
 						$row_data["I"] = $reference;
+						$row_data["J"] = "";
 						$row_data["K"] = $dateDebut;
 						$row_data["L"] = $dateFin;
 						$row_data["M"] = $datePrelevement;
@@ -1527,17 +1569,36 @@ class facture_cleodis extends facture {
 					}
 
 					if($row_data){
+						log::logger($row_data , "mfleurquin");
+
+						$indexCol = 0;
 						if($infos["rejet"]){
 							if($row_data["G"] != 0){
 								$row_auto++;
 								foreach($row_data as $col=>$valeur){
-									$sheets['auto']->write($col.$row_auto, $valeur);
+									if (($col === "B" || $col === "M") && $valeur ) {
+										$dateTime = new DateTime($valeur);
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+										$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+									} else {
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+									}
+									$sheet->getColumnDimension($col)->setAutoSize(true);
+									$indexCol++;
 								}
 							}
 						}else{
 							$row_auto++;
 							foreach($row_data as $col=>$valeur){
-								$sheets['auto']->write($col.$row_auto, $valeur);
+								if (($col === "B" || $col === "M") && $valeur ) {
+									$dateTime = new DateTime($valeur);
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+									$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+								} else {
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+								}
+								$sheet->getColumnDimension($col)->setAutoSize(true);
+								$indexCol++;
 							}
 						}
 					}
