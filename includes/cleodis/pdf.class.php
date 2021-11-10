@@ -5128,7 +5128,7 @@ class pdf_cleodis extends pdf {
 					$data[0]['details'] = "Equipements objets de la vente";
 				}elseif($this->devis['type_contrat']=="presta"){ $data[0]['details'] = "";
 				}else{	$data[0]['details'] = "Matériels objets de la location"; }
-				foreach ($this->lignes as $k => $i) {
+				/*foreach ($this->lignes as $k => $i) {
 					$produit = ATF::produit()->select($i["id_produit"]);
 		        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
 		        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
@@ -5145,7 +5145,23 @@ class pdf_cleodis extends pdf {
 					,$this->colsProduitAlignLeft
 					,""
 					,"details"=>$this->styleDetailsProduit
-				);
+				);*/
+				foreach ($this->lignes as $k => $i) {
+					$produit = ATF::produit()->select($i["id_produit"]);
+					$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
+					$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
+
+					log::logger($produit, "mfleurquin");
+					log::logger(ATF::tva()->select($produit["id_tva"], "text"), "mfleurquin");
+
+					$data[] = array(
+						round($i['quantite']),
+						$i['produit'].($i['serial']?" Numéro(s) de série : ".$i['serial']:""),
+						ATF::tva()->select($produit["id_tva"], "text")
+					);
+
+				}
 			}else{
 				if($this->facture['type_libre'] === "normale"){
 					//Préparation du détail
@@ -5154,10 +5170,10 @@ class pdf_cleodis extends pdf {
 					}else{
 						$data[0]['details'] = "Matériels objets de la location";
 					}
+
+
 					foreach ($this->lignes as $k => $i) {
-						$produit = ATF::produit()->select($i["id_produit"]);
-			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
 
 			        	$detail = "\n".round($i['quantite'])." ";
 			        	if($sous_categorie) $detail .= $sous_categorie." ";
@@ -5166,6 +5182,7 @@ class pdf_cleodis extends pdf {
 
 			          	$data[0]['details'] .= $detail;
 					}
+
 					$styles[0] = array(
 						""
 						,$this->colsProduitAlignLeft
@@ -5243,8 +5260,6 @@ class pdf_cleodis extends pdf {
 					)
 				);
 			}
-
-			log::logger($this->facture , "mfleurquin");
 
 
 			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
