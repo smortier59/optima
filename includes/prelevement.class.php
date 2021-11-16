@@ -47,7 +47,8 @@ class prelevement extends classes_optima{
         {
           while (($data = fgetcsv($open, 1000, ";")) !== FALSE) 
           {
-              $array[$row]['date'] = $data[8];
+              $dateInput = explode('/',$data[8]);
+              $array[$row]['date'] = $dateInput[2].'-'.$dateInput[1].'-'.$dateInput[0];
               $array[$row]['refs_facture'] = $data[2];
               $array[$row]['rum'] = $data[29];
               $array[$row]['montant'] = $data[4];
@@ -103,7 +104,7 @@ class prelevement extends classes_optima{
                   if(count($factures) == 1 ){
                         foreach($factures as $item){
                           $refs_facture = $item['facture.ref'];
-                            if($item['facture.prix'] == $value['montant'] && $item['facture.etat'] == "impayee"){
+                            if($item['prix_ttc'] == $value['montant'] && $item['facture.etat'] == "impayee"){
                                   $array[$key]['canPayment'] = true;
                                   // Mettre les réfs facture, séparés par virgule, dans une variable $refs_facture
                                   if ($item != end($factures)) $refs_facture .= ',';
@@ -137,11 +138,10 @@ class prelevement extends classes_optima{
             $facture = ATF::facture()->getByRef($r);
             if (!$facture) throw new errorATF("Facture non trouvée", 500);
             if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
-            $dt = DateTime::createFromFormat('d/m/Y', $item['date']);
             $paiement = array(
               "id_facture" => $facture['facture.id_facture'],
               "montant" => $facture['prix_ttc'],
-              "date" => $dt->format('Y-m-d H:i:s'),
+              "date" => $item['date'],
               "mode_paiement" => "prelevement",
               "remarques"=> "Rapprochement comptable via import Telescope - ".number_format($post['total'],2, ',', ' ')." €",
             );
