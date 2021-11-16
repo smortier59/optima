@@ -1335,6 +1335,10 @@ class facture_cleodis extends facture {
 				$ligne[2] = array("D"=> "706400" , "H"=> $h);
 				$ligne[3] = array("D"=> "706400" , "H"=> $h);
 				$ligne[4] = array("D"=> "445710" , "H"=> $h);
+
+				if ($item["facture.prix"] < 0 ) {
+					$ligne[4]["F"] = "D";
+				}
 				$libelle = $societe['code_client'];
 
 				switch ($choix) {
