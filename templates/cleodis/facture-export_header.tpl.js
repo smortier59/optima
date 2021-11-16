@@ -15,7 +15,7 @@
 	}
 },
 {/if}
-{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe"}
+{if ATF::$codename == "cleodis" || ATF::$codename == "cleodisbe" || ATF::$codename == "go_abonnement"}
 {
 	text: '{ATF::$usr->trans(export_comptable,$current_class->name())}'
 	, handler: function(b,e){
