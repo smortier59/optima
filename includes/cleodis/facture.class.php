@@ -1298,6 +1298,7 @@ class facture_cleodis extends facture {
 						$ligne[1]["D"] ="411000";
 						$ligne[2]["D"] ="706220";
 						$ligne[3]["D"] ="706220";
+						$ligne[4]["D"] ="445714";
 					break;
 
 					case 'libre_transfert':
