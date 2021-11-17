@@ -2112,10 +2112,20 @@ class societe_cleodis extends societe {
         $mail = new mail( $infos_mail );
         if($mail->send()){
             ATF::societe()->u(array("id_societe"=> $client["id_societe"] , "date_envoi_mail_creation_compte" => date("Y-m-d")));
+            ATF::suivi()->insert(array(
+              "id_societe"=>$client["id_societe"],
+              "type"=>"email",
+              "texte"=>"Envoi du mail de création de compte client à ".$client["email"],
+            ));
         }else{
             log::logger("------------------------------------------------------", "error_mail_creation_compte");
             log::logger("Probleme lors de l'envoi du mail de création de compte", "error_mail_creation_compte");
             log::logger($mail, "error_mail_creation_compte");
+            ATF::suivi()->insert(array(
+              "id_societe"=>$client["id_societe"],
+              "type"=>"email",
+              "texte"=>"Erreur lors de l'envoi du mail de création de compte à " . $client['email']. " (voir les logs error_mail_creation_compte)",
+            ));
         }
 
       }
