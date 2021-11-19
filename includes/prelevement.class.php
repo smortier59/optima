@@ -155,6 +155,84 @@ class prelevement extends classes_optima{
       }
       ATF::db()->commit_transaction();
     }
+
+    public function _fetchFactureImpayeesNonPrelevement($get){
+
+      if (!$get['limit'] && !$get['no-limit']) $get['limit'] =30;
+      if (!$get['tri']) $get['tri'] = "facture.ref";
+		  if (!$get['trid']) $get['trid'] = "desc";
+
+      // Gestion de la page
+      if (!$get['page']) $get['page'] = 0;
+      if ($get['no-limit']) $get['page'] = false;
+
+      ATF::facture()->q->reset()
+                              ->where('facture.etat','impayee')
+                              ->where('facture.id_termes',24,'AND',false,"!=")
+                              ->where('facture.id_termes',25,'AND',false,"!=");
+
+      $response = ATF::facture()->select_all($get['tri'],$get['trid'],$get['page'],true);
+
+      foreach ($response["data"] as $k=>$lines) {
+        foreach ($lines as $k_=>$val) {
+          if (strpos($k_,".")) {
+            $tmp = explode(".",$k_);
+            if($tmp[0] == "facture" && $tmp[1]=="id_societe_fk"){
+              $response["data"][$k]["ref_client"] = ATF::societe()->select($val,"ref");
+            }
+            $response["data"][$k][$tmp[1]] = $val;
+            
+            unset($response['data'][$k][$k_]);
+          }
+        }
+       
+      }
+
+      header("ts-total-row: ".$response['count']);
+      if ($get['limit']) header("ts-max-page: ".ceil(($response['count'])/$get['limit']));
+			if ($get['page']) header("ts-active-page: ".$get['page']);
+			if ($get['no-limit']) header("ts-no-limit: 1");
+
+      return $response['data'];
+    }
+
+    public function _paymentLettrageFacture($get,$post){
+      $date_paiement = $post['specification'][0]["value"];
+      $mode_paiement = $post['specification'][1]["value"];
+      $numero_cheque = $post['specification'][2]["value"];
+      $numero_compte = $post['specification'][3]["value"];
+      $numero_bordereau = $post['specification'][4]["value"];
+      $remarque = $post['specification'][5]["value"];
+
+      try {
+        ATF::db()->begin_transaction();
+        if (!$post['ref']) throw new errorATF("Aucune références de factures", 500);
+        if (!$date_paiement) throw new errorATF("Aucune date de paiement", 500);
+        if (!$mode_paiement) throw new errorATF("Mode de paiement manquant", 500);
+        if ($mode_paiement == "cheque" && !$numero_cheque)  throw new errorATF("Veuillez renseigner le numero de cheque", 500);
+        foreach ($post['ref'] as $key=>$r) {
+    
+            $facture = ATF::facture()->getByRef($r);
+            if (!$facture) throw new errorATF("Facture non trouvée", 500);
+            if ($facture['facture.etat'] != "impayee") throw new errorATF("Facture déjà payé ou alors pas en impayée.", 500);
+            $paiement = array(
+              "id_facture" => $facture['facture.id_facture'],
+              "montant" => $facture['prix_ttc'],
+              "date" => $date_paiement,
+              "mode_paiement" => $mode_paiement,
+              "num_cheque"=> $mode_paiement == "cheque"?  $numero_cheque: "",
+              "remarques"=> $remarque? $remarque: "Rapprochement comptable via import Telescope - ".number_format($post['total'],2, ',', ' ')." €",
+            );
+            // Appel de l'insert pour gérer les traitements post paiements : passage de la facture en payé, de la commande en terminée et de l'affaire en terminée. Puis calcul des intérêts
+            $id = ATF::facture_paiement()->insert($paiement);
+          
+        }
+      } catch (errorATF $e){
+        ATF::db()->rollback_transaction();
+        throw $e;
+      }
+      ATF::db()->commit_transaction();
+    }
   
 };
 
