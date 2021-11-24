@@ -67,6 +67,7 @@ class commande_cleodis extends commande {
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			,"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
@@ -347,6 +348,8 @@ class commande_cleodis extends commande {
 					return $commande['prix_achat'];
 				case "prix":
 					return $commande['prix'];
+				case "prix_sans_tva":
+					return $commande['prix_sans_tva'];
 				case "id_devis":
 					return $commande['id_devis'];
 			}
@@ -539,6 +542,9 @@ class commande_cleodis extends commande {
 	* @return bool
     */
 	public function updateDate($infos,&$s,&$request){
+		log::logger("UPDATE DATE", "mfleurquin");
+		log::logger($infos , "mfleurquin");
+
 		if (!$infos['id_commande']) return false;
 
 		if ($infos['value'] == "undefined") $infos["value"] = "";
@@ -601,6 +607,8 @@ class commande_cleodis extends commande {
 						,"date"=>$d[$infos['key']]
 					));
 					if($infos['key'] === "date_debut" && $infos['value']){
+						log::logger("ICI" , "mfleurquin");
+
 						//Creation de la facture prorata si besoin
 						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
 						$affaire = ATF::affaire()->select($id_affaire);
@@ -610,6 +618,8 @@ class commande_cleodis extends commande {
 										  "date_debut_contrat" => $infos['value'],
 										  "id_commande"=> $infos["id_commande"]
 										);
+							log::logger("Data facture prorata" , "mfleurquin");
+							log::logger($data , "mfleurquin");
 
 							ATF::facture()->createFactureProrata($data);
 						}
@@ -619,6 +629,8 @@ class commande_cleodis extends commande {
 										"id_commande"=> $infos["id_commande"]
 									 );
 
+						log::logger("Data 1ere facture" , "mfleurquin");
+						log::logger($data , "mfleurquin");
 						//Creation de la premiere facture
 						ATF::facture()->createPremiereFacture($data);
 
