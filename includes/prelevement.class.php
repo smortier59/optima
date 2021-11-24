@@ -107,6 +107,7 @@ class prelevement extends classes_optima{
                           $refs_facture = $item['facture.ref'];
                             if($item['prix_ttc'] == $montant && $item['facture.etat'] == "impayee"){
                                   $array[$key]['canPayment'] = true;
+                                  $array[$key]['montant'] = $montant;
                                   // Mettre les réfs facture, séparés par virgule, dans une variable $refs_facture
                                   if ($item != end($factures)) $refs_facture .= ',';
                             }else{
