@@ -1575,20 +1575,10 @@ class facturation extends classes_optima {
 
 					//Insertion des factures
 					$facture_date_previsionnelle=date('Y-m-d',strtotime($facturation["date_periode_debut"]."+".$day." day"));
-
-					$prix = $facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
-					$prix_sans_tva = 0;
-					$type_affaire = ATF::affaire()->select($affaire["id_affaire"], "id_type_affaire");
-					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-						$prix = $facturation["montant"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
-						$prix_sans_tva = $facturation["assurance"];
-					}
-
 					$facture=array(
 						"id_societe"=>$commande["id_societe"],
 						"ref"=>$ref,
-						"prix"=>$prix,
-						"prix_sans_tva"=>$prix_sans_tva,
+						"prix"=>$facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"],
 						"etat"=>"impayee",
 						"date"=>$date_debut,
 						"date_periode_debut"=>$facturation["date_periode_debut"],
@@ -1680,5 +1670,3 @@ class facturation_bdomplus extends facturation {
 };
 class facturation_bdom extends facturation { };
 class facturation_boulanger extends facturation { };
-
-class facturation_go_abonnement extends facturation { };

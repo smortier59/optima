@@ -53,6 +53,8 @@ class import extends classes_optima{
 
 		$resume[] = "========= DEBUT DE SCRIPT =========";
 
+
+		log::logger($file , "mfleurquin");
 		if($file["fichier-import"]){
 			$file = $file["fichier-import"]["tmp_name"];
 		}
