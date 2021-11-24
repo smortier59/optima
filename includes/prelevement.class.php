@@ -158,42 +158,138 @@ class prelevement extends classes_optima{
 
     public function _fetchFactureImpayeesNonPrelevement($get){
 
-      if (!$get['limit'] && !$get['no-limit']) $get['limit'] =30;
-      if (!$get['tri']) $get['tri'] = "facture.ref";
-		  if (!$get['trid']) $get['trid'] = "desc";
-
-      // Gestion de la page
-      if (!$get['page']) $get['page'] = 0;
-      if ($get['no-limit']) $get['page'] = false;
-
       ATF::facture()->q->reset()
                               ->where('facture.etat','impayee')
                               ->where('facture.id_termes',24,'AND',false,"!=")
                               ->where('facture.id_termes',25,'AND',false,"!=");
 
-      $response = ATF::facture()->select_all($get['tri'],$get['trid'],$get['page'],true);
+      $response = ATF::facture()->select_all();
 
-      foreach ($response["data"] as $k=>$lines) {
+      foreach ($response as $k=>$lines) {
         foreach ($lines as $k_=>$val) {
           if (strpos($k_,".")) {
             $tmp = explode(".",$k_);
             if($tmp[0] == "facture" && $tmp[1]=="id_societe_fk"){
-              $response["data"][$k]["ref_client"] = ATF::societe()->select($val,"ref");
+              $response[$k]["ref_client"] = ATF::societe()->select($val,"ref");
             }
-            $response["data"][$k][$tmp[1]] = $val;
+            $response[$k][$tmp[1]] = $val;
             
-            unset($response['data'][$k][$k_]);
+            unset($response[$k][$k_]);
           }
         }
        
       }
 
-      header("ts-total-row: ".$response['count']);
-      if ($get['limit']) header("ts-max-page: ".ceil(($response['count'])/$get['limit']));
-			if ($get['page']) header("ts-active-page: ".$get['page']);
-			if ($get['no-limit']) header("ts-no-limit: 1");
+      return $response;
+    }
 
-      return $response['data'];
+    public function _search($get,$post) {
+      $result = [];
+      ATF::facture()->q->reset()
+                              ->where('facture.etat','impayee')
+                              ->where('facture.id_termes',24,'AND',false,"!=")
+                              ->where('facture.id_termes',25,'AND',false,"!=");
+                              
+      $result = ATF::facture()->select_all();
+
+      foreach ($result as $k=>$lines) {
+        foreach ($lines as $k_=>$val) {
+          if (strpos($k_,".")) {
+            $tmp = explode(".",$k_);
+            if($tmp[0] == "facture" && $tmp[1]=="id_societe_fk"){
+              $result[$k]["ref_client"] = ATF::societe()->select($val,"ref");
+            }
+            $result[$k][$tmp[1]] = $val;
+            
+            unset($result[$k][$k_]);
+          }
+        }
+       
+      }
+
+      $return = [];
+      if($get['societe'] == 'All'){
+
+        ATF::facture()->q->reset()
+                                ->where('facture.etat','impayee')
+                                ->where('facture.id_termes',24,'AND',false,"!=")
+                                ->where('facture.id_termes',25,'AND',false,"!=");
+  
+        $response = ATF::facture()->select_all();
+
+        foreach ($response as $k=>$lines) {
+          foreach ($lines as $k_=>$val) {
+            if (strpos($k_,".")) {
+              $tmp = explode(".",$k_);
+              if($tmp[0] == "facture" && $tmp[1]=="id_societe_fk"){
+                $response[$k]["ref_client"] = ATF::societe()->select($val,"ref");
+              }
+              $response[$k][$tmp[1]] = $val;
+              
+              unset($response[$k][$k_]);
+            }
+          }
+         
+        }
+  
+        $return =  $response;
+        }
+
+       elseif(($get['societe'] ) && (!$get['date_debut'] && !$get['date_fin'] && !$get['numero_facture']) ){
+        foreach($result as $item=>$value){
+           if($value['id_societe'] == $get['societe']){
+             array_push($return,$value);
+           }
+        }
+      }elseif($get['societe'] && ($get['numero_facture'] && !$get["date_debut"] && !$get['date_fin'])){
+        foreach($result as $item=>$value){
+          if(($value['id_societe'] == $get['societe']) && ($value['ref'] == $get['numero_facture'])){
+            array_push($return,$value);
+          }
+        }
+      }elseif($get['societe'] && $get["date_debut"] && $get['date_fin']){
+        $datedebut = explode('-',$get['date_debut']);
+        $datefin = explode('-',$get['date_fin']);
+       
+        $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
+        $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
+
+        ATF::facture()->q->reset()
+            ->where('facture.etat','impayee')
+            ->where('facture.id_termes',24,'AND',false,"!=")
+            ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.date_debut_periode',$date_debut_periode)
+            ->where('facture.date_fin_periode',$date_fin_periode);
+        $result= ATF::facture()->sa();
+
+        foreach($result as $key=>$value){
+          ATF::societe()->q->reset()->where('societe.id_societe',$value['id_societe']);
+          $societes = ATF::societe()->select_all();
+
+          ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
+          $affaires = ATF::affaire()->sa();
+
+          foreach($societes as $item){
+            $result[$key]['ref_client'] = $item['ref'];
+            $result[$key]['id_societe'] = $item['societe'];
+            $result[$key]['prix_ttc'] = $result[$key]['prix'];
+
+            foreach($affaires as $affaire){
+              $result[$key]['id_affaire'] = $affaire['affaire'];
+            }
+          }
+
+        }
+
+        foreach($result as $item){
+          if($item['id_societe'] == $get['societe']){
+            array_push($return,$item);
+          }
+        }
+
+      }
+
+      return  $return;
     }
 
     public function _paymentLettrageFacture($get,$post){
@@ -209,7 +305,7 @@ class prelevement extends classes_optima{
         if (!$post['ref']) throw new errorATF("Aucune références de factures", 500);
         if (!$date_paiement) throw new errorATF("Aucune date de paiement", 500);
         if (!$mode_paiement) throw new errorATF("Mode de paiement manquant", 500);
-        if ($mode_paiement == "cheque" && !$numero_cheque)  throw new errorATF("Veuillez renseigner le numero de cheque", 500);
+        //if ($mode_paiement == "cheque" && !$numero_cheque)  throw new errorATF("Veuillez renseigner le numero de cheque", 500);
         foreach ($post['ref'] as $key=>$r) {
     
             $facture = ATF::facture()->getByRef($r);
