@@ -51,7 +51,7 @@ class prelevement extends classes_optima{
               $array[$row]['date'] = $dateInput[2].'-'.$dateInput[1].'-'.$dateInput[0];
               $array[$row]['refs_facture'] = $data[2];
               $array[$row]['rum'] = $data[29];
-              $array[$row]['montant'] = $data[4];
+              $array[$row]['montant'] = preg_replace('/\s+/', '', $data[4]);
 
               if (ATF::$codename == "att") {
                 $pattern = '/ASLI[0-9]{8}/';
@@ -103,11 +103,10 @@ class prelevement extends classes_optima{
                   $factures = ATF::facture()->select_all();
                   if(count($factures) == 1 ){
                         foreach($factures as $item){
-                          $montant = preg_replace('/\s+/', '', $value['montant']);
                           $refs_facture = $item['facture.ref'];
-                            if($item['prix_ttc'] == $montant && $item['facture.etat'] == "impayee"){
+                            if($item['prix_ttc'] == $value['montant'] && $item['facture.etat'] == "impayee"){
                                   $array[$key]['canPayment'] = true;
-                                  $array[$key]['montant'] = $montant;
+                                  
                                   // Mettre les réfs facture, séparés par virgule, dans une variable $refs_facture
                                   if ($item != end($factures)) $refs_facture .= ',';
                             }else{
