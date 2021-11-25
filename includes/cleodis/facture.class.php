@@ -1526,8 +1526,6 @@ class facture_cleodis extends facture {
 					}
 
 					if($row_data){
-						log::logger($row_data , "mfleurquin");
-
 						$indexCol = 0;
 						if($infos["rejet"]){
 							if($row_data["G"] != 0){
@@ -2921,7 +2919,7 @@ class facture_cleodisbe extends facture_cleodis {
      * @param array $sheets : contient les 5 onglets
      * @param array $infos : contient tous les enregistrements
      */
-     public function ajoutDonnees(&$sheets,$infos){
+    /* public function ajoutDonnees(&$sheet,$infos){
 		$row_auto=1;
 		$increment=0;
 		foreach ($infos as $key => $item) {
@@ -3114,27 +3112,41 @@ class facture_cleodisbe extends facture_cleodis {
 
 
 					if($row_data){
+						$indexCol = 0;
 						if($infos["rejet"]){
 							if($row_data["G"] != 0){
 								$row_auto++;
 								foreach($row_data as $col=>$valeur){
-									$sheets['auto']->write($col.$row_auto, $valeur);
+									if (($col === "B" || $col === "M") && $valeur ) {
+										$dateTime = new DateTime($valeur);
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+										$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+									} else {
+										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+									}
+									$sheet->getColumnDimension($col)->setAutoSize(true);
+									$indexCol++;
 								}
 							}
 						}else{
 							$row_auto++;
 							foreach($row_data as $col=>$valeur){
-								$sheets['auto']->write($col.$row_auto, $valeur);
+								if (($col === "B" || $col === "M") && $valeur ) {
+									$dateTime = new DateTime($valeur);
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
+									$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
+								} else {
+									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
+								}
+								$sheet->getColumnDimension($col)->setAutoSize(true);
+								$indexCol++;
 							}
 						}
 					}
 				}
 			}
 		}
-	}
-
-
-
+	}*/
 
 };
 class facture_cap extends facture_cleodis { };
