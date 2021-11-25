@@ -81,6 +81,9 @@ class facturation_fournisseur_boulanger extends facturation_fournisseur {
 				$date_debut = $commande->get("date_debut");
 				$date_fin   = $commande->get("date_evolution");
 
+				log::logger("----------" , "mfleurquin");
+				log::logger($date_fin , "mfleurquin");
+
 				foreach ($frequence as $key => $lignes) {
 					$date = $date_debut;
 					$montant = 0;
@@ -89,8 +92,16 @@ class facturation_fournisseur_boulanger extends facturation_fournisseur {
 						$montant += ($vl["prix_achat"] * $vl["quantite"]);
 					}
 
+					log::logger("===================" , "mfleurquin");
+					log::logger("Frequence : ".$key , "mfleurquin");
+					log::logger($date_fin , "mfleurquin");
+
+
 					$i=0;
 					while(strtotime($date) < strtotime($date_fin)){
+
+
+						log::logger("--".$date , "mfleurquin");
 
 						switch ($key) {
 							case 'mois':
@@ -152,6 +163,7 @@ class facturation_fournisseur_boulanger extends facturation_fournisseur {
 
 			}
 		} catch (errorATF $e) {
+			log::logger($e->getMessage() , "mfleurquin");
 			throw new errorATF($e, 100);
 		}
 	}
@@ -360,6 +372,10 @@ class facturation_fournisseur_boulanger extends facturation_fournisseur {
 		$emailGrille["objet"]=$texte." pour la periode du ".$date_debut."  au ".$date_fin.".";
 
 		foreach($facturer as $key=>$item){
+
+			log::logger($type , "mfleurquin");
+			log::logger($key , "mfleurquin");
+
 			//Tri des BDC par rapport au code, Societe ou date
 			ksort($item);
 			$item["reserve"]['cg']=$cg;
