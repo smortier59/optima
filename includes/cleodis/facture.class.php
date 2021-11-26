@@ -1266,14 +1266,18 @@ class facture_cleodis extends facture {
 								   	$en_cours = true;
 								}else{ $en_cours = false; }
 
-								//Affaire non refi ou refinancée par CLEODIS
-								if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
-									$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
-								//Affaire en cours et refinancée par BMF
-								}elseif($ResRefinancement && $refinancement == "BMF"){
-									$choix = "affaire_en_cours_refi_bmf";
-								}elseif(($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE') && $en_cours){
-									$choix = "affaire_en_cours_refi_cleofi_sgef";
+								if( ATF::$codename == "cleodisbe") {
+									$choix = "affaire_en_cours_cleodisbe";
+								} else {
+									//Affaire non refi ou refinancée par CLEODIS
+									if(!$ResRefinancement || ($ResRefinancement && $refinancement == "CLEODIS") && $en_cours){
+										$choix = "affaire_non_refi_ou_refi_cleodis_ac_date_deb_facture";
+									//Affaire en cours et refinancée par BMF
+									}elseif($ResRefinancement && $refinancement == "BMF"){
+										$choix = "affaire_en_cours_refi_bmf";
+									}elseif(($refinanceur['refinanceur']=='CLEOFI' || $refinanceur['refinanceur']=='FRANFINANCE') && $en_cours){
+										$choix = "affaire_en_cours_refi_cleofi_sgef";
+									}
 								}
 							}
 						}
@@ -1352,6 +1356,9 @@ class facture_cleodis extends facture {
 						$ligne[2]["D"] = "706230";
 						$ligne[3]["D"] = "706230";
 						$ligne[4]["D"] = "445713";
+						if (ATF::$codename == "cleodisbe") {
+							$ligne[4]["D"] = "445710";
+						}
 					break;
 
 					case 'avoir_sur_prolongation':
@@ -1396,6 +1403,12 @@ class facture_cleodis extends facture {
 						$ligne[2] = array("D"=> "706230" , "H"=> $h);
 						$ligne[3] = array("D"=> "706230" , "H"=> $h);
 						$ligne[4] = array("D"=> "445713" , "H"=> $h);
+					break;
+
+					case 'affaire_en_cours_cleodisbe':
+						$ligne[2]["D"] = "706200";
+						$ligne[3]["D"] = "706200";
+						$ligne[4]["D"] = "445710";
 					break;
 
 					case 'facture_sans_tva':
@@ -2912,6 +2925,7 @@ class facture_cleodis extends facture {
 };
 
 class facture_cleodisbe extends facture_cleodis {
+
 
 	/** Mise en place du contenu
      * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
