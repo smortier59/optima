@@ -894,8 +894,11 @@ class commande_cleodis extends commande {
 				if (!$commande->get("retour_prel")) {
 					$commande->set("retour_prel",$commande->get("retour_contrat"));
 				}
-				if (!$commande->get("retour_pv")) {
-					$commande->set("retour_pv",$commande->get("retour_contrat"));
+				// SI on est en BDOMPLUS, on met à jour aussi la date retour pv
+				if (ATF::$codename === 'bdomplus') {
+					if (!$commande->get("retour_pv")) {
+						$commande->set("retour_pv",$commande->get("retour_contrat"));
+					}
 				}
 				break;
 			case "date_evolution":
