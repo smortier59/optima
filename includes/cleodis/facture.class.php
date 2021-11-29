@@ -516,7 +516,9 @@ class facture_cleodis extends facture {
 		}
 
 		$dateFinPeriode = date_sub($dateTimeDebContrat, date_interval_create_from_date_string('1 days'));
-		$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
+		$dateFinPeriode = $dateFinPeriode->format('d-m-Y');
+
+
 
 		if($totalLoyer != 0){
 			$mode_paiement = "prelevement";
@@ -567,6 +569,8 @@ class facture_cleodis extends facture {
 
 	        $id_facture = $this->insert($facture);
 
+
+
 	        $this->libreToNormale(array("id_facture"=> $id_facture));
 
 	        //Sur l'echeancier, le montant ne doit pas être Loyer + aussrance + frais de dossier
@@ -577,6 +581,7 @@ class facture_cleodis extends facture {
 	        							"assurance"=>  $loyers[0]["assurance"],
 	        							"frais_de_gestion" => $loyers[0]["frais_de_gestion"]
 	    						));
+
 
 	    }
 
