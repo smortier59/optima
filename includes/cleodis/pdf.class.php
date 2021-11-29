@@ -5194,19 +5194,9 @@ class pdf_cleodis extends pdf {
 			$this->ln(5);
 			$total = $this->facture['prix'];
 			$totalTTC = $total*$this->facture['tva'];
-
-			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
-
-
-
 			if($this->facture['type_facture'] === "libre"){
 				if($this->facture['type_libre'] !== 1){
-					if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
-						$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
-					} else {
-						$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-					}
-
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
 					$data = array(
 						array(
 							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
@@ -5227,46 +5217,24 @@ class pdf_cleodis extends pdf {
 					);
 				}
 			}else{
-
-				if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
-					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
-				} else {
-					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-				}
-
-				$data = array(
-					array(
-						number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-						,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
-						,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
-						,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
-					)
-				);
+				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+					$data = array(
+						array(
+							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+							,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+							,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+							,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+						)
+					);
 			}
 
-			log::logger($this->facture , "mfleurquin");
 
 
-			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
-
-				$data[] = array(
-					number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
-					,"0.00%"
-					,""
-					,number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
-				);
-
-				$ttc = ($this->facture["prix"]* $this->facture["tva"]) + $this->facture["prix_sans_tva"];
-
-				$data[] = array(
-					"",
-					"",
-					"",
-					number_format(abs(round($ttc,2)),2,'.',' ')." €"
-				);
-			}
 			$this->tableau($head,$data);
+
 		}
+
+
 
 		$this->ln(10);
 		$y = $this->getY();
@@ -15697,64 +15665,5 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 	public $bgcolorTableau = "ba9856";
 	public $txtcolorTableau = "000000";
-
-
-	/*
-	public function contratA4Particulier($id, $signature,$sellsign) {
-
-		$this->initLogo($this->affaire["id_type_affaire"]);
-		$this->image($this->logo,10,10,40);
-
-
-		$this->sety(10);
-		$this->multicell(0,5,"LE LOUEUR",0,'C');
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',7);
-		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
-		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
-		$this->setLeftMargin(15);
-		$this->ln(5);
-		$this->setfont('arial','B',10);
-		$this->multicell(0,6,"L'ABONNÉ",0,'C');
-		$this->setLeftMargin(65);
-		$this->setfont('arial','B',7);
-		$this->multicell(0,3,"Nom : ".$this->client['societe'],0);
-		$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
-		$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
-
-		$this->multicell(0,3,"Mail : ".$this->client['particulier_email'],0);
-
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,60,220,60);
-		$this->setLeftMargin(15);
-		$this->setfont('arial','B',10);
-		$this->setY(62);
-
-		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".$this->commande['ref']);
-
-		$this->ln(5);
-
-		$this->SetLineWidth(0.35);
-		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
-		$this->line(0,73,220,73);
-
-		$this->setxy(15,75);
-		$this->SetDrawColor(0,0,0);
-		$this->SetLineWidth(0.2);
-
-
-		$titre = "ARTICLE 1 : CONTRAT D’ABONNEMENT";
-		$texte = "L'objet du contrat est l'abonnement comprenant la mise en location d'équipements dont le détail figure ci-après ainsi que des services associés.";
-
-		$this->setfont('arial','B',8);
-		$this->cell(0,5,$titre,0,1);
-		$this->setfont('arial','',8);
-		$this->multicell(0,4,$texte,0,1);
-
-
-	}
-	*/
 
  };
