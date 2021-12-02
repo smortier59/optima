@@ -2542,6 +2542,7 @@ class affaire_cleodis extends affaire {
 	* @author Cyril CHARLIER <ccharlier@absystech.fr>
 	*/
 	public function _CreateAffairePartenaire($get,$post,$files) {
+
 		$utilisateur  = ATF::$usr->get("contact");
 
 		$id_type_affaire = ATF::type_affaire_params()->get_type_affaire_by_societe($utilisateur["id_societe"]);
@@ -2605,11 +2606,10 @@ class affaire_cleodis extends affaire {
 
 			ATF::societe()->q->reset()
 				->select("id_societe")
-				->addOrder('ref',"ASC")
+				->addOrder('id_societe',"ASC")
 				->setDimension("row")
 				->setLimit(1);
 			$id_societe_codename = ATF::societe()->select_row();
-
 
 			$produits[0] = array(
 			  "devis_ligne__dot__produit"=> $post['libelle'],
@@ -2624,7 +2624,7 @@ class affaire_cleodis extends affaire {
 			  "devis_ligne__dot__commentaire"=>"",
 			  "devis_ligne__dot__neuf"=>"oui",
 			  "devis_ligne__dot__id_produit_fk"=>"",
-			  "devis_ligne__dot__id_fournisseur_fk"=>$id_societe_codename["id_societe"]
+			  "devis_ligne__dot__id_fournisseur_fk"=>$utilisateur["id_societe"]
 			);
 			$values_devis = array("loyer"=>json_encode($loyer), "produits"=>json_encode($produits));
 
@@ -2635,9 +2635,6 @@ class affaire_cleodis extends affaire {
 
 			if($post["site_associe"])	ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"site_associe"=>$post["site_associe"]));
 
-			if ($apporteur){
-				ATF::affaire()->u(array('id_affaire'=>$devis["id_affaire"],'apporteur'=>$apporteur));
-			}
 
 			ATF::affaire()->u(array("id_affaire"=>$devis["id_affaire"],"provenance"=>"partenaire",'id_partenaire'=>ATF::$usr->get('contact','id_societe')));
 
