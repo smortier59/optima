@@ -1082,7 +1082,7 @@ class facture_cleodis extends facture {
 			 if(ATF::$codename == "cleodisbe" OR  ATF::$codename == "cleodis"){
 
 				foreach($infos as $facture){
-					ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "OUI"));
+					ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "oui"));
 				}
 
 			 }

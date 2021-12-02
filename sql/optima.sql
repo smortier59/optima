@@ -20,6 +20,10 @@ UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 
 UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 2;
 UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 3;
 UPDATE `telescope` SET `home_events` = 'non' WHERE `telescope`.`id_telescope` = 4;
+UPDATE `facture` SET exporte = 'oui';
+ALTER TABLE `facture` ADD exporte  enum('oui','non') DEFAULT "non";
+
+
 
 
 INSERT INTO `constante` (`id_constante`, `constante`, `valeur`)
