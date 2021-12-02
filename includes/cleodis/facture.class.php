@@ -1087,8 +1087,6 @@ class facture_cleodis extends facture {
      * @param array $infos : contient tous les enregistrements
      */
      public function export_xls_special(&$infos){
-
-
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel.php";
 		require_once __ABSOLUTE_PATH__."libs/ATF/libs/PHPExcel/Classes/PHPExcel/Writer/Excel5.php";
 		$fname = tempnam(__TEMPORARY_PATH__, __TEMPLATE__.ATF::$usr->getID());
@@ -1103,11 +1101,18 @@ class facture_cleodis extends facture {
 		//mise en place des titres
 		$this->ajoutTitre($sheet);
 
-
-
 		//ajout des donnÃ©es
 		if($infos){
 			 $this->ajoutDonnees($sheet,$infos);
+
+			 if(ATF::$codename == "cleodisbe" OR  ATF::$codename == "cleodis"){
+
+				foreach($infos as $facture){
+					ATF::facture()->u(array("id_facture" => $facture['facture.id_facture_fk'] , "exporte" => "oui"));
+				}
+
+			 }
+			
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
