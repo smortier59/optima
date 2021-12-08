@@ -1075,7 +1075,15 @@ class affaire_cleodis extends affaire {
 	* @return float
 	*/
 	public function getCompteTLoyerActualise(&$infos) {
-		$a = new affaire_cleodis($infos["id_affaire"]);
+		if (ATF::$codename == "go_abonnement") {
+			$a = new affaire_go_abonnement($infos["id_affaire"]);
+		}
+		elseif (ATF::$codename == "bdomplus") {
+			$a = new affaire_bdomplus($infos["id_affaire"]);
+		} else {
+			$a = new affaire_cleodis($infos["id_affaire"]);
+		}
+
 		if ($c = $a->getCommande()) {
 			$date_debut = $c->get("date_debut");
 		}
