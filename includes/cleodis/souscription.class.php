@@ -1986,7 +1986,6 @@ class souscription_boulanger extends souscription_cleodis {
       switch($post["toDo"]) {
         case 'start':
           $this->demarrageContrat($affaire, $commande);
-          log::logger("Demmarage terminé" , "mfleurquin");
         break;
 
         case 'cancel':
