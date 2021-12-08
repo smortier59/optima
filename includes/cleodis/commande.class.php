@@ -542,8 +542,6 @@ class commande_cleodis extends commande {
 	* @return bool
     */
 	public function updateDate($infos,&$s,&$request){
-		log::logger("UPDATE DATE", "mfleurquin");
-		log::logger($infos , "mfleurquin");
 
 		if (!$infos['id_commande']) return false;
 
@@ -607,7 +605,6 @@ class commande_cleodis extends commande {
 						,"date"=>$d[$infos['key']]
 					));
 					if($infos['key'] === "date_debut" && $infos['value']){
-						log::logger("ICI" , "mfleurquin");
 
 						//Creation de la facture prorata si besoin
 						$id_affaire = $this->select($infos['id_commande'] , "id_affaire");
@@ -618,8 +615,6 @@ class commande_cleodis extends commande {
 										  "date_debut_contrat" => $infos['value'],
 										  "id_commande"=> $infos["id_commande"]
 										);
-							log::logger("Data facture prorata" , "mfleurquin");
-							log::logger($data , "mfleurquin");
 
 							ATF::facture()->createFactureProrata($data);
 						}
@@ -628,9 +623,6 @@ class commande_cleodis extends commande {
 										"date_debut_contrat" => $infos['value'],
 										"id_commande"=> $infos["id_commande"]
 									 );
-
-						log::logger("Data 1ere facture" , "mfleurquin");
-						log::logger($data , "mfleurquin");
 						//Creation de la premiere facture
 						ATF::facture()->createPremiereFacture($data);
 
@@ -1264,12 +1256,10 @@ class commande_cleodis extends commande {
 		if (is_numeric($infos) || is_string($infos)) {
 			$id=$this->decryptId($infos);
 			$commande=$this->select($id);
-//log::logger("delete1",'error.log');
 
 			//Commande
 			if($commande){
 //*****************************Transaction********************************
-//log::logger("delete2",'error.log');
 				ATF::db($this->db)->begin_transaction();
 				parent::delete($id,$s);
 
@@ -1297,7 +1287,6 @@ class commande_cleodis extends commande {
 
 				ATF::db($this->db)->commit_transaction();
 	//*****************************************************************************
-//log::logger("redirection",'error.log');
 
 				ATF::affaire()->redirection("select",$commande["id_affaire"]);
 
@@ -1791,8 +1780,8 @@ class commande_cleodis extends commande {
 		foreach($commandeSa["data"] as $key=>$item){
 			unset($affaires_parentes);
 
-//			log::logger($i." \ ".$commandeSa["count"],'cleodis_statut.log');
 			if(ATF::$codename == "cleodisbe") $commande = new commande_cleodisbe($item['id_commande']);
+			elseif(ATF::$codename == "go_abonnement") $commande = new commande_go_abonnement($item['id_commande']);
 			else $commande = new commande_cleodis($item['id_commande']);
 
 			$affaire = $commande->getAffaire();
