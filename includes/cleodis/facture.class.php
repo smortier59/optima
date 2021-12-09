@@ -243,6 +243,8 @@ class facture_cleodis extends facture {
 				if ($facture["id_affaire"]) {
 					if(ATF::affaire()->select($facture["id_affaire"],"nature")=="vente"){
 						return "cheque";
+					} else {
+						return ATF::commande()->select($facture["id_commande"], "type");
 					}
 				}
 				break;
@@ -432,7 +434,7 @@ class facture_cleodis extends facture {
 				$facture["facture"] = array(
 		            "id_societe" => $affaire["id_societe"],
 		            "type_facture" => "libre",
-		            "mode_paiement" => "prelevement",
+		            "mode_paiement" => $commande["type"],
 		            "id_affaire" => $affaire["id_affaire"],
 		            "type_libre" => "normale",
 		            "date" => date("d-m-Y"),
@@ -519,7 +521,7 @@ class facture_cleodis extends facture {
 		$dateFinPeriode = $dateFinPeriode->format('t-m-Y');
 
 		if($totalLoyer != 0){
-			$mode_paiement = "prelevement";
+			$mode_paiement = $commande["type"];
 			if($affaire["site_associe"] === 'toshiba') $mode_paiement = "cb";
 			if($affaire["site_associe"] === 'btwin') $mode_paiement = "pre-paiement";
 
