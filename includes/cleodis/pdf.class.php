@@ -4367,6 +4367,7 @@ class pdf_cleodis extends pdf {
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
+				$commentaire = "";
 
 
 
@@ -4374,20 +4375,25 @@ class pdf_cleodis extends pdf {
 				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
 				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
 
-				ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
+
+				if (ATF::$codename !== "go_abonnement") {
+					ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
 										   ->where('etat','valide','AND')
 										   ->from('demande_refi','id_refinanceur','refinanceur','id_refinanceur')
 										   ->where('refinanceur.code_refi','REFACTURATION');
 
-				if($refi = ATF::demande_refi()->select_row()){
-					if($commentaire) $commentaire .= 'Information de prélèvements : ';
-					$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+					if($refi = ATF::demande_refi()->select_row()){
+						if($commentaire) $commentaire .= 'Information de prélèvements : ';
+						$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+					}
 				}
 
 
-				$data[0][0] = $commentaire;
-				$styles[0][0] = $this->styleDetailsProduit;
-				$this->tableauBigHead($head,$data,$w,5,$styles);
+				if ($commentaire != "") {
+					$data[0][0] = $commentaire;
+					$styles[0][0] = $this->styleDetailsProduit;
+					$this->tableauBigHead($head,$data,$w,5,$styles);
+				}
 			}
 
 
