@@ -387,6 +387,7 @@ class devis_cleodis extends devis {
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
 
+
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
 		if(!$RUM){
