@@ -763,6 +763,19 @@ class facturation extends classes_optima {
 
 	}
 
+	function next_echeance($id_affaire,$date=false) {
+		$this->q->reset()->Where("id_affaire",$id_affaire,"AND",1)
+						 ->setDimension("row")
+						 ->addOrder("date_periode_debut","asc");
+
+		if($date){
+			$this->q->Where("id_facture",NULL,"AND",1,"IS NULL");
+		}
+
+		return $this->sa();
+
+	}
+
 	/**
 	* Incrémente le tableau renseignant le nombre d'enregistrement contrat envoyé (fc), prolongation envoyée (fp), contrat non envoyé (bfc), prolongation non envoyée (nfp)
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
