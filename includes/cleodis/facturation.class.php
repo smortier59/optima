@@ -1698,4 +1698,6 @@ class facturation_bdomplus extends facturation {
 class facturation_bdom extends facturation { };
 class facturation_boulanger extends facturation { };
 
-class facturation_go_abonnement extends facturation { };
+class facturation_go_abonnement extends facturation {
+	public $user_facturation = array(16,116);
+ };
