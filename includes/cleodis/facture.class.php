@@ -202,7 +202,11 @@ class facture_cleodis extends facture {
 				return date("Y-m-d");
 			case "date_previsionnelle":
 				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					if (ATF::$codename == "go_abonnement") {
+						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
+					} else {
+						$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					}
 					if($date_previsionnelle=ATF::affaire()->select($facture['id_affaire'],"date_previsionnelle")){
 						$day=$date_previsionnelle;
 					}else{
@@ -214,13 +218,22 @@ class facture_cleodis extends facture {
 				}
 			case "date_periode_debut":
 				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					if (ATF::$codename == "go_abonnement") {
+						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
+					} else {
+						$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					}
+
 					return $periode["date_periode_debut"];
 				}
 				break;
 			case "date_periode_fin":
 				if ($facture) {
-					$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					if (ATF::$codename == "go_abonnement") {
+						$periode = ATF::facturation()->next_echeance($facture['id_affaire'],true);
+					} else {
+						$periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true);
+					}
 					return $periode["date_periode_fin"];
 				}
 				break;
@@ -230,10 +243,18 @@ class facture_cleodis extends facture {
 					$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
 
 					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-							$prix=($periode["montant"]+$periode["frais_de_gestion"]);
-						}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-							$prix=$facture["prix"];
+						if (ATF::$codename == "go_abonnement") {
+							if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
+								$prix=($periode["montant"]+$periode["frais_de_gestion"]);
+							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+								$prix=$facture["prix"];
+							}
+						} else {
+							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+								$prix=($periode["montant"]+$periode["frais_de_gestion"]);
+							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+								$prix=$facture["prix"];
+							}
 						}
 					} else {
 						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
@@ -253,10 +274,18 @@ class facture_cleodis extends facture {
 
 						$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
 						if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-								$prix_sans_tva=$periode["assurance"];
-							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-								$prix_sans_tva=$facture["prix_sans_tva"];
+							if (ATF::$codename == "go_abonnement") {
+								if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
+									$prix_sans_tva=$periode["assurance"];
+								}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+									$prix_sans_tva=$facture["prix_sans_tva"];
+								}
+							} else {
+								if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+									$prix_sans_tva=$periode["assurance"];
+								}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+									$prix_sans_tva=$facture["prix_sans_tva"];
+								}
 							}
 						} else {
 							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
@@ -705,7 +734,14 @@ class facture_cleodis extends facture {
 			$infos["prix"]=$infos["prix_midas"];
 			$infos["commentaire"] = $infos["periode_midas"];
 		}elseif($infos["type_facture"]=="facture"){
-			if($facturation= ATF::facturation()->periode_facturation($commande['id_affaire'])){
+			if (ATF::$codename == "go_abonnement") {
+				$facturation= ATF::facturation()->next_echeance($commande['id_affaire']);
+			} else {
+				$facturation= ATF::facturation()->periode_facturation($commande['id_affaire']);
+			}
+
+
+			if($facturation){
 				if(($infos["date_periode_debut"]) && ($infos["date_periode_fin"])){
 					$date = explode("-", $infos["date_periode_debut"]);
 					$date_periode_debut = $date[2]."-".$date[1]."-".$date[0];
@@ -717,7 +753,14 @@ class facture_cleodis extends facture {
 					if(($infos["date_periode_debut"] >= $facturation["date_periode_debut"]) && ($infos["date_periode_fin"] <= $facturation["date_periode_fin"])){
 						//On est dans une periode de l'echeancier
 						if($facturation["id_facture"]) throw new errorATF("Il existe déjà une facturation pour cette période.",349);
-					}else{ $facturation = ATF::facturation()->periode_facturation($commande['id_affaire'],true); }
+					}else{
+						if (ATF::$codename == "go_abonnement") {
+							$facturation = ATF::facturation()->next_echeance($commande['id_affaire'],true);
+						} else {
+							$facturation = ATF::facturation()->periode_facturation($commande['id_affaire'],true);
+						}
+
+					}
 				}else{
 					$infos["date_periode_debut"] = $facturation["date_periode_debut"];
 					$infos["date_periode_fin"] = $facturation["date_periode_fin"];
