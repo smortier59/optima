@@ -24,7 +24,12 @@
 {if $id_affaire}
 	{$calcul_prix='true'}
 	{$q->reset()->addCondition("id_affaire",classes::decryptId($id_affaire))->setView([order=>$fields])->end()}
+	{if ATF::$codename="go_abonnement"}
+		{include file="loyer-lignes.tpl.js" proxyUrl="devis,getLoyerForUpdate.ajax,id_affaire={$id_affaire}"}
+	{else}
+		{include file="loyer-lignes.tpl.js"}
+	{/if}
 {else}
 	{$q->reset()->addCondition("id_affaire",0)->setView([order=>$fields])->end()}
+	{include file="loyer-lignes.tpl.js"}
 {/if}
-{include file="loyer-lignes.tpl.js"}
