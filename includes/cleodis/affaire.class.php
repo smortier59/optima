@@ -1189,8 +1189,17 @@ class affaire_cleodis extends affaire {
 		if(ATF::$usr->getID()){
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
-			$societe = ATF::societe()->select(246);
-			$from = $societe["societe"]." <".$societe["email"].">";
+			if (ATF::$codename != "cleodis" && ATF::$codename != "cleodisbe" ) {
+				ATF::constante()->q->reset()->where("constante","__MAIL_SOCIETE__");
+				$mail_societe = ATF::constante()->select_row();
+				ATF::constante()->q->reset()->where("constante","__SOCIETE__");
+				$optima_societe = ATF::constante()->select_row();
+
+				$from = $optima_societe["valeur"]." <". $mail_societe["valeur"] .">";
+			} else {
+				$societe = ATF::societe()->select(246);
+				$from = $societe["societe"]." <".$societe["email"].">";
+			}
 		}
 
 		if(!$email["objet"]){
@@ -1212,7 +1221,10 @@ class affaire_cleodis extends affaire {
 			$path = ATF::$table()->filepath($last_id,$item);
 			$mail->addFile($path,$key.$enregistrement["ref"].".pdf",true);
 		}
+		log::logger($info_mail , "mfleurquin");
 		$mail->send();
+
+
 
 		if($email["emailCopie"]){
 			$info_mail["recipient"] = $email["emailCopie"];
