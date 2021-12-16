@@ -4367,6 +4367,7 @@ class pdf_cleodis extends pdf {
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
+				$commentaire = "";
 
 
 
@@ -4388,10 +4389,11 @@ class pdf_cleodis extends pdf {
 				}
 
 
-
-				$data[0][0] = $commentaire;
-				$styles[0][0] = $this->styleDetailsProduit;
-				$this->tableauBigHead($head,$data,$w,5,$styles);
+				if ($commentaire != "") {
+					$data[0][0] = $commentaire;
+					$styles[0][0] = $this->styleDetailsProduit;
+					$this->tableauBigHead($head,$data,$w,5,$styles);
+				}
 			}
 
 
