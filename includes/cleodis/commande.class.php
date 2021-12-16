@@ -812,7 +812,64 @@ class commande_cleodis extends commande {
 						$commande->set("date_evolution",$date_fin_calculee);
 					}
 
+					if(ATF::$codename === "go_abonnement") {
+						// Si on a des prolongations deja créées, il faut mettre à jour les dates de début et fin de prolongation et génerer les echeanciers de prolongation
+						ATF::prolongation()->q->reset()->where("id_affaire", $affaire->get("id_affaire"), "AND")
+						->whereIsNull("prolongation.date_debut", "AND")
+						->addOrder("id_prolongation");
+						$prolongations = ATF::prolongation()->select_all();
+
+						if ($prolongations) {
+
+							$date_debut=date("Y-m-d",strtotime($date_fin_calculee."+1 day"));
+
+							foreach($prolongations as $kp => $vp) {
+								// On recupere le loyer de prolongation associé à la prolongation
+								ATF::loyer_prolongation()->q->reset()->where('id_prolongation', $vp["id_prolongation"]);
+								$lp = ATF::loyer_prolongation()->select_row();
+
+								if($lp['duree']){
+									if($lp['frequence_loyer']=="an"){
+										$frequence=12;
+									}elseif($lp['frequence_loyer']=="semestre"){
+										$frequence=6;
+									}elseif($lp['frequence_loyer']=="trimestre"){
+										$frequence=3;
+									}else{
+										$frequence=1;
+									}
+									$lp["date_debut"] = $date_debut;
+
+									$lp["date_fin"]=date("Y-m-d",strtotime($date_debut."+".($frequence*$lp['duree'])." month"));
+									$lp["date_fin"]=date("Y-m-d",strtotime($lp["date_fin"]."- 1 day"));
+
+									$date_debut=date("Y-m-d",strtotime($lp["date_fin"]."+ 1 day"));
+
+									ATF::loyer_prolongation()->u(array(
+											"id_loyer_prolongation"=> $lp["id_loyer_prolongation"],
+											"date_debut" => $lp["date_debut"],
+											"date_fin" => $lp["date_fin"]
+
+										)
+									);
+
+									ATF::prolongation()->u(array(
+											"id_prolongation"=> $lp["id_prolongation"],
+											"date_debut" => $lp["date_debut"],
+											"date_fin" => $lp["date_fin"]
+										)
+									);
+								}
+							}
+						}
+					}
+
+
 					$this->checkEtat($commande,$affaires_parentes);
+
+
+
+
 
 					/* L'échéancier de facturation devient disponible */
 					ATF::facturation()->insert_facturations($commande,$affaire,$affaires_parentes,$devis);
@@ -821,6 +878,7 @@ class commande_cleodis extends commande {
 						/*Il faut également généré l'echéancier de facturation fournisseur */
 						ATF::facturation_fournisseur()->generate_echeancier($commande,$affaire,$affaires_parentes,$devis);
 					}
+
 
 
 					//Ce test doit se faire obligatoirement sous insert_facturations() car cette méthode met à jour les dates prolong
@@ -866,14 +924,7 @@ class commande_cleodis extends commande {
 							} else {
 								// La date prévue d'évolution de la commande parente n'est pas dépassée
 								$commande_parente->set("etat","non_loyer");
-							}
-
-//							if ($affaire->get("etat") == "facture_refi") {
-//								// L'affaire est en état facture_refi
-//								$affaire_parente->set("etat","facture_refi");
-//							} else {
-//								$affaire_parente->set("etat","facture");
-//							}
+							}//
 						}
 					}
 
