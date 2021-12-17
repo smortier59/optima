@@ -12,24 +12,45 @@ ATF.buildGridEditor({
 	maj: function(){
 		var records = this.store.getRange();
 		var prix = 0;
+		var prix_sans_tva = 0;
 		var total = 0;
+		var assurance_sans_tva = false;
+
+		{if ATF::_r('id_devis')}
+			{$id_affaire = ATF::devis()->select(ATF::_r('id_devis'), 'id_affaire')}
+			{$id_type_affaire = ATF::affaire()->select($id_affaire, 'id_type_affaire')}
+			{if ATF::type_affaire()->select($id_type_affaire, 'assurance_sans_tva') === 'oui'}
+				assurance_sans_tva = true;
+			{/if}
+		{/if}
 
 		for (var i = 0; i < this.store.getRange().length; i++) {
 
-			console.log(records[i].data);
-
-
-			prix=(
-				records[i].data.{$current_class->table}__dot__loyer*1+
-				records[i].data.{$current_class->table}__dot__assurance*1+
-				records[i].data.{$current_class->table}__dot__frais_de_gestion*1+
-				records[i].data.{$current_class->table}__dot__serenite*1+
-				records[i].data.{$current_class->table}__dot__maintenance*1+
-				records[i].data.{$current_class->table}__dot__hotline*1+
-				records[i].data.{$current_class->table}__dot__supervision*1+
-				records[i].data.{$current_class->table}__dot__support*1
-			)*records[i].data.{$current_class->table}__dot__duree;
-			records[i].set('{$current_class->table}__dot__loyer_total',prix);
+			if (assurance_sans_tva) {
+				prix=(
+					records[i].data.{$current_class->table}__dot__loyer*1+
+					records[i].data.{$current_class->table}__dot__frais_de_gestion*1+
+					records[i].data.{$current_class->table}__dot__serenite*1+
+					records[i].data.{$current_class->table}__dot__maintenance*1+
+					records[i].data.{$current_class->table}__dot__hotline*1+
+					records[i].data.{$current_class->table}__dot__supervision*1+
+					records[i].data.{$current_class->table}__dot__support*1
+				)*records[i].data.{$current_class->table}__dot__duree;
+				prix_sans_tva=(records[i].data.{$current_class->table}__dot__assurance*1)*records[i].data.{$current_class->table}__dot__duree;
+				records[i].set('{$current_class->table}__dot__loyer_total',prix+prix_sans_tva);
+			} else {
+				prix=(
+					records[i].data.{$current_class->table}__dot__loyer*1+
+					records[i].data.{$current_class->table}__dot__assurance*1+
+					records[i].data.{$current_class->table}__dot__frais_de_gestion*1+
+					records[i].data.{$current_class->table}__dot__serenite*1+
+					records[i].data.{$current_class->table}__dot__maintenance*1+
+					records[i].data.{$current_class->table}__dot__hotline*1+
+					records[i].data.{$current_class->table}__dot__supervision*1+
+					records[i].data.{$current_class->table}__dot__support*1
+				)*records[i].data.{$current_class->table}__dot__duree;
+				records[i].set('{$current_class->table}__dot__loyer_total',prix);
+			}
 
 			{if $current_class->table == "loyer_prolongation"}
 				total+=prix;
@@ -39,10 +60,15 @@ ATF.buildGridEditor({
 				}
 			{/if}
 
-
 		}
 		if(Ext.ComponentMgr.get('{$table}[prix]')){
 			Ext.ComponentMgr.get('{$table}[prix]').setValue(ATF.formatNumeric(total));
+		}
+
+		if (assurance_sans_tva) {
+			if(Ext.ComponentMgr.get('{$table}[prix_sans_tva]')){
+				Ext.ComponentMgr.get('{$table}[prix_sans_tva]').setValue(ATF.formatNumeric(prix_sans_tva));
+			}
 		}
 
 		if(Ext.ComponentMgr.get('{$table}[marge]')){

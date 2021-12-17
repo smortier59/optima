@@ -765,6 +765,19 @@ class facturation extends classes_optima {
 
 	}
 
+	function next_echeance($id_affaire,$date=false) {
+		$this->q->reset()->Where("id_affaire",$id_affaire,"AND",1)
+						 ->setDimension("row")
+						 ->addOrder("date_periode_debut","asc");
+
+		if($date){
+			$this->q->Where("id_facture",NULL,"AND",1,"IS NULL");
+		}
+
+		return $this->sa();
+
+	}
+
 	/**
 	* Incrémente le tableau renseignant le nombre d'enregistrement contrat envoyé (fc), prolongation envoyée (fp), contrat non envoyé (bfc), prolongation non envoyée (nfp)
 	* @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
@@ -1575,10 +1588,20 @@ class facturation extends classes_optima {
 
 					//Insertion des factures
 					$facture_date_previsionnelle=date('Y-m-d',strtotime($facturation["date_periode_debut"]."+".$day." day"));
+
+					$prix = $facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
+					$prix_sans_tva = 0;
+					$type_affaire = ATF::affaire()->select($affaire["id_affaire"], "id_type_affaire");
+					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
+						$prix = $facturation["montant"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"];
+						$prix_sans_tva = $facturation["assurance"];
+					}
+
 					$facture=array(
 						"id_societe"=>$commande["id_societe"],
 						"ref"=>$ref,
-						"prix"=>$facturation["montant"]+$facturation["assurance"]+$facturation["frais_de_gestion"]+$facturation["serenite"]+$facturation["maintenance"]+$facturation["hotline"]+$facturation["supervision"]+$facturation["support"],
+						"prix"=>$prix,
+						"prix_sans_tva"=>$prix_sans_tva,
 						"etat"=>"impayee",
 						"date"=>$date_debut,
 						"date_periode_debut"=>$facturation["date_periode_debut"],
@@ -1602,13 +1625,19 @@ class facturation extends classes_optima {
 
 
 					if($facture["mode_paiement"] == "prelevement"){
-						$facture["etat"] = "payee";
-						$facture["date_paiement"] = $facture["date"];
+						if(ATF::$codename != "bdomplus"){
+							$facture["etat"] = "payee";
+							$facture["date_paiement"] = $facture["date"];
+						}else{
+							$facture["etat"] = "impayee";
+							$facture["date_paiement"] = NULL;
+						}
 					}else{
 						$facture["etat"] = "impayee";
 						$facture["date_paiement"] = NULL;
 					}
 
+					if(ATF::$codename == "bdomplus") $facture["date_paiement"] = NULL;
 
 					$id_facture=ATF::facture()->i($facture);
 
@@ -1670,3 +1699,7 @@ class facturation_bdomplus extends facturation {
 };
 class facturation_bdom extends facturation { };
 class facturation_boulanger extends facturation { };
+
+class facturation_go_abonnement extends facturation {
+	public $user_facturation = array(16,116);
+ };
