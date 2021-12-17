@@ -3131,16 +3131,19 @@ class affaire_cleodis extends affaire {
 	 * @param  $id_affaire
 	 */
 	public function createTacheAffaireFromSite($id_affaire){
-		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe') return;
+		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe' && ATF::$codename != 'go_abonnement') return;
 
-		ATF::user()->q->reset()->where("login", "jvasut", "OR", "filles")
-								//->where("login", "abowe", "OR", "filles")
-								->where("login", "mmysoet", "OR", "filles")
-								->where("login", "egerard", "OR", "filles")
-								->where("login", "btronquit", "OR", "filles")
-								->where("login", "pcaminel", "OR", "filles")
-								//->where("login", "smazars", "OR", "filles")
-								->where("login", "lhochart", "OR", "filles");
+		ATF::constante()->q->reset()->where("constante", "__DESTINATAIRE_NOTIFIE_TACHE_AFFAIRE_PARTENAIRE__");
+		$destinataire_notifie_tache_affaire_partenaire = ATF::constante()->select_row();
+		$destinataires = $destinataire_notifie_tache_affaire_partenaire["valeur"];
+		$destinataires = explode(',', $destinataires);
+
+
+		ATF::user()->q->reset();
+
+		foreach ($destinataires as $key => $value) {
+			ATF::user()->q->where("login", $value, "OR", "destinataires");
+		}
 
 
 		$filles = ATF::user()->sa();
@@ -3148,15 +3151,6 @@ class affaire_cleodis extends affaire {
         foreach ($filles as $key => $value) {
         	$dest[] = $value["id_user"];
      	}
-
-
-		// $dest = array("18", "21","112", "103","124");  //Pierre, Allison, Severine, Emily, Jeanne
-		// $id_user = 116; //Benjamin Tronquit
-
-		// if(ATF::$codename === "cleodisbe"){
-		// 	$dest = array("18", "21", "104", "124");  //Pierre, Allison, Severine,  Jeanne
-		// 	$id_user = 113;  //Benjamin Tronquit
-		// }
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
