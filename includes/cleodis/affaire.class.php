@@ -1189,8 +1189,17 @@ class affaire_cleodis extends affaire {
 		if(ATF::$usr->getID()){
 			$from = ATF::user()->nom(ATF::$usr->getID())." <".ATF::user()->select(ATF::$usr->getID(),"email").">";
 		}else{
-			$societe = ATF::societe()->select(246);
-			$from = $societe["societe"]." <".$societe["email"].">";
+			if (ATF::$codename != "cleodis" && ATF::$codename != "cleodisbe" ) {
+				ATF::constante()->q->reset()->where("constante","__MAIL_SOCIETE__");
+				$mail_societe = ATF::constante()->select_row();
+				ATF::constante()->q->reset()->where("constante","__SOCIETE__");
+				$optima_societe = ATF::constante()->select_row();
+
+				$from = $optima_societe["valeur"]." <". $mail_societe["valeur"] .">";
+			} else {
+				$societe = ATF::societe()->select(246);
+				$from = $societe["societe"]." <".$societe["email"].">";
+			}
 		}
 
 		if(!$email["objet"]){
@@ -1212,7 +1221,10 @@ class affaire_cleodis extends affaire {
 			$path = ATF::$table()->filepath($last_id,$item);
 			$mail->addFile($path,$key.$enregistrement["ref"].".pdf",true);
 		}
+		log::logger($info_mail , "mfleurquin");
 		$mail->send();
+
+
 
 		if($email["emailCopie"]){
 			$info_mail["recipient"] = $email["emailCopie"];
@@ -3405,6 +3417,8 @@ class affaire_bdomplus extends affaire_cleodis {
 		$this->table = "affaire";
 		parent::__construct($table_or_id);
 
+		$this->colonnes['fields_column'][] = 'affaire.renouveller';
+
 		$this->onglets = array(
 			'affaire_etat'
 			,"sell_and_sign"
@@ -3432,6 +3446,9 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		$this->colonnes['primary']['licence'] = array("custom"=>true);
 		$this->fieldstructure();
+
+		$this->addPrivilege("activeDesactiveRenouvellement");
+
 	}
 
 
@@ -3574,17 +3591,19 @@ class affaire_bdomplus extends affaire_cleodis {
 	}
 
 
-	/*
+	/**
 	* Pour toutes les affaires dont la date de debut = M+11 et qu'il n'y a pas de condition de prolongation
 	* On envoi un mail au client pour l'avertir du renouvellement et on crée un suivi
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function process_envoi_mail_information_renouvellement(){
-		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
-								   ->where("etat", "arreter_contentieux","AND", false, "!=")
-								   ->where("etat", "vente", "AND", false, "!=")
-								   ->where("etat", "non_loyer", "AND", false, "!=")
-								   ->where("etat", "AR", "AND", false, "!=");
+		ATF::commande()->q->reset()->from("commande","id_affaire","affaire","id_affaire")
+								   ->where("commande.etat", "arreter", "AND", false, "!=")
+								   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+								   ->where("commande.etat", "vente", "AND", false, "!=")
+								   ->where("commande.etat", "non_loyer", "AND", false, "!=")
+								   ->where("commande.etat", "AR", "AND", false, "!=")
+								   ->where("affaire.renouveller", "oui", "AND");
 
 		$contrats_en_cours = ATF::commande()->sa();
 
@@ -3600,7 +3619,6 @@ class affaire_bdomplus extends affaire_cleodis {
 			}
 
 			if($a_renouveller){
-
 				//log::logger($value , "mfleurquin");
 				$affaire = ATF::affaire()->select($value["id_affaire"]);
 
@@ -3661,11 +3679,14 @@ class affaire_bdomplus extends affaire_cleodis {
 	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
 	*/
 	public function process_envoi_mail_non_renouvellement_client_contentieux(){
-		ATF::commande()->q->reset()->where("etat", "arreter", "AND", false, "!=")
-								   ->where("etat", "arreter_contentieux","AND", false, "!=")
-								   ->where("etat", "vente", "AND", false, "!=")
-								   ->where("etat", "non_loyer", "AND", false, "!=")
-								   ->where("etat", "AR", "AND", false, "!=");
+
+		ATF::commande()->q->reset()->from("commande","id_affaire","affaire","id_affaire")
+								   ->where("commande.etat", "arreter", "AND", false, "!=")
+								   ->where("commande.etat", "arreter_contentieux","AND", false, "!=")
+								   ->where("commande.etat", "vente", "AND", false, "!=")
+								   ->where("commande.etat", "non_loyer", "AND", false, "!=")
+								   ->where("commande.etat", "AR", "AND", false, "!=")
+								   ->where("affaire.renouveller", "oui", "AND");
 								   //->where("etat", "%contentieux", "AND", false, "LIKE");
 
 		$contrats_en_cours = ATF::commande()->sa();
@@ -3828,7 +3849,18 @@ class affaire_bdomplus extends affaire_cleodis {
 					      $suivi["texte"] =  "Probleme lors de l'envoi du ".$suivi["texte"];
 					    }
 					    ATF::suivi()->i($suivi);
-					}else{
+					} else if(ATF::affaire()->select($value["id_affaire"], "renouveller") === "non") {
+						log::logger("Non renouvellée car affaire ref: ".ATF::affaire()->select($value["id_affaire"], "ref")." à ne pas renouveller, on stop juste l'affaire" , "renouvellement_ok");
+						$suivi = array(
+							"id_contact" => $contact["id_contact"],
+							"id_societe" => $value["id_societe"],
+							"id_affaire" => $affaire["id_affaire"],
+							"type"=> "note",
+							"type_suivi"=> "Contrat",
+							"texte" => "Non renouvellement de l'affaire, car il a été demandé de ne pas renouveller cette affaire"
+						  );
+						  ATF::suivi()->i($suivi);
+					} else{
 						log::logger("BON PAYEUR" , "renouvellement_ok");
 						log::logger($value["id_affaire"] , "renouvellement_ok");
 						//Client bon payeur, on arrete le contrat et crée l'annule et remplace pour cette affaire
@@ -3993,6 +4025,47 @@ class affaire_bdomplus extends affaire_cleodis {
 
 		}
 
+	}
+
+	/**
+	* Permet de mettre a jour une date en ajax
+	* @author Morgan FLEURQUIN <mfleurquin@absystech.fr>
+	* @param array $infos
+	* @return bool
+	*/
+	public function activeDesactiveRenouvellement($infos){
+		if(!isset($infos["renouveller"])) throw new errorATF("MISSING DATA renouveller", 500);
+		if(!isset($infos["id_affaire"])) throw new errorATF("MISSING DATA ID AFFAIRE", 500);
+
+
+		if(isset($infos['renouveller']) && $infos['id_affaire']){
+			//Mode transactionel
+			ATF::db($this->db)->begin_transaction();
+
+			try {
+				$affaire = new affaire_bdomplus($infos['id_affaire']);
+				$affaire->set("renouveller",$infos['renouveller']);
+				//On commit le tout
+				ATF::db($this->db)->commit_transaction();
+
+				if ($infos["renouveller"] == "oui") {
+					ATF::$msg->addNotice("Votre demande de reactivation du renouvellement est bien prise en compte");
+				} else {
+					ATF::$msg->addNotice("Votre demande de desactivation du renouvellement est bien prise en compte");
+				}
+
+				$this->redirection("select",$infos['id_affaire']);
+
+				return true;
+
+			} catch(errorATF $e) {
+				//On commit le tout
+				ATF::db($this->db)->rollback_transaction();
+				throw $e;
+			}
+		}else{
+			return false;
+		}
 	}
 
 

@@ -127,13 +127,13 @@ class devis_cleodis extends devis {
 			,"prix_achat"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 			,"marge_absolue"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
+			,"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield","null"=>true)
 		);
 
 		$this->colonnes['panel']['commentaire'] = array(
 			"commentaire_facture"=>array("custom"=>true,"xtype"=>"textfield"),
 			"commentaire_facture2"=>array("custom"=>true,"xtype"=>"textfield"),
 			"commentaire_facture3"=>array("custom"=>true,"xtype"=>"textfield")
-
 		);
 
 		$this->colonnes['panel']['courriel'] = array(
@@ -159,7 +159,7 @@ class devis_cleodis extends devis {
 
 		$this->colonnes['bloquees']['insert'] =
 		$this->colonnes['bloquees']['clone'] =
-		$this->colonnes['bloquees']['update'] =  array_merge(array('first_date_accord','date_accord','ref','etat','id_user','id_affaire','devis_etendre','perdu'));
+		$this->colonnes['bloquees']['update'] =  array_merge(array('first_date_accord','date_accord','ref','etat','id_user','id_affaire','devis_etendre','perdu', 'prix_sans_tva'));
 
 
 		// Ne pas afficher sur le select les panels spécifiques aux insert/update
@@ -378,11 +378,6 @@ class devis_cleodis extends devis {
 		$RUM = "";
 		$id_societe = ATF::societe()->select(ATF::$usr->get('contact','id_societe'),'id_societe');
 
-
-
-
-
-
 		$RUM = $this->recuperation_rum($affaire, $infos_AR, $infos_avenant, $infos);
 
 		if(!$RUM){
@@ -435,6 +430,10 @@ class devis_cleodis extends devis {
 
 		////////////////Opportunité
 		if ($infos["id_opportunite"])	ATF::opportunite()->u(array('id_opportunite'=>$infos['id_opportunite'],'etat'=>'fini','id_affaire'=>$infos["id_affaire"]));
+
+
+		$id_type_affaire = $infos["id_type_affaire"];
+
 
 		////////////////Devis
 		unset($infos["marge"],$infos['commentaire'],$infos["marge_absolue"],$infos["id_parent"],$infos["nature"],$infos["loyers"],$infos["frais_de_gestion_unique"],$infos["assurance_unique"],$infos["prix_vente"],$infos["date_garantie"],$infos["vente_societe"],$infos["BIC"],$infos["RIB"],$infos["IBAN"],$infos["nom_banque"],$infos["ville_banque"],$infos["type_affaire"], $infos["id_type_affaire"]  ,$infos["id_partenaire"],$infos["commentaire_facture"], $infos["commentaire_facture2"], $infos["commentaire_facture3"],$infos["langue"]);
@@ -493,7 +492,6 @@ class devis_cleodis extends devis {
 						         	'devis_ligne_dot_visible_pdf'=> 'non');
 		}
 
-		log::logger($infos_ligne , "ligne_devis");
 		//Lignes
 		if($infos_ligne){
 			$infos_ligne=$this->extJSUnescapeDot($infos_ligne,"devis_ligne");
@@ -504,8 +502,6 @@ class devis_cleodis extends devis {
 					throw new errorATF("Ligne de devis sans fournisseur",882);
 				}
 				unset($item["id_parc"]);
-
-				log::logger($item , "ligne_devis");
 
 				ATF::devis_ligne()->i($item);
 			}
@@ -541,6 +537,8 @@ class devis_cleodis extends devis {
 		if($infos["loyer_unique"]=="oui"){
 			$this->loyer_unique($infos['id_affaire'],$infos_avenant["affaire"][0],$loyer_unique);
 		}elseif($infos_loyer){
+			$prix = $prix_sans_tva = 0;
+
 			foreach($infos_loyer as $key=>$item){
 				foreach($item as $k=>$i){
 					$k_unescape=util::extJSUnescapeDot($k);
@@ -556,6 +554,19 @@ class devis_cleodis extends devis {
 				}else{
 					ATF::db($this->db)->rollback_transaction();
 					throw new errorATF("Il n'y a pas de fréquence pour un loyer",876);
+				}
+
+				if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === 'oui' ){
+					$prix += (	$item["loyer"]
+								+$item["frais_de_gestion"]
+								+$item["serenite"]
+								+$item["maintenance"]
+								+$item["supervision"]
+								+$item["support"]
+							)*$item["duree"];
+					$prix_sans_tva += $item["assurance"] * $item["duree"];
+
+					ATF::devis()->u(array("id_devis"=> $last_id, "prix"=> $prix, "prix_sans_tva"=>$prix_sans_tva));
 				}
 			}
 		}elseif($infos["type_contrat"]=="vente"){
