@@ -367,6 +367,7 @@ class prelevement extends classes_optima{
             $result[$key]['ref_client'] = $item['ref'];
             $result[$key]['id_societe_fk'] = $item['id_societe'];
             $result[$key]['prix_ttc'] = $result[$key]['prix'];
+            $result[$key]['id_societe'] = $item['societe'];
   
             foreach($affaires as $affaire){
               $result[$key]['id_affaire'] = $affaire['affaire'] ;
@@ -380,11 +381,11 @@ class prelevement extends classes_optima{
         }
 
       }
-      elseif(!$get['id_societe']){
+      elseif(!$get['id_societe'] && !$get["date_fin"] && !$get['date_debut'] && !$get['numero_facture']){
         ATF::facture()->q->reset()
-                                ->where('facture.etat','impayee')
-                                ->where('facture.id_termes',24,'AND',false,"!=")
-                                ->where('facture.id_termes',25,'AND',false,"!=");
+            ->where('facture.etat','impayee')
+            ->where('facture.id_termes',24,'AND',false,"!=")
+            ->where('facture.id_termes',25,'AND',false,"!=");
   
         $response = ATF::facture()->select_all();
 
@@ -408,7 +409,6 @@ class prelevement extends classes_optima{
 
        elseif(($get['id_societe'] ) && (!$get['date_debut'] && !$get['date_fin'] && !$get['numero_facture']) ){
         foreach($result as $item=>$value){
-          
            if($value['id_societe_fk'] == $get['id_societe']){
              array_push($return,$value);
            }
@@ -419,7 +419,7 @@ class prelevement extends classes_optima{
             array_push($return,$value);
           }
         }
-      }elseif($get['id_societe'] && $get["date_debut"] && $get['date_fin']){
+      }elseif($get['id_societe'] && $get["date_debut"] && $get['date_fin'] && !$get['numero_facture']){
         $datedebut = explode('-',$get['date_debut']);
         $datefin = explode('-',$get['date_fin']);
        
@@ -430,21 +430,23 @@ class prelevement extends classes_optima{
             ->where('facture.etat','impayee')
             ->where('facture.id_termes',24,'AND',false,"!=")
             ->where('facture.id_termes',25,'AND',false,"!=")
-            ->where('facture.date_debut_periode',$date_debut_periode)
-            ->where('facture.date_fin_periode',$date_fin_periode);
+            ->where('facture.date',$date_debut_periode,"AND",false,">=")
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
         $result= ATF::facture()->sa();
 
         foreach($result as $key=>$value){
           ATF::societe()->q->reset()->where('id_societe',$value['id_societe']);
           $societes = ATF::societe()->select_all();
 
-          ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
-          $affaires = ATF::affaire()->sa();
-
+          if($value['id_affaire']){
+            ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
+            $affaires = ATF::affaire()->sa();
+          }
           foreach($societes as $item){
             $result[$key]['ref_client'] = $item['ref'];
             $result[$key]['id_societe_fk'] = $item['id_societe'];
             $result[$key]['prix_ttc'] = $result[$key]['prix'];
+            $result[$key]['id_societe'] = $item['societe'];
 
             foreach($affaires as $affaire){
               $result[$key]['id_affaire'] = $affaire['affaire'];
@@ -454,10 +456,104 @@ class prelevement extends classes_optima{
         }
 
         foreach($result as $item){
-          if($item['id_societe'] == $get['id_societe']){
+          if($item['id_societe_fk'] == $get['id_societe']){
             array_push($return,$item);
           }
         }
+
+      }elseif($get['numero_facture'] && $get["date_debut"] && $get['date_fin'] && !$get['id_societe']){
+        $datedebut = explode('-',$get['date_debut']);
+        $datefin = explode('-',$get['date_fin']);
+       
+        $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
+        $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
+
+        ATF::facture()->q->reset()
+            ->where('facture.etat','impayee')
+            ->where('facture.id_termes',24,'AND',false,"!=")
+            ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.date',$date_debut_periode,"AND",false,">=")
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+        $result= ATF::facture()->sa();
+
+        foreach($result as $key=>$value){
+          ATF::societe()->q->reset()->where('id_societe',$value['id_societe']);
+          $societes = ATF::societe()->select_all();
+
+          if($value['id_affaire']){
+            ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
+            $affaires = ATF::affaire()->sa();  
+          }
+         
+
+          foreach($societes as $item){
+
+            $result[$key]['ref_client'] = $item['ref'];
+            $result[$key]['id_societe_fk'] = $item['id_societe'];
+            $result[$key]['prix_ttc'] = $result[$key]['prix'];
+            $result[$key]['id_societe'] = $item['societe'];
+
+            foreach($affaires as $affaire){
+              $result[$key]['id_affaire'] = $affaire['affaire'];
+            }
+          }
+
+        }
+
+
+        foreach($result as $item){
+          if($item['ref'] == $get['numero_facture']){
+            array_push($return,$item);
+          }
+        }
+
+
+      }elseif($get['numero_facture'] && $get["date_debut"] && $get['date_fin'] && $get['id_societe']){
+        $datedebut = explode('-',$get['date_debut']);
+        $datefin = explode('-',$get['date_fin']);
+       
+        $date_debut_periode = $datedebut[2]."-".$datedebut[1]."-".$datedebut[0];
+        $date_fin_periode = $datefin[2]."-".$datefin[1]."-".$datefin[0];
+
+        ATF::facture()->q->reset()
+            ->where('facture.etat','impayee')
+            ->where('facture.id_termes',24,'AND',false,"!=")
+            ->where('facture.id_termes',25,'AND',false,"!=")
+            ->where('facture.date',$date_debut_periode,"AND",false,">=")
+            ->where('facture.date',$date_fin_periode,"AND",false,"<=");
+        $result= ATF::facture()->sa();
+
+        foreach($result as $key=>$value){
+          ATF::societe()->q->reset()->where('id_societe',$value['id_societe']);
+          $societes = ATF::societe()->select_all();
+
+          if($value['id_affaire']){
+            ATF::affaire()->q->reset()->where('affaire.id_affaire',$value['id_affaire']);
+            $affaires = ATF::affaire()->sa();  
+          }
+         
+
+          foreach($societes as $item){
+
+            $result[$key]['ref_client'] = $item['ref'];
+            $result[$key]['id_societe_fk'] = $item['id_societe'];
+            $result[$key]['prix_ttc'] = $result[$key]['prix'];
+            $result[$key]['id_societe'] = $item['societe'];
+
+            foreach($affaires as $affaire){
+              $result[$key]['id_affaire'] = $affaire['affaire'];
+            }
+          }
+
+        }
+
+
+        foreach($result as $item){
+          if($item['ref'] == $get['numero_facture'] && $item['id_societe_fk'] == $get['id_societe']){
+            array_push($return,$item);
+          }
+        }
+
 
       }
 
