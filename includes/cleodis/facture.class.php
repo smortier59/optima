@@ -3553,7 +3553,7 @@ class facture_bdomplus extends facture_cleodis {
 
 					ATF::suivi()->insert($suivis);
 
-					ATF::facture()->u(array('id_facture'=> $vfacture, "date_paiement"=>$infos["date"]));
+					$this->updateDate(array("id_facture" => $vfacture,"key"=> "date_paiement", "value" =>$infos["date"]));
 
 				}
 			}
