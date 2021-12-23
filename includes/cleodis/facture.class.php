@@ -57,9 +57,8 @@ class facture_cleodis extends facture {
 		$this->colonnes['panel']['dates_facture'] = array(
 			"date_periode_debut"=>array("readonly"=>true),
 			"date_periode_fin"=>array("readonly"=>true),
-			"prix"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield"),
-			"prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
-
+			// "prix_sans_tva"=>array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield"),
+			"prix"  => array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
 		);
 
 		$this->colonnes['panel']['dates_facture_libre'] = array(
@@ -98,7 +97,7 @@ class facture_cleodis extends facture {
 		// Propriété des panels
 		$this->panels['primary'] = array("visible"=>true,'nbCols'=>3);
 		$this->panels['refi'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
-		$this->panels['dates_facture'] = array("visible"=>true,'nbCols'=>3);
+		$this->panels['dates_facture'] = array("visible"=>true,'nbCols'=>3, "hidden" => true);
 		$this->panels['midas'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
 		$this->panels['dates_facture_libre'] = array("visible"=>true,'nbCols'=>3,"hidden"=>true);
 		$this->panels['lignes_repris'] = array('nbCols'=>1);
@@ -269,7 +268,8 @@ class facture_cleodis extends facture {
 				}
 
 				break;
-				case "prix_sans_tva":
+			case "prix_sans_tva":
+					$prix_sans_tva = 0;
 					if ($facture) {
 
 						$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
@@ -295,10 +295,7 @@ class facture_cleodis extends facture {
 							}
 						}
 					}
-					if($prix_sans_tva){
-						return $prix_sans_tva;
-					}
-					return 0;
+					return $prix_sans_tva;
 
 					break;
 			case "prix_refi":
