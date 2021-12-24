@@ -1782,7 +1782,8 @@ class affaire_cleodis extends affaire {
 				$data['data'][$key]["payee"] = $this->paiementIsReceived($data['data'][$key]['id_affaire_fk'], true);
 				if($commande){
 					$data['data'][$key]["id_commande_crypt"] = ATF::commande()->cryptId($commande['commande.id_commande']);
-					$data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
+					$data["data"][$key]['contat_signe'] = true;
+					// $data['data'][$key]["contrat_signe"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retour")) ? true : false;
 
 					$data['data'][$key]["retourPV"] = file_exists(ATF::commande()->filepath($commande['commande.id_commande'],"retourPV")) ? true : false;
 				}else{
@@ -2797,17 +2798,8 @@ class affaire_cleodis extends affaire {
 			ATF::tache()->insert($tache);
 
             if($post["commentaire"]){
-            	//Creer un suivi pour alisson, Severine, jeanne
-            	ATF::user()->q->reset()->where("login", "tdelattre", "OR", "filles")
-            						   ->where("login", "jvasut", "OR", "filles")
-            						   ->where("login", "egerard", "OR", "filles")
-									   ->where("login", "mmysoet", "OR", "filles");
-            	$filles = ATF::user()->sa();
-            	$notifie = array();
 
-            	foreach ($filles as $key => $value) {
-            		$notifie[] = $value["id_user"];
-            	}
+				$notifie = ATF::user()->getDestinataireFromConstante("__NOTIFIE_COMMENTAIRE_AFFAIRE_PARTENAIRE__");
 
             	$suivi = array(
 					 "id_societe"=>$id_societe
@@ -3133,24 +3125,8 @@ class affaire_cleodis extends affaire {
 	public function createTacheAffaireFromSite($id_affaire){
 		if (ATF::$codename != 'cleodis' && ATF::$codename != 'cleodisbe' && ATF::$codename != 'go_abonnement') return;
 
-		ATF::constante()->q->reset()->where("constante", "__DESTINATAIRE_NOTIFIE_TACHE_AFFAIRE_PARTENAIRE__");
-		$destinataire_notifie_tache_affaire_partenaire = ATF::constante()->select_row();
-		$destinataires = $destinataire_notifie_tache_affaire_partenaire["valeur"];
-		$destinataires = explode(',', $destinataires);
+		$dest = ATF::user()->getDestinataireFromConstante("__NOTIFIE_CREATE_TACHE_PARTENAIRE__");
 
-
-		ATF::user()->q->reset();
-
-		foreach ($destinataires as $key => $value) {
-			ATF::user()->q->where("login", $value, "OR", "destinataires");
-		}
-
-
-		$filles = ATF::user()->sa();
-        $dest = array();
-        foreach ($filles as $key => $value) {
-        	$dest[] = $value["id_user"];
-     	}
 
 		$affaire = ATF::affaire()->select($id_affaire);
 		$societe = ATF::societe()->select($affaire["id_societe"]);
