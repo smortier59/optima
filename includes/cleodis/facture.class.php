@@ -150,7 +150,7 @@ class facture_cleodis extends facture {
 	* @return string
     */
 	public function default_value($field,&$s,&$request){
-
+		
 		if($id_facture = ATF::_r('id_facture')){
 			$facture=$this->select($id_facture);
 		}elseif ($id_commande = ATF::_r('id_commande')){
@@ -3667,7 +3667,194 @@ class facture_boulanger extends facture_cleodis {
 
 };
 
-class facture_assets extends facture_cleodis { };
+class facture_assets extends facture_cleodis {
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+		$this->fieldstructure();
+
+		$this->onglets = array('facture_ligne','slimpay_transaction');
+		$this->addPrivilege("aPrelever");
+		$this->addPrivilege("massPrelevementSlimpay");
+	}
+
+	public function getRefExterne(){
+		$prefix = "F930C";
+
+		$this->q->reset()
+				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`ref_externe`,6)+1',"max_ref")
+				->addOrder('ref_externe',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+		$nb=$this->sa();
+
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="00000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="000001";
+		}
+		return $prefix.$suffix;
+
+	}
+
+	public function massPrelevementSlimpay($infos){
+		$data = array();
+
+		if($infos["factures"]){
+			foreach ($infos["factures"] as $key => $value) {
+				$f = ATF::facture()->select($key);
+				$mandat_slimpay = $this->getMandatSlimpay($f["id_affaire"]);
+
+				$data[$mandat_slimpay]["libelle"] .= $f["ref"]." ";
+
+				if($data[$mandat_slimpay]["paymentReference"]){
+					$data[$mandat_slimpay]["prix"] = number_format($data[$mandat_slimpay]["prix"] + ($f["prix"]*__TVA__),2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+
+					$id_affaire = $this->getAffaireMere($f["id_affaire"]);
+					$d = str_replace(ATF::affaire()->select($id_affaire, "ref"), "", $f["ref"]);
+
+					$data[$mandat_slimpay]["paymentReference"] .= "/".$d;
+				}else{
+					$data[$mandat_slimpay]["prix"] = number_format(($f["prix"]*__TVA__),2 , ".", "");
+					$data[$mandat_slimpay]["id_facture"][] = $key;
+					$data[$mandat_slimpay]["paymentReference"] = $f["ref"];
+				}
+			}
+
+			foreach ($data as $key => $value) {
+				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
+				
+				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
+
+				foreach ($value["id_facture"] as $kfacture => $vfacture) {
+
+					ATF::slimpay_transaction()->i(array(
+													"id_facture"=> $vfacture,
+													"ref_slimpay" => $status["id"],
+												    "executionStatus"=>$status["executionStatus"],
+												    "date_execution"=>$status["executionDate"],
+												    "retour"=> json_encode($status)
+												   	)
+											 	);
+
+					$suivis = array("suivi"=> array(
+					"id_societe" => $this->select($vfacture , "id_societe"),
+					"type" => "note",
+					"date" => date("Y-m-d H:i:s"),
+					"texte" => "Prélèvement envoyé à Slimpay pour les factures ".$this->select($vfacture , "ref").";prélévement prévu le ".$infos['date']." libellé envoyé :".$infos['libelle'],
+					"type_suivi" => "Comptabilité",
+					"no_redirect" => true,
+
+						)
+					);
+
+					ATF::suivi()->insert($suivis);
+
+					$this->updateDate(array("id_facture" => $vfacture,"key"=> "date_paiement", "value" =>$infos["date"]));
+
+				}
+			}
+		}
+		return true;
+	}
+
+	public function aPrelever($infos){
+		$q = "SELECT facture.*
+		 	  FROM facture
+			  WHERE `id_facture` NOT IN (SELECT id_facture FROM slimpay_transaction)
+			  AND etat = 'impayee'
+			  AND date_paiement IS NULL
+			  ORDER BY `facture`.`id_societe`, `facture`.`id_affaire`";
+
+		$return = ATF::db()->sql2array($q);
+
+		foreach ($return as $key => $value) {
+			$return[$key]["client"] = ATF::societe()->nom($value["id_societe"]);
+			$return[$key]["date"] = date("d/m/Y" , strtotime($return[$key]["date"]));
+			$return[$key]["date_periode_debut"] = date("d/m/Y" , strtotime($return[$key]["date_periode_debut"]));
+			$return[$key]["date_periode_fin"] = date("d/m/Y" , strtotime($return[$key]["date_periode_fin"]));
+			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
+		}
+
+		$libelle = "Abonnement BDOM+ ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+
+		$result = array(
+						"libelle"=> $libelle,
+						"date_prelevement"=> date("Y-m-01", strtotime("+1 month")),
+						"lignes" => $return
+					   );
+
+		return $result;
+	}
+
+	public function statusDebitEnCours(){
+
+		$this->q->reset()->where("facture.date", date("Y-m-d", strtotime("-1 year")), "AND", null, ">=");
+		if($factures = $this->select_all()){
+			foreach ($factures as $kfacture => $vfacture) {
+
+				//On récupère la derniere transaction
+				ATF::slimpay_transaction()->q->reset()->where("id_facture", $vfacture["facture.id_facture"])->addOrder("id_slimpay_transaction", "DESC");
+				$transaction = ATF::slimpay_transaction()->select_all();
+				if($transaction){
+
+					//On récupère la derniere transaction connue (en BDD) pour cette facture
+					$state = ATF::slimpay()->getStatutDebit($transaction[0]["ref_slimpay"]);
+
+					//Si le state retourné par SLIMPAY est different de celui en BDD, on met à jour
+					if($state["executionStatus"] != $transaction[0]["executionStatus"]){
+						ATF::slimpay_transaction()->u(array("id_slimpay_transaction"=> $transaction[0]["id_slimpay_transaction"],
+															"executionStatus"=>$state["executionStatus"],
+															"retour"=>json_encode($state)
+													  ));
+
+						//Si le statut de la transaction est rejected, il faut allez rechercher la Transaction rejouée
+						if($state["executionStatus"] == "rejected") {
+							//un suivi sans destinataire "Facture xxxx impayée"
+							$suivis = array("suivi"=> array(
+													"id_societe" => $this->select($vfacture["facture.id_facture"] , "id_societe"),
+													"type" => "note",
+													"date" => date("Y-m-d H:i:s"),
+													"texte" => "Facture ".$this->select($vfacture["facture.id_facture"] , "ref")." impayée",
+													"id_affaire" => $this->select($vfacture["facture.id_facture"] , "id_affaire"),
+													"type_suivi" => "Contrat",
+													"no_redirect" => true,
+													"suivi_notifie"=>array(116)
+											  	)
+											);
+
+							ATF::suivi()->insert($suivis);
+
+							ATF::facture()->u(array('id_facture'=> $vfacture["facture.id_facture"], "etat"=>"impayee"));
+
+						}
+					}
+
+					if($state["replayCount"] == 0) log::logger("Transaction Initiale" , "mfleurquin");
+					if($state["replayCount"] == 1) log::logger("Transaction rejouée 1 fois" , "mfleurquin");
+					if($state["replayCount"] == 2) log::logger("Transaction rejouée 2 fois" , "mfleurquin");
+				}
+
+			}
+		}
+
+
+	}
+};
 
 class facture_go_abonnement extends facture_cleodis {
 
@@ -3680,7 +3867,6 @@ class facture_go_abonnement extends facture_cleodis {
 		$this->addPrivilege("aPrelever");
 		$this->addPrivilege("massPrelevementSlimpay");
 	}
-
 
 	function getRef($id_affaire,$type="facture"){
 		$affaire=ATF::affaire()->select($id_affaire);
