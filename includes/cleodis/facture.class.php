@@ -150,7 +150,7 @@ class facture_cleodis extends facture {
 	* @return string
     */
 	public function default_value($field,&$s,&$request){
-		
+
 		if($id_facture = ATF::_r('id_facture')){
 			$facture=$this->select($id_facture);
 		}elseif ($id_commande = ATF::_r('id_commande')){
@@ -1203,7 +1203,7 @@ class facture_cleodis extends facture {
 				}
 
 			 }
-			
+
 		}
 
 		$writer = new PHPExcel_Writer_Excel5($workbook);
@@ -3677,39 +3677,6 @@ class facture_assets extends facture_cleodis {
 		$this->addPrivilege("massPrelevementSlimpay");
 	}
 
-	public function getRefExterne(){
-		$prefix = "F930C";
-
-		$this->q->reset()
-				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
-				->addField('SUBSTRING(`ref_externe`,6)+1',"max_ref")
-				->addOrder('ref_externe',"DESC")
-				->setDimension("row")
-				->setLimit(1);
-		$nb=$this->sa();
-
-
-		if($nb["max_ref"]){
-			if($nb["max_ref"]<10){
-				$suffix="00000".$nb["max_ref"];
-			}elseif($nb["max_ref"]<100){
-				$suffix="0000".$nb["max_ref"];
-			}elseif($nb["max_ref"]<1000){
-				$suffix="000".$nb["max_ref"];
-			}elseif($nb["max_ref"]<10000){
-				$suffix="00".$nb["max_ref"];
-			}elseif($nb["max_ref"]<100000){
-				$suffix="0".$nb["max_ref"];
-			}else{
-				$suffix=$nb["max_ref"];
-			}
-		}else{
-			$suffix="000001";
-		}
-		return $prefix.$suffix;
-
-	}
-
 	public function massPrelevementSlimpay($infos){
 		$data = array();
 
@@ -3737,7 +3704,7 @@ class facture_assets extends facture_cleodis {
 
 			foreach ($data as $key => $value) {
 				if(!$infos["libelle"]) $infos["libelle"] = $value["libelle"];
-				
+
 				$status = ATF::slimpay()->createDebit($key,$value["prix"],$infos["libelle"], $infos["date"],$value["paymentReference"]);
 
 				foreach ($value["id_facture"] as $kfacture => $vfacture) {
@@ -3790,7 +3757,7 @@ class facture_assets extends facture_cleodis {
 			$return[$key]["prix_ttc"] = number_format(($value["prix"] * $value["tva"]), 2 , ".", "");
 		}
 
-		$libelle = "Abonnement BDOM+ ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
+		$libelle = "Abonnement Assets ".ATF::$usr->trans(date("F", strtotime("+1 month")))." ".date("Y", strtotime("+1 month"));
 
 		$result = array(
 						"libelle"=> $libelle,
