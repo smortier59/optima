@@ -39,7 +39,7 @@ class pdf_affaire extends classes_optima {
 
 		$this->foreign_key["id_affaire"] = "affaire";
 		$this->files["fichier_joint"] = array("type"=>"pdf","preview"=>false,"no_upload"=>false,"no_generate"=>true);
-		$this->files["fichier_joint2"] = array("type"=>"file","preview"=>false,"no_upload"=>false,"no_generate"=>true);
+		$this->files["fichier_joint2"] = array("preview"=>false,"no_upload"=>false,"no_generate"=>true);
 
 		$this->addPrivilege('getUrlImagePDF');
 		$this->addPrivilege('getAll');
