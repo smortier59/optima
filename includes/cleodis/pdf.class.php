@@ -5598,23 +5598,26 @@ class pdf_cleodis extends pdf {
 
 		if($this->client["id_famille"] != 9){
 
-
-
-
 			$this->cell(190,10,"CET ÉCHÉANCIER VAUT FACTURE (MONTANTS EN EUROS)",1,0,'C',true);
 
 			$this->sety(110);
 
 		}
 
-
-
 		$this->setfont('arial','',8);
+		$this->setTopMargin(30);
+		$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
 
+		$tva_sur_assurance = true;
+
+		if ($this->affaire["id_type_affaire"]) {
+			if (ATF::type_affaire()->select($this->affaire["id_type_affaire"], "assurance_sans_tva") == "oui") {
+				$tva_sur_assurance = false;
+			}
+		}
 		$totaux=ATF::facturation()->montant_total($this->affaire['id_affaire'],$this->type);
+
 		if ($this->lignes) {
-			$this->setTopMargin(30);
-			$head = array("Date échéance","Loyer ".$this->texteHT,"Prestations","Assurances","TVA (".(($this->commande['tva']-1)*100)."%) (1)","Total ".$this->texteTTC);
 			foreach ($this->lignes as $k=>$i) {
 				//Si le montant est différent c'est qu'on a changé de loyer, on le signale par une ligne
 				if($montant!=$i["montant"]){
@@ -5622,8 +5625,15 @@ class pdf_cleodis extends pdf {
 
 				if($i["type"]==$this->type) {
 					$loyer_ht=$i["montant"];
-					$tva=($i["montant"]+$i["frais_de_gestion"]+$i["assurance"])*($this->commande['tva']-1);
-					$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+
+					if ($tva_sur_assurance == false) {
+						$tva=($i["montant"]+$i["frais_de_gestion"])*($this->commande['tva']-1);
+						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+
+					} else {
+						$tva=($i["montant"]+$i["frais_de_gestion"]+$i["assurance"])*($this->commande['tva']-1);
+						$total=$tva+($i["montant"]+$i["frais_de_gestion"]+$i["assurance"]);
+					}
 
 					$data[] = array(
 						date("d/m/Y",strtotime($i["date_periode_debut"]))
@@ -5638,7 +5648,6 @@ class pdf_cleodis extends pdf {
 					$montant=$i["montant"];
 				}
 			}
-
 			$data[] = array("TOTAL"	,number_format($totaux["loyer"],2, ',', ' '),number_format($totaux["total_frais_de_gestion"],2, ',', ' '),number_format($totaux["total_assurance"],2, ',', ' '),number_format($totaux["tva"],2, ',', ' '),number_format($totaux["total"],2, ',', ' '));
 
 			$this->tableauBigHead($head,$data,190,5,false,270);
