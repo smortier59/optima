@@ -818,7 +818,9 @@ class facture_cleodis extends facture {
 			$infos["tva"]= "1.2";
 		}
 
-		if (ATF::$codename == "bdomplus" || ATF::$codename == "boulanger") $infos["ref_externe"] = $this->getRefExterne();
+		if (ATF::$codename == "bdomplus" || ATF::$codename == "boulanger" || ATF::$codename == "go_abonnement") {
+			$infos["ref_externe"] = $this->getRefExterne();
+		}
 
 
 		ATF::db($this->db)->begin_transaction();
@@ -3787,6 +3789,45 @@ class facture_go_abonnement extends facture_cleodis {
 			}
 		}
 		return true;
+	}
+
+	public function getRefExterne(){
+		$prefix = "F";
+
+		$this->q->reset()
+				->addCondition("ref_externe",$prefix."%","AND",false,"LIKE")
+				->addField('SUBSTRING(`ref_externe`,9)+1',"max_ref")
+				->addOrder('ref_externe',"DESC")
+				->setDimension("row")
+				->setLimit(1);
+		$nb=$this->sa();
+
+
+		if($nb["max_ref"]){
+			if($nb["max_ref"]<10){
+				$suffix="00000000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100){
+				$suffix="0000000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000){
+				$suffix="000000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000){
+				$suffix="00000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000){
+				$suffix="0000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<1000000){
+				$suffix="000".$nb["max_ref"];
+			}elseif($nb["max_ref"]<10000000){
+				$suffix="00".$nb["max_ref"];
+			}elseif($nb["max_ref"]<100000000){
+				$suffix="0".$nb["max_ref"];
+			}else{
+				$suffix=$nb["max_ref"];
+			}
+		}else{
+			$suffix="000000001";
+		}
+		return $prefix.$suffix;
+
 	}
 
 };
