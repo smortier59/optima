@@ -15875,7 +15875,12 @@ class pdf_go_abonnement extends pdf_cleodis {
 			$data[0][0] = "1";
 
 			$data[0][1] = "Redevance Abonnement";
-			$data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+
+			if($this->facture["redevance"] === "oui"){
+				if($this->affaire['ref'] && $this->affaire['nature']!="vente"){
+					$data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+				}
+			}
 			$data[0][1] .= "\nContrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
 
 
