@@ -1719,7 +1719,6 @@ class pdf_cleodis extends pdf {
 		if ($caracteristique) $d5 .= " - Caractéristique(s) : ".$caracteristique;
 
 		$details = $d1.$d2.$d3.$d4.$d5;
-
 		return $details;
 	}
 
@@ -3778,9 +3777,10 @@ class pdf_cleodis extends pdf {
 					if($produit["id_fabriquant"]) $designation .= ATF::fabriquant()->select($produit["id_fabriquant"] , "fabriquant")." ";
 					$designation .= "- ";
 				}
+
 				$designation .= $i['produit']?$i['produit']:$produit['produit'];
 				$details = $this->detailsProduit($i['id_produit'],$k,$i['commentaire'],$i['caracteristique']);
-                $designation .= $details;
+				$designation .= $details;
 
 				$data[] = array(
 					$i['ref']
@@ -4367,6 +4367,7 @@ class pdf_cleodis extends pdf {
 				$head = array("Commentaire");
 				$w = array(180);
 				$data = $styles = array();
+				$commentaire = "";
 
 
 
@@ -4374,20 +4375,25 @@ class pdf_cleodis extends pdf {
 				if($this->affaire["commentaire_facture2"]) $commentaire .= $this->affaire["commentaire_facture2"]."\n";
 				if($this->affaire["commentaire_facture3"]) $commentaire .= $this->affaire["commentaire_facture3"]."\n";
 
-				ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
+
+				if (ATF::$codename !== "go_abonnement") {
+					ATF::demande_refi()->q->reset()->where('id_affaire',$this->affaire['id_affaire'],'AND')
 										   ->where('etat','valide','AND')
 										   ->from('demande_refi','id_refinanceur','refinanceur','id_refinanceur')
 										   ->where('refinanceur.code_refi','REFACTURATION');
 
-				if($refi = ATF::demande_refi()->select_row()){
-					if($commentaire) $commentaire .= 'Information de prélèvements : ';
-					$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+					if($refi = ATF::demande_refi()->select_row()){
+						if($commentaire) $commentaire .= 'Information de prélèvements : ';
+						$commentaire .= "Cléodis agit en tant que mandataire de ".$refi['refinanceur'];
+					}
 				}
 
 
-				$data[0][0] = $commentaire;
-				$styles[0][0] = $this->styleDetailsProduit;
-				$this->tableauBigHead($head,$data,$w,5,$styles);
+				if ($commentaire != "") {
+					$data[0][0] = $commentaire;
+					$styles[0][0] = $this->styleDetailsProduit;
+					$this->tableauBigHead($head,$data,$w,5,$styles);
+				}
 			}
 
 
@@ -4398,7 +4404,7 @@ class pdf_cleodis extends pdf {
 
 		$this->SetXY(10,-30);
 		$this->setfont('arial','',7);
-		if(ATF::$codename != "bdomplus"){
+		if(ATF::$codename != "bdomplus" && ATF::$codename != "go_abonnement"){
 			$this->multicell(200,2,"Conformément à l’article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance.\nCette indemnité compensatoire sera complétée d’une indemnité moratoire correspondant au Taux BCE à sa dernière opération de refinancement majorée de 10 points, sans qu’une mise en demeure ne soit nécessaire, et ce sous toute réserve d’actions complémentaires en réparation du préjudice financier subit.");
 		}
 
@@ -5146,6 +5152,7 @@ class pdf_cleodis extends pdf {
 					,""
 					,"details"=>$this->styleDetailsProduit
 				);
+
 			}else{
 				if($this->facture['type_libre'] === "normale"){
 					//Préparation du détail
@@ -5154,10 +5161,10 @@ class pdf_cleodis extends pdf {
 					}else{
 						$data[0]['details'] = "Matériels objets de la location";
 					}
+
+
 					foreach ($this->lignes as $k => $i) {
-						$produit = ATF::produit()->select($i["id_produit"]);
-			        	$sous_categorie = ATF::sous_categorie()->select($produit["id_sous_categorie"],"sous_categorie");
-			        	$fabriquant = ATF::fabriquant()->select($produit["id_fabriquant"],"fabriquant");
+
 
 			        	$detail = "\n".round($i['quantite'])." ";
 			        	if($sous_categorie) $detail .= $sous_categorie." ";
@@ -5166,6 +5173,7 @@ class pdf_cleodis extends pdf {
 
 			          	$data[0]['details'] .= $detail;
 					}
+
 					$styles[0] = array(
 						""
 						,$this->colsProduitAlignLeft
@@ -5194,9 +5202,19 @@ class pdf_cleodis extends pdf {
 			$this->ln(5);
 			$total = $this->facture['prix'];
 			$totalTTC = $total*$this->facture['tva'];
+
+			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+
+
+
 			if($this->facture['type_facture'] === "libre"){
 				if($this->facture['type_libre'] !== 1){
-					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+					if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
+						$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
+					} else {
+						$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+					}
+
 					$data = array(
 						array(
 							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
@@ -5217,24 +5235,44 @@ class pdf_cleodis extends pdf {
 					);
 				}
 			}else{
-				$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
-					$data = array(
-						array(
-							number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
-							,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
-							,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
-							,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
-						)
-					);
+
+				if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA","Total ".$this->texteTTC);
+				} else {
+					$head = array("Montant Total ".$this->texteHT,"Taux","Montant TVA (".(($this->facture['tva']-1)*100)."%)","Total ".$this->texteTTC);
+				}
+
+				$data = array(
+					array(
+						number_format(abs(round($this->facture["prix"],2)),2,'.',' ')." €"
+						,number_format(abs(($this->facture['tva']-1)*100),2,'.',' ')."%"
+						,number_format(abs(round(($this->facture["prix"]*($this->facture['tva']-1)),2)),2,'.',' ')." €"
+						,number_format(abs(round($this->facture["prix"]*$this->facture['tva'],2)),2,'.',' ')." €"
+					)
+				);
 			}
 
 
+			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") === "oui"){
 
+				$data[] = array(
+					number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
+					,"0.00%"
+					,""
+					,number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €"
+				);
+
+				$ttc = ($this->facture["prix"]* $this->facture["tva"]) + $this->facture["prix_sans_tva"];
+
+				$data[] = array(
+					"",
+					"",
+					"",
+					number_format(abs(round($ttc,2)),2,'.',' ')." €"
+				);
+			}
 			$this->tableau($head,$data);
-
 		}
-
-
 
 		$this->ln(10);
 		$y = $this->getY();
@@ -10418,7 +10456,6 @@ class pdf_cleodisbe extends pdf_cleodis {
 						,number_format($i['quantite']*$i['prix'],2,'.',' ')
 						,$designation
 					);
-
 
 
 					$styles[] = array();
@@ -15666,5 +15703,265 @@ class pdf_go_abonnement extends pdf_cleodis {
 
 	public $bgcolorTableau = "ba9856";
 	public $txtcolorTableau = "000000";
+
+
+	/*
+	public function contratA4Particulier($id, $signature,$sellsign) {
+
+		$this->initLogo($this->affaire["id_type_affaire"]);
+		$this->image($this->logo,10,10,40);
+
+
+		$this->sety(10);
+		$this->multicell(0,5,"LE LOUEUR",0,'C');
+		$this->setLeftMargin(65);
+		$this->setfont('arial','B',7);
+		$this->multicell(0,3,$this->societe['societe']." - ".$this->societe['adresse']." - ".$this->societe['cp']." ".$this->societe['ville'],0);
+		$this->multicell(0,3,"Tél :".$this->societe['tel']." - Fax :".$this->societe['fax'],0);
+		$this->setLeftMargin(15);
+		$this->ln(5);
+		$this->setfont('arial','B',10);
+		$this->multicell(0,6,"L'ABONNÉ",0,'C');
+		$this->setLeftMargin(65);
+		$this->setfont('arial','B',7);
+		$this->multicell(0,3,"Nom : ".$this->client['societe'],0);
+		$this->multicell(0,3,"Adresse : ".$this->client['adresse'],0);
+		$this->multicell(0,3,"Code Postal : ".$this->client['cp']." Ville : ".$this->client['ville'],0);
+
+		$this->multicell(0,3,"Mail : ".$this->client['particulier_email'],0);
+
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(0,60,220,60);
+		$this->setLeftMargin(15);
+		$this->setfont('arial','B',10);
+		$this->setY(62);
+
+		$this->multicell(0,3,"CONDITIONS PARTICULIERES du Contrat d'abonnement n° : ".$this->commande['ref']);
+
+		$this->ln(5);
+
+		$this->SetLineWidth(0.35);
+		$this->SetDrawColor($this->Rentete, $this->Gentete, $this->Bentete);
+		$this->line(0,73,220,73);
+
+		$this->setxy(15,75);
+		$this->SetDrawColor(0,0,0);
+		$this->SetLineWidth(0.2);
+
+
+		$titre = "ARTICLE 1 : CONTRAT D’ABONNEMENT";
+		$texte = "L'objet du contrat est l'abonnement comprenant la mise en location d'équipements dont le détail figure ci-après ainsi que des services associés.";
+
+		$this->setfont('arial','B',8);
+		$this->cell(0,5,$titre,0,1);
+		$this->setfont('arial','',8);
+		$this->multicell(0,4,$texte,0,1);
+
+
+	}
+	*/
+
+
+	public function factureClassiqueSociete($global=false) {
+
+		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
+			$this->bmcFacture($global, true);
+		} else {
+			parent::factureClassiqueSociete($global);
+		}
+	}
+
+	public function factureClassiqueParticulier($global=false) {
+
+		$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+
+		if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
+			$this->bmcFacture($global, false);
+		} else {
+			parent::factureClassiqueParticulier($global);
+		}
+	}
+
+	public function bmcFacture($global=false, $btob=false) {
+		if(!$global){
+			$this->open();
+		}
+
+		$this->setHeader();
+		$this->addpage();
+		$this->setMargins(15,30);
+		$this->sety(15);
+
+
+		$this->setfont('arial','B',22);
+		if ($this->facture["prix"]>=0) {
+			if($this->facture["type_libre"] === "liberatoire"){
+				$this->multicell(0,15,'FACTURE LIBERATOIRE',0,'C');
+			}else{
+				$this->multicell(0,15,'FACTURE',0,'C');
+			}
+		} else {
+			$this->multicell(0,15,'AVOIR',0,'C');
+		}
+		$this->setfont('arial','',8);
+
+
+		//CADRE Societe
+		$cadre = array(
+			$this->societe['societe']
+			,$this->societe['adresse']
+			,$this->societe['adresse_2']
+			,$this->societe['cp']." ".$this->societe['ville']
+			,"Tel : ".$this->agence['tel']
+			,"N° TVA intra : FR 91 ".$this->societe["siren"]
+			,"RCS ".$this->societe['ville']." ".$this->societe['siren']
+		);
+		$this->cadre(20,35,80,35,$cadre,"Emetteur");
+
+
+		//CADRE Client
+		if($this->client['facturation_adresse']){
+			$cadre = array(
+				 $this->client['societe']
+				,$this->client['facturation_adresse']
+				,$this->client['facturation_adresse_2']
+				,$this->client['facturation_adresse_3']
+				,$this->client['facturation_cp']." ".$this->client['facturation_ville']
+				,"Tel : ".$this->client['tel']
+			);
+		}else{
+			$cadre = array(
+				 $this->client['societe']
+				,$this->client['adresse']
+				,$this->client['adresse_2']
+				,$this->client['adresse_3']
+				,$this->client['cp']." ".$this->client['ville']
+				,"Tel : ".$this->client['tel']
+			);
+		}
+
+		$this->cadre(110,35,80,35,$cadre,"Destinataire");
+
+		$this->multicell(0,5,"A l'attention de ".$this->client['societe'].",");
+		$this->ln(5);
+		$y = $this->gety();
+
+
+		//CADRE Date
+		$cadre = array(array("txt"=>"Date : ".date("d/m/Y",strtotime($this->facture['date'])),"align"=>"C"));
+		$this->cadre(10,$y,60,13,$cadre);
+
+		//CADRE Client
+		if($this->client['nom_commercial'] && $this->client['nom_commercial'] != '-'){
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).' '.($this->client['ref']?"(".$this->client['ref'].")":NULL).($this->client['nom_commercial']?"\n".$this->client['nom_commercial']:""),"align"=>"C", "h"=>5, "size"=>8));
+		}else{
+			$cadre = array(array("txt"=>util::truncate($this->client['societe'],25).' '.($this->client['ref']?"(".$this->client['ref'].")":NULL),"align"=>"C"));
+		}
+
+		$this->cadre(75,$y,60,13,$cadre);
+
+		//CADRE Facture
+		$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["ref"]?"-".$this->client["ref"]:NULL),"align"=>"C"));
+		$this->cadre(140,$y,60,13,$cadre);
+
+		if ($this->lignes) {
+			$head = array("Quantité","Désignation","Montant HT", 'TVA', "Assurance taxe \n d'assurance comprise", 'TOTAL TTC');
+			$w = array(20,60,30,20,25,30);
+			$data = $styles = array();
+
+			$data[0][0] = "1";
+
+			$data[0][1] = "Redevance Abonnement";
+			$data[0][1] .= "\nPour la période du ".date("d/m/Y",strtotime($this->facture['date_periode_debut']))." au ".date("d/m/Y",strtotime($this->facture['date_periode_fin']));
+			$data[0][1] .= "\nContrat n°".$this->affaire['ref']."-".$this->client["ref"].' - '.$this->affaire["affaire"];
+
+
+			//Désignation L3
+			$data[0][1] .= "\nPar ".ATF::$usr->trans($this->facture['mode_paiement'],'facture');
+			//Désignation L4
+			list($annee,$mois,$jour)= explode("-",$this->facture['date']);
+			//$data[0][1] .= "\nDate de facture le ".date("d/m/Y",strtotime($this->facture['date']));
+			// Montant Facture
+			$data[0][2] = number_format(abs($this->facture["prix"]),2,'.',' ')." €";
+
+			// On va chercher si la tva s'applique sur l'assurance loyer ou non
+			$id_type_affaire = ATF::affaire()->select($this->facture['id_affaire'], "id_type_affaire");
+			if ($id_type_affaire && ATF::type_affaire()->select($id_type_affaire, "assurance_sans_tva") ==="oui") {
+				$data[0][3] = number_format(abs(round($this->facture["prix"] * ($this->facture['tva']-1),2)),2,'.',' ')." €";
+				$data[0][4] = number_format(abs(round($this->facture["prix_sans_tva"],2)),2,'.',' ')." €";
+
+				$total = ($this->facture["prix"] * $this->facture['tva']) + $this->facture["prix_sans_tva"];
+				$data[0][5] = number_format(abs(round($total,2)),2,'.',' ')." €";
+			}
+
+			$styles[0][1] = array("align"=>"L");
+
+			$this->tableauBigHead($head,$data,$w,5,$styles);
+
+			if ($this->facture['commentaire']) {
+				$com = array(array("Commentaire : ".$this->facture['commentaire']));
+				$sCom = array(array($this->styleDetailsProduit));
+				$this->tableau(false,$com,180,5,$sCom);
+			}
+
+			if($this->facture['type_facture'] === "libre"){
+				if($this->facture['type_libre'] == "contentieux"){
+					$InfosTVA = array(array("\n\nTVA non applicable - Article 4632b du CGI"));
+					$sInfosTVA = array(array($this->styleDetailsProduit));
+					$this->tableau(false,$InfosTVA,180,5,$sInfosTVA);
+				}
+			}
+		}
+
+
+
+		$this->ln(10);
+		$y = $this->getY();
+		$this->setfont('arial','U',8);
+		$this->cell(60,5,"TERMES DE PAIEMENT",0,1);
+		$this->setfont('arial','',8);
+		if($this->facture["prix"]>0){
+			if($this->facture['mode_paiement']){
+				if ($this->facture['mode_paiement']=="pre-paiement") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cb") {
+					$this->cell(0,5,"Vous avez déjà réglé cette facture par Carte Bancaire le ".date("d/m/Y",strtotime($this->contrat['date'])),0,1);
+				} elseif ($this->facture['mode_paiement']=="cheque") {
+					$this->cell(0,5,"A réception de facture",0,1);
+				} elseif ($this->facture['mode_paiement']=="virement") {
+					$this->cell(0,5,"Par virement en date du ".date("d/m/Y",strtotime($this->facture['date_previsionnelle'])),0,1);
+				} elseif($this->facture['mode_paiement'] !="mandat") {
+					$this->cell(0,5,"Le ".date("d/m/Y",strtotime($this->facture['date_previsionnelle']))." vous serez débité sur le compte : ".$this->affaire['IBAN']." - ".$this->affaire['BIC'],0,1);
+				}
+			}
+		}else{
+			$this->cell(0,5,"Par remboursement ou compensation",0,1);
+		}
+
+		if($this->facture['mode_paiement'] !=="pre-paiement" && $this->facture['mode_paiement'] !=="cb"){
+			if(ATF::$codename !== "cleodisbe"){
+		      $this->cell(0,5,"RUM ".$this->affaire["RUM"],0,1);
+		      $this->cell(0,5,"ICS ".__ICS__ ,0,1);
+		    }
+		}
+
+		if($this->facture["mode_paiement"] == "virement" || $this->facture['mode_paiement'] =="mandat"){
+			$cadre = array();
+			$cadre[] = $this->societe["nom_banque"];
+			$cadre[] = "RIB : ".util::formatRIB($this->societe["RIB"]);
+			$cadre[] = "IBAN : ".$this->societe["IBAN"];
+			$cadre[] = "BIC : ".$this->societe["BIC"];
+			$this->cadre(85,$y,80,35,$cadre,"Coordonnées bancaires");
+		}
+
+		if ($btob) {
+			$this->setY(255);
+			$this->multicell(190,3,"Conformément à l'article L 441-6 du code de commerce, une indemnité forfaitaire de 40,00 EUR sera due de plein droit pour tout retard de paiement à l'échéance. Cette indemnité compensatoire sera complétée d'une pénalité de retard correspondant à trois fois le taux d’intérêt légal, sans qu'une mise en demeure ne soit nécessaire, et ce sous toute réserve d'actions complémentaires en réparation du préjudice financier subit.", 0, 'L');
+		}
+
+	}
 
  };
