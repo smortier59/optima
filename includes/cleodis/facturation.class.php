@@ -846,9 +846,6 @@ class facturation extends classes_optima {
 		$type_affaire2SI = ATF::type_affaire()->select_row();
 
 
-
-		$cleodis=ATF::societe()->select(246);
-
 		$this->q->reset()
 				->addField("facturation.*")
 				->addField("LTRIM(`societe`.`societe`)","ltrimsociete")
@@ -1041,6 +1038,7 @@ class facturation extends classes_optima {
 				)";
 
 		$prolongation=ATF::db()->sql2array($query);
+
 		foreach ($prolongation as $key=>$item) {
 			if(ATF::$codename== "cleodisbe"){
 				$objAffaire = new affaire_cleodisbe($item['id_affaire']);
@@ -1049,6 +1047,7 @@ class facturation extends classes_optima {
 			}
 
 			$objCommande = $objAffaire->getCommande();
+
 
 			try {
 				$id_facturation=$this->insert_facturation($objCommande,$objAffaire);
@@ -1464,6 +1463,7 @@ class facturation extends classes_optima {
 		log::logger("Envoi d'un pdf contenant toutes les factures prolongation...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_prolongation,"global_","Factures RESTITUTIONS prolongation",$s);
 
+
 		//Envoi d'un pdf contenant toutes les factures contrat
 		log::logger("Envoi d'un pdf contenant toutes les factures contrat 2SI...",__CLASS__);
 		$this->sendFactures($date_debut,$date_fin,$facture_contrat_2SI,"global_","Factures RESTITUTIONS contrat 2SI",$s);
@@ -1712,4 +1712,4 @@ class facturation_boulanger extends facturation { };
 
 class facturation_go_abonnement extends facturation {
 	public $user_facturation = array(16,116);
- };
+};
