@@ -3874,7 +3874,7 @@ class affaire_bdomplus extends affaire_cleodis {
 				ATF::db()->commit_transaction();
 			} catch (errorATF $e) {
 				ATF::db()->rollback_transaction();
-				log::logger($e->getMessage(), "mfleurquin");
+				log::logger($e->getMessage(), "renouvellement_erreur");
 			}
 		}
 
@@ -4011,15 +4011,15 @@ class affaire_bdomplus extends affaire_cleodis {
 
 
 			if(ATF::affaire()->select($id_affaire, "affaire") != "BDOM + : ".ATF::affaire()->select($value, "affaire")){
-				log::logger("##############################################", "mfleurquin");
-				log::logger("Parent -->", "mfleurquin");
-				log::logger(ATF::affaire()->select($id_affaire, "ref"), "mfleurquin");
-				log::logger(ATF::affaire()->select($id_affaire, "affaire"), "mfleurquin");
+				log::logger("##############################################", "renouvellement");
+				log::logger("Parent -->", "renouvellement");
+				log::logger(ATF::affaire()->select($id_affaire, "ref"), "renouvellement");
+				log::logger(ATF::affaire()->select($id_affaire, "affaire"), "renouvellement");
 
 
-				log::logger("Fille -->", "mfleurquin");
-				log::logger(ATF::affaire()->select($value, "ref"), "mfleurquin");
-				log::logger(ATF::affaire()->select($value, "affaire"), "mfleurquin");
+				log::logger("Fille -->", "renouvellement");
+				log::logger(ATF::affaire()->select($value, "ref"), "renouvellement");
+				log::logger(ATF::affaire()->select($value, "affaire"), "renouvellement");
 			}
 
 
