@@ -1,0 +1,1 @@
+ALTER TABLE `affaire` ADD `renouveller` ENUM('oui','non') NOT NULL DEFAULT 'oui' AFTER `id_type_affaire`
