@@ -4361,9 +4361,23 @@ class affaire_assets extends affaire_cleodis {
 
 class affaire_go_abonnement extends affaire_cleodis {
 
+	function __construct($table_or_id=NULL) {
+		parent::__construct($table_or_id);
+
+		$this->colonnes['panel']['specifique_goa'] = array(
+			"specifique_goa"=>array("custom"=>true)
+	   	);
+	   	$this->panels['specifique_goa'] = array("visible"=>true, 'nbCols'=>1);
+
+		$this->fieldstructure();
+
+
+		$this->addPrivilege("updateSpecifiqueGOA");
+
+	}
+
 	/**
-	* Retourne la ref d'une affaire autre qu'avenant
-	* @author Mathieu Tribouillard <mtribouillard@absystech.fr>
+	* Retourne la ref d'une affaire
 	* @param int $id_parent
 	* @return string ref
 	*/
@@ -4396,5 +4410,20 @@ class affaire_go_abonnement extends affaire_cleodis {
 			$suffix="00001";
 		}
 		return $prefix.$suffix;
+	}
+
+	public function updateSpecifiqueGOA($infos) {
+
+		$id_affaire = $this->decryptId($infos["id_affaire"]);
+
+		ATF::db($this->db)->begin_transaction();
+		try {
+			$this->u(array("id_affaire"=>$id_affaire,  $infos["field"]=>$infos["value"]));
+			ATF::db($this->db)->commit_transaction();
+			ATF::$msg->addNotice(ATF::$usr->trans($infos['field'], $this->table)." modifié avec succes");
+		} catch(errorATF $e) {
+			ATF::db($this->db)->rollback_transaction();
+			throw $e;
+		}
 	}
 };
