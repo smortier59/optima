@@ -60,15 +60,14 @@ class facture_cleodis extends facture {
 			"prix"  => array("custom"=>true,"readonly"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
 		);
 
-		$this->colonnes['panel']["hors_tva"] = array(
-			"prix_sans_tva"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
-		);
-
-
 		$this->colonnes['panel']['dates_facture_libre'] = array(
 			"date_periode_debut_libre"=>array("custom"=>true,"xtype"=>"datefield"),
 			"date_periode_fin_libre"=>array("custom"=>true,"xtype"=>"datefield"),
 			"prix_libre"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
+		);
+
+		$this->colonnes['panel']["hors_tva"] = array(
+			"prix_sans_tva"=>array("custom"=>true,"formatNumeric"=>true,"xtype"=>"textfield")
 		);
 
 		$this->colonnes['panel']['midas'] = array(
@@ -2820,15 +2819,16 @@ class facture_cleodis extends facture {
 								$ligneNonVisible = $return;
 							}
 
-							$this->insert(array("facture"=> $facture,
-												"values_facture" =>
-													array(
-														"produits_repris" => json_encode($ligneRepris) ,
-														"produits" => json_encode($ligneVisible) ,
-														"produits_non_visible" => json_encode($ligneNonVisible) ,
-													)
-												)
-										);
+							$this->insert(array(
+								"facture"=> $facture,
+								"values_facture" =>
+									array(
+										"produits_repris" => json_encode($ligneRepris) ,
+										"produits" => json_encode($ligneVisible) ,
+										"produits_non_visible" => json_encode($ligneNonVisible) ,
+									)
+								)
+							);
 							$facture_insert ++;
 						}else{
 							$erreurs["Contrat non trouvé (".$data[$col_ref_affaire[0]].")"] .= $lineCompteur.", ";
@@ -3076,245 +3076,7 @@ class facture_cleodis extends facture {
 
 };
 
-class facture_cleodisbe extends facture_cleodis {
-
-
-	/** Mise en place du contenu
-     * @author Nicolas BERTEMONT <nbertemont@absystech.fr>
-	 * @author Mathieu TRIBOUILLARD <mtribouillard@absystech.fr>
-     * @param array $sheets : contient les 5 onglets
-     * @param array $infos : contient tous les enregistrements
-     */
-    /* public function ajoutDonnees(&$sheet,$infos){
-		$row_auto=1;
-		$increment=0;
-		foreach ($infos as $key => $item) {
-			$increment++;
-			if($item){
-				//initialisation des données
-				$devis=ATF::devis()->select_special("id_affaire",$item['facture.id_affaire_fk']);
-				$societe = ATF::societe()->select($item['facture.id_societe_fk']);
-				if($id_refinanceur = ATF::demande_refi()->id_refinanceur($item['facture.id_affaire_fk'])){
-					$refinanceur=ATF::refinanceur()->select($id_refinanceur);
-				}else{
-					$refinanceur=NULL;
-				}
-
-	 			$date=date("dmY",strtotime($item['facture.date']));
-				$affaire=ATF::affaire()->select($item['facture.id_affaire_fk']);
-				if($increment>999){
-					$reference="F".date("ym",strtotime($item['facture.date'])).$increment;
-				}elseif($increment>99){
-					$reference="F".date("ym",strtotime($item['facture.date']))."0".$increment;
-				}elseif($increment>9){
-					$reference="F".date("ym",strtotime($item['facture.date']))."00".$increment;
-				}else{
-					$reference="F".date("ym",strtotime($item['facture.date']))."000".$increment;
-				}
-
-
-
-				$refinancement = "";
-
-				ATF::demande_refi()->q->reset()->where("id_affaire",$item['facture.id_affaire_fk'],"AND")
-											   ->where("etat","valide");
-				$ResRefinancement = ATF::demande_refi()->select_row();
-
-				if($ResRefinancement){
-					$refinancement = ATF::refinanceur()->select($ResRefinancement["id_refinanceur"] , "refinanceur");
-				}
-
-
-				// Récupération de : Date de debut, de fin et de prélèvement
-				$dateDebut = " ".date("d/m/y",strtotime($item['facture.date_periode_debut']));
-				$dateFin = " ".date("d/m/y",strtotime($item['facture.date_periode_fin']));
-				$datePrelevement = " ".date("dmY",strtotime($item['facture.date_periode_debut']." + ".$affaire['date_previsionnelle']." DAY"));
-
-
-				$infos_commande = ATF::commande()->select($this->select($item['facture.id_facture_fk'] , "id_commande"));
-
-
-				$libelle = 'F'.$item['facture.id_facture'].'-'.$societe['code_client'].'/'.$societe['societe'];
-
-
-				//Facture Cout copie
-				if($item["facture.type_facture"] == "libre" && $item["facture.type_libre"] == "cout_copie"){
-					$compte1 = "411000";
-					$compte2 = "707230";
-					$compte3 = "707230";
-					$compte4 = "445710";
-				}else if($item["facture.type_facture"] == "refi"){
-					//Facture refinancement
-					$compte1 = "411000";
-					$compte2 = "707110";
-					$compte3 = "707110";
-					$compte4 = "445710";
-					$dateDebut = "";
-					$dateFin = "";
-				}else if($refinancement == "BELFIUS LEASE SERVICES"){
-					$compte1 = "411300";
-					$compte2 = "707110";
-					$compte3 = "707110";
-					$compte4 = "445710";
-				}else if(strtotime($infos_commande['date_debut']) > strtotime($item['facture.date_periode_debut'])){
-
-					//Refinancé et autre CLEODIS BE
-					if($refinancement !== "" && $refinancement !== "CLEODIS BE"){
-						// Prorata sur contrat refinance
-						$compte1 = "411000";
-						$compte2 = "706300";
-						$compte3 = "706300";
-						$compte4 = "445710";
-					} else {
-						// Prorata sur contrat autoporte
-						$compte1 = "411000";
-						$compte2 = "706200";
-						$compte3 = "706200";
-						$compte4 = "445710";
-					}
-				}else if((strtotime($infos_commande['date_evolution']) < strtotime($item['facture.date_periode_debut']))
-					){
-					// Prolongation/Restitution CLEODIS BE
-					$compte1 = "411000";
-					$compte2 = "707230";
-					$compte3 = "707230";
-					$compte4 = "445710";
-				} else {
-					//Autoporte CLEODIS BE
-					$compte1 = "411000";
-					$compte2 = "706200";
-					$compte3 = "706200";
-					$compte4 = "445710";
-				}
-
-				//insertion des donnÃ©es
-				for ($i = 1; $i <= 4; $i++) {
-					$row_data=array();
-					if($i==1){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["D"]=$compte1;
-
-						if($item['facture.type_facture']=="refi"){
-							$row_data["E"]=$refinanceur['code_refi']." ".$refinanceur["refinanceur"];
-						}else{
-							$row_data["E"]=$societe["code_client"];
-						}
-
-						if($item['facture.prix']<0){
-							$row_data["F"]='C';
-						}else{
-							$row_data["F"]='D';
-						}
-
-
-						$row_data["G"]=round(abs($item['facture.prix']*$item['facture.tva']),2);
-
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-						$row_data["K"]=$dateDebut;
-						$row_data["L"]=$dateFin;
-						$row_data["M"]=$datePrelevement;
-						$row_data["N"]=$refinancement;
-					}elseif($i==2){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["D"]=$compte2;
-
-						if($item['facture.prix']<0){
-							$row_data["F"]='D';
-						}else{
-							$row_data["F"]='C';
-						}
-						$row_data["G"]=abs($item['facture.prix']);
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-						$row_data["K"]=$dateDebut;
-						$row_data["L"]=$dateFin;
-						$row_data["M"]=$datePrelevement;
-						$row_data["N"] = $refinancement;
-					}elseif($i==3){
-						$row_data["A"]='A1';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["D"]= $compte3;
-						if($item['facture.prix']<0){
-							$row_data["F"]='D';
-						}else{
-							$row_data["F"]='C';
-						}
-						$row_data["G"]=abs($item['facture.prix']);
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-
-						if($affaire["nature"]=="avenant"){
-							$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."AV ";
-						}else{
-							$row_data["J"]=" 20".substr($affaire["ref"],0,7).$societe["code_client"]."00 ";
-						}
-
-						$row_data["K"]=$dateDebut;
-						$row_data["L"]=$dateFin;
-						$row_data["M"]=$datePrelevement;
-						$row_data["N"]=$refinancement;
-
-					}elseif($i==4){
-						$row_data["A"]='G';
-						$row_data["B"]=" ".$date;
-						$row_data["C"]='VEN';
-						$row_data["D"]=$compte4;
-						$row_data["E"]='';
-						$row_data["F"]='C';
-						$row_data["G"]=abs(($item['facture.prix']*$item['facture.tva'])-$item['facture.prix']);
-						$row_data["H"]=$libelle;
-						$row_data["I"]=$reference;
-						$row_data["K"]=$dateDebut;
-						$row_data["L"]=$dateFin;
-						$row_data["M"]=$datePrelevement;
-						$row_data["N"]=$refinancement;
-					}
-
-
-					if($row_data){
-						$indexCol = 0;
-						if($infos["rejet"]){
-							if($row_data["G"] != 0){
-								$row_auto++;
-								foreach($row_data as $col=>$valeur){
-									if (($col === "B" || $col === "M") && $valeur ) {
-										$dateTime = new DateTime($valeur);
-										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
-										$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
-									} else {
-										$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
-									}
-									$sheet->getColumnDimension($col)->setAutoSize(true);
-									$indexCol++;
-								}
-							}
-						}else{
-							$row_auto++;
-							foreach($row_data as $col=>$valeur){
-								if (($col === "B" || $col === "M") && $valeur ) {
-									$dateTime = new DateTime($valeur);
-									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
-									$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('ddmmyyyy');
-								} else {
-									$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, $valeur);
-								}
-								$sheet->getColumnDimension($col)->setAutoSize(true);
-								$indexCol++;
-							}
-						}
-					}
-				}
-			}
-		}
-	}*/
-
-};
+class facture_cleodisbe extends facture_cleodis { };
 class facture_cap extends facture_cleodis { };
 
 class facture_bdomplus extends facture_cleodis {
