@@ -15864,7 +15864,11 @@ class pdf_go_abonnement extends pdf_cleodis {
 		$this->cadre(75,$y,60,13,$cadre);
 
 		//CADRE Facture
-		$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["ref"]?"-".$this->client["ref"]:NULL),"align"=>"C"));
+		if ($this->facture["ref_externe"]) {
+			$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref_externe'],"align"=>"C"));
+		} else {
+			$cadre = array(array("txt"=>"N° de facture : ".$this->facture['ref'].($this->client["ref"]?"-".$this->client["ref"]:NULL),"align"=>"C"));
+		}
 		$this->cadre(140,$y,60,13,$cadre);
 
 		if ($this->lignes) {
