@@ -861,7 +861,7 @@ class facturation extends classes_optima {
 		if($tu){
 			$this->q->addCondition("`societe`.`code_client`","TU");
 		}
-//$this->q->addCondition("`societe`.`id_societe`",1499);
+
 
 
 		$facturation=$this->sa();
@@ -902,7 +902,10 @@ class facturation extends classes_optima {
 
 					if($id_facture!="montant_zero"){
 
-						if($item["type"]!="prolongation"){
+
+						// On envoi les factures de prolongation dont l"echeance est déja présente, uniquement pour GO Abonnement
+						if($item["type"]!="prolongation" || ATF::$codename == "go_abonnement"){
+
 							//Enlever les factures envoyées par mail
 							if(!$contact["email"] && !$contact["email_perso"]){
 								if($affaire["id_type_affaire"] == $type_affaire2SI){
