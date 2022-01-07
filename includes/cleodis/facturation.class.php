@@ -1703,4 +1703,4 @@ class facturation_boulanger extends facturation { };
 
 class facturation_go_abonnement extends facturation {
 	public $user_facturation = array(16,116);
- };
+};
