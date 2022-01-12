@@ -4100,31 +4100,31 @@ class facture_go_abonnement extends facture_cleodis {
 				}
 
 				$choix = "defaut";
-				$code_libele = "F";
+				$code_libelle = "F";
 
 				if ($item["facture.type_facture"] === "facture") {
 					if ($item["facture.prix"] > 0) {
 						$choix = "facture_mensuelle";
 					} else {
-						$choix = "avoir_facture_mensuelle";
-						$code_libele = "A";
+
 					}
 				} elseif ($item["facture.type_facture"] == "libre") {
-					if ($item["facture.nature"] == "prorata") {
+					if ($item["facture.type_libre"] == "prorata") {
 						if ($item["facture.prix"] > 0) {
 							$choix = "facture_prorata";
 						} else {
 							$choix = "avoir_facture_prorata";
-							$code_libele = "A";
+							$code_libelle = "A";
 						}
-					}
-
-					if ($item["facture.nature"] == "prolongation") {
+					}elseif ($item["facture.nature"] == "engagement" || $item["facture.nature"] == "contrat") {
+						$choix = "avoir_facture_mensuelle";
+						$code_libelle = "A";
+					}elseif ($item["facture.nature"] == "prolongation") {
 						if ($item["facture.prix"] > 0) {
 							$choix = "facture_prolongation";
 						} else {
 							$choix = "avoir_facture_prolongation";
-							$code_libele = "A";
+							$code_libelle = "A";
 						}
 					}
 				}
@@ -4188,7 +4188,7 @@ class facture_go_abonnement extends facture_cleodis {
 							$ligne[2]["D"] = "706400";
 							$ligne[3]["D"] = "445710";
 							if ($item["facture.prix"] < 0) {
-								$code_libele = "A";
+								$code_libelle = "A";
 								$ligne[1]["F"] = "C";
 								$ligne[2]["F"] = "D";
 								$ligne[3]["F"] = "D";
@@ -4198,7 +4198,7 @@ class facture_go_abonnement extends facture_cleodis {
 							$ligne[2]["D"] = "706500";
 							$ligne[3]["D"] = "445710";
 							if ($item["facture.prix"] < 0) {
-								$code_libele = "A";
+								$code_libelle = "A";
 								$ligne[1]["F"] = "C";
 								$ligne[2]["F"] = "D";
 								$ligne[3]["F"] = "D";
@@ -4215,7 +4215,7 @@ class facture_go_abonnement extends facture_cleodis {
 					$row_data["B"] = $item['facture.date'];
 					$row_data["C"] = 'VEN';
 					$row_data["D"] = $value["D"];
-					$row_data["E"] = $code_libele;
+					$row_data["E"] = $code_libelle;
 					$row_data["F"] = $value["F"];
 
 					switch($key) {
