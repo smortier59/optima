@@ -904,7 +904,7 @@ class facturation extends classes_optima {
 
 
 						// On envoi les factures de prolongation dont l"echeance est déja présente, uniquement pour GO Abonnement
-						if($item["type"]!="prolongation" || ATF::$codename == "go_abonnement"){
+						//if($item["type"]!="prolongation" || ATF::$codename == "go_abonnement"){
 
 							//Enlever les factures envoyées par mail
 							if(!$contact["email"] && !$contact["email_perso"]){
@@ -966,7 +966,7 @@ class facturation extends classes_optima {
 								$non_envoye=$this->formateTabfacturer($non_envoye,$item,"client_non_envoye",false,$item["type"]);
 								$tab=$this->incrementeFacture($tab,$item["type"],false);
 							}
-						}
+						//}
 
 						log::logger("Création facture contrat de l'affaire ".$affaire["ref"],__CLASS__);
 					}else{
