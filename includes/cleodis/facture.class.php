@@ -4187,7 +4187,7 @@ class facture_go_abonnement extends facture_cleodis {
 							$ligne[1]["D"] = "0G000012";
 							$ligne[2]["D"] = "706400";
 							$ligne[3]["D"] = "445710";
-							if ($item["facture.prix"] < 0) {
+							if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
 								$code_libelle = "A";
 								$ligne[1]["F"] = "C";
 								$ligne[2]["F"] = "D";
