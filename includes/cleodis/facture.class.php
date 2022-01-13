@@ -4086,15 +4086,16 @@ class facture_go_abonnement extends facture_cleodis {
 			$increment++;
 			if($item){
 
-				log::logger($item , "mfleurquin");
+				$id_affaire = ATF::facture()->select($item["facture.id_facture_fk"], "id_affaire");
+				$id_societe = ATF::affaire()->select($id_affaire, "id_societe");
 
-				$num_chassis = ATF::affaire()->select($item["facture.id_affaire_fk"], "num_chassis");
+				$num_chassis = ATF::affaire()->select($id_affaire, "num_chassis");
 
 				$ligne = [];
 
 				// On recupere l'affaire pour voir si il y a un type d'affaire et si il n'y a pas de TVA sur Assurance
 				$sans_tva = false;
-				$id_type_affaire = ATF::affaire()->select($item["facture.id_affaire_fk"], "id_type_affaire");
+				$id_type_affaire = ATF::affaire()->select($id_affaire, "id_type_affaire");
 				if ($id_type_affaire) {
 					if (ATF::type_affaire()->select($id_type_affaire , "assurance_sans_tva") == "oui"){
 						$sans_tva = true;
@@ -4131,7 +4132,7 @@ class facture_go_abonnement extends facture_cleodis {
 					}
 				}
 
-				$ligne[1]["D"] = ATF::societe()->select($item["facture.id_societe_fk"], "ref");
+				$ligne[1]["D"] = ATF::societe()->select($id_societe, "ref");
 				$ligne[1]["F"] = "D";
 				$ligne[2]["F"] = "C";
 				$ligne[3]["F"] = "C";
