@@ -4131,10 +4131,11 @@ class facture_go_abonnement extends facture_cleodis {
 					}
 				}
 
+				$ligne[1]["D"] = ATF::societe()->select($item["facture.id_societe_fk"], "ref");
 				$ligne[1]["F"] = "D";
 				$ligne[2]["F"] = "C";
 				$ligne[3]["F"] = "C";
-				$ligne[1]["D"] = ATF::societe()->select($item["facture.id_societe_fk"], "ref");
+
 
 
 
