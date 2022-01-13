@@ -2309,7 +2309,7 @@ class societe_go_abonnement extends societe_cleodis {
   */
   public function create_ref(&$s){
 
-    $ref = "GO";
+    $ref = "0G";
 
     //Recherche du maximum
     $max=$this->get_max_ref($ref);

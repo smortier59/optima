@@ -4073,18 +4073,20 @@ class facture_go_abonnement extends facture_cleodis {
         }
      }
 
-	 /** Mise en place du contenu
-	 * @author Morgan Fleurquin <mfleurquin@absystech.fr>
-     * @param array $sheets : contient l'onglet
-     * @param array $infos : contient tous les enregistrements
-     */
-     public function ajoutDonnees(&$sheet,$infos){
+	/** Mise en place du contenu
+	* @author Morgan Fleurquin <mfleurquin@absystech.fr>
+    * @param array $sheets : contient l'onglet
+    * @param array $infos : contient tous les enregistrements
+    */
+    public function ajoutDonnees(&$sheet,$infos){
 
 		$row_auto=1;
 		$increment=0;
 		foreach ($infos as $key => $item) {
 			$increment++;
 			if($item){
+
+				log::logger($item , "mfleurquin");
 
 				$num_chassis = ATF::affaire()->select($item["facture.id_affaire_fk"], "num_chassis");
 
@@ -4132,12 +4134,14 @@ class facture_go_abonnement extends facture_cleodis {
 				$ligne[1]["F"] = "D";
 				$ligne[2]["F"] = "C";
 				$ligne[3]["F"] = "C";
+				$ligne[1]["D"] = ATF::societe()->select($item["facture.id_societe_fk"], "ref");
+
 
 
 				switch ($choix) {
 					case "facture_mensuelle":
 					case "avoir_facture_mensuelle":
-						$ligne[1]["D"] = "0G000012";
+
 						$ligne[2]["D"] = "706200";
 						$ligne[3]["D"] = "445712";
 						$ligne[4]["D"] = "706500";
@@ -4153,7 +4157,6 @@ class facture_go_abonnement extends facture_cleodis {
 
 					case "facture_prorata":
 					case "avoir_facture_prorata":
-						$ligne[1]["D"] = "0G000011";
 						$ligne[2]["D"] = "706300";
 						$ligne[3]["D"] = "445715";
 						$ligne[4]["D"] = "706500";
@@ -4169,7 +4172,6 @@ class facture_go_abonnement extends facture_cleodis {
 
 					case "facture_prolongation":
 					case "avoir_facture_prolongation":
-						$ligne[1]["D"] = "0G000012";
 						$ligne[2]["D"] = "706220";
 						$ligne[3]["D"] = "445713";
 						$ligne[4]["D"] = "706500";
@@ -4184,7 +4186,6 @@ class facture_go_abonnement extends facture_cleodis {
 
 					default:
 						if ($item["facture.tva"] > 1) {
-							$ligne[1]["D"] = "0G000012";
 							$ligne[2]["D"] = "706400";
 							$ligne[3]["D"] = "445710";
 							if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
@@ -4194,7 +4195,6 @@ class facture_go_abonnement extends facture_cleodis {
 								$ligne[3]["F"] = "D";
 							}
 						} else {
-							$ligne[1]["D"] = "0G000012";
 							$ligne[2]["D"] = "706500";
 							$ligne[3]["D"] = "445710";
 							if ($item["facture.prix"] < 0 || $item["facture.type_facture"] == "avoir") {
@@ -4209,6 +4209,8 @@ class facture_go_abonnement extends facture_cleodis {
 
 				//insertion des donnÃ©es
 				foreach ($ligne as $key => $value) {
+
+
 					$row_data=array();
 
 					$row_data["A"] = '';
@@ -4245,10 +4247,13 @@ class facture_go_abonnement extends facture_cleodis {
 					$row_data["H"] = $item["facture.id_affaire"]."-".$item["facture.id_societe"] ;
 					$row_data["I"] = $item["facture.ref_externe"];
 					$row_data["J"] = substr($num_chassis, -10)." ";
-					$row_data["K"] = ($item['facture.date_periode_debut']) ? $item['facture.date_periode_debut'] : " ";
-					$row_data["L"] = ($item['facture.date_periode_fin']) ? $item['facture.date_periode_fin'] : " ";
-					$row_data["M"] = ($item['facture.date_previsionnelle']) ? $item['facture.date_previsionnelle'] : " ";;
+					$row_data["K"] = ($item['facture.date_periode_debut']) ? $item['facture.date_periode_debut'] : "";
+					$row_data["L"] = ($item['facture.date_periode_fin']) ? $item['facture.date_periode_fin'] : "";
+					$row_data["M"] = ($item['facture.date_previsionnelle']) ? $item['facture.date_previsionnelle'] : "";
 
+					if ($key == 4 && $item["facture.prix_sans_tva"] == 0) {
+						$row_data = array();
+					}
 
 
 
@@ -4256,7 +4261,7 @@ class facture_go_abonnement extends facture_cleodis {
 						$indexCol = 0;
 						$row_auto++;
 						foreach($row_data as $col=>$valeur){
-							if (($col === "B" || $col === "K" || $col === "L" || $col === "M") && $valeur ) {
+							if (($col === "B" || $col === "K" || $col === "L" || $col === "M") && $valeur !== "" ) {
 								$dateTime = new DateTime($valeur);
 								$sheet->setCellValueByColumnAndRow($indexCol , $row_auto, PHPExcel_Shared_Date::PHPToExcel( $dateTime ));
 								$sheet->getStyleByColumnAndRow($indexCol , $row_auto)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
