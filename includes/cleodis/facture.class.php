@@ -242,15 +242,11 @@ class facture_cleodis extends facture {
 				break;
 			case "prix":
 				if ($facture) {
-					log::logger($facture , "mfleurquin");
 
-					$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
+					if (ATF::$codename === "go_abonnement") {
+						$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
 
-					log::logger($type_affaire , "mfleurquin");
-					log::logger(ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") , "mfleurquin");
-
-					if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-						if (ATF::$codename == "go_abonnement") {
+						if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
 							if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
 								$prix=($periode["montant"]+$periode["frais_de_gestion"]);
 							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
@@ -258,18 +254,20 @@ class facture_cleodis extends facture {
 							}
 						} else {
 							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-								$prix=($periode["montant"]+$periode["frais_de_gestion"]);
+								$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
 							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
 								$prix=$facture["prix"];
 							}
 						}
 					} else {
 						if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-							$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
+							$prix=($periode["montant"]+$periode["frais_de_gestion"]);
 						}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
 							$prix=$facture["prix"];
 						}
 					}
+
+
 				}
 				if($prix){
 					return $prix;
@@ -279,30 +277,31 @@ class facture_cleodis extends facture {
 			case "prix_sans_tva":
 					$prix_sans_tva = 0;
 					if ($facture) {
-
-						$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
-						if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
-							if (ATF::$codename == "go_abonnement") {
-								if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
-									$prix_sans_tva=$periode["assurance"];
-								}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-									$prix_sans_tva=$facture["prix_sans_tva"];
+						if (ATF::$codename === "go_abonnement") {
+							$type_affaire = ATF::affaire()->select($facture['id_affaire'], "id_type_affaire");
+							if ($type_affaire && ATF::type_affaire()->select($type_affaire, "assurance_sans_tva") === "oui") {
+								if (ATF::$codename == "go_abonnement") {
+									if($periode = ATF::facturation()->next_echeance($facture['id_affaire'],true)){
+										$prix_sans_tva=$periode["assurance"];
+									}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+										$prix_sans_tva=$facture["prix_sans_tva"];
+									}
+								} else {
+									if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
+										$prix_sans_tva=$periode["assurance"];
+									}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
+										if ($facture["prix_sans_tva"]) {
+											$prix_sans_tva=$facture["prix_sans_tva"];
+										}
+									}
 								}
 							} else {
 								if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-									$prix_sans_tva=$periode["assurance"];
+									$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
 								}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
 									if ($facture["prix_sans_tva"]) {
 										$prix_sans_tva=$facture["prix_sans_tva"];
 									}
-								}
-							}
-						} else {
-							if($periode = ATF::facturation()->periode_facturation($facture['id_affaire'],true)){
-								$prix=($periode["montant"]+$periode["frais_de_gestion"]+$periode["assurance"]);
-							}elseif(ATF::affaire()->select($facture['id_affaire'],"nature"=="vente")){
-								if ($facture["prix_sans_tva"]) {
-									$prix_sans_tva=$facture["prix_sans_tva"];
 								}
 							}
 						}
