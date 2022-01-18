@@ -696,16 +696,7 @@ class societe_cleodis extends societe {
     // Si avis_credit change, on crée un suivi !
     $avis_credit = $this->select($infos["id_societe"],"avis_credit");
 
-    ATF::user()->q->reset()->where("login", "lhochart", "OR", "filles")
-							   ->where("login", "jlesueur", "OR", "filles");
-    $filles = ATF::user()->sa();
-
-    $notifie = "";
-    // $notifie = "106,133"; // 106 Lesueur Jennifer et 21 Severine Mazars, 133 Laure Hochart
-		foreach ($filles as $key => $value) {
-      $notifie .= ','.$value["id_user"];
-    }
-    $notifie = substr($notifie, 1);
+    $notifie = ATF::user()->getDestinataireFromConstante(' __NOTIFIE_AVIS_CREDIT_SOCIETE_UPDATE__');
 
 
     if (!preg_match("/".$this->select($infos["id_societe"],"id_owner")."/",$notifie)) {
